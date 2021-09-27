@@ -2,97 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC091C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C859C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:46:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B91C460F11
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B6A360FF2
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:46:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236080AbhI0SZM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 14:25:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51754 "EHLO mail.kernel.org"
+        id S236265AbhI0Ss3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 14:48:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59164 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229875AbhI0SZK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 14:25:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B08FD60F11;
-        Mon, 27 Sep 2021 18:23:31 +0000 (UTC)
+        id S234211AbhI0Ss2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Sep 2021 14:48:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 351AC60F70;
+        Mon, 27 Sep 2021 18:46:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632767012;
-        bh=PEfnJvnMLX3HzCxJvQOSm8TUcP24eAq+3o46ij/lCio=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QLX7Zbm4eAjOypOxP3TA0hEiGTi5+UE4LoaR/+AApBexUvYyohRYQVbI6jMzxjzjT
-         x7C7XuRfXr6R9vbREJgTXejWww6Lx5aCMT2aHSOGCp0SOLNXpE+mYwjX4WLlXSMT/v
-         ZQS+g0wnvpq2ujW9XJK1OJLZHddrXuJyi1DYhLxcyxKjd12eTHHdCDmnTrUleN96Fl
-         c0eXtldARexqmfxnp8zVCcFkE7CuqzWmIfQixgEC/+FST13Chzurawv41c4mZmdM3l
-         o92h+WUxGNbEEr32hKNpIE6ePp5Mommzze6dEOXkqbDFXVaeu5/hQN3ae0lE+I/uXl
-         B+LQXXK7y6xLA==
-Date:   Mon, 27 Sep 2021 21:23:28 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
-        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Message-ID: <YVIMIFxjRcfDDub4@unreal>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com>
- <YVGsMsIjD2+aS3eC@unreal>
- <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
+        s=k20201202; t=1632768410;
+        bh=aAUpJLAvxQ+tHaQKvkiHUoC8zvr3SDhJ8uiCDNoeqXs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=qzynkof5Gd1zNVPHo3jVrAnP115kuAFhtBukKFpONdjp87NprCm91HDbrE/owxdhZ
+         xxo+KOoGVV8xi+r/xixAGATY/mdBwwFHbvwyMTntL/h4E9NIije4CwzKImO+Ft2TkT
+         esRYtMPRx+sjIdI+yAhG+ZMuViJGWjFRbn/mUsDAUOmzw+aAGycJPSGKcxVsrEIzp8
+         X0mn6JIfspomXpax77aqWhehi+1mnH/vQ4jhS6hEKe6Mz0SIuDNSMiJKjScDPZ41Nq
+         qTUq0ayObtqPUirRQM9z42nmYatHl4UCiTIAydz4MMVW/EurQNGzuSW/wTRFFDwp+A
+         k19lzCPqTmXVQ==
+Date:   Mon, 27 Sep 2021 13:46:48 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: Re: [PATCH v3 03/20] PCI/P2PDMA: make pci_p2pdma_map_type()
+ non-static
+Message-ID: <20210927184648.GA667259@bhelgaas>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
+In-Reply-To: <20210916234100.122368-4-logang@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
+On Thu, Sep 16, 2021 at 05:40:43PM -0600, Logan Gunthorpe wrote:
+> pci_p2pdma_map_type() will be needed by the dma-iommu map_sg
+> implementation because it will need to determine the mapping type
+> ahead of actually doing the mapping to create the actual iommu mapping.
+
+I don't expect this to go via the PCI tree, but if it did I would
+silently:
+
+  s/PCI/P2PDMA: make pci_p2pdma_map_type() non-static/
+    PCI/P2PDMA: Expose pci_p2pdma_map_type()/
+  s/iommu/IOMMU/
+
+and mention what this patch does in the commit log (in addition to the
+subject) and fix a couple minor typos below.
+
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+
+> ---
+>  drivers/pci/p2pdma.c       | 24 +++++++++++++---------
+>  include/linux/pci-p2pdma.h | 41 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 56 insertions(+), 9 deletions(-)
 > 
-> On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
-> > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
-> > > To optimize performance, set the affinity of the block device tagset
-> > > according to the virtio device affinity.
-> > > 
-> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > ---
-> > >   drivers/block/virtio_blk.c | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > index 9b3bd083b411..1c68c3e0ebf9 100644
-> > > --- a/drivers/block/virtio_blk.c
-> > > +++ b/drivers/block/virtio_blk.c
-> > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
-> > >   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
-> > >   	vblk->tag_set.ops = &virtio_mq_ops;
-> > >   	vblk->tag_set.queue_depth = queue_depth;
-> > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
-> > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
-> > I afraid that by doing it, you will increase chances to see OOM, because
-> > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
-> > the latter mode only on specific NUMA which can be depleted.
+> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+> index 1192c465ba6d..b656d8c801a7 100644
+> --- a/drivers/pci/p2pdma.c
+> +++ b/drivers/pci/p2pdma.c
+> @@ -20,13 +20,6 @@
+>  #include <linux/seq_buf.h>
+>  #include <linux/xarray.h>
+>  
+> -enum pci_p2pdma_map_type {
+> -	PCI_P2PDMA_MAP_UNKNOWN = 0,
+> -	PCI_P2PDMA_MAP_NOT_SUPPORTED,
+> -	PCI_P2PDMA_MAP_BUS_ADDR,
+> -	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+> -};
+> -
+>  struct pci_p2pdma {
+>  	struct gen_pool *pool;
+>  	bool p2pmem_published;
+> @@ -841,8 +834,21 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+>  }
+>  EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
+>  
+> -static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+> -						    struct device *dev)
+> +/**
+> + * pci_p2pdma_map_type - return the type of mapping that should be used for
+> + *	a given device and pgmap
+> + * @pgmap: the pagemap of a page to determine the mapping type for
+> + * @dev: device that is mapping the page
+> + *
+> + * Returns one of:
+> + *	PCI_P2PDMA_MAP_NOT_SUPPORTED - The mapping should not be done
+> + *	PCI_P2PDMA_MAP_BUS_ADDR - The mapping should use the PCI bus address
+> + *	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE - The mapping should be done normally
+> + *		using the CPU physical address (in dma-direct) or an IOVA
+> + *		mapping for the IOMMU.
+> + */
+> +enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+> +					     struct device *dev)
+>  {
+>  	enum pci_p2pdma_map_type type = PCI_P2PDMA_MAP_NOT_SUPPORTED;
+>  	struct pci_dev *provider = to_p2p_pgmap(pgmap)->provider;
+> diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+> index 8318a97c9c61..caac2d023f8f 100644
+> --- a/include/linux/pci-p2pdma.h
+> +++ b/include/linux/pci-p2pdma.h
+> @@ -16,6 +16,40 @@
+>  struct block_device;
+>  struct scatterlist;
+>  
+> +enum pci_p2pdma_map_type {
+> +	/*
+> +	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally for indicating the mapping
+> +	 * type hasn't been calculated yet. Functions that return this enum
+> +	 * never return this value.
+> +	 */
+> +	PCI_P2PDMA_MAP_UNKNOWN = 0,
+> +
+> +	/*
+> +	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
+> +	 * traverse the host bridge and the host bridge is not in the
+> +	 * whitelist. DMA Mapping routines should return an error when
+> +	 * this is returned.
+> +	 */
+> +	PCI_P2PDMA_MAP_NOT_SUPPORTED,
+> +
+> +	/*
+> +	 * PCI_P2PDMA_BUS_ADDR: Indicates that two devices can talk to
+> +	 * eachother directly through a PCI switch and the transaction will
+> +	 * not traverse the host bridge. Such a mapping should program
+> +	 * the DMA engine with PCI bus addresses.
+
+s/eachother/each other/
+
+> +	 */
+> +	PCI_P2PDMA_MAP_BUS_ADDR,
+> +
+> +	/*
+> +	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
+> +	 * to eachother, but the transaction traverses a host bridge on the
+> +	 * whitelist. In this case, a normal mapping either with CPU physical
+> +	 * addresses (in the case of dma-direct) or IOVA addresses (in the
+> +	 * case of IOMMUs) should be used to program the DMA engine.
+
+s/eachother/each other/
+
+> +	 */
+> +	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+> +};
+> +
+>  #ifdef CONFIG_PCI_P2PDMA
+>  int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+>  		u64 offset);
+> @@ -30,6 +64,8 @@ struct scatterlist *pci_p2pmem_alloc_sgl(struct pci_dev *pdev,
+>  					 unsigned int *nents, u32 length);
+>  void pci_p2pmem_free_sgl(struct pci_dev *pdev, struct scatterlist *sgl);
+>  void pci_p2pmem_publish(struct pci_dev *pdev, bool publish);
+> +enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+> +					     struct device *dev);
+>  int pci_p2pdma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
+>  		int nents, enum dma_data_direction dir, unsigned long attrs);
+>  void pci_p2pdma_unmap_sg_attrs(struct device *dev, struct scatterlist *sg,
+> @@ -83,6 +119,11 @@ static inline void pci_p2pmem_free_sgl(struct pci_dev *pdev,
+>  static inline void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+>  {
+>  }
+> +static inline enum pci_p2pdma_map_type
+> +pci_p2pdma_map_type(struct dev_pagemap *pgmap, struct device *dev)
+> +{
+> +	return PCI_P2PDMA_MAP_NOT_SUPPORTED;
+> +}
+>  static inline int pci_p2pdma_map_sg_attrs(struct device *dev,
+>  		struct scatterlist *sg, int nents, enum dma_data_direction dir,
+>  		unsigned long attrs)
+> -- 
+> 2.30.2
 > 
-> This is a common methodology we use in the block layer and in NVMe subsystem
-> and we don't afraid of the OOM issue you raised.
-
-There are many reasons for that, but we are talking about virtio here
-and not about NVMe.
-
-> 
-> This is not new and I guess that the kernel MM will (or should) be handling
-> the fallback you raised.
-
-I afraid that it is not. Can you point me to the place where such
-fallback is implemented?
-
-> 
-> Anyway, if we're doing this in NVMe I don't see a reason to afraid doing it
-> in virtio-blk.
-
-Still, it is nice to have some empirical data to support this copy/paste.
-
-There are too many myths related to optimizations, so finally it will be
-good to get some supportive data.
-
-Thanks
