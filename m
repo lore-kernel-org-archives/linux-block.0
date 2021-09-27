@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AABC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7AFC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:29:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5713661058
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:28:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC2A361058
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:29:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237656AbhI0Wa0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:30:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57052 "EHLO
+        id S237704AbhI0Waj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:30:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237545AbhI0WaZ (ORCPT
+        with ESMTP id S237444AbhI0Waj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:30:25 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327FBC061765
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 15:28:47 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id r75so24850991iod.7
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 15:28:47 -0700 (PDT)
+        Mon, 27 Sep 2021 18:30:39 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A71C061575
+        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 15:29:00 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id b6so21124089ilv.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 15:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
         bh=w9ezsQ1UkQZeC53NkFhy7B+1aNQW9TNDf1kl1c4M4R4=;
-        b=Ah7jkIIctR0HcnVgB5sWbeUdZwsGT2EehBK4lb+q32xOVavNWfD82zKlDGRJA1B4PM
-         /2U90/0SvcC9l1r+IDSlahEN/NC+QMNdf8OLk/ooOlydqwz6QGg8wDViFrkfEGikp/c3
-         /Q8A/XGE1SZVGZ1hcLnLB6Er8MX1tmX3kUoUHTd8fZUIlpDxvC5pwUQYipgCc7oJVSI+
-         rkiNvqR6Uh37Z5l+Gj9S3tYzBLrJ2DlUD27NmkKUe2vWKFh1TgA7VLVoziOPGtTGPqo8
-         dcSrTDLSWV/lT8K2aextSKUoXJ59tNYXOpE1Usf4pH7xnmSPdZY6piFtoxoW38lIHPW7
-         +BBQ==
+        b=Ffjc9XDV39XVuLIm8DJDvOIHuyWwHa/JDveqkJIq4EPQcwwF6i2IwXvqTayH1Zs+J0
+         zBBIHTdeujFBpyTsi7j+hLC6dG1lmzreXcsCJibD0ZHuJdAABtpVv3xmIelWiJg4Kiwx
+         y74YiDFOoIziOuEp0bFDeka+WbUijbofv2enBSkOGJFIlEwWIxbA3L0TdOIDNHbvW4s3
+         UX5WZ/WNqYbm3RB9OdDLcEyEdxxaBYh8+Ce09lqPv5Y/yeoNEYf2H8gl9ZQ2Gx73QUuz
+         bK1mNwQj3yvOA8l/cfkBNHF9G4YJ0ALLNw+vW7N07eAC0HlFOVJ1jxEY1tUin9ivF4Jg
+         GOjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=w9ezsQ1UkQZeC53NkFhy7B+1aNQW9TNDf1kl1c4M4R4=;
-        b=LUoiJwRMGIuSAuW6lGR7HqWwiGklf211MjiFsn/agwC9NyryuYNfeLKgKevRcfIclY
-         y5/ZpOv7zQWD2vsQig90ZdUnxqzUL8uazRa/4M2WLqQ9xVApDRbSTJi4SOjwdsainF8a
-         XR+77JV6AYni2qSFntUpUjiHad6W8+uZUHbRXURxS6OKGynxs2qeX9EGXf5dIZvfmU8M
-         WoLxwwqV0WsahoEqLgngKE62RiZTyty1lefl93gYORNP8YXuAij+CJn/GnLMMqv3O5W8
-         tZ53V8AehEEXMrts56GiZN8rE3sXA37C61Dl32uBX+c8oubx7ZhaUjGOLvfp+7PuMwDe
-         pknA==
-X-Gm-Message-State: AOAM5316C8tZt+gX5D/TMd2IgQqIgOo2eC4+o/zSqstkZnPCxYaaNbJt
-        fCzIrHWkTr2MliY8//1H1i8LNg==
-X-Google-Smtp-Source: ABdhPJztY3mK3ksoDQMf3OrQ8dUSONHNyLP4EfHo/dO6kIiAhPp9t/W2Pe9f9RD+PJfpbL6A6UQe4w==
-X-Received: by 2002:a02:22cf:: with SMTP id o198mr1814887jao.37.1632781726231;
-        Mon, 27 Sep 2021 15:28:46 -0700 (PDT)
+        b=L5s5GyGGRJdtlezHv1u7aKO59bmSlFQw0RnW2cxhR74mtOjlu5PVtmBg3ZU54o0ztO
+         fjelgYQvjVWXK4AWgoR4iyDt+a0lagtRzGr2c89b9ycqmVeTZJKXra4u2LahHzDpYkPU
+         I4tehGtZFfCOuHo4Sj+b6rU4rWnvMYbZqa6pk4Pt3rp0Xx4bfkj8el7hFt6NfHg7mAL1
+         ZCfpGe/ZbHb5nhmqT5zehqCjAwHJIZPOH9F1NcgBbMKLAIuNj+LYz6BIcNndZDW88xzb
+         qfrJhBy5MUdS7NLICqth0J9CnhUQC8PiX3tO8Eo/LAXHvJbVJuC0lNbI4RtT8rCB3rPt
+         c47Q==
+X-Gm-Message-State: AOAM531xbb1pr8jWaBnd5+dVLnyL8Md76gP+itpbM1QvllJ1bOVImhxi
+        IaU76M5U327REtsIn4fJFML2hw==
+X-Google-Smtp-Source: ABdhPJz2QpC01URNtiA6TI68tVS50xc5AHbinQF2wOnvWrWvzOWk+mcoidVwrUAWxR5vBmrTJemKng==
+X-Received: by 2002:a05:6e02:661:: with SMTP id l1mr1855976ilt.122.1632781740297;
+        Mon, 27 Sep 2021 15:29:00 -0700 (PDT)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id e13sm9446741iod.36.2021.09.27.15.28.44
+        by smtp.gmail.com with ESMTPSA id z25sm7614559iow.20.2021.09.27.15.28.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Sep 2021 15:28:45 -0700 (PDT)
-Subject: Re: [PATCH v4 5/6] loop: add error handling support for add_disk()
+        Mon, 27 Sep 2021 15:28:59 -0700 (PDT)
+Subject: Re: [PATCH v4 6/6] nbd: add error handling support for add_disk()
 To:     Luis Chamberlain <mcgrof@kernel.org>, martin.petersen@oracle.com,
         jejb@linux.ibm.com, kbusch@kernel.org, sagi@grimberg.me,
         adrian.hunter@intel.com, beanhuo@micron.com,
@@ -65,14 +65,14 @@ Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>
 References: <20210927215958.1062466-1-mcgrof@kernel.org>
- <20210927215958.1062466-6-mcgrof@kernel.org>
+ <20210927215958.1062466-7-mcgrof@kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1cd6103b-1251-cc22-93ad-da7f207147b4@kernel.dk>
-Date:   Mon, 27 Sep 2021 16:28:43 -0600
+Message-ID: <dc945e14-498b-2cc1-8ef3-8dcaacfb948c@kernel.dk>
+Date:   Mon, 27 Sep 2021 16:28:58 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210927215958.1062466-6-mcgrof@kernel.org>
+In-Reply-To: <20210927215958.1062466-7-mcgrof@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
