@@ -2,118 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405C1C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B97D4C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A21560EB4
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:09:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A17366054F
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:16:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233370AbhI0IL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 04:11:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37297 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233300AbhI0IL3 (ORCPT
+        id S233468AbhI0ISK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 04:18:10 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:36946 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233478AbhI0ISK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 04:11:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632730191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=l5HpZigQlfyuuUZ5v+ofmgDie9ICzyMUm/Yd5LeQNgs=;
-        b=Zl0pVuaBGhKjZ91cq4sV7i64vlKU3SjFTmY+OKJVP0FR1uH6ANNnc20s1MvT+8WdUik7E9
-        03Shkqvm2JL7OJXhA9REv4VDHRXmrqDmbBzmdAJyN33qSIEIzLJgk/h93oWIXYspbLH3iR
-        sDiwAB4iF08tRUETnwcNVcKptLRDA1I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-_aKQvTj3OGGAeQFzAmzX2g-1; Mon, 27 Sep 2021 04:09:45 -0400
-X-MC-Unique: _aKQvTj3OGGAeQFzAmzX2g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 27 Sep 2021 04:18:10 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4518010168C3;
-        Mon, 27 Sep 2021 08:09:44 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4750C6B54F;
-        Mon, 27 Sep 2021 08:09:41 +0000 (UTC)
-Date:   Mon, 27 Sep 2021 10:09:40 +0200
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
-        israelr@nvidia.com, hch@infradead.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Message-ID: <YVF8RBZSaJs9BScd@stefanha-x1.localdomain>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A909F1FF54;
+        Mon, 27 Sep 2021 08:16:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1632730591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EX5b2PoTJyve491JeLW2N7TfMIYrD37foMnGr9CA/0w=;
+        b=rKyLH5uL9Cj+5X6l5/QRZY/PiRqBJ6UzOmpYP9JzcNqrrqHcOeoCVYhbJl7TBs004Qdqua
+        MSuqFPVfF0N7/YfniGlmwGi14iA3E6hEQlFg2ObxCUmQ31vQ3NvKubTC84FjuNlzRPoc2a
+        1RHgzsPF8Wt9JpJasJP6vrgajSAEhLY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1632730591;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EX5b2PoTJyve491JeLW2N7TfMIYrD37foMnGr9CA/0w=;
+        b=VJUy5/syye5jIsbJ3kProycBldLTpI2ktTMoIrZxxKZk1/fykHONwU6+Bc7FaE4N8/BgOP
+        xoBKI72jxh64cDBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 461EC13A42;
+        Mon, 27 Sep 2021 08:16:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id aiz+BN19UWEsRwAAMHmgww
+        (envelope-from <colyli@suse.de>); Mon, 27 Sep 2021 08:16:29 +0000
+Subject: Re: [PATCH v3 3/6] badblocks: improvement badblocks_set() for
+ multiple ranges handling
+To:     Geliang Tang <geliangtang@gmail.com>
+Cc:     antlists@youngman.org.uk, Dan Williams <dan.j.williams@intel.com>,
+        nvdimm@lists.linux.dev, linux-raid@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>
+References: <20210913163643.10233-1-colyli@suse.de>
+ <20210913163643.10233-4-colyli@suse.de>
+ <8efbe758-74e4-32ea-d41e-639b750b27c0@gmail.com>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <8c1f4bc4-20c9-4711-4038-c23be7ae9a80@suse.de>
+Date:   Mon, 27 Sep 2021 16:16:27 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="fF+gM4A/h2gK2jIm"
-Content-Disposition: inline
-In-Reply-To: <20210926145518.64164-2-mgurtovoy@nvidia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <8efbe758-74e4-32ea-d41e-639b750b27c0@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/27/21 3:30 PM, Geliang Tang wrote:
+> On 9/14/21 00:36, Coly Li wrote:
 
---fF+gM4A/h2gK2jIm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[snipped]
+>> + * 2.1.1) If S and E are both acked or unacked range, the setting 
+>> range S can
+>> + *    be merged into existing bad range E. The result is,
+>> + *        +-------------+
+>> + *        |      S      |
+>> + *        +-------------+
+>> + * 2.1.2) If S is uncked setting and E is acked, the setting will be 
+>> dinied, and
+>
+> uncked -> unacked
+> dinied?
+>
 
-On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
-> To optimize performance, set the affinity of the block device tagset
-> according to the virtio device affinity.
->=20
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->  drivers/block/virtio_blk.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 9b3bd083b411..1c68c3e0ebf9 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
->  	vblk->tag_set.ops =3D &virtio_mq_ops;
->  	vblk->tag_set.queue_depth =3D queue_depth;
-> -	vblk->tag_set.numa_node =3D NUMA_NO_NODE;
-> +	vblk->tag_set.numa_node =3D virtio_dev_to_node(vdev);
->  	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
->  	vblk->tag_set.cmd_size =3D
->  		sizeof(struct virtblk_req) +
+You are correct, it should be unacked.
 
-I implemented NUMA affinity in the past and could not demonstrate a
-performance improvement:
-https://lists.linuxfoundation.org/pipermail/virtualization/2020-June/048248=
-=2Ehtml
+>> + *    the result is,
+>> + *        +-------------+
+>> + *        |      E      |
+>> + *        +-------------+
+>> + * 2.1.3) If S is acked setting and E is unacked, range S can 
+>> overwirte on E.
+>> + *    An extra slot from the bad blocks table will be allocated for 
+>> S, and head
+>> + *    of E will move to end of the inserted range E. The result is,
+>> + *        +--------+----+
+>> + *        |    S   | E  |
+>> + *        +--------+----+
+>> + * 2.2) The setting range size == already set range size
+>> + * 2.2.1) If S and E are both acked or unacked range, the setting 
+>> range S can
+>> + *    be merged into existing bad range E. The result is,
+>> + *        +-------------+
+>> + *        |      S      |
+>> + *        +-------------+
+>> + * 2.2.2) If S is uncked setting and E is acked, the setting will be 
+>> dinied, and
+>
+> uncked -> unacked
 
-The pathological case is when a guest with vNUMA has the virtio-blk-pci
-device on the "wrong" host NUMA node. Then memory accesses should cross
-NUMA nodes. Still, it didn't seem to matter.
+Yes, thanks for pointing out the typo. I will fix them in next version.
 
-Please share your benchmark results. If you haven't collected data yet
-you could even combine our patches to see if it helps. Thanks!
+[snipped]
+>> +/* Do exact work to set bad block range into the bad block table */
+>> +static int _badblocks_set(struct badblocks *bb, sector_t s, int 
+>> sectors,
+>> +              int acknowledged)
+>> +{
+>> +    u64 *p;
+>> +    struct badblocks_context bad;
+>> +    int prev = -1, hint = -1;
+>> +    int len = 0, added = 0;
+>> +    int retried = 0, space_desired = 0;
+>> +    int rv = 0;
+>> +    unsigned long flags;
+>
+> orig_start and orig_len are used in _badblocks_set() only, we can drop 
+> them from struct badblocks_context, declare two local variables instead:
+>
+>         sector_t orig_start;
+>         int orig_len;
+>
 
-Stefan
+It's fair, let me change it in next version.
 
---fF+gM4A/h2gK2jIm
-Content-Type: application/pgp-signature; name="signature.asc"
+[snipped]
 
------BEGIN PGP SIGNATURE-----
+Thanks for your review!
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFRfEMACgkQnKSrs4Gr
-c8ijxgf/WJsZGMwBy3P0wAF4J4oXhH44ONmgK3OJh5n9i3QtyVEG73LkgnD5Gf9M
-9NZnRYgfeYce3jD3ymDS6xk/lqY205H+O1ZYUvFo4Kn/w3hJvpstwbgMKk6sm4XB
-NXsaB+0M7gsAm0HVgWzkDqanzOSLMFJZpF0Lvtj6/+9NYyRvBXbFkP6vCfLQEoQw
-0YB+df/mv5UMjUXg0BxiXrMalaQ6po2bNAhBe3PmMXsVIr3wG/gyyUxyugKyZFeK
-KE/I4zTmsgqO/72E5c9On7mSF5zZvQNLA00K29ENsGZbprNodTcDhqdaNhwRdSCw
-SOku06A0BIXyZlgMKBqTxm8nW5XX4A==
-=sWXI
------END PGP SIGNATURE-----
-
---fF+gM4A/h2gK2jIm--
-
+Coly Li
