@@ -2,53 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DCACC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAE1C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A8B061157
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE1E5610A2
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237536AbhI0WCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50716 "EHLO
+        id S237723AbhI0WCf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:02:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237306AbhI0WCH (ORCPT
+        with ESMTP id S237684AbhI0WC3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:02:07 -0400
+        Mon, 27 Sep 2021 18:02:29 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928FAC061765;
-        Mon, 27 Sep 2021 15:00:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A266EC06176E;
+        Mon, 27 Sep 2021 15:00:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=eOGl5IZyZNnFXmP+I7kKDBQKd7BBidBOUcZv+xPQqWI=; b=lliCu+eKd3V1P+/sYJ0yd2PCrh
-        9ELPfdPTivFsxLYVUQdamOKpTZQ5EjeWqzTGXImkFZuCCORPUD+0L7y3MbC4152PxLGq8Q1x3nR/y
-        WbH9zYoGLr25pTRIqdL8Iu252s6oS8y94K/V+SoZG/YWmCX6lWaIFAVta7RgjUzwN4eZpHHbAljny
-        jv2QEBGFzrDs1l7laCe38Z7KLC4Fkl4R9S9hCiIPX6RUKp9M4N4rKNplc99ZW22MSmEaB6Zf+XayC
-        yn1e0cU462V4kxPmlszoM+JuCqTn1LzCOZ63BKAAsE7Uby00tY6XZZ6oGKLaoejvN+6vYqRkn+h/6
-        FCYNbmoQ==;
+        bh=vmoV/2yvLiwBFQQklXCjpC+/vAkb2GZd/kil2P+K9LY=; b=1N4JPqGLhLSNsS1Cgb2YIwsly7
+        +aW4YwpCslJYpkXAks9L5PAknlJFJXGDyS2ZEpaD2M0hKp7uuxemDnq0kmn0PiKNEhZfT3xU5OE2B
+        NEIidZ82kagd9xiTvY4QBVhmfjUldvqMwEvJy3GCCTADP8JJLfZaVXaqvSZjYvDbf4jwE6N+/UCCO
+        nFCZarCbKs9WvILUUJzj8n4GKX9IADqiqMHNghfdRfc0+glrPy84n7AImXEvFcu5sIum2O+W4K3/v
+        voAp9xetJTWmWSHjJcDRqvnSUKtPXEmI0SsH4et/rU0BJwVZAwXRe6CxRMvzIZNqW955VNmdGfG+F
+        VLf4/Vkw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUyfM-004SV3-Vt; Mon, 27 Sep 2021 22:00:05 +0000
+        id 1mUyfw-004Sv0-HC; Mon, 27 Sep 2021 22:00:40 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
-        kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
-        beanhuo@micron.com, ulf.hansson@linaro.org, avri.altman@wdc.com,
-        swboyd@chromium.org, agk@redhat.com, snitzer@redhat.com,
-        josef@toxicpanda.com
-Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
-        ming.lei@redhat.com, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
-        dm-devel@redhat.com, nbd@other.debian.org,
+To:     axboe@kernel.dk, colyli@suse.de, kent.overstreet@gmail.com,
+        kbusch@kernel.org, sagi@grimberg.me, vishal.l.verma@intel.com,
+        dan.j.williams@intel.com, dave.jiang@intel.com,
+        ira.weiny@intel.com, konrad.wilk@oracle.com, roger.pau@citrix.com,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        sstabellini@kernel.org, minchan@kernel.org, ngupta@vflare.org,
+        senozhatsky@chromium.org
+Cc:     xen-devel@lists.xenproject.org, nvdimm@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-bcache@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v4 5/6] loop: add error handling support for add_disk()
-Date:   Mon, 27 Sep 2021 14:59:57 -0700
-Message-Id: <20210927215958.1062466-6-mcgrof@kernel.org>
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v2 05/10] nvdimm/btt: use goto error labels on btt_blk_init()
+Date:   Mon, 27 Sep 2021 15:00:34 -0700
+Message-Id: <20210927220039.1064193-6-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210927215958.1062466-1-mcgrof@kernel.org>
-References: <20210927215958.1062466-1-mcgrof@kernel.org>
+In-Reply-To: <20210927220039.1064193-1-mcgrof@kernel.org>
+References: <20210927220039.1064193-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
@@ -56,42 +55,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We never checked for errors on add_disk() as this function
-returned void. Now that this is fixed, use the shiny new
-error handling.
+This will make it easier to share common error paths.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/loop.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/nvdimm/btt.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 7bf4686af774..00ee365ed5e0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2394,13 +2394,19 @@ static int loop_add(int i)
- 	disk->event_flags	= DISK_EVENT_FLAG_UEVENT;
- 	sprintf(disk->disk_name, "loop%d", i);
- 	/* Make this loop device reachable from pathname. */
--	add_disk(disk);
-+	err = add_disk(disk);
-+	if (err)
-+		goto out_cleanup_disk;
-+
- 	/* Show this loop device. */
- 	mutex_lock(&loop_ctl_mutex);
- 	lo->idr_visible = true;
- 	mutex_unlock(&loop_ctl_mutex);
-+
- 	return i;
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 29cc7325e890..23ee8c005db5 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1520,10 +1520,11 @@ static int btt_blk_init(struct btt *btt)
+ {
+ 	struct nd_btt *nd_btt = btt->nd_btt;
+ 	struct nd_namespace_common *ndns = nd_btt->ndns;
++	int rc = -ENOMEM;
  
+ 	btt->btt_disk = blk_alloc_disk(NUMA_NO_NODE);
+ 	if (!btt->btt_disk)
+-		return -ENOMEM;
++		goto out;
+ 
+ 	nvdimm_namespace_disk_name(ndns, btt->btt_disk->disk_name);
+ 	btt->btt_disk->first_minor = 0;
+@@ -1535,19 +1536,23 @@ static int btt_blk_init(struct btt *btt)
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, btt->btt_disk->queue);
+ 
+ 	if (btt_meta_size(btt)) {
+-		int rc = nd_integrity_init(btt->btt_disk, btt_meta_size(btt));
+-
+-		if (rc) {
+-			blk_cleanup_disk(btt->btt_disk);
+-			return rc;
+-		}
++		rc = nd_integrity_init(btt->btt_disk, btt_meta_size(btt));
++		if (rc)
++			goto out_cleanup_disk;
+ 	}
++
+ 	set_capacity(btt->btt_disk, btt->nlba * btt->sector_size >> 9);
+ 	device_add_disk(&btt->nd_btt->dev, btt->btt_disk, NULL);
++
+ 	btt->nd_btt->size = btt->nlba * (u64)btt->sector_size;
+ 	nvdimm_check_and_set_ro(btt->btt_disk);
+ 
+ 	return 0;
++
 +out_cleanup_disk:
-+	blk_cleanup_disk(disk);
- out_cleanup_tags:
- 	blk_mq_free_tag_set(&lo->tag_set);
- out_free_idr:
++	blk_cleanup_disk(btt->btt_disk);
++out:
++	return rc;
+ }
+ 
+ static void btt_blk_cleanup(struct btt *btt)
 -- 
 2.30.2
 
