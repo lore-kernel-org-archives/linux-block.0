@@ -2,126 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AD1C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 03:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D08C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 07:24:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8D6A60F3A
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 03:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A91360F6D
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 07:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232568AbhI0DnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Sep 2021 23:43:19 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:23073 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232488AbhI0DnS (ORCPT
+        id S233158AbhI0HZm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 03:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233149AbhI0HZl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Sep 2021 23:43:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1632714101; x=1664250101;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=QEQ1r5p16Ui7D09NsmBKqop8Ex+gK0dn6HAotZgmffo=;
-  b=hLkOVZCWQMtcAPwAN4a0SGNF1voFtV17sz1fHxMILVMGPB3OOnXUcRpm
-   nK/A9tRrwv2k7KFwObB3+/1vkCP9LX+jGv+z19kYBLXjWYiLKmYDloRr4
-   Q2xW7RqXVGX/Y3fJfNGbH0EnzUcqS0x1adlYysjbBbTdRWf0U1GUOKMg2
-   o1oFXIm5rCSb8X4+RT1cV3h0wovmC5EJIBDM5V3hyAXRNX5NpvsUOoXFT
-   IdXVRosd3D0bHxS+Tyx5ZE5SioY1S3R+ycDkCATmgl3eQQXkMsZT+ucH5
-   gv891VfnBLdJZZuYBJk4XCBO+M+ZIjziCDe0NTNMwYh8b0Of3Cn5a4xS6
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.85,325,1624291200"; 
-   d="scan'208";a="181035035"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 11:41:37 +0800
-IronPort-SDR: E8PrO2yjHesfuYo9MGdLwUtHFH5RdQXOWXty/hWH1+P03Bn6mFm+mpe2Yr1xWFouVX2o7njIaI
- 6MjbpqUCkMXDeNP5Tr0tVGEWQGstI/4USSR1bKznQalg+OicUyFlGkwdk0xukIvKdcw2OkkBIW
- suYiO0SBzB3kCPtc766sloVrRrSQAmL2Qdq+ZurQx5XEnqHvrH4WwQUoSuJvarqXZoLr4EZcPC
- Sl0cN8atMr3E2Flt/+VfynTmZgKSmhvAfc8Fip7IUdbR7VYZJ/CUkDAlDFUlLvCQGNwZIiaYUm
- jWKVWKg7qzeZuxVunRhpXcje
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2021 20:16:12 -0700
-IronPort-SDR: OaAZy18bX7lofjA+DipOUocZjfG6XHfegeja5qEnKpjTnrPXvdxr2Nf3a2YmjlYj8y3d9Pnzi6
- 5Ts+V/v+9rytgSYNMpwN5Xtcv+byjrT2KW+oQxUGkJym9pzTejwxkm+QfgKV5ExTVWlmiVOL1+
- +PFyfWAx4tGU+nZ/fk3JwhyW26w8oMEUpX0pBFqlrU+406Q4XHiJH4Zx1IV41BiwBeH9Sfpi+Z
- vaCzESxXuq9To6rhAuY4k1kxfjnDbD3R1CtRozDX9H4To2/mQxvKAmTHVJfnLc1daUqtZzqJcv
- Ew0=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2021 20:41:39 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4HHpN16D4rz1Rvlf
-        for <linux-block@vger.kernel.org>; Sun, 26 Sep 2021 20:41:37 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1632714096; x=1635306097; bh=QEQ1r5p16Ui7D09NsmBKqop8Ex+gK0dn6HA
-        otZgmffo=; b=Do627domueT7Oz76jkGKE5MSOyrpVf45I9Qy/UPpK6Vx3XSlhfZ
-        N/xM0s474vNF36oUu2C5NBPMl0idmQNgYW1cAq385BQ0ooYEiU7w/eE1hDWkjQWV
-        dqZzijj+cbK1gTIJ+9LEJq/b+JDusv8Zl/WzWmIHORRYFXH779Y++uI6pmRCR2+k
-        W5BGsXe4ilRumJ8hjX7ICxXp+WZWVSS98cfY5k0A50IKMe1MRjuozQPF2Zew4uju
-        +c/yXP6DNtrmPC3JZxASCemNiqUt//Z2lGatxo+RQ+vIu1SwCAewapy818QqEA47
-        HQaGmJPmc2axvFZogxuBQNYMUCbxw+RPZOg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 8DNyAuxbdeHf for <linux-block@vger.kernel.org>;
-        Sun, 26 Sep 2021 20:41:36 -0700 (PDT)
-Received: from [10.89.85.1] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.85.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4HHpMz56bJz1RvTg;
-        Sun, 26 Sep 2021 20:41:35 -0700 (PDT)
-Message-ID: <2be46ef0-8848-a097-4099-31f8103b53ad@opensource.wdc.com>
-Date:   Mon, 27 Sep 2021 12:41:31 +0900
+        Mon, 27 Sep 2021 03:25:41 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40EFFC061570;
+        Mon, 27 Sep 2021 00:24:03 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id rm6-20020a17090b3ec600b0019ece2bdd20so3131140pjb.1;
+        Mon, 27 Sep 2021 00:24:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=zRcqo9ZRM0x4X1qC1VhpLMYfBLcHfFC5rDADl7ze48U=;
+        b=bOT9MpcfrFqg+qIyclqxXB8nUB7bsphZ1S/xpNatC4515Qo0sU2pi7x/EqYfPeIecW
+         mlWgsxwLB5US417ZTRVOTKD08cp+ghdFf4H9oqoHaxWhlzirb3f2FWOuxybhJkvZ/+ja
+         qKOa4lVx0cxzVRr3tICl9/dqMwoYYiDuILPunoXKMJ988zvC3pkXz84SY02xR91xqMeK
+         Mhp2uzUyyW2uZ/0Nc8HRp7/1fexH3wr5WeeDqSNePU1G8UM800sMYpIUEBhhJ1q8EClr
+         3QGi9A8k5/PF2XUlSqn4bI8rhW3d22Oma7WyaTjuyEkKGu9oyDLD/vKogouMl84vHBQO
+         3QhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=zRcqo9ZRM0x4X1qC1VhpLMYfBLcHfFC5rDADl7ze48U=;
+        b=y8epyuEL5Y8AOU5pIp9WgsX+eXP1mdh8zJLJTIEloq39mccmRvGTTWapYCHIiYp1AA
+         LRQT92TDn33PygoHn4j9o91DM8QnfwdMHjRdVjU92Sd+VELa6UWIXyWnh97K2BK2jz5f
+         QqZB3eIokKMpHNe2tZOOHCLMPYt9qlcL4cah9YiNbkRrOFqfrwoLQvNaKI8aq3vDgQYn
+         jAgjx1QsLB3fv94n8kUBCm0j/LTRTJZfWnqpbik84OfyNwEKpUO4+hietG9TuWdJbyDn
+         o/qOW3fBhY1CjXULJnozwsOCHw5M4RlTfQnJxNg7GuQI1MJRJkrREddEQYYy/YFkEHBR
+         R77Q==
+X-Gm-Message-State: AOAM5320wmw7B5Xz3wm4EwfjucL2GuQ0baVKIdRIYSEN0kV45v4u/SKI
+        PAr0yzTmJu7IN+WLlDKeIzpsbmD50AzSjQ==
+X-Google-Smtp-Source: ABdhPJyM/wgKmx+FlPefYMinMxbqa/qTjV2GwDFj7rJrusdlBfsgZsLqa6sHI/ycfYifxKX04bR5Fg==
+X-Received: by 2002:a17:90a:bc8d:: with SMTP id x13mr18015275pjr.9.1632727442789;
+        Mon, 27 Sep 2021 00:24:02 -0700 (PDT)
+Received: from [10.239.207.187] ([43.224.245.179])
+        by smtp.gmail.com with ESMTPSA id q16sm14532927pfh.16.2021.09.27.00.23.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Sep 2021 00:24:02 -0700 (PDT)
+Message-ID: <e0fc4902-e8db-b507-651b-d930a74702ef@gmail.com>
+Date:   Mon, 27 Sep 2021 15:23:57 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.1.1
-Subject: Re: [PATCH 3/4] block/mq-deadline: Stop using per-CPU counters
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v3 1/6] badblocks: add more helper structure and routines
+ in badblocks.h
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Hannes Reinecke <hare@suse.de>
-References: <20210923232358.3907118-1-bvanassche@acm.org>
- <20210923232655.3907383-1-bvanassche@acm.org>
- <20210923232655.3907383-3-bvanassche@acm.org>
- <DM6PR04MB7081B7096944F8115A8BE2B6E7A49@DM6PR04MB7081.namprd04.prod.outlook.com>
- <81cd7cea-6060-4500-8af3-cd324aef61de@acm.org>
- <6d52ad94-36af-cce6-afaa-8d0a49939d2e@opensource.wdc.com>
- <9997e3dc-44f8-1884-04f9-fc43dc655d5d@acm.org>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital
-In-Reply-To: <9997e3dc-44f8-1884-04f9-fc43dc655d5d@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Coly Li <colyli@suse.de>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        nvdimm@lists.linux.dev
+Cc:     antlists@youngman.org.uk, Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>
+References: <20210913163643.10233-1-colyli@suse.de>
+ <20210913163643.10233-2-colyli@suse.de>
+From:   Geliang Tang <geliangtang@gmail.com>
+In-Reply-To: <20210913163643.10233-2-colyli@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/09/27 11:38, Bart Van Assche wrote:
-> On 9/26/21 17:19, Damien Le Moal wrote:
->> Another thing: in patch 3, you are actually not handling the overflows. So
->> dd_queued() may return some very weird number (temporarily) when the inserted
->> count overflows before the completed count does. Since
->> dd_dispatch_aged_requests() does not care about the actual value of dd_queued(),
->> only if it is 0 or not, I am not 100% sure if it is useful to fix. Except maybe
->> for sysfs attributes ?
+Hi Coly,
+
+On 9/14/21 00:36, Coly Li wrote:
+> This patch adds the following helper structure and routines into
+> badblocks.h,
+> - struct badblocks_context
+>    This structure is used in improved badblocks code for bad table
+>    iteration.
+> - BB_END()
+>    The macro to culculate end LBA of a bad range record from bad
+>    table.
+> - badblocks_full() and badblocks_empty()
+>    The inline routines to check whether bad table is full or empty.
+> - set_changed() and clear_changed()
+>    The inline routines to set and clear 'changed' tag from struct
+>    badblocks.
 > 
-> Hmm ... I'm not following. I think it can be proven mathematically that
-> dd_queued() returns a number in the range [0, max_queued_requests). Here is
-> an example:
-> * inserted = 1 (wrapped around).
-> * completed = UINT32_MAX - 1 (about to wrap but has not yet wrapped around).
-> * dd_queued() returns 2.
+> These new helper structure and routines can help to make the code more
+> clear, they will be used in the improved badblocks code in following
+> patches.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: NeilBrown <neilb@suse.de>
+> Cc: Richard Fan <richard.fan@suse.com>
+> Cc: Vishal L Verma <vishal.l.verma@intel.com>
+> ---
+>   include/linux/badblocks.h | 32 ++++++++++++++++++++++++++++++++
+>   1 file changed, 32 insertions(+)
+> 
+> diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
+> index 2426276b9bd3..166161842d1f 100644
+> --- a/include/linux/badblocks.h
+> +++ b/include/linux/badblocks.h
+> @@ -15,6 +15,7 @@
+>   #define BB_OFFSET(x)	(((x) & BB_OFFSET_MASK) >> 9)
+>   #define BB_LEN(x)	(((x) & BB_LEN_MASK) + 1)
+>   #define BB_ACK(x)	(!!((x) & BB_ACK_MASK))
+> +#define BB_END(x)	(BB_OFFSET(x) + BB_LEN(x))
+>   #define BB_MAKE(a, l, ack) (((a)<<9) | ((l)-1) | ((u64)(!!(ack)) << 63))
+>   
+>   /* Bad block numbers are stored sorted in a single page.
+> @@ -41,6 +42,14 @@ struct badblocks {
+>   	sector_t size;		/* in sectors */
+>   };
+>   
+> +struct badblocks_context {
+> +	sector_t	start;
+> +	sector_t	len;
 
-You mean 3, right ?
-But yes... Slow Monday, I need more coffee :)
+I think the type of 'len' should be 'int' instead of 'sector_t', since 
+we used 'int sectors' as one of the arguments of _badblocks_set().
 
-Cheers.
+> +	int		ack;
+> +	sector_t	orig_start;
+> +	sector_t	orig_len;
 
--- 
-Damien Le Moal
-Western Digital Research
+I think 'orig_start' and 'orig_len' can be dropped, see comments in patch 3.
+
+> +};
+> +
+>   int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+>   		   sector_t *first_bad, int *bad_sectors);
+>   int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+> @@ -63,4 +72,27 @@ static inline void devm_exit_badblocks(struct device *dev, struct badblocks *bb)
+>   	}
+>   	badblocks_exit(bb);
+>   }
+> +
+> +static inline int badblocks_full(struct badblocks *bb)
+> +{
+> +	return (bb->count >= MAX_BADBLOCKS);
+> +}
+> +
+> +static inline int badblocks_empty(struct badblocks *bb)
+> +{
+> +	return (bb->count == 0);
+> +}
+> +
+> +static inline void set_changed(struct badblocks *bb)
+> +{
+> +	if (bb->changed != 1)
+> +		bb->changed = 1;
+> +}
+> +
+> +static inline void clear_changed(struct badblocks *bb)
+> +{
+> +	if (bb->changed != 0)
+> +		bb->changed = 0;
+> +}
+> +
+>   #endif
+> 
+
