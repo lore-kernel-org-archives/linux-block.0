@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701CCC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 14:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BD7C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 14:10:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D74E60F94
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 14:09:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9419660F46
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 14:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234583AbhI0OLU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 10:11:20 -0400
-Received: from condef-04.nifty.com ([202.248.20.69]:56192 "EHLO
-        condef-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234717AbhI0OLT (ORCPT
+        id S234677AbhI0OMB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 10:12:01 -0400
+Received: from condef-08.nifty.com ([202.248.20.73]:33484 "EHLO
+        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234706AbhI0OL6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 10:11:19 -0400
-Received: from conuserg-10.nifty.com ([10.126.8.73])by condef-04.nifty.com with ESMTP id 18RE1AYs023449
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 23:01:10 +0900
+        Mon, 27 Sep 2021 10:11:58 -0400
+Received: from conuserg-10.nifty.com ([10.126.8.73])by condef-08.nifty.com with ESMTP id 18RE19HL028538
+        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 23:01:09 +0900
 Received: from grover.. (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
-        by conuserg-10.nifty.com with ESMTP id 18RE07G1028280;
-        Mon, 27 Sep 2021 23:00:10 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 18RE07G1028280
+        by conuserg-10.nifty.com with ESMTP id 18RE07G0028280;
+        Mon, 27 Sep 2021 23:00:09 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-10.nifty.com 18RE07G0028280
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1632751210;
-        bh=zWeVVrMdOBNr2TwWOoBOYkVjaBDcD5y8SZG9+hIZpO4=;
+        s=dec2015msa; t=1632751209;
+        bh=A+BkteJsqOiCj+z6B2881OBPKBaV4HPokeV46N2OmSY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OzPo6CiE3OUAdAvhYYiY7Rre3j3t1NjOWn0YHQzpTbEHsHAJKBfB3NfvyzdNhmqD3
-         XumuBqkAg1/V0VxZTtyq1AFcbR59mJKHgww3OvrbPs8WrRRzYvKQYTwm5GR+j11qCE
-         bRc7PRbcLOLj04JGs+Y+ci8VV/KVK1rUjn66B+dZDGOnmbnqSLhXSgC3SgQL0DTKoh
-         RFHwDXwMYmAIc7cKnpc7wZGj4O+E1vQOKnkQLrcR/+P/w1AN378apItyEV9dbG5k1P
-         OVqHXn3d4xiTe+QmXDhdjMjCbdskm6oseCF4v8fa8bG0UCId9U320xg75U4BV88jt6
-         TaV6jwLHLeOoQ==
+        b=JYMm4/RAQMnWOXdwLovsdIOhLVi5M69GwZTmkJz53e4GW6EOr7SgVYUIREEMBS/Ay
+         XhZtUYOgn2xhAT1TAbm/4oZnqMzLJHCsqsGuZe0tIP0ptUtt/MGoJH2cvRm3nAdu5f
+         a08eA18AULPjYz6YI4UxTlBJqHnyWQXLm29LTKigkx5+18FYbbui4Qe2koVJaqauiY
+         rT23mK9CWQLKUVFVkEmX4AyxH/FKSTz2V644EVVn4dG7xAqjwXQWTZoK2sRrVYzADk
+         WjfI41HxkYdCPpTv7QmigxGvM975r13OpE502YQ8ygg2dD/tnyUivbGNC2unKzrktE
+         0uzgoVTQM4tog==
 X-Nifty-SrcIP: [133.32.232.101]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [RESEND PATCH 4/4] block: move CONFIG_BLOCK guard to top Makefile
-Date:   Mon, 27 Sep 2021 23:00:00 +0900
-Message-Id: <20210927140000.866249-5-masahiroy@kernel.org>
+Subject: [RESEND PATCH 3/4] block: move menu "Partition type" to block/partitions/Kconfig
+Date:   Mon, 27 Sep 2021 22:59:59 +0900
+Message-Id: <20210927140000.866249-4-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210927140000.866249-1-masahiroy@kernel.org>
 References: <20210927140000.866249-1-masahiroy@kernel.org>
@@ -48,45 +48,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Every object under block/ depends on CONFIG_BLOCK.
-
-Move the guard to the top Makefile since there is no point to
-descend into block/ if CONFIG_BLOCK=n.
+Move the menu to the relevant place.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
 
- Makefile       | 3 ++-
- block/Makefile | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ block/Kconfig            | 4 ----
+ block/partitions/Kconfig | 4 ++++
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 60923c2f41d5..0bcaa9e30fdf 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1115,7 +1115,8 @@ export MODORDER := $(extmod_prefix)modules.order
- export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+diff --git a/block/Kconfig b/block/Kconfig
+index c4d35829ea4f..c6ce41a5e5b2 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -190,12 +190,8 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+ 	  by falling back to the kernel crypto API when inline
+ 	  encryption hardware is not present.
  
- ifeq ($(KBUILD_EXTMOD),)
--core-y		+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ block/
-+core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/
-+core-$(CONFIG_BLOCK)	+= block/
+-menu "Partition Types"
+-
+ source "block/partitions/Kconfig"
  
- vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, \
- 		     $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
-diff --git a/block/Makefile b/block/Makefile
-index 41aa1ba69c90..74df168729ec 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -3,7 +3,7 @@
- # Makefile for the kernel block layer
+-endmenu
+-
+ config BLOCK_COMPAT
+ 	def_bool COMPAT
+ 
+diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
+index 278593b8e4e9..7aff4eb81c60 100644
+--- a/block/partitions/Kconfig
++++ b/block/partitions/Kconfig
+@@ -2,6 +2,8 @@
  #
- 
--obj-$(CONFIG_BLOCK) := bdev.o fops.o bio.o elevator.o blk-core.o blk-sysfs.o \
-+obj-y		:= bdev.o fops.o bio.o elevator.o blk-core.o blk-sysfs.o \
- 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
- 			blk-exec.o blk-merge.o blk-timeout.o \
- 			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+ # Partition configuration
+ #
++menu "Partition Types"
++
+ config PARTITION_ADVANCED
+ 	bool "Advanced partition selection"
+ 	help
+@@ -267,3 +269,5 @@ config CMDLINE_PARTITION
+ 	help
+ 	  Say Y here if you want to read the partition table from bootargs.
+ 	  The format for the command line is just like mtdparts.
++
++endmenu
 -- 
 2.30.2
 
