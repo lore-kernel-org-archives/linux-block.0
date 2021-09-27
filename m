@@ -2,133 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D641BC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 20:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 947D4C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BACE860527
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 20:07:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76CEA60EE9
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236781AbhI0UJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 16:09:09 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:39998 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236733AbhI0UJG (ORCPT
+        id S237426AbhI0WCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:02:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237245AbhI0WCG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 16:09:06 -0400
-Received: from relay1.suse.de (relay1.suse.de [149.44.160.133])
-        by smtp-out2.suse.de (Postfix) with ESMTP id AE35B1FF7C;
-        Mon, 27 Sep 2021 20:07:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1632773245;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kxAIhH1YVtxRZIYXNVbyWMpsZD18tjPURBL8yhlODKY=;
-        b=rqCL/ZfaKLBBJ11Lvyjkmko7G0IT9x86WIcCx9OduTjm1NgsLZkg1W4/Fe1cCG/Qk9Yn8S
-        4UptkV/P2rPm+amFEtaKPN0FQNf0vfitqRtoMdyT/aUQpEjjB27ybGR9tRkeTK0IWi6EvT
-        6Aqpa+pvsMRplJz18xNNO1ZRkBSH1D8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1632773245;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kxAIhH1YVtxRZIYXNVbyWMpsZD18tjPURBL8yhlODKY=;
-        b=QEbbg8qe4mXGT8/Upe6yCLvS822wAxZpuHOGT5K9AL53fjW4hFZgMNlgvVQ4RqvbLrzxR0
-        6bmSu51+HcRz6eCA==
-Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
-        by relay1.suse.de (Postfix) with ESMTP id 389D425D42;
-        Mon, 27 Sep 2021 20:07:24 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 862D3DA799; Mon, 27 Sep 2021 22:07:08 +0200 (CEST)
-Date:   Mon, 27 Sep 2021 22:07:08 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     David Howells <dhowells@redhat.com>
-Cc:     willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
-        Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Anna Schumaker <anna.schumaker@netapp.com>, linux-mm@kvack.org,
-        Bob Liu <bob.liu@oracle.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Seth Jennings <sjenning@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Steve French <sfrench@samba.org>, NeilBrown <neilb@suse.de>,
-        Dan Magenheimer <dan.magenheimer@oracle.com>,
-        linux-nfs@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        linux-btrfs@vger.kernel.org, viro@zeniv.linux.org.uk,
-        torvalds@linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC][PATCH v3 0/9] mm: Use DIO for swap and fix NFS swapfiles
-Message-ID: <20210927200708.GI9286@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, David Howells <dhowells@redhat.com>,
-        willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
-        Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Anna Schumaker <anna.schumaker@netapp.com>, linux-mm@kvack.org,
-        Bob Liu <bob.liu@oracle.com>, "Darrick J. Wong" <djwong@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Seth Jennings <sjenning@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, Minchan Kim <minchan@kernel.org>,
-        Steve French <sfrench@samba.org>, NeilBrown <neilb@suse.de>,
-        Dan Magenheimer <dan.magenheimer@oracle.com>,
-        linux-nfs@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        linux-btrfs@vger.kernel.org, viro@zeniv.linux.org.uk,
-        torvalds@linux-foundation.org, linux-kernel@vger.kernel.org
-References: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+        Mon, 27 Sep 2021 18:02:06 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A50FC061575;
+        Mon, 27 Sep 2021 15:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=/2Y2MKFwUhO35iq3LLeVGpx3NHoUnH6gtoSyzdn2zgY=; b=O7xOt0yQy7+6NTR/u/7MXeXiyI
+        kyzS+V7ltb/1KPWatLq8px6EZNtTcLe7H582Ox379kivuzLvFGklALlQjFCkAy3gIyOYG+Uvb3J+u
+        KXzcppsVAKWBWVVw/O2WcuiFIQkF5vQMPJFsv6WyvLnFbE5diBACBx/mukDDSH2WU8SD26J212KM8
+        TtKeyTcOC59nhG6+Y6wn05cPuoJy26ePaDfiYJlltSDVqAUXnVmCdpRHuC9/paIvuBNJY2hPwbZs8
+        iDJYESn6bfqszE+eFwoHa4WxnNebufhulzC7m5ZzhanDdS6zIab8sCkN1irrRB/sH/vn/sTvxOatC
+        EK2MxMPA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mUyfM-004SUv-Rf; Mon, 27 Sep 2021 22:00:04 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
+        kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
+        beanhuo@micron.com, ulf.hansson@linaro.org, avri.altman@wdc.com,
+        swboyd@chromium.org, agk@redhat.com, snitzer@redhat.com,
+        josef@toxicpanda.com
+Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
+        ming.lei@redhat.com, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
+        dm-devel@redhat.com, nbd@other.debian.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 1/6] scsi/sd: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 14:59:53 -0700
+Message-Id: <20210927215958.1062466-2-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210927215958.1062466-1-mcgrof@kernel.org>
+References: <20210927215958.1062466-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 06:17:52PM +0100, David Howells wrote:
-> 
-> Hi Willy, Trond, Christoph,
-> 
-> Here's v3 of a change to make reads and writes from the swapfile use async
-> DIO, adding a new ->swap_rw() address_space method, rather than readpage()
-> or direct_IO(), as requested by Willy.  This allows NFS to bypass the write
-> checks that prevent swapfiles from working, plus a bunch of other checks
-> that may or may not be necessary.
-> 
-> Whilst trying to make this work, I found that NFS's support for swapfiles
-> seems to have been non-functional since Aug 2019 (I think), so the first
-> patch fixes that.  Question is: do we actually *want* to keep this
-> functionality, given that it seems that no one's tested it with an upstream
-> kernel in the last couple of years?
-> 
-> There are additional patches to get rid of noop_direct_IO and replace it
-> with a feature bitmask, to make btrfs, ext4, xfs and raw blockdevs use the
-> new ->swap_rw method and thence remove the direct BIO submission paths from
-> swap.
-> 
-> I kept the IOCB_SWAP flag, using it to enable REQ_SWAP.  I'm not sure if
-> that's necessary, but it seems accounting related.
-> 
-> The synchronous DIO I/O code on NFS, raw blockdev, ext4 swapfile and xfs
-> swapfile all seem to work fine.  Btrfs refuses to swapon because the file
-> might be CoW'd.  I've tried doing "chattr +C", but that didn't help.
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling.
 
-There was probably some step missing. The file must not have holes, so
-either do 'dd' to the right size or use fallocate (which is recommended
-in manual page btrfs(5) SWAPFILE SUPPORT). There are some fstests
-exercising swapfile (grep -l _format_swapfile tests/generic/*) so you
-could try that without having to set up the swapfile manually.
+As with the error handling for device_add() we follow the same
+logic and just put the device so that cleanup is done via the
+scsi_disk_release().
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/scsi/sd.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 523bf2fdc253..3a101ad4d16e 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3449,7 +3449,13 @@ static int sd_probe(struct device *dev)
+ 		pm_runtime_set_autosuspend_delay(dev,
+ 			sdp->host->hostt->rpm_autosuspend_delay);
+ 	}
+-	device_add_disk(dev, gd, NULL);
++
++	error = device_add_disk(dev, gd, NULL);
++	if (error) {
++		put_device(&sdkp->dev);
++		goto out;
++	}
++
+ 	if (sdkp->capacity)
+ 		sd_dif_config_host(sdkp);
+ 
+-- 
+2.30.2
+
