@@ -2,77 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FE7C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC091C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:23:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D57C460F4B
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B91C460F11
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 18:23:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235942AbhI0SVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 14:21:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55456 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235845AbhI0SVN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 14:21:13 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F5FC061575
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 11:19:35 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id on12-20020a17090b1d0c00b001997c60aa29so436884pjb.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 11:19:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/zKrL812IZj983CDNoTAXGWrzyYsFXUo70xd8d5OVRw=;
-        b=Jsb0eKvqCXj6YljT8mnNPPjr3BIta8VJgkFwUhes6b/1qGEctJiqdGoU7reuK1AZM/
-         dRzwyM05Kp1f84uAdAfp6lpa6Kk6KrCctynYJjcNFlJqW67E/6X+ki37v3QUWU0m1/u9
-         TcXQwmHrrC+9oANWkZnWvfG0vHePNl6ImGj+TPhUqDGEZvuThtKyx/QVWv+BDBO5CxEH
-         nrnvSk8H17UdAOfIRs/v4MaCJiFlW6Utx65qH2WPjcTKzOWfyynuYxqSqy7z5IXJyz+K
-         HWDDhB4TmrlY5XL9sfDfM16NI7TUx5PNG6Ocitq0UJCYq9SmfPkhVoCkM5WUHXeUawcz
-         7uLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/zKrL812IZj983CDNoTAXGWrzyYsFXUo70xd8d5OVRw=;
-        b=DnKsPiKYgZZ6RM0G3BqbPn9F7wS80I0WGsV59iOEIAQFej08p+h6Eiw4OA7JDSgtGW
-         eeO6MRS+/JUe8OMvpox6GfkN1qUWHbvxlPmxEI0Qj2W3FZM9OLThq37MOtSOFbkl2fCb
-         5aI66oCWLNtTLHrF+oR+tZD3xmiFml1xCRHl0rjXx5GQGWXk4eYTo+Wlc+hxdaos/HLo
-         gipjpe4bzhT5h0naCwuwsgxkPL+kmX0XA4Q7gWAge9kkzGHzNs83dk8fFcD304+rYQuj
-         sw+L5eLyt+6jGTKTuXwhMsaa0UP74oVcx/mjDDPkc4e6z0TjPNoPRd/bDxQbzyIMpJGv
-         Wqfw==
-X-Gm-Message-State: AOAM5302J8XJdUOJnqthpSSHIQk3ROVMrsunrNOGVlI3C9yOx2ELWEs6
-        l8G5t/r/d2hQLS3wBx1pIfO88JI9KPTXsYUWAmVFzQ==
-X-Google-Smtp-Source: ABdhPJzYACAhNeBki+5sxnyzl/I1D8hsXspGBbTtTNOTP9ryqsZwhQMC1+Cl+YsUD0Vcn6/Cm7DGttsgpUvEDzyH18I=
-X-Received: by 2002:a17:90a:d686:: with SMTP id x6mr573260pju.8.1632766774563;
- Mon, 27 Sep 2021 11:19:34 -0700 (PDT)
+        id S236080AbhI0SZM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 14:25:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51754 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229875AbhI0SZK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Sep 2021 14:25:10 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B08FD60F11;
+        Mon, 27 Sep 2021 18:23:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632767012;
+        bh=PEfnJvnMLX3HzCxJvQOSm8TUcP24eAq+3o46ij/lCio=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QLX7Zbm4eAjOypOxP3TA0hEiGTi5+UE4LoaR/+AApBexUvYyohRYQVbI6jMzxjzjT
+         x7C7XuRfXr6R9vbREJgTXejWww6Lx5aCMT2aHSOGCp0SOLNXpE+mYwjX4WLlXSMT/v
+         ZQS+g0wnvpq2ujW9XJK1OJLZHddrXuJyi1DYhLxcyxKjd12eTHHdCDmnTrUleN96Fl
+         c0eXtldARexqmfxnp8zVCcFkE7CuqzWmIfQixgEC/+FST13Chzurawv41c4mZmdM3l
+         o92h+WUxGNbEEr32hKNpIE6ePp5Mommzze6dEOXkqbDFXVaeu5/hQN3ae0lE+I/uXl
+         B+LQXXK7y6xLA==
+Date:   Mon, 27 Sep 2021 21:23:28 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
+        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVIMIFxjRcfDDub4@unreal>
+References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
+ <YVGsMsIjD2+aS3eC@unreal>
+ <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
 MIME-Version: 1.0
-References: <20210922183331.2455043-1-hch@lst.de>
-In-Reply-To: <20210922183331.2455043-1-hch@lst.de>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 27 Sep 2021 11:19:26 -0700
-Message-ID: <CAPcyv4g-H20sh_CLmNFycQ28BYGmVK8q_v6-8k2-YoctqwwUNQ@mail.gmail.com>
-Subject: Re: fix a dax/block device attribute registration regression
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, linux-block@vger.kernel.org,
-        Linux NVDIMM <nvdimm@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 11:34 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> Hi Dan and Jens,
->
-> this series fixed a regression in how the dax/write_cache attribute of the
-> pmem devices was registere.  It does so by both fixing the API abuse in the
-> driver and (temporarily) the behavior change in the block layer that made
-> this API abuse not work anymore.
+On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
+> > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> > > To optimize performance, set the affinity of the block device tagset
+> > > according to the virtio device affinity.
+> > > 
+> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > ---
+> > >   drivers/block/virtio_blk.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index 9b3bd083b411..1c68c3e0ebf9 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+> > >   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+> > >   	vblk->tag_set.ops = &virtio_mq_ops;
+> > >   	vblk->tag_set.queue_depth = queue_depth;
+> > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
+> > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
+> > I afraid that by doing it, you will increase chances to see OOM, because
+> > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
+> > the latter mode only on specific NUMA which can be depleted.
+> 
+> This is a common methodology we use in the block layer and in NVMe subsystem
+> and we don't afraid of the OOM issue you raised.
 
-I took patch1 into for-5.15/libnvdimm, patch2 into for-5.16/libnvdimm,
-and I'll leave patch3 for Jens.
+There are many reasons for that, but we are talking about virtio here
+and not about NVMe.
+
+> 
+> This is not new and I guess that the kernel MM will (or should) be handling
+> the fallback you raised.
+
+I afraid that it is not. Can you point me to the place where such
+fallback is implemented?
+
+> 
+> Anyway, if we're doing this in NVMe I don't see a reason to afraid doing it
+> in virtio-blk.
+
+Still, it is nice to have some empirical data to support this copy/paste.
+
+There are too many myths related to optimizations, so finally it will be
+good to get some supportive data.
+
+Thanks
