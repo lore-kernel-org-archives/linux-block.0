@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91093C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 23:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D567DC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 00:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73C036103B
-	for <linux-block@archiver.kernel.org>; Sun, 26 Sep 2021 23:09:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B449860F48
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 00:19:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232079AbhIZXKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Sep 2021 19:10:36 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:2900 "EHLO
+        id S232105AbhI0AV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Sep 2021 20:21:27 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:8246 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231979AbhIZXKf (ORCPT
+        with ESMTP id S231232AbhI0AV0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Sep 2021 19:10:35 -0400
+        Sun, 26 Sep 2021 20:21:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1632697737; x=1664233737;
+  t=1632701989; x=1664237989;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=TDOTPmawcYz4rmiMAIYJQQx5dPP35Ldh0mdFUTfrChI=;
-  b=ak++SGTJXJHjtj8QwbHXn3zAZVY+7BYQC63ZMZMQrrRu2FOPWU1JLhwg
-   EwNV/vGwamcgpsvjdFTl5Z0dW4RiM3/M7zPMerpXoX2tBBzwqEZBAxAwH
-   RVuptlDR2Xqak8YtNQQINJIxHKzqwsvQf3Rf7blkIdZTJbENLyc7fXACW
-   nPyNSzXSqcYMcTWtyaMMcC89P4PxBngfAGFhMdkepDxdGsKVOyLT0voXl
-   gM6jnpnShIFKf4elVhMFyegpfnrWuMYEEQ9hTDdLWbrxeIUoT/HLg6I0M
-   J4JlgJbDZKZdGX+Q1uZ5DP4aC3ZvxomWGAjcSAS/KvHUMVLyByjNUEInz
+  bh=iTw9IlallH8j6iEmVzFxn/bywFojbTAYvjtIGl1UK6g=;
+  b=AyGmPHdIF5tV2+raiR7cCNdcBxB+9P+Yx4Mgvtf42bnMIVFHi8DCedZZ
+   5/F9GM5aB3mN7X3+HestnuGyzxOwvRF4to6kzodRQQEHZ0G/vKtzcg4yz
+   SrQPIJTwKRt6qCUVlZA8Q0b08uOjQ1lxtsZWfA7j5JKrlFFDXIOvOu9Q7
+   s7ekIHYlmqxkxH8bDqeSbdVKPgI45QZH6gC9Am0wPXlfgkKv6te8TJM5v
+   U72U1yHlrcdLm+/yv9GpZ1CysK5cZbhAwlRnoUVyIO3OrH6NIBoPZ9Wvv
+   kY9h5cELtGTbVOiwoaIbCzYsqjucuJWmthqZGh7UKtb5WRVZNfe/G0itB
    g==;
 X-IronPort-AV: E=Sophos;i="5.85,325,1624291200"; 
-   d="scan'208";a="181015786"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 07:08:57 +0800
-IronPort-SDR: bRRNSbURdTOWL7EpeubVjol+gYjZYSn5YnP/5fovPOO2fZELLdSrf/ApzvSqHbjZBcY4BwZ62D
- 02hOSTYcuVKSY0/10RmNInBYsegXxqYMqcU7rC8+GyaWww1S4TCWoreNEzPLqCiIpSnUFjpAFH
- oEAVI/iKeebGiHA6Xw71DpE9hLpeFC18J7FgKX/F8z66AOHpDjPjKUlmn/td9Jt20kwKJHZfnV
- SeClyXb1IpnMS6sJMAMzb09wFb2kSeAkeTYIbK5CReidOJFN8e+zsdb7Oks39bbP+32f4MADgI
- T7ztcACp6VFE5inrW+F5TgpS
+   d="scan'208";a="181019556"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2021 08:19:49 +0800
+IronPort-SDR: vJX4Uee0XcFaB98bAQ5pnebCjgrAktCLMOGV7uTkI6gwdJ72ZCNxO2eOjKGn+FdMtiqpx33RyO
+ Hne4ki//eKkC47x6PF9qfJPixXOVKKFyOZZYs0oGB/5gr+aswUZC82a9kLZVpq5pMwkfAE5Wdv
+ S18KXAZrH0Q6SPHoFVl6yJ79CwTRMiZQoOpRvq2UGpkxlwRY65I0eFTZWcem+MJe3tTX3BQmn0
+ HtWHv7mgQeonvg+3HTb7R+QnHbVtn+PbPq0fz02xHVczH5mciIyrApFvx5K+h/fISoAXpmGuRi
+ Ec7O7aZqAtzt7I5s6ig7cMew
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2021 15:45:05 -0700
-IronPort-SDR: Wcwdy6DYNz1DDjr8ogJml+C820uoxKH6kFwk3OEbRNqarWcIBX8rsOxk6JQoYbEuo5yZNOG+OY
- dWPxVV65iduPrJSmnkTXUa6sbcSQwuj4sQk0l0S1LvgvFZMIe7TGwU5mafgXHJJmgGWS3/xfFf
- RYZLPibbINN6r/v8lCqK78iDh797/hh1uH38dvg4xM09RQj4JZ+5gU2v/mwgJALdgQFHPhcycs
- 1FEBKnpjw8YQl3Lf6I78Ng02UixMEgGMomu196+MuzJa0Pkihw+WyMVbGGBuL/yv/zTuQy+jlP
- f4I=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2021 16:54:23 -0700
+IronPort-SDR: ypL8HAkhzquND9bgsdATCqFNNsUS5Rog/SmJc0TTHiC6/qCBsrdg2APO2Um8Kmqqnw8ztb0Ad7
+ U30t5vcifvIq5vMUJJNEDmwyF4XevFzkI6eoS4fSyQShjOqIKZ/FV58hBa/b6sKmtKY7NvSfD6
+ bQtrTdOD+rd28+CI4a5xXxf2InqQJSqBz7NKKHKgdAVtJciKZXa/RC5Xu55KVyCC7U6QkimZS1
+ I/QQ0NqJ4gpWBnzXyug8SjRs0iaiEruwY1iljiw1vGzQRH6rtDVjWT5GZUNqJ0WQb+KwBowUYq
+ nBw=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2021 16:08:58 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2021 17:19:50 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4HHhKQ218zz1SHw0
-        for <linux-block@vger.kernel.org>; Sun, 26 Sep 2021 16:08:58 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4HHjv93K7tz1SHw0
+        for <linux-block@vger.kernel.org>; Sun, 26 Sep 2021 17:19:49 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,106 +57,77 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1632697737; x=1635289738; bh=TDOTPmawcYz4rmiMAIYJQQx5dPP35Ldh0md
-        FUTfrChI=; b=TmqmtvnUWB/0fOST0cEzXPQ5EjlnNrPpSxR+bjf6UJqZZo55P3D
-        FIoK8AI8+hr11KKXdI9k4f+fj7jXDyP+GSOexgk0xQ5mvJef7ZgJvnuC6IfeSIxu
-        68YNCNVQ/KNmrGCLycrn5vhJmh7iefjax+lFC53KM9o6w0POibu9PNHkEiXeA9GO
-        gl732LcWzZi0+Eh76bIZJ07k9YXnl8VYPQcR6VMWAdskcbLH7wUyZXqpzFX9nOqn
-        Q1Syji8+Zfe5lPXeAqSxX7a3Uzh6sEh0tLn4ixpeKfBTVQFKr4wfz9w2ASbpPiGH
-        D7WlSzZ0SuLjRdJmxdhMRyEoDIkt+zeXcPA==
+        1632701989; x=1635293990; bh=iTw9IlallH8j6iEmVzFxn/bywFojbTAYvjt
+        IGl1UK6g=; b=cQwz+Dx73yx6Nd4A3QY93xsDBd2OtkORiUXCHoEtOwRGT6LNxoQ
+        c9iSHjLNtnkIDUqKWU7ktowIbZ5qkF1EGwIA4DcrM71/PS6yHe7MjX+eVdNbCAKk
+        WsnrKuTKvclOPvAg3WWHXq95z/lGfM1muQpQlHwAeE3PcU4aRFUZ3gpQ2scoBj4E
+        uolaU5bNGHmnwj+AH+kecbI/8shTEicPEJBU5Xu0K6eIAAnOL/S0WkGCbOGd+9i9
+        TCwwsHXfsTfFLe0nCwA424bA/Qj+mqK5sd+0GfoyymeezuaLG/8bcx5c6GbKTjod
+        ULYgIKft+TO4JikJZGLvpwsuPdWMsR65MdA==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id GYmjJQPewIWz for <linux-block@vger.kernel.org>;
-        Sun, 26 Sep 2021 16:08:57 -0700 (PDT)
+        with ESMTP id LZxfVcEVJEJm for <linux-block@vger.kernel.org>;
+        Sun, 26 Sep 2021 17:19:49 -0700 (PDT)
 Received: from [10.89.85.1] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.85.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4HHhKL6dDzz1RvTg;
-        Sun, 26 Sep 2021 16:08:54 -0700 (PDT)
-Message-ID: <5fde9167-6f8b-c698-f34d-d7fafd4219f7@opensource.wdc.com>
-Date:   Mon, 27 Sep 2021 08:08:53 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4HHjv75mQlz1RvTg;
+        Sun, 26 Sep 2021 17:19:47 -0700 (PDT)
+Message-ID: <6d52ad94-36af-cce6-afaa-8d0a49939d2e@opensource.wdc.com>
+Date:   Mon, 27 Sep 2021 09:19:44 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.1.1
-Subject: Re: [PATCH v3 9/9] mm: Remove swap BIO paths and only use DIO paths
+Subject: Re: [PATCH 3/4] block/mq-deadline: Stop using per-CPU counters
 Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     hch@lst.de, trond.myklebust@primarydata.com,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, darrick.wong@oracle.com,
-        viro@zeniv.linux.org.uk, jlayton@kernel.org,
-        torvalds@linux-foundation.org, linux-nfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <YU84rYOyyXDP3wjp@casper.infradead.org>
- <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
- <163250396319.2330363.10564506508011638258.stgit@warthog.procyon.org.uk>
- <2396106.1632584202@warthog.procyon.org.uk>
- <YU9X2o74+aZP4iWV@casper.infradead.org>
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <20210923232358.3907118-1-bvanassche@acm.org>
+ <20210923232655.3907383-1-bvanassche@acm.org>
+ <20210923232655.3907383-3-bvanassche@acm.org>
+ <DM6PR04MB7081B7096944F8115A8BE2B6E7A49@DM6PR04MB7081.namprd04.prod.outlook.com>
+ <81cd7cea-6060-4500-8af3-cd324aef61de@acm.org>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital
-In-Reply-To: <YU9X2o74+aZP4iWV@casper.infradead.org>
+In-Reply-To: <81cd7cea-6060-4500-8af3-cd324aef61de@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/09/26 2:09, Matthew Wilcox wrote:
-> On Sat, Sep 25, 2021 at 04:36:42PM +0100, David Howells wrote:
->> Matthew Wilcox <willy@infradead.org> wrote:
+On 2021/09/25 11:59, Bart Van Assche wrote:
+> On 9/24/21 03:58, Damien Le Moal wrote:
+>> On 2021/09/24 8:27, Bart Van Assche wrote:
+>>> -/* I/O statistics for all I/O priorities (enum dd_prio). */
+>>> -struct io_stats {
+>>> -	struct io_stats_per_prio stats[DD_PRIO_COUNT];
+>>> +	uint32_t inserted;
+>>> +	uint32_t merged;
+>>> +	uint32_t dispatched;
+>>> +	atomic_t completed;
 >>
->>> On Fri, Sep 24, 2021 at 06:19:23PM +0100, David Howells wrote:
->>>> Delete the BIO-generating swap read/write paths and always use ->swap_rw().
->>>> This puts the mapping layer in the filesystem.
->>>
->>> Is SWP_FS_OPS now unused after this patch?
->>
->> Ummm.  Interesting question - it's only used in swap_set_page_dirty():
->>
->> int swap_set_page_dirty(struct page *page)
->> {
->> 	struct swap_info_struct *sis = page_swap_info(page);
->>
->> 	if (data_race(sis->flags & SWP_FS_OPS)) {
->> 		struct address_space *mapping = sis->swap_file->f_mapping;
->>
->> 		VM_BUG_ON_PAGE(!PageSwapCache(page), page);
->> 		return mapping->a_ops->set_page_dirty(page);
->> 	} else {
->> 		return __set_page_dirty_no_writeback(page);
->> 	}
->> }
+>> Why not use 64-bits types (regular unsigned long long and atomic64_t) ?
 > 
-> I suspect that's no longer necessary.  NFS was the only filesystem
-> using SWP_FS_OPS and ...
-> 
-> fs/nfs/file.c:  .set_page_dirty = __set_page_dirty_nobuffers,
-> 
-> so it's not like NFS does anything special to reserve memory to write
-> back swap pages.
-> 
->>> Also, do we still need ->swap_activate and ->swap_deactivate?
->>
->> f2fs does quite a lot of work in its ->swap_activate(), as does btrfs.  I'm
->> not sure how necessary it is.  cifs looks like it intends to use it, but it's
->> not fully implemented yet.  zonefs and nfs do some checking, including hole
->> checking in nfs's case.  nfs also does some setting up for the sunrpc
->> transport.
->>
->> btrfs, cifs, f2fs and nfs all supply ->swap_deactivate() to undo the effects
->> of the activation.
-> 
-> Right ... so my question really is, now that we're doing I/O through
-> aops->direct_IO (or ->swap_rw), do those magic things need to be done?
-> After all, open(O_DIRECT) doesn't do these same magic things.  They're
-> really there to allow the direct-to-BIO path to work, and you're removing
-> that here.
+> Even 64-bit counters can overflow. Using 32-bit counters makes it easier to
+> trigger an overflow of these counters.
 
-For zonefs, ->swap_activate() checks that the user is not trying to use a
-sequential write only file for swap. Swap cannot work on these files as there
-are no guarantees that the writes will be sequential.
+I was more thinking about the speed of additions/subtractions on 64-bits arch,
+which is a large part (the majority ?) of mq-deadline users. Not sure if there
+is a difference in speed for 32 bits and 64 bits simple math on 64 bits arch
+though. Probably not.
+
+Another thing: in patch 3, you are actually not handling the overflows. So
+dd_queued() may return some very weird number (temporarily) when the inserted
+count overflows before the completed count does. Since
+dd_dispatch_aged_requests() does not care about the actual value of dd_queued(),
+only if it is 0 or not, I am not 100% sure if it is useful to fix. Except maybe
+for sysfs attributes ?
+
+
 
 -- 
 Damien Le Moal
