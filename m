@@ -2,54 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9F3C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56752C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:05:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D36B6101A
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F08A61058
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:05:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238280AbhI0WGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50932 "EHLO
+        id S238099AbhI0WGo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:06:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237998AbhI0WFd (ORCPT
+        with ESMTP id S238029AbhI0WGZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:05:33 -0400
+        Mon, 27 Sep 2021 18:06:25 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E19C0611C0;
-        Mon, 27 Sep 2021 15:02:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECFEEC061BD2;
+        Mon, 27 Sep 2021 15:03:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=+OAfxCoaVOuKuOjWZKvBW/L6IB8523Q0h7o1ENcxwyY=; b=0OtugzOoZWoPNTHgHokvNhlzny
-        LVtyiNlqwmw6UskbWe87APtWwkxhfaTd657hK8Nxf64/0n7+qjsV7SqOENx+Nu2qDlxckAxUmF+Ny
-        AewzZsDualM8Exf0Z4MyhUf6wg4FoGv02lM2+G39XUuNmRy7q4DQjVJAvxnTsLM7wBNG7zW9xiMdt
-        0lGQg/MrOx1MZn++Eo7oAEvY+pQprH6S4mmf137SY8aFgyvffLFv8NL/59vgPhPeBEU9w/iiqI1Oz
-        bp7ic6YX1SV/0CLLDl0CKA8z9XRctV9hZQCOJcirvX+5F2ZSxVAPF0H+0JF5bVRvhnR1IuntUYRrS
-        H5tYNCSA==;
+        bh=/Fh2lmOhLx61pNto8wOBpgjdx63cIFvAcZhSgHtAR7M=; b=SMP4FDNuOn/O76PIw9Hxc779Pr
+        iDdXCBxk6gLk/dUFntCkLNkP0ZpcqBofBKl4UjEjpINecwY4PtBqOAkw2HTOtH8C1MZ602xTOqU8f
+        e/SHxNUV7Wz2lm0xlo+mJzvxny0ZuMhNf2HNLDf78MdWRQitDWGM+cn4wtz54KlC55Yup08WGWWk5
+        9f1VvBzkc2clsUB4UhqP/plRs8g0pEYbGH2PR/hiln7Xr3kC6FOHndG++BK9p+xWAgiDc3LUNryV+
+        Ad5VZpDW7D6WF9fmfDTBKPqnoJKlZjY31dwfYohddywcdncZlVWeLgdfpXtaIBUfMBF4VcwMPRqmX
+        DKrxowUA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUyhl-004Utz-PR; Mon, 27 Sep 2021 22:02:33 +0000
+        id 1mUyiF-004VHs-CN; Mon, 27 Sep 2021 22:03:03 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, gregkh@linuxfoundation.org,
-        chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
-        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
-        colin.king@canonical.com, shubhankarvk@gmail.com,
-        baijiaju1990@gmail.com, trix@redhat.com,
-        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
-        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-        sth@linux.ibm.com, hoeppner@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com, oberpar@linux.ibm.com,
-        tj@kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v2 4/6] s390/block/dasd_genhd: add error handling support for add_disk()
-Date:   Mon, 27 Sep 2021 15:02:30 -0700
-Message-Id: <20210927220232.1071926-5-mcgrof@kernel.org>
+To:     axboe@kernel.dk, efremov@linux.com, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v2 01/14] block/swim3: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 15:02:49 -0700
+Message-Id: <20210927220302.1073499-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210927220232.1071926-1-mcgrof@kernel.org>
-References: <20210927220232.1071926-1-mcgrof@kernel.org>
+In-Reply-To: <20210927220302.1073499-1-mcgrof@kernel.org>
+References: <20210927220302.1073499-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
@@ -61,41 +51,26 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
-Be sure to call dasd_gendisk_free() on error.
-
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/s390/block/dasd_genhd.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/block/swim3.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/s390/block/dasd_genhd.c b/drivers/s390/block/dasd_genhd.c
-index fa966e0db6ca..80673dbfb1f9 100644
---- a/drivers/s390/block/dasd_genhd.c
-+++ b/drivers/s390/block/dasd_genhd.c
-@@ -33,7 +33,7 @@ int dasd_gendisk_alloc(struct dasd_block *block)
- {
- 	struct gendisk *gdp;
- 	struct dasd_device *base;
--	int len;
-+	int len, rc;
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index 965af0a3e95b..f7e3482e846b 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1229,7 +1229,9 @@ static int swim3_attach(struct macio_dev *mdev,
+ 	disk->flags |= GENHD_FL_REMOVABLE;
+ 	sprintf(disk->disk_name, "fd%d", floppy_count);
+ 	set_capacity(disk, 2880);
+-	add_disk(disk);
++	rc = add_disk(disk);
++	if (rc)
++		goto out_cleanup_disk;
  
- 	/* Make sure the minor for this device exists. */
- 	base = block->base;
-@@ -79,7 +79,13 @@ int dasd_gendisk_alloc(struct dasd_block *block)
- 	dasd_add_link_to_gendisk(gdp, base);
- 	block->gdp = gdp;
- 	set_capacity(block->gdp, 0);
--	device_add_disk(&base->cdev->dev, block->gdp, NULL);
-+
-+	rc = device_add_disk(&base->cdev->dev, block->gdp, NULL);
-+	if (rc) {
-+		dasd_gendisk_free(block);
-+		return rc;
-+	}
-+
+ 	disks[floppy_count++] = disk;
  	return 0;
- }
- 
 -- 
 2.30.2
 
