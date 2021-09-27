@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4041C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 692E9C43217
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:01:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC890610FC
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:01:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51A76610A2
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:01:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237848AbhI0WCo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50850 "EHLO
+        id S237877AbhI0WCq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:02:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237726AbhI0WCa (ORCPT
+        with ESMTP id S237546AbhI0WCe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:02:30 -0400
+        Mon, 27 Sep 2021 18:02:34 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263F7C061604;
-        Mon, 27 Sep 2021 15:00:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31EEC0613EB;
+        Mon, 27 Sep 2021 15:00:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=vLYLL0oFZhxGylgSJPWXsGjPK2psQoUWyxkb9au47Xw=; b=vFdtNbirDyd+cqwuiMxjiJzgLG
-        Jt0ChJnf2JuPRFu4a+wlNaF4kthrKz7PxnttkR0Ds40s2EhZvp4JmkbSX6L3ADzaVDhCnLDp3cCs/
-        l0Ao4N5wA1GF1nIHrrOdTV9k0vDEX8dt7ZIGbkn5jeXk4By4iFu7i+TmcRDENgYIuV6M0/X0COZJ8
-        PTZwba2aQr3+WagO31hkbEZG4Js9Hr92YGi4M//TLw0Zk2t95HtZSK54Goe3CUTOj1kxdO0jr9W83
-        2Y8mWhaksDHH+sEiqrhCSZnBTG/J8tSzqfz5X0PYVM21EAFDp2zVD0/Chb9dwkwaSbB31hydbvvRb
-        1P5EOUhg==;
+        bh=Zp3peWChzsLwJZgR1i8Dtyh3FOO544lFeJzlWbkfyco=; b=xyicbK2H0CR7mxWgNNAbZZVOoG
+        f/TY+aOtnMS/uoVtMXqtPXis+vbZhtpiS/ndUP0AdX9IDRGIobYET1+iWMgf0eic3hI0JSLbAulKG
+        8wvXxEzmhDvXeOmmj8TPh+HGQ0Q2wvHySLXwxFAgsiQ0IWl+sk40LXHXcOXOHWUbo3breLF9OOmtC
+        aU5QvqBV5mC+pgxhFyfAWSzB39tzj8teDlNoEJNNKk8zoulQfqxsIBVBuYTJraMMbw8Z6hDN9ZQpa
+        LM244ocJ/fpPGEyLZkxh+GCiIuoIMgqFitcviGyRgvFztoaDWVexx1nlLNy/oEUY4relGyOFoN2oa
+        SP4Bj1fA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUyfw-004SvO-N8; Mon, 27 Sep 2021 22:00:40 +0000
+        id 1mUyfw-004SvY-Q6; Mon, 27 Sep 2021 22:00:40 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, colyli@suse.de, kent.overstreet@gmail.com,
         kbusch@kernel.org, sagi@grimberg.me, vishal.l.verma@intel.com,
@@ -42,9 +42,9 @@ Cc:     xen-devel@lists.xenproject.org, nvdimm@lists.linux.dev,
         linux-nvme@lists.infradead.org, linux-bcache@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v2 08/10] nvdimm/blk: add error handling support for add_disk()
-Date:   Mon, 27 Sep 2021 15:00:37 -0700
-Message-Id: <20210927220039.1064193-9-mcgrof@kernel.org>
+Subject: [PATCH v2 10/10] zram: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 15:00:39 -0700
+Message-Id: <20210927220039.1064193-11-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210927220039.1064193-1-mcgrof@kernel.org>
 References: <20210927220039.1064193-1-mcgrof@kernel.org>
@@ -59,36 +59,35 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
-Since nvdimm/blk uses devm we just need to move the devm
-registration towards the end. And in hindsight, that seems
-to also provide a fix given del_gendisk() should not be
-called unless the disk was already added via add_disk().
-The probably of that issue happening is low though, like
-OOM while calling devm_add_action(), so the fix is minor.
-
-We manually unwind in case of add_disk() failure prior
-to the devm registration.
-
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/nvdimm/blk.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/block/zram/zram_drv.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
-index 591fa1f86f1e..9f1eb41404ac 100644
---- a/drivers/nvdimm/blk.c
-+++ b/drivers/nvdimm/blk.c
-@@ -265,7 +265,9 @@ static int nsblk_attach_disk(struct nd_namespace_blk *nsblk)
- 	}
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index f61910c65f0f..59086e178fbd 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1953,7 +1953,9 @@ static int zram_add(void)
+ 		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
  
- 	set_capacity(disk, available_disk_size >> SECTOR_SHIFT);
--	device_add_disk(dev, disk, NULL);
-+	rc = device_add_disk(dev, disk, NULL);
-+	if (rc)
-+		goto out_before_devm_err;
+ 	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
+-	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++	ret = device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++	if (ret)
++		goto out_cleanup_disk;
  
- 	/* nd_blk_release_disk() is called if this fails */
- 	if (devm_add_action_or_reset(dev, nd_blk_release_disk, disk))
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ 
+@@ -1961,6 +1963,8 @@ static int zram_add(void)
+ 	pr_info("Added device: %s\n", zram->disk->disk_name);
+ 	return device_id;
+ 
++out_cleanup_disk:
++	blk_cleanup_disk(zram->disk);
+ out_free_idr:
+ 	idr_remove(&zram_index_idr, device_id);
+ out_free_dev:
 -- 
 2.30.2
 
