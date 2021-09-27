@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE43AC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD46C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B12DF60E73
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A67260EB6
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238004AbhI0WDv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:03:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50842 "EHLO
+        id S238025AbhI0WDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:03:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237507AbhI0WDg (ORCPT
+        with ESMTP id S237750AbhI0WDh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:03:36 -0400
+        Mon, 27 Sep 2021 18:03:37 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C60C061205;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E386C06120D;
         Mon, 27 Sep 2021 15:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=9wGZZnosWrb9aTYR1SBOukCJpr3hksEMHXreqE1SaGg=; b=vE2w2sgbBOa5s2r/fEOjAo4r6A
-        vmgVE3sv1Z9pc+/AfsYWsgxHk3CMiGysIlAelw2ykZZM4reECJ+y5g29/vGfuGtxvE1YL4kV1oAo+
-        PngUO4oMH91DujUB6uc9VTwURtU0BVWPQ3eHYQc+05YyV+IPxjEYAuLcd+S4oBvvt7RCpiSURqN0T
-        gqPdd0ZPsAzm2+jLq4ASrsHuC0TLc0Wkr/nW37J68Cm5vQg2EyCcpueX9BFYyYbOiWgwKQVrfjJSq
-        fblMC33qrnfECzL4KyNKkoWcFKmyAte2pJsZ6XhXFzupubwbSpu0dT4gvHZ813DzS396QzHuh4SCl
-        85j9WHOg==;
+        bh=7HsBSAXvJVS50Uiqx29feEn9n8Si95gNmRNJecp6B2Q=; b=3Ess48YLoTSGFL2YYsnTd0kv20
+        73ZZNmZzS2Ja1DzBcZeiUzMKDZDeORtY++OsydxJ8qjN6BHy/qRMQl4fuIr+A/iWUUcnxX60xD/57
+        dD4buBA0nGZ2hz9oX2MCpgu05MaXhGoTRGbRF5697NJFdL+8Um77FpvpbP7DCqKR/0KkJQbPMcI2j
+        EjHsivXWwuljscJ+cr9v2M0VofPEbBfBmfVZfcNCREl+xL5/Fl115IhwumwsHCJ/vVCzG+plphm3X
+        D+kkvw7qmBaKrJc+aKLsntabB8UlZG69u1PZvVOUoJc5shVZpal/PIbdkvlCo/6dAohJvIYow2tco
+        LO/veLpA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUygS-004TPc-4h; Mon, 27 Sep 2021 22:01:12 +0000
+        id 1mUygS-004TPa-38; Mon, 27 Sep 2021 22:01:12 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, justin@coraid.com, geert@linux-m68k.org,
         ulf.hansson@linaro.org, hare@suse.de, tj@kernel.org,
@@ -42,9 +42,9 @@ Cc:     linux-xtensa@linux-xtensa.org, linux-um@lists.infradead.org,
         linux-m68k@lists.linux-m68k.org, drbd-dev@lists.linbit.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 11/15] pd: cleanup initialization
-Date:   Mon, 27 Sep 2021 15:01:06 -0700
-Message-Id: <20210927220110.1066271-12-mcgrof@kernel.org>
+Subject: [PATCH v2 10/15] pf: cleanup initialization
+Date:   Mon, 27 Sep 2021 15:01:05 -0700
+Message-Id: <20210927220110.1066271-11-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210927220110.1066271-1-mcgrof@kernel.org>
 References: <20210927220110.1066271-1-mcgrof@kernel.org>
@@ -62,211 +62,288 @@ a single disk.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/paride/pd.c | 140 +++++++++++++++++++-------------------
- 1 file changed, 70 insertions(+), 70 deletions(-)
+ drivers/block/paride/pf.c | 223 +++++++++++++++++---------------------
+ 1 file changed, 99 insertions(+), 124 deletions(-)
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index 675327df6aff..500b89a4bdaf 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -875,9 +875,27 @@ static const struct blk_mq_ops pd_mq_ops = {
- 	.queue_rq	= pd_queue_rq,
+diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
+index d5b9c88ba76f..f471d48a87bc 100644
+--- a/drivers/block/paride/pf.c
++++ b/drivers/block/paride/pf.c
+@@ -214,7 +214,6 @@ static int pf_getgeo(struct block_device *bdev, struct hd_geometry *geo);
+ 
+ static void pf_release(struct gendisk *disk, fmode_t mode);
+ 
+-static int pf_detect(void);
+ static void do_pf_read(void);
+ static void do_pf_read_start(void);
+ static void do_pf_write(void);
+@@ -285,45 +284,6 @@ static const struct blk_mq_ops pf_mq_ops = {
+ 	.queue_rq	= pf_queue_rq,
  };
  
--static void pd_probe_drive(struct pd_unit *disk)
-+static int pd_probe_drive(struct pd_unit *disk, int autoprobe, int port,
-+		int mode, int unit, int protocol, int delay)
+-static void __init pf_init_units(void)
+-{
+-	struct pf_unit *pf;
+-	int unit;
+-
+-	pf_drive_count = 0;
+-	for (unit = 0, pf = units; unit < PF_UNITS; unit++, pf++) {
+-		struct gendisk *disk;
+-
+-		if (blk_mq_alloc_sq_tag_set(&pf->tag_set, &pf_mq_ops, 1,
+-				BLK_MQ_F_SHOULD_MERGE))
+-			continue;
+-
+-		disk = blk_mq_alloc_disk(&pf->tag_set, pf);
+-		if (IS_ERR(disk)) {
+-			blk_mq_free_tag_set(&pf->tag_set);
+-			continue;
+-		}
+-
+-		INIT_LIST_HEAD(&pf->rq_list);
+-		blk_queue_max_segments(disk->queue, cluster);
+-		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
+-		pf->disk = disk;
+-		pf->pi = &pf->pia;
+-		pf->media_status = PF_NM;
+-		pf->drive = (*drives[unit])[D_SLV];
+-		pf->lun = (*drives[unit])[D_LUN];
+-		snprintf(pf->name, PF_NAMELEN, "%s%d", name, unit);
+-		disk->major = major;
+-		disk->first_minor = unit;
+-		disk->minors = 1;
+-		strcpy(disk->disk_name, pf->name);
+-		disk->fops = &pf_fops;
+-		disk->events = DISK_EVENT_MEDIA_CHANGE;
+-		if (!(*drives[unit])[D_PRT])
+-			pf_drive_count++;
+-	}
+-}
+-
+ static int pf_open(struct block_device *bdev, fmode_t mode)
  {
-+	int index = disk - pd;
-+	int *parm = *drives[index];
- 	struct gendisk *p;
-+	int ret;
-+
-+	disk->pi = &disk->pia;
-+	disk->access = 0;
-+	disk->changed = 1;
-+	disk->capacity = 0;
-+	disk->drive = parm[D_SLV];
-+	snprintf(disk->name, PD_NAMELEN, "%s%c", name, 'a' + index);
-+	disk->alt_geom = parm[D_GEO];
-+	disk->standby = parm[D_SBY];
-+	INIT_LIST_HEAD(&disk->rq_list);
-+
-+	if (!pi_init(disk->pi, autoprobe, port, mode, unit, protocol, delay,
-+			pd_scratch, PI_PD, verbose, disk->name))
-+		return -ENXIO;
- 
- 	memset(&disk->tag_set, 0, sizeof(disk->tag_set));
- 	disk->tag_set.ops = &pd_mq_ops;
-@@ -887,14 +905,14 @@ static void pd_probe_drive(struct pd_unit *disk)
- 	disk->tag_set.queue_depth = 2;
- 	disk->tag_set.numa_node = NUMA_NO_NODE;
- 	disk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING;
--
--	if (blk_mq_alloc_tag_set(&disk->tag_set))
--		return;
-+	ret = blk_mq_alloc_tag_set(&disk->tag_set);
-+	if (ret)
-+		goto pi_release;
- 
- 	p = blk_mq_alloc_disk(&disk->tag_set, disk);
- 	if (IS_ERR(p)) {
--		blk_mq_free_tag_set(&disk->tag_set);
--		return;
-+		ret = PTR_ERR(p);
-+		goto free_tag_set;
- 	}
- 	disk->gd = p;
- 
-@@ -905,102 +923,84 @@ static void pd_probe_drive(struct pd_unit *disk)
- 	p->minors = 1 << PD_BITS;
- 	p->events = DISK_EVENT_MEDIA_CHANGE;
- 	p->private_data = disk;
--
- 	blk_queue_max_hw_sectors(p->queue, cluster);
- 	blk_queue_bounce_limit(p->queue, BLK_BOUNCE_HIGH);
- 
- 	if (disk->drive == -1) {
--		for (disk->drive = 0; disk->drive <= 1; disk->drive++)
--			if (pd_special_command(disk, pd_identify) == 0)
--				return;
--	} else if (pd_special_command(disk, pd_identify) == 0)
--		return;
--	disk->gd = NULL;
-+		for (disk->drive = 0; disk->drive <= 1; disk->drive++) {
-+			ret = pd_special_command(disk, pd_identify);
-+			if (ret == 0)
-+				break;
-+		}
-+	} else {
-+		ret = pd_special_command(disk, pd_identify);
-+	}
-+	if (ret)
-+		goto put_disk;
-+	set_capacity(disk->gd, disk->capacity);
-+	add_disk(disk->gd);
-+	return 0;
-+put_disk:
- 	put_disk(p);
-+	disk->gd = NULL;
-+free_tag_set:
-+	blk_mq_free_tag_set(&disk->tag_set);
-+pi_release:
-+	pi_release(disk->pi);
-+	return ret;
+ 	struct pf_unit *pf = bdev->bd_disk->private_data;
+@@ -718,59 +678,6 @@ static int pf_probe(struct pf_unit *pf)
+ 	return -1;
  }
  
--static int pd_detect(void)
-+static int __init pd_init(void)
- {
- 	int found = 0, unit, pd_drive_count = 0;
- 	struct pd_unit *disk;
- 
--	for (unit = 0; unit < PD_UNITS; unit++) {
--		int *parm = *drives[unit];
--		struct pd_unit *disk = pd + unit;
--		disk->pi = &disk->pia;
--		disk->access = 0;
--		disk->changed = 1;
--		disk->capacity = 0;
--		disk->drive = parm[D_SLV];
--		snprintf(disk->name, PD_NAMELEN, "%s%c", name, 'a'+unit);
--		disk->alt_geom = parm[D_GEO];
--		disk->standby = parm[D_SBY];
--		if (parm[D_PRT])
--			pd_drive_count++;
--		INIT_LIST_HEAD(&disk->rq_list);
--	}
-+	if (disable)
-+		return -ENODEV;
-+
-+	if (register_blkdev(major, name))
-+		return -ENODEV;
-+
-+	printk("%s: %s version %s, major %d, cluster %d, nice %d\n",
-+	       name, name, PD_VERSION, major, cluster, nice);
- 
- 	par_drv = pi_register_driver(name);
- 	if (!par_drv) {
- 		pr_err("failed to register %s driver\n", name);
+-static int pf_detect(void)
+-{
+-	struct pf_unit *pf = units;
+-	int k, unit;
+-
+-	printk("%s: %s version %s, major %d, cluster %d, nice %d\n",
+-	       name, name, PF_VERSION, major, cluster, nice);
+-
+-	par_drv = pi_register_driver(name);
+-	if (!par_drv) {
+-		pr_err("failed to register %s driver\n", name);
 -		return -1;
+-	}
+-	k = 0;
+-	if (pf_drive_count == 0) {
+-		if (pi_init(pf->pi, 1, -1, -1, -1, -1, -1, pf_scratch, PI_PF,
+-			    verbose, pf->name)) {
+-			if (!pf_probe(pf) && pf->disk) {
+-				pf->present = 1;
+-				k++;
+-			} else
+-				pi_release(pf->pi);
+-		}
+-
+-	} else
+-		for (unit = 0; unit < PF_UNITS; unit++, pf++) {
+-			int *conf = *drives[unit];
+-			if (!conf[D_PRT])
+-				continue;
+-			if (pi_init(pf->pi, 0, conf[D_PRT], conf[D_MOD],
+-				    conf[D_UNI], conf[D_PRO], conf[D_DLY],
+-				    pf_scratch, PI_PF, verbose, pf->name)) {
+-				if (pf->disk && !pf_probe(pf)) {
+-					pf->present = 1;
+-					k++;
+-				} else
+-					pi_release(pf->pi);
+-			}
+-		}
+-	if (k)
+-		return 0;
+-
+-	printk("%s: No ATAPI disk detected\n", name);
+-	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
+-		if (!pf->disk)
+-			continue;
+-		blk_cleanup_disk(pf->disk);
+-		blk_mq_free_tag_set(&pf->tag_set);
+-	}
+-	pi_unregister_driver(par_drv);
+-	return -1;
+-}
+-
+ /* The i/o request engine */
+ 
+ static int pf_start(struct pf_unit *pf, int cmd, int b, int c)
+@@ -1014,61 +921,129 @@ static void do_pf_write_done(void)
+ 	next_request(0);
+ }
+ 
++static int __init pf_init_unit(struct pf_unit *pf, bool autoprobe, int port,
++		int mode, int unit, int protocol, int delay, int ms)
++{
++	struct gendisk *disk;
++	int ret;
++
++	ret = blk_mq_alloc_sq_tag_set(&pf->tag_set, &pf_mq_ops, 1,
++				      BLK_MQ_F_SHOULD_MERGE);
++	if (ret)
++		return ret;
++
++	disk = blk_mq_alloc_disk(&pf->tag_set, pf);
++	if (IS_ERR(disk)) {
++		ret = PTR_ERR(disk);
++		goto out_free_tag_set;
++	}
++	disk->major = major;
++	disk->first_minor = pf - units;
++	disk->minors = 1;
++	strcpy(disk->disk_name, pf->name);
++	disk->fops = &pf_fops;
++	disk->events = DISK_EVENT_MEDIA_CHANGE;
++	disk->private_data = pf;
++
++	blk_queue_max_segments(disk->queue, cluster);
++	blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_HIGH);
++
++	INIT_LIST_HEAD(&pf->rq_list);
++	pf->disk = disk;
++	pf->pi = &pf->pia;
++	pf->media_status = PF_NM;
++	pf->drive = (*drives[disk->first_minor])[D_SLV];
++	pf->lun = (*drives[disk->first_minor])[D_LUN];
++	snprintf(pf->name, PF_NAMELEN, "%s%d", name, disk->first_minor);
++
++	if (!pi_init(pf->pi, autoprobe, port, mode, unit, protocol, delay,
++			pf_scratch, PI_PF, verbose, pf->name))
++		goto out_free_disk;
++	if (pf_probe(pf))
++		goto out_pi_release;
++
++	add_disk(disk);
++	pf->present = 1;
++	return 0;
++
++out_pi_release:
++	pi_release(pf->pi);
++out_free_disk:
++	blk_cleanup_disk(pf->disk);
++out_free_tag_set:
++	blk_mq_free_tag_set(&pf->tag_set);
++	return ret;
++}
++
+ static int __init pf_init(void)
+ {				/* preliminary initialisation */
+ 	struct pf_unit *pf;
+-	int unit;
++	int found = 0, unit;
+ 
+ 	if (disable)
+ 		return -EINVAL;
+ 
+-	pf_init_units();
++	if (register_blkdev(major, name))
++		return -EBUSY;
+ 
+-	if (pf_detect())
+-		return -ENODEV;
+-	pf_busy = 0;
++	printk("%s: %s version %s, major %d, cluster %d, nice %d\n",
++	       name, name, PF_VERSION, major, cluster, nice);
+ 
+-	if (register_blkdev(major, name)) {
+-		for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
+-			if (!pf->disk)
+-				continue;
+-			blk_cleanup_queue(pf->disk->queue);
+-			blk_mq_free_tag_set(&pf->tag_set);
+-			put_disk(pf->disk);
+-		}
+-		return -EBUSY;
++	par_drv = pi_register_driver(name);
++	if (!par_drv) {
++		pr_err("failed to register %s driver\n", name);
 +		goto out_unregister_blkdev;
  	}
  
--	if (pd_drive_count == 0) { /* nothing spec'd - so autoprobe for 1 */
--		disk = pd;
--		if (pi_init(disk->pi, 1, -1, -1, -1, -1, -1, pd_scratch,
--			    PI_PD, verbose, disk->name)) {
--			pd_probe_drive(disk);
--			if (!disk->gd)
--				pi_release(disk->pi);
--		}
-+	for (unit = 0; unit < PD_UNITS; unit++) {
-+		int *parm = *drives[unit];
- 
-+		if (parm[D_PRT])
-+			pd_drive_count++;
+-	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
+-		struct gendisk *disk = pf->disk;
++	for (unit = 0; unit < PF_UNITS; unit++) {
++		if (!(*drives[unit])[D_PRT])
++			pf_drive_count++;
 +	}
-+
-+	if (pd_drive_count == 0) { /* nothing spec'd - so autoprobe for 1 */
-+		if (!pd_probe_drive(pd, 1, -1, -1, -1, -1, -1))
+ 
+-		if (!pf->present)
+-			continue;
+-		disk->private_data = pf;
+-		add_disk(disk);
++	pf = units;
++	if (pf_drive_count == 0) {
++		if (pf_init_unit(pf, 1, -1, -1, -1, -1, -1, verbose))
 +			found++;
- 	} else {
- 		for (unit = 0, disk = pd; unit < PD_UNITS; unit++, disk++) {
- 			int *parm = *drives[unit];
- 			if (!parm[D_PRT])
- 				continue;
--			if (pi_init(disk->pi, 0, parm[D_PRT], parm[D_MOD],
--				     parm[D_UNI], parm[D_PRO], parm[D_DLY],
--				     pd_scratch, PI_PD, verbose, disk->name)) {
--				pd_probe_drive(disk);
--				if (!disk->gd)
--					pi_release(disk->pi);
--			}
--		}
--	}
--	for (unit = 0, disk = pd; unit < PD_UNITS; unit++, disk++) {
--		if (disk->gd) {
--			set_capacity(disk->gd, disk->capacity);
--			add_disk(disk->gd);
--			found = 1;
-+			if (!pd_probe_drive(disk, 0, parm[D_PRT], parm[D_MOD],
-+					parm[D_UNI], parm[D_PRO], parm[D_DLY]))
++	} else {
++		for (unit = 0; unit < PF_UNITS; unit++, pf++) {
++			int *conf = *drives[unit];
++			if (!conf[D_PRT])
++				continue;
++			if (pf_init_unit(pf, 0, conf[D_PRT], conf[D_MOD],
++				    conf[D_UNI], conf[D_PRO], conf[D_DLY],
++				    verbose))
 +				found++;
- 		}
++		}
++	}
++	if (!found) {
++		printk("%s: No ATAPI disk detected\n", name);
++		goto out_unregister_pi_driver;
  	}
- 	if (!found) {
- 		printk("%s: no valid drive found\n", name);
--		pi_unregister_driver(par_drv);
-+		goto out_pi_unregister_driver;
- 	}
--	return found;
--}
--
--static int __init pd_init(void)
--{
--	if (disable)
--		goto out1;
--
--	if (register_blkdev(major, name))
--		goto out1;
--
--	printk("%s: %s version %s, major %d, cluster %d, nice %d\n",
--	       name, name, PD_VERSION, major, cluster, nice);
--	if (!pd_detect())
--		goto out2;
- 
++	pf_busy = 0;
  	return 0;
- 
--out2:
-+out_pi_unregister_driver:
++
++out_unregister_pi_driver:
 +	pi_unregister_driver(par_drv);
 +out_unregister_blkdev:
- 	unregister_blkdev(major, name);
--out1:
- 	return -ENODEV;
++	unregister_blkdev(major, name);
++	return -ENODEV;
  }
  
+ static void __exit pf_exit(void)
+ {
+ 	struct pf_unit *pf;
+ 	int unit;
+-	unregister_blkdev(major, name);
++
+ 	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
+-		if (!pf->disk)
++		if (!pf->present)
+ 			continue;
+-
+-		if (pf->present)
+-			del_gendisk(pf->disk);
+-
+-		blk_cleanup_queue(pf->disk->queue);
++		del_gendisk(pf->disk);
++		blk_cleanup_disk(pf->disk);
+ 		blk_mq_free_tag_set(&pf->tag_set);
+-		put_disk(pf->disk);
+-
+-		if (pf->present)
+-			pi_release(pf->pi);
++		pi_release(pf->pi);
+ 	}
++
++	unregister_blkdev(major, name);
+ }
+ 
+ MODULE_LICENSE("GPL");
 -- 
 2.30.2
 
