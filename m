@@ -2,88 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE6FC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 14:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B22C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 15:12:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 288FD60FC0
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 14:32:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F49060EE2
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 15:12:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234722AbhI0OeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 10:34:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40556 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234909AbhI0OeQ (ORCPT
+        id S235025AbhI0PO3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 11:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39430 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235002AbhI0PO3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 10:34:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632753158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RDiXGM7KM67kZstwJFIhcJQ97P5qdvgAwhAEiTRorTg=;
-        b=HUJ3FnH2fdc7iTZb972/38VsXAuxxAejB6ccJl/ak4FSHaKz4tE8KEAX/LHDYD7LPihvD8
-        EqhIuARULb1BCV4l+V36icd4JZvWRye1ChuR9anTrrvoyacr+n7oqXp3DBRNGr5D9vO7LO
-        srcPUY9edsEFW+T2zrKQthj+RWCqGj8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-rsH5-72jP0WynmuMYSwomg-1; Mon, 27 Sep 2021 10:32:36 -0400
-X-MC-Unique: rsH5-72jP0WynmuMYSwomg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 164D2835DE2;
-        Mon, 27 Sep 2021 14:32:35 +0000 (UTC)
-Received: from T590 (ovpn-8-37.pek2.redhat.com [10.72.8.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80D5C10023AE;
-        Mon, 27 Sep 2021 14:32:31 +0000 (UTC)
-Date:   Mon, 27 Sep 2021 22:32:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/4] block: drain file system I/O on del_gendisk
-Message-ID: <YVHV+q5Mwj/mUjU7@T590>
-References: <20210922172222.2453343-1-hch@lst.de>
- <20210922172222.2453343-4-hch@lst.de>
- <YUvZi2a0KjxEkiHo@T590>
- <20210923052705.GA5314@lst.de>
- <YUwhPy1J8lzHQF77@T590>
- <20210927120441.GA25223@lst.de>
+        Mon, 27 Sep 2021 11:14:29 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E67C061575;
+        Mon, 27 Sep 2021 08:12:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8XzwjHs843zXfH+an8ktBMeno92g9Ry3oPa0mEU0F9Y=; b=yl6jRQe2sVgWrVgWeBgFJ+S7oR
+        /e90qkak+HPKGyulGJm90XMNsFK/zfGqhgLeooNqscTavy6evL0HHFNge1Zzq2VrXwArcH6vbiw4z
+        3Q6j+sxPlW8GcIiHNRkx4xwKkp+wy696/EKhiGyZais1OM6i0hJjjx9qbfYBhuUQt4SKr6zuTQu45
+        F/FuoRActMgjTHcotZ+9bHWMAaDx37a7TEZpkeobrqw45MbXni9GhYrCB553/ALZwxOFsVSQJeeQR
+        bOJ86jrRrPfXU12tbNZQCps3ePRpwisKB7zfcqv5hmEWBJn93+QesNl3X42AveF9ZHUVHrpIrmKmh
+        cZHPP/IQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mUsID-00344C-ET; Mon, 27 Sep 2021 15:11:45 +0000
+Date:   Mon, 27 Sep 2021 08:11:45 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        rdunlap@infradead.org, rafael@kernel.org, masahiroy@kernel.org,
+        ndesaulniers@google.com, yzaikin@google.com, nathan@kernel.org,
+        ojeda@kernel.org, penguin-kernel@i-love.sakura.ne.jp,
+        vitor@massaru.org, elver@google.com, jarkko@kernel.org,
+        glider@google.com, rf@opensource.cirrus.com,
+        stephen@networkplumber.org, David.Laight@aculab.com,
+        bvanassche@acm.org, jolsa@kernel.org,
+        andriy.shevchenko@linux.intel.com, trishalfonso@google.com,
+        andreyknvl@gmail.com, jikos@kernel.org, mbenes@suse.com,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        reinette.chatre@intel.com, fenghua.yu@intel.com, bp@alien8.de,
+        x86@kernel.org, hpa@zytor.com, lizefan.x@bytedance.com,
+        hannes@cmpxchg.org, daniel.vetter@ffwll.ch, bhelgaas@google.com,
+        kw@linux.com, dan.j.williams@intel.com, senozhatsky@chromium.org,
+        hch@lst.de, joe@perches.com, hkallweit1@gmail.com, axboe@kernel.dk,
+        jpoimboe@redhat.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, peterz@infradead.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, copyleft-next@lists.fedorahosted.org
+Subject: Re: [PATCH v7 00/12 (RESEND)] syfs: generic deadlock fix with module
+ removal
+Message-ID: <YVHfMVmy8Lo0J3vR@bombadil.infradead.org>
+References: <20210918050430.3671227-1-mcgrof@kernel.org>
+ <YUjLAbnEB5qPfnL8@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210927120441.GA25223@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <YUjLAbnEB5qPfnL8@slm.duckdns.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 02:04:41PM +0200, Christoph Hellwig wrote:
-> On Thu, Sep 23, 2021 at 02:39:59PM +0800, Ming Lei wrote:
-> > > > After blk_mq_unfreeze_queue() returns, blk_try_enter_queue() will return
-> > > > true, so new FS I/O from opened bdev still won't be blocked, right?
-> > > 
-> > > It won't be blocked by blk_mq_unfreeze_queue, but because the capacity
-> > > is set to 0 it still won't make it to the driver.
-> > 
-> > One bio could be made & checked before set_capacity(0), then is
-> > submitted after blk_mq_unfreeze_queue() returns.
-> > 
-> > blk_mq_freeze_queue_wait() doesn't always imply RCU grace period, for
-> > example, the .q_usage_counter may have been in atomic mode before
-> > calling blk_queue_start_drain() & blk_mq_freeze_queue_wait().
+On Mon, Sep 20, 2021 at 07:55:13AM -1000, Tejun Heo wrote:
+> On Fri, Sep 17, 2021 at 10:04:18PM -0700, Luis Chamberlain wrote:
+> > In this v7 I've decided it is best to merge all the effort together into
+> > one patch set because communication was being lost when I split the
+> > patches up. This was not helping in any way to either fix the zram
+> > issues or come to consensus on a generic solution. The patches are also
+> > merged now because they are all related now.
 > 
-> True, but this isn't really a new issue as we never had proper quiesce
-> behavior.  I have a bunch of ideas of how to make this actually solid,
-> but none of them looks like 5.15 material.
+> Building up all the testing framewoork is really great. I have no opinions
+> about the license related stuff but all other changes generally look good to
+> me.
 
-It is new issue since edb0872f44ec ("block: move the bdi from the
-request_queue to the gendisk").
+OK I am going to send a v8 shortly with the changes from folks addressed.
+I'm going to trim the Cc list considerbly for that v8 as the list is already
+quite large and I think it may appear as spam to some lists, I'll drop the
+copyleft-next folks as hopefully the license stuff is out of the way.
 
-Previously bdi has longer lifetime than request queue, but now it becomes
-not, then either queue_to_disk() or queue->disk may cause panic.
-
-
-Thanks,
-Ming
+  Luis
 
