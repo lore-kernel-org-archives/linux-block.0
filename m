@@ -2,87 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6EEC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857C7C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:03:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F76A610E8
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FF97610FC
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:03:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237649AbhI0WFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:05:25 -0400
-Received: from mail-pj1-f46.google.com ([209.85.216.46]:54864 "EHLO
-        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237859AbhI0WFO (ORCPT
+        id S238019AbhI0WF0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:05:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237546AbhI0WFO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 27 Sep 2021 18:05:14 -0400
-Received: by mail-pj1-f46.google.com with SMTP id me1so13446213pjb.4
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 15:03:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dWPDIqUc0l0F8dGvfUPkfQYdLuhLXoQm0wENyPTxnUc=;
-        b=2V67yR8Rdoag0Y17HCT9SPZjC+g1C6BkliXOGqXsU4SYt5MeYepzOwJcWbdMgEFMuA
-         2jLXyi1vb9HCAJlBC4fjorc1mpjh70KFyAl24glTeRr0i1EJWKUqyeJl0gD8ZfkJsFU6
-         fFWluSSLMOjbMpgusAYIWYssSpr4G0VhZw6WAzbj5jZHODwg6sLp82g4roIZAoWGunpE
-         TkcduIaXbc8oOpyQhOUwO2b9NRvWqv88IaiVtI+xddUYqkiWLTMGwXaIOK4+AWXND560
-         fqZveDU0j9MKO7rT4BALl3xaxZiyg3u9N1brXEpeL1YZn9pu4wyWUEJ7Xfn2HGOP5XmV
-         Qhbw==
-X-Gm-Message-State: AOAM532oGEXxyYbD4K9pQxaDpQKXFL1kOFj4BaD/C6a48utKX54Uez64
-        YDaR+RFFViwlFevWQK8vI6k=
-X-Google-Smtp-Source: ABdhPJzs+1qT6xtzzlFoAJFxIdei9uzw2DnV7E4SPydXl2txdu9ztaSXJft9h8l+t+MaQjQ/3alfRw==
-X-Received: by 2002:a17:902:8a8c:b0:13e:45bc:e9a9 with SMTP id p12-20020a1709028a8c00b0013e45bce9a9mr341692plo.11.1632780215920;
-        Mon, 27 Sep 2021 15:03:35 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:3e98:6842:383d:b5b2])
-        by smtp.gmail.com with ESMTPSA id y13sm381587pjm.5.2021.09.27.15.03.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Sep 2021 15:03:35 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v2 0/4] Restore I/O priority support in the mq-deadline scheduler
-Date:   Mon, 27 Sep 2021 15:03:24 -0700
-Message-Id: <20210927220328.1410161-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13B7DC061211;
+        Mon, 27 Sep 2021 15:02:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=JRWTgzBcm05V8ySpKi+Sn387LcpeiWI92yzQrCXgXhI=; b=PkFreus+OyH9OhtirxXvpPHryN
+        E3CEpDcIJqXTbwH3Nn7zTHGIkjKDat1oUO+HMwRsegJ2duFMKCfKasb2I9MihJGYzIiXTk/Cw0M0e
+        b5T4RRN1axX1ux1NQ6NgGHkweaYtaGTypTFKKZQRZtidG1B8nU6kP9+r+9WcO2YTe+eGHiawDP7zl
+        Qq9RUWwfCC+iOtqeQ0lN/NBnuK39zbbhd0dvQPCKlLTubtUH4UgqGgAClSsGqDUAqxnJpURKoqfjW
+        8juL0YNksH3DHVxMmU/M/8H7Qq75bBYOF5IKUlLW5ofE4D0oVTcGWjt/EjLE1WtMBkLalM2XNOWY6
+        Hsd20z5Q==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mUyhC-004UJI-DG; Mon, 27 Sep 2021 22:01:58 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, bhelgaas@google.com, liushixin2@huawei.com,
+        thunder.leizhen@huawei.com, lee.jones@linaro.org,
+        geoff@infradead.org, mpe@ellerman.id.au, benh@kernel.crashing.org,
+        paulus@samba.org, jim@jtan.com, haris.iqbal@ionos.com,
+        jinpu.wang@ionos.com, josh.h.morris@us.ibm.com,
+        pjk1939@linux.ibm.com, tim@cyberelk.net, richard@nod.at,
+        miquel.raynal@bootlin.com, vigneshr@ti.com
+Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v2 02/10] pktcdvd: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 15:01:49 -0700
+Message-Id: <20210927220157.1069658-3-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210927220157.1069658-1-mcgrof@kernel.org>
+References: <20210927220157.1069658-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling.
 
-This patch series includes the following changes compared to the v5.14-r7
-implementation:
-- Fix request accounting by counting requeued requests once.
-- Test correctness of the request accounting code by triggering a kernel
-  warning from inside dd_exit_sched() if an inconsistency has been detected.
-- Switch from per-CPU counters to individual counters.
-- Restore I/O priority support in the mq-deadline scheduler. The performance
-  measurements in the description of patch 4/4 show that the peformance
-  regressions in the previous version of this patch have been fixed. This has
-  been achieved by using 'jiffies' instead of ktime_get() and also by skipping
-  the aging mechanism if all queued requests have the same I/O priority.
+The out_mem2 error label already does what we need so
+re-use that.
 
-Please consider this patch series for kernel v5.16.
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/block/pktcdvd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
-
-Bart.
-
-Changes compared to v1:
-- Renamed 'aging_expire' into 'prio_aging_expire'.
-- Renamed dd_dispatch_aged_requests() into dd_dispatch_prio_aged_requests().
-- Adjusted a source code comment.
-
-Bart Van Assche (4):
-  block/mq-deadline: Improve request accounting further
-  block/mq-deadline: Add an invariant check
-  block/mq-deadline: Stop using per-CPU counters
-  block/mq-deadline: Prioritize high-priority requests
-
- block/mq-deadline.c | 220 ++++++++++++++++++++++++++++----------------
- 1 file changed, 143 insertions(+), 77 deletions(-)
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 0f26b2510a75..415248962e67 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2729,7 +2729,9 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
+ 	/* inherit events of the host device */
+ 	disk->events = pd->bdev->bd_disk->events;
+ 
+-	add_disk(disk);
++	ret = add_disk(disk);
++	if (ret)
++		goto out_mem2;
+ 
+ 	pkt_sysfs_dev_new(pd);
+ 	pkt_debugfs_dev_new(pd);
+-- 
+2.30.2
 
