@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B16EEC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB5DC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 994FA61058
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:04:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E91A611EE
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:04:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237767AbhI0WGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:06:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50928 "EHLO
+        id S238273AbhI0WGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:06:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237883AbhI0WFe (ORCPT
+        with ESMTP id S238009AbhI0WFd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:05:34 -0400
+        Mon, 27 Sep 2021 18:05:33 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFD1EC061217;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7091C0611C5;
         Mon, 27 Sep 2021 15:02:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=0XhzHqCRK7YpFsSG+7Rmrxl0ZALMmH2eUYve6WoEo48=; b=FVOFkdymklCD9HFfwIA+D+3xTm
-        TsckIlazcNTsRtk64tsaiwo3wu86zZ2y43ctmSLDJgp7V4mxt+XWGceXb0dXYXy2LBR92VQp63zm+
-        VXeMrQogOnIKb8OWRMZ54F80i2uLPLWcfg388mkvxNd0y251xt24Bk3t9v29agqUjGO1KkA9HFsO9
-        eUqKdzur1+A4N7XofqKJCE6QLka7PZbTTXYoTYdFme0hJBxnZxgSEVjIZEZpCqrPhECSj9zVMPvWL
-        3T82b9AN9WbwJWJMepzeLogaEIW3J8r+lLE3X3OfoJBuC/uBmVASjC2kbc1qAtAyo3gNPmKfB8MCa
-        rDRUSVfw==;
+        bh=9WAQqGmCnBZBIvZV5P2hlA8WSQ4fd7LqTPumJ23Kn/w=; b=vRqehUSL/G0aRLcaRqeiOvgww5
+        +2zju1bjtX3i4Oh0bkiE5PVSrqWDvWGGaPNhqQbFuCDbJUtOAzi+3v9pwHn07GPFPzYAW4aJyMAbf
+        qxr8/lBUQs37sjh9vhfq4ndDqzpy8oizRJAst6XKx5Auvtk4xR7OZoV66MWI4GaqK3bCCBHnhOviq
+        xdB0cQRoO7en2gAuiIcJNBxDLNqeOaHo1hhtqdMBOjAtoVGjBEwN5Nz99LfmH1gbLggxi+Sj0gLkw
+        GaOSwE1mJYVAXebsd1HEEnt6J2Y5IRZ6a6GJsOGliqfk7dJ4XDjFXJxQZEo2W90pATXQttGsc+dac
+        rGuquvog==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUyhm-004UuE-2P; Mon, 27 Sep 2021 22:02:34 +0000
+        id 1mUyhl-004Utq-KJ; Mon, 27 Sep 2021 22:02:33 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, gregkh@linuxfoundation.org,
         chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
@@ -44,9 +44,9 @@ To:     axboe@kernel.dk, gregkh@linuxfoundation.org,
 Cc:     linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
         linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v2 6/6] s390/block/scm_blk: add error handling support for add_disk()
-Date:   Mon, 27 Sep 2021 15:02:32 -0700
-Message-Id: <20210927220232.1071926-7-mcgrof@kernel.org>
+Subject: [PATCH v2 1/6] cdrom/gdrom: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 15:02:27 -0700
+Message-Id: <20210927220232.1071926-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210927220232.1071926-1-mcgrof@kernel.org>
 References: <20210927220232.1071926-1-mcgrof@kernel.org>
@@ -61,32 +61,31 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/s390/block/scm_blk.c | 7 ++++++-
+ drivers/cdrom/gdrom.c | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/s390/block/scm_blk.c b/drivers/s390/block/scm_blk.c
-index 88cba6212ee2..61ecdcb2cc6a 100644
---- a/drivers/s390/block/scm_blk.c
-+++ b/drivers/s390/block/scm_blk.c
-@@ -495,9 +495,14 @@ int scm_blk_dev_setup(struct scm_blk_dev *bdev, struct scm_device *scmdev)
- 
- 	/* 512 byte sectors */
- 	set_capacity(bdev->gendisk, scmdev->size >> 9);
--	device_add_disk(&scmdev->dev, bdev->gendisk, NULL);
-+	ret = device_add_disk(&scmdev->dev, bdev->gendisk, NULL);
-+	if (ret)
-+		goto out_cleanup_disk;
+diff --git a/drivers/cdrom/gdrom.c b/drivers/cdrom/gdrom.c
+index 8e1fe75af93f..d50cc1fd34d5 100644
+--- a/drivers/cdrom/gdrom.c
++++ b/drivers/cdrom/gdrom.c
+@@ -805,9 +805,14 @@ static int probe_gdrom(struct platform_device *devptr)
+ 		err = -ENOMEM;
+ 		goto probe_fail_free_irqs;
+ 	}
+-	add_disk(gd.disk);
++	err = add_disk(gd.disk);
++	if (err)
++		goto probe_fail_add_disk;
 +
  	return 0;
  
-+out_cleanup_disk:
-+	blk_cleanup_disk(bdev->gendisk);
- out_tag:
- 	blk_mq_free_tag_set(&bdev->tag_set);
- out:
++probe_fail_add_disk:
++	kfree(gd.toc);
+ probe_fail_free_irqs:
+ 	free_irq(HW_EVENT_GDROM_DMA, &gd);
+ 	free_irq(HW_EVENT_GDROM_CMD, &gd);
 -- 
 2.30.2
 
