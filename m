@@ -2,147 +2,217 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF05FC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19900C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:59:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA83360FC2
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 017EA6108E
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 08:59:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233434AbhI0IZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 04:25:28 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:53284 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233337AbhI0IZ2 (ORCPT
+        id S233595AbhI0JBS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 05:01:18 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3876 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233593AbhI0JBR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 04:25:28 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0979D22098;
-        Mon, 27 Sep 2021 08:23:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1632731030; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=37o9ue6D55euseY87j2eVtMIU2ZEOiSWr0h3uppibpo=;
-        b=mEmCCoa0naAO9rk9L+BWrTdgk5YyRGEv2i7pHHtnBn/1JVcWsTME3v//EfgkuFmg2tK6WX
-        eKJyywKRLghT3BAj+3YGyt5iCDsMWiO3tNq2tAXkOOjsVvxhevMfx0A7DSckyzruz4f5O5
-        6N2WE65afKo51F8kjRzsO5i/SZG0LnA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1632731030;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=37o9ue6D55euseY87j2eVtMIU2ZEOiSWr0h3uppibpo=;
-        b=NsvW0sX2DUOMXz8fou8QufETZ23R0NJX0guAOpKhK3DsWM5cfAUmxlsrXsNpfOa9mUDfS2
-        KvhBVZsWiRKF2uDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2218913A42;
-        Mon, 27 Sep 2021 08:23:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 9/86OJJ/UWEzSwAAMHmgww
-        (envelope-from <colyli@suse.de>); Mon, 27 Sep 2021 08:23:46 +0000
-Subject: Re: [PATCH v3 1/6] badblocks: add more helper structure and routines
- in badblocks.h
-To:     Geliang Tang <geliangtang@gmail.com>
-Cc:     antlists@youngman.org.uk, Dan Williams <dan.j.williams@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.de>, nvdimm@lists.linux.dev,
-        linux-raid@vger.kernel.org, Richard Fan <richard.fan@suse.com>,
-        Vishal L Verma <vishal.l.verma@intel.com>
-References: <20210913163643.10233-1-colyli@suse.de>
- <20210913163643.10233-2-colyli@suse.de>
- <e0fc4902-e8db-b507-651b-d930a74702ef@gmail.com>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <b0960871-1fc6-ed76-965c-7b0adff6641c@suse.de>
-Date:   Mon, 27 Sep 2021 16:23:45 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.14.0
+        Mon, 27 Sep 2021 05:01:17 -0400
+Received: from fraeml710-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HHxMn2wh8z67gvx;
+        Mon, 27 Sep 2021 16:56:53 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml710-chm.china.huawei.com (10.206.15.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Mon, 27 Sep 2021 10:59:38 +0200
+Received: from [10.47.85.67] (10.47.85.67) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Mon, 27 Sep
+ 2021 09:59:37 +0100
+Subject: Re: [PATCH v4 11/13] blk-mq: Refactor and rename
+ blk_mq_free_map_and_{requests->rqs}()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "hare@suse.de" <hare@suse.de>
+References: <1632472110-244938-1-git-send-email-john.garry@huawei.com>
+ <1632472110-244938-12-git-send-email-john.garry@huawei.com>
+ <YU/Va9T+zcRNExUF@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <45c0c587-59a2-1761-e175-3920669d0bfb@huawei.com>
+Date:   Mon, 27 Sep 2021 10:02:40 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <e0fc4902-e8db-b507-651b-d930a74702ef@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YU/Va9T+zcRNExUF@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.85.67]
+X-ClientProxiedBy: lhreml717-chm.china.huawei.com (10.201.108.68) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/27/21 3:23 PM, Geliang Tang wrote:
-> Hi Coly,
->
-> On 9/14/21 00:36, Coly Li wrote:
->> This patch adds the following helper structure and routines into
->> badblocks.h,
->> - struct badblocks_context
->>    This structure is used in improved badblocks code for bad table
->>    iteration.
->> - BB_END()
->>    The macro to culculate end LBA of a bad range record from bad
->>    table.
->> - badblocks_full() and badblocks_empty()
->>    The inline routines to check whether bad table is full or empty.
->> - set_changed() and clear_changed()
->>    The inline routines to set and clear 'changed' tag from struct
->>    badblocks.
+On 26/09/2021 03:05, Ming Lei wrote:
+> On Fri, Sep 24, 2021 at 04:28:28PM +0800, John Garry wrote:
+>> Refactor blk_mq_free_map_and_requests() such that it can be used at many
+>> sites at which the tag map and rqs are freed.
 >>
->> These new helper structure and routines can help to make the code more
->> clear, they will be used in the improved badblocks code in following
->> patches.
+>> Also rename to blk_mq_free_map_and_rqs(), which is shorter and matches the
+>> alloc equivalent.
 >>
->> Signed-off-by: Coly Li <colyli@suse.de>
->> Cc: Dan Williams <dan.j.williams@intel.com>
->> Cc: Hannes Reinecke <hare@suse.de>
->> Cc: Jens Axboe <axboe@kernel.dk>
->> Cc: NeilBrown <neilb@suse.de>
->> Cc: Richard Fan <richard.fan@suse.com>
->> Cc: Vishal L Verma <vishal.l.verma@intel.com>
+>> Suggested-by: Ming Lei<ming.lei@redhat.com>
+>> Signed-off-by: John Garry<john.garry@huawei.com>
+>> Reviewed-by: Hannes Reinecke<hare@suse.de>
 >> ---
->>   include/linux/badblocks.h | 32 ++++++++++++++++++++++++++++++++
->>   1 file changed, 32 insertions(+)
+>>   block/blk-mq-tag.c |  3 +--
+>>   block/blk-mq.c     | 40 ++++++++++++++++++++++++----------------
+>>   block/blk-mq.h     |  4 +++-
+>>   3 files changed, 28 insertions(+), 19 deletions(-)
 >>
->> diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
->> index 2426276b9bd3..166161842d1f 100644
->> --- a/include/linux/badblocks.h
->> +++ b/include/linux/badblocks.h
->> @@ -15,6 +15,7 @@
->>   #define BB_OFFSET(x)    (((x) & BB_OFFSET_MASK) >> 9)
->>   #define BB_LEN(x)    (((x) & BB_LEN_MASK) + 1)
->>   #define BB_ACK(x)    (!!((x) & BB_ACK_MASK))
->> +#define BB_END(x)    (BB_OFFSET(x) + BB_LEN(x))
->>   #define BB_MAKE(a, l, ack) (((a)<<9) | ((l)-1) | ((u64)(!!(ack)) << 
->> 63))
->>     /* Bad block numbers are stored sorted in a single page.
->> @@ -41,6 +42,14 @@ struct badblocks {
->>       sector_t size;        /* in sectors */
->>   };
->>   +struct badblocks_context {
->> +    sector_t    start;
->> +    sector_t    len;
->
-> I think the type of 'len' should be 'int' instead of 'sector_t', since 
-> we used 'int sectors' as one of the arguments of _badblocks_set().
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index db99f1246795..a0ecc6d88f84 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -607,8 +607,7 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+>>   		if (!new)
+>>   			return -ENOMEM;
+>>   
+>> -		blk_mq_free_rqs(set, *tagsptr, hctx->queue_num);
+>> -		blk_mq_free_rq_map(*tagsptr, set->flags);
+>> +		blk_mq_free_map_and_rqs(set, *tagsptr, hctx->queue_num);
+>>   		*tagsptr = new;
+>>   	} else {
+>>   		/*
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 46772773b9c4..464ea20b9bcb 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2878,15 +2878,15 @@ static bool __blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+>>   	return set->tags[hctx_idx];
+>>   }
+>>   
+>> -static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+>> -					 unsigned int hctx_idx)
+>> +void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+>> +			     struct blk_mq_tags *tags,
+>> +			     unsigned int hctx_idx)
+>>   {
+>>   	unsigned int flags = set->flags;
+>>   
+>> -	if (set->tags && set->tags[hctx_idx]) {
+>> -		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
+>> -		blk_mq_free_rq_map(set->tags[hctx_idx], flags);
+>> -		set->tags[hctx_idx] = NULL;
+>> +	if (tags) {
+>> +		blk_mq_free_rqs(set, tags, hctx_idx);
+>> +		blk_mq_free_rq_map(tags, flags);
+>>   	}
+>>   }
+>>   
+>> @@ -2967,8 +2967,10 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+>>   			 * fallback in case of a new remap fails
+>>   			 * allocation
+>>   			 */
+>> -			if (i && set->tags[i])
+>> -				blk_mq_free_map_and_requests(set, i);
+>> +			if (i && set->tags[i]) {
+>> +				blk_mq_free_map_and_rqs(set, set->tags[i], i);
+>> +				set->tags[i] = NULL;
+>> +			}
+>>   
+>>   			hctx->tags = NULL;
+>>   			continue;
+>> @@ -3264,8 +3266,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>>   		struct blk_mq_hw_ctx *hctx = hctxs[j];
+>>   
+>>   		if (hctx) {
+>> -			if (hctx->tags)
+>> -				blk_mq_free_map_and_requests(set, j);
+>> +			blk_mq_free_map_and_rqs(set, set->tags[j], j);
+>> +			set->tags[j] = NULL;
+>>   			blk_mq_exit_hctx(q, set, hctx, j);
+>>   			hctxs[j] = NULL;
+>>   		}
+>> @@ -3361,8 +3363,10 @@ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+>>   	return 0;
+>>   
+>>   out_unwind:
+>> -	while (--i >= 0)
+>> -		blk_mq_free_map_and_requests(set, i);
+>> +	while (--i >= 0) {
+>> +		blk_mq_free_map_and_rqs(set, set->tags[i], i);
+>> +		set->tags[i] = NULL;
+>> +	}
+>>   
+>>   	return -ENOMEM;
+>>   }
+>> @@ -3557,8 +3561,10 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+>>   	return 0;
+>>   
+>>   out_free_mq_rq_maps:
+>> -	for (i = 0; i < set->nr_hw_queues; i++)
+>> -		blk_mq_free_map_and_requests(set, i);
+>> +	for (i = 0; i < set->nr_hw_queues; i++) {
+>> +		blk_mq_free_map_and_rqs(set, set->tags[i], i);
+>> +		set->tags[i] = NULL;
+>> +	}
+>>   out_free_mq_map:
+>>   	for (i = 0; i < set->nr_maps; i++) {
+>>   		kfree(set->map[i].mq_map);
+>> @@ -3590,8 +3596,10 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+>>   {
+>>   	int i, j;
+>>   
+>> -	for (i = 0; i < set->nr_hw_queues; i++)
+>> -		blk_mq_free_map_and_requests(set, i);
+>> +	for (i = 0; i < set->nr_hw_queues; i++) {
+>> +		blk_mq_free_map_and_rqs(set, set->tags[i], i);
+>> +		set->tags[i] = NULL;
+>> +	}
+> There are 5 callers in which 'set->tags[i]' is cleared, so just
+> wondering why you don't clear set->tags[i] at default in
+> blk_mq_free_map_and_rqs(). And just call __blk_mq_free_map_and_rqs()
+> for the only other user?
+
+blk_mq_free_map_and_rqs() is not always passed set->tags[i]:
+
+- blk_mq_tag_update_depth() calls blk_mq_free_map_and_rqs() for sched tags
+
+- __blk_mq_alloc_rq_maps() calls blk_mq_free_map_and_rqs() for 
+shared_sbitmap_tags
+
+Function __blk_mq_free_map_and_rqs() is not public and really only 
+intended for set->tags[i]
+
+So I did consider passing the address of the tags pointer to
+blk_mq_free_map_and_rqs(), like:
+
+void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+			struct blk_mq_tag **tags,
+			unsigned int hctx_idx)
+
+{
+	...
+	*tags = NULL;
+}
+
+But then the API becomes a bit asymmetric, as we deal with tags pointer 
+normally:
+
+struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+					     unsigned int hctx_idx,
+					     unsigned int depth);
 
 
-OK, I will change it.
+However, apart from this, I can change __blk_mq_free_map_and_rqs() to 
+NULLify set->tags[i], as it is always passed set->tags[i].
 
->
->> +    int        ack;
->> +    sector_t    orig_start;
->> +    sector_t    orig_len;
->
-> I think 'orig_start' and 'orig_len' can be dropped, see comments in 
-> patch 3.
+Do you have a preference?
 
-Yes, I will change it in next version. Please review the new version latter.
+Thanks,
+John
 
-Thanks for your review.
 
-Coly Li
