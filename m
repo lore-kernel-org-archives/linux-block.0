@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED7FC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 266F3C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC58A60EB6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DE0C60EB6
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:02:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238048AbhI0WEB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:04:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50794 "EHLO
+        id S238061AbhI0WEC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237479AbhI0WDg (ORCPT
+        with ESMTP id S237544AbhI0WDf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:03:36 -0400
+        Mon, 27 Sep 2021 18:03:35 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88EAFC06127F;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79010C06125D;
         Mon, 27 Sep 2021 15:01:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=GTqlLrZsj3Suk0ZD1zxrlS/P00ynG/BQTDmWUdhTXPM=; b=pZ75FiviARqXSmE5LIDqLZZHBc
-        Df6eRurl8Nmk0UFJNmGWSDr7RWS8BGLcsRgHgu7zMKMlFEY40TMSBy4za1WmqcOQudbdRWnYv3JNR
-        uxiE7y88AYxvBbosyU3OMbABdNr7z5XOGskwQ6Ic89l8o+vBoqRtpGxRaf/wpT8iVW+gzJ9F0iG+2
-        DVQK4kQkcuDPQFldVywiQfEPJQrXA/2JNACdvPqfalrHhaqWVNolh2QcVriVKhjnrGEbV7O9thybr
-        koXWQuGwkW2Fax82PYSPuXh1BHd+AABFPtQe+CFX0daPHhHbHYw+9hXAeY/9aIDZ9XdQ9Ot1jsngq
-        pxMsNZnw==;
+        bh=08q31EIVp0CLnjZ3JOSG2pLmduRMGbbY0RWG/PagZSQ=; b=dTfOGMG3AUYtr1bbCvG0t/klmk
+        LajkDYnCSmLe5sT2mHlX5un+6JkZTlg6PVmWy4n5/jgMM/1A6QdINqzW+2KuF4kDyJ8nTkrt8z8n0
+        jjusumjxb+KSwZv+kU0wBQHA6Hkv2iykZTStpVHwwFltABaYnNs1hWEIhYff0sMAjxbUs350a55K3
+        JHrs2nbuUBT1jU9cWK+1XZTDN41Hf4nMBTqsRDCdL2otKu/9pw25SXrc2JgTutuxeRBmL442aIUba
+        XEFhwVvAydc/G8adPf7VLVpBDx4OAGF3Weps0t52oIP5WeiDl/FWVvLlY7imcJkluXUwBIZTO7S1v
+        WUzWDZGQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUygS-004TPm-Av; Mon, 27 Sep 2021 22:01:12 +0000
+        id 1mUygR-004TPI-N2; Mon, 27 Sep 2021 22:01:11 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, justin@coraid.com, geert@linux-m68k.org,
         ulf.hansson@linaro.org, hare@suse.de, tj@kernel.org,
@@ -42,9 +42,9 @@ Cc:     linux-xtensa@linux-xtensa.org, linux-um@lists.infradead.org,
         linux-m68k@lists.linux-m68k.org, drbd-dev@lists.linbit.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v2 15/15] pd: add error handling support for add_disk()
-Date:   Mon, 27 Sep 2021 15:01:10 -0700
-Message-Id: <20210927220110.1066271-16-mcgrof@kernel.org>
+Subject: [PATCH v2 02/15] aoe: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 15:00:57 -0700
+Message-Id: <20210927220110.1066271-3-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210927220110.1066271-1-mcgrof@kernel.org>
 References: <20210927220110.1066271-1-mcgrof@kernel.org>
@@ -61,27 +61,33 @@ error handling.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/paride/pd.c | 6 +++++-
+ drivers/block/aoe/aoeblk.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index 500b89a4bdaf..e59759bcf416 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -938,8 +938,12 @@ static int pd_probe_drive(struct pd_unit *disk, int autoprobe, int port,
- 	if (ret)
- 		goto put_disk;
- 	set_capacity(disk->gd, disk->capacity);
--	add_disk(disk->gd);
-+	ret = add_disk(disk->gd);
-+	if (ret)
-+		goto cleanup_disk;
- 	return 0;
-+cleanup_disk:
-+	blk_cleanup_disk(disk->gd);
- put_disk:
- 	put_disk(p);
- 	disk->gd = NULL;
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 06b360f7123a..e436b0e8eff5 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -417,7 +417,9 @@ aoeblk_gdalloc(void *vp)
+ 
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ 
+-	device_add_disk(NULL, gd, aoe_attr_groups);
++	err = device_add_disk(NULL, gd, aoe_attr_groups);
++	if (err)
++		goto out_disk_cleanup;
+ 	aoedisk_add_debugfs(d);
+ 
+ 	spin_lock_irqsave(&d->lock, flags);
+@@ -426,6 +428,8 @@ aoeblk_gdalloc(void *vp)
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ 	return;
+ 
++out_disk_cleanup:
++	blk_cleanup_disk(gd);
+ err_tagset:
+ 	blk_mq_free_tag_set(set);
+ err_mempool:
 -- 
 2.30.2
 
