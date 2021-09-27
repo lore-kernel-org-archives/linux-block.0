@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0664C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DCACC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CE2261058
-	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A8B061157
+	for <linux-block@archiver.kernel.org>; Mon, 27 Sep 2021 22:00:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237562AbhI0WCN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 18:02:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50728 "EHLO
+        id S237536AbhI0WCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 18:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237393AbhI0WCJ (ORCPT
+        with ESMTP id S237306AbhI0WCH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 18:02:09 -0400
+        Mon, 27 Sep 2021 18:02:07 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B21C06176A;
-        Mon, 27 Sep 2021 15:00:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928FAC061765;
+        Mon, 27 Sep 2021 15:00:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=qKliB10CfGq8L4QLEdlnpwyZaQvLLM7XDzH+61TZwL8=; b=XEH5n0CyNS6aPwksdoPT0SWQwJ
-        2NWFQEDY+TnIX6LyAAy7m0gpsuDiHOzrCN9BGZ/IvsBuEYf28BDSUcJkXXZ19i9N9boDuWqOKNpOP
-        s8XWHSI+GpMKvoYWUytNbQmi4aG392YfwYK5fMfvzQ+EXuhjoWDERdFCRZ1XOfUW14du81gYPIZLR
-        xGXWkL8p7wCmxAjbum96HT1EsS63pWr+xgRaROL0aEc33mfFDN43Q91+/fomdaBfa6XNYbTe/HuZ9
-        ZoHPAZ10vsOb2IhgTDasF61ETEu6UVDrGmygSV/3b3a1YZWph4mFcj1niNsyOVeWOir8F/ZwmSPQw
-        sqD1jwZA==;
+        bh=eOGl5IZyZNnFXmP+I7kKDBQKd7BBidBOUcZv+xPQqWI=; b=lliCu+eKd3V1P+/sYJ0yd2PCrh
+        9ELPfdPTivFsxLYVUQdamOKpTZQ5EjeWqzTGXImkFZuCCORPUD+0L7y3MbC4152PxLGq8Q1x3nR/y
+        WbH9zYoGLr25pTRIqdL8Iu252s6oS8y94K/V+SoZG/YWmCX6lWaIFAVta7RgjUzwN4eZpHHbAljny
+        jv2QEBGFzrDs1l7laCe38Z7KLC4Fkl4R9S9hCiIPX6RUKp9M4N4rKNplc99ZW22MSmEaB6Zf+XayC
+        yn1e0cU462V4kxPmlszoM+JuCqTn1LzCOZ63BKAAsE7Uby00tY6XZZ6oGKLaoejvN+6vYqRkn+h/6
+        FCYNbmoQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mUyfM-004SV1-Ur; Mon, 27 Sep 2021 22:00:04 +0000
+        id 1mUyfM-004SV3-Vt; Mon, 27 Sep 2021 22:00:05 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, martin.petersen@oracle.com, jejb@linux.ibm.com,
         kbusch@kernel.org, sagi@grimberg.me, adrian.hunter@intel.com,
@@ -41,10 +41,11 @@ Cc:     hch@infradead.org, hare@suse.de, bvanassche@acm.org,
         linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
         dm-devel@redhat.com, nbd@other.debian.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v4 4/6] dm: add add_disk() error handling
-Date:   Mon, 27 Sep 2021 14:59:56 -0700
-Message-Id: <20210927215958.1062466-5-mcgrof@kernel.org>
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 5/6] loop: add error handling support for add_disk()
+Date:   Mon, 27 Sep 2021 14:59:57 -0700
+Message-Id: <20210927215958.1062466-6-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210927215958.1062466-1-mcgrof@kernel.org>
 References: <20210927215958.1062466-1-mcgrof@kernel.org>
@@ -59,34 +60,38 @@ We never checked for errors on add_disk() as this function
 returned void. Now that this is fixed, use the shiny new
 error handling.
 
-There are two calls to dm_setup_md_queue() which can fail then,
-one on dm_early_create() and we can easily see that the error path
-there calls dm_destroy in the error path. The other use case is on
-the ioctl table_load case. If that fails userspace needs to call
-the DM_DEV_REMOVE_CMD to cleanup the state - similar to any other
-failure.
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/md/dm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/block/loop.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a011d09cb0fa..b83aab8507c2 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -2083,7 +2083,9 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
- 	if (r)
- 		return r;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 7bf4686af774..00ee365ed5e0 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2394,13 +2394,19 @@ static int loop_add(int i)
+ 	disk->event_flags	= DISK_EVENT_FLAG_UEVENT;
+ 	sprintf(disk->disk_name, "loop%d", i);
+ 	/* Make this loop device reachable from pathname. */
+-	add_disk(disk);
++	err = add_disk(disk);
++	if (err)
++		goto out_cleanup_disk;
++
+ 	/* Show this loop device. */
+ 	mutex_lock(&loop_ctl_mutex);
+ 	lo->idr_visible = true;
+ 	mutex_unlock(&loop_ctl_mutex);
++
+ 	return i;
  
--	add_disk(md->disk);
-+	r = add_disk(md->disk);
-+	if (r)
-+		return r;
- 
- 	r = dm_sysfs_init(md);
- 	if (r) {
++out_cleanup_disk:
++	blk_cleanup_disk(disk);
+ out_cleanup_tags:
+ 	blk_mq_free_tag_set(&lo->tag_set);
+ out_free_idr:
 -- 
 2.30.2
 
