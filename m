@@ -2,206 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A47C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 10:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 016AEC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 10:41:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F0FF60ED6
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 10:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC6C561131
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 10:41:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240242AbhI1Khs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 06:37:48 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:50007 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240237AbhI1Khq (ORCPT
+        id S240199AbhI1Km5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 06:42:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31438 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240280AbhI1Kmv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 06:37:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1632825367; x=1664361367;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=bdefvBUWM1D9fxiIGthckV7ISoVqD8TAhF6Ov5pUNrU=;
-  b=oQo0aReliffy0RZlovj0czXsGLJyDSAuGEg+AacqJTxBtiF6bEOO3biA
-   qgeyKgsLFHJ07hN0Vh9q4vFj1125Q4dMsRPLuwFmco0RYhLuYsBY+KNG+
-   Z+XTVsNDLXYCd3H9kus1pEz7Ob+VRACC0dzjk036eY2k+CJCW4S7T7zTx
-   wY0RN/NO+6TvUMMQtCELp2cZWPIAFF9EFo8t6qBCLgPidON09cD41WZYl
-   pv1MJR1s4QwHwCgsJvixtjvx9cqVGvI/g4bLoLt+ERoG9UczwjJ/A7nfQ
-   4VhlzNkOPo12OjbvhknJ9GRA5g6LxRqLlBDT7nwXST+eMcuag5XXFunVV
-   w==;
-X-IronPort-AV: E=Sophos;i="5.85,329,1624291200"; 
-   d="scan'208";a="185959586"
-Received: from mail-dm6nam11lp2175.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.175])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Sep 2021 18:36:06 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LwOfYbsNj06tLAy8JpQsgki0B0yXM44GWYxw+J1SkMgzrZzU/DL99HIMHGKN2gUkaM4fVwN91/IAjEkfWf6QeNQqzj/Qhk199/cfoby9bWrwiRtCIvG1KDQfWBZTwXemRRv2a/gjx7P9MBawx27q2J7xLeAO2nNYFUNELE7Hct5XqSXCef2jKglX8s0FcxGo+k3Fn+eKThgKRpifEKXOKNU7tVsm5LUkpEEf8QQFJvA2ffAvfazGfi+LfK77BdscyJPvpM3dEIkO0VkxmUnQXgcjs56JIydpLGat7GODorMGNei/vwXYoMTs0/OhF+xFeDQWnjWBU9+N754EuLjYGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=3vAXAxmXt7qeaBgHTOXhPXBxEYTOw7Soru+jxrjz53E=;
- b=Bby2m6OnQqmeesLG7aejFQ7ZssyhLLnTeiV9EdOteW2lvfpNcjIuoNPhYNdVHDT4W5kV4w6OAeJE8oR1F0vDiSD0OdhF9H41HF+6R0TbC2XgxJCF3/wrzquuAK5ZpLkiUeO4p5/eWJ06LDH6anQmafcHEkEHV2Gpp37aet2R9ZPe+++8T1GMD5mjiMxMnljLrtOm9Hyj4nrMmMfi7IBZLfBrUQECi0nl/08JCQEms3oA1m7fra3mlZUgG+Xg7wTWywEJ75qkcLZA6hG2FlyrtHf/h4SoFazfWmfCboDIK6KP6LKycZPvehJBpUeDqwmVsuHHiZBQI3VW5npRZ6GiBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3vAXAxmXt7qeaBgHTOXhPXBxEYTOw7Soru+jxrjz53E=;
- b=qamqzsGbvFGS96pZMPpCdvSHS+oa++BydYIwTRtRL+kK6s+XlTOBUkDr1uBfLD6AYqoqRkuzFqDjmMDO+IiU1MG/HDCXYw1aXZ+03nsUuiiS5LPycf7bLfMLCT1THAzMlIULOvSjNkT8g+cRLJZpcFD6rHvM6AQFO9wopVSEmK0=
-Received: from PH0PR04MB7158.namprd04.prod.outlook.com (2603:10b6:510:8::18)
- by PH0PR04MB7448.namprd04.prod.outlook.com (2603:10b6:510:b::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.14; Tue, 28 Sep
- 2021 10:36:04 +0000
-Received: from PH0PR04MB7158.namprd04.prod.outlook.com
- ([fe80::3d04:c2fb:e69f:27e8]) by PH0PR04MB7158.namprd04.prod.outlook.com
- ([fe80::3d04:c2fb:e69f:27e8%6]) with mapi id 15.20.4544.022; Tue, 28 Sep 2021
- 10:36:04 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v2 4/4] block/mq-deadline: Prioritize high-priority
- requests
-Thread-Topic: [PATCH v2 4/4] block/mq-deadline: Prioritize high-priority
- requests
-Thread-Index: AQHXs+uatM/VKmrUakm8WAOr+0LlwKu5QW6A
-Date:   Tue, 28 Sep 2021 10:36:04 +0000
-Message-ID: <YVLwE9O6Dqz5GxNW@x1-carbon>
-References: <20210927220328.1410161-1-bvanassche@acm.org>
- <20210927220328.1410161-5-bvanassche@acm.org>
-In-Reply-To: <20210927220328.1410161-5-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: acm.org; dkim=none (message not signed)
- header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 33aa8bf2-afe4-453f-33b8-08d9826bc5ed
-x-ms-traffictypediagnostic: PH0PR04MB7448:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB74489897538C609C5224B7C1F2A89@PH0PR04MB7448.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:843;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WDY7c63rkjlXERj6GkcsBMIj8JQpLywaDoASb4tb/8vL4HcgGviM/o3r/RTW71a6jtz05dy2uEPXqG5AyN1zDRUw2nFc7eE27W+lcWlY2hpUAateW7spvBJiDVvDXtcqzANFJPNyhNBsGgsGWEnCCFYBLpkSeGOLWUZVfCvh5LYAhjCklnlwtXC6rRmkxZumBTMWCitDUJ9EFEYUCHKsueXUNarfGUU9htvlAcXCsXl6xey1mG2kLlSj08J6ypYWEtnMfOYAguBM75XgFcGSh30Qrkhbb/ZuO0/Btz/3RhjywUMr87q9qzYths7LDZEIUK0dQ4JP1/sMRZyG1mmL5mjh6e+lqhiP6zCDFRB1fQQTcErXsyDAN/pnqSVMXinGvC6Ej/bFHFjJ+XkFLWIlrc/84vdr1AJW79NhUaoVDWVn6kwEv1h5/HxTNKQcF0GnrAL45eNc5u/RDT3dXAOIBk40dckrrGok4rkO+uvx5Zl0MWf8WvTNy1cY1DnNxXvjywcR5G1pWvh5XQpt0a9z3nluHyH0a5PGlxH/h75OHbtXhSFymK9OPub281t5vXMJKOG2s7co+VZUFP2onqK2jsMXfoXcu9K+vi0S9+d7ZgA+hHmm1X2q4XY4M13FRH18ECPB9fOlU0xJa9IXKNRi3kVcP0jYgxv6YUDkQg33mHHBBFmal1bk5zxOPoD8JHe2PDLYo4OX3I3vJ2Z07AQRgA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7158.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(4636009)(366004)(66946007)(66476007)(38100700002)(6512007)(4326008)(316002)(54906003)(83380400001)(6506007)(122000001)(71200400001)(508600001)(9686003)(76116006)(91956017)(186003)(33716001)(6916009)(2906002)(26005)(6486002)(66446008)(64756008)(66556008)(8676002)(38070700005)(8936002)(5660300002)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?CK9/uVtiGynRjL26cQpbQAnV4Tyl02dY6sWrMV2O6438tuQauK28nEfTgRI7?=
- =?us-ascii?Q?Bsk7+71UKOlyMx4wkwGK1QsmYrqiaalUNYlcDMpgYxXIre14m2qC9XlrYYET?=
- =?us-ascii?Q?mKJSpmCBC6OV2JdvCHd05MnftNC6jg3YKXqEc8dKBZCSrcw362OCUU2yoyiP?=
- =?us-ascii?Q?A4uYmTOnBGtoK3C4dHfBb+kjDzTDf674BCy2ltqFOmlED8OEu7ucge1FbtFO?=
- =?us-ascii?Q?xrLFXJ2jdxesOUbd4flIiVHnSCgtDTwr5VJPtz/0JW5v6srXPX7eK7gixoK1?=
- =?us-ascii?Q?QqbPqjDS8cnkWtjYkATA8Zf8UWMUW4hbn6HVBrGBOi41Q6ZI+EvlVes6TQ6D?=
- =?us-ascii?Q?LdUCjyl8oeWL19+P6ydo1ea9SA++MjhD5uPaHeSRK2Z5JFgWQKG0qAJK9s+k?=
- =?us-ascii?Q?xn+QaDiP25UyDU4fIRyk8r6eAKc97KrwHPFar+5jo6fuKGlcyw6W+GeOPrdf?=
- =?us-ascii?Q?wji6FbuPBhjVas8EXKMckoo+efRH1tys3kuz7ZqpWQqTwU57gTpvImSaTgHF?=
- =?us-ascii?Q?BnHT+iTngjh/Eml1LHeSK1WtpLFUisyiJskth3JtLvufPKEbjwrBf28gY/Pn?=
- =?us-ascii?Q?hC/51M5vDiwAb1RL3FlogpuxkyjQ+2kqkCUErH2eXdohGd6yZRz4Hn5p8XiM?=
- =?us-ascii?Q?978VdEdo7zl3IOqyhSRTNq6z/udxrTdXmOIyMCPbwzH1cBRCO7WokyTIionh?=
- =?us-ascii?Q?x/WLb1PaONqP48Hs+Y/D2JLTQVk+X52BSjyuZOFLblwO3V0HnvwZxI2Wofw3?=
- =?us-ascii?Q?m5njjURx1HCJOqk1JQfbX7QOH3i0tIjdqFkIWMYN/wFxqvpVx4xLqIFgJeLU?=
- =?us-ascii?Q?DObUJN2MT06aOe9nti1fprQvg64YNvSUJkooxE3cU9E74faejEd9bL7a1FmP?=
- =?us-ascii?Q?CuxZx5YfyKlCQGGtRBb9S2REZs/R3VzAdSnqg62r6LJYyiyp7SrNmk/UUH0Y?=
- =?us-ascii?Q?lRzYkTbSsSA9SH8tm439bLqDB1Ag4IdQWCUs+Fd1ZYH3SLv10ylsY02I5tyR?=
- =?us-ascii?Q?ANBPU0abpNrc1gtuOZnisAZv3A/QOSDsxZ4u3a/Tk6WVPJ/zloA+PKw+vmsE?=
- =?us-ascii?Q?kLX5jyO61nNtcn8y6LEM/zUVo+r6G/Jqi4SVTL2NVbwy1D5pl50FlGLrPjPT?=
- =?us-ascii?Q?CXcNeaN6dLVAo8sYi7sYl7//OMog5YenzA39qm1e2/huaieqS4lr0D8dY5xU?=
- =?us-ascii?Q?R3bD5bMRgPXj3B5qlQk6Z00HRE1z+u+/Eljj4q0bVhr7tooO5/62ZxUPz7sC?=
- =?us-ascii?Q?QISwDYSwDzbqVoe08E/lx64miipgC5slnyq65/mjSu9R/6JY4knS6q1WZy6T?=
- =?us-ascii?Q?nLXylQM7+binfiRP8gWQl+Ys?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <884CA9BC83D89D42879DCB6061A912FE@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Tue, 28 Sep 2021 06:42:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632825672;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=Iu25a+cqnBrHkIKSfPPiJTfwCo9Wph8TbFl7lcWV0QE=;
+        b=YcIWGYyhcBm69xVGzsMGFhCWIk0iHPY7hglfF30mbIZsj1PAVDCQHUUGEuuV1vNXqOV2NC
+        VKeLEz9xrb6vhvZpW3pI0ajuOog0DEI8ABbVPQXDK3kvEqHIvc+4ja2dcJT2xo4TFgR4pR
+        vWgJOPCpAeMO80df8xve3LkWGuCYe78=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-IJqy338sNcKDUVGeK5N0jQ-1; Tue, 28 Sep 2021 06:41:11 -0400
+X-MC-Unique: IJqy338sNcKDUVGeK5N0jQ-1
+Received: by mail-oi1-f198.google.com with SMTP id j200-20020acaebd1000000b0027357b3466aso19471082oih.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Sep 2021 03:41:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Iu25a+cqnBrHkIKSfPPiJTfwCo9Wph8TbFl7lcWV0QE=;
+        b=NnQVDdX7kDNYR/R6NDsCdlpKrUP0+beFHVbX63Sfc2QgMgt3uJ0EELhiXNZkWBJtKX
+         ctw4OBQcNs2Q4nZ5jq1dHLcu5nAWRwP3XC+yfL7Z37V768ZkcWsfwfhZX22Fgm6Aucc8
+         E+9V6MQikt6UIHtFJh4VUYVsQE+fmp9DDke1zpLPiMHI7GwMO5eDcmdBQoBd9dsURH/T
+         9azsieVE0c3R+vkbejh82jhd0Iy9BKUGuOaOC7pFKuys8qdsH128pSNoX0jdvNlANLDB
+         NsBC4dCo0rI/ERMt9b20lL7s6PP2gGsOyBiOoOLq8DtRqy8Bszxj8gL7Zv9TRZrzmsPh
+         WSxw==
+X-Gm-Message-State: AOAM5308eGooKRpGFd3O/75zsux/jZE+nEodcY9r+Yi712Wtqellp39/
+        v/R9RBG7bZXm2pGY4HS1iIewQLxleaCoEac09IPlF/W9LSn9SLT5q1noPvtW55p0BSJQpmk3r97
+        Fnfn64+rr9HUJuIzV0eZPgcnIIAqxDFjml8fEiNc=
+X-Received: by 2002:a54:4f1d:: with SMTP id e29mr3051080oiy.179.1632825670114;
+        Tue, 28 Sep 2021 03:41:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxguprT5Kh+XNwcMXaa/xjlzAHVOdzCXISGeISVXs6yPk5zkBGlnnZsxcg5XWTANTYg4+5V0X1BkJquCNdkBSY=
+X-Received: by 2002:a54:4f1d:: with SMTP id e29mr3051069oiy.179.1632825669870;
+ Tue, 28 Sep 2021 03:41:09 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7158.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33aa8bf2-afe4-453f-33b8-08d9826bc5ed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2021 10:36:04.2149
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /A/h+NBiX1G2wdsFAwS6gd28wwBAziG6LfGsgc/l1lzHXT7FEaQnnskwS+Qsp8jPjTrQyp/QzXBZ6wY+7WXOCQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7448
+From:   Bruno Goncalves <bgoncalv@redhat.com>
+Date:   Tue, 28 Sep 2021 12:40:59 +0200
+Message-ID: <CA+QYu4oBndcsqv9f4r5Xn_C+WnPO1HYf4TGJ9b7=95R0akZX-Q@mail.gmail.com>
+Subject: btrfs - ppc64le - NIP [c0000000004bfbf4] kmem_cache_alloc_node+0x1c4/0x4d0
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        CKI Project <cki-project@redhat.com>,
+        Xiong Zhou <xzhou@redhat.com>, Huanian Li <huanli@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 03:03:28PM -0700, Bart Van Assche wrote:
-> In addition to reverting commit 7b05bf771084 ("Revert "block/mq-deadline:
-> Prioritize high-priority requests""), this patch uses 'jiffies' instead
-> of ktime_get() in the code for aging lower priority requests.
+Hello,
 
-Considering that this is basically a revert of a revert,
-except for the ktime_get() to jiffies change, I think that
-you should state the reason for this change in the change log.
+When testing stable tree from
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
+using cki xfstests for btrfs [1] on ppc64le we hit the following
+panic:
 
-> Ran the following script:
->=20
-> set -e
-> scriptdir=3D$(dirname "$0")
-> if [ -e /sys/module/scsi_debug ]; then modprobe -r scsi_debug; fi
-> modprobe scsi_debug ndelay=3D1000000 max_queue=3D16
-> sd=3D''
-> while [ -z "$sd" ]; do
->   sd=3D$(basename /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/targe=
-t*/*/block/*)
-> done
-> echo $((100*1000)) > "/sys/block/$sd/queue/iosched/prio_aging_expire"
-> if [ -e /sys/fs/cgroup/io.prio.class ]; then
->   cd /sys/fs/cgroup
->   echo restrict-to-be >io.prio.class
->   echo +io > cgroup.subtree_control
-> else
->   cd /sys/fs/cgroup/blkio/
->   echo restrict-to-be >blkio.prio.class
-> fi
-> echo $$ >cgroup.procs
-> mkdir -p hipri
-> cd hipri
-> if [ -e io.prio.class ]; then
->   echo none-to-rt >io.prio.class
-> else
->   echo none-to-rt >blkio.prio.class
-> fi
-> { "${scriptdir}/max-iops" -a1 -d32 -j1 -e mq-deadline "/dev/$sd" >& ~/low=
--pri.txt & }
-> echo $$ >cgroup.procs
-> "${scriptdir}/max-iops" -a1 -d32 -j1 -e mq-deadline "/dev/$sd" >& ~/hi-pr=
-i.txt
->=20
-> Result:
-> * 11000 IOPS for the high-priority job
-> *    40 IOPS for the low-priority job
->=20
-> If the prio aging expiry time is changed from 100s into 0, the IOPS resul=
-ts
-> change into 6712 and 6796 IOPS.
->=20
-> The max-iops script is a script that runs fio with the following argument=
-s:
-> --bs=3D4K --gtod_reduce=3D1 --ioengine=3Dlibaio --ioscheduler=3D${arg_e} =
---runtime=3D60
-> --norandommap --rw=3Dread --thread --buffered=3D0 --numjobs=3D${arg_j}
-> --iodepth=3D${arg_d} --iodepth_batch_submit=3D${arg_a}
-> --iodepth_batch_complete=3D$((arg_d / 2)) --name=3D${positional_argument_=
-1}
-> --filename=3D${positional_argument_1}
->=20
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> Cc: Niklas Cassel <Niklas.Cassel@wdc.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
+[11660.843269] Running test [T:132376093 - xfstests - btrfs]
+[11679.449129] BUG: Unable to handle kernel data access on read at
+0xf7b347dd8c8fdb98
+[11679.449160] Faulting instruction address: 0xc0000000004bfa94
+[11679.449175] Oops: Kernel access of bad area, sig: 11 [#1]
+[11679.449186] LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA PowerNV
+[11679.449211] Modules linked in: xt_nat xt_addrtype xt_mark
+nft_chain_nat xt_MASQUERADE nf_nat xt_comment veth bridge stp llc
+vsock_loopback vmw_vsock_virtio_transport_common vsock loop tun af_key
+crypto_user scsi_transport_iscsi xt_multiport ip_gre ip_tunnel gre
+bluetooth ecdh_generic overlay xt_CONNSECMARK xt_SECMARK nft_counter
+xt_state xt_conntrack nft_compat ah6 ah4 nft_objref nft_ct
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink vfat
+fat jfs sctp ip6_udp_tunnel udp_tunnel ipmi_watchdog ipmi_poweroff
+ipmi_ssif ipmi_devintf dm_log_writes rfkill sunrpc at24 joydev
+tpm_i2c_nuvoton crct10dif_vpmsum ofpart regmap_i2c ipmi_powernv
+powernv_flash mtd opal_prd tg3 rtc_opal ipmi_msghandler i2c_opal fuse
+zram ip_tables xfs ast i2c_algo_bit drm_vram_helper drm_kms_helper
+syscopyarea sysfillrect sysimgblt fb_sys_fops cec drm_ttm_helper ttm
+vmx_crypto crc32c_vpmsum drm i2c_core drm_panel_orientation_quirks
+[last unloaded: raid10]
+[11679.449536] CPU: 48 PID: 1114140 Comm: configure Tainted: G
+  OE     5.14.7 #1
+[11679.449562] NIP:  c0000000004bfa94 LR: c0000000004bf94c CTR: c000000000976790
+[11679.449595] REGS: c000000088b9f0a0 TRAP: 0380   Tainted: G
+ OE      (5.14.7)
+[11679.449629] MSR:  9000000000009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR:
+88222248  XER: 000000ad
+[11679.449663] CFAR: c0000000004bfa78 IRQMASK: 1
+[11679.449663] GPR00: c0000000004bf94c c000000088b9f340
+c000000002866d00 0000000000000000
+[11679.449663] GPR04: 0000000000002900 ffffffffffffffff
+00000000000004b5 c009e000014f04c0
+[11679.449663] GPR08: 0000000000000118 f7b347dd8c8fda80
+c009dfe0057b04c0 6f723cbf8c9e92a8
+[11679.449663] GPR12: 0000000000004000 c000001ffffab800
+000000015217f760 0000000000000000
+[11679.449663] GPR16: 0000000121d387b8 c000000088b9fbf0
+0000000000000000 0000000000080001
+[11679.449663] GPR20: c0000000460cc0a0 0000000000000001
+0000000000060800 c0000000414c11f0
+[11679.449663] GPR24: 0000000000000000 c0000000028a8af8
+c00000000097520c ffffffffffffffff
+[11679.449663] GPR28: 0000000000002900 0000000000000000
+0000000000000001 c00000002ff9d080
+[11679.449887] NIP [c0000000004bfa94] kmem_cache_alloc_node+0x1c4/0x4d0
+[11679.449924] LR [c0000000004bf94c] kmem_cache_alloc_node+0x7c/0x4d0
+[11679.449957] Call Trace:
+[11679.449973] [c000000088b9f340] [c000000088b9f3d0]
+0xc000000088b9f3d0 (unreliable)
+[11679.450018] [c000000088b9f3b0] [c00000000097520c] bfq_get_queue+0x1cc/0x680
+[11679.450052] [c000000088b9f470] [c000000000975d20] bfq_init_rq+0x530/0xc90
+[11679.450085] [c000000088b9f550] [c0000000009768a4]
+bfq_insert_requests+0x114/0x16f0
+[11679.450120] [c000000088b9f6c0] [c00000000093a86c]
+blk_mq_sched_insert_requests+0xac/0x1e0
+[11679.450156] [c000000088b9f710] [c000000000932468]
+blk_mq_flush_plug_list+0x138/0x1f0
+[11679.450182] [c000000088b9f780] [c00000000091d8e8] blk_finish_plug+0x68/0x90
+[11679.450206] [c000000088b9f7b0] [c0000000003eb990] read_pages+0x1d0/0x4b0
+[11679.450230] [c000000088b9f830] [c0000000003ebe8c]
+page_cache_ra_unbounded+0x21c/0x300
+[11679.450266] [c000000088b9f8d0] [c0000000003dc4ac]
+filemap_get_pages+0x11c/0x7d0
+[11679.450301] [c000000088b9f9a0] [c0000000003dcc4c] filemap_read+0xec/0x480
+[11679.450326] [c000000088b9fad0] [c008000019d224d8]
+xfs_file_buffered_read+0xe0/0x120 [xfs]
+[11679.450450] [c000000088b9fb10] [c008000019d23ad4]
+xfs_file_read_iter+0xac/0x170 [xfs]
+[11679.450568] [c000000088b9fb50] [c00000000051ade4] __kernel_read+0x144/0x360
+[11679.450593] [c000000088b9fc40] [c000000000526a74] bprm_execve+0x254/0x7e0
+[11679.450616] [c000000088b9fd10] [c00000000052792c]
+do_execveat_common+0x17c/0x250
+[11679.450650] [c000000088b9fd70] [c000000000527a48] sys_execve+0x48/0x60
+[11679.450683] [c000000088b9fdb0] [c00000000002d47c]
+system_call_exception+0x11c/0x360
+[11679.450718] [c000000088b9fe10] [c00000000000c1e8]
+system_call_vectored_common+0xe8/0x278
+[11679.450754] --- interrupt: 3000 at 0x7fff9a6f0d04
+[11679.450784] NIP:  00007fff9a6f0d04 LR: 0000000000000000 CTR: 0000000000000000
+[11679.450798] REGS: c000000088b9fe80 TRAP: 3000   Tainted: G
+ OE      (5.14.7)
+[11679.450812] MSR:  900000000280f033
+<SF,HV,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 42224442  XER: 00000000
+[11679.450860] IRQMASK: 0
+[11679.450860] GPR00: 000000000000000b 00007fffc7ec6ba0
+00007fff9a817000 0000000152180480
+[11679.450860] GPR04: 000000015217ecb0 0000000152141a00
+00000001520f0012 000000000015217e
+[11679.450860] GPR08: 000000015212ad60 0000000000000000
+0000000000000000 0000000000000000
+[11679.450860] GPR12: 0000000000000000 00007fff9a95afa0
+000000015217f760 0000000000000000
+[11679.450860] GPR16: 0000000121d387b8 0000000121d394d4
+0000000000000000 000000000000001f
+[11679.450860] GPR20: 000000015217ecb0 000000015217fd70
+0000000000000000 0000000152180480
+[11679.450860] GPR24: 0000000000000000 000000015217f760
+000000015216bc60 000000015217ecb0
+[11679.450860] GPR28: 0000000152141a00 ffffffffffffffff
+000000015217ff10 0000000000100000
+[11679.451087] NIP [00007fff9a6f0d04] 0x7fff9a6f0d04
+[11679.451107] LR [0000000000000000] 0x0
+[11679.451125] --- interrupt: 3000
+[11679.451142] Instruction dump:
+[11679.451161] 2e1bffff 3b000000 3bc00001 2c2a0000 4182009c 41920010
+894a0007 7c1b5000
+[11679.451240] 4082008c 811f0028 e95f0000 e97f00b8 <7ce9402a> 7c094214
+79490720 0b090000
+[11679.451352] ---[ end trace 91affa7e930d27d6 ]---
+[11679.533226]
+[11680.533327] Kernel panic - not syncing: Fatal exception
+[11682.416281] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
-With an elaborated change log, this looks good to me:
+We don't have a reliable reproducer, but we have hit this 3 times so far.
 
-Reviewed-by: Niklas Cassel <niklas.cassel@wdc.com>=
+It might be related to the issue found with KASAN [2].
+
+[1] https://gitlab.com/cki-project/kernel-tests/-/tree/main/filesystems/xfs/xfstests
+[2] https://lore.kernel.org/linux-block/98103103-c517-59d2-a4d6-9b0758cbdfc1@kernel.dk/T/
+
+Thank you,
+Bruno
+
