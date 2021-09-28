@@ -2,72 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4184C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828B2C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C293C60F6C
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 736D76113E
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:39:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235848AbhI1FaO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 01:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38502 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235647AbhI1FaH (ORCPT
+        id S234991AbhI1Flf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 01:41:35 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:42402 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234243AbhI1Flf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 01:30:07 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E06CC061575
-        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 22:28:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=4WBm4eXmjObEW2+XSf9ryC+/P7AfIxwtLCkgYn+jKm0=; b=a1h17Nvs37/nM8bb781Xwg4ROk
-        +pHTum1nnoWujf/dKgGHjjDQgH9sHLU9VwT8v0evywWBwcK/fZDFm5AbNw8CRPrWDg64KNN7Ep2un
-        fc2YlCquyV5StvXvJO1e1SNSKvefdY1Y4I5TPK2Sku9SkjopzByzUd3l1aIf0SrNOS+yW/6bGiS84
-        JJKzzs/fpJlySvSRF60txEFXhWz5DNkWan/f5Ssuw0juD98kcGBXwaN9wj5CKStERO+Q1iElI4Byw
-        kLBcXCVtqWKRWIW3fA0GxDURXb5EHm6GReX9fjWzLE2Mt3GeJW/Ix9/7+3e0B63opRSiXwO1Ydrpy
-        eb69r8lQ==;
-Received: from p4fdb05cb.dip0.t-ipconnect.de ([79.219.5.203] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mV5em-00AWRi-Go; Tue, 28 Sep 2021 05:28:07 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: print the current process in handle_bad_sector
-Date:   Tue, 28 Sep 2021 07:27:55 +0200
-Message-Id: <20210928052755.113016-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+        Tue, 28 Sep 2021 01:41:35 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 0C7BD201BB;
+        Tue, 28 Sep 2021 05:39:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1632807595; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=13TnURwhS8h4t01lwoZLD/d/5oPL9agrfycanDfeTRQ=;
+        b=PT9kgFrx9DkgIx21N+ey4rvrG+p5lgzclkflex7M8ulg7b/MPe/8YBUPSSqsTo2GTahbjJ
+        Gey5RuOSF1hNpbYAFgKbf2oL0K4d67fdRAt+eRdY+iU4RsWpBKefK/X7oBdujgebC7iQbz
+        cH9ujOHUnez6nwSvlDTdjkQYCRSdxBg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1632807595;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=13TnURwhS8h4t01lwoZLD/d/5oPL9agrfycanDfeTRQ=;
+        b=VnyBApxFuoR87JCq7TgLnoYycKzbt1M/1osAF+bIrqg5sP1C+l/tWJFxYA8+084TxkpCY5
+        Hr8IhCD3XymifdAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AB01913A98;
+        Tue, 28 Sep 2021 05:39:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id JO5JKKqqUmHUNQAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 28 Sep 2021 05:39:54 +0000
+Subject: Re: [PATCH v2 03/10] nvme-multipath: add error handling support for
+ add_disk()
+To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
+        colyli@suse.de, kent.overstreet@gmail.com, kbusch@kernel.org,
+        sagi@grimberg.me, vishal.l.verma@intel.com,
+        dan.j.williams@intel.com, dave.jiang@intel.com,
+        ira.weiny@intel.com, konrad.wilk@oracle.com, roger.pau@citrix.com,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        sstabellini@kernel.org, minchan@kernel.org, ngupta@vflare.org,
+        senozhatsky@chromium.org
+Cc:     xen-devel@lists.xenproject.org, nvdimm@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210927220039.1064193-1-mcgrof@kernel.org>
+ <20210927220039.1064193-4-mcgrof@kernel.org>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <85d33b80-1d54-67ba-47f9-0298093b6d80@suse.de>
+Date:   Tue, 28 Sep 2021 07:39:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
+In-Reply-To: <20210927220039.1064193-4-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make the bad sector information a little more useful by printing
-current->comm to identify the caller.
+On 9/28/21 12:00 AM, Luis Chamberlain wrote:
+> We never checked for errors on add_disk() as this function
+> returned void. Now that this is fixed, use the shiny new
+> error handling.
+> 
+> Since we now can tell for sure when a disk was added, move
+> setting the bit NVME_NSHEAD_DISK_LIVE only when we did
+> add the disk successfully.
+> 
+> Nothing to do here as the cleanup is done elsewhere. We take
+> care and use test_and_set_bit() because it is protects against
+> two nvme paths simultaneously calling device_add_disk() on the
+> same namespace head.
+> 
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>   drivers/nvme/host/multipath.c | 13 +++++++++++--
+>   1 file changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+> index e8ccdd398f78..35cace4f3f5f 100644
+> --- a/drivers/nvme/host/multipath.c
+> +++ b/drivers/nvme/host/multipath.c
+> @@ -496,13 +496,22 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
+>   static void nvme_mpath_set_live(struct nvme_ns *ns)
+>   {
+>   	struct nvme_ns_head *head = ns->head;
+> +	int rc;
+>   
+>   	if (!head->disk)
+>   		return;
+>   
+> +	/*
+> +	 * test_and_set_bit() is used because it is protecting against two nvme
+> +	 * paths simultaneously calling device_add_disk() on the same namespace
+> +	 * head.
+> +	 */
+>   	if (!test_and_set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
+> -		device_add_disk(&head->subsys->dev, head->disk,
+> -				nvme_ns_id_attr_groups);
+> +		rc = device_add_disk(&head->subsys->dev, head->disk,
+> +				     nvme_ns_id_attr_groups);
+> +		if (rc)
+> +			return;
+> +		set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags);
+>   		nvme_add_ns_head_cdev(head);
+>   	}
+>   
+> Errm.
+Setting the same bit twice?
+And shouldn't you unset the bit if 'device_add_disk()' fails?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Cheers,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5454db2fa263b..4c2a3db4bd336 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -636,8 +636,9 @@ static void handle_bad_sector(struct bio *bio, sector_t maxsector)
- {
- 	char b[BDEVNAME_SIZE];
- 
--	pr_info_ratelimited("attempt to access beyond end of device\n"
-+	pr_info_ratelimited("%s: attempt to access beyond end of device\n"
- 			    "%s: rw=%d, want=%llu, limit=%llu\n",
-+			    current->comm,
- 			    bio_devname(bio, b), bio->bi_opf,
- 			    bio_end_sector(bio), maxsector);
- }
+Hannes
 -- 
-2.30.2
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
