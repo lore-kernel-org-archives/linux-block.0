@@ -2,100 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 149DAC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 03:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FEF2C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:23:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED22D6124B
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 03:11:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DB8D611C7
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:23:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238804AbhI1DNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 23:13:23 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:35268 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238748AbhI1DNX (ORCPT
+        id S234091AbhI1FYy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 01:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233290AbhI1FYx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 23:13:23 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 95E6C222DF;
-        Tue, 28 Sep 2021 03:11:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1632798701; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k1irZcE6GgE63UfMaZ69q7wFQxdxy8PkJV1UDRuOwDA=;
-        b=Af8PPYiGG/KoV03reINXBzNVPccmiyHVMrwNt2UIFxlU1jhXBp5nI2Gka9opvfla6EYXOa
-        u9dubE+5BF4AwBJlVzPfA+nwLlAQkhckDkag+FkKT+kBsnwd6qmqqlWA/pOjn0C1Ffe5V9
-        HYSxfFfncwL3S6Y8kijKplmMugjgsEE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1632798701;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k1irZcE6GgE63UfMaZ69q7wFQxdxy8PkJV1UDRuOwDA=;
-        b=rvEM/v30W6HdMnLZksiPaBfoRjZ8iPYI6P23HeASJG7DpSxpqPRoywlWfOvhpMFCEARX9U
-        W3t0wcFCENMdaDDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C1463132D4;
-        Tue, 28 Sep 2021 03:11:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id HD3CH+SHUmHafwAAMHmgww
-        (envelope-from <neilb@suse.de>); Tue, 28 Sep 2021 03:11:32 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+        Tue, 28 Sep 2021 01:24:53 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1392EC061575;
+        Mon, 27 Sep 2021 22:23:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=A04dM+Vo9/Fetf7krH0dGPC++Y24iPZldsb1IcuSrY8=; b=aRY4V1sGCTesXudqb9o16TDrY4
+        So7uD86nqB92AiLd9otKv6X6MfWgkOAeId/QuKEULs9GPk8juifoFzT1FcrlwMsQ7ZRhUI8kmCE+c
+        Yli36oAEOytrjPeUgbZNvzCjU2EzP9rba/ZlJ006Z+tuNmvc9v3TUlHcc8qJ/K2P6yp3IY1ADaqjS
+        J4NXRo7VuTMbjV8iDjYIIul09I5WL+RdhOTGjuJBq9NS8v9mf0g6z3H5Tny0BOZ/4hSyNzwEawg9e
+        5eekUuS6ByryxDk1zzvY4nLWDB3xOU1vOs8rgt5f3Z8GKkntaFhrkCAQwL1iiiMTbmdpmGkBYAAPD
+        vjp2zNNg==;
+Received: from p4fdb05cb.dip0.t-ipconnect.de ([79.219.5.203] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mV5ZG-00AW6O-LM; Tue, 28 Sep 2021 05:22:21 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-block@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Subject: remove ->rq_disk
+Date:   Tue, 28 Sep 2021 07:22:06 +0200
+Message-Id: <20210928052211.112801-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   "NeilBrown" <neilb@suse.de>
-To:     "David Howells" <dhowells@redhat.com>
-Cc:     willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
-        "Theodore Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        "Trond Myklebust" <trond.myklebust@hammerspace.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "Andreas Dilger" <adilger.kernel@dilger.ca>,
-        "Anna Schumaker" <anna.schumaker@netapp.com>, linux-mm@kvack.org,
-        "Bob Liu" <bob.liu@oracle.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "Josef Bacik" <josef@toxicpanda.com>,
-        "Seth Jennings" <sjenning@linux.vnet.ibm.com>,
-        "Jens Axboe" <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-cifs@vger.kernel.org, "Chris Mason" <clm@fb.com>,
-        "David Sterba" <dsterba@suse.com>,
-        "Minchan Kim" <minchan@kernel.org>,
-        "Steve French" <sfrench@samba.org>,
-        "Dan Magenheimer" <dan.magenheimer@oracle.com>,
-        linux-nfs@vger.kernel.org, "Ilya Dryomov" <idryomov@gmail.com>,
-        linux-btrfs@vger.kernel.org, dhowells@redhat.com,
-        viro@zeniv.linux.org.uk, torvalds@linux-foundation.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC][PATCH v3 0/9] mm: Use DIO for swap and fix NFS swapfiles
-In-reply-to: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
-References: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
-Date:   Tue, 28 Sep 2021 13:11:29 +1000
-Message-id: <163279868982.18792.10448745714922373194@noble.neil.brown.name>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 25 Sep 2021, David Howells wrote:
-> Whilst trying to make this work, I found that NFS's support for swapfiles
-> seems to have been non-functional since Aug 2019 (I think), so the first
-> patch fixes that.  Question is: do we actually *want* to keep this
-> functionality, given that it seems that no one's tested it with an upstream
-> kernel in the last couple of years?
+Hi Jens,
 
-SUSE definitely want to keep this functionality.  We have customers
-using it.
-I agree it would be good if it was being tested somewhere....
+this series removes the rq_disk field in struct request, which isn't
+needed now that we can get the disk from the request_queue.
 
-Thanks,
-NeilBrown
+Diffstat:
+ block/blk-core.c                   |   10 ++++----
+ block/blk-exec.c                   |   10 ++------
+ block/blk-flush.c                  |    3 --
+ block/blk-merge.c                  |    7 ------
+ block/blk-mq.c                     |    1 
+ block/blk.h                        |    2 -
+ block/bsg-lib.c                    |    2 -
+ drivers/block/amiflop.c            |    2 -
+ drivers/block/ataflop.c            |    6 ++---
+ drivers/block/floppy.c             |    6 ++---
+ drivers/block/mtip32xx/mtip32xx.c  |    2 -
+ drivers/block/null_blk/trace.h     |    2 -
+ drivers/block/paride/pcd.c         |    2 -
+ drivers/block/paride/pd.c          |    6 ++---
+ drivers/block/paride/pf.c          |    4 +--
+ drivers/block/pktcdvd.c            |    2 -
+ drivers/block/rnbd/rnbd-clt.c      |    4 +--
+ drivers/block/sunvdc.c             |    2 -
+ drivers/block/sx8.c                |    4 +--
+ drivers/block/virtio_blk.c         |    2 -
+ drivers/md/dm-mpath.c              |    1 
+ drivers/mmc/core/block.c           |   12 +++++-----
+ drivers/mtd/mtd_blkdevs.c          |   10 +-------
+ drivers/nvme/host/core.c           |    4 +--
+ drivers/nvme/host/fault_inject.c   |    2 -
+ drivers/nvme/host/pci.c            |    7 ++----
+ drivers/nvme/host/trace.h          |    6 ++---
+ drivers/nvme/target/passthru.c     |    3 --
+ drivers/scsi/ch.c                  |    2 -
+ drivers/scsi/scsi_bsg.c            |    2 -
+ drivers/scsi/scsi_error.c          |    2 -
+ drivers/scsi/scsi_ioctl.c          |   43 ++++++++++++++-----------------------
+ drivers/scsi/scsi_lib.c            |    5 ++--
+ drivers/scsi/scsi_logging.c        |    4 ++-
+ drivers/scsi/sd.c                  |   26 +++++++++++-----------
+ drivers/scsi/sd_zbc.c              |    8 +++---
+ drivers/scsi/sg.c                  |    6 ++---
+ drivers/scsi/sr.c                  |   11 ++++-----
+ drivers/scsi/st.c                  |    4 +--
+ drivers/scsi/ufs/ufshcd.c          |    3 --
+ drivers/scsi/ufs/ufshpb.c          |    5 +---
+ drivers/scsi/virtio_scsi.c         |    2 -
+ drivers/target/target_core_pscsi.c |    2 -
+ drivers/usb/storage/transport.c    |    2 -
+ fs/nfsd/blocklayout.c              |    2 -
+ include/linux/blk-mq.h             |   11 ++-------
+ include/scsi/scsi_cmnd.h           |    2 -
+ include/scsi/scsi_device.h         |    4 +--
+ include/scsi/scsi_ioctl.h          |    4 +--
+ include/trace/events/block.h       |    8 +++---
+ kernel/trace/blktrace.c            |    2 -
+ 51 files changed, 125 insertions(+), 159 deletions(-)
