@@ -2,137 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2FEC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 06:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF9BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 06:47:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D8FE61159
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 06:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09F7D611C7
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 06:47:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237798AbhI1GlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 02:41:11 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:51636 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234207AbhI1GlG (ORCPT
+        id S238960AbhI1GtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 02:49:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40035 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238930AbhI1GtX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 02:41:06 -0400
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210928063921epoutp02346835ec01d127cf3e759d17cdd81ad7~o6Rm7DfZm2766127661epoutp02f
-        for <linux-block@vger.kernel.org>; Tue, 28 Sep 2021 06:39:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210928063921epoutp02346835ec01d127cf3e759d17cdd81ad7~o6Rm7DfZm2766127661epoutp02f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1632811161;
-        bh=ec/cnE/B9m6a4wLi6h6bXa6hyK8Qh1NGtayht6ko26w=;
-        h=Subject:Reply-To:From:To:Date:References:From;
-        b=gN/LUOrgBTiW7tX+8rt6gSfEQoLYRqhdV7c7iY5ikDWU1njg4XYtZoylFQNh/7g6o
-         q/e449o+28LmltBGKd+GbIZth+BHJzNo34Qk7ryYtl9nvTnayMoerLxrxotV92Kttq
-         /IacTTxKnx7e7LyOTOC86upY+pkJfgwKglpYQy8c=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
-        20210928063920epcas2p327a44b24703f1c1d4a19595e55d55174~o6RmL42BB0294202942epcas2p3j;
-        Tue, 28 Sep 2021 06:39:20 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.40.188]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4HJVGb5k5Bz4x9QY; Tue, 28 Sep
-        2021 06:39:19 +0000 (GMT)
-X-AuditID: b6c32a46-63bff70000002658-c9-6152b8976e4e
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5E.BF.09816.798B2516; Tue, 28 Sep 2021 15:39:19 +0900 (KST)
-Mime-Version: 1.0
-Subject: [PATCH] block-map: added error handling for bio_copy_kern()
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung CHOI <j-young.choi@samsung.com>
-From:   Jinyoung CHOI <j-young.choi@samsung.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20210928063919epcms2p12ef0dfc94e6756f7bf85945522720e8f@epcms2p1>
-Date:   Tue, 28 Sep 2021 15:39:19 +0900
-X-CMS-MailID: 20210928063919epcms2p12ef0dfc94e6756f7bf85945522720e8f
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-CMS-TYPE: 102P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDKsWRmVeSWpSXmKPExsWy7bCmue70HUGJBs8WiVisvtvPZvHykKZF
-        b/9WNou9t7QtLu+aw+bA6nH5bKlH35ZVjB6fN8kFMEfl2GSkJqakFimk5iXnp2TmpdsqeQfH
-        O8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYA7VNSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX
-        2CqlFqTkFBgaFugVJ+YWl+al6yXn51oZGhgYmQJVJuRk3Jt1g63gOl/Fpme5DYyXuLoYOTgk
-        BEwktryo7WLk4hAS2MEosWJ/KytInFdAUOLvDmEQU1jARWJDY14XIydQiZLEuTWzGCHCBhK3
-        es1BwmwCehI/l8xgA5kiIrCcUeLw+puMIAkJAV6JGe1PWSBsaYnty7dCxTUkfizrZYawRSVu
-        rn7LDmO/PzYfqkZEovXeWagaQYkHP3dDxSUlGidMg5pZLnF1+RwWkMUSAh2MEpeX3IRK6Etc
-        69gIZvMK+EpsenKNFcRmEVCVOPL6PhNEjYvE5lm7wBYwC8hLbH87hxnkMWYBTYn1u/QhoaMs
-        ceQWC8wrDRt/s6OzmQX4JDoO/4WL75j3hAmiVU1iUZMRRFhG4uvh+VAlHhILv31gmcCoOAsR
-        zLOQnDAL4YQFjMyrGMVSC4pz01OLjQqMkON1EyM42Wm57WCc8vaD3iFGJg7GQ4wSHMxKIrzB
-        LP6JQrwpiZVVqUX58UWlOanFhxhNgZ6fyCwlmpwPTLd5JfGGpkZmZgaWphamZkYWSuK8c/85
-        JQoJpCeWpGanphakFsH0MXFwSjUw8ba5KhVMZFaJiyhqWxnimPxqd2rhnC/eD48wc0g8m8i+
-        t/yljsXb7oeHNZf3Gq/iP3uu2Ujz3b4UXWuXLe7B+/9sKE7fErFu3/JpFuGPwts2sr1N/xhe
-        3Rr0QO9WsMK/w9J14V/jX3VzskpNfeAqknpqS+ncuw6nfOSe/5Fp+RN6z9p5XteGa03hXxsl
-        xA7PlbRVtWc2uLjmUnLxT9mUDE/XGZ/Fls4++pnTxK1XW9LC9iLP7a0bf3+wsDrq+7xuzvmk
-        3DIWjTNfttrKOHQeD+o+MfNRs1as2bS10rudm+dxSP765zP/XWWU7DWrhKVLO7NfFIVdEIlW
-        POOhpDrR+crDvPN606cuWedztUFdiaU4I9FQi7moOBEAmXP1EP8DAAA=
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210928063420epcms2p8f0cad25e1b820169755962ff4555d3ac
-References: <CGME20210928063420epcms2p8f0cad25e1b820169755962ff4555d3ac@epcms2p1>
+        Tue, 28 Sep 2021 02:49:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632811664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sCmNJ5vO7haCV1drO5nn+RW5ibWF9pJv3xiWMlwH7+g=;
+        b=Q9qYjbHhMQqBR3sfzaNDA6GqGLSbYe0ovfOV/BgVL70LoXt7FMFbSE4aW8KN/3J0HW64Yd
+        8SxjJ55zfSlssuVSOc/yej9LAwxGHwN9VCWsBTsv18uOXf+lHLlnFW8kc0m4NuWDv0cb2H
+        LinPK9bKBialrEmV1q0xExpFuo44Q60=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-_X6jgUWMN0ePwSNylaNBSQ-1; Tue, 28 Sep 2021 02:47:40 -0400
+X-MC-Unique: _X6jgUWMN0ePwSNylaNBSQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED4CD1808312;
+        Tue, 28 Sep 2021 06:47:38 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.122])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 196165F70B;
+        Tue, 28 Sep 2021 06:47:34 +0000 (UTC)
+Date:   Tue, 28 Sep 2021 08:47:33 +0200
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
+        israelr@nvidia.com, hch@infradead.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVK6hdcrXwQHrXQ9@stefanha-x1.localdomain>
+References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
+ <YVF8RBZSaJs9BScd@stefanha-x1.localdomain>
+ <21295187-41c4-5fb6-21c3-28004eb7c5d8@nvidia.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="tlmjEO+SMhyWD/NG"
+Content-Disposition: inline
+In-Reply-To: <21295187-41c4-5fb6-21c3-28004eb7c5d8@nvidia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When new pages are allocated to bio through alloc_page() in
-bio_copy_kern(), the pages must be freed in error handling after that.
 
-There is little chance of an error occurring in blk_rq_append_bio(), but
-in the code flow, pages additionally allocated to bio must be released.
+--tlmjEO+SMhyWD/NG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
----
- block/blk-map.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+On Mon, Sep 27, 2021 at 08:39:30PM +0300, Max Gurtovoy wrote:
+>=20
+> On 9/27/2021 11:09 AM, Stefan Hajnoczi wrote:
+> > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> > > To optimize performance, set the affinity of the block device tagset
+> > > according to the virtio device affinity.
+> > >=20
+> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > ---
+> > >   drivers/block/virtio_blk.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index 9b3bd083b411..1c68c3e0ebf9 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vd=
+ev)
+> > >   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+> > >   	vblk->tag_set.ops =3D &virtio_mq_ops;
+> > >   	vblk->tag_set.queue_depth =3D queue_depth;
+> > > -	vblk->tag_set.numa_node =3D NUMA_NO_NODE;
+> > > +	vblk->tag_set.numa_node =3D virtio_dev_to_node(vdev);
+> > >   	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
+> > >   	vblk->tag_set.cmd_size =3D
+> > >   		sizeof(struct virtblk_req) +
+> > I implemented NUMA affinity in the past and could not demonstrate a
+> > performance improvement:
+> > https://lists.linuxfoundation.org/pipermail/virtualization/2020-June/04=
+8248.html
+> >=20
+> > The pathological case is when a guest with vNUMA has the virtio-blk-pci
+> > device on the "wrong" host NUMA node. Then memory accesses should cross
+> > NUMA nodes. Still, it didn't seem to matter.
+>=20
+> I think the reason you didn't see any improvement is since you didn't use
+> the right device for the node query. See my patch 1/2.
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 4526adde0156..584369a7837f 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -628,6 +628,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
-        int reading = rq_data_dir(rq) == READ;
-        unsigned long addr = (unsigned long) kbuf;
-        struct bio *bio;
-+       int do_copy = 0;
-        int ret;
+That doesn't seem to be the case. Please see
+drivers/base/core.c:device_add():
 
-        if (len > (queue_max_hw_sectors(q) << 9))
-@@ -635,8 +636,9 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
-        if (!len || !kbuf)
-                return -EINVAL;
+  /* use parent numa_node */
+  if (parent && (dev_to_node(dev) =3D=3D NUMA_NO_NODE))
+          set_dev_node(dev, dev_to_node(parent));
 
--       if (!blk_rq_aligned(q, addr, len) || object_is_on_stack(kbuf) ||
--           blk_queue_may_bounce(q))
-+       do_copy = !blk_rq_aligned(q, addr, len) || object_is_on_stack(kbuf) ||
-+               blk_queue_may_bounce(q);
-+       if (do_copy)
-                bio = bio_copy_kern(q, kbuf, len, gfp_mask, reading);
-        else
-                bio = bio_map_kern(q, kbuf, len, gfp_mask);
-@@ -648,8 +650,11 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
-        bio->bi_opf |= req_op(rq);
+IMO it's cleaner to use dev_to_node(&vdev->dev) than to directly access
+the parent.
 
-        ret = blk_rq_append_bio(rq, bio);
--       if (unlikely(ret))
-+       if (unlikely(ret)) {
-+               if (do_copy)
-+                       bio_free_pages(bio);
-                bio_put(bio);
-+       }
-        return ret;
- }
- EXPORT_SYMBOL(blk_rq_map_kern);
---
-2.25.1
+Have I missed something?
+
+>=20
+> I can try integrating these patches in my series and fix it.
+>=20
+> BTW, we might not see a big improvement because of other bottlenecks but
+> this is known perf optimization we use often in block storage drivers.
+
+Let's see benchmark results. Otherwise this is just dead code that adds
+complexity.
+
+Stefan
+
+--tlmjEO+SMhyWD/NG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFSuoMACgkQnKSrs4Gr
+c8jpCgf8CGJHEk5t5Yz49uW2kuVSk/IZC3Uk7tJ7zK+xNzn1d2lgfpCvVl0a0AdC
+YxDeNMKrD5Oh+0AWZaOpenc0FMWZIC4gu85XGpyyxkbgcQWImQPTLNsR2l7ZlDsI
+thxfw+TkrccTvpq/X6J28iiMxqLi2HEvUd8bTj/4QVUQJgYpDyc75YflbJtwgcIv
+mmr8PBanK2J3O7AoNfPK+kARXD1/74w3p45z3iPLrnvFr79KgqEAH+34xSZCA2BJ
+ohOfaQJ68mrHkshlcblnsNAk2LZWPU8yoUSh4Buf7LcEMEbxbCGEHdZtuOgARhNM
+KxyuXSb7Q+TiRYQwAc6Sz2sSCqLFJg==
+=cy+s
+-----END PGP SIGNATURE-----
+
+--tlmjEO+SMhyWD/NG--
+
