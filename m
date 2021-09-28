@@ -2,144 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF9BC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 06:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1572C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 08:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09F7D611C7
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 06:47:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EF46611C7
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 08:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238960AbhI1GtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 02:49:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40035 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238930AbhI1GtX (ORCPT
+        id S239642AbhI1Iqa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 04:46:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39034 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239618AbhI1Iq3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 02:49:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632811664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sCmNJ5vO7haCV1drO5nn+RW5ibWF9pJv3xiWMlwH7+g=;
-        b=Q9qYjbHhMQqBR3sfzaNDA6GqGLSbYe0ovfOV/BgVL70LoXt7FMFbSE4aW8KN/3J0HW64Yd
-        8SxjJ55zfSlssuVSOc/yej9LAwxGHwN9VCWsBTsv18uOXf+lHLlnFW8kc0m4NuWDv0cb2H
-        LinPK9bKBialrEmV1q0xExpFuo44Q60=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-_X6jgUWMN0ePwSNylaNBSQ-1; Tue, 28 Sep 2021 02:47:40 -0400
-X-MC-Unique: _X6jgUWMN0ePwSNylaNBSQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED4CD1808312;
-        Tue, 28 Sep 2021 06:47:38 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 196165F70B;
-        Tue, 28 Sep 2021 06:47:34 +0000 (UTC)
-Date:   Tue, 28 Sep 2021 08:47:33 +0200
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, oren@nvidia.com, nitzanc@nvidia.com,
-        israelr@nvidia.com, hch@infradead.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
-Message-ID: <YVK6hdcrXwQHrXQ9@stefanha-x1.localdomain>
-References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210926145518.64164-2-mgurtovoy@nvidia.com>
- <YVF8RBZSaJs9BScd@stefanha-x1.localdomain>
- <21295187-41c4-5fb6-21c3-28004eb7c5d8@nvidia.com>
+        Tue, 28 Sep 2021 04:46:29 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18S8NPRj005548;
+        Tue, 28 Sep 2021 04:44:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=zBxfoBHkX8WZAFCzMW2WEkfCuH/znFi5cWiwbPqjqWM=;
+ b=EGz9+271qGmkpAW3qZvfm5GhIfGvLkS9sQHypX5tsIotlkKWr2kV5oZY0YMYsWdeJIN7
+ eUiRtCOCChOG9S8wIuGLIB2rLSTZa72xcVtajiOCtIpNi2CP8QArSEXGwiaiYw9EBVKL
+ LHWObPhD6knPvm9aZh+SuHO92g3B6klmYQ1Sm6zqls3XkEqKAwclCbyjyKXGiH/nyJ6a
+ B9K7lPZNN2FdYQZEzeJckB5wcVAZegaPQll5SQJGMHx08o1OOsCTWJp+Jg27qaBQOXLq
+ Ll/w5rTWdDU0tzcImRkxehDQzZxDrcDjpG+P3c4PkbvhWPq/b4p6hTafmqFBgBSWQlbc sQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagsfe4rh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Sep 2021 04:44:23 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18S8iNuH031289;
+        Tue, 28 Sep 2021 04:44:23 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagsfe4qw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Sep 2021 04:44:23 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18S8hFQQ031611;
+        Tue, 28 Sep 2021 08:44:20 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3b9u1jbtpu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 28 Sep 2021 08:44:20 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18S8iGao59572508
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Sep 2021 08:44:16 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA92E11C06C;
+        Tue, 28 Sep 2021 08:44:16 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 951DF11C069;
+        Tue, 28 Sep 2021 08:44:15 +0000 (GMT)
+Received: from osiris (unknown [9.145.163.77])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 28 Sep 2021 08:44:15 +0000 (GMT)
+Date:   Tue, 28 Sep 2021 10:44:14 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, gregkh@linuxfoundation.org,
+        chaitanya.kulkarni@wdc.com, atulgopinathan@gmail.com, hare@suse.de,
+        maximlevitsky@gmail.com, oakad@yahoo.com, ulf.hansson@linaro.org,
+        colin.king@canonical.com, shubhankarvk@gmail.com,
+        baijiaju1990@gmail.com, trix@redhat.com,
+        dongsheng.yang@easystack.cn, ceph-devel@vger.kernel.org,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        sth@linux.ibm.com, hoeppner@linux.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, oberpar@linux.ibm.com, tj@kernel.org,
+        linux-s390@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] block: 5th batch of add_disk() error handling
+ conversions
+Message-ID: <YVLV3s66GVVSQ+tj@osiris>
+References: <20210927220232.1071926-1-mcgrof@kernel.org>
+ <25afa23b-52af-9b79-8bd8-5e31da62c291@kernel.dk>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="tlmjEO+SMhyWD/NG"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <21295187-41c4-5fb6-21c3-28004eb7c5d8@nvidia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <25afa23b-52af-9b79-8bd8-5e31da62c291@kernel.dk>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YxG9ke3W_jbTNpwVPcs7XrGQVIxP9RN0
+X-Proofpoint-ORIG-GUID: iz_w5IRro-Zutc101Wh7ZoX-CWSF6VdI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-28_04,2021-09-28_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 mlxscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109280050
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Sep 27, 2021 at 04:32:17PM -0600, Jens Axboe wrote:
+> On 9/27/21 4:02 PM, Luis Chamberlain wrote:
+> > This is the 5th series of driver conversions for add_disk() error
+> > handling. This set along with the entire 7th set of patches can be
+> > found on my 20210927-for-axboe-add-disk-error-handling branch [0].
+> 
+> Applied 1-2.
 
---tlmjEO+SMhyWD/NG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Sep 27, 2021 at 08:39:30PM +0300, Max Gurtovoy wrote:
->=20
-> On 9/27/2021 11:09 AM, Stefan Hajnoczi wrote:
-> > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
-> > > To optimize performance, set the affinity of the block device tagset
-> > > according to the virtio device affinity.
-> > >=20
-> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > ---
-> > >   drivers/block/virtio_blk.c | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > index 9b3bd083b411..1c68c3e0ebf9 100644
-> > > --- a/drivers/block/virtio_blk.c
-> > > +++ b/drivers/block/virtio_blk.c
-> > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vd=
-ev)
-> > >   	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
-> > >   	vblk->tag_set.ops =3D &virtio_mq_ops;
-> > >   	vblk->tag_set.queue_depth =3D queue_depth;
-> > > -	vblk->tag_set.numa_node =3D NUMA_NO_NODE;
-> > > +	vblk->tag_set.numa_node =3D virtio_dev_to_node(vdev);
-> > >   	vblk->tag_set.flags =3D BLK_MQ_F_SHOULD_MERGE;
-> > >   	vblk->tag_set.cmd_size =3D
-> > >   		sizeof(struct virtblk_req) +
-> > I implemented NUMA affinity in the past and could not demonstrate a
-> > performance improvement:
-> > https://lists.linuxfoundation.org/pipermail/virtualization/2020-June/04=
-8248.html
-> >=20
-> > The pathological case is when a guest with vNUMA has the virtio-blk-pci
-> > device on the "wrong" host NUMA node. Then memory accesses should cross
-> > NUMA nodes. Still, it didn't seem to matter.
->=20
-> I think the reason you didn't see any improvement is since you didn't use
-> the right device for the node query. See my patch 1/2.
-
-That doesn't seem to be the case. Please see
-drivers/base/core.c:device_add():
-
-  /* use parent numa_node */
-  if (parent && (dev_to_node(dev) =3D=3D NUMA_NO_NODE))
-          set_dev_node(dev, dev_to_node(parent));
-
-IMO it's cleaner to use dev_to_node(&vdev->dev) than to directly access
-the parent.
-
-Have I missed something?
-
->=20
-> I can try integrating these patches in my series and fix it.
->=20
-> BTW, we might not see a big improvement because of other bottlenecks but
-> this is known perf optimization we use often in block storage drivers.
-
-Let's see benchmark results. Otherwise this is just dead code that adds
-complexity.
-
-Stefan
-
---tlmjEO+SMhyWD/NG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFSuoMACgkQnKSrs4Gr
-c8jpCgf8CGJHEk5t5Yz49uW2kuVSk/IZC3Uk7tJ7zK+xNzn1d2lgfpCvVl0a0AdC
-YxDeNMKrD5Oh+0AWZaOpenc0FMWZIC4gu85XGpyyxkbgcQWImQPTLNsR2l7ZlDsI
-thxfw+TkrccTvpq/X6J28iiMxqLi2HEvUd8bTj/4QVUQJgYpDyc75YflbJtwgcIv
-mmr8PBanK2J3O7AoNfPK+kARXD1/74w3p45z3iPLrnvFr79KgqEAH+34xSZCA2BJ
-ohOfaQJ68mrHkshlcblnsNAk2LZWPU8yoUSh4Buf7LcEMEbxbCGEHdZtuOgARhNM
-KxyuXSb7Q+TiRYQwAc6Sz2sSCqLFJg==
-=cy+s
------END PGP SIGNATURE-----
-
---tlmjEO+SMhyWD/NG--
-
+Hmm.. naturally I would have expected that the dasd patch also would
+go via block tree. But let's not spend too much time figuring out what
+gets routed where.
+Applied 4-6. Thanks!
