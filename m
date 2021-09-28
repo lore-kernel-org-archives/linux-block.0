@@ -2,75 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 828B2C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:39:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 239E7C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:45:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 736D76113E
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:39:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E06B56113E
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:45:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234991AbhI1Flf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 01:41:35 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:42402 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234243AbhI1Flf (ORCPT
+        id S234300AbhI1Frf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 01:47:35 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:49412 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234207AbhI1Frf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 01:41:35 -0400
+        Tue, 28 Sep 2021 01:47:35 -0400
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 0C7BD201BB;
-        Tue, 28 Sep 2021 05:39:55 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A62C3222B5;
+        Tue, 28 Sep 2021 05:45:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1632807595; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1632807955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=13TnURwhS8h4t01lwoZLD/d/5oPL9agrfycanDfeTRQ=;
-        b=PT9kgFrx9DkgIx21N+ey4rvrG+p5lgzclkflex7M8ulg7b/MPe/8YBUPSSqsTo2GTahbjJ
-        Gey5RuOSF1hNpbYAFgKbf2oL0K4d67fdRAt+eRdY+iU4RsWpBKefK/X7oBdujgebC7iQbz
-        cH9ujOHUnez6nwSvlDTdjkQYCRSdxBg=
+        bh=qSjSGCSLWWNsA7RxMdyxjBb9y4G8Pd/BYxcyrhWy7qc=;
+        b=iarsVD7t2to19B/O5X569j5QSbGxB0u5KYz/DSXcTOOZcXTwx13mZnGpkCBi1wUfYKwWuu
+        qs7DjrcprBaPKhw1L3xfmzxRiYFUwSjxnfNOX0nGxEIiUKIPHn4PFjNvRZUVOXbM8UHxN7
+        79/mrbRkex5zPqK3JEzcumX+yA64cno=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1632807595;
+        s=susede2_ed25519; t=1632807955;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=13TnURwhS8h4t01lwoZLD/d/5oPL9agrfycanDfeTRQ=;
-        b=VnyBApxFuoR87JCq7TgLnoYycKzbt1M/1osAF+bIrqg5sP1C+l/tWJFxYA8+084TxkpCY5
-        Hr8IhCD3XymifdAw==
+        bh=qSjSGCSLWWNsA7RxMdyxjBb9y4G8Pd/BYxcyrhWy7qc=;
+        b=fd3lmriNKe/AKZbslQXLPXo4WeQa/SdentKFnL7EBbD7vnYVL1roGjP/GnEbJ1lnJiayM/
+        RTL6mHWXkOVSLrBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AB01913A98;
-        Tue, 28 Sep 2021 05:39:54 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7892F13A98;
+        Tue, 28 Sep 2021 05:45:55 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id JO5JKKqqUmHUNQAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 28 Sep 2021 05:39:54 +0000
-Subject: Re: [PATCH v2 03/10] nvme-multipath: add error handling support for
- add_disk()
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        colyli@suse.de, kent.overstreet@gmail.com, kbusch@kernel.org,
-        sagi@grimberg.me, vishal.l.verma@intel.com,
-        dan.j.williams@intel.com, dave.jiang@intel.com,
-        ira.weiny@intel.com, konrad.wilk@oracle.com, roger.pau@citrix.com,
-        boris.ostrovsky@oracle.com, jgross@suse.com,
-        sstabellini@kernel.org, minchan@kernel.org, ngupta@vflare.org,
-        senozhatsky@chromium.org
-Cc:     xen-devel@lists.xenproject.org, nvdimm@lists.linux.dev,
-        linux-nvme@lists.infradead.org, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210927220039.1064193-1-mcgrof@kernel.org>
- <20210927220039.1064193-4-mcgrof@kernel.org>
+        id dKSoHBOsUmFyOAAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 28 Sep 2021 05:45:55 +0000
+Subject: Re: [PATCH v2 1/4] block/mq-deadline: Improve request accounting
+ further
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>
+References: <20210927220328.1410161-1-bvanassche@acm.org>
+ <20210927220328.1410161-2-bvanassche@acm.org>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <85d33b80-1d54-67ba-47f9-0298093b6d80@suse.de>
-Date:   Tue, 28 Sep 2021 07:39:54 +0200
+Message-ID: <b895ef93-78a2-2eda-7b8d-1a858f9701e8@suse.de>
+Date:   Tue, 28 Sep 2021 07:45:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210927220039.1064193-4-mcgrof@kernel.org>
+In-Reply-To: <20210927220328.1410161-2-bvanassche@acm.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -78,57 +72,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/28/21 12:00 AM, Luis Chamberlain wrote:
-> We never checked for errors on add_disk() as this function
-> returned void. Now that this is fixed, use the shiny new
-> error handling.
+On 9/28/21 12:03 AM, Bart Van Assche wrote:
+> The scheduler .insert_requests() callback is called when a request is
+> queued for the first time and also when it is requeued. Only count a
+> request the first time it is queued. Additionally, since the mq-deadline
+> scheduler only performs zone locking for requests that have been
+> inserted, skip the zone unlock code for requests that have not been
+> inserted into the mq-deadline scheduler.
 > 
-> Since we now can tell for sure when a disk was added, move
-> setting the bit NVME_NSHEAD_DISK_LIVE only when we did
-> add the disk successfully.
-> 
-> Nothing to do here as the cleanup is done elsewhere. We take
-> care and use test_and_set_bit() because it is protects against
-> two nvme paths simultaneously calling device_add_disk() on the
-> same namespace head.
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> Fixes: 38ba64d12d4c ("block/mq-deadline: Track I/O statistics")
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->   drivers/nvme/host/multipath.c | 13 +++++++++++--
->   1 file changed, 11 insertions(+), 2 deletions(-)
+>   block/mq-deadline.c | 17 ++++++++++-------
+>   1 file changed, 10 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> index e8ccdd398f78..35cace4f3f5f 100644
-> --- a/drivers/nvme/host/multipath.c
-> +++ b/drivers/nvme/host/multipath.c
-> @@ -496,13 +496,22 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
->   static void nvme_mpath_set_live(struct nvme_ns *ns)
->   {
->   	struct nvme_ns_head *head = ns->head;
-> +	int rc;
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 47f042fa6a68..c27b4347ca91 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -677,8 +677,10 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>   	blk_req_zone_write_unlock(rq);
 >   
->   	if (!head->disk)
->   		return;
+>   	prio = ioprio_class_to_prio[ioprio_class];
+> -	dd_count(dd, inserted, prio);
+> -	rq->elv.priv[0] = (void *)(uintptr_t)1;
+> +	if (!rq->elv.priv[0]) {
+> +		dd_count(dd, inserted, prio);
+> +		rq->elv.priv[0] = (void *)(uintptr_t)1;
+> +	}
 >   
-> +	/*
-> +	 * test_and_set_bit() is used because it is protecting against two nvme
-> +	 * paths simultaneously calling device_add_disk() on the same namespace
-> +	 * head.
-> +	 */
->   	if (!test_and_set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
-> -		device_add_disk(&head->subsys->dev, head->disk,
-> -				nvme_ns_id_attr_groups);
-> +		rc = device_add_disk(&head->subsys->dev, head->disk,
-> +				     nvme_ns_id_attr_groups);
-> +		if (rc)
-> +			return;
-> +		set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags);
->   		nvme_add_ns_head_cdev(head);
->   	}
+>   	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
+>   		blk_mq_free_requests(&free);
+> @@ -759,12 +761,13 @@ static void dd_finish_request(struct request *rq)
 >   
-> Errm.
-Setting the same bit twice?
-And shouldn't you unset the bit if 'device_add_disk()' fails?
+>   	/*
+>   	 * The block layer core may call dd_finish_request() without having
+> -	 * called dd_insert_requests(). Hence only update statistics for
+> -	 * requests for which dd_insert_requests() has been called. See also
+> -	 * blk_mq_request_bypass_insert().
+> +	 * called dd_insert_requests(). Skip requests that bypassed I/O
+> +	 * scheduling. See also blk_mq_request_bypass_insert().
+>   	 */
+> -	if (rq->elv.priv[0])
+> -		dd_count(dd, completed, prio);
+> +	if (!rq->elv.priv[0])
+> +		return;
+> +
+> +	dd_count(dd, completed, prio);
+>   
+>   	if (blk_queue_is_zoned(q)) {
+>   		unsigned long flags;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
