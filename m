@@ -2,217 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B80C43219
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 01:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DF7C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 02:23:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6028D6134F
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 01:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B82161213
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 02:23:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238499AbhI1BkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Sep 2021 21:40:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43478 "EHLO
+        id S238609AbhI1CZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Sep 2021 22:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238458AbhI1BkU (ORCPT
+        with ESMTP id S238529AbhI1CZG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Sep 2021 21:40:20 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D7FC061604;
-        Mon, 27 Sep 2021 18:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xwta8/zLIpEcQkAo4oHfj0Dkwhwuhu/ZvQ6AUzjotmM=; b=eFLSa5qDbEwz7lGAPa61BV3kja
-        0/wtVVb/HNao3rYKvQRCv5VYnO6QNgbEGMzWnGCQ/TE6HEGqe2qmzVaKs+Whnx2Zyfbw1ea3e4Otv
-        JA/Y1ipbTjzWcUbp79Xm6dhG0LUOKAc5sRfDe8hDTVqZdyBtAIQfSk6nBv9vC3UhOEnwKA53PKQAJ
-        DbYqxVtC2sv+emCbJ0UsqmVbCtUsiYksYsjoa+vL4A3rTJVbXhizjrdZxducXLSuQpYESffeqPcTh
-        yb2Wz+tc7PsgzV12g0G2TvnfiXWKVwZzMQG8oqPpkfFhFZsdD1PJSzi05CMkU1eINfbHQr6SBoCzO
-        ThOPf2Wg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mV24u-0056Lv-71; Tue, 28 Sep 2021 01:38:40 +0000
-Date:   Mon, 27 Sep 2021 18:38:40 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Lucas De Marchi <lucas.demarchi@intel.com>
-Cc:     linux-modules@vger.kernel.org, live-patching@vger.kernel.org,
-        fstests@vger.kernel.org, linux-block@vger.kernel.org, hare@suse.de,
-        dgilbert@interlog.com, jeyu@kernel.org, osandov@fb.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] libkmod-module: add support for a patient module
- removal option
-Message-ID: <YVJyIGXN/TR8zdU9@bombadil.infradead.org>
-References: <20210810051602.3067384-1-mcgrof@kernel.org>
- <20210810051602.3067384-4-mcgrof@kernel.org>
- <20210923085156.scmf5wxr2phc356b@ldmartin-desk2>
+        Mon, 27 Sep 2021 22:25:06 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 682F7C061604
+        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 19:23:27 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id c1so17566154pfp.10
+        for <linux-block@vger.kernel.org>; Mon, 27 Sep 2021 19:23:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ooN16JrioNGlmqQw6vIIMRaz6CAOTTB0/ZNT5KnAics=;
+        b=CbzCgNDLkTLm8G2E0VoWVuFUyaVIHenmxwWwkTlyBgpHtRcCTdFuJ/lkMB67/qor6A
+         ytP5Fh0YB6ntGqrUTYpPV7Sq0VtK6mNyg1tzzftzDwyIdU9ST353XlwCzut3ff6FI95S
+         NzR9Ng0nvon4rGosrGv4luX9qY1/8dcFFgODI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ooN16JrioNGlmqQw6vIIMRaz6CAOTTB0/ZNT5KnAics=;
+        b=2VsW1NrTaHAcjnqVhslTKprjsOwL9f9H7kJdgJ8PQ94HHo+fgu7L4myEYSzp9CBHKA
+         bpbl4fx6fZWz/qpfDfQ1dOSrxi8YckwAA0Ev2PAmR/mMLLM+dn8rt2GSZ+AyzUDH4p0I
+         5il7PoUPYS1vck6RhnrCEeEQFIfDFYahw/jpWb7+4wpLnqtTXDFR8ex4BO6fyYIM8Wpx
+         bTF4C5QcabOZrdZ72IcRvQ27cDpn0C059eGTBgnjhaaW5F1lcL9AD0lTsPeXoDt95CZo
+         lQZbMaWfI/y7iqdS+mYTagpfuABpMB3M7eA3iE9U9lLhUIIRxLKqZ9nQ/smDf1pKY5zV
+         nqoA==
+X-Gm-Message-State: AOAM5301Vnvp8R96DyHkqTMX7iKXYncnXc9f1EHuRWtHhwmyp6ZFVYXh
+        NBPiES7xDKqxiG0i9WXaV/NC4w==
+X-Google-Smtp-Source: ABdhPJz9q7h1zZF0H1p2F4KtS1JXYzYTplO3rpAIOYs3PKgNcVZQZl2eehV117fSYU9EPuWI4EEM1w==
+X-Received: by 2002:a62:9242:0:b0:446:5771:7901 with SMTP id o63-20020a629242000000b0044657717901mr3121242pfd.81.1632795806931;
+        Mon, 27 Sep 2021 19:23:26 -0700 (PDT)
+Received: from google.com ([2409:10:2e40:5100:2c64:ca0e:433e:ef5b])
+        by smtp.gmail.com with ESMTPSA id z33sm19060544pga.20.2021.09.27.19.23.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Sep 2021 19:23:26 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 11:23:21 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Brian Geffon <bgeffon@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        Suleiman Souhlal <suleiman@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Subject: Re: [PATCH v5] zram: Introduce an aged idle interface
+Message-ID: <YVJ8mSOwdWzyqIMz@google.com>
+References: <20210917210640.214211-1-bgeffon@google.com>
+ <20210924161128.1508015-1-bgeffon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210923085156.scmf5wxr2phc356b@ldmartin-desk2>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20210924161128.1508015-1-bgeffon@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 23, 2021 at 01:51:56AM -0700, Lucas De Marchi wrote:
-> On Mon, Aug 09, 2021 at 10:16:02PM -0700, Luis Chamberlain wrote:
-> The story was not kind like that. It wasn't removed "in favor for a 10
-> second sleep" in the sense that the sleep would replace the wait.
-> 
-> It was actually for "this wait logic in the kernel is complex and
-> buggy, let's try to remove it". So we decided to deprecate it and add
-> a sleep rmmod to see if anyone complained. 1 year later of no complains
-> we removed it from kernel. This was all after noticing we had never
-> implemented the wait logic in modprobe - it was only done in rmmod.
+On (21/09/24 09:11), Brian Geffon wrote:
+[..]
 
-OK fixed the commit log thanks!
+Some silly nits:
 
-> > --- a/libkmod/libkmod-module.c
-> > +++ b/libkmod/libkmod-module.c
-> > @@ -30,6 +30,9 @@
-> > #include <stdlib.h>
-> > #include <string.h>
-> > #include <unistd.h>
-> > +#include <poll.h>
-> > +#include <time.h>
-> > +#include <math.h>
-> > #include <sys/mman.h>
-> > #include <sys/stat.h>
-> > #include <sys/syscall.h>
-> > @@ -802,6 +805,143 @@ KMOD_EXPORT int kmod_module_remove_module(struct kmod_module *mod,
-> > 	return err;
-> > }
-> > 
-> > +static int timespec_to_ms(struct timespec *t)
-> > +{
-> > +	return (t->tv_sec * 1000) + lround(t->tv_nsec / 1000000);
-> > +}
-> > +
-> > +static int time_delta_ms(struct timespec *before, struct timespec *after)
-> > +{
-> > +	if (!before || !after)
-> > +		return 0;
-> > +	return timespec_to_ms(after) - timespec_to_ms(before);
-> > +}
-> 
-> we have a similar thing in util.[ch]
+> +static void mark_idle(struct zram *zram, ktime_t cutoff)
+>  {
+> -	struct zram *zram = dev_to_zram(dev);
+> +	int is_idle = 1;
+>  	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+>  	int index;
+>  
+> -	if (!sysfs_streq(buf, "all"))
+> -		return -EINVAL;
+> -
+> -	down_read(&zram->init_lock);
+> -	if (!init_done(zram)) {
+> -		up_read(&zram->init_lock);
+> -		return -EINVAL;
+> -	}
+> -
+>  	for (index = 0; index < nr_pages; index++) {
+>  		/*
+>  		 * Do not mark ZRAM_UNDER_WB slot as ZRAM_IDLE to close race.
+> @@ -314,14 +308,49 @@ static ssize_t idle_store(struct device *dev,
+>  		 */
+>  		zram_slot_lock(zram, index);
+>  		if (zram_allocated(zram, index) &&
+> -				!zram_test_flag(zram, index, ZRAM_UNDER_WB))
+> -			zram_set_flag(zram, index, ZRAM_IDLE);
+> +				!zram_test_flag(zram, index, ZRAM_UNDER_WB)) {
+> +#ifdef CONFIG_ZRAM_MEMORY_TRACKING
+> +				is_idle = (!cutoff || ktime_after(cutoff, zram->table[index].ac_time));
 
-Alright, this OK?
+checkpatch "WARNING: suspect code indent for conditional statements (16, 32)"
 
-diff --git a/shared/util.c b/shared/util.c
-index b487b5f..b911e63 100644
---- a/shared/util.c
-+++ b/shared/util.c
-@@ -466,6 +466,19 @@ unsigned long long ts_usec(const struct timespec *ts)
- 	       (unsigned long long) ts->tv_nsec / NSEC_PER_USEC;
- }
- 
-+unsigned long long ts_msec(const struct timespec *ts)
-+{
-+	return ts_usec(ts) * 1000;
-+}
-+
-+unsigned long long ts_delta_ms(const struct timespec *before,
-+			       const struct timespec *after)
-+{
-+	if (!before || !after)
-+		return 0;
-+	return ts_msec(after) - ts_msec(before);
-+}
-+
- unsigned long long stat_mstamp(const struct stat *st)
- {
- #ifdef HAVE_STRUCT_STAT_ST_MTIM
-diff --git a/shared/util.h b/shared/util.h
-index c6a31df..f8c28e7 100644
---- a/shared/util.h
-+++ b/shared/util.h
-@@ -43,6 +43,9 @@ int mkdir_p(const char *path, int len, mode_t mode);
- int mkdir_parents(const char *path, mode_t mode);
- unsigned long long stat_mstamp(const struct stat *st);
- unsigned long long ts_usec(const struct timespec *ts);
-+unsigned long long ts_msec(const struct timespec *ts);
-+unsigned long long ts_delta_ms(const struct timespec *before,
-+			       const struct timespec *after);
- 
- /* endianess and alignments                                                 */
- /* ************************************************************************ */
+Looks like `is_idle` is at one extra indent level.
 
-> > +/**
-> > + * kmod_module_remove_module_wait:
-> > + * @mod: kmod module
-> > + * @flags: flags to pass to Linux kernel when removing the module. The only valid flag is
-> > + * KMOD_REMOVE_FORCE: force remove module regardless if it's still in
-> > + * use by a kernel subsystem or other process;
-> > + * KMOD_REMOVE_NOWAIT is always enforced, causing us to pass O_NONBLOCK to
-> > + * delete_module(2). We do the waiting in userspace, if a wait was desired.
-> > + *
-> > + * Remove a module from Linux kernel patiently.
-> > + *
-> > + * Returns: 0 on success or < 0 on failure.
-> > + */
-> > +KMOD_EXPORT int kmod_module_remove_module_wait(struct kmod_module *mod,
-> > +					       unsigned int flags,
-> > +					       bool wait)
-> 
-> why do you have kmod_get_refcnt_timeout/kmod_set_refcnt_timeout instead
-> of just doing s/bool wait/unsigned int wait_msec/)?
+> +#endif
+> +			if (is_idle)
+> +				zram_set_flag(zram, index, ZRAM_IDLE);
+> +		}
+>  		zram_slot_unlock(zram, index);
+>  	}
+> +}
+>  
+> -	up_read(&zram->init_lock);
+> +static ssize_t idle_store(struct device *dev,
+> +		struct device_attribute *attr, const char *buf, size_t len)
+> +{
+> +	struct zram *zram = dev_to_zram(dev);
+> +	ktime_t cutoff_time = 0;
+> +	ssize_t rv = -EINVAL;
+>  
+> -	return len;
+> +	if (!sysfs_streq(buf, "all")) {
+> +		/*
+> +		 * If it did not parse as 'all' try to treat it as an integer when
+> +		 * we have memory tracking enabled.
+> +		 */
+> +		u64 age_sec;
 
-Because it lets us do a smaller change on the respetive tools:
+checkpatch "WARNING: Missing a blank line after declarations"
 
-tools/modprobe.c-               flags |= KMOD_REMOVE_FORCE;
-tools/modprobe.c-
-tools/modprobe.c:       err = kmod_module_remove_module_wait(mod, flags, do_remove_patient);
-tools/modprobe.c-       if (err == -EEXIST) {
-tools/modprobe.c-               if (!first_time)
---
-tools/remove.c-         goto unref;
-tools/remove.c-
-tools/remove.c: err = kmod_module_remove_module_wait(mod, 0, do_remove_patient);
-tools/remove.c- if (err < 0)
-tools/remove.c-         goto unref;
---
-tools/rmmod.c-          }
-tools/rmmod.c-
-tools/rmmod.c:          err = kmod_module_remove_module_wait(mod, flags,
-tools/rmmod.c- do_remove_patient);
-tools/rmmod.c-          if (err < 0) {
+> +		if (IS_ENABLED(CONFIG_ZRAM_MEMORY_TRACKING) && !kstrtoull(buf, 0, &age_sec))
+> +			cutoff_time = ktime_sub(ktime_get_boottime(),
+> +					ns_to_ktime(age_sec * NSEC_PER_SEC));
+> +		else
+> +			goto out;
+> +	}
+> +
+> +	down_read(&zram->init_lock);
+> +	if (!init_done(zram))
+> +		goto out_unlock;
+> +
+> +	/* A age_sec of 0 marks everything as idle, this is the "all" behavior */
 
-That is, the timeout is contextual of the context.
+	s/age_sec/cutoff_time/
 
-> > +		if ((refcnt <= 0) || (refcnt > 0 && !wait)) {
-> > +			NOTICE(mod->ctx, "%s refcnt is %d\n", mod->name, (int) refcnt);
-> > +			err_time = clock_gettime(CLOCK_MONOTONIC, &t2);
-> > +			if (err_time != 0)
-> > +				kmod_set_removal_timeout(mod->ctx, 0);
-> 
-> I don't follow why kmod_module_get_refcnt_wait() is setting the removal
-> timeout at all. This seems to be doing it behind users back.
-
-Because if clock_gettime() returns something other than 0 then
-your clock is messed up and you should not be using a timeout, so
-yes, we correct that then. We can scream loud, or use a default.
-
-I figured not using one would be better in that case.
-
-> The idea of using the refcnt fd was actually that then
-> users could integrate it on their mainloops (probably using epoll). And
-> then the same impl could be shared by kmod_module_remove_module_wait(),
-> which would do a select().
-> 
-> This seems more like a kmod_module_refcnt_wait_zero() using poll()
-> + adjusting the timeout
-
-Sorry don't follow. And since I have one day before vacation, I suppose
-I won't get to this until I get back. But I'd be happy if you massage
-it as you see fit as you're used to the code base and I'm sure have
-a better idea of what likely is best for the library.
-
-> > +	ret = kmod_module_get_refcnt_wait(mod, do_remove_patient);
-> 
-> for tool implementation, shouldn't we just ignore
-> kmod_module_get_refcnt() and proceed to
-> kmod_module_remove_module_wait()?
-
-I'll let you decide. Otherwise this will have to wait until I get back
-from vacation.
-
-  Luis
+> +	mark_idle(zram, cutoff_time);
+> +	rv = len;
