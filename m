@@ -2,180 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FD4C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 16:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED6BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 16:27:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDE1161206
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 16:14:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A6106124B
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 16:27:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241738AbhI1QPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 12:15:55 -0400
-Received: from mail-bn8nam12on2076.outbound.protection.outlook.com ([40.107.237.76]:2529
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S241645AbhI1QPz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 12:15:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CgnLPepNhI5yGoddJpK/mRnBlz+SaSC4PY96beCPPcqcsqY4NGcjC58nzgiuI2F8DyY7vmeA4NU4WegB4uyAXKhVnWuZERMUcVcqMxMaIYiu1s4nhF9vRPFhcRT30Aaiu7pubYloEQzA3uE+Gz+GjGNP4XLHVBpNZjBnJGuY1jJaZusaqdbSs9vcqrfAFgddx9opKkkdng/Uvgfm2CRhnHnGGGHicddecbdnaogg4vD/5ssWXT5ddOoLE4nxsKdNjk4KwF9unn/tssLjOTAtsOmaMb6A5PEDxLPcVPLBm79KgcNbFDhhyOdIoGDmZ0xggJwOsc69d5VywE9mxVMAAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=SoEstR/57QdSekQedtC6H3sazLzGQWhp578NmDdSDVE=;
- b=W6XU+X4jZ6LBkpnaRvb97hxgFosPCQRqzhWwa5kuKYZPuvrnQtyNKcavP5ENWAIFn2hW14wGlfrG/pTYFbs6xxkdHOwTxh9AbBYd0TRiEO0lbQsgd9pEIEaG6JMVXZHlKzvuDLXlFSrYPgx0Iiwfw0K1OMpyzM54cRGOX6d21djy0QhBpXbAJmTCytTEmM3fbYUPBHofQ4wDY95cNPajNTWrvrVD0FIrwv3kkOvLLDNtj2RHsRqWHkoffzzBVJAWs6opg3sUdKvPAmERotoGBJ8ll/upfYVU4H8OQeYyqszYFd+Wrs4fQcUVM1ktAOCMAtoAZw+YNqRcSkmlWOtrhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.35) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SoEstR/57QdSekQedtC6H3sazLzGQWhp578NmDdSDVE=;
- b=EcsAO1oXXfNEEFzbd2VbU2j7vdyuK6MeYiFYyG1Nkb8SIuE0PfL0CuzGf4e+faPCkxeKcZcjtrH2LqC6gwMj5mQ5ohVWO6/1+oFS/SLEyEcDUw92jHQbVo3jCebmv8t61gUBGJ9bF/QdavvBBcoQ/k60vu14ox4bQ7BG72VHsL1f13EUADz3gQ0NWXyhsi6PYwoe8IQqcu3/ZlqwOMck6I62cuKF990sbvsEybNLnX5maQ911cHKR3YqWBjdDrXHOFUYKGTdoVoVdxRH2yVL9sWlEtEB1Vtk2RXhtgnmeH7M5arjAzGHlCOSkOKaBlaooTLsD0/GKpwp0/JZGz1RKQ==
-Received: from MW4PR04CA0112.namprd04.prod.outlook.com (2603:10b6:303:83::27)
- by BL0PR12MB2356.namprd12.prod.outlook.com (2603:10b6:207:4d::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.18; Tue, 28 Sep
- 2021 16:14:13 +0000
-Received: from CO1NAM11FT055.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:83:cafe::70) by MW4PR04CA0112.outlook.office365.com
- (2603:10b6:303:83::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.13 via Frontend
- Transport; Tue, 28 Sep 2021 16:14:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.35; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.35) by
- CO1NAM11FT055.mail.protection.outlook.com (10.13.175.129) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4544.13 via Frontend Transport; Tue, 28 Sep 2021 16:14:13 +0000
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 28 Sep
- 2021 16:14:12 +0000
-Received: from [172.27.0.114] (172.20.187.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 28 Sep
- 2021 16:14:09 +0000
-Subject: Re: [PATCH 1/2] virtio: introduce virtio_dev_to_node helper
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <stefanha@redhat.com>, <oren@nvidia.com>, <nitzanc@nvidia.com>,
-        <israelr@nvidia.com>, <hch@infradead.org>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+        id S241749AbhI1Q30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 12:29:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59886 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241768AbhI1Q3Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Sep 2021 12:29:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 636A360EE9;
+        Tue, 28 Sep 2021 16:27:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632846466;
+        bh=pxmRZz6UdCKyo/pIVTPGaxM9qJvC87Qcki0mcSQG0Gc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QOZ1Eyxws/1pmJeQ1d8Rz+AAw2zaFbTsRdmGXgZ0EuuCNMAnvjr0hvhZkhJZYEjfj
+         uW8aT2SBMEBI6njSafdsdsdK2Np+fmUeCOChkM6Tp/gt5QnJTmiUg0/vjJE+k6yUIE
+         VNiZh45LgC+8EhnSmzhPQzliLswMH2tgkFYLGahoPXXexWTnU6J7KKKL8jC82GzVRR
+         57UETot+3TQaJmhd1ITCbcBIcMkDwZAjD1hX0uVIIA+GVmMh9e+GKb1nuSBOtvX76c
+         0ZuADBIy+RtZmPDHKonWSA3KftxSaj8l94/qhoO58dfGzRDH1m2Dx0TA+IDh/jt3GK
+         QjdJG113AplqA==
+Date:   Tue, 28 Sep 2021 19:27:42 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
+        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Yaron Gepstein <yarong@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVNCflMxWh4m7ewU@unreal>
 References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
- <20210927053121-mutt-send-email-mst@kernel.org>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <bd0abefb-cc61-5156-f7e9-d07fc9187759@nvidia.com>
-Date:   Tue, 28 Sep 2021 19:14:05 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
+ <YVGsMsIjD2+aS3eC@unreal>
+ <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
+ <YVIMIFxjRcfDDub4@unreal>
+ <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20210927053121-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a751aaa3-fa0f-4ad5-e463-08d9829b031f
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2356:
-X-Microsoft-Antispam-PRVS: <BL0PR12MB235683DDB39095B3BFD872BFDEA89@BL0PR12MB2356.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R9bou9ax+fN+g1Izwa3ICEPvY+2Aokms9UxMOXgDeKWPvCBHlQQ4gveaDEC898tj8I5xzznNj5RGoY85YWuV3hl858H3pyNu3f/WIFVuXdjKeZSoxhYdVy0sETKbFn4HPvLiLUmGflyr72TDP8Upo9J26A8MIKnNBFb7RIJv8tDw8+NrAk02F/ynNGDSvket+P/ICz4w9u917xVL74p4DlCB2soTSUvrTpcAwNC3q7HhMg1tpTbYdU9DQVSr3MdiLRQMQlczSGoAzdBALqukvPZiK/CTBuuYnPgFyfa57PfXtwtO5nF9wq9xMuMCF00kU0FAXycdnozWT2Jk2qxXGNnMSpgQWHv8Gtl2Slpm1mlr2dOBES/EAtP5rliN9StxOOOmnwxcqe395C4gLZmru+ZOXWhkguNa15r5NbZpzrK2aRKoBjHwEV/hbI3T+o5bOak1Cx0ZFiHBJp+WlbTW8audu6F4YO4wcBTjiKLZK48/WcX/mNviS8UcRkSfJ5Twts9gU5+BPKRuW3gPOeUJOO1P8Y83mFX68snTvz0lD/DFBPfy7zSLiebZHYdIIBzq+vlglnH5WrL0I+CgvOGRbkyd2vYOO1DCEB8Wj55UK4gkZ8uRigYhzRJqyQJ++kaJq61UsVd7FOLV5NU/Ge4U2AiSP3jc0X/9uff7tbuI/+T9E6MvF5t5rwXdoU14tfJ1FNCwqNKXntd97ye8BK2XnbPMb+bpjXEXP/OC8RlyDN0=
-X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(47076005)(6666004)(6916009)(70586007)(426003)(36756003)(8676002)(54906003)(336012)(31686004)(31696002)(356005)(26005)(70206006)(53546011)(36860700001)(86362001)(8936002)(82310400003)(186003)(36906005)(2906002)(4326008)(7636003)(83380400001)(16526019)(2616005)(316002)(508600001)(16576012)(5660300002)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2021 16:14:13.2330
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a751aaa3-fa0f-4ad5-e463-08d9829b031f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT055.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2356
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Sep 28, 2021 at 06:59:15PM +0300, Max Gurtovoy wrote:
+> 
+> On 9/27/2021 9:23 PM, Leon Romanovsky wrote:
+> > On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
+> > > On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
+> > > > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> > > > > To optimize performance, set the affinity of the block device tagset
+> > > > > according to the virtio device affinity.
+> > > > > 
+> > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > ---
+> > > > >    drivers/block/virtio_blk.c | 2 +-
+> > > > >    1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > 
+> > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > > index 9b3bd083b411..1c68c3e0ebf9 100644
+> > > > > --- a/drivers/block/virtio_blk.c
+> > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+> > > > >    	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+> > > > >    	vblk->tag_set.ops = &virtio_mq_ops;
+> > > > >    	vblk->tag_set.queue_depth = queue_depth;
+> > > > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
+> > > > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
+> > > > I afraid that by doing it, you will increase chances to see OOM, because
+> > > > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
+> > > > the latter mode only on specific NUMA which can be depleted.
+> > > This is a common methodology we use in the block layer and in NVMe subsystem
+> > > and we don't afraid of the OOM issue you raised.
+> > There are many reasons for that, but we are talking about virtio here
+> > and not about NVMe.
+> 
+> Ok. what reasons ?
 
-On 9/27/2021 12:31 PM, Michael S. Tsirkin wrote:
-> On Sun, Sep 26, 2021 at 05:55:17PM +0300, Max Gurtovoy wrote:
->> Also expose numa_node field as a sysfs attribute. Now virtio device
->> drivers will be able to allocate memory that is node-local to the
->> device. This significantly helps performance and it's oftenly used in
->> other drivers such as NVMe, for example.
->>
->> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> If you have to respin this, it is better to split this in
-> two patches, one with the helper one adding a sysfs attribute.
+For example, NVMe are physical devices that rely on DMA operations,
+PCI connectivity e.t.c to operate. Such systems indeed can benefit from
+NUMA locality hints. At the end, these devices are physically connected
+to that NUMA node.
 
-It's not a problem, but it will cause the first commit to include a 
-method that is not used anywhere.
+In our case, virtio-blk is a software interface that doesn't have all
+these limitations. On the contrary, the virtio-blk can be created on one
+CPU and moved later to be close to the QEMU which can run on another NUMA
+node.
 
-I'm not sure this is preferred but I can do it.
+Also this patch increases chances to get OOM by factor of NUMA nodes.
+Before your patch, the virtio_blk can allocate from X memory, after your
+patch it will be X/NUMB_NUMA_NODES.
 
->
->
->> ---
->>   drivers/virtio/virtio.c | 10 ++++++++++
->>   include/linux/virtio.h  | 13 +++++++++++++
->>   2 files changed, 23 insertions(+)
->>
->> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
->> index 588e02fb91d3..bdbd76c5c58c 100644
->> --- a/drivers/virtio/virtio.c
->> +++ b/drivers/virtio/virtio.c
->> @@ -60,12 +60,22 @@ static ssize_t features_show(struct device *_d,
->>   }
->>   static DEVICE_ATTR_RO(features);
->>   
->> +static ssize_t numa_node_show(struct device *_d,
->> +			      struct device_attribute *attr, char *buf)
->> +{
->> +	struct virtio_device *vdev = dev_to_virtio(_d);
->> +
->> +	return sysfs_emit(buf, "%d\n", virtio_dev_to_node(vdev));
->> +}
->> +static DEVICE_ATTR_RO(numa_node);
->> +
->>   static struct attribute *virtio_dev_attrs[] = {
->>   	&dev_attr_device.attr,
->>   	&dev_attr_vendor.attr,
->>   	&dev_attr_status.attr,
->>   	&dev_attr_modalias.attr,
->>   	&dev_attr_features.attr,
->> +	&dev_attr_numa_node.attr,
->>   	NULL,
->>   };
->>   ATTRIBUTE_GROUPS(virtio_dev);
->> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
->> index 41edbc01ffa4..05b586ac71d1 100644
->> --- a/include/linux/virtio.h
->> +++ b/include/linux/virtio.h
->> @@ -125,6 +125,19 @@ static inline struct virtio_device *dev_to_virtio(struct device *_dev)
->>   	return container_of(_dev, struct virtio_device, dev);
->>   }
->>   
->> +/**
->> + * virtio_dev_to_node - return the NUMA node for a given virtio device
->> + * @vdev:	device to get the NUMA node for.
->> + */
->> +static inline int virtio_dev_to_node(struct virtio_device *vdev)
->> +{
->> +	struct device *parent = vdev->dev.parent;
->> +
->> +	if (!parent)
->> +		return NUMA_NO_NODE;
->> +	return dev_to_node(parent);
->> +}
->> +
->>   void virtio_add_status(struct virtio_device *dev, unsigned int status);
->>   int register_virtio_device(struct virtio_device *dev);
->>   void unregister_virtio_device(struct virtio_device *dev);
->> -- 
->> 2.18.1
+In addition, it has all chances to even hurt performance.
+
+So yes, post v2, but as Stefan and I asked, please provide supportive
+performance results, because what was done for another subsystem doesn't
+mean that it will be applicable here.
+
+Thanks
