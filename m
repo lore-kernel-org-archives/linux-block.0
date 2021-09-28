@@ -2,69 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239E7C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BC0C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E06B56113E
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:45:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97C7D6108F
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 05:47:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234300AbhI1Frf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 01:47:35 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:49412 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234207AbhI1Frf (ORCPT
+        id S235176AbhI1Fss (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 01:48:48 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:43032 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234207AbhI1Fss (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 01:47:35 -0400
+        Tue, 28 Sep 2021 01:48:48 -0400
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A62C3222B5;
-        Tue, 28 Sep 2021 05:45:55 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 65D7C201B8;
+        Tue, 28 Sep 2021 05:47:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1632807955; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1632808028; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qSjSGCSLWWNsA7RxMdyxjBb9y4G8Pd/BYxcyrhWy7qc=;
-        b=iarsVD7t2to19B/O5X569j5QSbGxB0u5KYz/DSXcTOOZcXTwx13mZnGpkCBi1wUfYKwWuu
-        qs7DjrcprBaPKhw1L3xfmzxRiYFUwSjxnfNOX0nGxEIiUKIPHn4PFjNvRZUVOXbM8UHxN7
-        79/mrbRkex5zPqK3JEzcumX+yA64cno=
+        bh=RBMvJQWujYEAJ72DVPpiIBZ8MlEvwrCLnMZ6tCL4YHo=;
+        b=dQ7SW8AfgY2W8cD2csGbLeaDx2MGAVuOvmxjr7cCRHeRkhaXfSDA9xr3Ll6zpTO1l7wpAh
+        2zLkfGnte4irU89hhK4QJ36TKHCYy4jOIwOcoJvJPi8xRVqrg/9gxLROJDGHC12gk1tOji
+        dGAlMOo2nOOEP6DU/1L+5I+fQe/uFac=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1632807955;
+        s=susede2_ed25519; t=1632808028;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qSjSGCSLWWNsA7RxMdyxjBb9y4G8Pd/BYxcyrhWy7qc=;
-        b=fd3lmriNKe/AKZbslQXLPXo4WeQa/SdentKFnL7EBbD7vnYVL1roGjP/GnEbJ1lnJiayM/
-        RTL6mHWXkOVSLrBQ==
+        bh=RBMvJQWujYEAJ72DVPpiIBZ8MlEvwrCLnMZ6tCL4YHo=;
+        b=3gDOgEFJtXfo2Cr3e+n+lqQnMc9x6Qj+C7nonrasOynTOZLJyTcfWS4WLHU90veiNCa+h9
+        67Kiy4TFRdR8XFDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7892F13A98;
-        Tue, 28 Sep 2021 05:45:55 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4405E13A98;
+        Tue, 28 Sep 2021 05:47:08 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id dKSoHBOsUmFyOAAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 28 Sep 2021 05:45:55 +0000
-Subject: Re: [PATCH v2 1/4] block/mq-deadline: Improve request accounting
- further
+        id Bwl5D1ysUmHXOAAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 28 Sep 2021 05:47:08 +0000
+Subject: Re: [PATCH v2 2/4] block/mq-deadline: Add an invariant check
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Niklas Cassel <Niklas.Cassel@wdc.com>
 References: <20210927220328.1410161-1-bvanassche@acm.org>
- <20210927220328.1410161-2-bvanassche@acm.org>
+ <20210927220328.1410161-3-bvanassche@acm.org>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <b895ef93-78a2-2eda-7b8d-1a858f9701e8@suse.de>
-Date:   Tue, 28 Sep 2021 07:45:55 +0200
+Message-ID: <0d3317b4-2e94-d206-4860-c2d39bc8471e@suse.de>
+Date:   Tue, 28 Sep 2021 07:47:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210927220328.1410161-2-bvanassche@acm.org>
+In-Reply-To: <20210927220328.1410161-3-bvanassche@acm.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -73,58 +72,61 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 9/28/21 12:03 AM, Bart Van Assche wrote:
-> The scheduler .insert_requests() callback is called when a request is
-> queued for the first time and also when it is requeued. Only count a
-> request the first time it is queued. Additionally, since the mq-deadline
-> scheduler only performs zone locking for requests that have been
-> inserted, skip the zone unlock code for requests that have not been
-> inserted into the mq-deadline scheduler.
+> Check a statistics invariant at module unload time. When running
+> blktests, the invariant is verified every time a request queue is
+> removed and hence is verified at least once per test.
 > 
-> Fixes: 38ba64d12d4c ("block/mq-deadline: Track I/O statistics")
 > Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
 > Reviewed-by: Niklas Cassel <Niklas.Cassel@wdc.com>
 > Cc: Hannes Reinecke <hare@suse.de>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->   block/mq-deadline.c | 17 ++++++++++-------
->   1 file changed, 10 insertions(+), 7 deletions(-)
+>   block/mq-deadline.c | 18 ++++++++++++------
+>   1 file changed, 12 insertions(+), 6 deletions(-)
 > 
 > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 47f042fa6a68..c27b4347ca91 100644
+> index c27b4347ca91..2586b3f8c7e9 100644
 > --- a/block/mq-deadline.c
 > +++ b/block/mq-deadline.c
-> @@ -677,8 +677,10 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->   	blk_req_zone_write_unlock(rq);
+> @@ -270,6 +270,12 @@ deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>   	deadline_remove_request(rq->q, per_prio, rq);
+>   }
 >   
->   	prio = ioprio_class_to_prio[ioprio_class];
-> -	dd_count(dd, inserted, prio);
-> -	rq->elv.priv[0] = (void *)(uintptr_t)1;
-> +	if (!rq->elv.priv[0]) {
-> +		dd_count(dd, inserted, prio);
-> +		rq->elv.priv[0] = (void *)(uintptr_t)1;
-> +	}
->   
->   	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
->   		blk_mq_free_requests(&free);
-> @@ -759,12 +761,13 @@ static void dd_finish_request(struct request *rq)
->   
->   	/*
->   	 * The block layer core may call dd_finish_request() without having
-> -	 * called dd_insert_requests(). Hence only update statistics for
-> -	 * requests for which dd_insert_requests() has been called. See also
-> -	 * blk_mq_request_bypass_insert().
-> +	 * called dd_insert_requests(). Skip requests that bypassed I/O
-> +	 * scheduling. See also blk_mq_request_bypass_insert().
->   	 */
-> -	if (rq->elv.priv[0])
-> -		dd_count(dd, completed, prio);
-> +	if (!rq->elv.priv[0])
-> +		return;
+> +/* Number of requests queued for a given priority level. */
+> +static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
+> +{
+> +	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
+> +}
 > +
-> +	dd_count(dd, completed, prio);
+>   /*
+>    * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
+>    * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
+> @@ -539,6 +545,12 @@ static void dd_exit_sched(struct elevator_queue *e)
 >   
->   	if (blk_queue_is_zoned(q)) {
->   		unsigned long flags;
+>   		WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_READ]));
+>   		WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_WRITE]));
+> +		WARN_ONCE(dd_queued(dd, prio) != 0,
+> +			  "statistics for priority %d: i %u m %u d %u c %u\n",
+> +			  prio, dd_sum(dd, inserted, prio),
+> +			  dd_sum(dd, merged, prio),
+> +			  dd_sum(dd, dispatched, prio),
+> +			  dd_sum(dd, completed, prio));
+>   	}
+>   
+>   	free_percpu(dd->stats);
+> @@ -950,12 +962,6 @@ static int dd_async_depth_show(void *data, struct seq_file *m)
+>   	return 0;
+>   }
+>   
+> -/* Number of requests queued for a given priority level. */
+> -static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
+> -{
+> -	return dd_sum(dd, inserted, prio) - dd_sum(dd, completed, prio);
+> -}
+> -
+>   static int dd_queued_show(void *data, struct seq_file *m)
+>   {
+>   	struct request_queue *q = data;
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
