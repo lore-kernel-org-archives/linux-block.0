@@ -2,60 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC46BC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 18:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE7FC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 18:48:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEC356136F
-	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 18:33:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 053B66128E
+	for <linux-block@archiver.kernel.org>; Tue, 28 Sep 2021 18:48:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233817AbhI1Seh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Sep 2021 14:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52690 "EHLO
+        id S242322AbhI1Sua (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Sep 2021 14:50:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242547AbhI1SeO (ORCPT
+        with ESMTP id S242273AbhI1Sua (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Sep 2021 14:34:14 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C84FCC061765
-        for <linux-block@vger.kernel.org>; Tue, 28 Sep 2021 11:32:21 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id a13so14048476qvo.9
-        for <linux-block@vger.kernel.org>; Tue, 28 Sep 2021 11:32:21 -0700 (PDT)
+        Tue, 28 Sep 2021 14:50:30 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE25C06161C
+        for <linux-block@vger.kernel.org>; Tue, 28 Sep 2021 11:48:50 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id c20so20865152qtb.2
+        for <linux-block@vger.kernel.org>; Tue, 28 Sep 2021 11:48:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=bg5/FXYy6+0jcxwwe7U26Md8Qo1QDW6vkKmJYeX4i1Y=;
-        b=Hl/E00tVRRsG4VyZTxHCUyfFppftH6aDIraQlh7Zo4b85gvTNF+AYqXgzSNwc5/npf
-         l06458g+lvnyddemEzX90uBn/bHB8RYcKfeo1e7FpLjMI+74Dzz/0g/94z+f7GzW+0Zd
-         CfpRY5E+W8e1NS+sbJ1/ugjuNMbciPIgxXLMQk1vyLzXxq0uHenjiyziZ6R3dyiq9JVL
-         p4sfE2H5q8AjNru6j9eT1fchBVmabhTgc0UQSbcACR3kakx5Tj48HjTa5txeDIwD47Yn
-         QqR/fi/0MROMXY9kXIbtoFfIdbEtX3H3w3iXU5cvYHfX3miyrcJhnWwRC/Xh64nSBvuk
-         yGrA==
+         :content-disposition:in-reply-to;
+        bh=V9OdhKHkz+bDWOgw519ym53HGQqRyLuvFdP/XrS7z5w=;
+        b=U6Cle1ar5YMOX4vRLBQAyCUIzflL0rP5DDqpOBJE+YXNQaN+2OCi9d0Iy1j+ZqEb0q
+         ldJaiLHkalWypayZHQx3L3YPO9DcOqCmj/7fnNa9sm7+IILMYJgnEeoBHOfV3+5sIA1G
+         7PoT13IhlGy54nJMnWjX2JC+DO7VxjDE7MqR0TIZG4kkDyH5MeFimp+WrD7+H8fZcSrr
+         rjU6GjV1RHVgJefkq1bsjD7HjG42edUR2AMuNMVNVDWGsf2VmvclfT7eJ7t5/82dwAMV
+         kHPwsALEwDASPTTgXVp7pyVtxMvNs1y+xdofJ6ktmPZVIieklzttcPQ7dqgixshVYpDP
+         cjwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=bg5/FXYy6+0jcxwwe7U26Md8Qo1QDW6vkKmJYeX4i1Y=;
-        b=fXWroO+q49qvP63++C0Yko1TiWjhPo3kCM/NrpuPNcd76CIjYH8EVQCek5KeZfG8sg
-         7QG/8yloP5DBQpxbel8ZP0y3dvtNWhejiK/K2p2zRulJzT1Z+5XYya17q81bR06mI8qL
-         yG2ry/qFNZxLlFqrKu6U33EEEj754wdCNbdedDVHBYxQ5ksTLBGQ3AfeVFYoJZ8IrGGd
-         gWzh6my0kOKTrDzinfgGKChHEsf0UlM8cj2W5uIsWlGY3Skaip/EdBvn/XLZlLEH9xtq
-         2Hq1UqkYIZGxmhw8WXewCXAiup7xPUUMU2BR+Ub8H8JbhFNMC42VDY56aiGCiuY1PEC2
-         84AQ==
-X-Gm-Message-State: AOAM533wEozUpfQ0qy00XlSk26ImRuGKyRVQj9Se4CwXcETIMw/xSx+u
-        D8fMEJkD7E4mLqxL8hc/X2lptA==
-X-Google-Smtp-Source: ABdhPJzfCJn9TE545S5oPvfgJD/DrRXSPKUbE0avVhY8SKIQnFw2dHzYLn+zJmKsF3kZryoXkBtS0Q==
-X-Received: by 2002:ad4:4652:: with SMTP id y18mr7157907qvv.2.1632853940961;
-        Tue, 28 Sep 2021 11:32:20 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id w185sm16014000qkd.30.2021.09.28.11.32.20
+         :mime-version:content-disposition:in-reply-to;
+        bh=V9OdhKHkz+bDWOgw519ym53HGQqRyLuvFdP/XrS7z5w=;
+        b=pP0jq5Xtt90Xt5ZZL2pvhUPlifmaMpZV6CfYzzcjfGr0lKls21Lx8D1Qr6akGMqlj5
+         Ysciv0eUM346fukGQ+ToSkKPolKhB+Ph+MHAZ9eUC1jKd2j69OiKL7NokdhNvjwDFBrQ
+         WOZVpjFQm2mF0rDosmqh7RW67UPF4WbHLi5wvqTok6x4xbTIMtdQV+bs0X7R8HiqJ9yb
+         beRjIvMrzekSgS1RWGYrkquTPYnaiaD9ebynNs7Hll+DJaJIQYf9e5mNORj4WX/KjLV6
+         OnRk20zTfiEAR1skOKwPsxHv7N9nG92hU4kxWVjYZqLssCUsrXa2sw/KPY8A5HJzRquG
+         sJQg==
+X-Gm-Message-State: AOAM533xNlfMTw6215Ktye/1sIt+vGCMjaLYnKM8e93XwpTmAgobBm5N
+        dL1e4PNsGesBSULn21/McwEssg==
+X-Google-Smtp-Source: ABdhPJxMh4uLV/Co2Bi0Uj4NMD1oETxTUQz1ehKuaeVQOMiXGKhC5tKssJhY1an+RZ/0cNTGVGgAwg==
+X-Received: by 2002:ac8:46c8:: with SMTP id h8mr7389965qto.341.1632854929767;
+        Tue, 28 Sep 2021 11:48:49 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id b65sm15601470qkc.46.2021.09.28.11.48.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 11:32:20 -0700 (PDT)
+        Tue, 28 Sep 2021 11:48:49 -0700 (PDT)
 Received: from jgg by mlx with local (Exim 4.94)
         (envelope-from <jgg@ziepe.ca>)
-        id 1mVHtr-007FEl-RE; Tue, 28 Sep 2021 15:32:19 -0300
-Date:   Tue, 28 Sep 2021 15:32:19 -0300
+        id 1mVI9o-007FZ4-5q; Tue, 28 Sep 2021 15:48:48 -0300
+Date:   Tue, 28 Sep 2021 15:48:48 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Logan Gunthorpe <logang@deltatee.com>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -79,127 +78,62 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Robin Murphy <robin.murphy@arm.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: Re: [PATCH v3 01/20] lib/scatterlist: add flag for indicating P2PDMA
- segments in an SGL
-Message-ID: <20210928183219.GJ3544071@ziepe.ca>
+Subject: Re: [PATCH v3 03/20] PCI/P2PDMA: make pci_p2pdma_map_type()
+ non-static
+Message-ID: <20210928184848.GK3544071@ziepe.ca>
 References: <20210916234100.122368-1-logang@deltatee.com>
- <20210916234100.122368-2-logang@deltatee.com>
+ <20210916234100.122368-4-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210916234100.122368-2-logang@deltatee.com>
+In-Reply-To: <20210916234100.122368-4-logang@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 05:40:41PM -0600, Logan Gunthorpe wrote:
-> Make use of the third free LSB in scatterlist's page_link on 64bit systems.
-> 
-> The extra bit will be used by dma_[un]map_sg_p2pdma() to determine when a
-> given SGL segments dma_address points to a PCI bus address.
-> dma_unmap_sg_p2pdma() will need to perform different cleanup when a
-> segment is marked as P2PDMA.
-> 
-> Using this bit requires adding an additional dependency on CONFIG_64BIT to
-> CONFIG_PCI_P2PDMA. This should be acceptable as the majority of P2PDMA
-> use cases are restricted to newer root complexes and roughly require the
-> extra address space for memory BARs used in the transactions.
-> 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
->  drivers/pci/Kconfig         |  2 +-
->  include/linux/scatterlist.h | 50 ++++++++++++++++++++++++++++++++++---
->  2 files changed, 47 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-> index 0c473d75e625..90b4bddb3300 100644
-> +++ b/drivers/pci/Kconfig
-> @@ -163,7 +163,7 @@ config PCI_PASID
->  
->  config PCI_P2PDMA
->  	bool "PCI peer-to-peer transfer support"
-> -	depends on ZONE_DEVICE
-> +	depends on ZONE_DEVICE && 64BIT
-
-Perhaps a comment to explain what the 64bit is doing?
-
->  	select GENERIC_ALLOCATOR
->  	help
->  	  Enableѕ drivers to do PCI peer-to-peer transactions to and from
-> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-> index 266754a55327..e62b1cf6386f 100644
-> +++ b/include/linux/scatterlist.h
-> @@ -64,6 +64,21 @@ struct sg_append_table {
->  #define SG_CHAIN	0x01UL
->  #define SG_END		0x02UL
->  
-> +/*
-> + * bit 2 is the third free bit in the page_link on 64bit systems which
-> + * is used by dma_unmap_sg() to determine if the dma_address is a PCI
-> + * bus address when doing P2PDMA.
-> + * Note: CONFIG_PCI_P2PDMA depends on CONFIG_64BIT because of this.
-> + */
+On Thu, Sep 16, 2021 at 05:40:43PM -0600, Logan Gunthorpe wrote:
+> +enum pci_p2pdma_map_type {
+> +	/*
+> +	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally for indicating the mapping
+> +	 * type hasn't been calculated yet. Functions that return this enum
+> +	 * never return this value.
+> +	 */
+> +	PCI_P2PDMA_MAP_UNKNOWN = 0,
 > +
-> +#ifdef CONFIG_PCI_P2PDMA
-> +#define SG_DMA_PCI_P2PDMA	0x04UL
+> +	/*
+> +	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
+> +	 * traverse the host bridge and the host bridge is not in the
+> +	 * whitelist. DMA Mapping routines should return an error when
 
-Add a 
-	static_assert(__alignof__(void *) == 8);
+I gather we are supposed to type allowlist now
 
-?
-
-> +#else
-> +#define SG_DMA_PCI_P2PDMA	0x00UL
-> +#endif
+> +	 * this is returned.
+> +	 */
+> +	PCI_P2PDMA_MAP_NOT_SUPPORTED,
 > +
-> +#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END | SG_DMA_PCI_P2PDMA)
+> +	/*
+> +	 * PCI_P2PDMA_BUS_ADDR: Indicates that two devices can talk to
+> +	 * eachother directly through a PCI switch and the transaction will
+
+'each other'
+
+> +	 * not traverse the host bridge. Such a mapping should program
+> +	 * the DMA engine with PCI bus addresses.
+> +	 */
+> +	PCI_P2PDMA_MAP_BUS_ADDR,
 > +
->  /*
->   * We overload the LSB of the page pointer to indicate whether it's
->   * a valid sg entry, or whether it points to the start of a new scatterlist.
-> @@ -72,7 +87,9 @@ struct sg_append_table {
->  #define sg_is_chain(sg)		((sg)->page_link & SG_CHAIN)
->  #define sg_is_last(sg)		((sg)->page_link & SG_END)
->  #define sg_chain_ptr(sg)	\
-> -	((struct scatterlist *) ((sg)->page_link & ~(SG_CHAIN | SG_END)))
-> +	((struct scatterlist *)((sg)->page_link & ~SG_PAGE_LINK_MASK))
-> +
-> +#define sg_is_dma_pci_p2pdma(sg) ((sg)->page_link & SG_DMA_PCI_P2PDMA)
+> +	/*
+> +	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
+> +	 * to eachother, but the transaction traverses a host bridge on the
 
-I've been encouraging people to use static inlines more..
+'each other'
 
-static inline unsigned int __sg_flags(struct scatterlist *sg)
-{
-	return sg->page_link & SG_PAGE_LINK_MASK;
-}
-static inline bool sg_is_chain(struct scatterlist *sg)
-{
-	return __sg_flags(sg) & SG_CHAIN;
-}
-static inline bool sg_is_last(struct scatterlist *sg)
-{
-	return __sg_flags(sg) & SG_END;
-}
-static inline bool sg_is_dma_pci_p2pdma(struct scatterlist *sg)
-{
-	return __sg_flags(sg) & SG_DMA_PCI_P2PDMA;
-}
-
->  /**
->   * sg_assign_page - Assign a given page to an SG entry
-> @@ -86,13 +103,13 @@ struct sg_append_table {
->   **/
->  static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
->  {
-> -	unsigned long page_link = sg->page_link & (SG_CHAIN | SG_END);
-> +	unsigned long page_link = sg->page_link & SG_PAGE_LINK_MASK;
-
-I think this should just be '& SG_END', sg_assign_page() doesn't look
-like it should ever be used on a sg_chain entry, so this is just
-trying to preserve the end stamp.
-
-Anyway, this looks OK
+> +	 * whitelist. In this case, a normal mapping either with CPU physical
+> +	 * addresses (in the case of dma-direct) or IOVA addresses (in the
+> +	 * case of IOMMUs) should be used to program the DMA engine.
+> +	 */
+> +	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+> +};
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
