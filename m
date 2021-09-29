@@ -2,141 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE5F5C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 20:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89254C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 21:16:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE3F460F70
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 20:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DDDC615A7
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 21:16:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346507AbhI2UUy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 16:20:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40148 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346361AbhI2UUx (ORCPT
+        id S1346873AbhI2VR5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 17:17:57 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:58738 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232258AbhI2VR4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 16:20:53 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BA12C06161C
-        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 13:19:12 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id l13so3554580qtv.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 13:19:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=02EXaRR/LNadeGaGEAJYu9eu7Tm3d0AkQIYMMcAXP4c=;
-        b=LE4/GyFbg6PDYrFzMabU3wOkVWt1bHu/gEgjJL5r//rlKzDS9g6ZiNQZLgEqE5952C
-         dhL0UwiqvNKYDPPQwubbwnqD9mpLnpOEj3bv8j2jO1T9MAE3sZYwQ6v4I0zIsPKYyZ4O
-         rdmxyzL/WT5dtPbI02l1h0ZBCIiueWXex102uRrAV0withKV6ROlvuDYxJP2cXQYBS2P
-         MiqX0CMENIKK+QG5J5hg8kAfOm4AOlfDXgGFEFmsQPmHc89hK9HHWbd0922OIa0ky0DK
-         +koVjJRzBZVdI1lt+yaJcdYnUZs9aEE637ZhmjvS56wbP/NlDDSnzSlUs5LBT01p5N49
-         lXxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=02EXaRR/LNadeGaGEAJYu9eu7Tm3d0AkQIYMMcAXP4c=;
-        b=BzpShXihJ0e4AYCgVHEPhOTuKx5QyYDZq0m+lIueBtio70BdcY2pRV+1j3Z6UW6jYx
-         /lMK2Q6V5cZ4t5KW19BPzPamaBu+erRZRXQzIXTsdKyfnqQdX+SSkmD+Lxj6Golp+zHo
-         P/QifaJGFobtM1KA+RibnkokipfNw1C/2dSm+mQN1mIliSyiyAo7/iVS3MxpzimTQx6b
-         pPUXLKTA/l4EtKHM0Ik4ttZ4t5hszEDzzPPOgSusWgTGwr1owdpZZvJpAh11yTDzZKWi
-         0Nadx2A+37yYmJwgnlpXfzYn7LIR5cDMJiKmuiHXcg23Iq4kmTj181lYRcdPuNj4C9Tw
-         8mOg==
-X-Gm-Message-State: AOAM532RkkI0+b7wSE5FJ5grRE8xlKu3SBuXjwyCNXS2qT1Tz7fsvdzz
-        BVBy6fTiKu1akrEpBgIbpPk8wg==
-X-Google-Smtp-Source: ABdhPJwtTleKCd4n65jPyiBJ5xy5JKPI3hEe5Ya8CJPORXD/cexXVJrGJWxaT2KgbAuRKQXmDeCx3Q==
-X-Received: by 2002:ac8:4243:: with SMTP id r3mr2223327qtm.187.1632946751266;
-        Wed, 29 Sep 2021 13:19:11 -0700 (PDT)
-Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id z10sm485338qtv.6.2021.09.29.13.19.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Sep 2021 13:19:10 -0700 (PDT)
-Subject: Re: [PATCH] nbd: use shifts rather than multiplies
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Pavel Machek <pavel@ucw.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-References: <20210920232533.4092046-1-ndesaulniers@google.com>
-From:   Josef Bacik <josef@toxicpanda.com>
-Message-ID: <079a17e7-6cf1-7632-bf12-1df0edf4f93a@toxicpanda.com>
-Date:   Wed, 29 Sep 2021 16:19:09 -0400
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.14.0
+        Wed, 29 Sep 2021 17:17:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=RfrWfjCRN+UowtRVbNA3b2L6enFhSnjdcCuQt0d3QdI=; b=sx8iDLgZqm9oV/jPtvYl6hWxOJ
+        izKJEIZpDyBIKLWz8FDerUW5k2MT7pPtfUTyZiEU6bE7HoV7pneW/CZR2zMIxsytGbyq8vFegsKGv
+        49LSCi3qE6cFcuu3ANDMzF0wHUfqas6dQodjbfxt/8zHWnBhP9N8kOEENBNUjLrsTXNl90Sahn8H0
+        HAUhhk1jLu1tfiA5AYOXEg4lkZh0pmHiPlunotwWT39n20HVUlZzMB6xXhNwz+2qZPfnc/8Ia0J5E
+        FZIAlxHcWmAecE99N9j4B2rg3AG9XIO/VHcG1DdeZNocY4lVPpt+WxirDMZKAHuss1OBzFQ0yFB23
+        svZcaJZQ==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1mVgvW-0006Bq-H1; Wed, 29 Sep 2021 15:15:43 -0600
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+References: <20210916234100.122368-1-logang@deltatee.com>
+ <20210916234100.122368-2-logang@deltatee.com>
+ <20210928183219.GJ3544071@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <3f3abc6b-0a80-dbb6-f9dc-8a4cc33c975c@deltatee.com>
+Date:   Wed, 29 Sep 2021 15:15:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20210920232533.4092046-1-ndesaulniers@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210928183219.GJ3544071@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v3 01/20] lib/scatterlist: add flag for indicating P2PDMA
+ segments in an SGL
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/21 7:25 PM, Nick Desaulniers wrote:
-> commit fad7cd3310db ("nbd: add the check to prevent overflow in
-> __nbd_ioctl()") raised an issue from the fallback helpers added in
-> commit f0907827a8a9 ("compiler.h: enable builtin overflow checkers and
-> add fallback code")
-> 
-> ERROR: modpost: "__divdi3" [drivers/block/nbd.ko] undefined!
-> 
-> As Stephen Rothwell notes:
->    The added check_mul_overflow() call is being passed 64 bit values.
->    COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW is not set for this build (see
->    include/linux/overflow.h).
-> 
-> Specifically, the helpers for checking whether the results of a
-> multiplication overflowed (__unsigned_mul_overflow,
-> __signed_add_overflow) use the division operator when
-> !COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW.  This is problematic for 64b
-> operands on 32b hosts.
-> 
-> This was fixed upstream by
-> commit 76ae847497bc ("Documentation: raise minimum supported version of
-> GCC to 5.1")
-> which is not suitable to be backported to stable.
-> 
-> Further, __builtin_mul_overflow() would emit a libcall to a
-> compiler-rt-only symbol when compiling with clang < 14 for 32b targets.
-> 
-> ld.lld: error: undefined symbol: __mulodi4
-> 
-> In order to keep stable buildable with GCC 4.9 and clang < 14, modify
-> struct nbd_config to instead track the number of bits of the block size;
-> reconstructing the block size using runtime checked shifts that are not
-> problematic for those compilers and in a ways that can be backported to
-> stable.
-> 
-> In nbd_set_size, we do validate that the value of blksize must be a
-> power of two (POT) and is in the range of [512, PAGE_SIZE] (both
-> inclusive).
-> 
-> This does modify the debugfs interface.
-> 
-> Cc: stable@vger.kernel.org
-> Cc: Arnd Bergmann <arnd@kernel.org>
-> Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> Link: https://github.com/ClangBuiltLinux/linux/issues/1438
-> Link: https://lore.kernel.org/all/20210909182525.372ee687@canb.auug.org.au/
-> Link: https://lore.kernel.org/stable/CAHk-=whiQBofgis_rkniz8GBP9wZtSZdcDEffgSLO62BUGV3gg@mail.gmail.com/
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Suggested-by: Kees Cook <keescook@chromium.org>
-> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Suggested-by: Pavel Machek <pavel@ucw.cz>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Thanks,
+On 2021-09-28 12:32 p.m., Jason Gunthorpe wrote:
+> On Thu, Sep 16, 2021 at 05:40:41PM -0600, Logan Gunthorpe wrote:
+>>  config PCI_P2PDMA
+>>  	bool "PCI peer-to-peer transfer support"
+>> -	depends on ZONE_DEVICE
+>> +	depends on ZONE_DEVICE && 64BIT
+> 
+> Perhaps a comment to explain what the 64bit is doing?
 
-Josef
+Added.
+
+>>  	select GENERIC_ALLOCATOR
+>>  	help
+>>  	  Enableѕ drivers to do PCI peer-to-peer transactions to and from
+>> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+>> index 266754a55327..e62b1cf6386f 100644
+>> +++ b/include/linux/scatterlist.h
+>> @@ -64,6 +64,21 @@ struct sg_append_table {
+>>  #define SG_CHAIN	0x01UL
+>>  #define SG_END		0x02UL
+>>  
+>> +/*
+>> + * bit 2 is the third free bit in the page_link on 64bit systems which
+>> + * is used by dma_unmap_sg() to determine if the dma_address is a PCI
+>> + * bus address when doing P2PDMA.
+>> + * Note: CONFIG_PCI_P2PDMA depends on CONFIG_64BIT because of this.
+>> + */
+>> +
+>> +#ifdef CONFIG_PCI_P2PDMA
+>> +#define SG_DMA_PCI_P2PDMA	0x04UL
+> 
+> Add a 
+> 	static_assert(__alignof__(void *) == 8);
+> 
+> ?
+
+Good idea. Though, I think your line isn't quite correct. I've added:
+
+static_assert(__alignof__(struct page) >= 8);
+
+>> +#define sg_is_dma_pci_p2pdma(sg) ((sg)->page_link & SG_DMA_PCI_P2PDMA)
+> 
+> I've been encouraging people to use static inlines more..
+
+I also prefer static inlines, but I usually follow the style of the code
+I'm changing. In any case, I've changed to static inlines similar to
+your example.
+
+>>  /**
+>>   * sg_assign_page - Assign a given page to an SG entry
+>> @@ -86,13 +103,13 @@ struct sg_append_table {
+>>   **/
+>>  static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
+>>  {
+>> -	unsigned long page_link = sg->page_link & (SG_CHAIN | SG_END);
+>> +	unsigned long page_link = sg->page_link & SG_PAGE_LINK_MASK;
+> 
+> I think this should just be '& SG_END', sg_assign_page() doesn't look
+> like it should ever be used on a sg_chain entry, so this is just
+> trying to preserve the end stamp.
+
+Perhaps, but I'm not comfortable making that change in this patch or
+series. Though, I've reverted this specific change in my patch so
+sg_assign_page() will clear SG_DMA_PCI_P2PDMA.
+
+Logan
