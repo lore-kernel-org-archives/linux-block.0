@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AC6C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 23:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AF5C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 23:21:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BF5261528
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 23:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C97E611BD
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 23:21:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347434AbhI2XH1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 19:07:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50170 "EHLO
+        id S245755AbhI2XXe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 19:23:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347389AbhI2XH1 (ORCPT
+        with ESMTP id S1347538AbhI2XXb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 19:07:27 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F57C061769
-        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 16:05:45 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id j13so3959760qtq.6
-        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 16:05:45 -0700 (PDT)
+        Wed, 29 Sep 2021 19:23:31 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74F05C06161C
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 16:21:49 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id f130so4030993qke.6
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 16:21:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Rb14cjSJqqt1iOg7v1WUt5AVmuRSH7cZOE8ujwxMcMg=;
-        b=DIaskCn5WR5tA6jhdOqyO4JGz4+XatRitSbJTb+kmIqDsCr01GjZ0p3lPuKzblpDJT
-         zhfIKMKyyPJmhP4fwKW9s1DOIPeWnXpgnGWww2ZsqZXMAXwagCxFkdbr/ZZNpdbvhNz6
-         yhMxNtaJ4799pZOw9yof96R6NI1pis1TXcHgXiz2OGYJ2JTRjUBWxNfY9Bnx4SBlBLHZ
-         NOkoZJeyzIFho5nhxKuuBqHTm7LkOuC/VLVY0i+EnUBy4CEUt/GqO7FcsIRDEUISOa/r
-         ebsfSg+Kyd8gPXIldmrnVbOFPyE5xD126E/0FnMFaQl4NuKh0l+VCCKdHBolF0rJnHvM
-         E9AA==
+        bh=1Hmlahc/i9658U3YzBDCjabD8lk1Mv+/ZOzt2omk2Ho=;
+        b=SJtWHdnGo9L4mdll+qKaZsmtvpn7ds7Jqf9UErLrQmOsqRP3sxU8o3aw5o2MvhL5Mj
+         lM03toh8ImPud8H7vh/AGGkl+3vURvGKxRBh5yeP3iqYJ3RXD4HkzTzjBF6Mgc3CyYL4
+         NPwaDU2c+i54bQ4atNBSa63XnbDUvexvPwjoCQkmNEdCUAl1T+QvgnRV98lCDddMEe7S
+         LVFALRCv3M02kPjD9ocMpxen45b3XXJIbEyj72HfycWLiBpEdaWRxZc5TzgjO4IW95ia
+         6tYGEjCfhjevDUh3QKMgzT1YEh/Dp9tLfgFk0cHBocInRv2rBNOuuogJ3/Vn3OANJNLH
+         kWlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Rb14cjSJqqt1iOg7v1WUt5AVmuRSH7cZOE8ujwxMcMg=;
-        b=rHYdBcArGPb0v+RHqOtNVvtEVszEzQ8DKqVQIQDXHvzltnOfoCobUI4KtrRiq4IK9z
-         26pywZuwJ2/D950nXsrjU8K7oz1U7U4V1BilKrWN2cEgszLyUFHhsyxqxjIm9Omue4Iz
-         H/raH3zgLhZNAMIJX3KSLsJgU+cTf84P4a4vLxSUt2O1wpp8JgSoQGx84/M8KDcakuBg
-         Uc4Z44NxR8K06ukXEQ8iaJLWctrjt3lw/rnsB5zOMWlkZYj5UBAMNQr9IfZJ07i0Fwig
-         SjRiw892rljGtLFS0TdF3u+/yj+QcEUr1IKWdwgq3zwefxVHyE0OOvsQqqivLVuRL46w
-         dWHA==
-X-Gm-Message-State: AOAM530JmVBLhNdascjParFLt9jgCuP6PPmoG/vgGqVihXY15qrBGIaB
-        tmaxDJ6zjEal0ITHHb3aim2o6Q==
-X-Google-Smtp-Source: ABdhPJyapID+TUOl/mUzGMXiMJpXeNaxe+8Z2o/bunUXmIm+EzT4IvoM8B4R+kDDMjzs5lMTxyRE3w==
-X-Received: by 2002:ac8:7613:: with SMTP id t19mr2882513qtq.365.1632956745011;
-        Wed, 29 Sep 2021 16:05:45 -0700 (PDT)
+        bh=1Hmlahc/i9658U3YzBDCjabD8lk1Mv+/ZOzt2omk2Ho=;
+        b=MDw1CvxSal61JAduGxPAj1encIGJs8ywwVTFgE1S7eeyiquB+Ub2sb6Bl9MOsp1eZf
+         sflEvbOdXVMxbwVNgeQfCLIabgGdCDtpXOGUsj1zY3tNT6EGhhzqIAV86SUTBCwMPTVK
+         ExgApxpHRdNKZWwLkehKkYHVaupgjO3FqbWgTt/q1MGFRHfkZOV4gWtuwLV8UsmhZo80
+         4Oy+0sHDcCts1u71TEQQDSvNjdnigjwUhV3Mnpr9wlLW5AO87l6A9PRnhBcvXB2fXr5w
+         HnVYCykHVa2Ha/c5xpDyYLyHiV/IMsI0AjtYL0vqbLcFKkQAhXHCBBgwJ9G55zMMsNeW
+         /ASA==
+X-Gm-Message-State: AOAM533nk/E8HDkErsEkfWk67lRHgf4LQ93kP7i3MdwahfW8gW10y8Tt
+        FebgNNkfCFpzYFZ1A2fiNKtSTQ==
+X-Google-Smtp-Source: ABdhPJxjfksXX9RBzjsealxa+5cO5Ph50HuUSNxxHRV+6R5kI7btDIJAlC0cqyNxWaWuBVsQ1jP8wA==
+X-Received: by 2002:a37:b386:: with SMTP id c128mr2193672qkf.426.1632957708587;
+        Wed, 29 Sep 2021 16:21:48 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id h4sm645980qtj.83.2021.09.29.16.05.44
+        by smtp.gmail.com with ESMTPSA id x3sm631017qkl.107.2021.09.29.16.21.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Sep 2021 16:05:44 -0700 (PDT)
+        Wed, 29 Sep 2021 16:21:48 -0700 (PDT)
 Received: from jgg by mlx with local (Exim 4.94)
         (envelope-from <jgg@ziepe.ca>)
-        id 1mVidz-007iU5-Sx; Wed, 29 Sep 2021 20:05:43 -0300
-Date:   Wed, 29 Sep 2021 20:05:43 -0300
+        id 1mVitX-007ii8-Gm; Wed, 29 Sep 2021 20:21:47 -0300
+Date:   Wed, 29 Sep 2021 20:21:47 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Logan Gunthorpe <logang@deltatee.com>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -78,47 +78,47 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Robin Murphy <robin.murphy@arm.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: Re: [PATCH v3 19/20] PCI/P2PDMA: introduce pci_mmap_p2pmem()
-Message-ID: <20210929230543.GB3544071@ziepe.ca>
+Subject: Re: [PATCH v3 00/20] Userspace P2PDMA with O_DIRECT NVMe devices
+Message-ID: <20210929232147.GD3544071@ziepe.ca>
 References: <20210916234100.122368-1-logang@deltatee.com>
- <20210916234100.122368-20-logang@deltatee.com>
- <20210928195518.GV3544071@ziepe.ca>
- <8d386273-c721-c919-9749-fc0a7dc1ed8b@deltatee.com>
+ <20210928200216.GW3544071@ziepe.ca>
+ <06d75fcb-ce8b-30a5-db36-b6c108460d3d@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8d386273-c721-c919-9749-fc0a7dc1ed8b@deltatee.com>
+In-Reply-To: <06d75fcb-ce8b-30a5-db36-b6c108460d3d@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 03:42:00PM -0600, Logan Gunthorpe wrote:
+On Wed, Sep 29, 2021 at 03:50:02PM -0600, Logan Gunthorpe wrote:
+> 
+> 
+> On 2021-09-28 2:02 p.m., Jason Gunthorpe wrote:
+> > On Thu, Sep 16, 2021 at 05:40:40PM -0600, Logan Gunthorpe wrote:
+> >> Hi,
+> >>
+> >> This patchset continues my work to add userspace P2PDMA access using
+> >> O_DIRECT NVMe devices. My last posting[1] just included the first 13
+> >> patches in this series, but the early P2PDMA cleanup and map_sg error
+> >> changes from that series have been merged into v5.15-rc1. To address
+> >> concerns that that series did not add any new functionality, I've added
+> >> back the userspcae functionality from the original RFC[2] (but improved
+> >> based on the original feedback).
+> > 
+> > I really think this is the best series yet, it really looks nice
+> > overall. I know the sg flag was a bit of a debate at the start, but it
+> > serves an undeniable purpose and the resulting standard DMA APIs 'just
+> > working' is really clean.
+> 
+> Actually, so far, nobody has said anything negative about using the SG flag.
+> 
+> > There is more possible here, we could also pass the new GUP flag in the
+> > ib_umem code..
+> 
+> Yes, that would be very useful.
 
-> The main reason is probably this: if we don't use VM_MIXEDMAP, then we
-> can't set pte_devmap(). 
-
-I think that is an API limitation in the fault routines..
-
-finish_fault() should set the pte_devmap - eg by passing the
-PFN_DEV|PFN_MAP somehow through the vma->vm_page_prot to mk_pte() or
-otherwise signaling do_set_pte() that it should set those PTE bits
-when it creates the entry.
-
-(or there should be a vmf_* helper for this special case, but using
-the vmf->page seems righter to me)
-
-> If we don't set pte_devmap(), then every single page that GUP
-> processes needs to check if it's a ZONE_DEVICE page and also if it's
-> a P2PDMA page (thus dereferencing pgmap) in order to satisfy the
-> requirements of FOLL_PCI_P2PDMA.
-
-Definately not suggesting not to set pte_devmap(), only that
-VM_MIXEDMAP should not be set on VMAs that only contain struct
-pages. That is an abuse of what it is intended for.
-
-At the very least there should be a big comment above the usage
-explaining that this is just working around a limitation in
-finish_fault() where it cannot set the PFN_DEV|PFN_MAP bits today.
+You might actually prefer to do that then the bio changes to get the
+infrastructur merged as it seems less "core"
 
 Jason
-
