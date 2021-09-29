@@ -2,221 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9049C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 04:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3077C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 04:17:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC55D613D1
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 04:17:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B89CF613D3
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 04:17:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232244AbhI2ESt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 00:18:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60884 "EHLO
+        id S233040AbhI2ETG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 00:19:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24410 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232353AbhI2ESt (ORCPT
+        by vger.kernel.org with ESMTP id S232353AbhI2ETF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 00:18:49 -0400
+        Wed, 29 Sep 2021 00:19:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632889028;
+        s=mimecast20190719; t=1632889044;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=78Fsgf1h+RTfDgrnE/nQEe6tYqMqnM7d0kWUC6K8lx0=;
-        b=FVDt8sF7IevfrineaYGRIMVADFvHgYqbbaEOrP4siljWMIlP/kiBALrqHbVSNMriedx1ok
-        I/kZwxTzmt5LbQ6s/BAQ1kk5rmB9w01oFYgrFSM/RLACKet2ahmQs7W233JXo50hgGZzBu
-        oLSbG8H4bbToWUI/MZn2PFjElweZsZU=
+        bh=KrY+IS0jZG6xj97OVcmzVVUHAeJrr7PBDGZWgu5Io0k=;
+        b=iJZx3SrcFEa9DI9Syv/L7hKZa+oXFe6dbBdCQexkBKanuTLq6VFuFmyYc8IsxQHoDnhuOt
+        U6DBESRxJVzcknWu9AlihyBvXN8mlKGnsLbkX84GPynF9dretkvsuOcHvX/CFSMhxwUmDD
+        5PlIt0eEYbH9Tc7miu8D9CDh/la6+5o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-V4ec62t6MJq9enBSN7ieYg-1; Wed, 29 Sep 2021 00:17:06 -0400
-X-MC-Unique: V4ec62t6MJq9enBSN7ieYg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-220-TXdVKvJuNLu7Y0fl6E3Atw-1; Wed, 29 Sep 2021 00:17:20 -0400
+X-MC-Unique: TXdVKvJuNLu7Y0fl6E3Atw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 117C5802921;
-        Wed, 29 Sep 2021 04:17:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDB9C801B3D;
+        Wed, 29 Sep 2021 04:17:18 +0000 (UTC)
 Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CE6A5C1D5;
-        Wed, 29 Sep 2021 04:16:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D8D2519C79;
+        Wed, 29 Sep 2021 04:17:07 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-block@vger.kernel.org
 Cc:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
         Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/5] nvme: paring quiesce/unquiesce
-Date:   Wed, 29 Sep 2021 12:15:58 +0800
-Message-Id: <20210929041559.701102-5-ming.lei@redhat.com>
+Subject: [PATCH 5/5] blk-mq: support nested blk_mq_quiesce_queue()
+Date:   Wed, 29 Sep 2021 12:15:59 +0800
+Message-Id: <20210929041559.701102-6-ming.lei@redhat.com>
 In-Reply-To: <20210929041559.701102-1-ming.lei@redhat.com>
 References: <20210929041559.701102-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current blk_mq_quiesce_queue() and blk_mq_unquiesce_queue() always
-stops and starts the queue unconditionally. And there can be concurrent
-quiesce/unquiesce coming from different unrelated code paths, so
-unquiesce may come unexpectedly and start queue too early.
+Turns out that blk_mq_freeze_queue() isn't stronger[1] than
+blk_mq_quiesce_queue() because dispatch may still be in-progress after
+queue is frozen, and in several cases, such as switching io scheduler,
+updating nr_requests & wbt latency, we still need to quiesce queue as a
+supplement of freezing queue.
 
-Prepare for supporting nested / concurrent quiesce/unquiesce, so that we
-can address the above issue.
+As we need to extend uses of blk_mq_quiesce_queue(), it is inevitable
+for us to need support nested quiesce, especailly we can't let
+unquiesce happen when there is quiesce originated from other contexts.
 
-NVMe has very complicated quiesce/unquiesce use pattern, add one mutex
-and queue stopped state in nvme_ctrl, so that we can make sure that
-quiece/unquiesce is called in pair.
+This patch introduces q->mq_quiesce_depth to deal concurrent quiesce,
+and we only unquiesce queue when it is the last one from all contexts.
+
+One kernel panic issue has been reported[2] when running stress test on
+dm-mpath's updating nr_requests and suspending queue, and the similar
+issue should exist on almost all drivers which use quiesce/unquiesce.
+
+[1] https://marc.info/?l=linux-block&m=150993988115872&w=2
+[2] https://listman.redhat.com/archives/dm-devel/2021-September/msg00189.html
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c | 51 ++++++++++++++++++++++++++++++++++++----
- drivers/nvme/host/nvme.h |  4 ++++
- 2 files changed, 50 insertions(+), 5 deletions(-)
+ block/blk-mq.c         | 20 +++++++++++++++++---
+ include/linux/blkdev.h |  2 ++
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 23fb746a8970..5d0b2eb38e43 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -4375,6 +4375,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	clear_bit(NVME_CTRL_FAILFAST_EXPIRED, &ctrl->flags);
- 	spin_lock_init(&ctrl->lock);
- 	mutex_init(&ctrl->scan_lock);
-+	mutex_init(&ctrl->queues_stop_lock);
- 	INIT_LIST_HEAD(&ctrl->namespaces);
- 	xa_init(&ctrl->cels);
- 	init_rwsem(&ctrl->namespaces_rwsem);
-@@ -4450,14 +4451,44 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- }
- EXPORT_SYMBOL_GPL(nvme_init_ctrl);
- 
-+static void __nvme_stop_admin_queue(struct nvme_ctrl *ctrl)
-+{
-+	lockdep_assert_held(&ctrl->queues_stop_lock);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 21bf4c3f0825..10f8a3d4e3a1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -209,7 +209,12 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
+  */
+ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+ {
+-	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
++	unsigned long flags;
 +
-+	if (!ctrl->admin_queue_stopped) {
-+		blk_mq_quiesce_queue(ctrl->admin_q);
-+		ctrl->admin_queue_stopped = true;
++	spin_lock_irqsave(&q->queue_lock, flags);
++	if (!q->quiesce_depth++)
++		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
++	spin_unlock_irqrestore(&q->queue_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+ 
+@@ -250,10 +255,19 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+  */
+ void blk_mq_unquiesce_queue(struct request_queue *q)
+ {
+-	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
++	unsigned long flags;
++	bool run_queue = false;
++
++	spin_lock_irqsave(&q->queue_lock, flags);
++	if (q->quiesce_depth > 0 && !--q->quiesce_depth) {
++		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
++		run_queue = true;
 +	}
-+}
++	spin_unlock_irqrestore(&q->queue_lock, flags);
+ 
+ 	/* dispatch requests which are inserted during quiescing */
+-	blk_mq_run_hw_queues(q, true);
++	if (run_queue)
++		blk_mq_run_hw_queues(q, true);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0e960d74615e..74c60e2d61f9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -315,6 +315,8 @@ struct request_queue {
+ 	 */
+ 	struct mutex		mq_freeze_lock;
+ 
++	int			quiesce_depth;
 +
-+static void __nvme_start_admin_queue(struct nvme_ctrl *ctrl)
-+{
-+	lockdep_assert_held(&ctrl->queues_stop_lock);
-+
-+	if (ctrl->admin_queue_stopped) {
-+		blk_mq_unquiesce_queue(ctrl->admin_q);
-+		ctrl->admin_queue_stopped = false;
-+	}
-+}
-+
- static void nvme_start_ns_queue(struct nvme_ns *ns)
- {
--	blk_mq_unquiesce_queue(ns->queue);
-+	lockdep_assert_held(&ns->ctrl->queues_stop_lock);
-+
-+	if (test_bit(NVME_NS_STOPPED, &ns->flags)) {
-+		blk_mq_unquiesce_queue(ns->queue);
-+		clear_bit(NVME_NS_STOPPED, &ns->flags);
-+	}
- }
- 
- static void nvme_stop_ns_queue(struct nvme_ns *ns)
- {
--	blk_mq_quiesce_queue(ns->queue);
-+	lockdep_assert_held(&ns->ctrl->queues_stop_lock);
-+
-+	if (!test_bit(NVME_NS_STOPPED, &ns->flags)) {
-+		blk_mq_quiesce_queue(ns->queue);
-+		set_bit(NVME_NS_STOPPED, &ns->flags);
-+	}
- }
- 
- /*
-@@ -4490,16 +4521,18 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
- 
-+	mutex_lock(&ctrl->queues_stop_lock);
- 	down_read(&ctrl->namespaces_rwsem);
- 
- 	/* Forcibly unquiesce queues to avoid blocking dispatch */
- 	if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
--		nvme_start_admin_queue(ctrl);
-+		__nvme_start_admin_queue(ctrl);
- 
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
- 		nvme_set_queue_dying(ns);
- 
- 	up_read(&ctrl->namespaces_rwsem);
-+	mutex_unlock(&ctrl->queues_stop_lock);
- }
- EXPORT_SYMBOL_GPL(nvme_kill_queues);
- 
-@@ -4555,10 +4588,12 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
- 
-+	mutex_lock(&ctrl->queues_stop_lock);
- 	down_read(&ctrl->namespaces_rwsem);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
- 		nvme_stop_ns_queue(ns);
- 	up_read(&ctrl->namespaces_rwsem);
-+	mutex_unlock(&ctrl->queues_stop_lock);
- }
- EXPORT_SYMBOL_GPL(nvme_stop_queues);
- 
-@@ -4566,22 +4601,28 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
- 
-+	mutex_lock(&ctrl->queues_stop_lock);
- 	down_read(&ctrl->namespaces_rwsem);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
- 		nvme_start_ns_queue(ns);
- 	up_read(&ctrl->namespaces_rwsem);
-+	mutex_unlock(&ctrl->queues_stop_lock);
- }
- EXPORT_SYMBOL_GPL(nvme_start_queues);
- 
- void nvme_stop_admin_queue(struct nvme_ctrl *ctrl)
- {
--	blk_mq_quiesce_queue(ctrl->admin_q);
-+	mutex_lock(&ctrl->queues_stop_lock);
-+	__nvme_stop_admin_queue(ctrl);
-+	mutex_unlock(&ctrl->queues_stop_lock);
- }
- EXPORT_SYMBOL_GPL(nvme_stop_admin_queue);
- 
- void nvme_start_admin_queue(struct nvme_ctrl *ctrl)
- {
--	blk_mq_unquiesce_queue(ctrl->admin_q);
-+	mutex_lock(&ctrl->queues_stop_lock);
-+	__nvme_start_admin_queue(ctrl);
-+	mutex_unlock(&ctrl->queues_stop_lock);
- }
- EXPORT_SYMBOL_GPL(nvme_start_admin_queue);
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 47877a5f1515..3a02a370f025 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -341,6 +341,9 @@ struct nvme_ctrl {
- 	struct page *discard_page;
- 	unsigned long discard_page_busy;
- 
-+	bool	admin_queue_stopped;
-+	struct mutex	queues_stop_lock;
-+
- 	struct nvme_fault_inject fault_inject;
- };
- 
-@@ -457,6 +460,7 @@ struct nvme_ns {
- #define NVME_NS_ANA_PENDING	2
- #define NVME_NS_FORCE_RO	3
- #define NVME_NS_READY		4
-+#define NVME_NS_STOPPED		5
- 
- 	struct cdev		cdev;
- 	struct device		cdev_device;
+ 	struct blk_mq_tag_set	*tag_set;
+ 	struct list_head	tag_set_list;
+ 	struct bio_set		bio_split;
 -- 
 2.31.1
 
