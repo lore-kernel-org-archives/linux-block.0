@@ -2,168 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB811C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 06:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4E7C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 06:50:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98E29613A7
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 06:44:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1926613C8
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 06:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244422AbhI2GqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 02:46:11 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:58369 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244342AbhI2GqK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 02:46:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1632897869; x=1664433869;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=NyfR0mMdfst+m6AxvOrSbjFz4SRxlfk/WyGblWqmXKY=;
-  b=LB9d9xByErGCuKQA8bZL4e38zLmGsLyTKC5Y0CSxrDUbHAlJ6ApfpQOA
-   oP8V4bY39EyOYFZyF7rhp2Op4zgOYszj9mUI756BITQNQ41H8H2bssKy6
-   /xpaWJBRGoqtp6svADvLNnyIQ4skV4oMBoLqGA2RfVT1dDUaVHjKxOu1J
-   O8ru1aG0Y4+sREhLeCubyqWDpVgJYBU8HRYUsJrNOwzEDs5OBH/kRKhwI
-   wkAB8nQT+ShegxHLWmemHS4wsK4nzqrniueY2yGwEOF5VVujEMEuE+FCL
-   kqKUe7dkTfT9DmTq+UfdMvoYmqFwiFwGxPeYdb8QO+6jFed3rJC5rD+MP
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.85,331,1624291200"; 
-   d="scan'208";a="285072411"
-Received: from mail-dm3nam07lp2043.outbound.protection.outlook.com (HELO NAM02-DM3-obe.outbound.protection.outlook.com) ([104.47.56.43])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Sep 2021 14:44:26 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lyvHG+XAfZBc1WOBLDMPTsyNEfJWXLopz8PmM9KtPea1ZFFS3SG3Pvc2GcFhUbf/W1U3O9JZtNamtA1jWSC/cr7dEwj6pqkaFv6D3ips3oZI5otBdJEGngxfl0v44lCLzRZDlKm9F0BVXAucdGQlYsWpGABreoNw5wE7Z6qEp0KWpAZXiO5XlLavTZhprbVBmIgFCDfFOrQTLWK180a5516cLmZW5jw1BoAqggC1YmVN+FpnbtQAA0QVVSbsuqqtfBJfPCTg9WJhe1vVj9qrQlYtGhL+6yOvRI2Xj4sLgtC7EkDWFWEUGLPLnPGkZ0cnhuBWigjE1ZFk1sOQVzlO0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=NyfR0mMdfst+m6AxvOrSbjFz4SRxlfk/WyGblWqmXKY=;
- b=jx4lckGVAPrQC/FMHciiNaL9N9QbqCJQwoI8TxUSTBkL7veaJDkPIEn+7dQ5bqcG9wfVANshEFTOoQgPKeHO+zE05/DcQrDHF7oZ7U7tv8MuXSuEPNwbxz/i50Wa8hP9XW7Ch/4I0CFoRb7coEN1yUtmcCp/R0wLyfPFXQroeZRw6TShAbvk+08SRXZ2vlJKUSnYffE5vClUBNT3BKJLjn89i5OwLIuZr6eQRqfU78C2Ri3qJXIwJe0fiww68ZA+qnUzBYiMfe/MZh3Lxt/fd2higt27CSSeCVxUiT/Tfzk05Lo/bzF4oOg+8sk35pf2UrbJUdPbWK78N1XVWykUNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NyfR0mMdfst+m6AxvOrSbjFz4SRxlfk/WyGblWqmXKY=;
- b=t3AxLajrcKCDovavoLzIUFtXzf7+o0DTWE+71kmnJMNI+51krJPvV8JYogpXmYbQMAa9UPxeLrrFs9WJz8c8dwc80/LzBe2e0ro8Z93k57LfAPqyOVPfNhOrBv9+LeEZhe/hSkc/CflCOEyMxlOSFfttNMzrQkc7sHISgJd9kVg=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by PH0PR04MB7352.namprd04.prod.outlook.com (2603:10b6:510:1a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.15; Wed, 29 Sep
- 2021 06:44:22 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::5d0d:3d52:2041:885a]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::5d0d:3d52:2041:885a%4]) with mapi id 15.20.4566.015; Wed, 29 Sep 2021
- 06:44:22 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier.gonz@samsung.com>
-CC:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Thread-Topic: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Thread-Index: AQHXRfrE+mT6pvaiwEOWn89Dsv4XaA==
-Date:   Wed, 29 Sep 2021 06:44:22 +0000
-Message-ID: <PH0PR04MB7416C6D3E446DE6CFFABC5C39BA99@PH0PR04MB7416.namprd04.prod.outlook.com>
-References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
- <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
- <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
- <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bd3482f7-e6a0-4889-afce-08d98314921b
-x-ms-traffictypediagnostic: PH0PR04MB7352:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <PH0PR04MB735289F97E18FAFC64A65DC69BA99@PH0PR04MB7352.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XgIOrqvE/Cc2h7XPGFM8SHpVE8xFu139tuBEj70o//6OYcjYpSabJJKs8vskNAE8KM+alH5G+pkgQkqASqeCEk6k8a390sg3fCK1rcVULO3Q2XVDs0H8fqXHN+ryvRR8ldKyisJDyxifWIqDlsRUNnx99eJ2yEfAq3ULGBtlZwY/TjySt59+QqsqIAtdJ02c0DwRb5K/QwdnTtefY+uo+/6X1q03qehK9SJvJdZsU61CNUonsDTvQ/8oXuL3Ea1vjPopMs2dGtzjam0ZE4AVAwcB8A4OcCZsZEpsvtK0qJLAn7tIywXmwqOHEXPIEEKmYPz5Ui1GxahG4EKNMQojZiDZxLDM0W/t0p2/GuysaJ9qo6q6kuwb8nIroCC7L2EDzmF1AndjX/SGm4bepsaWIZbPNwfQC031oqTY7Z9dOHV2l88dNTVUULOHZsc/MFS1Nd4kM3LgmY+A/B/HqodBoth78oVgSmE4CwEDonpJOUn+ZClB5a7AOQXQuNhop/U0upBR9xMuaBclwgLkqlZshAwqUypDAd915TSerfN+a5apliuOeWNFDehbMmgWaMTfTOX/sQwl7D+3tV0cwTIlCjl2H2Ayt+Pxx0+h82EuGU1jSOW2hxtr/QToaCEOB58zVg4/RBwoSx0aDHIKlIhDZ7BDRmoH8sPrt6m1Myjd+judsQfqvyAnxx/Wg73DHMwuOWXHfbPSexbR2CMUIO5qXA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(4326008)(8936002)(91956017)(6506007)(186003)(54906003)(316002)(53546011)(71200400001)(76116006)(8676002)(86362001)(2906002)(5660300002)(66446008)(66476007)(66556008)(64756008)(122000001)(52536014)(508600001)(38100700002)(7416002)(4744005)(7696005)(6916009)(38070700005)(55016002)(33656002)(66946007)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?3zfCM9fxj5Ip3evj7FIt1xvlD3T2pEczqwvU2iyf+L9FylO8r/PWggLFZ0?=
- =?iso-8859-1?Q?F3yjxixO5wh3vSPb3OouMhL3Fh0Edugz+4d8VMHtRKSOKqgAXPZ0Z7i0rr?=
- =?iso-8859-1?Q?odGOU6w0Ytbdj33j1BXFe/1quUANcsWSz7ujo58v0jytCjTSF+Tb8yaFIA?=
- =?iso-8859-1?Q?lzTXzgDjGiJFnN8c4R0Z5d0HuiKljEbYf/XFw8PaxCTpuKQaH6OYuAQa0R?=
- =?iso-8859-1?Q?IVWRsk0/HLyB++r9ICf3PX/+ZwDuWaJDtHabfzpybhz0kz2mdmPFziB5HH?=
- =?iso-8859-1?Q?LmwmySHbaOdYpfwY8P743DhAIz/3lwtWYhA+aTb96CAEe0XhVYdaNoQt/p?=
- =?iso-8859-1?Q?KkZgTXT7er6RqZiL2DHyG4zY2zlbp49ig/0JTtiXxcAP7pQS4pLOlEijUL?=
- =?iso-8859-1?Q?BeqoZAuO5RxgCELLxwi0Pb7HHkbwn6fPgrkFTT2Q81YuGWoNTxjmvJkEQC?=
- =?iso-8859-1?Q?nRwAGjFCrQ+3x3nduKsQHXj5POlWfR8Jl98lp8jIFbouklsHAc8cdefL25?=
- =?iso-8859-1?Q?5Ao/6rQ+BK8hSVKcMyZrERaAoEM9rXF7JoQi3wFrz8FmESu+ISmckNG95o?=
- =?iso-8859-1?Q?2vgAH4YIJN0vbWuecb3Ty6qNXKMm53a7QyhoSy9EsjglHvuycrGcOmlj2c?=
- =?iso-8859-1?Q?65wzj7ycBiYAwzuhUoIj59zvYS6Qu7sLWHpC3Yh3GtxSqT3xxJIxU+voZr?=
- =?iso-8859-1?Q?0PdqVsM1FTuWWstq8Z+iIIEAgkgqTe0zw/6csCtbfNsNa+CvC9m4j7/JKg?=
- =?iso-8859-1?Q?guxZhMgR7xMVi8tFnjy6wNMNi6ZggBTDBCimUz1h2ELZPSSqK49fw0mSp1?=
- =?iso-8859-1?Q?4hfXaSoUp09KlFSkt/5jwF7jaebpMxlIFyFwUkGlEaXvca9NgzCTAhjLUO?=
- =?iso-8859-1?Q?3ImAL4gx60WVyHGZiOBHklt9Ct+8DTkV/zP0cKWxIOWdRoyve/3x5r2yOk?=
- =?iso-8859-1?Q?LG9Li4/T8oIO1PvNmYiGgDGGzgSjiRpyUXHnApYvTuvJBrhkmNu2ZSnu+T?=
- =?iso-8859-1?Q?1irFze/+/bH/gzrYeMdzXR0dMviqisn+5vFm30bLPkGZx3ass2QdH8uJHR?=
- =?iso-8859-1?Q?bUTbEufDynXIm1uD4FiituW5DXq4mr4JSHTIh2o46zM4brH2XBwV2sIwXm?=
- =?iso-8859-1?Q?DGejF732H+5gDHzEAKPROT6fqCc40wpGZmn1n2Ouz+3/Vc//d6I69U4jXE?=
- =?iso-8859-1?Q?8BGIow+748JTMAfkGVrGAhXWL4SF7+66tjPYgj9qsgWH45i8yfeUwGeavN?=
- =?iso-8859-1?Q?fqji5Y1jKCSLHVMUP5538CWqxrj1dMfiQPUxyBmwi9PHNaKCVe5ju1WkAE?=
- =?iso-8859-1?Q?sU6P1TUOZK5Fcu7pGrsqvLnKsnu5n5KPCc6bonMr6dwt7z23Hz+7LWy2hz?=
- =?iso-8859-1?Q?zuVQxcjLeqyw9YwZGJHF8jv1VA1ChDZQc99kGdqTaJB7QFZTVnEWPS/byM?=
- =?iso-8859-1?Q?lOe5FmOwwbPiS9PCdFAqASlq5tFUdrK01y0sdw=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        id S244448AbhI2GwA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 02:52:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48368 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244194AbhI2Gv7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Sep 2021 02:51:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8DD8B61381;
+        Wed, 29 Sep 2021 06:50:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632898219;
+        bh=E1m+fcLpD0Wlj72IN6jL13t8OONZeJk7RLRYa9nXCnQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=thUQUgjdkd2q1v1WgiwyLfEk8z9PaoyVaRp7H0aeQt3uAjG4qO6mQfzZ/JcXvQqA6
+         RGfczIsLJfoKeOBC2UlY2roFcUnhZTGuSLxrohw6wNUFJa5KkeUJWzc9o5nuYGcjzk
+         crdOQno+axKIQ/YGfQjx1PJOpWwbkf5NPBDY6l+G+jzExSNPAIoAUgc0+v15Ns9kYw
+         qbbBbnHKYzKAmUAArGI21o7VsJ+DLSJHNZefybT0OaSs6XHHwW//6EUpnqD96/h+P7
+         74a94bUgtpr5DIHOXDKCJbeHIEzxuFWvtl8DC2koIIKTlUV/i5N6xCw4r3NM8zb3Wv
+         wQA5DCtRPATBA==
+Date:   Wed, 29 Sep 2021 09:50:15 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        kvm@vger.kernel.org, stefanha@redhat.com, oren@nvidia.com,
+        nitzanc@nvidia.com, israelr@nvidia.com, hch@infradead.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Yaron Gepstein <yarong@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH 2/2] virtio-blk: set NUMA affinity for a tagset
+Message-ID: <YVQMp4aIBJNi9qrH@unreal>
+References: <20210926145518.64164-1-mgurtovoy@nvidia.com>
+ <20210926145518.64164-2-mgurtovoy@nvidia.com>
+ <YVGsMsIjD2+aS3eC@unreal>
+ <0c155679-e1db-3d1e-2b4e-a0f12ce5950c@nvidia.com>
+ <YVIMIFxjRcfDDub4@unreal>
+ <f8de7c19-9f04-a458-6c1d-8133a83aa93f@nvidia.com>
+ <YVNCflMxWh4m7ewU@unreal>
+ <f0cc8cb4-92dc-f5f9-ea50-aa312ac6a056@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd3482f7-e6a0-4889-afce-08d98314921b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Sep 2021 06:44:22.1208
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CqT0HiC8Tmmp0wANKmEU2jWJwK40hwfut+1VBNn7LflXYlh5nf/nixeOh37O2HQuIhmdinODpDDXZniqlDKKohC7zvzUmyl053Qwc0yT928=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7352
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f0cc8cb4-92dc-f5f9-ea50-aa312ac6a056@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/09/2021 21:13, Javier Gonz=E1lez wrote:=0A=
-> Since we are not going to be able to talk about this at LSF/MM, a few of=
-=0A=
-> us thought about holding a dedicated virtual discussion about Copy=0A=
-> Offload. I believe we can use Chaitanya's thread as a start. Given the=0A=
-> current state of the current patches, I would propose that we focus on=0A=
-> the next step to get the minimal patchset that can go upstream so that=0A=
-> we can build from there.=0A=
-> =0A=
-> Before we try to find a date and a time that fits most of us, who would=
-=0A=
-> be interested in participating?=0A=
-=0A=
-I'd definitively be interested in participating.=0A=
+On Wed, Sep 29, 2021 at 02:28:08AM +0300, Max Gurtovoy wrote:
+> 
+> On 9/28/2021 7:27 PM, Leon Romanovsky wrote:
+> > On Tue, Sep 28, 2021 at 06:59:15PM +0300, Max Gurtovoy wrote:
+> > > On 9/27/2021 9:23 PM, Leon Romanovsky wrote:
+> > > > On Mon, Sep 27, 2021 at 08:25:09PM +0300, Max Gurtovoy wrote:
+> > > > > On 9/27/2021 2:34 PM, Leon Romanovsky wrote:
+> > > > > > On Sun, Sep 26, 2021 at 05:55:18PM +0300, Max Gurtovoy wrote:
+> > > > > > > To optimize performance, set the affinity of the block device tagset
+> > > > > > > according to the virtio device affinity.
+> > > > > > > 
+> > > > > > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > > > > > ---
+> > > > > > >     drivers/block/virtio_blk.c | 2 +-
+> > > > > > >     1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > > 
+> > > > > > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > > > > > index 9b3bd083b411..1c68c3e0ebf9 100644
+> > > > > > > --- a/drivers/block/virtio_blk.c
+> > > > > > > +++ b/drivers/block/virtio_blk.c
+> > > > > > > @@ -774,7 +774,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+> > > > > > >     	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+> > > > > > >     	vblk->tag_set.ops = &virtio_mq_ops;
+> > > > > > >     	vblk->tag_set.queue_depth = queue_depth;
+> > > > > > > -	vblk->tag_set.numa_node = NUMA_NO_NODE;
+> > > > > > > +	vblk->tag_set.numa_node = virtio_dev_to_node(vdev);
+> > > > > > I afraid that by doing it, you will increase chances to see OOM, because
+> > > > > > in NUMA_NO_NODE, MM will try allocate memory in whole system, while in
+> > > > > > the latter mode only on specific NUMA which can be depleted.
+> > > > > This is a common methodology we use in the block layer and in NVMe subsystem
+> > > > > and we don't afraid of the OOM issue you raised.
+> > > > There are many reasons for that, but we are talking about virtio here
+> > > > and not about NVMe.
+> > > Ok. what reasons ?
+> > For example, NVMe are physical devices that rely on DMA operations,
+> > PCI connectivity e.t.c to operate. Such systems indeed can benefit from
+> > NUMA locality hints. At the end, these devices are physically connected
+> > to that NUMA node.
+> 
+> FYI Virtio devices are also physical devices that have PCI interface and
+> rely on DMA operations.
+> 
+> from virtio spec: "Virtio devices use normal bus mechanisms of interrupts
+> and DMA which should be familiar
+> to any device driver author".
+
+Yes, this is how bus in Linux is implemented, there is nothing new here. 
+
+> 
+> Also we develop virtio HW at NVIDIA for blk and net devices with our SNAP
+> technology.
+> 
+> These devices are connected via PCI bus to the host.
+
+How all these related to general virtio-blk implementation?
+
+> 
+> We also support SRIOV.
+> 
+> Same it true also for paravirt devices that are emulated by QEMU but still
+> the guest sees them as PCI devices.
+
+Yes, the key word here - "emulated".
+
+> 
+> > 
+> > In our case, virtio-blk is a software interface that doesn't have all
+> > these limitations. On the contrary, the virtio-blk can be created on one
+> > CPU and moved later to be close to the QEMU which can run on another NUMA
+> > node.
+> 
+> Not at all. virtio is HW interface.
+
+Virtio are para-virtualized devices that are represented as HW interfaces
+in the guest OS. They are not needed to be real devices in the hypervisor,
+which is my (and probably most of the world) use case.
+
+My QEMU command line contains something like that: "-drive file=IMAGE.img,if=virtio"
+
+> 
+> I don't understand what are you saying here ?
+> 
+> > 
+> > Also this patch increases chances to get OOM by factor of NUMA nodes.
+> 
+> This is common practice in Linux for storage drivers. Why does it bothers
+> you at all ?
+
+Do I need a reason to ask for a clarification for publicly posted patch
+in open mailing list?
+
+I use virtio and care about it.
+
+> 
+> I already decreased the memory footprint for virtio blk devices.
+
+As I wrote before, you decreased by several KB, but by this patch you
+limited available memory in magnitudes.
+
+> 
+> 
+> > Before your patch, the virtio_blk can allocate from X memory, after your
+> > patch it will be X/NUMB_NUMA_NODES.
+> 
+> So go ahead and change all the block layer if it bothers you so much.
+> 
+> Also please change the NVMe subsystem when you do it.
+
+I suggest less radical approach - don't take patches without proven
+benefit.
+
+We are in 2021, let's rely on NUMA node policy.
+
+> 
+> And lets see what the community will say.
+
+Stephen asked you for performance data too. I'm not alone here.
+
+> 
+> > In addition, it has all chances to even hurt performance.
+> > 
+> > So yes, post v2, but as Stefan and I asked, please provide supportive
+> > performance results, because what was done for another subsystem doesn't
+> > mean that it will be applicable here.
+> 
+> I will measure the perf but even if we wont see an improvement since it
+> might not be the bottleneck, this changes should be merged since this is the
+> way the block layer is optimized.
+
+This is not acceptance criteria to merge patches.
+
+> 
+> This is a micro optimization that commonly used also in other subsystem. And
+> non of your above reasons (PCI, SW device, DMA) is true.
+
+Every subsystem is different, in some it makes sense, in others it doesn't.
+
+We (RDMA) had very long discussion (together with perf data) and heavily tailored
+test to measure influence of per-node allocations and guess what? We didn't see
+any performance advantage.
+
+https://lore.kernel.org/linux-rdma/c34a864803f9bbd33d3f856a6ba2dd595ab708a7.1620729033.git.leonro@nvidia.com/
+
+> 
+> Virtio blk device is in 99% a PCI device (paravirt or real HW) exactly like
+> any other PCI device you are familiar with.
+> 
+> It's connected physically to some slot, it has a BAR, MMIO, configuration
+> space, etc..
+
+In general case, it is far from being true.
+
+> 
+> Thanks.
+> 
+> > 
+> > Thanks
