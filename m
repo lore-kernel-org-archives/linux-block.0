@@ -2,64 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 476EDC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 07:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C4BC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 07:14:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A0CC6137A
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 07:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64B8161368
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 07:14:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244529AbhI2HLG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 03:11:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55114 "EHLO
+        id S244551AbhI2HP7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 03:15:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244495AbhI2HLF (ORCPT
+        with ESMTP id S244486AbhI2HP7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 03:11:05 -0400
+        Wed, 29 Sep 2021 03:15:59 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D2DC06161C;
-        Wed, 29 Sep 2021 00:09:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 896BAC06161C
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 00:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Rfn/RSuMmk5y6ZJA1VwqaUbdI4VVIDYyQj92saxwa1U=; b=vB+VKm4IMGdjKTike8OfMVSW8q
-        +Ux2VKLJBweoaELDrkaxJ2zefCvAWPOyEkZfLHCRYKgz4Zqn5+uaxBwzEVmmgOkD5bG3R34gh64Kh
-        2FU14wa/9Jgi1fn+Pa6sU1bWJyNYWbsXzd32IOLUpJjreI1wD9p9VB1p2JpULaidKxwIzueaWlxjS
-        2U0vfAaeFVYzhWbHi2ktszjPdnCWAx5xzCxBu4rlqcjCMuJuGeTLZ6w9jJo8Tnj1E+GWiPGBq4uQV
-        5cv17DnMqbWzc5A35ZQ4+qjRPNhioxu1DFbT7jIa/4QaXev+K96MAf1l7lqfUUHzHBCefuGYqLk95
-        G1PvkLdA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mVTha-00Bahg-2B; Wed, 29 Sep 2021 07:08:43 +0000
-Date:   Wed, 29 Sep 2021 08:08:26 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Po-Wen Kao <powen.kao@mediatek.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, stanley.chu@mediatek.com,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        avri.altman@wdc.com, alim.akhtar@samsung.com, jejb@linux.ibm.com,
-        peter.wang@mediatek.com, chun-hung.wu@mediatek.com,
-        alice.chao@mediatek.com, jonathan.hsu@mediatek.com,
-        cc.chou@mediatek.com, chaotian.jing@mediatek.com,
-        jiajie.hao@mediatek.com, wsd_upstream@mediatek.com,
-        ed.tsai@mediatek.com
-Subject: Re: [PATCH 1/2] blk-mq: new busy request iterator for driver
-Message-ID: <YVQQ6mNhdMVQOhZN@infradead.org>
-References: <20210929070047.4223-1-powen.kao@mediatek.com>
- <20210929070047.4223-2-powen.kao@mediatek.com>
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=q/6bix4Pj8WDMOQ88jaSgL+NDsM1q2XSL46VHfZnYts=; b=W1ubT4SCfrV5ioobA1LV1OwcEB
+        uLYCYALX6vXHH49Eo2Rt9Rq5u6M3f1Vq0wdxCo9XgEhniT83p/F/ifvUwMCPRZSi87iC49J0Cichf
+        K15hk0ftBD+aBdMv4o5FZe1dDKYvafAe1LG4qppYdLGLmsPle5LwIRkNg/cedD/ZIV3xn10b5bVqR
+        ppPV40CXe4bJ61pdiyvpr1Gy2mksifjryGj/PoRNPjnMtufZgkw8qddaSM+AVMnLqkOy3zoaHBgnd
+        /ZKMZCZskXFlvWh6TI7OaVpY4vSpAO/84YLD/TunnU1SnmBw6XMmMciUeGlX0XSgt3iDUKAcwd2CR
+        TsxOIafQ==;
+Received: from p4fdb05cb.dip0.t-ipconnect.de ([79.219.5.203] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mVTli-00BasR-70; Wed, 29 Sep 2021 07:13:07 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: tear down file system I/O in del_gendisk v3
+Date:   Wed, 29 Sep 2021 09:12:36 +0200
+Message-Id: <20210929071241.934472-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210929070047.4223-2-powen.kao@mediatek.com>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 03:00:46PM +0800, Po-Wen Kao wrote:
-> Driver occasionally execute allocated request directly without
-> dispatching to block layer, thus request never appears in tags->rqs.
-> To allow driver to iterate through requests in static_rqs, a new
-> interface blk_mq_drv_tagset_busy_iter() is introduced.
+Ming reported that for SCSI we have a lifetime problem now that
+the BDI moved from the request_queue to the disk as del_gendisk
+doesn't finish all outstanding file system I/O.  It turns out
+this actually is an older problem, although the case where it could
+be hit before was very unusual (unbinding of a SCSI upper driver
+while the scsi_device stays around).  This series fixes this by
+draining all I/O in del_gendisk.
 
-Don't do that.  All requests must be dispatched to blk-mq.  Let's not
-even get started on these hacks that will make our life painful forever.
+Changes since v2:
+ - move the call to submit_bio_checks into freeze protection
+
+Changes since v1:
+ - fix a commit log typo
+ - keep the existing nowait vs queue dying semantics in bio_queue_enter 
+ - actually keep q_usage_counter in atomic mode after del_gendisk
