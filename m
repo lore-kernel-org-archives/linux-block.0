@@ -2,75 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBC6C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 11:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BF4C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 12:54:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A735C613D1
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 11:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02B3761214
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 12:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245410AbhI2LzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 07:55:11 -0400
-Received: from mail-wr1-f47.google.com ([209.85.221.47]:38677 "EHLO
-        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244947AbhI2LzK (ORCPT
+        id S1343923AbhI2M4c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 08:56:32 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:23236 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343889AbhI2M4c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 07:55:10 -0400
-Received: by mail-wr1-f47.google.com with SMTP id u18so3790917wrg.5
-        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 04:53:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2Y1HuBf9lN+kQWKCO1g1Kb4iuwMOmOhY2Wh4y+H0eoM=;
-        b=MYqJvzmMMpwqwLEVzncWl1OLfkdfj1SpccVtlpFBQv/yAU3yZofBGsX+MOvrXkpCG+
-         x/tZ/jvJH4GK0xwkTTRg3SHNsAaYgprcnY8g/XTjTzybUuVGogDAiHJrhBARlF1dZ25s
-         L2uGAeq1/q5e5/2VeshmZC6AGupwsFcJYpvYM5dIs/qBy+8m6GrYnADjSR4Zu8lsgj+K
-         LWycWHG4iA1NMIv2zCfigZMpv86N5ZcLUOHdVZlQ1JSHq/ADmBZLoA+W20WyEan55PQH
-         7+q6lVd0RMhSTh69zQTcV9/MG+pzVQ5vg4+iLRTIT8IHhGLPTD6ug5QfEWEPnQWTqb59
-         VNtA==
-X-Gm-Message-State: AOAM532rPUYibQRZNpA8Nn1qkq9DIuO/9r9yeQFsA+PM0IO4RXSjZ78O
-        E9VX1RSmuvH2CnRRCMrJwUY=
-X-Google-Smtp-Source: ABdhPJzGhWGVbT3MlvchMuoy7R3Q5OKSNBay3CCJMwDPSmx6sCdOeLTR/AnuOZ2XrUegMeOgKkvtvQ==
-X-Received: by 2002:a5d:64e2:: with SMTP id g2mr6264457wri.323.1632916408500;
-        Wed, 29 Sep 2021 04:53:28 -0700 (PDT)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id 189sm1644821wmz.27.2021.09.29.04.53.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Sep 2021 04:53:28 -0700 (PDT)
-Subject: Re: [PATCH 5/5] blk-mq: support nested blk_mq_quiesce_queue()
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-Cc:     linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>
-References: <20210929041559.701102-1-ming.lei@redhat.com>
- <20210929041559.701102-6-ming.lei@redhat.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <54b636d5-ede6-a700-4d02-4712db679234@grimberg.me>
-Date:   Wed, 29 Sep 2021 14:53:27 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Wed, 29 Sep 2021 08:56:32 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4HKGXP4W3Jz8tV5;
+        Wed, 29 Sep 2021 20:53:57 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Wed, 29 Sep 2021 20:54:49 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Wed, 29 Sep 2021 20:54:49 +0800
+Subject: Re: [patch v8 0/7] handle unexpected message from server
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <hch@infradead.org>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20210916093350.1410403-1-yukuai3@huawei.com>
+ <f56cc608-ac55-0eee-f3d0-19ba1a8c22ef@huawei.com>
+Message-ID: <37b222c1-d6b0-3e46-248a-2557db40ae92@huawei.com>
+Date:   Wed, 29 Sep 2021 20:54:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210929041559.701102-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <f56cc608-ac55-0eee-f3d0-19ba1a8c22ef@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 9/29/21 7:15 AM, Ming Lei wrote:
-> Turns out that blk_mq_freeze_queue() isn't stronger[1] than
-> blk_mq_quiesce_queue() because dispatch may still be in-progress after
-> queue is frozen, and in several cases, such as switching io scheduler,
-> updating nr_requests & wbt latency, we still need to quiesce queue as a
-> supplement of freezing queue.
+On 2021/09/23 21:33, yukuai (C) wrote:
+> On 2021/09/16 17:33, Yu Kuai wrote:
 > 
-> As we need to extend uses of blk_mq_quiesce_queue(), it is inevitable
-> for us to need support nested quiesce, especailly we can't let
-> unquiesce happen when there is quiesce originated from other contexts.
+> Hi, jens
+> 
+> Any interest to apply this series?
 
-The serialization need is clear, but why is the nesting required?
-In other words what is the harm is running the hw queue every time
-we unquiesce?
+friendly ping ...
+> 
+> Thanks,
+> Kuai
+>> This patch set tries to fix that client might oops if nbd server send
+>> unexpected message to client, for example, our syzkaller report a uaf
+>> in nbd_read_stat():
+>>
+>> Call trace:
+>>   dump_backtrace+0x0/0x310 arch/arm64/kernel/time.c:78
+>>   show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
+>>   __dump_stack lib/dump_stack.c:77 [inline]
+>>   dump_stack+0x144/0x1b4 lib/dump_stack.c:118
+>>   print_address_description+0x68/0x2d0 mm/kasan/report.c:253
+>>   kasan_report_error mm/kasan/report.c:351 [inline]
+>>   kasan_report+0x134/0x2f0 mm/kasan/report.c:409
+>>   check_memory_region_inline mm/kasan/kasan.c:260 [inline]
+>>   __asan_load4+0x88/0xb0 mm/kasan/kasan.c:699
+>>   __read_once_size include/linux/compiler.h:193 [inline]
+>>   blk_mq_rq_state block/blk-mq.h:106 [inline]
+>>   blk_mq_request_started+0x24/0x40 block/blk-mq.c:644
+>>   nbd_read_stat drivers/block/nbd.c:670 [inline]
+>>   recv_work+0x1bc/0x890 drivers/block/nbd.c:749
+>>   process_one_work+0x3ec/0x9e0 kernel/workqueue.c:2147
+>>   worker_thread+0x80/0x9d0 kernel/workqueue.c:2302
+>>   kthread+0x1d8/0x1e0 kernel/kthread.c:255
+>>   ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1174
+>>
+>> 1) At first, a normal io is submitted and completed with scheduler:
+>>
+>> internel_tag = blk_mq_get_tag -> get tag from sched_tags
+>>   blk_mq_rq_ctx_init
+>>    sched_tags->rq[internel_tag] = sched_tag->static_rq[internel_tag]
+>> ...
+>> blk_mq_get_driver_tag
+>>   __blk_mq_get_driver_tag -> get tag from tags
+>>   tags->rq[tag] = sched_tag->static_rq[internel_tag]
+>>
+>> So, both tags->rq[tag] and sched_tags->rq[internel_tag] are pointing
+>> to the request: sched_tags->static_rq[internal_tag]. Even if the
+>> io is finished.
+>>
+>> 2) nbd server send a reply with random tag directly:
+>>
+>> recv_work
+>>   nbd_read_stat
+>>    blk_mq_tag_to_rq(tags, tag)
+>>     rq = tags->rq[tag]
+>>
+>> 3) if the sched_tags->static_rq is freed:
+>>
+>> blk_mq_sched_free_requests
+>>   blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i)
+>>    -> step 2) access rq before clearing rq mapping
+>>    blk_mq_clear_rq_mapping(set, tags, hctx_idx);
+>>    __free_pages() -> rq is freed here
+>>
+>> 4) Then, nbd continue to use the freed request in nbd_read_stat()
+>>
+>> Changes in v8:
+>>   - add patch 5 to this series.
+>>   - modify some words.
+>> Changes in v7:
+>>   - instead of exposing blk_queue_exit(), using percpu_ref_put()
+>>   directly.
+>>   - drop the ref right after nbd_handle_reply().
+>> Changes in v6:
+>>   - don't set cmd->status to error if request is completed before
+>>   nbd_clear_req().
+>>   - get 'q_usage_counter' to prevent accessing freed request through
+>>   blk_mq_tag_to_rq(), instead of using blk_mq_find_and_get_req().
+>> Changes in v5:
+>>   - move patch 1 & 2 in v4 (patch 4 & 5 in v5) behind
+>>   - add some comment in patch 5
+>> Changes in v4:
+>>   - change the name of the patchset, since uaf is not the only problem
+>>   if server send unexpected reply message.
+>>   - instead of adding new interface, use blk_mq_find_and_get_req().
+>>   - add patch 5 to this series
+>> Changes in v3:
+>>   - v2 can't fix the problem thoroughly, add patch 3-4 to this series.
+>>   - modify descriptions.
+>>   - patch 5 is just a cleanup
+>> Changes in v2:
+>>   - as Bart suggested, add a new helper function for drivers to get
+>>   request by tag.
+>>
+>> Yu Kuai (7):
+>>    nbd: don't handle response without a corresponding request message
+>>    nbd: make sure request completion won't concurrent
+>>    nbd: check sock index in nbd_read_stat()
+>>    nbd: don't start request if nbd_queue_rq() failed
+>>    nbd: clean up return value checking of sock_xmit()
+>>    nbd: partition nbd_read_stat() into nbd_read_reply() and
+>>      nbd_handle_reply()
+>>    nbd: fix uaf in nbd_handle_reply()
+>>
+>>   drivers/block/nbd.c | 135 +++++++++++++++++++++++++++++++-------------
+>>   1 file changed, 96 insertions(+), 39 deletions(-)
+>>
