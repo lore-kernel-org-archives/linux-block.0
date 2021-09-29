@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89254C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 21:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD23C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 21:26:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DDDC615A7
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 21:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 726BD615E4
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 21:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346873AbhI2VR5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 17:17:57 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:58738 "EHLO
+        id S1346640AbhI2V2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 17:28:07 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:58868 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbhI2VR4 (ORCPT
+        with ESMTP id S232425AbhI2V2H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 17:17:56 -0400
+        Wed, 29 Sep 2021 17:28:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
         Message-ID:From:References:Cc:To:content-disposition;
-        bh=RfrWfjCRN+UowtRVbNA3b2L6enFhSnjdcCuQt0d3QdI=; b=sx8iDLgZqm9oV/jPtvYl6hWxOJ
-        izKJEIZpDyBIKLWz8FDerUW5k2MT7pPtfUTyZiEU6bE7HoV7pneW/CZR2zMIxsytGbyq8vFegsKGv
-        49LSCi3qE6cFcuu3ANDMzF0wHUfqas6dQodjbfxt/8zHWnBhP9N8kOEENBNUjLrsTXNl90Sahn8H0
-        HAUhhk1jLu1tfiA5AYOXEg4lkZh0pmHiPlunotwWT39n20HVUlZzMB6xXhNwz+2qZPfnc/8Ia0J5E
-        FZIAlxHcWmAecE99N9j4B2rg3AG9XIO/VHcG1DdeZNocY4lVPpt+WxirDMZKAHuss1OBzFQ0yFB23
-        svZcaJZQ==;
+        bh=nHl0IFgZgGpHvQgDpFAFAHI5VsGy7jlQRmnLx5A/xGM=; b=MCqUG28cCMzBbE1ij1ryNHEwuG
+        vmZLEFq36tbkkbW136PBApl58FA1BmBPgQBO7Vy0W5ociLCy71GucZmvTbS4ZuGIJP9zwEllXw+LA
+        UGWft03gK6gOYJgiD+dsK/1kgwTomHkZqRxsyNczjso4P1gx3Ij1JXLnu2IapCBmayItQTHeNpkS/
+        DC6lggy8f7brCrKZtAqlb9CtUK1brfum4Ak2xaHEFeqKv/j0gS2y0/htYjsguEkp+SDSmGZN8QDmG
+        6sMtXlUKlXg7yhYmw6GAdVCKl32z3ozsNy2BN4wHpD3K1QOk50H6mu+nC38p2AFa0sDw+7jDyE4cU
+        jR2cdMMg==;
 Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
         by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.92)
         (envelope-from <logang@deltatee.com>)
-        id 1mVgvW-0006Bq-H1; Wed, 29 Sep 2021 15:15:43 -0600
+        id 1mVh5f-0006Ii-Sf; Wed, 29 Sep 2021 15:26:13 -0600
 To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -52,23 +52,23 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 References: <20210916234100.122368-1-logang@deltatee.com>
- <20210916234100.122368-2-logang@deltatee.com>
- <20210928183219.GJ3544071@ziepe.ca>
+ <20210916234100.122368-5-logang@deltatee.com>
+ <20210928185552.GL3544071@ziepe.ca>
 From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <3f3abc6b-0a80-dbb6-f9dc-8a4cc33c975c@deltatee.com>
-Date:   Wed, 29 Sep 2021 15:15:34 -0600
+Message-ID: <907b0cd9-84b7-c6ef-30b3-3f52f2e0e5ba@deltatee.com>
+Date:   Wed, 29 Sep 2021 15:26:09 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20210928183219.GJ3544071@ziepe.ca>
+In-Reply-To: <20210928185552.GL3544071@ziepe.ca>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-CA
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 24.64.144.200
 X-SA-Exim-Rcpt-To: ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
 X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v3 01/20] lib/scatterlist: add flag for indicating P2PDMA
- segments in an SGL
+Subject: Re: [PATCH v3 04/20] PCI/P2PDMA: introduce helpers for dma_map_sg
+ implementations
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
@@ -77,69 +77,83 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021-09-28 12:32 p.m., Jason Gunthorpe wrote:
-> On Thu, Sep 16, 2021 at 05:40:41PM -0600, Logan Gunthorpe wrote:
->>  config PCI_P2PDMA
->>  	bool "PCI peer-to-peer transfer support"
->> -	depends on ZONE_DEVICE
->> +	depends on ZONE_DEVICE && 64BIT
-> 
-> Perhaps a comment to explain what the 64bit is doing?
-
-Added.
-
->>  	select GENERIC_ALLOCATOR
->>  	help
->>  	  Enableѕ drivers to do PCI peer-to-peer transactions to and from
->> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
->> index 266754a55327..e62b1cf6386f 100644
->> +++ b/include/linux/scatterlist.h
->> @@ -64,6 +64,21 @@ struct sg_append_table {
->>  #define SG_CHAIN	0x01UL
->>  #define SG_END		0x02UL
+On 2021-09-28 12:55 p.m., Jason Gunthorpe wrote:
+> On Thu, Sep 16, 2021 at 05:40:44PM -0600, Logan Gunthorpe wrote:
+>> Add pci_p2pdma_map_segment() as a helper for simple dma_map_sg()
+>> implementations. It takes an scatterlist segment that must point to a
+>> pci_p2pdma struct page and will map it if the mapping requires a bus
+>> address.
+>>
+>> The return value indicates whether the mapping required a bus address
+>> or whether the caller still needs to map the segment normally. If the
+>> segment should not be mapped, -EREMOTEIO is returned.
+>>
+>> This helper uses a state structure to track the changes to the
+>> pgmap across calls and avoid needing to lookup into the xarray for
+>> every page.
+>>
+>> Also add pci_p2pdma_map_bus_segment() which is useful for IOMMU
+>> dma_map_sg() implementations where the sg segment containing the page
+>> differs from the sg segment containing the DMA address.
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>>  drivers/pci/p2pdma.c       | 59 ++++++++++++++++++++++++++++++++++++++
+>>  include/linux/pci-p2pdma.h | 21 ++++++++++++++
+>>  2 files changed, 80 insertions(+)
+>>
+>> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+>> index b656d8c801a7..58c34f1f1473 100644
+>> +++ b/drivers/pci/p2pdma.c
+>> @@ -943,6 +943,65 @@ void pci_p2pdma_unmap_sg_attrs(struct device *dev, struct scatterlist *sg,
+>>  }
+>>  EXPORT_SYMBOL_GPL(pci_p2pdma_unmap_sg_attrs);
 >>  
->> +/*
->> + * bit 2 is the third free bit in the page_link on 64bit systems which
->> + * is used by dma_unmap_sg() to determine if the dma_address is a PCI
->> + * bus address when doing P2PDMA.
->> + * Note: CONFIG_PCI_P2PDMA depends on CONFIG_64BIT because of this.
+>> +/**
+>> + * pci_p2pdma_map_segment - map an sg segment determining the mapping type
+>> + * @state: State structure that should be declared outside of the for_each_sg()
+>> + *	loop and initialized to zero.
+>> + * @dev: DMA device that's doing the mapping operation
+>> + * @sg: scatterlist segment to map
+>> + *
+>> + * This is a helper to be used by non-iommu dma_map_sg() implementations where
+>> + * the sg segment is the same for the page_link and the dma_address.
+>> + *
+>> + * Attempt to map a single segment in an SGL with the PCI bus address.
+>> + * The segment must point to a PCI P2PDMA page and thus must be
+>> + * wrapped in a is_pci_p2pdma_page(sg_page(sg)) check.
+>> + *
+>> + * Returns the type of mapping used and maps the page if the type is
+>> + * PCI_P2PDMA_MAP_BUS_ADDR.
 >> + */
->> +
->> +#ifdef CONFIG_PCI_P2PDMA
->> +#define SG_DMA_PCI_P2PDMA	0x04UL
+>> +enum pci_p2pdma_map_type
+>> +pci_p2pdma_map_segment(struct pci_p2pdma_map_state *state, struct device *dev,
+>> +		       struct scatterlist *sg)
+>> +{
+>> +	if (state->pgmap != sg_page(sg)->pgmap) {
+>> +		state->pgmap = sg_page(sg)->pgmap;
+>> +		state->map = pci_p2pdma_map_type(state->pgmap, dev);
+>> +		state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
+>> +	}
 > 
-> Add a 
-> 	static_assert(__alignof__(void *) == 8);
+> Is this safe? I was just talking with Joao about this,
 > 
-> ?
-
-Good idea. Though, I think your line isn't quite correct. I've added:
-
-static_assert(__alignof__(struct page) >= 8);
-
->> +#define sg_is_dma_pci_p2pdma(sg) ((sg)->page_link & SG_DMA_PCI_P2PDMA)
+>  https://lore.kernel.org/r/20210928180150.GI3544071@ziepe.ca
 > 
-> I've been encouraging people to use static inlines more..
 
-I also prefer static inlines, but I usually follow the style of the code
-I'm changing. In any case, I've changed to static inlines similar to
-your example.
+I agree that taking the extra reference on the pagemap seems
+unnecessary. However, it was convenient for the purposes of this
+patchset to not have to check the page type for every page and only on
+every new page map. But if we need to add a check directly to gup,
+that'd probably be fine too.
 
->>  /**
->>   * sg_assign_page - Assign a given page to an SG entry
->> @@ -86,13 +103,13 @@ struct sg_append_table {
->>   **/
->>  static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
->>  {
->> -	unsigned long page_link = sg->page_link & (SG_CHAIN | SG_END);
->> +	unsigned long page_link = sg->page_link & SG_PAGE_LINK_MASK;
+> API wise I absolutely think this should be safe as written, but is it
+> really?
 > 
-> I think this should just be '& SG_END', sg_assign_page() doesn't look
-> like it should ever be used on a sg_chain entry, so this is just
-> trying to preserve the end stamp.
+> Does pgmap ensure that a positive refcount struct page always has a
+> valid pgmap pointer (and thus the mess in gup can be deleted) or does
+> this need to get the pgmap as well to keep it alive?
 
-Perhaps, but I'm not comfortable making that change in this patch or
-series. Though, I've reverted this specific change in my patch so
-sg_assign_page() will clear SG_DMA_PCI_P2PDMA.
+Yes, the P2PDMA code ensures that the pgmap will not be deleted if there
+is a positive refcount on any struct page.
 
-Logan
+LOgan
