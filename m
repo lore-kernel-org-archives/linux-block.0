@@ -2,107 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B948C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 15:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D648C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 15:45:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25ED361465
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 15:44:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AFB561247
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 15:45:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245150AbhI2PqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 11:46:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29182 "EHLO
+        id S245550AbhI2Pq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 11:46:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30422 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245313AbhI2PqD (ORCPT
+        by vger.kernel.org with ESMTP id S245658AbhI2Pqw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 11:46:03 -0400
+        Wed, 29 Sep 2021 11:46:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632930261;
+        s=mimecast20190719; t=1632930311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LR3ObdM1X37e6OfSRn8U+lGYCyvoYCCHleB0Zqxpw04=;
-        b=O/eUtapqKfbqehB7fi/dvG72VhljGbHO3GxNeaNVhLS0KK2ci6F93bH3/RUW0I4dIjBK6q
-        OUkljPlrrtmiyU4HfwhT+cNdlfiAWgjaJa5paA9QktVlGZRcQcHSE0AY85fXOm7Gd/09RM
-        k4xKdgwh9cwykZF5h9UMEDwZII/PCtw=
+        bh=YD/JzDwhuk7rGKkEzFS8gH/oiqrA2eu324rL5fdp0h4=;
+        b=LtX0hKsvvLPInWBr1cPVdiZ2NJPyEqU6S8ld1o5sdCBvyqUAzPxevSfw1AW6X+YG3QDvmY
+        l5ti+29+CWGkKa+wHKQuViRz5zmuo9+fwOYasc7TZBWJ/5oaWV6/1VXRF2zZHl2wRkQTNV
+        R7oEZwhJluyZumERTNwGPIR1rdd4+8k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-ooXitBhVPKK49Q_IGM_U2A-1; Wed, 29 Sep 2021 11:44:20 -0400
-X-MC-Unique: ooXitBhVPKK49Q_IGM_U2A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-169-RydRWjxQMwK58uTqWu6Ekw-1; Wed, 29 Sep 2021 11:45:08 -0400
+X-MC-Unique: RydRWjxQMwK58uTqWu6Ekw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F388801B3D;
-        Wed, 29 Sep 2021 15:44:19 +0000 (UTC)
-Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 512855C1B4;
-        Wed, 29 Sep 2021 15:44:14 +0000 (UTC)
-Date:   Wed, 29 Sep 2021 23:44:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 5/5] blk-mq: support nested blk_mq_quiesce_queue()
-Message-ID: <YVSJyIxfFQ+KSNi4@T590>
-References: <20210929041559.701102-1-ming.lei@redhat.com>
- <20210929041559.701102-6-ming.lei@redhat.com>
- <54b636d5-ede6-a700-4d02-4712db679234@grimberg.me>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00CAB1006AA3;
+        Wed, 29 Sep 2021 15:45:06 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 51DD86A900;
+        Wed, 29 Sep 2021 15:45:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210927200708.GI9286@twin.jikos.cz>
+References: <20210927200708.GI9286@twin.jikos.cz> <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+To:     dsterba@suse.cz
+Cc:     dhowells@redhat.com
+Cc:     willy@infradead.org, Chris Mason <clm@fb.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        Ilya Dryomov <idryomov@gmail.com>, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC][PATCH v3 0/9] mm: Use DIO for swap and fix NFS swapfiles
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54b636d5-ede6-a700-4d02-4712db679234@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <4005661.1632930302.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 29 Sep 2021 16:45:02 +0100
+Message-ID: <4005662.1632930302@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 02:53:27PM +0300, Sagi Grimberg wrote:
-> 
-> 
-> On 9/29/21 7:15 AM, Ming Lei wrote:
-> > Turns out that blk_mq_freeze_queue() isn't stronger[1] than
-> > blk_mq_quiesce_queue() because dispatch may still be in-progress after
-> > queue is frozen, and in several cases, such as switching io scheduler,
-> > updating nr_requests & wbt latency, we still need to quiesce queue as a
-> > supplement of freezing queue.
-> > 
-> > As we need to extend uses of blk_mq_quiesce_queue(), it is inevitable
-> > for us to need support nested quiesce, especailly we can't let
-> > unquiesce happen when there is quiesce originated from other contexts.
-> 
-> The serialization need is clear, but why is the nesting required?
+David Sterba <dsterba@suse.cz> wrote:
 
-I guess the serialization is what my nesting meant:
+> > There are additional patches to get rid of noop_direct_IO and replace =
+it
+> > with a feature bitmask, to make btrfs, ext4, xfs and raw blockdevs use=
+ the
+> > new ->swap_rw method and thence remove the direct BIO submission paths=
+ from
+> > swap.
+> > =
 
-1) code path1:
+> > I kept the IOCB_SWAP flag, using it to enable REQ_SWAP.  I'm not sure =
+if
+> > that's necessary, but it seems accounting related.
+>
+> There was probably some step missing. The file must not have holes, so
+> either do 'dd' to the right size or use fallocate (which is recommended
+> in manual page btrfs(5) SWAPFILE SUPPORT). There are some fstests
+> exercising swapfile (grep -l _format_swapfile tests/generic/*) so you
+> could try that without having to set up the swapfile manually.
 
-- quiesce
-- do something
-- unquiesce
+Yeah.  As advised elsewhere, I removed the file and recreated it, doing th=
+e
+chattr before extending the file.  At that point swapon worked.  It didn't
+work though, and various userspace programs started dying.  I'm guessing m=
+y
+btrfs_swap_rw() is wrong somehow.
 
-2) code path2:
-- quiesce
-- do something
-- unquiesce
-
-What the patch tries to implement is that the actual unquiesce action has
-to be done in the last or outermost unquiesce of the two code paths.
-
-Not sure if serialization is a good term here, maybe I should use words of
-concurrent quiesce, or other better one? Nesting is really supported
-by this patch, such as code path2 may be part of 'do something' in code
-path1. Meantime serialization among quiesce and unquiesce is supported
-too.
-
-> In other words what is the harm is running the hw queue every time
-> we unquiesce?
-
-running hw queue in each unquiesce doesn't matter, what matters is that
-the QUIESCE flag has to be cleared in the outermost or the last unquiesce.
-But if QUIESCE isn't set, it isn't useless to run hw queue in unquiesce.
-
- 
-
-Thanks,
-Ming
+David
 
