@@ -2,219 +2,262 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B894C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 18:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DBAC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 20:16:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F171E61502
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 18:48:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74F5B6152B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 20:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346326AbhI2SuS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 14:50:18 -0400
-Received: from mga02.intel.com ([134.134.136.20]:62449 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346078AbhI2SuQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 14:50:16 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10122"; a="212270450"
-X-IronPort-AV: E=Sophos;i="5.85,334,1624345200"; 
-   d="scan'208";a="212270450"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2021 11:48:34 -0700
-X-IronPort-AV: E=Sophos;i="5.85,334,1624345200"; 
-   d="scan'208";a="479374879"
-Received: from ojefferi-mobl.ger.corp.intel.com (HELO ldmartin-desk2) ([10.212.173.172])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2021 11:48:32 -0700
-Date:   Wed, 29 Sep 2021 11:48:31 -0700
-From:   Lucas De Marchi <lucas.demarchi@intel.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-modules@vger.kernel.org, live-patching@vger.kernel.org,
-        fstests@vger.kernel.org, linux-block@vger.kernel.org, hare@suse.de,
-        dgilbert@interlog.com, jeyu@kernel.org, osandov@fb.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] libkmod-module: add support for a patient module
- removal option
-Message-ID: <20210929184810.adrqpsvlfybnc5qt@ldmartin-desk2>
-X-Patchwork-Hint: comment
-References: <20210810051602.3067384-1-mcgrof@kernel.org>
- <20210810051602.3067384-4-mcgrof@kernel.org>
- <20210923085156.scmf5wxr2phc356b@ldmartin-desk2>
- <YVJyIGXN/TR8zdU9@bombadil.infradead.org>
+        id S1346627AbhI2USM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 16:18:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39562 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346615AbhI2USM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Sep 2021 16:18:12 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505FCC06161C
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 13:16:30 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id e15so15682307lfr.10
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 13:16:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dXMsl02ir9gZe15hXtiBjL0oNEGYPzQSwMubAcb7BYw=;
+        b=hLqJUzWkLdIyKSt44xdZNe3K6Z8zqSML/DRC5qqOOA9zb2RVFgywUZrsfgfdCnwar7
+         jy6xYOZfutwWImpkURGChQ/P+HVK7hu799iFnnPC6yzVRDHmC6SuIiLkYe2cp89Itan+
+         /4JXq6/566+QDWiPUga8/i8OxBdjDp+KWTEfG2dG46azCn3zeB53IM9oGfNCcVQgilME
+         jRbz9eGlMfrx1RI2SkO6EWQ01jdq2no5Z571SYgeHYEq1VuZuRaMQWmYVrO5F6HuVE0n
+         /kyf38nTBojYdxulniLlbSR6zo5Ob/GzZvZXVC4x/WCpCdqpSCydIN5CHQvdc75P+f5r
+         7HuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dXMsl02ir9gZe15hXtiBjL0oNEGYPzQSwMubAcb7BYw=;
+        b=0RVOPtdo5t//hE4TZ+hbMfT9oHiCpMtZU6UItgYR3/Lvb0wOy72OcjiLkwmHh6saAr
+         oQRwm41QtwmX7nG9eRVtSe/S4lcL+O2jekxr1lOonoMUHEWNL1gbKidEYQqH9ap9kdq0
+         7kc826plONNiszPTk+Q8pc054BaHwFBqbcJUt/yd1g34mWVG5QwNPK9CzPeMoTgoD4H7
+         fRv0ItOE6tkMpd2Lk3lXmADqMUzwjJ6Al4ELoT1ChpFAMlG2k/dgU4rNKD1QxnXOR26p
+         qNDbKPYJW/yo7RVwbVvBLv5mLW1gr+SoBcXRK0Zhw+DLtcvsBVRiiZxq+06U4JDfsDaa
+         PPCA==
+X-Gm-Message-State: AOAM532Mz9H+ZG4zIWeyOvAWc+ZcY3GXLD0iVLgPLxBlkiVbdrFjo2iK
+        13sHHbtrnG4VSISZgQVld4Gc/nfRgeRiDgP4xNlO0Q==
+X-Google-Smtp-Source: ABdhPJyMCijvghXPMHxRTIkwCi5TSR0fl4vAeXD5GcOIlYdzZ658wKRP3E/Q9D6+tLnC0Q3tZSSI+o1OBxmgLLmrvvg=
+X-Received: by 2002:a2e:b892:: with SMTP id r18mr1992643ljp.220.1632946588318;
+ Wed, 29 Sep 2021 13:16:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <YVJyIGXN/TR8zdU9@bombadil.infradead.org>
+References: <20210920232533.4092046-1-ndesaulniers@google.com>
+In-Reply-To: <20210920232533.4092046-1-ndesaulniers@google.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 29 Sep 2021 13:16:16 -0700
+Message-ID: <CAKwvOdkkwOB3v34Tx_8akVR3BSR_R7eD8BDBPbJyH=74wLB3dw@mail.gmail.com>
+Subject: Re: [PATCH] nbd: use shifts rather than multiplies
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Kees Cook <keescook@chromium.org>, Pavel Machek <pavel@ucw.cz>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 06:38:40PM -0700, Luis Chamberlain wrote:
->On Thu, Sep 23, 2021 at 01:51:56AM -0700, Lucas De Marchi wrote:
->> On Mon, Aug 09, 2021 at 10:16:02PM -0700, Luis Chamberlain wrote:
->> The story was not kind like that. It wasn't removed "in favor for a 10
->> second sleep" in the sense that the sleep would replace the wait.
->>
->> It was actually for "this wait logic in the kernel is complex and
->> buggy, let's try to remove it". So we decided to deprecate it and add
->> a sleep rmmod to see if anyone complained. 1 year later of no complains
->> we removed it from kernel. This was all after noticing we had never
->> implemented the wait logic in modprobe - it was only done in rmmod.
+On Mon, Sep 20, 2021 at 4:25 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
->OK fixed the commit log thanks!
+> commit fad7cd3310db ("nbd: add the check to prevent overflow in
+> __nbd_ioctl()") raised an issue from the fallback helpers added in
+> commit f0907827a8a9 ("compiler.h: enable builtin overflow checkers and
+> add fallback code")
 >
->> > --- a/libkmod/libkmod-module.c
->> > +++ b/libkmod/libkmod-module.c
->> > @@ -30,6 +30,9 @@
->> > #include <stdlib.h>
->> > #include <string.h>
->> > #include <unistd.h>
->> > +#include <poll.h>
->> > +#include <time.h>
->> > +#include <math.h>
->> > #include <sys/mman.h>
->> > #include <sys/stat.h>
->> > #include <sys/syscall.h>
->> > @@ -802,6 +805,143 @@ KMOD_EXPORT int kmod_module_remove_module(struct kmod_module *mod,
->> > 	return err;
->> > }
->> >
->> > +static int timespec_to_ms(struct timespec *t)
->> > +{
->> > +	return (t->tv_sec * 1000) + lround(t->tv_nsec / 1000000);
->> > +}
->> > +
->> > +static int time_delta_ms(struct timespec *before, struct timespec *after)
->> > +{
->> > +	if (!before || !after)
->> > +		return 0;
->> > +	return timespec_to_ms(after) - timespec_to_ms(before);
->> > +}
->>
->> we have a similar thing in util.[ch]
+> ERROR: modpost: "__divdi3" [drivers/block/nbd.ko] undefined!
 >
->Alright, this OK?
+> As Stephen Rothwell notes:
+>   The added check_mul_overflow() call is being passed 64 bit values.
+>   COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW is not set for this build (see
+>   include/linux/overflow.h).
 >
->diff --git a/shared/util.c b/shared/util.c
->index b487b5f..b911e63 100644
->--- a/shared/util.c
->+++ b/shared/util.c
->@@ -466,6 +466,19 @@ unsigned long long ts_usec(const struct timespec *ts)
-> 	       (unsigned long long) ts->tv_nsec / NSEC_PER_USEC;
-> }
+> Specifically, the helpers for checking whether the results of a
+> multiplication overflowed (__unsigned_mul_overflow,
+> __signed_add_overflow) use the division operator when
+> !COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW.  This is problematic for 64b
+> operands on 32b hosts.
 >
->+unsigned long long ts_msec(const struct timespec *ts)
->+{
->+	return ts_usec(ts) * 1000;
->+}
->+
->+unsigned long long ts_delta_ms(const struct timespec *before,
->+			       const struct timespec *after)
->+{
->+	if (!before || !after)
->+		return 0;
->+	return ts_msec(after) - ts_msec(before);
->+}
->+
-> unsigned long long stat_mstamp(const struct stat *st)
-> {
-> #ifdef HAVE_STRUCT_STAT_ST_MTIM
->diff --git a/shared/util.h b/shared/util.h
->index c6a31df..f8c28e7 100644
->--- a/shared/util.h
->+++ b/shared/util.h
->@@ -43,6 +43,9 @@ int mkdir_p(const char *path, int len, mode_t mode);
-> int mkdir_parents(const char *path, mode_t mode);
-> unsigned long long stat_mstamp(const struct stat *st);
-> unsigned long long ts_usec(const struct timespec *ts);
->+unsigned long long ts_msec(const struct timespec *ts);
->+unsigned long long ts_delta_ms(const struct timespec *before,
->+			       const struct timespec *after);
+> This was fixed upstream by
+> commit 76ae847497bc ("Documentation: raise minimum supported version of
+> GCC to 5.1")
+> which is not suitable to be backported to stable.
 >
-> /* endianess and alignments                                                 */
-> /* ************************************************************************ */
+> Further, __builtin_mul_overflow() would emit a libcall to a
+> compiler-rt-only symbol when compiling with clang < 14 for 32b targets.
 >
->> > +/**
->> > + * kmod_module_remove_module_wait:
->> > + * @mod: kmod module
->> > + * @flags: flags to pass to Linux kernel when removing the module. The only valid flag is
->> > + * KMOD_REMOVE_FORCE: force remove module regardless if it's still in
->> > + * use by a kernel subsystem or other process;
->> > + * KMOD_REMOVE_NOWAIT is always enforced, causing us to pass O_NONBLOCK to
->> > + * delete_module(2). We do the waiting in userspace, if a wait was desired.
->> > + *
->> > + * Remove a module from Linux kernel patiently.
->> > + *
->> > + * Returns: 0 on success or < 0 on failure.
->> > + */
->> > +KMOD_EXPORT int kmod_module_remove_module_wait(struct kmod_module *mod,
->> > +					       unsigned int flags,
->> > +					       bool wait)
->>
->> why do you have kmod_get_refcnt_timeout/kmod_set_refcnt_timeout instead
->> of just doing s/bool wait/unsigned int wait_msec/)?
+> ld.lld: error: undefined symbol: __mulodi4
 >
->Because it lets us do a smaller change on the respetive tools:
+> In order to keep stable buildable with GCC 4.9 and clang < 14, modify
+> struct nbd_config to instead track the number of bits of the block size;
+> reconstructing the block size using runtime checked shifts that are not
+> problematic for those compilers and in a ways that can be backported to
+> stable.
 >
->tools/modprobe.c-               flags |= KMOD_REMOVE_FORCE;
->tools/modprobe.c-
->tools/modprobe.c:       err = kmod_module_remove_module_wait(mod, flags, do_remove_patient);
->tools/modprobe.c-       if (err == -EEXIST) {
->tools/modprobe.c-               if (!first_time)
->--
->tools/remove.c-         goto unref;
->tools/remove.c-
->tools/remove.c: err = kmod_module_remove_module_wait(mod, 0, do_remove_patient);
->tools/remove.c- if (err < 0)
->tools/remove.c-         goto unref;
->--
->tools/rmmod.c-          }
->tools/rmmod.c-
->tools/rmmod.c:          err = kmod_module_remove_module_wait(mod, flags,
->tools/rmmod.c- do_remove_patient);
->tools/rmmod.c-          if (err < 0) {
+> In nbd_set_size, we do validate that the value of blksize must be a
+> power of two (POT) and is in the range of [512, PAGE_SIZE] (both
+> inclusive).
 >
->That is, the timeout is contextual of the context.
+> This does modify the debugfs interface.
 >
->> > +		if ((refcnt <= 0) || (refcnt > 0 && !wait)) {
->> > +			NOTICE(mod->ctx, "%s refcnt is %d\n", mod->name, (int) refcnt);
->> > +			err_time = clock_gettime(CLOCK_MONOTONIC, &t2);
->> > +			if (err_time != 0)
->> > +				kmod_set_removal_timeout(mod->ctx, 0);
->>
->> I don't follow why kmod_module_get_refcnt_wait() is setting the removal
->> timeout at all. This seems to be doing it behind users back.
+> Cc: stable@vger.kernel.org
+> Cc: Arnd Bergmann <arnd@kernel.org>
+> Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/1438
+> Link: https://lore.kernel.org/all/20210909182525.372ee687@canb.auug.org.au/
+> Link: https://lore.kernel.org/stable/CAHk-=whiQBofgis_rkniz8GBP9wZtSZdcDEffgSLO62BUGV3gg@mail.gmail.com/
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Suggested-by: Kees Cook <keescook@chromium.org>
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Suggested-by: Pavel Machek <pavel@ucw.cz>
+> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+
+Hi Josef,
+Do you have cycles to review this patch, or is this something I should
+ask Jens or Linus about picking up?
+
+> ---
+> This patch is kind of a v3 for solving this problem.
+> v2: https://lore.kernel.org/stable/20210914002318.2298583-1-ndesaulniers@google.com/
+> v1: https://lore.kernel.org/stable/20210913203201.1844253-1-ndesaulniers@google.com/
+> But is quite different in approach. Instead of trying to fix up the
+> overflow routines in stable, we amend the code in nbd.c as per Linus
+> (against mainline) with fixes from Kees to use the named overflow
+> checker.
 >
->Because if clock_gettime() returns something other than 0 then
->your clock is messed up and you should not be using a timeout, so
->yes, we correct that then. We can scream loud, or use a default.
+>  drivers/block/nbd.c | 29 +++++++++++++++++------------
+>  1 file changed, 17 insertions(+), 12 deletions(-)
 >
->I figured not using one would be better in that case.
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5170a630778d..1183f7872b71 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -97,13 +97,18 @@ struct nbd_config {
 >
->> The idea of using the refcnt fd was actually that then
->> users could integrate it on their mainloops (probably using epoll). And
->> then the same impl could be shared by kmod_module_remove_module_wait(),
->> which would do a select().
->>
->> This seems more like a kmod_module_refcnt_wait_zero() using poll()
->> + adjusting the timeout
+>         atomic_t recv_threads;
+>         wait_queue_head_t recv_wq;
+> -       loff_t blksize;
+> +       unsigned int blksize_bits;
+>         loff_t bytesize;
+>  #if IS_ENABLED(CONFIG_DEBUG_FS)
+>         struct dentry *dbg_dir;
+>  #endif
+>  };
 >
->Sorry don't follow. And since I have one day before vacation, I suppose
->I won't get to this until I get back. But I'd be happy if you massage
->it as you see fit as you're used to the code base and I'm sure have
->a better idea of what likely is best for the library.
+> +static inline unsigned int nbd_blksize(struct nbd_config *config)
+> +{
+> +       return 1u << config->blksize_bits;
+> +}
+> +
+>  struct nbd_device {
+>         struct blk_mq_tag_set tag_set;
+>
+> @@ -146,7 +151,7 @@ static struct dentry *nbd_dbg_dir;
+>
+>  #define NBD_MAGIC 0x68797548
+>
+> -#define NBD_DEF_BLKSIZE 1024
+> +#define NBD_DEF_BLKSIZE_BITS 10
+>
+>  static unsigned int nbds_max = 16;
+>  static int max_part = 16;
+> @@ -317,12 +322,12 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
+>                 loff_t blksize)
+>  {
+>         if (!blksize)
+> -               blksize = NBD_DEF_BLKSIZE;
+> +               blksize = 1u << NBD_DEF_BLKSIZE_BITS;
+>         if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
+>                 return -EINVAL;
+>
+>         nbd->config->bytesize = bytesize;
+> -       nbd->config->blksize = blksize;
+> +       nbd->config->blksize_bits = __ffs(blksize);
+>
+>         if (!nbd->task_recv)
+>                 return 0;
+> @@ -1337,7 +1342,7 @@ static int nbd_start_device(struct nbd_device *nbd)
+>                 args->index = i;
+>                 queue_work(nbd->recv_workq, &args->work);
+>         }
+> -       return nbd_set_size(nbd, config->bytesize, config->blksize);
+> +       return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
+>  }
+>
+>  static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
+> @@ -1406,11 +1411,11 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+>         case NBD_SET_BLKSIZE:
+>                 return nbd_set_size(nbd, config->bytesize, arg);
+>         case NBD_SET_SIZE:
+> -               return nbd_set_size(nbd, arg, config->blksize);
+> +               return nbd_set_size(nbd, arg, nbd_blksize(config));
+>         case NBD_SET_SIZE_BLOCKS:
+> -               if (check_mul_overflow((loff_t)arg, config->blksize, &bytesize))
+> +               if (check_shl_overflow(arg, config->blksize_bits, &bytesize))
+>                         return -EINVAL;
+> -               return nbd_set_size(nbd, bytesize, config->blksize);
+> +               return nbd_set_size(nbd, bytesize, nbd_blksize(config));
+>         case NBD_SET_TIMEOUT:
+>                 nbd_set_cmd_timeout(nbd, arg);
+>                 return 0;
+> @@ -1476,7 +1481,7 @@ static struct nbd_config *nbd_alloc_config(void)
+>         atomic_set(&config->recv_threads, 0);
+>         init_waitqueue_head(&config->recv_wq);
+>         init_waitqueue_head(&config->conn_wait);
+> -       config->blksize = NBD_DEF_BLKSIZE;
+> +       config->blksize_bits = NBD_DEF_BLKSIZE_BITS;
+>         atomic_set(&config->live_connections, 0);
+>         try_module_get(THIS_MODULE);
+>         return config;
+> @@ -1604,7 +1609,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
+>         debugfs_create_file("tasks", 0444, dir, nbd, &nbd_dbg_tasks_fops);
+>         debugfs_create_u64("size_bytes", 0444, dir, &config->bytesize);
+>         debugfs_create_u32("timeout", 0444, dir, &nbd->tag_set.timeout);
+> -       debugfs_create_u64("blocksize", 0444, dir, &config->blksize);
+> +       debugfs_create_u32("blocksize_bits", 0444, dir, &config->blksize_bits);
+>         debugfs_create_file("flags", 0444, dir, nbd, &nbd_dbg_flags_fops);
+>
+>         return 0;
+> @@ -1826,7 +1831,7 @@ nbd_device_policy[NBD_DEVICE_ATTR_MAX + 1] = {
+>  static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
+>  {
+>         struct nbd_config *config = nbd->config;
+> -       u64 bsize = config->blksize;
+> +       u64 bsize = nbd_blksize(config);
+>         u64 bytes = config->bytesize;
+>
+>         if (info->attrs[NBD_ATTR_SIZE_BYTES])
+> @@ -1835,7 +1840,7 @@ static int nbd_genl_size_set(struct genl_info *info, struct nbd_device *nbd)
+>         if (info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES])
+>                 bsize = nla_get_u64(info->attrs[NBD_ATTR_BLOCK_SIZE_BYTES]);
+>
+> -       if (bytes != config->bytesize || bsize != config->blksize)
+> +       if (bytes != config->bytesize || bsize != nbd_blksize(config))
+>                 return nbd_set_size(nbd, bytes, bsize);
+>         return 0;
+>  }
+>
+> base-commit: 4c17ca27923c16fd73bbb9ad033c7d749c3bcfcc
+> --
+> 2.33.0.464.g1972c5931b-goog
+>
 
 
-sure, np. I will take a look as time permits.
-
-thanks
-Lucas De Marchi
-
->
->> > +	ret = kmod_module_get_refcnt_wait(mod, do_remove_patient);
->>
->> for tool implementation, shouldn't we just ignore
->> kmod_module_get_refcnt() and proceed to
->> kmod_module_remove_module_wait()?
->
->I'll let you decide. Otherwise this will have to wait until I get back
->from vacation.
->
->  Luis
+-- 
+Thanks,
+~Nick Desaulniers
