@@ -2,179 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6720C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 00:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02064C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 00:36:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C722261555
-	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 00:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7CA8613CE
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 00:36:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346986AbhI3AG7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 20:06:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47743 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231238AbhI3AG6 (ORCPT
+        id S1347478AbhI3Aig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 20:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42556 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346735AbhI3Aig (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 20:06:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632960316;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FKM4FZ1+Sj46EyvkXnp0WenJowC0Gqd7KS8Hczjzp7Y=;
-        b=ZRHGmZVzoxzVkIcogmPbxz4ls8H6RypXHZJWyd9MJndBJVEgf5aCZJBO5CT13vLoROOVuz
-        z0WPsK6GTCsVugjhFUsKa5pnbbz8cVY9jeahViFuWEk0vSwWumk8MDtC5CxwF90p2qzCE3
-        x1yIbsMODkMldr4gJU4L3eyFMe7Sou0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21--4yjIENIP-yx6NUtRe2ZPw-1; Wed, 29 Sep 2021 20:05:12 -0400
-X-MC-Unique: -4yjIENIP-yx6NUtRe2ZPw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE7BD801E72;
-        Thu, 30 Sep 2021 00:05:10 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 72A786A8E7;
-        Thu, 30 Sep 2021 00:05:06 +0000 (UTC)
-Date:   Thu, 30 Sep 2021 08:05:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V3 5/7] genirq/affinity: move group_cpus_evenly() into
- lib/
-Message-ID: <YVT/Lki9OaRa8OCR@T590>
-References: <20210928005558.243352-1-ming.lei@redhat.com>
- <20210928005558.243352-6-ming.lei@redhat.com>
- <74bcc75e-0b68-1d6b-b7f6-4681ec754257@huawei.com>
+        Wed, 29 Sep 2021 20:38:36 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D56DC06176A
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 17:36:54 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id c20so4134378qtb.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Sep 2021 17:36:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BwrEOqITMVHTWeCijhMHSDgtGtdliHDBULe1zYCMads=;
+        b=cnipXcpqu4R5bM9dgEXfQv8BOGJdXA84Z/vct47TAZsrhe6w/r9oUXvVRUGjrFVc9o
+         1pqzLcPWuKWB7IKDJ67GQ2rJ0XJHZa9rDepLeYkUUjlUxrxSVALpK00Eq0gEhv5XCimW
+         sHs4w+N9g0alec3otIgld2+AWdRLOeWRpLw+d3vtzb9Y7LM/WjCoP1OCGXbI5oFH2wcA
+         Od4IxfZeZh+ym8BbKDSyGmZFnDZ/c6eOX1Sg9JX8M/BMCZdpEJadR2DfQiZA22RjHFQD
+         9rTLu0GC5IGCqxQldXIJQ2vZ9a0iJRa0h0Mj+ZaME/saY1/RCbRN+q8xTUUHVWNi7uTT
+         2+YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BwrEOqITMVHTWeCijhMHSDgtGtdliHDBULe1zYCMads=;
+        b=3UdTur6pL8zpBiwF2ciK/YZgI5Q7ai23BHXsSPsf4LjNBGQrcIRySxUZei2poE0+ne
+         QDAfg1ZDL9tmSOnPAa8ddua4QCA/r+Ilz3/c+dtvbCimyAirWhORhlUeCR90O98Z/z1T
+         d5PK30XzokFZHDb8+NHyjM1YBvxV5myJO5fxVwe4lcj3pTjUeJanBXaD0T2JUpVnz8Wd
+         RlPzlYT4QBm80SWo6PxUN45snnBSf9UCeEsdmvEB9gZ3c7BMbtM3EbbrypgJGZbE7tx0
+         xLbjD5SbWhILCQVqtj3tGNtLQ7HcXiWQGDevUxliKA82BKYtRKzhKtgIu42UISrdpnVK
+         fKNA==
+X-Gm-Message-State: AOAM533Ry/jLNVJ8GhiQUpnySex/6dv6vLy4KA0DJIzyIjodKEziqvAd
+        crWuGwbw8W35J6p8erZVcp5bRg==
+X-Google-Smtp-Source: ABdhPJyC31MajIpVcurSSZ3nYCkO27psWnTuDsfNku/zaFdrDm/CS7iSRUZR5Bb8yV4im907u+gPsg==
+X-Received: by 2002:ac8:5ad5:: with SMTP id d21mr3421614qtd.345.1632962213405;
+        Wed, 29 Sep 2021 17:36:53 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id h4sm815147qtb.67.2021.09.29.17.36.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Sep 2021 17:36:52 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mVk4C-007upE-BZ; Wed, 29 Sep 2021 21:36:52 -0300
+Date:   Wed, 29 Sep 2021 21:36:52 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: Re: [PATCH v3 19/20] PCI/P2PDMA: introduce pci_mmap_p2pmem()
+Message-ID: <20210930003652.GH3544071@ziepe.ca>
+References: <20210916234100.122368-1-logang@deltatee.com>
+ <20210916234100.122368-20-logang@deltatee.com>
+ <20210928195518.GV3544071@ziepe.ca>
+ <8d386273-c721-c919-9749-fc0a7dc1ed8b@deltatee.com>
+ <20210929230543.GB3544071@ziepe.ca>
+ <32ce26d7-86e9-f8d5-f0cf-40497946efe9@deltatee.com>
+ <20210929233540.GF3544071@ziepe.ca>
+ <f9a83402-3d66-7437-ca47-77bac4108424@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <74bcc75e-0b68-1d6b-b7f6-4681ec754257@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <f9a83402-3d66-7437-ca47-77bac4108424@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 03:40:44PM +0100, John Garry wrote:
-> 
-> > +/**
-> > + * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-> > + * @numgrps: number of groups
-> > + *
-> > + * Return: cpumask array if successful, NULL otherwise. And each element
-> > + * includes CPUs assigned to this group
-> > + *
-> > + * Try to put close CPUs from viewpoint of CPU and NUMA locality into
-> > + * same group, and run two-stage grouping:
-> > + *	1) allocate present CPUs on these groups evenly first
-> > + *	2) allocate other possible CPUs on these groups evenly
-> > + *
-> > + * We guarantee in the resulted grouping that all CPUs are covered, and
-> > + * no same CPU is assigned to different groups
-> 
-> nit: I'd have "no same CPU is assigned to multiple groups"
+On Wed, Sep 29, 2021 at 05:49:36PM -0600, Logan Gunthorpe wrote:
 
-OK
+> Some of this seems out of date. Pretty sure the pages are not refcounted
+> with vmf_insert_mixed() and vmf_insert_mixed() is currently the only way
+> to use VM_MIXEDMAP mappings.
 
-> 
-> > + */
-> > +struct cpumask *group_cpus_evenly(unsigned int numgrps)
-> 
-> nit: The name group_cpus_evenly() would imply an action on some cpus, when
-> it's just calculating some masks - I think "masks" should be at least
-> included in the name
+Hum.
 
-Naming is always the hard part in reviewing, I think cpu is more
-readable, maybe group_all_cpus_evenly()?
+vmf_insert_mixed() boils down to insert_pfn() which always sets the
+special bit, so vm_normal_page() returns NULL and thus the pages are
+not freed during zap.
 
-> 
-> > +{
-> > +	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
-> > +	cpumask_var_t *node_to_cpumask;
-> > +	cpumask_var_t nmsk, npresmsk;
-> > +	int ret = -ENOMEM;
-> > +	struct cpumask *masks = NULL;
-> > +
-> > +	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
-> > +		return NULL;
-> > +
-> > +	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
-> > +		goto fail_nmsk;
-> > +
-> > +	node_to_cpumask = alloc_node_to_cpumask();
-> > +	if (!node_to_cpumask)
-> > +		goto fail_npresmsk;
-> > +
-> > +	masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
-> > +	if (!masks)
-> > +		goto fail_node_to_cpumask;
-> > +
-> > +	/* Stabilize the cpumasks */
-> > +	cpus_read_lock();
-> > +	build_node_to_cpumask(node_to_cpumask);
-> > +
-> > +	/* grouping present CPUs first */
-> > +	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
-> > +				  cpu_present_mask, nmsk, masks);
-> > +	if (ret < 0)
-> > +		goto fail_build_affinity;
-> > +	nr_present = ret;
-> > +
-> > +	/*
-> > +	 * Allocate non present CPUs starting from the next group to be
-> > +	 * handled. If the grouping of present CPUs already exhausted the
-> > +	 * group space, assign the non present CPUs to the already
-> > +	 * allocated out groups.
-> > +	 */
-> > +	if (nr_present >= numgrps)
-> > +		curgrp = 0;
-> > +	else
-> > +		curgrp = nr_present;
-> > +	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
-> > +	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
-> > +				  npresmsk, nmsk, masks);
-> > +	if (ret >= 0)
-> > +		nr_others = ret;
-> > +
-> > + fail_build_affinity:
-> 
-> nit: Strange that success path goes through "fail" labels. Current code is
-> this way, so feel free to ignore.
+So, if the pages are always special and not refcounted all the docs
+seem really out of date - or rather they describe the situation
+without the special bit, I think.
 
-I'd rather not change current behavior in this patches.
+Why would DAX want to do this in the first place?? This means the
+address space zap is much more important that just speeding up
+destruction, it is essential for correctness since the PTEs are not
+holding refcounts naturally...
 
-> 
-> > +	cpus_read_unlock();
-> > +
-> > +	if (ret >= 0)
-> > +		WARN_ON(nr_present + nr_others < numgrps);
-> > +
-> > + fail_node_to_cpumask:
-> > +	free_node_to_cpumask(node_to_cpumask);
-> > +
-> > + fail_npresmsk:
-> > +	free_cpumask_var(npresmsk);
-> > +
-> > + fail_nmsk:
-> > +	free_cpumask_var(nmsk);
-> > +	if (ret < 0) {
-> > +		kfree(masks);
-> > +		return NULL;
-> > +	}
-> > +	return masks;
-> > +}
-> > +EXPORT_SYMBOL_GPL(group_cpus_evenly);
-> 
-> Are there any users which are available as modules? As I see, the only users
-> are blk-mq-cpumap.c and irq/affinity.c, which I guess aren't available as
-> modules.
+Sigh.
 
-Yeah, so far only two built-in users, I think it is fine to start with
-not exporting the symbols, will change to this way in next version.
-
-
-Thanks, 
-Ming
-
+Jason
