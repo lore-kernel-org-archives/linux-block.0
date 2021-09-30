@@ -2,131 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38300C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 23:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6720C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 00:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DC7A615E4
-	for <linux-block@archiver.kernel.org>; Wed, 29 Sep 2021 23:52:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C722261555
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 00:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238351AbhI2Xy3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Sep 2021 19:54:29 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:60894 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233892AbhI2Xy3 (ORCPT
+        id S1346986AbhI3AG7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Sep 2021 20:06:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47743 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231238AbhI3AG6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Sep 2021 19:54:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=EbaHldIfmljK2aAsHQqeoY1Qg/19dgw063FCWj78kIA=; b=BYOpvsO/6zfK/zmuM4LPBTGkEY
-        IX+IV00ne55Vn0YfEDps7ZCSwEilHH8U02Q33wf4MlxPdQ0UWL6DzmjorF0O9tl0Jsm4uIASf2Ene
-        aM4efeOMiejklMT3X3x4u5ceMHI9es5C0nZcATdnazTQGIO6GnDxU0gRZUpRLY04BYWJRwGKwIzlM
-        MsiSqwPDnK66YxcCdj+o8uhP8jg1uNPzO6/t6Cb0JyUhdXEqKBgV0BT6H0WJz9/AKmbztTCYQsoOP
-        zcbO+BgjsyCmu9TditfVdrlL1UcCemw3a1G6PSim8Gk2mjPDqAMmHRRC5zbBXFVy2p6sr5VqIlFuw
-        E0w7Az4Q==;
-Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1mVjNK-0008VW-LI; Wed, 29 Sep 2021 17:52:35 -0600
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-References: <20210916234100.122368-1-logang@deltatee.com>
- <20210928200216.GW3544071@ziepe.ca>
- <06d75fcb-ce8b-30a5-db36-b6c108460d3d@deltatee.com>
- <20210929232147.GD3544071@ziepe.ca>
- <93f56919-03ee-8326-10ee-8fbd9078b8e0@deltatee.com>
- <20210929233624.GG3544071@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <142badec-f6f5-e471-698e-8a386aae3c2b@deltatee.com>
-Date:   Wed, 29 Sep 2021 17:52:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Wed, 29 Sep 2021 20:06:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632960316;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FKM4FZ1+Sj46EyvkXnp0WenJowC0Gqd7KS8Hczjzp7Y=;
+        b=ZRHGmZVzoxzVkIcogmPbxz4ls8H6RypXHZJWyd9MJndBJVEgf5aCZJBO5CT13vLoROOVuz
+        z0WPsK6GTCsVugjhFUsKa5pnbbz8cVY9jeahViFuWEk0vSwWumk8MDtC5CxwF90p2qzCE3
+        x1yIbsMODkMldr4gJU4L3eyFMe7Sou0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21--4yjIENIP-yx6NUtRe2ZPw-1; Wed, 29 Sep 2021 20:05:12 -0400
+X-MC-Unique: -4yjIENIP-yx6NUtRe2ZPw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE7BD801E72;
+        Thu, 30 Sep 2021 00:05:10 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 72A786A8E7;
+        Thu, 30 Sep 2021 00:05:06 +0000 (UTC)
+Date:   Thu, 30 Sep 2021 08:05:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V3 5/7] genirq/affinity: move group_cpus_evenly() into
+ lib/
+Message-ID: <YVT/Lki9OaRa8OCR@T590>
+References: <20210928005558.243352-1-ming.lei@redhat.com>
+ <20210928005558.243352-6-ming.lei@redhat.com>
+ <74bcc75e-0b68-1d6b-b7f6-4681ec754257@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20210929233624.GG3544071@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v3 00/20] Userspace P2PDMA with O_DIRECT NVMe devices
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74bcc75e-0b68-1d6b-b7f6-4681ec754257@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2021-09-29 5:36 p.m., Jason Gunthorpe wrote:
-> On Wed, Sep 29, 2021 at 05:28:38PM -0600, Logan Gunthorpe wrote:
->>
->>
->> On 2021-09-29 5:21 p.m., Jason Gunthorpe wrote:
->>> On Wed, Sep 29, 2021 at 03:50:02PM -0600, Logan Gunthorpe wrote:
->>>>
->>>>
->>>> On 2021-09-28 2:02 p.m., Jason Gunthorpe wrote:
->>>>> On Thu, Sep 16, 2021 at 05:40:40PM -0600, Logan Gunthorpe wrote:
->>>>>> Hi,
->>>>>>
->>>>>> This patchset continues my work to add userspace P2PDMA access using
->>>>>> O_DIRECT NVMe devices. My last posting[1] just included the first 13
->>>>>> patches in this series, but the early P2PDMA cleanup and map_sg error
->>>>>> changes from that series have been merged into v5.15-rc1. To address
->>>>>> concerns that that series did not add any new functionality, I've added
->>>>>> back the userspcae functionality from the original RFC[2] (but improved
->>>>>> based on the original feedback).
->>>>>
->>>>> I really think this is the best series yet, it really looks nice
->>>>> overall. I know the sg flag was a bit of a debate at the start, but it
->>>>> serves an undeniable purpose and the resulting standard DMA APIs 'just
->>>>> working' is really clean.
->>>>
->>>> Actually, so far, nobody has said anything negative about using the SG flag.
->>>>
->>>>> There is more possible here, we could also pass the new GUP flag in the
->>>>> ib_umem code..
->>>>
->>>> Yes, that would be very useful.
->>>
->>> You might actually prefer to do that then the bio changes to get the
->>> infrastructur merged as it seems less "core"
->>
->> I'm a little bit more concerned about my patch set growing too large.
->> It's already at 20 patches and I think I'll need to add a couple more
->> based on the feedback you've already provided. So I'm leaning toward
->> pushing more functionality as future work.
+On Wed, Sep 29, 2021 at 03:40:44PM +0100, John Garry wrote:
 > 
-> I mean you could postpone the three block related patches and use a
-> single ib_umem patch instead as the consumer.
+> > +/**
+> > + * group_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
+> > + * @numgrps: number of groups
+> > + *
+> > + * Return: cpumask array if successful, NULL otherwise. And each element
+> > + * includes CPUs assigned to this group
+> > + *
+> > + * Try to put close CPUs from viewpoint of CPU and NUMA locality into
+> > + * same group, and run two-stage grouping:
+> > + *	1) allocate present CPUs on these groups evenly first
+> > + *	2) allocate other possible CPUs on these groups evenly
+> > + *
+> > + * We guarantee in the resulted grouping that all CPUs are covered, and
+> > + * no same CPU is assigned to different groups
+> 
+> nit: I'd have "no same CPU is assigned to multiple groups"
 
-I think that's not a very compelling use case given the only provider of
-these VMAs is an NVMe block device. My patch set enables a real world
-use (copying data between NVMe devices P2P through the CMB with O_DIRECT).
+OK
 
-Being able to read or write a CMB with RDMA and only RDMA is not very
-compelling.
+> 
+> > + */
+> > +struct cpumask *group_cpus_evenly(unsigned int numgrps)
+> 
+> nit: The name group_cpus_evenly() would imply an action on some cpus, when
+> it's just calculating some masks - I think "masks" should be at least
+> included in the name
 
-Logan
+Naming is always the hard part in reviewing, I think cpu is more
+readable, maybe group_all_cpus_evenly()?
+
+> 
+> > +{
+> > +	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
+> > +	cpumask_var_t *node_to_cpumask;
+> > +	cpumask_var_t nmsk, npresmsk;
+> > +	int ret = -ENOMEM;
+> > +	struct cpumask *masks = NULL;
+> > +
+> > +	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+> > +		return NULL;
+> > +
+> > +	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
+> > +		goto fail_nmsk;
+> > +
+> > +	node_to_cpumask = alloc_node_to_cpumask();
+> > +	if (!node_to_cpumask)
+> > +		goto fail_npresmsk;
+> > +
+> > +	masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
+> > +	if (!masks)
+> > +		goto fail_node_to_cpumask;
+> > +
+> > +	/* Stabilize the cpumasks */
+> > +	cpus_read_lock();
+> > +	build_node_to_cpumask(node_to_cpumask);
+> > +
+> > +	/* grouping present CPUs first */
+> > +	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+> > +				  cpu_present_mask, nmsk, masks);
+> > +	if (ret < 0)
+> > +		goto fail_build_affinity;
+> > +	nr_present = ret;
+> > +
+> > +	/*
+> > +	 * Allocate non present CPUs starting from the next group to be
+> > +	 * handled. If the grouping of present CPUs already exhausted the
+> > +	 * group space, assign the non present CPUs to the already
+> > +	 * allocated out groups.
+> > +	 */
+> > +	if (nr_present >= numgrps)
+> > +		curgrp = 0;
+> > +	else
+> > +		curgrp = nr_present;
+> > +	cpumask_andnot(npresmsk, cpu_possible_mask, cpu_present_mask);
+> > +	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
+> > +				  npresmsk, nmsk, masks);
+> > +	if (ret >= 0)
+> > +		nr_others = ret;
+> > +
+> > + fail_build_affinity:
+> 
+> nit: Strange that success path goes through "fail" labels. Current code is
+> this way, so feel free to ignore.
+
+I'd rather not change current behavior in this patches.
+
+> 
+> > +	cpus_read_unlock();
+> > +
+> > +	if (ret >= 0)
+> > +		WARN_ON(nr_present + nr_others < numgrps);
+> > +
+> > + fail_node_to_cpumask:
+> > +	free_node_to_cpumask(node_to_cpumask);
+> > +
+> > + fail_npresmsk:
+> > +	free_cpumask_var(npresmsk);
+> > +
+> > + fail_nmsk:
+> > +	free_cpumask_var(nmsk);
+> > +	if (ret < 0) {
+> > +		kfree(masks);
+> > +		return NULL;
+> > +	}
+> > +	return masks;
+> > +}
+> > +EXPORT_SYMBOL_GPL(group_cpus_evenly);
+> 
+> Are there any users which are available as modules? As I see, the only users
+> are blk-mq-cpumap.c and irq/affinity.c, which I guess aren't available as
+> modules.
+
+Yeah, so far only two built-in users, I think it is fine to start with
+not exporting the symbols, will change to this way in next version.
+
+
+Thanks, 
+Ming
+
