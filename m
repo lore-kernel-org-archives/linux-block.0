@@ -2,137 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382F5C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 15:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7F5C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 16:20:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EB3B61411
-	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 15:56:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B17916141B
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 16:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346896AbhI3P6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Sep 2021 11:58:18 -0400
-Received: from mail-pg1-f181.google.com ([209.85.215.181]:43712 "EHLO
-        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347264AbhI3P6P (ORCPT
+        id S1349834AbhI3QVw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Sep 2021 12:21:52 -0400
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:41907 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349579AbhI3QVv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Sep 2021 11:58:15 -0400
-Received: by mail-pg1-f181.google.com with SMTP id r2so6692853pgl.10
-        for <linux-block@vger.kernel.org>; Thu, 30 Sep 2021 08:56:33 -0700 (PDT)
+        Thu, 30 Sep 2021 12:21:51 -0400
+Received: by mail-pl1-f171.google.com with SMTP id x8so4394907plv.8;
+        Thu, 30 Sep 2021 09:20:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=DJldzFwmSWHeQ300xoIRPMAhGIh9N799MhxD2bX20is=;
-        b=VniQqISsyPwdESkKM8caSvoRujx4o/laiQXxDI3TQkKy4ymGHOvh0JTEkfN1gaYsuy
-         w34FXiObvVaWRLOJnOc+ScqVRAsWDvtXcBKwvK68VgCRIMfK/RrgqPEG6SVt59dTt4Zu
-         c0Au4PrW7MlDA4FlunzBulZnDB0HS8sXppzvRyVN89sIxxIJO8EzILPwy+tO/eggpzzz
-         AN7kRYFeZ5jrUG0T8mGJTtRK6qQ0mUxlvgEDAqHypHdfbFt17EYOjUE02wlNr/852Un5
-         qEaetUycWYh6pB4KeQe3y+p7d6x7QRwsIcwfLm8eoDIDxbv8HISPzT7IMejnVEoyt2hf
-         9oLA==
-X-Gm-Message-State: AOAM530dG6TKAoMpUk+XPtnniBqy6YotaksCBza6sikL1A71UHXx22BH
-        mTEY3d9jJouM6itIhR2wOEo=
-X-Google-Smtp-Source: ABdhPJwo66gJdxFEK7jtzxS04VZrY+6cdjQhPSuzJp3+SPBs4ALUnDKc4KlZ8SrCy5nNaSywNogDgw==
-X-Received: by 2002:a63:4464:: with SMTP id t36mr5645283pgk.4.1633017392259;
-        Thu, 30 Sep 2021 08:56:32 -0700 (PDT)
+        bh=yG1/o+/DnMH77sK/4dZhI1SBFsLkmeMylzKyExyvyVo=;
+        b=VMOMxXrk3WipEBkwtyRKsqEK/+hGcd6Xyv2//4vlFXzFr4kYcDxEG8qPMfLnEJCU46
+         L7lGjp3A0jTO7A2w8Nu9vj/3qfEVpzcHp31SFcuzf94+yQmtPAh9QBCO9Y3Jnmutz2xw
+         MW6bzrww9mCCWv3YOkSvSuLEczumDBQJ90fmE/1PAdpbxWqCsNk8VgYGoV5dw1vL18hT
+         H11wBYoQlxdKpldScRPa3o3ayID3taRq+xPtIPuGhyMcH8kdQlFOyVpF688PGFKjum+8
+         LnyIqX5W5cgx7EUQDNi1C7LTqesPp3ShBYA1LoOaNYByN+Xxo+D51IMNoDFDWmGKUkwr
+         gfJw==
+X-Gm-Message-State: AOAM530cKxHipAVZYvrPwObMt6VEtaijjkgs3l4IOMchU6wlXElRJ/Ft
+        Z6HvhDfPKGLUXEd1CrQLx1g=
+X-Google-Smtp-Source: ABdhPJzaCOnFZETcMKaHwCPxzFz713M2S082LglpsjtX0j5t65Ek+coBFDcqzxklnkgshMeKu30lrQ==
+X-Received: by 2002:a17:90b:104d:: with SMTP id gq13mr14201836pjb.101.1633018808562;
+        Thu, 30 Sep 2021 09:20:08 -0700 (PDT)
 Received: from [10.254.204.66] (50-242-106-94-static.hfc.comcastbusiness.net. [50.242.106.94])
-        by smtp.gmail.com with ESMTPSA id n12sm3428888pff.166.2021.09.30.08.56.30
+        by smtp.gmail.com with ESMTPSA id t15sm3663221pgi.80.2021.09.30.09.20.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Sep 2021 08:56:31 -0700 (PDT)
-Subject: Re: [PATCH V2 5/5] blk-mq: support concurrent queue quiesce/unquiesce
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>
-References: <20210930125621.1161726-1-ming.lei@redhat.com>
- <20210930125621.1161726-6-ming.lei@redhat.com>
+        Thu, 30 Sep 2021 09:20:07 -0700 (PDT)
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "msnitzer@redhat.com" <msnitzer@redhat.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "rwheeler@redhat.com" <rwheeler@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Vincent Fu <vincent.fu@samsung.com>
+References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
+ <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
+ <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <e3d6c61c-f7cf-dcb0-df2e-a8e9acf5aaaa@acm.org>
-Date:   Thu, 30 Sep 2021 08:56:29 -0700
+Message-ID: <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
+Date:   Thu, 30 Sep 2021 09:20:04 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20210930125621.1161726-6-ming.lei@redhat.com>
+In-Reply-To: <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/21 5:56 AM, Ming Lei wrote:
-> Turns out that blk_mq_freeze_queue() isn't stronger[1] than
-> blk_mq_quiesce_queue() because dispatch may still be in-progress after
-> queue is frozen, and in several cases, such as switching io scheduler,
-> updating nr_requests & wbt latency, we still need to quiesce queue as a
-> supplement of freezing queue.
-
-Is there agreement about this? If not, how about leaving out the above from the
-patch description?
-
-> As we need to extend uses of blk_mq_quiesce_queue(), it is inevitable
-> for us to need support nested quiesce, especially we can't let
-> unquiesce happen when there is quiesce originated from other contexts.
+On 9/28/21 12:13 PM, Javier González wrote:
+> Since we are not going to be able to talk about this at LSF/MM, a few of
+> us thought about holding a dedicated virtual discussion about Copy
+> Offload. I believe we can use Chaitanya's thread as a start. Given the
+> current state of the current patches, I would propose that we focus on
+> the next step to get the minimal patchset that can go upstream so that
+> we can build from there.
 > 
-> This patch introduces q->mq_quiesce_depth to deal concurrent quiesce,
-> and we only unquiesce queue when it is the last/outer-most one of all
-> contexts.
-> 
-> One kernel panic issue has been reported[2] when running stress test on
-> dm-mpath's updating nr_requests and suspending queue, and the similar
-> issue should exist on almost all drivers which use quiesce/unquiesce.
-> 
-> [1] https://marc.info/?l=linux-block&m=150993988115872&w=2
-> [2] https://listman.redhat.com/archives/dm-devel/2021-September/msg00189.html
+> Before we try to find a date and a time that fits most of us, who would
+> be interested in participating?
 
-Please share the call stack of the kernel oops fixed by [2] since that
-call stack is not in the patch description.
-
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 21bf4c3f0825..10f8a3d4e3a1 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -209,7 +209,12 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
->    */
->   void blk_mq_quiesce_queue_nowait(struct request_queue *q)
->   {
-> -	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&q->queue_lock, flags);
-> +	if (!q->quiesce_depth++)
-> +		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-> +	spin_unlock_irqrestore(&q->queue_lock, flags);
->   }
->   EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
-
-Consider using == 0 instead of ! to check whether or not quiesce_depth is
-zero to improve code readability.
-
-> @@ -250,10 +255,19 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
->    */
->   void blk_mq_unquiesce_queue(struct request_queue *q)
->   {
-> -	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-> +	unsigned long flags;
-> +	bool run_queue = false;
-> +
-> +	spin_lock_irqsave(&q->queue_lock, flags);
-> +	if (q->quiesce_depth > 0 && !--q->quiesce_depth) {
-> +		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-> +		run_queue = true;
-> +	}
-> +	spin_unlock_irqrestore(&q->queue_lock, flags);
->   
->   	/* dispatch requests which are inserted during quiescing */
-> -	blk_mq_run_hw_queues(q, true);
-> +	if (run_queue)
-> +		blk_mq_run_hw_queues(q, true);
->   }
-
-So calling with blk_mq_unquiesce_queue() q->quiesce_depth <= 0 is ignored
-quietly? How about triggering a kernel warning for that condition?
-
-Otherwise the code changes look good to me.
+Given the technical complexity of this topic and also that the people who are
+interested live in multiple time zones, I prefer email to discuss the technical
+aspects of this work. My attempt to summarize how to implement copy offloading
+is available here: https://github.com/bvanassche/linux-kernel-copy-offload.
+Feedback on this text is welcome.
 
 Thanks,
 
