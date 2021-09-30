@@ -2,104 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7F5C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 16:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 945A1C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 16:50:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B17916141B
-	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 16:20:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D9AF6159A
+	for <linux-block@archiver.kernel.org>; Thu, 30 Sep 2021 16:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349834AbhI3QVw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Sep 2021 12:21:52 -0400
-Received: from mail-pl1-f171.google.com ([209.85.214.171]:41907 "EHLO
-        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349579AbhI3QVv (ORCPT
+        id S1351439AbhI3Qv6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Sep 2021 12:51:58 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:43978 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348841AbhI3Qv4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Sep 2021 12:21:51 -0400
-Received: by mail-pl1-f171.google.com with SMTP id x8so4394907plv.8;
-        Thu, 30 Sep 2021 09:20:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yG1/o+/DnMH77sK/4dZhI1SBFsLkmeMylzKyExyvyVo=;
-        b=VMOMxXrk3WipEBkwtyRKsqEK/+hGcd6Xyv2//4vlFXzFr4kYcDxEG8qPMfLnEJCU46
-         L7lGjp3A0jTO7A2w8Nu9vj/3qfEVpzcHp31SFcuzf94+yQmtPAh9QBCO9Y3Jnmutz2xw
-         MW6bzrww9mCCWv3YOkSvSuLEczumDBQJ90fmE/1PAdpbxWqCsNk8VgYGoV5dw1vL18hT
-         H11wBYoQlxdKpldScRPa3o3ayID3taRq+xPtIPuGhyMcH8kdQlFOyVpF688PGFKjum+8
-         LnyIqX5W5cgx7EUQDNi1C7LTqesPp3ShBYA1LoOaNYByN+Xxo+D51IMNoDFDWmGKUkwr
-         gfJw==
-X-Gm-Message-State: AOAM530cKxHipAVZYvrPwObMt6VEtaijjkgs3l4IOMchU6wlXElRJ/Ft
-        Z6HvhDfPKGLUXEd1CrQLx1g=
-X-Google-Smtp-Source: ABdhPJzaCOnFZETcMKaHwCPxzFz713M2S082LglpsjtX0j5t65Ek+coBFDcqzxklnkgshMeKu30lrQ==
-X-Received: by 2002:a17:90b:104d:: with SMTP id gq13mr14201836pjb.101.1633018808562;
-        Thu, 30 Sep 2021 09:20:08 -0700 (PDT)
-Received: from [10.254.204.66] (50-242-106-94-static.hfc.comcastbusiness.net. [50.242.106.94])
-        by smtp.gmail.com with ESMTPSA id t15sm3663221pgi.80.2021.09.30.09.20.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Sep 2021 09:20:07 -0700 (PDT)
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Thu, 30 Sep 2021 12:51:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=74h/+uZ+hrx0m4JxI1QkVpn5MOeSFXzNtUhZ4V300TI=; b=B5EPYCR6ELWWooi0yJ6/qwUCfs
+        xW68Odfkghb4ttQc08Np1dJRJhN9XdQKzIzlF9dxrShVzcR/fZ5mUTyUvDuCkeNQ4pQDaLqRNu4AV
+        9LBrq4VtrshpfRFd0tC3BAEpbaapoxt2T047s7v1k6PNW0G2koW4beGyNRcL+qQrpt1pAbvFArccc
+        9VhMSwHDeIwHWvh1BwQ3z3yRH/FBLA0ifIAFC12OqOFSrd1SnYHwgJBpvv5ay7kPYeRzcbtcELV2O
+        OfNoBSYFaO6AmrjP+TI7VDSlCZHBP7pqp9YmEG2tAPspvl1N53iFQI2JW4LgrqkrZjwFCuG05yLoM
+        xP02bFUA==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1mVzFp-0004cR-WF; Thu, 30 Sep 2021 10:49:55 -0600
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
- <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
- <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
- <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
-Date:   Thu, 30 Sep 2021 09:20:04 -0700
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+References: <20210916234100.122368-1-logang@deltatee.com>
+ <20210916234100.122368-2-logang@deltatee.com>
+ <fa99b871-8753-7c3c-09f0-3fd7f610e664@nvidia.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <c38e2ed7-43d8-767e-5b84-562c479267f4@deltatee.com>
+Date:   Thu, 30 Sep 2021 10:49:46 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <fa99b871-8753-7c3c-09f0-3fd7f610e664@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, chaitanyak@nvidia.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v3 01/20] lib/scatterlist: add flag for indicating P2PDMA
+ segments in an SGL
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/28/21 12:13 PM, Javier González wrote:
-> Since we are not going to be able to talk about this at LSF/MM, a few of
-> us thought about holding a dedicated virtual discussion about Copy
-> Offload. I believe we can use Chaitanya's thread as a start. Given the
-> current state of the current patches, I would propose that we focus on
-> the next step to get the minimal patchset that can go upstream so that
-> we can build from there.
+
+
+On 2021-09-29 10:47 p.m., Chaitanya Kulkarni wrote:
+> Logan,
 > 
-> Before we try to find a date and a time that fits most of us, who would
-> be interested in participating?
+>> +/*
+>> + * bit 2 is the third free bit in the page_link on 64bit systems which
+>> + * is used by dma_unmap_sg() to determine if the dma_address is a PCI
+>> + * bus address when doing P2PDMA.
+>> + * Note: CONFIG_PCI_P2PDMA depends on CONFIG_64BIT because of this.
+>> + */
+>> +
+>> +#ifdef CONFIG_PCI_P2PDMA
+>> +#define SG_DMA_PCI_P2PDMA      0x04UL
+>> +#else
+>> +#define SG_DMA_PCI_P2PDMA      0x00UL
+>> +#endif
+>> +
+>> +#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END | SG_DMA_PCI_P2PDMA)
+>> +
+> 
+> You are doing two things in one patch :-
+> 1. Introducing a new macro to replace the current macros.
+> 2. Adding a new member to those macros.
+> 
+> shouldn't this be split into two patches where you introduce a
+> macro SG_PAGE_LINK_MASK (SG_CHAIN | SG_END) in prep patch and
+> update the SF_PAGE_LINK_MASK with SG_DMA_PCI_P2PDMA with related
+> code?
+> 
 
-Given the technical complexity of this topic and also that the people who are
-interested live in multiple time zones, I prefer email to discuss the technical
-aspects of this work. My attempt to summarize how to implement copy offloading
-is available here: https://github.com/bvanassche/linux-kernel-copy-offload.
-Feedback on this text is welcome.
+Ok, will split. I'll also add the static inline cleanup Jason suggested
+in the first patch.
 
-Thanks,
-
-Bart.
+Logan
