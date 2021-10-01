@@ -2,146 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C78C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 19:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9E6C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 20:13:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04233619EE
-	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 19:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD67E61AF7
+	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 20:13:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231246AbhJAT7p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Oct 2021 15:59:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbhJAT7o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Oct 2021 15:59:44 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45987C061775
-        for <linux-block@vger.kernel.org>; Fri,  1 Oct 2021 12:58:00 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id z184so13013281iof.5
-        for <linux-block@vger.kernel.org>; Fri, 01 Oct 2021 12:58:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=s6pRFF/X8rzKRYzB08v21cTq+o2ffnNGgmWS4AC7+Xg=;
-        b=hxBkz1LaiDsMz+JPw/3iMZLO7QG2xgZBZpo8J2ySjCsRtBKMs7d8JhpKpHsSRw1d3r
-         zwjFbl56NkLEDbWYJveXejMjKcKlhDTUAi2s17bWrrhPzVghzS+PIeXrZVwCUh+xoqTt
-         RmBKhiQxygIX/REqG29GMJdZaTOK6rmwKwQ4tDXzIAbsOBb83fQZafmoWwdWekzmQo22
-         UVLUkZ/2Pcxxs19v+Zodx65lm8YciEGrxA7H5BIVT65rQ52TXa+7A4u+fZmLDbEHR8Tz
-         /sIus1C3i5R2OH7QQSjmi7fnkVnld6F7x0WyrFLkBIrmCDbDDw1J9JEipBhjFtpjRsnh
-         l+Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=s6pRFF/X8rzKRYzB08v21cTq+o2ffnNGgmWS4AC7+Xg=;
-        b=x/2hIKF4lTsyxqloOmxCwYCBpfEAnzFED1nbDKwzsilhv+K8zv9+fRlFnmTDb+Y186
-         xHG9pdojl2I8/ehB1Tz28FSq53slhE222W1FYVZK+AhBFn/B/CgECacRPAL5nDnvZnDu
-         F5IA94Zaj6Tl35Ok0gyUZoQBQdLXoar2vAIJRcKrhoHjQgHQDCfo3mnf1QpN/eljGljn
-         I94YUiI/R9RtiWMUuogBvY7vXi3p76KRLkBAwz8mEJ8kvH8iiO/kKQpJM8ehU4K7fFMl
-         A33NKvRhr5BmJhE4onlDVEsk8plFpb728njJKsPcJN4ZXoULu7opiT8YvPF9jDoxEGtw
-         dJCw==
-X-Gm-Message-State: AOAM533TPFaP2IlUKni2hFRfy9b9bqAL4i8u0JuXcjNHAnCq8xkiqWDo
-        RnwPSXtCPe9RFlkp77ffZ+XjFQ==
-X-Google-Smtp-Source: ABdhPJyJnfMffDAo6OzdHBoErcW15s034VdkP0Asp1YuINROuGgHNXlevHd2e3Rdyv6qRTvnwOw4PQ==
-X-Received: by 2002:a5d:9d15:: with SMTP id j21mr9589505ioj.121.1633118279526;
-        Fri, 01 Oct 2021 12:57:59 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id z6sm4329725iox.28.2021.10.01.12.57.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Oct 2021 12:57:59 -0700 (PDT)
-Subject: Re: swim3.c:1200:38: error: 'FLOPPY_MAJOR' undeclared (first use in
- this function)
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        lkft-triage@lists.linaro.org
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>
-References: <CA+G9fYsKjyOL1xj+GFC=Ab7Yw+b0Tg9jf8uvnN2tOc6OdupA-Q@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <250970e7-e430-e8fe-2844-5c7f627b0c26@kernel.dk>
-Date:   Fri, 1 Oct 2021 13:57:52 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229896AbhJAUPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Oct 2021 16:15:24 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:35274 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229879AbhJAUPX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Oct 2021 16:15:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=MT0f0inatgvWHt9y6q41qCoiZgUB0hemG4eYA9iG0ZI=; b=gqh8dihCcDiD7/l4vhuUnLDPle
+        9EFzkzLPUy1dTkJIIS1JcbckiRfeXzJ3oPIWHHWu13MU5vZZTHs9K3VGis/f5lP/HAvCEkb2bDCoN
+        TVp36+euwLuf/+pQqIkLxjeOadBmDXsgBbgQIXRtYh3SCtOVuof43ew53y5WYQK1MoKHHMWFWrxpj
+        YV8lkp6q6VCo8sHUFpLphXcyAeg2LlwFDBTBjy2/jUe8+CL2T7gCQhwH9jY3nmRmA9+owtn82wpNH
+        GNBBBIIzV1eUB0QsANCVQCY6M7rzdY6M85FAsLTdYcDm8qwoj53La4rnmlpfbJDQo7Qm8m25f65pS
+        GXXa4xSA==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1mWOuH-000696-1t; Fri, 01 Oct 2021 14:13:22 -0600
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alistair Popple <apopple@nvidia.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+References: <20210916234100.122368-20-logang@deltatee.com>
+ <20210928195518.GV3544071@ziepe.ca>
+ <8d386273-c721-c919-9749-fc0a7dc1ed8b@deltatee.com>
+ <20210929230543.GB3544071@ziepe.ca>
+ <32ce26d7-86e9-f8d5-f0cf-40497946efe9@deltatee.com>
+ <20210929233540.GF3544071@ziepe.ca>
+ <f9a83402-3d66-7437-ca47-77bac4108424@deltatee.com>
+ <20210930003652.GH3544071@ziepe.ca> <20211001134856.GN3544071@ziepe.ca>
+ <4fdd337b-fa35-a909-5eee-823bfd1e9dc4@deltatee.com>
+ <20211001174511.GQ3544071@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <95ada0ac-08cc-5b77-8675-b955b1b6d488@deltatee.com>
+Date:   Fri, 1 Oct 2021 14:13:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <CA+G9fYsKjyOL1xj+GFC=Ab7Yw+b0Tg9jf8uvnN2tOc6OdupA-Q@mail.gmail.com>
+In-Reply-To: <20211001174511.GQ3544071@ziepe.ca>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, dan.j.williams@intel.com, hch@lst.de, Felix.Kuehling@amd.com, apopple@nvidia.com, jgg@ziepe.ca
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v3 19/20] PCI/P2PDMA: introduce pci_mmap_p2pmem()
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/1/21 4:49 AM, Naresh Kamboju wrote:
-> Following build errors noticed while building Linux next 20211001
-> with gcc-11 for powerpc architecture.
-> 
-> kernel/sched/debug.c: In function 'print_cfs_group_stats':
-> kernel/sched/debug.c:460:41: warning: unused variable 'stats'
-> [-Wunused-variable]
->   460 |                struct sched_statistics *stats =
-> __schedstats_from_se(se);
->       |                                         ^~~~~
-> In file included from include/linux/blkdev.h:6,
->                  from include/linux/blk-mq.h:5,
->                  from drivers/block/swim3.c:24:
-> drivers/block/swim3.c: In function 'swim3_attach':
-> drivers/block/swim3.c:1200:38: error: 'FLOPPY_MAJOR' undeclared (first
-> use in this function)
->  1200 |                 rc = register_blkdev(FLOPPY_MAJOR, "fd");
->       |                                      ^~~~~~~~~~~~
-> include/linux/genhd.h:276:27: note: in definition of macro 'register_blkdev'
->   276 |         __register_blkdev(major, name, NULL)
->       |                           ^~~~~
-> drivers/block/swim3.c:1200:38: note: each undeclared identifier is
-> reported only once for each function it appears in
->  1200 |                 rc = register_blkdev(FLOPPY_MAJOR, "fd");
->       |                                      ^~~~~~~~~~~~
-> include/linux/genhd.h:276:27: note: in definition of macro 'register_blkdev'
->   276 |         __register_blkdev(major, name, NULL)
->       |                           ^~~~~
-> make[3]: *** [scripts/Makefile.build:288: drivers/block/swim3.o] Error 1
-> make[3]: Target '__build' not remade because of errors.
-> make[2]: *** [scripts/Makefile.build:571: drivers/block] Error 2
-> make[2]: Target '__build' not remade because of errors.
-> make[1]: *** [Makefile:2034: drivers] Error 2
-> 
-> Build config:
-> https://builds.tuxbuild.com/1ytcB62L9I617oV0cveJtUhcpUu/config
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> meta data:
-> -----------
->     git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
->     git_sha: a25006a77348ba06c7bc96520d331cd9dd370715
->     git_short_log: a25006a77348 (\"Add linux-next specific files for 20211001\")
->     kconfig:  ppc6xx_defconfig
->     kernel_version: 5.15.0-rc3
->     target_arch: powerpc
->     toolchain: gcc-11
-> 
-> steps to reproduce:
-> https://builds.tuxbuild.com/1ytcB62L9I617oV0cveJtUhcpUu/tuxmake_reproducer.sh
-
-Does this fix it?
 
 
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index f7e3482e846b..4b91c9aa5892 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -27,6 +27,7 @@
- #include <linux/module.h>
- #include <linux/spinlock.h>
- #include <linux/wait.h>
-+#include <linux/major.h>
- #include <asm/io.h>
- #include <asm/dbdma.h>
- #include <asm/prom.h>
+On 2021-10-01 11:45 a.m., Jason Gunthorpe wrote:
+>> Before the invalidation, an active flag is cleared to ensure no new
+>> mappings can be created while the unmap is proceeding.
+>> unmap_mapping_range() should sequence itself with the TLB flush and
+> 
+> AFIAK unmap_mapping_range() kicks off the TLB flush and then
+> returns. It doesn't always wait for the flush to fully finish. Ie some
+> cases use RCU to lock the page table against GUP fast and so the
+> put_page() doesn't happen until the call_rcu completes - after a grace
+> period. The unmap_mapping_range() does not wait for grace periods.
 
--- 
-Jens Axboe
+Admittedly, the tlb flush code isn't the easiest code to understand.
+But, yes it seems at least on some arches the pages are freed by
+call_rcu(). But can't this be fixed easily by adding a synchronize_rcu()
+call after calling unmap_mapping_range()? Certainly after a
+synchronize_rcu(), the TLB has been flushed and it is safe to free those
+pages.
 
+>> P2PDMA follows this pattern, except pages are not mapped linearly and
+>> are returned to the genalloc when their refcount falls to 1. This only
+>> happens after a VMA is closed which should imply the PTEs have already
+>> been unlinked from the pages. 
+> 
+> And here is the problem, since the genalloc is being used we now care
+> that a page should not continue to be accessed by userspace after it
+> has be placed back into the genalloc. I suppose fsdax has the same
+> basic issue too.
+
+Ok, similar question. Then if we call synchronize_rcu() in vm_close(),
+before the put_page() calls which return the pages to the genalloc,
+would that not guarantee the TLBs have been appropriately flushed?
+
+
+>> Not to say that all this couldn't use a big conceptual cleanup. A
+>> similar question exists with the single find_special_page() user
+>> (xen/gntdev) and it's definitely not clear what the differences are
+>> between the find_special_page() and vmf_insert_mixed() techniques and
+>> when one should be used over the other. Or could they both be merged to
+>> use the same technique?
+> 
+> Oh that gntdev stuff is just nonsense. IIRC is trying to delegate
+> control over a PTE entry itself to the hypervisor.
+> 
+> 		/*
+> 		 * gntdev takes the address of the PTE in find_grant_ptes() and
+> 		 * passes it to the hypervisor in gntdev_map_grant_pages(). The
+> 		 * purpose of the notifier is to prevent the hypervisor pointer
+> 		 * to the PTE from going stale.
+> 		 *
+> 		 * Since this vma's mappings can't be touched without the
+> 		 * mmap_lock, and we are holding it now, there is no need for
+> 		 * the notifier_range locking pattern.
+> 
+> I vaugely recall it stuffs in a normal page then has the hypervisor
+> overwrite the PTE. When it comes time to free the PTE it recovers the
+> normal page via the 'find_special_page' hack and frees it. Somehow the
+> hypervisor is also using the normal page for something.
+> 
+> It is all very strange and one shouldn't think about it :|
+
+Found this from an old commit message which seems to be a better
+explanation, though I still don't fully understand it:
+
+   In a Xen PV guest, the PTEs contain MFNs so get_user_pages() (for
+   example) must do an MFN to PFN (M2P) lookup before it can get the
+   page.  For foreign pages (those owned by another guest) the M2P
+   lookup returns the PFN as seen by the foreign guest (which would be
+   completely the wrong page for the local guest).
+
+   This cannot be fixed up improving the M2P lookup since one MFN may be
+   mapped onto two or more pages so getting the right page is impossible
+   given just the MFN.
+
+Yes, all very strange.
+
+Logan
