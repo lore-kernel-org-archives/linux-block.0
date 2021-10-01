@@ -2,147 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1017DC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 07:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EB2C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 10:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFE4561A56
-	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 07:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B50F161A56
+	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 10:50:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231431AbhJAHiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Oct 2021 03:38:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50040 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231222AbhJAHiI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Oct 2021 03:38:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1B28D61A56;
-        Fri,  1 Oct 2021 07:36:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1633073784;
-        bh=F7FORTn48/F8tKh/vrqU2iD+S5SdTTcOrGHdRF5xuhM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CUgDaxumqVLgqn5UYFFs4mpQVt+mTF64KU4Ol2Hpz3AXUJbyqqHxxqzpxpovAyl17
-         dIw9UynDCXMIIzcTu011qomNHpSpWZm7DFTqorTSwaUFVQc9MJx728NI3CVmq2vf9E
-         b911fk7Qfn0pqUfUDFQ9SJOCE+OaLeByr8CHx7ME=
-Date:   Fri, 1 Oct 2021 09:36:22 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Long Li <longli@microsoft.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Siddharth Gupta <sidgup@codeaurora.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [Patch v5 0/3] Introduce a driver to support host accelerated
- access to Microsoft Azure Blob for Azure VM
-Message-ID: <YVa6dtvt/BaajmmK@kroah.com>
-References: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
- <e249d88b-6ca2-623f-6f6e-9547e2b36f1f@acm.org>
- <BY5PR21MB15060F1B9CDB078189B76404CEF29@BY5PR21MB1506.namprd21.prod.outlook.com>
- <YQwvL2N6JpzI+hc8@kroah.com>
- <BY5PR21MB1506A93E865A8D6972DD0AAECEF49@BY5PR21MB1506.namprd21.prod.outlook.com>
- <YQ9oTBSRyHCffC2k@kroah.com>
- <BY5PR21MB15065658FA902CC0BC162956CEF79@BY5PR21MB1506.namprd21.prod.outlook.com>
- <BY5PR21MB1506091AFED0EB62F081313ECEA29@BY5PR21MB1506.namprd21.prod.outlook.com>
- <DM6PR21MB15135923A4CB0E61786ABC22CEAA9@DM6PR21MB1513.namprd21.prod.outlook.com>
+        id S1352478AbhJAKv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Oct 2021 06:51:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58758 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1352491AbhJAKv4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Oct 2021 06:51:56 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D6C8C061775
+        for <linux-block@vger.kernel.org>; Fri,  1 Oct 2021 03:50:11 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id l7so9481485edq.3
+        for <linux-block@vger.kernel.org>; Fri, 01 Oct 2021 03:50:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Q0Ww4rdF93vuhLA9EB8gy8zyZFUhPSXKcFE+ISMqwg0=;
+        b=wcZvcDO43h0zIQAIwDovuHJoDyirgyV5cYvW5x/H2yCkDuPswY2OXVOEu2D6AO34fY
+         ANbbxnLfGpBpoFxboRHaYI6de6ydIWbE9N/zqKULfh62kUJseMiS6lXYkZhCq1l3MPYe
+         vV/m835fq8UqpAUioTWa1xBfwLmCMRRHHGD32+KqCy1io9pahXpjxvmraJcDHpafrg6S
+         7fwzn/I7Dnx6kukl7wxM0JCKQGwgXRkn0f3MywMCJJSo0hpDiiGLO19qaMuSTab4GlXx
+         pDdDxXeyS9MRNBmBB4u6kydOaUCPQ0rhs/5kvQkB/ChD/LGPuggPgFz7aE2PmmGJjJWi
+         ZVMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Q0Ww4rdF93vuhLA9EB8gy8zyZFUhPSXKcFE+ISMqwg0=;
+        b=2sqTQavD/5hUc30jJwewjyWdM0eXZfKcs1jLmqg/gwmHbID9WKLnVopC9X5AGzbwEG
+         o0ot65qo0TNK/6igR2wM0wkuahA9UsBS8fkHlWK+mXbWHR6p6F2MXg3ldM+YqhvTvgpq
+         BlTZpa1h3Cuhfbk3tMVCFK7mCXu4RyTgyl+AzUK3AZrvZm2bBSRsN9ELLEZPWUZf+axu
+         d+GroeOD70hUyFS0O117uQKiwVZsiVFkAPSekDh6TFu+4FM7tCP1gZWhfbDKHJFtN5LB
+         zMxIZbpQzoXbfgwJe2/kgaNxYttqihmQbJJH2ZHu/kDRbTsSw9jq1yZyQ1Jn5wfKZlKD
+         J6WA==
+X-Gm-Message-State: AOAM532K4sEfEOGdvZr8d5nr3Nd68vRpsgsripMuitvbCGZc38ZBJO4c
+        6pY4UtRYMXcS+l2x/JvNh0PNbFElllju022CG+HCIW3dEpKT+Q==
+X-Google-Smtp-Source: ABdhPJwC3mpxAp+yFDP18LlzEJJAxEi6YO60QJjagz4jHMt+1+jwJGVWTjZvA/aTzdbygkEXB/7hehkVUmcIc20uTW8=
+X-Received: by 2002:a05:6402:1778:: with SMTP id da24mr13776581edb.398.1633085409734;
+ Fri, 01 Oct 2021 03:50:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR21MB15135923A4CB0E61786ABC22CEAA9@DM6PR21MB1513.namprd21.prod.outlook.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Fri, 1 Oct 2021 16:19:58 +0530
+Message-ID: <CA+G9fYsKjyOL1xj+GFC=Ab7Yw+b0Tg9jf8uvnN2tOc6OdupA-Q@mail.gmail.com>
+Subject: swim3.c:1200:38: error: 'FLOPPY_MAJOR' undeclared (first use in this function)
+To:     open list <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        lkft-triage@lists.linaro.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 10:25:12PM +0000, Long Li wrote:
-> > Greg,
-> > 
-> > I apologize for the delay. I have attached the Java transport library (a tgz file)
-> > in the email. The file is released for review under "The MIT License (MIT)".
-> > 
-> > The transport library implemented functions needed for reading from a Block
-> > Blob using this driver. The function for transporting I/O is
-> > Java_com_azure_storage_fastpath_driver_FastpathDriver_read(), defined
-> > in "./src/fastpath/jni/fpjar_endpoint.cpp".
-> > 
-> > In particular, requestParams is in JSON format (REST) that is passed from a
-> > Blob application using Blob API for reading from a Block Blob.
-> > 
-> > For an example of how a Blob application using the transport library, please
-> > see Blob support for Hadoop ABFS:
-> > https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgith
-> > ub.com%2Fapache%2Fhadoop%2Fpull%2F3309%2Fcommits%2Fbe7d12662e2
-> > 3a13e6cf10cf1fa5e7eb109738e7d&amp;data=04%7C01%7Clongli%40microsof
-> > t.com%7C3acb68c5fd6144a1857908d97e247376%7C72f988bf86f141af91ab2d7
-> > cd011db47%7C1%7C0%7C637679518802561720%7CUnknown%7CTWFpbGZsb
-> > 3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0
-> > %3D%7C1000&amp;sdata=6z3ZXPtMC5OvF%2FgrtbcRdFlqzzR1xJNRxE2v2Qrx
-> > FL8%3D&amp;reserved=0
+Following build errors noticed while building Linux next 20211001
+with gcc-11 for powerpc architecture.
 
-Odd url :(
+kernel/sched/debug.c: In function 'print_cfs_group_stats':
+kernel/sched/debug.c:460:41: warning: unused variable 'stats'
+[-Wunused-variable]
+  460 |                struct sched_statistics *stats =
+__schedstats_from_se(se);
+      |                                         ^~~~~
+In file included from include/linux/blkdev.h:6,
+                 from include/linux/blk-mq.h:5,
+                 from drivers/block/swim3.c:24:
+drivers/block/swim3.c: In function 'swim3_attach':
+drivers/block/swim3.c:1200:38: error: 'FLOPPY_MAJOR' undeclared (first
+use in this function)
+ 1200 |                 rc = register_blkdev(FLOPPY_MAJOR, "fd");
+      |                                      ^~~~~~~~~~~~
+include/linux/genhd.h:276:27: note: in definition of macro 'register_blkdev'
+  276 |         __register_blkdev(major, name, NULL)
+      |                           ^~~~~
+drivers/block/swim3.c:1200:38: note: each undeclared identifier is
+reported only once for each function it appears in
+ 1200 |                 rc = register_blkdev(FLOPPY_MAJOR, "fd");
+      |                                      ^~~~~~~~~~~~
+include/linux/genhd.h:276:27: note: in definition of macro 'register_blkdev'
+  276 |         __register_blkdev(major, name, NULL)
+      |                           ^~~~~
+make[3]: *** [scripts/Makefile.build:288: drivers/block/swim3.o] Error 1
+make[3]: Target '__build' not remade because of errors.
+make[2]: *** [scripts/Makefile.build:571: drivers/block] Error 2
+make[2]: Target '__build' not remade because of errors.
+make[1]: *** [Makefile:2034: drivers] Error 2
 
-> > In ABFS, the entry point for using Blob I/O is at AbfsRestOperation
-> > executeRead() in hadoop-tools/hadoop-
-> > azure/src/main/java/org/apache/hadoop/fs/azurebfs/services/AbfsInputStr
-> > eam.java, from line 553 to 564, this function eventually calls into
-> > executeFastpathRead() in hadoop-tools/hadoop-
-> > azure/src/main/java/org/apache/hadoop/fs/azurebfs/services/AbfsClient.ja
-> > va.
-> > 
-> > ReadRequestParameters is the data that is passed to requestParams
-> > (described above) in the transport library. In this Blob application use-case,
-> > ReadRequestParameters has eTag and sessionInfo (sessionToken). They are
-> > both defined in this commit, and are treated as strings passed in JSON format
-> > to I/O issuing function
-> > Java_com_azure_storage_fastpath_driver_FastpathDriver_read() in the
-> > transport library using this driver.
-> > 
-> > Thanks,
-> > Long
-> 
-> Hello Greg,
-> 
-> I have shared the source code of the Blob client using this driver, and the reason why the Azure Blob driver is not implemented through POSIX with file system and Block layer.
+Build config:
+https://builds.tuxbuild.com/1ytcB62L9I617oV0cveJtUhcpUu/config
 
-Please wrap your text lines...
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Anyway, no, you showed a client for this interface, but you did not
-explain why this could not be implemented using a filesystem and block
-layer.  Only that it is not what you did.
+meta data:
+-----------
+    git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+    git_sha: a25006a77348ba06c7bc96520d331cd9dd370715
+    git_short_log: a25006a77348 (\"Add linux-next specific files for 20211001\")
+    kconfig:  ppc6xx_defconfig
+    kernel_version: 5.15.0-rc3
+    target_arch: powerpc
+    toolchain: gcc-11
 
-> Blob APIs are specified in this doc:
-> https://docs.microsoft.com/en-us/rest/api/storageservices/blob-service-rest-api
-> 
-> The semantic of reading data from Blob is specified in this doc:
-> https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob
-> 
-> The source code I shared demonstrated how a Blob is read to Hadoop through ABFS. In general, A Blob client can use any optional request headers specified in the API suitable for its specific application. The Azure Blob service is not designed to be POSIX compliant. I hope this answers your question on why this driver is not implemented at file system or block layer.
+steps to reproduce:
+https://builds.tuxbuild.com/1ytcB62L9I617oV0cveJtUhcpUu/tuxmake_reproducer.sh
 
-
-Again, you are saying "it is this way because we created it this way",
-which does not answer the question of "why were you required to do it
-this way", right?
-
-> Do you have more comments on this driver?
-
-Again, please answer _why_ you are going around the block layer and
-creating a new api that circumvents all of the interfaces and
-protections that the normal file system layer provides.  What is lacking
-in the existing apis that has required you to create a new one that is
-incompatible with everything that has ever existed so far?
-
-thanks,
-
-greg k-h
+--
+Linaro LKFT
+https://lkft.linaro.org
