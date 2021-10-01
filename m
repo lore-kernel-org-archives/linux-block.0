@@ -2,142 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69805C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 13:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5587C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 15:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A5BD619F9
-	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 13:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE51961AD1
+	for <linux-block@archiver.kernel.org>; Fri,  1 Oct 2021 15:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231537AbhJANuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Oct 2021 09:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44450 "EHLO
+        id S231936AbhJAPDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Oct 2021 11:03:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231502AbhJANun (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Oct 2021 09:50:43 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611BAC06177D
-        for <linux-block@vger.kernel.org>; Fri,  1 Oct 2021 06:48:59 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id x12so9123006qkf.9
-        for <linux-block@vger.kernel.org>; Fri, 01 Oct 2021 06:48:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=LG5nuVM12UKCUvMUz/H7oZ+JnPtb7xeOrg+cdikjdUw=;
-        b=i2nZSJalGl2HFR2lljteQga9LLzznj1VY4sKfMFrOuI5TPw+9fxa9Y7VF6ORCDu6gf
-         s1VZcbmu8prmAySSW0muDV9sPFy+ocsOAHMu7czDjdTka8/r9gDirvuLv+DjNcMP+yu2
-         2vpgG0jpIzFJO3o2EESr3Knc9sAVcu/3zrGpfyryk0rXsa3CM7UVEgJZI2lyiRkkfNpM
-         06X0/la9ZF1/JOw1nIH1hT6QVKTk7TJuv33hiHw5ih9p7MWcfmzNHEd0oxDuij3diKPb
-         ruwnbMTM1vlfPcAVocSCOhTaVtV1FJ3tIhW47hPjbC6RUYlSTDx8/p4BvGKL4lQu/579
-         YBXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LG5nuVM12UKCUvMUz/H7oZ+JnPtb7xeOrg+cdikjdUw=;
-        b=Vb2tFaGftm4Io76EnBMJ3InE+BFtDVJYisvOuQ0/evh4UEfQmLcijr6jrlgrbVgdKe
-         MQDhNXoI8Uo4kzYxH9FMtYEuGpUoWzNILvWsacytjifojZXNHpIKTBGUVX06z187k7/j
-         FRQRLkVARNjdlSbNFKhZqCLKOtbcznvamNjkRWvw+9pDNEhdO0E4/gcXyC8fwYIC33Lj
-         mtk1895MPb3/V1SKs2enH8zRo9zQ4zUSV5VwHCUU2ve2fdEc7cfkX3AGSCkLwjw96/hZ
-         nN/pgE572JAjCUYJbn2M6nM1eu/IMhx8CMyPvOlhW78myOPx3iKzTjeH8JR52sR37tBL
-         3udQ==
-X-Gm-Message-State: AOAM533VIYtCVZguNId2kvmJq/ykjRwF/VMIXLCckEAPbG8UYUWuupIE
-        ZUTZImjy3lX0/llcHhqVF6GnuQ==
-X-Google-Smtp-Source: ABdhPJxAWiRAix1MOnP+fusB3RWFs4aefuUjIqiau0+pjC7MwPUEHTq7EjNfCISJpSPUQC5qQMYTaw==
-X-Received: by 2002:a37:65d6:: with SMTP id z205mr9907719qkb.522.1633096138367;
-        Fri, 01 Oct 2021 06:48:58 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id u19sm3747206qtx.40.2021.10.01.06.48.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Oct 2021 06:48:57 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mWIuG-008R2P-Oj; Fri, 01 Oct 2021 10:48:56 -0300
-Date:   Fri, 1 Oct 2021 10:48:56 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: Re: [PATCH v3 19/20] PCI/P2PDMA: introduce pci_mmap_p2pmem()
-Message-ID: <20211001134856.GN3544071@ziepe.ca>
-References: <20210916234100.122368-1-logang@deltatee.com>
- <20210916234100.122368-20-logang@deltatee.com>
- <20210928195518.GV3544071@ziepe.ca>
- <8d386273-c721-c919-9749-fc0a7dc1ed8b@deltatee.com>
- <20210929230543.GB3544071@ziepe.ca>
- <32ce26d7-86e9-f8d5-f0cf-40497946efe9@deltatee.com>
- <20210929233540.GF3544071@ziepe.ca>
- <f9a83402-3d66-7437-ca47-77bac4108424@deltatee.com>
- <20210930003652.GH3544071@ziepe.ca>
+        with ESMTP id S231881AbhJAPDA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Oct 2021 11:03:00 -0400
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [IPv6:2001:67c:2050::465:103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067B5C061775;
+        Fri,  1 Oct 2021 08:01:16 -0700 (PDT)
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:105:465:1:3:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4HLYGK2ddSzQjhJ;
+        Fri,  1 Oct 2021 17:01:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mailbox.org; h=
+        content-transfer-encoding:content-type:content-type:mime-version
+        :subject:subject:references:in-reply-to:message-id:from:from
+        :date:date:received; s=mail20150812; t=1633100470; bh=4J5HpEj9PI
+        gaNqH8sYcJ7kaGnNR9PO2w7go2s+EnliU=; b=Z29wguy+F6ITVnLKidGmdz5XFj
+        /daaHpKkhE/hZ1u6jv1rHoI5V65KVk32vWPZ9aTJ0JkKpSAtkMFOVmqQhgYqV35I
+        1hGpxA4FqVSFWgjcRTnypKOjeB0TCGoOSmdB7OH8KMPDXbgsnnvtOeR/SbGibJ2v
+        /P1NRtMKQfQe+ZtfmY2wVntajQgEXczLNM9D6jLUaj44Yk/fD9tGtAY3BTwby8Mv
+        FEBffJ3glRZLs7EzplhmrNazG2HzTxF+3uCoCN3P0pTXtFgdRcf5Zdym9PvfYQPP
+        YNXur94pedkOwAMVVUsHutrRsjAGPLw+Qb3NBa7s6bL4RL0FrncZrVwAmmWA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+        t=1633100471;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gC8lZCt63UyxoZI5uFbYTSMp7MC0RJhh8HtvLj0uzcE=;
+        b=wXs0HTMdzrenM41bwhyM/dG6JRMCyDAUnXVdp5h/F703F58/Prebonq2o27w8ZJ5Z/zz1G
+        lE/efA26342uaoee4e+eH4hMatsPtoclq553GgIRM+LBNwSoGcn/N2Sq6LYD+orryLUiOa
+        cNoocbmYUOdf4CFZzieR3A21v8y+D63BBg0vZ2vXrBwOhq4IGG6pniLR4JIDArX0Tlo7pf
+        g+Qjq3eIupGkYKxSzjOT0m4wLXkAOrQmhbTF0bTyzUbO1DY5tWX7xIk+Bf3voVJTMf1yAl
+        itYX/AqlCa0rwy+PusuPtFdYwHQoF7rC9n3JFJqUelw3w+cGoOLZHXXjbfm2TA==
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+Date:   Fri, 1 Oct 2021 17:01:09 +0200 (CEST)
+From:   torvic9@mailbox.org
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <1889051823.161943.1633100469857@office.mailbox.org>
+In-Reply-To: <1624640454.149631.1632987871186@office.mailbox.org>
+References: <1624640454.149631.1632987871186@office.mailbox.org>
+Subject: Re: [BUG] kernel BUG at mm/slub.c - possible BFQ issue?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210930003652.GH3544071@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Rspamd-Queue-Id: 8DFBA272
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 09:36:52PM -0300, Jason Gunthorpe wrote:
+> torvic9@mailbox.org hat am 30.09.2021 09:44 geschrieben:
+> 
+>  
+> Hello,
+> 
+> I encounter a hard freeze on both 5.14 and 5.15 when using BFQ.
+> Unfortunately, I do not have a full error log, because the computer
+> totally freezes and slightly corrupts the display, so it's
+> impossible to read the entire message.
+> 
+> However, what I could get is the following:
+> 
+>   kernel BUG at mm/slub.c:379
+>   invalid opcode: 0000 [#1]
+>   RIP: 0010:__slab_free
+>   [...]
+>   Call Trace:
+>   bfq_set_next_ioprio_data
+>   [...]
+>   bfq_put_queue
+>   bfq_insert_requests
+>   [...]
+> 
+> This issue appears more or less randomly and it sometimes takes a
+> little while to reproduce it (running fio helps).
+> The call trace always contains references to BFQ, but they are not
+> always the exact same. Once, I could see on the corrupted display
+> the message "general protection fault".
+> I could reproduce this issue on two computers.
+> 
+> Not quite sure but I *think* the issue first appeared somewhere around
+> 5.14.5 or 5.14.6, during which time BFQ only got the following commit:
+> 
+>   (88013a0c5d99) block, bfq: honor already-setup queue merges
 
-> Why would DAX want to do this in the first place?? This means the
-> address space zap is much more important that just speeding up
-> destruction, it is essential for correctness since the PTEs are not
-> holding refcounts naturally...
+I have now reverted the above commit and launched some heavy I/O like
+e.g. git kernel, fio, xz compression, and so far, no freezes anymore!
+Too early to say that this commit really is the cause though.
+Would be great if someone could have a look at it.
 
-It is not really for this series to fix, but I think the whole thing
-is probably racy once you start allowing pte_special pages to be
-accessed by GUP.
-
-If we look at unmapping the PTE relative to GUP fast the important
-sequence is how the TLB flushing doesn't decrement the page refcount
-until after it knows any concurrent GUP fast is completed. This is
-arch specific, eg it could be done async through a call_rcu handler.
-
-This ensures that pages can't cross back into the free pool and be
-reallocated until we know for certain that nobody is walking the PTEs
-and could potentially take an additional reference on it. The scheme
-cannot rely on the page refcount being 0 because oce it goes into the
-free pool it could be immeidately reallocated back to a non-zero
-refcount.
-
-A DAX user that simply does an address space invalidation doesn't
-sequence itself with any of this mechanism. So we can race with a
-thread doing GUP fast and another thread re-cycling the page into
-another use - creating a leakage of the page from one security context
-to another.
-
-This seems to be made worse for the pgmap stuff due to the wonky
-refcount usage - at least if the refcount had dropped to zero gup fast
-would be blocked for a time, but even that doesn't happen.
-
-In short, I think using pg special for anything that can be returned
-by gup fast (and maybe even gup!) is racy/wrong. We must have the
-normal refcount mechanism work for correctness of the recycling flow.
-
-I don't know why DAX did this, I think we should be talking about
-udoing it all of it, not just the wonky refcounting Alistair and Felix
-are working on, but also the use of MIXEDMAP and pte special for
-struct page backed memory.
-
-Jason
+> 
+> 5.13 doesn't seem to be affected AFAICS.
+> 
+> Does anyone have an idea what is going on?
+> I will now revert the above commit and see if that helps...
+> 
+> Thanks,
+> Tor
