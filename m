@@ -2,193 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EE5C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 15:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D19C433FE
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 18:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13EC161357
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 15:39:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1AE06139E
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 18:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235542AbhJDPlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Oct 2021 11:41:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38459 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234314AbhJDPla (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Oct 2021 11:41:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633361981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qU1FtB2Eld4jQppv2Kg9J4SKZoBotXi+g3+/KDP2nB0=;
-        b=Ji1ekAVtELkiAF3gBH5NEDrs1pRF5oKB1QAMKpaKVDAn9JfMz4BTr+ZVoaP+4ANTsB/MkF
-        OXlp81kBY7gFHKaeo1o9XIJnOQMwejgBOHqSnof5yaOXH5THF3T2MSJwAmDsf3797rkW4p
-        nMBYsnrxh09ttdb2BTj+3Q2w8npkR8c=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-VzJmoiALMJi9dzgnN1SClg-1; Mon, 04 Oct 2021 11:39:39 -0400
-X-MC-Unique: VzJmoiALMJi9dzgnN1SClg-1
-Received: by mail-ed1-f70.google.com with SMTP id w6-20020a50d786000000b003dabc563406so13195904edi.17
-        for <linux-block@vger.kernel.org>; Mon, 04 Oct 2021 08:39:38 -0700 (PDT)
+        id S238617AbhJDSaz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Oct 2021 14:30:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238633AbhJDSaw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Oct 2021 14:30:52 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9CD1C061749;
+        Mon,  4 Oct 2021 11:29:02 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id rm6-20020a17090b3ec600b0019ece2bdd20so565904pjb.1;
+        Mon, 04 Oct 2021 11:29:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ksk0ituITPDur7VOi1jCXxieV8Du5TeIguFZkpAVdZs=;
+        b=iccVLZIu59DB5VPOrdxx0bcJFMS/iGHtuLWCAMdKR/gBUXElbZvJTn6B5bMYOsrHnZ
+         xuWo7RKx36K5p+IvSTKGNUw3YM2W1xLIucrR8Z1UrutBLiLzi5mgNGVjtJAz/QJxQ9Jt
+         kWB7Cmh5xaWcTrNSlXGdozrtBCeu5w5iY4y7aVE0DEwqyxChwAhcrolcXYIj1J5Uk3KC
+         f/UA+RvUyKkT8c+fWJ8zmNbTMufzlrrAoqu4C6y/oP0GxY1e6n3XlDOoZ2VTRNNNIq8i
+         piENPpRSmZV1YQLjeTi6b1SlzLg/LndQ8R8JQIR4+Oo7na8633EximFc9+QZ4+MIMb2t
+         RxeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qU1FtB2Eld4jQppv2Kg9J4SKZoBotXi+g3+/KDP2nB0=;
-        b=1ZEYhxuLKiLIrYXzE1HdmYDIBC8VgQQvDDB6/t/Lr+Dli1FYRErjT7g3z/eBjQiK9W
-         /DubYjbG/uD5Ox+UVVpbB956siGpFKArgeopQDs8VFuJpJgf6n7Hhppqxg/N8jOolnvu
-         hFqG4u3HmZTdB2k6flYP8LPBLHO73ET/sY4iRXrG3aRnWqruefws0Prati3dCkJon5NT
-         1zDXUg5qSpO7uZbbIryQKUl9MhETYpg5XZV/T0jO0hmMDBTqekv2BNuJqGYphnObKeY9
-         HEC6H+5076Kjgn75Uo6gwECpvLiWfaGxDYJY/jhHYMSmZRQ8Pe/FgPgkSQeB3sIigrD5
-         Gm6A==
-X-Gm-Message-State: AOAM532hux9pWYeggA5i4UTag+c3bBHLFk3BlnPXqNd2X3LS7xCX/PVj
-        qfly8+BwPEWJVvr12vz5r4l+PXv4/vgaYZ6bfF7PiclB1dVb6K6rd25Cd/er5yxqO3ziWAPEvFF
-        xyY2URMD5h6OYL7QmjIAr+88=
-X-Received: by 2002:a17:906:a2c9:: with SMTP id by9mr13462723ejb.305.1633361977034;
-        Mon, 04 Oct 2021 08:39:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJymXaxS/ytfZ06+7jKPOhRySBzCqaPSUjBwPFfvyPHjd3iZN7oI5pN28PgDrC2yAGlapCwmMA==
-X-Received: by 2002:a17:906:a2c9:: with SMTP id by9mr13462700ejb.305.1633361976806;
-        Mon, 04 Oct 2021 08:39:36 -0700 (PDT)
-Received: from redhat.com (93-172-224-64.bb.netvision.net.il. [93.172.224.64])
-        by smtp.gmail.com with ESMTPSA id o5sm7374753eds.26.2021.10.04.08.39.35
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=ksk0ituITPDur7VOi1jCXxieV8Du5TeIguFZkpAVdZs=;
+        b=2yZcF7Y2kT9E+r4MIx7oYk+h+ihA24voUKO80KxYQALro7N5AVKGjXHptP7c/Zz0xw
+         GCT4939HzIXCIVGtQEc3NT/+qkZbiUm2x9eg65Vpl0Rhcbc89rDAb9/30g1VVtIRaYAZ
+         u716kdm9MmTNXJXnMGLFOfD+NKc3QCOSokaaJxgLjM6Mimm+BvRlUks742lnCjwNa9yZ
+         vhC/4/F4MJt7Or2/uH9yR2WhqZeU37Ej5XGFDRSh5CQF3hmEJ3gb5Mr+/VGRuZI+Vudt
+         DJq8zPnd1swZDNKnjzYBCExQmwoYgPdHu10P18/tpQAZNhkF/osTMLiw8iYwrgW81wyX
+         47RA==
+X-Gm-Message-State: AOAM532NVNtN5PYQebiuJtmgag4RVsz1VTLqi+mFIomfVH6cWLWtUPgq
+        RzIuJ0zfzoz1uTdPRBcPtEI=
+X-Google-Smtp-Source: ABdhPJx6K9cY4Ez2SM0zDinX5vRHY+dnuuStKoVmdFQ59mUKuTYIX3wud8X0wgvomj/ZkUoS6lac+Q==
+X-Received: by 2002:a17:90a:5d01:: with SMTP id s1mr32191111pji.16.1633372142227;
+        Mon, 04 Oct 2021 11:29:02 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:db55:938c:e15a:4670])
+        by smtp.gmail.com with ESMTPSA id 17sm15888836pgr.10.2021.10.04.11.29.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 08:39:36 -0700 (PDT)
-Date:   Mon, 4 Oct 2021 11:39:33 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     jasowang@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
- space
-Message-ID: <20211004113722-mutt-send-email-mst@kernel.org>
-References: <20210809101609.148-1-xieyongji@bytedance.com>
- <20211004112623-mutt-send-email-mst@kernel.org>
+        Mon, 04 Oct 2021 11:29:01 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 4 Oct 2021 11:28:59 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Brian Geffon <bgeffon@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        Suleiman Souhlal <suleiman@google.com>,
+        Jesse Barnes <jsbarnes@google.com>
+Subject: Re: [PATCH] zram: Allow backing device to be assigned after init
+Message-ID: <YVtH60zyzq9AhUv2@google.com>
+References: <20211001181627.394921-1-bgeffon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211004112623-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20211001181627.394921-1-bgeffon@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 04, 2021 at 11:27:29AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Aug 09, 2021 at 06:16:09PM +0800, Xie Yongji wrote:
-> > An untrusted device might presents an invalid block size
-> > in configuration space. This tries to add validation for it
-> > in the validate callback and clear the VIRTIO_BLK_F_BLK_SIZE
-> > feature bit if the value is out of the supported range.
-> > 
-> > And we also double check the value in virtblk_probe() in
-> > case that it's changed after the validation.
-> > 
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+On Fri, Oct 01, 2021 at 11:16:27AM -0700, Brian Geffon wrote:
+> There does not appear to be a technical reason to not
+> allow the zram backing device to be assigned after the
+> zram device is initialized.
 > 
-> So I had to revert this due basically bugs in QEMU.
+> This change will allow for the backing device to be assigned
+> as long as no backing device is already assigned. In that
+> event backing_dev would return -EEXIST.
 > 
-> My suggestion at this point is to try and update
-> blk_queue_logical_block_size to BUG_ON when the size
-> is out of a reasonable range.
+> Signed-off-by: Brian Geffon <bgeffon@google.com>
+> ---
+>  drivers/block/zram/zram_drv.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> This has the advantage of fixing more hardware, not just virtio.
-> 
-> 
-> 
-> > ---
-> >  drivers/block/virtio_blk.c | 39 +++++++++++++++++++++++++++++++++------
-> >  1 file changed, 33 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 4b49df2dfd23..afb37aac09e8 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -692,6 +692,28 @@ static const struct blk_mq_ops virtio_mq_ops = {
-> >  static unsigned int virtblk_queue_depth;
-> >  module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
-> >  
-> > +static int virtblk_validate(struct virtio_device *vdev)
-> > +{
-> > +	u32 blk_size;
-> > +
-> > +	if (!vdev->config->get) {
-> > +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > +			__func__);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
-> > +		return 0;
-> > +
-> > +	blk_size = virtio_cread32(vdev,
-> > +			offsetof(struct virtio_blk_config, blk_size));
-> > +
-> > +	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
-> > +		__virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int virtblk_probe(struct virtio_device *vdev)
-> >  {
-> >  	struct virtio_blk *vblk;
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index fcaf2750f68f..12b4555ee079 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -462,9 +462,9 @@ static ssize_t backing_dev_store(struct device *dev,
+>  		return -ENOMEM;
+>  
+>  	down_write(&zram->init_lock);
+> -	if (init_done(zram)) {
+> -		pr_info("Can't setup backing device for initialized device\n");
+> -		err = -EBUSY;
+> +	if (zram->backing_dev) {
+> +		pr_info("Backing device is already assigned\n");
+> +		err = -EEXIST;
+>  		goto out;
 
-I started wondering about this. So let's assume is
-PAGE_SIZE < blk_size (after all it's up to guest at many platforms).
+Hi Brian,
 
-Will using the device even work given blk size is less than what
-is can support?
+I am worry about the inconsistency with other interface of current zram
+set up. They were supposed to set it up before zram disksize setting
+because it makes code more simple/maintainalbe in that we don't need
+to check some feature on the fly.
 
-And what exactly happens today if blk_size is out of this range?
-
-
-
-
-
-> > @@ -703,12 +725,6 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >  	u8 physical_block_exp, alignment_offset;
-> >  	unsigned int queue_depth;
-> >  
-> > -	if (!vdev->config->get) {
-> > -		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > -			__func__);
-> > -		return -EINVAL;
-> > -	}
-> > -
-> >  	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
-> >  			     GFP_KERNEL);
-> >  	if (err < 0)
-> > @@ -823,6 +839,14 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >  	else
-> >  		blk_size = queue_logical_block_size(q);
-> >  
-> > +	if (unlikely(blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)) {
-> > +		dev_err(&vdev->dev,
-> > +			"block size is changed unexpectedly, now is %u\n",
-> > +			blk_size);
-> > +		err = -EINVAL;
-> > +		goto err_cleanup_disk;
-> > +	}
-> > +
-> >  	/* Use topology information if available */
-> >  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
-> >  				   struct virtio_blk_config, physical_block_exp,
-> > @@ -881,6 +905,8 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >  	device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
-> >  	return 0;
-> >  
-> > +err_cleanup_disk:
-> > +	blk_cleanup_disk(vblk->disk);
-> >  out_free_tags:
-> >  	blk_mq_free_tag_set(&vblk->tag_set);
-> >  out_free_vq:
-> > @@ -983,6 +1009,7 @@ static struct virtio_driver virtio_blk = {
-> >  	.driver.name			= KBUILD_MODNAME,
-> >  	.driver.owner			= THIS_MODULE,
-> >  	.id_table			= id_table,
-> > +	.validate			= virtblk_validate,
-> >  	.probe				= virtblk_probe,
-> >  	.remove				= virtblk_remove,
-> >  	.config_changed			= virtblk_config_changed,
-> > -- 
-> > 2.11.0
-
+Let's think about when zram extends the writeback of incompressible
+page on demand. The write path will need the backing_dev under
+down_read(&zarm->init_lock) or other conditional variable to check
+whether the feature is enabled or not on the fly.
+It adds locking dependency as well as performance overhead(I don't
+think it's a good deal that scarfice hot path for rare event even
+though it's not that big).
