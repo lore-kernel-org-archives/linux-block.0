@@ -2,434 +2,263 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51240C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 13:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583A0C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 13:24:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A3C861AFF
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 13:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A3F61507
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 13:24:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234289AbhJDNFu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Oct 2021 09:05:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44948 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233954AbhJDNDw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Oct 2021 09:03:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633352522;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WDwZjIkjDMi/DSkQPvF1GldI3TJvYlgRsEkEEdP+wYU=;
-        b=F3qMBk6G6bJUuZgwvl4YCZwOG5vlX9MYyQLsjmM4FuTlvq14no3aUb0xMajDJ/MHwc6nsD
-        yKLCp8wceUSaZsPvG11cUwxdmFHJyjQFrhqbjZxeqgpQDrMJ8e9YvZH4M4Cu/rjOPm6JRB
-        uQswusA+q3i9QojguUdOEOAbETnivyQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179--C0NnhIxNNmYt8iOUlgqFg-1; Mon, 04 Oct 2021 09:01:52 -0400
-X-MC-Unique: -C0NnhIxNNmYt8iOUlgqFg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95A3B8145F7;
-        Mon,  4 Oct 2021 13:01:50 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 406D11036B27;
-        Mon,  4 Oct 2021 13:01:34 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 194D1YWF000643;
-        Mon, 4 Oct 2021 09:01:34 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 194D1XWc000638;
-        Mon, 4 Oct 2021 09:01:33 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Mon, 4 Oct 2021 09:01:33 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Christoph Hellwig <hch@lst.de>
-cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH] loop: don't print warnings if the underlying filesystem
- doesn't support discard
-In-Reply-To: <20210924155822.GA10064@lst.de>
-Message-ID: <alpine.LRH.2.02.2110040851130.30719@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.2109231539520.27863@file01.intranet.prod.int.rdu2.redhat.com> <20210924155822.GA10064@lst.de>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S237113AbhJDN0H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Oct 2021 09:26:07 -0400
+Received: from mail-mw2nam10on2080.outbound.protection.outlook.com ([40.107.94.80]:10080
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235037AbhJDNYa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Oct 2021 09:24:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KcLgTEcgaZm83N489GvkNHonV+7wjuOIw+8tdZPSe+ocdLVLMjZyno49i+/dg3pHe6wiD367yxCLsRB47wKQ0MijwRutGn6fi2nf+f7lB+R3D90g19yZQ+NbSInics2cEYpB1J0lquh7bFRx+ZEucs0JUGoyPX85w+j4Ubdmpdx0dY5NNNqrH235zNIkbgUbZ7in5g+6Byr8jQQvi3Nml2ilg+/HL8HzarSPkh3Sh/Wc4Au1qlpOw7cmAOxS1SbPEKQ+/ZV9DXQ5Yfw/YLwNq6a96UTh6W0xMydFj3L1qHUwFXImWuK1jKSWtXEnjWxp1mme5rH22W6ofZPeR8xTUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LAU71db1p8rdQgUjQB1Ns2sk4eURkc+wtnNP8/tDPHg=;
+ b=ESuZa1gz2RbbsZr20B7mS9i8TWVRxwOemOpm4pYRu6fpQqfOC80ohXaoNmoi7O0OdUB1k8mJnXvurxumyPRMBQVGYfUBsoz3oFjT40nQoHFAZR2jg3HxVdtx/cE8Vz1QaQ6y6QAHAEtte/RF524WcX2qfmrkFpm1dV1VoPWpbUeuZKpOVW8baZ6mVAlw5FQZWoijP6N7qF6kWofWNbBMMyhksLUuk78J+g1t8ArT2Tr5sguZFSH++v64CITaSTbJ6CMpzojYBEJNViqsIPBPoB3+cMplpa2oBJZ5HHE5SW5eD/jLjKbHEjcIaIVzRJp23lubCgcolKzxPPdATjHy5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LAU71db1p8rdQgUjQB1Ns2sk4eURkc+wtnNP8/tDPHg=;
+ b=0B0BVZl1w+La4sfzhJjZqexiinsHGuUdUHDYMc0RcAmgWapzah3OC6dczRd+Nh6FI1y/pv9XEzJwHDcUliAimRWVhJJqJKOittZP3Lna0GmtR2IaeX74tQg56fgVKINqHqBCxQqHF6evgEg6PW5ReGCV88uzHWlTeZZYpvAOS74=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from MWHPR1201MB0192.namprd12.prod.outlook.com
+ (2603:10b6:301:5a::14) by MWHPR1201MB0112.namprd12.prod.outlook.com
+ (2603:10b6:301:5a::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.15; Mon, 4 Oct
+ 2021 13:22:37 +0000
+Received: from MWHPR1201MB0192.namprd12.prod.outlook.com
+ ([fe80::55c7:6fc9:b2b1:1e6a]) by MWHPR1201MB0192.namprd12.prod.outlook.com
+ ([fe80::55c7:6fc9:b2b1:1e6a%10]) with mapi id 15.20.4566.022; Mon, 4 Oct 2021
+ 13:22:36 +0000
+Subject: Re: [PATCH v3 19/20] PCI/P2PDMA: introduce pci_mmap_p2pmem()
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Logan Gunthorpe <logang@deltatee.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+References: <8d386273-c721-c919-9749-fc0a7dc1ed8b@deltatee.com>
+ <20210929230543.GB3544071@ziepe.ca>
+ <32ce26d7-86e9-f8d5-f0cf-40497946efe9@deltatee.com>
+ <20210929233540.GF3544071@ziepe.ca>
+ <f9a83402-3d66-7437-ca47-77bac4108424@deltatee.com>
+ <20210930003652.GH3544071@ziepe.ca> <20211001134856.GN3544071@ziepe.ca>
+ <4fdd337b-fa35-a909-5eee-823bfd1e9dc4@deltatee.com>
+ <20211001174511.GQ3544071@ziepe.ca>
+ <809be72b-efb2-752c-31a6-702c8a307ce7@amd.com>
+ <20211004131102.GU3544071@ziepe.ca>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+Message-ID: <1e219386-7547-4f42-d090-2afd62a268d7@amd.com>
+Date:   Mon, 4 Oct 2021 15:22:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <20211004131102.GU3544071@ziepe.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: AM0P190CA0017.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::27) To MWHPR1201MB0192.namprd12.prod.outlook.com
+ (2603:10b6:301:5a::14)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received: from [192.168.178.21] (91.14.161.181) by AM0P190CA0017.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.15 via Frontend Transport; Mon, 4 Oct 2021 13:22:28 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7faa79b9-a537-46bc-3f3c-08d9873a0817
+X-MS-TrafficTypeDiagnostic: MWHPR1201MB0112:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MWHPR1201MB01121264D0A33595A226C0D883AE9@MWHPR1201MB0112.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0BEBo5sJrqIfeOlANh57LEpsqiq87iyNtxcceTwZFjCIreP60DaaTPm64JE9zY/6n63kSzDaw/1vjkhgy0syyxpWI+KbUk6lQObiz4HDjj0ZRcKwsd8+BdNHFn5qMR4RX92GAeU7C+Y5QQ84QxMLRhdmNyl5evyckI9Y6E7h+X+wcIrFxqcU+UXQYg4qHV8lQxM7i8pFYV3fpWwAkzfFSV3SBy5ZnG9rHZFPvQiJq3VBf3sXxqyFuEBAL/BxDZiVmZ6OMBhtz+y2rPwDYrsSI/yRBEgPmopuzvOfB0DM6buisnPY/gdB/zsooF+jOWjLCailBisc5iIS3HmexktI2oVu0HKNVsyvBzu7yD1XNHEX65t357nS0xjZyME9S88SjnFW+X+fo0sctInF6uGfeQqQx9h1Rrar3wHYJHp5GqEoCZQ1W3I3u1ANmMuz7uU1P4n67sWrjQPYOdWj7IuBWI5VnW/i23UALwFI2a/Hfb9IuNtjh/IlUYVNBZh4/8r5OlgAn6nv14TcKXLc/RlavWjqBNH0WGIomsyvOT5Pid8OwMc3Ym8Rp3PmEFPrUVppMAS+lzx6H9LDcFdh2ZVBWvCYt7OqNkkgP8bVlnDHUapnPn5lbf6u8amANL6gphSuMtbNPBeOfrcxjhwhzpEOIAWhMQLmHU/Nn0xdTAbWPv5HbD9XDqSuEkl00eF0oju4oowaKpe4AZ3emfg4RGfozAQtE07z7O17UzTqXuall1w=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1201MB0192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31686004)(316002)(5660300002)(83380400001)(31696002)(38100700002)(2616005)(8676002)(7416002)(6916009)(54906003)(66574015)(956004)(16576012)(8936002)(4326008)(2906002)(186003)(6666004)(26005)(86362001)(36756003)(508600001)(6486002)(66946007)(66556008)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vk9tSTJIRXFhSXZYemQvS2VQTzQzRlhuYXBVcHdRK3RzQTIySVZ1R3BFS2sy?=
+ =?utf-8?B?cVRSTXlub21MRDllZTJGTi85Ky9JUlNRSENxN2hybzR6MWY2Z2tJWW9MMlQy?=
+ =?utf-8?B?N3ZydGhhdmh1RW9HcFB6VTlBNnpwLzh4UzIybldYTGsyZ0Y5VEtIUDFzaTBP?=
+ =?utf-8?B?NkNJQ2dpSGJ1UG5ub0VEWmlScmtISlpTd0V3YUIzRVd6REh0UGlqOUZzbVZY?=
+ =?utf-8?B?cDV4aFNPY1Baem1mRWU5YzdLT29QWUFSQ2tLOG1EeFJuZWpBNFFzazVtLzNv?=
+ =?utf-8?B?U1hQMThHUFl2QzRUTHJRYXVDUzVnaG5JZlVJWHgzZ2I2K25QTHovNlYzb1Vm?=
+ =?utf-8?B?Q2xFdnk1TXZhbW5BN0hZVmJzazJaaGNVRHZpUlg3eTBnVFNYNWRESHNzdU1h?=
+ =?utf-8?B?SGZIMmhwaUhETWJtV1I1ZzY3RXF6RHViaGh6d3dGeS8xbk9rOGdWcE8xVHNx?=
+ =?utf-8?B?dUplVzVuY3JtWUJtb3VOMC9CVmJZQmRjTS9YRlRnOG4xRngxci9IcHdmTUxu?=
+ =?utf-8?B?OVRuRTV6Z3gvNjNVRW9HZm5hcmxxUEhqRDFNZ0RxQ3NOdjJJUHFYalBYbzR2?=
+ =?utf-8?B?d3RMSTJIRjUyZWhpREY1N1lmMWRrc245TlRKZERHMTdPKzBibWpPOFZjTUhl?=
+ =?utf-8?B?ek0zNG8rUVMyaVZkR1ZIN29QSmRZbkpncUx4a0JScElHUm9DVmFQS29WQm5p?=
+ =?utf-8?B?Q2dBOHNsZGRwQXFuTlc4aVdHYm1aencvdWxPTVd6Q2tjMzBRMDJjSHVNZ3l4?=
+ =?utf-8?B?SEprL1BPR3EzV3dubFpIeUNjcGE5RHBCaEJMR0ZxY1NjZEZMRzNiOWhRNGNH?=
+ =?utf-8?B?SlhrTDRPNjIyRmcxYWFGczhXSkwzSXVXNkVmYzIzb0xWZWRscmg2eE45YkZo?=
+ =?utf-8?B?OEdwWkVVL0d2VnRzdG93ODRXbWhMZXp0OTBTQlIyN2hBcGwrMkZ4TitRM0pZ?=
+ =?utf-8?B?YnZqdnc3WHpKZ3dMUkVUUUVZclJ2MGtnWlJwRkZHMjNYeEFBdUdmVWpuQUlk?=
+ =?utf-8?B?WEFPNWltSnRFejl2enZ5RWE3SmhseDZPcEIyeWtjanFaRHkzeUVPT1NQcnU5?=
+ =?utf-8?B?RFpPMEdLNndVUUN3MHd6cjNBZENqK0xQRG82dm83a1RYQWF3UHUwemdqVFNy?=
+ =?utf-8?B?ZllHQWtEWE9SdzkxRVh6RDlzanhsYmduUFMzZHhFUlhyT2t1SWRaRGRKQlVZ?=
+ =?utf-8?B?Y01ObnVreFpncFlNQnFYWk51OUlsUVlReDZJaTJENkZBNFBRSWZRRDBENjMx?=
+ =?utf-8?B?cUZET3owTnc4bHlyS3VHbThRREpTTWpwdUdmdktuOVM3T0kreWIzbDlvZmd5?=
+ =?utf-8?B?UHJkckVqcjZXYjUxemU5Y2twYXJYT0hBcTBNUlF3dDZuNWsrQlFDNXgxbk15?=
+ =?utf-8?B?Y25XUXlnRlNsY3gweWp3MDM0cFdSOWs1TGREaS9aVGRNWlhMODk1SXFZZDdw?=
+ =?utf-8?B?MEdjZEx3VmYwY3FnK01vN2lhdnlhYVBweDlCd2tyZXRsdmJqYkd0TGJjMlVq?=
+ =?utf-8?B?Z0d2TEV4SXVlUUZXTHZURzk3VHFEVVkrazlTNnZNT2pvcmpldndUbmNVdmJv?=
+ =?utf-8?B?bVVaRS9TeFlMVDJoeDd0czYyUFp0U21YQ2VGY1FEaElqc25FWThMMjZ1OEJX?=
+ =?utf-8?B?bUJ5OEdkQWUzYWFUOVpLOEhRTkNuYmNQV1ZGRU5OZEdmLzBsc01BemF0NHBq?=
+ =?utf-8?B?MDBMMDhnWndkalFWSk0weTdGRDBsV3kySFlDZW9kVERROVdCVDBPMzVtVDl5?=
+ =?utf-8?Q?cEgdy5Jv9eIgsST3VLJklQevNKq24AwJODb35a/?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7faa79b9-a537-46bc-3f3c-08d9873a0817
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1201MB0192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2021 13:22:36.7388
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MuJNwMMb4NTFiVQ9F93qmMM6VkSOKuzEfFgX6jFPM1ue1eGOtEW3wDH1N1y1oITa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB0112
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Am 04.10.21 um 15:11 schrieb Jason Gunthorpe:
+> On Mon, Oct 04, 2021 at 08:58:35AM +0200, Christian König wrote:
+>> I'm not following this discussion to closely, but try to look into it from
+>> time to time.
+>>
+>> Am 01.10.21 um 19:45 schrieb Jason Gunthorpe:
+>>> On Fri, Oct 01, 2021 at 11:01:49AM -0600, Logan Gunthorpe wrote:
+>>>
+>>>> In device-dax, the refcount is only used to prevent the device, and
+>>>> therefore the pages, from going away on device unbind. Pages cannot be
+>>>> recycled, as you say, as they are mapped linearly within the device. The
+>>>> address space invalidation is done only when the device is unbound.
+>>> By address space invalidation I mean invalidation of the VMA that is
+>>> pointing to those pages.
+>>>
+>>> device-dax may not have a issue with use-after-VMA-invalidation by
+>>> it's very nature since every PFN always points to the same
+>>> thing. fsdax and this p2p stuff are different though.
+>>>
+>>>> Before the invalidation, an active flag is cleared to ensure no new
+>>>> mappings can be created while the unmap is proceeding.
+>>>> unmap_mapping_range() should sequence itself with the TLB flush and
+>>> AFIAK unmap_mapping_range() kicks off the TLB flush and then
+>>> returns. It doesn't always wait for the flush to fully finish. Ie some
+>>> cases use RCU to lock the page table against GUP fast and so the
+>>> put_page() doesn't happen until the call_rcu completes - after a grace
+>>> period. The unmap_mapping_range() does not wait for grace periods.
+>> Wow, wait a second. That is quite a boomer. At least in all GEM/TTM based
+>> graphics drivers that could potentially cause a lot of trouble.
+>>
+>> I've just double checked and we certainly have the assumption that when
+>> unmap_mapping_range() returns the pte is gone and the TLB flush completed in
+>> quite a number of places.
+>>
+>> Do you have more information when and why that can happen?
+> There are two things to keep in mind, flushing the PTEs from the HW
+> and serializing against gup_fast.
+>
+> If you start at unmap_mapping_range() the page is eventually
+> discovered in zap_pte_range() and the PTE cleared. It is then passed
+> into __tlb_remove_page() which puts it on the batch->pages list
+>
+> The page free happens in tlb_batch_pages_flush() via
+> free_pages_and_swap_cache()
+>
+> The tlb_batch_pages_flush() happens via zap_page_range() ->
+> tlb_finish_mmu(), presumably after the HW has wiped the TLB's on all
+> CPUs. On x86 this is done with an IPI and also serializes gup fast, so
+> OK
+>
+> The interesting case is CONFIG_MMU_GATHER_RCU_TABLE_FREE which doesn't
+> rely on IPIs anymore to synchronize with gup-fast.
+>
+> In this configuration it means when unmap_mapping_range() returns the
+> TLB will have been flushed, but no serialization with GUP fast was
+> done.
+>
+> This is OK if the GUP fast cannot return the page at all. I assume
+> this generally describes the DRM caes?
 
+Yes, exactly that. GUP is completely forbidden for such mappings.
 
-On Fri, 24 Sep 2021, Christoph Hellwig wrote:
+But what about accesses by other CPUs? In other words our use case is 
+like the following:
 
-> On Thu, Sep 23, 2021 at 03:48:27PM -0400, Mikulas Patocka wrote:
-> > Hi
-> > 
-> > When running the lvm testsuite, we get a lot of warnings 
-> > "blk_update_request: operation not supported error, dev loop0, sector 0 op 
-> > 0x9:(WRITE_ZEROES) flags 0x800800 phys_seg 0 prio class 0". The lvm 
-> > testsuite puts the loop device on tmpfs and the reason for the warning is 
-> > that tmpfs supports fallocate, but doesn't support FALLOC_FL_ZERO_RANGE.
-> > 
-> > I've created this patch to silence the warnings.
-> > 
-> > Mikulas
-> > 
-> > 
-> > 
-> > From: Mikulas Patocka <mpatocka@redhat.com>
-> > 
-> > The loop driver checks for the fallocate method and if it is present, it
-> > assumes that the filesystem can do FALLOC_FL_ZERO_RANGE and
-> > FALLOC_FL_PUNCH_HOLE requests. However, some filesystems (such as fat, or
-> > tmpfs) have the fallocate method, but lack the capability to do
-> > FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE.
-> > 
-> > This results in syslog warnings "blk_update_request: operation not
-> > supported error, dev loop0, sector 0 op 0x9:(WRITE_ZEROES) flags 0x800800
-> > phys_seg 0 prio class 0"
-> > 
-> > This patch sets RQF_QUIET to silence the warnings.
-> 
-> Doesn't this just paper over the problem?  I think we need an
-> unsigned int with flag in the file_operations for the supported
-> operations for this kind of use.
+1. We found that we need exclusive access to the higher level object a 
+page belongs to.
 
-Do you want this patch?
+2. The lock of the higher level object is taken. The lock is also taken 
+in the fault handler for the VMA which inserts the PTE in the first place.
 
-Mikulas
+3. unmap_mapping_range() for the range of the object is called, the 
+expectation is that when that function returns only the kernel can have 
+a mapping of the pages backing the object.
 
+4. The kernel has exclusive access to the pages and we know that 
+userspace can't mess with them any more.
 
+That use case is completely unrelated to GUP and when this doesn't work 
+we have quite a problem.
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+I should probably note that we recently switched from VM_MIXEDMAP to 
+using VM_PFNMAP because the former didn't prevented GUP on all 
+architectures.
 
-The loop driver checks for the fallocate method and if it is present, it 
-assumes that the filesystem can do FALLOC_FL_ZERO_RANGE and 
-FALLOC_FL_PUNCH_HOLE requests. However, some filesystems (such as fat, or 
-tmpfs) have the fallocate method, but lack the capability to do 
-FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE.
+Christian.
 
-This results in syslog warnings "blk_update_request: operation not 
-supported error, dev loop0, sector 0 op 0x9:(WRITE_ZEROES) flags 0x800800 
-phys_seg 0 prio class 0". The error can be reproduced with this command:
-"truncate -s 1GiB /tmp/file; losetup /dev/loop0 /tmp/file; blkdiscard -z /dev/loop0"
-
-This patch introduces a field "fallocate_flags" in struct file_operations 
-that specifies the flags that are supported by the fallocate methods. The 
-loopback driver will check this field to determine if FALLOC_FL_PUNCH_HOLE 
-or FALLOC_FL_ZERO_RANGE is supported
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
-Index: linux-2.6/block/fops.c
-===================================================================
---- linux-2.6.orig/block/fops.c
-+++ linux-2.6/block/fops.c
-@@ -628,6 +628,7 @@ const struct file_operations def_blk_fop
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= blkdev_fallocate,
-+	.fallocate_flags = BLKDEV_FALLOC_FL_SUPPORTED,
- };
- 
- static __init int blkdev_init(void)
-Index: linux-2.6/fs/btrfs/file.c
-===================================================================
---- linux-2.6.orig/fs/btrfs/file.c
-+++ linux-2.6/fs/btrfs/file.c
-@@ -3688,6 +3688,7 @@ const struct file_operations btrfs_file_
- 	.release	= btrfs_release_file,
- 	.fsync		= btrfs_sync_file,
- 	.fallocate	= btrfs_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
- 	.unlocked_ioctl	= btrfs_ioctl,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= btrfs_compat_ioctl,
-Index: linux-2.6/fs/ceph/file.c
-===================================================================
---- linux-2.6.orig/fs/ceph/file.c
-+++ linux-2.6/fs/ceph/file.c
-@@ -2492,5 +2492,6 @@ const struct file_operations ceph_file_f
- 	.unlocked_ioctl = ceph_ioctl,
- 	.compat_ioctl = compat_ptr_ioctl,
- 	.fallocate	= ceph_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 	.copy_file_range = ceph_copy_file_range,
- };
-Index: linux-2.6/fs/cifs/cifsfs.c
-===================================================================
---- linux-2.6.orig/fs/cifs/cifsfs.c
-+++ linux-2.6/fs/cifs/cifsfs.c
-@@ -1281,6 +1281,7 @@ const struct file_operations cifs_file_o
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_strict_ops = {
-@@ -1301,6 +1302,7 @@ const struct file_operations cifs_file_s
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_direct_ops = {
-@@ -1321,6 +1323,7 @@ const struct file_operations cifs_file_d
- 	.llseek = cifs_llseek,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_nobrl_ops = {
-@@ -1339,6 +1342,7 @@ const struct file_operations cifs_file_n
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_strict_nobrl_ops = {
-@@ -1357,6 +1361,7 @@ const struct file_operations cifs_file_s
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_direct_nobrl_ops = {
-@@ -1375,6 +1380,7 @@ const struct file_operations cifs_file_d
- 	.llseek = cifs_llseek,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_dir_ops = {
-Index: linux-2.6/fs/ext4/file.c
-===================================================================
---- linux-2.6.orig/fs/ext4/file.c
-+++ linux-2.6/fs/ext4/file.c
-@@ -929,6 +929,7 @@ const struct file_operations ext4_file_o
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ext4_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct inode_operations ext4_file_inode_operations = {
-Index: linux-2.6/fs/f2fs/file.c
-===================================================================
---- linux-2.6.orig/fs/f2fs/file.c
-+++ linux-2.6/fs/f2fs/file.c
-@@ -4499,6 +4499,7 @@ const struct file_operations f2fs_file_o
- 	.flush		= f2fs_file_flush,
- 	.fsync		= f2fs_sync_file,
- 	.fallocate	= f2fs_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_INSERT_RANGE,
- 	.unlocked_ioctl	= f2fs_ioctl,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= f2fs_compat_ioctl,
-Index: linux-2.6/fs/fat/file.c
-===================================================================
---- linux-2.6.orig/fs/fat/file.c
-+++ linux-2.6/fs/fat/file.c
-@@ -211,6 +211,7 @@ const struct file_operations fat_file_op
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= fat_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE,
- };
- 
- static int fat_cont_expand(struct inode *inode, loff_t size)
-Index: linux-2.6/fs/fuse/file.c
-===================================================================
---- linux-2.6.orig/fs/fuse/file.c
-+++ linux-2.6/fs/fuse/file.c
-@@ -3147,6 +3147,7 @@ static const struct file_operations fuse
- 	.compat_ioctl	= fuse_file_compat_ioctl,
- 	.poll		= fuse_file_poll,
- 	.fallocate	= fuse_file_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
- 	.copy_file_range = fuse_copy_file_range,
- };
- 
-Index: linux-2.6/fs/gfs2/file.c
-===================================================================
---- linux-2.6.orig/fs/gfs2/file.c
-+++ linux-2.6/fs/gfs2/file.c
-@@ -1366,6 +1366,7 @@ const struct file_operations gfs2_file_f
- 	.splice_write	= gfs2_file_splice_write,
- 	.setlease	= simple_nosetlease,
- 	.fallocate	= gfs2_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
- };
- 
- const struct file_operations gfs2_dir_fops = {
-Index: linux-2.6/fs/hugetlbfs/inode.c
-===================================================================
---- linux-2.6.orig/fs/hugetlbfs/inode.c
-+++ linux-2.6/fs/hugetlbfs/inode.c
-@@ -1163,6 +1163,7 @@ const struct file_operations hugetlbfs_f
- 	.get_unmapped_area	= hugetlb_get_unmapped_area,
- 	.llseek			= default_llseek,
- 	.fallocate		= hugetlbfs_fallocate,
-+	.fallocate_flags	= FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- };
- 
- static const struct inode_operations hugetlbfs_dir_inode_operations = {
-Index: linux-2.6/fs/nfs/nfs4file.c
-===================================================================
---- linux-2.6.orig/fs/nfs/nfs4file.c
-+++ linux-2.6/fs/nfs/nfs4file.c
-@@ -457,6 +457,7 @@ const struct file_operations nfs4_file_o
- 	.copy_file_range = nfs4_copy_file_range,
- 	.llseek		= nfs4_file_llseek,
- 	.fallocate	= nfs42_fallocate,
-+	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
- 	.remap_file_range = nfs42_remap_file_range,
- #else
- 	.llseek		= nfs_file_llseek,
-Index: linux-2.6/fs/ntfs3/file.c
-===================================================================
---- linux-2.6.orig/fs/ntfs3/file.c
-+++ linux-2.6/fs/ntfs3/file.c
-@@ -1246,6 +1246,7 @@ const struct file_operations ntfs_file_o
- 	.fsync		= generic_file_fsync,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ntfs_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE,
- 	.release	= ntfs_file_release,
- };
- // clang-format on
-Index: linux-2.6/fs/ocfs2/file.c
-===================================================================
---- linux-2.6.orig/fs/ocfs2/file.c
-+++ linux-2.6/fs/ocfs2/file.c
-@@ -2746,6 +2746,7 @@ const struct file_operations ocfs2_fops
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ocfs2_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 	.remap_file_range = ocfs2_remap_file_range,
- };
- 
-@@ -2792,6 +2793,7 @@ const struct file_operations ocfs2_fops_
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ocfs2_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 	.remap_file_range = ocfs2_remap_file_range,
- };
- 
-Index: linux-2.6/fs/overlayfs/file.c
-===================================================================
---- linux-2.6.orig/fs/overlayfs/file.c
-+++ linux-2.6/fs/overlayfs/file.c
-@@ -645,6 +645,7 @@ const struct file_operations ovl_file_op
- 	.fsync		= ovl_fsync,
- 	.mmap		= ovl_mmap,
- 	.fallocate	= ovl_fallocate,
-+	.fallocate_flags = FALLOC_FL_SUPPORTED_MASK,
- 	.fadvise	= ovl_fadvise,
- 	.flush		= ovl_flush,
- 	.splice_read    = generic_file_splice_read,
-Index: linux-2.6/fs/xfs/xfs_file.c
-===================================================================
---- linux-2.6.orig/fs/xfs/xfs_file.c
-+++ linux-2.6/fs/xfs/xfs_file.c
-@@ -1464,6 +1464,7 @@ const struct file_operations xfs_file_op
- 	.fsync		= xfs_file_fsync,
- 	.get_unmapped_area = thp_get_unmapped_area,
- 	.fallocate	= xfs_file_fallocate,
-+	.fallocate_flags = XFS_FALLOC_FL_SUPPORTED,
- 	.fadvise	= xfs_file_fadvise,
- 	.remap_file_range = xfs_file_remap_range,
- };
-Index: linux-2.6/include/linux/fs.h
-===================================================================
---- linux-2.6.orig/include/linux/fs.h
-+++ linux-2.6/include/linux/fs.h
-@@ -2098,6 +2098,7 @@ struct file_operations {
- 	int (*setlease)(struct file *, long, struct file_lock **, void **);
- 	long (*fallocate)(struct file *file, int mode, loff_t offset,
- 			  loff_t len);
-+	unsigned fallocate_flags;
- 	void (*show_fdinfo)(struct seq_file *m, struct file *f);
- #ifndef CONFIG_MMU
- 	unsigned (*mmap_capabilities)(struct file *);
-Index: linux-2.6/ipc/shm.c
-===================================================================
---- linux-2.6.orig/ipc/shm.c
-+++ linux-2.6/ipc/shm.c
-@@ -44,6 +44,7 @@
- #include <linux/mount.h>
- #include <linux/ipc_namespace.h>
- #include <linux/rhashtable.h>
-+#include <linux/falloc.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -558,6 +559,7 @@ static const struct file_operations shm_
- 	.get_unmapped_area	= shm_get_unmapped_area,
- 	.llseek		= noop_llseek,
- 	.fallocate	= shm_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- };
- 
- /*
-@@ -571,6 +573,7 @@ static const struct file_operations shm_
- 	.get_unmapped_area	= shm_get_unmapped_area,
- 	.llseek		= noop_llseek,
- 	.fallocate	= shm_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- };
- 
- bool is_file_shm_hugepages(struct file *file)
-Index: linux-2.6/mm/shmem.c
-===================================================================
---- linux-2.6.orig/mm/shmem.c
-+++ linux-2.6/mm/shmem.c
-@@ -3797,6 +3797,7 @@ static const struct file_operations shme
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= shmem_fallocate,
-+	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- #endif
- };
- 
-Index: linux-2.6/drivers/block/loop.c
-===================================================================
---- linux-2.6.orig/drivers/block/loop.c
-+++ linux-2.6/drivers/block/loop.c
-@@ -947,7 +947,9 @@ static void loop_config_discard(struct l
- 	 * encryption is enabled, because it may give an attacker
- 	 * useful information.
- 	 */
--	} else if (!file->f_op->fallocate || lo->lo_encrypt_key_size) {
-+	} else if ((file->f_op->fallocate_flags & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE)) !=
-+						  (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE) ||
-+		   lo->lo_encrypt_key_size) {
- 		max_discard_sectors = 0;
- 		granularity = 0;
- 
-@@ -959,7 +961,10 @@ static void loop_config_discard(struct l
- 	if (max_discard_sectors) {
- 		q->limits.discard_granularity = granularity;
- 		blk_queue_max_discard_sectors(q, max_discard_sectors);
--		blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
-+		if (file->f_op->fallocate_flags & FALLOC_FL_ZERO_RANGE)
-+			blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
-+		else
-+			blk_queue_max_write_zeroes_sectors(q, 0);
- 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
- 	} else {
- 		q->limits.discard_granularity = 0;
+> However, if the GUP fast can return the page then something,
+> somewhere, needs to serialize the page free with the RCU as the GUP
+> fast can be observing the old PTE before it was zap'd until the RCU
+> grace expires.
+>
+> Relying on the page ref being !0 to protect GUP fast is not safe
+> because the page ref can be incr'd immediately upon page re-use.
+>
+> Interestingly I looked around for this on PPC and I only found RCU
+> delayed freeing of the page table level, not RCU delayed freeing of
+> pages themselves.. I wonder if it was missed?
+>
+> There is a path on PPC (tlb_remove_table_sync_one) that triggers an
+> IPI but it looks like an exception, and we wouldn't need the RCU at
+> all if we used IPI to serialize GUP fast...
+>
+> It makes logical sense if the RCU also frees the pages on
+> CONFIG_MMU_GATHER_RCU_TABLE_FREE so anything returnable by GUP fast
+> must be refcounted and freed by tlb_batch_pages_flush(), not by the
+> caller of unmap_mapping_range().
+>
+> If we expect to allow the caller of unmap_mapping_range() to free then
+> CONFIG_MMU_GATHER_RCU_TABLE_FREE can't really exist, we always need to
+> trigger a serializing IPI during tlb_batch_pages_flush()
+>
+> AFAICT, at least
+>
+> Jason
 
