@@ -2,246 +2,434 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CE1C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 12:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51240C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 13:04:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F33561269
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 12:26:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A3C861AFF
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 13:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230405AbhJDM1t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Oct 2021 08:27:49 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:36140 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230238AbhJDM1r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Oct 2021 08:27:47 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 110BF1FFE8;
-        Mon,  4 Oct 2021 12:25:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1633350358; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        id S234289AbhJDNFu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Oct 2021 09:05:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44948 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233954AbhJDNDw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Oct 2021 09:03:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1633352522;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7IxxPlB8tzOE9SFdP2TOqN9xF9p9hy5CQPEmRi44+Pc=;
-        b=LxxzGCNr1pIiX1sj4CFAHBVWTSgK5By2QZ0gMr1jeDOQkbJWhfgz+EFflxdjp+ZKeI1zEL
-        kd3eRPczbKci1YbzQRUsvESYO6x07bxQV0mszHK39Jih6xd6mO8NW4haYU6YvFcLS2SiQj
-        roObUJnwAl4ATSAgRUbRCboeFOCw4+k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1633350358;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7IxxPlB8tzOE9SFdP2TOqN9xF9p9hy5CQPEmRi44+Pc=;
-        b=LTIWelOtknuEf99+xDwbmAPl7HKzN0bZxdc5N7KqVZDT6VcI1m4rkOhnv6HpAtths4yT2Q
-        ihXynJAUGS5CgSDg==
-Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id EB25FA3B88;
-        Mon,  4 Oct 2021 12:25:57 +0000 (UTC)
-Received: by adalid.arch.suse.de (Postfix, from userid 17828)
-        id D458E518F25A; Mon,  4 Oct 2021 14:25:57 +0200 (CEST)
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        John Garry <john.garry@huawei.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        James Smart <james.smart@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
-Subject: [RFC] nvme-fc: Allow managed IRQs
-Date:   Mon,  4 Oct 2021 14:25:48 +0200
-Message-Id: <20211004122548.113722-1-dwagner@suse.de>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <YUL8wz6CM4jrUeeN@T590>
-References: <YUL8wz6CM4jrUeeN@T590>
+        bh=WDwZjIkjDMi/DSkQPvF1GldI3TJvYlgRsEkEEdP+wYU=;
+        b=F3qMBk6G6bJUuZgwvl4YCZwOG5vlX9MYyQLsjmM4FuTlvq14no3aUb0xMajDJ/MHwc6nsD
+        yKLCp8wceUSaZsPvG11cUwxdmFHJyjQFrhqbjZxeqgpQDrMJ8e9YvZH4M4Cu/rjOPm6JRB
+        uQswusA+q3i9QojguUdOEOAbETnivyQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179--C0NnhIxNNmYt8iOUlgqFg-1; Mon, 04 Oct 2021 09:01:52 -0400
+X-MC-Unique: -C0NnhIxNNmYt8iOUlgqFg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95A3B8145F7;
+        Mon,  4 Oct 2021 13:01:50 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 406D11036B27;
+        Mon,  4 Oct 2021 13:01:34 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 194D1YWF000643;
+        Mon, 4 Oct 2021 09:01:34 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 194D1XWc000638;
+        Mon, 4 Oct 2021 09:01:33 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Mon, 4 Oct 2021 09:01:33 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Christoph Hellwig <hch@lst.de>
+cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Zdenek Kabelac <zkabelac@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [PATCH] loop: don't print warnings if the underlying filesystem
+ doesn't support discard
+In-Reply-To: <20210924155822.GA10064@lst.de>
+Message-ID: <alpine.LRH.2.02.2110040851130.30719@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2109231539520.27863@file01.intranet.prod.int.rdu2.redhat.com> <20210924155822.GA10064@lst.de>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-nvme-fc is currently the only user of blk_mq_alloc_request_hctx().
-With the recent changes to teach the nvme subsystem to honor managed
-IRQs, the assumption was the complete nvme-fc doesn't use managed
-IRQs. Unfortunately, the qla2xxx driver uses the managed IRQs.
 
-Add an interface the nvme-fc drivers to update the mapping and also to
-set the use_managed_irq flag. This is very ugly as we have to pass
-down struct blk_mq_tag_set. I haven't found any better way so far.
 
-Relax the requirement in the blk_mq_alloc_request_hctx() that only
-!managed IRQs are supported. As long one CPU is online in the
-requested hctx all is good. If this is not the case we return an
-error which allows the upper layer to start the reconnect loop.
+On Fri, 24 Sep 2021, Christoph Hellwig wrote:
 
-As the current qla2xxx already depends on managed IRQs the main
-difference with and without this patch is, that we see
+> On Thu, Sep 23, 2021 at 03:48:27PM -0400, Mikulas Patocka wrote:
+> > Hi
+> > 
+> > When running the lvm testsuite, we get a lot of warnings 
+> > "blk_update_request: operation not supported error, dev loop0, sector 0 op 
+> > 0x9:(WRITE_ZEROES) flags 0x800800 phys_seg 0 prio class 0". The lvm 
+> > testsuite puts the loop device on tmpfs and the reason for the warning is 
+> > that tmpfs supports fallocate, but doesn't support FALLOC_FL_ZERO_RANGE.
+> > 
+> > I've created this patch to silence the warnings.
+> > 
+> > Mikulas
+> > 
+> > 
+> > 
+> > From: Mikulas Patocka <mpatocka@redhat.com>
+> > 
+> > The loop driver checks for the fallocate method and if it is present, it
+> > assumes that the filesystem can do FALLOC_FL_ZERO_RANGE and
+> > FALLOC_FL_PUNCH_HOLE requests. However, some filesystems (such as fat, or
+> > tmpfs) have the fallocate method, but lack the capability to do
+> > FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE.
+> > 
+> > This results in syslog warnings "blk_update_request: operation not
+> > supported error, dev loop0, sector 0 op 0x9:(WRITE_ZEROES) flags 0x800800
+> > phys_seg 0 prio class 0"
+> > 
+> > This patch sets RQF_QUIET to silence the warnings.
+> 
+> Doesn't this just paper over the problem?  I think we need an
+> unsigned int with flag in the file_operations for the supported
+> operations for this kind of use.
 
-  nvme nvme8: Connect command failed, error wo/DNR bit: -16402
-  nvme nvme8: NVME-FC{8}: reset: Reconnect attempt failed (-18)
+Do you want this patch?
 
-instead of just timeouts such as
+Mikulas
 
-  qla2xxx [0000:81:00.0]-5032:1: ABT_IOCB: Invalid completion handle (1da) -- timed-out.
 
-In both cases the system recovers as soon at least one CPUs is online
-in all hctx. Also note, this is only for admin request. As long
-no FC reset happens and a reconnect attempt is triggered, user space
-is able to issue I/Os do the target.
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
+From: Mikulas Patocka <mpatocka@redhat.com>
 
-Hi,
+The loop driver checks for the fallocate method and if it is present, it 
+assumes that the filesystem can do FALLOC_FL_ZERO_RANGE and 
+FALLOC_FL_PUNCH_HOLE requests. However, some filesystems (such as fat, or 
+tmpfs) have the fallocate method, but lack the capability to do 
+FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE.
 
-I've played a bit with this patch to figure out what the impact is for
-the qla2xxx driver. Basically, the situation doesn't change a lot with
-Ming's patches. If we happen to run into the situation that all CPUs
-are offline in one hctx and a reconnect attempt is triggered all
-traffic to the target cease. But as soon we have at least one CPU
-online in all hctx the system recovers.
+This results in syslog warnings "blk_update_request: operation not 
+supported error, dev loop0, sector 0 op 0x9:(WRITE_ZEROES) flags 0x800800 
+phys_seg 0 prio class 0". The error can be reproduced with this command:
+"truncate -s 1GiB /tmp/file; losetup /dev/loop0 /tmp/file; blkdiscard -z /dev/loop0"
 
-This patch just makes it a bit more verbose (maybe a warning could be
-added to blk_mq_alloc_request_hctx()).
+This patch introduces a field "fallocate_flags" in struct file_operations 
+that specifies the flags that are supported by the fallocate methods. The 
+loopback driver will check this field to determine if FALLOC_FL_PUNCH_HOLE 
+or FALLOC_FL_ZERO_RANGE is supported
 
-Thanks,
-Daniel
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
- block/blk-mq.c                  | 10 +++++++---
- drivers/nvme/host/fc.c          | 13 +++++++++++++
- drivers/scsi/qla2xxx/qla_nvme.c | 14 ++++++++++++++
- drivers/scsi/qla2xxx/qla_os.c   |  3 +++
- include/linux/nvme-fc-driver.h  |  4 ++++
- 5 files changed, 41 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a2db50886a26..df65690bf649 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -486,9 +486,13 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	if (!blk_mq_hw_queue_mapped(data.hctx))
- 		goto out_queue_exit;
- 
--	WARN_ON_ONCE(blk_mq_hctx_use_managed_irq(data.hctx));
--
--	cpu = blk_mq_first_mapped_cpu(data.hctx);
-+	if (blk_mq_hctx_use_managed_irq(data.hctx)) {
-+		cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
-+		if (cpu >= nr_cpu_ids)
-+			return ERR_PTR(ret);
-+	} else {
-+		cpu = blk_mq_first_mapped_cpu(data.hctx);
-+	}
- 	data.ctx = __blk_mq_get_ctx(q, cpu);
- 
- 	if (!q->elevator)
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index aa14ad963d91..001ba8f0776b 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2841,6 +2841,17 @@ nvme_fc_complete_rq(struct request *rq)
- 	nvme_fc_ctrl_put(ctrl);
- }
- 
-+static int
-+nvme_fc_map_queues(struct blk_mq_tag_set *set)
-+{
-+	struct nvme_fc_ctrl *ctrl = set->driver_data;
-+
-+	if (ctrl->lport->ops->map_queues)
-+		return ctrl->lport->ops->map_queues(&ctrl->lport->localport, set);
-+
-+	return blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
-+}
-+
- 
- static const struct blk_mq_ops nvme_fc_mq_ops = {
- 	.queue_rq	= nvme_fc_queue_rq,
-@@ -2849,6 +2860,7 @@ static const struct blk_mq_ops nvme_fc_mq_ops = {
- 	.exit_request	= nvme_fc_exit_request,
- 	.init_hctx	= nvme_fc_init_hctx,
- 	.timeout	= nvme_fc_timeout,
-+	.map_queues	= nvme_fc_map_queues,
+Index: linux-2.6/block/fops.c
+===================================================================
+--- linux-2.6.orig/block/fops.c
++++ linux-2.6/block/fops.c
+@@ -628,6 +628,7 @@ const struct file_operations def_blk_fop
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= blkdev_fallocate,
++	.fallocate_flags = BLKDEV_FALLOC_FL_SUPPORTED,
  };
  
- static int
-@@ -3392,6 +3404,7 @@ static const struct blk_mq_ops nvme_fc_admin_mq_ops = {
- 	.exit_request	= nvme_fc_exit_request,
- 	.init_hctx	= nvme_fc_init_admin_hctx,
- 	.timeout	= nvme_fc_timeout,
-+	.map_queues	= nvme_fc_map_queues,
+ static __init int blkdev_init(void)
+Index: linux-2.6/fs/btrfs/file.c
+===================================================================
+--- linux-2.6.orig/fs/btrfs/file.c
++++ linux-2.6/fs/btrfs/file.c
+@@ -3688,6 +3688,7 @@ const struct file_operations btrfs_file_
+ 	.release	= btrfs_release_file,
+ 	.fsync		= btrfs_sync_file,
+ 	.fallocate	= btrfs_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
+ 	.unlocked_ioctl	= btrfs_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= btrfs_compat_ioctl,
+Index: linux-2.6/fs/ceph/file.c
+===================================================================
+--- linux-2.6.orig/fs/ceph/file.c
++++ linux-2.6/fs/ceph/file.c
+@@ -2492,5 +2492,6 @@ const struct file_operations ceph_file_f
+ 	.unlocked_ioctl = ceph_ioctl,
+ 	.compat_ioctl = compat_ptr_ioctl,
+ 	.fallocate	= ceph_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ 	.copy_file_range = ceph_copy_file_range,
+ };
+Index: linux-2.6/fs/cifs/cifsfs.c
+===================================================================
+--- linux-2.6.orig/fs/cifs/cifsfs.c
++++ linux-2.6/fs/cifs/cifsfs.c
+@@ -1281,6 +1281,7 @@ const struct file_operations cifs_file_o
+ 	.remap_file_range = cifs_remap_file_range,
+ 	.setlease = cifs_setlease,
+ 	.fallocate = cifs_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
  };
  
+ const struct file_operations cifs_file_strict_ops = {
+@@ -1301,6 +1302,7 @@ const struct file_operations cifs_file_s
+ 	.remap_file_range = cifs_remap_file_range,
+ 	.setlease = cifs_setlease,
+ 	.fallocate = cifs_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
+ };
  
-diff --git a/drivers/scsi/qla2xxx/qla_nvme.c b/drivers/scsi/qla2xxx/qla_nvme.c
-index 1c5da2dbd6f9..b7681f66d05b 100644
---- a/drivers/scsi/qla2xxx/qla_nvme.c
-+++ b/drivers/scsi/qla2xxx/qla_nvme.c
-@@ -667,6 +667,19 @@ static void qla_nvme_remoteport_delete(struct nvme_fc_remote_port *rport)
- 	complete(&fcport->nvme_del_done);
- }
+ const struct file_operations cifs_file_direct_ops = {
+@@ -1321,6 +1323,7 @@ const struct file_operations cifs_file_d
+ 	.llseek = cifs_llseek,
+ 	.setlease = cifs_setlease,
+ 	.fallocate = cifs_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
+ };
  
-+static int qla_nvme_map_queues(struct nvme_fc_local_port *lport,
-+				struct blk_mq_tag_set *set)
-+{
-+
-+	struct blk_mq_queue_map *qmap = &set->map[HCTX_TYPE_DEFAULT];
-+	int ret;
-+
-+	ret = blk_mq_map_queues(qmap);
-+	qmap->use_managed_irq = true;
-+
-+	return ret;
-+}
-+
- static struct nvme_fc_port_template qla_nvme_fc_transport = {
- 	.localport_delete = qla_nvme_localport_delete,
- 	.remoteport_delete = qla_nvme_remoteport_delete,
-@@ -676,6 +689,7 @@ static struct nvme_fc_port_template qla_nvme_fc_transport = {
- 	.ls_abort	= qla_nvme_ls_abort,
- 	.fcp_io		= qla_nvme_post_cmd,
- 	.fcp_abort	= qla_nvme_fcp_abort,
-+	.map_queues	= qla_nvme_map_queues,
- 	.max_hw_queues  = 8,
- 	.max_sgl_segments = 1024,
- 	.max_dif_sgl_segments = 64,
-diff --git a/drivers/scsi/qla2xxx/qla_os.c b/drivers/scsi/qla2xxx/qla_os.c
-index d2e40aaba734..188ce9b7f407 100644
---- a/drivers/scsi/qla2xxx/qla_os.c
-+++ b/drivers/scsi/qla2xxx/qla_os.c
-@@ -7914,6 +7914,9 @@ static int qla2xxx_map_queues(struct Scsi_Host *shost)
- 		rc = blk_mq_map_queues(qmap);
- 	else
- 		rc = blk_mq_pci_map_queues(qmap, vha->hw->pdev, vha->irq_offset);
-+
-+	qmap->use_managed_irq = true;
-+
- 	return rc;
- }
+ const struct file_operations cifs_file_nobrl_ops = {
+@@ -1339,6 +1342,7 @@ const struct file_operations cifs_file_n
+ 	.remap_file_range = cifs_remap_file_range,
+ 	.setlease = cifs_setlease,
+ 	.fallocate = cifs_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
+ };
  
-diff --git a/include/linux/nvme-fc-driver.h b/include/linux/nvme-fc-driver.h
-index 2a38f2b477a5..afae40d8c347 100644
---- a/include/linux/nvme-fc-driver.h
-+++ b/include/linux/nvme-fc-driver.h
-@@ -471,6 +471,8 @@ struct nvme_fc_remote_port {
-  *       specified by the fcp_request->private pointer.
-  *       Value is Mandatory. Allowed to be zero.
-  */
-+struct blk_mq_tag_set;
-+
- struct nvme_fc_port_template {
- 	/* initiator-based functions */
- 	void	(*localport_delete)(struct nvme_fc_local_port *);
-@@ -497,6 +499,8 @@ struct nvme_fc_port_template {
- 	int	(*xmt_ls_rsp)(struct nvme_fc_local_port *localport,
- 				struct nvme_fc_remote_port *rport,
- 				struct nvmefc_ls_rsp *ls_rsp);
-+	int	(*map_queues)(struct nvme_fc_local_port *localport,
-+				struct blk_mq_tag_set *set);
+ const struct file_operations cifs_file_strict_nobrl_ops = {
+@@ -1357,6 +1361,7 @@ const struct file_operations cifs_file_s
+ 	.remap_file_range = cifs_remap_file_range,
+ 	.setlease = cifs_setlease,
+ 	.fallocate = cifs_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
+ };
  
- 	u32	max_hw_queues;
- 	u16	max_sgl_segments;
--- 
-2.29.2
+ const struct file_operations cifs_file_direct_nobrl_ops = {
+@@ -1375,6 +1380,7 @@ const struct file_operations cifs_file_d
+ 	.llseek = cifs_llseek,
+ 	.setlease = cifs_setlease,
+ 	.fallocate = cifs_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
+ };
+ 
+ const struct file_operations cifs_dir_ops = {
+Index: linux-2.6/fs/ext4/file.c
+===================================================================
+--- linux-2.6.orig/fs/ext4/file.c
++++ linux-2.6/fs/ext4/file.c
+@@ -929,6 +929,7 @@ const struct file_operations ext4_file_o
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= ext4_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_INSERT_RANGE,
+ };
+ 
+ const struct inode_operations ext4_file_inode_operations = {
+Index: linux-2.6/fs/f2fs/file.c
+===================================================================
+--- linux-2.6.orig/fs/f2fs/file.c
++++ linux-2.6/fs/f2fs/file.c
+@@ -4499,6 +4499,7 @@ const struct file_operations f2fs_file_o
+ 	.flush		= f2fs_file_flush,
+ 	.fsync		= f2fs_sync_file,
+ 	.fallocate	= f2fs_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE | FALLOC_FL_INSERT_RANGE,
+ 	.unlocked_ioctl	= f2fs_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= f2fs_compat_ioctl,
+Index: linux-2.6/fs/fat/file.c
+===================================================================
+--- linux-2.6.orig/fs/fat/file.c
++++ linux-2.6/fs/fat/file.c
+@@ -211,6 +211,7 @@ const struct file_operations fat_file_op
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= fat_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE,
+ };
+ 
+ static int fat_cont_expand(struct inode *inode, loff_t size)
+Index: linux-2.6/fs/fuse/file.c
+===================================================================
+--- linux-2.6.orig/fs/fuse/file.c
++++ linux-2.6/fs/fuse/file.c
+@@ -3147,6 +3147,7 @@ static const struct file_operations fuse
+ 	.compat_ioctl	= fuse_file_compat_ioctl,
+ 	.poll		= fuse_file_poll,
+ 	.fallocate	= fuse_file_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
+ 	.copy_file_range = fuse_copy_file_range,
+ };
+ 
+Index: linux-2.6/fs/gfs2/file.c
+===================================================================
+--- linux-2.6.orig/fs/gfs2/file.c
++++ linux-2.6/fs/gfs2/file.c
+@@ -1366,6 +1366,7 @@ const struct file_operations gfs2_file_f
+ 	.splice_write	= gfs2_file_splice_write,
+ 	.setlease	= simple_nosetlease,
+ 	.fallocate	= gfs2_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+ };
+ 
+ const struct file_operations gfs2_dir_fops = {
+Index: linux-2.6/fs/hugetlbfs/inode.c
+===================================================================
+--- linux-2.6.orig/fs/hugetlbfs/inode.c
++++ linux-2.6/fs/hugetlbfs/inode.c
+@@ -1163,6 +1163,7 @@ const struct file_operations hugetlbfs_f
+ 	.get_unmapped_area	= hugetlb_get_unmapped_area,
+ 	.llseek			= default_llseek,
+ 	.fallocate		= hugetlbfs_fallocate,
++	.fallocate_flags	= FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ };
+ 
+ static const struct inode_operations hugetlbfs_dir_inode_operations = {
+Index: linux-2.6/fs/nfs/nfs4file.c
+===================================================================
+--- linux-2.6.orig/fs/nfs/nfs4file.c
++++ linux-2.6/fs/nfs/nfs4file.c
+@@ -457,6 +457,7 @@ const struct file_operations nfs4_file_o
+ 	.copy_file_range = nfs4_copy_file_range,
+ 	.llseek		= nfs4_file_llseek,
+ 	.fallocate	= nfs42_fallocate,
++	.fallocate_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+ 	.remap_file_range = nfs42_remap_file_range,
+ #else
+ 	.llseek		= nfs_file_llseek,
+Index: linux-2.6/fs/ntfs3/file.c
+===================================================================
+--- linux-2.6.orig/fs/ntfs3/file.c
++++ linux-2.6/fs/ntfs3/file.c
+@@ -1246,6 +1246,7 @@ const struct file_operations ntfs_file_o
+ 	.fsync		= generic_file_fsync,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= ntfs_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE,
+ 	.release	= ntfs_file_release,
+ };
+ // clang-format on
+Index: linux-2.6/fs/ocfs2/file.c
+===================================================================
+--- linux-2.6.orig/fs/ocfs2/file.c
++++ linux-2.6/fs/ocfs2/file.c
+@@ -2746,6 +2746,7 @@ const struct file_operations ocfs2_fops
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= ocfs2_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ 	.remap_file_range = ocfs2_remap_file_range,
+ };
+ 
+@@ -2792,6 +2793,7 @@ const struct file_operations ocfs2_fops_
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= ocfs2_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ 	.remap_file_range = ocfs2_remap_file_range,
+ };
+ 
+Index: linux-2.6/fs/overlayfs/file.c
+===================================================================
+--- linux-2.6.orig/fs/overlayfs/file.c
++++ linux-2.6/fs/overlayfs/file.c
+@@ -645,6 +645,7 @@ const struct file_operations ovl_file_op
+ 	.fsync		= ovl_fsync,
+ 	.mmap		= ovl_mmap,
+ 	.fallocate	= ovl_fallocate,
++	.fallocate_flags = FALLOC_FL_SUPPORTED_MASK,
+ 	.fadvise	= ovl_fadvise,
+ 	.flush		= ovl_flush,
+ 	.splice_read    = generic_file_splice_read,
+Index: linux-2.6/fs/xfs/xfs_file.c
+===================================================================
+--- linux-2.6.orig/fs/xfs/xfs_file.c
++++ linux-2.6/fs/xfs/xfs_file.c
+@@ -1464,6 +1464,7 @@ const struct file_operations xfs_file_op
+ 	.fsync		= xfs_file_fsync,
+ 	.get_unmapped_area = thp_get_unmapped_area,
+ 	.fallocate	= xfs_file_fallocate,
++	.fallocate_flags = XFS_FALLOC_FL_SUPPORTED,
+ 	.fadvise	= xfs_file_fadvise,
+ 	.remap_file_range = xfs_file_remap_range,
+ };
+Index: linux-2.6/include/linux/fs.h
+===================================================================
+--- linux-2.6.orig/include/linux/fs.h
++++ linux-2.6/include/linux/fs.h
+@@ -2098,6 +2098,7 @@ struct file_operations {
+ 	int (*setlease)(struct file *, long, struct file_lock **, void **);
+ 	long (*fallocate)(struct file *file, int mode, loff_t offset,
+ 			  loff_t len);
++	unsigned fallocate_flags;
+ 	void (*show_fdinfo)(struct seq_file *m, struct file *f);
+ #ifndef CONFIG_MMU
+ 	unsigned (*mmap_capabilities)(struct file *);
+Index: linux-2.6/ipc/shm.c
+===================================================================
+--- linux-2.6.orig/ipc/shm.c
++++ linux-2.6/ipc/shm.c
+@@ -44,6 +44,7 @@
+ #include <linux/mount.h>
+ #include <linux/ipc_namespace.h>
+ #include <linux/rhashtable.h>
++#include <linux/falloc.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -558,6 +559,7 @@ static const struct file_operations shm_
+ 	.get_unmapped_area	= shm_get_unmapped_area,
+ 	.llseek		= noop_llseek,
+ 	.fallocate	= shm_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ };
+ 
+ /*
+@@ -571,6 +573,7 @@ static const struct file_operations shm_
+ 	.get_unmapped_area	= shm_get_unmapped_area,
+ 	.llseek		= noop_llseek,
+ 	.fallocate	= shm_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ };
+ 
+ bool is_file_shm_hugepages(struct file *file)
+Index: linux-2.6/mm/shmem.c
+===================================================================
+--- linux-2.6.orig/mm/shmem.c
++++ linux-2.6/mm/shmem.c
+@@ -3797,6 +3797,7 @@ static const struct file_operations shme
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= shmem_fallocate,
++	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
+ #endif
+ };
+ 
+Index: linux-2.6/drivers/block/loop.c
+===================================================================
+--- linux-2.6.orig/drivers/block/loop.c
++++ linux-2.6/drivers/block/loop.c
+@@ -947,7 +947,9 @@ static void loop_config_discard(struct l
+ 	 * encryption is enabled, because it may give an attacker
+ 	 * useful information.
+ 	 */
+-	} else if (!file->f_op->fallocate || lo->lo_encrypt_key_size) {
++	} else if ((file->f_op->fallocate_flags & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE)) !=
++						  (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE) ||
++		   lo->lo_encrypt_key_size) {
+ 		max_discard_sectors = 0;
+ 		granularity = 0;
+ 
+@@ -959,7 +961,10 @@ static void loop_config_discard(struct l
+ 	if (max_discard_sectors) {
+ 		q->limits.discard_granularity = granularity;
+ 		blk_queue_max_discard_sectors(q, max_discard_sectors);
+-		blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
++		if (file->f_op->fallocate_flags & FALLOC_FL_ZERO_RANGE)
++			blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
++		else
++			blk_queue_max_write_zeroes_sectors(q, 0);
+ 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+ 	} else {
+ 		q->limits.discard_granularity = 0;
 
