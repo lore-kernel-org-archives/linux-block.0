@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FA5C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 18:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC9DC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 20:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DE106140D
-	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 18:41:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBA4D61357
+	for <linux-block@archiver.kernel.org>; Mon,  4 Oct 2021 20:54:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235233AbhJDSnV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Oct 2021 14:43:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53980 "EHLO
+        id S232496AbhJDU4q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Oct 2021 16:56:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233311AbhJDSnU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Oct 2021 14:43:20 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92726C061745
-        for <linux-block@vger.kernel.org>; Mon,  4 Oct 2021 11:41:31 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id p13so40517061edw.0
-        for <linux-block@vger.kernel.org>; Mon, 04 Oct 2021 11:41:31 -0700 (PDT)
+        with ESMTP id S229716AbhJDU4q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Oct 2021 16:56:46 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F69CC061745;
+        Mon,  4 Oct 2021 13:54:57 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id k23-20020a17090a591700b001976d2db364so803199pji.2;
+        Mon, 04 Oct 2021 13:54:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=56z64RfaxhBPHKBxrKpIeCmw/JUaEkC5bctLSO4zbPw=;
-        b=TeduhA16QD2I64VEL8/9gJBRrib/Wz2GZLhomm/YNweUBFDosOQiR+aEnQJnaC/TEW
-         rWsreaFR7KDYuJkO4zUwgtEpOzn0aWtEK98XFefnumwNRlaJWh40mZStymnEvzxnk88j
-         zDo4oOfjR9VHkw/c9lvbymAKvxfNTxpPsFq1WjxD2EJQn7uAHEXlvxUE0ZDh8ArzT3S3
-         IN7GxnAFJHJscNHTl/7O5IHo/wjzjI6qPDHcjl38P3ERDrNyZmRb+PV0I2QJFQEEbjmb
-         Rl2RjOVG0xNzpAGCG8S4/Ttiouc5c/C40giJRPxQDoKP3cpZSlQL13Qvzm3tYuWW3oDN
-         pVMA==
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kZJWM4F6Z6unu/rs+8fm9uleDQhYGGgncRQjKQf/aDk=;
+        b=VWSK07yHbpdJGE2T9j6a20cM1d6NclHBP9VWgpxpQVBKyrqPP+X9QuK0NWKLKwBFZP
+         hIzkqSNpOh88uOkBFgCQh5FDc0tPCOiJZpU7XbluN9peyZ90NjAu+9M6+96g+BGlybbX
+         fHAB8cuFj0j4eOL7GjaQkNtxDiRJ5dghYWoxFhGMU33+jQkyreqHyG6dmMTvIfaYu8lY
+         RbVRFQO80ucTXL2Vlu3n96jeQfwtj4sLcuJb0oKO7xr4MIYuN7hRYSAHbpWHFFYwc2U7
+         kV7RQPl06tqo+8wljn+b6zD3aO55ziRIXg8+TTnrSch8bq0dfYC7S/3/5lkL3FwO9I98
+         9XXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=56z64RfaxhBPHKBxrKpIeCmw/JUaEkC5bctLSO4zbPw=;
-        b=my8nPcSQL/oC7w4jpu5wLQ5B9o1RoVJ+y9jGqUpv7R4DSXDU4MRoLfgkz9CJ0qZwgy
-         WQKkYwoor1i4fCz7Npzpt35W9Bgb3Fp/tzIE6Iey4gFH22Y4mfX2IFwoPo7GhRtszTyZ
-         liJz4zDOlM09KnGsA+zGDH//0nNXsjCelQPUySBB9vJJsPPTlZ5ryMuvhmrRQrTIGkuR
-         4SrBdAHPc1Fuh3FsNJPauEALocq568B/OVW/6KpcB0idVkZqUXERcA4E5CvslCXRtrfK
-         XLi+M+rsnBt8Rt6Riosvxzmhz6Z+yXEhecdR0PdB8W1egDgc2BjjSB7vSrvmFrcCIiuP
-         /uXA==
-X-Gm-Message-State: AOAM530thlAHgF2FsfpMAO6ExePAU2BHZYa9DoF3ctkDtsMYakYKlZnS
-        dEJ7aLZ83F8fX7c8Njfarz3i+VtFoo/OxnfLivfu/A==
-X-Google-Smtp-Source: ABdhPJz2rknpyNQ8MGXFJG1LnJpKskoos7OkxWt2/J14Md3TpbhY+emzD05svJEHbtaRNGKVB9WKg4SX3f/nTp+xnhM=
-X-Received: by 2002:a17:906:b098:: with SMTP id x24mr19388219ejy.88.1633372888755;
- Mon, 04 Oct 2021 11:41:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211001181627.394921-1-bgeffon@google.com> <YVtH60zyzq9AhUv2@google.com>
-In-Reply-To: <YVtH60zyzq9AhUv2@google.com>
-From:   Brian Geffon <bgeffon@google.com>
-Date:   Mon, 4 Oct 2021 14:40:52 -0400
-Message-ID: <CADyq12xk-2Fhnf_rJQ70oC1_98OEBJqwxOt6z=PpJa5V=X3dFQ@mail.gmail.com>
-Subject: Re: [PATCH] zram: Allow backing device to be assigned after init
-To:     Minchan Kim <minchan@kernel.org>
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=kZJWM4F6Z6unu/rs+8fm9uleDQhYGGgncRQjKQf/aDk=;
+        b=pFpn8MtIKOSDhsByuHiLcaVjXt3wIIB27rBPH9VuGaBWWrtN6Ck+dmafZ6Bi6gSEej
+         WElrolo8LDttB38jn6SaONXjodHuzuoILuLvgOSPsSLLfRhxZO6aWNhZg+tnZQX8HyBK
+         GRHewGRuPAnyDJ9RRrczdMlhLMnr1RZWj2SCcslAwZ6eFWUGblLA6ZohqdtJ70+oXq0H
+         eOCuRMFyfxG85rnrqQMFOYoVD5xsI3xZuW2t1rGlyYndjkAwIy0txJvgtVslYt+EPTfU
+         k1nHw+f9zpXUujn81xG79uznL0Ihnyo7mNrLhMroI8O25Acf5TS5n1EKm/M8XudUUz5C
+         vHJg==
+X-Gm-Message-State: AOAM531965giF2VQW+4JtTgIJgT4dZocMo/GPob1YnT7PF/JfUfo4GYT
+        3mt/4AaIXSvD1rev7/TU7UlSTcPcB8Q=
+X-Google-Smtp-Source: ABdhPJyhKXQQOv4O2I8Q2nIpCs8vrjSKNrTVCZHyKhMRjpWm+JvPOdgiWJEm9Z0ToGlZ1m0MjdP8gw==
+X-Received: by 2002:a17:902:6b01:b0:13e:50bb:790f with SMTP id o1-20020a1709026b0100b0013e50bb790fmr1626001plk.42.1633380896502;
+        Mon, 04 Oct 2021 13:54:56 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:db55:938c:e15a:4670])
+        by smtp.gmail.com with ESMTPSA id d60sm11539860pjk.49.2021.10.04.13.54.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 13:54:56 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 4 Oct 2021 13:54:54 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Brian Geffon <bgeffon@google.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Nitin Gupta <ngupta@vflare.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
@@ -62,59 +62,79 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         linux-block@vger.kernel.org,
         Suleiman Souhlal <suleiman@google.com>,
         Jesse Barnes <jsbarnes@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] zram: Allow backing device to be assigned after init
+Message-ID: <YVtqHv+p3uYkbu5E@google.com>
+References: <20211001181627.394921-1-bgeffon@google.com>
+ <YVtH60zyzq9AhUv2@google.com>
+ <CADyq12xk-2Fhnf_rJQ70oC1_98OEBJqwxOt6z=PpJa5V=X3dFQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADyq12xk-2Fhnf_rJQ70oC1_98OEBJqwxOt6z=PpJa5V=X3dFQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 4, 2021 at 2:29 PM Minchan Kim <minchan@kernel.org> wrote:
->
-> On Fri, Oct 01, 2021 at 11:16:27AM -0700, Brian Geffon wrote:
-> > There does not appear to be a technical reason to not
-> > allow the zram backing device to be assigned after the
-> > zram device is initialized.
+On Mon, Oct 04, 2021 at 02:40:52PM -0400, Brian Geffon wrote:
+> On Mon, Oct 4, 2021 at 2:29 PM Minchan Kim <minchan@kernel.org> wrote:
 > >
-> > This change will allow for the backing device to be assigned
-> > as long as no backing device is already assigned. In that
-> > event backing_dev would return -EEXIST.
+> > On Fri, Oct 01, 2021 at 11:16:27AM -0700, Brian Geffon wrote:
+> > > There does not appear to be a technical reason to not
+> > > allow the zram backing device to be assigned after the
+> > > zram device is initialized.
+> > >
+> > > This change will allow for the backing device to be assigned
+> > > as long as no backing device is already assigned. In that
+> > > event backing_dev would return -EEXIST.
+> > >
+> > > Signed-off-by: Brian Geffon <bgeffon@google.com>
+> > > ---
+> > >  drivers/block/zram/zram_drv.c | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> > > index fcaf2750f68f..12b4555ee079 100644
+> > > --- a/drivers/block/zram/zram_drv.c
+> > > +++ b/drivers/block/zram/zram_drv.c
+> > > @@ -462,9 +462,9 @@ static ssize_t backing_dev_store(struct device *dev,
+> > >               return -ENOMEM;
+> > >
+> > >       down_write(&zram->init_lock);
+> > > -     if (init_done(zram)) {
+> > > -             pr_info("Can't setup backing device for initialized device\n");
+> > > -             err = -EBUSY;
+> > > +     if (zram->backing_dev) {
+> > > +             pr_info("Backing device is already assigned\n");
+> > > +             err = -EEXIST;
+> > >               goto out;
 > >
-> > Signed-off-by: Brian Geffon <bgeffon@google.com>
-> > ---
-> >  drivers/block/zram/zram_drv.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > Hi Brian,
 > >
-> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> > index fcaf2750f68f..12b4555ee079 100644
-> > --- a/drivers/block/zram/zram_drv.c
-> > +++ b/drivers/block/zram/zram_drv.c
-> > @@ -462,9 +462,9 @@ static ssize_t backing_dev_store(struct device *dev,
-> >               return -ENOMEM;
+> 
+> Hi Minchan,
+> 
+> > I am worry about the inconsistency with other interface of current zram
+> > set up. They were supposed to set it up before zram disksize setting
+> > because it makes code more simple/maintainalbe in that we don't need
+> > to check some feature on the fly.
 > >
-> >       down_write(&zram->init_lock);
-> > -     if (init_done(zram)) {
-> > -             pr_info("Can't setup backing device for initialized device\n");
-> > -             err = -EBUSY;
-> > +     if (zram->backing_dev) {
-> > +             pr_info("Backing device is already assigned\n");
-> > +             err = -EEXIST;
-> >               goto out;
->
-> Hi Brian,
->
+> > Let's think about when zram extends the writeback of incompressible
+> > page on demand. The write path will need the backing_dev under
+> > down_read(&zarm->init_lock) or other conditional variable to check
+> > whether the feature is enabled or not on the fly.
+> 
+> I don't follow what you mean by that, writeback_store already holds
+> down_read(&zarm->init_lock).
 
-Hi Minchan,
+I should have explained a bit more. Sorry about that.
+I am thinking about a feature to deal with incompressible page.
+Let's have an example to handle incompressible page for that.
 
-> I am worry about the inconsistency with other interface of current zram
-> set up. They were supposed to set it up before zram disksize setting
-> because it makes code more simple/maintainalbe in that we don't need
-> to check some feature on the fly.
->
-> Let's think about when zram extends the writeback of incompressible
-> page on demand. The write path will need the backing_dev under
-> down_read(&zarm->init_lock) or other conditional variable to check
-> whether the feature is enabled or not on the fly.
+zram_bvec_rw
+  zram_bvec_write
+    if (comp_len >= huge_class)
+        zs_page_writeback
+            down_read(&zram->init_lock) or some other way
 
-I don't follow what you mean by that, writeback_store already holds
-down_read(&zarm->init_lock).
-
-Brian
+It's just idea for incompressible page but we might intorduce
+the way for other compresible pages, too at some condition.
