@@ -2,233 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C23C43217
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 20:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDAF6C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 22:29:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0CFD6121F
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 20:57:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7A8D6113E
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 22:29:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbhJEU6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Oct 2021 16:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231439AbhJEU6w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Oct 2021 16:58:52 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45D5C061755
-        for <linux-block@vger.kernel.org>; Tue,  5 Oct 2021 13:57:01 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id kk10so568171pjb.1
-        for <linux-block@vger.kernel.org>; Tue, 05 Oct 2021 13:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=T+sMQPLCyYA4dgDA1po3mBpk0YoEDbPhmdJtIoH1yHg=;
-        b=kVgnrWPqt/8TfKL7BNZmPQgr0QNgPXvvZytDS2h5kaHcpxqTbADjBCJ/Abt2MRD2ho
-         AQE6rA2089pPBRBYTGNYGFKtDpFFZRx90vfQSkxbm4IaXQ3Pq8Gm9EV0WQBnS6muswp+
-         oqVLs9ZzfyMttc3apez4GOzOBxGUI3GFG9IZA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=T+sMQPLCyYA4dgDA1po3mBpk0YoEDbPhmdJtIoH1yHg=;
-        b=A8yAla8E/16gy9iFu3IgxSgqQZ9ZwsvHYhi/FQBoDNa05Jf7Kbr8W3Kvq8zljWF6iO
-         UgnfqHhQy//KXsWDdBPaxVf4Izc+P82BCie8A4toYZd7/cHTHKQnIIH8nkmZdnA4VG7q
-         JMWb//RZF8jIsr0Nkh0yMlRlvEDHR8IbI17dB8yGOGRLKl43K/H8akANqIPSOuLKIY6y
-         v31syHm8z4r2akugXC4OhT7hZXdubU6RPl0FVDE4VqQhCjMC5hIWUK9s5QA8wMO9cbnR
-         MP2VvlNI2TIOJppaxbegBXmRtqTvpxDvni4N45YM8DYHP7m05w7Spx1QJeui6st4vJCO
-         pJUg==
-X-Gm-Message-State: AOAM531ppy82/aobWWhf+adpVxx2riT1niKwYiBhLpOLJo76sZWLBLwx
-        znp4DmZsDaO1Br4Y18rdO9MYsg==
-X-Google-Smtp-Source: ABdhPJy7Oi6ah2YEoAsHtUO4Oj62iQ0k+3Z363yUYvVg6uJCzv8mP6M8mdrm/8nMPcYAbOMuxZNFfA==
-X-Received: by 2002:a17:90a:1984:: with SMTP id 4mr6348154pji.87.1633467421458;
-        Tue, 05 Oct 2021 13:57:01 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id u12sm3312455pjr.2.2021.10.05.13.57.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 13:57:01 -0700 (PDT)
-Date:   Tue, 5 Oct 2021 13:57:00 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
-        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
-        joe@perches.com, tglx@linutronix.de, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 12/12] zram: use ATTRIBUTE_GROUPS to fix sysfs
- deadlock module removal
-Message-ID: <202110051356.D8B18C4@keescook>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-13-mcgrof@kernel.org>
+        id S231304AbhJEWbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Oct 2021 18:31:21 -0400
+Received: from mail-mw2nam10on2086.outbound.protection.outlook.com ([40.107.94.86]:3498
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230477AbhJEWbV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 Oct 2021 18:31:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HqyIiesZEPzkdI+sMx5BhjF/sj5IGgxWX8uvTM1x+9n1lnc/Ne+hgXfjic4a0dYTrbPrACc5fczjLuJFqdom4kPkzC0r3VSGGrRa+4Aa6KWJ/gRO0uwgVzkx67iO4OlJQ/ZHmk4nthw3hce04uLtCnKxhNf2LYztZHEgAmv/cPEQOGpC1txk6tjCckOtsII3UM1q6k/q7MVmAplMpIOKpg3TFGFDkEcixDtRf72odNo0K1EE+sEaRyXLCnhL3JSJgSqZQxH4DsY6sDm60AWQH3o+upwvnOzWAu5aIPH7JYf19mHESlUZtWf6nhzRWg7dSHJMW7H9A+nY6iEZkBVmsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=chkYqoM6E93PKji183hSuWb9LTQEjHrIwMqf1+qRNwI=;
+ b=Rlfn6HGQA8fxmtnl3Q5LVIJVODw+Nd/GiID1DqHhYBcIpUw+RcKV0p5qC0uCxBhvx2ONTJX3Z+mBYVvn+JkAqW9xAJJAN9DU7nhXDSD7/L+cq9MF7RBL3ZANJ0vM7UauOwoBJzXRt9tVXfPKDHiAz6Yvp55TgNUN5tJJpU2QyOrCG8iywPPlvzFp34CqRFqhcj5XsFCk46vf0XCniEUqHOEke9uAVYqEv2M67wfovNAUpDcpUyTD7hH88m9QtYOSnIVN9HcNauD9XWNZhr8iXpTR9+LA0zTDHllg2hyMFY8aOskOhI2aKCe6da4gYrC8q0BqMwzdUPOeu7P7lSqbpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=lst.de smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=chkYqoM6E93PKji183hSuWb9LTQEjHrIwMqf1+qRNwI=;
+ b=XdTk9XOGaZG307QTshC3i8J6U3bdiKPGvIOF9n+5QijIv4IVwmkNX81Y7KGnEbOLLPJACxkiX+M7t9uHgq3e9arVpG5sld4XOO17icWVSfcsLS+LvhH4il/s3tI3DzNTSv+5KI9/zwd2Gzo/vH+C1Mwfo1gX873nkwdujXda/EDDKkR5mZ3rEq9Zu27xyhx8BCfvL2qwx66pmjrcAXYQXTWZjmqDMvqpdncaIW88X++DmZ7DJiEtmnz6a+1KjyuikCnL7BU7uOCGGU98UQkWju24aEJj23vMzdPtASWf8yH1p4vQzcyaniqeHIOqXr4FTHe8qh25ORJ6VcFtoqvAZA==
+Received: from DM5PR05CA0015.namprd05.prod.outlook.com (2603:10b6:3:d4::25) by
+ CY4PR12MB1399.namprd12.prod.outlook.com (2603:10b6:903:38::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4566.19; Tue, 5 Oct 2021 22:29:28 +0000
+Received: from DM6NAM11FT044.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:d4:cafe::de) by DM5PR05CA0015.outlook.office365.com
+ (2603:10b6:3:d4::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.7 via Frontend
+ Transport; Tue, 5 Oct 2021 22:29:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT044.mail.protection.outlook.com (10.13.173.185) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4566.14 via Frontend Transport; Tue, 5 Oct 2021 22:29:27 +0000
+Received: from [172.27.1.153] (172.20.187.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Tue, 5 Oct
+ 2021 22:29:20 +0000
+Subject: Re: [PATCH v3 10/20] nvme-pci: convert to using dma_map_sgtable()
+To:     Logan Gunthorpe <logang@deltatee.com>,
+        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        <linux-mm@kvack.org>, <iommu@lists.linux-foundation.org>
+CC:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Dan Williams" <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        "Jakowski Andrzej" <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+References: <20210916234100.122368-1-logang@deltatee.com>
+ <20210916234100.122368-11-logang@deltatee.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <f38472e5-1273-140c-9177-299f09330c2a@nvidia.com>
+Date:   Wed, 6 Oct 2021 01:29:17 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210927163805.808907-13-mcgrof@kernel.org>
+In-Reply-To: <20210916234100.122368-11-logang@deltatee.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 13cff12d-bd1c-4670-891c-08d9884f975b
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1399:
+X-Microsoft-Antispam-PRVS: <CY4PR12MB139955E979C71D9B148E83B9DEAF9@CY4PR12MB1399.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /jVsOBNqCNnGnzpCBvnGnNKbiTobINaogTE7wjsFEUjyDWxaa0WagZox3rZfeBcdKYcLwlydFY+vxPQfV7WaXPPZn41RnmFyzY87DvpIT6l+PBuMzUShjv+VcV3Ajp7pVr2hPMQlHw6UmcCOxtg1urhpzdMr01Z97hkCmq8Es7HsjZOuRy4dlM7dTIEqC3Zw0ksg3ASJgs4mkgr8m5g4A7ice8sIlTqKnj6xRM4viaSyAsVKZzf5RSM1kwp529ioXp3J6wK7fdsP1MFpR1PvV/nkyD8HZO2EkDbSJhuh/O2EsexZpDARRvGr/XAkZNBIT6w2ZnN4/2HnaxczyQ6oDUKKgDs/XS7yhq6yj09zujxCvMVnQXkxtT/JCt38OomhniiqFy/9BXoh14PBadwEy1gL9gZAIN5j4FioLL+4vBOUUJqNwZ8ShHsh4vS5MJGPGbwIqCAIrCC7PfDQ4N/sA1I3bpINLZqWxiHOadqskiI6+MYgJMl0ktnh0T3Kb18ClES2qYsmTlgtGe7AFw2/odDh2eHgRIyWYklEdkaMY1u0iIfWVUvqtFVsM/26mg5gOlj8+/pciCPRNkE95WEbOkHwKYAnf8Zw8WPv5pq6KkYBfUbXdi3T1UUfIF07LU/73R31whuR4uvF3SwDUSW/1eSkI74vQwunolcraa8SxTVoAFdJ0zGPADnjqlA0IfB7MqgYxecTIJMVLL+HP5oPFRus0v0SnjjSmmFFpdvK8wQ6WFENnnpJOy2+q8MfzYpT
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(82310400003)(2906002)(47076005)(110136005)(186003)(16526019)(70586007)(26005)(54906003)(4326008)(7416002)(16576012)(8676002)(8936002)(316002)(31686004)(70206006)(53546011)(2616005)(83380400001)(356005)(6666004)(5660300002)(426003)(7636003)(508600001)(36756003)(4744005)(86362001)(31696002)(336012)(36860700001)(43740500002)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2021 22:29:27.1291
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13cff12d-bd1c-4670-891c-08d9884f975b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT044.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1399
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 09:38:05AM -0700, Luis Chamberlain wrote:
-> The ATTRIBUTE_GROUPS is typically used to avoid boiler plate
-> code which is used in many drivers. Embracing ATTRIBUTE_GROUPS was
-> long due on the zram driver, however a recent fix for sysfs allows
-> users of ATTRIBUTE_GROUPS to also associate a module to the group
-> attribute.
+Logan,
 
-Does this mean that other modules using sysfs but _not_
-ATTRIBUTE_GROUPS() are still vulnerable to potential use-after-free of
-the kernfs fops?
-
--Kees
-
-> 
-> In zram's case this also means it allows us to fix a race which triggers
-> a deadlock on the zram driver. This deadlock happens when a sysfs attribute
-> use a lock also used on module removal. This happens when for instance a
-> sysfs file on a driver is used, then at the same time we have module
-> removal call trigger. The module removal call code holds a lock, and then
-> the sysfs file entry waits for the same lock. While holding the lock the
-> module removal tries to remove the sysfs entries, but these cannot be
-> removed yet as one is waiting for a lock. This won't complete as the lock
-> is already held. Likewise module removal cannot complete, and so we
-> deadlock.
-> 
-> Sysfs fixes this when the group attributes have a module associated to
-> it, sysfs will *try* to get a refcount to the module when a shared
-> lock is used, prior to mucking with a sysfs attribute. If this fails we
-> just give up right away.
-> 
-> This deadlock was first reported with the zram driver, a sketch of how
-> this can happen follows:
-> 
-> CPU A                              CPU B
->                                    whatever_store()
-> module_unload
->   mutex_lock(foo)
->                                    mutex_lock(foo)
->    del_gendisk(zram->disk);
->      device_del()
->        device_remove_groups()
-> 
-> In this situation whatever_store() is waiting for the mutex foo to
-> become unlocked, but that won't happen until module removal is complete.
-> But module removal won't complete until the sysfs file being poked
-> completes which is waiting for a lock already held.
-> 
-> This issue can be reproduced easily on the zram driver as follows:
-> 
-> Loop 1 on one terminal:
-> 
-> while true;
-> 	do modprobe zram;
-> 	modprobe -r zram;
-> done
-> 
-> Loop 2 on a second terminal:
-> while true; do
-> 	echo 1024 >  /sys/block/zram0/disksize;
-> 	echo 1 > /sys/block/zram0/reset;
-> done
-> 
-> Without this patch we end up in a deadlock, and the following
-> stack trace is produced which hints to us what the issue was:
-> 
-> INFO: task bash:888 blocked for more than 120 seconds.
->       Tainted: G            E 5.12.0-rc1-next-20210304+ #4
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> task:bash            state:D stack:    0 pid:  888 ppid: 887 flags:<etc>
-> Call Trace:
->  __schedule+0x2e4/0x900
->  schedule+0x46/0xb0
->  schedule_preempt_disabled+0xa/0x10
->  __mutex_lock.constprop.0+0x2c3/0x490
->  ? _kstrtoull+0x35/0xd0
->  reset_store+0x6c/0x160 [zram]
->  kernfs_fop_write_iter+0x124/0x1b0
->  new_sync_write+0x11c/0x1b0
->  vfs_write+0x1c2/0x260
->  ksys_write+0x5f/0xe0
->  do_syscall_64+0x33/0x80
->  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> RIP: 0033:0x7f34f2c3df33
-> RSP: 002b:00007ffe751df6e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f34f2c3df33
-> RDX: 0000000000000002 RSI: 0000561ccb06ec10 RDI: 0000000000000001
-> RBP: 0000561ccb06ec10 R08: 000000000000000a R09: 0000000000000001
-> R10: 0000561ccb157590 R11: 0000000000000246 R12: 0000000000000002
-> R13: 00007f34f2d0e6a0 R14: 0000000000000002 R15: 00007f34f2d0e8a0
-> INFO: task modprobe:1104 can't die for more than 120 seconds.
-> task:modprobe        state:D stack:    0 pid: 1104 ppid: 916 flags:<etc>
-> Call Trace:
->  __schedule+0x2e4/0x900
->  schedule+0x46/0xb0
->  __kernfs_remove.part.0+0x228/0x2b0
->  ? finish_wait+0x80/0x80
->  kernfs_remove_by_name_ns+0x50/0x90
->  remove_files+0x2b/0x60
->  sysfs_remove_group+0x38/0x80
->  sysfs_remove_groups+0x29/0x40
->  device_remove_attrs+0x4a/0x80
->  device_del+0x183/0x3e0
->  ? mutex_lock+0xe/0x30
->  del_gendisk+0x27a/0x2d0
->  zram_remove+0x8a/0xb0 [zram]
->  ? hot_remove_store+0xf0/0xf0 [zram]
->  zram_remove_cb+0xd/0x10 [zram]
->  idr_for_each+0x5e/0xd0
->  destroy_devices+0x39/0x6f [zram]
->  __do_sys_delete_module+0x190/0x2a0
->  do_syscall_64+0x33/0x80
->  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> RIP: 0033:0x7f32adf727d7
-> RSP: 002b:00007ffc08bb38a8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-> RAX: ffffffffffffffda RBX: 000055eea23cbb10 RCX: 00007f32adf727d7
-> RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055eea23cbb78
-> RBP: 000055eea23cbb10 R08: 0000000000000000 R09: 0000000000000000
-> R10: 00007f32adfe5ac0 R11: 0000000000000206 R12: 000055eea23cbb78
-> R13: 0000000000000000 R14: 0000000000000000 R15: 000055eea23cbc20
-> 
-> [0] https://lkml.kernel.org/r/20210401235925.GR4332@42.do-not-panic.com
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+On 9/17/2021 2:40 AM, Logan Gunthorpe wrote:
+> The dma_map operations now support P2PDMA pages directly. So remove
+> the calls to pci_p2pdma_[un]map_sg_attrs() and replace them with calls
+> to dma_map_sgtable().
+>
+> dma_map_sgtable() returns more complete error codes than dma_map_sg()
+> and allows differentiating EREMOTEIO errors in case an unsupported
+> P2PDMA transfer is requested. When this happens, return BLK_STS_TARGET
+> so the request isn't retried.
+>
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 > ---
->  drivers/block/zram/zram_drv.c | 11 ++---------
->  1 file changed, 2 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index b26abcb955cc..60a55ae8cd91 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1902,14 +1902,7 @@ static struct attribute *zram_disk_attrs[] = {
->  	NULL,
->  };
->  
-> -static const struct attribute_group zram_disk_attr_group = {
-> -	.attrs = zram_disk_attrs,
-> -};
-> -
-> -static const struct attribute_group *zram_disk_attr_groups[] = {
-> -	&zram_disk_attr_group,
-> -	NULL,
-> -};
-> +ATTRIBUTE_GROUPS(zram_disk);
->  
->  /*
->   * Allocate and initialize new zram device. the function returns
-> @@ -1981,7 +1974,7 @@ static int zram_add(void)
->  		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
->  
->  	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
-> -	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
-> +	device_add_disk(NULL, zram->disk, zram_disk_groups);
->  
->  	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
->  
-> -- 
-> 2.30.2
-> 
+>   drivers/nvme/host/pci.c | 69 +++++++++++++++++------------------------
+>   1 file changed, 29 insertions(+), 40 deletions(-)
 
--- 
-Kees Cook
+Looks good,
+
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+
+
