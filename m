@@ -2,103 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE94CC433FE
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41270C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:32:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACFB061502
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:29:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 275E061506
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:32:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235894AbhJEPbT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Oct 2021 11:31:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59804 "EHLO
+        id S229626AbhJEPeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Oct 2021 11:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235148AbhJEPbS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Oct 2021 11:31:18 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BAAC06174E
-        for <linux-block@vger.kernel.org>; Tue,  5 Oct 2021 08:29:28 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id j15so22238984ila.6
-        for <linux-block@vger.kernel.org>; Tue, 05 Oct 2021 08:29:28 -0700 (PDT)
+        with ESMTP id S231513AbhJEPeS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Oct 2021 11:34:18 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D86C061749
+        for <linux-block@vger.kernel.org>; Tue,  5 Oct 2021 08:32:27 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id i13so22267627ilm.4
+        for <linux-block@vger.kernel.org>; Tue, 05 Oct 2021 08:32:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nc1FgnD/mSYqMld6sjsRt6tVpmIMdZPD5t5JRK+GtPQ=;
-        b=ruSR8ca4l8fkTchOCj9w2x/+8imPlkfn1vNHg+Qo62P64JV/TGOAYBmy5yShly/sYC
-         nNscVaNY1sO6xzm5NloCxyS4mz83lAbOZBmii+ZfOdyvrOaJYF60PBsOVVdprYH/ndDT
-         rNxO/CodUXFonCcAJw5vdF9IAWH5v0uMjrDLvq0yYftjgFI09aPK10zqkSQs4sD5KGSt
-         GxdEweYQ7VFevtOHFqOLfHy0YgnSCQs3DIrhA31qeqFjPahY1zI5fpnhupsBa14Eh/PY
-         IdHy/5nf5F1wx5PA3l/EB4rNVBzzB4a3/j3fk/QcHnFzwSpEAim5bwJtV12YoNRmsYJ1
-         Xn3g==
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=IBEdg256g7XrTRf/DgSzh1YjxdhVgqzhTZgsp9rQe3k=;
+        b=Od0MTpLgXXOlBNlUkkeMYhSwI6xqlCTHNJv1W6vZhEThi4qFBx5I00fWx/9l4v6CNp
+         1bJSg7uiXpUGvss51BZ4dGA9Hh6NGV414rk6A7z/eGovCKwRe2Qe9Qgy2szPvyFueoui
+         klPIzkfnRQHbk6KfWvZifeYu8WfbcVUMj3PymGOngTellnwAVNjxTn9kAFJXjKhLY0zJ
+         mcq9lGfpcYuBfqNsLLB7XKj7B9ekx3EGmraW91Pm9QSD5k6l7fMwrJoeJZSKwUWw1Xvn
+         TCXNA/VJZSck7b66NxALrfiVvcyuxtLuMmJeUHRsPLlAsxp0mWa6iexLkVdLC9RWc+TU
+         v7Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nc1FgnD/mSYqMld6sjsRt6tVpmIMdZPD5t5JRK+GtPQ=;
-        b=CpnzOpZ6tH60ZPCpriRE4zjzn+ZLcSth6JS4JzhGJSAXY1VFP+4H+iRYe+PLPjVOWd
-         mlhqlR6KCrZFAmY8p5RkMbH0iY9VIXUv0MH4xs+zkozax8TI/t0z1KzpmUpt+HQKhCtK
-         FdPRY+g0eV9FFVVh1xoMMnuwWKDM6Qw8SEdRE+o5LNhrrbiH2PJzbfaWwYQ/aAxm3ADM
-         Mh2p0uClyRQ6f4iU7ZDRJGPbgCqGR4QmScGuBFJpdJYSRbJUWMek9VMTOTzBm/PkYHZQ
-         9TqdSydZlqJa6crart7408s7TA0+JiVKhUU1wlWHq0qHwd5X3QxJMrgqDdXha4zt1IwL
-         /ZJA==
-X-Gm-Message-State: AOAM531CoAGWHyhD3Bmcol3VCsch9jjtona5DeoZXffJ/POitsN3JFlJ
-        PDKbguxdqFRTbsB8XIJkNM1qqoIcr3rvHDlVR3c=
-X-Google-Smtp-Source: ABdhPJyuMOaPh9ixqHeXqV4CV7cXW6VBecVooyEvjiqtaR4o7vPrY6GmVHCekm52jhQ1B6ANaqOo9g==
-X-Received: by 2002:a05:6e02:190a:: with SMTP id w10mr3378933ilu.2.1633447767565;
-        Tue, 05 Oct 2021 08:29:27 -0700 (PDT)
-Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id m5sm6317762ild.45.2021.10.05.08.29.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 08:29:27 -0700 (PDT)
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=IBEdg256g7XrTRf/DgSzh1YjxdhVgqzhTZgsp9rQe3k=;
+        b=DUN2qbdD+SlMhcaBtxUXOPy4tZ3x+NCe5NPWzGNPiTCYmp30vannHVaA0jzhi4717N
+         lmeRObH/fTmORh4HluBiD6kwujW0AdU53xwvJXdmuBaQp+yV4MN9r30KiGrTkDjiip/D
+         gUZkLZwHk6pqsmU6hWG1hoMahdc1A9M3cCYdeogURpNHYUh+EPq10f+NPbTiZ/Nu7/E7
+         G25GXhltvaIQ9LpRUu14ZmMWNSwwrlWjY5NCnoGfQBequchOEiY4HVyHXU1nUUpxWyAV
+         jWnrfwd8wBeA23iJHOydB5RfyatziUD96cKh/AIlbuPu1KAz8W6w6nbx2J68D3veUZPt
+         rETQ==
+X-Gm-Message-State: AOAM5327hZ7OFTx3xT3jvC+cJsNBJiZ1p930rih3J9H5TCm9IGVxCIc2
+        5i2rr8nSw3vPi2ANNAzSepcrLtn3tUFfcpRKEdw=
+X-Google-Smtp-Source: ABdhPJyVy3ReqQT+6HPJsBMezwYz1ukG/IWuHpN0z6sViKrVb5/TzDYZY/cbUAmDvZPknHLhZbeM8A==
+X-Received: by 2002:a92:1a08:: with SMTP id a8mr3532730ila.301.1633447947159;
+        Tue, 05 Oct 2021 08:32:27 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id y124sm11233763iof.8.2021.10.05.08.32.26
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Oct 2021 08:32:26 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     tj@kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] block: inherit request start time from bio for BLK_CGROUP
-Date:   Tue,  5 Oct 2021 09:29:22 -0600
-Message-Id: <20211005152922.57326-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211005152922.57326-1-axboe@kernel.dk>
-References: <20211005152922.57326-1-axboe@kernel.dk>
+Subject: [PATCH] block: don't call should_fail_request() for
+ !CONFIG_FAIL_MAKE_REQUEST
+Message-ID: <50093280-104b-545a-c4c9-2fc3efd45520@kernel.dk>
+Date:   Tue, 5 Oct 2021 09:32:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Doing high IOPS testing with blk-cgroups enabled spends ~15-20% of the
-time just doing ktime_get_ns() -> readtsc. We essentially read and
-set the start time twice, one for the bio and then again when that bio
-is mapped to a request.
-
-Given that the time between the two is very short, inherit the bio
-start time instead of reading it again. This cuts 1/3rd of the overhead
-of the time keeping.
+Unnecessary function call, if we don't have that specific configuration
+option enabled.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-mq.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a8c437afc2c3..a40c94505680 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -718,7 +718,14 @@ void blk_mq_start_request(struct request *rq)
- 	trace_block_rq_issue(rq);
+---
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 5454db2fa263..a267f11f55cb 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -697,8 +697,10 @@ static inline bool bio_check_ro(struct bio *bio)
  
- 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
--		rq->io_start_time_ns = ktime_get_ns();
-+		u64 start_time;
-+#ifdef CONFIG_BLK_CGROUP
-+		if (rq->bio)
-+			start_time = bio_issue_time(&rq->bio->bi_issue);
-+		else
+ static noinline int should_fail_bio(struct bio *bio)
+ {
++#ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	if (should_fail_request(bdev_whole(bio->bi_bdev), bio->bi_iter.bi_size))
+ 		return -EIO;
 +#endif
-+			start_time = ktime_get_ns();
-+		rq->io_start_time_ns = start_time;
- 		rq->stats_sectors = blk_rq_sectors(rq);
- 		rq->rq_flags |= RQF_STATS;
- 		rq_qos_issue(q, rq);
+ 	return 0;
+ }
+ ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
+
 -- 
-2.33.0
+Jens Axboe
 
