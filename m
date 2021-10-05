@@ -2,146 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77F0C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 09:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B570EC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 10:28:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BE18610C9
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 09:24:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9439961507
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 10:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233545AbhJEJ0a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Oct 2021 05:26:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55611 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232773AbhJEJ03 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Oct 2021 05:26:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633425879;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qyGWEhpdvwHRCn/lr1t/kNe6MHkOq9fXmq3K7gAa+cc=;
-        b=RD2GftGyfyrVrqjB0yAUet2wrjKOU9CTSPZ76kmGPW9dyAfqEDyS/5d4nqAQ2WAcWIHeA/
-        QyMwUo3a1/GhMPHkJAjz4WMyE9g0zkcLUPRXUXxI/22cZThD2i4+/dgrqmq/PgM8SkcYzO
-        GenOJcQ32mVQoL0GnyJ+ABuvOFBT84s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-YETLEAj_PmuF1NvZWR3dfQ-1; Tue, 05 Oct 2021 05:24:35 -0400
-X-MC-Unique: YETLEAj_PmuF1NvZWR3dfQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A2C610151E1;
-        Tue,  5 Oct 2021 09:24:33 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C0F385F4EA;
-        Tue,  5 Oct 2021 09:24:23 +0000 (UTC)
-Date:   Tue, 5 Oct 2021 17:24:18 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
-        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
-        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
-        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YVwZwh7qDKfSM59h@T590>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-10-mcgrof@kernel.org>
+        id S233576AbhJEKah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Oct 2021 06:30:37 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3917 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233077AbhJEKah (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Oct 2021 06:30:37 -0400
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HNty61Ymlz67b2s;
+        Tue,  5 Oct 2021 18:25:18 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Tue, 5 Oct 2021 12:28:44 +0200
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Tue, 5 Oct 2021 11:28:42 +0100
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ming.lei@redhat.com>, <hare@suse.de>,
+        <linux-scsi@vger.kernel.org>, <kashyap.desai@broadcom.com>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH v5 00/14] blk-mq: Reduce static requests memory footprint for shared sbitmap
+Date:   Tue, 5 Oct 2021 18:23:25 +0800
+Message-ID: <1633429419-228500-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210927163805.808907-10-mcgrof@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 27, 2021 at 09:38:02AM -0700, Luis Chamberlain wrote:
-> When driver sysfs attributes use a lock also used on module removal we
-> can race to deadlock. This happens when for instance a sysfs file on
-> a driver is used, then at the same time we have module removal call
-> trigger. The module removal call code holds a lock, and then the
-> driver's sysfs file entry waits for the same lock. While holding the
-> lock the module removal tries to remove the sysfs entries, but these
-> cannot be removed yet as one is waiting for a lock. This won't complete
-> as the lock is already held. Likewise module removal cannot complete,
-> and so we deadlock.
-> 
-> This can now be easily reproducible with our sysfs selftest as follows:
-> 
-> ./tools/testing/selftests/sysfs/sysfs.sh -t 0027
-> 
-> This uses a local driver lock. Test 0028 can also be used, that uses
-> the rtnl_lock():
-> 
-> ./tools/testing/selftests/sysfs/sysfs.sh -t 0028
-> 
-> To fix this we extend the struct kernfs_node with a module reference
-> and use the try_module_get() after kernfs_get_active() is called. As
-> documented in the prior patch, we now know that once kernfs_get_active()
-> is called the module is implicitly guarded to exist and cannot be removed.
-> This is because the module is the one in charge of removing the same
-> sysfs file it created, and removal of sysfs files on module exit will wait
-> until they don't have any active references. By using a try_module_get()
-> after kernfs_get_active() we yield to let module removal trump calls to
-> process a sysfs operation, while also preventing module removal if a sysfs
-> operation is in already progress. This prevents the deadlock.
-> 
-> This deadlock was first reported with the zram driver, however the live
+Currently a full set of static requests are allocated per hw queue per
+tagset when shared sbitmap is used.
 
-Looks not see the lock pattern you mentioned in zram driver, can you
-share the related zram code?
+However, only tagset->queue_depth number of requests may be active at
+any given time. As such, only tagset->queue_depth number of static
+requests are required.
 
-> patching folks have acknowledged they have observed this as well with
-> live patching, when a live patch is removed. I was then able to
-> reproduce easily by creating a dedicated selftest for it.
-> 
-> A sketch of how this can happen follows, consider foo a local mutex
-> part of a driver, and used on the driver's module exit routine and
-> on one of its sysfs ops:
-> 
-> foo.c:
-> static DEFINE_MUTEX(foo);
-> static ssize_t foo_store(struct device *dev,
-> 			 struct device_attribute *attr,
-> 			 const char *buf, size_t count)
-> {
-> 	...
-> 	mutex_lock(&foo);
-> 	...
-> 	mutex_lock(&foo);
-> 	...
-> }
-> static DEVICE_ATTR_RW(foo);
-> ...
-> void foo_exit(void)
-> {
-> 	mutex_lock(&foo);
-> 	...
-> 	mutex_unlock(&foo);
-> }
-> module_exit(foo_exit);
-> 
-> And this can lead to this condition:
-> 
-> CPU A                              CPU B
->                                    foo_store()
-> foo_exit()
->   mutex_lock(&foo)
->                                    mutex_lock(&foo)
->    del_gendisk(some_struct->disk);
->      device_del()
->        device_remove_groups()
+The same goes for using an IO scheduler, which allocates a full set of
+static requests per hw queue per request queue.
 
-I guess the deadlock exists if foo_exit() is called anywhere. If yes,
-look the issue may not be related with removing module directly, right?
+This series changes shared sbitmap support by using a shared tags per
+tagset and request queue. Ming suggested something along those lines in
+v1 review. In using a shared tags, the static rqs also become shared,
+reducing the number of sets of static rqs, reducing memory usage.
 
+Patch "blk-mq: Use shared tags for shared sbitmap support" is a bit big,
+and could potentially be broken down. But then maintaining ability to
+bisect becomes harder and each sub-patch would get more convoluted.
 
+For megaraid sas driver on my 128-CPU arm64 system with 1x SATA disk, we
+save approx. 300MB(!) [370MB -> 60MB]
 
-Thanks,
-Ming
+Baseline is 1b2d1439fc25 (block/for-next) Merge branch 'for-5.16/io_uring'
+into for-next
+
+Changes since v4:
+- Add Hannes' and Ming's RB tags (thanks!) - but please check 12/14 rework
+- Add patch to change "shared sbitmap" naming to "shared tags"
+- Rebase "block: Rename BLKDEV_MAX_RQ -> BLKDEV_DEFAULT_RQ"
+
+Changes since v3:
+- Fix transient error handling issue in  05/13
+- Add Hannes RB tags (thanks!)
+
+Changes since v2:
+- Make blk_mq_clear_rq_mapping() static again
+- Various function renaming for conciseness and consistency
+- Add/refactor alloc/free map and rqs function
+- Drop the new blk_mq_ops init_request method in favour of passing an
+  invalid HW queue index for shared sbitmap
+- Add patch to not clear rq mapping for driver tags
+- Remove blk_mq_init_bitmap_tags()
+- Add some more RB tags (thanks!)
+
+Changes since v1:
+- Switch to use blk_mq_tags for shared sbitmap
+- Add new blk_mq_ops init request callback
+- Add some RB tags (thanks!)
+
+John Garry (14):
+  blk-mq: Change rqs check in blk_mq_free_rqs()
+  block: Rename BLKDEV_MAX_RQ -> BLKDEV_DEFAULT_RQ
+  blk-mq: Relocate shared sbitmap resize in blk_mq_update_nr_requests()
+  blk-mq: Invert check in blk_mq_update_nr_requests()
+  blk-mq-sched: Rename blk_mq_sched_alloc_{tags -> map_and_rqs}()
+  blk-mq-sched: Rename blk_mq_sched_free_{requests -> rqs}()
+  blk-mq: Pass driver tags to blk_mq_clear_rq_mapping()
+  blk-mq: Don't clear driver tags own mapping
+  blk-mq: Add blk_mq_tag_update_sched_shared_sbitmap()
+  blk-mq: Add blk_mq_alloc_map_and_rqs()
+  blk-mq: Refactor and rename blk_mq_free_map_and_{requests->rqs}()
+  blk-mq: Use shared tags for shared sbitmap support
+  blk-mq: Stop using pointers for blk_mq_tags bitmap tags
+  blk-mq: Change shared sbitmap naming to shared tags
+
+ block/bfq-iosched.c    |   4 +-
+ block/blk-core.c       |   6 +-
+ block/blk-mq-debugfs.c |   8 +-
+ block/blk-mq-sched.c   | 118 +++++++++++-------------
+ block/blk-mq-sched.h   |   4 +-
+ block/blk-mq-tag.c     | 135 ++++++++++------------------
+ block/blk-mq-tag.h     |  16 ++--
+ block/blk-mq.c         | 198 +++++++++++++++++++++++------------------
+ block/blk-mq.h         |  36 ++++----
+ block/blk.h            |   2 +-
+ block/elevator.c       |   2 +-
+ block/kyber-iosched.c  |   4 +-
+ block/mq-deadline.c    |   2 +-
+ drivers/block/rbd.c    |   2 +-
+ include/linux/blk-mq.h |  17 ++--
+ include/linux/blkdev.h |   5 +-
+ 16 files changed, 262 insertions(+), 297 deletions(-)
+
+-- 
+2.26.2
 
