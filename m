@@ -2,115 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20DB1C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 08:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77F0C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 09:24:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2DA461507
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 08:04:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BE18610C9
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 09:24:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232772AbhJEIGL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Oct 2021 04:06:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28651 "EHLO
+        id S233545AbhJEJ0a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Oct 2021 05:26:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55611 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232793AbhJEIGK (ORCPT
+        by vger.kernel.org with ESMTP id S232773AbhJEJ03 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Oct 2021 04:06:10 -0400
+        Tue, 5 Oct 2021 05:26:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633421060;
+        s=mimecast20190719; t=1633425879;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vtULx88xAOp/JsicdkATYnwFMV/hB6VPvYC999jApo8=;
-        b=gFzTspHhC2bk/Wbc+oD/AqwlgTsgf0GNC4xiMvRHU2d44ihuSN7ZV3FJF4K1weH+IZvvRO
-        R+5Zuob35ljVJAxQuFgDv0gGZnpT826mIGSXKc1dti4vRxg1PkegN/ZDo9KK1GG2qXAcoJ
-        1mGiym8/IzrdXqaZ75ndF23xHZlmn4U=
+        bh=qyGWEhpdvwHRCn/lr1t/kNe6MHkOq9fXmq3K7gAa+cc=;
+        b=RD2GftGyfyrVrqjB0yAUet2wrjKOU9CTSPZ76kmGPW9dyAfqEDyS/5d4nqAQ2WAcWIHeA/
+        QyMwUo3a1/GhMPHkJAjz4WMyE9g0zkcLUPRXUXxI/22cZThD2i4+/dgrqmq/PgM8SkcYzO
+        GenOJcQ32mVQoL0GnyJ+ABuvOFBT84s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-8fu__61VMtOhSr-PMRLRiw-1; Tue, 05 Oct 2021 04:04:16 -0400
-X-MC-Unique: 8fu__61VMtOhSr-PMRLRiw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-531-YETLEAj_PmuF1NvZWR3dfQ-1; Tue, 05 Oct 2021 05:24:35 -0400
+X-MC-Unique: YETLEAj_PmuF1NvZWR3dfQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 140611842158;
-        Tue,  5 Oct 2021 08:04:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A2C610151E1;
+        Tue,  5 Oct 2021 09:24:33 +0000 (UTC)
 Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F88E60C17;
-        Tue,  5 Oct 2021 08:04:10 +0000 (UTC)
-Date:   Tue, 5 Oct 2021 16:04:06 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C0F385F4EA;
+        Tue,  5 Oct 2021 09:24:23 +0000 (UTC)
+Date:   Tue, 5 Oct 2021 17:24:18 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V2 1/5] nvme: add APIs for stopping/starting admin queue
-Message-ID: <YVwG9qjNUNrE5duR@T590>
-References: <20210930125621.1161726-1-ming.lei@redhat.com>
- <20210930125621.1161726-2-ming.lei@redhat.com>
- <95d25bd6-f632-67cc-657e-5158c6412256@nvidia.com>
- <YVu3EjPqT8VME/oY@T590>
- <79efb733-4904-d27f-b336-d5d97d3ca261@nvidia.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
+        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
+        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
+        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
+Message-ID: <YVwZwh7qDKfSM59h@T590>
+References: <20210927163805.808907-1-mcgrof@kernel.org>
+ <20210927163805.808907-10-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79efb733-4904-d27f-b336-d5d97d3ca261@nvidia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210927163805.808907-10-mcgrof@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 05, 2021 at 03:38:18AM +0000, Chaitanya Kulkarni wrote:
-> On 10/4/21 19:23, Ming Lei wrote:
-> > External email: Use caution opening links or attachments
-> > 
-> > 
-> > Hello Chaitanya,
-> > 
-> > On Fri, Oct 01, 2021 at 05:56:04AM +0000, Chaitanya Kulkarni wrote:
-> >> On 9/30/2021 5:56 AM, Ming Lei wrote:
-> >>> External email: Use caution opening links or attachments
-> >>>
-> >>>
-> >>> Add two APIs for stopping and starting admin queue.
-> >>>
-> >>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> >>
-> >>
-> >> this patch looks good to me, but from the feedback I've received in past
-> >> we need to add the new functions in the patch where they are actually
-> >> used than adding it in a separate patch.
-> > 
-> > The added two APIs are exported via EXPORT_SYMBOL_GPL(), so it won't
-> > cause any build warning. I see lots of such practise too.
-> > 
+On Mon, Sep 27, 2021 at 09:38:02AM -0700, Luis Chamberlain wrote:
+> When driver sysfs attributes use a lock also used on module removal we
+> can race to deadlock. This happens when for instance a sysfs file on
+> a driver is used, then at the same time we have module removal call
+> trigger. The module removal call code holds a lock, and then the
+> driver's sysfs file entry waits for the same lock. While holding the
+> lock the module removal tries to remove the sysfs entries, but these
+> cannot be removed yet as one is waiting for a lock. This won't complete
+> as the lock is already held. Likewise module removal cannot complete,
+> and so we deadlock.
 > 
-> the comment was not related to any build or warning.
+> This can now be easily reproducible with our sysfs selftest as follows:
 > 
-> > It is easier for reviewing in this way since the 1st patch focuses on
-> > API implementation, and the 2nd patch focuses on using the API,
-> > especially there are lots of users in patch 2.
-> > 
+> ./tools/testing/selftests/sysfs/sysfs.sh -t 0027
 > 
-> I am aware of that, just sharing what I got the comments in the past.
+> This uses a local driver lock. Test 0028 can also be used, that uses
+> the rtnl_lock():
 > 
-> > But if you really don't like this way, I am fine to merge the two since
-> > merging is always easier than splitting, :-)
-> > 
+> ./tools/testing/selftests/sysfs/sysfs.sh -t 0028
 > 
-> it will be good if we can keep the consistency ... nothing else ..
+> To fix this we extend the struct kernfs_node with a module reference
+> and use the try_module_get() after kernfs_get_active() is called. As
+> documented in the prior patch, we now know that once kernfs_get_active()
+> is called the module is implicitly guarded to exist and cannot be removed.
+> This is because the module is the one in charge of removing the same
+> sysfs file it created, and removal of sysfs files on module exit will wait
+> until they don't have any active references. By using a try_module_get()
+> after kernfs_get_active() we yield to let module removal trump calls to
+> process a sysfs operation, while also preventing module removal if a sysfs
+> operation is in already progress. This prevents the deadlock.
+> 
+> This deadlock was first reported with the zram driver, however the live
 
-OK, got it, and the latest such nvme patch is the following one, which
-introduced an API in one standalone patch.
+Looks not see the lock pattern you mentioned in zram driver, can you
+share the related zram code?
 
-commit dda3248e7fc306e0ce3612ae96bdd9a36e2ab04f
-Author: Chao Leng <lengchao@huawei.com>
-Date:   Thu Feb 4 08:55:11 2021 +0100
+> patching folks have acknowledged they have observed this as well with
+> live patching, when a live patch is removed. I was then able to
+> reproduce easily by creating a dedicated selftest for it.
+> 
+> A sketch of how this can happen follows, consider foo a local mutex
+> part of a driver, and used on the driver's module exit routine and
+> on one of its sysfs ops:
+> 
+> foo.c:
+> static DEFINE_MUTEX(foo);
+> static ssize_t foo_store(struct device *dev,
+> 			 struct device_attribute *attr,
+> 			 const char *buf, size_t count)
+> {
+> 	...
+> 	mutex_lock(&foo);
+> 	...
+> 	mutex_lock(&foo);
+> 	...
+> }
+> static DEVICE_ATTR_RW(foo);
+> ...
+> void foo_exit(void)
+> {
+> 	mutex_lock(&foo);
+> 	...
+> 	mutex_unlock(&foo);
+> }
+> module_exit(foo_exit);
+> 
+> And this can lead to this condition:
+> 
+> CPU A                              CPU B
+>                                    foo_store()
+> foo_exit()
+>   mutex_lock(&foo)
+>                                    mutex_lock(&foo)
+>    del_gendisk(some_struct->disk);
+>      device_del()
+>        device_remove_groups()
 
-    nvme: introduce a nvme_host_path_error helper
+I guess the deadlock exists if foo_exit() is called anywhere. If yes,
+look the issue may not be related with removing module directly, right?
 
 
 
-Thanks 
+Thanks,
 Ming
 
