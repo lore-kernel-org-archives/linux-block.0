@@ -2,171 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA738C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 02:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 130A5C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 03:21:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 912976124D
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 02:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E45476113D
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 03:21:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230097AbhJECdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Oct 2021 22:33:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39478 "EHLO
+        id S230237AbhJEDXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Oct 2021 23:23:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30334 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229659AbhJECdY (ORCPT
+        by vger.kernel.org with ESMTP id S229659AbhJEDXe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Oct 2021 22:33:24 -0400
+        Mon, 4 Oct 2021 23:23:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633401094;
+        s=mimecast20190719; t=1633404104;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Y7jJ6KHx8OrB8Mx5SJVvL7UsMt1KY18IEIlpK+BFivY=;
-        b=dYot6Q3E+JGN7vVPPegUMnklyCUBeexYUw3U9HC/BWrzRNr68CaPda9+bqNIHcmbOqREIX
-        ac51AHBiHm5jgm7U3c6G+YLIYxVquMWsSHrBeAV3dANXLOHswkBc1N5rw9hbLOqDPf3Ugf
-        vz6TgnztpcKqgl3BX8bpN+3EFU/oW4U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-597-EBiTeELeNvax-nm-USI9VQ-1; Mon, 04 Oct 2021 22:31:31 -0400
-X-MC-Unique: EBiTeELeNvax-nm-USI9VQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C02EB8145E6;
-        Tue,  5 Oct 2021 02:31:29 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2181410013D7;
-        Tue,  5 Oct 2021 02:31:24 +0000 (UTC)
-Date:   Tue, 5 Oct 2021 10:31:19 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V2 5/5] blk-mq: support concurrent queue quiesce/unquiesce
-Message-ID: <YVu49xcM1N//fvKR@T590>
-References: <20210930125621.1161726-1-ming.lei@redhat.com>
- <20210930125621.1161726-6-ming.lei@redhat.com>
- <e3d6c61c-f7cf-dcb0-df2e-a8e9acf5aaaa@acm.org>
+        bh=xk/7YbIZQF2rW5bq7XOVF5+Z1qU2pZKVc4y/DpCoUKU=;
+        b=Hylp2lp5iCWoEQ67dKkCEoh0zmCpF+p/LSUgtRkSU65YjCpyE3s6jBGkFlA4bQahRTIxbT
+        yt02gPaFR7fIGWvbs7SIU+fiLJsRRkVaQHHp49ErGfoDWddNz9akeu5oWGFxmVnAYrv/Gd
+        FBLqPN71D8O79PPnHZ6blm8mb6P8Gm4=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-600-9p6AuGcpMVaXzv6gnZSOVw-1; Mon, 04 Oct 2021 23:21:42 -0400
+X-MC-Unique: 9p6AuGcpMVaXzv6gnZSOVw-1
+Received: by mail-yb1-f198.google.com with SMTP id 83-20020a251956000000b0059948f541cbso26506465ybz.7
+        for <linux-block@vger.kernel.org>; Mon, 04 Oct 2021 20:21:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xk/7YbIZQF2rW5bq7XOVF5+Z1qU2pZKVc4y/DpCoUKU=;
+        b=ArSbUpj3OcbtfgNQmQtmuO6d1revNWxDYVGUKKnosLX3ekUj3h5+QPJ+bO6H/VC6W8
+         igR+iwnLDhX/7ObksjFO2g3wOGl+AZB2sl8OjSLxRMnt4AtqVJAb5dSsQOaimVHhJ658
+         HqVAeEPPQsBuoxnraIfqNpa/FyyLj05fmO6TNdcdG0RzY+s5d0i1DI1bpynBjJb+pWHV
+         V1tLOJoUMie5zMQMj5WXBmHU/5eRB/JyswYoJzxm1s6oDPE5rPwfwXVLh/KD81eM2BSw
+         y9IpOHO0UgvQvIDwJcz4PMahBrZ89daakC/E1C0zCWYZBAG7++NMxw+mdZB7amn8Ru+3
+         Vmuw==
+X-Gm-Message-State: AOAM532S+UbDHQJZvmMAuQHCRZsCiSQzCGtZvL/1JJfPDMBlyj+QS6Gb
+        i+v6kVoa5F05jnKTYCS8KnyWTn6vgvLSUCth7/q4+X8kt23m2ru080xnVSWzB3z8ylPgGKr4FYi
+        3+Cu9am9smwI2uNEsoMNCbOxIPiDugekLtrodsmI=
+X-Received: by 2002:a25:2208:: with SMTP id i8mr19236374ybi.86.1633404102168;
+        Mon, 04 Oct 2021 20:21:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwvxWboVZDPTjHx/SzBtkcYuB29eNb+iTvhUe9n6Gz1CBDsDL88nFugHhLm/qFAN/yGBmBVv5NaLIO0hXacmVQ=
+X-Received: by 2002:a25:2208:: with SMTP id i8mr19236359ybi.86.1633404101936;
+ Mon, 04 Oct 2021 20:21:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e3d6c61c-f7cf-dcb0-df2e-a8e9acf5aaaa@acm.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <CAHj4cs8XNtkzbbiLnFmVu82wYeQpLkVp6_wCtrnbhODay+OP9w@mail.gmail.com>
+ <059007be-03fa-5948-d86d-d1750587e894@acm.org> <c5db85b3ecb9730d848b2c37c975b72acd8a2413.camel@redhat.com>
+ <CAHj4cs_8KbMJ+HU22E4-e_zYuPj8TfGOzxNtzQqxqKig9S=gQg@mail.gmail.com> <491cab4b-1f5b-2881-5ba2-943c23d407ff@acm.org>
+In-Reply-To: <491cab4b-1f5b-2881-5ba2-943c23d407ff@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Tue, 5 Oct 2021 11:21:30 +0800
+Message-ID: <CAHj4cs_6DkGwj3UJWi3YJYJxuzGST-Yi8x4EVrO4YsHP+Pk=7Q@mail.gmail.com>
+Subject: Re: [bug report] blktests srp/013 lead kernel panic with latest
+ block/for-next and 5.13.15
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        CKI Project <cki-project@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 30, 2021 at 08:56:29AM -0700, Bart Van Assche wrote:
-> On 9/30/21 5:56 AM, Ming Lei wrote:
-> > Turns out that blk_mq_freeze_queue() isn't stronger[1] than
-> > blk_mq_quiesce_queue() because dispatch may still be in-progress after
-> > queue is frozen, and in several cases, such as switching io scheduler,
-> > updating nr_requests & wbt latency, we still need to quiesce queue as a
-> > supplement of freezing queue.
-> 
-> Is there agreement about this? If not, how about leaving out the above from the
-> patch description?
+On Wed, Sep 29, 2021 at 2:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 9/27/21 10:10 PM, Yi Zhang wrote:
+> > Hi Bart
+> >
+> > Bisect shows this issue was introduced from bellow commit, btw, this is always reproduced on the s390x kvm environment:
+> >
+> > commit 65ca846a53149a1a72cd8d02e7b2e73dd545b834
+> > Author: Bart Van Assche <bvanassche@acm.org <mailto:bvanassche@acm.org>>
+> > Date:   Wed Jan 22 19:56:34 2020 -0800
+> >
+> >      scsi: core: Introduce {init,exit}_cmd_priv()
+> >
+> >      The current behavior of the SCSI core is to clear driver-private data
+> >      before preparing a request for submission to the SCSI LLD. Make it possible
+> >      for SCSI LLDs to disable clearing of driver-private data.
+> >
+> >      These hooks will be used by a later patch, namely "scsi: ufs: Let the SCSI
+> >      core allocate per-command UFS data".
+> >
+> > (gdb) l *(scsi_mq_exit_request+0x2c)
+> > 0x8d7be4 is in scsi_mq_exit_request (drivers/scsi/scsi_lib.c:1780).
+> > 1775 unsigned int hctx_idx)
+> > 1776 {
+> > 1777 struct Scsi_Host *shost = set->driver_data;
+> > 1778 struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
+> > 1779
+> > 1780 if (shost->hostt->exit_cmd_priv)
+> > 1781 shost->hostt->exit_cmd_priv(shost, cmd);
+> > 1782 kmem_cache_free(scsi_sense_cache, cmd->sense_buffer);
+> > 1783 }
+> > 1784
+>
+> Hi Yi,
+>
+> Thank you for having taken the time to run a bisect. However, I strongly doubt
+> that the bisection result is correct. If there would be anything wrong with the
+> above patch it would already have been noticed on other architectures. I
+> recommend to proceed as follows:
+> * Verify whether the reported issue only occurs with the stable kernel series or
+>    also with mainline kernels.
 
-Yeah, actually the code has been merged, please see the related
-functions: elevator_switch(), queue_wb_lat_store() and
-blk_mq_update_nr_requests().
+This can be reproduced on both stable kernels and mainline kernels.
 
-> 
-> > As we need to extend uses of blk_mq_quiesce_queue(), it is inevitable
-> > for us to need support nested quiesce, especially we can't let
-> > unquiesce happen when there is quiesce originated from other contexts.
-> > 
-> > This patch introduces q->mq_quiesce_depth to deal concurrent quiesce,
-> > and we only unquiesce queue when it is the last/outer-most one of all
-> > contexts.
-> > 
-> > One kernel panic issue has been reported[2] when running stress test on
-> > dm-mpath's updating nr_requests and suspending queue, and the similar
-> > issue should exist on almost all drivers which use quiesce/unquiesce.
-> > 
-> > [1] https://marc.info/?l=linux-block&m=150993988115872&w=2
-> > [2] https://listman.redhat.com/archives/dm-devel/2021-September/msg00189.html
-> 
-> Please share the call stack of the kernel oops fixed by [2] since that
-> call stack is not in the patch description.
+> * Work with the soft-iWARP author to improve the reliability of the siw driver.
+>    If I run blktests in an x86 VM then the following appears sporadically in
+>    the kernel log:
+>
+> ------------[ cut here ]------------
+> WARNING: CPU: 18 PID: 5462 at drivers/infiniband/sw/siw/siw_cm.c:255 __siw_cep_dealloc+0x184/0x190 [siw]
+> CPU: 1 PID: 5462 Comm: kworker/u144:13 Tainted: G            E     5.15.0-rc2-dbg+ #7
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+> Workqueue: iw_cm_wq cm_work_handler [iw_cm]
+> RIP: 0010:__siw_cep_dealloc+0x184/0x190 [siw]
+> Call Trace:
+>   siw_cep_put+0x5c/0x80 [siw]
+>   siw_reject+0x13c/0x230 [siw]
+>   iw_cm_reject+0xac/0x130 [iw_cm]
+>   cm_conn_req_handler+0x4f1/0x7d0 [iw_cm]
+>   cm_work_handler+0x885/0x9c0 [iw_cm]
+>   process_one_work+0x535/0xad0
+>   worker_thread+0x2e7/0x700
+>   kthread+0x1f6/0x220
+>   ret_from_fork+0x1f/0x30
+> irq event stamp: 11449266
+> hardirqs last  enabled at (11449265): [<ffffffff81fc4248>] _raw_spin_unlock_irq+0x28/0x50
+> hardirqs last disabled at (11449266): [<ffffffff81fb7e44>] __schedule+0x5f4/0xbb0
+> softirqs last  enabled at (11449176): [<ffffffffa06d142f>] p_fill_from_dev_buffer+0xff/0x140 [scsi_debug]
+> softirqs last disabled at (11449168): [<ffffffffa06d1400>] p_fill_from_dev_buffer+0xd0/0x140 [scsi_debug]
+> ---[ end trace b23871487c995b72 ]---
+>
+> * Use the rdma_rxe driver to run blktests since at least in my experience that
+>    driver is more reliable than the soft-iWARP driver.
+>
 
-OK, it is something like the following:
+I would suggest reproducing it on s390x platform since it was easy on
+that platform from my testing.
+And from the CKI tests history, it also has been reproduced on
+ppc64le/aarch64 with rdma_rxe.
 
-[  145.453672] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.12.0-2.fc30 04/01/2014
-[  145.454104] RIP: 0010:dm_softirq_done+0x46/0x220 [dm_mod]
-[  145.454536] Code: 85 ed 0f 84 40 01 00 00 44 0f b6 b7 70 01 00 00 4c 8b a5 18 01 00 00 45 89 f5 f6 47 1d 04 75 57 49 8b 7c 24 08 48 85 ff 74 4d <48> 8b 47 08 48 8b 40 58 48 85 c0 74 40 49 8d 4c 24 50 44 89 f2 48
-[  145.455423] RSP: 0000:ffffa88600003ef8 EFLAGS: 00010282
-[  145.455865] RAX: ffffffffc03fbd10 RBX: ffff979144c00010 RCX: dead000000000200
-[  145.456321] RDX: ffffa88600003f30 RSI: ffff979144c00068 RDI: ffffa88600d01040
-[  145.456764] RBP: ffff979150eb7990 R08: ffff9791bbc27de0 R09: 0000000000000100
-[  145.457205] R10: 0000000000000068 R11: 000000000000004c R12: ffff979144c00138
-[  145.457647] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000010
-[  145.458080] FS:  00007f57e5d13180(0000) GS:ffff9791bbc00000(0000) knlGS:0000000000000000
-[  145.458516] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  145.458945] CR2: ffffa88600d01048 CR3: 0000000106cf8003 CR4: 0000000000370ef0
-[  145.459382] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  145.459815] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  145.460250] Call Trace:
-[  145.460779]  <IRQ>
-[  145.461453]  blk_done_softirq+0xa1/0xd0
-[  145.462138]  __do_softirq+0xd7/0x2d6
-[  145.462814]  irq_exit+0xf7/0x100
-[  145.463480]  do_IRQ+0x7f/0xd0
-[  145.464131]  common_interrupt+0xf/0xf
-[  145.464797]  </IRQ>
+BTW, I've verified this issue with Ming's patch on s390x, thanks for
+looking this issue.
 
-> 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 21bf4c3f0825..10f8a3d4e3a1 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -209,7 +209,12 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-> >    */
-> >   void blk_mq_quiesce_queue_nowait(struct request_queue *q)
-> >   {
-> > -	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-> > +	unsigned long flags;
-> > +
-> > +	spin_lock_irqsave(&q->queue_lock, flags);
-> > +	if (!q->quiesce_depth++)
-> > +		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-> > +	spin_unlock_irqrestore(&q->queue_lock, flags);
-> >   }
-> >   EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
-> 
-> Consider using == 0 instead of ! to check whether or not quiesce_depth is
-> zero to improve code readability.
-
-Fine.
-
-> 
-> > @@ -250,10 +255,19 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
-> >    */
-> >   void blk_mq_unquiesce_queue(struct request_queue *q)
-> >   {
-> > -	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-> > +	unsigned long flags;
-> > +	bool run_queue = false;
-> > +
-> > +	spin_lock_irqsave(&q->queue_lock, flags);
-> > +	if (q->quiesce_depth > 0 && !--q->quiesce_depth) {
-> > +		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-> > +		run_queue = true;
-> > +	}
-> > +	spin_unlock_irqrestore(&q->queue_lock, flags);
-> >   	/* dispatch requests which are inserted during quiescing */
-> > -	blk_mq_run_hw_queues(q, true);
-> > +	if (run_queue)
-> > +		blk_mq_run_hw_queues(q, true);
-> >   }
-> 
-> So calling with blk_mq_unquiesce_queue() q->quiesce_depth <= 0 is ignored
-> quietly? How about triggering a kernel warning for that condition?
-
-OK.
+https://lore.kernel.org/linux-scsi/20210930124415.1160754-1-ming.lei@redhat.com/T/#u
 
 
-Thanks, 
-Ming
+> Thanks,
+>
+> Bart.
+>
+
+
+-- 
+Best Regards,
+  Yi Zhang
 
