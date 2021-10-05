@@ -2,94 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41270C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DED5C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:45:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 275E061506
-	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:32:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0539561165
+	for <linux-block@archiver.kernel.org>; Tue,  5 Oct 2021 15:45:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbhJEPeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Oct 2021 11:34:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60502 "EHLO
+        id S236259AbhJEPr1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Oct 2021 11:47:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231513AbhJEPeS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Oct 2021 11:34:18 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D86C061749
-        for <linux-block@vger.kernel.org>; Tue,  5 Oct 2021 08:32:27 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id i13so22267627ilm.4
-        for <linux-block@vger.kernel.org>; Tue, 05 Oct 2021 08:32:27 -0700 (PDT)
+        with ESMTP id S235876AbhJEPrX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Oct 2021 11:47:23 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342D9C06174E
+        for <linux-block@vger.kernel.org>; Tue,  5 Oct 2021 08:45:33 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id d8so545894edx.9
+        for <linux-block@vger.kernel.org>; Tue, 05 Oct 2021 08:45:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=IBEdg256g7XrTRf/DgSzh1YjxdhVgqzhTZgsp9rQe3k=;
-        b=Od0MTpLgXXOlBNlUkkeMYhSwI6xqlCTHNJv1W6vZhEThi4qFBx5I00fWx/9l4v6CNp
-         1bJSg7uiXpUGvss51BZ4dGA9Hh6NGV414rk6A7z/eGovCKwRe2Qe9Qgy2szPvyFueoui
-         klPIzkfnRQHbk6KfWvZifeYu8WfbcVUMj3PymGOngTellnwAVNjxTn9kAFJXjKhLY0zJ
-         mcq9lGfpcYuBfqNsLLB7XKj7B9ekx3EGmraW91Pm9QSD5k6l7fMwrJoeJZSKwUWw1Xvn
-         TCXNA/VJZSck7b66NxALrfiVvcyuxtLuMmJeUHRsPLlAsxp0mWa6iexLkVdLC9RWc+TU
-         v7Ew==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=K2e0futlAUbG+ZdLC/9LMtsaBsYQ0WPqxpYvW+YkyEo=;
+        b=VRCTSDdGeAGVvNS1RUoTz5PszOfL72feK18/dfZnw9XHNt+6kQUg80oHAV7pKyB4yT
+         AWZC5ymtzB39r5pB8ciNshfO6VEtHwvOS/gRieB40iZnMAUKRumhOabt3IYkHfbuMlws
+         LqTSE5POXxu7Csyv+DCju2OliIXZM9am8CZMlHPnP0lkKbf8h5zaDnPgGkYkyGWlwH6s
+         VQ6/TbjksPZgUh4cZGq1c1vfDJCu7CjxlF/U9JMSoE+3SwMTaRwsI9RI12aPOrjWxaK2
+         7on9qeQptckV/kDe8Awtzs6rA/wLBNDl4ZsWXSpuYgbXNNUhiAYTZ2AP3Q3BtzK+qSzL
+         OdZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=IBEdg256g7XrTRf/DgSzh1YjxdhVgqzhTZgsp9rQe3k=;
-        b=DUN2qbdD+SlMhcaBtxUXOPy4tZ3x+NCe5NPWzGNPiTCYmp30vannHVaA0jzhi4717N
-         lmeRObH/fTmORh4HluBiD6kwujW0AdU53xwvJXdmuBaQp+yV4MN9r30KiGrTkDjiip/D
-         gUZkLZwHk6pqsmU6hWG1hoMahdc1A9M3cCYdeogURpNHYUh+EPq10f+NPbTiZ/Nu7/E7
-         G25GXhltvaIQ9LpRUu14ZmMWNSwwrlWjY5NCnoGfQBequchOEiY4HVyHXU1nUUpxWyAV
-         jWnrfwd8wBeA23iJHOydB5RfyatziUD96cKh/AIlbuPu1KAz8W6w6nbx2J68D3veUZPt
-         rETQ==
-X-Gm-Message-State: AOAM5327hZ7OFTx3xT3jvC+cJsNBJiZ1p930rih3J9H5TCm9IGVxCIc2
-        5i2rr8nSw3vPi2ANNAzSepcrLtn3tUFfcpRKEdw=
-X-Google-Smtp-Source: ABdhPJyVy3ReqQT+6HPJsBMezwYz1ukG/IWuHpN0z6sViKrVb5/TzDYZY/cbUAmDvZPknHLhZbeM8A==
-X-Received: by 2002:a92:1a08:: with SMTP id a8mr3532730ila.301.1633447947159;
-        Tue, 05 Oct 2021 08:32:27 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id y124sm11233763iof.8.2021.10.05.08.32.26
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Oct 2021 08:32:26 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: don't call should_fail_request() for
- !CONFIG_FAIL_MAKE_REQUEST
-Message-ID: <50093280-104b-545a-c4c9-2fc3efd45520@kernel.dk>
-Date:   Tue, 5 Oct 2021 09:32:26 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K2e0futlAUbG+ZdLC/9LMtsaBsYQ0WPqxpYvW+YkyEo=;
+        b=4wODB4IcUdjSie2T8LOL3p4U3/dkc6uQgBuWZSIdVghLjgSOHTuXQu+1jKKGoivAMS
+         wEFMie+rmcQRFZATQnPmgkH9kohYSeJZmEchOOQoIoaIccRUL35SBZaNhoJQA5gpAU6/
+         qb4wbBrayXnA9lGCBgjfPJRYb+3eh1HCfrJMT52pw9VLTckuH0h/XXI5iqAlNj/XPgTE
+         WQJVnfittitFRKj4eDtlRkn814tyKeWT73KNeR23Kar/oMruAffIg2HklsTrMgsDJXsi
+         6nfkN9fqv1ZZlJ2VLrm8ylIXWnZs7GNHNHRaqYxD5wQU0nZXWaUKPkJNdco/vxqoimas
+         UmxQ==
+X-Gm-Message-State: AOAM5332xcPE1xUfare+I5Ka1JQ7snr/NvFKkwenV1ltxOyM2qpNn1nl
+        k41eSaA+kTf/EWLnfdqI+V8nt4ecPbNY94Od757w
+X-Google-Smtp-Source: ABdhPJwSAmk0A7TVnFboIgJpdzqg4ajMWT69rrynDmD428vE3IVUAInjGd+MJVcv0aCPu2UuQlLCg1XO4RvUZ0WzUhY=
+X-Received: by 2002:a17:906:2cd6:: with SMTP id r22mr24839647ejr.398.1633448731742;
+ Tue, 05 Oct 2021 08:45:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210809101609.148-1-xieyongji@bytedance.com> <20211004112623-mutt-send-email-mst@kernel.org>
+ <20211005062359-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20211005062359-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 5 Oct 2021 23:45:31 +0800
+Message-ID: <CACycT3tUSem1ovOjykmg2Y5+uUaqsiDkFAjrt7SFkJCc9LGbAA@mail.gmail.com>
+Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config space
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Kevin Wolf <kwolf@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Unnecessary function call, if we don't have that specific configuration
-option enabled.
+On Tue, Oct 5, 2021 at 6:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Oct 04, 2021 at 11:27:29AM -0400, Michael S. Tsirkin wrote:
+> > On Mon, Aug 09, 2021 at 06:16:09PM +0800, Xie Yongji wrote:
+> > > An untrusted device might presents an invalid block size
+> > > in configuration space. This tries to add validation for it
+> > > in the validate callback and clear the VIRTIO_BLK_F_BLK_SIZE
+> > > feature bit if the value is out of the supported range.
+> > >
+> > > And we also double check the value in virtblk_probe() in
+> > > case that it's changed after the validation.
+> > >
+> > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> >
+> > So I had to revert this due basically bugs in QEMU.
+> >
+> > My suggestion at this point is to try and update
+> > blk_queue_logical_block_size to BUG_ON when the size
+> > is out of a reasonable range.
+> >
+> > This has the advantage of fixing more hardware, not just virtio.
+> >
+>
+> Stefan also pointed out this duplicates the logic from
+>
+>         if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
+>                 return -EINVAL;
+>
+>
+> and a bunch of other places.
+>
+>
+> Would it be acceptable for blk layer to validate the input
+> instead of having each driver do it's own thing?
+> Maybe inside blk_queue_logical_block_size?
+>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Now the nbd and loop driver will validate the blksize and return error
+if it's invalid. But the nvme and null_blk driver just corrects the
+blksize to a reasonable range without returning any error. I'm not
+sure which way the block layer should follow. Or just simplify the
+logic in nbd and loop driver?
 
----
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5454db2fa263..a267f11f55cb 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -697,8 +697,10 @@ static inline bool bio_check_ro(struct bio *bio)
- 
- static noinline int should_fail_bio(struct bio *bio)
- {
-+#ifdef CONFIG_FAIL_MAKE_REQUEST
- 	if (should_fail_request(bdev_whole(bio->bi_bdev), bio->bi_iter.bi_size))
- 		return -EIO;
-+#endif
- 	return 0;
- }
- ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
-
--- 
-Jens Axboe
-
+Thanks,
+Yongji
