@@ -2,116 +2,390 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 823CFC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B6CEC43217
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5856C61077
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51DED610CE
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbhJFXP2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 19:15:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46842 "EHLO
+        id S230463AbhJFXPa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 19:15:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230322AbhJFXP2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 19:15:28 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B2FC061755
-        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 16:13:34 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id j2so4473975ilo.10
-        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 16:13:34 -0700 (PDT)
+        with ESMTP id S231154AbhJFXP3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 19:15:29 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9319AC061753
+        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 16:13:36 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id m20so3936968iol.4
+        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 16:13:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OCNBphKAfWXDaAht8UQdCK6F187ODvF0e1hM63EFZbQ=;
-        b=SNaa2PaGR6lXvINONlsLnAvfuyezrW4U04/yAA3RiP4x5CfKVOfjio46zKjPpRVYC6
-         miaidQHvu0m2lYgcWeerAz0vSjrJb9kfIXUr64BptFCUEPYk56YvJSqrOiTS4ZVq44K+
-         pQaD3RafWL9TyEuSTQDCgFVMVHan0SoXox03xOCSlYxLsyhwDncyFz8IfHZJ6PiebFjT
-         Y+AR+wEQneSLEKOZqaewNnJ+TEJ8RPaxnYtZAp2hBRtYJzDpF3ZxSuknFGzJ/OIFaUIB
-         th5sfLRJTh5la1L+k+yrnXLgKw42Fni/zzx46fnIrH8UmVbxFAJNubUoSrtpYBNs2sIe
-         plmQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=f0CDhZ3n9c9Wbis2PmGVaPgugzsGmtUSf+fxsIMVGmw=;
+        b=phyA3KEXMh7wFtX0TNaStaUPlzsaKWMq5abW5zZGdgeA4IonWOPutibqdId0q9sYK2
+         PBTzKCzmlfQAytFcdXvgBhLO37dK/Wooy0AAmFw0ZMW9RN1ajgCXzQUJpl+WlRoui8RE
+         3mi659LwzDjaXs4jlZE9/ALpU9tdiYevtaD5pMCp2E+zisOzgp4+CRXV5lho9kX3nri9
+         Um+hMRVpc/MVzO7xxLc4a6ZJS7Mhwxf8E27wvcVOxgIsaWt1OawixvBXD/ECmVF1y/Jt
+         qCBwNw+1eoyzXaVwlNpFrPOWJgld2/xcGrGO9gYZebzPqeaVADnSARqcUYWhEW06Ekdr
+         nqaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OCNBphKAfWXDaAht8UQdCK6F187ODvF0e1hM63EFZbQ=;
-        b=rW08QDvakTsujAhfdjyUeyvmpfnU8JDDoE8i2CZXu9cRDmwQmkbMWVL/+bGH0sCUdt
-         gy6kCB+e3oERfG2P5685xImyDKiTODggenQ0M0rMqwVbDNCjFC6IlYxIml1Ex0UjxDsf
-         4dYCWPZK8j+NYTUpyaCR16qCDEp/XHmaZcN7YhQDc7JWseg6Ybrb30Ye6SAHAyrfGPX2
-         DnpuX1cMF8V7ChGnF95XZVAixBS5E9mXrqbgjl4UejwKkFni/vYplA8+hFmt2gtn23jl
-         tCr6ZpD5R3zdqrQLGPT2t2pKcRjPzszNOtU4wbCDIG+ypa6tJOr/n1XacmJLqlyqwUwr
-         ZKrA==
-X-Gm-Message-State: AOAM5339QvC/asRfbLFqIr0Z/ac3R1ORnc9VJ4BaPdRCjPTpMUHNAJMv
-        9hJNS+FyJ55SQLFEGGnkqRMo0QoyPLoZbQ==
-X-Google-Smtp-Source: ABdhPJxOLwHCmtGHmTd6CVRRlGIOnDGJq14EogDccq49S/kNEJcVF8+5nhem0NZjyDdLgNOqqC2dXQ==
-X-Received: by 2002:a05:6e02:bc9:: with SMTP id c9mr640846ilu.309.1633562014171;
-        Wed, 06 Oct 2021 16:13:34 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=f0CDhZ3n9c9Wbis2PmGVaPgugzsGmtUSf+fxsIMVGmw=;
+        b=jpFw/Lu6UYf5ypue8JJ5zwgnCiGKTTVeH/tM6c/Ikqrt5ep+lFmO6AF2Ol7t0WTLhm
+         j2KbqVZXUpZuFRAHbMVYBx8Ex7Id1v2TE30MzSsXKkBd8/pUpOb4g2WasoIT34UzAtm2
+         5BkIdVbbHFnb+Y79BNPZw/7Hfll2um5GOVhDBZaWUb3sv7TQsMMPMNuB8X9L3lnipRnc
+         2VG8RjPfvaba7EJJLsLV35JvxhmrHavXxXUptOiNiOyuU3fJv4MCoqFoQHCXsXyPid3A
+         FcjCAcNdzufaLKit5PRedAeKeakQXxFGu65M1V9w9g5TSdaNo0w6p5j/LAxdTQvS/9lX
+         Et+w==
+X-Gm-Message-State: AOAM5331WNRmL4ID7zVtrKmviyJLEaMEn7n9Erp6Dy1B/rsHzg8B9/CG
+        8RYcBJl+vJfWqxMYWUWAEQcB12aaVIcyyA==
+X-Google-Smtp-Source: ABdhPJymVS9ebXOcm3pIk39zBp0lxakeabhdHebYp44tR5qTHf/9daOekgARzxH1f0Xt/fCZN5CrEw==
+X-Received: by 2002:a6b:8b52:: with SMTP id n79mr808914iod.8.1633562015797;
+        Wed, 06 Oct 2021 16:13:35 -0700 (PDT)
 Received: from p1.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id o1sm12955203ilj.41.2021.10.06.16.13.33
+        by smtp.gmail.com with ESMTPSA id o1sm12955203ilj.41.2021.10.06.16.13.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 16:13:33 -0700 (PDT)
+        Wed, 06 Oct 2021 16:13:35 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
-Cc:     io-uring@vger.kernel.org
-Subject: [PATCHSET v2 0/3] Add plug based request allocation batching
-Date:   Wed,  6 Oct 2021 17:13:27 -0600
-Message-Id: <20211006231330.20268-1-axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 2/3] block: pre-allocate requests if plug is started and is a batch
+Date:   Wed,  6 Oct 2021 17:13:29 -0600
+Message-Id: <20211006231330.20268-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20211006231330.20268-1-axboe@kernel.dk>
+References: <20211006231330.20268-1-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+The caller typically has a good (or even exact) idea of how many requests
+it needs to submit. We can make the request/tag allocation a lot more
+efficient if we just allocate N requests/tags upfront when we queue the
+first bio from the batch.
 
-Even if the caller knows that N requests will be submitted, we still
-have to go all the way to tag allocation for each one. That's somewhat
-inefficient, when we could just grab as many tags as we need initially
-instead.
+Provide a new plug start helper that allows the caller to specify how many
+IOs are expected. This sets plug->nr_ios, and we can use that for smarter
+request allocation. The plug provides a holding spot for requests, and
+request allocation will check it before calling into the normal request
+allocation path.
 
-This small series allows request caching in the blk_plug. We add a new
-helper for passing in how many requests we expect to submit,
-blk_start_plug_nr_ios(), and then we can use that information to
-populate the cache on the first request allocation. Subsequent queue
-attempts can then just grab a pre-allocated request out of the cache
-rather than go into the tag allocation again.
+The blk_finish_plug() is called, check if there are unused requests and
+free them. This should not happen in normal operations. The exception is
+if we get merging, then we may be left with requests that need freeing
+when done.
 
-This brings single core performance on my setup from:
+This raises the per-core performance on my setup from ~5.8M to ~6.1M
+IOPS.
 
-taskset -c 0,16  t/io_uring -b512 -d128 -s32 -c32 -p1 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
-Added file /dev/nvme1n1 (submitter 0)
-Added file /dev/nvme2n1 (submitter 1)
-polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-Engine=io_uring, sq_ring=128, cq_ring=256
-submitter=0, tid=1206
-submitter=1, tid=1207
-IOPS=5806400, BW=2835MiB/s, IOS/call=32/32, inflight=(77 32)
-IOPS=5860352, BW=2861MiB/s, IOS/call=32/31, inflight=(102 128)
-IOPS=5844800, BW=2853MiB/s, IOS/call=32/32, inflight=(102 32)
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-core.c       | 47 ++++++++++++++++------------
+ block/blk-mq.c         | 70 ++++++++++++++++++++++++++++++++++--------
+ block/blk-mq.h         |  5 +++
+ include/linux/blk-mq.h |  5 ++-
+ include/linux/blkdev.h | 15 ++++++++-
+ 5 files changed, 109 insertions(+), 33 deletions(-)
 
-to:
-
-taskset -c 0,16  t/io_uring -b512 -d128 -s32 -c32 -p1 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
-Added file /dev/nvme1n1 (submitter 0)
-Added file /dev/nvme2n1 (submitter 1)
-polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-Engine=io_uring, sq_ring=128, cq_ring=256
-submitter=0, tid=1220
-submitter=1, tid=1221
-IOPS=6061248, BW=2959MiB/s, IOS/call=32/31, inflight=(114 82)
-IOPS=6100672, BW=2978MiB/s, IOS/call=32/31, inflight=(128 128)
-IOPS=6082496, BW=2969MiB/s, IOS/call=32/32, inflight=(77 38)
-
-which is about a 4-5% improvement in single core performance. Looking
-at profiles, we're spending _less_ time in sbitmap even though we're
-doing more work.
-
-V2:
-- Remove hunk from another patch in patch 2
-- Make the plugging limits block layer private
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d83e56b2f64e..9b8c70670190 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1624,6 +1624,31 @@ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
+ }
+ EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+ 
++void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
++{
++	struct task_struct *tsk = current;
++
++	/*
++	 * If this is a nested plug, don't actually assign it.
++	 */
++	if (tsk->plug)
++		return;
++
++	INIT_LIST_HEAD(&plug->mq_list);
++	plug->cached_rq = NULL;
++	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
++	plug->rq_count = 0;
++	plug->multiple_queues = false;
++	plug->nowait = false;
++	INIT_LIST_HEAD(&plug->cb_list);
++
++	/*
++	 * Store ordering should not be needed here, since a potential
++	 * preempt will imply a full memory barrier
++	 */
++	tsk->plug = plug;
++}
++
+ /**
+  * blk_start_plug - initialize blk_plug and track it inside the task_struct
+  * @plug:	The &struct blk_plug that needs to be initialized
+@@ -1649,25 +1674,7 @@ EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+  */
+ void blk_start_plug(struct blk_plug *plug)
+ {
+-	struct task_struct *tsk = current;
+-
+-	/*
+-	 * If this is a nested plug, don't actually assign it.
+-	 */
+-	if (tsk->plug)
+-		return;
+-
+-	INIT_LIST_HEAD(&plug->mq_list);
+-	INIT_LIST_HEAD(&plug->cb_list);
+-	plug->rq_count = 0;
+-	plug->multiple_queues = false;
+-	plug->nowait = false;
+-
+-	/*
+-	 * Store ordering should not be needed here, since a potential
+-	 * preempt will imply a full memory barrier
+-	 */
+-	tsk->plug = plug;
++	blk_start_plug_nr_ios(plug, 1);
+ }
+ EXPORT_SYMBOL(blk_start_plug);
+ 
+@@ -1719,6 +1726,8 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 
+ 	if (!list_empty(&plug->mq_list))
+ 		blk_mq_flush_plug_list(plug, from_schedule);
++	if (unlikely(!from_schedule && plug->cached_rq))
++		blk_mq_free_plug_rqs(plug);
+ }
+ 
+ /**
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5327abbefbab..ced94eb8e297 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -352,6 +352,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ 	struct request_queue *q = data->q;
+ 	struct elevator_queue *e = q->elevator;
+ 	u64 alloc_time_ns = 0;
++	struct request *rq;
+ 	unsigned int tag;
+ 
+ 	/* alloc_time includes depth and tag waits */
+@@ -385,10 +386,21 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ 	 * case just retry the hctx assignment and tag allocation as CPU hotplug
+ 	 * should have migrated us to an online CPU by now.
+ 	 */
+-	tag = blk_mq_get_tag(data);
+-	if (tag == BLK_MQ_NO_TAG) {
++	do {
++		tag = blk_mq_get_tag(data);
++		if (tag != BLK_MQ_NO_TAG) {
++			rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
++			if (!--data->nr_tags)
++				return rq;
++			if (e || data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
++				return rq;
++			rq->rq_next = *data->cached_rq;
++			*data->cached_rq = rq;
++			data->flags |= BLK_MQ_REQ_NOWAIT;
++			continue;
++		}
+ 		if (data->flags & BLK_MQ_REQ_NOWAIT)
+-			return NULL;
++			break;
+ 
+ 		/*
+ 		 * Give up the CPU and sleep for a random short time to ensure
+@@ -397,8 +409,15 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+ 		 */
+ 		msleep(3);
+ 		goto retry;
++	} while (1);
++
++	if (data->cached_rq) {
++		rq = *data->cached_rq;
++		*data->cached_rq = rq->rq_next;
++		return rq;
+ 	}
+-	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
++
++	return NULL;
+ }
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+@@ -408,6 +427,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		.q		= q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
++		.nr_tags	= 1,
+ 	};
+ 	struct request *rq;
+ 	int ret;
+@@ -436,6 +456,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 		.q		= q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
++		.nr_tags	= 1,
+ 	};
+ 	u64 alloc_time_ns = 0;
+ 	unsigned int cpu;
+@@ -537,6 +558,18 @@ void blk_mq_free_request(struct request *rq)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_free_request);
+ 
++void blk_mq_free_plug_rqs(struct blk_plug *plug)
++{
++	while (plug->cached_rq) {
++		struct request *rq;
++
++		rq = plug->cached_rq;
++		plug->cached_rq = rq->rq_next;
++		percpu_ref_get(&rq->q->q_usage_counter);
++		blk_mq_free_request(rq);
++	}
++}
++
+ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ {
+ 	u64 now = 0;
+@@ -2178,6 +2211,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+ 	const int is_flush_fua = op_is_flush(bio->bi_opf);
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
++		.nr_tags	= 1,
+ 	};
+ 	struct request *rq;
+ 	struct blk_plug *plug;
+@@ -2204,13 +2238,26 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+ 
+ 	hipri = bio->bi_opf & REQ_HIPRI;
+ 
+-	data.cmd_flags = bio->bi_opf;
+-	rq = __blk_mq_alloc_request(&data);
+-	if (unlikely(!rq)) {
+-		rq_qos_cleanup(q, bio);
+-		if (bio->bi_opf & REQ_NOWAIT)
+-			bio_wouldblock_error(bio);
+-		goto queue_exit;
++	plug = blk_mq_plug(q, bio);
++	if (plug && plug->cached_rq) {
++		rq = plug->cached_rq;
++		plug->cached_rq = rq->rq_next;
++		INIT_LIST_HEAD(&rq->queuelist);
++		data.hctx = rq->mq_hctx;
++	} else {
++		data.cmd_flags = bio->bi_opf;
++		if (plug) {
++			data.nr_tags = plug->nr_ios;
++			plug->nr_ios = 1;
++			data.cached_rq = &plug->cached_rq;
++		}
++		rq = __blk_mq_alloc_request(&data);
++		if (unlikely(!rq)) {
++			rq_qos_cleanup(q, bio);
++			if (bio->bi_opf & REQ_NOWAIT)
++				bio_wouldblock_error(bio);
++			goto queue_exit;
++		}
+ 	}
+ 
+ 	trace_block_getrq(bio);
+@@ -2229,7 +2276,6 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+ 		return BLK_QC_T_NONE;
+ 	}
+ 
+-	plug = blk_mq_plug(q, bio);
+ 	if (unlikely(is_flush_fua)) {
+ 		/* Bypass scheduler for flush requests */
+ 		blk_insert_flush(rq);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 171e8cdcff54..5da970bb8865 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -125,6 +125,7 @@ extern int __blk_mq_register_dev(struct device *dev, struct request_queue *q);
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
++void blk_mq_free_plug_rqs(struct blk_plug *plug);
+ 
+ void blk_mq_release(struct request_queue *q);
+ 
+@@ -152,6 +153,10 @@ struct blk_mq_alloc_data {
+ 	unsigned int shallow_depth;
+ 	unsigned int cmd_flags;
+ 
++	/* allocate multiple requests/tags in one go */
++	unsigned int nr_tags;
++	struct request **cached_rq;
++
+ 	/* input & output parameter */
+ 	struct blk_mq_ctx *ctx;
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 75d75657df21..0e941f217578 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -90,7 +90,10 @@ struct request {
+ 	struct bio *bio;
+ 	struct bio *biotail;
+ 
+-	struct list_head queuelist;
++	union {
++		struct list_head queuelist;
++		struct request *rq_next;
++	};
+ 
+ 	/*
+ 	 * The hash is used inside the scheduler, and killed once the
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 472b4ab007c6..17705c970d7e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -722,10 +722,17 @@ extern void blk_set_queue_dying(struct request_queue *);
+  */
+ struct blk_plug {
+ 	struct list_head mq_list; /* blk-mq requests */
+-	struct list_head cb_list; /* md requires an unplug callback */
++
++	/* if ios_left is > 1, we can batch tag/rq allocations */
++	struct request *cached_rq;
++	unsigned short nr_ios;
++
+ 	unsigned short rq_count;
++
+ 	bool multiple_queues;
+ 	bool nowait;
++
++	struct list_head cb_list; /* md requires an unplug callback */
+ };
+ 
+ struct blk_plug_cb;
+@@ -738,6 +745,7 @@ struct blk_plug_cb {
+ extern struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug,
+ 					     void *data, int size);
+ extern void blk_start_plug(struct blk_plug *);
++extern void blk_start_plug_nr_ios(struct blk_plug *, unsigned short);
+ extern void blk_finish_plug(struct blk_plug *);
+ extern void blk_flush_plug_list(struct blk_plug *, bool);
+ 
+@@ -772,6 +780,11 @@ long nr_blockdev_pages(void);
+ struct blk_plug {
+ };
+ 
++static inline void blk_start_plug_nr_ios(struct blk_plug *plug,
++					 unsigned short nr_ios)
++{
++}
++
+ static inline void blk_start_plug(struct blk_plug *plug)
+ {
+ }
 -- 
-Jens Axboe
-
+2.33.0
 
