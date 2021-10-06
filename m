@@ -2,97 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F867C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 15:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AE9C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 16:35:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5F27610C7
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 15:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24C1B610E5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 16:35:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231768AbhJFQAn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 12:00:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58754 "EHLO
+        id S231528AbhJFQhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 12:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230101AbhJFQAm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 12:00:42 -0400
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC98C061746
-        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 08:58:50 -0700 (PDT)
-Received: by mail-vs1-xe2b.google.com with SMTP id p18so3350375vsu.7
-        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 08:58:50 -0700 (PDT)
+        with ESMTP id S231447AbhJFQhR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 12:37:17 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7F4C061746
+        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 09:35:25 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id d18so3468649iof.13
+        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 09:35:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8f0JVd+gTPaH9TpaiXB3RSVMg8JjTNf39SFpo8XmoJM=;
-        b=IZFP+pqJ8mPBqSpzgjYgFunJO7ogWb4uCMdEFWzDX6cwL3jJZgaQUWgGtOhwNEXaI2
-         ftZDL/jZb81JwekvprJrX2uUsobN/1LykudNc7ARjJs8GDOfCrSG01eHFqEOSG/Qcvs7
-         ErysdKELjnLc0JWWKFLyidlAOwtMP6LLsEvuh210vz0qAJZfAgs4Te9bp9tYoAxqvlsf
-         fC7aNQ7rHqsFeUpPf4Wy3xSTJINgJHYm7YpxymNM7LhvbQnDOPMumABo5fY8eGfCNv+4
-         /tM6hffevQZHuBVv9k7sD7gq+XswKOAihKmmWN+jk/XTzjv82H2pITgh08GQlfEcp2U+
-         Vc2g==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=msVIeFs4KRx0G52I454LZ5OGlbz556v7g/KPwBP7mcE=;
+        b=uzYb+05OhQyBZvdL77U0c1vlr92n7PMggZz9lsoj1vu5BsXBn3IkvDLKgFq1A+Z7vI
+         JtMlHYiEXt3P1PlAdZReROxST11km0JI6GkXK34ivd2AiNgh0BcMeI6cC5ffIUyPkHrp
+         rk3BhCFAumlJAnBYwTACvYrSg7M3e54kSwoiq5AkpjP6OyGnfZMaPC789j2carv66mGs
+         EEcE7tCozd5atYI1KwDXcIk/1aXdb8u0UG2Nl4xqy2/PPHNk9S3Dk1mDVRUULXrkFuHd
+         3bq2R0Aq43bWaE4xROV6oLrrGLlTSUfV82qIkCrCAqCwRwzQ6Bms4Ye9Nldggmainjd6
+         mjMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8f0JVd+gTPaH9TpaiXB3RSVMg8JjTNf39SFpo8XmoJM=;
-        b=JZdZdl/I/NOELvbFh0N2ee5X8psilR69QHUj0x/hZ6ZSO9hInEmr4Q/igwfntBcOCq
-         Qxb7wZ8clRaGHH+orHCF5WLRrk5Rkh19wpB4ozrl/q1Q0lWKZgMtPB47kUVd48O5tK+W
-         slcoQKEFmiFtp8H5vTY/078bQiBn3i837sGfZZ2kGldQSpgzvBnMalvDT2DSLLz1tHwh
-         01V+x9ZoROjR1bCR1qlqMTlYvpdEHcL4pI5htk67Yt6M3u/xS3EK5PHtHsKrqYbUvwM+
-         fZAQkvGfaTzCa4plAdCJyFd49sXa5CzylK3jAACIICAqZW0UH5LPp9B7Kx2coRdkvXty
-         UCfA==
-X-Gm-Message-State: AOAM531X6o5wOg+pT6eFqDq77aHfS2xedwz2d9Ot0V+L2ivR1DgYCOyC
-        S1DrSm69RG0sU+E0L2Yf3E2HtHzgHu7vEMHXLXVo/g==
-X-Google-Smtp-Source: ABdhPJxm6beT16fsT8mDfI3FtrLzaLeQGcMms/9pNJPVpN0ScU9qe6ITvrn4MU+1+mVeFPdgu3rCjiGbIrh2vbb/JBg=
-X-Received: by 2002:a67:e94a:: with SMTP id p10mr25025921vso.56.1633535929203;
- Wed, 06 Oct 2021 08:58:49 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=msVIeFs4KRx0G52I454LZ5OGlbz556v7g/KPwBP7mcE=;
+        b=OlYRHhT1yfBL5HEaSCBHx2zn+donCuX/ed90vVv+ZRFzfWoE8zibA6XdjXwCeopfzx
+         OxLHBLOedywEAnD6G3g/BuPLCMsK/oR945WRd0zjk1a8rGQzZ205FHvMmspoPTiBh1hp
+         ezHt/CqjLZ7zBVVO2U5adBjuIq/TkumNVvviwQH7j+FtknKKcZiJ46wQl1nMZ73ZeuDF
+         w7+Ri5gqBPWscGU0RDqxrMWwUQrurjFOa3Y/Kl/wyN2lnqZ7aZ8KcpuW8lOoAt/pQTlj
+         CPmWhHSNmx24BYZPqWJFzNff4bD6KVq0gucohivn9sUzzFFMWfyQ7uTMksSlrzip/tMa
+         hUEw==
+X-Gm-Message-State: AOAM533JlKdX28j6TiqOqoUPVvnaowFHqTesCQw818gT9GLBqYxcsMfd
+        VUimrWxB7DCJ3yGvGxQesTuGErSMNPFX04dBFjM=
+X-Google-Smtp-Source: ABdhPJyNCP+xWCaQbaHX+Sa1RR/ABICK4oa5t73WLG9cF+OpxXi/AnJ9sAhfJYbV56OLZFbYIL2m8A==
+X-Received: by 2002:a05:6602:1486:: with SMTP id a6mr7305390iow.104.1633538124595;
+        Wed, 06 Oct 2021 09:35:24 -0700 (PDT)
+Received: from p1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id n17sm1911890ile.76.2021.10.06.09.35.24
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Oct 2021 09:35:24 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Subject: [PATCHSET RFC 0/3] Add plug based request allocation batching
+Date:   Wed,  6 Oct 2021 10:35:19 -0600
+Message-Id: <20211006163522.450882-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-References: <20210505193655.2414268-1-egranata@google.com> <CAPR809ukYeThsPy4eg8A-G8b4Hwt7Prxh9P75=Vp9jnCKb6WqQ@mail.gmail.com>
- <YO6ro345FI0XE8vv@stefanha-x1.localdomain> <87pmvlck3p.fsf@redhat.com>
- <YO7zwKbH6OEW2z1o@stefanha-x1.localdomain> <CAPR809uuo=5kmzUs3RFp6z_4===R0hxdFiScLPouUS+qxdaVWg@mail.gmail.com>
- <87h7duz7vq.fsf@redhat.com>
-In-Reply-To: <87h7duz7vq.fsf@redhat.com>
-From:   Enrico Granata <egranata@google.com>
-Date:   Wed, 6 Oct 2021 09:58:38 -0600
-Message-ID: <CAPR809vsz_z4ooL6dPJMDtTWtf02-jbz4FVipRjsLGczCV_XCQ@mail.gmail.com>
-Subject: Re: [virtio-dev] Fwd: [PATCH v2] Provide detailed specification of
- virtio-blk lifetime metrics
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        virtio-dev@lists.oasis-open.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, hch@infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I would very much favor that - thanks for bringing this thread back to attention
+Hi,
 
-Thanks,
-- Enrico
+Even if the caller knows that N requests will be submitted, we still
+have to go all the way to tag allocation for each one. That's somewhat
+inefficient, when we could just grab as many tags as we need initially
+instead.
 
-Thanks,
-- Enrico
+This small series allows request caching in the blk_plug. We add a new
+helper for passing in how many requests we expect to submit,
+blk_start_plug_nr_ios(), and then we can use that information to
+populate the cache on the first request allocation. Subsequent queue
+attempts can then just grab a pre-allocated request out of the cache
+rather than go into the tag allocation again.
+
+This brings single core performance on my setup from:
+
+sudo taskset -c 0,16  t/io_uring -b512 -d128 -s32 -c32 -p1 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
+Added file /dev/nvme1n1 (submitter 0)
+Added file /dev/nvme2n1 (submitter 1)
+polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=256
+submitter=0, tid=1206
+submitter=1, tid=1207
+IOPS=5806400, BW=2835MiB/s, IOS/call=32/32, inflight=(77 32)
+IOPS=5860352, BW=2861MiB/s, IOS/call=32/31, inflight=(102 128)
+IOPS=5844800, BW=2853MiB/s, IOS/call=32/32, inflight=(102 32)
+
+to:
+
+taskset -c 0,16  t/io_uring -b512 -d128 -s32 -c32 -p1 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
+Added file /dev/nvme1n1 (submitter 0)
+Added file /dev/nvme2n1 (submitter 1)
+polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=256
+submitter=0, tid=1220
+submitter=1, tid=1221
+IOPS=6061248, BW=2959MiB/s, IOS/call=32/31, inflight=(114 82)
+IOPS=6100672, BW=2978MiB/s, IOS/call=32/31, inflight=(128 128)
+IOPS=6082496, BW=2969MiB/s, IOS/call=32/32, inflight=(77 38)
+
+which is about a 4-5% improvement in single core performance. Looking
+at profiles, we're spending _less_ time in sbitmap even though we're
+doing more work.
+
+-- 
+Jens Axboe
 
 
-On Wed, Oct 6, 2021 at 5:54 AM Cornelia Huck <cohuck@redhat.com> wrote:
->
-> On Fri, Aug 06 2021, Enrico Granata <egranata@google.com> wrote:
->
-> > Hi folks,
-> > I am back from my leave of absence, so thank you everyone for your patience
-> >
-> > This proposal has been outstanding for a while and didn't seem to
-> > receive pushback, especially compared to the initial proposal
-> >
-> > Would it be the right time to put this modification up for a vote?
->
-> I guess no news is good news? (Or it fell through the cracks for everybody...)
->
-> I can update #106 and start voting.
->
->
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->
