@@ -2,127 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8EFC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98FB2C433F5
 	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A962C610C8
+	by mail.kernel.org (Postfix) with ESMTP id 7FFEC610A0
 	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231678AbhJFRdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 13:33:55 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:50242 "EHLO
+        id S238855AbhJFRdy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 13:33:54 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:50240 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232082AbhJFRdv (ORCPT
+        with ESMTP id S231678AbhJFRdv (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 13:33:51 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id C89F0223CD;
+        by smtp-out1.suse.de (Postfix) with ESMTP id C8B27224DF;
         Wed,  6 Oct 2021 17:31:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1633541517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lvHw3PwW6TDsFi8W0PgH0zwihCZPnGWlWI/UD/BIXxI=;
-        b=nqQ3Ykg+hYj70bYxleDCkje22wEYgzUe5kbYEj0KgxaerUN7/mYmaD9yDbRamZX8gD8b29
-        hcwee4fSjXXHsPm+Azv9aG3t3uLu5PLBGepj2PSwaF6l9iWuSF7fOHxug6CYf9NkUsUBeq
-        jzkPh6JKw2YhldGYasU3virP+dlorn8=
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MxeXr2d1lbvQmDb8MHYavn82BOMN9IAiRL9yXG4pCvI=;
+        b=yBkkxhw3ym7xoAGpn+RSblZ0mPVR7E54+FWf5HdqH17fddrV5xTz9E8+5HPZYIVCvIfLpx
+        sojpjT68wHDOn+q51LXPfwragvHrQYlHqjFl/bhNNWavqSTxRNJXB0bgWx78gEA0ep+H8h
+        GiUQi+5uYqUp5iWFJEvgLSfwprzOWGI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1633541517;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lvHw3PwW6TDsFi8W0PgH0zwihCZPnGWlWI/UD/BIXxI=;
-        b=pci4I5KY7Qahajl6GfgIuRdVgdutUDQppeEDRIa0CRJrgIBljtcZxxIk4svbru4uhbS9qe
-        qSG2x4YckUUjBvCg==
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MxeXr2d1lbvQmDb8MHYavn82BOMN9IAiRL9yXG4pCvI=;
+        b=OHSZ30lZe3e/FOnWDqaABIrTNZ2F+H2BnEIYaP3JpLS9csQahkzhDc5A0vAlG+AQJfIENl
+        FTHJJ+o3/AiQcECg==
 Received: from quack2.suse.cz (unknown [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id B13A6A3B83;
+        by relay2.suse.de (Postfix) with ESMTP id B1886A3B89;
         Wed,  6 Oct 2021 17:31:57 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 6551A1F2C99; Wed,  6 Oct 2021 19:31:57 +0200 (CEST)
+        id 59EA41F2C8D; Wed,  6 Oct 2021 19:31:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH 3/8] bfq: Store full bitmap depth in bfq_data
-Date:   Wed,  6 Oct 2021 19:31:42 +0200
-Message-Id: <20211006173157.6906-3-jack@suse.cz>
+Subject: [PATCH 0/8 v3] bfq: Limit number of allocated scheduler tags per cgroup
+Date:   Wed,  6 Oct 2021 19:31:39 +0200
+Message-Id: <20211006164110.10817-1-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20211006164110.10817-1-jack@suse.cz>
-References: <20211006164110.10817-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2357; h=from:subject; bh=sNqsOH8z2zBVNQi55Ud9g7Q1mtyHGxzPOFAv9uD3Lg0=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhXd1+yJSM7NGZ5fl1qc4ciNJExWF/Rma0bIO8Nfk/ LJ93naWJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYV3dfgAKCRCcnaoHP2RA2Q3bB/ 4rPNyR9++F1zwct/cWKAUmMIAwtGl4DjCoLAyoENLoo9c1X7YPkTIKTnRdVktbk22bmcunXN5y9Kr4 inuXMYA0PXtdUZ1+T+YEUpiNksE4esoQDpA8VQx4k3yZIqUxNlXv90hfw1N7NgEfJnerOcOQdX6YU1 NsnZVLK9owHzJHlt53cNXIBl2n622EVvzjkNn436JROjcqI3+wrkx8O6HblEtgTQoUd49U5PPJAFIV Ue6VmEtAYDFUKQI+LMUDLfaMoTJG7eDmGkZJCUbhY7PxmJbJqC3ykePZytdMzao8+vHs/Hqa2q1LJw G2Re6aBecfr1k6/61r4zfsUAfvx4fZ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4088; h=from:subject:message-id; bh=yUSAzX82wEpA49FQSo1XRvAj0+1W/b2lkZ0Bh/dJdTU=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhXd1e77MKyH/oq6Hrjy/n/rE1x/fjSelvOVjeOXWY 6TZEoPiJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYV3dXgAKCRCcnaoHP2RA2VSYB/ 4s1fJZ41QrK2wXsbxu2ObEuPJfiQVCcaZ0G6K9lYAc3HV1mWKRWhXyG0A80xS5FRjWyyNaT4D2GU24 FE5WPOiM5xkzzzqcoPB8TV0sYmZog0ki9fdXj66LtQfe8zHr5ZVFT8/VtaPma2kqZxFK3z+61h114W hd9IIbLRk4ZU+gGao8vGmA6U+skTf18LtTHBv63RndJAF34uDAHSmthVlakdjQ8VdBukkNdvejaFf9 oDigVtKxZUkI8glGebqrjahIsXxpLGVpIPPIg0fUivXGikVxBG/s9yMu8/RJjafbYtjhnSrS8h9tZG sQjbZIE8OE5gi6yjwSTwgz4EzteFKl
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Store bitmap depth shift inside bfq_data so that we can use it in
-bfq_limit_depth() for proportioning when limiting number of available
-request tags for a cgroup.
+Hello!
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/bfq-iosched.c | 10 ++++++----
- block/bfq-iosched.h |  1 +
- 2 files changed, 7 insertions(+), 4 deletions(-)
+Here is the third revision of my patches to fix how bfq weights apply on cgroup
+throughput and on throughput of processes with different IO priorities. Since
+v2 I've added some more patches so that now IO priorities also result in
+service differentiation (previously they had no effect on service
+differentiation on some workloads similarly to cgroup weights). The last patch
+in the series still needs some work as in the current state it causes a
+notable regression (~20-30%) with dbench benchmark for large numbers of
+clients. I've verified that the last patch is indeed necessary for the service
+differentiation with the workload described in its changelog. As we discussed
+with Paolo, I have also found out that if I remove the "waker has enough
+budget" condition from bfq_select_queue(), dbench performance is restored
+and the service differentiation is still good. But we probably need some
+justification or cleaner solution than just removing the condition so that
+is still up to discussion. But first seven patches already noticeably improve
+the situation for lots of workloads so IMO they stand on their own and
+can be merged regardless of how we go about the last patch.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4d9e04edb614..c93a74b8e9c8 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6855,7 +6855,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
- 				      struct sbitmap_queue *bt)
- {
- 	unsigned int i, j, min_shallow = UINT_MAX;
-+	unsigned int depth = 1U << bt->sb.shift;
- 
-+	bfqd->full_depth_shift = bt->sb.shift;
- 	/*
- 	 * In-word depths if no bfq_queue is being weight-raised:
- 	 * leaving 25% of tags only for sync reads.
-@@ -6867,13 +6869,13 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
- 	 * limit 'something'.
- 	 */
- 	/* no more than 50% of tags for async I/O */
--	bfqd->word_depths[0][0] = max((1U << bt->sb.shift) >> 1, 1U);
-+	bfqd->word_depths[0][0] = max(depth >> 1, 1U);
- 	/*
- 	 * no more than 75% of tags for sync writes (25% extra tags
- 	 * w.r.t. async I/O, to prevent async I/O from starving sync
- 	 * writes)
- 	 */
--	bfqd->word_depths[0][1] = max(((1U << bt->sb.shift) * 3) >> 2, 1U);
-+	bfqd->word_depths[0][1] = max((depth * 3) >> 2, 1U);
- 
- 	/*
- 	 * In-word depths in case some bfq_queue is being weight-
-@@ -6883,9 +6885,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
- 	 * shortage.
- 	 */
- 	/* no more than ~18% of tags for async I/O */
--	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
-+	bfqd->word_depths[1][0] = max((depth * 3) >> 4, 1U);
- 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
-+	bfqd->word_depths[1][1] = max((depth * 6) >> 4, 1U);
- 
- 	for (i = 0; i < 2; i++)
- 		for (j = 0; j < 2; j++)
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 3787cfb0febb..820cb8c2d1fe 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -769,6 +769,7 @@ struct bfq_data {
- 	 * function)
- 	 */
- 	unsigned int word_depths[2][2];
-+	unsigned int full_depth_shift;
- };
- 
- enum bfqq_state_flags {
--- 
-2.26.2
+Changes since v2:
+* Rebased on top of current Linus' tree
+* Updated computation of scheduler tag proportions to work correctly even
+  for processes within the same cgroup but with different IO priorities
+* Added comment roughly explaining why we limit tag depth
+* Added patch limiting waker / wakee detection in time so avoid at least the
+  most obvious false positives
+* Added patch to log waker / wakee detections in blktrace for better debugging
+* Added patch properly account injected IO
 
+Changes since v1:
+* Fixed computation of appropriate proportion of scheduler tags for a cgroup
+  to work with deeper cgroup hierarchies.
+
+Original cover letter:
+
+I was looking into why cgroup weights do not have any measurable impact on
+writeback throughput from different cgroups. This actually a regression from
+CFQ where things work more or less OK and weights have roughly the impact they
+should. The problem can be reproduced e.g. by running the following easy fio
+job in two cgroups with different weight:
+
+[writer]
+directory=/mnt/repro/
+numjobs=1
+rw=write
+size=8g
+time_based
+runtime=30
+ramp_time=10
+blocksize=1m
+direct=0
+ioengine=sync
+
+I can observe there's no significat difference in the amount of data written
+from different cgroups despite their weights are in say 1:3 ratio.
+
+After some debugging I've understood the dynamics of the system. There are two
+issues:
+
+1) The amount of scheduler tags needs to be significantly larger than the
+amount of device tags. Otherwise there are not enough requests waiting in BFQ
+to be dispatched to the device and thus there's nothing to schedule on.
+
+2) Even with enough scheduler tags, writers from two cgroups eventually start
+contending on scheduler tag allocation. These are served on first come first
+served basis so writers from both cgroups feed requests into bfq with
+approximately the same speed. Since bfq prefers IO from heavier cgroup, that is
+submitted and completed faster and eventually we end up in a situation when
+there's no IO from the heavier cgroup in bfq and all scheduler tags are
+consumed by requests from the lighter cgroup. At that point bfq just dispatches
+lots of the IO from the lighter cgroup since there's no contender for disk
+throughput. As a result observed throughput for both cgroups are the same.
+
+This series fixes this problem by accounting how many scheduler tags are
+allocated for each cgroup and if a cgroup has more tags allocated than its
+fair share (based on weights) in its service tree, we heavily limit scheduler
+tag bitmap depth for it so that it is not be able to starve other cgroups from
+scheduler tags.
+
+What do people think about this?
+
+								Honza
+
+Previous versions:
+Link: http://lore.kernel.org/r/20210712171146.12231-1-jack@suse.cz # v1
+Link: http://lore.kernel.org/r/20210715132047.20874-1-jack@suse.cz # v2
