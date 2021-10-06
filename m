@@ -2,102 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DB0C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C63AFC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:56:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95E50610C8
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:33:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF72861184
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:56:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbhJFRf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 13:35:28 -0400
-Received: from mail-pj1-f46.google.com ([209.85.216.46]:42839 "EHLO
-        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231175AbhJFRf2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 13:35:28 -0400
-Received: by mail-pj1-f46.google.com with SMTP id nn3-20020a17090b38c300b001a03bb6c4ebso471335pjb.1;
-        Wed, 06 Oct 2021 10:33:35 -0700 (PDT)
+        id S229565AbhJFR5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 13:57:51 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:42504 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229496AbhJFR5v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 13:57:51 -0400
+Received: by mail-pj1-f54.google.com with SMTP id nn3-20020a17090b38c300b001a03bb6c4ebso528432pjb.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 10:55:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=b0udGD6yPXFIVJbeGvfLIzJwm0LmddvqozG4vFBfvTE=;
-        b=ZPqNZPwXBI6xmgS3O7IOfXqglzgK11exax56Pds4fVYOeKSP6G8DA7zkj7hqneepWC
-         A+jWU+ewLPCT71vKfNiI58SJJcrs6NusRRSmv9afagfoexsQeFdCSoQ40gO/+vFT3m2q
-         kv7+tKpZGpJjCAxvJKzko8Sl4d+HiVOENhFP6sAzS7bjLCg/9+Jz2fBonj6Rc6mI9NiX
-         8UfSqnNiPKd8b3I9hvV903ep6yC/OXpFmbDdWOHJBDhNuT3vHGrMKvuGZbesTqoisMeV
-         +7LhwWd4RgIUmTL9Qzx5Mx0cX6qAzEUz0DUEMc6UhZlZ9Ih+BqYCWVDqkROCaoJh81V7
-         qbiQ==
-X-Gm-Message-State: AOAM530cD1FfkwXSfaRtKLS5PeGk+b8Ym18/UW6WQMGCq8c2BtCqZoxM
-        cFC0RBK7uoVl78idHCEygws=
-X-Google-Smtp-Source: ABdhPJww5vn0LIX4yaBzMmvw+4zhd9LR+fC9FR6Wt5P5+rHOabghLfn4cJcj1iGMZ4cyBz8ApUN3GQ==
-X-Received: by 2002:a17:902:e801:b0:13f:255:9db5 with SMTP id u1-20020a170902e80100b0013f02559db5mr1022291plg.23.1633541615361;
-        Wed, 06 Oct 2021 10:33:35 -0700 (PDT)
+        bh=RaNSR5nhuH4MIzXHEr+eJpwQXScc8btGVTFUT4+CjYw=;
+        b=jTS7t0T/+upVfBD4qpwULSJdL0vLo3CLLtuFJ2ERxsekiwN+yLxmH1z4SEKtWJGZrC
+         UUA057ghkmkx/+CSA1s4Sl3hjAO5KoxZ0HrlpCOjj+7/1OqSqegF64uX+b8XCX9C5rQX
+         yTZnjCRCkxTU78Ljw4fAb9qpTVqNUFGOzxyDHjYEXwK26j/vyTKB1xOQ+/4NrsOij+Ab
+         igjj25U+ea/wvJYsDDBdc5YMBNmv7QU766Aq9IPRK5ARZSM+HngRiurJJW7v19ByYrtY
+         K+GsnIg0zL+WhVEQrk1DP06UgapliHALsZu4y//iXYxywTP3tfRbboCACrZP+zkOea7B
+         J0Lw==
+X-Gm-Message-State: AOAM532Af8p1EvhMgdWQ40pyd2MJxEg4/0Fd+vMX5RMnpaDnk4C+qtO1
+        aLVh+k7biaccWKLydm83HB/8cxb7wGE=
+X-Google-Smtp-Source: ABdhPJw0w/eFFpIYMQDaDelBApERaOPDe6xSnzlFmAMlJZAtajEQzB6wFUxpqXfR+i90m0cxlYYiAw==
+X-Received: by 2002:a17:90b:4a51:: with SMTP id lb17mr83316pjb.41.1633542958507;
+        Wed, 06 Oct 2021 10:55:58 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:6ad6:c36f:fdfb:9e74])
-        by smtp.gmail.com with ESMTPSA id c15sm9368288pfp.39.2021.10.06.10.33.33
+        by smtp.gmail.com with ESMTPSA id x13sm7198749pgt.80.2021.10.06.10.55.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Oct 2021 10:33:34 -0700 (PDT)
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>
-Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
- <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
- <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
- <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
- <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
- <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
+        Wed, 06 Oct 2021 10:55:58 -0700 (PDT)
+Subject: Re: [PATCH 1/3] block: bump max plugged deferred size from 16 to 32
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20211006163522.450882-1-axboe@kernel.dk>
+ <20211006163522.450882-2-axboe@kernel.dk>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <fbe69cc0-36ea-c096-d247-f201bad979f4@acm.org>
-Date:   Wed, 6 Oct 2021 10:33:32 -0700
+Message-ID: <54e098e5-8230-a04f-e4fa-83a9cfa94649@acm.org>
+Date:   Wed, 6 Oct 2021 10:55:56 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
+In-Reply-To: <20211006163522.450882-2-axboe@kernel.dk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/6/21 3:05 AM, Javier González wrote:
-> I agree that the topic is complex. However, we have not been able to
-> find a clear path forward in the mailing list.
+On 10/6/21 9:35 AM, Jens Axboe wrote:
+> Particularly for NVMe with efficient deferred submission for many
+> requests, there are nice benefits to be seen by bumping the default max
+> plug count from 16 to 32. This is especially true for virtualized setups,
+> where the submit part is more expensive. But can be noticed even on
+> native hardware.
+> 
+> Reduce the multiple queue factor from 4 to 2, since we're changing the
+> default size.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   block/blk-mq.c         | 4 ++--
+>   include/linux/blkdev.h | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index a40c94505680..5327abbefbab 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2145,14 +2145,14 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+>   }
+>   
+>   /*
+> - * Allow 4x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
+> + * Allow 2x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
+>    * queues. This is important for md arrays to benefit from merging
+>    * requests.
+>    */
+>   static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
+>   {
+>   	if (plug->multiple_queues)
+> -		return BLK_MAX_REQUEST_COUNT * 4;
+> +		return BLK_MAX_REQUEST_COUNT * 2;
+>   	return BLK_MAX_REQUEST_COUNT;
+>   }
+>   
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index b19172db7eef..534298ac73cc 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -727,7 +727,7 @@ struct blk_plug {
+>   	bool multiple_queues;
+>   	bool nowait;
+>   };
+> -#define BLK_MAX_REQUEST_COUNT 16
+> +#define BLK_MAX_REQUEST_COUNT 32
+>   #define BLK_PLUG_FLUSH_SIZE (128 * 1024)
+>   
+>   struct blk_plug_cb;
 
-Hmm ... really? At least Martin Petersen and I consider device mapper 
-support essential. How about starting from Mikulas' patch series that 
-supports the device mapper? See also 
-https://lore.kernel.org/all/alpine.LRH.2.02.2108171630120.30363@file01.intranet.prod.int.rdu2.redhat.com/
-
-> What do you think about joining the call to talk very specific next
-> steps to get a patchset that we can start reviewing in detail.
-
-I can do that.
+Since BLK_MAX_REQUEST_COUNT is only used inside the block layer core but 
+not by any block driver, can it be moved from include/linux/blkdev.h 
+into block/blk-mq.h?
 
 Thanks,
 
 Bart.
+
+
