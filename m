@@ -2,96 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9533CC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 18:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 764DBC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 19:19:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FB5C610E6
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 18:27:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C9C8611AE
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 19:19:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232498AbhJFS3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 14:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37956 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232027AbhJFS3Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 14:29:24 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E8DC061746
-        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 11:27:32 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id b78so3911617iof.2
-        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 11:27:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=tc69Dyki6YTtI4VB0qOAr80S4BNh19uLij6WVKUQK1Q=;
-        b=o5nGOJFCgLtTAmCaz/aZJ9ir9yhvTCmUQJqMpeFA3Fh0H/beJpjwdWOJjLi4ZEZygQ
-         RnhRuh54Qy3tC52MiynrPwrUBV5q+2dmcjLl1FbUR4hRh4SWI/martEE6WLUsIRYd48/
-         v1DGy5zq1OGo5zhgP/xXhSQfB7mdNqJY8T3naxdABTAxmRs/YB6Hc/Xfu0xD97bOh73t
-         kENeEKcOOJayIP7UpgLlgUORClFl3WfAV/1hTC+l2bvKOgzeKnmzdeWu+IqrjFTPItaj
-         z2AB0KiI785zkVFyJNh3UatQioQaPKElCfHosCujdtwLyJ31pKidMTCSNuMAOB8++5lP
-         fxug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tc69Dyki6YTtI4VB0qOAr80S4BNh19uLij6WVKUQK1Q=;
-        b=fZCxqsFeRsNd2f1Wudrtc0KeBqgWZq38EQ/vg5N4PQ3ahn1Vgud0Cy3KU0Q/Rcxhen
-         xZ351Ak5ARuL28VqUhMVDndewFG42olOFqQIqe3pL1vM+Yay6RvGfsxLTRMs96lgti/Z
-         f5hNdZ9fABdbM0lhpMsoL/GGo6RsK0SJpDLo3r4bfGMTXUOpRqJ21PfYwvKZIcm9yxtt
-         ah0C/JG5zy7hQenHTLrGLF/L2ByZLNLjgAmIv2tQgv6PgOCXj33jsStQct0AFirBLQ26
-         FvXWUH5+vNJ3Ms57YYEsITZcFrBg/66fDKdqMdM+IB+X2g31Lv8erbkFQ0DmL/dor1pz
-         EptQ==
-X-Gm-Message-State: AOAM530xmZU3fkgSGJvfIm5Go3gcibnsywGediDKN5Kl/3itz6w5uGFV
-        p1QxhTyR78aZgNY3Yi6OXbc6B/aK2qPVMAOHW+E=
-X-Google-Smtp-Source: ABdhPJyftJi8jDfqeQC/PmoSMF+zXrmgdMtNYx/78HMu8L9ILGH+PfcPF5nLo1izl6CJSLv8/xSttg==
-X-Received: by 2002:a05:6602:25ca:: with SMTP id d10mr7765365iop.124.1633544851178;
-        Wed, 06 Oct 2021 11:27:31 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id d11sm8872309iom.29.2021.10.06.11.27.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Oct 2021 11:27:30 -0700 (PDT)
-Subject: Re: [PATCH 2/3] block: pre-allocate requests if plug is started and
- is a batch
-To:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-References: <20211006163522.450882-1-axboe@kernel.dk>
- <20211006163522.450882-3-axboe@kernel.dk>
- <bf1418a7-127d-dbd7-6fef-6351bfe2abe4@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <41c497f1-0666-3fe0-823c-fe8753473055@kernel.dk>
-Date:   Wed, 6 Oct 2021 12:27:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S239170AbhJFTVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 15:21:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57260 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229926AbhJFTVm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Oct 2021 15:21:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EB8EF60E08;
+        Wed,  6 Oct 2021 19:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633547990;
+        bh=jtxsG2SwawdYzU6il/sfJ0ENU64MGlMKlZB80iW6roU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VyaoB/EI+7jjXddZ4SHcH6AV6AtIFbAae+qixWQ/hOt749shXxxaEoJabGr3+q+DT
+         etE0sPLuPKY10HhidWeRDgwi2cx31o/deCcjst00Ye/Seed7zKwydYQQmxoMWT9dik
+         kPf+5C9cRwN4bF4fp+G0WSFVWNMD3V7YLgKT4J3HlldRzG23vvRq9G4Gb5x3cZO7F+
+         gYP3hH7QxxiO4O9LRn6bcBJjYCAhwqMYsAIAJ6UK2aEfUSGkKYEtkJvtIgB//bf0ie
+         Y+cq/1c9scMiyPP5tVqRfwOO/w+Q9EmqNR3VawZiRkXmj1t/zz4OMLFYn1D0fqn1X0
+         TQWW2OGrDRQ1g==
+Date:   Wed, 6 Oct 2021 12:19:48 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Satya Tangirala <satyaprateek2357@gmail.com>,
+        dm-devel@redhat.com, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: [PATCH v4 3/4] blk-crypto: rename blk_keyslot_manager to
+ blk_crypto_profile
+Message-ID: <YV321JFYV/u7pbsO@gmail.com>
+References: <20210929163600.52141-1-ebiggers@kernel.org>
+ <20210929163600.52141-4-ebiggers@kernel.org>
+ <YV2kdHeS4GTXUdpi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bf1418a7-127d-dbd7-6fef-6351bfe2abe4@acm.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YV2kdHeS4GTXUdpi@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/6/21 12:24 PM, Bart Van Assche wrote:
-> On 10/6/21 9:35 AM, Jens Axboe wrote:
->> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->> index 3b967053e9f5..4b2006ec8bf2 100644
->> --- a/include/linux/blk_types.h
->> +++ b/include/linux/blk_types.h
->> @@ -22,6 +22,7 @@ struct bio_crypt_ctx;
->>   
->>   struct block_device {
->>   	sector_t		bd_start_sect;
->> +	sector_t		bd_nr_sectors;
->>   	struct disk_stats __percpu *bd_stats;
->>   	unsigned long		bd_stamp;
->>   	bool			bd_read_only;	/* read-only policy */
+On Wed, Oct 06, 2021 at 09:28:20AM -0400, Mike Snitzer wrote:
+> On Wed, Sep 29 2021 at 12:35P -0400,
+> Eric Biggers <ebiggers@kernel.org> wrote:
 > 
-> Hmm ... I can't find any code in this patch that sets bd_nr_sectors? Did 
-> I perhaps overlook something?
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > blk_keyslot_manager is misnamed because it doesn't necessarily manage
+> > keyslots.  It actually does several different things:
+> > 
+> >   - Contains the crypto capabilities of the device.
+> > 
+> >   - Provides functions to control the inline encryption hardware.
+> >     Originally these were just for programming/evicting keyslots;
+> >     however, new functionality (hardware-wrapped keys) will require new
+> >     functions here which are unrelated to keyslots.  Moreover,
+> >     device-mapper devices already (ab)use "keyslot_evict" to pass key
+> >     eviction requests to their underlying devices even though
+> >     device-mapper devices don't have any keyslots themselves (so it
+> >     really should be "evict_key", not "keyslot_evict").
+> > 
+> >   - Sometimes (but not always!) it manages keyslots.  Originally it
+> >     always did, but device-mapper devices don't have keyslots
+> >     themselves, so they use a "passthrough keyslot manager" which
+> >     doesn't actually manage keyslots.  This hack works, but the
+> >     terminology is unnatural.  Also, some hardware doesn't have keyslots
+> >     and thus also uses a "passthrough keyslot manager" (support for such
+> >     hardware is yet to be upstreamed, but it will happen eventually).
+> > 
+> > Let's stop having keyslot managers which don't actually manage keyslots.
+> > Instead, rename blk_keyslot_manager to blk_crypto_profile.
+> > 
+> > This is a fairly big change, since for consistency it also has to update
+> > keyslot manager-related function names, variable names, and comments --
+> > not just the actual struct name.  However it's still a fairly
+> > straightforward change, as it doesn't change any actual functionality.
+> > 
+> > Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # For MMC
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> 
+> Unfortunate how fiddley this change forced you to get but it looks
+> like you've done a very solid job of cleaning it all up to be
+> consistent.
+> 
+> Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+> 
 
-Good eye - nope, that's from a different patch! Looks like it got folded
-in by mistake... I'll fix it, thanks Bart.
+Thanks for the reviews!  Yes, we should have done it this way originally which
+would have saved some pain, but better late than never.
 
--- 
-Jens Axboe
+Jens, anything else you're waiting for before applying this series?  Note that
+I'm not sure that Satya will leave any feedback, given that he's no longer
+working for Google, so any kernel work he does is in his free time.
 
+- Eric
