@@ -2,143 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4B8C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 20:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E8BC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5322161177
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 20:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 813FB611CA
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234538AbhJFUyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 16:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42892 "EHLO
+        id S230322AbhJFXP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 19:15:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbhJFUyi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 16:54:38 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE7DCC061746;
-        Wed,  6 Oct 2021 13:52:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=uUaggMIrJXJwK050Pd3Se7IpSEl1Adm3p+WvBJ2vdko=; b=jgTWnVUluiFhTPDmK08GSEh2kG
-        XpbTv0VUuOw5KQi55TTUbo9Ax4g8VywNBW5WVzYdIDzLYwMjGLZtGThEjlbYdJuQ7AP0dSSWOWnDo
-        8DV+HSdFgSAoxkUmB1lguBYBME75FUpFvhqjUwYCjMOlBH/u1jouPM9HxS1UedhdLTwOdOnYgR51t
-        4mv0Z+mgjqz+hsMnqZX9H6bJpqOJHQOJAwe+K8MIDi3FkVX1Ga24geCz/lE+WsW2ThKjcL+a757es
-        hP12tzuX8ndeNRgeFqIh7mgPNmXF2TPimJhyAk+scFa6bgS/YqO0Gw0g+U91/G8qWW64ZgmlOPV+Z
-        5vkjUh0Q==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mYDu8-00FWKD-Mu; Wed, 06 Oct 2021 20:52:44 +0000
-Subject: Re: [PATCH v3] drivers/cdrom: improved ioctl for media change
- detection
-To:     Lukas Prediger <lumip@lumip.de>, phil@philpotter.co.uk
-Cc:     axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <YT5BO7bUMMkwNCTh@equinox> <20210912191207.74449-1-lumip@lumip.de>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <42492b83-8741-786d-1b6e-cdd122576ae3@infradead.org>
-Date:   Wed, 6 Oct 2021 13:52:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        with ESMTP id S230492AbhJFXP2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 19:15:28 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF612C061746
+        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 16:13:35 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id 134so4621792iou.12
+        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 16:13:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=V3ile7Y+Lk23ZR7EdRYyUdG6ABjNHxlyVI4hZ5R+jUM=;
+        b=XA7mV0yGcVRHdSZ+QmTvpQav5MhU6JKmpDPoYFju3LI6oQwDflQnRAWHmEqL6XTgSx
+         Q31GKdwIQnEyS2A86adwPe9NSkhuC0plzfeLPQzKfyFroLnCoydJ/JHs9qr0GmWnUBYR
+         x9oxPq1WVGC/K42PzptC4tCGSWP2ovyAFDGCIBZJJkOY6EKwQ2H87D/xnPoKo3kSIq47
+         lypSZHt2FwjD97FcYXbUI1yx+L3wRXVje941OyoaZlWoY3CsM7e7c7vPSMoQPIAq+ZbZ
+         Hu4JJCqZWgRzLxcH0MKV4x2SjrKwg6Adbf7Hnm+PDDP07FfdTTpT/dztzdT07IVPLkVf
+         5b3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=V3ile7Y+Lk23ZR7EdRYyUdG6ABjNHxlyVI4hZ5R+jUM=;
+        b=vJVr1oSRYRbRJI+JF6aNEt7iW76Iyva2QKwnJ34VpPlw4UgDuuwThrcJKYdBqG86hZ
+         t5eGMOkDQ6OHECzYCY249URtv05rZtpECrqPGtVsDqFJqIkyw5KIj3eKdUZMsbC1AHX3
+         d2UCF0+OHr9IMnN9/4wwiSjPc/EFFKAELvkIPc/sFyQgkBqHP+gYyJ20N907wGjtfkff
+         xKQ8Uxsn6NxWwPuvoAKl/83N41l/Gd4pfOCIAmXV1580ikWO2R65NLhphM61xKHADqFr
+         Mmd1xwemNPtNWhA9ot86gDCcEZ1l5Xla/dsM7yDL+K/NMuhcjP/hMGm2lC+OaQbKQBI4
+         5Cmg==
+X-Gm-Message-State: AOAM533xZz0Ur4B+9FYE8CBaT1VzGhkb1ebQs9NWPOdgh0gYG2PppXTc
+        ZmjNx8QubMsp6c87CjC33FB/1rMtxXJVbQ==
+X-Google-Smtp-Source: ABdhPJzFmIMLO9P4hPZ1WlUrCzVnrP6wI3Jb3t19SwxcmGZ1mFYzmnZqp/IKSaihmrUI2OamW+cdog==
+X-Received: by 2002:a05:6638:2482:: with SMTP id x2mr405176jat.32.1633562014890;
+        Wed, 06 Oct 2021 16:13:34 -0700 (PDT)
+Received: from p1.localdomain ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id o1sm12955203ilj.41.2021.10.06.16.13.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Oct 2021 16:13:34 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/3] block: bump max plugged deferred size from 16 to 32
+Date:   Wed,  6 Oct 2021 17:13:28 -0600
+Message-Id: <20211006231330.20268-2-axboe@kernel.dk>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20211006231330.20268-1-axboe@kernel.dk>
+References: <20211006231330.20268-1-axboe@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20210912191207.74449-1-lumip@lumip.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/12/21 12:12 PM, Lukas Prediger wrote:
-> diff --git a/Documentation/userspace-api/ioctl/cdrom.rst b/Documentation/userspace-api/ioctl/cdrom.rst
-> index 3b4c0506de46..bac5bbf93ca0 100644
-> --- a/Documentation/userspace-api/ioctl/cdrom.rst
-> +++ b/Documentation/userspace-api/ioctl/cdrom.rst
-> @@ -54,6 +54,9 @@ are as follows:
->   	CDROM_SELECT_SPEED	Set the CD-ROM speed
->   	CDROM_SELECT_DISC	Select disc (for juke-boxes)
->   	CDROM_MEDIA_CHANGED	Check is media changed
-> +	CDROM_TIMED_MEDIA_CHANGE	Check if media changed
-> +					since given time
-> +					(struct cdrom_timed_media_change_info)
->   	CDROM_DRIVE_STATUS	Get tray position, etc.
->   	CDROM_DISC_STATUS	Get disc type, etc.
->   	CDROM_CHANGER_NSLOTS	Get number of slots
+Particularly for NVMe with efficient deferred submission for many
+requests, there are nice benefits to be seen by bumping the default max
+plug count from 16 to 32. This is especially true for virtualized setups,
+where the submit part is more expensive. But can be noticed even on
+native hardware.
 
-Hi Lukas, Phil,
+Reduce the multiple queue factor from 4 to 2, since we're changing the
+default size.
 
-This doc change causes a documentation build warning:
+While changing it, move the defines into the block layer private header.
+These aren't values that anyone outside of the block layer uses, or
+should use.
 
-Documentation/userspace-api/ioctl/cdrom.rst:57: WARNING: Malformed table.
-Text in column margin in table line 42.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-mq.c         | 4 ++--
+ block/blk.h            | 6 ++++++
+ include/linux/blkdev.h | 2 --
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-The "=====" lines describe the table columns and they cannot be
-exceeded without a warning. The table needs to be reformatted.
-
-Lukas, will you handle that?
-thanks.
-
-
-======================  ===============================================
-CDROMPAUSE              Pause Audio Operation
-CDROMRESUME             Resume paused Audio Operation
-CDROMPLAYMSF            Play Audio MSF (struct cdrom_msf)
-CDROMPLAYTRKIND         Play Audio Track/index (struct cdrom_ti)
-CDROMREADTOCHDR         Read TOC header (struct cdrom_tochdr)
-CDROMREADTOCENTRY       Read TOC entry (struct cdrom_tocentry)
-CDROMSTOP               Stop the cdrom drive
-CDROMSTART              Start the cdrom drive
-CDROMEJECT              Ejects the cdrom media
-CDROMVOLCTRL            Control output volume (struct cdrom_volctrl)
-CDROMSUBCHNL            Read subchannel data (struct cdrom_subchnl)
-CDROMREADMODE2          Read CDROM mode 2 data (2336 Bytes)
-                         (struct cdrom_read)
-CDROMREADMODE1          Read CDROM mode 1 data (2048 Bytes)
-                         (struct cdrom_read)
-CDROMREADAUDIO          (struct cdrom_read_audio)
-CDROMEJECT_SW           enable(1)/disable(0) auto-ejecting
-CDROMMULTISESSION       Obtain the start-of-last-session
-                         address of multi session disks
-                         (struct cdrom_multisession)
-CDROM_GET_MCN           Obtain the "Universal Product Code"
-                         if available (struct cdrom_mcn)
-CDROM_GET_UPC           Deprecated, use CDROM_GET_MCN instead.
-CDROMRESET              hard-reset the drive
-CDROMVOLREAD            Get the drive's volume setting
-                         (struct cdrom_volctrl)
-CDROMREADRAW            read data in raw mode (2352 Bytes)
-                         (struct cdrom_read)
-CDROMREADCOOKED         read data in cooked mode
-CDROMSEEK               seek msf address
-CDROMPLAYBLK            scsi-cd only, (struct cdrom_blk)
-CDROMREADALL            read all 2646 bytes
-CDROMGETSPINDOWN        return 4-bit spindown value
-CDROMSETSPINDOWN        set 4-bit spindown value
-CDROMCLOSETRAY          pendant of CDROMEJECT
-CDROM_SET_OPTIONS       Set behavior options
-CDROM_CLEAR_OPTIONS     Clear behavior options
-CDROM_SELECT_SPEED      Set the CD-ROM speed
-CDROM_SELECT_DISC       Select disc (for juke-boxes)
-CDROM_MEDIA_CHANGED     Check is media changed
-CDROM_TIMED_MEDIA_CHANGE        Check if media changed
-                                 since given time
-                                 (struct cdrom_timed_media_change_info)
-CDROM_DRIVE_STATUS      Get tray position, etc.
-CDROM_DISC_STATUS       Get disc type, etc.
-CDROM_CHANGER_NSLOTS    Get number of slots
-CDROM_LOCKDOOR          lock or unlock door
-CDROM_DEBUG             Turn debug messages on/off
-CDROM_GET_CAPABILITY    get capabilities
-CDROMAUDIOBUFSIZ        set the audio buffer size
-DVD_READ_STRUCT         Read structure
-DVD_WRITE_STRUCT        Write structure
-DVD_AUTH                Authentication
-CDROM_SEND_PACKET       send a packet to the drive
-CDROM_NEXT_WRITABLE     get next writable block
-CDROM_LAST_WRITTEN      get last block written on disc
-======================  ===============================================
-
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a40c94505680..5327abbefbab 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2145,14 +2145,14 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+ }
+ 
+ /*
+- * Allow 4x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
++ * Allow 2x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
+  * queues. This is important for md arrays to benefit from merging
+  * requests.
+  */
+ static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
+ {
+ 	if (plug->multiple_queues)
+-		return BLK_MAX_REQUEST_COUNT * 4;
++		return BLK_MAX_REQUEST_COUNT * 2;
+ 	return BLK_MAX_REQUEST_COUNT;
+ }
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 21283541a99f..38867b4c5c7e 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -222,6 +222,12 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ void blk_account_io_start(struct request *req);
+ void blk_account_io_done(struct request *req, u64 now);
+ 
++/*
++ * Plug flush limits
++ */
++#define BLK_MAX_REQUEST_COUNT	32
++#define BLK_PLUG_FLUSH_SIZE	(128 * 1024)
++
+ /*
+  * Internal elevator interface
+  */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index b19172db7eef..472b4ab007c6 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -727,8 +727,6 @@ struct blk_plug {
+ 	bool multiple_queues;
+ 	bool nowait;
+ };
+-#define BLK_MAX_REQUEST_COUNT 16
+-#define BLK_PLUG_FLUSH_SIZE (128 * 1024)
+ 
+ struct blk_plug_cb;
+ typedef void (*blk_plug_cb_fn)(struct blk_plug_cb *, bool);
 -- 
-~Randy
+2.33.0
+
