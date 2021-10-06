@@ -2,108 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8BEC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 16:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8EFC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9342D60F94
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 16:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A962C610C8
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233690AbhJFQhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 12:37:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233666AbhJFQhU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 12:37:20 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F312C061746
-        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 09:35:28 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id w10so3442786ilc.13
-        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 09:35:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=FYcOruoZxh6lmMsi/LYojQ9n4MU9jWaK2/KXL1DOsqI=;
-        b=111XAdfH/KsPkjwkYLUqSrlGtP01q7izqR1WoNm60TQQ754VyzDA2hgib9Ji4XsCM0
-         gJN62jGFwdzSXgC11EC3dF+nD8qmfnsrG4tsZQWZwVcCbS2LOrJP0k5bdB+zUoDINiSQ
-         sVP5UXQ9F7tkokJjBMYZg2zS4C3Dd6EYKtwdQwL1R+NTlWbFPeVACW1rwnJ9fUhSDQeL
-         V4XgzOVc5siOF5kPNEtpfrnl4AOnyoSrSrzsd9Yr9L90cBXQ3WIktW5xSFxl8uuTYbiN
-         y6NtrCZqb09Ze+oMQ357fn25PLplqWwQqHtPW8aK9DIHlL9DpBgjc1dSdpsB09j9wu9U
-         ecBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FYcOruoZxh6lmMsi/LYojQ9n4MU9jWaK2/KXL1DOsqI=;
-        b=XRPPDXbvislzpwYOvKWNMAC0umbZp2/pBCr1bO7dlMTJlLS967Akn1aSJXg8L93TjR
-         IYHhqGELCJez+4Qi/YnmdxGvY0kS2l7pKvEYSQbIVllM6FeTouuN1ZpHuAdINx5lqe+Q
-         SSpqasjrMtLHYujvxZZkKwdBbszUz5rrNhch8XMWIx4W6sWL1vYfv6/xegnHXEKKWcTb
-         SqePCSPHcCGlEwYycSfTZ+PG4y/H3jqRwTBvh34GslBWZas1hkSOg4uaIJgCSe4foGUG
-         Ulm9+gN9PpcBQPrOcnuVtsVypWyy/O3FZHJkBbJ59PZttNt8i3wB11XWX3Cwgdmhe55n
-         ND2g==
-X-Gm-Message-State: AOAM532nGr38fFaUVp30Ac+r9+caFcRjsS0ceAhTNvZQySx7HjlIfKuw
-        bwfOL+4ecd2PJQ87c/IvUEfwxIuYnhmjoSAKJCc=
-X-Google-Smtp-Source: ABdhPJxIuFMR3fGp2ArnhHHCXGGWM1H14D1LR4f7bQinlqkqtPQE8AolrNJxvOb+7Wsy8EapyEfV4g==
-X-Received: by 2002:a05:6e02:de8:: with SMTP id m8mr1100729ilj.131.1633538127409;
-        Wed, 06 Oct 2021 09:35:27 -0700 (PDT)
-Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id n17sm1911890ile.76.2021.10.06.09.35.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 09:35:26 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/3] io_uring: inform block layer of how many requests we are submitting
-Date:   Wed,  6 Oct 2021 10:35:22 -0600
-Message-Id: <20211006163522.450882-4-axboe@kernel.dk>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211006163522.450882-1-axboe@kernel.dk>
-References: <20211006163522.450882-1-axboe@kernel.dk>
+        id S231678AbhJFRdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 13:33:55 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:50242 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232082AbhJFRdv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 13:33:51 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id C89F0223CD;
+        Wed,  6 Oct 2021 17:31:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1633541517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lvHw3PwW6TDsFi8W0PgH0zwihCZPnGWlWI/UD/BIXxI=;
+        b=nqQ3Ykg+hYj70bYxleDCkje22wEYgzUe5kbYEj0KgxaerUN7/mYmaD9yDbRamZX8gD8b29
+        hcwee4fSjXXHsPm+Azv9aG3t3uLu5PLBGepj2PSwaF6l9iWuSF7fOHxug6CYf9NkUsUBeq
+        jzkPh6JKw2YhldGYasU3virP+dlorn8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1633541517;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lvHw3PwW6TDsFi8W0PgH0zwihCZPnGWlWI/UD/BIXxI=;
+        b=pci4I5KY7Qahajl6GfgIuRdVgdutUDQppeEDRIa0CRJrgIBljtcZxxIk4svbru4uhbS9qe
+        qSG2x4YckUUjBvCg==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id B13A6A3B83;
+        Wed,  6 Oct 2021 17:31:57 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 6551A1F2C99; Wed,  6 Oct 2021 19:31:57 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 3/8] bfq: Store full bitmap depth in bfq_data
+Date:   Wed,  6 Oct 2021 19:31:42 +0200
+Message-Id: <20211006173157.6906-3-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20211006164110.10817-1-jack@suse.cz>
+References: <20211006164110.10817-1-jack@suse.cz>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2357; h=from:subject; bh=sNqsOH8z2zBVNQi55Ud9g7Q1mtyHGxzPOFAv9uD3Lg0=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhXd1+yJSM7NGZ5fl1qc4ciNJExWF/Rma0bIO8Nfk/ LJ93naWJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYV3dfgAKCRCcnaoHP2RA2Q3bB/ 4rPNyR9++F1zwct/cWKAUmMIAwtGl4DjCoLAyoENLoo9c1X7YPkTIKTnRdVktbk22bmcunXN5y9Kr4 inuXMYA0PXtdUZ1+T+YEUpiNksE4esoQDpA8VQx4k3yZIqUxNlXv90hfw1N7NgEfJnerOcOQdX6YU1 NsnZVLK9owHzJHlt53cNXIBl2n622EVvzjkNn436JROjcqI3+wrkx8O6HblEtgTQoUd49U5PPJAFIV Ue6VmEtAYDFUKQI+LMUDLfaMoTJG7eDmGkZJCUbhY7PxmJbJqC3ykePZytdMzao8+vHs/Hqa2q1LJw G2Re6aBecfr1k6/61r4zfsUAfvx4fZ
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The block layer can use this knowledge to make smarter decisions on
-how to handle the request, if it knows that N more may be coming. Switch
-to using blk_start_plug_nr_ios() to pass in that information.
+Store bitmap depth shift inside bfq_data so that we can use it in
+bfq_limit_depth() for proportioning when limiting number of available
+request tags for a cgroup.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/io_uring.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 10 ++++++----
+ block/bfq-iosched.h |  1 +
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 62dc128e9b6b..c35b0f230be8 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -314,6 +314,8 @@ struct io_submit_state {
- 	bool			plug_started;
- 	bool			need_plug;
- 
-+	unsigned short		submit_nr;
-+
- 	/*
- 	 * Batch completion logic
- 	 */
-@@ -7035,7 +7037,7 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 	 * is potentially a read/write to block based storage.
- 	 */
- 	if (state->need_plug && io_op_defs[req->opcode].plug) {
--		blk_start_plug(&state->plug);
-+		blk_start_plug_nr_ios(&state->plug, state->submit_nr);
- 		state->plug_started = true;
- 		state->need_plug = false;
- 	}
-@@ -7150,6 +7152,7 @@ static void io_submit_state_start(struct io_submit_state *state,
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 4d9e04edb614..c93a74b8e9c8 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6855,7 +6855,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+ 				      struct sbitmap_queue *bt)
  {
- 	state->plug_started = false;
- 	state->need_plug = max_ios > 2;
-+	state->submit_nr = max_ios;
- 	/* set only head, no need to init link_last in advance */
- 	state->link.head = NULL;
- }
+ 	unsigned int i, j, min_shallow = UINT_MAX;
++	unsigned int depth = 1U << bt->sb.shift;
+ 
++	bfqd->full_depth_shift = bt->sb.shift;
+ 	/*
+ 	 * In-word depths if no bfq_queue is being weight-raised:
+ 	 * leaving 25% of tags only for sync reads.
+@@ -6867,13 +6869,13 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+ 	 * limit 'something'.
+ 	 */
+ 	/* no more than 50% of tags for async I/O */
+-	bfqd->word_depths[0][0] = max((1U << bt->sb.shift) >> 1, 1U);
++	bfqd->word_depths[0][0] = max(depth >> 1, 1U);
+ 	/*
+ 	 * no more than 75% of tags for sync writes (25% extra tags
+ 	 * w.r.t. async I/O, to prevent async I/O from starving sync
+ 	 * writes)
+ 	 */
+-	bfqd->word_depths[0][1] = max(((1U << bt->sb.shift) * 3) >> 2, 1U);
++	bfqd->word_depths[0][1] = max((depth * 3) >> 2, 1U);
+ 
+ 	/*
+ 	 * In-word depths in case some bfq_queue is being weight-
+@@ -6883,9 +6885,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+ 	 * shortage.
+ 	 */
+ 	/* no more than ~18% of tags for async I/O */
+-	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
++	bfqd->word_depths[1][0] = max((depth * 3) >> 4, 1U);
+ 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+-	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
++	bfqd->word_depths[1][1] = max((depth * 6) >> 4, 1U);
+ 
+ 	for (i = 0; i < 2; i++)
+ 		for (j = 0; j < 2; j++)
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 3787cfb0febb..820cb8c2d1fe 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -769,6 +769,7 @@ struct bfq_data {
+ 	 * function)
+ 	 */
+ 	unsigned int word_depths[2][2];
++	unsigned int full_depth_shift;
+ };
+ 
+ enum bfqq_state_flags {
 -- 
-2.33.0
+2.26.2
 
