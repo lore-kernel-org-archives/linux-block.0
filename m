@@ -2,138 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D420C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5EBC433EF
 	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EDAC3610C8
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37358610CC
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 17:32:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239064AbhJFRd7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 13:33:59 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:41990 "EHLO
+        id S238724AbhJFReA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 13:34:00 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:41998 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238724AbhJFRdv (ORCPT
+        with ESMTP id S238764AbhJFRdv (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 13:33:51 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 090621FEF3;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 0C80B2006A;
         Wed,  6 Oct 2021 17:31:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1633541518; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3wk6tCskQ9yIfiKGjM5o2XAB1G+7SzmoK7GhWE/e1TY=;
-        b=NkKmRO0Dk1sh2DWAUK7bXabDkXDp9S1Q4hdQ9g1SOCStcyocl6+EDZHCohcuK/6liBpUQJ
-        kLq0IMvm/wp6rJD6ALoROfu4TF8zH8mTVJUpItMGUHfO+o6OlMYoFXNSxJpPKZVtTxUXmI
-        M6biBLADwm0qduC8agoQf+/Y1nVNV3U=
+        bh=E/cdzGWpVIi/1lQxdCU4YeORCPw1dAioHvfRnoNLvf0=;
+        b=0x9ne/1J4UprHY8IHdP2CokYpftFFyo2CjfkqwS26YdRaMKCWyHOTyX84nftp0GO8RqRK9
+        v4vwxa3xpOWy8e6sb89QBX2OtzcSfM+qbi/4a505rEkKIXL5dGQoy4UAXJaRA5V7uaNgTE
+        hbgwDwWHy0GMTc6InOFq0+KNyVLbew0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1633541518;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3wk6tCskQ9yIfiKGjM5o2XAB1G+7SzmoK7GhWE/e1TY=;
-        b=fAXG8LSsn8b9Yv4xIlmjA6lnlyRG76kUw0LC/ZfjMpGyLQHWQGePvJQ7F4a1DfWv0kczfz
-        +tdO1Dnr6AD4IKAA==
+        bh=E/cdzGWpVIi/1lQxdCU4YeORCPw1dAioHvfRnoNLvf0=;
+        b=RrD4ABMCXNsBItRip3TaFyFzX+XuJGg4Rbv8xU/KRI8natIoocoJDAZPXGNRJaKc4CQp/5
+        HWtlxJOmyoWD9kDw==
 Received: from quack2.suse.cz (unknown [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id E7D7DA3B8E;
+        by relay2.suse.de (Postfix) with ESMTP id E91FDA3B91;
         Wed,  6 Oct 2021 17:31:57 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 716431F2CA3; Wed,  6 Oct 2021 19:31:57 +0200 (CEST)
+        id 782291F2CA8; Wed,  6 Oct 2021 19:31:57 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH 6/8] bfq: Provide helper to generate bfqq name
-Date:   Wed,  6 Oct 2021 19:31:45 +0200
-Message-Id: <20211006173157.6906-6-jack@suse.cz>
+Subject: [PATCH 8/8] bfq: Do not let waker requests skip proper accounting
+Date:   Wed,  6 Oct 2021 19:31:47 +0200
+Message-Id: <20211006173157.6906-8-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211006164110.10817-1-jack@suse.cz>
 References: <20211006164110.10817-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2855; h=from:subject; bh=RkAzfQOxfcGjo5Yxwc+JRb2ioBSMxMmjz16n6Ifdwe0=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGBJj7zbo/TTVadDXFmKfEnR8u4VLmNKb2u45NgnJFmVrD3dU /AjrZDRmYWDkYJAVU2RZHXlR+9o8o66toRoyMINYmUCmMHBxCsCNbuVgWGI0+6pbegnPBCnzKSsfdB nLlLN4rqzn7mmRmbhB4khMf/IriYuWSntXBei9Z3aUzN93bPL9TYbvvrIZpc217D8qfXyHJpvvD+Pu lJcsy1csPyu4syda49WxIm+bHweEMs6YRFTL3Zma9yvC/vnTHakPNkhYuritkVJZ9kTpmeC8G2seb+ 2zstfKE/W0l1SZMm9a4Q7eJIltfe8jSyOyfBSZ4sR3VG9t8zLId74XqlrWetbGvVzuv8vHV9rZL7pX LZvlHfy6sOZfD6+yd6PU3Z5vjtEN18JsnpjsfSH0c/u8+5pnHHlZZM51reI/f0Vt2z7vOtY5tzW26/ pO8e0VMg/jOLzB5LXbe9YpcU8B
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5049; h=from:subject; bh=JvltDTlTsWoqMQ81Lk3WlFrszv2LKI4OA/zKkQgyAs8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhXd2C9iUzzdgguU1Fwl4Ti/1wE0vJWWwMVIQ7KpIh vioEWF2JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYV3dggAKCRCcnaoHP2RA2XVaCA CwjVfttwuL5/siGYZePU412Z97Q6odxlbHXkRdrRpmnBZU506rcDZbT+Xq0F4Lb9PMAXHNuyNITS8x YUuHgxZXGOBg0d+YIi+PYnt8N+ZQiaHs96NgMr+f5fUcr438LqdgoP33tVWVWz99pxySoBQu4KPbLe Qxzlt98JHCQGy8kBeCFs1CXlDm/muTHE7x1oX0Zmvf/UjvCi08i5XwhZNVPd6dJrvJ9/Vh/+1X9NWg 5D0q3C3UDhJ05REyTSCaqodn5aTNFKtdllgrEeTVz09KiQXdPTV8Qfoe6PoJHNWmxHQmih507hW/LS zjSsf+WvTAJ7dJcChf9zLr9zferMPS
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of having helper formating bfqq pid, provide a helper to
-generate full bfqq name as used in the traces. It saves some code
-duplication and will save more in the coming tracepoints.
+Commit 7cc4ffc55564 ("block, bfq: put reqs of waker and woken in
+dispatch list") added a condition to bfq_insert_request() which added
+waker's requests directly to dispatch list. The rationale was that
+completing waker's IO is needed to get more IO for the current queue.
+Although this rationale is valid, there is a hole in it. The waker does
+not necessarily serve the IO only for the current queue and maybe it's
+current IO is not needed for current queue to make progress. Furthermore
+injecting IO like this completely bypasses any service accounting within
+bfq and thus we do not properly track how much service is waker's queue
+getting or that the waker is actually doing any IO. Depending on the
+conditions this can result in the waker getting too much or too few
+service.
 
+Consider for example the following job file:
+
+[global]
+directory=/mnt/repro/
+rw=write
+size=8g
+time_based
+runtime=30
+ramp_time=10
+blocksize=1m
+direct=0
+ioengine=sync
+
+[slowwriter]
+numjobs=1
+prioclass=2
+prio=7
+fsync=200
+
+[fastwriter]
+numjobs=1
+prioclass=2
+prio=0
+fsync=200
+
+Despite processes have very different IO priorities, they get the same
+about of service. The reason is that bfq identifies these processes as
+having waker-wakee relationship and once that happens, IO from
+fastwriter gets injected during slowwriter's time slice. As a result bfq
+is not aware that fastwriter has any IO to do and constantly schedules
+only slowwriter's queue. Thus fastwriter is forced to compete with
+slowwriter's IO all the time instead of getting its share of time based
+on IO priority.
+
+Drop the special injection condition from bfq_insert_request(). As a
+result, requests will be tracked and queued in a normal way and on next
+dispatch bfq_select_queue() can decide whether the waker's inserted
+requests should be injected during the current queue's timeslice or not.
+
+Fixes: 7cc4ffc55564 ("block, bfq: put reqs of waker and woken in dispatch list")
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.h | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ block/bfq-iosched.c | 44 +-------------------------------------------
+ 1 file changed, 1 insertion(+), 43 deletions(-)
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index bb8180c52a31..07288b9da389 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -25,7 +25,7 @@
- #define BFQ_DEFAULT_GRP_IOPRIO	0
- #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 886befc35b57..803a0c313f0f 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6132,48 +6132,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
  
--#define MAX_PID_STR_LENGTH 12
-+#define MAX_BFQQ_NAME_LENGTH 16
+ 	spin_lock_irq(&bfqd->lock);
+ 	bfqq = bfq_init_rq(rq);
+-
+-	/*
+-	 * Reqs with at_head or passthrough flags set are to be put
+-	 * directly into dispatch list. Additional case for putting rq
+-	 * directly into the dispatch queue: the only active
+-	 * bfq_queues are bfqq and either its waker bfq_queue or one
+-	 * of its woken bfq_queues. The rationale behind this
+-	 * additional condition is as follows:
+-	 * - consider a bfq_queue, say Q1, detected as a waker of
+-	 *   another bfq_queue, say Q2
+-	 * - by definition of a waker, Q1 blocks the I/O of Q2, i.e.,
+-	 *   some I/O of Q1 needs to be completed for new I/O of Q2
+-	 *   to arrive.  A notable example of waker is journald
+-	 * - so, Q1 and Q2 are in any respect the queues of two
+-	 *   cooperating processes (or of two cooperating sets of
+-	 *   processes): the goal of Q1's I/O is doing what needs to
+-	 *   be done so that new Q2's I/O can finally be
+-	 *   issued. Therefore, if the service of Q1's I/O is delayed,
+-	 *   then Q2's I/O is delayed too.  Conversely, if Q2's I/O is
+-	 *   delayed, the goal of Q1's I/O is hindered.
+-	 * - as a consequence, if some I/O of Q1/Q2 arrives while
+-	 *   Q2/Q1 is the only queue in service, there is absolutely
+-	 *   no point in delaying the service of such an I/O. The
+-	 *   only possible result is a throughput loss
+-	 * - so, when the above condition holds, the best option is to
+-	 *   have the new I/O dispatched as soon as possible
+-	 * - the most effective and efficient way to attain the above
+-	 *   goal is to put the new I/O directly in the dispatch
+-	 *   list
+-	 * - as an additional restriction, Q1 and Q2 must be the only
+-	 *   busy queues for this commit to put the I/O of Q2/Q1 in
+-	 *   the dispatch list.  This is necessary, because, if also
+-	 *   other queues are waiting for service, then putting new
+-	 *   I/O directly in the dispatch list may evidently cause a
+-	 *   violation of service guarantees for the other queues
+-	 */
+-	if (!bfqq ||
+-	    (bfqq != bfqd->in_service_queue &&
+-	     bfqd->in_service_queue != NULL &&
+-	     bfq_tot_busy_queues(bfqd) == 1 + bfq_bfqq_busy(bfqq) &&
+-	     (bfqq->waker_bfqq == bfqd->in_service_queue ||
+-	      bfqd->in_service_queue->waker_bfqq == bfqq)) || at_head) {
++	if (!bfqq || at_head) {
+ 		if (at_head)
+ 			list_add(&rq->queuelist, &bfqd->dispatch);
+ 		else
+@@ -6200,7 +6159,6 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	 * merge).
+ 	 */
+ 	cmd_flags = rq->cmd_flags;
+-
+ 	spin_unlock_irq(&bfqd->lock);
  
- /*
-  * Soft real-time applications are extremely more latency sensitive
-@@ -1083,26 +1083,27 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- /* --------------- end of interface of B-WF2Q+ ---------------- */
- 
- /* Logging facilities. */
--static inline void bfq_pid_to_str(int pid, char *str, int len)
-+static inline void bfq_bfqq_name(struct bfq_queue *bfqq, char *str, int len)
- {
--	if (pid != -1)
--		snprintf(str, len, "%d", pid);
-+	char type = bfq_bfqq_sync(bfqq) ? 'S' : 'A';
-+
-+	if (bfqq->pid != -1)
-+		snprintf(str, len, "bfq%d%c", bfqq->pid, type);
- 	else
--		snprintf(str, len, "SHARED-");
-+		snprintf(str, len, "bfqSHARED-%c", type);
- }
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
--	char pid_str[MAX_PID_STR_LENGTH];	\
-+	char pid_str[MAX_BFQQ_NAME_LENGTH];				\
- 	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
- 		break;							\
--	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
-+	bfq_bfqq_name((bfqq), pid_str, MAX_BFQQ_NAME_LENGTH);		\
- 	blk_add_cgroup_trace_msg((bfqd)->queue,				\
- 			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
--			"bfq%s%c " fmt, pid_str,			\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
-+			"%s " fmt, pid_str, ##args);			\
- } while (0)
- 
- #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
-@@ -1113,13 +1114,11 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...) do {	\
--	char pid_str[MAX_PID_STR_LENGTH];	\
-+	char pid_str[MAX_BFQQ_NAME_LENGTH];				\
- 	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
- 		break;							\
--	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
--	blk_add_trace_msg((bfqd)->queue, "bfq%s%c " fmt, pid_str,	\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
--				##args);	\
-+	bfq_bfqq_name((bfqq), pid_str, MAX_BFQQ_NAME_LENGTH);		\
-+	blk_add_trace_msg((bfqd)->queue, "%s " fmt, pid_str, ##args);	\
- } while (0)
- #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)		do {} while (0)
- 
+ 	bfq_update_insert_stats(q, bfqq, idle_timer_disabled,
 -- 
 2.26.2
 
