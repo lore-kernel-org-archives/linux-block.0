@@ -2,85 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4B38C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 13:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F867C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 15:58:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CDF761075
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 13:29:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5F27610C7
+	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 15:58:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238676AbhJFNbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 09:31:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28852 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231403AbhJFNbH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Oct 2021 09:31:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633526955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wzQmzBUEihVkKDDjIOOM5bJWBT7h0GK8QC/ZlgQykqs=;
-        b=i5tP3pinYcf1oGJX/YTXOhc9Qd4zocU+QtT6ShOwAvhTo8EQnHPfvgTQgbeKX3tws2AOOW
-        rUrVotiVTv7zWfiguSCZp5ExD9ruQt3egvn/64TwY0W6Yh7iFYxZ61w9zSJyHz9iRfwigq
-        0rvBU76iZ6pi/epe83A/Uhc5RVuOJ9g=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-D2XD9oEFNZKk20Xlz8E7Cg-1; Wed, 06 Oct 2021 09:29:14 -0400
-X-MC-Unique: D2XD9oEFNZKk20Xlz8E7Cg-1
-Received: by mail-qk1-f197.google.com with SMTP id i16-20020a05620a249000b004558dcb5663so2159594qkn.9
-        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 06:29:14 -0700 (PDT)
+        id S231768AbhJFQAn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Oct 2021 12:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230101AbhJFQAm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 12:00:42 -0400
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC98C061746
+        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 08:58:50 -0700 (PDT)
+Received: by mail-vs1-xe2b.google.com with SMTP id p18so3350375vsu.7
+        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 08:58:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8f0JVd+gTPaH9TpaiXB3RSVMg8JjTNf39SFpo8XmoJM=;
+        b=IZFP+pqJ8mPBqSpzgjYgFunJO7ogWb4uCMdEFWzDX6cwL3jJZgaQUWgGtOhwNEXaI2
+         ftZDL/jZb81JwekvprJrX2uUsobN/1LykudNc7ARjJs8GDOfCrSG01eHFqEOSG/Qcvs7
+         ErysdKELjnLc0JWWKFLyidlAOwtMP6LLsEvuh210vz0qAJZfAgs4Te9bp9tYoAxqvlsf
+         fC7aNQ7rHqsFeUpPf4Wy3xSTJINgJHYm7YpxymNM7LhvbQnDOPMumABo5fY8eGfCNv+4
+         /tM6hffevQZHuBVv9k7sD7gq+XswKOAihKmmWN+jk/XTzjv82H2pITgh08GQlfEcp2U+
+         Vc2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wzQmzBUEihVkKDDjIOOM5bJWBT7h0GK8QC/ZlgQykqs=;
-        b=LAwWAQKO76h21ZXk22U5c6pHdoa0c5mDpdv2ubFudZ8rCcOQjw8zzwXBJb5rKBUltn
-         n4qAvT37eGKLCyFbBJPhmYymPxHTQ+K3KXStU0YL2CGt1uuWDfUveYkdFZwhLrDCX3Q1
-         23DWP+hI/yvVH8kemdbZnoFHHG70Iki3twnapBATWoGlK+BUS5ZC/I+xYwT3rr1ATNyL
-         g/PYSBam8WEk6dv15DcffK4gVdcnwoIu4kkLB0PjR8tZlsPc7/n4HFOCrKahQIu45ecq
-         44fALdrgVk3OkVERaedyB0GaKziPWthKJLiFTRE9FrP/9Dd6rqKZQZOQo+ekG/MjCN4u
-         rtzA==
-X-Gm-Message-State: AOAM530LccuYVsEC0Q0FgF/VUsatgczLettiU2wlnQf8WmKSfj3xymYh
-        i6q3xAyPHuKxHkqUrhqtyW4svSD5FD7tnVDWE1Cx9zyD2/cS6V4V3Yw5YftVbMCj7goEkn8rAGu
-        2ATmQh/DLYtFuxZaKICqJrkfpeBTqh1hwR+punvmRRhfJ2mwMsHY2eWCzmBTqiHfvw4/eWiTq
-X-Received: by 2002:ac8:88:: with SMTP id c8mr7511097qtg.12.1633526953830;
-        Wed, 06 Oct 2021 06:29:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/8v3wqkJ1Y5E44+yD/hKM+9kQgCyFGq7beETeqK37nW1j+ndjaNNfhnHZDIHaVp6v5rSBYQ==
-X-Received: by 2002:ac8:88:: with SMTP id c8mr7511066qtg.12.1633526953614;
-        Wed, 06 Oct 2021 06:29:13 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id z6sm950959qke.24.2021.10.06.06.29.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 06:29:13 -0700 (PDT)
-Date:   Wed, 6 Oct 2021 09:29:12 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Satya Tangirala <satyaprateek2357@gmail.com>, dm-devel@redhat.com,
-        linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v4 4/4] blk-crypto: update inline encryption documentation
-Message-ID: <YV2kqFA3y3qo8ls/@redhat.com>
-References: <20210929163600.52141-1-ebiggers@kernel.org>
- <20210929163600.52141-5-ebiggers@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8f0JVd+gTPaH9TpaiXB3RSVMg8JjTNf39SFpo8XmoJM=;
+        b=JZdZdl/I/NOELvbFh0N2ee5X8psilR69QHUj0x/hZ6ZSO9hInEmr4Q/igwfntBcOCq
+         Qxb7wZ8clRaGHH+orHCF5WLRrk5Rkh19wpB4ozrl/q1Q0lWKZgMtPB47kUVd48O5tK+W
+         slcoQKEFmiFtp8H5vTY/078bQiBn3i837sGfZZ2kGldQSpgzvBnMalvDT2DSLLz1tHwh
+         01V+x9ZoROjR1bCR1qlqMTlYvpdEHcL4pI5htk67Yt6M3u/xS3EK5PHtHsKrqYbUvwM+
+         fZAQkvGfaTzCa4plAdCJyFd49sXa5CzylK3jAACIICAqZW0UH5LPp9B7Kx2coRdkvXty
+         UCfA==
+X-Gm-Message-State: AOAM531X6o5wOg+pT6eFqDq77aHfS2xedwz2d9Ot0V+L2ivR1DgYCOyC
+        S1DrSm69RG0sU+E0L2Yf3E2HtHzgHu7vEMHXLXVo/g==
+X-Google-Smtp-Source: ABdhPJxm6beT16fsT8mDfI3FtrLzaLeQGcMms/9pNJPVpN0ScU9qe6ITvrn4MU+1+mVeFPdgu3rCjiGbIrh2vbb/JBg=
+X-Received: by 2002:a67:e94a:: with SMTP id p10mr25025921vso.56.1633535929203;
+ Wed, 06 Oct 2021 08:58:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210929163600.52141-5-ebiggers@kernel.org>
+References: <20210505193655.2414268-1-egranata@google.com> <CAPR809ukYeThsPy4eg8A-G8b4Hwt7Prxh9P75=Vp9jnCKb6WqQ@mail.gmail.com>
+ <YO6ro345FI0XE8vv@stefanha-x1.localdomain> <87pmvlck3p.fsf@redhat.com>
+ <YO7zwKbH6OEW2z1o@stefanha-x1.localdomain> <CAPR809uuo=5kmzUs3RFp6z_4===R0hxdFiScLPouUS+qxdaVWg@mail.gmail.com>
+ <87h7duz7vq.fsf@redhat.com>
+In-Reply-To: <87h7duz7vq.fsf@redhat.com>
+From:   Enrico Granata <egranata@google.com>
+Date:   Wed, 6 Oct 2021 09:58:38 -0600
+Message-ID: <CAPR809vsz_z4ooL6dPJMDtTWtf02-jbz4FVipRjsLGczCV_XCQ@mail.gmail.com>
+Subject: Re: [virtio-dev] Fwd: [PATCH v2] Provide detailed specification of
+ virtio-blk lifetime metrics
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        virtio-dev@lists.oasis-open.org, linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, hch@infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 29 2021 at 12:36P -0400,
-Eric Biggers <ebiggers@kernel.org> wrote:
+I would very much favor that - thanks for bringing this thread back to attention
 
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Rework most of inline-encryption.rst to be easier to follow, to correct
-> some information, to add some important details and remove some
-> unimportant details, and to take into account the renaming from
-> blk_keyslot_manager to blk_crypto_profile.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+Thanks,
+- Enrico
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+Thanks,
+- Enrico
 
+
+On Wed, Oct 6, 2021 at 5:54 AM Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> On Fri, Aug 06 2021, Enrico Granata <egranata@google.com> wrote:
+>
+> > Hi folks,
+> > I am back from my leave of absence, so thank you everyone for your patience
+> >
+> > This proposal has been outstanding for a while and didn't seem to
+> > receive pushback, especially compared to the initial proposal
+> >
+> > Would it be the right time to put this modification up for a vote?
+>
+> I guess no news is good news? (Or it fell through the cracks for everybody...)
+>
+> I can update #106 and start voting.
+>
+>
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>
