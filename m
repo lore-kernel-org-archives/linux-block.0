@@ -2,396 +2,292 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2194DC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 18:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A08DEC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 20:32:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 055C861263
-	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 18:15:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88DDA60F23
+	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 20:32:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243502AbhJGSR1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Oct 2021 14:17:27 -0400
-Received: from mail-bn8nam12on2127.outbound.protection.outlook.com ([40.107.237.127]:28193
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233807AbhJGSR1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Oct 2021 14:17:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Sdn29w6flGsebAorczW22qhaw8NLq8Iain790pU8PCarPaVnOjcZY9Qh5HW0qJxcyXKncAQQuQSNrDyRd01nY+jwIV3U7Ewc3bd47SBE24qGF7KLj7GliRT+jfWo5T5QU8qBIesFB2SW61I3Tb7Igzms1KUHVMOaQYBx4o3zStKPRlMy63aF1kLha/XFNlY20KE52q7RCSrFyb3XM5LLEbYb4CiqxACMOga50rc/pdTBRSDpiiLCMYgjyDST1r41DOttD6oxCxC2zpTMTJD32h6/7gGk87tX2U+RBQNCdaXWfeHmZvVJ8iyr/kr/BazN6ks5s0HNFMESw75+Cxvizg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ec7zP9veX+E5R9Ndfeufn0nxdmPZ8znGwn7+N88fdUI=;
- b=Pi9W2kVOqndvZtOpxv/csml3gIFb1uTYnk8duGhgoLUC3MFT/3LTbly0zOA0UDCnZ+Rd8BN42RrWYwQbXIIpMf2Ow6R/Z3sH1yYc/16rNC8UrdbzcTBCMNN+spogFIEFtfNNw0JyChPLUlZNB0AUuQHWWwbexpZhw423Fbb9kZLnd0UxxypBpgOw3RP3A7339cJT9pDnS/YqglAZ5H4p7X7wgo6z6/ca1z0keWhqgJT+0GW+NVeU2T21MnetuH56cAeQfyHhW4NxIEcdPnS9LCmS8u+UWdrhm22cCymZueXwAOvIgzYFn2FSvYTBS0ckxhTwHqYJ9a+FfXqkU7gyUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ec7zP9veX+E5R9Ndfeufn0nxdmPZ8znGwn7+N88fdUI=;
- b=CtN18em18WC6Yx6wW26VBrYNixu2qdH83b93COeq1j0reTT/UAMFah98+TBhjyWQqfUPtqO3ceL+Z/sL8ZSxqM/7/+mzoPjd9yeSbVnOt8akf3YtNjgQ0jc9USH4leWQpwXpRuXauW9YYMU2le12UtZC6qXsqjEdlr2k4MyeaBc=
-Received: from BY5PR21MB1506.namprd21.prod.outlook.com (2603:10b6:a03:23d::12)
- by SJ0PR21MB1981.namprd21.prod.outlook.com (2603:10b6:a03:298::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.4; Thu, 7 Oct
- 2021 18:15:26 +0000
-Received: from BY5PR21MB1506.namprd21.prod.outlook.com
- ([fe80::c5e9:9018:e64f:c330]) by BY5PR21MB1506.namprd21.prod.outlook.com
- ([fe80::c5e9:9018:e64f:c330%9]) with mapi id 15.20.4608.005; Thu, 7 Oct 2021
- 18:15:26 +0000
-From:   Long Li <longli@microsoft.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC:     Bart Van Assche <bvanassche@acm.org>,
-        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Siddharth Gupta <sidgup@codeaurora.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: RE: [Patch v5 0/3] Introduce a driver to support host accelerated
- access to Microsoft Azure Blob for Azure VM
-Thread-Topic: [Patch v5 0/3] Introduce a driver to support host accelerated
- access to Microsoft Azure Blob for Azure VM
-Thread-Index: AQHXiceSNIn8c8rqq0aMs/Uc2xnVEKtlJaUAgAARXqCAAAZzgIADIFJggAC3SwCAAv3hYIBE4/SggAyEiKCAAJ8QAIAKHh2w
-Date:   Thu, 7 Oct 2021 18:15:25 +0000
-Message-ID: <BY5PR21MB15060E0A4AC1F6335A08EAB4CEB19@BY5PR21MB1506.namprd21.prod.outlook.com>
-References: <1628146812-29798-1-git-send-email-longli@linuxonhyperv.com>
- <e249d88b-6ca2-623f-6f6e-9547e2b36f1f@acm.org>
- <BY5PR21MB15060F1B9CDB078189B76404CEF29@BY5PR21MB1506.namprd21.prod.outlook.com>
- <YQwvL2N6JpzI+hc8@kroah.com>
- <BY5PR21MB1506A93E865A8D6972DD0AAECEF49@BY5PR21MB1506.namprd21.prod.outlook.com>
- <YQ9oTBSRyHCffC2k@kroah.com>
- <BY5PR21MB15065658FA902CC0BC162956CEF79@BY5PR21MB1506.namprd21.prod.outlook.com>
- <BY5PR21MB1506091AFED0EB62F081313ECEA29@BY5PR21MB1506.namprd21.prod.outlook.com>
- <DM6PR21MB15135923A4CB0E61786ABC22CEAA9@DM6PR21MB1513.namprd21.prod.outlook.com>
- <YVa6dtvt/BaajmmK@kroah.com>
-In-Reply-To: <YVa6dtvt/BaajmmK@kroah.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=49de1b74-ade8-40c8-bab7-98a7668ac908;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2021-10-07T18:06:44Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a7f28d15-c684-4f15-b35b-08d989be6fbd
-x-ms-traffictypediagnostic: SJ0PR21MB1981:
-x-ms-exchange-transport-forked: True
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <SJ0PR21MB19813DF03608528B6B241F63CEB19@SJ0PR21MB1981.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OQTmMCD/lV/uAWnN923s7WIqEzgvJ7/O6lZE6Ri4+St77rs/kaU4TF44FpQhr3ET52v24wsaGAxlXDQ4/hRUMGC2Z5NXQrCWglTIR+EU70GM3Xx6Na6nR2QXXY2SwUR+sim0D/EhIkVwvwkpDsZYCu2Uv64zgcM+FQGqyOOxG5Q6rrtQa0m9o85IyfKPuy5yOdyZoFH3jn4YW0rRGHjNVW3YBIPys6GCpmX7QOw08e8HTorD5x+JAPwXrfyP3Mj7Un6T691sbOJQdZRPM3QRRWzSZp1yGUxYt4IMrZKWYa7ThHZlGxs9iHkQKBfbQNeKaBkGYqwXdkkJ3BV7sYkG0YSytcQQ4V0ti/JwOajK+qnZXxB/hvoaOBGY4xFUPDEKQHK5nm85vYZmbP84RB5wF/XOsRMxrKm0T0MwLliQ7+FqAjCB09tmgcdLwdJSO4+6SoC54lCcr12L98orZFixQW6uS1LjoobWraQH3GSVeC4QbYl0MCkMkf1ABRf5v74SHS7L+kx9L54XrYXGjBKeARp1eelkE853yqZmNORX0fladC/iLraLV3wmzr1W/7dX9FQLL8asu30joDBRG2dsZecGaf66pOyTPLBuXEzYwskCX+7Kfcp9djonwRCEqoDpjK4q7K9GX4NQwDC0QZ5Q7h7A25ZKWDvWK5S0TPvMEE/033E4ZpSmwvdZoh+gmWUv62qs6CcwSvTg3oPIzaoFeFjH5m1kFL3B+PdlUU6KQFcJQ9pTqwStEIxn76u6jo5uBjeO5vupyNyXLRfLGvADoZRNlyP20JLTDHqDdo1Me0o68MianjyHhTWD9cYA3ClEnxkzVEuwD9dEc+WNqH/o9w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1506.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(47530400004)(508600001)(8676002)(8936002)(10290500003)(8990500004)(316002)(86362001)(66446008)(64756008)(52536014)(9686003)(55016002)(66556008)(5660300002)(54906003)(966005)(2906002)(66946007)(66476007)(76116006)(7416002)(83380400001)(71200400001)(38070700005)(6506007)(26005)(38100700002)(186003)(33656002)(7696005)(82960400001)(82950400001)(6916009)(4326008)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3RgNxZmjHC04HBhn12Fm2GVJiDMGX3PhGhspk5oRffZ/YyAQq5jFM6apYbWp?=
- =?us-ascii?Q?ZsQklnZDSRS3JEjhfzbvSdamBHeKvcAfudF9tVy5Q07kxS4YaHErE8NLKN+X?=
- =?us-ascii?Q?W0Gwj+wYdqoukNDtPzNO2Yq0ZsooVh8XZy65OeB9hkW/SNzS9Zk9fJMQr1hT?=
- =?us-ascii?Q?VD9f3uO90qJcp1NO4yx6VZR1Ub+r5oaIp2e+NhE6fcWI4B6MvZjr6y88d/Lw?=
- =?us-ascii?Q?bsYTJl0uAeR1BqtMdhiRgyMsw3FYkicMem20ykMrzbS/nccjn2+8xdqwBJv6?=
- =?us-ascii?Q?br8mStBKsfc/c3O2jhLwgVXqT+mOIkAbU/Jx7+Wm+rFNh5JXE+aJ+gnqsJYW?=
- =?us-ascii?Q?2N/4c4bBtgKKBXAsayqFMyNx0ZBMOFdtc8gzAKYYYQDPUFrCVWmd5sYGFDpt?=
- =?us-ascii?Q?p6suGkJgyNs58b5WEQxeaG+C3z2l0GUdN1wq1P2TavfpBi6Gg6m85an4vSl3?=
- =?us-ascii?Q?/2vD3GdjxQn+GFDND0vacTumgMe90KHljKd4VuFXcfWP6cNq/Rcu8O7d7cTR?=
- =?us-ascii?Q?9QA+BgX705PzCB2P7BdY3FFe/HstSwpafZBTO2W2+9eR+jrnHBpetV7yJQ6E?=
- =?us-ascii?Q?Q8ceCdraH+h8L7Dc6jjZF0b/9Y50uJeGyPB+HGgyoA+pazf6OLMv3ntg9zT/?=
- =?us-ascii?Q?TRE++xRaKhxYRJybwEOH1eQQuIY2FCE2w2QNFbqEN4ogroIZwXkPCHr1WOTU?=
- =?us-ascii?Q?geYTns7T5q7ZHiG3+O8U+jtyNuqrspdCFycLqmcTBwmBbemlOtYCmbl8njIO?=
- =?us-ascii?Q?UqqYbaN1GbBxwSThWeZXDcf4P4igj6UMJ5qIn8UxOpdaGKQrnvU2UqfW7Y8M?=
- =?us-ascii?Q?+LdMKWgI4fMeRjdwB33DCeO/phUHN1xLkX6nagKip/y4VBcxY5iOGwUuaPOu?=
- =?us-ascii?Q?wxa8OUl/KO4CpsXNcXVR3GJpIOjAY+jeaU+sNcVDEZgHRpauxmunj7WGTVtG?=
- =?us-ascii?Q?vWx3ye2l5OunrMwKGYW2ksJgcqm12FhEesbBuUAco8LBAV8hyzMTPiwSeIpF?=
- =?us-ascii?Q?6x9egD/htXrkBaNaN5ImLSM6lBXtkSS7+dJIebadIViXG4VAl3m8k58IE06b?=
- =?us-ascii?Q?fU6tnw3BMNFJddbqUHlVAQnnJGx/ANodOuvJ3sbz22pdNvqHhfh/BHNYLISm?=
- =?us-ascii?Q?CDibA70DfZ8JF36D5km5NWF5Dnbld+SIP+k2nye++Ke1z0fxAepawovFnTil?=
- =?us-ascii?Q?NhZMr98bBJk4WHxGV3Gp/D1sshzoqD05L09jCACTIeSfAnVI6d0jiup5OLyT?=
- =?us-ascii?Q?J2LaBmxCk4ubI0TPvt+vqhZJ7zpFB6sMD5faNGewB/DnNbNBZWw4jnMrbiD7?=
- =?us-ascii?Q?XAj1MRi512NHlrGjrAXgJ5/k?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S235284AbhJGUeI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Oct 2021 16:34:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57608 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242408AbhJGUeB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Oct 2021 16:34:01 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D9AC061774
+        for <linux-block@vger.kernel.org>; Thu,  7 Oct 2021 13:32:02 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id c7so7332045qka.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Oct 2021 13:32:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=nHIDwAcotutI0CUhRDRl9tzpG77y6Ae30UXin0Di0qA=;
+        b=KtpHLkuC77fVSdTVHRynEnYx671peU49IPXNMfGJWrDig91R9QexFPR8mR+Xb+xQjI
+         aYkWFlLuOcbd1PxxeyTPtehuRibDxJNCN+m8VdskllSHmqkTnlo6TLbTo2oYKj0Akuza
+         n26bVcUa22+iXNrAvxUpUFXu85xfHso6yxGAY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=nHIDwAcotutI0CUhRDRl9tzpG77y6Ae30UXin0Di0qA=;
+        b=sPDKBO7+oRd3N8Y1MWe6ggaKdOLVoSLsydbIr7PeN3JnsdtZzz+h+GgYYkeBy1e6Yv
+         BRNHTvyMYxt+cSripvqNQRfT4OBILRAZaGYU7UwdJUxYOPTkjdPXY6kndlUURlJuJDfd
+         HbisUdS2D2NIPQ1y+zWuBfsJ1vl6o7U+28Fz7fjMhb2LBeCC+dKjQt8wUw5446uowIXI
+         YlboHs9lmOTodKsEuAQsZAfqr6EUbFZ+kwGLXKtVKb5/wrsGRCAV9sIX17ARre28iZ7Y
+         reiC2aXmlUnY08JvhITwbb2KnqDDzADUQbI9FNMV7RvEOrDvPhiukJIKm90iOQjLSque
+         KziA==
+X-Gm-Message-State: AOAM532m9ggbVVi72U+toO4vNMWbV+OZrY9soBi+q/afmbxDZdhNo5VJ
+        i6o9lQNldmJXTldIQ0+cz3ZEbtVV55uNo8bGXbjQNg==
+X-Google-Smtp-Source: ABdhPJydKhChwBLCRAksv1FmDtptvtptbHz5loaUb7CZMytdLcc5fF5RXgnsOVnqWlnoeGt/nIlOYPiK+oTWYWfWA3I=
+X-Received: by 2002:a37:8242:: with SMTP id e63mr5334586qkd.294.1633638721551;
+ Thu, 07 Oct 2021 13:32:01 -0700 (PDT)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <1633429419-228500-1-git-send-email-john.garry@huawei.com>
+ <ae33dde8-96e8-2978-5f32-c7e0a6136e8e@kernel.dk> <81d9e019-b730-221e-a8c0-f72a8422a2ec@huawei.com>
+ d3a11ba59cc0a912fa6486a148a7458a@mail.gmail.com
+In-Reply-To: d3a11ba59cc0a912fa6486a148a7458a@mail.gmail.com
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1506.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7f28d15-c684-4f15-b35b-08d989be6fbd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2021 18:15:25.9676
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: T5oLuUkghV8uZyJESPDFwQAuohswRxnUoA538JYyiux5RahygGR2igErHBra6OafBjceCENC5ij7wnJTARcpGw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR21MB1981
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQGgGyzjlHsoUBOKQforaoyr3oYZHgFiajqbAYnHiCCsHEhW8IADf5Xg
+Date:   Fri, 8 Oct 2021 02:01:52 +0530
+Message-ID: <e4e92abbe9d52bcba6b8cc6c91c442cc@mail.gmail.com>
+Subject: RE: [PATCH v5 00/14] blk-mq: Reduce static requests memory footprint
+ for shared sbitmap
+To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, hare@suse.de, linux-scsi@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="000000000000b5fb0105cdc92701"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> Subject: Re: [Patch v5 0/3] Introduce a driver to support host accelerate=
-d
-> access to Microsoft Azure Blob for Azure VM
->=20
-> On Thu, Sep 30, 2021 at 10:25:12PM +0000, Long Li wrote:
-> > > Greg,
-> > >
-> > > I apologize for the delay. I have attached the Java transport
-> > > library (a tgz file) in the email. The file is released for review un=
-der "The
-> MIT License (MIT)".
-> > >
-> > > The transport library implemented functions needed for reading from
-> > > a Block Blob using this driver. The function for transporting I/O is
-> > > Java_com_azure_storage_fastpath_driver_FastpathDriver_read(),
-> > > defined in "./src/fastpath/jni/fpjar_endpoint.cpp".
-> > >
-> > > In particular, requestParams is in JSON format (REST) that is passed
-> > > from a Blob application using Blob API for reading from a Block Blob.
-> > >
-> > > For an example of how a Blob application using the transport
-> > > library, please see Blob support for Hadoop ABFS:
-> > >
-> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgi
-> > > th
-> > >
-> ub.com%2Fapache%2Fhadoop%2Fpull%2F3309%2Fcommits%2Fbe7d12662e2
-> > >
-> 3a13e6cf10cf1fa5e7eb109738e7d&amp;data=3D04%7C01%7Clongli%40microsof
-> > >
-> t.com%7C3acb68c5fd6144a1857908d97e247376%7C72f988bf86f141af91ab2d7
-> > >
-> cd011db47%7C1%7C0%7C637679518802561720%7CUnknown%7CTWFpbGZsb
-> > >
-> 3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0
-> > > %3D%7C1000&amp;sdata=3D6z3ZXPtMC5OvF%2FgrtbcRdFlqzzR1xJNRxE2v2
-> Qrx
-> > > FL8%3D&amp;reserved=3D0
->=20
-> Odd url :(
->=20
-> > > In ABFS, the entry point for using Blob I/O is at AbfsRestOperation
-> > > executeRead() in hadoop-tools/hadoop-
-> > >
-> azure/src/main/java/org/apache/hadoop/fs/azurebfs/services/AbfsInput
-> > > Str eam.java, from line 553 to 564, this function eventually calls
-> > > into
-> > > executeFastpathRead() in hadoop-tools/hadoop-
-> > > azure/src/main/java/org/apache/hadoop/fs/azurebfs/services/AbfsClien
-> > > t.ja
-> > > va.
-> > >
-> > > ReadRequestParameters is the data that is passed to requestParams
-> > > (described above) in the transport library. In this Blob application
-> > > use-case, ReadRequestParameters has eTag and sessionInfo
-> > > (sessionToken). They are both defined in this commit, and are
-> > > treated as strings passed in JSON format to I/O issuing function
-> > > Java_com_azure_storage_fastpath_driver_FastpathDriver_read() in the
-> > > transport library using this driver.
-> > >
-> > > Thanks,
-> > > Long
-> >
-> > Hello Greg,
-> >
-> > I have shared the source code of the Blob client using this driver, and=
- the
-> reason why the Azure Blob driver is not implemented through POSIX with fi=
-le
-> system and Block layer.
->=20
-> Please wrap your text lines...
->=20
-> Anyway, no, you showed a client for this interface, but you did not expla=
-in
-> why this could not be implemented using a filesystem and block layer.  On=
-ly
-> that it is not what you did.
->=20
-> > Blob APIs are specified in this doc:
-> >
-> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fdocs
-> > .microsoft.com%2Fen-us%2Frest%2Fapi%2Fstorageservices%2Fblob-
-> service-r
-> > est-
-> api&amp;data=3D04%7C01%7Clongli%40microsoft.com%7C6a51f21c78a3413e63
-> >
-> 9d08d984ae2c58%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C6376
-> 867059
-> >
-> 24012728%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoi
-> V2luMzIiL
-> >
-> CJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=3DZiWmZ%2FpuQHNn
-> dHNmnIWHO
-> > yrXPSscNBbR6RvSr%2FCBuEY%3D&amp;reserved=3D0
-> >
-> > The semantic of reading data from Blob is specified in this doc:
-> >
-> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fdocs
-> > .microsoft.com%2Fen-us%2Frest%2Fapi%2Fstorageservices%2Fget-
-> blob&amp;d
-> >
-> ata=3D04%7C01%7Clongli%40microsoft.com%7C6a51f21c78a3413e639d08d984a
-> e2c5
-> >
-> 8%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C63768670592401272
-> 8%7CUn
-> >
-> known%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6
-> Ik1haW
-> >
-> wiLCJXVCI6Mn0%3D%7C1000&amp;sdata=3DxqUObAdYkFf8efSRuK%2FOXm%2
-> BRd%2FCiBI
-> > 0BjNfx9YpkGN0%3D&amp;reserved=3D0
-> >
-> > The source code I shared demonstrated how a Blob is read to Hadoop
-> through ABFS. In general, A Blob client can use any optional request head=
-ers
-> specified in the API suitable for its specific application. The Azure Blo=
-b service
-> is not designed to be POSIX compliant. I hope this answers your question =
-on
-> why this driver is not implemented at file system or block layer.
->=20
->=20
-> Again, you are saying "it is this way because we created it this way", wh=
-ich
-> does not answer the question of "why were you required to do it this way"=
-,
-> right?
->=20
-> > Do you have more comments on this driver?
->=20
-> Again, please answer _why_ you are going around the block layer and
-> creating a new api that circumvents all of the interfaces and protections=
- that
-> the normal file system layer provides.  What is lacking in the existing a=
-pis that
-> has required you to create a new one that is incompatible with everything
-> that has ever existed so far?
->=20
-> thanks,
->=20
-> greg k-h
+--000000000000b5fb0105cdc92701
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Greg,
+> > -----Original Message-----
+> > From: John Garry [mailto:john.garry@huawei.com]
+> > Sent: Tuesday, October 5, 2021 7:05 PM
+> > To: Jens Axboe <axboe@kernel.dk>; kashyap.desai@broadcom.com
+> > Cc: linux-block@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > ming.lei@redhat.com; hare@suse.de; linux-scsi@vger.kernel.org
+> > Subject: Re: [PATCH v5 00/14] blk-mq: Reduce static requests memory
+> > footprint for shared sbitmap
+> >
+> > On 05/10/2021 13:35, Jens Axboe wrote:
+> > >> Baseline is 1b2d1439fc25 (block/for-next) Merge branch 'for-
+> 5.16/io_uring'
+> > >> into for-next
+> > > Let's get this queued up for testing, thanks John.
+> >
+> > Cheers, appreciated
+> >
+> > @Kashyap, You mentioned that when testing you saw a performance
+> > regression from v5.11 -> v5.12 - any idea on that yet? Can you
+> > describe the scenario, like IO scheduler and how many disks and the
+> > type? Does disabling host_tagset_enable restore performance?
+>
+> John - I am still working on this. System was not available due to some
+> other
+> debugging.
 
-Azure Blob is massively scalable and secure object storage designed for clo=
-ud native=20
-workloads. Many of its features are not possible to implement through POSIX=
- file=20
-system. Please find some of them below:
-=20
-For read and write API calls (for both data and metadata) Conditional Suppo=
-rt=20
-(https://docs.microsoft.com/en-us/rest/api/storageservices/specifying-condi=
-tional-headers-for-blob-service-operations)=20
-is supported by Azure Blob. Every change will result in an update to the La=
-st Modified=20
-Time (=3D=3D ETag) of the changed file and customers can use If-Modified-Si=
-nce, If-Unmodified-Since,=20
-If-Match, and If-None-Match conditions. Furthermore, almost all APIs suppor=
-t this=20
-since customers require fine-grained and complete control via these conditi=
-ons. It=20
-is not possible/practical to implement Conditional Support in POSIX filesys=
-tem.
-=20
-The Blob API supports multiple write-modes of files with three different bl=
-ob types:=20
-Block Blobs (https://docs.microsoft.com/en-us/rest/api/storageservices/oper=
-ations-on-block-blobs),=20
-Append Blobs, and Page Blobs. Block Blobs support very large file sizes (hu=
-ndreds=20
-of TBs in a single file) and are more optimal for larger blocks, have two-p=
-hased=20
-commit protocol, block sharing, and application control over block identifi=
-ers. Block=20
-blobs support both uncommitted and committed data. Block blobs allow the us=
-er to=20
-stage a series of modifications, then atomically update the block list to i=
-ncorporate=20
-multiple disjoint updates in one operation. This is not possible in POSIX f=
-ilesystem.
-=20
-Azure Blob supports Blob Tiers (https://docs.microsoft.com/en-us/azure/stor=
-age/blobs/access-tiers-overview).=20
-The "Archive" tier is not possible to implement in POSIX file system. To ac=
-cess data=20
-from an "Archive" tier, it needs to go through rehydration (https://docs.mi=
-crosoft.com/en-us/azure/storage/blobs/archive-rehydrate-overview)=20
-to become "Cool" or "Hot" tier. Note that the customer requirement for tier=
-s is that=20
-they do not change what URI, endpoint, or file/folder they access at all - =
-same endpoint,=20
-same file path is a must requirement. There is no POSIX semantics to descri=
-be Archive=20
-and Rehydration, while maintaining the same path for the data.
-=20
-The Azure Blob feature Customer Provided Keys (https://docs.microsoft.com/e=
-n-us/azure/storage/blobs/encryption-customer-provided-keys)=20
-provides different encryption key for data at a per-request level. It's not=
- possible=20
-to inject this into POSIX filesystem and it is a critical security feature =
-for customers=20
-requiring higher level of security such as the Finance industry customers. =
-There=20
-exists file-level metadata implementation that indicates info about the enc=
-ryption=20
-as well. Note that encryption at file/folder level or higher granularity do=
-es not=20
-meet such customers' needs - not just on individual customer requirements b=
-ut also=20
-related financial regulations.
-=20
-The Immutable Storage (https://docs.microsoft.com/en-us/azure/storage/blobs=
-/immutable-storage-overview)=20
-feature is not possible with POSIX filesystem. This provides WORM (Write-On=
-ce Read-Many)=20
-guarantees on data where it is impossible (regardless of access control, i.=
-e. even=20
-the highest level administrator/root) to modify/delete data until a certain=
- interval=20
-has passed; it also includes features such as Legal Hold. Note that per the=
- industry=20
-and security requirements, the store must enforce these WORM and Legal Hold=
- aspects=20
-directly, it cannot be done with access control mechanisms or enforcing thi=
-s at the=20
-various endpoints that access the data.
- =20
-Blob Index (https://docs.microsoft.com/en-us/azure/storage/blobs/storage-ma=
-nage-find-blobs)=20
-which provides multi-dimensions secondary indexing on user-settable blob ta=
-gs (metadata)=20
-is not possible to accomplish in POSIX filesystem. The indexing engine need=
-s to incorporate=20
-with Storage access control integration, Lifecycle retention integration, r=
-untime=20
-API call conditions, it's not possible to support in the filesystem itself;=
- in other=20
-words, it cannot be done as a side-car or higher level service without comp=
-romising=20
-on the customer requirements for Blob Index. Related Blob APIs for this are=
- Set Blob=20
-Tags (https://docs.microsoft.com/en-us/rest/api/storageservices/set-blob-ta=
-gs) and=20
-Find Blob by Tags (https://docs.microsoft.com/en-us/rest/api/storageservice=
-s/find-blobs-by-tags).
+John -
 
-Thanks,
+I tested this patchset on 5.15-rc4 (master) -
+https://github.com/torvalds/linux.git
 
-Long
+#1 I noticed some performance regression @mq-deadline scheduler which is not
+related to this series. I will bisect and get more detail about this issue
+separately.
+#2  w.r.t this patchset, I noticed one issue which is related to cpu usage
+is high in certain case.
 
+I have covered test on same setup using same h/w. I tested on Aero MegaRaid
+Controller.
+
+Test #1 : Total 24 SAS SSDs in JBOD mode.
+(numactl -N 1 fio
+24.fio --rw=randread --bs=4k --iodepth=256 --numjobs=1
+--ioscheduler=none/mq-deadline)
+No performance regression is noticed using this patchset. I can get 3.1 M
+IOPs (max IOPs on this setup). I noticed some CPU hogging issue if iodepth
+from application is high.
+
+Cpu usage data from (top)
+%Node1 :  6.4 us, 57.5 sy,  0.0 ni, 23.7 id,  0.0 wa,  0.0 hi, 12.4 si,  0.0
+st
+
+Perf top data -
+     19.11%  [kernel]        [k] native_queued_spin_lock_slowpath
+     4.72%  [megaraid_sas]  [k] complete_cmd_fusion
+     3.70%  [megaraid_sas]  [k] megasas_build_and_issue_cmd_fusion
+     2.76%  [megaraid_sas]  [k] megasas_build_ldio_fusion
+     2.16%  [kernel]        [k] syscall_return_via_sysret
+     2.16%  [kernel]        [k] entry_SYSCALL_64
+     1.87%  [megaraid_sas]  [k] megasas_queue_command
+     1.58%  [kernel]        [k] io_submit_one
+     1.53%  [kernel]        [k] llist_add_batch
+     1.51%  [kernel]        [k] blk_mq_find_and_get_req
+     1.43%  [kernel]        [k] llist_reverse_order
+     1.42%  [kernel]        [k] scsi_complete
+     1.18%  [kernel]        [k] blk_mq_rq_ctx_init.isra.51
+     1.17%  [kernel]        [k] _raw_spin_lock_irqsave
+     1.15%  [kernel]        [k] blk_mq_get_driver_tag
+     1.09%  [kernel]        [k] read_tsc
+     0.97%  [kernel]        [k] native_irq_return_iret
+     0.91%  [kernel]        [k] scsi_queue_rq
+     0.89%  [kernel]        [k] blk_complete_reqs
+
+Perf top data indicates lock contention in "blk_mq_find_and_get_req" call.
+
+1.31%     1.31%  kworker/57:1H-k  [kernel.vmlinux]
+     native_queued_spin_lock_slowpath
+     ret_from_fork
+     kthread
+     worker_thread
+     process_one_work
+     blk_mq_timeout_work
+     blk_mq_queue_tag_busy_iter
+     bt_iter
+     blk_mq_find_and_get_req
+     _raw_spin_lock_irqsave
+     native_queued_spin_lock_slowpath
+
+
+Kernel v5.14 Data -
+
+%Node1 :  8.4 us, 31.2 sy,  0.0 ni, 43.7 id,  0.0 wa,  0.0 hi, 16.8 si,  0.0
+st
+     4.46%  [kernel]       [k] complete_cmd_fusion
+     3.69%  [kernel]       [k] megasas_build_and_issue_cmd_fusion
+     2.97%  [kernel]       [k] blk_mq_find_and_get_req
+     2.81%  [kernel]       [k] megasas_build_ldio_fusion
+     2.62%  [kernel]       [k] syscall_return_via_sysret
+     2.17%  [kernel]       [k] __entry_text_start
+     2.01%  [kernel]       [k] io_submit_one
+     1.87%  [kernel]       [k] scsi_queue_rq
+     1.77%  [kernel]       [k] native_queued_spin_lock_slowpath
+     1.76%  [kernel]       [k] scsi_complete
+     1.66%  [kernel]       [k] llist_reverse_order
+     1.63%  [kernel]       [k] _raw_spin_lock_irqsave
+     1.61%  [kernel]       [k] llist_add_batch
+     1.39%  [kernel]       [k] aio_complete_rw
+     1.37%  [kernel]       [k] read_tsc
+     1.07%  [kernel]       [k] blk_complete_reqs
+     1.07%  [kernel]       [k] native_irq_return_iret
+     1.04%  [kernel]       [k] __x86_indirect_thunk_rax
+     1.03%  fio            [.] __fio_gettime
+     1.00%  [kernel]       [k] flush_smp_call_function_queue
+
+
+Test #2: Three VDs (each VD consist of 8 SAS SSDs).
+(numactl -N 1 fio
+3vd.fio --rw=randread --bs=4k --iodepth=32 --numjobs=8
+--ioscheduler=none/mq-deadline)
+
+There is a performance regression but it is not due to this patch set.
+Kernel v5.11 gives 2.1M IOPs on mq-deadline but 5.15 (without this patchset)
+gives 1.8M IOPs.
+In this test I did not noticed CPU issue as mentioned in Test-1.
+
+In general, I noticed host_busy is incorrect once I apply this patchset. It
+should not be more than can_queue, but sysfs host_busy value is very high
+when IOs are running. This issue is only after applying this patchset.
+
+Is this patch set only change the behavior of <shared_host_tag> enabled
+driver ? Will there be any impact on mpi3mr driver ? I can test that as
+well.
+
+Kashyap
+
+>
+> >
+> >  From checking differences between those kernels, I don't see anything
+> > directly relevant in sbitmap support or in the megaraid sas driver.
+> >
+> > Thanks,
+> > John
+
+--000000000000b5fb0105cdc92701
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+P3lSxcw4Cg90iKHqfpwLnGNc9AGXHMxUCukpnAHRlivljilKHMx1ymb180BLmtF+ZLm6KrFLQWzB
+4KeiUOMtKM13wJrQubqTeZgB1XA+89jeLYlxagVsMyksdwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
+BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
+YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
+BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
+MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
+YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
+Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
+HREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
+BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUkTOZp9jXE3yPj4ieKeDT
+OiNyCtswDQYJKoZIhvcNAQELBQADggEBABG1KCh7cLjStywh4S37nKE1eE8KPyAxDzQCkhxYLBVj
+gnnhaLmEOayEucPAsM1hCRAm/vR3RQ27lMXBGveCHaq9RZkzTjGSbzr8adOGK3CluPrasNf5StX3
+GSk4HwCapA39BDUrhnc/qG5vHwLrgA1jwAvSy8e/vn4F4h+KPrPoFNd1OnCafedbuiEXTqTkn5Rk
+vZ2AOTcSbxvmyKBMb/iu1vn7AAoui0d8GYCPoz8shf2iWMSUXVYJAMrtRHVJr47J5jlopF5F2ghC
+MzNfx6QsmJhYiRByd8L9sUOjp/DMgkC6H93PyYpYMiBGapgNf6UMsLg/1kx5DATNwhPAJbkxggJt
+MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
+VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxwO04DXOeYbZtr
+4mAwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIBLEYiJ31FcL8QmOf5+FfuSdRU1
+dRNC24XDSNp5kpyJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIx
+MTAwNzIwMzIwMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
+AwQCATANBgkqhkiG9w0BAQEFAASCAQB9jy2296MrlWT9pTkePlDfqNRDOeATMZTyhwC53xaVSuNJ
+m240XWF7szUAzScJUs6By80cXF3N8G+VgkdVN90WxDHKCFPFUUUWMZnK7+WSEhHyMREzyVlw8Ugz
+0vC33u776Yx6SCPeFWvvO81pZV8tU3JQ+6d46VK+0wgVSb1+qsFuPKJuNMPI32nv9zBg+mM2fe3y
+jQtx8GcwEKxbSn3vOCyueEJwfHjk3aFXjeRpamnXYXP+jXM/4KHlliI/RT03GaHBJs8mR5m1fQOG
+TSzlI9wTpkcqt/OKM0+q/K2AyOJh5MkNRK93NqUYZ9kdM/f90LHuwX8KV3Jv+ZRRRYsw
+--000000000000b5fb0105cdc92701--
