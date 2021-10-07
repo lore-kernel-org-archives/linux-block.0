@@ -2,390 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B6CEC43217
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 279B2C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 06:40:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51DED610CE
-	for <linux-block@archiver.kernel.org>; Wed,  6 Oct 2021 23:13:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 043F661215
+	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 06:40:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbhJFXPa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Oct 2021 19:15:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46858 "EHLO
+        id S233507AbhJGGme (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Oct 2021 02:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231154AbhJFXP3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Oct 2021 19:15:29 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9319AC061753
-        for <linux-block@vger.kernel.org>; Wed,  6 Oct 2021 16:13:36 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id m20so3936968iol.4
-        for <linux-block@vger.kernel.org>; Wed, 06 Oct 2021 16:13:36 -0700 (PDT)
+        with ESMTP id S232680AbhJGGmd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Oct 2021 02:42:33 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D8C3C061746;
+        Wed,  6 Oct 2021 23:40:40 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id c29so4506786pfp.2;
+        Wed, 06 Oct 2021 23:40:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=f0CDhZ3n9c9Wbis2PmGVaPgugzsGmtUSf+fxsIMVGmw=;
-        b=phyA3KEXMh7wFtX0TNaStaUPlzsaKWMq5abW5zZGdgeA4IonWOPutibqdId0q9sYK2
-         PBTzKCzmlfQAytFcdXvgBhLO37dK/Wooy0AAmFw0ZMW9RN1ajgCXzQUJpl+WlRoui8RE
-         3mi659LwzDjaXs4jlZE9/ALpU9tdiYevtaD5pMCp2E+zisOzgp4+CRXV5lho9kX3nri9
-         Um+hMRVpc/MVzO7xxLc4a6ZJS7Mhwxf8E27wvcVOxgIsaWt1OawixvBXD/ECmVF1y/Jt
-         qCBwNw+1eoyzXaVwlNpFrPOWJgld2/xcGrGO9gYZebzPqeaVADnSARqcUYWhEW06Ekdr
-         nqaw==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=rchYZ1OmvrTj6Dnb5m6nbANunxf9oFlLci7r8WnLUPs=;
+        b=O+7v3Tfioq20KfK+iM0C+zGiMKkOfAsz+ANPc0m+oNdQQOsOiltCkSWLlWzH3uGSAw
+         6VTdx1hFDFjrc2AKEBhK2aNu1U8F5Dqcef+wgfRGfqO+kA86OnmQL+fAqGMGJ6Cgf794
+         2apr60YhCU8TtaK892mqvAlkPPf54ZQLDkmeB/kp2lU/AGyPMwXSv66laka4M0tQoLZ4
+         uV/ieHXAPFvzBTrBe4C8m4y5/UgTdzQcY9gQ9TvpJpzfeg1V4AEjYblTstjiYX2+8QFR
+         DtVpbsVrNOPBb2jH3eXW1FUjU1hFa90FaXO3MyxAAPeEPXv3qHPjpXb+LZe3H1w8lbKO
+         IsmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=f0CDhZ3n9c9Wbis2PmGVaPgugzsGmtUSf+fxsIMVGmw=;
-        b=jpFw/Lu6UYf5ypue8JJ5zwgnCiGKTTVeH/tM6c/Ikqrt5ep+lFmO6AF2Ol7t0WTLhm
-         j2KbqVZXUpZuFRAHbMVYBx8Ex7Id1v2TE30MzSsXKkBd8/pUpOb4g2WasoIT34UzAtm2
-         5BkIdVbbHFnb+Y79BNPZw/7Hfll2um5GOVhDBZaWUb3sv7TQsMMPMNuB8X9L3lnipRnc
-         2VG8RjPfvaba7EJJLsLV35JvxhmrHavXxXUptOiNiOyuU3fJv4MCoqFoQHCXsXyPid3A
-         FcjCAcNdzufaLKit5PRedAeKeakQXxFGu65M1V9w9g5TSdaNo0w6p5j/LAxdTQvS/9lX
-         Et+w==
-X-Gm-Message-State: AOAM5331WNRmL4ID7zVtrKmviyJLEaMEn7n9Erp6Dy1B/rsHzg8B9/CG
-        8RYcBJl+vJfWqxMYWUWAEQcB12aaVIcyyA==
-X-Google-Smtp-Source: ABdhPJymVS9ebXOcm3pIk39zBp0lxakeabhdHebYp44tR5qTHf/9daOekgARzxH1f0Xt/fCZN5CrEw==
-X-Received: by 2002:a6b:8b52:: with SMTP id n79mr808914iod.8.1633562015797;
-        Wed, 06 Oct 2021 16:13:35 -0700 (PDT)
-Received: from p1.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id o1sm12955203ilj.41.2021.10.06.16.13.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 16:13:35 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/3] block: pre-allocate requests if plug is started and is a batch
-Date:   Wed,  6 Oct 2021 17:13:29 -0600
-Message-Id: <20211006231330.20268-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211006231330.20268-1-axboe@kernel.dk>
-References: <20211006231330.20268-1-axboe@kernel.dk>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=rchYZ1OmvrTj6Dnb5m6nbANunxf9oFlLci7r8WnLUPs=;
+        b=eZB0eAnEDRLkxKE2EbWgwNBPhFZm47FbP7QvcPTTkXxntJooigy0rnoIk/QOUosPmN
+         0Sncq0QRLqQlSaFWS+9OHvb8S9gXqIQqjB8d09C9TzYH82XCtbc54g85oKWIUWnr7fS0
+         VH8qPScG1vtLTI9f2vR681dfzyXu2INoOAcenLLbJXdu5bBSXsB40ECsX8UCM6YNTDfJ
+         JLeG6mMrqlOZM+Y2+rkyuIKzaa3C4hKEKD+MUcel1w6hcdm/eaPVM84kiKqoq5LXcqhz
+         lPsX5TsLVSQHc0LzllZGAwpEu6Ck0ACD1+kPFFh80FzmRDi6brE1fO/IVswUlapCYBHA
+         Jqhg==
+X-Gm-Message-State: AOAM533ZhXfdvv+YYsN8OmLpSvMg08Q21XyzzF7a55xNEFTJSzBkq45u
+        HMx7fVEPCte7a3CHATafbMKi+ffFfKjgPr0IRyp7E6CfaKFB+N0=
+X-Google-Smtp-Source: ABdhPJxrWmcU7AzTy6Llp+zmxjXH3KAy/mRdFUScx+jA5RlbVQ4lgC0RabvXrznpxqpNB3TfgOmg0bxTrCTOmnCrneg=
+X-Received: by 2002:a63:85c6:: with SMTP id u189mr1970797pgd.381.1633588840007;
+ Wed, 06 Oct 2021 23:40:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CACkBjsZh7DCs+N+R=0+mnNqFZW8ck5cSgV4MpGM6ySbfenUJ+g@mail.gmail.com>
+In-Reply-To: <CACkBjsZh7DCs+N+R=0+mnNqFZW8ck5cSgV4MpGM6ySbfenUJ+g@mail.gmail.com>
+From:   Hao Sun <sunhao.th@gmail.com>
+Date:   Thu, 7 Oct 2021 14:40:29 +0800
+Message-ID: <CACkBjsb0Hxam_e5+vOOanF_BfGAcf5UY+=Cc-pyphQftETTe8Q@mail.gmail.com>
+Subject: Re: kernel BUG in block_invalidatepage
+To:     Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The caller typically has a good (or even exact) idea of how many requests
-it needs to submit. We can make the request/tag allocation a lot more
-efficient if we just allocate N requests/tags upfront when we queue the
-first bio from the batch.
+Hello,
 
-Provide a new plug start helper that allows the caller to specify how many
-IOs are expected. This sets plug->nr_ios, and we can use that for smarter
-request allocation. The plug provides a holding spot for requests, and
-request allocation will check it before calling into the normal request
-allocation path.
+This crash can still be triggered repeatedly on the latest kernel.
 
-The blk_finish_plug() is called, check if there are unused requests and
-free them. This should not happen in normal operations. The exception is
-if we get merging, then we may be left with requests that need freeing
-when done.
+HEAD commit: 60a9483534ed Merge tag 'warning-fixes-20211005'
+git tree: upstream
+kernel config: https://drive.google.com/file/d/1u-ncYGLkq3xqdlNQYJz8-G6Fhf3H-moP/view?usp=sharing
 
-This raises the per-core performance on my setup from ~5.8M to ~6.1M
-IOPS.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-core.c       | 47 ++++++++++++++++------------
- block/blk-mq.c         | 70 ++++++++++++++++++++++++++++++++++--------
- block/blk-mq.h         |  5 +++
- include/linux/blk-mq.h |  5 ++-
- include/linux/blkdev.h | 15 ++++++++-
- 5 files changed, 109 insertions(+), 33 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d83e56b2f64e..9b8c70670190 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1624,6 +1624,31 @@ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
- }
- EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
- 
-+void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
-+{
-+	struct task_struct *tsk = current;
-+
-+	/*
-+	 * If this is a nested plug, don't actually assign it.
-+	 */
-+	if (tsk->plug)
-+		return;
-+
-+	INIT_LIST_HEAD(&plug->mq_list);
-+	plug->cached_rq = NULL;
-+	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
-+	plug->rq_count = 0;
-+	plug->multiple_queues = false;
-+	plug->nowait = false;
-+	INIT_LIST_HEAD(&plug->cb_list);
-+
-+	/*
-+	 * Store ordering should not be needed here, since a potential
-+	 * preempt will imply a full memory barrier
-+	 */
-+	tsk->plug = plug;
-+}
-+
- /**
-  * blk_start_plug - initialize blk_plug and track it inside the task_struct
-  * @plug:	The &struct blk_plug that needs to be initialized
-@@ -1649,25 +1674,7 @@ EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
-  */
- void blk_start_plug(struct blk_plug *plug)
- {
--	struct task_struct *tsk = current;
--
--	/*
--	 * If this is a nested plug, don't actually assign it.
--	 */
--	if (tsk->plug)
--		return;
--
--	INIT_LIST_HEAD(&plug->mq_list);
--	INIT_LIST_HEAD(&plug->cb_list);
--	plug->rq_count = 0;
--	plug->multiple_queues = false;
--	plug->nowait = false;
--
--	/*
--	 * Store ordering should not be needed here, since a potential
--	 * preempt will imply a full memory barrier
--	 */
--	tsk->plug = plug;
-+	blk_start_plug_nr_ios(plug, 1);
- }
- EXPORT_SYMBOL(blk_start_plug);
- 
-@@ -1719,6 +1726,8 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 
- 	if (!list_empty(&plug->mq_list))
- 		blk_mq_flush_plug_list(plug, from_schedule);
-+	if (unlikely(!from_schedule && plug->cached_rq))
-+		blk_mq_free_plug_rqs(plug);
- }
- 
- /**
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5327abbefbab..ced94eb8e297 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -352,6 +352,7 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 	struct request_queue *q = data->q;
- 	struct elevator_queue *e = q->elevator;
- 	u64 alloc_time_ns = 0;
-+	struct request *rq;
- 	unsigned int tag;
- 
- 	/* alloc_time includes depth and tag waits */
-@@ -385,10 +386,21 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 	 * case just retry the hctx assignment and tag allocation as CPU hotplug
- 	 * should have migrated us to an online CPU by now.
- 	 */
--	tag = blk_mq_get_tag(data);
--	if (tag == BLK_MQ_NO_TAG) {
-+	do {
-+		tag = blk_mq_get_tag(data);
-+		if (tag != BLK_MQ_NO_TAG) {
-+			rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
-+			if (!--data->nr_tags)
-+				return rq;
-+			if (e || data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
-+				return rq;
-+			rq->rq_next = *data->cached_rq;
-+			*data->cached_rq = rq;
-+			data->flags |= BLK_MQ_REQ_NOWAIT;
-+			continue;
-+		}
- 		if (data->flags & BLK_MQ_REQ_NOWAIT)
--			return NULL;
-+			break;
- 
- 		/*
- 		 * Give up the CPU and sleep for a random short time to ensure
-@@ -397,8 +409,15 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
- 		 */
- 		msleep(3);
- 		goto retry;
-+	} while (1);
-+
-+	if (data->cached_rq) {
-+		rq = *data->cached_rq;
-+		*data->cached_rq = rq->rq_next;
-+		return rq;
- 	}
--	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
-+
-+	return NULL;
- }
- 
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
-@@ -408,6 +427,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 		.q		= q,
- 		.flags		= flags,
- 		.cmd_flags	= op,
-+		.nr_tags	= 1,
- 	};
- 	struct request *rq;
- 	int ret;
-@@ -436,6 +456,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 		.q		= q,
- 		.flags		= flags,
- 		.cmd_flags	= op,
-+		.nr_tags	= 1,
- 	};
- 	u64 alloc_time_ns = 0;
- 	unsigned int cpu;
-@@ -537,6 +558,18 @@ void blk_mq_free_request(struct request *rq)
- }
- EXPORT_SYMBOL_GPL(blk_mq_free_request);
- 
-+void blk_mq_free_plug_rqs(struct blk_plug *plug)
-+{
-+	while (plug->cached_rq) {
-+		struct request *rq;
-+
-+		rq = plug->cached_rq;
-+		plug->cached_rq = rq->rq_next;
-+		percpu_ref_get(&rq->q->q_usage_counter);
-+		blk_mq_free_request(rq);
-+	}
-+}
-+
- inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
- {
- 	u64 now = 0;
-@@ -2178,6 +2211,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 	const int is_flush_fua = op_is_flush(bio->bi_opf);
- 	struct blk_mq_alloc_data data = {
- 		.q		= q,
-+		.nr_tags	= 1,
- 	};
- 	struct request *rq;
- 	struct blk_plug *plug;
-@@ -2204,13 +2238,26 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 
- 	hipri = bio->bi_opf & REQ_HIPRI;
- 
--	data.cmd_flags = bio->bi_opf;
--	rq = __blk_mq_alloc_request(&data);
--	if (unlikely(!rq)) {
--		rq_qos_cleanup(q, bio);
--		if (bio->bi_opf & REQ_NOWAIT)
--			bio_wouldblock_error(bio);
--		goto queue_exit;
-+	plug = blk_mq_plug(q, bio);
-+	if (plug && plug->cached_rq) {
-+		rq = plug->cached_rq;
-+		plug->cached_rq = rq->rq_next;
-+		INIT_LIST_HEAD(&rq->queuelist);
-+		data.hctx = rq->mq_hctx;
-+	} else {
-+		data.cmd_flags = bio->bi_opf;
-+		if (plug) {
-+			data.nr_tags = plug->nr_ios;
-+			plug->nr_ios = 1;
-+			data.cached_rq = &plug->cached_rq;
-+		}
-+		rq = __blk_mq_alloc_request(&data);
-+		if (unlikely(!rq)) {
-+			rq_qos_cleanup(q, bio);
-+			if (bio->bi_opf & REQ_NOWAIT)
-+				bio_wouldblock_error(bio);
-+			goto queue_exit;
-+		}
- 	}
- 
- 	trace_block_getrq(bio);
-@@ -2229,7 +2276,6 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 		return BLK_QC_T_NONE;
- 	}
- 
--	plug = blk_mq_plug(q, bio);
- 	if (unlikely(is_flush_fua)) {
- 		/* Bypass scheduler for flush requests */
- 		blk_insert_flush(rq);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 171e8cdcff54..5da970bb8865 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -125,6 +125,7 @@ extern int __blk_mq_register_dev(struct device *dev, struct request_queue *q);
- extern int blk_mq_sysfs_register(struct request_queue *q);
- extern void blk_mq_sysfs_unregister(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
-+void blk_mq_free_plug_rqs(struct blk_plug *plug);
- 
- void blk_mq_release(struct request_queue *q);
- 
-@@ -152,6 +153,10 @@ struct blk_mq_alloc_data {
- 	unsigned int shallow_depth;
- 	unsigned int cmd_flags;
- 
-+	/* allocate multiple requests/tags in one go */
-+	unsigned int nr_tags;
-+	struct request **cached_rq;
-+
- 	/* input & output parameter */
- 	struct blk_mq_ctx *ctx;
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 75d75657df21..0e941f217578 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -90,7 +90,10 @@ struct request {
- 	struct bio *bio;
- 	struct bio *biotail;
- 
--	struct list_head queuelist;
-+	union {
-+		struct list_head queuelist;
-+		struct request *rq_next;
-+	};
- 
- 	/*
- 	 * The hash is used inside the scheduler, and killed once the
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 472b4ab007c6..17705c970d7e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -722,10 +722,17 @@ extern void blk_set_queue_dying(struct request_queue *);
-  */
- struct blk_plug {
- 	struct list_head mq_list; /* blk-mq requests */
--	struct list_head cb_list; /* md requires an unplug callback */
-+
-+	/* if ios_left is > 1, we can batch tag/rq allocations */
-+	struct request *cached_rq;
-+	unsigned short nr_ios;
-+
- 	unsigned short rq_count;
-+
- 	bool multiple_queues;
- 	bool nowait;
-+
-+	struct list_head cb_list; /* md requires an unplug callback */
- };
- 
- struct blk_plug_cb;
-@@ -738,6 +745,7 @@ struct blk_plug_cb {
- extern struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug,
- 					     void *data, int size);
- extern void blk_start_plug(struct blk_plug *);
-+extern void blk_start_plug_nr_ios(struct blk_plug *, unsigned short);
- extern void blk_finish_plug(struct blk_plug *);
- extern void blk_flush_plug_list(struct blk_plug *, bool);
- 
-@@ -772,6 +780,11 @@ long nr_blockdev_pages(void);
- struct blk_plug {
- };
- 
-+static inline void blk_start_plug_nr_ios(struct blk_plug *plug,
-+					 unsigned short nr_ios)
-+{
-+}
-+
- static inline void blk_start_plug(struct blk_plug *plug)
- {
- }
--- 
-2.33.0
-
+------------[ cut here ]------------
+kernel BUG at fs/buffer.c:1514!
+invalid opcode: 0000 [#1] PREEMPT SMP
+CPU: 3 PID: 25416 Comm: syz-executor Not tainted 5.15.0-rc4+ #22
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+RIP: 0010:block_invalidatepage+0x27f/0x2a0 fs/buffer.c:1514
+Code: ff ff e8 b4 fd d6 ff b9 02 00 00 00 be 02 00 00 00 4c 89 ff 48
+c7 c2 40 b1 25 84 e8 8b 1b c5 02 e9 c9 fe ff ff e8 91 fd d6 ff <0f> 0b
+e8 8a fd d6 ff 0f 0b e8 83 fd d6 ff 48 8d 5d ff e9 57 ff ff
+RSP: 0018:ffffc9000538fa70 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffea0004518000 RCX: 0000000000000000
+RDX: ffff88810dd2a280 RSI: ffffffff8160943f RDI: ffffea0004518000
+RBP: ffffea0004518000 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffc9000538f908 R11: 0000000000000001 R12: ffffffff816091c0
+R13: ffffc9000538fb78 R14: 0000000000000000 R15: ffffc9000538fb00
+FS:  0000000000000000(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020590008 CR3: 000000000588a000 CR4: 0000000000750ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ do_invalidatepage mm/truncate.c:157 [inline]
+ truncate_cleanup_page+0x15c/0x280 mm/truncate.c:176
+ truncate_inode_pages_range+0x169/0xc20 mm/truncate.c:325
+ kill_bdev.isra.16+0x28/0x30 block/bdev.c:77
+ blkdev_flush_mapping+0x4c/0x130 block/bdev.c:658
+ blkdev_put_whole+0x54/0x60 block/bdev.c:689
+ blkdev_put+0x6f/0x210 block/bdev.c:953
+ blkdev_close+0x26/0x30 block/fops.c:460
+ __fput+0xdf/0x380 fs/file_table.c:280
+ task_work_run+0x86/0xd0 kernel/task_work.c:164
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0x4f1/0x11c0 kernel/exit.c:825
+ do_group_exit+0x57/0xe0 kernel/exit.c:922
+ get_signal+0x1d0/0x10b0 kernel/signal.c:2868
+ arch_do_signal_or_restart+0xa9/0x860 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xf2/0x280 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
+ do_syscall_64+0x40/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4196af
+Code: Unable to access opcode bytes at RIP 0x419685.
+RSP: 002b:00007faeee07b9c0 EFLAGS: 00000293 ORIG_RAX: 0000000000000012
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: 00000000004196af
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000003 R15: 000000002059c040
+Modules linked in:
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+---[ end trace bb86c370c06fa387 ]---
+RIP: 0010:block_invalidatepage+0x27f/0x2a0 fs/buffer.c:1514
+Code: ff ff e8 b4 fd d6 ff b9 02 00 00 00 be 02 00 00 00 4c 89 ff 48
+c7 c2 40 b1 25 84 e8 8b 1b c5 02 e9 c9 fe ff ff e8 91 fd d6 ff <0f> 0b
+e8 8a fd d6 ff 0f 0b e8 83 fd d6 ff 48 8d 5d ff e9 57 ff ff
+RSP: 0018:ffffc9000538fa70 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffea0004518000 RCX: 0000000000000000
+RDX: ffff88810dd2a280 RSI: ffffffff8160943f RDI: ffffea0004518000
+RBP: ffffea0004518000 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffc9000538f908 R11: 0000000000000001 R12: ffffffff816091c0
+R13: ffffc9000538fb78 R14: 0000000000000000 R15: ffffc9000538fb00
+FS:  0000000000000000(0000) GS:ffff88813dd00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f397f798010 CR3: 0000000012392000 CR4: 0000000000750ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
