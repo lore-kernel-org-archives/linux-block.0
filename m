@@ -2,79 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE40EC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 23:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F36C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Oct 2021 03:02:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D62D760FD8
-	for <linux-block@archiver.kernel.org>; Thu,  7 Oct 2021 23:34:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E27EE60FDC
+	for <linux-block@archiver.kernel.org>; Fri,  8 Oct 2021 03:02:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232813AbhJGXgR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Oct 2021 19:36:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42332 "EHLO
+        id S229526AbhJHDEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Oct 2021 23:04:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231513AbhJGXgR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Oct 2021 19:36:17 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33B51C061570;
-        Thu,  7 Oct 2021 16:34:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=tugju1JUEZJBZUFrxJ4ZMrMB9fpeGLyFJeYbcKA9tmQ=; b=rvjgJYcLM7BqOUgQDchuRGKCmO
-        tXsd2MgCRhIlJ0F+gc1CaHcnG1wGEd7wwcGba7Beh00SdMNr497gembcw7k4PP1P4Qb72dqvUDVPV
-        cCFq38fgYJFJCD+Z/j8/fbKSwRhJ4E3s+SSqFkOQcr7EKcxL2rhlkFdfaOP1CdY+3aQk/Hu0SFKMx
-        4ibxG5YR7UnG75qmfPdFZfZgOnhODLMRZLuCqz5jKQaVNA80VnMtwgsrLn838tQt2MmcH/cSc240r
-        y8pSPg2mo/+DCMZ/XwtKwtyp7L7pFA+j8XnZ4nHZ5O01tyL9TtxsrqfMBH837FgYFhuBLSgZOTKD2
-        MWFy/Onw==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mYcty-000yBT-IW; Thu, 07 Oct 2021 23:34:15 +0000
-Subject: Re: [PATCH] cdrom: docs: reformat table in
- Documentation/userspace-api/ioctl/cdrom.rst
-To:     Phillip Potter <phil@philpotter.co.uk>, axboe@kernel.dk
-Cc:     hch@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lumip@lumip.de
-References: <20211007231720.31997-1-phil@philpotter.co.uk>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <464a0b2f-c556-ccda-aa3c-26733fba4617@infradead.org>
-Date:   Thu, 7 Oct 2021 16:34:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        with ESMTP id S229501AbhJHDEU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Oct 2021 23:04:20 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CEDC061570;
+        Thu,  7 Oct 2021 20:02:25 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id a73so1800559pge.0;
+        Thu, 07 Oct 2021 20:02:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=6Q3V7EH8l2IpZO4Ot7Mt4f30fT3Ph8j8fckQ39xjaXY=;
+        b=mSWMMcLC5jgE+PhXrVd2rC8EkaVaENg3bR+KriFfud7ZTRMZqvXtJOC56n50KpGt6w
+         oRjHaSUzwv3zubHBroFY5nrbJ+8ziFCv9BteANN5fMjF5n26gokkuiImQ8GledBS9fKD
+         049WSa1jnOxgiEHtQSuvuUg3yXZ4DtChjoM0j6Vfr0sASjbtE1KNeXyJ3Hb+n2vQ3TzQ
+         QqVFmBnk7dsJd37AwexdpajwP80UyqOqH9JBsJp4HG7IICUVghEt3OuSsvgJI53EKN53
+         BGUVDV8HbW7gdNmyTyhEl1H5n3FGwJzuQHLeMqtTU3G5Y5APelCQH9C0ouNWTn3L8cqq
+         dITA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=6Q3V7EH8l2IpZO4Ot7Mt4f30fT3Ph8j8fckQ39xjaXY=;
+        b=OHc1a92JpgyT4sm/bFBfC8UvYbm9GgMTr+wEFcSpmcx4mDHPm1MA3z9x9WlEI55n0e
+         TFSDGNIiet5YHjh8gctMBgcx2VKm6jbRRb3euk1aqarFMUvUmYL6+HHujIdwZ/Kojdt+
+         kVy7KAZtrNwFzSn7wI4ga8uASFl75JSE8qKYU8h5LpDFLZ1IztTSt9qQTtmARzypHkiS
+         +srSKhyoLdPDbK8yXV+7dCI9ofp8CVBmnNjXq0i/02Ty8erMumljff78OijcMJnotjqv
+         21KafAnF8pvIaLDVR0iz++AGnT/jbBmFG21MnF43yTdjFjIqpqHcEUvMTqhRtN3Mh73e
+         CQSg==
+X-Gm-Message-State: AOAM532ErUCYpQOogYLGGi0d+rDMnzDURRS/p7FTRPVMnVLZ4oleid2z
+        0Jp1SrTHd1mGMfiPKrEQesGSbnn8LxNZcLChGQ==
+X-Google-Smtp-Source: ABdhPJyeZNOAn4GzIquroW5XcC4zBgwRbLpCZmkeCyRxRPzKEf6sjn8CTqryyTC1m+RbqWms3v02/9Fm/oo+/N/B1QY=
+X-Received: by 2002:a63:2c02:: with SMTP id s2mr2585381pgs.205.1633662145285;
+ Thu, 07 Oct 2021 20:02:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20211007231720.31997-1-phil@philpotter.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CACkBjsZh7DCs+N+R=0+mnNqFZW8ck5cSgV4MpGM6ySbfenUJ+g@mail.gmail.com>
+ <CACkBjsb0Hxam_e5+vOOanF_BfGAcf5UY+=Cc-pyphQftETTe8Q@mail.gmail.com> <YV8B+VGQ7TZoeJ8W@casper.infradead.org>
+In-Reply-To: <YV8B+VGQ7TZoeJ8W@casper.infradead.org>
+From:   Hao Sun <sunhao.th@gmail.com>
+Date:   Fri, 8 Oct 2021 11:02:14 +0800
+Message-ID: <CACkBjsZ8vxzSAnhVqnkJwQi1a5oCddGRZrK5bmvUQYzDKBDsjw@mail.gmail.com>
+Subject: Re: kernel BUG in block_invalidatepage
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/7/21 4:17 PM, Phillip Potter wrote:
-> Add extra space to the first column of ioctl values table, and also realign
-> the text in the second column, to fix a documentation build warning
-> introduced by: commit 67f1e027c270 ("drivers/cdrom: improved ioctl for
-> media change detection")
-> 
-> Suggested-by: Randy Dunlap <rdunlap@infradead.org>
-> Fixes: 67f1e027c270 ("drivers/cdrom: improved ioctl for media change detection")
-> Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
+Matthew Wilcox <willy@infradead.org> =E4=BA=8E2021=E5=B9=B410=E6=9C=887=E6=
+=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8810:20=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Thu, Oct 07, 2021 at 02:40:29PM +0800, Hao Sun wrote:
+> > Hello,
+> >
+> > This crash can still be triggered repeatedly on the latest kernel.
+>
+> I asked you three days ago to try a patch and report the results:
+>
+> https://lore.kernel.org/linux-mm/YVtWhVNFhLbA9+Tl@casper.infradead.org/
 
-Looks good. Thanks.
+Sorry, I missed that.
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Here are the results.
+Used reproducer: https://paste.ubuntu.com/p/yrYsn4zpcn/
+Kernel log *before* applying the patch: https://paste.ubuntu.com/p/WtkFKB6V=
+y9/
+Kernel log *after* applying the patch: https://paste.ubuntu.com/p/S2VrtDdgg=
+p/
+Symbolized log: https://paste.ubuntu.com/p/RwXjCXDxB8/
 
+In summary, the reproducer can crash the kernel with the same
+backtrace before applying the patch.
+After applying the patch, the reproducer program took about 3 minutes
+to crash the kernel and the backtrace seems different (RIP points to
+create_empty_buffers now).
+All the above tests were done on commit 60a9483534ed (Merge tag
+'warning-fixes-20211005').
 
-> ---
->   Documentation/userspace-api/ioctl/cdrom.rst | 116 ++++++++++----------
->   1 file changed, 58 insertions(+), 58 deletions(-)
-> 
-> diff --git a/Documentation/userspace-api/ioctl/cdrom.rst b/Documentation/userspace-api/ioctl/cdrom.rst
-> index bac5bbf93ca0..682948fc88a3 100644
-> --- a/Documentation/userspace-api/ioctl/cdrom.rst
-> +++ b/Documentation/userspace-api/ioctl/cdrom.rst
-
-
-
--- 
-~Randy
+Regards
+Hao
