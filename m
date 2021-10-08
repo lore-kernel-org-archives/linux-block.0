@@ -2,99 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD070C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  8 Oct 2021 09:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA55C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Oct 2021 10:15:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C603660EC0
-	for <linux-block@archiver.kernel.org>; Fri,  8 Oct 2021 09:17:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33DF46103C
+	for <linux-block@archiver.kernel.org>; Fri,  8 Oct 2021 10:15:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236145AbhJHJT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Oct 2021 05:19:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54876 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229785AbhJHJT1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Oct 2021 05:19:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633684652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MjDZx1fQKjNQlKZbBeD82QrB0Ihe+5TQzyp1JtFq7hY=;
-        b=R1lwqipdk6CR5+D2GNxdPxG5ZAHcbqev1RETOwnGo4ZArC3QZxsw2jPnAlV/FV0mEHMEAQ
-        QBaWRNG3QfKhGMPCAfFH3QIYTZpP0bLZBTeuOeApe1y4P1I+x/KnEH5VS6wyJpE9afmyFc
-        AXWla/F2rhcZxa9mKAS0YhMEM85WDbE=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-5dGGNUFnM_mH6FEFFVoW5g-1; Fri, 08 Oct 2021 05:17:31 -0400
-X-MC-Unique: 5dGGNUFnM_mH6FEFFVoW5g-1
-Received: by mail-pg1-f199.google.com with SMTP id s19-20020a63e813000000b00287d976d152so1294495pgh.3
-        for <linux-block@vger.kernel.org>; Fri, 08 Oct 2021 02:17:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=MjDZx1fQKjNQlKZbBeD82QrB0Ihe+5TQzyp1JtFq7hY=;
-        b=UPxXi0dMRoxGf2k2Q63Anofls741WYUBmC1z4ODCKRFjqfZlLDqbAiTs7/s3K9kSdY
-         z5ElN1gYe0Fd9RKKK7zm5XeP0oOHctuo3+i9yGiNGVb2vAgnC2fY5lPjCX7w65qpUbfT
-         6x3VQ7SzkH93AqbcwrWmNTUh4nuyqvSM0B2HVRjIX1GJpoZYyWEV/Gb5ljm+OBidGWlV
-         c1BcLD+Zo7Lbeeu5Imd4/Yx42HRHgjQBTvfRUJ571mFXk5lu30kEDLrJEKqN2PydxmnB
-         25pu47Yp+imzxIlXkLkkAmB3bhspOprOfwBvTa2bUCjA+XEV80kgHYBue93IDNZz3r4E
-         qowg==
-X-Gm-Message-State: AOAM5301Nzhp294EtzOiWmaViuIribwbWOFWMQ+bj18D1rN1ffQ6LGFI
-        XtcWHGevlEgG1CSDKUBTalrFQG65oqxmADoncJfWkExu3XpkS8GaahoGkIWYv7WHps9ja6IFbUp
-        hUjJl96rI4Xiacn2qI83kpNk=
-X-Received: by 2002:a63:f5b:: with SMTP id 27mr3647345pgp.302.1633684649705;
-        Fri, 08 Oct 2021 02:17:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyI5sORuIjy5pkP0wq4hXnm4U7ksEGByBSTpcKewsdRuT9q1hV4Sboi0B9e2oU0v3iuXloVFg==
-X-Received: by 2002:a63:f5b:: with SMTP id 27mr3647317pgp.302.1633684649455;
-        Fri, 08 Oct 2021 02:17:29 -0700 (PDT)
-Received: from [10.72.12.176] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id lp9sm1953852pjb.35.2021.10.08.02.17.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Oct 2021 02:17:28 -0700 (PDT)
-Subject: Re: nbd lifetimes fixes
-To:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
+        id S236118AbhJHKRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Oct 2021 06:17:03 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3945 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229989AbhJHKRC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Oct 2021 06:17:02 -0400
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HQkW92w2xz67yBh;
+        Fri,  8 Oct 2021 18:11:49 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Fri, 8 Oct 2021 12:15:05 +0200
+Received: from [10.47.80.141] (10.47.80.141) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Fri, 8 Oct 2021
+ 11:15:04 +0100
+Subject: Re: [PATCH v5 00/14] blk-mq: Reduce static requests memory footprint
+ for shared sbitmap
+To:     Kashyap Desai <kashyap.desai@broadcom.com>,
         Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-References: <20210825163108.50713-1-hch@lst.de>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <a3d9e740-828a-6b4e-f1d6-b89fc905700c@redhat.com>
-Date:   Fri, 8 Oct 2021 17:17:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ming.lei@redhat.com>, <hare@suse.de>, <linux-scsi@vger.kernel.org>
+References: <1633429419-228500-1-git-send-email-john.garry@huawei.com>
+ <ae33dde8-96e8-2978-5f32-c7e0a6136e8e@kernel.dk>
+ <81d9e019-b730-221e-a8c0-f72a8422a2ec@huawei.com>
+ <e4e92abbe9d52bcba6b8cc6c91c442cc@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <8867352d-2107-1f8a-0f1c-ef73450bf256@huawei.com>
+Date:   Fri, 8 Oct 2021 11:17:35 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <20210825163108.50713-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <e4e92abbe9d52bcba6b8cc6c91c442cc@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.80.141]
+X-ClientProxiedBy: lhreml744-chm.china.huawei.com (10.201.108.194) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 07/10/2021 21:31, Kashyap Desai wrote:
+> Perf top data indicates lock contention in "blk_mq_find_and_get_req" call.
+> 
+> 1.31%     1.31%  kworker/57:1H-k  [kernel.vmlinux]
+>       native_queued_spin_lock_slowpath
+>       ret_from_fork
+>       kthread
+>       worker_thread
+>       process_one_work
+>       blk_mq_timeout_work
+>       blk_mq_queue_tag_busy_iter
+>       bt_iter
+>       blk_mq_find_and_get_req
+>       _raw_spin_lock_irqsave
+>       native_queued_spin_lock_slowpath
+> 
+> 
+> Kernel v5.14 Data -
+> 
+> %Node1 :  8.4 us, 31.2 sy,  0.0 ni, 43.7 id,  0.0 wa,  0.0 hi, 16.8 si,  0.0
+> st
+>       4.46%  [kernel]       [k] complete_cmd_fusion
+>       3.69%  [kernel]       [k] megasas_build_and_issue_cmd_fusion
+>       2.97%  [kernel]       [k] blk_mq_find_and_get_req
+>       2.81%  [kernel]       [k] megasas_build_ldio_fusion
+>       2.62%  [kernel]       [k] syscall_return_via_sysret
+>       2.17%  [kernel]       [k] __entry_text_start
+>       2.01%  [kernel]       [k] io_submit_one
+>       1.87%  [kernel]       [k] scsi_queue_rq
+>       1.77%  [kernel]       [k] native_queued_spin_lock_slowpath
+>       1.76%  [kernel]       [k] scsi_complete
+>       1.66%  [kernel]       [k] llist_reverse_order
+>       1.63%  [kernel]       [k] _raw_spin_lock_irqsave
+>       1.61%  [kernel]       [k] llist_add_batch
+>       1.39%  [kernel]       [k] aio_complete_rw
+>       1.37%  [kernel]       [k] read_tsc
+>       1.07%  [kernel]       [k] blk_complete_reqs
+>       1.07%  [kernel]       [k] native_irq_return_iret
+>       1.04%  [kernel]       [k] __x86_indirect_thunk_rax
+>       1.03%  fio            [.] __fio_gettime
+>       1.00%  [kernel]       [k] flush_smp_call_function_queue
+> 
+> 
+> Test #2: Three VDs (each VD consist of 8 SAS SSDs).
+> (numactl -N 1 fio
+> 3vd.fio --rw=randread --bs=4k --iodepth=32 --numjobs=8
+> --ioscheduler=none/mq-deadline)
+> 
+> There is a performance regression but it is not due to this patch set.
+> Kernel v5.11 gives 2.1M IOPs on mq-deadline but 5.15 (without this patchset)
+> gives 1.8M IOPs.
+> In this test I did not noticed CPU issue as mentioned in Test-1.
+> 
+> In general, I noticed host_busy is incorrect once I apply this patchset. It
+> should not be more than can_queue, but sysfs host_busy value is very high
+> when IOs are running. This issue is only after applying this patchset.
+> 
+> Is this patch set only change the behavior of <shared_host_tag> enabled
+> driver ? Will there be any impact on mpi3mr driver ? I can test that as
+> well.
 
-On 8/26/21 12:31 AM, Christoph Hellwig wrote:
-> Hi Josef and Jens,
->
-> this series tries to deal with the fallout of the recent lock scope
-> reduction as pointed out by Tetsuo and szybot and inspired by /
-> reused from the catchall patch by Tetsuo.  One big change is that
-> I finally decided to kill off the ->destroy_complete scheme entirely
-> because I'm pretty sure it is not needed with the various fixes and
-> we can just return an error for the tiny race condition where it
-> matters.  Xiubo, can you double check this with your nbd-runner
-> setup?  nbd-runner itself seems pretty generic and not directly
-> reproduce anything here.
->
-> Note that the syzbot reproduer still fails eventually, but in
-> devtmpfsd in a way that does not look related to the loop code
-> at all.
->
-Sorry, I think I have missed this thread.
+I can see where the high value of host_busy is coming from in this 
+series - we incorrectly re-iter the tags by #hw queues times in 
+blk_mq_tagset_busy_iter() - d'oh.
 
-Test this and works well for me by using the nbd-runner.
+Please try the below patch. I have looked at other places where we may 
+have similar problems in looping the hw queue count for tagset->tags[], 
+and they look ok. But I will double-check. I think that 
+blk_mq_queue_tag_busy_iter() should be fine - Ming?
 
+--->8----
 
+ From e6ecaa6d624ebb903fa773ca2a2035300b4c55c5 Mon Sep 17 00:00:00 2001
+From: John Garry <john.garry@huawei.com>
+Date: Fri, 8 Oct 2021 10:55:11 +0100
+Subject: [PATCH] blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
+
+Since it is now possible for a tagset to share a single set of tags, the
+iter function should not re-iter the tags for the count of hw queues in
+that case. Rather it should just iter once.
+
+Signed-off-by: John Garry <john.garry@huawei.com>
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 72a2724a4eee..ef888aab81b3 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -378,9 +378,15 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, 
+busy_tag_iter_fn *fn,
+  void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+  		busy_tag_iter_fn *fn, void *priv)
+  {
++	int nr_hw_queues;
+  	int i;
+
+-	for (i = 0; i < tagset->nr_hw_queues; i++) {
++	if (blk_mq_is_shared_tags(tagset->flags))
++		nr_hw_queues = 1;
++	else
++		nr_hw_queues = tagset->nr_hw_queues;
++
++	for (i = 0; i < nr_hw_queues; i++) {
+  		if (tagset->tags && tagset->tags[i])
+  			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+  					      BT_TAG_ITER_STARTED);
+
+----8<----
+
+Thanks,
+john
