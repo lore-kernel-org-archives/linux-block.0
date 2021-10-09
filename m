@@ -2,92 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E868C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  9 Oct 2021 09:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D945C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  9 Oct 2021 12:26:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D67060F8F
-	for <linux-block@archiver.kernel.org>; Sat,  9 Oct 2021 09:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D4AE60F59
+	for <linux-block@archiver.kernel.org>; Sat,  9 Oct 2021 12:26:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232035AbhJIJo5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Oct 2021 05:44:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52128 "EHLO
+        id S232332AbhJIM22 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Oct 2021 08:28:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231853AbhJIJo4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Oct 2021 05:44:56 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1264CC061570
-        for <linux-block@vger.kernel.org>; Sat,  9 Oct 2021 02:43:00 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id 133so5582390pgb.1
-        for <linux-block@vger.kernel.org>; Sat, 09 Oct 2021 02:43:00 -0700 (PDT)
+        with ESMTP id S233117AbhJIM21 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Oct 2021 08:28:27 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D3EC061570;
+        Sat,  9 Oct 2021 05:26:30 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id i12so25559626wrb.7;
+        Sat, 09 Oct 2021 05:26:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=qcraft-ai.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=Ah1u3rGdryLKEZSr8qONi3KYTW8xXaP8VYmQu7I06zs=;
-        b=DM+sQEd8R0s55VvykaEo09ijuTVbj4g51xu3oGt31muxER76bFZvdt+Y9B2EiudfAS
-         W35WtFxxcerQllaI3kx41V3dFhjlA6dtnUsn0hgnzvwty2jXX2Ukq/9Kwg0dw/yZGf+W
-         V4IX2C2Z0UtNGARJuxSYC65EIJxjGxWjk8aN2ZR0bhGl5pdIY/TnHZtsyH1faNrHyVtj
-         FI0rKJgfUZfE+uwVewm+uCcnIa9le2NSeuecm1+ZB+E1EjrZy9VuAc9Lb47AtljC2L04
-         1EKBSpou/AV10HVD4fHOXWXVzFFMaiC5eJcRxnc25cmAak+IHzX91mc+toR1FbX2suWi
-         a9yw==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UBEdLjsSDpzSYSrkJTEaUEEJcVMFPpSfiM84UPXqOU8=;
+        b=OB+4rId2iZJtnZl7HGJ6IR0yuqog3G0yy80LkkezhN8bMmR82H8AHwmEsRH2tcyNql
+         4lBM32yH901vUvWS+dh+LMDbfwzHzx86VhGmpWTEKhfivFb27vWGEjcMtsiBJb0p8+fQ
+         LZAmlOR2wYzAlEUlc9iVwA+EiXKLty8/WtOa7cmvv/7NcgclR7tXRk5xM8jmNoLOSfDb
+         /i6Ow/O9Y1xMUANDLkkHBnqnwKN2pf03PGsNeZNPLyGNaOsU+m+IQwwozkQRFS7fFyKQ
+         eBNP44qKbzcIxhvvzdB0ummzbC1YEVno+9jGge8LviB5JiGyFjLutWH0YgRhJzsoXjUk
+         rIeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Ah1u3rGdryLKEZSr8qONi3KYTW8xXaP8VYmQu7I06zs=;
-        b=yLlbymKbXSJSO4ZapgKELAaQhZqTJDDrI938K1yk5CAccnogXzu06ahibj1OMYg/m9
-         tFROqqs8zR/4LnRNHjgoBWt0t7dOlK3+HqFhWJR3GFtcn9s2fIu/yPUHSwkqmFRX0I7v
-         z01iw+54F8zDByyzJ6V8E7CYDFFSn7tha1R1PK7Txws6bBh2GPeo9RQAHfWd+mRaW++o
-         4qVm37OQCQ0jmuPSWQnzTtAlEQDpuY+61SFlFGeEJjjCCvKXtntNQw6M8AlPXgpl0Aqi
-         QOKBS2wYrxeph7/sae8A9ZH+5bN//V3a5MZWCbePcfotdRxsIi091R+2wuBYvuOdOA0m
-         Q1Fg==
-X-Gm-Message-State: AOAM533aaFOonAzn5ZWELmGvWNUYZeWUqxOkBfMMW1CepiQiMS7b3bGm
-        e/6/UfrDsAULcFGJckaJzoipoA==
-X-Google-Smtp-Source: ABdhPJzSyygY4RYse7dpTLIIt5yYljy7F+9kivN6hBaigSHsPbcD170Gl/o5s87wJkO4eJeQu2kFfQ==
-X-Received: by 2002:aa7:8f12:0:b0:44c:833f:9dad with SMTP id x18-20020aa78f12000000b0044c833f9dadmr14614319pfr.35.1633772579535;
-        Sat, 09 Oct 2021 02:42:59 -0700 (PDT)
-Received: from [172.18.2.138] ([137.59.101.13])
-        by smtp.gmail.com with ESMTPSA id s7sm2007535pgc.60.2021.10.09.02.42.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Oct 2021 02:42:59 -0700 (PDT)
-Subject: Re: [PATCH] block: fix syzbot report UAF in bdev_free_inode()
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Zqiang <qiang.zhang1211@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@kernel.dk
-References: <20211009065951.11567-1-qiang.zhang1211@gmail.com>
- <ad09fde9-9655-fc28-4298-4b43d57cd76c@i-love.sakura.ne.jp>
-From:   zhangqiang <zhangqiang@qcraft.ai>
-Message-ID: <d1cf5746-360a-9cb1-a69f-020480994352@qcraft.ai>
-Date:   Sat, 9 Oct 2021 17:42:55 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UBEdLjsSDpzSYSrkJTEaUEEJcVMFPpSfiM84UPXqOU8=;
+        b=XOnkx6A9Xz6xJIa43UKaPDR46gzy56P4HQT8q9WH8YT2r1YH6djwg4zoGES8lBToqg
+         VV0eRxzhc5MZNRNVZq8r+SSj3GxJBUU+hhvxuRte/CLUlkoppcSTzmoLDVT1sXC7x6GW
+         3YQ14ohdKL7uPglqmcgDbzEDu4yJZkjfoWR4tYnOmbOp8i/rXrfi9++VW/HrRqn+a5PM
+         ImNKUlynlm6QD9c0So/Y2upn+lFfhu29GjY4mb4lVcn01J3PzgspYyNhgSsWG13j67Oc
+         g/rc0qPfNsrgqXc5oE05Q9+oRMUGUR7t4jsNVJbsCopY2rBqYeaWSXrL8FwpfbpB334k
+         pWMw==
+X-Gm-Message-State: AOAM532r+RWunzPcIq6bRT75LCpfZUVs/PkA6AQY0Q7kNdJ43Ugfeid8
+        jDf87pEUbtQXMc2g2U5uSk2ZM1S+PqM=
+X-Google-Smtp-Source: ABdhPJzRDRW6ohCZvt2WHcPnSnvdsUmQuJ2PtNbitBkJIjGK1cBod9GMZmm/QJQaYe3jB5oP7qA79w==
+X-Received: by 2002:adf:fe4e:: with SMTP id m14mr10650758wrs.14.1633782389425;
+        Sat, 09 Oct 2021 05:26:29 -0700 (PDT)
+Received: from localhost.localdomain ([85.255.236.155])
+        by smtp.gmail.com with ESMTPSA id o12sm2157468wrv.78.2021.10.09.05.26.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Oct 2021 05:26:29 -0700 (PDT)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     asml.silence@gmail.com
+Subject: [PATCH 0/6] some block optimisations
+Date:   Sat,  9 Oct 2021 13:25:37 +0100
+Message-Id: <cover.1633781740.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-In-Reply-To: <ad09fde9-9655-fc28-4298-4b43d57cd76c@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On top of perf-wip branch,
 
-On 2021/10/9 下午5:34, Tetsuo Handa wrote:
-> On 2021/10/09 15:59, Zqiang wrote:
->> The xa_insert() may be return error in __alloc_disk_node(), and the disk
->> object will be release, however there are two operations that will release
->> it, kfree(disk) and iput(disk->part0->bd_inode), the iput operations
->> will call call_rcu(), because the rcu callback executed is an asynchronous
->> actionthe, so when free disk object in rcu callback, the disk object haven
->> been released. solve it through a unified release action.
->>
->> Reported-by: syzbot+8281086e8a6fbfbd952a@syzkaller.appspotmail.com
->> Signed-off-by: Zqiang <qiang.zhang1211@gmail.com>
-> Thanks. But my patch is ready for 5.15.
->
-> https://lore.kernel.org/all/e6dd13c5-8db0-4392-6e78-a42ee5d2a1c4@i-love.sakura.ne.jp/T/#u
+./io_uring -d32 -s32 -c32 -b512 -p1 /dev/nullb0
+~3.3 MIOPS vs 3.5 MIOPS, so gives around extra ~4-5%.
 
+The main part is caching struct block_device + some inlining.
 
-Thanks, there is a problem with my patch, your path is more suitable
+Pavel Begunkov (6):
+  block: cache bdev in struct file for raw bdev IO
+  block: inline BDEV_I and friends
+  blk-mq: optimise *end_request non-stat path
+  block: inline hot paths of blk_account_io_*()
+  blk-mq: inline hot part of __blk_mq_sched_restart
+  block: convert ->bd_inode to container_of()
+
+ block/bdev.c           | 16 ----------------
+ block/blk-core.c       | 30 +++++++++---------------------
+ block/blk-mq-sched.c   |  4 +---
+ block/blk-mq-sched.h   |  8 +++++++-
+ block/blk-mq.c         |  9 ++++-----
+ block/blk.h            | 24 +++++++++++++++++++++---
+ block/fops.c           | 40 ++++++++++++++++++++++------------------
+ include/linux/blkdev.h | 31 +++++++++++++++++++++++++------
+ 8 files changed, 89 insertions(+), 73 deletions(-)
+
+-- 
+2.33.0
 
