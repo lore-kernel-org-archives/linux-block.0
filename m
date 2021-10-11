@@ -2,56 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10569C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 11:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 625D7C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 15:23:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE9F560EE2
-	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 11:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D47960E98
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 15:23:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233476AbhJKLmn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Oct 2021 07:42:43 -0400
-Received: from verein.lst.de ([213.95.11.211]:37008 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231128AbhJKLmn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Oct 2021 07:42:43 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A095D68BEB; Mon, 11 Oct 2021 13:40:41 +0200 (CEST)
-Date:   Mon, 11 Oct 2021 13:40:41 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xie Yongji <xieyongji@bytedance.com>, jasowang@redhat.com,
-        stefanha@redhat.com, virtualization@lists.linux-foundation.org,
+        id S234088AbhJKPZW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Oct 2021 11:25:22 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:45270 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231951AbhJKPZV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Oct 2021 11:25:21 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 361FF2017B;
+        Mon, 11 Oct 2021 15:23:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1633965800; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7c/NrmzTGTsgOvKn52EsTSKmzoG1TlQJCZXKhAlpBfA=;
+        b=hO7xF03Ts64S2p90ng+KaDHXFlaWeJQbfgY0oz5i8Z4FH2+GtaHZr5w66bllhb3wztRKmm
+        XaD8fXn7yC/jL8x/f+4DTJsSIVZCFPGD5xFoo8QO82SHqf6J62kCRtfiPELGQqmK5rwdJ8
+        /YGKVXaRserLrG2N0N67Fz8pFYZLkA0=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1532113BC5;
+        Mon, 11 Oct 2021 15:23:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id NQQUBOhWZGFSTwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Mon, 11 Oct 2021 15:23:20 +0000
+Date:   Mon, 11 Oct 2021 17:23:18 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kevin Wolf <kwolf@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
- space
-Message-ID: <20211011114041.GB16138@lst.de>
-References: <20210809101609.148-1-xieyongji@bytedance.com> <20211004112623-mutt-send-email-mst@kernel.org> <20211005062359-mutt-send-email-mst@kernel.org>
+        yi.zhang@huawei.com
+Subject: Re: [PATCH] blk-cgroup: check blkcg policy is enabled in
+ blkg_create()
+Message-ID: <20211011152318.GA61605@blackbody.suse.cz>
+References: <20211008072720.797814-1-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211005062359-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20211008072720.797814-1-yukuai3@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 05, 2021 at 06:42:43AM -0400, Michael S. Tsirkin wrote:
-> Stefan also pointed out this duplicates the logic from 
-> 
->         if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
->                 return -EINVAL;
-> 
-> 
-> and a bunch of other places.
-> 
-> 
-> Would it be acceptable for blk layer to validate the input
-> instead of having each driver do it's own thing?
-> Maybe inside blk_queue_logical_block_size?
+Hello.
 
-I'm pretty sure we want down that before.  Let's just add a helper
-just for that check for now as part of this series.  Actually validating
-in in blk_queue_logical_block_size seems like a good idea, but returning
-errors from that has a long tail.
+On Fri, Oct 08, 2021 at 03:27:20PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+> This is because blkg_alloc() is called from blkg_conf_prep() without
+> holding 'q->queue_lock', and elevator is exited before blkg_create():
+ 
+IIUC the problematic interleaving is this one (I've noticed `blkg->pd[i]
+= NULL` to thread 2 call trace):
+
+> thread 1                            thread 2
+> blkg_conf_prep
+>  spin_lock_irq(&q->queue_lock);
+>  blkg_lookup_check -> return NULL
+>  spin_unlock_irq(&q->queue_lock);
+> 
+>  blkg_alloc
+>   blkcg_policy_enabled -> true
+>   pd = ->pd_alloc_fn
+>                                    blk_mq_exit_sched
+>                                     bfq_exit_queue
+>                                      blkcg_deactivate_policy
+>                                       spin_lock_irq(&q->queue_lock);
+>                                       __clear_bit(pol->plid, q->blkcg_pols);
+>
+                                        pol->pd_free_fn(blkg->pd[i]);
+                                        blkg->pd[i] = NULL;
+>
+>                                       spin_unlock_irq(&q->queue_lock);
+>                                     q->elevator = NULL;
+    blkg->pd[i] = pd
+>   spin_lock_irq(&q->queue_lock);
+>    blkg_create
+>     if (blkg->pd[i])
+>      ->pd_init_fn -> q->elevator is NULL
+>   spin_unlock_irq(&q->queue_lock);
+
+In high-level terms, is this a race between (blk)io controller attribute
+write and a device scheduler (elevator) switch?
+If so, I'd add it to the commit message.
+
+> Fix the problem by checking that policy is still enabled in
+> blkg_create().
+
+Is this sufficient wrt some other q->elevator users later?
+
+> @@ -252,6 +266,9 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+>  		goto err_free_blkg;
+>  	}
+>  
+
+I'd add a comment here like:
+
+> Re-check policies are still enabled, since the caller blkg_conf_prep()
+> temporarily drops q->queue_lock and we can race with
+> blk_mq_exit_sched() removing policies.
+
+> +	if (new_blkg)
+> +		blkg_check_pd(q, new_blkg);
+> +
+
+Thanks,
+Michal
