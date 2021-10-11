@@ -2,114 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CF5C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 01:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C017C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 02:45:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60CAF60F23
-	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 01:36:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0926160FBF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 02:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231578AbhJKBiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Oct 2021 21:38:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38056 "EHLO
+        id S233326AbhJKCrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Oct 2021 22:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231481AbhJKBiL (ORCPT
+        with ESMTP id S230273AbhJKCrS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Oct 2021 21:38:11 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679E3C06161C
-        for <linux-block@vger.kernel.org>; Sun, 10 Oct 2021 18:36:12 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id s17so12699069ioa.13
-        for <linux-block@vger.kernel.org>; Sun, 10 Oct 2021 18:36:12 -0700 (PDT)
+        Sun, 10 Oct 2021 22:47:18 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F016C061570;
+        Sun, 10 Oct 2021 19:45:19 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id x8so10256405plv.8;
+        Sun, 10 Oct 2021 19:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0bn13mcQUloSRmo2eFgDJ5AKWLlTB4WVGCyGBhdHi1I=;
-        b=PUNzBLN0rAwEjaoY5DFZoIT6PAnDeq2HrcyPBsBdjDMJ+5ssrFHD6zCyoJc4z/zmj4
-         pabBnmBUNZyRRmlPNPgboZ3JjUe66pkK44amXWcghmcZEHu97HCVtC56OR1j2eU1VSB+
-         lVO3514+6RCocUyjvUJz3NtmM4cIiPWa2HbvR2JGDBzJ8UTCa+MrbQTVDTQPYK/ZRtKc
-         TYfAQOWYsH2BAkU8T5d3Y3ezrTgTjLbZ2rmOaa2lCmNQHH3hjztRWyjnWX27Q7pv6Bx7
-         NMalo4tJCCq0xjfYEowhJwjcd66AxppFPmZenfdHINg887eJ32+RYxIEHlglSWOHiBD/
-         oR6Q==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+mAotbMl3KaTUP/0ZTOkObNmPxfcYn3kxOVtDQVB4Sc=;
+        b=OGftsYgpEXlnfW/tx60Ejrq/7M7DHlxqt+dlWV1nHuLJS/3KMDBn5CN78YE+vE8P5i
+         M6DdoKEZ1KpjeAuCvxxo23tk7GO9fPNYwLtCF/yotm+wGco1YaOIB4xBZdwXhIpab72d
+         qnz4iGS535Vx2q8KFL3aciuJ3PT/JltxFYlUy4xDsJBJwbV/BpLz9H8gTC7FJiRC+Vbl
+         syPXUuvdB3OsPZzo7Tk7CIIHKm4AKlzsHxyxFmdl0no5PsNyDIDWWsFop6fc1lORCUKY
+         yY0HZHVJzYkmUwSSbaffeZWNTR1ImWCkSP3uEKvbUBvrvgmXDNHqvMKgvYtrp++VUm8e
+         zZtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=0bn13mcQUloSRmo2eFgDJ5AKWLlTB4WVGCyGBhdHi1I=;
-        b=4Fb8PZsZMx9xwqseIwDTUffR0YajUybqTZrcozmOvj1BVkhFt9fVk5GaVPQVh1DtTD
-         pQxLYsc3inNq+YjPXmlxQ9AkyCYzfUKv6mJjccfs628lc1gvmypMNiv3ud7w5pVanxnB
-         42jmYmBl3vdINrOa1ARKoTVXSW6CW279DIElX2msImfdd+4tEdp+AJHU16FCfQnHAsYE
-         YEJ2Mqjyvq3f0pyvEXAnItVYnmqBGl+Y4wS6DvJerNjzDSQzI2ugSGtjiIV7kA226hlB
-         ceIPXCsT3xBR3dy97+jgOl6H7RQoW3sx2s4ypBaoMPvlEorPSW/CyiX89SeV0dhDxvIc
-         NikA==
-X-Gm-Message-State: AOAM531Uj4bvQ3iaa4+YZwWa1LgRa8Yj13ZNdOrRmtRnNOAQA/09wDjr
-        7fDOEgCy/E4aInND9maLyUezSg==
-X-Google-Smtp-Source: ABdhPJxeONXJBLUs5vdfEPp0jHJoYSLvOIByQwSY9dL/Y1x8XfIolodZeK4pX3H1ag+3tXak4KjDeA==
-X-Received: by 2002:a6b:7107:: with SMTP id q7mr8454iog.63.1633916171678;
-        Sun, 10 Oct 2021 18:36:11 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id w23sm3121563iot.30.2021.10.10.18.36.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Oct 2021 18:36:11 -0700 (PDT)
-Subject: Re: [PATCH] cdrom: docs: reformat table in
- Documentation/userspace-api/ioctl/cdrom.rst
-To:     Phillip Potter <phil@philpotter.co.uk>,
-        Randy Dunlap <rdunlap@infradead.org>
-Cc:     hch@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lumip@lumip.de
-References: <20211007231720.31997-1-phil@philpotter.co.uk>
- <464a0b2f-c556-ccda-aa3c-26733fba4617@infradead.org>
- <YWOC2Iyszh7WAgzf@equinox>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d9a0177b-f6aa-c03b-0925-9858703d6607@kernel.dk>
-Date:   Sun, 10 Oct 2021 19:36:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=+mAotbMl3KaTUP/0ZTOkObNmPxfcYn3kxOVtDQVB4Sc=;
+        b=xI7M2XCMLLZzlcry0CsUQyVtUolnPy0D11s6u3P6+mLxbCq7bPH32FcN2w6bFiG3MD
+         M3S6aWhGBz+pfNhKaHEze5KGWvTb0KqZ4+CwpW1e1IJWSZ0B76FqSzBCRxkmTSjmjJRe
+         +nBbzxoJRvskgOXDAHUec83SU5ufO35RyyOlSRz1jkLxzO8qBUvSWyug/R3VE/DpqpIJ
+         tbc+WOShy9zSRcYXgQMrkYoGQ4FcAvFjQxEvr2Rv4SgU18avKk0XuFUbFl2TFlweFYJH
+         3z88lp3o/LGUx8Z93gSogSgxeIHJk0QcPXSl7pJvLRHTpc0T+J/1VEBWqw9nVnGQTy8r
+         GW0Q==
+X-Gm-Message-State: AOAM530azvIkVrmTcWYbk5Vq6vxOOZKhk05otamYTdOtv87Qc6YDYg14
+        vuSnLgTqMRgHkZlHfOKsV9mr4PXhD/AXww==
+X-Google-Smtp-Source: ABdhPJzW8SZ0cPIkCJN1Z+TVmytZRRRADvPvKD+GiemmfsBZpX2ip1x37mqK3fBvhaNVh9BG9mW6EA==
+X-Received: by 2002:a17:90a:8b8d:: with SMTP id z13mr28080267pjn.214.1633920318629;
+        Sun, 10 Oct 2021 19:45:18 -0700 (PDT)
+Received: from localhost.localdomain ([103.112.79.203])
+        by smtp.gmail.com with ESMTPSA id h4sm17554297pjm.14.2021.10.10.19.45.15
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 10 Oct 2021 19:45:18 -0700 (PDT)
+From:   "Yan, Zheng" <ukernel@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@lst.de, paskripkin@gmail.com,
+        "Yan, Zheng" <yanzheng03@kuaishou.com>
+Subject: [PATCH v2] block: nbd: fix sanity check for first_minor
+Date:   Mon, 11 Oct 2021 10:45:09 +0800
+Message-Id: <20211011024509.2012-1-ukernel@gmail.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
-In-Reply-To: <YWOC2Iyszh7WAgzf@equinox>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/10/21 6:18 PM, Phillip Potter wrote:
-> On Thu, Oct 07, 2021 at 04:34:13PM -0700, Randy Dunlap wrote:
->> On 10/7/21 4:17 PM, Phillip Potter wrote:
->>> Add extra space to the first column of ioctl values table, and also realign
->>> the text in the second column, to fix a documentation build warning
->>> introduced by: commit 67f1e027c270 ("drivers/cdrom: improved ioctl for
->>> media change detection")
->>>
->>> Suggested-by: Randy Dunlap <rdunlap@infradead.org>
->>> Fixes: 67f1e027c270 ("drivers/cdrom: improved ioctl for media change detection")
->>> Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
->>
->> Looks good. Thanks.
->>
->> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
->>
->>
->>> ---
->>>   Documentation/userspace-api/ioctl/cdrom.rst | 116 ++++++++++----------
->>>   1 file changed, 58 insertions(+), 58 deletions(-)
->>>
->>> diff --git a/Documentation/userspace-api/ioctl/cdrom.rst b/Documentation/userspace-api/ioctl/cdrom.rst
->>> index bac5bbf93ca0..682948fc88a3 100644
->>> --- a/Documentation/userspace-api/ioctl/cdrom.rst
->>> +++ b/Documentation/userspace-api/ioctl/cdrom.rst
->>
->>
->>
->> -- 
->> ~Randy
-> 
-> Thank you for the review Randy.
+From: "Yan, Zheng" <yanzheng03@kuaishou.com>
 
-Applied.
+Device's minor is a 20-bits number, max value is 0xfffff.
 
+Fixes: b1a811633f ("block: nbd: add sanity check for first_minor").
+Signed-off-by: "Yan, Zheng" <yanzheng03@kuaishou.com>
+---
+ drivers/block/nbd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 1183f7872b71..118039d35468 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1750,10 +1750,10 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 
+ 	/* Too big first_minor can cause duplicate creation of
+ 	 * sysfs files/links, since first_minor will be truncated to
+-	 * byte in __device_add_disk().
++	 * 20-bits number in __device_add_disk().
+ 	 */
+ 	disk->first_minor = index << part_shift;
+-	if (disk->first_minor > 0xff) {
++	if (disk->first_minor > MINORMASK) {
+ 		err = -EINVAL;
+ 		goto out_free_idr;
+ 	}
 -- 
-Jens Axboe
+2.12.2
 
