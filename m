@@ -2,60 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD4FC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 08:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 522A5C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 08:34:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3560360ED4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 08:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BBB960EE3
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 08:34:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234932AbhJKIbB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Oct 2021 04:31:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45470 "EHLO
+        id S235055AbhJKIgL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Oct 2021 04:36:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234910AbhJKIbA (ORCPT
+        with ESMTP id S234985AbhJKIgK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Oct 2021 04:31:00 -0400
+        Mon, 11 Oct 2021 04:36:10 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F41C061570;
-        Mon, 11 Oct 2021 01:29:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AACC061570;
+        Mon, 11 Oct 2021 01:34:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=sztkCoURuqdRvrtmoX0y2x+BvWMtJwZhjdAMJIDHL2k=; b=jmEczP9+nk/1ca9r43kTEnWYCk
-        fD/zQbZ0H026IxClf06SUzYw5xpJd2MofpMTqs+2sJ4KeJZDnu3xjZGRegkJ3s6yL2/gDFiadMWtX
-        zTNpIFeAq1j0CxIIrXO5hhqQgm8fomZGBtRgJ2ctrskryxonJ0JAiE2eZwWMIBZ2HLUeTwEHz39uu
-        hFcJwAedQJwhYJvqE/O7sCuski38SP2ftpMxroSf0CtaGkuvAZfYjCx6mYLaUSKgRvJzQvVDFJttk
-        hszh6qzyJ736U3HO+7EmjxudbV5O7SG+CGf65Zd1Yfw9MddId+k8p5lfs5rozrJzssVh7hquue4F6
-        YPEY85VA==;
+        bh=6yNA6WgIZDWyoNuRPs3i/c8qU8Td2KIoizBhLCmRuIA=; b=BEvmEAaEoe+LTIQva/1Bo04bTt
+        0+769BNM2j5aCBN+SpvdisvKDcfdleBfocKK9rekY5lJZW9GFt07vXkTu+9lMES7AUtL7p2lR2Z+I
+        WE3b+pk5eeVnqZuFnC/ZeVQDD7y5ulThg4JpBLPzpTpcQuH9ivlbTFw3XidkV0VLBb+J4RD0x6gA0
+        QRTE7Mj0I8WGX8SyYtYtQp14Kx6TWKFkO8XydOXVp3rQwLHADysx3fjGBtWvaFXk5MG6hKnDEprJM
+        KaWTRGUYdj8ZdoV+8OIrtFCIvxEXzwe76Z3h350wPHnuhOQUAPI0aFvsWYMovcwsHedXjDHcoDQC/
+        DXPXtkDg==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mZqdn-005N7Q-BW; Mon, 11 Oct 2021 08:26:59 +0000
-Date:   Mon, 11 Oct 2021 09:26:35 +0100
+        id 1mZqjL-005NYg-47; Mon, 11 Oct 2021 08:32:58 +0000
+Date:   Mon, 11 Oct 2021 09:32:19 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/6] block: cache bdev in struct file for raw bdev IO
-Message-ID: <YWP1O+oZmsovShoR@infradead.org>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] block: convert ->bd_inode to container_of()
+Message-ID: <YWP2k4ffuOrO6NsX@infradead.org>
 References: <cover.1633781740.git.asml.silence@gmail.com>
- <cfc66d9946422fa1778504f976621c91be2befb5.1633781740.git.asml.silence@gmail.com>
- <0785c707-ba82-1e46-5d4d-63ccacdb471f@kernel.dk>
+ <41af3da80d59b705eb2260f7f469955ad68a96d2.1633781740.git.asml.silence@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0785c707-ba82-1e46-5d4d-63ccacdb471f@kernel.dk>
+In-Reply-To: <41af3da80d59b705eb2260f7f469955ad68a96d2.1633781740.git.asml.silence@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 09, 2021 at 10:33:17AM -0600, Jens Axboe wrote:
-> > +static inline struct block_device *blkdev_get_bdev(struct file *file)
-> > +{
-> > +	return file->private_data;
-> > +}
-> 
-> Get rid of this and just use bdev = file->private_data where
-> appropriate. Easier to read, we don't need to hide this in a function.
+On Sat, Oct 09, 2021 at 01:25:43PM +0100, Pavel Begunkov wrote:
+> +static inline struct inode *bdev_file_inode(struct file *file)
+>  {
+> +	struct block_device *bdev = blkdev_get_bdev(file);
+> +
+> +	return bdev_get_inode(bdev);
+>  }
 
-100% agreed.
+No need for this helper either.
+
+> +static inline struct inode *bdev_get_inode(struct block_device *bdev)
+> +{
+> +	return &container_of(bdev, struct bdev_inode, bdev)->vfs_inode;
+> +}
+
+This is rather misnamed, not get anywhere in here.
