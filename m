@@ -2,59 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C389CC433F5
-	for <linux-block@archiver.kernel.org>; Sat,  9 Oct 2021 22:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DBFC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 00:18:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A891B60E74
-	for <linux-block@archiver.kernel.org>; Sat,  9 Oct 2021 22:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0193E61039
+	for <linux-block@archiver.kernel.org>; Mon, 11 Oct 2021 00:18:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbhJIWHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Oct 2021 18:07:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43686 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230503AbhJIWHV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Oct 2021 18:07:21 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 668F660F23;
-        Sat,  9 Oct 2021 22:05:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633817124;
-        bh=LqD/buSs9YH7vumRkDqUIw/OX5Ke0GhPFiFoWOGWEgY=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=fI5rijtKTplQzYvuNRvqoTGVjKVabbHevh1djDSthTxYhqw6aBOhej+ZjtUkH1GOS
-         WfoPWiX6Vrc/O2UMfRTLZLpnmu/Jx1/SL8zLYLYU4c+hfaKscYuzlj1XEqfQKV7J+C
-         jMZCxrf1WiXI/FaA6Wr6Zm2c9SulnDoqL/SRNX29mhIjjsuiTqDfSGacah5LwnhZSM
-         kd9T53EWG9lncYbBGAhfUNxqPLhuonrN1YW4quKwjBR70qIsX/U8xaaQEnJJvCgDo0
-         xp81X+F1HR1t+Ik48q/fv2Etbtcip8nAXRw8y8RLxJkKBUYgxA1P9+qOUa6FaSZh2H
-         WA1+YArLYkHKQ==
-Subject: Re: [GIT PULL] Block fixes for 5.15-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <05521e6b-9f74-0949-43eb-5029f27d9061@kernel.dk>
-References: <05521e6b-9f74-0949-43eb-5029f27d9061@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <05521e6b-9f74-0949-43eb-5029f27d9061@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.15-2021-10-09
-X-PR-Tracked-Commit-Id: 1dbdd99b511c966be9147ad72991a2856ac76f22
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 50eb0a06e6cae01d8a8d63770030d01ac2fb572a
-Message-Id: <163381712438.3348.1010839962749303448.pr-tracker-bot@kernel.org>
-Date:   Sat, 09 Oct 2021 22:05:24 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S231648AbhJKAUg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Oct 2021 20:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232931AbhJKAUf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Oct 2021 20:20:35 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434E5C061570
+        for <linux-block@vger.kernel.org>; Sun, 10 Oct 2021 17:18:36 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id u18so50356922wrg.5
+        for <linux-block@vger.kernel.org>; Sun, 10 Oct 2021 17:18:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philpotter-co-uk.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+ertAYRuBrO4o1phVoXpE4ROiBPxr5B4o34tTZaBB8A=;
+        b=DPfU03D3DqsL+CkdbZ/BDchAbEN5TtBMbdvFV9GkUeSTuTTgA/INSnQlJdCMxC5cQI
+         ybD0bKSGMABhPCrWhW7opF0hAycAKHYKGQbNVBRc3BJ7ls05pGAl6mLWfdu9b36B46/N
+         v10OImb6nVtP5wrgqKce/WtzXxAGHx5J1Zli7xFEBtx+D/5rjv9fNVux7EcEqqyMdYOs
+         xrlmUfrxBVHye0urgF/RzoZRqtuVfIN4Jlaj/QMA+AIqvaqLgAdjSgEFFNL9znvjDQpV
+         2wp5dSDTPpMu9QatmmmptpJgYSK/pwe9YC2GD9i6YukCjMK04OcaIs5ypDP6Up5mWO1U
+         qj4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+ertAYRuBrO4o1phVoXpE4ROiBPxr5B4o34tTZaBB8A=;
+        b=JOy+2QDP6/MUOOaOuVysLIATtz8EdXXq1QoeUrORPoIFkJsSiL9xjnPsus8A5uKMAn
+         57V0SYUwmP/YS8iTG5kSFzQ4aWuyHg1HbTX56L9XocpLbNguMkhs2sic2yEcIvfTBro/
+         VM3YbqLltuNZ1AbIkjRRTrGE+AZNVnD0C6Bld5opskom7fJ83PDiLMsGCkrQNRRBWBeK
+         EdKH8ZfKg6rsdq9N7/otGyyIjovkiarsCTNva3NYXxyxWrmb8IsG4mpMumA2gkMg/47j
+         gFMjnlUHbexl1zJ7/P5kkCDc+K6Kyt+gwDZ1m7bWH9A0YKOXw1Qa0itcnFTnV/XCsjnN
+         0Vbw==
+X-Gm-Message-State: AOAM533Ff4Cb/6cmczD5ENwd1+3ETjJdvMP0lqNEAeLAxcOX55lvSr96
+        /B7H+M2BOJP6yxx4Eo1adq9QMIX55s00vA==
+X-Google-Smtp-Source: ABdhPJzLmNrhjQpndv3iPH0ThAst4NK4h72w8khYnDOD3zReF83j4toL6PQbN/Ipmxjv69D5fNHlSQ==
+X-Received: by 2002:adf:e101:: with SMTP id t1mr21586690wrz.395.1633911514884;
+        Sun, 10 Oct 2021 17:18:34 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id d8sm6190613wrz.84.2021.10.10.17.18.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Oct 2021 17:18:34 -0700 (PDT)
+Date:   Mon, 11 Oct 2021 01:18:32 +0100
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lumip@lumip.de
+Subject: Re: [PATCH] cdrom: docs: reformat table in
+ Documentation/userspace-api/ioctl/cdrom.rst
+Message-ID: <YWOC2Iyszh7WAgzf@equinox>
+References: <20211007231720.31997-1-phil@philpotter.co.uk>
+ <464a0b2f-c556-ccda-aa3c-26733fba4617@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <464a0b2f-c556-ccda-aa3c-26733fba4617@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sat, 9 Oct 2021 12:45:49 -0600:
+On Thu, Oct 07, 2021 at 04:34:13PM -0700, Randy Dunlap wrote:
+> On 10/7/21 4:17 PM, Phillip Potter wrote:
+> > Add extra space to the first column of ioctl values table, and also realign
+> > the text in the second column, to fix a documentation build warning
+> > introduced by: commit 67f1e027c270 ("drivers/cdrom: improved ioctl for
+> > media change detection")
+> > 
+> > Suggested-by: Randy Dunlap <rdunlap@infradead.org>
+> > Fixes: 67f1e027c270 ("drivers/cdrom: improved ioctl for media change detection")
+> > Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
+> 
+> Looks good. Thanks.
+> 
+> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+> 
+> 
+> > ---
+> >   Documentation/userspace-api/ioctl/cdrom.rst | 116 ++++++++++----------
+> >   1 file changed, 58 insertions(+), 58 deletions(-)
+> > 
+> > diff --git a/Documentation/userspace-api/ioctl/cdrom.rst b/Documentation/userspace-api/ioctl/cdrom.rst
+> > index bac5bbf93ca0..682948fc88a3 100644
+> > --- a/Documentation/userspace-api/ioctl/cdrom.rst
+> > +++ b/Documentation/userspace-api/ioctl/cdrom.rst
+> 
+> 
+> 
+> -- 
+> ~Randy
 
-> git://git.kernel.dk/linux-block.git tags/block-5.15-2021-10-09
+Thank you for the review Randy.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/50eb0a06e6cae01d8a8d63770030d01ac2fb572a
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Regards,
+Phil
