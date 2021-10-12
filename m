@@ -2,138 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CD6C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 00:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDD7C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 01:09:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A27060F38
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 00:21:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EECA604DB
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 01:09:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234353AbhJLAXP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Oct 2021 20:23:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42163 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233597AbhJLAXN (ORCPT
+        id S233194AbhJLBLN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Oct 2021 21:11:13 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:28919 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233137AbhJLBLN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Oct 2021 20:23:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1633998072;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XpsLnH9NGEB0jCvrlBpGabDndtUY8/3VwXWgLo0MtD0=;
-        b=Wnty/c4j6ru04ZU7uZapG2s5KXuOI5UpNixETCHbp2PmViHoffTOpTi8lDp6A43MuVQqlW
-        NMJSItm8jRdhjn4if1wBPxLVGUFr8fj0Kei5CrLhTHzp1CG8L4AGT0eB/apDDvdAm0YW/v
-        ibgMWxmpuNnBGpTj8nBu6WJ9ADoAqW4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-00PJPiFrMTyzNCMr5bA9IA-1; Mon, 11 Oct 2021 20:21:08 -0400
-X-MC-Unique: 00PJPiFrMTyzNCMr5bA9IA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C2DF657;
-        Tue, 12 Oct 2021 00:21:04 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 496F757CA1;
-        Tue, 12 Oct 2021 00:20:51 +0000 (UTC)
-Date:   Tue, 12 Oct 2021 08:20:46 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
-        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
-        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
-        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YWTU3kTlJKONyFjZ@T590>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-10-mcgrof@kernel.org>
- <YVwZwh7qDKfSM59h@T590>
- <YWSr2trabEJflzlj@bombadil.infradead.org>
+        Mon, 11 Oct 2021 21:11:13 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HSy9x4t66zbn4y;
+        Tue, 12 Oct 2021 09:04:37 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Tue, 12 Oct 2021 09:09:04 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Tue, 12 Oct 2021 09:09:03 +0800
+Subject: Re: [PATCH] blk-cgroup: check blkcg policy is enabled in
+ blkg_create()
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20211008072720.797814-1-yukuai3@huawei.com>
+ <20211011152318.GA61605@blackbody.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <93193221-fbad-444f-c325-9f19d4c5931b@huawei.com>
+Date:   Tue, 12 Oct 2021 09:09:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YWSr2trabEJflzlj@bombadil.infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20211011152318.GA61605@blackbody.suse.cz>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 11, 2021 at 02:25:46PM -0700, Luis Chamberlain wrote:
-> On Tue, Oct 05, 2021 at 05:24:18PM +0800, Ming Lei wrote:
-> > On Mon, Sep 27, 2021 at 09:38:02AM -0700, Luis Chamberlain wrote:
-> > > When driver sysfs attributes use a lock also used on module removal we
-> > > can race to deadlock. This happens when for instance a sysfs file on
-> > > a driver is used, then at the same time we have module removal call
-> > > trigger. The module removal call code holds a lock, and then the
-> > > driver's sysfs file entry waits for the same lock. While holding the
-> > > lock the module removal tries to remove the sysfs entries, but these
-> > > cannot be removed yet as one is waiting for a lock. This won't complete
-> > > as the lock is already held. Likewise module removal cannot complete,
-> > > and so we deadlock.
-> > > 
-> > > This can now be easily reproducible with our sysfs selftest as follows:
-> > > 
-> > > ./tools/testing/selftests/sysfs/sysfs.sh -t 0027
-> > > 
-> > > This uses a local driver lock. Test 0028 can also be used, that uses
-> > > the rtnl_lock():
-> > > 
-> > > ./tools/testing/selftests/sysfs/sysfs.sh -t 0028
-> > > 
-> > > To fix this we extend the struct kernfs_node with a module reference
-> > > and use the try_module_get() after kernfs_get_active() is called. As
-> > > documented in the prior patch, we now know that once kernfs_get_active()
-> > > is called the module is implicitly guarded to exist and cannot be removed.
-> > > This is because the module is the one in charge of removing the same
-> > > sysfs file it created, and removal of sysfs files on module exit will wait
-> > > until they don't have any active references. By using a try_module_get()
-> > > after kernfs_get_active() we yield to let module removal trump calls to
-> > > process a sysfs operation, while also preventing module removal if a sysfs
-> > > operation is in already progress. This prevents the deadlock.
-> > > 
-> > > This deadlock was first reported with the zram driver, however the live
-> > 
-> > Looks not see the lock pattern you mentioned in zram driver, can you
-> > share the related zram code?
+On 2021/10/11 23:23, Michal Koutný wrote:
+> Hello.
 > 
-> I recommend to not look at the zram driver, instead look at the
-> test_sysfs driver as that abstracts the issue more clearly and uses
+> On Fri, Oct 08, 2021 at 03:27:20PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>> This is because blkg_alloc() is called from blkg_conf_prep() without
+>> holding 'q->queue_lock', and elevator is exited before blkg_create():
+>   
+> IIUC the problematic interleaving is this one (I've noticed `blkg->pd[i]
+> = NULL` to thread 2 call trace):
 
-Looks test_sysfs isn't in linus tree, where can I find it? Also please
-update your commit log about this wrong info if it can't be applied on
-zram.
-
-> two different locks as an example. The point is that if on module
-> removal *any* lock is used which is *also* used on the sysfs file
-> created by the module, you can deadlock.
+The new blkg will not add to blkg_list untill pd_init_fn() is done in
+blkg_create(), thus blkcg_deactivate_policy() can't access this blkg.
 > 
-> > > And this can lead to this condition:
-> > > 
-> > > CPU A                              CPU B
-> > >                                    foo_store()
-> > > foo_exit()
-> > >   mutex_lock(&foo)
-> > >                                    mutex_lock(&foo)
-> > >    del_gendisk(some_struct->disk);
-> > >      device_del()
-> > >        device_remove_groups()
-> > 
-> > I guess the deadlock exists if foo_exit() is called anywhere. If yes,
-> > look the issue may not be related with removing module directly, right?
+>> thread 1                            thread 2
+>> blkg_conf_prep
+>>   spin_lock_irq(&q->queue_lock);
+>>   blkg_lookup_check -> return NULL
+>>   spin_unlock_irq(&q->queue_lock);
+>>
+>>   blkg_alloc
+>>    blkcg_policy_enabled -> true
+>>    pd = ->pd_alloc_fn
+>>                                     blk_mq_exit_sched
+>>                                      bfq_exit_queue
+>>                                       blkcg_deactivate_policy
+>>                                        spin_lock_irq(&q->queue_lock);
+>>                                        __clear_bit(pol->plid, q->blkcg_pols);
+>>
+>                                          pol->pd_free_fn(blkg->pd[i]);
+>                                          blkg->pd[i] = NULL;
+>>
+>>                                        spin_unlock_irq(&q->queue_lock);
+>>                                      q->elevator = NULL;
+>      blkg->pd[i] = pd
+>>    spin_lock_irq(&q->queue_lock);
+>>     blkg_create
+>>      if (blkg->pd[i])
+>>       ->pd_init_fn -> q->elevator is NULL
+>>    spin_unlock_irq(&q->queue_lock);
 > 
-> No, the reason this can deadlock is that the module exit routine will
-> patiently wait for the sysfs / kernfs files to be stop being used,
+> In high-level terms, is this a race between (blk)io controller attribute
+> write and a device scheduler (elevator) switch?
+> If so, I'd add it to the commit message.
+> 
+>> Fix the problem by checking that policy is still enabled in
+>> blkg_create().
+> 
+> Is this sufficient wrt some other q->elevator users later?
+> 
+>> @@ -252,6 +266,9 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+>>   		goto err_free_blkg;
+>>   	}
+>>   
+> 
+> I'd add a comment here like:
+> 
+>> Re-check policies are still enabled, since the caller blkg_conf_prep()
+>> temporarily drops q->queue_lock and we can race with
+>> blk_mq_exit_sched() removing policies.
 
-Can you share the code which waits for the sysfs / kernfs files to be
-stop being used? And why does it make a difference in case of being
-called from module_exit()?
+Thanks for your advice.
 
-
-
-Thanks,
-Ming
-
+Best regards,
+Kuai
+> 
+>> +	if (new_blkg)
+>> +		blkg_check_pd(q, new_blkg);
+>> +
+> 
+> Thanks,
+> Michal
+> .
+> 
