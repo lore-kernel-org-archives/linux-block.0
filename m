@@ -2,98 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B96C43217
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 17:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FB3C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 17:15:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3E96610C7
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 17:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 515D360F21
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 17:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231985AbhJLRGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 13:06:04 -0400
-Received: from mail-pj1-f46.google.com ([209.85.216.46]:53895 "EHLO
-        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231672AbhJLRGD (ORCPT
+        id S231717AbhJLRR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 13:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230463AbhJLRR3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 13:06:03 -0400
-Received: by mail-pj1-f46.google.com with SMTP id ls18so104002pjb.3;
-        Tue, 12 Oct 2021 10:04:02 -0700 (PDT)
+        Tue, 12 Oct 2021 13:17:29 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D846EC061570
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 10:15:27 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id s17so19330707ioa.13
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 10:15:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TEZ+j+7Xnya4ZmMY8NH2kLnjeHnmslYOas+kzo29PwU=;
+        b=U1Ll6A94DorWI94ovVjj1I9ioVr3GdBh/W9TcgO/5zHZk+CbgQEVMd4qJ/MDZrrvap
+         4iVn2IilZ3ZWllcnwtAKVecDwEnXnrhbb9R7Q5NSVcoNv78YNx3GNrgQPPdckSUOMW/v
+         B511qFzIwavFCS9MUy/kTjqTDdMslqAG/7lbfL6UvK+ECOt8RRXlf/CLpGhUinj2e+/F
+         fumMu/IPdE1AEvLa12+zHtEQAJlYlhRWNL5S42/JpGdGYTeCAiTTN/ruY6/BS/Rcml2O
+         Rl1++9cq7E+x4eX/r1TucoF2q/vOD6jC1JTev8IY57p+jchAe+WtkeQblig+QAGkhU1m
+         x4cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=2RcSeUsktuetoQBEZpsEvSsK23QGJITn0bTBxOQUvyM=;
-        b=od26oBs9lRTeVROr24UaOvp9yOGD/l+LFhfmRgT0H9bNQSaUnEtmO21mMOFbuB96tJ
-         DIQdeUggfRKwBIK5NUzGJEx7g78PUwVYIRgfEWFF1c1SG9uOUl5dQB5v2NVmu/VJ16x7
-         /c5DO0iIxv53BIFBM1CKruaTBnWw78/y8YaUu/eC9z6nFiT/e7NETBvNrHW5wt7o9v+y
-         P93GBqN3NsV682yxwlDAiv4RknkKihqiGWzDNqLiOQEVzkUmxgSolP1cGdZvUYYrWMil
-         gN5APlfPoGsxmnZTxrBmY7sAEdXBACdvu0YYwhZhszqP8Yufb8M/BBPe4iWANt1t63RE
-         XX8A==
-X-Gm-Message-State: AOAM531PDwhOFKB5F/h3C8vgwcucxPM+d7KSaM4Eps4pdtyT6zKHjNei
-        KtBgwX5rFlimKZGrihBGQBX3He7pjVk=
-X-Google-Smtp-Source: ABdhPJx7w0h+NGW01JNSzoWwdrkTtZ24JTOq90hDFYfVE5Nb8/Qrjlu33OND/CQt0Nv/VUfkNfCUYQ==
-X-Received: by 2002:a17:902:e801:b0:13f:2212:d641 with SMTP id u1-20020a170902e80100b0013f2212d641mr19598028plg.87.1634058241085;
-        Tue, 12 Oct 2021 10:04:01 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:8c1a:acb2:4eff:5d13])
-        by smtp.gmail.com with ESMTPSA id i13sm7691052pgn.69.2021.10.12.10.03.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Oct 2021 10:04:00 -0700 (PDT)
-Subject: Re: [PATCH 1/7] block: add a ->get_unique_id method
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     "J. Bruce Fields" <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org
-References: <20211012120445.861860-1-hch@lst.de>
- <20211012120445.861860-2-hch@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <981907d6-2763-1a53-abb5-a265bb02f386@acm.org>
-Date:   Tue, 12 Oct 2021 10:03:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        bh=TEZ+j+7Xnya4ZmMY8NH2kLnjeHnmslYOas+kzo29PwU=;
+        b=eV1xU8GFeteJ+5pd/kqly0kLKgec1VM2YsJUP3chCyqbHX+5sqwMwiI5M20RB0YcWY
+         JcOvgxoiuF5jexEKO58zImqB4oVUTOnHxXR8ZqJQ3KjOLgFki4SWzw5DkAhX9UkuaUDZ
+         nu5QRF76L2FHr8a/e+dA4XajoroIOYybB7MqlVHwqZVN2MDuxRNmWI2lURjz3JiCoMo+
+         FWSNbsO/yP6/jJYAQDzHD05popoAmBF6SpIKjkhXzk1p4w4SDHOrP4/x/LY7vkxSEDT5
+         77ALObky/wYZRH2BchByfJybXa8DA77atrQ8SuvjBsHOomkuoPDSBn24v/7xRZH9elFt
+         0I6A==
+X-Gm-Message-State: AOAM533jcCjpXTh2k0KPioJ9Bjxl0oKMGjjrQNCXZi4SvXGtvqdn6JvI
+        tjhlVaPhEMwllxAJhB22xp2D5/Vkn4k80w==
+X-Google-Smtp-Source: ABdhPJwj0WrhuAC9qUtC3Z+DL9Q6pVWbu8Zkh7xTuwLFRpQEw8GPVCDWebwiTGtiqa/BVQYhuT99Ew==
+X-Received: by 2002:a05:6602:2188:: with SMTP id b8mr24919007iob.217.1634058926930;
+        Tue, 12 Oct 2021 10:15:26 -0700 (PDT)
+Received: from p1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id w15sm4577824ill.23.2021.10.12.10.15.26
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Oct 2021 10:15:26 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Subject: [PATCHSET 0/2] Improve batched tag allocation
+Date:   Tue, 12 Oct 2021 11:15:23 -0600
+Message-Id: <20211012171525.665644-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-In-Reply-To: <20211012120445.861860-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/12/21 5:04 AM, Christoph Hellwig wrote:
-> Add a method to query query uniqueue IDs from block devices.  It will be
-> used to remove code that deeply pokes into SCSI internals in the NFS
-> server.  The implementation in the sd driver itself can also be much
-> nicer as it can use the cached VPD page instead of always sending a
-> command as the current NFS code does.
-> 
-> For now the interface is kept very minimal but could be easily
-> extended when other users like a block-layer sysfs interface for
-> uniquue IDs shows up.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   include/linux/blkdev.h | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 17705c970d7e1..81f94a7c54521 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1188,6 +1188,7 @@ struct block_device_operations {
->   	int (*report_zones)(struct gendisk *, sector_t sector,
->   			unsigned int nr_zones, report_zones_cb cb, void *data);
->   	char *(*devnode)(struct gendisk *disk, umode_t *mode);
-> +	int (*get_unique_id)(struct gendisk *disk, u8 id[16], u8 id_type);
->   	struct module *owner;
->   	const struct pr_ops *pr_ops;
+Hi,
 
-Please document the meaning of the 'u8 id_type' argument, how callers 
-can determine the length of the unique ID and what the meaning of the 
-return value is.
+We can do better than implementing batch tag allocs as just repeated
+calls into sbitmap. Add a sbitmap helper to grab a batch all at once,
+and use that instead.
 
-Thanks,
+Testing with instrumentation added, we get very close to the full batch
+count. For NVMe, if I run with 32 batch submits, the actual success
+batch size is ~31 on average. This is close to ideal, as one hw queue
+will have a 63 tag size and hence we get 31 of 32 tags once every 1/32
+alloc. This could be improved, but wasting the extra cycles in sbitmap
+to skip to the next index for that case doesn't seem worth it.
 
-Bart.
+-- 
+Jens Axboe
+
 
