@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A58C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04683C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:13:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CEAF60C4B
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:12:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF1CE60C4B
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:13:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232281AbhJLSOn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 14:14:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55198 "EHLO
+        id S232694AbhJLSP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 14:15:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbhJLSOm (ORCPT
+        with ESMTP id S231672AbhJLSP4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 14:14:42 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87EFC061745
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:12:40 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id h196so11935719iof.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:12:40 -0700 (PDT)
+        Tue, 12 Oct 2021 14:15:56 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F97FC061570
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:13:54 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id d11so6365ilc.8
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:13:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=to:from:subject:message-id:date:user-agent:mime-version
          :content-language:content-transfer-encoding;
-        bh=en69FUDE0a4W5H0NqOm3I6EaSYFWLXHHuCLRZz08r7U=;
-        b=p9BxJV00yvawkljPNjxRoHvxtSYZUuv2w3irsHr35hFltxfS9ijbApmV5xaKBjBuyO
-         VVbBnoAP4Rs9mxk8SRK3SzIrSHq5txC6FV3QNCrcNaW3lqskQg7ui1MYKcWsnbNscc4A
-         LVGCd2LciUF5eOq2xo6547OWqgnn/etlgkYTcOXWQd2JLvv8AdpBiVVweJpvl/eFAJtb
-         MHl7Ogkt492PDXDVwPCS1TjUG8VaIll+7Uk5R1oyF4ptAoN8CsT2XE7Ps8tYa6pZ4YUu
-         B2txHHWrnqNqoHVzk5gvlTPA0MfmtxGZQh+p1Jd9Jca/olt1k/3BJJ/zkYeb16pWTpiH
-         wlGA==
+        bh=pxy+IeGZ/2+54IAu8W6w9clBCil/FCpsfF0lDbMIXCM=;
+        b=15JGGpPisUgXmSpRfMDkSc2wu9TqKTrelJbK+ddOJ1kqT63Hqek5QW3gF1FZuqJ4LX
+         B/3eOKLySvYrCQxGTaoP5nqVB+uJu03+JkuvikBnA6ilE8swj5djFnnJ/tPruRh+qFMn
+         TYMZ4pfONJlyABcU6xFheQQZqUiC1JPckow0VFeGUX7tgxqH7nZ5uL8tTGMmQqY49wa3
+         STasQfAY3sofgcrnBk+ZTw+JGQFrNijanrgrY10/68CeG9xiY1+S6FXUAHkFw9S13Lql
+         K0cSHQuawfgcNsvbYaTB7/DF8/Bwsd0sPHfRJI9XKEWwV9UAWXwk1dpEixECCe9aFDbP
+         xtqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:to:from:subject:message-id:date:user-agent
          :mime-version:content-language:content-transfer-encoding;
-        bh=en69FUDE0a4W5H0NqOm3I6EaSYFWLXHHuCLRZz08r7U=;
-        b=xVoYQ8qEgDcLfqU+tsw6uI40Tmvqi6e+Ym7q/N7EPhxhJTVQp8TTNhX5kmGclaVXAl
-         EYF1I5gzmD6jaDcUQ4ogGVykL/2i+P8RhFT5yd6Q5oR1a70pFfHkwvjj2+6WCM0m9Sh5
-         kF7KC3LA3C3NDdUujYljOwwiuZSU94cYxcKXs7aQ8U+TfDwnqEXTn0GSWw8PxfUGtqB2
-         Xq6f/d4DqWXYJZGGcOM0zVeaSrbuKu/f1W4y0PdN/FCYL6Zu/PN+ibspuk9/Y/eLyr1M
-         Pg51Wo2CWnlZUkmCqA5+EdiAtg4Mtffmz/nNlbeMQDZAmKdRR8nQDalTnDSW3wR0eo/L
-         yGcw==
-X-Gm-Message-State: AOAM532m9J3pASSuynXl4CqTY1Wr5jxB7C/ngm5QLdwrFCO4ouP2Ds3Q
-        Z8wgDaqpy4OiM7i4CqeZctjwjS2d4px5fA==
-X-Google-Smtp-Source: ABdhPJyJSpy7pBGQ4AxaPlXpfiqx31z21YP+LVfUj3jiJxU1ro6ic/cSjo6aFG9lL2TfHlcsbNrb1w==
-X-Received: by 2002:a02:6027:: with SMTP id i39mr23594682jac.91.1634062360030;
-        Tue, 12 Oct 2021 11:12:40 -0700 (PDT)
+        bh=pxy+IeGZ/2+54IAu8W6w9clBCil/FCpsfF0lDbMIXCM=;
+        b=NVRBzFQ5XNDjYAD8NFpjVZok8XJDLSsXtCS0rBmGiP1s6DbCgQJ/9Bm/G21cQ2XtpV
+         dowactgQjFGubqB9lrZCtnEzCOWJQrhTiVchaJnXDp+0hCDqjbl7CJClxHeoCF0PyRoK
+         fkAszTKp9YiG3WrfvokgDeTGu+q05eILimDOgjSfpJJLaxwDVqX6kscwJiOMSPaRIZOk
+         uH9CliczahnNctWZ5DrDM/xwdYK+ZRskZz0kJ1y5FCSzPTv7YjlIe5W/mFfC9sXzVzs6
+         52nG6yTD2QDBhpPm8Mwn0/i4TxV+xritPiCOZujzRwmqTqMzLYKOnOrjLWhfEjPBxsxU
+         HYYA==
+X-Gm-Message-State: AOAM530RxZpjdS9ZP2WQtodiHI+lVllvH7WqB0G6HyYGU/hr2wWhR7QH
+        XYj7SVVglB6FiXatPfB2eexn7g==
+X-Google-Smtp-Source: ABdhPJxNGvskmVxwBBb41nDyftCeAEQHIMmpFpmbx9gpT+cycBZMBGF1t/Nu28R+aKc9oTwZbBDANA==
+X-Received: by 2002:a05:6e02:1747:: with SMTP id y7mr24665149ill.95.1634062433107;
+        Tue, 12 Oct 2021 11:13:53 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id z5sm5694733ilh.9.2021.10.12.11.12.39
-        for <linux-block@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id v63sm5754851ioe.17.2021.10.12.11.13.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Oct 2021 11:12:39 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Tue, 12 Oct 2021 11:13:52 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: remove plug based merging
-Message-ID: <f17bf111-d625-88a1-238c-842e11b10c55@kernel.dk>
-Date:   Tue, 12 Oct 2021 12:12:39 -0600
+Subject: [PATCH] nvme: don't memset() the normal read/write command
+Message-ID: <b38d0d5c-191a-68cd-f6fb-5662706dc366@kernel.dk>
+Date:   Tue, 12 Oct 2021 12:13:52 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
@@ -67,112 +67,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's expensive to browse the whole plug list for merge opportunities at
-the IOPS rates that modern storage can do. For sequential IO, the one-hit
-cached merge should suffice on fast drives, and for rotational storage the
-IO scheduler will do a more exhaustive lookup based merge anyway.
+This memset in the fast path costs a lot of cycles on my setup. Here's a
+top-of-profile of doing ~6.7M IOPS:
 
-Just remove the plug based O(N) traversal merging.
++    5.90%  io_uring  [nvme]            [k] nvme_queue_rq
++    5.32%  io_uring  [nvme_core]       [k] nvme_setup_cmd
++    5.17%  io_uring  [kernel.vmlinux]  [k] io_submit_sqes
++    4.97%  io_uring  [kernel.vmlinux]  [k] blkdev_direct_IO
+
+and a perf diff with this patch:
+
+     0.92%     +4.40%  [nvme_core]       [k] nvme_setup_cmd
+
+reducing it from 5.3% to only 0.9%. This takes it from the 2nd most
+cycle consumer to something that's mostly irrelevant.
+
+Retain the full clear for the other commands to avoid doing any audits
+there, and just clear the fields in the rw command manually that we
+don't already fill.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
 ---
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 762da71f9fde..e10f49decd06 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -1043,62 +1043,6 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
- 	return BIO_MERGE_FAILED;
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index ec7fa6f31e68..c1b19fd69503 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -854,9 +854,16 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+ 		dsmgmt |= NVME_RW_DSM_FREQ_PREFETCH;
  
--/**
-- * blk_attempt_plug_merge - try to merge with %current's plugged list
-- * @q: request_queue new bio is being queued at
-- * @bio: new bio being queued
-- * @nr_segs: number of segments in @bio
-- * @same_queue_rq: pointer to &struct request that gets filled in when
-- * another request associated with @q is found on the plug list
-- * (optional, may be %NULL)
-- *
-- * Determine whether @bio being queued on @q can be merged with a request
-- * on %current's plugged list.  Returns %true if merge was successful,
-- * otherwise %false.
-- *
-- * Plugging coalesces IOs from the same issuer for the same purpose without
-- * going through @q->queue_lock.  As such it's more of an issuing mechanism
-- * than scheduling, and the request, while may have elvpriv data, is not
-- * added on the elevator at this point.  In addition, we don't have
-- * reliable access to the elevator outside queue lock.  Only check basic
-- * merging parameters without querying the elevator.
-- *
-- * Caller must ensure !blk_queue_nomerges(q) beforehand.
-- */
--bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
--		unsigned int nr_segs, struct request **same_queue_rq)
--{
--	struct blk_plug *plug;
--	struct request *rq;
--	struct list_head *plug_list;
--
--	plug = blk_mq_plug(q, bio);
--	if (!plug)
--		return false;
--
--	plug_list = &plug->mq_list;
--
--	list_for_each_entry_reverse(rq, plug_list, queuelist) {
--		if (rq->q == q && same_queue_rq) {
--			/*
--			 * Only blk-mq multiple hardware queues case checks the
--			 * rq in the same queue, there should be only one such
--			 * rq in a queue
--			 **/
--			*same_queue_rq = rq;
--		}
--
--		if (rq->q != q)
--			continue;
--
--		if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
--		    BIO_MERGE_OK)
--			return true;
+ 	cmnd->rw.opcode = op;
++	cmnd->rw.flags = 0;
++	cmnd->rw.command_id = 0;
+ 	cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
++	cmnd->rw.rsvd2 = 0;
++	cmnd->rw.metadata = 0;
+ 	cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
+ 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
++	cmnd->rw.reftag = 0;
++	cmnd->rw.apptag = 0;
++	cmnd->rw.appmask = 0;
+ 
+ 	if (req_op(req) == REQ_OP_WRITE && ctrl->nr_streams)
+ 		nvme_assign_write_stream(ctrl, req, &control, &dsmgmt);
+@@ -907,51 +914,64 @@ void nvme_cleanup_cmd(struct request *req)
+ }
+ EXPORT_SYMBOL_GPL(nvme_cleanup_cmd);
+ 
++static void nvme_clear_cmd(struct request *req)
++{
++	if (!(req->rq_flags & RQF_DONTPREP)) {
++		nvme_clear_nvme_request(req);
++		memset(nvme_req(req)->cmd, 0, sizeof(struct nvme_command));
++	}
++}
++
+ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req)
+ {
+ 	struct nvme_command *cmd = nvme_req(req)->cmd;
+ 	struct nvme_ctrl *ctrl = nvme_req(req)->ctrl;
+ 	blk_status_t ret = BLK_STS_OK;
+ 
+-	if (!(req->rq_flags & RQF_DONTPREP)) {
+-		nvme_clear_nvme_request(req);
+-		memset(cmd, 0, sizeof(*cmd));
 -	}
 -
--	return false;
--}
--
- /*
-  * Iterate list of requests and see if we can merge this bio with any
-  * of them.
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5777064f1174..4c5b34787bbf 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2323,10 +2323,6 @@ void blk_mq_submit_bio(struct bio *bio)
- 	if (!bio_integrity_prep(bio))
- 		goto queue_exit;
- 
--	if (!is_flush_fua && !blk_queue_nomerges(q) &&
--	    blk_attempt_plug_merge(q, bio, nr_segs, &same_queue_rq))
--		goto queue_exit;
--
- 	if (blk_mq_sched_bio_merge(q, bio, nr_segs))
- 		goto queue_exit;
- 
-diff --git a/block/blk.h b/block/blk.h
-index fa23338449ed..0afee3e6a7c1 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -214,8 +214,6 @@ static inline void blk_integrity_del(struct gendisk *disk)
- unsigned long blk_rq_timeout(unsigned long timeout);
- void blk_add_timer(struct request *req);
- 
--bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
--		unsigned int nr_segs, struct request **same_queue_rq);
- bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
- 			struct bio *bio, unsigned int nr_segs);
- 
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DRV_IN:
+ 	case REQ_OP_DRV_OUT:
+ 		/* these are setup prior to execution in nvme_init_request() */
+ 		break;
+ 	case REQ_OP_FLUSH:
++		nvme_clear_cmd(req);
+ 		nvme_setup_flush(ns, cmd);
+ 		break;
+ 	case REQ_OP_ZONE_RESET_ALL:
+ 	case REQ_OP_ZONE_RESET:
++		nvme_clear_cmd(req);
+ 		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_RESET);
+ 		break;
+ 	case REQ_OP_ZONE_OPEN:
++		nvme_clear_cmd(req);
+ 		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_OPEN);
+ 		break;
+ 	case REQ_OP_ZONE_CLOSE:
++		nvme_clear_cmd(req);
+ 		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_CLOSE);
+ 		break;
+ 	case REQ_OP_ZONE_FINISH:
++		nvme_clear_cmd(req);
+ 		ret = nvme_setup_zone_mgmt_send(ns, req, cmd, NVME_ZONE_FINISH);
+ 		break;
+ 	case REQ_OP_WRITE_ZEROES:
++		nvme_clear_cmd(req);
+ 		ret = nvme_setup_write_zeroes(ns, req, cmd);
+ 		break;
+ 	case REQ_OP_DISCARD:
++		nvme_clear_cmd(req);
+ 		ret = nvme_setup_discard(ns, req, cmd);
+ 		break;
+ 	case REQ_OP_READ:
++		nvme_clear_nvme_request(req);
+ 		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
+ 		break;
+ 	case REQ_OP_WRITE:
++		nvme_clear_nvme_request(req);
+ 		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
+ 		break;
+ 	case REQ_OP_ZONE_APPEND:
++		nvme_clear_nvme_request(req);
+ 		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_zone_append);
+ 		break;
+ 	default:
+
 -- 
 Jens Axboe
 
