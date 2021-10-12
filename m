@@ -2,81 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A714C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 14:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D43C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 14:57:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 454306052B
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 14:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E6AB60231
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 14:57:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237120AbhJLO4U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 10:56:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235294AbhJLO4U (ORCPT
+        id S237248AbhJLO7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 10:59:48 -0400
+Received: from mail-wr1-f42.google.com ([209.85.221.42]:39776 "EHLO
+        mail-wr1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237062AbhJLO7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 10:56:20 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81952C061570
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 07:54:18 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id k3so13450606ilu.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 07:54:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yXzKK10Zizmq5VvDOg19F2ywe7K1er3n4VHylKXS3Zk=;
-        b=LVHjdSfPmkVlqScrx1udINq2BMCkvP6g7CEet2tm+l/h3L9FAOW6z4FsQKQ0EP4fj5
-         YSTgjP9VQVEapomu3V/NxdSO871eoDnlqOInXO7X2FdQEMg+eHLoPoVPoPay8Bo+EjTl
-         Ay+ggBrbDh5QnHpsnrTIs6VHGhUT8ORHVhthQ5My7ZXGaIFwS0sBdyCwDpfBCBnv6Yw1
-         WF0lTDn8PaooQxurREQ1tioScDWy/gds4a+ZKeUoqqfoDiCq0d4lzhe/B/A0j3yakdle
-         RiXdbmV0UjPDzS2UZ3fqOVy9vm9TIxeq9EZ4eyxi+5kqB2TnBGctl8qk7q//xmcWkXhz
-         J0gQ==
+        Tue, 12 Oct 2021 10:59:47 -0400
+Received: by mail-wr1-f42.google.com with SMTP id r18so67903685wrg.6;
+        Tue, 12 Oct 2021 07:57:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=yXzKK10Zizmq5VvDOg19F2ywe7K1er3n4VHylKXS3Zk=;
-        b=rt9s1cmwKMMZeWcGrXLbKRlzTza/V/gh7Ban9tqGz/X9zaP2ln8D+GeC0oEe3A023R
-         kuTGPSE3MGgYREsI1Bpq3Fn1cREmUEn9M6w4b7F/jz4la5mH7qeskrXWjeAn2x1XhAvi
-         6f78j7MByOr7gsqVti3CHYJBhY7DAR//zPKD1v5BWLzmsBAyvZ2HzCbty+XX3aEfjT1B
-         Qakj57foXqEzlmt2GvVvP0W5g0QMRbS1fqOxAwumOKioIK3XWwH8VHz0yoBbg/D0N+p9
-         agpLsZx705H+vJeo1fvjSZmJqAjsCMa3aPsjBeGtqiSNxNjfFgaaYQxJC7/RKQdCh2d/
-         mXXA==
-X-Gm-Message-State: AOAM530NJYquP+gBdXFs+71UK0MQ2r6V8BgGDw/dqYsJ0vr6pxadvesv
-        PbmiLH8IfArj5ESeYRiYhqTvW0LcyrU3vg==
-X-Google-Smtp-Source: ABdhPJxZHLkCe2qL9wGtWagAkhM+zDkO4aejm0q41kkqBswrGZJVUiIllfi1vpW1pt6moL/3ano2Gw==
-X-Received: by 2002:a92:d2d1:: with SMTP id w17mr106079ilg.166.1634050457819;
-        Tue, 12 Oct 2021 07:54:17 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id d4sm2154077ilv.3.2021.10.12.07.54.17
+        bh=VtXwb5BYNS5KGkt6MvcktBG7LF1gDr4C50twzOZ5210=;
+        b=dKrfiLoFLSGrv+exOJ6XTc8x2FJ4nzNfs87PivVDdio8by8PwF2VA2x2wo/aCPm8P8
+         PZb9sRBYEufUaUQo4ZWQjhsH7pxXvmaqZM43QZij5KBN9iuZzIoNf2qhZRii4aIuLuDE
+         dIpaaPTNXsFHlEgVrN0Mac0LbUwNelAN5L2rBaOrx1yhGZgErce6UwioY065JsHoQvy0
+         8a1Ro6TgLh5SnRwss3JvwxVopSq1eiA5niM/bdxig2CtPxVSqgTOZmPlMnQKFpVOiC/f
+         6ZtSc2fXHFqTLkCIRYhyr8MR5FEQhwPka0GSpWAtDg4O3Q55LfRzm8QwdQFj9bYihGrk
+         uk5A==
+X-Gm-Message-State: AOAM532cRh4mAk8CFELdzkSjZcSESy6HnxoGm5k4E6dmrKO9EQpJLnTH
+        CO3GQLTx+emohBjF4RHB1kY=
+X-Google-Smtp-Source: ABdhPJxz+cYCges9NE0K4zRRi+5Im04qxitQs7NFCycHffQ+nJC3FVxsi+esTCwTWq5519XTQc7Pqw==
+X-Received: by 2002:a05:600c:35d0:: with SMTP id r16mr3654310wmq.97.1634050665189;
+        Tue, 12 Oct 2021 07:57:45 -0700 (PDT)
+Received: from [192.168.81.70] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id w2sm5646211wrt.31.2021.10.12.07.57.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Oct 2021 07:54:17 -0700 (PDT)
-Subject: Re: small block layer ioctl cleanups
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20211012104450.659013-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <027aaf61-2f85-8abb-4481-781ad7c1de36@kernel.dk>
-Date:   Tue, 12 Oct 2021 08:54:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 12 Oct 2021 07:57:44 -0700 (PDT)
+Subject: Re: switch block layer polling to a bio based model v4
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+References: <20211012111226.760968-1-hch@lst.de>
+ <07f31547-5570-4150-7a4b-1d773fb9fa87@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <040104f6-720d-35ed-7e15-a704e6488fd4@grimberg.me>
+Date:   Tue, 12 Oct 2021 17:57:43 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20211012104450.659013-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <07f31547-5570-4150-7a4b-1d773fb9fa87@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/12/21 4:44 AM, Christoph Hellwig wrote:
-> Hi Jens,
+
+>> Hi all,
+>>
+>> This series clean up the block polling code a bit and changes the interface
+>> to poll for a specific bio instead of a request_queue and cookie pair.
+>>
+>> Polling for the bio itself leads to a few advantages:
+>>
+>>    - the cookie construction can made entirely private in blk-mq.c
+>>    - the caller does not need to remember the request_queue and cookie
+>>      separately and thus sidesteps their lifetime issues
+>>    - keeping the device and the cookie inside the bio allows to trivially
+>>      support polling BIOs remapping by stacking drivers
+>>    - a lot of code to propagate the cookie back up the submission path can
+>>      removed entirely
+>>
+>> The one major caveat is that this requires RCU freeing polled BIOs to make
+>> sure the bio that contains the polling information is still alive when
+>> io_uring tries to poll it through the iocb. For synchronous polling all the
+>> callers have a bio reference anyway, so this is not an issue.
 > 
-> this series cleans up a few minors bits in the ioctl path.
+> I ran this through the usual peak testing, and it doesn't seem to regress
+> anything for me. We're still at around ~7.4M polled IOPS on a single CPU
+> core:
+> 
+> taskset -c 0,16 t/io_uring -d128 -b512 -s32 -c32 -p1 -F1 -B1 -D1 -n2 /dev/nvme1n1 /dev/nvme2n1
+> Added file /dev/nvme1n1 (submitter 0)
+> Added file /dev/nvme2n1 (submitter 1)
+> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
+> Engine=io_uring, sq_ring=128, cq_ring=256
+> submitter=0, tid=1199
+> submitter=1, tid=1200
+> IOPS=7322112, BW=3575MiB/s, IOS/call=32/31, inflight=(110 71)
+> IOPS=7452736, BW=3639MiB/s, IOS/call=32/31, inflight=(52 80)
+> IOPS=7419904, BW=3623MiB/s, IOS/call=32/31, inflight=(78 104)
+> IOPS=7392576, BW=3609MiB/s, IOS/call=32/32, inflight=(75 102)
 
-Applied, thanks.
-
--- 
-Jens Axboe
-
+Jens, is that with nvme_core.multipath=Y ?
