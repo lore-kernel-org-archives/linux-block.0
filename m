@@ -2,206 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F17EAC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 08:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70258C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 08:45:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEACE6101D
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 08:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57AB2604D2
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 08:45:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234522AbhJLIRs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 04:17:48 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:13725 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234368AbhJLIRs (ORCPT
+        id S232666AbhJLIra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 04:47:30 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:58878 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230043AbhJLIra (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 04:17:48 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HT7jX5tjCzWlHR;
-        Tue, 12 Oct 2021 16:14:08 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Tue, 12 Oct 2021 16:15:44 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.8; Tue, 12 Oct
- 2021 16:15:44 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <lijinlin3@huawei.com>
-Subject: [PATCH -next] block: fix UAF from race of ioc_release_fn() and __ioc_clear_queue()
-Date:   Tue, 12 Oct 2021 16:30:44 +0800
-Message-ID: <20211012083044.2409495-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        Tue, 12 Oct 2021 04:47:30 -0400
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19C8H07a028913;
+        Tue, 12 Oct 2021 08:45:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
+ bh=DNHAajdD/laYl26pvqOmGzk5clrYarwwxGCajagJvpU=;
+ b=ul7WEEVpMNW26Bh/n4j/K31sCOD7OSx3ntdGWCfQ7DruSounLiNuS8Lsaw7YMVJPltB1
+ 41AEn2Jyvdz7WXcCu6AN4StEdcvGrFxJwVx6oyoqng1fEm9eZ16QItvIxCJVaborx86x
+ Z8v4Lgr9VJfFa/g3ICmwanosgZFangZg5LRaBCQBDoyZCmHPrJVCHI0MoAoI5slh34iC
+ LRSz+sWSm/KzVQAn1PeommrXG1FfyHRqLNqugEUtinx765lNOLj9AnOO1I33MYXNIKLo
+ TpRc1zE83+dCsNcb1A0vCbw3Un3m4qMK/J/emNlVArNS+qh3gHq8OwqQOnGCMoTbjiM2 9g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3bmpwn605w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Oct 2021 08:45:20 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 19C8f64m019789;
+        Tue, 12 Oct 2021 08:45:02 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2102.outbound.protection.outlook.com [104.47.58.102])
+        by userp3020.oracle.com with ESMTP id 3bkyv9rre2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Oct 2021 08:45:02 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IIQvukH7VZThFfwI33gvCV/gzXyREVhcqIjzIVySFnMT1T1Wte2SeLpucOoyPSDnDWtjmnLTyolr8TgrAIiGmQU8zwx6Ku31GWH6yzitFIjF/AlGg1+7LlvJxw18SFlG7Qf3B48H05IBWy0box5t9xR4Of8RTsdXWy4bww4qg7+rwnErGYFmobC+U18666YBgBvYm031xJClTloZQrRa4PvBQdM+TvAJgybwJCrEw+Y5geEwmW7lxbS6ne489AWyAqwxy7dUaNfwG6gVlH0ImuRCpPDAjz8UcDuteA4nUZpH1nbWbzPYg0E/VkHt911Cvs04/gXth35i1E3CBy4O0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DNHAajdD/laYl26pvqOmGzk5clrYarwwxGCajagJvpU=;
+ b=jMjvC6dPOchHIZwamVYSSzUogineJUjAWQ18M9MYUH4OLnGqkP2Sl9RiFESfpxJCPb1CNwgWC67WxIjwhMpbctTDHtsMeZF0ajB6jLJUhLFSkgKJUugbPFELQVaekhQt34/JBtZjw3b6NaUBTv+sBqaNeMfhvQlAO0/V8Vu9PwHyGR47ycpgYcq2pgwZVzCsl1BNOX6J2VB57RUTKfL17QrZaVusR4GvVg6nFP+94fwlUzLQROtizE2b6qNjzTDi+2tqKuJQ4cWBNvldcnSrM6V3F/o+w+v+lQRe5O0B18Uu7lf3thQhyawr/1+czy1o+Hcg2ATwqiuvasgMDeY7hw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DNHAajdD/laYl26pvqOmGzk5clrYarwwxGCajagJvpU=;
+ b=nvqxfTnu/oKzxpEVyYgR16OZNzhwkg2LNKo0pMODGNielbwYsRaH90jwa1ZoaZEOje5LZNItfiflpffpAWN63lbvjsR7hNWioIs3XPQQLWFROmYpMRMYLRs4CtyaNTqrCX+eQDWZDoBy9hotbolza/SeLBV1ftEejZC/LEB5m+0=
+Authentication-Results: ionos.com; dkim=none (message not signed)
+ header.d=none;ionos.com; dmarc=none action=none header.from=oracle.com;
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by CO1PR10MB4658.namprd10.prod.outlook.com
+ (2603:10b6:303:91::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.20; Tue, 12 Oct
+ 2021 08:45:00 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::d409:11b5:5eb2:6be9]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::d409:11b5:5eb2:6be9%5]) with mapi id 15.20.4587.026; Tue, 12 Oct 2021
+ 08:45:00 +0000
+Date:   Tue, 12 Oct 2021 11:44:43 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] block/rnbd-clt-sysfs: fix a couple uninitialized variable
+ bugs
+Message-ID: <20211012084443.GA31472@kili>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: AM8P251CA0022.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21b::27) To MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+Received: from kili (2a02:6900:8208:1848::11d1) by AM8P251CA0022.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:21b::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.14 via Frontend Transport; Tue, 12 Oct 2021 08:44:54 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b7fbea00-54df-421c-bda9-08d98d5c9394
+X-MS-TrafficTypeDiagnostic: CO1PR10MB4658:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CO1PR10MB46584D36313A0C4DB02720788EB69@CO1PR10MB4658.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5ZP4yahzofeJ2t6zxKe2sGtzhHU9hWdfWIdhdDqpR5yFz8a5yAlscRjHkWCcFRCOQR7CPss8F7lqc2MGoPPVqWXv1o7xvToEsFzdYYt17/86p0X1Az9KzyXNNlqiyD6SRZj0ovwBpSJko456xBSNn9clBGeKpL1+9EjUouEY2Yhos1ogoYv/pJA4VSUX9Ngine651z0YT97xBPhI3lwwIPd3j4637E18nJhgseGqBm9l78eeHaBJrglmMDL9rm39apmhJHjDCRn6+3Jltwb7lZ6KwGSJilccm/f5T7qHpRzYg83279fRLr6gW/p7wm89un9GzuGttUku+kpekc1I2ZMQKxzIds991p6u1aCDEqn6vTfx+Y8ePN03gaY3pdOuS6yYEr7YuL/kf82eL2iAB0oehgfDGy9iL4WV2wfjZklgH4bEdtpPBl5eF0mff+IeDG51ullQSnap4Owb17od3dOScp65+c7EWz3ayWMXnoW4Jrg+/4gWWcaCFEAbhLE7c4P74UBITnivqTOzQ+7POgKmQzSJ04B1AWhUHMAgxSPCaD0d3vW8rIc3DP3yACYyb+E7PZDChpnHA2Qu4q1iHsDozquyqoXGFN3WWbPUQiUIHPFd14FVQzZBwqcDlPyy4AjWQpFkezfDouE86hQZmA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(5660300002)(66946007)(66476007)(7416002)(33656002)(86362001)(1076003)(4744005)(9686003)(508600001)(33716001)(66556008)(38100700002)(54906003)(44832011)(4326008)(110136005)(6666004)(316002)(2906002)(186003)(8676002)(6496006)(83380400001)(55016002)(52116002)(9576002)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5MOWyKpyFT3UHBV0+LClME9Imn2ghDRK+HFIhagtfn9KLeIjCFgslJr40nUy?=
+ =?us-ascii?Q?Xet+KX2mQpClgZvolnViErwZMP3IhSsA9WJlMkTA20XRbvIJqh9U10PFl65K?=
+ =?us-ascii?Q?SBgMJ19xi2r1jbWdOzFwEQodIm4xSOwNPJOv/OFWk8E6m8sA73wVebYG86EU?=
+ =?us-ascii?Q?DC4YtBfiG5+Q+Q4c6RPve5faw9y2dlXyyyujFfzCU0ilK4c1mi8dQBLXln4Y?=
+ =?us-ascii?Q?wVTNlnrcn6bYA3diW1zNQvfeOPqd1PptjVgKNlFBbsYj5v38+ISFLIdErF3a?=
+ =?us-ascii?Q?L7H6pHyO/yDh4f5/IF4lPuOnYM+253XDWx7pPnQupEmwvOkllsspHdXRGT5/?=
+ =?us-ascii?Q?2m409PkZydDjm0jkVpjXT2d0UDDU11/+1s1X4DRVM/sVJvXJ89zHQRaSShzF?=
+ =?us-ascii?Q?nyseizJrPy4sw6ybhg7mDXbRxbMgh6faqZDcjQ7J84OgbRcZXPFmhQEf2wL8?=
+ =?us-ascii?Q?WAABao4+TgI1QSioQtrOoKiaXCwD2qGCPOkSWZ44zgd28kzVzgWhot/TIvDB?=
+ =?us-ascii?Q?Pqa25gKHVx8qPEeE97N2BjkAaDlwnML2c3yiBTaQ4fn+cN6+BVEoifhgHwSN?=
+ =?us-ascii?Q?glnX6QMoIndYuudp+5pMfTPvjNuAPyylKuCHaqE2DXKmAfJyTt+N6whdr0rK?=
+ =?us-ascii?Q?ndDa3SJH/JT/ODuHaCROjXeKJ06VOJ2Et5rKr3QaMlLVYvtmsQ8qAUiaTHkX?=
+ =?us-ascii?Q?EejK299ZvGNfSKSkCVDJ3NNPutNHLMwMi3eBJCngD0bXbEf1iWH8N9xpxoGt?=
+ =?us-ascii?Q?gFSAoFxCdR6wy+8GAdf3CXQqwXIMq6vnmVjfYuYS8vRwVTD1KGMTugCK7dTg?=
+ =?us-ascii?Q?Rcszh2QaVtNW2ZDjMygh0YHBtrvz1qL49oOWjAafBukT2p5KkgYhNmOGEPz0?=
+ =?us-ascii?Q?Qq32Gx450YYFJBi1JGnIaLfKIAyk0Xy3zaUPGZJWms/tfovFbKePrNvYPnUa?=
+ =?us-ascii?Q?lbX/wNJUBUP6MRNSTRlyle+hJTiAFuavGzFL32adkMqKOcyWRHJ9vcl8OF/I?=
+ =?us-ascii?Q?HJeJJ83sW1mU96OjzAc/z8B6pxgCKZ59r1vBgxcjC34fZhJpqvMYUC6J76NJ?=
+ =?us-ascii?Q?NRSkXMjKn7rv+D8XsX6htlyFPc799agzRyatWd99ZxasZnn5NEe0nzlggxQ8?=
+ =?us-ascii?Q?Pqj5T5LHhPXTUbHu1MveQAaeo5/V/9Pmioh/xTG7ufgY2+0Db74OYlmZgQlZ?=
+ =?us-ascii?Q?sA0IWDqFVmVBiC6KpNqxCI4wzKRcf9Z2hq2XCBZT4ZBhhdXIBbbKf9DW7Nyb?=
+ =?us-ascii?Q?FfPjiMG/XF01s5San1vPOHKD0uQA0UxDYO9VaBsKKX5c2vUvVP2IVOI/QjVN?=
+ =?us-ascii?Q?BmgKNyrjQBVbRVhziT48yxsdLAWXvd2624Fa6nrXtIr9XRtRmNgTCCgaebra?=
+ =?us-ascii?Q?gK+LFb8=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7fbea00-54df-421c-bda9-08d98d5c9394
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2021 08:45:00.3121
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: edv+QMga13tex8xB1Y+TvxfcfgIX2QV7cRThY3PgpT6mZ4hklvNtyU8tjsMLl+sgzivJM/WaLvxsuPB2AR+ApXPI2sn3E4LXIMwClAAQIwQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4658
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10134 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 mlxscore=0 spamscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110120048
+X-Proofpoint-GUID: Dfjblc6p42f4_c8IsKCjUGTKdIb9KSgy
+X-Proofpoint-ORIG-GUID: Dfjblc6p42f4_c8IsKCjUGTKdIb9KSgy
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-KASAN reports a use-after-free report when doing block test:
+These variables are printed on the error path if match_int() fails so
+they have to be initialized.
 
-[293762.535116]
-==================================================================
-[293762.535129] BUG: KASAN: use-after-free in
-queued_spin_lock_slowpath+0x78/0x4c8
-[293762.535133] Write of size 2 at addr ffff8000d5f12bc8 by task sh/9148
-[293762.535135]
-[293762.535145] CPU: 1 PID: 9148 Comm: sh Kdump: loaded Tainted: G W
-4.19.90-vhulk2108.6.0.h824.kasan.eulerosv2r10.aarch64 #1
-[293762.535148] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0
-02/06/2015
-[293762.535150] Call trace:
-[293762.535154] dump_backtrace+0x0/0x310
-[293762.535158] show_stack+0x28/0x38
-[293762.535165] dump_stack+0xec/0x15c
-[293762.535172] print_address_description+0x68/0x2d0
-[293762.535177] kasan_report+0x130/0x2f0
-[293762.535182] __asan_store2+0x80/0xa8
-[293762.535189] queued_spin_lock_slowpath+0x78/0x4c8
-[293762.535194] __ioc_clear_queue+0x158/0x160
-[293762.535198] ioc_clear_queue+0x194/0x258
-[293762.535202] elevator_switch_mq+0x64/0x170
-[293762.535206] elevator_switch+0x140/0x270
-[293762.535211] elv_iosched_store+0x1a4/0x2a0
-[293762.535215] queue_attr_store+0x90/0xe0
-[293762.535219] sysfs_kf_write+0xa8/0xe8
-[293762.535222] kernfs_fop_write+0x1f8/0x378
-[293762.535227] __vfs_write+0xe0/0x360
-[293762.535233] vfs_write+0xf0/0x270
-[293762.535237] ksys_write+0xdc/0x1b8
-[293762.535241] __arm64_sys_write+0x50/0x60
-[293762.535245] el0_svc_common+0xc8/0x320
-[293762.535250] el0_svc_handler+0xf8/0x160
-[293762.535253] el0_svc+0x10/0x218
-[293762.535254]
-[293762.535258] Allocated by task 3466763:
-[293762.535264] kasan_kmalloc+0xe0/0x190
-[293762.535269] kasan_slab_alloc+0x14/0x20
-[293762.535276] kmem_cache_alloc_node+0x1b4/0x420
-[293762.535280] create_task_io_context+0x40/0x210
-[293762.535284] generic_make_request_checks+0xc78/0xe38
-[293762.535288] generic_make_request+0xf8/0x640
-[293762.535394] generic_file_direct_write+0x100/0x268
-[293762.535401] __generic_file_write_iter+0x128/0x370
-[293762.535467] vfs_iter_write+0x64/0x90
-[293762.535489] ovl_write_iter+0x2f8/0x458 [overlay]
-[293762.535493] __vfs_write+0x264/0x360
-[293762.535497] vfs_write+0xf0/0x270
-[293762.535501] ksys_write+0xdc/0x1b8
-[293762.535505] __arm64_sys_write+0x50/0x60
-[293762.535509] el0_svc_common+0xc8/0x320
-[293762.535387] ext4_direct_IO+0x3c8/0xe80 [ext4]
-[293762.535394] generic_file_direct_write+0x100/0x268
-[293762.535401] __generic_file_write_iter+0x128/0x370
-[293762.535452] ext4_file_write_iter+0x610/0xa80 [ext4]
-[293762.535457] do_iter_readv_writev+0x28c/0x390
-[293762.535463] do_iter_write+0xfc/0x360
-[293762.535467] vfs_iter_write+0x64/0x90
-[293762.535489] ovl_write_iter+0x2f8/0x458 [overlay]
-[293762.535493] __vfs_write+0x264/0x360
-[293762.535497] vfs_write+0xf0/0x270
-[293762.535501] ksys_write+0xdc/0x1b8
-[293762.535505] __arm64_sys_write+0x50/0x60
-[293762.535509] el0_svc_common+0xc8/0x320
-[293762.535513] el0_svc_handler+0xf8/0x160
-[293762.535517] el0_svc+0x10/0x218
-[293762.535521]
-[293762.535523] Freed by task 3466763:
-[293762.535528] __kasan_slab_free+0x120/0x228
-[293762.535532] kasan_slab_free+0x10/0x18
-[293762.535536] kmem_cache_free+0x68/0x248
-[293762.535540] put_io_context+0x104/0x190
-[293762.535545] put_io_context_active+0x204/0x2c8
-[293762.535549] exit_io_context+0x74/0xa0
-[293762.535553] do_exit+0x658/0xae0
-[293762.535557] do_group_exit+0x74/0x1a8
-[293762.535561] get_signal+0x21c/0xf38
-[293762.535564] do_signal+0x10c/0x450
-[293762.535568] do_notify_resume+0x224/0x4b0
-[293762.535573] work_pending+0x8/0x10
-[293762.535574]
-[293762.535578] The buggy address belongs to the object at
-ffff8000d5f12bb8
-which belongs to the cache blkdev_ioc of size 136
-[293762.535582] The buggy address is located 16 bytes inside of
-136-byte region [ffff8000d5f12bb8, ffff8000d5f12c40)
-[293762.535583] The buggy address belongs to the page:
-[293762.535588] page:ffff7e000357c480 count:1 mapcount:0
-mapping:ffff8000d8563c00 index:0x0
-[293762.536201] flags: 0x7ffff0000000100(slab)
-[293762.536540] raw: 07ffff0000000100 ffff7e0003118588 ffff8000d8adb530
-ffff8000d8563c00
-[293762.536546] raw: 0000000000000000 0000000000140014 00000001ffffffff
-0000000000000000
-[293762.536551] page dumped because: kasan: bad access detected
-[293762.536552]
-[293762.536554] Memory state around the buggy address:
-[293762.536558] ffff8000d5f12a80: 00 00 00 00 00 00 fc fc fc fc fc fc fc
-fc fb fb
-[293762.536562] ffff8000d5f12b00: fb fb fb fb fb fb fb fb fb fb fb fb fb
-fb fb fc
-[293762.536566] >ffff8000d5f12b80: fc fc fc fc fc fc fc fb fb fb fb fb
-fb fb fb fb
-[293762.536568] ^
-[293762.536572] ffff8000d5f12c00: fb fb fb fb fb fb fb fb fc fc fc fc fc
-fc fc fc
-[293762.536576] ffff8000d5f12c80: 00 00 00 00 00 00 00 00 00 00 00 00 00
-00 00 00
-
-[293762.536577]
-==================================================================
-
-ioc_release_fn() will destroy icq from ioc->icq_list and
-__ioc_clear_queue() will destroy icq from request_queue->icq_list.
-However, the ioc_release_fn() will hold ioc_lock firstly, and
-free ioc finally. Then __ioc_clear_queue() will get ioc from icq
-and hold ioc_lock, but ioc has been released, which will result
-in a use-after-free.
-
-CPU0                                    CPU1
-put_io_context                          elevator_switch_mq
-queue_work &ioc->release_work            ioc_clear_queue
-                                           ^^^ splice q->icq_list
-                                         __ioc_clear_queue
-                                           ^^^get icq from icq_list
-                                              get ioc from icq->ioc
-  ioc_release_fn
-   spin_lock(ioc->lock)
-   ioc_destroy_icq(icq)
-   spin_unlock(ioc->lock)
-   free(ioc)
-                                         spin_lock(ioc->lock) <= UAF
-
-Fix by grabbing the request_queue->queue_lock in ioc_clear_queue() to
-avoid this race scene.
-
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+Fixes: 2958a995edc9 ("block/rnbd-clt: Support polling mode for IO latency optimization")
+Fixes: 1eb54f8f5dd8 ("block/rnbd: client: sysfs interface functions")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- block/blk-ioc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/rnbd/rnbd-clt-sysfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index 57299f860d41..1d6ba8ff5a66 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -242,9 +242,9 @@ void ioc_clear_queue(struct request_queue *q)
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index 4b93fd83bf79..44e45af00e83 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -71,8 +71,10 @@ static int rnbd_clt_parse_map_options(const char *buf, size_t max_path_cnt,
+ 	int opt_mask = 0;
+ 	int token;
+ 	int ret = -EINVAL;
+-	int i, dest_port, nr_poll_queues;
++	int nr_poll_queues = 0;
++	int dest_port = 0;
+ 	int p_cnt = 0;
++	int i;
  
- 	spin_lock_irq(&q->queue_lock);
- 	list_splice_init(&q->icq_list, &icq_list);
--	spin_unlock_irq(&q->queue_lock);
- 
- 	__ioc_clear_queue(&icq_list);
-+	spin_unlock_irq(&q->queue_lock);
- }
- 
- int create_task_io_context(struct task_struct *task, gfp_t gfp_flags, int node)
+ 	options = kstrdup(buf, GFP_KERNEL);
+ 	if (!options)
 -- 
-2.22.0
+2.20.1
 
