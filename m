@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C67C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1260AC43219
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9447460ED4
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F284F60C4B
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231672AbhJLST4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 14:19:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56362 "EHLO
+        id S232880AbhJLST5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 14:19:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232876AbhJLSTx (ORCPT
+        with ESMTP id S232898AbhJLSTx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 12 Oct 2021 14:19:53 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E93C061749
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:50 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id h196so11952111iof.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:50 -0700 (PDT)
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C897FC061753
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:51 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id b10so9789907iof.12
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=asLPVvaI6oCPe8wORJN6EjuFtRgJYqm63DZu+cx8JsQ=;
-        b=CmfEc9mQB9lO29JPwofIa11Kas2KU5iu8SUhbohb4VSoVmZThidxv7WrmW9wMBYrZ5
-         2ovXZs50WzQXM9a300stHamMPsMBaANPbsN4QnYm3xpfKk3ZWdwNJ7YAdPzRljHewmvc
-         QiPsVNbBbP3OhbMpRt18Lf9Fp2mckYet1aRZHx3JiytcFV7PdYbd+lIIErp/LpLxLzdr
-         02m+Y/KSVrJA/hoe5ZGU5GD1jMHxiKlLUytfVw/ALlGXjzUWzIgyXKbhgkL7t6y4kV12
-         VfFIyzK+GNX3XtJR8d0qmpWqoKrekTX3D5tos0MI/kqyrtaqunJa6exPX/QINsCP5v0i
-         50Pw==
+        bh=DjfdwdOP2h7oZEEBaaGTV7Ar0fpekZ11g0+z4RlOBFc=;
+        b=bRoG2yUgCYnYvg7NKkf++dKLMYEkxzLOz0jSARY33vIzlpxU1IgRGTM3UDqk7RyeLM
+         J6su0UnY7wxg75qfgtW4CErQHMobfuiipG1EBn6s2WNyQB9la9TurxcemyFXCzD4Q9bQ
+         c2z5OCbCRJL2Ks1OPNQVv2reTG4kLpasVe55/R5azpcoS3FtbIdO0NUY3uxEJFLULwe2
+         cPN7mNqDB0cSDHb0XEUsqakHBGfBqjB2FsVf4OrnlGSNmkTFKrMiHo+4/Pyt5CgbVMdN
+         DQCdribv0ZJIFK+4YuAsSDFnUPj3QSFQ1XEDVrQEkbOp4JBVjeVYni/6LFydo4VYbz6L
+         of+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=asLPVvaI6oCPe8wORJN6EjuFtRgJYqm63DZu+cx8JsQ=;
-        b=LNVy8tBbqLrRoTO6OLRgqqUaaiMaCwqckKcRB97w8ClMojMmEf7DxRnmN1BCOPpeca
-         Yv0TSWxR2wlk/3JEvuD/eqDmjFj7wrImMzPfl9pyFCX5z6ZYTBGd7w7v8bJSOBvxqVXn
-         saOSfvWebNd5ioCic3cFxvb07LGgImV6VzeL3S9Hlk1VqBn5endNYxDfBdVwH62+Djq2
-         OzMS0JgdAaMtSDlpiO9m6HOv+A1jFneTcumXbljiHXMzEOacsr5pyNJAAMHwQuIYU5Ol
-         t3kLI1q21qddEWB/d3R5Eh67RZUz7ZRqWvzp0tSN6CpQI7/LaJEb4RQnKxq+PW1oj+ZP
-         7Zcg==
-X-Gm-Message-State: AOAM5326WFb+q0aikdYCegfBw6jTpvJR8KYxdXb2wFooI36GzF6FvgEG
-        ZJW71QNoJCeIs1jiAP2hDH/ot74ZKgrCug==
-X-Google-Smtp-Source: ABdhPJwkE3dxr/0rq0VrRSE68PL1+EAMN/pQspwllaSGJWl/eYWlW2ZK4LHYccQBKKjnL7pSKfMP0g==
-X-Received: by 2002:a05:6602:15d3:: with SMTP id f19mr12148167iow.161.1634062668482;
-        Tue, 12 Oct 2021 11:17:48 -0700 (PDT)
+        bh=DjfdwdOP2h7oZEEBaaGTV7Ar0fpekZ11g0+z4RlOBFc=;
+        b=tvAtWgP5b8j2QUBauguXTA8czMA+qzpF2HoykKG2s7AYcP9gzR6PcMg537PmJOO2ba
+         yiABqJqnH78Vv7iQGC1pYS6pj3OPMDqg6SppgAxQnevNYb/Rsr6smfRF1eRaapZStKG8
+         hkRxXKjaz3OPWiRMLwo1mLxRY1Lv+w8yWD6trGyr4R1jskCSTzlm+tXebEkq464fZPxM
+         jCnIIaOu37zXq1WAOuJKpLkuX705qYpV4nBhUx0meep8JGOnBr00txHwXbiv7Lh5c5+X
+         7PrPvfvMDNsp6Vm/kcKs9p1fDtaknn0fbHLAAWKFam6746/SY4g7VXQ5KaZK3FNO6ehD
+         XDyg==
+X-Gm-Message-State: AOAM5331cg2iUBulm4UYpWpZAgJanaUdB/dAa4Y+T8S9RfcEtYQrLAyk
+        JSJ3Y1/I4xewvp8/MmkK1yZw7nCMjtzgWQ==
+X-Google-Smtp-Source: ABdhPJziSe/gtjT2FZNxJ2RLiMM1v05nbamjdJp+BydRrv5XNMyXoHvJawcqB13St6uhac91Fx2U9A==
+X-Received: by 2002:a6b:f816:: with SMTP id o22mr26398442ioh.106.1634062670348;
+        Tue, 12 Oct 2021 11:17:50 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x5sm2242476ioh.23.2021.10.12.11.17.47
+        by smtp.gmail.com with ESMTPSA id x5sm2242476ioh.23.2021.10.12.11.17.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 11:17:47 -0700 (PDT)
+        Tue, 12 Oct 2021 11:17:49 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/9] nvme: move the fast path nvme error and disposition helpers
-Date:   Tue, 12 Oct 2021 12:17:38 -0600
-Message-Id: <20211012181742.672391-6-axboe@kernel.dk>
+Subject: [PATCH 8/9] io_uring: utilize the io_batch infrastructure for more efficient polled IO
+Date:   Tue, 12 Oct 2021 12:17:41 -0600
+Message-Id: <20211012181742.672391-9-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211012181742.672391-1-axboe@kernel.dk>
 References: <20211012181742.672391-1-axboe@kernel.dk>
@@ -66,200 +66,74 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These are called for every IO completion, move them inline in the nvme
-private header rather than have them be a function call out of the PCI
-part of the nvme drivers.
+Wire up using an io_batch for f_op->iopoll(). If the lower stack supports
+it, we can handle high rates of polled IO more efficiently.
 
-We also need them for batched handling, hence the patch also serves as a
-preparation for that.
+This raises the single core efficiency on my system from ~6.1M IOPS to
+~6.6M IOPS running a random read workload at depth 128 on two gen2
+Optane drives.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/host/core.c | 73 ++--------------------------------------
- drivers/nvme/host/nvme.h | 72 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 74 insertions(+), 71 deletions(-)
+ fs/io_uring.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 4b7c009fccfe..ec7fa6f31e68 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -44,9 +44,10 @@ static unsigned char shutdown_timeout = 5;
- module_param(shutdown_timeout, byte, 0644);
- MODULE_PARM_DESC(shutdown_timeout, "timeout in seconds for controller shutdown");
- 
--static u8 nvme_max_retries = 5;
-+u8 nvme_max_retries = 5;
- module_param_named(max_retries, nvme_max_retries, byte, 0644);
- MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
-+EXPORT_SYMBOL_GPL(nvme_max_retries);
- 
- static unsigned long default_ps_max_latency_us = 100000;
- module_param(default_ps_max_latency_us, ulong, 0644);
-@@ -261,48 +262,6 @@ static void nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl)
- 	nvme_put_ctrl(ctrl);
- }
- 
--static blk_status_t nvme_error_status(u16 status)
--{
--	switch (status & 0x7ff) {
--	case NVME_SC_SUCCESS:
--		return BLK_STS_OK;
--	case NVME_SC_CAP_EXCEEDED:
--		return BLK_STS_NOSPC;
--	case NVME_SC_LBA_RANGE:
--	case NVME_SC_CMD_INTERRUPTED:
--	case NVME_SC_NS_NOT_READY:
--		return BLK_STS_TARGET;
--	case NVME_SC_BAD_ATTRIBUTES:
--	case NVME_SC_ONCS_NOT_SUPPORTED:
--	case NVME_SC_INVALID_OPCODE:
--	case NVME_SC_INVALID_FIELD:
--	case NVME_SC_INVALID_NS:
--		return BLK_STS_NOTSUPP;
--	case NVME_SC_WRITE_FAULT:
--	case NVME_SC_READ_ERROR:
--	case NVME_SC_UNWRITTEN_BLOCK:
--	case NVME_SC_ACCESS_DENIED:
--	case NVME_SC_READ_ONLY:
--	case NVME_SC_COMPARE_FAILED:
--		return BLK_STS_MEDIUM;
--	case NVME_SC_GUARD_CHECK:
--	case NVME_SC_APPTAG_CHECK:
--	case NVME_SC_REFTAG_CHECK:
--	case NVME_SC_INVALID_PI:
--		return BLK_STS_PROTECTION;
--	case NVME_SC_RESERVATION_CONFLICT:
--		return BLK_STS_NEXUS;
--	case NVME_SC_HOST_PATH_ERROR:
--		return BLK_STS_TRANSPORT;
--	case NVME_SC_ZONE_TOO_MANY_ACTIVE:
--		return BLK_STS_ZONE_ACTIVE_RESOURCE;
--	case NVME_SC_ZONE_TOO_MANY_OPEN:
--		return BLK_STS_ZONE_OPEN_RESOURCE;
--	default:
--		return BLK_STS_IOERR;
--	}
--}
--
- static void nvme_retry_req(struct request *req)
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 082ff64c1bcb..cbf00ad3ac3f 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2390,6 +2390,8 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
  {
- 	unsigned long delay = 0;
-@@ -318,34 +277,6 @@ static void nvme_retry_req(struct request *req)
- 	blk_mq_delay_kick_requeue_list(req->q, delay);
- }
+ 	struct io_wq_work_node *pos, *start, *prev;
+ 	unsigned int poll_flags = BLK_POLL_NOSLEEP;
++	struct file *file = NULL;
++	struct io_batch ib;
+ 	int nr_events = 0;
  
--enum nvme_disposition {
--	COMPLETE,
--	RETRY,
--	FAILOVER,
--};
--
--static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
--{
--	if (likely(nvme_req(req)->status == 0))
--		return COMPLETE;
--
--	if (blk_noretry_request(req) ||
--	    (nvme_req(req)->status & NVME_SC_DNR) ||
--	    nvme_req(req)->retries >= nvme_max_retries)
--		return COMPLETE;
--
--	if (req->cmd_flags & REQ_NVME_MPATH) {
--		if (nvme_is_path_error(nvme_req(req)->status) ||
--		    blk_queue_dying(req->q))
--			return FAILOVER;
--	} else {
--		if (blk_queue_dying(req->q))
--			return COMPLETE;
--	}
--
--	return RETRY;
--}
--
- static inline void nvme_end_req(struct request *req)
- {
- 	blk_status_t status = nvme_error_status(nvme_req(req)->status);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ed79a6c7e804..3d11b5cb478d 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -903,4 +903,76 @@ static inline bool nvme_multi_css(struct nvme_ctrl *ctrl)
- 	return (ctrl->ctrl_config & NVME_CC_CSS_MASK) == NVME_CC_CSS_CSI;
- }
+ 	/*
+@@ -2399,11 +2401,17 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
+ 	if (ctx->poll_multi_queue && force_nonspin)
+ 		poll_flags |= BLK_POLL_ONESHOT;
  
-+static inline blk_status_t nvme_error_status(u16 status)
-+{
-+	switch (status & 0x7ff) {
-+	case NVME_SC_SUCCESS:
-+		return BLK_STS_OK;
-+	case NVME_SC_CAP_EXCEEDED:
-+		return BLK_STS_NOSPC;
-+	case NVME_SC_LBA_RANGE:
-+	case NVME_SC_CMD_INTERRUPTED:
-+	case NVME_SC_NS_NOT_READY:
-+		return BLK_STS_TARGET;
-+	case NVME_SC_BAD_ATTRIBUTES:
-+	case NVME_SC_ONCS_NOT_SUPPORTED:
-+	case NVME_SC_INVALID_OPCODE:
-+	case NVME_SC_INVALID_FIELD:
-+	case NVME_SC_INVALID_NS:
-+		return BLK_STS_NOTSUPP;
-+	case NVME_SC_WRITE_FAULT:
-+	case NVME_SC_READ_ERROR:
-+	case NVME_SC_UNWRITTEN_BLOCK:
-+	case NVME_SC_ACCESS_DENIED:
-+	case NVME_SC_READ_ONLY:
-+	case NVME_SC_COMPARE_FAILED:
-+		return BLK_STS_MEDIUM;
-+	case NVME_SC_GUARD_CHECK:
-+	case NVME_SC_APPTAG_CHECK:
-+	case NVME_SC_REFTAG_CHECK:
-+	case NVME_SC_INVALID_PI:
-+		return BLK_STS_PROTECTION;
-+	case NVME_SC_RESERVATION_CONFLICT:
-+		return BLK_STS_NEXUS;
-+	case NVME_SC_HOST_PATH_ERROR:
-+		return BLK_STS_TRANSPORT;
-+	case NVME_SC_ZONE_TOO_MANY_ACTIVE:
-+		return BLK_STS_ZONE_ACTIVE_RESOURCE;
-+	case NVME_SC_ZONE_TOO_MANY_OPEN:
-+		return BLK_STS_ZONE_OPEN_RESOURCE;
-+	default:
-+		return BLK_STS_IOERR;
-+	}
-+}
++	ib.req_list = NULL;
+ 	wq_list_for_each(pos, start, &ctx->iopoll_list) {
+ 		struct io_kiocb *req = container_of(pos, struct io_kiocb, comp_list);
+ 		struct kiocb *kiocb = &req->rw.kiocb;
+ 		int ret;
+ 
++		if (!file)
++			file = kiocb->ki_filp;
++		else if (file != kiocb->ki_filp)
++			break;
 +
-+enum nvme_disposition {
-+	COMPLETE,
-+	RETRY,
-+	FAILOVER,
-+};
-+
-+extern u8 nvme_max_retries;
-+
-+static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
-+{
-+	if (likely(nvme_req(req)->status == 0))
-+		return COMPLETE;
-+
-+	if (blk_noretry_request(req) ||
-+	    (nvme_req(req)->status & NVME_SC_DNR) ||
-+	    nvme_req(req)->retries >= nvme_max_retries)
-+		return COMPLETE;
-+
-+	if (req->cmd_flags & REQ_NVME_MPATH) {
-+		if (nvme_is_path_error(nvme_req(req)->status) ||
-+		    blk_queue_dying(req->q))
-+			return FAILOVER;
-+	} else {
-+		if (blk_queue_dying(req->q))
-+			return COMPLETE;
-+	}
-+
-+	return RETRY;
-+}
-+
- #endif /* _NVME_H */
+ 		/*
+ 		 * Move completed and retryable entries to our local lists.
+ 		 * If we find a request that requires polling, break out
+@@ -2412,19 +2420,21 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
+ 		if (READ_ONCE(req->iopoll_completed))
+ 			break;
+ 
+-		ret = kiocb->ki_filp->f_op->iopoll(kiocb, NULL, poll_flags);
++		ret = kiocb->ki_filp->f_op->iopoll(kiocb, &ib, poll_flags);
+ 		if (unlikely(ret < 0))
+ 			return ret;
+ 		else if (ret)
+ 			poll_flags |= BLK_POLL_ONESHOT;
+ 
+ 		/* iopoll may have completed current req */
+-		if (READ_ONCE(req->iopoll_completed))
++		if (ib.req_list || READ_ONCE(req->iopoll_completed))
+ 			break;
+ 	}
+ 
+-	if (!pos)
++	if (!pos && !ib.req_list)
+ 		return 0;
++	if (ib.req_list)
++		ib.complete(&ib);
+ 
+ 	prev = start;
+ 	wq_list_for_each_resume(pos, prev) {
 -- 
 2.33.0
 
