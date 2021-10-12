@@ -2,55 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB248C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 16:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B96C43217
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 17:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84A5260295
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 16:50:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3E96610C7
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 17:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbhJLQwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 12:52:16 -0400
-Received: from mail-pf1-f182.google.com ([209.85.210.182]:34637 "EHLO
-        mail-pf1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbhJLQwP (ORCPT
+        id S231985AbhJLRGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 13:06:04 -0400
+Received: from mail-pj1-f46.google.com ([209.85.216.46]:53895 "EHLO
+        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231672AbhJLRGD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 12:52:15 -0400
-Received: by mail-pf1-f182.google.com with SMTP id g14so91336pfm.1
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 09:50:14 -0700 (PDT)
+        Tue, 12 Oct 2021 13:06:03 -0400
+Received: by mail-pj1-f46.google.com with SMTP id ls18so104002pjb.3;
+        Tue, 12 Oct 2021 10:04:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pyFv6DRp7mj/TLzrQIpVommdcoXtzdvra+rup/vPgR4=;
-        b=YuTtsd16Mmc92E8dVHeXdUtp85Fp2KzkODATclVi98JKeLJMEiNQBeTP8kkiVNjhM6
-         JrFiQxcpOvX1OiZ52K/MeMOfnnzlMJmloB/7SlnC1bs+E57z2NZBP8PPuzX8hsraw0fA
-         lsP5HGe/zHYnKK6aZb2gPBZ4z+TVQk3VvI0Rv/KVdhf28t+rm5fQqpvdNjfDAWL1+HcZ
-         Hzt8l8nFQAjaiS4zTYlrNjFpCrT/LxyfXcdS+BkVPuR3d7LIU/tfXMNjB4nMj/k8BfZc
-         TJfikNZAQLF4+WGX4IY2lXHmSN92cfYUNJSVYLTrV86DNDMrbo34LbQKZoczCCR6C0sR
-         LmHg==
-X-Gm-Message-State: AOAM531qf9qPMac1LemuaCTiH7Ys7hgegWmVo7bPIQevJTuKxC3bFZho
-        ESzHexHA+Unv5XZaOJ1TzKE=
-X-Google-Smtp-Source: ABdhPJwTpBGjULlYiKlbOfc5N6o7DtsijNW+l2r5Ip5ZBV/isIjOmuv6AyEfJPmCNZ7NpziTdyvuTA==
-X-Received: by 2002:a05:6a00:26dd:b0:44d:2531:9f46 with SMTP id p29-20020a056a0026dd00b0044d25319f46mr10473312pfw.46.1634057413516;
-        Tue, 12 Oct 2021 09:50:13 -0700 (PDT)
+        bh=2RcSeUsktuetoQBEZpsEvSsK23QGJITn0bTBxOQUvyM=;
+        b=od26oBs9lRTeVROr24UaOvp9yOGD/l+LFhfmRgT0H9bNQSaUnEtmO21mMOFbuB96tJ
+         DIQdeUggfRKwBIK5NUzGJEx7g78PUwVYIRgfEWFF1c1SG9uOUl5dQB5v2NVmu/VJ16x7
+         /c5DO0iIxv53BIFBM1CKruaTBnWw78/y8YaUu/eC9z6nFiT/e7NETBvNrHW5wt7o9v+y
+         P93GBqN3NsV682yxwlDAiv4RknkKihqiGWzDNqLiOQEVzkUmxgSolP1cGdZvUYYrWMil
+         gN5APlfPoGsxmnZTxrBmY7sAEdXBACdvu0YYwhZhszqP8Yufb8M/BBPe4iWANt1t63RE
+         XX8A==
+X-Gm-Message-State: AOAM531PDwhOFKB5F/h3C8vgwcucxPM+d7KSaM4Eps4pdtyT6zKHjNei
+        KtBgwX5rFlimKZGrihBGQBX3He7pjVk=
+X-Google-Smtp-Source: ABdhPJx7w0h+NGW01JNSzoWwdrkTtZ24JTOq90hDFYfVE5Nb8/Qrjlu33OND/CQt0Nv/VUfkNfCUYQ==
+X-Received: by 2002:a17:902:e801:b0:13f:2212:d641 with SMTP id u1-20020a170902e80100b0013f2212d641mr19598028plg.87.1634058241085;
+        Tue, 12 Oct 2021 10:04:01 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:8c1a:acb2:4eff:5d13])
-        by smtp.gmail.com with ESMTPSA id k22sm3734836pji.2.2021.10.12.09.50.12
+        by smtp.gmail.com with ESMTPSA id i13sm7691052pgn.69.2021.10.12.10.03.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Oct 2021 09:50:12 -0700 (PDT)
-Subject: Re: [dm-devel] [PATCH 1/5] block: factor out a chunk_size_left helper
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>
-References: <20211012163613.994933-1-hch@lst.de>
- <20211012163613.994933-2-hch@lst.de>
+        Tue, 12 Oct 2021 10:04:00 -0700 (PDT)
+Subject: Re: [PATCH 1/7] block: add a ->get_unique_id method
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     "J. Bruce Fields" <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+References: <20211012120445.861860-1-hch@lst.de>
+ <20211012120445.861860-2-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <d5273d1f-dbf1-8921-b03d-0f61d08dbfdc@acm.org>
-Date:   Tue, 12 Oct 2021 09:50:11 -0700
+Message-ID: <981907d6-2763-1a53-abb5-a265bb02f386@acm.org>
+Date:   Tue, 12 Oct 2021 10:03:59 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <20211012163613.994933-2-hch@lst.de>
+In-Reply-To: <20211012120445.861860-2-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -58,22 +61,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/12/21 9:36 AM, Christoph Hellwig wrote:
-> +/*
-> + * Return how much of the chunk sectors is left to be used for an I/O at the
-> + * given offset.
-> + */
-> +static inline unsigned int chunk_size_left(sector_t offset,
-> +		unsigned int chunk_sectors)
-> +{
-> +	if (unlikely(!is_power_of_2(chunk_sectors)))
-> +		return chunk_sectors - sector_div(offset, chunk_sectors);
-> +	return chunk_sectors - (offset & (chunk_sectors - 1));
-> +}
+On 10/12/21 5:04 AM, Christoph Hellwig wrote:
+> Add a method to query query uniqueue IDs from block devices.  It will be
+> used to remove code that deeply pokes into SCSI internals in the NFS
+> server.  The implementation in the sd driver itself can also be much
+> nicer as it can use the cached VPD page instead of always sending a
+> command as the current NFS code does.
+> 
+> For now the interface is kept very minimal but could be easily
+> extended when other users like a block-layer sysfs interface for
+> uniquue IDs shows up.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   include/linux/blkdev.h | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 17705c970d7e1..81f94a7c54521 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1188,6 +1188,7 @@ struct block_device_operations {
+>   	int (*report_zones)(struct gendisk *, sector_t sector,
+>   			unsigned int nr_zones, report_zones_cb cb, void *data);
+>   	char *(*devnode)(struct gendisk *disk, umode_t *mode);
+> +	int (*get_unique_id)(struct gendisk *disk, u8 id[16], u8 id_type);
+>   	struct module *owner;
+>   	const struct pr_ops *pr_ops;
 
-No "blk_" prefix for the function name? I think most other functions 
-declared or defined in this header file have such a prefix.
+Please document the meaning of the 'u8 id_type' argument, how callers 
+can determine the length of the unique ID and what the meaning of the 
+return value is.
 
 Thanks,
 
 Bart.
+
