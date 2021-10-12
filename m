@@ -2,445 +2,251 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E881FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 20:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF4AC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 21:18:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C01A861050
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 20:25:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D603610CC
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 21:18:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234611AbhJLU1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 16:27:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31443 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234460AbhJLU1y (ORCPT
+        id S235565AbhJLVUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 17:20:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41544 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233223AbhJLVUl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 16:27:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634070351;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=j20UAtWtq8r/uPWs+yBMZbP4xOs9Q4tdf7SXtdw4vY4=;
-        b=SHw6583vtoxV9OqrYhyEC4tpGha2HZjhKm3xOUw/LQkah3KTQBQwYjiN5NUQExCtHu1KHb
-        DNH9l0H1+CS8ZFOm1OLWqMBf5qTAcLzuRGo4gd+m50OnKtKbUPYIVe1YuXvuGBp/1wkVuT
-        g027MZwWmVOIUVRH89uFFdmFxHTvhDc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-98NkiJLDOGix-0WUubu3aA-1; Tue, 12 Oct 2021 16:25:48 -0400
-X-MC-Unique: 98NkiJLDOGix-0WUubu3aA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 696DA801AFC;
-        Tue, 12 Oct 2021 20:25:47 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C3C9E60CC6;
-        Tue, 12 Oct 2021 20:25:04 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 19CKP45A026290;
-        Tue, 12 Oct 2021 16:25:04 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 19CKP3K3026286;
-        Tue, 12 Oct 2021 16:25:03 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Tue, 12 Oct 2021 16:25:03 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Christoph Hellwig <hch@lst.de>
-cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org
-Subject: [PATCH v3] loop: don't print warnings if the underlying filesystem
- doesn't support discard
-In-Reply-To: <20211012062049.GB17407@lst.de>
-Message-ID: <alpine.LRH.2.02.2110121516440.21015@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.2109231539520.27863@file01.intranet.prod.int.rdu2.redhat.com> <20210924155822.GA10064@lst.de> <alpine.LRH.2.02.2110040851130.30719@file01.intranet.prod.int.rdu2.redhat.com> <20211012062049.GB17407@lst.de>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        Tue, 12 Oct 2021 17:20:41 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC92C061570;
+        Tue, 12 Oct 2021 14:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=vWzGsAV2KWJEGMZ3MY3jerls6czxe/slqAoHxuRSd8g=; b=D6jsX9HUrv8ydp4bNYkgz/pIE2
+        k9+v4Meo0YrAhvRChSvovjxGfOncxPHVch+gsAH7jjX1KMZq0N66TrOTSU4gkmaC+eWOZJqxTB1wy
+        8E29AZmDENJq2hg5JRNSh36Cos1zExkPmaQpMmrkE/2ki9A3RbYGaz5ZoDuWLqFow4bPPH/qDdR1u
+        e2e+Jekrz1JM5zVym6uCCznKWDk8HcaHs1iW01t6SxPcCYsypYEQpnCzD4d/ECV8Y2B5M2m2ljjfg
+        0b3w2RzckXS6m4LFPZNiI7fysi/t/OrRy9OZGKc0BFr4wh21EVG7rWtrywuLTPQzax+aPQ7UuF4e+
+        lHMlbHMg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1maPAK-00E0hW-HR; Tue, 12 Oct 2021 21:18:28 +0000
+Date:   Tue, 12 Oct 2021 14:18:28 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
+        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
+        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
+        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
+Message-ID: <YWX7pAn0YMaJeJBA@bombadil.infradead.org>
+References: <20210927163805.808907-1-mcgrof@kernel.org>
+ <20210927163805.808907-10-mcgrof@kernel.org>
+ <YVwZwh7qDKfSM59h@T590>
+ <YWSr2trabEJflzlj@bombadil.infradead.org>
+ <YWTU3kTlJKONyFjZ@T590>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YWTU3kTlJKONyFjZ@T590>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On Tue, 12 Oct 2021, Christoph Hellwig wrote:
-
-> On Mon, Oct 04, 2021 at 09:01:33AM -0400, Mikulas Patocka wrote:
-> > Do you want this patch?
+On Tue, Oct 12, 2021 at 08:20:46AM +0800, Ming Lei wrote:
+> On Mon, Oct 11, 2021 at 02:25:46PM -0700, Luis Chamberlain wrote:
+> > On Tue, Oct 05, 2021 at 05:24:18PM +0800, Ming Lei wrote:
+> > > On Mon, Sep 27, 2021 at 09:38:02AM -0700, Luis Chamberlain wrote:
+> > > > When driver sysfs attributes use a lock also used on module removal we
+> > > > can race to deadlock. This happens when for instance a sysfs file on
+> > > > a driver is used, then at the same time we have module removal call
+> > > > trigger. The module removal call code holds a lock, and then the
+> > > > driver's sysfs file entry waits for the same lock. While holding the
+> > > > lock the module removal tries to remove the sysfs entries, but these
+> > > > cannot be removed yet as one is waiting for a lock. This won't complete
+> > > > as the lock is already held. Likewise module removal cannot complete,
+> > > > and so we deadlock.
+> > > > 
+> > > > This can now be easily reproducible with our sysfs selftest as follows:
+> > > > 
+> > > > ./tools/testing/selftests/sysfs/sysfs.sh -t 0027
+> > > > 
+> > > > This uses a local driver lock. Test 0028 can also be used, that uses
+> > > > the rtnl_lock():
+> > > > 
+> > > > ./tools/testing/selftests/sysfs/sysfs.sh -t 0028
+> > > > 
+> > > > To fix this we extend the struct kernfs_node with a module reference
+> > > > and use the try_module_get() after kernfs_get_active() is called. As
+> > > > documented in the prior patch, we now know that once kernfs_get_active()
+> > > > is called the module is implicitly guarded to exist and cannot be removed.
+> > > > This is because the module is the one in charge of removing the same
+> > > > sysfs file it created, and removal of sysfs files on module exit will wait
+> > > > until they don't have any active references. By using a try_module_get()
+> > > > after kernfs_get_active() we yield to let module removal trump calls to
+> > > > process a sysfs operation, while also preventing module removal if a sysfs
+> > > > operation is in already progress. This prevents the deadlock.
+> > > > 
+> > > > This deadlock was first reported with the zram driver, however the live
+> > > 
+> > > Looks not see the lock pattern you mentioned in zram driver, can you
+> > > share the related zram code?
+> > 
+> > I recommend to not look at the zram driver, instead look at the
+> > test_sysfs driver as that abstracts the issue more clearly and uses
 > 
-> Yes, this looks like what I want.  Minor nitpicks below:
+> Looks test_sysfs isn't in linus tree, where can I find it?
+
+https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210927-sysfs-generic-deadlock-fix
+
+> Also please
+> update your commit log about this wrong info if it can't be applied on
+> zram.
+
+It does apply to zram, it is just that I have other fixes for zram in
+my pipeline which will change the zram driver further, and so what makes
+more sense is to abstract the issue into a selftest driver to
+demonstrate the issue more clearly.
+
+To reproduce the deadlock revert the patch in this thread and then run
+either of these two tests as root:
+
+./tools/testing/selftests/sysfs/sysfs.sh -w 0027
+./tools/testing/selftests/sysfs/sysfs.sh -w 0028
+
+You will need to enable the test_sysfs driver.
+
+> > two different locks as an example. The point is that if on module
+> > removal *any* lock is used which is *also* used on the sysfs file
+> > created by the module, you can deadlock.
+> > 
+> > > > And this can lead to this condition:
+> > > > 
+> > > > CPU A                              CPU B
+> > > >                                    foo_store()
+> > > > foo_exit()
+> > > >   mutex_lock(&foo)
+> > > >                                    mutex_lock(&foo)
+> > > >    del_gendisk(some_struct->disk);
+> > > >      device_del()
+> > > >        device_remove_groups()
+> > > 
+> > > I guess the deadlock exists if foo_exit() is called anywhere. If yes,
+> > > look the issue may not be related with removing module directly, right?
+> > 
+> > No, the reason this can deadlock is that the module exit routine will
+> > patiently wait for the sysfs / kernfs files to be stop being used,
 > 
-> > +	.fallocate_flags = BLKDEV_FALLOC_FL_SUPPORTED,
-> 
-> I'd probably call this fallocate_supported_flags.
-> 
-> > +	.fallocate_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
-> 
-> Please avoid over 80 lines for a plain list of flags.
+> Can you share the code which waits for the sysfs / kernfs files to be
+> stop being used?
 
-OK. Here I'm sending a new version of the patch.
+How about a call trace of the two tasks which deadlock, here is one of
+running test 0027:
 
-BTW. for some filesystems (cifs, ext4, fuse, ...), the supported falloc 
-flags vary dynamically - for example, ext4 can do COLLAPSE_RANGE and 
-INSERT_RANGE operations only if the filesystem is not ext2 or ext3 and if 
-the file is not encrypted.
+kdevops login: [  363.875459] INFO: task sysfs.sh:1271 blocked for more
+than 120 seconds.
+[  363.878341]       Tainted: G            E
+5.15.0-rc3-next-20210927+ #83
+[  363.881218] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[  363.882255] task:sysfs.sh        state:D stack:    0 pid: 1271 ppid:
+1 flags:0x00000004
+[  363.882894] Call Trace:
+[  363.883091]  <TASK>
+[  363.883259]  __schedule+0x2fd/0x990
+[  363.883551]  schedule+0x43/0xe0
+[  363.883800]  schedule_preempt_disabled+0x14/0x20
+[  363.884160]  __mutex_lock.constprop.0+0x249/0x470
+[  363.884524]  test_dev_x_store+0xa5/0xc0 [test_sysfs]
+[  363.884915]  kernfs_fop_write_iter+0x177/0x220
+[  363.885257]  new_sync_write+0x11c/0x1b0
+[  363.885556]  vfs_write+0x20d/0x2a0
+[  363.885821]  ksys_write+0x5f/0xe0
+[  363.886081]  do_syscall_64+0x38/0xc0
+[  363.886359]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  363.886748] RIP: 0033:0x7fee00f8bf33
+[  363.887029] RSP: 002b:00007ffd372c5d18 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[  363.887633] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fee00f8bf33
+[  363.888217] RDX: 0000000000000003 RSI: 000055a4d14a0db0 RDI: 0000000000000001
+[  363.888761] RBP: 000055a4d14a0db0 R08: 000000000000000a R09: 0000000000000002
+[  363.889267] R10: 000055a4d1554ac0 R11: 0000000000000246 R12: 0000000000000003
+[  363.889983] R13: 00007fee0105c6a0 R14: 0000000000000003 R15: 00007fee0105c8a0
+[  363.890513]  </TASK>
+[  363.890709] INFO: task modprobe:1276 blocked for more than 120 seconds.
+[  363.891185]       Tainted: G            E 5.15.0-rc3-next-20210927+ #83
+[  363.891781] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  363.892353] task:modprobe        state:D stack:    0 pid: 1276 ppid: 1 flags:0x00004000
+[  363.892955] Call Trace:
+[  363.893141]  <TASK>
+[  363.893457]  __schedule+0x2fd/0x990
+[  363.893865]  schedule+0x43/0xe0
+[  363.894246]  __kernfs_remove.part.0+0x21e/0x2a0
+[  363.894704]  ? do_wait_intr_irq+0xa0/0xa0
+[  363.895142]  kernfs_remove_by_name_ns+0x50/0x90
+[  363.895632]  remove_files+0x2b/0x60
+[  363.896035]  sysfs_remove_group+0x38/0x80
+[  363.896470]  sysfs_remove_groups+0x29/0x40
+[  363.896912]  device_remove_attrs+0x5b/0x90
+[  363.897352]  device_del+0x183/0x400
+[  363.897758]  unregister_test_dev_sysfs+0x5b/0xaa [test_sysfs]
+[  363.898317]  test_sysfs_exit+0x45/0xfb0 [test_sysfs]
+[  363.898833]  __do_sys_delete_module+0x18d/0x2a0
+[  363.899329]  ? fpregs_assert_state_consistent+0x1e/0x40
+[  363.899868]  ? exit_to_user_mode_prepare+0x3a/0x180
+[  363.900390]  do_syscall_64+0x38/0xc0
+[  363.900810]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  363.901330] RIP: 0033:0x7f21915c57d7
+[  363.901747] RSP: 002b:00007ffd90869fe8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+[  363.902442] RAX: ffffffffffffffda RBX: 000055ce676ffc30 RCX: 00007f21915c57d7
+[  363.903104] RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055ce676ffc98
+[  363.903782] RBP: 000055ce676ffc30 R08: 0000000000000000 R09: 0000000000000000
+[  363.904462] R10: 00007f2191638ac0 R11: 0000000000000206 R12: 000055ce676ffc98
+[  363.905128] R13: 0000000000000000 R14: 0000000000000000 R15: 000055ce676ffdf0
+[  363.905797]  </TASK>
 
-Should we add a new flag FALLOC_FL_RETURN_SUPORTED_FLAGS that will return 
-the supported flags instead of using a static field in the file_operations 
-structure?
 
-Mikulas
+And gdb:
 
+(gdb) l *(__kernfs_remove+0x21e)
+0xffffffff8139288e is in __kernfs_remove (fs/kernfs/dir.c:476).
+471                     if (atomic_read(&kn->active) != KN_DEACTIVATED_BIAS)
+472                             lock_contended(&kn->dep_map, _RET_IP_);
+473             }
+474
+475             /* but everyone should wait for draining */
+476             wait_event(root->deactivate_waitq,
+477                        atomic_read(&kn->active) == KN_DEACTIVATED_BIAS);
+478
+479             if (kernfs_lockdep(kn)) {
+480                     lock_acquired(&kn->dep_map, _RET_IP_);
 
+(gdb) l *(kernfs_remove_by_name_ns+0x50)
+0xffffffff813938d0 is in kernfs_remove_by_name_ns (fs/kernfs/dir.c:1534).
+1529
+1530            kn = kernfs_find_ns(parent, name, ns);
+1531            if (kn)
+1532                    __kernfs_remove(kn);
+1533
+1534            up_write(&kernfs_rwsem);
+1535
+1536            if (kn)
+1537                    return 0;
+1538            else
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+The same happens for test 0028 except instead of a mutex
+lock an rtnl_lock() is used.
 
-The loop driver checks for the fallocate method and if it is present, it 
-assumes that the filesystem can do FALLOC_FL_ZERO_RANGE and 
-FALLOC_FL_PUNCH_HOLE requests. However, some filesystems (such as fat, or 
-tmpfs) have the fallocate method, but lack the capability to do 
-FALLOC_FL_ZERO_RANGE and/or FALLOC_FL_PUNCH_HOLE.
+Would this be better for the commit log?
 
-This results in syslog warnings "blk_update_request: operation not 
-supported error, dev loop0, sector 0 op 0x9:(WRITE_ZEROES) flags 0x800800 
-phys_seg 0 prio class 0". The error can be reproduced with this command:
-"truncate -s 1GiB /tmp/file; losetup /dev/loop0 /tmp/file; blkdiscard -z 
-/dev/loop0"
+> And why does it make a difference in case of being
+> called from module_exit()?
 
-This patch introduces a field "fallocate_supported_flags" in struct 
-file_operations that specifies the flags that are supported by the 
-fallocate methods. The loopback driver will check this field to determine 
-if FALLOC_FL_PUNCH_HOLE or FALLOC_FL_ZERO_RANGE is supported
+Well because that is where we remove the sysfs files. *If*
+a developer happens to use a lock on a sysfs op but it is
+also used on module exit, this deadlock is bound to happen.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
-Index: linux-2.6/block/fops.c
-===================================================================
---- linux-2.6.orig/block/fops.c
-+++ linux-2.6/block/fops.c
-@@ -628,6 +628,7 @@ const struct file_operations def_blk_fop
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= blkdev_fallocate,
-+	.fallocate_supported_flags = BLKDEV_FALLOC_FL_SUPPORTED,
- };
- 
- static __init int blkdev_init(void)
-Index: linux-2.6/fs/btrfs/file.c
-===================================================================
---- linux-2.6.orig/fs/btrfs/file.c
-+++ linux-2.6/fs/btrfs/file.c
-@@ -3688,6 +3688,8 @@ const struct file_operations btrfs_file_
- 	.release	= btrfs_release_file,
- 	.fsync		= btrfs_sync_file,
- 	.fallocate	= btrfs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
- 	.unlocked_ioctl	= btrfs_ioctl,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= btrfs_compat_ioctl,
-Index: linux-2.6/fs/ceph/file.c
-===================================================================
---- linux-2.6.orig/fs/ceph/file.c
-+++ linux-2.6/fs/ceph/file.c
-@@ -2492,5 +2492,6 @@ const struct file_operations ceph_file_f
- 	.unlocked_ioctl = ceph_ioctl,
- 	.compat_ioctl = compat_ptr_ioctl,
- 	.fallocate	= ceph_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 	.copy_file_range = ceph_copy_file_range,
- };
-Index: linux-2.6/fs/cifs/cifsfs.c
-===================================================================
---- linux-2.6.orig/fs/cifs/cifsfs.c
-+++ linux-2.6/fs/cifs/cifsfs.c
-@@ -1281,6 +1281,9 @@ const struct file_operations cifs_file_o
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_strict_ops = {
-@@ -1301,6 +1304,9 @@ const struct file_operations cifs_file_s
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_direct_ops = {
-@@ -1321,6 +1327,9 @@ const struct file_operations cifs_file_d
- 	.llseek = cifs_llseek,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_nobrl_ops = {
-@@ -1339,6 +1348,9 @@ const struct file_operations cifs_file_n
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_strict_nobrl_ops = {
-@@ -1357,6 +1369,9 @@ const struct file_operations cifs_file_s
- 	.remap_file_range = cifs_remap_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_file_direct_nobrl_ops = {
-@@ -1375,6 +1390,9 @@ const struct file_operations cifs_file_d
- 	.llseek = cifs_llseek,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct file_operations cifs_dir_ops = {
-Index: linux-2.6/fs/ext4/file.c
-===================================================================
---- linux-2.6.orig/fs/ext4/file.c
-+++ linux-2.6/fs/ext4/file.c
-@@ -929,6 +929,9 @@ const struct file_operations ext4_file_o
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ext4_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_INSERT_RANGE,
- };
- 
- const struct inode_operations ext4_file_inode_operations = {
-Index: linux-2.6/fs/f2fs/file.c
-===================================================================
---- linux-2.6.orig/fs/f2fs/file.c
-+++ linux-2.6/fs/f2fs/file.c
-@@ -4499,6 +4499,9 @@ const struct file_operations f2fs_file_o
- 	.flush		= f2fs_file_flush,
- 	.fsync		= f2fs_sync_file,
- 	.fallocate	= f2fs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE |
-+		FALLOC_FL_ZERO_RANGE | FALLOC_FL_INSERT_RANGE,
- 	.unlocked_ioctl	= f2fs_ioctl,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= f2fs_compat_ioctl,
-Index: linux-2.6/fs/fat/file.c
-===================================================================
---- linux-2.6.orig/fs/fat/file.c
-+++ linux-2.6/fs/fat/file.c
-@@ -211,6 +211,7 @@ const struct file_operations fat_file_op
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= fat_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE,
- };
- 
- static int fat_cont_expand(struct inode *inode, loff_t size)
-Index: linux-2.6/fs/fuse/file.c
-===================================================================
---- linux-2.6.orig/fs/fuse/file.c
-+++ linux-2.6/fs/fuse/file.c
-@@ -3147,6 +3147,8 @@ static const struct file_operations fuse
- 	.compat_ioctl	= fuse_file_compat_ioctl,
- 	.poll		= fuse_file_poll,
- 	.fallocate	= fuse_file_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE,
- 	.copy_file_range = fuse_copy_file_range,
- };
- 
-Index: linux-2.6/fs/gfs2/file.c
-===================================================================
---- linux-2.6.orig/fs/gfs2/file.c
-+++ linux-2.6/fs/gfs2/file.c
-@@ -1366,6 +1366,7 @@ const struct file_operations gfs2_file_f
- 	.splice_write	= gfs2_file_splice_write,
- 	.setlease	= simple_nosetlease,
- 	.fallocate	= gfs2_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
- };
- 
- const struct file_operations gfs2_dir_fops = {
-Index: linux-2.6/fs/hugetlbfs/inode.c
-===================================================================
---- linux-2.6.orig/fs/hugetlbfs/inode.c
-+++ linux-2.6/fs/hugetlbfs/inode.c
-@@ -1163,6 +1163,7 @@ const struct file_operations hugetlbfs_f
- 	.get_unmapped_area	= hugetlb_get_unmapped_area,
- 	.llseek			= default_llseek,
- 	.fallocate		= hugetlbfs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- };
- 
- static const struct inode_operations hugetlbfs_dir_inode_operations = {
-Index: linux-2.6/fs/nfs/nfs4file.c
-===================================================================
---- linux-2.6.orig/fs/nfs/nfs4file.c
-+++ linux-2.6/fs/nfs/nfs4file.c
-@@ -457,6 +457,7 @@ const struct file_operations nfs4_file_o
- 	.copy_file_range = nfs4_copy_file_range,
- 	.llseek		= nfs4_file_llseek,
- 	.fallocate	= nfs42_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
- 	.remap_file_range = nfs42_remap_file_range,
- #else
- 	.llseek		= nfs_file_llseek,
-Index: linux-2.6/fs/ntfs3/file.c
-===================================================================
---- linux-2.6.orig/fs/ntfs3/file.c
-+++ linux-2.6/fs/ntfs3/file.c
-@@ -1246,6 +1246,8 @@ const struct file_operations ntfs_file_o
- 	.fsync		= generic_file_fsync,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ntfs_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE |
-+		FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE,
- 	.release	= ntfs_file_release,
- };
- // clang-format on
-Index: linux-2.6/fs/ocfs2/file.c
-===================================================================
---- linux-2.6.orig/fs/ocfs2/file.c
-+++ linux-2.6/fs/ocfs2/file.c
-@@ -2746,6 +2746,7 @@ const struct file_operations ocfs2_fops
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ocfs2_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 	.remap_file_range = ocfs2_remap_file_range,
- };
- 
-@@ -2792,6 +2793,7 @@ const struct file_operations ocfs2_fops_
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ocfs2_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 	.remap_file_range = ocfs2_remap_file_range,
- };
- 
-Index: linux-2.6/fs/overlayfs/file.c
-===================================================================
---- linux-2.6.orig/fs/overlayfs/file.c
-+++ linux-2.6/fs/overlayfs/file.c
-@@ -658,6 +658,7 @@ const struct file_operations ovl_file_op
- 	.fsync		= ovl_fsync,
- 	.mmap		= ovl_mmap,
- 	.fallocate	= ovl_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_SUPPORTED_MASK,
- 	.fadvise	= ovl_fadvise,
- 	.flush		= ovl_flush,
- 	.splice_read    = generic_file_splice_read,
-Index: linux-2.6/fs/xfs/xfs_file.c
-===================================================================
---- linux-2.6.orig/fs/xfs/xfs_file.c
-+++ linux-2.6/fs/xfs/xfs_file.c
-@@ -1464,6 +1464,7 @@ const struct file_operations xfs_file_op
- 	.fsync		= xfs_file_fsync,
- 	.get_unmapped_area = thp_get_unmapped_area,
- 	.fallocate	= xfs_file_fallocate,
-+	.fallocate_supported_flags = XFS_FALLOC_FL_SUPPORTED,
- 	.fadvise	= xfs_file_fadvise,
- 	.remap_file_range = xfs_file_remap_range,
- };
-Index: linux-2.6/include/linux/fs.h
-===================================================================
---- linux-2.6.orig/include/linux/fs.h
-+++ linux-2.6/include/linux/fs.h
-@@ -2098,6 +2098,7 @@ struct file_operations {
- 	int (*setlease)(struct file *, long, struct file_lock **, void **);
- 	long (*fallocate)(struct file *file, int mode, loff_t offset,
- 			  loff_t len);
-+	unsigned fallocate_supported_flags;
- 	void (*show_fdinfo)(struct seq_file *m, struct file *f);
- #ifndef CONFIG_MMU
- 	unsigned (*mmap_capabilities)(struct file *);
-Index: linux-2.6/ipc/shm.c
-===================================================================
---- linux-2.6.orig/ipc/shm.c
-+++ linux-2.6/ipc/shm.c
-@@ -44,6 +44,7 @@
- #include <linux/mount.h>
- #include <linux/ipc_namespace.h>
- #include <linux/rhashtable.h>
-+#include <linux/falloc.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -558,6 +559,7 @@ static const struct file_operations shm_
- 	.get_unmapped_area	= shm_get_unmapped_area,
- 	.llseek		= noop_llseek,
- 	.fallocate	= shm_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- };
- 
- /*
-@@ -571,6 +573,7 @@ static const struct file_operations shm_
- 	.get_unmapped_area	= shm_get_unmapped_area,
- 	.llseek		= noop_llseek,
- 	.fallocate	= shm_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- };
- 
- bool is_file_shm_hugepages(struct file *file)
-Index: linux-2.6/mm/shmem.c
-===================================================================
---- linux-2.6.orig/mm/shmem.c
-+++ linux-2.6/mm/shmem.c
-@@ -3797,6 +3797,7 @@ static const struct file_operations shme
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= shmem_fallocate,
-+	.fallocate_supported_flags = FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- #endif
- };
- 
-Index: linux-2.6/drivers/block/loop.c
-===================================================================
---- linux-2.6.orig/drivers/block/loop.c
-+++ linux-2.6/drivers/block/loop.c
-@@ -947,7 +947,10 @@ static void loop_config_discard(struct l
- 	 * encryption is enabled, because it may give an attacker
- 	 * useful information.
- 	 */
--	} else if (!file->f_op->fallocate || lo->lo_encrypt_key_size) {
-+	} else if ((file->f_op->fallocate_supported_flags &
-+			(FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE)) !=
-+			(FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE) ||
-+		   lo->lo_encrypt_key_size) {
- 		max_discard_sectors = 0;
- 		granularity = 0;
- 
-@@ -959,7 +962,10 @@ static void loop_config_discard(struct l
- 	if (max_discard_sectors) {
- 		q->limits.discard_granularity = granularity;
- 		blk_queue_max_discard_sectors(q, max_discard_sectors);
--		blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
-+		if (file->f_op->fallocate_supported_flags & FALLOC_FL_ZERO_RANGE)
-+			blk_queue_max_write_zeroes_sectors(q, max_discard_sectors);
-+		else
-+			blk_queue_max_write_zeroes_sectors(q, 0);
- 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
- 	} else {
- 		q->limits.discard_granularity = 0;
-
+  Luis
