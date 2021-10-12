@@ -2,112 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B42C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 15:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9EEC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 15:14:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 540E560527
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 15:09:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2EA260C4A
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 15:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234857AbhJLPL1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 11:11:27 -0400
-Received: from mail-wr1-f53.google.com ([209.85.221.53]:42943 "EHLO
-        mail-wr1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbhJLPLZ (ORCPT
+        id S235317AbhJLPQM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 11:16:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32194 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229633AbhJLPQL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 11:11:25 -0400
-Received: by mail-wr1-f53.google.com with SMTP id v17so67854449wrv.9;
-        Tue, 12 Oct 2021 08:09:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=J1LZaElNrkRTt0L3TOQg6vlE4jRHoB3hzqVL1wIyGtw=;
-        b=mKgt6g/gNF+O52SAApJuDICNAXPdQPiC7akJ2lapADCV6JfnbZ7eRuvIvHIYNaa5Xa
-         eZECqFXEyNu7onbdtqor8iMbjNMvTtcT7mJ2gQDWNkXaG07cTG2YXoNKuIFIEzOxjhSK
-         y8NRX4OQ6jPEZ3UWzxey4185m6TQxPHkzWxsGT8ddJQKUb7x3mEuRwNX5OG98jsotKqj
-         ghThyWB5V2xe7yZJqCjcGU0bz+SI2VKbOOvD8YSwMC6Nq4CkssIRoyxADIeZDRl+uv40
-         3p0FXYI1vFHhb728QXSjWBKVPnNGFxYMf88JpU2jM/S+8XNb3ZE+MC7OfD+7yP90/3DK
-         piAw==
-X-Gm-Message-State: AOAM532Vv2cbZkNHT1NA035IdX5Q5XR0VhXKd4v0Xd/KcMk+SkVJ9JWS
-        LsQ3C3UYugxU/wK/D5dtncXo/vR3k7s=
-X-Google-Smtp-Source: ABdhPJzUa0NDblM2T2QL1+RHFgBKRczuoTxZUdRpZb6VVmvwDGzRabZJtooobPPXFM3WMF7ximyaQw==
-X-Received: by 2002:adf:a550:: with SMTP id j16mr33357712wrb.180.1634051362822;
-        Tue, 12 Oct 2021 08:09:22 -0700 (PDT)
-Received: from [192.168.81.70] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id a63sm899421wmd.34.2021.10.12.08.09.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Oct 2021 08:09:22 -0700 (PDT)
-Subject: Re: switch block layer polling to a bio based model v4
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Tue, 12 Oct 2021 11:16:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634051649;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2xvN2vLxgg7nr/3sm0rZxnDgmYjVBd3T2S4YxkSk3YY=;
+        b=UH8xot7bRgz3vSt+nKIup9VGpl81ONdftqc2hb96QR9f1+YhSzBzOT8M9tOnJf5RLAnxfC
+        TZkE9evLAkdKFYESP1eK0X9mMvExydslrX5tBYsgoHhHCIc3PGnosRCGIt+Yt5AoMV68hC
+        V0KsHXJmug6X56D0Sp1DxaGYnwypTiM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-i9Dvu8TpNbmzFE8yTvmj4A-1; Tue, 12 Oct 2021 11:14:08 -0400
+X-MC-Unique: i9Dvu8TpNbmzFE8yTvmj4A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9719B112A0A0;
+        Tue, 12 Oct 2021 15:14:06 +0000 (UTC)
+Received: from T590 (ovpn-8-34.pek2.redhat.com [10.72.8.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AC0F196FA;
+        Tue, 12 Oct 2021 15:14:01 +0000 (UTC)
+Date:   Tue, 12 Oct 2021 23:13:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
         Keith Busch <kbusch@kernel.org>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-References: <20211012111226.760968-1-hch@lst.de>
- <07f31547-5570-4150-7a4b-1d773fb9fa87@kernel.dk>
- <040104f6-720d-35ed-7e15-a704e6488fd4@grimberg.me>
- <1f53ea37-6825-de63-0f51-5ff54fa7618e@kernel.dk>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <054cd2ed-1996-d6dd-5842-2bf5a03fbdea@grimberg.me>
-Date:   Tue, 12 Oct 2021 18:09:20 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH V3 6/6] blk-mq: support concurrent queue quiesce/unquiesce
+Message-ID: <YWWmNMNKEUtBI1EH@T590>
+References: <20211009034713.1489183-1-ming.lei@redhat.com>
+ <20211009034713.1489183-7-ming.lei@redhat.com>
+ <20211012103010.GA29640@lst.de>
+ <YWWki6An1sOpx3rV@T590>
+ <20211012150827.GB20571@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <1f53ea37-6825-de63-0f51-5ff54fa7618e@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211012150827.GB20571@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 10/12/21 5:58 PM, Jens Axboe wrote:
-> On 10/12/21 8:57 AM, Sagi Grimberg wrote:
->>
->>>> Hi all,
->>>>
->>>> This series clean up the block polling code a bit and changes the interface
->>>> to poll for a specific bio instead of a request_queue and cookie pair.
->>>>
->>>> Polling for the bio itself leads to a few advantages:
->>>>
->>>>     - the cookie construction can made entirely private in blk-mq.c
->>>>     - the caller does not need to remember the request_queue and cookie
->>>>       separately and thus sidesteps their lifetime issues
->>>>     - keeping the device and the cookie inside the bio allows to trivially
->>>>       support polling BIOs remapping by stacking drivers
->>>>     - a lot of code to propagate the cookie back up the submission path can
->>>>       removed entirely
->>>>
->>>> The one major caveat is that this requires RCU freeing polled BIOs to make
->>>> sure the bio that contains the polling information is still alive when
->>>> io_uring tries to poll it through the iocb. For synchronous polling all the
->>>> callers have a bio reference anyway, so this is not an issue.
->>>
->>> I ran this through the usual peak testing, and it doesn't seem to regress
->>> anything for me. We're still at around ~7.4M polled IOPS on a single CPU
->>> core:
->>>
->>> taskset -c 0,16 t/io_uring -d128 -b512 -s32 -c32 -p1 -F1 -B1 -D1 -n2 /dev/nvme1n1 /dev/nvme2n1
->>> Added file /dev/nvme1n1 (submitter 0)
->>> Added file /dev/nvme2n1 (submitter 1)
->>> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
->>> Engine=io_uring, sq_ring=128, cq_ring=256
->>> submitter=0, tid=1199
->>> submitter=1, tid=1200
->>> IOPS=7322112, BW=3575MiB/s, IOS/call=32/31, inflight=(110 71)
->>> IOPS=7452736, BW=3639MiB/s, IOS/call=32/31, inflight=(52 80)
->>> IOPS=7419904, BW=3623MiB/s, IOS/call=32/31, inflight=(78 104)
->>> IOPS=7392576, BW=3609MiB/s, IOS/call=32/32, inflight=(75 102)
->>
->> Jens, is that with nvme_core.multipath=Y ?
+On Tue, Oct 12, 2021 at 05:08:27PM +0200, Christoph Hellwig wrote:
+> On Tue, Oct 12, 2021 at 11:06:51PM +0800, Ming Lei wrote:
+> > > We can get rid of the QUEUE_FLAG_QUIESCED flag now and just look
+> > > at ->quiesce_depth directly.
+> > 
+> > I'd rather not to do that given we need to check QUEUE_FLAG_QUIESCED in fast
+> > path.
 > 
-> No, I don't have multipath enabled. I can run that too, if you'd like.
+> Checking an integer vs checking a bit is easier actually faster or at
+> least the same speed depending on the architecture / micro architecture.
 
-That would be useful to learn. thanks.
+->queue_flag is always hot, but quiesce_depth can't be and shouldn't be
+since it is used very less.
+
+
+-- 
+Ming
+
