@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6584BC43217
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 242A7C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49F54610D1
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0982561050
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 18:17:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232915AbhJLST5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 14:19:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56364 "EHLO
+        id S232898AbhJLST6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 14:19:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232880AbhJLSTx (ORCPT
+        with ESMTP id S231586AbhJLST4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 14:19:53 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED105C06174E
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:50 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id r134so13543593iod.11
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:50 -0700 (PDT)
+        Tue, 12 Oct 2021 14:19:56 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B34C061570
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:54 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id n7so15840085iod.0
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 11:17:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=k37AHCp3gxbOm+kB3mONj2ZpBCnDrxLtP5yZn3K0HAw=;
-        b=xLzKlSET2fR6nBbzaKk8t0rd/n9qOxVIXuvmVFyJjDCKcWTxdfqs20/qLQOmcJt5Fn
-         VyPAalxyj7ws2PdRVPuDZ+HLUkAkcz2eX5sV3iYxQ3VxPd8DLzLPi+zEBZx1wmsp4eBk
-         Hs22OF236nM5Sgz/X1hO768y4+UvcTfIbxARacNd+N6CQAR4XFSD4YFgtuceul8GSm/f
-         ubMtOMFT2G8s2Lm7hYwlynmlcPfrNLl32VkU50ffFjejsvQQy0PajecQqcON355Sv7sD
-         bWyYNadnLLicxO1dxToCf5kgE8BZKqo0heHc0rI0im35ZoBVroBVbVtuExSgjRjH8y7Z
-         6PYw==
+        bh=02YgnQreYCX7+Oxqq3CeMBFEG37oqt2Ce2mb0JVD220=;
+        b=Eux1eS+TTL560c91wPLqapoKifb21C7tey/OZpPpoGKzlGsNJl79vwVMDUPcZOkSU2
+         GJpDYNmzoZa+aPmTqTBIuQkf6fFclenH2wgXmgr2o7Wy1SKcyfABIasO65EClQJEKmNO
+         WeKHOymXE0PqhjPBUyl1S9sEhbAFubc2+3liCuGGWQZLSQ0nBKImxfHAzoOJNO97x5Kw
+         rZkRuwBNf/mTH27ptlF8GiU+5XcdedWl+V4u1MBpbAaXEJ8m7DB4FpyPaG+4+lYY0gDJ
+         UXBBEzH7trA1BaxyS1iTb5b82DNvHmNYw2KwVSc0AM3VrcnP8SJlietGdzBGZSy9AWau
+         U4Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=k37AHCp3gxbOm+kB3mONj2ZpBCnDrxLtP5yZn3K0HAw=;
-        b=nDZA+M3yRFN/76X7fTwKZXJ7q06v+jkxkkOjIDnxu6KVl20eP5Wh5nKnaRBgrPFkX6
-         tl8fmlmH02+m2FiZcXTD10ufxcLH13UFyGColgE4fM+zyhtNRPr/hfcSKL9qoEv3rUZV
-         Kq0UWde2JH/arYj9NeCuFnIb2dvIWtpJHxujIFSY5kJhEK60sSh1dep8c8trrw4CDsQ5
-         DkmhDTHUujBCOI4Cx+K97S7Y7MaElysycUD0R9QofDmnRUHpIw46hsZ1KpgqdUblU+xi
-         xt57OdQXAo+6W33dz7AxfJseNNm3DrUxuaoLYmBP/DAtCJuYa4NDiFDkiGHzg9+LUO5P
-         iqXg==
-X-Gm-Message-State: AOAM530dhk/nKZH2odwZd6cQ0+z6wG+YgTxgvh6oOO9C1xFxWdjhBOeU
-        2cwhybI/VZmDiCiy4FnGLe8YldXXPk2OLg==
-X-Google-Smtp-Source: ABdhPJxt9Bpfn9NYmP2VoZf1TdMwyoTtlYbJC9lQKgtGkT/hJlYN6SLGYkhRN3OZpBXc9hOaDsU/MA==
-X-Received: by 2002:a6b:ea11:: with SMTP id m17mr10276462ioc.139.1634062669277;
-        Tue, 12 Oct 2021 11:17:49 -0700 (PDT)
+        bh=02YgnQreYCX7+Oxqq3CeMBFEG37oqt2Ce2mb0JVD220=;
+        b=RSLzmg3qviXL+DiX29FOAlyojgjRM2+vLuMbdTevtbN06ckslSMG/2ZDqc3bvNdmdH
+         2ndCvsjchxdKBGvlv7hNBjW/oCU7Q43rPOn+Sggx7bnJ5SY/mLezApctXYr6wwKqEq/E
+         B2U02zZWL4kIePYyteK8K7bDimTIpaVDko/CT1OSHyoJQEODPV92ZRiwGXRLvA7l+eBL
+         vb/C3BurwnB1T2qPl5wLhDw59hPaoSkiNmAhsvPSnwCnuQgJsbhIPaA/ZBmucXvv5Fbn
+         1wbEAj2U64BVThTZddgZQDl8tOKasqYdYZRQlIDhV5do8UcA80hY1yvL+r174pwkhxbe
+         MaMQ==
+X-Gm-Message-State: AOAM532+/6eEUNhL1EHi+Rn3S1oedDe6NVo/xzEN1C3X8xbp86/MKjiy
+        uhBkZW+fiGZG5SAQKoZr3Z4wKpKZUW1r+A==
+X-Google-Smtp-Source: ABdhPJzLXeyV1eoE+dHJLaLxkTDH6LP3vtSkQOg0svef2OUCzcEZ92ZiNVNGpY5iVdx/jUpkl6Z5bA==
+X-Received: by 2002:a6b:3b85:: with SMTP id i127mr24321080ioa.111.1634062671161;
+        Tue, 12 Oct 2021 11:17:51 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x5sm2242476ioh.23.2021.10.12.11.17.48
+        by smtp.gmail.com with ESMTPSA id x5sm2242476ioh.23.2021.10.12.11.17.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 11:17:48 -0700 (PDT)
+        Tue, 12 Oct 2021 11:17:50 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/9] nvme: add support for batched completion of polled IO
-Date:   Tue, 12 Oct 2021 12:17:39 -0600
-Message-Id: <20211012181742.672391-7-axboe@kernel.dk>
+Subject: [PATCH 9/9] nvme: wire up completion batching for the IRQ path
+Date:   Tue, 12 Oct 2021 12:17:42 -0600
+Message-Id: <20211012181742.672391-10-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211012181742.672391-1-axboe@kernel.dk>
 References: <20211012181742.672391-1-axboe@kernel.dk>
@@ -66,151 +66,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Take advantage of struct io_batch, if passed in to the nvme poll handler.
-If it's set, rather than complete each request individually inline, store
-them in the io_batch list. We only do so for requests that will complete
-successfully, anything else will be completed inline as before.
+Trivial to do now, just need our own io_batch on the stack and pass that
+in to the usual command completion handling.
 
-Add an mq_ops->complete_batch() handler to do the post-processing of
-the io_batch list once polling is complete.
+I pondered making this dependent on how many entries we had to process,
+but even for a single entry there's no discernable difference in
+performance or latency. Running a sync workload over io_uring:
+
+t/io_uring -b512 -d1 -s1 -c1 -p0 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
+
+yields the below performance before the patch:
+
+IOPS=254820, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
+IOPS=251174, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+IOPS=250806, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+
+and the following after:
+
+IOPS=255972, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
+IOPS=251920, BW=123MiB/s, IOS/call=1/1, inflight=(1 1)
+IOPS=251794, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+
+which definitely isn't slower, about the same if you factor in a bit of
+variance. For peak performance workloads, benchmarking shows a 2%
+improvement.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/host/pci.c | 69 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 63 insertions(+), 6 deletions(-)
+ drivers/nvme/host/pci.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 4ad63bb9f415..4713da708cd4 100644
+index 4713da708cd4..fb3de6f68eb1 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -959,7 +959,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
+@@ -1076,8 +1076,10 @@ static inline void nvme_update_cq_head(struct nvme_queue *nvmeq)
  
--static void nvme_pci_complete_rq(struct request *req)
-+static void nvme_pci_unmap_rq(struct request *req)
+ static inline int nvme_process_cq(struct nvme_queue *nvmeq)
  {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct nvme_dev *dev = iod->nvmeq->dev;
-@@ -969,9 +969,34 @@ static void nvme_pci_complete_rq(struct request *req)
- 			       rq_integrity_vec(req)->bv_len, rq_data_dir(req));
- 	if (blk_rq_nr_phys_segments(req))
- 		nvme_unmap_data(dev, req);
-+}
-+
-+static void nvme_pci_complete_rq(struct request *req)
-+{
-+	nvme_pci_unmap_rq(req);
- 	nvme_complete_rq(req);
- }
++	struct io_batch ib;
+ 	int found = 0;
  
-+static void nvme_pci_complete_batch(struct io_batch *ib)
-+{
-+	struct request *req;
-+
-+	req = ib->req_list;
-+	while (req) {
-+		nvme_pci_unmap_rq(req);
-+		if (req->rq_flags & RQF_SPECIAL_PAYLOAD)
-+			nvme_cleanup_cmd(req);
-+		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-+				req_op(req) == REQ_OP_ZONE_APPEND)
-+			req->__sector = nvme_lba_to_sect(req->q->queuedata,
-+					le64_to_cpu(nvme_req(req)->result.u64));
-+		req->status = nvme_error_status(nvme_req(req)->status);
-+		req = req->rq_next;
-+	}
-+
-+	blk_mq_end_request_batch(ib);
-+}
-+
- /* We read the CQE phase first to check if the rest of the entry is valid */
- static inline bool nvme_cqe_pending(struct nvme_queue *nvmeq)
- {
-@@ -996,7 +1021,8 @@ static inline struct blk_mq_tags *nvme_queue_tagset(struct nvme_queue *nvmeq)
- 	return nvmeq->dev->tagset.tags[nvmeq->qid - 1];
- }
- 
--static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
-+static inline void nvme_handle_cqe(struct nvme_queue *nvmeq,
-+				   struct io_batch *ib, u16 idx)
- {
- 	struct nvme_completion *cqe = &nvmeq->cqes[idx];
- 	__u16 command_id = READ_ONCE(cqe->command_id);
-@@ -1023,8 +1049,17 @@ static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
- 	}
- 
- 	trace_nvme_sq(req, cqe->sq_head, nvmeq->sq_tail);
--	if (!nvme_try_complete_req(req, cqe->status, cqe->result))
--		nvme_pci_complete_rq(req);
-+	if (!nvme_try_complete_req(req, cqe->status, cqe->result)) {
-+		enum nvme_disposition ret;
-+
-+		ret = nvme_decide_disposition(req);
-+		if (unlikely(!ib || req->end_io || ret != COMPLETE)) {
-+			nvme_pci_complete_rq(req);
-+		} else {
-+			req->rq_next = ib->req_list;
-+			ib->req_list = req;
-+		}
-+	}
- }
- 
- static inline void nvme_update_cq_head(struct nvme_queue *nvmeq)
-@@ -1050,7 +1085,7 @@ static inline int nvme_process_cq(struct nvme_queue *nvmeq)
++	ib.req_list = NULL;
+ 	while (nvme_cqe_pending(nvmeq)) {
+ 		found++;
+ 		/*
+@@ -1085,12 +1087,15 @@ static inline int nvme_process_cq(struct nvme_queue *nvmeq)
  		 * the cqe requires a full read memory barrier
  		 */
  		dma_rmb();
--		nvme_handle_cqe(nvmeq, nvmeq->cq_head);
-+		nvme_handle_cqe(nvmeq, NULL, nvmeq->cq_head);
+-		nvme_handle_cqe(nvmeq, NULL, nvmeq->cq_head);
++		nvme_handle_cqe(nvmeq, &ib, nvmeq->cq_head);
  		nvme_update_cq_head(nvmeq);
  	}
  
-@@ -1092,6 +1127,27 @@ static void nvme_poll_irqdisable(struct nvme_queue *nvmeq)
- 	enable_irq(pci_irq_vector(pdev, nvmeq->cq_vector));
+-	if (found)
++	if (found) {
++		if (ib.req_list)
++			nvme_pci_complete_batch(&ib);
+ 		nvme_ring_cq_doorbell(nvmeq);
++	}
+ 	return found;
  }
  
-+static inline int nvme_poll_cq(struct nvme_queue *nvmeq, struct io_batch *ib)
-+{
-+	int found = 0;
-+
-+	while (nvme_cqe_pending(nvmeq)) {
-+		found++;
-+		/*
-+		 * load-load control dependency between phase and the rest of
-+		 * the cqe requires a full read memory barrier
-+		 */
-+		dma_rmb();
-+		nvme_handle_cqe(nvmeq, ib, nvmeq->cq_head);
-+		nvme_update_cq_head(nvmeq);
-+	}
-+
-+	if (found)
-+		nvme_ring_cq_doorbell(nvmeq);
-+	return found;
-+}
-+
-+
- static int nvme_poll(struct blk_mq_hw_ctx *hctx, struct io_batch *ib)
- {
- 	struct nvme_queue *nvmeq = hctx->driver_data;
-@@ -1101,7 +1157,7 @@ static int nvme_poll(struct blk_mq_hw_ctx *hctx, struct io_batch *ib)
- 		return 0;
- 
- 	spin_lock(&nvmeq->cq_poll_lock);
--	found = nvme_process_cq(nvmeq);
-+	found = nvme_poll_cq(nvmeq, ib);
- 	spin_unlock(&nvmeq->cq_poll_lock);
- 
- 	return found;
-@@ -1639,6 +1695,7 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
- static const struct blk_mq_ops nvme_mq_ops = {
- 	.queue_rq	= nvme_queue_rq,
- 	.complete	= nvme_pci_complete_rq,
-+	.complete_batch = nvme_pci_complete_batch,
- 	.commit_rqs	= nvme_commit_rqs,
- 	.init_hctx	= nvme_init_hctx,
- 	.init_request	= nvme_init_request,
 -- 
 2.33.0
 
