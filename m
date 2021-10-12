@@ -2,103 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A792CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 09:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2413C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 09:33:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90A7C60F3A
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 09:08:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A84D161056
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 09:33:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235386AbhJLJKp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 05:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42578 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235306AbhJLJKp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 05:10:45 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B94C06161C
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 02:08:43 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id r7so64771725wrc.10
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 02:08:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=J5tWkOQuIl0OZJOGpfR29lXHqMPLwxRju9KQkuQAZfY=;
-        b=ZLALu2ZGDCxbTc4NJwezL/z/uP2403PMM5OBJiUTNasL1aQiv47ZFhgXewWJZuY+Ix
-         zBd0mCzzuYXKPSa97tjBhinDMc7qEibuOsQVCyiLHJpwIj53R778KlZOXMn0RMFST76S
-         RVHqULsUBMUYy7sih5X9uG92Gdnt9bZHMv5j2u5d7dR6gNTEv3KJXiXLSJjcCXlhawnk
-         IkWz5+2x+yPikT1ISoeU2XU68T1HJVv4sojfYYGl679Du6w+BX0L9milGloKgycVRUUH
-         4E18oy9DoTGRmBa4KI3bKeRVX141bXb3n3lMksaxPGKLfR1wo8ntFiW3oKfjNmQ0hbXB
-         pG6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=J5tWkOQuIl0OZJOGpfR29lXHqMPLwxRju9KQkuQAZfY=;
-        b=jHLlVFETyvmNXTl5ouRGRf2XKW8vzor872n8/YCkQJ1MpmCVYxwsdrUrHiZ00IYYGX
-         E2RQScEcYLp9PWSJZA4lDQlAf0QCCigc7d+3RcC1p5W7w70KLNrs6h/Z9FDI0koNIqVs
-         APAqx5PkGqkLLzGvKV+PIN2MR8Hh9vgP7TCJRc8nDNLTsoaJXliT//vhCa0VaA3bBEjC
-         zb8h8yDuVA/KfDFvZ629xzIgEumrAZOnt7Ad/AiTOLT7JC8O7Z6RctqeEAJxIQCLMMT3
-         10QxdnAyl5XKZz6s+PEky2Cz2PEkO8cz+LpvkQc5NlRcnfwkeUXLscCWHQ6NrMZyR6Yv
-         e4Gg==
-X-Gm-Message-State: AOAM533EypR0KTJG0SfdEvYyZxR1KmujtCYvzN4lFrmuljz1DHEBxraT
-        5w0LXCvK1ldLQll8q1ArUR53y+/OqOgDJ+En8CHpIg==
-X-Google-Smtp-Source: ABdhPJz3bvhG1Ws0mV6RQ8+jCUxY+7BKNPQgG+z2/+EqJb1aEZa43yvjKlXRtHUY0RkWlQH4TuVaxTU3gsalXisBwsw=
-X-Received: by 2002:adf:aa96:: with SMTP id h22mr30612000wrc.405.1634029722328;
- Tue, 12 Oct 2021 02:08:42 -0700 (PDT)
+        id S235783AbhJLJfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 05:35:07 -0400
+Received: from verein.lst.de ([213.95.11.211]:40700 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235771AbhJLJfG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Oct 2021 05:35:06 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1FB2A68BEB; Tue, 12 Oct 2021 11:33:02 +0200 (CEST)
+Date:   Tue, 12 Oct 2021 11:33:01 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 6/5] kyber: avoid q->disk dereferences in trace points
+Message-ID: <20211012093301.GA27795@lst.de>
+References: <20210929071241.934472-1-hch@lst.de>
 MIME-Version: 1.0
-References: <20211012084443.GA31472@kili>
-In-Reply-To: <20211012084443.GA31472@kili>
-From:   Gioh Kim <gi-oh.kim@ionos.com>
-Date:   Tue, 12 Oct 2021 11:08:06 +0200
-Message-ID: <CAJX1Ytb+_dSxk8h2u7JYa0RGuDYe=DEqNCB_Cpxf7d0o9RSAWA@mail.gmail.com>
-Subject: Re: [PATCH] block/rnbd-clt-sysfs: fix a couple uninitialized variable bugs
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210929071241.934472-1-hch@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 12, 2021 at 10:45 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
->
-> These variables are printed on the error path if match_int() fails so
-> they have to be initialized.
->
-> Fixes: 2958a995edc9 ("block/rnbd-clt: Support polling mode for IO latency optimization")
-> Fixes: 1eb54f8f5dd8 ("block/rnbd: client: sysfs interface functions")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->  drivers/block/rnbd/rnbd-clt-sysfs.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-> index 4b93fd83bf79..44e45af00e83 100644
-> --- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-> +++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-> @@ -71,8 +71,10 @@ static int rnbd_clt_parse_map_options(const char *buf, size_t max_path_cnt,
->         int opt_mask = 0;
->         int token;
->         int ret = -EINVAL;
-> -       int i, dest_port, nr_poll_queues;
-> +       int nr_poll_queues = 0;
-> +       int dest_port = 0;
->         int p_cnt = 0;
-> +       int i;
->
->         options = kstrdup(buf, GFP_KERNEL);
->         if (!options)
-> --
-> 2.20.1
->
 
-Thank you.
-Acked-by: Gioh Kim <gi-oh.kim@ionos.com>
+q->disk becomes invalid after the gendisk is removed.  Work around this
+by caching the dev_t for the tracepoints.  The real fix would be to
+properly tear down the I/O schedulers with the gendisk, but that is
+a much more invasive change.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/kyber-iosched.c        | 10 ++++++----
+ include/trace/events/kyber.h | 19 +++++++++----------
+ 2 files changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 15a8be57203d6..a0ffbabfac2c6 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -151,6 +151,7 @@ struct kyber_ctx_queue {
+ 
+ struct kyber_queue_data {
+ 	struct request_queue *q;
++	dev_t dev;
+ 
+ 	/*
+ 	 * Each scheduling domain has a limited number of in-flight requests
+@@ -257,7 +258,7 @@ static int calculate_percentile(struct kyber_queue_data *kqd,
+ 	}
+ 	memset(buckets, 0, sizeof(kqd->latency_buckets[sched_domain][type]));
+ 
+-	trace_kyber_latency(kqd->q, kyber_domain_names[sched_domain],
++	trace_kyber_latency(kqd->dev, kyber_domain_names[sched_domain],
+ 			    kyber_latency_type_names[type], percentile,
+ 			    bucket + 1, 1 << KYBER_LATENCY_SHIFT, samples);
+ 
+@@ -270,7 +271,7 @@ static void kyber_resize_domain(struct kyber_queue_data *kqd,
+ 	depth = clamp(depth, 1U, kyber_depth[sched_domain]);
+ 	if (depth != kqd->domain_tokens[sched_domain].sb.depth) {
+ 		sbitmap_queue_resize(&kqd->domain_tokens[sched_domain], depth);
+-		trace_kyber_adjust(kqd->q, kyber_domain_names[sched_domain],
++		trace_kyber_adjust(kqd->dev, kyber_domain_names[sched_domain],
+ 				   depth);
+ 	}
+ }
+@@ -366,6 +367,7 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
+ 		goto err;
+ 
+ 	kqd->q = q;
++	kqd->dev = disk_devt(q->disk);
+ 
+ 	kqd->cpu_latency = alloc_percpu_gfp(struct kyber_cpu_latency,
+ 					    GFP_KERNEL | __GFP_ZERO);
+@@ -774,7 +776,7 @@ kyber_dispatch_cur_domain(struct kyber_queue_data *kqd,
+ 			list_del_init(&rq->queuelist);
+ 			return rq;
+ 		} else {
+-			trace_kyber_throttled(kqd->q,
++			trace_kyber_throttled(kqd->dev,
+ 					      kyber_domain_names[khd->cur_domain]);
+ 		}
+ 	} else if (sbitmap_any_bit_set(&khd->kcq_map[khd->cur_domain])) {
+@@ -787,7 +789,7 @@ kyber_dispatch_cur_domain(struct kyber_queue_data *kqd,
+ 			list_del_init(&rq->queuelist);
+ 			return rq;
+ 		} else {
+-			trace_kyber_throttled(kqd->q,
++			trace_kyber_throttled(kqd->dev,
+ 					      kyber_domain_names[khd->cur_domain]);
+ 		}
+ 	}
+diff --git a/include/trace/events/kyber.h b/include/trace/events/kyber.h
+index 491098a0d8ed9..bf7533f171ff9 100644
+--- a/include/trace/events/kyber.h
++++ b/include/trace/events/kyber.h
+@@ -13,11 +13,11 @@
+ 
+ TRACE_EVENT(kyber_latency,
+ 
+-	TP_PROTO(struct request_queue *q, const char *domain, const char *type,
++	TP_PROTO(dev_t dev, const char *domain, const char *type,
+ 		 unsigned int percentile, unsigned int numerator,
+ 		 unsigned int denominator, unsigned int samples),
+ 
+-	TP_ARGS(q, domain, type, percentile, numerator, denominator, samples),
++	TP_ARGS(dev, domain, type, percentile, numerator, denominator, samples),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(	dev_t,	dev				)
+@@ -30,7 +30,7 @@ TRACE_EVENT(kyber_latency,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= disk_devt(q->disk);
++		__entry->dev		= dev;
+ 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
+ 		strlcpy(__entry->type, type, sizeof(__entry->type));
+ 		__entry->percentile	= percentile;
+@@ -47,10 +47,9 @@ TRACE_EVENT(kyber_latency,
+ 
+ TRACE_EVENT(kyber_adjust,
+ 
+-	TP_PROTO(struct request_queue *q, const char *domain,
+-		 unsigned int depth),
++	TP_PROTO(dev_t dev, const char *domain, unsigned int depth),
+ 
+-	TP_ARGS(q, domain, depth),
++	TP_ARGS(dev, domain, depth),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(	dev_t,	dev			)
+@@ -59,7 +58,7 @@ TRACE_EVENT(kyber_adjust,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= disk_devt(q->disk);
++		__entry->dev		= dev;
+ 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
+ 		__entry->depth		= depth;
+ 	),
+@@ -71,9 +70,9 @@ TRACE_EVENT(kyber_adjust,
+ 
+ TRACE_EVENT(kyber_throttled,
+ 
+-	TP_PROTO(struct request_queue *q, const char *domain),
++	TP_PROTO(dev_t dev, const char *domain),
+ 
+-	TP_ARGS(q, domain),
++	TP_ARGS(dev, domain),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(	dev_t,	dev			)
+@@ -81,7 +80,7 @@ TRACE_EVENT(kyber_throttled,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= disk_devt(q->disk);
++		__entry->dev		= dev;
+ 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
+ 	),
+ 
+-- 
+2.30.2
+
