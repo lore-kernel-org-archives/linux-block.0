@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE3CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D048DC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:48:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B153A60F23
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:48:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC75060F23
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236004AbhJLKuE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 06:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36832 "EHLO
+        id S235972AbhJLKur (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 06:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235932AbhJLKuD (ORCPT
+        with ESMTP id S235932AbhJLKuq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 06:50:03 -0400
+        Tue, 12 Oct 2021 06:50:46 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C60EC061570
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 03:48:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A37C061570
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 03:48:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=LsAS9Ygj80w363bIN4XwCd/d3GT/58wGpTl7ChHvZ6g=; b=caSIrs8AN+UYNM3ClvNN3OUSvB
-        wgqElAOp16UOY7mCQnVTxb77ouKubSKn6aKwWC33mYSkKyHS/kGuUFbaIR/YqH1DSiLRISDEGSP/G
-        T+FgsmNjQ93z61NZ4nuxSCH5h5FOYz9Flv6STZoeaEw2BtWqqqeG4HxaneuTOVVfzyE5mqm+o8wYZ
-        dfYXJsvstnW6d+Xd6nmnluNrvTJsHxi6hGNOKcv8lIH7lrnqeAR5oupqEVoWFoEgGeEWuNfNBVBsL
-        9QQAN2ulMS8wpWglZtQLdoiuTLJ9fm1MGdrpc8VHUT4czwv0oykLTD2QiaSkvnmXnZ/hkr/3DYwJm
-        8R+F8fRw==;
+        bh=kA+nkXDjDDLRM3jRm6BOmcXzqKWrmN5hncLLaaNmUdg=; b=SyZc4dx65K+T+Zo7bNp4HZSo8h
+        S2FLKLH5T3QrLpcVa3Cm3nuvlMweNA1cQ3tCfFF9nywjKhEUrff+6LqLP1i20xRJFEt7RMYA3yITg
+        ypTnmqMqyaYBGdMfsApliGGxGb0WMCl76UMXLeEUBfq00Jr/3D3nUcKXEPOdT9HVi2zCR75X93p3/
+        +u3rA6UXkhbfcz0fQQo5hsSJbDIqECuIdcxELHwivObEL/kMeaAKuCE7ix22/AW0k+9DuAnHMFsjR
+        sDF8S3SaBlU7PggaMEXg5nYLeIaQosoQhIu5cKpIq49fLGPu6gjTbXxotlZabFxPjsSYnkP7j5V2j
+        P99IfkUg==;
 Received: from [2001:4bb8:199:73c5:f5ed:58c2:719f:d965] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1maFJ4-006QZq-I6; Tue, 12 Oct 2021 10:47:06 +0000
+        id 1maFKC-006QbY-It; Tue, 12 Oct 2021 10:48:10 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 2/3] block: move the *blkdev_ioctl declarations out of blkdev.h
-Date:   Tue, 12 Oct 2021 12:44:49 +0200
-Message-Id: <20211012104450.659013-3-hch@lst.de>
+Subject: [PATCH 3/3] block: merge block_ioctl into blkdev_ioctl
+Date:   Tue, 12 Oct 2021 12:44:50 +0200
+Message-Id: <20211012104450.659013-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211012104450.659013-1-hch@lst.de>
 References: <20211012104450.659013-1-hch@lst.de>
@@ -47,44 +47,97 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These are only used inside of block/.
+Simplify the ioctl path and match the code structure on the compat side.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk.h           | 4 ++++
- include/linux/genhd.h | 4 ----
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ block/blk.h   |  3 +--
+ block/fops.c  | 19 +------------------
+ block/ioctl.c | 18 ++++++++++++++----
+ 3 files changed, 16 insertions(+), 24 deletions(-)
 
 diff --git a/block/blk.h b/block/blk.h
-index 38867b4c5c7ed..bca4ba1a1f8dd 100644
+index bca4ba1a1f8dd..35ca73355f90c 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -403,6 +403,10 @@ static inline void bio_clear_hipri(struct bio *bio)
+@@ -403,8 +403,7 @@ static inline void bio_clear_hipri(struct bio *bio)
  	bio->bi_opf &= ~REQ_HIPRI;
  }
  
-+int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
-+		unsigned long arg);
-+long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
-+
+-int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+-		unsigned long arg);
++long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
+ 
  extern const struct address_space_operations def_blk_aops;
+diff --git a/block/fops.c b/block/fops.c
+index 1e970c247e0eb..7bb9581a146cf 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -461,23 +461,6 @@ static int blkdev_close(struct inode *inode, struct file *filp)
+ 	return 0;
+ }
  
- #endif /* BLK_INTERNAL_H */
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index c1639c16b74c3..082a3e5fd8fa1 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -280,10 +280,6 @@ bool bdev_check_media_change(struct block_device *bdev);
- int __invalidate_device(struct block_device *bdev, bool kill_dirty);
- void set_capacity(struct gendisk *disk, sector_t size);
- 
--/* for drivers/char/raw.c: */
--int blkdev_ioctl(struct block_device *, fmode_t, unsigned, unsigned long);
--long compat_blkdev_ioctl(struct file *, unsigned, unsigned long);
+-static long block_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+-{
+-	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
+-	fmode_t mode = file->f_mode;
 -
- #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
- int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk);
- void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk);
+-	/*
+-	 * O_NDELAY can be altered using fcntl(.., F_SETFL, ..), so we have
+-	 * to updated it before every ioctl.
+-	 */
+-	if (file->f_flags & O_NDELAY)
+-		mode |= FMODE_NDELAY;
+-	else
+-		mode &= ~FMODE_NDELAY;
+-
+-	return blkdev_ioctl(bdev, mode, cmd, arg);
+-}
+-
+ /*
+  * Write data to the block device.  Only intended for the block device itself
+  * and the raw driver which basically is a fake block device.
+@@ -621,7 +604,7 @@ const struct file_operations def_blk_fops = {
+ 	.iopoll		= blkdev_iopoll,
+ 	.mmap		= generic_file_mmap,
+ 	.fsync		= blkdev_fsync,
+-	.unlocked_ioctl	= block_ioctl,
++	.unlocked_ioctl	= blkdev_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= compat_blkdev_ioctl,
+ #endif
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 0f823444cc557..77b1b2453f395 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -538,12 +538,22 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+  *
+  * New commands must be compatible and go into blkdev_common_ioctl
+  */
+-int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+-			unsigned long arg)
++long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ {
+-	int ret;
+-	loff_t size;
++	struct block_device *bdev = I_BDEV(file->f_mapping->host);
+ 	void __user *argp = (void __user *)arg;
++	fmode_t mode = file->f_mode;
++	loff_t size;
++	int ret;
++
++	/*
++	 * O_NDELAY can be altered using fcntl(.., F_SETFL, ..), so we have
++	 * to updated it before every ioctl.
++	 */
++	if (file->f_flags & O_NDELAY)
++		mode |= FMODE_NDELAY;
++	else
++		mode &= ~FMODE_NDELAY;
+ 
+ 	switch (cmd) {
+ 	/* These need separate implementations for the data structure */
 -- 
 2.30.2
 
