@@ -2,86 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB7DC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 16:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB248C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 16:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 198566108F
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 16:45:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84A5260295
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 16:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbhJLQrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 12:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbhJLQrA (ORCPT
+        id S229809AbhJLQwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 12:52:16 -0400
+Received: from mail-pf1-f182.google.com ([209.85.210.182]:34637 "EHLO
+        mail-pf1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229565AbhJLQwP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 12:47:00 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9545CC061570
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 09:44:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=/5uYh4ExOIZhja/8G0h5dj7VL0zcyNA471aQT2/JKso=; b=Mj1H9h83lvDw+KbJx3FLLp0PWi
-        9Yd7tiEVrw9YZ69fH3KF48RaV/G8dfaEYcabcwox6KlyC/H+fwzBE3QhLDTBovihKgbnwmGyYlhR9
-        q+vtajCQEzuEkIi88OPY9NVOfIcUkMg5nbjUFuBUjhAM5kA9XSgVASFxAMe8XyDiYb7ZwqKtQU2DI
-        f2HFLV3dCew1WMq3dGsEhRe2ec4bbrH9r87X/mZr3vmXzMFO+CCE7W2HhU2J1Mksoxe/kDV0Z2IDY
-        mt3QATLdb/BY4hyJFS3VOokbN/dytTajqOH0nCCDpuYRe6JjpXvHRkjt2tBghzWMx3SEksI6xNyUJ
-        g6OzUufg==;
-Received: from [2001:4bb8:199:73c5:f5ed:58c2:719f:d965] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1maKri-006f89-6Y; Tue, 12 Oct 2021 16:43:27 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 5/5] block: pass the start sector to get_max_io_size
-Date:   Tue, 12 Oct 2021 18:36:13 +0200
-Message-Id: <20211012163613.994933-6-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211012163613.994933-1-hch@lst.de>
+        Tue, 12 Oct 2021 12:52:15 -0400
+Received: by mail-pf1-f182.google.com with SMTP id g14so91336pfm.1
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 09:50:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pyFv6DRp7mj/TLzrQIpVommdcoXtzdvra+rup/vPgR4=;
+        b=YuTtsd16Mmc92E8dVHeXdUtp85Fp2KzkODATclVi98JKeLJMEiNQBeTP8kkiVNjhM6
+         JrFiQxcpOvX1OiZ52K/MeMOfnnzlMJmloB/7SlnC1bs+E57z2NZBP8PPuzX8hsraw0fA
+         lsP5HGe/zHYnKK6aZb2gPBZ4z+TVQk3VvI0Rv/KVdhf28t+rm5fQqpvdNjfDAWL1+HcZ
+         Hzt8l8nFQAjaiS4zTYlrNjFpCrT/LxyfXcdS+BkVPuR3d7LIU/tfXMNjB4nMj/k8BfZc
+         TJfikNZAQLF4+WGX4IY2lXHmSN92cfYUNJSVYLTrV86DNDMrbo34LbQKZoczCCR6C0sR
+         LmHg==
+X-Gm-Message-State: AOAM531qf9qPMac1LemuaCTiH7Ys7hgegWmVo7bPIQevJTuKxC3bFZho
+        ESzHexHA+Unv5XZaOJ1TzKE=
+X-Google-Smtp-Source: ABdhPJwTpBGjULlYiKlbOfc5N6o7DtsijNW+l2r5Ip5ZBV/isIjOmuv6AyEfJPmCNZ7NpziTdyvuTA==
+X-Received: by 2002:a05:6a00:26dd:b0:44d:2531:9f46 with SMTP id p29-20020a056a0026dd00b0044d25319f46mr10473312pfw.46.1634057413516;
+        Tue, 12 Oct 2021 09:50:13 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:8c1a:acb2:4eff:5d13])
+        by smtp.gmail.com with ESMTPSA id k22sm3734836pji.2.2021.10.12.09.50.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Oct 2021 09:50:12 -0700 (PDT)
+Subject: Re: [dm-devel] [PATCH 1/5] block: factor out a chunk_size_left helper
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>
 References: <20211012163613.994933-1-hch@lst.de>
+ <20211012163613.994933-2-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <d5273d1f-dbf1-8921-b03d-0f61d08dbfdc@acm.org>
+Date:   Tue, 12 Oct 2021 09:50:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20211012163613.994933-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pass the start sector instead of the whole bio.
+On 10/12/21 9:36 AM, Christoph Hellwig wrote:
+> +/*
+> + * Return how much of the chunk sectors is left to be used for an I/O at the
+> + * given offset.
+> + */
+> +static inline unsigned int chunk_size_left(sector_t offset,
+> +		unsigned int chunk_sectors)
+> +{
+> +	if (unlikely(!is_power_of_2(chunk_sectors)))
+> +		return chunk_sectors - sector_div(offset, chunk_sectors);
+> +	return chunk_sectors - (offset & (chunk_sectors - 1));
+> +}
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-merge.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+No "blk_" prefix for the function name? I think most other functions 
+declared or defined in this header file have such a prefix.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 15b2aef1507e5..b397972b526a0 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -174,12 +174,10 @@ static struct bio *blk_bio_write_same_split(struct request_queue *q,
-  * requests that are submitted to a block device if the start of a bio is not
-  * aligned to a physical block boundary.
-  */
--static inline unsigned get_max_io_size(struct request_queue *q,
--				       struct bio *bio)
-+static inline unsigned get_max_io_size(struct request_queue *q, sector_t sector)
- {
- 	unsigned pbs = queue_physical_block_size(q) >> SECTOR_SHIFT;
- 	unsigned lbs = queue_logical_block_size(q) >> SECTOR_SHIFT;
--	sector_t sector = bio->bi_iter.bi_sector;
- 	unsigned start_offset = sector & (pbs - 1);
- 	unsigned sectors = q->limits.max_sectors;
- 	unsigned max_sectors;
-@@ -287,7 +285,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	struct bio_vec bv, bvprv, *bvprvp = NULL;
- 	struct bvec_iter iter;
- 	unsigned nsegs = 0, sectors = 0;
--	const unsigned max_sectors = get_max_io_size(q, bio);
-+	const unsigned max_sectors = get_max_io_size(q, bio->bi_iter.bi_sector);
- 	const unsigned max_segs = queue_max_segments(q);
- 
- 	bio_for_each_bvec(bv, bio, iter) {
--- 
-2.30.2
+Thanks,
 
+Bart.
