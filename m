@@ -2,60 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB60C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F81C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:30:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4272461076
-	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD64D61108
+	for <linux-block@archiver.kernel.org>; Tue, 12 Oct 2021 10:30:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235437AbhJLKIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 06:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55528 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232699AbhJLKIV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 06:08:21 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7E22C061570;
-        Tue, 12 Oct 2021 03:06:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Tm/SVhWyh0og9kUpE+P54a51MFIH9FnLLFZknRdEFn4=; b=O8UVPi0ygN+0OhAkW4mXfXCVn3
-        c5WWOQuqD5gopWyCpqD80f3NEDSaWSpqcKLBMY09AoSrsvDMaYm4rJGiDyPoa87TO3d7ejwXJrISi
-        TLvVN1SpzNOZ2tprhPq2BP5yo4CVBt2ADh4zy8jt+i4NRQTYdnW7xEJMPi7+5OjfOwO5d6PD347hN
-        0Z7Bs49063KQeAcvzhDd8A+PrX+wajEg2jczTjYhHXCg3GCiZlYG7vVQStA8oisINLFdjASWBnGG7
-        B3018lYsUdH9pfxr6WWEJItOzcve/EWcpgPUWmD+CYmCydlueRjBP0ZQlq5N66dS0LRBnv7HHj0+m
-        H83zP/mQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1maEeP-006Oie-KT; Tue, 12 Oct 2021 10:05:21 +0000
-Date:   Tue, 12 Oct 2021 11:04:49 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH 1/3] block: bump max plugged deferred size from 16 to 32
-Message-ID: <YWVdwWUuzqp7s7FV@infradead.org>
-References: <20211006231330.20268-1-axboe@kernel.dk>
- <20211006231330.20268-2-axboe@kernel.dk>
+        id S235961AbhJLKcR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 06:32:17 -0400
+Received: from verein.lst.de ([213.95.11.211]:40848 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235840AbhJLKcQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Oct 2021 06:32:16 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7315267373; Tue, 12 Oct 2021 12:30:11 +0200 (CEST)
+Date:   Tue, 12 Oct 2021 12:30:10 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH V3 6/6] blk-mq: support concurrent queue
+ quiesce/unquiesce
+Message-ID: <20211012103010.GA29640@lst.de>
+References: <20211009034713.1489183-1-ming.lei@redhat.com> <20211009034713.1489183-7-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211006231330.20268-2-axboe@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20211009034713.1489183-7-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 06, 2021 at 05:13:28PM -0600, Jens Axboe wrote:
-> Particularly for NVMe with efficient deferred submission for many
-> requests, there are nice benefits to be seen by bumping the default max
-> plug count from 16 to 32. This is especially true for virtualized setups,
-> where the submit part is more expensive. But can be noticed even on
-> native hardware.
+On Sat, Oct 09, 2021 at 11:47:13AM +0800, Ming Lei wrote:
+> +	spin_lock_irqsave(&q->queue_lock, flags);
+> +	if (!q->quiesce_depth++)
+> +		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
 
-It might be worth to throw in a comment how ths value was chosen.
+We can get rid of the QUEUE_FLAG_QUIESCED flag now and just look
+at ->quiesce_depth directly.
 
-Otherwise this looks good:
+> +	spin_lock_irqsave(&q->queue_lock, flags);
+> +	WARN_ON_ONCE(q->quiesce_depth <= 0);
+> +	if (q->quiesce_depth > 0 && !--q->quiesce_depth) {
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+	if (WARN_ON_ONCE(q->quiesce_depth <= 0))
+		; /* oops */
+	else if (!--q->quiesce_depth)
+		run_queue = true;
+
+Otherwise this looks sensible.
