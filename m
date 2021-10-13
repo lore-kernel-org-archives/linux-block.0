@@ -2,164 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B44F6C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 15:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4BEC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 15:04:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D83E60F21
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 15:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D1A360F21
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 15:04:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237036AbhJMPGm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 11:06:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47355 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236315AbhJMPGl (ORCPT
+        id S237143AbhJMPGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 11:06:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237145AbhJMPGp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 11:06:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634137478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=d+mcxn9Yq7uI+Viy+K4BQvLPxElVK5331udxqYrTR1s=;
-        b=HGBEVqk9Fi8SItaH0I5jBlgPDGIEKXn3Rgivklx+csfSYBVC1GZMX5nLbW6s/UR+upqkkb
-        bfqkZ3QTNPQb69iM/q16/GH/tCpciv/sSr4BXk5p2o9JNEkMTxu9lWYHpBNNgP6DL8s8kD
-        AXyoikJH/Xe0pwqsULeup213SlhxNIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-yR6kJGqXNkKhVj3G7P5dzg-1; Wed, 13 Oct 2021 11:04:34 -0400
-X-MC-Unique: yR6kJGqXNkKhVj3G7P5dzg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EDE0802CB8;
-        Wed, 13 Oct 2021 15:04:31 +0000 (UTC)
-Received: from T590 (ovpn-8-39.pek2.redhat.com [10.72.8.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AAC357CB9;
-        Wed, 13 Oct 2021 15:04:12 +0000 (UTC)
-Date:   Wed, 13 Oct 2021 23:04:07 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Miroslav Benes <mbenes@suse.cz>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com
-Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YWb1Z7EXruo6gaEp@T590>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-10-mcgrof@kernel.org>
- <YVwZwh7qDKfSM59h@T590>
- <YWSr2trabEJflzlj@bombadil.infradead.org>
- <YWTU3kTlJKONyFjZ@T590>
- <YWX7pAn0YMaJeJBA@bombadil.infradead.org>
- <YWYxN875B6rlmAjC@T590>
- <YWbSk6p3bfXUPZ92@bombadil.infradead.org>
+        Wed, 13 Oct 2021 11:06:45 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDE35C061749
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 08:04:41 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id j8so3056331ila.11
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 08:04:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=w2jgNNc357e8RqjPllKDcjNosbT6cGqclg0KFwnLUY0=;
+        b=02sKR+wgW/K2ZEq9riQYkQBuWo7fCRlOpjrUziTzFmezbuDBI3UM12KsGeJm2U3ACC
+         sjrJaxDfuqQvcwIKJeD7fMMgtajtQWhGdw+3KXgVzZETDlfQFu0J7OFYm/o5In6+I/zm
+         E6Prfp5un9Iw3mA5uIa+uHayISAPzXlGi6d+wb3TZCn/tJR1oQYb3fmmx1+DFgBUgl8T
+         uIV6WnrlhzAKExDuagJK68JZv32Icn/MLM1Z91dFaQAvJKeVbbJBRzw1YHmFLu+Bk3hL
+         T61MNy6EWUZN/dzHWHN8z0Uyf+bsC3FxTmgjrC24lJqBo7jEm7mS2LHT0E/rUWpS9tJJ
+         tk9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=w2jgNNc357e8RqjPllKDcjNosbT6cGqclg0KFwnLUY0=;
+        b=qRt6YyBP5q4Cvqb5OZJi/R2K5TAji+Ft612fwELpGHTKAOajXaDNp7HbRMJLyE+c0b
+         XVDe7CGo7uKNvswp5gmVH4l4nbizTN3Y0AYbmZLQKvlw8dAhHegq6Rvj8arTJ6Tlrb09
+         8T9m2cJ+wtl4q/J6gZEq4eJFsjJ4Hs/M4Pgf9AMdfH2K4/dCk4g6az5oREcWAw40VJOl
+         sQIhgcMJ6DnfNpsVynn2+X/jgoN52zY0jZ4JncFpzPEM3VUJggIxXxOM+/l3Iwzv0x4/
+         45r75SlynK8KWD7FphyoLJXqMNRkPtEgE3gQovZxlUktFcjrhbh8418pvp4MkY1d6tZ1
+         y0EQ==
+X-Gm-Message-State: AOAM530nkuWfB490r2U2mXqRD4WqNSNxS9eZkJOlPuZ4usFshb844Rme
+        HxXBcy0qZG0T5wIcvME4aVHTVnmK7p6TxQ==
+X-Google-Smtp-Source: ABdhPJytNrGVe3HWp9npn2OZmD2EhOqPh92mhIEmyhLx/eiqJxESPTctr9COlhruT0qKYCze55jzyw==
+X-Received: by 2002:a92:cf06:: with SMTP id c6mr1411ilo.177.1634137480797;
+        Wed, 13 Oct 2021 08:04:40 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id g3sm7103208ile.61.2021.10.13.08.04.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Oct 2021 08:04:40 -0700 (PDT)
+Subject: Re: [PATCH 9/9] nvme: wire up completion batching for the IRQ path
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org
+References: <20211012181742.672391-1-axboe@kernel.dk>
+ <20211012181742.672391-10-axboe@kernel.dk> <YWaG2c9IAm1y3275@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f0992fda-e1ec-9751-5d2c-90d7c0ae013f@kernel.dk>
+Date:   Wed, 13 Oct 2021 09:04:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YWbSk6p3bfXUPZ92@bombadil.infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <YWaG2c9IAm1y3275@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 05:35:31AM -0700, Luis Chamberlain wrote:
-> On Wed, Oct 13, 2021 at 09:07:03AM +0800, Ming Lei wrote:
-> > On Tue, Oct 12, 2021 at 02:18:28PM -0700, Luis Chamberlain wrote:
-> > > > Looks test_sysfs isn't in linus tree, where can I find it?
-> > > 
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210927-sysfs-generic-deadlock-fix
-> > > 
-> > > To reproduce the deadlock revert the patch in this thread and then run
-> > > either of these two tests as root:
-> > > 
-> > > ./tools/testing/selftests/sysfs/sysfs.sh -w 0027
-> > > ./tools/testing/selftests/sysfs/sysfs.sh -w 0028
-> > > 
-> > > You will need to enable the test_sysfs driver.
-> > > > Can you share the code which waits for the sysfs / kernfs files to be
-> > > > stop being used?
-> > > 
-> > > How about a call trace of the two tasks which deadlock, here is one of
-> > > running test 0027:
-> > > 
-> > > kdevops login: [  363.875459] INFO: task sysfs.sh:1271 blocked for more
-> > > than 120 seconds.
+On 10/13/21 1:12 AM, Christoph Hellwig wrote:
+> On Tue, Oct 12, 2021 at 12:17:42PM -0600, Jens Axboe wrote:
+>> Trivial to do now, just need our own io_batch on the stack and pass that
+>> in to the usual command completion handling.
+>>
+>> I pondered making this dependent on how many entries we had to process,
+>> but even for a single entry there's no discernable difference in
+>> performance or latency. Running a sync workload over io_uring:
+>>
+>> t/io_uring -b512 -d1 -s1 -c1 -p0 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
+>>
+>> yields the below performance before the patch:
+>>
+>> IOPS=254820, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
+>> IOPS=251174, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+>> IOPS=250806, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+>>
+>> and the following after:
+>>
+>> IOPS=255972, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
+>> IOPS=251920, BW=123MiB/s, IOS/call=1/1, inflight=(1 1)
+>> IOPS=251794, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+>>
+>> which definitely isn't slower, about the same if you factor in a bit of
+>> variance. For peak performance workloads, benchmarking shows a 2%
+>> improvement.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  drivers/nvme/host/pci.c | 9 +++++++--
+>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+>> index 4713da708cd4..fb3de6f68eb1 100644
+>> --- a/drivers/nvme/host/pci.c
+>> +++ b/drivers/nvme/host/pci.c
+>> @@ -1076,8 +1076,10 @@ static inline void nvme_update_cq_head(struct nvme_queue *nvmeq)
+>>  
+>>  static inline int nvme_process_cq(struct nvme_queue *nvmeq)
+>>  {
+>> +	struct io_batch ib;
+>>  	int found = 0;
+>>  
+>> +	ib.req_list = NULL;
 > 
-> <-- snip -->
+> Is this really more efficient than
 > 
-> > That doesn't show the deadlock is related with module_exit().
-> 
-> Not directly no.
+> 	struct io_batch ib = { };
 
-Then the patch title of 'sysfs: fix deadlock race with module removal'
-is wrong.
+Probably not. I could add a DEFINE_IO_BATCH() helper, would make it easier if
+other kinds of init is ever needed.
 
-> 
-> > It is clearly one AA deadlock, what I meant was that it isn't related with
-> > module exit cause lock & device_del() isn't always done in module exit, so
-> > I doubt your fix with grabbing module refcnt is good or generic enough.
-> 
-> A device_del() *can* happen in other areas other than module exit sure,
-> but the issue is if a shared lock is used *before* device_del() and also
-> used on a sysfs op. Typically this can happen on module exit, and the
-> other common use case in my experience is on sysfs ops, such is the case
-> with the zram driver. Both cases are covered then by this fix.
-
-Again, can you share the related zram code about the issue? In
-zram_drv.c of linus or next tree, I don't see any lock is held before
-calling del_gendisk().
-
-> 
-> If there are other areas, that is still driver specific, but of the
-> things we *can* generalize, definitely module exit is a common path.
-> 
-> > Except for your cooked test_sys module, how many real drivers do suffer the
-> > problem? What are they?
-> 
-> I only really seriously considered trying to generalize this after it
-
-IMO your generalization isn't good or correct because this kind of issue
-is _not_ related with module exit at all. What matters is just that one lock is
-held before calling device_del(), meantime the same lock is required
-in the device's attribute show/store function().
-
-There are many cases in which we call device_del() not from module_exit(),
-such as scsi scan, scsi sysfs store(), or even handling event from
-device side, nvme error handling, usb hotplug, ...
-
-> was hinted to me live patching was also affected, and so clearly
-> something generic was desirable.
-
-It might be just the only two drivers(zram and live patch) with this bug, and
-it is one simply AA bug in driver. Not mention I don't see such usage in
-zram_drv.c.
-
-> 
-> There may be other drivers for sure, but a hunt for that with semantics
-> would require a bit complex coccinelle patch with iteration support.
-> 
-> > Why can't we fix the exact driver?
-> 
-> You can try, the way the lock is used in zram is correct, specially
-
-What is the lock in zram? Again can you share the related functions?
-
-> after my other fix in this series which addresses another unrelated bug
-> with cpu hotplug multistate support. So we then can proceed to either
-> take the position to say: "Thou shalt not use a shared lock on module
-> exit and a sysfs op" and try to fix all places, or we generalize a fix
-> for this. A generic fix seems more desirable.
-
-What matters is that the lock is held before calling device_del()
-instead of being held in module_exit().
-
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
