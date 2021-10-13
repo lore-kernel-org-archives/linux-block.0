@@ -2,100 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D874C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB13C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 877C5610C9
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:16:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6405D60ED4
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:22:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbhJMJSW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 05:18:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33484 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230045AbhJMJSW (ORCPT
+        id S239075AbhJMJY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 05:24:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55933 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230150AbhJMJY5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 05:18:22 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07768C061570;
-        Wed, 13 Oct 2021 02:16:19 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id k7so5876700wrd.13;
-        Wed, 13 Oct 2021 02:16:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=zyEmz/tB0Rrdz8IwvSoIaxMjG4aLpVCV8hROcWXqRMk=;
-        b=F6rCYzxaQTTyTOj6ZsMzyD9QZkWGNPI8jg2TFOpxZ6Zyk8gyCFQrYq+u1Qr3hqLw10
-         uMDZytBQ4Sw2JrreurmbF4HquFjWcx3Lc4g87eeZx22BkP8oKSMa1WgDvQvpQY1UeUMW
-         VjQNnYxtIXj40FLdFlu3JaR23UQpMnsBzK6vYDQLkfbkrwOgHS2XvkJk5aS/1IIl/rEb
-         JnKEemZlTnSrBwTLhIP+MhgdLUfxZfJf9HYLuYTZr51H5kEOclCd4Rk/URid+2Sbx6J5
-         svC2cHhJ6pwfL9ngVL4kAR6a2BlCtjG27eBpoVIGOrhKYszPGKtF6M5P+R2jwMqLjlkY
-         TkgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=zyEmz/tB0Rrdz8IwvSoIaxMjG4aLpVCV8hROcWXqRMk=;
-        b=aDnFkmfj7ulVNYIpOebCvv9Y7Gdv1+P+CETOO0pGCfBG8uxfQOXvnVedhwKleF0WDV
-         Sf6drq/ip63qpx9zZg5YKRSNlltT/4X/H60TwKaX6vdsVPpJZgl0cmq0FFxFmvRRG6kY
-         Sa4LOKwtaBCpkWs9+iPnSWk+RhAvf2NYx6yRMe47jiEIlnIqLF2NmpCmnsHXbsJr4V5S
-         sDX7j+ILdOKCTEcJ4EUGGJNR0pWoAEHENYO4FYJqYRCnzToEGlnS5uDz/bAPUfFoX2T/
-         CeEZeAYmGr/Gls1owY4SRzlEcejX4OW1LBE10L1rfGoT0L1bpGR1yV3njEJ9KGRBPpVS
-         twHg==
-X-Gm-Message-State: AOAM532UYhg/Jx0ScWd00/bCmEocLsCRWnYnjGX7/HzeDz295ekcRSVF
-        9Z/ea/sPSMYqNcBYVQouvuY=
-X-Google-Smtp-Source: ABdhPJwGRaxSvIX5NpEHodd5tbp9peXVTaepz5YYcWXmrqI73fH1uiFPuaCmA/7KHvwLTV3vJqKC4Q==
-X-Received: by 2002:a5d:47ae:: with SMTP id 14mr4043351wrb.120.1634116577652;
-        Wed, 13 Oct 2021 02:16:17 -0700 (PDT)
-Received: from [192.168.8.197] ([185.69.145.208])
-        by smtp.gmail.com with ESMTPSA id z2sm11824327wrh.44.2021.10.13.02.16.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Oct 2021 02:16:17 -0700 (PDT)
-Message-ID: <e52033e5-bff6-c2a3-9e23-ccfa505b064d@gmail.com>
-Date:   Wed, 13 Oct 2021 10:15:37 +0100
+        Wed, 13 Oct 2021 05:24:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634116973;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jWnFrkPl/HQNKGbEFFdCtAjAbrQ0f0wfX+pKKqhAWSU=;
+        b=aQuS4SnYdXl85kxRQ0cmDIQzW67msxsxCpouMOtoGJ48bsgEplbgzP0aEi4AZM4CZ9jn6D
+        y9hFLis4zaxYj/qcc8ra75ahw6HfcBSOz/rTD4nwCy1nw2n2EYnguU3Ze/eD2T70aaBRlb
+        5izYTbLVbBzyC9Fa2hI4SRuJG355VCo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-n_8-IG_fM_uOmtY2wl_brw-1; Wed, 13 Oct 2021 05:22:52 -0400
+X-MC-Unique: n_8-IG_fM_uOmtY2wl_brw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22CBF5074C;
+        Wed, 13 Oct 2021 09:22:51 +0000 (UTC)
+Received: from T590 (ovpn-8-39.pek2.redhat.com [10.72.8.39])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 782BE22713;
+        Wed, 13 Oct 2021 09:22:47 +0000 (UTC)
+Date:   Wed, 13 Oct 2021 17:22:42 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kashyap.desai@broadcom.com,
+        hare@suse.de
+Subject: Re: [PATCH] blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
+Message-ID: <YWalYoOZmpkmAZNK@T590>
+References: <1634114459-143003-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.2
-Subject: Re: [PATCH v2 0/3] on top of for-5.16/block
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@infradead.org>
-References: <cover.1634115360.git.asml.silence@gmail.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <cover.1634115360.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1634114459-143003-1-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/13/21 09:57, Pavel Begunkov wrote:
+On Wed, Oct 13, 2021 at 04:40:59PM +0800, John Garry wrote:
+> Since it is now possible for a tagset to share a single set of tags, the
+> iter function should not re-iter the tags for the count of #hw queues in
+> that case. Rather it should just iter once.
+> 
+> Fixes: e0fdf846c7bb ("blk-mq: Use shared tags for shared sbitmap support")
+> Reported-by: Kashyap Desai <kashyap.desai@broadcom.com>
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 72a2724a4eee..c943b6529619 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -378,9 +378,12 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+>  void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+>  		busy_tag_iter_fn *fn, void *priv)
+>  {
+> -	int i;
+> +	unsigned int flags = tagset->flags;
+> +	int i, nr_tags;
+> +
+> +	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
+>  
+> -	for (i = 0; i < tagset->nr_hw_queues; i++) {
+> +	for (i = 0; i < nr_tags; i++) {
+>  		if (tagset->tags && tagset->tags[i])
+>  			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+>  					      BT_TAG_ITER_STARTED);
 
-Bodged subject, should've been block optimisation or so.
+blk_mq_queue_tag_busy_iter() needn't such change?
 
-> ./io_uring -d32 -s32 -c32 -b512 -p1 /dev/nullb0
-> ~3.3 MIOPS vs 3.5 MIOPS, so gives around extra ~4-5%.
-> 
-> The main part is caching struct block_device + some inlining.
-> 
-> v2: without applied patches, merge previous 6/6 into the second patch
->      get rid of helpers (Jens, Christoph)
->      kill bdev_inode and move inode into bdev (Christoph)
-> 
-> Pavel Begunkov (3):
->    block: cache bdev in struct file for raw bdev IO
->    block: don't hide inode from block_device users
->    blk-mq: optimise *end_request non-stat path
-> 
->   block/bdev.c              | 44 ++++++++++-----------------------------
->   block/blk-mq.c            | 18 +++++++---------
->   block/fops.c              | 43 ++++++++++++++++----------------------
->   include/linux/blk_types.h |  1 +
->   include/linux/blkdev.h    |  8 +++++--
->   5 files changed, 44 insertions(+), 70 deletions(-)
-> 
 
--- 
-Pavel Begunkov
+Thanks,
+Ming
+
