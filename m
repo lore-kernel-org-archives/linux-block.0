@@ -2,109 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E4FC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F20C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:10:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5127C60E05
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:06:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58CAC610FE
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238644AbhJMJIf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 05:08:35 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3974 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229987AbhJMJIe (ORCPT
+        id S239006AbhJMJMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 05:12:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60298 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238986AbhJMJMM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 05:08:34 -0400
-Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HTml23zrvz6H6yb;
-        Wed, 13 Oct 2021 17:02:38 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Wed, 13 Oct 2021 11:06:29 +0200
-Received: from [10.47.95.55] (10.47.95.55) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.8; Wed, 13 Oct
- 2021 10:06:28 +0100
-Subject: Re: [PATCH 6/9] nvme: add support for batched completion of polled IO
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20211012181742.672391-1-axboe@kernel.dk>
- <20211012181742.672391-7-axboe@kernel.dk>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <659e549a-db56-ecae-35a3-2f6203dc3a28@huawei.com>
-Date:   Wed, 13 Oct 2021 10:09:34 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Wed, 13 Oct 2021 05:12:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF86C061570
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 02:10:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jhDHaTzSK9KQOEMInSsXneLpEtrDxAhCmbDe22iRirg=; b=ilZqHN670JySAZmSriiA+vwbSL
+        lmzAZ9M8xYEEbFghBmWhdXn0tdA4LpDzEtVh+dZrPRiyUlOZu7DRoRKDMZnnNLseKeyKh1c5fONzC
+        3oWYkqZGJAaSVB1YPt70LLLjcLsKnvyHNfXXllrn1usgmS9IKvAp+8/5u+tuxZVkCColMPv/pfTE6
+        S5/L9qN0Tys/ZAsj+fh/rLS37re/mt72k9ro/db3QY34Mtht+mG8dBLcQsZOeNxWNKcOaF7R++Q1/
+        RHMd0HdIdAPS7YN3gcWR//HY+EHwFBOufcyFgVLgYpgAUOCJJxNPY/+fFDyWC5b3yleyMnkbyDoUE
+        7eTjIkzA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1maaFy-007HmI-Nl; Wed, 13 Oct 2021 09:09:23 +0000
+Date:   Wed, 13 Oct 2021 10:09:02 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Subject: Re: kernel NULL pointer triggered with blktests block/025 on latest
+ linux-block/for-next
+Message-ID: <YWaiLsQkwe9aq8pE@infradead.org>
+References: <CAHj4cs8poXTLdC+j6u7zypLKR7RpAaG-vxK4dWDz6bCMfPOjsQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20211012181742.672391-7-axboe@kernel.dk>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.95.55]
-X-ClientProxiedBy: lhreml703-chm.china.huawei.com (10.201.108.52) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHj4cs8poXTLdC+j6u7zypLKR7RpAaG-vxK4dWDz6bCMfPOjsQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/10/2021 19:17, Jens Axboe wrote:
-> Signed-off-by: Jens Axboe<axboe@kernel.dk>
-> ---
->   drivers/nvme/host/pci.c | 69 +++++++++++++++++++++++++++++++++++++----
->   1 file changed, 63 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 4ad63bb9f415..4713da708cd4 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -959,7 +959,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
->   	return ret;
->   }
->   
-> -static void nvme_pci_complete_rq(struct request *req)
-> +static void nvme_pci_unmap_rq(struct request *req)
->   {
->   	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
->   	struct nvme_dev *dev = iod->nvmeq->dev;
-> @@ -969,9 +969,34 @@ static void nvme_pci_complete_rq(struct request *req)
->   			       rq_integrity_vec(req)->bv_len, rq_data_dir(req));
->   	if (blk_rq_nr_phys_segments(req))
->   		nvme_unmap_data(dev, req);
-> +}
-> +
-> +static void nvme_pci_complete_rq(struct request *req)
-> +{
-> +	nvme_pci_unmap_rq(req);
->   	nvme_complete_rq(req);
->   }
->   
-> +static void nvme_pci_complete_batch(struct io_batch *ib)
-> +{
-> +	struct request *req;
-> +
-> +	req = ib->req_list;
-> +	while (req) {
-> +		nvme_pci_unmap_rq(req);
+On Wed, Oct 13, 2021 at 04:50:13PM +0800, Yi Zhang wrote:
+> Hello
+> The below NULL pointer issue was triggered on the latest
+> linux-block/for-next with blktests, is it one known issue?
 
-This will do the DMA SG unmap per request. Often this is a performance 
-bottle neck when we have an IOMMU enabled in strict mode. So since we 
-complete in batches, could we combine all the SGs in the batch to do one 
-big DMA unmap SG, and not one-by-one?
+Please try this patchset:
 
-Just a thought.
-
-> +		if (req->rq_flags & RQF_SPECIAL_PAYLOAD)
-> +			nvme_cleanup_cmd(req);
-> +		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> +				req_op(req) == REQ_OP_ZONE_APPEND)
-> +			req->__sector = nvme_lba_to_sect(req->q->queuedata,
-> +					le64_to_cpu(nvme_req(req)->result.u64));
-> +		req->status = nvme_error_status(nvme_req(req)->status);
-> +		req = req->rq_next;
-> +	}
-> +
-> +	blk_mq_end_request_batch(ib);
-> +}
-
+https://lore.kernel.org/linux-block/20210929071241.934472-1-hch@lst.de/T/#m6591be7882bf30f3538a8baafbac1712f0763ebb
