@@ -2,177 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF9BC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE01C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:58:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8527760235
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4465761027
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:58:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238101AbhJMGlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 02:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53452 "EHLO
+        id S229819AbhJMHAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 03:00:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238111AbhJMGla (ORCPT
+        with ESMTP id S229818AbhJMHAM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 02:41:30 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D352C061762
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:39:27 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id w14so1138378pll.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:39:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DD/2eDntZRvmYFLabpX6hx1U0eeFdg0nt6CnyRZUcUo=;
-        b=BK3/LJ89flw5mVlU3UcEyxJ6LbnnmcNslFQOP5bfSd/QHd96C82eb1OGM/6y9E9tVZ
-         +RxJ42PRvcA8OnuNTe7jWQrLB4kIfwLscnkVOAeCEBYDFaLLczsrzmikDhrnLSmHevHI
-         DJYQS0KGPHFoIgmlnCi12Zqd0uHHCS6ptE1xE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DD/2eDntZRvmYFLabpX6hx1U0eeFdg0nt6CnyRZUcUo=;
-        b=DBs1tacGpfOTw3d7RNuFhO3dOuAlpg9vZJ8XkVA07PmJAsMW6bIV/uLa7z5JE9TleE
-         h8UBshmF1OrN/mLYVdrPQAS/1OIhAWvM4aRC84Y6zxiPpRm3HBvQ9BbMMa2RHbXUQZlF
-         dIiEZY8NUDfiooyQk3HBye1ZfP+ZrbV84TtXyA3pv4az2VbjzR5t5W5j20UycxF8xvtC
-         R6971jIhV8Vy5nSdems/4oC3EuuXkteJrO9slfdXJgGWt5w+sp4EXjw5Deiug1WLhiha
-         2nQZ1bG2ckMQig/Dub0ChjL6cqWhHz6BLkuxAuGiDalzuLDj6zFgAImonFoAhmb8h7vy
-         7jDw==
-X-Gm-Message-State: AOAM533NWxWQd9lfC80v/LdrGd0sgQ78A1ZEU6WSnbCQSaHpGvXgRqm+
-        u4WYrn7/rFHsiPHN3stwUL9ZXg==
-X-Google-Smtp-Source: ABdhPJz6dN+fakHkI4mmw5FMrWYwE5jr866artFMUIcBHqytxUEdEx+T1ampoWpSo+mgvVckvfVoUQ==
-X-Received: by 2002:a17:90b:4b4f:: with SMTP id mi15mr808506pjb.97.1634107166729;
-        Tue, 12 Oct 2021 23:39:26 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id y17sm9562796pfn.96.2021.10.12.23.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 23:39:26 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 23:39:25 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
-        David Sterba <dsterba@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
-        linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
-        reiserfs-devel@vger.kernel.org
-Subject: Re: don't use ->bd_inode to access the block device size
-Message-ID: <202110122335.19348E8E8@keescook>
-References: <20211013051042.1065752-1-hch@lst.de>
+        Wed, 13 Oct 2021 03:00:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A49E1C061570
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=6XBrGyfLCtOvf42dvPkBd38w5ZcZ/QL5CHQHSIDzL5w=; b=aXmVjKqdmVH4Guug9I2d4YepTQ
+        ajHfevgjJqayh32OOaORhpGBwFN05XuL3bh4qCROeZoTOv2vVMFdZHuvZtCaQvRk5vBpSMC+FiXej
+        959l+Ki1aMJKC7ywdzVh/4z3NQSrPSdkiALtzBaYaaTwxU1VKXPeW5WEKNIeYfYz4Z6DiP2ZlJF27
+        zmagiupMSohLF8SXUvCUq8fQgb3JVW2myD3OKPAeeq3N4dTPit4fDWhonxI12vfUWcaxLd+RMIlSg
+        nNLXZsDD3tSVjWdsAYJ8ywRKguIYl2g4ZcHu/WR6oLP/VAmbdVd+T5zs5YKV3OBj6q/nQUctW+D+d
+        53lFXXKw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1maYCI-007CNT-O4; Wed, 13 Oct 2021 06:57:29 +0000
+Date:   Wed, 13 Oct 2021 07:57:06 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 5/9] nvme: move the fast path nvme error and disposition
+ helpers
+Message-ID: <YWaDQiwoo/vjNXxZ@infradead.org>
+References: <20211012181742.672391-1-axboe@kernel.dk>
+ <20211012181742.672391-6-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211013051042.1065752-1-hch@lst.de>
+In-Reply-To: <20211012181742.672391-6-axboe@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 07:10:13AM +0200, Christoph Hellwig wrote:
-> I wondered about adding a helper for looking at the size in byte units
-> to avoid the SECTOR_SHIFT shifts in various places.  But given that
-> I could not come up with a good name and block devices fundamentally
-> work in sector size granularity I decided against that.
+Please Cc the nvme list for nvme changes.
 
-Without something like bdev_nr_bytes(), this series has 13 of 29 patches
-actually _adding_ an open-coded calculation:
+> -static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
+> -{
+> -	if (likely(nvme_req(req)->status == 0))
+> -		return COMPLETE;
 
-[PATCH 05/29] mtd/block2mtd: use bdev_nr_sectors instead of open coding it
-[PATCH 06/29] nvmet: use bdev_nr_sectors instead of open coding it
-[PATCH 07/29] target/iblock: use bdev_nr_sectors instead of open coding it
-[PATCH 08/29] fs: use bdev_nr_sectors instead of open coding it in blkdev_max_block
-[PATCH 11/29] btrfs: use bdev_nr_sectors instead of open coding it
-[PATCH 16/29] jfs: use bdev_nr_sectors instead of open coding it
-[PATCH 17/29] nfs/blocklayout: use bdev_nr_sectors instead of open coding it
-[PATCH 18/29] nilfs2: use bdev_nr_sectors instead of open coding it
-[PATCH 19/29] ntfs3: use bdev_nr_sectors instead of open coding it
-[PATCH 20/29] pstore/blk: use bdev_nr_sectors instead of open coding it
-[PATCH 21/29] reiserfs: use bdev_nr_sectors instead of open coding it
-[PATCH 22/29] squashfs: use bdev_nr_sectors instead of open coding it
-[PATCH 23/29] block: use bdev_nr_sectors instead of open coding it in blkdev_fallocate
-
-I think it's well worth having that helper (or at least leaving these
-alone). Otherwise, this is a lot of churn without a clear net benefit,
-IMO.
-
-The others look good to me, though!
-
--Kees
-
->
-> Diffstat:
->  block/fops.c                        |    2 +-
->  drivers/block/drbd/drbd_int.h       |    3 +--
->  drivers/md/bcache/super.c           |    2 +-
->  drivers/md/bcache/util.h            |    4 ----
->  drivers/md/bcache/writeback.c       |    2 +-
->  drivers/md/dm-bufio.c               |    2 +-
->  drivers/md/dm-cache-metadata.c      |    2 +-
->  drivers/md/dm-cache-target.c        |    2 +-
->  drivers/md/dm-clone-target.c        |    2 +-
->  drivers/md/dm-dust.c                |    5 ++---
->  drivers/md/dm-ebs-target.c          |    2 +-
->  drivers/md/dm-era-target.c          |    2 +-
->  drivers/md/dm-exception-store.h     |    2 +-
->  drivers/md/dm-flakey.c              |    3 +--
->  drivers/md/dm-integrity.c           |    6 +++---
->  drivers/md/dm-linear.c              |    3 +--
->  drivers/md/dm-log-writes.c          |    4 ++--
->  drivers/md/dm-log.c                 |    2 +-
->  drivers/md/dm-mpath.c               |    2 +-
->  drivers/md/dm-raid.c                |    6 +++---
->  drivers/md/dm-switch.c              |    2 +-
->  drivers/md/dm-table.c               |    3 +--
->  drivers/md/dm-thin-metadata.c       |    2 +-
->  drivers/md/dm-thin.c                |    2 +-
->  drivers/md/dm-verity-target.c       |    3 +--
->  drivers/md/dm-writecache.c          |    2 +-
->  drivers/md/dm-zoned-target.c        |    2 +-
->  drivers/md/md.c                     |   26 +++++++++++---------------
->  drivers/mtd/devices/block2mtd.c     |    5 +++--
->  drivers/nvme/target/io-cmd-bdev.c   |    4 ++--
->  drivers/target/target_core_iblock.c |    5 +++--
->  fs/affs/super.c                     |    2 +-
->  fs/btrfs/dev-replace.c              |    2 +-
->  fs/btrfs/disk-io.c                  |    3 ++-
->  fs/btrfs/ioctl.c                    |    4 ++--
->  fs/btrfs/volumes.c                  |    7 ++++---
->  fs/buffer.c                         |    4 ++--
->  fs/cramfs/inode.c                   |    2 +-
->  fs/ext4/super.c                     |    2 +-
->  fs/fat/inode.c                      |    5 +----
->  fs/hfs/mdb.c                        |    2 +-
->  fs/hfsplus/wrapper.c                |    2 +-
->  fs/jfs/resize.c                     |    5 ++---
->  fs/jfs/super.c                      |    5 ++---
->  fs/nfs/blocklayout/dev.c            |    4 ++--
->  fs/nilfs2/ioctl.c                   |    2 +-
->  fs/nilfs2/super.c                   |    2 +-
->  fs/nilfs2/the_nilfs.c               |    3 ++-
->  fs/ntfs/super.c                     |    8 +++-----
->  fs/ntfs3/super.c                    |    3 +--
->  fs/pstore/blk.c                     |    4 ++--
->  fs/reiserfs/super.c                 |    7 ++-----
->  fs/squashfs/super.c                 |    5 +++--
->  fs/udf/lowlevel.c                   |    5 ++---
->  fs/udf/super.c                      |    9 +++------
->  include/linux/genhd.h               |    6 ++++++
->  56 files changed, 100 insertions(+), 117 deletions(-)
-
---
-Kees Cook
+I think the only part here that needs to be inline is this check.
+The rest is all slow path error handling.
