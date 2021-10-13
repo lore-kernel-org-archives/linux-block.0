@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3284C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D41C0C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:30:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A395461039
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:29:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1B4161039
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238003AbhJMGbo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 02:31:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51094 "EHLO
+        id S237967AbhJMGcs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 02:32:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbhJMGbn (ORCPT
+        with ESMTP id S237914AbhJMGcr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 02:31:43 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBD8DC061570
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:29:40 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id v20so1107343plo.7
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:29:40 -0700 (PDT)
+        Wed, 13 Oct 2021 02:32:47 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C82C061765
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:30:44 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id q19so1563957pfl.4
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:30:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=W+Po2ncML0dagir1ZXD2ovXOKvk/W+c/3o5vm+NA9cQ=;
-        b=QomLyJ/uwXmEgOIdGiIKpgwe7fIN3sqRRqysUR703Xs3YgTlXaMfe2P+HII9dJHv27
-         pe85K+wWKdH0PewpBtncrX+pK9/vv2ewnDdpNrXhC91Xk/Ncvs9CyiBnb8qEmm15S3FV
-         6BEJ5rXVDozZ1lv8jDs3uSJtiPb9Dk/ZAAcM0=
+        bh=VuQ9K07zKhFVmW27yAURvZgXNg5Kde2VB7A9n6/jcRM=;
+        b=UofdAPLwzqN9irjKYpz7rqdpJba6YSanghzltJ7hygDQHnFxjoYnCn4YD0xclCWyyn
+         1QGVCjAoCfMyHBxT5bED+JODP9R8TqKO5BZ3Ypckfrxuser3a0TwMhxL4/T0VMAtKJpU
+         VKx0vRkqgm8Bnukgx8yTpvFmvLGoFoDP/yYAY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=W+Po2ncML0dagir1ZXD2ovXOKvk/W+c/3o5vm+NA9cQ=;
-        b=qzLfYigiIRJJJ/ue+FKLtJfQibxcx4I1fu0PQvCYGyDQUrrA55YwvxvNvfYddrlA/2
-         Bzkj60qmEx0Bx7nJJBBVuuYI9okYpTx1fjQzqHJ3QDMGpLvzDpZXh4OK+WbTc4Ao+ZuT
-         URNY86WSY5eUHiiDqvv6Fdpy5kKwMIDSbbjdAI7yuGDq99gsDpPwvAOT7ipnGT39jp/n
-         KV8q12IN8B0bAe8puVAaXeiOnGWfX8cYl/QVYCFyn7PVw/3qC+Evm8VGtunI/67ryia8
-         Azb1vaMP+knfkBgQWzTOr4nY42mClUsSVel9InQtaeBMhxsX/p4g8USBmKBIYyM610hX
-         ecaQ==
-X-Gm-Message-State: AOAM531Hgv/nnLTBUoM+GwQpKZPsQpXWrLn9y18pOdFm60G/hZTBIbSJ
-        2XUXvNXLZyBKMcCVVlwEAHsRUw==
-X-Google-Smtp-Source: ABdhPJwwvDzOMlBdl8uBpL682Y/M/U5HFlms6OXsU9pvWhVrOJHosSbnvoIECvMOshQ6rTYdsLz56g==
-X-Received: by 2002:a17:90b:4b4c:: with SMTP id mi12mr11492173pjb.57.1634106580411;
-        Tue, 12 Oct 2021 23:29:40 -0700 (PDT)
+        bh=VuQ9K07zKhFVmW27yAURvZgXNg5Kde2VB7A9n6/jcRM=;
+        b=fYsioLaV5G9SkGyQVkcGAEsEicwRXavSRHtReiqdM2ChA+j/3sashzLJBCDpsqndmu
+         rLz5GA4dTMjQEJswvZ9Q9lwxjXu3AbaGnlFof7bwTalk9EP+59cXNCC+AER9NZlsDN97
+         wWDHXoTTWAJeaBgsuEjy/8I3bsFegBrDTwrLlk3CPNyL3jzTbydVRb5xqq73TDjShvvr
+         5HE/HqsrDNONZ9/gtd443IdoU715b/udr8e0CGX/pWpFGEbdx4Wo/gEntSmjylwNKZ4+
+         gw5WvEBXGsVHTjWG9YDu6lq2s+EK3Tuynl638GcsmBRa8G8sCMzyRJSiDyrgKIbEEyBJ
+         NAPA==
+X-Gm-Message-State: AOAM53355PYYdxxbU1tO1IdrIv/iJe5TpkO/g93ese+UhnaWyY9RZRVF
+        CY2vqCOtdWRztxXCky59yISopw==
+X-Google-Smtp-Source: ABdhPJxi3MilTVqoy9Kf7ydXOCYXbOlyCyon1KO3ew5UZssKOax53PkSESvwHqWMi+XXw8wleT4Yrw==
+X-Received: by 2002:a05:6a00:ccb:b0:44c:eb4b:f24e with SMTP id b11-20020a056a000ccb00b0044ceb4bf24emr25691167pfv.16.1634106644424;
+        Tue, 12 Oct 2021 23:30:44 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id x7sm12999948pfj.28.2021.10.12.23.29.39
+        by smtp.gmail.com with ESMTPSA id z10sm12678073pfn.70.2021.10.12.23.30.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 23:29:39 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 23:29:39 -0700
+        Tue, 12 Oct 2021 23:30:44 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 23:30:43 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
@@ -73,7 +73,7 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
         linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
         reiserfs-devel@vger.kernel.org
 Subject: Re: [PATCH 25/29] ext4: use sb_bdev_nr_blocks
-Message-ID: <202110122328.92B4FC41F4@keescook>
+Message-ID: <202110122330.6E549D2@keescook>
 References: <20211013051042.1065752-1-hch@lst.de>
  <20211013051042.1065752-26-hch@lst.de>
 MIME-Version: 1.0
@@ -103,9 +103,10 @@ On Wed, Oct 13, 2021 at 07:10:38AM +0200, Christoph Hellwig wrote:
 > -	blocks_count = sb->s_bdev->bd_inode->i_size >> sb->s_blocksize_bits;
 > +	blocks_count = sb_bdev_nr_blocks(sb);
 
-Is s_blocksize_bits always 9 here? If not, this isn't equivalent.
+Wait, my bad. Yes, this is fine. It's going through two helpers. :)
 
--Kees
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
 
 >  	if (blocks_count && ext4_blocks_count(es) > blocks_count) {
 >  		ext4_msg(sb, KERN_WARNING, "bad geometry: block count %llu "
