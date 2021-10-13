@@ -2,44 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9EDC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 11:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09123C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 11:47:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 647B1601FC
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 11:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFE41603E5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 11:47:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbhJMLPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 07:15:09 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:25181 "EHLO
+        id S230414AbhJMLta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 07:49:30 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:25182 "EHLO
         szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbhJMLPI (ORCPT
+        with ESMTP id S229571AbhJMLta (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 07:15:08 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4HTqcC60wFz8tbx;
-        Wed, 13 Oct 2021 19:11:55 +0800 (CST)
+        Wed, 13 Oct 2021 07:49:30 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4HTrMs4sSqz8tdj;
+        Wed, 13 Oct 2021 19:46:17 +0800 (CST)
 Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Wed, 13 Oct 2021 19:13:01 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Wed, 13
- Oct 2021 19:13:01 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v3 2/2] block, bfq: do not idle if only one cgroup is activated
-Date:   Wed, 13 Oct 2021 19:25:34 +0800
-Message-ID: <20211013112534.3073296-3-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211013112534.3073296-1-yukuai3@huawei.com>
-References: <20211013112534.3073296-1-yukuai3@huawei.com>
+ 15.1.2308.8; Wed, 13 Oct 2021 19:47:24 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Wed, 13 Oct 2021 19:47:24 +0800
+Subject: Re: [PATCH] blk-cgroup: check blkcg policy is enabled in
+ blkg_create()
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     Tejun Heo <tj@kernel.org>
+CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20211008072720.797814-1-yukuai3@huawei.com>
+ <YWRxi2OaIHhG9rOc@slm.duckdns.org>
+ <9d9ac88b-43e6-5b50-bc0b-98ad4704eca5@huawei.com>
+Message-ID: <68bd1b2c-f4a6-664c-0812-30cb458d0f15@huawei.com>
+Date:   Wed, 13 Oct 2021 19:47:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
+In-Reply-To: <9d9ac88b-43e6-5b50-bc0b-98ad4704eca5@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  dggema762-chm.china.huawei.com (10.1.198.204)
 X-CFilter-Loop: Reflected
@@ -47,52 +52,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If only one group is activated, there is no need to guarantee the
-same share of the throughput of queues in the same group.
+On 2021/10/12 9:39, yukuai (C) wrote:
+> On 2021/10/12 1:16, Tejun Heo wrote:
+>> On Fri, Oct 08, 2021 at 03:27:20PM +0800, Yu Kuai wrote:
+>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>>> index eb48090eefce..00e1d97621ea 100644
+>>> --- a/block/blk-cgroup.c
+>>> +++ b/block/blk-cgroup.c
+>>> @@ -226,6 +226,20 @@ struct blkcg_gq *blkg_lookup_slowpath(struct 
+>>> blkcg *blkcg,
+>>>   }
+>>>   EXPORT_SYMBOL_GPL(blkg_lookup_slowpath);
+>>> +static void blkg_check_pd(struct request_queue *q, struct blkcg_gq 
+>>> *blkg)
+>>> +{
+>>> +    int i;
+>>> +
+>>> +    for (i = 0; i < BLKCG_MAX_POLS; i++) {
+>>> +        struct blkcg_policy *pol = blkcg_policy[i];
+>>> +
+>>> +        if (blkg->pd[i] && !blkcg_policy_enabled(q, pol)) {
+>>> +            pol->pd_free_fn(blkg->pd[i]);
+>>> +            blkg->pd[i] = NULL;
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>>   /*
+>>>    * If @new_blkg is %NULL, this function tries to allocate a new one as
+>>>    * necessary using %GFP_NOWAIT.  @new_blkg is always consumed on 
+>>> return.
+>>> @@ -252,6 +266,9 @@ static struct blkcg_gq *blkg_create(struct blkcg 
+>>> *blkcg,
+>>>           goto err_free_blkg;
+>>>       }
+>>> +    if (new_blkg)
+>>> +        blkg_check_pd(q, new_blkg);
+>>> +
+>>
+>> Can't this happen the other way around too? ie. Linking a pd which 
+>> doesn't
+>> have an entry for a policy which got enabled inbetween? And what if an
+>> existing policy was de-registered and another policy got the policy id
+>> inbetween? I think the correct solution here would be synchronizing 
+>> alloc -
+>> create blocks against policy deactivation rather than trying to patch an
+>> allocated blkg later. Deactivation being a really slow path, there are
+>> plenty of options. The main challenge would making it difficult to make
+>> mistakes with, I guess.
+> 
+> For the case policy was de-registered, I think there won't be a problem
+> because pd_init_fn() is not called yet, and the blkg is not at
+> blkg_list, it's fine to use this blkg for the new policy.
+> 
+> For the case policy got enabled inbetween, the problem is that the pd
+> still doesn't have an entry for the policy, perhaps we can call
+> pd_alloc_fn() additionally in blkg_create?
+> 
+> If checking the blkg in blkg_create() is not a good solution, and we
+> decide to synchronize alloc-create blkg against policy deactivation.
+> Since only bfq policy can be deactivated or activated while queue is
+> not dying, and queue is freezed during activation and deactivation,
+> can we get a q->q_usage_counter and put it after blkg_create() is done
+> to prevent concurrent bfq policy activation and deactivation?
 
-Test procedure:
-run "fio -numjobs=1 -ioengine=psync -bs=4k -direct=1 -rw=randread..."
-multiple times in the same cgroup.
+Just found that blkcg_deactivate_policy() will call
+blk_mq_freeze_queue(), thus get q->q_usage_counter is wrong...
 
-Test result: total bandwidth(Mib/s)
-| total jobs | before this patch | after this patch      |
-| ---------- | ----------------- | --------------------- |
-| 1          | 33.8              | 33.8                  |
-| 2          | 33.8              | 65.4 (32.7 each job)  |
-| 4          | 33.8              | 106.8 (26.7 each job) |
-| 8          | 33.8              | 126.4 (15.8 each job) |
-
-By the way, if I test with "fio -numjobs=1/2/4/8 ...", test result is
-the same with or without this patch. This is because bfq_queue can
-be merged in this situation.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/bfq-iosched.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d251735383f7..8d94f511bee8 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -709,7 +709,7 @@ bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
-  * much easier to maintain the needed state:
-  * 1) all active queues have the same weight,
-  * 2) all active queues belong to the same I/O-priority class,
-- * 3) there are no active groups.
-+ * 3) there are one active group at most.
-  * In particular, the last condition is always true if hierarchical
-  * support or the cgroups interface are not enabled, thus no state
-  * needs to be maintained in this case.
-@@ -741,7 +741,7 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
- 
- 	return varied_queue_weights || multiple_classes_busy
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
--	       || bfqd->num_groups_with_pending_reqs > 0
-+	       || bfqd->num_groups_with_pending_reqs > 1
- #endif
- 		;
- }
--- 
-2.31.1
-
+Thanks,
+Kuai
