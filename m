@@ -2,454 +2,340 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DFFC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 20:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F005AC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 20:44:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3399F60E0B
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 20:04:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9949610F9
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 20:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238804AbhJMUGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 16:06:38 -0400
-Received: from sonic306-27.consmr.mail.ne1.yahoo.com ([66.163.189.89]:45221
-        "EHLO sonic306-27.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238370AbhJMUGh (ORCPT
+        id S229496AbhJMUqU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 16:46:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52784 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229462AbhJMUqU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 16:06:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1634155473; bh=vy0ySlKJ420+1oXXRPTErtsd+r99aCxGcq2kEwHLezk=; h=Subject:To:Cc:References:From:Date:In-Reply-To:From:Subject:Reply-To; b=nInaZrn7E1jYvxIQGJIIL5R2ygg35zkozwc1QqhVa8bmasqEELK8NGcaQb8agJkAJpP1dGGyaHpoQAEJ0VL8jJu+VpuB/W8la4Pa1zMg5k/9/ONW7f4pDhsb1i7iDc/vXMreSRAI/fkSMeU+yz24PyA9uJtEKeF7GX0lXL/vFPPX8JO+AS8eA6kZlBntjf3fB3J6gA0x9jK4xyegtgwpH8jeB45B3AW4JgghCdE/j+hBJzknMjlBBXcWi9dbxGs2GYoaT9IBY3j0AnP2tZY3tR0IHfIQ9PObG9HQMCWOre/jMLY+vTG9L16zAljB7bRY9XmI3rcpu3k6oAFfNQDaMw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1634155473; bh=GEEBjmJGEQxfcyFnIEv3fggIaOqXHNf1pk/YosIFj4c=; h=X-Sonic-MF:Subject:To:From:Date:From:Subject; b=e3itMHeCDpMr45c9F7mBUhqMA+IMj+anA5dtZGkTgDkdRUbr2ejfi4HSUKaq3qmpvoJLzHcYl1wM3TLZwl8v9aXk9mSwcl20I4AcOJh0M3nPZYGpO+VXCgA4wu0KWVJAjeoGm5ddvo7yMCEIjjGjUXHF+lBwPFiu6gRzTcaDCNo3o9qq9MDcssMNnpWv+J2rxLOxiEe9JkMTwCOO2CsMfHj6VFiMPP4GZO0z4OhU4G2KOw8hEFmHMsdVSu3cQHXo/FemW+5pmkz+G8fv5xZwLLlHE7N9UKdpWqW7w1R087PgdLNeBCoarpraL6R3OIED9/MfrqKOi5OmN21+WwhQ7g==
-X-YMail-OSG: kn2xUMIVM1ljcldJdbo_xnkqUuNbDqiYOz6Jvm2Kl9F.VON6OW4LCcMFdCT9Fwn
- uzldctGGMlW52a8qUqSj6WP1HGnUZTE_AyKWwRoUd1xa9VzKtdGcOih4yhOrjtlmsNomokEP0wmI
- c699IFR2LHW4Ik0FKOH33riSUAYAJkFGg4_DhgYLr9p7sY2P4Mya_cgFHyq7_zd0bno7qlvgJbAp
- kKy9Cgl12uTbUpEdtR1Lk8NXapLp5W1xoTEowVep4Mj8Io72Nt08D99Bv1MO13aJS3AM3_0L8NMy
- .SHIp9yoIDhFawdlNNVp5Off36cm2mxcxvJjFp7fQf9fwss2zEPcKAjoo3r30xWOZa3M7CMqVjmi
- oXVAN6NgWBHetc44JmLzRBAcCvcmDWWducM0_cnrDsQs.h6cSY94ZItvorsVi8Rjw3w2h3Efxw1o
- PpyxdYqGsepYyiKN8TqSr8cdLx71s9bmJYaXeMzYVIljyuyX3ZQKA2c1.xLZV493SNxObTe9uyZo
- pUKZwxdNcFmqjKkPP_2H7q81rPGcIF4.1jwLtxqsYJH1LYErC178Cft84EOgZveJU0l2_5tXviaj
- CpKx35eaFuk8Hauhs6eEq7GhmUN2_OmswvjS0IE8yRiz2DA3OY2dOzIpeaPy9dcy27HfLKeKnXwN
- .RPoJaIGD.eJgRn6a5VhX8nQa1uzeh4CILgyXLqN2aPdqDwVE1NTNZrQc49o9m_Rdyosd.MllIWa
- roSQGBJSXqzGF8SDg3PxeOlEgKxF3wKRoQFjq7gn2WBctNLqdk1Fv4wjFFP.Uulqd767ZLce0nGM
- JtFt7Mfy0QZxeYt31NIPBdUA1zvtQ6ymvfZDNPJPu.T9dsAzi.QNXYBRcAHFxoTbLOLRBItKJxrt
- dyHpYUkU2SkMv_K4i6kR8nwof9Fe1ddP53ZOHey0W2yzsJR2MupHl2dMe0moFZ2YSraQV4rPU7Zl
- oYFQqip9TSUREY6YLltTOwEDEEd0DpHV5DVUo7tGgmS.imdVaB9_yaTWkbrVEALa_PwEuA8hxzAQ
- v.XveYILv.ky80TD7ePE0lFGk5WV_dzeyJjtn227FihLSYxTB1lWg02W5HZYdlIWpLFtYwNP4pzA
- vR_EEr0QZF6vSc_eyXXYFJXU43hsiLkGs_Z.QIHtl7NjP7C2pSeGpHjqMZ2wkXoIh5vdZyQMEu4s
- .Obb31LicwYVWpfRU8FSoWOhcWzW46kj4L4U9KKYO.AU7oNqQAl_Ru9h8Slbb.wOXk0_NYXVpmiW
- _j7DUOFmuDk2K2i_rfCSLCfJPUZRUuqDi3H9rptm4pW_eMpqzTqc6vM8pL8y_SSfTsvbHLMW8ILn
- GGUbyHO8rnfabappvy_21dSwfrL8P2jfTQuI6FSC_NqHWBk_efbBROzZ6d9GZBd4d3b4GxwIhDUg
- pi3yejHHY_T89ImnSYgkbuiT4fVJb2WNxVluWVFIHOSRo5kyk6bEfffUW4ClPvmbX9xEiMDKOiVQ
- lFVxCpgDB6ost0uaWpZU.EXKWX1DxG7S3eOkFh1DvRySIVRiBtlXEYLgBMbK36ORyWCbZYCu4ut8
- JdwJe77Y8_hEJ7eO38.55.ngwSsKl5sgg3P1YHIgsRfjCX9L_bnsSFvX3NbPrH5qUGChgVMoV.8d
- V3nd4CIZOrS.dmq1T0zOzmbUZwvMUsq0xMkDVWNgJwfSPfPVzy.vVbgCL8Es8JT1fSrmtiHjAVgg
- Bt0WEhP_lB9ZBNBOvXb8OIVR0ZWwyfXUkTYIGo0.JcGv_RldoEjG.0Ua1nRVg_yFUF7SUpM4rinf
- _rD3KMuTuGlRwXLtDDB2NxhLOCLKmiR1w7aoQwYgC8tOacfe9Xi1thBkECVFaXsLnTJIulFF29YL
- u85rP3TpCIx0sxdZ5tn1T7Rs2iwlust2EcNDketERPaHEUTXJVqjLyAVcOwHkRw.C08.aQMHx7kd
- f2fiJOLFggYVc2mIJfP3yK_R1tEGN0po6rV9dMZiM.IR_s_hpzegOtqZVzOZpjM7cqRBWI1T9iuS
- prh9dYMzf5snUBPsxjIfDsFx93VDfsx_eb99FM9Vkq066.zto1VYpYEOGPh5O6cDFBu7yr8N6rV5
- 05LP1.aEJ4NnfDLBiqsRgQiScbjVgwymfmWTjxX_Pj5sBuz3n6XT.uVnZrXA2FeytSBk6CTs0UGN
- XX732ySAljKmh4DUZI1z86zuqraFfBQzfVdlMTwg3j3WBqQC.iydYEBMMjzSx5iW4Hm6tSSd5Eh1
- uueHK5yAGypMnqKiA23RFrmDIxeKz8Xg6rQX6SEg6wND4HcEmrlIkCZI-
-X-Sonic-MF: <casey@schaufler-ca.com>
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.ne1.yahoo.com with HTTP; Wed, 13 Oct 2021 20:04:33 +0000
-Received: by kubenode504.mail-prod1.omega.ne1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA ID d8008b9a833b5ea326972ffc61c3990e;
-          Wed, 13 Oct 2021 20:04:32 +0000 (UTC)
-Subject: Re: [RFC PATCH v7 05/16] ipe: add LSM hooks on execution and kernel
- read
-To:     deven.desai@linux.microsoft.com, corbet@lwn.net, axboe@kernel.dk,
-        agk@redhat.com, snitzer@redhat.com, ebiggers@kernel.org,
-        tytso@mit.edu, paul@paul-moore.com, eparis@redhat.com,
-        jmorris@namei.org, serge@hallyn.com
-Cc:     linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org,
-        jannh@google.com, linux-fscrypt@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        Casey Schaufler <casey@schaufler-ca.com>
-References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
- <1634151995-16266-6-git-send-email-deven.desai@linux.microsoft.com>
-From:   Casey Schaufler <casey@schaufler-ca.com>
-Message-ID: <a358e0b0-2fc0-8b03-4bee-141675fdc73e@schaufler-ca.com>
-Date:   Wed, 13 Oct 2021 13:04:31 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Wed, 13 Oct 2021 16:46:20 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CDD6C061570
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 13:44:16 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id x1so1215893iof.7
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 13:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=paM2p8vZnf/TaoeqWLYwfHOHV/RT07ipuW657wI8IRE=;
+        b=wEIlvbxYtP0xX22lUhJrh1g9IXuh8ZGkaoMNizecDRAI1/mcshw/q69Hahj/25jjGm
+         RL1dFuQPW9DZZ1gNz1+HtrT6zRFGywZWnYOJKFnMxpwawzgBmEacJF60kE6ccXP8WOTH
+         PnkDaQtWEDOxaAgZ6a3kJp/oo8r+WtAGysJn55EOBhKwT7xYfF9htE2TM4oVHhsiMDzA
+         K/gr2KfV8gZsHQhuS47m4pT7auqyj+T5iSvGoYveYyCaQ3vtWdDuG5tsPCLu4dsIJgo7
+         fPFoGlZb3+LYWxo09BoYIaLKxAuuWYP/ltngTW5FsFGDP3QuvpdR4G0QVarGsO032JZd
+         BtyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=paM2p8vZnf/TaoeqWLYwfHOHV/RT07ipuW657wI8IRE=;
+        b=0nEI+sHjCO2r/BSGtXegFACt4TPiZ1tZ/q0XTh2+wUucuPzNAnBD1nLbokPd4W9Ncv
+         3mVRSrDVcSY8dT2Ul4ivHSnB8lKWQwXbTeLk/iaL1nOSgHzQucHVf6aWm4uQx1NF9aEj
+         Bysrwy9pttwlrFnio43egzpfk0wPbewxSuNiEcOyt4NwYIu+NCF/QdiTf6OWK3c04HEp
+         FKDlMViPnNH6SxGGzePjhKH4lGT0l9szUdGUMhLQrunSABj3BL16tRIQGWX1yeNiTfZw
+         uSA09lNAJWcGJY6/M3HJh8/w2ZQPig/6+CBseXyukckXsrCN4YI2F/I8pv/0alydR9Sh
+         SIIA==
+X-Gm-Message-State: AOAM531GLIvIcesrnAX2rZ4lbbxYOxqfJsR6aNU3DAc77oLq3BuBA7FA
+        NK7FU9Tlp6Pzc/PwbKWaaXwXsZBqqR4=
+X-Google-Smtp-Source: ABdhPJw07TxJRO1CfEBXMjZmYCdrJGm/9rxuHl57wbdDOch0KQRZphM+B/W7WWrqE0DaRJQf8JBrSQ==
+X-Received: by 2002:a02:ad05:: with SMTP id s5mr1176713jan.65.1634157855092;
+        Wed, 13 Oct 2021 13:44:15 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id l6sm271521ilt.31.2021.10.13.13.44.14
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Oct 2021 13:44:14 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: handle fast path of bio splitting inline
+Message-ID: <30045b11-0064-1849-5b10-f8fa05c6958d@kernel.dk>
+Date:   Wed, 13 Oct 2021 14:44:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1634151995-16266-6-git-send-email-deven.desai@linux.microsoft.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-X-Mailer: WebService/1.1.19116 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/13/2021 12:06 PM, deven.desai@linux.microsoft.com wrote:
-> From: Deven Bowers <deven.desai@linux.microsoft.com>
->
-> IPE's initial goal is to control both execution and the loading of
-> kernel modules based on the system's definition of trust. It
-> accomplishes this by plugging into the security hooks for execve,
-> mprotect, mmap, kernel_load_data and kernel_read_data.
->
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> ---
->
-> Relevant changes since v6:
->   * Split up patch 02/12 into four parts:
->       1. context creation [01/16]
->       2. audit [07/16]
->       3. evaluation loop [03/16]
->       4. access control hooks [05/16] (this patch)
->
-> ---
->  security/ipe/hooks.c  | 149 ++++++++++++++++++++++++++++++++++++++++++=
+The fast path is no splitting needed. Separate the handling into a
+check part we can inline, and an out-of-line handling path if we do
+need to split.
 
->  security/ipe/hooks.h  |  23 ++++++-
->  security/ipe/ipe.c    |   5 ++
->  security/ipe/policy.c |  23 +++++++
->  security/ipe/policy.h |  12 +++-
->  5 files changed, 209 insertions(+), 3 deletions(-)
->
-> diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-> index ed0c886eaa5a..216242408a80 100644
-> --- a/security/ipe/hooks.c
-> +++ b/security/ipe/hooks.c
-> @@ -6,11 +6,15 @@
->  #include "ipe.h"
->  #include "ctx.h"
->  #include "hooks.h"
-> +#include "eval.h"
-> =20
-> +#include <linux/fs.h>
->  #include <linux/sched.h>
->  #include <linux/types.h>
->  #include <linux/refcount.h>
->  #include <linux/rcupdate.h>
-> +#include <linux/binfmts.h>
-> +#include <linux/mman.h>
-> =20
->  /**
->   * ipe_task_alloc: Assign a new context for an associated task structu=
-re.
-> @@ -56,3 +60,148 @@ void ipe_task_free(struct task_struct *task)
->  	ipe_put_ctx(ctx);
->  	rcu_read_unlock();
->  }
-> +
-> +/**
-> + * ipe_on_exec: LSM hook called when a process is loaded through the e=
-xec
-> + *		family of system calls.
-> + * @bprm: Supplies a pointer to a linux_binprm structure to source the=
- file
-> + *	  being evaluated.
-> + *
-> + * Return:
-> + * 0 - OK
-> + * !0 - Error
-> + */
-> +int ipe_on_exec(struct linux_binprm *bprm)
-> +{
-> +	return ipe_process_event(bprm->file, ipe_operation_exec, ipe_hook_exe=
-c);
-> +}
-> +
-> +/**
-> + * ipe_on_mmap: LSM hook called when a file is loaded through the mmap=
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-> + *		family of system calls.
-> + * @f: File being mmap'd. Can be NULL in the case of anonymous memory.=
+---
 
-> + * @reqprot: The requested protection on the mmap, passed from usermod=
-e.
-> + * @prot: The effective protection on the mmap, resolved from reqprot =
-and
-> + *	  system configuration.
-> + * @flags: Unused.
-> + *
-> + * Return:
-> + * 0 - OK
-> + * !0 - Error
-> + */
-> +int ipe_on_mmap(struct file *f, unsigned long reqprot, unsigned long p=
-rot,
-> +		unsigned long flags)
-> +{
-> +	if (prot & PROT_EXEC || reqprot & PROT_EXEC)
-> +		return ipe_process_event(f, ipe_operation_exec, ipe_hook_mmap);
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ipe_on_mprotect: LSM hook called when a mmap'd region of memory is =
-changing
-> + *		    its protections via mprotect.
-> + * @vma: Existing virtual memory area created by mmap or similar
-> + * @reqprot: The requested protection on the mmap, passed from usermod=
-e.
-> + * @prot: The effective protection on the mmap, resolved from reqprot =
-and
-> + *	  system configuration.
-> + *
-> + * Return:
-> + * 0 - OK
-> + * !0 - Error
-> + */
-> +int ipe_on_mprotect(struct vm_area_struct *vma, unsigned long reqprot,=
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 9a55b5070829..20ec9f00801a 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -14,6 +14,7 @@
+ #include "blk.h"
+ #include "blk-rq-qos.h"
+ #include "blk-throttle.h"
++#include "blk-merge.h"
+ 
+ static inline void bio_get_first_bvec(struct bio *bio, struct bio_vec *bv)
+ {
+@@ -92,10 +93,8 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
+ 	return bio_will_gap(req->q, NULL, bio, req->bio);
+ }
+ 
+-static struct bio *blk_bio_discard_split(struct request_queue *q,
+-					 struct bio *bio,
+-					 struct bio_set *bs,
+-					 unsigned *nsegs)
++struct bio *blk_bio_discard_split(struct request_queue *q, struct bio *bio,
++				  struct bio_set *bs, unsigned *nsegs)
+ {
+ 	unsigned int max_discard_sectors, granularity;
+ 	int alignment;
+@@ -136,8 +135,8 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
+ 	return bio_split(bio, split_sectors, GFP_NOIO, bs);
+ }
+ 
+-static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
+-		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
++struct bio *blk_bio_write_zeroes_split(struct request_queue *q, struct bio *bio,
++				       struct bio_set *bs, unsigned *nsegs)
+ {
+ 	*nsegs = 0;
+ 
+@@ -150,10 +149,8 @@ static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
+ 	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
+ }
+ 
+-static struct bio *blk_bio_write_same_split(struct request_queue *q,
+-					    struct bio *bio,
+-					    struct bio_set *bs,
+-					    unsigned *nsegs)
++struct bio *blk_bio_write_same_split(struct request_queue *q, struct bio *bio,
++				     struct bio_set *bs, unsigned *nsegs)
+ {
+ 	*nsegs = 1;
+ 
+@@ -275,10 +272,8 @@ static bool bvec_split_segs(const struct request_queue *q,
+  * responsible for ensuring that @bs is only destroyed after processing of the
+  * split bio has finished.
+  */
+-static struct bio *blk_bio_segment_split(struct request_queue *q,
+-					 struct bio *bio,
+-					 struct bio_set *bs,
+-					 unsigned *segs)
++struct bio *blk_bio_segment_split(struct request_queue *q, struct bio *bio,
++				  struct bio_set *bs, unsigned *segs)
+ {
+ 	struct bio_vec bv, bvprv, *bvprvp = NULL;
+ 	struct bvec_iter iter;
+@@ -322,67 +317,17 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	return bio_split(bio, sectors, GFP_NOIO, bs);
+ }
+ 
+-/**
+- * __blk_queue_split - split a bio and submit the second half
+- * @bio:     [in, out] bio to be split
+- * @nr_segs: [out] number of segments in the first bio
+- *
+- * Split a bio into two bios, chain the two bios, submit the second half and
+- * store a pointer to the first half in *@bio. If the second bio is still too
+- * big it will be split by a recursive call to this function. Since this
+- * function may allocate a new bio from q->bio_split, it is the responsibility
+- * of the caller to ensure that q->bio_split is only released after processing
+- * of the split bio has finished.
+- */
+-void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
++void blk_bio_handle_split(struct bio **bio, struct bio *split)
+ {
+-	struct request_queue *q = (*bio)->bi_bdev->bd_disk->queue;
+-	struct bio *split = NULL;
+-
+-	switch (bio_op(*bio)) {
+-	case REQ_OP_DISCARD:
+-	case REQ_OP_SECURE_ERASE:
+-		split = blk_bio_discard_split(q, *bio, &q->bio_split, nr_segs);
+-		break;
+-	case REQ_OP_WRITE_ZEROES:
+-		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split,
+-				nr_segs);
+-		break;
+-	case REQ_OP_WRITE_SAME:
+-		split = blk_bio_write_same_split(q, *bio, &q->bio_split,
+-				nr_segs);
+-		break;
+-	default:
+-		/*
+-		 * All drivers must accept single-segments bios that are <=
+-		 * PAGE_SIZE.  This is a quick and dirty check that relies on
+-		 * the fact that bi_io_vec[0] is always valid if a bio has data.
+-		 * The check might lead to occasional false negatives when bios
+-		 * are cloned, but compared to the performance impact of cloned
+-		 * bios themselves the loop below doesn't matter anyway.
+-		 */
+-		if (!q->limits.chunk_sectors &&
+-		    (*bio)->bi_vcnt == 1 &&
+-		    ((*bio)->bi_io_vec[0].bv_len +
+-		     (*bio)->bi_io_vec[0].bv_offset) <= PAGE_SIZE) {
+-			*nr_segs = 1;
+-			break;
+-		}
+-		split = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
+-		break;
+-	}
+-
+-	if (split) {
+-		/* there isn't chance to merge the splitted bio */
+-		split->bi_opf |= REQ_NOMERGE;
++	/* there isn't chance to merge the splitted bio */
++	split->bi_opf |= REQ_NOMERGE;
+ 
+-		bio_chain(split, *bio);
+-		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+-		submit_bio_noacct(*bio);
+-		*bio = split;
++	bio_chain(split, *bio);
++	trace_block_split(split, (*bio)->bi_iter.bi_sector);
++	submit_bio_noacct(*bio);
++	*bio = split;
+ 
+-		blk_throtl_charge_bio_split(*bio);
+-	}
++	blk_throtl_charge_bio_split(*bio);
+ }
+ 
+ /**
+@@ -397,9 +342,10 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+  */
+ void blk_queue_split(struct bio **bio)
+ {
++	struct request_queue *q = (*bio)->bi_bdev->bd_disk->queue;
+ 	unsigned int nr_segs;
+ 
+-	__blk_queue_split(bio, &nr_segs);
++	__blk_queue_split(q, bio, &nr_segs);
+ }
+ EXPORT_SYMBOL(blk_queue_split);
+ 
+diff --git a/block/blk-merge.h b/block/blk-merge.h
+new file mode 100644
+index 000000000000..8f0b7dec2dd2
+--- /dev/null
++++ b/block/blk-merge.h
+@@ -0,0 +1,71 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef BLK_MERGE_H
++#define BLK_MERGE_H
++
++#include "blk-mq.h"
++
++struct bio *blk_bio_discard_split(struct request_queue *q, struct bio *bio,
++				  struct bio_set *bs, unsigned *nsegs);
++struct bio *blk_bio_write_zeroes_split(struct request_queue *q, struct bio *bio,
++				       struct bio_set *bs, unsigned *nsegs);
++struct bio *blk_bio_write_same_split(struct request_queue *q, struct bio *bio,
++				     struct bio_set *bs, unsigned *nsegs);
++struct bio *blk_bio_segment_split(struct request_queue *q, struct bio *bio,
++				  struct bio_set *bs, unsigned *segs);
++void blk_bio_handle_split(struct bio **bio, struct bio *split);
++
++/**
++ * blk_queue_split - split a bio and submit the second half
++ * @bio:     [in, out] bio to be split
++ * @nr_segs: [out] number of segments in the first bio
++ *
++ * Split a bio into two bios, chain the two bios, submit the second half and
++ * store a pointer to the first half in *@bio. If the second bio is still too
++ * big it will be split by a recursive call to this function. Since this
++ * function may allocate a new bio from q->bio_split, it is the responsibility
++ * of the caller to ensure that q->bio_split is only released after processing
++ * of the split bio has finished.
++ */
++static inline void __blk_queue_split(struct request_queue *q, struct bio **bio,
++				     unsigned int *nr_segs)
++{
++	struct bio *split = NULL;
++
++	switch (bio_op(*bio)) {
++	case REQ_OP_DISCARD:
++	case REQ_OP_SECURE_ERASE:
++		split = blk_bio_discard_split(q, *bio, &q->bio_split, nr_segs);
++		break;
++	case REQ_OP_WRITE_ZEROES:
++		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split,
++				nr_segs);
++		break;
++	case REQ_OP_WRITE_SAME:
++		split = blk_bio_write_same_split(q, *bio, &q->bio_split,
++				nr_segs);
++		break;
++	default:
++		/*
++		 * All drivers must accept single-segments bios that are <=
++		 * PAGE_SIZE.  This is a quick and dirty check that relies on
++		 * the fact that bi_io_vec[0] is always valid if a bio has data.
++		 * The check might lead to occasional false negatives when bios
++		 * are cloned, but compared to the performance impact of cloned
++		 * bios themselves the loop below doesn't matter anyway.
++		 */
++		if (!q->limits.chunk_sectors &&
++		    (*bio)->bi_vcnt == 1 &&
++		    ((*bio)->bi_io_vec[0].bv_len +
++		     (*bio)->bi_io_vec[0].bv_offset) <= PAGE_SIZE) {
++			*nr_segs = 1;
++			break;
++		}
++		split = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
++		break;
++	}
++
++	if (split)
++		blk_bio_handle_split(bio, split);
++}
++
++#endif
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7dadfac5bad0..54c510c0f3ee 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -42,6 +42,7 @@
+ #include "blk-stat.h"
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
++#include "blk-merge.h"
+ 
+ static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
+ 
+@@ -2514,7 +2515,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	blk_status_t ret;
+ 
+ 	blk_queue_bounce(q, &bio);
+-	__blk_queue_split(&bio, &nr_segs);
++	__blk_queue_split(q, &bio, &nr_segs);
+ 
+ 	if (!bio_integrity_prep(bio))
+ 		goto queue_exit;
+diff --git a/block/blk.h b/block/blk.h
+index 0afee3e6a7c1..c0b59bc38a2e 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -262,7 +262,6 @@ ssize_t part_timeout_show(struct device *, struct device_attribute *, char *);
+ ssize_t part_timeout_store(struct device *, struct device_attribute *,
+ 				const char *, size_t);
+ 
+-void __blk_queue_split(struct bio **bio, unsigned int *nr_segs);
+ int ll_back_merge_fn(struct request *req, struct bio *bio,
+ 		unsigned int nr_segs);
+ bool blk_attempt_req_merge(struct request_queue *q, struct request *rq,
 
-> +		    unsigned long prot)
-> +{
-> +	/* Already Executable */
-> +	if (vma->vm_flags & VM_EXEC)
-> +		return 0;
-> +
-> +	if (((prot & PROT_EXEC) || reqprot & PROT_EXEC))
-> +		return ipe_process_event(vma->vm_file, ipe_operation_exec,
-> +					 ipe_hook_mprotect);
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ipe_on_kernel_read: LSM hook called when a file is being read in fr=
-om
-> + *		       disk.
-> + * @file: Supplies a pointer to the file structure being read in from =
-disk
-> + * @id: Supplies the enumeration identifying the purpose of the read.
-> + * @contents: Unused.
-> + *
-> + * Return:
-> + * 0 - OK
-> + * !0 - Error
-> + */
-> +int ipe_on_kernel_read(struct file *file, enum kernel_read_file_id id,=
-
-> +		       bool contents)
-> +{
-> +	enum ipe_operation op;
-> +
-> +	switch (id) {
-> +	case READING_FIRMWARE:
-> +		op =3D ipe_operation_firmware;
-> +		break;
-> +	case READING_MODULE:
-> +		op =3D ipe_operation_kernel_module;
-> +		break;
-> +	case READING_KEXEC_INITRAMFS:
-> +		op =3D ipe_operation_kexec_initramfs;
-> +		break;
-> +	case READING_KEXEC_IMAGE:
-> +		op =3D ipe_operation_kexec_image;
-> +		break;
-> +	case READING_POLICY:
-> +		op =3D ipe_operation_ima_policy;
-> +		break;
-> +	case READING_X509_CERTIFICATE:
-> +		op =3D ipe_operation_ima_x509;
-> +		break;
-> +	default:
-> +		op =3D ipe_operation_max;
-> +	}
-> +
-> +	return ipe_process_event(file, op, ipe_hook_kernel_read);
-> +}
-> +
-> +/**
-> + * ipe_on_kernel_load_data: LSM hook called when a buffer is being rea=
-d in from
-> + *			    disk.
-> + * @id: Supplies the enumeration identifying the purpose of the read.
-> + * @contents: Unused.
-> + *
-> + * Return:
-> + * 0 - OK
-> + * !0 - Error
-> + */
-> +int ipe_on_kernel_load_data(enum kernel_load_data_id id, bool contents=
-)
-> +{
-> +	enum ipe_operation op;
-> +
-> +	switch (id) {
-> +	case LOADING_FIRMWARE:
-> +		op =3D ipe_operation_firmware;
-> +		break;
-> +	case LOADING_MODULE:
-> +		op =3D ipe_operation_kernel_module;
-> +		break;
-> +	case LOADING_KEXEC_INITRAMFS:
-> +		op =3D ipe_operation_kexec_initramfs;
-> +		break;
-> +	case LOADING_KEXEC_IMAGE:
-> +		op =3D ipe_operation_kexec_image;
-> +		break;
-> +	case LOADING_POLICY:
-> +		op =3D ipe_operation_ima_policy;
-> +		break;
-> +	case LOADING_X509_CERTIFICATE:
-> +		op =3D ipe_operation_ima_x509;
-> +		break;
-> +	default:
-> +		op =3D ipe_operation_max;
-> +	}
-> +
-> +	return ipe_process_event(NULL, op, ipe_hook_kernel_load);
-> +}
-> diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
-> index 58ed4a612e26..c99a0b7f45f7 100644
-> --- a/security/ipe/hooks.h
-> +++ b/security/ipe/hooks.h
-> @@ -5,11 +5,19 @@
->  #ifndef IPE_HOOKS_H
->  #define IPE_HOOKS_H
-> =20
-> +#include <linux/fs.h>
->  #include <linux/types.h>
->  #include <linux/sched.h>
-> +#include <linux/binfmts.h>
-> +#include <linux/security.h>
-> =20
->  enum ipe_hook {
-> -	ipe_hook_max =3D 0
-> +	ipe_hook_exec =3D 0,
-> +	ipe_hook_mmap,
-> +	ipe_hook_mprotect,
-> +	ipe_hook_kernel_read,
-> +	ipe_hook_kernel_load,
-> +	ipe_hook_max
->  };
-> =20
->  int ipe_task_alloc(struct task_struct *task,
-> @@ -17,4 +25,17 @@ int ipe_task_alloc(struct task_struct *task,
-> =20
->  void ipe_task_free(struct task_struct *task);
-> =20
-> +int ipe_on_exec(struct linux_binprm *bprm);
-> +
-> +int ipe_on_mmap(struct file *f, unsigned long reqprot, unsigned long p=
-rot,
-> +		unsigned long flags);
-> +
-> +int ipe_on_mprotect(struct vm_area_struct *vma, unsigned long reqprot,=
-
-> +		    unsigned long prot);
-> +
-> +int ipe_on_kernel_read(struct file *file, enum kernel_read_file_id id,=
-
-> +		       bool contents);
-> +
-> +int ipe_on_kernel_load_data(enum kernel_load_data_id id, bool contents=
-);
-> +
->  #endif /* IPE_HOOKS_H */
-> diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-> index b58b372327a1..3f9d43783293 100644
-> --- a/security/ipe/ipe.c
-> +++ b/security/ipe/ipe.c
-> @@ -25,6 +25,11 @@ struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init =
-=3D {
->  static struct security_hook_list ipe_hooks[] __lsm_ro_after_init =3D {=
-
->  	LSM_HOOK_INIT(task_alloc, ipe_task_alloc),
->  	LSM_HOOK_INIT(task_free, ipe_task_free),
-> +	LSM_HOOK_INIT(bprm_check_security, ipe_on_exec),
-> +	LSM_HOOK_INIT(mmap_file, ipe_on_mmap),
-> +	LSM_HOOK_INIT(file_mprotect, ipe_on_mprotect),
-> +	LSM_HOOK_INIT(kernel_read_file, ipe_on_kernel_read),
-> +	LSM_HOOK_INIT(kernel_load_data, ipe_on_kernel_load_data),
-
-Please stick with the lsmname_hook_name convention, as you did
-with ipe_task_alloc and ipe_task_free. Anyone who is looking at
-more than one LSM is going to have a much harder time working
-with your code the way you have it. Think
-
-	% find security | xargs grep '_bprm_check_security('
-
->  };
-> =20
->  /**
-> diff --git a/security/ipe/policy.c b/security/ipe/policy.c
-> index b766824cc08f..048500229365 100644
-> --- a/security/ipe/policy.c
-> +++ b/security/ipe/policy.c
-> @@ -483,6 +483,14 @@ int ipe_parse_op(const struct ipe_policy_token *to=
-k,
->  {
->  	substring_t match[MAX_OPT_ARGS] =3D { 0 };
->  	const match_table_t ops =3D {
-> +		{ ipe_operation_exec,		 "EXECUTE" },
-> +		{ ipe_operation_firmware,	 "FIRMWARE" },
-> +		{ ipe_operation_kernel_module,	 "KMODULE" },
-> +		{ ipe_operation_kexec_image,	 "KEXEC_IMAGE" },
-> +		{ ipe_operation_kexec_initramfs, "KEXEC_INITRAMFS"},
-> +		{ ipe_operation_ima_policy,	 "IMA_POLICY" },
-> +		{ ipe_operation_ima_x509,	 "IMA_X509_CERT" },
-> +		{ ipe_op_alias_kernel_read,	 "KERNEL_READ" },
->  		{ ipe_op_alias_max, NULL },
->  	};
-> =20
-> @@ -838,6 +846,15 @@ static int parse_policy(struct ipe_policy *p)
->  	return rc;
->  }
-> =20
-> +static const enum ipe_operation alias_kread[] =3D {
-> +	ipe_operation_firmware,
-> +	ipe_operation_kernel_module,
-> +	ipe_operation_ima_policy,
-> +	ipe_operation_ima_x509,
-> +	ipe_operation_kexec_image,
-> +	ipe_operation_kexec_initramfs,
-> +};
-> +
->  /**
->   * ipe_is_op_alias: Determine if @op is an alias for one or more opera=
-tions
->   * @op: Supplies the operation to check. Should be either ipe_operatio=
-n or
-> @@ -852,9 +869,15 @@ static int parse_policy(struct ipe_policy *p)
->  bool ipe_is_op_alias(int op, const enum ipe_operation **map, size_t *s=
-ize)
->  {
->  	switch (op) {
-> +	case ipe_op_alias_kernel_read:
-> +		*map =3D alias_kread;
-> +		*size =3D ARRAY_SIZE(alias_kread);
-> +		break;
->  	default:
->  		return false;
->  	}
-> +
-> +	return true;
->  }
-> =20
->  /**
-> diff --git a/security/ipe/policy.h b/security/ipe/policy.h
-> index 6818f6405dd0..ca37af46e5af 100644
-> --- a/security/ipe/policy.h
-> +++ b/security/ipe/policy.h
-> @@ -26,7 +26,14 @@ struct ipe_policy_line {
->  struct ipe_module;
-> =20
->  enum ipe_operation {
-> -	ipe_operation_max =3D 0,
-> +	ipe_operation_exec =3D 0,
-> +	ipe_operation_firmware,
-> +	ipe_operation_kernel_module,
-> +	ipe_operation_kexec_image,
-> +	ipe_operation_kexec_initramfs,
-> +	ipe_operation_ima_policy,
-> +	ipe_operation_ima_x509,
-> +	ipe_operation_max
->  };
-> =20
->  /*
-> @@ -34,7 +41,8 @@ enum ipe_operation {
->   * that are just one or more operations under the hood
->   */
->  enum ipe_op_alias {
-> -	ipe_op_alias_max =3D ipe_operation_max,
-> +	ipe_op_alias_kernel_read =3D ipe_operation_max,
-> +	ipe_op_alias_max,
->  };
-> =20
->  enum ipe_action {
+-- 
+Jens Axboe
 
