@@ -2,174 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C995C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B0AC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:51:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F42A60D07
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:46:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFCB861056
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:51:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231516AbhJMMsS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 08:48:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31181 "EHLO
+        id S232807AbhJMMxr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 08:53:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51921 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230197AbhJMMsR (ORCPT
+        by vger.kernel.org with ESMTP id S232949AbhJMMxq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 08:48:17 -0400
+        Wed, 13 Oct 2021 08:53:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634129174;
+        s=mimecast20190719; t=1634129503;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=pio+Rp9lSXqTgcX0jd1ToQMieUTpIAr4Wm8ggp456+o=;
-        b=fDi80G8h49m015tHrzDRZ4dnqOQz0tumxczgdg4RqrZK9kUk+sxseASBtqJwMu98wFSVv+
-        S26k9vkQSgyDok8hhvjNtlVGQc+sWGXq9I+FCQzYrISs42izR6FhOYKkrFLxywRPClTBkd
-        yMxLe2DuDR0GAMUuJa0Ll+tDy/ZZCjw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-XTE1s7i2M7KGi33xSKesxQ-1; Wed, 13 Oct 2021 08:46:13 -0400
-X-MC-Unique: XTE1s7i2M7KGi33xSKesxQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f1-20020a5d64c1000000b001611832aefeso1865592wri.17
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 05:46:13 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T/7FiCB1ISKOEoQmv0h0vU/4qoNS1mIBBsK6BA/38aI=;
+        b=eQS7Da+meQrkDunshiehhtY1ofFpXtpZtF/twq99yQcJcmUJMxuoTZ2UJsa0BHsLHc8jj/
+        ZHCTLf0Ko/8V4tFPq3QoU4wsxJ2TWm1Isj2B8XxVKp/xSLwGWxUy/RKoFQlTWKnwGYkTK7
+        Xyfex4ajtKs1xhO/X87muA8CgVTcxv4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-hCbcuFxzMgixxsf8J7ONOA-1; Wed, 13 Oct 2021 08:51:42 -0400
+X-MC-Unique: hCbcuFxzMgixxsf8J7ONOA-1
+Received: by mail-wr1-f69.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so1893929wrc.9
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 05:51:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=pio+Rp9lSXqTgcX0jd1ToQMieUTpIAr4Wm8ggp456+o=;
-        b=4Qux6w+6ixC9dh1UnKzQXPSFZb7OqAgJu4PngkVPErOXY8MXTRwz3gN6s1nBKW3B4p
-         pMWvTTTdoiMn6jpHuyr8p8jpGF7CA6E3h85uZjbdpFUR5TyrR0Kxy70fj4OgEMDLWa2Z
-         NsPZmLQvXJtDBdRLAOhCB4bGEK6mJH4lVu6vrHBoYrzH8Gq7QUSYZf3z7ns82Lfs5hXX
-         pRfa2+HVL3LpoNjkVpOPsk8W/k7Iaow/4SWzr3u2IcndI9M7r2h3G7ZHWZym4zKp9sbk
-         HeY2+HkNfhKy7/iSkrTamEnbWb81/RwHEEXZeMgR/BMbMaGrhxqjsTVGlFNnjo39/ePt
-         X+HA==
-X-Gm-Message-State: AOAM531ecOJfJ3hSinvZHNKKD/UlPSKsXoYJgTsoJPtxyWgygrwQPBGN
-        xXLIIEYMY9EbIO7i4Tye+NLSkrqgszknV2exDtB9ulpH1JWBFb2fHCSaWDcv7XOxvEAJd3ff9iT
-        R5I9Y7xRAAGyUvS0xQsveiRI=
-X-Received: by 2002:a1c:3586:: with SMTP id c128mr12804926wma.78.1634129172062;
-        Wed, 13 Oct 2021 05:46:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxWON28WQcyoAHS7/UuoGSQN5DfnmTJuEAcV0OBwnEccLiKLDK1QD4fr9pYUdKD+eXE6vI3mA==
-X-Received: by 2002:a1c:3586:: with SMTP id c128mr12804894wma.78.1634129171809;
-        Wed, 13 Oct 2021 05:46:11 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=T/7FiCB1ISKOEoQmv0h0vU/4qoNS1mIBBsK6BA/38aI=;
+        b=dUnSbXnarqaTZxAnInd84k/j68jCOdaASAYbNYYbEg+e4Z7lO6g0WmaOFdgUmpOBsg
+         1j6+yD9Z0Gjs+2ukxRlEYe54whdBKJv+9dT6Rsm/Xg87U4xp5zzF1DUmCt712jLag2C2
+         RIN7jkm3mrFZZR4j6waH7GCA5Tkpm789/6N5JDoTG8hkWnp4ztpNG0xhbU4WKrRpKzGw
+         VgkCzPPEPYd2hgAQAdUgbJApAs8KurKpkaCmT4edF44Esqbf3J5+VMgiaeRBjd5CzmrY
+         7ofl+koua23v68HY/1J+U4Q0TlFww9r5AS4A9lFa+rVzZtdpLLdWr3DMXcXWrUlSmotB
+         6mAw==
+X-Gm-Message-State: AOAM531sE0u/YRl0rnlKFZdb2EY+DqBHjulN82TrHp/YMEppWMkSVJgp
+        34RdcG+YO4o+CaE1GSP2Dfx+7ym1D3MqRYeMiyzeNIOFZSu3Dnax8x1UXpTs9QoQ4PU3qO0gFJM
+        l23RQQqrCujFJvSqYYpnQXUI=
+X-Received: by 2002:a1c:29c7:: with SMTP id p190mr12443699wmp.65.1634129500756;
+        Wed, 13 Oct 2021 05:51:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyxXShSsCgY6/PDbrJUPITVtStrZWvnffqdaNuTNNoDSChn1zbY5sZOccceeIhneM0FjogR/A==
+X-Received: by 2002:a1c:29c7:: with SMTP id p190mr12443682wmp.65.1634129500615;
+        Wed, 13 Oct 2021 05:51:40 -0700 (PDT)
 Received: from redhat.com ([2.55.30.112])
-        by smtp.gmail.com with ESMTPSA id s1sm5015348wmc.47.2021.10.13.05.46.09
+        by smtp.gmail.com with ESMTPSA id j1sm16548759wrb.56.2021.10.13.05.51.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 05:46:11 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 08:46:08 -0400
+        Wed, 13 Oct 2021 05:51:40 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 08:51:36 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     stable@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jason Wang <jasowang@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH] Revert "virtio-blk: Add validation for block size in config
- space"
-Message-ID: <20211013124553.23803-1-mst@redhat.com>
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Kevin Wolf <kwolf@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
+ space
+Message-ID: <20211013084711-mutt-send-email-mst@kernel.org>
+References: <20210809101609.148-1-xieyongji@bytedance.com>
+ <20211004112623-mutt-send-email-mst@kernel.org>
+ <20211005062359-mutt-send-email-mst@kernel.org>
+ <20211011114041.GB16138@lst.de>
+ <20211013082025-mutt-send-email-mst@kernel.org>
+ <CACycT3skLJp1HfovKP8AvQmdxhyJNG6YFrb6kXjd48qaztHBNQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+In-Reply-To: <CACycT3skLJp1HfovKP8AvQmdxhyJNG6YFrb6kXjd48qaztHBNQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It turns out that access to config space before completing the feature
-negotiation is broken for big endian guests at least with QEMU hosts up
-to 6.1 inclusive.  This affects any device that accesses config space in
-the validate callback: at the moment that is virtio-net with
-VIRTIO_NET_F_MTU but since 82e89ea077b9 ("virtio-blk: Add validation for
-block size in config space") that also started affecting virtio-blk with
-VIRTIO_BLK_F_BLK_SIZE. Further, unlike VIRTIO_NET_F_MTU which is off by
-default on QEMU, VIRTIO_BLK_F_BLK_SIZE is on by default, which resulted
-in lots of people not being able to boot VMs on BE.
+On Wed, Oct 13, 2021 at 08:34:22PM +0800, Yongji Xie wrote:
+> On Wed, Oct 13, 2021 at 8:21 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Oct 11, 2021 at 01:40:41PM +0200, Christoph Hellwig wrote:
+> > > On Tue, Oct 05, 2021 at 06:42:43AM -0400, Michael S. Tsirkin wrote:
+> > > > Stefan also pointed out this duplicates the logic from
+> > > >
+> > > >         if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
+> > > >                 return -EINVAL;
+> > > >
+> > > >
+> > > > and a bunch of other places.
+> > > >
+> > > >
+> > > > Would it be acceptable for blk layer to validate the input
+> > > > instead of having each driver do it's own thing?
+> > > > Maybe inside blk_queue_logical_block_size?
+> > >
+> > > I'm pretty sure we want down that before.  Let's just add a helper
+> > > just for that check for now as part of this series.  Actually validating
+> > > in in blk_queue_logical_block_size seems like a good idea, but returning
+> > > errors from that has a long tail.
+> >
+> > Xie Yongji, I think I will revert this patch for now - can you
+> > please work out adding that helper and using it in virtio?
+> >
+> 
+> Fine, I will do it.
+> 
+> Thanks,
+> Yongji
 
-The spec is very clear that what we are doing is legal so QEMU needs to
-be fixed, but given it's been broken for so many years and no one
-noticed, we need to give QEMU a bit more time before applying this.
+Great, thanks! And while at it, pls research a bit more and mention
+in the commit log what is the result of an illegal blk size?
+Is it memory corruption? A catastrophic failure?
+If it's one of these cases, then it's ok to just fail probe.
 
-Further, this patch is incomplete (does not check blk size is a power
-of two) and it duplicates the logic from nbd.
-
-Revert for now, and we'll reapply a cleaner logic in the next release.
-
-Cc: stable@vger.kernel.org
-Fixes: 82e89ea077b9 ("virtio-blk: Add validation for block size in config space")
-Cc: Xie Yongji <xieyongji@bytedance.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/block/virtio_blk.c | 37 ++++++-------------------------------
- 1 file changed, 6 insertions(+), 31 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 9b3bd083b411..303caf2d17d0 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -689,28 +689,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
- static unsigned int virtblk_queue_depth;
- module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
- 
--static int virtblk_validate(struct virtio_device *vdev)
--{
--	u32 blk_size;
--
--	if (!vdev->config->get) {
--		dev_err(&vdev->dev, "%s failure: config access disabled\n",
--			__func__);
--		return -EINVAL;
--	}
--
--	if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
--		return 0;
--
--	blk_size = virtio_cread32(vdev,
--			offsetof(struct virtio_blk_config, blk_size));
--
--	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
--		__virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
--
--	return 0;
--}
--
- static int virtblk_probe(struct virtio_device *vdev)
- {
- 	struct virtio_blk *vblk;
-@@ -722,6 +700,12 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	u8 physical_block_exp, alignment_offset;
- 	unsigned int queue_depth;
- 
-+	if (!vdev->config->get) {
-+		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-+			__func__);
-+		return -EINVAL;
-+	}
-+
- 	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
- 			     GFP_KERNEL);
- 	if (err < 0)
-@@ -836,14 +820,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	else
- 		blk_size = queue_logical_block_size(q);
- 
--	if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE) {
--		dev_err(&vdev->dev,
--			"block size is changed unexpectedly, now is %u\n",
--			blk_size);
--		err = -EINVAL;
--		goto out_cleanup_disk;
--	}
--
- 	/* Use topology information if available */
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
- 				   struct virtio_blk_config, physical_block_exp,
-@@ -1009,7 +985,6 @@ static struct virtio_driver virtio_blk = {
- 	.driver.name			= KBUILD_MODNAME,
- 	.driver.owner			= THIS_MODULE,
- 	.id_table			= id_table,
--	.validate			= virtblk_validate,
- 	.probe				= virtblk_probe,
- 	.remove				= virtblk_remove,
- 	.config_changed			= virtblk_config_changed,
 -- 
 MST
 
