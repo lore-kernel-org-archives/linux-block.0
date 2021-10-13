@@ -2,613 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B72C7C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 21:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 881AAC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 22:33:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94C5F61154
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 21:16:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F69860E78
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 22:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbhJMVSk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 17:18:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60088 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbhJMVSk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 17:18:40 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EEE5C061570;
-        Wed, 13 Oct 2021 14:16:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OweN4/Q43r5ozRtiEmdcNGecCgrlkdYBbqLd/9fIyVk=; b=cmm0g5Se2fWpUxGHvS6/o1TTcp
-        /swZ7uaI+PDlqFVaF2Zi47SDpB+XkzBatRloiXdxRM9IThZNImjwcEaOedeJ5FXpvxC3i3djvO+1X
-        1awvhIRanaOJ0jyMfu85yaOxlFzOjpH/v59jvmjABFtQhkcadtEiePraL4t5sOZ+bv+GX+pv7GgLH
-        JhSntEk5nBztXOUXirJmr9bcC9rWIBpfRL8CPbhtt0X4HXhZkknC2JcnJRRfBtDYcO53kiTzWuI05
-        irVDoJ4aC8jFAmvlq24fs5BojdIGY1Ub8a65qLuQU7WoZ9JVju8+5wX+1t6ceyHytQnJYFWywSJIN
-        gmycqdHw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1malbq-000hyd-FV; Wed, 13 Oct 2021 21:16:22 +0000
-Date:   Wed, 13 Oct 2021 14:16:22 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Miroslav Benes <mbenes@suse.cz>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mcgrof@kernel.org
-Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YWdMpv8lAFYtc18c@bombadil.infradead.org>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-10-mcgrof@kernel.org>
- <YVwZwh7qDKfSM59h@T590>
- <YWSr2trabEJflzlj@bombadil.infradead.org>
- <YWTU3kTlJKONyFjZ@T590>
- <YWX7pAn0YMaJeJBA@bombadil.infradead.org>
- <YWYxN875B6rlmAjC@T590>
- <YWbSk6p3bfXUPZ92@bombadil.infradead.org>
- <YWb1Z7EXruo6gaEp@T590>
+        id S231502AbhJMWfZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 18:35:25 -0400
+Received: from mail-bn8nam12on2064.outbound.protection.outlook.com ([40.107.237.64]:62464
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231450AbhJMWfY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Oct 2021 18:35:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SM2arQQxlIgoDYQ46t34DpvON3XojvqUmgBvj3625YvDM8OiZTXIh3Yxj2XldpfNe1+RJBdosqli6LqC+AmJLTDHQbrJxiojwcfpmSVfpXRpu7nRt9m8QIHPBjieSElYq1X0Uuumpjx6KhZfMpmlYhtYgIDGNBQHMfyQ5Shd3OhiL71ddclvV39ao6CP+U2v6S5DXgg5u1bq7ITlx/PX2U5l6qhnf7dKER4vtYRvY+COYTWby6aQKjuME2sTVm1Z/0SMWttZj55UkLBgAILR8rtZEnpuX+saGbptMZpvg+IzzdsybcnGDQITKYC2TmsA+T89gjm3aJz4NbO1ZgCV6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V9WNQaxe89gO8xkELPjDEHsY1By2K3v3YTrmazx1lBU=;
+ b=WcFP2yj605NtTLcYHaSAd7nOLjvhEhxG827ixuJJv9I0WMQa7zqXeM7V3q4Hp6hxDICznXui4OCWExbvdpmR8D6n5N/4JnuaeoWYq8rI4q4i3xl26GXAxt0sJ5cZ0ice/EU0NuVhxB+BBOewE9PMFla6cOLnWr5eyi7Rcy21DKMz6DgT85VKVKgS1G6nkcVTfXFRd0lEUgJXv6jPPzgj29s2VK4y/uiYx9dtnu7yUmC78UfyYM5sOFt+Jw3LwTySe9DAjVyxgOaQjzKxnt13UDjhUYqkbuBY5rs6v+9Q7O6SvTwWLfEbvb8UCTY/r9Z7nfL6UpmT7JyMMc0G5zKXaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V9WNQaxe89gO8xkELPjDEHsY1By2K3v3YTrmazx1lBU=;
+ b=GpOJhl+LAJaWxKBV1Lu0pgqBbaNRzR4vWpX9AHg7cbRd6RliVVV7f18G/yIuJ8n1yQZaotQ2qYnEeRYtq/oQZ2dbOkxDwwEk56ziBY4u5ui5jowrM33FF+N6wunLiRPk0MwRj6MxAIXnOQVMa8TR0QUhVD3laiur9XyQGsk1huuudfCXENn8bIerLX3JaXqu61E4lnwcQY/trhmzNArzxglLKCv+DwiATk1sLIRKDGLWuQhnRLvCzuVa7EUB/p/kgYZZ4oF5HjzVKXnFWA9156VxZ480AH109Os/mWmzLyqRvoJvRKlQbQOV9kGywsKhHsVynOMT2NlDWYae9/cUFQ==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by MW2PR12MB2379.namprd12.prod.outlook.com (2603:10b6:907:9::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4587.19; Wed, 13 Oct
+ 2021 22:33:16 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::3db1:105d:2524:524]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::3db1:105d:2524:524%7]) with mapi id 15.20.4587.026; Wed, 13 Oct 2021
+ 22:33:16 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Song Liu <song@kernel.org>, David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Kees Cook <keescook@chromium.org>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        Jan Kara <jack@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "jfs-discussion@lists.sourceforge.net" 
+        <jfs-discussion@lists.sourceforge.net>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
+        "linux-ntfs-dev@lists.sourceforge.net" 
+        <linux-ntfs-dev@lists.sourceforge.net>,
+        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
+        "reiserfs-devel@vger.kernel.org" <reiserfs-devel@vger.kernel.org>
+Subject: Re: [PATCH 06/29] nvmet: use bdev_nr_sectors instead of open coding
+ it
+Thread-Topic: [PATCH 06/29] nvmet: use bdev_nr_sectors instead of open coding
+ it
+Thread-Index: AQHXv/IJT42aTaoS/ky8slEigekLeKvRhLuA
+Date:   Wed, 13 Oct 2021 22:33:16 +0000
+Message-ID: <d061489a-af65-93e3-0e1a-5742b009ac79@nvidia.com>
+References: <20211013051042.1065752-1-hch@lst.de>
+ <20211013051042.1065752-7-hch@lst.de>
+In-Reply-To: <20211013051042.1065752-7-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 925e5792-cd56-400c-cb55-08d98e99737c
+x-ms-traffictypediagnostic: MW2PR12MB2379:
+x-microsoft-antispam-prvs: <MW2PR12MB2379A765A4511F401E080AB7A3B79@MW2PR12MB2379.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:883;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: HmZNDs+/9bmFO3mxqVbYpCBiptkoJOhlXm6drvLo1eIAAPn0GDF5ReB0O24E/3QR9QdZdObW9Fmbvfpd9fmKqBvWculll//lsFwD7JiPtJy3K1fq/8reSUHRkcQe7PN6nyDBGUV6SqFU+AAs7oZI4SL98Nsc0lsn+SC9QCsjOFPAjQ245whu/OdX09HQC2JcOekWTATlBc0DheLZyLAsipKZiZ7HXpz9Z4UT+qVCfD5kTMtUDIOQGDPUXLTzw1Gc9EtXLLMLNAiB2u5QN/664tM+kMgFZ6u2fPLjadG4YgAn3bRt2KcwHol6PgnRlOeqH8HXbEwli1/zkpobuDgxjTtl9d3KdZ/PjAGaZFLzsXUMiRQbRO3/xxg+KxKflIoXdXDhMif8nqavaUbF8WlMr7GHzzksOeAg8EsYuRMaxzMELGyvyV3q5PO4EFI94R/z9r2+INzrMAhMSvWvKVVD8HGY6vax07dJz1OPsOKjQvSC5XXaXlwh7sxbVJ84Y3Dyqtz9SYAIfT8mmLXxXwNT28ZQGhNVW2EGOkXwr8QnbX5EyvX2XdmOkJM9mb/6vR9GzwqZt7DlmhUsVSnC+HQTn+hCqFAH3sxIpXT48NesUZxgA75oRlfejztTYpwFrbw2m2ZaYHD8DnBz9s1AiBKU/r1Jw0oFvVTq5fHiGloruQ/ddTe76i/mnLfmuM1KdbfSsPYbKP7sedZ5BQDx32iPzggdxPc8oJdjvvneOUt9C4heN+1BOPDaqfrTrfeGM5gfNRmqi6zdQj278VcYL5aGAw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(122000001)(38100700002)(36756003)(5660300002)(83380400001)(316002)(6506007)(91956017)(66476007)(76116006)(86362001)(6486002)(8936002)(8676002)(66556008)(4326008)(2616005)(2906002)(110136005)(54906003)(66446008)(6512007)(64756008)(186003)(66946007)(31686004)(53546011)(71200400001)(38070700005)(7416002)(558084003)(7406005)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Wm9Rc09FeE5lSmptUWFYZ0o5RWI5RWRaRDNJaDVTTUVUYzdYK3pmWlFOYWFs?=
+ =?utf-8?B?aDBCdm1OK3QvTHNTSlNrekpMR2hZVUp6MSszNmlxRE04TzR1RXQ3WDZiemJR?=
+ =?utf-8?B?QmtGRWY3eEtKYWdhV3N0OWtIdVpVenJtYzVtWTVUc2dGTmliYUo0UjZSUEIx?=
+ =?utf-8?B?b2hnd05SekloRjMrU1J3cXM3MHVkQ044eTlaRDMwUFN2V2xHb1Q0aXBHU0sz?=
+ =?utf-8?B?QkFRWjdBa3ZPZmpyS0Z6aWcyZFNVU2pDMXJVRUw4L3A1UHNnTS9WNmZqNzJ2?=
+ =?utf-8?B?U2E4Q3lsWVhjS1d2TFp4OE1kamtUUFk1alpQejFoZXBHQjA0TEZQMTBEdUtk?=
+ =?utf-8?B?dUVQNW9xb01KVEE3d3hzczJyMVpOcWxnOUIwalNJOHE3dEpuRkgwcEV1dk9u?=
+ =?utf-8?B?RUlhRi80OEdoYno0RGthOXNQdkxFSGVwZG0xQzVWOEtlcXVnV2hCK21Ob1FS?=
+ =?utf-8?B?Y1NQYzFXRlZZZ3M2TG43OUc2Zmx5dXdFd2xsY1o1S0doMXZLcUdYV2xVK1RD?=
+ =?utf-8?B?MnFoZ3lFbkpCUDN6QS9ldCtsVlgzQ2VrVVpGRnFCY1dsME9rMWFXQ0RaYm9k?=
+ =?utf-8?B?ditJZlZaaWN5aDZrWTFRWGZQbmhUVEpNbWczbTI1Z2NNSXc2bWxlanRPSU0v?=
+ =?utf-8?B?dVU4RWNkeVZ5dllhZzNqZDZMVXpNZkhEN004dkh1Qm9ENmNmZHcrNFVnbW52?=
+ =?utf-8?B?VVRWbEExYkVoNld3ME5Kc25hUngwdDFDSEtndE81UUZ6b3NnbW9mcVR5NDRm?=
+ =?utf-8?B?ejVGSGN4MDAvQXJqWGhyK2V3Q2RxQkJhdU9NdkhwSnlUb21lb3g1OXpDc0xH?=
+ =?utf-8?B?Z2dDWWRGbEVGaGRSTm5IZXUyV2ZEMU9VeGltejZFOFZrWmtrSk8xRkV3bGd5?=
+ =?utf-8?B?ckNmeEQraklBSEh1Y0s0RE1jU0djU3lvb0tPdXI1TkhVdU1COUFLM2VFTTlU?=
+ =?utf-8?B?NEk1OU05ZmFzZ0ZkTHB3ZWRETU0zS3pNV3FQdkl3SDcrd0p6NGdmRG1vbXlB?=
+ =?utf-8?B?a1ZBbnh5SlhaRGRqaUFQRUNrTFl0ZFlJUTN6N0lBWUNlQkhVTGVqd1FSRmZG?=
+ =?utf-8?B?U25VczZKeko5aHFOSTZFU3VPVzBKRERwZ2hZNEkxQlFjbnYyc3A3NzlURlND?=
+ =?utf-8?B?N0YyK0M4OGsvdWF0U29vWjEwZG1PYkU1NTZEY0dVUjBOUVpEbW5WcERuM1h6?=
+ =?utf-8?B?bDl5WWRSM3AvME9OWHhheE9Mb1Q3MWtudllVY0dSQlRBeGxDSDYzTFlOcERU?=
+ =?utf-8?B?dDA4YjJGQ1kvb21IcXVVaElSdmJiYk1DN2dLU0k2TURqU2FKSlFMczZ1T1pm?=
+ =?utf-8?B?eFlPQlU3WlBQM1d5SUQwNzh4T2FrK1RLOFU5cGNiUW8wb2ZBaEUzSnZrWm1a?=
+ =?utf-8?B?bThxK2x4RXp3aVQxZ0pzNjhaVnBlaGRwSWkwcm9mVnh2YmUyeDc2SHgyQWxE?=
+ =?utf-8?B?R1o3TCtNOHR1NStsMVBTVTVCdVZrQklXUlIwalVoWlVtRDFPTUhEbDRaT1lV?=
+ =?utf-8?B?UU1nb1hHVkhFZ1VucW1ud1UxRngrL0FiZ0RlUWJ2bHlDSnpvZ2g0bVJKclFF?=
+ =?utf-8?B?Tmh3NC9CWmhab3RyczU0MFhkUDlPNUZDa0YyQTQyeHBWdFQvdUgzdEJLSGYw?=
+ =?utf-8?B?alAxWklTdVpyNllXemZKTWZ1cWRBS1RNS0liN29va2pmMlppbFlvZWdDMVJL?=
+ =?utf-8?B?M3dEL2RYaVBYT0ZheFRiVmxsY1NnQlJ3VSttZHVlSjJ0VDBDcHZPRHdRZmJJ?=
+ =?utf-8?B?N0IxRlFPb0dkS1NqVGVrYWNxdWgvdURLeVc2MC92a3NvNU5iWEhXdm5ZeklM?=
+ =?utf-8?B?TnFEZVlVYTZ0MjNKN1YzeVRPNUhyWS9xME1UVUpmTXhVVkJpQ0ZQQVlDcmYr?=
+ =?utf-8?Q?lon6lLeyBTQAM?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <61F41960B16F6C40AEC03242CA4F6BBB@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YWb1Z7EXruo6gaEp@T590>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 925e5792-cd56-400c-cb55-08d98e99737c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Oct 2021 22:33:16.6695
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mPsTW6e+igrbMrCtSBOuyDdDJc4pZjDc2MHDoi2YpPa3DR287U8g7YDRmZD1A3l+TXhqsBdc8AuDAbRsnRRXzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2379
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 11:04:07PM +0800, Ming Lei wrote:
-> On Wed, Oct 13, 2021 at 05:35:31AM -0700, Luis Chamberlain wrote:
-> > On Wed, Oct 13, 2021 at 09:07:03AM +0800, Ming Lei wrote:
-> > > On Tue, Oct 12, 2021 at 02:18:28PM -0700, Luis Chamberlain wrote:
-> > > > > Looks test_sysfs isn't in linus tree, where can I find it?
-> > > > 
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210927-sysfs-generic-deadlock-fix
-> > > > 
-> > > > To reproduce the deadlock revert the patch in this thread and then run
-> > > > either of these two tests as root:
-> > > > 
-> > > > ./tools/testing/selftests/sysfs/sysfs.sh -w 0027
-> > > > ./tools/testing/selftests/sysfs/sysfs.sh -w 0028
-> > > > 
-> > > > You will need to enable the test_sysfs driver.
-> > > > > Can you share the code which waits for the sysfs / kernfs files to be
-> > > > > stop being used?
-> > > > 
-> > > > How about a call trace of the two tasks which deadlock, here is one of
-> > > > running test 0027:
-> > > > 
-> > > > kdevops login: [  363.875459] INFO: task sysfs.sh:1271 blocked for more
-> > > > than 120 seconds.
-> > 
-> > <-- snip -->
-> > 
-> > > That doesn't show the deadlock is related with module_exit().
-> > 
-> > Not directly no.
-> 
-> Then the patch title of 'sysfs: fix deadlock race with module removal'
-> is wrong.
-
-Well that is what it does though. The scope of the issue you are raising
-is beyond module removal, but I do agree such races can exist outside of
-module removal.
-
-> > > It is clearly one AA deadlock, what I meant was that it isn't related with
-> > > module exit cause lock & device_del() isn't always done in module exit, so
-> > > I doubt your fix with grabbing module refcnt is good or generic enough.
-> > 
-> > A device_del() *can* happen in other areas other than module exit sure,
-> > but the issue is if a shared lock is used *before* device_del() and also
-> > used on a sysfs op. Typically this can happen on module exit, and the
-> > other common use case in my experience is on sysfs ops, such is the case
-> > with the zram driver. Both cases are covered then by this fix.
-> 
-> Again, can you share the related zram code about the issue? In
-> zram_drv.c of linus or next tree, I don't see any lock is held before
-> calling del_gendisk().
-
-There is another bug with CPU hotplug multistate support in the zram
-driver which a patch in this series fixes, refer to the patch titled
-"zram: fix crashes with cpu hotplug multistate". In zram's case we need
-to contend a generic lock on certain sysfs attributes due to the way CPU
-hotplug is used.
-
-If we tried to generalize this on the block layer the closest we get is
-the disk->fops->owner, however zram is an example driver where the
-disk->fops is actually be even changed *after* module load, and so the
-original disk->fops->owner can be dynamic. In zram's case the
-fops->owner is the same, however we have no semantics to ensure this is
-the case for all block drivers.
-
-In the case for live patching, refer to the use of klp_mutex. The way
-that was solved there was a combination of completions and deferred
-works to solve it, so that all kobject_put calls are outside of the
-critical sections, refer to commit 3ec24776bfd0 ("livepatch:
-allow removal of a disabled patch").
-
-And so it was encouraged a generic solution be sought after.
-
-> > If there are other areas, that is still driver specific, but of the
-> > things we *can* generalize, definitely module exit is a common path.
-> > 
-> > > Except for your cooked test_sys module, how many real drivers do suffer the
-> > > problem? What are they?
-> > 
-> > I only really seriously considered trying to generalize this after it
-> 
-> IMO your generalization isn't good or correct because this kind of issue
-> is _not_ related with module exit at all. What matters is just that one lock is
-> held before calling device_del(), meantime the same lock is required
-> in the device's attribute show/store function().
-
-Your point that a race for a deadlock still can exist beyond module
-removal is valid but unfortunately there are no possible semantics I can
-see to fix that generically at this time.
-
-> There are many cases in which we call device_del() not from module_exit(),
-> such as scsi scan, scsi sysfs store(), or even handling event from
-> device side, nvme error handling, usb hotplug, ...
-
-These are really good points.
-
-> > was hinted to me live patching was also affected, and so clearly
-> > something generic was desirable.
-> 
-> It might be just the only two drivers(zram and live patch) with this bug, and
-> it is one simply AA bug in driver. Not mention I don't see such usage in
-> zram_drv.c.
-
-Well... given what you say above about other uses cases other than
-module removal which can remove sysfs files and having them be used,
-the possibilities of this deadlock existing elsewhere should increase,
-not decrease.
-
-> > There may be other drivers for sure, but a hunt for that with semantics
-> > would require a bit complex coccinelle patch with iteration support.
-> > 
-> > > Why can't we fix the exact driver?
-> > 
-> > You can try, the way the lock is used in zram is correct, specially
-> 
-> What is the lock in zram? Again can you share the related functions?
-
-If you git checked out the tree I mentioned try looking at the code
-there with the fix for CPU hotplug multistate in mind.
-
-> > after my other fix in this series which addresses another unrelated bug
-> > with cpu hotplug multistate support. So we then can proceed to either
-> > take the position to say: "Thou shalt not use a shared lock on module
-> > exit and a sysfs op" and try to fix all places, or we generalize a fix
-> > for this. A generic fix seems more desirable.
-> 
-> What matters is that the lock is held before calling device_del()
-> instead of being held in module_exit().
-
-I agree the possibilities can include more than just module exit.
-Unfortunately I can't see a way to generalize this further. I tried,
-see below, and this moves the ideas from a module to the kobject, but
-even with that, it does not get us any closer to fixing this
-generically. The reason a fix works for module removal is the
-try_module_get() call when getting the kernfs active reference
-will trump the module exit call completely, and so we *do* prevent
-the context which will issue the lock in this case if a sysfs
-operation is in progress.
-
-Outside of that call sequence I am afraid we'd need separate solutions
-or side with the 'though shall not use a shared lock on a sysfs op
-and when issuing a device_del(), other than module exit'.
-
-Below is an attempt to generalize this further, but it does not work,
-let me know if you have further ideas.
-
-diff --git a/arch/x86/kernel/cpu/resctrl/rdtgroup.c b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
-index b57b3db9a6a7..4edf3b37fd2c 100644
---- a/arch/x86/kernel/cpu/resctrl/rdtgroup.c
-+++ b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
-@@ -209,7 +209,7 @@ static int rdtgroup_add_file(struct kernfs_node *parent_kn, struct rftype *rft)
- 
- 	kn = __kernfs_create_file(parent_kn, rft->name, rft->mode,
- 				  GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
--				  0, rft->kf_ops, rft, NULL, NULL);
-+				  0, rft->kf_ops, rft, NULL, NULL, NULL);
- 	if (IS_ERR(kn))
- 		return PTR_ERR(kn);
- 
-@@ -2482,7 +2482,7 @@ static int mon_addfile(struct kernfs_node *parent_kn, const char *name,
- 
- 	kn = __kernfs_create_file(parent_kn, name, 0444,
- 				  GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, 0,
--				  &kf_mondata_ops, priv, NULL, NULL);
-+				  &kf_mondata_ops, priv, NULL, NULL, NULL);
- 	if (IS_ERR(kn))
- 		return PTR_ERR(kn);
- 
-diff --git a/drivers/base/core.c b/drivers/base/core.c
-index 7758223f040c..38f07072ab44 100644
---- a/drivers/base/core.c
-+++ b/drivers/base/core.c
-@@ -3507,6 +3507,7 @@ bool kill_device(struct device *dev)
- 	if (dev->p->dead)
- 		return false;
- 	dev->p->dead = true;
-+	kobject_set_being_removed(&dev->kobj);
- 	return true;
- }
- EXPORT_SYMBOL_GPL(kill_device);
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index ba581429bf7b..7d14f6b2c12d 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -14,6 +14,7 @@
- #include <linux/slab.h>
- #include <linux/security.h>
- #include <linux/hash.h>
-+#include <linux/kobject.h>
- 
- #include "kernfs-internal.h"
- 
-@@ -414,15 +415,38 @@ static bool kernfs_unlink_sibling(struct kernfs_node *kn)
-  */
- struct kernfs_node *kernfs_get_active(struct kernfs_node *kn)
- {
-+	int v;
-+
- 	if (unlikely(!kn))
- 		return NULL;
- 
- 	if (!atomic_inc_unless_negative(&kn->active))
- 		return NULL;
- 
-+	/*
-+	 * If a kobject created the kernfs_node, the kobject cannot possibly be
-+	 * removed if the above atomic_inc_unless_negative() succeeded. But we
-+	 * need to inspect if its on its way out to ensure that we don't
-+	 * deadlock in case a kernfs operation and the code responsible for
-+	 * the kobject removal used a shared lock.
-+	 */
-+	if (kn->kobj) {
-+		if (WARN_ON(!kobject_get_unless_zero(kn->kobj))) {
-+			goto fail;
-+		} else if (kobject_being_removed(kn->kobj)) {
-+			kobject_put(kn->kobj);
-+			goto fail;
-+		}
-+	}
-+
- 	if (kernfs_lockdep(kn))
- 		rwsem_acquire_read(&kn->dep_map, 0, 1, _RET_IP_);
- 	return kn;
-+fail:
-+	v = atomic_dec_return(&kn->active);
-+	if (unlikely(v == KN_DEACTIVATED_BIAS))
-+		wake_up_all(&kernfs_root(kn)->deactivate_waitq);
-+	return NULL;
- }
- 
- /**
-@@ -442,6 +466,7 @@ void kernfs_put_active(struct kernfs_node *kn)
- 	if (kernfs_lockdep(kn))
- 		rwsem_release(&kn->dep_map, _RET_IP_);
- 	v = atomic_dec_return(&kn->active);
-+	kobject_put(kn->kobj);
- 	if (likely(v != KN_DEACTIVATED_BIAS))
- 		return;
- 
-@@ -572,7 +597,8 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 					     struct kernfs_node *parent,
- 					     const char *name, umode_t mode,
- 					     kuid_t uid, kgid_t gid,
--					     unsigned flags)
-+					     unsigned flags,
-+					     struct kobject *kobj)
- {
- 	struct kernfs_node *kn;
- 	u32 id_highbits;
-@@ -607,6 +633,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 	kn->name = name;
- 	kn->mode = mode;
- 	kn->flags = flags;
-+	kn->kobj = kobj;
- 
- 	if (!uid_eq(uid, GLOBAL_ROOT_UID) || !gid_eq(gid, GLOBAL_ROOT_GID)) {
- 		struct iattr iattr = {
-@@ -640,12 +667,13 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
- 				    const char *name, umode_t mode,
- 				    kuid_t uid, kgid_t gid,
--				    unsigned flags)
-+				    unsigned flags,
-+				    struct kobject *kobj)
- {
- 	struct kernfs_node *kn;
- 
- 	kn = __kernfs_new_node(kernfs_root(parent), parent,
--			       name, mode, uid, gid, flags);
-+			       name, mode, uid, gid, flags, kobj);
- 	if (kn) {
- 		kernfs_get(parent);
- 		kn->parent = parent;
-@@ -927,7 +955,7 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
- 
- 	kn = __kernfs_new_node(root, NULL, "", S_IFDIR | S_IRUGO | S_IXUGO,
- 			       GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
--			       KERNFS_DIR);
-+			       KERNFS_DIR, NULL);
- 	if (!kn) {
- 		idr_destroy(&root->ino_idr);
- 		kfree(root);
-@@ -969,20 +997,22 @@ void kernfs_destroy_root(struct kernfs_root *root)
-  * @gid: gid of the new directory
-  * @priv: opaque data associated with the new directory
-  * @ns: optional namespace tag of the directory
-+ * @kobj: if set, the kobject responsible for this directory
-  *
-  * Returns the created node on success, ERR_PTR() value on failure.
-  */
- struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
- 					 const char *name, umode_t mode,
- 					 kuid_t uid, kgid_t gid,
--					 void *priv, const void *ns)
-+					 void *priv, const void *ns,
-+					 struct kobject *kobj)
- {
- 	struct kernfs_node *kn;
- 	int rc;
- 
- 	/* allocate */
- 	kn = kernfs_new_node(parent, name, mode | S_IFDIR,
--			     uid, gid, KERNFS_DIR);
-+			     uid, gid, KERNFS_DIR, kobj);
- 	if (!kn)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -1014,7 +1044,8 @@ struct kernfs_node *kernfs_create_empty_dir(struct kernfs_node *parent,
- 
- 	/* allocate */
- 	kn = kernfs_new_node(parent, name, S_IRUGO|S_IXUGO|S_IFDIR,
--			     GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, KERNFS_DIR);
-+			     GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, KERNFS_DIR,
-+			     parent->kobj);
- 	if (!kn)
- 		return ERR_PTR(-ENOMEM);
- 
-diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
-index 4479c6580333..1b02f3e69c81 100644
---- a/fs/kernfs/file.c
-+++ b/fs/kernfs/file.c
-@@ -978,6 +978,7 @@ const struct file_operations kernfs_file_fops = {
-  * @priv: private data for the file
-  * @ns: optional namespace tag of the file
-  * @key: lockdep key for the file's active_ref, %NULL to disable lockdep
-+ * @kobj: if set, the kobject responsible for the file
-  *
-  * Returns the created node on success, ERR_PTR() value on error.
-  */
-@@ -987,7 +988,8 @@ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
- 					 loff_t size,
- 					 const struct kernfs_ops *ops,
- 					 void *priv, const void *ns,
--					 struct lock_class_key *key)
-+					 struct lock_class_key *key,
-+					 struct kobject *kobj)
- {
- 	struct kernfs_node *kn;
- 	unsigned flags;
-@@ -996,7 +998,7 @@ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
- 	flags = KERNFS_FILE;
- 
- 	kn = kernfs_new_node(parent, name, (mode & S_IALLUGO) | S_IFREG,
--			     uid, gid, flags);
-+			     uid, gid, flags, kobj);
- 	if (!kn)
- 		return ERR_PTR(-ENOMEM);
- 
-diff --git a/fs/kernfs/kernfs-internal.h b/fs/kernfs/kernfs-internal.h
-index 9e3abf597e2d..44983720d292 100644
---- a/fs/kernfs/kernfs-internal.h
-+++ b/fs/kernfs/kernfs-internal.h
-@@ -134,7 +134,8 @@ int kernfs_add_one(struct kernfs_node *kn);
- struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
- 				    const char *name, umode_t mode,
- 				    kuid_t uid, kgid_t gid,
--				    unsigned flags);
-+				    unsigned flags,
-+				    struct kobject *kobj);
- 
- /*
-  * file.c
-diff --git a/fs/kernfs/symlink.c b/fs/kernfs/symlink.c
-index 19a6c71c6ff5..c877de06e53a 100644
---- a/fs/kernfs/symlink.c
-+++ b/fs/kernfs/symlink.c
-@@ -36,7 +36,8 @@ struct kernfs_node *kernfs_create_link(struct kernfs_node *parent,
- 		gid = target->iattr->ia_gid;
- 	}
- 
--	kn = kernfs_new_node(parent, name, S_IFLNK|0777, uid, gid, KERNFS_LINK);
-+	kn = kernfs_new_node(parent, name, S_IFLNK|0777, uid, gid, KERNFS_LINK,
-+			     target->kobj);
- 	if (!kn)
- 		return ERR_PTR(-ENOMEM);
- 
-diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
-index b6b6796e1616..9cc159e9fb55 100644
---- a/fs/sysfs/dir.c
-+++ b/fs/sysfs/dir.c
-@@ -57,7 +57,7 @@ int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
- 	kobject_get_ownership(kobj, &uid, &gid);
- 
- 	kn = kernfs_create_dir_ns(parent, kobject_name(kobj), 0755, uid, gid,
--				  kobj, ns);
-+				  kobj, ns, kobj);
- 	if (IS_ERR(kn)) {
- 		if (PTR_ERR(kn) == -EEXIST)
- 			sysfs_warn_dup(parent, kobject_name(kobj));
-diff --git a/fs/sysfs/file.c b/fs/sysfs/file.c
-index 42dcf96881b6..e1a3315dba35 100644
---- a/fs/sysfs/file.c
-+++ b/fs/sysfs/file.c
-@@ -292,7 +292,7 @@ int sysfs_add_file_mode_ns(struct kernfs_node *parent,
- #endif
- 
- 	kn = __kernfs_create_file(parent, attr->name, mode & 0777, uid, gid,
--				  PAGE_SIZE, ops, (void *)attr, ns, key);
-+				  PAGE_SIZE, ops, (void *)attr, ns, key, kobj);
- 	if (IS_ERR(kn)) {
- 		if (PTR_ERR(kn) == -EEXIST)
- 			sysfs_warn_dup(parent, attr->name);
-@@ -309,6 +309,7 @@ int sysfs_add_bin_file_mode_ns(struct kernfs_node *parent,
- 	struct lock_class_key *key = NULL;
- 	const struct kernfs_ops *ops;
- 	struct kernfs_node *kn;
-+	struct kobject *kobj = parent->priv;
- 
- 	if (battr->mmap)
- 		ops = &sysfs_bin_kfops_mmap;
-@@ -327,7 +328,8 @@ int sysfs_add_bin_file_mode_ns(struct kernfs_node *parent,
- #endif
- 
- 	kn = __kernfs_create_file(parent, attr->name, mode & 0777, uid, gid,
--				  battr->size, ops, (void *)attr, ns, key);
-+				  battr->size, ops, (void *)attr, ns, key,
-+				  kobj);
- 	if (IS_ERR(kn)) {
- 		if (PTR_ERR(kn) == -EEXIST)
- 			sysfs_warn_dup(parent, attr->name);
-diff --git a/fs/sysfs/group.c b/fs/sysfs/group.c
-index eeb0e3099421..36022fe2b21d 100644
---- a/fs/sysfs/group.c
-+++ b/fs/sysfs/group.c
-@@ -135,7 +135,8 @@ static int internal_create_group(struct kobject *kobj, int update,
- 		} else {
- 			kn = kernfs_create_dir_ns(kobj->sd, grp->name,
- 						  S_IRWXU | S_IRUGO | S_IXUGO,
--						  uid, gid, kobj, NULL);
-+						  uid, gid, kobj, NULL,
-+						  kobj);
- 			if (IS_ERR(kn)) {
- 				if (PTR_ERR(kn) == -EEXIST)
- 					sysfs_warn_dup(kobj->sd, grp->name);
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index cd968ee2b503..38155414e6e5 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -161,6 +161,7 @@ struct kernfs_node {
- 	unsigned short		flags;
- 	umode_t			mode;
- 	struct kernfs_iattrs	*iattr;
-+	struct kobject		*kobj;
- };
- 
- /*
-@@ -370,7 +371,8 @@ void kernfs_destroy_root(struct kernfs_root *root);
- struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
- 					 const char *name, umode_t mode,
- 					 kuid_t uid, kgid_t gid,
--					 void *priv, const void *ns);
-+					 void *priv, const void *ns,
-+					 struct kobject *kobj);
- struct kernfs_node *kernfs_create_empty_dir(struct kernfs_node *parent,
- 					    const char *name);
- struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
-@@ -379,7 +381,8 @@ struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
- 					 loff_t size,
- 					 const struct kernfs_ops *ops,
- 					 void *priv, const void *ns,
--					 struct lock_class_key *key);
-+					 struct lock_class_key *key,
-+					 struct kobject *kobj);
- struct kernfs_node *kernfs_create_link(struct kernfs_node *parent,
- 				       const char *name,
- 				       struct kernfs_node *target);
-@@ -472,14 +475,15 @@ static inline void kernfs_destroy_root(struct kernfs_root *root) { }
- static inline struct kernfs_node *
- kernfs_create_dir_ns(struct kernfs_node *parent, const char *name,
- 		     umode_t mode, kuid_t uid, kgid_t gid,
--		     void *priv, const void *ns)
-+		     void *priv, const void *ns, struct kobject *kobj)
- { return ERR_PTR(-ENOSYS); }
- 
- static inline struct kernfs_node *
- __kernfs_create_file(struct kernfs_node *parent, const char *name,
- 		     umode_t mode, kuid_t uid, kgid_t gid,
- 		     loff_t size, const struct kernfs_ops *ops,
--		     void *priv, const void *ns, struct lock_class_key *key)
-+		     void *priv, const void *ns, struct lock_class_key *key,
-+		     struct kobject *kobj)
- { return ERR_PTR(-ENOSYS); }
- 
- static inline struct kernfs_node *
-@@ -566,7 +570,7 @@ kernfs_create_dir(struct kernfs_node *parent, const char *name, umode_t mode,
- {
- 	return kernfs_create_dir_ns(parent, name, mode,
- 				    GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
--				    priv, NULL);
-+				    priv, NULL, parent->kobj);
- }
- 
- static inline int kernfs_remove_by_name(struct kernfs_node *parent,
-diff --git a/include/linux/kobject.h b/include/linux/kobject.h
-index efd56f990a46..cb26ebeb7cf1 100644
---- a/include/linux/kobject.h
-+++ b/include/linux/kobject.h
-@@ -77,6 +77,7 @@ struct kobject {
- 	unsigned int state_add_uevent_sent:1;
- 	unsigned int state_remove_uevent_sent:1;
- 	unsigned int uevent_suppress:1;
-+	unsigned int being_removed:1;
- };
- 
- extern __printf(2, 3)
-@@ -117,6 +118,15 @@ extern void kobject_get_ownership(struct kobject *kobj,
- 				  kuid_t *uid, kgid_t *gid);
- extern char *kobject_get_path(struct kobject *kobj, gfp_t flag);
- 
-+static inline bool kobject_being_removed(const struct kobject *kobj)
-+{
-+	if (!kobj)
-+		return false;
-+	return !!kobj->being_removed;
-+}
-+
-+void kobject_set_being_removed(struct kobject *kobj);
-+
- /**
-  * kobject_has_children - Returns whether a kobject has children.
-  * @kobj: the object to test
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 9e0390000025..c6b0a28f599c 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -3975,7 +3975,7 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
- 				  cgroup_file_mode(cft),
- 				  GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
- 				  0, cft->kf_ops, cft,
--				  NULL, key);
-+				  NULL, key, NULL);
- 	if (IS_ERR(kn))
- 		return PTR_ERR(kn);
- 
-diff --git a/lib/kobject.c b/lib/kobject.c
-index 4a56f519139d..ef89bf2ac218 100644
---- a/lib/kobject.c
-+++ b/lib/kobject.c
-@@ -221,6 +221,12 @@ static void kobject_init_internal(struct kobject *kobj)
- 	kobj->state_initialized = 1;
- }
- 
-+void kobject_set_being_removed(struct kobject *kobj)
-+{
-+	if (!kobj)
-+		return;
-+	kobj->being_removed = 1;
-+}
- 
- static int kobject_add_internal(struct kobject *kobj)
- {
+T24gMTAvMTIvMjAyMSAxMDoxMCBQTSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IFVzZSB0
+aGUgcHJvcGVyIGhlbHBlciB0byByZWFkIHRoZSBibG9jayBkZXZpY2Ugc2l6ZS4NCj4gDQo+IFNp
+Z25lZC1vZmYtYnk6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KPiAtLS0NCg0KTG9v
+a3MgZ29vZC4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBLdWxrYXJuaSA8a2NoQG52aWRpYS5j
+b20+DQo=
