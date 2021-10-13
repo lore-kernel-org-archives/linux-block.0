@@ -2,137 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D0CC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 07:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6EDC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 07:13:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30AA8610A0
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 07:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFDA560EDF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 07:13:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238336AbhJMHME (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 03:12:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60704 "EHLO
+        id S230057AbhJMHPk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 03:15:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238334AbhJMHMA (ORCPT
+        with ESMTP id S229833AbhJMHPk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 03:12:00 -0400
+        Wed, 13 Oct 2021 03:15:40 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A77C061570
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 00:09:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA4AC061570
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 00:13:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Q6v1qYFSzejbOcobGcA8Pm+xEYzFhY58TnbWUsVzHpo=; b=LZ807zr40oKfQ/3XaZ234bbepp
-        O7ZlqrbcmChRK8l+c/WFUWdaAbTDMNzbL8QJ1CrClLgftGQygV7FrFmVoqrGDjSwm5/ENkWewnSOu
-        cchTuCmSNeyVdIp1C0xLSWDBoO6QzpX77TqYmlcNINZORut5cIS9f7tfKM7K9vk0IdIN3MRhbF+P7
-        z91fGeCsqD9BSJxdQYHkh+nanuIVzBgqKOvFQxVNKEknWmYy4L2QOgUpUNPv4hG4tOWlam92zU245
-        O4C3AF1nWMRB5MwmMRSlwzKmg6mOnHPDOjtA/Rd0R7qJeGj3EmGdLArurMjhQDcZZ2TjYXxPULjzX
-        JiGWAwTw==;
+        bh=YIW8X/aLaMFY8kZSxmdCd4LemQb8nwnk4AXsiNFEflM=; b=WnXhX6ZX/9aqAevqNXG/HRhWtz
+        uGrC6l+oQLo4lTQvnNR6QP7DKLDA4VOkjsxWHa+yxQE7GAsvN7RHsmtGgV/Jsz/yaDBpIXvzCscqr
+        TGy+VYvKAjo3j7PMUA77AQ7g7P+O4e88QEZmFqD2W6/ITYw7Zkeow+teTJRUS5OpmZ7ekvwgPb8pA
+        cQZ968gf+AmPvPyKKStm2Z2MbNPaAd4jehxhJOP9SDVHdpiPCLkM2VJqVDCHQgAcyk2yB3zv7h3z5
+        tgWE/LFF8Q/J7AvsRiQW/fJwM3+hYnJ1U7h/PaMln5arwnUpYHbBQiclCgXjqPbOhfEwQHqOjrrQp
+        OFfUOwOg==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1maYNj-007Czh-9Z; Wed, 13 Oct 2021 07:09:10 +0000
-Date:   Wed, 13 Oct 2021 08:08:55 +0100
+        id 1maYR7-007DBD-Fc; Wed, 13 Oct 2021 07:12:58 +0000
+Date:   Wed, 13 Oct 2021 08:12:25 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 6/9] nvme: add support for batched completion of polled IO
-Message-ID: <YWaGB/798mw3kt9O@infradead.org>
+Subject: Re: [PATCH 9/9] nvme: wire up completion batching for the IRQ path
+Message-ID: <YWaG2c9IAm1y3275@infradead.org>
 References: <20211012181742.672391-1-axboe@kernel.dk>
- <20211012181742.672391-7-axboe@kernel.dk>
+ <20211012181742.672391-10-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211012181742.672391-7-axboe@kernel.dk>
+In-Reply-To: <20211012181742.672391-10-axboe@kernel.dk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 12, 2021 at 12:17:39PM -0600, Jens Axboe wrote:
-> Take advantage of struct io_batch, if passed in to the nvme poll handler.
-> If it's set, rather than complete each request individually inline, store
-> them in the io_batch list. We only do so for requests that will complete
-> successfully, anything else will be completed inline as before.
+On Tue, Oct 12, 2021 at 12:17:42PM -0600, Jens Axboe wrote:
+> Trivial to do now, just need our own io_batch on the stack and pass that
+> in to the usual command completion handling.
 > 
-> Add an mq_ops->complete_batch() handler to do the post-processing of
-> the io_batch list once polling is complete.
+> I pondered making this dependent on how many entries we had to process,
+> but even for a single entry there's no discernable difference in
+> performance or latency. Running a sync workload over io_uring:
+> 
+> t/io_uring -b512 -d1 -s1 -c1 -p0 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
+> 
+> yields the below performance before the patch:
+> 
+> IOPS=254820, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
+> IOPS=251174, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+> IOPS=250806, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+> 
+> and the following after:
+> 
+> IOPS=255972, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
+> IOPS=251920, BW=123MiB/s, IOS/call=1/1, inflight=(1 1)
+> IOPS=251794, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
+> 
+> which definitely isn't slower, about the same if you factor in a bit of
+> variance. For peak performance workloads, benchmarking shows a 2%
+> improvement.
 > 
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->  drivers/nvme/host/pci.c | 69 +++++++++++++++++++++++++++++++++++++----
->  1 file changed, 63 insertions(+), 6 deletions(-)
+>  drivers/nvme/host/pci.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
 > diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 4ad63bb9f415..4713da708cd4 100644
+> index 4713da708cd4..fb3de6f68eb1 100644
 > --- a/drivers/nvme/host/pci.c
 > +++ b/drivers/nvme/host/pci.c
-> @@ -959,7 +959,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	return ret;
->  }
+> @@ -1076,8 +1076,10 @@ static inline void nvme_update_cq_head(struct nvme_queue *nvmeq)
 >  
-> -static void nvme_pci_complete_rq(struct request *req)
-> +static void nvme_pci_unmap_rq(struct request *req)
+>  static inline int nvme_process_cq(struct nvme_queue *nvmeq)
 >  {
->  	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
->  	struct nvme_dev *dev = iod->nvmeq->dev;
-> @@ -969,9 +969,34 @@ static void nvme_pci_complete_rq(struct request *req)
->  			       rq_integrity_vec(req)->bv_len, rq_data_dir(req));
->  	if (blk_rq_nr_phys_segments(req))
->  		nvme_unmap_data(dev, req);
-> +}
-> +
-> +static void nvme_pci_complete_rq(struct request *req)
-> +{
-> +	nvme_pci_unmap_rq(req);
->  	nvme_complete_rq(req);
->  }
+> +	struct io_batch ib;
+>  	int found = 0;
 >  
-> +static void nvme_pci_complete_batch(struct io_batch *ib)
-> +{
-> +	struct request *req;
-> +
-> +	req = ib->req_list;
-> +	while (req) {
-> +		nvme_pci_unmap_rq(req);
-> +		if (req->rq_flags & RQF_SPECIAL_PAYLOAD)
-> +			nvme_cleanup_cmd(req);
-> +		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
-> +				req_op(req) == REQ_OP_ZONE_APPEND)
-> +			req->__sector = nvme_lba_to_sect(req->q->queuedata,
-> +					le64_to_cpu(nvme_req(req)->result.u64));
-> +		req->status = nvme_error_status(nvme_req(req)->status);
-> +		req = req->rq_next;
-> +	}
-> +
-> +	blk_mq_end_request_batch(ib);
+> +	ib.req_list = NULL;
 
-I hate all this open coding.  All the common logic needs to be in a
-common helper.  Also please add a for_each macro for the request list
-iteration.  I already thought about that for the batch allocation in
-for-next, but with ever more callers this becomes essential.
+Is this really more efficient than
 
-> +	if (!nvme_try_complete_req(req, cqe->status, cqe->result)) {
-> +		enum nvme_disposition ret;
-> +
-> +		ret = nvme_decide_disposition(req);
-> +		if (unlikely(!ib || req->end_io || ret != COMPLETE)) {
-> +			nvme_pci_complete_rq(req);
+	struct io_batch ib = { };
 
-This actually is the likely case as only polling ever does the batch
-completion.  In doubt I'd prefer if we can avoid these likely/unlikely
-annotations as much as possible.
-
-> +		} else {
-> +			req->rq_next = ib->req_list;
-> +			ib->req_list = req;
-> +		}
-
-And all this list manipulation should use proper helper.
-
-> +	}
-
-Also - can you look into turning this logic into an inline function with
-a callback for the driver?  I think in general gcc will avoid the
-indirect call for function pointers passed directly.  That way we can
-keep a nice code structure but also avoid the indirections.
-
-Same for nvme_pci_complete_batch.
+?
