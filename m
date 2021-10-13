@@ -2,237 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AABECC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 08:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C207C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 08:46:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CC9F60C40
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 08:35:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09CD961053
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 08:46:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232922AbhJMIhm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 04:37:42 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:43150 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233479AbhJMIhl (ORCPT
+        id S233648AbhJMIsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 04:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54784 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232634AbhJMIsN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 04:37:41 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20211013083536euoutp025fb288dee5384eb7fa17d67ef68ea8c0~tiiZKYjE91986919869euoutp02L
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 08:35:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20211013083536euoutp025fb288dee5384eb7fa17d67ef68ea8c0~tiiZKYjE91986919869euoutp02L
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1634114136;
-        bh=lEXMQGbCbMscpq5Afgy20WzMWHP7jdEjLxxE5OlTv9w=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=Lrtu5DaW4v3dIKxcvPevjQhUxvpsJLRlXsW4Wnbr84VYuhvGUIDXAfyCHuFq5iwKw
-         qpOTfmtjw+Gn3w/3v3tctgsc2kUt6/AU5JZL+GUlfPqpC9URXHugzYODUXMYvQbLcX
-         2g/ID1y3UP+e9Ts7OV0Ncv7UISPCqOj3MlNoM45Q=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20211013083536eucas1p1a795c57a764df3335f868000c9bd6669~tiiYmAiHG0164501645eucas1p1B;
-        Wed, 13 Oct 2021 08:35:36 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id E7.15.45756.85A96616; Wed, 13
-        Oct 2021 09:35:36 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20211013083535eucas1p13f4ddfc4b6ee1a62c824d48b0cc0e105~tiiYLEzD81511715117eucas1p1f;
-        Wed, 13 Oct 2021 08:35:35 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20211013083535eusmtrp1e3e4270a1575147c3e0ee833770dc49b~tiiYKE2KJ2173921739eusmtrp1c;
-        Wed, 13 Oct 2021 08:35:35 +0000 (GMT)
-X-AuditID: cbfec7f2-7bdff7000002b2bc-16-61669a58817f
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 2F.C0.20981.75A96616; Wed, 13
-        Oct 2021 09:35:35 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20211013083535eusmtip2ecd856f2ed1ab8f61ba652b25279da00~tiiX7G0Tr2272522725eusmtip2s;
-        Wed, 13 Oct 2021 08:35:35 +0000 (GMT)
-Received: from localhost (106.210.248.142) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 13 Oct 2021 09:35:34 +0100
-Date:   Wed, 13 Oct 2021 10:35:33 +0200
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        "Kanchan Joshi" <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Message-ID: <20211013083533.hhgrkm3lhoytfp3a@mpHalley-2.domain_not_set.invalid>
+        Wed, 13 Oct 2021 04:48:13 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F79C061570;
+        Wed, 13 Oct 2021 01:46:10 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id v17so5647174wrv.9;
+        Wed, 13 Oct 2021 01:46:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=0VFk+51xpem3lCydw/SgtpoptzvnLBUdv9gVbfKWlsk=;
+        b=YakdbvDfmfTCQIawnG+GvuHAgeNp9iJjT37y8gV9UfBA70dnb76Ni6Rx4lt7dHYx2E
+         4iU4s4rZ8mP80TXfSpvSutWrATUzX/gBK8e39lryQHOpXRte0YSyDwm4KngCAssMz20O
+         wuohbQFSoSJH0cCVFQcERAiTnhFkJxhPc5bAMLeTRqncX+r5woDE6tvrVmeG87rM254z
+         UJWxWsEuol6jQ2OTG5qZbrZSD03CF8fk9zS1dA72OXMn7V/ETr/eY3EYSAUiBca+d31Y
+         8Utfbu9mq0GgLebvlpscoijg+2Ph9ayOwO28r8ltfx5nLpFzwUTt9ArTpK1hJe3syseN
+         xqcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=0VFk+51xpem3lCydw/SgtpoptzvnLBUdv9gVbfKWlsk=;
+        b=yvs9FD+B56qhJ6LW2gxVIxCf3yxa+5qVUcbCn1jvM1/azM14F0AKYrtm1an4E8QBaw
+         QQbYspkgIVm+5HJ84jiTTNVzwuR8/CdwmQnHzlQF8DbWF39FPF1vMSDy1movHdKiL/h8
+         kAlu1+5ozaIZJ39/Wqa4v35g0GZ9vtVSwdt/qhvqBtqHeDz6WapmzfDko0x7Yfl1VL83
+         2hEPo/43bK+e7gr5eNgWV5zZHlb223ftSRs5GBr6y64h9aoduwdNg2Hu37ClNIH9Y5pK
+         xbcFLu3vTsARnuzGiTNG1WeKe6i5p/Q5Ua3VDlJ4a8E9qpZOsJpMM+JXpxdlKE/CQUIN
+         HDvQ==
+X-Gm-Message-State: AOAM53266hKufuABhBSFDquP85k0X+xdr+pBEfYL43gt2ixhIXP5FG0k
+        qlZDYHJbR3VlIBNeGKlV5is9PYRVfPE=
+X-Google-Smtp-Source: ABdhPJz80981iNu6IqqdZZObheAZBa5PEI4JGMetk0qMIF11oyltoWcBD1w7pgNLsu9gGf9sQtZ+iA==
+X-Received: by 2002:adf:9c02:: with SMTP id f2mr38714628wrc.329.1634114769354;
+        Wed, 13 Oct 2021 01:46:09 -0700 (PDT)
+Received: from [192.168.8.197] ([185.69.145.208])
+        by smtp.gmail.com with ESMTPSA id t18sm13047322wrm.81.2021.10.13.01.46.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Oct 2021 01:46:09 -0700 (PDT)
+Message-ID: <85028200-1dc4-c012-8f84-9ef582cb66e6@gmail.com>
+Date:   Wed, 13 Oct 2021 09:45:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211006100121.2hqfdkyuivzvzd33@mpHalley.domain_not_set.invalid>
-X-Originating-IP: [106.210.248.142]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprIJsWRmVeSWpSXmKPExsWy7djPc7oRs9ISDc53c1qsvtvPZjHtw09m
-        i1m3X7NYvD/4mNVi77vZrBaPN/1nstizaBKTxcrVR5ks/nbdY7KYdOgao8XeW9oW85c9Zbfo
-        vr6DzWLf673MFsuP/2OymNhxlcni3Kw/bBaH711lsVj9x8Ji5TMmi1f74xxEPS5f8faY2PyO
-        3ePy2VKPTas62Tw2L6n3mHxjOaPH7psNbB4zPn1h87h+ZjuTR2/zOzaPj09vsXhse9jL7vF+
-        31Wg2tPVHp83yXm0H+hmChCI4rJJSc3JLEst0rdL4MroPu9ecE+y4t9/1wbGVyJdjJwcEgIm
-        Ehe/LmLrYuTiEBJYwSjxafZfRpCEkMAXRonmLZkQic+MEh2vn7HAdJx8+pIZIrGcUeJa6zVW
-        uKqGUwegMlsZJZadvssG0sIioCrx4OUvVhCbTcBe4tKyW8wgtoiAnsTVWzfYQRqYBTZwSmxa
-        tAGsQVjAU2LHhn4mEJtXwF/i6eJZbBC2oMTJmU/A7mAWsJLo/NAENJQDyJaWWP6PAyIsL9G8
-        dTbYfE4BP4nm67vZQUokBJQllk/3hfigVmLtsTNgayUElnJJzJ/wkhUi4SJx/eIiZghbWOLV
-        8S3sELaMxOnJPSwQDc2MEmfWXGGGcHoYJf5MWsEIscFaou9MDkSDo8T2KQ+ZIcJ8EjfeCkLc
-        xicxadt0qDCvREeb0ARGlVlIHpuF5LFZCI/NQvLYAkaWVYziqaXFuempxYZ5qeV6xYm5xaV5
-        6XrJ+bmbGIGp9vS/4592MM599VHvECMTB+MhRgkOZiURXsOM1EQh3pTEyqrUovz4otKc1OJD
-        jNIcLErivKtmr4kXEkhPLEnNTk0tSC2CyTJxcEo1MCXLzpqz3Cqm+6/Xr8t3/TvrmYvbXdOf
-        a0483P2k7Fjwf4NXutccvutv7U4SDJLMmSP0Ji+g2nDlbdbV87JezJlorBf15HMj3+Ku1Qn/
-        HgX+OqbA2/PMbUvT169MZx3uNEQ9vPpkQ/aSrfozPf1C+7oKYp5q6+THK/c7z3W9ZXTCWjve
-        cfbn+rlMl45zrT0cwFW2MGLuqYLtNzOb71nIxzu3Xlpzr77uZsfOey+5kp4JPbpcmsO1v/Xp
-        /whxwzme7Noni2uOLO82OHlI2n+7ke+9MvZ8hnTOj9fefvxnPO3b5D2BXXL8RRkGWd7a2mFp
-        FyNbD87J3ap6tvG71TOPrxNehs09pCeSFVtio155SImlOCPRUIu5qDgRAIXemJckBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNKsWRmVeSWpSXmKPExsVy+t/xe7rhs9ISDQ7vU7dYfbefzWLah5/M
-        FrNuv2axeH/wMavF3nezWS0eb/rPZLFn0SQmi5WrjzJZ/O26x2Qx6dA1Rou9t7Qt5i97ym7R
-        fX0Hm8W+13uZLZYf/8dkMbHjKpPFuVl/2CwO37vKYrH6j4XFymdMFq/2xzmIely+4u0xsfkd
-        u8fls6Uem1Z1snlsXlLvMfnGckaP3Tcb2DxmfPrC5nH9zHYmj97md2weH5/eYvHY9rCX3eP9
-        vqtAtaerPT5vkvNoP9DNFCAQpWdTlF9akqqQkV9cYqsUbWhhpGdoaaFnZGKpZ2hsHmtlZKqk
-        b2eTkpqTWZZapG+XoJfRfd694J5kxb//rg2Mr0S6GDk5JARMJE4+fcncxcjFISSwlFFi18Ev
-        jBAJGYlPVz6yQ9jCEn+udbFBFH1klFj8vIkJwtkK5OyaAtbBIqAq8eDlL1YQm03AXuLSslvM
-        ILaIgJ7E1Vs32EEamAU2cEpsWrSBDSQhLOApsWNDPxOIzSvgL/F08SyoFfuZJTo2/WCFSAhK
-        nJz5hAXEZhawkJg5/zzQNg4gW1pi+T8OiLC8RPPW2WDLOAX8JJqv72YHKZEQUJZYPt0X4oNa
-        iVf3dzNOYBSZhWToLCRDZyEMnYVk6AJGllWMIqmlxbnpucVGesWJucWleel6yfm5mxiBqWjb
-        sZ9bdjCufPVR7xAjEwfjIUYJDmYlEV7DjNREId6UxMqq1KL8+KLSnNTiQ4ymwCCayCwlmpwP
-        TIZ5JfGGZgamhiZmlgamlmbGSuK8JkfWxAsJpCeWpGanphakFsH0MXFwSjUwzXKcnt9/9urp
-        FfIp8xYvYWI9ovucP8NhyrR7kjIx9cLX7HbOfjStX/VJkFbXjXVbO97Lny6YNq9BjTGSf2lV
-        39pvqgufWZy8bGO5KqjUv1Fkxbki/XC/bXmnGNYoruLmCnvZox0574F4y4evJ3an1Z9LDxPe
-        3nbu1rIt3D2yc42eXmn4sExZVePLFX2lx1N+adWlZCfUv4ueuVff+Crnr5aDr2bpRGzdY/Wu
-        ecHd0sh/F8U/Wm+bpTtli5HjQi07908/V9b2zBNM5QkxKtr99HeueqJjzY6MjbWRqevEP0cs
-        Mdx+4pqcS+mWl3efr94+76DhlzjfNcZOc2bIeG7ijDvAtkfQadnTSz7rrGaaP1diKc5INNRi
-        LipOBAAGHKBGzgMAAA==
-X-CMS-MailID: 20211013083535eucas1p13f4ddfc4b6ee1a62c824d48b0cc0e105
-X-Msg-Generator: CA
-X-RootMTR: 20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c
-References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
-        <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
-        <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
-        <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
-        <c1b0f954-0728-e6ab-73ab-7b466a7d2eb7@nvidia.com>
-        <20211006100121.2hqfdkyuivzvzd33@mpHalley.domain_not_set.invalid>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.2
+Subject: Re: [PATCH 1/6] block: cache bdev in struct file for raw bdev IO
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1633781740.git.asml.silence@gmail.com>
+ <cfc66d9946422fa1778504f976621c91be2befb5.1633781740.git.asml.silence@gmail.com>
+ <0785c707-ba82-1e46-5d4d-63ccacdb471f@kernel.dk>
+ <YWP1O+oZmsovShoR@infradead.org>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <YWP1O+oZmsovShoR@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Chaitanya,
-
-Did you have a chance to look at the answers below?
-
-I would like to start finding candidate dates throughout the next couple
-of weeks.
-
-Thanks,
-Javier
-
-On 06.10.2021 12:01, Javier González wrote:
->On 30.09.2021 09:43, Chaitanya Kulkarni wrote:
->>Javier,
+On 10/11/21 09:26, Christoph Hellwig wrote:
+> On Sat, Oct 09, 2021 at 10:33:17AM -0600, Jens Axboe wrote:
+>>> +static inline struct block_device *blkdev_get_bdev(struct file *file)
+>>> +{
+>>> +	return file->private_data;
+>>> +}
 >>
->>>
->>>Hi all,
->>>
->>>Since we are not going to be able to talk about this at LSF/MM, a few of
->>>us thought about holding a dedicated virtual discussion about Copy
->>>Offload. I believe we can use Chaitanya's thread as a start. Given the
->>>current state of the current patches, I would propose that we focus on
->>>the next step to get the minimal patchset that can go upstream so that
->>>we can build from there.
->>>
->>
->>I agree with having a call as it has been two years I'm trying to have
->>this discussion.
->>
->>Before we setup a call, please summarize following here :-
->>
->>1. Exactly what work has been done so far.
->
->
->We can categorize that into two sets. First one for XCopy (2014), and
->second one for NVMe Copy (2021).
->
->XCOPY set *********
->- block-generic copy command (single range, between one
->  source/destination device)
->- ioctl interface for the above
->- SCSI plumbing (block-generic to XCOPY conversion)
->- device-mapper support: offload copy whenever possible (if IO is not
->  split while traveling layers of virtual devices)
->
->NVMe-Copy set *************
->- block-generic copy command (multiple ranges, between one
->  source/destination device)
->- ioctl interface for the above
->- NVMe plumbing (block-generic to NVMe Copy conversion)
->- copy-emulation (read + write) in block-layer
->- device-mapper support: no offload, rather fall back to copy-emulation
->
->
->>2. What kind of feedback you got.
->
->For NVMe Copy, the major points are - a) add copy-emulation in
->block-layer and use that if copy-offload is not natively supported by
->device b) user-interface (ioctl) should be extendable for copy across
->two devices (one source, one destination) c) device-mapper targets
->should support copy-offload, whenever possible
->
->"whenever possible" cases get reduced compared to XCOPY because NVMe
->Copy is wit
->
->>3. What are the exact blockers/objections.
->
->I think it was device-mapper for XCOPY and remains the same for NVMe
->Copy as well.  Device-mapper support requires decomposing copy operation
->to read and write.  While that is not great for efficiency PoV, bigger
->concern is to check if we are taking the same route as XCOPY.
->
->From Martin's document (http://mkp.net/pubs/xcopy.pdf), if I got it
->right, one the major blocker is having more failure cases than
->successful ones. And that did not justify the effort/code to wire up
->device mapper.  Is that a factor to consider for NVMe Copy (which is
->narrower in scope than XCOPY).
->
->>4. Potential ways of moving forward.
->
->a) we defer attempt device-mapper support (until NVMe has
->support/usecase), and address everything else (reusable user-interface
->etc.)
->
->b) we attempt device-mapper support (by moving to composite read+write
->communication between block-layer and nvme)
->
->
->Is this enough in your mind to move forward with a specific agenda? If
->we can, I would like to target the meetup in the next 2 weeks.
->
->Thanks,
->Javier
+>> Get rid of this and just use bdev = file->private_data where
+>> appropriate. Easier to read, we don't need to hide this in a function.
+> 
+> 100% agreed.
 
+The reasoning is as always, it's much easier to change if we change
+what we store there. I don't agree, but don't care enough to stay
+on the point, will resend with the change
+
+-- 
+Pavel Begunkov
