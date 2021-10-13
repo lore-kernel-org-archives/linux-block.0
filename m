@@ -2,104 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755E7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD277C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:23:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52FA7610EA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:21:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C7EE60F23
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:23:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbhJMMXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 08:23:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:46664 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229715AbhJMMXg (ORCPT
+        id S230236AbhJMMZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 08:25:28 -0400
+Received: from mail-wr1-f46.google.com ([209.85.221.46]:39867 "EHLO
+        mail-wr1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229715AbhJMMZ1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 08:23:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634127693;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aI/a1CuIplLBzfM7K3SKE+P3jJtMmkhDmL35+rhqKP0=;
-        b=C4LauQ+o9aqPqS48sQDqIGOFb3fS8HOAbMFB29oMK8POZgiuOaYWLRuebzXGiGK8AmR/XG
-        AuWoBsNVLkljQaCkEAVHvBG4Gm0snKVtKB7fKY6RKopb4UC3dqsYCW47oNIg++IY9rYAzC
-        ybbeuJnS8h8TdT7821V4Iz7rA8q863M=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-hjFhriivOQuO7TwaLBFV5w-1; Wed, 13 Oct 2021 08:21:32 -0400
-X-MC-Unique: hjFhriivOQuO7TwaLBFV5w-1
-Received: by mail-wr1-f72.google.com with SMTP id l6-20020adfa386000000b00160c4c1866eso1842699wrb.4
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 05:21:32 -0700 (PDT)
+        Wed, 13 Oct 2021 08:25:27 -0400
+Received: by mail-wr1-f46.google.com with SMTP id r18so7743267wrg.6
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 05:23:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aI/a1CuIplLBzfM7K3SKE+P3jJtMmkhDmL35+rhqKP0=;
-        b=JAb5LbSaIE99HkyQyYdXbDP7dISSi/dvt9qzHABHUWn1i/qeM75J2GJsGREbe1yOwK
-         tzeStU0qgnpzWNTgM9aHM5dmD182s7qNBltTsn4r7iGtH+TwdDnbc0NClxp4qIrF35I1
-         IP+b0ZhzOoQ/QaNBR1mwbKXEBa93LA7sgQWCrmbAhbZbeaDtaLVnE7mIk1Y5QYDkYvAu
-         jYbKWW2HuYrR6cs/TNQXIKB0mNuqZNn2kWR0icZgdq8XjyOqjBIKZ1qW9gT+qASBihaj
-         CUbvBgvZ7t6JyvV2YeFbhAAL5nhUBojOKnxYg6gaL61M7qOPZd2UA8BOVaoi+7I7je6n
-         zW6g==
-X-Gm-Message-State: AOAM533lHaa87lhTciCCJ1DY6QdN408wtIqtOXM8l+t06pCt3OPOvzxK
-        3GC0NlrQf5AkGvSKITncVvFoQ3Al5Cv8HLMKCj1doKKI+hjPC8tahtPT3f3HFrQCcY0Ks3WOER4
-        NzEVN4VbQ60lDiCMxMSfkiAM=
-X-Received: by 2002:adf:a390:: with SMTP id l16mr39148254wrb.291.1634127691192;
-        Wed, 13 Oct 2021 05:21:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTkyD1UVKzRrFV61FHdBE4Y7buV45IeIqTmyybPN8AIOWvYr+YRHziMwJhfqqGLO65loliiQ==
-X-Received: by 2002:adf:a390:: with SMTP id l16mr39148230wrb.291.1634127690995;
-        Wed, 13 Oct 2021 05:21:30 -0700 (PDT)
-Received: from redhat.com ([2.55.30.112])
-        by smtp.gmail.com with ESMTPSA id q14sm5174087wmq.4.2021.10.13.05.21.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 05:21:30 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 08:21:26 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Xie Yongji <xieyongji@bytedance.com>, jasowang@redhat.com,
-        stefanha@redhat.com, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kevin Wolf <kwolf@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config
- space
-Message-ID: <20211013082025-mutt-send-email-mst@kernel.org>
-References: <20210809101609.148-1-xieyongji@bytedance.com>
- <20211004112623-mutt-send-email-mst@kernel.org>
- <20211005062359-mutt-send-email-mst@kernel.org>
- <20211011114041.GB16138@lst.de>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8HqoT6QO2zaRfcgy0j9QTM+ExP2pCgdEYCJfJSGrEgQ=;
+        b=ifVuT/GYCR/Htp8n0bMgsIHLz7RkSDr8pxmKWdrUXBkTBnbwDK7nE3Pfvk4vr601aK
+         xaLimGSnApb0swWWS1guCm+GdH/bzAyZ4uH+uB8Yamu/fhaQDWAj1LskrhJraXvAeJfS
+         rGbpfAW+oC9WyMpfYC6MdFybLRUktsqo2Ub1tZSTYcDd2huu6OuzakGwVlUGHzwYB2k4
+         3a2bx9xqrIXESLHrLsi0W5k/LGQqaaTx2sgFu+JVN7k2Rt9GWI++/8qvAAG0T+KuosS3
+         1E7vsHZ4TKsyGKG4AiRF71VMZ32jkXnJToA39s0fz93imCpkzqA90Jff/9EtU3dewS79
+         KkVQ==
+X-Gm-Message-State: AOAM530upb1/2kcbNUDQ401ov90zobm6eCWsPPyR3fOyQRmDJEn0Cifx
+        zSad+hrpWWMIFbhmWo5YFUY=
+X-Google-Smtp-Source: ABdhPJyBpMzV8+iJPFvo+cKhdx4EU43xBBccsWlSa5HU4f9PjYqzyb/xbNHZwe+BbpwcuGNQxb4PbQ==
+X-Received: by 2002:adf:bd91:: with SMTP id l17mr39598282wrh.261.1634127803106;
+        Wed, 13 Oct 2021 05:23:23 -0700 (PDT)
+Received: from [192.168.81.70] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id t3sm5031647wmj.33.2021.10.13.05.23.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Oct 2021 05:23:22 -0700 (PDT)
+Subject: Re: [PATCH V3 4/6] nvme: paring quiesce/unquiesce
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20211009034713.1489183-1-ming.lei@redhat.com>
+ <20211009034713.1489183-5-ming.lei@redhat.com>
+ <20211012103620.GB29640@lst.de> <YWWjXN3GEzypVFZ/@T590>
+ <20211012150741.GA20571@lst.de> <YWWnEvX2uT4mUDpE@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <37e70e26-7ae7-2ed9-abaa-7242444b659e@grimberg.me>
+Date:   Wed, 13 Oct 2021 15:23:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211011114041.GB16138@lst.de>
+In-Reply-To: <YWWnEvX2uT4mUDpE@T590>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 11, 2021 at 01:40:41PM +0200, Christoph Hellwig wrote:
-> On Tue, Oct 05, 2021 at 06:42:43AM -0400, Michael S. Tsirkin wrote:
-> > Stefan also pointed out this duplicates the logic from 
-> > 
-> >         if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
-> >                 return -EINVAL;
-> > 
-> > 
-> > and a bunch of other places.
-> > 
-> > 
-> > Would it be acceptable for blk layer to validate the input
-> > instead of having each driver do it's own thing?
-> > Maybe inside blk_queue_logical_block_size?
+
+>>> There are lots of unbalanced usage in nvme, such as
+>>>
+>>> 1) nvme pci:
+>>>
+>>> - nvme_dev_disable() can be called more than one times before starting
+>>> reset, so multiple nvme_stop_queues() vs. single nvme_start_queues().
+>>>
+>>> 2) Forcibly unquiesce queues in nvme_kill_queues() even though queues
+>>> are never quiesced, and similar usage can be seen in tcp/fc/rdma too
+>>>
+>>> Once the quiesce and unquiesce are run from difference context, it becomes
+>>> not easy to audit if the two is done in pair.
+>>
+>> Yes, but I'm not sure a magic flag is really the solution here.
+>> I think we need to work on our state machine here so that this is less
+>> of a mess.
 > 
-> I'm pretty sure we want down that before.  Let's just add a helper
-> just for that check for now as part of this series.  Actually validating
-> in in blk_queue_logical_block_size seems like a good idea, but returning
-> errors from that has a long tail.
+> Frankly speaking, I am not sure you can clean the whole mess in short time.
+> 
+> At least the approach of using the flag is clean and correct, and it can
+> be reverted quite easily if you finally cleaned it.
 
-Xie Yongji, I think I will revert this patch for now - can you
-please work out adding that helper and using it in virtio?
+I agree.
 
-Thanks,
+The assumption today is that quiesce/unquiesce are stateless in the
+sense that they don't need to be paired.
 
--- 
-MST
+At least for fabrics, the state-machine should be sufficient to
+serialize the setup/teardown, but if we break the above assumption
+we will need to remember if we are setting up after a reset (which
+quiesced) or if we are setting up the controller for the first time
+(or we artificially quiesce the queues in the first time as well).
 
+As Ming pointed out, pci changes are more involved with non-trivial
+scenarios.
