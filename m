@@ -2,59 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D0A9C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 17:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAEF9C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 17:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5F0DE610EA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 17:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B171D6101D
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 17:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbhJMRf6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 13:35:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37078 "EHLO
+        id S231228AbhJMRsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 13:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbhJMRf5 (ORCPT
+        with ESMTP id S238146AbhJMRsJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 13:35:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277BFC061570
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 10:33:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ba96B3BincnapozQebznkVJ5OEEf4XtTAXMAJtffBjw=; b=uv3SMh8B1VHUsvD1o6Hwja8tho
-        46RA4iE0XtR6d3hXOvEUtn8lOoFR6yxSQLsYcVzZye/qwraveH70RVW3KxdL65cZ8SsVn5VvojAKx
-        USlFe1uuasnOWuusd2zzvRynHXxi3nYds54JwEp/f3YlDpQAnK8cVQe2j4g8MH6HDhPnGy8bZrpnp
-        IXHwk++BPvIxfL1niPcvIO8ykHVfxWK+dIPoz5uyjOo3xoRzNYbLeJIQB88jXLJufFWUzsgGwpBjj
-        anOmnIcDlJI+ga2Jlr8fyYS0jxKSEdz1puhmZnuLXOqSa1/r0eSahUXwnhA88Jmkx68INy0gFH8uL
-        G84Lszgg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mai6p-007fF9-FR; Wed, 13 Oct 2021 17:32:50 +0000
-Date:   Wed, 13 Oct 2021 18:32:07 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        Wed, 13 Oct 2021 13:48:09 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F73FC061570
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 10:46:06 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id j8so556188ila.11
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 10:46:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7fEZ5rnBRdDspyoejLNWPyy1H9Xqf8tOCmcYbMpo85k=;
+        b=mXnSN+RPQ4Q5oYQSCR3SkrX4e9F30cy07XrTn8iVPHc2se7QjKnLwj96ddt204RHcw
+         u7fCZFzN1PhLsBJlcy8Vra2DJbHomC7C+OwHAcDW9G71eIw9m3AdoGhRAwOwyvAa/9a8
+         PiWX5SbhOSNvBrG0DhG7WcUNkWTXTqRs6Uv/M3kh3w0V/7X3SdzO39JbUjJwkb6LKRr0
+         +7EiE8wx5DaSHwshpPhOErb9NRzUBLeJ/fmCOc7r7ojpRuJ7LGSR2rTpzXqXGWbZ1XKF
+         R3/C/C5eIjKOrEPAGEOho39QmH0XiGG/VA1M06/f1TbHw1r3R9UwQDBOdHIzGDaS2cuj
+         8cxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7fEZ5rnBRdDspyoejLNWPyy1H9Xqf8tOCmcYbMpo85k=;
+        b=SbfckOzv5QvNLY+92o7aeq9ZVcuVCI+XjwxlTpMkALuzc/+od2IGlN5VTirtkvIteE
+         EcSIhB25QMv1xl+kQIrFkK0O20XHYDLv7SEpFs5Y4OqpiLliZOKMjqv8tqIXDbsGyjun
+         7482zMkwqRPUepZ1J2wvswczMAjKKEVnqcDi/fw3mvUeKzQwylyy6MI2Owfmx5Y14Ubj
+         iaWn/ztmX+sdHfIdTqJdwwtszSQMtGtkpIJ364NKsrZ/rvqNBKGOY+dH+enxNmxJs9RB
+         SQA/fzMOC31Jc9m2j932s5pnOxC6QqAMcnNaF+Je3w4SsbRgHSbR5qbWtG8jCUkI11xW
+         KOwQ==
+X-Gm-Message-State: AOAM532WzKSDx5rwvUZ/rY7NRhdi2dN+XIXOcgnhPE/57aHV6KP2205t
+        iZ1/wQKMcI+e4w+LiywCMnKgmEHrKua4CQ==
+X-Google-Smtp-Source: ABdhPJxlgbJ3L+9pvMa2YRQh21OhZUW0mYTiyYHzpNv4NcCr4dMslMjERkqamLo1kURgQAdBfKHQ4w==
+X-Received: by 2002:a05:6e02:14d3:: with SMTP id o19mr378564ilk.156.1634147165349;
+        Wed, 13 Oct 2021 10:46:05 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m10sm89661ila.13.2021.10.13.10.46.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Oct 2021 10:46:05 -0700 (PDT)
+Subject: Re: [PATCH 2/4] block: inline fast path of driver tag allocation
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/4] block: move update request helpers into blk-mq.c
-Message-ID: <YWcYFywO7J0R4oMb@infradead.org>
 References: <20211013164937.985367-1-axboe@kernel.dk>
- <20211013164937.985367-5-axboe@kernel.dk>
+ <20211013164937.985367-3-axboe@kernel.dk> <YWcV52525ZR6ilwx@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ad0cc4dc-1742-87ac-73f7-2d16be37f44f@kernel.dk>
+Date:   Wed, 13 Oct 2021 11:46:04 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013164937.985367-5-axboe@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YWcV52525ZR6ilwx@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 10:49:37AM -0600, Jens Axboe wrote:
-> For some reason we still have them in blk-core, with the rest of the
-> request completion being in blk-mq. That causes and out-of-line call
-> for each completion.
+On 10/13/21 11:22 AM, Christoph Hellwig wrote:
+> On Wed, Oct 13, 2021 at 10:49:35AM -0600, Jens Axboe wrote:
+>> If we don't use an IO scheduler or have shared tags, then we don't need
+>> to call into this external function at all. This saves ~2% for such
+>> a setup.
 > 
-> Move them into blk-mq.c instead.
+> Hmm.  What happens if you just throw an inline tag onto
+> blk_mq_get_driver_tag?
 
-The status/errno helpers really are core code.  And if we change
-the block_rq_complete tracepoint to just take the status and do the
-conversion inside the trace event to avoid the fast path out of line
-call.
+I'd be surprised if that's any different than my patch in terms of
+performance, the fast path would be about the same. I don't feel
+strongly about it, can do that instead.
+
+-- 
+Jens Axboe
+
