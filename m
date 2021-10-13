@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D0AC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:14:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB66C43219
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:16:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB84B60C4D
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9ADB160C4D
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:16:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237888AbhJMGQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 02:16:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47518 "EHLO
+        id S237901AbhJMGSR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 02:18:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237892AbhJMGQb (ORCPT
+        with ESMTP id S237909AbhJMGSP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 02:16:31 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BAF1C061766
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:14:25 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id g5so1105883plg.1
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:14:25 -0700 (PDT)
+        Wed, 13 Oct 2021 02:18:15 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A708C061753
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:16:13 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id k26so1528173pfi.5
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=cU/dcevRRiOMyYUwUWALBmXmlvE8es1M77S7S7Vy3hg=;
-        b=V/PklmmvmwB6oF28+X9W5oSqUy3MEBQUnBb4J2bRKEg/eIXO/xXpeqqwQGZrKIWhNv
-         T8ctXe4hPipGRmAP9ugd0bC7MXlyH2K83qjMXuuXIhufHwq0vvnSHMGq1LP/1SN2Yv7x
-         bKng84M/wOhI7OL1CmIwsfNERqhd12BkP84hk=
+        bh=FeQrChfiZcW4o0OhHTmPDOdTdbcOGCmUWNGR2fssds0=;
+        b=YUuG6H1i9AjWoYvXd657AlnL8Btrj3iAYL/kBUykjBQlXgbXqBCSYgFqW+ybNjzAeB
+         flHfU7/d2gVIiRxHZf0let0/mE+C7OG46tBNBXIlx9AYwOAntMTNFSW889cvlMxABatE
+         ibs+ClrRJ9QM6AUZ6rkBA4X98UUtvKEjHgCX4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=cU/dcevRRiOMyYUwUWALBmXmlvE8es1M77S7S7Vy3hg=;
-        b=calbkh0n/ij1hjl+RZuR8KXefYFnwGQWcJwfZRmIJP+yDthIuVuXCTjTirf4zgg2/V
-         1jzdxDVywwQmJLRrE78t5d/QAPjiAUGVpEAYjUtLPmhxDPJJRwV9tme70bXHWHVOOoyt
-         VXQUFImpwfDX7fxYe2JmMzTza32u7M4PqKyBNNqwFg3iXs2iF5HtLVsYiip6FYl/B3Vb
-         lqLec4CLsu0FpxyaM7bmtF20ssy1EHUHp07ssOnFnyZrNglWlkgD6A802viKAhovA5kA
-         5NAvhmwaTepbnzlgMkz1+L/389hZ2/o2NUvX/kJX0et3ZtsGr7XSWpHyNg7bi3pi+DJE
-         6q+w==
-X-Gm-Message-State: AOAM5315hQmMvf2pKgpY3l8YXEN0Kwelp+ROd/pVj/Nwuyqw5I+uyPzV
-        mxhx1gIrfleShhdpgQR9qSGseA==
-X-Google-Smtp-Source: ABdhPJzB9T5WPRLBzlHsv86tToIXEU4uRcFKAiECkCtvwz0iUp/WDY5ZssCw0V4lwGrfF5Bgew0Phw==
-X-Received: by 2002:a17:90a:8912:: with SMTP id u18mr10958091pjn.69.1634105664752;
-        Tue, 12 Oct 2021 23:14:24 -0700 (PDT)
+        bh=FeQrChfiZcW4o0OhHTmPDOdTdbcOGCmUWNGR2fssds0=;
+        b=W8FPDGrynwrqAsFi8d92/yWbR/Bfk0zFc2YOczZj6wEvicZxXRl69X175mIg4oo6PJ
+         Mxjwx1i+T7mqfD4gftNAVVO5DiBLJb2RIyiJBn73UjigMyncSquJcLbANnZvopTvGZAK
+         6meDU5qtcM46RdAzdse2uWFftp2M23CId1HY7LCorOh7Q7TehoD/30BqJp7p+T9Gc119
+         jn8gCD5JFBKZzhWogivQA5pZDMBLAOB2znseANGGM+CxI6hdEcNN+TfiATmjutZriqgu
+         sBYSJsYGgyirCeYZiWuDx1j6cq6+gBOgs8SO8Z8NisuVJvHm5vcSFRdgeoVz63iKS1/u
+         zZyw==
+X-Gm-Message-State: AOAM531kRdoF52Lh1/J2H+Ls1jBwoZESAdthxbQ3pzQihNZtDnZEehXa
+        Y7NlWvXwdT2FSuWQJjde7pUnGA==
+X-Google-Smtp-Source: ABdhPJwmuFRgBzGEKwhfH80cvrnOY6Q3ng7kI1vOHwrwBDvns1KKcyGoScUlnacdxAU8v7fqrhUUVw==
+X-Received: by 2002:a63:d654:: with SMTP id d20mr26275164pgj.122.1634105772620;
+        Tue, 12 Oct 2021 23:16:12 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id o6sm12981960pfp.79.2021.10.12.23.14.24
+        by smtp.gmail.com with ESMTPSA id a28sm13085937pfg.33.2021.10.12.23.16.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 23:14:24 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 23:14:23 -0700
+        Tue, 12 Oct 2021 23:16:12 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 23:16:11 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
@@ -72,24 +72,40 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
         linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
         reiserfs-devel@vger.kernel.org
-Subject: Re: [PATCH 10/29] affs: use bdev_nr_sectors instead of open coding it
-Message-ID: <202110122314.6BE3F05AA3@keescook>
+Subject: Re: [PATCH 12/29] cramfs: use bdev_nr_sectors instead of open coding
+ it
+Message-ID: <202110122315.7CFF5F6@keescook>
 References: <20211013051042.1065752-1-hch@lst.de>
- <20211013051042.1065752-11-hch@lst.de>
+ <20211013051042.1065752-13-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211013051042.1065752-11-hch@lst.de>
+In-Reply-To: <20211013051042.1065752-13-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 07:10:23AM +0200, Christoph Hellwig wrote:
+On Wed, Oct 13, 2021 at 07:10:25AM +0200, Christoph Hellwig wrote:
 > Use the proper helper to read the block device size.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/cramfs/inode.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+> index 2be65269a987c..3e44cc3ed0543 100644
+> --- a/fs/cramfs/inode.c
+> +++ b/fs/cramfs/inode.c
+> @@ -209,7 +209,7 @@ static void *cramfs_blkdev_read(struct super_block *sb, unsigned int offset,
+>  		return read_buffers[i] + blk_offset;
+>  	}
+>  
+> -	devsize = mapping->host->i_size >> PAGE_SHIFT;
+> +	devsize = bdev_nr_sectors(sb->s_bdev) >> (PAGE_SHIFT - SECTOR_SHIFT);
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+I find this less readable than "bytes >> PAGE_SHIFT". I'd suggest this
+use a new bdev_nr_bytes() helper.
 
 -- 
 Kees Cook
