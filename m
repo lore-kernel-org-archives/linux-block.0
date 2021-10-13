@@ -2,30 +2,30 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C80EC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 19:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DE7C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 19:06:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16AB6610F9
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 19:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4289760E96
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 19:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237585AbhJMTIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 15:08:45 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:48828 "EHLO
+        id S238710AbhJMTIr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 15:08:47 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:48868 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234061AbhJMTIn (ORCPT
+        with ESMTP id S236646AbhJMTIn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 13 Oct 2021 15:08:43 -0400
 Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 5E16720B9CFD;
+        by linux.microsoft.com (Postfix) with ESMTPSA id 8E62820B9CFE;
         Wed, 13 Oct 2021 12:06:39 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5E16720B9CFD
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8E62820B9CFE
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1634151999;
-        bh=RwgWTI2lR1liQo0Ep2pQkcohF0BcSh0Qv3HDZoX5XD8=;
+        bh=w3obODL05MfKRl8vk4Y/hfY4hQkZQqVTucc0wPjAJGE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QziEqF8OA2o0+cfTWdItqUlvp4kjFL6QRVRgDFlPRGydWgRs3y6gqZuYDkuKdNPAH
-         Sb+WbVYBIA8oLI3KGlv4IPle+YiE4oS1BfZ1SY0DEB+eojqKWTq30De/8+yG/kpuOo
-         IuJ1mEwttHonq9tNqAQf/Xbo5VaPI9MWx7j08k+c=
+        b=gLhfLIX5BRTPM8vOIsLmRzeXA38//A+wKlF7R/4AEoUIi6kQeWyg8lwzmNrPCvwnd
+         AsJO64/JjUQNGVCV7wbFVWNgjg4+luOGRRYV8yrmutX73ayWQ5dSVFhDqGsUn7zolR
+         z5dYoQtZavHj0hOWKNbfj0P5UaEuyMhOm6vRx7C8=
 From:   deven.desai@linux.microsoft.com
 To:     corbet@lwn.net, axboe@kernel.dk, agk@redhat.com,
         snitzer@redhat.com, ebiggers@kernel.org, tytso@mit.edu,
@@ -35,9 +35,9 @@ Cc:     jannh@google.com, dm-devel@redhat.com, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-audit@redhat.com,
         linux-security-module@vger.kernel.org
-Subject: [RFC PATCH v7 01/16] security: add ipe lsm & initial context creation
-Date:   Wed, 13 Oct 2021 12:06:20 -0700
-Message-Id: <1634151995-16266-2-git-send-email-deven.desai@linux.microsoft.com>
+Subject: [RFC PATCH v7 03/16] ipe: add evaluation loop
+Date:   Wed, 13 Oct 2021 12:06:22 -0700
+Message-Id: <1634151995-16266-4-git-send-email-deven.desai@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
 References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
@@ -47,158 +47,174 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Integrity Policy Enforcement (IPE) is an LSM that provides an
-complimentary approach to Mandatory Access Control than existing LSMs
-today.
-
-Existing LSMs have centered around the concept of access to a resource
-should be controlled by the current user's credentials. IPE's approach,
-is that access to a resource should be controlled by the system's trust
-of a current resource.
-
-The basis of this approach is that every process in the kernel is
-associated with a context that determines the policy for what is
-trusted by said process and its descendents, starting with 'init'.
+IPE must have a centralized function to evaluate incoming callers
+against IPE's policy. This iteration of the policy for against the rules
+for that specific caller is known as the evaluation loop.
 
 Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 ---
 
 Relevant changes since v6:
-  * Split up patch 02/11 into three parts:
-      1. context creation (new) [this patch]
-      2. parser (refactored)
-      3. evaluation loop
-  * Refactor series to:
-      1. Support a context structure, enabling easier testing
+  * Refactor patch to support a context structure,
+    enabling easier testing
+  * Split up patch 02/12 into four parts:
+      1. context creation [01/16]
+      2. audit [07/16]
+      3. evaluation loop [03/16] (this patch)
+      4. access control hooks [05/16]
 
 ---
- MAINTAINERS           |   6 ++
- security/Kconfig      |  11 +--
- security/Makefile     |   1 +
- security/ipe/Kconfig  |  19 +++++
- security/ipe/Makefile |  11 +++
- security/ipe/ctx.c    | 161 ++++++++++++++++++++++++++++++++++++++++++
- security/ipe/ctx.h    |  28 ++++++++
- security/ipe/hooks.c  |  58 +++++++++++++++
- security/ipe/hooks.h  |  16 +++++
- security/ipe/ipe.c    |  57 +++++++++++++++
- security/ipe/ipe.h    |  19 +++++
- 11 files changed, 382 insertions(+), 5 deletions(-)
- create mode 100644 security/ipe/Kconfig
- create mode 100644 security/ipe/Makefile
- create mode 100644 security/ipe/ctx.c
- create mode 100644 security/ipe/ctx.h
- create mode 100644 security/ipe/hooks.c
- create mode 100644 security/ipe/hooks.h
- create mode 100644 security/ipe/ipe.c
- create mode 100644 security/ipe/ipe.h
+ security/ipe/Makefile             |   1 +
+ security/ipe/ctx.c                |  57 ++++++++++++
+ security/ipe/ctx.h                |   6 ++
+ security/ipe/eval.c               | 142 ++++++++++++++++++++++++++++++
+ security/ipe/eval.h               |  26 ++++++
+ security/ipe/hooks.h              |   4 +
+ security/ipe/modules/ipe_module.h |   3 +
+ security/ipe/policy.c             |  27 ++++++
+ security/ipe/policy.h             |   4 +
+ 9 files changed, 270 insertions(+)
+ create mode 100644 security/ipe/eval.c
+ create mode 100644 security/ipe/eval.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e0bca0de0df7..f1e76f791d47 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9279,6 +9279,12 @@ S:	Supported
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/zohar/linux-integrity.git
- F:	security/integrity/ima/
- 
-+INTEGRITY POLICY ENFORCEMENT (IPE)
-+M:	Deven Bowers <deven.desai@linux.microsoft.com>
-+M:	Fan Wu <wufan@linux.microsoft.com>
-+S:	Supported
-+F:	security/ipe/
-+
- INTEL 810/815 FRAMEBUFFER DRIVER
- M:	Antonino Daplas <adaplas@gmail.com>
- L:	linux-fbdev@vger.kernel.org
-diff --git a/security/Kconfig b/security/Kconfig
-index 0ced7fd33e4d..6ed9b3b5a75c 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -239,6 +239,7 @@ source "security/yama/Kconfig"
- source "security/safesetid/Kconfig"
- source "security/lockdown/Kconfig"
- source "security/landlock/Kconfig"
-+source "security/ipe/Kconfig"
- 
- source "security/integrity/Kconfig"
- 
-@@ -278,11 +279,11 @@ endchoice
- 
- config LSM
- 	string "Ordered list of enabled LSMs"
--	default "landlock,lockdown,yama,loadpin,safesetid,integrity,smack,selinux,tomoyo,apparmor,bpf" if DEFAULT_SECURITY_SMACK
--	default "landlock,lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tomoyo,bpf" if DEFAULT_SECURITY_APPARMOR
--	default "landlock,lockdown,yama,loadpin,safesetid,integrity,tomoyo,bpf" if DEFAULT_SECURITY_TOMOYO
--	default "landlock,lockdown,yama,loadpin,safesetid,integrity,bpf" if DEFAULT_SECURITY_DAC
--	default "landlock,lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
-+	default "landlock,lockdown,yama,loadpin,safesetid,integrity,smack,selinux,tomoyo,apparmor,bpf,ipe" if DEFAULT_SECURITY_SMACK
-+	default "landlock,lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,smack,tomoyo,bpf,ipe" if DEFAULT_SECURITY_APPARMOR
-+	default "landlock,lockdown,yama,loadpin,safesetid,integrity,tomoyo,bpf,ipe" if DEFAULT_SECURITY_TOMOYO
-+	default "landlock,lockdown,yama,loadpin,safesetid,integrity,bpf,ipe" if DEFAULT_SECURITY_DAC
-+	default "landlock,lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf,ipe"
- 	help
- 	  A comma-separated list of LSMs, in initialization order.
- 	  Any LSMs left off this list will be ignored. This can be
-diff --git a/security/Makefile b/security/Makefile
-index 18121f8f85cd..527b1864d96c 100644
---- a/security/Makefile
-+++ b/security/Makefile
-@@ -24,6 +24,7 @@ obj-$(CONFIG_SECURITY_LOCKDOWN_LSM)	+= lockdown/
- obj-$(CONFIG_CGROUPS)			+= device_cgroup.o
- obj-$(CONFIG_BPF_LSM)			+= bpf/
- obj-$(CONFIG_SECURITY_LANDLOCK)		+= landlock/
-+obj-$(CONFIG_SECURITY_IPE)		+= ipe/
- 
- # Object integrity file lists
- obj-$(CONFIG_INTEGRITY)			+= integrity/
-diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-new file mode 100644
-index 000000000000..c4503083e92d
---- /dev/null
-+++ b/security/ipe/Kconfig
-@@ -0,0 +1,19 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Integrity Policy Enforcement (IPE) configuration
-+#
-+
-+menuconfig SECURITY_IPE
-+	bool "Integrity Policy Enforcement (IPE)"
-+	depends on SECURITY && SECURITYFS
-+	select PKCS7_MESSAGE_PARSER
-+	select SYSTEM_DATA_VERIFICATION
-+	help
-+	  This option enables the Integrity Policy Enforcement subsystem
-+	  allowing systems to enforce integrity having no dependencies
-+	  on filesystem metadata, making its decisions based off of kernel-
-+	  resident features and data structures. A key feature of IPE is a
-+	  customizable policy to allow admins to reconfigure integrity
-+	  requirements on the fly.
-+
-+	  If unsure, answer N.
 diff --git a/security/ipe/Makefile b/security/ipe/Makefile
-new file mode 100644
-index 000000000000..ba3df729e252
---- /dev/null
+index 9a97efd8a190..0db69f13e82a 100644
+--- a/security/ipe/Makefile
 +++ b/security/ipe/Makefile
-@@ -0,0 +1,11 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (C) Microsoft Corporation. All rights reserved.
-+#
-+# Makefile for building the IPE module as part of the kernel tree.
-+#
-+
-+obj-$(CONFIG_SECURITY_IPE) += \
-+	ctx.o \
-+	hooks.o \
-+	ipe.o \
+@@ -9,6 +9,7 @@ ccflags-y := -I$(srctree)/security/ipe/modules
+ 
+ obj-$(CONFIG_SECURITY_IPE) += \
+ 	ctx.o \
++	eval.o \
+ 	hooks.o \
+ 	ipe.o \
+ 	modules.o \
 diff --git a/security/ipe/ctx.c b/security/ipe/ctx.c
-new file mode 100644
-index 000000000000..c24f5d1d41bd
---- /dev/null
+index c24f5d1d41bd..9274e51eff52 100644
+--- a/security/ipe/ctx.c
 +++ b/security/ipe/ctx.c
-@@ -0,0 +1,161 @@
+@@ -5,6 +5,7 @@
+ 
+ #include "ipe.h"
+ #include "ctx.h"
++#include "policy.h"
+ 
+ #include <linux/slab.h>
+ #include <linux/types.h>
+@@ -76,10 +77,25 @@ struct ipe_context *ipe_get_ctx_rcu(struct ipe_context __rcu *ctx)
+  */
+ static void free_ctx_work(struct work_struct *const work)
+ {
++	struct ipe_policy *p = NULL;
+ 	struct ipe_context *ctx = NULL;
+ 
+ 	ctx = container_of(work, struct ipe_context, free_work);
+ 
++	/* Make p->ctx no longer have any references */
++	spin_lock(&ctx->lock);
++	list_for_each_entry(p, &ctx->policies, next)
++		rcu_assign_pointer(p->ctx, NULL);
++	spin_unlock(&ctx->lock);
++	synchronize_rcu();
++
++	/*
++	 * locking no longer necessary - nothing can get a reference to ctx,
++	 * so list is guaranteed stable.
++	 */
++	list_for_each_entry(p, &ctx->policies, next)
++		ipe_put_policy(p);
++
+ 	kfree(ctx);
+ }
+ 
+@@ -104,6 +120,7 @@ static struct ipe_context *create_ctx(void)
+ 	}
+ 
+ 	INIT_WORK(&ctx->free_work, free_ctx_work);
++	INIT_LIST_HEAD(&ctx->policies);
+ 	refcount_set(&ctx->refcount, 1);
+ 	spin_lock_init(&ctx->lock);
+ 
+@@ -114,6 +131,46 @@ static struct ipe_context *create_ctx(void)
+ 	return ERR_PTR(rc);
+ }
+ 
++/**
++ * remove_policy: Remove a policy from its context
++ * @p: Supplies a pointer to a policy that will be removed from its context
++ *
++ * Decrements @p's reference by 1.
++ */
++void ipe_remove_policy(struct ipe_policy *p)
++{
++	struct ipe_context *ctx;
++
++	ctx = ipe_get_ctx_rcu(p->ctx);
++	if (!ctx)
++		return;
++
++	spin_lock(&ctx->lock);
++	list_del_init(&p->next);
++	rcu_assign_pointer(p->ctx, NULL);
++	spin_unlock(&ctx->lock);
++	synchronize_rcu();
++
++	ipe_put_ctx(ctx);
++	/* drop the reference representing the list */
++	ipe_put_policy(p);
++}
++
++/**
++ * ipe_add_policy: Associate @p with @ctx
++ * @ctx: Supplies a pointer to the ipe_context structure to associate @p with.
++ * @p: Supplies a pointer to the ipe_policy structure to associate.
++ */
++void ipe_add_policy(struct ipe_context *ctx, struct ipe_policy *p)
++{
++	spin_lock(&ctx->lock);
++	rcu_assign_pointer(p->ctx, ctx);
++	list_add_tail(&p->next, &ctx->policies);
++	refcount_inc(&p->refcount);
++	spin_unlock(&ctx->lock);
++	synchronize_rcu();
++}
++
+ /**
+  * ipe_put_ns: Decrement the reference of an ipe_context structure,
+  *	       scheduling a free as necessary.s
+diff --git a/security/ipe/ctx.h b/security/ipe/ctx.h
+index 69a2c92c0a8c..a0da92da818c 100644
+--- a/security/ipe/ctx.h
++++ b/security/ipe/ctx.h
+@@ -12,10 +12,14 @@
+ #include <linux/workqueue.h>
+ 
+ struct ipe_context {
++	struct ipe_policy __rcu *active_policy;
++
+ 	refcount_t refcount;
+ 	/* Protects concurrent writers */
+ 	spinlock_t lock;
+ 
++	struct list_head policies; /* type: ipe_policy */
++
+ 	struct work_struct free_work;
+ };
+ 
+@@ -24,5 +28,7 @@ struct ipe_context __rcu **ipe_tsk_ctx(struct task_struct *tsk);
+ struct ipe_context *ipe_current_ctx(void);
+ struct ipe_context *ipe_get_ctx_rcu(struct ipe_context __rcu *ctx);
+ void ipe_put_ctx(struct ipe_context *ctx);
++void ipe_add_policy(struct ipe_context *ctx, struct ipe_policy *p);
++void ipe_remove_policy(struct ipe_policy *p);
+ 
+ #endif /* IPE_CONTEXT_H */
+diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+new file mode 100644
+index 000000000000..b732f76cfd05
+--- /dev/null
++++ b/security/ipe/eval.c
+@@ -0,0 +1,142 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) Microsoft Corporation. All rights reserved.
@@ -206,63 +222,235 @@ index 000000000000..c24f5d1d41bd
 +
 +#include "ipe.h"
 +#include "ctx.h"
++#include "eval.h"
++#include "hooks.h"
++#include "policy.h"
++#include "modules/ipe_module.h"
 +
 +#include <linux/slab.h>
-+#include <linux/types.h>
-+#include <linux/parser.h>
-+#include <linux/refcount.h>
-+#include <linux/spinlock.h>
++#include <linux/file.h>
++#include <linux/sched.h>
++#include <linux/rcupdate.h>
 +
 +/**
-+ * ipe_current_ctx: Helper to retrieve the ipe_context for the current task.
++ * build_ctx: Build an evaluation context.
++ * @file: Supplies a pointer to the file to associated with the evaluation
++ * @op: Supplies the IPE policy operation associated with the evaluation
++ * @hook: Supplies the LSM hook associated with the evaluation.
++ *
++ * The current IPE Context will have a reference count increased by one until
++ * this is deallocated.
 + *
 + * Return:
-+ *	See ipe_get_ctx_rcu
++ * !IS_ERR - OK
 + */
-+struct ipe_context *ipe_current_ctx(void)
++static struct ipe_eval_ctx *build_ctx(const struct file *file,
++				      enum ipe_operation op,
++				      enum ipe_hook hook)
 +{
-+	return ipe_get_ctx_rcu(*ipe_tsk_ctx(current));
++	struct ipe_eval_ctx *ctx = NULL;
++
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	ctx->file = file;
++	ctx->op = op;
++	ctx->hook = hook;
++	ctx->ci_ctx = ipe_current_ctx();
++
++	return ctx;
 +}
 +
 +/**
-+ * ipe_tsk_ctx: Retrieve the RCU-protected address of the task
-+ *		that contains the ipe_context.
-+ * @tsk: Task to retrieve the address from.
-+ *
-+ * Callers need to use the rcu* family functions to interact with
-+ * the ipe_context, or ipe_get_ctx_rcu.
-+ *
-+ * Return:
-+ *	Valid Address to a location containing an RCU-protected ipe_context.
++ * free_ctx: Deallocate a previously-allocated ipe_eval_ctx
++ * @ctx: Supplies a pointer to the evaluation context to free.
 + */
-+struct ipe_context __rcu **ipe_tsk_ctx(struct task_struct *tsk)
++static void free_ctx(struct ipe_eval_ctx *ctx)
 +{
-+	return tsk->security + ipe_blobs.lbs_task;
++	if (IS_ERR_OR_NULL(ctx))
++		return;
++
++	ipe_put_ctx(ctx->ci_ctx);
++	kfree(ctx);
 +}
 +
 +/**
-+ * ipe_get_ctx_rcu: Retrieve the underlying ipe_context in an rcu protected
-+ *		    address space.
-+ * @ctx: Context to dereference.
++ * evaluate: Analyze @ctx against the active policy and return the result.
++ * @ctx: Supplies a pointer to the context being evaluated.
 + *
-+ * This function will increment the reference count of the dereferenced
-+ * ctx, ensuring that it is valid outside of the rcu_read_lock.
-+ *
-+ * However, if a context has a reference count of 0 (and thus being)
-+ * freed, this API will return NULL.
++ * This is the loop where all policy evaluation happens against IPE policy.
 + *
 + * Return:
-+ *	!NULL - Valid context
-+ *	NULL - the dereferenced context will not exist outside after the
-+ *	       next grace period.
++ * 0 - OK
++ * -EACCES - @ctx did not pass evaluation.
++ * !0 - Error
 + */
-+struct ipe_context *ipe_get_ctx_rcu(struct ipe_context __rcu *ctx)
++static int evaluate(const struct ipe_eval_ctx *const ctx)
 +{
-+	struct ipe_context *rv = NULL;
++	int rc = 0;
++	bool match = false;
++	enum ipe_action action;
++	struct ipe_policy *pol = NULL;
++	const struct ipe_rule *rule = NULL;
++	const struct ipe_policy_mod *module = NULL;
++	const struct ipe_operation_table *rules = NULL;
++
++	pol = ipe_get_policy_rcu(ctx->ci_ctx->active_policy);
++	if (!pol)
++		goto out;
++
++	rules = &pol->parsed->rules[ctx->op];
++
++	list_for_each_entry(rule, &rules->rules, next) {
++		match = true;
++
++		list_for_each_entry(module, &rule->modules, next)
++			match = match && module->mod->eval(ctx, module->mod_value);
++
++		if (match)
++			break;
++	}
++
++	if (match) {
++		action = rule->action;
++	} else if (rules->default_action != ipe_action_max) {
++		action = rules->default_action;
++	} else {
++		action = pol->parsed->global_default;
++	}
++
++	if (action == ipe_action_deny)
++		rc = -EACCES;
++
++out:
++	ipe_put_policy(pol);
++	return rc;
++}
++
++/**
++ * ipe_process_event: Submit @file for verification against IPE's policy
++ * @file: Supplies an optional pointer to the file being submitted.
++ * @op: IPE Policy Operation to associate with @file
++ * @hook: LSM Hook to associate with @file
++ *
++ * @file can be NULL and will be submitted for evaluation like a non-NULL
++ * file.
++ *
++ * Return:
++ * 0 - OK
++ * -EACCES - @file did not pass verification
++ * !0 - Error
++ */
++int ipe_process_event(const struct file *file, enum ipe_operation op,
++		      enum ipe_hook hook)
++{
++	int rc = 0;
++	struct ipe_eval_ctx *ctx = NULL;
++
++	ctx = build_ctx(file, op, hook);
++	if (IS_ERR(ctx))
++		return PTR_ERR(ctx);
++
++	rc = evaluate(ctx);
++
++	free_ctx(ctx);
++	return rc;
++}
+diff --git a/security/ipe/eval.h b/security/ipe/eval.h
+new file mode 100644
+index 000000000000..db6da2998a20
+--- /dev/null
++++ b/security/ipe/eval.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#ifndef IPE_EVAL_H
++#define IPE_EVAL_H
++
++#include <linux/file.h>
++
++#include "ctx.h"
++#include "hooks.h"
++#include "policy.h"
++
++struct ipe_eval_ctx {
++	enum ipe_hook hook;
++	enum ipe_operation op;
++
++	const struct file *file;
++	struct ipe_context *ci_ctx;
++};
++
++int ipe_process_event(const struct file *file, enum ipe_operation op,
++		      enum ipe_hook hook);
++
++#endif /* IPE_EVAL_H */
+diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
+index e0ae3c7dfb5b..58ed4a612e26 100644
+--- a/security/ipe/hooks.h
++++ b/security/ipe/hooks.h
+@@ -8,6 +8,10 @@
+ #include <linux/types.h>
+ #include <linux/sched.h>
+ 
++enum ipe_hook {
++	ipe_hook_max = 0
++};
++
+ int ipe_task_alloc(struct task_struct *task,
+ 		   unsigned long clone_flags);
+ 
+diff --git a/security/ipe/modules/ipe_module.h b/security/ipe/modules/ipe_module.h
+index 397a54cbc4db..b4f975e9218a 100644
+--- a/security/ipe/modules/ipe_module.h
++++ b/security/ipe/modules/ipe_module.h
+@@ -6,6 +6,7 @@
+ #define IPE_MODULE_H
+ 
+ #include <linux/types.h>
++#include "../eval.h"
+ 
+ /**
+  * ipe_module: definition of an extensible module for IPE properties.
+@@ -23,6 +24,8 @@ struct ipe_module {
+ 	u16				version;	/* required */
+ 	int (*parse)(const char *valstr, void **value);	/* required */
+ 	int (*free)(void **value);			/* optional */
++	bool (*eval)(const struct ipe_eval_ctx *ctx,	/* required */
++		     const void *val);
+ };
+ 
+ #define IPE_MODULE(parser)				\
+diff --git a/security/ipe/policy.c b/security/ipe/policy.c
+index 9dd60dd34477..8970f96453d6 100644
+--- a/security/ipe/policy.c
++++ b/security/ipe/policy.c
+@@ -874,6 +874,32 @@ void ipe_put_policy(struct ipe_policy *p)
+ 	kfree(p);
+ }
+ 
++/**
++ * ipe_get_policy_rcu: Dereference rcu-protected @p and increase the reference
++ *		       count.
++ * @p: rcu-protected pointer to dereference
++ *
++ * Not safe to call on IS_ERR.
++ *
++ * Return:
++ * !NULL - reference count of @p was valid, and increased by one.
++ * NULL - reference count of @p is not valid.
++ */
++struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p)
++{
++	struct ipe_policy *rv = NULL;
 +
 +	rcu_read_lock();
 +
-+	rv = rcu_dereference(ctx);
++	rv = rcu_dereference(p);
 +	if (!rv || !refcount_inc_not_zero(&rv->refcount))
 +		rv = NULL;
 +
@@ -271,303 +459,37 @@ index 000000000000..c24f5d1d41bd
 +	return rv;
 +}
 +
-+/**
-+ * free_ctx_work: Worker function to deallocate a context structure.
-+ * @work: work_struct passed to schedule_work
-+ */
-+static void free_ctx_work(struct work_struct *const work)
-+{
-+	struct ipe_context *ctx = NULL;
+ static int set_pkcs7_data(void *ctx, const void *data, size_t len,
+ 			  size_t asn1hdrlen)
+ {
+@@ -912,6 +938,7 @@ struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	refcount_set(&new->refcount, 1);
++	INIT_LIST_HEAD(&new->next);
+ 
+ 	if (!text) {
+ 		new->pkcs7len = pkcs7len;
+diff --git a/security/ipe/policy.h b/security/ipe/policy.h
+index d78788db238c..2b5041c5a75a 100644
+--- a/security/ipe/policy.h
++++ b/security/ipe/policy.h
+@@ -87,11 +87,15 @@ struct ipe_policy {
+ 	struct ipe_parsed_policy *parsed;
+ 
+ 	refcount_t	refcount;
 +
-+	ctx = container_of(work, struct ipe_context, free_work);
-+
-+	kfree(ctx);
-+}
-+
-+/**
-+ * create_ctx: Allocate a context structure.
-+ *
-+ * The reference count at this point will be set to 1.
-+ *
-+ * Return:
-+ * !IS_ERR - OK
-+ * ERR_PTR(-ENOMEM) - Lack of memory.
-+ */
-+static struct ipe_context *create_ctx(void)
-+{
-+	int rc = 0;
-+	struct ipe_context *ctx = NULL;
-+
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx) {
-+		rc = -ENOMEM;
-+		goto err;
-+	}
-+
-+	INIT_WORK(&ctx->free_work, free_ctx_work);
-+	refcount_set(&ctx->refcount, 1);
-+	spin_lock_init(&ctx->lock);
-+
-+	return ctx;
-+
-+err:
-+	ipe_put_ctx(ctx);
-+	return ERR_PTR(rc);
-+}
-+
-+/**
-+ * ipe_put_ns: Decrement the reference of an ipe_context structure,
-+ *	       scheduling a free as necessary.s
-+ * @ctx: Structure to free
-+ *
-+ * This function no-ops on error and null values for @ctx, and the
-+ * deallocation will only occur if the refcount is 0.
-+ */
-+void ipe_put_ctx(struct ipe_context *ctx)
-+{
-+	if (IS_ERR_OR_NULL(ctx) || !refcount_dec_and_test(&ctx->refcount))
-+		return;
-+
-+	schedule_work(&ctx->free_work);
-+}
-+
-+/**
-+ * ipe_init_ctx: Initialize the init context.
-+ *
-+ * This is called at LSM init, and marks the kernel init process
-+ * with a context. All processes descendent from kernel
-+ * init will inherit this context.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * -ENOMEM: Not enough memory to allocate the init context.
-+ */
-+int __init ipe_init_ctx(void)
-+{
-+	int rc = 0;
-+	struct ipe_context *lns = NULL;
-+
-+	lns = create_ctx();
-+	if (IS_ERR(lns)) {
-+		rc = PTR_ERR(lns);
-+		goto err;
-+	}
-+
-+	rcu_assign_pointer(*ipe_tsk_ctx(current), lns);
-+
-+	return 0;
-+err:
-+	ipe_put_ctx(lns);
-+	return rc;
-+}
-diff --git a/security/ipe/ctx.h b/security/ipe/ctx.h
-new file mode 100644
-index 000000000000..69a2c92c0a8c
---- /dev/null
-+++ b/security/ipe/ctx.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+#ifndef IPE_CONTEXT_H
-+#define IPE_CONTEXT_H
-+
-+#include <linux/sched.h>
-+#include <linux/types.h>
-+#include <linux/refcount.h>
-+#include <linux/spinlock.h>
-+#include <linux/workqueue.h>
-+
-+struct ipe_context {
-+	refcount_t refcount;
-+	/* Protects concurrent writers */
-+	spinlock_t lock;
-+
-+	struct work_struct free_work;
-+};
-+
-+int __init ipe_init_ctx(void);
-+struct ipe_context __rcu **ipe_tsk_ctx(struct task_struct *tsk);
-+struct ipe_context *ipe_current_ctx(void);
-+struct ipe_context *ipe_get_ctx_rcu(struct ipe_context __rcu *ctx);
-+void ipe_put_ctx(struct ipe_context *ctx);
-+
-+#endif /* IPE_CONTEXT_H */
-diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-new file mode 100644
-index 000000000000..ed0c886eaa5a
---- /dev/null
-+++ b/security/ipe/hooks.c
-@@ -0,0 +1,58 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ctx.h"
-+#include "hooks.h"
-+
-+#include <linux/sched.h>
-+#include <linux/types.h>
-+#include <linux/refcount.h>
-+#include <linux/rcupdate.h>
-+
-+/**
-+ * ipe_task_alloc: Assign a new context for an associated task structure.
-+ * @task: Supplies the task structure to assign a context to.
-+ * @clone_flags: unused.
-+ *
-+ * The context assigned is always the context of the current task.
-+ * Reference counts are dropped by ipe_task_free
-+ *
-+ * Return:
-+ * 0 - OK
-+ * -ENOMEM - Out of Memory
-+ */
-+int ipe_task_alloc(struct task_struct *task, unsigned long clone_flags)
-+{
-+	struct ipe_context __rcu **ctx = NULL;
-+	struct ipe_context *current_ctx = NULL;
-+
-+	current_ctx = ipe_current_ctx();
-+	ctx = ipe_tsk_ctx(task);
-+	rcu_assign_pointer(*ctx, current_ctx);
-+	refcount_inc(&current_ctx->refcount);
-+
-+	ipe_put_ctx(current_ctx);
-+	return 0;
-+}
-+
-+/**
-+ * ipe_task_free: Drop a reference to an ipe_context associated with @task.
-+ *		  If there are no tasks remaining, the context is freed.
-+ * @task: Supplies the task to drop an ipe_context reference to.
-+ */
-+void ipe_task_free(struct task_struct *task)
-+{
-+	struct ipe_context *ctx;
-+
-+	/*
-+	 * This reference was the initial creation, no need to increment
-+	 * refcount
-+	 */
-+	rcu_read_lock();
-+	ctx = rcu_dereference(*ipe_tsk_ctx(task));
-+	ipe_put_ctx(ctx);
-+	rcu_read_unlock();
-+}
-diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
-new file mode 100644
-index 000000000000..e0ae3c7dfb5b
---- /dev/null
-+++ b/security/ipe/hooks.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+#ifndef IPE_HOOKS_H
-+#define IPE_HOOKS_H
-+
-+#include <linux/types.h>
-+#include <linux/sched.h>
-+
-+int ipe_task_alloc(struct task_struct *task,
-+		   unsigned long clone_flags);
-+
-+void ipe_task_free(struct task_struct *task);
-+
-+#endif /* IPE_HOOKS_H */
-diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-new file mode 100644
-index 000000000000..d600346702e5
---- /dev/null
-+++ b/security/ipe/ipe.c
-@@ -0,0 +1,57 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#include "ipe.h"
-+#include "ctx.h"
-+#include "hooks.h"
-+
-+#include <linux/fs.h>
-+#include <linux/sched.h>
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/security.h>
-+#include <linux/rcupdate.h>
-+#include <linux/lsm_hooks.h>
-+
-+struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
-+	.lbs_task = sizeof(struct ipe_context __rcu *),
-+};
-+
-+static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
-+	LSM_HOOK_INIT(task_alloc, ipe_task_alloc),
-+	LSM_HOOK_INIT(task_free, ipe_task_free),
-+};
-+
-+/**
-+ * ipe_init: Entry point of IPE.
-+ *
-+ * This is called at LSM init, which happens occurs early during kernel
-+ * start up. During this phase, IPE loads the properties compiled into
-+ * the kernel, and register's IPE's hooks. The boot policy is loaded
-+ * later, during securityfs init, at which point IPE will start
-+ * enforcing its policy.
-+ *
-+ * Return:
-+ * 0 - OK
-+ * -ENOMEM - Context creation failed.
-+ */
-+static int __init ipe_init(void)
-+{
-+	int rc = 0;
-+
-+	rc = ipe_init_ctx();
-+	if (rc)
-+		return rc;
-+
-+	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), "ipe");
-+
-+	return rc;
-+}
-+
-+DEFINE_LSM(ipe) = {
-+	.name = "ipe",
-+	.init = ipe_init,
-+	.blobs = &ipe_blobs,
-+};
-diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
-new file mode 100644
-index 000000000000..09c492b8fd03
---- /dev/null
-+++ b/security/ipe/ipe.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) Microsoft Corporation. All rights reserved.
-+ */
-+
-+#ifndef IPE_H
-+#define IPE_H
-+
-+#define pr_fmt(fmt) "IPE " fmt "\n"
-+
-+#include "ctx.h"
-+
-+#include <linux/types.h>
-+#include <linux/sched.h>
-+#include <linux/lsm_hooks.h>
-+
-+extern struct lsm_blob_sizes ipe_blobs;
-+
-+#endif /* IPE_H */
++	struct list_head next;		/* type: ipe_policy */
++	struct ipe_context __rcu *ctx;
+ };
+ 
+ struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
+ 				  const char *pkcs7, size_t pkcs7len);
+ void ipe_put_policy(struct ipe_policy *pol);
+ bool ipe_is_op_alias(int op, const enum ipe_operation **map, size_t *size);
++struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p);
+ 
+ #endif /* IPE_POLICY_H */
 -- 
 2.33.0
 
