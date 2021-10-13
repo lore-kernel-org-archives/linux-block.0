@@ -2,91 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956AFC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3D1C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:54:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C44161053
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71E3361027
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:54:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbhJMQ4X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 12:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55866 "EHLO
+        id S237470AbhJMQ4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 12:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237193AbhJMQ4X (ORCPT
+        with ESMTP id S237193AbhJMQ4Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 12:56:23 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8D7FC061570
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 09:54:19 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id n7so529566iod.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 09:54:19 -0700 (PDT)
+        Wed, 13 Oct 2021 12:56:24 -0400
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EBD7C061570
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 09:54:20 -0700 (PDT)
+Received: by mail-il1-x12a.google.com with SMTP id s3so477520ild.0
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 09:54:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lsdOKA8abZlWjUQi+XSxDsDxn/yeJdaC9Rvb2XuYVfQ=;
-        b=gdWflAPvZr7STBI3QGmUjSIJdVA9oQrJsaeF2PV4QcO3nr+61pK/IyRQP29uY7Kpcw
-         PBYTJpulg3YYTSm1nQ7FX6YleF6w8E3Tyr0TDdWNFzawI7BI07f82PQMXyCGcevQxMJF
-         gcw3MrgT8sr8+wTtdSqEFFFXj497JL2SRrO1wacb5YlXcvg0GyJJwdAyalUuc48zRkND
-         P9KvrZ/NSQqu3fwrtOE9GWh/Rku7QVKjQgv7Sdp92xM+w07nISdQx0MxiwHTXLUCdIhW
-         Tk8AOzLFLfp7ISBkcWSfYa1eXGHkqUNgHRhj/OyYHvl+LkRhthl0ZnLrFEOzcmql4sfX
-         vTgA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=/HxmRu2SrFMjxnbbGwX0Q0a2H0TAm1oB9K6LjRRzJwo=;
+        b=ge82IDkCAO34j14tCKoHv2ZrI1SAmm8yMepOnP8dufan9alc7mpGpJ+Bka9Eb3RX0J
+         1PN1sx7T96kS661+CGew+EIqGCsr2KFAnvbXbUUOQJt773BgGZC4CcxEr8JYxsIKaBh3
+         JkcM5ViegjazL91JsGCy2+keJYjR7CZV8nIk67HALx8cAenvKKh2uBS+57sku3jltB+o
+         +QBrldav12tswZ4kbYSOwRmDB8bl+2v1SQnQbwKz09rM+iHH8FTl5ubHu/pxXJumR0q0
+         Q30CagyAjngRIRNGuy6G9ZDsvy4rDByPhy1Jr/fti6J538DsrAlx+IlvVqKOlOO5te6X
+         0R3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lsdOKA8abZlWjUQi+XSxDsDxn/yeJdaC9Rvb2XuYVfQ=;
-        b=P/cWbyLR3emzh9GZpqwroyvCrDMqiMrgrQZ9PferUzchDvdEYBOrUiavLtrUeW+RKn
-         JsCyIYNOF0Ul45wI+gvv3uCkKVsws0keLoFZMMFfaby5kYuN3vKxk2T159qmkB3vzNLq
-         iU4Cx4Hp/ZlL7OSc8bZrI6iP2Fauoxo72hIrB9q39wO+OFgJjhj/N4cmMOWAKepY2XVb
-         rj6Q2MKoSkFnNsdx1IfoefgJPSNW8SGypBZaVZyBH04FnVpbXCoy9Hmy0tbg4hfP17pS
-         Gski00c8uBxi8h3ezg2Z/h3DWt6WOvS/t+8L5kdBclc3681f+3qWzUdHSzR39z3GDJpQ
-         JUxw==
-X-Gm-Message-State: AOAM5322goXtXFuEJtWJXatQpeV4tPqSuPtWQyWRlpDdd99F7k54fZQk
-        CxVIp4b7nBDxUfYPC4ZUpmFs/EBSxwe9aA==
-X-Google-Smtp-Source: ABdhPJxy08Ku/Xqw0Gb74x5oWY825aZdEZ0h8ssBC4lGlyosPxCBhoji/AH9YP9cW9fy1tRyEBOIgw==
-X-Received: by 2002:a5d:9ad9:: with SMTP id x25mr296257ion.59.1634144059075;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=/HxmRu2SrFMjxnbbGwX0Q0a2H0TAm1oB9K6LjRRzJwo=;
+        b=ECmsr4hvjT3yV9AfjeccBrcUastUmivpxIWIbWZEAkMQul2gUCSIQYQ2L5EjdI3nXj
+         OGaUaV2iFRm/mlF0GyxeLCR7rdl+mKuHKugw/lEMUMnuxgakZ2Hk0tqQ7oPc4kLRaTbG
+         +6nAc4TZ8/y7kP0+RKtdlpt7UOLHkqLeL3TyZDF2lc9SPJiAr8dyEtZrbauZKoR5vtaG
+         pV4zpml0HIAD82m0Qd+7dzMQ+eb7W4GV/rDhvtUR8dHmlP47a4kDvD9SE3xhffeZ7qQ/
+         stm7BoWfddMyJ9j/bRuROaalYFdVBNcCw1JI/AYuqpLtLsVs1sVyMdhPJXYvwBxL0HKH
+         yLhQ==
+X-Gm-Message-State: AOAM533PrWsqg5P08s5YS7At0CFozwgrq7EdcywzDTko0Dxzro46s+Tx
+        D6S3XfJcKEku8CLmW71RjXnDGGeP95QgPA==
+X-Google-Smtp-Source: ABdhPJzPUvV7QQuurN48GtuuWaEmZc9Vw6wdiL+DBGwzzGQ8R11U5u6Ax2AE3CU0J0xMF4VsvMrTMA==
+X-Received: by 2002:a92:2001:: with SMTP id j1mr140876ile.84.1634144059768;
         Wed, 13 Oct 2021 09:54:19 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id r7sm65023ior.25.2021.10.13.09.54.18
-        for <linux-block@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id r7sm65023ior.25.2021.10.13.09.54.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 09:54:18 -0700 (PDT)
+        Wed, 13 Oct 2021 09:54:19 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
-Subject: [PATCHSET v2 0/9] Batched completions
-Date:   Wed, 13 Oct 2021 10:54:07 -0600
-Message-Id: <20211013165416.985696-1-axboe@kernel.dk>
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/9] block: define io_batch structure
+Date:   Wed, 13 Oct 2021 10:54:08 -0600
+Message-Id: <20211013165416.985696-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20211013165416.985696-1-axboe@kernel.dk>
+References: <20211013165416.985696-1-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+This adds the io_batch structure, and a helper for defining one on the
+stack. It's meant to be used for collecting requests for completion,
+with a completion handler defined to be called at the end.
 
-We now do decent batching of allocations for submit, but we still
-complete requests individually. This costs a lot of CPU cycles.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ include/linux/blkdev.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-This patchset adds support for collecting requests for completion,
-and then completing them as a batch. This includes things like freeing
-a batch of tags.
-
-A few rough edges in this patchset, but sending it out for comments
-so I can whip it into an upstreamable thing. As per patch 8, the
-wins here are pretty massive - 8-10% improvement in the peak IOPS.
-
-Changes since v1:
-- Rename ib -> iob for the batch
-- Add rq_list helpers
-- Change array -> tags_array naming
-- Drop nvme disposition patch
-- Rework the batched completion on the nvme side to be a lot cleaner
-- Add DEFINE_IO_BATCH helper
-- Move batch into blkdev.h instead of in fs.h
-
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2a8689e949b4..b39b19dbe7b6 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1298,4 +1298,14 @@ int fsync_bdev(struct block_device *bdev);
+ int freeze_bdev(struct block_device *bdev);
+ int thaw_bdev(struct block_device *bdev);
+ 
++struct io_batch {
++	struct request *req_list;
++	void (*complete)(struct io_batch *);
++};
++
++#define DEFINE_IO_BATCH(name)			\
++	struct io_batch name = {		\
++		.req_list = NULL		\
++	}
++
+ #endif /* _LINUX_BLKDEV_H */
 -- 
-Jens Axboe
-
+2.33.0
 
