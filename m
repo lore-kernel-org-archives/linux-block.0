@@ -2,115 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E29C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D786C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 13:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DA99610EA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 12:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58606610E7
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 13:16:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbhJMNB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 09:01:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56754 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232949AbhJMNB1 (ORCPT
+        id S234198AbhJMNSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 09:18:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43215 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233774AbhJMNSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 09:01:27 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65075C061570
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 05:59:24 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id y12so9989120eda.4
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 05:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VgcPZ/VE3a6UD0gwAUDDSfYNJhdyVBbycd9KeXHOYHM=;
-        b=ndArNa0HmqnsRzlysy93djlVuh/kqTwrCRC04MiyCzlokwU6D0cQ3Bbx+1Msp3a0kq
-         fDJVYpiLq3aFIRt7VgtW7JibN+h+Q/yN9IfOzJhAkTM/fr5cvIWR2/1cWKdtOYSA3EYm
-         qZWl8LdPki4DjSLk2jLjHAErrC0Al++e3odTf+AmXTPv/EVUClim6wIPE4wk923ZlyD+
-         TLHR+7NpFulvfpJW8peNGqIZRn/XRiGFn1wjGDpJXT2AFkRFATP0HMC9KWP6A7uu6Ub1
-         fWThoH+Vn4zUBbvaUaXpQNuRIGYXgtY8CdRM80d7L9TWYBPAPOck4ohsweYsRFR2VdNa
-         Jv1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VgcPZ/VE3a6UD0gwAUDDSfYNJhdyVBbycd9KeXHOYHM=;
-        b=VoH4wmesJT6HzLqhntnJm6YV0Gr9uSxplUuW5JApSAG0ZKQXkefQAWbxLMJ3lb81pe
-         x9C+isZt8011AtfTTwgMBUrgOMsBKtF7XH8XjDC75zTcqCmJ56+uLnh8l1fFbMcAIhi6
-         VUrei42Tl4rmhP8DO4IyCMy3a4hksImOw07NfptU07rAN8An21+5yPamCThB952NTszr
-         FARRgDY3cMtHJCaEMtLVr/QE/mtSrFcE6MFdpZJge0vP8QkFBSuzl5k+0BoJIegQNz7C
-         DBopfyzoU/cn8BNZYHwe5vjOYKYQvrtuLrannx5zVFIdGALDe5mf5U0uAC9TssgRasIY
-         6Qtg==
-X-Gm-Message-State: AOAM532k8vL6cOhvtNLKKQUy4UxzFHP7J5o020M3+ev80mPA8f7wo3vt
-        GDuJ5/D510hKmwWGi7GNptzRnZUnKmLZsuZN7PYo
-X-Google-Smtp-Source: ABdhPJzgPADRXFXaS1vYyh2jK9MJH6mvnTgnwdfTvoN2wDEHXGVHLXkBfHUrjA74sxkLWw0zhl39qEXkT1/imAT3FrA=
-X-Received: by 2002:a17:906:ce25:: with SMTP id sd5mr39252100ejb.398.1634129963024;
- Wed, 13 Oct 2021 05:59:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210809101609.148-1-xieyongji@bytedance.com> <20211004112623-mutt-send-email-mst@kernel.org>
- <20211005062359-mutt-send-email-mst@kernel.org> <20211011114041.GB16138@lst.de>
- <20211013082025-mutt-send-email-mst@kernel.org> <CACycT3skLJp1HfovKP8AvQmdxhyJNG6YFrb6kXjd48qaztHBNQ@mail.gmail.com>
- <20211013084711-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20211013084711-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 13 Oct 2021 20:59:12 +0800
-Message-ID: <CACycT3vNOcuEZngDcUup=jugj-HJWUjSot5AkE5DYdBzPfzZZg@mail.gmail.com>
-Subject: Re: [PATCH v5] virtio-blk: Add validation for block size in config space
+        Wed, 13 Oct 2021 09:18:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634130988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3UweUBspHinuJSQhguEdx6WU40R4nh4wg670z3EQDCs=;
+        b=XNP1QDwX2f719a9ZrFnhwucrTmmJi3xG6/ZEi9kIsyI5EgoqN8WKfM1aPjoQSJIbgOQFYV
+        pFRVUyG4/rV6koPl8MKbwi0AXmQTYeRxBCWmzjs1lY2Bl9yZ8PmUbb1llOU47KJzq7j5Ui
+        2AnDvE9EkAQFUkWYniyGFIldV/jAtHA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-51EXKiPTPNOe2wB9MiFWRQ-1; Wed, 13 Oct 2021 09:16:25 -0400
+X-MC-Unique: 51EXKiPTPNOe2wB9MiFWRQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85FDA100A95A;
+        Wed, 13 Oct 2021 13:16:22 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.22.33.167])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6603219E7E;
+        Wed, 13 Oct 2021 13:16:20 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id DEFAB22023A; Wed, 13 Oct 2021 09:16:19 -0400 (EDT)
+Date:   Wed, 13 Oct 2021 09:16:19 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
 To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jason Wang <jasowang@redhat.com>,
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Kevin Wolf <kwolf@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <YWbcI15YOkhnPh5x@redhat.com>
+References: <20211013105226.20225-1-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 8:51 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Oct 13, 2021 at 08:34:22PM +0800, Yongji Xie wrote:
-> > On Wed, Oct 13, 2021 at 8:21 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Mon, Oct 11, 2021 at 01:40:41PM +0200, Christoph Hellwig wrote:
-> > > > On Tue, Oct 05, 2021 at 06:42:43AM -0400, Michael S. Tsirkin wrote:
-> > > > > Stefan also pointed out this duplicates the logic from
-> > > > >
-> > > > >         if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
-> > > > >                 return -EINVAL;
-> > > > >
-> > > > >
-> > > > > and a bunch of other places.
-> > > > >
-> > > > >
-> > > > > Would it be acceptable for blk layer to validate the input
-> > > > > instead of having each driver do it's own thing?
-> > > > > Maybe inside blk_queue_logical_block_size?
-> > > >
-> > > > I'm pretty sure we want down that before.  Let's just add a helper
-> > > > just for that check for now as part of this series.  Actually validating
-> > > > in in blk_queue_logical_block_size seems like a good idea, but returning
-> > > > errors from that has a long tail.
-> > >
-> > > Xie Yongji, I think I will revert this patch for now - can you
-> > > please work out adding that helper and using it in virtio?
-> > >
-> >
-> > Fine, I will do it.
-> >
-> > Thanks,
-> > Yongji
->
-> Great, thanks! And while at it, pls research a bit more and mention
-> in the commit log what is the result of an illegal blk size?
-> Is it memory corruption? A catastrophic failure?
-> If it's one of these cases, then it's ok to just fail probe.
->
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
 
-Sure, and I think it will be one of these cases. Will add some stack
-dump in the commit log.
+fs/fuse/virtio_fs.c changes look good to me.
 
-Thanks,
-Yongji
+Reviewed-by: Vivek Goyal <vgoyal@redhat.com>
+
+Vivek
+
+[..]
+> diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
+> index 0ad89c6629d7..27c3b74070a2 100644
+> --- a/fs/fuse/virtio_fs.c
+> +++ b/fs/fuse/virtio_fs.c
+> @@ -895,7 +895,7 @@ static int virtio_fs_probe(struct virtio_device *vdev)
+>  	return 0;
+>  
+>  out_vqs:
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
+>  	virtio_fs_cleanup_vqs(vdev, fs);
+>  	kfree(fs->vqs);
+>  
+> @@ -927,7 +927,7 @@ static void virtio_fs_remove(struct virtio_device *vdev)
+>  	list_del_init(&fs->list);
+>  	virtio_fs_stop_all_queues(fs);
+>  	virtio_fs_drain_all_queues_locked(fs);
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
+>  	virtio_fs_cleanup_vqs(vdev, fs);
+>  
+>  	vdev->priv = NULL;
+
+
+Thanks
+Vivek
+
