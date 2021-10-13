@@ -2,123 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D18C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC2DC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:58:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4ADE60EB4
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65ECC60F94
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 09:58:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237936AbhJMJdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 05:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36856 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237572AbhJMJdS (ORCPT
+        id S239170AbhJMKAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 06:00:14 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3975 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236501AbhJMKAN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 05:33:18 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55885C061570;
-        Wed, 13 Oct 2021 02:31:15 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id p13so7741041edw.0;
-        Wed, 13 Oct 2021 02:31:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jSDv3nCwYvRWF60PFzYmVFtCqi6n+8kG/qLGRQcEwXY=;
-        b=XDrKXspyEQaSQYdqJnWhS/O0wblIXJrWl9pE6svv7KjgrDGVXul7dxFR95SMikNbI8
-         dPBwNGXnMZrq9ECfkN9qd8qudIplcKbKQ02+dvBybldEqKgGTDn4o+Q+1yZvLDbQTpxH
-         j0F3JAFmKpiVLRpHTHEBPzaDyzHphlM3B0d+/j7Ro7xiITFiea8XjX1E/h70+j8E07xJ
-         iueofrb4NiJyC6FBpvAD+REiiIZXBpKUegBHgRICkLNGzc50RGa+mMfC0qBppipcUZ0O
-         0MOGnuc/w5sEpIO1qpW0KnLTEIw6dv//T71InSxwu/1xkmLMW6ESgvB/ttIEAHR+9lRU
-         du6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jSDv3nCwYvRWF60PFzYmVFtCqi6n+8kG/qLGRQcEwXY=;
-        b=a/9NWlYe1KD6qiKYTb7tewBmaSvmZudaDcgwZSgkzw86ol10izBu8ANoKwcfmRfK90
-         IimS2YoiRx5C58Zq5B/kSYlmNXuY12eOGOlGdUNdqOdoginCi5kPJ1EdvW0pee+3G1ru
-         HCVSRE5gCuvpt7IJQIRlh4jTotisb1yRrwIzfvUNr2HDa3aRzKBEcSdu5CSTygL5C7qN
-         OxdllwjRcgKH6do7qHj9Dc4f8hT3LLP9H3E5RJwmPHoDlCLSCpN+j3nfy7HzsiO0vAKX
-         CMYCbIP5vSG6oWbdJmdDMsPnhZ6ZIc+xqn4tbShPmjFBIOyZW/hoa7Ak+CJAC8r2B41J
-         ptDw==
-X-Gm-Message-State: AOAM532Crg6in8UMZOaVR9jB3qT11uoF8SZ3tV/5Mcc/aG9r8pPVm4rI
-        0dpoo3ykX5f06s+1QxuMXYZa9lQYh5JzCA==
-X-Google-Smtp-Source: ABdhPJzWnNPujm70ssX25zhSqx1K1lXHECTOGOjBrmNCExix4poiHSM5QToDrvQz8D7ttpAXJOx3mg==
-X-Received: by 2002:a05:6402:51d0:: with SMTP id r16mr7954872edd.353.1634117473882;
-        Wed, 13 Oct 2021 02:31:13 -0700 (PDT)
-Received: from [192.168.178.40] (ipbcc061e7.dynamic.kabel-deutschland.de. [188.192.97.231])
-        by smtp.gmail.com with ESMTPSA id p7sm7639013edr.6.2021.10.13.02.31.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Oct 2021 02:31:13 -0700 (PDT)
-Subject: Re: [PATCH 07/29] target/iblock: use bdev_nr_sectors instead of open
- coding it
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Song Liu <song@kernel.org>, David Sterba <dsterba@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Kees Cook <keescook@chromium.org>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
-        linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
-        reiserfs-devel@vger.kernel.org
-References: <20211013051042.1065752-1-hch@lst.de>
- <20211013051042.1065752-8-hch@lst.de>
-From:   Bodo Stroesser <bostroesser@gmail.com>
-Message-ID: <3babe7ca-cf08-fd19-6793-39f6d78bca12@gmail.com>
-Date:   Wed, 13 Oct 2021 11:31:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Wed, 13 Oct 2021 06:00:13 -0400
+Received: from fraeml714-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HTntc1Hhrz67wWV;
+        Wed, 13 Oct 2021 17:54:16 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml714-chm.china.huawei.com (10.206.15.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.8; Wed, 13 Oct 2021 11:58:07 +0200
+Received: from [10.47.95.55] (10.47.95.55) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.8; Wed, 13 Oct
+ 2021 10:58:06 +0100
+Subject: Re: [PATCH] blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kashyap.desai@broadcom.com>,
+        <hare@suse.de>
+References: <1634114459-143003-1-git-send-email-john.garry@huawei.com>
+ <YWalYoOZmpkmAZNK@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <79266509-f327-9de3-d22e-0e9fe00387ee@huawei.com>
+Date:   Wed, 13 Oct 2021 11:01:11 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <20211013051042.1065752-8-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <YWalYoOZmpkmAZNK@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.95.55]
+X-ClientProxiedBy: lhreml703-chm.china.huawei.com (10.201.108.52) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 13.10.21 07:10, Christoph Hellwig wrote:
-> Use the proper helper to read the block device size.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/target/target_core_iblock.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-> index 31df20abe141f..ab7f5678ebc44 100644
-> --- a/drivers/target/target_core_iblock.c
-> +++ b/drivers/target/target_core_iblock.c
-> @@ -232,8 +232,9 @@ static unsigned long long iblock_emulate_read_cap_with_block_size(
->   	struct block_device *bd,
->   	struct request_queue *q)
->   {
-> -	unsigned long long blocks_long = (div_u64(i_size_read(bd->bd_inode),
-> -					bdev_logical_block_size(bd)) - 1);
-> +	loff_t size = bdev_nr_sectors(bd) << SECTOR_SHIFT;
-> +	unsigned long long blocks_long =
-> +		div_u64(size, bdev_logical_block_size(bd)) - 1;
->   	u32 block_size = bdev_logical_block_size(bd);
+On 13/10/2021 10:22, Ming Lei wrote:
+> On Wed, Oct 13, 2021 at 04:40:59PM +0800, John Garry wrote:
+>> Since it is now possible for a tagset to share a single set of tags, the
+>> iter function should not re-iter the tags for the count of #hw queues in
+>> that case. Rather it should just iter once.
+>>
+>> Fixes: e0fdf846c7bb ("blk-mq: Use shared tags for shared sbitmap support")
+>> Reported-by: Kashyap Desai<kashyap.desai@broadcom.com>
+>> Signed-off-by: John Garry<john.garry@huawei.com>
+>>
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 72a2724a4eee..c943b6529619 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -378,9 +378,12 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+>>   void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+>>   		busy_tag_iter_fn *fn, void *priv)
+>>   {
+>> -	int i;
+>> +	unsigned int flags = tagset->flags;
+>> +	int i, nr_tags;
+>> +
+>> +	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
+>>   
+>> -	for (i = 0; i < tagset->nr_hw_queues; i++) {
+>> +	for (i = 0; i < nr_tags; i++) {
+>>   		if (tagset->tags && tagset->tags[i])
+>>   			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+>>   					      BT_TAG_ITER_STARTED);
+> blk_mq_queue_tag_busy_iter() needn't such change?
 
-To enhance readability, would it make sense to shift the new lines
-behind "u32 block_size = ...", so block_size can be used in div_u64
-instead of using bdev_logical_block_size twice?
+I didn't think so.
 
->   
->   	if (block_size == dev->dev_attrib.block_size)
-> 
+blk_mq_queue_tag_busy_iter() will indeed re-iter the tags per hctx. 
+However in bt_iter(), we check rq->mq_hctx == hctx for calling the iter 
+callback:
+
+static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+{
+	...
+
+	if (rq->q == hctx->queue && rq->mq_hctx == hctx)
+		ret = iter_data->fn(hctx, rq, iter_data->data, reserved);
+
+And this would only pass for the correct hctx which we're iter'ing for. 
+Indeed, it would be nice not to iter excessive times, but I didn't see a 
+straightforward way to change that.
+
+There is also blk_mq_all_tag_iter():
+
+void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+		void *priv)
+{
+	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS);
+}
+
+But then the only user is blk_mq_hctx_has_requests():
+
+static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
+{
+	struct blk_mq_tags *tags = hctx->sched_tags ?
+			hctx->sched_tags : hctx->tags;
+	struct rq_iter_data data = {
+		.hctx	= hctx,
+	};
+
+	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
+	return data.has_rq;
+}
+
+But, again like bt_iter(), blk_mq_has_request() will check the hctx matches:
+
+static bool blk_mq_has_request(struct request *rq, void *data, bool 
+reserved)
+{
+	struct rq_iter_data *iter_data = data;
+
+	if (rq->mq_hctx != iter_data->hctx)
+		return true;
+	iter_data->has_rq = true;
+	return false;
+}
+
+Thanks,
+John
