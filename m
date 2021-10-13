@@ -2,68 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF3FC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC0DC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:18:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73EDD610C9
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D069460D42
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 16:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbhJMQQr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 12:16:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhJMQQp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 12:16:45 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5993DC061570
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 09:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YwVd+lveMisa4MC2613HMxwHzRSRc48B6eRCJLbyxP8=; b=lznIs8HAoA1B5AJCxZwN/n/nbr
-        obsGId5zRZ/gWc0EdHGTtJzMAkpKx2euUdpZqt+EPgIfmBDmuaMSxkiUGM1XMTc9GmIWQozAUKVg5
-        oD0yEzNHi5yfdg1fQMmmBwoD1WEqMDcJ8nEkMknw5/DRNuHPyKCQVPGeVX1BaC6wMMeC268mEkELS
-        INx7pgATG1/+H6tlMYw3Gehr2HVKVLyYz6X9Ss/7ZyGUc8arbjuWDvXBxPPcmXAO/j80NipmFKMCj
-        rhGunibIfIQO7FeU6DWJQ0vduIbd21CJ6Ttjgxows5XY6xi+lC22y5gbO927LGfEvKcll4ScAbH3P
-        Pm09cbeg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1magsS-007bOv-8b; Wed, 13 Oct 2021 16:13:39 +0000
-Date:   Wed, 13 Oct 2021 17:13:12 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 6/9] nvme: add support for batched completion of polled IO
-Message-ID: <YWcFmHnnk1dGigO9@infradead.org>
-References: <20211012181742.672391-1-axboe@kernel.dk>
- <20211012181742.672391-7-axboe@kernel.dk>
- <YWaGB/798mw3kt9O@infradead.org>
- <03bccee7-de50-0118-994d-4c1a23ce384a@kernel.dk>
- <YWb4SqWFQinePqzj@infradead.org>
- <e3b138c8-49bd-2dba-b7a0-878d5c857167@kernel.dk>
- <YWcAK5D+M6406e7w@infradead.org>
- <9456daa7-bf40-ee85-65b5-a58b9e704706@kernel.dk>
+        id S229873AbhJMQUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 12:20:22 -0400
+Received: from foss.arm.com ([217.140.110.172]:41924 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229529AbhJMQUV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Oct 2021 12:20:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 588C61063;
+        Wed, 13 Oct 2021 09:18:17 -0700 (PDT)
+Received: from e120937-lin (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 25FED3F694;
+        Wed, 13 Oct 2021 09:18:07 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 17:18:04 +0100
+From:   Cristian Marussi <cristian.marussi@arm.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <20211013161804.GB6376@e120937-lin>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9456daa7-bf40-ee85-65b5-a58b9e704706@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 10:04:36AM -0600, Jens Axboe wrote:
-> On 10/13/21 9:50 AM, Christoph Hellwig wrote:
-> > On Wed, Oct 13, 2021 at 09:42:23AM -0600, Jens Axboe wrote:
-> >> Something like this?
-> > 
-> > Something like that.  Although without making the new function inline
-> > this will generate an indirect call.
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
 > 
-> It will, but I don't see how we can have it both ways...
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
+>  include/linux/virtio.h                     | 1 +
+>  net/9p/trans_virtio.c                      | 2 +-
+>  net/vmw_vsock/virtio_transport.c           | 4 ++--
+>  sound/virtio/virtio_card.c                 | 4 ++--
+>  26 files changed, 39 insertions(+), 33 deletions(-)
+> 
+[snip]
+> diff --git a/drivers/firmware/arm_scmi/virtio.c b/drivers/firmware/arm_scmi/virtio.c
+> index 11e8efb71375..6b8d93fe8848 100644
+> --- a/drivers/firmware/arm_scmi/virtio.c
+> +++ b/drivers/firmware/arm_scmi/virtio.c
+> @@ -452,7 +452,7 @@ static void scmi_vio_remove(struct virtio_device *vdev)
+>  	 * outstanding message on any vqueue to be ignored by complete_cb: now
+>  	 * we can just stop processing buffers and destroy the vqueues.
+>  	 */
+> -	vdev->config->reset(vdev);
+> +	virtio_reset_device(vdev);
+>  	vdev->config->del_vqs(vdev);
+>  	/* Ensure scmi_vdev is visible as NULL */
+>  	smp_store_mb(scmi_vdev, NULL);
 
-Last time I played with these optimization gcc did inline function
-pointers passed to __always_inline function into the calling
-function.  That is you can keep the source level abstraction but get the
-code generation as if it was open coded.
+
+Reviewed-by: Cristian Marussi <cristian.marussi@arm.com>
+
+Thanks,
+Cristian
+
