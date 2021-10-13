@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF47C4321E
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9B4C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:27:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7DA760F11
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BB5D60249
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 06:27:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237949AbhJMGS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 02:18:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48148 "EHLO
+        id S237992AbhJMG3r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 02:29:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237952AbhJMGSz (ORCPT
+        with ESMTP id S237882AbhJMG3r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 02:18:55 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA5DC06174E
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:16:52 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id lk8-20020a17090b33c800b001a0a284fcc2so3618676pjb.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:16:52 -0700 (PDT)
+        Wed, 13 Oct 2021 02:29:47 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 581ADC061746
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:27:44 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id x4so1113010pln.5
+        for <linux-block@vger.kernel.org>; Tue, 12 Oct 2021 23:27:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Vr2Ti0XXPw/GzVjOiY0OfTomtbZYRULNYJUDEzmrzO4=;
-        b=K4nvDpNl1g5m539wsQDBpCbf3zo170v/GW6ZnHLXNDrULUU4yYZgBZyGAb+wBnnkpe
-         Kw4TilugsMOouo/bETIRMTNNbwFs2By6YycSQiwP6WhM+z5A0iE/rlwHD7YheTZVwxWg
-         UujJ8p17bj864LNgI93in3n9RRNxotwxYx6iE=
+        bh=C7+rA9/qIKI+jEKdGT8jq286cyAFBOUDDboMnfms+Z8=;
+        b=AlEYQ5u0lf8LlpP+7qsCcuJhK1pgOk4qAHuS3VO4jhvcYvvdHIhevJhnSmtjCxYajF
+         GvRWvFMVajscl3jlCv3bKH7RKiMCJHNfpDbORo8xCSB0MCLratUhvvPInP4hPM2sN7/u
+         axF+0KLgxbxN6eO5bdOoxf3QMqBfSL0vk4cKc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Vr2Ti0XXPw/GzVjOiY0OfTomtbZYRULNYJUDEzmrzO4=;
-        b=RNtKZXbNg0hN36PdSJ8048aqkzzstxq2daY6YLtN60cnsiggu6NGpI8qGaMJgnIDZE
-         B6W7R85GfPnNg8BSfMnrPDfa8bjj7HI443MpySFB/HJ9AsA3QgnrXussCcEeL67gQ/bE
-         8GeuUYmdYWvANDYi4lWqYGBMXZQlIjpRZWPeAf5oJzuqNf5VX60LZmELVoNATz9eWfeC
-         xODFKa6JMBdqwqBcbaSYZQWjsIYyGosiHaAF86N3w2jipld/nXVC4q7Weh/oRA02uFZj
-         xeG2uUUf7+gvz2SS+g1VwEKnSvbFyS7qOLRXGnh31HnnRaZrPu8r8zSMkeA0+AFGMgB8
-         ZEQA==
-X-Gm-Message-State: AOAM530n8PsOAa8Xb5AhoDcq28q4uWl7utNGsV+lFjuUYN6rjFq83OfU
-        HdZ43D7u7xhUaizoo/hn9O5F7Q==
-X-Google-Smtp-Source: ABdhPJyviIqYDhsPW2xustTPT0ttTkhiIBbQskiTA4bVnp1eNaDrTHxU5FKFz1farm1RVUHRoFmswQ==
-X-Received: by 2002:a17:90b:1c8f:: with SMTP id oo15mr11110082pjb.169.1634105812260;
-        Tue, 12 Oct 2021 23:16:52 -0700 (PDT)
+        bh=C7+rA9/qIKI+jEKdGT8jq286cyAFBOUDDboMnfms+Z8=;
+        b=skBXfqE6XIP5o8aThqpLK98+xASug69otQ2BYdFihsVK9UJgrPmWGK7DDBdORAv0hb
+         FoS0DPC1lnKQpcYEW+vUkA6452LSjAHy0PHcvba7lRZoklW5UAbJpFZLugNkD1YVuxJg
+         cY17F3ADEyVCJ9SmTmkUY2QKSxIZ4TcBR4J4CELDXl5euB30CjAy6866WpIKi2diOvW5
+         WGMFIRpNF6AFL+7GRaTnCwgqW9V3KtBecofgtH69PfGBhxLiDFOl7raAfw3PkdNivEuq
+         evQIcZ3DSrLZ8e1JbIJLoCoHNngGevYYb5gtMXn8i8Hr1LmByBEvfo+I/k9iK9G2J2T9
+         9WbA==
+X-Gm-Message-State: AOAM530jDoU2zsnYW1CgOfwPHA2TYp5dzPeYxAH6MmbcMyWL0iGxkej+
+        5iUix6UVaFl3ENUVz4Mcdmd2JA==
+X-Google-Smtp-Source: ABdhPJz8mp+/J7KQDpbHq7K2lAJxf17Ai5GLPqj67ERcH9Uej4DEhzNclBgAGGyGj3QY5e4RheoMRg==
+X-Received: by 2002:a17:90b:88d:: with SMTP id bj13mr4255866pjb.211.1634106463887;
+        Tue, 12 Oct 2021 23:27:43 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id c64sm7486893pga.40.2021.10.12.23.16.51
+        by smtp.gmail.com with ESMTPSA id x15sm7730841pgo.48.2021.10.12.23.27.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 23:16:51 -0700 (PDT)
-Date:   Tue, 12 Oct 2021 23:16:51 -0700
+        Tue, 12 Oct 2021 23:27:43 -0700 (PDT)
+Date:   Tue, 12 Oct 2021 23:27:42 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
@@ -72,25 +72,63 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
         linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
         reiserfs-devel@vger.kernel.org
-Subject: Re: [PATCH 15/29] hfsplus: use bdev_nr_sectors instead of open
- coding it
-Message-ID: <202110122316.9C54C2F@keescook>
+Subject: Re: [PATCH 24/29] block: add a sb_bdev_nr_blocks helper
+Message-ID: <202110122319.3029AE5AA@keescook>
 References: <20211013051042.1065752-1-hch@lst.de>
- <20211013051042.1065752-16-hch@lst.de>
+ <20211013051042.1065752-25-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211013051042.1065752-16-hch@lst.de>
+In-Reply-To: <20211013051042.1065752-25-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 07:10:28AM +0200, Christoph Hellwig wrote:
-> Use the proper helper to read the block device size.
+On Wed, Oct 13, 2021 at 07:10:37AM +0200, Christoph Hellwig wrote:
+> Add a helper to return the size of sb->s_bdev in sb->s_blocksize_bits
+> based unites.  Note that SECTOR_SHIFT has to be open coded due to
+> include dependency issues for now, but I have a plan to sort that out
+> eventually.
+
+Wouldn't that just need a quick lift into a new header file to be
+included by genhd.h, blkev.h, and:
+
+drivers/mtd/ssfdc.c:#define SECTOR_SHIFT                9
+fs/hfsplus/hfsplus_raw.h:#define HFSPLUS_SECTOR_SHIFT         9
+
+I think that's worth doing at some point in this series since genhd.h
+already has existing open-coded "9"s. And, really, a *lot* of other
+places too:
+
+$ git grep -E '(<<|>>) 9' | grep -E '\b(block|blk|sector|bdev)\b' | wc -l
+240
+
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Reviewed-by: Kees Cook <keescook@chromium.org>
+> ---
+>  include/linux/genhd.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 082a3e5fd8fa1..6eaef8fa78bcd 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -245,6 +245,12 @@ static inline sector_t get_capacity(struct gendisk *disk)
+>  	return bdev_nr_sectors(disk->part0);
+>  }
+>  
+> +static inline u64 sb_bdev_nr_blocks(struct super_block *sb)
+> +{
+> +	return bdev_nr_sectors(sb->s_bdev) >>
+> +		(sb->s_blocksize_bits - 9 /* SECTOR_SHIFT */);
+> +}
+> +
+>  int bdev_disk_changed(struct gendisk *disk, bool invalidate);
+>  void blk_drop_partitions(struct gendisk *disk);
+>  
+> -- 
+> 2.30.2
+> 
 
 -- 
 Kees Cook
