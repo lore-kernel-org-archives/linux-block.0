@@ -2,272 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D80C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 01:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 109C8C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 01:43:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1CA460E74
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 01:07:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7BC660BD3
+	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 01:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235884AbhJMBJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Oct 2021 21:09:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41344 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235775AbhJMBJ2 (ORCPT
+        id S234119AbhJMBpR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Oct 2021 21:45:17 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:64266 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229580AbhJMBpQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Oct 2021 21:09:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634087245;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9W5/Nim7UR99mhQj6VlGoOdNyQkVOGVgooJgVby/UVQ=;
-        b=DJyaTYAGVUCm+fAZpcxjd0AGXg/mjRP//WCQR/8E2KumLQqPK4MjT3dBD+J/BHeJJLCwdY
-        b4wI+iUUOqj79LaEGIb6AjG/rv3HdibCX+heA+gJmpL7wlSD7/LwwWDsgXZruijtlA1npK
-        y9JqWZebV81DjsXcUlWsiQlTKQWqJfE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-HxK1RB5_PS67AtBc8N0hMg-1; Tue, 12 Oct 2021 21:07:22 -0400
-X-MC-Unique: HxK1RB5_PS67AtBc8N0hMg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF65169721;
-        Wed, 13 Oct 2021 01:07:19 +0000 (UTC)
-Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 145D660D30;
-        Wed, 13 Oct 2021 01:07:09 +0000 (UTC)
-Date:   Wed, 13 Oct 2021 09:07:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
-        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
-        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
-        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 09/12] sysfs: fix deadlock race with module removal
-Message-ID: <YWYxN875B6rlmAjC@T590>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-10-mcgrof@kernel.org>
- <YVwZwh7qDKfSM59h@T590>
- <YWSr2trabEJflzlj@bombadil.infradead.org>
- <YWTU3kTlJKONyFjZ@T590>
- <YWX7pAn0YMaJeJBA@bombadil.infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YWX7pAn0YMaJeJBA@bombadil.infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        Tue, 12 Oct 2021 21:45:16 -0400
+Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20211013014312epoutp0393f949396cfa33eb34ecc0bc674cfc64~tc6Uac7bD2073020730epoutp03c
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 01:43:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20211013014312epoutp0393f949396cfa33eb34ecc0bc674cfc64~tc6Uac7bD2073020730epoutp03c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1634089392;
+        bh=5hgsZMnyHmMQuJ17+DuONfTtOtgQHJQx6uixMnpyb9w=;
+        h=Subject:Reply-To:From:To:Date:References:From;
+        b=IMdhHaT6sgaJdi8SaLkAKpO4pbXlzdY/zpwFcBk98u5jf83t2VMRNtQqyGXn+uXB0
+         a2nf+a/ZyqqDeAjkgkKdde14dQgLwGn5KWPfiho4RhOVTj67jNDP4Ou1TDiQZV0Zuj
+         rzCND24TzEGtsvDjLeWiGmbv5/LzXfQAeWQdlRto=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20211013014309epcas2p15f019c6c8a12ef5633d9f87784e9de70~tc6Rchuyl0925409254epcas2p1E;
+        Wed, 13 Oct 2021 01:43:09 +0000 (GMT)
+Received: from epsmges2p4.samsung.com (unknown [182.195.36.102]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4HTZzn5PtYz4x9QF; Wed, 13 Oct
+        2021 01:43:01 +0000 (GMT)
+X-AuditID: b6c32a48-d75ff70000002500-7e-616639a135d6
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4C.F4.09472.1A936616; Wed, 13 Oct 2021 10:42:57 +0900 (KST)
+Mime-Version: 1.0
+Subject: [PATCH v2] block-map: added error handling for bio_copy_kern()
+Reply-To: j-young.choi@samsung.com
+Sender: Jinyoung CHOI <j-young.choi@samsung.com>
+From:   Jinyoung CHOI <j-young.choi@samsung.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20211013014256epcms2p5485187a369a9f8c74c2b3ab925df88fb@epcms2p5>
+Date:   Wed, 13 Oct 2021 10:42:56 +0900
+X-CMS-MailID: 20211013014256epcms2p5485187a369a9f8c74c2b3ab925df88fb
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+CMS-TYPE: 102P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGKsWRmVeSWpSXmKPExsWy7bCmhe5Cy7REgxe3eCxW3+1ns3h5SNPi
+        9IRFTBa9/VvZLPbe0ra4vGsOmwObx+YVWh6Xz5Z69G1ZxejxeZNcAEtUtk1GamJKapFCal5y
+        fkpmXrqtkndwvHO8qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0GIlhbLEnFKgUEBicbGSvp1N
+        UX5pSapCRn5xia1SakFKToF5gV5xYm5xaV66Xl5qiZWhgYGRKVBhQnZG35Logt+yFSdPHGNq
+        YHwt08XIySEhYCKx5sh+1i5GLg4hgR2MEs/eNrJ0MXJw8AoISvzdIQxSIyzgLvG1r5UFxBYS
+        UJI4t2YWI0iJsICBxK1ec5Awm4CexM8lM9hAxogIXGCUWDxhJzPEfF6JGe1PWSBsaYnty7cy
+        QtgaEj+W9ULViErcXP2WHcZ+f2w+VI2IROu9s1A1ghIPfu6GiktKNE6YBjWzXOLq8jksIIsl
+        BDoYJS4vuQmV0Je41rERzOYV8JWY2/cUrJlFQFViWfMfJogaF4nuKSBXc3IwC2hLLFv4mhnk
+        MWYBTYn1u/RBTAkBZYkjt1hgXmnY+Jsdnc0swCfRcfgvXHzHvCdMEK1qEouajCDCMhJfD8+H
+        KvGQmDmng3kCo+IsRDjPQnLCLIQTFjAyr2IUSy0ozk1PLTYqMIHHbHJ+7iZGcALU8tjBOPvt
+        B71DjEwcjIcYJTiYlUR4DYHpSog3JbGyKrUoP76oNCe1+BCjKdDzE5mlRJPzgSk4ryTe0MTS
+        wMTMzNDcyNTAXEmcd+4/p0QhgfTEktTs1NSC1CKYPiYOTqkGJnm+Nb0Mj5+n9s6W2LEoY1/d
+        nFmhN6cYzTFdpJ2QtCZIJ8SM68/l+Mw/HJ/C30/exCuqtUJ5x6a46AL35Cop4y0L8r4Uh3zI
+        n371Du+/BCsn/saiJ05+fVxTlKZHuciXrzPifrtH+llh7uHm5l/7b/u18fGGFN9/u+DDzjbX
+        Ha0CL25d3fH01cP8aRGfvqXPvRtVHOS0/5VzmHVK7Sd3T0OhwK2/35zQfPpG5YvSlnUvXlja
+        cgluP3aUaW9YjoSGZNoCPpYvfaocBXedN4R3Mb4JnxuiXafueGrWgkkq65bVX+Te3BOq3Gp4
+        ukt+8REOF93D7pZK4mwNS1T0Vz/fVl2eHFG7my1v6e11T5+dUWIpzkg01GIuKk4EAFaElbsJ
+        BAAA
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20211013014256epcms2p5485187a369a9f8c74c2b3ab925df88fb
+References: <CGME20211013014256epcms2p5485187a369a9f8c74c2b3ab925df88fb@epcms2p5>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 12, 2021 at 02:18:28PM -0700, Luis Chamberlain wrote:
-> On Tue, Oct 12, 2021 at 08:20:46AM +0800, Ming Lei wrote:
-> > On Mon, Oct 11, 2021 at 02:25:46PM -0700, Luis Chamberlain wrote:
-> > > On Tue, Oct 05, 2021 at 05:24:18PM +0800, Ming Lei wrote:
-> > > > On Mon, Sep 27, 2021 at 09:38:02AM -0700, Luis Chamberlain wrote:
-> > > > > When driver sysfs attributes use a lock also used on module removal we
-> > > > > can race to deadlock. This happens when for instance a sysfs file on
-> > > > > a driver is used, then at the same time we have module removal call
-> > > > > trigger. The module removal call code holds a lock, and then the
-> > > > > driver's sysfs file entry waits for the same lock. While holding the
-> > > > > lock the module removal tries to remove the sysfs entries, but these
-> > > > > cannot be removed yet as one is waiting for a lock. This won't complete
-> > > > > as the lock is already held. Likewise module removal cannot complete,
-> > > > > and so we deadlock.
-> > > > > 
-> > > > > This can now be easily reproducible with our sysfs selftest as follows:
-> > > > > 
-> > > > > ./tools/testing/selftests/sysfs/sysfs.sh -t 0027
-> > > > > 
-> > > > > This uses a local driver lock. Test 0028 can also be used, that uses
-> > > > > the rtnl_lock():
-> > > > > 
-> > > > > ./tools/testing/selftests/sysfs/sysfs.sh -t 0028
-> > > > > 
-> > > > > To fix this we extend the struct kernfs_node with a module reference
-> > > > > and use the try_module_get() after kernfs_get_active() is called. As
-> > > > > documented in the prior patch, we now know that once kernfs_get_active()
-> > > > > is called the module is implicitly guarded to exist and cannot be removed.
-> > > > > This is because the module is the one in charge of removing the same
-> > > > > sysfs file it created, and removal of sysfs files on module exit will wait
-> > > > > until they don't have any active references. By using a try_module_get()
-> > > > > after kernfs_get_active() we yield to let module removal trump calls to
-> > > > > process a sysfs operation, while also preventing module removal if a sysfs
-> > > > > operation is in already progress. This prevents the deadlock.
-> > > > > 
-> > > > > This deadlock was first reported with the zram driver, however the live
-> > > > 
-> > > > Looks not see the lock pattern you mentioned in zram driver, can you
-> > > > share the related zram code?
-> > > 
-> > > I recommend to not look at the zram driver, instead look at the
-> > > test_sysfs driver as that abstracts the issue more clearly and uses
-> > 
-> > Looks test_sysfs isn't in linus tree, where can I find it?
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20210927-sysfs-generic-deadlock-fix
-> 
-> > Also please
-> > update your commit log about this wrong info if it can't be applied on
-> > zram.
-> 
-> It does apply to zram, it is just that I have other fixes for zram in
-> my pipeline which will change the zram driver further, and so what makes
-> more sense is to abstract the issue into a selftest driver to
-> demonstrate the issue more clearly.
-> 
-> To reproduce the deadlock revert the patch in this thread and then run
-> either of these two tests as root:
-> 
-> ./tools/testing/selftests/sysfs/sysfs.sh -w 0027
-> ./tools/testing/selftests/sysfs/sysfs.sh -w 0028
-> 
-> You will need to enable the test_sysfs driver.
-> 
-> > > two different locks as an example. The point is that if on module
-> > > removal *any* lock is used which is *also* used on the sysfs file
-> > > created by the module, you can deadlock.
-> > > 
-> > > > > And this can lead to this condition:
-> > > > > 
-> > > > > CPU A                              CPU B
-> > > > >                                    foo_store()
-> > > > > foo_exit()
-> > > > >   mutex_lock(&foo)
-> > > > >                                    mutex_lock(&foo)
-> > > > >    del_gendisk(some_struct->disk);
-> > > > >      device_del()
-> > > > >        device_remove_groups()
-> > > > 
-> > > > I guess the deadlock exists if foo_exit() is called anywhere. If yes,
-> > > > look the issue may not be related with removing module directly, right?
-> > > 
-> > > No, the reason this can deadlock is that the module exit routine will
-> > > patiently wait for the sysfs / kernfs files to be stop being used,
-> > 
-> > Can you share the code which waits for the sysfs / kernfs files to be
-> > stop being used?
-> 
-> How about a call trace of the two tasks which deadlock, here is one of
-> running test 0027:
-> 
-> kdevops login: [  363.875459] INFO: task sysfs.sh:1271 blocked for more
-> than 120 seconds.
-> [  363.878341]       Tainted: G            E
-> 5.15.0-rc3-next-20210927+ #83
-> [  363.881218] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> disables this message.
-> [  363.882255] task:sysfs.sh        state:D stack:    0 pid: 1271 ppid:
-> 1 flags:0x00000004
-> [  363.882894] Call Trace:
-> [  363.883091]  <TASK>
-> [  363.883259]  __schedule+0x2fd/0x990
-> [  363.883551]  schedule+0x43/0xe0
-> [  363.883800]  schedule_preempt_disabled+0x14/0x20
-> [  363.884160]  __mutex_lock.constprop.0+0x249/0x470
-> [  363.884524]  test_dev_x_store+0xa5/0xc0 [test_sysfs]
-> [  363.884915]  kernfs_fop_write_iter+0x177/0x220
-> [  363.885257]  new_sync_write+0x11c/0x1b0
-> [  363.885556]  vfs_write+0x20d/0x2a0
-> [  363.885821]  ksys_write+0x5f/0xe0
-> [  363.886081]  do_syscall_64+0x38/0xc0
-> [  363.886359]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [  363.886748] RIP: 0033:0x7fee00f8bf33
-> [  363.887029] RSP: 002b:00007ffd372c5d18 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> [  363.887633] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fee00f8bf33
-> [  363.888217] RDX: 0000000000000003 RSI: 000055a4d14a0db0 RDI: 0000000000000001
-> [  363.888761] RBP: 000055a4d14a0db0 R08: 000000000000000a R09: 0000000000000002
-> [  363.889267] R10: 000055a4d1554ac0 R11: 0000000000000246 R12: 0000000000000003
-> [  363.889983] R13: 00007fee0105c6a0 R14: 0000000000000003 R15: 00007fee0105c8a0
-> [  363.890513]  </TASK>
-> [  363.890709] INFO: task modprobe:1276 blocked for more than 120 seconds.
-> [  363.891185]       Tainted: G            E 5.15.0-rc3-next-20210927+ #83
-> [  363.891781] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [  363.892353] task:modprobe        state:D stack:    0 pid: 1276 ppid: 1 flags:0x00004000
-> [  363.892955] Call Trace:
-> [  363.893141]  <TASK>
-> [  363.893457]  __schedule+0x2fd/0x990
-> [  363.893865]  schedule+0x43/0xe0
-> [  363.894246]  __kernfs_remove.part.0+0x21e/0x2a0
-> [  363.894704]  ? do_wait_intr_irq+0xa0/0xa0
-> [  363.895142]  kernfs_remove_by_name_ns+0x50/0x90
-> [  363.895632]  remove_files+0x2b/0x60
-> [  363.896035]  sysfs_remove_group+0x38/0x80
-> [  363.896470]  sysfs_remove_groups+0x29/0x40
-> [  363.896912]  device_remove_attrs+0x5b/0x90
-> [  363.897352]  device_del+0x183/0x400
-> [  363.897758]  unregister_test_dev_sysfs+0x5b/0xaa [test_sysfs]
-> [  363.898317]  test_sysfs_exit+0x45/0xfb0 [test_sysfs]
-> [  363.898833]  __do_sys_delete_module+0x18d/0x2a0
-> [  363.899329]  ? fpregs_assert_state_consistent+0x1e/0x40
-> [  363.899868]  ? exit_to_user_mode_prepare+0x3a/0x180
-> [  363.900390]  do_syscall_64+0x38/0xc0
-> [  363.900810]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [  363.901330] RIP: 0033:0x7f21915c57d7
-> [  363.901747] RSP: 002b:00007ffd90869fe8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-> [  363.902442] RAX: ffffffffffffffda RBX: 000055ce676ffc30 RCX: 00007f21915c57d7
-> [  363.903104] RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055ce676ffc98
-> [  363.903782] RBP: 000055ce676ffc30 R08: 0000000000000000 R09: 0000000000000000
-> [  363.904462] R10: 00007f2191638ac0 R11: 0000000000000206 R12: 000055ce676ffc98
-> [  363.905128] R13: 0000000000000000 R14: 0000000000000000 R15: 000055ce676ffdf0
-> [  363.905797]  </TASK>
+When new pages are allocated to bio through alloc_page() in
+bio_copy_kern(), the pages must be freed in error handling after that.
+There is little chance of an error occurring in blk_rq_append_bio(), but
+in the code flow, pages additionally allocated to bio must be released.
 
-That doesn't show the deadlock is related with module_exit().
-
-> 
-> 
-> And gdb:
-> 
-> (gdb) l *(__kernfs_remove+0x21e)
-> 0xffffffff8139288e is in __kernfs_remove (fs/kernfs/dir.c:476).
-> 471                     if (atomic_read(&kn->active) != KN_DEACTIVATED_BIAS)
-> 472                             lock_contended(&kn->dep_map, _RET_IP_);
-> 473             }
-> 474
-> 475             /* but everyone should wait for draining */
-> 476             wait_event(root->deactivate_waitq,
-> 477                        atomic_read(&kn->active) == KN_DEACTIVATED_BIAS);
-> 478
-> 479             if (kernfs_lockdep(kn)) {
-> 480                     lock_acquired(&kn->dep_map, _RET_IP_);
-> 
-> (gdb) l *(kernfs_remove_by_name_ns+0x50)
-> 0xffffffff813938d0 is in kernfs_remove_by_name_ns (fs/kernfs/dir.c:1534).
-> 1529
-> 1530            kn = kernfs_find_ns(parent, name, ns);
-> 1531            if (kn)
-> 1532                    __kernfs_remove(kn);
-> 1533
-> 1534            up_write(&kernfs_rwsem);
-> 1535
-> 1536            if (kn)
-> 1537                    return 0;
-> 1538            else
-> 
-> The same happens for test 0028 except instead of a mutex
-> lock an rtnl_lock() is used.
-> 
-> Would this be better for the commit log?
-> 
-> > And why does it make a difference in case of being
-> > called from module_exit()?
-> 
-> Well because that is where we remove the sysfs files. *If*
-> a developer happens to use a lock on a sysfs op but it is
-> also used on module exit, this deadlock is bound to happen.
-
-It is clearly one AA deadlock, what I meant was that it isn't related with
-module exit cause lock & device_del() isn't always done in module exit, so
-I doubt your fix with grabbing module refcnt is good or generic enough.
-
-Except for your cooked test_sys module, how many real drivers do suffer the
-problem? What are they? Why can't we fix the exact driver?
-
-
-Thanks,
-Ming
-
+V2:
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20-=20As=20pointed=20out=20by=20=
+Christoph,=20replace=20int=20with=20bool=0D=0A=0D=0ASigned-off-by:=20Jinyou=
+ng=20Choi=20<j-young.choi=40samsung.com>=0D=0A---=0D=0A=C2=A0block/blk-map.=
+c=20=7C=2011=20++++++++---=0D=0A=C2=A01=20file=20changed,=208=20insertions(=
++),=203=20deletions(-)=0D=0Adiff=20--git=20a/block/blk-map.c=20b/block/blk-=
+map.c=0D=0Aindex=204526adde0156..b137a2f569f8=20100644=0D=0A---=20a/block/b=
+lk-map.c=0D=0A+++=20b/block/blk-map.c=0D=0A=40=40=20-628,6=20+628,7=20=40=
+=40=20int=20blk_rq_map_kern(struct=20request_queue=20*q,=20struct=20request=
+=20*rq,=20void=20*kbuf,=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20i=
+nt=20reading=20=3D=20rq_data_dir(rq)=20=3D=3D=20READ;=0D=0A=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=20unsigned=20long=20addr=20=3D=20(unsigned=20lo=
+ng)=20kbuf;=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20struct=20bio=
+=20*bio;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20bool=20do_copy;=0D=0A=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20int=20ret;=0D=0A=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20if=20(len=20>=20(queue_max_hw_sectors(q)=
+=20<<=209))=0D=0A=40=40=20-635,8=20+636,9=20=40=40=20int=20blk_rq_map_kern(=
+struct=20request_queue=20*q,=20struct=20request=20*rq,=20void=20*kbuf,=0D=
+=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20if=20(=21len=20=7C=7C=20=21=
+kbuf)=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=20return=20-EINVAL;=0D=0A-=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=20if=20(=21blk_rq_aligned(q,=20addr,=20len)=20=7C=7C=20obje=
+ct_is_on_stack(kbuf)=20=7C=7C=0D=0A-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=20blk_queue_may_bounce(q))=0D=0A+=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=20do_copy=20=3D=20=21blk_rq_aligned(q,=20addr,=20len)=20=
+=7C=7C=20object_is_on_stack(kbuf)=20=7C=7C=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20blk_queue_ma=
+y_bounce(q);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20if=20(do_copy)=0D=
+=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=20bio=20=3D=20bio_copy_kern(q,=20kbuf,=20len,=20gfp_mask=
+,=20reading);=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20else=0D=0A=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=20bio=20=3D=20bio_map_kern(q,=20kbuf,=20len,=20gfp_mask);=
+=0D=0A=40=40=20-648,8=20+650,11=20=40=40=20int=20blk_rq_map_kern(struct=20r=
+equest_queue=20*q,=20struct=20request=20*rq,=20void=20*kbuf,=0D=0A=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20bio->bi_opf=20=7C=3D=20req_op(rq);=0D=
+=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20ret=20=3D=20blk_rq_append_b=
+io(rq,=20bio);=0D=0A-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20if=20(unlikely(=
+ret))=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20if=20(unlikely(ret))=20=
+=7B=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=20if=20(do_copy)=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=20bio_free_pages(bio);=0D=0A=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20=
+bio_put(bio);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20=7D=0D=0A=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20return=20ret;=0D=0A=C2=A0=7D=0D=0A=
+=C2=A0EXPORT_SYMBOL(blk_rq_map_kern);=0D=0A--=0D=0A2.25.1=C2=A0
