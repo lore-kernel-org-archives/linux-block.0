@@ -2,137 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF60C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7E1C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 177DC61152
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80FB860EE5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:36:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbhJNIUj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 04:20:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34833 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230032AbhJNIUj (ORCPT
+        id S230202AbhJNIij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 04:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43642 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230112AbhJNIij (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 04:20:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634199514;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g/kvozVUbaeY+snlBIvQUQ6zEskRm3LgqfriGB6wA7o=;
-        b=iXtQVuhWLHXS6NFM5f2xVKtP9ESkHHUOMgmJy/kSlT++Jysb00+0Gp5JJ/pzCEUChbHa61
-        tGPN3KgmKjm1maknKSvXFMyq8NriMnRy27O108Bnm8uz5QnxIHSA8783N/wk71QZMtuX41
-        c0GpC6pwR774XDtM9jnG7QQtwg6IxR8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-ubuILikANEycPgv86f-wfA-1; Thu, 14 Oct 2021 04:18:30 -0400
-X-MC-Unique: ubuILikANEycPgv86f-wfA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 749A51015DA0;
-        Thu, 14 Oct 2021 08:18:29 +0000 (UTC)
-Received: from localhost (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CBE7260936;
-        Thu, 14 Oct 2021 08:18:12 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai3@huawei.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 6/6] blk-mq: support concurrent queue quiesce/unquiesce
-Date:   Thu, 14 Oct 2021 16:17:10 +0800
-Message-Id: <20211014081710.1871747-7-ming.lei@redhat.com>
-In-Reply-To: <20211014081710.1871747-1-ming.lei@redhat.com>
-References: <20211014081710.1871747-1-ming.lei@redhat.com>
+        Thu, 14 Oct 2021 04:38:39 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DACFC061746
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 01:36:34 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id y3so17024903wrl.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 01:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cfakvhen/wxw5fHdRu0DEuLT5DMfJlXe2a/johLjqxo=;
+        b=h40uJnzRy4bIKfqfvwm3i/kik60+Kgx2sfXbHxmv0MsZax7HkeDmryc9yctryM7xlU
+         37bg2VuoZWdH4kTXGosC95Fa3QYJayYirIbI/UeFVNH/Nzn2/7/VodB6g1hiMuG9zp+p
+         egl0Br7pM5vnKxSuUDa7BUq17cmPH9MsIYOosVtDeEDQMUaCZ6h+AWD2esXOH1LRk+zZ
+         X2uV1Nn3ulaudun/4f5AT6jS5oilV0myDq9ozSQAqUnytF1YgcEInQmj+cCLjl5OgT5o
+         004n5bwSXge4iP3a4skCS8avlQccw5QvPN8BVpAjam8zZmlkvShcDVpQvgmxjplGDMKz
+         pkRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cfakvhen/wxw5fHdRu0DEuLT5DMfJlXe2a/johLjqxo=;
+        b=JDzsYgG9Iz1tlcU9A/Rs+0vCcaKTY6e+p/JudJo+wRPEOWs8aI67GQ5rUEfdairTOT
+         C8zGNopdkRycsH4hWeUJkt7ZiN72OD7k1zQzL4yBk33HSQp7LRZ9xItSHLnXiJskXAMS
+         ZvDeRiHWskL6DRm7KMRVeqrMSLBcmbXiqCHMHfulLUutthujzKWsJBqMSNEEzJHkMFAg
+         oafdJe+doTuZu41TsngJW04wFwyCoLQFVkBLhG/f2aC4QtnBeH3cXtzZMuCYJoCEPgba
+         szmGYZfPoY5NxdJgdSZsfm1kvCidCVpoFXIA8+N44lxIO48SYUOBlty3aktbEOb55rTR
+         8Hfw==
+X-Gm-Message-State: AOAM530XwUYwoOqpLMne6XxTy0nyik7dc1hJ5YWArJjw0DmUNjg43Dug
+        FiSZwQUCdU/vSZiR8yydEIOFbQ==
+X-Google-Smtp-Source: ABdhPJzpVg8OIER+zTALG2ilasSHxD7bC/dTlVAeWBUDgRwrRvN9DCthCd2lRX0ZyZDpw2FTk6Hq6g==
+X-Received: by 2002:a5d:59a9:: with SMTP id p9mr5151873wrr.386.1634200593067;
+        Thu, 14 Oct 2021 01:36:33 -0700 (PDT)
+Received: from myrica (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
+        by smtp.gmail.com with ESMTPSA id r4sm2299114wrz.58.2021.10.14.01.36.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 01:36:32 -0700 (PDT)
+Date:   Thu, 14 Oct 2021 09:36:09 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <YWfr+Z0wgpQ48yC5@myrica>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_quiesce_queue() has been used a bit wide now, so far we don't support
-concurrent/nested quiesce. One biggest issue is that unquiesce can happen
-unexpectedly in case that quiesce/unquiesce are run concurrently from
-more than one context.
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
 
-This patch introduces q->mq_quiesce_depth to deal concurrent quiesce,
-and we only unquiesce queue when it is the last/outer-most one of all
-contexts.
+>  drivers/iommu/virtio-iommu.c               | 2 +-
 
-Several kernel panic issue has been reported[1][2][3] when running stress
-quiesce test. And this patch has been verified in these reports.
-
-[1] https://lore.kernel.org/linux-block/9b21c797-e505-3821-4f5b-df7bf9380328@huawei.com/T/#m1fc52431fad7f33b1ffc3f12c4450e4238540787
-[2] https://lore.kernel.org/linux-block/9b21c797-e505-3821-4f5b-df7bf9380328@huawei.com/T/#m10ad90afeb9c8cc318334190a7c24c8b5c5e0722
-[3] https://listman.redhat.com/archives/dm-devel/2021-September/msg00189.html
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c         | 22 +++++++++++++++++++---
- include/linux/blkdev.h |  2 ++
- 2 files changed, 21 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 68cccb2d1f8c..360e8eaee4dc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -209,7 +209,12 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-  */
- void blk_mq_quiesce_queue_nowait(struct request_queue *q)
- {
--	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&q->queue_lock, flags);
-+	if (!q->quiesce_depth++)
-+		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-+	spin_unlock_irqrestore(&q->queue_lock, flags);
- }
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
- 
-@@ -250,10 +255,21 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
-  */
- void blk_mq_unquiesce_queue(struct request_queue *q)
- {
--	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-+	unsigned long flags;
-+	bool run_queue = false;
-+
-+	spin_lock_irqsave(&q->queue_lock, flags);
-+	if (WARN_ON_ONCE(q->quiesce_depth <= 0)) {
-+		;
-+	} else if (!--q->quiesce_depth) {
-+		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-+		run_queue = true;
-+	}
-+	spin_unlock_irqrestore(&q->queue_lock, flags);
- 
- 	/* dispatch requests which are inserted during quiescing */
--	blk_mq_run_hw_queues(q, true);
-+	if (run_queue)
-+		blk_mq_run_hw_queues(q, true);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 17705c970d7e..52020fae665c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -314,6 +314,8 @@ struct request_queue {
- 	 */
- 	struct mutex		mq_freeze_lock;
- 
-+	int			quiesce_depth;
-+
- 	struct blk_mq_tag_set	*tag_set;
- 	struct list_head	tag_set_list;
- 	struct bio_set		bio_split;
--- 
-2.31.1
-
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
