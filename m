@@ -2,134 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD9AC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 22:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E0EC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 01:33:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F40861154
-	for <linux-block@archiver.kernel.org>; Wed, 13 Oct 2021 22:54:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20499611C2
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 01:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbhJMW4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 18:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbhJMW4f (ORCPT
+        id S229660AbhJNBfU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 21:35:20 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:13737 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229496AbhJNBfT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 18:56:35 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E68C061570;
-        Wed, 13 Oct 2021 15:54:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=DsH9WcMVyggggsdQx3bujMapUdnlUoCWn8obGz9Evmg=; b=GUGQh00o6vm3mO8uquvBObd9k9
-        xig3DOa/oIupOI44S2XFrwQSfegbECOQ6MKl7rK9p32qB6d9mttvm4bECkIyO9Apb16anxPPnCQTF
-        BIiIdsU8F11eb0+F6EUQcI1mCPZMckQtjmedLAAJi38DWx8ci7qKe4AWQZrZ6vsu6J7OygfgR/WGR
-        BLz/wjUInJEHPfBYDOaVFvkaRjbpAcIXEM206gIfwoJr7rUKXF6IOGoVIriYNTHaYVEyRDnl8iZjZ
-        lEAbH+ivxLghmvukFqSpixPR5QGqI06jfHR3yLujF3AYmbo4YHFoOzCiq6uAZJosRMDrENx+jtzwx
-        9Ln/7dDA==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1man8o-000wgr-2f; Wed, 13 Oct 2021 22:54:30 +0000
-Subject: Re: [RFC PATCH v7 07/16] ipe: add auditing support
-To:     deven.desai@linux.microsoft.com, corbet@lwn.net, axboe@kernel.dk,
-        agk@redhat.com, snitzer@redhat.com, ebiggers@kernel.org,
-        tytso@mit.edu, paul@paul-moore.com, eparis@redhat.com,
-        jmorris@namei.org, serge@hallyn.com
-Cc:     jannh@google.com, dm-devel@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-audit@redhat.com,
-        linux-security-module@vger.kernel.org
-References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
- <1634151995-16266-8-git-send-email-deven.desai@linux.microsoft.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <9c1eec3b-8bb0-9e3e-d6e5-18c670ac2b03@infradead.org>
-Date:   Wed, 13 Oct 2021 15:54:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Wed, 13 Oct 2021 21:35:19 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HVBh75YmzzWk31;
+        Thu, 14 Oct 2021 09:31:35 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.8; Thu, 14 Oct 2021 09:33:14 +0800
+Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
+ (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Thu, 14
+ Oct 2021 09:33:13 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+Subject: [PATCH v4 0/2] optimize the bfq queue idle judgment
+Date:   Thu, 14 Oct 2021 09:45:54 +0800
+Message-ID: <20211014014556.3597008-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <1634151995-16266-8-git-send-email-deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Changes in V4:
+ - fix a compile warning when CONFIG_BLK_CGROUP is not enabled.
 
-On 10/13/21 12:06 PM, deven.desai@linux.microsoft.com wrote:
-> diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
-> index c4503083e92d..ef556b66e674 100644
-> --- a/security/ipe/Kconfig
-> +++ b/security/ipe/Kconfig
-> @@ -17,3 +17,55 @@ menuconfig SECURITY_IPE
->   	  requirements on the fly.
->   
->   	  If unsure, answer N.
-> +
-> +if SECURITY_IPE
-> +
-> +choice
-> +	prompt "Hash algorithm used in auditing policies"
-> +	default IPE_AUDIT_HASH_SHA1
-> +	depends on AUDIT
-> +	help
-> +		Specify the hash algorithm used when auditing policies.
-> +		The hash is used to uniquely identify a policy from other
-> +		policies on the system.
-> +
-> +		If unsure, leave default.
-> +
-> +	config IPE_AUDIT_HASH_SHA1
-> +		bool "sha1"
-> +		depends on CRYPTO_SHA1
-> +		help
-> +			Use the SHA128 algorithm to hash policies
-> +			in the audit records.
-> +
-> +	config IPE_AUDIT_HASH_SHA256
-> +		bool "sha256"
-> +		depends on CRYPTO_SHA256
-> +		help
-> +			Use the SHA256 algorithm to hash policies
-> +			in the audit records.
-> +
-> +	config IPE_AUDIT_HASH_SHA384
-> +		bool "sha384"
-> +		depends on CRYPTO_SHA512
-> +		help
-> +			Use the SHA384 algorithm to hash policies
-> +			in the audit records
-> +
-> +	config IPE_AUDIT_HASH_SHA512
-> +		bool "sha512"
-> +		depends on CRYPTO_SHA512
-> +		help
-> +			Use the SHA512 algorithm to hash policies
-> +			in the audit records
-> +endchoice
-> +
-> +config IPE_AUDIT_HASH_ALG
-> +	string
-> +	depends on AUDIT
-> +	default "sha1" if IPE_AUDIT_HASH_SHA1
-> +	default "sha256" if IPE_AUDIT_HASH_SHA256
-> +	default "sha384" if IPE_AUDIT_HASH_SHA384
-> +	default "sha512" if IPE_AUDIT_HASH_SHA512
-> +
-> +endif
+Changes in V3:
+ - Instead of tracking each queue in root group, tracking root group
+ directly just like non-root group does.
+ - remove patch 3,4 from these series.
 
-Please follow coding-style for Kconfig files:
+Chagnes in V2:
+ - as suggested by Paolo, add support to track if root_group have any
+ pending requests, and use that to handle the situation when only one
+ group is activated while root group doesn't have any pending requests.
+ - modify commit message in patch 2
 
-(from Documentation/process/coding-style.rst, section 10):
+Yu Kuai (2):
+  block, bfq: counted root group into 'num_groups_with_pending_reqs'
+  block, bfq: do not idle if only one cgroup is activated
 
-For all of the Kconfig* configuration files throughout the source tree,
-the indentation is somewhat different.  Lines under a ``config`` definition
-are indented with one tab, while help text is indented an additional two
-spaces.
+ block/bfq-iosched.c | 40 ++++++++++++++++++++++++++++--------
+ block/bfq-wf2q.c    | 50 +++++++++++++++++++++++++++++++++------------
+ 2 files changed, 69 insertions(+), 21 deletions(-)
 
-
-thanks.
 -- 
-~Randy
+2.31.1
+
