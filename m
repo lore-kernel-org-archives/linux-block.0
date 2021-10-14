@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8283EC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00056C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:18:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C71B610E8
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAB6061108
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbhJNIT5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 04:19:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42377 "EHLO
+        id S230126AbhJNIUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 04:20:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37958 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230117AbhJNIT4 (ORCPT
+        by vger.kernel.org with ESMTP id S229992AbhJNIUI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 04:19:56 -0400
+        Thu, 14 Oct 2021 04:20:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634199471;
+        s=mimecast20190719; t=1634199484;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Kv5fvG9KZriDjoofQEBWp898Mk3hvdOZp76TKP2/6jo=;
-        b=ObLX6WcZv4bMnQRZpTqb/HASrZJbYPhF4INXWDXcLh4Evs15RfKQNq6B67frHDwJK3L9KP
-        BlOAG/vbAVK1XoXPgkizhpG1jRvdQbobsZ+M2P1ahgJJIwCbI205DjuPFOza/6j0d9mzqk
-        3Ik4FVEAU3fECns0X5GVcJOIhpOoRO0=
+        bh=7G3UKlJlve/dAHeQ4aDLZgNL6CcToFOApymUAdlSpAM=;
+        b=RBNnJhYreIENKv1p3j/wKVTPwtvRzt3wh+Lmzm1877PFQL8byrZWAcX7mllr7cOxh9OswE
+        t7B7HmvGUZDhKC8XQNxgzM4Ge3OYfX0hLiCzC8cPR8fqXisRTTCbiEB/Yrv86OKtdhuDZe
+        40Lu+1Qwr5gXzrFtAuYuij8x2NdXsEA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-MWBkp6otPwCo7Jamuqw7Rg-1; Thu, 14 Oct 2021 04:17:48 -0400
-X-MC-Unique: MWBkp6otPwCo7Jamuqw7Rg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-113-6O7VCqKLP-qhVQh6D_HwOQ-1; Thu, 14 Oct 2021 04:18:01 -0400
+X-MC-Unique: 6O7VCqKLP-qhVQh6D_HwOQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28E0A805750;
-        Thu, 14 Oct 2021 08:17:47 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73BBBA0CB6;
+        Thu, 14 Oct 2021 08:17:59 +0000 (UTC)
 Received: from localhost (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 817FA5DF35;
-        Thu, 14 Oct 2021 08:17:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 823305F4E2;
+        Thu, 14 Oct 2021 08:17:49 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -44,110 +44,95 @@ To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
 Cc:     Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Yu Kuai <yukuai3@huawei.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 3/6] nvme: prepare for pairing quiescing and unquiescing
-Date:   Thu, 14 Oct 2021 16:17:07 +0800
-Message-Id: <20211014081710.1871747-4-ming.lei@redhat.com>
+Subject: [PATCH V4 4/6] nvme: paring quiesce/unquiesce
+Date:   Thu, 14 Oct 2021 16:17:08 +0800
+Message-Id: <20211014081710.1871747-5-ming.lei@redhat.com>
 In-Reply-To: <20211014081710.1871747-1-ming.lei@redhat.com>
 References: <20211014081710.1871747-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add two helpers so that we can prepare for pairing quiescing and
-unquiescing which will be done in next patch.
+The current blk_mq_quiesce_queue() and blk_mq_unquiesce_queue() always
+stops and starts the queue unconditionally. And there can be concurrent
+quiesce/unquiesce coming from different unrelated code paths, so
+unquiesce may come unexpectedly and start queue too early.
+
+Prepare for supporting concurrent quiesce/unquiesce from multiple
+contexts, so that we can address the above issue.
+
+NVMe has very complicated quiesce/unquiesce use pattern, add one atomic
+bit for makeiing sure that blk-mq quiece/unquiesce is always called in
+pair.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c | 52 ++++++++++++++++++++++++----------------
- 1 file changed, 31 insertions(+), 21 deletions(-)
+ drivers/nvme/host/core.c | 12 ++++++++----
+ drivers/nvme/host/nvme.h |  2 ++
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 91d91d4f76d7..23fb746a8970 100644
+index 23fb746a8970..4391760e2e9a 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -119,25 +119,6 @@ static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
- static void nvme_update_keep_alive(struct nvme_ctrl *ctrl,
- 				   struct nvme_command *cmd);
+@@ -4452,12 +4452,14 @@ EXPORT_SYMBOL_GPL(nvme_init_ctrl);
  
--/*
-- * Prepare a queue for teardown.
-- *
-- * This must forcibly unquiesce queues to avoid blocking dispatch, and only set
-- * the capacity to 0 after that to avoid blocking dispatchers that may be
-- * holding bd_butex.  This will end buffered writers dirtying pages that can't
-- * be synced.
-- */
--static void nvme_set_queue_dying(struct nvme_ns *ns)
--{
--	if (test_and_set_bit(NVME_NS_DEAD, &ns->flags))
--		return;
--
--	blk_set_queue_dying(ns->queue);
--	blk_mq_unquiesce_queue(ns->queue);
--
--	set_capacity_and_notify(ns->disk, 0);
--}
--
- void nvme_queue_scan(struct nvme_ctrl *ctrl)
+ static void nvme_start_ns_queue(struct nvme_ns *ns)
  {
- 	/*
-@@ -4469,6 +4450,35 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+-	blk_mq_unquiesce_queue(ns->queue);
++	if (test_and_clear_bit(NVME_NS_STOPPED, &ns->flags))
++		blk_mq_unquiesce_queue(ns->queue);
  }
- EXPORT_SYMBOL_GPL(nvme_init_ctrl);
  
-+static void nvme_start_ns_queue(struct nvme_ns *ns)
-+{
-+	blk_mq_unquiesce_queue(ns->queue);
-+}
-+
-+static void nvme_stop_ns_queue(struct nvme_ns *ns)
-+{
-+	blk_mq_quiesce_queue(ns->queue);
-+}
-+
-+/*
-+ * Prepare a queue for teardown.
-+ *
-+ * This must forcibly unquiesce queues to avoid blocking dispatch, and only set
-+ * the capacity to 0 after that to avoid blocking dispatchers that may be
-+ * holding bd_butex.  This will end buffered writers dirtying pages that can't
-+ * be synced.
-+ */
-+static void nvme_set_queue_dying(struct nvme_ns *ns)
-+{
-+	if (test_and_set_bit(NVME_NS_DEAD, &ns->flags))
-+		return;
-+
-+	blk_set_queue_dying(ns->queue);
-+	nvme_start_ns_queue(ns);
-+
-+	set_capacity_and_notify(ns->disk, 0);
-+}
-+
- /**
-  * nvme_kill_queues(): Ends all namespace queues
-  * @ctrl: the dead controller that needs to end
-@@ -4547,7 +4557,7 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl)
- 
- 	down_read(&ctrl->namespaces_rwsem);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_quiesce_queue(ns->queue);
-+		nvme_stop_ns_queue(ns);
- 	up_read(&ctrl->namespaces_rwsem);
+ static void nvme_stop_ns_queue(struct nvme_ns *ns)
+ {
+-	blk_mq_quiesce_queue(ns->queue);
++	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
++		blk_mq_quiesce_queue(ns->queue);
  }
- EXPORT_SYMBOL_GPL(nvme_stop_queues);
-@@ -4558,7 +4568,7 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
  
- 	down_read(&ctrl->namespaces_rwsem);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_unquiesce_queue(ns->queue);
-+		nvme_start_ns_queue(ns);
- 	up_read(&ctrl->namespaces_rwsem);
+ /*
+@@ -4575,13 +4577,15 @@ EXPORT_SYMBOL_GPL(nvme_start_queues);
+ 
+ void nvme_stop_admin_queue(struct nvme_ctrl *ctrl)
+ {
+-	blk_mq_quiesce_queue(ctrl->admin_q);
++	if (!test_and_set_bit(NVME_CTRL_ADMIN_Q_STOPPED, &ctrl->flags))
++		blk_mq_quiesce_queue(ctrl->admin_q);
  }
- EXPORT_SYMBOL_GPL(nvme_start_queues);
+ EXPORT_SYMBOL_GPL(nvme_stop_admin_queue);
+ 
+ void nvme_start_admin_queue(struct nvme_ctrl *ctrl)
+ {
+-	blk_mq_unquiesce_queue(ctrl->admin_q);
++	if (test_and_clear_bit(NVME_CTRL_ADMIN_Q_STOPPED, &ctrl->flags))
++		blk_mq_unquiesce_queue(ctrl->admin_q);
+ }
+ EXPORT_SYMBOL_GPL(nvme_start_admin_queue);
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 47877a5f1515..0fa6fa22f088 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -336,6 +336,7 @@ struct nvme_ctrl {
+ 	int nr_reconnects;
+ 	unsigned long flags;
+ #define NVME_CTRL_FAILFAST_EXPIRED	0
++#define NVME_CTRL_ADMIN_Q_STOPPED	1
+ 	struct nvmf_ctrl_options *opts;
+ 
+ 	struct page *discard_page;
+@@ -457,6 +458,7 @@ struct nvme_ns {
+ #define NVME_NS_ANA_PENDING	2
+ #define NVME_NS_FORCE_RO	3
+ #define NVME_NS_READY		4
++#define NVME_NS_STOPPED		5
+ 
+ 	struct cdev		cdev;
+ 	struct device		cdev_device;
 -- 
 2.31.1
 
