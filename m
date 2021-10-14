@@ -2,63 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E92C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 06:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F69C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 07:20:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3207861156
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 06:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D68AF60ED4
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 07:20:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbhJNGay (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 02:30:54 -0400
-Received: from verein.lst.de ([213.95.11.211]:48781 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229530AbhJNGay (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 02:30:54 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 5DA6768B05; Thu, 14 Oct 2021 08:28:44 +0200 (CEST)
-Date:   Thu, 14 Oct 2021 08:28:44 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Song Liu <song@kernel.org>, David Sterba <dsterba@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Kees Cook <keescook@chromium.org>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
-        linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
-        reiserfs-devel@vger.kernel.org
-Subject: Re: don't use ->bd_inode to access the block device size
-Message-ID: <20211014062844.GA25448@lst.de>
-References: <20211013051042.1065752-1-hch@lst.de>
+        id S229929AbhJNHWj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 03:22:39 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:42230 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229551AbhJNHWe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Oct 2021 03:22:34 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 665E021A74;
+        Thu, 14 Oct 2021 07:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1634196029; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aPTi1jqJyanJr/yNq20ScgD69zcuM+p9ZxOZzkcy74A=;
+        b=mk0T43qO+gs1pZQcg5yt0kA/uzk9/YwB09jawrZrsNAviPBypyhCXoOzqCQYFojVwSI+LL
+        gro6hZXd5pbzgHaGRJFz2iXxZq5jiMIHAdbt8/y97cJej3QKh+uLJp20WGGvU8hjHaQCTc
+        reG6LjMlw3h+/wYJX7cMcN+ZXbcCbiY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1634196029;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aPTi1jqJyanJr/yNq20ScgD69zcuM+p9ZxOZzkcy74A=;
+        b=hLrXfej1L/ZECPSWBM2VaEQ39O70S6E51TUwwUoHcPbwES0vHNSyyd8OH+wKJCyTLA7W2w
+        b1FdWO+RPRRIN7Bw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3C63A13D3F;
+        Thu, 14 Oct 2021 07:20:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id p8PqDD3aZ2EQGAAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 14 Oct 2021 07:20:29 +0000
+Subject: Re: [PATCH 4/9] sbitmap: test bit before calling test_and_set_bit()
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20211013165416.985696-1-axboe@kernel.dk>
+ <20211013165416.985696-5-axboe@kernel.dk>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <409c693c-4570-b6f4-3839-501633856151@suse.de>
+Date:   Thu, 14 Oct 2021 09:20:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013051042.1065752-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20211013165416.985696-5-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 07:10:13AM +0200, Christoph Hellwig wrote:
-> I wondered about adding a helper for looking at the size in byte units
-> to avoid the SECTOR_SHIFT shifts in various places.  But given that
-> I could not come up with a good name and block devices fundamentally
-> work in sector size granularity I decided against that.
+On 10/13/21 6:54 PM, Jens Axboe wrote:
+> If we come across bits that are already set, then it's quicker to test
+> that first and gate the test_and_set_bit() operation on the result of
+> the bit test.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>   lib/sbitmap.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index c6e2f1f2c4d2..11b244a8d00f 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -166,7 +166,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+>   			return -1;
+>   		}
+>   
+> -		if (!test_and_set_bit_lock(nr, word))
+> +		if (!test_bit(nr, word) && !test_and_set_bit_lock(nr, word))
+>   			break;
+>   
+>   		hint = nr + 1;
+> 
+Hah. Finally something to latch on.
 
-So it seems like the biggest review feedback is that we should have
-such a helper.  I think the bdev_size name is the worst as size does
-not imply a particular unit.  bdev_nr_bytes is a little better but I'm
-not too happy.  Any other suggestions or strong opinions?
+I've seen this coding pattern quite a lot in the block layer, and, of 
+course, mostly in the hot path.
+(Kinda the point, I guess :-)
+
+However, my question is this:
+
+While 'test_and_set_bit()' is atomic, the combination of
+'test_bit && !test_and_set_bit()' is not.
+
+IE this change moves an atomic operation into a non-atomic one.
+So how can we be sure that this patch doesn't introduce a race condition?
+And if it doesn't, should we add some comment above the code why this is 
+safe to do here?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
