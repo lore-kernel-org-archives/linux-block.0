@@ -2,71 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C709C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 13:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DFFC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 13:03:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C49F610CC
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 13:02:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44DD5610E7
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 13:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230440AbhJNNEl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 09:04:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48086 "EHLO
+        id S230378AbhJNNFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 09:05:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231300AbhJNNEk (ORCPT
+        with ESMTP id S231300AbhJNNFs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 09:04:40 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6A4C061570
-        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 06:02:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=1NthEYJkbSP/qeUs2KAfucMdRZbFJTlri42psOaVEGk=; b=vnvuxZrIhrmoMh1EZMVTw66ESv
-        w1s5cuX/S97Rkx6K0WDP6hMxBDipMMkVy74PGLXd9GLRe9MN4CMQYmlybD+n67MkGtFrR9bZnJXxw
-        jMBKG/ddZbY+jGZV51ENu3B5glAiHYWH/qT8UdhBLqBxpK0eXDAyYtJLq+IzFgLR0lY1lZG0B+yn6
-        kqc4sw6uHzqSxbP8NRZDlleJHWeDK4itYeWxi25imOoPqnb1ujuVsrgBJoZ7pV+W5aeGee3APAZwK
-        ZLbBk8DXFvE9PEfMkC6lY17NkkjisLL3Vo/qTY3bdA8Lsot6fOf2/xbzoC4MOgYdlhsYRSqYUcpqb
-        AoRLKSvg==;
-Received: from [2001:4bb8:199:73c5:b1be:a02d:b459:cc1a] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mb0NW-0039HQ-Cs; Thu, 14 Oct 2021 13:02:34 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
+        Thu, 14 Oct 2021 09:05:48 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68E2C06174E
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 06:03:43 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id s3so3470784ild.0
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 06:03:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PGg6tIfmHttRoxHW4Q2JJNlX4U1geAKtKCI9yt5+TGI=;
+        b=YipiAHZ5JwnuqzzjnFzAjxw9nVZJ3bYXyCnhdWoTKY3BTrMqFKxPWgjBLjljougNUG
+         +gxI/QeTnxOeBtHcFzPs+8jKKToyB0P2RFTKIyI1AhwIx+5oeN2tNBb1fxK5ClhEX7Ko
+         f7JAydjWDZsgH0JVKyN5CuaLhV6lhx330bu28N9Bz2XU6ha6Z1Rz5UT27QlBcZ+g/KCE
+         Hq23QGE8B63ctbOBfdwaDxpN1EGErVjPYAERKi3Jlszv2MXc/skcyArE5s2lCe4JVuqc
+         px6UFf6ZStTHncPyBAZQ0HvSLsrSMOYRhd5zpTVAFsI4XsvqqPUwdJ53EbqWD++odubo
+         TqXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PGg6tIfmHttRoxHW4Q2JJNlX4U1geAKtKCI9yt5+TGI=;
+        b=KizfCFIpRJrA7f/9ibRMFYRyu1krqcpY4LKuNG3/CaidU8BauRK0CNCGKYWx2tjJ3x
+         GtS22hOS9CC7Aw49JKsodxFrhjWV7eZ7Nyxktaxd/MMLMlj+RrmZKJCy81tB7fkmnqR3
+         vYb0spYcok9I/8SM3GPQnfwdm4Sap5LfIJLooMFQekfVdyix4TtNS7tKF7wPcz6kjtVu
+         OWfpfqurTUHAC3kmXOfcQmC0xjULvRSFvJMBuNxxiOu8P31DhvIHxS0ts6J4dyGQOzje
+         sLRjedsY3+eZKtsDHavtLeglL3dZ3rJk20Ywe/C8+Y/YrLySRXxBporfEa0rGsSfjymR
+         U4lA==
+X-Gm-Message-State: AOAM533h0WHBpEKQaNxlViUocFn9JsmrBfcwbXGWewgMQXQd7xaIUwib
+        NDeHHQ07Es4n07YPPaQ6cvc3XBwwm8PXjQ==
+X-Google-Smtp-Source: ABdhPJw5CAqv1Kq67W0gNA6UKqSa24YELNJJIrrNemXqej1X4Y2m9u13uWriNSa6/3kFd9Q7xquKwg==
+X-Received: by 2002:a92:2001:: with SMTP id j1mr2314015ile.84.1634216623200;
+        Thu, 14 Oct 2021 06:03:43 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id v15sm1226971ilg.87.2021.10.14.06.03.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Oct 2021 06:03:42 -0700 (PDT)
+Subject: Re: [PATCH 2/2] block: improve batched tag allocation
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: warn when putting the final reference on a registered disk
-Date:   Thu, 14 Oct 2021 15:02:31 +0200
-Message-Id: <20211014130231.1468538-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+References: <20211012171525.665644-1-axboe@kernel.dk>
+ <20211012171525.665644-3-axboe@kernel.dk> <YWe9e+4V5Cw325uA@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <67852402-6217-f537-2c30-274903923fea@kernel.dk>
+Date:   Thu, 14 Oct 2021 07:03:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YWe9e+4V5Cw325uA@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Warn when the last reference on a live disk is put without calling
-del_gendisk first.  There are some BDI related bug reports that look
-like a case of this, so make sure we have the proper instrumentation
-to catch it.
+On 10/13/21 11:17 PM, Christoph Hellwig wrote:
+> On Tue, Oct 12, 2021 at 11:15:25AM -0600, Jens Axboe wrote:
+>>  
+>> +unsigned long blk_mq_get_tags(struct blk_mq_alloc_data *data, int nr_tags,
+>> +			      unsigned int *offset)
+>> +{
+>> +	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+>> +	struct sbitmap_queue *bt = &tags->bitmap_tags;
+>> +	unsigned long ret;
+>> +
+>> +	if (data->shallow_depth ||data->flags & BLK_MQ_REQ_RESERVED ||
+> 
+> Missing whitespace after the first ||.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c | 1 +
- 1 file changed, 1 insertion(+)
+Fixed.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 5e8aa0ab66c2a..dd7e949f876ed 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1057,6 +1057,7 @@ static void disk_release(struct device *dev)
- 	struct gendisk *disk = dev_to_disk(dev);
- 
- 	might_sleep();
-+	WARN_ON_ONCE(disk_live(disk));
- 
- 	disk_release_events(disk);
- 	kfree(disk->random);
+>> +	if (data->nr_tags > 1) {
+>> +		unsigned long tags;
+>> +		unsigned int tag_offset;
+>> +		int i, nr = 0;
+>> +
+>> +		tags = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+>> +		if (unlikely(!tags)) {
+>> +			data->nr_tags = 1;
+>> +			goto retry;
+> 
+> Unless I'm missing something we don't want the retry case that maps
+> the contexts against and calls blk_mq_tag_busy again.
+
+Yes and no, we could've been preempted and we're now on a different CPU.
+It's not a huge deal or likely outcome, and it'll only hurt efficiency a
+bit if that's the case. Can be skipped.
+
+>> +		}
+>> +		for (i = 0; tags; i++) {
+>> +			if (!(tags & (1UL << i)))
+>> +				continue;
+>> +			tag = tag_offset + i;
+>> +			tags &= ~(1UL << i);
+>> +			rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
+>> +			rq->rq_next = *data->cached_rq;
+>> +			*data->cached_rq = rq;
+>> +		}
+>> +		data->nr_tags -= nr;
+> 
+> And keeping all this batch logic in a helper (even if inlined) would
+> simplify the code a lot.  Something like this untested patch:
+
+Yeah, I did go back and forth on that, it's small enough that I didn't
+care too much about it, but an inline helper is fine too. I can fold
+this in.
+
 -- 
-2.30.2
+Jens Axboe
 
