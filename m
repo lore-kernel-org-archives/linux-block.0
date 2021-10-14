@@ -2,82 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A82ECC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 20:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35100C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 23:02:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88450610F9
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 20:28:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14ADB61090
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 23:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232086AbhJNUaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 16:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37556 "EHLO
+        id S230512AbhJNXER (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 19:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231408AbhJNUaG (ORCPT
+        with ESMTP id S230503AbhJNXEQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 16:30:06 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC0AC061570;
-        Thu, 14 Oct 2021 13:28:01 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id n65so17538579ybb.7;
-        Thu, 14 Oct 2021 13:28:01 -0700 (PDT)
+        Thu, 14 Oct 2021 19:04:16 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5E7C061570;
+        Thu, 14 Oct 2021 16:02:11 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id y1so5164162plk.10;
+        Thu, 14 Oct 2021 16:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=X/5NOuaTC7GdG1HuEPP9I36zK6ViujDRxabRQSupDHo=;
-        b=mZSIsOvJHc61pRh6A/XJqJhCkjUDhzyZEDo0NiXq4EYG0pvrL6zmdtCQRc4MVmsnRu
-         W4bA9WqUDspnIcnE1LObWeijQbP2Fl0/5uDdIQ4qT3nxE/+dCQbziFDKajSfkPbjAgNq
-         IXnp9Qlrkvoc0bTXmxaJD/zWelOAZMHWoSqggSezx//cPL1hGkxfSNQyepSzibIqTrvm
-         VddHdN8lvISRpJDGlimsVktN+y7WaTFkTqlHJbVFTTu76vkxvCwvL+FDp+TCJs7fijDW
-         FNsAfXZsNMCAnyBhw/sxSuF5cmu3+WH911MqcwCx6X0wRCAPkya1XWVHvwxT6JEK/bNO
-         J5sw==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=elTbg3LLUd0tVBsGRe2KL6JIDNTTkS+yo5Y7KpMBtaI=;
+        b=cUpF41cCqBEdQM5Vy4oXPwRIalVbBy7qZLhMjEI1uIlTteb5LmN/H00giAunB22XcQ
+         Rb1T6P5WxAbwd/9Z3VHFzv4bIkr+VLMZVbLZ5qYjwr4VTnONXCk+/+m3hgaIxZSS28Ll
+         UPaRwwh3tga2xx+TEa/l+627I105dRlbE/h5kG91JTNhUTqK8VearSHYK2danHujFqv+
+         /LCziI12wgBbNMkW2eLkVRb1OSr5fL8183BjyY9XTk2En4YutFwbN092cFqqBznkKIaJ
+         UJ/2JRMxeZVoo716OzXfoHL3DgrprJ0Vc0zt8fiv7FwJKbKroFAVG8bG0XDtnjBVsbvs
+         o9vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=X/5NOuaTC7GdG1HuEPP9I36zK6ViujDRxabRQSupDHo=;
-        b=j6ZZiBF7dfSnYqJXdTMSD/SZD/e9dDLxbKoW7wnI/Wv7SCiUe7Qf/fhCbCotJKvdZZ
-         2bDD7xEf1C0JInG9FPeiJw3cUosh6T0GcuC5ygbuVoq7MOv0Ud+0dr/Nao+9tJQi41PT
-         YoiDMzsLieXgTnAoLM+yIBky2dNBUqxJi0QZ9PxEfAUCXpqRK/BxoTBY7tfPCdLvN5KQ
-         /tlz/lcY4ChgJQzLdR9hMYATf8N6hp5jI6L4+y1n2bGppsvOqoPfvl6Bpk98FqOnKdbd
-         HRC8+vOmKM0wPYZRXSLAV3lTxD7KWYyuMHbW8e5X/6oEIC4MmZSLXqEdaHol1wbqTRTN
-         WhQg==
-X-Gm-Message-State: AOAM530e7L5UWrGErIpqAHrmh0Vce8Q09GQtb3o80YkzhCfFDIMTbfOY
-        AeSULrKWOhI8jLbkeFgGTTy1cN9UdiewMz/EQfMaHDc6Jx0=
-X-Google-Smtp-Source: ABdhPJwg9lqbsJzFdH/trlT3Wp/VmvB1S90EPeLIHPlWMMDAImHpzO0Jlbu8yUrDRh7Hw2O5YBe/lCa4d7ooWPe4eYg=
-X-Received: by 2002:a25:45c6:: with SMTP id s189mr8443476yba.290.1634243280776;
- Thu, 14 Oct 2021 13:28:00 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=elTbg3LLUd0tVBsGRe2KL6JIDNTTkS+yo5Y7KpMBtaI=;
+        b=sDe710UG/aLkjXrEWhXa2CuyTfc5t0W7r9hYI7MmmgRMivcEZWkeYk+8FRpPDcT4Rb
+         +8EuZJRMGcLAqEoqpjqoQOtWSdIlp/OYIrQMOD9sTf0IvejAJ8AMG+GBiDeYW3DfC9dc
+         uJ8ma6Xl63CoX5ozh9PicgmUSxyvVi854ZUgMiK0ca+j4IxEKarXD9bZxo1N87pIgjXr
+         rYH/AwvWplyvCwJA28pmZmyU4HzHplkfXJTXnX5VU//1mXPCyNbSSoFVo6Uywwk1pfxQ
+         kL1Ci5BtFD4nUVpeVMNbWOnyhN/1YpNfPM/1gpvgFHKZyzjIqPNfjoov2RyG07+3Rd1x
+         jjZA==
+X-Gm-Message-State: AOAM531+pj2if62yzORgwDAkioKZmQ2//AmrSEmiPTxLkDzKkwSm1neH
+        PXzbmGY2zi0ET5Kl00Skl1Q=
+X-Google-Smtp-Source: ABdhPJwF36h78Uv3hhK6clWu6wpJ3llzJ4CbV8Rc0b4yJOcFirr1LmZ637DSMk29qLAaSrvaIgV4yw==
+X-Received: by 2002:a17:90a:8b8d:: with SMTP id z13mr23578422pjn.214.1634252530863;
+        Thu, 14 Oct 2021 16:02:10 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id t11sm3407027pfj.173.2021.10.14.16.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 16:02:07 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 14 Oct 2021 13:02:06 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, paolo.valente@linaro.org, fchecconi@gmail.com,
+        avanzini.arianna@gmail.com, mkoutny@suse.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v2 -next] blk-cgroup: synchoronize blkg creation against
+ policy deactivation
+Message-ID: <YWi27oAU0v5v86eN@slm.duckdns.org>
+References: <20211013124456.3186005-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-References: <20210809141744.1203023-1-hch@lst.de> <20210809141744.1203023-5-hch@lst.de>
- <20211014143123.GA22126@u164.east.ru> <20211014143243.GA25700@lst.de>
-In-Reply-To: <20211014143243.GA25700@lst.de>
-From:   Anatoly Pugachev <matorola@gmail.com>
-Date:   Thu, 14 Oct 2021 23:27:50 +0300
-Message-ID: <CADxRZqxgu_A=BMOPVCAUteLfLUWAmL_b-S8+TBW1j-eW5O6dwA@mail.gmail.com>
-Subject: Re: [sparc64] kernel OOPS (was: [PATCH 4/5] block: move the bdi from
- the request_queue to the gendisk)
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        cgroups@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm <linux-mm@kvack.org>,
-        Sparc kernel list <sparclinux@vger.kernel.org>,
-        Linux Kernel list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013124456.3186005-1-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 14, 2021 at 5:32 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Hi Anatoly,
->
-> please try this patchset:
->
-> https://lore.kernel.org/linux-block/CAHj4cs8tYY-ShH=QdrVirwXqX4Uze6ewZAGew_oRKLL_CCLNJg@mail.gmail.com/T/#m6591be7882bf30f3538a8baafbac1712f0763ebb
+On Wed, Oct 13, 2021 at 08:44:56PM +0800, Yu Kuai wrote:
+> @@ -1401,6 +1406,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
+>  	if (queue_is_mq(q))
+>  		blk_mq_freeze_queue(q);
+>  
+> +	mutex_lock(&q->blkg_lock);
+>  	spin_lock_irq(&q->queue_lock);
 
-Christoph,
+Given that deactivation drains q_usage_counter through
+blk_mq_freeze_queue(), can't the blkg_conf_prep() just pin the usage count?
 
-thanks. Tested (with 5.15.0-rc5 + patchset) and no-more hangs with the
-test-suite. Thanks again.
+Thanks.
+
+-- 
+tejun
