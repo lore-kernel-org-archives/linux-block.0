@@ -2,97 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EBEC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 01:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A95C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 01:36:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A332611C7
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 01:33:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF500611C7
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 01:36:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbhJNBf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Oct 2021 21:35:29 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:25183 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbhJNBf3 (ORCPT
+        id S229878AbhJNBip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Oct 2021 21:38:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29931 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229837AbhJNBip (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Oct 2021 21:35:29 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4HVBhw0Gf6z8tdH;
-        Thu, 14 Oct 2021 09:32:16 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.8; Thu, 14 Oct 2021 09:33:14 +0800
-Received: from huawei.com (10.175.127.227) by dggema762-chm.china.huawei.com
- (10.1.198.204) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.8; Thu, 14
- Oct 2021 09:33:14 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH v4 2/2] block, bfq: do not idle if only one cgroup is activated
-Date:   Thu, 14 Oct 2021 09:45:56 +0800
-Message-ID: <20211014014556.3597008-3-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211014014556.3597008-1-yukuai3@huawei.com>
-References: <20211014014556.3597008-1-yukuai3@huawei.com>
+        Wed, 13 Oct 2021 21:38:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634175401;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ojdf6628VplIf3Ky6Hl21LjxxayitntGvwBqERQmdDg=;
+        b=XHLeEFMS5JD/gArvWjViP+sl4Ri7ouWZc7ZzrAaDwoj3B/oTp0baXjGb/D/32bwVTwFZ0Q
+        1vFB1aIi6sD/UqTET/n6rdjfuExr67NKGpjLUCvdL5nsE/W6UzRe4pq1l3mKupbBogriJ2
+        991uZ5qxqgsv8mMKFCWLTMcaPBaSZH0=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-GwCG2IgMOWaBuUjDBwRTrA-1; Wed, 13 Oct 2021 21:36:39 -0400
+X-MC-Unique: GwCG2IgMOWaBuUjDBwRTrA-1
+Received: by mail-yb1-f199.google.com with SMTP id f8-20020a2585480000b02905937897e3daso5303407ybn.2
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 18:36:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ojdf6628VplIf3Ky6Hl21LjxxayitntGvwBqERQmdDg=;
+        b=UJCvlmInK8oUx/ewvbqRfPHDzHNB2Pkfty7uxEmcFS6CuCeKqyFgAwxv0LXDKEr7EE
+         b1TThDILO1AuqPJNX4ECbnwUfvGTTUqtMINi5fymIS1DIgHhjArMqIqtux03seIMAUmM
+         l+hBkpCvHT+ghc3/0eGZH3ix1IXF8XhjC0DptsZUgKQfNc93ecxC+xkHxs/yQ8++PAZg
+         3CShfK8cffEmFP/Pz04dGAPyLgH0OxIi/4/xS0mD8WSrYmkFAgbzqr2c02GAwtE6ALZT
+         XKjIMmNl1j3rjefETprot9AKZU3SyEKKpPxFeluwFdrxDZplyUZvMT9vbHfsiejG2BUH
+         FgFw==
+X-Gm-Message-State: AOAM53279ruNMWvEFoBtvA+sPjwd8SiZ+3+9dMtCn7FJqVc1Man4cPd9
+        aWyhkf85zyVEUAuA1Qn3jg8NqHPwFQxoVKbUbDG8xjB9H1scMdqi4J+n46QuZ13PuDSqwjSFshn
+        GQIpb6kA1NkYABVZL7PPqFin2C+8SiQo5D7hp/Mw=
+X-Received: by 2002:a25:bd03:: with SMTP id f3mr2924869ybk.412.1634175398983;
+        Wed, 13 Oct 2021 18:36:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyiY3lIjTxO3clXNFiyfz05/uB3sTV9uNsyPOaKWIxDySFH3jYGmdCMD3aQTwqA03xAlUL/rLe/N3pUYpN2U+M=
+X-Received: by 2002:a25:bd03:: with SMTP id f3mr2924862ybk.412.1634175398848;
+ Wed, 13 Oct 2021 18:36:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
+References: <CAHj4cs8poXTLdC+j6u7zypLKR7RpAaG-vxK4dWDz6bCMfPOjsQ@mail.gmail.com>
+ <YWaiLsQkwe9aq8pE@infradead.org>
+In-Reply-To: <YWaiLsQkwe9aq8pE@infradead.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Thu, 14 Oct 2021 09:36:27 +0800
+Message-ID: <CAHj4cs-=DbnXS_552yyYxd5dae3wRXzoQftPUpUhSPjNfD-RBQ@mail.gmail.com>
+Subject: Re: kernel NULL pointer triggered with blktests block/025 on latest linux-block/for-next
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If only one group is activated, there is no need to guarantee the
-same share of the throughput of queues in the same group.
+On Wed, Oct 13, 2021 at 5:10 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Wed, Oct 13, 2021 at 04:50:13PM +0800, Yi Zhang wrote:
+> > Hello
+> > The below NULL pointer issue was triggered on the latest
+> > linux-block/for-next with blktests, is it one known issue?
+>
+> Please try this patchset:
+>
+> https://lore.kernel.org/linux-block/20210929071241.934472-1-hch@lst.de/T/#m6591be7882bf30f3538a8baafbac1712f0763ebb
+>
 
-Test procedure:
-run "fio -numjobs=1 -ioengine=psync -bs=4k -direct=1 -rw=randread..."
-multiple times in the same cgroup.
+Yeah,  the issue was fixed with the patchset, feel free to add:
 
-Test result: total bandwidth(Mib/s)
-| total jobs | before this patch | after this patch      |
-| ---------- | ----------------- | --------------------- |
-| 1          | 33.8              | 33.8                  |
-| 2          | 33.8              | 65.4 (32.7 each job)  |
-| 4          | 33.8              | 106.8 (26.7 each job) |
-| 8          | 33.8              | 126.4 (15.8 each job) |
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-By the way, if I test with "fio -numjobs=1/2/4/8 ...", test result is
-the same with or without this patch. This is because bfq_queue can
-be merged in this situation.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/bfq-iosched.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d251735383f7..8d94f511bee8 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -709,7 +709,7 @@ bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
-  * much easier to maintain the needed state:
-  * 1) all active queues have the same weight,
-  * 2) all active queues belong to the same I/O-priority class,
-- * 3) there are no active groups.
-+ * 3) there are one active group at most.
-  * In particular, the last condition is always true if hierarchical
-  * support or the cgroups interface are not enabled, thus no state
-  * needs to be maintained in this case.
-@@ -741,7 +741,7 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
- 
- 	return varied_queue_weights || multiple_classes_busy
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
--	       || bfqd->num_groups_with_pending_reqs > 0
-+	       || bfqd->num_groups_with_pending_reqs > 1
- #endif
- 		;
- }
 -- 
-2.31.1
+Best Regards,
+  Yi Zhang
 
