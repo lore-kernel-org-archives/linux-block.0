@@ -2,64 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6673C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 05:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 584D4C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 05:18:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CACA360F9E
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 05:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 279A661027
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 05:18:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbhJNFEd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 01:04:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51388 "EHLO
+        id S229506AbhJNFUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 01:20:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbhJNFEd (ORCPT
+        with ESMTP id S229498AbhJNFUj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 01:04:33 -0400
+        Thu, 14 Oct 2021 01:20:39 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED09C061570
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 22:02:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB1EC061570
+        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 22:18:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Z2on1RmQfsHUDMXP/ulBq685C5GFk7YDOia/inf8fy8=; b=A5oqwcEGhbNOF+3Ae8I+5h+S6+
-        GVjGggfcVABDnPhmj3esdL9D3n2Vqkg8uYh36TcOq6Vg496wdFBAj9mPKsLftUJwyLq+EJmyPAj2+
-        g4nIac9IxT1NxMdmSuVO0AX2uAGj/QWt2gBT5gwJCLoMrXSMEfMqzDc3gk+mJMYtZstluK0+7tbJv
-        foVY6aSTNObxuNtuHOGIR6HUaV87L0QPjXHMHYr1sCsjMclcZeEuDUBEDux4VMUWJBE3Aj7uV5Tjd
-        Q7TIfd/JRgo3JwsBlKbEZkJLq8zg4a9zGbot4YMjcoET5GzUdom36K6eh4OsGDTrg8rd3NpFHHEc7
-        NARC9kwA==;
+        bh=lyHkdhixK7kwhDPDTW9KYPd7Ar3jcRfJrHwTlhLBtoM=; b=ols3MprT+UT5cI41Ec8xDf7MhZ
+        3MPOYh2UU7Ca/VJYm+hkC02pnW4igcSTQqO1zMB8OsoqxJe5vwTv8NrI9Ht/LeJigxpdAokiQa2fl
+        ITjfkAllhiC591ednMlgM8F6hTO77ci3D1OC6GoB2+XjJGpcjYHb31kJR8Yt2cLsLn8jbS6fnivzx
+        szTMj69AJwv2/fEMLF5p2/07pfhnPTT8XBiIY3/ZHb1+yKke4QlNIdToditI/6HUP0O4wKrADO2Gs
+        yghVykMt0PttOBdm7iXfHCmm4bcSxgKLCKLzsOfUuFz9h+OUZhxQ8lqAodkOO2OGVzTWzsyCMaaN3
+        WN1G1lIg==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1masrP-0082jn-Sf; Thu, 14 Oct 2021 05:01:23 +0000
-Date:   Thu, 14 Oct 2021 06:00:55 +0100
+        id 1mat7j-0083Cf-Ki; Thu, 14 Oct 2021 05:18:02 +0000
+Date:   Thu, 14 Oct 2021 06:17:47 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/4] block: move update request helpers into blk-mq.c
-Message-ID: <YWe5h25TVmF3V05w@infradead.org>
-References: <20211013164937.985367-1-axboe@kernel.dk>
- <20211013164937.985367-5-axboe@kernel.dk>
- <YWcYFywO7J0R4oMb@infradead.org>
- <f55d823f-79ca-67f0-1868-c013d7711fe5@kernel.dk>
- <YWcdXjZPpYvuaJ5O@infradead.org>
- <2418e448-6df4-ce6e-da2d-99fb7ac41fcb@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: improve batched tag allocation
+Message-ID: <YWe9e+4V5Cw325uA@infradead.org>
+References: <20211012171525.665644-1-axboe@kernel.dk>
+ <20211012171525.665644-3-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2418e448-6df4-ce6e-da2d-99fb7ac41fcb@kernel.dk>
+In-Reply-To: <20211012171525.665644-3-axboe@kernel.dk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 11:57:51AM -0600, Jens Axboe wrote:
-> It's not like they are conditionally enabled, if you get one you get
-> the other. But I can shuffle it around if it means a lot to you...
+On Tue, Oct 12, 2021 at 11:15:25AM -0600, Jens Axboe wrote:
+>  
+> +unsigned long blk_mq_get_tags(struct blk_mq_alloc_data *data, int nr_tags,
+> +			      unsigned int *offset)
+> +{
+> +	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+> +	struct sbitmap_queue *bt = &tags->bitmap_tags;
+> +	unsigned long ret;
+> +
+> +	if (data->shallow_depth ||data->flags & BLK_MQ_REQ_RESERVED ||
 
-As I've been trying to reshuffle the files and data structures to
-keep the bio and requests bits clearly separated I'd appreciate if we
-can keep the status codes in core.c and just do the long overdue move
-the request completion helers.
+Missing whitespace after the first ||.
 
-And as said before:  I think we should fix the trace point to not
-unconditionally call the status to errno conversion first as not doing
-it at all for the fast path will be even faster than inlining it :)
+> +	if (data->nr_tags > 1) {
+> +		unsigned long tags;
+> +		unsigned int tag_offset;
+> +		int i, nr = 0;
+> +
+> +		tags = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+> +		if (unlikely(!tags)) {
+> +			data->nr_tags = 1;
+> +			goto retry;
+
+Unless I'm missing something we don't want the retry case that maps
+the contexts against and calls blk_mq_tag_busy again.
+
+> +		}
+> +		for (i = 0; tags; i++) {
+> +			if (!(tags & (1UL << i)))
+> +				continue;
+> +			tag = tag_offset + i;
+> +			tags &= ~(1UL << i);
+> +			rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
+> +			rq->rq_next = *data->cached_rq;
+> +			*data->cached_rq = rq;
+> +		}
+> +		data->nr_tags -= nr;
+
+And keeping all this batch logic in a helper (even if inlined) would
+simplify the code a lot.  Something like this untested patch:
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5ac94149fb4be..608b270a7f6b8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -373,6 +373,38 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	return rq;
+ }
+ 
++static inline struct request *
++__blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
++		u64 alloc_time_ns)
++{
++	unsigned int tag, tag_offset;
++	struct request *rq;
++	unsigned long tags;
++	int i, nr = 0;
++
++	tags = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
++	if (unlikely(!tags))
++		return NULL;
++
++	for (i = 0; tags; i++) {
++		if (!(tags & (1UL << i)))
++			continue;
++		tag = tag_offset + i;
++		tags &= ~(1UL << i);
++		rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
++		rq->rq_next = *data->cached_rq;
++		*data->cached_rq = rq;
++	}
++	data->nr_tags -= nr;
++
++	if (!data->cached_rq)
++		return NULL;
++
++	rq = *data->cached_rq;
++	*data->cached_rq = rq->rq_next;
++	return rq;
++}
++
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+@@ -411,56 +443,32 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	 * Try batched alloc if we want more than 1 tag.
+ 	 */
+ 	if (data->nr_tags > 1) {
+-		unsigned long tags;
+-		unsigned int tag_offset;
+-		int i, nr = 0;
+-
+-		tags = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+-		if (unlikely(!tags)) {
+-			data->nr_tags = 1;
+-			goto retry;
+-		}
+-		for (i = 0; tags; i++) {
+-			if (!(tags & (1UL << i)))
+-				continue;
+-			tag = tag_offset + i;
+-			tags &= ~(1UL << i);
+-			rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
+-			rq->rq_next = *data->cached_rq;
+-			*data->cached_rq = rq;
+-		}
+-		data->nr_tags -= nr;
+-	} else {
+-		/*
+-		 * Waiting allocations only fail because of an inactive hctx.
+-		 * In that case just retry the hctx assignment and tag
+-		 * allocation as CPU hotplug should have migrated us to an
+-		 * online CPU by now.
+-		 */
+-		tag = blk_mq_get_tag(data);
+-		if (tag == BLK_MQ_NO_TAG) {
+-			if (data->flags & BLK_MQ_REQ_NOWAIT)
+-				return NULL;
+-			/*
+-			 * Give up the CPU and sleep for a random short time to
+-			 * ensure that thread using a realtime scheduling class
+-			 * are migrated off the CPU, and thus off the hctx that
+-			 * is going away.
+-			 */
+-			msleep(3);
+-			goto retry;
+-		}
+-
+-		return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
++		rq = __blk_mq_alloc_requests_batch(data, alloc_time_ns);
++		if (rq)
++			return rq;
++		data->nr_tags = 1;
+ 	}
+ 
+-	if (data->cached_rq) {
+-		rq = *data->cached_rq;
+-		*data->cached_rq = rq->rq_next;
+-		return rq;
++	/*
++	 * Waiting allocations only fail because of an inactive hctx.  In that
++	 * case just retry the hctx assignment and tag allocation as CPU hotplug
++	 * should have migrated us to an online CPU by now.
++	 */
++	tag = blk_mq_get_tag(data);
++	if (tag == BLK_MQ_NO_TAG) {
++		if (data->flags & BLK_MQ_REQ_NOWAIT)
++			return NULL;
++		/*
++		 * Give up the CPU and sleep for a random short time to
++		 * ensure that thread using a realtime scheduling class
++		 * are migrated off the CPU, and thus off the hctx that
++		 * is going away.
++		 */
++		msleep(3);
++		goto retry;
+ 	}
+ 
+-	return NULL;
++	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
+ }
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
