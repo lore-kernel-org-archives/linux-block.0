@@ -2,87 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC11C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4127DC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:14:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96E9D60E0C
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22E7E60F4A
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:14:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232990AbhJNPOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 11:14:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49806 "EHLO
+        id S232920AbhJNPQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 11:16:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234312AbhJNPOE (ORCPT
+        with ESMTP id S232713AbhJNPQh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 11:14:04 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B005AC06136B
-        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:07:39 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id i11so3817917ila.12
-        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:07:39 -0700 (PDT)
+        Thu, 14 Oct 2021 11:16:37 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28CC3C061760
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:14:33 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id oa12-20020a17090b1bcc00b0019f715462a8so4987035pjb.3
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:14:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=SfJyXvRKhjtS0cyhrXF03/tm4IHT9n76BF2F5ZJ0mLM=;
-        b=63SgkVEVxlJJbLeYFQziy19tPIXplozPNML5kfLIXNs6YRiGgFBBD3dRDj1J5b9CFJ
-         e5w0LwRUaGXRKdGDAsGxVw1ZMHWSsWQCDfiqKU2n+knjeYra8i1ROa37Xss4gAg1SVZi
-         t0X1HEoMAeO1brtYgdHzSbCX0PFNqEgdZyHL9WJ7YJbGznalJVPxTLdgEVh+nQBTNKhr
-         CVtemTh6TSwEQc38JVq6N+xCjGoN/O7Ef7zz3u02n0p9Knjws7oxPQCsc5tLJU7M6Hdw
-         CMVQi2ygZ5xv/B3D9fNdGzt91Uj6xqhNlmCLR6eYhbITAjCQn4w+Pp++aeqjEyxKdTtF
-         dlgA==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kk58q1N6iOKJV9MmXM4g94KiVUwgBacQdDgb8dq+Hqc=;
+        b=mlZB9Nj4m8jk1JFv+iCH7Znrwanh3CDPQczVzomtmeQ5BLbFN1inwmhXkfQwL1sdEQ
+         hih7m3SNinxkOxv1CMzByR9lFDUUB4oAxo3E3cDYo/S67L6xZfuz5zRsWVJKP1+73Scy
+         QCwjhJQjGzKf7SNt+QV8U3nYErgEHf4yODN/I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SfJyXvRKhjtS0cyhrXF03/tm4IHT9n76BF2F5ZJ0mLM=;
-        b=J7Ge3VMA7W4v3O3FoNzIq2NCMKoSuDQpEMvsrjwmaQfX+jgUGaH9rpq/GaESzQfpfM
-         CKA7/4Yyh6iMkqCB2JvARwQ0OX4O07u/3KJ/L9BrKIsPCe5k7iOQ+kkLp31MaK6caoko
-         76eKIlGC1Tzw0yjqjCOrJ7aHscqF59KmAXDE4VbS5FRzZ0TUWjeFacG/YpdTJQaY27yo
-         OI1QYRSs7JnNUl4IVh5R4ybsIlbt5GvEF7D0YybznbVs40tRoAEF+1HKvlmCJ+0E3GeH
-         zTmD1HhXlFGMnACy6SgxcLbCEBgA20lw+JL8+K+G0jCBZ9077oea8E0zo2y2s/t5QAws
-         KacA==
-X-Gm-Message-State: AOAM530OECNeibcgakW3deBD4ht7FudscsjcE5VyDj4OX7fwA8ixOe6P
-        DRdL81r+hi1zSJswZt2+cWQECIUq3TYmsg==
-X-Google-Smtp-Source: ABdhPJxdB4ieGCBY+L04nlT2giJ1T7Gt6iBQIwYTJx1PW7z0qeSZzOhwM5nr6LUuVtYSXEDy6CoO5g==
-X-Received: by 2002:a92:2c0d:: with SMTP id t13mr2799365ile.99.1634224059075;
-        Thu, 14 Oct 2021 08:07:39 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id ay5sm1486566iob.46.2021.10.14.08.07.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Oct 2021 08:07:38 -0700 (PDT)
-Subject: Re: [GIT PULL] nvme fixes for Linux 5.15
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YWgrK/7ttndn93Fx@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b77904e4-7a20-fe98-55e2-b211d2217553@kernel.dk>
-Date:   Thu, 14 Oct 2021 09:07:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kk58q1N6iOKJV9MmXM4g94KiVUwgBacQdDgb8dq+Hqc=;
+        b=RrVqEdbp4+SG40R+9qksIOcB3OpCFdkUTiyt28hOnJv7eDmiLlhMoLgkm39oXyoiGm
+         Hjpcxoa08fv4DnmmDWbNhcmF/WUTLGxSCIdMY+6DMhIDi4zVsSTuxMYEi7Sr8X9b2wMH
+         hwT9cN+UmUPezID2fAAFVIj8gdUmWx84EQjdMubDkqii3T/fCypIGlDKWGW4SY8bsd8J
+         v0ZYm9PidrSj2aMMbq66oOqTYsyNnxybmxwstwBYchbDFqfLoSTWAdhd6PXV3uDwtUa8
+         DkwNC7tw8/GJSDdCxKAF8cMnkaDjzoP5kzvTJo1HXucn2CE0dVnf8kLYAsBUO0qCSwyJ
+         ctpg==
+X-Gm-Message-State: AOAM530Qqt9UcMKowUBeYwCrGE/MTNH/G4Xt9RAzSoWyh+sXzXsMcpM8
+        ucrexf92QusnI8fIw+58Npaaag==
+X-Google-Smtp-Source: ABdhPJz+A28iMSsGMew00w4bTffNulDM4PlP1p1A1+RouZBKHQoPJUsZrDvvxCBzVTavFWwP5kdepA==
+X-Received: by 2002:a17:90a:86:: with SMTP id a6mr20774739pja.190.1634224472530;
+        Thu, 14 Oct 2021 08:14:32 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id w4sm2822114pfb.3.2021.10.14.08.14.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 08:14:32 -0700 (PDT)
+Date:   Thu, 14 Oct 2021 08:14:31 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Dave Kleikamp <dave.kleikamp@oracle.com>
+Cc:     Anton Altaparmakov <anton@tuxera.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Song Liu <song@kernel.org>, David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        Jan Kara <jack@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "jfs-discussion@lists.sourceforge.net" 
+        <jfs-discussion@lists.sourceforge.net>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
+        "linux-ntfs-dev@lists.sourceforge.net" 
+        <linux-ntfs-dev@lists.sourceforge.net>,
+        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
+        "reiserfs-devel@vger.kernel.org" <reiserfs-devel@vger.kernel.org>
+Subject: Re: don't use ->bd_inode to access the block device size
+Message-ID: <202110140813.44C95229@keescook>
+References: <20211013051042.1065752-1-hch@lst.de>
+ <20211014062844.GA25448@lst.de>
+ <3AB8052D-DD45-478B-85F2-BFBEC1C7E9DF@tuxera.com>
+ <a5eb3c18-deb2-6539-cc24-57e6d5d3500c@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <YWgrK/7ttndn93Fx@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5eb3c18-deb2-6539-cc24-57e6d5d3500c@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/14/21 7:05 AM, Christoph Hellwig wrote:
-> The following changes since commit 298ba0e3d4af539cc37f982d4c011a0f07fca48c:
+On Thu, Oct 14, 2021 at 08:13:59AM -0500, Dave Kleikamp wrote:
+> On 10/14/21 4:32AM, Anton Altaparmakov wrote:
+> > Hi Christoph,
+> > 
+> > > On 14 Oct 2021, at 07:28, Christoph Hellwig <hch@lst.de> wrote:
+> > > 
+> > > On Wed, Oct 13, 2021 at 07:10:13AM +0200, Christoph Hellwig wrote:
+> > > > I wondered about adding a helper for looking at the size in byte units
+> > > > to avoid the SECTOR_SHIFT shifts in various places.  But given that
+> > > > I could not come up with a good name and block devices fundamentally
+> > > > work in sector size granularity I decided against that.
+> > > 
+> > > So it seems like the biggest review feedback is that we should have
+> > > such a helper.  I think the bdev_size name is the worst as size does
+> > > not imply a particular unit.  bdev_nr_bytes is a little better but I'm
+> > > not too happy.  Any other suggestions or strong opinions?
+> > 
+> > bdev_byte_size() would seem to address your concerns?
+> > 
+> > bdev_nr_bytes() would work though - it is analogous to bdev_nr_sectors() after all.
+> > 
+> > No strong opinion here but I do agree with you that bdev_size() is a bad choice for sure.  It is bound to cause bugs down the line when people forget what unit it is in.
 > 
->   nvme: keep ctrl->namespaces ordered (2021-09-21 09:17:15 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.15-2021-10-14
+> I don't really mind bdev_size since it's analogous to i_size, but
+> bdev_nr_bytes seems good to me.
 
-Pulled, thanks.
+I much prefer bdev_nr_bytes(), as "size" has no units.
 
 -- 
-Jens Axboe
-
+Kees Cook
