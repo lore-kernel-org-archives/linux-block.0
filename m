@@ -2,202 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1ADC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 05:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 711ACC43219
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 06:11:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03331610CB
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 05:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5509D61156
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 06:11:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbhJNF5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 01:57:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32733 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229457AbhJNF5v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 01:57:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634190946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BAJQlUnpJGNYVVkjFBgbYcXUFXkFAM867FKrPwKtnBU=;
-        b=PYzCIMDLJUVulSGD2RGoY1FylcnfDwBCWZW6LhTTsh21qII7PP7ECxCX/z82/uxVjUpPL7
-        GFRPfebD1EdAHtznGoSvtNugT8TnL6d1xH+WtuTRiTTzG0ldgvkz9xDRj5FPAT7RCS0MNs
-        oW0+Ckv6w7MUWVqKj0jc/imSiHzWUKU=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-9ZTmLgCIO3mXxxTw7g9vEg-1; Thu, 14 Oct 2021 01:55:45 -0400
-X-MC-Unique: 9ZTmLgCIO3mXxxTw7g9vEg-1
-Received: by mail-ed1-f69.google.com with SMTP id c8-20020a50d648000000b003daa53c7518so4185537edj.21
-        for <linux-block@vger.kernel.org>; Wed, 13 Oct 2021 22:55:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BAJQlUnpJGNYVVkjFBgbYcXUFXkFAM867FKrPwKtnBU=;
-        b=7PNc/gWk060TOlPjBcWmMHmtwdTql3F4bPG0dSjQioP7tnsUgYSqWpXnUGyXDF3bd3
-         Du6tsEyEdqZ4z3iwjcNkIYDXKffGLechAcTW631JTD7IHERaA6VEKCEfucvuwj4IMLGv
-         SwDKCyw9jwH3YsA6tHql0yA4W/GkLSs5QBo5aq1aEK/mLkSFUGge8P/Rpz3+xdJi1vpH
-         KhHQoI9lA2Om90yZ3qhSKbBxcyOwzS+io/5snEcNXzqQJ4UiC/sNKOrjWUcbBuGqamkY
-         XMxs4t94jL8KgsGPz6Gy4CurqXgeMDuTp7098tLlDJcdGqL1SLv5hwngmQ3QdhagXB/E
-         QOOQ==
-X-Gm-Message-State: AOAM532xR2Tjg5zebcRsPj3NM9BYpzRJ4VI6vXg8Ru4F7tf41e/w0ADI
-        4GrsWoLKwgZ3n2GROB3r/ngNHiIiFxopRTRpuTDzlYV+BO6S+8swFq9jPRU9N8MhkrbGKkQQvNs
-        26sqWUD8L9NhfeCodE3GV8Ow=
-X-Received: by 2002:a17:906:fb19:: with SMTP id lz25mr1476006ejb.406.1634190944463;
-        Wed, 13 Oct 2021 22:55:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzkfgQIXxK3a8hnf8Yk/1EOBU93PwQ/K7bp1CzcCdKlz/OHkGbWKA2JjGysHrbIwPi9cJl4zA==
-X-Received: by 2002:a17:906:fb19:: with SMTP id lz25mr1475987ejb.406.1634190944256;
-        Wed, 13 Oct 2021 22:55:44 -0700 (PDT)
-Received: from redhat.com ([2.55.16.227])
-        by smtp.gmail.com with ESMTPSA id oz11sm1030711ejc.72.2021.10.13.22.55.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 22:55:43 -0700 (PDT)
-Date:   Thu, 14 Oct 2021 01:55:39 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        stable@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
+        id S229669AbhJNGNq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 02:13:46 -0400
+Received: from mail-eopbgr80113.outbound.protection.outlook.com ([40.107.8.113]:54398
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229502AbhJNGNp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Oct 2021 02:13:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CVLpCrg/iMBonQOUVkVYpAYGWB/fbGuDLv21wGf5C1H8wlaA/l9TGez4nw05lVGrS00RfojVKaFR8ha39Me563wXpQw4YxsXoa1ejiLhc7RBhk7bPzR0zABMYVVIfDZvHYkBRUfxT6uIflBrSrVViWBXZRGreQj/gF7qJNp0O2bdaK6JMlPZkDvQBklsO9/sFgUHY3zabxiKrty5Yms6Yewq/z+bWa3l8TxFQ/kE+YdNhFtXHRa0ipxNm348wZAJm6UTrh18lXQ45aP08zOBnHkG+Fb4N4MjNB35/iKVw1Yr2tlJ6JzOKhDz4AniGIHJL5BCRrWoNkQFUuJbLkYERw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=N5po46FltMSdOciY6xiDB8yxJJKRjyrEtyokuS09wIY=;
+ b=A43aDctrCqMSv5AlvZVNoocmQQDgv577bD3pA+iazXvg6op7vSN5FB0hSGDiz6G+O8kKqltDDkjg6HdGL1uIaarMDhM/iVYn+0aHMOzOfYui/IPA6cVjz+jlJIl2EFGpiTMzihDI+ABt/EUdO1JyUJmU0ToAbCIF96SEDIOhKN7F802Bsq+ovVuUjFnlnA04V21/pCx5LdysTt1ZYkqUfbwQTNWQVW29E4PUlPI2hd4uRFcekutag1CyoqY0IUtbtIyv/hSM4r8jXd97nNXDkXyfR+DJUk88mmXEiZu6XGhVIJWCwR251gVT++o2mdzLY7UhCuaX7z8MYIl+1IX0kQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=opensynergy.com; dmarc=pass action=none
+ header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=opensynergy.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N5po46FltMSdOciY6xiDB8yxJJKRjyrEtyokuS09wIY=;
+ b=CSJSBBHnW3baLnDRwlg2I8emKcF3J7lABXAaaMzJY2J02UF2fXZ8KIkeUWuahLhTFofrwfSZSjbKvHbSOWTAwNXvpGA2j9pXJ11l9FJ0gEzMsOSLeVQpX+OJWg87fLh5FDqClqepZMYge6xD/JRubCUTLtCYjOl0QRgcUe440/w=
+Authentication-Results: alsa-project.org; dkim=none (message not signed)
+ header.d=none;alsa-project.org; dmarc=none action=none
+ header.from=opensynergy.com;
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Jens Axboe <axboe@kernel.dk>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] Revert "virtio-blk: Add validation for block size in
- config space"
-Message-ID: <20211014015029-mutt-send-email-mst@kernel.org>
-References: <20211013124553.23803-1-mst@redhat.com>
- <CACGkMEvoE8+FxvX_vJEqEuqHptHu1-0TyM4j1P=cnRiBD6-1vA@mail.gmail.com>
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+References: <20211013105226.20225-1-mst@redhat.com>
+From:   Anton Yakovlev <anton.yakovlev@opensynergy.com>
+Message-ID: <0b0c22fa-9002-55b9-163b-e735b8370892@opensynergy.com>
+Date:   Thu, 14 Oct 2021 08:11:32 +0200
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM6P195CA0068.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:209:87::45) To AM0PR04MB5891.eurprd04.prod.outlook.com
+ (2603:10a6:208:12e::28)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEvoE8+FxvX_vJEqEuqHptHu1-0TyM4j1P=cnRiBD6-1vA@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bc1df71c-bda2-459b-332d-08d98ed97a8c
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7986:
+X-Microsoft-Antispam-PRVS: <AM8PR04MB798610F33A2DA83B1D8AA0338DB89@AM8PR04MB7986.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jbX/pZINSH89MTyMy1D/tvhcyD0fit/sJiKJQkYGZfitVO+hGJnQ0jEux+Lbl7Xqivs6g2iM1R4BYKcXlI9AYFzdJHyresWlrHCIUrcpLdxuEmSVsHLu8+NQpZAp1b9kfUW0Rho8dbWsawT/bND8ZY4dkG3oVOStOujGLwhiRzhLIPsTJrEdKj9uhpoQtBVpmRBdl4qby4ixhYIRSteENggyMOk2ujOQybO2kh+bDbzV4iNvNi446OLMbPIZy7deWIay3zFGa9Wgfv4aSGdC2gSgryYrPWVrw/tH9BSROTTqbPCs7+tJHHZAd92moPkvX8VPRhQAZuPyRpqWc8GrW5kLS+c8HvnRH7O6XOYBe3HKDK4R+aRTDxH9YJ0k2ads2T6hnFDXUntlljgrPG+T1wRFv5cS66QrxTaMkPgIyWzuGsHUA2lbGN+B95TfGiKNTHu41P7G8G9D9JG2MZ4twxSfOlOrJHMwOblLEW25bPPoc/M1Y8x3iKsIcUMKVaiOJL2MRMfClWXM+rZLsgFdWFf80JVaKOWswrTgtlNkk94lYBWDZYtBNggadb7L9qDRQlu6imfIUEe+mgU7ZhzOlIVRCcfe6o95dABXzEDoFyB3e8LQnx46ulxhxfVgAhqk616zkVrG5doXV4UQiXPxfQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5891.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(346002)(376002)(136003)(39840400004)(4326008)(66476007)(44832011)(66946007)(5660300002)(53546011)(4744005)(66556008)(8936002)(2906002)(86362001)(7416002)(38100700002)(31686004)(8676002)(54906003)(42186006)(316002)(2616005)(36756003)(7366002)(7406005)(508600001)(83380400001)(31696002)(186003)(26005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YVhWQUswYmZWbVpidm96MDN1Y2xyWk4vWlFRMTcvUk5MQm9QOVBPV0F5bndL?=
+ =?utf-8?B?SHY5KzFDT1U3Wld0dGhqdmdSb3FpbUNkWjQwRXNEZlBhRTR3Zk1jWkZjZnJS?=
+ =?utf-8?B?RDd3RTR4TTFDTzlYeGQrMVB2eFlQc3Q2QnEreHlFL09JTmdmck5YZEZIcjZY?=
+ =?utf-8?B?UTIwRVNVZEVOM3UvV3NXMGMydmFLOXNzZmxsVzdBWEhEM1JVdzlSL0FHZ2V0?=
+ =?utf-8?B?QVE1R054REVsRCtTdHVqMlpnS0JDVloyRElKV2p5dDYwSUZUMFhvVytGQkVu?=
+ =?utf-8?B?QXVSYVBpeS84N0dvM2hnWGMwZW1Qa2xYd0svNUtXRUFiMGgzeTZKZGhwZmJa?=
+ =?utf-8?B?VHVZQmNrZ3hRT3lRTEZGRU5tcEpvVWNVazhoZFg5d00rSHJ4ckU4REp0dnRh?=
+ =?utf-8?B?THh6aUJXZ294UEFTSFNyb1JnME9TV29qTTBzWksxVDVwRDM1SkxSdGpnbUgv?=
+ =?utf-8?B?UitMNVE0aFVjTUltTVFKbE54b0hGaEdOa3FPWEpkWk51YUxtK240Z0FaUFNL?=
+ =?utf-8?B?TFhZYXdxeklrUVVYd0RPUlUzeFRtakNTRXRnTVM5dTBlQlpVbUZ3Z1U0UUpS?=
+ =?utf-8?B?MWlZNXg1TlNtWFJFMWhsaC9Xei9NQndBT2QzUkpOcGZLek1BWFpZMW9tN0c5?=
+ =?utf-8?B?cnI0NXVvTWRqMTNoWllPSUQ0RGdLT1Q5cXZvK09HWldjbng1NXMydWFFWFZp?=
+ =?utf-8?B?RVl4TFNrd3A2bUVTMmZ3TVlvUHlabkpPQzNFTVhWNUtYeEhlWGk0ZW5DY3Zz?=
+ =?utf-8?B?dlR3Z2hzRytIcTFSbjdaRUw1Mk9tVmZheXVLL2ZyaFNXd0R0Uzd2Z3Zxazlj?=
+ =?utf-8?B?OFZnZG1xZmR6QUxiMjQ0ODhDYzdQQXdrU1hXTVJCeTdGc1NkZkUwK3JPendZ?=
+ =?utf-8?B?a3dadzZWYld4Z09qelQyNktubUhoVnU3K1dpdEdJZDNNUjg3OFBYeTZlSFpL?=
+ =?utf-8?B?TDBhNzJXdncrRnNxK1J4NWNLbXFCM0RWd2pxb3lwUFpOcllkd25WeDVWRnVi?=
+ =?utf-8?B?MHpZTE1sQWRmK3RJSFowb2NiUzJoM0FPNDRmOUNsbGU1ZDN6KzBpaEN0Zk9Y?=
+ =?utf-8?B?N0IwY1BHS2FtalNZQngxM0J0UHgrUEtRd0RUb3Z6SUxTVyt6UUV6QmNXT2VD?=
+ =?utf-8?B?L0xMNytDUU9PL0xsS2kxZ3VadXI3RFJ0RkcrKzhLcENVQmVKRG9EYjhpUGNU?=
+ =?utf-8?B?TkxmY1dXdnJGZ3lva01oaERlLy84VjJzQm1GSWxPTVFaamREOWxpK3ZFaEJ2?=
+ =?utf-8?B?REtPVDE3V0puTTNKQXJpS2VRUFF2Z0pwUC9TRVAzUVozcWxCbEQzVkNJeVk3?=
+ =?utf-8?B?c1ZETUdQb0FQNHNBVXRwdC9mYWNqbkk2MWtmM1RWOW1lRU8xZXVYdUVLNW9v?=
+ =?utf-8?B?bzBVYnB3SGQvaUZsdHl6d0NDaFdreXhiVnZ0dmFGK3Rvd2sxanpCWHQzNTB0?=
+ =?utf-8?B?R0hFUHBxc0REMjRGeU00OStsL09tOXRsdHRGQVc1S3JNYXc4Sk1nTFFFYTlP?=
+ =?utf-8?B?QWNvZzJGb1VRWlRtQXQrMlhnWXhPeERUUTFyWHMxWDRjU04vM1FVc0U0R2Rp?=
+ =?utf-8?B?STI3Wkl6dTQxMzdtOTQ0MUFVeFJDdGJWeXdJNWlpSDRIS0Z6djZDNHFaQ0dN?=
+ =?utf-8?B?QldKSTgrUVZYNmgzVFZJcXV2ZHVYNnJYNU9LeGI2VGVzMHdqUkdsMlZpUVZt?=
+ =?utf-8?B?bzV6Ky9Ra3lFTGdZMGMyOW5sWHpPQUJKRjVydXc2OG1vZy8vcW5na1o4ejBn?=
+ =?utf-8?Q?xz3mOvFa2ozXf9ONVb1AUXUoupX1M0/tPkdmnc3?=
+X-OriginatorOrg: opensynergy.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc1df71c-bda2-459b-332d-08d98ed97a8c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5891.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2021 06:11:36.7959
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oeNH+rEXARHKuwrt6kflln1JHZ/1aagGfI/NxMnd5ZPaPSygBdpV2N0pR0aS2MooCF9MO6tV8L4jH2f5alI0Yw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7986
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 14, 2021 at 10:45:25AM +0800, Jason Wang wrote:
-> On Wed, Oct 13, 2021 at 8:46 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > It turns out that access to config space before completing the feature
-> > negotiation is broken for big endian guests at least with QEMU hosts up
-> > to 6.1 inclusive.  This affects any device that accesses config space in
-> > the validate callback: at the moment that is virtio-net with
-> > VIRTIO_NET_F_MTU but since 82e89ea077b9 ("virtio-blk: Add validation for
-> > block size in config space") that also started affecting virtio-blk with
-> > VIRTIO_BLK_F_BLK_SIZE.
+On 13.10.2021 12:55, Michael S. Tsirkin wrote:
+
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
 > 
-> Ok, so it looks like I need to do something similar in my series to
-> validate max_nr_ports in probe() instead of validate()? (multi port is
-> not enabled by default).
-
-I think what we should do is fix upstream QEMU first. With that, plus
-Halil's work-around writing out the version 1 feature, we should be
-good reading config in validate.
-
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>   sound/virtio/virtio_card.c                 | 4 ++--
 > 
-> I wonder if we need to document this and rename the validate to
-> validate_features() (since we can do very little thing if we can't
-> read config in .validate()).
 
-That's not a bad idea anyway - any validation that does not
-need to clear features can be done in probe in any case.
+Reviewed-by: Anton Yakovlev <anton.yakovlev@opensynergy.com>
 
+-- 
+Anton Yakovlev
+Senior Software Engineer
 
-> > Further, unlike VIRTIO_NET_F_MTU which is off by
-> > default on QEMU, VIRTIO_BLK_F_BLK_SIZE is on by default, which resulted
-> > in lots of people not being able to boot VMs on BE.
-> >
-> > The spec is very clear that what we are doing is legal so QEMU needs to
-> > be fixed, but given it's been broken for so many years and no one
-> > noticed, we need to give QEMU a bit more time before applying this.
-> >
-> > Further, this patch is incomplete (does not check blk size is a power
-> > of two) and it duplicates the logic from nbd.
-> >
-> > Revert for now, and we'll reapply a cleaner logic in the next release.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: 82e89ea077b9 ("virtio-blk: Add validation for block size in config space")
-> > Cc: Xie Yongji <xieyongji@bytedance.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> Acked-by: jason Wang <jasowang@redhat.com>
-> 
-> > ---
-> >  drivers/block/virtio_blk.c | 37 ++++++-------------------------------
-> >  1 file changed, 6 insertions(+), 31 deletions(-)
-> >
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 9b3bd083b411..303caf2d17d0 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -689,28 +689,6 @@ static const struct blk_mq_ops virtio_mq_ops = {
-> >  static unsigned int virtblk_queue_depth;
-> >  module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
-> >
-> > -static int virtblk_validate(struct virtio_device *vdev)
-> > -{
-> > -       u32 blk_size;
-> > -
-> > -       if (!vdev->config->get) {
-> > -               dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > -                       __func__);
-> > -               return -EINVAL;
-> > -       }
-> > -
-> > -       if (!virtio_has_feature(vdev, VIRTIO_BLK_F_BLK_SIZE))
-> > -               return 0;
-> > -
-> > -       blk_size = virtio_cread32(vdev,
-> > -                       offsetof(struct virtio_blk_config, blk_size));
-> > -
-> > -       if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE)
-> > -               __virtio_clear_bit(vdev, VIRTIO_BLK_F_BLK_SIZE);
-> > -
-> > -       return 0;
-> > -}
-> > -
-> >  static int virtblk_probe(struct virtio_device *vdev)
-> >  {
-> >         struct virtio_blk *vblk;
-> > @@ -722,6 +700,12 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >         u8 physical_block_exp, alignment_offset;
-> >         unsigned int queue_depth;
-> >
-> > +       if (!vdev->config->get) {
-> > +               dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > +                       __func__);
-> > +               return -EINVAL;
-> > +       }
-> > +
-> >         err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
-> >                              GFP_KERNEL);
-> >         if (err < 0)
-> > @@ -836,14 +820,6 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >         else
-> >                 blk_size = queue_logical_block_size(q);
-> >
-> > -       if (blk_size < SECTOR_SIZE || blk_size > PAGE_SIZE) {
-> > -               dev_err(&vdev->dev,
-> > -                       "block size is changed unexpectedly, now is %u\n",
-> > -                       blk_size);
-> > -               err = -EINVAL;
-> > -               goto out_cleanup_disk;
-> > -       }
-> > -
-> >         /* Use topology information if available */
-> >         err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
-> >                                    struct virtio_blk_config, physical_block_exp,
-> > @@ -1009,7 +985,6 @@ static struct virtio_driver virtio_blk = {
-> >         .driver.name                    = KBUILD_MODNAME,
-> >         .driver.owner                   = THIS_MODULE,
-> >         .id_table                       = id_table,
-> > -       .validate                       = virtblk_validate,
-> >         .probe                          = virtblk_probe,
-> >         .remove                         = virtblk_remove,
-> >         .config_changed                 = virtblk_config_changed,
-> > --
-> > MST
-> >
-
+OpenSynergy GmbH
+Rotherstr. 20, 10245 Berlin
