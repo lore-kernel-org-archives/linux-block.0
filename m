@@ -2,76 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DC5C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B37C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:17:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A4516109F
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:05:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5DA760EDF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 08:17:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbhJNIHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 04:07:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36428 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbhJNIHP (ORCPT
+        id S229985AbhJNITe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 04:19:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26332 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229551AbhJNITd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 04:07:15 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D18BC061570
-        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 01:05:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=25XY4YrpwBExwBP6s8IxaKKZ2GSD+wtTsYdTtN84f4s=; b=ukxxY1+NLmualQn0AJbJYDgjvB
-        XS0zPwb5YKTFJ2T10B3oLP8q5cBFMVawPMlAeIa+56cMUz6lv4FX2UxC8+CQLDOKrWSYeQxo/EYBU
-        cQdjl2PwfKyIy132jp+AdRLxX4ecIPi+yOuoOEwCq+htVtpwNWNMb8CCD7V2DfXdawwwdtT0h5Ltn
-        kPlPEeaZGM2HRY+Kk0a4pW7BlkubWd+5Uj5bCdICZQWQY3WIWXGaJYkG2y0ah7b0F1dnr0I7Ip154
-        Zl+CE/kBSxjxBb7aCIGuY0hI9APrb0EMHmCmcR88Pwc5lpUEzW3I56Ozvpi8/7KLKcpVbAXtinTkX
-        k8r0IJgw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1maviA-008AWu-9n; Thu, 14 Oct 2021 08:04:10 +0000
-Date:   Thu, 14 Oct 2021 09:03:34 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 8/9] io_uring: utilize the io_batch infrastructure for
- more efficient polled IO
-Message-ID: <YWfkVtB+pMpaG2T3@infradead.org>
-References: <20211013165416.985696-1-axboe@kernel.dk>
- <20211013165416.985696-9-axboe@kernel.dk>
+        Thu, 14 Oct 2021 04:19:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634199449;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=23p+T0tGpMlNZUopKvREpNtpwsNoh2ybY4O0b8iKYvs=;
+        b=S8shHtCw8wgVOYyMymUf9oNDyH5SK6taC3qAL0VkZT99GKXozbBFiYE4cOkq9W0HNb/Mb6
+        Fv0SsBCEOvdLfteAGQrHM3rBAdRqRThgnAgTj254idW9ud9VrfM6BJm3sEg2PDC0O8Igt8
+        FU4Dqc8a6ryP2t3bQoFVlhfeHiybHDI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-552-rYZtqdW1NXCsXH_7RiWt7Q-1; Thu, 14 Oct 2021 04:17:26 -0400
+X-MC-Unique: rYZtqdW1NXCsXH_7RiWt7Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89B16801ADA;
+        Thu, 14 Oct 2021 08:17:24 +0000 (UTC)
+Received: from localhost (ovpn-8-32.pek2.redhat.com [10.72.8.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 837125F4EA;
+        Thu, 14 Oct 2021 08:17:18 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Yu Kuai <yukuai3@huawei.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 0/6] blk-mq: support concurrent queue quiescing
+Date:   Thu, 14 Oct 2021 16:17:04 +0800
+Message-Id: <20211014081710.1871747-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013165416.985696-9-axboe@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 10:54:15AM -0600, Jens Axboe wrote:
-> @@ -2404,6 +2406,11 @@ static int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
->  		struct kiocb *kiocb = &req->rw.kiocb;
->  		int ret;
->  
-> +		if (!file)
-> +			file = kiocb->ki_filp;
-> +		else if (file != kiocb->ki_filp)
-> +			break;
-> +
+Hello,
 
-Can you explain why we now can only poll for a single file (independent
-of the fact that batching is used)?
+request queue quiescing has been applied in lots of block drivers and
+block core from different/un-related code paths. So far, both quiesce
+and unquiesce changes the queue state unconditionally. This way has
+caused trouble, such as, driver is quiescing queue for its own purpose,
+however block core's queue quiesce may come because of elevator switch,
+updating nr_requests or other queue attributes, then un-expected
+unquiesce may come too early.
 
-> +	if (!pos && !iob.req_list)
->  		return 0;
-> +	if (iob.req_list)
-> +		iob.complete(&iob);
+It has been observed kernel panic when running stress test on dm-mpath
+suspend and updating nr_requests.
 
-Why not:
+Fix the issue by supporting concurrent queue quiescing. But nvme has very
+complicated uses on quiesce/unquiesce, which two may not be called in
+pairing, so switch to this way in patch 1~4, and patch 5 provides
+nested queue quiesce.
 
-	if (iob.req_list)
-		iob.complete(&iob);
-	else if (!pos)
-		return 0;
+V4:
+	- one small patch style change as suggested by Christoph, only patch 6/6
+	is touched
 
-?
+V3:
+	- add patch 5/6 to clear NVME_CTRL_ADMIN_Q_STOPPED for nvme-loop
+	  after reallocating admin queue
+	- take Bart's suggestion to add warning in blk_mq_unquiesce_queue()
+	& update commit log
+
+V2:
+	- replace mutex with atomic ops for supporting paring quiesce &
+	  unquiesce
+
+
+Ming Lei (6):
+  nvme: add APIs for stopping/starting admin queue
+  nvme: apply nvme API to quiesce/unquiesce admin queue
+  nvme: prepare for pairing quiescing and unquiescing
+  nvme: paring quiesce/unquiesce
+  nvme: loop: clear NVME_CTRL_ADMIN_Q_STOPPED after admin queue is
+    reallocated
+  blk-mq: support concurrent queue quiesce/unquiesce
+
+ block/blk-mq.c             | 22 ++++++++++--
+ drivers/nvme/host/core.c   | 70 ++++++++++++++++++++++++++------------
+ drivers/nvme/host/fc.c     |  8 ++---
+ drivers/nvme/host/nvme.h   |  4 +++
+ drivers/nvme/host/pci.c    |  8 ++---
+ drivers/nvme/host/rdma.c   | 14 ++++----
+ drivers/nvme/host/tcp.c    | 16 ++++-----
+ drivers/nvme/target/loop.c |  6 ++--
+ include/linux/blkdev.h     |  2 ++
+ 9 files changed, 100 insertions(+), 50 deletions(-)
+
+-- 
+2.31.1
+
