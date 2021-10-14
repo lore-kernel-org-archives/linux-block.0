@@ -2,127 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4127DC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753B7C4167D
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:14:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22E7E60F4A
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:14:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6065A61151
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 15:14:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232920AbhJNPQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 11:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50598 "EHLO
+        id S232738AbhJNPQm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 11:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232713AbhJNPQh (ORCPT
+        with ESMTP id S232922AbhJNPQk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 11:16:37 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28CC3C061760
-        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:14:33 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id oa12-20020a17090b1bcc00b0019f715462a8so4987035pjb.3
-        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:14:33 -0700 (PDT)
+        Thu, 14 Oct 2021 11:16:40 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3242C061570
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:14:35 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id i189so4204980ioa.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 08:14:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kk58q1N6iOKJV9MmXM4g94KiVUwgBacQdDgb8dq+Hqc=;
-        b=mlZB9Nj4m8jk1JFv+iCH7Znrwanh3CDPQczVzomtmeQ5BLbFN1inwmhXkfQwL1sdEQ
-         hih7m3SNinxkOxv1CMzByR9lFDUUB4oAxo3E3cDYo/S67L6xZfuz5zRsWVJKP1+73Scy
-         QCwjhJQjGzKf7SNt+QV8U3nYErgEHf4yODN/I=
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Ww3KH2wTTqnipZwzgG67/y0sw8ABjtYvekZ99wY0LNM=;
+        b=zVwh8cB8gNXcbDlWm5h41lDyl/i7/wXM36v8SLOyB//tdX7QOm1P8X9OXzOBP3I/Pi
+         EWlTmomNvnkrWsjp739qHPO/TUs0hrJ5CJkTEIMfOGZAljcQUJZPD69dYFUYPKRVvrf+
+         hBvyGQizfdbFiB9jSzRRSZLxinZUHcSMO19U42JwQS3nSfsXAaj/fIt/bxHD2fPS8HAw
+         aym8ep6+/O7cwca0/pQAOZjCdh0fR5qkN6U/SAkvHf+iTrWZpQj5z/zfrOAoi9CcZmVd
+         DWbWtxeaksSOdEHggeS+yXAnzwx1qTlndo/mK3YSgiULJpv/9DTu8VwYCnuXHqI+9CfK
+         OCjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kk58q1N6iOKJV9MmXM4g94KiVUwgBacQdDgb8dq+Hqc=;
-        b=RrVqEdbp4+SG40R+9qksIOcB3OpCFdkUTiyt28hOnJv7eDmiLlhMoLgkm39oXyoiGm
-         Hjpcxoa08fv4DnmmDWbNhcmF/WUTLGxSCIdMY+6DMhIDi4zVsSTuxMYEi7Sr8X9b2wMH
-         hwT9cN+UmUPezID2fAAFVIj8gdUmWx84EQjdMubDkqii3T/fCypIGlDKWGW4SY8bsd8J
-         v0ZYm9PidrSj2aMMbq66oOqTYsyNnxybmxwstwBYchbDFqfLoSTWAdhd6PXV3uDwtUa8
-         DkwNC7tw8/GJSDdCxKAF8cMnkaDjzoP5kzvTJo1HXucn2CE0dVnf8kLYAsBUO0qCSwyJ
-         ctpg==
-X-Gm-Message-State: AOAM530Qqt9UcMKowUBeYwCrGE/MTNH/G4Xt9RAzSoWyh+sXzXsMcpM8
-        ucrexf92QusnI8fIw+58Npaaag==
-X-Google-Smtp-Source: ABdhPJz+A28iMSsGMew00w4bTffNulDM4PlP1p1A1+RouZBKHQoPJUsZrDvvxCBzVTavFWwP5kdepA==
-X-Received: by 2002:a17:90a:86:: with SMTP id a6mr20774739pja.190.1634224472530;
-        Thu, 14 Oct 2021 08:14:32 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id w4sm2822114pfb.3.2021.10.14.08.14.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 08:14:32 -0700 (PDT)
-Date:   Thu, 14 Oct 2021 08:14:31 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Dave Kleikamp <dave.kleikamp@oracle.com>
-Cc:     Anton Altaparmakov <anton@tuxera.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Song Liu <song@kernel.org>, David Sterba <dsterba@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Jan Kara <jack@suse.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "jfs-discussion@lists.sourceforge.net" 
-        <jfs-discussion@lists.sourceforge.net>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
-        "linux-ntfs-dev@lists.sourceforge.net" 
-        <linux-ntfs-dev@lists.sourceforge.net>,
-        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
-        "reiserfs-devel@vger.kernel.org" <reiserfs-devel@vger.kernel.org>
-Subject: Re: don't use ->bd_inode to access the block device size
-Message-ID: <202110140813.44C95229@keescook>
-References: <20211013051042.1065752-1-hch@lst.de>
- <20211014062844.GA25448@lst.de>
- <3AB8052D-DD45-478B-85F2-BFBEC1C7E9DF@tuxera.com>
- <a5eb3c18-deb2-6539-cc24-57e6d5d3500c@oracle.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ww3KH2wTTqnipZwzgG67/y0sw8ABjtYvekZ99wY0LNM=;
+        b=RWchziQHDFM5dwJXbTpQacU9dU5WomCnd5d6PJjzLiOpmEfdu5d3f4QuPusKZ+nod2
+         rI79t94JmGEaLz7Fjf4KKw2vy3l9t3Wpo6INvWVx0k5VeIxkfdvvCq7zEKLrzyPzTPbj
+         paRJ53PNbWfJM+NFOFliJp5laewuvKOYg7Ta1FX+FJvMKtt2DF7acl8gSayU1sWMUEX/
+         U6pK1o6M5Qml8O+eDxRJJt11pHeTRQIZ55gIxCQ0W/WoB7BIa0dFQ7tsCkGPtsqoHNvQ
+         EIF8Zx0+urZ9kmRPLL4CucoHobpQ6ioMBjB7XPUj+kjCS3r+EyfYqYYRVF+RCLFQZW0H
+         aDTg==
+X-Gm-Message-State: AOAM531DnhsVN7G1jKxuhQF0Mtu9ADVX50QXavImiALAT1x04krKBfMd
+        l8bD80wVQgRn1Ch6k2f/IxLJBrgsfwdJww==
+X-Google-Smtp-Source: ABdhPJzOCaVOFP4dvIW1PHIEhGGqIyU5H24wa/NkAMptcrUThne6DhwqXuamRk8j1xRTtRm0jr3p5A==
+X-Received: by 2002:a05:6602:3412:: with SMTP id n18mr3102921ioz.65.1634224474937;
+        Thu, 14 Oct 2021 08:14:34 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id u12sm1327199ioc.33.2021.10.14.08.14.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Oct 2021 08:14:34 -0700 (PDT)
+Subject: Re: [PATCH 4/4] block: move update request helpers into blk-mq.c
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org
+References: <20211013164937.985367-1-axboe@kernel.dk>
+ <20211013164937.985367-5-axboe@kernel.dk> <YWcYFywO7J0R4oMb@infradead.org>
+ <f55d823f-79ca-67f0-1868-c013d7711fe5@kernel.dk>
+ <YWcdXjZPpYvuaJ5O@infradead.org>
+ <2418e448-6df4-ce6e-da2d-99fb7ac41fcb@kernel.dk>
+ <YWe5h25TVmF3V05w@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bd531677-0d1c-c6d7-fb7f-3b8dd40a4e64@kernel.dk>
+Date:   Thu, 14 Oct 2021 09:14:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a5eb3c18-deb2-6539-cc24-57e6d5d3500c@oracle.com>
+In-Reply-To: <YWe5h25TVmF3V05w@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 14, 2021 at 08:13:59AM -0500, Dave Kleikamp wrote:
-> On 10/14/21 4:32AM, Anton Altaparmakov wrote:
-> > Hi Christoph,
-> > 
-> > > On 14 Oct 2021, at 07:28, Christoph Hellwig <hch@lst.de> wrote:
-> > > 
-> > > On Wed, Oct 13, 2021 at 07:10:13AM +0200, Christoph Hellwig wrote:
-> > > > I wondered about adding a helper for looking at the size in byte units
-> > > > to avoid the SECTOR_SHIFT shifts in various places.  But given that
-> > > > I could not come up with a good name and block devices fundamentally
-> > > > work in sector size granularity I decided against that.
-> > > 
-> > > So it seems like the biggest review feedback is that we should have
-> > > such a helper.  I think the bdev_size name is the worst as size does
-> > > not imply a particular unit.  bdev_nr_bytes is a little better but I'm
-> > > not too happy.  Any other suggestions or strong opinions?
-> > 
-> > bdev_byte_size() would seem to address your concerns?
-> > 
-> > bdev_nr_bytes() would work though - it is analogous to bdev_nr_sectors() after all.
-> > 
-> > No strong opinion here but I do agree with you that bdev_size() is a bad choice for sure.  It is bound to cause bugs down the line when people forget what unit it is in.
+On 10/13/21 11:00 PM, Christoph Hellwig wrote:
+> On Wed, Oct 13, 2021 at 11:57:51AM -0600, Jens Axboe wrote:
+>> It's not like they are conditionally enabled, if you get one you get
+>> the other. But I can shuffle it around if it means a lot to you...
 > 
-> I don't really mind bdev_size since it's analogous to i_size, but
-> bdev_nr_bytes seems good to me.
+> As I've been trying to reshuffle the files and data structures to
+> keep the bio and requests bits clearly separated I'd appreciate if we
+> can keep the status codes in core.c and just do the long overdue move
+> the request completion helers.
 
-I much prefer bdev_nr_bytes(), as "size" has no units.
+Fair enough, I'll leave the error stuff in blk-core, doesn't really matter
+anyway as it should be out-of-line.
+
+> And as said before:  I think we should fix the trace point to not
+> unconditionally call the status to errno conversion first as not doing
+> it at all for the fast path will be even faster than inlining it :)
+
+I'll do that as separate patch on top.
 
 -- 
-Kees Cook
+Jens Axboe
+
