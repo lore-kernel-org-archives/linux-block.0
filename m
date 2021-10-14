@@ -2,105 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D18B4C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 09:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FABC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 09:23:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8D4E61056
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 09:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DA4E6101D
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 09:23:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbhJNJHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 05:07:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26980 "EHLO
+        id S229513AbhJNJZn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 05:25:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48989 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229994AbhJNJHc (ORCPT
+        by vger.kernel.org with ESMTP id S229468AbhJNJZn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 05:07:32 -0400
+        Thu, 14 Oct 2021 05:25:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634202328;
+        s=mimecast20190719; t=1634203418;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=oMWPMqU7gk/+N3iNFaV+79Yi0W3twmcpJsUg5C85gDg=;
-        b=c6rbvrIK6s/YChg2BSEYsU6AXEGqvNMV4QRNiyjis8KhuRfjMXang/birchQfpH/MCMzxA
-        dXEgfPH07+G0ouqD/XTnNI5ano01dM3+Gd/l+ANP33C1V9IMLsXM7gogqZozK5UP3Lp+/5
-        1SLiAIA17pJSOAevLbM64LlpVGhJJaA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-OSY2_JyaPVe5zF2HaJsh6g-1; Thu, 14 Oct 2021 05:05:24 -0400
-X-MC-Unique: OSY2_JyaPVe5zF2HaJsh6g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B18E8100CCC8;
-        Thu, 14 Oct 2021 09:05:13 +0000 (UTC)
-Received: from dhcp-12-105.nay.redhat.com (unknown [10.66.61.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D5D319724;
-        Thu, 14 Oct 2021 09:05:12 +0000 (UTC)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     osandov@osandov.com, bvanassche@acm.org
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests] tests/srp: fix module loading issue during srp tests
-Date:   Thu, 14 Oct 2021 17:04:55 +0800
-Message-Id: <20211014090455.7949-1-yi.zhang@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zpnHbQU/P3dvZjk8T87puDae5n+9jnJ7vmvPjzHElVE=;
+        b=Jaz9LrFIUOjSJ5wwpKvUaxd7mRO9iW3Y6ZYv7bBYqRDPgSDJZqyHDrbQebkhMWx7ahjeh2
+        PcK5Qf25FftLNCrhO3vbcXFHls2u9vjyHLisCOopTNQbpbpdi/ff6rNjP0yRYqBtb1KF4H
+        G1MVrTjg0jpIFjN91VtPsc8uskmznhE=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-CAVijNKIOBS_6ysi-cN9iA-1; Thu, 14 Oct 2021 05:23:36 -0400
+X-MC-Unique: CAVijNKIOBS_6ysi-cN9iA-1
+Received: by mail-yb1-f198.google.com with SMTP id z130-20020a256588000000b005b6b4594129so6330917ybb.15
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 02:23:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zpnHbQU/P3dvZjk8T87puDae5n+9jnJ7vmvPjzHElVE=;
+        b=J28EV4L5h2gTrewOAt6M8xJASmyByrWSQfPf3F50o+SBkjjjj69wSWAZgk9DcDYC8B
+         gBz5PGNN+AM4vcgFdtgcbiyMk2p8CNWSO2I4LeHwpyOCZEXdyMRq10eC9XVotABNcxvw
+         x1lsAzU8cgUf1jsaXYDgZ5CrIvh/NihfcZyTBPzjbFzVWzCHEq5HtEhl402b4A+GLj1D
+         EWbNPmRyAZx1KWU7adfdyJRzU82F39EUYS5OR5MXJFw8wPgXgoapE61OYnUshMoXsnxs
+         thcXl/dIa/gebvvtLjFT/K4B10BL+NPIYFj2jZRth3/RoCBHJs7AotAOYD68OigMub3z
+         ArPQ==
+X-Gm-Message-State: AOAM530ihVH+DWjROraM/Uq1I2iUxP0CMXpLqQzYiZJZ2Uvm0wPSGMV5
+        bLpqHSFEkJQJIVM37V7hocwjSuUwEEE/3Z+kUpu21+QA18NODqR3ZDrV1kyOCOAfDVm0k8ImSX2
+        c4C+gxaN7XKQgkCcnrCFy4pllW1uv/IALQjFx5zs=
+X-Received: by 2002:a25:3104:: with SMTP id x4mr5066300ybx.512.1634203416178;
+        Thu, 14 Oct 2021 02:23:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxwhlLQYkeARYzsLFNQ4Hlk7VXH35Eo9ANXpgP2MPz3S6LiBmE+ahMkjoO2xkAdlfR7eUOv1BlFaXbx2s4ARtQ=
+X-Received: by 2002:a25:3104:: with SMTP id x4mr5066281ybx.512.1634203415959;
+ Thu, 14 Oct 2021 02:23:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20210929071241.934472-1-hch@lst.de>
+In-Reply-To: <20210929071241.934472-1-hch@lst.de>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Thu, 14 Oct 2021 17:23:25 +0800
+Message-ID: <CAHj4cs8tYY-ShH=QdrVirwXqX4Uze6ewZAGew_oRKLL_CCLNJg@mail.gmail.com>
+Subject: Re: tear down file system I/O in del_gendisk v3
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The ib_isert/ib_srpt modules will be automatically loaded after the first
- time rdma_rxe/siw setup, which will lead srp tests fail.
+This patchset fixed the NULL pointer issue triggered by blktests block/025
+https://lore.kernel.org/linux-block/YWfJ06KX3HT1nANX@infradead.org/T/#mbf26cd34c88660ce0221dd7933b294a0b0298319
 
-$ modprobe rdma_rxe
-$ echo eno1 >/sys/module/rdma_rxe/parameters/add
-$ lsmod | grep -E "ib_srpt|iscsi_target_mod|ib_isert"
-ib_srpt               167936  0
-ib_isert              139264  0
-iscsi_target_mod      843776  1 ib_isert
-target_core_mod      1069056  3 iscsi_target_mod,ib_srpt,ib_isert
-rdma_cm               315392  5 rpcrdma,ib_srpt,ib_iser,ib_isert,rdma_ucm
-ib_cm                 344064  2 rdma_cm,ib_srpt
-ib_core              1101824  10 rdma_cm,rdma_rxe,rpcrdma,ib_srpt,iw_cm,ib_iser,ib_isert,rdma_ucm,ib_uverbs,ib_cm
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-$ ./check srp/001
-srp/001 (Create and remove LUNs)                             [failed]
-    runtime    ...  3.675s
-    --- tests/srp/001.out	2021-10-13 01:18:50.846740093 -0400
-    +++ /root/blktests/results/nodev/srp/001.out.bad	2021-10-14 03:24:18.593852208 -0400
-    @@ -1,3 +1 @@
-    -Configured SRP target driver
-    -count_luns(): 3 <> 3
-    -Passed
-    +insmod: ERROR: could not insert module /lib/modules/5.15.0-rc5.fix+/kernel/drivers/infiniband/ulp/srpt/ib_srpt.ko: File exists
-modprobe: FATAL: Module iscsi_target_mod is in use.
+On Wed, Sep 29, 2021 at 3:14 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Ming reported that for SCSI we have a lifetime problem now that
+> the BDI moved from the request_queue to the disk as del_gendisk
+> doesn't finish all outstanding file system I/O.  It turns out
+> this actually is an older problem, although the case where it could
+> be hit before was very unusual (unbinding of a SCSI upper driver
+> while the scsi_device stays around).  This series fixes this by
+> draining all I/O in del_gendisk.
+>
+> Changes since v2:
+>  - move the call to submit_bio_checks into freeze protection
+>
+> Changes since v1:
+>  - fix a commit log typo
+>  - keep the existing nowait vs queue dying semantics in bio_queue_enter
+>  - actually keep q_usage_counter in atomic mode after del_gendisk
+>
 
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- tests/srp/rc | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/srp/rc b/tests/srp/rc
-index 586f007..f89948b 100755
---- a/tests/srp/rc
-+++ b/tests/srp/rc
-@@ -494,6 +494,7 @@ start_lio_srpt() {
- 	if modinfo ib_srpt | grep -q '^parm:[[:blank:]]*rdma_cm_port:'; then
- 		opts+=("rdma_cm_port=${srp_rdma_cm_port}")
- 	fi
-+	unload_module ib_srpt && \
- 	insmod "/lib/modules/$(uname -r)/kernel/drivers/infiniband/ulp/srpt/ib_srpt."* "${opts[@]}" || return $?
- 	i=0
- 	for r in "${vdev_path[@]}"; do
-@@ -551,7 +552,7 @@ stop_lio_srpt() {
- 	rmdir /sys/kernel/config/target/*/* >&/dev/null
- 	rmdir /sys/kernel/config/target/* >&/dev/null
- 
--	for m in ib_srpt iscsi_target_mod target_core_pscsi target_core_iblock \
-+	for m in ib_srpt ib_isert iscsi_target_mod target_core_pscsi target_core_iblock \
- 			 target_core_file target_core_stgt target_core_user \
- 			 target_core_mod
- 	do
 -- 
-2.21.3
+Best Regards,
+  Yi Zhang
 
