@@ -2,82 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76351C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 12:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DFCC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 13:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F15E60249
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 12:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFCD4610CC
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 13:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231283AbhJNM7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 08:59:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39449 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230373AbhJNM73 (ORCPT
+        id S230389AbhJNNDm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 09:03:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230307AbhJNNDm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 08:59:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634216244;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mLprBwzw3zdwZmIPUsgXWg/hL7f0fQH46xTlmsNLxUs=;
-        b=gfxHL/DDkmmUepHZGX8UnYw75gOTY7bD27prIF/xKKS/yO406rrpvw8BDdQyMJkMiqYnZl
-        gm8thlKsj/Q9HV6k5DzLCHgeUun/3MlV4VXuetj1fzaAhjbNGiCJSmgnkzuSLFVxFuVvqS
-        IWarMBHK6pVIAxSn7X0qQ4pXRJdt00M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-tD5ZwdSZMFyAtD4ErJy4lw-1; Thu, 14 Oct 2021 08:57:21 -0400
-X-MC-Unique: tD5ZwdSZMFyAtD4ErJy4lw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0850F80365C;
-        Thu, 14 Oct 2021 12:57:20 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9591E5F4E2;
-        Thu, 14 Oct 2021 12:57:07 +0000 (UTC)
-Date:   Thu, 14 Oct 2021 20:57:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 6/5] kyber: avoid q->disk dereferences in trace points
-Message-ID: <YWgpHlO8UJ+IY3lB@T590>
-References: <20210929071241.934472-1-hch@lst.de>
- <20211012093301.GA27795@lst.de>
+        Thu, 14 Oct 2021 09:03:42 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67198C061570
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 06:01:37 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id d125so3639696iof.5
+        for <linux-block@vger.kernel.org>; Thu, 14 Oct 2021 06:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=DAEGDAuPbU/UsEoguNMCXNFrBpM9xfKecWAU03Wi78o=;
+        b=RHxWXpdV7UcUHoT8i2VRhVrjtVF7IK8zWSzF2ccOgEoEdRkFSGatWYrTDbjAAYeqyj
+         5lKzfWdfvQ0dL7xdKxQeYysC5ZwznZ6a835EHa7GbmxTvxumYkeWYfSIzL7YhLpCHNqN
+         ZsrH5/tFGBrW+Top8U5Wo4wku5db+BFtpCz/S/Qaqps+tm9gDfUj7yCoRfK0WfaMtXUF
+         Af3Gm32TRnBrhDuPL0+TOaTjPi7Wq9+s0Aixcc+QZhnDT0I2KKB/kLLJRUmQ1zcorNGF
+         /b+uTQpDqPRPVB/HUW9GgqoYfOPf7qtkl+a3uksYGIl/1zs2hKSedfbAHuKiQGnTY3uI
+         VjOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DAEGDAuPbU/UsEoguNMCXNFrBpM9xfKecWAU03Wi78o=;
+        b=Y+RZPJChRWzA14kTe7gaAyMc7rYA6wsKgYEbgYETD1IufYequuzcR8ydadUMXtoJmf
+         1fcGP1L9B5wfGdL7vmFuvA5yPhAywk3kE+OLMWn+3Tcirh0YehgM7p1zAE1+x9AAsoVb
+         ZOQd1rXzYqDVFr4ZMhS72pT49dtOqC9B99kgvMRvgisJ/cr6MsfZyoTFkY0mb66CcOoQ
+         GWl1caF5GGP0B8UwCR066DJBqZDPw5oTmQBx18fx4ZdehTWgYw8s1QWK+1ByBo1Kxduf
+         Rpc0jYyheG/2ppHHhaLoeaVw6ha/KF87xPszfJgeXmc6hQT2cRFN32tfCQWZqBG9cIV1
+         5JJQ==
+X-Gm-Message-State: AOAM530eKkIg5rW4aaa2yeWqIcY15gjarOXWaXQFr1gUZlYtMppeSAn6
+        MfIand0qz5IAS8eg1w6YNI+ln90nH0CZ3Q==
+X-Google-Smtp-Source: ABdhPJzE+YXFRd50IX1QHTk+L0yPpGGhE3xZJxt4W2TLUEZcFRZe0oDvjwgi0TqRvUvkruL9o00aRg==
+X-Received: by 2002:a05:6602:2d81:: with SMTP id k1mr2252996iow.87.1634216496482;
+        Thu, 14 Oct 2021 06:01:36 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id l125sm1196284ioa.2.2021.10.14.06.01.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Oct 2021 06:01:36 -0700 (PDT)
+Subject: Re: [PATCH 4/9] sbitmap: test bit before calling test_and_set_bit()
+To:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org
+References: <20211013165416.985696-1-axboe@kernel.dk>
+ <20211013165416.985696-5-axboe@kernel.dk>
+ <409c693c-4570-b6f4-3839-501633856151@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6b8569fa-cb9f-0f9b-9272-225ce243b71f@kernel.dk>
+Date:   Thu, 14 Oct 2021 07:01:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211012093301.GA27795@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <409c693c-4570-b6f4-3839-501633856151@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Christoph,
-
-On Tue, Oct 12, 2021 at 11:33:01AM +0200, Christoph Hellwig wrote:
+On 10/14/21 1:20 AM, Hannes Reinecke wrote:
+> On 10/13/21 6:54 PM, Jens Axboe wrote:
+>> If we come across bits that are already set, then it's quicker to test
+>> that first and gate the test_and_set_bit() operation on the result of
+>> the bit test.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>   lib/sbitmap.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+>> index c6e2f1f2c4d2..11b244a8d00f 100644
+>> --- a/lib/sbitmap.c
+>> +++ b/lib/sbitmap.c
+>> @@ -166,7 +166,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+>>   			return -1;
+>>   		}
+>>   
+>> -		if (!test_and_set_bit_lock(nr, word))
+>> +		if (!test_bit(nr, word) && !test_and_set_bit_lock(nr, word))
+>>   			break;
+>>   
+>>   		hint = nr + 1;
+>>
+> Hah. Finally something to latch on.
 > 
-> q->disk becomes invalid after the gendisk is removed.  Work around this
-> by caching the dev_t for the tracepoints.  The real fix would be to
-> properly tear down the I/O schedulers with the gendisk, but that is
-> a much more invasive change.
+> I've seen this coding pattern quite a lot in the block layer, and, of 
+> course, mostly in the hot path.
+> (Kinda the point, I guess :-)
+> 
+> However, my question is this:
+> 
+> While 'test_and_set_bit()' is atomic, the combination of
+> 'test_bit && !test_and_set_bit()' is not.
+> 
+> IE this change moves an atomic operation into a non-atomic one.
+> So how can we be sure that this patch doesn't introduce a race condition?
+> And if it doesn't, should we add some comment above the code why this is 
+> safe to do here?
 
-Except for kyber, blkcg code refers q->disk too.
+If test_bit() returns true, we don't bother with the atomic
+test_and_set. That's to avoid re-dirtying a cacheline when the operation
+would be pointless. There's no race in this case, we just skip this bit.
 
-Such as blkg_dev_name() used in showing blk cgroup files, see
-tg_print_limit(), but blkcg_exit_queue() is called in queue's release
-handler, so q->disk can be referred when reading blkcg file of cgroup
-fs from userspace after deleting gendisk.
+The sequence of !test_bit && !test_and_set_bit is very much still
+atomic, it's just gated on the fact that our optimistic first check said
+that the bit is currently clear. It obviously has to be.
 
-I think it is fine to move blkcg_exit_queue() into del_gendisk(), but
-bfq_exit_queue() is still run from queue's release handler, and bfq's
-blkcg policy is deactivated there. That said the referring in reading
-bfq's cgroup file still can come after deleting disk, especially kernel
-panic could be caused when q->disk is cleared between the check and
-calling to bdi_dev_name() in blkg_dev_name().
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
