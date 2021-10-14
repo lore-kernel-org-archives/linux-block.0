@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5978C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 14:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB667C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 14:04:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEA86610E7
-	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 14:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC8F3610D0
+	for <linux-block@archiver.kernel.org>; Thu, 14 Oct 2021 14:04:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbhJNOGZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 10:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34282 "EHLO
+        id S231761AbhJNOG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 10:06:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231741AbhJNOGY (ORCPT
+        with ESMTP id S231744AbhJNOGZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 10:06:24 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80EDEC061570;
-        Thu, 14 Oct 2021 07:04:19 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id r7so19904477wrc.10;
-        Thu, 14 Oct 2021 07:04:19 -0700 (PDT)
+        Thu, 14 Oct 2021 10:06:25 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D537C061570;
+        Thu, 14 Oct 2021 07:04:20 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id i12so19859325wrb.7;
+        Thu, 14 Oct 2021 07:04:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=xMDSwcqMD4khSm3c9+/YMjtoelEIVc6ZxCpty49UuyU=;
-        b=AxiIhFD4IfhliDORTe+QwUkODFNn2c4w4V550YqOchrB0VvuDHq4bp0zfGMywng0VO
-         ytcIbMhk8GkDfDfdQwIRSyzzxvs/ObiOtimP4+Nhwkd/+belDjXXtJVn33zsgoHrasX/
-         Nz0orwzf1jtKSMbHS79S2KFMfa3kroOlD8QrWQrllyf93xpCglKxS1PAOe9/zYTIikaT
-         jQVHE1P4NwY/VQjyi2MYmQ0vPkNYxjgRQkNgTu6PU2zhXeGviJ8aThj4LiuXVykD21Zt
-         BRzc0t7prrH30pf4DHIkNTSN0gu2FNfQgn3QA1HEAIGprBPVNQU48SWZveBX1AwUqnYq
-         ypZw==
+        bh=0qu3wfbcbDBRoEiFSBFw8GNfAxgn5icQsmAb4gNPUck=;
+        b=NtF+pXe9D9jiV9qdP2lV6TFfAT0Qh/N+Ys7vjDDKXItwxpgTY/GppMkEpzY9F+HHhz
+         06bem6LC4L6M2QeU/7DoetBOmKhRwzzDjptKK2n8bCopcbg0SBGX6HJxbXkdsPdpJJ2N
+         oWy+nJiHj9nlCXh3vP8xxVrdZPQAPpB/AQM3jU/nVLn4Ss5FhJ0n0E3pIUJ3oMhBSyH6
+         Gvfz15tQD8c5pxTLHFiAEo24pREqScIp3ZQjG6dA7wDIRU3r0NGRSt1eEjT55OgQ1FyD
+         p7yh9Vm5URC5f59Qc6vXTUXjivYmjRGHETwUrxNAlqNMqnjpwRRz1Tr18XNyODOmcgdF
+         k/aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=xMDSwcqMD4khSm3c9+/YMjtoelEIVc6ZxCpty49UuyU=;
-        b=swYkyTIz3fYI4AUafWBnzpbUjExu5+VuYNlepbxz7UKcqcomHPm7OIDn4OIFXgBWwA
-         xJVItsUKYIgt1YzyDy9EPajt0nLHFmB/R7JkDNhd893lJNgHAaOcjS/E/KynqL/8fhAW
-         3eKopfaw6xrFkToBsxXkIV6DD2psNL4R7XDOVfbkPcq1VkNCtBasc1+xhqYZNWgHjvC1
-         GPsnPjYHsK6l/mN3dOTerdfo+1QcOwySKMq0n/YKfPpkeXvMIFYCh0T09ijNlwhxEm4B
-         jnCPJlmBYJNLDYbKj3oCVuKc9yYvYzb5vz1K4pzUc0lGVtATE2ZKvIAAshc5Fnc9+3Rt
-         GYEg==
-X-Gm-Message-State: AOAM532U9Stz7kdKj2sE9aFNyuLblSNd3FL7/G7PCYxozNFfeEQTVbKg
-        lfSK/IZGUHL3c/dYjBoNMgg=
-X-Google-Smtp-Source: ABdhPJzrkk7jigfMVG5/daAjnzuaUl/cNSCh7B7Dz7rLgE88dqX88O4ynmQFt7yV3Gbvcq2Omfy6jw==
-X-Received: by 2002:a05:6000:1869:: with SMTP id d9mr6741492wri.161.1634220258116;
-        Thu, 14 Oct 2021 07:04:18 -0700 (PDT)
+        bh=0qu3wfbcbDBRoEiFSBFw8GNfAxgn5icQsmAb4gNPUck=;
+        b=GwenpC3jbIjttCKfDWe0FzkuZFZIAB0xnWsMiFG/Rg5UBr+zhV1ftOY+vdyDZVGvJH
+         Yr/cL64bRITdcag83ffdkIr1wSz//2m7gmiO6T9oSL6TZvvTzIhXh7WaGvPAYmppDL+c
+         WS1WqwwM06V3Op2tHUFDI9v0FLmABiLEWCjFVWmKTtOZYnsUBVjjWiOlnc9l3U1p6laO
+         pHT5u++/B1xRWY0zzkJYRUc3tJLYTavCRdXmvXdCQSv6xUL3FUOAwgWU0bOo9YVPXOhp
+         fzu0Tn6XUljZbuSA4NzoTysXo5xuV6HTrwlEmMTr/Bafw4dVLM7LABMzy9NcCk67Ldkd
+         4NZw==
+X-Gm-Message-State: AOAM5317tqpMEhgZ/zDc/ICfnx78ZNGYIcoR/yDVqpSBk5/n6lr69dMS
+        bWbfrYsmy6/DK1HND+aaP1WtIx4gsbI=
+X-Google-Smtp-Source: ABdhPJyZDmi78ck2x8xyMR/imlvRg/M//3eJTrZDeHDYFifeem5IYpO0NVHJOEEGtudeHtfuadpPZg==
+X-Received: by 2002:a5d:6dad:: with SMTP id u13mr6914930wrs.370.1634220259039;
+        Thu, 14 Oct 2021 07:04:19 -0700 (PDT)
 Received: from localhost.localdomain ([185.69.145.214])
-        by smtp.gmail.com with ESMTPSA id p8sm2273461wmg.15.2021.10.14.07.04.17
+        by smtp.gmail.com with ESMTPSA id p8sm2273461wmg.15.2021.10.14.07.04.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 07:04:17 -0700 (PDT)
+        Thu, 14 Oct 2021 07:04:18 -0700 (PDT)
 From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Christoph Hellwig <hch@infradead.org>, asml.silence@gmail.com
-Subject: [PATCH 2/5] block: use bdev_get_queue() in bdev.c
-Date:   Thu, 14 Oct 2021 15:03:27 +0100
-Message-Id: <a352936ce5d9ac719645b1e29b173d931ebcdc02.1634219547.git.asml.silence@gmail.com>
+Subject: [PATCH 3/5] block: use bdev_get_queue() in bio.c
+Date:   Thu, 14 Oct 2021 15:03:28 +0100
+Message-Id: <85c36ea784d285a5075baa10049e6b59e15fb484.1634219547.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1634219547.git.asml.silence@gmail.com>
 References: <cover.1634219547.git.asml.silence@gmail.com>
@@ -72,45 +72,52 @@ queue pointer and so is fater.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- block/bdev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/bio.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 30ae5b5d5f91..384e5bf991d8 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -327,12 +327,12 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
- 	if (!ops->rw_page || bdev_get_integrity(bdev))
- 		return result;
+diff --git a/block/bio.c b/block/bio.c
+index 7377fc93606a..fb3704a61e07 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -910,7 +910,7 @@ EXPORT_SYMBOL(bio_add_pc_page);
+ int bio_add_zone_append_page(struct bio *bio, struct page *page,
+ 			     unsigned int len, unsigned int offset)
+ {
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
++	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	bool same_page = false;
  
--	result = blk_queue_enter(bdev->bd_disk->queue, 0);
-+	result = blk_queue_enter(bdev_get_queue(bdev), 0);
- 	if (result)
- 		return result;
- 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page,
- 			      REQ_OP_READ);
--	blk_queue_exit(bdev->bd_disk->queue);
-+	blk_queue_exit(bdev_get_queue(bdev));
- 	return result;
- }
+ 	if (WARN_ON_ONCE(bio_op(bio) != REQ_OP_ZONE_APPEND))
+@@ -1054,7 +1054,7 @@ static int bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter)
  
-@@ -363,7 +363,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ static int bio_iov_bvec_set_append(struct bio *bio, struct iov_iter *iter)
+ {
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
++	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	struct iov_iter i = *iter;
  
- 	if (!ops->rw_page || bdev_get_integrity(bdev))
- 		return -EOPNOTSUPP;
--	result = blk_queue_enter(bdev->bd_disk->queue, 0);
-+	result = blk_queue_enter(bdev_get_queue(bdev), 0);
- 	if (result)
- 		return result;
+ 	iov_iter_truncate(&i, queue_max_zone_append_sectors(q) << 9);
+@@ -1132,7 +1132,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+ 	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+ 	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
++	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	unsigned int max_append_sectors = queue_max_zone_append_sectors(q);
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+@@ -1469,10 +1469,10 @@ void bio_endio(struct bio *bio)
+ 		return;
  
-@@ -376,7 +376,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
- 		clean_page_buffers(page);
- 		unlock_page(page);
+ 	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACKED))
+-		rq_qos_done_bio(bio->bi_bdev->bd_disk->queue, bio);
++		rq_qos_done_bio(bdev_get_queue(bio->bi_bdev), bio);
+ 
+ 	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+-		trace_block_bio_complete(bio->bi_bdev->bd_disk->queue, bio);
++		trace_block_bio_complete(bdev_get_queue(bio->bi_bdev), bio);
+ 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
  	}
--	blk_queue_exit(bdev->bd_disk->queue);
-+	blk_queue_exit(bdev_get_queue(bdev));
- 	return result;
- }
  
 -- 
 2.33.0
