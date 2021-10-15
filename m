@@ -2,91 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3106FC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 17:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF7FC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 17:33:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A168611ED
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 17:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B0CE61151
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 17:33:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237638AbhJORdt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Oct 2021 13:33:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42424 "EHLO
+        id S233119AbhJORfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Oct 2021 13:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235261AbhJORds (ORCPT
+        with ESMTP id S232596AbhJORfF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Oct 2021 13:33:48 -0400
+        Fri, 15 Oct 2021 13:35:05 -0400
 Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26BA6C061570;
-        Fri, 15 Oct 2021 10:31:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C96EC061570
+        for <linux-block@vger.kernel.org>; Fri, 15 Oct 2021 10:32:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=uUlcTDK4XPU+iizrpIkJOrRHPABQ0RGWVp54/0NzJKk=; b=NgbjHiyaDO4zvgJzUVTEBWtoLd
-        MxI2VAOvKixcFxmUR9Q78HrsKsnDB2feafuRocMJlVJca+AtlN2zmCFgfeF73UGfFhvY36HHdpv+c
-        p1/8xX3sPuI7ChCJO1bKSWXZ0nrU7NiH+lVFMaTQ4HoVgLCIiqAeSMRNDIBy98+Bb908T9VbJT4zJ
-        VTKMweCE7STFbx6SekAkMWFyslODFau0/CJz9pXg1M5OcXwK3M7uRgMch3FDaVwHYbHdPwaAjj2ZP
-        IHpqOF83NJkwFyvrlkb19rWiAs7nWP3NODSCnSsYVSn/uKy59n0CpkMd0lNUHlfse0jti5fbGEnEE
-        EJKPi/Fg==;
+        bh=q+cpk68oP20LmU/hEqaOAEyM+jw7UMCxtprUI16/t30=; b=SVy+I1SNP6Qy7iIIUpbnRmwrFo
+        Wsr+EsgP/bMEqczrdd8cauZ6qxjIpeb+ItdebXA/oC8nOa2c2+j3B5b0q6IoMwa9pWD+/Q2YJuzdP
+        PeeJo3hVBh5RZcf/h6waPdlqkNz9MmBhdv+PBzuwOltoES2szdcBsrzNqW9HY/WjtlP5LgTBuitvw
+        tzh7X3fqsHA7Jt6t8CCuAQkabjfClumOOafDhJOulyZO5BexknFoeLcJnfcAQb9urxTA/8GKYpInM
+        wraJWbChWZ1hGxG6IxHhPOMnn8RD1F0ir4+A+GAP2dwRCwLwPmVCxzbPY+yHTCr+4+Cu2hmScYkKd
+        KBE+O7SQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mbR3L-008L4Y-Lv; Fri, 15 Oct 2021 17:31:31 +0000
-Date:   Fri, 15 Oct 2021 10:31:31 -0700
+        id 1mbR4k-008LB6-6m; Fri, 15 Oct 2021 17:32:58 +0000
+Date:   Fri, 15 Oct 2021 10:32:58 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
-        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
-        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
-        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YWm68xUnAofop3PZ@bombadil.infradead.org>
-References: <20210927163805.808907-1-mcgrof@kernel.org>
- <20210927163805.808907-12-mcgrof@kernel.org>
- <YWeOJP2UJWYF94fu@T590>
- <YWeR4moCRh+ZHOmH@T590>
- <YWiSAN6xfYcUDJCb@bombadil.infradead.org>
- <YWjCpLUNPF3s4P2U@T590>
- <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
- <YWk9e957Hb+I7HvR@T590>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Minchan Kim <minchan@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 0/3] zram: fix two races
+Message-ID: <YWm7SkL4TZXTw/a3@bombadil.infradead.org>
+References: <20211015121652.2024287-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YWk9e957Hb+I7HvR@T590>
+In-Reply-To: <20211015121652.2024287-1-ming.lei@redhat.com>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 15, 2021 at 04:36:11PM +0800, Ming Lei wrote:
-> On Thu, Oct 14, 2021 at 05:22:40PM -0700, Luis Chamberlain wrote:
-> > On Fri, Oct 15, 2021 at 07:52:04AM +0800, Ming Lei wrote:
-> ...
-> > > 
-> > > We need to understand the exact reason why there is still cpuhp node
-> > > left, can you share us the exact steps for reproducing the issue?
-> > > Otherwise we may have to trace and narrow down the reason.
-> > 
-> > See my commit log for my own fix for this issue.
+On Fri, Oct 15, 2021 at 08:16:49PM +0800, Ming Lei wrote:
+> Hello,
 > 
-> OK, thanks!
+> Fixes the following two issues reported by Luis Chamberlain by simpler
+> approach, meantime it is sort of simplification of handling resetting/removing
+> device vs. open().
 > 
-> I can reproduce the issue, and the reason is that reset_store fails
-> zram_remove() when unloading module, then the warning is caused.
+> - zram leak during unloading module, which is one race between resetting
+> and removing device
 > 
-> The top 3 patches in the following tree can fix the issue:
-> 
-> https://github.com/ming1/linux/commits/my_v5.15-blk-dev
+> - zram resource leak in case that disksize_store is done after resetting
+> and before deleting gendisk in zram_remove()
 
-Thanks for trying an alternative fix! A crash stops yes, however this
-also ends up leaving the driver in an unrecoverable state after a few
-tries. Ie, you CTRL-C the scripts and try again over and over again and
-the driver ends up in a situation where it just says:
-
-zram: Can't change algorithm for initialized device
-
-And the zram module can't be removed at that point.
+As noted in the other thread, unfortunately this is not enough, and can
+leave the driver in a bad state. So either more work is needed or my
+alternative patch can be considered. But I do understand the desire to
+avoid the mutex on removal, if we can do that great.
 
   Luis
