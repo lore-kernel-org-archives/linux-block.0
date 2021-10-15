@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AE9C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E6BC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E47161041
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16D9F61101
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239086AbhJOXzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Oct 2021 19:55:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
+        id S239112AbhJOXzH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Oct 2021 19:55:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbhJOXzE (ORCPT
+        with ESMTP id S239055AbhJOXzF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Oct 2021 19:55:04 -0400
+        Fri, 15 Oct 2021 19:55:05 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 959C3C061762;
-        Fri, 15 Oct 2021 16:52:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C66C3C061764;
+        Fri, 15 Oct 2021 16:52:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=vmoV/2yvLiwBFQQklXCjpC+/vAkb2GZd/kil2P+K9LY=; b=k0iIsRd4etFUTdob28o4ORiDN4
-        +B5FyF731o7hr+GINXvlvMEAMpsLwW5pC/OKgrZhFwyicCWbpFYSPPBTrBIjvSuVnrLjhUSLYS++y
-        oRkzDGAOTsEh93X+qg4nyS4uWEdS1lTDNed0oMklQ8zbFZvEmtlBlaap7C7u4S3ktr+flejwhLn6v
-        kgxKkRW5rGqDNa6Cku4cssrBYgKN0s5RFNPfDoSHCSG9iQEucDFOEf6fvVjlMBFP7jCkT/hLFNSOo
-        cpEoBq/XBYeFkTadkfricUfOXARU2LfOTVXw3vn1MHJ8F/i5S8b+Km/fw6MNqjRctXbmhviSiCcL6
-        I9TcNhtA==;
+        bh=bWrYy27/Ft+aLDChsLBGCGZJ9I29Pbmku4dc9v02/r0=; b=IY2ti5CFu7tk7l/1b1dOBrzqFV
+        aY9UvoJKkeTLc2QMRNWX6uc1JjZmitgQWYAqCJrHP3ukaJAS1Znz/MF42OZxUAt/7nUAnIiAlaBdw
+        qxqWz+L6WdoNhUxemK8IqK8TTz5PiYshQ9/0IYTCEPZsgX8UFxP25gp3gw4mI5zwxPE0jpzsJMdNF
+        piTCgmlnkXlxAQxhoX2yeSSTMZLJghSLJlHFu34Sux+hr4llFOQyl8BtkdxpGRy5hn40pVSQcZxr9
+        8NMljnWNJV+SY+YkxBhw9vXuVPxdhVfyQszbzyQE3EdW1D1TeSngbhl2jloBhz2cfG6cuZlUSHqj0
+        9sJQoaow==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mbWzt-009C31-2Y; Fri, 15 Oct 2021 23:52:21 +0000
+        id 1mbWzt-009C2x-0D; Fri, 15 Oct 2021 23:52:21 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, geoff@infradead.org, mpe@ellerman.id.au,
         benh@kernel.crashing.org, paulus@samba.org, jim@jtan.com,
@@ -42,9 +42,9 @@ Cc:     linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
         linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 04/13] nvdimm/btt: use goto error labels on btt_blk_init()
-Date:   Fri, 15 Oct 2021 16:52:10 -0700
-Message-Id: <20211015235219.2191207-5-mcgrof@kernel.org>
+Subject: [PATCH 02/13] nvme-multipath: add error handling support for add_disk()
+Date:   Fri, 15 Oct 2021 16:52:08 -0700
+Message-Id: <20211015235219.2191207-3-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211015235219.2191207-1-mcgrof@kernel.org>
 References: <20211015235219.2191207-1-mcgrof@kernel.org>
@@ -55,60 +55,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This will make it easier to share common error paths.
+We never checked for errors on add_disk() as this function
+returned void. Now that this is fixed, use the shiny new
+error handling.
+
+Since we now can tell for sure when a disk was added, move
+setting the bit NVME_NSHEAD_DISK_LIVE only when we did
+add the disk successfully.
+
+Nothing to do here as the cleanup is done elsewhere. We take
+care and use test_and_set_bit() because it is protects against
+two nvme paths simultaneously calling device_add_disk() on the
+same namespace head.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/nvdimm/btt.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ drivers/nvme/host/multipath.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-index 29cc7325e890..23ee8c005db5 100644
---- a/drivers/nvdimm/btt.c
-+++ b/drivers/nvdimm/btt.c
-@@ -1520,10 +1520,11 @@ static int btt_blk_init(struct btt *btt)
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index e8ccdd398f78..022837f7be41 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -496,13 +496,23 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
+ static void nvme_mpath_set_live(struct nvme_ns *ns)
  {
- 	struct nd_btt *nd_btt = btt->nd_btt;
- 	struct nd_namespace_common *ndns = nd_btt->ndns;
-+	int rc = -ENOMEM;
+ 	struct nvme_ns_head *head = ns->head;
++	int rc;
  
- 	btt->btt_disk = blk_alloc_disk(NUMA_NO_NODE);
- 	if (!btt->btt_disk)
--		return -ENOMEM;
-+		goto out;
+ 	if (!head->disk)
+ 		return;
  
- 	nvdimm_namespace_disk_name(ndns, btt->btt_disk->disk_name);
- 	btt->btt_disk->first_minor = 0;
-@@ -1535,19 +1536,23 @@ static int btt_blk_init(struct btt *btt)
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, btt->btt_disk->queue);
- 
- 	if (btt_meta_size(btt)) {
--		int rc = nd_integrity_init(btt->btt_disk, btt_meta_size(btt));
--
--		if (rc) {
--			blk_cleanup_disk(btt->btt_disk);
--			return rc;
--		}
-+		rc = nd_integrity_init(btt->btt_disk, btt_meta_size(btt));
-+		if (rc)
-+			goto out_cleanup_disk;
++	/*
++	 * test_and_set_bit() is used because it is protecting against two nvme
++	 * paths simultaneously calling device_add_disk() on the same namespace
++	 * head.
++	 */
+ 	if (!test_and_set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
+-		device_add_disk(&head->subsys->dev, head->disk,
+-				nvme_ns_id_attr_groups);
++		rc = device_add_disk(&head->subsys->dev, head->disk,
++				     nvme_ns_id_attr_groups);
++		if (rc) {
++			clear_bit(NVME_NSHEAD_DISK_LIVE, &ns->flags);
++			return;
++		}
+ 		nvme_add_ns_head_cdev(head);
  	}
-+
- 	set_capacity(btt->btt_disk, btt->nlba * btt->sector_size >> 9);
- 	device_add_disk(&btt->nd_btt->dev, btt->btt_disk, NULL);
-+
- 	btt->nd_btt->size = btt->nlba * (u64)btt->sector_size;
- 	nvdimm_check_and_set_ro(btt->btt_disk);
  
- 	return 0;
-+
-+out_cleanup_disk:
-+	blk_cleanup_disk(btt->btt_disk);
-+out:
-+	return rc;
- }
- 
- static void btt_blk_cleanup(struct btt *btt)
 -- 
 2.30.2
 
