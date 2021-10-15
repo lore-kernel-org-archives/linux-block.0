@@ -2,132 +2,244 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1DAC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 02:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04670C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 03:01:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6C2360F4A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 02:07:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E19DA61152
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 03:01:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231208AbhJOCJs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Oct 2021 22:09:48 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:61131 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229938AbhJOCJr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Oct 2021 22:09:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1634263663; x=1665799663;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=l4sxWpef19AH5gHAUrhEssE7h2mlb15v8sz2l4ASCkY=;
-  b=DnGKGUC5/+0kvWHIgPwfiLLPTSk9bbSgxRwvzfhkAVeIcKMAE/bqZHD9
-   vwkqy2OnQJh44s6u2exIISBqXSZPZgGkpRXrv0fNGP6Bs3GkSsE5AHS/9
-   +ElyGErvYjiOERGMXQpOLo6lxePAbipWVbxWATTr2/uY4OsRjb2vY/GCo
-   JU7OSaPXsBN46pBEFo1Kk4BRrfJLcz+4D9Gtwb+w9UIexPUKYWdTzcVIM
-   Xdh65tZcwyzZttqpDiHBXzQfGEvo7irBjFRZX6IyJh18XoHUwXZUa6K0g
-   eAMpUysC5kIORh+SC4EDAzR7JmSaYlWtj286nSmNgxLbfVmhTd7iMS43w
-   A==;
-X-IronPort-AV: E=Sophos;i="5.85,374,1624291200"; 
-   d="scan'208";a="294637511"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Oct 2021 10:07:42 +0800
-IronPort-SDR: k9TkPPJyW8YxkGNOy/eRxM4/B/mGbVRXPqb6E3bMIsmTO0qXcwGUMfShewG2tAQgOSgAHJQFsc
- yPTyI2nIzI9Ll0WogNgXIvdgahp3SeyCkQuEGrJ+vdDRVNWPF93oNPP194eX5PVclnYJYAz+Wn
- XxjvNHwqfYdGBgemi5i9ylQ/gQxB0KEaF0w9XFAy11pD0oxpcxyzyCHWqm/Am1rKAfSkv//aIB
- gHHpPK+PSaNmaW2BWZx3iIZ77NB2vwUeavuhe2phVzJNdx7JjvULBVOUi0M/zNLc4cLD1QBr2G
- ouwcTwNp5JPGYzkP96s9pZJp
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2021 18:41:53 -0700
-IronPort-SDR: 5YC0xryhlk8T1ww6rRBjjAtJRzVKeqyn0VhweC+sI21X4Eg1jLqHeZQ7Dsu/YRsLcTXqkiWQMM
- Y9cf/m0huEZock4epc2ZgGA1C3DyFofMynGn95BAyuhzQNHHNUh3vieuxPuTYkI8NMqVOYXqEC
- d7b6eXtvOhjyEUoOH5LKwo6MO0PdXUiorzdieBZI/DVDAiZaOtflpinuDHIkO/agK/+0mVnmPu
- fFwVWm9l7M5WEa6CMA0dC2VEj2oJ8UySuOd45wZbBAUu+dYWKFBm706RqnlgrUo80cTTX4mXJl
- /dU=
-WDCIronportException: Internal
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.173])
-  by uls-op-cesaip01.wdc.com with ESMTP; 14 Oct 2021 19:07:40 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH] block: Fix partition check for host-aware zoned block devices
-Date:   Fri, 15 Oct 2021 11:07:40 +0900
-Message-Id: <20211015020740.506425-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.31.1
+        id S229848AbhJODDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Oct 2021 23:03:40 -0400
+Received: from out0.migadu.com ([94.23.1.103]:45611 "EHLO out0.migadu.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229526AbhJODDi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Oct 2021 23:03:38 -0400
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1634266887;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3JKKcKQvzmKtnZfQe0695j3qKTRuj5F96dGAJHbJWhM=;
+        b=sHRXBvQ3uzVNSyW2U4PMQMJqqgDHZce78OlRAvH4+YgVDmf0vBv7+1VNVN14ajTRIc+Rln
+        v3wLKO7D6AKu7/vjqnf57mwYy7cCS60P1fXxtHavMKvZonqswopZfomK0rOXs6QMumB9E4
+        Nq65njoCBlTOoltGah1kWIxOzX3YSAg=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+Subject: Re: [PATCH v2] md: Kill usage of page->index
+To:     Kent Overstreet <kent.overstreet@gmail.com>,
+        "heming.zhao@suse.com" <heming.zhao@suse.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        alexander.h.duyck@linux.intel.com
+References: <20211013160034.3472923-1-kent.overstreet@gmail.com>
+ <20211013160034.3472923-5-kent.overstreet@gmail.com>
+ <bcdd4b56-9b6b-c5cb-2eb7-540fa003d692@linux.dev>
+ <04714b0e-297b-7383-ed4f-e39ae5e56433@suse.com>
+ <YWg/AGR50Vw7DDuU@moria.home.lan>
+Message-ID: <c2e2edd1-8f6f-1849-df0a-46916e311586@linux.dev>
+Date:   Fri, 15 Oct 2021 11:01:21 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YWg/AGR50Vw7DDuU@moria.home.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: guoqing.jiang@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit a33df75c6328 ("block: use an xarray for disk->part_tbl") modified
-the method to check partition existence in host-aware zoned block
-devices from disk_has_partitions() helper function call to empty check
-of xarray disk->part_tbl. However, disk->part_tbl always has single
-entry for disk->part0 and never becomes empty. This resulted in the
-host-aware zoned devices always judged to have partitions, and it made
-the sysfs queue/zoned attribute to be "none" instead of "host-aware"
-regardless of partition existence in the devices.
 
-This also caused DEBUG_LOCKS_WARN_ON(lock->magic != lock) for
-sdkp->rev_mutex in scsi layer when the kernel detects host-aware zoned
-device. Since block layer handled the host-aware zoned devices as non-
-zoned devices, scsi layer did not have chance to initialize the mutex
-for zone revalidation. Therefore, the warning was triggered.
 
-To fix the issues, call the helper function disk_has_partitions() in
-place of disk->part_tbl empty check. Since the function was removed with
-the commit a33df75c6328, reimplement it to walk through entries in the
-xarray disk->part_tbl.
+On 10/14/21 10:30 PM, Kent Overstreet wrote:
+> On Thu, Oct 14, 2021 at 04:58:46PM +0800,heming.zhao@suse.com  wrote:
+>> Hello all,
+>>
+>> The page->index takes an important role for cluster-md module.
+>> i.e, a two-node HA env, node A bitmap may be managed in first 4K area, then
+>> node B bitmap is in 8K area (the second page). this patch removes the index
+>> and fix/hardcode index with value 0, which will only operate first node bitmap.
+>>
+>> If this serial patches are important and must be merged in mainline, we should
+>> redesign code logic for the related code.
+>>
+>> Thanks,
+>> Heming
+> Can you look at and test the updated patch below? The more I look at the md
+> bitmap code the more it scares me.
+>
+> -- >8 --
+> Subject: [PATCH] md: Kill usage of page->index
+>
+> As part of the struct page cleanups underway, we want to remove as much
+> usage of page->mapping and page->index as possible, as frequently they
+> are known from context - as they are here in the md bitmap code.
+>
+> Signed-off-by: Kent Overstreet<kent.overstreet@gmail.com>
+> ---
+>   drivers/md/md-bitmap.c | 49 ++++++++++++++++++++----------------------
+>   drivers/md/md-bitmap.h |  1 +
+>   2 files changed, 24 insertions(+), 26 deletions(-)
+>
+> diff --git a/drivers/md/md-bitmap.c b/drivers/md/md-bitmap.c
+> index e29c6298ef..316e4cd5a7 100644
+> --- a/drivers/md/md-bitmap.c
+> +++ b/drivers/md/md-bitmap.c
+> @@ -165,10 +165,8 @@ static int read_sb_page(struct mddev *mddev, loff_t offset,
+>   
+>   		if (sync_page_io(rdev, target,
+>   				 roundup(size, bdev_logical_block_size(rdev->bdev)),
+> -				 page, REQ_OP_READ, 0, true)) {
+> -			page->index = index;
+> +				 page, REQ_OP_READ, 0, true))
+>   			return 0;
+> -		}
+>   	}
+>   	return -EIO;
+>   }
+> @@ -209,7 +207,8 @@ static struct md_rdev *next_active_rdev(struct md_rdev *rdev, struct mddev *mdde
+>   	return NULL;
+>   }
+>   
+> -static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+> +static int write_sb_page(struct bitmap *bitmap, struct page *page,
+> +			 unsigned long index, int wait)
+>   {
+>   	struct md_rdev *rdev;
+>   	struct block_device *bdev;
+> @@ -224,7 +223,7 @@ static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+>   
+>   		bdev = (rdev->meta_bdev) ? rdev->meta_bdev : rdev->bdev;
+>   
+> -		if (page->index == store->file_pages-1) {
+> +		if (index == store->file_pages-1) {
+>   			int last_page_size = store->bytes & (PAGE_SIZE-1);
+>   			if (last_page_size == 0)
+>   				last_page_size = PAGE_SIZE;
+> @@ -236,8 +235,7 @@ static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+>   		 */
+>   		if (mddev->external) {
+>   			/* Bitmap could be anywhere. */
+> -			if (rdev->sb_start + offset + (page->index
+> -						       * (PAGE_SIZE/512))
+> +			if (rdev->sb_start + offset + index * PAGE_SECTORS
+>   			    > rdev->data_offset
+>   			    &&
+>   			    rdev->sb_start + offset
+> @@ -247,7 +245,7 @@ static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+>   		} else if (offset < 0) {
+>   			/* DATA  BITMAP METADATA  */
+>   			if (offset
+> -			    + (long)(page->index * (PAGE_SIZE/512))
+> +			    + (long)(index * PAGE_SECTORS)
+>   			    + size/512 > 0)
+>   				/* bitmap runs in to metadata */
+>   				goto bad_alignment;
+> @@ -259,7 +257,7 @@ static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+>   			/* METADATA BITMAP DATA */
+>   			if (rdev->sb_start
+>   			    + offset
+> -			    + page->index*(PAGE_SIZE/512) + size/512
+> +			    + index * PAGE_SECTORS + size/512
+>   			    > rdev->data_offset)
+>   				/* bitmap runs in to data */
+>   				goto bad_alignment;
+> @@ -268,7 +266,7 @@ static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+>   		}
+>   		md_super_write(mddev, rdev,
+>   			       rdev->sb_start + offset
+> -			       + page->index * (PAGE_SIZE/512),
+> +			       + index * PAGE_SECTORS,
+>   			       size,
+>   			       page);
+>   	}
+> @@ -285,12 +283,13 @@ static void md_bitmap_file_kick(struct bitmap *bitmap);
+>   /*
+>    * write out a page to a file
+>    */
+> -static void write_page(struct bitmap *bitmap, struct page *page, int wait)
+> +static void write_page(struct bitmap *bitmap, struct page *page,
+> +		       unsigned long index, int wait)
+>   {
+>   	struct buffer_head *bh;
+>   
+>   	if (bitmap->storage.file == NULL) {
+> -		switch (write_sb_page(bitmap, page, wait)) {
+> +		switch (write_sb_page(bitmap, page, index, wait)) {
+>   		case -EINVAL:
+>   			set_bit(BITMAP_WRITE_ERROR, &bitmap->flags);
+>   		}
+> @@ -399,7 +398,6 @@ static int read_page(struct file *file, unsigned long index,
+>   		blk_cur++;
+>   		bh = bh->b_this_page;
+>   	}
+> -	page->index = index;
+>   
+>   	wait_event(bitmap->write_wait,
+>   		   atomic_read(&bitmap->pending_writes)==0);
+> @@ -472,7 +470,7 @@ void md_bitmap_update_sb(struct bitmap *bitmap)
+>   	sb->sectors_reserved = cpu_to_le32(bitmap->mddev->
+>   					   bitmap_info.space);
+>   	kunmap_atomic(sb);
+> -	write_page(bitmap, bitmap->storage.sb_page, 1);
+> +	write_page(bitmap, bitmap->storage.sb_page, bitmap->storage.sb_index, 1);
 
-Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: stable@vger.kernel.org # v5.14+
----
- block/blk-settings.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+I guess it is fine for sb_page now.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index a7c857ad7d10..b880c70e22e4 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -842,6 +842,24 @@ bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(blk_queue_can_use_dma_map_merging);
- 
-+static bool disk_has_partitions(struct gendisk *disk)
-+{
-+	unsigned long idx;
-+	struct block_device *part;
-+	bool ret = false;
-+
-+	rcu_read_lock();
-+	xa_for_each(&disk->part_tbl, idx, part) {
-+		if (bdev_is_partition(part)) {
-+			ret = true;
-+			break;
-+		}
-+	}
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
- /**
-  * blk_queue_set_zoned - configure a disk queue zoned model.
-  * @disk:	the gendisk of the queue to configure
-@@ -876,7 +894,7 @@ void blk_queue_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
- 		 * we do nothing special as far as the block layer is concerned.
- 		 */
- 		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) ||
--		    !xa_empty(&disk->part_tbl))
-+		    disk_has_partitions(disk))
- 			model = BLK_ZONED_NONE;
- 		break;
- 	case BLK_ZONED_NONE:
--- 
-2.31.1
+[...]
 
+> @@ -1027,7 +1024,7 @@ void md_bitmap_unplug(struct bitmap *bitmap)
+>   							  "md bitmap_unplug");
+>   			}
+>   			clear_page_attr(bitmap, i, BITMAP_PAGE_PENDING);
+> -			write_page(bitmap, bitmap->storage.filemap[i], 0);
+> +			write_page(bitmap, bitmap->storage.filemap[i], i, 0);
+
+But for filemap page, I am not sure the above is correct.
+
+>   			writing = 1;
+>   		}
+>   	}
+> @@ -1137,7 +1134,7 @@ static int md_bitmap_init_from_disk(struct bitmap *bitmap, sector_t start)
+>   				memset(paddr + offset, 0xff,
+>   				       PAGE_SIZE - offset);
+>   				kunmap_atomic(paddr);
+> -				write_page(bitmap, page, 1);
+> +				write_page(bitmap, page, index, 1);
+
+Ditto.
+
+>   
+>   				ret = -EIO;
+>   				if (test_bit(BITMAP_WRITE_ERROR,
+> @@ -1336,7 +1333,7 @@ void md_bitmap_daemon_work(struct mddev *mddev)
+>   		if (bitmap->storage.filemap &&
+>   		    test_and_clear_page_attr(bitmap, j,
+>   					     BITMAP_PAGE_NEEDWRITE)) {
+> -			write_page(bitmap, bitmap->storage.filemap[j], 0);
+> +			write_page(bitmap, bitmap->storage.filemap[j], j, 0);
+
+Ditto.
+
+
+>   		}
+>   	}
+>   
+> diff --git a/drivers/md/md-bitmap.h b/drivers/md/md-bitmap.h
+> index cfd7395de8..6e820eea32 100644
+> --- a/drivers/md/md-bitmap.h
+> +++ b/drivers/md/md-bitmap.h
+> @@ -207,6 +207,7 @@ struct bitmap {
+>   						 * w/ filemap pages */
+>   		unsigned long file_pages;	/* number of pages in the file*/
+>   		unsigned long bytes;		/* total bytes in the bitmap */
+> +		unsigned long sb_index;		/* sb page index */
+
+I guess it resolve the issue for sb_page, and we might need to do 
+similar things
+for filemap as well if I am not misunderstood.
+
+Thanks,
+Guoqing
