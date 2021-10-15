@@ -2,68 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32B2C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 16:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4488C4321E
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 16:52:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A41CD61053
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 16:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A08AF60F25
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 16:52:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237248AbhJOQTD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Oct 2021 12:19:03 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:51186 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236917AbhJOQTC (ORCPT
+        id S241699AbhJOQyQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Oct 2021 12:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241700AbhJOQyF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Oct 2021 12:19:02 -0400
-Date:   Fri, 15 Oct 2021 18:16:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1634314614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oqu1oJeEHUxhy202sz9OoMP/FwVFN/ikHYyAlVt7IQc=;
-        b=kVqjNhvNFUOBXgfbiPZQKeKFnk0hFrIR/lZ67VOXMupRmg/tx4a1nSHDu2AEenlbTzwCVF
-        +nkS7gp4RP7PruToCVjjMs6if3tH6pL6Mzfz4yygMGTE/M9ZVHQGHTpgo47BnNJb8E5AMJ
-        qxeMyolajGXetDLmUfokPrnkksNeavDn/me97vZEtEa+hvuBqNq0zzQhBqEXVzbepPToKx
-        0LJm2LpT+PvvowuPvJ/teMyvJijU+9qUj6CbNZ13FS9uVq12R/p6WjFkhVkfW7FlpQjM3S
-        o5qYqv+LDlPUuAXFamkwTA/5k9OObiU+nhPW3+4ZcaNdrjp8+1QEvwWyoSJYQA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1634314614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oqu1oJeEHUxhy202sz9OoMP/FwVFN/ikHYyAlVt7IQc=;
-        b=TsfTdm4eLJJ3f45PPXWJBjp/6+Cv4ytxKVl99W2NkjFZTy9gEWPVnYqdOH/W8x+NZoBwCz
-        RAvybNnPNKIineBg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, Jens Axboe <axboe@kernel.dk>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 3/3] scsi, usb: storage: Complete the blk-request
- directly.
-Message-ID: <20211015161653.muq37x6mkeru6lxc@linutronix.de>
-References: <20211015151412.3229037-1-bigeasy@linutronix.de>
- <20211015151412.3229037-4-bigeasy@linutronix.de>
- <YWmmn4MpTSGHRVOU@infradead.org>
+        Fri, 15 Oct 2021 12:54:05 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0478C06176E
+        for <linux-block@vger.kernel.org>; Fri, 15 Oct 2021 09:51:57 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id c29so8876564pfp.2
+        for <linux-block@vger.kernel.org>; Fri, 15 Oct 2021 09:51:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8gI6mB0v8/bvGUktJ4Ms64SCq44VzGlslt0/tVmUcu0=;
+        b=QdjfyqDFD4soQMEMSOicdhBdVamKBaYeLFRjv2+GeJkhkobBQ1wXcffRbrMri+SgXS
+         ho2ZSrthIeYBE7Wx2MPp5VyuPKs5uKhB2/hHDVUacoeny7NW+A6nzAebO0KCgT+nfajN
+         4woprmqITLxBlJcOq6oS9FryrMRcuTjaoqcfg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8gI6mB0v8/bvGUktJ4Ms64SCq44VzGlslt0/tVmUcu0=;
+        b=73bYEuS8X464Ne/M8pH0ur8Gr1B1H2TfdsQ8ChsDbQMjZMznq31NvkNYmFreXvQYsT
+         +A5D7cB0Db0AKD/PVA95UHQtRq/hiWQJMTMw7yXE9ZO+Tzu28XphDdfKAX6dv3D8spGj
+         l5D2vMQiEL4TbQC30TcsXgJ8HUFmCfJpBRwuD5yhYqa7PoVKK6l668MyLbVCz1Lc0agn
+         4zAWmaYm0QWXfSzWh3qEXOaJ7/CI364WOwDJdihssz7OiOXzhdyjZEUIJIAuew4X7xRl
+         PCBRWGLNp/Y4sJ+8J4UerO+o8CBV+b8PpAuIRD7Ydu52Zr8z4i4OnOezu1i00dlHkLP1
+         cUJQ==
+X-Gm-Message-State: AOAM533MwV2OVzgGdmq+LeW6cH6jQgiUiFBcptlN/ErpnsLUukxHTY5Z
+        IiX6u2IzahgMjHepN0q9hdHoOg==
+X-Google-Smtp-Source: ABdhPJzqeoukQXK8ExXBqth3GcTvhtURMxE+sN7W7wsB5KXgmz+OQ2/XE0rohu9GSzNW6fPwLJfBIw==
+X-Received: by 2002:a05:6a00:1a15:b0:44d:a80:a194 with SMTP id g21-20020a056a001a1500b0044d0a80a194mr12521866pfv.78.1634316717195;
+        Fri, 15 Oct 2021 09:51:57 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id w18sm5617464pfj.170.2021.10.15.09.51.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Oct 2021 09:51:56 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 09:51:56 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+        ntfs3@lists.linux.dev, reiserfs-devel@vger.kernel.org
+Subject: Re: [PATCH 13/30] cramfs: use bdev_nr_bytes instead of open coding it
+Message-ID: <202110150951.94FEBC4C@keescook>
+References: <20211015132643.1621913-1-hch@lst.de>
+ <20211015132643.1621913-14-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YWmmn4MpTSGHRVOU@infradead.org>
+In-Reply-To: <20211015132643.1621913-14-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-10-15 09:04:47 [-0700], Christoph Hellwig wrote:
-> Bart has been working on removing the ->scsi_done indirection, so this
-> will need to find a way to interact with that
+On Fri, Oct 15, 2021 at 03:26:26PM +0200, Christoph Hellwig wrote:
+> Use the proper helper to read the block device size.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Okay. So I just wait until it is there. Is this v5.15/16 material?
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Sebastian
+-- 
+Kees Cook
