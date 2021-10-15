@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBABEC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8402DC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5C8C611C1
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CCA26120F
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 23:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239210AbhJOXzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Oct 2021 19:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43764 "EHLO
+        id S239226AbhJOXzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Oct 2021 19:55:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239136AbhJOXzI (ORCPT
+        with ESMTP id S239195AbhJOXzJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Oct 2021 19:55:08 -0400
+        Fri, 15 Oct 2021 19:55:09 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B843C061570;
-        Fri, 15 Oct 2021 16:53:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F77C061762;
+        Fri, 15 Oct 2021 16:53:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=OEudjQURI1tjI6DN2XbbpoNvfS6WRIGCcJ/ZL9K/jW0=; b=0i4mMLZDva/pK7opYP5oiPP3fv
-        rQ5uBC0tGPAZX1/i/6SCFM7QhjhhhwAbuLFbiv/1f5wb0lapDOFHvxZvxtSMncixscY8/BqQSkmHR
-        bKufKXpomn+5Yt6hm7SI2U9JkzvsrqfhY87yB6+iGoFmOvdJBFKy++RKFa2jbpnEvtU/qeCq8RCeX
-        E1A3LHGJOU8cUFmZUHPIFWQtnl8JnCheJuo9YAIxyhYZ8WZAAsNq9omJMDUKNdlNj8ckazv7XBMVp
-        mh+OlppW3pioNclIkbHstsm1EwaGp1IDGWQEb8jm1JZqdCFS8tbGBnG1UoMmly0+bewl7yE/bHwXJ
-        s5LUHtJQ==;
+        bh=6NZfHmNoX5N/dbslA9tEZ3wm71g//v2MOeHuD/3FoC0=; b=IqiWkGJxOs4RZJjHpZ7nll994s
+        uQA7UIW+Ocik9GPEuu98PXKCk2c1/R4dmgJNmMK7hIT0CSmMm2dNOhTyBQnJAcQVps9OAi5PycSEB
+        lFwC/uYATxJhPiYhXVyPODu4sXxqnG/Kv6uAQzwaYmHA5XxAypucqitped5paW7j/jY5YdjpBuwNO
+        JXXnDjWd7gRdgfbjhElarcK95Xm273zx4UiqerCVkP3oitZ1QvMbY/dK2IjadIAuhraTLxgzCGeBo
+        hA6DJrWJ+8rFDTxLBOZlKX+fmT/H5hwAwFdfvcPhQB8OtMJQQqLRwkmCHBpjn7W+8UVgkpKB5sRdm
+        X3RLj42w==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mbWzt-009C3L-EQ; Fri, 15 Oct 2021 23:52:21 +0000
+        id 1mbWzt-009C3H-Bn; Fri, 15 Oct 2021 23:52:21 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, geoff@infradead.org, mpe@ellerman.id.au,
         benh@kernel.crashing.org, paulus@samba.org, jim@jtan.com,
@@ -42,9 +42,9 @@ Cc:     linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-mtd@lists.infradead.org, nvdimm@lists.linux.dev,
         linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 13/13] mtd/ubi/block: add error handling support for add_disk()
-Date:   Fri, 15 Oct 2021 16:52:19 -0700
-Message-Id: <20211015235219.2191207-14-mcgrof@kernel.org>
+Subject: [PATCH 11/13] ps3vram: add error handling support for add_disk()
+Date:   Fri, 15 Oct 2021 16:52:17 -0700
+Message-Id: <20211015235219.2191207-12-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211015235219.2191207-1-mcgrof@kernel.org>
 References: <20211015235219.2191207-1-mcgrof@kernel.org>
@@ -61,33 +61,29 @@ error handling.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/mtd/ubi/block.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/block/ps3vram.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
-index e003b4b44ffa..062e6c2c45f5 100644
---- a/drivers/mtd/ubi/block.c
-+++ b/drivers/mtd/ubi/block.c
-@@ -447,12 +447,18 @@ int ubiblock_create(struct ubi_volume_info *vi)
- 	list_add_tail(&dev->list, &ubiblock_devices);
+diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
+index c7b19e128b03..af2a0d09c598 100644
+--- a/drivers/block/ps3vram.c
++++ b/drivers/block/ps3vram.c
+@@ -755,9 +755,14 @@ static int ps3vram_probe(struct ps3_system_bus_device *dev)
+ 	dev_info(&dev->core, "%s: Using %llu MiB of GPU memory\n",
+ 		 gendisk->disk_name, get_capacity(gendisk) >> 11);
  
- 	/* Must be the last step: anyone can call file ops from now on */
--	add_disk(dev->gd);
-+	ret = add_disk(dev->gd);
-+	if (ret)
-+		goto out_destroy_wq;
+-	device_add_disk(&dev->core, gendisk, NULL);
++	error = device_add_disk(&dev->core, gendisk, NULL);
++	if (error)
++		goto out_cleanup_disk;
 +
- 	dev_info(disk_to_dev(dev->gd), "created from ubi%d:%d(%s)",
- 		 dev->ubi_num, dev->vol_id, vi->name);
- 	mutex_unlock(&devices_mutex);
  	return 0;
  
-+out_destroy_wq:
-+	list_del(&dev->list);
-+	destroy_workqueue(dev->wq);
- out_remove_minor:
- 	idr_remove(&ubiblock_minor_idr, gd->first_minor);
- out_cleanup_disk:
++out_cleanup_disk:
++	blk_cleanup_disk(gendisk);
+ out_cache_cleanup:
+ 	remove_proc_entry(DEVICE_NAME, NULL);
+ 	ps3vram_cache_cleanup(dev);
 -- 
 2.30.2
 
