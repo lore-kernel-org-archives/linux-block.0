@@ -2,151 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328E5C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 18:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA85AC43217
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 19:25:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D8D960C4A
-	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 18:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A223E61151
+	for <linux-block@archiver.kernel.org>; Fri, 15 Oct 2021 19:25:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241485AbhJOSpk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Oct 2021 14:45:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241405AbhJOSpd (ORCPT
+        id S242702AbhJOT1z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Oct 2021 15:27:55 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:51948 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238307AbhJOT1w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Oct 2021 14:45:33 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E19CC061570;
-        Fri, 15 Oct 2021 11:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CrScqNKMgRV1rKvxe0whCx/+ah432GRzJ6rU4W802Bg=; b=e8yUBc7VImD8hMVZvoak5LZiI0
-        XuCa4kRJ/sMe0/AKP6Y7pUNQlINfWnpN48qy1UcXov5eBZRHO42yaD7EiJ8GfcsupZTucc7gp4uCI
-        RLRoYivgL3qydgIg9R0ydVOVNVoiooG2WZrbzU+52LgTABMGTysGTfVTuhhL/13yiC4IDQlEPOWoq
-        CFYEiCaUApfdlh4TZ3+gP7/ylAPPxxuF1xvYQ9Zs5PKvWttP8FrzuwGgkHyYsqTKzRe6SSMeqN+qg
-        03/46Fc11IfcngA7KSMUqv2x56TGi1o6PrzyiD4dLVRZSA4p7HU5f4IbPzDZ8+8W+C7GMQdtF8E4D
-        pc7XbnUw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mbSAn-008U2u-6D; Fri, 15 Oct 2021 18:43:17 +0000
-Date:   Fri, 15 Oct 2021 11:43:17 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Finn Thain <fthain@linux-m68k.org>
-Cc:     axboe@kernel.dk, hch@lst.de, efremov@linux.com, song@kernel.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        viro@zeniv.linux.org.uk, hare@suse.de, jack@suse.cz,
-        ming.lei@redhat.com, tj@kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: [PATCH v2 1/2] block: make __register_blkdev() return an error
-Message-ID: <YWnLxahmHK5hDm2y@bombadil.infradead.org>
-References: <20210927220332.1074647-1-mcgrof@kernel.org>
- <20210927220332.1074647-2-mcgrof@kernel.org>
- <2ac2e05f-327a-b66f-aaa0-276db2e46730@linux-m68k.org>
+        Fri, 15 Oct 2021 15:27:52 -0400
+Received: from [10.137.106.139] (unknown [131.107.159.11])
+        by linux.microsoft.com (Postfix) with ESMTPSA id A840E20B9D2B;
+        Fri, 15 Oct 2021 12:25:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A840E20B9D2B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1634325945;
+        bh=RPZtRxj2Ft0zzKXvpgW0rZMYpHi1gS55iyEpO7uuSJY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=ccCuDchH9sh5yYOrHA40uvyfplTe3oCiqj9ESax6es5pjOU7zhzl+xuNw4A3ht2NP
+         XtjqZPD/uSqSTIQL/xduVGrKXRtNn6mqMqyZMDFih/9UOG/9j1x34dBapCpe2KYHQ0
+         rS6B9PRwppJDpJLTf2vrEFV5OzOFjKHa64SZ/siE=
+Message-ID: <7bd474ae-3dbe-4351-fa10-ee68e5c7267c@linux.microsoft.com>
+Date:   Fri, 15 Oct 2021 12:25:45 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ac2e05f-327a-b66f-aaa0-276db2e46730@linux-m68k.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH v7 07/16] ipe: add auditing support
+Content-Language: en-US
+To:     Randy Dunlap <rdunlap@infradead.org>, corbet@lwn.net,
+        axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+        ebiggers@kernel.org, tytso@mit.edu, paul@paul-moore.com,
+        eparis@redhat.com, jmorris@namei.org, serge@hallyn.com
+Cc:     jannh@google.com, dm-devel@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-audit@redhat.com,
+        linux-security-module@vger.kernel.org
+References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1634151995-16266-8-git-send-email-deven.desai@linux.microsoft.com>
+ <9c1eec3b-8bb0-9e3e-d6e5-18c670ac2b03@infradead.org>
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+In-Reply-To: <9c1eec3b-8bb0-9e3e-d6e5-18c670ac2b03@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 28, 2021 at 10:57:18AM +1000, Finn Thain wrote:
-> On Mon, 27 Sep 2021, Luis Chamberlain wrote:
-> 
-> > diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-> > index 5dc9b3d32415..be0627345b21 100644
-> > --- a/drivers/block/ataflop.c
-> > +++ b/drivers/block/ataflop.c
-> > @@ -1989,24 +1989,34 @@ static int ataflop_alloc_disk(unsigned int drive, unsigned int type)
-> >  
-> >  static DEFINE_MUTEX(ataflop_probe_lock);
-> >  
-> > -static void ataflop_probe(dev_t dev)
-> > +static int ataflop_probe(dev_t dev)
-> >  {
-> >  	int drive = MINOR(dev) & 3;
-> >  	int type  = MINOR(dev) >> 2;
-> > +	int err = 0;
-> >  
-> >  	if (type)
-> >  		type--;
-> >  
-> > -	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS)
-> > -		return;
-> > +	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS) {
-> > +		err = -EINVAL;
-> > +		goto out;
-> > +	}
-> > +
-> >  	mutex_lock(&ataflop_probe_lock);
-> >  	if (!unit[drive].disk[type]) {
-> > -		if (ataflop_alloc_disk(drive, type) == 0) {
-> > -			add_disk(unit[drive].disk[type]);
-> > +		err = ataflop_alloc_disk(drive, type);
-> > +		if (err == 0) {
-> > +			err = add_disk(unit[drive].disk[type]);
-> > +			if (err)
-> > +				blk_cleanup_disk(unit[drive].disk[type]);
-> >  			unit[drive].registered[type] = true;
-> >  		}
-> >  	}
-> >  	mutex_unlock(&ataflop_probe_lock);
-> > +
-> > +out:
-> > +	return err;
-> >  }
-> >  
-> >  static void atari_cleanup_floppy_disk(struct atari_floppy_struct *fs)
-> 
-> I think the change to ataflop_probe() would be more clear without adding 
-> an 'out' label, like your change to floppy.c:
+On 10/13/2021 3:54 PM, Randy Dunlap wrote:
+> Hi,
+>
+> On 10/13/21 12:06 PM, deven.desai@linux.microsoft.com wrote:
+>> diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+>> index c4503083e92d..ef556b66e674 100644
+>> --- a/security/ipe/Kconfig
+>> +++ b/security/ipe/Kconfig
+>> @@ -17,3 +17,55 @@ menuconfig SECURITY_IPE
+>>         requirements on the fly.
+>>           If unsure, answer N.
+>> +
+>> +if SECURITY_IPE
+>> +
+>> +choice
+>> +    prompt "Hash algorithm used in auditing policies"
+>> +    default IPE_AUDIT_HASH_SHA1
+>> +    depends on AUDIT
+>> +    help
+>> +        Specify the hash algorithm used when auditing policies.
+>> +        The hash is used to uniquely identify a policy from other
+>> +        policies on the system.
+>> +
+>> +        If unsure, leave default.
+>> +
+>> +    config IPE_AUDIT_HASH_SHA1
+>> +        bool "sha1"
+>> +        depends on CRYPTO_SHA1
+>> +        help
+>> +            Use the SHA128 algorithm to hash policies
+>> +            in the audit records.
+>> +
+>> +    config IPE_AUDIT_HASH_SHA256
+>> +        bool "sha256"
+>> +        depends on CRYPTO_SHA256
+>> +        help
+>> +            Use the SHA256 algorithm to hash policies
+>> +            in the audit records.
+>> +
+>> +    config IPE_AUDIT_HASH_SHA384
+>> +        bool "sha384"
+>> +        depends on CRYPTO_SHA512
+>> +        help
+>> +            Use the SHA384 algorithm to hash policies
+>> +            in the audit records
+>> +
+>> +    config IPE_AUDIT_HASH_SHA512
+>> +        bool "sha512"
+>> +        depends on CRYPTO_SHA512
+>> +        help
+>> +            Use the SHA512 algorithm to hash policies
+>> +            in the audit records
+>> +endchoice
+>> +
+>> +config IPE_AUDIT_HASH_ALG
+>> +    string
+>> +    depends on AUDIT
+>> +    default "sha1" if IPE_AUDIT_HASH_SHA1
+>> +    default "sha256" if IPE_AUDIT_HASH_SHA256
+>> +    default "sha384" if IPE_AUDIT_HASH_SHA384
+>> +    default "sha512" if IPE_AUDIT_HASH_SHA512
+>> +
+>> +endif
+>
+> Please follow coding-style for Kconfig files:
+>
+> (from Documentation/process/coding-style.rst, section 10):
+>
+> For all of the Kconfig* configuration files throughout the source tree,
+> the indentation is somewhat different.  Lines under a ``config`` 
+> definition
+> are indented with one tab, while help text is indented an additional two
+> spaces.
+>
+Oof. That's embarrassing. Sorry, I'll fix this for v8.
 
-Good point! Fixed.
+While I'm at it, is the help text required for choice configs?
+checkpatch --strict complains with a warning without them, but
+I see other places in the tree where help text is omitted for
+these configs attached to a choice.
 
-> > diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> > index 0434f28742e7..95a1c8ef62f7 100644
-> > --- a/drivers/block/floppy.c
-> > +++ b/drivers/block/floppy.c
-> > @@ -4517,21 +4517,27 @@ static int floppy_alloc_disk(unsigned int drive, unsigned int type)
-> >  
-> >  static DEFINE_MUTEX(floppy_probe_lock);
-> >  
-> > -static void floppy_probe(dev_t dev)
-> > +static int floppy_probe(dev_t dev)
-> >  {
-> >  	unsigned int drive = (MINOR(dev) & 3) | ((MINOR(dev) & 0x80) >> 5);
-> >  	unsigned int type = (MINOR(dev) >> 2) & 0x1f;
-> > +	int err = 0;
-> >  
-> >  	if (drive >= N_DRIVE || !floppy_available(drive) ||
-> >  	    type >= ARRAY_SIZE(floppy_type))
-> > -		return;
-> > +		return -EINVAL;
-> >  
-> >  	mutex_lock(&floppy_probe_lock);
-> >  	if (!disks[drive][type]) {
-> > -		if (floppy_alloc_disk(drive, type) == 0)
-> > -			add_disk(disks[drive][type]);
-> > +		if (floppy_alloc_disk(drive, type) == 0) {
-> > +			err = add_disk(disks[drive][type]);
-> > +			if (err)
-> > +				blk_cleanup_disk(disks[drive][type]);
-> > +		}
-> >  	}
-> >  	mutex_unlock(&floppy_probe_lock);
-> > +
-> > +	return err;
-> >  }
-> >  
-> >  static int __init do_floppy_init(void)
-> 
-> In floppy_probe(), I think you should return the potential error result 
-> from floppy_alloc_disk(), like you did in ataflop.c.
+Documentation/process/* doesn't seem to have any guidance, nor
+Documentation/kbuild/* on whether it is safe to ignore that
+checkpatch warning.
 
-Indeed, thanks, fixed.
 
-  Luis
+
+
