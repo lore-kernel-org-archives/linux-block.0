@@ -2,89 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCA7C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 08:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB117C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 11:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA5BD611AF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 08:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB6D5611AF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 11:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239735AbhJPI6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 04:58:48 -0400
-Received: from condef-02.nifty.com ([202.248.20.67]:57735 "EHLO
-        condef-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236048AbhJPI6r (ORCPT
+        id S244325AbhJPLbO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 07:31:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36286 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244324AbhJPLbM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 04:58:47 -0400
-Received: from conssluserg-01.nifty.com ([10.126.8.80])by condef-02.nifty.com with ESMTP id 19G8qcqW004323
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 17:52:38 +0900
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id 19G8qQZ2028356;
-        Sat, 16 Oct 2021 17:52:26 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 19G8qQZ2028356
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1634374346;
-        bh=58deza8b/MvQFjM9wKDK2CKyqfQ4yZT6QveafG26adU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=LtsTCIkIPUcvhkWpZSXnWBK2NLtvCpcjp7txYAkxiBouMohyATyRN7NZGnFV1dvKH
-         Syx4rh7npZqmAPYn3MB90wMH8zX5x9eEL9P6XzI5iJpDmCOA6zAfPxwNFeX2KjJibM
-         qIyk4bOKgLvWJP/p60AW3ToLdHF3wZ/fg3Ap2njyDNCpOsweNRhf5cBhwirqzs+36w
-         RXkzHL9NFW9pLy++JEoH+Q3fWX/ow9NiWlWhS0Cv7QzZSEU+vj9cWQpa5dG1vLi8Ae
-         moY6GbxaGyXCZ6DvAQd2V0do8VbwFEjFATCsB0XwFIqMkII8J71pcdNqeyZu8i8HMI
-         upbAUgSPiXCQA==
-X-Nifty-SrcIP: [209.85.216.45]
-Received: by mail-pj1-f45.google.com with SMTP id gn3so3324226pjb.0;
-        Sat, 16 Oct 2021 01:52:26 -0700 (PDT)
-X-Gm-Message-State: AOAM53007sVlv3tI/bcsT9qvvabYjDqh57g7NhrTO6OlwV3L09Vn0nvp
-        cFAsgxjg40F/FMB5XFN+UlA3jBMmtBZER7nDQKk=
-X-Google-Smtp-Source: ABdhPJw4RLNm4WUwuq2e1NujEZKOeDC+dPL+XOGnGPYSPpaZZBPDeAIBJMrNXFk5oEufB/kSYzrvmJEC3IV60ei4oHk=
-X-Received: by 2002:a17:90b:1d06:: with SMTP id on6mr33910048pjb.119.1634374345728;
- Sat, 16 Oct 2021 01:52:25 -0700 (PDT)
+        Sat, 16 Oct 2021 07:31:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634383744;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FpnA9lYWxkJjvg75Ewu7vyuMBg8oJ+36xZYExlcfae0=;
+        b=X/LGTeiWIBLXsRHckAoQjixV/rpnIsy1JaX4ZFNzhvoHsSlMJBSRb0nVgGH0MMbZMatLtf
+        FpX9N6IEKRj0BEyUmCYXsDrGN4IPWkIJll+GMUDbdTzMz3UhU45ZgEVqCl987JFZ+r10FO
+        pTMW05bM3zxfVJf1WoKFDvw3JaXfOiE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-AX-aE8PPOTGtJ1ZuG3mfog-1; Sat, 16 Oct 2021 07:29:00 -0400
+X-MC-Unique: AX-aE8PPOTGtJ1ZuG3mfog-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91F0010A8E00;
+        Sat, 16 Oct 2021 11:28:57 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C8695DA61;
+        Sat, 16 Oct 2021 11:28:44 +0000 (UTC)
+Date:   Sat, 16 Oct 2021 19:28:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
+        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
+        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
+        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YWq3Z++uoJ/kcp+3@T590>
+References: <20210927163805.808907-1-mcgrof@kernel.org>
+ <20210927163805.808907-12-mcgrof@kernel.org>
+ <YWeOJP2UJWYF94fu@T590>
+ <YWeR4moCRh+ZHOmH@T590>
+ <YWiSAN6xfYcUDJCb@bombadil.infradead.org>
+ <YWjCpLUNPF3s4P2U@T590>
+ <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
+ <YWk9e957Hb+I7HvR@T590>
+ <YWm68xUnAofop3PZ@bombadil.infradead.org>
 MIME-Version: 1.0
-References: <20210927140000.866249-1-masahiroy@kernel.org>
-In-Reply-To: <20210927140000.866249-1-masahiroy@kernel.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 16 Oct 2021 17:51:48 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAT-QLMk1T=PmfWurr8g2HB5=SUZZnexR9ovaFFuzC90vQ@mail.gmail.com>
-Message-ID: <CAK7LNAT-QLMk1T=PmfWurr8g2HB5=SUZZnexR9ovaFFuzC90vQ@mail.gmail.com>
-Subject: Re: [RESEND PATCH 0/4] block: clean up Kconfig and Makefile
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YWm68xUnAofop3PZ@bombadil.infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Fri, Oct 15, 2021 at 10:31:31AM -0700, Luis Chamberlain wrote:
+> On Fri, Oct 15, 2021 at 04:36:11PM +0800, Ming Lei wrote:
+> > On Thu, Oct 14, 2021 at 05:22:40PM -0700, Luis Chamberlain wrote:
+> > > On Fri, Oct 15, 2021 at 07:52:04AM +0800, Ming Lei wrote:
+> > ...
+> > > > 
+> > > > We need to understand the exact reason why there is still cpuhp node
+> > > > left, can you share us the exact steps for reproducing the issue?
+> > > > Otherwise we may have to trace and narrow down the reason.
+> > > 
+> > > See my commit log for my own fix for this issue.
+> > 
+> > OK, thanks!
+> > 
+> > I can reproduce the issue, and the reason is that reset_store fails
+> > zram_remove() when unloading module, then the warning is caused.
+> > 
+> > The top 3 patches in the following tree can fix the issue:
+> > 
+> > https://github.com/ming1/linux/commits/my_v5.15-blk-dev
+> 
+> Thanks for trying an alternative fix! A crash stops yes, however this
 
-On Mon, Sep 27, 2021 at 11:00 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
->
-> This is a resend of
-> https://lore.kernel.org/linux-block/20210528184435.252924-1-masahiroy@kernel.org/#t
+I doubt it is alternative since your patchset doesn't mention the exact
+reason of 'Error: Removing state 63 which has instances left.', that is
+simply caused by failing to remove zram because ->claim is set during
+unloading module.
+
+Yeah, you mentioned the race between disksize_store() vs. zram_remove(),
+however I don't think it is reproduced easily in the test because the race
+window is pretty small, also it can be fixed easily in my 3rd path
+without any complicated tricks.
+
+Not dig into details of your patchset via grabbing module reference
+count during show/store attribute of kernfs which is done in your patch
+9, but IMO this way isn't necessary:
+
+1) any driver module has to cleanup anything which may refer to symbols
+or data defined in module_exit of this driver
+
+2) device_del() is often done in module_exit(), once device_del()
+returns, no any new show/store on the device's kobject attribute
+is possible.
+
+3) it is _not_ a must or pattern for fixing bugs to hold one lock before
+calling device_del(), meantime the lock is required in the device's
+attribute show()/store(), which causes AA deadlock easily. Your approach
+just avoids the issue by not releasing module until all show/store are
+done.
+
+Also the model of using module refcount is usually that if anyone will
+use the module, grab one extra ref, and once the use is done, release
+it. For example of block device, the driver's module refcnt is grabbed
+when the disk/part is opened, and released when the disk/part is closed.
 
 
-ping?
+> also ends up leaving the driver in an unrecoverable state after a few
+> tries. Ie, you CTRL-C the scripts and try again over and over again and
+> the driver ends up in a situation where it just says:
+> 
+> zram: Can't change algorithm for initialized device
 
->
->
-> Masahiro Yamada (4):
->   block: remove redundant =y from BLK_CGROUP dependency
->   block: simplify Kconfig files
->   block: move menu "Partition type" to block/partitions/Kconfig
->   block: move CONFIG_BLOCK guard to top Makefile
->
->  Makefile                 |  3 ++-
->  block/Kconfig            | 28 ++++++++++------------------
->  block/Kconfig.iosched    |  4 ----
->  block/Makefile           |  2 +-
->  block/partitions/Kconfig |  4 ++++
->  5 files changed, 17 insertions(+), 24 deletions(-)
->
-> --
-> 2.30.2
->
+It means the algorithm can't be changed for one initialized device
+at the exact time. That is understandable because two zram02.sh are
+running concurrently.
+
+Your test script just runs two ./zram02.sh tasks concurrently forever,
+so what is your expected result for the test? Of course, it can't be
+over.
+
+I can't reproduce the 'unrecoverable' state in my test, can you share the
+stack trace log after that happens?
+
+Is the zram02.sh still running or slept somewhere in the 'unrecoverable'
+state? If it is still running, it means the current sleep point isn't
+interruptable when running 'CTRL-C'. In my test, after several 'CTRL-C',
+both the two zram02.sh started from two terminals can be terminated. If
+it is slept somewhere forever, it can be one problem.
+
+> 
+> And the zram module can't be removed at that point.
+
+It is just that systemd opens the zram or the disk is opened as swap
+disk, and once systemd closes it or after you run swapoff, it can be
+unloaded.
 
 
--- 
-Best Regards
-Masahiro Yamada
+Thanks,
+Ming
+
