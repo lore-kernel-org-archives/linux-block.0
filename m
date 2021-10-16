@@ -2,133 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D41EC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 14:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F38C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 14:34:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 517FC611C1
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 14:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEA5060EE9
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 14:34:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240479AbhJPO2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 10:28:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35738 "EHLO
+        id S232069AbhJPOgF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 10:36:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235901AbhJPO2t (ORCPT
+        with ESMTP id S231551AbhJPOgB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 10:28:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E7FC061570
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 07:26:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ceT6eA8mdzSwHIbTO4TNF6qslH0cTv58+sKoeCffn4A=; b=XBQLVhdEUKSCos+ZzBAVBZEF/P
-        Q1UNJY891frWdACZR9u7CBKDWZGLwee1b5If7o7vySUCGH6dOdxpQzkdoZ81sb579VIqm4kdmqtWR
-        6JruCEoOmJPAllS9BehwD3IHFeAqeT4C+3TGZZkK2F+Nk95Mmsl2PDSUc3ireId8OyvJP3iHxBa3x
-        sgvr+W1nt/IbZwyNOEQiVqnFGGvdNa/Ytcm5CsVOPcEMjfp/A+muBw/3Yt0uow9RLzotBO4o3tVDQ
-        2pONKhB3xgS+hY8pltRMvMiwANQDgD0qg/TBVILR/gXaXBPTbaWoglT56eBKhuUSKYGEXhD3S0plm
-        FAbfdcbQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mbkde-009ipU-Df; Sat, 16 Oct 2021 14:26:24 +0000
-Date:   Sat, 16 Oct 2021 15:26:18 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH] block: Fix partition check for host-aware zoned block
- devices
-Message-ID: <YWrhCiWGjfxqAca2@casper.infradead.org>
-References: <20211015020740.506425-1-shinichiro.kawasaki@wdc.com>
- <20211016043450.GA27231@lst.de>
+        Sat, 16 Oct 2021 10:36:01 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D96C061570
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 07:33:53 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id f15so10240691ilu.7
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 07:33:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=cPeQaqbZzw/NPmxUlFqYS+Vp17ZYtK18oFoQqeTJA3U=;
+        b=tfMzBIfQAXCxphhl0qJdbSBH4c86jwhyDbGWR68ArnowAsSF5vMdq8rw+kvSbEHwDe
+         unVDozs/nlPhgXXZ4jESyZkZgiEnEvifRajZa+FRxPSOmZImRb5JXcwp9w4Fs54o78cx
+         g40DcZvnAUQWKEk9BFiKnhfXf16PDYM0Y/NoYGOEpemg9GT6/Q6x946miz7IaWlofrf4
+         OBaaDcmnPIbVG+z1ylkg9JcjwkiQY/AhpK9jVFWpnGvppSznCbjX7w0M2IsWvbfsjqFb
+         7RfJzExGREf97qCLRERlkSqy/z/WoTTZekfKxmIC+EXzamVqQgLQHV1a7XC3bK279sK+
+         jviA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cPeQaqbZzw/NPmxUlFqYS+Vp17ZYtK18oFoQqeTJA3U=;
+        b=LN+j5SDth9dzJvllobcYPKXuOA0do9v1MNvaPg0xZTyhlOnjegN9vPejopBRWRphnk
+         CpP9U6ochkJJsrFzrSsjha8kY5vAW+8egmD4zt/UgPS4vfw8jDByWoKZTnNkua2OFWXc
+         IPoABNK6CM4ZTLDKZ0mhBqSY/JYDxwHz3zrK49vzqeDc23c0IazplbtAZ4DZWuH2qt7e
+         dATYiqjIY08NMYBZhMY9CmBG3cFTDMKfNRr/e/oLdiJuT8SUhlvwVio3Bi4oG+qNcv/S
+         0GScR3mrOrgxxx3FbymhU4fw2FLMBA18b4Bk9dZkSnjuzHv6YrBaKuSiCJt8xhCkXaiq
+         v4Ow==
+X-Gm-Message-State: AOAM5327QVUb+BspgAtE9FpCLCSo0UgYLT0BLTiMScgt4oWCK4WLoAOa
+        pOhxyNGN6N6Z8+CImdmhHrTAHkLyucoc6A==
+X-Google-Smtp-Source: ABdhPJxPi+/UiA/8bcsGV6iafokAG6ebmKkQ82gjt1jwoDAautaKJ02KSWizCTcSWrOJThflvT/yCg==
+X-Received: by 2002:a05:6e02:b4f:: with SMTP id f15mr7551512ilu.183.1634394831848;
+        Sat, 16 Oct 2021 07:33:51 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id u15sm149408ilv.85.2021.10.16.07.33.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Oct 2021 07:33:51 -0700 (PDT)
+Subject: Re: [PATCH 8/9] io_uring: utilize the io_batch infrastructure for
+ more efficient polled IO
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org
+References: <20211013165416.985696-1-axboe@kernel.dk>
+ <20211013165416.985696-9-axboe@kernel.dk> <YWfkVtB+pMpaG2T3@infradead.org>
+ <7ed66f47-6f5a-39b2-7cd8-df7cf0952743@kernel.dk>
+ <YWhWBt7kljI+BGbX@infradead.org>
+ <c80263c8-f6d6-e3d9-058f-26d64c7e5acc@kernel.dk>
+ <YWpVRXYGuN8mA7nH@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <dc60f44f-cf20-b81b-5272-0d517868e07d@kernel.dk>
+Date:   Sat, 16 Oct 2021 08:33:45 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211016043450.GA27231@lst.de>
+In-Reply-To: <YWpVRXYGuN8mA7nH@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 16, 2021 at 06:34:50AM +0200, Christoph Hellwig wrote:
-> On Fri, Oct 15, 2021 at 11:07:40AM +0900, Shin'ichiro Kawasaki wrote:
-> > To fix the issues, call the helper function disk_has_partitions() in
-> > place of disk->part_tbl empty check. Since the function was removed with
-> > the commit a33df75c6328, reimplement it to walk through entries in the
-> > xarray disk->part_tbl.
+On 10/15/21 10:29 PM, Christoph Hellwig wrote:
+> On Thu, Oct 14, 2021 at 12:14:19PM -0600, Jens Axboe wrote:
+>>> Either way this should be commented as right now it looks pretty
+>>> arbitrary.
+>>
+>> I got rid of this and added a dev_id kind of cookie that gets matched
+>> on batched addition.
 > 
-> Looks good,
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> Matthew,
-> 
-> we talked about possiblig adding a xa_nr_entries helper a while ago.
-> This would be a good place for it, as we could just check
-> xa_nr_entries() > 1 for example.
+> Thinking about this a bit more.  I don't think we need to differenciate
+> devices, just complete handlers.  That is everything using the same
+> ->complete_batch handler could go onto the same list.  Which means
+> different nvme devices can be polled together.  So I think we can
+> just check the complete/complete_batch handler and be done with it.
+> The big benefit besides saving a field is that this is pretty much
+> self-explaining.
 
-Do I understand the problem correctly, that you don't actually want to
-know whether there's more than one entry in the array, but rather that
-there's an entry at an index other than 0?
+Good idea, cleaner than a dev_id cookie too. I'll be sending out the
+revised series soonish, but I incorporated that change.
 
-If so, that's an easy question to answer, we just don't have a helper
-for it yet.  Something like this should do:
+-- 
+Jens Axboe
 
-static inline bool xa_is_trivial(const struct xarray *xa)
-{
-	void *entry = READ_ONCE(xa->xa_head);
-
-	return entry || !xa_is_node(entry);
-}
-
-Probably needs a better name than that.
-
-> > 
-> > Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
-> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > Cc: stable@vger.kernel.org # v5.14+
-> > ---
-> >  block/blk-settings.c | 20 +++++++++++++++++++-
-> >  1 file changed, 19 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/blk-settings.c b/block/blk-settings.c
-> > index a7c857ad7d10..b880c70e22e4 100644
-> > --- a/block/blk-settings.c
-> > +++ b/block/blk-settings.c
-> > @@ -842,6 +842,24 @@ bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
-> >  }
-> >  EXPORT_SYMBOL_GPL(blk_queue_can_use_dma_map_merging);
-> >  
-> > +static bool disk_has_partitions(struct gendisk *disk)
-> > +{
-> > +	unsigned long idx;
-> > +	struct block_device *part;
-> > +	bool ret = false;
-> > +
-> > +	rcu_read_lock();
-> > +	xa_for_each(&disk->part_tbl, idx, part) {
-> > +		if (bdev_is_partition(part)) {
-> > +			ret = true;
-> > +			break;
-> > +		}
-> > +	}
-> > +	rcu_read_unlock();
-> > +
-> > +	return ret;
-> > +}
-> > +
-> >  /**
-> >   * blk_queue_set_zoned - configure a disk queue zoned model.
-> >   * @disk:	the gendisk of the queue to configure
-> > @@ -876,7 +894,7 @@ void blk_queue_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
-> >  		 * we do nothing special as far as the block layer is concerned.
-> >  		 */
-> >  		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) ||
-> > -		    !xa_empty(&disk->part_tbl))
-> > +		    disk_has_partitions(disk))
-> >  			model = BLK_ZONED_NONE;
-> >  		break;
-> >  	case BLK_ZONED_NONE:
-> > -- 
-> > 2.31.1
-> ---end quoted text---
