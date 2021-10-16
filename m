@@ -2,51 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEFEC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 04:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC38C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 04:34:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EE21610E5
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 04:31:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3411E61211
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 04:34:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239554AbhJPEeE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 00:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239469AbhJPEeD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 00:34:03 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC24EC061570
-        for <linux-block@vger.kernel.org>; Fri, 15 Oct 2021 21:31:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8KS4ckXY03on/Co3i3qF2x1mCvY05mjRSKv8kENw0iY=; b=kOzaK6yFcSL9dg4G3hhQW3DZ0h
-        behA9kCi2mKOA8C+rYWc8881U4LJ/OCh7fGacwrA6mSXa9r0CYfG35pS/Zmb+nTwNjy4G2JZwu5ZT
-        Ki3n7GlJ6OO40C1vqNVq0P4N4w4NDm3dkvHQimFXTon0AAYyDJo7IRQJkJP52qOOWbkd72/Ti4SDZ
-        tg/ylXm95wcOxNcRdVYMsze+ZDqyJbDINqWZX4uqU9cu/eY8t9PZKZ4e6XionjArSO7ArLCSiZo7o
-        MfTMEiFhx2AY+/FDh6OTDJZdhj5LqKdZDPpHP+AJhn2p/T0QlMinU9uc/2U78/Gu2aw90+nXeE88l
-        aP5sHZyg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mbbMR-009jGD-CQ; Sat, 16 Oct 2021 04:31:55 +0000
-Date:   Fri, 15 Oct 2021 21:31:55 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v3] block: only check previous entry for plug merge
- attempt
-Message-ID: <YWpVuzjbuwUQlVa0@infradead.org>
-References: <9222613d-d4d3-7cfb-2e96-1bfa3b5f2d7f@kernel.dk>
+        id S239550AbhJPEhA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 00:37:00 -0400
+Received: from verein.lst.de ([213.95.11.211]:56709 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239469AbhJPEhA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Oct 2021 00:37:00 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B422868BEB; Sat, 16 Oct 2021 06:34:50 +0200 (CEST)
+Date:   Sat, 16 Oct 2021 06:34:50 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH] block: Fix partition check for host-aware zoned block
+ devices
+Message-ID: <20211016043450.GA27231@lst.de>
+References: <20211015020740.506425-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9222613d-d4d3-7cfb-2e96-1bfa3b5f2d7f@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20211015020740.506425-1-shinichiro.kawasaki@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good module the needed comment update:
+On Fri, Oct 15, 2021 at 11:07:40AM +0900, Shin'ichiro Kawasaki wrote:
+> To fix the issues, call the helper function disk_has_partitions() in
+> place of disk->part_tbl empty check. Since the function was removed with
+> the commit a33df75c6328, reimplement it to walk through entries in the
+> xarray disk->part_tbl.
+
+Looks good,
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Matthew,
+
+we talked about possiblig adding a xa_nr_entries helper a while ago.
+This would be a good place for it, as we could just check
+xa_nr_entries() > 1 for example.
+
+> 
+> Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Cc: stable@vger.kernel.org # v5.14+
+> ---
+>  block/blk-settings.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index a7c857ad7d10..b880c70e22e4 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -842,6 +842,24 @@ bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
+>  }
+>  EXPORT_SYMBOL_GPL(blk_queue_can_use_dma_map_merging);
+>  
+> +static bool disk_has_partitions(struct gendisk *disk)
+> +{
+> +	unsigned long idx;
+> +	struct block_device *part;
+> +	bool ret = false;
+> +
+> +	rcu_read_lock();
+> +	xa_for_each(&disk->part_tbl, idx, part) {
+> +		if (bdev_is_partition(part)) {
+> +			ret = true;
+> +			break;
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	return ret;
+> +}
+> +
+>  /**
+>   * blk_queue_set_zoned - configure a disk queue zoned model.
+>   * @disk:	the gendisk of the queue to configure
+> @@ -876,7 +894,7 @@ void blk_queue_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
+>  		 * we do nothing special as far as the block layer is concerned.
+>  		 */
+>  		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) ||
+> -		    !xa_empty(&disk->part_tbl))
+> +		    disk_has_partitions(disk))
+>  			model = BLK_ZONED_NONE;
+>  		break;
+>  	case BLK_ZONED_NONE:
+> -- 
+> 2.31.1
+---end quoted text---
