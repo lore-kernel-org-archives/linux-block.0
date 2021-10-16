@@ -2,91 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC01C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 13:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D41EC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 14:26:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6098061164
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 13:25:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 517FC611C1
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 14:26:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240360AbhJPN17 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 09:27:59 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:54009 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240323AbhJPN16 (ORCPT
+        id S240479AbhJPO2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 10:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235901AbhJPO2t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 09:27:58 -0400
-Received: from fsav414.sakura.ne.jp (fsav414.sakura.ne.jp [133.242.250.113])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 19GDPela063723;
-        Sat, 16 Oct 2021 22:25:40 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav414.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp);
- Sat, 16 Oct 2021 22:25:40 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 19GDPdvA063720
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 16 Oct 2021 22:25:39 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-To:     linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: [PATCH] ataflop: unlock ataflop_probe_lock at atari_floppy_init()
-Message-ID: <1d9351dc-baeb-1a54-625c-04ce01b009b0@i-love.sakura.ne.jp>
-Date:   Sat, 16 Oct 2021 22:25:35 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Sat, 16 Oct 2021 10:28:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E7FC061570
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 07:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ceT6eA8mdzSwHIbTO4TNF6qslH0cTv58+sKoeCffn4A=; b=XBQLVhdEUKSCos+ZzBAVBZEF/P
+        Q1UNJY891frWdACZR9u7CBKDWZGLwee1b5If7o7vySUCGH6dOdxpQzkdoZ81sb579VIqm4kdmqtWR
+        6JruCEoOmJPAllS9BehwD3IHFeAqeT4C+3TGZZkK2F+Nk95Mmsl2PDSUc3ireId8OyvJP3iHxBa3x
+        sgvr+W1nt/IbZwyNOEQiVqnFGGvdNa/Ytcm5CsVOPcEMjfp/A+muBw/3Yt0uow9RLzotBO4o3tVDQ
+        2pONKhB3xgS+hY8pltRMvMiwANQDgD0qg/TBVILR/gXaXBPTbaWoglT56eBKhuUSKYGEXhD3S0plm
+        FAbfdcbQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mbkde-009ipU-Df; Sat, 16 Oct 2021 14:26:24 +0000
+Date:   Sat, 16 Oct 2021 15:26:18 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH] block: Fix partition check for host-aware zoned block
+ devices
+Message-ID: <YWrhCiWGjfxqAca2@casper.infradead.org>
+References: <20211015020740.506425-1-shinichiro.kawasaki@wdc.com>
+ <20211016043450.GA27231@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211016043450.GA27231@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit bf9c0538e485b591 ("ataflop: use a separate gendisk for each media
-format") introduced ataflop_probe_lock mutex, but forgot to unlock the
-mutex when atari_floppy_init() (i.e. module loading) succeeded. If
-ataflop_probe() is called, it will deadlock on ataflop_probe_lock mutex.
+On Sat, Oct 16, 2021 at 06:34:50AM +0200, Christoph Hellwig wrote:
+> On Fri, Oct 15, 2021 at 11:07:40AM +0900, Shin'ichiro Kawasaki wrote:
+> > To fix the issues, call the helper function disk_has_partitions() in
+> > place of disk->part_tbl empty check. Since the function was removed with
+> > the commit a33df75c6328, reimplement it to walk through entries in the
+> > xarray disk->part_tbl.
+> 
+> Looks good,
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> Matthew,
+> 
+> we talked about possiblig adding a xa_nr_entries helper a while ago.
+> This would be a good place for it, as we could just check
+> xa_nr_entries() > 1 for example.
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Fixes: bf9c0538e485b591 ("ataflop: use a separate gendisk for each media format")
----
-To m68k users
+Do I understand the problem correctly, that you don't actually want to
+know whether there's more than one entry in the array, but rather that
+there's an entry at an index other than 0?
 
-  This patch suggests that nobody is testing this module using a real hardware.
-  Can somebody test this module?
-  Is current m68k hardware still supporting Atari floppy?
-  If Atari floppy is no longer supported, do we still need this module?
+If so, that's an easy question to answer, we just don't have a helper
+for it yet.  Something like this should do:
 
-To Christoph Hellwig and Luis Chamberlain
+static inline bool xa_is_trivial(const struct xarray *xa)
+{
+	void *entry = READ_ONCE(xa->xa_head);
 
-  If we move __register_blkdev() in atari_floppy_init() to the end of
-  atari_floppy_init() and move unregister_blkdev() in atari_floppy_exit() to
-  the beginning of atari_floppy_exit(), we can remove unregister_blkdev() from
-  atari_floppy_init(), and I think we can also remove ataflop_probe_lock mutex
-  because probe function and __exit function are serialized by major_names_lock
-  mutex.
+	return entry || !xa_is_node(entry);
+}
 
- drivers/block/ataflop.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Probably needs a better name than that.
 
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index a093644ac39f..39b42cb8d173 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -2072,7 +2072,8 @@ static int __init atari_floppy_init (void)
- 	       UseTrackbuffer ? "" : "no ");
- 	config_types();
- 
--	return 0;
-+	ret = 0;
-+	goto out_unlock;
- 
- err:
- 	while (--i >= 0) {
--- 
-2.18.4
-
+> > 
+> > Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
+> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> > Cc: stable@vger.kernel.org # v5.14+
+> > ---
+> >  block/blk-settings.c | 20 +++++++++++++++++++-
+> >  1 file changed, 19 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/blk-settings.c b/block/blk-settings.c
+> > index a7c857ad7d10..b880c70e22e4 100644
+> > --- a/block/blk-settings.c
+> > +++ b/block/blk-settings.c
+> > @@ -842,6 +842,24 @@ bool blk_queue_can_use_dma_map_merging(struct request_queue *q,
+> >  }
+> >  EXPORT_SYMBOL_GPL(blk_queue_can_use_dma_map_merging);
+> >  
+> > +static bool disk_has_partitions(struct gendisk *disk)
+> > +{
+> > +	unsigned long idx;
+> > +	struct block_device *part;
+> > +	bool ret = false;
+> > +
+> > +	rcu_read_lock();
+> > +	xa_for_each(&disk->part_tbl, idx, part) {
+> > +		if (bdev_is_partition(part)) {
+> > +			ret = true;
+> > +			break;
+> > +		}
+> > +	}
+> > +	rcu_read_unlock();
+> > +
+> > +	return ret;
+> > +}
+> > +
+> >  /**
+> >   * blk_queue_set_zoned - configure a disk queue zoned model.
+> >   * @disk:	the gendisk of the queue to configure
+> > @@ -876,7 +894,7 @@ void blk_queue_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
+> >  		 * we do nothing special as far as the block layer is concerned.
+> >  		 */
+> >  		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) ||
+> > -		    !xa_empty(&disk->part_tbl))
+> > +		    disk_has_partitions(disk))
+> >  			model = BLK_ZONED_NONE;
+> >  		break;
+> >  	case BLK_ZONED_NONE:
+> > -- 
+> > 2.31.1
+> ---end quoted text---
