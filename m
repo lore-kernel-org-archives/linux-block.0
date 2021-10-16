@@ -2,63 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5DAC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 17:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92904C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 21:21:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 301B061181
-	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 17:28:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7758861164
+	for <linux-block@archiver.kernel.org>; Sat, 16 Oct 2021 21:21:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244423AbhJPRa3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 13:30:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50786 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244418AbhJPRa2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 13:30:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 3605C61139;
-        Sat, 16 Oct 2021 17:28:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1634405300;
-        bh=DLfxSRQyg7pHQahVBJif+khJF++RmYVYTpPUPAVnrnU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=LQ8+BT9hqTnYpvNyTcK9c+vcSI3cJBleo656RPiCtaR/28sYgZI+Vw42yVI0PT2Wv
-         bgCneRDm6rvyg3mZYXMUA9CHxowOrtO06JDLC7BLidF+mXjjeRdplAoObBrVr2XBQF
-         aGbE9Ww5wcGZ5+yk3gLdfnXPoRmuVYvzJK5aGjKEeiERuCPAzsgMkh1bMDDXBhBCxr
-         jaNVP+mPiOaeu7DaMNehaXpnolRrOilCbuEtbTUYzgOMZstBLJ8DTUBLIN/yI9a/TM
-         DZC06QBP/1dyQw3pmeJRT3UuJ8ga/0JOY+jqeNpgWPKXMASyKPTKoLZEUJUKBRFXwf
-         BiYFPa6tpbqvw==
-Subject: Re: [git pull] device mapper fixes for 5.15-rc6
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <YWnprivVeSQHkRxN@redhat.com>
-References: <YWnprivVeSQHkRxN@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <YWnprivVeSQHkRxN@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.15/dm-fixes
-X-PR-Tracked-Commit-Id: d208b89401e073de986dc891037c5a668f5d5d95
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: dcd619847ca7b1f3123ba35976225ee77b83f959
-Message-Id: <163440530018.22586.16517091888216383062.pr-tracker-bot@kernel.org>
-Date:   Sat, 16 Oct 2021 17:28:20 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Akilesh Kailash <akailash@google.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jiazi Li <jqqlijiazi@gmail.com>, Ming Lei <ming.lei@redhat.com>
+        id S241041AbhJPVXv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 17:23:51 -0400
+Received: from mail-pf1-f174.google.com ([209.85.210.174]:40556 "EHLO
+        mail-pf1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241000AbhJPVXt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Oct 2021 17:23:49 -0400
+Received: by mail-pf1-f174.google.com with SMTP id o133so11472902pfg.7;
+        Sat, 16 Oct 2021 14:21:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=pP45eXzz1JfHD3xUyRKD/lLddvhCQLEQjybOQXsKJZk=;
+        b=spV28wBqRYQCuNjuzFlqG/D716dSPcWcub8LjEOjEdZb2ZQ84uvwO5D+J/55cP+N4G
+         cfWN93Q3BjJggPUfGaWTICC94pN6fb7E6MXDXAOqYXjixLhf6RUdNWv7wPZagrTQnwdJ
+         PJPsXxYRZsUzxUL1lgxbYmvdWjmfogKz5Zrfu2Ho5aaIHT2Hyv51kH0ndoYOF15bvMHJ
+         eIiSCEM8fUSKIU5WEGqldOU/Fj/g30hvsld9AXjBRW7wOMUU6TIhVp4wv1Wc6o8rz4fe
+         9spAvxyGYJuYBuFF85B4Ba997lbyRtBvimgdo1wGfDrNpVnjxyRmBxWOrwNE3sZJdIPV
+         b/fg==
+X-Gm-Message-State: AOAM533a/vheEriQYK4PVn09ns00kDO4XR4scM6/JPVst5eA98kHxERk
+        tPD3NouOQzRDSppHgFmbEv0=
+X-Google-Smtp-Source: ABdhPJzPTxj6WaG/HsuZwJMHGnDS0JgiG83KKopx8Ui7F+UjhcNXoTQQG+G0LUYmgeY01QR00i7skg==
+X-Received: by 2002:a63:3481:: with SMTP id b123mr15521900pga.230.1634419300624;
+        Sat, 16 Oct 2021 14:21:40 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:f0a3:eba0:b940:fc7c? ([2601:647:4000:d7:f0a3:eba0:b940:fc7c])
+        by smtp.gmail.com with ESMTPSA id k3sm14836806pjg.43.2021.10.16.14.21.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Oct 2021 14:21:39 -0700 (PDT)
+Message-ID: <a6354cfb-753a-8376-b96c-f35fda9b9b8a@acm.org>
+Date:   Sat, 16 Oct 2021 14:21:37 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH 3/3] scsi, usb: storage: Complete the blk-request
+ directly.
+Content-Language: en-US
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20211015151412.3229037-1-bigeasy@linutronix.de>
+ <20211015151412.3229037-4-bigeasy@linutronix.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20211015151412.3229037-4-bigeasy@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 15 Oct 2021 16:50:54 -0400:
+On 10/15/21 08:14, Sebastian Andrzej Siewior wrote:
+> +static inline void scsi_done(struct scsi_cmnd *scmd)
+> +{
+> +	scmd->scsi_done(scmd);
+> +}
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.15/dm-fixes
+How about leaving out this function definition and open-coding it into 
+its callers?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/dcd619847ca7b1f3123ba35976225ee77b83f959
+Additionally, please rebase this patch series on top of "[PATCH v3 
+00/88] Call scsi_done() directly" 
+(https://lore.kernel.org/linux-scsi/20211007202923.2174984-1-bvanassche@acm.org/ 
+or https://github.com/bvanassche/linux/tree/scsi-remove-done-callback). 
+Otherwise Linus will have to resolve a very complicated merge conflict.
 
-Thank you!
+Thank you,
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Bart.
