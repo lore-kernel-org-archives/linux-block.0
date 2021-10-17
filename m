@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC8EC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 13:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92866C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 13:09:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 371F660F93
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 13:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72E3E61054
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 13:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236494AbhJQNFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Oct 2021 09:05:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47796 "EHLO
+        id S242277AbhJQNLQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Oct 2021 09:11:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236421AbhJQNFV (ORCPT
+        with ESMTP id S242195AbhJQNLQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Oct 2021 09:05:21 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBB6C061765
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 06:03:11 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id y67so13104451iof.10
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 06:03:11 -0700 (PDT)
+        Sun, 17 Oct 2021 09:11:16 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00AC0C061768
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 06:09:07 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id n7so13235177iod.0
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 06:09:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=cpHZ7r0xJhtTVNnwnC2/v/oL0NL2Mq8QcDvO2xernog=;
-        b=CmNJkyumqn2veFHFq4gljV+Uvx4uvgW0UcP7OCqp1IeC8MXGY+7pE/ld5GE4VhnY6e
-         kNOKTY+rOpzpSqaa73j0pmtb2hBD5MXsEZH0C1eBtwBXHc4hFNd9keW30ePIV/BCEZrk
-         qEPl1k3RJNgPCA2aK4WE1H2la4/MeIrPRJlNZjTCGEMlZ/I1MenhZZXpkwBDMeslScFG
-         aGSCq5exWY0M9b7RPsQO7mqP9RXbIhVkVp2cfMiUTeaTIHFimvXfIb0pmxR5OASyuy7i
-         m/B6WzIIQgbD2v6y6Kq6IORz8RPzERNOxiNu+vKQKrPyfEmVsR5CQ/N5JrXmp8KHasDX
-         FH9Q==
+        bh=JjTUcswak3wNQ07o/cAA8ASagn3sBBiKAFFVV9MPLGY=;
+        b=MwYh/MTjBldn0NaUlbNgR+bcry9YjTzvURoZXaW+a9oo5sUUdgdqfyydnOpDdMzrKw
+         U4P+chtvI/2JY1Wwxx2QVMBsxeyBFfzLmGcHGkqPn9CtbKjybaCVuQ5K9b7S+if0OMFk
+         825/rIcJ3cU1iPDEnm+hWd1EZNHiXx5bkc3XwvenQ2dRefWE1Z+lggkHbJ/SFKma/K1W
+         p4lPuKauOH7qYxskb7Qr4dCXf83U6YacRrhVi3s+WlZLNCfUf58w3YGmqo4Ey8GCyuKb
+         QoZSprQWh/1V3VYF8WLfmWk43vD1H+XELwcA88a+JZxdjBmXAt5jgAHL3kXgHfnmq0dd
+         VdQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cpHZ7r0xJhtTVNnwnC2/v/oL0NL2Mq8QcDvO2xernog=;
-        b=lotTALM2LmCPxVCAFkbraGg0meqViskfXzN/eF34sRHw7A9bL0phlMp0jyD1gYG7/9
-         QEj2yKnGph3NLIchM/t3jexOhwKcF0spYD/gIFjYOY6LFM432nZ3nHq69KQVoE8UAAzq
-         DQeeDgjgupqag64E64AqevOXNIFQoz438JNnua4kZtWRVwQThgQLDJ8zpTvL3EhpELVo
-         ExMCyIwNnzf3jMYmAvCpjw0DjnWhDE7cy4J8dDApn8s6PG+ndqp5jz86wNvDqhEGEECl
-         5VkIe8N0gvs5jA8BdJ6vdp76QSJzwCpt1/i7LQUdP6g80lgEvX6k3/MZCb3ITo9xopNl
-         1iRQ==
-X-Gm-Message-State: AOAM533sZcKsHrLrbF2U6KH5Oo8QZ0sOWwRceCxkk8YihPFW3mXfVDVk
-        9mUdLjRHQEB2Jt+3BvjB+goi4A==
-X-Google-Smtp-Source: ABdhPJx4iSggqclLbZlTWfHwCsa83vp6P8YD2Msi27jk+2CYfGoHuU7w0epdKWXm5Z6GR/3tPsZYeQ==
-X-Received: by 2002:a6b:f816:: with SMTP id o22mr11299221ioh.106.1634475791291;
-        Sun, 17 Oct 2021 06:03:11 -0700 (PDT)
+        bh=JjTUcswak3wNQ07o/cAA8ASagn3sBBiKAFFVV9MPLGY=;
+        b=UH9IEuOmCyY7TmkuInKmRGxQPa2PRQ3upP79pPeVDHhCZTZtQsFZ+I5OalZe/ABHTq
+         PllZDnGBWYyVk0KY6FY2qZ/L6xi2FNJXHpXGPesLzXJR7lDxGtRcX9aUbqrSum1UQ0Ew
+         N63FoYsIaO1AhNpCKX8QO8zMY/Au0KPEGalpUzkx0dSSTc2WScVRIeDwiR6nTjOLDnzE
+         EtBDFCWfcv0kHMrtFtiS/f76IBQUI7zainNNDwjVkcG5mFrODfvgpaxmhZsWDcVeOce4
+         BK/rZ81GpAOlgE/+BHWHxW6Le9Xzi4qbZdm4toYyaNhpnTi+HiwbL7PwSDUBvrtERgj3
+         WizA==
+X-Gm-Message-State: AOAM5329V9hfznO9+oyWJjYLJ6AXw4YUMDD8btyexExNDRd7QM0Xrfcn
+        88DmzrnrKdHEfoc2Bqw60XxhiQ==
+X-Google-Smtp-Source: ABdhPJzN6fYK76DGdE6l3EFetuuFFi39nbjL8hMx6HKtI6Yzsc1ASDS9Y6dYEhdQI2ysQiVvoCKnAQ==
+X-Received: by 2002:a5d:9d56:: with SMTP id k22mr10556215iok.177.1634476146412;
+        Sun, 17 Oct 2021 06:09:06 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id r11sm5585992ilt.83.2021.10.17.06.03.10
+        by smtp.gmail.com with ESMTPSA id k4sm5410856ilv.9.2021.10.17.06.09.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Oct 2021 06:03:10 -0700 (PDT)
+        Sun, 17 Oct 2021 06:09:06 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
 Subject: Re: [PATCH BUGFIX 0/1] block, bfq: fix bug 214503
-Date:   Sun, 17 Oct 2021 07:03:08 -0600
-Message-Id: <163447578602.89992.1872535198744308847.b4-ty@kernel.dk>
+Date:   Sun, 17 Oct 2021 07:09:03 -0600
+Message-Id: <163447613966.93968.4244205080477398010.b4-ty@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211015144336.45894-1-paolo.valente@linaro.org>
 References: <20211015144336.45894-1-paolo.valente@linaro.org>
@@ -81,7 +81,7 @@ On Fri, 15 Oct 2021 16:43:35 +0200, Paolo Valente wrote:
 Applied, thanks!
 
 [1/1] block, bfq: reset last_bfqq_created on group change
-      commit: d29bd41428cfff9b582c248db14a47e2be8457a8
+      (no commit info)
 
 Best regards,
 -- 
