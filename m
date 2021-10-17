@@ -2,43 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA1B3C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 16:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F80C433FE
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 16:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 983AA61151
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 16:18:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63E9561151
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 16:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242510AbhJQQU1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Oct 2021 12:20:27 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:64174 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242328AbhJQQU0 (ORCPT
+        id S242627AbhJQQWC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Oct 2021 12:22:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34874 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242615AbhJQQWA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Oct 2021 12:20:26 -0400
-Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 19HGI9bE070901;
-        Mon, 18 Oct 2021 01:18:09 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
- Mon, 18 Oct 2021 01:18:09 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 19HGI98x070898
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Mon, 18 Oct 2021 01:18:09 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-To:     Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-block@vger.kernel.org
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: [PATCH] brd: remove brd_devices_mutex mutex
-Message-ID: <554f57b8-8c18-0293-f76c-0626a5e0184f@i-love.sakura.ne.jp>
-Date:   Mon, 18 Oct 2021 01:18:04 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Sun, 17 Oct 2021 12:22:00 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8EFC061768
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 09:19:51 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id z69so10359173iof.9
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 09:19:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=m98bfzlixYwHRJy9xQyd49Ys4ry64BoGTkvwZJ8uo5I=;
+        b=0nNRmTW+z+9JitGKpcYp3dhOZCx6z5zbaWYP52J929hUxBs1gV7rZTxwwS7OoDy9B6
+         8PDZnjK0YzJs/JHwLAcwg1cJOPZITq7KHVncUUanGkW1DdxKuANZgNoOg9nwWt8NNQLW
+         9AGD0+r9oLc7vuvihVoHvDnvT3vM5h1/gNDf1kdwhXTHyUV2opNmGL+suPOWvbXFoTNp
+         KhRDy1OOmlkieTmcOihYiqYBvYzT5r8ka0yYXNPW3SqytlkybFt6TmfXjcp1/13XTr4e
+         jDsax7syILnu3nyl5Z18n5Vy305ePnPyHbuvEjMhtripeP+mb1xkOyRU3Zs/xSPJ2uY9
+         fzww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=m98bfzlixYwHRJy9xQyd49Ys4ry64BoGTkvwZJ8uo5I=;
+        b=S4iDydy2RULGZuzXZvzeCxrOqBH/DmMWZTehY2NSwYHozUbtjlGgyVOBKJNBn7TDfn
+         dS0ASNvuXAin2S2Xpd3kcPjx4VI+S7EQ+KI/sgiE3rvt45zHo/7lcLPS/kjQfPPqhl/4
+         WGNCP4tRf3XIVKg7JVqIgTjQTzNRnOXp5z9mgeUzZBXODO+Lsz89V4FatU4R742Grt0u
+         JL/5JJ+JGo/rKkhBM4MpPfCS1EfUYks85X2kmOTPNCySsEXdlbyXxgM34avSN4GdWuvp
+         7f+MD4BkkYNRcKxDQFwQQHp97vjd0vpl7vT5T9eHjucGgKRsBZe/JE62KPzEV9MJ8iKG
+         eJhA==
+X-Gm-Message-State: AOAM532bzwx2fh8XVaxoKxgH+ITEvNits3Wp3Y9A5bH5n1a+5elzFAhD
+        FJk51Rt73TjA8vXj/fBFBHWx8yWg30OKUw==
+X-Google-Smtp-Source: ABdhPJwtznf6e9ywGwmoXxpYcHdnOQoaceVwkkcFOrzZJibIx5sp1fBqNKH1DbnHAQ6DSKwUA0X5eQ==
+X-Received: by 2002:a05:6602:2599:: with SMTP id p25mr11374972ioo.90.1634487590516;
+        Sun, 17 Oct 2021 09:19:50 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id 26sm5416212ioz.55.2021.10.17.09.19.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Oct 2021 09:19:50 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/3] blk-mq: Add blk_mq_complete_request_direct()
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20211015151412.3229037-1-bigeasy@linutronix.de>
+ <20211015151412.3229037-2-bigeasy@linutronix.de>
+ <YWmmULYUeo/Zd6Jl@infradead.org>
+ <20211015161533.5cnhqqd3asy3e3vg@linutronix.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <951f4cde-fcc8-f5fe-845a-ccdc3f360428@kernel.dk>
+Date:   Sun, 17 Oct 2021 10:19:48 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20211015161533.5cnhqqd3asy3e3vg@linutronix.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -46,162 +82,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If brd_alloc() from brd_probe() is called before brd_alloc() from
-brd_init() is called, module loading will fail with -EEXIST error.
-To close this race, call __register_blkdev() just before leaving
-brd_init().
+On 10/15/21 10:15 AM, Sebastian Andrzej Siewior wrote:
+> On 2021-10-15 09:03:28 [-0700], Christoph Hellwig wrote:
+>> On Fri, Oct 15, 2021 at 05:14:10PM +0200, Sebastian Andrzej Siewior wrote:
+>>> +void blk_mq_complete_request_direct(struct request *rq)
+>>> +{
+>>> +	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+>>> +	rq->q->mq_ops->complete(rq);
+>>> +}
+>>
+>> As this is called by the driver we known what ->complete this helper
+>> would call.  So instead of doing this we could just call
+>> blk_mq_set_request_complete and the actual completion helper.
+>> The comment above it will need some updates of course.
+> 
+> So
+> 	blk_mq_set_request_complete();
+> 	mmc_blk_mq_complete();
+> 
+> for the mmc driver and no fiddling in the blk-mq then.
 
-Then, we can remove brd_devices_mutex mutex, for brd_device list
-will no longer be accessed concurrently.
+Just pass in the handler:
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- drivers/block/brd.c | 73 +++++++++++++++++++--------------------------
- 1 file changed, 30 insertions(+), 43 deletions(-)
+void blk_mq_complete_request_direct(struct request *rq,
+				    void (*complete)(struct request *rq))
+{
+	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+	complete(rq);
+}
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index aa0472718dce..028c2c593fc8 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -362,7 +362,6 @@ __setup("ramdisk_size=", ramdisk_size);
-  * (should share code eventually).
-  */
- static LIST_HEAD(brd_devices);
--static DEFINE_MUTEX(brd_devices_mutex);
- static struct dentry *brd_debugfs_dir;
- 
- static int brd_alloc(int i)
-@@ -371,21 +370,14 @@ static int brd_alloc(int i)
- 	struct gendisk *disk;
- 	char buf[DISK_NAME_LEN];
- 
--	mutex_lock(&brd_devices_mutex);
--	list_for_each_entry(brd, &brd_devices, brd_list) {
--		if (brd->brd_number == i) {
--			mutex_unlock(&brd_devices_mutex);
-+	list_for_each_entry(brd, &brd_devices, brd_list)
-+		if (brd->brd_number == i)
- 			return -EEXIST;
--		}
--	}
- 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
--	if (!brd) {
--		mutex_unlock(&brd_devices_mutex);
-+	if (!brd)
- 		return -ENOMEM;
--	}
- 	brd->brd_number		= i;
- 	list_add_tail(&brd->brd_list, &brd_devices);
--	mutex_unlock(&brd_devices_mutex);
- 
- 	spin_lock_init(&brd->brd_lock);
- 	INIT_RADIX_TREE(&brd->brd_pages, GFP_ATOMIC);
-@@ -425,9 +417,7 @@ static int brd_alloc(int i)
- 	return 0;
- 
- out_free_dev:
--	mutex_lock(&brd_devices_mutex);
- 	list_del(&brd->brd_list);
--	mutex_unlock(&brd_devices_mutex);
- 	kfree(brd);
- 	return -ENOMEM;
- }
-@@ -437,15 +427,19 @@ static void brd_probe(dev_t dev)
- 	brd_alloc(MINOR(dev) / max_part);
- }
- 
--static void brd_del_one(struct brd_device *brd)
-+static void brd_cleanup(void)
- {
--	del_gendisk(brd->brd_disk);
--	blk_cleanup_disk(brd->brd_disk);
--	brd_free_pages(brd);
--	mutex_lock(&brd_devices_mutex);
--	list_del(&brd->brd_list);
--	mutex_unlock(&brd_devices_mutex);
--	kfree(brd);
-+	struct brd_device *brd, *next;
-+
-+	debugfs_remove_recursive(brd_debugfs_dir);
-+
-+	list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
-+		del_gendisk(brd->brd_disk);
-+		blk_cleanup_disk(brd->brd_disk);
-+		brd_free_pages(brd);
-+		list_del(&brd->brd_list);
-+		kfree(brd);
-+	}
- }
- 
- static inline void brd_check_and_reset_par(void)
-@@ -469,9 +463,18 @@ static inline void brd_check_and_reset_par(void)
- 
- static int __init brd_init(void)
- {
--	struct brd_device *brd, *next;
- 	int err, i;
- 
-+	brd_check_and_reset_par();
-+
-+	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
-+
-+	for (i = 0; i < rd_nr; i++) {
-+		err = brd_alloc(i);
-+		if (err)
-+			goto out_free;
-+	}
-+
- 	/*
- 	 * brd module now has a feature to instantiate underlying device
- 	 * structure on-demand, provided that there is an access dev node.
-@@ -487,28 +490,16 @@ static int __init brd_init(void)
- 	 *	dynamically.
- 	 */
- 
--	if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe))
--		return -EIO;
--
--	brd_check_and_reset_par();
--
--	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
--
--	for (i = 0; i < rd_nr; i++) {
--		err = brd_alloc(i);
--		if (err)
--			goto out_free;
-+	if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe)) {
-+		err = -EIO;
-+		goto out_free;
- 	}
- 
- 	pr_info("brd: module loaded\n");
- 	return 0;
- 
- out_free:
--	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
--	debugfs_remove_recursive(brd_debugfs_dir);
--
--	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
--		brd_del_one(brd);
-+	brd_cleanup();
- 
- 	pr_info("brd: module NOT loaded !!!\n");
- 	return err;
-@@ -516,13 +507,9 @@ static int __init brd_init(void)
- 
- static void __exit brd_exit(void)
- {
--	struct brd_device *brd, *next;
- 
- 	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
--	debugfs_remove_recursive(brd_debugfs_dir);
--
--	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
--		brd_del_one(brd);
-+	brd_cleanup();
- 
- 	pr_info("brd: module unloaded\n");
- }
+And we should probably put it in blk-mq.h so it inlines nicely, and
+that'll be faster than the indirect call.
+
 -- 
-2.18.4
+Jens Axboe
 
