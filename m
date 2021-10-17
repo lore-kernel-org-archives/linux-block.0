@@ -2,119 +2,208 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81266C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 758F5C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E31360F8F
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:06:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 574BE60E97
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241299AbhJQCIq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 22:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46422 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbhJQCIl (ORCPT
+        id S241402AbhJQCM1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 22:12:27 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:51697 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230047AbhJQCM1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 22:08:41 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B49C061765
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 19:06:31 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id n7so12312274iod.0
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 19:06:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=O0KZzxnbSs7XF6vV0kQd43FeM70rIf1FqGXI5pxksKQ=;
-        b=JSyOEopMiVH9WNksAwm625nmRXzP5HlOlPOSERHqxqjZ5cDa+9rw2op0W9VWvFZUg6
-         WBHrg65HdHsjnOEga4Bk0EF5TyLzyzqbewva3ns1L5rZ+qeXY0rprjAXsk20wyBlhGY2
-         oIV0jkDCZbT+hk8ybwRdu2KPz0xYRKKLRB0etNPkcvYVBe7Aqkav1+VlJLJEQ+YwYSXj
-         BgEuk78Pc98YnYddWiDajuoIEsFwThe2B5NRpF+C4EZYzxWaQ7w2VELkyfEJb1eBKz8E
-         V/LI3mP2Sm6GziWEgpBcuaJwidcxbuMBFteVKCflTofqse6jRUkkcgwkbQV44y2FFmsW
-         rycg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=O0KZzxnbSs7XF6vV0kQd43FeM70rIf1FqGXI5pxksKQ=;
-        b=O7M3zNt2pqBev+g7xT6fgaUhlOUJQSukAbINmYdU3AgjDRbJaTU8ylSOvlLlnz2MHe
-         hIUFTsG1cNoE9Gbxy3QwBiiAhRA3Ytbp+Tr5LGBfQ0hqjnfkHOKERBP8wuWrfUGHeBZ6
-         HpgMuVWj/SDbJq+C7PHjLVU7XPkWN2Z5ahwpgNfTkzU/CeTWbcIkFfRQmhCWxgkoRlUX
-         Jpr3h3toeJ5mv/ObmzrM/jBRwZCpFDTTqMP7iFrfOiF68YyB8wwDLqrB0KnMs7Lu2Pyx
-         nwPmjeXfgemCHRfMuqxmRx379QIQZwnV7FIJ3ERZk32p2HlMJLNlzGNvNJrbIGbiQVXc
-         nevA==
-X-Gm-Message-State: AOAM532eAUcLSxOsN0hYMIA817WI2fud/Ask9n9OGP4l9JWygzed4Qjr
-        lJlaG2P0Q/ebqG7tTLw4mcpBwUFR9n++MA==
-X-Google-Smtp-Source: ABdhPJzLN3uYoR0FCgtQiXze3MM6I4ArOa0QCuier11CJQrNNltN3gUK52EoxCTLtOJ1pQKPlDq48w==
-X-Received: by 2002:a05:6638:3396:: with SMTP id h22mr13577234jav.13.1634436390862;
-        Sat, 16 Oct 2021 19:06:30 -0700 (PDT)
-Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id n25sm5072127ioz.51.2021.10.16.19.06.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Oct 2021 19:06:30 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/6] nvme: wire up completion batching for the IRQ path
-Date:   Sat, 16 Oct 2021 20:06:23 -0600
-Message-Id: <20211017020623.77815-7-axboe@kernel.dk>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211017020623.77815-1-axboe@kernel.dk>
-References: <20211017020623.77815-1-axboe@kernel.dk>
+        Sat, 16 Oct 2021 22:12:27 -0400
+Received: from fsav414.sakura.ne.jp (fsav414.sakura.ne.jp [133.242.250.113])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 19H29q9x031339;
+        Sun, 17 Oct 2021 11:09:52 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav414.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp);
+ Sun, 17 Oct 2021 11:09:52 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 19H29pK4031336
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sun, 17 Oct 2021 11:09:51 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: [PATCH v2] ataflop: remove ataflop_probe_lock mutex
+To:     Michael Schmitz <schmitzmic@gmail.com>,
+        linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+        Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Finn Thain <fthain@linux-m68k.org>
+References: <1d9351dc-baeb-1a54-625c-04ce01b009b0@i-love.sakura.ne.jp>
+ <6d26961c-3b51-d6e1-fb95-b72e720ed5d0@gmail.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <5524e6ee-e469-9775-07c4-7baf5e330148@i-love.sakura.ne.jp>
+Date:   Sun, 17 Oct 2021 11:09:47 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <6d26961c-3b51-d6e1-fb95-b72e720ed5d0@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Trivial to do now, just need our own io_comp_batch on the stack and pass
-that in to the usual command completion handling.
+Commit bf9c0538e485b591 ("ataflop: use a separate gendisk for each media
+format") introduced ataflop_probe_lock mutex, but forgot to unlock the
+mutex when atari_floppy_init() (i.e. module loading) succeeded. This will
+result in double lock deadlock if ataflop_probe() is called. Also,
+unregister_blkdev() must not be called from atari_floppy_init() with
+ataflop_probe_lock held when atari_floppy_init() failed, for
+ataflop_probe() waits for ataflop_probe_lock with major_names_lock held
+(i.e. AB-BA deadlock).
 
-I pondered making this dependent on how many entries we had to process,
-but even for a single entry there's no discernable difference in
-performance or latency. Running a sync workload over io_uring:
+__register_blkdev() needs to be called last in order to avoid calling
+ataflop_probe() when atari_floppy_init() is about to fail, for memory for
+completing already-started ataflop_probe() safely will be released as soon
+as atari_floppy_init() released ataflop_probe_lock mutex.
 
-t/io_uring -b512 -d1 -s1 -c1 -p0 -F1 -B1 -n2 /dev/nvme1n1 /dev/nvme2n1
+As with commit 8b52d8be86d72308 ("loop: reorder loop_exit"),
+unregister_blkdev() needs to be called first in order to avoid calling
+ataflop_alloc_disk() from ataflop_probe() after del_gendisk() from
+atari_floppy_exit().
 
-yields the below performance before the patch:
+By relocating __register_blkdev() / unregister_blkdev() as explained above,
+we can remove ataflop_probe_lock mutex, for probe function and __exit
+function are serialized by major_names_lock mutex.
 
-IOPS=254820, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
-IOPS=251174, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
-IOPS=250806, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
-
-and the following after:
-
-IOPS=255972, BW=124MiB/s, IOS/call=1/1, inflight=(1 1)
-IOPS=251920, BW=123MiB/s, IOS/call=1/1, inflight=(1 1)
-IOPS=251794, BW=122MiB/s, IOS/call=1/1, inflight=(1 1)
-
-which definitely isn't slower, about the same if you factor in a bit of
-variance. For peak performance workloads, benchmarking shows a 2%
-improvement.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Fixes: bf9c0538e485b591 ("ataflop: use a separate gendisk for each media format")
 ---
- drivers/nvme/host/pci.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Changes in v2:
+  Remove ataflop_probe_lock mutex than unlocking.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index e916d5e167c1..fdb0716614c9 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1075,7 +1075,13 @@ static inline int nvme_poll_cq(struct nvme_queue *nvmeq,
+Finn Thain wrote:
+> So I wonder if it would have been possible to use Aranym to find the 
+> regression, or avoid it in the first place?
+
+OK, there is an emulator for testing this module. But I'm not familiar
+with m68k environment. Luis Chamberlain is proposing patchset for adding
+add_disk() error handling. I think that an answer would be to include
+m68k's mailing list into a patch for this module in order to notify of
+changes and expect m68k developers to review/test the patch.
+
+Michael Schmitz wrote:
+> Not as a module, no. I use the Atari floppy driver built-in. Latest kernel version I ran was 5.13.
+
+Great. Can you try this patch alone?
+
+ drivers/block/ataflop.c | 55 ++++++++++++++++++++---------------------
+ 1 file changed, 27 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index a093644ac39f..adfe198e4699 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -1986,8 +1986,6 @@ static int ataflop_alloc_disk(unsigned int drive, unsigned int type)
+ 	return 0;
+ }
  
- static inline int nvme_process_cq(struct nvme_queue *nvmeq)
+-static DEFINE_MUTEX(ataflop_probe_lock);
+-
+ static void ataflop_probe(dev_t dev)
  {
--	return nvme_poll_cq(nvmeq, NULL);
-+	DEFINE_IO_COMP_BATCH(iob);
-+	int found;
-+
-+	found = nvme_poll_cq(nvmeq, &iob);
-+	if (iob.req_list)
-+		nvme_pci_complete_batch(&iob);
-+	return found;
-  }
+ 	int drive = MINOR(dev) & 3;
+@@ -1998,12 +1996,30 @@ static void ataflop_probe(dev_t dev)
  
- static irqreturn_t nvme_irq(int irq, void *data)
+ 	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS)
+ 		return;
+-	mutex_lock(&ataflop_probe_lock);
+ 	if (!unit[drive].disk[type]) {
+ 		if (ataflop_alloc_disk(drive, type) == 0)
+ 			add_disk(unit[drive].disk[type]);
+ 	}
+-	mutex_unlock(&ataflop_probe_lock);
++}
++
++static void atari_floppy_cleanup(void)
++{
++	int i;
++	int type;
++
++	for (i = 0; i < FD_MAX_UNITS; i++) {
++		for (type = 0; type < NUM_DISK_MINORS; type++) {
++			if (!unit[i].disk[type])
++				continue;
++			del_gendisk(unit[i].disk[type]);
++			blk_cleanup_queue(unit[i].disk[type]->queue);
++			put_disk(unit[i].disk[type]);
++		}
++		blk_mq_free_tag_set(&unit[i].tag_set);
++	}
++
++	del_timer_sync(&fd_timer);
++	atari_stram_free(DMABuffer);
+ }
+ 
+ static int __init atari_floppy_init (void)
+@@ -2015,11 +2031,6 @@ static int __init atari_floppy_init (void)
+ 		/* Amiga, Mac, ... don't have Atari-compatible floppy :-) */
+ 		return -ENODEV;
+ 
+-	mutex_lock(&ataflop_probe_lock);
+-	ret = __register_blkdev(FLOPPY_MAJOR, "fd", ataflop_probe);
+-	if (ret)
+-		goto out_unlock;
+-
+ 	for (i = 0; i < FD_MAX_UNITS; i++) {
+ 		memset(&unit[i].tag_set, 0, sizeof(unit[i].tag_set));
+ 		unit[i].tag_set.ops = &ataflop_mq_ops;
+@@ -2072,7 +2083,12 @@ static int __init atari_floppy_init (void)
+ 	       UseTrackbuffer ? "" : "no ");
+ 	config_types();
+ 
+-	return 0;
++	ret = __register_blkdev(FLOPPY_MAJOR, "fd", ataflop_probe);
++	if (ret) {
++		printk(KERN_ERR "atari_floppy_init: cannot register block device\n");
++		atari_floppy_cleanup();
++	}
++	return ret;
+ 
+ err:
+ 	while (--i >= 0) {
+@@ -2081,9 +2097,6 @@ static int __init atari_floppy_init (void)
+ 		blk_mq_free_tag_set(&unit[i].tag_set);
+ 	}
+ 
+-	unregister_blkdev(FLOPPY_MAJOR, "fd");
+-out_unlock:
+-	mutex_unlock(&ataflop_probe_lock);
+ 	return ret;
+ }
+ 
+@@ -2128,22 +2141,8 @@ __setup("floppy=", atari_floppy_setup);
+ 
+ static void __exit atari_floppy_exit(void)
+ {
+-	int i, type;
+-
+-	for (i = 0; i < FD_MAX_UNITS; i++) {
+-		for (type = 0; type < NUM_DISK_MINORS; type++) {
+-			if (!unit[i].disk[type])
+-				continue;
+-			del_gendisk(unit[i].disk[type]);
+-			blk_cleanup_queue(unit[i].disk[type]->queue);
+-			put_disk(unit[i].disk[type]);
+-		}
+-		blk_mq_free_tag_set(&unit[i].tag_set);
+-	}
+ 	unregister_blkdev(FLOPPY_MAJOR, "fd");
+-
+-	del_timer_sync(&fd_timer);
+-	atari_stram_free( DMABuffer );
++	atari_floppy_cleanup();
+ }
+ 
+ module_init(atari_floppy_init)
 -- 
-2.33.1
+2.18.4
 
