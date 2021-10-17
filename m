@@ -2,97 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03842C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADEEC433FE
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C4A1E611C1
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CC0D611C1
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241284AbhJQBht (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 21:37:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
+        id S231837AbhJQBkC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 21:40:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231837AbhJQBht (ORCPT
+        with ESMTP id S244666AbhJQBkB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 21:37:49 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D0DC061765
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:35:40 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id r134so12171465iod.11
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:35:40 -0700 (PDT)
+        Sat, 16 Oct 2021 21:40:01 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B41BC061765
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:53 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id h27so5491794ila.5
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=bV//hRpD4HqQoa/SUF9A6qUUTt0qjW3gj+7fefZux3w=;
-        b=TwfySlWgmGVFFE00agoZD1JBLije4xo67vN0fZOOxmHDiPVkEw0KbpGgUowiw+KJMj
-         XV6FZVhz464UPjR2Aj3/h0ObsxBo9GyPQo+mVvUebsNyR5k4Uql8BuIberKoobBb3bEF
-         lEFuvn+SCnGQkUR3T9gmnVj/0mDHvxlpWiAl2uK4ZKpcKYpV16OogvqsfCVHmI1MD1rI
-         UB8CPlfASX8mBzgNVg/VYnRaVDPfysOBs0vfS+T7XeuRxiGBvzcCULp7HQYqza+WErnP
-         fpwRpOALFJOdDH01Y3kzS8KGM5sDedaxcBGpxTHaT/OVeccTW5sHCWECzUS35sMNf9l4
-         QCsg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=8OcUz0fb+TxP+b1ymvvoFMzaszn0xSCc26VaJnYFNDg=;
+        b=MUuun0nepB4H+VC9Apr38JKcIN49MICoRd/0bgPJXLocemjxdNm6noNJL+BLd1zi1G
+         e0B0NT0ZHFKJsEKEhiQNVBM4FxJbbztb+44MCv4UJi5MRuDl6u6AUOJpLJ+7WQvIlTzb
+         lT8q4LUZiWim9lUMV6V4Nui7ooVRfva6HG3NuP2Dl3uZu6Qcj03Y1wZ6LOnLz/X+b+xX
+         9N+Pm9T1r4ixuu+Kh1hpxvYdJAOxaZ+YmJazrhOAm2Lz8kR/5b081F8tcGKTRe2VjUQU
+         Kyb7ymPqtjoByBOgmRTzUEVpouJD2F63hI0J7PuWBwg++DyjnJGsDknDud6YDqbPZ48b
+         qeXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=bV//hRpD4HqQoa/SUF9A6qUUTt0qjW3gj+7fefZux3w=;
-        b=heg4xhDAdQhyl+AFvRK4PdBL0C9GnFF8py3wPVst/7NtuqkCzv76Ytfv6t3hTA49KL
-         qFUBV8ACI++VmGe2pJC0D8Jxu57ScXBLCZiUtXosJDLQOysFfxdF0T7IqIGiCfGgPW8i
-         Awh7ZTF17YPPdPFTwfOKKU0Rz26kqMRMqEN95cSfBu9JAPrGnliQcVzpiqXNJqjn2Skg
-         Z/o1KFCxRXiqcDGCEegfeEcFQwoOpu3sLr0LZ/riBbj4l40YNtiGSvOmQUaRIDtkxmSL
-         CwRziFCbs2FESvyFFQ94YJHQ8+iWirF3m3fwew4YEIPBhZ3jDX35tzmwoH+0Amf0Eslc
-         9SuQ==
-X-Gm-Message-State: AOAM533TZ0WVxLugN2q0GDn/tF+OkUtkq5H8vro5Lb7tn3pFQeDVP/lR
-        3yBeI9Y1X4Mpg+TO/9Dc7u0TgUnQxuOKPg==
-X-Google-Smtp-Source: ABdhPJyfZkC0qiOF5iuBlOG+3QJY9dUPl8mz391pV5T+5K8Vy4Wu+b6iqhfRZ7NEel98JL61ryOqew==
-X-Received: by 2002:a05:6602:1514:: with SMTP id g20mr9584985iow.9.1634434539795;
-        Sat, 16 Oct 2021 18:35:39 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id i125sm4674929iof.7.2021.10.16.18.35.39
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 Oct 2021 18:35:39 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=8OcUz0fb+TxP+b1ymvvoFMzaszn0xSCc26VaJnYFNDg=;
+        b=tWvZCd0Wq6yDfhqv+NePSLQb3N/tX1keBeK6pPmqPlJ/K17/qdJLirUHf+y8Da1mEg
+         0wOLhKO9dPaiN84XRPCQmy2FhLmtxr0UbllGczd7kVOzffOH88dy3WpLrFmxhfR8o6ih
+         7onX8tGgriFrH4iBbnqDGc3UXhE/RFurkZ852vICRWhxzWqxcsShTaQDoWl07L7mnDuV
+         3j2Hjh5L54XMLeI/WK9FVXx6ZT1alieTQrpm0imIo+CpzYYiuT0JTasMJjdaP7Ooa9+h
+         BMwll0kUzK4hnpWf+n99/I/P53OzOjwyViFy1X/0ahP8pXiiq6NXMtYM4nhI51GMEqaH
+         vQTw==
+X-Gm-Message-State: AOAM531DjDkB0LL0R6OzHZ+gTCOn+UVQzNS/OGoiME1RMwC9dxyG5AAC
+        nmByqdh7qGQjCnMj1WBLVHu4S99CD8WPPQ==
+X-Google-Smtp-Source: ABdhPJzCBVCUJYqbjbb4rK/ShbyY5ig3kdxqBC+o78FzSOH/l+WNUyhN+TqBX5CkOljmHNjOBbCzgQ==
+X-Received: by 2002:a05:6e02:1989:: with SMTP id g9mr9133522ilf.165.1634434672439;
+        Sat, 16 Oct 2021 18:37:52 -0700 (PDT)
+Received: from localhost.localdomain ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Oct 2021 18:37:52 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: don't dereference request after flush insertion
-Message-ID: <f2f17f46-ff3a-01c4-bfd4-8dec836ec343@kernel.dk>
-Date:   Sat, 16 Oct 2021 19:35:39 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 01/14] block: inline fast path of driver tag allocation
+Date:   Sat, 16 Oct 2021 19:37:35 -0600
+Message-Id: <20211017013748.76461-2-axboe@kernel.dk>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20211017013748.76461-1-axboe@kernel.dk>
+References: <20211017013748.76461-1-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We could have a race here, where the request gets freed before we call
-into blk_mq_run_hw_queue(). If this happens, we cannot rely on the state
-of the request.
-
-Grab the hardware context before inserting the flush.
+If we don't use an IO scheduler or have shared tags, then we don't need
+to call into this external function at all. This saves ~2% for such
+a setup.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
 ---
+ block/blk-mq.c |  8 +++-----
+ block/blk-mq.h | 15 ++++++++++++++-
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2197cfbf081f..22b30a89bf3a 100644
+index 1bbe5de66c40..90bc93fe373e 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2468,9 +2468,10 @@ void blk_mq_submit_bio(struct bio *bio)
- 	}
+@@ -1145,7 +1145,7 @@ static inline unsigned int queued_to_index(unsigned int queued)
+ 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
+ }
  
- 	if (unlikely(is_flush_fua)) {
-+		struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 		/* Bypass scheduler for flush requests */
- 		blk_insert_flush(rq);
--		blk_mq_run_hw_queue(rq->mq_hctx, true);
-+		blk_mq_run_hw_queue(hctx, true);
- 	} else if (plug && (q->nr_hw_queues == 1 ||
- 		   blk_mq_is_shared_tags(rq->mq_hctx->flags) ||
- 		   q->mq_ops->commit_rqs || !blk_queue_nonrot(q))) {
+-static bool __blk_mq_get_driver_tag(struct request *rq)
++static bool __blk_mq_alloc_driver_tag(struct request *rq)
+ {
+ 	struct sbitmap_queue *bt = &rq->mq_hctx->tags->bitmap_tags;
+ 	unsigned int tag_offset = rq->mq_hctx->tags->nr_reserved_tags;
+@@ -1169,11 +1169,9 @@ static bool __blk_mq_get_driver_tag(struct request *rq)
+ 	return true;
+ }
+ 
+-bool blk_mq_get_driver_tag(struct request *rq)
++bool __blk_mq_get_driver_tag(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ {
+-	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+-
+-	if (rq->tag == BLK_MQ_NO_TAG && !__blk_mq_get_driver_tag(rq))
++	if (rq->tag == BLK_MQ_NO_TAG && !__blk_mq_alloc_driver_tag(rq))
+ 		return false;
+ 
+ 	if ((hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED) &&
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 8be447995106..ceed0a001c76 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -264,7 +264,20 @@ static inline void blk_mq_put_driver_tag(struct request *rq)
+ 	__blk_mq_put_driver_tag(rq->mq_hctx, rq);
+ }
+ 
+-bool blk_mq_get_driver_tag(struct request *rq);
++bool __blk_mq_get_driver_tag(struct blk_mq_hw_ctx *hctx, struct request *rq);
++
++static inline bool blk_mq_get_driver_tag(struct request *rq)
++{
++	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
++
++	if (rq->tag != BLK_MQ_NO_TAG &&
++	    !(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
++		hctx->tags->rqs[rq->tag] = rq;
++		return true;
++	}
++
++	return __blk_mq_get_driver_tag(hctx, rq);
++}
+ 
+ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+ {
 -- 
-Jens Axboe
+2.33.1
 
