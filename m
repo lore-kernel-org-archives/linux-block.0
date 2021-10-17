@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A2AC43217
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB03C433FE
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:06:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BB8E60F9D
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4093560F8F
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 02:06:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbhJQCIi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 22:08:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
+        id S230516AbhJQCIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 22:08:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbhJQCIh (ORCPT
+        with ESMTP id S230102AbhJQCIi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 22:08:37 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22B21C061765
+        Sat, 16 Oct 2021 22:08:38 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BE1C061765
         for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 19:06:29 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id x1so11287743ilv.4
+Received: by mail-il1-x129.google.com with SMTP id i11so11245124ila.12
         for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 19:06:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=InJDaECD8ya3uBxdjuGJF1Ibtx52SHkhp5ABM0rQclM=;
-        b=mccYOhXf+sxjF2+TBadRmeorH+j66d1REZlgZ1iPEhV8qyIHhnZJqpQDOoTC6vp+io
-         Y3R2vBcqgKGOCkIHD2jbalAt8j+C2C8LNkEUY3TM+QDYiUA/i4ac2s6BSMhONVhuvHXg
-         PXB0T593q/CWupVdNbX6RIBDzKP0LBcg9eF9cqInTFuLFi4eYNJoU/s16Sd9s6L65q8Y
-         +wLnNz4YywV0IAmW2W2vl8AmY+DvXcIBE5MCitn4B+SV9cIhmkh2P9dLmYEHdQCXF2LJ
-         Zx2QyDjOyPtLJiO1vgIObou0IRCeqDQzJefKp3BkaIsUs3agDimv85kbkGrkWn6y3r5i
-         VnCw==
+        bh=3Tqp9z4lhhAWkP6OrLx9Za9LfIDVjiUd7WeSrfg9Jh8=;
+        b=0xf4v63zXWqoJ3612+Eit088Q66P9ZuyoAKJbIqKq79xkrWzbpLbiJ1kqZ8C1cRxNQ
+         Zje5vOc7NIE4ER558P6Exs/9sc05kLeItT4J2YOT12Shy23k3yVXuIavzBQcK8AVlkn1
+         P6RHDl9tNy3XQEwGuifhFI296ZQUTE35f//kggj/25z1B1fHQZpLhmKyJ8Rr4Fu2Ik88
+         58Ke1LpSEIifxZxfZeszO/UwRw1K7oFjl9wBQfR0qvFurdVwv5+BZKnj7VS4UYE+4dNC
+         7JI1Hg97451MwF9mqR0g05wgCxTAfzN6IITyhA2jGagAMXIITk7ZcQYGoKH+Pl5IVOmP
+         zLug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=InJDaECD8ya3uBxdjuGJF1Ibtx52SHkhp5ABM0rQclM=;
-        b=CUQu5pTJtt5snHaKrHKwQTa/GnhUg3tIPY1MHp1H/Q9cc6mLNFnSW8vgjbtn1zvX6F
-         nzmX4XN5mBWvuSIEoFdZnXotBOonF0RbCqM9Ml058lACxiUyEGdyPu+JaqlLfxWM8aKO
-         hUOEAeMHZO1fxteU2piWNBpOBs7jUpno9Ahv3EtuXZ6Lk1QAXqjWUKTe/cCRcNrco/gV
-         PT02kjuh8KXNUJtto9DyDniP4yE23GDdk1T73nf231x1jsTO+aeZI4opZyE2xCJzkizz
-         IvvV2j4zbpSiqTiZRbTl6PdVMdwrtUH7juy8flSaCPGAnjRyT7PqLXQABI9tBw72NXCX
-         odxw==
-X-Gm-Message-State: AOAM532+8tycC9cauR1VIvrTtyjWVuQlIbJowiNdkpp6mjbMDoanQMG/
-        v5XFmTtenhOMvuw/uVapS+/Xxk3p0U+z4w==
-X-Google-Smtp-Source: ABdhPJz37fTNSMroyVu6rqFIRF/D7bOhaiOL/yrc3Q4yQndi3Rx2ZiTDaUtAiE/6SgHUEh5CLJ/sng==
-X-Received: by 2002:a05:6e02:4b1:: with SMTP id e17mr9428836ils.119.1634436388335;
-        Sat, 16 Oct 2021 19:06:28 -0700 (PDT)
+        bh=3Tqp9z4lhhAWkP6OrLx9Za9LfIDVjiUd7WeSrfg9Jh8=;
+        b=AwDttvYdSNeadBwyuch0+E4ZJo1hXipKsFL/fiAcEochEI2QB90Hh1omYScO4Q5Qov
+         LuzbOpz4us2DDLG3WK7uf3/pdC/zE52azvap6LEcE0wOBdv8xxnrHmNWAM5lulrlIXxB
+         tsuXkYc93K4j09QquxoxEvulv3Hhll2DnsYNPBG9iqVwOYAgQSsSrPyKvZdn8My6Pp8n
+         dSfXwDimBpODdtcW0KxPfrpqDXOq+ng7rWPRmf7loMpUmUjLc5jFK/FuewRd8GPRXwXS
+         t5i7Q3nsiHbL9ZfpR7jgKy4/4vfd0rjLbW02M34q368m6HEYSkFfZR75u1LHf9yYML/f
+         NJvA==
+X-Gm-Message-State: AOAM533OIqUSZYd3CMLyIsrhAgsrAY5vVg6AjOoRvM1ocueGjUHlHsMS
+        FCHTNKTgTs1+66ecQXksSPGEe+mXlMaW/Q==
+X-Google-Smtp-Source: ABdhPJyCE0u6OD1jMjECPjXSqsWDufOnLui9EejEDDKgQr3D/1rMhDz8a6y6fj1+Sub87837Mv7L9g==
+X-Received: by 2002:a92:cd82:: with SMTP id r2mr10112805ilb.198.1634436389214;
+        Sat, 16 Oct 2021 19:06:29 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id n25sm5072127ioz.51.2021.10.16.19.06.27
+        by smtp.gmail.com with ESMTPSA id n25sm5072127ioz.51.2021.10.16.19.06.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Sat, 16 Oct 2021 19:06:28 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/6] block: add support for blk_mq_end_request_batch()
-Date:   Sat, 16 Oct 2021 20:06:20 -0600
-Message-Id: <20211017020623.77815-4-axboe@kernel.dk>
+Subject: [PATCH 4/6] nvme: add support for batched completion of polled IO
+Date:   Sat, 16 Oct 2021 20:06:21 -0600
+Message-Id: <20211017020623.77815-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211017020623.77815-1-axboe@kernel.dk>
 References: <20211017020623.77815-1-axboe@kernel.dk>
@@ -66,196 +66,179 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of calling blk_mq_end_request() on a single request, add a helper
-that takes the new struct io_comp_batch and completes any request stored
-in there.
+Take advantage of struct io_comp_batch, if passed in to the nvme poll
+handler. If it's set, rather than complete each request individually
+inline, store them in the io_comp_batch list. We only do so for requests
+that will complete successfully, anything else will be completed inline as
+before.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq-tag.c     |  6 ++++
- block/blk-mq-tag.h     |  1 +
- block/blk-mq.c         | 81 ++++++++++++++++++++++++++++++++----------
- include/linux/blk-mq.h | 29 +++++++++++++++
- 4 files changed, 98 insertions(+), 19 deletions(-)
+ drivers/nvme/host/core.c | 17 ++++++++++++++---
+ drivers/nvme/host/nvme.h | 14 ++++++++++++++
+ drivers/nvme/host/pci.c  | 31 +++++++++++++++++++++++++------
+ 3 files changed, 53 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index c43b97201161..b94c3e8ef392 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -207,6 +207,12 @@ void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index c2c2e8545292..4eadecc67c91 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -346,15 +346,19 @@ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
+ 	return RETRY;
+ }
+ 
+-static inline void nvme_end_req(struct request *req)
++static inline void nvme_end_req_zoned(struct request *req)
+ {
+-	blk_status_t status = nvme_error_status(nvme_req(req)->status);
+-
+ 	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+ 	    req_op(req) == REQ_OP_ZONE_APPEND)
+ 		req->__sector = nvme_lba_to_sect(req->q->queuedata,
+ 			le64_to_cpu(nvme_req(req)->result.u64));
++}
++
++static inline void nvme_end_req(struct request *req)
++{
++	blk_status_t status = nvme_error_status(nvme_req(req)->status);
+ 
++	nvme_end_req_zoned(req);
+ 	nvme_trace_bio_complete(req);
+ 	blk_mq_end_request(req, status);
+ }
+@@ -381,6 +385,13 @@ void nvme_complete_rq(struct request *req)
+ }
+ EXPORT_SYMBOL_GPL(nvme_complete_rq);
+ 
++void nvme_complete_batch_req(struct request *req)
++{
++	nvme_cleanup_cmd(req);
++	nvme_end_req_zoned(req);
++}
++EXPORT_SYMBOL_GPL(nvme_complete_batch_req);
++
+ /*
+  * Called to unwind from ->queue_rq on a failed command submission so that the
+  * multipathing code gets called to potentially failover to another path.
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ed79a6c7e804..ef2467b93adb 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -638,6 +638,20 @@ static inline bool nvme_is_aen_req(u16 qid, __u16 command_id)
+ }
+ 
+ void nvme_complete_rq(struct request *req);
++void nvme_complete_batch_req(struct request *req);
++
++static __always_inline void nvme_complete_batch(struct io_comp_batch *iob,
++						void (*fn)(struct request *rq))
++{
++	struct request *req;
++
++	rq_list_for_each(&iob->req_list, req) {
++		fn(req);
++		nvme_complete_batch_req(req);
++	}
++	blk_mq_end_request_batch(iob);
++}
++
+ blk_status_t nvme_host_path_error(struct request *req);
+ bool nvme_cancel_request(struct request *req, void *data, bool reserved);
+ void nvme_cancel_tagset(struct nvme_ctrl *ctrl);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index d1ab9250101a..e916d5e167c1 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -959,7 +959,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
+ }
+ 
+-static void nvme_pci_complete_rq(struct request *req)
++static __always_inline void nvme_pci_unmap_rq(struct request *req)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct nvme_dev *dev = iod->nvmeq->dev;
+@@ -969,9 +969,19 @@ static void nvme_pci_complete_rq(struct request *req)
+ 			       rq_integrity_vec(req)->bv_len, rq_data_dir(req));
+ 	if (blk_rq_nr_phys_segments(req))
+ 		nvme_unmap_data(dev, req);
++}
++
++static void nvme_pci_complete_rq(struct request *req)
++{
++	nvme_pci_unmap_rq(req);
+ 	nvme_complete_rq(req);
+ }
+ 
++static void nvme_pci_complete_batch(struct io_comp_batch *iob)
++{
++	nvme_complete_batch(iob, nvme_pci_unmap_rq);
++}
++
+ /* We read the CQE phase first to check if the rest of the entry is valid */
+ static inline bool nvme_cqe_pending(struct nvme_queue *nvmeq)
+ {
+@@ -996,7 +1006,8 @@ static inline struct blk_mq_tags *nvme_queue_tagset(struct nvme_queue *nvmeq)
+ 	return nvmeq->dev->tagset.tags[nvmeq->qid - 1];
+ }
+ 
+-static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
++static inline void nvme_handle_cqe(struct nvme_queue *nvmeq,
++				   struct io_comp_batch *iob, u16 idx)
+ {
+ 	struct nvme_completion *cqe = &nvmeq->cqes[idx];
+ 	__u16 command_id = READ_ONCE(cqe->command_id);
+@@ -1023,7 +1034,9 @@ static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
+ 	}
+ 
+ 	trace_nvme_sq(req, cqe->sq_head, nvmeq->sq_tail);
+-	if (!nvme_try_complete_req(req, cqe->status, cqe->result))
++	if (!nvme_try_complete_req(req, cqe->status, cqe->result) &&
++	    !blk_mq_add_to_batch(req, iob, nvme_req(req)->status,
++					nvme_pci_complete_batch))
+ 		nvme_pci_complete_rq(req);
+ }
+ 
+@@ -1039,7 +1052,8 @@ static inline void nvme_update_cq_head(struct nvme_queue *nvmeq)
  	}
  }
  
-+void blk_mq_put_tags(struct blk_mq_tags *tags, int *tag_array, int nr_tags)
-+{
-+	sbitmap_queue_clear_batch(&tags->bitmap_tags, tags->nr_reserved_tags,
-+					tag_array, nr_tags);
-+}
-+
- struct bt_iter_data {
- 	struct blk_mq_hw_ctx *hctx;
- 	busy_iter_fn *fn;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index e617c7220626..df787b5a23bd 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -19,6 +19,7 @@ unsigned long blk_mq_get_tags(struct blk_mq_alloc_data *data, int nr_tags,
- 			      unsigned int *offset);
- extern void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
- 			   unsigned int tag);
-+void blk_mq_put_tags(struct blk_mq_tags *tags, int *tag_array, int nr_tags);
- extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_tags **tags,
- 					unsigned int depth, bool can_grow);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8eb80e70e8ea..58dc0c0c24ac 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -292,15 +292,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
+-static inline int nvme_process_cq(struct nvme_queue *nvmeq)
++static inline int nvme_poll_cq(struct nvme_queue *nvmeq,
++			       struct io_comp_batch *iob)
+ {
+ 	int found = 0;
+ 
+@@ -1050,7 +1064,7 @@ static inline int nvme_process_cq(struct nvme_queue *nvmeq)
+ 		 * the cqe requires a full read memory barrier
+ 		 */
+ 		dma_rmb();
+-		nvme_handle_cqe(nvmeq, nvmeq->cq_head);
++		nvme_handle_cqe(nvmeq, iob, nvmeq->cq_head);
+ 		nvme_update_cq_head(nvmeq);
+ 	}
+ 
+@@ -1059,6 +1073,11 @@ static inline int nvme_process_cq(struct nvme_queue *nvmeq)
+ 	return found;
  }
  
--/*
-- * Only need start/end time stamping if we have iostat or
-- * blk stats enabled, or using an IO scheduler.
-- */
--static inline bool blk_mq_need_time_stamp(struct request *rq)
--{
--	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_ELV));
--}
--
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		unsigned int tag, u64 alloc_time_ns)
++static inline int nvme_process_cq(struct nvme_queue *nvmeq)
++{
++	return nvme_poll_cq(nvmeq, NULL);
++ }
++
+ static irqreturn_t nvme_irq(int irq, void *data)
  {
-@@ -754,19 +745,21 @@ bool blk_update_request(struct request *req, blk_status_t error,
- }
- EXPORT_SYMBOL_GPL(blk_update_request);
+ 	struct nvme_queue *nvmeq = data;
+@@ -1101,7 +1120,7 @@ static int nvme_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ 		return 0;
  
--inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
-+static inline void __blk_mq_end_request_acct(struct request *rq, u64 now)
- {
--	if (blk_mq_need_time_stamp(rq)) {
--		u64 now = ktime_get_ns();
-+	if (rq->rq_flags & RQF_STATS) {
-+		blk_mq_poll_stats_start(rq->q);
-+		blk_stat_add(rq, now);
-+	}
+ 	spin_lock(&nvmeq->cq_poll_lock);
+-	found = nvme_process_cq(nvmeq);
++	found = nvme_poll_cq(nvmeq, iob);
+ 	spin_unlock(&nvmeq->cq_poll_lock);
  
--		if (rq->rq_flags & RQF_STATS) {
--			blk_mq_poll_stats_start(rq->q);
--			blk_stat_add(rq, now);
--		}
-+	blk_mq_sched_completed_request(rq, now);
-+	blk_account_io_done(rq, now);
-+}
- 
--		blk_mq_sched_completed_request(rq, now);
--		blk_account_io_done(rq, now);
--	}
-+inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
-+{
-+	if (blk_mq_need_time_stamp(rq))
-+		__blk_mq_end_request_acct(rq, ktime_get_ns());
- 
- 	if (rq->end_io) {
- 		rq_qos_done(rq->q, rq);
-@@ -785,6 +778,56 @@ void blk_mq_end_request(struct request *rq, blk_status_t error)
- }
- EXPORT_SYMBOL(blk_mq_end_request);
- 
-+#define TAG_COMP_BATCH		32
-+
-+static inline void blk_mq_flush_tag_batch(struct blk_mq_hw_ctx *hctx,
-+					  int *tag_array, int nr_tags)
-+{
-+	struct request_queue *q = hctx->queue;
-+
-+	blk_mq_put_tags(hctx->tags, tag_array, nr_tags);
-+	percpu_ref_put_many(&q->q_usage_counter, nr_tags);
-+}
-+
-+void blk_mq_end_request_batch(struct io_comp_batch *iob)
-+{
-+	int tags[TAG_COMP_BATCH], nr_tags = 0;
-+	struct blk_mq_hw_ctx *last_hctx = NULL;
-+	struct request *rq;
-+	u64 now = 0;
-+
-+	if (iob->need_ts)
-+		now = ktime_get_ns();
-+
-+	while ((rq = rq_list_pop(&iob->req_list)) != NULL) {
-+		prefetch(rq->bio);
-+		prefetch(rq->rq_next);
-+
-+		blk_update_request(rq, BLK_STS_OK, blk_rq_bytes(rq));
-+		__blk_mq_end_request_acct(rq, now);
-+
-+		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
-+		if (!refcount_dec_and_test(&rq->ref))
-+			continue;
-+
-+		blk_crypto_free_request(rq);
-+		blk_pm_mark_last_busy(rq);
-+		rq_qos_done(rq->q, rq);
-+
-+		if (nr_tags == TAG_COMP_BATCH ||
-+		    (last_hctx && last_hctx != rq->mq_hctx)) {
-+			blk_mq_flush_tag_batch(last_hctx, tags, nr_tags);
-+			nr_tags = 0;
-+		}
-+		tags[nr_tags++] = rq->tag;
-+		last_hctx = rq->mq_hctx;
-+	}
-+
-+	if (nr_tags)
-+		blk_mq_flush_tag_batch(last_hctx, tags, nr_tags);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_end_request_batch);
-+
- static void blk_complete_reqs(struct llist_head *list)
- {
- 	struct llist_node *entry = llist_reverse_order(llist_del_all(list));
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 938ca6e86556..4dbf7948b0e4 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -761,6 +761,35 @@ static inline void blk_mq_set_request_complete(struct request *rq)
- void blk_mq_start_request(struct request *rq);
- void blk_mq_end_request(struct request *rq, blk_status_t error);
- void __blk_mq_end_request(struct request *rq, blk_status_t error);
-+void blk_mq_end_request_batch(struct io_comp_batch *ib);
-+
-+/*
-+ * Only need start/end time stamping if we have iostat or
-+ * blk stats enabled, or using an IO scheduler.
-+ */
-+static inline bool blk_mq_need_time_stamp(struct request *rq)
-+{
-+	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_ELV));
-+}
-+
-+/*
-+ * Batched completions only work when there is no I/O error and no special
-+ * ->end_io handler.
-+ */
-+static inline bool blk_mq_add_to_batch(struct request *req,
-+				       struct io_comp_batch *iob, int ioerror,
-+				       void (*complete)(struct io_comp_batch *))
-+{
-+	if (!iob || (req->rq_flags & RQF_ELV) || req->end_io || ioerror)
-+		return false;
-+	if (!iob->complete)
-+		iob->complete = complete;
-+	else if (iob->complete != complete)
-+		return false;
-+	iob->need_ts |= blk_mq_need_time_stamp(req);
-+	rq_list_add(&iob->req_list, req);
-+	return true;
-+}
- 
- void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list);
- void blk_mq_kick_requeue_list(struct request_queue *q);
+ 	return found;
 -- 
 2.33.1
 
