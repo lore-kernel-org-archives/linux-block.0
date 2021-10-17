@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA3FC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCFAC433F5
 	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:38:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 365E0611F0
+	by mail.kernel.org (Postfix) with ESMTP id B70B861211
 	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:38:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244807AbhJQBkK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S244799AbhJQBkK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 16 Oct 2021 21:40:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244809AbhJQBkI (ORCPT
+        with ESMTP id S244796AbhJQBkJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 21:40:08 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063DFC06176F
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:59 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id z69so9063363iof.9
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:59 -0700 (PDT)
+        Sat, 16 Oct 2021 21:40:09 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFA3C061768
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:38:00 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id j8so11216294ila.11
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:38:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=fDQGjF9l9l0KYntZqRHf0xcHh6lv2lU7jnlOIiiayCM=;
-        b=PVWHBAgo5ll8rF+CBQwGPMKuKwtS1TJuGUy7VbyXEtpa7ot6hkzia1rDA1O8wPOP8M
-         xUgKHCsunkosNoLeDqrZ/uJIe7voMGvIWHoqHVpvFlUg0aqgw9314RKK5RtYtwQpum/4
-         MPnSEyHQ+5VOXSqIpsjOLLoV0l8CIeooWc4PH3VFTTwEoEV4lRrcsXZ4owWUpPy4s49i
-         fseZtIbh94gGhIypiBdlJ9ndFI6rCd462GryrfcHguFEzfuD2tEHMMDel6gp5ZYzolKf
-         rD/Bvm4tqsckUscBvMk133Z24w8fCGy/MfGz6d6kTVd112o82cobK93s+05QwZxAdl1K
-         uDUA==
+        bh=ERBT8VF2wyOK8Bo9ixt5H3WSIawANolkBAaKtj+zNU8=;
+        b=ql2sVcnScaNVaSQlNWeQafIoKnOprfZd/oGZwfkW9H1y8JosRl4J+DjlPeWNZVA8kC
+         WeXsVjG/jQJcY41HO6bbSkLkNh/xguS3NvxYBWIr3cfwibIm5EEQjtR6qwau7+Hw9yJs
+         DwlarUN7QCDssGxQCI1/Ykdr/GEqagb8HgTzlSKEncv1hx/KN+evxgLce26ETYZCOT3w
+         YzsbOnEo0kfDtu/BOHLYxd0n+2Oi8sP6UN3aZSjePNjp06nQxZNEdz9NkXDOHaWjny5W
+         D/SOZ4QSxhg8bolacNRFd9Uz7ws5WrwcvPhJOs7/eSROYHChmxGZ4OrS4mXECXowaurW
+         28ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=fDQGjF9l9l0KYntZqRHf0xcHh6lv2lU7jnlOIiiayCM=;
-        b=PfCo4yf6UEVR2adInSYB1hRB32Mv3yQHp+U7kDe9Hzimjmn9bfuEjqWKpjR+AkUmmX
-         1v+UTquUYKdpBbpvJ7Ag46bXX/IYymDaQueZPuZk2r3pMPTRWwB4JYiBjQupStEPv+NV
-         L4wjHZ6wwbUL2iIf0PKeC+CoOZKByoA+fbpJJX3JI8bgG8eAE/mrgxvR0se/AqUBlc+S
-         vmu5wlfbcuOUC7VhxS9zYRPwBLDBn+ohnbE7HEu+nJyVh7HFlTZC63fbEnabF9GppHWZ
-         n/th0IPGMVVq9Gkej839qIyWNuoYcbrkl5c8OBBHgU96cAMnASbgX8xloiGnzuTNcutv
-         n3iA==
-X-Gm-Message-State: AOAM533CSWYj+xzTPxk2zHgy7kko4eWo2f8DG3tj3oHTWQUpVbY2JmGt
-        POx0+F5t1jI25DAFHhvUb0iEbB0pkCPObQ==
-X-Google-Smtp-Source: ABdhPJyHJidWNIxE+LzL/gQnjGGnoN13lsvpTuLAcKijxVWRL8huaMIhoHfcJYE8sAJwHuGcOlChjw==
-X-Received: by 2002:a05:6602:2c02:: with SMTP id w2mr9419923iov.45.1634434679196;
+        bh=ERBT8VF2wyOK8Bo9ixt5H3WSIawANolkBAaKtj+zNU8=;
+        b=apubhKFoE6oCzYX1hF3PtCVkXVO2z0APG9UxJ+Oyt5FQS2bv22vuL+cSj8gMiDWpZz
+         6KJTMfEHIy6iGGblgtqkxvHOpuw90Tk0NXmS/VRSQLI+O5NwW4I7f2BCppIvlTH48Xq9
+         C3XXb0s9ers46/YUU9fVw3uaA+RNbrr0iPTOeH6wJ7n0zFGAlgMC0/8R50uteVEjMBSa
+         jkd2Unz7IHYxtHjOeYIYXCvWVz8MHn68eFZkLypicIVn76J97bqmjM+5cRIVc+LDVM5+
+         HMG3jxatN8PsTsSkHfGpqSXdBkuo18jtC1WJ5+dygf4nwlcGD7pzFL/+Il9L14fj9DWG
+         W8xg==
+X-Gm-Message-State: AOAM530NnihtfDayP8ttx40sCvW2RvhG66kxcbAnvuLGz103qMz2NS34
+        l+A9jfIWhhe5y2hIILxrwzC0VLPFKftG/w==
+X-Google-Smtp-Source: ABdhPJzfCpsQvn4xo4wEw6an6pEQFhLo/FeuRssw3zcmzZC+ED45j40jq9LftmOBwHKWHJ+cqKxmRw==
+X-Received: by 2002:a92:cbc2:: with SMTP id s2mr9469430ilq.228.1634434679867;
         Sat, 16 Oct 2021 18:37:59 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.58
+        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Oct 2021 18:37:58 -0700 (PDT)
+        Sat, 16 Oct 2021 18:37:59 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 11/14] block: optimize blk_mq_rq_ctx_init()
-Date:   Sat, 16 Oct 2021 19:37:45 -0600
-Message-Id: <20211017013748.76461-12-axboe@kernel.dk>
+Subject: [PATCH 12/14] block: align blkdev_dio inlined bio to a cacheline
+Date:   Sat, 16 Oct 2021 19:37:46 -0600
+Message-Id: <20211017013748.76461-13-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211017013748.76461-1-axboe@kernel.dk>
 References: <20211017013748.76461-1-axboe@kernel.dk>
@@ -66,123 +66,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This takes ~4.7% on a peak performance run, with this patch it brings it
-down to ~3.7%.
+We get all sorts of unreliable and funky results since the bio is
+designed to align on a cacheline, which it does not when inlined like
+this.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-[axboe: rebase and move queuelist init]
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c | 64 ++++++++++++++++++++++++--------------------------
- 1 file changed, 31 insertions(+), 33 deletions(-)
+ block/fops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 064fdeeb1be5..0d05ac4a3b50 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -304,63 +304,62 @@ static inline bool blk_mq_need_time_stamp(struct request *rq)
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		unsigned int tag, u64 alloc_time_ns)
- {
-+	struct blk_mq_ctx *ctx = data->ctx;
-+	struct blk_mq_hw_ctx *hctx = data->hctx;
-+	struct request_queue *q = data->q;
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct request *rq = tags->static_rqs[tag];
-+	unsigned int cmd_flags = data->cmd_flags;
-+	u64 start_time_ns = 0;
+diff --git a/block/fops.c b/block/fops.c
+index 1d4f862950bb..7eebd590342b 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -137,7 +137,7 @@ struct blkdev_dio {
+ 	size_t			size;
+ 	atomic_t		ref;
+ 	unsigned int		flags;
+-	struct bio		bio;
++	struct bio		bio ____cacheline_aligned_in_smp;
+ };
  
--	if (data->q->elevator) {
--		rq->rq_flags = RQF_ELV;
--		rq->tag = BLK_MQ_NO_TAG;
--		rq->internal_tag = tag;
--	} else {
-+	rq->q = q;
-+	rq->mq_ctx = ctx;
-+	rq->mq_hctx = hctx;
-+	rq->cmd_flags = cmd_flags;
-+	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
-+	data->hctx->queued++;
-+	if (!q->elevator) {
- 		rq->rq_flags = 0;
- 		rq->tag = tag;
- 		rq->internal_tag = BLK_MQ_NO_TAG;
-+	} else {
-+		rq->rq_flags = RQF_ELV;
-+		rq->tag = BLK_MQ_NO_TAG;
-+		rq->internal_tag = tag;
- 	}
--
--	/* csd/requeue_work/fifo_time is initialized before use */
--	rq->q = data->q;
--	rq->mq_ctx = data->ctx;
--	rq->mq_hctx = data->hctx;
--	rq->cmd_flags = data->cmd_flags;
--	if (data->flags & BLK_MQ_REQ_PM)
--		rq->rq_flags |= RQF_PM;
--	if (blk_queue_io_stat(data->q))
--		rq->rq_flags |= RQF_IO_STAT;
-+	rq->timeout = 0;
- 	INIT_LIST_HEAD(&rq->queuelist);
--	INIT_HLIST_NODE(&rq->hash);
--	RB_CLEAR_NODE(&rq->rb_node);
- 	rq->rq_disk = NULL;
- 	rq->part = NULL;
- #ifdef CONFIG_BLK_RQ_ALLOC_TIME
- 	rq->alloc_time_ns = alloc_time_ns;
- #endif
--	if (blk_mq_need_time_stamp(rq))
--		rq->start_time_ns = ktime_get_ns();
--	else
--		rq->start_time_ns = 0;
- 	rq->io_start_time_ns = 0;
- 	rq->stats_sectors = 0;
- 	rq->nr_phys_segments = 0;
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 	rq->nr_integrity_segments = 0;
- #endif
--	blk_crypto_rq_set_defaults(rq);
--	/* tag was already set */
--	WRITE_ONCE(rq->deadline, 0);
--
--	rq->timeout = 0;
--
- 	rq->end_io = NULL;
- 	rq->end_io_data = NULL;
--
--	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
-+	if (data->flags & BLK_MQ_REQ_PM)
-+		rq->rq_flags |= RQF_PM;
-+	if (blk_queue_io_stat(data->q))
-+		rq->rq_flags |= RQF_IO_STAT;
-+	if (blk_mq_need_time_stamp(rq))
-+		start_time_ns = ktime_get_ns();
-+	rq->start_time_ns = start_time_ns;
-+	blk_crypto_rq_set_defaults(rq);
- 	refcount_set(&rq->ref, 1);
-+	WRITE_ONCE(rq->deadline, 0);
- 
--	if (!op_is_flush(data->cmd_flags) && (rq->rq_flags & RQF_ELV)) {
--		struct elevator_queue *e = data->q->elevator;
-+	if (rq->rq_flags & RQF_ELV) {
-+		struct elevator_queue *e = q->elevator;
- 
- 		rq->elv.icq = NULL;
--		if (e->type->ops.prepare_request) {
-+		RB_CLEAR_NODE(&rq->rb_node);
-+		INIT_HLIST_NODE(&rq->hash);
-+		if (!op_is_flush(cmd_flags) && e->type->ops.prepare_request) {
- 			if (e->type->icq_cache)
- 				blk_mq_sched_assign_ioc(rq);
- 
-@@ -369,7 +368,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		}
- 	}
- 
--	data->hctx->queued++;
- 	return rq;
- }
- 
+ static struct bio_set blkdev_dio_pool;
 -- 
 2.33.1
 
