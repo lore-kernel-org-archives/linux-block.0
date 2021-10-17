@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66453C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE82C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:38:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D6E561040
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 295BF60F6F
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:38:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244790AbhJQBkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 21:40:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40176 "EHLO
+        id S244666AbhJQBkG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 21:40:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244778AbhJQBkF (ORCPT
+        with ESMTP id S244796AbhJQBkF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 16 Oct 2021 21:40:05 -0400
 Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790F1C061765
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:56 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id e144so12217359iof.3
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53CB5C061767
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:57 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id y67so12157842iof.10
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kulItnynzJhecGOua2JHXYjtl5ISMVm/qb97eP8VDrc=;
-        b=Ht1c48nBdWf+wlcfiZRiTp5QaMW+/DmtZEmp3lEUUDWEPTU/7JPpnhsEz7CfEd+6J2
-         ejTS8+GO0cNpfWJz87jtgctINCQSlzzPW0TLukYeUd7cuzD97KKI7gCaHehZrTOFWn23
-         W6yiwWIR5erZZssjuawTwpx6dajBtKEjJ4q+DW3SkpaLUlcZ5VKq4TvzdNyAam3rFzA5
-         vV8Ogjmq4InSjwyCAJCMQj/djbwoH5sT+u+u7T1aE/Hw3ZbqIJbEFQpEKGufrofBMRIX
-         Zi2wbAEy11bRPZ0QhdbtRRY/xyV2WeSUnCf7A16nJ+8GvIu/cDw0Jk9Avf7k5lYlBRUG
-         ZPoA==
+        bh=jHDbtDHsjqqwQO86cmJQVVA0iWqfAFLWw2YWksxgxRI=;
+        b=kvguSuTXz3Jhj7oEcK5lvAqYPaNA1ZwRn7LHSzB060BX63wQNKDxTNQb93ciA6fGjq
+         uT28jqaNgxGM03rz6U37zK/luc4Jf4UjUSuMBJTY7XZR8mioQLTLzPx+p3inUtTYOzc5
+         dN29iZACqwJ6TDxNM8+VZQ7bqHO7euNQtLQhcxwEuxKyDGUByLb4v3WUoYC/v550Lc7v
+         jmSGzKXeUe/hIZx0EiaAVANdkWyyuufLGj4ZIBPvwFqKzX5fqrW0mGHLd/+2o5LnvIdH
+         NqeOxz77YfS1gQVsWi2myDPoHSivsrpelzA53YHbs8Rzf/B2NiYQ33x9FMF7VdUisZUP
+         SOlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kulItnynzJhecGOua2JHXYjtl5ISMVm/qb97eP8VDrc=;
-        b=h+MG6BG038qScOXfcKKRzTWUfzmO1ri/sQ3kwCFpBUveCTevn3yGzQzeYIcfdLf7yf
-         lHFSPQo6E3YLzwL6XhIUFxgw9at4OEGTrgqx2FJozXgYgRcMsjEJKVx+bWBVwIZyaoJY
-         g/+rQyP4xWPZskxtXgWfngV8ty7mZSnQ6iLO7zusSdGysM3gNNhYbvQdnzox6GG08Pyk
-         Wsy1vF3h3fgHg9MqYFyUbzfiNkNb+HDu7gEEMARW4VNkCLT/RHxd5eYFhYZif8bYrpZE
-         /mg5gJdcp8SzTc/JvznSmEVxAJgbzv0h8PtC+EfulA7jYr4mBPKrzMiWMgf5xUSpxQ1Y
-         qPIQ==
-X-Gm-Message-State: AOAM5306i8CyxRYjJdAvw15Cre3uNyfszUeYPdiq47vvwWhgm67Iw97K
-        SeOwNKMIwtZGQpkVQbRbpoAA4KZ47sjF0w==
-X-Google-Smtp-Source: ABdhPJxvQ/TuF1l8q0T8KC8j2+U3rWPSQww0UPGSDS9DaXuCJxZ6s0VKDB0FcmHc8zTcisnCqBaXSw==
-X-Received: by 2002:a02:ac8a:: with SMTP id x10mr13729163jan.43.1634434675728;
-        Sat, 16 Oct 2021 18:37:55 -0700 (PDT)
+        bh=jHDbtDHsjqqwQO86cmJQVVA0iWqfAFLWw2YWksxgxRI=;
+        b=iyA9jo3/mSDWJwb9b1mtmREHonBYoYqSJMgxv+VvI0pdYayDHz6pxsTi7TgZqYy7c2
+         Z80mfTv9EEL37C6g0WCheOFdSRaApPKb2kXf0LQKK49WgN+3KnHYWz74H3fKCQQ48lJK
+         +VALsx6mSkHz8346pYt32Qx+vJozOH+X6of0zxGGJ9hG17Uu/tgz+BwOa5AUOkWqMswa
+         RAYxC2M8CLymr3mO8RZpcX/kfMZPFDXlkmJSkHa40W3X1ub+3Ynxz36oa8Vi7ACpUHue
+         YAmtoaTEv7t1Mctd4TaGDAffnCifoK8z1+CwW9+AkBTE5Pxyz+A2b5RIF/TVJhPO1OSW
+         md7Q==
+X-Gm-Message-State: AOAM532di5l+qrQ8wgTRM1Ga12ivIVJzL95jiFBdmpf9G32ahWd4jOY1
+        x/Za7yZl3GDWJRMP/v4Z/BSpj9Zl5s0p5g==
+X-Google-Smtp-Source: ABdhPJwnx01UW+YZvEmo1aOuFKx+1D+xCtGfyou9iZABy6fDD6h2C7xqwDqRvpo+8Yk28vlLVnwTyw==
+X-Received: by 2002:a02:b803:: with SMTP id o3mr13482327jam.55.1634434676550;
+        Sat, 16 Oct 2021 18:37:56 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.55
+        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Oct 2021 18:37:55 -0700 (PDT)
+        Sat, 16 Oct 2021 18:37:56 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 06/14] block: store elevator state in request
-Date:   Sat, 16 Oct 2021 19:37:40 -0600
-Message-Id: <20211017013748.76461-7-axboe@kernel.dk>
+Subject: [PATCH 07/14] block: change plugging to use a singly linked list
+Date:   Sat, 16 Oct 2021 19:37:41 -0600
+Message-Id: <20211017013748.76461-8-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211017013748.76461-1-axboe@kernel.dk>
 References: <20211017013748.76461-1-axboe@kernel.dk>
@@ -66,166 +66,363 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add an rq private RQF_ELV flag, which tells the block layer that this
-request was initialized on a queue that has an IO scheduler attached.
-This allows for faster checking in the fast path, rather than having to
-deference rq->q later on.
+Use a singly linked list for the blk_plug. This saves 8 bytes in the
+blk_plug struct, and makes for faster list manipulations than doubly
+linked lists. As we don't use the doubly linked lists for anything,
+singly linked is just fine.
 
-Elevator switching does full quiesce of the queue before detaching an
-IO scheduler, so it's safe to cache this in the request itself.
+This yields a bump in default (merging enabled) performance from 7.0
+to 7.1M IOPS, and ~7.5M IOPS with merging disabled.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq-sched.h   | 27 ++++++++++++++++-----------
- block/blk-mq.c         | 20 +++++++++++---------
- include/linux/blk-mq.h |  2 ++
- 3 files changed, 29 insertions(+), 20 deletions(-)
+ block/blk-core.c       |   5 +-
+ block/blk-merge.c      |   8 +--
+ block/blk-mq.c         | 156 +++++++++++++++++++++++++++--------------
+ block/blk.h            |   2 +-
+ include/linux/blkdev.h |   6 +-
+ 5 files changed, 113 insertions(+), 64 deletions(-)
 
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index fe252278ed9a..98836106b25f 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -56,29 +56,34 @@ static inline bool
- blk_mq_sched_allow_merge(struct request_queue *q, struct request *rq,
- 			 struct bio *bio)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index bdc03b80a8d0..fced71948162 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1542,11 +1542,12 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
+ 	if (tsk->plug)
+ 		return;
+ 
+-	INIT_LIST_HEAD(&plug->mq_list);
++	plug->mq_list = NULL;
+ 	plug->cached_rq = NULL;
+ 	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
+ 	plug->rq_count = 0;
+ 	plug->multiple_queues = false;
++	plug->has_elevator = false;
+ 	plug->nowait = false;
+ 	INIT_LIST_HEAD(&plug->cb_list);
+ 
+@@ -1632,7 +1633,7 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
  {
--	struct elevator_queue *e = q->elevator;
--
--	if (e && e->type->ops.allow_merge)
--		return e->type->ops.allow_merge(q, rq, bio);
-+	if (rq->rq_flags & RQF_ELV) {
-+		struct elevator_queue *e = q->elevator;
+ 	flush_plug_callbacks(plug, from_schedule);
  
-+		if (e->type->ops.allow_merge)
-+			return e->type->ops.allow_merge(q, rq, bio);
-+	}
- 	return true;
- }
- 
- static inline void blk_mq_sched_completed_request(struct request *rq, u64 now)
+-	if (!list_empty(&plug->mq_list))
++	if (!rq_list_empty(plug->mq_list))
+ 		blk_mq_flush_plug_list(plug, from_schedule);
+ 	if (unlikely(!from_schedule && plug->cached_rq))
+ 		blk_mq_free_plug_rqs(plug);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index ec727234ac48..b3f3e689a5ac 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -1085,23 +1085,23 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
+  * Caller must ensure !blk_queue_nomerges(q) beforehand.
+  */
+ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
+-		unsigned int nr_segs, struct request **same_queue_rq)
++		unsigned int nr_segs, bool *same_queue_rq)
  {
--	struct elevator_queue *e = rq->q->elevator;
-+	if (rq->rq_flags & RQF_ELV) {
-+		struct elevator_queue *e = rq->q->elevator;
+ 	struct blk_plug *plug;
+ 	struct request *rq;
  
--	if (e && e->type->ops.completed_request)
--		e->type->ops.completed_request(rq, now);
-+		if (e->type->ops.completed_request)
-+			e->type->ops.completed_request(rq, now);
-+	}
- }
+ 	plug = blk_mq_plug(q, bio);
+-	if (!plug || list_empty(&plug->mq_list))
++	if (!plug || rq_list_empty(plug->mq_list))
+ 		return false;
  
- static inline void blk_mq_sched_requeue_request(struct request *rq)
- {
--	struct request_queue *q = rq->q;
--	struct elevator_queue *e = q->elevator;
-+	if (rq->rq_flags & RQF_ELV) {
-+		struct request_queue *q = rq->q;
-+		struct elevator_queue *e = q->elevator;
- 
--	if ((rq->rq_flags & RQF_ELVPRIV) && e && e->type->ops.requeue_request)
--		e->type->ops.requeue_request(rq);
-+		if ((rq->rq_flags & RQF_ELVPRIV) && e->type->ops.requeue_request)
-+			e->type->ops.requeue_request(rq);
-+	}
- }
- 
- static inline bool blk_mq_sched_has_work(struct blk_mq_hw_ctx *hctx)
+ 	/* check the previously added entry for a quick merge attempt */
+-	rq = list_last_entry(&plug->mq_list, struct request, queuelist);
++	rq = rq_list_peek(&plug->mq_list);
+ 	if (rq->q == q && same_queue_rq) {
+ 		/*
+ 		 * Only blk-mq multiple hardware queues case checks the rq in
+ 		 * the same queue, there should be only one such rq in a queue
+ 		 */
+-		*same_queue_rq = rq;
++		*same_queue_rq = true;
+ 	}
+ 	if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) == BIO_MERGE_OK)
+ 		return true;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fa5b12200404..5d22c228f6df 100644
+index 5d22c228f6df..cd1249284c1f 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -299,7 +299,7 @@ void blk_mq_wake_waiters(struct request_queue *q)
-  */
- static inline bool blk_mq_need_time_stamp(struct request *rq)
- {
--	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS)) || rq->q->elevator;
-+	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_ELV));
+@@ -19,7 +19,6 @@
+ #include <linux/smp.h>
+ #include <linux/interrupt.h>
+ #include <linux/llist.h>
+-#include <linux/list_sort.h>
+ #include <linux/cpu.h>
+ #include <linux/cache.h>
+ #include <linux/sched/sysctl.h>
+@@ -2118,54 +2117,100 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 	spin_unlock(&ctx->lock);
  }
  
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
-@@ -309,9 +309,11 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	struct request *rq = tags->static_rqs[tag];
- 
- 	if (data->q->elevator) {
-+		rq->rq_flags = RQF_ELV;
- 		rq->tag = BLK_MQ_NO_TAG;
- 		rq->internal_tag = tag;
- 	} else {
-+		rq->rq_flags = 0;
- 		rq->tag = tag;
- 		rq->internal_tag = BLK_MQ_NO_TAG;
- 	}
-@@ -320,7 +322,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->q = data->q;
- 	rq->mq_ctx = data->ctx;
- 	rq->mq_hctx = data->hctx;
--	rq->rq_flags = 0;
- 	rq->cmd_flags = data->cmd_flags;
- 	if (data->flags & BLK_MQ_REQ_PM)
- 		rq->rq_flags |= RQF_PM;
-@@ -356,11 +357,11 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	data->ctx->rq_dispatched[op_is_sync(data->cmd_flags)]++;
- 	refcount_set(&rq->ref, 1);
- 
--	if (!op_is_flush(data->cmd_flags)) {
-+	if (!op_is_flush(data->cmd_flags) && (rq->rq_flags & RQF_ELV)) {
- 		struct elevator_queue *e = data->q->elevator;
- 
- 		rq->elv.icq = NULL;
--		if (e && e->type->ops.prepare_request) {
-+		if (e->type->ops.prepare_request) {
- 			if (e->type->icq_cache)
- 				blk_mq_sched_assign_ioc(rq);
- 
-@@ -575,12 +576,13 @@ static void __blk_mq_free_request(struct request *rq)
- void blk_mq_free_request(struct request *rq)
+-static int plug_rq_cmp(void *priv, const struct list_head *a,
+-		       const struct list_head *b)
++static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
  {
- 	struct request_queue *q = rq->q;
--	struct elevator_queue *e = q->elevator;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 
--	if (rq->rq_flags & RQF_ELVPRIV) {
--		if (e && e->type->ops.finish_request)
-+	if (rq->rq_flags & (RQF_ELVPRIV | RQF_ELV)) {
-+		struct elevator_queue *e = q->elevator;
+-	struct request *rqa = container_of(a, struct request, queuelist);
+-	struct request *rqb = container_of(b, struct request, queuelist);
++	struct blk_mq_hw_ctx *hctx = NULL;
++	int queued = 0;
++	int errors = 0;
 +
-+		if (e->type->ops.finish_request)
- 			e->type->ops.finish_request(rq);
- 		if (rq->elv.icq) {
- 			put_io_context(rq->elv.icq->ioc);
-@@ -2239,7 +2241,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		goto insert;
- 	}
++	while (!rq_list_empty(plug->mq_list)) {
++		struct request *rq;
++		blk_status_t ret;
++
++		rq = rq_list_pop(&plug->mq_list);
  
--	if (q->elevator && !bypass_insert)
-+	if ((rq->rq_flags & RQF_ELV) && !bypass_insert)
- 		goto insert;
+-	if (rqa->mq_ctx != rqb->mq_ctx)
+-		return rqa->mq_ctx > rqb->mq_ctx;
+-	if (rqa->mq_hctx != rqb->mq_hctx)
+-		return rqa->mq_hctx > rqb->mq_hctx;
++		if (!hctx)
++			hctx = rq->mq_hctx;
++		else if (hctx != rq->mq_hctx && hctx->queue->mq_ops->commit_rqs) {
++			trace_block_unplug(hctx->queue, queued, !from_schedule);
++			hctx->queue->mq_ops->commit_rqs(hctx);
++			queued = 0;
++			hctx = rq->mq_hctx;
++		}
++
++		ret = blk_mq_request_issue_directly(rq,
++						rq_list_empty(plug->mq_list));
++		if (ret != BLK_STS_OK) {
++			if (ret == BLK_STS_RESOURCE ||
++					ret == BLK_STS_DEV_RESOURCE) {
++				blk_mq_request_bypass_insert(rq, false,
++						rq_list_empty(plug->mq_list));
++				break;
++			}
++			blk_mq_end_request(rq, ret);
++			errors++;
++		} else
++			queued++;
++	}
  
- 	budget_token = blk_mq_get_dispatch_budget(q);
-@@ -2475,7 +2477,7 @@ void blk_mq_submit_bio(struct bio *bio)
+-	return blk_rq_pos(rqa) > blk_rq_pos(rqb);
++	/*
++	 * If we didn't flush the entire list, we could have told
++	 * the driver there was more coming, but that turned out to
++	 * be a lie.
++	 */
++	if ((!rq_list_empty(plug->mq_list) || errors) &&
++	     hctx->queue->mq_ops->commit_rqs && queued)
++		hctx->queue->mq_ops->commit_rqs(hctx);
+ }
+ 
+ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ {
++	struct blk_mq_hw_ctx *this_hctx;
++	struct blk_mq_ctx *this_ctx;
++	unsigned int depth;
+ 	LIST_HEAD(list);
+ 
+-	if (list_empty(&plug->mq_list))
++	if (rq_list_empty(plug->mq_list))
+ 		return;
+-	list_splice_init(&plug->mq_list, &list);
+-
+-	if (plug->rq_count > 2 && plug->multiple_queues)
+-		list_sort(NULL, &list, plug_rq_cmp);
+-
+ 	plug->rq_count = 0;
+ 
++	if (!plug->multiple_queues && !plug->has_elevator) {
++		blk_mq_plug_issue_direct(plug, from_schedule);
++		if (rq_list_empty(plug->mq_list))
++			return;
++	}
++
++	this_hctx = NULL;
++	this_ctx = NULL;
++	depth = 0;
+ 	do {
+-		struct list_head rq_list;
+-		struct request *rq, *head_rq = list_entry_rq(list.next);
+-		struct list_head *pos = &head_rq->queuelist; /* skip first */
+-		struct blk_mq_hw_ctx *this_hctx = head_rq->mq_hctx;
+-		struct blk_mq_ctx *this_ctx = head_rq->mq_ctx;
+-		unsigned int depth = 1;
+-
+-		list_for_each_continue(pos, &list) {
+-			rq = list_entry_rq(pos);
+-			BUG_ON(!rq->q);
+-			if (rq->mq_hctx != this_hctx || rq->mq_ctx != this_ctx)
+-				break;
+-			depth++;
++		struct request *rq;
++
++		rq = rq_list_pop(&plug->mq_list);
++
++		if (!this_hctx) {
++			this_hctx = rq->mq_hctx;
++			this_ctx = rq->mq_ctx;
++		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx) {
++			trace_block_unplug(this_hctx->queue, depth,
++						!from_schedule);
++			blk_mq_sched_insert_requests(this_hctx, this_ctx,
++						&list, from_schedule);
++			depth = 0;
++			this_hctx = rq->mq_hctx;
++			this_ctx = rq->mq_ctx;
++
  		}
  
- 		blk_add_rq_to_plug(plug, rq);
--	} else if (q->elevator) {
-+	} else if (rq->rq_flags & RQF_ELV) {
+-		list_cut_before(&rq_list, &list, pos);
+-		trace_block_unplug(head_rq->q, depth, !from_schedule);
+-		blk_mq_sched_insert_requests(this_hctx, this_ctx, &rq_list,
++		list_add(&rq->queuelist, &list);
++		depth++;
++	} while (!rq_list_empty(plug->mq_list));
++
++	if (!list_empty(&list)) {
++		trace_block_unplug(this_hctx->queue, depth, !from_schedule);
++		blk_mq_sched_insert_requests(this_hctx, this_ctx, &list,
+ 						from_schedule);
+-	} while(!list_empty(&list));
++	}
+ }
+ 
+ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
+@@ -2345,16 +2390,17 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+ {
+-	list_add_tail(&rq->queuelist, &plug->mq_list);
+-	plug->rq_count++;
+-	if (!plug->multiple_queues && !list_is_singular(&plug->mq_list)) {
+-		struct request *tmp;
++	if (!plug->multiple_queues) {
++		struct request *nxt = rq_list_peek(&plug->mq_list);
+ 
+-		tmp = list_first_entry(&plug->mq_list, struct request,
+-						queuelist);
+-		if (tmp->q != rq->q)
++		if (nxt && nxt->q != rq->q)
+ 			plug->multiple_queues = true;
+ 	}
++	if (!plug->has_elevator && (rq->rq_flags & RQF_ELV))
++		plug->has_elevator = true;
++	rq->rq_next = NULL;
++	rq_list_add(&plug->mq_list, rq);
++	plug->rq_count++;
+ }
+ 
+ /*
+@@ -2389,7 +2435,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	const int is_flush_fua = op_is_flush(bio->bi_opf);
+ 	struct request *rq;
+ 	struct blk_plug *plug;
+-	struct request *same_queue_rq = NULL;
++	bool same_queue_rq = false;
+ 	unsigned int nr_segs = 1;
+ 	blk_status_t ret;
+ 
+@@ -2463,15 +2509,17 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		 * IO may benefit a lot from plug merging.
+ 		 */
+ 		unsigned int request_count = plug->rq_count;
+-		struct request *last = NULL;
++		struct request *tmp = NULL;
+ 
+-		if (!request_count)
++		if (!request_count) {
+ 			trace_block_plug(q);
+-		else
+-			last = list_entry_rq(plug->mq_list.prev);
++		} else if (!blk_queue_nomerges(q)) {
++			tmp = rq_list_peek(&plug->mq_list);
++			if (blk_rq_bytes(tmp) < BLK_PLUG_FLUSH_SIZE)
++				tmp = NULL;
++		}
+ 
+-		if (request_count >= blk_plug_max_rq_count(plug) || (last &&
+-		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
++		if (request_count >= blk_plug_max_rq_count(plug) || tmp) {
+ 			blk_flush_plug_list(plug, false);
+ 			trace_block_plug(q);
+ 		}
+@@ -2481,6 +2529,8 @@ void blk_mq_submit_bio(struct bio *bio)
  		/* Insert the request at the IO scheduler queue */
  		blk_mq_sched_insert_request(rq, false, true, true);
  	} else if (plug && !blk_queue_nomerges(q)) {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index a9c1d0882550..3a399aa372b5 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -55,6 +55,8 @@ typedef __u32 __bitwise req_flags_t;
- #define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
- /* ->timeout has been called, don't expire again */
- #define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
-+/* queue has elevator attached */
-+#define RQF_ELV			((__force req_flags_t)(1 << 22))
++		struct request *first_rq = NULL;
++
+ 		/*
+ 		 * We do limited plugging. If the bio can be merged, do that.
+ 		 * Otherwise the existing request in the plug list will be
+@@ -2488,19 +2538,17 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		 * The plug list might get flushed before this. If that happens,
+ 		 * the plug list is empty, and same_queue_rq is invalid.
+ 		 */
+-		if (list_empty(&plug->mq_list))
+-			same_queue_rq = NULL;
+-		if (same_queue_rq) {
+-			list_del_init(&same_queue_rq->queuelist);
++		if (!rq_list_empty(plug->mq_list) && same_queue_rq) {
++			first_rq = rq_list_pop(&plug->mq_list);
+ 			plug->rq_count--;
+ 		}
+ 		blk_add_rq_to_plug(plug, rq);
+ 		trace_block_plug(q);
  
- /* flags that prevent us from merging requests: */
- #define RQF_NOMERGE_FLAGS \
+-		if (same_queue_rq) {
++		if (first_rq) {
+ 			trace_block_unplug(q, 1, true);
+-			blk_mq_try_issue_directly(same_queue_rq->mq_hctx,
+-						  same_queue_rq);
++			blk_mq_try_issue_directly(first_rq->mq_hctx,
++						  first_rq);
+ 		}
+ 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
+ 		   !rq->mq_hctx->dispatch_busy) {
+diff --git a/block/blk.h b/block/blk.h
+index fdfaa6896fc4..c15d1ab224b8 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -216,7 +216,7 @@ void blk_add_timer(struct request *req);
+ void blk_print_req_error(struct request *req, blk_status_t status);
+ 
+ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
+-		unsigned int nr_segs, struct request **same_queue_rq);
++		unsigned int nr_segs, bool *same_queue_rq);
+ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ 			struct bio *bio, unsigned int nr_segs);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 43dda725dcae..c6a6402cb1a1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -727,7 +727,7 @@ extern void blk_set_queue_dying(struct request_queue *);
+  * schedule() where blk_schedule_flush_plug() is called.
+  */
+ struct blk_plug {
+-	struct list_head mq_list; /* blk-mq requests */
++	struct request *mq_list; /* blk-mq requests */
+ 
+ 	/* if ios_left is > 1, we can batch tag/rq allocations */
+ 	struct request *cached_rq;
+@@ -736,6 +736,7 @@ struct blk_plug {
+ 	unsigned short rq_count;
+ 
+ 	bool multiple_queues;
++	bool has_elevator;
+ 	bool nowait;
+ 
+ 	struct list_head cb_list; /* md requires an unplug callback */
+@@ -776,8 +777,7 @@ static inline bool blk_needs_flush_plug(struct task_struct *tsk)
+ 	struct blk_plug *plug = tsk->plug;
+ 
+ 	return plug &&
+-		 (!list_empty(&plug->mq_list) ||
+-		 !list_empty(&plug->cb_list));
++		 (plug->mq_list || !list_empty(&plug->cb_list));
+ }
+ 
+ int blkdev_issue_flush(struct block_device *bdev);
 -- 
 2.33.1
 
