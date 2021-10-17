@@ -2,64 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 396D5C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 12:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC8EC433F5
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 13:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1911260F93
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 12:59:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 371F660F93
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 13:03:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343628AbhJQNCG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Oct 2021 09:02:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47072 "EHLO
+        id S236494AbhJQNFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Oct 2021 09:05:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245672AbhJQNCG (ORCPT
+        with ESMTP id S236421AbhJQNFV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Oct 2021 09:02:06 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5926C061765
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 05:59:56 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id w11so12123513ilv.6
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 05:59:56 -0700 (PDT)
+        Sun, 17 Oct 2021 09:05:21 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBB6C061765
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 06:03:11 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id y67so13104451iof.10
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 06:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=lunQFRlncbllbXQWeil8QJ9NZRaIpK/43jLlPRnBMKo=;
-        b=FJKg3uVq6GKz2851+RqGvDQtN1aJosoJYUWypacYSYMAPJe8kWfIHZOLM91V6HDSud
-         3a+t4V8awzzC3O01IH3h1C+DmkAx+2l1dAtOiKg36DDACYzy8927a6meYoP+hpyakv9q
-         L73ZCIBdhGKYniDHOQC+2y9DpKM5JsJdxipz/jMEAPY86VqGQHCIWhnyXYHL5t8Lnr9v
-         GqjaE638YdUfL3Zr2AnzDU5B7CpFS8MAX9W+tTmeYEi9B202OtZdTfu6wYu1JGjxke/k
-         FByrRNi9H5VKMztdmckKY/V3tpZqzAi6Ed2mr50qkxPTJTiblfrtD6/aH7Br8shh1ddm
-         mA+g==
+        bh=cpHZ7r0xJhtTVNnwnC2/v/oL0NL2Mq8QcDvO2xernog=;
+        b=CmNJkyumqn2veFHFq4gljV+Uvx4uvgW0UcP7OCqp1IeC8MXGY+7pE/ld5GE4VhnY6e
+         kNOKTY+rOpzpSqaa73j0pmtb2hBD5MXsEZH0C1eBtwBXHc4hFNd9keW30ePIV/BCEZrk
+         qEPl1k3RJNgPCA2aK4WE1H2la4/MeIrPRJlNZjTCGEMlZ/I1MenhZZXpkwBDMeslScFG
+         aGSCq5exWY0M9b7RPsQO7mqP9RXbIhVkVp2cfMiUTeaTIHFimvXfIb0pmxR5OASyuy7i
+         m/B6WzIIQgbD2v6y6Kq6IORz8RPzERNOxiNu+vKQKrPyfEmVsR5CQ/N5JrXmp8KHasDX
+         FH9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=lunQFRlncbllbXQWeil8QJ9NZRaIpK/43jLlPRnBMKo=;
-        b=ZIuHpdrr5XkT33neC68p1A0dm70kjgI2ZniicGz9oTbq3F8meHV4ncPEllQiznSU2Q
-         25eEib5/drZDTNHTeVteskZCbf7d2VVx52OPbM/pEepKqT+0l58TIn3zoE0Oysp1o1nG
-         N5LN+/AVa8b5YYMvf1aOEZTHnmFscba0RdZ5Z7jGCMFS2FFTV9QqIQClhb4UwOPqp/4k
-         lOP/2GmRXiFuY0H/mtskR67SLxjkb5aJ16TRLwozwH9iu4aPEI+rLNK9ctqzOoxzgY6o
-         WEFqr24XxETRb1LuHluEnPjtZwuU80RYG3+O3WX298+RmEa37nhPXHRW4R59OOs2L//E
-         Xy1g==
-X-Gm-Message-State: AOAM533OC9OZHl2dh+6uuY8y/FjZwakP361SDbdnjxf6nUGD7hXrP6DK
-        2Hc30sRg3FMJ4fFHIV4bUbKgbA==
-X-Google-Smtp-Source: ABdhPJzb02HPbz5Jm2Yjt/GBE/FZYjKYwiKp+30dZkqTUiH5P5RIdQEm9MHxvidkTXqtosakWznXTg==
-X-Received: by 2002:a05:6e02:120f:: with SMTP id a15mr3192090ilq.109.1634475596022;
-        Sun, 17 Oct 2021 05:59:56 -0700 (PDT)
+        bh=cpHZ7r0xJhtTVNnwnC2/v/oL0NL2Mq8QcDvO2xernog=;
+        b=lotTALM2LmCPxVCAFkbraGg0meqViskfXzN/eF34sRHw7A9bL0phlMp0jyD1gYG7/9
+         QEj2yKnGph3NLIchM/t3jexOhwKcF0spYD/gIFjYOY6LFM432nZ3nHq69KQVoE8UAAzq
+         DQeeDgjgupqag64E64AqevOXNIFQoz438JNnua4kZtWRVwQThgQLDJ8zpTvL3EhpELVo
+         ExMCyIwNnzf3jMYmAvCpjw0DjnWhDE7cy4J8dDApn8s6PG+ndqp5jz86wNvDqhEGEECl
+         5VkIe8N0gvs5jA8BdJ6vdp76QSJzwCpt1/i7LQUdP6g80lgEvX6k3/MZCb3ITo9xopNl
+         1iRQ==
+X-Gm-Message-State: AOAM533sZcKsHrLrbF2U6KH5Oo8QZ0sOWwRceCxkk8YihPFW3mXfVDVk
+        9mUdLjRHQEB2Jt+3BvjB+goi4A==
+X-Google-Smtp-Source: ABdhPJx4iSggqclLbZlTWfHwCsa83vp6P8YD2Msi27jk+2CYfGoHuU7w0epdKWXm5Z6GR/3tPsZYeQ==
+X-Received: by 2002:a6b:f816:: with SMTP id o22mr11299221ioh.106.1634475791291;
+        Sun, 17 Oct 2021 06:03:11 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id h5sm2534531ili.12.2021.10.17.05.59.55
+        by smtp.gmail.com with ESMTPSA id r11sm5585992ilt.83.2021.10.17.06.03.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Oct 2021 05:59:55 -0700 (PDT)
+        Sun, 17 Oct 2021 06:03:10 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: warn when putting the final reference on a registered disk
-Date:   Sun, 17 Oct 2021 06:59:51 -0600
-Message-Id: <163447558819.89398.2379548063287854869.b4-ty@kernel.dk>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH BUGFIX 0/1] block, bfq: fix bug 214503
+Date:   Sun, 17 Oct 2021 07:03:08 -0600
+Message-Id: <163447578602.89992.1872535198744308847.b4-ty@kernel.dk>
 X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211014130231.1468538-1-hch@lst.de>
-References: <20211014130231.1468538-1-hch@lst.de>
+In-Reply-To: <20211015144336.45894-1-paolo.valente@linaro.org>
+References: <20211015144336.45894-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -67,18 +68,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 14 Oct 2021 15:02:31 +0200, Christoph Hellwig wrote:
-> Warn when the last reference on a live disk is put without calling
-> del_gendisk first.  There are some BDI related bug reports that look
-> like a case of this, so make sure we have the proper instrumentation
-> to catch it.
+On Fri, 15 Oct 2021 16:43:35 +0200, Paolo Valente wrote:
+> this patch fixes bug 214503 [1]. Commit 2d52c58b9c9b ("block, bfq:
+> honor already-setup queue merges") has not to do with this bug, and
+> can be restored.
 > 
+> Thanks,
+> Paolo
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: warn when putting the final reference on a registered disk
-      commit: a20417611b98e12a724e5c828c472ea16990b71f
+[1/1] block, bfq: reset last_bfqq_created on group change
+      commit: d29bd41428cfff9b582c248db14a47e2be8457a8
 
 Best regards,
 -- 
