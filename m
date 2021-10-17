@@ -2,91 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC70FC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 12:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396D5C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 12:59:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9733360FED
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 12:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1911260F93
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 12:59:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343636AbhJQNBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Oct 2021 09:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46930 "EHLO
+        id S1343628AbhJQNCG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Oct 2021 09:02:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343588AbhJQNBe (ORCPT
+        with ESMTP id S245672AbhJQNCG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Oct 2021 09:01:34 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6C5C061765
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 05:59:24 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id x1so13117310iof.7
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 05:59:24 -0700 (PDT)
+        Sun, 17 Oct 2021 09:02:06 -0400
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5926C061765
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 05:59:56 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id w11so12123513ilv.6
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 05:59:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ytX4HdIZmZ28e1ub8YIdiheHvRBS77VmJQMUomMwZkA=;
-        b=b2D1jO0GcUxp7achKObI+Nv8UhJt1FNRDu1AyUc9+GJ849mv89fpQRQp6IRF1UZKvs
-         Vr1AoR+naW9m9uEQnSrSVCPdouciTZRAi/ZVdmkKeZKmOc9JNn8VaovuT5VVxsjMR1KD
-         8zNfTLGBaAvFb2fT26a8KFooz8U4VrXYRZdFw4tFt1uJRzN4hEOTgyfs+J7DAmh1LSRv
-         XjfQoIPKU6gnVyTjdQ9aoTJKcYP7sITOmaOJtwKKpRKKvJ2XeWmPUXPWH5LYHgxsefkV
-         /AdTg6rBNEFrT21voZkAQOwJIXq0uk1RMboPKEvJOuNv1UlH1d3Xmhekk29Un3mt8Oxc
-         /JEQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=lunQFRlncbllbXQWeil8QJ9NZRaIpK/43jLlPRnBMKo=;
+        b=FJKg3uVq6GKz2851+RqGvDQtN1aJosoJYUWypacYSYMAPJe8kWfIHZOLM91V6HDSud
+         3a+t4V8awzzC3O01IH3h1C+DmkAx+2l1dAtOiKg36DDACYzy8927a6meYoP+hpyakv9q
+         L73ZCIBdhGKYniDHOQC+2y9DpKM5JsJdxipz/jMEAPY86VqGQHCIWhnyXYHL5t8Lnr9v
+         GqjaE638YdUfL3Zr2AnzDU5B7CpFS8MAX9W+tTmeYEi9B202OtZdTfu6wYu1JGjxke/k
+         FByrRNi9H5VKMztdmckKY/V3tpZqzAi6Ed2mr50qkxPTJTiblfrtD6/aH7Br8shh1ddm
+         mA+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ytX4HdIZmZ28e1ub8YIdiheHvRBS77VmJQMUomMwZkA=;
-        b=wsG0tJNYpPMmITrzAn6D+pIC12Z6umYEdVvM4/Y4X/xD7BHqnGs4t0rREvCI7xVsOH
-         6g7CEpwLpBQYVQPSoGXq1vifzVsSgxhVx34sha+6usRto4CyM5UGTwDbRcp2nTADh9SK
-         2nZlsIogNFvyD5ZlqYj1SbvuS8DGNtMDzvptdBRuWP3bo3i5tkZv6UE1pn9zwm3tnys9
-         P+kR6sIhXNWSaEQupRHUlpOfUxL+dtFlXsehlpvF7YDU37Tc2oIZTRtqgPLIHIfiDTFo
-         d+iAd8SBctCsM6CeogG/Hd3YUSUWG+bKkENb5lMmelPKMgVtY/e8ALF1hcW9oHCpwRq0
-         FbWg==
-X-Gm-Message-State: AOAM532DJU2bHNTzJpTdxEFHFbwRQTAufcOz6QUvVBomZdBrjK5smTSH
-        LulXNz+GLpS6FR1jTvI54vloWQ==
-X-Google-Smtp-Source: ABdhPJynKQdq8QvliNhrBE29N1TiRlprCrIimKQqCsGfTIN8WfnfzrKPRWW++mb6W8hidJYfWUomyg==
-X-Received: by 2002:a02:cb94:: with SMTP id u20mr14596094jap.134.1634475564268;
-        Sun, 17 Oct 2021 05:59:24 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id h10sm5367427ilh.48.2021.10.17.05.59.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Oct 2021 05:59:23 -0700 (PDT)
-Subject: Re: [PATCH 0/5] cache request_queue pointer
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@infradead.org>
-References: <cover.1634219547.git.asml.silence@gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=lunQFRlncbllbXQWeil8QJ9NZRaIpK/43jLlPRnBMKo=;
+        b=ZIuHpdrr5XkT33neC68p1A0dm70kjgI2ZniicGz9oTbq3F8meHV4ncPEllQiznSU2Q
+         25eEib5/drZDTNHTeVteskZCbf7d2VVx52OPbM/pEepKqT+0l58TIn3zoE0Oysp1o1nG
+         N5LN+/AVa8b5YYMvf1aOEZTHnmFscba0RdZ5Z7jGCMFS2FFTV9QqIQClhb4UwOPqp/4k
+         lOP/2GmRXiFuY0H/mtskR67SLxjkb5aJ16TRLwozwH9iu4aPEI+rLNK9ctqzOoxzgY6o
+         WEFqr24XxETRb1LuHluEnPjtZwuU80RYG3+O3WX298+RmEa37nhPXHRW4R59OOs2L//E
+         Xy1g==
+X-Gm-Message-State: AOAM533OC9OZHl2dh+6uuY8y/FjZwakP361SDbdnjxf6nUGD7hXrP6DK
+        2Hc30sRg3FMJ4fFHIV4bUbKgbA==
+X-Google-Smtp-Source: ABdhPJzb02HPbz5Jm2Yjt/GBE/FZYjKYwiKp+30dZkqTUiH5P5RIdQEm9MHxvidkTXqtosakWznXTg==
+X-Received: by 2002:a05:6e02:120f:: with SMTP id a15mr3192090ilq.109.1634475596022;
+        Sun, 17 Oct 2021 05:59:56 -0700 (PDT)
+Received: from localhost.localdomain ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id h5sm2534531ili.12.2021.10.17.05.59.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Oct 2021 05:59:55 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <dba463cb-3f1e-0972-aeaf-099d7c12bd0e@kernel.dk>
-Date:   Sun, 17 Oct 2021 06:59:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: warn when putting the final reference on a registered disk
+Date:   Sun, 17 Oct 2021 06:59:51 -0600
+Message-Id: <163447558819.89398.2379548063287854869.b4-ty@kernel.dk>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20211014130231.1468538-1-hch@lst.de>
+References: <20211014130231.1468538-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <cover.1634219547.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/14/21 8:03 AM, Pavel Begunkov wrote:
-> Cache request_queue in bdev and replace two derefs in
-> bdev->bd_disk->queue with bdev->bd_queue. Benchmarking
-> with nullblk gave me around +1% to peak perf.
+On Thu, 14 Oct 2021 15:02:31 +0200, Christoph Hellwig wrote:
+> Warn when the last reference on a live disk is put without calling
+> del_gendisk first.  There are some BDI related bug reports that look
+> like a case of this, so make sure we have the proper instrumentation
+> to catch it.
 > 
-> All patches are self contained and don't rely on others from
-> the set including 1/5 and can be taken separately. And some
-> changes go in separate patches to minimise conflicts. When
-> we agree on the approach, I'll send the rest converting some
-> other spots out of block.
+> 
 
-Looks fine to me. Christoph, any concerns?
+Applied, thanks!
 
-One note, though - s/fater/faster in patches 2..5 in the commit
-message.
+[1/1] block: warn when putting the final reference on a registered disk
+      commit: a20417611b98e12a724e5c828c472ea16990b71f
 
+Best regards,
 -- 
 Jens Axboe
+
 
