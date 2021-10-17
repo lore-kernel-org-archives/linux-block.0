@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49865C4332F
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E48FC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28AF660F70
-	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0B6360F70
+	for <linux-block@archiver.kernel.org>; Sun, 17 Oct 2021 01:37:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244776AbhJQBkC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Oct 2021 21:40:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40152 "EHLO
+        id S244792AbhJQBkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Oct 2021 21:40:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244666AbhJQBkC (ORCPT
+        with ESMTP id S244778AbhJQBkD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Oct 2021 21:40:02 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E722EC061765
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:53 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id z69so9063202iof.9
-        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:53 -0700 (PDT)
+        Sat, 16 Oct 2021 21:40:03 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBB1C061765
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:55 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id 188so12157663iou.12
+        for <linux-block@vger.kernel.org>; Sat, 16 Oct 2021 18:37:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Zk+VFUyTHswlZhVazEfOgbMJknuQJMVW20A7FDAdBoY=;
-        b=1NiYVEuR3i7KT6Jj6x5n12kjrMNcvRwLttA0275gZExQUfb7VWn2/iVeb6E72aY7DL
-         /RsUyyp+5GVTVO63uFz3ZhCRgn5c1CmOKPPJGBpQTyaMlVznN69Zu9GDT3BHerltZ9o8
-         UGzo1wwyFhay9NxLYIukwIHXI6sM3aqLfVNF9w2S+Fx0rZdTYZ03Rsxhb5LdeAMZzv/q
-         wqk0ybvAtm0T0TjG213C6TDLHO1lzriKsXcoPwxsPoocCjq8zoYHimRdyOhAq53gdKCm
-         7oy1ilQq/TH8kQTWz9NU1GYyBaJJ5A5Wxiv38YWqKWj6ZHzcQbivhfqfD0kUe2aAIIiC
-         h8rg==
+        bh=+Y03XGOLth6ew15W15TylF0EHYAmrv3Y3nwGIpoWtJU=;
+        b=GY2jfy5JCSz/tI5lmX2KmMJ1Nnm4nNHqpEOccV8loPkha8cnNkfmpTIoR+c557yNY7
+         5wvaZ353Dd/A6LSemW0P7PbIGT7pLhOZ7OXuMdPooOZrNctB4Se7C8ojDnxuCs+nDC6y
+         USElD+rjUEj0Gnc4PG3ofOyh8jsqz3R0W537ZL/Gg3Z0t18pM0iFLZpEATNDoNK7aJim
+         ErFk/y9iWU8SPj43lD0+1DtvpHmHLxUb1WsWfOHMmRNGMCK7caUYQ7BdFYD7xNPhDPj8
+         R+su5PsNDGegg6ICRAyK2cU4XpZcu0wO3eBQOtp1akF+KUsxHNc4KbQpAHImG6bypWr/
+         YYbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Zk+VFUyTHswlZhVazEfOgbMJknuQJMVW20A7FDAdBoY=;
-        b=3Ac8cluVfUwQJKPsg5ZaG2TO49F3CMlBsPjoNgzNu9sWtcoZd/geTX5PBE+ovFd8YQ
-         x0hJ2gomRzhsy7uCzmbNpehyWt8BnLoDFTJUJg2451yLOBWSGE5T6VwdWv6lCsJstDgL
-         Lcycf0DVNZVcOvwbIef7SFZOEOq2n2lMiOPEgPv+ShOZ3x8poRtTnl6MGxA4asGweEMo
-         wkOu9qHgow/qBTRo3tEIEsmpyePuOA/Usz4LaqbUraDp3vKdy1jfjbTydx6c7RO3RTaO
-         46FB21t5gpSWOTmuHz0M72fF2KSwYUw7sHsYqfPJ/gvFBgMyTA+Ve3q1hKFmF9nErvwt
-         zXWg==
-X-Gm-Message-State: AOAM532PU+s7dVk3PgvBkk96Rj7y9/+32ZLocgLm8KOBbiCgFvYgEL3y
-        SfVArPJpz/nl7PQ1ot94ZPyJYajNBbE17A==
-X-Google-Smtp-Source: ABdhPJzJno1cEt4Cd8Ntf+ikpFg7p9YdPTGDS260+dzXRvlwYJWjj8mJfrg57kmgcRtyp6vM4J5eYg==
-X-Received: by 2002:a05:6602:2f06:: with SMTP id q6mr9409170iow.39.1634434673157;
-        Sat, 16 Oct 2021 18:37:53 -0700 (PDT)
+        bh=+Y03XGOLth6ew15W15TylF0EHYAmrv3Y3nwGIpoWtJU=;
+        b=cp8zfZmjgirr1iMp6ySdsFemIrzwBaHvokT4gaXqgIy2ECfHKQa+v721TnRALFTUlb
+         jfGMGYO2aBfJMEkhaIeTUGMBlbaMUcSoFNrLU5JiYvDtQ1wY9pwWxUIt1a9ajNx/pJhB
+         Yl4m/5zFuSkfGDNceh9GvuPlxN9FZ2TlkIq/O29pOTLX7aGSZLdkBDPQupEgzdonNbgi
+         lQ4+PSSG2uCC/EPLyNj4DcIBKWYQQ71T+7fSmuCBjgdQ1ZEy4xWvV/DTHXY29ieoz/tC
+         RVtiX2oXxSKZJWAEs/ScAs3o02nogkN3Q0gcmV+/7GN8wVDVrkXIjqLsgbY/5NC6kaY3
+         EiyQ==
+X-Gm-Message-State: AOAM531fT4/vqq6IAoN/cOkRjKCzAGmVoCcXVj/wzSKoK7raIv3HJ2uj
+        NCumTWIL2r1rZVYv5cI4tjYl24EhjD4=
+X-Google-Smtp-Source: ABdhPJzfOz8+phn4bUIwqRK4WvHwgUfElCmdjdQ9hvw53ZdiIELLumMcQh61nCj2qbecg36Q7opQJA==
+X-Received: by 2002:a05:6602:1651:: with SMTP id y17mr9509809iow.114.1634434674286;
+        Sat, 16 Oct 2021 18:37:54 -0700 (PDT)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.52
+        by smtp.gmail.com with ESMTPSA id j17sm4934383ilq.1.2021.10.16.18.37.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Oct 2021 18:37:52 -0700 (PDT)
+        Sat, 16 Oct 2021 18:37:54 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/14] block: don't bother iter advancing a fully done bio
-Date:   Sat, 16 Oct 2021 19:37:36 -0600
-Message-Id: <20211017013748.76461-3-axboe@kernel.dk>
+Subject: [PATCH 04/14] block: move update request helpers into blk-mq.c
+Date:   Sat, 16 Oct 2021 19:37:38 -0600
+Message-Id: <20211017013748.76461-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211017013748.76461-1-axboe@kernel.dk>
 References: <20211017013748.76461-1-axboe@kernel.dk>
@@ -66,91 +66,364 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we're completing nbytes and nbytes is the size of the bio, don't bother
-with calling into the iterator increment helpers. Just clear the bio
-size and we're done.
+For some reason we still have them in blk-core, with the rest of the
+request completion being in blk-mq. That causes and out-of-line call
+for each completion.
+
+Move them into blk-mq.c instead, where they belong.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/bio.c         | 15 ++-------------
- include/linux/bio.h | 24 ++++++++++++++++++++++--
- 2 files changed, 24 insertions(+), 15 deletions(-)
+ block/blk-core.c | 146 +----------------------------------------------
+ block/blk-mq.c   | 144 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk.h      |   1 +
+ 3 files changed, 146 insertions(+), 145 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index a3c9ff23a036..2427e6fca942 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1278,18 +1278,7 @@ int submit_bio_wait(struct bio *bio)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2596327f07d6..bdc03b80a8d0 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -217,7 +217,7 @@ int blk_status_to_errno(blk_status_t status)
  }
- EXPORT_SYMBOL(submit_bio_wait);
+ EXPORT_SYMBOL_GPL(blk_status_to_errno);
+ 
+-static void print_req_error(struct request *req, blk_status_t status)
++void blk_print_req_error(struct request *req, blk_status_t status)
+ {
+ 	int idx = (__force int)status;
+ 
+@@ -235,33 +235,6 @@ static void print_req_error(struct request *req, blk_status_t status)
+ 		IOPRIO_PRIO_CLASS(req->ioprio));
+ }
+ 
+-static void req_bio_endio(struct request *rq, struct bio *bio,
+-			  unsigned int nbytes, blk_status_t error)
+-{
+-	if (error)
+-		bio->bi_status = error;
+-
+-	if (unlikely(rq->rq_flags & RQF_QUIET))
+-		bio_set_flag(bio, BIO_QUIET);
+-
+-	bio_advance(bio, nbytes);
+-
+-	if (req_op(rq) == REQ_OP_ZONE_APPEND && error == BLK_STS_OK) {
+-		/*
+-		 * Partial zone append completions cannot be supported as the
+-		 * BIO fragments may end up not being written sequentially.
+-		 */
+-		if (bio->bi_iter.bi_size)
+-			bio->bi_status = BLK_STS_IOERR;
+-		else
+-			bio->bi_iter.bi_sector = rq->__sector;
+-	}
+-
+-	/* don't actually finish bio if it's part of flush sequence */
+-	if (bio->bi_iter.bi_size == 0 && !(rq->rq_flags & RQF_FLUSH_SEQ))
+-		bio_endio(bio);
+-}
+-
+ void blk_dump_rq_flags(struct request *rq, char *msg)
+ {
+ 	printk(KERN_INFO "%s: dev %s: flags=%llx\n", msg,
+@@ -1304,17 +1277,6 @@ static void update_io_ticks(struct block_device *part, unsigned long now,
+ 	}
+ }
+ 
+-static void blk_account_io_completion(struct request *req, unsigned int bytes)
+-{
+-	if (req->part && blk_do_io_stat(req)) {
+-		const int sgrp = op_stat_group(req_op(req));
+-
+-		part_stat_lock();
+-		part_stat_add(req->part, sectors[sgrp], bytes >> 9);
+-		part_stat_unlock();
+-	}
+-}
+-
+ void __blk_account_io_done(struct request *req, u64 now)
+ {
+ 	const int sgrp = op_stat_group(req_op(req));
+@@ -1423,112 +1385,6 @@ void blk_steal_bios(struct bio_list *list, struct request *rq)
+ }
+ EXPORT_SYMBOL_GPL(blk_steal_bios);
  
 -/**
-- * bio_advance - increment/complete a bio by some number of bytes
-- * @bio:	bio to advance
-- * @bytes:	number of bytes to complete
+- * blk_update_request - Complete multiple bytes without completing the request
+- * @req:      the request being processed
+- * @error:    block status code
+- * @nr_bytes: number of bytes to complete for @req
 - *
-- * This updates bi_sector, bi_size and bi_idx; if the number of bytes to
-- * complete doesn't align with a bvec boundary, then bv_len and bv_offset will
-- * be updated on the last bvec as well.
+- * Description:
+- *     Ends I/O on a number of bytes attached to @req, but doesn't complete
+- *     the request structure even if @req doesn't have leftover.
+- *     If @req has leftover, sets it up for the next range of segments.
 - *
-- * @bio will then represent the remaining, uncompleted portion of the io.
-- */
--void bio_advance(struct bio *bio, unsigned bytes)
-+void __bio_advance(struct bio *bio, unsigned bytes)
- {
- 	if (bio_integrity(bio))
- 		bio_integrity_advance(bio, bytes);
-@@ -1297,7 +1286,7 @@ void bio_advance(struct bio *bio, unsigned bytes)
- 	bio_crypt_advance(bio, bytes);
- 	bio_advance_iter(bio, &bio->bi_iter, bytes);
+- *     Passing the result of blk_rq_bytes() as @nr_bytes guarantees
+- *     %false return from this function.
+- *
+- * Note:
+- *	The RQF_SPECIAL_PAYLOAD flag is ignored on purpose in this function
+- *      except in the consistency check at the end of this function.
+- *
+- * Return:
+- *     %false - this request doesn't have any more data
+- *     %true  - this request has more data
+- **/
+-bool blk_update_request(struct request *req, blk_status_t error,
+-		unsigned int nr_bytes)
+-{
+-	int total_bytes;
+-
+-	trace_block_rq_complete(req, blk_status_to_errno(error), nr_bytes);
+-
+-	if (!req->bio)
+-		return false;
+-
+-#ifdef CONFIG_BLK_DEV_INTEGRITY
+-	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
+-	    error == BLK_STS_OK)
+-		req->q->integrity.profile->complete_fn(req, nr_bytes);
+-#endif
+-
+-	if (unlikely(error && !blk_rq_is_passthrough(req) &&
+-		     !(req->rq_flags & RQF_QUIET)))
+-		print_req_error(req, error);
+-
+-	blk_account_io_completion(req, nr_bytes);
+-
+-	total_bytes = 0;
+-	while (req->bio) {
+-		struct bio *bio = req->bio;
+-		unsigned bio_bytes = min(bio->bi_iter.bi_size, nr_bytes);
+-
+-		if (bio_bytes == bio->bi_iter.bi_size)
+-			req->bio = bio->bi_next;
+-
+-		/* Completion has already been traced */
+-		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+-		req_bio_endio(req, bio, bio_bytes, error);
+-
+-		total_bytes += bio_bytes;
+-		nr_bytes -= bio_bytes;
+-
+-		if (!nr_bytes)
+-			break;
+-	}
+-
+-	/*
+-	 * completely done
+-	 */
+-	if (!req->bio) {
+-		/*
+-		 * Reset counters so that the request stacking driver
+-		 * can find how many bytes remain in the request
+-		 * later.
+-		 */
+-		req->__data_len = 0;
+-		return false;
+-	}
+-
+-	req->__data_len -= total_bytes;
+-
+-	/* update sector only for requests with clear definition of sector */
+-	if (!blk_rq_is_passthrough(req))
+-		req->__sector += total_bytes >> 9;
+-
+-	/* mixed attributes always follow the first bio */
+-	if (req->rq_flags & RQF_MIXED_MERGE) {
+-		req->cmd_flags &= ~REQ_FAILFAST_MASK;
+-		req->cmd_flags |= req->bio->bi_opf & REQ_FAILFAST_MASK;
+-	}
+-
+-	if (!(req->rq_flags & RQF_SPECIAL_PAYLOAD)) {
+-		/*
+-		 * If total number of sectors is less than the first segment
+-		 * size, something has gone terribly wrong.
+-		 */
+-		if (blk_rq_bytes(req) < blk_rq_cur_bytes(req)) {
+-			blk_dump_rq_flags(req, "request botched");
+-			req->__data_len = blk_rq_cur_bytes(req);
+-		}
+-
+-		/* recalculate the number of segments */
+-		req->nr_phys_segments = blk_recalc_rq_segments(req);
+-	}
+-
+-	return true;
+-}
+-EXPORT_SYMBOL_GPL(blk_update_request);
+-
+ #if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+ /**
+  * rq_flush_dcache_pages - Helper function to flush all pages in a request
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 90bc93fe373e..ffccc5f0f66a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -613,6 +613,150 @@ void blk_mq_free_plug_rqs(struct blk_plug *plug)
+ 	}
  }
--EXPORT_SYMBOL(bio_advance);
-+EXPORT_SYMBOL(__bio_advance);
  
- void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
- 			struct bio *src, struct bvec_iter *src_iter)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 62d684b7dd4c..9538f20ffaa5 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -119,6 +119,28 @@ static inline void bio_advance_iter_single(const struct bio *bio,
- 		bvec_iter_advance_single(bio->bi_io_vec, iter, bytes);
- }
- 
-+void __bio_advance(struct bio *, unsigned bytes);
-+
-+/**
-+ * bio_advance - increment/complete a bio by some number of bytes
-+ * @bio:	bio to advance
-+ * @bytes:	number of bytes to complete
-+ *
-+ * This updates bi_sector, bi_size and bi_idx; if the number of bytes to
-+ * complete doesn't align with a bvec boundary, then bv_len and bv_offset will
-+ * be updated on the last bvec as well.
-+ *
-+ * @bio will then represent the remaining, uncompleted portion of the io.
-+ */
-+static inline void bio_advance(struct bio *bio, unsigned int nbytes)
++static void req_bio_endio(struct request *rq, struct bio *bio,
++			  unsigned int nbytes, blk_status_t error)
 +{
-+	if (nbytes == bio->bi_iter.bi_size) {
-+		bio->bi_iter.bi_size = 0;
-+		return;
++	if (error)
++		bio->bi_status = error;
++
++	if (unlikely(rq->rq_flags & RQF_QUIET))
++		bio_set_flag(bio, BIO_QUIET);
++
++	bio_advance(bio, nbytes);
++
++	if (req_op(rq) == REQ_OP_ZONE_APPEND && error == BLK_STS_OK) {
++		/*
++		 * Partial zone append completions cannot be supported as the
++		 * BIO fragments may end up not being written sequentially.
++		 */
++		if (bio->bi_iter.bi_size)
++			bio->bi_status = BLK_STS_IOERR;
++		else
++			bio->bi_iter.bi_sector = rq->__sector;
 +	}
-+	__bio_advance(bio, nbytes);
++
++	/* don't actually finish bio if it's part of flush sequence */
++	if (bio->bi_iter.bi_size == 0 && !(rq->rq_flags & RQF_FLUSH_SEQ))
++		bio_endio(bio);
 +}
 +
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
-@@ -381,8 +403,6 @@ static inline int bio_iov_vecs_to_alloc(struct iov_iter *iter, int max_segs)
- struct request_queue;
++static void blk_account_io_completion(struct request *req, unsigned int bytes)
++{
++	if (req->part && blk_do_io_stat(req)) {
++		const int sgrp = op_stat_group(req_op(req));
++
++		part_stat_lock();
++		part_stat_add(req->part, sectors[sgrp], bytes >> 9);
++		part_stat_unlock();
++	}
++}
++
++/**
++ * blk_update_request - Complete multiple bytes without completing the request
++ * @req:      the request being processed
++ * @error:    block status code
++ * @nr_bytes: number of bytes to complete for @req
++ *
++ * Description:
++ *     Ends I/O on a number of bytes attached to @req, but doesn't complete
++ *     the request structure even if @req doesn't have leftover.
++ *     If @req has leftover, sets it up for the next range of segments.
++ *
++ *     Passing the result of blk_rq_bytes() as @nr_bytes guarantees
++ *     %false return from this function.
++ *
++ * Note:
++ *	The RQF_SPECIAL_PAYLOAD flag is ignored on purpose in this function
++ *      except in the consistency check at the end of this function.
++ *
++ * Return:
++ *     %false - this request doesn't have any more data
++ *     %true  - this request has more data
++ **/
++bool blk_update_request(struct request *req, blk_status_t error,
++		unsigned int nr_bytes)
++{
++	int total_bytes;
++
++	trace_block_rq_complete(req, blk_status_to_errno(error), nr_bytes);
++
++	if (!req->bio)
++		return false;
++
++#ifdef CONFIG_BLK_DEV_INTEGRITY
++	if (blk_integrity_rq(req) && req_op(req) == REQ_OP_READ &&
++	    error == BLK_STS_OK)
++		req->q->integrity.profile->complete_fn(req, nr_bytes);
++#endif
++
++	if (unlikely(error && !blk_rq_is_passthrough(req) &&
++		     !(req->rq_flags & RQF_QUIET)))
++		blk_print_req_error(req, error);
++
++	blk_account_io_completion(req, nr_bytes);
++
++	total_bytes = 0;
++	while (req->bio) {
++		struct bio *bio = req->bio;
++		unsigned bio_bytes = min(bio->bi_iter.bi_size, nr_bytes);
++
++		if (bio_bytes == bio->bi_iter.bi_size)
++			req->bio = bio->bi_next;
++
++		/* Completion has already been traced */
++		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
++		req_bio_endio(req, bio, bio_bytes, error);
++
++		total_bytes += bio_bytes;
++		nr_bytes -= bio_bytes;
++
++		if (!nr_bytes)
++			break;
++	}
++
++	/*
++	 * completely done
++	 */
++	if (!req->bio) {
++		/*
++		 * Reset counters so that the request stacking driver
++		 * can find how many bytes remain in the request
++		 * later.
++		 */
++		req->__data_len = 0;
++		return false;
++	}
++
++	req->__data_len -= total_bytes;
++
++	/* update sector only for requests with clear definition of sector */
++	if (!blk_rq_is_passthrough(req))
++		req->__sector += total_bytes >> 9;
++
++	/* mixed attributes always follow the first bio */
++	if (req->rq_flags & RQF_MIXED_MERGE) {
++		req->cmd_flags &= ~REQ_FAILFAST_MASK;
++		req->cmd_flags |= req->bio->bi_opf & REQ_FAILFAST_MASK;
++	}
++
++	if (!(req->rq_flags & RQF_SPECIAL_PAYLOAD)) {
++		/*
++		 * If total number of sectors is less than the first segment
++		 * size, something has gone terribly wrong.
++		 */
++		if (blk_rq_bytes(req) < blk_rq_cur_bytes(req)) {
++			blk_dump_rq_flags(req, "request botched");
++			req->__data_len = blk_rq_cur_bytes(req);
++		}
++
++		/* recalculate the number of segments */
++		req->nr_phys_segments = blk_recalc_rq_segments(req);
++	}
++
++	return true;
++}
++EXPORT_SYMBOL_GPL(blk_update_request);
++
+ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+ {
+ 	if (blk_mq_need_time_stamp(rq)) {
+diff --git a/block/blk.h b/block/blk.h
+index f6e61cebd6ae..fdfaa6896fc4 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -213,6 +213,7 @@ static inline void blk_integrity_del(struct gendisk *disk)
  
- extern int submit_bio_wait(struct bio *bio);
--extern void bio_advance(struct bio *, unsigned);
--
- extern void bio_init(struct bio *bio, struct bio_vec *table,
- 		     unsigned short max_vecs);
- extern void bio_uninit(struct bio *);
+ unsigned long blk_rq_timeout(unsigned long timeout);
+ void blk_add_timer(struct request *req);
++void blk_print_req_error(struct request *req, blk_status_t status);
+ 
+ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
+ 		unsigned int nr_segs, struct request **same_queue_rq);
 -- 
 2.33.1
 
