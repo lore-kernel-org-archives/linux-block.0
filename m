@@ -2,89 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5FBBC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 07:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 670F9C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 07:44:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84B4860F46
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 07:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44DC16124F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 07:44:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230379AbhJRHLt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 03:11:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59566 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230419AbhJRHLl (ORCPT
+        id S230326AbhJRHqx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 03:46:53 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:33280 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229847AbhJRHqx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 03:11:41 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FAC2C061745;
-        Mon, 18 Oct 2021 00:09:30 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id l16-20020a9d6a90000000b0054e7ab56f27so796849otq.12;
-        Mon, 18 Oct 2021 00:09:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=O/OZJC0HIUE3DNP74CA6ob2Ysy1RgHmyhS2ZxyEPXFQ=;
-        b=SSUOD1uC9IodrXjZW/i5EdgxkEgrD955N9s4FpbRkuCr8XDDCmVTbVqRPHDNRSENmQ
-         iz9t4oURkPyAIYFZ3pF4/7pS+eNQ6jTzoIb8Ev4KENA7b6ItNIiOxdYyMocXP4myvfsj
-         15woTtJGjmSTDkC3/6mQkEhMkSU7psQwGbmQfHehlpJMH3yHUwtWBcHFxxkAXVoKt9Ts
-         nBaKJ59mpV+je8EW4XMdc2rrfQz96tlTmC0TJu+NT3nZuvW7kx11mUXZ9afwkITGFFTH
-         VJ4YFQqqQCqqqoGqQaTuKHkzbE+8N/bVbWwHgsEX8SSO9yDK5OStQK0VbKm5QKeo1bcd
-         is/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=O/OZJC0HIUE3DNP74CA6ob2Ysy1RgHmyhS2ZxyEPXFQ=;
-        b=o8R9Zwf5hdwuKPbYH+P5uvqFSeWG4wP90FJPDQIW51egpvFSJDqef2OObmZJxjrsdD
-         AeK3v4FxfgmBsjthzdgqAte61LSAzRXH3dqVtEyv8ZjeFAA3O23ebOyXOpZUU2+xq4ox
-         tTeN7F1dUPO5xNsI+MnCDgyhcVYO8XFl+d9vVC/K1Gq3Z4HyJn6fPHs8CM1sqMiu15kf
-         ShOVPwPHZLs5GWC+8abZQQCLzv19g50ACkFd1ysaHixr6Vt/YFu1BmrgYnUVRPyphXOv
-         IllF5BywSs+UMBTuv3vRAIs9BA7w3IJV0kFyLOWjCqG6cdcYV7gCKgnLiv5lJkBUlFUy
-         OCew==
-X-Gm-Message-State: AOAM531hSPMfvHxOIxLl6Qhc8t5KZ3DfEydgo3OgKHGqEzRCqlsqcyHq
-        K5t5s0lXiA7xa8qlgANF+mEBBALkSSYI7znu6jakZipkDQU=
-X-Google-Smtp-Source: ABdhPJyVC+RTqo8zzXghqNePAGY9z5PgIv0+b0z2Csc9EVNystgb5c+HnaMTxR7F/tuzIl8oNOgfX2djHgX3uGTMNIE=
-X-Received: by 2002:a05:6830:92:: with SMTP id a18mr12269184oto.307.1634540969155;
- Mon, 18 Oct 2021 00:09:29 -0700 (PDT)
+        Mon, 18 Oct 2021 03:46:53 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7A87721A6B;
+        Mon, 18 Oct 2021 07:44:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1634543081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uRitaSdTVQaJHWkcEYYfsZh1e5H5O4Y2u6C6EN9RHZw=;
+        b=gUoGOZZobYJpoYjwU2IYPymMA2YuQ+2qgz7MpnioolDyxfQi34gjYGErciu7THulCvDIqH
+        E7qmjTjvluoTqPaG4qvEl19HG8kMSL6uyXSBA/+xPDdly7aws8Gi9L8GNw+9p5mYyMAd4V
+        djR7gC7CKd0VOHwEq/c5fpRQ7D+qZ2o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1634543081;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uRitaSdTVQaJHWkcEYYfsZh1e5H5O4Y2u6C6EN9RHZw=;
+        b=fIfevUhOPCPCtiqRALZ1/X9QKxZrhIYuKH49E96y7E0LnvrY8Z1tbgxJtHXE3fpRTpSYki
+        Fq56TopyYm6xSyBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 504DD13CC9;
+        Mon, 18 Oct 2021 07:44:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id wgNzEuklbWFDFgAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Mon, 18 Oct 2021 07:44:41 +0000
+Message-ID: <11b2fa69-ebcf-fec4-73e5-51ada24c5aaf@suse.cz>
+Date:   Mon, 18 Oct 2021 09:44:40 +0200
 MIME-Version: 1.0
-From:   Youfu Zhang <zhangyoufu@gmail.com>
-Date:   Mon, 18 Oct 2021 15:08:53 +0800
-Message-ID: <CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com>
-Subject: [BUG] blk-throttle panic on 32bit machine after startup
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Content-Language: en-US
+To:     Kent Overstreet <kent.overstreet@gmail.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        alexander.h.duyck@linux.intel.com,
+        David Rientjes <rientjes@google.com>
+References: <20211013160034.3472923-1-kent.overstreet@gmail.com>
+ <20211013160034.3472923-2-kent.overstreet@gmail.com>
+ <e29733c7-e65a-935a-4e05-3a060240ea5a@redhat.com>
+ <YWhCp/lKbJS9XSqn@moria.home.lan>
+From:   Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 1/5] mm: Make free_area->nr_free per migratetype
+In-Reply-To: <YWhCp/lKbJS9XSqn@moria.home.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 10/14/21 16:45, Kent Overstreet wrote:
+> On Wed, Oct 13, 2021 at 06:33:06PM +0200, David Hildenbrand wrote:
+>> > @@ -9317,6 +9319,7 @@ void __offline_isolated_pages(unsigned long start_pfn, unsigned long end_pfn)
+>> >  	struct page *page;
+>> >  	struct zone *zone;
+>> >  	unsigned int order;
+>> > +	unsigned int migratetype;
+>> >  	unsigned long flags;
+>> >  
+>> >  	offline_mem_sections(pfn, end_pfn);
+>> > @@ -9346,7 +9349,8 @@ void __offline_isolated_pages(unsigned long start_pfn, unsigned long end_pfn)
+>> >  		BUG_ON(page_count(page));
+>> >  		BUG_ON(!PageBuddy(page));
+>> >  		order = buddy_order(page);
+>> > -		del_page_from_free_list(page, zone, order);
+>> > +		migratetype = get_pfnblock_migratetype(page, pfn);
+>> 
+>> As the free pages are isolated, theoretically this should be
+>> MIGRATE_ISOLATE.
+> 
+> Thanks for noticing that - I somehow missed the fact that pageblock migratetypes
+> change at runtime,
 
-I ran into a kernel bug related to blk-throttle on CentOS 7 AltArch for i386.
-Userspace programs may panic the kernel if they hit the I/O limit
-within 5 minutes after startup.
+Not only that. Buddy merging will also merge pages from different
+migratetypes. I think that's the main reason why nr_free is not per
+migratetype. Your patch has been attempted few times already, e.g. here [1].
 
-Root cause:
-1. jiffies was initialized to -300HZ during boot on 32bit machines
-2. enable blkio cgroup hierarchy
-   __DEVEL__sane_behavior for cgroup v1 or default hierarchy for cgroup v2
-   EL7 kernel modified throtl_pd_init and always enable hierarchical throttling
-3. enable & trigger blkio throttling within 5 minutes after startup
-   bio propagated from child tg to parent
-4. enter throtl_start_new_slice_with_credit
-   if(time_after_eq(start, tg->slice_start[rw]))
-   aka. time_after_eq(0xFFFxxxxx, 0) does not hold
-   parent tg->slice_start[rw] was zero-initialized and not updated
-5. enter throtl_trim_slice
-   BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]))
-   aka. time_before(0xFFFxxxxx, 0) triggers a panic
+[1]
+https://lore.kernel.org/all/alpine.DEB.2.10.1611161731350.17379@chino.kir.corp.google.com/
 
-Reproducer: (tested on Alpine Linux x86 kernel 5.10.X)
-#!/bin/sh
-CGROUP_PATH="$(mktemp -d)"
-mount -t cgroup2 none "$CGROUP_PATH"
-echo +io >"$CGROUP_PATH/cgroup.subtree_control"
-mkdir "$CGROUP_PATH/child"
-echo "7:0 riops=2" >"$CGROUP_PATH/child/io.max"
-echo 0 >"$CGROUP_PATH/child/cgroup.procs"
-echo 3 >/proc/sys/vm/drop_caches
-dd if=/dev/loop0 of=/dev/null count=3
+> so my patch is wrong. I'm going to have to rework my patch to
+> store the migratetype of free pages in the page itself.
+
+Yeah that would be the solution. Will likely bring some overhead to
+alloc/free fastpaths, which would have to be worth it, so nobody attempted it.
+
+
