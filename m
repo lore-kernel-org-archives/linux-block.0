@@ -2,92 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B892C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 15:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1941AC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 15:38:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 249EB60F0F
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 15:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E89FF610C8
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 15:38:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231894AbhJRP15 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 11:27:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34226 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbhJRP15 (ORCPT
+        id S232488AbhJRPkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 11:40:20 -0400
+Received: from sender4-op-o18.zoho.com ([136.143.188.18]:17802 "EHLO
+        sender4-op-o18.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230346AbhJRPkT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 11:27:57 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE29BC06161C
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 08:25:45 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id n7so16808196iod.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 08:25:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Xl1gQhAS96ALQGgsU5bwERUfEXFWE9c4lwvTSUH46RI=;
-        b=S5VdjpnxrXOZev1PnHvNzh1dgSq2KjGhvIK7a78yjp4aVxaTFvjDgNbIl4heHOaKoZ
-         FtgOy31XsTIDH3iYXy8dwB9TXzvmcrwawnYt8inu2rpINNyRWZlYBWQnlDbfrJYmYyXM
-         QB978NdH8hprYfn+fnQATFQ00aP3FTpOLkgrmJHQgJMauih264Ah6i5zX6+y2caXv5bb
-         RSy3Y1qKRtRd4EslAHLcVLxMwiseJkJ4BjCWxQdspTwUTK5QbUR9j7xXLAGvP6Hey7bq
-         i12C/c+W41+drSr26VaMvWEDqjM4gRu052Defkl/V8VDeF/8gWGmwQH8TE7GaflSL988
-         NBOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Xl1gQhAS96ALQGgsU5bwERUfEXFWE9c4lwvTSUH46RI=;
-        b=iTNiUHKfJC/40TLJeSjIc0/mO/3gy78GfybI5VADNyhB9cVozxpF0ZPtJr3pdLIRA0
-         JEeZPEH3MPZIlyZELU/r/DfgGDMO6IJ1/s9HIWOc8o+6OY75JrRZJpA8Z9Y1CJ63F/QY
-         jbOHKqbWZtZYe17Jy8PhPfLWH9V72nKK+i+sWb76051eZnxrh2EkUq4hgcxPXGmU2rG0
-         6hbCbIXMlRmCqJg1llYg6QfAq6LfPqQNo8AbAqQyuRZ7YyMy9yYJ0MvRSFu+gOYwRiHr
-         D8h7jGCgSQ9p0kWKePggxT7yDd3yLWJvb+H51R9V089v5mg+WvjKjreX5a1pbGHMPv+z
-         3XPg==
-X-Gm-Message-State: AOAM5322xmWrnWOUc2OU+kMvi1h72+42rzaf+vBqGlFunOBjaMuqKKu5
-        Jal/NaueFkArsK2+j/MM9g8D8b0w3P46tg==
-X-Google-Smtp-Source: ABdhPJwVNC9wkROB/oWQYPwDWOAz+QcalUgUSsYH+Eyjci4c0NZLQjDvjRm+qMJdwQpHHCQv+foi6w==
-X-Received: by 2002:a05:6602:1542:: with SMTP id h2mr15399400iow.198.1634570745071;
-        Mon, 18 Oct 2021 08:25:45 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id g13sm7218434ilc.54.2021.10.18.08.25.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 08:25:44 -0700 (PDT)
-Subject: Re: [PATCH 6/6] nvme: wire up completion batching for the IRQ path
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org
-References: <20211017020623.77815-1-axboe@kernel.dk>
- <20211017020623.77815-7-axboe@kernel.dk> <YW1K7RR2F+dL9ntI@infradead.org>
- <458fdc6d-e006-48fb-b66c-c4c2b631b236@kernel.dk>
- <YW2PULGTYHdb/PoP@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2540b8f1-7cf4-e688-3a4e-8b88fee1cfff@kernel.dk>
-Date:   Mon, 18 Oct 2021 09:25:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 18 Oct 2021 11:40:19 -0400
+X-Greylist: delayed 914 seconds by postgrey-1.27 at vger.kernel.org; Mon, 18 Oct 2021 11:40:19 EDT
+ARC-Seal: i=1; a=rsa-sha256; t=1634570567; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=SIztRUc9OQz6SZ051eIl/GUuuVi6UQupUR1dRGjXznCaZ8l9bplFLwtW353jA4hc6dDbxyVgm5eT69cjFKuu2IiHRBPqmSjoSdx7YCAusel16d+vq4MMzj8JE3mImBzkFyi5FqzBzixJ3qrG3Fh+OC0Ucnn3XyD7lFn4nbq9MKE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1634570567; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=kZhtruoVwNb47EYcsxuzHngcaBNhwqEKuTTcZhdi/HE=; 
+        b=cYe4rVsidMUiSQijOj3zGKiTs6fGGlGD98uIHB8iQZ1AtnwyjIGUY7xovPVPvN6ebwWCdZpPtNa4NoGqNl/KoaIjHT5oFDWXgF6RzXEkIkxqhD0kf+o1INuZOC6UgKrV78+a2GOp+egHZOVWmQ3LCw5tlB6w2bFDU9F08x+W/z4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=librazy.org;
+        spf=pass  smtp.mailfrom=im@librazy.org;
+        dmarc=pass header.from=<im@librazy.org>
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; 
+  s=zoho; d=librazy.org; 
+  h=message-id:date:mime-version:user-agent:from:subject:to:cc:references:in-reply-to:content-type; 
+  b=TgijLkBzZ7Q/RMm2R9BF2LVqca7CTy+7KrSxYKdcFG+sSjpE5ei9w2qLu3ltiAVqRzUOoYskSVXR
+    sJXnKMRgJRS0/EdWoc+RNVOksV7LizPRPMGhTDoebLKW/Rpse5NO2TirtU5MHMwMTYoNK1bkf1gv
+    /CQRxyoT1OQyaxKOZRc=  
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1634570567;
+        s=mx; d=librazy.org; i=im@librazy.org;
+        h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+        bh=kZhtruoVwNb47EYcsxuzHngcaBNhwqEKuTTcZhdi/HE=;
+        b=e7gJw8grFe/k7pDLAMOlujFTGoN08nc2CVJ0B/nMAud9K5h962WRHocctzMz8bYP
+        oTQsTq5HURE01HdTv9jGiA/yyr3VmDKTpa3cninBpo9msJugpIzgT6/XPkpz+jq0Uzr
+        pDOV9nbkncx0MNUNPbKGdFrVnGkpzvamFM2Ma52s=
+Received: from [192.168.8.8] (112.10.216.114 [112.10.216.114]) by mx.zohomail.com
+        with SMTPS id 1634570563689491.1625136176144; Mon, 18 Oct 2021 08:22:43 -0700 (PDT)
+Message-ID: <e726813b-4f6d-3a5d-6adb-8407a9b4c7f7@librazy.org>
+Date:   Mon, 18 Oct 2021 23:22:27 +0800
 MIME-Version: 1.0
-In-Reply-To: <YW2PULGTYHdb/PoP@infradead.org>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+From:   Liqueur Librazy <im@librazy.org>
+Subject: Re: [BUG] blk-throttle panic on 32bit machine after startup
+To:     zhangyoufu@gmail.com
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, tj@kernel.org
+References: <CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com>
 Content-Language: en-US
+In-Reply-To: <CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/18/21 9:14 AM, Christoph Hellwig wrote:
-> On Mon, Oct 18, 2021 at 07:41:30AM -0600, Jens Axboe wrote:
->>> Ok, here the splitt makes sense.  That being said I'd rather only add
->>> what is nvme_poll_cq as a separate function here, and I'd probably
->>> name it __nvme_process_cq as the poll name could create some confusion.
->>
->> Sure, I can shuffle that around. Can I add your reviewed/acked by with
->> that for those two, or do you want the series resent?
-> 
-> I'm fine with that change included:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+Hi,
 
-Great, thanks.
+Yet another colleague of the reporter here. I found that some 
+precondition maybe not sound when tg->slice_end[rw] is initialized with 
+0, which time_before(INITIAL_JIFFIES, 0) holds true in 32-bit Linux.
 
--- 
-Jens Axboe
+As in v5.15-rc6/block/blk-throttle.c
 
+1. L833
+
+	/* Determine if previously allocated or extended slice is complete or 
+not */
+	static bool throtl_slice_used(struct throtl_grp *tg, bool rw)
+	{
+		if (time_in_range(jiffies, tg->slice_start[rw], tg->slice_end[rw]))
+			return false;
+
+		return true;
+	}
+
+throtl_slice_used will always return true for a newly initialized slice.
+This may be intentional behavior but not mentioned in comment.
+(except when jiffies == 0, which is another topic: will 
+time_in_range_open do better here?)
+
+2. L791, in throtl_start_new_slice_with_credit
+
+	/*
+	 * Previous slice has expired. We must have trimmed it after last
+	 * bio dispatch. That means since start of last slice, we never used
+	 * that bandwidth. Do try to make use of that bandwidth while giving
+	 * credit.
+	 */
+	if (time_after_eq(start, tg->slice_start[rw]))
+		tg->slice_start[rw] = start;
+
+As mentioned in my colleague Haoran Luo's reply, time_after_eq(start, 
+tg->slice_start[rw]) is falsy when the jiffies had not wrapped around.
+A easy solution is to add a check for tg->slice_start[rw] == 0, or we 
+should initialize tg->slice_start[rw] and tg->slice_end[rw] with 
+INITIAL_JIFFIES.
