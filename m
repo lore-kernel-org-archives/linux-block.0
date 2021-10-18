@@ -2,83 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FFFC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 20:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D67C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 21:42:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACBAE6103D
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 20:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5CE561027
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 21:42:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbhJRUy4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 16:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52504 "EHLO
+        id S229529AbhJRVpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 17:45:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhJRUyz (ORCPT
+        with ESMTP id S229555AbhJRVpG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 16:54:55 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1903AC06161C
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 13:52:44 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id 188so17822273iou.12
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 13:52:44 -0700 (PDT)
+        Mon, 18 Oct 2021 17:45:06 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCE5C06161C
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 14:42:54 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id y4so12250531plb.0
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 14:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=Yb6fDrcaihf9xOvWSjq7rtKlyMEYMqkVYoeVqHGi14M=;
-        b=Tw+OXhmDqKY5D4HCuOfvlJN+oMihczl+mT7qw9xHk0pDv3hj0y5Az9cX9nOD1y/OqS
-         NPMMjNxM4cxdUtQtbCt/qRXT3i/A9SDl2oYTXxnJAXPzyJ1dCXLe2jU3qiSnmZMN46+O
-         ld19a7f2AUN8ZEAflPzwWVVavEx6kVzutjdfIX79uBZ20/fnCLM4KHxiDRIfpTP/rZEa
-         R9ZoKbxX5l97xTeurxNMiy+Bsv8O9hHZtW2v9jR6BgynCMYGRK4FFMcVr4Jii8A+9hre
-         K87W1OOYljBtuEBpfHiu08jk7G0N3xJb1teZbmPQLYKFKBvvnoNa6Y3BWnI0y7B4ghip
-         sIRg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=LY6T9ymFruKs6NMBZ2llZXv4ELG7NuQfo8otcDECv1c=;
+        b=MY7CzKDkNryZn2Vb1xaABRZul6Zcud5p+EXVokTmyYxY9E45a9Mmg8MLCYQPJoL1Mj
+         1DmhCyO1EiqlkZEvj5lMnnpjInaxLptduovsdyV8CGG7p6wSsgyXMBC/c81WTnvksG3j
+         XE/g3N1AGVSrFN04gJ3jx50dY4F8xTw/52TySU6Cr+MudnSlxnaOSTyEkhZk8XpatAJP
+         9FdImPkKhrUCken/Zkh1/ffyAgWJoGGVl6tFvxHSMZPVVffS6LG+J0H7iqLE3E92WFRF
+         yK5sp0zkomDzNKF8TTww+RrNocNKJhZjzzjO4UtcObk1TIZHguZ4CAC8a6+LjacPUsd2
+         90UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Yb6fDrcaihf9xOvWSjq7rtKlyMEYMqkVYoeVqHGi14M=;
-        b=vcLmPfOWKim6ynoIkS1Veup7ZHDJ1CfNSMpACBHtREO28b8c24dH8K2AA7DMMqgk06
-         qyZWmNZQr9vedsZ2Ei9YQSX35NG27szLWV0fID5IzJXHOHjujgAmNlMtBVdpUVcrMALB
-         +QuXUTEcGzhaAbF9X0mYSPfNV44/SC6VkQY2JWHxe3JGywp/fX+OwKOSmZUY4YoRwc21
-         GG5niQOAEkSllIE7yiZlYoegDb0er+dcPzQp98VBc7oTFjnKsA92ICgZCEelaS8BKsm2
-         M35YPhQ5iaWGFezWgYDBwWFBle+hYSHMSWo55A6lNuWz19qc5jctLvZrDzwwvK6pGpVS
-         zK1A==
-X-Gm-Message-State: AOAM531vL1TG5vCgNxic+FaXJMglfnDSQlLFvXi7iGKI5Nlef0pRM5F1
-        MJxQ00RcQtyRfQbWdswGfM6gazbBSlI=
-X-Google-Smtp-Source: ABdhPJyGcx9S1uef3LTD+rpqPuU/K4bpSv1PT75oVviFS+sq8fZN4odtk24QXQE98R4bmQLcOZdOGA==
-X-Received: by 2002:a02:7105:: with SMTP id n5mr1476301jac.64.1634590363389;
-        Mon, 18 Oct 2021 13:52:43 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id d12sm7389875ila.79.2021.10.18.13.52.42
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 13:52:43 -0700 (PDT)
-Subject: Re: Block trees rebased
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=LY6T9ymFruKs6NMBZ2llZXv4ELG7NuQfo8otcDECv1c=;
+        b=K9XNrpkEt2Y5VxT3MyB/ClynFRSPbigWDN9Kb59n9L3kRb41MUbbR4dM4cAxlRQ8Q7
+         YbZBWUrq6Vo9xPWzz3MjU56aqmD/7+qXcTtuWEgMFUcKypU1JgRCgBOjS4tqp3qN2/ux
+         sVriT/wubh8Ul8+ddPSPdlKZF204qPdVyclLvsrEds+jFBun2Qau3gCW+iZzxNvwZXeS
+         775QNheaRQgPJsari3sUS1CSwRPCGnZvWvPzV2a9f97hzhhVgsVs0DhejeM6rYdVregp
+         W25f6RYAhPtH8D6mCYVzG1ul9u/k+ZULoG6p0MW0ua04dcNJnGueqzYsySWT3Qo4VhBA
+         3rjw==
+X-Gm-Message-State: AOAM533jwLP1Lfn/XIoKMqmccNyLC0sPp3Nt+56qS6KYT8QtbzGa/M2P
+        AGnrAFLOh8IR8+4fOgV/4DnHVrO9G6xDCbxY
+X-Google-Smtp-Source: ABdhPJxsTMyxmBwNQunw7lmlnA7zgbVUEs2flIc2nm9tEcP/dseS8T7KAZoMx57tUoWVrGVO+RfkzA==
+X-Received: by 2002:a17:90b:1e4f:: with SMTP id pi15mr1633342pjb.231.1634593374082;
+        Mon, 18 Oct 2021 14:42:54 -0700 (PDT)
+Received: from localhost.localdomain ([2600:380:4a2d:7994:f51f:596c:ef50:c5c0])
+        by smtp.gmail.com with ESMTPSA id w13sm375317pjc.29.2021.10.18.14.42.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Oct 2021 14:42:53 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <795ab0ff-dd7d-d225-e42a-04878bd4d8d1@kernel.dk>
-Message-ID: <8aa58b9a-ee53-0390-1608-7c5363fa4b05@kernel.dk>
-Date:   Mon, 18 Oct 2021 14:52:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 0/3] blk_mq_rq_ctx_init() optimisations
+Date:   Mon, 18 Oct 2021 15:42:49 -0600
+Message-Id: <163459336626.437265.18265519350698264777.b4-ty@kernel.dk>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <cover.1634589262.git.asml.silence@gmail.com>
+References: <cover.1634589262.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <795ab0ff-dd7d-d225-e42a-04878bd4d8d1@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/18/21 6:31 AM, Jens Axboe wrote:
-> Hi,
+On Mon, 18 Oct 2021 21:37:26 +0100, Pavel Begunkov wrote:
+> Restore the original version of the patches. Mostly the same as was
+> sent out by Jens, but those were squashed and a couple of details
+> is missing.
 > 
-> Just a heads-up that I've rebased the 5.16 block trees, mainly to avoid
-> a bunch of conflicts with the bdi lifetime fixes that went into -rc6, but
-> also to get rid of a silly post-merge branch that we ended up having.
+> Pavel Begunkov (3):
+>   block: skip elevator fields init for non-elv queue
+>   block: blk_mq_rq_ctx_init cache ctx/q/hctx
+>   block: cache rq_flags inside blk_mq_rq_ctx_init()
+> 
+> [...]
 
-This should now be completed.
+Applied, thanks!
 
+[1/3] block: skip elevator fields init for non-elv queue
+      commit: 4f266f2be822eacd70aca2a7a53c4a111be79acb
+[2/3] block: blk_mq_rq_ctx_init cache ctx/q/hctx
+      commit: 605f784e4f5faecf6c78070c6bf446e920104f9f
+[3/3] block: cache rq_flags inside blk_mq_rq_ctx_init()
+      commit: 128459062bc994355027e190477c432ec5b5638a
+
+Best regards,
 -- 
 Jens Axboe
+
 
