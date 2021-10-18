@@ -2,113 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 670F9C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 07:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A3FC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 08:06:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44DC16124F
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 07:44:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C67E61050
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 08:06:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbhJRHqx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 03:46:53 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:33280 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229847AbhJRHqx (ORCPT
+        id S230512AbhJRIIT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 04:08:19 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3993 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230472AbhJRIIS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 03:46:53 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7A87721A6B;
-        Mon, 18 Oct 2021 07:44:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1634543081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uRitaSdTVQaJHWkcEYYfsZh1e5H5O4Y2u6C6EN9RHZw=;
-        b=gUoGOZZobYJpoYjwU2IYPymMA2YuQ+2qgz7MpnioolDyxfQi34gjYGErciu7THulCvDIqH
-        E7qmjTjvluoTqPaG4qvEl19HG8kMSL6uyXSBA/+xPDdly7aws8Gi9L8GNw+9p5mYyMAd4V
-        djR7gC7CKd0VOHwEq/c5fpRQ7D+qZ2o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1634543081;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uRitaSdTVQaJHWkcEYYfsZh1e5H5O4Y2u6C6EN9RHZw=;
-        b=fIfevUhOPCPCtiqRALZ1/X9QKxZrhIYuKH49E96y7E0LnvrY8Z1tbgxJtHXE3fpRTpSYki
-        Fq56TopyYm6xSyBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 504DD13CC9;
-        Mon, 18 Oct 2021 07:44:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id wgNzEuklbWFDFgAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Mon, 18 Oct 2021 07:44:41 +0000
-Message-ID: <11b2fa69-ebcf-fec4-73e5-51ada24c5aaf@suse.cz>
-Date:   Mon, 18 Oct 2021 09:44:40 +0200
+        Mon, 18 Oct 2021 04:08:18 -0400
+Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HXq9B2gjpz67Mww;
+        Mon, 18 Oct 2021 16:02:22 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Mon, 18 Oct 2021 10:06:06 +0200
+Received: from [10.47.85.98] (10.47.85.98) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Mon, 18 Oct
+ 2021 09:06:05 +0100
+Subject: Re: [PATCH] blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
+From:   John Garry <john.garry@huawei.com>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
+        "hare@suse.de" <hare@suse.de>
+References: <1634114459-143003-1-git-send-email-john.garry@huawei.com>
+ <YWalYoOZmpkmAZNK@T590> <79266509-f327-9de3-d22e-0e9fe00387ee@huawei.com>
+ <YWay/n+BJTLm1Alb@T590> <9f3c4d57-6b77-5345-0d4c-275962214b2a@huawei.com>
+ <YWbtRm22vohvY0Ca@T590> <7e142559-1c96-8d84-081a-378c1f6d1306@huawei.com>
+Message-ID: <1065f517-c94b-5a47-34f6-52015b3ef907@huawei.com>
+Date:   Mon, 18 Oct 2021 09:08:57 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
+In-Reply-To: <7e142559-1c96-8d84-081a-378c1f6d1306@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-To:     Kent Overstreet <kent.overstreet@gmail.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        alexander.h.duyck@linux.intel.com,
-        David Rientjes <rientjes@google.com>
-References: <20211013160034.3472923-1-kent.overstreet@gmail.com>
- <20211013160034.3472923-2-kent.overstreet@gmail.com>
- <e29733c7-e65a-935a-4e05-3a060240ea5a@redhat.com>
- <YWhCp/lKbJS9XSqn@moria.home.lan>
-From:   Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 1/5] mm: Make free_area->nr_free per migratetype
-In-Reply-To: <YWhCp/lKbJS9XSqn@moria.home.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.85.98]
+X-ClientProxiedBy: lhreml718-chm.china.huawei.com (10.201.108.69) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/14/21 16:45, Kent Overstreet wrote:
-> On Wed, Oct 13, 2021 at 06:33:06PM +0200, David Hildenbrand wrote:
->> > @@ -9317,6 +9319,7 @@ void __offline_isolated_pages(unsigned long start_pfn, unsigned long end_pfn)
->> >  	struct page *page;
->> >  	struct zone *zone;
->> >  	unsigned int order;
->> > +	unsigned int migratetype;
->> >  	unsigned long flags;
->> >  
->> >  	offline_mem_sections(pfn, end_pfn);
->> > @@ -9346,7 +9349,8 @@ void __offline_isolated_pages(unsigned long start_pfn, unsigned long end_pfn)
->> >  		BUG_ON(page_count(page));
->> >  		BUG_ON(!PageBuddy(page));
->> >  		order = buddy_order(page);
->> > -		del_page_from_free_list(page, zone, order);
->> > +		migratetype = get_pfnblock_migratetype(page, pfn);
->> 
->> As the free pages are isolated, theoretically this should be
->> MIGRATE_ISOLATE.
+On 13/10/2021 16:13, John Garry wrote:
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 72a2724a4eee..2a2ad6dfcc33 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -232,8 +232,9 @@ static bool bt_iter(struct sbitmap *bitmap, 
+>> unsigned int bitnr, void *data)
+>>       if (!rq)
+>>           return true;
+>> -    if (rq->q == hctx->queue && rq->mq_hctx == hctx)
+>> -        ret = iter_data->fn(hctx, rq, iter_data->data, reserved);
+>> +    if (rq->q == hctx->queue && (rq->mq_hctx == hctx ||
+>> +                blk_mq_is_shared_tags(hctx->flags)))
+>> +        ret = iter_data->fn(rq->mq_hctx, rq, iter_data->data, reserved);
+>>       blk_mq_put_rq_ref(rq);
+>>       return ret;
+>>   }
+>> @@ -460,6 +461,9 @@ void blk_mq_queue_tag_busy_iter(struct 
+>> request_queue *q, busy_iter_fn *fn,
+>>           if (tags->nr_reserved_tags)
+>>               bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
+>>           bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
+>> +
+>> +        if (blk_mq_is_shared_tags(hctx->flags))
+>> +            break;
+>>       }
+>>       blk_queue_exit(q);
+>>   }
+>>
 > 
-> Thanks for noticing that - I somehow missed the fact that pageblock migratetypes
-> change at runtime,
+> I suppose that is ok, and means that we iter once.
+> 
+> However, I have to ask, where is the big user of 
+> blk_mq_queue_tag_busy_iter() coming from? I saw this from Kashyap's mail:
+> 
+>  > 1.31%     1.31%  kworker/57:1H-k  [kernel.vmlinux]
+>  >       native_queued_spin_lock_slowpath
+>  >       ret_from_fork
+>  >       kthread
+>  >       worker_thread
+>  >       process_one_work
+>  >       blk_mq_timeout_work
+>  >       blk_mq_queue_tag_busy_iter
+>  >       bt_iter
+>  >       blk_mq_find_and_get_req
+>  >       _raw_spin_lock_irqsave
+>  >       native_queued_spin_lock_slowpath
+> 
+> How or why blk_mq_timeout_work()?
 
-Not only that. Buddy merging will also merge pages from different
-migratetypes. I think that's the main reason why nr_free is not per
-migratetype. Your patch has been attempted few times already, e.g. here [1].
+Just some update: I tried hisi_sas with 10x SAS SSDs, megaraid sas with 
+1x SATA HDD (that's all I have), and null blk with lots of devices, and 
+I still can't see high usage of blk_mq_queue_tag_busy_iter().
 
-[1]
-https://lore.kernel.org/all/alpine.DEB.2.10.1611161731350.17379@chino.kir.corp.google.com/
+So how about we get this patch processed (to fix 
+blk_mq_tagset_busy_iter()), as it is independent of 
+blk_mq_queue_tag_busy_iter()? And then wait for some update or some more 
+info from Kashyap regarding blk_mq_queue_tag_busy_iter()
 
-> so my patch is wrong. I'm going to have to rework my patch to
-> store the migratetype of free pages in the page itself.
-
-Yeah that would be the solution. Will likely bring some overhead to
-alloc/free fastpaths, which would have to be worth it, so nobody attempted it.
-
-
+Thanks,
+John
