@@ -2,97 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 025E1C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 02:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F387C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 02:43:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D56C9610A3
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 02:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1671861260
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 02:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243170AbhJRCow (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Oct 2021 22:44:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32670 "EHLO
+        id S243039AbhJRCqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Oct 2021 22:46:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23813 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243161AbhJRCor (ORCPT
+        by vger.kernel.org with ESMTP id S243029AbhJRCqH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Oct 2021 22:44:47 -0400
+        Sun, 17 Oct 2021 22:46:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634524955;
+        s=mimecast20190719; t=1634525035;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bNTSAOTt6Yv2MDoPtOGaSGRRLT99tBO5zNZhTktx4j0=;
-        b=dhP4ldaKrALLRk12WuDHua+1vf/Dp+2fr6Ap6kmgnaKkXS9wcSimahqhOJg8gh8By2fZ3s
-        lfVDh8diMatzrJy3Gt+ubFI50q/jzPo7LCD+BbeivNitqQK2JMy5dtHldtSfAA0XKr3UsB
-        fTq882p22GYsrsRS/OK3zSPTSW0G4KI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-1XAABNt7Nb68vG7-zascXw-1; Sun, 17 Oct 2021 22:42:31 -0400
-X-MC-Unique: 1XAABNt7Nb68vG7-zascXw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C5411006AA3;
-        Mon, 18 Oct 2021 02:42:30 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B538C5D6D5;
-        Mon, 18 Oct 2021 02:42:25 +0000 (UTC)
-Date:   Mon, 18 Oct 2021 10:42:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: don't dereference request after flush insertion
-Message-ID: <YWzfDJ9sYBbLn741@T590>
-References: <f2f17f46-ff3a-01c4-bfd4-8dec836ec343@kernel.dk>
+        bh=24awu7awUCOKi36V9SWrgRA1ZbaOc+SStEb3sQlvlgc=;
+        b=Z+PMTp7vElYDgHojDYn7xJSRhiZs7aSI7sYyQQLwTuU3OYMJNzf9XY5QfqVW7J4rd7BGUM
+        wQ+U1AuiSoik7S3NMS2uIETtSgIkSzAMrSutEpG/Xyf+krxqkw9XoCrRu+ByI9cW3pSOJN
+        SG7VrIs0rOVdkIEMjqIaukw9n2EIasU=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-kLn7Ul-gNHCDwpGZi9m_PA-1; Sun, 17 Oct 2021 22:43:54 -0400
+X-MC-Unique: kLn7Ul-gNHCDwpGZi9m_PA-1
+Received: by mail-yb1-f197.google.com with SMTP id i21-20020a253b15000000b005b9c0fbba45so18399355yba.20
+        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 19:43:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=24awu7awUCOKi36V9SWrgRA1ZbaOc+SStEb3sQlvlgc=;
+        b=g9k2JarM+ioMOuA9pt0KPIwYrQ2IB7c0nC4/fgZmvrf6yxV91UQFrcFl67alo7Vj6E
+         +9khruw1Wjk5CG2tEm954dchMkdxgCBSG+W2+FDHO9Q1AiDKpto4KjlDZgHA1+l+dY52
+         6PaC3G5Iuh5I2fxgSer7CqrSM3FKIJKPSdekZczyvyfnFSOI/dDuvJE82IWaxNd+P7ei
+         qpxD+GA+nkCTDxO5WurJIuknPxJtE4jYrAU4lpAJM4wuDhpeSjRxk1rl3KfOUDVajjbq
+         CWOaIqWnkMGqc1xG9Jsn+fxMkS6tN2KYV5W/e9ZNRubHgeczFXdc75E73ANAZLcsbRC+
+         72JQ==
+X-Gm-Message-State: AOAM531WkTDoyTG04X4OYRWpIdFBYjNFE9namYhnqwnZR+T3kp9jvxUf
+        pOIJ0Lk+//ib0uNgRR6gGxUopATVubMcE277ilqR+9ardVrhWZJSTD9WoMRbemg6eCKXzmVjGSw
+        IGEJamPT79INZ5jC3Fdy+ZSKnYFssUBj2sLYzq3U=
+X-Received: by 2002:a25:3212:: with SMTP id y18mr26370129yby.308.1634525034095;
+        Sun, 17 Oct 2021 19:43:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzs1eNssraNdT+jK9OAQ4JYVymDwppEy4Q2v5UAjOMxe1lPfmqVIgivEI4eg5P4o95MD27a2g2qp0KTSXO83K0=
+X-Received: by 2002:a25:3212:: with SMTP id y18mr26370110yby.308.1634525033886;
+ Sun, 17 Oct 2021 19:43:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f2f17f46-ff3a-01c4-bfd4-8dec836ec343@kernel.dk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20211014090455.7949-1-yi.zhang@redhat.com> <a24c9629-be0b-145e-414f-327ad35270e9@acm.org>
+In-Reply-To: <a24c9629-be0b-145e-414f-327ad35270e9@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Mon, 18 Oct 2021 10:43:42 +0800
+Message-ID: <CAHj4cs9HXs0+jHPdUZ53TWjeYOTKw_9M59qNPHHQY=n4=pqnoA@mail.gmail.com>
+Subject: Re: [PATCH blktests] tests/srp: fix module loading issue during srp tests
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Omar Sandoval <osandov@osandov.com>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 16, 2021 at 07:35:39PM -0600, Jens Axboe wrote:
-> We could have a race here, where the request gets freed before we call
-> into blk_mq_run_hw_queue(). If this happens, we cannot rely on the state
-> of the request.
-> 
-> Grab the hardware context before inserting the flush.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 2197cfbf081f..22b30a89bf3a 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2468,9 +2468,10 @@ void blk_mq_submit_bio(struct bio *bio)
->  	}
->  
->  	if (unlikely(is_flush_fua)) {
-> +		struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
->  		/* Bypass scheduler for flush requests */
->  		blk_insert_flush(rq);
-> -		blk_mq_run_hw_queue(rq->mq_hctx, true);
-> +		blk_mq_run_hw_queue(hctx, true);
->  	} else if (plug && (q->nr_hw_queues == 1 ||
->  		   blk_mq_is_shared_tags(rq->mq_hctx->flags) ||
->  		   q->mq_ops->commit_rqs || !blk_queue_nonrot(q))) {
+On Fri, Oct 15, 2021 at 11:30 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 10/14/21 02:04, Yi Zhang wrote:
+> > diff --git a/tests/srp/rc b/tests/srp/rc
+> > index 586f007..f89948b 100755
+> > --- a/tests/srp/rc
+> > +++ b/tests/srp/rc
+> > @@ -494,6 +494,7 @@ start_lio_srpt() {
+> >       if modinfo ib_srpt | grep -q '^parm:[[:blank:]]*rdma_cm_port:'; then
+> >               opts+=("rdma_cm_port=${srp_rdma_cm_port}")
+> >       fi
+> > +     unload_module ib_srpt && \
+> >       insmod "/lib/modules/$(uname -r)/kernel/drivers/infiniband/ulp/srpt/ib_srpt."* "${opts[@]}" || return $?
+>
+> A nit: the backslash after && can be removed.
+>
 
-From report in [1], no device close & queue release is involved, and
-request freeing could be much easier to trigger than queue release,
-so looks fine:
+Thanks Bart, I've sent V2 to fix it.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-Fixes: f328476e373a ("blk-mq: cleanup blk_mq_submit_bio")
+> Otherwise this patch looks fine to me.
+>
+> Thanks,
+>
+> Bart.
+>
 
 
-
-[1] https://lore.kernel.org/linux-block/23531d29-9d96-6744-bab9-797e65379037@kernel.dk/T/#t
-
-
-thanks,
-Ming
+-- 
+Best Regards,
+  Yi Zhang
 
