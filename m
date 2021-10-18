@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A0AC4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0368BC433FE
 	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:51:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B109610C8
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:51:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC52961027
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbhJRRxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S234207AbhJRRxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 18 Oct 2021 13:53:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234135AbhJRRxZ (ORCPT
+        with ESMTP id S233383AbhJRRxY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 13:53:25 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3477C06161C
+        Mon, 18 Oct 2021 13:53:24 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47DC7C06161C
         for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 10:51:13 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id y67so17227253iof.10
+Received: by mail-io1-xd2c.google.com with SMTP id x1so17256265iof.7
         for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 10:51:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nHdWo5JlPcrT5ny9e2xXLs7Ss2obuQA7vRyruQpssLs=;
-        b=dh+8RZ+gUJBSgu3ijYn8rYkrAMNcTC1VEK2abmNh6zBMaNjF24PxT3h4z++MyjvYH1
-         TCrkqkZ5X8MR44nhaWzYPuwRVZmnSWqwcs3LSGJULSSmO53Vp+SITASt3Ghlc44jFNb7
-         CykIXr7XuKx+NHAXp7u6vtDl3v7JV3Xf5Jn2kr91nUOmHWlZSKqH0q9NDS8W+HW4q3Mc
-         V4zPnDsAZbmypH0cFuA/svtwTs96yh1yaSB2jocP6wIFoNavINQJa5OeytRx7lbFIoA5
-         1lBRwZzF+dJQx3lRmusKC8OEswZKmJ/T7mxLhREmJB2Twqoz0x22Ku6K7GdYoWgXUR8D
-         csPQ==
+        bh=C6KyFvc9/cRpsVEldC9hLwi1Bm5WYTo8xsA740Oti4I=;
+        b=uY070Cu39UZOIfxSbB8Ls4g+mTGycigkPKHFSZswHBChYP5IuXhNE7WISmhMgAPJ5M
+         xGeaqr7+x53EuZzbN5Xk7yyvE/PKCy64Nm/QtZ+LqTiutpI1/JumLMU74f2k5ybrwr1r
+         LI56K2s6DibElVZCAHcuxXsOSCRDZx2SfiiIgtBx7j2sBUq0GYXv1bCGtjM9GcEOJLQO
+         fvFyogLgOu1dpsOf2P1bCrNKEhovbBIv/+NoAY/fXvB7tnsdNj4xDW7QUXAvXuzB8xzf
+         +L2y/S29xuR9GUzj0XEnwhu8tfyBsmo6wXRLfHghxcY3k7YDVReYAjfJ6bmnAXXoA8nk
+         PlBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nHdWo5JlPcrT5ny9e2xXLs7Ss2obuQA7vRyruQpssLs=;
-        b=dM8NE6m0tcmysXyGIaKjEG/zbMJRr55FaVy2kGSO9IzFQOUHhakffh6aIlZYkDRJqH
-         dQCdV7GrHiqYdrhbZ5U/hGu7vUDTRMZN/x6hZA1KhzEiY/ETkAGC3xYk3iuEj1vAC2Ap
-         lfBeNkqb/e3QmUf69/+JEXfgi5f069sohFU/dwV0eyo0ILDYV+XLa+bk0/bGEjFUWMPx
-         3Ul4agDVUoB9qWAt+vkkkcyJZTPL26xqgn9+uH6QEVtZ4LR3uQsUgZ9m3/c91M+99mDE
-         Rswj4PfLLcBP7izA7opwjo+qyxK1kd3jEGVUxDVEZQvZ088qDZK7nowlRBHz5d3vIkVs
-         L/WA==
-X-Gm-Message-State: AOAM530ZBPUdH95G6ggxgFhrSZgzZi1t5jynC0hvd0EuIp61jOdLfFWY
-        wkZfVcLiaFLyzBICG5jNwyKyJOS9Og4T/A==
-X-Google-Smtp-Source: ABdhPJxa/HaNYOdtT2bPcoWkljamtjQ+kisWTeNylgcFXnep42QnNj+4W5IVt3CGtIdeMJ5dUFPXIA==
-X-Received: by 2002:a05:6602:1546:: with SMTP id h6mr15133840iow.125.1634579473143;
-        Mon, 18 Oct 2021 10:51:13 -0700 (PDT)
+        bh=C6KyFvc9/cRpsVEldC9hLwi1Bm5WYTo8xsA740Oti4I=;
+        b=JSHtzWI1mRQyo2xuvNjKPGpasBgYO68E63McGkkfDTbZ0s1WUyUuhB/ACNcvIU2f/3
+         TYr2Oq44X4t27QhirjuPUBKPByPQcvYknqvFL/NXWZIIz4j8QQ/iuum0ZSwIsPiiW2tO
+         tMK371VjNbwA9/HGiwM6/HHHQBQlZUOZXDmwrgnEg/YlvE6IYcSG23xOMIvaGcozUHRA
+         ycVo/PTj9fpuIsRwB6lmIkArG2k1wN66BHxeDFEp520sm7OBiWS8SfX+QpqlpOVHuQxp
+         8Y1To4GkgeSZ7YClyx6258Z4KJPsqt5NetY+AjAmUifLT1wA6IS307VimcV65FZdCY7S
+         StgA==
+X-Gm-Message-State: AOAM530IjiHcBhknwIWBeWwkgqPAp+Eyez6leZqco51q4Ok63io2yjS1
+        up71IlgNB96VfBziY8w4Bb77ey3Hwc5TIw==
+X-Google-Smtp-Source: ABdhPJzvDtv/FgT6zwhpuNOr2Re9j+qLdfFFODD2j5sNJGm70gR7RXrvBBna6V8t2zp4cfqJUP0Mbw==
+X-Received: by 2002:a6b:8f44:: with SMTP id r65mr15458436iod.156.1634579472392;
+        Mon, 18 Oct 2021 10:51:12 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v17sm7380017ilh.67.2021.10.18.10.51.12
+        by smtp.gmail.com with ESMTPSA id v17sm7380017ilh.67.2021.10.18.10.51.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 18 Oct 2021 10:51:12 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/6] block: return whether or not to unplug through boolean
-Date:   Mon, 18 Oct 2021 11:51:05 -0600
-Message-Id: <20211018175109.401292-3-axboe@kernel.dk>
+Subject: [PATCH 1/6] block: don't call blk_status_to_errno in blk_update_request
+Date:   Mon, 18 Oct 2021 11:51:04 -0600
+Message-Id: <20211018175109.401292-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211018175109.401292-1-axboe@kernel.dk>
 References: <20211018175109.401292-1-axboe@kernel.dk>
@@ -66,117 +66,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of returning the same queue request through a request pointer,
-use a boolean to accomplish the same.
+From: Christoph Hellwig <hch@lst.de>
 
+We only need to call it to resolve the blk_status_t -> errno mapping for
+tracing, so move the conversion into the tracepoints that are not called
+at all when tracing isn't enabled.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-merge.c | 11 +++++------
- block/blk-mq.c    | 16 +++++++++-------
- block/blk.h       |  2 +-
- 3 files changed, 15 insertions(+), 14 deletions(-)
+ block/blk-mq.c               | 2 +-
+ include/trace/events/block.h | 6 +++---
+ kernel/trace/blktrace.c      | 7 ++++---
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index ec727234ac48..c273b58378ce 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -1067,9 +1067,8 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
-  * @q: request_queue new bio is being queued at
-  * @bio: new bio being queued
-  * @nr_segs: number of segments in @bio
-- * @same_queue_rq: pointer to &struct request that gets filled in when
-- * another request associated with @q is found on the plug list
-- * (optional, may be %NULL)
-+ * @same_queue_rq: output value, will be true if there's an existing request
-+ * from the passed in @q already in the plug list
-  *
-  * Determine whether @bio being queued on @q can be merged with the previous
-  * request on %current's plugged list.  Returns %true if merge was successful,
-@@ -1085,7 +1084,7 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
-  * Caller must ensure !blk_queue_nomerges(q) beforehand.
-  */
- bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
--		unsigned int nr_segs, struct request **same_queue_rq)
-+		unsigned int nr_segs, bool *same_queue_rq)
- {
- 	struct blk_plug *plug;
- 	struct request *rq;
-@@ -1096,12 +1095,12 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
- 
- 	/* check the previously added entry for a quick merge attempt */
- 	rq = list_last_entry(&plug->mq_list, struct request, queuelist);
--	if (rq->q == q && same_queue_rq) {
-+	if (rq->q == q) {
- 		/*
- 		 * Only blk-mq multiple hardware queues case checks the rq in
- 		 * the same queue, there should be only one such rq in a queue
- 		 */
--		*same_queue_rq = rq;
-+		*same_queue_rq = true;
- 	}
- 	if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) == BIO_MERGE_OK)
- 		return true;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e3ef55f76701..d957b6812a98 100644
+index f7c610f5f3e7..e3ef55f76701 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2422,7 +2422,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	const int is_flush_fua = op_is_flush(bio->bi_opf);
- 	struct request *rq;
- 	struct blk_plug *plug;
--	struct request *same_queue_rq = NULL;
-+	bool same_queue_rq = false;
- 	unsigned int nr_segs = 1;
- 	blk_status_t ret;
+@@ -672,7 +672,7 @@ bool blk_update_request(struct request *req, blk_status_t error,
+ {
+ 	int total_bytes;
  
-@@ -2515,6 +2515,8 @@ void blk_mq_submit_bio(struct bio *bio)
- 		/* Insert the request at the IO scheduler queue */
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	} else if (plug && !blk_queue_nomerges(q)) {
-+		struct request *next_rq = NULL;
-+
- 		/*
- 		 * We do limited plugging. If the bio can be merged, do that.
- 		 * Otherwise the existing request in the plug list will be
-@@ -2522,19 +2524,19 @@ void blk_mq_submit_bio(struct bio *bio)
- 		 * The plug list might get flushed before this. If that happens,
- 		 * the plug list is empty, and same_queue_rq is invalid.
- 		 */
--		if (list_empty(&plug->mq_list))
--			same_queue_rq = NULL;
- 		if (same_queue_rq) {
--			list_del_init(&same_queue_rq->queuelist);
-+			next_rq = list_last_entry(&plug->mq_list,
-+							struct request,
-+							queuelist);
-+			list_del_init(&next_rq->queuelist);
- 			plug->rq_count--;
- 		}
- 		blk_add_rq_to_plug(plug, rq);
- 		trace_block_plug(q);
+-	trace_block_rq_complete(req, blk_status_to_errno(error), nr_bytes);
++	trace_block_rq_complete(req, error, nr_bytes);
  
--		if (same_queue_rq) {
-+		if (next_rq) {
- 			trace_block_unplug(q, 1, true);
--			blk_mq_try_issue_directly(same_queue_rq->mq_hctx,
--						  same_queue_rq);
-+			blk_mq_try_issue_directly(next_rq->mq_hctx, next_rq);
- 		}
- 	} else if ((q->nr_hw_queues > 1 && is_sync) ||
- 		   !rq->mq_hctx->dispatch_busy) {
-diff --git a/block/blk.h b/block/blk.h
-index e80350327e6d..b9729c12fd62 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -218,7 +218,7 @@ void blk_add_timer(struct request *req);
- void blk_print_req_error(struct request *req, blk_status_t status);
+ 	if (!req->bio)
+ 		return false;
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index cc5ab96a7471..a95daa4d4caa 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -114,7 +114,7 @@ TRACE_EVENT(block_rq_requeue,
+  */
+ TRACE_EVENT(block_rq_complete,
  
- bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
--		unsigned int nr_segs, struct request **same_queue_rq);
-+		unsigned int nr_segs, bool *same_queue_rq);
- bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
- 			struct bio *bio, unsigned int nr_segs);
+-	TP_PROTO(struct request *rq, int error, unsigned int nr_bytes),
++	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
  
+ 	TP_ARGS(rq, error, nr_bytes),
+ 
+@@ -122,7 +122,7 @@ TRACE_EVENT(block_rq_complete,
+ 		__field(  dev_t,	dev			)
+ 		__field(  sector_t,	sector			)
+ 		__field(  unsigned int,	nr_sector		)
+-		__field(  int,		error			)
++		__field(  int	,	error			)
+ 		__array(  char,		rwbs,	RWBS_LEN	)
+ 		__dynamic_array( char,	cmd,	1		)
+ 	),
+@@ -131,7 +131,7 @@ TRACE_EVENT(block_rq_complete,
+ 		__entry->dev	   = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
+ 		__entry->sector    = blk_rq_pos(rq);
+ 		__entry->nr_sector = nr_bytes >> 9;
+-		__entry->error     = error;
++		__entry->error     = blk_status_to_errno(error);
+ 
+ 		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
+ 		__get_str(cmd)[0] = '\0';
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index fa91f398f28b..1183c88634aa 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -816,7 +816,7 @@ blk_trace_request_get_cgid(struct request *rq)
+  *     Records an action against a request. Will log the bio offset + size.
+  *
+  **/
+-static void blk_add_trace_rq(struct request *rq, int error,
++static void blk_add_trace_rq(struct request *rq, blk_status_t error,
+ 			     unsigned int nr_bytes, u32 what, u64 cgid)
+ {
+ 	struct blk_trace *bt;
+@@ -834,7 +834,8 @@ static void blk_add_trace_rq(struct request *rq, int error,
+ 		what |= BLK_TC_ACT(BLK_TC_FS);
+ 
+ 	__blk_add_trace(bt, blk_rq_trace_sector(rq), nr_bytes, req_op(rq),
+-			rq->cmd_flags, what, error, 0, NULL, cgid);
++			rq->cmd_flags, what, blk_status_to_errno(error), 0,
++			NULL, cgid);
+ 	rcu_read_unlock();
+ }
+ 
+@@ -863,7 +864,7 @@ static void blk_add_trace_rq_requeue(void *ignore, struct request *rq)
+ }
+ 
+ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+-			int error, unsigned int nr_bytes)
++			blk_status_t error, unsigned int nr_bytes)
+ {
+ 	blk_add_trace_rq(rq, error, nr_bytes, BLK_TA_COMPLETE,
+ 			 blk_trace_request_get_cgid(rq));
 -- 
 2.33.1
 
