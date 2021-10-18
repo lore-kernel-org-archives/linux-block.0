@@ -2,139 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7468C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2389C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CEA760EE5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80CAD6101B
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231352AbhJRJK2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 05:10:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46327 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231305AbhJRJKP (ORCPT
+        id S231213AbhJRJNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 05:13:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58868 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231149AbhJRJNe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 05:10:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634548083;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SYhE5y9SYVehwomW1tK9izimp0Fp9sjsJ29UQfuMIu8=;
-        b=J/0TLWh7Vq0dhNdJ5/Dp7Rck7YKlqRp5IIFX4Nw4r06x85uyM4TEcuQnBn3n0i40szVVRC
-        KgathynRZUc2I1A6BVUB2RIGZAuOnS5KlwW2mX8z3gOY/6CfiJNiUPEjxV+/KtQwO+AYuf
-        0+1a4rH645wElAZwnW1a1SJDAa2LA9Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-tJPLIy7HOfiOON5Vde2j8Q-1; Mon, 18 Oct 2021 05:08:00 -0400
-X-MC-Unique: tJPLIy7HOfiOON5Vde2j8Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDBCEA40C0;
-        Mon, 18 Oct 2021 09:07:58 +0000 (UTC)
-Received: from T590 (ovpn-8-37.pek2.redhat.com [10.72.8.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A9B3794A0;
-        Mon, 18 Oct 2021 09:07:45 +0000 (UTC)
-Date:   Mon, 18 Oct 2021 17:07:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
-        "hare@suse.de" <hare@suse.de>
-Subject: Re: [PATCH] blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
-Message-ID: <YW05XGjO8KfYp9xp@T590>
-References: <1634114459-143003-1-git-send-email-john.garry@huawei.com>
- <YWalYoOZmpkmAZNK@T590>
- <79266509-f327-9de3-d22e-0e9fe00387ee@huawei.com>
- <YWay/n+BJTLm1Alb@T590>
- <9f3c4d57-6b77-5345-0d4c-275962214b2a@huawei.com>
- <YWbtRm22vohvY0Ca@T590>
- <7e142559-1c96-8d84-081a-378c1f6d1306@huawei.com>
- <1065f517-c94b-5a47-34f6-52015b3ef907@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1065f517-c94b-5a47-34f6-52015b3ef907@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        Mon, 18 Oct 2021 05:13:34 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79BE6C06161C;
+        Mon, 18 Oct 2021 02:11:23 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id m21so15439850pgu.13;
+        Mon, 18 Oct 2021 02:11:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=Ewy/OKswLYPZAgNcZXQwvve5zSIn1eK4olZjK+6v5cE=;
+        b=DrVPf6LaBZ2rOkH0DPMaGRbRtFfL8B0052hB2ZYe1ZIcJXeTl9ncExV9IOQTRVkx7K
+         DxYQv1sN8p9ZTf3hcNGtVxmnrB+XAqGBGino9YvXL4wMkQTR2EIYY0XEnll8iuwmqtP1
+         KzzqZeoDJsVjgYvIh2pHcE3YqKmaUSe6gEOtDdWyDE2QCDv5V3tVwRgXCzP1TeRqPEK4
+         SmKk2ONaJh2UvO82sFAYjqQX3ScFLT1wUmyYeKVuyJjjTE+y5S05UMrk9KsTjj+uDRAa
+         KcZouhu7ixR0FHjxD5+qw8rsrfWdK/d59UpztXGkkJmEfy7nZeanBH0sIOad/LH9ol8M
+         hM0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Ewy/OKswLYPZAgNcZXQwvve5zSIn1eK4olZjK+6v5cE=;
+        b=cIYT/5c9eJC/jkBkoiuwlntewdDaObv6pIDcxVuIljDNEbaXbB8uwnUU1Hh0sFQ+Tc
+         o0LCldu0/c/2DauEQ4AXIb/UjisInLuYZYUPh1h8ky424OVoZR/rnTiQ3UV2bsrohJSR
+         gxFI/WpV5uq47FZIeXiDMa087D6t8i8i3HrUqo6TayMOPAHtdoFOXI/DdntEmDzXq58t
+         HUUP7rU9e1hhDR4fjJ670dO3NheV3NmjLddqwyjcBoazQ5o1tmvaBO8DDNmPAQ0i+q8T
+         lEN/tDrNWjYteypoVfTONxUmvqHR8tmx6+r4KZFzszJ+GLBUzKCvkGa6q3z9SlAAPhld
+         SBIQ==
+X-Gm-Message-State: AOAM533IG/RC4S0e/hI8rAG+sw838I5oKaPxlNAjU/9z+K+ebxIoBlrG
+        Iyi1Vb8WRUiJIPtw3aGbc6E=
+X-Google-Smtp-Source: ABdhPJwspwvNNJxse0N4olrSeBZoCa5R9srL0m3FyRh5mIUP+AWhbt97viHoUfYL6Xp9xXnrrAFfNA==
+X-Received: by 2002:a05:6a00:9a2:b0:44c:b979:afe3 with SMTP id u34-20020a056a0009a200b0044cb979afe3mr11666105pfg.61.1634548283020;
+        Mon, 18 Oct 2021 02:11:23 -0700 (PDT)
+Received: from BJ-zhangqiang.qcraft.lan ([137.59.101.13])
+        by smtp.gmail.com with ESMTPSA id oc8sm12916951pjb.15.2021.10.18.02.11.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Oct 2021 02:11:22 -0700 (PDT)
+From:   Zqiang <qiang.zhang1211@gmail.com>
+To:     axboe@kernel.dk, hch@lst.de, willy@infradead.org,
+        sunhao.th@gmail.com, hch@infradead.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zqiang <qiang.zhang1211@gmail.com>
+Subject: [PATCH] block: fix incorrect references to disk objects
+Date:   Mon, 18 Oct 2021 17:11:16 +0800
+Message-Id: <20211018091116.16874-1-qiang.zhang1211@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 18, 2021 at 09:08:57AM +0100, John Garry wrote:
-> On 13/10/2021 16:13, John Garry wrote:
-> > > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > > index 72a2724a4eee..2a2ad6dfcc33 100644
-> > > --- a/block/blk-mq-tag.c
-> > > +++ b/block/blk-mq-tag.c
-> > > @@ -232,8 +232,9 @@ static bool bt_iter(struct sbitmap *bitmap,
-> > > unsigned int bitnr, void *data)
-> > >       if (!rq)
-> > >           return true;
-> > > -    if (rq->q == hctx->queue && rq->mq_hctx == hctx)
-> > > -        ret = iter_data->fn(hctx, rq, iter_data->data, reserved);
-> > > +    if (rq->q == hctx->queue && (rq->mq_hctx == hctx ||
-> > > +                blk_mq_is_shared_tags(hctx->flags)))
-> > > +        ret = iter_data->fn(rq->mq_hctx, rq, iter_data->data, reserved);
-> > >       blk_mq_put_rq_ref(rq);
-> > >       return ret;
-> > >   }
-> > > @@ -460,6 +461,9 @@ void blk_mq_queue_tag_busy_iter(struct
-> > > request_queue *q, busy_iter_fn *fn,
-> > >           if (tags->nr_reserved_tags)
-> > >               bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
-> > >           bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
-> > > +
-> > > +        if (blk_mq_is_shared_tags(hctx->flags))
-> > > +            break;
-> > >       }
-> > >       blk_queue_exit(q);
-> > >   }
-> > > 
-> > 
-> > I suppose that is ok, and means that we iter once.
-> > 
-> > However, I have to ask, where is the big user of
-> > blk_mq_queue_tag_busy_iter() coming from? I saw this from Kashyap's
-> > mail:
-> > 
-> >  > 1.31%     1.31%  kworker/57:1H-k  [kernel.vmlinux]
-> >  >       native_queued_spin_lock_slowpath
-> >  >       ret_from_fork
-> >  >       kthread
-> >  >       worker_thread
-> >  >       process_one_work
-> >  >       blk_mq_timeout_work
-> >  >       blk_mq_queue_tag_busy_iter
-> >  >       bt_iter
-> >  >       blk_mq_find_and_get_req
-> >  >       _raw_spin_lock_irqsave
-> >  >       native_queued_spin_lock_slowpath
-> > 
-> > How or why blk_mq_timeout_work()?
-> 
-> Just some update: I tried hisi_sas with 10x SAS SSDs, megaraid sas with 1x
-> SATA HDD (that's all I have), and null blk with lots of devices, and I still
-> can't see high usage of blk_mq_queue_tag_busy_iter().
+When adding partitions to the disk, the reference count of the disk
+object is increased. then alloc partition device and called
+device_add(), if the device_add() return error, the reference
+count of the disk object will be reduced twice, at put_device(pdev)
+and put_disk(disk). this leads to the end of the object's life cycle
+prematurely, and trigger following calltrace.
 
-It should be triggered easily in case of heavy io accounting:
+  __init_work+0x2d/0x50 kernel/workqueue.c:519
+  synchronize_rcu_expedited+0x3af/0x650 kernel/rcu/tree_exp.h:847
+  bdi_remove_from_list mm/backing-dev.c:938 [inline]
+  bdi_unregister+0x17f/0x5c0 mm/backing-dev.c:946
+  release_bdi+0xa1/0xc0 mm/backing-dev.c:968
+  kref_put include/linux/kref.h:65 [inline]
+  bdi_put+0x72/0xa0 mm/backing-dev.c:976
+  bdev_free_inode+0x11e/0x220 block/bdev.c:408
+  i_callback+0x3f/0x70 fs/inode.c:226
+  rcu_do_batch kernel/rcu/tree.c:2508 [inline]
+  rcu_core+0x76d/0x16c0 kernel/rcu/tree.c:2743
+  __do_softirq+0x1d7/0x93b kernel/softirq.c:558
+  invoke_softirq kernel/softirq.c:432 [inline]
+  __irq_exit_rcu kernel/softirq.c:636 [inline]
+  irq_exit_rcu+0xf2/0x130 kernel/softirq.c:648
+  sysvec_apic_timer_interrupt+0x93/0xc0
 
-while true; do cat /proc/diskstats; done
+making disk is NULL when calling put_disk().
 
+Reported-by: Hao Sun <sunhao.th@gmail.com>
+Signed-off-by: Zqiang <qiang.zhang1211@gmail.com>
+---
+ block/partitions/core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> So how about we get this patch processed (to fix blk_mq_tagset_busy_iter()),
-> as it is independent of blk_mq_queue_tag_busy_iter()? And then wait for some
-> update or some more info from Kashyap regarding blk_mq_queue_tag_busy_iter()
-
-Looks fine:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-
-Thanks,
-Ming
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 3a4898433c43..4cb6803e7021 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -424,6 +424,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+ 	device_del(pdev);
+ out_put:
+ 	put_device(pdev);
++	disk = NULL;
+ out_put_disk:
+ 	put_disk(disk);
+ 	return ERR_PTR(err);
+-- 
+2.17.1
 
