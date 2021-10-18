@@ -2,99 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6172EC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 01:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF48C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 01:49:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 447D0610A6
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 01:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 354FA61027
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 01:49:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231983AbhJRBV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Oct 2021 21:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38868 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234408AbhJRBV0 (ORCPT
+        id S242957AbhJRBvz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Oct 2021 21:51:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36596 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235368AbhJRBvz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Oct 2021 21:21:26 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABAD4C06161C
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 18:19:15 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id i189so14389026ioa.1
-        for <linux-block@vger.kernel.org>; Sun, 17 Oct 2021 18:19:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/Ss6rRSBafTIyy3JhG9gpWccPlEHBJC6ZWuBmCdlDp0=;
-        b=Xrvkrt26FJkelTeTryGVQXkGgmwphAIS0XbuvXrHExwVfeZ1NSjegp/rkUYOKtCN4I
-         IoO/SgnPZnSa9wN5y018mZFcoY1oTJsMYeWv4krUryHKxi6YItVdaWH4GnRlL808LhSc
-         WEou4qvAXRdUHtoAh7ODDawwJzo67nqpGgaJIFFlNJgAx4sDmYJB7v2+JA3FYoKU3CPQ
-         i2O7l5L9j+81NB6SKnHw6xuDk7g91oVx951lRYVxNBP04vQVce5qDpHjh8I2GZTovBe3
-         mMqao8t3Abe0WrFqYWQAm087iJxbdobeecCjK7vkB3hICmRH+e+O93+Mm3ES3NYjLSUj
-         t/wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/Ss6rRSBafTIyy3JhG9gpWccPlEHBJC6ZWuBmCdlDp0=;
-        b=CVy/Pgr6kVMcRzIBZwjoygxUsPKqYoJSxWJ+hn5igrYYUOZNBuNmil5Leh7CIc/Df4
-         wSLdR9ssk1owj+Ap9Z8EsUt+DZ8KpHCc6svTDevz7Yg0ilAUGEe6W1KrRbGjR2SXmjtl
-         d424Tci/tYPM0jp+FWK0ykPBAhpARbxz2b2kV3wGc1x8gXOh70YQSAk5yMPV9aHTZ35n
-         HDvC95kson1iYX48woQIlus6roMkWDyU/FN2f3YfMIAjmRNSJ5x3Nh3IyIZGJj+xSxz2
-         jv9weX4f1s0FNhlcPCmUIvCXwrr9whGzmoFl92qEIB1Y7zWx5nfw7Eb2LD2AFFU4xdCf
-         wOdg==
-X-Gm-Message-State: AOAM533BKTT+CdL5dO9gguoSmPqV2l/eJsmmoDzUoZGdjZURTPw4jLBJ
-        J9yVptwEyrmNqfd9ZsJLqH73Ww==
-X-Google-Smtp-Source: ABdhPJz46apwwR3fPj7comOfIeu5CLlqxArnD7r0hvgNjTJBUvusbXLbDOJ2jDqFbZ4E1gktMYuLIA==
-X-Received: by 2002:a02:858c:: with SMTP id d12mr16836425jai.110.1634519954760;
-        Sun, 17 Oct 2021 18:19:14 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id i8sm1167604ilm.10.2021.10.17.18.19.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Oct 2021 18:19:14 -0700 (PDT)
-Subject: Re: [PATCH V4 0/6] blk-mq: support concurrent queue quiescing
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai3@huawei.com>
-References: <20211014081710.1871747-1-ming.lei@redhat.com>
- <20211014121145.GB15198@lst.de> <YWzIazr+VjY9MNCv@T590>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <bd75e597-ab35-2a88-c2a7-e4e5365bf0ef@kernel.dk>
-Date:   Sun, 17 Oct 2021 19:19:13 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Sun, 17 Oct 2021 21:51:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634521784;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wvbqwT6JOn4vPU7EEG0cLC4MpIsizCcdEfa5JCFAlnE=;
+        b=iLDNhf3hm+JtW0b+K+fTNVQ1czkmkp5NnvY/eAG1AkMjVcjV1MHQfS0AKIFZagbCnuhgvG
+        0Ns7oxyLxDCRiDFDW802tMKeJ6XXZ5TFlJaaNr+W5KcvRfVWC5EZ4ZSeA2jTrs9ZcFQvvX
+        uX7IiAmYt64/VoGHNzycuRZJUDKwJdg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-mkg1LEzjPhqsXt3jQmfiuQ-1; Sun, 17 Oct 2021 21:49:42 -0400
+X-MC-Unique: mkg1LEzjPhqsXt3jQmfiuQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F033180830C;
+        Mon, 18 Oct 2021 01:49:41 +0000 (UTC)
+Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 790F360BF4;
+        Mon, 18 Oct 2021 01:49:36 +0000 (UTC)
+Date:   Mon, 18 Oct 2021 09:49:31 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: don't dereference request after flush insertion
+Message-ID: <YWzSqzsuDF8Fl9jB@T590>
+References: <f2f17f46-ff3a-01c4-bfd4-8dec836ec343@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <YWzIazr+VjY9MNCv@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2f17f46-ff3a-01c4-bfd4-8dec836ec343@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/17/21 7:05 PM, Ming Lei wrote:
-> On Thu, Oct 14, 2021 at 02:11:45PM +0200, Christoph Hellwig wrote:
->> Except for the nitpick just noted this looks fine to me:
->>
->> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>
->> I plan to apply at least 1-5 to the nvme tree with that nitpick fixed
->> up locally.
->>
->> Jens: do you want me to take the last patch through the nvme tree as
->> well?
+On Sat, Oct 16, 2021 at 07:35:39PM -0600, Jens Axboe wrote:
+> We could have a race here, where the request gets freed before we call
+> into blk_mq_run_hw_queue(). If this happens, we cannot rely on the state
+> of the request.
 > 
-> Hello Jens & Christoph,
+> Grab the hardware context before inserting the flush.
 > 
-> Any chance to make it in v5.16?
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 2197cfbf081f..22b30a89bf3a 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2468,9 +2468,10 @@ void blk_mq_submit_bio(struct bio *bio)
+>  	}
+>  
+>  	if (unlikely(is_flush_fua)) {
+> +		struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+>  		/* Bypass scheduler for flush requests */
+>  		blk_insert_flush(rq);
+> -		blk_mq_run_hw_queue(rq->mq_hctx, true);
+> +		blk_mq_run_hw_queue(hctx, true);
 
-Yep, I'll take a look at this in the morning. Rebasing the block tree
-anyway, I'll let you know if we need any changes here.
+If the request is freed before running queue, the request queue could
+be released and the hctx may be freed.
 
--- 
-Jens Axboe
+Thanks,
+Ming
 
