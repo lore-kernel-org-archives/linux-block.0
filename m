@@ -2,51 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C671C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71426C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 18:00:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1909C610C7
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55A9860F0F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 18:00:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231917AbhJRR7K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 13:59:10 -0400
-Received: from verein.lst.de ([213.95.11.211]:35376 "EHLO verein.lst.de"
+        id S230216AbhJRSCs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 14:02:48 -0400
+Received: from verein.lst.de ([213.95.11.211]:35379 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229980AbhJRR7K (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 13:59:10 -0400
+        id S229634AbhJRSCs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Oct 2021 14:02:48 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8932668AFE; Mon, 18 Oct 2021 19:56:53 +0200 (CEST)
-Date:   Mon, 18 Oct 2021 19:56:53 +0200
+        id 6AB5768AFE; Mon, 18 Oct 2021 20:00:34 +0200 (CEST)
+Date:   Mon, 18 Oct 2021 20:00:33 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Coly Li <colyli@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
-        David Sterba <dsterba@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Kees Cook <keescook@chromium.org>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ntfs3@lists.linux.dev, reiserfs-devel@vger.kernel.org
-Subject: Re: don't use ->bd_inode to access the block device size v3
-Message-ID: <20211018175653.GA4194@lst.de>
-References: <20211018101130.1838532-1-hch@lst.de> <4a8c3a39-9cd3-5b2f-6d0f-a16e689755e6@kernel.dk> <20211018171843.GA3338@lst.de> <2f5dcf79-8419-45ff-c27c-68d43242ccfe@kernel.dk> <20211018174901.GA3990@lst.de> <e0784f3e-46c8-c90c-870b-60cc2ed7a2da@kernel.dk>
+Cc:     linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: [PATCH 2/6] block: return whether or not to unplug through
+ boolean
+Message-ID: <20211018180033.GA4232@lst.de>
+References: <20211018175109.401292-1-axboe@kernel.dk> <20211018175109.401292-3-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e0784f3e-46c8-c90c-870b-60cc2ed7a2da@kernel.dk>
+In-Reply-To: <20211018175109.401292-3-axboe@kernel.dk>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
