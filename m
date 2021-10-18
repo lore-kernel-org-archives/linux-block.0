@@ -2,92 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35C7C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8543FC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:53:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEF5361027
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:51:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B31861263
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 17:53:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234252AbhJRRx2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 13:53:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39382 "EHLO
+        id S229980AbhJRRzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 13:55:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233830AbhJRRx1 (ORCPT
+        with ESMTP id S231931AbhJRRzW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 13:53:27 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D75BC061765
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 10:51:16 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id n7so17352541iod.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 10:51:16 -0700 (PDT)
+        Mon, 18 Oct 2021 13:55:22 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CB0C061768
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 10:53:11 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id s17so17225950ioa.13
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 10:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nlhkTVMRTDUIg6xLkz4mvLFJzbvrzB5LrVKzz1g0kp8=;
-        b=q7dIawP9BMGEUvv0nz3zPT66kOxfZ+7PLCOG8Z5ZmdlL1dFDEHcndYGVf45pKY5GXv
-         Knoj1wtYK1I+a3ICzhzwEzJCwqY6qZeqCQQI/kcWqo0KxOn+MQKoa1rYBURntA1Dnsfv
-         VDpyRuoCrgll8s8pOhl0z4jda7FOt8ezjaOiwW73AYRSaQnQ2gJAWaczQ77bIho4kc6F
-         tlPf7Tp+rQe8ClG79Bwg9ysV3kkoKkM1wuUDuhr7UOjzNM2UWYZkOaYyqNQdIP7DWkwr
-         YVwK0DCatLhUzETwyQqLqHJyo3YjJfoXiDWGa0Quk/nF+5MTetA4AcEJ4xJ/lM4OQs3U
-         plEA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=YH4oGe9dRfdZQ1d4CvnTMZ1r7HRf2QBAQWpHy9E3Wng=;
+        b=UdB/aADcuFPlPcZ5zloyGSC8r8sjGP46bdFZgOczbw//2VtX+qD5PI/hTVyCm/RwVy
+         FXAjDscH1TQ3fsg0fSzaSQe7AynSLix9FEl76DQK4y8MTjp/aJVzkmTFFG7c2xS8iXPi
+         s+lRVm4eViQimOGv1xw+YUEHZjc66LhnruY2OKJU4kNG1W3nUI3yYhopF97varulsEhH
+         lrAHcDhmWx+Ldz3ca7hK3R16UzzOUjcC//cwEEUu4EBzTbKGlwl++3WbIOKHwppSidbZ
+         J2GwRHTpqmvpQIvUpXH1LIhuUZWDULALzfc74tUrBZWM1yZdKVE8ClvuVU+5LBey+DKb
+         N3Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nlhkTVMRTDUIg6xLkz4mvLFJzbvrzB5LrVKzz1g0kp8=;
-        b=yyGYaCN0/uMgKqw9rbWdqghIFrFL3Zh9uDTVwuRRoxyjpuy+wiNJxY3iEJvswCF6S6
-         CwqoJk+uZFk1IE0Jll47nxB71gmUaGr9TMRJVAYZUGFSucYR2qR0NssPQri3jqnGjcfD
-         lZyzaQFDtYSK7IJxJOQybCQKZlb2C85kzx4pHnU/jXIo/kUPBS9LNgsDmGPGV7IQQqX1
-         6U63SsHmRZIqWBkKwneY/t7zOWf39KdV6EOcgYrg4GhAnMdCqEQl1nN/hPRQWqMtkQVo
-         ZmSwO22j+93dDY0s1WpBY9tY1MvKIvkaFZa2x1Xe0aOUwKb8VjiPUN3KbqeSQJl1Qjhu
-         g5Pg==
-X-Gm-Message-State: AOAM5330d+LHGij4yDzNygtCTg1q76MYZRWau5IuRs+akhw0zy0xusay
-        2+vkukeBr6q/B+LY9V8WYcfXqkCBTZA=
-X-Google-Smtp-Source: ABdhPJw2D0VTGptY83uacStKNDIQi77yURzxzLQGUQuo+ogCij9iocKXK4u5PESrYMVs4Rf4u1/A/Q==
-X-Received: by 2002:a05:6602:2c88:: with SMTP id i8mr15696227iow.48.1634579475906;
-        Mon, 18 Oct 2021 10:51:15 -0700 (PDT)
-Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v17sm7380017ilh.67.2021.10.18.10.51.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 10:51:15 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YH4oGe9dRfdZQ1d4CvnTMZ1r7HRf2QBAQWpHy9E3Wng=;
+        b=RnmtleJKRbIu1ZzeaUdAOH3kGbBJ8cYOSaiItLMeoHvJYivlQLZzasORbzDdDMi+Ys
+         eO0PYMzPodbFYLddfJd3xKD17EuDjZYFuf1fJL/F4htnW8fE9ydC121yLBJn7dwUgIEp
+         qkxE2bNAcX9O5dReIp6NPqV9rN07ocQzKRWDQdjLjkyUlDj0mGaSyaJFFfHvBTedjFJd
+         l/gAno63TQGlHeOF3SHwk04E7z17flKZ+H2zM/KJPZ/iGY0g5We/YzhmNC0iLl+uJEKo
+         Wr/qAlv7gNt1gpXuZG/t3Q5p9JIzBnsnBnL11gcKfspp1i6NEjhUONClU0meSAd7WsJm
+         U/aw==
+X-Gm-Message-State: AOAM530jVvf2oqp4T3ttTkpmLLJgYBYify/F5txTjpFKrvfivN3yalWi
+        E7CyhIOgez1TZjuXeDKUgzIuzA==
+X-Google-Smtp-Source: ABdhPJzaVpRAohIh75kPuEB6cvjZHptUXsyrO2OyQP99Xt2V/uaZI2XjjHTplRgkBKRlsFA7V0q64g==
+X-Received: by 2002:a6b:8dd6:: with SMTP id p205mr14846469iod.192.1634579590519;
+        Mon, 18 Oct 2021 10:53:10 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m15sm3303730ilh.73.2021.10.18.10.53.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Oct 2021 10:53:10 -0700 (PDT)
+Subject: Re: don't use ->bd_inode to access the block device size v3
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Song Liu <song@kernel.org>, David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Kees Cook <keescook@chromium.org>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+        ntfs3@lists.linux.dev, reiserfs-devel@vger.kernel.org
+References: <20211018101130.1838532-1-hch@lst.de>
+ <4a8c3a39-9cd3-5b2f-6d0f-a16e689755e6@kernel.dk>
+ <20211018171843.GA3338@lst.de>
+ <2f5dcf79-8419-45ff-c27c-68d43242ccfe@kernel.dk>
+ <20211018174901.GA3990@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 6/6] block: align blkdev_dio inlined bio to a cacheline
-Date:   Mon, 18 Oct 2021 11:51:09 -0600
-Message-Id: <20211018175109.401292-7-axboe@kernel.dk>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211018175109.401292-1-axboe@kernel.dk>
-References: <20211018175109.401292-1-axboe@kernel.dk>
+Message-ID: <e0784f3e-46c8-c90c-870b-60cc2ed7a2da@kernel.dk>
+Date:   Mon, 18 Oct 2021 11:53:08 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211018174901.GA3990@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We get all sorts of unreliable and funky results since the bio is
-designed to align on a cacheline, which it does not when inlined like
-this.
+On 10/18/21 11:49 AM, Christoph Hellwig wrote:
+> On Mon, Oct 18, 2021 at 11:40:51AM -0600, Jens Axboe wrote:
+>>  static inline loff_t bdev_nr_bytes(struct block_device *bdev)
+>>  {
+>> -	return i_size_read(bdev->bd_inode);
+>> +	return bdev->bd_nr_sectors;
+> 
+> This hunk needs to go into bdev_nr_sectors, and the bdev_nr_bytes
+> probably wants to call bdev_nr_sectors and do the shifting.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/fops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Makes sense.
 
-diff --git a/block/fops.c b/block/fops.c
-index 2ae8a7bd2b84..e30082ea219a 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -137,7 +137,7 @@ struct blkdev_dio {
- 	size_t			size;
- 	atomic_t		ref;
- 	unsigned int		flags;
--	struct bio		bio;
-+	struct bio		bio ____cacheline_aligned_in_smp;
- };
+commit dd018a580d0037f65d7dd801cbf3e053f36283de
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Mon Oct 18 11:39:45 2021 -0600
+
+    block: cache inode size in bdev
+    
+    Reading the inode size brings in a new cacheline for IO submit, and
+    it's in the hot path being checked for every single IO. When doing
+    millions of IOs per core per second, this is noticeable overhead.
+    
+    Cache the nr_sectors in the bdev itself.
+    
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 759bc06810f8..53495e3391e3 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -58,6 +58,7 @@ void set_capacity(struct gendisk *disk, sector_t sectors)
  
- static struct bio_set blkdev_dio_pool;
+ 	spin_lock(&bdev->bd_size_lock);
+ 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
++	bdev->bd_nr_sectors = sectors;
+ 	spin_unlock(&bdev->bd_size_lock);
+ }
+ EXPORT_SYMBOL(set_capacity);
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 9dbddc355b40..66ef9bc6d6a1 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -91,6 +91,7 @@ static void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors)
+ {
+ 	spin_lock(&bdev->bd_size_lock);
+ 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
++	bdev->bd_nr_sectors = sectors;
+ 	spin_unlock(&bdev->bd_size_lock);
+ }
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 472e55e0e94f..fe065c394fff 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -39,6 +39,7 @@ struct bio_crypt_ctx;
+ 
+ struct block_device {
+ 	sector_t		bd_start_sect;
++	sector_t		bd_nr_sectors;
+ 	struct disk_stats __percpu *bd_stats;
+ 	unsigned long		bd_stamp;
+ 	bool			bd_read_only;	/* read-only policy */
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 7b0326661a1e..a967b3fb3c71 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -236,14 +236,14 @@ static inline sector_t get_start_sect(struct block_device *bdev)
+ 	return bdev->bd_start_sect;
+ }
+ 
+-static inline loff_t bdev_nr_bytes(struct block_device *bdev)
++static inline sector_t bdev_nr_sectors(struct block_device *bdev)
+ {
+-	return i_size_read(bdev->bd_inode);
++	return bdev->bd_nr_sectors;
+ }
+ 
+-static inline sector_t bdev_nr_sectors(struct block_device *bdev)
++static inline loff_t bdev_nr_bytes(struct block_device *bdev)
+ {
+-	return bdev_nr_bytes(bdev) >> SECTOR_SHIFT;
++	return bdev_nr_setors(bdev) << SECTOR_SHIFT;
+ }
+ 
+ static inline sector_t get_capacity(struct gendisk *disk)
+
 -- 
-2.33.1
+Jens Axboe
 
