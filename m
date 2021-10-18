@@ -2,129 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2BBC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 23:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA6AC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 23:17:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 206EB60C49
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 23:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97FFF60F8F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 23:17:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232299AbhJRXJf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 19:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54212 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbhJRXJf (ORCPT
+        id S233126AbhJRXT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 19:19:28 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48057 "EHLO
+        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230070AbhJRXT1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 19:09:35 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB5F1C061745
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 16:07:23 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id j8so16543026ila.11
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 16:07:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=cgBnfuvcZu56328itL4at5TeThGSI6ERZbPFvtTMPB0=;
-        b=soDFYoIOYlmGB1fXcSHfAqdDOiFWS+3DeI2m5jhCu6TC0AQ8PwF0ttJZTgKjuRxCaY
-         E8Lp6pvXC8SFUFicJzIZgO7+mJEfVcob6QuT34jQXGHeItnUfdvWtH5r9g9naNYSAEX1
-         XBrtLMMxiaBdFu3vVfou25WzOwZf1p55knBa3gtTr8/xKCrS28IoB4IuqmQ+63ZZKqGE
-         xUIAWMO0qi7jI+q7MjR2XrEMpBGjwscKH+XnBuZIioMORx+lep2vKHpToaHwhJt910Lg
-         Pw3LXTSqCIhAqF/abMxrFsB7DBdriXZr8UDqds2pElWuxCSPxm2qmQxOVZjD2BCrZ6Mz
-         KaUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cgBnfuvcZu56328itL4at5TeThGSI6ERZbPFvtTMPB0=;
-        b=j/U1SudP5ImhiYPXFqcIZyP/DlTWqp+1AKzPOO32luSWxpXAWA+C00SvH0lqLLJXl0
-         7zntM8fVPVGgMyqthFY7GJCWvIuFrgMxbT9sjpVCav87wsxYR4kfi4S0ZacQjF64mP44
-         oA4kY36mlOrgwKWqUkB4UuuiV75bro9JdAR2fCkl6iw76KQW8n95eFdwXqXaMa7Hp4LR
-         AUuJlWBUdJyLHeZhtVzTpOXfvrP4OYdcB/xPNPI9o5kE86kf17Sne0bCGsVn2bMhu3gV
-         65clxc4K4D5mIEpMi43CwBdKtwJiY4f36ouvc8rZcK21eWwsp0f0L+sn1V9umofP1zlF
-         lTNQ==
-X-Gm-Message-State: AOAM532y0XVLsb/apORNP2CWSnpz0rorml71tYADQBbso8HEvpFBpSWD
-        pCNZ90pVWmenqp5zhhwknqsAcQ==
-X-Google-Smtp-Source: ABdhPJxS+/Y50/QdD0KF2Et0sT9G8VxE2gDlkU6k1WEAqIC07fzYRgdMythLZ/BoE0w0BUI0O9Oxrw==
-X-Received: by 2002:a05:6e02:1a2e:: with SMTP id g14mr12399334ile.294.1634598443041;
-        Mon, 18 Oct 2021 16:07:23 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id b13sm7267493ioq.26.2021.10.18.16.07.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 16:07:22 -0700 (PDT)
-Subject: Re: [PATCH RFC] block - ataflop.c: fix breakage introduced at blk-mq
- refactoring
-To:     Finn Thain <fthain@linux-m68k.org>
-Cc:     Michael Schmitz <schmitzmic@gmail.com>, linux-m68k@vger.kernel.org,
+        Mon, 18 Oct 2021 19:19:27 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id D343E5C02AD;
+        Mon, 18 Oct 2021 19:17:15 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 18 Oct 2021 19:17:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=x7IWaM
+        g/xwqql0+MHK53bh2W0mi/Fp8zsCtvfvGPzAE=; b=jeWqtVj9NvUVir/2eQPnQV
+        CrBh4hKO38qIdxZEkkDFQnT4iVkOc/3drY8GwKDCIP23gkwZKKuelpJa/XphoMIX
+        m8mwDzvMTSwfoopBLeuNR02IiTjp3islumpU/1uMEH9mVS7FmtJ4+HmgbfiZ3BFR
+        kENz4YV2i/BpDJnvEvrsj9yCmIuLXim5D/ztIw6YTV5QFZJ8rry7jz3nQrKG+LBZ
+        guBKkJmsxRQMSlz+eMlR73oRzb86X0o37ApFHZZW0yHQzGvWzjbvs9onh9EK7j2a
+        GOt+URMK3zWm4DOKRu0eX03d5tOuX7IH18RkwP9/6xsXdPCgPnlMOVMbJs+a8X0Q
+        ==
+X-ME-Sender: <xms:ewBuYQTLgUI70QC7OZsiC0GfGtF3oY4QPer-3p5EA7Yag9JnMCMfgQ>
+    <xme:ewBuYdwkT9Wm585FWdrZ0V_lKPU6R6O42Xl12PTCg_XF4yl8MADnEipO78K3KV8wU
+    HXr3QptH89T5kbJMKk>
+X-ME-Received: <xmr:ewBuYd2xAKgVZXn9lM3sNR7Pb2uID4fp6QfF7T3GXD7Sztu8PbShH1ioY5vVjCwOT8qCj9CDQvAJxt4LbK7s3aWMYVP7QpxVyZg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrvddvuddgudelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffujgfkfhggtgesthdtredttddtvdenucfhrhhomhephfhinhhnucfv
+    hhgrihhnuceofhhthhgrihhnsehlihhnuhigqdhmieekkhdrohhrgheqnecuggftrfgrth
+    htvghrnhepteduueduueetuddukedvuddvhfeluedtvefhkeeludeitdetjeeihedtkeej
+    vdefnecuffhomhgrihhnpehfrhgvvgdrfhhrpdgrmhhighgrshhtohhrvgdrvghupdgsih
+    hgmhgvshhsohifihhrvghsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghr
+    rghmpehmrghilhhfrhhomhepfhhthhgrihhnsehlihhnuhigqdhmieekkhdrohhrgh
+X-ME-Proxy: <xmx:ewBuYUC1twpCPlmTmAKHWOqdy1KlUiHtdBnGmumSxoDNtIaZoiqQ3Q>
+    <xmx:ewBuYZhwU3Cv7ZIwk_dk4mqU_B0L_b2CMWyKq8nVxQNkof1yAmCBiA>
+    <xmx:ewBuYQodtuck6EuzWdAFgyMHMh779h5LEPblrsbsMV0aLrAYqqouOg>
+    <xmx:ewBuYetZnUhYbFdnWlkLayrB4sZ8DUM6Ai6S7ZVUneomUaj-a-Rm3w>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 18 Oct 2021 19:17:13 -0400 (EDT)
+Date:   Tue, 19 Oct 2021 10:17:19 +1100 (AEDT)
+From:   Finn Thain <fthain@linux-m68k.org>
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     Michael Schmitz <schmitzmic@gmail.com>, linux-m68k@vger.kernel.org,
         geert@linux-m68k.org, linux-block@vger.kernel.org,
         Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-References: <20211018222157.12238-1-schmitzmic@gmail.com>
- <8d60483d-3cd6-5df7-8db6-7a8b9ce462e3@kernel.dk>
- <97323ce2-4f5c-3af2-83ac-686edf672aea@linux-m68k.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7f64bd89-e0a5-8bc9-e504-add00dc63cf6@kernel.dk>
-Date:   Mon, 18 Oct 2021 17:07:21 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+Subject: Re: [PATCH RFC] block - ataflop.c: fix breakage introduced at blk-mq
+ refactoring
+In-Reply-To: <7f64bd89-e0a5-8bc9-e504-add00dc63cf6@kernel.dk>
+Message-ID: <604778bc-816a-3f2e-d2ad-d39d7f7f230@linux-m68k.org>
+References: <20211018222157.12238-1-schmitzmic@gmail.com> <8d60483d-3cd6-5df7-8db6-7a8b9ce462e3@kernel.dk> <97323ce2-4f5c-3af2-83ac-686edf672aea@linux-m68k.org> <7f64bd89-e0a5-8bc9-e504-add00dc63cf6@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <97323ce2-4f5c-3af2-83ac-686edf672aea@linux-m68k.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/18/21 4:51 PM, Finn Thain wrote:
+On Mon, 18 Oct 2021, Jens Axboe wrote:
+
+> > It is much more difficult to report regressions than it is to use a 
+> > workaround (i.e. boot a known good kernel). And I have plenty of 
+> > sympathy for end-users who may assume that the people and corporations 
+> > who create the breakage will take responsibility for fixing it.
 > 
-> On Mon, 18 Oct 2021, Jens Axboe wrote:
+> We're talking about a floppy driver here, and one for ATARI no less. 
+> It's not much of a leap of faith to assume that
 > 
->> Was going to ask if this driver was used by anyone, since it's taken 3
->> years for the breakage to be spotted... 
+> a) those users are more savvy than the average computer user, as they
+>    have to compile their own kernels anyway.
 > 
-> A lack of bug reports never implied a lack of users (or potential users). 
-> That falacy is really getting tiresome.
+> b) that there are essentially zero of them left. The number is clearly
+>    different from zero, but I doubt by much.
+> 
 
-If it's utterly broken, I'd say yes, it very much does imply that really
-nobody is using it. 
+Well, that assumption is as dangerous as any. The floppy interface is 
+still important even if most of the old mechanisms have been replaced.
 
-> It is much more difficult to report regressions than it is to use a 
-> workaround (i.e. boot a known good kernel). And I have plenty of sympathy 
-> for end-users who may assume that the people and corporations who create 
-> the breakage will take responsibility for fixing it.
+http://hxc2001.free.fr/floppy_drive_emulator/
+https://amigastore.eu/en/220-sd-floppy-emulator-rev-c.html
+https://www.bigmessowires.com/floppy-emu/
 
-We're talking about a floppy driver here, and one for ATARI no less.
-It's not much of a leap of faith to assume that
+> Hence it would stand to reason that if someone was indeed in the group 
+> of ATARI floppy users that they would know how to report a bug. 
 
-a) those users are more savvy than the average computer user, as they
-   have to compile their own kernels anyway.
-
-b) that there are essentially zero of them left. The number is clearly
-   different from zero, but I doubt by much.
-
-Hence it would stand to reason that if someone was indeed in the group
-of ATARI floppy users that they would know how to report a bug. Not to
-mention that it was pretty broken to begin with, so can't have been used
-much before either.
-
-The reason I ask is always to have an eye out for what drivers can be
-eventually removed. The older drivers, and particurly the floppy ones,
-are quite horrible and would need a lot of work to bring up to modern
-standards in terms of how they are written. And if nobody is really
-using them, then we'd all be better off cutting some of that dead
-baggage.
-
-> Do maintainers really expect innocent end users to report and bisect 
-> regressions, and also test a series of potential fixes until one of them 
-> is finally found to both work and pass code review?
-
-If someone reports a bug to me, the most basic is usually "It worked in
-this version, it's broken in this one". Then you take it from there,
-depending on the abilities of the user. I'd only ask someone to bisect
-an issue if it's really puzzling and the user is capable and willing.
-But it doesn't take much to send a simple email saying that something
-used to work and now it's broken.
-
--- 
-Jens Axboe
-
+Yes, it would if the premise was valid. But the premise is just a flawed 
+assumption.
