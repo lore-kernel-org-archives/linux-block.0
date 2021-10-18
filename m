@@ -2,69 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E07C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 08:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FF7C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 08:21:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8127360F12
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 08:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0AC1610E8
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 08:21:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230469AbhJRITb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 04:19:31 -0400
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21404 "EHLO
-        sender4-of-o54.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231180AbhJRITb (ORCPT
+        id S231368AbhJRIXM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 04:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47370 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231339AbhJRIXL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 04:19:31 -0400
-X-Greylist: delayed 910 seconds by postgrey-1.27 at vger.kernel.org; Mon, 18 Oct 2021 04:19:31 EDT
-ARC-Seal: i=1; a=rsa-sha256; t=1634544036; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=ARM3XR8ozbk5ZKj0o0HG2ck/7mjnAPp4awkkTw3VapiUpDnPJ9qBxfM0tRgqxaqk/JdjUC4lVy8jVAruMw9H99mGYUNd27FTYYu2Q8o7wzVFz7GH9ExR1ACawGXRRVeAJO8g6LRUAtwz8hcZmM4LnYMu8bFL1X5jSZ9KzPJo8DM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1634544036; h=Content-Type:Cc:Date:From:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=h49ZUkYbpHvFgd4ygOJoSWfJB1R1I4UzMaRy7bssn/0=; 
-        b=juUmx1ezfKgDa8C/3MBdDsGgAISJpdNYMNRQtFIwuTn1mU+m+WN/HYZPc2r4grhZ/eqkfNhL6xth1SZsFZmK4/FOSVO4Ct3HwxMaw+o/cXofRlvIZVEQqKxWDmZJViKXxFD/nGAqmCRZmLLOAyC39ZB220p7Hz6STsQdEPnuwz0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=www@aegistudio.net;
-        dmarc=pass header.from=<www@aegistudio.net>
-Received: from aegistudio (115.216.104.229 [115.216.104.229]) by mx.zohomail.com
-        with SMTPS id 1634544032608898.571502480912; Mon, 18 Oct 2021 01:00:32 -0700 (PDT)
-Date:   Mon, 18 Oct 2021 08:00:27 +0000
-From:   Haoran Luo <www@aegistudio.net>
-To:     zhangyoufu@gmail.com
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, tj@kernel.org
-Subject: Re: [BUG] blk-throttle panic on 32bit machine after startup
-Message-ID: <YW0pm5xcxgWnW98f@aegistudio>
-Reply-To: CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com
+        Mon, 18 Oct 2021 04:23:11 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A189C06161C;
+        Mon, 18 Oct 2021 01:21:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hcBrJIfX8KRG2y624/3+06nv2sO8QewOZ0r46Ig7gv4=; b=k9tK5SH7oPrpZoslvPkWh+8I8v
+        DoLD7hprHMc8sniAebV0jgWUfqAnXp5vsAqTxsW4l9jCI+w8MaoC2ngJMcPFEDWrntK8LH2TQ7m6j
+        2ECb6cA5QZWESl/dAjjs4uPxigyVQQNB8B3+fq2E5tizhsoKc7YKVm7zq4RsR9azwfzk5W3DLF75p
+        hC8qGcVMPL0pJMlg+qBApfJLlDJEV91iqJPHGB7enTDr0Q/UWbt8HyZl0H0QW4pWZ1sqThoUUkz+s
+        D8LSUhmLluk+8fpfS+XSppr3V5XIFnxjGBHs3u0r+KQDbprpLCRMmhuQjHp06Ofy9Dg/N2F7Q1hd5
+        wrfiSkpw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mcNtB-00EcnB-Gt; Mon, 18 Oct 2021 08:20:57 +0000
+Date:   Mon, 18 Oct 2021 01:20:57 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 0/5] cache request_queue pointer
+Message-ID: <YW0uaa+5E07MWDZI@infradead.org>
+References: <cover.1634219547.git.asml.silence@gmail.com>
+ <dba463cb-3f1e-0972-aeaf-099d7c12bd0e@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-ZohoMailClient: External
+In-Reply-To: <dba463cb-3f1e-0972-aeaf-099d7c12bd0e@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-(Sorry for the garbled message due to my mistaken the configuration of mutt)
+On Sun, Oct 17, 2021 at 06:59:22AM -0600, Jens Axboe wrote:
+> > All patches are self contained and don't rely on others from
+> > the set including 1/5 and can be taken separately. And some
+> > changes go in separate patches to minimise conflicts. When
+> > we agree on the approach, I'll send the rest converting some
+> > other spots out of block.
+> 
+> Looks fine to me. Christoph, any concerns?
 
-I'm the college of the reporter and I would like to provide more
-information.
-
-The code in 5.15-rc6 in "blk-throttle.c" around line 791 is written as
-below:
-
-	/*
-	 * Previous slice has expired. We must have trimmed it after
-	 * last
-	 * bio dispatch. That means since start of last slice, we never
-	 * used
-	 * that bandwidth. Do try to make use of that bandwidth while
-	 * giving
-	 * credit.
-	 */
-	if (time_after_eq(start, tg->slice_start[rw]))
-		tg->slice_start[rw] = start;
-
-I think this piece of code presumes all jiffies values are greater than
-0, which is the initial value assigned when kzalloc-ing throtl_grp. It
-fails on 32-bit linux for the first 5 minutes after booting, since the
-jiffies value then will be less than 0.
+No huge fan of the extra pointer, but if it helps.. 
