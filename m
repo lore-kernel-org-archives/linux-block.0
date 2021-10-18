@@ -2,62 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9398CC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 11:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7374EC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 11:16:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74C8E61356
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 11:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5806E60F8F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 11:16:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbhJRLM4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 07:12:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38669 "EHLO
+        id S229668AbhJRLS4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 07:18:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33189 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230350AbhJRLMz (ORCPT
+        by vger.kernel.org with ESMTP id S229473AbhJRLS4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 07:12:55 -0400
+        Mon, 18 Oct 2021 07:18:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634555442;
+        s=mimecast20190719; t=1634555804;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type;
-        bh=4ONTD8kZwHejyhuqLR07ribowPqNpmDpocf2+wOHMuI=;
-        b=EhtEafMoHBIaTol0XF1DajvMVdmVkY9iGZPiKYWfLsHUrOnBOqaoCSmtlUQXRQJyG0UGWA
-        kcB9WjqBWnwHiOVCcrnzo0Cl6BA3MpXZ/0wKFWPm9x/LzFn1A2/aAAGbdIz1kOdZYBAPDh
-        bxE3s/yjzCx6Oq5gO7wk1mAdU0fPJ2c=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-MknMwaGZMVewrHNzo2lQLg-1; Mon, 18 Oct 2021 07:10:41 -0400
-X-MC-Unique: MknMwaGZMVewrHNzo2lQLg-1
-Received: by mail-yb1-f197.google.com with SMTP id b197-20020a2534ce000000b005b71a4e189eso19888953yba.5
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 04:10:41 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R6h7/3FNjDfW/aKcBxh4pRXGx+3VwDT0FJcpENMpRN8=;
+        b=DK8JbShXbsslOnok8hoZSYiEfU6iQ+q2+OutQb4V7hlHWPwt1HR8Yo9rqN6tnbFaU3EOdB
+        7C/vo1V0sL165JkYyPZI+yyfrqsi1ls98JKsCF/XEy7p0Jpnltm/uVxRzo8ULVGU59u2Re
+        aQKWtx4HxG9LN5cn9lX735SFH6KQGbI=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-XX82n1FYO_GT__bn3pe-BA-1; Mon, 18 Oct 2021 07:16:43 -0400
+X-MC-Unique: XX82n1FYO_GT__bn3pe-BA-1
+Received: by mail-yb1-f199.google.com with SMTP id y16-20020a2586d0000000b005b752db8f97so19603520ybm.18
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 04:16:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=4ONTD8kZwHejyhuqLR07ribowPqNpmDpocf2+wOHMuI=;
-        b=gd/vqnvPax3agMae4KtiC2SSbdFMrKtJO/a6vAMFhgDudubYbD2KJP1borZAe2vRcH
-         nXajrS37+3ApidBr+SXrT7LuJIrQJvEbDDM5yqLQnvUKUXuaGYbV7DiANjWTPY4YwkKq
-         RU7ecggvaOgoW9bHjtGB9XfzmmW2Ecf8x9VTnqOfoFrR42blUSZkSb7a4e5J8fQGAnu+
-         iyq+pye+LOtpXhc9JIKOaeLDKjzgRhvQ6VQ8Ow/NIwRtqwZ81A6l0KYLLzGhqUGoH8RP
-         2xQEZ2e32sIMZpT0KG58vzWR16zXSwtU2ZdjIYpwQ9/JSHuJlAtjRdGOrYKKe693MlDC
-         AudA==
-X-Gm-Message-State: AOAM533mirQTto5tBdKPXkupN4PDM/ijhlyfnmFPcTa0VkVS+AWSATZ2
-        htvDsJ3G6ZSihpeAbz351E3Q5Bo7gAcY2pFg328IcaZ4uC7eBMdFBmPH+FcDYPrTTba1CrXlQTE
-        d8Exh0jtzaa4AETmyDMPfageAmMIG/UZtgNdNk24=
-X-Received: by 2002:a25:3104:: with SMTP id x4mr28593931ybx.512.1634555440449;
-        Mon, 18 Oct 2021 04:10:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJziuLV19IKELOEdgXDQwonJrvvC0ym9bjKSICdltY4mr4dgp/lR1R1zmjKuSFCEH65yWo0KlX+iUJBr9cDoQFg=
-X-Received: by 2002:a25:3104:: with SMTP id x4mr28593908ybx.512.1634555440217;
- Mon, 18 Oct 2021 04:10:40 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=R6h7/3FNjDfW/aKcBxh4pRXGx+3VwDT0FJcpENMpRN8=;
+        b=MPbCL3xphDPer4RmYOZvaD4BdRnogtbOWR6d2CYAh4P50uDvD59f1LDVTBlxVHVnH7
+         C5QZT5quLZWUl64GEPdCJ0dRnUGxzMWusjhLyRiRNNX5Q2dXO/ngamFeuwr/Hm7wN16z
+         5n64gzXcFzKryNjoL92jXfearEh7nhlQf2YwYrBcVZGdVFcSdAdZCI+dAWCjEM9LPbB2
+         XYebP2qmu62I5nf34cpM0KKzCUF8b70AvrHDRxQlZIvIvIMjP3/VdppTlp7ysSZpEA0E
+         kqxKYlqCpYEWlRvSSWHxIE5HNYtMapR9gGAq/41MhpgvmiqUnDJUmMNVS8endcaacW4R
+         ZLAA==
+X-Gm-Message-State: AOAM530EOyEz43u3+pz7UY/FcU8BFHEeU0gsRlBvVPwPUK+g3/g/39lY
+        ja+BTrdS4RKw1VyZYwxWVHkv8XKmtZGAGny/S7M7IiRr4WtsKxwonLoKUsAdS7oSaD+sRGZvzmd
+        633TR3PbkvQrrQNcp3/TagsoQBNJjnKYvVvgPKVI=
+X-Received: by 2002:a25:ab61:: with SMTP id u88mr26783597ybi.241.1634555803019;
+        Mon, 18 Oct 2021 04:16:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7WTOdSKB7LlvZkTpwlJxiajoe0o0gnrnQwozz2NUxnacq8lDOE+Iq7CMj7WnbifWc0WhlJlgAh1LOrFTEqOY=
+X-Received: by 2002:a25:ab61:: with SMTP id u88mr26783578ybi.241.1634555802803;
+ Mon, 18 Oct 2021 04:16:42 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAHj4cs87BapQJcV0a=M6=dc9PrsGH6qzqJEt9fbjLK1aShnMPg@mail.gmail.com>
+In-Reply-To: <CAHj4cs87BapQJcV0a=M6=dc9PrsGH6qzqJEt9fbjLK1aShnMPg@mail.gmail.com>
 From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Mon, 18 Oct 2021 19:10:06 +0800
-Message-ID: <CAHj4cs87BapQJcV0a=M6=dc9PrsGH6qzqJEt9fbjLK1aShnMPg@mail.gmail.com>
-Subject: [regression] ndctl destroy-namespace operation hang from 5.15.0-rc6
-To:     linux-nvdimm <linux-nvdimm@lists.01.org>,
+Date:   Mon, 18 Oct 2021 19:16:07 +0800
+Message-ID: <CAHj4cs-dw7voqLumMHCSdxMAArFs=v=mvtyFLLU6tQP91U2eLg@mail.gmail.com>
+Subject: Fwd: [regression] ndctl destroy-namespace operation hang from 5.15.0-rc6
+To:     Linux NVDIMM <nvdimm@lists.linux.dev>,
         linux-block <linux-block@vger.kernel.org>
+Cc:     Dan Williams <dan.j.williams@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+
+Forward to the right nvdimm mailist
+
+---------- Forwarded message ---------
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Mon, Oct 18, 2021 at 7:10 PM
+Subject: [regression] ndctl destroy-namespace operation hang from 5.15.0-rc6
+To: linux-nvdimm <linux-nvdimm@lists.01.org>, linux-block
+<linux-block@vger.kernel.org>
+
 
 Hello
 
@@ -201,6 +216,11 @@ ppid:  1896 flags:0x00004000
 
 
 --
+Best Regards,
+  Yi Zhang
+
+
+-- 
 Best Regards,
   Yi Zhang
 
