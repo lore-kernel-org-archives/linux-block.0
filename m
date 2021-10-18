@@ -2,110 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2389C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC59C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80CAD6101B
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2519F610A6
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231213AbhJRJNk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 05:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58868 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231149AbhJRJNe (ORCPT
+        id S231431AbhJRJN6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 05:13:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27556 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231394AbhJRJNz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 05:13:34 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79BE6C06161C;
-        Mon, 18 Oct 2021 02:11:23 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id m21so15439850pgu.13;
-        Mon, 18 Oct 2021 02:11:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=Ewy/OKswLYPZAgNcZXQwvve5zSIn1eK4olZjK+6v5cE=;
-        b=DrVPf6LaBZ2rOkH0DPMaGRbRtFfL8B0052hB2ZYe1ZIcJXeTl9ncExV9IOQTRVkx7K
-         DxYQv1sN8p9ZTf3hcNGtVxmnrB+XAqGBGino9YvXL4wMkQTR2EIYY0XEnll8iuwmqtP1
-         KzzqZeoDJsVjgYvIh2pHcE3YqKmaUSe6gEOtDdWyDE2QCDv5V3tVwRgXCzP1TeRqPEK4
-         SmKk2ONaJh2UvO82sFAYjqQX3ScFLT1wUmyYeKVuyJjjTE+y5S05UMrk9KsTjj+uDRAa
-         KcZouhu7ixR0FHjxD5+qw8rsrfWdK/d59UpztXGkkJmEfy7nZeanBH0sIOad/LH9ol8M
-         hM0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Ewy/OKswLYPZAgNcZXQwvve5zSIn1eK4olZjK+6v5cE=;
-        b=cIYT/5c9eJC/jkBkoiuwlntewdDaObv6pIDcxVuIljDNEbaXbB8uwnUU1Hh0sFQ+Tc
-         o0LCldu0/c/2DauEQ4AXIb/UjisInLuYZYUPh1h8ky424OVoZR/rnTiQ3UV2bsrohJSR
-         gxFI/WpV5uq47FZIeXiDMa087D6t8i8i3HrUqo6TayMOPAHtdoFOXI/DdntEmDzXq58t
-         HUUP7rU9e1hhDR4fjJ670dO3NheV3NmjLddqwyjcBoazQ5o1tmvaBO8DDNmPAQ0i+q8T
-         lEN/tDrNWjYteypoVfTONxUmvqHR8tmx6+r4KZFzszJ+GLBUzKCvkGa6q3z9SlAAPhld
-         SBIQ==
-X-Gm-Message-State: AOAM533IG/RC4S0e/hI8rAG+sw838I5oKaPxlNAjU/9z+K+ebxIoBlrG
-        Iyi1Vb8WRUiJIPtw3aGbc6E=
-X-Google-Smtp-Source: ABdhPJwspwvNNJxse0N4olrSeBZoCa5R9srL0m3FyRh5mIUP+AWhbt97viHoUfYL6Xp9xXnrrAFfNA==
-X-Received: by 2002:a05:6a00:9a2:b0:44c:b979:afe3 with SMTP id u34-20020a056a0009a200b0044cb979afe3mr11666105pfg.61.1634548283020;
-        Mon, 18 Oct 2021 02:11:23 -0700 (PDT)
-Received: from BJ-zhangqiang.qcraft.lan ([137.59.101.13])
-        by smtp.gmail.com with ESMTPSA id oc8sm12916951pjb.15.2021.10.18.02.11.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 02:11:22 -0700 (PDT)
-From:   Zqiang <qiang.zhang1211@gmail.com>
-To:     axboe@kernel.dk, hch@lst.de, willy@infradead.org,
-        sunhao.th@gmail.com, hch@infradead.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zqiang <qiang.zhang1211@gmail.com>
-Subject: [PATCH] block: fix incorrect references to disk objects
-Date:   Mon, 18 Oct 2021 17:11:16 +0800
-Message-Id: <20211018091116.16874-1-qiang.zhang1211@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 18 Oct 2021 05:13:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634548304;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0Q56wj21GGdBKSsvdrGkUKMB3bovLQF+EDH+bXTHBkA=;
+        b=N0vaMvauF0ccCq2YZXgMI5mhKzGodUEXPgSRnsH39xAYnZb7rwFoCc1rP+pgNtYe2CahDQ
+        DHr5nqPct8u3d2kwtMraqRZ4xCd0j8EOe4SisWUK0YeXoB3Q93GNCqm/HwnRKOTyY/r7Yh
+        bvVm9G6bVbkOTOgNpE97ZF2hMDrKnHs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-xrfhSSOmOkixr02B7l7AAg-1; Mon, 18 Oct 2021 05:11:41 -0400
+X-MC-Unique: xrfhSSOmOkixr02B7l7AAg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 750F619057A4;
+        Mon, 18 Oct 2021 09:11:39 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3119A5DF36;
+        Mon, 18 Oct 2021 09:11:25 +0000 (UTC)
+Date:   Mon, 18 Oct 2021 10:11:24 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <YW06PCof8Z76MXtC@stefanha-x1.localdomain>
+References: <20211013105226.20225-1-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="nfeOsJT4P4stmsz9"
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When adding partitions to the disk, the reference count of the disk
-object is increased. then alloc partition device and called
-device_add(), if the device_add() return error, the reference
-count of the disk object will be reduced twice, at put_device(pdev)
-and put_disk(disk). this leads to the end of the object's life cycle
-prematurely, and trigger following calltrace.
 
-  __init_work+0x2d/0x50 kernel/workqueue.c:519
-  synchronize_rcu_expedited+0x3af/0x650 kernel/rcu/tree_exp.h:847
-  bdi_remove_from_list mm/backing-dev.c:938 [inline]
-  bdi_unregister+0x17f/0x5c0 mm/backing-dev.c:946
-  release_bdi+0xa1/0xc0 mm/backing-dev.c:968
-  kref_put include/linux/kref.h:65 [inline]
-  bdi_put+0x72/0xa0 mm/backing-dev.c:976
-  bdev_free_inode+0x11e/0x220 block/bdev.c:408
-  i_callback+0x3f/0x70 fs/inode.c:226
-  rcu_do_batch kernel/rcu/tree.c:2508 [inline]
-  rcu_core+0x76d/0x16c0 kernel/rcu/tree.c:2743
-  __do_softirq+0x1d7/0x93b kernel/softirq.c:558
-  invoke_softirq kernel/softirq.c:432 [inline]
-  __irq_exit_rcu kernel/softirq.c:636 [inline]
-  irq_exit_rcu+0xf2/0x130 kernel/softirq.c:648
-  sysvec_apic_timer_interrupt+0x93/0xc0
+--nfeOsJT4P4stmsz9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-making disk is NULL when calling put_disk().
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
+>  include/linux/virtio.h                     | 1 +
+>  net/9p/trans_virtio.c                      | 2 +-
+>  net/vmw_vsock/virtio_transport.c           | 4 ++--
+>  sound/virtio/virtio_card.c                 | 4 ++--
+>  26 files changed, 39 insertions(+), 33 deletions(-)
 
-Reported-by: Hao Sun <sunhao.th@gmail.com>
-Signed-off-by: Zqiang <qiang.zhang1211@gmail.com>
----
- block/partitions/core.c | 1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 3a4898433c43..4cb6803e7021 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -424,6 +424,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 	device_del(pdev);
- out_put:
- 	put_device(pdev);
-+	disk = NULL;
- out_put_disk:
- 	put_disk(disk);
- 	return ERR_PTR(err);
--- 
-2.17.1
+--nfeOsJT4P4stmsz9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFtOjkACgkQnKSrs4Gr
+c8gexAf6AlqH6xn5qy4PTBIyVWqBNKslYRUY3StOZeOLM+CPmkOFP+txQ8EkZk8Q
+CoN3LYe7SYgM+Ta9+IaB/5DMPe0oGp4HL47kDEaEdzoQ9X3xaM5sjDQ7fAauSqhb
+gcL3J12kjjI6wrP3O8u9Dp56doY0k43WCsghVyJ90yZ6C8o9DQEAQZcon2vrQnO7
+dHlQQkT29XNt6VmZeKoyx55lRentw0HeuxR5CBrYMdVDHbL3SoXm3fACGBB2ci5i
+KxES5tR0Wq5ibMq5TbU1/40QKB+JfW8unQNAHCxd0EU2QVWaYe/4eaL1gHLvR1V0
+6Xa1DS0k8l/mV2V9drYFwRnygjMH1Q==
+=g/hu
+-----END PGP SIGNATURE-----
+
+--nfeOsJT4P4stmsz9--
 
