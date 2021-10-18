@@ -2,121 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3BCC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 12:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E74D1C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 12:53:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03BFF610A1
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 12:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C775360FD9
+	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 12:53:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231712AbhJRMvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 08:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
+        id S229519AbhJRMzP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 08:55:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbhJRMvu (ORCPT
+        with ESMTP id S231217AbhJRMzP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 08:51:50 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE22C06161C
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 05:49:39 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id y67so16028293iof.10
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 05:49:39 -0700 (PDT)
+        Mon, 18 Oct 2021 08:55:15 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E84C06161C
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 05:53:04 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id j8so14706340ila.11
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 05:53:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=yml7Ptd8JydBCH2SbrqO9bF1kUkIRHbJ+XeaaVED5To=;
-        b=4VIvy5swV+y4YUcs/tqI50vjVuCtOnsrvby3VbHcH/lg7iQkEOFhV4Js1j40BSKG5n
-         ACLv0jmBNWw6rfvvmrWqyzvi7+FF7E5yuGdgp9RUvAbclh0ODJVu/QKy+BocFYpT0dXV
-         RP5xWts9hb+kpYQN52LfvfzRujH2lAD5uRLKJSZcTv8hfEKcaisxV4RRWbjH0Cak7NEH
-         LXk/xyR8h15PyrDSf0iNuzNphBNgwTSV10BQR8BFn0H36jKoL4WBRgKj2Q2j+aNJ14vL
-         q8PC37KV7wtw1koL5iNkpF2KzgDs0qob003VPtaxD4eU3Wuz5koyiqgf9YLayZ1RdlSB
-         JZpA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LZ6uikSw+HJSKoT2XOXxqOhzMqQVouLTIlfVkn3BOis=;
+        b=4CESz5QZX/P4UMGhLnxGVAsQXSCU67J9UIr8+gwtdqGRT4RXLPPB2wY803tvTj9L58
+         xZ0VfOcmjGjz8Me2cmEUGy3gzaC6d3mrYaWy0bmaV+Wq4iHtW2mUSxzq6Bar+quQE3+d
+         SRkYLNFnmYb42fvlcqD58u40XXm+0Xo2mLkGRgX0a4qfbxW20UE4rQl+fgFWlXqzrk+v
+         /QhHGB3tMzokXcRGK/cHGg+/4Ot2sAcGrJIxkSChKJulaEoxp9kVS1yMSYsrwCskWXxf
+         jbj6TxBA28yb53qD6WjE6Tu9Ew8lqU0FR8Td4LKUecaBXFoviHk/IH7dMJqbocxhi9Gr
+         LeyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yml7Ptd8JydBCH2SbrqO9bF1kUkIRHbJ+XeaaVED5To=;
-        b=VaFVF0bwU+2eDVqr8s+v+W7Poty41JhiDGcgWEM88+s2DaROEm8kK/9UCJcM9/HbXx
-         OiMttKOdtcLKGKxWaQNBvWPCW6lKJxkhkk1CutFmmJKN85q3k6Dsg4pqxMXU/rNPDe2S
-         Dte0YfG77vKKLcp1VmRDAxzOZaLcMPV1VcXyz31NOJH3bNAvED9MTkEyiN7eHI26WkI4
-         7q0t6sxFoAdmTNelbv1V9H3kq8RzT7rjbTOxP4ZOCo8NFNuQBCk01Lp61Qwam99AO2Eg
-         +fuAjhG0HjjhVBVmM20O/H5noq2xLlyj9/Wr3FpJlYMxoGOFL388yuo8F+7OBx847QK5
-         +ziQ==
-X-Gm-Message-State: AOAM531ctbmCrPV0yS8JLC1j3EmzqyqRFhPVlMWsTC8KlOo/0J1ojlN/
-        tC7uof7q4pJ1olQnYhgWrcYFF63F+aPMUQ==
-X-Google-Smtp-Source: ABdhPJzl2oC6JWYUugXRX9NCp32xwd+TjJejvJrKCNTIXW1QMY7ZTJTYx9zdDLzzoVF71XauagSUrw==
-X-Received: by 2002:a05:6602:1343:: with SMTP id i3mr14189514iov.58.1634561379101;
-        Mon, 18 Oct 2021 05:49:39 -0700 (PDT)
-Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id z26sm6780081ioe.9.2021.10.18.05.49.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 05:49:38 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LZ6uikSw+HJSKoT2XOXxqOhzMqQVouLTIlfVkn3BOis=;
+        b=ZroZk0KqqdfYgD9dxemmsCr2xgec/qXBv8TzdLTLejPWiYAXZrPvc5ev8OKRDn/hBi
+         DDI+y3i2W7iT9fSGoO9OvKKy1E1YNd9taxQltAh8SuVx6zqItiecaJq/xooeWAXdS+ES
+         cl7ZU5xYnnxPmAOlhIg8ov1KBXUDSVe/6IOqbxZY4GGJ4GSc3gHfDMWhijbe5xRrK8d3
+         3YmMv2iZ9Rv+cnb2kvwFzJiT9Bg5EsURU9vIM9q6xn2Kr6fwqhXFtjNsE9h3vSdZb47G
+         wz+0NUtq4WGdn8fHJZ5nZTgZS9NpqfbuUEm1uiF2MpOe3SzsmNLLp6pIhl/b9/a2dnkY
+         0YPQ==
+X-Gm-Message-State: AOAM531fY6lac+6KEOfEr3bhZAvLlHdTWWTpqy601Pf8obHgYmb+qrIg
+        e+Bq2tk8vgPK6qe8G7EFazEOOygxC36ApQ==
+X-Google-Smtp-Source: ABdhPJyY8v3ax5xmxgXpV6MlKnTQxPrDjAdcpOLpOVX6t42LQls3QKTtDE432vJpKWCAcSKojYB2vg==
+X-Received: by 2002:a92:c206:: with SMTP id j6mr6810875ilo.71.1634561583621;
+        Mon, 18 Oct 2021 05:53:03 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id z11sm6986332ilb.11.2021.10.18.05.53.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Oct 2021 05:53:03 -0700 (PDT)
+Subject: [PATCH v2 1/2] nvme: move command clear into the various setup
+ helpers
 To:     linux-block@vger.kernel.org
-Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 2/2] nvme: don't memset() the normal read/write command
-Date:   Mon, 18 Oct 2021 06:49:34 -0600
-Message-Id: <20211018124934.235658-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211018124934.235658-1-axboe@kernel.dk>
+Cc:     hch@lst.de
 References: <20211018124934.235658-1-axboe@kernel.dk>
+ <20211018124934.235658-2-axboe@kernel.dk>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f90f4e83-52d2-4d92-126a-9f65f384f8a4@kernel.dk>
+Date:   Mon, 18 Oct 2021 06:53:02 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211018124934.235658-2-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This memset in the fast path costs a lot of cycles on my setup. Here's a
-top-of-profile of doing ~6.7M IOPS:
+On 10/18/21 6:49 AM, Jens Axboe wrote:
+> We don't have to worry about doing extra memsets by moving it outside
+> the protection of RQF_DONTPREP, as nvme doesn't do partial completions.
+> 
+> This is in preparation for making the read/write fast path not do a full
+> memset of the command.
 
-+    5.90%  io_uring  [nvme]            [k] nvme_queue_rq
-+    5.32%  io_uring  [nvme_core]       [k] nvme_setup_cmd
-+    5.17%  io_uring  [kernel.vmlinux]  [k] io_submit_sqes
-+    4.97%  io_uring  [kernel.vmlinux]  [k] blkdev_direct_IO
+Gah, v2 of this one below, it send out an older one.
 
-and a perf diff with this patch:
+commit fb4e29f648e320c94f210c54692c754ad69fb6f6
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Mon Oct 18 06:45:06 2021 -0600
 
-     0.92%     +4.40%  [nvme_core]       [k] nvme_setup_cmd
-
-reducing it from 5.3% to only 0.9%. This takes it from the 2nd most
-cycle consumer to something that's mostly irrelevant.
-
-Acked-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/nvme/host/core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+    nvme: move command clear into the various setup helpers
+    
+    We don't have to worry about doing extra memsets by moving it outside
+    the protection of RQF_DONTPREP, as nvme doesn't do partial completions.
+    
+    This is in preparation for making the read/write fast path not do a full
+    memset of the command.
+    
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 7944ad52f213..3e691354598c 100644
+index ae15cb714596..de2250c5b057 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -917,8 +917,6 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
+@@ -823,6 +823,7 @@ static void nvme_assign_write_stream(struct nvme_ctrl *ctrl,
+ static inline void nvme_setup_flush(struct nvme_ns *ns,
+ 		struct nvme_command *cmnd)
+ {
++	memset(cmnd, 0, sizeof(*cmnd));
+ 	cmnd->common.opcode = nvme_cmd_flush;
+ 	cmnd->common.nsid = cpu_to_le32(ns->head->ns_id);
+ }
+@@ -874,6 +875,7 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+ 		return BLK_STS_IOERR;
+ 	}
+ 
++	memset(cmnd, 0, sizeof(*cmnd));
+ 	cmnd->dsm.opcode = nvme_cmd_dsm;
+ 	cmnd->dsm.nsid = cpu_to_le32(ns->head->ns_id);
+ 	cmnd->dsm.nr = cpu_to_le32(segments - 1);
+@@ -890,6 +892,8 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
+ 		struct request *req, struct nvme_command *cmnd)
+ {
++	memset(cmnd, 0, sizeof(*cmnd));
++
+ 	if (ns->ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES)
+ 		return nvme_setup_discard(ns, req, cmnd);
+ 
+@@ -914,6 +918,8 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
  	u16 control = 0;
  	u32 dsmgmt = 0;
  
--	memset(cmnd, 0, sizeof(*cmnd));
--
++	memset(cmnd, 0, sizeof(*cmnd));
++
  	if (req->cmd_flags & REQ_FUA)
  		control |= NVME_RW_FUA;
  	if (req->cmd_flags & (REQ_FAILFAST_DEV | REQ_RAHEAD))
-@@ -928,9 +926,15 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		dsmgmt |= NVME_RW_DSM_FREQ_PREFETCH;
+@@ -982,10 +988,8 @@ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req)
+ 	struct nvme_ctrl *ctrl = nvme_req(req)->ctrl;
+ 	blk_status_t ret = BLK_STS_OK;
  
- 	cmnd->rw.opcode = op;
-+	cmnd->rw.flags = 0;
- 	cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
-+	cmnd->rw.rsvd2 = 0;
-+	cmnd->rw.metadata = 0;
- 	cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
- 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
-+	cmnd->rw.reftag = 0;
-+	cmnd->rw.apptag = 0;
-+	cmnd->rw.appmask = 0;
+-	if (!(req->rq_flags & RQF_DONTPREP)) {
++	if (!(req->rq_flags & RQF_DONTPREP))
+ 		nvme_clear_nvme_request(req);
+-		memset(cmd, 0, sizeof(*cmd));
+-	}
  
- 	if (req_op(req) == REQ_OP_WRITE && ctrl->nr_streams)
- 		nvme_assign_write_stream(ctrl, req, &control, &dsmgmt);
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DRV_IN:
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index d95010481fce..bfc259e0d7b8 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -233,6 +233,8 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
+ blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
+ 		struct nvme_command *c, enum nvme_zone_mgmt_action action)
+ {
++	memset(c, 0, sizeof(*c));
++
+ 	c->zms.opcode = nvme_cmd_zone_mgmt_send;
+ 	c->zms.nsid = cpu_to_le32(ns->head->ns_id);
+ 	c->zms.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
+
 -- 
-2.33.1
+Jens Axboe
 
