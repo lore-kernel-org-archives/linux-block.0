@@ -2,91 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 863E4C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE2CDC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:37:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 601836128B
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9380C6136F
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:37:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232717AbhJSTOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 15:14:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45526 "EHLO
+        id S231738AbhJSTjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 15:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231355AbhJSTOF (ORCPT
+        with ESMTP id S230432AbhJSTjM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 15:14:05 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F65C06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 12:11:52 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id w12-20020a056830410c00b0054e7ceecd88so3562132ott.2
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 12:11:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=CzG+Zf3dRxBFeY2vCinV3BI2+jApgHmGWmEPgYqpD6s=;
-        b=Og+Y+bDzjDzpiy77y/IfgqxmJj2K9Pudl0/EJ4gxfKuynIhzrW0hCh+n8sBYBKlHow
-         9rCqmBliSsUwt2NLRScaojiCVaPndOjuWj9F4eNSpiqJOLNWa9X48t1fDDjRDqf/JemW
-         FvggDo5d0BAJHQLDr6wV7VU9eBx2/2MzXLtLyKu8PSTmPzbkuLBGw0dYF1pvfiM4FYhz
-         N5DzC4RC1FQ6X80mYRxJgiPH6eoCP539GbxwVcbfgc/P+kEKLWV8fAYF6Xa3GuFAcyhP
-         cSrDUP0Zok2A8QOdVNLH6Jqic4Cdsz/lAnd4uYw1/Jhgi/0paIlaVZovXoyHqDKCSV3c
-         w59A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CzG+Zf3dRxBFeY2vCinV3BI2+jApgHmGWmEPgYqpD6s=;
-        b=OyvIJtyrRRnTzCe6cBxaVA9CQDTIkdGby+4iVsWM88azCMGj8Tsy3ZBM7PfSyk2zAq
-         K7Y6ROUlwzPs1K8M1xOeOq7PY+KP6B2u/5kCOLr3emrXzuuyNTwDEHk0Pyt8T7tLCevf
-         kqLL0FSE6bdNEAcxM5P6hCw/Yq07+EhYaQPIIdwmZSGMFJZUg2d4J5STOUHzTOS6WeaD
-         jzCTZoxDDjhWN3d6u18n332Iiwk71izeatKsLcVadCYoNNXQpe6M4dJm7hAeJiz6gPXo
-         nUUWigYiiPlVQem0aOFuZ1RJqpQ/6y1cCcsWPkT+/IPRvdzA2xkXJwoHoSOO8ETj1DJ1
-         37Bg==
-X-Gm-Message-State: AOAM532Zci8m510OVZ/dgAssxK2cCMh1tJWCnuJgsak1mLwLev9ZELSH
-        q0lBqnt5BlC3HTmmIgznhGl88TgK5WtBmQ==
-X-Google-Smtp-Source: ABdhPJyZJ09cjNcAgFuwBiDnNSAJNXC7aQIMCt1VgqWm7HzPrNrfZ2jsum0fTrkLBHmkcNJpZvnK5w==
-X-Received: by 2002:a05:6830:2316:: with SMTP id u22mr6660586ote.239.1634670711228;
-        Tue, 19 Oct 2021 12:11:51 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id bg16sm1658933oib.14.2021.10.19.12.11.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 12:11:50 -0700 (PDT)
-Subject: Re: [PATCH] block: improve error checking in
- blkdev_bio_end_io_async()
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <69df4731-3232-eb2a-664d-47d0db381843@kernel.dk>
- <b813826d-ce9a-c043-2d87-a7275d5df77d@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5383f8de-ddd9-2148-799a-7a72011975ac@kernel.dk>
-Date:   Tue, 19 Oct 2021 13:11:50 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 19 Oct 2021 15:39:12 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49CABC06161C;
+        Tue, 19 Oct 2021 12:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=npiA1/BckufA/m+irMg6eqFPqYx0reNFf9Z4p7vaYXU=; b=HBXrBM4kBn1mIISA6ZRTEsVa/a
+        HbBElJD/ZtV+aPX7EEvN/Ig7haO5MpBSF61XfTafLHBdoosPyZzQkAF2gVZCx44+eUHwMH8ynYmYh
+        d5HggA4pW6WC5wxQPWEA52Fhh9joVMOrt9ac2f8Ytgcl3iwSvkVi6clwuAn7GwJNPk0R9qKP0xzQo
+        TM7za36h8cD0QShOa3WPbe3xYmOxnF64R0jxhDduGpQq7N1QPCyFHW+PscBcEhLiDwoGbMvRHCovb
+        XHUwkw1dDZY01MdpXO0tIa86xh/71FnxSRi30TsVo+CQEepu4V0EW7DLrufD3qQupRSkFWGZgJnTi
+        630Qdx0g==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mcuug-002X6t-6v; Tue, 19 Oct 2021 19:36:42 +0000
+Date:   Tue, 19 Oct 2021 12:36:42 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YW8eSq2B+5FtOLZb@bombadil.infradead.org>
+References: <YWiSAN6xfYcUDJCb@bombadil.infradead.org>
+ <YWjCpLUNPF3s4P2U@T590>
+ <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
+ <YWk9e957Hb+I7HvR@T590>
+ <YWm68xUnAofop3PZ@bombadil.infradead.org>
+ <YWq3Z++uoJ/kcp+3@T590>
+ <YW3LuzaPhW96jSBK@bombadil.infradead.org>
+ <YW4uwep3BCe9Vxq8@T590>
+ <YW7kFXlzRrvwzARP@bombadil.infradead.org>
+ <YW7ygbLAwm2/LZFl@T590>
 MIME-Version: 1.0
-In-Reply-To: <b813826d-ce9a-c043-2d87-a7275d5df77d@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YW7ygbLAwm2/LZFl@T590>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/21 1:06 PM, Pavel Begunkov wrote:
-> On 10/19/21 19:59, Jens Axboe wrote:
->> Track the current error status of the dio with DIO_ERROR in the flags,
->> which can then avoid diving into dio->bio for the fast path of not
->> having any errors. This reduces the overhead of the function nicely,
->> which was previously dominated by this seemingly cheap check:
->>
->>       4.55%     -1.13%  [kernel.vmlinux]  [k] blkdev_bio_end_io_async
+On Wed, Oct 20, 2021 at 12:29:53AM +0800, Ming Lei wrote:
+> On Tue, Oct 19, 2021 at 08:28:21AM -0700, Luis Chamberlain wrote:
+> > On Tue, Oct 19, 2021 at 10:34:41AM +0800, Ming Lei wrote:
+> > > Please try the following patch against upstream(linus or next) tree(basically
+> > > fold revised 2 and 3 of V1, and cover two issues: not fail zram_remove in
+> > > module_exit(), race between zram_remove() and disksize_store()), and see if
+> > > everything is fine for you:
+> > 
+> > Page fault ...
+> > 
+> > [   18.284256] zram: Removed device: zram0
+> > [   18.312974] BUG: unable to handle page fault for address:
+> > ffffad86de903008
+> > [   18.313707] #PF: supervisor read access in kernel mode
+> > [   18.314248] #PF: error_code(0x0000) - not-present page
+> > [   18.314797] PGD 100000067 P4D 100000067 PUD 10031e067 PMD 136a28067
 > 
-> Jens, something gone wrong here. blkdev_bio_end_io_async() is a
-> function from my not yet published branch, the perf here is for it,
-> but the patch tackles blkdev_bio_end_io().
+> That is another race between zram_reset_device() and disksize_store(),
+> which is supposed to be covered by ->init_lock, and follows the delta fix
+> against the last patch I posted, and the whole patch can be found in the
+> github link:
+> 
+> https://github.com/ming1/linux/commit/fa6045b1371eb301f392ac84adaf3ad53bb16894
+> 
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index d0cae7a42f4d..a14ba3d350ea 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1704,12 +1704,12 @@ static void zram_reset_device(struct zram *zram)
+>  	set_capacity_and_notify(zram->disk, 0);
+>  	part_stat_set_all(zram->disk->part0, 0);
+>  
+> -	up_write(&zram->init_lock);
+>  	/* I/O operation under all of CPU are done so let's free */
+>  	zram_meta_free(zram, disksize);
+>  	memset(&zram->stats, 0, sizeof(zram->stats));
+>  	zcomp_destroy(comp);
+>  	reset_bdev(zram);
+> +	up_write(&zram->init_lock);
+>  }
+>  
+>  static ssize_t disksize_store(struct device *dev,
 
-Yeah, see followup email...
+With this, it still ends up in a state where we loop and can't get out of:
 
--- 
-Jens Axboe
+zram: Can't change algorithm for initialized device
 
+  Luis
