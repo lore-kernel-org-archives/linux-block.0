@@ -2,69 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE1BC43219
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E0DC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:59:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64E1C6128B
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBFEB6128B
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233744AbhJSSuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 14:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40328 "EHLO
+        id S234625AbhJSTCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 15:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234612AbhJSSuu (ORCPT
+        with ESMTP id S231355AbhJSTCE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 14:50:50 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8299DC06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 11:48:37 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id y67so21511377iof.10
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 11:48:37 -0700 (PDT)
+        Tue, 19 Oct 2021 15:02:04 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05353C06161C
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 11:59:51 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id w12-20020a056830410c00b0054e7ceecd88so3521167ott.2
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 11:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JABbiNToQZ5a+bjEWUK0pbrE/4uEB2au01u3vMiwyUA=;
-        b=F1EbynelcR+2laudFSps7IFEM6WK8Ta1FjarR4t4NNvDQq+KjTppatJ36x5UM0FTH3
-         /ixhcgsKTamyLS23Xs7bQYlKOv1yPsC2gsaFbOfvmBpNwe4UgEcX5/cFX76MDJrCPVwW
-         ZEig6UdP/zw6TteWYouAQQDS9EoIYOlngLVwyFhFzDN5VMkj4YaivzP5jLubeG33uHPi
-         aE8359KBqrTpp7au+Yu1ZDwDqcFgWjuNW9G1xkA573aWOZKcxZ8vk0NgZq4q1bblEdWD
-         x+9uU3JVVs46ubQ66mx5v9hJ/P50N3HJ6uLZ8QpSwJqUs6AL+HisJ8jIlPTWdcOLGzbz
-         7c8Q==
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=KOdi8wISjQ00kcc1Bnp9kfXCk0uvrku3t9b/u6XOqxg=;
+        b=bzI+1mZLiRzu5MKvsxv5tWo1BUH1qKXAAWQrv9LpwmrkA4OCzR8QdfOExiY//mLtFU
+         pMu+N6vN5yOU3YMpIlSQdwWllm3q/GkUr6vN3Yzz9Ez61vNGcrUwdRnVhKiYzqL6QIAV
+         77yoCd1fPgudZglSctJi8J4NxKLb7KkY4UKMg1pvVN5O31x6CdSg8X1fUN8GWhK0TYjJ
+         n97hs4Foh7y3A5zJaViCu0Wmjlujr07R/J0GKh6QP0/P4/iN0xHuLxMLuaV6u6E3Umbn
+         2oV5oHuMYIKHQqGlHtQyevBVxrXHvCRbk+ucqmfTYM2/fG2Fm+s6KI0LsGWZI0O3PdSc
+         +5zA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JABbiNToQZ5a+bjEWUK0pbrE/4uEB2au01u3vMiwyUA=;
-        b=OIKXRZFXGS5Xvmc292+SRrs9rJcIkDWa2nctEM8eSaYvkhUHRN2LAADz8g+DMfiiNn
-         iCZv4A4SGsOHTbXMGQejB1imyo4qBEOODExYdRNabQACmrTLU9ZeWuEPwsd/5SxRSgA7
-         G7DipG5sm1tSxhSoS06WNGfYOUZ30N/sjVwXbF1PxEOZBF0g735aAnN/XO3lO6xefFgi
-         N7Oci1eTcU8nlWYhdM7Fa1wBG4z312swnUwZOOq1B+bCe4IjfuTuU0OAXFLFJqpWCe0Z
-         72Dt+ey0NkEhTp4bykakzJe9abABj/LcmNaME26P71EBSVPM0R7c/ZLx63qt2unWntAV
-         SI4A==
-X-Gm-Message-State: AOAM53383a2mrzvrxNuXs9f3UCfnJEyCpA851i3TGHSeyKqNQ/HpZgZn
-        cpl+PNDUAOi5wf7WEsAIb0c3Waj/ADUpsw==
-X-Google-Smtp-Source: ABdhPJwfB7dTAbi7tFlYF1+lw16fVlVzuvKIRjmrCUJznOC9J3z4Rv9n2ouOPb0iDPaDq0YYMSK8Xg==
-X-Received: by 2002:a02:620b:: with SMTP id d11mr5413748jac.69.1634669316689;
-        Tue, 19 Oct 2021 11:48:36 -0700 (PDT)
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=KOdi8wISjQ00kcc1Bnp9kfXCk0uvrku3t9b/u6XOqxg=;
+        b=F4dAcZkdT/ALjqLcfyXnNJ5ZMZlj6jluAkt4pi41iEMI1sZLyBt9NYlvaqCOkmXIlE
+         6AeEfYOAFzht7NvQmamVBmVoR8k7966OxeLhVO/hLBdf0UCDQDqe7gIuvStb7wTYjYpS
+         Rd4ggjTYSh83ydDIUrQN9OqwycFs1kMmFf5QZhBXnvreaolv25DXdm6E1pXYbp/TGvjG
+         zKFlHTdJoYw04udv4FYjEP+KHhr2UWGCxr1CFtune8nFlnGobZ/yx+9GLdA9NOsu7VIT
+         GJNtukhrXx5tk4UkuMB4W52eSzwKBKvOaKoadnKmbxN/4FiKdrvY5jL3ppa6W+4zCCpX
+         SgPw==
+X-Gm-Message-State: AOAM532MeIDvVoRLWtNdNoEMjTwCoKeMfat5mvy63S6OOgNOE9QC3kCq
+        sqIX7PnmdcAI+S0j/mHTDIbl843zRcFx2Q==
+X-Google-Smtp-Source: ABdhPJxbiKwrzbKOqIw5njnxSc/euq9JsVa3/2H7UClYJ28jSt4dTIkKdg788Di1bkveEtEJnwMfOA==
+X-Received: by 2002:a05:6830:19d7:: with SMTP id p23mr6846648otp.33.1634669990147;
+        Tue, 19 Oct 2021 11:59:50 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id n17sm9043749ile.76.2021.10.19.11.48.36
+        by smtp.gmail.com with ESMTPSA id a15sm4195365oiw.53.2021.10.19.11.59.49
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 11:48:36 -0700 (PDT)
-Subject: Re: [PATCH 1/4] block: add rq_flags to struct blk_mq_alloc_data
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-block@vger.kernel.org
-References: <20211019153300.623322-1-axboe@kernel.dk>
- <20211019153300.623322-2-axboe@kernel.dk>
- <20211019184259.GD2083665@dhcp-10-100-145-180.wdc.com>
+        Tue, 19 Oct 2021 11:59:49 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2635920a-2976-5ffa-6090-15d73968c0c8@kernel.dk>
-Date:   Tue, 19 Oct 2021 12:48:35 -0600
+Subject: [PATCH] block: improve error checking in blkdev_bio_end_io_async()
+Message-ID: <69df4731-3232-eb2a-664d-47d0db381843@kernel.dk>
+Date:   Tue, 19 Oct 2021 12:59:48 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20211019184259.GD2083665@dhcp-10-100-145-180.wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,25 +67,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/21 12:42 PM, Keith Busch wrote:
-> On Tue, Oct 19, 2021 at 09:32:57AM -0600, Jens Axboe wrote:
->> There's a hole here we can use, and it's faster to set this earlier
-> 
-> <snip>
-> 
->> @@ -148,6 +148,7 @@ struct blk_mq_alloc_data {
->>  	blk_mq_req_flags_t flags;
->>  	unsigned int shallow_depth;
->>  	unsigned int cmd_flags;
->> +	unsigned int rq_flags;
->>  
->>  	/* allocate multiple requests/tags in one go */
->>  	unsigned int nr_tags;
-> 
-> The patch looks good, but the new field doesn't appear to occupy a hole.
+Track the current error status of the dio with DIO_ERROR in the flags,
+which can then avoid diving into dio->bio for the fast path of not
+having any errors. This reduces the overhead of the function nicely,
+which was previously dominated by this seemingly cheap check:
 
-Yes, not sure how I missed the first flags. I'll cut that from the commit
-message.
+     4.55%     -1.13%  [kernel.vmlinux]  [k] blkdev_bio_end_io_async
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/block/fops.c b/block/fops.c
+index d4f4fffb7d32..21d265caecff 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -127,6 +127,7 @@ enum {
+ 	DIO_MULTI_BIO		= 1,
+ 	DIO_SHOULD_DIRTY	= 2,
+ 	DIO_IS_SYNC		= 4,
++	DIO_ERROR		= 8,
+ };
+ 
+ struct blkdev_dio {
+@@ -147,8 +148,10 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 	struct blkdev_dio *dio = bio->bi_private;
+ 	unsigned int flags = dio->flags;
+ 
+-	if (bio->bi_status && !dio->bio.bi_status)
++	if (!(flags & DIO_ERROR) && !dio->bio.bi_status) {
+ 		dio->bio.bi_status = bio->bi_status;
++		flags |= DIO_ERROR;
++	}
+ 
+ 	if (!(flags & DIO_MULTI_BIO) || atomic_dec_and_test(&dio->ref)) {
+ 		if (!(flags & DIO_IS_SYNC)) {
+@@ -157,7 +160,7 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 
+ 			WRITE_ONCE(iocb->private, NULL);
+ 
+-			if (likely(!dio->bio.bi_status)) {
++			if (likely(!(flags & DIO_ERROR))) {
+ 				ret = dio->size;
+ 				iocb->ki_pos += ret;
+ 			} else {
 
 -- 
 Jens Axboe
