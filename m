@@ -2,141 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD4FC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 06:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0DFC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 06:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8A6C6115B
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 06:20:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37C76610A1
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 06:23:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234125AbhJSGW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 02:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbhJSGWz (ORCPT
+        id S234178AbhJSG0I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 02:26:08 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:50458 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234165AbhJSG0H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 02:22:55 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A818C06161C;
-        Mon, 18 Oct 2021 23:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=P0Qb5DQF0h6Vh0HJc/CLwBlglni+7Xd8PpHSfCQ3aWg=; b=sHj2kDpMMRysIff/a9GcdgwK9q
-        pEdgWrNIOaa5o98is8jbTV2m+5teuZOvR6nLD7a+D5wo9ruzkJpAIiKMZL2SvnbFU7qqazBnUzkAr
-        CzVKUikkZGfoghzrbgCszJQ/1lakJiFFJO4cX09mGTuJBdqiD/5QS0keKDqKA56xvsrYg5gNdstV/
-        IsRDpEQ59aDx7T+Jau0l9CRTNcVKHGco+jjVWsQsfI0+dfKbfrn6SSk+86dcBzFDrbqi1/oH8MZaZ
-        tfNJcavptzEkBb/vzLRWVO18vnxg9bAkTmacgsI81F2RcxKhpswvP7OmnCkahQ5L9cepE4ExRlzew
-        GtBeqQAA==;
-Received: from 089144192247.atnat0001.highway.a1.net ([89.144.192.247] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mciUK-000HMH-N6; Tue, 19 Oct 2021 06:20:41 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Davidlohr Bueso <dave@stgolabs.net>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH 3/3] partitions/ibm: use bdev_nr_sectors instead of open coding it
-Date:   Tue, 19 Oct 2021 08:20:24 +0200
-Message-Id: <20211019062024.2171074-4-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211019062024.2171074-1-hch@lst.de>
-References: <20211019062024.2171074-1-hch@lst.de>
+        Tue, 19 Oct 2021 02:26:07 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 346CE2197E;
+        Tue, 19 Oct 2021 06:23:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1634624633; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aNvJPt85vZf9bBMJjbgwMuKxAMmcbsHIJPwZz/3xngo=;
+        b=aPPUZQip1FXzonJxM4wqd/690HrZk6fz9rhHm/1JCFBw9ALlZDpceFtf6flMY3j6oMRMFe
+        AQmevTkq51HUk5WPl3N4P1eN9xv890mbZxJ7GfHV8xreOSPvAbt4ZkskV7eS7JuJeAvANa
+        9uoyyw60aVq6hbOMcli3eofF+oZayMg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1634624633;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aNvJPt85vZf9bBMJjbgwMuKxAMmcbsHIJPwZz/3xngo=;
+        b=GijXbiZXw/n+u9uG38fm5BwLSEeX5PBkSlrFwGvVSFdmfffvdMVEtRW9XLwkcJp1P8EfmE
+        6ukLpP3n3DF7j3Dw==
+Received: from pobox.suse.cz (pobox.suse.cz [10.100.2.14])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 0341FA3B8A;
+        Tue, 19 Oct 2021 06:23:52 +0000 (UTC)
+Date:   Tue, 19 Oct 2021 08:23:51 +0200 (CEST)
+From:   Miroslav Benes <mbenes@suse.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+In-Reply-To: <YW4uwep3BCe9Vxq8@T590>
+Message-ID: <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
+References: <20210927163805.808907-12-mcgrof@kernel.org> <YWeOJP2UJWYF94fu@T590> <YWeR4moCRh+ZHOmH@T590> <YWiSAN6xfYcUDJCb@bombadil.infradead.org> <YWjCpLUNPF3s4P2U@T590> <YWjJ0O7K+31Iz3ox@bombadil.infradead.org> <YWk9e957Hb+I7HvR@T590>
+ <YWm68xUnAofop3PZ@bombadil.infradead.org> <YWq3Z++uoJ/kcp+3@T590> <YW3LuzaPhW96jSBK@bombadil.infradead.org> <YW4uwep3BCe9Vxq8@T590>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the proper helper to read the block device size and switch various
-places to pass the size in terms of sectors which is more practical.
+> > By you only addressing the deadlock as a requirement on approach a) you are
+> > forgetting that there *may* already be present drivers which *do* implement
+> > such patterns in the kernel. I worked on addressing the deadlock because
+> > I was informed livepatching *did* have that issue as well and so very
+> > likely a generic solution to the deadlock could be beneficial to other
+> > random drivers.
+> 
+> In-tree zram doesn't have such deadlock, if livepatching has such AA deadlock,
+> just fixed it, and seems it has been fixed by 3ec24776bfd0.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/partitions/ibm.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+I would not call it a fix. It is a kind of ugly workaround because the 
+generic infrastructure lacked (lacks) the proper support in my opinion. 
+Luis is trying to fix that.
 
-diff --git a/block/partitions/ibm.c b/block/partitions/ibm.c
-index 9bca396aef4ad..d56912fe81732 100644
---- a/block/partitions/ibm.c
-+++ b/block/partitions/ibm.c
-@@ -198,7 +198,7 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
- 				char name[],
- 				union label_t *label,
- 				sector_t labelsect,
--				loff_t i_size,
-+				sector_t nr_sectors,
- 				dasd_information2_t *info)
- {
- 	loff_t offset, geo_size, size;
-@@ -213,14 +213,14 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
- 	} else {
- 		/*
- 		 * Formated w/o large volume support. If the sanity check
--		 * 'size based on geo == size based on i_size' is true, then
-+		 * 'size based on geo == size based on br_sectors' is true, then
- 		 * we can safely assume that we know the formatted size of
- 		 * the disk, otherwise we need additional information
- 		 * that we can only get from a real DASD device.
- 		 */
- 		geo_size = geo->cylinders * geo->heads
- 			* geo->sectors * secperblk;
--		size = i_size >> 9;
-+		size = nr_sectors;
- 		if (size != geo_size) {
- 			if (!info) {
- 				strlcat(state->pp_buf, "\n", PAGE_SIZE);
-@@ -229,7 +229,7 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
- 			if (!strcmp(info->type, "ECKD"))
- 				if (geo_size < size)
- 					size = geo_size;
--			/* else keep size based on i_size */
-+			/* else keep size based on nr_sectors */
- 		}
- 	}
- 	/* first and only partition starts in the first block after the label */
-@@ -293,7 +293,8 @@ int ibm_partition(struct parsed_partitions *state)
- 	struct gendisk *disk = state->disk;
- 	struct block_device *bdev = disk->part0;
- 	int blocksize, res;
--	loff_t i_size, offset, size;
-+	loff_t offset, size;
-+	sector_t nr_sectors;
- 	dasd_information2_t *info;
- 	struct hd_geometry *geo;
- 	char type[5] = {0,};
-@@ -308,8 +309,8 @@ int ibm_partition(struct parsed_partitions *state)
- 	blocksize = bdev_logical_block_size(bdev);
- 	if (blocksize <= 0)
- 		goto out_symbol;
--	i_size = i_size_read(bdev->bd_inode);
--	if (i_size == 0)
-+	nr_sectors = bdev_nr_sectors(bdev);
-+	if (nr_sectors == 0)
- 		goto out_symbol;
- 	info = kmalloc(sizeof(dasd_information2_t), GFP_KERNEL);
- 	if (info == NULL)
-@@ -336,7 +337,7 @@ int ibm_partition(struct parsed_partitions *state)
- 						   label);
- 		} else if (!strncmp(type, "LNX1", 4)) {
- 			res = find_lnx1_partitions(state, geo, blocksize, name,
--						   label, labelsect, i_size,
-+						   label, labelsect, nr_sectors,
- 						   info);
- 		} else if (!strncmp(type, "CMS1", 4)) {
- 			res = find_cms1_partitions(state, geo, blocksize, name,
-@@ -353,7 +354,7 @@ int ibm_partition(struct parsed_partitions *state)
- 		res = 1;
- 		if (info->format == DASD_FORMAT_LDL) {
- 			strlcat(state->pp_buf, "(nonl)", PAGE_SIZE);
--			size = i_size >> 9;
-+			size = nr_sectors;
- 			offset = (info->label_block + 1) * (blocksize >> 9);
- 			put_partition(state, 1, offset, size-offset);
- 			strlcat(state->pp_buf, "\n", PAGE_SIZE);
--- 
-2.30.2
+Just my two cents.
 
+Miroslav
