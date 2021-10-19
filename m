@@ -2,86 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A47CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E495BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:07:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 033E861373
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:05:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6BB160FE8
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:07:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233744AbhJSTH6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 15:07:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44154 "EHLO
+        id S234663AbhJSTJT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 15:09:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231355AbhJSTH5 (ORCPT
+        with ESMTP id S231355AbhJSTJS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 15:07:57 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8685DC06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 12:05:44 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id p6-20020a9d7446000000b0054e6bb223f3so2926816otk.3
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 12:05:44 -0700 (PDT)
+        Tue, 19 Oct 2021 15:09:18 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295BFC06161C
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 12:07:05 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id o24-20020a05600c511800b0030d9da600aeso4978832wms.4
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 12:07:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=mTZvuPk5p33U4e2lqjhFCtwvus4Zb7UkGXhjMU7TyUM=;
-        b=kyfrl7xYKgU8HPMUGrjUVl+4iKdIzBCQWta5q0wya3XsN75OowxkgmEs2exhYmhCKh
-         AyDkFBSnTEVv486ZP6SRvbbu/tUBMGMMLCECV3nL+S3HvYpWHPlah+/bYZkhMiLkhHhZ
-         bk6vGFJgbRKpc3Y9gnq+tuGk52xesTahMo5gljRhTiwR0vfWcrq7l59/OuaTlEMy18wK
-         LGqpOP+sFJh4CcAQ0CmPw1frOZ0lDpjrSuPH7d7qi3vkwow6bKNcEDi6MViscszI3ubL
-         fLtxWdOdumRwtN6XfvrDjPeIPzJJVEAJL/S3zl5UKOotmCK/zhk2qatm9grSigB4MtJc
-         HMhQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=GE8YxdOnAWHzH/DIx6fj/sdteAcP2q6NDrSIvl8ELFQ=;
+        b=EWKhLz2A09XLg3fl2zy1PBxwDq9xWCeIRgi6xV5M6FpSr3dtowb6QK6WNQXOvQQ2NW
+         3OVUHWOT2wZdekm/rweegPGLByiVT9CkQZ8T3dyT0PFvOJhQo+mm30At8ZKUjBx+TD87
+         cBX9jQ7Ku/kYOAP/Es5nhXkxzlnLwFbBt4BddPPx9SAMEx29neuINTW3b6T5B6ON5mUr
+         awD5p7pByJhdaGXlpo2xcIEMe5E9J8Uqs0HnPoiAxxFGNMSpUa00IoyX3G5TkufBATN1
+         3k1l81fksyyTv+Ck0TAK88QKHoaRqZ7aylYCYeSjbNiXNXnQt2S4Qt4FUNmnSvT4gV2k
+         jxig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=mTZvuPk5p33U4e2lqjhFCtwvus4Zb7UkGXhjMU7TyUM=;
-        b=nNyoeOvbbLqhRFf0a8FwUZ/l4PZXT1YVT4ckMf7CxY10n41GT9L19VvwSewIVHRDJH
-         HRgttSIN9e3OW/UayTQ1LwF+wkQvZ6oduFZVVM5O/bRbHPXNpeLG907yCgJdPh21Ic/f
-         UUBc59Lmh4iHN2qkcN0u1YZ3Mvr9DrPJIFuwpTaECayKlIM9SwF0H4nbXvYRoZLFFOfz
-         gemjnYhyw1E2htib9F77EqzwXMBtepulHj8hCu856SHKELVhCao9LiE0qvS5no7gtfVU
-         C6zLVtAgCDHCaq/UY4ZEDYc/EWhL1P8roH83U3WF2SlVzuIivOdTb77KX4RJOou5X3ZE
-         6rng==
-X-Gm-Message-State: AOAM531tE6YJbAqqWmN9uaVVXZqa2oOXG6VF/DNhyj0sTr4bvYqgUj+i
-        uLjvYV4t5tD4ngRlnmP6rMxYvyzjNRQjRg==
-X-Google-Smtp-Source: ABdhPJyxOei9oBlB+ftYZOm3M+Oi1zFwwIO5or11roiiZSnXSs2j8ctHaWhrc+CqnH1LLw3EJ+Hd9Q==
-X-Received: by 2002:a9d:396:: with SMTP id f22mr6814362otf.327.1634670343365;
-        Tue, 19 Oct 2021 12:05:43 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id l7sm3151213oog.22.2021.10.19.12.05.43
-        for <linux-block@vger.kernel.org>
+        bh=GE8YxdOnAWHzH/DIx6fj/sdteAcP2q6NDrSIvl8ELFQ=;
+        b=wUQH97vXEIknGFGS3Jkm5SE7kqTin5JgmbB3oQ+kPB3zZZoWUCQqwNqKr+uDzJjPtu
+         smdj/ZvFE0ktBRSKPUfSAa2SdTtLSaswJaXvbaqLrnzBFkVYHBQZ8qmserMtupD2CmDf
+         eFZFoYaWynX8rpvWQNgVQ8Oc8hpMHysSL8Hgu8XHHCPVwMHUWxHilYaaMUrmsESMnAQY
+         vx59iOIAojSSWuHASfWO272nJvXYEMQ9NZS/0gYAHqYM+1mi/ZwYo04GK3HM1C+oPimW
+         GyecJHQJM/shS1filXQ7gIFRfhcYuq3rpzbpIv10NCBhTJfmQeuVqEJah2XgoiEo7y0W
+         ZjvQ==
+X-Gm-Message-State: AOAM531qatvL1LDeVtK4O6FzFQH0zSD5G7awZZzcLZE+aG3PEeUAyb5V
+        /Os0f8uBW5nSP2tltpbCtVs2EQSIdW2xGg==
+X-Google-Smtp-Source: ABdhPJw7wRYgw2CxB22ybonfzQM27XDkAsACWB/1lKMzVzNfksFeVuGBsz6yVBKaWNJmcw9a30vwDw==
+X-Received: by 2002:a1c:6a11:: with SMTP id f17mr8301834wmc.132.1634670423782;
+        Tue, 19 Oct 2021 12:07:03 -0700 (PDT)
+Received: from [192.168.8.197] ([185.69.145.194])
+        by smtp.gmail.com with ESMTPSA id n11sm15164718wrw.43.2021.10.19.12.07.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 12:05:43 -0700 (PDT)
+        Tue, 19 Oct 2021 12:07:03 -0700 (PDT)
+Message-ID: <b813826d-ce9a-c043-2d87-a7275d5df77d@gmail.com>
+Date:   Tue, 19 Oct 2021 20:06:23 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.2
 Subject: Re: [PATCH] block: improve error checking in
  blkdev_bio_end_io_async()
-From:   Jens Axboe <axboe@kernel.dk>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <69df4731-3232-eb2a-664d-47d0db381843@kernel.dk>
-Message-ID: <eb5f3cf7-4bf3-d7f3-ed7f-cf067410f31b@kernel.dk>
-Date:   Tue, 19 Oct 2021 13:05:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <69df4731-3232-eb2a-664d-47d0db381843@kernel.dk>
-Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <69df4731-3232-eb2a-664d-47d0db381843@kernel.dk>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <69df4731-3232-eb2a-664d-47d0db381843@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/21 12:59 PM, Jens Axboe wrote:
+On 10/19/21 19:59, Jens Axboe wrote:
 > Track the current error status of the dio with DIO_ERROR in the flags,
 > which can then avoid diving into dio->bio for the fast path of not
 > having any errors. This reduces the overhead of the function nicely,
 > which was previously dominated by this seemingly cheap check:
 > 
->      4.55%     -1.13%  [kernel.vmlinux]  [k] blkdev_bio_end_io_async
+>       4.55%     -1.13%  [kernel.vmlinux]  [k] blkdev_bio_end_io_async
 
-Disregard, ended up being an older test version. I'll send the right
-one.
+Jens, something gone wrong here. blkdev_bio_end_io_async() is a
+function from my not yet published branch, the perf here is for it,
+but the patch tackles blkdev_bio_end_io().
+
+P.s. once blkdev_bio_end_io_async() doesn't need it, and once in
+normal blkdev_bio_end_io() will be a slow-ish path, so probably
+we don't care much.
+
+
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> diff --git a/block/fops.c b/block/fops.c
+> index d4f4fffb7d32..21d265caecff 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -127,6 +127,7 @@ enum {
+>   	DIO_MULTI_BIO		= 1,
+>   	DIO_SHOULD_DIRTY	= 2,
+>   	DIO_IS_SYNC		= 4,
+> +	DIO_ERROR		= 8,
+>   };
+>   
+>   struct blkdev_dio {
+> @@ -147,8 +148,10 @@ static void blkdev_bio_end_io(struct bio *bio)
+>   	struct blkdev_dio *dio = bio->bi_private;
+>   	unsigned int flags = dio->flags;
+>   
+> -	if (bio->bi_status && !dio->bio.bi_status)
+> +	if (!(flags & DIO_ERROR) && !dio->bio.bi_status) {
+>   		dio->bio.bi_status = bio->bi_status;
+> +		flags |= DIO_ERROR;
+> +	}
+>   
+>   	if (!(flags & DIO_MULTI_BIO) || atomic_dec_and_test(&dio->ref)) {
+>   		if (!(flags & DIO_IS_SYNC)) {
+> @@ -157,7 +160,7 @@ static void blkdev_bio_end_io(struct bio *bio)
+>   
+>   			WRITE_ONCE(iocb->private, NULL);
+>   
+> -			if (likely(!dio->bio.bi_status)) {
+> +			if (likely(!(flags & DIO_ERROR))) {
+>   				ret = dio->size;
+>   				iocb->ki_pos += ret;
+>   			} else {
+> 
 
 -- 
-Jens Axboe
-
+Pavel Begunkov
