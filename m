@@ -2,89 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01757C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C81C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:28:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4EC46136F
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:02:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D27996137D
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234665AbhJSSEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 14:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbhJSSEX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 14:04:23 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476A8C06161C;
-        Tue, 19 Oct 2021 11:02:10 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 75so20113121pga.3;
-        Tue, 19 Oct 2021 11:02:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3sZM03eQhB2KzVvExB+/wmjn4hXG0h6WujSIe5Eehcg=;
-        b=pdVCsGnAm94532oZGMO3Ez89POaEjaCzYWHB2T/AXlJ5kW/oyCcWkHgf25+XwKca1J
-         a47acU8a9sfAUgqWXUcaYq6slfGMUYBcESJfuGUEzt59CGaW4CqsPe3VS7FX0eWlaWhY
-         Tue14lvZ5Y9McXLISdKd/pFYeNK4mCBpxO68v+BXR5kIHZC8lSzQPxTglTLjji3OEUfF
-         jd0nuqkcjHEy1T0nrO1S31iGZ4id5Zj4PP0mtLuD+ZExXNnS9W+N2mxFdx98uKgkUsiL
-         YMyY88VFK/hzjbyEi+Mt/sTW45vXwseARbgOmeCXLABsSN/a1/jfF8CMViONAjZbJAnL
-         f5HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=3sZM03eQhB2KzVvExB+/wmjn4hXG0h6WujSIe5Eehcg=;
-        b=lqSd7W/KJH3Nynl266yOuLbrlSuGpBSw5xYu1yGOBjTNKc9MXqgxkKWalkQT4xmbB7
-         Ijxhp+V60g2d5Aeb62ci62KFXhY2tgvdBbGbNFgch97cSoI9MqSyYKfMjlYV3I8mSApq
-         f4u7i3gwSHvOpINoSQaTS0xliXgiIoi+CTOKft7SADfzTFK5KQCzuKiTboPqju5MHlNR
-         L6SNlkJ6bQAPyelsUI69BEj+dHjnAcser5w4Na5rIP1LntM4rNgeDH5NzUq0SXFYHz5A
-         n3NwwD7QXH5ZAROqMk+2cKzFTcxiyBT5izgzux4dmIuCvddOMJvH/c5PlYW0R7d2ento
-         jzpA==
-X-Gm-Message-State: AOAM531+3M4GsiusxpDwBT5fUxFOz8SASOymb2zVfziJCGMmB5WhOwDp
-        sOFd3NKCUK1zoBK5U2A8p9o=
-X-Google-Smtp-Source: ABdhPJyCPBmixUfzOynGK/HWr1nOgd+4zNCnD1vU7BIwevA7IuOBArVJlJPt3veA3X+p62Qo4MJwdQ==
-X-Received: by 2002:a62:e510:0:b0:44c:e06e:80dd with SMTP id n16-20020a62e510000000b0044ce06e80ddmr1364636pff.48.1634666529582;
-        Tue, 19 Oct 2021 11:02:09 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id z12sm3237715pjh.51.2021.10.19.11.02.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 11:02:08 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 19 Oct 2021 08:02:07 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Zheng Liang <zhengliang6@huawei.com>
-Cc:     axboe@kernel.dk, paolo.valente@linaro.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH v2] block, bfq: fix UAF problem in bfqg_stats_init()
-Message-ID: <YW8IH83UVyWrivVS@slm.duckdns.org>
-References: <20211018024225.1493938-1-zhengliang6@huawei.com>
+        id S232633AbhJSSav (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 14:30:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48028 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231783AbhJSSav (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Oct 2021 14:30:51 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 176A661260;
+        Tue, 19 Oct 2021 18:28:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1634668118;
+        bh=Fhtf7VlSWsJXLka1T9VBb/ONbZ90TTb8FR0sVs3L9EQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VfAJNtcOST2+jtOjorP6OvbHK/4a4VzLKddo9DGEu/6D/C4Pig8UIFZ/LXhpeQ/gg
+         vke0Bmqay8ArobdugFVgr6gMl+oZG4mJsvgJuW/ZS66vKqMz++llXaBNoiqHPPtVXy
+         7ixt7ZSQAGBh5ONON38LP0ilRkLpWXuiWvoKYb4dRm1oWz2rvPQGSFcCi/2zFuJZzP
+         f9C4TKTeodx1ZiIXe/Az/aD/wQ9/bqL6sULWKoLrEcyEkaqaaz3tdObbhLyFBRcqJh
+         +SWrZNKYQiVlUvR8GH1JznCRIs8/BzWpiVhAirHB0Q6YAtY98zXcNH0IGzbo8k6FAS
+         cmO1FqpEZytUw==
+Date:   Tue, 19 Oct 2021 11:28:35 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: [PATCH v2 1/2] nvme: move command clear into the various setup
+ helpers
+Message-ID: <20211019182835.GB2083665@dhcp-10-100-145-180.wdc.com>
+References: <20211018124934.235658-1-axboe@kernel.dk>
+ <20211018124934.235658-2-axboe@kernel.dk>
+ <f90f4e83-52d2-4d92-126a-9f65f384f8a4@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211018024225.1493938-1-zhengliang6@huawei.com>
+In-Reply-To: <f90f4e83-52d2-4d92-126a-9f65f384f8a4@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 18, 2021 at 10:42:25AM +0800, Zheng Liang wrote:
-> In bfq_pd_alloc(), the function bfqg_stats_init() init bfqg. If
-> blkg_rwstat_init() init bfqg_stats->bytes successful and init
-> bfqg_stats->ios failed, bfqg_stats_init() return failed, bfqg will
-> be freed. But blkg_rwstat->cpu_cnt is not deleted from the list of
-> percpu_counters. If we traverse the list of percpu_counters, It will
-> have UAF problem.
+On Mon, Oct 18, 2021 at 06:53:02AM -0600, Jens Axboe wrote:
+> commit fb4e29f648e320c94f210c54692c754ad69fb6f6
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Mon Oct 18 06:45:06 2021 -0600
 > 
-> we should use blkg_rwstat_exit() to cleanup bfqg_stats bytes in the
-> above scenario.
-> 
-> Fixes: commit fd41e60331b ("bfq-iosched: stop using blkg->stat_bytes and ->stat_ios")
-> Signed-off-by: Zheng Liang <zhengliang6@huawei.com>
+>     nvme: move command clear into the various setup helpers
+>     
+>     We don't have to worry about doing extra memsets by moving it outside
+>     the protection of RQF_DONTPREP, as nvme doesn't do partial completions.
+>     
+>     This is in preparation for making the read/write fast path not do a full
+>     memset of the command.
+>     
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Looks good.
 
-Thanks.
-
--- 
-tejun
+Reviewed-by: Keith Busch <kbusch@kernel.org>
