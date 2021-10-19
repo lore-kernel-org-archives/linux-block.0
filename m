@@ -2,68 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB77CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 13:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD07CC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 13:46:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A443560FDA
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 13:45:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C162961074
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 13:46:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235944AbhJSNr6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 09:47:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54706 "EHLO
+        id S236003AbhJSNs1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 09:48:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235691AbhJSNr5 (ORCPT
+        with ESMTP id S236008AbhJSNs0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 09:47:57 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD630C061746
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 06:45:44 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id l10-20020a056830154a00b00552b74d629aso2813882otp.5
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 06:45:44 -0700 (PDT)
+        Tue, 19 Oct 2021 09:48:26 -0400
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1662EC06161C
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 06:46:14 -0700 (PDT)
+Received: by mail-ot1-x329.google.com with SMTP id p6-20020a9d7446000000b0054e6bb223f3so1703386otk.3
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 06:46:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hfhCL4H2IqoEAY7P0qSMczzQq7iOCcIlsad5SfE30VA=;
-        b=eIL2wnUA6lsjieR++/JE53Lk9+pJsGf8Lv1/S0qdP0BjTXix72NcmJvmAF7hYLwx3a
-         YdUd/5dnNfPkUd6aj4r215cwlAnnULuE3RD/n2qUnsnNe5nmALYj9MJ8rg3aLXDekSXf
-         FOknZS+ckP31+6eSXAw4QT3uMznaKEWk05YNgVfL5A9zBx7SSExl6TjAJYqOiYPu8Q1k
-         xbe404aCsC5I+XFH0gn2kAUd46uPCOypVSoFm2DQmgK8oucreqTV3Pw/1WGyDAa8y+L2
-         FHKRWG6H22NcvxFsROzXM5FR3Yhg4lVmtFB0mUB7zNNmJxlL4kPvbObAqYxv8Tcd1JIg
-         vOEA==
+        bh=ucIWtET5JrdeSqqJuLCzHbELJKdBfUKzDRkTlrBAWuk=;
+        b=aDoTmOUos+hDwCphQVxpgeIEGFEHS416tKwSHtoE6W4oTLc7oNpgqVsZMjpFgMYozZ
+         u4Dxmw523wrckTOEJ3aTQZwIvmGLWX3y30CzvgZiknAgZc9wezObmXCp7RlJQnl5whJ9
+         xGOZ+UNTcqeDs/ANM7r6WphtrNdGM8pK8vkI0Utm+OA3Yn5EEQa2ZhGhoLamBU+eeG7H
+         acNS7/5XvU0RcA+xu/HCIbSc4MWm8L/pZkEYSy57NYvmeH0SILzgUYWqcVb2nj0PL54n
+         tXXIwUP21uTbAEYydMbQ94+5NH5GBhURNcvSnUl7uXnHFEdCoCOSt7OlzUJ7hokQmdUY
+         DhaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hfhCL4H2IqoEAY7P0qSMczzQq7iOCcIlsad5SfE30VA=;
-        b=AqX6MlNZG0AR5/cq0TD1Ehjd6CiXDZYRFVBMXIfkZxXggJt44cYPLyhg+FtmG+t6X0
-         Bn1bcYPUvIPiiKkwMnQgeiarToizFpaCstzq+ndc1VBF7h4wVlvorGYfqAIqVg2W0E1E
-         YWo52x+u1hRVMeYsAqH1dXS5Kine08znRjD2JhZcSp5sikb6HnbTpmO9oYGil1xdz6CF
-         HFfvFd9U3oOtYRlT3fHNh5stypfCQN8jwksK8tn3T1dWblO1U+yoHUDOkw4OIN8NjiTp
-         fSmIjIpNDIfujNeMxW2/WrP1Nh3WakYaLaeW31uRsLKO6SF+aw3rdZxPWuGinvNmdfTj
-         aAZA==
-X-Gm-Message-State: AOAM5307+ojyJpf/qKvH/wkRKp8wq+Q2CIro6DR0iS7oKgBbPIgcr/mn
-        H+xg0yj+4kt/XsQ17UcTqyOO/Ct1Ey99mg==
-X-Google-Smtp-Source: ABdhPJyoeKPTtarp+CQmZSXzgHR+qxsombSw3qAek+X9Nzcr9KvxKemvZKrpS93vcrZhonPnmpTmWQ==
-X-Received: by 2002:a9d:7998:: with SMTP id h24mr5635958otm.181.1634651143981;
-        Tue, 19 Oct 2021 06:45:43 -0700 (PDT)
+        bh=ucIWtET5JrdeSqqJuLCzHbELJKdBfUKzDRkTlrBAWuk=;
+        b=K3HzFvTAIbLxTG/2VMSJ9cBemfSvfyuSqjME6Q1z1z6uYz6DdIp/17308/1bBKJvwj
+         QRUtbrzYScnmy6xVyy533lMduZichoPeXLJUKCSEv+D7V+oh8Ehpuf45l4opqX1Bg79L
+         V6FTaGQNhpFlPFlur/NowcPRxn4JadFp8I+hDoBJp2V6e3h3Agm9xos4ye9aWtqtebTQ
+         L+TsG6FkjC9QyUbuY3YvrzYiVHD0MkaShwa9U2iiOVoWofppTt+jWbJbP1tfgBZdWlqG
+         N1W8t6MQGcoQfH4EdXvNz5BbZgSgDIWw5jdE94Q3V9jTzCRt53jMKc+OIo+3S/H7T9S5
+         nF/w==
+X-Gm-Message-State: AOAM530XWadkVL8A3OWAcAeeyot3rrSzJBzTABLvzITdLsMGdtGWGHEE
+        sZUM/jL9iAht9xTZOfCW+GgNowN+Qf2uhw==
+X-Google-Smtp-Source: ABdhPJxWND25ZkymfS7YGCPx1f0aKAJcXLvxxuiq8RJsquLgNJKKjb8b7A4CpxtYYiwPanhv+hf7Ig==
+X-Received: by 2002:a05:6830:1f2a:: with SMTP id e10mr5435207oth.118.1634651173225;
+        Tue, 19 Oct 2021 06:46:13 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id j16sm3698142oig.29.2021.10.19.06.45.43
+        by smtp.gmail.com with ESMTPSA id y123sm3621818oie.0.2021.10.19.06.46.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 06:45:43 -0700 (PDT)
-Subject: Re: [PATCH 2/2] block: attempt direct issue of plug list
+        Tue, 19 Oct 2021 06:46:13 -0700 (PDT)
+Subject: Re: [PATCH 1/2] blk-mq: remove the RQF_ELVPRIV check in
+ blk_mq_free_request
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org
-References: <20211019120834.595160-1-axboe@kernel.dk>
- <20211019120834.595160-3-axboe@kernel.dk> <20211019133647.GB19216@lst.de>
+References: <20211019133944.2500822-1-hch@lst.de>
+ <20211019133944.2500822-2-hch@lst.de>
+ <6393ab57-3a9a-e5ee-6428-c1a4f0bee1f6@kernel.dk>
+ <20211019134457.GA20622@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <57e10bf5-86cb-95f3-fde7-090018d7c077@kernel.dk>
-Date:   Tue, 19 Oct 2021 07:45:43 -0600
+Message-ID: <52b0f155-b7dd-c14e-8273-ff76ec22b169@kernel.dk>
+Date:   Tue, 19 Oct 2021 07:46:12 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20211019133647.GB19216@lst.de>
+In-Reply-To: <20211019134457.GA20622@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,24 +74,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/21 7:36 AM, Christoph Hellwig wrote:
-> On Tue, Oct 19, 2021 at 06:08:34AM -0600, Jens Axboe wrote:
->> If we have just one queue type in the plug list, then we can extend our
->> direct issue to cover a full plug list as well.
+On 10/19/21 7:44 AM, Christoph Hellwig wrote:
+> On Tue, Oct 19, 2021 at 07:43:04AM -0600, Jens Axboe wrote:
+>> On 10/19/21 7:39 AM, Christoph Hellwig wrote:
+>>> If RQF_ELVPRIV is set RQF_ELV is by definition set as well.
+>>>
+>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>> ---
+>>>  block/blk-mq.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>> index 428e0e0fd5504..34392c439d2a8 100644
+>>> --- a/block/blk-mq.c
+>>> +++ b/block/blk-mq.c
+>>> @@ -580,7 +580,7 @@ void blk_mq_free_request(struct request *rq)
+>>>  	struct request_queue *q = rq->q;
+>>>  	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+>>>  
+>>> -	if (rq->rq_flags & (RQF_ELVPRIV | RQF_ELV)) {
+>>> +	if (rq->rq_flags & RQF_ELV) {
+>>
+>> Actually just fixed a bug there. RQF_ELV means "we have an IO
+>> scheduler", and RQF_ELVPRIV means that plus "we have rq private data".
+>> The above shouldn't check RQF_ELV at all, just PRIV.
 > 
-> I don't think this description matches what the code does.  My impression
-> of what the code does it:
-> 
-> If a plug only has requests for a single queue, and that queue does not
-> use an I/O scheduler, we can just issue the list of requests directly
-> from the plug.
-> 
-> Otherwise looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Well, in that case RQF_ELVPRIV can be replaced with
+> RQF_ELV && !op_is_flush as in the next patch.  But I can resend once I
+> see the fix in a tree somewhere.
 
-I'll expand it a bit, that is what I was trying to say, but it just
-became too brief.
+That'd be great. It's in for-5.16/block
 
 -- 
 Jens Axboe
