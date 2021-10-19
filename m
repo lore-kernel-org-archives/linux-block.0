@@ -2,76 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B6CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A315C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93EBD61361
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B86D61355
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230303AbhJSRMm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 13:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46266 "EHLO
+        id S234506AbhJSRNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 13:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229894AbhJSRMl (ORCPT
+        with ESMTP id S234613AbhJSRNt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 13:12:41 -0400
+        Tue, 19 Oct 2021 13:13:49 -0400
 Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD68C06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 10:10:27 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id d125so21230631iof.5
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 10:10:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C42CC061746
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 10:11:37 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id h196so21263697iof.2
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 10:11:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=u1QTaBnY7Bx3/oW7D9ZuY0gJfdSJNFQsm2jE8G8IhYI=;
-        b=MMzMCnme8a1D+2tTqfQ5LQ7zAtLDyEAGKS/4tOQ62SGUwTuSqZRXnFdN/xXQ9hSd3u
-         du+Rgw5rHPDEuMtZm/jFI8clSFA3uv6CzLpdppeEFfTytwbYYsFFwxMoFMq70KP/CCfh
-         GOFjfI3DjFS3y6Q/Iw+ujyLTUKJvDwcUyF78lIR7mvRl1530CcX9VY9eQ+E0dUn7yRw8
-         zkQGS3LMLc+KM8wDCdbTQ7JjjNb4XbB9rxgtGZi6LhbniL2f2FmIdqHdep+WMiX8BSfQ
-         6eRxELMKBMtrhOGa3tqfD6o6K94rpm28+J+C7rcso0swHatJ2/nVvG/FqosOFAuC2M2Z
-         nPDg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=9nNFJafehBF2DqCROwwySiwn6Y3GKArtLiVFqM+LLss=;
+        b=tz6zldbs8fcCfLu5knqDo5ntX3sqxkUwSNWMqGEZAC3KskdYOHbBMmkiv67EWS/Bah
+         1+uXFEgtfZhgtdk5uDDe1SIAlgPkEnWkv2UPrc8eXWjzDoKCk+9WvI90ZG76pQcOzSar
+         rP92vjosZY5eE1kctMMfcdGh645wROW2w4lJSNx0N41MHH3qTqKr67ikByBtHCIdK+ne
+         dChTZs+hWrkLrs6qGpreqdT0eO4eGu//Al0xBEPOYwOr0nTTjjqyRDICQ+Tt2A2obLb2
+         VlkyFQXzaj9DiuOpia+tHj8x+ovqd7js+PDo5q7PLAizgsdUd+3msgGRujZqsuBa6NxX
+         gmOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=u1QTaBnY7Bx3/oW7D9ZuY0gJfdSJNFQsm2jE8G8IhYI=;
-        b=EdCzFRqT+N1F1ZLSWrox7/jjn7dkubxUDhcwDF4JEeBEsch2dyizpMaq2PC7hJKU+Y
-         1VmrXFTeKJfkMv6acBAVzNdzxMs60ym6Is25JtVggamA8sJrRwJnF/yhUwolYDyoq2fH
-         0erx8Lb0sPwqKVR7svocy4nCQQhoOTNkI8nuzgRF3zqf2Tk0MSuw7qK+x/vWa6/3Bhw3
-         GECh+G2RkkH6oP+r6rynDancrg1OWJO4Gkjnm/lmHFQgc9cjqz9EG3A/ElGa3kscCxvB
-         rOtkkO2tjqykpyniLuDP/FlMBIzmJJ09mNbQY2iw7YQM6IzIbHGiAJICkkTY35tE7zy1
-         xTyQ==
-X-Gm-Message-State: AOAM532HF5AdKYBcpiFJ3leJx87P9ax822N9cmtXjcdriqsoadqIc1Am
-        L1pgGj35cU+usWQB5cK23WJb97kV/H5oAg==
-X-Google-Smtp-Source: ABdhPJy9MXCyAJnDoPt02cJR3dYtfbAJbqM/4g5qGntjYNQnW4bd4DVsa1zc5tBviOfioLvO1zZ2CQ==
-X-Received: by 2002:a6b:208:: with SMTP id 8mr20121808ioc.46.1634663426104;
-        Tue, 19 Oct 2021 10:10:26 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id e14sm8679622ioe.37.2021.10.19.10.10.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Oct 2021 10:10:25 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: don't handle non-flush requests in
- blk_insert_flush
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20211019122553.2467817-1-hch@lst.de>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=9nNFJafehBF2DqCROwwySiwn6Y3GKArtLiVFqM+LLss=;
+        b=KWtbwORVd4muDdBiJKU0b4Y2IXBxdtEhSBCOeQl0Dcx5Mc8Nf8Km4VFSdFOe0e+mDd
+         i1yRRLPjhrd3y6v003h0AC83kCzyKatlURJccx8mAjqGL7V1+ddKWn22L41WroatGh1k
+         JPXkIy823axMQWaVKtZj3AXhAlDqLNRqz05JFQEnzXyjF5F10nTTtzc6iWxTtIn430qJ
+         E6eAFspygZwR7cuS0XyY9/TyIyJkh0WmGUgkBYSLve99n9TQsrce3xhZk/BZCXUGR1CJ
+         TSSMdUsru1auC6uoz6vjAEw4Dp0cO+ychRy9Jhm6b0PALw+jPT/++FkIFILhYN69Vpj0
+         3OnA==
+X-Gm-Message-State: AOAM530pSDuvDZPvtWQxyGlQTIxGVFBkPLYzDPHIx6hfWZSlStQEvvJo
+        QY33YsZmpv2GvsM6txi3sgEgHq2jR9gcLQ==
+X-Google-Smtp-Source: ABdhPJwSZPVG9ANmMYck+JQNyN7Z2xQira/yIiKqjI3YZOb/AQHHuMA8TC+w/9jd1q/LhiCAELvLVA==
+X-Received: by 2002:a05:6602:13c3:: with SMTP id o3mr19921409iov.142.1634663496451;
+        Tue, 19 Oct 2021 10:11:36 -0700 (PDT)
+Received: from p1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id t12sm8518003ilp.43.2021.10.19.10.11.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Oct 2021 10:11:36 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3fffc188-106e-8c12-be32-ebbe717444cd@kernel.dk>
-Date:   Tue, 19 Oct 2021 11:10:25 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: don't handle non-flush requests in blk_insert_flush
+Date:   Tue, 19 Oct 2021 11:11:34 -0600
+Message-Id: <163466349198.667080.16319805997468516195.b4-ty@kernel.dk>
+X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211019122553.2467817-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20211019122553.2467817-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/19/21 6:25 AM, Christoph Hellwig wrote:
+On Tue, 19 Oct 2021 14:25:53 +0200, Christoph Hellwig wrote:
 > Return to the normal blk_mq_submit_bio flow if the bio did not end up
 > actually being a flush because the device didn't support it.  Note that
 > this is basically impossible to hit without special instrumentation given
@@ -81,9 +77,16 @@ On 10/19/21 6:25 AM, Christoph Hellwig wrote:
 > With this the call to blk_mq_run_hw_queue for the flush requests can be
 > removed given that the actual flush requests are always issued via the
 > requeue workqueue which runs the queue unconditionally.
+> 
+> [...]
 
-This looks great, thanks.
+Applied, thanks!
 
+[1/1] blk-mq: don't handle non-flush requests in blk_insert_flush
+      commit: d92ca9d8348fb12c89eac5928bd651c3a485d7b9
+
+Best regards,
 -- 
 Jens Axboe
+
 
