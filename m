@@ -2,256 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9711C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 16:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF0EC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:00:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0EFE61057
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 16:40:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 622906113B
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:00:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234444AbhJSQmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 12:42:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35975 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234130AbhJSQmT (ORCPT
+        id S234038AbhJSRDF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 13:03:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44022 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230158AbhJSRDF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 12:42:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634661606;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2rc5ZXQmK9kKYJDi1YzawO6EnOKTupbA3b+o84caZ7c=;
-        b=YtGl3MoZNAjDSOGbWeNt4dKDaYLEiQsNroEKbUZV1Zw6+W0AF4mt57Ic8ky+spRhQKuBld
-        XCdLuHKGMtfkOq2woTniC9O53hnrCwMEfSmldTrBG8WkjHrJtYjp2ipEMRnrlpHk+Gme6I
-        67OqfC8NOWSER0Ze5c0lqJDGfjy/JhM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-PU8UiIgeOeSUr6uAHZ2kHQ-1; Tue, 19 Oct 2021 12:40:02 -0400
-X-MC-Unique: PU8UiIgeOeSUr6uAHZ2kHQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 006261023F4D;
-        Tue, 19 Oct 2021 16:40:00 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3ED599CF;
-        Tue, 19 Oct 2021 16:39:27 +0000 (UTC)
-Date:   Wed, 20 Oct 2021 00:39:22 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YW70uklcBWrmJIn8@T590>
-References: <YWeR4moCRh+ZHOmH@T590>
- <YWiSAN6xfYcUDJCb@bombadil.infradead.org>
- <YWjCpLUNPF3s4P2U@T590>
- <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
- <YWk9e957Hb+I7HvR@T590>
- <YWm68xUnAofop3PZ@bombadil.infradead.org>
- <YWq3Z++uoJ/kcp+3@T590>
- <YW3LuzaPhW96jSBK@bombadil.infradead.org>
- <YW4uwep3BCe9Vxq8@T590>
- <YW7pQKi8AlV+ZemU@bombadil.infradead.org>
+        Tue, 19 Oct 2021 13:03:05 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4D5C06161C;
+        Tue, 19 Oct 2021 10:00:52 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id e5-20020a17090a804500b001a116ad95caso382404pjw.2;
+        Tue, 19 Oct 2021 10:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5oDh6wY5mxgjBgRFmj6OpdKqeAcazi57fngXpPsPLWE=;
+        b=lRts9Q2QN5BocnpFjJPqpBK3Fxaxv4kEBoF/rHLBeWaGIYwAxlKsPIhkQCB7sNAmRj
+         UERoxRYtgRGMzur8k2GM5Y/uFfigfGYqd1hcqOryGHOglz1dxWtZNVUYhgx0tD+hilKq
+         V8/oWKqn3J2sTUprRMG/t7pLpLgbMEIoyy/+Yyr6FKU3FUd/0I1Urd0FLCulQCkhKyz8
+         4TLlu7kFoFyRAEOHLSuV4dkq9oUAiIfZuvxmu4RCbRc28MpW7etPuuxUZLeetNOmIejx
+         9MpRHH231nr3EYgiUBiOpX+2Z1SpFRYcJy86zemrDgVuzLz5/JQWebAYxJqNe4SaNEB/
+         rBww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=5oDh6wY5mxgjBgRFmj6OpdKqeAcazi57fngXpPsPLWE=;
+        b=j+/sT10d7Kmyk1NLXKKnjsj1T7gQ/gSjhAEZOG/oNP/KWILgAsbWR+8hmypzvQGScz
+         0nDq6oQfxT1r/qkz34+jqTk1IGaL0ActKV5pYnYdjMQhFUeFP9C50WEav3jDvzPetlSw
+         z4OiwZ6xY0v6fGZ+sHEtcDj6fU8Uhrp4bnbCIbcvihoOOs45KTlYvRLynlMtezOuYp/w
+         r1bjoCiE13EX68qggPPqC0qO2DBw4mxldSQD1mAUxszaI+n0kziYJP9FIsURqBzil/Z4
+         0GWaU2N3/o4C3tG8ceZ55X4W0HMOA1W0maI9DxSwjPd3LpY7ELJw5MR+NLiA4nHqUTo+
+         m5qg==
+X-Gm-Message-State: AOAM532A4F/NOZujYTYIdskqkXkb1HYdN4grMr+PRWvyvcKFHh4cuoT6
+        F9LEjn4Pa1IwADd1Q9NsSvRtdy27rn4BYw==
+X-Google-Smtp-Source: ABdhPJz2Txw4Iyq0OpTfOKDWQ5EPgZrJEgJ5wmiLGj6rOynX5rPquD2dOQEYI7PZZR0bLUwKgFAVJg==
+X-Received: by 2002:a17:902:c942:b0:13f:d1c:819a with SMTP id i2-20020a170902c94200b0013f0d1c819amr34461656pla.64.1634662851444;
+        Tue, 19 Oct 2021 10:00:51 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id i123sm16894060pfg.157.2021.10.19.10.00.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Oct 2021 10:00:50 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 19 Oct 2021 07:00:49 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, paolo.valente@linaro.org,
+        avanzini.arianna@gmail.com, fchecconi@gmail.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v3 -next 1/2] blk-cgroup: don't call
+ blk_mq_freeze_queue() in blkcg_deactivate_policy()
+Message-ID: <YW75wUcf9CcmqdD5@slm.duckdns.org>
+References: <20211019024132.432458-1-yukuai3@huawei.com>
+ <20211019024132.432458-2-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YW7pQKi8AlV+ZemU@bombadil.infradead.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20211019024132.432458-2-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 08:50:24AM -0700, Luis Chamberlain wrote:
-> On Tue, Oct 19, 2021 at 10:34:41AM +0800, Ming Lei wrote:
-> > On Mon, Oct 18, 2021 at 12:32:11PM -0700, Luis Chamberlain wrote:
-> > > On Sat, Oct 16, 2021 at 07:28:39PM +0800, Ming Lei wrote:
-> > > > On Fri, Oct 15, 2021 at 10:31:31AM -0700, Luis Chamberlain wrote:
-> > > > > On Fri, Oct 15, 2021 at 04:36:11PM +0800, Ming Lei wrote:
-> > > > > > On Thu, Oct 14, 2021 at 05:22:40PM -0700, Luis Chamberlain wrote:
-> > > > > > > On Fri, Oct 15, 2021 at 07:52:04AM +0800, Ming Lei wrote:
-> > > > > > ...
-> > > > > > > > 
-> > > > > > > > We need to understand the exact reason why there is still cpuhp node
-> > > > > > > > left, can you share us the exact steps for reproducing the issue?
-> > > > > > > > Otherwise we may have to trace and narrow down the reason.
-> > > > > > > 
-> > > > > > > See my commit log for my own fix for this issue.
-> > > > > > 
-> > > > > > OK, thanks!
-> > > > > > 
-> > > > > > I can reproduce the issue, and the reason is that reset_store fails
-> > > > > > zram_remove() when unloading module, then the warning is caused.
-> > > > > > 
-> > > > > > The top 3 patches in the following tree can fix the issue:
-> > > > > > 
-> > > > > > https://github.com/ming1/linux/commits/my_v5.15-blk-dev
-> > > > > 
-> > > > > Thanks for trying an alternative fix! A crash stops yes, however this
-> > > > 
-> > > > I doubt it is alternative since your patchset doesn't mention the exact
-> > > > reason of 'Error: Removing state 63 which has instances left.', that is
-> > > > simply caused by failing to remove zram because ->claim is set during
-> > > > unloading module.
-> > > 
-> > > Well I disagree because it does explain how the race can happen, and it
-> > > also explains how since the sysfs interface is exposed until module
-> > > removal completes, it leaves exposed knobs to allow re-initializing of a
-> > > struct zcomp for a zram device before the exit.
-> > > 
-> > > > Yeah, you mentioned the race between disksize_store() vs. zram_remove(),
-> > > > however I don't think it is reproduced easily in the test because the race
-> > > > window is pretty small, also it can be fixed easily in my 3rd path
-> > > > without any complicated tricks.
-> > > 
-> > > Reproducing for me is... extremely easy.
-> > 
-> > In my observation, failing zram_remove() is extremely easy to trigger, which
-> > is caused by reset_store() which sets ->reclaim as true, so
-> > zram_remove() is failed and zram_reset_device() is bypassed , then the
-> > failure of 'Error: Removing state 63 which has instances left.' is caused.
-> > 
-> > We are in same page?
-> 
-> The actual first issue is the CPU hotplug remove callback is long gone and
-> in the meantime we allow a race to add a new "instance", in the zram
-> driver's case a cpu struct zcomp instance though the sysfs interface.
-> 
-> Regardless of if zram_remove() can fail or not, the above race needs to
-> be addressed.
-> 
-> > > > Not dig into details of your patchset via grabbing module reference
-> > > > count during show/store attribute of kernfs which is done in your patch
-> > > > 9, but IMO this way isn't necessary:
-> > > 
-> > > That's to address the deadlock only.
-> > > 
-> > > > 1) any driver module has to cleanup anything which may refer to symbols
-> > > > or data defined in module_exit of this driver
-> > > 
-> > > Yes, and as the cpu multistate hotplug documentation warns (although
-> > > such documentation is kind of hidden) that driver authors need to be
-> > > careful with module removal too, refer to the warning at the end of
-> > > __cpuhp_remove_state_cpuslocked() about module removal.
-> > 
-> > It is zram's bug. zram has to clean everything in module_exit(),
-> > unfortunately zram_remove() can be failed when calling from
-> > module_exit() because ->claim is set as true by reset_store(), then
-> > zram_reset_device()(->zcomp_destroy) isn't called, and this failure should
-> > not happen when unloading module, should it?
-> 
-> You're addressing a possible failig zram_remove() while I address not
-> allowing entry to muck with the zram driver at all once we're bailing
-> on module removal.
-> 
-> > > > 2) device_del() is often done in module_exit(), once device_del()
-> > > > returns, no any new show/store on the device's kobject attribute
-> > > > is possible.
-> > > 
-> > > Right and if a syfs knob is exposed before device_del() completely
-> > > and is allowed to do things, the driver should take care to prevent
-> > > races for CPU multistate support. The small state machine I added ensures
-> > 
-> > What is the race for CPU multistate support? If you mean 'Error: Removing
-> > state 63 which has instances left.', it is zram's bug since zram has to
-> > cleanup everything in module_exit().
-> 
-> Yes. And it is what my out of tree yet Acked patch, 'zram: fix     
-> crashes with cpu hotplug multistate' does.
+Hello,
 
-Unfortunately that patch adds new deadlock between hot_remove_store() and
-disksize_store() & others, see my below comment.
+On Tue, Oct 19, 2021 at 10:41:31AM +0800, Yu Kuai wrote:
+> blkcg_deactivate_policy() can be called from either
+> blk_cleanup_queue() for all policies or elevator_switch() for bfq
+> policy. Thus there is no need to freeze queue in
+> blkcg_deactivate_policy() since the caller freeze the queue aready.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-> 
-> > > we don't run over any expectations from cpu hotplug multistate support.
-> > > 
-> > > I've *never* suggested there cannot be alternatives to my solution with
-> > > the small state machine, but for you to say it is incorrect is simply
-> > > not right either.
-> > > 
-> > > > 3) it is _not_ a must or pattern for fixing bugs to hold one lock before
-> > > > calling device_del(), meantime the lock is required in the device's
-> > > > attribute show()/store(), which causes AA deadlock easily. Your approach
-> > > > just avoids the issue by not releasing module until all show/store are
-> > > > done.
-> > > 
-> > > Right, there are two approaches here:
-> > > 
-> > > a) Your approach is to accept the deadlock as a requirement and so
-> > > you would prefer to implement an alternative to using a shared lock
-> > > on module exit and sysfs op.
-> > 
-> > wrt. in-tree zram, there is neither any deadlock in linus tree, nor after
-> > applying my 3 patches. If you think there is, please share us the code
-> > or lockdep warning.
-> 
-> Right, 'zram: fix crashes with cpu hotplug multistate' is not yet
-> merged, my approach to fixing that does add a lock use on module removal
-> which does introduce a possible deadlock with syfs, which is later addressed
-> generically between sysfs and module removal for all drivers.
-> 
-> > > b) While I address such a deadlock head on as I think this sort of locking
-> > > be allowed for two reasons:
-> > >    b1) as we never documented such requirement otherwise.
-> > >    b2) There is a possibility that other drivers already exist too
-> > >        which *do* use a shared lock on module removal and sysfs ops
-> > >        (and I just confirmed this to be true)
-> > 
-> > The 'deadlock' is actually caused by your out-of-tree patch of 'zram: fix
-> > crashes with cpu hotplug multistate' which adds mutex_lock(zram_index_mutex)
-> > in destroy_devices().
-> 
-> Yes yes, but you are completely throwing out the window that other
-> possible deadlocks can exist in the kernel *and* that *new* cases of
-> the deadlock can easily also be added!
-> 
-> > We can fix this issue easily without needing the global lock, please see the
-> > attached(pre-V2) patch.
-> 
-> So far your patches do not fix the issues though...
-> 
-> > > So I *really* don't think it is wise for us to simply accept this new
-> > > found deadlock as a *new* requirement, specially if we can fix it easily.
-> > > 
-> > > A cursory review using Coccinelle potential issues with mutex lock
-> > > directly used on module exit (so this doesn't cover drivers like zram
-> > > which uses a routine and then grabs the lock through indirection) and a
-> > > sysfs op shows these drivers are also affected by this deadlock:
-> > > 
-> > >   * arch/powerpc/sysdev/fsl_mpic_timer_wakeup.c
-> > 
-> > In fsl_wakeup_sys_exit(), device_remove_file() is called before
-> > acquiring &sysfs_lock, so there shouldn't be such AA deadlock.
-> > 
-> > >   * lib/test_firmware.c
-> > 
-> > Yeah, there is the AA deadlock risk, but it should be fixed by moving
-> > misc_deregister() out of &test_fw_mutex.
-> 
-> And just like that you are ignoring other possible uses in the kernel
-> which might have similar deadlocks.
-> 
-> So do you want to take the position:
-> 
-> Hey driver authors: you cannot use any shared lock on module removal and
-> on sysfs ops?
+I would just keep the calls. The operation requires the q to be frozen and
+there isn't a good way to annotate that the caller must be holding a usage
+count, so it's useful even just as documentation.
 
-IMO, yes, in your patch of 'zram: fix crashes with cpu hotplug multistate',
-when you added mutex_lock(zram_index_mutex) to disksize_store() and
-other attribute show() or store() method. You have added new deadlock
-between hot_remove_store() and disksize_store() & others, which can't be
-addressed by your approach of holding module refcnt.
+Thanks.
 
-So far not see ltp tests covers hot add/remove interface yet.
-
-
-Thanks, 
-Ming
-
+-- 
+tejun
