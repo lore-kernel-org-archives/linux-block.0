@@ -2,93 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D90BBC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 23:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108B4C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 00:14:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4D6461212
-	for <linux-block@archiver.kernel.org>; Mon, 18 Oct 2021 23:55:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7A086134F
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 00:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231454AbhJRX6D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 19:58:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbhJRX6D (ORCPT
+        id S229702AbhJSAQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 20:16:45 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:60021 "EHLO
+        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229529AbhJSAQo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 19:58:03 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87055C06161C
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 16:55:51 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id s1so10588658plg.12
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 16:55:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+LEQ+tebO6ATn4tiHRUJvzNAZiN6hFiHNtKZ2lhn1ko=;
-        b=HeeVbqaIDPd56hEMsRVcJbTyAPqIdRLjylODoXjY9vMIu40XRnyzvfM8BW1mWZxwaN
-         XTcTk0YWkrJwcy4bNbyUdjcfcaBPIeseIIzOtFfhlqeJKkSxb9mCtXJEciZJ2SGZ0iJb
-         Ig1Ld9mZDGGLshwE16AOQHqzcZJwsUPZTe2R4jKwrSV52kl9cMjpM5ONVCNDPhJZp7y/
-         kagGo87Au6FNWg24D97g6P67sNXGpW5veVlUvyS0cpiOtiCXOBHDxk7vz+1SpVW+omOq
-         IOEdxRNNwpaG6MX2co1lvNABTbGY+BlgnkV2rOZBrFmR0DJhFV6AgjbMNrhB3B5SULC/
-         eUcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+LEQ+tebO6ATn4tiHRUJvzNAZiN6hFiHNtKZ2lhn1ko=;
-        b=Q5hgBxmpVCFi8XU9k7h5lvxII+6V9sPGO3os1tBtz2HtrXRXHtIShtjTEnhDC+I+yO
-         9wWY5yWA5Py8FL+l0UQnAeKYWkBXAYLA88jQcEL+vAcur7BOvOz5OpLwf2RMId4APcmZ
-         DAFfldIBwiUOnRdmM0zBuqJC+oI/W7qt+yCZh/4Yz8SgeQe7UaOyqd4u7o/rlTVBq7Xz
-         uEk+RLIHLoduNXDwTvMln0skDrhhAv0Bv+5lKjlQX3c6RwXW0ZkSPIiVSe53r3noaAjr
-         M/KwAOFTRfVj3poLfAE2+beONpbGQOlGGow0XAJWS8h+RVTgi8ctQXG+idhb3erTkRr8
-         GVvA==
-X-Gm-Message-State: AOAM530w2KAQvGm+XFo3xgTC7noQ25O4OUWLaFHJEh2pv+NrHeOTg7Lk
-        BASos7E3cF65PPbG8fBtDbcY7OraEALDdw==
-X-Google-Smtp-Source: ABdhPJyx1HIPXWmqahtD9u6xSMJ2yEce+hfDoyEbK5Yg/X752xKJqAzrs4ARzaIWpYv5OlgP18JqCQ==
-X-Received: by 2002:a17:90b:4c86:: with SMTP id my6mr2369535pjb.203.1634601350874;
-        Mon, 18 Oct 2021 16:55:50 -0700 (PDT)
-Received: from relinquished.localdomain ([2620:10d:c090:400::5:b911])
-        by smtp.gmail.com with ESMTPSA id t1sm14088911pfe.51.2021.10.18.16.55.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Oct 2021 16:55:50 -0700 (PDT)
-Date:   Mon, 18 Oct 2021 16:55:48 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-m68k@vger.kernel.org,
+        Mon, 18 Oct 2021 20:16:44 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 64F255C0276;
+        Mon, 18 Oct 2021 20:14:32 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 18 Oct 2021 20:14:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=+Ap1jq
+        gfpVtDi3jf9yBMD5H1mUkWgpHT9h4jyVoyJz0=; b=Bc4hYSthPgzMgo3KzHoBhA
+        5dj8xsAzatX0qUJOwIFSRpeFmFKKftEPo8/mbmqhT7c8xKIDvdZzpYEstNspvFQx
+        0T7Yo603noiJihxSHlyp73T5+b1n0nOx3dFMJtlMOdczoSkn2X3x6RiCtQUX2QGm
+        ycPIi0VxnCxcXCXKSlbXXpOlDIKpBfizxS585NKxisDBBP+zksjQjxpCxwoYRrrp
+        Zmx5OLfsspSTkzfnLv7x+RV1qXCHtqTIKYuIlCsMylL54B0zgv6sJXSD0und41NO
+        REfApk0i+thRWRRgD6jte8e7IjLtwhuFqrDFATSxnI3nNK2+KUiVQ5GcHsp1AdcA
+        ==
+X-ME-Sender: <xms:6A1uYUBSF6Rj3SE6BTKmWftrtoQwlrKsPnC4WhizLwFa482Y6SILqw>
+    <xme:6A1uYWihyWzE5u687N_Vd7juj49043AJSyAoyz2Wz7of2Yuxpz55cf1w6LILzHLbe
+    TmpTOz84948a76k84c>
+X-ME-Received: <xmr:6A1uYXmBHWx2H3_83rv4sHBiSee8rYJtJHqOUFM8Bsv9l0pnIfiu_BgUVW7JUW1S_ggHADzpVhRLSMwjAAbQbV8Qnq0pclXh5DY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrvddvuddgfeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffujgfkfhggtgesthdtredttddtvdenucfhrhhomhephfhinhhnucfv
+    hhgrihhnuceofhhthhgrihhnsehlihhnuhigqdhmieekkhdrohhrgheqnecuggftrfgrth
+    htvghrnhepkeevvedtkeeftdefhfdvgfelleefhfdtfeeiteejjeevgffhudefjeekhefg
+    uedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehfthhhrghinheslhhinhhugidqmheikehk
+    rdhorhhg
+X-ME-Proxy: <xmx:6A1uYaxCUhnA_bCdbvJiUKlVQN526VAfKIgbr9ko4QFtf0DXNuzY8Q>
+    <xmx:6A1uYZSvwIr66NYntJ9C578VFovfI7OQJm9TDxd-gn_0jlfREADVuw>
+    <xmx:6A1uYVZWIOea32p_Q_fP_J8Goamu7CBiVeH2-Z-dIU60SE3w2rkDYg>
+    <xmx:6A1uYbfw4KrqEJyLJEDy_RU_zrwYVflm5cFjG4BLxNR_8zKP1vhWlg>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 18 Oct 2021 20:14:29 -0400 (EDT)
+Date:   Tue, 19 Oct 2021 11:14:36 +1100 (AEDT)
+From:   Finn Thain <fthain@linux-m68k.org>
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     Michael Schmitz <schmitzmic@gmail.com>, linux-m68k@vger.kernel.org,
         geert@linux-m68k.org, linux-block@vger.kernel.org,
         Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 Subject: Re: [PATCH RFC] block - ataflop.c: fix breakage introduced at blk-mq
  refactoring
-Message-ID: <YW4JhN/oin89P+TC@relinquished.localdomain>
-References: <20211018222157.12238-1-schmitzmic@gmail.com>
- <8d60483d-3cd6-5df7-8db6-7a8b9ce462e3@kernel.dk>
- <791e1173-4794-a547-2c84-112cc6627a1f@gmail.com>
+In-Reply-To: <460a172c-6103-3839-eecc-a193d1cc208f@kernel.dk>
+Message-ID: <a4e827c-9163-9fff-dd20-cdd44432fda5@linux-m68k.org>
+References: <20211018222157.12238-1-schmitzmic@gmail.com> <8d60483d-3cd6-5df7-8db6-7a8b9ce462e3@kernel.dk> <97323ce2-4f5c-3af2-83ac-686edf672aea@linux-m68k.org> <7f64bd89-e0a5-8bc9-e504-add00dc63cf6@kernel.dk> <604778bc-816a-3f2e-d2ad-d39d7f7f230@linux-m68k.org>
+ <460a172c-6103-3839-eecc-a193d1cc208f@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <791e1173-4794-a547-2c84-112cc6627a1f@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 12:35:27PM +1300, Michael Schmitz wrote:
-> Hi Jens,
-> 
-> On 19/10/21 11:30, Jens Axboe wrote:
-> > Was going to ask if this driver was used by anyone, since it's taken 3
-> 
-> Can't honestly say - I'm not following any other user forum than linux-m68k
-> (and that's not really a user forum either).
-> 
-> > years for the breakage to be spotted... In all fairness, it was pretty
-> > horribly broken before the change too (like waiting in request_fn, under
-> > a lock).
-> 
-> In all fairness, it was a pretty broken design, but it did at least work. I
-> concede that it was unmaintainable in its old form, and still largely is,
-> just surprised that I didn't see a call for testing on linux-m68k,
-> considering the committer realized it probably wouldn't work.
+On Mon, 18 Oct 2021, Jens Axboe wrote:
 
-I recall cc'ing some people that I hoped could point me at the right
-place to test this, but I don't think I was aware of the linux-m68k
-mailing list.
+> 
+> Oh please, can we skip the empty words, this is tiresome and 
+> unproductive. Since you apparently have a much better grasp on this than 
+> I do, answer me this:
+> 
+> 1) How many users of ataflop are there?
+> 
+> 2) How big of a subset of that group are capable of figuring out where
+>    to send a bug report?
+> 
+
+Both good questions. Here are some more.
+
+3) How many users is sufficient to justify the cost of keeping ataflop 
+around?
+
+4) How long is the user count allowed to remain below that threshold, 
+before the code is removed?
+
+> By your reasoning, any bug would go unreported for years, no matter how 
+> big the user group is. That is patently false.
+
+No, those are your words, not mine.
+
+> It's most commonly a combination of how hard it is to hit, and how many 
+> can potentially hit it. Yes, some people will work around a bug, but 
+> others will not. Hence a subset of people that hit it will report it. 
+> Decades of bug reports have proven this to be true on my end.
+> 
+
+I agree that a bug report count can be a proxy for a user count, but there 
+is always a confidence level attached to such statistical reasoning, which 
+can and should be quantified.
+
+> Nobody has reported the ataflop issue in 3 years. Either these people 
+> never upgrade (which may be true), or none of them are using ataflop. 
+> It's as simple as that.
+> 
+
+It is when you over-simplify. The mere fact that Michael is working on 
+this driver publicly will probably increase its user base.
+
+I think you and I both know that code with non-zero user count regularly 
+gets removed. I think the main criterion for keeping code around has 
+always been the expense.
+
+So I help with API modernization for the drivers I'm responsible for, to 
+make them cheaper to keep around. Other people concerned about the cost of 
+keeping code in the tree should look at drivers which only work on devices 
+with vendor kernels. And they should consider the size of those drivers.
+
+When kernel.org has dropped all the code in that category, then sure, 
+let's worry about a few tiny old legacy drivers.
