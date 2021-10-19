@@ -2,244 +2,221 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CF7C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 09:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63677C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 09:52:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C29ED60C51
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 09:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CCA960FD8
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 09:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235082AbhJSJpt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 05:45:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48093 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234764AbhJSJps (ORCPT
+        id S231652AbhJSJyx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 05:54:53 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:46232 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234808AbhJSJyx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 05:45:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634636615;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M9aTZbqcvn/jav246EtrvcBxJ0XUz1/bgWtUWvk310E=;
-        b=Bgs4GtQ8ISjjEaSmzCB9cxKThRsTkybNeWHjhuFilUUulwicaA4fSKsW6ybtoYNO8s7K9N
-        qCQBbzQHJiovoqwOjZ0D/2YLEXiWy2eDQUPfLHbs4E2nEtMGcRyYhO74rTeei7x/UNTJlg
-        uvTpq+OyYcZni6h8E3bnorPT13gd0Ro=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-aJInQkXdOeudS-am28jCIg-1; Tue, 19 Oct 2021 05:43:34 -0400
-X-MC-Unique: aJInQkXdOeudS-am28jCIg-1
-Received: by mail-oi1-f199.google.com with SMTP id w26-20020a056808019a00b00298e7b4523cso1548325oic.9
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 02:43:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=M9aTZbqcvn/jav246EtrvcBxJ0XUz1/bgWtUWvk310E=;
-        b=RnzY2o8Yqj6n304VnGcJ7sc5WOY2l30wxyC73xx0vqtk8psfM+5xvjr5aRUmAe1Ij6
-         IohKerPeHARvU6flAiWhsxmI2eyleaxh3MdeIJgBoa0PAw+lIAxuT5tE+/pHMittaTn7
-         dNALZRAZBnkdhUqRsZrcKcgwTNQdg61vdg6S558gk0cSEBesCwsuYCQ0liH7UlADsMcm
-         YeFFwiJeU1rVpRXWpaLjvjBADomWPQ3vatb5cCzIyL+6WjKflczAJj+IQ5uTNktlvVQ3
-         Hvis1nAD5IiGKLIJvFwmo59bPyUr3H9B8Wchd3rlDsoWV7JK4yJ3QhgQTR+DfgGhFlAI
-         JQzA==
-X-Gm-Message-State: AOAM532SPzp66SnwmfraWbXqeIHH99UiOVG2h7hVih0a3t3wYF0PgxND
-        5XFSBmdm3S6hD3Ny23cenkxZBCyBXQ3QMKPbFtZejF+z/2uppc74ZHSAl6+dvCah5zrBK62DoQk
-        xiDiN0qaJB7H3r4wxTS1pscnKo0XRjr/+1KfJBWw=
-X-Received: by 2002:a05:6830:3184:: with SMTP id p4mr4293498ots.219.1634636612889;
-        Tue, 19 Oct 2021 02:43:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdozApRAUPNbnCiReyBxV1/j32YV/pBeWyB1tmBEizCGrBAWRkDLsDvXuQdDAk0khFx4krw4ZHx5MiTNF0Mxc=
-X-Received: by 2002:a05:6830:3184:: with SMTP id p4mr4293473ots.219.1634636612619;
- Tue, 19 Oct 2021 02:43:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <cki.1BB6AA01C6.FWO6ZHIQNG@redhat.com> <CAHj4cs_3MSAHXaxwwCreLhpL7c+Tak4+y-Hv_Ld7kDT0ZbCRtw@mail.gmail.com>
- <8543f0bf-66b8-8688-313a-0d9e21fce184@kernel.dk> <CAHj4cs8ooypxnhqmdRiJ56i0V0mrxnpo7VYy6RAndaQ=qTbpug@mail.gmail.com>
-In-Reply-To: <CAHj4cs8ooypxnhqmdRiJ56i0V0mrxnpo7VYy6RAndaQ=qTbpug@mail.gmail.com>
-From:   Bruno Goncalves <bgoncalv@redhat.com>
-Date:   Tue, 19 Oct 2021 11:43:21 +0200
-Message-ID: <CA+QYu4rK8csEBjKNxkT0_TeB-NxySYq8gxK8xzCE6uCDRZrcSw@mail.gmail.com>
-Subject: =?UTF-8?Q?Re=3A_=F0=9F=92=A5_PANICKED=3A_Waiting_for_review=3A_Test_report_f?=
-        =?UTF-8?Q?or_kernel_5=2E15=2E0=2Drc6_=28block=2C_1983520d=29?=
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        skt-results-master@redhat.com,
-        CKI Project <cki-project@redhat.com>,
-        Changhui Zhong <czhong@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 19 Oct 2021 05:54:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1634637160; x=1666173160;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=RoA8xIawJMYkqI0miBBeFEFPNJ3pyDgKESuMqpt2i+4=;
+  b=I2Rc95AXwygrvpb9AiXiu7laKf5Br9F7bditUaw2sGKLkd/3HJO4saRT
+   X90nBxbfQe+3VC/ht2xlOX+1FV7VlS64/pgESMNSVDnNwYGupZks8Wh6E
+   kM/0lUnr572xj2sMbM9FnTJKk9+d/9JjrWFWjWVIFUGfBfhFbXoWzOR91
+   4KUhr0gF09Xu2wdLKYPV/z09NScAh4ArzUAqyP8+ruDd5AL6flN1LGAK9
+   dwsRIJY4mWdRpgRRSRFOpBhHKKjmxFBodka+bd6u1w332YZo+rUquIRD0
+   AlXX7SfhnLeeWWbVI3U1jhUOuWZOq6cISEL3NaZ2RPx+Ltc8t3PFcWoD9
+   w==;
+X-IronPort-AV: E=Sophos;i="5.85,384,1624291200"; 
+   d="scan'208";a="182309483"
+Received: from mail-bn8nam11lp2177.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.177])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Oct 2021 17:52:39 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wk0D0qTJ9l52rqIIuuD6sQaUoax0oqmLeYXAdDl626nTRjSjs2oI3eSS71I0I+d0AM3hB/lJoECsMa6ynDl7kVpenvP4cChUtyhp3lIJ+LIhhyGsKBW1Mltf69/MXwX0NlIdfa3JXtC2y4t+siQij2hnbl3BCvLvUGCqoRv9VW+Vk8lTtGvOmbjK7jPpYRCcfmRuN9zkBIIAoYLOCX6hnbY0j9jPRZLlewX1FdPJNTuYjLHVgrx/DylelM9b9Bp1epE3YKzrBR/5SKtrBIv1hQA9Dt253Hfk4X56W2NbGNPMwjetdtfcXnLvyt8jBzXS/Be48ae3N/4sGRV8V4Vfrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xsoc/E7Jh0BUwCElXxMtXnLwsa291GfR060OSWFRNFg=;
+ b=HM6y4ofIYnp2Dl0+lJzwDvRyItO9gl7lRpxRBOgHtl7wtGenF1t4lmqtCXs61C0eBAhlKNdOm52wERGzJtaCyz6qg5jM5E7tCGBPkYUDj+51x5EQdd0WdRVqKcIkxr5AV+E2vyzKeUA2UUnIjAySQGj14gvS5Q9rBbxSzxTafprSZaVbn12ai6LONMOhRYgkgdCF/M0pGsi0sh2l9U1dU4kMhTSXU2F19qOHWzkx2bS5iu37SAz7JSw4sEhn7hKQisL5BHKvvfnGuIRkSRWJJgXyyjQqTGCb0XCt+1JUcuDPo6Bf7TwqCyRdvs9qUNgq0m6AIY/sc9OFZpSAJLAMLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xsoc/E7Jh0BUwCElXxMtXnLwsa291GfR060OSWFRNFg=;
+ b=OO9jOYN/ncJMP1hAZPZZt90aF0yERT5FXf7Cf4FKLikl3jtmeP+rA7IETT6Axb2YvGcDgdj+r/mfF7xAjXu+EqCXaNmlJPWb/+cMidnqC6aEQqmUHOhD5gWulig+eMb5E0N+mIjyllcd0+B51ltMRtZ6AQyVSGzDNmrm4ULZ1fQ=
+Received: from SJ0PR04MB7184.namprd04.prod.outlook.com (2603:10b6:a03:291::7)
+ by BYAPR04MB5846.namprd04.prod.outlook.com (2603:10b6:a03:10e::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.18; Tue, 19 Oct
+ 2021 09:52:38 +0000
+Received: from SJ0PR04MB7184.namprd04.prod.outlook.com
+ ([fe80::30f6:c28:984d:bd79]) by SJ0PR04MB7184.namprd04.prod.outlook.com
+ ([fe80::30f6:c28:984d:bd79%5]) with mapi id 15.20.4608.018; Tue, 19 Oct 2021
+ 09:52:38 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Matthew Wilcox <willy@infradead.org>
+CC:     Christoph Hellwig <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH] block: Fix partition check for host-aware zoned block
+ devices
+Thread-Topic: [PATCH] block: Fix partition check for host-aware zoned block
+ devices
+Thread-Index: AQHXwWl0GeeFOFPXu0aKIwPL+z+ZR6vVC30AgAClQQCABGqHgA==
+Date:   Tue, 19 Oct 2021 09:52:37 +0000
+Message-ID: <20211019095237.ndbi3xarxkddmfut@shindev>
+References: <20211015020740.506425-1-shinichiro.kawasaki@wdc.com>
+ <20211016043450.GA27231@lst.de> <YWrhCiWGjfxqAca2@casper.infradead.org>
+In-Reply-To: <YWrhCiWGjfxqAca2@casper.infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 41fa6f92-b78c-4905-4577-08d992e62f1c
+x-ms-traffictypediagnostic: BYAPR04MB5846:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB5846602481A1F722DD747BCDEDBD9@BYAPR04MB5846.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 6e5QKrdZCAcvOeqxuHyDjym2pbXB0G9mGM88XT2o2Bsh/bQVVSZ9Gcr00y8V7NLhnc+jH8uaNffRppD+eRyL6HXAlUxj/HEbKeH3884N6JnIk6k2NVT2SnYuVNoLIoJMh1u70kYtDRNU0aLwIuB6izW1VDfLNC395zS5xo4wnoY7jGbbMaHvepDHuXzRNa9yeqjjNtfPpJ21mxIvRW1uuof2EC8Ttmwz6gY/hTzLshVaoJqbo9HmaaMvinJhXySflhGgo8wXbGcwM8AngivW0GSwuuhYG3S791mqgBkP9TRiaPA3MINRnnMBJ+7R9DIc8P5521SemRUhkk002D6hdiLh6YKsjLYgVIbRNNhWjVH9znWKAUvIyItIib4kF5EduhxaWwoVjQA9Zfsth8nBPGwZcb+hyL2BH5RCNvcWNGSdlShkpv/FRe/97sVpQAh4wkSs6zsVLpAtWBXGC85diOTSYYIx9h75alm7zyNUqWVx3ykDoKASWR7raUemOYbZaOdBgllyXqFz6fSiNAw10auGzOZ2v8n+QXaq9DXm/uLUHW6C+QHreSqCqrRwCSw2JNhPN+IT4+Rd7MxpQ+uNDJadoamkrkolZKAuP3Mx326WXFQMiWwTKwPzfIMBWOPd6V37Bj+4+0+5R106DHb+RgwJO6/s6GtealJQq6U0I+G3hDgq68JQyB2soSdreZVlZ9P+xBx4j1S2IkwPtLQu8g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR04MB7184.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(366004)(44832011)(1076003)(83380400001)(8676002)(26005)(38100700002)(2906002)(33716001)(186003)(71200400001)(6916009)(54906003)(8936002)(66946007)(66446008)(76116006)(91956017)(5660300002)(6486002)(122000001)(9686003)(66476007)(64756008)(82960400001)(66556008)(6506007)(38070700005)(4326008)(508600001)(6512007)(316002)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rjp2mY2zdPEMgszYg8u1OSFmTKplN25yfIev/PxkQaEeL8TseUL2R9d0Fky/?=
+ =?us-ascii?Q?laWW+RAOkNiaWEvdK2xVmEEXNXWFdFQayBEzod7Y0Sn8Ap+r7D5noEwwv9wM?=
+ =?us-ascii?Q?PqSU8p9lO/wfpt2ru8tIBqRyV0kGC7EI99Dea6Q0TV2ErIUZuVU1+Syh2SFo?=
+ =?us-ascii?Q?ZZMzpmL1SkSxESDP2Auxfl/76GxYPIIZq3Tmq40muUQtnWh5R0mcVbVy20f/?=
+ =?us-ascii?Q?PJ2I8qte71zfB6MUcBBxAhp0K0cmf63WdqPyeSAacceF4rmLWGLK1b4YhIr4?=
+ =?us-ascii?Q?MtXZGJmdA/S8IeulAODta6nQoWQx+t5zTPTVG0QsAsjor33Y7VZb7dpC4BDc?=
+ =?us-ascii?Q?UON4SewSm02rcbQKNzu1WTgQbJuv+avj3GbKaBBJCKpORpU/YXUePccWVo2m?=
+ =?us-ascii?Q?rBw/Hr/sDR3ek3Sjsl6E4PsNNoQqSwtlFcdQH5hR7o/vVa1Kk3TuVA+mX62D?=
+ =?us-ascii?Q?4vJJNYGQlhNvqohyACypGozWgEz8lU6utmUjMwdfQSgoK7f3R49qlQUv5EP0?=
+ =?us-ascii?Q?5+/pEOJW2fq5lpHmSMXZY82sHaxrw8Ilv3eJUDXesmQw1FppbijMXf2QQJx2?=
+ =?us-ascii?Q?SZqSl0Ao8X1k4e/uKrLqzGwwwzWFMLgIRFO6OqWHyFGXwRrLm3z7CYzv3zes?=
+ =?us-ascii?Q?02IM+43Md2Q4nG/ntTjPUy5gP/dFLD9PPVIjjoBJV1/i8GOW8rgIp59oDbj9?=
+ =?us-ascii?Q?ICwAGnnatlByGgQszYejkKxmE/0zzoTHsSQFF1UZuiPvs2Jxe4kHb4Oplg1Z?=
+ =?us-ascii?Q?fbrHzd05p/DnnwkwyXzph5bfibrQo53WBA7KjH2Lr9tqDwYLl/n50h9tw7cC?=
+ =?us-ascii?Q?PpJkJFC4N5WkIWf2mEsW/gSZkRJpn+4whLG9uUZGVhZgMfLgPGEphKiTjAZR?=
+ =?us-ascii?Q?RfhZmSa8W8iKkjwaK0CTdJd3Ga89tgoiOUjONwC4PVtUQyPW/Rv0iZnKsrvH?=
+ =?us-ascii?Q?g03uaSy9/QOewL1cfh1ChYQKcQkw3DFEuW8aSA1ujxaBRyRBOs7AvtA53wtN?=
+ =?us-ascii?Q?fLqI7vi2KGx9NWza6uSPEEnNTeeudzwZJd6qhS5nQceqBDkyL/DTYWRZlTdM?=
+ =?us-ascii?Q?OBkpb7gSLkeCAs/9fUZ6EELZKH4jtucZvv33jhJ9GaJR94myhVjygDhwrGYj?=
+ =?us-ascii?Q?m4RrBRI65No18k4tZahDsI+Z1wMWpG8OqkQ2GMhGHBczRvPo1osYgMesnhfL?=
+ =?us-ascii?Q?uKSAFFg8nyjeD1tteM0LY0yxbf5pVlyVn3ZdqpdCVvqa9vRvOt3a0Iajtfnm?=
+ =?us-ascii?Q?Q36tg+bAtIDnjcFyBezMsousWI0xM1sx1fH83QX0UQDcmH6tOyjXhtfyG+ix?=
+ =?us-ascii?Q?BLf9exRcy6dBycqpUSwM3Ag/FHuYpu/rFJCT5lMk+bTdUw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9719CFB8644E874C92218D08EDCC1546@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR04MB7184.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41fa6f92-b78c-4905-4577-08d992e62f1c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Oct 2021 09:52:37.8757
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +RUbgwUdO9zusdsYa7wqvJi5Dt0A3zTSNUuSn5cDccsSJSRlhxULFQyvofAcLXHZsd0PFCepltc2Ww2ZGb9qgPeZMulQgTcDY+5QikuFL6c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5846
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 5:41 AM Yi Zhang <yi.zhang@redhat.com> wrote:
->
-> On Tue, Oct 19, 2021 at 10:52 AM Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > On 10/18/21 8:13 PM, Yi Zhang wrote:
-> > > Hello
-> > >
-> > > With this commit, the servers boots with NULL pointer[1], pls help ch=
-eck it.
-> > >
-> > >>        Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/=
-axboe/linux-block.git
-> > >>             Commit: 1983520d28d8 - Merge branch 'for-5.16/io_uring' =
-into for-next
-> > > [1]
-> > > [    8.614036] Kernel attempted to read user page (f) - exploit
-> > > attempt? (uid: 0)
-> > > [    8.614071] BUG: Kernel NULL pointer dereference on read at 0x0000=
-000f
-> > > [    8.614099] Faulting instruction address: 0xc00000000093b5b4
-> > > [    8.614118] Oops: Kernel access of bad area, sig: 11 [#1]
-> > > [    8.614143] LE PAGE_SIZE=3D64K MMU=3DRadix SMP NR_CPUS=3D2048 NUMA=
- PowerNV
-> > > [    8.614192] Modules linked in: zram ip_tables ast i2c_algo_bit
-> > > drm_vram_helper drm_kms_helper syscopyarea sysfillrect sysimgblt
-> > > fb_sys_fops cec drm_ttm_helper ttm drm vmx_crypto crc32c_vpmsum
-> > > i2c_core drm_panel_orientation_quirks
-> > > [    8.614285] CPU: 52 PID: 0 Comm: swapper/52 Not tainted 5.15.0-rc6=
-+ #1
-> > > [    8.614323] NIP:  c00000000093b5b4 LR: c00000000093b5a4 CTR: c0000=
-00000972c50
-> > > [    8.614371] REGS: c000000018d3b430 TRAP: 0300   Not tainted  (5.15=
-.0-rc6+)
-> > > [    8.614409] MSR:  9000000000009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR:
-> > > 44004284  XER: 00000000
-> > > [    8.614464] CFAR: c000000000972cd0 DAR: 000000000000000f DSISR:
-> > > 40000000 IRQMASK: 1
-> > > [    8.614464] GPR00: c00000000093b5a4 c000000018d3b6d0
-> > > c0000000028aa100 c000000044582a00
-> > > [    8.614464] GPR04: 00000000ffff8e2c 0000000000000001
-> > > 0000000000000004 c000000001212930
-> > > [    8.614464] GPR08: 00000000000001d7 0000000000000007
-> > > c000000044361f80 0000000000000000
-> > > [    8.614464] GPR12: c000000000972c50 c000001ffffa7200
-> > > 0000000000000000 0000000000000100
-> > > [    8.614464] GPR16: 0000000000000004 0000000004200042
-> > > 0000000000000000 0000000000000001
-> > > [    8.614464] GPR20: c0000000028d3a00 c000000002167888
-> > > 00000000ffff8e2d c000000002167888
-> > > [    8.614464] GPR24: c0000000021f0580 0000000000000001
-> > > c000000044582ae0 0000000000000801
-> > > [    8.614464] GPR28: c000000044361f80 c000000044361f80
-> > > c00000003b81f800 c000000044582a00
-> > > [    8.614852] NIP [c00000000093b5b4] blk_mq_free_request+0x74/0x210
-> > > [    8.614898] LR [c00000000093b5a4] blk_mq_free_request+0x64/0x210
-> > > [    8.614942] Call Trace:
-> > > [    8.614961] [c000000018d3b6d0] [c00000000093b8ec]
-> > > __blk_mq_end_request+0x19c/0x1d0 (unreliable)
-> > > [    8.615020] [c000000018d3b710] [c00000000092fdfc]
-> > > blk_flush_complete_seq+0x1ac/0x3d0
-> > > [    8.615077] [c000000018d3b770] [c0000000009302dc] flush_end_io+0x2=
-bc/0x390
-> > > [    8.615122] [c000000018d3b7d0] [c00000000093b7cc]
-> > > __blk_mq_end_request+0x7c/0x1d0
-> > > [    8.615174] [c000000018d3b810] [c000000000c20684]
-> > > scsi_end_request+0x124/0x270
-> > > [    8.615228] [c000000018d3b860] [c000000000c21458]
-> > > scsi_io_completion+0x1f8/0x740
-> > > [    8.615250] [c000000018d3b900] [c000000000c13e14]
-> > > scsi_finish_command+0x134/0x190
-> > > [    8.615292] [c000000018d3b990] [c000000000c21068] scsi_complete+0x=
-a8/0x200
-> > > [    8.615345] [c000000018d3ba10] [c000000000939870] blk_complete_req=
-s+0x80/0xa0
-> > > [    8.615409] [c000000018d3ba40] [c00000000115dfe0] __do_softirq+0x1=
-70/0x3fc
-> > > [    8.615475] [c000000018d3bb30] [c00000000015df38] __irq_exit_rcu+0=
-x168/0x1a0
-> > > [    8.615535] [c000000018d3bb60] [c00000000015e140] irq_exit+0x20/0x=
-40
-> > > [    8.615583] [c000000018d3bb80] [c000000000054670]
-> > > doorbell_exception+0x120/0x300
-> > > [    8.615616] [c000000018d3bbc0] [c000000000016cc4]
-> > > replay_soft_interrupts+0x1e4/0x2c0
-> > > [    8.615639] [c000000018d3bda0] [c000000000016ed8]
-> > > arch_local_irq_restore+0x138/0x1a0
-> > > [    8.615694] [c000000018d3bdd0] [c000000000de1714]
-> > > cpuidle_enter_state+0x104/0x540
-> > > [    8.615741] [c000000018d3be30] [c000000000de1bec] cpuidle_enter+0x=
-4c/0x70
-> > > [    8.615795] [c000000018d3be70] [c0000000001aef18] do_idle+0x2f8/0x=
-3f0
-> > > [    8.615839] [c000000018d3bf00] [c0000000001af238] cpu_startup_entr=
-y+0x38/0x40
-> > > [    8.615901] [c000000018d3bf30] [c00000000005be6c] start_secondary+=
-0x29c/0x2b0
-> > > [    8.615969] [c000000018d3bf90] [c00000000000d254]
-> > > start_secondary_prolog+0x10/0x14
-> > > [    8.616025] Instruction dump:
-> > > [    8.616074] 41820048 e93d0008 e9290000 e9890068 2c2c0000 41820010
-> > > 7d8903a6 4e800421
-> > > [    8.616136] e8410018 e93f00d8 2c290000 41820140 <e8690008> 4bff6b9=
-1
-> > > 60000000 39400000
-> > > [    8.616184] ---[ end trace cc3215be892e1be7 ]---
-> > > [    8.644628] systemd-journald[1408]: Received client request to
-> > > flush runtime journal.
-> > > [  OK  ] Finished Create Static Device Nodes in /dev.
-> > >          Starting Rule-based Manage=E2=80=A6for Device Events and Fil=
-es...
-> > > [  OK  ] Finished Coldplug All udev Devices.
-> > >          Starting Wait for udev To =E2=80=A6plete Device Initializati=
-on...
-> > > [    8.690954] fuse: init (API version 7.34)
-> > > [  OK  ] Finished Load Kernel Module fuse.
-> > > [    8.694411]
-> > >          Mounting FUSE Control File System...
-> > > [  OK  ] Mounted FUSE Control File System.
-> > > [  OK  ] Started Rule-based Manager for Device Events and Files.
-> > >          Starting Load Kernel Module configfs...
-> > > [  OK  ] Finished Load Kernel Module configfs.
-> > > [    8.950307] IPMI message handler: version 39.2
-> > > [  OK  ] Found device /dev/zram0.
-> > >          Starting Create swap on /dev/zram0...
-> > > [    9.008355] zram0: detected capacity change from 0 to 16777216
-> > > [    9.694430] Kernel panic - not syncing: Aiee, killing interrupt ha=
-ndler!
-> > > [   11.080031] ---[ end Kernel panic - not syncing: Aiee, killing
-> > > interrupt handler! ]---
-> >
-> > Can you try this?
-> >
->
-> Yeah, the boot panic issue was fixed on ppc64le from my testing, how
-> about wait CKI re-test it on other arches?
+On Oct 16, 2021 / 15:26, Matthew Wilcox wrote:
+> On Sat, Oct 16, 2021 at 06:34:50AM +0200, Christoph Hellwig wrote:
+> > On Fri, Oct 15, 2021 at 11:07:40AM +0900, Shin'ichiro Kawasaki wrote:
+> > > To fix the issues, call the helper function disk_has_partitions() in
+> > > place of disk->part_tbl empty check. Since the function was removed w=
+ith
+> > > the commit a33df75c6328, reimplement it to walk through entries in th=
+e
+> > > xarray disk->part_tbl.
+> >=20
+> > Looks good,
+> >=20
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >=20
+> > Matthew,
+> >=20
+> > we talked about possiblig adding a xa_nr_entries helper a while ago.
+> > This would be a good place for it, as we could just check
+> > xa_nr_entries() > 1 for example.
+>=20
+> Do I understand the problem correctly, that you don't actually want to
+> know whether there's more than one entry in the array, but rather that
+> there's an entry at an index other than 0?
+>=20
+> If so, that's an easy question to answer, we just don't have a helper
+> for it yet.  Something like this should do:
+>=20
+> static inline bool xa_is_trivial(const struct xarray *xa)
+> {
+> 	void *entry =3D READ_ONCE(xa->xa_head);
+>=20
+> 	return entry || !xa_is_node(entry);
+> }
+>=20
+> Probably needs a better name than that.
 
-Thanks, CKI is running for
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commi=
-t/?h=3Dfor-next&id=3D3da791d43d00f7f8c824ac7b619c9f73e44fea13,
-the boot issue is fixed.
+Thanks for the discussion. Based on the code above, I tried following hunk
+below, and confirmed the new helper function can be used to fix the issue I
+found. Good. To make it work, I needed to change the logical operator in th=
+e
+function from OR to AND. As for the function name, my mere suggestion is
+xa_has_single_entry(), but this may not be the best.
 
-Bruno
+I would like to ask advice on the next action for the fix. If my original p=
+atch
+can go to upstream first, I think the changes for this new xarray helper ca=
+n be
+done later. This approach would be good if the new helper will not be propa=
+gated
+to the stable branches. Another approach is to do both of this new helper
+introduction and the issue fix at this moment. Which approach is the better=
+?
 
->
-> >
-> > diff --git a/block/blk-flush.c b/block/blk-flush.c
-> > index 4201728bf3a5..e9c0b300a177 100644
-> > --- a/block/blk-flush.c
-> > +++ b/block/blk-flush.c
-> > @@ -129,6 +129,9 @@ static void blk_flush_restore_request(struct reques=
-t *rq)
-> >         /* make @rq a normal request */
-> >         rq->rq_flags &=3D ~RQF_FLUSH_SEQ;
-> >         rq->end_io =3D rq->flush.saved_end_io;
-> > +       /* clear pointers overlapping with flush data */
-> > +       rq->elv.icq =3D NULL;
-> > +       rq->elv.priv[0] =3D rq->elv.priv[1] =3D NULL;
-> >  }
-> >
-> >  static void blk_flush_queue_rq(struct request *rq, bool add_front)
-> >
-> > --
-> > Jens Axboe
-> >
->
->
-> --
-> Best Regards,
->   Yi Zhang
->
 
+diff --git a/include/linux/xarray.h b/include/linux/xarray.h
+index a91e3d90df8a..7a31c9423d01 100644
+--- a/include/linux/xarray.h
++++ b/include/linux/xarray.h
+@@ -1238,6 +1238,20 @@ static inline unsigned long xa_to_sibling(const void=
+ *entry)
+ 	return xa_to_internal(entry);
+ }
+=20
++/**
++ * xa_has_single_entry() - Does it have an entry at an index other than 0?
++ * @entry: XArray entry.
++ *
++ * Context: Any context.
++ * Return: %true if there is no entry at an index other than 0.
++ */
++static inline bool xa_has_single_entry(const struct xarray *xa)
++{
++	const void *entry =3D READ_ONCE(xa->xa_head);
++
++	return entry && !xa_is_node(entry);
++}
++
+ /**
+  * xa_is_sibling() - Is the entry a sibling entry?
+  * @entry: Entry retrieved from the XArray
+
+
+--=20
+Best Regards,
+Shin'ichiro Kawasaki=
