@@ -2,174 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B278C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF9CC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:30:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 852A66135E
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:24:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFF996101A
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbhJSV1E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 17:27:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47084 "EHLO
+        id S229498AbhJSVcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 17:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbhJSV1B (ORCPT
+        with ESMTP id S229483AbhJSVcf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 17:27:01 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86916C06176D
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 14:24:47 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 63-20020a1c0042000000b0030d60716239so5646990wma.4
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 14:24:47 -0700 (PDT)
+        Tue, 19 Oct 2021 17:32:35 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41AAFC06161C;
+        Tue, 19 Oct 2021 14:30:22 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id n11so14643213plf.4;
+        Tue, 19 Oct 2021 14:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+EgGdcRessLiI1FhX2RaNc12KdVxW/zeIH1xYRNQfwU=;
-        b=XH5xoa5wD9VRDzEjzmk2g+2N0zkPJThsMygbKK77vzMjOMGOCiUEEldIbKSEjEvtWG
-         V8WLjxJJoQTCHWsdAJd9f7iJSfpRQo3MWHxkOhOdq5MBkdSiiuufDsVsr+rbtjvmDFhL
-         SvEvNNdMhJs10mCdKRPtpdtXPrt8ie2rebLXNsQxD2TTw0Bd5itpgxYQTU6UPwxBW6mr
-         6EhydPnQBmDpaNpH0dpAeCU0J2nNPnr86/yxWK0ROs0+60I7sHSIxheAwSwlpEfVgcOm
-         4Zs2c1Xebb2ICVB+1FAe4S0NMM4hCUF0sB2hJ1qJjsGk4PNzAkloN66r64Ow2WlBWl24
-         mOPw==
+        h=from:subject:to:references:cc:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding;
+        bh=/A0vjBtdWcQiSlwZh59qIbopjqHxgB5b4LP7gfZx3Oo=;
+        b=oILrH2qysB+qDzhwkdG8LC2R/dLRHXDpRW+GHAfo68BlOShl4R3Y5OakI73uO6ClMm
+         IXx3pihhbxSMgFAW1tl6wekLLi3NXPlc5a6a/prVsqDGe54UI3SVnE+SRqT0iB0nWU9D
+         V2C1XdG+22z7ELfnDRTljKrkcExNSoJsEzRt/LMg+soZzJ9l9EGi12k+s1f1l9XUAAfg
+         Ytc8Rqd8LB3/fs2uyDJmVuG8Tm/Kfa0lnnlubQkboz6imhqJjobVLMQvBQP2mqnjiYgC
+         NEKMLpN9CkHEjMXTQBBihpr6QQJkXeSgRrQv7cPSDYKZjytUCYc97fehiiY3hKwDQ1wr
+         61bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+EgGdcRessLiI1FhX2RaNc12KdVxW/zeIH1xYRNQfwU=;
-        b=Mv3EtpFN7s0K4C+e8aVydEN702Y6cGgTdbueCbQ2EKyQeO44g1xchLqjFYsvdUY4EC
-         F409iIeqAxu8237ogJz7sZBz2uLi9KmwovLQkHlGrYLInfXwGZI9KoQF9Kq0RSbcZzwY
-         nslRR49ih8NGZ+r091UptzWrPRAfe1VrhiJY4sDcbdpl/Nk1RcEkI2Vbl+G+0fDLDTfo
-         1KCmIbc8b4IrxDypW8h6U7wFHuJPrXN+aDBiWA6hsa0CdUhazAtFFdkfKVSZjqprFCeb
-         AQ1U/N3bDaodNbJ6ORhjoqW90O8j1z4IWxBvnDY1eG4zgikH670mz2obiIkGDrPupwtY
-         ZklA==
-X-Gm-Message-State: AOAM5308JThlE4mdRtUwfR6RqcvpopBUKYT8w+wdx6u/OcCy54ZpwysY
-        EtVqAMTB3lC5Ykk7cmjumZkBRtrQ9VGlgw==
-X-Google-Smtp-Source: ABdhPJyTAwlnxG+msw3uUQnKbsSzM6FifGXac6J07zBoq0xL1pdzh7GGtlG6zSjYcyE6PihvEpKHfQ==
-X-Received: by 2002:a05:600c:154f:: with SMTP id f15mr9312837wmg.195.1634678685981;
-        Tue, 19 Oct 2021 14:24:45 -0700 (PDT)
-Received: from 127.0.0.1localhost ([185.69.145.194])
-        by smtp.gmail.com with ESMTPSA id m14sm216020wms.25.2021.10.19.14.24.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 14:24:45 -0700 (PDT)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH 16/16] block: optimise submit_bio_checks for normal rw
-Date:   Tue, 19 Oct 2021 22:24:25 +0100
-Message-Id: <c53849108e8c2b831e78cd58b44244b27df43ab6.1634676157.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <cover.1634676157.git.asml.silence@gmail.com>
-References: <cover.1634676157.git.asml.silence@gmail.com>
+        h=x-gm-message-state:from:subject:to:references:cc:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
+        bh=/A0vjBtdWcQiSlwZh59qIbopjqHxgB5b4LP7gfZx3Oo=;
+        b=apVWCQhpuFPHK6QrcpigwPcGjMbgsEMZhs9jk4bvZqxi4YCDlaEVA9OKHx3+jLUZ5w
+         eMGlFnih0FYMH8ywh+JKUQcePmv5XBvtM47bKDxTAuIWmrIgRbzInbZ4KbWeG98TUbbZ
+         Nf79PVtmDYF4B/3bFv8tzhLR+6t70kY++vJVbth09rIfF2pTP/pLhEEjKf5YtqTCD9TU
+         dH4SFwIllhsLCBEuGP8mbYSPTWUqlxNyVlx+9o+7lDAjDySJs3KGjFuDIXUMA7oZdbIX
+         ob6ryZWOJcw7LMM75M/JWoM0fG+NPSXyiV1pClWNQixBVOj9D9CHdgeCqwEpQ7Rn83/R
+         BjRw==
+X-Gm-Message-State: AOAM533+wXnu2+3E48VjAPtksxeL6NCfS8nesImX/pLvT11vJWOgsb7F
+        KolzE3WvlRc0tpYhlCZi/ycBUwwLGrc=
+X-Google-Smtp-Source: ABdhPJzHARR0Ko1Jx1iA5U9QYvyBKHW+A2haok8dfwMYjyR0ffa+wpvQVT5VJi9wDnU3uBDUfjY1Yg==
+X-Received: by 2002:a17:902:9b8a:b0:13f:c286:a060 with SMTP id y10-20020a1709029b8a00b0013fc286a060mr12356715plp.66.1634679021318;
+        Tue, 19 Oct 2021 14:30:21 -0700 (PDT)
+Received: from [10.1.1.26] (222-155-4-20-adsl.sparkbb.co.nz. [222.155.4.20])
+        by smtp.gmail.com with ESMTPSA id a12sm3554685pjq.16.2021.10.19.14.30.18
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 Oct 2021 14:30:20 -0700 (PDT)
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Subject: Re: [PATCH v2] block - ataflop.c: fix breakage introduced at blk-mq
+ refactoring
+To:     Jens Axboe <axboe@kernel.dk>, geert@linux-m68k.org,
+        linux-m68k@vger.kernel.org
+References: <20211019061321.26425-1-schmitzmic@gmail.com>
+ <163464555754.595860.5260761740824485566.b4-ty@kernel.dk>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        linux-block@vger.kernel.org
+Message-ID: <658a78d1-942c-3099-eaac-91afbbddc31c@gmail.com>
+Date:   Wed, 20 Oct 2021 10:30:09 +1300
+User-Agent: Mozilla/5.0 (X11; Linux ppc64; rv:45.0) Gecko/20100101
+ Thunderbird/45.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <163464555754.595860.5260761740824485566.b4-ty@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Optimise the switch in submit_bio_checks() for reads, writes and
-flushes. REQ_OP_READ/WRITE/FLUSH take numbers from 0 to 2, so the added
-checks are compiled into a single condition:
+Thanks Jens,
 
-if (op <= REQ_OP_FLUSH) {} else { switch() ... };
+I'll pore over the code some more to see if there are any other problems...
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/blk-core.c | 74 +++++++++++++++++++++++++-----------------------
- 1 file changed, 39 insertions(+), 35 deletions(-)
+Cheers,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 52019b8a1487..7ba8f53a8340 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -776,6 +776,7 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	blk_status_t status = BLK_STS_IOERR;
- 	struct blk_plug *plug;
-+	unsigned op;
- 
- 	might_sleep();
- 
-@@ -817,41 +818,44 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
- 		bio_clear_polled(bio);
- 
--	switch (bio_op(bio)) {
--	case REQ_OP_DISCARD:
--		if (!blk_queue_discard(q))
--			goto not_supported;
--		break;
--	case REQ_OP_SECURE_ERASE:
--		if (!blk_queue_secure_erase(q))
--			goto not_supported;
--		break;
--	case REQ_OP_WRITE_SAME:
--		if (!q->limits.max_write_same_sectors)
--			goto not_supported;
--		break;
--	case REQ_OP_ZONE_APPEND:
--		status = blk_check_zone_append(q, bio);
--		if (status != BLK_STS_OK)
--			goto end_io;
--		break;
--	case REQ_OP_ZONE_RESET:
--	case REQ_OP_ZONE_OPEN:
--	case REQ_OP_ZONE_CLOSE:
--	case REQ_OP_ZONE_FINISH:
--		if (!blk_queue_is_zoned(q))
--			goto not_supported;
--		break;
--	case REQ_OP_ZONE_RESET_ALL:
--		if (!blk_queue_is_zoned(q) || !blk_queue_zone_resetall(q))
--			goto not_supported;
--		break;
--	case REQ_OP_WRITE_ZEROES:
--		if (!q->limits.max_write_zeroes_sectors)
--			goto not_supported;
--		break;
--	default:
--		break;
-+	op = bio_op(bio);
-+	if (op != REQ_OP_READ && op != REQ_OP_WRITE && op != REQ_OP_FLUSH) {
-+		switch (op) {
-+		case REQ_OP_DISCARD:
-+			if (!blk_queue_discard(q))
-+				goto not_supported;
-+			break;
-+		case REQ_OP_SECURE_ERASE:
-+			if (!blk_queue_secure_erase(q))
-+				goto not_supported;
-+			break;
-+		case REQ_OP_WRITE_SAME:
-+			if (!q->limits.max_write_same_sectors)
-+				goto not_supported;
-+			break;
-+		case REQ_OP_ZONE_APPEND:
-+			status = blk_check_zone_append(q, bio);
-+			if (status != BLK_STS_OK)
-+				goto end_io;
-+			break;
-+		case REQ_OP_ZONE_RESET:
-+		case REQ_OP_ZONE_OPEN:
-+		case REQ_OP_ZONE_CLOSE:
-+		case REQ_OP_ZONE_FINISH:
-+			if (!blk_queue_is_zoned(q))
-+				goto not_supported;
-+			break;
-+		case REQ_OP_ZONE_RESET_ALL:
-+			if (!blk_queue_is_zoned(q) || !blk_queue_zone_resetall(q))
-+				goto not_supported;
-+			break;
-+		case REQ_OP_WRITE_ZEROES:
-+			if (!q->limits.max_write_zeroes_sectors)
-+				goto not_supported;
-+			break;
-+		default:
-+			break;
-+		}
- 	}
- 
- 	/*
--- 
-2.33.1
+	Michael
 
+On 20/10/21 01:12, Jens Axboe wrote:
+> On Tue, 19 Oct 2021 19:13:21 +1300, Michael Schmitz wrote:
+>> Refactoring of the Atari floppy driver when converting to blk-mq
+>> has broken the state machine in not-so-subtle ways:
+>>
+>> finish_fdc() must be called when operations on the floppy device
+>> have completed. This is crucial in order to relase the ST-DMA
+>> lock, which protects against concurrent access to the ST-DMA
+>> controller by other drivers (some DMA related, most just related
+>> to device register access - broken beyond compare, I know).
+>>
+>> [...]
+>
+> Applied, thanks!
+>
+> [1/1] block - ataflop.c: fix breakage introduced at blk-mq refactoring
+>       commit: 86d46fdaa12ae5befc16b8d73fc85a3ca0399ea6
+>
+> Best regards,
+>
