@@ -2,102 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F6DC43219
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E438DC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:04:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1172360F02
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 19:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C06B961156
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234400AbhJSTsx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 15:48:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53276 "EHLO
+        id S230190AbhJSVGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 17:06:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230147AbhJSTsw (ORCPT
+        with ESMTP id S231506AbhJSVGh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 15:48:52 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E596C06161C;
-        Tue, 19 Oct 2021 12:46:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jCo7U915eFRqWzpvn4v1HPXwjv12FjYjhZ4kBCli1BA=; b=XQzRM95CX9ofAeF03oyBgo9tdr
-        tca/b6ddAmgUpGHrIOgKOl7J+MmMtICCtW9iI9X/pIp9MDdL8jhpdq1WUpyF+AqNyJJXM+xcXea+Y
-        A+/eXwEiUOwerfpiB9WrGkP+ywwG+ealnZuYQt1ByR+KUnhNAXDvKMFwufKpwEgRWHNiYPNEhnjoi
-        bTJNL3eWVoeD+EBPCVAiiRgFpwqUUIkHuRc7HNZ6R8Ax6kfd/8src6qtI8PSnjLsvdemXY2lQiN4s
-        fVHcuQayWAEmJ2qh+RFvpTD5WkbnMFHUROEQZMwM1v8B3T9/7bol/7RXJacyarkYcDITzTWqga2Vd
-        eQK52yWw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mcv49-002XTn-Ah; Tue, 19 Oct 2021 19:46:29 +0000
-Date:   Tue, 19 Oct 2021 12:46:29 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
-        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
-        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
-        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YW8glVdremhn1eF2@bombadil.infradead.org>
-References: <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
- <YWk9e957Hb+I7HvR@T590>
- <YWm68xUnAofop3PZ@bombadil.infradead.org>
- <YWq3Z++uoJ/kcp+3@T590>
- <YW3LuzaPhW96jSBK@bombadil.infradead.org>
- <YW4uwep3BCe9Vxq8@T590>
- <YW7pQKi8AlV+ZemU@bombadil.infradead.org>
- <YW7xbnrqfzifa9OC@kroah.com>
- <YW7yjQVC4NRfrWxD@bombadil.infradead.org>
- <YW8AQ4fMNV8MT1vX@kroah.com>
+        Tue, 19 Oct 2021 17:06:37 -0400
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A61C06161C;
+        Tue, 19 Oct 2021 14:04:22 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:281:8300:104d::5f6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 3F7BF7DE;
+        Tue, 19 Oct 2021 21:04:22 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 3F7BF7DE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1634677462; bh=OBcS/ydQa8jx7fNfnnJNWUzruUCNqteSSCGMNGtXBQk=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=Air9jU1ddzD3XVn+ET5DV9x7i7OrWZN/DVwJuDI40ThC9obz0SBdkjOu5v3ED5Aql
+         cDw9YwdQ1+rjiFMHx+X9TDbqFr0CO8srUhKVmtpMZVB/jZjFf1yGdHQrtishdmziom
+         cFGB0ipeBza8mEAKWs2cQybPK60p4bAuYJvibSJ2haNPmlOQKUqDMdSjcqRA3mIHX/
+         ww4dy/PVMrBeMhtNcK7JeH3NtNkssHRA7q8Djycas+WVy1MiyCTysVulp5PjWd/gBG
+         iaLkP5VTXNTRueNPGPUiv2mJL6uv3DQqameEnDea84a5jjIHcnSxwD4yeHxOqVBSY6
+         bv4EoLj9O4lDg==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Jens Axboe <axboe@kernel.dk>, Steffen Maier <maier@linux.ibm.com>,
+        Nikanth Karthikesan <knikanth@suse.de>,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH] block: add documentation for inflight
+In-Reply-To: <572fd6c4-ccb9-4799-3882-685efa4492ad@kernel.dk>
+References: <20211019130230.77594-1-maier@linux.ibm.com>
+ <572fd6c4-ccb9-4799-3882-685efa4492ad@kernel.dk>
+Date:   Tue, 19 Oct 2021 15:04:21 -0600
+Message-ID: <87lf2osp4a.fsf@meer.lwn.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YW8AQ4fMNV8MT1vX@kroah.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 07:28:35PM +0200, Greg KH wrote:
-> On Tue, Oct 19, 2021 at 09:30:05AM -0700, Luis Chamberlain wrote:
-> > On Tue, Oct 19, 2021 at 06:25:18PM +0200, Greg KH wrote:
-> > > On Tue, Oct 19, 2021 at 08:50:24AM -0700, Luis Chamberlain wrote:
-> > > > So do you want to take the position:
-> > > > 
-> > > > Hey driver authors: you cannot use any shared lock on module removal and
-> > > > on sysfs ops?
-> > > 
-> > > Yes, I would not recommend using such a lock at all.  sysfs operations
-> > > happen on a per-device basis, so you can lock the device structure.
-> > 
-> > All devices are going to be removed on module removal and so cannot be locked.
-> 
-> devices are not normally created by a driver, that is up to the bus
-> controller logic.  A module will just disconnect itself from the device,
-> the device does not go away.
-> 
-> But yes, there are exceptions, and if you are doing something odd like
-> that, then you need to be aware of crazy things like this, so be
-> careful.  But for all normal drivers, they do not have to worry about
-> this.
+Jens Axboe <axboe@kernel.dk> writes:
 
-"Recommend" is a weak position to take given a possible deadlock with sysfs.
+> On 10/19/21 7:02 AM, Steffen Maier wrote:
+>> Complements v2.6.32 commit a9327cac440b ("Seperate read and write
+>> statistics of in_flight requests") and commit 316d315bffa4 ("block:
+>> Seperate read and write statistics of in_flight requests v2").
+>
+> Jon, probably better if you take this through the doc tree. You can
+> add my:
+>
+> Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Do we want to at the very least document this is not a supported scheme?
+Done.
 
-If so I can also add a simple 1 level indirrection coccinelle patch to
-detect these schemes and complain about them as wel, if we are going to
-take this position.
+Thanks,
 
-But to simply disregard this as "not an issue", or we won't do anything
-seems pretty counter productive given we *do* had drivers with this
-issue before *and* still have them upstream, and can end up with more
-drivers like this later.
-
-  Luis
+jon
