@@ -2,95 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0289CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01757C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:02:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBEBE611BF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4EC46136F
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 18:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231235AbhJSRsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 13:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54328 "EHLO
+        id S234665AbhJSSEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 14:04:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231226AbhJSRsN (ORCPT
+        with ESMTP id S230158AbhJSSEX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 13:48:13 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 812D9C06161C;
-        Tue, 19 Oct 2021 10:46:00 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id f21so14204967plb.3;
-        Tue, 19 Oct 2021 10:46:00 -0700 (PDT)
+        Tue, 19 Oct 2021 14:04:23 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476A8C06161C;
+        Tue, 19 Oct 2021 11:02:10 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 75so20113121pga.3;
+        Tue, 19 Oct 2021 11:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=2MlySN5JbrqzxF/Em4ggjCL2GMkbXRbHLm4CFSB5M5I=;
-        b=cNd6/BHJIRYcPDuXiiaGgGr4U3V9uE4qNprUYOv81pfog4kXAogbLT8Soi9Q5nMjyA
-         3sEnP7x22YmWxIbl8dgVaHcT+99BrRLMrQQ/wd/FfiH9Q8WmGCHjq9q8esWhid5E7hws
-         0SYmG/UVbn6H0J3YGQbXmWNCCCzOBnS0E3BN4du6DdvRVx5uW52BwLuGUW5c/Z8DDqvp
-         IFrCKb/2BW9EYdF0EiiXz+xY63OC1DFoKna6vLrCaoOMO3HjUxWbh+K8DpRV235S7Bca
-         tata+q2H+0kz2Lo9xTopCiziDO4CGZLfX1hzmLPCr1y/P+MTxnLcr8H0XyWp9axC7LOP
-         1cNA==
+        bh=3sZM03eQhB2KzVvExB+/wmjn4hXG0h6WujSIe5Eehcg=;
+        b=pdVCsGnAm94532oZGMO3Ez89POaEjaCzYWHB2T/AXlJ5kW/oyCcWkHgf25+XwKca1J
+         a47acU8a9sfAUgqWXUcaYq6slfGMUYBcESJfuGUEzt59CGaW4CqsPe3VS7FX0eWlaWhY
+         Tue14lvZ5Y9McXLISdKd/pFYeNK4mCBpxO68v+BXR5kIHZC8lSzQPxTglTLjji3OEUfF
+         jd0nuqkcjHEy1T0nrO1S31iGZ4id5Zj4PP0mtLuD+ZExXNnS9W+N2mxFdx98uKgkUsiL
+         YMyY88VFK/hzjbyEi+Mt/sTW45vXwseARbgOmeCXLABsSN/a1/jfF8CMViONAjZbJAnL
+         f5HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to;
-        bh=2MlySN5JbrqzxF/Em4ggjCL2GMkbXRbHLm4CFSB5M5I=;
-        b=KI/dOZAQf12/NGqloWkoYXZj6TcdPGGKPvXnm9G6C54pFPoKOMJNBGBUD2Jd5y6NdK
-         28xBmoX5MsC055QkHcO44Ivm1DwAKSZk5C+mrTn1AE4I1ysEKH0zNF5kYMjUxu2AU1dt
-         0V7yZs9CcslngN8UAmZ2qltZH/pGIS9SVLAIcCwWqyrQiqDhBiWOdk8EfekFjqnM6VMv
-         2k6NXYd0I4+cwRV07FtpFAzG6pmfXt6olaY6tMRm6o4VhjeCSl8v7+keuM91q3y3zPsC
-         dUzu302LCdtjUU6vsjHhnOafrDqkOczH7ieFDSjwFPmW9Yb6QSZyj3LOv56ExFkC7GyW
-         exdg==
-X-Gm-Message-State: AOAM531i5BviZUEwOn2zwfXf9eHecZcC/PHOoQ2ind7OW/8D6w+M9JGB
-        9eFXqfCKKDVb5KI/SqRZAQIH40tr6Ma4DQ==
-X-Google-Smtp-Source: ABdhPJz9AsSMiqpetjedULS1/fN+K0h+yk5otUwJeov984s4Rej5h0dUCETP3WbwUdEVuoNsc1oIyA==
-X-Received: by 2002:a17:902:e883:b0:13f:1393:d185 with SMTP id w3-20020a170902e88300b0013f1393d185mr35147477plg.64.1634665559552;
-        Tue, 19 Oct 2021 10:45:59 -0700 (PDT)
+        bh=3sZM03eQhB2KzVvExB+/wmjn4hXG0h6WujSIe5Eehcg=;
+        b=lqSd7W/KJH3Nynl266yOuLbrlSuGpBSw5xYu1yGOBjTNKc9MXqgxkKWalkQT4xmbB7
+         Ijxhp+V60g2d5Aeb62ci62KFXhY2tgvdBbGbNFgch97cSoI9MqSyYKfMjlYV3I8mSApq
+         f4u7i3gwSHvOpINoSQaTS0xliXgiIoi+CTOKft7SADfzTFK5KQCzuKiTboPqju5MHlNR
+         L6SNlkJ6bQAPyelsUI69BEj+dHjnAcser5w4Na5rIP1LntM4rNgeDH5NzUq0SXFYHz5A
+         n3NwwD7QXH5ZAROqMk+2cKzFTcxiyBT5izgzux4dmIuCvddOMJvH/c5PlYW0R7d2ento
+         jzpA==
+X-Gm-Message-State: AOAM531+3M4GsiusxpDwBT5fUxFOz8SASOymb2zVfziJCGMmB5WhOwDp
+        sOFd3NKCUK1zoBK5U2A8p9o=
+X-Google-Smtp-Source: ABdhPJyCPBmixUfzOynGK/HWr1nOgd+4zNCnD1vU7BIwevA7IuOBArVJlJPt3veA3X+p62Qo4MJwdQ==
+X-Received: by 2002:a62:e510:0:b0:44c:e06e:80dd with SMTP id n16-20020a62e510000000b0044ce06e80ddmr1364636pff.48.1634666529582;
+        Tue, 19 Oct 2021 11:02:09 -0700 (PDT)
 Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id e20sm1545621pfv.59.2021.10.19.10.45.58
+        by smtp.gmail.com with ESMTPSA id z12sm3237715pjh.51.2021.10.19.11.02.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 10:45:59 -0700 (PDT)
+        Tue, 19 Oct 2021 11:02:08 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 19 Oct 2021 07:45:57 -1000
+Date:   Tue, 19 Oct 2021 08:02:07 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Youfu Zhang <zhangyoufu@gmail.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [BUG] blk-throttle panic on 32bit machine after startup
-Message-ID: <YW8EVVmrQpuiwyEC@slm.duckdns.org>
-References: <CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com>
+To:     Zheng Liang <zhengliang6@huawei.com>
+Cc:     axboe@kernel.dk, paolo.valente@linaro.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v2] block, bfq: fix UAF problem in bfqg_stats_init()
+Message-ID: <YW8IH83UVyWrivVS@slm.duckdns.org>
+References: <20211018024225.1493938-1-zhengliang6@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com>
+In-Reply-To: <20211018024225.1493938-1-zhengliang6@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 18, 2021 at 03:08:53PM +0800, Youfu Zhang wrote:
-> Hi,
+On Mon, Oct 18, 2021 at 10:42:25AM +0800, Zheng Liang wrote:
+> In bfq_pd_alloc(), the function bfqg_stats_init() init bfqg. If
+> blkg_rwstat_init() init bfqg_stats->bytes successful and init
+> bfqg_stats->ios failed, bfqg_stats_init() return failed, bfqg will
+> be freed. But blkg_rwstat->cpu_cnt is not deleted from the list of
+> percpu_counters. If we traverse the list of percpu_counters, It will
+> have UAF problem.
 > 
-> I ran into a kernel bug related to blk-throttle on CentOS 7 AltArch for i386.
-> Userspace programs may panic the kernel if they hit the I/O limit
-> within 5 minutes after startup.
+> we should use blkg_rwstat_exit() to cleanup bfqg_stats bytes in the
+> above scenario.
 > 
-> Root cause:
-> 1. jiffies was initialized to -300HZ during boot on 32bit machines
-> 2. enable blkio cgroup hierarchy
->    __DEVEL__sane_behavior for cgroup v1 or default hierarchy for cgroup v2
->    EL7 kernel modified throtl_pd_init and always enable hierarchical throttling
-> 3. enable & trigger blkio throttling within 5 minutes after startup
->    bio propagated from child tg to parent
-> 4. enter throtl_start_new_slice_with_credit
->    if(time_after_eq(start, tg->slice_start[rw]))
->    aka. time_after_eq(0xFFFxxxxx, 0) does not hold
->    parent tg->slice_start[rw] was zero-initialized and not updated
-> 5. enter throtl_trim_slice
->    BUG_ON(time_before(tg->slice_end[rw], tg->slice_start[rw]))
->    aka. time_before(0xFFFxxxxx, 0) triggers a panic
+> Fixes: commit fd41e60331b ("bfq-iosched: stop using blkg->stat_bytes and ->stat_ios")
+> Signed-off-by: Zheng Liang <zhengliang6@huawei.com>
 
-This doesn't reproduce on 5.14.
+Acked-by: Tejun Heo <tj@kernel.org>
 
 Thanks.
 
