@@ -2,188 +2,231 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F04C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 03:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B163AC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 03:41:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07B326103B
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 03:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 833CE60F9E
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 03:41:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbhJSDaI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 23:30:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44738 "EHLO
+        id S229774AbhJSDnY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 23:43:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33620 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229742AbhJSDaH (ORCPT
+        by vger.kernel.org with ESMTP id S229742AbhJSDnX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 23:30:07 -0400
+        Mon, 18 Oct 2021 23:43:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634614075;
+        s=mimecast20190719; t=1634614870;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=9U72ZD1GAz0mO/zD/boGMJUMKf3KZeMbrSX+aq4r3b0=;
-        b=UOaG7fo6AgPR2oJtSFNbk5l90ZVA6BE+OjREHv3U2UFV5OgglXgzGfbVgNfevwQ1Dk8v8W
-        q74aTjnlP6b4ndyl49eLbIxLpd/pecOfCw7VSOvwBE3n7hpShr9O6CgcIbeIdPQ7OyUG0u
-        F9i6Eah58YgSPzuvUsf62pYNCh9zSso=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=w8c/OzkfR1qHVyiQbTG/0WaFOxOdPhNVUKOsp/A9ErY=;
+        b=Lkzyrzbu/1LuIA1M16KN1d6ggLQEpgLPru4RPBjkueI0Z+Ceynscpai6JDsj9qcEeIIzCv
+        zi99bl5NYHBsgCEA6PF3faCwdQkHd3+wOShs03oAbuUdqoLDoS6iuHvaPBwfx6EvrCHnbA
+        BBSb86GX2unzEX+jFO9rLj34gRFjPz8=
 Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
  [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42--5Fs1cuaMxqx785ybHkd1g-1; Mon, 18 Oct 2021 23:27:53 -0400
-X-MC-Unique: -5Fs1cuaMxqx785ybHkd1g-1
-Received: by mail-yb1-f199.google.com with SMTP id y16-20020a2586d0000000b005b752db8f97so22762522ybm.18
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 20:27:53 -0700 (PDT)
+ us-mta-492-lY1ty80gN8OZ19qJ8tx3zA-1; Mon, 18 Oct 2021 23:41:09 -0400
+X-MC-Unique: lY1ty80gN8OZ19qJ8tx3zA-1
+Received: by mail-yb1-f199.google.com with SMTP id y16-20020a2586d0000000b005b752db8f97so22793806ybm.18
+        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 20:41:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=9U72ZD1GAz0mO/zD/boGMJUMKf3KZeMbrSX+aq4r3b0=;
-        b=wf829YtsYZtQY1g3bPxt1BRLgJqG9gXiBv7tK/mZU7C+EQy+pcBvxu7KtmCRVp1gk1
-         Sg2Vsk8yljA0DK0mLiFsiCJmXbFL14uD7X29rEqxj7lqndfPgCzGbWDF69inXw0X6Hdh
-         qz9PAjLoV66sX54fyDK3nrOiztTxI2k6DkHjCOhqdlqwS4qMVU8XpNciPUAbQLJMg5c/
-         kgjwhcxLhDXmRC70KpPfV8uDGAka/yHe0+OcoG0GuJUuE7YjqUkLJSLn73syByC9djF4
-         qeIJkiltDcSiOsfgmZRokzTcN2hxRAIljJjH9LsrzIZlNy+9OWrc/GJyfDGqayuNmizd
-         qz0g==
-X-Gm-Message-State: AOAM530ExqdEQ8GYGWZRoHNjcOULHaUGwKeSk39u/YXLwqVFgEjZmu7E
-        lj3Ryr2Ofr4nkQX6q5M7h1JeFnzB5YZ+dkhvRkX3jBtS/YGozS1nJxWE4WZsL5pzHva2vuc9gVg
-        ZizzM25QAq4EafP91MEmaXpgPSVMoPDeN2TKWsqI=
-X-Received: by 2002:a25:bd03:: with SMTP id f3mr32056319ybk.412.1634614073108;
-        Mon, 18 Oct 2021 20:27:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzS/eEq7ByrZtEEXQiiYd/RS+UoWZJyXyEPxc+lD5MdXoglNGaisIEzBONkQFVRnmcdor4tWVHBxsIXUGOrg1o=
-X-Received: by 2002:a25:bd03:: with SMTP id f3mr32056300ybk.412.1634614072881;
- Mon, 18 Oct 2021 20:27:52 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=w8c/OzkfR1qHVyiQbTG/0WaFOxOdPhNVUKOsp/A9ErY=;
+        b=Q8/ipJNWUOZwbJbLMDgR7ZlNqe8C/v7MeLXlGUVruVfL/pnfaxPiP0JHNRoJS+MBqk
+         lGEo/6FC3cUTQgQeOeZ/nNJbd5K6m6qoMIZu56ZGyB3AY7OY1sNXUxCu5U0dsYx7ej5H
+         DYoP2V2GW7+TxAAjNPDjyBCim5dIfXpjx6RKnUPrDxM3VtYFel/DeKnpXF1vdHh0CRQ+
+         XozMMH79eHsq6+f8OgKg0FRUEDL0PO57sUCPvwh9MVQ7lb8CNrdsH6h67GQSacYIJQMC
+         76M930Yh3Gu1jUT3vHmEJN2mhVVZOVAU1rP1Xog42DN2ntI20hJbAlaJaREzloDU2PGZ
+         bpyA==
+X-Gm-Message-State: AOAM5322jifB9IF/Y2b3HmvNL9Fmc3TfaMpHiNnSAs/MC7XRPKFFJhdR
+        IgxdR6H4PEVoRDlToYi5CMDgr31dqrlyMhSRnVOBNn8MGTy+NVPWJVPIiNJueOLdNNp0kkuUMIJ
+        ip7zJtBil0Mpo1RUOSmSlon/hifqqsT/DMR9X5ak=
+X-Received: by 2002:a25:ab61:: with SMTP id u88mr31237556ybi.241.1634614868592;
+        Mon, 18 Oct 2021 20:41:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKjn0wx/4g2lVjzEEXNU8WN0bB0FqsEpjHPakYbA+g1WY8wL1IfSfzxucRiHXhSvdPNRIZQ5pO0c1dOJ7AJUk=
+X-Received: by 2002:a25:ab61:: with SMTP id u88mr31237537ybi.241.1634614868329;
+ Mon, 18 Oct 2021 20:41:08 -0700 (PDT)
 MIME-Version: 1.0
+References: <cki.1BB6AA01C6.FWO6ZHIQNG@redhat.com> <CAHj4cs_3MSAHXaxwwCreLhpL7c+Tak4+y-Hv_Ld7kDT0ZbCRtw@mail.gmail.com>
+ <8543f0bf-66b8-8688-313a-0d9e21fce184@kernel.dk>
+In-Reply-To: <8543f0bf-66b8-8688-313a-0d9e21fce184@kernel.dk>
 From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Tue, 19 Oct 2021 11:27:40 +0800
-Message-ID: <CAHj4cs-_vkTW=dAzbZYGxpEWSpzpcmaNeY1R=vH311+9vMUSdg@mail.gmail.com>
-Subject: [bug report] WARNING: CPU: 4 PID: 10482 at block/mq-deadline.c:597 dd_exit_sched+0x198/0x1d0
-To:     linux-block <linux-block@vger.kernel.org>
-Cc:     skt-results-master@redhat.com,
-        Bruno Goncalves <bgoncalv@redhat.com>
+Date:   Tue, 19 Oct 2021 11:40:57 +0800
+Message-ID: <CAHj4cs8ooypxnhqmdRiJ56i0V0mrxnpo7VYy6RAndaQ=qTbpug@mail.gmail.com>
+Subject: =?UTF-8?Q?Re=3A_=F0=9F=92=A5_PANICKED=3A_Waiting_for_review=3A_Test_report_f?=
+        =?UTF-8?Q?or_kernel_5=2E15=2E0=2Drc6_=28block=2C_1983520d=29?=
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        skt-results-master@redhat.com,
+        CKI Project <cki-project@redhat.com>,
+        Changhui Zhong <czhong@redhat.com>,
+        Bruno Goncalves <bgoncalv@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello
+On Tue, Oct 19, 2021 at 10:52 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 10/18/21 8:13 PM, Yi Zhang wrote:
+> > Hello
+> >
+> > With this commit, the servers boots with NULL pointer[1], pls help chec=
+k it.
+> >
+> >>        Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/ax=
+boe/linux-block.git
+> >>             Commit: 1983520d28d8 - Merge branch 'for-5.16/io_uring' in=
+to for-next
+> > [1]
+> > [    8.614036] Kernel attempted to read user page (f) - exploit
+> > attempt? (uid: 0)
+> > [    8.614071] BUG: Kernel NULL pointer dereference on read at 0x000000=
+0f
+> > [    8.614099] Faulting instruction address: 0xc00000000093b5b4
+> > [    8.614118] Oops: Kernel access of bad area, sig: 11 [#1]
+> > [    8.614143] LE PAGE_SIZE=3D64K MMU=3DRadix SMP NR_CPUS=3D2048 NUMA P=
+owerNV
+> > [    8.614192] Modules linked in: zram ip_tables ast i2c_algo_bit
+> > drm_vram_helper drm_kms_helper syscopyarea sysfillrect sysimgblt
+> > fb_sys_fops cec drm_ttm_helper ttm drm vmx_crypto crc32c_vpmsum
+> > i2c_core drm_panel_orientation_quirks
+> > [    8.614285] CPU: 52 PID: 0 Comm: swapper/52 Not tainted 5.15.0-rc6+ =
+#1
+> > [    8.614323] NIP:  c00000000093b5b4 LR: c00000000093b5a4 CTR: c000000=
+000972c50
+> > [    8.614371] REGS: c000000018d3b430 TRAP: 0300   Not tainted  (5.15.0=
+-rc6+)
+> > [    8.614409] MSR:  9000000000009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR:
+> > 44004284  XER: 00000000
+> > [    8.614464] CFAR: c000000000972cd0 DAR: 000000000000000f DSISR:
+> > 40000000 IRQMASK: 1
+> > [    8.614464] GPR00: c00000000093b5a4 c000000018d3b6d0
+> > c0000000028aa100 c000000044582a00
+> > [    8.614464] GPR04: 00000000ffff8e2c 0000000000000001
+> > 0000000000000004 c000000001212930
+> > [    8.614464] GPR08: 00000000000001d7 0000000000000007
+> > c000000044361f80 0000000000000000
+> > [    8.614464] GPR12: c000000000972c50 c000001ffffa7200
+> > 0000000000000000 0000000000000100
+> > [    8.614464] GPR16: 0000000000000004 0000000004200042
+> > 0000000000000000 0000000000000001
+> > [    8.614464] GPR20: c0000000028d3a00 c000000002167888
+> > 00000000ffff8e2d c000000002167888
+> > [    8.614464] GPR24: c0000000021f0580 0000000000000001
+> > c000000044582ae0 0000000000000801
+> > [    8.614464] GPR28: c000000044361f80 c000000044361f80
+> > c00000003b81f800 c000000044582a00
+> > [    8.614852] NIP [c00000000093b5b4] blk_mq_free_request+0x74/0x210
+> > [    8.614898] LR [c00000000093b5a4] blk_mq_free_request+0x64/0x210
+> > [    8.614942] Call Trace:
+> > [    8.614961] [c000000018d3b6d0] [c00000000093b8ec]
+> > __blk_mq_end_request+0x19c/0x1d0 (unreliable)
+> > [    8.615020] [c000000018d3b710] [c00000000092fdfc]
+> > blk_flush_complete_seq+0x1ac/0x3d0
+> > [    8.615077] [c000000018d3b770] [c0000000009302dc] flush_end_io+0x2bc=
+/0x390
+> > [    8.615122] [c000000018d3b7d0] [c00000000093b7cc]
+> > __blk_mq_end_request+0x7c/0x1d0
+> > [    8.615174] [c000000018d3b810] [c000000000c20684]
+> > scsi_end_request+0x124/0x270
+> > [    8.615228] [c000000018d3b860] [c000000000c21458]
+> > scsi_io_completion+0x1f8/0x740
+> > [    8.615250] [c000000018d3b900] [c000000000c13e14]
+> > scsi_finish_command+0x134/0x190
+> > [    8.615292] [c000000018d3b990] [c000000000c21068] scsi_complete+0xa8=
+/0x200
+> > [    8.615345] [c000000018d3ba10] [c000000000939870] blk_complete_reqs+=
+0x80/0xa0
+> > [    8.615409] [c000000018d3ba40] [c00000000115dfe0] __do_softirq+0x170=
+/0x3fc
+> > [    8.615475] [c000000018d3bb30] [c00000000015df38] __irq_exit_rcu+0x1=
+68/0x1a0
+> > [    8.615535] [c000000018d3bb60] [c00000000015e140] irq_exit+0x20/0x40
+> > [    8.615583] [c000000018d3bb80] [c000000000054670]
+> > doorbell_exception+0x120/0x300
+> > [    8.615616] [c000000018d3bbc0] [c000000000016cc4]
+> > replay_soft_interrupts+0x1e4/0x2c0
+> > [    8.615639] [c000000018d3bda0] [c000000000016ed8]
+> > arch_local_irq_restore+0x138/0x1a0
+> > [    8.615694] [c000000018d3bdd0] [c000000000de1714]
+> > cpuidle_enter_state+0x104/0x540
+> > [    8.615741] [c000000018d3be30] [c000000000de1bec] cpuidle_enter+0x4c=
+/0x70
+> > [    8.615795] [c000000018d3be70] [c0000000001aef18] do_idle+0x2f8/0x3f=
+0
+> > [    8.615839] [c000000018d3bf00] [c0000000001af238] cpu_startup_entry+=
+0x38/0x40
+> > [    8.615901] [c000000018d3bf30] [c00000000005be6c] start_secondary+0x=
+29c/0x2b0
+> > [    8.615969] [c000000018d3bf90] [c00000000000d254]
+> > start_secondary_prolog+0x10/0x14
+> > [    8.616025] Instruction dump:
+> > [    8.616074] 41820048 e93d0008 e9290000 e9890068 2c2c0000 41820010
+> > 7d8903a6 4e800421
+> > [    8.616136] e8410018 e93f00d8 2c290000 41820140 <e8690008> 4bff6b91
+> > 60000000 39400000
+> > [    8.616184] ---[ end trace cc3215be892e1be7 ]---
+> > [    8.644628] systemd-journald[1408]: Received client request to
+> > flush runtime journal.
+> > [  OK  ] Finished Create Static Device Nodes in /dev.
+> >          Starting Rule-based Manage=E2=80=A6for Device Events and Files=
+...
+> > [  OK  ] Finished Coldplug All udev Devices.
+> >          Starting Wait for udev To =E2=80=A6plete Device Initialization=
+...
+> > [    8.690954] fuse: init (API version 7.34)
+> > [  OK  ] Finished Load Kernel Module fuse.
+> > [    8.694411]
+> >          Mounting FUSE Control File System...
+> > [  OK  ] Mounted FUSE Control File System.
+> > [  OK  ] Started Rule-based Manager for Device Events and Files.
+> >          Starting Load Kernel Module configfs...
+> > [  OK  ] Finished Load Kernel Module configfs.
+> > [    8.950307] IPMI message handler: version 39.2
+> > [  OK  ] Found device /dev/zram0.
+> >          Starting Create swap on /dev/zram0...
+> > [    9.008355] zram0: detected capacity change from 0 to 16777216
+> > [    9.694430] Kernel panic - not syncing: Aiee, killing interrupt hand=
+ler!
+> > [   11.080031] ---[ end Kernel panic - not syncing: Aiee, killing
+> > interrupt handler! ]---
+>
+> Can you try this?
+>
 
-Here is another issue triggered with blktests nvmeof-mp/012 on ppc64le
+Yeah, the boot panic issue was fixed on ppc64le from my testing, how
+about wait CKI re-test it on other arches?
 
->        Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->             Commit: 1983520d28d8 - Merge branch 'for-5.16/io_uring' into for-next
+>
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 4201728bf3a5..e9c0b300a177 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -129,6 +129,9 @@ static void blk_flush_restore_request(struct request =
+*rq)
+>         /* make @rq a normal request */
+>         rq->rq_flags &=3D ~RQF_FLUSH_SEQ;
+>         rq->end_io =3D rq->flush.saved_end_io;
+> +       /* clear pointers overlapping with flush data */
+> +       rq->elv.icq =3D NULL;
+> +       rq->elv.priv[0] =3D rq->elv.priv[1] =3D NULL;
+>  }
+>
+>  static void blk_flush_queue_rq(struct request *rq, bool add_front)
+>
+> --
+> Jens Axboe
+>
 
 
-[  198.810575] run blktests nvmeof-mp/012 at 2021-10-18 14:04:34
-[  198.880348] null_blk: module loaded
-[  198.952441] device-mapper: table: 253:1: multipath: error getting device
-[  198.952458] device-mapper: ioctl: error adding target to table
-[  198.952642] SoftiWARP attached
-[  199.070415] nvmet: adding nsid 1 to subsystem nvme-test
-[  199.079054] nvmet_rdma: enabling port 1 (10.0.2.177:7777)
-[  199.172211] nvmet: creating controller 1 for subsystem nvme-test
-for NQN nqn.2014-08.org.nvmexpress:uuid:548b1456-be56-4e3b-b887-a93e4557c960.
-[  199.172631] nvme nvme0: creating 8 I/O queues.
-[  199.176935] nvme nvme0: mapped 8/0/0 default/read/poll queues.
-[  199.177528] nvme nvme0: new ctrl: NQN "nvme-test", addr 10.0.2.177:7777
-[  199.191054] device-mapper: table: 253:1: multipath: error getting device
-[  199.191065] device-mapper: ioctl: error adding target to table
-[  199.302695] device-mapper: table: 253:2: multipath: error getting device
-[  199.302703] device-mapper: ioctl: error adding target to table
-[  201.342136] ------------[ cut here ]------------
-[  201.342149] statistics for priority 1: i 5803 m 0 d 5803 c 6467
-[  201.342163] WARNING: CPU: 4 PID: 10482 at block/mq-deadline.c:597
-dd_exit_sched+0x198/0x1d0
-[  201.342171] Modules linked in: nvme nvmet_rdma nvmet siw null_blk
-nvme_rdma nvme_fabrics rdma_cm iw_cm ib_cm dm_service_time
-scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_multipath ib_core nvme_core
-bonding tls rfkill sunrpc ibmveth crct10dif_vpmsum pseries_rng drm
-drm_panel_orientation_quirks i2c_core fuse zram ip_tables xfs ibmvscsi
-nx_compress_pseries scsi_transport_srp nx_compress vmx_crypto
-crc32c_vpmsum [last unloaded: siw]
-[  201.342213] CPU: 4 PID: 10482 Comm: check Not tainted 5.15.0-rc6 #1
-[  201.342218] NIP:  c0000000009733d8 LR: c0000000009733d4 CTR: 00000000006db41c
-[  201.342223] REGS: c00000002134b720 TRAP: 0700   Not tainted  (5.15.0-rc6)
-[  201.342227] MSR:  800000000282b033
-<SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 4842828f  XER: 00000004
-[  201.342239] CFAR: c000000000152b34 IRQMASK: 0
-[  201.342239] GPR00: c0000000009733d4 c00000002134b9c0
-c0000000028a9a00 0000000000000033
-[  201.342239] GPR04: 00000000ffffdfff c00000002134b678
-c00000002134b670 0000000000000027
-[  201.342239] GPR08: 0000000000000001 c0000001ffa07f90
-0000000000000023 0000000000000001
-[  201.342239] GPR12: 000000002842828f c00000001eca9d00
-0000000000000000 0000000000000000
-[  201.342239] GPR16: 00000001334d87b8 00000001334d94d4
-0000000020000000 00000001333eae80
-[  201.342239] GPR20: c00000000ece5ebc 00000000000016ab
-0000000000001943 0000000000000001
-[  201.342239] GPR24: c00000000152b440 0000000000000000
-c0000000027e2094 0000000000000000
-[  201.342239] GPR28: c00000000ece5f48 c00000000ece5e00
-0000000000000001 c00000000ece5e80
-[  201.342289] NIP [c0000000009733d8] dd_exit_sched+0x198/0x1d0
-[  201.342294] LR [c0000000009733d4] dd_exit_sched+0x194/0x1d0
-[  201.342298] Call Trace:
-[  201.342301] [c00000002134b9c0] [c0000000009733d4]
-dd_exit_sched+0x194/0x1d0 (unreliable)
-[  201.342308] [c00000002134ba80] [c000000000946f98]
-blk_mq_exit_sched+0xe8/0x120
-[  201.342314] [c00000002134bad0] [c0000000009251c4]
-elevator_switch_mq+0x84/0x210
-[  201.342319] [c00000002134bb50] [c000000000925a4c]
-elv_iosched_store+0x47c/0x5d0
-[  201.342325] [c00000002134bbb0] [c00000000092cb58] queue_attr_store+0x78/0xc0
-[  201.342330] [c00000002134bc00] [c000000000644984] sysfs_kf_write+0x64/0x80
-[  201.342336] [c00000002134bc20] [c000000000643e4c]
-kernfs_fop_write_iter+0x1bc/0x2b0
-[  201.342342] [c00000002134bc70] [c000000000521314] new_sync_write+0x124/0x1b0
-[  201.342348] [c00000002134bd10] [c000000000524614] vfs_write+0x2c4/0x390
-[  201.342353] [c00000002134bd60] [c000000000524988] ksys_write+0x78/0x130
-[  201.342359] [c00000002134bdb0] [c00000000002d648]
-system_call_exception+0x188/0x360
-[  201.342365] [c00000002134be10] [c00000000000c1e8]
-system_call_vectored_common+0xe8/0x278
-[  201.342371] --- interrupt: 3000 at 0x7fffb664fee4
-[  201.342375] NIP:  00007fffb664fee4 LR: 0000000000000000 CTR: 0000000000000000
-[  201.342379] REGS: c00000002134be80 TRAP: 3000   Not tainted  (5.15.0-rc6)
-[  201.342383] MSR:  800000000280f033
-<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 48422488  XER: 00000000
-[  201.342395] IRQMASK: 0
-[  201.342395] GPR00: 0000000000000004 00007fffdfc43400
-00007fffb6747000 0000000000000001
-[  201.342395] GPR04: 0000010010ac2b20 0000000000000006
-0000000000000010 0000010010acdec3
-[  201.342395] GPR08: 0000000000000000 0000000000000000
-0000000000000000 0000000000000000
-[  201.342395] GPR12: 0000000000000000 00007fffb688afa0
-0000000000000000 0000000000000000
-[  201.342395] GPR16: 00000001334d87b8 00000001334d94d4
-0000000020000000 00000001333eae80
-[  201.342395] GPR20: 0000000000000000 00007fffdfc43624
-0000000133483128 00000001334d89bc
-[  201.342395] GPR24: 00000001334d8a50 0000000000000000
-0000010010ac2b20 0000000000000006
-[  201.342395] GPR28: 0000000000000006 00007fffb67416d8
-0000010010ac2b20 0000000000000006
-[  201.342441] NIP [00007fffb664fee4] 0x7fffb664fee4
-[  201.342445] LR [0000000000000000] 0x0
-[  201.342447] --- interrupt: 3000
-[  201.342450] Instruction dump:
-[  201.342452] 2c090000 4082ff7c 9afa0000 81140000 80ff0038 80df0034
-80bf0030 7d0807b4
-[  201.342461] 7fc4f378 7f03c378 4b7df6fd 60000000 <0fe00000> 60420000
-0fe00000 60000000
-[  201.342470] ---[ end trace 108cf85114306689 ]---
-[  202.926082] nvme nvme0: Removing ctrl: NQN "nvme-test"
-[  203.272436] nvmet: creating controller 1 for subsystem nvme-test
-for NQN nqn.2014-08.org.nvmexpress:uuid:548b1456-be56-4e3b-b887-a93e4557c960.
-[  203.272975] nvme nvme0: creating 8 I/O queues.
-[  203.277569] nvme nvme0: mapped 8/0/0 default/read/poll queues.
-[  203.278187] nvme nvme0: new ctrl: NQN "nvme-test", addr 10.0.2.177:7777
-[  203.290859] device-mapper: table: 253:1: multipath: error getting device
-[  203.290866] device-mapper: ioctl: error adding target to table
-[  203.401606] device-mapper: table: 253:1: multipath: error getting device
-[  203.401614] device-mapper: ioctl: error adding target to table
-[  207.146139] nvme nvme0: Removing ctrl: NQN "nvme-test"
-[  207.927071] SoftiWARP detached
-
--- 
+--=20
 Best Regards,
   Yi Zhang
 
