@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1462C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1697C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:24:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C307861355
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:24:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99B4E61355
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 21:24:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbhJSV0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229521AbhJSV0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 19 Oct 2021 17:26:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46964 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbhJSV0s (ORCPT
+        with ESMTP id S229483AbhJSV0t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 17:26:48 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345B2C06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 14:24:35 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id g2so14544803wme.4
+        Tue, 19 Oct 2021 17:26:49 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DC4C06161C
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 14:24:36 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id z77-20020a1c7e50000000b0030db7b70b6bso5679703wmc.1
         for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 14:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eqByaVwNH1eDBgQxrWe4ZD3BlTfVAS6fttIbCtAyDOI=;
-        b=pIUX/q7WhHPLBIVr/tMHIGuHsyHHwYs/7Mon24mXi6hc/vTdvM1INgZ2wVbY4DCLZX
-         BUZuGmHjn6r2D8ginDbyM7T7vMGVnmWc8RY+itLzOUgERJmppvIDuA6Dyt5vKDHkpAfq
-         4MFf7fsHCzhzh7dV3FYNaw1VdWpjh/d8Hn23u2j3Zs6UFi9EhCQM4YN49hVLary+iziS
-         s9T9kP/21AOw8zUNHi8VX4DxzDt6IRALGKWpIeEpdmwJami6pPzFqxjeDadbw/B1+qPo
-         3I7duSi+euPj5dgMweTzNcYAu/Bixv/Xx8S/mC/t93oY+whXiGktu56o5d9Gw/MR886G
-         6L0w==
+        bh=fKkwHTUtYVuEoE7mZDvi41g9g5mXV7xtQqtX4zIAEZI=;
+        b=FAry/GyM2e0kOTlythIvfEzRGo5aBPHNRgviKt1Yq0XNem8hxmIQ8VI31HcPsdrX5L
+         Cufw6u+VsIAdKQEsYy85tehnAi/kofU06V08AKEqFUIB83FXXF1f5gzoYuzm02+k0WWl
+         5wiqJb/VAtVxnMcMNTk1NrcmMWfuBllbU65LT+VekelDzwAeGE8chXdW54Dk6muqCbwM
+         7F5VOzE5OpBx1/ApfEKR84qfpTorw+8LyjZJOq96qYP7Snrjeu6TtgFF1IYhV8EnltPU
+         BCipQgskPHuRnjETbJH1DX+Qg5ioen9xjTeSB3I0ih7FB6kHv7CsrrhLHS+Bm1q+cV0p
+         9o+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eqByaVwNH1eDBgQxrWe4ZD3BlTfVAS6fttIbCtAyDOI=;
-        b=14StiLRRbMI0vVRAmUN9vZmBtplE7f1EG7UViodU5qSg0dR1MASUCO0jYtOCYIDV/t
-         wN2ZVcYMWdA3OdZahdTAq57N8XEc22z74QOFYnyOFAKsLlDdWU1plpsAIrzLq5pmodY6
-         3v2pnprBFVaqi0hPR35vNqWC0YXpu0zR5aKDQjXeNjUE32f3rrOdwYIiuCQwhbChAO7c
-         x2flIqd+tJraCvFJYEU+9Do/FoyvSSzI68DnKOqp5H4vK++Uvm2jVhZ5hOVuCYx4sg9t
-         TGp3TIXn5wloRYw7CqWZq++XXwLCllzZmu8sNbByt7UF/bSNzqPo+VIYE/j5wqyuEOOI
-         Ss4w==
-X-Gm-Message-State: AOAM533XCeCPQTi/hEddRyS6WIioZ0Zx+akDTrXyWy9bVDqCOibewjrr
-        hMlU7waVLqNX4luraEK1GQHR8bnkW2Roxg==
-X-Google-Smtp-Source: ABdhPJyR5+Ls5k9SMipR1qjzRAYTS9yAQr3bSKFPGNj1gknME7g7J81CJh/5hCRwW5Wld3DTdEtjqQ==
-X-Received: by 2002:a1c:2246:: with SMTP id i67mr9185501wmi.72.1634678673622;
-        Tue, 19 Oct 2021 14:24:33 -0700 (PDT)
+        bh=fKkwHTUtYVuEoE7mZDvi41g9g5mXV7xtQqtX4zIAEZI=;
+        b=y8zdPhFojS1c9XLPba9+5Hk6/idS4Qo16+cX7DdEXlNXaOTjACe1waj+6YfogBXm2M
+         ogsMAe9gIkBxwmtMay+kTcInGRwMHZDra2PlgprCO3Lv1dGRzYnv3Qjx0Wgw/yEIgihu
+         zl9p10BElK+v2uoiwtS+U53whFXlQe5cVmXH1kYpyMbqLDYJVc/1GC5+nMPl/tnMGesf
+         KEadpwhj8bYK/bcmJGRcgKeXu0wGkshQYtV7PG8Z0C75/x5pMhUAiSkYi7CIuvVEWeeq
+         pY0Ox40qW5l64cuZSB69ye3u1KgYpRERmlx8meQUeAZSZk7xPXknQeQNCZPWGFrZA2TQ
+         B0eg==
+X-Gm-Message-State: AOAM532MSNd9ktVWR0O4yNWw3vSa0CgmiZKemefBY49DWjuyTI9qXTB4
+        EyHF0NPgX+aiAYMXqvu/6PLvECfGz4KIAA==
+X-Google-Smtp-Source: ABdhPJzviAd2Y25S1F7DtSVWZYvZmDsOz+2UX1aNvqQ7SOEMvGZ9+Ietqsv1UKsnYWLE6U4/ZsbDJQ==
+X-Received: by 2002:a05:600c:1912:: with SMTP id j18mr4584513wmq.117.1634678674446;
+        Tue, 19 Oct 2021 14:24:34 -0700 (PDT)
 Received: from 127.0.0.1localhost ([185.69.145.194])
-        by smtp.gmail.com with ESMTPSA id m14sm216020wms.25.2021.10.19.14.24.32
+        by smtp.gmail.com with ESMTPSA id m14sm216020wms.25.2021.10.19.14.24.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 14:24:33 -0700 (PDT)
+        Tue, 19 Oct 2021 14:24:34 -0700 (PDT)
 From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH 01/16] block: turn macro helpers into inline functions
-Date:   Tue, 19 Oct 2021 22:24:10 +0100
-Message-Id: <a6dbe9a09b7e0695803a944a7f27ecb8480a7409.1634676157.git.asml.silence@gmail.com>
+Subject: [PATCH 02/16] block: convert leftovers to bdev_get_queue
+Date:   Tue, 19 Oct 2021 22:24:11 +0100
+Message-Id: <654f1cba1fe9c321cb87943ee33a21c7ea3d8e65.1634676157.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <cover.1634676157.git.asml.silence@gmail.com>
 References: <cover.1634676157.git.asml.silence@gmail.com>
@@ -67,65 +67,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace bio_set_dev() with an identical inline helper and move it
-further to fix a dependency problem with bio_associate_blkg(). Do the
-same for bio_copy_dev().
+Convert bdev->bd_disk->queue to bdev_get_queue(), which is faster.
+Apparently, there are a few such spots in block that got lost during
+rebases.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- include/linux/bio.h | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ block/blk-core.c  | 2 +-
+ block/blk-merge.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 9538f20ffaa5..b12453d7b8a8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -430,22 +430,6 @@ void zero_fill_bio(struct bio *bio);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index e6ad5b51d0c3..c1ba34777c6d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1080,7 +1080,7 @@ EXPORT_SYMBOL(submit_bio);
+  */
+ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
+ {
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
++	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	blk_qc_t cookie = READ_ONCE(bio->bi_cookie);
+ 	int ret;
  
- extern const char *bio_devname(struct bio *bio, char *buffer);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 3e6fa449caff..df69f4bb7717 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -383,7 +383,7 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+  */
+ void blk_queue_split(struct bio **bio)
+ {
+-	struct request_queue *q = (*bio)->bi_bdev->bd_disk->queue;
++	struct request_queue *q = bdev_get_queue((*bio)->bi_bdev);
+ 	unsigned int nr_segs;
  
--#define bio_set_dev(bio, bdev) 				\
--do {							\
--	bio_clear_flag(bio, BIO_REMAPPED);		\
--	if ((bio)->bi_bdev != (bdev))			\
--		bio_clear_flag(bio, BIO_THROTTLED);	\
--	(bio)->bi_bdev = (bdev);			\
--	bio_associate_blkg(bio);			\
--} while (0)
--
--#define bio_copy_dev(dst, src)			\
--do {						\
--	bio_clear_flag(dst, BIO_REMAPPED);		\
--	(dst)->bi_bdev = (src)->bi_bdev;	\
--	bio_clone_blkg_association(dst, src);	\
--} while (0)
--
- #define bio_dev(bio) \
- 	disk_devt((bio)->bi_bdev->bd_disk)
- 
-@@ -463,6 +447,22 @@ static inline void bio_clone_blkg_association(struct bio *dst,
- 					      struct bio *src) { }
- #endif	/* CONFIG_BLK_CGROUP */
- 
-+static inline void bio_set_dev(struct bio *bio, struct block_device *bdev)
-+{
-+	bio_clear_flag(bio, BIO_REMAPPED);
-+	if (bio->bi_bdev != bdev)
-+		bio_clear_flag(bio, BIO_THROTTLED);
-+	bio->bi_bdev = bdev;
-+	bio_associate_blkg(bio);
-+}
-+
-+static inline void bio_copy_dev(struct bio *dst, struct bio *src)
-+{
-+	bio_clear_flag(dst, BIO_REMAPPED);
-+	dst->bi_bdev = src->bi_bdev;
-+	bio_clone_blkg_association(dst, src);
-+}
-+
- /*
-  * BIO list management for use by remapping drivers (e.g. DM or MD) and loop.
-  *
+ 	if (blk_may_split(q, *bio))
 -- 
 2.33.1
 
