@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2039C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 15:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3964AC43217
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 15:33:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABEB26135F
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 15:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23D9961074
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 15:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234325AbhJSPf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232568AbhJSPf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 19 Oct 2021 11:35:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51426 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233552AbhJSPfS (ORCPT
+        with ESMTP id S234369AbhJSPfS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 19 Oct 2021 11:35:18 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C378C061776
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 08:33:05 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id k3so18823034ilu.2
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 08:33:05 -0700 (PDT)
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DACE0C061769
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 08:33:04 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id d125so20847080iof.5
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 08:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2IVTGJOXa34g7zaZVPSnTIdxeithhMltU8f7waUJSLg=;
-        b=vtpyJFkqmNRcIek6ec9y8UlVo+rIKnl7CzJ6VteIFljwrl+7VWBAv4ZS+tuhQVnblL
-         /nQCE79kZcloFM3PX6rGHNXXXeGYqd4tVpixjzqcgKyFaBQbNOVOdLx7JfQRjhGtD9/5
-         qF3XA4ReLgtylMriuAH9668J0lXhYxi4miXeeOmDFHDP6sBsfYOMn2JnQsVYUaqJaB9o
-         gG+tuBQHmChB+NkhjUekmnr1xHMAWJXXd50+RUFKRxnlMEaAFIslkW2kTL9q9MS364eQ
-         RWtNRCaDkhDQ4lrZEVQudw5jZd4MS7i9M/v1jc7J5Ce0goIj7bt4tn1A4cVTNzNVD0oe
-         elmg==
+        bh=6Tlo+tdHfOcf4wSgEKYr3aWD1rF/BFu8f44oFe46Gs0=;
+        b=iS3nrpREIfnOUifwe7Hp1JmLhgchstOJnqehbNP6KxscDqfb4HjqP1PCWCTg7ngNJ9
+         c799Pk94yTMtHod48RkeXuqTzRXMYgRZttdU+uMoAJWMwefHbSV2XB0X7j+2LZhOOX6N
+         PphRjVJavky7SL4Yi1NXr6aoEbwTfylKBVadPSqjKsPKQAYev2K/s/AZYuxtTUNA6AVQ
+         hl1xoa7AHtrtQ8B5F6YG3GpGaIu8IBHOOMHz6NJDuD7IbkVZAxq3Fr6weHapta5Oxr5G
+         yGevrsP9doX7E7UQO7rbhcCAKFS68LPphl9tA1v2zqvPjEOxnNnQA5NBfGyytZzdNi0t
+         ET+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2IVTGJOXa34g7zaZVPSnTIdxeithhMltU8f7waUJSLg=;
-        b=7D7onYOtCnDU4OmlDzhuskUTh7LNze8bLROHuP3yYGG4nryD46cKzse7DgxSrwHRFN
-         uDn4KLJuZk6CB77finPyx6h+xPiNNJB+nJyzv9f9BdmMQNxQyovGLHx3VMqZqBW/mpxD
-         YCxziPRw2rdpBEkslR8L0p6qN9duBLurMNSPemGdc690aSIt/ZjlbrINPdQDJHgzaOzU
-         Xh853fti2VjpgJcJbaGmAfkwPXCGJQXZn7v4bXZZr/CDZ8AdLj8sae1LczXwX0eSi18S
-         JJZtXwQYYbIOi3N4vBuyEjj2jghD1lEWGoG9mujRUuoCJSXTf4Mcy77jWSrYY+reWhIr
-         6f5Q==
-X-Gm-Message-State: AOAM533XYHJ/Bpd9hjCqoHjqX/kFEn6eLw7oVfMu4rFg5Acwva6SeDGB
-        EjPhCCglw9bVUE/bnj21KJZN4QGI2Ys+nA==
-X-Google-Smtp-Source: ABdhPJyshNnixwAnGJlCIZwe6f1r5B3pU+SIaGsOsba66Nu5+sQbEIm8pbrDVqNxjCB+t2Y2YJjNjg==
-X-Received: by 2002:a05:6e02:1807:: with SMTP id a7mr17930941ilv.285.1634657584438;
-        Tue, 19 Oct 2021 08:33:04 -0700 (PDT)
+        bh=6Tlo+tdHfOcf4wSgEKYr3aWD1rF/BFu8f44oFe46Gs0=;
+        b=mtNv/6o9cz+Umjp/ni023AzMXNLoK04fnLGxm0SxR80EbLW+fEHo/U38QzAzp02p2F
+         f2KJf3sxhshngzRfnxc7BZe8lEgUwcoUnq1FxeYz0VXifmGFgcHYz7Yazk6myq5O49vC
+         yQUPE82262m181Mf4QcTJwb2tm6NcYpmjOWD2H+bZhyFagRP4DZ/MQs4RiNXEP4LHWVP
+         4o9YO7vW43e3N+U5LB3+lUMm0yuMZvLgsfVPx/C6trUNhhFK7qeWJcv1AflcWAaWqGBD
+         f65vPlk4LY/3evgF1HuUwGq1YgjukiLpQMHJ7CHoui3SqAqJEjeNqX5AjW7W4xclx8JH
+         EPBQ==
+X-Gm-Message-State: AOAM532G+RGe7UwPfsU8poESX5K/aF3zu7jfVlvUtdJJs0AxjWS76OEv
+        vm1vyHMivjZxRi/f5aBOQd1Jgp2Zg810Ww==
+X-Google-Smtp-Source: ABdhPJxiDDMqrQsVCfYsky0tj0Kl2aQQAbI5YY5kMYWhKUnTI+X87bJyy+5bAPIe9MifBHeSfCZeXQ==
+X-Received: by 2002:a5d:8d08:: with SMTP id p8mr1295145ioj.169.1634657583787;
+        Tue, 19 Oct 2021 08:33:03 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
         by smtp.gmail.com with ESMTPSA id t12sm8409555ilp.43.2021.10.19.08.33.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 08:33:04 -0700 (PDT)
+        Tue, 19 Oct 2021 08:33:03 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/4] block: pass in blk_mq_tags to blk_mq_rq_ctx_init()
-Date:   Tue, 19 Oct 2021 09:32:58 -0600
-Message-Id: <20211019153300.623322-3-axboe@kernel.dk>
+Subject: [PATCH 1/4] block: add rq_flags to struct blk_mq_alloc_data
+Date:   Tue, 19 Oct 2021 09:32:57 -0600
+Message-Id: <20211019153300.623322-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211019153300.623322-1-axboe@kernel.dk>
 References: <20211019153300.623322-1-axboe@kernel.dk>
@@ -66,82 +66,102 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of getting this from data for every invocation of request
-initialization, pass it in as an argument instead.
+There's a hole here we can use, and it's faster to set this earlier
+rather than need to check q->elevator multiple times.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ block/blk-mq.c | 20 ++++++++++----------
+ block/blk-mq.h |  8 ++++----
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 93b6912768ff..fbaecb6e6dd4 100644
+index d0fe86b46d1b..93b6912768ff 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -300,12 +300,11 @@ void blk_mq_wake_waiters(struct request_queue *q)
- }
- 
- static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
--		unsigned int tag, u64 alloc_time_ns)
-+		struct blk_mq_tags *tags, unsigned int tag, u64 alloc_time_ns)
- {
+@@ -305,25 +305,22 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
  	struct blk_mq_ctx *ctx = data->ctx;
  	struct blk_mq_hw_ctx *hctx = data->hctx;
  	struct request_queue *q = data->q;
--	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+-	struct elevator_queue *e = q->elevator;
+ 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
  	struct request *rq = tags->static_rqs[tag];
+-	unsigned int rq_flags = 0;
  
- 	if (!(data->rq_flags & RQF_ELV)) {
-@@ -377,20 +376,22 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
- 		u64 alloc_time_ns)
- {
- 	unsigned int tag, tag_offset;
-+	struct blk_mq_tags *tags;
+-	if (e) {
+-		rq_flags = RQF_ELV;
+-		rq->tag = BLK_MQ_NO_TAG;
+-		rq->internal_tag = tag;
+-	} else {
++	if (!(data->rq_flags & RQF_ELV)) {
+ 		rq->tag = tag;
+ 		rq->internal_tag = BLK_MQ_NO_TAG;
++	} else {
++		rq->tag = BLK_MQ_NO_TAG;
++		rq->internal_tag = tag;
+ 	}
+ 
+ 	if (data->flags & BLK_MQ_REQ_PM)
+-		rq_flags |= RQF_PM;
++		data->rq_flags |= RQF_PM;
+ 	if (blk_queue_io_stat(q))
+-		rq_flags |= RQF_IO_STAT;
+-	rq->rq_flags = rq_flags;
++		data->rq_flags |= RQF_IO_STAT;
++	rq->rq_flags = data->rq_flags;
+ 
+ 	if (blk_mq_need_time_stamp(rq))
+ 		rq->start_time_ns = ktime_get_ns();
+@@ -474,6 +471,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		.q		= q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
++		.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 		.nr_tags	= 1,
+ 	};
  	struct request *rq;
--	unsigned long tags;
-+	unsigned long tag_mask;
- 	int i, nr = 0;
+@@ -503,6 +501,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 		.q		= q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
++		.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 		.nr_tags	= 1,
+ 	};
+ 	u64 alloc_time_ns = 0;
+@@ -2500,6 +2499,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 			.q		= q,
+ 			.nr_tags	= 1,
+ 			.cmd_flags	= bio->bi_opf,
++			.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 		};
  
--	tags = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
--	if (unlikely(!tags))
-+	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-+	if (unlikely(!tag_mask))
- 		return NULL;
+ 		if (plug) {
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index d8ccb341e82e..10be317c1c13 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -148,6 +148,7 @@ struct blk_mq_alloc_data {
+ 	blk_mq_req_flags_t flags;
+ 	unsigned int shallow_depth;
+ 	unsigned int cmd_flags;
++	unsigned int rq_flags;
  
--	for (i = 0; tags; i++) {
--		if (!(tags & (1UL << i)))
-+	tags = blk_mq_tags_from_data(data);
-+	for (i = 0; tag_mask; i++) {
-+		if (!(tag_mask & (1UL << i)))
- 			continue;
- 		tag = tag_offset + i;
--		tags &= ~(1UL << i);
--		rq = blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
-+		tag_mask &= ~(1UL << i);
-+		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns);
- 		rq_list_add(data->cached_rq, rq);
- 	}
- 	data->nr_tags -= nr;
-@@ -461,7 +462,8 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
- 		goto retry;
- 	}
+ 	/* allocate multiple requests/tags in one go */
+ 	unsigned int nr_tags;
+@@ -165,10 +166,9 @@ static inline bool blk_mq_is_shared_tags(unsigned int flags)
  
--	return blk_mq_rq_ctx_init(data, tag, alloc_time_ns);
-+	return blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag,
-+					alloc_time_ns);
+ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data *data)
+ {
+-	if (data->q->elevator)
+-		return data->hctx->sched_tags;
+-
+-	return data->hctx->tags;
++	if (!(data->rq_flags & RQF_ELV))
++		return data->hctx->tags;
++	return data->hctx->sched_tags;
  }
  
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
-@@ -547,7 +549,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	tag = blk_mq_get_tag(&data);
- 	if (tag == BLK_MQ_NO_TAG)
- 		goto out_queue_exit;
--	return blk_mq_rq_ctx_init(&data, tag, alloc_time_ns);
-+	return blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag,
-+					alloc_time_ns);
- 
- out_queue_exit:
- 	blk_queue_exit(q);
+ static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
 -- 
 2.33.1
 
