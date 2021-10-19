@@ -2,107 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A95CFC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 00:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 668FDC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 00:42:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90C02600D4
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 00:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45CE26103B
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 00:42:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbhJSAny (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Oct 2021 20:43:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46602 "EHLO
+        id S229730AbhJSAou (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Oct 2021 20:44:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230149AbhJSAny (ORCPT
+        with ESMTP id S229677AbhJSAot (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Oct 2021 20:43:54 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DEEC06161C
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 17:41:42 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id h27so10995477ila.5
-        for <linux-block@vger.kernel.org>; Mon, 18 Oct 2021 17:41:42 -0700 (PDT)
+        Mon, 18 Oct 2021 20:44:49 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5631C06161C;
+        Mon, 18 Oct 2021 17:42:37 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id d3so6161299edp.3;
+        Mon, 18 Oct 2021 17:42:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3ZE1w99zHSeEaOVW5PLZYTSPH8uDVmcv6n6KnaTAnwU=;
-        b=okCeuXC1zwp0QxH0yGpBnlfHVC3RfEtpKqwVasA3RQ3DIdNDTGcv0VI+Mvxsrgrc/j
-         88xARknJ9wOl+uMkMAMBoPjnzm8XRKXplFuaJRx3arL313pun4qJid91QkXVMWVF1B7v
-         T10RCt3smXy2kSpwqODU2CqC1h4SIt/YCWodxXk/VdqTPfxbntVpEvZkbsa70yMmv6vg
-         K6SX9WQ6MeAxPTkRakpkyEOFxpgzm02qY/9G5I/i8sCbI6IR75wWZRiHJig2usjIebgv
-         XJBoUJZt3xR0epuy9DVlJkgt4DZX8ONaO5iVQ+TYi1whgsTA4ottXf4N3RDLrMHApnzx
-         MNig==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GjGwQdVktjvV+tWzHSaef8ArATDvoXaYyDl0Pgr4guA=;
+        b=L+aFB+B0AngW4r127wUHLfqy0+T4gzGP4tJtEyS6dInG0/5E5sGABqESCyuVP3ZYrT
+         jeGTgXAYDgvo8lGTfLnr97R1Oo422zr1BPEntqz5OqMXowfqNEBNXPKVrGUQteIcmBFa
+         hvAaUq/3U2bSp6X/MxrOMz8PRZgMVTCGHz1Hnqf4h/nlbqgBQPRXuYvsnuO3Na58k3yK
+         DRJzNjd1xwVA6c4DAcW9NRSIE5rc5r6qCCZhjJSvhEEJccN2uBlOOSMosuTcqVkId3Ye
+         1LbUKkGzx8rz5AkwvP8Go2dGkiU6/wmVOc0thW6zVmd2ki0EgzL60RwYz4ohNBHw4fDi
+         LpgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3ZE1w99zHSeEaOVW5PLZYTSPH8uDVmcv6n6KnaTAnwU=;
-        b=ED8wpCR3rECdO2S7cu3LKlODE+n/tegJSWc38pdBS9FT8q3Xrjpt3gpU+ILIwq8YRz
-         NUz4KzGvVVYzxVyb15UW6A+tNRbe/h2qkpjHq+/espdZn8HDa9Gz0OKEZGdOmlRrQlLC
-         u/vLe/gKFp1sHax+l1mZ+tQRh6WFTXmXUu2upg00ASq1Kbc4A3xev35wUHxZ4+BcqSkX
-         Kwccjoq/lRiN46k6MsPWuQmqxDrFVmSeYO3C2XHqZCoUC+yqjw6ih0XbP2PA4+pNpoTQ
-         CRa9chNief6/2IYjNcXRn2/IWJ0jxDXYg20l+puoB1xvH65jYFgjxUGZd4jOlYKKJ+GP
-         WPug==
-X-Gm-Message-State: AOAM530GRYLpMzzk9uOrOMGOxKPQkAfiqC488fqTCG506q9W67frpDUN
-        J3O3sYzeaNtUTzckdLdka0E5Fg==
-X-Google-Smtp-Source: ABdhPJzjf+ugZkSyF+BU1QlViAy/1tFHwsKG9bUkv42N1Wi4sFpEsPJGRTLS9mAuCMRgW4QTjrOwmg==
-X-Received: by 2002:a92:ced0:: with SMTP id z16mr15979755ilq.256.1634604099877;
-        Mon, 18 Oct 2021 17:41:39 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id u15sm3613307ilv.85.2021.10.18.17.41.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Oct 2021 17:41:39 -0700 (PDT)
-Subject: Re: [PATCH RFC] block - ataflop.c: fix breakage introduced at blk-mq
- refactoring
-To:     Finn Thain <fthain@linux-m68k.org>
-Cc:     Michael Schmitz <schmitzmic@gmail.com>, linux-m68k@vger.kernel.org,
-        geert@linux-m68k.org, linux-block@vger.kernel.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-References: <20211018222157.12238-1-schmitzmic@gmail.com>
- <8d60483d-3cd6-5df7-8db6-7a8b9ce462e3@kernel.dk>
- <97323ce2-4f5c-3af2-83ac-686edf672aea@linux-m68k.org>
- <7f64bd89-e0a5-8bc9-e504-add00dc63cf6@kernel.dk>
- <604778bc-816a-3f2e-d2ad-d39d7f7f230@linux-m68k.org>
- <460a172c-6103-3839-eecc-a193d1cc208f@kernel.dk>
- <a4e827c-9163-9fff-dd20-cdd44432fda5@linux-m68k.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3596239b-3637-6ea7-d7d5-fe81d0c7604f@kernel.dk>
-Date:   Mon, 18 Oct 2021 18:41:37 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GjGwQdVktjvV+tWzHSaef8ArATDvoXaYyDl0Pgr4guA=;
+        b=INro6zd0rWkZ4QAYV8t1ct3mcIBOsHM8TCk0XNe1uQJB4C8T+CLyj3jAtlEpa+cMbF
+         BlTHPtQXhUYSDHk3HaUm4K9MS/A62Jr7/VddL1Jhb3814F10H8HlKhPMkzhRCXePRueN
+         MigJq790iLQ+vg2M3NVF8wN5GMuJKdP1AGlh3OO3Ce6eNnYb28KT6bzwlSjrnygKfTr6
+         ixzCj9ml3XXnCIXhzWhAuxr7eO/nWK6Sua9P5i8/fduOR+tZREoI+hPiP2Z5laLb6g4A
+         f0MYaDSGunL1dMwmqweuFhlw4sF+RMbrVrnX5zDcuDzo06VZDJ6K5jGLn3b41kW4GClA
+         1xfg==
+X-Gm-Message-State: AOAM533+rH0J+oig5VBnW8DjaaTBZgmbWVZci4kqlRlMi/KOQryEdPKf
+        xDIjjwh8r2dwMXxrIuPnn69n4TwbWj6k7ra+4p5F6kr8
+X-Google-Smtp-Source: ABdhPJylfhSozLyajUhY7dIebgi7QaiCYTHSE9IYOFxf85SO+zlPhbCjljdBGdYFJTVJWzaj9DYlguLmpyY5oNIN3O0=
+X-Received: by 2002:a17:907:d01:: with SMTP id gn1mr8424587ejc.187.1634604156306;
+ Mon, 18 Oct 2021 17:42:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a4e827c-9163-9fff-dd20-cdd44432fda5@linux-m68k.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20211018222157.12238-1-schmitzmic@gmail.com> <8d60483d-3cd6-5df7-8db6-7a8b9ce462e3@kernel.dk>
+ <791e1173-4794-a547-2c84-112cc6627a1f@gmail.com> <859908de-0ca0-0425-1220-a3192c1e9110@kernel.dk>
+In-Reply-To: <859908de-0ca0-0425-1220-a3192c1e9110@kernel.dk>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Date:   Tue, 19 Oct 2021 13:42:24 +1300
+Message-ID: <CAOmrzkJZAAGEQFamfSb-jZNr5r0hr6jM+YoMSTCS08TtDWxcZg@mail.gmail.com>
+Subject: Re: [PATCH RFC] block - ataflop.c: fix breakage introduced at blk-mq refactoring
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Linux/m68k" <linux-m68k@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-block@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/18/21 6:14 PM, Finn Thain wrote:
-> On Mon, 18 Oct 2021, Jens Axboe wrote:
-> 
->>
->> Oh please, can we skip the empty words, this is tiresome and 
->> unproductive. Since you apparently have a much better grasp on this than 
->> I do, answer me this:
->>
->> 1) How many users of ataflop are there?
->>
->> 2) How big of a subset of that group are capable of figuring out where
->>    to send a bug report?
->>
-> 
-> Both good questions. Here are some more.
-> 
-> 3) How many users is sufficient to justify the cost of keeping ataflop 
-> around?
-> 
-> 4) How long is the user count allowed to remain below that threshold, 
-> before the code is removed?
+Hi Jens,
 
-I'm not interested in bot conversations. EOD.
+On Tue, Oct 19, 2021 at 12:40 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >> 'last' is set if it's the last of a sequence of ->queue_rq() calls. If
+> >> you just do sync IO, then last is always set, as there is no sequence.
+> >> It's not hard to generate sequences, but on a floppy with basically no
+> >> queue depth the most you'd ever get is 2. You could try and set:
+> >>
+> >> /sys/block/<dev>/queue/max_sectors_kb
+> >>
+> >> to 4 for example, and then do something that generates a larger than 4k
+> >> write or read. Ideally that should give you more than 1.
+> >
+> > Thanks, tried that - that does indeed cause multiple requests queued to
+> > the driver (which rejects them promptly).
+> >
+> > Now fails because ataflop_commit_rqs() unconditionally calls
+> > finish_fdc() right after the first request started processing- and
+> > promptly wipes it again.
+> >
+> > What is the purpose of .commit_rqs? The PC legacy floppy driver doesn't
+> > use it ...
+>
+> You only need to care about bd->last if you have something in the driver
+> that can make it cheaper to commit more than one request. An example is
+> a driver that fills in requests, and then has an operation to ring the
+> submission doorbell to flush them out. The latter is what ->commit_rqs
+> is for.
 
--- 
-Jens Axboe
+OK, that's indeed a no-op for our floppy driver, which can queue
+exactly one request.
 
+> For a floppy driver, just ignore bd->last and don't implement
+> commit_rqs, I don't think we're squeezing a lot of extra efficiency out
+> of it through that! Think many hundreds of thousands of IOPS or millions
+> of IOPS, not a handful of IOPS or less.
+
+I'm not averse to using bd->last to close down only after the last
+request in a sequence if it can be done safely (i.e. the requests that
+had been rejected are then promptly requeued). But complexity is the
+enemy of maintainability, so the nice and easy fix should be enough.
+
+I'll respin and send another version shortly.
+
+Cheers,
+
+    Michael
