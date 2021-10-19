@@ -2,288 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3BEC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 07:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F89C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 07:44:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF22261355
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 07:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9E5B61374
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 07:44:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231187AbhJSHjH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 03:39:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbhJSHjH (ORCPT
+        id S230207AbhJSHqt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 03:46:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60151 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234552AbhJSHql (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 03:39:07 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4949CC06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 00:36:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=CYNxRQ01pKOwVYHa06L+8e98u7Vn+1wScPdYwItVY+s=; b=19fOJrqxoRvezDB5PLNjHendDt
-        UMLV7KEq8MwKXqQGhk9dtI+aDHgNd24RrxO9B6eXd84yuaRPBXm/JPcGxqtfgD8+MnFSACtKiP0NA
-        WAxjX6e8ruk/h0XtBmwwwJvDK7uqoLoblrP/mNC3mCPeenmwEepQsRrUjKF79NfIYCLttqx434QN4
-        DyRddrLV1Bq6FougUkDPddZtVxzCvJ6Bxns31bnb8cn+YPStkkJ4XZu/lKu56HUHtJIZG0cPjRl7p
-        VDH11mcl4QvbIV/PziL/g5GF4R2GVD48/Xt3hgig/X80GKehiS4xYHywHWhHPojviTKwkRiVzpuQc
-        mSLdFnWQ==;
-Received: from 089144192247.atnat0001.highway.a1.net ([89.144.192.247] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mcjg5-000QWr-CW; Tue, 19 Oct 2021 07:36:54 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-mm@kvack.org
-Subject: [PATCH 2/2] memremap: remove support for external pgmap refcounts
-Date:   Tue, 19 Oct 2021 09:36:41 +0200
-Message-Id: <20211019073641.2323410-3-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211019073641.2323410-1-hch@lst.de>
-References: <20211019073641.2323410-1-hch@lst.de>
+        Tue, 19 Oct 2021 03:46:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634629468;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xdb9pgCES243B4qiRy/jopANeVX7zGOs7S7OBfoCKBM=;
+        b=S1e08T8jGuiq4cXZqcKV9l9IZbOy2yz+1mH7iE+dALLwobINh2k3HVrjd0OxH4grwc9sDp
+        faQELyEpxKiz7cE46yJzSvKfaOT9evwZ0Dkco+YniFMLeCYD/vhvvpuSndWShMEF1GX5hf
+        8QFqsCz+qZ2ZeCEAC2/pz8X+XZ+eHLA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-550-jCxHfB9sO5-8XCTP8TdceQ-1; Tue, 19 Oct 2021 03:44:25 -0400
+X-MC-Unique: jCxHfB9sO5-8XCTP8TdceQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 952DE10A8E01;
+        Tue, 19 Oct 2021 07:44:23 +0000 (UTC)
+Received: from T590 (ovpn-8-39.pek2.redhat.com [10.72.8.39])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 56D8F19C79;
+        Tue, 19 Oct 2021 07:44:15 +0000 (UTC)
+Date:   Tue, 19 Oct 2021 15:44:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Lennart Poettering <lennart@poettering.net>,
+        Jens Axboe <axboe@fb.com>, Martijn Coenen <maco@android.com>,
+        linux-block@vger.kernel.org, Luca Boccassi <bluca@debian.org>,
+        Karel Zak <kzak@redhat.com>
+Subject: Re: Is LO_FLAGS_DIRECT_IO by default a good idea?
+Message-ID: <YW53SrKnKmn2Aa0k@T590>
+References: <YW2CaJHYbw244l+V@gardel-login>
+ <20211018150550.GA29993@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211018150550.GA29993@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No driver is left using the external pgmap refcount, so remove the
-code to support it.
+On Mon, Oct 18, 2021 at 05:05:50PM +0200, Christoph Hellwig wrote:
+> On Mon, Oct 18, 2021 at 04:19:20PM +0200, Lennart Poettering wrote:
+> > A brief answer like "yes, please, enable by default" would already
+> > make me happy.
+> 
+> I thikn enabling it by default is a good idea.  The only good use
+> case I can think of for using buffered I/O is when the image has
+> a smaller block size than supported on the host file.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/memremap.h          | 18 ++--------
- mm/memremap.c                     | 59 +++++++------------------------
- tools/testing/nvdimm/test/iomap.c | 43 +++++++---------------
- 3 files changed, 27 insertions(+), 93 deletions(-)
+Maybe we can enable it at default in kernel side, then fackback to
+buffered IO if DIO is failed.
 
-diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-index c0e9d35889e8d..a8bc588fe7aa8 100644
---- a/include/linux/memremap.h
-+++ b/include/linux/memremap.h
-@@ -72,16 +72,6 @@ struct dev_pagemap_ops {
- 	 */
- 	void (*page_free)(struct page *page);
- 
--	/*
--	 * Transition the refcount in struct dev_pagemap to the dead state.
--	 */
--	void (*kill)(struct dev_pagemap *pgmap);
--
--	/*
--	 * Wait for refcount in struct dev_pagemap to be idle and reap it.
--	 */
--	void (*cleanup)(struct dev_pagemap *pgmap);
--
- 	/*
- 	 * Used for private (un-addressable) device memory only.  Must migrate
- 	 * the page back to a CPU accessible page.
-@@ -95,8 +85,7 @@ struct dev_pagemap_ops {
-  * struct dev_pagemap - metadata for ZONE_DEVICE mappings
-  * @altmap: pre-allocated/reserved memory for vmemmap allocations
-  * @ref: reference count that pins the devm_memremap_pages() mapping
-- * @internal_ref: internal reference if @ref is not provided by the caller
-- * @done: completion for @internal_ref
-+ * @done: completion for @ref
-  * @type: memory type: see MEMORY_* in memory_hotplug.h
-  * @flags: PGMAP_* flags to specify defailed behavior
-  * @ops: method table
-@@ -109,8 +98,7 @@ struct dev_pagemap_ops {
-  */
- struct dev_pagemap {
- 	struct vmem_altmap altmap;
--	struct percpu_ref *ref;
--	struct percpu_ref internal_ref;
-+	struct percpu_ref ref;
- 	struct completion done;
- 	enum memory_type type;
- 	unsigned int flags;
-@@ -191,7 +179,7 @@ static inline unsigned long memremap_compat_align(void)
- static inline void put_dev_pagemap(struct dev_pagemap *pgmap)
- {
- 	if (pgmap)
--		percpu_ref_put(pgmap->ref);
-+		percpu_ref_put(&pgmap->ref);
- }
- 
- #endif /* _LINUX_MEMREMAP_H_ */
-diff --git a/mm/memremap.c b/mm/memremap.c
-index ed593bf87109a..d7034c55d0a24 100644
---- a/mm/memremap.c
-+++ b/mm/memremap.c
-@@ -112,30 +112,6 @@ static unsigned long pfn_next(unsigned long pfn)
- #define for_each_device_pfn(pfn, map, i) \
- 	for (pfn = pfn_first(map, i); pfn < pfn_end(map, i); pfn = pfn_next(pfn))
- 
--static void dev_pagemap_kill(struct dev_pagemap *pgmap)
--{
--	if (pgmap->ops && pgmap->ops->kill)
--		pgmap->ops->kill(pgmap);
--	else
--		percpu_ref_kill(pgmap->ref);
--}
--
--static void dev_pagemap_cleanup(struct dev_pagemap *pgmap)
--{
--	if (pgmap->ops && pgmap->ops->cleanup) {
--		pgmap->ops->cleanup(pgmap);
--	} else {
--		wait_for_completion(&pgmap->done);
--		percpu_ref_exit(pgmap->ref);
--	}
--	/*
--	 * Undo the pgmap ref assignment for the internal case as the
--	 * caller may re-enable the same pgmap.
--	 */
--	if (pgmap->ref == &pgmap->internal_ref)
--		pgmap->ref = NULL;
--}
--
- static void pageunmap_range(struct dev_pagemap *pgmap, int range_id)
- {
- 	struct range *range = &pgmap->ranges[range_id];
-@@ -167,11 +143,12 @@ void memunmap_pages(struct dev_pagemap *pgmap)
- 	unsigned long pfn;
- 	int i;
- 
--	dev_pagemap_kill(pgmap);
-+	percpu_ref_kill(&pgmap->ref);
- 	for (i = 0; i < pgmap->nr_range; i++)
- 		for_each_device_pfn(pfn, pgmap, i)
- 			put_page(pfn_to_page(pfn));
--	dev_pagemap_cleanup(pgmap);
-+	wait_for_completion(&pgmap->done);
-+	percpu_ref_exit(&pgmap->ref);
- 
- 	for (i = 0; i < pgmap->nr_range; i++)
- 		pageunmap_range(pgmap, i);
-@@ -188,8 +165,7 @@ static void devm_memremap_pages_release(void *data)
- 
- static void dev_pagemap_percpu_release(struct percpu_ref *ref)
- {
--	struct dev_pagemap *pgmap =
--		container_of(ref, struct dev_pagemap, internal_ref);
-+	struct dev_pagemap *pgmap = container_of(ref, struct dev_pagemap, ref);
- 
- 	complete(&pgmap->done);
- }
-@@ -295,8 +271,8 @@ static int pagemap_range(struct dev_pagemap *pgmap, struct mhp_params *params,
- 	memmap_init_zone_device(&NODE_DATA(nid)->node_zones[ZONE_DEVICE],
- 				PHYS_PFN(range->start),
- 				PHYS_PFN(range_len(range)), pgmap);
--	percpu_ref_get_many(pgmap->ref, pfn_end(pgmap, range_id)
--			- pfn_first(pgmap, range_id));
-+	percpu_ref_get_many(&pgmap->ref,
-+		pfn_end(pgmap, range_id) - pfn_first(pgmap, range_id));
- 	return 0;
- 
- err_add_memory:
-@@ -362,22 +338,11 @@ void *memremap_pages(struct dev_pagemap *pgmap, int nid)
- 		break;
- 	}
- 
--	if (!pgmap->ref) {
--		if (pgmap->ops && (pgmap->ops->kill || pgmap->ops->cleanup))
--			return ERR_PTR(-EINVAL);
--
--		init_completion(&pgmap->done);
--		error = percpu_ref_init(&pgmap->internal_ref,
--				dev_pagemap_percpu_release, 0, GFP_KERNEL);
--		if (error)
--			return ERR_PTR(error);
--		pgmap->ref = &pgmap->internal_ref;
--	} else {
--		if (!pgmap->ops || !pgmap->ops->kill || !pgmap->ops->cleanup) {
--			WARN(1, "Missing reference count teardown definition\n");
--			return ERR_PTR(-EINVAL);
--		}
--	}
-+	init_completion(&pgmap->done);
-+	error = percpu_ref_init(&pgmap->ref, dev_pagemap_percpu_release, 0,
-+				GFP_KERNEL);
-+	if (error)
-+		return ERR_PTR(error);
- 
- 	devmap_managed_enable_get(pgmap);
- 
-@@ -486,7 +451,7 @@ struct dev_pagemap *get_dev_pagemap(unsigned long pfn,
- 	/* fall back to slow path lookup */
- 	rcu_read_lock();
- 	pgmap = xa_load(&pgmap_array, PHYS_PFN(phys));
--	if (pgmap && !percpu_ref_tryget_live(pgmap->ref))
-+	if (pgmap && !percpu_ref_tryget_live(&pgmap->ref))
- 		pgmap = NULL;
- 	rcu_read_unlock();
- 
-diff --git a/tools/testing/nvdimm/test/iomap.c b/tools/testing/nvdimm/test/iomap.c
-index ed563bdd88f39..b752ce47ead3c 100644
---- a/tools/testing/nvdimm/test/iomap.c
-+++ b/tools/testing/nvdimm/test/iomap.c
-@@ -100,25 +100,17 @@ static void nfit_test_kill(void *_pgmap)
- {
- 	struct dev_pagemap *pgmap = _pgmap;
- 
--	WARN_ON(!pgmap || !pgmap->ref);
--
--	if (pgmap->ops && pgmap->ops->kill)
--		pgmap->ops->kill(pgmap);
--	else
--		percpu_ref_kill(pgmap->ref);
--
--	if (pgmap->ops && pgmap->ops->cleanup) {
--		pgmap->ops->cleanup(pgmap);
--	} else {
--		wait_for_completion(&pgmap->done);
--		percpu_ref_exit(pgmap->ref);
--	}
-+	WARN_ON(!pgmap);
-+
-+	percpu_ref_kill(&pgmap->ref);
-+
-+	wait_for_completion(&pgmap->done);
-+	percpu_ref_exit(&pgmap->ref);
- }
- 
- static void dev_pagemap_percpu_release(struct percpu_ref *ref)
- {
--	struct dev_pagemap *pgmap =
--		container_of(ref, struct dev_pagemap, internal_ref);
-+	struct dev_pagemap *pgmap = container_of(ref, struct dev_pagemap, ref);
- 
- 	complete(&pgmap->done);
- }
-@@ -132,22 +124,11 @@ void *__wrap_devm_memremap_pages(struct device *dev, struct dev_pagemap *pgmap)
- 	if (!nfit_res)
- 		return devm_memremap_pages(dev, pgmap);
- 
--	if (!pgmap->ref) {
--		if (pgmap->ops && (pgmap->ops->kill || pgmap->ops->cleanup))
--			return ERR_PTR(-EINVAL);
--
--		init_completion(&pgmap->done);
--		error = percpu_ref_init(&pgmap->internal_ref,
--				dev_pagemap_percpu_release, 0, GFP_KERNEL);
--		if (error)
--			return ERR_PTR(error);
--		pgmap->ref = &pgmap->internal_ref;
--	} else {
--		if (!pgmap->ops || !pgmap->ops->kill || !pgmap->ops->cleanup) {
--			WARN(1, "Missing reference count teardown definition\n");
--			return ERR_PTR(-EINVAL);
--		}
--	}
-+	init_completion(&pgmap->done);
-+	error = percpu_ref_init(&pgmap->ref, dev_pagemap_percpu_release, 0,
-+				GFP_KERNEL);
-+	if (error)
-+		return ERR_PTR(error);
- 
- 	error = devm_add_action_or_reset(dev, nfit_test_kill, pgmap);
- 	if (error)
--- 
-2.30.2
+thanks, 
+Ming
 
