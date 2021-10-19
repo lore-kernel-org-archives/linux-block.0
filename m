@@ -2,91 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A315C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44F9C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:28:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B86D61355
-	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:11:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFF186137C
+	for <linux-block@archiver.kernel.org>; Tue, 19 Oct 2021 17:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234506AbhJSRNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Oct 2021 13:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234613AbhJSRNt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Oct 2021 13:13:49 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C42CC061746
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 10:11:37 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id h196so21263697iof.2
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 10:11:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=9nNFJafehBF2DqCROwwySiwn6Y3GKArtLiVFqM+LLss=;
-        b=tz6zldbs8fcCfLu5knqDo5ntX3sqxkUwSNWMqGEZAC3KskdYOHbBMmkiv67EWS/Bah
-         1+uXFEgtfZhgtdk5uDDe1SIAlgPkEnWkv2UPrc8eXWjzDoKCk+9WvI90ZG76pQcOzSar
-         rP92vjosZY5eE1kctMMfcdGh645wROW2w4lJSNx0N41MHH3qTqKr67ikByBtHCIdK+ne
-         dChTZs+hWrkLrs6qGpreqdT0eO4eGu//Al0xBEPOYwOr0nTTjjqyRDICQ+Tt2A2obLb2
-         VlkyFQXzaj9DiuOpia+tHj8x+ovqd7js+PDo5q7PLAizgsdUd+3msgGRujZqsuBa6NxX
-         gmOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=9nNFJafehBF2DqCROwwySiwn6Y3GKArtLiVFqM+LLss=;
-        b=KWtbwORVd4muDdBiJKU0b4Y2IXBxdtEhSBCOeQl0Dcx5Mc8Nf8Km4VFSdFOe0e+mDd
-         i1yRRLPjhrd3y6v003h0AC83kCzyKatlURJccx8mAjqGL7V1+ddKWn22L41WroatGh1k
-         JPXkIy823axMQWaVKtZj3AXhAlDqLNRqz05JFQEnzXyjF5F10nTTtzc6iWxTtIn430qJ
-         E6eAFspygZwR7cuS0XyY9/TyIyJkh0WmGUgkBYSLve99n9TQsrce3xhZk/BZCXUGR1CJ
-         TSSMdUsru1auC6uoz6vjAEw4Dp0cO+ychRy9Jhm6b0PALw+jPT/++FkIFILhYN69Vpj0
-         3OnA==
-X-Gm-Message-State: AOAM530pSDuvDZPvtWQxyGlQTIxGVFBkPLYzDPHIx6hfWZSlStQEvvJo
-        QY33YsZmpv2GvsM6txi3sgEgHq2jR9gcLQ==
-X-Google-Smtp-Source: ABdhPJwSZPVG9ANmMYck+JQNyN7Z2xQira/yIiKqjI3YZOb/AQHHuMA8TC+w/9jd1q/LhiCAELvLVA==
-X-Received: by 2002:a05:6602:13c3:: with SMTP id o3mr19921409iov.142.1634663496451;
-        Tue, 19 Oct 2021 10:11:36 -0700 (PDT)
-Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id t12sm8518003ilp.43.2021.10.19.10.11.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 10:11:36 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: don't handle non-flush requests in blk_insert_flush
-Date:   Tue, 19 Oct 2021 11:11:34 -0600
-Message-Id: <163466349198.667080.16319805997468516195.b4-ty@kernel.dk>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211019122553.2467817-1-hch@lst.de>
-References: <20211019122553.2467817-1-hch@lst.de>
+        id S232127AbhJSRav (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Oct 2021 13:30:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56440 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231226AbhJSRau (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Oct 2021 13:30:50 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2BE4F61355;
+        Tue, 19 Oct 2021 17:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1634664517;
+        bh=59LlQsuP3ZW+Cqkg0bmKDDTdZJ6xYatNGwXXx+Ql12c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YWZi9VFvsWHjYkDIPd8f49GxBVmj/S9NVGgH7d94tK3kKeCF+lF3syMiKzMmqfuyg
+         JEHxrMIxVUmTbr2P3UxsxW/NFBzES4GLdSmR5jSm9QRoc0t7a8kiYYJnuP8TXiAFgt
+         ifpV2BfQaooqVVlB4sG6JiSoyYkjtUSC8FI4Ss/k=
+Date:   Tue, 19 Oct 2021 19:28:35 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        akpm@linux-foundation.org, minchan@kernel.org, jeyu@kernel.org,
+        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
+        joe@perches.com, tglx@linutronix.de, keescook@chromium.org,
+        rostedt@goodmis.org, linux-spdx@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YW8AQ4fMNV8MT1vX@kroah.com>
+References: <YWjCpLUNPF3s4P2U@T590>
+ <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
+ <YWk9e957Hb+I7HvR@T590>
+ <YWm68xUnAofop3PZ@bombadil.infradead.org>
+ <YWq3Z++uoJ/kcp+3@T590>
+ <YW3LuzaPhW96jSBK@bombadil.infradead.org>
+ <YW4uwep3BCe9Vxq8@T590>
+ <YW7pQKi8AlV+ZemU@bombadil.infradead.org>
+ <YW7xbnrqfzifa9OC@kroah.com>
+ <YW7yjQVC4NRfrWxD@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YW7yjQVC4NRfrWxD@bombadil.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 19 Oct 2021 14:25:53 +0200, Christoph Hellwig wrote:
-> Return to the normal blk_mq_submit_bio flow if the bio did not end up
-> actually being a flush because the device didn't support it.  Note that
-> this is basically impossible to hit without special instrumentation given
-> that submit_bio_checks already clears these flags usually, so we'd need a
-> tight race to actually hit this code path.
+On Tue, Oct 19, 2021 at 09:30:05AM -0700, Luis Chamberlain wrote:
+> On Tue, Oct 19, 2021 at 06:25:18PM +0200, Greg KH wrote:
+> > On Tue, Oct 19, 2021 at 08:50:24AM -0700, Luis Chamberlain wrote:
+> > > So do you want to take the position:
+> > > 
+> > > Hey driver authors: you cannot use any shared lock on module removal and
+> > > on sysfs ops?
+> > 
+> > Yes, I would not recommend using such a lock at all.  sysfs operations
+> > happen on a per-device basis, so you can lock the device structure.
 > 
-> With this the call to blk_mq_run_hw_queue for the flush requests can be
-> removed given that the actual flush requests are always issued via the
-> requeue workqueue which runs the queue unconditionally.
-> 
-> [...]
+> All devices are going to be removed on module removal and so cannot be locked.
 
-Applied, thanks!
+devices are not normally created by a driver, that is up to the bus
+controller logic.  A module will just disconnect itself from the device,
+the device does not go away.
 
-[1/1] blk-mq: don't handle non-flush requests in blk_insert_flush
-      commit: d92ca9d8348fb12c89eac5928bd651c3a485d7b9
+But yes, there are exceptions, and if you are doing something odd like
+that, then you need to be aware of crazy things like this, so be
+careful.  But for all normal drivers, they do not have to worry about
+this.
 
-Best regards,
--- 
-Jens Axboe
+thanks,
 
-
+greg k-h
