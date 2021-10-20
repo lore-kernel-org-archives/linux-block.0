@@ -2,207 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B0CC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC31C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:54:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 956436135F
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:41:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 374B76137C
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbhJTOnz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 10:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54538 "EHLO
+        id S230195AbhJTO4d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 10:56:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbhJTOnv (ORCPT
+        with ESMTP id S230072AbhJTO4c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 10:43:51 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E5BC06161C
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:41:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ZFzyTxhL31rM+CddLYCmyu8tXSw4Y3k90Iix1fq6Wr4=; b=DSMFaCQsJcexmzfjvZOowH84eH
-        NCVMO6YiR+c3lFsTYEgtgt67QHXXtFfL3cIuWO0/lwl2S1LC4wpwOv90mCVRui5EgaBC3kxehP9E0
-        B++LlOrj6AhNEuF1vXrxlXW8vluU4FVNb5iBTfQ0eEcJXCghKW8vxwKzLlbinQM5KLTo0neKwz8UJ
-        zvjIauPOQgqOj+Y6vkhgsdhYq2YLlPlHsf/v2QP3Pwv//ATWXUIEEM5NDsyprd6OLaBdeEdrOJmVW
-        OOG+ANgZ2Q8XELWEA1qDM1DRANS+wuxsM1LhEzSqIpfUDpcv3/8ypSKoTt4t4WT/1o1kxCQYKSoc9
-        15JVCPzQ==;
-Received: from [2001:4bb8:180:8777:a130:d02a:a9b5:7d80] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mdCmd-004oHs-8F; Wed, 20 Oct 2021 14:41:35 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 4/4] block: cleanup the flush plug helpers
-Date:   Wed, 20 Oct 2021 16:41:19 +0200
-Message-Id: <20211020144119.142582-5-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211020144119.142582-1-hch@lst.de>
-References: <20211020144119.142582-1-hch@lst.de>
+        Wed, 20 Oct 2021 10:56:32 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA07C061753
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:54:18 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id p6-20020a9d7446000000b0054e6bb223f3so6120937otk.3
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:54:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TZZSEfWCStHUfXhWoXkg5KMgJocnV57u5o2CEcJ7HCc=;
+        b=m6t8lcoqFlEuO2YtgUGyJOgTFG9r3gegg328r7yqi7ahbS8ubR2dD0/Pj2EWCTAUuA
+         M02ojT0kPrzHZYYG+nzIM/amlc0aviTrC5h073WmzUsDG5kSpMZnjhuK+i8EoLI8XtFV
+         tAOJI6Dq6RqsaFkY7XaLCF+jWOo8HC09LBuWXmFGMukDr003XnwiD9sz7/I/c5Gdrkja
+         EgQndCGLKNGRW6KF4GgsUvpBI9e/r1wrQDvkfxN5dmsQcuosbJ5bD+47WPJHDtMVt1ox
+         UNh+E6Iq9tCpN0OMN/AP4Ti0h/SP/2gadP9EfeelfLwNwKFK/cs3CzBNoPypeMhUfQ1Q
+         8tNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TZZSEfWCStHUfXhWoXkg5KMgJocnV57u5o2CEcJ7HCc=;
+        b=0O7G7aVahYPPnjQr2CrsMMKfdRoEPvQVGL/JwqLYpprA4g9mcgluRc81YR+K8z7/mX
+         ZXmOHlKOWAv7n5gZI8vWAqeJJcad2VnJA/zHhSdqNn7/Sz39/vwYalwwLRpz8jxAJkDf
+         MfWp9ZhcWPI89K/uLqfTHpyXaGPnw2z2VdcF7FGI4MeV2xbSFHgAwXUsI/wPTtqVIx4O
+         ifhAun23tnagzWz7jDwyHBgmLi2t4LS22ISPskK4v57VbLyGI3oDQlpFUanjZuYfHcv6
+         RUF6uIwYV8YPv8Jz0XQRxRg6kmKgxuCe+IxNyTtciSeAQd13PQId7ez4qmCbdNO0Dd0Y
+         WyHA==
+X-Gm-Message-State: AOAM530eTcv7D8g7g4XhtEFIE4tp9j8noTnXOmVHaiyhAmFBk29JCSSe
+        GGkxOQwcUFHJ5zHC0WfH+xCv/w==
+X-Google-Smtp-Source: ABdhPJyA70p8IeSf47juIEqV0A0ohyswwqnHS0r02Wg4m/IZ8h7PlFDckmkiOFfwNwbTNzml/h726Q==
+X-Received: by 2002:a9d:4c99:: with SMTP id m25mr294329otf.204.1634741657447;
+        Wed, 20 Oct 2021 07:54:17 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id bc41sm476898oob.2.2021.10.20.07.54.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Oct 2021 07:54:17 -0700 (PDT)
+Subject: Re: remove QUEUE_FLAG_SCSI_PASSTHROUGH v2
+To:     Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     "J. Bruce Fields" <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+References: <20211019075418.2332481-1-hch@lst.de>
+ <yq15ytsbawr.fsf@ca-mkp.ca.oracle.com> <20211020053341.GA25529@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0a70e163-d6cb-9733-a91f-d0bee2c23c69@kernel.dk>
+Date:   Wed, 20 Oct 2021 08:54:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20211020053341.GA25529@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consolidate the various helpers into a single blk_flush_plug helper that
-takes a plk_plug and the from_scheduler bool and switch all callsites to
-call it directly.  Checks that the plug is non-NULL must be performed by
-the caller, something that most already do anyway.
+On 10/19/21 11:33 PM, Christoph Hellwig wrote:
+> On Wed, Oct 20, 2021 at 12:05:24AM -0400, Martin K. Petersen wrote:
+>>
+>> Christoph,
+>>
+>>> The changes to support pktcdvd are a bit ugly, but I can't think of
+>>> anything better (except for removing the driver entirely).  If we'd
+>>> want to support packet writing today it would probably live entirely
+>>> inside the sr driver.
+>>
+>> Yeah, I agree.
+>>
+>> Anyway. No major objections from me. Not sure whether it makes most
+>> sense for this to go through block or scsi?
+> 
+> I'm not sure either, but either tree is fine with me.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c       | 13 ++++++-------
- fs/fs-writeback.c      |  5 +++--
- include/linux/blkdev.h | 29 ++++-------------------------
- kernel/sched/core.c    |  5 +++--
- 4 files changed, 16 insertions(+), 36 deletions(-)
+Looks fine to me, outside of the spelling error in patch 1. I can set
+up a topic branch for this one.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 63fee1f82bd7d..bb25934c9408a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1089,7 +1089,7 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
- 		return 0;
- 
- 	if (current->plug)
--		blk_flush_plug_list(current->plug, false);
-+		blk_flush_plug(current->plug, false);
- 
- 	if (blk_queue_enter(q, BLK_MQ_REQ_NOWAIT))
- 		return 0;
-@@ -1637,7 +1637,7 @@ struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug, void *data,
- }
- EXPORT_SYMBOL(blk_check_plugged);
- 
--void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
-+void blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- {
- 	if (!list_empty(&plug->cb_list))
- 		flush_plug_callbacks(plug, from_schedule);
-@@ -1659,11 +1659,10 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
-  */
- void blk_finish_plug(struct blk_plug *plug)
- {
--	if (plug != current->plug)
--		return;
--	blk_flush_plug_list(plug, false);
--
--	current->plug = NULL;
-+	if (plug == current->plug) {
-+		blk_flush_plug(plug, false);
-+		current->plug = NULL;
-+	}
- }
- EXPORT_SYMBOL(blk_finish_plug);
- 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 81ec192ce0673..4124a89a1a5df 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -1893,7 +1893,8 @@ static long writeback_sb_inodes(struct super_block *sb,
- 			 * unplug, so get our IOs out the door before we
- 			 * give up the CPU.
- 			 */
--			blk_flush_plug(current);
-+			if (current->plug)
-+				blk_flush_plug(current->plug, false);
- 			cond_resched();
- 		}
- 
-@@ -2291,7 +2292,7 @@ void wakeup_flusher_threads(enum wb_reason reason)
- 	 * If we are expecting writeback progress we must submit plugged IO.
- 	 */
- 	if (blk_needs_flush_plug(current))
--		blk_schedule_flush_plug(current);
-+		blk_flush_plug(current->plug, true);
- 
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(bdi, &bdi_list, bdi_list)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c95aee920bbb4..16647fbd1c2c4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -708,9 +708,8 @@ extern void blk_set_queue_dying(struct request_queue *);
-  * as the lock contention for request_queue lock is reduced.
-  *
-  * It is ok not to disable preemption when adding the request to the plug list
-- * or when attempting a merge, because blk_schedule_flush_list() will only flush
-- * the plug list when the task sleeps by itself. For details, please see
-- * schedule() where blk_schedule_flush_plug() is called.
-+ * or when attempting a merge. For details, please see schedule() where
-+ * blk_flush_plug() is called.
-  */
- struct blk_plug {
- 	struct request *mq_list; /* blk-mq requests */
-@@ -740,23 +739,8 @@ extern struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug,
- extern void blk_start_plug(struct blk_plug *);
- extern void blk_start_plug_nr_ios(struct blk_plug *, unsigned short);
- extern void blk_finish_plug(struct blk_plug *);
--extern void blk_flush_plug_list(struct blk_plug *, bool);
- 
--static inline void blk_flush_plug(struct task_struct *tsk)
--{
--	struct blk_plug *plug = tsk->plug;
--
--	if (plug)
--		blk_flush_plug_list(plug, false);
--}
--
--static inline void blk_schedule_flush_plug(struct task_struct *tsk)
--{
--	struct blk_plug *plug = tsk->plug;
--
--	if (plug)
--		blk_flush_plug_list(plug, true);
--}
-+void blk_flush_plug(struct blk_plug *plug, bool from_schedule);
- 
- static inline bool blk_needs_flush_plug(struct task_struct *tsk)
- {
-@@ -785,15 +769,10 @@ static inline void blk_finish_plug(struct blk_plug *plug)
- {
- }
- 
--static inline void blk_flush_plug(struct task_struct *task)
--{
--}
--
--static inline void blk_schedule_flush_plug(struct task_struct *task)
-+static inline void blk_flush_plug(struct blk_plug *plug, bool async)
- {
- }
- 
--
- static inline bool blk_needs_flush_plug(struct task_struct *tsk)
- {
- 	return false;
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 92ef7b68198c4..34f37502c27e1 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -6343,7 +6343,7 @@ static inline void sched_submit_work(struct task_struct *tsk)
- 	 * make sure to submit it to avoid deadlocks.
- 	 */
- 	if (blk_needs_flush_plug(tsk))
--		blk_schedule_flush_plug(tsk);
-+		blk_flush_plug(tsk->plug, true);
- }
- 
- static void sched_update_worker(struct task_struct *tsk)
-@@ -8354,7 +8354,8 @@ int io_schedule_prepare(void)
- 	int old_iowait = current->in_iowait;
- 
- 	current->in_iowait = 1;
--	blk_schedule_flush_plug(current);
-+	if (current->plug)
-+		blk_flush_plug(current->plug, true);
- 
- 	return old_iowait;
- }
+Christoph, can you do a resend with the enum naming fixed?
+
 -- 
-2.30.2
+Jens Axboe
 
