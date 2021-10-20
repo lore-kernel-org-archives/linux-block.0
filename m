@@ -2,282 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D471CC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 18:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C19C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 19:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B97966121E
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 18:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 754F16121E
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 19:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231338AbhJTS6X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 14:58:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57244 "EHLO
+        id S231462AbhJTTDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 15:03:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230290AbhJTS6W (ORCPT
+        with ESMTP id S231485AbhJTTDO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 14:58:22 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16ACEC061749
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 11:56:08 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id s17so25857578ioa.13
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 11:56:08 -0700 (PDT)
+        Wed, 20 Oct 2021 15:03:14 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1729BC06161C
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 12:01:00 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id r18so167281wrg.6
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 12:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sBiOVQO8Jkvj1cgLTkB6Z1YHjRkBGEmLvET6u6LAmpE=;
-        b=YTsDhaEGwMWn4tv3nQjUWRWSTsxOWZOlBVJ089eVjW1mc2f3ceCC1rbVNMf4rc9t4+
-         NIbTyXwng8wWYSCQRcWSzKlgGWYriJbN0MOq+UB4zjs+BZ17TPSGXoVN0XltopNe3SS4
-         hddAqA2G59DpqQE86vD/P/K2DIUArmCWzOZnz70d5L/cXG6MLrQe5Qs+Em+QucD7q5jf
-         5KZZ1CHp8Ft2N9Z9Y5bYaBuPVCk60tEjsliPSAmM1Vnag+zaShIfLBeuGSBm0QQefi5u
-         WyVPK9ZoFQ+OrqQF+VxpjJbA7S1rXU0Y9o7Dx3Drym/6AkU866nGRC75Nwp8Dv+twXgP
-         OgfQ==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=jieLNTWmzrvLHzQZ3McWX3OLp16MhU3QtUbl4LNofiE=;
+        b=ICNNmSZC0z1QFIo3+zfUIFL9M5OKZERToiGngwwDjkbnSBWJySNFagH7FV1Bv47Npb
+         QcDqSzqnnAE4z0RrxmTSFmup5FKmqijLAyX90N6WGNPOWeXA/+/rIX5ayf63m2LCe36W
+         rZmfAl1QnLZv6oNOurVExzRe21nZxwNzhefbOdTCn0Wyhw2YjDlUosMhepynaGgXM4XT
+         cwJYwS7zSWYEJO0vi7KQK/0uiViKLhzO+P5bGVlRanvQ6RRUbiZFMshNfd6AWdFtH6wT
+         2yi77XG1Zw5Z7VEPJ0qyyf/q9OYuuIfMrdU77DidjhNJZ36tjrFLzmGqBpkcjKph3gsg
+         NOzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sBiOVQO8Jkvj1cgLTkB6Z1YHjRkBGEmLvET6u6LAmpE=;
-        b=GKhkuOdhVyqjwuIIYRHI5DdwviwQvThny92O4QRSuiaeVO/UaQZT5GFiQQEGFyOmJX
-         XLrPobSowVtilIpIuVl1PH2y+iywG6OEfUu0NqpjR63rD2g0YVYXKygoauoTkVYmXD9o
-         s36WrhNpxNeRqwWsLTaDr4IekCjHSYjqjuUv61NzauBNO3KpBqjGlGi//vnR4+uiY5/Q
-         MocpG5gwKExc79GfDPb6swtmDVdatFAKScEM8SeRUHDuk7LKW8vGLY7StjUkwjiCk6XW
-         tLS5G6S4m7QH533KaZAVRy9mda4myZG9jJ+sDMEjgCQmBevefWy2wMGBNtG46EFxe5fL
-         Mo4Q==
-X-Gm-Message-State: AOAM532sWjRsmAL2Dy68SfprVFDizOOe80Y4b7SI4olv40J9j7K52dHl
-        aWhhC4O+RAb/XiGrACi0k7ONEU2bBk1RtA==
-X-Google-Smtp-Source: ABdhPJxNdy0wPZ4DHYqCDghMP5WIvR8WQgxtEPsfxpukPj4iMVYYIthopd1ZIJB9HOMQWJEhSJOTyg==
-X-Received: by 2002:a02:6064:: with SMTP id d36mr762041jaf.80.1634756167247;
-        Wed, 20 Oct 2021 11:56:07 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id v63sm1449499ioe.17.2021.10.20.11.56.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 11:56:06 -0700 (PDT)
-Subject: Re: [PATCH] fs: kill unused ret2 argument from iocb->ki_complete()
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-aio@kvack.org
-References: <ce839d66-1d05-dab8-4540-71b8485fdaf3@kernel.dk>
- <x498ryno93g.fsf@segfault.boston.devel.redhat.com>
- <16a7a029-0d23-6a14-9ae9-79ab8a9adb34@kernel.dk>
- <x494k9bo84w.fsf@segfault.boston.devel.redhat.com>
- <80244d5b-692c-35ac-e468-2581ff869395@kernel.dk>
-Message-ID: <8f5fdbbf-dc66-fabe-db3b-01b2085083b0@kernel.dk>
-Date:   Wed, 20 Oct 2021 12:56:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=jieLNTWmzrvLHzQZ3McWX3OLp16MhU3QtUbl4LNofiE=;
+        b=g4l3iJ5YV1n9ZWk+63ZEPMLjbt1tETbV4lzn3c5xSZBgI3Aeat95+Y7M6mE9M3i9X5
+         uIsiQFgdCFg+Dk9FCp7wDz4dJoUiWJxmyRBdvp4z/fR85Cl6q1haiiWk0dD51qSPXZUP
+         9Z/bViZTMlIQhEHq4KNHxJN4bPGWUuONLNCknu4DrKQEC56IH5riAGkkXHtekO7qOsBH
+         iSdm/+1YvNDnuRvky43RUdDE7K53AXG0kW9Wq7k+ImWFb0u00a9F2HQljVMVwHk50CUW
+         PuCEyF8WeEZ8wbAy8BqqkKt753bfmjQp9UcTtqOpm0R0wZKjeq/XKLr89mHIIkn850Kd
+         Tt3Q==
+X-Gm-Message-State: AOAM531DamaCU/uS7YUxzoSj7JmPpDmPeFh8svl+spDpC1t3cfQpXUB2
+        GqOYgD8yZaQsGt/JbeV/Bukw2Xq9vxHBGw==
+X-Google-Smtp-Source: ABdhPJwzXru6U8FURPjsyw4EyCb7WBWGZJdkTlPi+xaGNO8CPgnAEUvLGyX4j+fubHtbAmJIBDSSOw==
+X-Received: by 2002:adf:9791:: with SMTP id s17mr1269466wrb.122.1634756458283;
+        Wed, 20 Oct 2021 12:00:58 -0700 (PDT)
+Received: from 127.0.0.1localhost ([185.69.145.206])
+        by smtp.gmail.com with ESMTPSA id j11sm2743880wmi.24.2021.10.20.12.00.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Oct 2021 12:00:57 -0700 (PDT)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 1/3] block: optimise boundary blkdev_read_iter's checks
+Date:   Wed, 20 Oct 2021 20:00:48 +0100
+Message-Id: <fff34e613aeaae1ad12977dc4592cb1a1f5d3190.1634755800.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <cover.1634755800.git.asml.silence@gmail.com>
+References: <cover.1634755800.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <80244d5b-692c-35ac-e468-2581ff869395@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/20/21 12:41 PM, Jens Axboe wrote:
-> Working on just changing it to a 64-bit type instead, then we can pass
-> in both at once with res2 being the upper 32 bits. That'll keep the same
-> API on the aio side.
+Combine pos and len checks and mark unlikely. Also, don't reexpand if
+it's not truncated.
 
-Here's that as an incremental. Since we can only be passing in 32-bits
-anyway across 32/64-bit, we can just make it an explicit 64-bit instead.
-This generates the same code on 64-bit for calling ->ki_complete, and we
-can trivially ignore the usb gadget issue as we now can pass in both
-values (and fill them in on the aio side).
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ block/fops.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 92b87aa8be86..66c6e0c5d638 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -550,7 +550,7 @@ static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
- 		blk_mq_complete_request(rq);
- }
+diff --git a/block/fops.c b/block/fops.c
+index 21d25ee0e4bf..8f733c919ed1 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -503,17 +503,20 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	size_t shorted = 0;
+ 	ssize_t ret;
  
--static void lo_rw_aio_complete(struct kiocb *iocb, long ret)
-+static void lo_rw_aio_complete(struct kiocb *iocb, u64 ret)
- {
- 	struct loop_cmd *cmd = container_of(iocb, struct loop_cmd, iocb);
- 
-diff --git a/drivers/nvme/target/io-cmd-file.c b/drivers/nvme/target/io-cmd-file.c
-index 80a0f35ae1dc..83a2f5b0a3a0 100644
---- a/drivers/nvme/target/io-cmd-file.c
-+++ b/drivers/nvme/target/io-cmd-file.c
-@@ -123,7 +123,7 @@ static ssize_t nvmet_file_submit_bvec(struct nvmet_req *req, loff_t pos,
- 	return call_iter(iocb, &iter);
- }
- 
--static void nvmet_file_io_done(struct kiocb *iocb, long ret)
-+static void nvmet_file_io_done(struct kiocb *iocb, u64 ret)
- {
- 	struct nvmet_req *req = container_of(iocb, struct nvmet_req, f.iocb);
- 	u16 status = NVME_SC_SUCCESS;
-diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
-index 968ace2ddf64..c4ca7fa18e61 100644
---- a/drivers/target/target_core_file.c
-+++ b/drivers/target/target_core_file.c
-@@ -245,7 +245,7 @@ struct target_core_file_cmd {
- 	struct bio_vec	bvecs[];
- };
- 
--static void cmd_rw_aio_complete(struct kiocb *iocb, long ret)
-+static void cmd_rw_aio_complete(struct kiocb *iocb, u64 ret)
- {
- 	struct target_core_file_cmd *cmd;
- 
-diff --git a/drivers/usb/gadget/function/f_fs.c b/drivers/usb/gadget/function/f_fs.c
-index e20c19a0f106..8536f19d3c9a 100644
---- a/drivers/usb/gadget/function/f_fs.c
-+++ b/drivers/usb/gadget/function/f_fs.c
-@@ -831,7 +831,7 @@ static void ffs_user_copy_worker(struct work_struct *work)
- 		kthread_unuse_mm(io_data->mm);
- 	}
- 
--	io_data->kiocb->ki_complete(io_data->kiocb, ret);
-+	io_data->kiocb->ki_complete(io_data->kiocb, ((u64) ret << 32) | ret);
- 
- 	if (io_data->ffs->ffs_eventfd && !kiocb_has_eventfd)
- 		eventfd_signal(io_data->ffs->ffs_eventfd, 1);
-diff --git a/drivers/usb/gadget/legacy/inode.c b/drivers/usb/gadget/legacy/inode.c
-index ad1739dbfab9..d3deb23eb2ab 100644
---- a/drivers/usb/gadget/legacy/inode.c
-+++ b/drivers/usb/gadget/legacy/inode.c
-@@ -469,7 +469,7 @@ static void ep_user_copy_worker(struct work_struct *work)
- 		ret = -EFAULT;
- 
- 	/* completing the iocb can drop the ctx and mm, don't touch mm after */
--	iocb->ki_complete(iocb, ret);
-+	iocb->ki_complete(iocb, ((u64) ret << 32) | ret);
- 
- 	kfree(priv->buf);
- 	kfree(priv->to_free);
-@@ -492,14 +492,16 @@ static void ep_aio_complete(struct usb_ep *ep, struct usb_request *req)
- 	 * complete the aio request immediately.
- 	 */
- 	if (priv->to_free == NULL || unlikely(req->actual == 0)) {
-+		u64 aio_ret;
-+
- 		kfree(req->buf);
- 		kfree(priv->to_free);
- 		kfree(priv);
- 		iocb->private = NULL;
- 		/* aio_complete() reports bytes-transferred _and_ faults */
+-	if (pos >= size)
+-		return 0;
 -
--		iocb->ki_complete(iocb,
--				req->actual ? req->actual : (long)req->status);
-+		aio_ret = req->actual ? req->actual : (long)req->status;
-+		aio_ret |= (u64) req->status << 32;
-+		iocb->ki_complete(iocb, aio_ret);
- 	} else {
- 		/* ep_copy_to_user() won't report both; we hide some faults */
- 		if (unlikely(0 != req->status))
-diff --git a/fs/aio.c b/fs/aio.c
-index 836dc7e48db7..e39c61dccf37 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1417,7 +1417,7 @@ static void aio_remove_iocb(struct aio_kiocb *iocb)
- 	spin_unlock_irqrestore(&ctx->ctx_lock, flags);
- }
- 
--static void aio_complete_rw(struct kiocb *kiocb, long res)
-+static void aio_complete_rw(struct kiocb *kiocb, u64 res)
- {
- 	struct aio_kiocb *iocb = container_of(kiocb, struct aio_kiocb, rw);
- 
-@@ -1436,8 +1436,8 @@ static void aio_complete_rw(struct kiocb *kiocb, long res)
- 		file_end_write(kiocb->ki_filp);
+-	size -= pos;
+-	if (iov_iter_count(to) > size) {
+-		shorted = iov_iter_count(to) - size;
+-		iov_iter_truncate(to, size);
++	if (unlikely(pos + iov_iter_count(to) > size)) {
++		if (pos >= size)
++			return 0;
++		size -= pos;
++		if (iov_iter_count(to) > size) {
++			shorted = iov_iter_count(to) - size;
++			iov_iter_truncate(to, size);
++		}
  	}
  
--	iocb->ki_res.res = res;
--	iocb->ki_res.res2 = 0;
-+	iocb->ki_res.res = res & 0xffffffff;
-+	iocb->ki_res.res2 = res >> 32;
- 	iocb_put(iocb);
+ 	ret = generic_file_read_iter(iocb, to);
+-	iov_iter_reexpand(to, iov_iter_count(to) + shorted);
++
++	if (unlikely(shorted))
++		iov_iter_reexpand(to, iov_iter_count(to) + shorted);
+ 	return ret;
  }
  
-diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-index effe37ef8629..b2f44ff8eae2 100644
---- a/fs/cachefiles/io.c
-+++ b/fs/cachefiles/io.c
-@@ -37,11 +37,11 @@ static inline void cachefiles_put_kiocb(struct cachefiles_kiocb *ki)
- /*
-  * Handle completion of a read from the cache.
-  */
--static void cachefiles_read_complete(struct kiocb *iocb, long ret)
-+static void cachefiles_read_complete(struct kiocb *iocb, u64 ret)
- {
- 	struct cachefiles_kiocb *ki = container_of(iocb, struct cachefiles_kiocb, iocb);
- 
--	_enter("%ld", ret);
-+	_enter("%llu", (unsigned long long) ret);
- 
- 	if (ki->term_func) {
- 		if (ret >= 0)
-@@ -159,12 +159,12 @@ static int cachefiles_read(struct netfs_cache_resources *cres,
- /*
-  * Handle completion of a write to the cache.
-  */
--static void cachefiles_write_complete(struct kiocb *iocb, long ret)
-+static void cachefiles_write_complete(struct kiocb *iocb, u64 ret)
- {
- 	struct cachefiles_kiocb *ki = container_of(iocb, struct cachefiles_kiocb, iocb);
- 	struct inode *inode = file_inode(ki->iocb.ki_filp);
- 
--	_enter("%ld", ret);
-+	_enter("%llu", (unsigned long long) ret);
- 
- 	/* Tell lockdep we inherited freeze protection from submission thread */
- 	__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 5ad046145f29..0ed6c199f394 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2672,7 +2672,7 @@ static void __io_complete_rw(struct io_kiocb *req, long res, long res2,
- 	__io_req_complete(req, issue_flags, req->result, io_put_rw_kbuf(req));
- }
- 
--static void io_complete_rw(struct kiocb *kiocb, long res)
-+static void io_complete_rw(struct kiocb *kiocb, u64 res)
- {
- 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw.kiocb);
- 
-@@ -2683,7 +2683,7 @@ static void io_complete_rw(struct kiocb *kiocb, long res)
- 	io_req_task_work_add(req);
- }
- 
--static void io_complete_rw_iopoll(struct kiocb *kiocb, long res)
-+static void io_complete_rw_iopoll(struct kiocb *kiocb, u64 res)
- {
- 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw.kiocb);
- 
-diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
-index ac461a499882..ff7db16aea2e 100644
---- a/fs/overlayfs/file.c
-+++ b/fs/overlayfs/file.c
-@@ -272,7 +272,7 @@ static void ovl_aio_cleanup_handler(struct ovl_aio_req *aio_req)
- 	kmem_cache_free(ovl_aio_request_cachep, aio_req);
- }
- 
--static void ovl_aio_rw_complete(struct kiocb *iocb, long res)
-+static void ovl_aio_rw_complete(struct kiocb *iocb, u64 res)
- {
- 	struct ovl_aio_req *aio_req = container_of(iocb,
- 						   struct ovl_aio_req, iocb);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 0dcb9020a7b3..3c809ce2518c 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -330,7 +330,7 @@ struct kiocb {
- 	randomized_struct_fields_start
- 
- 	loff_t			ki_pos;
--	void (*ki_complete)(struct kiocb *iocb, long ret);
-+	void (*ki_complete)(struct kiocb *iocb, u64 ret);
- 	void			*private;
- 	int			ki_flags;
- 	u16			ki_hint;
-
 -- 
-Jens Axboe
+2.33.1
 
