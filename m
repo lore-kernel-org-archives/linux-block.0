@@ -2,52 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66667C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 05:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6772CC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:08:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4089861183
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 05:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31AC16115A
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:08:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbhJTFf6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 01:35:58 -0400
-Received: from verein.lst.de ([213.95.11.211]:40673 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229920AbhJTFf5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 01:35:57 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 607DE68BEB; Wed, 20 Oct 2021 07:33:41 +0200 (CEST)
-Date:   Wed, 20 Oct 2021 07:33:41 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org
-Subject: Re: remove QUEUE_FLAG_SCSI_PASSTHROUGH v2
-Message-ID: <20211020053341.GA25529@lst.de>
-References: <20211019075418.2332481-1-hch@lst.de> <yq15ytsbawr.fsf@ca-mkp.ca.oracle.com>
+        id S229715AbhJTGK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 02:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49568 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229591AbhJTGKZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Oct 2021 02:10:25 -0400
+Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F3EC06161C;
+        Tue, 19 Oct 2021 23:08:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=nVCF7K3gy8t++oilgt6Lq+1KU5MchEW73Byv1/RLJqY=; b=4n0xkWPlHbg/VzNBLPkn8vCxp7
+        QG3TRqWD/fHXTHYyn8/ho/KT/q296fZPgLIRLug7NiB1mnUiTy8Vwbix7cYU6wvVI8A020mOjHWNy
+        EMlNrLVtXLSCN5yjMR+/QOpeJ/4C62pQmMkiT7sf92SXvbMl2MmwsuutwKVrJQNMORLnwvAFKuwJL
+        RQjQf1/5C6dH0SBCUr1WnXoIbdm8oAicgpEQT7PkIQyHZ8vhS8PZvJCDGJMplAg2ZQYgiNPLeMVp0
+        FQLScE6aLaF86LhPT7dnN5gTo5WiilVAxq1MEM+ly5jJWtNx+lh7igAbCe/XZkU0JaArmaz8cXbgM
+        vQW/mCCQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1md4lm-003SQk-N2; Wed, 20 Oct 2021 06:08:10 +0000
+Date:   Tue, 19 Oct 2021 23:08:10 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Naohiro Aota <naohiro.aota@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: schedule queue restart after BLK_STS_ZONE_RESOURCE
+Message-ID: <YW+ySp6Fqgxr8alD@infradead.org>
+References: <20211020040404.132984-1-naohiro.aota@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq15ytsbawr.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20211020040404.132984-1-naohiro.aota@wdc.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 20, 2021 at 12:05:24AM -0400, Martin K. Petersen wrote:
-> 
-> Christoph,
-> 
-> > The changes to support pktcdvd are a bit ugly, but I can't think of
-> > anything better (except for removing the driver entirely).  If we'd
-> > want to support packet writing today it would probably live entirely
-> > inside the sr driver.
-> 
-> Yeah, I agree.
-> 
-> Anyway. No major objections from me. Not sure whether it makes most
-> sense for this to go through block or scsi?
+On Wed, Oct 20, 2021 at 01:04:04PM +0900, Naohiro Aota wrote:
+>  		needs_restart = blk_mq_sched_needs_restart(hctx);
+> +		need_resource |= (prep == PREP_DISPATCH_NO_BUDGET);
 
-I'm not sure either, but either tree is fine with me.
+Nit: I think this would be a little more readable as:
+
+		if (prep == PREP_DISPATCH_NO_BUDGET)
+			need_resource = true;
+
+But otherwise the patch looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
