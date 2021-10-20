@@ -2,68 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB69C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F29ECC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E792F6138D
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB98461374
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:12:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230265AbhJTONH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 10:13:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47264 "EHLO
+        id S229691AbhJTOOu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 10:14:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229897AbhJTONH (ORCPT
+        with ESMTP id S229632AbhJTOOt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 10:13:07 -0400
+        Wed, 20 Oct 2021 10:14:49 -0400
 Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DD66C06161C
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:10:52 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id y15-20020a9d460f000000b0055337e17a55so919970ote.10
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:10:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44C69C06161C
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:12:35 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id d21-20020a9d4f15000000b0054e677e0ac5so6603395otl.11
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:12:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=OwwXvtu1JuRXan9acu6rA91PNQ2tvb7gHdWKmp6i7XI=;
-        b=vUZB1MHttsHU4KeVvT2tp2DlaEolytMNDY7I7gpmhlXmqT13Uq6tP4ZUwCeRG0i7qV
-         R9BlDSoKCsOtp7E3+AJ70yaBMBkfYEsN+QoZphok8rkFykjUtsyJf3lpGuCmzPVErf7w
-         wIktR/xrLE0tE0pr32RVdFmRxAsC/7Xz7aMTXgHHURp3ccztHmaOnEdXKfNkuvhFOH6z
-         St5lJy3Z3b6nHkGxRtoiy/F4uJ80Pwduoclr0s5aLW0VHFlH8aLW88hshWCmN91gTU1I
-         8LpYDqh7UzDSZhGxi7b9VwrYY1FLFsBKoS7KUe3i5RJgFdUEvnWuoT1x6AcNu4rGCgPD
-         Efkg==
+        bh=W3Q7Dh2ujhBL/b6CJ/27uuMJlO13X6l3lEzVOHSlgG0=;
+        b=VMBSL2pcy4eNLKVRzo8SZ2slo+0qPeMJ0VSH8Jo1ncv0DMmzzNzijm5jWnTRGa3B/J
+         Khb9Ga7Tb5oxMX8q39RLjM3zNTkbZOjuOCSGILmrEtLsc1UPQuTvKzDlI22TB+ek9pYB
+         FXqmULy/jhBQ6S16UrveRbSbn2vIJVLn9hUGBi95tzOUODZ5zo+AXSgIlwrciCxO4nX0
+         d6CoOZJ/tOsow+JPIRVhZI1jnOPZbEBu8DVCxwpvj2Obba6nh9clToWNkfTqLc9vWtsE
+         qYKTLaPRMRS18jVyNRLpt6vbbrvtJdimBXZ+onNpX82L5nWS499+Wqcz1mifRzqn9DUh
+         Z1uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=OwwXvtu1JuRXan9acu6rA91PNQ2tvb7gHdWKmp6i7XI=;
-        b=gTlZPdRWiVQbHUHexwpLTsKXwjpiRCKDCT7CoQqCMctno2OtH8qjznVbl7MwryonI8
-         ihbALO2ngBwpqC3XzF1cNHrJMLoVrSA5pNATrIuBvy7DV9bmbOTafGBfd99FXKXgRsY5
-         DYK9JSbpqtQ80payqbdHVW2THrVAgX9Ze52szPabaQcB4BXwbiGgqXKoyv4h88Yi8r2Q
-         gLi4DOdDhr+CaoL+Ev80An2jreEr+PEYgif75t37XxOTB3K4KAUjevqF3MQmHPOibebZ
-         Qz7B2v3jZYz0YeN5WHT7NlbX/2/i3Bx8OiOt6Qq9cnCzxJSwh8NCnyHuhFBK6w/fSHW0
-         d26w==
-X-Gm-Message-State: AOAM532x9NdDYgiyFoy8zfS5aiKiFWA2MPaU8JQl0e4YqlpIsyTIeenM
-        HBNikOzYw20D1IRXkOvWPqHxSMvbu1yv4Q==
-X-Google-Smtp-Source: ABdhPJywtoaZOCnIbWk8E+tfUStTYS0FtnLlCQ530+/FZxjdU02twrTwh9GtwcWgwP68t4hGrh+5Sw==
-X-Received: by 2002:a05:6830:2424:: with SMTP id k4mr100719ots.210.1634739051908;
-        Wed, 20 Oct 2021 07:10:51 -0700 (PDT)
+        bh=W3Q7Dh2ujhBL/b6CJ/27uuMJlO13X6l3lEzVOHSlgG0=;
+        b=B4H6gW7PKH17+omHdmhQNVNu3f1pou2UmMHo31LpfMgHVHhAL6Ve4Y7GkVkVh7tlzi
+         DP8ile08mWuHiC1wkH2gLFkrvIWaklcheg4W9IUjLFCFMDo50ehXNIT/6/9ap7OTVoxA
+         KcWsO5Ahz4erE26Iiz9e6AFxAomnrocZk0sWVAumPXzGsaAyjKlH67jEueNgn29f2xdd
+         BK13lNiOn0mQ4nuEekjZGHfW0ipFxxp0RNFayFJZRFXkUKkcN34GVL2w2t9GL2XLxypQ
+         ZZOZnwqiGRpX0DwMVROHbM9W8GfEfayZEp2jB9vaWr5gm0ufdTcTWph/rpPai8t2Jmsu
+         nXRA==
+X-Gm-Message-State: AOAM5315jaYnY4u7KVs5MTcxZbngz3KCqQYHLzaI6qHiKrZD4bBUCBHh
+        scgj8bH7sAECVwFD7mERSWcWKow4T3AMwg==
+X-Google-Smtp-Source: ABdhPJzJzK1kYnSmR4+AuJgK52IZNF01Cnf9iDmFns3sNSEW+EfbR4HJGdLZw1xJz85z05QJERC0NA==
+X-Received: by 2002:a9d:6c16:: with SMTP id f22mr95836otq.364.1634739154418;
+        Wed, 20 Oct 2021 07:12:34 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c3sm499546otr.42.2021.10.20.07.10.51
+        by smtp.gmail.com with ESMTPSA id h91sm475412otb.38.2021.10.20.07.12.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 07:10:51 -0700 (PDT)
+        Wed, 20 Oct 2021 07:12:34 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 0/7] s390/dasd: cleanup and small fixes
-Date:   Wed, 20 Oct 2021 08:10:48 -0600
-Message-Id: <163473904605.733616.14248179151724257187.b4-ty@kernel.dk>
+To:     linux-block@vger.kernel.org,
+        Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: Re: (subset) [PATCH 00/16] block optimisation round
+Date:   Wed, 20 Oct 2021 08:12:30 -0600
+Message-Id: <163473913694.734248.7272076627568407137.b4-ty@kernel.dk>
 X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211020115124.1735254-1-sth@linux.ibm.com>
-References: <20211020115124.1735254-1-sth@linux.ibm.com>
+In-Reply-To: <cover.1634676157.git.asml.silence@gmail.com>
+References: <cover.1634676157.git.asml.silence@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -71,35 +68,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 20 Oct 2021 13:51:17 +0200, Stefan Haberland wrote:
-> please apply this patchset for the upcomming merge window.
-> There is some code cleanup and some smaller fixes.
+On Tue, 19 Oct 2021 22:24:09 +0100, Pavel Begunkov wrote:
+> Jens tried out a similar series with some not yet sent additions:
+> 8.2-8.3 MIOPS -> ~9 MIOPS, or 8-10%.
 > 
-> Best regards,
-> Stefan
-> 
-> Heiko Carstens (2):
->   s390/dasd: handle request magic consistently as unsigned int
->   s390/dasd: fix kernel doc comment
+> 12/16 is bulky, but it nicely drives the numbers. Moreover, with
+> it we can rid of some not used anymore optimisations in
+> __blkdev_direct_IO() because it awlays serve multiple bios.
+> E.g. no need in conditional referencing with DIO_MULTI_BIO,
+> and _probably_ can be converted to chained bio.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/7] s390/dasd: handle request magic consistently as unsigned int
-      commit: 169bbdacaa473a2f3abd3ab8170e1c7795931560
-[2/7] s390/dasd: fix kernel doc comment
-      commit: 10c78e53eea3d9359d4e2a0a4a17a73aacd85497
-[3/7] s390/dasd: split up dasd_eckd_read_conf
-      commit: 23596961b43752be871ea3a5756c7267f8140cff
-[4/7] s390/dasd: move dasd_eckd_read_fc_security
-      commit: 74e2f2110258d5cb5f3bcbf3f9813d523eb049b9
-[5/7] s390/dasd: summarize dasd configuration data in a separate structure
-      commit: 542e30ce8e6e1104e99c78a520a821b05b6ea98b
-[6/7] s390/dasd: fix missing path conf_data after failed allocation
-      commit: 9dffede0115e96d0ff0a07e4382569a9c6dba735
-[7/7] s390/dasd: fix possibly missed path verification
-      commit: a8e5d491dfc184c6b78cbb7f44107b01229c9df2
+[01/16] block: turn macro helpers into inline functions
+        (no commit info)
+[02/16] block: convert leftovers to bdev_get_queue
+        (no commit info)
+[03/16] block: optimise req_bio_endio()
+        (no commit info)
+[04/16] block: don't bloat enter_queue with percpu_ref
+        (no commit info)
+[05/16] block: inline a part of bio_release_pages()
+        (no commit info)
 
 Best regards,
 -- 
