@@ -2,109 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB046C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 13:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC2AC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:02:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBD486128E
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 13:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74A4261361
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 14:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbhJTN6w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 09:58:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43802 "EHLO
+        id S230091AbhJTOEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 10:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbhJTN6v (ORCPT
+        with ESMTP id S230024AbhJTOEg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 09:58:51 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50584C061746
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 06:56:37 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id a16so2112739qvm.2
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 06:56:37 -0700 (PDT)
+        Wed, 20 Oct 2021 10:04:36 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869A9C06161C
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:02:22 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id s9so7408972oiw.6
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 07:02:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=SOhTeqssi38uRwcp6bVWgkiT3zeBEjmbv5sIUX3YlqU=;
-        b=hoUyPC59lX3NJhAvLcW+xrOuF/F3LgSCM2KPXyjTOAbnllVZLjCw+iYBU2Np+xrhtP
-         LrM9cOJ7WfDmqHWcOOhTEGmqtJ2TtNxMQL5oiuyNhkNaefBRPJha8jntBeiQeTEGMuFH
-         4gtRwUy7ER5zFEWcz1qbLuM12NcErMCteETSTR8YPfrv0Zc7rfQQbkyViiuP81s+bZm0
-         Hy0fI2IekAaZo2aCZC/SKQH6vwUwmyl0LHXNgz6CxODahnEcSvAqlr+uf4rMfxyTnx39
-         CZAo9OmetYEiLnWRyWPCDqbh54dg39dj9mNZ8kOcmXBwIzEHoVDmsWTQvFDkr43/nj7D
-         x1YA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=fasKjH6neLHJGQKXWnbpfp+Zf9dplFj5ge5uyM8zytE=;
+        b=PGBxqdHOBR301r3rq795pclPkLqGKtwnB9xJwXfpJo03061xsV6pSaZ00HMZs+mFgp
+         fyVU09SJpZOpkXRL1Q8qOCQt0+c3RRQ9Xx8756TROD78333jwnztkc2tlhPl/7BR5sWy
+         wZl5X9C7o9pW4ngO8otOJLU2Ha+TcsNuv0uzkotcsqn9Yk1GQ4mmCoQEqSRcvIKBwLgV
+         SDqRpErEQUCgPyyYnSpFkj9eLfVo0udVO+0jYpDi1Rd1M3FyRZ+7JLZWAJUadOa6+LUb
+         KSHdq9KW3rv+pDtrppXFZ/aNMMPf8P4PSXg+PWKpunH7i6A3i78g6TIuGdGOvKskDFIC
+         i+dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SOhTeqssi38uRwcp6bVWgkiT3zeBEjmbv5sIUX3YlqU=;
-        b=Je3bWn1+Rv20OktlK07I5k8geohNT647Xtrkie9BwR3uiwr7VsaEpoVUJgwLVL0oQ2
-         Hc56Xkxw269N8x+BXQwEzKaRVyst9bhXD4EhPKNjXTeMxoOhfpTkaEzrDLuLrTCyoFIG
-         zkb32+F0OAxZ66OSTzvY6DMJXHNeHYeqliVMY6YaiMHv0bpR26g79dHXuCCiORq4aZSj
-         cPEgBcjGUFjYap8dZWnK1xHqn5Sul7mTjFLBWBhc9VfXZf+jhIVVcOBp1wGRw5x0y8+l
-         Vz2zCrgB40xlX8y5tvIRBwMR1up/mYImWiYIWhdIjYqIFnJf1TiGrcTaTyNIGYTkvo3a
-         R9nQ==
-X-Gm-Message-State: AOAM533LXh3udgO3p2/lIVX9aC8s3+oaWexXdwOm5z2Y81G1/qtAxN8r
-        xGjcUgeSQs/mPHVNX6iSTMlD637hRqUhdA==
-X-Google-Smtp-Source: ABdhPJxYhvejPIL1k6+jDvOj701OJVq1RlboIHsw8i0VCcEri6yz2aLYS3hFQP14xY7XetaBBzM2ZQ==
-X-Received: by 2002:a05:6214:e41:: with SMTP id o1mr6391933qvc.0.1634738196355;
-        Wed, 20 Oct 2021 06:56:36 -0700 (PDT)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id i67sm1007555qkd.90.2021.10.20.06.56.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 06:56:36 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 09:56:35 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Ye Bin <yebin10@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] nbd: Fix use-after-free in pid_show
-Message-ID: <YXAgEyCjtQYkZA4A@localhost.localdomain>
-References: <20211020073959.2679255-1-yebin10@huawei.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fasKjH6neLHJGQKXWnbpfp+Zf9dplFj5ge5uyM8zytE=;
+        b=1yzp1fOrJNBb7qF29AnS/16cHYOCX7Ayfg5UEupmA28V2WtTEgqHS+1wNPvUtzice1
+         eXVZdtUJ1KFCuzss4RSIIh+gH4zhxMjcruOz3Oio4IPkuJlpocdyeimJPSeD08cSZ4Gd
+         TnOZ+YWo7ZphRpeeThqMvL/jf4AJXZplrpw5IfqTCSeQ7I559fZ3GFFibWnhmsbsDjHE
+         vk3It9g4bynJGvlix4vwAz4kdK1w6VZ4JBS7buAETgHzi+lAaZjQTD9rfcEszYRGDkA4
+         Wt8OmVyb6fFPVnZ1TUmEpJlrJkFU8UL2fGvqx6X1QeTwk4PngzeHl+GMNu70iJlqe6Ne
+         IGFA==
+X-Gm-Message-State: AOAM531wWiG12pZVWEqgBanLZLeqmD5zcZbgX92A4t3LeoVDlmPkPGWN
+        RjF3pi3SSPPk/fO0TgjIRh8hFA==
+X-Google-Smtp-Source: ABdhPJwZr4sXlpWImaGdcJgkClNFE73Vt4YBcOqCPNapcAtcyCPykp9pp/0iKQC8MCc1RUu3hIlnLw==
+X-Received: by 2002:aca:c1c3:: with SMTP id r186mr9571156oif.79.1634738540342;
+        Wed, 20 Oct 2021 07:02:20 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id x62sm464931oig.24.2021.10.20.07.02.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Oct 2021 07:02:19 -0700 (PDT)
+Subject: Re: [PATCHSET v3] Batched completions
+To:     John Garry <john.garry@huawei.com>, linux-block@vger.kernel.org
+Cc:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+References: <20211017020623.77815-1-axboe@kernel.dk>
+ <b47e9ae3-52e0-8cfa-9dcb-bfd46ad4c46d@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <27be55bd-2a94-2c11-bf9f-934cefb9dbbe@kernel.dk>
+Date:   Wed, 20 Oct 2021 08:02:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211020073959.2679255-1-yebin10@huawei.com>
+In-Reply-To: <b47e9ae3-52e0-8cfa-9dcb-bfd46ad4c46d@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 20, 2021 at 03:39:59PM +0800, Ye Bin wrote:
-> I got issue as follows:
-> [  263.886511] BUG: KASAN: use-after-free in pid_show+0x11f/0x13f
-> [  263.888359] Read of size 4 at addr ffff8880bf0648c0 by task cat/746
-> [  263.890479] CPU: 0 PID: 746 Comm: cat Not tainted 4.19.90-dirty #140
-> [  263.893162] Call Trace:
-> [  263.893509]  dump_stack+0x108/0x15f
-> [  263.893999]  print_address_description+0xa5/0x372
-> [  263.894641]  kasan_report.cold+0x236/0x2a8
-> [  263.895696]  __asan_report_load4_noabort+0x25/0x30
-> [  263.896365]  pid_show+0x11f/0x13f
-> [  263.897422]  dev_attr_show+0x48/0x90
-> [  263.898361]  sysfs_kf_seq_show+0x24d/0x4b0
-> [  263.899479]  kernfs_seq_show+0x14e/0x1b0
-> [  263.900029]  seq_read+0x43f/0x1150
-> [  263.900499]  kernfs_fop_read+0xc7/0x5a0
-> [  263.903764]  vfs_read+0x113/0x350
-> [  263.904231]  ksys_read+0x103/0x270
-> [  263.905230]  __x64_sys_read+0x77/0xc0
-> [  263.906284]  do_syscall_64+0x106/0x360
-> [  263.906797]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+On 10/20/21 5:14 AM, John Garry wrote:
+> On 17/10/2021 03:06, Jens Axboe wrote:
+>> Hi,
 > 
-> Reproduce this issue as follows:
-> 1. nbd-server 8000 /tmp/disk
-> 2. nbd-client localhost 8000 /dev/nbd1
-> 3. cat /sys/block/nbd1/pid
-> Then trigger use-after-free in pid_show.
+> +linux-scsi
 > 
-> Reason is after do step '2', nbd-client progress is already exit. So
-> it's task_struct already freed.
-> To solve this issue, revert part of 6521d39a64b3's modify and remove
-> useless 'recv_task' member of nbd_device.
+>>
+>> We now do decent batching of allocations for submit, but we still
+>> complete requests individually. This costs a lot of CPU cycles.
+>>
+>> This patchset adds support for collecting requests for completion,
+>> and then completing them as a batch. This includes things like freeing
+>> a batch of tags.
+>>
+>> This version is looking pretty good to me now, and should be ready
+>> for 5.16.
 > 
-> Fixes: 6521d39a64b3 ("nbd: Remove variable 'pid'")
-> Signed-off-by: Ye Bin <yebin10@huawei.com>
+> Just wondering if anyone was looking at supporting this for SCSI 
+> midlayer? I was thinking about looking at it...
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Since it's pretty new, don't think anyone has looked at that yet.
+I just did the nvme case, for both submit and complete batching.
+But the code is generic and would plug into anything.
 
-Thanks,
+-- 
+Jens Axboe
 
-Josef
