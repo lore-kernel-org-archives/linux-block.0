@@ -2,144 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFA4C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 11:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E89DC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 12:08:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EABB6610FF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 11:53:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 425F961260
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 12:08:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbhJTL4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 07:56:07 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:13958 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhJTL4G (ORCPT
+        id S229702AbhJTMK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 08:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47132 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229548AbhJTMKz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 07:56:06 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HZ89H2ttlzZcLW;
-        Wed, 20 Oct 2021 19:52:03 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.15; Wed, 20 Oct 2021 19:53:50 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.15; Wed, 20 Oct 2021 19:53:49 +0800
-Subject: Re: [PATCH v4 1/2] block, bfq: counted root group into
- 'num_groups_with_pending_reqs'
-To:     Paolo Valente <paolo.valente@linaro.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20211014014556.3597008-1-yukuai3@huawei.com>
- <20211014014556.3597008-2-yukuai3@huawei.com>
- <0DD9CFF0-6110-497D-A352-9F37CADADC6B@linaro.org>
- <1f89cece-a123-6190-bb72-d59035dac266@huawei.com>
- <2E8712BB-5BFB-4647-AE9A-B06E199500D7@linaro.org>
- <8912e5ca-67bb-4a9a-a2ce-ba13e0fc86ed@huawei.com>
- <AA986626-D3BF-43F3-81C2-FD7AA3C1ACD2@linaro.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <c61ea2d2-91e7-249b-ac1c-e6e2240f88ae@huawei.com>
-Date:   Wed, 20 Oct 2021 19:53:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 20 Oct 2021 08:10:55 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5A6C06161C
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 05:08:41 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id b15-20020a1c800f000000b0030d60716239so1073157wmd.4
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 05:08:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=fnSXd6pECZmRz/MR/flYEHcSEh197wOm5ugPJahV2NI=;
+        b=VdriVTbzZ6vzNejOqhEI9yxDPZIxxOjgleA1Rz8BCObquriCABxq7YpJrXdt35dmBo
+         XYl96Knz0P41w/BjtHSrqRw7JNDeS2S9UBSSAOBioMIBUZn6Vv+3nSrQ84BUiHQi7+AX
+         HJytMpOI8L1LfgdDrws90rFu8loj0QulNDasYuPuyA0LdOlwW+4sZs2ZGok3b4CHgJkN
+         rRGrPnjyxI+/G8lZCmMARJdiPMXmGCecdhzIhuVWUSU76wm/HOO3SAjPxDhver48qaIR
+         bMuPC7EFQsj/nxQYoyUS+ePUjdXV9WPc9booVnE2BcjRc5K4QM4VXdmydgrpy2f1gmgd
+         caYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fnSXd6pECZmRz/MR/flYEHcSEh197wOm5ugPJahV2NI=;
+        b=TTBSK9G4Z+ipvMhU6RYiY6GI7uTAepLZajli/EnqsQoBDwP2ADo6TvW6+Aj4OOOena
+         HxvTZlDSACXpg620yu8Ock9ObXTlVf5LLX3L9UdkjvikCormuO5jdpyGkMvogPnuWByA
+         yDk/v0XYOjTbZ3LeZxBqlQ78ZUyuZC0W5wNkRka8hGvAo443omBjlRxezEyht31TNJ1V
+         iVPep5c7HWTiFCTLnsxa0H87fPwi9OEGd3ivY6E3Sn0mYGlhnXDBKUPYgfXFcVT7r/DE
+         Q8EacHDAPCx7IJ6FKHIfrLt6Oau1NMJ3FXjK+ipIVSGcyIxyE0y65m7KcTbAqdo6hH6n
+         X+0g==
+X-Gm-Message-State: AOAM533s8Plw7VPysSWauJG1nP99bbIxWSC0qXBSw/XwvYIjXLLI6ONw
+        JmDd6/v38jTMKcq64M8to/o=
+X-Google-Smtp-Source: ABdhPJzF5cFqktld7wthoU4tXRD8uS4Gdfn5Y9hRfset/lVAp3WYgxDcU7Dwd+MdIgJDT/IZYoBsRA==
+X-Received: by 2002:a7b:c4cd:: with SMTP id g13mr8144722wmk.34.1634731720033;
+        Wed, 20 Oct 2021 05:08:40 -0700 (PDT)
+Received: from [192.168.43.77] (82-132-229-137.dab.02.net. [82.132.229.137])
+        by smtp.gmail.com with ESMTPSA id v185sm4920798wme.35.2021.10.20.05.08.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Oct 2021 05:08:39 -0700 (PDT)
+Message-ID: <ff6cc7ef-cf16-712d-af69-61db1a23df08@gmail.com>
+Date:   Wed, 20 Oct 2021 13:08:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <AA986626-D3BF-43F3-81C2-FD7AA3C1ACD2@linaro.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 04/16] block: don't bloat enter_queue with percpu_ref
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <cover.1634676157.git.asml.silence@gmail.com>
+ <49bff6b10644a6c789414bf72452edb7d54c132f.1634676157.git.asml.silence@gmail.com>
+ <YW+zUKSJQe3sEk4P@infradead.org>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <YW+zUKSJQe3sEk4P@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/10/20 17:43, Paolo Valente wrote:
+On 10/20/21 07:12, Christoph Hellwig wrote:
+> On Tue, Oct 19, 2021 at 10:24:13PM +0100, Pavel Begunkov wrote:
+>> percpu_ref_put() are inlined for performance and bloat the binary, we
+>> don't care about the fail case of blk_try_enter_queue(), so we can
+>> replace it with a call to blk_queue_exit().
+
+Thanks for going through the series!
+
+> Does this make a difference for you?
+
+It did with a different compiler with extra patches and a different
+base, but checking with for-5.16/block the binary size stays the same.
+
+
+> That being said using the proper helpers always seems like a good idea,
+> so:
 > 
-> 
->> Il giorno 20 ott 2021, alle ore 11:38, yukuai (C) <yukuai3@huawei.com> ha scritto:
->>
->> On 2021/10/20 17:29, Paolo Valente wrote:
->>>> Il giorno 20 ott 2021, alle ore 11:20, yukuai (C) <yukuai3@huawei.com> ha scritto:
->>>>
->>>> On 2021/10/20 16:51, Paolo Valente wrote:
->>>>
->>>>>> @@ -860,9 +870,25 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd,
->>>>>> 			     struct bfq_queue *bfqq)
->>>>>> {
->>>>>> 	struct bfq_entity *entity = bfqq->entity.parent;
->>>>>> +	struct bfq_sched_data *sd;
->>>>>> +
->>>>>> +	/*
->>>>>> +	 * If the bfq queue is in root group, the decrement of
->>>>>> +	 * num_groups_with_pending_reqs is performed immediately upon the
->>>>>> +	 * deactivation of entity.
->>>>>> +	 */
->>>>>> +	if (!entity) {
->>>>>> +		entity = &bfqd->root_group->entity;
->>>>>> +		sd = entity->my_sched_data;
->>>>>> +
->>>>>> +		if (!sd->in_service_entity)
->>>>>> +			bfq_clear_group_with_pending_reqs(bfqd, entity);
->>>>>> +
->>>>>> +		return;
->>>>>> +	}
->>>>>>
->>>>>> 	for_each_entity(entity) {
->>>>>> -		struct bfq_sched_data *sd = entity->my_sched_data;
->>>>>> +		sd = entity->my_sched_data;
->>>>>>
->>>>>> 		if (sd->next_in_service || sd->in_service_entity) {
->>>>>> 			/*
->>>>>> @@ -880,7 +906,8 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd,
->>>>>> 		}
->>>>>>
->>>>>> 		/*
->>>>>> -		 * The decrement of num_groups_with_pending_reqs is
->>>>>> +		 * If the bfq queue is not in root group,
->>>>>> +		 * the decrement of num_groups_with_pending_reqs is
->>>>> I'm sorry if I didn't notice this before, but why do you postpone the
->>>>> decrement only for queues not in root group?  If I'm not missing
->>>>> anything, the active (i.e., with pending reqs) state of the root group
->>>>> is to be computed as that of ay other group.
->>>>
->>>> Hi, Paolo
->>>>
->>>> I thought if queue is in root group, then bfqq->entity.parent is NULL,
->>>> and such case is handled above, which is separate from previous
->>>> implementation for queues that are not in root group.
->>>>
->>>> Is this the wrong way to handle root group?
->>>>
->>> I think that, if we want to count also the root group among the active
->>> ones, then the logic for tagging the root group as active must be the
->>> same as the other groups. Or am I missing something?
->>
->> Hi, Paolo
->>
->> Currently, if queue is in root group, bfqq->entity.parent is NULL, and
->> this makes it hard to keep the same logic.
->>
->> Can we store root_group->my_entity to bfqq->entity.parent if the queue
->> is in root group?
->>
-> 
-> Any sensible implementation is ok for me.  Usually, stuff for root
-> group is in the bfqd.
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
 
-I'll try to do implement that way,
-
-Thanks,
-Kuai
-
-> Thanks,
-> Paolo
-> 
->> Thanks,
->> Kuai
-> 
-> .
-> 
+-- 
+Pavel Begunkov
