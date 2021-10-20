@@ -2,181 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B65C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 15:08:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2835C43217
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 15:48:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FFA06137C
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 15:08:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A598B611F2
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 15:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbhJTPK5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 11:10:57 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4010 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbhJTPK4 (ORCPT
+        id S230463AbhJTPud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 11:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230460AbhJTPud (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 11:10:56 -0400
-Received: from fraeml712-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HZDRj3tffz67Xsj;
-        Wed, 20 Oct 2021 23:04:49 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml712-chm.china.huawei.com (10.206.15.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Wed, 20 Oct 2021 17:08:39 +0200
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.015;
- Wed, 20 Oct 2021 17:08:39 +0200
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-CC:     "corbet@lwn.net" <corbet@lwn.net>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "eparis@redhat.com" <eparis@redhat.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "jannh@google.com" <jannh@google.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-audit@redhat.com" <linux-audit@redhat.com>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Subject: RE: [RFC PATCH v7 12/16] fsverity|security: add security hooks to
- fsverity digest and signature
-Thread-Topic: [RFC PATCH v7 12/16] fsverity|security: add security hooks to
- fsverity digest and signature
-Thread-Index: AQHXwGWUN6BqcPCg3Uma5jdt5usPz6vRLYAAgAMlHYCAAAy0gIAHoD6w
-Date:   Wed, 20 Oct 2021 15:08:39 +0000
-Message-ID: <5c1f800ba554485cb3659da689d2079a@huawei.com>
-References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
- <1634151995-16266-13-git-send-email-deven.desai@linux.microsoft.com>
- <YWcyYBuNppjrVOe2@gmail.com>
- <9089bdb0-b28a-9fa0-c510-00fa275af621@linux.microsoft.com>
- <YWngaVdvMyWBlITZ@gmail.com>
-In-Reply-To: <YWngaVdvMyWBlITZ@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.221.98.153]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 20 Oct 2021 11:50:33 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAEC4C06161C;
+        Wed, 20 Oct 2021 08:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=HBm/Dqi3jW7uqk4DDOcgZCLMM+rxars2xSrNqJBELD4=; b=2Nfb8jhDT8Z/1YppkaaGzMBE5F
+        7DhHQ0SucI4gkSMWSPV7qRIfV71Fm6qrfDrJmlPqzT7KRfnj1yBiDyOvhgFH59z59TYTW1kELLAVg
+        mLk1u/MgB+DYSZ1pYh9quyEyxaf9eS7gY6oh1R2myWpq2f4ZN+t8O9pDmupq3jh8lU1/6coGTgRIG
+        C8k2APmUBWLR1sFqAAQXTM7S5Y5k25OWJXYSBl+d9lruqyMox+TX5UmnYt1ffUmBrwhJfbE6Q8mm2
+        r6X/+eHUQhd8s8zbcTZND5RIi0WiXLOOp5v6be+Wi35/qyZrcuIhl8AEJKo3MYxcs2OMjnbQngNMf
+        RACz1Adg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mdDoy-0057WV-4E; Wed, 20 Oct 2021 15:48:04 +0000
+Date:   Wed, 20 Oct 2021 08:48:04 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YXA6NMhwoiIMeHji@bombadil.infradead.org>
+References: <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
+ <YWk9e957Hb+I7HvR@T590>
+ <YWm68xUnAofop3PZ@bombadil.infradead.org>
+ <YWq3Z++uoJ/kcp+3@T590>
+ <YW3LuzaPhW96jSBK@bombadil.infradead.org>
+ <YW4uwep3BCe9Vxq8@T590>
+ <YW7kFXlzRrvwzARP@bombadil.infradead.org>
+ <YW7ygbLAwm2/LZFl@T590>
+ <YW8eSq2B+5FtOLZb@bombadil.infradead.org>
+ <YW9tqPunx5bssxIz@T590>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YW9tqPunx5bssxIz@T590>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiBGcm9tOiBFcmljIEJpZ2dlcnMgW21haWx0bzplYmlnZ2Vyc0BrZXJuZWwub3JnXQ0KPiBTZW50
-OiBGcmlkYXksIE9jdG9iZXIgMTUsIDIwMjEgMTA6MTEgUE0NCj4gT24gRnJpLCBPY3QgMTUsIDIw
-MjEgYXQgMTI6MjU6NTNQTSAtMDcwMCwgRGV2ZW4gQm93ZXJzIHdyb3RlOg0KPiA+DQo+ID4gT24g
-MTAvMTMvMjAyMSAxMjoyNCBQTSwgRXJpYyBCaWdnZXJzIHdyb3RlOg0KPiA+ID4gT24gV2VkLCBP
-Y3QgMTMsIDIwMjEgYXQgMTI6MDY6MzFQTSAtMDcwMCwNCj4gZGV2ZW4uZGVzYWlAbGludXgubWlj
-cm9zb2Z0LmNvbSB3cm90ZToNCj4gPiA+ID4gRnJvbTogRmFuIFd1IDx3dWZhbkBsaW51eC5taWNy
-b3NvZnQuY29tPg0KPiA+ID4gPg0KPiA+ID4gPiBBZGQgc2VjdXJpdHlfaW5vZGVfc2V0c2VjdXJp
-dHkgdG8gZnN2ZXJpdHkgc2lnbmF0dXJlIHZlcmlmaWNhdGlvbi4NCj4gPiA+ID4gVGhpcyBjYW4g
-bGV0IExTTXMgc2F2ZSB0aGUgc2lnbmF0dXJlIGRhdGEgYW5kIGRpZ2VzdCBoYXNoZXMgcHJvdmlk
-ZWQNCj4gPiA+ID4gYnkgZnN2ZXJpdHkuDQo+ID4gPiBDYW4geW91IGVsYWJvcmF0ZSBvbiB3aHkg
-TFNNcyBuZWVkIHRoaXMgaW5mb3JtYXRpb24/DQo+ID4NCj4gPiBUaGUgcHJvcG9zZWQgTFNNIChJ
-UEUpIG9mIHRoaXMgc2VyaWVzIHdpbGwgYmUgdGhlIG9ubHkgb25lIHRvIG5lZWQNCj4gPiB0aGlz
-IGluZm9ybWF0aW9uIGF0IHRoZcKgIG1vbWVudC4gSVBF4oCZcyBnb2FsIGlzIHRvIGhhdmUgcHJv
-dmlkZQ0KPiA+IHRydXN0LWJhc2VkIGFjY2VzcyBjb250cm9sLiBUcnVzdCBhbmQgSW50ZWdyaXR5
-IGFyZSB0aWVkIHRvZ2V0aGVyLA0KPiA+IGFzIHlvdSBjYW5ub3QgcHJvdmUgdHJ1c3Qgd2l0aG91
-dCBwcm92aW5nIGludGVncml0eS4NCj4gDQo+IEkgdGhpbmsgeW91IG1lYW4gYXV0aGVudGljaXR5
-LCBub3QgaW50ZWdyaXR5Pw0KPiANCj4gQWxzbyBob3cgZG9lcyB0aGlzIGRpZmZlciBmcm9tIElN
-QT8gIEkga25vdyB0aGF0IElNQSBkb2Vzbid0IHN1cHBvcnQgZnMtdmVyaXR5DQo+IGZpbGUgaGFz
-aGVzLCBidXQgdGhhdCBjb3VsZCBiZSBjaGFuZ2VkLiAgV2h5IG5vdCBleHRlbmQgSU1BIHRvIGNv
-dmVyIHlvdXIgdXNlDQo+IGNhc2Uocyk/DQo+IA0KPiA+IElQRSBuZWVkcyB0aGUgZGlnZXN0IGlu
-Zm9ybWF0aW9uIHRvIGJlIGFibGUgdG8gY29tcGFyZSBhIGRpZ2VzdA0KPiA+IHByb3ZpZGVkIGJ5
-IHRoZSBwb2xpY3kgYXV0aG9yLCBhZ2FpbnN0IHRoZSBkaWdlc3QgY2FsY3VsYXRlZCBieQ0KPiA+
-IGZzdmVyaXR5IHRvIG1ha2UgYSBkZWNpc2lvbiBvbiB3aGV0aGVyIHRoYXQgc3BlY2lmaWMgZmls
-ZSwgcmVwcmVzZW50ZWQNCj4gPiBieSB0aGUgZGlnZXN0IGlzIGF1dGhvcml6ZWQgZm9yIHRoZSBh
-Y3Rpb25zIHNwZWNpZmllZCBpbiB0aGUgcG9saWN5Lg0KPiA+DQo+ID4gQSBtb3JlIGNvbmNyZXRl
-IGV4YW1wbGUsIGlmIGFuIElQRSBwb2xpY3kgYXV0aG9yIHdyaXRlczoNCj4gPg0KPiA+IMKgwqDC
-oCBvcD1FWEVDVVRFIGZzdmVyaXR5X2RpZ2VzdD08SGV4RGlnZXN0ID4gYWN0aW9uPURFTlkNCj4g
-Pg0KPiA+IElQRSB0YWtlcyB0aGUgZGlnZXN0IHByb3ZpZGVkIGJ5IHRoaXMgc2VjdXJpdHkgaG9v
-aywgc3RvcmVzIGl0DQo+ID4gaW4gSVBFJ3Mgc2VjdXJpdHkgYmxvYiBvbiB0aGUgaW5vZGUuIElm
-IHRoaXMgZmlsZSBpcyBsYXRlcg0KPiA+IGV4ZWN1dGVkLCBJUEUgY29tcGFyZXMgdGhlIGRpZ2Vz
-dCBzdG9yZWQgaW4gdGhlIExTTSBibG9iLA0KPiA+IHByb3ZpZGVkIGJ5IHRoaXMgaG9vaywgYWdh
-aW5zdCA8SGV4RGlnZXN0PiBpbiB0aGUgcG9saWN5LCBpZg0KPiA+IGl0IG1hdGNoZXMsIGl0IGRl
-bmllcyB0aGUgYWNjZXNzLCBwZXJmb3JtaW5nIGEgcmV2b2NhdGlvbg0KPiA+IG9mIHRoYXQgZmls
-ZS4NCj4gDQo+IERvIHlvdSBoYXZlIGEgYmV0dGVyIGV4YW1wbGU/ICBUaGlzIG9uZSBpcyBwcmV0
-dHkgdXNlbGVzcyBzaW5jZSBvbmUgY2FuIGdldA0KPiBhcm91bmQgaXQganVzdCBieSBleGVjdXRp
-bmcgYSBmaWxlIHRoYXQgZG9lc24ndCBoYXZlIGZzLXZlcml0eSBlbmFibGVkLg0KDQpJIHdhcyB3
-b25kZXJpbmcgaWYgdGhlIGZvbGxvd2luZyB1c2UgY2FzZSBjYW4gYmUgc3VwcG9ydGVkOg0KYWxs
-b3cgdGhlIGV4ZWN1dGlvbiBvZiBmaWxlcyBwcm90ZWN0ZWQgd2l0aCBmc3Zlcml0eSBpZiB0aGUg
-cm9vdA0KZGlnZXN0IGlzIGZvdW5kIGFtb25nIHJlZmVyZW5jZSB2YWx1ZXMgKGluc3RlYWQgb2Yg
-cHJvdmlkaW5nDQp0aGVtIG9uZSBieSBvbmUgaW4gdGhlIHBvbGljeSkuDQoNClNvbWV0aGluZyBs
-aWtlOg0KDQpvcD1FWEVDVVRFIGZzdmVyaXR5X2RpZ2VzdD1kaWdsaW0gYWN0aW9uPUFMTE9XDQoN
-CkRJR0xJTSBpcyBhIGNvbXBvbmVudCBJJ20gd29ya2luZyBvbiB0aGF0IGdlbmVyaWNhbGx5DQpz
-dG9yZXMgZGlnZXN0cy4gVGhlIGN1cnJlbnQgdXNlIGNhc2UgaXMgdG8gc3RvcmUgZmlsZSBkaWdl
-c3RzDQpmcm9tIFJQTVRBR19GSUxFRElHRVNUUyBhbmQgdXNlIHRoZW0gd2l0aCBJTUEsIGJ1dA0K
-dGhlIGZzdmVyaXR5IHVzZSBjYXNlIGNvdWxkIGJlIGVhc2lseSBzdXBwb3J0ZWQgKGlmIHRoZSBy
-b290DQpkaWdlc3QgaXMgc3RvcmVkIGluIHRoZSBSUE0gaGVhZGVyKS4NCg0KRElHTElNIGFsc28g
-dGVsbHMgd2hldGhlciBvciBub3QgdGhlIHNpZ25hdHVyZSBvZiB0aGUgc291cmNlDQpjb250YWlu
-aW5nIGZpbGUgZGlnZXN0cyAob3IgZnN2ZXJpdHkgZGlnZXN0cykgaXMgdmFsaWQgKHRoZSBzaWdu
-YXR1cmUNCm9mIHRoZSBSUE0gaGVhZGVyIGlzIHRha2VuIGZyb20gUlBNVEFHX1JTQUhFQURFUiku
-DQoNClRoZSBtZW1vcnkgb2NjdXBhdGlvbiBpcyByZWxhdGl2ZWx5IHNtYWxsIGZvciBleGVjdXRh
-Ymxlcw0KYW5kIHNoYXJlZCBsaWJyYXJpZXMuIEkgcHVibGlzaGVkIGEgZGVtbyBmb3IgRmVkb3Jh
-IGFuZA0Kb3BlblNVU0Ugc29tZSB0aW1lIGFnbzoNCg0KaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcv
-bGludXgtaW50ZWdyaXR5LzQ4Y2Q3MzdjNTA0ZDQ1MjA4Mzc3ZGFhMjdkNjI1NTMxQGh1YXdlaS5j
-b20vDQoNClRoYW5rcw0KDQpSb2JlcnRvDQoNCkhVQVdFSSBURUNITk9MT0dJRVMgRHVlc3NlbGRv
-cmYgR21iSCwgSFJCIDU2MDYzDQpNYW5hZ2luZyBEaXJlY3RvcjogTGkgUGVuZywgWmhvbmcgUm9u
-Z2h1YQ0KDQo+ID4gVGhpcyBicmluZ3MgbWUgdG8geW91ciBuZXh0IGNvbW1lbnQ6DQo+ID4NCj4g
-PiA+IFRoZSBkaWdlc3QgaXNuJ3QgbWVhbmluZ2Z1bCB3aXRob3V0IGtub3dpbmcgdGhlIGhhc2gg
-YWxnb3JpdGhtIGl0IHVzZXMuDQo+ID4gSXQncyBhdmFpbGFibGUgaGVyZSwgYnV0IHlvdSBhcmVu
-J3QgcGFzc2luZyBpdCB0byB0aGlzIGZ1bmN0aW9uLg0KPiA+DQo+ID4gVGhlIGRpZ2VzdCBpcyBt
-ZWFuaW5nZnVsIHdpdGhvdXQgdGhlIGFsZ29yaXRobSBpbiB0aGlzIGNhc2UuDQo+IA0KPiBObywg
-aXQncyBub3QuDQo+IA0KPiBEaWdlc3RzIGFyZSBtZWFuaW5nbGVzcyB3aXRob3V0IGtub3dpbmcg
-d2hhdCBhbGdvcml0aG0gdGhleSB3ZXJlIGNyZWF0ZWQNCj4gd2l0aC4NCj4gDQo+IElmIHlvdXIg
-c2VjdXJpdHkgcG9saWN5IGlzIHNvbWV0aGluZyBsaWtlICJUcnVzdCB0aGUgZmlsZSB3aXRoIGRp
-Z2VzdCAkZm9vIiBhbmQNCj4gbXVsdGlwbGUgaGFzaCBhbGdvcml0aG1zIGFyZSBwb3NzaWJsZSwg
-dGhlbiB0aGUgYWxvcml0aG0gaW50ZW5kZWQgdG8gYmUgdXNlZA0KPiBuZWVkcyB0byBiZSBleHBs
-aWNpdGx5IHNwZWNpZmllZC4gIE90aGVyd2lzZSBhbnkgYWxnb3JpdGhtIHdpdGggdGhlIHNhbWUg
-bGVuZ3RoDQo+IGRpZ2VzdCB3aWxsIGJlIGFjY2VwdGVkLiAgVGhhdCdzIGEgZmF0YWwgZmxhdyBp
-ZiBhbnkgb2YgdGhlc2UgYWxnb3JpdGhtcyBpcw0KPiBjcnlwdG9ncmFwaGljYWxseSBicm9rZW4g
-b3Igd2FzIG5ldmVyIGludGVuZGVkIHRvIGJlIGEgY3J5cHRvZ3JhcGhpYyBhbGdvcml0aG0NCj4g
-aW4gdGhlIGZpcnN0IHBsYWNlIChlLmcuLCBhIG5vbi1jcnlwdG9ncmFwaGljIGNoZWNrc3VtKS4N
-Cj4gDQo+IENyeXB0b3N5c3RlbXMgYWx3YXlzIG5lZWQgdG8gc3BlY2lmeSB0aGUgY3J5cHRvIGFs
-Z29yaXRobShzKSB1c2VkOyB0aGUNCj4gYWR2ZXJzYXJ5DQo+IG11c3Qgbm90IGJlIGFsbG93ZWQg
-dG8gY2hvb3NlIHRoZSBhbGdvcml0aG1zLg0KPiANCj4gSSdtIG5vdCBzdXJlIGhvdyB0aGVzZSBw
-YXRjaGVzIGNhbiBiZSB0YWtlbiBzZXJpb3VzbHkgd2hlbiB0aGV5J3JlIGdldHRpbmcgdGhpcw0K
-PiBzb3J0IG9mIHRoaW5nIHdyb25nLg0KPiANCj4gPiA+ID4gKwkJCQkJRlNfVkVSSVRZX1NJR05B
-VFVSRV9TRUNfTkFNRSwNCj4gPiA+ID4gKwkJCQkJc2lnbmF0dXJlLCBzaWdfc2l6ZSwgMCk7DQo+
-ID4gPiBUaGlzIGlzIG9ubHkgZm9yIGZzLXZlcml0eSBidWlsdC1pbiBzaWduYXR1cmVzIHdoaWNo
-IGFyZW4ndCB0aGUgb25seSB3YXkgdG8gZG8NCj4gPiA+IHNpZ25hdHVyZXMgd2l0aCBmcy12ZXJp
-dHkuICBBcmUgeW91IHN1cmUgdGhpcyBpcyB3aGF0IHlvdSdyZSBsb29raW5nIGZvcj8NCj4gPg0K
-PiA+IENvdWxkIHlvdSBlbGFib3JhdGUgb24gdGhlIG90aGVyIHNpZ25hdHVyZSB0eXBlcyB0aGF0
-IGNhbiBiZSB1c2VkDQo+ID4gd2l0aCBmcy12ZXJpdHk/IEnigJltIDk5JSBzdXJlIHRoaXMgaXMg
-d2hhdCBJ4oCZbSBsb29raW5nIGZvciBhcyB0aGlzDQo+ID4gaXMgYSBzaWduYXR1cmUgdmFsaWRh
-dGVkIGluIHRoZSBrZXJuZWwgYWdhaW5zdCB0aGUgZnMtdmVyaXR5IGtleXJpbmcNCj4gPiBhcyBw
-YXJ0IG9mIHRoZSDigJxmc3Zlcml0eSBlbmFibGXigJ0gdXRpbGl0eS4NCj4gPg0KPiA+IEl0J3Mg
-aW1wb3J0YW50IHRoYXQgdGhlIHNpZ25hdHVyZSBpcyB2YWxpZGF0ZWQgaW4gdGhlIGtlcm5lbCwg
-YXMNCj4gPiB1c2Vyc3BhY2UgaXMgY29uc2lkZXJlZCB1bnRydXN0ZWQgdW50aWwgdGhlIHNpZ25h
-dHVyZSBpcyB2YWxpZGF0ZWQNCj4gPiBmb3IgdGhpcyBjYXNlLg0KPiA+DQo+ID4gPiBDYW4geW91
-IGVsYWJvcmF0ZSBvbiB5b3VyIHVzZSBjYXNlIGZvciBmcy12ZXJpdHkgYnVpbHQtaW4gc2lnbmF0
-dXJlcywNCj4gPiBTdXJlLCBzaWduYXR1cmVzLCBsaWtlIGRpZ2VzdHMsIGFsc28gcHJvdmlkZSBh
-IHdheSB0byBwcm92ZSBpbnRlZ3JpdHksDQo+ID4gYW5kIHRoZSB0cnVzdCBjb21wb25lbnQgY29t
-ZXMgZnJvbSB0aGUgdmFsaWRhdGlvbiBhZ2FpbnN0IHRoZSBrZXlyaW5nLA0KPiA+IGFzIG9wcG9z
-ZWQgdG8gYSBmaXhlZCB2YWx1ZSBpbiBJUEXigJlzIHBvbGljeS4gVGhlIHVzZSBjYXNlIGZvciBm
-cy12ZXJpdHkNCj4gPiBidWlsdC1pbiBzaWduYXR1cmVzIGlzIHRoYXQgd2UgaGF2ZSBhIHJ3IGV4
-dDQgZmlsZXN5c3RlbSB0aGF0IGhhcyBzb21lDQo+ID4gZXhlY3V0YWJsZSBmaWxlcywgYW5kIHdl
-IHdhbnQgdG8gaGF2ZSBhIGV4ZWN1dGlvbiBwb2xpY3kgKHRocm91Z2ggSVBFKQ0KPiA+IHRoYXQg
-b25seSBfdHJ1c3RlZF8gZXhlY3V0YWJsZXMgY2FuIHJ1bi4gUGVyZiBpcyBpbXBvcnRhbnQgaGVy
-ZSwgaGVuY2UNCj4gPiBmcy12ZXJpdHkuDQo+IA0KPiBNb3N0IHVzZXJzIG9mIGZzLXZlcml0eSBi
-dWlsdC1pbiBzaWduYXR1cmVzIGhhdmUgYWN0dWFsbHkgYmVlbiBlbmZvcmNpbmcgdGhlaXINCj4g
-c2VjdXJpdHkgcG9saWN5IGluIHVzZXJzcGFjZSwgYnkgY2hlY2tpbmcgd2hldGhlciBzcGVjaWZp
-YyBmaWxlcyBoYXZlIHRoZQ0KPiBmcy12ZXJpdHkgYml0IHNldCBvciBub3QuICBTdWNoIHVzZXJz
-IGNvdWxkIGp1c3Qgc3RvcmUgYW5kIHZlcmlmeSBzaWduYXR1cmVzIGluDQo+IHVzZXJzcGFjZSBp
-bnN0ZWFkLCB3aXRob3V0IGFueSBrZXJuZWwgaW52b2x2ZW1lbnQuICBTbyB0aGF0J3Mgd2hhdCBJ
-J3ZlIGJlZW4NCj4gcmVjb21tZW5kaW5nICh3aXRoIGxpbWl0ZWQgc3VjY2VzcywgdW5mb3J0dW5h
-dGVseSkuDQo+IA0KPiBJZiB5b3UgcmVhbGx5IGRvIG5lZWQgaW4ta2VybmVsIHNpZ25hdHVyZSB2
-ZXJpZmljYXRpb24sIHRoZW4gdGhhdCBtYXkgYmUgYQ0KPiBsZWdpdGltYXRlIHVzZSBjYXNlIGZv
-ciB0aGUgZnMtdmVyaXR5IGJ1aWx0LWluIHNpZ25hdHVyZXMsIGFsdGhvdWdoIEkgZG8gd29uZGVy
-DQo+IHdoeSB5b3UgYXJlbid0IHVzaW5nIElNQSBhbmQgaXRzIHNpZ25hdHVyZSBtZWNoYW5pc20g
-aW5zdGVhZC4NCj4gDQo+IC0gRXJpYw0K
+On Wed, Oct 20, 2021 at 09:15:20AM +0800, Ming Lei wrote:
+> On Tue, Oct 19, 2021 at 12:36:42PM -0700, Luis Chamberlain wrote:
+> > On Wed, Oct 20, 2021 at 12:29:53AM +0800, Ming Lei wrote:
+> > > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> > > index d0cae7a42f4d..a14ba3d350ea 100644
+> > > --- a/drivers/block/zram/zram_drv.c
+> > > +++ b/drivers/block/zram/zram_drv.c
+> > > @@ -1704,12 +1704,12 @@ static void zram_reset_device(struct zram *zram)
+> > >  	set_capacity_and_notify(zram->disk, 0);
+> > >  	part_stat_set_all(zram->disk->part0, 0);
+> > >  
+> > > -	up_write(&zram->init_lock);
+> > >  	/* I/O operation under all of CPU are done so let's free */
+> > >  	zram_meta_free(zram, disksize);
+> > >  	memset(&zram->stats, 0, sizeof(zram->stats));
+> > >  	zcomp_destroy(comp);
+> > >  	reset_bdev(zram);
+> > > +	up_write(&zram->init_lock);
+> > >  }
+> > >  
+> > >  static ssize_t disksize_store(struct device *dev,
+> > 
+> > With this, it still ends up in a state where we loop and can't get out of:
+> > 
+> > zram: Can't change algorithm for initialized device
+> 
+> Again, you are running two zram02.sh[1] on /dev/zram0, that isn't unexpected
+
+You mean that it is not expected? If so then yes, of course.
+
+> behavior. Here the difference is just timing.
+
+Right, but that is what helped reproduce a difficutl to re-produce customer
+bug. Once you find an easy way to reproduce a reported issue you stick
+with it and try to make the situation worse to ensure no more bugs are
+present.
+
+> Also you did not answer my question about your test expected result when
+> running the following script from two terminal concurrently:
+> 
+> 	while true; do
+> 		PATH=$PATH:$PWD:$PWD/../../../lib/ ./zram02.sh;
+> 	done
+
+If you run this, you should see no failures.
+
+Once you start a second script that one should cause odd issues on both
+sides but never crash or stall the module.
+
+A second series of tests is hitting CTRL-C on either randonly and
+restarting testing once again randomly.
+
+Again, neither should crash the kernel or stall the module.
+
+In the end of these tests you should be able to run the script alone
+just once and not see issues.
+
+  Luis
