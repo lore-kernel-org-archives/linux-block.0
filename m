@@ -2,74 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA60C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 17:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC5D8C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 18:14:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39EBE611F2
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 17:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FDCA60FF2
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 18:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbhJTRve (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 13:51:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55498 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230499AbhJTRvZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 13:51:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 083B46128B;
-        Wed, 20 Oct 2021 17:49:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1634752150;
-        bh=UY7whghJ0CF+27cck+zPo8YHzcjinvyXjF/op8BsEto=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FzW4GeyNS55sRWhnvPUiGcJuCKOtmL1+3Fs7GwIUyKZ1XEBZMiEtemmrwggcZrq1F
-         o64alCGTeqAnnRBz2y3Emp++LUAf4k3xdQ/7i45jbng+qaCjnOCyCy+rwG4Nmnb3Pl
-         fu3moUeh15d70HbM/1u/ab3BLII+F+Bkx4SnFx4g=
-Date:   Wed, 20 Oct 2021 19:49:07 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jens Axboe <axboe@kernel.dk>, linux-usb@vger.kernel.org
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S231222AbhJTSQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 14:16:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46879 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231173AbhJTSQh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Oct 2021 14:16:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634753662;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JlbiDX/zLUgGtbtz7d4EWViuLkB3Jf+ofvgaSGXt0P0=;
+        b=gAZiYbffuxlsmIlUwd/sp+N9yk+f4UpMOBUyTweCId2JwTppBoYvXtxxz3gHHTs56it2MT
+        KoVDJtqmcq6M0d4H5RQ8tL8NrFBYJJmpVPjmZurlws8yTrpMVYt+BQ9uD/a24TkHRAVT2S
+        PWRMe+Ya98kMnlM5aBq1fBrP+bDDTqM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-lry4q7BWMcupuR_0Mc3LyA-1; Wed, 20 Oct 2021 14:14:16 -0400
+X-MC-Unique: lry4q7BWMcupuR_0Mc3LyA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D2F010A8E00;
+        Wed, 20 Oct 2021 18:14:15 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05D26694B5;
+        Wed, 20 Oct 2021 18:14:14 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-fsdevel\@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-aio@kvack.org
 Subject: Re: [PATCH] fs: kill unused ret2 argument from iocb->ki_complete()
-Message-ID: <YXBWk8Zzi7yIyTi/@kroah.com>
 References: <ce839d66-1d05-dab8-4540-71b8485fdaf3@kernel.dk>
- <YXBSLweOk1he8DTO@infradead.org>
- <fe54edc2-da83-6dbb-cfb9-ad3a7fbe3780@kernel.dk>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Wed, 20 Oct 2021 14:16:19 -0400
+In-Reply-To: <ce839d66-1d05-dab8-4540-71b8485fdaf3@kernel.dk> (Jens Axboe's
+        message of "Wed, 20 Oct 2021 10:49:07 -0600")
+Message-ID: <x498ryno93g.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe54edc2-da83-6dbb-cfb9-ad3a7fbe3780@kernel.dk>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 20, 2021 at 11:35:27AM -0600, Jens Axboe wrote:
-> On 10/20/21 11:30 AM, Christoph Hellwig wrote:
-> > On Wed, Oct 20, 2021 at 10:49:07AM -0600, Jens Axboe wrote:
-> >> It's not used for anything, and we're wasting time passing in zeroes
-> >> where we could just ignore it instead. Update all ki_complete users in
-> >> the kernel to drop that last argument.
-> >>
-> >> The exception is the USB gadget code, which passes in non-zero. But
-> >> since nobody every looks at ret2, it's still pointless.
-> > 
-> > Yes, the USB gadget passes non-zero, and aio passes that on to
-> > userspace.  So this is an ABI change.  Does it actually matter?
-> > I don't know, but you could CC the relevant maintainers and list
-> > to try to figure that out.
-> 
-> True, guess it does go out to userspace. Greg, is anyone using
-> it on the userspace side?
+Hi, Jens,
 
-I really do not know (adding linux-usb@vger)  My interactions with the
-gadget code have not been through the aio api, thankfully :)
+Jens Axboe <axboe@kernel.dk> writes:
 
-Odds are it's fine, I think that something had to be passed in there so
-that was chosen?  If the aio code didn't do anything with it, I can't
-see where the gadget code gets it back at anywhere, but I might be
-looking in the wrong place.
+> It's not used for anything, and we're wasting time passing in zeroes
+> where we could just ignore it instead. Update all ki_complete users in
+> the kernel to drop that last argument.
 
-Anyone else here know?
+What does "wasting time passing in zeroes" mean?
 
-thanks,
+> The exception is the USB gadget code, which passes in non-zero. But
+> since nobody every looks at ret2, it's still pointless.
 
-greg k-h
+As Christoph mentioned, it is passed along to userspace as part of the
+io_event.
+
+> @@ -499,8 +499,7 @@ static void ep_aio_complete(struct usb_ep *ep, struct usb_request *req)
+>  		/* aio_complete() reports bytes-transferred _and_ faults */
+
+Note this comment ^^^
+
+>  
+>  		iocb->ki_complete(iocb,
+> -				req->actual ? req->actual : (long)req->status,
+> -				req->status);
+> +				req->actual ? req->actual : (long)req->status);
+
+We can't know whether some userspace implementation relies on this
+behavior, so I don't think you can change it.
+
+Cheers,
+Jeff
+
+p.s. Please CC linux-aio on future changes to the aio code.
+
