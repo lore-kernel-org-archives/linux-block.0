@@ -2,164 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54269C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 09:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65475C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 10:10:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EF186137B
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 09:43:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E299611EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 10:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbhJTJpl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 05:45:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbhJTJpj (ORCPT
+        id S230139AbhJTKM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 06:12:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41133 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230082AbhJTKM4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 05:45:39 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8ECBC061746
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 02:43:25 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id r18so24077367edv.12
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 02:43:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=v1VSTfmj+2omzHjhOYwuPhGVdz2EGeKwbUST3Yohfp8=;
-        b=b4aLpPEOdV/TIxwTKhJahMs87GTv74bw7jmVmHTZ7cs3ACizYGm48qQd6k+CAkSF6i
-         odDbyf6hymgVeDmxcBaYCqnY1n+6Ixee8rOqgqFcV/1qpLCkcY2b+zB94AsySvrDDKjL
-         9EHL1ODLW3Uo3pBF5utQR7L8NQSgxFXaMqaAOT2AKCTmAKcl0TOgBYfhIAwi5AzU2N8b
-         0C8gjkB6isP32/zSrc6I1TJanHRb8Sn+M9DRqr/sde5GaCiFs72TfAgxd4DptvlWNxQy
-         Xm06CtYANZWpTTdv7cIAKZLVxHhsBngflVsJDVkb55UAueFt2WbUfJ6KzzPAGD0idD0A
-         qCPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=v1VSTfmj+2omzHjhOYwuPhGVdz2EGeKwbUST3Yohfp8=;
-        b=kKYN73CPiVl9awL3XqJsoHh90ZrVNsMi8k5FIqq0GmbJ4hraYJGysA+SR42MX48MNe
-         d8rEIK2dYQ1JwpopX40I/cjQE7NE0VTeD/0Op9Zesspg7WT18ji8X4GgrRgOtslEDbBJ
-         VXv7hK1pdyIwSjeEDLEFpQwW5aIv4ejDScf50ONR4h2X7KqcosE2OCuRmbiI/2koMDOE
-         bLO65uw2rpcC+x8AY9qZX9umFdPI1VAGvdEKZqi3Ldi5gMuHquPex6wzb0w2TeBOCZyg
-         G9T/x2GimL2p4fv3YTJQyVyzIJn0SCvvp+xjulGNygquTj+NN8lRqpfKBtP6f2s6bWVh
-         K2Qw==
-X-Gm-Message-State: AOAM531as939PA/fxJFoZ6KpdvHIyGCvah/NnyT1CwgcVP5I3izf5w7W
-        xRT1Jhzn9Wx07uYPn9wBkdd3qA==
-X-Google-Smtp-Source: ABdhPJy+ZQccMneiNAm3ecn4imRuDdy7DOOhi+6IM973twATsLL7fRQpW0eUwpLeTBURbwkyEeyJCQ==
-X-Received: by 2002:a50:e14a:: with SMTP id i10mr61558844edl.73.1634723004215;
-        Wed, 20 Oct 2021 02:43:24 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id s7sm857404edw.67.2021.10.20.02.43.23
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Oct 2021 02:43:23 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v4 1/2] block, bfq: counted root group into
- 'num_groups_with_pending_reqs'
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <8912e5ca-67bb-4a9a-a2ce-ba13e0fc86ed@huawei.com>
-Date:   Wed, 20 Oct 2021 11:43:22 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AA986626-D3BF-43F3-81C2-FD7AA3C1ACD2@linaro.org>
-References: <20211014014556.3597008-1-yukuai3@huawei.com>
- <20211014014556.3597008-2-yukuai3@huawei.com>
- <0DD9CFF0-6110-497D-A352-9F37CADADC6B@linaro.org>
- <1f89cece-a123-6190-bb72-d59035dac266@huawei.com>
- <2E8712BB-5BFB-4647-AE9A-B06E199500D7@linaro.org>
- <8912e5ca-67bb-4a9a-a2ce-ba13e0fc86ed@huawei.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Wed, 20 Oct 2021 06:12:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634724641;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iVYvpCAnj9ExJE6+BU/e/+6ORCn7prDFiQBrCjeMj74=;
+        b=TkJM2guU1gLshwYEInWMDrPHylEFgFVKcQIEVqgguC89fTB49/RiQJhLN7sbQmUjGtdJZR
+        FcFL7TOVgwgp20/Iwzx+2NqsdI2ht4XejbIFiRX45sDQT1eVqQo7jusUbBWJJzgkSItc8Q
+        zSDl43E1Q6ttpv2aUIcSzlzXKFw3D34=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-SDebCvAIP7iyuPJjpM4UEw-1; Wed, 20 Oct 2021 06:10:38 -0400
+X-MC-Unique: SDebCvAIP7iyuPJjpM4UEw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EC83802575;
+        Wed, 20 Oct 2021 10:10:35 +0000 (UTC)
+Received: from T590 (ovpn-8-41.pek2.redhat.com [10.72.8.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A511D7621D;
+        Wed, 20 Oct 2021 10:09:56 +0000 (UTC)
+Date:   Wed, 20 Oct 2021 18:09:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Miroslav Benes <mbenes@suse.cz>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        live-patching@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YW/q70dLyF+YudyF@T590>
+References: <YWk9e957Hb+I7HvR@T590>
+ <YWm68xUnAofop3PZ@bombadil.infradead.org>
+ <YWq3Z++uoJ/kcp+3@T590>
+ <YW3LuzaPhW96jSBK@bombadil.infradead.org>
+ <YW4uwep3BCe9Vxq8@T590>
+ <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
+ <YW6OptglA6UykZg/@T590>
+ <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
+ <YW/KEsfWJMIPnz76@T590>
+ <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Oct 20, 2021 at 10:19:27AM +0200, Miroslav Benes wrote:
+> On Wed, 20 Oct 2021, Ming Lei wrote:
+> 
+> > On Wed, Oct 20, 2021 at 08:43:37AM +0200, Miroslav Benes wrote:
+> > > On Tue, 19 Oct 2021, Ming Lei wrote:
+> > > 
+> > > > On Tue, Oct 19, 2021 at 08:23:51AM +0200, Miroslav Benes wrote:
+> > > > > > > By you only addressing the deadlock as a requirement on approach a) you are
+> > > > > > > forgetting that there *may* already be present drivers which *do* implement
+> > > > > > > such patterns in the kernel. I worked on addressing the deadlock because
+> > > > > > > I was informed livepatching *did* have that issue as well and so very
+> > > > > > > likely a generic solution to the deadlock could be beneficial to other
+> > > > > > > random drivers.
+> > > > > > 
+> > > > > > In-tree zram doesn't have such deadlock, if livepatching has such AA deadlock,
+> > > > > > just fixed it, and seems it has been fixed by 3ec24776bfd0.
+> > > > > 
+> > > > > I would not call it a fix. It is a kind of ugly workaround because the 
+> > > > > generic infrastructure lacked (lacks) the proper support in my opinion. 
+> > > > > Luis is trying to fix that.
+> > > > 
+> > > > What is the proper support of the generic infrastructure? I am not
+> > > > familiar with livepatching's model(especially with module unload), you mean
+> > > > livepatching have to do the following way from sysfs:
+> > > > 
+> > > > 1) during module exit:
+> > > > 	
+> > > > 	mutex_lock(lp_lock);
+> > > > 	kobject_put(lp_kobj);
+> > > > 	mutex_unlock(lp_lock);
+> > > > 	
+> > > > 2) show()/store() method of attributes of lp_kobj
+> > > > 	
+> > > > 	mutex_lock(lp_lock)
+> > > > 	...
+> > > > 	mutex_unlock(lp_lock)
+> > > 
+> > > Yes, this was exactly the case. We then reworked it a lot (see 
+> > > 958ef1e39d24 ("livepatch: Simplify API by removing registration step"), so 
+> > > now the call sequence is different. kobject_put() is basically offloaded 
+> > > to a workqueue scheduled right from the store() method. Meaning that 
+> > > Luis's work would probably not help us currently, but on the other hand 
+> > > the issues with AA deadlock were one of the main drivers of the redesign 
+> > > (if I remember correctly). There were other reasons too as the changelog 
+> > > of the commit describes.
+> > > 
+> > > So, from my perspective, if there was a way to easily synchronize between 
+> > > a data cleanup from module_exit callback and sysfs/kernfs operations, it 
+> > > could spare people many headaches.
+> > 
+> > kobject_del() is supposed to do so, but you can't hold a shared lock
+> > which is required in show()/store() method. Once kobject_del() returns,
+> > no pending show()/store() any more.
+> > 
+> > The question is that why one shared lock is required for livepatching to
+> > delete the kobject. What are you protecting when you delete one kobject?
+> 
+> I think it boils down to the fact that we embed kobject statically to 
+> structures which livepatch uses to maintain data. That is discouraged 
+> generally, but all the attempts to implement it correctly were utter 
+> failures.
 
+OK, then it isn't one common usage, in which kobject covers the release
+of the external object. What is the exact kobject in livepatching?
 
-> Il giorno 20 ott 2021, alle ore 11:38, yukuai (C) <yukuai3@huawei.com> =
-ha scritto:
->=20
-> On 2021/10/20 17:29, Paolo Valente wrote:
->>> Il giorno 20 ott 2021, alle ore 11:20, yukuai (C) =
-<yukuai3@huawei.com> ha scritto:
->>>=20
->>> On 2021/10/20 16:51, Paolo Valente wrote:
->>>=20
->>>>> @@ -860,9 +870,25 @@ void bfq_weights_tree_remove(struct bfq_data =
-*bfqd,
->>>>> 			     struct bfq_queue *bfqq)
->>>>> {
->>>>> 	struct bfq_entity *entity =3D bfqq->entity.parent;
->>>>> +	struct bfq_sched_data *sd;
->>>>> +
->>>>> +	/*
->>>>> +	 * If the bfq queue is in root group, the decrement of
->>>>> +	 * num_groups_with_pending_reqs is performed immediately upon =
-the
->>>>> +	 * deactivation of entity.
->>>>> +	 */
->>>>> +	if (!entity) {
->>>>> +		entity =3D &bfqd->root_group->entity;
->>>>> +		sd =3D entity->my_sched_data;
->>>>> +
->>>>> +		if (!sd->in_service_entity)
->>>>> +			bfq_clear_group_with_pending_reqs(bfqd, entity);
->>>>> +
->>>>> +		return;
->>>>> +	}
->>>>>=20
->>>>> 	for_each_entity(entity) {
->>>>> -		struct bfq_sched_data *sd =3D entity->my_sched_data;
->>>>> +		sd =3D entity->my_sched_data;
->>>>>=20
->>>>> 		if (sd->next_in_service || sd->in_service_entity) {
->>>>> 			/*
->>>>> @@ -880,7 +906,8 @@ void bfq_weights_tree_remove(struct bfq_data =
-*bfqd,
->>>>> 		}
->>>>>=20
->>>>> 		/*
->>>>> -		 * The decrement of num_groups_with_pending_reqs is
->>>>> +		 * If the bfq queue is not in root group,
->>>>> +		 * the decrement of num_groups_with_pending_reqs is
->>>> I'm sorry if I didn't notice this before, but why do you postpone =
-the
->>>> decrement only for queues not in root group?  If I'm not missing
->>>> anything, the active (i.e., with pending reqs) state of the root =
-group
->>>> is to be computed as that of ay other group.
->>>=20
->>> Hi, Paolo
->>>=20
->>> I thought if queue is in root group, then bfqq->entity.parent is =
-NULL,
->>> and such case is handled above, which is separate from previous
->>> implementation for queues that are not in root group.
->>>=20
->>> Is this the wrong way to handle root group?
->>>=20
->> I think that, if we want to count also the root group among the =
-active
->> ones, then the logic for tagging the root group as active must be the
->> same as the other groups. Or am I missing something?
->=20
-> Hi, Paolo
->=20
-> Currently, if queue is in root group, bfqq->entity.parent is NULL, and
-> this makes it hard to keep the same logic.
->=20
-> Can we store root_group->my_entity to bfqq->entity.parent if the queue
-> is in root group?
->=20
+But kobject_del() won't release the kobject, you shouldn't need the lock
+to delete kobject first. After the kobject is deleted, no any show() and
+store() any more, isn't such sync[1] you expected?
 
-Any sensible implementation is ok for me.  Usually, stuff for root
-group is in the bfqd.
 
 Thanks,
-Paolo
-
-> Thanks,
-> Kuai
+Ming
 
