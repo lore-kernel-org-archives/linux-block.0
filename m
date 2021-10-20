@@ -2,122 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2835C43217
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 15:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26842C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 16:10:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A598B611F2
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 15:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECA7D61374
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 16:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbhJTPud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 11:50:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41702 "EHLO
+        id S231183AbhJTQMi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 12:12:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230460AbhJTPud (ORCPT
+        with ESMTP id S229817AbhJTQMg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 11:50:33 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAEC4C06161C;
-        Wed, 20 Oct 2021 08:48:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HBm/Dqi3jW7uqk4DDOcgZCLMM+rxars2xSrNqJBELD4=; b=2Nfb8jhDT8Z/1YppkaaGzMBE5F
-        7DhHQ0SucI4gkSMWSPV7qRIfV71Fm6qrfDrJmlPqzT7KRfnj1yBiDyOvhgFH59z59TYTW1kELLAVg
-        mLk1u/MgB+DYSZ1pYh9quyEyxaf9eS7gY6oh1R2myWpq2f4ZN+t8O9pDmupq3jh8lU1/6coGTgRIG
-        C8k2APmUBWLR1sFqAAQXTM7S5Y5k25OWJXYSBl+d9lruqyMox+TX5UmnYt1ffUmBrwhJfbE6Q8mm2
-        r6X/+eHUQhd8s8zbcTZND5RIi0WiXLOOp5v6be+Wi35/qyZrcuIhl8AEJKo3MYxcs2OMjnbQngNMf
-        RACz1Adg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mdDoy-0057WV-4E; Wed, 20 Oct 2021 15:48:04 +0000
-Date:   Wed, 20 Oct 2021 08:48:04 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YXA6NMhwoiIMeHji@bombadil.infradead.org>
-References: <YWjJ0O7K+31Iz3ox@bombadil.infradead.org>
- <YWk9e957Hb+I7HvR@T590>
- <YWm68xUnAofop3PZ@bombadil.infradead.org>
- <YWq3Z++uoJ/kcp+3@T590>
- <YW3LuzaPhW96jSBK@bombadil.infradead.org>
- <YW4uwep3BCe9Vxq8@T590>
- <YW7kFXlzRrvwzARP@bombadil.infradead.org>
- <YW7ygbLAwm2/LZFl@T590>
- <YW8eSq2B+5FtOLZb@bombadil.infradead.org>
- <YW9tqPunx5bssxIz@T590>
+        Wed, 20 Oct 2021 12:12:36 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75809C06161C
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 09:10:21 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id r6so10252243oiw.2
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 09:10:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=ZVPpPne3hTAcsySPNM/JdUSxROLoLWQduZ0ukg/aGcU=;
+        b=no+a4TOoa/yuVasJoRAakoU05XWEklc9FM7Tc5612B6pqupyZ2ii4oOBpMGzIvgeaj
+         c6HrFK9uEzA7m/6rjzpj/jbdfsZLyxGw3H/fZ2XeF8pe+2Se+xOr1MGh8O8W6rIee0gf
+         u2QcB7BJXOlwrbsk6U3ozuVF4E0iaLJ7Y5uuMbzC9cS3VFp0t8AG5NBic+3dA+8fqwPm
+         BnTVeQhPGAf+9w5RNw28jNfCvIs2Ek6exw0fJjwSk8qfVpnv5I3F6LuW8KW9dSau0ozq
+         qoR2Fsr6I99ttZb4bqThbyLxQ5TllS9/GoQst49cthWMpCRh8W055IW3z9WaqrxJDE5F
+         jKOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=ZVPpPne3hTAcsySPNM/JdUSxROLoLWQduZ0ukg/aGcU=;
+        b=kwW4ZHoB8uOEqVwxAg1U5V+t2wQUXE38F74qKUtwK3xIEtAJQyNR500PNCQK6ThsoK
+         151wqbZDdD/Ls5/J9Fne2uLfchp3r/Bom4jkrXuqEI2d8fj2QcGv0qjQyDPfh+Paaej3
+         hXyFp96CSNbKZ6/66aaByz/6CF8xcABePp9bI57qDyXd9Am9mKiQbl7Utg3X/POCn7ir
+         A+xK5fhagkSChXzlk8w9KoM0RFtF44D8SVXj+ESmp4eclyZjAgcDxM3uIBZTBEgPO3rN
+         C7wSFL57Cv5rdAAgpJBWgDnt0nLXq8u0XSXfMdkpNhk3EeoYmcCp081FNE76qJO3ki5O
+         9oEg==
+X-Gm-Message-State: AOAM531B3XMaWU0ns3j59NkfTmodHeg2cFpGN3IT40+URrlfUo7LSaUk
+        ziSlUzDLEAXebk1BMiRpUPbWgg==
+X-Google-Smtp-Source: ABdhPJxiRqdVDqKsvg7hRm82+e2FigxxVGFVwgVU0N/Hl2eFeaPWDCPxjyeSUaKANZwfGijoyk0c3Q==
+X-Received: by 2002:a05:6808:2129:: with SMTP id r41mr292866oiw.110.1634746220468;
+        Wed, 20 Oct 2021 09:10:20 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m23sm481459oom.34.2021.10.20.09.10.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Oct 2021 09:10:20 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org,
+        Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20211020144119.142582-1-hch@lst.de>
+References: <20211020144119.142582-1-hch@lst.de>
+Subject: Re: cleanup and optimize block plug handling
+Message-Id: <163474621989.782268.9399115618832147943.b4-ty@kernel.dk>
+Date:   Wed, 20 Oct 2021 10:10:19 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YW9tqPunx5bssxIz@T590>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 20, 2021 at 09:15:20AM +0800, Ming Lei wrote:
-> On Tue, Oct 19, 2021 at 12:36:42PM -0700, Luis Chamberlain wrote:
-> > On Wed, Oct 20, 2021 at 12:29:53AM +0800, Ming Lei wrote:
-> > > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> > > index d0cae7a42f4d..a14ba3d350ea 100644
-> > > --- a/drivers/block/zram/zram_drv.c
-> > > +++ b/drivers/block/zram/zram_drv.c
-> > > @@ -1704,12 +1704,12 @@ static void zram_reset_device(struct zram *zram)
-> > >  	set_capacity_and_notify(zram->disk, 0);
-> > >  	part_stat_set_all(zram->disk->part0, 0);
-> > >  
-> > > -	up_write(&zram->init_lock);
-> > >  	/* I/O operation under all of CPU are done so let's free */
-> > >  	zram_meta_free(zram, disksize);
-> > >  	memset(&zram->stats, 0, sizeof(zram->stats));
-> > >  	zcomp_destroy(comp);
-> > >  	reset_bdev(zram);
-> > > +	up_write(&zram->init_lock);
-> > >  }
-> > >  
-> > >  static ssize_t disksize_store(struct device *dev,
-> > 
-> > With this, it still ends up in a state where we loop and can't get out of:
-> > 
-> > zram: Can't change algorithm for initialized device
+On Wed, 20 Oct 2021 16:41:15 +0200, Christoph Hellwig wrote:
+> this is a spinoff from Pavel's misc optimizations.  It shuld take care
+> of his two painpoints and also cleans up the interface for flushing
+> plugs a bit.
 > 
-> Again, you are running two zram02.sh[1] on /dev/zram0, that isn't unexpected
-
-You mean that it is not expected? If so then yes, of course.
-
-> behavior. Here the difference is just timing.
-
-Right, but that is what helped reproduce a difficutl to re-produce customer
-bug. Once you find an easy way to reproduce a reported issue you stick
-with it and try to make the situation worse to ensure no more bugs are
-present.
-
-> Also you did not answer my question about your test expected result when
-> running the following script from two terminal concurrently:
+> Diffstat:
+>  block/blk-core.c       |   17 ++++++++---------
+>  block/blk-mq.c         |    2 +-
+>  block/blk-mq.h         |    1 +
+>  fs/fs-writeback.c      |    5 +++--
+>  include/linux/blk-mq.h |    2 --
+>  include/linux/blkdev.h |   29 ++++-------------------------
+>  kernel/sched/core.c    |    5 +++--
+>  7 files changed, 20 insertions(+), 41 deletions(-)
 > 
-> 	while true; do
-> 		PATH=$PATH:$PWD:$PWD/../../../lib/ ./zram02.sh;
-> 	done
+> [...]
 
-If you run this, you should see no failures.
+Applied, thanks!
 
-Once you start a second script that one should cause odd issues on both
-sides but never crash or stall the module.
+[1/4] blk-mq: only flush requests from the plug in blk_mq_submit_bio
+      commit: a214b949d8e365583dd67441f6f608f0b20f7f52
+[2/4] blk-mq: move blk_mq_flush_plug_list to block/blk-mq.h
+      commit: dbb6f764a079d1dea883c6f2439d91db4f0fb2f2
+[3/4] block: optimise blk_flush_plug_list
+      commit: b600455d84307696b3cb7debdaf3081080748409
+[4/4] block: cleanup the flush plug helpers
+      commit: 008f75a20e7072d0840ec323c39b42206f3fa8a0
 
-A second series of tests is hitting CTRL-C on either randonly and
-restarting testing once again randomly.
+Best regards,
+-- 
+Jens Axboe
 
-Again, neither should crash the kernel or stall the module.
 
-In the end of these tests you should be able to run the script alone
-just once and not see issues.
-
-  Luis
