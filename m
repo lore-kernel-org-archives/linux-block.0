@@ -2,97 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 158E8C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B2EC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:39:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6609610A3
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCB46610A3
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbhJTGlD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 02:41:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28578 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229817AbhJTGk7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 02:40:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634711925;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PrOFEvqhNQrQ0/ExACfaN4BBMFTlowBIDO0/wNK/PGI=;
-        b=PoMinisIlENjtV23IhOMvbpBLah8wxjwdjn5rP8xZ+wo9VG8J45LBHAk9Fs7hbc0lzpm+s
-        PWWnH5ab608WFXYURopCjgNBetS4FDQtoAqgK15/QoQfULTkwz36mH2zM3yVOkN8oikeRW
-        /XM9YBOWpdDfHzGoHltb2Ejwcfi1i64=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-n2s1kz6jO3mBLJpFzxBGUA-1; Wed, 20 Oct 2021 02:38:44 -0400
-X-MC-Unique: n2s1kz6jO3mBLJpFzxBGUA-1
-Received: by mail-yb1-f197.google.com with SMTP id b126-20020a251b84000000b005bd8aca71a2so29065704ybb.4
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 23:38:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PrOFEvqhNQrQ0/ExACfaN4BBMFTlowBIDO0/wNK/PGI=;
-        b=JwLscdVX+V5iwcB1Z7wnZ73yhOsQnQEdl/dLLl4Kg/t8uIDWsdn6VSAexGf+No672T
-         hL9IJ1a97zS00PntXNVmLXpBEBuAIJ7XKVW8KWTEhWdFwvktF1gpRHFlCfMHeyuQSyaO
-         zzf96ya6c6qMM2gSI+nCTKhcM4qqEirYkB1mVUjxREZLmtWIz23sQeEC4rwAItTAOvpN
-         izZxwi834HNlKY/x5J5ZfKWQyc8pxLxaMbUeJ+BNT6tcooh84hRKZFwzl7pZzYdMGhYL
-         2s0+W1b8rvoVHBUSWAHxAK3dWyXJr/df+hTQihaPscXgJolyFOii5JeoHVc5tKk4136t
-         oxTw==
-X-Gm-Message-State: AOAM530HhB/q30s4ITV0OSIvX9AacLQqWbMkz6TXWCeIFPmIM6UzRjSu
-        yO57mlznkgse0F14aBvscNB86AFH6cavGB8vLBos+RoOVr4k9UdASo27c5rhoXQ7BvW6ztZmVnU
-        8LzprbMomePQKbLGjs+1f2J8GRU9AzoHh+uTU4NI=
-X-Received: by 2002:a25:3104:: with SMTP id x4mr40913559ybx.512.1634711923714;
-        Tue, 19 Oct 2021 23:38:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwIZmVt4b8AgEMPxIzXR7HjibNCLFoFON5qfINqUWjmWY1rYZGs5qe6fNCsg2PkDEFW2ZrVeNuo6RpgxFciEWQ=
-X-Received: by 2002:a25:3104:: with SMTP id x4mr40913541ybx.512.1634711923514;
- Tue, 19 Oct 2021 23:38:43 -0700 (PDT)
+        id S229771AbhJTGmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 02:42:08 -0400
+Received: from mga11.intel.com ([192.55.52.93]:59683 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229591AbhJTGmH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Oct 2021 02:42:07 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10142"; a="226167087"
+X-IronPort-AV: E=Sophos;i="5.87,166,1631602800"; 
+   d="scan'208";a="226167087"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2021 23:39:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,166,1631602800"; 
+   d="scan'208";a="575146481"
+Received: from ahunter-desktop.fi.intel.com (HELO [10.237.72.76]) ([10.237.72.76])
+  by fmsmga002.fm.intel.com with ESMTP; 19 Oct 2021 23:39:50 -0700
+Subject: Re: [PATCH v2 2/2] mmc: core: Use blk_mq_complete_request_direct().
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+References: <20211018135559.244400-1-bigeasy@linutronix.de>
+ <20211018135559.244400-3-bigeasy@linutronix.de>
+ <CAPDyKFrnmevHeCZ3Fb3XCOx6cHvEv6b3ktYdU-WAnuuq8L4kXQ@mail.gmail.com>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+Message-ID: <675b6ad0-080c-c2ad-314c-618a941f9d1c@intel.com>
+Date:   Wed, 20 Oct 2021 09:39:49 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20211019073641.2323410-1-hch@lst.de>
-In-Reply-To: <20211019073641.2323410-1-hch@lst.de>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Wed, 20 Oct 2021 14:38:23 +0800
-Message-ID: <CAHj4cs-osb2QuuCV2PW8xhefc3ATReur=b0tVf6ogTkMFmVi=A@mail.gmail.com>
-Subject: Re: fix a pmem regression due to drain the block queue in del_gendisk
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux NVDIMM <nvdimm@lists.linux.dev>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAPDyKFrnmevHeCZ3Fb3XCOx6cHvEv6b3ktYdU-WAnuuq8L4kXQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Verified the issue was fixed by this patchset.
-https://lore.kernel.org/linux-block/CAHj4cs87BapQJcV0a=M6=dc9PrsGH6qzqJEt9fbjLK1aShnMPg@mail.gmail.com/
+On 19/10/2021 14:32, Ulf Hansson wrote:
+> + Adrian
+> 
+> On Mon, 18 Oct 2021 at 15:56, Sebastian Andrzej Siewior
+> <bigeasy@linutronix.de> wrote:
+>>
+>> The completion callback for the sdhci-pci device is invoked from a
+>> kworker.
+>> I couldn't identify in which context is mmc_blk_mq_req_done() invoke but
+>> the remaining caller are from invoked from preemptible context. Here it
+>> would make sense to complete the request directly instead scheduling
+>> ksoftirqd for its completion.
+>>
+>> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> 
+> Thanks for working on this!
+> 
+> I have looped in Adrian, to allow him to provide us with his input too.
 
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Thanks!
+
+Looks good to me.
+
+Acked-by: Adrian Hunter <adrian.hunter@intel.com>
 
 
-On Tue, Oct 19, 2021 at 3:37 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Hi Dan,
->
-> this series fixes my recently introduced regression in the pmem driver by
-> removing the usage of q_usage_count as the external pgmap refcount in the
-> pmem driver and then removes the now unused external refcount
-> infrastructure.
->
-> Diffstat:
->  drivers/nvdimm/pmem.c             |   33 +--------------------
->  include/linux/memremap.h          |   18 +----------
->  mm/memremap.c                     |   59 +++++++-------------------------------
->  tools/testing/nvdimm/test/iomap.c |   43 +++++++--------------------
->  4 files changed, 29 insertions(+), 124 deletions(-)
->
-
-
---
-Best Regards,
-  Yi Zhang
+> 
+>> ---
+>>  drivers/mmc/core/block.c | 22 ++++++++++++++--------
+>>  1 file changed, 14 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+>> index 431af5e8be2f8..7d6b43fe52e8a 100644
+>> --- a/drivers/mmc/core/block.c
+>> +++ b/drivers/mmc/core/block.c
+>> @@ -2051,7 +2051,8 @@ static void mmc_blk_mq_dec_in_flight(struct mmc_queue *mq, struct request *req)
+>>                 mmc_put_card(mq->card, &mq->ctx);
+>>  }
+>>
+>> -static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req)
+>> +static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req,
+>> +                               bool can_sleep)
+>>  {
+>>         struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
+>>         struct mmc_request *mrq = &mqrq->brq.mrq;
+>> @@ -2063,10 +2064,14 @@ static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req)
+>>          * Block layer timeouts race with completions which means the normal
+>>          * completion path cannot be used during recovery.
+>>          */
+>> -       if (mq->in_recovery)
+>> +       if (mq->in_recovery) {
+>>                 mmc_blk_mq_complete_rq(mq, req);
+>> -       else if (likely(!blk_should_fake_timeout(req->q)))
+>> -               blk_mq_complete_request(req);
+>> +       } else if (likely(!blk_should_fake_timeout(req->q))) {
+>> +               if (can_sleep)
+>> +                       blk_mq_complete_request_direct(req, mmc_blk_mq_complete);
+>> +               else
+>> +                       blk_mq_complete_request(req);
+>> +       }
+>>
+>>         mmc_blk_mq_dec_in_flight(mq, req);
+>>  }
+>> @@ -2087,7 +2092,7 @@ void mmc_blk_mq_recovery(struct mmc_queue *mq)
+>>
+>>         mmc_blk_urgent_bkops(mq, mqrq);
+>>
+>> -       mmc_blk_mq_post_req(mq, req);
+>> +       mmc_blk_mq_post_req(mq, req, true);
+>>  }
+>>
+>>  static void mmc_blk_mq_complete_prev_req(struct mmc_queue *mq,
+>> @@ -2106,7 +2111,7 @@ static void mmc_blk_mq_complete_prev_req(struct mmc_queue *mq,
+>>         if (prev_req)
+>>                 *prev_req = mq->complete_req;
+>>         else
+>> -               mmc_blk_mq_post_req(mq, mq->complete_req);
+>> +               mmc_blk_mq_post_req(mq, mq->complete_req, true);
+>>
+>>         mq->complete_req = NULL;
+>>
+>> @@ -2178,7 +2183,8 @@ static void mmc_blk_mq_req_done(struct mmc_request *mrq)
+>>         mq->rw_wait = false;
+>>         wake_up(&mq->wait);
+>>
+>> -       mmc_blk_mq_post_req(mq, req);
+>> +       /* context unknown */
+>> +       mmc_blk_mq_post_req(mq, req, false);
+> 
+> So it seems we would benefit from knowing the context here, right?
+> 
+> At this point, what you suggest seems like a reasonable way forward
+> (assuming atomic context), but in a next step we could potentially add
+> a non-atomic helper function for mmc host drivers to call, when that
+> is suitable. Would that make sense you think?
+> 
+>>  }
+>>
+>>  static bool mmc_blk_rw_wait_cond(struct mmc_queue *mq, int *err)
+>> @@ -2238,7 +2244,7 @@ static int mmc_blk_mq_issue_rw_rq(struct mmc_queue *mq,
+>>         err = mmc_start_request(host, &mqrq->brq.mrq);
+>>
+>>         if (prev_req)
+>> -               mmc_blk_mq_post_req(mq, prev_req);
+>> +               mmc_blk_mq_post_req(mq, prev_req, true);
+>>
+>>         if (err)
+>>                 mq->rw_wait = false;
+> 
+> Kind regards
+> Uffe
+> 
 
