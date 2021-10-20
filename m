@@ -2,55 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731DDC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 158E8C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:38:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E5CC61183
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:37:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6609610A3
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 06:38:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbhJTGjg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 02:39:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56082 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbhJTGjf (ORCPT
+        id S229820AbhJTGlD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 02:41:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28578 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229817AbhJTGk7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 02:39:35 -0400
-Received: from bombadil.infradead.org (unknown [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA6BC06161C
-        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 23:37:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=u/HJpyZTumYYBAecANhFdrhQl06E63HKzeNiDMSg6+g=; b=AiBpddxeKTdl0lrz+V6brnCJpM
-        ZdK3e19oSV1KCkBbAC3pz5B2QXRntEATsfZZCQ2kDpMzQsna5BGq+whNTLlFKPUVQw8pgdSxeAVh3
-        0Ri9UMo5m7/AC0+fomwp8WDQOOHWAkR4TOL+iT4eIfRQsipuw4h7e3b1UNDZCGOZvy/pSANLl3J6Y
-        jt0PtpmQXqYk15qF+vwq0R5fGBj4akJgYN+Li2wVPv6FAl3jJqQ2EQ4mD5DoZH5uEDxNrT4ufSymL
-        0NqomTrn42K3TkRfhC7PDnSlfrqpC7StuoohPUxEZ60Ei2ln6qdYHkS8fyML1+h/Pd3C3FcQAGspg
-        +S46xupQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1md5E1-003U5L-Ns; Wed, 20 Oct 2021 06:37:21 +0000
-Date:   Tue, 19 Oct 2021 23:37:21 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 13/16] block: add async version of bio_set_polled
-Message-ID: <YW+5Ic7v++qXiGXw@infradead.org>
-References: <cover.1634676157.git.asml.silence@gmail.com>
- <673fc6ca8f2e761586d21c709348642113f13f86.1634676157.git.asml.silence@gmail.com>
+        Wed, 20 Oct 2021 02:40:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634711925;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PrOFEvqhNQrQ0/ExACfaN4BBMFTlowBIDO0/wNK/PGI=;
+        b=PoMinisIlENjtV23IhOMvbpBLah8wxjwdjn5rP8xZ+wo9VG8J45LBHAk9Fs7hbc0lzpm+s
+        PWWnH5ab608WFXYURopCjgNBetS4FDQtoAqgK15/QoQfULTkwz36mH2zM3yVOkN8oikeRW
+        /XM9YBOWpdDfHzGoHltb2Ejwcfi1i64=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-n2s1kz6jO3mBLJpFzxBGUA-1; Wed, 20 Oct 2021 02:38:44 -0400
+X-MC-Unique: n2s1kz6jO3mBLJpFzxBGUA-1
+Received: by mail-yb1-f197.google.com with SMTP id b126-20020a251b84000000b005bd8aca71a2so29065704ybb.4
+        for <linux-block@vger.kernel.org>; Tue, 19 Oct 2021 23:38:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PrOFEvqhNQrQ0/ExACfaN4BBMFTlowBIDO0/wNK/PGI=;
+        b=JwLscdVX+V5iwcB1Z7wnZ73yhOsQnQEdl/dLLl4Kg/t8uIDWsdn6VSAexGf+No672T
+         hL9IJ1a97zS00PntXNVmLXpBEBuAIJ7XKVW8KWTEhWdFwvktF1gpRHFlCfMHeyuQSyaO
+         zzf96ya6c6qMM2gSI+nCTKhcM4qqEirYkB1mVUjxREZLmtWIz23sQeEC4rwAItTAOvpN
+         izZxwi834HNlKY/x5J5ZfKWQyc8pxLxaMbUeJ+BNT6tcooh84hRKZFwzl7pZzYdMGhYL
+         2s0+W1b8rvoVHBUSWAHxAK3dWyXJr/df+hTQihaPscXgJolyFOii5JeoHVc5tKk4136t
+         oxTw==
+X-Gm-Message-State: AOAM530HhB/q30s4ITV0OSIvX9AacLQqWbMkz6TXWCeIFPmIM6UzRjSu
+        yO57mlznkgse0F14aBvscNB86AFH6cavGB8vLBos+RoOVr4k9UdASo27c5rhoXQ7BvW6ztZmVnU
+        8LzprbMomePQKbLGjs+1f2J8GRU9AzoHh+uTU4NI=
+X-Received: by 2002:a25:3104:: with SMTP id x4mr40913559ybx.512.1634711923714;
+        Tue, 19 Oct 2021 23:38:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwIZmVt4b8AgEMPxIzXR7HjibNCLFoFON5qfINqUWjmWY1rYZGs5qe6fNCsg2PkDEFW2ZrVeNuo6RpgxFciEWQ=
+X-Received: by 2002:a25:3104:: with SMTP id x4mr40913541ybx.512.1634711923514;
+ Tue, 19 Oct 2021 23:38:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <673fc6ca8f2e761586d21c709348642113f13f86.1634676157.git.asml.silence@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20211019073641.2323410-1-hch@lst.de>
+In-Reply-To: <20211019073641.2323410-1-hch@lst.de>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Wed, 20 Oct 2021 14:38:23 +0800
+Message-ID: <CAHj4cs-osb2QuuCV2PW8xhefc3ATReur=b0tVf6ogTkMFmVi=A@mail.gmail.com>
+Subject: Re: fix a pmem regression due to drain the block queue in del_gendisk
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux NVDIMM <nvdimm@lists.linux.dev>, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 19, 2021 at 10:24:22PM +0100, Pavel Begunkov wrote:
-> If we know that a iocb is async we can optimise bio_set_polled() a bit,
-> add a new helper bio_set_polled_async().
+Verified the issue was fixed by this patchset.
+https://lore.kernel.org/linux-block/CAHj4cs87BapQJcV0a=M6=dc9PrsGH6qzqJEt9fbjLK1aShnMPg@mail.gmail.com/
 
-This avoids a single if.  Why?  I'm really worried about all these
-micro-optimizations that just make the code harder and harder to
-maintain.
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+
+
+On Tue, Oct 19, 2021 at 3:37 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Hi Dan,
+>
+> this series fixes my recently introduced regression in the pmem driver by
+> removing the usage of q_usage_count as the external pgmap refcount in the
+> pmem driver and then removes the now unused external refcount
+> infrastructure.
+>
+> Diffstat:
+>  drivers/nvdimm/pmem.c             |   33 +--------------------
+>  include/linux/memremap.h          |   18 +----------
+>  mm/memremap.c                     |   59 +++++++-------------------------------
+>  tools/testing/nvdimm/test/iomap.c |   43 +++++++--------------------
+>  4 files changed, 29 insertions(+), 124 deletions(-)
+>
+
+
+--
+Best Regards,
+  Yi Zhang
+
