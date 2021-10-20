@@ -2,110 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5773C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 19:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 006A0C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 20:03:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F28760EB2
-	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 19:54:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D81676137B
+	for <linux-block@archiver.kernel.org>; Wed, 20 Oct 2021 20:03:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231612AbhJTT4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 15:56:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42374 "EHLO
+        id S231573AbhJTUFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Oct 2021 16:05:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231653AbhJTT4w (ORCPT
+        with ESMTP id S230020AbhJTUFk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 15:56:52 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A62C06174E
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 12:54:38 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id i6so6176201ila.12
-        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 12:54:38 -0700 (PDT)
+        Wed, 20 Oct 2021 16:05:40 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03863C06161C;
+        Wed, 20 Oct 2021 13:03:25 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id i12so71040wrb.7;
+        Wed, 20 Oct 2021 13:03:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=SXEBqjlrNeQLC3cCdFvWFBZcm6c8pSFlJ+Ev3n10SV4=;
-        b=gYBXhN15vb3aLXFPFXG/+r2AqV8CelHvxQ+j5SKHUXkDb7ASKNRZIEhjYM00SccleP
-         WJ56IlGahOFFftScI3zF51a3Nq4gPglpsBwUj5IY5K6gq1b5SRH7vKzRS7p00ys9l/nQ
-         KPKKC4SjKpmq7a/e7LtO0cYt+pJAFj7WQG4mC023Eeeqp/dzBbDkMrjfrNeIvh8IIGwQ
-         geT8kLM+HwFwmb2j6tHsrQI5I5uFmqGxNqVAvbhFRP3d9Q3JB3zp15cQ8Lpf04Asd87q
-         cBHITdnN1ebz704g2JunpK/A+9bMza0I8TihJC/st7GP4ALkjaTQUcdE276pR1W+qEZf
-         JQTQ==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aJs761PIZHA/yQrkxYR0H2JI0nZrSlRKQ+QXU0IoUbA=;
+        b=E5lEyRk0SI0GaN1hNyuOKFhy90A37dGMRYW9dJGiPzvYhS3VJFVFKUSv4mS0bU14tW
+         1qQpAEhOh2noHu8C0vDRCApJJCPsvI4xF86GD/8FYsK8DgL0YxXp7QCuJoswxcTaFZjA
+         OcQGruxyCuSZZxtwcIX4ezT1hf1XRqqShRQPxP+9PvMQtctoLAe/YA1KIYfw18xC3eqI
+         W1IOCTf5K8NmHAS+Csl7bG0EQYADDVbv+eef8IpmvLByw3kQruusrIvABcjhqe+Ri9gO
+         NPknaHxOPG4zKvyuoLeXMUy2/L4KmYDpXsnI54yG76DTx3kj3zO9mCVkm+vw2BmPP3NY
+         u4Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=SXEBqjlrNeQLC3cCdFvWFBZcm6c8pSFlJ+Ev3n10SV4=;
-        b=P0XlDsTu6/rhyVCEQHCePEZICb2DxlGK/bYoEl18Em1OGWNjEg/WRhGS/Dzm/+u9I0
-         B8YwFDkB5ZY7z06iJzV3YPOCFsnD11LFe9/63NkBrx8dEl4PqumfmiVgbC6UPEJMV1LH
-         FvOLJaKi+wpd/0qCypxQdP2WYhb4NWWVtz7r2xQ8rHpSqPVvITfAuJnWDvnLk9YnSwlI
-         S/v3xi0WYglDDu0Y1GpiwISIDTztNPPkqGhy1H9J09EcBtfeprrjuA0iJC3xdQaYaL6A
-         3bXvvzFtTCRqc3z94tmfnYahjcJV08IDq0oC/og4KLW+yBMlAj9H2HlWE1kEy09/Y3C3
-         djcg==
-X-Gm-Message-State: AOAM532sjmgf29lt0wWfI+wxnaO/zTp9NFhY4ay+/fbkcKFz3amt4ago
-        6k6Hv1LFpJHDaO+R4OEXx+3d7LOEZxohlg==
-X-Google-Smtp-Source: ABdhPJxi6lks0gYpKKh4LuvzEtLvK0kK+rMhTvV/K5AYOqtlLtAM3sJp8SxGwa5Ie/acDWj4d7nv+A==
-X-Received: by 2002:a92:d801:: with SMTP id y1mr669770ilm.159.1634759677565;
-        Wed, 20 Oct 2021 12:54:37 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id e14sm1600878ioe.37.2021.10.20.12.54.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Oct 2021 12:54:37 -0700 (PDT)
-Subject: Re: [PATCH] fs: kill unused ret2 argument from iocb->ki_complete()
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-aio@kvack.org
-References: <ce839d66-1d05-dab8-4540-71b8485fdaf3@kernel.dk>
- <x498ryno93g.fsf@segfault.boston.devel.redhat.com>
- <16a7a029-0d23-6a14-9ae9-79ab8a9adb34@kernel.dk>
- <x494k9bo84w.fsf@segfault.boston.devel.redhat.com>
- <80244d5b-692c-35ac-e468-2581ff869395@kernel.dk>
- <8f5fdbbf-dc66-fabe-db3b-01b2085083b0@kernel.dk>
- <x49zgr3mrzs.fsf@segfault.boston.devel.redhat.com>
- <a60158d1-6ee0-6229-dc62-19ec40674585@kernel.dk>
- <x49v91rmqao.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ea4bd905-4fc5-510f-fe8f-dfc4033d6500@kernel.dk>
-Date:   Wed, 20 Oct 2021 13:54:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=aJs761PIZHA/yQrkxYR0H2JI0nZrSlRKQ+QXU0IoUbA=;
+        b=Z+EtHjaKfmjPsHPDH8zdjHxz82vrQ9RJ29FroBzPSQQdcgUikryp6SQzJMV4DQnRzk
+         7xtRCfWNN0zPfwceUzrnleS8G/PF2AGZkMtUkGPirnUobHpR5FhBlhPLN46E4fu56oOU
+         PI9hY3qanZo9xa7dnI4BrFYcHn5rjsFHkbsI0MK/TPmzFeVmy81kUnfXW4hWg4slwX8X
+         dDnmX8nlAthtePTBUcYKqmiSCMdMGwt6DTp+y+EKdwESKouhpRqkjoQtgbJaGDRUR4NG
+         6LstJicI+j8wRjc0QBaoA5BQ4cm/Zwg6gCHTt6gTPfwBZ0SrQmh0ATrnR2Kcixp2q2Bv
+         eVfg==
+X-Gm-Message-State: AOAM533CWS7VydBe0l7OZEg7KSuOc33+1GRacH1PA+Hja5CAi5pT8kVC
+        EQ/zWkdPAyiLVXAm+JMUFph/DLAlou93iQ==
+X-Google-Smtp-Source: ABdhPJy3VWjV7RWxxX3ABRwN4a8zHIkMBYKY2/89GnqyLE2t7QJc80rh8nEK3tGl/iFFYlwSiIV7Fg==
+X-Received: by 2002:a5d:4b8c:: with SMTP id b12mr1641206wrt.31.1634760204248;
+        Wed, 20 Oct 2021 13:03:24 -0700 (PDT)
+Received: from 127.0.0.1localhost ([185.69.145.206])
+        by smtp.gmail.com with ESMTPSA id m14sm3600119wms.25.2021.10.20.13.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Oct 2021 13:03:23 -0700 (PDT)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Christoph Lameter <cl@linux.com>,
+        Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH 0/2] optimise blk_try_enter_queue()
+Date:   Wed, 20 Oct 2021 21:03:17 +0100
+Message-Id: <cover.1634759754.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-In-Reply-To: <x49v91rmqao.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/20/21 1:47 PM, Jeff Moyer wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
->> On 10/20/21 1:11 PM, Jeff Moyer wrote:
->>> Jens Axboe <axboe@kernel.dk> writes:
->>>
->>>> On 10/20/21 12:41 PM, Jens Axboe wrote:
->>>>> Working on just changing it to a 64-bit type instead, then we can pass
->>>>> in both at once with res2 being the upper 32 bits. That'll keep the same
->>>>> API on the aio side.
->>>>
->>>> Here's that as an incremental. Since we can only be passing in 32-bits
->>>> anyway across 32/64-bit, we can just make it an explicit 64-bit instead.
->>>> This generates the same code on 64-bit for calling ->ki_complete, and we
->>>> can trivially ignore the usb gadget issue as we now can pass in both
->>>> values (and fill them in on the aio side).
->>>
->>> Yeah, I think that should work.
->>
->> Passed test and allmodconfig sanity check, sent out as v2 :)
-> 
-> It passed the libaio tests on x64.  I'll do some more testing and review
-> the v2 posting.
+Kill extra rcu_read_lock/unlock() pair in blk_try_enter_queue().
+Testing with io_uring (high batching) with nullblk:
 
-Thanks Jeff!
+Before:
+3.20%  io_uring  [kernel.vmlinux]  [k] __rcu_read_unlock
+3.05%  io_uring  [kernel.vmlinux]  [k] __rcu_read_lock
+
+After:
+2.52%  io_uring  [kernel.vmlinux]  [k] __rcu_read_unlock
+2.28%  io_uring  [kernel.vmlinux]  [k] __rcu_read_lock
+
+Doesn't necessarily translates into 1.4% perfofrmance improvement
+but nice to have.
+
+Pavel Begunkov (2):
+  percpu_ref: percpu_ref_tryget_live() version holding RCU
+  block: kill extra rcu lock/unlock in queue enter
+
+ block/blk-core.c                |  2 +-
+ include/linux/percpu-refcount.h | 31 +++++++++++++++++++++----------
+ 2 files changed, 22 insertions(+), 11 deletions(-)
 
 -- 
-Jens Axboe
+2.33.1
 
