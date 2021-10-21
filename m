@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C84E9C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 20:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 689FAC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 21:02:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A88E660F50
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 20:56:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 436B3610A4
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 21:02:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232073AbhJUU6v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 16:58:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31070 "EHLO
+        id S231822AbhJUVEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 17:04:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35816 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231848AbhJUU6v (ORCPT
+        by vger.kernel.org with ESMTP id S230272AbhJUVEP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 16:58:51 -0400
+        Thu, 21 Oct 2021 17:04:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634849794;
+        s=mimecast20190719; t=1634850119;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=68HUPzgPttUWe5FwedRO8wZKqqjzi3HsAYTIx2wQjJ0=;
-        b=T6SwCnWMbSzeWxHDL0ovGJ+zPUS7cQU0PM6hy4Xf/rNvRz+ySrn9IWCj0oluQtIJwd+ej1
-        GLhl99XcNFdd06/ZC0PCzLpDTF/T8ystD3sWvlzCYoGhfHNrHnYpl8Be+mVxR5mtNjKXUa
-        e+4A2jBsEEd+dzWH0kEhlDIWBTFlBY8=
+        bh=Viwng1G6iGM+hVHeS3JvQSAt/ZohVSUtijHLDpzwV58=;
+        b=KhOlfET10bjA5YzaN3TmQVOLE539i+JzPD5LXD613ucHX+M6UX25JKjn0XUd+++8t9t3ZE
+        8S77CpS9g3j9aMgVYOqZwdwtBHZJsa6XAW9hDsR51KxS4RLie6WXqKVg3Qw24Eo8CUlKHx
+        AMWb1z0dRNWCOMGa7yCjnnr5u0C7Qt4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-34zrKJK6POCILkQm9taGyA-1; Thu, 21 Oct 2021 16:56:31 -0400
-X-MC-Unique: 34zrKJK6POCILkQm9taGyA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-429-N5XlrqMmPMSK8EsR3PF-sA-1; Thu, 21 Oct 2021 17:01:55 -0400
+X-MC-Unique: N5XlrqMmPMSK8EsR3PF-sA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D45A4806691;
-        Thu, 21 Oct 2021 20:56:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 480E9362FB;
+        Thu, 21 Oct 2021 21:01:54 +0000 (UTC)
 Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DDDE1017E35;
-        Thu, 21 Oct 2021 20:56:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF05E60862;
+        Thu, 21 Oct 2021 21:01:53 +0000 (UTC)
 From:   Jeff Moyer <jmoyer@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -52,64 +52,71 @@ References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
         <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
         <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
         <7a697483-8e44-6dc3-361e-ae7b62b82074@kernel.dk>
+        <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com>
 X-PGP-KeyID: 1F78E1B4
 X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Thu, 21 Oct 2021 16:58:34 -0400
-In-Reply-To: <7a697483-8e44-6dc3-361e-ae7b62b82074@kernel.dk> (Jens Axboe's
-        message of "Thu, 21 Oct 2021 14:41:18 -0600")
-Message-ID: <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com>
+Date:   Thu, 21 Oct 2021 17:03:59 -0400
+In-Reply-To: <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com> (Jeff Moyer's
+        message of "Thu, 21 Oct 2021 16:58:34 -0400")
+Message-ID: <x49sfwut7i8.fsf@segfault.boston.devel.redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> writes:
+Jeff Moyer <jmoyer@redhat.com> writes:
 
-> On 10/21/21 12:05 PM, Jeff Moyer wrote:
->> 
->>>> I'll follow up if there are issues.
->> 
->> s390 (big endian, 64 bit) is failing libaio test 21:
->> 
->> # harness/cases/21.p
->> Expected -EAGAIN, got 4294967285
->> 
->> If I print out both res and res2 using %lx, you'll see what happened:
->> 
->> Expected -EAGAIN, got fffffff5,ffffffff
->> 
->> The sign extension is being split up.
+> Jens Axboe <axboe@kernel.dk> writes:
 >
-> Funky, does it work if you apply this on top?
+>> On 10/21/21 12:05 PM, Jeff Moyer wrote:
+>>> 
+>>>>> I'll follow up if there are issues.
+>>> 
+>>> s390 (big endian, 64 bit) is failing libaio test 21:
+>>> 
+>>> # harness/cases/21.p
+>>> Expected -EAGAIN, got 4294967285
+>>> 
+>>> If I print out both res and res2 using %lx, you'll see what happened:
+>>> 
+>>> Expected -EAGAIN, got fffffff5,ffffffff
+>>> 
+>>> The sign extension is being split up.
+>>
+>> Funky, does it work if you apply this on top?
+>>
+>> diff --git a/fs/aio.c b/fs/aio.c
+>> index 3674abc43788..c56437908339 100644
+>> --- a/fs/aio.c
+>> +++ b/fs/aio.c
+>> @@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
+>>  	 * 32-bits of value at most for either value, bundle these up and
+>>  	 * pass them in one u64 value.
+>>  	 */
+>> -	iocb->ki_res.res = lower_32_bits(res);
+>> -	iocb->ki_res.res2 = upper_32_bits(res);
+>> +	iocb->ki_res.res = (long) (res & 0xffffffff);
+>> +	iocb->ki_res.res2 = (long) (res >> 32);
+>>  	iocb_put(iocb);
+>>  }
 >
-> diff --git a/fs/aio.c b/fs/aio.c
-> index 3674abc43788..c56437908339 100644
-> --- a/fs/aio.c
-> +++ b/fs/aio.c
-> @@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
->  	 * 32-bits of value at most for either value, bundle these up and
->  	 * pass them in one u64 value.
->  	 */
-> -	iocb->ki_res.res = lower_32_bits(res);
-> -	iocb->ki_res.res2 = upper_32_bits(res);
-> +	iocb->ki_res.res = (long) (res & 0xffffffff);
-> +	iocb->ki_res.res2 = (long) (res >> 32);
->  	iocb_put(iocb);
->  }
+> I think you'll also need to clamp any ki_complete() call sites to 32
+> bits (cast to int, or what have you).  Otherwise that sign extension
+> will spill over into res2.
+>
+> fwiw, I tested with this:
+>
+> 	iocb->ki_res.res = (long)(int)lower_32_bits(res);
+> 	iocb->ki_res.res2 = (long)(int)upper_32_bits(res);
+>
+> Coupled with the call site changes, that made things work for me.
 
-I think you'll also need to clamp any ki_complete() call sites to 32
-bits (cast to int, or what have you).  Otherwise that sign extension
-will spill over into res2.
-
-fwiw, I tested with this:
-
-	iocb->ki_res.res = (long)(int)lower_32_bits(res);
-	iocb->ki_res.res2 = (long)(int)upper_32_bits(res);
-
-Coupled with the call site changes, that made things work for me.
+This is all starting to feel like a minefield.  If you don't have any
+concrete numbers to show that there is a speedup, I think we should
+shelf this change.
 
 -Jeff
 
