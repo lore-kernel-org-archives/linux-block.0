@@ -2,238 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 348E6C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 556CAC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:37:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A712611CE
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3333160EBD
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:37:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229878AbhJUNho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 09:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbhJUNho (ORCPT
+        id S229952AbhJUNjq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 09:39:46 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:29922 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230361AbhJUNjp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 09:37:44 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54FA8C061348
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 06:35:26 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id w14so1295435edv.11
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 06:35:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mK3OqhfTR/3crHzqfGZ0OC0iJVa2/KLLqHbKu+TtMvc=;
-        b=eyP5gEGuSRObkLlREcZNFYMrKz4gk+fJus5vdchUCF3pvAf5trjBlYhJ8XB3h1figc
-         MtEVsVXvtKn79LsvUIIQou5H0ZjDqyrJv2S/1p81jjL2kxFQLVXXqWZU7R9bcEB3zYiD
-         bzNtMqUpWqSRoHGcfF3/lGu18EApwFA7H1bpdlT9Q0VvuLCMff6Bb/wCxQ0p4w9WXqMM
-         YN/SaBZfLUYyFMYIbEiCqiLxQRaaHQrL3+Id0+G/tsjaTt30FcgwA8wkV1QpBfssoUm2
-         hzEYSWLo87iw6pKXAbGNX2C+zO1zM+h9BcVHuifWLHdzmc5nW7h1v4JtuTVl8I37kRJh
-         qEWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mK3OqhfTR/3crHzqfGZ0OC0iJVa2/KLLqHbKu+TtMvc=;
-        b=H3YuUD73+k9WtuI48n2NmJHZxv1LsHN5kfkxJm9nmaEhBqMlae+7alUjViberr1msT
-         cpARhWey4lnVONq3U+08bTTeoNL4jCD0bBoB4rAjCLfLHGX23+68//8eywvqkpoCoTXM
-         eiOmvR3u9IRfw9sbSJSvF9AyGJBi2ESK+ajSknN+y9p+kK6I3sK43tMorHobdmw9lbtJ
-         sVrPqpD9IRMz3snmS4A7tVEn0oaqrKWF8jz/zodIloWrUakibRip8nJYBHqPr52Zkn2/
-         tauzxYwmRs6KUbj05VFMbanqrkCuYiUwfucBo0cX1pBFGL1EU3dW016gjJ3FNWowCShd
-         C2yA==
-X-Gm-Message-State: AOAM530ecHvzlZ0/YibhCKcem3ecIFiQq2viSEzIfxVe14Ml7lX3mg/P
-        qa1MpXJMCIYwoMmNOsEPp/5v+1tV2OPxRfwspn1zNw==
-X-Google-Smtp-Source: ABdhPJzVR7aQr0Mb+s6OFUQLPhmMpZxgYebrmg/iz1/DMldqo1P5pDs2rmbmTuLsNucbTmdUYkIhoui9xptPiAG5LWM=
-X-Received: by 2002:aa7:df83:: with SMTP id b3mr7700838edy.294.1634823324792;
- Thu, 21 Oct 2021 06:35:24 -0700 (PDT)
+        Thu, 21 Oct 2021 09:39:45 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HZpM93TLYzbnJG;
+        Thu, 21 Oct 2021 21:32:53 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.15; Thu, 21 Oct 2021 21:37:27 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.15; Thu, 21 Oct 2021 21:37:27 +0800
+Subject: Re: [PATCH 0/2] nbd: fix sanity check for first_minor
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>, <josef@toxicpanda.com>,
+        <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
+        <luomeng12@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20211021122936.758221-1-yukuai3@huawei.com>
+ <72fb140d-609b-c035-bdd6-d2b8639c116b@gmail.com>
+ <17182476-e5bf-f493-9d9b-fedb2d9c8e1a@huawei.com>
+Message-ID: <92d9f001-f77b-8263-53a6-aab83daccef9@huawei.com>
+Date:   Thu, 21 Oct 2021 21:37:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <CA+G9fYvv6YsRM2Qf7AGMo3nwqkuAt_D1i+6H_ApHk3kmScyDyg@mail.gmail.com>
- <788ceb78-c0b8-b1cd-b658-31c377e24711@huawei.com>
-In-Reply-To: <788ceb78-c0b8-b1cd-b658-31c377e24711@huawei.com>
-From:   Anders Roxell <anders.roxell@linaro.org>
-Date:   Thu, 21 Oct 2021 15:35:13 +0200
-Message-ID: <CADYN=9KqNsJL4PSdZYM89RRW6qwNGLrJd_+evXFO6XHSfAqYfA@mail.gmail.com>
-Subject: Re: BUG: KASAN: use-after-free in blk_mq_sched_tags_teardown
-To:     John Garry <john.garry@huawei.com>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "lkft-triage@lists.linaro.org" <lkft-triage@lists.linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <17182476-e5bf-f493-9d9b-fedb2d9c8e1a@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 21 Oct 2021 at 14:17, John Garry <john.garry@huawei.com> wrote:
->
-> On 21/10/2021 13:01, Naresh Kamboju wrote:
-> > Following KASAN BUG noticed on linux next 20211021 while booting qemu-arm64
-> > with allmodconfig.
->
-> Thanks for the report.
->
-> I can't read comments and have broken the same thing twice ... please
-> try this change:
->
-> ---8<---
->
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index e85b7556b096..6a9444848e3a 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -541,7 +541,7 @@ static void blk_mq_sched_tags_teardown(struct
-> request_queue *q, unsigned int fla
->
->          queue_for_each_hw_ctx(q, hctx, i) {
->                  if (hctx->sched_tags) {
-> -                       if (!blk_mq_is_shared_tags(q->tag_set->flags))
-> +                       if (!blk_mq_is_shared_tags(flags))
->                                  blk_mq_free_rq_map(hctx->sched_tags);
->                          hctx->sched_tags = NULL;
->                  }
+On 2021/10/21 21:13, yukuai (C) wrote:
+> On 2021/10/21 20:35, Pavel Skripkin wrote:
+>> On 10/21/21 15:29, Yu Kuai wrote:
+>>> Yu Kuai (2):
+>>>    nbd: fix max value for 'first_minor'
+>>>    nbd: fix possible overflow for 'first_minor' in nbd_dev_add()
+>>>
+>>>   drivers/block/nbd.c | 6 +++---
+>>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>
+>> Hi, Yu!
+>>
+>> Thank you for the fix, but this wrong check should be just removed, 
+>> since root case of wrong sysfs file creation was fixed, as Christoph 
+>> said [1]
 
-That fixed this issue.
+Hi, Christoph
 
-Tested-by: Anders Roxell <anders.roxell@linaro.org>
+By the way, if we remove the checking, there will be two kernel warnings
+when the problem happens. Maybe keeping the checking is better?
 
-Cheers,
-Anders
+[   19.860640] sysfs: cannot create duplicate filename '/dev/block/43:0'
+[   19.861659] CPU: 1 PID: 872 Comm: modprobe Not tainted 
+5.15.0-rc6-next-20211020-00001-g2f1
+[   19.863175] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+BIOS ?-20190727_0738364
+[   19.865183] Call Trace:
+[   19.866512]  <TASK>
+[   19.866863]  ? dump_stack_lvl+0x73/0x9f
+[   19.867941]  ? dump_stack+0x13/0x1b
+[   19.868475]  ? sysfs_warn_dup.cold+0x27/0x45
+[   19.869075]  ? sysfs_do_create_link_sd.isra.0+0x131/0x150
+[   19.869818]  ? sysfs_create_link+0x29/0x60
+[   19.870459]  ? device_add+0xbd6/0xf60
+[   19.871032]  ? _printk+0x5f/0x7d
+[   19.871518]  ? device_add_disk+0x153/0x5d0
+[   19.872160]  ? nbd_dev_add+0x30e/0x470 [nbd]
+[   19.872828]  ? 0xffffffffc0060000
+[   19.873332]  ? nbd_init+0x1dc/0x1000 [nbd]
+[   19.873924]  ? do_one_initcall+0x71/0x3a0
+[   19.874534]  ? gcov_event+0x70/0x690
+[   19.875058]  ? do_init_module+0xa6/0x350
+[   19.875587]  ? load_module+0x2587/0x2720
+[   19.876130]  ? kernel_read+0x31/0xb0
+[   19.876638]  ? kernel_read_file+0x15a/0x360
+[   19.877271]  ? __do_sys_finit_module+0xe5/0x190
+[   19.877951]  ? __do_sys_finit_module+0xe5/0x190
+[   19.878563]  ? __x64_sys_finit_module+0x1e/0x30
+[   19.879182]  ? do_syscall_64+0x35/0x80
+[   19.879700]  ? entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   19.880413]  </TASK>
+[   19.880806] ------------[ cut here ]------------
+[   19.881502] WARNING: CPU: 1 PID: 872 at block/genhd.c:543 
+device_add_disk+0x2af/0x5d0
+[   19.882695] Modules linked in: nbd(+)
+[   19.883290] CPU: 1 PID: 872 Comm: modprobe Not tainted 
+5.15.0-rc6-next-20211020-00001-g2f1
+[   19.884823] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+BIOS ?-20190727_0738364
+[   19.886866] RIP: 0010:device_add_disk+0x2af/0x5d0
+[   19.887606] Code: 6e f2 f2 0b 01 49 8b 76 48 48 8b 3d db 03 f3 0b e8 
+f6 ec a9 ff 48 83 050
+[   19.890456] RSP: 0018:ffffc90000e47c70 EFLAGS: 00010202
+[   19.891293] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 
+00000000000ae001
+[   19.892274] RDX: 00000000000ac001 RSI: ffffffff91b5906b RDI: 
+0000000000000000
+[   19.893318] RBP: ffff8881034ad600 R08: 0000000000000000 R09: 
+ffffffff915e2e69
+[   19.894425] R10: 0000000000000014 R11: 0000000000000001 R12: 
+00000000ffffffef
+[   19.895544] R13: 0000000000000000 R14: ffff88817d720600 R15: 
+ffff88817d720648
+[   19.896652] FS:  00007fc08c7a7040(0000) GS:ffff88882f640000(0000) 
+knlGS:0000000000000000
+[   19.897902] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   19.898768] CR2: 00007fc08bcf0395 CR3: 000000017c467000 CR4: 
+00000000000006e0
+[   19.899754] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[   19.900856] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[   19.901989] Call Trace:
+[   19.902387]  <TASK>
+[   19.902732]  nbd_dev_add+0x30e/0x470 [nbd]
+[   19.903395]  ? 0xffffffffc0060000
+[   19.903917]  nbd_init+0x1dc/0x1000 [nbd]
+[   19.904536]  do_one_initcall+0x71/0x3a0
+[   19.905166]  ? gcov_event+0x70/0x690
+[   19.905745]  do_init_module+0xa6/0x350
+[   19.906351]  load_module+0x2587/0x2720
+[   19.906932]  ? kernel_read+0x31/0xb0
+[   19.907509]  ? kernel_read_file+0x15a/0x360
+[   19.908195]  ? __do_sys_finit_module+0xe5/0x190
+[   19.908894]  __do_sys_finit_module+0xe5/0x190
+[   19.909591]  __x64_sys_finit_module+0x1e/0x30
+[   19.910289]  do_syscall_64+0x35/0x80
+[   19.910855]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   19.911652] RIP: 0033:0x7fc08bc7a4e9
+[   19.912231] Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 
+48 89 f8 48 89 f7 488
+[   19.915026] RSP: 002b:00007fff0ddf6fd8 EFLAGS: 00000246 ORIG_RAX: 
+0000000000000139
+[   19.916080] RAX: ffffffffffffffda RBX: 00005596400853e0 RCX: 
+00007fc08bc7a4e9
+[   19.917180] RDX: 0000000000000000 RSI: 000055963fe1bc26 RDI: 
+0000000000000003
+[   19.918302] RBP: 000055963fe1bc26 R08: 0000000000000000 R09: 
+0000000000000000
+[   19.919412] R10: 0000000000000003 R11: 0000000000000246 R12: 
+0000000000000000
+[   19.920524] R13: 00005596400854f0 R14: 0000000000040000 R15: 
+00005596400853e0
+[   19.921629]  </TASK>
+[   19.922005] ---[ end trace e09ecf130812479d ]---
 
->
->
-> --- >8 ---
->
-> thanks
->
-> >
-> > [   77.613151][    T5] BUG: KASAN: use-after-free in
-> > blk_mq_sched_tags_teardown+0x54/0x140
-> > [   77.616733][    T5] Read of size 4 at addr ffff000010d9b258 by task
-> > kworker/0:0/5
-> > [   77.620107][    T5]
-> > [   77.621306][    T5] CPU: 0 PID: 5 Comm: kworker/0:0 Tainted: G
-> >    W       T 5.15.0-rc6-next-20211021 #1
-> > 4d661763b10b5f85042868a82a033ba2fc3e45c4
-> > [   77.626986][    T5] Hardware name: linux,dummy-virt (DT)
-> > [   77.629480][    T5] Workqueue: events kobject_delayed_cleanup
-> > [   77.632269][    T5] Call trace:
-> > [   77.633853][    T5]  dump_backtrace+0x0/0x340
-> > [   77.635938][    T5]  show_stack+0x34/0x80
-> > [   77.637934][    T5]  dump_stack_lvl+0x88/0xd8
-> > [   77.640070][    T5]  print_address_description.constprop.0+0x38/0x340
-> > [   77.643034][    T5]  __kasan_report+0x160/0x200
-> > [   77.645227][    T5]  kasan_report+0x5c/0x180
-> > [   77.647312][    T5]  __asan_load4+0xc8/0x100
-> > [   77.649391][    T5]  blk_mq_sched_tags_teardown+0x54/0x140
-> > [   77.651984][    T5]  blk_mq_exit_sched+0x128/0x180
-> > [   77.654299][    T5]  __elevator_exit+0x44/0x80
-> > [   77.656415][    T5]  blk_release_queue+0x138/0x200
-> > [   77.658710][    T5]  kobject_cleanup+0x144/0x200
-> > [   77.660971][    T5]  kobject_delayed_cleanup+0x1c/0x40
-> > [   77.663404][    T5]  process_one_work+0x50c/0x880
-> > [   77.665684][    T5]  worker_thread+0x3ec/0x740
-> > [   77.667838][    T5]  kthread+0x220/0x240
-> > [   77.669740][    T5]  ret_from_fork+0x10/0x20
-> > [   77.671778][    T5]
-> > [   77.672974][    T5] Allocated by task 1:
-> > [   77.674888][    T5]  kasan_save_stack+0x30/0x80
-> > [   77.677082][    T5]  __kasan_kmalloc+0x78/0x100
-> > [   77.679235][    T5]  kmem_cache_alloc_trace+0x360/0x400
-> > [   77.681707][    T5]  add_mtd_blktrans_dev+0x274/0x6c0
-> > [   77.684079][    T5]  mtdblock_add_mtd+0x110/0x180
-> > [   77.686333][    T5]  blktrans_notify_add+0x68/0xc0
-> > [   77.688521][    T5]  add_mtd_device+0x4e8/0x6c0
-> > [   77.690659][    T5]  mtd_device_parse_register+0x13c/0x3c0
-> > [   77.693258][    T5]  physmap_flash_probe+0x83c/0x8c0
-> > [   77.695630][    T5]  platform_probe+0x98/0x140
-> > [   77.697776][    T5]  really_probe+0x234/0x6c0
-> > [   77.699913][    T5]  __driver_probe_device+0x144/0x240
-> > [   77.702307][    T5]  driver_probe_device+0x68/0x140
-> > [   77.704502][    T5]  __driver_attach+0x1f0/0x280
-> > [   77.706598][    T5]  bus_for_each_dev+0xdc/0x1c0
-> > [   77.708669][    T5]  driver_attach+0x40/0x80
-> > [   77.710621][    T5]  bus_add_driver+0x1c0/0x300
-> > [   77.712660][    T5]  driver_register+0x170/0x200
-> > [   77.714749][    T5]  __platform_driver_register+0x50/0x80
-> > [   77.717148][    T5]  physmap_init+0x5c/0xfc
-> > [   77.719074][    T5]  do_one_initcall+0xb0/0x2c0
-> > [   77.721127][    T5]  do_initcalls+0x17c/0x244
-> > [   77.723109][    T5]  kernel_init_freeable+0x2d4/0x378
-> > [   77.725376][    T5]  kernel_init+0x34/0x180
-> > [   77.727304][    T5]  ret_from_fork+0x10/0x20
-> > [   77.729261][    T5]
-> > [   77.730367][    T5] Freed by task 1:
-> > [   77.732009][    T5]  kasan_save_stack+0x30/0x80
-> > [   77.734083][    T5]  kasan_set_track+0x30/0x80
-> > [   77.736085][    T5]  kasan_set_free_info+0x34/0x80
-> > [   77.738261][    T5]  ____kasan_slab_free+0xfc/0x1c0
-> > [   77.740433][    T5]  __kasan_slab_free+0x3c/0x80
-> > [   77.742518][    T5]  slab_free_freelist_hook+0x1d4/0x2c0
-> > [   77.744892][    T5]  kfree+0x160/0x300
-> > [   77.746618][    T5]  blktrans_dev_release+0x64/0x100
-> > [   77.748821][    T5]  del_mtd_blktrans_dev+0x1c0/0x240
-> > [   77.751079][    T5]  mtdblock_remove_dev+0x28/0x80
-> > [   77.753246][    T5]  blktrans_notify_remove+0xa4/0x140
-> > [   77.755507][    T5]  del_mtd_device+0x84/0x1c0
-> > [   77.757541][    T5]  mtd_device_unregister+0x90/0xc0
-> > [   77.759764][    T5]  physmap_flash_remove+0x58/0x180
-> > [   77.762012][    T5]  platform_remove+0x48/0xc0
-> > [   77.764032][    T5]  __device_release_driver+0x1dc/0x340
-> > [   77.766393][    T5]  driver_detach+0x138/0x200
-> > [   77.768396][    T5]  bus_remove_driver+0x100/0x180
-> > [   77.770554][    T5]  driver_unregister+0x64/0xc0
-> > [   77.772633][    T5]  platform_driver_unregister+0x28/0x80
-> > [   77.775042][    T5]  physmap_init+0xc4/0xfc
-> > [   77.776994][    T5]  do_one_initcall+0xb0/0x2c0
-> > [   77.779028][    T5]  do_initcalls+0x17c/0x244
-> > [   77.781023][    T5]  kernel_init_freeable+0x2d4/0x378
-> > [   77.783269][    T5]  kernel_init+0x34/0x180
-> > [   77.785196][    T5]  ret_from_fork+0x10/0x20
-> > [   77.787135][    T5]
-> > [   77.788230][    T5] The buggy address belongs to the object at
-> > ffff000010d9b200
-> > [   77.788230][    T5]  which belongs to the cache kmalloc-512 of size 512
-> > [   77.793866][    T5] The buggy address is located 88 bytes inside of
-> > [   77.793866][    T5]  512-byte region [ffff000010d9b200, ffff000010d9b400)
-> > [   77.799169][    T5] The buggy address belongs to the page:
-> > [   77.801555][    T5] page:fffffc0000436600 refcount:1 mapcount:0
-> > mapping:0000000000000000 index:0x0 pfn:0x50d98
-> > [   77.805683][    T5] head:fffffc0000436600 order:2
-> > compound_mapcount:0 compound_pincount:0
-> > [   77.809109][    T5] flags:
-> > 0x1fffe0000010200(slab|head|node=0|zone=0|lastcpupid=0xffff)
-> > [   77.812496][    T5] raw: 01fffe0000010200 fffffc0000436408
-> > fffffc0000436908 ffff000006c03080
-> > [   77.816037][    T5] raw: 0000000000000000 00000000000a000a
-> > 00000001ffffffff 0000000000000000
-> > [   77.819566][    T5] page dumped because: kasan: bad access detected
-> > [   77.822255][    T5]
-> > [   77.823357][    T5] Memory state around the buggy address:
-> > [   77.825747][    T5]  ffff000010d9b100: fc fc fc fc fc fc fc fc fc
-> > fc fc fc fc fc fc fc
-> > [   77.829081][    T5]  ffff000010d9b180: fc fc fc fc fc fc fc fc fc
-> > fc fc fc fc fc fc fc
-> > [   77.832393][    T5] >ffff000010d9b200: fa fb fb fb fb fb fb fb fb
-> > fb fb fb fb fb fb fb
-> > [   77.835714][    T5]                                                     ^
-> > [   77.838602][    T5]  ffff000010d9b280: fb fb fb fb fb fb fb fb fb
-> > fb fb fb fb fb fb fb
-> > [   77.841936][    T5]  ffff000010d9b300: fb fb fb fb fb fb fb fb fb
-> > fb fb fb fb fb fb fb
-> >
-> > full boot log link,
-> > https://pastebin.com/xL5MYSD6
-> >
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >
-> > --
-> > Linaro LKFT
-> > https://lkft.linaro.org
-> >
->
+Thanks,
+Kuai
+> 
+> Hi, Pavel
+> 
+> Thanks for your response, with the root cause fixed, patch 1 is not
+> needed anymore. However, the overflow case in patch 2 is still
+> possible.
+> 
+> Does anyone plan to remove the checking?
+> 
+> Thanks,
+> Kuai
+>>
+>>
+>>
+>>
+>> [1] https://lore.kernel.org/lkml/20211011073556.GA10735@lst.de/
+>>
+>>
+>>
+>> With regards,
+>> Pavel Skripkin
+>> .
+>>
