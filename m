@@ -2,216 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD54C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 07:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DE5C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 07:23:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63A1460F9F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 07:13:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 779B260FC3
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 07:23:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbhJUHPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 03:15:53 -0400
-Received: from smtprelay0089.hostedemail.com ([216.40.44.89]:40412 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231283AbhJUHPv (ORCPT
+        id S231143AbhJUHZm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 03:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229499AbhJUHZm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 03:15:51 -0400
-X-Greylist: delayed 307 seconds by postgrey-1.27 at vger.kernel.org; Thu, 21 Oct 2021 03:15:51 EDT
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave07.hostedemail.com (Postfix) with ESMTP id B84B51812942B
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 07:08:29 +0000 (UTC)
-Received: from omf04.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay07.hostedemail.com (Postfix) with ESMTP id 0533A180E07B8;
-        Thu, 21 Oct 2021 07:08:28 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf04.hostedemail.com (Postfix) with ESMTPA id 95407D1514;
-        Thu, 21 Oct 2021 07:08:24 +0000 (UTC)
-Message-ID: <b85fee5ff20d2b398948a6bccf1bcc5eb22b49ff.camel@perches.com>
-Subject: Re: [PATCH] virtio-blk: fixup coccinelle warnings
-From:   Joe Perches <joe@perches.com>
-To:     cgel.zte@gmail.com, mst@redhat.com,
-        Denis Efremov <efremov@linux.com>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Gilles Muller <Gilles.Muller@inria.fr>,
-        Nicolas Palix <nicolas.palix@imag.fr>,
-        Michal Marek <michal.lkml@markovi.net>, cocci@inria.fr
-Cc:     jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
-        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ye Guojin <ye.guojin@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Date:   Thu, 21 Oct 2021 00:08:23 -0700
-In-Reply-To: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
-References: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1 
+        Thu, 21 Oct 2021 03:25:42 -0400
+X-Greylist: delayed 559 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 21 Oct 2021 00:23:26 PDT
+Received: from out10.migadu.com (out10.migadu.com [IPv6:2001:41d0:2:e8e3::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E126C06161C;
+        Thu, 21 Oct 2021 00:23:26 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1634800447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+HEpr9JzEndtAa1pBv+f+c1A9jbIOIDhOKuf+02txAU=;
+        b=XGMYIDBOGiAWWEmoFhdiUTPMy48kOGW9fMnjR77hIchg2yycIjwkMj/EEDMKgBWm6/qpGx
+        lU6BuA4UY57DOeolCvY6Xb5Uphb/4zFgw8ShUp70j2Ke+U9CAWfQ0e1PTj81fhS1qIXW77
+        Nne5gbL4jY7eNak6lbR9u40ZdDUW7RY=
+From:   Jackie Liu <liu.yun@linux.dev>
+To:     axboe@kernel.dk, hch@lst.de
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        liu.yun@linux.dev
+Subject: [PATCH 2/2] scsi: bsg: fix errno when scsi_bsg_register_queue fails
+Date:   Thu, 21 Oct 2021 15:13:44 +0800
+Message-Id: <20211021071344.1600362-2-liu.yun@linux.dev>
+In-Reply-To: <20211021071344.1600362-1-liu.yun@linux.dev>
+References: <20211021071344.1600362-1-liu.yun@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Server: rspamout03
-X-Rspamd-Queue-Id: 95407D1514
-X-Stat-Signature: w1k1cs1tg45sjhxa5ai68tet591rgwep
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18GuLItoKjGI2brebfiEvCynGxVYaDHZyo=
-X-HE-Tag: 1634800104-276374
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: liu.yun@linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-10-21 at 06:51 +0000, cgel.zte@gmail.com wrote:
-> From: Ye Guojin <ye.guojin@zte.com.cn>
-> 
-> coccicheck complains about the use of snprintf() in sysfs show
-> functions:
-> WARNING  use scnprintf or sprintf
-> 
-> Use sysfs_emit instead of scnprintf or sprintf makes more sense.
-[]
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-[]
-> @@ -624,7 +624,7 @@ cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
-> -	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
-> +	return sysfs_emit(buf, "%s\n", virtblk_cache_types[writeback]);
+From: Jackie Liu <liuyun01@kylinos.cn>
 
-Perhaps scripts/coccinelle/api/device_attr_show.cocci should be updated
-to be more like the script used in commit 1c7fd72687d6
+When the value of error is printed, it will always be 0. Here, we should be
+print the correct error code when scsi_bsg_register_queue fails.
 
-@@
-identifier d_show;
-identifier dev, attr, buf;
-@@
+Fixes: ead09dd3aed5 ("scsi: bsg: Simplify device registration")
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+---
+ drivers/scsi/scsi_sysfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	return
--	sprintf(buf,
-+	sysfs_emit(buf,
-	...);
-	...>
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	return
--	snprintf(buf, PAGE_SIZE,
-+	sysfs_emit(buf,
-	...);
-	...>
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	return
--	scnprintf(buf, PAGE_SIZE,
-+	sysfs_emit(buf,
-	...);
-	...>
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-expression chr;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	return
--	strcpy(buf, chr);
-+	sysfs_emit(buf, chr);
-	...>
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-identifier len;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	len =
--	sprintf(buf,
-+	sysfs_emit(buf,
-	...);
-	...>
-	return len;
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-identifier len;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	len =
--	snprintf(buf, PAGE_SIZE,
-+	sysfs_emit(buf,
-	...);
-	...>
-	return len;
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-identifier len;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
-	len =
--	scnprintf(buf, PAGE_SIZE,
-+	sysfs_emit(buf,
-	...);
-	...>
-	return len;
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-identifier len;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	<...
--	len += scnprintf(buf + len, PAGE_SIZE - len,
-+	len += sysfs_emit_at(buf, len,
-	...);
-	...>
-	return len;
-}
-
-@@
-identifier d_show;
-identifier dev, attr, buf;
-expression chr;
-@@
-
-ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	...
--	strcpy(buf, chr);
--	return strlen(buf);
-+	return sysfs_emit(buf, chr);
-}
-
+diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
+index 86793259e541..d8789f6cda62 100644
+--- a/drivers/scsi/scsi_sysfs.c
++++ b/drivers/scsi/scsi_sysfs.c
+@@ -1379,6 +1379,7 @@ int scsi_sysfs_add_sdev(struct scsi_device *sdev)
+ 			 * We're treating error on bsg register as non-fatal, so
+ 			 * pretend nothing went wrong.
+ 			 */
++			error = PTR_ERR(sdev->bsg_dev);
+ 			sdev_printk(KERN_INFO, sdev,
+ 				    "Failed to register bsg queue, errno=%d\n",
+ 				    error);
+-- 
+2.25.1
 
