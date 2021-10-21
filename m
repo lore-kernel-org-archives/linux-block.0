@@ -2,113 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07379C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 15:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4B0C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 15:01:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFF9860F9F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 15:01:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7BA7611CE
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 15:01:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231520AbhJUPDa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 11:03:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230283AbhJUPDZ (ORCPT
+        id S231605AbhJUPDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 11:03:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28818 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231207AbhJUPDj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 11:03:25 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF80C0613B9
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 08:01:09 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id n63so1198737oif.7
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 08:01:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=6jnVZbBkLbnw6pFZpxUldRg4FuFfEZElhVVQao3Uy20=;
-        b=ZGFMo833ta2HUfgqVLXUNHJV5pTUNb23BosrQDRrArzz1VYW1rZvujqd1q9AvwL/2L
-         I3qasTS/LaOX+rTG38fA1WkYeozE1AIG6Y1LWW3KJy++pLKzaue+ysn5BR5qqBazSL3X
-         IVR4Fjt0Mg/h6j4Zo8LPwJHvk9rRXi+EODiN4CZjW0a3nWKAwsxdaWUyN0Iinpv2NO0m
-         dB+Q+OGRW5ZAtyv3ynB4fi22vLxF+kmJ+bRRxyM9NM8BrnQaDlNccb6EwaqBPSB/5dXE
-         w0UzuwJbGrVM1iqd9niPDqAPfBdtIGPYSTrtcyZITTG5mzlvKTmg+/w7FrEp4Vj/y3G+
-         Cdig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=6jnVZbBkLbnw6pFZpxUldRg4FuFfEZElhVVQao3Uy20=;
-        b=J+unzRIBrxgqHaPNMf18cM9sbud99PUXfnH8G+LfR6/GASHK50TQgCHmOdvhkZp6KU
-         e4T53gSgMR2MyhzmJodw6cg28hMNYTph8EULFo8397z3KR+j9+Wa+VFph7CwF1ajblXK
-         Vpe/yguqqyQqfwO+StGwDB7FCgi6o3sZ+ybcvL16xurScjuRWUJnYzU8w27ublWfcbXC
-         gvpU/CdTcDKlh5jrrrWA0biP4oQXO9fZ5+bi49V06OMbw1ekCHXXCRxiPPokp4gRGZwl
-         kNr0OjHGgyDKPDq3cAwAczRi1LIIuQ+dDcTGWjmPLd1i1vb2xkpqFAy0EZBw44sno5zx
-         02OQ==
-X-Gm-Message-State: AOAM532HHeAfta4QYLEVKlPlLBhTMA4LxvMdDCkyV4cUHJZFyJvlk8rU
-        8kaKS6QdLqY05fx8edRwdNRHBg==
-X-Google-Smtp-Source: ABdhPJxcqYzZpw8hjWvx8wtyMAFaG+Ip962yojdp/B4kEz2Pn9lx52Qn4eX8lgw7zW26Sgpyf8s+nQ==
-X-Received: by 2002:a05:6808:3c9:: with SMTP id o9mr4905862oie.20.1634828468846;
-        Thu, 21 Oct 2021 08:01:08 -0700 (PDT)
-Received: from [127.0.1.1] ([2600:380:783a:c43c:af64:c142:4db7:63ac])
-        by smtp.gmail.com with ESMTPSA id w18sm1173833ott.29.2021.10.21.08.01.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Oct 2021 08:01:08 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     thehajime@gmail.com, zhuyifei1999@gmail.com, haris.iqbal@ionos.com,
-        johannes.berg@intel.com, roger.pau@citrix.com,
-        miquel.raynal@bootlin.com, jdike@addtoit.com,
-        anton.ivanov@cambridgegreys.com, geert@linux-m68k.org,
-        krisman@collabora.com, vigneshr@ti.com, richard@nod.at,
-        hare@suse.de, jinpu.wang@ionos.com, jgross@suse.com,
-        sstabellini@kernel.org, ulf.hansson@linaro.org, agk@redhat.com,
-        linux-mtd@lists.infradead.org,
-        Luis Chamberlain <mcgrof@kernel.org>, tj@kernel.org,
-        colyli@suse.de, jejb@linux.ibm.com, chris.obbard@collabora.com,
-        snitzer@redhat.com, boris.ostrovsky@oracle.com,
-        kent.overstreet@gmail.com, martin.petersen@oracle.com
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        xen-devel@lists.xenproject.org, linux-um@lists.infradead.org,
-        linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-m68k@lists.linux-m68k.org, linux-scsi@vger.kernel.org
-In-Reply-To: <20211015233028.2167651-1-mcgrof@kernel.org>
-References: <20211015233028.2167651-1-mcgrof@kernel.org>
-Subject: Re: (subset) [PATCH 0/9] block: reviewed add_disk() error handling set
-Message-Id: <163482846658.50565.12530170761457767964.b4-ty@kernel.dk>
-Date:   Thu, 21 Oct 2021 09:01:06 -0600
+        Thu, 21 Oct 2021 11:03:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634828482;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ECaxQdQKnklt0rj4YD4/JOyPjuoL6n2hzDdfNl+Em4E=;
+        b=cAtJXM8YttIEFOLIR4Q47S2h5IXpKvWcBVJYntLkqtBL9D5krhbE3s8W80rkta838AejZ+
+        nkkRg/7B782hyhPcTCxaPKJCA5puGzYNguKn2HO4N64fxFks3198RbR/CPgYean1CRqllz
+        piv164oClIunMm/mxvT0S+GebZ7W2Q4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-W8WTIcBMM2i3RTGww9x_sA-1; Thu, 21 Oct 2021 11:01:19 -0400
+X-MC-Unique: W8WTIcBMM2i3RTGww9x_sA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93B168EE59;
+        Thu, 21 Oct 2021 15:00:43 +0000 (UTC)
+Received: from localhost (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 807F25F4E9;
+        Thu, 21 Oct 2021 15:00:40 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 3/3] dm: don't stop request queue after the dm device is suspended
+Date:   Thu, 21 Oct 2021 22:59:18 +0800
+Message-Id: <20211021145918.2691762-4-ming.lei@redhat.com>
+In-Reply-To: <20211021145918.2691762-1-ming.lei@redhat.com>
+References: <20211021145918.2691762-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 15 Oct 2021 16:30:19 -0700, Luis Chamberlain wrote:
-> Jens,
-> 
-> I had last split up patches into 7 groups, but at this point now
-> most changes are merged except a few more drivers. Instead of creating
-> a new patch set for each of the 7 groups I'm creating 3 new groups of
-> patches now:
-> 
-> [...]
+For fixing queue quiesce race between driver and block layer(elevator
+switch, update nr_requests, ...), we need to support concurrent quiesce
+and unquiesce, which requires the two call to be balanced.
 
-Applied, thanks!
+__bind() is only called from dm_swap_table() in which dm device has been
+suspended already, so not necessary to stop queue again. With this way,
+request queue quiesce and unquiesce can be balanced.
 
-[3/9] dm: add add_disk() error handling
-      commit: e7089f65dd51afeda5eb760506b5950d95f9ec29
-[4/9] bcache: add error handling support for add_disk()
-      commit: 2961c3bbcaec0ed7fb7b9a465b3796f37f2294e5
-[5/9] xen-blkfront: add error handling support for add_disk()
-      commit: 293a7c528803321479593d42d0898bb5a9769db1
-[6/9] m68k/emu/nfblock: add error handling support for add_disk()
-      commit: 21fd880d3da7564bab68979417cab7408e4f9642
-[7/9] um/drivers/ubd_kern: add error handling support for add_disk()
-      commit: 66638f163a2b5c5b462ca38525129b14a20117eb
-[8/9] rnbd: add error handling support for add_disk()
-      commit: 2e9e31bea01997450397d64da43b6675e0adb9e3
-[9/9] mtd: add add_disk() error handling
-      commit: 83b863f4a3f0de4ece7802d9121fed0c3e64145f
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue quiesce/unquiesce")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-Best regards,
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 7870e6460633..727282d79b26 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1927,16 +1927,6 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
+ 
+ 	dm_table_event_callback(t, event_callback, md);
+ 
+-	/*
+-	 * The queue hasn't been stopped yet, if the old table type wasn't
+-	 * for request-based during suspension.  So stop it to prevent
+-	 * I/O mapping before resume.
+-	 * This must be done before setting the queue restrictions,
+-	 * because request-based dm may be run just after the setting.
+-	 */
+-	if (request_based)
+-		dm_stop_queue(q);
+-
+ 	if (request_based) {
+ 		/*
+ 		 * Leverage the fact that request-based DM targets are
 -- 
-Jens Axboe
-
+2.31.1
 
