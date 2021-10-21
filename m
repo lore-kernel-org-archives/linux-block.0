@@ -2,100 +2,216 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1E7C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 06:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD54C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 07:13:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7873C61362
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 06:51:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63A1460F9F
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 07:13:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231228AbhJUGxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 02:53:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46324 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230385AbhJUGxl (ORCPT
+        id S231281AbhJUHPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 03:15:53 -0400
+Received: from smtprelay0089.hostedemail.com ([216.40.44.89]:40412 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231283AbhJUHPv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 02:53:41 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA51FC06161C;
-        Wed, 20 Oct 2021 23:51:22 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id x66so1670858pfx.13;
-        Wed, 20 Oct 2021 23:51:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4IT569PC5azMfJUgBeCpQwHxR9xWFaiNqcnPd3IC73s=;
-        b=q3pSCZDRL5KRM3nvMGV2JXBH/4b6ox9NxeQKc+0sSfJ777k+A0GZnc86SKVZm8B6FP
-         KiZFZcKa2lKX0xrSbZroAher8ZC35dXlFmyWaFImSw6Bxx7FR/E1+HvowzD0zQ1GtIyM
-         SVjBPAcBWR4c60+CeEGyMTq0P6DQR55mf9MXq9XB6cAy6xTapHI1ybFdwpW58QXaWXJ+
-         8h6QidGoNMOJQspJNWmYXM5ZVodysciypEoAfx/zHNfrrvJ83QUgjT8keumD/10XFWiF
-         8hIr7rVqE30Y4ot56oqV7xAPFqqDaYw7vjWiSq/TgQqNLPSMOoLHICJj0wgsqaBTDPEk
-         JUYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4IT569PC5azMfJUgBeCpQwHxR9xWFaiNqcnPd3IC73s=;
-        b=Fhr5Qus8A6Zc3JwUjoOzn4Py7nA2aABFaGaUmBfm/2ehqP74YQCBnqSnhCMAAJwvpj
-         MUMnqgvUbWIZfir6e1yAMI35yoWkmTkrXHDvK+YUkcxcYivyXzHuGrSysj+u+jK2H9qS
-         WEU8voOnVuKPjin4aX7Kzrf8PT96DTtJxAlQqWtP02t0lHVPY/GyQmLJoQzinfhMcpre
-         +tcN/wgL9zcDylXwB/gletDwHEbjIwldf0Ja4UIHjxaXnnZ2MEucbNeCOy9PlM5iBqgX
-         jPPbUjguMwFW32OGpW1QKRiUjycGB96FyTaOSOXzlqc0u4UyDpO9iDhZWtyqqqN7yDA/
-         Q3uA==
-X-Gm-Message-State: AOAM531tO8gv87inYNqgxhGQfrTvs+KMo5x8pojVcBOaTv+m/8wF35HS
-        i5Y1JXNTKbpOI/3KCDSnJFU=
-X-Google-Smtp-Source: ABdhPJz0BJlpzbnAEevj8A4yskyuz6x05+ew4k5oZvbTEUsltQEBNmRkeig+0JTifRTceHvzgu4sig==
-X-Received: by 2002:a62:e510:0:b0:44c:e06e:80dd with SMTP id n16-20020a62e510000000b0044ce06e80ddmr3623411pff.48.1634799082315;
-        Wed, 20 Oct 2021 23:51:22 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id r14sm4063254pgn.91.2021.10.20.23.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 23:51:21 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: ye.guojin@zte.com.cn
-To:     mst@redhat.com
+        Thu, 21 Oct 2021 03:15:51 -0400
+X-Greylist: delayed 307 seconds by postgrey-1.27 at vger.kernel.org; Thu, 21 Oct 2021 03:15:51 EDT
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+        by smtpgrave07.hostedemail.com (Postfix) with ESMTP id B84B51812942B
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 07:08:29 +0000 (UTC)
+Received: from omf04.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay07.hostedemail.com (Postfix) with ESMTP id 0533A180E07B8;
+        Thu, 21 Oct 2021 07:08:28 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf04.hostedemail.com (Postfix) with ESMTPA id 95407D1514;
+        Thu, 21 Oct 2021 07:08:24 +0000 (UTC)
+Message-ID: <b85fee5ff20d2b398948a6bccf1bcc5eb22b49ff.camel@perches.com>
+Subject: Re: [PATCH] virtio-blk: fixup coccinelle warnings
+From:   Joe Perches <joe@perches.com>
+To:     cgel.zte@gmail.com, mst@redhat.com,
+        Denis Efremov <efremov@linux.com>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Gilles Muller <Gilles.Muller@inria.fr>,
+        Nicolas Palix <nicolas.palix@imag.fr>,
+        Michal Marek <michal.lkml@markovi.net>, cocci@inria.fr
 Cc:     jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
         axboe@kernel.dk, virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ye Guojin <ye.guojin@zte.com.cn>,
         Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] virtio-blk: fixup coccinelle warnings
-Date:   Thu, 21 Oct 2021 06:51:11 +0000
-Message-Id: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+Date:   Thu, 21 Oct 2021 00:08:23 -0700
+In-Reply-To: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
+References: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.4-1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout03
+X-Rspamd-Queue-Id: 95407D1514
+X-Stat-Signature: w1k1cs1tg45sjhxa5ai68tet591rgwep
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX18GuLItoKjGI2brebfiEvCynGxVYaDHZyo=
+X-HE-Tag: 1634800104-276374
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ye Guojin <ye.guojin@zte.com.cn>
+On Thu, 2021-10-21 at 06:51 +0000, cgel.zte@gmail.com wrote:
+> From: Ye Guojin <ye.guojin@zte.com.cn>
+> 
+> coccicheck complains about the use of snprintf() in sysfs show
+> functions:
+> WARNING  use scnprintf or sprintf
+> 
+> Use sysfs_emit instead of scnprintf or sprintf makes more sense.
+[]
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+[]
+> @@ -624,7 +624,7 @@ cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
+> -	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
+> +	return sysfs_emit(buf, "%s\n", virtblk_cache_types[writeback]);
 
-coccicheck complains about the use of snprintf() in sysfs show
-functions:
-WARNING  use scnprintf or sprintf
+Perhaps scripts/coccinelle/api/device_attr_show.cocci should be updated
+to be more like the script used in commit 1c7fd72687d6
 
-Use sysfs_emit instead of scnprintf or sprintf makes more sense.
+@@
+identifier d_show;
+identifier dev, attr, buf;
+@@
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Ye Guojin <ye.guojin@zte.com.cn>
----
- drivers/block/virtio_blk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	return
+-	sprintf(buf,
++	sysfs_emit(buf,
+	...);
+	...>
+}
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 303caf2d17d0..8a71b2f9f4b7 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -624,7 +624,7 @@ cache_type_show(struct device *dev, struct device_attribute *attr, char *buf)
- 	u8 writeback = virtblk_get_cache_mode(vblk->vdev);
- 
- 	BUG_ON(writeback >= ARRAY_SIZE(virtblk_cache_types));
--	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
-+	return sysfs_emit(buf, "%s\n", virtblk_cache_types[writeback]);
- }
- 
- static DEVICE_ATTR_RW(cache_type);
--- 
-2.25.1
+@@
+identifier d_show;
+identifier dev, attr, buf;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	return
+-	snprintf(buf, PAGE_SIZE,
++	sysfs_emit(buf,
+	...);
+	...>
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	return
+-	scnprintf(buf, PAGE_SIZE,
++	sysfs_emit(buf,
+	...);
+	...>
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+expression chr;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	return
+-	strcpy(buf, chr);
++	sysfs_emit(buf, chr);
+	...>
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+identifier len;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	len =
+-	sprintf(buf,
++	sysfs_emit(buf,
+	...);
+	...>
+	return len;
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+identifier len;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	len =
+-	snprintf(buf, PAGE_SIZE,
++	sysfs_emit(buf,
+	...);
+	...>
+	return len;
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+identifier len;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+	len =
+-	scnprintf(buf, PAGE_SIZE,
++	sysfs_emit(buf,
+	...);
+	...>
+	return len;
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+identifier len;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	<...
+-	len += scnprintf(buf + len, PAGE_SIZE - len,
++	len += sysfs_emit_at(buf, len,
+	...);
+	...>
+	return len;
+}
+
+@@
+identifier d_show;
+identifier dev, attr, buf;
+expression chr;
+@@
+
+ssize_t d_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	...
+-	strcpy(buf, chr);
+-	return strlen(buf);
++	return sysfs_emit(buf, chr);
+}
+
 
