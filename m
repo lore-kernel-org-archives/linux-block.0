@@ -2,82 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6743DC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D9AC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:34:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B532610CB
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FBE2611CE
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 13:34:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbhJUNfA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 09:35:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbhJUNe7 (ORCPT
+        id S231425AbhJUNgq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 09:36:46 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:36044 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230229AbhJUNgp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 09:34:59 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 556D9C0613B9
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 06:32:42 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id r10so874202wra.12
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 06:32:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=kyCextoPvgtr3t/y/l6axBP+SOq5Z1Feyg2dwwLVO0c=;
-        b=fst3EueJTT/Hb77O5cXVUT7TQaBTvpvydDAQPuQPWCicq8zd2H7Vr1mB3q8VucOVAO
-         dsEc/gXQ4RE4/BunzcAK0PQNJItV+D2tcM2Ierk6XNW5LgLhuXnBPTHICon/ipiSnM32
-         TOr8p2n9M8OFhCIZunc856ea8QtlRsQ3viGA1tsvwtAgaOwtBz/kq6yUY7vSNWmEjpRz
-         5tUcuarvgDTKf7WVkwd+6UpbUktC+8o0KZFy7DeYzormTUVV0ymRscmelM4c5A/+ha2I
-         DVritg0lc8iswFPqtwqfvsYhSoK76ccCocB5E+WLdnyxzrtadQ0keTekAnoJ1h/MRGUU
-         jQJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kyCextoPvgtr3t/y/l6axBP+SOq5Z1Feyg2dwwLVO0c=;
-        b=0u3G9SGqF65AGzqEv9unck6+bXZU9eclmATKZblIMY+E2Ot6w0AqieHQ1zw54kynb1
-         rs7mac5UKhIPS/yl3qpZzvzo1k+Pl5aOotkYdmojmbWeluSXtZoVoAHKnOAyZhayiMY1
-         OQv5KD6iShlP8murczvnX0LMG9GKN+GMsY7gdziHneemi4rSahGVP60q5hVDljm9HySd
-         hB/h2xBwj2JTLpVvBaUJfsK1t70k6hYqKeqDVwmNqCySLwA5RImJTcAi1B3ha5wMY0Wn
-         M0FTUep7J9jI/mDFBdseAas8WhHk8+vc8FoOx6xqepMuxo6OVM6f8gmg4m8SIQFQpuQ6
-         DuOw==
-X-Gm-Message-State: AOAM5314w4Trbu7KgsQb+zQj7Xw7fCfAdAlbBMvvCXJ8q/t0ELYI6R5l
-        h1UBDa/SSPIqdYhAKd5CXIU=
-X-Google-Smtp-Source: ABdhPJxSPPSRuogEM8xXM1lFqjkiBNKcJpzHCCubEeIHsH/13tTgPuBiwlb9xGcCbYU1fAd9YZS0OQ==
-X-Received: by 2002:a05:6000:1544:: with SMTP id 4mr7636824wry.374.1634823161011;
-        Thu, 21 Oct 2021 06:32:41 -0700 (PDT)
-Received: from [192.168.8.198] ([185.69.145.206])
-        by smtp.gmail.com with ESMTPSA id k10sm4772468wrh.64.2021.10.21.06.32.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 06:32:40 -0700 (PDT)
-Message-ID: <4c9beb78-f8b2-ce2e-eaed-d4bb2ebd302c@gmail.com>
-Date:   Thu, 21 Oct 2021 14:32:43 +0100
+        Thu, 21 Oct 2021 09:36:45 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 597272199D;
+        Thu, 21 Oct 2021 13:34:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1634823268; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IWF3N189nqk9QfOozLtyL2wMdRZFQPA2LrP487Lut3s=;
+        b=BwjBm5b1r6VpqNvegMrdEUegHzhMAI9RKeLHgh+cHQN34DTUVyd2vFKpDTs0QF2sq5sLY3
+        hfoBK5fJo78y+cql5bGhGZJ3evrIWdOpwv+VH85gDn3b6KH4tYFkK0qYXi9Q7x1XYAErWR
+        7FZ6RJnNLFl/sNjUnTHD7crGEUl0MmQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1634823268;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IWF3N189nqk9QfOozLtyL2wMdRZFQPA2LrP487Lut3s=;
+        b=esUjDTh4UdlNHPVJNS18Y38yCdgCykCb9qK4+wjgKPmbPHLnGbwAFNYh9tcXyaXkuLW+nX
+        RaLEhy9Q/AEn7oAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1BC2F13BA5;
+        Thu, 21 Oct 2021 13:34:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ADC7BWRscWFYJgAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 21 Oct 2021 13:34:28 +0000
+Subject: Re: [PATCH 1/7] block: add a ->get_unique_id method
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     "J. Bruce Fields" <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+References: <20211021060607.264371-1-hch@lst.de>
+ <20211021060607.264371-2-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <0acbd09c-6c31-3413-2fb1-9d15f2ee6201@suse.de>
+Date:   Thu, 21 Oct 2021 15:34:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 2/3] block: clean up blk_mq_submit_bio() merging
+In-Reply-To: <20211021060607.264371-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <cover.1634755800.git.asml.silence@gmail.com>
- <daedc90d4029a5d1d73344771632b1faca3aaf81.1634755800.git.asml.silence@gmail.com>
- <YXElIFr6EE2Cy7zL@infradead.org>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <YXElIFr6EE2Cy7zL@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/21/21 09:30, Christoph Hellwig wrote:
-> Looks good,
+On 10/21/21 8:06 AM, Christoph Hellwig wrote:
+> Add a method to query unique IDs from block devices.  It will be used to
+> remove code that deeply pokes into SCSI internals in the NFS server.
+> The implementation in the sd driver itself is also much nicer as it can
+> use the cached VPD page instead of always sending a command as the
+> current NFS code does.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> For now the interface is kept very minimal but could be easily
+> extended when other users like a block-layer sysfs interface for
+> uniquue IDs shows up.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   include/linux/blkdev.h | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Great, thanks!
+Cheers,
 
+Hannes
 -- 
-Pavel Begunkov
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
