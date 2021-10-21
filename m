@@ -2,113 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31966C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 17:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7892C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 17:39:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 033DC61A7F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 17:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E9E861354
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 17:39:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231777AbhJURVS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 13:21:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51704 "EHLO
+        id S230355AbhJURmF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 13:42:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbhJURVR (ORCPT
+        with ESMTP id S230434AbhJURmF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 13:21:17 -0400
+        Thu, 21 Oct 2021 13:42:05 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0977C061764;
-        Thu, 21 Oct 2021 10:19:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00ED4C061570;
+        Thu, 21 Oct 2021 10:39:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=AD7baqDv7qcOXIpKfV7ERWwjC0Jt5iI28VcJ9GrCqks=; b=rZTla/b7wEl07NyABgcNxY4UWI
-        6JYo0XaNvaYZ3UxR5KpgG/qNARinza7TjgaNGaBeO6CX8cPtGObHKiCHqQzQRzg3r0K5hun+hUiQB
-        JBYk+83/2/jiTN5s0tLuOeMdhxRuCu/eFq5Uh74WlzeOFtcncBfRQlntYmi6Hjge9bFsOrBo5NfSo
-        XWcjBM8locwogPOgmFNCI/tOpS93yC7LWUUkPEccW+0rf2d92TnZ83zCop52oeZpWZYchrbZY+1ue
-        pIG/OXVZDujhVNGknKs5lBF2owxKIDNKvMZQ57PWscfx06l4OwXv8Hu0JGDOEJzOZsyB2ktlNSET7
-        oVfNOJ5g==;
+        bh=wbKnAVdwfP+5DNMopkjjBAYPB3ZdYZtPUIqeOJ1noD0=; b=epwZmF4d+MaIlCE6iEQH4XN0XG
+        MRQek/8Z/mfw1Fi3PELO7/1kTIi+KfwWKlxNhB3FLf0t6f+bRQIfcSs/4aeqXIGKBgRXKdm3aA5d9
+        W+CUKyYfueqf1PmmtuayWyOCwsNLpIkBtBei0La5i6rmelE9LmQCrKwHhyMT6svxrN5jo8xa6DZVK
+        tVgvx282U91q1+hId9zcHjm1P3f/kUdYQLTe66H3ckPhTdjTizwSxyE59ijrh44zAHa+R2oGRZ9kc
+        1Z4YBgbIbn9c6oLs0aXNcWc8+Kh7QkHu3VBEAlbjVeukh2rbs1tisdikGARb78LEN9ldrYsVo77OM
+        QMa4efnA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mdbiJ-008UQT-NH; Thu, 21 Oct 2021 17:18:47 +0000
-Date:   Thu, 21 Oct 2021 10:18:47 -0700
+        id 1mdc2c-008VfV-It; Thu, 21 Oct 2021 17:39:46 +0000
+Date:   Thu, 21 Oct 2021 10:39:46 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YXGg95OcaR+5ktAZ@bombadil.infradead.org>
-References: <YWm68xUnAofop3PZ@bombadil.infradead.org>
- <YWq3Z++uoJ/kcp+3@T590>
- <YW3LuzaPhW96jSBK@bombadil.infradead.org>
- <YW4uwep3BCe9Vxq8@T590>
- <YW7kFXlzRrvwzARP@bombadil.infradead.org>
- <YW7ygbLAwm2/LZFl@T590>
- <YW8eSq2B+5FtOLZb@bombadil.infradead.org>
- <YW9tqPunx5bssxIz@T590>
- <YXA6NMhwoiIMeHji@bombadil.infradead.org>
- <YXC2qcx/RlLwjrKx@T590>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 0/4] zram: fix two races and one zram leak
+Message-ID: <YXGl4v1cMJtCLg2d@bombadil.infradead.org>
+References: <20211020015548.2374568-1-ming.lei@redhat.com>
+ <YXCMtRVXrGOec6OR@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YXC2qcx/RlLwjrKx@T590>
+In-Reply-To: <YXCMtRVXrGOec6OR@google.com>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 08:39:05AM +0800, Ming Lei wrote:
-> On Wed, Oct 20, 2021 at 08:48:04AM -0700, Luis Chamberlain wrote:
-> > A second series of tests is hitting CTRL-C on either randonly and
-> > restarting testing once again randomly.
+On Wed, Oct 20, 2021 at 02:40:05PM -0700, Minchan Kim wrote:
+> On Wed, Oct 20, 2021 at 09:55:44AM +0800, Ming Lei wrote:
+> > Hello,
+> > 
+> > Fixes three issues reported by Luis Chamberlain with one simpler approach:
+> > 
+> > - race between between zram_reset_device() and disksize_store() (1/4)
+> > 
+> > - zram leak during unloading module, which is one race between resetting
+> > and removing device (2/4)
+> > 
+> > - race between zram_remove and disksize_store (3/4)
+> > 
+> > Also replace replace fsync_bdev with sync_blockdev since no one opens
+> > it.(4/4)
+> > 
+> > V2:
+> > 	- take another approach to avoid failing of zram_remove()
+> > 	- add patch to address race between zram_reset_device() and
+> > 	  disksize_store()
+> > 
 > 
-> ltp/zram02.sh has cleanup handler via trap to clean everything(swapoff/umount/reset/
-> rmmod), ctrl-c will terminate current forground task and cause shell to run the
-> cleanup handler first, but further 'ctrl-c' will terminate the cleanup handler,
-> then the cleanup won't be done completely, such as zram disk is left as swap
-> device and zram can't be unloaded. The idea can be observed via the following
-> script:
+> Thanks for breaking the problems down, Ming.
 > 
-> 	#!/bin/bash
-> 	trap 'echo "enter trap"; sleep 20; echo "exit trap";' INT
-> 	sleep 30
+> To me, the whole patchset looks good to me since each patch solves
+> the problem step by step and finally fix.
 > 
-> After the above script is run foreground, when 1st ctrl-c is pressed, 'sleep 30'
-> is terminated, then the trap command is run, so you can see "enter trap"
-> dumped. Then if you pressed 2nd ctrl-c, 'sleep 20' is terminated immediately.
-> So 'swapoff' from zram02.sh's trap function can be terminated in this way.
-> 
-> zram disk being left as swap disk can be observed with your patch too
-> after terminating via multiple ctrl-c which has to be done this way because
-> the test is dead loop.
-> 
-> So it is hard to cleanup everything completely after multiple 'CTRL-C' is
-> involved, and it should be impossible. It needs violent multiple ctrl-c to
-> terminate the dealoop test.
-> 
-> So it isn't reasonable to expect that zram can be always unloaded successfully
-> after the test script is terminated via multiple ctrl-c.
+> Luis, do you have any concern of this patchset to solve the cpuhp
+> problem? (Sorry in advance if I miss some concerns if you raised
+> in different thread. I'm totally lost).
 
-For the life of me, I do not run into these issue with my patch. But
-with yours I had.
+Running tests against this now. Will report back!
 
-To be clear, I run zram02.sh on two terminals. Then to interrupt I just leave
-CTRL-C pressed to issue multiple terminations until the script is done
-on each terminal at a time, until I see both have completed.
-
-I repeat the same test, noting always that when I start one one terminal
-the test is succeeding. And also when I cancel completely one script the
-test continue fine without issue.
-
-> But zram can be unloaded after running swapoff manually, from driver
-> viewpoint, nothing is wrong.
-
-I had not run into that issue with my patch FWIW.
-
-  Luis
+ Luis
