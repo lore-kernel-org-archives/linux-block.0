@@ -2,121 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 689FAC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 21:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D48C4C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 22:51:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 436B3610A4
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 21:02:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B22EA61359
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 22:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231822AbhJUVEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 17:04:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35816 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230272AbhJUVEP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 17:04:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634850119;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Viwng1G6iGM+hVHeS3JvQSAt/ZohVSUtijHLDpzwV58=;
-        b=KhOlfET10bjA5YzaN3TmQVOLE539i+JzPD5LXD613ucHX+M6UX25JKjn0XUd+++8t9t3ZE
-        8S77CpS9g3j9aMgVYOqZwdwtBHZJsa6XAW9hDsR51KxS4RLie6WXqKVg3Qw24Eo8CUlKHx
-        AMWb1z0dRNWCOMGa7yCjnnr5u0C7Qt4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-N5XlrqMmPMSK8EsR3PF-sA-1; Thu, 21 Oct 2021 17:01:55 -0400
-X-MC-Unique: N5XlrqMmPMSK8EsR3PF-sA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 480E9362FB;
-        Thu, 21 Oct 2021 21:01:54 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF05E60862;
-        Thu, 21 Oct 2021 21:01:53 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-fsdevel\@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-aio@kvack.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v2] fs: replace the ki_complete two integer arguments with a single argument
-References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
-        <YXElk52IsvCchbOx@infradead.org> <YXFHgy85MpdHpHBE@infradead.org>
-        <4d3c5a73-889c-2e2c-9bb2-9572acdd11b7@kernel.dk>
-        <YXF8X3RgRfZpL3Cb@infradead.org>
-        <b7b6e63e-8787-f24c-2028-e147b91c4576@kernel.dk>
-        <x49ee8ev21s.fsf@segfault.boston.devel.redhat.com>
-        <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
-        <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
-        <7a697483-8e44-6dc3-361e-ae7b62b82074@kernel.dk>
-        <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Thu, 21 Oct 2021 17:03:59 -0400
-In-Reply-To: <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com> (Jeff Moyer's
-        message of "Thu, 21 Oct 2021 16:58:34 -0400")
-Message-ID: <x49sfwut7i8.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S231515AbhJUWxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 18:53:42 -0400
+Received: from rere.qmqm.pl ([91.227.64.183]:57374 "EHLO rere.qmqm.pl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229567AbhJUWxl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Oct 2021 18:53:41 -0400
+Received: from remote.user (localhost [127.0.0.1])
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4Hb2lb3tbrz5Y;
+        Fri, 22 Oct 2021 00:51:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
+        t=1634856684; bh=lHHnRAA8YLV9uPJ7CrD5WKHXnh3ph4RCyZ2dlYvGX+0=;
+        h=Date:From:Subject:To:Cc:From;
+        b=m7le8OCLrkH6rybhlZq/HqAvBjFNaosEB2GQ6A4ljIgcX2emA0CUoBa+cIPaz/rMf
+         AhPUyHbxvPW1bZUGg4UK3JjtRZtcc0iwanowHISBp9kFUHk5cjPqGdRldzc+JAIeqM
+         Uqm91y41Xj6nu0kehiHKz09q26LWCYrVvIO2/lWZrDWIR84DX4J5yk968HrZI6Eka5
+         3grcJEib0cbEi7Tcccfs0shUFktMCT5B2Q+RKrtoLt0PqaGEpJ2ePdaNffq0Z9AuIH
+         lLR5Bs25g7JhFs4kEEaS/jg4838r47CnFRoggiIJopvR2DBOf5pVVgRKryqq5YkDUG
+         X9aplhRG3AjFQ==
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.103.3 at mail
+Date:   Fri, 22 Oct 2021 00:51:23 +0200
+Message-Id: <8a6b11c6ada5d55bdb2b1f8319e47bbf5192654b.1634856658.git.mirq-linux@rere.qmqm.pl>
+From:   =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>
+Subject: [PATCH 1/2] block: parse cmdline partitions first
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jeff Moyer <jmoyer@redhat.com> writes:
+Make sure cmdline-provided partitions can override anything that's
+on a storage device.
 
-> Jens Axboe <axboe@kernel.dk> writes:
->
->> On 10/21/21 12:05 PM, Jeff Moyer wrote:
->>> 
->>>>> I'll follow up if there are issues.
->>> 
->>> s390 (big endian, 64 bit) is failing libaio test 21:
->>> 
->>> # harness/cases/21.p
->>> Expected -EAGAIN, got 4294967285
->>> 
->>> If I print out both res and res2 using %lx, you'll see what happened:
->>> 
->>> Expected -EAGAIN, got fffffff5,ffffffff
->>> 
->>> The sign extension is being split up.
->>
->> Funky, does it work if you apply this on top?
->>
->> diff --git a/fs/aio.c b/fs/aio.c
->> index 3674abc43788..c56437908339 100644
->> --- a/fs/aio.c
->> +++ b/fs/aio.c
->> @@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
->>  	 * 32-bits of value at most for either value, bundle these up and
->>  	 * pass them in one u64 value.
->>  	 */
->> -	iocb->ki_res.res = lower_32_bits(res);
->> -	iocb->ki_res.res2 = upper_32_bits(res);
->> +	iocb->ki_res.res = (long) (res & 0xffffffff);
->> +	iocb->ki_res.res2 = (long) (res >> 32);
->>  	iocb_put(iocb);
->>  }
->
-> I think you'll also need to clamp any ki_complete() call sites to 32
-> bits (cast to int, or what have you).  Otherwise that sign extension
-> will spill over into res2.
->
-> fwiw, I tested with this:
->
-> 	iocb->ki_res.res = (long)(int)lower_32_bits(res);
-> 	iocb->ki_res.res2 = (long)(int)upper_32_bits(res);
->
-> Coupled with the call site changes, that made things work for me.
+Signed-off-by: Michał Mirosław <mirq-linux@rere.qmqm.pl>
+---
+ block/partitions/core.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-This is all starting to feel like a minefield.  If you don't have any
-concrete numbers to show that there is a speedup, I think we should
-shelf this change.
-
--Jeff
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 66ef9bc6d6a1..b4dac3077dce 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -15,6 +15,13 @@
+ #include "check.h"
+ 
+ static int (*check_part[])(struct parsed_partitions *) = {
++	/*
++	 * Let cmdline override whatever there is on disk.
++	 */
++#ifdef CONFIG_CMDLINE_PARTITION
++	cmdline_partition,
++#endif
++
+ 	/*
+ 	 * Probe partition formats with tables at disk address 0
+ 	 * that also have an ADFS boot block at 0xdc0.
+@@ -42,9 +49,6 @@ static int (*check_part[])(struct parsed_partitions *) = {
+ 	adfspart_check_ADFS,
+ #endif
+ 
+-#ifdef CONFIG_CMDLINE_PARTITION
+-	cmdline_partition,
+-#endif
+ #ifdef CONFIG_EFI_PARTITION
+ 	efi_partition,		/* this must come before msdos */
+ #endif
+-- 
+2.30.2
 
