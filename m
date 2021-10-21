@@ -2,91 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19459C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 14:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07FE0C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 14:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F228361221
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 14:35:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E09AF6121F
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 14:35:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbhJUOh1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 10:37:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26173 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229878AbhJUOh0 (ORCPT
+        id S229878AbhJUOiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 10:38:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40776 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230283AbhJUOiC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 10:37:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634826908;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VugW9XKQqql+D4jW/MwnSaiqD5NSjAuo7rb/rILE+vA=;
-        b=cFz+b8GpgUJ8L3LhXQRA9WnqE7Jvqg5jM7sz9r+C+ytGV1Hvfopeao2XOL5gKQSxTUf+cD
-        wrKu497PVobeWv8kdTC1WxJmhVDo7YUuvJEWmIOmvAewluXlNutdJPZ4KWbrg06ThUh19t
-        wcaSjhs9Ko2Iaim7r1/xDgHbDMAnpNo=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-5CKAGYiSOvCOEPs8w-cKAQ-1; Thu, 21 Oct 2021 10:35:06 -0400
-X-MC-Unique: 5CKAGYiSOvCOEPs8w-cKAQ-1
-Received: by mail-ed1-f70.google.com with SMTP id i7-20020a50d747000000b003db0225d219so617043edj.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 07:35:06 -0700 (PDT)
+        Thu, 21 Oct 2021 10:38:02 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC64C061348
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 07:35:46 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id v77so1129799oie.1
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 07:35:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=nYizJ/nuHwnjXaUlZmhnL7XHcjukCYe58+uBV+TNUy0=;
+        b=dXL+Dez8Df/+OmQhuQ2fBPJ0e/poY80CtbtBu6UwvKYX+w3HSUl0FtArgV6P2EMvrW
+         8ZGPuU1dWbaIeJCpL2tL7Nq9wovOmzZtrVNlp0nnMGnevX+FGBQQYYdhQhJD19AyGAll
+         S6uexlYkXy7k2X41zKaLNX0uc3xuaMBrndnx0HcFRDaS2LNQ1+gzcjvKuDMXHIUnZ03S
+         XPpzAoGZLKcbvm1tkKGVxbwHyRUiAuwu7IqfQ/9Z96H1otdsJ2Fej6NX5hFG5GuhSYGy
+         RfFskthZctAvDgEf/QrTJXTZTTn5AAiFxlskwdvFtdOyp4uy8+Dj9zfhjwWxtwP6siWD
+         A2gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VugW9XKQqql+D4jW/MwnSaiqD5NSjAuo7rb/rILE+vA=;
-        b=D8xy/F59zH4jR2Y/jWJuBWN+0rbrHsA43oLZRwXpD4lmj1ofnb0mceP8IgQdm8WY4A
-         Gi9iXQ9UtILpfQ7giILU/dQc/jhGfW45EZpdttwA2duLLlke+hKjjfCtTdhKd2NFWaSP
-         yIqzuyX+J/pL2Rq88yypI8FG0Z+KQM4eVyeTxvuySxGepehLYxiPvWXrFWgzRh31SInk
-         tELLF0sIa23GHpXxzzBBui4EzT0dQHl2RKlHDlq6N+f8jjAEJUduo4zzYco0M/ef/wQ1
-         qzOUb8m0anKnxaSp/4P0j/mlW5H/UHF3AjSx+P/P09KmdxIe1jNgj44vyBU+TsoJ8wEc
-         wttA==
-X-Gm-Message-State: AOAM531y1J0DMXhbisMaqdJmnE4jhO23q5T6OpSFs6Ww8da7/oUhN0Fg
-        ExfA1sKsmO9mHkyv9Iuux1YgOLaOqXwa8THrWMEyejn8LDsoqnDKhJTpECgSAu9HHQ2tpLHQEQB
-        qspXd4lpI6mPg1wmKHZY/3io=
-X-Received: by 2002:a17:907:961e:: with SMTP id gb30mr7883136ejc.484.1634826905604;
-        Thu, 21 Oct 2021 07:35:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxSRO0xBoE29HcFaVDTP+mg9VveZQjRkYIv8YWZhFjn3jIIO8pGIPgUQcl4cBQPn6cnJIg4Xw==
-X-Received: by 2002:a17:907:961e:: with SMTP id gb30mr7883111ejc.484.1634826905435;
-        Thu, 21 Oct 2021 07:35:05 -0700 (PDT)
-Received: from steredhat (host-79-30-88-77.retail.telecomitalia.it. [79.30.88.77])
-        by smtp.gmail.com with ESMTPSA id u18sm2900999eds.86.2021.10.21.07.35.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Oct 2021 07:35:05 -0700 (PDT)
-Date:   Thu, 21 Oct 2021 16:35:03 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     cgel.zte@gmail.com
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ye Guojin <ye.guojin@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: Re: [PATCH] virtio-blk: fixup coccinelle warnings
-Message-ID: <20211021143503.xp7u6qmypvhbl5th@steredhat>
-References: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nYizJ/nuHwnjXaUlZmhnL7XHcjukCYe58+uBV+TNUy0=;
+        b=lcAIPi4T5dFnDYAL2ztzDX4Ff6HRKoE/yBZwyf6g3WJJ6AA0bVh/VElSQxVYoA8OaN
+         qR9+267u3Qm8hSktFMvdp8RdfKDohH8ZljTQt8yEbB6LdnQTjn5WXx5EqLD5ZL6laP9P
+         EwH9kPXoqth0IL0BeHGiAEcE2shkXMe8cV1d+JfiieaUm8ivp7a4nju9YTn/qi2oGd4I
+         YdeDv9W42bnVabXPnM94rBE8v7NteETGtgy4T5xKAQjoZaMtqS/wgv7z8OxDyNatXHAd
+         FEdITmk/4FbSHWv2vyYK6lOPjJYpgXAYuA0OKplf33wYYz2wtcvwNv1UPmfLdofXE7Ja
+         uIXg==
+X-Gm-Message-State: AOAM531B2DVSJGw5boagnICvQkn4S9ipDmQJc7qOsGtr57F5Caj/O7DW
+        BVYEa+lsj+97cAq/GmIUokak5dehq+bHX3C3
+X-Google-Smtp-Source: ABdhPJxWqA09KwjQoOuT19z0e5ihfYskg5XFT15ttw6yi8pWO9OO7fg1NnzWrh1819t+8NgtGboBlw==
+X-Received: by 2002:a05:6808:221e:: with SMTP id bd30mr4767332oib.115.1634826946186;
+        Thu, 21 Oct 2021 07:35:46 -0700 (PDT)
+Received: from ?IPv6:2600:380:783a:c43c:af64:c142:4db7:63ac? ([2600:380:783a:c43c:af64:c142:4db7:63ac])
+        by smtp.gmail.com with ESMTPSA id w20sm1069864otj.23.2021.10.21.07.35.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 07:35:45 -0700 (PDT)
+Subject: Re: [PATCH 1/2] fs: bdev: fix conflicting comment from lookup_bdev
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Jackie Liu <liu.yun@linux.dev>, hch@lst.de
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20211021071344.1600362-1-liu.yun@linux.dev>
+ <163482627258.38562.7953994214106016215.b4-ty@kernel.dk>
+Message-ID: <2f3adf35-28d4-9fe3-0541-8aa580cda6f4@kernel.dk>
+Date:   Thu, 21 Oct 2021 08:35:43 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20211021065111.1047824-1-ye.guojin@zte.com.cn>
+In-Reply-To: <163482627258.38562.7953994214106016215.b4-ty@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 06:51:11AM +0000, cgel.zte@gmail.com wrote:
->From: Ye Guojin <ye.guojin@zte.com.cn>
->
->coccicheck complains about the use of snprintf() in sysfs show
->functions:
->WARNING  use scnprintf or sprintf
->
->Use sysfs_emit instead of scnprintf or sprintf makes more sense.
->
->Reported-by: Zeal Robot <zealci@zte.com.cn>
->Signed-off-by: Ye Guojin <ye.guojin@zte.com.cn>
->---
-> drivers/block/virtio_blk.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+On 10/21/21 8:24 AM, Jens Axboe wrote:
+> On Thu, 21 Oct 2021 15:13:43 +0800, Jackie Liu wrote:
+>> From: Jackie Liu <liuyun01@kylinos.cn>
+>>
+>> We switched to directly use dev_t to get block device, lookup changed the
+>> meaning of use, now we fix this conflicting comment.
+>>
+>>
+> 
+> Applied, thanks!
+> 
+> [1/2] fs: bdev: fix conflicting comment from lookup_bdev
+>       commit: 057178cf518e699695a4b614a7a08c350b1fdcfd
+> [2/2] scsi: bsg: fix errno when scsi_bsg_register_queue fails
+>       commit: e85c8915cf374af76efdc03a53a20fdec9d8eb5a
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Eh, I only applied 1/2. The other can go through the SCSI tree.
+
+-- 
+Jens Axboe
 
