@@ -2,97 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F39C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 03:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B2F2C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 04:02:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73FC861183
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 03:44:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC0F76113D
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 04:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231336AbhJUDqs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Oct 2021 23:46:48 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:30404 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231530AbhJUDqK (ORCPT
+        id S229539AbhJUEEk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 00:04:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25458 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229499AbhJUEEj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Oct 2021 23:46:10 -0400
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19L345vU029738;
-        Thu, 21 Oct 2021 03:43:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2021-07-09;
- bh=BSjTWby1MMCLQUchrOSGc4QoXnzcMZ91l35lRX12C+A=;
- b=s10GXTgGaX78Zmg+DOSDrfc0P0mwy8l94S/NZcyOPTkKyIMY2Y0KlCwxCAx31besDrcr
- gXfw3fEKtGCdejoVtEWUD00kuevcL/euKQ1b4LL0nm4E8CV6SIOFqCYP0rxj7RC74EVk
- e1PqokwRndi0pkrqAVruOVLwEN5l5viuqDFrINzci/HP18Znfe79FD5iVhadUThPY2uw
- odRGpVz8brO185YsW3tTaXuLihuEjMaflid8MLFI6u/8vn+luvxy/mDr7zofRsdPscVh
- mNLR9sg3Koj94WqKMhqpn6d0kreDZqZeu97CD8yHp5SK3EUYUYKj0bD7U5PsVZFWhw4s kA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3btkwj3wvw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Oct 2021 03:43:10 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 19L3etve078225;
-        Thu, 21 Oct 2021 03:43:08 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3030.oracle.com with ESMTP id 3bqmshem6t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Oct 2021 03:43:08 +0000
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 19L3gu8A082116;
-        Thu, 21 Oct 2021 03:43:07 GMT
-Received: from ca-mkp.mkp.ca.oracle.com (ca-mkp.ca.oracle.com [10.156.108.201])
-        by aserp3030.oracle.com with ESMTP id 3bqmshekyd-13;
-        Thu, 21 Oct 2021 03:43:07 +0000
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     zhuyifei1999@gmail.com, thehajime@gmail.com, hare@suse.de,
-        jinpu.wang@ionos.com, jgross@suse.com, johannes.berg@intel.com,
-        geert@linux-m68k.org, linux-mtd@lists.infradead.org,
-        miquel.raynal@bootlin.com, axboe@kernel.dk,
-        Luis Chamberlain <mcgrof@kernel.org>, jdike@addtoit.com,
-        kent.overstreet@gmail.com, richard@nod.at, colyli@suse.de,
-        agk@redhat.com, haris.iqbal@ionos.com, krisman@collabora.com,
-        roger.pau@citrix.com, anton.ivanov@cambridgegreys.com,
-        sstabellini@kernel.org, ulf.hansson@linaro.org, vigneshr@ti.com,
-        chris.obbard@collabora.com, jejb@linux.ibm.com,
-        boris.ostrovsky@oracle.com, tj@kernel.org, snitzer@redhat.com
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-        dm-devel@redhat.com, linux-bcache@vger.kernel.org
-Subject: Re: [PATCH 0/9] block: reviewed add_disk() error handling set
-Date:   Wed, 20 Oct 2021 23:42:44 -0400
-Message-Id: <163478764105.7011.9400354892813636458.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20211015233028.2167651-1-mcgrof@kernel.org>
-References: <20211015233028.2167651-1-mcgrof@kernel.org>
+        Thu, 21 Oct 2021 00:04:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634788944;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zqZR5Pqksvt2mjge07Hx3CYwH+m5LT2HlaOHVqFWmbY=;
+        b=NGebaCBje3XuW88bw5RwvnkkOEFgRGtYlmeQjmgmfCFBDxILjYg8g6DpPnen85Yt+cdWBE
+        323ZWSNx/BpWcJQqGXgdig//zD9+DiY9xZ+Z5Xr9rsx4IxgXnS4OQb6Iez+2XDbprGe+k/
+        iT1H6EVPyVtghKAlwDfEAwWFD4aHXvE=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-tpeDDo4ENMGG6Fn2WxoHdQ-1; Thu, 21 Oct 2021 00:02:22 -0400
+X-MC-Unique: tpeDDo4ENMGG6Fn2WxoHdQ-1
+Received: by mail-yb1-f199.google.com with SMTP id h185-20020a256cc2000000b005bdce4db0easo33960307ybc.12
+        for <linux-block@vger.kernel.org>; Wed, 20 Oct 2021 21:02:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zqZR5Pqksvt2mjge07Hx3CYwH+m5LT2HlaOHVqFWmbY=;
+        b=O1pd8YAd1oT+GPK8ngvFDbftAlQZ4OwMzyRypat2sG8F9pdcRoqt3NopA2jGb/2DdR
+         ymYb/fiRnKrWFCPrsWOfk8ul/np974Ih/T3e6JEugwko1Ax5zA/JVbejp70ldoG21E+Y
+         35DZK1VpYoViJVf2v+KAnmBJMo/D7yv3brzgEp5JYm5aaqkpjNKz8Kcyo6NrZOCwFFaX
+         G5bchKT/wnzEIz1J9BWXFo32N6oq4GPFvDWGZs7ttEZUQQxVe8g80pFt2V/pK0kcaKmv
+         gPl6VZYtZCInI3OXw3yCuyNO9zNQ4NLfILOrahecx0KAEnTDwTrkFY6YWb352Sj+DQ7f
+         nbLg==
+X-Gm-Message-State: AOAM530zEwI71X/s7b535Z4kcZE5qFqBupjAXquI3nBW+ksju0P+3GIA
+        Hb/ynjS7gVFlkQA/+0p+qQFI4/7+PQOBg+IkDtiDg7vgo23CgsCoZEKb8Qd0wLeQmdvN6CYbVI9
+        k4m8VFaf4NiaFCdO+Lf/k8BAhcuhqUwqX1aYDRaI=
+X-Received: by 2002:a25:cb03:: with SMTP id b3mr3750489ybg.138.1634788941825;
+        Wed, 20 Oct 2021 21:02:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx1OqGtotGJ/jQ9wN65VpDFQc4rItzSgKvGu1fzBNWnk5U1gJ+6z7o2JZTVOIIOcb2HByX6UB08bCkOi6XMEuU=
+X-Received: by 2002:a25:cb03:: with SMTP id b3mr3750466ybg.138.1634788941608;
+ Wed, 20 Oct 2021 21:02:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: BAR8nzodBeKYX4DEPTjC7SU079lshTb2
-X-Proofpoint-GUID: BAR8nzodBeKYX4DEPTjC7SU079lshTb2
+References: <CAHj4cs80zAUc2grnCZ015-2Rvd-=gXRfB_dFKy=RTm+wRo09HQ@mail.gmail.com>
+ <1b2ac8f7-495e-abeb-80de-3d72af2ac7e0@kernel.dk>
+In-Reply-To: <1b2ac8f7-495e-abeb-80de-3d72af2ac7e0@kernel.dk>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Thu, 21 Oct 2021 12:02:10 +0800
+Message-ID: <CAHj4cs92yZue+HRuBHv=QWmJk11_2z2SbMJ8Xzc9jzgvbFzD-A@mail.gmail.com>
+Subject: Re: [bug report] kernel BUG at block/blk-mq.c:1042!
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 15 Oct 2021 16:30:19 -0700, Luis Chamberlain wrote:
+On Wed, Oct 20, 2021 at 10:21 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 10/19/21 8:29 PM, Yi Zhang wrote:
+> > Hello
+> >
+> > Below issue was triggered with blktests srp/ tests during CKI run on
+> > linux-block/for-next, seems it was introduced from [2], and still can
+> > be reproduced with [1]
+> >
+> > [1] 4ff840e57c84 Merge branch 'for-5.16/drivers' into for-next [2]
+> > 59d62b58f120 Merge branch 'for-5.16/block' into for-next
+>
+> Can you see if this helps? I don't think that check is valid anymore,
+> there are plenty of cases where queuelist may not be valid just yet,
+> but it doesn't mean that it's an issue for requeue. The check is
+> meant to catch someone doing requeue when the request is still
+> inserted.
+>
 
-> Jens,
-> 
-> I had last split up patches into 7 groups, but at this point now
-> most changes are merged except a few more drivers. Instead of creating
-> a new patch set for each of the 7 groups I'm creating 3 new groups of
-> patches now:
-> 
-> [...]
+Yes, the issue was fixed with this patch, feel free to add:
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-Applied to 5.16/scsi-queue, thanks!
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8b05a8f9bb33..a71aeed7b987 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1053,7 +1053,6 @@ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+>         /* this request will be re-inserted to io scheduler queue */
+>         blk_mq_sched_requeue_request(rq);
+>
+> -       BUG_ON(!list_empty(&rq->queuelist));
+>         blk_mq_add_to_requeue_list(rq, true, kick_requeue_list);
+>  }
+>  EXPORT_SYMBOL(blk_mq_requeue_request);
+>
+> --
+> Jens Axboe
+>
 
-[1/9] scsi/sd: add error handling support for add_disk()
-      https://git.kernel.org/mkp/scsi/c/2a7a891f4c40
-[2/9] scsi/sr: add error handling support for add_disk()
-      https://git.kernel.org/mkp/scsi/c/e9d658c2175b
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Best Regards,
+  Yi Zhang
+
