@@ -2,108 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987B9C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 17:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2017C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 18:03:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7816C610CF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 17:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC418619EC
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 18:03:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232345AbhJURtc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 13:49:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232764AbhJURt3 (ORCPT
+        id S232544AbhJUSGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 14:06:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21792 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232439AbhJUSF7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 13:49:29 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF08C061225;
-        Thu, 21 Oct 2021 10:46:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ar6Nln+iCTz4ULZ5bzZwdi/BNywgNiInR3KbeYJPJFk=; b=AEimvyF3sRUECrII1PM+N3udi6
-        28GlMX49irZ0MwupJsdmWUAxWVRy4DDOl8pwbTMvpmEi/hh/dz3dlkCTJwH8dJRvOx981O7pIREJc
-        MmWq8Hwe+cpNZg9q/zM8Y4dpt3iGgqJ5237scd62OU0D1e9NmnW9r9jp7mDh5G3Xc81+Ebsq4YkmC
-        pV5z/FAFKorXY+5BkFlRSDuvAyt/A6W8ZB2n8njjAqfeWmVur7XBaS2IfaZU2bdhr5s8wHP775wLy
-        WIJSglVVErcW/ERCpOeVEuK4VGoiTbQn/HalF0ZNtCLrFyQV/nlMbz/1L0kU3ijTCJeaungNq/72p
-        YGKa42eg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mdc9S-008YZ0-Fj; Thu, 21 Oct 2021 17:46:50 +0000
-Date:   Thu, 21 Oct 2021 10:46:50 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 0/4] zram: fix two races and one zram leak
-Message-ID: <YXGnijd+Ca+bWJZs@bombadil.infradead.org>
-References: <20211020015548.2374568-1-ming.lei@redhat.com>
- <YXCMtRVXrGOec6OR@google.com>
- <YXGl4v1cMJtCLg2d@bombadil.infradead.org>
+        Thu, 21 Oct 2021 14:05:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634839423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oSHfqseBKeRB8xf7I0mUX0PNFUzMlKErE4TYf1UyH6c=;
+        b=Q19sLk113c3MuUJoxvOpSjMQmOYG3SCbn0WHoSxgZgRk3Fi9q+YrDor+Wh/IYiO9brgGMt
+        DgENtPxYl6C4r06TnLTI6I2JL0a1jP0KrBcuy3MizcGg6GdDjf37Z4P5NrguEj1yesnixU
+        7pj1DfakXTMN+bbdXlF4vx5IlAE5qRQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-nxdvAYv3MO2dOkZVxQcX4A-1; Thu, 21 Oct 2021 14:03:41 -0400
+X-MC-Unique: nxdvAYv3MO2dOkZVxQcX4A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 779B01006AA3;
+        Thu, 21 Oct 2021 18:03:40 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEE2560C13;
+        Thu, 21 Oct 2021 18:03:39 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "linux-fsdevel\@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-aio@kvack.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH v2] fs: replace the ki_complete two integer arguments with a single argument
+References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
+        <YXElk52IsvCchbOx@infradead.org> <YXFHgy85MpdHpHBE@infradead.org>
+        <4d3c5a73-889c-2e2c-9bb2-9572acdd11b7@kernel.dk>
+        <YXF8X3RgRfZpL3Cb@infradead.org>
+        <b7b6e63e-8787-f24c-2028-e147b91c4576@kernel.dk>
+        <x49ee8ev21s.fsf@segfault.boston.devel.redhat.com>
+        <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Thu, 21 Oct 2021 14:05:45 -0400
+In-Reply-To: <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk> (Jens Axboe's
+        message of "Thu, 21 Oct 2021 09:19:45 -0600")
+Message-ID: <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXGl4v1cMJtCLg2d@bombadil.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 10:39:46AM -0700, Luis Chamberlain wrote:
-> On Wed, Oct 20, 2021 at 02:40:05PM -0700, Minchan Kim wrote:
-> > On Wed, Oct 20, 2021 at 09:55:44AM +0800, Ming Lei wrote:
-> > > Hello,
-> > > 
-> > > Fixes three issues reported by Luis Chamberlain with one simpler approach:
-> > > 
-> > > - race between between zram_reset_device() and disksize_store() (1/4)
-> > > 
-> > > - zram leak during unloading module, which is one race between resetting
-> > > and removing device (2/4)
-> > > 
-> > > - race between zram_remove and disksize_store (3/4)
-> > > 
-> > > Also replace replace fsync_bdev with sync_blockdev since no one opens
-> > > it.(4/4)
-> > > 
-> > > V2:
-> > > 	- take another approach to avoid failing of zram_remove()
-> > > 	- add patch to address race between zram_reset_device() and
-> > > 	  disksize_store()
-> > > 
-> > 
-> > Thanks for breaking the problems down, Ming.
-> > 
-> > To me, the whole patchset looks good to me since each patch solves
-> > the problem step by step and finally fix.
-> > 
-> > Luis, do you have any concern of this patchset to solve the cpuhp
-> > problem? (Sorry in advance if I miss some concerns if you raised
-> > in different thread. I'm totally lost).
-> 
-> Running tests against this now. Will report back!
 
-So indeed with these patches I end up in the situation where we if
-if spawn two ltp zram02.sh runs and cancel then randomly and start
-them again:
+>> I'll follow up if there are issues.
 
-zram: Can't change algorithm for initialized device
+s390 (big endian, 64 bit) is failing libaio test 21:
 
-And after that only if you do:
+# harness/cases/21.p
+Expected -EAGAIN, got 4294967285
 
-swapoff /dev/zram0
+If I print out both res and res2 using %lx, you'll see what happened:
 
-Only then can you restart the tests again.
+Expected -EAGAIN, got fffffff5,ffffffff
 
-I had note seen that with my patch fix, but But Ming noted that he
-did see that, and I trust him, although I can't reproduce that issue.
+The sign extension is being split up.
 
-And from at lest a testing perspective then:
+-Jeff
 
-Tested-by: Luis Chamberlain <mcgrof@kernel.org>
-
-I'll go and do the line-by-line code review now.
-
-  Luis
