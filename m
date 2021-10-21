@@ -2,73 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0755C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 04:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5DEC43217
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 06:06:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB22A60F5D
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 04:27:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4F81611CC
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 06:06:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbhJUE3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 00:29:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43042 "EHLO
+        id S230000AbhJUGId (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 02:08:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbhJUE3g (ORCPT
+        with ESMTP id S229597AbhJUGIc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 00:29:36 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C1AC06161C;
-        Wed, 20 Oct 2021 21:27:21 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id g125so12250813oif.9;
-        Wed, 20 Oct 2021 21:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p2FMynZOQufRpN0krg/fWL4lMAv54qnvK4coLS/EU4A=;
-        b=AqSwHZhheu6j2y/Drfa4RgRI3nwNY2JKuGqCu+Xx++xkG4AObI86htgIpb57nuwjpN
-         wu58Sl0HROuB1uMFrz9fZGGghx0tn61tA7J6/V4zbmEvfU8oqpJU9p+DvTzh0mhmiYbU
-         auiGxnA2iTeL/UqkNEe20DJlf8dAnKOFjCQGqW080T8iYVdvoJRPZkHnrYJ8CoYNSdTL
-         2XF+EoOs6rFjGodSO21/dQlXJbzIbNTr8Z+uzB82Sy7U32uTZbkS5ZdfAO45qrDVpnve
-         3163bDwWERrIm+W++Z7OjZItL5Z8Uu6xdwvQhIs8adJ2LtA6w/h0+llXAs/D4ENlZbBS
-         kvRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p2FMynZOQufRpN0krg/fWL4lMAv54qnvK4coLS/EU4A=;
-        b=erEjSZkLWxO5WZSi670DkZKNo63xIOL7BJ1BIb4AIkdFL0OQun17/uUuCoZMHA6QCl
-         ROXfkQqMM7hVQ1QOwXGfT56S+SKjBsl1DvPSz/0Et67qvuFWriZekEBynwSdD3p/am+z
-         mfMP91iJVfXN6Z2+TNwdsyXVls2iPfWI+z412Os+MF85/9hA7IiOObUfRH2jWKVhYQt1
-         ROuDb5j74A0q693OxbxQ2L/rSkpA6Fu5QgVxnlNUnSOGmZBCk57huzojUuzA+Do5CQHu
-         aEsJX2KAKa8lS892FcgD0HseAxJzzG6lxnF0DIPkRK4lTaj7F3AHoBqUMrLc1txADk14
-         ndXg==
-X-Gm-Message-State: AOAM53254u9LG+mZoUXhJTlalJjEgPSGCGenToCkCsyX++SzZivNhwWL
-        /3ceBqNsrrzahthIOCb/tHvIri5TYKOIj+nry6YTB/IlnL8=
-X-Google-Smtp-Source: ABdhPJxSoPGbHjks7D1ifeY43HZk+BwpZCvHxXYjxf0lakr0CAkF6qOoSL32lwbfSJnYQanWn6fe6IBYP+qtbvfb/oM=
-X-Received: by 2002:a54:4381:: with SMTP id u1mr2404872oiv.49.1634790440469;
- Wed, 20 Oct 2021 21:27:20 -0700 (PDT)
+        Thu, 21 Oct 2021 02:08:32 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7839BC061749;
+        Wed, 20 Oct 2021 23:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=eMKXkDPYpzBoNZTUfrLiZ9UP9E1Xw6mYKD9ELYGXON8=; b=V+nV2/+WGUx76PRMLoQUTDkD7H
+        ZB0h6Phz5IYd241eSnt1kF0A6Gh6G3u50zfr2G4MwG+Z9jkDE6Q6V6hbrGhsnz0TuvcYFZ6vIpBZ2
+        ojo1YjFJVlbYRtCx46gs3IXg2yFZMkztFIxDP6Tss9gfr657krLUvWEs+flwerR4XDxPQVhspiEdS
+        ZRdmAedUwtPL1R2qbWbguC18qN+sS98ujV3SxLNn5c9DD+WqwX2Bqn9phc6SsIDVVKvq56TJbQfdN
+        jqllBcKMCblmJ6o0Lwg1DcV7ajqXpq3MPvhxtHs27lKjjk0ioodHLjHxenPjRMXhcWYmeSB5R2V3i
+        Iy3qE/LQ==;
+Received: from [2001:4bb8:180:8777:7df0:a8d8:40cc:3310] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mdRDS-006U4Q-1O; Thu, 21 Oct 2021 06:06:14 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     "J. Bruce Fields" <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+Subject: [PATCH 1/7] block: add a ->get_unique_id method
+Date:   Thu, 21 Oct 2021 08:06:01 +0200
+Message-Id: <20211021060607.264371-2-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211021060607.264371-1-hch@lst.de>
+References: <20211021060607.264371-1-hch@lst.de>
 MIME-Version: 1.0
-References: <CAEKhA2x1Qi3Ywaj9fzdsaChabqDSMe2m2441wReg_V=39_Cuhg@mail.gmail.com>
- <YW8EVVmrQpuiwyEC@slm.duckdns.org>
-In-Reply-To: <YW8EVVmrQpuiwyEC@slm.duckdns.org>
-From:   Youfu Zhang <zhangyoufu@gmail.com>
-Date:   Thu, 21 Oct 2021 12:26:44 +0800
-Message-ID: <CAEKhA2yENaRmCXaEYZFp_S55BnJxm51LwL7AbN24DZ7OpsUDag@mail.gmail.com>
-Subject: Re: [BUG] blk-throttle panic on 32bit machine after startup
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> This doesn't reproduce on 5.14.
+Add a method to query unique IDs from block devices.  It will be used to
+remove code that deeply pokes into SCSI internals in the NFS server.
+The implementation in the sd driver itself is also much nicer as it can
+use the cached VPD page instead of always sending a command as the
+current NFS code does.
 
-I can reproduce this bug on 5.14 i386.
-I ran the reproducer (slightly modified, sr0 instead of loop0, 11:0
-instead of 8:0) on Debian installer live CD.
-https://cdimage.debian.org/cdimage/daily-builds/daily/current/i386/iso-cd/debian-testing-i386-netinst.iso
-I posted a screen recording at https://youtu.be/ULdoHizTi0k. Please check.
+For now the interface is kept very minimal but could be easily
+extended when other users like a block-layer sysfs interface for
+uniquue IDs shows up.
 
-Thanks.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blkdev.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index fd9771a1da096..af61fb3e1502c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1177,6 +1177,14 @@ static inline void blk_ksm_unregister(struct request_queue *q) { }
+ 
+ #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
+ 
++enum blk_unique_id {
++	/* these match the Designator Types specified in SPC */
++	BLK_UID_T10	= 1,
++	BLK_UID_EUI64	= 2,
++	BLK_UID_NAA	= 3,
++};
++
++#define NFL4_UFLG_MASK			0x0000003F
+ 
+ struct block_device_operations {
+ 	void (*submit_bio)(struct bio *bio);
+@@ -1195,6 +1203,9 @@ struct block_device_operations {
+ 	int (*report_zones)(struct gendisk *, sector_t sector,
+ 			unsigned int nr_zones, report_zones_cb cb, void *data);
+ 	char *(*devnode)(struct gendisk *disk, umode_t *mode);
++	/* returns the length of the identifier or a negative errno: */
++	int (*get_unique_id)(struct gendisk *disk, u8 id[16],
++			enum blk_unique_id id_type);
+ 	struct module *owner;
+ 	const struct pr_ops *pr_ops;
+ 
+-- 
+2.30.2
+
