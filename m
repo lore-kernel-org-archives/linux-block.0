@@ -2,81 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2017C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 18:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB6FC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 18:18:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC418619EC
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 18:03:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63C4661A05
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 18:18:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232544AbhJUSGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 14:06:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21792 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232439AbhJUSF7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 14:05:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634839423;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oSHfqseBKeRB8xf7I0mUX0PNFUzMlKErE4TYf1UyH6c=;
-        b=Q19sLk113c3MuUJoxvOpSjMQmOYG3SCbn0WHoSxgZgRk3Fi9q+YrDor+Wh/IYiO9brgGMt
-        DgENtPxYl6C4r06TnLTI6I2JL0a1jP0KrBcuy3MizcGg6GdDjf37Z4P5NrguEj1yesnixU
-        7pj1DfakXTMN+bbdXlF4vx5IlAE5qRQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-nxdvAYv3MO2dOkZVxQcX4A-1; Thu, 21 Oct 2021 14:03:41 -0400
-X-MC-Unique: nxdvAYv3MO2dOkZVxQcX4A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 779B01006AA3;
-        Thu, 21 Oct 2021 18:03:40 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEE2560C13;
-        Thu, 21 Oct 2021 18:03:39 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-fsdevel\@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-aio@kvack.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v2] fs: replace the ki_complete two integer arguments with a single argument
-References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
-        <YXElk52IsvCchbOx@infradead.org> <YXFHgy85MpdHpHBE@infradead.org>
-        <4d3c5a73-889c-2e2c-9bb2-9572acdd11b7@kernel.dk>
-        <YXF8X3RgRfZpL3Cb@infradead.org>
-        <b7b6e63e-8787-f24c-2028-e147b91c4576@kernel.dk>
-        <x49ee8ev21s.fsf@segfault.boston.devel.redhat.com>
-        <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Thu, 21 Oct 2021 14:05:45 -0400
-In-Reply-To: <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk> (Jens Axboe's
-        message of "Thu, 21 Oct 2021 09:19:45 -0600")
-Message-ID: <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S232319AbhJUSUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 14:20:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40658 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232306AbhJUSUW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Oct 2021 14:20:22 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B7CB361ABA;
+        Thu, 21 Oct 2021 18:18:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1634840285;
+        bh=8fcdwKbPJ3DAlmVhO7uF1VahsQ5segPEdgzsPkODe4c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=UWqMewDnQ3RvES5prFE3/POVZY9+5pNDpTdm3AUYLrGuMZKOF5e5VuC862w3KMTq3
+         hq76/s8bmCBsLM8tXIBx7CUO5f8zcasr2ZGmI64lIugMCUEZCb1CJwtk+BD3SOkBbi
+         hl5aIL0qnBckYbfDt09POuethoZkPWtgktaPBL0dAi8JcC+Opc9kibQzT/4L7uG3un
+         +//uQg0Dov95Vbm88HJXTd2IXR6Smx0iVOYq7EMZSDnfoAq9TbiChg+god3tYBNgAS
+         4j8xYiAyR7dFEMum0ih81YeXO+3M0s7RRA+H7DnHFMNmK/+K26EyZc7naApmOnAp3G
+         FW9h2tMHjCaLQ==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org
+Cc:     linux-arm-msm@vger.kernel.org, kernel-team@android.com,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Gaurav Kashyap <gaurkash@codeaurora.org>,
+        Satya Tangirala <satyaprateek2357@gmail.com>
+Subject: [RFC PATCH v3 0/3] Support for hardware-wrapped inline encryption keys
+Date:   Thu, 21 Oct 2021 11:16:05 -0700
+Message-Id: <20211021181608.54127-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+[ NOTE: this patchset is an RFC that isn't ready for merging yet because
+  it doesn't yet include the vendor-specific UFS or eMMC driver changes
+  needed to actually use the feature.  I.e., this patchset isn't
+  sufficient to actually use hardware-wrapped keys with upstream yet.
 
->> I'll follow up if there are issues.
+  For context, hardware-wrapped key support has been out-of-tree in the
+  Android kernels since January 2020; upstreaming has been blocked on
+  hardware availability and support.  However, an SoC that supports this
+  feature (SM8350, a.k.a. Qualcomm Snapdragon 888) finally has been
+  publicly released and had basic SoC support upstreamed.  Also, some
+  other SoCs will support the same feature soon, e.g. the "Tensor" SoC
+  which was recently announced.  So, things should be progressing soon.
+  So while the driver changes are gotten ready, I wanted to get things
+  started and give people a chance to give early feedback on the plan
+  for how the kernel will support this type of hardware.]
 
-s390 (big endian, 64 bit) is failing libaio test 21:
+This patchset adds framework-level support (i.e., block and fscrypt
+support) for hardware-wrapped keys when the inline encryption hardware
+supports them.  Hardware-wrapped keys are inline encryption keys that
+are wrapped (encrypted) by a key internal to the hardware.  Except at
+initial unlocking time, the wrapping key is an ephemeral, per-boot key.
+Hardware-wrapped keys can only be unwrapped (decrypted) by the hardware,
+e.g. when a key is programmed into a keyslot.  They are never visible to
+software in raw form, except optionally during key generation (the
+hardware supports importing keys as well as generating keys itself).
 
-# harness/cases/21.p
-Expected -EAGAIN, got 4294967285
+This feature protects the encryption keys from read-only compromises of
+kernel memory, such as that which can occur during a cold boot attack.
+It does this without limiting the number of keys that can be used, as
+would be the case with solutions that didn't use key wrapping.
 
-If I print out both res and res2 using %lx, you'll see what happened:
+The kernel changes to support this feature basically consist of changes
+to blk-crypto to allow a blk_crypto_key to be hardware-wrapped and to
+allow storage drivers to support hardware-wrapped keys, new block device
+ioctls for creating and preparing hardware-wrapped keys, and changes to
+fscrypt to allow the fscrypt master keys to be hardware-wrapped.
 
-Expected -EAGAIN, got fffffff5,ffffffff
+For full details, see the individual patches, especially the detailed
+documentation they add to Documentation/block/inline-encryption.rst and
+Documentation/filesystems/fscrypt.rst.
 
-The sign extension is being split up.
+This patchset is organized as follows:
 
--Jeff
+- Patch 1 adds the block support and documentation, excluding the ioctls
+  needed to get a key ready to be used in the first place.
+
+- Patch 2 adds new block device ioctls for creating and preparing
+  hardware-wrapped keys.
+
+- Patch 3 adds the fscrypt support and documentation.
+
+This patchset is based on top of linux-block/for-next
+(https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-next)
+and fscrypt/master
+(https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git/log/?h=master).
+It can also be retrieved from tag "wrapped-keys-v3" of
+https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git
+
+Changed v2 => v3:
+    - Dropped some fscrypt cleanups that were applied.
+    - Rebased on top of the latest linux-block and fscrypt branches.
+    - Minor cleanups.
+
+Changed v1 => v2:
+    - Added new ioctls for creating and preparing hardware-wrapped keys.
+    - Rebased onto my patchset which renames blk_keyslot_manager to
+      blk_crypto_profile.
+
+Eric Biggers (3):
+  block: add basic hardware-wrapped key support
+  block: add ioctls to create and prepare hardware-wrapped keys
+  fscrypt: add support for hardware-wrapped keys
+
+ Documentation/block/inline-encryption.rst | 238 +++++++++++++++++++++-
+ Documentation/filesystems/fscrypt.rst     | 154 ++++++++++++--
+ block/blk-crypto-fallback.c               |   5 +-
+ block/blk-crypto-internal.h               |  10 +
+ block/blk-crypto-profile.c                |  97 +++++++++
+ block/blk-crypto.c                        | 158 +++++++++++++-
+ block/ioctl.c                             |   4 +
+ drivers/md/dm-table.c                     |   1 +
+ drivers/mmc/host/cqhci-crypto.c           |   2 +
+ drivers/scsi/ufs/ufshcd-crypto.c          |   1 +
+ fs/crypto/fscrypt_private.h               |  83 +++++++-
+ fs/crypto/hkdf.c                          |   4 +-
+ fs/crypto/inline_crypt.c                  |  64 +++++-
+ fs/crypto/keyring.c                       | 119 ++++++++---
+ fs/crypto/keysetup.c                      |  74 ++++++-
+ fs/crypto/keysetup_v1.c                   |   5 +-
+ fs/crypto/policy.c                        |  11 +-
+ include/linux/blk-crypto-profile.h        |  80 ++++++++
+ include/linux/blk-crypto.h                |  70 ++++++-
+ include/uapi/linux/fs.h                   |  19 ++
+ include/uapi/linux/fscrypt.h              |   7 +-
+ 21 files changed, 1111 insertions(+), 95 deletions(-)
+
+-- 
+2.33.1
 
