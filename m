@@ -2,161 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A300C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 19:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC40C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 20:41:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A51061221
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 19:46:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0763861186
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 20:41:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231629AbhJUTss (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 15:48:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56788 "EHLO
+        id S231948AbhJUUnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 16:43:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231732AbhJUTso (ORCPT
+        with ESMTP id S231579AbhJUUnj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 15:48:44 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84216C0613B9
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 12:46:27 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id t9so1157042lfd.1
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 12:46:27 -0700 (PDT)
+        Thu, 21 Oct 2021 16:43:39 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0688BC0613B9
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 13:41:23 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id g125so2410814oif.9
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 13:41:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bNIcVIgUzaYpY3A6fcbKgS9qwdI5Wr5HY9fdPyib42A=;
-        b=kwgZ72iHNgSZ9cB17w0kNtyJwRm4TsX61EERnsx38nJGCeSOlC1qZgHS1U+++6TpJj
-         KZtQBaUiIPRb5D8Fw08jOECIvkwpxFxdph3J+JIfZVkG/jfCCty7daPMosclDXV5lKKF
-         2Lw1zWcDeeFaB9pyQeaurQDyZULUnBFjIGz0fTAOb77NMyXnPlb48WjMtxYb9tmDErdu
-         AXtywiunOeh+B1zs2QO9xI1tGz7LpKTSuyi5C3dCBskRk1eDdOwvJZlrpO7g3qnN2xMb
-         ZWt+XS6IapCP/UUe1STaN+ujhpi52i1ERRZnTyj3qbEOk5a1rnFc1WjFeMfRKoO2NltE
-         rZag==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=zYu/XzE61dMqHf6uR2/QbWx7gRoKrMaZmUU9f8DAHPw=;
+        b=erpsMOJBVRPBocX2r8KaI4qmlq/SX4EgdaY+ZtYkEOqWmQjRam1maiyODvwQ/EtQ5B
+         RUMsgnsOU2i2/BfyrDhrk1RaYKjPiuZW1gsPJPFgb+t7yywAscRsuOxbj2k1ZXV10PmU
+         cQBFM7KocDa+jfucuBba+3g5b892mE/mGIXkIUNzbEhRwcKMMuAZ0kfFfgxWrt7x83cJ
+         vlo77Lh+T+jvS7ziAuCBL9hLJddJxdss5f3+1gdelFU9QBvGb4ZJwftlUBvws/4iP93A
+         P9Tx43hQlhVXWcD7ls+YeKHuWbc8YcN8BQG6MlzK0jdj2Vq+37Ti0v5VLMfnSi4L0Gz5
+         x1mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bNIcVIgUzaYpY3A6fcbKgS9qwdI5Wr5HY9fdPyib42A=;
-        b=FnyDDakp0v11Gnvgw5DjvqrKK0XH3zXuCoCs7AkunJW4p6X/yT4rsradBoqBMfdPTk
-         34tah3xbw2zYO5dx4TiW/32+fH+woTeuTC2JY2YgtI9jldKcuwH7eQI2JKwgqMdahXkH
-         LqICkyMVXLF4C7X3P09Qr2j/hfpApwqPm2vCTDVHp2xl8UIhoZ17aEz2m23ntf7TXCkh
-         ZQ4Top5+eh8n0twiIqdTZBqeT3CtAT2piNTYmPcoLj4m8GowOICkgnb8Uk4bXOtnLJBg
-         Gx0qcMvv35B+KoyT2g8+vrRijVovBiXSLxeRJtKcO3umxbFuSsLt/Q9aNUuB5pGyS0Rt
-         PWPA==
-X-Gm-Message-State: AOAM533kQzz3VGbE/HC0LOIl5DRptwz+QqIevy+iw3gUte3qGoZVXvg7
-        oXSgBF1+Xsr75RiF67+9ALDDs+J3XXXXzN+aY74YfQ==
-X-Google-Smtp-Source: ABdhPJzKdKS1zsPFnhRBDRCeNfkHWULi7EPtZkghY+VZnP4oQRlPe62/uFAvhJoeg/v+iV/Ri06o99PSh87qK3ELtFw=
-X-Received: by 2002:a05:6512:3254:: with SMTP id c20mr6210542lfr.254.1634845584852;
- Thu, 21 Oct 2021 12:46:24 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zYu/XzE61dMqHf6uR2/QbWx7gRoKrMaZmUU9f8DAHPw=;
+        b=pPRNqA/JVqjIX+Wh+iOBy8O5JLT1idkqg29wF20Cd78jnNv308YsJ+VMrGsrO6In98
+         H67LsJ70FOJaK32W8W8MvITt62s1+GwvllIsdHmhYnuCFcvTKbCFwZRwgx2nmM5vZZZH
+         JyLDwUMhwCtCdkE8i3yqvCmjID1HAijsdnIrYDZk8ROWrO/ABWypulD3zMlPYYj5pSGk
+         ukOL2s1sZqxG4O5RVPlPIM9JC/VWR31hrr/HlBb2NpKLinUvqkBvnf0O0HLWpYqqL6Rl
+         kN06GHA2iGYyIUFmzGGYnUjwpBdHY1bbTtDitL2YBlNqMJokv6MoRuoW+lMXGw0P4tKe
+         c0rA==
+X-Gm-Message-State: AOAM533VAIBPFd2V0lvnMjGL+NTbP4Klec5Nj3fULqWtpJ/YnNIrT7/T
+        DDyy9CCgE76aGevyLawm/EuVKQYME/cplw==
+X-Google-Smtp-Source: ABdhPJxJ+1j42/Jy6Bxk7qm9NcJnUowtZbUgd82CjGbt8EHDWpJAunp0atGG7AaHRM89xSb2ARyc0Q==
+X-Received: by 2002:aca:3e86:: with SMTP id l128mr6050189oia.111.1634848882316;
+        Thu, 21 Oct 2021 13:41:22 -0700 (PDT)
+Received: from [172.20.15.86] (rrcs-24-173-18-66.sw.biz.rr.com. [24.173.18.66])
+        by smtp.gmail.com with ESMTPSA id q15sm1228625otk.81.2021.10.21.13.41.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 13:41:21 -0700 (PDT)
+Subject: Re: [PATCH v2] fs: replace the ki_complete two integer arguments with
+ a single argument
+To:     Jeff Moyer <jmoyer@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-aio@kvack.org, linux-usb@vger.kernel.org
+References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
+ <YXElk52IsvCchbOx@infradead.org> <YXFHgy85MpdHpHBE@infradead.org>
+ <4d3c5a73-889c-2e2c-9bb2-9572acdd11b7@kernel.dk>
+ <YXF8X3RgRfZpL3Cb@infradead.org>
+ <b7b6e63e-8787-f24c-2028-e147b91c4576@kernel.dk>
+ <x49ee8ev21s.fsf@segfault.boston.devel.redhat.com>
+ <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
+ <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <7a697483-8e44-6dc3-361e-ae7b62b82074@kernel.dk>
+Date:   Thu, 21 Oct 2021 14:41:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20211018135559.244400-1-bigeasy@linutronix.de> <20211018135559.244400-3-bigeasy@linutronix.de>
-In-Reply-To: <20211018135559.244400-3-bigeasy@linutronix.de>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 21 Oct 2021 21:45:48 +0200
-Message-ID: <CAPDyKFqBMfPvHp8fHj65Pw+apAx14A6Z6+QOhRAXPHM_OnNA1w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] mmc: core: Use blk_mq_complete_request_direct().
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 18 Oct 2021 at 15:56, Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> The completion callback for the sdhci-pci device is invoked from a
-> kworker.
-> I couldn't identify in which context is mmc_blk_mq_req_done() invoke but
-> the remaining caller are from invoked from preemptible context. Here it
-> would make sense to complete the request directly instead scheduling
-> ksoftirqd for its completion.
->
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On 10/21/21 12:05 PM, Jeff Moyer wrote:
+> 
+>>> I'll follow up if there are issues.
+> 
+> s390 (big endian, 64 bit) is failing libaio test 21:
+> 
+> # harness/cases/21.p
+> Expected -EAGAIN, got 4294967285
+> 
+> If I print out both res and res2 using %lx, you'll see what happened:
+> 
+> Expected -EAGAIN, got fffffff5,ffffffff
+> 
+> The sign extension is being split up.
 
-Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+Funky, does it work if you apply this on top?
 
-Jens, will you funnel this via your tree?
+diff --git a/fs/aio.c b/fs/aio.c
+index 3674abc43788..c56437908339 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
+ 	 * 32-bits of value at most for either value, bundle these up and
+ 	 * pass them in one u64 value.
+ 	 */
+-	iocb->ki_res.res = lower_32_bits(res);
+-	iocb->ki_res.res2 = upper_32_bits(res);
++	iocb->ki_res.res = (long) (res & 0xffffffff);
++	iocb->ki_res.res2 = (long) (res >> 32);
+ 	iocb_put(iocb);
+ }
+ 
 
-Kind regards
-Uffe
+-- 
+Jens Axboe
 
-> ---
->  drivers/mmc/core/block.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-> index 431af5e8be2f8..7d6b43fe52e8a 100644
-> --- a/drivers/mmc/core/block.c
-> +++ b/drivers/mmc/core/block.c
-> @@ -2051,7 +2051,8 @@ static void mmc_blk_mq_dec_in_flight(struct mmc_queue *mq, struct request *req)
->                 mmc_put_card(mq->card, &mq->ctx);
->  }
->
-> -static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req)
-> +static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req,
-> +                               bool can_sleep)
->  {
->         struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
->         struct mmc_request *mrq = &mqrq->brq.mrq;
-> @@ -2063,10 +2064,14 @@ static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req)
->          * Block layer timeouts race with completions which means the normal
->          * completion path cannot be used during recovery.
->          */
-> -       if (mq->in_recovery)
-> +       if (mq->in_recovery) {
->                 mmc_blk_mq_complete_rq(mq, req);
-> -       else if (likely(!blk_should_fake_timeout(req->q)))
-> -               blk_mq_complete_request(req);
-> +       } else if (likely(!blk_should_fake_timeout(req->q))) {
-> +               if (can_sleep)
-> +                       blk_mq_complete_request_direct(req, mmc_blk_mq_complete);
-> +               else
-> +                       blk_mq_complete_request(req);
-> +       }
->
->         mmc_blk_mq_dec_in_flight(mq, req);
->  }
-> @@ -2087,7 +2092,7 @@ void mmc_blk_mq_recovery(struct mmc_queue *mq)
->
->         mmc_blk_urgent_bkops(mq, mqrq);
->
-> -       mmc_blk_mq_post_req(mq, req);
-> +       mmc_blk_mq_post_req(mq, req, true);
->  }
->
->  static void mmc_blk_mq_complete_prev_req(struct mmc_queue *mq,
-> @@ -2106,7 +2111,7 @@ static void mmc_blk_mq_complete_prev_req(struct mmc_queue *mq,
->         if (prev_req)
->                 *prev_req = mq->complete_req;
->         else
-> -               mmc_blk_mq_post_req(mq, mq->complete_req);
-> +               mmc_blk_mq_post_req(mq, mq->complete_req, true);
->
->         mq->complete_req = NULL;
->
-> @@ -2178,7 +2183,8 @@ static void mmc_blk_mq_req_done(struct mmc_request *mrq)
->         mq->rw_wait = false;
->         wake_up(&mq->wait);
->
-> -       mmc_blk_mq_post_req(mq, req);
-> +       /* context unknown */
-> +       mmc_blk_mq_post_req(mq, req, false);
->  }
->
->  static bool mmc_blk_rw_wait_cond(struct mmc_queue *mq, int *err)
-> @@ -2238,7 +2244,7 @@ static int mmc_blk_mq_issue_rw_rq(struct mmc_queue *mq,
->         err = mmc_start_request(host, &mqrq->brq.mrq);
->
->         if (prev_req)
-> -               mmc_blk_mq_post_req(mq, prev_req);
-> +               mmc_blk_mq_post_req(mq, prev_req, true);
->
->         if (err)
->                 mq->rw_wait = false;
-> --
-> 2.33.0
->
