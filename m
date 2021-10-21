@@ -2,88 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7107C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619AAC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:22:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95AEF6137C
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 423BE6120F
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:22:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230441AbhJUQXU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 12:23:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbhJUQXU (ORCPT
+        id S231616AbhJUQZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 12:25:05 -0400
+Received: from mail-pf1-f176.google.com ([209.85.210.176]:47019 "EHLO
+        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230072AbhJUQZE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 12:23:20 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8554AC061764;
-        Thu, 21 Oct 2021 09:21:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FX0dkun5WT6rd/7wz/5I/0pAp1+2wzVqcn4smVW06Kk=; b=NPBHrnNN+GDT52A4PBcACmDn+n
-        rab14iBDZnViJNWCw1829ZH7Z3XU0R9+7bfp4i8w2QRfbFwas+K+/IG5a2u5c/tdnUmdfgWM/F7+2
-        +izW7wLkAaUw5BNcfkaGoE65OwPN0wjAZZJV8F2GEto4hbTaPWj124O8UwnUt41FNJ62S4OL10rgX
-        bGJln2+QGPF1WJD0S7zLiD+NCWNxzVd0LH8B0ICqHG9IbYWEKrDYZhINaR8oLHCZTHsNJzJLe581Z
-        PBXMSObezQsrpck2Xl7xnG15Fiv1QEbptqNu9SnzdySZnkkiZ5m3HwGPxm/fTBDIgT6DGKMzSQB7p
-        dtjmRZiw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mdaoR-008L91-Fa; Thu, 21 Oct 2021 16:21:03 +0000
-Date:   Thu, 21 Oct 2021 09:21:03 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Michael Schmitz <schmitzmic@gmail.com>,
-        linux-block@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-        Christoph Hellwig <hch@lst.de>,
-        Finn Thain <fthain@linux-m68k.org>
-Subject: Re: [PATCH v2] ataflop: remove ataflop_probe_lock mutex
-Message-ID: <YXGTbx0bp/kZCSDf@bombadil.infradead.org>
-References: <1d9351dc-baeb-1a54-625c-04ce01b009b0@i-love.sakura.ne.jp>
- <6d26961c-3b51-d6e1-fb95-b72e720ed5d0@gmail.com>
- <5524e6ee-e469-9775-07c4-7baf5e330148@i-love.sakura.ne.jp>
- <YXGTNjhWfVjsB9A8@bombadil.infradead.org>
+        Thu, 21 Oct 2021 12:25:04 -0400
+Received: by mail-pf1-f176.google.com with SMTP id x66so1066835pfx.13;
+        Thu, 21 Oct 2021 09:22:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XdjveOQuWQpe9c88w6YkAw9IMQkaAD2HUvEGV/fm9Uo=;
+        b=FsJYZ+hmsYxlhOzVJOLBJVM7Wdm4/IcXkUDxgxZFuH/8nGc6ytC48+tAspP50jTJxp
+         6/XdCtMvGnOoLAwxmK/lVYHUDxm5RjC8urjC3x8nOqVgMNJ4P1wnLF1gqvFmT+GEe0VE
+         CQdjQVUmPG+cQfoI0jXeaSOGxgHiPCZ69Tk+XRVq8W0DyvKx2WCyBw8H+BoQsT2pIlGr
+         G+zclEQCDXTuG9Kyd9+1wq6c6XBFLsaMVhkLwdhQaaeK3/BVXgO7GM4r18EDrwCF74eY
+         yHwRQR7+gdoljUQPuXskHhFixt77oQeQxpud0iGU3+PfHvBMsIWJ+3Xiz8iedRK5mXND
+         QyaQ==
+X-Gm-Message-State: AOAM530XK536C55xCFCiA04q528qelDIBqjoLX1eect/K243reZJEKtx
+        GrhF0yqCfLyDElHl8+qDVk4=
+X-Google-Smtp-Source: ABdhPJzTVu0+/rGQjKRaHpEV4QXGZMVCOqOrVWkgv0AeSRIkkc4jbpl7CEra0juPsyBghRAy6pQTCg==
+X-Received: by 2002:a62:3387:0:b0:44d:7ec:906a with SMTP id z129-20020a623387000000b0044d07ec906amr6543521pfz.69.1634833368168;
+        Thu, 21 Oct 2021 09:22:48 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:452c:8e0d:d8a1:4d6])
+        by smtp.gmail.com with ESMTPSA id s22sm6407691pfe.76.2021.10.21.09.22.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Oct 2021 09:22:47 -0700 (PDT)
+Subject: Re: please revert the UFS HPB support
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Daejun Park <daejun7.park@samsung.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20211021144210.GA28195@lst.de>
+ <84fac5a3-135a-2ac8-5929-a1031a311cb7@kernel.dk>
+ <20211021151520.GA31407@lst.de> <20211021151728.GA31600@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <2cba13c3-bcd5-2a47-e4cb-54fa1ca088f3@acm.org>
+Date:   Thu, 21 Oct 2021 09:22:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXGTNjhWfVjsB9A8@bombadil.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20211021151728.GA31600@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 09:20:06AM -0700, Luis Chamberlain wrote:
-> On Sun, Oct 17, 2021 at 11:09:47AM +0900, Tetsuo Handa wrote:
-> > Commit bf9c0538e485b591 ("ataflop: use a separate gendisk for each media
-> > format") introduced ataflop_probe_lock mutex, but forgot to unlock the
-> > mutex when atari_floppy_init() (i.e. module loading) succeeded. This will
-> > result in double lock deadlock if ataflop_probe() is called. Also,
-> > unregister_blkdev() must not be called from atari_floppy_init() with
-> > ataflop_probe_lock held when atari_floppy_init() failed, for
-> > ataflop_probe() waits for ataflop_probe_lock with major_names_lock held
-> > (i.e. AB-BA deadlock).
-> > 
-> > __register_blkdev() needs to be called last in order to avoid calling
-> > ataflop_probe() when atari_floppy_init() is about to fail, for memory for
-> > completing already-started ataflop_probe() safely will be released as soon
-> > as atari_floppy_init() released ataflop_probe_lock mutex.
-> > 
-> > As with commit 8b52d8be86d72308 ("loop: reorder loop_exit"),
-> > unregister_blkdev() needs to be called first in order to avoid calling
-> > ataflop_alloc_disk() from ataflop_probe() after del_gendisk() from
-> > atari_floppy_exit().
-> > 
-> > By relocating __register_blkdev() / unregister_blkdev() as explained above,
-> > we can remove ataflop_probe_lock mutex, for probe function and __exit
-> > function are serialized by major_names_lock mutex.
-> > 
-> > Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> > Fixes: bf9c0538e485b591 ("ataflop: use a separate gendisk for each media format")
+On 10/21/21 8:17 AM, Christoph Hellwig wrote:
+> On Thu, Oct 21, 2021 at 05:15:20PM +0200, Christoph Hellwig wrote:
+>>>> I just noticed the UFS HPB support landed in 5.15, and just as
+>>>> before it is completely broken by allocating another request on
+>>>> the same device and then reinserting it in the queue.  It is bad
+>>>> enough that we have to live with blk_insert_cloned_request for
+>>>> dm-mpath, but this is too big of an API abuse to make it into
+>>>> a release.  We need to drop this code ASAP, and I can prepare
+>>>> a patch for that.
+>>>
+>>> That sounds awful, do you have a link to the offending commit(s)?
+>>
+>> I'll need to look for it, busy in calls right now, but just grep for
+>> blk_insert_cloned_request.
 > 
-> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Might as well finish the git blame:
+> 
+> commit 41d8a9333cc96f5ad4dd7a52786585338257d9f1
+> Author: Daejun Park <daejun7.park@samsung.com>
+> Date:   Mon Jul 12 18:00:25 2021 +0900
+> 
+>      scsi: ufs: ufshpb: Add HPB 2.0 support
+>          
+>      Version 2.0 of HBP supports reads of varying sizes from 4KB to 1MB.
+> 
+>      A read operation <= 32KB is supported as single HPB read. A read between
+>      36KB and 1MB is supported by a combination of write buffer command and HPB
+>      read command to deliver more PPN. The write buffer commands may not be
+>      issued immediately due to busy tags. To use HPB read more aggressively, the
+>      driver can requeue the write buffer command. The requeue threshold is
+>      implemented as timeout and can be modified with requeue_timeout_ms entry in
+>      sysfs.
 
-I should note though that this does not apply to linux-next, I rebased
-it and will send a rebased version on my v3 series of my last patch set
-for add_disk error handling work().
+(+Daejun)
 
-  Luis
+Daejun, can the HPB code be reworked such that it does not use 
+blk_insert_cloned_request()? I'm concerned that if the HPB code is not 
+reworked that it will be removed from the upstream kernel.
+
+Thanks,
+
+Bart.
