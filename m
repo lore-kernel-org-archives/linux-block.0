@@ -2,115 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E53EC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F80BC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:50:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAA3A610C8
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:48:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66B7061409
+	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 16:50:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbhJUQuS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 12:50:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44402 "EHLO
+        id S231623AbhJUQwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 12:52:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232033AbhJUQuM (ORCPT
+        with ESMTP id S230187AbhJUQwQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 12:50:12 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B4D7C061764;
-        Thu, 21 Oct 2021 09:47:56 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id s19so45878ljj.11;
-        Thu, 21 Oct 2021 09:47:55 -0700 (PDT)
+        Thu, 21 Oct 2021 12:52:16 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B076FC0613B9
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 09:50:00 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id l10-20020a056830154a00b00552b74d629aso1172803otp.5
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 09:50:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=teoHzi6Hmm/OVFrA0e8JXtWu9N4wtV6Jv4Y9vx/yxR0=;
-        b=Ke7CiYkPNKFISeqO2ZhVh8+k0kvSAIk683PKPVHhtsHDtLhVwn2f+0hQSJJ7r6orGa
-         B7BfSVZoqpWcB5YqNDCuDGJER0BOzTnlUMKZa9tsTfEfZEHCcfLce7MCivrazcR5Tnd3
-         SMS4TH7DYlBA7ePK8tge9BjdQon1+5LLQHE17eN7i5JbEC9zfejp+6wbwSCyDBv2C43r
-         z7fYucPtrEa1/61dIb/hM86y0hhxKSbbpEsVuOT3+9gNpfGUIxkSyjANFOwaH2SIQwq0
-         DGdt/pm2SEMvQZJ7YthPL5Je99dXF8sOqm4+IMv+79hL6yaHt8Kmst0GGoPAlL+bA+AV
-         ouDg==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=H/Eozbq7KtLQv7I05PmFbNf/apdYsXdfHT73zybO8ZE=;
+        b=WVreQnwbDkzUfWoXogfNSbxO7gQ5mEHdBCGow+FGfeTLO8lAO0KQ5uqcOslFmoLHrs
+         2clYpPgdW10cKh1EId/lbwHWD5bXnZ4ftdhbtW9266w35OBGRf/06VDOkBeSjjSRBA7e
+         2dXHzDSVLw9JVo4yngyMXyrNwx7QDTY4/94hxomTPJvSI58BrpiF7LQSD34rKKhLMWqt
+         JjvP085MeYyMXzEOHbT7WF2P2vyXarBnsQsSd6gs8S5A6lqCRrXbntxu4gWyBSomycpq
+         FE5K+hfoY0OGxR0+JVTC2hHYvrysUA6cCDnnApbvDJJfiV7kIqrcitBT6bX87Wz4gKTd
+         g45Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=teoHzi6Hmm/OVFrA0e8JXtWu9N4wtV6Jv4Y9vx/yxR0=;
-        b=Cf3QPf+H3Q36dP/MoM0PZ3ASnHNOynNKt31whHxrSYLwTOCAXKJAcgE7WDiOqDtOtw
-         YfxFiIAhRyzNvoAztF8UMEvgMzum6ZnliPZq0sKIjI/dwHbO/T1rfXP1HXMs70yymEKo
-         oIjpdzDUO3EI1D9OhWHg/sfdhtXrKJ6pEb7Mh04N2NW9uO5YbVfU8Y96Qwd8Xlihg1TJ
-         i6vCvNQNxiCxNsulNCe7EWeoHkMfCS/Gb4bu9lyNQogv7GAGh8yXVP9qUCAc49s8D4cP
-         rDnOYDGaAS2gifRD2s71re03bhbQOnEkKJgpkW+ON1ZbHR1zQ1QySRC0sthaHI55osVC
-         i+5Q==
-X-Gm-Message-State: AOAM533kNVKYaEylmDK6Y8clXO0EMZE9hvilJGmwo64bV4Sx76xz0az8
-        TV/ClX7REP096QNYnO5Gfq0fetdTEYM=
-X-Google-Smtp-Source: ABdhPJxytDT9pDTb/bTC5dE5btSmvHObDmj7vUPhohHmYJletZw2VYtYZK0DWFzBUGXcNRT8AnkTrA==
-X-Received: by 2002:a05:651c:32f:: with SMTP id b15mr6862293ljp.318.1634834874386;
-        Thu, 21 Oct 2021 09:47:54 -0700 (PDT)
-Received: from [192.168.1.11] ([94.103.235.181])
-        by smtp.gmail.com with ESMTPSA id o6sm507091lfr.19.2021.10.21.09.47.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Oct 2021 09:47:53 -0700 (PDT)
-Message-ID: <8f6f738b-2d74-1778-648a-dc62603319d0@gmail.com>
-Date:   Thu, 21 Oct 2021 19:47:51 +0300
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=H/Eozbq7KtLQv7I05PmFbNf/apdYsXdfHT73zybO8ZE=;
+        b=ICFJM0gHwkxkaj8tM5NURuA8ppvKn25K6vHIi0YmOgF1oARAMYMWQzKqebYwY4gjgM
+         LWYwSs+o0bbGMqrGjQHXAbThtR0WiOxOSqTycavrOxBYM0R6KYWHuxGjj3CCiLDFOPhL
+         kLWmy7mPtktVA1pVCfyRlTnXVkhrwBDlkHzjr3pu0Bo9yds7YjlAvX9R1STueH9Svkvl
+         /M90sevCcAK3NXkxzzzCGT4c9hZD8yFRjwm3MnYX7uiHmSSffNeFbm2Ol3V7koneCJF9
+         Tt1+Q3R3OxM2ONvepccQBM25D+creSeGu29qA/T5ZSxBikd9J2vXS1umkV+QtUrdtf6H
+         9Ktg==
+X-Gm-Message-State: AOAM533/BhTEi67XBePoFI9ze2sJu4ekcJb3RDfg2KLmcNaIogV+PcOg
+        tGULalXdN5z+Dw027dsargK5+w==
+X-Google-Smtp-Source: ABdhPJw4fg+s6o/fbrAgM6IxFUri1B2riMoKLYLBK8KHXUcxmp3h8VPW/Swvw/MRzkp1OZUSWEvhAw==
+X-Received: by 2002:a9d:3b8:: with SMTP id f53mr6001846otf.253.1634834999951;
+        Thu, 21 Oct 2021 09:49:59 -0700 (PDT)
+Received: from [127.0.1.1] ([2600:380:783a:c43c:af64:c142:4db7:63ac])
+        by smtp.gmail.com with ESMTPSA id g29sm1179353oic.27.2021.10.21.09.49.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Oct 2021 09:49:59 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org,
+        Satya Tangirala <satyaprateek2357@gmail.com>,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+In-Reply-To: <20211018180453.40441-1-ebiggers@kernel.org>
+References: <20211018180453.40441-1-ebiggers@kernel.org>
+Subject: Re: [PATCH v6 0/4] blk-crypto cleanups
+Message-Id: <163483499921.66288.14458324918559511031.b4-ty@kernel.dk>
+Date:   Thu, 21 Oct 2021 10:49:59 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.2
-Subject: Re: [PATCH 0/2] nbd: fix sanity check for first_minor
-Content-Language: en-US
-To:     "yukuai (C)" <yukuai3@huawei.com>, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        luomeng12@huawei.com, Christoph Hellwig <hch@lst.de>
-References: <20211021122936.758221-1-yukuai3@huawei.com>
- <72fb140d-609b-c035-bdd6-d2b8639c116b@gmail.com>
- <17182476-e5bf-f493-9d9b-fedb2d9c8e1a@huawei.com>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <17182476-e5bf-f493-9d9b-fedb2d9c8e1a@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/21/21 16:13, yukuai (C) wrote:
-> On 2021/10/21 20:35, Pavel Skripkin wrote:
->> On 10/21/21 15:29, Yu Kuai wrote:
->>> Yu Kuai (2):
->>>    nbd: fix max value for 'first_minor'
->>>    nbd: fix possible overflow for 'first_minor' in nbd_dev_add()
->>>
->>>   drivers/block/nbd.c | 6 +++---
->>>   1 file changed, 3 insertions(+), 3 deletions(-)
->>>
->> 
->> Hi, Yu!
->> 
->> Thank you for the fix, but this wrong check should be just removed, 
->> since root case of wrong sysfs file creation was fixed, as Christoph 
->> said [1]
+On Mon, 18 Oct 2021 11:04:49 -0700, Eric Biggers wrote:
+> This series renames struct blk_keyslot_manager to struct
+> blk_crypto_profile, as it is misnamed; it doesn't always manage
+> keyslots.  It's much more logical to think of it as the
+> "blk-crypto profile" of a device, similar to blk_integrity_profile.
 > 
-> Hi, Pavel
+> This series also improves the inline-encryption.rst documentation file,
+> and cleans up blk-crypto-fallback a bit.
 > 
-> Thanks for your response, with the root cause fixed, patch 1 is not
-> needed anymore. However, the overflow case in patch 2 is still
-> possible.
-> 
-> Does anyone plan to remove the checking?
-> 
+> [...]
+
+Applied, thanks!
+
+[1/4] blk-crypto-fallback: properly prefix function and struct names
+      commit: eebcafaebb17cb8fda671709fab5dd836bdc3a08
+[2/4] blk-crypto: rename keyslot-manager files to blk-crypto-profile
+      commit: 1e8d44bddf57f6d878e083f281a34d5c88feb7db
+[3/4] blk-crypto: rename blk_keyslot_manager to blk_crypto_profile
+      commit: cb77cb5abe1f4fae4a33b735606aae22f9eaa1c7
+[4/4] blk-crypto: update inline encryption documentation
+      commit: 8e9f666a6e66d3f882c094646d35536d2759103a
+
+Best regards,
+-- 
+Jens Axboe
 
 
-Hm, I thought it was already removed, but I was wrong, I guess. Let's 
-see what Christoph thinks about this check.
-
-Maybe add_disk() error handling is still not in Linus tree, I haven't 
-checked yet. Sysfs warnings _should_ be fixed by proper error handling, 
-but maybe there is another problem somewhere...
-
-
-
-
-With regards,
-Pavel Skripkin
