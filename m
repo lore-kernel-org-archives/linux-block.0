@@ -2,230 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCE2C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B41CC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:44:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35C3160F0F
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 686D161251
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:44:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233340AbhJVPcD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Oct 2021 11:32:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40070 "EHLO
+        id S233257AbhJVPq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Oct 2021 11:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233257AbhJVPcD (ORCPT
+        with ESMTP id S231453AbhJVPq1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Oct 2021 11:32:03 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6E4C061764
-        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:29:45 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id o4so5440685oia.10
-        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:29:45 -0700 (PDT)
+        Fri, 22 Oct 2021 11:46:27 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A395C061764
+        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:44:09 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id n11-20020a17090a2bcb00b001a1e7a0a6a6so2352619pje.0
+        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:44:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LUtnq1wX3c9ZSKlFVqBQ9milrt9oUJPe3W7pJqk8fis=;
-        b=Dt6Xe7RT9/rmETzyvm6KPZXudZiAHUA2T8XHt//MeIXHgfevOpKLZ+t5VvL4srw/Ba
-         IQEzzktExKHA9fZfICrEpqT1kmakmZoRxQFEv+4IFM6Fopm+2rwRHhgAhC0W8wWc83rS
-         oOh71WpSfXuHTo8oZnZGplwUy/o5P257gkK9AzYegblq//FMB6WsRJrP8apwa+7GnNP1
-         10vtC0aguxaaRjQXa4kABPrDsqWyZa1BUPPIFw/DIKZ/uDIv8Vgz1rr1hu4xisGj2gcr
-         7Y6f7k4EWgGMsoC0QmpSDGb6rzpmYI02gymq27osbsFKaiB0vsyY3jt2dt662L+3wHPu
-         k3jg==
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iD/YdYWU0CibrUrNT2AHjd524fNyniaHzDz+a4Nr73I=;
+        b=0P231w6Ya6SVWz0/xgd/baLTyoWwmKPsCCxX4cZneaql942u/6wi4RJfkEJ1WkQt7O
+         7ftFeAD+cVcpIQ/Ej4JqtqDJ4au0y94b0Hxj+jJ0eNOTPgq9MAU5rbz/2wtN9/QbqpXF
+         GYDkKo7pZPviDpMthPDr7IEkHYfCOF+ahRj9Hmhl8d81dVSf/klHN5vliDINeCl0rUX+
+         iVt/tBiAzg8cy4vcHMVVyGXJ91OIQHY3qWRFOR2JxNq3GoekC2TNVw9P8WE4XMYY8N5v
+         ISJGLd34fCPlWm56jbR2Skn8Cz3PpIoVlqslPi+nPI/Nrky1oAOB9Z+9rhbEu+OVC1+B
+         rAQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LUtnq1wX3c9ZSKlFVqBQ9milrt9oUJPe3W7pJqk8fis=;
-        b=ufEanUV60Srb9AuZS+o8IcSDIjBc3UbpqF94f85P9b4GM9k35lrRNiGcM5f976Bf0k
-         v6sZruYi+qPhkBwNso7Ybm24eM8QT3PeMjGT3JRlFi3zJ1g7molJGXLkq8uI8qLUEBcQ
-         wfCSgiATW/zJMs6LVWBlcdw4bar0eQa3HCYDd4qXP+uplP+93BRhE0U8+GEfElVQKsW/
-         smwFtbpIj5Sj2qjUY3vF9Q/UV43VaXcRdY2WCPuVIIQedSpHvbxJv4ftWPrxymEna3ks
-         7mTDBz4pp7GgNd4lN7Yq4Ft6OTkcvBa0LeyOpNbEcVCu+vfai69tPn9+nWG2N+WkDLni
-         s4Ig==
-X-Gm-Message-State: AOAM531NW68rE1AUy/M1paWPFM3ZA0Uq9bp7TxxlVe8YmjuXIdxhmq9H
-        18or+eOX/v0WtVY2M/cJEkD+Og==
-X-Google-Smtp-Source: ABdhPJx1jjUdC1bsdaA7We5wTASWQ/NVsI6ael3sh50HPmv4zQ9u/R/KB+jBRoiRr7junic+9/3XsQ==
-X-Received: by 2002:aca:ac0b:: with SMTP id v11mr10588962oie.155.1634916585185;
-        Fri, 22 Oct 2021 08:29:45 -0700 (PDT)
-Received: from [172.20.15.86] (rrcs-24-173-18-66.sw.biz.rr.com. [24.173.18.66])
-        by smtp.gmail.com with ESMTPSA id v22sm1491435oot.43.2021.10.22.08.29.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Oct 2021 08:29:44 -0700 (PDT)
-Subject: Re: [PATCH v2] fs: replace the ki_complete two integer arguments with
- a single argument
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-aio@kvack.org, linux-usb@vger.kernel.org
-References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
- <YXElk52IsvCchbOx@infradead.org> <YXFHgy85MpdHpHBE@infradead.org>
- <4d3c5a73-889c-2e2c-9bb2-9572acdd11b7@kernel.dk>
- <YXF8X3RgRfZpL3Cb@infradead.org>
- <b7b6e63e-8787-f24c-2028-e147b91c4576@kernel.dk>
- <x49ee8ev21s.fsf@segfault.boston.devel.redhat.com>
- <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
- <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
- <7a697483-8e44-6dc3-361e-ae7b62b82074@kernel.dk>
- <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com>
- <x49sfwut7i8.fsf@segfault.boston.devel.redhat.com>
- <d67c3d6f-56a2-4ace-7b57-cb9c594ad82c@kernel.dk>
-Message-ID: <67127b02-2b58-5944-8bfb-e842182d6459@kernel.dk>
-Date:   Fri, 22 Oct 2021 09:29:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iD/YdYWU0CibrUrNT2AHjd524fNyniaHzDz+a4Nr73I=;
+        b=aYmtBcD+8+muZ9LRLI/oOP+446uKgn23QqfcGsu7+AoPC56aYmAvAsXqkr5cMTTlSz
+         Hv0CVKupQIrUoD6cs6REkoY/l0O3yoiaAxYcOHZC5pV3pmptCARO1V8XHocsRikAS8f1
+         JkloCx1k80yB7M5+B62AWbIvxi2yLIRu+10KeCoDizR4JQzGIb/bRz3xmmH322AjkqpZ
+         Y4md28DoWLac/GSawkxoMawQoNgQqVXGglmMYEfuewf+mbletmifriOcZxm+rhVxBrQP
+         IGzAo3BSWeUrA2H8YDF5pum0qvh3GyMa51bhhpix7sHdMC4qqtaix743JiFavFaVKzM1
+         G4Iw==
+X-Gm-Message-State: AOAM530S3SsB0w7UzrLBGjxpinpVd5V0NfhSVN0UIEAG6qWuK1Y9TSRh
+        YmVE4+iKzmX11xhy2U6bJUurUrTAocXaBPlEXgWd5w==
+X-Google-Smtp-Source: ABdhPJwvGEiemHTU2PuYQrPBVLwNnk1G6dXjNp0/LHArCCIpY/aqRwNrqc0oa8rEc/+wcjTuGy7ilzYJj6grslSTWo8=
+X-Received: by 2002:a17:90a:a085:: with SMTP id r5mr15376908pjp.8.1634917448922;
+ Fri, 22 Oct 2021 08:44:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d67c3d6f-56a2-4ace-7b57-cb9c594ad82c@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20211019073641.2323410-1-hch@lst.de> <20211019073641.2323410-3-hch@lst.de>
+ <YXFtwcAC0WyxIWIC@angband.pl> <20211022055515.GA21767@lst.de>
+In-Reply-To: <20211022055515.GA21767@lst.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Fri, 22 Oct 2021 08:43:58 -0700
+Message-ID: <CAPcyv4joX3K36ovKn2K95iDtW77jJwoAgAs5JSRMcETff=-brg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] memremap: remove support for external pgmap refcounts
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Adam Borowski <kilobyte@angband.pl>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>,
+        Linux MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/22/21 8:19 AM, Jens Axboe wrote:
-> On 10/21/21 3:03 PM, Jeff Moyer wrote:
->> Jeff Moyer <jmoyer@redhat.com> writes:
->>
->>> Jens Axboe <axboe@kernel.dk> writes:
->>>
->>>> On 10/21/21 12:05 PM, Jeff Moyer wrote:
->>>>>
->>>>>>> I'll follow up if there are issues.
->>>>>
->>>>> s390 (big endian, 64 bit) is failing libaio test 21:
->>>>>
->>>>> # harness/cases/21.p
->>>>> Expected -EAGAIN, got 4294967285
->>>>>
->>>>> If I print out both res and res2 using %lx, you'll see what happened:
->>>>>
->>>>> Expected -EAGAIN, got fffffff5,ffffffff
->>>>>
->>>>> The sign extension is being split up.
->>>>
->>>> Funky, does it work if you apply this on top?
->>>>
->>>> diff --git a/fs/aio.c b/fs/aio.c
->>>> index 3674abc43788..c56437908339 100644
->>>> --- a/fs/aio.c
->>>> +++ b/fs/aio.c
->>>> @@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
->>>>  	 * 32-bits of value at most for either value, bundle these up and
->>>>  	 * pass them in one u64 value.
->>>>  	 */
->>>> -	iocb->ki_res.res = lower_32_bits(res);
->>>> -	iocb->ki_res.res2 = upper_32_bits(res);
->>>> +	iocb->ki_res.res = (long) (res & 0xffffffff);
->>>> +	iocb->ki_res.res2 = (long) (res >> 32);
->>>>  	iocb_put(iocb);
->>>>  }
->>>
->>> I think you'll also need to clamp any ki_complete() call sites to 32
->>> bits (cast to int, or what have you).  Otherwise that sign extension
->>> will spill over into res2.
->>>
->>> fwiw, I tested with this:
->>>
->>> 	iocb->ki_res.res = (long)(int)lower_32_bits(res);
->>> 	iocb->ki_res.res2 = (long)(int)upper_32_bits(res);
->>>
->>> Coupled with the call site changes, that made things work for me.
->>
->> This is all starting to feel like a minefield.  If you don't have any
->> concrete numbers to show that there is a speedup, I think we should
->> shelf this change.
-> 
-> It's really not a minefield at all, we just need a proper help to encode
-> the value. I'm out until Tuesday, but I'll sort it out when I get back.
-> Can also provide some numbers on this.
+On Thu, Oct 21, 2021 at 10:55 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Thu, Oct 21, 2021 at 03:40:17PM +0200, Adam Borowski wrote:
+> > This breaks at least drivers/pci/p2pdma.c:222
+>
+> Indeed.  I've updated this patch, but the fix we need to urgently
+> get into 5.15-rc is the first one only anyway.
+>
+> nvdimm maintainers, can you please act on it ASAP?
 
-I think this incremental should fix it, also providing a helper to
-properly pack these. The more I look at the gadget stuff the more I also
-get the feeling that it really is wonky and nobody uses res2, which
-would be a nice cleanup to continue. But I think it should be separate.
-
-
-diff --git a/drivers/usb/gadget/function/f_fs.c b/drivers/usb/gadget/function/f_fs.c
-index 8536f19d3c9a..9c5372229714 100644
---- a/drivers/usb/gadget/function/f_fs.c
-+++ b/drivers/usb/gadget/function/f_fs.c
-@@ -831,7 +831,7 @@ static void ffs_user_copy_worker(struct work_struct *work)
- 		kthread_unuse_mm(io_data->mm);
- 	}
- 
--	io_data->kiocb->ki_complete(io_data->kiocb, ((u64) ret << 32) | ret);
-+	io_data->kiocb->ki_complete(io_data->kiocb, aio_res_pack(ret, ret));
- 
- 	if (io_data->ffs->ffs_eventfd && !kiocb_has_eventfd)
- 		eventfd_signal(io_data->ffs->ffs_eventfd, 1);
-diff --git a/drivers/usb/gadget/legacy/inode.c b/drivers/usb/gadget/legacy/inode.c
-index d3deb23eb2ab..15dff219b483 100644
---- a/drivers/usb/gadget/legacy/inode.c
-+++ b/drivers/usb/gadget/legacy/inode.c
-@@ -469,7 +469,7 @@ static void ep_user_copy_worker(struct work_struct *work)
- 		ret = -EFAULT;
- 
- 	/* completing the iocb can drop the ctx and mm, don't touch mm after */
--	iocb->ki_complete(iocb, ((u64) ret << 32) | ret);
-+	iocb->ki_complete(iocb, aio_res_pack(ret, ret));
- 
- 	kfree(priv->buf);
- 	kfree(priv->to_free);
-@@ -499,8 +499,10 @@ static void ep_aio_complete(struct usb_ep *ep, struct usb_request *req)
- 		kfree(priv);
- 		iocb->private = NULL;
- 		/* aio_complete() reports bytes-transferred _and_ faults */
--		aio_ret = req->actual ? req->actual : (long)req->status;
--		aio_ret |= (u64) req->status << 32;
-+		if (req->actual)
-+			aio_ret = aio_res_pack(req->actual, req->status);
-+		else
-+			aio_ret = aio_res_pack(req->status, req->status);
- 		iocb->ki_complete(iocb, aio_ret);
- 	} else {
- 		/* ep_copy_to_user() won't report both; we hide some faults */
-diff --git a/fs/aio.c b/fs/aio.c
-index 3674abc43788..cd43a26b2aa2 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
- 	 * 32-bits of value at most for either value, bundle these up and
- 	 * pass them in one u64 value.
- 	 */
--	iocb->ki_res.res = lower_32_bits(res);
--	iocb->ki_res.res2 = upper_32_bits(res);
-+	iocb->ki_res.res = (long) lower_32_bits(res);
-+	iocb->ki_res.res2 = (long) upper_32_bits(res);
- 	iocb_put(iocb);
- }
- 
-diff --git a/include/linux/aio.h b/include/linux/aio.h
-index b83e68dd006f..50a6c7da27ec 100644
---- a/include/linux/aio.h
-+++ b/include/linux/aio.h
-@@ -24,4 +24,18 @@ static inline void kiocb_set_cancel_fn(struct kiocb *req,
- extern unsigned long aio_nr;
- extern unsigned long aio_max_nr;
- 
-+/*
-+ * Take some care packing two 32-bit quantities into a 64-bit, so we don't
-+ * get sign extensions ruining the result. aio uses long, but it's really
-+ * just 32-bit values.
-+ */
-+static inline u64 aio_res_pack(long res, long res2)
-+{
-+	u64 ret;
-+
-+	ret = (u64) res2 << 32;
-+	ret |= (u32) res;
-+	return ret;
-+}
-+
- #endif /* __LINUX__AIO_H */
-
--- 
-Jens Axboe
-
+Yes, I have been pulled in many directions this past week, but I do
+plan to get this queued for v5.15-rc7.
