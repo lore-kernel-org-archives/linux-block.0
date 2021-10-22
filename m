@@ -2,184 +2,400 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F30B0C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 03:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DE2C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 05:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D279A61882
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 03:13:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E89F60F57
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 05:29:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232839AbhJVDP2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 23:15:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44146 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232835AbhJVDP2 (ORCPT
+        id S229484AbhJVFcD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Oct 2021 01:32:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50086 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229478AbhJVFcC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 23:15:28 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C459C061764
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 20:13:11 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id y12so519014eda.4
-        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 20:13:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mariadb.org; s=google;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=NWPB4CAXhxVJwiGIVfHAuBvSiaK2u2qvRHeXXrzdNYc=;
-        b=SttAMN+Cjw38JQJlp6ZpUWvnKq5odokJfF+XhWq52MQcAjczUgcNhbJ7M4MtvIdzks
-         fvCtsshEFw2pC+owTs7JRjV/ZxXG7AUjSTPK9GMLEACcXsEKwaAMNkH0RNgbgxXUzcMw
-         G35LTZa4FmCrFJAnSIdDEvJRb9zBUfPvRd4xPbMHicuMrQXIu3+VK4QfUkb1k1xbwh4M
-         ABlZJsRWogW/kSCluhh4SlbWe64Zovr6N+32amG1Hihav9pTQ++uwvVwO2gchuevOsIo
-         9lFXdumKataUvuYYxO1ec4whfyaFGI/iM2hgPNNfolku3FG9YtHpVZhuDrZzFklh9mXB
-         naUA==
+        Fri, 22 Oct 2021 01:32:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634880584;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BIJIn5w8h0IlAUxVZkK6c+MC4SyTGyHAvh7qA5Ti3ho=;
+        b=Ss6UiGdz8F73WfUaOX5zQfYE49UjWe83Jxzi8LVSwCGxjC3h2khXAykYsVYlHJc7Qd0ZUf
+        52sXicXb+xbEk0MOxKed4HNGlQiHX6fJ13Ly9Y350UUsIptlc5qSIa3q/6dE8e1WBJd1Jd
+        CSKMPB78zGt4GnvsbztvzBFFkJAZyxc=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-dp7xWtTQPauZNOC4Kn5uLQ-1; Fri, 22 Oct 2021 01:29:43 -0400
+X-MC-Unique: dp7xWtTQPauZNOC4Kn5uLQ-1
+Received: by mail-il1-f200.google.com with SMTP id h28-20020a056e021d9c00b00259bda44072so1849247ila.9
+        for <linux-block@vger.kernel.org>; Thu, 21 Oct 2021 22:29:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=NWPB4CAXhxVJwiGIVfHAuBvSiaK2u2qvRHeXXrzdNYc=;
-        b=THothE6gjrVZNATiGjd4muS5VFQkFYkVw0dHah1ch1bpC2R3pYpeJsawrszY2gd01g
-         7vynefNHhjQ5T5VMMgtnwBoUy1QHzoB+RRg+nlyWPVBYWLrD/ux80dlfYpfwK8aNkN9Y
-         CwDZ2qzSxPxU0fdt6b9RvYLy9wRv0zDQnMxpZlE+YhBFc0Jq4yFfAm9sEtFeUwDbsPv0
-         SnODs2I5gZvnjeaoZgYS69FVhRmLuY3ID2namkyzaPJneZ+B4gGBYL/5LF6T4XzZiRIH
-         OunzLza8LL7Of8ObBkWqrd9gbmVlEVWxVL+DJ2J1X64u0CEbg7AGeHDZuamXT8fEwUQT
-         WZKA==
-X-Gm-Message-State: AOAM532lMbh7ezpBm2rSQe9Gvpt0U1NWt5h+RlBaP+KhmMkzhfKMKg30
-        yNsH9cZjiC9BkoDqygcYlY9ZK42yA9NzGjmmWf03WboONeyjQA==
-X-Google-Smtp-Source: ABdhPJyMltF15+W7n89Z0hAXtK2/y2/b8oPAftKKPvPqrI8Tp0kpPCzZ2Mt0hnNnm8qmbPWK12jE1WCFO/gpb37pjDg=
-X-Received: by 2002:a17:907:7691:: with SMTP id jv17mr11468886ejc.378.1634872389480;
- Thu, 21 Oct 2021 20:13:09 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BIJIn5w8h0IlAUxVZkK6c+MC4SyTGyHAvh7qA5Ti3ho=;
+        b=6HpNZiRgvY3U+1v0+2Ep4a9mJ/6DV/W3At2nAqbaRCAHPYzUBGNE5YKhjgFGZNVz0u
+         bpem1BaTEW41aJrLXruyNDVSoN1kRVdjghYsjMsJaQOeLWkgviAWmJj6uvLVEhzQi6W+
+         ZvUrBq2HpjD0KiAG+7cY8O1Snq9+Mw5GtWL1cDVwgsnVgNwXjpdTiW7/QgtX/sT5b3Pv
+         VXO8ZHY+BUkLz9otDrjY09E2WdbANEjtopr2WROdj4kt6uE17NASp8m7PDvBr83EmNGT
+         9Na4w3lPEnrTNA3lP9FazrkPKPzdOlI8atWG8OijK0+lVMLwHOXx33MgZFDkDV0ylHIM
+         9bww==
+X-Gm-Message-State: AOAM531QQUMIVkzI3NlApuLZSMwtOZjvW2JG8cc67m1psATYs6jzmuua
+        +YDUzeGblTdG52BvQnyuezKqdPjfNseBNe+JHeTGccE8DDYQro9CfBoIXwdiYHc22tauXDYoHHR
+        OScwmQq7d4JdKMAVdHaSixQM+Aeu/P/Gah9TOE3M=
+X-Received: by 2002:a05:6e02:1a69:: with SMTP id w9mr6517723ilv.235.1634880581989;
+        Thu, 21 Oct 2021 22:29:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzURi8R0BeW4TNPJWSg+dxYdI5LXn+d7jGIsNXSPoNIjdGAC1mq+KWKqIWm9tPYWy3NA9Y5bmJDUeOUXwBHaqw=
+X-Received: by 2002:a05:6e02:1a69:: with SMTP id w9mr6517710ilv.235.1634880581649;
+ Thu, 21 Oct 2021 22:29:41 -0700 (PDT)
 MIME-Version: 1.0
-From:   Daniel Black <daniel@mariadb.org>
-Date:   Fri, 22 Oct 2021 14:12:58 +1100
-Message-ID: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
-Subject: uring regression - lost write request
-To:     linux-block@vger.kernel.org
+References: <CAHj4cs9w7_thDw-DN11GaoA+HH9YVAMHmrAZhi_rA24xhbTYOA@mail.gmail.com>
+In-Reply-To: <CAHj4cs9w7_thDw-DN11GaoA+HH9YVAMHmrAZhi_rA24xhbTYOA@mail.gmail.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Fri, 22 Oct 2021 13:29:30 +0800
+Message-ID: <CAHj4cs_CM7NzJtNmnD0CiPVOmr0jVEktNyD8d=UMZ0xEUArzow@mail.gmail.com>
+Subject: Re: [bug report] WARNING: CPU: 109 PID: 739473 at block/blk-stat.c:218
+ blk_free_queue_stats+0x3c/0x80
+To:     linux-block <linux-block@vger.kernel.org>
+Cc:     Bruno Goncalves <bgoncalv@redhat.com>,
+        skt-results-master@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sometime after 5.11 and is fixed in 5.15-rcX (rc6 extensively tested
-over last few days) is a kernel regression we are tracing in
-https://jira.mariadb.org/browse/MDEV-26674 and
-https://jira.mariadb.org/browse/MDEV-26555
-5.10 and early across many distros and hardware appear not to have a problem.
+Hi
+This issue is still can be reproduced with the latest linux-block/for-next
 
-I'd appreciate some help identifying a 5.14 linux stable patch
-suitable as I observe the fault in mainline 5.14.14 (built
-https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.14.14/). This is of
-interest to both Debian (sid)
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=996951 , Ubuntu
-(Impish) and Fedora fc33-35 (TODO bug report)..
+    Kernel repo:
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+            Commit: 8131e5e445ac - Merge branch 'for-5.16/block' into for-next
 
-Marko in https://jira.mariadb.org/browse/MDEV-26555?focusedCommentId=198601&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-198601
-traced this down to a io_uring_wait_cqe never returning after a
-request was pushed.
+On Tue, Oct 19, 2021 at 12:13 PM Yi Zhang <yi.zhang@redhat.com> wrote:
+>
+> Hello
+> Below WARNING was triggered with blktests block/001 on ppc64le/aarch64
+> during CKI tests, pls help check it, thanks.
+>
+>   Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+>             Commit: b199567fe754 - Merge branch 'for-5.16/bdev-size'
+> into for-next
+>
+>
+> [ 2260.897475] run blktests block/001 at 2021-10-18 18:33:34
+> [ 2260.930028] alternatives: patching kernel code
+> [ 2260.938145] scsi_debug:sdebug_driver_probe: scsi_debug: trim
+> poll_queues to 0. poll_q/nr_hw = (0/1)
+> [ 2260.947251] scsi host7: scsi_debug: version 0190 [20200710]
+> [ 2260.947251]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+> [ 2260.959707] scsi_debug:sdebug_driver_probe: scsi_debug: trim
+> poll_queues to 0. poll_q/nr_hw = (0/1)
+> [ 2260.959828] scsi 7:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2260.968770] scsi host8: scsi_debug: version 0190 [20200710]
+> [ 2260.968770]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+> [ 2260.977217] sd 7:0:0:0: Power-on or device reset occurred
+> [ 2260.977525] sd 7:0:0:0: Attached scsi generic sg14 type 0
+> [ 2260.989380] scsi_debug:sdebug_driver_probe: scsi_debug: trim
+> poll_queues to 0. poll_q/nr_hw = (0/1)
+> [ 2260.989440] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2260.989683] sd 8:0:0:0: Attached scsi generic sg15 type 0
+> [ 2260.989738] sd 8:0:0:0: Power-on or device reset occurred
+> [ 2261.009878] sd 8:0:0:0: [sdl] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2261.014263] sd 7:0:0:0: [sdk] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2261.016650] scsi host9: scsi_debug: version 0190 [20200710]
+> [ 2261.016650]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+> [ 2261.017094] scsi_debug:sdebug_driver_probe: scsi_debug: trim
+> poll_queues to 0. poll_q/nr_hw = (0/1)
+> [ 2261.017109] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2261.017407] sd 9:0:0:0: Attached scsi generic sg16 type 0
+> [ 2261.017413] sd 9:0:0:0: Power-on or device reset occurred
+> [ 2261.024287] sd 7:0:0:0: [sdk] Write Protect is off
+> [ 2261.027452] scsi host10: scsi_debug: version 0190 [20200710]
+> [ 2261.027452]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+> [ 2261.032073] sd 8:0:0:0: [sdl] Write Protect is off
+> [ 2261.037519] sd 9:0:0:0: [sdm] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2261.042678] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
+>    0190 PQ: 0 ANSI: 7
+> [ 2261.052111] sd 8:0:0:0: [sdl] Write cache: enabled, read cache:
+> enabled, supports DPO and FUA
+> [ 2261.054769] sd 7:0:0:0: [sdk] Write cache: enabled, read cache:
+> enabled, supports DPO and FUA
+> [ 2261.063333] sd 10:0:0:0: Power-on or device reset occurred
+> [ 2261.063340] sd 10:0:0:0: Attached scsi generic sg17 type 0
+> [ 2261.064024] sd 9:0:0:0: [sdm] Write Protect is off
+> [ 2261.082156] sd 8:0:0:0: [sdl] Optimal transfer size 524288 bytes
+> [ 2261.084058] sd 9:0:0:0: [sdm] Write cache: enabled, read cache:
+> enabled, supports DPO and FUA
+> [ 2261.101158] sd 7:0:0:0: [sdk] Optimal transfer size 524288 bytes
+> [ 2261.106817] sd 10:0:0:0: [sdn] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2261.114100] sd 9:0:0:0: [sdm] Optimal transfer size 524288 bytes
+> [ 2261.128948] sd 10:0:0:0: [sdn] Write Protect is off
+> [  2261.210521] sts DPO and FUA
+> [  2261.249185] s[ 2261.632507] sd 8:0:0:0: [sdl] Attached SCSI disk
+> [ 2261.672478] sd 7:0:0:0: [sdk] Attached SCSI disk
+> [ 2261.672489] sd 9:0:0:0: [sdm] Attached SCSI disk
+> [ 2261.802507] sd 10:0:0:0: [sdn] Attached SCSI disk
+> [ 2262.173663] sd 9:0:0:0: [sdm] Synchronizing SCSI cache
+> [ 2262.173676] sd 8:0:0:0: [sdl] Synchronizing SCSI cache
+> [ 2262.185405] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2262.190384] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2262.193772] sd 9:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.193848] sd 9:0:0:0: Power-on or device reset occurred
+> [ 2262.201866] sd 8:0:0:0: Power-on or device reset occurred
+> [ 2262.207047] sd 8:0:0:0: Attached scsi generic sg15 type 0
+> [ 2262.213925] sd 9:0:0:0: [sdl] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2262.218506] sd 7:0:0:0: [sdk] Synchronizing SCSI cache
+> [ 2262.223159] sd 9:0:0:0: [sdl] Write Protect is off
+> [ 2262.223184] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.223189] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.223200] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.223203] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.223213] sd 8:0:0:0: [sdm] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.223216] sd 8:0:0:0: [sdm] 0-byte physical blocks
+> [ 2262.223224] sd 8:0:0:0: [sdm] Write Protect is on
+> [ 2262.223233] sd 8:0:0:0: [sdm] Asking for cache data failed
+> [ 2262.223235] sd 8:0:0:0: [sdm] Assuming drive cache: write through
+> [ 2262.231018] sd 10:0:0:0: [sdn] Synchronizing SCSI cache
+> [ 2262.235604] sd 9:0:0:0: [sdl] Asking for cache data failed
+> [ 2262.236777] scsi 7:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2262.237063] sd 7:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.237115] sd 7:0:0:0: Power-on or device reset occurred
+> [ 2262.246789] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
+>    0190 PQ: 0 ANSI: 7
+> [ 2262.247170] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.247174] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2262.247185] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.247188] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2262.247198] sd 7:0:0:0: [sdk] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.247201] sd 7:0:0:0: [sdk] 0-byte physical blocks
+> [ 2262.247207] sd 7:0:0:0: [sdk] Write Protect is on
+> [ 2262.247216] sd 7:0:0:0: [sdk] Asking for cache data failed
+> [ 2262.247218] sd 7:0:0:0: [sdk] Assuming drive cache: write through
+> [ 2262.249761] sd 9:0:0:0: [sdl] Assuming drive cache: write through
+> [ 2262.254794] sd 10:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.254819] sd 10:0:0:0: Power-on or device reset occurred
+> [ 2262.274922] sd 10:0:0:0: [sdn] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2262.295902] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.296079] sd 10:0:0:0: [sdn] Write Protect is off
+> [ 2262.301282] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.306770] sd 10:0:0:0: [sdn] Asking for cache data failed
+> [ 2262.438436] sd 10:0:0:0: [sdn] Assuming drive cache: write through
+> [ 2262.444621] sd 10:0:0:0: [sdn] Optimal transfer size 524288 bytes
+> [ 2262.475561] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.484960] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2262.485574] sd 9:0:0:0: [sdl] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.495670] sd 10:0:0:0: [sdn] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.499129] sd 9:0:0:0: [sdl] Sense not available.
+> [ 2262.508592] sd 10:0:0:0: [sdn] Sense not available.
+> [ 2262.552707] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.562089] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.566909] sd 8:0:0:0: [sdm] Write Protect is off
+> [ 2262.571702] sd 8:0:0:0: [sdm] Attached SCSI disk
+> [ 2262.592701] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.602082] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2262.606897] sd 7:0:0:0: [sdk] Write Protect is off
+> [ 2262.611691] sd 7:0:0:0: [sdk] Attached SCSI disk
+> [ 2262.632824] sd 9:0:0:0: [sdl] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.632826] sd 10:0:0:0: [sdn] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.639249] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2262.639510] sd 8:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.639536] sd 8:0:0:0: Power-on or device reset occurred
+> [ 2262.642208] sd 9:0:0:0: [sdl] Sense not available.
+> [ 2262.649586] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.649590] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.649600] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.649603] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.649613] sd 8:0:0:0: [sdm] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.649615] sd 8:0:0:0: [sdm] 0-byte physical blocks
+> [ 2262.649621] sd 8:0:0:0: [sdm] Write Protect is off
+> [ 2262.649629] sd 8:0:0:0: [sdm] Asking for cache data failed
+> [ 2262.649631] sd 8:0:0:0: [sdm] Assuming drive cache: write through
+> [ 2262.651678] sd 10:0:0:0: [sdn] Sense not available.
+> [ 2262.651691] sd 10:0:0:0: [sdn] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.659778] sd 9:0:0:0: [sdl] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.665171] sdn: detected capacity change from 16384 to 0
+> [ 2262.670559] sdl: detected capacity change from 16384 to 0
+> [ 2262.675330] sd 10:0:0:0: [sdn] Attached SCSI disk
+> [ 2262.684711] sd 9:0:0:0: [sdl] Attached SCSI disk
+> [ 2262.788917] scsi 7:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2262.797259] sd 7:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.797288] sd 7:0:0:0: Power-on or device reset occurred
+> [ 2262.808090] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.817481] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2262.822271] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.831669] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2262.835596] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.836469] sd 7:0:0:0: [sdk] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.845838] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2262.852000] sd 7:0:0:0: [sdk] 0-byte physical blocks
+> [ 2262.861765] sd 7:0:0:0: [sdk] Write Protect is off
+> [ 2262.863794] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2262.868565] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
+>    0190 PQ: 0 ANSI: 7
+> [ 2262.868825] sd 10:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.868862] sd 10:0:0:0: Power-on or device reset occurred
+> [ 2262.874892] sd 9:0:0:0: Attached scsi generic sg14 type 0
+> [ 2262.874920] sd 9:0:0:0: Power-on or device reset occurred
+> [ 2262.878916] sd 10:0:0:0: [sdl] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.878920] sd 10:0:0:0: [sdl] Sense not available.
+> [ 2262.878931] sd 10:0:0:0: [sdl] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2262.878934] sd 10:0:0:0: [sdl] Sense not available.
+> [ 2262.878944] sd 10:0:0:0: [sdl] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2262.878946] sd 10:0:0:0: [sdl] 0-byte physical blocks
+> [ 2262.878952] sd 10:0:0:0: [sdl] Write Protect is off
+> [ 2262.878960] sd 10:0:0:0: [sdl] Asking for cache data failed
+> [ 2262.878962] sd 10:0:0:0: [sdl] Assuming drive cache: write through
+> [ 2262.882813] sd 7:0:0:0: [sdk] Asking for cache data failed
+> [ 2262.894986] sd 9:0:0:0: [sdn] 16384 512-byte logical blocks: (8.39
+> MB/8.00 MiB)
+> [ 2262.899142] sd 7:0:0:0: [sdk] Assuming drive cache: write through
+> [ 2262.904537] sd 9:0:0:0: [sdn] Write Protect is off
+> [ 2262.984722] sd 9:0:0:0: [sdn] Asking for cache data failed
+> [ 2262.990195] sd 9:0:0:0: [sdn] Assuming drive cache: write through
+> [ 2263.015502] sd 10:0:0:0: [sdl] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.024985] sd 10:0:0:0: [sdl] Sense not available.
+> [ 2263.052711] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.055557] sd 9:0:0:0: [sdn] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.062092] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2263.066282] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.066288] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2263.066304] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.066308] sd 7:0:0:0: [sdk] Sense not available.
+> [ 2263.066338] sd 7:0:0:0: [sdk] Attached SCSI disk
+> [ 2263.071479] sd 9:0:0:0: [sdn] Sense not available.
+> [ 2263.114031] sd 8:0:0:0: [sdm] Attached SCSI disk
+> [ 2263.178933] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
+>   0190 PQ: 0 ANSI: 7
+> [ 2263.187276] sd 8:0:0:0: Attached scsi generic sg14 type 0
+> [ 2263.187370] sd 8:0:0:0: Power-on or device reset occurred
+> [ 2263.198126] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.207522] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2263.212312] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.212722] sd 10:0:0:0: [sdl] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.221703] sd 8:0:0:0: [sdm] Sense not available.
+> [ 2263.231165] sd 10:0:0:0: [sdl] Sense not available.
+> [ 2263.235953] sd 8:0:0:0: [sdm] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2263.240837] sd 10:0:0:0: [sdl] Attached SCSI disk
+> [ 2263.246992] sd 8:0:0:0: [sdm] 0-byte physical blocks
+> [ 2263.256637] sd 8:0:0:0: [sdm] Write Protect is off
+> [ 2263.261422] sd 8:0:0:0: [sdm] Asking for cache data failed
+> [ 2263.266903] sd 8:0:0:0: [sdm] Assuming drive cache: write through
+> [ 2263.293351] sd 9:0:0:0: [sdn] Read Capacity(10) failed: Result:
+> hostbyte=DID_ERROR driverbyte=DRIVER_OK
+> [ 2263.298586] ------------[ cut here ]------------
+> [ 2263.302739] sd 9:0:0:0: [sdn] Sense not available.
+> [ 2263.307335] WARNING: CPU: 109 PID: 739473 at block/blk-stat.c:218
+> blk_free_queue_stats+0x3c/0x80
+> [ 2263.312121] sd 9:0:0:0: [sdn] 0 512-byte logical blocks: (0 B/0 B)
+> [ 2263.320880] Modules linked in: scsi_debug dm_log_writes rfkill
+> mlx5_ib ib_uverbs ib_core sunrpc mlx5_core mlxfw psample acpi_ipmi
+> i2c_smbus tls joydev ipmi_ssif ipmi_devintf ipmi_msghandler vfat fat
+> thunderx2_pmu fuse
+> [ 2263.327074] sdn: detected capacity change from 16384 to 0
+> [ 2263.327076]  zram ip_tables
+> [ 2263.346360] sd 9:0:0:0: [sdn] Attached SCSI disk
+> [ 2263.351733]  xfs crct10dif_ce ast ghash_ce i2c_algo_bit
+> drm_vram_helper drm_kms_helper syscopyarea sysfillrect sysimgblt
+> fb_sys_fops cec drm_ttm_helper ttm drm gpio_xlp i2c_xlp9xx uas
+> usb_storage aes_neon_bs
+> [ 2263.377547] CPU: 109 PID: 739473 Comm: check Not tainted 5.15.0-rc6 #1
+> [ 2263.384064] Hardware name: HPE Apollo 70             /C01_APACHE_MB
+>         , BIOS L50_5.13_1.11 06/18/2019
+> [ 2263.393790] pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [ 2263.400741] pc : blk_free_queue_stats+0x3c/0x80
+> [ 2263.405259] lr : blk_release_queue+0x48/0x140
+> [ 2263.409604] sp : ffff80002c3c3aa0
+> [ 2263.412906] x29: ffff80002c3c3aa0 x28: ffff00089e500000 x27: 0000000000000000
+> [ 2263.420031] x26: ffff000815f5d428 x25: dead000000000100 x24: dead000000000122
+> [ 2263.427156] x23: ffff000815f56150 x22: 0000000000000000 x21: ffff0008a85a0860
+> [ 2263.434280] x20: ffff8000120351a8 x19: ffff0008a85a07e0 x18: ffffffffffffffff
+> [ 2263.441404] x17: 303a377465677261 x16: 742f3774736f682f x15: 0000000000000000
+> [ 2263.448528] x14: 0000000000000001 x13: 0000000000000040 x12: 0000000000000040
+> [ 2263.455652] x11: ffff000800400b68 x10: ffff000800400b6a x9 : ffff80001077604c
+> [ 2263.462776] x8 : ffff000800405ff8 x7 : 0000000000000000 x6 : ffff000800406160
+> [ 2263.469900] x5 : 0000000000000000 x4 : 0000000000000003 x3 : 0000000000000000
+> [ 2263.477024] x2 : 0000000000002710 x1 : ffff00088ab81b80 x0 : ffff0008a21cfa80
+> [ 2263.484149] Call trace:
+> [ 2263.486584]  blk_free_queue_stats+0x3c/0x80
+> [ 2263.490755]  blk_release_queue+0x48/0x140
+> [ 2263.494752]  kobject_cleanup+0x4c/0x180
+> [ 2263.498578]  kobject_put+0x50/0xd0
+> [ 2263.501968]  blk_put_queue+0x20/0x30
+> [ 2263.505535]  scsi_device_dev_release_usercontext+0x160/0x244
+> [ 2263.511188]  execute_in_process_context+0x50/0xa0
+> [ 2263.515883]  scsi_device_dev_release+0x28/0x3c
+> [ 2263.520316]  device_release+0x40/0xa0
+> [ 2263.523968]  kobject_cleanup+0x4c/0x180
+> [ 2263.527792]  kobject_put+0x50/0xd0
+> [ 2263.531182]  put_device+0x20/0x30
+> [ 2263.534485]  scsi_device_put+0x38/0x50
+> [ 2263.538224]  sdev_store_delete+0x90/0xf0
+> [ 2263.542136]  dev_attr_store+0x24/0x40
+> [ 2263.545786]  sysfs_kf_write+0x50/0x60
+> [ 2263.549436]  kernfs_fop_write_iter+0x134/0x1c4
+> [ 2263.553869]  new_sync_write+0xdc/0x15c
+> [ 2263.557609]  vfs_write+0x230/0x2d0
+> [ 2263.560998]  ksys_write+0x64/0xec
+> [ 2263.564301]  __arm64_sys_write+0x28/0x34
+> [ 2263.568212]  invoke_syscall+0x50/0x120
+> [ 2263.571953]  el0_svc_common.constprop.0+0x4c/0x100
+> [ 2263.576732]  do_el0_svc+0x34/0xa0
+> [ 2263.580035]  el0_svc+0x30/0xd0
+> [ 2263.583081]  el0t_64_sync_handler+0xa4/0x130
+> [ 2263.587340]  el0t_64_sync+0x1a4/0x1a8
+> [ 2263.590991] ---[ end trace 1631cb4f2dc87b68 ]---
+>
+>
+> --
+> Best Regards,
+>   Yi Zhang
 
-The observed behavior uses a mariadb-test package for 10.6
 
-dan@impish:~$ uname -a
-Linux impish 5.14.14-051414-generic #202110201037 SMP Wed Oct 20
-11:04:11 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
 
-dan@impish:~$ cd /usr/share/mysql/mysql-test/
+-- 
+Best Regards,
+  Yi Zhang
 
-dan@impish:/usr/share/mysql/mysql-test$ ./mtr --vardir=/tmp/var
---parallel=4 stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb    stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb  stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb
-Logging: ./mtr  --vardir=/tmp/var --parallel=4 stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-stress.ddl_innodb stress.ddl_innodb stress.ddl_innodb
-vardir: /tmp/var
-Removing old var directory...
-Creating var directory '/tmp/var'...
-Checking supported features...
-MariaDB Version 10.6.5-MariaDB-1:10.6.5+maria~impish
- - SSL connections supported
- - binaries built with wsrep patch
-Collecting tests...
-Installing system database...
-
-==============================================================================
-
-TEST                                  WORKER RESULT   TIME (ms) or COMMENT
---------------------------------------------------------------------------
-
-worker[1] Using MTR_BUILD_THREAD 300, with reserved ports 16000..16019
-worker[4] Using MTR_BUILD_THREAD 301, with reserved ports 16020..16039
-worker[3] Using MTR_BUILD_THREAD 302, with reserved ports 16040..16059
-worker[2] Using MTR_BUILD_THREAD 303, with reserved ports 16060..16079
-stress.ddl_innodb 'innodb'               w3 [ pass ]  185605
-stress.ddl_innodb 'innodb'               w4 [ pass ]  186292
-stress.ddl_innodb 'innodb'               w2 [ pass ]  193053
-stress.ddl_innodb 'innodb'               w1 [ pass ]  202529
-stress.ddl_innodb 'innodb'               w4 [ pass ]  213972
-stress.ddl_innodb 'innodb'               w3 [ pass ]  214661
-stress.ddl_innodb 'innodb'               w1 [ pass ]  213266
-stress.ddl_innodb 'innodb'               w4 [ pass ]  181716
-stress.ddl_innodb 'innodb'               w3 [ pass ]  194047
-stress.ddl_innodb 'innodb'               w1 [ pass ]  208319
-stress.ddl_innodb 'innodb'               w2 [ fail ]
-        Test ended at 2021-10-22 01:24:22
-
-----------SERVER LOG START-----------
-2021-10-22  1:24:20 0 [ERROR] [FATAL] InnoDB:
-innodb_fatal_semaphore_wait_threshold was exceeded for dict_sys.latch.
-Please refer to
-https://mariadb.com/kb/en/how-to-produce-a-full-stack-trace-for-mysqld/
-
-This threshold is 10 minutes so its not like the hardware is that slow.
-
-To my frustration, the hirsuite based container (below) created as a
-test framework for you has never produced a fault even though running
-on the same 5.14.14-200.fc34.x86_64 kernel that would fail after 2-3
-stress.ddl_innodb tests.
-
-$ podman run   --rm --privileged=true
-quay.io/danielgblack/mariadb-test:uring    --vardir=/var/tmp
-stress.ddl_innodb{,,,,,,,,,,,,,}
-...
---------------------------------------------------------------------------
-The servers were restarted 0 times
-Spent 2908.065 of 822 seconds executing testcases
-
-Completed: All 18 tests were successful.
-
-Looking at server test logs in /var/tmp/[0-9]/*/*err* the mariadbd
-process are using uring.
-
-I hope provides a hint.
-
-In the mean time, the complete reproduce is to pull a 10.6 disto
-package from https://mariadb.org/download/?tab=repo-config
-It has to be a distro that provides liburing like:
-Debian sid
-Ubuntu - groovy+
-Rhel8
-Fedora
-
-(centos/rhel are doing the incorrect baseurl currently, replace the
-last fragement of the path, with [rhel|centos][7|8]-$arch )
-Install repo.
-Install Package mariadb-test (pull in MariaDB server as dependency).
-ldd /usr/{s}bin/mariadbd to check liburing is there.
-
-cd /usr/share/mysql/mysql-test
-./mtr --vardir=/tmp/var   --parallel=4 encryption.innochecksum{,,,,,}
-./mtr --vardir=/tmp/var   --parallel=4 stress.ddl_innodb{,,,,,}
-
-Should generate a backtrace like above.
-
-As an mtr argument with gdb and xterm installed the following will
-breakpoint the application at this state.
- --gdb='b ib::fatal::~fatal;r'
-
-I'm happy to build from a tree like
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=io_uring-5.15
-if you'd like to to test something locally.
-
-I can also run bpftrace scripts to pull out info if required.
