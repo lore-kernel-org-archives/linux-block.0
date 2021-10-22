@@ -2,118 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F8DC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 23:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1BEC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 00:05:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CF1F61362
-	for <linux-block@archiver.kernel.org>; Thu, 21 Oct 2021 23:50:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 818CE6101D
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 00:05:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230500AbhJUXxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Oct 2021 19:53:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55460 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbhJUXxO (ORCPT
+        id S229512AbhJVAID (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Oct 2021 20:08:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47342 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231758AbhJVAIC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Oct 2021 19:53:14 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9976BC061764;
-        Thu, 21 Oct 2021 16:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=DtBjhtMrujyY2DKwNIYQXsIF5iJYJCec4RHft5e6GAw=; b=g7ZanBeX/DNUkfStQQNwEl9ya4
-        ejv6LtO3pz1TBhGUkVMTkJ/3BcgzyM3L/Om5cIF/+2l3Y+z/uL0G/9dMlkGBg1QFQMytl+Ou0Hjsy
-        V17k2IHsA9plSG/fxYrCbsncIlg0nWuAHsk2u79rUGdbr/KLIlhIbSgeyyixDg+4N3MVfZ7KsSf6f
-        JZQaCpQtHl/PspXQEaYLvWZITLJcGe1YJlT3sPVEiEWc07Zl0w8f+tyCa0vPRLlMkRhOKjRigKQmj
-        swUMr2IuJ4rklPhrOKHEdR6YYtS+si31je8COsPE5M1gaMUSW/mgRkp/fVVhLVjju0IrSOojTeYfr
-        OL33xSDA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mdhpn-009KDd-Tv; Thu, 21 Oct 2021 23:50:55 +0000
-Date:   Thu, 21 Oct 2021 16:50:55 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Minchan Kim <minchan@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 2/4] zram: don't fail to remove zram during unloading
- module
-Message-ID: <YXH836VvSpnBnvuK@bombadil.infradead.org>
-References: <20211020015548.2374568-1-ming.lei@redhat.com>
- <20211020015548.2374568-3-ming.lei@redhat.com>
+        Thu, 21 Oct 2021 20:08:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634861145;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N5JfCAsI+inccAUJ1Aaxw45z/l5KEHCFXJn6LAT6Uv8=;
+        b=gs0ydNl57/JUkxjCBrVde3aRhLoLGKgKIlpA5bQR0vwuEWY2XtZUfORY76B2hF91kX5pVQ
+        InFI9AemreBsL3a7DpR/Fg+euxJwKzUDcDik55mxGMJoNHkemeqPtfWYs8qVIWX1go5mq0
+        WQ5/gdYXTh9WB0f+gs9p31IzPPVVaZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-2rnw5DspNCGnqLASt3ZXsg-1; Thu, 21 Oct 2021 20:05:39 -0400
+X-MC-Unique: 2rnw5DspNCGnqLASt3ZXsg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81E66806688;
+        Fri, 22 Oct 2021 00:05:36 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE0B819D9B;
+        Fri, 22 Oct 2021 00:05:23 +0000 (UTC)
+Date:   Fri, 22 Oct 2021 08:05:18 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YXIAPtvxW98lyM9r@T590>
+References: <YWq3Z++uoJ/kcp+3@T590>
+ <YW3LuzaPhW96jSBK@bombadil.infradead.org>
+ <YW4uwep3BCe9Vxq8@T590>
+ <YW7kFXlzRrvwzARP@bombadil.infradead.org>
+ <YW7ygbLAwm2/LZFl@T590>
+ <YW8eSq2B+5FtOLZb@bombadil.infradead.org>
+ <YW9tqPunx5bssxIz@T590>
+ <YXA6NMhwoiIMeHji@bombadil.infradead.org>
+ <YXC2qcx/RlLwjrKx@T590>
+ <YXGg95OcaR+5ktAZ@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211020015548.2374568-3-ming.lei@redhat.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <YXGg95OcaR+5ktAZ@bombadil.infradead.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 20, 2021 at 09:55:46AM +0800, Ming Lei wrote:
-> When zram module is started to be unloaded, no one should use all zram
-> disks at that time. But disk's show() or store() attribute method may be
-> running, this way is expected because device_del()(called from
-> del_gendisk) will drain all pending show()/store().
+On Thu, Oct 21, 2021 at 10:18:47AM -0700, Luis Chamberlain wrote:
+> On Thu, Oct 21, 2021 at 08:39:05AM +0800, Ming Lei wrote:
+> > On Wed, Oct 20, 2021 at 08:48:04AM -0700, Luis Chamberlain wrote:
+> > > A second series of tests is hitting CTRL-C on either randonly and
+> > > restarting testing once again randomly.
+> > 
+> > ltp/zram02.sh has cleanup handler via trap to clean everything(swapoff/umount/reset/
+> > rmmod), ctrl-c will terminate current forground task and cause shell to run the
+> > cleanup handler first, but further 'ctrl-c' will terminate the cleanup handler,
+> > then the cleanup won't be done completely, such as zram disk is left as swap
+> > device and zram can't be unloaded. The idea can be observed via the following
+> > script:
+> > 
+> > 	#!/bin/bash
+> > 	trap 'echo "enter trap"; sleep 20; echo "exit trap";' INT
+> > 	sleep 30
+> > 
+> > After the above script is run foreground, when 1st ctrl-c is pressed, 'sleep 30'
+> > is terminated, then the trap command is run, so you can see "enter trap"
+> > dumped. Then if you pressed 2nd ctrl-c, 'sleep 20' is terminated immediately.
+> > So 'swapoff' from zram02.sh's trap function can be terminated in this way.
+> > 
+> > zram disk being left as swap disk can be observed with your patch too
+> > after terminating via multiple ctrl-c which has to be done this way because
+> > the test is dead loop.
+> > 
+> > So it is hard to cleanup everything completely after multiple 'CTRL-C' is
+> > involved, and it should be impossible. It needs violent multiple ctrl-c to
+> > terminate the dealoop test.
+> > 
+> > So it isn't reasonable to expect that zram can be always unloaded successfully
+> > after the test script is terminated via multiple ctrl-c.
+> 
+> For the life of me, I do not run into these issue with my patch. But
+> with yours I had.
+> 
+> To be clear, I run zram02.sh on two terminals. Then to interrupt I just leave
+> CTRL-C pressed to issue multiple terminations until the script is done
+> on each terminal at a time, until I see both have completed.
+> 
+> I repeat the same test, noting always that when I start one one terminal
+> the test is succeeding. And also when I cancel completely one script the
+> test continue fine without issue.
 
-How about:
+As I explained wrt. shell's trap, this issue won't be avoided from
+userspace because trap function can be terminated by ctrl-c too,
+otherwise one shell script may not be terminated at all.
 
-----------
-When the zram module is being unloaded, no one should be using the
-zram disks. However even while being unloaded the zram module's
-sysfs attributes might be poked at to re-configure the zram module.
-This is expected, and kernfs ensures that these operations complete
-before device_del() completes.
-----------
+The unclean shutdown can be observed in single 'while true; do zram02.sh; done'
+too on both your patches and mine.
 
-> But reset_store() may set ->claim which will fail zram_remove(), when
-> this happens, the zram device will be leaked and the warning of 'Error:
-> Removing state 63 which has instances left.' is triggered during
-> unloading module.
+Also it is insane to write write test in a deadloop, and people seldom
+do that, not see such way in either blktests/xfstests.
 
-Note: the "Removing state 63 which has instances left" does not
-necessarily mean the struct zram is leaked. It just means that the per
-cpu struct zcomp instances are leaked, given the CPU hotplug removal
-callback is in charge of cleaning them up. That this gave us a hint that
-we do in fact leak a struct zram device as well is separate from what
-the message means, but I do agree it should be *that* because as you
-noted, LTP does not yet try to make spaghetti with hot_add_show().
+I you limit completion time of this test in long enough time(one or
+several hours) or big enough loops, I believe it can be done cleanly,
+such as:
 
-So, how about:
+cnt=0
+MAX=10000
+while [ $cnt -lt $MAX ]; do
+	PATH=$PATH:$PWD:$PWD/../../../lib/ ./zram02.sh;
+done
 
-----------
-When the reset sysfs op (reset_store()) gets called the zram->claim will
-be set, and this prevents zram_remove() from removing a zram device. If one
-is unloading the module and one races to run the reset sysfs op we end
-up leaking the struct zram device. We learned about this issue through
-the error "Error: Removing state 63 which has instances left". While
-this just means the any of the per cpu struct zcomp instances are
-leaked when we're removing the CPU hotplug multistate callback, the
-test case (running LTP zram02.sh twice in different terminals) that
-allows us to reproduce this issue only mucks with reseting the devices,
-not hot_add_show(). Setting zram->claim will prevent zram_remove() from
-completing successfully, and so on module removal zram_remove_cb() does
-not tell us when it failed to remove the full struct zram device and
-it leaks.
-----------
 
-This begs the question, should we not then also make zram_remove_cb()
-chatty on failure?
+Thanks,
+Ming
 
-> Fixes the issue by not failing zram_remove() if ->claim is set, and
-> we actually need to do nothing in case that zram_reset() is running
-> since del_gendisk() will wait until zram_reset() is done.
-
-Sure this all looks like a reasonable alternative to the issue without
-using a generic lock. It does beg the questions if this suffices for
-the other oddball sysfs ops, but we can take that up with time.
-
-> Reported-by: Luis Chamberlain <mcgrof@kernel.org>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-In so far as the code is concerned:
-
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-
-  Luis
