@@ -2,90 +2,230 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2ADBC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCE2C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:29:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C70F6115B
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:16:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35C3160F0F
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 15:29:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233196AbhJVPSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Oct 2021 11:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36950 "EHLO
+        id S233340AbhJVPcD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Oct 2021 11:32:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231635AbhJVPSo (ORCPT
+        with ESMTP id S233257AbhJVPcD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Oct 2021 11:18:44 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F3EDC061764
-        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:16:27 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id e59-20020a9d01c1000000b00552c91a99f7so4780557ote.6
-        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:16:27 -0700 (PDT)
+        Fri, 22 Oct 2021 11:32:03 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6E4C061764
+        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:29:45 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id o4so5440685oia.10
+        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 08:29:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=ANjxMyzEaBerOwzLK0Q3RxHvXsNIIMRJZ4VhyjUE2w8=;
-        b=Um61NSl9XZjxdivHLbY9cyH91To30EM1MV27+M0ag4zCerhQSBBvzx1BRSBoHD6Vu7
-         NJy+RmfZJ7bdbaMjkyaUbT2mKri6WdrUNzA/5s1Ab25uWmeNmfEqRa6CoZMRzcv4pAnW
-         GqG4yWcCLcl+b1P6/mXuBprj0JiQzSfEfm7op605Qg+C4BnrvkZthiuK4P+Hh6YBev+i
-         S+LHJUy3hnl+GrLAfnleLK8RjDegxB6WzfRslI1sEu4869lFJcADzxfcTFz23+dxroRV
-         OaX1gIYVqHHhZ1Vvejvi5Wkow+QtUwGJ16Cg6KHA2PwABXN5QvlxxcWk2uN7/lAtlV4y
-         r3dg==
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LUtnq1wX3c9ZSKlFVqBQ9milrt9oUJPe3W7pJqk8fis=;
+        b=Dt6Xe7RT9/rmETzyvm6KPZXudZiAHUA2T8XHt//MeIXHgfevOpKLZ+t5VvL4srw/Ba
+         IQEzzktExKHA9fZfICrEpqT1kmakmZoRxQFEv+4IFM6Fopm+2rwRHhgAhC0W8wWc83rS
+         oOh71WpSfXuHTo8oZnZGplwUy/o5P257gkK9AzYegblq//FMB6WsRJrP8apwa+7GnNP1
+         10vtC0aguxaaRjQXa4kABPrDsqWyZa1BUPPIFw/DIKZ/uDIv8Vgz1rr1hu4xisGj2gcr
+         7Y6f7k4EWgGMsoC0QmpSDGb6rzpmYI02gymq27osbsFKaiB0vsyY3jt2dt662L+3wHPu
+         k3jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=ANjxMyzEaBerOwzLK0Q3RxHvXsNIIMRJZ4VhyjUE2w8=;
-        b=U1Pcxhh/A9XIhiYSkRzXcnOUyyIWWy6BhhmH7WQaU6SIdQbf56kOfNOWCU1U9bLi4p
-         zUueX2BB264La8Tl6jURzIjOlGfzdlBj4B/fjen12Ixj6ESN+lHcNU10X8KkUbOihx80
-         z570Y8O1YH242vvdSUiT7YPmU5fj33+W28fa/Pqy8lS5rxu2IsOlLj5ZTKKux3tqJksg
-         MMEeioSncd/kDk1FzF83kN21+1x0WDkIJqx76W9cbFUb7+OdA85B/M5UHoL1rF29myNW
-         xUi7Z6kpUMpHSYOW9+kW5shhMoeibUfd3gXnemqrkB/QLVmAgZ4B0F6hDRGOjseadTJ4
-         uA/Q==
-X-Gm-Message-State: AOAM533mcHdbZ/f3qQZZlIrawMP2ySnloJd4hqW4mNZSve8NkSOW9oOo
-        oFiYiiNyeF2DVe5mBolptq3iSA==
-X-Google-Smtp-Source: ABdhPJxVF1FPp4NIY23klw94VQMWmGA8+pwcyTnKttWZaIi0nOTHXtGUy6TNbgHv3LBU/WCQXWfbyQ==
-X-Received: by 2002:a9d:7644:: with SMTP id o4mr397173otl.270.1634915786523;
-        Fri, 22 Oct 2021 08:16:26 -0700 (PDT)
-Received: from [127.0.1.1] (rrcs-24-173-18-66.sw.biz.rr.com. [24.173.18.66])
-        by smtp.gmail.com with ESMTPSA id y5sm1733409otg.52.2021.10.22.08.16.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Oct 2021 08:16:26 -0700 (PDT)
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LUtnq1wX3c9ZSKlFVqBQ9milrt9oUJPe3W7pJqk8fis=;
+        b=ufEanUV60Srb9AuZS+o8IcSDIjBc3UbpqF94f85P9b4GM9k35lrRNiGcM5f976Bf0k
+         v6sZruYi+qPhkBwNso7Ybm24eM8QT3PeMjGT3JRlFi3zJ1g7molJGXLkq8uI8qLUEBcQ
+         wfCSgiATW/zJMs6LVWBlcdw4bar0eQa3HCYDd4qXP+uplP+93BRhE0U8+GEfElVQKsW/
+         smwFtbpIj5Sj2qjUY3vF9Q/UV43VaXcRdY2WCPuVIIQedSpHvbxJv4ftWPrxymEna3ks
+         7mTDBz4pp7GgNd4lN7Yq4Ft6OTkcvBa0LeyOpNbEcVCu+vfai69tPn9+nWG2N+WkDLni
+         s4Ig==
+X-Gm-Message-State: AOAM531NW68rE1AUy/M1paWPFM3ZA0Uq9bp7TxxlVe8YmjuXIdxhmq9H
+        18or+eOX/v0WtVY2M/cJEkD+Og==
+X-Google-Smtp-Source: ABdhPJx1jjUdC1bsdaA7We5wTASWQ/NVsI6ael3sh50HPmv4zQ9u/R/KB+jBRoiRr7junic+9/3XsQ==
+X-Received: by 2002:aca:ac0b:: with SMTP id v11mr10588962oie.155.1634916585185;
+        Fri, 22 Oct 2021 08:29:45 -0700 (PDT)
+Received: from [172.20.15.86] (rrcs-24-173-18-66.sw.biz.rr.com. [24.173.18.66])
+        by smtp.gmail.com with ESMTPSA id v22sm1491435oot.43.2021.10.22.08.29.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 08:29:44 -0700 (PDT)
+Subject: Re: [PATCH v2] fs: replace the ki_complete two integer arguments with
+ a single argument
 From:   Jens Axboe <axboe@kernel.dk>
-To:     John Garry <john.garry@huawei.com>
-Cc:     ming.lei@redhat.com, anders.roxell@linaro.org,
-        naresh.kamboju@linaro.org, linux-block@vger.kernel.org,
-        arnd@arndb.de, linux-kernel@vger.kernel.org
-In-Reply-To: <1634890340-15432-1-git-send-email-john.garry@huawei.com>
-References: <1634890340-15432-1-git-send-email-john.garry@huawei.com>
-Subject: Re: [PATCH] blk-mq-sched: Don't reference queue tagset in blk_mq_sched_tags_teardown()
-Message-Id: <163491578487.92334.5273496329606212281.b4-ty@kernel.dk>
-Date:   Fri, 22 Oct 2021 09:16:24 -0600
+To:     Jeff Moyer <jmoyer@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-aio@kvack.org, linux-usb@vger.kernel.org
+References: <4d409f23-2235-9fa6-4028-4d6c8ed749f8@kernel.dk>
+ <YXElk52IsvCchbOx@infradead.org> <YXFHgy85MpdHpHBE@infradead.org>
+ <4d3c5a73-889c-2e2c-9bb2-9572acdd11b7@kernel.dk>
+ <YXF8X3RgRfZpL3Cb@infradead.org>
+ <b7b6e63e-8787-f24c-2028-e147b91c4576@kernel.dk>
+ <x49ee8ev21s.fsf@segfault.boston.devel.redhat.com>
+ <6338ba2b-cd71-f66d-d596-629c2812c332@kernel.dk>
+ <x497de6uubq.fsf@segfault.boston.devel.redhat.com>
+ <7a697483-8e44-6dc3-361e-ae7b62b82074@kernel.dk>
+ <x49wnm6t7r9.fsf@segfault.boston.devel.redhat.com>
+ <x49sfwut7i8.fsf@segfault.boston.devel.redhat.com>
+ <d67c3d6f-56a2-4ace-7b57-cb9c594ad82c@kernel.dk>
+Message-ID: <67127b02-2b58-5944-8bfb-e842182d6459@kernel.dk>
+Date:   Fri, 22 Oct 2021 09:29:43 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <d67c3d6f-56a2-4ace-7b57-cb9c594ad82c@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 22 Oct 2021 16:12:20 +0800, John Garry wrote:
-> We should not reference the queue tagset in blk_mq_sched_tags_teardown()
-> (see function comment) for the blk-mq flags, so use the passed flags
-> instead.
+On 10/22/21 8:19 AM, Jens Axboe wrote:
+> On 10/21/21 3:03 PM, Jeff Moyer wrote:
+>> Jeff Moyer <jmoyer@redhat.com> writes:
+>>
+>>> Jens Axboe <axboe@kernel.dk> writes:
+>>>
+>>>> On 10/21/21 12:05 PM, Jeff Moyer wrote:
+>>>>>
+>>>>>>> I'll follow up if there are issues.
+>>>>>
+>>>>> s390 (big endian, 64 bit) is failing libaio test 21:
+>>>>>
+>>>>> # harness/cases/21.p
+>>>>> Expected -EAGAIN, got 4294967285
+>>>>>
+>>>>> If I print out both res and res2 using %lx, you'll see what happened:
+>>>>>
+>>>>> Expected -EAGAIN, got fffffff5,ffffffff
+>>>>>
+>>>>> The sign extension is being split up.
+>>>>
+>>>> Funky, does it work if you apply this on top?
+>>>>
+>>>> diff --git a/fs/aio.c b/fs/aio.c
+>>>> index 3674abc43788..c56437908339 100644
+>>>> --- a/fs/aio.c
+>>>> +++ b/fs/aio.c
+>>>> @@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
+>>>>  	 * 32-bits of value at most for either value, bundle these up and
+>>>>  	 * pass them in one u64 value.
+>>>>  	 */
+>>>> -	iocb->ki_res.res = lower_32_bits(res);
+>>>> -	iocb->ki_res.res2 = upper_32_bits(res);
+>>>> +	iocb->ki_res.res = (long) (res & 0xffffffff);
+>>>> +	iocb->ki_res.res2 = (long) (res >> 32);
+>>>>  	iocb_put(iocb);
+>>>>  }
+>>>
+>>> I think you'll also need to clamp any ki_complete() call sites to 32
+>>> bits (cast to int, or what have you).  Otherwise that sign extension
+>>> will spill over into res2.
+>>>
+>>> fwiw, I tested with this:
+>>>
+>>> 	iocb->ki_res.res = (long)(int)lower_32_bits(res);
+>>> 	iocb->ki_res.res2 = (long)(int)upper_32_bits(res);
+>>>
+>>> Coupled with the call site changes, that made things work for me.
+>>
+>> This is all starting to feel like a minefield.  If you don't have any
+>> concrete numbers to show that there is a speedup, I think we should
+>> shelf this change.
 > 
-> This solves a use-after-free, similarly fixed earlier (and since broken
-> again) in commit f0c1c4d2864e ("blk-mq: fix use-after-free in
-> blk_mq_exit_sched").
-> 
-> [...]
+> It's really not a minefield at all, we just need a proper help to encode
+> the value. I'm out until Tuesday, but I'll sort it out when I get back.
+> Can also provide some numbers on this.
 
-Applied, thanks!
+I think this incremental should fix it, also providing a helper to
+properly pack these. The more I look at the gadget stuff the more I also
+get the feeling that it really is wonky and nobody uses res2, which
+would be a nice cleanup to continue. But I think it should be separate.
 
-[1/1] blk-mq-sched: Don't reference queue tagset in blk_mq_sched_tags_teardown()
-      commit: 8bdf7b3fe1f48a2c1c212d4685903bba01409c0e
 
-Best regards,
+diff --git a/drivers/usb/gadget/function/f_fs.c b/drivers/usb/gadget/function/f_fs.c
+index 8536f19d3c9a..9c5372229714 100644
+--- a/drivers/usb/gadget/function/f_fs.c
++++ b/drivers/usb/gadget/function/f_fs.c
+@@ -831,7 +831,7 @@ static void ffs_user_copy_worker(struct work_struct *work)
+ 		kthread_unuse_mm(io_data->mm);
+ 	}
+ 
+-	io_data->kiocb->ki_complete(io_data->kiocb, ((u64) ret << 32) | ret);
++	io_data->kiocb->ki_complete(io_data->kiocb, aio_res_pack(ret, ret));
+ 
+ 	if (io_data->ffs->ffs_eventfd && !kiocb_has_eventfd)
+ 		eventfd_signal(io_data->ffs->ffs_eventfd, 1);
+diff --git a/drivers/usb/gadget/legacy/inode.c b/drivers/usb/gadget/legacy/inode.c
+index d3deb23eb2ab..15dff219b483 100644
+--- a/drivers/usb/gadget/legacy/inode.c
++++ b/drivers/usb/gadget/legacy/inode.c
+@@ -469,7 +469,7 @@ static void ep_user_copy_worker(struct work_struct *work)
+ 		ret = -EFAULT;
+ 
+ 	/* completing the iocb can drop the ctx and mm, don't touch mm after */
+-	iocb->ki_complete(iocb, ((u64) ret << 32) | ret);
++	iocb->ki_complete(iocb, aio_res_pack(ret, ret));
+ 
+ 	kfree(priv->buf);
+ 	kfree(priv->to_free);
+@@ -499,8 +499,10 @@ static void ep_aio_complete(struct usb_ep *ep, struct usb_request *req)
+ 		kfree(priv);
+ 		iocb->private = NULL;
+ 		/* aio_complete() reports bytes-transferred _and_ faults */
+-		aio_ret = req->actual ? req->actual : (long)req->status;
+-		aio_ret |= (u64) req->status << 32;
++		if (req->actual)
++			aio_ret = aio_res_pack(req->actual, req->status);
++		else
++			aio_ret = aio_res_pack(req->status, req->status);
+ 		iocb->ki_complete(iocb, aio_ret);
+ 	} else {
+ 		/* ep_copy_to_user() won't report both; we hide some faults */
+diff --git a/fs/aio.c b/fs/aio.c
+index 3674abc43788..cd43a26b2aa2 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1442,8 +1442,8 @@ static void aio_complete_rw(struct kiocb *kiocb, u64 res)
+ 	 * 32-bits of value at most for either value, bundle these up and
+ 	 * pass them in one u64 value.
+ 	 */
+-	iocb->ki_res.res = lower_32_bits(res);
+-	iocb->ki_res.res2 = upper_32_bits(res);
++	iocb->ki_res.res = (long) lower_32_bits(res);
++	iocb->ki_res.res2 = (long) upper_32_bits(res);
+ 	iocb_put(iocb);
+ }
+ 
+diff --git a/include/linux/aio.h b/include/linux/aio.h
+index b83e68dd006f..50a6c7da27ec 100644
+--- a/include/linux/aio.h
++++ b/include/linux/aio.h
+@@ -24,4 +24,18 @@ static inline void kiocb_set_cancel_fn(struct kiocb *req,
+ extern unsigned long aio_nr;
+ extern unsigned long aio_max_nr;
+ 
++/*
++ * Take some care packing two 32-bit quantities into a 64-bit, so we don't
++ * get sign extensions ruining the result. aio uses long, but it's really
++ * just 32-bit values.
++ */
++static inline u64 aio_res_pack(long res, long res2)
++{
++	u64 ret;
++
++	ret = (u64) res2 << 32;
++	ret |= (u32) res;
++	return ret;
++}
++
+ #endif /* __LINUX__AIO_H */
+
 -- 
 Jens Axboe
-
 
