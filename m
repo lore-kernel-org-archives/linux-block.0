@@ -2,165 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB69C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 09:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FB9C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 09:22:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5A5461108
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 09:15:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F19F861108
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 09:22:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232483AbhJVJSO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Oct 2021 05:18:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31832 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232580AbhJVJSN (ORCPT
+        id S232404AbhJVJYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Oct 2021 05:24:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41722 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232307AbhJVJYq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Oct 2021 05:18:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634894155;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=G3cW3zoVlu4oi/52XaFtkNhCU8dR251sfiAlQbdZmxw=;
-        b=VsBSEFrI65sryTfKimMmOuEcd8aQUYsvm93TygY6/ED2R/fJgiFd1kp48ysZFqyA9d4r3h
-        8FqIsd3/nGVK3KOUEDbUfKyEt2ObTJQcpTE+v/TCZWtIutcx3P+DDYFYXSBuxEpnWNhhje
-        Qmn1MvCqxFHQC33h7ylcvmWBK5ekeWo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-PSBfTmpSNuicIQ9A8YDncA-1; Fri, 22 Oct 2021 05:15:54 -0400
-X-MC-Unique: PSBfTmpSNuicIQ9A8YDncA-1
-Received: by mail-wr1-f72.google.com with SMTP id h99-20020adf906c000000b001644add8925so798440wrh.0
-        for <linux-block@vger.kernel.org>; Fri, 22 Oct 2021 02:15:53 -0700 (PDT)
+        Fri, 22 Oct 2021 05:24:46 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A97B2C061764;
+        Fri, 22 Oct 2021 02:22:29 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id t16so2898619eds.9;
+        Fri, 22 Oct 2021 02:22:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=8wRakYYkxElrlaPhMN+8m3gMM0Ofd4s2CuL6BRUXvDg=;
+        b=Ek+biRSv3O/qpa+FWdKUcAZraqR5s1HBhR6mdRXfJ4HHquUO2xiApOLTlxDeBaU9kM
+         /g9txSdLG9fjqogY8NOlllRSg9ZrQNyozBBobR5yTzqIwHRQkLV/IfiH+Iyh5I72MOkL
+         z96dGco0XKWw3z0hWxi8QOoqqK6aAPN5kUeFJMxIyEUNE0doDhRC4B1EaI4/9jWBRftY
+         YZExPyG9ySS+dNW3GlCs2LFFvIVsebA0ippVa0xlWC9ZZ6AXYyF6wBYVebVHrlpH5jay
+         WV8D9vAgy0zXGMApypzfHvVfwmwGdr7zakcQVH7feMW5A491MCxfN5UGyTeQL4bn819m
+         mxlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=G3cW3zoVlu4oi/52XaFtkNhCU8dR251sfiAlQbdZmxw=;
-        b=IdmhBb3uFO64lz0q1SF9aKdHgcajiVReewKdN5bF7dK1wPgWkOUs1ETN3kbfn6IdyL
-         7CVHOcwBzRj7gQO9XBCFLoOU74At2MdcwJeMPwYwd18jFAZ04hxskSh/8GjBfxlPgT64
-         aI1ky1Vr3YegAKxU/3kvt3/c4dUIP4zEDNt3vskW8VSUAAzIdKOrJckxYGmA0qa3WTBb
-         Yw79Bi3Td/FFpQX94oc3UKDkdG29iJFVrJMs/Od+FgRfoirrfENJvYzfD3AwXxKXS3Vt
-         5QAXVj89v5kVjnBSZUyIsl1QIpUSDV1cILT853HoywwTUoDRbPjlslPoXTRzCXDAGK3f
-         ZwTQ==
-X-Gm-Message-State: AOAM531YKDxGjGmoPkrcEWGWedch4FqIUS2R+dZzQxGfYqNgu7WGBhgr
-        Y1hQ/qMMfKo3NSt/XlrESlEhzFYU8J39PS0MbDb51IpVi2k6zS3T5W8PfAQ+naVBDYes5VQQw8J
-        EIU2cpVlqGWyV/VxpaqvlfG0=
-X-Received: by 2002:adf:c986:: with SMTP id f6mr14715344wrh.216.1634894152813;
-        Fri, 22 Oct 2021 02:15:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy9UzrJ47jd8AVMlb0zsnyhbeLN4MbCsLDsxpH5rzw33A79i6LywRRy6NMmtWFyEM7afYZFuw==
-X-Received: by 2002:adf:c986:: with SMTP id f6mr14715317wrh.216.1634894152607;
-        Fri, 22 Oct 2021 02:15:52 -0700 (PDT)
-Received: from redhat.com ([2.55.24.172])
-        by smtp.gmail.com with ESMTPSA id q18sm10324419wmc.7.2021.10.22.02.15.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Oct 2021 02:15:51 -0700 (PDT)
-Date:   Fri, 22 Oct 2021 05:15:47 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, hch@infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        israelr@nvidia.com, nitzanc@nvidia.com, oren@nvidia.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 1/1] virtio-blk: avoid preallocating big SGL for data
-Message-ID: <20211022051343-mutt-send-email-mst@kernel.org>
-References: <20210901131434.31158-1-mgurtovoy@nvidia.com>
- <YTYvOetMHvocg9UZ@stefanha-x1.localdomain>
- <692f8e81-8585-1d39-e7a4-576ae01438a1@nvidia.com>
- <YUCUF7co94CRGkGU@stefanha-x1.localdomain>
- <56cf84e2-fec0-08e8-0a47-24bb1df71883@nvidia.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=8wRakYYkxElrlaPhMN+8m3gMM0Ofd4s2CuL6BRUXvDg=;
+        b=uNrwoEVjWxr9re2tvoXey+qZpAusvqMB7t6bQVQF4DCdSxO7ZbmV2pg76t8T/vMqYA
+         ROVibpDXnYb8j+7VbC7M94QrB4/ORB56pvZABzcXvpuAf7SSglPZJ6ikaOGL1Bi0I5R2
+         qGfBv/tDj9hT2kT7ew+BPNTCNTO3vCrffoMCZuIQejdDE5YsYuhoe3l81I2eGVwOwwf5
+         AUlbDzizYh/R+gWDy5w+Gw6hw/RVoGL3nL6e3szD17k04fSl7DHIhknmLoAit/dvSRo5
+         rtsnERUN5A5PISt/a2Hs63GGh1nm1y0KWJlXkb4WQflJQaGS5IDN1FFTKs+apIGgE9z8
+         xnIQ==
+X-Gm-Message-State: AOAM530K3dkJ7NNDP0tWIfO/h9XzODI3yNzAXr6H/7Kc4s3uKSZIgOfW
+        TY4MPR0UNwipQyz0LSzrgKhiw1ePbsE=
+X-Google-Smtp-Source: ABdhPJxqBmr5FAEZ2PoX3cXSIj5DNGJdKaGG2ygmftNBfkNh29V9Xqkw0DSi8xp96ScR62uKQQNJ2g==
+X-Received: by 2002:a17:906:912:: with SMTP id i18mr13903323ejd.131.1634894548338;
+        Fri, 22 Oct 2021 02:22:28 -0700 (PDT)
+Received: from [192.168.8.198] ([148.252.133.195])
+        by smtp.gmail.com with ESMTPSA id o25sm691981ejc.22.2021.10.22.02.22.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 02:22:28 -0700 (PDT)
+Message-ID: <cdf7c768-47ad-78c4-a22a-f0f1a435b6f6@gmail.com>
+Date:   Fri, 22 Oct 2021 10:22:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56cf84e2-fec0-08e8-0a47-24bb1df71883@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v2 1/2] percpu_ref: percpu_ref_tryget_live() version
+ holding RCU
+Content-Language: en-US
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Lameter <cl@linux.com>, Tejun Heo <tj@kernel.org>
+References: <cover.1634822969.git.asml.silence@gmail.com>
+ <3066500d7a6eb3e03f10adf98b87fdb3b1c49db8.1634822969.git.asml.silence@gmail.com>
+ <YXFytAdeF5RPRERf@fedora>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <YXFytAdeF5RPRERf@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-My tree is ok.
-Looks like your patch was developed on top of some other tree,
-not plan upstream linux, so git am fails. I applied it using
-patch and some manual tweaking, and it seems to work for
-me but please do test it in linux-next and confirm -
-will push to a linux-next branch in my tree soon.
+On 10/21/21 15:01, Dennis Zhou wrote:
+> Hello,
+> 
+> On Thu, Oct 21, 2021 at 02:30:51PM +0100, Pavel Begunkov wrote:
+>> Add percpu_ref_tryget_live_rcu(), which is a version of
+>> percpu_ref_tryget_live() but the user is responsible for enclosing it in
+>> a RCU read lock section.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>   include/linux/percpu-refcount.h | 33 +++++++++++++++++++++++----------
+>>   1 file changed, 23 insertions(+), 10 deletions(-)
+>>
+[...]
+>> +
+>>   /**
+>>    * percpu_ref_tryget_live - try to increment a live percpu refcount
+>>    * @ref: percpu_ref to try-get
+> 
+> Nit: it's dumb convention at this point, but do you mind copying this
+> guy up. I like consistency.
 
-On Thu, Sep 23, 2021 at 04:40:56PM +0300, Max Gurtovoy wrote:
-> Hi MST/Jens,
-> 
-> Do we need more review here or are we ok with the code and the test matrix ?
-> 
-> If we're ok, we need to decide if this goes through virtio PR or block PR.
-> 
-> Cheers,
-> 
-> -Max.
-> 
-> On 9/14/2021 3:22 PM, Stefan Hajnoczi wrote:
-> > On Mon, Sep 13, 2021 at 05:50:21PM +0300, Max Gurtovoy wrote:
-> > > On 9/6/2021 6:09 PM, Stefan Hajnoczi wrote:
-> > > > On Wed, Sep 01, 2021 at 04:14:34PM +0300, Max Gurtovoy wrote:
-> > > > > No need to pre-allocate a big buffer for the IO SGL anymore. If a device
-> > > > > has lots of deep queues, preallocation for the sg list can consume
-> > > > > substantial amounts of memory. For HW virtio-blk device, nr_hw_queues
-> > > > > can be 64 or 128 and each queue's depth might be 128. This means the
-> > > > > resulting preallocation for the data SGLs is big.
-> > > > > 
-> > > > > Switch to runtime allocation for SGL for lists longer than 2 entries.
-> > > > > This is the approach used by NVMe drivers so it should be reasonable for
-> > > > > virtio block as well. Runtime SGL allocation has always been the case
-> > > > > for the legacy I/O path so this is nothing new.
-> > > > > 
-> > > > > The preallocated small SGL depends on SG_CHAIN so if the ARCH doesn't
-> > > > > support SG_CHAIN, use only runtime allocation for the SGL.
-> > > > > 
-> > > > > Re-organize the setup of the IO request to fit the new sg chain
-> > > > > mechanism.
-> > > > > 
-> > > > > No performance degradation was seen (fio libaio engine with 16 jobs and
-> > > > > 128 iodepth):
-> > > > > 
-> > > > > IO size      IOPs Rand Read (before/after)         IOPs Rand Write (before/after)
-> > > > > --------     ---------------------------------    ----------------------------------
-> > > > > 512B          318K/316K                                    329K/325K
-> > > > > 
-> > > > > 4KB           323K/321K                                    353K/349K
-> > > > > 
-> > > > > 16KB          199K/208K                                    250K/275K
-> > > > > 
-> > > > > 128KB         36K/36.1K                                    39.2K/41.7K
-> > > > I ran fio randread benchmarks with 4k, 16k, 64k, and 128k at iodepth 1,
-> > > > 8, and 64 on two vCPUs. The results look fine, there is no significant
-> > > > regression.
-> > > > 
-> > > > iodepth=1 and iodepth=64 are very consistent. For some reason the
-> > > > iodepth=8 has significant variance but I don't think it's the fault of
-> > > > this patch.
-> > > > 
-> > > > Fio results and the Jupyter notebook export are available here (check
-> > > > out benchmark.html to see the graphs):
-> > > > 
-> > > > https://gitlab.com/stefanha/virt-playbooks/-/tree/virtio-blk-sgl-allocation-benchmark/notebook
-> > > > 
-> > > > Guest:
-> > > > - Fedora 34
-> > > > - Linux v5.14
-> > > > - 2 vCPUs (pinned), 4 GB RAM (single host NUMA node)
-> > > > - 1 IOThread (pinned)
-> > > > - virtio-blk aio=native,cache=none,format=raw
-> > > > - QEMU 6.1.0
-> > > > 
-> > > > Host:
-> > > > - RHEL 8.3
-> > > > - Linux 4.18.0-240.22.1.el8_3.x86_64
-> > > > - Intel(R) Xeon(R) Silver 4214 CPU @ 2.20GHz
-> > > > - Intel Optane DC P4800X
-> > > > 
-> > > > Stefan
-> > > Thanks, Stefan.
-> > > 
-> > > Would you like me to add some of the results in my commit msg ? or Tested-By
-> > > sign ?
-> > Thanks, there's no need to change the commit description.
-> > 
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Looks Jens already took it. If you still want it moved, do you mind
+it in a separate patch?
 
+And I'm not sure I follow where you want it to be, currently it's
+right before percpu_ref_tryget_live, which uses it.
+
+-- 
+Pavel Begunkov
