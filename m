@@ -2,70 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CE1C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 08:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A98C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 09:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26B41610A8
-	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 08:55:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D999C60F43
+	for <linux-block@archiver.kernel.org>; Fri, 22 Oct 2021 09:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232060AbhJVI5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Oct 2021 04:57:33 -0400
-Received: from tartarus.angband.pl ([51.83.246.204]:40346 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231550AbhJVI5c (ORCPT
+        id S232460AbhJVJNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Oct 2021 05:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38940 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232060AbhJVJNA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Oct 2021 04:57:32 -0400
-Received: from kilobyte by tartarus.angband.pl with local (Exim 4.94.2)
-        (envelope-from <kilobyte@angband.pl>)
-        id 1mdqIC-005NTO-V3; Fri, 22 Oct 2021 10:52:48 +0200
-Date:   Fri, 22 Oct 2021 10:52:48 +0200
-From:   Adam Borowski <kilobyte@angband.pl>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-mm@kvack.org
-Subject: Re: [PATCH 2/2] memremap: remove support for external pgmap refcounts
-Message-ID: <YXJ74Atvd7i40O4x@angband.pl>
-References: <20211019073641.2323410-1-hch@lst.de>
- <20211019073641.2323410-3-hch@lst.de>
- <YXFtwcAC0WyxIWIC@angband.pl>
- <20211022055515.GA21767@lst.de>
+        Fri, 22 Oct 2021 05:13:00 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6330BC061764;
+        Fri, 22 Oct 2021 02:10:43 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id u13so1034185edy.10;
+        Fri, 22 Oct 2021 02:10:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:cc:from:in-reply-to:content-transfer-encoding;
+        bh=P6jDog9aGxRaFIsyIUOXH5bsPwrCpSO2aM+bugPoS5U=;
+        b=BgmeNdGonvO83jDYphBBuB7X24UY15U4zDGDDcjVz/6x30II/biCBrYw08YkZPMji/
+         kxParE3DOhd9Yi3NNAU/CSTqJ6ltPyJsqvgNZGVnDHxPBjg/3XufvkpOuECAHcf9tp9C
+         IMsqqFPTwPsHgaOsU5ghPKSdvRuEOvWbUEyzMtcQV8IyE5fkkz5s+aI33h6XTCIQjJXn
+         9MPTOLKb48LJwRmfryjaypGgRhvoSyRaQRk2AWC1OSJoxY0xT03TQj3AiMJbIgnpb522
+         ACYnPtUB3o9kqPNTcvL0v+A4hSmsU/uHaDB6iWoKp2GU0la3L8T6YUkAmhocyTk+iMUB
+         4B+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:cc:from:in-reply-to
+         :content-transfer-encoding;
+        bh=P6jDog9aGxRaFIsyIUOXH5bsPwrCpSO2aM+bugPoS5U=;
+        b=l5KjeZjmZnuN1RyaVaDgMDM7euH+0SFn2uNG9Etuq1FchMEUlwjZzlKHoCWDQUNi2D
+         lhssCFDso5bI0UESxHNZB+m6OnI9bB5VE/Tn28pKWuaPUY1PhMHZdGGP21nltK6YIJY1
+         rHz9sOdgD9HgCTk+tIxqYsJHEq0APFge+hBUKjEWVNxbd75E3HY3f9DWSoYQUqWK58fT
+         JlA7sQ97oQ1yirp2UPNnEfdtMOTJPLh7QOHFtffd4GOJ9v8riJc2hUAMPa6ZGL6XQoB5
+         i2nPiUAYvwdwAEib6SSIx1zaLQeVOOr5E3waHqef4g/ciHONx1Nm3YjBQoD9H6z8TR5R
+         I5JQ==
+X-Gm-Message-State: AOAM533Tzee/eadTpk/Z1bmIvvw1vb174E0SC2W5dlSZu8phqRfJpion
+        Gj07H1JDO9lv88i8W9iYOT8=
+X-Google-Smtp-Source: ABdhPJy//JuJ99iNpcHrHxfk0EphY5E8T+oO0hQwIzzQeAbl2rkJlQ9NbfsX00ig6PF++uOugjtLEg==
+X-Received: by 2002:a50:f09c:: with SMTP id v28mr13927010edl.360.1634893841999;
+        Fri, 22 Oct 2021 02:10:41 -0700 (PDT)
+Received: from [192.168.8.198] ([148.252.133.195])
+        by smtp.gmail.com with ESMTPSA id u18sm4046521eds.86.2021.10.22.02.10.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Oct 2021 02:10:41 -0700 (PDT)
+Message-ID: <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
+Date:   Fri, 22 Oct 2021 10:10:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211022055515.GA21767@lst.de>
-X-Junkbait: aaron@angband.pl, zzyx@angband.pl
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Mail-From: kilobyte@angband.pl
-X-SA-Exim-Scanned: No (on tartarus.angband.pl); SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: uring regression - lost write request
+Content-Language: en-US
+To:     Daniel Black <daniel@mariadb.org>, linux-block@vger.kernel.org
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+Cc:     io-uring@vger.kernel.org
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 07:55:15AM +0200, Christoph Hellwig wrote:
-> On Thu, Oct 21, 2021 at 03:40:17PM +0200, Adam Borowski wrote:
-> > This breaks at least drivers/pci/p2pdma.c:222
+On 10/22/21 04:12, Daniel Black wrote:
+> Sometime after 5.11 and is fixed in 5.15-rcX (rc6 extensively tested
+> over last few days) is a kernel regression we are tracing in
+> https://jira.mariadb.org/browse/MDEV-26674 and
+> https://jira.mariadb.org/browse/MDEV-26555
+> 5.10 and early across many distros and hardware appear not to have a problem.
 > 
-> Indeed.  I've updated this patch, but the fix we need to urgently
-> get into 5.15-rc is the first one only anyway.
-> 
-> nvdimm maintainers, can you please act on it ASAP?
+> I'd appreciate some help identifying a 5.14 linux stable patch
+> suitable as I observe the fault in mainline 5.14.14 (built
 
-As for build tests, after the p2pdma thingy I've tried all{yes,no,mod}config
-and a handful of randconfigs, looks like it was the only place you missed.
+Cc: io-uring@vger.kernel.org
 
-As for runtime, a bunch of ndctl uses work fine with no explosions.
+Let me try to remember anything relevant from 5.15,
+Thanks for letting know
 
-Thus: Tested-By.
-
-
-Meow!
 -- 
-⢀⣴⠾⠻⢶⣦⠀ Don't be racist.  White, amber or black, all beers should
-⣾⠁⢠⠒⠀⣿⡁ be judged based solely on their merits.  Heck, even if a
-⢿⡄⠘⠷⠚⠋⠀ cider applies for a beer's job, why not?
-⠈⠳⣄⠀⠀⠀⠀ On the other hand, mass-produced lager is not a race.
+Pavel Begunkov
