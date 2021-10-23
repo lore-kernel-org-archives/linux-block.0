@@ -2,138 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 087A7C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 14:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54E6C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 15:43:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D928C60FC3
-	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 14:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D12266103D
+	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 15:43:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230253AbhJWODr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Oct 2021 10:03:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbhJWODq (ORCPT
+        id S230037AbhJWPpc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Oct 2021 11:45:32 -0400
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:50666 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229954AbhJWPpb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Oct 2021 10:03:46 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7901EC061767
-        for <linux-block@vger.kernel.org>; Sat, 23 Oct 2021 07:01:27 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id z5-20020a9d4685000000b005537cbe6e5aso1293177ote.1
-        for <linux-block@vger.kernel.org>; Sat, 23 Oct 2021 07:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GKRuYgjCbvOVgpuUacb8YxSFi+RmQ4i5T5oV5f5cqeA=;
-        b=B34iaqiy0/nymsgFlq0YNjboFkFPgb2eNGKGB5LSqhx5SAvkkw46MtCnmUiL0kpy91
-         Kk5bKhSO4mby88CCeGm6Ixtq3a5FSnKytwSVsm6CCgKcRPjkuABBfLlK8elm7llC2y1T
-         M/aMpDm9Tk2ND+Hg04cuTOpvzDYFFBNUWKdXU9Xw8E5HTOWjQbpbexhil20tTVl0UoUQ
-         HXbnNVqePLMDULJ1v+y8HRLB5xjQn3DCLhNDnXinpGqF24IiM1NRdqdB32nh1Lw6BCeZ
-         QlEhMdFTnPMtLYRqgSBi3f4qt8TUDFFmao4lnQ9rdsV4GmPcWDMOc35KGAA8R+k44CGr
-         y6ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GKRuYgjCbvOVgpuUacb8YxSFi+RmQ4i5T5oV5f5cqeA=;
-        b=FMSGkl/VDl+epTsJp6/2neVxSCUqTlZ5IbuHa2q91DAOZn9Kna8P25Azu96g1iSnxa
-         B51LRc9pnW2ejiIUHr6TEBSaKZZTY9XtkiXr+ENFUddw7wwWDlYSmSn/3IZ750c+pKax
-         WLBRYmL7T4ucfFZykBKNoH731pc2U0QylxESXZog8t19wVBEsgYfibVTsniV0BC2Cu0J
-         2GPjEPxc7tF6Xu7FXcomKbwAFkIhJzVtOkRBdSBUtFbdVO8Pa/sOv9scEDUv4gv+Y/XY
-         rgh4z5vCHS+ZBw1UssVNchkPmJSH0bXfg9CzxYtJBz9Y0LsFWNMIhRVdyq+PVjGGARWe
-         /IBA==
-X-Gm-Message-State: AOAM530ohxFpIMig4mBh21XWPQTTQyQhICMEQQkRlKLZxjJNmQ2ONeky
-        U6WgSfYa3uqLzVQnKL/6Lw1blzfXRowCmkul
-X-Google-Smtp-Source: ABdhPJxLHRhLtWtZ3CRZQJCp5+yLa4Xu3IybsZWMpigkUXRnpDSiRgg7OQiFlzXN1rare9EoKjSi/A==
-X-Received: by 2002:a9d:3c3:: with SMTP id f61mr4902109otf.196.1634997686271;
-        Sat, 23 Oct 2021 07:01:26 -0700 (PDT)
-Received: from ?IPv6:2600:380:7c74:6b9d:23e8:d6e3:1c2d:7022? ([2600:380:7c74:6b9d:23e8:d6e3:1c2d:7022])
-        by smtp.gmail.com with ESMTPSA id 95sm2286391otr.2.2021.10.23.07.01.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 23 Oct 2021 07:01:25 -0700 (PDT)
-Subject: Re: [PATCH] fs: kill unused ret2 argument from iocb->ki_complete()
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     John Keeping <john@metanate.com>, linux-usb@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <ce839d66-1d05-dab8-4540-71b8485fdaf3@kernel.dk>
- <YXBSLweOk1he8DTO@infradead.org>
- <fe54edc2-da83-6dbb-cfb9-ad3a7fbe3780@kernel.dk> <YXBWk8Zzi7yIyTi/@kroah.com>
- <20211021174021.273c82b1.john@metanate.com>
- <e39e7f45-1c1e-a9bb-b413-1dfc21b1b20f@kernel.dk> <YXPRQV1BT2yYYOgN@kroah.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ca6107d5-8e17-3a07-f039-7a06761c616c@kernel.dk>
-Date:   Sat, 23 Oct 2021 08:01:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Sat, 23 Oct 2021 11:45:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635003792;
+        bh=Z6K7LTvBRIJIb0g/+eF6LqIR9On0z/f56XxFPFMQiWY=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=aL8ymHXZUUKeU0G5rFeg9R5eN6SbAHNeSTiM7nPDjW3PN6IttfMyfKo1HvrxCvaDJ
+         /AwGoyP6x2VkMBw+SBB1hH3b6cKTXmF33zaATtw2H4wFcNCAj/SvsmeysP+a58B9uF
+         8EDkb1GaXE7edRJrf1mg9aaYGcrP6ngJE6FpFxZ4=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 7970D12805A8;
+        Sat, 23 Oct 2021 11:43:12 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id Etrgv-_yR2Hh; Sat, 23 Oct 2021 11:43:12 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635003792;
+        bh=Z6K7LTvBRIJIb0g/+eF6LqIR9On0z/f56XxFPFMQiWY=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=aL8ymHXZUUKeU0G5rFeg9R5eN6SbAHNeSTiM7nPDjW3PN6IttfMyfKo1HvrxCvaDJ
+         /AwGoyP6x2VkMBw+SBB1hH3b6cKTXmF33zaATtw2H4wFcNCAj/SvsmeysP+a58B9uF
+         8EDkb1GaXE7edRJrf1mg9aaYGcrP6ngJE6FpFxZ4=
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id C1C1312801A1;
+        Sat, 23 Oct 2021 11:43:10 -0400 (EDT)
+Message-ID: <571fc7393fb043e3c34bca57402bd098a56ea8ac.camel@HansenPartnership.com>
+Subject: Re: please revert the UFS HPB support
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Daejun Park <daejun7.park@samsung.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+Date:   Sat, 23 Oct 2021 11:43:09 -0400
+In-Reply-To: <2cba13c3-bcd5-2a47-e4cb-54fa1ca088f3@acm.org>
+References: <20211021144210.GA28195@lst.de>
+         <84fac5a3-135a-2ac8-5929-a1031a311cb7@kernel.dk>
+         <20211021151520.GA31407@lst.de> <20211021151728.GA31600@lst.de>
+         <2cba13c3-bcd5-2a47-e4cb-54fa1ca088f3@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-In-Reply-To: <YXPRQV1BT2yYYOgN@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/23/21 3:09 AM, Greg Kroah-Hartman wrote:
-> On Fri, Oct 22, 2021 at 09:44:32AM -0600, Jens Axboe wrote:
->> On 10/21/21 10:40 AM, John Keeping wrote:
->>> On Wed, 20 Oct 2021 19:49:07 +0200
->>> Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
->>>
->>>> On Wed, Oct 20, 2021 at 11:35:27AM -0600, Jens Axboe wrote:
->>>>> On 10/20/21 11:30 AM, Christoph Hellwig wrote:  
->>>>>> On Wed, Oct 20, 2021 at 10:49:07AM -0600, Jens Axboe wrote:  
->>>>>>> It's not used for anything, and we're wasting time passing in zeroes
->>>>>>> where we could just ignore it instead. Update all ki_complete users in
->>>>>>> the kernel to drop that last argument.
->>>>>>>
->>>>>>> The exception is the USB gadget code, which passes in non-zero. But
->>>>>>> since nobody every looks at ret2, it's still pointless.  
->>>>>>
->>>>>> Yes, the USB gadget passes non-zero, and aio passes that on to
->>>>>> userspace.  So this is an ABI change.  Does it actually matter?
->>>>>> I don't know, but you could CC the relevant maintainers and list
->>>>>> to try to figure that out.  
->>>>>
->>>>> True, guess it does go out to userspace. Greg, is anyone using
->>>>> it on the userspace side?  
->>>>
->>>> I really do not know (adding linux-usb@vger)  My interactions with the
->>>> gadget code have not been through the aio api, thankfully :)
->>>>
->>>> Odds are it's fine, I think that something had to be passed in there so
->>>> that was chosen?  If the aio code didn't do anything with it, I can't
->>>> see where the gadget code gets it back at anywhere, but I might be
->>>> looking in the wrong place.
->>>>
->>>> Anyone else here know?
->>>
->>> I really doubt anyone uses io_event::res2 with FunctionFS gadgets.  The
->>> examples in tools/usb/ffs-aio-example/ either check just "res" or ignore
->>> the status completely.
->>>
->>> The only other program I can find using aio FunctionFS is adbd which
->>> also checks res and ignores res2 [1].  Other examples I know of just use
->>> synchronous I/O.
->>
->> So is there consensus on the USB side that we can just fill res2 with
->> zero? The single cases that does just do res == res2 puts the error
->> in res anyway, which is what you'd expect.
->>
->> If so, then I do think that'd be cleaner than packing two values into
->> a u64.
+On Thu, 2021-10-21 at 09:22 -0700, Bart Van Assche wrote:
+> On 10/21/21 8:17 AM, Christoph Hellwig wrote:
+> > On Thu, Oct 21, 2021 at 05:15:20PM +0200, Christoph Hellwig wrote:
+> > > > > I just noticed the UFS HPB support landed in 5.15, and just
+> > > > > as before it is completely broken by allocating another
+> > > > > request on the same device and then reinserting it in the
+> > > > > queue.  It is bad enough that we have to live with
+> > > > > blk_insert_cloned_request for dm-mpath, but this is too big
+> > > > > of an API abuse to make it into a release.  We need to drop
+> > > > > this code ASAP, and I can prepare a patch for that.
+> > > > 
+> > > > That sounds awful, do you have a link to the offending
+> > > > commit(s)?
+> > > 
+> > > I'll need to look for it, busy in calls right now, but just grep
+> > > for blk_insert_cloned_request.
+> > 
+> > Might as well finish the git blame:
+> > 
+> > commit 41d8a9333cc96f5ad4dd7a52786585338257d9f1
+> > Author: Daejun Park <daejun7.park@samsung.com>
+> > Date:   Mon Jul 12 18:00:25 2021 +0900
+> > 
+> >      scsi: ufs: ufshpb: Add HPB 2.0 support
+> >          
+> >      Version 2.0 of HBP supports reads of varying sizes from 4KB to
+> > 1MB.
+> > 
+> >      A read operation <= 32KB is supported as single HPB read. A
+> > read between
+> >      36KB and 1MB is supported by a combination of write buffer
+> > command and HPB
+> >      read command to deliver more PPN. The write buffer commands
+> > may not be
+> >      issued immediately due to busy tags. To use HPB read more
+> > aggressively, the
+> >      driver can requeue the write buffer command. The requeue
+> > threshold is
+> >      implemented as timeout and can be modified with
+> > requeue_timeout_ms entry in
+> >      sysfs.
 > 
-> I think yes, we should try that, and if something breaks, be ready to
-> provide a fix for it.
+> (+Daejun)
+> 
+> Daejun, can the HPB code be reworked such that it does not use 
+> blk_insert_cloned_request()? I'm concerned that if the HPB code is
+> not reworked that it will be removed from the upstream kernel.
 
-I've split the change in two, one that gets rid of the special arguments
-on the USB side, and one that then drops it for the whole kernel since
-everybody passes 0 at that point. Should make it easy to pinpoint, if
-need be.
+Just to give urgency to Bart's request: we have two or three weeks
+before the kernel is due to go final.  Can the problems identified by
+Christoph be fixed within that timeframe?
 
--- 
-Jens Axboe
+Specifically, looking at the paper you reference, it only uses READ
+BUFFER for the host cache sharing.  Since the JDEC standard appears to
+be proprietary, I have no method of understanding why the driver now
+uses WRITE BUFFER as well, but it appears to be a simple optimization. 
+If you can cut out the WRITE BUFFER code, blk_insert_cloned_request()
+will also be gone and thus the API abuse.  Can you get us a simple
+patch doing this ASAP so we don't have to revert the driver?
+
+James
+
 
