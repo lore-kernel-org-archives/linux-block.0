@@ -2,129 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BB7C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 17:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF56C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 18:58:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99ED360FD9
-	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 17:15:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C966560FC3
+	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 18:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbhJWRRo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Oct 2021 13:17:44 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:44989 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230051AbhJWRRo (ORCPT
+        id S231137AbhJWTAr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Oct 2021 15:00:47 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:50911 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230104AbhJWTAq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Oct 2021 13:17:44 -0400
-Received: by mail-il1-f199.google.com with SMTP id k11-20020a92c24b000000b00259faad3693so3454930ilo.11
-        for <linux-block@vger.kernel.org>; Sat, 23 Oct 2021 10:15:25 -0700 (PDT)
+        Sat, 23 Oct 2021 15:00:46 -0400
+Received: by mail-io1-f71.google.com with SMTP id z18-20020a6b5c12000000b005dccad62545so5695247ioh.17
+        for <linux-block@vger.kernel.org>; Sat, 23 Oct 2021 11:58:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=DV/MOHQ2co/CAzFUt/mzNaZB34djLqxLLJWPVD/n/f0=;
-        b=HaNYVWLTJcplNWZymnunhbIjlH3TDw++fvhnzykblTPUY0393erCAEjef/NB47+06+
-         nE8XjxSLNOZkA6D+End6w1rcgZXQx5blPm1nXEvKPhtwMIbDsRhVdhwCTbMf4cjHENyA
-         pw1LFuuwvR8TPJ3QdgdlK3mCtov/oY0+8cgYwdS3YcVdpTvv4fdiyzRGLNL230oQ8WDy
-         NBx3v6K2ptPf38tFAcz8j3R2XzQemSh4J9ECuKSZhVCjMejgz4bHNyP4SM0VrjUQzVxm
-         GdDjkljQFX488OmxRlhRbr4dYj1OpN/XYpLuPLrvirwcI8XLrFMrPIvtA3vScUkJALcA
-         xX7w==
-X-Gm-Message-State: AOAM532aRhmE1vK5M1c1AeywVpKDC/XT+yQnFw+QagdDwdGIemCBJMP+
-        ZnyyAHEhr1LE8GiYWCaJUAsFOhlGTsFrg7HUhUbg/MlsOGpc
-X-Google-Smtp-Source: ABdhPJxQiYdY2Ge3I/CZfGVj3hnnOQjjvPSuufHe16qPTseoy5wI1aATM1VWW/22Eq+2N2YbFstqGS+qVn2UxowoJ8oGzlNIKaux
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=eCivDOpGNwJ3PvYvmEJEwXEnX0U6KVVQYKAd0WYoqUQ=;
+        b=25WFCBABQ1shqe4+OSj8/YXgJyy0eMZCM3xJmi7r383RX7lnT2rdf0I5Kajh/PyJRF
+         uNmKcc+4nH1It9R3jMEznLJfnfyDSj6/xtT6yUouZ/WP38FS6aDjuQTtmObm9mX4+1U3
+         y0rlmfupmO8xEfRladQFHU5d1xZZe2rxxMwSKB7eVxhNrfu7osSi9HmcUYvbkuZnC6cz
+         pKg2I4/5VA3GYg6COtiBH2jxe9XB2Nx3zKzVLVcOwWsUlKFr2mUtkGkhkaYU487gFgho
+         XO6rAItHw7tflW0wP4JnycBOe8Z9p7GIzwwNMgLtkpdL4ojwcDkFXyVSUoSp6hMF7XnV
+         OVLA==
+X-Gm-Message-State: AOAM533ZUf3C9xfvFaBCeLED9C7PYX5UHsoT5B9OCO4Ytx5d6TYuE5Ve
+        LunAem0HvbY0sM7e4iwMRcFA0I4DgDGiKJtR8EkUiqPoyiVR
+X-Google-Smtp-Source: ABdhPJyZbEzHvvsdjRIXP2qZL+wuOQzbRZUt+s8X3dbAGfjjAKRHhxTl5dVi75AjMydIXvOQA7+15tTKrqxbyZ5CyLURN3WIHJSN
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:13e2:: with SMTP id w2mr4236775ilj.110.1635009324846;
- Sat, 23 Oct 2021 10:15:24 -0700 (PDT)
-Date:   Sat, 23 Oct 2021 10:15:24 -0700
+X-Received: by 2002:a05:6e02:1ba5:: with SMTP id n5mr1803268ili.249.1635015507189;
+ Sat, 23 Oct 2021 11:58:27 -0700 (PDT)
+Date:   Sat, 23 Oct 2021 11:58:27 -0700
+In-Reply-To: <0000000000004ee28405cbe8d287@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000003129805cf0846c0@google.com>
-Subject: [syzbot] WARNING in cleanup_srcu_struct (3)
-From:   syzbot <syzbot+86a4d699d56e1efda543@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Message-ID: <00000000000082261505cf09b69c@google.com>
+Subject: Re: [syzbot] memory leak in blk_iolatency_init
+From:   syzbot <syzbot+01321b15cc98e6bf96d6@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        noreply@bizcloud-server.changyang.com.tw, sashal@kernel.org,
+        stable@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        tj@kernel.org, yanfei.xu@windriver.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+syzbot has found a reproducer for the following issue on:
 
-syzbot found the following issue on:
-
-HEAD commit:    519d81956ee2 Linux 5.15-rc6
+HEAD commit:    9c0c4d24ac00 Merge tag 'block-5.15-2021-10-22' of git://gi..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1003f734b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d95853dad8472c91
-dashboard link: https://syzkaller.appspot.com/bug?extid=86a4d699d56e1efda543
-compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
+console output: https://syzkaller.appspot.com/x/log.txt?x=1709f5c4b00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d25eeb482b0f99b
+dashboard link: https://syzkaller.appspot.com/bug?extid=01321b15cc98e6bf96d6
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102280acb00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=144b96f8b00000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+86a4d699d56e1efda543@syzkaller.appspotmail.com
+Reported-by: syzbot+01321b15cc98e6bf96d6@syzkaller.appspotmail.com
 
-WARNING: CPU: 0 PID: 484 at lib/debugobjects.c:508 debug_print_object lib/debugobjects.c:505 [inline]
-WARNING: CPU: 0 PID: 484 at lib/debugobjects.c:508 debug_object_assert_init+0x1fa/0x250 lib/debugobjects.c:895
-Modules linked in:
-CPU: 0 PID: 484 Comm: syz-executor.3 Not tainted 5.15.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:debug_print_object lib/debugobjects.c:505 [inline]
-RIP: 0010:debug_object_assert_init+0x1fa/0x250 lib/debugobjects.c:895
-Code: e8 2b 16 b8 fd 4c 8b 45 00 48 c7 c7 a0 2f b4 8a 48 c7 c6 00 2c b4 8a 48 c7 c2 e0 31 b4 8a 31 c9 49 89 d9 31 c0 e8 b6 c7 36 fd <0f> 0b ff 05 7a 59 c5 09 48 83 c5 38 48 89 e8 48 c1 e8 03 42 80 3c
-RSP: 0018:ffffc90012ae6e78 EFLAGS: 00010246
-RAX: 4660acffeccb0800 RBX: 0000000000000000 RCX: 0000000000040000
-RDX: ffffc90010531000 RSI: 000000000000a7fa RDI: 000000000000a7fb
-RBP: ffffffff8a512d00 R08: ffffffff81693402 R09: ffffed10173857a8
-R10: ffffed10173857a8 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffff8880b9c00110 R14: 0000000000000003 R15: ffffffff90c0a0a0
-FS:  00007f5227fd9700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555555c92708 CR3: 000000008b078000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- debug_timer_assert_init kernel/time/timer.c:739 [inline]
- debug_assert_init kernel/time/timer.c:784 [inline]
- try_to_del_timer_sync+0xa5/0x3c0 kernel/time/timer.c:1229
- del_timer_sync+0x238/0x2f0 kernel/time/timer.c:1382
- cleanup_srcu_struct+0x2ca/0x580 kernel/rcu/srcutree.c:379
- blk_mq_hw_sysfs_release+0x6c/0x130 block/blk-mq-sysfs.c:40
- kobject_cleanup+0x1c0/0x280 lib/kobject.c:705
- blk_mq_release+0x255/0x2d0 block/blk-mq.c:3101
- blk_release_queue+0x306/0x420 block/blk-sysfs.c:823
- kobject_cleanup+0x1c0/0x280 lib/kobject.c:705
- __blk_mq_alloc_disk+0x101/0x150 block/blk-mq.c:3149
- nbd_dev_add+0x34d/0x940 drivers/block/nbd.c:1721
- nbd_genl_connect+0xa66/0x1f50 drivers/block/nbd.c:1889
- genl_family_rcv_msg_doit net/netlink/genetlink.c:731 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
- genl_rcv_msg+0x1032/0x1480 net/netlink/genetlink.c:792
- netlink_rcv_skb+0x200/0x470 net/netlink/af_netlink.c:2510
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x814/0x9f0 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0xa29/0xe50 net/netlink/af_netlink.c:1935
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg net/socket.c:724 [inline]
- ____sys_sendmsg+0x5b9/0x910 net/socket.c:2409
- ___sys_sendmsg net/socket.c:2463 [inline]
- __sys_sendmsg+0x36f/0x450 net/socket.c:2492
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f522aa84a39
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f5227fd9188 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f522ab88020 RCX: 00007f522aa84a39
-RDX: 0000000000000000 RSI: 0000000020000700 RDI: 0000000000000004
-RBP: 00007f522aadec5f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffe58c753ff R14: 00007f5227fd9300 R15: 0000000000022000
+BUG: memory leak
+unreferenced object 0xffff888104729800 (size 96):
+  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
+  hex dump (first 32 bytes):
+    00 49 c9 85 ff ff ff ff e0 b0 8b 03 81 88 ff ff  .I..............
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
+    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
+    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
+    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
+    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
+    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
+    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
+    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
+    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
+    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
+    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
+    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
+BUG: memory leak
+unreferenced object 0xffff888104729400 (size 96):
+  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
+  hex dump (first 32 bytes):
+    00 49 c9 85 ff ff ff ff 90 a8 8b 03 81 88 ff ff  .I..............
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
+    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
+    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
+    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
+    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
+    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
+    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
+    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
+    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
+    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
+    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
+    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+BUG: memory leak
+unreferenced object 0xffff888104767e00 (size 96):
+  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
+  hex dump (first 32 bytes):
+    00 49 c9 85 ff ff ff ff 40 a0 8b 03 81 88 ff ff  .I......@.......
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
+    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
+    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
+    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
+    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
+    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
+    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
+    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
+    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
+    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
+    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
+    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+BUG: memory leak
+unreferenced object 0xffff888104767500 (size 96):
+  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
+  hex dump (first 32 bytes):
+    00 49 c9 85 ff ff ff ff 60 31 88 03 81 88 ff ff  .I......`1......
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
+    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
+    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
+    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
+    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
+    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
+    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
+    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
+    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
+    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
+    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
+    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+
+write to /proc/sys/kernel/hung_task_check_interval_secs failed: No such file or directory
+write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
+write to /proc/sys/kernel/hung_task_check_interval_secs failed: No such file or directory
+write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
+
