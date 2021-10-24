@@ -2,164 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF56C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 18:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF75C433FE
+	for <linux-block@archiver.kernel.org>; Sun, 24 Oct 2021 00:03:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C966560FC3
-	for <linux-block@archiver.kernel.org>; Sat, 23 Oct 2021 18:58:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0FC360E96
+	for <linux-block@archiver.kernel.org>; Sun, 24 Oct 2021 00:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231137AbhJWTAr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Oct 2021 15:00:47 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:50911 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230104AbhJWTAq (ORCPT
+        id S231372AbhJXAFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Oct 2021 20:05:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41378 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230284AbhJXAFj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Oct 2021 15:00:46 -0400
-Received: by mail-io1-f71.google.com with SMTP id z18-20020a6b5c12000000b005dccad62545so5695247ioh.17
-        for <linux-block@vger.kernel.org>; Sat, 23 Oct 2021 11:58:27 -0700 (PDT)
+        Sat, 23 Oct 2021 20:05:39 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DD3C061764;
+        Sat, 23 Oct 2021 17:03:19 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id o4-20020a17090a3d4400b001a1c8344c3fso6383022pjf.3;
+        Sat, 23 Oct 2021 17:03:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:references:cc:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding;
+        bh=PxwtS641WYFpHkOEkJn+avDYn2BdLBo4DP4nO7ftXvU=;
+        b=SL+DviOgCpxPI+EbDKx7sGamzqbXdpRsT5d2ofbPZ+yYodnja4MW8Lad1M/CNZPT64
+         I+U2gmuBI0efwEGbGCqjMvnrDsJTrvKHAfycXNj9L39TUIHasPMQZ1x+J1jXtBoskT12
+         jd6ViLyPLlic6RofzOWCIzMiRJpw5/SGTV+5676o48mQ3AJly+W83rNvwls+6m5Zj0SD
+         r7BOd58BuvuMBpBQeMQjIg0qAsw7QELlYvKOZQI8Ik5V/wK3tHAwKCY1oz/4bvvAh0S9
+         9A0DafTMwU1OJATeuQO/3rE81wt8XY4twDyn8neJ3+TdR9+V1+mAHPSkRhQOdZK2l97v
+         XNjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=eCivDOpGNwJ3PvYvmEJEwXEnX0U6KVVQYKAd0WYoqUQ=;
-        b=25WFCBABQ1shqe4+OSj8/YXgJyy0eMZCM3xJmi7r383RX7lnT2rdf0I5Kajh/PyJRF
-         uNmKcc+4nH1It9R3jMEznLJfnfyDSj6/xtT6yUouZ/WP38FS6aDjuQTtmObm9mX4+1U3
-         y0rlmfupmO8xEfRladQFHU5d1xZZe2rxxMwSKB7eVxhNrfu7osSi9HmcUYvbkuZnC6cz
-         pKg2I4/5VA3GYg6COtiBH2jxe9XB2Nx3zKzVLVcOwWsUlKFr2mUtkGkhkaYU487gFgho
-         XO6rAItHw7tflW0wP4JnycBOe8Z9p7GIzwwNMgLtkpdL4ojwcDkFXyVSUoSp6hMF7XnV
-         OVLA==
-X-Gm-Message-State: AOAM533ZUf3C9xfvFaBCeLED9C7PYX5UHsoT5B9OCO4Ytx5d6TYuE5Ve
-        LunAem0HvbY0sM7e4iwMRcFA0I4DgDGiKJtR8EkUiqPoyiVR
-X-Google-Smtp-Source: ABdhPJyZbEzHvvsdjRIXP2qZL+wuOQzbRZUt+s8X3dbAGfjjAKRHhxTl5dVi75AjMydIXvOQA7+15tTKrqxbyZ5CyLURN3WIHJSN
+        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
+        bh=PxwtS641WYFpHkOEkJn+avDYn2BdLBo4DP4nO7ftXvU=;
+        b=BUiZZUr/xKRyxbzAExQ6IfzlDpv4E17G6ID5gDNb7omarwLPC65qQvioCE7Wjf6Ely
+         YOCg7CCZaMOy+g9nPYt/9PEJ+fo6ifWFMUZvASagO2Am0oNT1xf3lQojssSySYvTKk/e
+         kV7ah74Z54u61n8fUyVbwsNj3GgaemkqUQjSy1ODV948/HRk+X4uDb7LgXXTBtBbdvyP
+         hdoWvu4mojjLJXpEWhAgOKFbax0Fer7MudLjWZeyllmXL6oxVos5wCVlDq8IlqH0R47l
+         cc2Bpu6n+Wm5cdG3nmI5OWzDCgWZ6hCDNAy75Ffj6Pp1Ozl2D8qnqEU0qnThzJchqZOM
+         CFRA==
+X-Gm-Message-State: AOAM530cL/Bh86SiPWs5MJ0rGvhcJiZ+yjLsAXhuhXOzGDDCy5v66BHN
+        2vXYN64Z+bpMaZLnrokWC4o=
+X-Google-Smtp-Source: ABdhPJyXCyLbpKo7n5tJ9eyNZbqsG3IqcrSFvApjQOyYw/gbVWMlhSJkUplRCpSeujKHRZk9IXEDUg==
+X-Received: by 2002:a17:90b:388a:: with SMTP id mu10mr10384183pjb.0.1635033798833;
+        Sat, 23 Oct 2021 17:03:18 -0700 (PDT)
+Received: from [10.1.1.26] (222-155-4-20-adsl.sparkbb.co.nz. [222.155.4.20])
+        by smtp.gmail.com with ESMTPSA id h1sm15243550pfi.168.2021.10.23.17.03.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 23 Oct 2021 17:03:18 -0700 (PDT)
+Subject: Re: [PATCH v3 0/3] last batch of add_disk() error handling
+ conversions
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Luis Chamberlain <mcgrof@kernel.org>
+References: <20211021163856.2000993-1-mcgrof@kernel.org>
+ <66655777-6f9b-adbc-03ff-125aecd3f509@i-love.sakura.ne.jp>
+Cc:     linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        efremov@linux.com, song@kernel.org, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, viro@zeniv.linux.org.uk, hare@suse.de,
+        jack@suse.cz, ming.lei@redhat.com, tj@kernel.org
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <ad1546c4-cfb7-3dd2-9592-9916c23ae164@gmail.com>
+Date:   Sun, 24 Oct 2021 13:03:02 +1300
+User-Agent: Mozilla/5.0 (X11; Linux ppc64; rv:45.0) Gecko/20100101
+ Thunderbird/45.8.0
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1ba5:: with SMTP id n5mr1803268ili.249.1635015507189;
- Sat, 23 Oct 2021 11:58:27 -0700 (PDT)
-Date:   Sat, 23 Oct 2021 11:58:27 -0700
-In-Reply-To: <0000000000004ee28405cbe8d287@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000082261505cf09b69c@google.com>
-Subject: Re: [syzbot] memory leak in blk_iolatency_init
-From:   syzbot <syzbot+01321b15cc98e6bf96d6@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        noreply@bizcloud-server.changyang.com.tw, sashal@kernel.org,
-        stable@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        tj@kernel.org, yanfei.xu@windriver.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <66655777-6f9b-adbc-03ff-125aecd3f509@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Hi Tetsuo,
 
-HEAD commit:    9c0c4d24ac00 Merge tag 'block-5.15-2021-10-22' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1709f5c4b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d25eeb482b0f99b
-dashboard link: https://syzkaller.appspot.com/bug?extid=01321b15cc98e6bf96d6
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102280acb00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=144b96f8b00000
+On 22/10/21 14:06, Tetsuo Handa wrote:
+> On 2021/10/22 1:38, Luis Chamberlain wrote:
+>> I rebased Tetsuo Handa's patch onto the latest linux-next as this
+>> series depends on it, and so I am sending it part of this series as
+>> without it, this won't apply. Tetsuo, does the rebase of your patch
+>> look OK?
+>
+> OK, though I wanted my fix to be sent to upstream and stable before this series.
+>
+>>
+>> If it is not too much trouble, I'd like to ask for testing for the
+>> ataflop changes from Michael Schmitz, if possible, that is he'd just
+>> have to merge Tetsuo's rebased patch and the 2nd patch in this series.
+>> This is all rebased on linux-next tag 20211020.
+>
+> Yes, please.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+01321b15cc98e6bf96d6@syzkaller.appspotmail.com
+Took a little convincing (patch 2 didn't apply cleanly by 'git am' on 
+yesterday's top of linux-next), but works just fine, thanks.
 
-BUG: memory leak
-unreferenced object 0xffff888104729800 (size 96):
-  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
-  hex dump (first 32 bytes):
-    00 49 c9 85 ff ff ff ff e0 b0 8b 03 81 88 ff ff  .I..............
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
-    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
-    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
-    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
-    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
-    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
-    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
-    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
-    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
-    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
-    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
-    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
-    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
-    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
-    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+I'll submit another patch with ataflop fixes that were used in my tests, 
+but nothing in that interacts with your patches at all.
 
-BUG: memory leak
-unreferenced object 0xffff888104729400 (size 96):
-  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
-  hex dump (first 32 bytes):
-    00 49 c9 85 ff ff ff ff 90 a8 8b 03 81 88 ff ff  .I..............
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
-    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
-    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
-    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
-    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
-    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
-    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
-    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
-    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
-    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
-    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
-    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
-    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
-    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
-    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+Tested-by: Michael Schmitz <schmitzmic@gmail.com>
 
-BUG: memory leak
-unreferenced object 0xffff888104767e00 (size 96):
-  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
-  hex dump (first 32 bytes):
-    00 49 c9 85 ff ff ff ff 40 a0 8b 03 81 88 ff ff  .I......@.......
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
-    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
-    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
-    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
-    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
-    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
-    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
-    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
-    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
-    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
-    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
-    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
-    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
-    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
-    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-BUG: memory leak
-unreferenced object 0xffff888104767500 (size 96):
-  comm "kworker/u4:2", pid 156, jiffies 4294937755 (age 219.670s)
-  hex dump (first 32 bytes):
-    00 49 c9 85 ff ff ff ff 60 31 88 03 81 88 ff ff  .I......`1......
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff82268cf8>] kmalloc include/linux/slab.h:591 [inline]
-    [<ffffffff82268cf8>] kzalloc include/linux/slab.h:721 [inline]
-    [<ffffffff82268cf8>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:724
-    [<ffffffff8225f71e>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1193
-    [<ffffffff82228fca>] blk_alloc_queue+0x22a/0x2e0 block/blk-core.c:584
-    [<ffffffff8223ee35>] blk_mq_init_queue_data block/blk-mq.c:3119 [inline]
-    [<ffffffff8223ee35>] __blk_mq_alloc_disk+0x25/0xd0 block/blk-mq.c:3143
-    [<ffffffff826a187f>] floppy_alloc_disk+0x2f/0x130 drivers/block/floppy.c:4495
-    [<ffffffff86f2aaa9>] do_floppy_init drivers/block/floppy.c:4566 [inline]
-    [<ffffffff86f2aaa9>] floppy_async_init+0x10f/0x1329 drivers/block/floppy.c:4731
-    [<ffffffff81277354>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
-    [<ffffffff81265dbf>] process_one_work+0x2cf/0x620 kernel/workqueue.c:2297
-    [<ffffffff812666c9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2444
-    [<ffffffff8126fc48>] kthread+0x188/0x1d0 kernel/kthread.c:319
-    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
-write to /proc/sys/kernel/hung_task_check_interval_secs failed: No such file or directory
-write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
-write to /proc/sys/kernel/hung_task_check_interval_secs failed: No such file or directory
-write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
-
+> After this series, I guess we can remove "bool registered[NUM_DISK_MINORS];" like below
+> due to (unit[drive].disk[type] != NULL) == (unit[drive].registered[type] == true).
+> Regarding this series, setting unit[drive].registered[type] = true in ataflop_probe() is
+> pointless because atari_floppy_cleanup() checks unit[i].disk[type] != NULL for calling
+> del_gendisk(). And we need to fix __register_blkdev() in driver/block/floppy.c because
+> floppy_probe_lock is pointless.
+>
+>  drivers/block/ataflop.c | 75 +++++++++++++++--------------------------
+>  1 file changed, 28 insertions(+), 47 deletions(-)
+>
+> diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+> index c58750dcc685..7fedf8506335 100644
+> --- a/drivers/block/ataflop.c
+> +++ b/drivers/block/ataflop.c
+> @@ -299,7 +299,6 @@ static struct atari_floppy_struct {
+>  				   disk change detection) */
+>  	int flags;		/* flags */
+>  	struct gendisk *disk[NUM_DISK_MINORS];
+> -	bool registered[NUM_DISK_MINORS];
+>  	int ref;
+>  	int type;
+>  	struct blk_mq_tag_set tag_set;
+> @@ -1988,41 +1987,20 @@ static int ataflop_probe(dev_t dev)
+>  	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS)
+>  		return -EINVAL;
+>
+> -	if (!unit[drive].disk[type]) {
+> -		err = ataflop_alloc_disk(drive, type);
+> -		if (err == 0) {
+> -			err = add_disk(unit[drive].disk[type]);
+> -			if (err) {
+> -				blk_cleanup_disk(unit[drive].disk[type]);
+> -				unit[drive].disk[type] = NULL;
+> -			} else
+> -				unit[drive].registered[type] = true;
+> +	if (unit[drive].disk[type])
+> +		return 0;
+> +	err = ataflop_alloc_disk(drive, type);
+> +	if (err == 0) {
+> +		err = add_disk(unit[drive].disk[type]);
+> +		if (err) {
+> +			blk_cleanup_disk(unit[drive].disk[type]);
+> +			unit[drive].disk[type] = NULL;
+>  		}
+>  	}
+>
+>  	return err;
+>  }
+>
+> -static void atari_floppy_cleanup(void)
+> -{
+> -	int i;
+> -	int type;
+> -
+> -	for (i = 0; i < FD_MAX_UNITS; i++) {
+> -		for (type = 0; type < NUM_DISK_MINORS; type++) {
+> -			if (!unit[i].disk[type])
+> -				continue;
+> -			del_gendisk(unit[i].disk[type]);
+> -			blk_cleanup_queue(unit[i].disk[type]->queue);
+> -			put_disk(unit[i].disk[type]);
+> -		}
+> -		blk_mq_free_tag_set(&unit[i].tag_set);
+> -	}
+> -
+> -	del_timer_sync(&fd_timer);
+> -	atari_stram_free(DMABuffer);
+> -}
+> -
+>  static void atari_cleanup_floppy_disk(struct atari_floppy_struct *fs)
+>  {
+>  	int type;
+> @@ -2030,13 +2008,24 @@ static void atari_cleanup_floppy_disk(struct atari_floppy_struct *fs)
+>  	for (type = 0; type < NUM_DISK_MINORS; type++) {
+>  		if (!fs->disk[type])
+>  			continue;
+> -		if (fs->registered[type])
+> -			del_gendisk(fs->disk[type]);
+> +		del_gendisk(fs->disk[type]);
+>  		blk_cleanup_disk(fs->disk[type]);
+>  	}
+>  	blk_mq_free_tag_set(&fs->tag_set);
+>  }
+>
+> +static void atari_floppy_cleanup(void)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < FD_MAX_UNITS; i++)
+> +		atari_cleanup_floppy_disk(&unit[i]);
+> +
+> +	del_timer_sync(&fd_timer);
+> +	if (DMABuffer)
+> +		atari_stram_free(DMABuffer);
+> +}
+> +
+>  static int __init atari_floppy_init (void)
+>  {
+>  	int i;
+> @@ -2055,13 +2044,10 @@ static int __init atari_floppy_init (void)
+>  		unit[i].tag_set.numa_node = NUMA_NO_NODE;
+>  		unit[i].tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+>  		ret = blk_mq_alloc_tag_set(&unit[i].tag_set);
+> -		if (ret)
+> -			goto err;
+> -
+> -		ret = ataflop_alloc_disk(i, 0);
+>  		if (ret) {
+> -			blk_mq_free_tag_set(&unit[i].tag_set);
+> -			goto err;
+> +			while (--i >= 0)
+> +				blk_mq_free_tag_set(&unit[i].tag_set);
+> +			return ret;
+>  		}
+>  	}
+>
+> @@ -2090,10 +2076,9 @@ static int __init atari_floppy_init (void)
+>  	for (i = 0; i < FD_MAX_UNITS; i++) {
+>  		unit[i].track = -1;
+>  		unit[i].flags = 0;
+> -		ret = add_disk(unit[i].disk[0]);
+> -		if (ret)
+> -			goto err_out_dma;
+> -		unit[i].registered[0] = true;
+> +		ret = ataflop_probe(MKDEV(0, 1 << 2));
+> +		if (err)
+> +			goto err;
+>  	}
+>
+>  	printk(KERN_INFO "Atari floppy driver: max. %cD, %strack buffering\n",
+> @@ -2108,12 +2093,8 @@ static int __init atari_floppy_init (void)
+>  	}
+>  	return ret;
+>
+> -err_out_dma:
+> -	atari_stram_free(DMABuffer);
+>  err:
+> -	while (--i >= 0)
+> -		atari_cleanup_floppy_disk(&unit[i]);
+> -
+> +	atari_floppy_cleanup();
+>  	return ret;
+>  }
+>
+>
