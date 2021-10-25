@@ -2,199 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFE4C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E8C8C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:44:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF37460EDF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59DD560E05
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:44:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232671AbhJYNoY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 09:44:24 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:26120 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230502AbhJYNoY (ORCPT
+        id S232840AbhJYNqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 09:46:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232740AbhJYNqf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 09:44:24 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4HdGKd30LQz1DHsD;
-        Mon, 25 Oct 2021 21:40:05 +0800 (CST)
-Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.15; Mon, 25 Oct 2021 21:41:58 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.15; Mon, 25 Oct 2021 21:41:57 +0800
-Subject: Re: [PATCH 0/2] nbd: fix sanity check for first_minor
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     Pavel Skripkin <paskripkin@gmail.com>, <josef@toxicpanda.com>,
-        <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
-        <luomeng12@huawei.com>, Christoph Hellwig <hch@lst.de>
-References: <20211021122936.758221-1-yukuai3@huawei.com>
- <72fb140d-609b-c035-bdd6-d2b8639c116b@gmail.com>
- <17182476-e5bf-f493-9d9b-fedb2d9c8e1a@huawei.com>
- <92d9f001-f77b-8263-53a6-aab83daccef9@huawei.com>
-Message-ID: <9199b0a5-8286-024f-1343-ea386140c206@huawei.com>
-Date:   Mon, 25 Oct 2021 21:41:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 25 Oct 2021 09:46:35 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B00C061767
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:44:13 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id v2-20020a05683018c200b0054e3acddd91so12472507ote.8
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MM8jdVyerQvfZyPbeUryPT3SmGVcOPU6mZrI4nILcLg=;
+        b=mClFKx2dbpXWM19Ektn5260qOIqFuNK7FfIPCUKflmWQPUKuoSwooBrYa5mdCIDY9O
+         RbYBt+p7CH7A/eiKgDCeuDyPNiu+O33V4DulgcaMQOGYdKNdb29Z4hSVJJ6mbKMKNZCt
+         8L6O35Jqi5emYiujXtgJ6DxkkD2Mof270wwPI4I9OjP1SJ5FKkUzzR9xAh1puEA+oDNh
+         6jt/6NaHAT9AULJhROpzHkij24CYDXJlc7QEn52vn/etzSA6zH7opnWOkx98hOyvx2K5
+         54Z3/HA21qBXe+T+sh/0EAt28Ie2werOS98U+oxpo9NixA3X/5OwSGlDZ0lli0B2aLHw
+         sjvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MM8jdVyerQvfZyPbeUryPT3SmGVcOPU6mZrI4nILcLg=;
+        b=6XlfVkXYT2nVOFI/wDv5kFZBSkJjV/p3wAFHAqbBeO0giaSaztv9OU0+7L+rmgNpZK
+         LrJIBtlWYFOUFGhI5xD+OXKClZGY9uZp7N9fMAcjIKuFCOK1G/s0lNw+ETPjDWTMXZAZ
+         nRvLMjn3LKda6okiUhoADcFcJSQmw6YLZk8/RAOA6t6zXofCVu32o08QSqyipvhp+M0v
+         2oF3pCfqcsAxiPuo83w098mkBalSE8Japu772/3GaZ+sbvqxX8Xunkl7xeERupafiB6o
+         uqignRcazsR5t/sEywuUS0wnlrx7ZOAi1Y2oYlgUA7vUq/h15TMOz65G+8hg5B/Y+syn
+         lV0g==
+X-Gm-Message-State: AOAM532N8e5IlllVn25JQK9l4IIDxcQkJahVh5rwmU4Ach3tICmsM7FJ
+        ABKVUH/6+ssfB2+Mfkxjh7nB2g==
+X-Google-Smtp-Source: ABdhPJzk+5hzL4/xOj0RwFzVNKc+Cm32fWiHUopjysK4P7xLCnfaNGn65C8Jj1xYhWwiq/ktgYz5ng==
+X-Received: by 2002:a9d:2033:: with SMTP id n48mr12897323ota.221.1635169452428;
+        Mon, 25 Oct 2021 06:44:12 -0700 (PDT)
+Received: from ?IPv6:2600:380:6060:12a6:721f:26e:6f8:a9aa? ([2600:380:6060:12a6:721f:26e:6f8:a9aa])
+        by smtp.gmail.com with ESMTPSA id g15sm3733385oiy.8.2021.10.25.06.44.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Oct 2021 06:44:12 -0700 (PDT)
+Subject: Re: [PATCH v3] block: fix incorrect references to disk objects
+To:     Zqiang <qiang.zhang1211@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     hch@lst.de, sunhao.th@gmail.com, hch@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211018115807.21103-1-qiang.zhang1211@gmail.com>
+ <YW1n91DAaVyuISVV@casper.infradead.org>
+ <9d2f7753-d7a7-f91e-077b-40b274199185@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d5b9a684-2405-7db8-02ab-8ebc93c40fd5@kernel.dk>
+Date:   Mon, 25 Oct 2021 07:44:07 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <92d9f001-f77b-8263-53a6-aab83daccef9@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <9d2f7753-d7a7-f91e-077b-40b274199185@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggema762-chm.china.huawei.com (10.1.198.204)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/10/21 21:37, yukuai (C) wrote:
-> On 2021/10/21 21:13, yukuai (C) wrote:
->> On 2021/10/21 20:35, Pavel Skripkin wrote:
->>> On 10/21/21 15:29, Yu Kuai wrote:
->>>> Yu Kuai (2):
->>>>    nbd: fix max value for 'first_minor'
->>>>    nbd: fix possible overflow for 'first_minor' in nbd_dev_add()
->>>>
->>>>   drivers/block/nbd.c | 6 +++---
->>>>   1 file changed, 3 insertions(+), 3 deletions(-)
->>>>
->>>
->>> Hi, Yu!
->>>
->>> Thank you for the fix, but this wrong check should be just removed, 
->>> since root case of wrong sysfs file creation was fixed, as Christoph 
->>> said [1]
+On 10/25/21 2:27 AM, Zqiang wrote:
 > 
-> Hi, Christoph
+> On 2021/10/18 下午8:26, Matthew Wilcox wrote:
+>> On Mon, Oct 18, 2021 at 07:58:07PM +0800, Zqiang wrote:
+>>> When adding partitions to the disk, the reference count of the disk
+>>> object is increased. then alloc partition device and called
+>>> device_add(), if the device_add() return error, the reference
+>>> count of the disk object will be reduced twice, at put_device(pdev)
+>>> and put_disk(disk). this leads to the end of the object's life cycle
+>>> prematurely, and trigger following calltrace.
+>>>
+>>>    __init_work+0x2d/0x50 kernel/workqueue.c:519
+>>>    synchronize_rcu_expedited+0x3af/0x650 kernel/rcu/tree_exp.h:847
+>>>    bdi_remove_from_list mm/backing-dev.c:938 [inline]
+>>>    bdi_unregister+0x17f/0x5c0 mm/backing-dev.c:946
+>>>    release_bdi+0xa1/0xc0 mm/backing-dev.c:968
+>>>    kref_put include/linux/kref.h:65 [inline]
+>>>    bdi_put+0x72/0xa0 mm/backing-dev.c:976
+>>>    bdev_free_inode+0x11e/0x220 block/bdev.c:408
+>>>    i_callback+0x3f/0x70 fs/inode.c:226
+>>>    rcu_do_batch kernel/rcu/tree.c:2508 [inline]
+>>>    rcu_core+0x76d/0x16c0 kernel/rcu/tree.c:2743
+>>>    __do_softirq+0x1d7/0x93b kernel/softirq.c:558
+>>>    invoke_softirq kernel/softirq.c:432 [inline]
+>>>    __irq_exit_rcu kernel/softirq.c:636 [inline]
+>>>    irq_exit_rcu+0xf2/0x130 kernel/softirq.c:648
+>>>    sysvec_apic_timer_interrupt+0x93/0xc0
+>>>
+>>> Return directly after calling the put_device().
+>>>
+>>> Reported-by: Hao Sun <sunhao.th@gmail.com>
+>>> Signed-off-by: Zqiang <qiang.zhang1211@gmail.com>
+>> Fixes: 9d3b8813895d ("block: change the refcounting for partitions")
+>> Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 > 
-> By the way, if we remove the checking, there will be two kernel warnings
-> when the problem happens. Maybe keeping the checking is better?
+> Hello Jens Axboe
+> 
+> The patch description information of the previous v2 version is 
+> incorrect, v3 modified the description information, please applied the 
+> v3 version.
 
-friendly ping ...
-> 
-> [   19.860640] sysfs: cannot create duplicate filename '/dev/block/43:0'
-> [   19.861659] CPU: 1 PID: 872 Comm: modprobe Not tainted 
-> 5.15.0-rc6-next-20211020-00001-g2f1
-> [   19.863175] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
-> BIOS ?-20190727_0738364
-> [   19.865183] Call Trace:
-> [   19.866512]  <TASK>
-> [   19.866863]  ? dump_stack_lvl+0x73/0x9f
-> [   19.867941]  ? dump_stack+0x13/0x1b
-> [   19.868475]  ? sysfs_warn_dup.cold+0x27/0x45
-> [   19.869075]  ? sysfs_do_create_link_sd.isra.0+0x131/0x150
-> [   19.869818]  ? sysfs_create_link+0x29/0x60
-> [   19.870459]  ? device_add+0xbd6/0xf60
-> [   19.871032]  ? _printk+0x5f/0x7d
-> [   19.871518]  ? device_add_disk+0x153/0x5d0
-> [   19.872160]  ? nbd_dev_add+0x30e/0x470 [nbd]
-> [   19.872828]  ? 0xffffffffc0060000
-> [   19.873332]  ? nbd_init+0x1dc/0x1000 [nbd]
-> [   19.873924]  ? do_one_initcall+0x71/0x3a0
-> [   19.874534]  ? gcov_event+0x70/0x690
-> [   19.875058]  ? do_init_module+0xa6/0x350
-> [   19.875587]  ? load_module+0x2587/0x2720
-> [   19.876130]  ? kernel_read+0x31/0xb0
-> [   19.876638]  ? kernel_read_file+0x15a/0x360
-> [   19.877271]  ? __do_sys_finit_module+0xe5/0x190
-> [   19.877951]  ? __do_sys_finit_module+0xe5/0x190
-> [   19.878563]  ? __x64_sys_finit_module+0x1e/0x30
-> [   19.879182]  ? do_syscall_64+0x35/0x80
-> [   19.879700]  ? entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [   19.880413]  </TASK>
-> [   19.880806] ------------[ cut here ]------------
-> [   19.881502] WARNING: CPU: 1 PID: 872 at block/genhd.c:543 
-> device_add_disk+0x2af/0x5d0
-> [   19.882695] Modules linked in: nbd(+)
-> [   19.883290] CPU: 1 PID: 872 Comm: modprobe Not tainted 
-> 5.15.0-rc6-next-20211020-00001-g2f1
-> [   19.884823] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
-> BIOS ?-20190727_0738364
-> [   19.886866] RIP: 0010:device_add_disk+0x2af/0x5d0
-> [   19.887606] Code: 6e f2 f2 0b 01 49 8b 76 48 48 8b 3d db 03 f3 0b e8 
-> f6 ec a9 ff 48 83 050
-> [   19.890456] RSP: 0018:ffffc90000e47c70 EFLAGS: 00010202
-> [   19.891293] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 
-> 00000000000ae001
-> [   19.892274] RDX: 00000000000ac001 RSI: ffffffff91b5906b RDI: 
-> 0000000000000000
-> [   19.893318] RBP: ffff8881034ad600 R08: 0000000000000000 R09: 
-> ffffffff915e2e69
-> [   19.894425] R10: 0000000000000014 R11: 0000000000000001 R12: 
-> 00000000ffffffef
-> [   19.895544] R13: 0000000000000000 R14: ffff88817d720600 R15: 
-> ffff88817d720648
-> [   19.896652] FS:  00007fc08c7a7040(0000) GS:ffff88882f640000(0000) 
-> knlGS:0000000000000000
-> [   19.897902] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   19.898768] CR2: 00007fc08bcf0395 CR3: 000000017c467000 CR4: 
-> 00000000000006e0
-> [   19.899754] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
-> 0000000000000000
-> [   19.900856] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
-> 0000000000000400
-> [   19.901989] Call Trace:
-> [   19.902387]  <TASK>
-> [   19.902732]  nbd_dev_add+0x30e/0x470 [nbd]
-> [   19.903395]  ? 0xffffffffc0060000
-> [   19.903917]  nbd_init+0x1dc/0x1000 [nbd]
-> [   19.904536]  do_one_initcall+0x71/0x3a0
-> [   19.905166]  ? gcov_event+0x70/0x690
-> [   19.905745]  do_init_module+0xa6/0x350
-> [   19.906351]  load_module+0x2587/0x2720
-> [   19.906932]  ? kernel_read+0x31/0xb0
-> [   19.907509]  ? kernel_read_file+0x15a/0x360
-> [   19.908195]  ? __do_sys_finit_module+0xe5/0x190
-> [   19.908894]  __do_sys_finit_module+0xe5/0x190
-> [   19.909591]  __x64_sys_finit_module+0x1e/0x30
-> [   19.910289]  do_syscall_64+0x35/0x80
-> [   19.910855]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [   19.911652] RIP: 0033:0x7fc08bc7a4e9
-> [   19.912231] Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 
-> 48 89 f8 48 89 f7 488
-> [   19.915026] RSP: 002b:00007fff0ddf6fd8 EFLAGS: 00000246 ORIG_RAX: 
-> 0000000000000139
-> [   19.916080] RAX: ffffffffffffffda RBX: 00005596400853e0 RCX: 
-> 00007fc08bc7a4e9
-> [   19.917180] RDX: 0000000000000000 RSI: 000055963fe1bc26 RDI: 
-> 0000000000000003
-> [   19.918302] RBP: 000055963fe1bc26 R08: 0000000000000000 R09: 
-> 0000000000000000
-> [   19.919412] R10: 0000000000000003 R11: 0000000000000246 R12: 
-> 0000000000000000
-> [   19.920524] R13: 00005596400854f0 R14: 0000000000040000 R15: 
-> 00005596400853e0
-> [   19.921629]  </TASK>
-> [   19.922005] ---[ end trace e09ecf130812479d ]---
-> 
-> Thanks,
-> Kuai
->>
->> Hi, Pavel
->>
->> Thanks for your response, with the root cause fixed, patch 1 is not
->> needed anymore. However, the overflow case in patch 2 is still
->> possible.
->>
->> Does anyone plan to remove the checking?
->>
->> Thanks,
->> Kuai
->>>
->>>
->>>
->>>
->>> [1] https://lore.kernel.org/lkml/20211011073556.GA10735@lst.de/
->>>
->>>
->>>
->>> With regards,
->>> Pavel Skripkin
->>> .
->>>
+This patch is already upstream, I don't have a time machine...
+
+-- 
+Jens Axboe
+
