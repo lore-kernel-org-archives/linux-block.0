@@ -2,68 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E324C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 02:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 399B2C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 02:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28E276054F
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 02:27:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 074C060F4F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 02:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232148AbhJYCaP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Oct 2021 22:30:15 -0400
-Received: from mail-pl1-f176.google.com ([209.85.214.176]:42679 "EHLO
-        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232135AbhJYCaP (ORCPT
+        id S232169AbhJYC5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Oct 2021 22:57:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37949 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229665AbhJYC5D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Oct 2021 22:30:15 -0400
-Received: by mail-pl1-f176.google.com with SMTP id v16so1493667ple.9
-        for <linux-block@vger.kernel.org>; Sun, 24 Oct 2021 19:27:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=W9aK1etcXCIdootYAHqQdX7pqU9mXrKzcfIq9N/QPe8=;
-        b=ybSFVURQCuHOOXFgG8IqlzxTjs8Bv80U6Jah6D8UATD6SPKWcdzXZ07OmX/ItE28i8
-         UzsoGWb97m+es2ZkQ6bhO35ustocVtcqS3rJsNWuRoU2tJfLZJstp5Uej/250BnHQ5lE
-         6xuP9s+hQofgQizgY9g8EMVl09HKocWNK8w51pc3XKfCWQ8/24aXI/Z3FXVEjiDRzRAg
-         LfJjaNSW5czWDkcrkE86gm2Oph4uzgd7Y/BKO5mK1HM5hyRbApV8woRv4mVVquQA9m9u
-         aawnId04drcUc/b2APANBx1+UtwsQQ5NxhPoTOPlF9o1xU600ltnJ7Pdx7pRIVSj4wov
-         5yWg==
-X-Gm-Message-State: AOAM532/lW5/FffyUu9A9Jg0hu/6gmAnfK+uk0gu2qT0SR5Gfqrj2rIe
-        czQpnmaQSITq91lIKkX/nZg=
-X-Google-Smtp-Source: ABdhPJwcGkt+dGstn178H7EoLmV4ckSt869sOslNxgNyxIaFrMqHcsQNfHR7mDGj5Ea/4jXGq0TTkQ==
-X-Received: by 2002:a17:90a:ea11:: with SMTP id w17mr20098669pjy.61.1635128873400;
-        Sun, 24 Oct 2021 19:27:53 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:1d23:4f1f:253d:c1e1? ([2601:647:4000:d7:1d23:4f1f:253d:c1e1])
-        by smtp.gmail.com with ESMTPSA id g21sm10433787pfv.127.2021.10.24.19.27.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Oct 2021 19:27:52 -0700 (PDT)
-Message-ID: <904355ef-554e-0b72-5d16-3089a042de9e@acm.org>
-Date:   Sun, 24 Oct 2021 19:27:51 -0700
+        Sun, 24 Oct 2021 22:57:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635130481;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kHLzd1yN1HItmCmiyo6e0YvO6hbI30slfLz3N4utYS8=;
+        b=B5CKPfFJN+OYs5YkS1iUwpQsRf+V+gxGJNMVwp3DN2v6kZTgAlwXjdlNNeMYpZejCosu9o
+        VHUZb1/UbZkufSw/nUNFfoM27wif2adXJzrE8lEE41EMI2nao9+PaW9XmjlX4R2pDhCk/S
+        +DUwsC+acDHahDC2BYxK9LmCg7p7rFA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-5NyMsUJ2PjqsX07MCK3nXA-1; Sun, 24 Oct 2021 22:54:40 -0400
+X-MC-Unique: 5NyMsUJ2PjqsX07MCK3nXA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB7AF10A8E01;
+        Mon, 25 Oct 2021 02:54:38 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C5C4D19D9D;
+        Mon, 25 Oct 2021 02:54:32 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Minchan Kim <minchan@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 0/4] zram: fix two races and one zram leak
+Date:   Mon, 25 Oct 2021 10:54:22 +0800
+Message-Id: <20211025025426.2815424-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH blktests V4] tests/srp: fix module loading issue during
- srp tests
-Content-Language: en-US
-To:     Yi Zhang <yi.zhang@redhat.com>, osandov@osandov.com
-Cc:     linux-block@vger.kernel.org
-References: <20211025012416.23432-1-yi.zhang@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20211025012416.23432-1-yi.zhang@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/21 18:24, Yi Zhang wrote:
-> The ib_isert/ib_srpt modules will be automatically loaded after the first
->   time rdma_rxe/siw setup [ ... ]
+Hello,
 
-Doesn't this depend on the contents of the /etc/rdma/modules/*conf
-configuration files?
+Fixes three issues reported by Luis Chamberlain with one simpler approach:
 
-Anyway:
+- race between between zram_reset_device() and disksize_store() (1/4)
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+- zram leak during unloading module, which is one race between resetting
+and removing device (2/4)
+
+- race between zram_remove and disksize_store (3/4)
+
+Also replace replace fsync_bdev with sync_blockdev since no one opens
+it.(4/4)
+
+V3:
+	- no code change
+	- update commit log or comment as Luis suggested
+	- add reviewed-by tag
+
+V2:
+	- take another approach to avoid failing of zram_remove()
+	- add patch to address race between zram_reset_device() and
+	  disksize_store()
+
+
+Ming Lei (4):
+  zram: fix race between zram_reset_device() and disksize_store()
+  zram: don't fail to remove zram during unloading module
+  zram: avoid race between zram_remove and disksize_store
+  zram: replace fsync_bdev with sync_blockdev
+
+ drivers/block/zram/zram_drv.c | 39 ++++++++++++++++++++++++++++-------
+ 1 file changed, 31 insertions(+), 8 deletions(-)
+
+-- 
+2.31.1
+
