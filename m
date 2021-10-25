@@ -2,439 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C599C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 14:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E23C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 14:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0641E60F22
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 14:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10B2860F9B
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 14:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230396AbhJYOFP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 10:05:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33944 "EHLO
+        id S233069AbhJYOJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 10:09:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233262AbhJYOFN (ORCPT
+        with ESMTP id S232801AbhJYOJg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 10:05:13 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02E7C061767
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 07:02:51 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id o204so15633620oih.13
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 07:02:51 -0700 (PDT)
+        Mon, 25 Oct 2021 10:09:36 -0400
+Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA30C061767
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 07:07:14 -0700 (PDT)
+Received: by mail-oo1-xc30.google.com with SMTP id a17-20020a4a6851000000b002b59bfbf669so3691211oof.9
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 07:07:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=LQTlXFtCKPw6PwaYzZ3YLjh7IsIDwEvIC9RhDUkwqkM=;
-        b=ZNeVKi/aoxtQ6f3+SjRWIGmJLeMQGBsiXrmUmUjMNaFTXNPJ2kjgFdTElawOQnUuxe
-         tE+PABQVvNsuGj76MmVN07ruOnkuaANn/NYWtwvAmsL2S9XAwyIYW9sMS9416Lk+Qdgb
-         M/KY4+9yyDJ7qEWojS5mWEs0Sv/2m3mdqVYRClFwJVf8RzT6Xpa5JKOF0B34St1hQ7c9
-         a9fYsf5isZ0jKSHIXm9do8tpzDaXwUIKNLPtkXs2fH4+sty2vbsaBo8EcZ5fcedKRcF5
-         PVzLBGfdlco13nbsWp2KSzR1wXxvSim6lcEFWVCDEZPFi0dMU1M4pTXWFXLOrX9W/zmd
-         IpCw==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=kDzqDk02jjGLZUoZ4bS2zC6bmwxuZbbhnUm06hNeRU0=;
+        b=mg57l1eRjjhfCyqn/1M2bGZqoa9qHVsaCvynpdtyiCN4id1rFKBpkAAJ0l8dNle87j
+         a6xwTKyfjTKpkRRF8VCgaM7joIdasOYSkp/zlm6JmguJcRGZ/mLmtCmfTmwu0xZzAehF
+         K673Yghp3Uv6Ra+Kfh92YMXrpOtuNQIpdY3UnbiyMtn0peZFYvq1qy0FEJnxkA/uHsp8
+         VWcJE6+6A1nBPd+Ced/zQMn0DYD+sMKcxJk1G2wqGiCOPJARkE0lcFSJJyk06xNK2CiP
+         /yrqVf3xP9oIpgkkWpBWoxDCfeJvWrnOYZAqzODrLq71L4xI637N3F8Q6nhkDjpXYdin
+         lH2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LQTlXFtCKPw6PwaYzZ3YLjh7IsIDwEvIC9RhDUkwqkM=;
-        b=mgwTm8jl8ySCYDVX4xMozHGyPaRqVTEOl67R7/7D79/2AVTUUMYlZrA0fyXpbQXT00
-         V1klKuYBZ7i1uJTDPc2APv/wc58IpDmZAgJR/KRrAKnypNUz4s7BhtV6cFzmDTv2FhwK
-         FvYVqYBhTPVd+crP6c0JnFvg0NfTtSr2tdAI/aFRvvRDdgH4N+f2z3b1Oqm0rmL6kmVK
-         q1RiDnohKeMRChissheZzSHnZpKf5MXosJok4nBZkmIJbIpufcgRCrNhwORDmhaB22F4
-         0ZOX+NTHdzz3PlwBYgv4BmlXqZ4ILkbsqUPSehZeIXnppjwAB5/LPGLIZohWL+InwapX
-         oS5A==
-X-Gm-Message-State: AOAM533W3Vom+HYniFRjyOxGgS8t2egC3mQKRjGCTGv0PiSj1qTBRSaN
-        boCnwGCLDZAOJ5V6JpiukB4cmw==
-X-Google-Smtp-Source: ABdhPJxq0PvgqbBTd8aU9cchej58ao33tjlFldxtrm4cNYVtkv/QexXl1Q47fPVQ7YQJpjtEqLZy8w==
-X-Received: by 2002:a05:6808:158c:: with SMTP id t12mr22572136oiw.74.1635170570659;
-        Mon, 25 Oct 2021 07:02:50 -0700 (PDT)
-Received: from ?IPv6:2600:380:6060:12a6:721f:26e:6f8:a9aa? ([2600:380:6060:12a6:721f:26e:6f8:a9aa])
-        by smtp.gmail.com with ESMTPSA id x12sm3008422oot.6.2021.10.25.07.02.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 07:02:50 -0700 (PDT)
-Subject: Re: [bug report][bisected] WARNING: CPU: 109 PID: 739473 at
- block/blk-stat.c:218 blk_free_queue_stats+0x3c/0x80
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     Bruno Goncalves <bgoncalv@redhat.com>,
-        skt-results-master@redhat.com, Christoph Hellwig <hch@lst.de>
-References: <CAHj4cs9w7_thDw-DN11GaoA+HH9YVAMHmrAZhi_rA24xhbTYOA@mail.gmail.com>
- <CAHj4cs_CM7NzJtNmnD0CiPVOmr0jVEktNyD8d=UMZ0xEUArzow@mail.gmail.com>
- <CAHj4cs-M0Pp7OxE6QXJkGrjHcoqz+bdBuVngjsTp07h8gzLHXQ@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=kDzqDk02jjGLZUoZ4bS2zC6bmwxuZbbhnUm06hNeRU0=;
+        b=uCzHSczQq7vMywebrNCkW4FS2V6/EMD7+kKhW+5CHxlKDSlnLD/DmsJbK6/E/fkrNF
+         F+FxYnU4mgwUSvI5Ju7RSAurcYgsnsmj1KoSHcHfmWi03iy0DakBaBmWCd1eIbrPDWwr
+         vrj06ga4HEUaBcDoyjCUVmf57RtEezyMS9xexnn7P97S2H6Q7hybCozL0TL6jNIOSy2k
+         yxBR7DO0uoTvv9txeml12ZQixIHHzswC6LMc0klfUv0Dd2wkELAUvraSYHhYkW8meQ6F
+         ow29XD0bG7ErJIffq96uB+WokbEkSAZwZelL4/gMfvLD492l3rwWrGiAhgf/Q72AC036
+         XNbw==
+X-Gm-Message-State: AOAM533jZc74mV1J5K/XdJUFtqSutHt8SJFxwfD9X+bM+a9sI9CmY6+y
+        D/AeDx8N6E7zZjNj4C6ofFYi7w==
+X-Google-Smtp-Source: ABdhPJxFIAzJkscm2yB6G9tMnVOVHME7z5Vb1ICc/+Vnz5Uaj4YXWPJgGfJ3gGT6AX0tJLhrm24SSA==
+X-Received: by 2002:a4a:52ce:: with SMTP id d197mr12178711oob.83.1635170833420;
+        Mon, 25 Oct 2021 07:07:13 -0700 (PDT)
+Received: from [127.0.1.1] ([2600:380:6060:12a6:721f:26e:6f8:a9aa])
+        by smtp.gmail.com with ESMTPSA id a1sm3538821oti.30.2021.10.25.07.07.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 07:07:13 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9350ac53-84c0-b102-16ba-68fee6bcdbca@kernel.dk>
-Date:   Mon, 25 Oct 2021 08:02:46 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     tj@kernel.org, Yu Kuai <yukuai3@huawei.com>,
+        avanzini.arianna@gmail.com, fchecconi@gmail.com,
+        paolo.valente@linaro.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        yi.zhang@huawei.com, cgroups@vger.kernel.org
+In-Reply-To: <20211020014036.2141723-1-yukuai3@huawei.com>
+References: <20211020014036.2141723-1-yukuai3@huawei.com>
+Subject: Re: [PATCH v4] blk-cgroup: synchoronize blkg creation against policy deactivation
+Message-Id: <163517083229.164887.15484331314458434649.b4-ty@kernel.dk>
+Date:   Mon, 25 Oct 2021 08:07:12 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAHj4cs-M0Pp7OxE6QXJkGrjHcoqz+bdBuVngjsTp07h8gzLHXQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Adding Christoph
+On Wed, 20 Oct 2021 09:40:36 +0800, Yu Kuai wrote:
+> Out test report a null pointer dereference:
+> 
+> [  168.534653] ==================================================================
+> [  168.535614] Disabling lock debugging due to kernel taint
+> [  168.536346] BUG: kernel NULL pointer dereference, address: 0000000000000008
+> [  168.537274] #PF: supervisor read access in kernel mode
+> [  168.537964] #PF: error_code(0x0000) - not-present page
+> [  168.538667] PGD 0 P4D 0
+> [  168.539025] Oops: 0000 [#1] PREEMPT SMP KASAN
+> [  168.539656] CPU: 13 PID: 759 Comm: bash Tainted: G    B             5.15.0-rc2-next-202100
+> [  168.540954] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_0738364
+> [  168.542736] RIP: 0010:bfq_pd_init+0x88/0x1e0
+> [  168.543318] Code: 98 00 00 00 e8 c9 e4 5b ff 4c 8b 65 00 49 8d 7c 24 08 e8 bb e4 5b ff 4d0
+> [  168.545803] RSP: 0018:ffff88817095f9c0 EFLAGS: 00010002
+> [  168.546497] RAX: 0000000000000001 RBX: ffff888101a1c000 RCX: 0000000000000000
+> [  168.547438] RDX: 0000000000000003 RSI: 0000000000000002 RDI: ffff888106553428
+> [  168.548402] RBP: ffff888106553400 R08: ffffffff961bcaf4 R09: 0000000000000001
+> [  168.549365] R10: ffffffffa2e16c27 R11: fffffbfff45c2d84 R12: 0000000000000000
+> [  168.550291] R13: ffff888101a1c098 R14: ffff88810c7a08c8 R15: ffffffffa55541a0
+> [  168.551221] FS:  00007fac75227700(0000) GS:ffff88839ba80000(0000) knlGS:0000000000000000
+> [  168.552278] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  168.553040] CR2: 0000000000000008 CR3: 0000000165ce7000 CR4: 00000000000006e0
+> [  168.554000] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [  168.554929] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [  168.555888] Call Trace:
+> [  168.556221]  <TASK>
+> [  168.556510]  blkg_create+0x1c0/0x8c0
+> [  168.556989]  blkg_conf_prep+0x574/0x650
+> [  168.557502]  ? stack_trace_save+0x99/0xd0
+> [  168.558033]  ? blkcg_conf_open_bdev+0x1b0/0x1b0
+> [  168.558629]  tg_set_conf.constprop.0+0xb9/0x280
+> [  168.559231]  ? kasan_set_track+0x29/0x40
+> [  168.559758]  ? kasan_set_free_info+0x30/0x60
+> [  168.560344]  ? tg_set_limit+0xae0/0xae0
+> [  168.560853]  ? do_sys_openat2+0x33b/0x640
+> [  168.561383]  ? do_sys_open+0xa2/0x100
+> [  168.561877]  ? __x64_sys_open+0x4e/0x60
+> [  168.562383]  ? __kasan_check_write+0x20/0x30
+> [  168.562951]  ? copyin+0x48/0x70
+> [  168.563390]  ? _copy_from_iter+0x234/0x9e0
+> [  168.563948]  tg_set_conf_u64+0x17/0x20
+> [  168.564467]  cgroup_file_write+0x1ad/0x380
+> [  168.565014]  ? cgroup_file_poll+0x80/0x80
+> [  168.565568]  ? __mutex_lock_slowpath+0x30/0x30
+> [  168.566165]  ? pgd_free+0x100/0x160
+> [  168.566649]  kernfs_fop_write_iter+0x21d/0x340
+> [  168.567246]  ? cgroup_file_poll+0x80/0x80
+> [  168.567796]  new_sync_write+0x29f/0x3c0
+> [  168.568314]  ? new_sync_read+0x410/0x410
+> [  168.568840]  ? __handle_mm_fault+0x1c97/0x2d80
+> [  168.569425]  ? copy_page_range+0x2b10/0x2b10
+> [  168.570007]  ? _raw_read_lock_bh+0xa0/0xa0
+> [  168.570622]  vfs_write+0x46e/0x630
+> [  168.571091]  ksys_write+0xcd/0x1e0
+> [  168.571563]  ? __x64_sys_read+0x60/0x60
+> [  168.572081]  ? __kasan_check_write+0x20/0x30
+> [  168.572659]  ? do_user_addr_fault+0x446/0xff0
+> [  168.573264]  __x64_sys_write+0x46/0x60
+> [  168.573774]  do_syscall_64+0x35/0x80
+> [  168.574264]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> [  168.574960] RIP: 0033:0x7fac74915130
+> [  168.575456] Code: 73 01 c3 48 8b 0d 58 ed 2c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 444
+> [  168.577969] RSP: 002b:00007ffc3080e288 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> [  168.578986] RAX: ffffffffffffffda RBX: 0000000000000009 RCX: 00007fac74915130
+> [  168.579937] RDX: 0000000000000009 RSI: 000056007669f080 RDI: 0000000000000001
+> [  168.580884] RBP: 000056007669f080 R08: 000000000000000a R09: 00007fac75227700
+> [  168.581841] R10: 000056007655c8f0 R11: 0000000000000246 R12: 0000000000000009
+> [  168.582796] R13: 0000000000000001 R14: 00007fac74be55e0 R15: 00007fac74be08c0
+> [  168.583757]  </TASK>
+> [  168.584063] Modules linked in:
+> [  168.584494] CR2: 0000000000000008
+> [  168.584964] ---[ end trace 2475611ad0f77a1a ]---
+> 
+> [...]
 
-On 10/25/21 5:02 AM, Yi Zhang wrote:
-> So bisecting shows it was introduced from this commit, and it's 100%
-> reproduced with blktests block/001 on the ppc64le.
-> 
-> commit 8e141f9eb803e209714a80aa6ec073893f94c526 (HEAD)
-> Author: Christoph Hellwig <hch@lst.de>
-> Date:   Wed Sep 29 09:12:40 2021 +0200
-> 
->     block: drain file system I/O on del_gendisk
-> 
->     Instead of delaying draining of file system I/O related items like the
->     blk-qos queues, the integrity read workqueue and timeouts only when the
->     request_queue is removed, do that when del_gendisk is called.  This is
->     important for SCSI where the upper level drivers that control the gendisk
->     are separate entities, and the disk can be freed much earlier than the
->     request_queue, or can even be unbound without tearing down the queue.
-> 
-> 
-> On Fri, Oct 22, 2021 at 1:29 PM Yi Zhang <yi.zhang@redhat.com> wrote:
->>
->> Hi
->> This issue is still can be reproduced with the latest linux-block/for-next
->>
->>     Kernel repo:
->> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->>             Commit: 8131e5e445ac - Merge branch 'for-5.16/block' into for-next
->>
->> On Tue, Oct 19, 2021 at 12:13 PM Yi Zhang <yi.zhang@redhat.com> wrote:
->>>
->>> Hello
->>> Below WARNING was triggered with blktests block/001 on ppc64le/aarch64
->>> during CKI tests, pls help check it, thanks.
->>>
->>>   Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->>>             Commit: b199567fe754 - Merge branch 'for-5.16/bdev-size'
->>> into for-next
->>>
->>>
->>> [ 2260.897475] run blktests block/001 at 2021-10-18 18:33:34
->>> [ 2260.930028] alternatives: patching kernel code
->>> [ 2260.938145] scsi_debug:sdebug_driver_probe: scsi_debug: trim
->>> poll_queues to 0. poll_q/nr_hw = (0/1)
->>> [ 2260.947251] scsi host7: scsi_debug: version 0190 [20200710]
->>> [ 2260.947251]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
->>> [ 2260.959707] scsi_debug:sdebug_driver_probe: scsi_debug: trim
->>> poll_queues to 0. poll_q/nr_hw = (0/1)
->>> [ 2260.959828] scsi 7:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2260.968770] scsi host8: scsi_debug: version 0190 [20200710]
->>> [ 2260.968770]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
->>> [ 2260.977217] sd 7:0:0:0: Power-on or device reset occurred
->>> [ 2260.977525] sd 7:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2260.989380] scsi_debug:sdebug_driver_probe: scsi_debug: trim
->>> poll_queues to 0. poll_q/nr_hw = (0/1)
->>> [ 2260.989440] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2260.989683] sd 8:0:0:0: Attached scsi generic sg15 type 0
->>> [ 2260.989738] sd 8:0:0:0: Power-on or device reset occurred
->>> [ 2261.009878] sd 8:0:0:0: [sdl] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2261.014263] sd 7:0:0:0: [sdk] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2261.016650] scsi host9: scsi_debug: version 0190 [20200710]
->>> [ 2261.016650]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
->>> [ 2261.017094] scsi_debug:sdebug_driver_probe: scsi_debug: trim
->>> poll_queues to 0. poll_q/nr_hw = (0/1)
->>> [ 2261.017109] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2261.017407] sd 9:0:0:0: Attached scsi generic sg16 type 0
->>> [ 2261.017413] sd 9:0:0:0: Power-on or device reset occurred
->>> [ 2261.024287] sd 7:0:0:0: [sdk] Write Protect is off
->>> [ 2261.027452] scsi host10: scsi_debug: version 0190 [20200710]
->>> [ 2261.027452]   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
->>> [ 2261.032073] sd 8:0:0:0: [sdl] Write Protect is off
->>> [ 2261.037519] sd 9:0:0:0: [sdm] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2261.042678] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
->>>    0190 PQ: 0 ANSI: 7
->>> [ 2261.052111] sd 8:0:0:0: [sdl] Write cache: enabled, read cache:
->>> enabled, supports DPO and FUA
->>> [ 2261.054769] sd 7:0:0:0: [sdk] Write cache: enabled, read cache:
->>> enabled, supports DPO and FUA
->>> [ 2261.063333] sd 10:0:0:0: Power-on or device reset occurred
->>> [ 2261.063340] sd 10:0:0:0: Attached scsi generic sg17 type 0
->>> [ 2261.064024] sd 9:0:0:0: [sdm] Write Protect is off
->>> [ 2261.082156] sd 8:0:0:0: [sdl] Optimal transfer size 524288 bytes
->>> [ 2261.084058] sd 9:0:0:0: [sdm] Write cache: enabled, read cache:
->>> enabled, supports DPO and FUA
->>> [ 2261.101158] sd 7:0:0:0: [sdk] Optimal transfer size 524288 bytes
->>> [ 2261.106817] sd 10:0:0:0: [sdn] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2261.114100] sd 9:0:0:0: [sdm] Optimal transfer size 524288 bytes
->>> [ 2261.128948] sd 10:0:0:0: [sdn] Write Protect is off
->>> [  2261.210521] sts DPO and FUA
->>> [  2261.249185] s[ 2261.632507] sd 8:0:0:0: [sdl] Attached SCSI disk
->>> [ 2261.672478] sd 7:0:0:0: [sdk] Attached SCSI disk
->>> [ 2261.672489] sd 9:0:0:0: [sdm] Attached SCSI disk
->>> [ 2261.802507] sd 10:0:0:0: [sdn] Attached SCSI disk
->>> [ 2262.173663] sd 9:0:0:0: [sdm] Synchronizing SCSI cache
->>> [ 2262.173676] sd 8:0:0:0: [sdl] Synchronizing SCSI cache
->>> [ 2262.185405] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2262.190384] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2262.193772] sd 9:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.193848] sd 9:0:0:0: Power-on or device reset occurred
->>> [ 2262.201866] sd 8:0:0:0: Power-on or device reset occurred
->>> [ 2262.207047] sd 8:0:0:0: Attached scsi generic sg15 type 0
->>> [ 2262.213925] sd 9:0:0:0: [sdl] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2262.218506] sd 7:0:0:0: [sdk] Synchronizing SCSI cache
->>> [ 2262.223159] sd 9:0:0:0: [sdl] Write Protect is off
->>> [ 2262.223184] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.223189] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.223200] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.223203] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.223213] sd 8:0:0:0: [sdm] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.223216] sd 8:0:0:0: [sdm] 0-byte physical blocks
->>> [ 2262.223224] sd 8:0:0:0: [sdm] Write Protect is on
->>> [ 2262.223233] sd 8:0:0:0: [sdm] Asking for cache data failed
->>> [ 2262.223235] sd 8:0:0:0: [sdm] Assuming drive cache: write through
->>> [ 2262.231018] sd 10:0:0:0: [sdn] Synchronizing SCSI cache
->>> [ 2262.235604] sd 9:0:0:0: [sdl] Asking for cache data failed
->>> [ 2262.236777] scsi 7:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2262.237063] sd 7:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.237115] sd 7:0:0:0: Power-on or device reset occurred
->>> [ 2262.246789] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
->>>    0190 PQ: 0 ANSI: 7
->>> [ 2262.247170] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.247174] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2262.247185] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.247188] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2262.247198] sd 7:0:0:0: [sdk] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.247201] sd 7:0:0:0: [sdk] 0-byte physical blocks
->>> [ 2262.247207] sd 7:0:0:0: [sdk] Write Protect is on
->>> [ 2262.247216] sd 7:0:0:0: [sdk] Asking for cache data failed
->>> [ 2262.247218] sd 7:0:0:0: [sdk] Assuming drive cache: write through
->>> [ 2262.249761] sd 9:0:0:0: [sdl] Assuming drive cache: write through
->>> [ 2262.254794] sd 10:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.254819] sd 10:0:0:0: Power-on or device reset occurred
->>> [ 2262.274922] sd 10:0:0:0: [sdn] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2262.295902] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.296079] sd 10:0:0:0: [sdn] Write Protect is off
->>> [ 2262.301282] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.306770] sd 10:0:0:0: [sdn] Asking for cache data failed
->>> [ 2262.438436] sd 10:0:0:0: [sdn] Assuming drive cache: write through
->>> [ 2262.444621] sd 10:0:0:0: [sdn] Optimal transfer size 524288 bytes
->>> [ 2262.475561] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.484960] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2262.485574] sd 9:0:0:0: [sdl] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.495670] sd 10:0:0:0: [sdn] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.499129] sd 9:0:0:0: [sdl] Sense not available.
->>> [ 2262.508592] sd 10:0:0:0: [sdn] Sense not available.
->>> [ 2262.552707] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.562089] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.566909] sd 8:0:0:0: [sdm] Write Protect is off
->>> [ 2262.571702] sd 8:0:0:0: [sdm] Attached SCSI disk
->>> [ 2262.592701] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.602082] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2262.606897] sd 7:0:0:0: [sdk] Write Protect is off
->>> [ 2262.611691] sd 7:0:0:0: [sdk] Attached SCSI disk
->>> [ 2262.632824] sd 9:0:0:0: [sdl] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.632826] sd 10:0:0:0: [sdn] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.639249] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2262.639510] sd 8:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.639536] sd 8:0:0:0: Power-on or device reset occurred
->>> [ 2262.642208] sd 9:0:0:0: [sdl] Sense not available.
->>> [ 2262.649586] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.649590] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.649600] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.649603] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.649613] sd 8:0:0:0: [sdm] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.649615] sd 8:0:0:0: [sdm] 0-byte physical blocks
->>> [ 2262.649621] sd 8:0:0:0: [sdm] Write Protect is off
->>> [ 2262.649629] sd 8:0:0:0: [sdm] Asking for cache data failed
->>> [ 2262.649631] sd 8:0:0:0: [sdm] Assuming drive cache: write through
->>> [ 2262.651678] sd 10:0:0:0: [sdn] Sense not available.
->>> [ 2262.651691] sd 10:0:0:0: [sdn] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.659778] sd 9:0:0:0: [sdl] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.665171] sdn: detected capacity change from 16384 to 0
->>> [ 2262.670559] sdl: detected capacity change from 16384 to 0
->>> [ 2262.675330] sd 10:0:0:0: [sdn] Attached SCSI disk
->>> [ 2262.684711] sd 9:0:0:0: [sdl] Attached SCSI disk
->>> [ 2262.788917] scsi 7:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2262.797259] sd 7:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.797288] sd 7:0:0:0: Power-on or device reset occurred
->>> [ 2262.808090] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.817481] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2262.822271] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.831669] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2262.835596] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.836469] sd 7:0:0:0: [sdk] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.845838] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2262.852000] sd 7:0:0:0: [sdk] 0-byte physical blocks
->>> [ 2262.861765] sd 7:0:0:0: [sdk] Write Protect is off
->>> [ 2262.863794] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2262.868565] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
->>>    0190 PQ: 0 ANSI: 7
->>> [ 2262.868825] sd 10:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.868862] sd 10:0:0:0: Power-on or device reset occurred
->>> [ 2262.874892] sd 9:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2262.874920] sd 9:0:0:0: Power-on or device reset occurred
->>> [ 2262.878916] sd 10:0:0:0: [sdl] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.878920] sd 10:0:0:0: [sdl] Sense not available.
->>> [ 2262.878931] sd 10:0:0:0: [sdl] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2262.878934] sd 10:0:0:0: [sdl] Sense not available.
->>> [ 2262.878944] sd 10:0:0:0: [sdl] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2262.878946] sd 10:0:0:0: [sdl] 0-byte physical blocks
->>> [ 2262.878952] sd 10:0:0:0: [sdl] Write Protect is off
->>> [ 2262.878960] sd 10:0:0:0: [sdl] Asking for cache data failed
->>> [ 2262.878962] sd 10:0:0:0: [sdl] Assuming drive cache: write through
->>> [ 2262.882813] sd 7:0:0:0: [sdk] Asking for cache data failed
->>> [ 2262.894986] sd 9:0:0:0: [sdn] 16384 512-byte logical blocks: (8.39
->>> MB/8.00 MiB)
->>> [ 2262.899142] sd 7:0:0:0: [sdk] Assuming drive cache: write through
->>> [ 2262.904537] sd 9:0:0:0: [sdn] Write Protect is off
->>> [ 2262.984722] sd 9:0:0:0: [sdn] Asking for cache data failed
->>> [ 2262.990195] sd 9:0:0:0: [sdn] Assuming drive cache: write through
->>> [ 2263.015502] sd 10:0:0:0: [sdl] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.024985] sd 10:0:0:0: [sdl] Sense not available.
->>> [ 2263.052711] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.055557] sd 9:0:0:0: [sdn] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.062092] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2263.066282] sd 7:0:0:0: [sdk] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.066288] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2263.066304] sd 7:0:0:0: [sdk] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.066308] sd 7:0:0:0: [sdk] Sense not available.
->>> [ 2263.066338] sd 7:0:0:0: [sdk] Attached SCSI disk
->>> [ 2263.071479] sd 9:0:0:0: [sdn] Sense not available.
->>> [ 2263.114031] sd 8:0:0:0: [sdm] Attached SCSI disk
->>> [ 2263.178933] scsi 8:0:0:0: Direct-Access     Linux    scsi_debug
->>>   0190 PQ: 0 ANSI: 7
->>> [ 2263.187276] sd 8:0:0:0: Attached scsi generic sg14 type 0
->>> [ 2263.187370] sd 8:0:0:0: Power-on or device reset occurred
->>> [ 2263.198126] sd 8:0:0:0: [sdm] Read Capacity(16) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.207522] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2263.212312] sd 8:0:0:0: [sdm] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.212722] sd 10:0:0:0: [sdl] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.221703] sd 8:0:0:0: [sdm] Sense not available.
->>> [ 2263.231165] sd 10:0:0:0: [sdl] Sense not available.
->>> [ 2263.235953] sd 8:0:0:0: [sdm] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2263.240837] sd 10:0:0:0: [sdl] Attached SCSI disk
->>> [ 2263.246992] sd 8:0:0:0: [sdm] 0-byte physical blocks
->>> [ 2263.256637] sd 8:0:0:0: [sdm] Write Protect is off
->>> [ 2263.261422] sd 8:0:0:0: [sdm] Asking for cache data failed
->>> [ 2263.266903] sd 8:0:0:0: [sdm] Assuming drive cache: write through
->>> [ 2263.293351] sd 9:0:0:0: [sdn] Read Capacity(10) failed: Result:
->>> hostbyte=DID_ERROR driverbyte=DRIVER_OK
->>> [ 2263.298586] ------------[ cut here ]------------
->>> [ 2263.302739] sd 9:0:0:0: [sdn] Sense not available.
->>> [ 2263.307335] WARNING: CPU: 109 PID: 739473 at block/blk-stat.c:218
->>> blk_free_queue_stats+0x3c/0x80
->>> [ 2263.312121] sd 9:0:0:0: [sdn] 0 512-byte logical blocks: (0 B/0 B)
->>> [ 2263.320880] Modules linked in: scsi_debug dm_log_writes rfkill
->>> mlx5_ib ib_uverbs ib_core sunrpc mlx5_core mlxfw psample acpi_ipmi
->>> i2c_smbus tls joydev ipmi_ssif ipmi_devintf ipmi_msghandler vfat fat
->>> thunderx2_pmu fuse
->>> [ 2263.327074] sdn: detected capacity change from 16384 to 0
->>> [ 2263.327076]  zram ip_tables
->>> [ 2263.346360] sd 9:0:0:0: [sdn] Attached SCSI disk
->>> [ 2263.351733]  xfs crct10dif_ce ast ghash_ce i2c_algo_bit
->>> drm_vram_helper drm_kms_helper syscopyarea sysfillrect sysimgblt
->>> fb_sys_fops cec drm_ttm_helper ttm drm gpio_xlp i2c_xlp9xx uas
->>> usb_storage aes_neon_bs
->>> [ 2263.377547] CPU: 109 PID: 739473 Comm: check Not tainted 5.15.0-rc6 #1
->>> [ 2263.384064] Hardware name: HPE Apollo 70             /C01_APACHE_MB
->>>         , BIOS L50_5.13_1.11 06/18/2019
->>> [ 2263.393790] pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->>> [ 2263.400741] pc : blk_free_queue_stats+0x3c/0x80
->>> [ 2263.405259] lr : blk_release_queue+0x48/0x140
->>> [ 2263.409604] sp : ffff80002c3c3aa0
->>> [ 2263.412906] x29: ffff80002c3c3aa0 x28: ffff00089e500000 x27: 0000000000000000
->>> [ 2263.420031] x26: ffff000815f5d428 x25: dead000000000100 x24: dead000000000122
->>> [ 2263.427156] x23: ffff000815f56150 x22: 0000000000000000 x21: ffff0008a85a0860
->>> [ 2263.434280] x20: ffff8000120351a8 x19: ffff0008a85a07e0 x18: ffffffffffffffff
->>> [ 2263.441404] x17: 303a377465677261 x16: 742f3774736f682f x15: 0000000000000000
->>> [ 2263.448528] x14: 0000000000000001 x13: 0000000000000040 x12: 0000000000000040
->>> [ 2263.455652] x11: ffff000800400b68 x10: ffff000800400b6a x9 : ffff80001077604c
->>> [ 2263.462776] x8 : ffff000800405ff8 x7 : 0000000000000000 x6 : ffff000800406160
->>> [ 2263.469900] x5 : 0000000000000000 x4 : 0000000000000003 x3 : 0000000000000000
->>> [ 2263.477024] x2 : 0000000000002710 x1 : ffff00088ab81b80 x0 : ffff0008a21cfa80
->>> [ 2263.484149] Call trace:
->>> [ 2263.486584]  blk_free_queue_stats+0x3c/0x80
->>> [ 2263.490755]  blk_release_queue+0x48/0x140
->>> [ 2263.494752]  kobject_cleanup+0x4c/0x180
->>> [ 2263.498578]  kobject_put+0x50/0xd0
->>> [ 2263.501968]  blk_put_queue+0x20/0x30
->>> [ 2263.505535]  scsi_device_dev_release_usercontext+0x160/0x244
->>> [ 2263.511188]  execute_in_process_context+0x50/0xa0
->>> [ 2263.515883]  scsi_device_dev_release+0x28/0x3c
->>> [ 2263.520316]  device_release+0x40/0xa0
->>> [ 2263.523968]  kobject_cleanup+0x4c/0x180
->>> [ 2263.527792]  kobject_put+0x50/0xd0
->>> [ 2263.531182]  put_device+0x20/0x30
->>> [ 2263.534485]  scsi_device_put+0x38/0x50
->>> [ 2263.538224]  sdev_store_delete+0x90/0xf0
->>> [ 2263.542136]  dev_attr_store+0x24/0x40
->>> [ 2263.545786]  sysfs_kf_write+0x50/0x60
->>> [ 2263.549436]  kernfs_fop_write_iter+0x134/0x1c4
->>> [ 2263.553869]  new_sync_write+0xdc/0x15c
->>> [ 2263.557609]  vfs_write+0x230/0x2d0
->>> [ 2263.560998]  ksys_write+0x64/0xec
->>> [ 2263.564301]  __arm64_sys_write+0x28/0x34
->>> [ 2263.568212]  invoke_syscall+0x50/0x120
->>> [ 2263.571953]  el0_svc_common.constprop.0+0x4c/0x100
->>> [ 2263.576732]  do_el0_svc+0x34/0xa0
->>> [ 2263.580035]  el0_svc+0x30/0xd0
->>> [ 2263.583081]  el0t_64_sync_handler+0xa4/0x130
->>> [ 2263.587340]  el0t_64_sync+0x1a4/0x1a8
->>> [ 2263.590991] ---[ end trace 1631cb4f2dc87b68 ]---
->>>
->>>
->>> --
->>> Best Regards,
->>>   Yi Zhang
->>
->>
->>
->> --
->> Best Regards,
->>   Yi Zhang
-> 
-> 
-> 
+Applied, thanks!
 
+[1/1] blk-cgroup: synchoronize blkg creation against policy deactivation
+      commit: 0c9d338c8443b06da8e8d3bfce824c5ea6d3488f
 
+Best regards,
 -- 
 Jens Axboe
+
 
