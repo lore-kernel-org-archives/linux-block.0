@@ -2,63 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B01C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 09:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC5BAC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 09:47:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AE1C604AC
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 09:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AB99603E7
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 09:47:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232748AbhJYJtf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 05:49:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59420 "EHLO
+        id S232681AbhJYJtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 05:49:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232797AbhJYJsK (ORCPT
+        with ESMTP id S232809AbhJYJsP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 05:48:10 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA04C061243
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 02:45:48 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id oa4so7833699pjb.2
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 02:45:48 -0700 (PDT)
+        Mon, 25 Oct 2021 05:48:15 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B695C061220
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 02:45:53 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id l186so3926628pge.7
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 02:45:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=TqXG0/tzAMme0lqJcgyNBNW84HzqzOSloOMxwNDMqnk=;
-        b=kJn8WmBPxx2lPt7y+97D6FpgwkUWAAljn+Zm+aBrEBCA99yKW7fVRUnA2WZKE1sYeK
-         +N7QI6AvoMlxnStRSMsS6WyoC9ZeLJllS7sftIqEP8tBbAMPgwh6a7+Tuak6los3qU57
-         1YtBkzgTlJWbyRd8qlOZo6Aktn3XtwW71ZLwdKY/RPjX3LLOgSrt5btja+2VCTtchCY0
-         mUjfmvk+xybbjbz55fxHZ4vrCckGLOSI/A5pf8bp+OHNVHVJ25uFHaykX99gEh3L5vFt
-         2bmQzUEQhfeghTXEeSdLw2dEyyePTaP9UMSGeK1SyBQRzuCk1kochTNqsrk/h/jYtFW+
-         5Z3g==
+        bh=z+Z7xBwuEdiDo3yfPlLotr1uBNzHqi96x2Qr+oepBsg=;
+        b=15U6o0BRYIjxKzdZQ9qlzBcMsGkmDKOqIlUj4DEIpH35tgQ9ByQuIOF2gOd2SrPOVK
+         WLBWo5HGkc4gYHNzfAL3QJBcdShi2dMQrpMTV1/Dt1OXzHv8GQW/HT/XNYnYIFsYIcJ0
+         ayswLcHqMl8yATnLNE720OJEsvVIPJ9F1Z5Z/ogPkQyeV6QcBqUpC6PFUn6SxOFP1055
+         Ywo76qs1XQZPFmCmC2G3Dm1BZUQ6ncLkF42kqH7q0K9PXJJcDQ69Jx4HqlM/IOMjkq1b
+         bMFPVAOfDR3pZb/IAYh7daWLvSpY1KoLmDTnQ87l5dJHaErhupAYRbdo6TqWxo5GCmjS
+         /LZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=TqXG0/tzAMme0lqJcgyNBNW84HzqzOSloOMxwNDMqnk=;
-        b=1u3iaZDFIzD1+GdFjBup8TYa0c9PmCIVYZE07x9v6cjPBl1qnXR8kvgIxsSdGl4HCz
-         hZzCcgM4fAgHBdIm1pF1PvH1ZNbYhHjc4D4ZaKAtHa2zDM/LfrU8OgL7BuXX7ZXz7szl
-         u/Q9R7udc0yA5jIgPuGVN86Z62g5gZcMjCT3gbIgeHIh4wVHMWAvBeXUcW+OfSmgczWG
-         6MScw1lxiNuOcJMd4ndKhLVIKSLN+Zi6fJ26iTbBrgs7IbMn8/r37ws8qKnksX01JMcA
-         SMi4h7WFQEsgAEvG7xyDiEzWnClixE8zh5+r2JO5Q/piZOiigVEsJGB/77cAFOJH0QJh
-         xNqQ==
-X-Gm-Message-State: AOAM533yMbONRocqnvBunTqUxhGmhxeku73dRKi4REFh2fIOnaro9Y3r
-        jPZIbBlISrr5P8q/7VCYWEYP
-X-Google-Smtp-Source: ABdhPJyYnUBUJBlE5vmoLy7tjBAXomLv28tkul4/ceDm5JlLpp1BoaCPHDhe79iQ//++rOpn7NVmAQ==
-X-Received: by 2002:a17:90a:bd04:: with SMTP id y4mr19448627pjr.99.1635155147764;
-        Mon, 25 Oct 2021 02:45:47 -0700 (PDT)
+        bh=z+Z7xBwuEdiDo3yfPlLotr1uBNzHqi96x2Qr+oepBsg=;
+        b=leg/rjAwiDiQA+Ab1O4tweg1Bsq0VOEJNWaobLP+OK1mT4zavliodLBTUla7Pvlvl9
+         /gsg++7Pa4LQ+2uHnbc2IQxgSiO528oiYrSxDCTtA2+HzHZAymPhtcpAN8369uC1ZlGS
+         C6ygDz9u6mXfVGGFy+ZFfnoITTK2A8wUY08bIvr4QBXN9wdLeH0n8D5B4xnRKWiUBbql
+         zKDqgOWrpbbPgvdmHzjw/KgEe5HX9osDilc15OcK5PHkgAfqUHUS+m6sX6nXt7MhLzUP
+         OQg1FNiqvgHGagUAcmowgBYqm4sLgXZJ9zXUyNBDJu5yudNOnoAd0hJ1an4totMp8Ex/
+         k+jQ==
+X-Gm-Message-State: AOAM531GsQtxYRh5EXWgPqwVLZ4loh1Qa+CoTaBzOhKpnAEKhkCWQk8e
+        26Cg15fVYoiRXMcmgLG3eWAQ
+X-Google-Smtp-Source: ABdhPJyX2r+nUzD6cxyL3ncyEb6QxB6hw/+2sEZG0Mfnx94HOreDWdGH+gtwePOJc0jGFKfTH9/gjA==
+X-Received: by 2002:a63:131f:: with SMTP id i31mr12758784pgl.207.1635155152846;
+        Mon, 25 Oct 2021 02:45:52 -0700 (PDT)
 Received: from localhost ([139.177.225.237])
-        by smtp.gmail.com with ESMTPSA id f17sm4738576pfv.69.2021.10.25.02.45.46
+        by smtp.gmail.com with ESMTPSA id s13sm20840212pfk.175.2021.10.25.02.45.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 02:45:47 -0700 (PDT)
+        Mon, 25 Oct 2021 02:45:52 -0700 (PDT)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     axboe@kernel.dk, hch@lst.de, josef@toxicpanda.com, mst@redhat.com,
         jasowang@redhat.com, stefanha@redhat.com, kwolf@redhat.com
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH 1/4] block: Add a helper to validate the block size
-Date:   Mon, 25 Oct 2021 17:43:03 +0800
-Message-Id: <20211025094306.97-2-xieyongji@bytedance.com>
+Subject: [PATCH 2/4] nbd: Use blk_validate_block_size() to validate block size
+Date:   Mon, 25 Oct 2021 17:43:04 +0800
+Message-Id: <20211025094306.97-3-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211025094306.97-1-xieyongji@bytedance.com>
 References: <20211025094306.97-1-xieyongji@bytedance.com>
@@ -68,35 +68,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are some duplicated codes to validate the block
-size in block drivers. This limitation actually comes
-from block layer, so this patch tries to add a new block
-layer helper for that.
+Use the block layer helper to validate block size instead
+of open coding it.
 
 Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 ---
- include/linux/blkdev.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/block/nbd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 12b9dbcc980e..805cd02d7914 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -235,6 +235,14 @@ struct request {
- 	void *end_io_data;
- };
- 
-+static inline int blk_validate_block_size(unsigned int bsize)
-+{
-+	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static inline bool blk_op_is_passthrough(unsigned int op)
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 1183f7872b71..3f58c3eb38b6 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -323,7 +323,8 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
  {
- 	op &= REQ_OP_MASK;
+ 	if (!blksize)
+ 		blksize = 1u << NBD_DEF_BLKSIZE_BITS;
+-	if (blksize < 512 || blksize > PAGE_SIZE || !is_power_of_2(blksize))
++
++	if (blk_validate_block_size(blksize))
+ 		return -EINVAL;
+ 
+ 	nbd->config->bytesize = bytesize;
 -- 
 2.11.0
 
