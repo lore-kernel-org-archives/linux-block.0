@@ -2,341 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C57C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 11:09:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C94FFC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 11:12:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D737360EFF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 11:09:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8DD760EDF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 11:12:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232526AbhJYLMD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 07:12:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50292 "EHLO
+        id S232778AbhJYLOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 07:14:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbhJYLMD (ORCPT
+        with ESMTP id S230232AbhJYLOT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 07:12:03 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 563AAC061767
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 04:09:41 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id s1so15723178edd.3
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 04:09:41 -0700 (PDT)
+        Mon, 25 Oct 2021 07:14:19 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFF1C061745
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 04:11:57 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id y22-20020a1c7d16000000b003231ea3d705so12677374wmc.4
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 04:11:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mariadb.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=U8+LHhKcitCj037DxkL9eRRC0rVnBDOxrczGfygo6Zs=;
-        b=cqoebytXiJbrBe/Aog3OJ686CW2ENe9vXrZtxCZXr3CaDHCF25WuWT/zKZcaUlJNgL
-         xa47FJ6tnoewY6x+jTp2x8wGJXw1t+Ct9EcUh50KuvhQi5sTYeJJB/1KPEHz5ACTq/xI
-         +RHzfwBaACV5HyyLWFO7i3AuMhEG9kJoqNWe6mehkoiAZtG211YQRlQpJKo0O/Blx6a9
-         mIl3UYFDUDbTj+zKa9JgL7Zt7HQIeKIoo7dQDO0IkFKeZNxjwBf2wswlKlR0ajebZ7KN
-         /+GF4ik4xn4OtEjywDZjeSZPu84A9Mu6UitIG2LGyK3V3C4F4TXTM4Mpb29P4CdvLObd
-         4NtQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=cep0oUZuEKxpQmkHA5E8nLfCNHI1LiTiOo2Ma1D4ZsU=;
+        b=lnExz9SbdXXnGsBuSsBp5psdJURvEurNW4wjegm5pMn6D5ACNj8OatX4VS24vTaLzP
+         jZ94popDin2puJB72i6SAVs2m8kpTXrtfskiQyVOJQA/06+0HBmVngBgQf5MlqtcBmsZ
+         yZSWhPPIfGqk4jlDG6+gyvsOI5FagLuaUKTPo9QD3B4urZyykIUSsMNxvj9Sm9HoZuof
+         lqhNHMMwcOwuy9Zg+iMYALBW2RG0Bn27HIx4FK6RsAciBHQRoM9HwYDNrdhc0U4sADre
+         SK5nd9DQSp+/BipRjhAkManRZ2zsgYo323R5oRbCE0FFLqBUFFwxnOJ51FqmodyXtJ8Q
+         TF6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=U8+LHhKcitCj037DxkL9eRRC0rVnBDOxrczGfygo6Zs=;
-        b=ktFAhN/B8SDV5Yy8+D6A6auaYUa76z3cgaomh6YBaHr2+NrFdQ8Osmx1ARx8W3FSnr
-         h0QYM74qBE8um1OcKZ5p0dGCJsSpgKnFlDBC2eeR/bFpQ9ZdJrURx9pG1broMNp0H3fz
-         dtsC+ejIIfaYra8fVQDeF2H5NiYqNOdgVpt7mMAdZbUUO6N5RHrvQM++45n/GL2XQtrz
-         pRqjLFPp9cnYOFwx/ldoJvEoKqRE5twjZ86ywuFrMVzqSp8/GHr8zwTD0oNhT3G1jTa5
-         1k3Ih25d31Gy8BHuci/2tpLFTrc0wAxe9VFrXG4HhR2e+i18wWrS1fYpl9mazMVM1gcS
-         oTRg==
-X-Gm-Message-State: AOAM5308bjqPfLtWb3myTW3XiggeTeKph8PjPqqBxi92iPY9jbEiAeJB
-        ZciI+QdgjvZQHIQbj+R/fovbxNUWe+3ODGF95I6VUQ==
-X-Google-Smtp-Source: ABdhPJzcI+0jf1+/ylJTImPWIiKs7pDJTk0EpvFQD1J/PJpkrIsM3wuLwdx1tIFPLFt1rr/+kVOoz4CR71pdBoWnOTI=
-X-Received: by 2002:a50:da48:: with SMTP id a8mr25372012edk.146.1635160179733;
- Mon, 25 Oct 2021 04:09:39 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=cep0oUZuEKxpQmkHA5E8nLfCNHI1LiTiOo2Ma1D4ZsU=;
+        b=g1BlJx2nGKIz1vQ9S8apWAkEbh3u4vuk9MSNyTsWS5Y/dv4xqhebp1D3r7iBruYXg9
+         LVw0bEMPi62MkzrDodeewQqv5kN4H7zHcU7NgAG0vemp9a3Xi5UO2ScB2zOdLOR72O09
+         LL9RcA4lbQQDybu/FQ0NlK35xwKY4WSr0F05uX0pDXrYjJAA8/h9C4Yr1SQaLGYljr3X
+         Cup24w1fh54FvJoZaAUDkL7YehWZsJnpF0X98DfoaIO9mjkFyiPmgloNemT6iH5I5YpW
+         +el1Ru/n3QTqukx+/lI8K+Vekq4qtiFhz9WhaZAriu9NiVcppxJXT+33GnwQBHDbTKw4
+         0nvA==
+X-Gm-Message-State: AOAM530fuNwlfRpLSG9RPoTTYpgmUKms0DLxXAYAiNm0yvFtuIKoWRmz
+        smdCgpWwPJArzDuyaIWQRDI=
+X-Google-Smtp-Source: ABdhPJyYaiwNHCFAUD3sCxCKBaSONq19k1pf8M41PKVn/2+P7hiYaHSpSVOanmadebTZlHlvyJyEpQ==
+X-Received: by 2002:a1c:4e15:: with SMTP id g21mr15833055wmh.38.1635160315674;
+        Mon, 25 Oct 2021 04:11:55 -0700 (PDT)
+Received: from [192.168.8.198] ([185.69.144.165])
+        by smtp.gmail.com with ESMTPSA id w7sm9892023wrm.64.2021.10.25.04.11.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Oct 2021 04:11:55 -0700 (PDT)
+Message-ID: <87d9f109-c00e-7e79-36c3-61f153db3561@gmail.com>
+Date:   Mon, 25 Oct 2021 12:10:14 +0100
 MIME-Version: 1.0
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com> <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
-In-Reply-To: <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
-From:   Daniel Black <daniel@mariadb.org>
-Date:   Mon, 25 Oct 2021 22:09:28 +1100
-Message-ID: <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
-Subject: Re: uring regression - lost write request
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 3/5] block: avoid extra iter advance with async iocb
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <cover.1635006010.git.asml.silence@gmail.com>
+ <aee615ac9cd6804c10c14938d011e0913f751960.1635006010.git.asml.silence@gmail.com>
+ <YXZd3ETk4P+OBWXD@infradead.org>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <YXZd3ETk4P+OBWXD@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 8:59 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
->
-> On 10/22/21 10:10, Pavel Begunkov wrote:
-> > On 10/22/21 04:12, Daniel Black wrote:
-> >> Sometime after 5.11 and is fixed in 5.15-rcX (rc6 extensively tested
-> >> over last few days) is a kernel regression we are tracing in
-> >> https://jira.mariadb.org/browse/MDEV-26674 and
-> >> https://jira.mariadb.org/browse/MDEV-26555
-> >> 5.10 and early across many distros and hardware appear not to have a problem.
-> >>
-> >> I'd appreciate some help identifying a 5.14 linux stable patch
-> >> suitable as I observe the fault in mainline 5.14.14 (built
-> >
-> > Cc: io-uring@vger.kernel.org
-> >
-> > Let me try to remember anything relevant from 5.15,
-> > Thanks for letting know
->
-> Daniel, following the links I found this:
->
-> "From: Daniel Black <daniel@mariadb.org>
-> ...
-> The good news is I've validated that the linux mainline 5.14.14 build
-> from https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.14.14/ has
-> actually fixed this problem."
->
-> To be clear, is the mainline 5.14 kernel affected with the issue?
-> Or does the problem exists only in debian/etc. kernel trees?
->
-> --
-> Pavel Begunkov
+On 10/25/21 08:33, Christoph Hellwig wrote:
+> On Sat, Oct 23, 2021 at 05:21:34PM +0100, Pavel Begunkov wrote:
+>> --- a/block/fops.c
+>> +++ b/block/fops.c
+>> @@ -352,11 +352,21 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+>>   	bio->bi_end_io = blkdev_bio_end_io_async;
+>>   	bio->bi_ioprio = iocb->ki_ioprio;
+>>   
+>> -	ret = bio_iov_iter_get_pages(bio, iter);
+>> -	if (unlikely(ret)) {
+>> -		bio->bi_status = BLK_STS_IOERR;
+>> -		bio_endio(bio);
+>> -		return ret;
+>> +	if (!iov_iter_is_bvec(iter)) {
+>> +		ret = bio_iov_iter_get_pages(bio, iter);
+>> +		if (unlikely(ret)) {
+>> +			bio->bi_status = BLK_STS_IOERR;
+>> +			bio_endio(bio);
+>> +			return ret;
+>> +		}
+> 
+> Nit: I generally find it much nicer to read if simple if statements
+> don't use pointless negations.
+> 
+>> +	} else {
+>> +		/*
+>> +		 * Users don't rely on the iterator being in any particular
+>> +		 * state for async I/O returning -EIOCBQUEUED, hence we can
+>> +		 * avoid expensive iov_iter_advance(). Bypass
+>> +		 * bio_iov_iter_get_pages() and set the bvec directly.
+>> +		 */
+>> +		bio_iov_bvec_set(bio, iter);
+> 
+> So if this optimization is so useful, please also do it for
+> non-bvec iov_iters, which is what 99% of the applications actually
+> use.
+
+It's an async path, so mainly io_uring or aio, I don't think there
+is much profit in doing that for iov, especially behind iov -> bvec
+translation with page referencing.
+
+Could've been done nonetheless, but what I think about looks too
+ugly because of the loop inside of bio_iov_iter_get_pages(). Don't
+think the sketch below is viable, any better ideas?
 
 
-Thanks Pavel for looking.
+ssize_t __bio_iov_iter_get_pages() {
+	...
+	/* not advancing */
+	return size;
+}
 
-I'm retesting https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.14.14/
-in earnest. I did get some assertions, but they may have been
-unrelated. The testing continues...
+do {
+	if (bio_op(bio) == REQ_OP_ZONE_APPEND)
+		ret = __bio_iov_append_get_pages(bio, iter);
+	else
+		ret = __bio_iov_iter_get_pages(bio, iter);
+	if (ret < 0)
+		break;
+	iov_iter_advance(ret);
+} while (iov_iter_count(iter) && !bio_full(bio, 0));
 
-The problem with debian trees on 5.14.12 (as
-linux-image-5.14.0-3-amd64_5.14.12-1_amd64.deb) was quite real
-https://jira.mariadb.org/browse/MDEV-26674?focusedCommentId=203155&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-203155
+and copy paste into fops.c
 
+do {
+	if (bio_op(bio) == REQ_OP_ZONE_APPEND)
+		ret = __bio_iov_append_get_pages(bio, iter);
+	else
+		ret = __bio_iov_iter_get_pages(bio, iter);
 
-What is concrete is the fc34 package of 5.14.14 (which obviously does
-have a Red Hat delta
-https://src.fedoraproject.org/rpms/kernel/blob/f34/f/patch-5.14-redhat.patch),
-but unsure of significance. Output below:
-
-https://koji.fedoraproject.org/koji/buildinfo?buildID=1847210
-
-$ uname -a
-Linux localhost.localdomain 5.14.14-200.fc34.x86_64 #1 SMP Wed Oct 20
-16:15:12 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
-
-~/repos/mariadb-server-10.6 10.6
-$ bd
-
-~/repos/build-mariadb-server-10.6
-$ mysql-test/mtr  --parallel=4 encryption.innochecksum{,,,,,}
-Logging: /home/dan/repos/mariadb-server-10.6/mysql-test/mariadb-test-run.pl
- --parallel=4 encryption.innochecksum encryption.innochecksum
-encryption.innochecksum encryption.innochecksum
-encryption.innochecksum encryption.innochecksum
-vardir: /home/dan/repos/build-mariadb-server-10.6/mysql-test/var
-Removing old var directory...
- - WARNING: Using the 'mysql-test/var' symlink
-The destination for symlink
-/home/dan/repos/build-mariadb-server-10.6/mysql-test/var does not
-exist; Removing it and creating a new var directory
-Creating var directory
-'/home/dan/repos/build-mariadb-server-10.6/mysql-test/var'...
-Checking supported features...
-MariaDB Version 10.6.5-MariaDB
- - SSL connections supported
- - binaries built with wsrep patch
-Collecting tests...
-Installing system database...
-
-==============================================================================
-
-TEST                                  WORKER RESULT   TIME (ms) or COMMENT
---------------------------------------------------------------------------
-
-worker[1] Using MTR_BUILD_THREAD 300, with reserved ports 16000..16019
-worker[3] Using MTR_BUILD_THREAD 302, with reserved ports 16040..16059
-worker[2] Using MTR_BUILD_THREAD 301, with reserved ports 16020..16039
-worker[4] Using MTR_BUILD_THREAD 303, with reserved ports 16060..16079
-encryption.innochecksum '16k,cbc,innodb,strict_crc32' w3 [ pass ]   5460
-encryption.innochecksum '16k,cbc,innodb,strict_crc32' w2 [ pass ]   5418
-encryption.innochecksum '16k,cbc,innodb,strict_crc32' w1 [ pass ]   9391
-encryption.innochecksum '16k,cbc,innodb,strict_crc32' w3 [ pass ]   8682
-encryption.innochecksum '16k,cbc,innodb,strict_crc32' w3 [ pass ]   3873
-encryption.innochecksum '8k,cbc,innodb,strict_crc32' w1 [ pass ]   9133
-encryption.innochecksum '4k,cbc,innodb,strict_crc32' w2 [ pass ]  11074
-encryption.innochecksum '8k,cbc,innodb,strict_crc32' w1 [ pass ]   5253
-encryption.innochecksum '16k,cbc,innodb,strict_full_crc32' w3 [ pass ]   4019
-encryption.innochecksum '4k,cbc,innodb,strict_crc32' w2 [ pass ]   6318
-encryption.innochecksum '16k,cbc,innodb,strict_full_crc32' w3 [ pass ]   6176
-encryption.innochecksum '8k,cbc,innodb,strict_crc32' w1 [ pass ]   7305
-encryption.innochecksum '16k,cbc,innodb,strict_full_crc32' w3 [ pass ]   4430
-encryption.innochecksum '4k,cbc,innodb,strict_crc32' w2 [ pass ]  10005
-encryption.innochecksum '8k,cbc,innodb,strict_crc32' w1 [ pass ]   6878
-encryption.innochecksum '16k,cbc,innodb,strict_full_crc32' w3 [ pass ]   3613
-encryption.innochecksum '16k,cbc,innodb,strict_full_crc32' w3 [ pass ]   3875
-encryption.innochecksum '4k,cbc,innodb,strict_crc32' w2 [ pass ]   6612
-encryption.innochecksum '8k,cbc,innodb,strict_crc32' w1 [ pass ]   4901
-encryption.innochecksum '16k,cbc,innodb,strict_full_crc32' w3 [ pass ]   3853
-encryption.innochecksum '8k,cbc,innodb,strict_crc32' w1 [ pass ]   5080
-encryption.innochecksum '4k,cbc,innodb,strict_crc32' w2 [ pass ]   7072
-encryption.innochecksum '4k,cbc,innodb,strict_crc32' w2 [ pass ]   6774
-encryption.innochecksum '4k,cbc,innodb,strict_full_crc32' w3 [ pass ]   7037
-encryption.innochecksum '8k,cbc,innodb,strict_full_crc32' w1 [ pass ]   4961
-encryption.innochecksum '8k,cbc,innodb,strict_full_crc32' w1 [ pass ]   5692
-encryption.innochecksum '4k,cbc,innodb,strict_full_crc32' w3 [ pass ]   8449
-encryption.innochecksum '16k,ctr,innodb,strict_crc32' w2 [ pass ]   5515
-encryption.innochecksum '8k,cbc,innodb,strict_full_crc32' w1 [ pass ]   5650
-encryption.innochecksum '16k,ctr,innodb,strict_crc32' w2 [ pass ]   3722
-encryption.innochecksum '4k,cbc,innodb,strict_full_crc32' w3 [ pass ]   6691
-encryption.innochecksum '8k,cbc,innodb,strict_full_crc32' w1 [ pass ]   4611
-encryption.innochecksum '16k,ctr,innodb,strict_crc32' w2 [ pass ]   4587
-encryption.innochecksum '16k,ctr,innodb,strict_crc32' w2 [ pass ]   5465
-encryption.innochecksum '8k,cbc,innodb,strict_full_crc32' w1 [ pass ]   6900
-encryption.innochecksum '4k,cbc,innodb,strict_full_crc32' w3 [ pass ]   8333
-encryption.innochecksum '16k,ctr,innodb,strict_crc32' w2 [ pass ]   4691
-encryption.innochecksum '8k,cbc,innodb,strict_full_crc32' w1 [ pass ]   5077
-encryption.innochecksum '4k,cbc,innodb,strict_full_crc32' w3 [ pass ]   6319
-encryption.innochecksum '16k,ctr,innodb,strict_crc32' w2 [ pass ]   4590
-encryption.innochecksum '4k,ctr,innodb,strict_crc32' w1 [ pass ]   9683
-encryption.innochecksum '8k,ctr,innodb,strict_crc32' w2 [ pass ]   5404
-encryption.innochecksum '4k,ctr,innodb,strict_crc32' w1 [ pass ]   6775
-encryption.innochecksum '8k,ctr,innodb,strict_crc32' w2 [ pass ]   6190
-encryption.innochecksum '4k,ctr,innodb,strict_crc32' w1 [ pass ]   9354
-encryption.innochecksum '8k,ctr,innodb,strict_crc32' w2 [ pass ]   7734
-encryption.innochecksum '8k,ctr,innodb,strict_crc32' w2 [ pass ]   4993
-encryption.innochecksum '4k,ctr,innodb,strict_crc32' w1 [ pass ]   6280
-encryption.innochecksum '8k,ctr,innodb,strict_crc32' w2 [ pass ]   4487
-encryption.innochecksum '4k,ctr,innodb,strict_crc32' w1 [ pass ]   6971
-encryption.innochecksum '8k,ctr,innodb,strict_crc32' w2 [ pass ]   5172
-encryption.innochecksum '4k,ctr,innodb,strict_crc32' w1 [ pass ]   6317
-encryption.innochecksum '16k,ctr,innodb,strict_full_crc32' w2 [ pass ]   3371
-encryption.innochecksum '16k,ctr,innodb,strict_full_crc32' w2 [ pass ]   3472
-encryption.innochecksum '16k,ctr,innodb,strict_full_crc32' w2 [ pass ]   6707
-encryption.innochecksum '4k,ctr,innodb,strict_full_crc32' w1 [ pass ]   9337
-encryption.innochecksum '16k,ctr,innodb,strict_full_crc32' w2 [ pass ]   9176
-encryption.innochecksum '4k,ctr,innodb,strict_full_crc32' w1 [ pass ]  11817
-encryption.innochecksum '16k,ctr,innodb,strict_full_crc32' w2 [ pass ]   3419
-encryption.innochecksum '16k,ctr,innodb,strict_full_crc32' w2 [ pass ]   5256
-encryption.innochecksum '4k,ctr,innodb,strict_full_crc32' w1 [ pass ]   9291
-encryption.innochecksum '4k,ctr,innodb,strict_full_crc32' w1 [ pass ]   6508
-encryption.innochecksum '4k,ctr,innodb,strict_full_crc32' w2 [ pass ]   6294
-encryption.innochecksum '4k,ctr,innodb,strict_full_crc32' w1 [ pass ]   6327
-encryption.innochecksum '8k,ctr,innodb,strict_full_crc32' w2 [ pass ]   4579
-encryption.innochecksum '8k,ctr,innodb,strict_full_crc32' w1 [ pass ]   4764
-encryption.innochecksum '8k,ctr,innodb,strict_full_crc32' w2 [ pass ]   4469
-encryption.innochecksum '8k,ctr,innodb,strict_full_crc32' w1 [ pass ]   4677
-encryption.innochecksum '8k,ctr,innodb,strict_full_crc32' w2 [ pass ]   4696
-encryption.innochecksum '8k,ctr,innodb,strict_full_crc32' w1 [ pass ]   3898
-encryption.innochecksum '4k,cbc,innodb,strict_full_crc32' w3 [ pass ]  127358
-encryption.innochecksum '16k,cbc,innodb,strict_crc32' w4 [ fail ]
-        Test ended at 2021-10-25 21:39:13
-
-CURRENT_TEST: encryption.innochecksum
-mysqltest: At line 41: query 'INSERT INTO t3 SELECT * FROM t1' failed:
-<Unknown> (2013): Lost connection to server during query
-
-The result from queries just before the failure was:
-SET GLOBAL innodb_file_per_table = ON;
-set global innodb_compression_algorithm = 1;
-# Create and populate a tables
-CREATE TABLE t1 (a INT AUTO_INCREMENT PRIMARY KEY, b TEXT)
-ENGINE=InnoDB ENCRYPTED=YES ENCRYPTION_KEY_ID=4;
-CREATE TABLE t2 (a INT AUTO_INCREMENT PRIMARY KEY, b TEXT)
-ENGINE=InnoDB ROW_FORMAT=COMPRESSED ENCRYPTED=YES ENCRYPTION_KEY_ID=4;
-CREATE TABLE t3 (a INT AUTO_INCREMENT PRIMARY KEY, b TEXT)
-ENGINE=InnoDB ROW_FORMAT=COMPRESSED ENCRYPTED=NO;
-CREATE TABLE t4 (a INT AUTO_INCREMENT PRIMARY KEY, b TEXT)
-ENGINE=InnoDB PAGE_COMPRESSED=1;
-CREATE TABLE t5 (a INT AUTO_INCREMENT PRIMARY KEY, b TEXT)
-ENGINE=InnoDB PAGE_COMPRESSED=1 ENCRYPTED=YES ENCRYPTION_KEY_ID=4;
-CREATE TABLE t6 (a INT AUTO_INCREMENT PRIMARY KEY, b TEXT) ENGINE=InnoDB;
+	if (ret < 0 || iov_iter_count(iter) == ret || bio_full(bio, 0))
+		break;
+	iov_iter_advance(ret);
+} while (1);
 
 
-Server [mysqld.1 - pid: 15380, winpid: 15380, exit: 256] failed during test run
-Server log from this test:
-----------SERVER LOG START-----------
-$ /home/dan/repos/build-mariadb-server-10.6/sql/mariadbd
---defaults-group-suffix=.1
---defaults-file=/home/dan/repos/build-mariadb-server-10.6/mysql-test/var/4/my.cnf
---log-output=file --innodb-page-size=16K
---skip-innodb-read-only-compressed
---innodb-checksum-algorithm=strict_crc32 --innodb-flush-sync=OFF
---innodb --innodb-cmpmem --innodb-cmp-per-index --innodb-trx
---innodb-locks --innodb-lock-waits --innodb-metrics
---innodb-buffer-pool-stats --innodb-buffer-page
---innodb-buffer-page-lru --innodb-sys-columns --innodb-sys-fields
---innodb-sys-foreign --innodb-sys-foreign-cols --innodb-sys-indexes
---innodb-sys-tables --innodb-sys-virtual
---plugin-load-add=file_key_management.so --loose-file-key-management
---loose-file-key-management-filename=/home/dan/repos/mariadb-server-10.6/mysql-test/std_data/keys.txt
---file-key-management-encryption-algorithm=aes_cbc
---skip-innodb-read-only-compressed --core-file
---loose-debug-sync-timeout=300
-2021-10-25 21:28:56 0 [Note]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd (server
-10.6.5-MariaDB-log) starting as process 15381 ...
-2021-10-25 21:28:56 0 [Warning] Could not increase number of
-max_open_files to more than 1024 (request: 32190)
-2021-10-25 21:28:56 0 [Warning] Changed limits: max_open_files: 1024
-max_connections: 151 (was 151)  table_cache: 421 (was 2000)
-2021-10-25 21:28:56 0 [Note] Plugin 'partition' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'SEQUENCE' is disabled.
-2021-10-25 21:28:56 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
-2021-10-25 21:28:56 0 [Note] InnoDB: Number of pools: 1
-2021-10-25 21:28:56 0 [Note] InnoDB: Using crc32 + pclmulqdq instructions
-2021-10-25 21:28:56 0 [Note] InnoDB: Using liburing
-2021-10-25 21:28:56 0 [Note] InnoDB: Initializing buffer pool, total
-size = 8388608, chunk size = 8388608
-2021-10-25 21:28:56 0 [Note] InnoDB: Completed initialization of buffer pool
-2021-10-25 21:28:56 0 [Note] InnoDB: 128 rollback segments are active.
-2021-10-25 21:28:56 0 [Note] InnoDB: Creating shared tablespace for
-temporary tables
-2021-10-25 21:28:56 0 [Note] InnoDB: Setting file './ibtmp1' size to
-12 MB. Physically writing the file full; Please wait ...
-2021-10-25 21:28:56 0 [Note] InnoDB: File './ibtmp1' size is now 12 MB.
-2021-10-25 21:28:56 0 [Note] InnoDB: 10.6.5 started; log sequence
-number 43637; transaction id 17
-2021-10-25 21:28:56 0 [Note] InnoDB: Loading buffer pool(s) from
-/home/dan/repos/build-mariadb-server-10.6/mysql-test/var/4/mysqld.1/data/ib_buffer_pool
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_FT_CONFIG' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_SYS_TABLESTATS' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_FT_DELETED' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_CMP' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'THREAD_POOL_WAITS' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_CMP_RESET' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'THREAD_POOL_QUEUES' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'FEEDBACK' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_FT_INDEX_TABLE' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'THREAD_POOL_GROUPS' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_CMP_PER_INDEX_RESET' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_FT_INDEX_CACHE' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_FT_BEING_DELETED' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_CMPMEM_RESET' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_FT_DEFAULT_STOPWORD' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_SYS_TABLESPACES' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'user_variables' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'INNODB_TABLESPACES_ENCRYPTION' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'THREAD_POOL_STATS' is disabled.
-2021-10-25 21:28:56 0 [Note] Plugin 'unix_socket' is disabled.
-2021-10-25 21:28:56 0 [Warning]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: unknown
-variable 'loose-feedback-debug-startup-interval=20'
-2021-10-25 21:28:56 0 [Warning]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: unknown
-variable 'loose-feedback-debug-first-interval=60'
-2021-10-25 21:28:56 0 [Warning]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: unknown
-variable 'loose-feedback-debug-interval=60'
-2021-10-25 21:28:56 0 [Warning]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: unknown option
-'--loose-pam-debug'
-2021-10-25 21:28:56 0 [Warning]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: unknown option
-'--loose-aria'
-2021-10-25 21:28:56 0 [Warning]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: unknown
-variable 'loose-debug-sync-timeout=300'
-2021-10-25 21:28:56 0 [Note] Server socket created on IP: '127.0.0.1'.
-2021-10-25 21:28:56 0 [Note]
-/home/dan/repos/build-mariadb-server-10.6/sql/mariadbd: ready for
-connections.
-Version: '10.6.5-MariaDB-log'  socket:
-'/home/dan/repos/build-mariadb-server-10.6/mysql-test/var/tmp/4/mysqld.1.sock'
- port: 16060  Source distribution
-2021-10-25 21:28:56 0 [Note] InnoDB: Buffer pool(s) load completed at
-211025 21:28:56
-2021-10-25 21:39:11 0 [ERROR] [FATAL] InnoDB:
-innodb_fatal_semaphore_wait_threshold was exceeded for dict_sys.latch
+
+-- 
+Pavel Begunkov
