@@ -2,131 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6CF3C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A62DC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:41:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CCB360FE8
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:36:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C7FC60EDF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:41:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232467AbhJYNi1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 09:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230344AbhJYNi1 (ORCPT
+        id S231921AbhJYNnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 09:43:42 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:29935 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230502AbhJYNnl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 09:38:27 -0400
-Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A1DC061745
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:36:04 -0700 (PDT)
-Received: by mail-oo1-xc2b.google.com with SMTP id a17-20020a4a6851000000b002b59bfbf669so3657078oof.9
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:36:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=dmWGSJIsWb+aOhh0t3aM9irYHyVwx9PbhT/vqJqSCww=;
-        b=LglnzvaS+9x5eDFBfxX3Ns+bJmd4gGKGOjU0AyidUv3GKPGIAC7emhNnlUqR0Rd8ze
-         MK36DBH0zCFVf/itOZsmxIRI3Pvj7sa3fwp2BmGrbGOnuchOydTb52M+WSYAfUJMis1K
-         ss/kAmtT8NBDtXI7HXXUyVYy6TLq/1SY9I82KCNaVNp7dsaL5frhYLUBzPwpED1VrzYZ
-         5bvJZCY/utf4LZSvu/IDw7RtLo8xKnS+oWLGvAGj9izV/DR7zz7mIkfRh4iv7gLZgNDm
-         blOERQpo/DibDiCjYeRSIax9duJBCbnmenDEw5rxOoaeT/l6GbZfPKhNBOnMXO8Uwlv/
-         7VdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dmWGSJIsWb+aOhh0t3aM9irYHyVwx9PbhT/vqJqSCww=;
-        b=pkSOavDCocLCUByK3n2tZTsHEn9gcvJ0n//I3Dp7lxfggjxFNZ0vQdBF8IBLK+Ty++
-         qkZz26em+gxf6Ei9UKVrF7Z41pze9h4YpORlG+lKmlf3hz+ZEprJqz/8DE8zQci4V8vG
-         6jI60hzq41zUyoEbV5G3YHpfwcxjDNUQ/fzdk1urQpMljHYK2KDSeGkLwGbMwkUesqx+
-         XSY7DwJOvvZ9rOAcc31A1H72eWrlliKnWVEz27JGnviL4vhZqcoTpK/wu1RXRNwl5Qre
-         8nXrL/xvIfVKtQDJOSM8oE+6FAoWVroVIY0Az8FzpF4ATvyZPQ72uQdEedqkD98XOKa0
-         ZA6Q==
-X-Gm-Message-State: AOAM5338kfR/K6KHKu+GXhPRhB7ABaFm4ZGsWGFw5pvfjT//4SK7HI64
-        0MHN5jT+pFzTUQ+uPtQSKECShA==
-X-Google-Smtp-Source: ABdhPJz1xo+TzaHfm3pkLhyBFd5zEZY2L2UdL2gRpvW7tQVkwfkm2gcP3YuM9jlqSMVVY6Zjgqj9cw==
-X-Received: by 2002:a4a:dfdb:: with SMTP id p27mr12147573ood.70.1635168964117;
-        Mon, 25 Oct 2021 06:36:04 -0700 (PDT)
-Received: from ?IPv6:2600:380:6060:12a6:721f:26e:6f8:a9aa? ([2600:380:6060:12a6:721f:26e:6f8:a9aa])
-        by smtp.gmail.com with ESMTPSA id w16sm3534007oti.3.2021.10.25.06.36.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 06:36:03 -0700 (PDT)
-Subject: Re: [syzbot] KCSAN: data-race in sbitmap_queue_clear /
- sbitmap_queue_clear (3)
-To:     syzbot <syzbot+4f8bfd804b4a1f95b8f6@syzkaller.appspotmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-References: <00000000000089871905cf2b7d09@google.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f37aa186-8820-451f-6fa2-eee45799a428@kernel.dk>
-Date:   Mon, 25 Oct 2021 07:35:59 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 25 Oct 2021 09:43:41 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HdGFf6ljyzbnKS;
+        Mon, 25 Oct 2021 21:36:38 +0800 (CST)
+Received: from dggema762-chm.china.huawei.com (10.1.198.204) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.15; Mon, 25 Oct 2021 21:41:16 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ dggema762-chm.china.huawei.com (10.1.198.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.15; Mon, 25 Oct 2021 21:41:15 +0800
+Subject: Re: [PATCH v4] blk-cgroup: synchoronize blkg creation against policy
+ deactivation
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <avanzini.arianna@gmail.com>, <fchecconi@gmail.com>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211020014036.2141723-1-yukuai3@huawei.com>
+ <461fa6c1-fbc3-2c66-ed11-8d035c45975a@huawei.com>
+Message-ID: <6e4c912f-eb32-fa03-cce1-bed3f85586b8@huawei.com>
+Date:   Mon, 25 Oct 2021 21:41:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <00000000000089871905cf2b7d09@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <461fa6c1-fbc3-2c66-ed11-8d035c45975a@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggema762-chm.china.huawei.com (10.1.198.204)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/25/21 5:16 AM, syzbot wrote:
-> Hello,
+On 2021/10/22 9:28, yukuai (C) wrote:
+> Hi 2021/10/20 9:40, Yu Kuai wrote:
+>> Out test report a null pointer dereference:
+>>
+>> [  168.534653] 
+>> ==================================================================
+>> [  168.535614] Disabling lock debugging due to kernel taint
+>> [  168.536346] BUG: kernel NULL pointer dereference, address: 
+>> 0000000000000008
+>> [  168.537274] #PF: supervisor read access in kernel mode
+>> [  168.537964] #PF: error_code(0x0000) - not-present page
+>> [  168.538667] PGD 0 P4D 0
+>> [  168.539025] Oops: 0000 [#1] PREEMPT SMP KASAN
+>> [  168.539656] CPU: 13 PID: 759 Comm: bash Tainted: G    B             
+>> 5.15.0-rc2-next-202100
+>> [  168.540954] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+>> BIOS ?-20190727_0738364
+>> [  168.542736] RIP: 0010:bfq_pd_init+0x88/0x1e0
+>> [  168.543318] Code: 98 00 00 00 e8 c9 e4 5b ff 4c 8b 65 00 49 8d 7c 
+>> 24 08 e8 bb e4 5b ff 4d0
+>> [  168.545803] RSP: 0018:ffff88817095f9c0 EFLAGS: 00010002
+>> [  168.546497] RAX: 0000000000000001 RBX: ffff888101a1c000 RCX: 
+>> 0000000000000000
+>> [  168.547438] RDX: 0000000000000003 RSI: 0000000000000002 RDI: 
+>> ffff888106553428
+>> [  168.548402] RBP: ffff888106553400 R08: ffffffff961bcaf4 R09: 
+>> 0000000000000001
+>> [  168.549365] R10: ffffffffa2e16c27 R11: fffffbfff45c2d84 R12: 
+>> 0000000000000000
+>> [  168.550291] R13: ffff888101a1c098 R14: ffff88810c7a08c8 R15: 
+>> ffffffffa55541a0
+>> [  168.551221] FS:  00007fac75227700(0000) GS:ffff88839ba80000(0000) 
+>> knlGS:0000000000000000
+>> [  168.552278] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [  168.553040] CR2: 0000000000000008 CR3: 0000000165ce7000 CR4: 
+>> 00000000000006e0
+>> [  168.554000] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+>> 0000000000000000
+>> [  168.554929] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+>> 0000000000000400
+>> [  168.555888] Call Trace:
+>> [  168.556221]  <TASK>
+>> [  168.556510]  blkg_create+0x1c0/0x8c0
+>> [  168.556989]  blkg_conf_prep+0x574/0x650
+>> [  168.557502]  ? stack_trace_save+0x99/0xd0
+>> [  168.558033]  ? blkcg_conf_open_bdev+0x1b0/0x1b0
+>> [  168.558629]  tg_set_conf.constprop.0+0xb9/0x280
+>> [  168.559231]  ? kasan_set_track+0x29/0x40
+>> [  168.559758]  ? kasan_set_free_info+0x30/0x60
+>> [  168.560344]  ? tg_set_limit+0xae0/0xae0
+>> [  168.560853]  ? do_sys_openat2+0x33b/0x640
+>> [  168.561383]  ? do_sys_open+0xa2/0x100
+>> [  168.561877]  ? __x64_sys_open+0x4e/0x60
+>> [  168.562383]  ? __kasan_check_write+0x20/0x30
+>> [  168.562951]  ? copyin+0x48/0x70
+>> [  168.563390]  ? _copy_from_iter+0x234/0x9e0
+>> [  168.563948]  tg_set_conf_u64+0x17/0x20
+>> [  168.564467]  cgroup_file_write+0x1ad/0x380
+>> [  168.565014]  ? cgroup_file_poll+0x80/0x80
+>> [  168.565568]  ? __mutex_lock_slowpath+0x30/0x30
+>> [  168.566165]  ? pgd_free+0x100/0x160
+>> [  168.566649]  kernfs_fop_write_iter+0x21d/0x340
+>> [  168.567246]  ? cgroup_file_poll+0x80/0x80
+>> [  168.567796]  new_sync_write+0x29f/0x3c0
+>> [  168.568314]  ? new_sync_read+0x410/0x410
+>> [  168.568840]  ? __handle_mm_fault+0x1c97/0x2d80
+>> [  168.569425]  ? copy_page_range+0x2b10/0x2b10
+>> [  168.570007]  ? _raw_read_lock_bh+0xa0/0xa0
+>> [  168.570622]  vfs_write+0x46e/0x630
+>> [  168.571091]  ksys_write+0xcd/0x1e0
+>> [  168.571563]  ? __x64_sys_read+0x60/0x60
+>> [  168.572081]  ? __kasan_check_write+0x20/0x30
+>> [  168.572659]  ? do_user_addr_fault+0x446/0xff0
+>> [  168.573264]  __x64_sys_write+0x46/0x60
+>> [  168.573774]  do_syscall_64+0x35/0x80
+>> [  168.574264]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+>> [  168.574960] RIP: 0033:0x7fac74915130
+>> [  168.575456] Code: 73 01 c3 48 8b 0d 58 ed 2c 00 f7 d8 64 89 01 48 
+>> 83 c8 ff c3 66 0f 1f 444
+>> [  168.577969] RSP: 002b:00007ffc3080e288 EFLAGS: 00000246 ORIG_RAX: 
+>> 0000000000000001
+>> [  168.578986] RAX: ffffffffffffffda RBX: 0000000000000009 RCX: 
+>> 00007fac74915130
+>> [  168.579937] RDX: 0000000000000009 RSI: 000056007669f080 RDI: 
+>> 0000000000000001
+>> [  168.580884] RBP: 000056007669f080 R08: 000000000000000a R09: 
+>> 00007fac75227700
+>> [  168.581841] R10: 000056007655c8f0 R11: 0000000000000246 R12: 
+>> 0000000000000009
+>> [  168.582796] R13: 0000000000000001 R14: 00007fac74be55e0 R15: 
+>> 00007fac74be08c0
+>> [  168.583757]  </TASK>
+>> [  168.584063] Modules linked in:
+>> [  168.584494] CR2: 0000000000000008
+>> [  168.584964] ---[ end trace 2475611ad0f77a1a ]---
+>>
+>> This is because blkg_alloc() is called from blkg_conf_prep() without
+>> holding 'q->queue_lock', and elevator is exited before blkg_create():
+>>
+>> thread 1                            thread 2
+>> blkg_conf_prep
+>>   spin_lock_irq(&q->queue_lock);
+>>   blkg_lookup_check -> return NULL
+>>   spin_unlock_irq(&q->queue_lock);
+>>
+>>   blkg_alloc
+>>    blkcg_policy_enabled -> true
+>>    pd = ->pd_alloc_fn
+>>    blkg->pd[i] = pd
+>>                                     blk_mq_exit_sched
+>>                                      bfq_exit_queue
+>>                                       blkcg_deactivate_policy
+>>                                        spin_lock_irq(&q->queue_lock);
+>>                                        __clear_bit(pol->plid, 
+>> q->blkcg_pols);
+>>                                        spin_unlock_irq(&q->queue_lock);
+>>                                      q->elevator = NULL;
+>>    spin_lock_irq(&q->queue_lock);
+>>     blkg_create
+>>      if (blkg->pd[i])
+>>       ->pd_init_fn -> q->elevator is NULL
+>>    spin_unlock_irq(&q->queue_lock);
+>>
+>> Because blkcg_deactivate_policy() requires queue to be frozen, we can
+>> grab q_usage_counter to synchoronize blkg_conf_prep() against
+>> blkcg_deactivate_policy().
+>>
+>> Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and 
+>> cgroups support")
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> Acked-by: Tejun Heo <tj@kernel.org>
 > 
-> syzbot found the following issue on:
+> Hi, jens
 > 
-> HEAD commit:    2f111a6fd5b5 Merge tag 'ceph-for-5.15-rc7' of git://github..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10dae330b00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=b2868748300e5cf6
-> dashboard link: https://syzkaller.appspot.com/bug?extid=4f8bfd804b4a1f95b8f6
-> compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
+> Can you please apply this patch?
 > 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+4f8bfd804b4a1f95b8f6@syzkaller.appspotmail.com
-> 
-> ==================================================================
-> BUG: KCSAN: data-race in sbitmap_queue_clear / sbitmap_queue_clear
-> 
-> write to 0xffffe8ffffd145b8 of 4 bytes by interrupt on cpu 1:
->  sbitmap_queue_clear+0xca/0xf0 lib/sbitmap.c:606
->  blk_mq_put_tag+0x82/0x90
->  __blk_mq_free_request+0x114/0x180 block/blk-mq.c:507
->  blk_mq_free_request+0x2c8/0x340 block/blk-mq.c:541
->  __blk_mq_end_request+0x214/0x230 block/blk-mq.c:565
->  blk_mq_end_request+0x37/0x50 block/blk-mq.c:574
->  lo_complete_rq+0xca/0x170 drivers/block/loop.c:541
->  blk_complete_reqs block/blk-mq.c:584 [inline]
->  blk_done_softirq+0x69/0x90 block/blk-mq.c:589
->  __do_softirq+0x12c/0x26e kernel/softirq.c:558
->  run_ksoftirqd+0x13/0x20 kernel/softirq.c:920
->  smpboot_thread_fn+0x22f/0x330 kernel/smpboot.c:164
->  kthread+0x262/0x280 kernel/kthread.c:319
->  ret_from_fork+0x1f/0x30
-> 
-> write to 0xffffe8ffffd145b8 of 4 bytes by interrupt on cpu 0:
->  sbitmap_queue_clear+0xca/0xf0 lib/sbitmap.c:606
->  blk_mq_put_tag+0x82/0x90
->  __blk_mq_free_request+0x114/0x180 block/blk-mq.c:507
->  blk_mq_free_request+0x2c8/0x340 block/blk-mq.c:541
->  __blk_mq_end_request+0x214/0x230 block/blk-mq.c:565
->  blk_mq_end_request+0x37/0x50 block/blk-mq.c:574
->  lo_complete_rq+0xca/0x170 drivers/block/loop.c:541
->  blk_complete_reqs block/blk-mq.c:584 [inline]
->  blk_done_softirq+0x69/0x90 block/blk-mq.c:589
->  __do_softirq+0x12c/0x26e kernel/softirq.c:558
->  run_ksoftirqd+0x13/0x20 kernel/softirq.c:920
->  smpboot_thread_fn+0x22f/0x330 kernel/smpboot.c:164
->  kthread+0x262/0x280 kernel/kthread.c:319
->  ret_from_fork+0x1f/0x30
+> Thanks,
+> Kuai
 
-This is just a per-cpu alloc hint, it's racy by nature. What's the
-preferred way to silence these?
-
--- 
-Jens Axboe
-
+friendly ping ...
