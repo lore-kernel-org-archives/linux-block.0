@@ -2,67 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FC4C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 06:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 618B9C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 07:05:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A0B960FBF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 06:45:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 489EC60F9C
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 07:05:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231139AbhJYGrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 02:47:47 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:52704 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbhJYGrq (ORCPT
+        id S230174AbhJYHHs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 03:07:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229979AbhJYHHr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 02:47:46 -0400
-Date:   Mon, 25 Oct 2021 08:45:22 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1635144323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ddXW1IAEewv3IDmdYyUoJd2X13n5ysAHyyFO1j6t/0o=;
-        b=Im+Ftc4FvRhlJHm9A0ueRGkbHUxNi5W8PUeFsip9tCBZHgxDMrN5fLCzB1Mj5RfmSxsgTv
-        nUz1xg8C3FKg9pLOXwrEyn/OqghQCbV1BcD6Ygr4aiCgBKLt7Kpw/geopYGXbf1jhzW4Km
-        75mGSfl9vt/RkWaTHvbJX0zpdc/AyvnXtmOz/OSApOD9Ma3SqSzP6qRrQ6MPRS8kwGmhiT
-        /fHEqCRPXsjP3HB/Zwjs+8k0OA4ajkxEDyg6yfaBcfwOU09x5/BHqfAB8C3nKPV5UBW2W3
-        x/QA6eWkQt3Qn4W5o9yogBktQKtWAoPY3wF39JhSpVRmFUdlUtDYZsoPJpEPxg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1635144323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ddXW1IAEewv3IDmdYyUoJd2X13n5ysAHyyFO1j6t/0o=;
-        b=nNFDOrz6yv8xHs0xavwonaW23nJ5RD8tYubLAMGMS9I6ophJjCFQvRPKRpKZoPTxXX23wD
-        2zWwB6/KQvDvtIDg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
-        tglx@linutronix.de, Ulf Hansson <ulf.hansson@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 1/2] blk-mq: Add blk_mq_complete_request_direct()
-Message-ID: <20211025064522.5rkkj72rcfka3wqj@linutronix.de>
-References: <20211018135559.244400-1-bigeasy@linutronix.de>
- <20211018135559.244400-2-bigeasy@linutronix.de>
- <YW2Q0ikJR13NWgGD@infradead.org>
+        Mon, 25 Oct 2021 03:07:47 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 069DBC061745;
+        Mon, 25 Oct 2021 00:05:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=MWfB/Pp9FZbja07tYucEjisRFC0HHkvFMwtwn3gyp3o=; b=iYjOpX6U1STCkN0OBRL3wUW+pj
+        lq61H5lzNBFdkjygcXrFzebRbs5zTLj2vCwNUvz8ibdeTvQyxfB7T8pzvjdiQ9pelfHpUmtADRAuy
+        gzTveXNaTNxIQ6CwFcF8ssczvalPLNqioI8Oxbfl3/c6pd1Rd4HHOojx48lTatSy5twHuhg3RZXJg
+        FZa7noPc8mLvcGEG7sBXxo1MEG6aABF3MMcjV2Cc7RtmkzMhYgS4dZHVhGZs7VQLla9BXDCRTFpHF
+        B91GjTc0FzbsnJmGRzI+4YSKyx159kUBQpKFxQFC9TeQGQ2imvj2A54eSNFbdKA4eR0F7Wx22dWEz
+        sDcehvPw==;
+Received: from [2001:4bb8:184:6dcb:6093:467a:cccc:351c] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1meu2p-00FUNj-1e; Mon, 25 Oct 2021 07:05:19 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mtd@lists.infradead.org
+Subject: move all struct request releated code out of blk-core.c
+Date:   Mon, 25 Oct 2021 09:05:05 +0200
+Message-Id: <20211025070517.1548584-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YW2Q0ikJR13NWgGD@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-10-18 08:20:50 [-0700], Christoph Hellwig wrote:
-> On Mon, Oct 18, 2021 at 03:55:58PM +0200, Sebastian Andrzej Siewior wrote:
-> > +static inline void blk_mq_complete_request_direct(struct request *rq,
-> > +						  void (*complete)(struct request *rq))
-> 
-> Pleae avoid the overly long line.
-> 
-> ote that by doing the normal two tab indent for the continuation that
-> would be super trivial and way more readable.
+Hi Jens,
 
-Oki.
+this series (against the for-5.16/passthrough-flag branch) removes the
+remaining struct request related code from blk-core.c and cleans up a
+few related bits around that.
 
-Sebastian
+Diffstat:
+ b/block/Makefile                     |    2 
+ b/block/blk-core.c                   |  362 ----------------------
+ b/block/blk-mq.c                     |  573 +++++++++++++++++++++++++++++------
+ b/block/blk-mq.h                     |    3 
+ b/block/blk.h                        |   33 --
+ b/drivers/block/paride/pd.c          |    4 
+ b/drivers/block/pktcdvd.c            |    2 
+ b/drivers/block/virtio_blk.c         |    4 
+ b/drivers/md/dm-mpath.c              |    4 
+ b/drivers/mmc/core/block.c           |   20 -
+ b/drivers/mtd/mtd_blkdevs.c          |   10 
+ b/drivers/mtd/ubi/block.c            |    6 
+ b/drivers/scsi/scsi_bsg.c            |    2 
+ b/drivers/scsi/scsi_error.c          |    2 
+ b/drivers/scsi/scsi_ioctl.c          |    4 
+ b/drivers/scsi/scsi_lib.c            |   46 ++
+ b/drivers/scsi/sg.c                  |    6 
+ b/drivers/scsi/sr.c                  |    2 
+ b/drivers/scsi/st.c                  |    4 
+ b/drivers/scsi/ufs/ufshcd.c          |   20 -
+ b/drivers/scsi/ufs/ufshpb.c          |    8 
+ b/drivers/target/target_core_pscsi.c |    4 
+ b/include/linux/blk-mq.h             |   16 
+ block/blk-exec.c                     |  116 -------
+ 24 files changed, 597 insertions(+), 656 deletions(-)
