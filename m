@@ -2,138 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 502DCC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6CF3C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:36:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F6656054F
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:20:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CCB360FE8
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 13:36:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231748AbhJYNWW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 09:22:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28448 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230109AbhJYNWV (ORCPT
+        id S232467AbhJYNi1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 09:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230344AbhJYNi1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 09:22:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635167999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pQ1OI9HAD5wjVNNOGgAN/kQupBGnrAHU5IxWWPewKWg=;
-        b=K+E7lXTNZl5o5E8yFGZqgCowZ2oLAcO22GtsqYBMO0b8GvyVkU/YKGiOLyka6sIniAtwth
-        i4BI9N6GkWLUNgyQvhuEgqO61sNgRQYMa/KR6eHbY1Q4rrLaQIVO2SUf0JXrsbqjiVVID0
-        EGRiwJSRxG9gfSLlBUc+eKx1rspiCdM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-uwYVbCj6PSG2eVL2Ds4PXQ-1; Mon, 25 Oct 2021 09:19:58 -0400
-X-MC-Unique: uwYVbCj6PSG2eVL2Ds4PXQ-1
-Received: by mail-wm1-f72.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso3483987wml.9
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:19:58 -0700 (PDT)
+        Mon, 25 Oct 2021 09:38:27 -0400
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A1DC061745
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:36:04 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id a17-20020a4a6851000000b002b59bfbf669so3657078oof.9
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 06:36:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=dmWGSJIsWb+aOhh0t3aM9irYHyVwx9PbhT/vqJqSCww=;
+        b=LglnzvaS+9x5eDFBfxX3Ns+bJmd4gGKGOjU0AyidUv3GKPGIAC7emhNnlUqR0Rd8ze
+         MK36DBH0zCFVf/itOZsmxIRI3Pvj7sa3fwp2BmGrbGOnuchOydTb52M+WSYAfUJMis1K
+         ss/kAmtT8NBDtXI7HXXUyVYy6TLq/1SY9I82KCNaVNp7dsaL5frhYLUBzPwpED1VrzYZ
+         5bvJZCY/utf4LZSvu/IDw7RtLo8xKnS+oWLGvAGj9izV/DR7zz7mIkfRh4iv7gLZgNDm
+         blOERQpo/DibDiCjYeRSIax9duJBCbnmenDEw5rxOoaeT/l6GbZfPKhNBOnMXO8Uwlv/
+         7VdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pQ1OI9HAD5wjVNNOGgAN/kQupBGnrAHU5IxWWPewKWg=;
-        b=IGoCYo8aQYL3NsuhxQim3MGeCFWm/1eL1EikY7uCtO/iRdAMwXx28ykO73kd85sUQl
-         c+DViKsPVOZd+4swBFm3TWXG5QAlrl2sAZ5MtB6Xo3gsDs+bMn2+qMIUylK2FHHTtZ7x
-         3eUZqPHSUQUTy8lQcqsPjmv4OfhzvJPa8Q18Mb3NzLEZjGiWThIOacwbjbvqf5v9YUcj
-         TVZljj5fW8uxF2BiV4tjKDySt0Zob53sdH2GllEvlwDU/SLnvQm5ByrSshsaKf8Keb0c
-         bAaUbDF6IPJpGSUCcZBE2ERlotu0Oq0jDkFLjT5xnd8NJ7DXXF7V/OHe9KNZLvGNnLhe
-         Z7oQ==
-X-Gm-Message-State: AOAM530pYebib5520JxyFwTh/y9Rj522EJ+Lzcn9v51WdIAGGJQcuMaN
-        zTBCIgDuwxxt5w9tOhwd4OFOFIVr5GXJGxKRUa23eAstSv+SG9p+Tsnmnhts2L24bN12WBSib2h
-        2LSYHSAabfV2BLNcAElG4cy0=
-X-Received: by 2002:adf:d20d:: with SMTP id j13mr21610396wrh.432.1635167997168;
-        Mon, 25 Oct 2021 06:19:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/aD7gRnCuI5j47+0ONiKyu52bZ58nYsV/ZMfaGwWvIPrql4qDGm85P73R9e6uVPOdWjBWhQ==
-X-Received: by 2002:adf:d20d:: with SMTP id j13mr21610369wrh.432.1635167997009;
-        Mon, 25 Oct 2021 06:19:57 -0700 (PDT)
-Received: from redhat.com ([2a03:c5c0:207e:bfd4:918:2bfe:a2a5:6abe])
-        by smtp.gmail.com with ESMTPSA id s11sm8355747wrt.60.2021.10.25.06.19.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 06:19:56 -0700 (PDT)
-Date:   Mon, 25 Oct 2021 09:19:47 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     axboe@kernel.dk, hch@lst.de, josef@toxicpanda.com,
-        jasowang@redhat.com, stefanha@redhat.com, kwolf@redhat.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 4/4] virtio-blk: Use blk_validate_block_size() to
- validate block size
-Message-ID: <20211025091911-mutt-send-email-mst@kernel.org>
-References: <20211025094306.97-1-xieyongji@bytedance.com>
- <20211025094306.97-5-xieyongji@bytedance.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dmWGSJIsWb+aOhh0t3aM9irYHyVwx9PbhT/vqJqSCww=;
+        b=pkSOavDCocLCUByK3n2tZTsHEn9gcvJ0n//I3Dp7lxfggjxFNZ0vQdBF8IBLK+Ty++
+         qkZz26em+gxf6Ei9UKVrF7Z41pze9h4YpORlG+lKmlf3hz+ZEprJqz/8DE8zQci4V8vG
+         6jI60hzq41zUyoEbV5G3YHpfwcxjDNUQ/fzdk1urQpMljHYK2KDSeGkLwGbMwkUesqx+
+         XSY7DwJOvvZ9rOAcc31A1H72eWrlliKnWVEz27JGnviL4vhZqcoTpK/wu1RXRNwl5Qre
+         8nXrL/xvIfVKtQDJOSM8oE+6FAoWVroVIY0Az8FzpF4ATvyZPQ72uQdEedqkD98XOKa0
+         ZA6Q==
+X-Gm-Message-State: AOAM5338kfR/K6KHKu+GXhPRhB7ABaFm4ZGsWGFw5pvfjT//4SK7HI64
+        0MHN5jT+pFzTUQ+uPtQSKECShA==
+X-Google-Smtp-Source: ABdhPJz1xo+TzaHfm3pkLhyBFd5zEZY2L2UdL2gRpvW7tQVkwfkm2gcP3YuM9jlqSMVVY6Zjgqj9cw==
+X-Received: by 2002:a4a:dfdb:: with SMTP id p27mr12147573ood.70.1635168964117;
+        Mon, 25 Oct 2021 06:36:04 -0700 (PDT)
+Received: from ?IPv6:2600:380:6060:12a6:721f:26e:6f8:a9aa? ([2600:380:6060:12a6:721f:26e:6f8:a9aa])
+        by smtp.gmail.com with ESMTPSA id w16sm3534007oti.3.2021.10.25.06.36.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Oct 2021 06:36:03 -0700 (PDT)
+Subject: Re: [syzbot] KCSAN: data-race in sbitmap_queue_clear /
+ sbitmap_queue_clear (3)
+To:     syzbot <syzbot+4f8bfd804b4a1f95b8f6@syzkaller.appspotmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+References: <00000000000089871905cf2b7d09@google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f37aa186-8820-451f-6fa2-eee45799a428@kernel.dk>
+Date:   Mon, 25 Oct 2021 07:35:59 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211025094306.97-5-xieyongji@bytedance.com>
+In-Reply-To: <00000000000089871905cf2b7d09@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 05:43:06PM +0800, Xie Yongji wrote:
-> The block layer can't support the block size larger than
-> page size yet. If an untrusted device presents an invalid
-> block size in configuration space, it will result in the
-> kernel crash something like below:
+On 10/25/21 5:16 AM, syzbot wrote:
+> Hello,
 > 
-> [  506.154324] BUG: kernel NULL pointer dereference, address: 0000000000000008
-> [  506.160416] RIP: 0010:create_empty_buffers+0x24/0x100
-> [  506.174302] Call Trace:
-> [  506.174651]  create_page_buffers+0x4d/0x60
-> [  506.175207]  block_read_full_page+0x50/0x380
-> [  506.175798]  ? __mod_lruvec_page_state+0x60/0xa0
-> [  506.176412]  ? __add_to_page_cache_locked+0x1b2/0x390
-> [  506.177085]  ? blkdev_direct_IO+0x4a0/0x4a0
-> [  506.177644]  ? scan_shadow_nodes+0x30/0x30
-> [  506.178206]  ? lru_cache_add+0x42/0x60
-> [  506.178716]  do_read_cache_page+0x695/0x740
-> [  506.179278]  ? read_part_sector+0xe0/0xe0
-> [  506.179821]  read_part_sector+0x36/0xe0
-> [  506.180337]  adfspart_check_ICS+0x32/0x320
-> [  506.180890]  ? snprintf+0x45/0x70
-> [  506.181350]  ? read_part_sector+0xe0/0xe0
-> [  506.181906]  bdev_disk_changed+0x229/0x5c0
-> [  506.182483]  blkdev_get_whole+0x6d/0x90
-> [  506.183013]  blkdev_get_by_dev+0x122/0x2d0
-> [  506.183562]  device_add_disk+0x39e/0x3c0
-> [  506.184472]  virtblk_probe+0x3f8/0x79b [virtio_blk]
-> [  506.185461]  virtio_dev_probe+0x15e/0x1d0 [virtio]
+> syzbot found the following issue on:
 > 
-> So this patch tries to use the block layer helper to
-> validate the block size.
+> HEAD commit:    2f111a6fd5b5 Merge tag 'ceph-for-5.15-rc7' of git://github..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10dae330b00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b2868748300e5cf6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=4f8bfd804b4a1f95b8f6
+> compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
 > 
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->  drivers/block/virtio_blk.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> Unfortunately, I don't have any reproducer for this issue yet.
 > 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 303caf2d17d0..5bcacefe969e 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -815,9 +815,12 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
->  				   struct virtio_blk_config, blk_size,
->  				   &blk_size);
-> -	if (!err)
-> +	if (!err) {
-> +		if (blk_validate_block_size(blk_size))
-> +			goto out_cleanup_disk;
-> +
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+4f8bfd804b4a1f95b8f6@syzkaller.appspotmail.com
+> 
+> ==================================================================
+> BUG: KCSAN: data-race in sbitmap_queue_clear / sbitmap_queue_clear
+> 
+> write to 0xffffe8ffffd145b8 of 4 bytes by interrupt on cpu 1:
+>  sbitmap_queue_clear+0xca/0xf0 lib/sbitmap.c:606
+>  blk_mq_put_tag+0x82/0x90
+>  __blk_mq_free_request+0x114/0x180 block/blk-mq.c:507
+>  blk_mq_free_request+0x2c8/0x340 block/blk-mq.c:541
+>  __blk_mq_end_request+0x214/0x230 block/blk-mq.c:565
+>  blk_mq_end_request+0x37/0x50 block/blk-mq.c:574
+>  lo_complete_rq+0xca/0x170 drivers/block/loop.c:541
+>  blk_complete_reqs block/blk-mq.c:584 [inline]
+>  blk_done_softirq+0x69/0x90 block/blk-mq.c:589
+>  __do_softirq+0x12c/0x26e kernel/softirq.c:558
+>  run_ksoftirqd+0x13/0x20 kernel/softirq.c:920
+>  smpboot_thread_fn+0x22f/0x330 kernel/smpboot.c:164
+>  kthread+0x262/0x280 kernel/kthread.c:319
+>  ret_from_fork+0x1f/0x30
+> 
+> write to 0xffffe8ffffd145b8 of 4 bytes by interrupt on cpu 0:
+>  sbitmap_queue_clear+0xca/0xf0 lib/sbitmap.c:606
+>  blk_mq_put_tag+0x82/0x90
+>  __blk_mq_free_request+0x114/0x180 block/blk-mq.c:507
+>  blk_mq_free_request+0x2c8/0x340 block/blk-mq.c:541
+>  __blk_mq_end_request+0x214/0x230 block/blk-mq.c:565
+>  blk_mq_end_request+0x37/0x50 block/blk-mq.c:574
+>  lo_complete_rq+0xca/0x170 drivers/block/loop.c:541
+>  blk_complete_reqs block/blk-mq.c:584 [inline]
+>  blk_done_softirq+0x69/0x90 block/blk-mq.c:589
+>  __do_softirq+0x12c/0x26e kernel/softirq.c:558
+>  run_ksoftirqd+0x13/0x20 kernel/softirq.c:920
+>  smpboot_thread_fn+0x22f/0x330 kernel/smpboot.c:164
+>  kthread+0x262/0x280 kernel/kthread.c:319
+>  ret_from_fork+0x1f/0x30
 
+This is just a per-cpu alloc hint, it's racy by nature. What's the
+preferred way to silence these?
 
-Did you test this with an invalid blk size? It seems unlikely that it
-fails properly the way you'd expect.
-
->  		blk_queue_logical_block_size(q, blk_size);
-> -	else
-> +	} else
->  		blk_size = queue_logical_block_size(q);
->  
->  	/* Use topology information if available */
-> -- 
-> 2.11.0
+-- 
+Jens Axboe
 
