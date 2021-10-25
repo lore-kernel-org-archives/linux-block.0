@@ -2,96 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DAAC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 10:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 017B6C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 10:38:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 140FE60E52
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 10:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D543160E96
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 10:38:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230387AbhJYKbO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 06:31:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40782 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230231AbhJYKbN (ORCPT
+        id S230231AbhJYKkW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 06:40:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35883 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232877AbhJYKkW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 06:31:13 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72463C061745
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 03:28:51 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id a20-20020a1c7f14000000b003231d13ee3cso12548825wmd.3
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 03:28:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:in-reply-to:content-transfer-encoding;
-        bh=Te9zNoIa0vFfWqKPM7HQ04jgG0BMBOIhARAaFs7PR/A=;
-        b=Fh0wnlmFoS0TxD8/SuYJUucvk/U04aCqcPL03PluHNPa9swvT5Q1dW0a7j1P65Q4FK
-         qeITslZLfC8/9TuCdLQtoJFahm4XgV22Y7l4XJKxtgzMcA8f/zukeum4vIE/he55r/W2
-         7VZnZvu5s54l+53lWJeZg2P9hgDbbhMc0NbMpLVL9/V2ojkR0yUka9WBEUolauBeVkR1
-         FYGOJ41/XoFtQNI1SCQfCAgq18OxU3NhyYZN4J8S6sfomgCB/HsHXtEHbXqYcuRMFmg4
-         tjwEYUoHyFRJebXrxoHrY4ckos6F0AGpkBa/BJa21DDkC1/2ujzHNXXTG2c9HNAmJKE1
-         3SsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=Te9zNoIa0vFfWqKPM7HQ04jgG0BMBOIhARAaFs7PR/A=;
-        b=hpWY0ErpCJhg6ihiZyqM3g56q5rvdz30w2vEHc5H+KFJtR4OaY+oeH2baaf3AjlQtK
-         fTOJy+xgpyY1hrK1c4OEmYtbeuQ1dI0eDyRq4hM7M4MFqm8tOVVpCqpwtUE258ER61/P
-         eJ8IvKF6iino/U7xdzrTKsyLUJuzk9fqfj46k8uIBRpVEjVeqrqM0jUu2lUjP/e/QBBO
-         uGuzQ2xPT/Kvyd5Qzzbk0rFJ/s/YLPgWL1l5d+LzSJvwbz0EiKPwOJHuMZl25pfAzFs5
-         s8j1GKgCqDpUxZmkFWkXzwhrKMZv6BQ19OPyYKBHumRCWjk/yjHmWiPTkOsD00p+dUB9
-         x6Ww==
-X-Gm-Message-State: AOAM532U/CFpKJSz4su3XXfWS+AMST6tccaUx+YZp4saHL6y98hQiPNj
-        6Hcw4noXj8dsULF8Gkr/FtI=
-X-Google-Smtp-Source: ABdhPJxD87Np1I35qwOYSJDhgWhqO9dQqxdMj2af6aeotusCFZ80wThxeUu6zu/4dGAapHsB18KYGA==
-X-Received: by 2002:a1c:7901:: with SMTP id l1mr16015481wme.160.1635157729234;
-        Mon, 25 Oct 2021 03:28:49 -0700 (PDT)
-Received: from [192.168.8.198] ([185.69.144.165])
-        by smtp.gmail.com with ESMTPSA id f9sm5544664wrx.31.2021.10.25.03.28.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 03:28:48 -0700 (PDT)
-Message-ID: <59bdf1f5-c96d-2cdf-32ba-a8b3ab777cf8@gmail.com>
-Date:   Mon, 25 Oct 2021 11:27:12 +0100
+        Mon, 25 Oct 2021 06:40:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635158279;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1fOeWyRMs4exdMtz4NGI80T+TinV1ASf/mcv6Mz8YcE=;
+        b=hOc7kukKzmI4jJbcCgNR8iat858XF2i37KxKPqNPVu3tC/ZuLdkSbrtE2Zwuf/e1sXEsFQ
+        0jKOfbRwrhxVF8HiWUR6jT89SYg0GOclYL54EaJ149O+p6W1yN24D0ZgXXfydz9lJ3dEKW
+        +t5tMn+WDkeKC6qSbZ4h+kbRoSge+9Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-Un1IlTeLNQGSZueuUVZbKw-1; Mon, 25 Oct 2021 06:37:58 -0400
+X-MC-Unique: Un1IlTeLNQGSZueuUVZbKw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A163B100CCC4;
+        Mon, 25 Oct 2021 10:37:56 +0000 (UTC)
+Received: from ws.net.home (ovpn-112-9.ams2.redhat.com [10.36.112.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F43A60CA1;
+        Mon, 25 Oct 2021 10:37:52 +0000 (UTC)
+Date:   Mon, 25 Oct 2021 12:37:50 +0200
+From:   Karel Zak <kzak@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Lennart Poettering <lennart@poettering.net>,
+        Martijn Coenen <maco@android.com>, linux-block@vger.kernel.org,
+        Luca Boccassi <bluca@debian.org>
+Subject: Re: Is LO_FLAGS_DIRECT_IO by default a good idea?
+Message-ID: <20211025103750.dhfmof4izoh5ybrq@ws.net.home>
+References: <YW2CaJHYbw244l+V@gardel-login>
+ <20211018150550.GA29993@lst.de>
+ <YW53SrKnKmn2Aa0k@T590>
+ <32ccb509-37b7-c9f0-14f3-d68c24c55dad@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 4/5] block: kill unused polling bits in
- __blkdev_direct_IO()
-Content-Language: en-US
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <cover.1635006010.git.asml.silence@gmail.com>
- <2e63549f6bce3442c27997fae83082f1c9f4e6c3.1635006010.git.asml.silence@gmail.com>
- <YXZeNUVx3cJW/lV+@infradead.org>
- <4e53a08b-3cfa-8351-2713-af632a759e88@gmail.com>
-In-Reply-To: <4e53a08b-3cfa-8351-2713-af632a759e88@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32ccb509-37b7-c9f0-14f3-d68c24c55dad@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/25/21 11:12, Pavel Begunkov wrote:
-> On 10/25/21 08:35, Christoph Hellwig wrote:
->> On Sat, Oct 23, 2021 at 05:21:35PM +0100, Pavel Begunkov wrote:
->>> With addition of __blkdev_direct_IO_async(), __blkdev_direct_IO() now
->>> serves only multio-bio I/O, which we don't poll. Now we can remove
->>> anything related to I/O polling from it.
->>
->> Looks good, but please also remove the entire non-multi bio support
->> while you're at it.
+On Tue, Oct 19, 2021 at 06:24:34AM -0600, Jens Axboe wrote:
+> On 10/19/21 1:44 AM, Ming Lei wrote:
+> > On Mon, Oct 18, 2021 at 05:05:50PM +0200, Christoph Hellwig wrote:
+> >> On Mon, Oct 18, 2021 at 04:19:20PM +0200, Lennart Poettering wrote:
+> >>> A brief answer like "yes, please, enable by default" would already
+> >>> make me happy.
+> >>
+> >> I thikn enabling it by default is a good idea.  The only good use
+> >> case I can think of for using buffered I/O is when the image has
+> >> a smaller block size than supported on the host file.
+> > 
+> > Maybe we can enable it at default in kernel side, then fackback to
+> > buffered IO if DIO is failed.
 > 
-> ok, will include into the series
+> Yes I think that's sane, pure DIO probably isn't a great idea by
+> default. But if we have a sane fallback, then I do think it'd be the
+> best way to run it.
 
-You mean simplifying __blkdev_direct_IO(), right? E.g. as mentioned
-removing DIO_MULTI_BIO.
+So, I can wait for kernel rather than enable it by default in
+losetup/mount, right? :-)
 
-There is also some potential for doing bio_iov_vecs_to_alloc()
-only once and doing some refactoring on top of it, but would
-need extra legwork that is better to go separately.
+  Karel
+
 
 -- 
-Pavel Begunkov
+ Karel Zak  <kzak@redhat.com>
+ http://karelzak.blogspot.com
+
