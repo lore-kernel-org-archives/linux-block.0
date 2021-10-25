@@ -2,172 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A765C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 08:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08293C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 08:28:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20D6460EE9
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 08:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E503960EE9
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 08:28:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbhJYI1t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 04:27:49 -0400
-Received: from mail-dm6nam08on2064.outbound.protection.outlook.com ([40.107.102.64]:29217
-        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232153AbhJYI1f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 04:27:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FlMUXsHeISHn4jgO9oLCaYMHNSoIs0rZaICmL5jtN0MnrvLDJbt28HiLxXBnWexB3YizoW9g4fZiEAhhR5Io+Ay07OWljuCPYqd14VvJOSEDyeRdRiy7Gw9lQJug5KmqNBUeVWbb4pnehG57TywJHpwFiFGPv3DlzRITWhAaNR4FgIYScn5ZZalzU29EcSMKtcztP8YbpYhesRSBQ5xDU+CZHQxEC4vNd+rvHVR67ykHmXOgaXZ3AqTTyc969ReE3tj2pOxmmxE674apFS7ZgrzKqghDlr+iPKpCnxs8ii+EANnqxFRqWjHkSmm8S719ZsO5QUVfriqM+N4sVK94wA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c1vRWj+OyVxzzd86oK+EOA2kXN2Kf3mxEsc/hvmWBB4=;
- b=BJ4CqEY4cXj9BYtu3qOUS7utWYhK+WVtzfM3urtnmsW1SMQ/it4ZDItR8hm4mVDi2lDvLXT2c20e3MI6GcGa5stupi1gdM6G4hqyPjXPLafZvBj3fau165nDj1eqYIkghwMRTouz1Jpl965/+6XQXZ02TwnTFHBEXMHYLLbONgZsxyTp1hmR+EwwHIG63qpXcOefQvEODSSLEfvzGHpsSbvnH7G9vOrohSRc8Dbc2CVTuRGLTJjhA79W00hT9eZlOXTNCDBRKL/OihyO3xku0AE2VVYVnnhEqsX7q19XYEAdW5JsEFjiSXeHYhHYqDyPTZ174kSEK2T2AcgMKTBNGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c1vRWj+OyVxzzd86oK+EOA2kXN2Kf3mxEsc/hvmWBB4=;
- b=bJJyUdIpNZxLBbnoHEidjMYYaVzIqTHdaAMSgVh0CECgOLbbeLMNu7JMx+hSbkN7+JxCfZR3fOQMAP68b09mO1xYc8ehydglG7hDUzjp3Hoz002lYpWfg9H5nkF3W6mE5NvRrf3jKBDcz8ST9hMTGgE0qCMZKZR2tT9ID8ViCgs0EES8Bd4VQwjNolppnvtgR/mYAuYiZlfZpbvvKoI2hqZELaTZCJou1SP4ViVICXL50cv66f5IoacHUNVI5yoHKN+7g7cwz5G+hyzIVNnWlrXwD9hhK5pR506SkfpDlLX8tYmsEVl4zRlxHlm+3oBXj+65QfKiBCGGVOqCdgiRuw==
-Received: from DS7PR03CA0015.namprd03.prod.outlook.com (2603:10b6:5:3b8::20)
- by BN8PR12MB3395.namprd12.prod.outlook.com (2603:10b6:408:43::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16; Mon, 25 Oct
- 2021 08:25:11 +0000
-Received: from DM6NAM11FT028.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b8:cafe::6d) by DS7PR03CA0015.outlook.office365.com
- (2603:10b6:5:3b8::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18 via Frontend
- Transport; Mon, 25 Oct 2021 08:25:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT028.mail.protection.outlook.com (10.13.173.140) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4628.16 via Frontend Transport; Mon, 25 Oct 2021 08:25:10 +0000
-Received: from [172.27.13.250] (172.20.187.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 25 Oct
- 2021 08:25:02 +0000
-Message-ID: <ed3bcce8-ede4-f4a3-d0a3-91662d5aae4e@nvidia.com>
-Date:   Mon, 25 Oct 2021 11:24:57 +0300
+        id S231264AbhJYIaY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 04:30:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41352 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230019AbhJYIaY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Oct 2021 04:30:24 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A97CC061745;
+        Mon, 25 Oct 2021 01:28:02 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id gn3so7704272pjb.0;
+        Mon, 25 Oct 2021 01:28:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=+mmc/7BEwZRLX6+ZqDE43E4jjRWpDliO633u1hVx2ts=;
+        b=GALr7cTe4sEh368r3rwdvOiXIQbDkSmS8+Ts63+iBVfU3pqyxfzTRg9+ymOToYG8a8
+         ZBC4MQ1u3mN7+rScfsrDcVgobysrhU5vKa22GLJyLfZubtU6rU0G/cJEsj4uICxGmtZP
+         OCnPBjhQPF7YsgEk3usFn8tcrJ/IJV0nFVFozTe5oaYHrTIpKDOqfdRx6BKqMWnaEBN+
+         DcDaSDpNDD1GN+Lkm/Hkc8La+EGvSS23BbXGgqL2oen94RZ7oJv2eEmDoGWYrtEU4OLU
+         vECffbUH/a6ykZZ6EoybEgujqXnG3m/0QAAgrnNXMSCO1o39ciWO0sq9B/sAjWtH0Yt2
+         mg8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=+mmc/7BEwZRLX6+ZqDE43E4jjRWpDliO633u1hVx2ts=;
+        b=mPm2vCcf4sHEuJWsX2Xnz5Y5slIYjarYw28QgdNciJmUphrTfcZcPPEkAVlLmMEyRP
+         cFCAqC+6/JkjKwEi8CsJebGfg95VwFQi5qUF0oygpFx011a+HAfVNb80YU9XzEUXxTMj
+         q16BLtREjiumYCsRx/cOQ5qGrIXP9iJ6PMYo8icxliYX4oi0hGzd5UCK4v98/eJiy0e0
+         AG0EXcUMH/BB+PdFOmD+mS7KdPaaKSwXWF5/qJhlWOsP/t2Pf1uPbWu0igWNa8Q2kEuq
+         C02j+4gi8834MkDyL0g36g8jPDIXFbTa/9a7Dijm5Y19efnMrVjTejqMPesP4sKUtDWV
+         mw+g==
+X-Gm-Message-State: AOAM533CNWCIyLHC6K0rCir41BcWuEE3h7+Tf3Rt1/AJarM/4C8ExcVa
+        8da1wi6CPhLveXfYK4a14ujRMeu+Trz/Dr8o
+X-Google-Smtp-Source: ABdhPJyadfzEQgFXhwwgjg6jPwIFK0Y53vSe6zPdWVrtNVaryWFv4LhXxRPKRMhhG5dPqjRj00lZ0g==
+X-Received: by 2002:a17:902:cecf:b0:140:5397:92b7 with SMTP id d15-20020a170902cecf00b00140539792b7mr5041260plg.66.1635150481684;
+        Mon, 25 Oct 2021 01:28:01 -0700 (PDT)
+Received: from [172.18.2.138] ([137.59.101.13])
+        by smtp.gmail.com with ESMTPSA id n2sm2906435pjo.20.2021.10.25.01.27.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Oct 2021 01:28:01 -0700 (PDT)
+Subject: Re: [PATCH v3] block: fix incorrect references to disk objects
+To:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     axboe@kernel.dk, hch@lst.de, sunhao.th@gmail.com,
+        hch@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211018115807.21103-1-qiang.zhang1211@gmail.com>
+ <YW1n91DAaVyuISVV@casper.infradead.org>
+From:   Zqiang <qiang.zhang1211@gmail.com>
+Message-ID: <9d2f7753-d7a7-f91e-077b-40b274199185@gmail.com>
+Date:   Mon, 25 Oct 2021 16:27:58 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH] virtio_blk: corrent types for status handling
+In-Reply-To: <YW1n91DAaVyuISVV@casper.infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>
-CC:     kernel test robot <lkp@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Feng Li <lifeng1519@gmail.com>,
-        Israel Rukshin <israelr@nvidia.com>,
-        <virtualization@lists.linux-foundation.org>,
-        <linux-block@vger.kernel.org>
-References: <20211025075825.1603118-1-mst@redhat.com>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <20211025075825.1603118-1-mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d5bab908-2a4b-42eb-d842-08d99790f619
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3395:
-X-Microsoft-Antispam-PRVS: <BN8PR12MB3395E36E96D5A73A8D8C8BA1DE839@BN8PR12MB3395.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KNONlf3yWGPqVaFnYql0LT2/he91/N7poRMVhX6DDFZ5CHmkYJ+YUaSj0hsAq9e36GVLbhg+LIJUZB8/OpYJ6xkiovlwsI7ZtJhtIHqfZEke4TytmbDe2Y4o2hZmzgt3DacOAksOqrx/MrzEm3hdKtMx6lvH1Pg2C9Wsr2H2+SIdZLcxXUSa2/QrfFINeDh1Iw/GYJOXkw1RZXbKd6Vbc68w9dog2nlF8cPJV4z566AHA+LANv4fnds2X8S8kM8EW0wuCc8TYehvJaqLbOR9jMheZ0Hp6/HjJZkXunghGBy8kBZVBHOOqvzmZF6sx9t4lmU0zCfvwkDzgQO29owNNWHLb8SwwF3U4nuaPTb9WxXSF1VhPCUvm5Zv9bIMihkFYA8GDMtZ0iCShCwfoBfNf9touBBWO+tA8IwSpJqTu2MQLP36WJCsFHF8Yg+h/Kqek/LFJXswOfaNF3GZxt5wqlfLpFkj/ebvMMeeeDKfyLXDpRAh4kgjwDB4L4rwzALEktNAGn6FXkCa9pUev1JlXigtGmXf+TTAMMJLZsn90aoWPOoRQ1LhiIjq0wUWzs00dJgh9OlJ2kp0Dj3JfLBdeHaqge1Iow2bKRZUUgv8fnmFjyCZEKOw7CI9yh2b4HTRgEItjAqYtKeVhdvNHulcf76+hdVolc5PE1XwHXGMkUiDEF4e7uolqviQ1rgX+zJMKZUFqyqkbVwj5936phXGc6qzlbGystNqbKP3Dl8UMoY=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(53546011)(336012)(36906005)(6666004)(16526019)(2906002)(7416002)(47076005)(31696002)(4326008)(83380400001)(70206006)(70586007)(316002)(2616005)(36860700001)(16576012)(8676002)(5660300002)(54906003)(82310400003)(110136005)(508600001)(26005)(356005)(426003)(7636003)(86362001)(8936002)(36756003)(186003)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2021 08:25:10.8500
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5bab908-2a4b-42eb-d842-08d99790f619
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT028.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3395
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 10/25/2021 10:58 AM, Michael S. Tsirkin wrote:
-> virtblk_setup_cmd returns blk_status_t in an int, callers then assign it
-> back to a blk_status_t variable. blk_status_t is either u32 or (more
-> typically) u8 so it works, but is inelegant and causes sparse warnings.
->
-> Pass the status in blk_status_t in a consistent way.
->
-> Reported-by: kernel test robot <lkp@intel.com>
-> Fixes: b2c5221fd074 ("virtio-blk: avoid preallocating big SGL for data")
-> Cc: Max Gurtovoy <mgurtovoy@nvidia.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->   drivers/block/virtio_blk.c | 14 ++++++++------
->   1 file changed, 8 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index c336d9bb9105..c7d05ff24084 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -208,8 +208,9 @@ static void virtblk_cleanup_cmd(struct request *req)
->   		kfree(bvec_virt(&req->special_vec));
->   }
->   
-> -static int virtblk_setup_cmd(struct virtio_device *vdev, struct request *req,
-> -		struct virtblk_req *vbr)
-> +static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
-> +				      struct request *req,
-> +				      struct virtblk_req *vbr)
->   {
->   	bool unmap = false;
->   	u32 type;
-> @@ -317,14 +318,15 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
->   	unsigned long flags;
->   	unsigned int num;
->   	int qid = hctx->queue_num;
-> -	int err;
->   	bool notify = false;
-> +	blk_status_t status;
-> +	int err;
->   
->   	BUG_ON(req->nr_phys_segments + 2 > vblk->sg_elems);
->   
-> -	err = virtblk_setup_cmd(vblk->vdev, req, vbr);
-> -	if (unlikely(err))
-> -		return err;
-> +	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
-> +	if (unlikely(status))
-> +		return status;
->   
+On 2021/10/18 下午8:26, Matthew Wilcox wrote:
+> On Mon, Oct 18, 2021 at 07:58:07PM +0800, Zqiang wrote:
+>> When adding partitions to the disk, the reference count of the disk
+>> object is increased. then alloc partition device and called
+>> device_add(), if the device_add() return error, the reference
+>> count of the disk object will be reduced twice, at put_device(pdev)
+>> and put_disk(disk). this leads to the end of the object's life cycle
+>> prematurely, and trigger following calltrace.
+>>
+>>    __init_work+0x2d/0x50 kernel/workqueue.c:519
+>>    synchronize_rcu_expedited+0x3af/0x650 kernel/rcu/tree_exp.h:847
+>>    bdi_remove_from_list mm/backing-dev.c:938 [inline]
+>>    bdi_unregister+0x17f/0x5c0 mm/backing-dev.c:946
+>>    release_bdi+0xa1/0xc0 mm/backing-dev.c:968
+>>    kref_put include/linux/kref.h:65 [inline]
+>>    bdi_put+0x72/0xa0 mm/backing-dev.c:976
+>>    bdev_free_inode+0x11e/0x220 block/bdev.c:408
+>>    i_callback+0x3f/0x70 fs/inode.c:226
+>>    rcu_do_batch kernel/rcu/tree.c:2508 [inline]
+>>    rcu_core+0x76d/0x16c0 kernel/rcu/tree.c:2743
+>>    __do_softirq+0x1d7/0x93b kernel/softirq.c:558
+>>    invoke_softirq kernel/softirq.c:432 [inline]
+>>    __irq_exit_rcu kernel/softirq.c:636 [inline]
+>>    irq_exit_rcu+0xf2/0x130 kernel/softirq.c:648
+>>    sysvec_apic_timer_interrupt+0x93/0xc0
+>>
+>> Return directly after calling the put_device().
+>>
+>> Reported-by: Hao Sun <sunhao.th@gmail.com>
+>> Signed-off-by: Zqiang <qiang.zhang1211@gmail.com>
+> Fixes: 9d3b8813895d ("block: change the refcounting for partitions")
+> Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-Maybe we can compare the returned status to BLK_STS_OK. But I see we 
-don't do it also in NVMe subsystem so I guess we can assume BLK_STS_OK 
-== 0 forever.
+Hello Jens Axboe
 
-Jens/Christoph, any thoughts on that ?
+The patch description information of the previous v2 version is 
+incorrect, v3 modified the description information, please applied the 
+v3 version.
+
+Thanks
+
+Zqiang
 
 
-Anyway Looks good.
 
-Thanks for the fix,
-
-Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-
->   	blk_mq_start_request(req);
->   
