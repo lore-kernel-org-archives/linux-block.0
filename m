@@ -2,105 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B55B1C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 01:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E324C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 02:27:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D47A61076
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 01:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28E276054F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 02:27:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232038AbhJYBqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Oct 2021 21:46:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22227 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231928AbhJYBqe (ORCPT
+        id S232148AbhJYCaP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Oct 2021 22:30:15 -0400
+Received: from mail-pl1-f176.google.com ([209.85.214.176]:42679 "EHLO
+        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232135AbhJYCaP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Oct 2021 21:46:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635126252;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=N+DIrvZXbcAkXJ/OchXf+lha18HEJRfjUfzTN2XxsYY=;
-        b=aEB1gwJIihCnQ/9Y+zGYCOmQboMqavaKxrMlWnfTX1LG5wgsJH6RmIw67lAQizQMOhIfwb
-        XkKk9ylbb5jxp1AWX0D8whXpkspBoS2o6NNjcppJFDxMH/yqBIu+4joUUTqcHBcp24No7K
-        fkn92uz24rX0ul3oT5y40EM9J2itq2o=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-exnlklDeM92MhePHMNf5OQ-1; Sun, 24 Oct 2021 21:44:09 -0400
-X-MC-Unique: exnlklDeM92MhePHMNf5OQ-1
-Received: by mail-yb1-f200.google.com with SMTP id w199-20020a25c7d0000000b005bea7566924so15131276ybe.20
-        for <linux-block@vger.kernel.org>; Sun, 24 Oct 2021 18:44:09 -0700 (PDT)
+        Sun, 24 Oct 2021 22:30:15 -0400
+Received: by mail-pl1-f176.google.com with SMTP id v16so1493667ple.9
+        for <linux-block@vger.kernel.org>; Sun, 24 Oct 2021 19:27:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=N+DIrvZXbcAkXJ/OchXf+lha18HEJRfjUfzTN2XxsYY=;
-        b=iAawixqujqQsQdcHxg0UK6Wws2OZYUqXT3dGssDtrV8wO68eamn/MFQi7CJ8ScZlD0
-         N6iMhNjSzD2HFO2l0dWjf+qvHxI2C4z8qbbKZjcsqqnoWevmcI3CmLdAXtxaieRqmT81
-         eEo6KDqROoTrOuiJZ4em3GtsJgT9b+AjZrZXHQT7sTxG6j7Ivt2Z0IQ84WLl34iitGgg
-         lCzgPlS+u2PXuge4HzuT6RdUN015Aa6z9xafN3i2GxYz45pojcPoqPQYkON/31LEPCQ2
-         bezuyJsf05pOJRtUyzyCqoLMZ7MAumV9RHKc7Me2nAPtQaVZQ2rFK6I5fNeaJQeujtkQ
-         qBUA==
-X-Gm-Message-State: AOAM530LW/tO5/3ZjbXZJRjl+vCtQxjmveSpn54elyud7UEH5DkA+UBy
-        xwDo2Vs7PrhYyyp6rJgQBqqzrleS/JTVj6fG8t26I7qHbauu2Mz7gztuatpgIPfQofnbpLTMPuz
-        24bHbBX10/E0aZaS8kQaiUldVJ+IkXOL/WiEwOS8=
-X-Received: by 2002:a5b:18c:: with SMTP id r12mr14527346ybl.308.1635126248675;
-        Sun, 24 Oct 2021 18:44:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXgAebb5EiOX8n3xGCGi7pF2GMyeviasxkrMIBZ4FLVtuGqvIhRrxVJyTEMj3M5GvFesVhioiqCJC2jL6JZ2s=
-X-Received: by 2002:a5b:18c:: with SMTP id r12mr14527331ybl.308.1635126248542;
- Sun, 24 Oct 2021 18:44:08 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=W9aK1etcXCIdootYAHqQdX7pqU9mXrKzcfIq9N/QPe8=;
+        b=ybSFVURQCuHOOXFgG8IqlzxTjs8Bv80U6Jah6D8UATD6SPKWcdzXZ07OmX/ItE28i8
+         UzsoGWb97m+es2ZkQ6bhO35ustocVtcqS3rJsNWuRoU2tJfLZJstp5Uej/250BnHQ5lE
+         6xuP9s+hQofgQizgY9g8EMVl09HKocWNK8w51pc3XKfCWQ8/24aXI/Z3FXVEjiDRzRAg
+         LfJjaNSW5czWDkcrkE86gm2Oph4uzgd7Y/BKO5mK1HM5hyRbApV8woRv4mVVquQA9m9u
+         aawnId04drcUc/b2APANBx1+UtwsQQ5NxhPoTOPlF9o1xU600ltnJ7Pdx7pRIVSj4wov
+         5yWg==
+X-Gm-Message-State: AOAM532/lW5/FffyUu9A9Jg0hu/6gmAnfK+uk0gu2qT0SR5Gfqrj2rIe
+        czQpnmaQSITq91lIKkX/nZg=
+X-Google-Smtp-Source: ABdhPJwcGkt+dGstn178H7EoLmV4ckSt869sOslNxgNyxIaFrMqHcsQNfHR7mDGj5Ea/4jXGq0TTkQ==
+X-Received: by 2002:a17:90a:ea11:: with SMTP id w17mr20098669pjy.61.1635128873400;
+        Sun, 24 Oct 2021 19:27:53 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:1d23:4f1f:253d:c1e1? ([2601:647:4000:d7:1d23:4f1f:253d:c1e1])
+        by smtp.gmail.com with ESMTPSA id g21sm10433787pfv.127.2021.10.24.19.27.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Oct 2021 19:27:52 -0700 (PDT)
+Message-ID: <904355ef-554e-0b72-5d16-3089a042de9e@acm.org>
+Date:   Sun, 24 Oct 2021 19:27:51 -0700
 MIME-Version: 1.0
-References: <20211021145918.2691762-1-ming.lei@redhat.com>
-In-Reply-To: <20211021145918.2691762-1-ming.lei@redhat.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Mon, 25 Oct 2021 09:43:57 +0800
-Message-ID: <CAHj4cs8QB7QCc7t+bweesdZPOLmAXrwrj8yEnAtJPk80L_v1kQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] block: keep quiesce & unquiesce balanced for scsi/dm
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH blktests V4] tests/srp: fix module loading issue during
+ srp tests
+Content-Language: en-US
+To:     Yi Zhang <yi.zhang@redhat.com>, osandov@osandov.com
+Cc:     linux-block@vger.kernel.org
+References: <20211025012416.23432-1-yi.zhang@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20211025012416.23432-1-yi.zhang@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Verified with the blktests srp/, thanks Ming.
+On 10/24/21 18:24, Yi Zhang wrote:
+> The ib_isert/ib_srpt modules will be automatically loaded after the first
+>   time rdma_rxe/siw setup [ ... ]
 
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Doesn't this depend on the contents of the /etc/rdma/modules/*conf
+configuration files?
 
-On Thu, Oct 21, 2021 at 11:00 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> Hello Jens,
->
-> Recently we merge the patch of e70feb8b3e68 ("blk-mq: support concurrent queue
-> quiesce/unquiesce") for fixing race between driver and block layer wrt.
-> queue quiesce.
->
-> Yi reported that srp/002 is broken with this patch, turns out scsi and
-> dm don't keep the two balanced actually.
->
-> So fix dm and scsi and make srp/002 pass again.
->
->
-> Ming Lei (3):
->   scsi: avoid to quiesce sdev->request_queue two times
->   scsi: make sure that request queue queiesce and unquiesce balanced
->   dm: don't stop request queue after the dm device is suspended
->
->  drivers/md/dm.c            | 10 ------
->  drivers/scsi/scsi_lib.c    | 70 ++++++++++++++++++++++++++------------
->  include/scsi/scsi_device.h |  1 +
->  3 files changed, 49 insertions(+), 32 deletions(-)
->
-> --
-> 2.31.1
->
+Anyway:
 
-
--- 
-Best Regards,
-  Yi Zhang
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
