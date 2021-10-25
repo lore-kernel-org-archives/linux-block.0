@@ -2,121 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD8CC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 08:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02EEBC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 09:47:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0438604D2
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 08:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA9616054F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 09:47:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231940AbhJYIt0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 04:49:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45716 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232160AbhJYItZ (ORCPT
+        id S232695AbhJYJt3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 05:49:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30788 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232755AbhJYJr3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 04:49:25 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8487AC061745
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 01:47:03 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id w10-20020a4a274a000000b002b6e972caa1so3411367oow.11
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 01:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QD6S5FcXqbMWnr2NhEbAy6feKFx0sh0idDAxYvo4UWA=;
-        b=sygHC/VOYcly0K34H6f+G/9jVVFyNzaaI0rIUf/2HPloUI5E5b7L6u/6Kr9GqjMNIj
-         31oj9Wj7ZylE/zaHSup06g+cQ8AML1nHrYqo139tQ8UI+yN/J6v/cf4pgskmxAT00PeE
-         s3ho9bL8M8Zr5m8lvJFG9lL3vh796cl9hPObufKgDYkD4n+Fvz3XmAjKLhlaW23tSPzq
-         ZxTfVrYWUANJeaE+fu4gcGTE/Hnllut8n5RYkcLo5GEfyvcgNtD64AC9g5ugn1iywCqU
-         W/CD+r77Goc592kGebk2POeFo/H0UGQhkkJQb2UmmRLiZwBR3PpVlSI2IYw3Ner/bwCg
-         3neQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QD6S5FcXqbMWnr2NhEbAy6feKFx0sh0idDAxYvo4UWA=;
-        b=vuhcY4QAiZKLVjyMJDdNG/rFA6LU4qKRmnvl0QrWSWhUwB8d89qqkSlvIfr6ZZyH4+
-         XvaBn/z38k2Mw1uMFTEaOtorB+6L212RSmJPAXw4+ynnqEIN1+MqQIub1JimSqBFmoZF
-         zIvqAe4nyz7kMsPOjTivXITDACtpQCdTTKLoBAE90AHdYwSmxahGHJvKiP7MqsrYkDgd
-         3h9kritSj55U/N2yCJ2vB/A9eVYEB6velXQw4ut/s+N6To4M9qkwsxYNyhYE3hgFCNsJ
-         WOBtf7UjiobIYaR5zkgFYNIIXfJZn4aSbNca3YaZq6d+LCngatTtzEeg1ZMfIOeJbw2Z
-         sd2g==
-X-Gm-Message-State: AOAM530Km2L6NFM9F8jLxwXOzQJ5lq3w6kxOpvWaX1cngwFnpJpwh6Mu
-        XQ3ffSZLHFn6FfCAxmj9CEulBF06E5NNlo6Jt1X2JA==
-X-Google-Smtp-Source: ABdhPJzRvj0Lq8NOJOOfTnmTc0kuAGX3WevBNcmF8DvEpgpKBbKX0g1yV0hUJ9yXTFboNOIAfsIzf6KGrK8XFDEAaMQ=
-X-Received: by 2002:a4a:d5c8:: with SMTP id a8mr11131804oot.18.1635151622652;
- Mon, 25 Oct 2021 01:47:02 -0700 (PDT)
+        Mon, 25 Oct 2021 05:47:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635155106;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EyFirPMayDHzwLGGiRTyeQ0weH3h+eslLCxAu78O9JI=;
+        b=AmGg/ijE/L2vBOui5CnHpCUP3WdeVeGzVDSui+gZfsqAEm3hN5QcakY9j8GsuHYc0NZelq
+        FTPPbSAj8L5ENjKfH4LlFCs967xQQqMQaXQ+E4UwcCThVfTdF50t+9o7m+yl7IbGCVeOsx
+        Rfl/oi4l0NWPNAb4ACLAOwVietYCJhk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-y2xOzSXzMlKNpppbwYCI-w-1; Mon, 25 Oct 2021 05:45:05 -0400
+X-MC-Unique: y2xOzSXzMlKNpppbwYCI-w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74646814263;
+        Mon, 25 Oct 2021 09:44:49 +0000 (UTC)
+Received: from localhost (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A436A1948C;
+        Mon, 25 Oct 2021 09:44:48 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 1/8] loop: move flush_dcache_page to ->complete of request
+Date:   Mon, 25 Oct 2021 17:44:30 +0800
+Message-Id: <20211025094437.2837701-2-ming.lei@redhat.com>
+In-Reply-To: <20211025094437.2837701-1-ming.lei@redhat.com>
+References: <20211025094437.2837701-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <000000000000d4e1e105cf235f15@google.com> <a189d065-fb64-b76f-9f45-f866f9d5638c@huawei.com>
-In-Reply-To: <a189d065-fb64-b76f-9f45-f866f9d5638c@huawei.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 25 Oct 2021 10:46:51 +0200
-Message-ID: <CACT4Y+acFmP4kiSTAWniyqVfGf2cHfqNqvy7vfa-Hc1RVigFzg@mail.gmail.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in blk_mq_sched_tags_teardown
-To:     John Garry <john.garry@huawei.com>
-Cc:     syzbot <syzbot+412ca156285f619b8b62@syzkaller.appspotmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "hare@suse.de" <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 25 Oct 2021 at 10:39, John Garry <john.garry@huawei.com> wrote:
->
-> On 25/10/2021 02:35, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    51dba6e335ff Add linux-next specific files for 20211020
-> > git tree:       linux-next
-> > console output:https://syzkaller.appspot.com/x/log.txt?x=10171dc8b00000
-> > kernel config:https://syzkaller.appspot.com/x/.config?x=1adca843ed814d57
-> > dashboard link:https://syzkaller.appspot.com/bug?extid=412ca156285f619b8b62
-> > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> > syz repro:https://syzkaller.appspot.com/x/repro.syz?x=14f768b4b00000
-> > C reproducer:https://syzkaller.appspot.com/x/repro.c?x=1295a8c7300000
-> >
-> > The issue was bisected to:
-> >
-> > commit 645db34e50501aac141713fb47a315e5202ff890
->
-> I think that it should be e155b0c238b2 ("blk-mq: Use shared tags for
-> shared sbitmap support")
->
-> > Author: John Garry<john.garry@huawei.com>
-> > Date:   Tue Oct 5 10:23:36 2021 +0000
-> >
-> >      blk-mq: Refactor and rename blk_mq_free_map_and_{requests->rqs}()
-> >
-> > bisection log:https://syzkaller.appspot.com/x/bisect.txt?x=1597e130b00000
-> > final oops:https://syzkaller.appspot.com/x/report.txt?x=1797e130b00000
-> > console output:https://syzkaller.appspot.com/x/log.txt?x=1397e130b00000
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by:syzbot+412ca156285f619b8b62@syzkaller.appspotmail.com
-> > Fixes: 645db34e5050 ("blk-mq: Refactor and rename blk_mq_free_map_and_{requests->rqs}()")
-> >
-> > ==================================================================
-> > BUG: KASAN: use-after-free in blk_mq_sched_tags_teardown+0x2a1/0x2d0 block/blk-mq-sched.c:544
-> > Read of size 4 at addr ffff8880760b81e0 by task systemd-udevd/6750
->
-> #syz fix: blk-mq-sched: Don't reference queue tagset in
-> blk_mq_sched_tags_teardown()
+Prepare for unifying backing buffered IO code, so move
+flush_dcache_page() into ->complete() of read request.
 
-Hi John,
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/loop.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-Thanks for updating the bug.
-It looks like the title was line wrapped. There is a hack specifically
-for gmail to put the title onto separate line, it's still parsable
-this way (if the whole title fits into 78 cols of course :))
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 7bf4686af774..8f140d637435 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -405,8 +405,6 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
+ 		if (len < 0)
+ 			return len;
+ 
+-		flush_dcache_page(bvec.bv_page);
+-
+ 		if (len != bvec.bv_len) {
+ 			struct bio *bio;
+ 
+@@ -507,11 +505,24 @@ static int lo_req_flush(struct loop_device *lo, struct request *rq)
+ 	return ret;
+ }
+ 
++static void lo_flush_dcache_for_read(struct request *rq)
++{
++	struct bio_vec bvec;
++	struct req_iterator iter;
++
++	rq_for_each_segment(bvec, rq, iter)
++		flush_dcache_page(bvec.bv_page);
++}
++
+ static void lo_complete_rq(struct request *rq)
+ {
+ 	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	blk_status_t ret = BLK_STS_OK;
+ 
++	/* Kernel wrote to our pages, call flush_dcache_page */
++	if (req_op(rq) == REQ_OP_READ && !cmd->use_aio && cmd->ret >= 0)
++		lo_flush_dcache_for_read(rq);
++
+ 	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
+ 	    req_op(rq) != REQ_OP_READ) {
+ 		if (cmd->ret < 0)
+-- 
+2.31.1
 
-#syz fix:
-blk-mq-sched: Don't reference queue tagset in blk_mq_sched_tags_teardown()
