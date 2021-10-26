@@ -2,234 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBF7C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 15:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76AE6C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 16:36:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 034116108D
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 15:38:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63C4160F02
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 16:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236983AbhJZPk0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 11:40:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34103 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236118AbhJZPkS (ORCPT
+        id S235674AbhJZQjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 12:39:11 -0400
+Received: from mail-pg1-f172.google.com ([209.85.215.172]:41973 "EHLO
+        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234299AbhJZQjK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 11:40:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635262674;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tYSbJmBjw+oBo0taflTQ22z74lJbbTngjPSIoTNb7do=;
-        b=XYu+1yrj6siIeoEZDFujmSS6p6IVqj++FPRzOM0ieGnTMB5LWGH1xjb5d2NneT7aA7bIkd
-        XhpvMfYe7E37E4onRdKKv5Xo/UhJ9fg+uxySgyX4tj3dbX/hpZxfyH0PycVWyUhyitSxN5
-        YCPxpT5K42ThgfkBChma5FFiJH2fYYI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-0qABItmvPAOOJhQt3eR43w-1; Tue, 26 Oct 2021 11:37:50 -0400
-X-MC-Unique: 0qABItmvPAOOJhQt3eR43w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43E358797D3;
-        Tue, 26 Oct 2021 15:37:47 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44D305DF36;
-        Tue, 26 Oct 2021 15:37:35 +0000 (UTC)
-Date:   Tue, 26 Oct 2021 23:37:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Miroslav Benes <mbenes@suse.cz>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YXgguuAY5iEUIV0u@T590>
-References: <YWq3Z++uoJ/kcp+3@T590>
- <YW3LuzaPhW96jSBK@bombadil.infradead.org>
- <YW4uwep3BCe9Vxq8@T590>
- <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
- <YW6OptglA6UykZg/@T590>
- <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
- <YW/KEsfWJMIPnz76@T590>
- <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
- <YW/q70dLyF+YudyF@T590>
- <YXfA0jfazCPDTEBw@alley>
+        Tue, 26 Oct 2021 12:39:10 -0400
+Received: by mail-pg1-f172.google.com with SMTP id 83so11661pgc.8;
+        Tue, 26 Oct 2021 09:36:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dAqe3YnTOdTV+SdN4Z4XT4EnkTy0b5083zzk171qBC0=;
+        b=TPaXNsOtz3xm+dUGhCPEelKAQJkPYKBHvYH4mA1gZ6tbtnZi+HWlIc78ESx2XTKdnx
+         UEVOT2X0mh73Q6RJEoNLpptIS8oIFjfN6hUipPM26dcKtrpr+QQIpCeO79D1uAZzAckW
+         Nka32tB9c+ZW7Xs0h2q08oeHW2Wsnptw9Rxx73KHf4jfRI1fdfyrQNgmW7TZkv9ROxVd
+         rhFA9hcKvwkO8QYU7lP/vj4tySicvIDVB88x+Cb9KYMNP4wcgCT780bSBSwfDKh+x0X/
+         O9j3VgG9QS8VboTUGWBpmOUNkGYEiReCTWp0NxFuAl3aDAouaxHYvAsfVv8Mf6s/CBQw
+         bgzw==
+X-Gm-Message-State: AOAM532gOaY22naaygalqRlMWXv5AM9rM9ip9dni5rgMfez5oIHFu5M8
+        C+RCdERDSZrfhoxiORRxeMN7HqlcA3S+Ug==
+X-Google-Smtp-Source: ABdhPJztnj190k8biAi6qT1Cq9ZUO6zQSL5ez8cdvbIcEY88OnzKGBUbDokriozgwkeyiyWb7iFU9w==
+X-Received: by 2002:a63:1406:: with SMTP id u6mr19767758pgl.106.1635266205096;
+        Tue, 26 Oct 2021 09:36:45 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:26a4:3b5f:3c4f:53f5])
+        by smtp.gmail.com with ESMTPSA id mp14sm1328815pjb.17.2021.10.26.09.36.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Oct 2021 09:36:44 -0700 (PDT)
+Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
+To:     Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
+Cc:     axboe@kernel.dk, alim.akhtar@samsung.com, avri.altman@wdc.com,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20211026071204.1709318-1-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
+Date:   Tue, 26 Oct 2021 09:36:43 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXfA0jfazCPDTEBw@alley>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20211026071204.1709318-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 26, 2021 at 10:48:18AM +0200, Petr Mladek wrote:
-> On Wed 2021-10-20 18:09:51, Ming Lei wrote:
-> > On Wed, Oct 20, 2021 at 10:19:27AM +0200, Miroslav Benes wrote:
-> > > On Wed, 20 Oct 2021, Ming Lei wrote:
-> > > 
-> > > > On Wed, Oct 20, 2021 at 08:43:37AM +0200, Miroslav Benes wrote:
-> > > > > On Tue, 19 Oct 2021, Ming Lei wrote:
-> > > > > 
-> > > > > > On Tue, Oct 19, 2021 at 08:23:51AM +0200, Miroslav Benes wrote:
-> > > > > > > > > By you only addressing the deadlock as a requirement on approach a) you are
-> > > > > > > > > forgetting that there *may* already be present drivers which *do* implement
-> > > > > > > > > such patterns in the kernel. I worked on addressing the deadlock because
-> > > > > > > > > I was informed livepatching *did* have that issue as well and so very
-> > > > > > > > > likely a generic solution to the deadlock could be beneficial to other
-> > > > > > > > > random drivers.
-> > > > > > > > 
-> > > > > > > > In-tree zram doesn't have such deadlock, if livepatching has such AA deadlock,
-> > > > > > > > just fixed it, and seems it has been fixed by 3ec24776bfd0.
-> > > > > > > 
-> > > > > > > I would not call it a fix. It is a kind of ugly workaround because the 
-> > > > > > > generic infrastructure lacked (lacks) the proper support in my opinion. 
-> > > > > > > Luis is trying to fix that.
-> > > > > > 
-> > > > > > What is the proper support of the generic infrastructure? I am not
-> > > > > > familiar with livepatching's model(especially with module unload), you mean
-> > > > > > livepatching have to do the following way from sysfs:
-> > > > > > 
-> > > > > > 1) during module exit:
-> > > > > > 	
-> > > > > > 	mutex_lock(lp_lock);
-> > > > > > 	kobject_put(lp_kobj);
-> > > > > > 	mutex_unlock(lp_lock);
-> > > > > > 	
-> > > > > > 2) show()/store() method of attributes of lp_kobj
-> > > > > > 	
-> > > > > > 	mutex_lock(lp_lock)
-> > > > > > 	...
-> > > > > > 	mutex_unlock(lp_lock)
-> > > > > 
-> > > > > Yes, this was exactly the case. We then reworked it a lot (see 
-> > > > > 958ef1e39d24 ("livepatch: Simplify API by removing registration step"), so 
-> > > > > now the call sequence is different. kobject_put() is basically offloaded 
-> > > > > to a workqueue scheduled right from the store() method. Meaning that 
-> > > > > Luis's work would probably not help us currently, but on the other hand 
-> > > > > the issues with AA deadlock were one of the main drivers of the redesign 
-> > > > > (if I remember correctly). There were other reasons too as the changelog 
-> > > > > of the commit describes.
-> > > > > 
-> > > > > So, from my perspective, if there was a way to easily synchronize between 
-> > > > > a data cleanup from module_exit callback and sysfs/kernfs operations, it 
-> > > > > could spare people many headaches.
-> > > > 
-> > > > kobject_del() is supposed to do so, but you can't hold a shared lock
-> > > > which is required in show()/store() method. Once kobject_del() returns,
-> > > > no pending show()/store() any more.
-> > > > 
-> > > > The question is that why one shared lock is required for livepatching to
-> > > > delete the kobject. What are you protecting when you delete one kobject?
-> > > 
-> > > I think it boils down to the fact that we embed kobject statically to 
-> > > structures which livepatch uses to maintain data. That is discouraged 
-> > > generally, but all the attempts to implement it correctly were utter 
-> > > failures.
-> > 
-> > OK, then it isn't one common usage, in which kobject covers the release
-> > of the external object. What is the exact kobject in livepatching?
-> 
-> Below are more details about the livepatch code. I hope that it will
-> help you to see if zram has similar problems or not.
-> 
-> We have kobject in three structures: klp_func, klp_object, and
-> klp_patch, see include/linux/livepatch.h.
-> 
-> These structures have to be statically defined in the module sources
-> because they define what is livepatched, see
-> samples/livepatch/livepatch-sample.c
-> 
-> The kobject is used there to show information about the patch, patched
-> objects, and patched functions, in sysfs. And most importantly,
-> the sysfs interface can be used to disable the livepatch.
-> 
-> The problem with static structures is that the module must stay
-> in the memory as long as the sysfs interface exists. It can be
-> solved in module_exit() callback. It could wait until the sysfs
-> interface is destroyed.
-> 
-> kobject API does not support this scenario. The relase() callbacks
+On 10/26/21 12:12 AM, Christoph Hellwig wrote:
+> The HPB support added this merge window is fundanetally flawed as it
+                                              ^^^^^^^^^^^^
+                                              fundanetally -> fundamentally
 
-kobject_delete() is for supporting this scenario, that is why we don't
-need to grab module refcnt before calling show()/store() of the
-kobject's attributes.
+Since the implementation can be reworked not to use
+blk_insert_cloned_request() I'm not sure using the word "fundamentally"
+is appropriate.
 
-kobject_delete() can be called in module_exit(), then any show()/store()
-will be done after kobject_delete() returns.
+> uses blk_insert_cloned_request to insert a cloned request onto the same
+> queue as the one that the original request came from, leading to all
+> kinds of issues in blk-mq accounting (in addition to this API being
+> a special case for dm-mpath that should not see other users).
 
-> are called asynchronously. It expects that the structure is bundled
-> in a dynamically allocated structure.  As a result, the sysfs
-> interface can be removed even after the module removal.
+More detailed information would have been welcome.
 
-That should be one bug, otherwise store()/show() method could be called
-into after the module is unloaded.
+> Fixes: f02bc9754a68 ("scsi: ufs: ufshpb: Introduce Host Performance Buffer
+> feature")
 
-> 
-> The livepatching might create the dynamic structures by duplicating
-> the structures defined in the module statically. It might safe us
-> some headaches with kobject release. But it would also need an extra code
-> that would need to be maintained. The structure constrains strings
-> than need to be duplicated and later freed...
-> 
-> 
-> > But kobject_del() won't release the kobject, you shouldn't need the lock
-> > to delete kobject first. After the kobject is deleted, no any show() and
-> > store() any more, isn't such sync[1] you expected?
-> 
-> Livepatch code never called kobject_del() under a lock. It would cause
-> the obvious deadlock. The historic code only waited in the
-> module_exit() callback until the sysfs interface was removed.
+I assume that you wanted to refer to commit 41d8a9333cc9 ("scsi: ufs: ufshpb:
+Add HPB 2.0 support") instead since that commit is the only commit that
+introduced a blk_insert_cloned_request() call in the UFS HPB code?
 
-OK, then Luis shouldn't consider livepatching as one such issue to solve
-with one generic solution.
-
-> 
-> It has changed in the commit 958ef1e39d24d6cb8bf2a740 ("livepatch:
-> Simplify API by removing registration step"). The livepatch could
-> never get enabled again after it was disabled now. The sysfs interface
-> is removed when the livepatch gets disabled. The module could
-> be removed only after the sysfs interface is destroyed, see
-> the module_put() in klp_free_patch_finish().
-
-OK, that is livepatching's implementation: all the kobjects are deleted &
-freed after disabling the livepatch module, that looks one kill-me
-operation, instead of disabling, so this way isn't a normal usage,
-scsi has similar sysfs interface of delete. Also kobjects can't be
-removed in enable's store() directly, since deadlock could be
-caused, looks wq has to be used here for avoiding deadlock.
-
-BTW, what is the livepatching module use model? try_module_get() is
-called in klp_init_patch_early()<-klp_enable_patch()<-module_init(),
-module_put() is called in klp_free_patch_finish() which seems only be
-called after 'echo 0 > /sys/kernel/livepatch/$lp_mod/enabled'.
-
-Usually when the module isn't used, module_exit() gets chance to be called
-by userspace rmmod, then all kobjects created in this module can be
-deleted in module_exit().
-
-> 
-> The livepatch code uses workqueue because the livepatch can be
-> disabled via sysfs interface. It obviously could not wait until
-> the sysfs interface is removed in the sysfs write() callback
-> that triggered the removal.
-
-If klp_free_patch_* is moved into module_exit() and not let enable
-store() to kill kobjects, all kobjects can be deleted in module_exit(),
-then wait_for_completion(patch->finish) may be removed, also wq isn't
-required for the async cleanup.
-
-
-
-Thanks, 
-Ming
-
+Bart.
