@@ -2,45 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7C4C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 07:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E81A7C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 08:23:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5706C610CB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 07:37:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB73061106
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 08:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbhJZHkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 03:40:21 -0400
-Received: from verein.lst.de ([213.95.11.211]:60777 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229687AbhJZHkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 03:40:21 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 47AAF6732D; Tue, 26 Oct 2021 09:37:56 +0200 (CEST)
-Date:   Tue, 26 Oct 2021 09:37:56 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 6/8] loop: relax loop dio use condition
-Message-ID: <20211026073756.GE31967@lst.de>
-References: <20211025094437.2837701-1-ming.lei@redhat.com> <20211025094437.2837701-7-ming.lei@redhat.com>
+        id S233551AbhJZIZy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 04:25:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21032 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233897AbhJZIZx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Oct 2021 04:25:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635236609;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+oz6iMexA5HW9aZZnRgNBDgftbDjl783CHggO8Dnsec=;
+        b=iFJ+GHHxYOoR6MDLnOCSKyXw22BjyRdod8JFqie0xBa/bL2kZMRvV/2P66Z4ixjLm6a68/
+        Hdv7QHW52SD7QnPRXhwIngbh4bIDjMBvsWqQrLDahTMgJQSXSE63IZvmvO98XiXuf2TC0h
+        QhBim4AUaGfwgPptLeBfOo/uppHBjSY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-532-JpNAk9SaMSiM0Lhi8MKc9Q-1; Tue, 26 Oct 2021 04:23:27 -0400
+X-MC-Unique: JpNAk9SaMSiM0Lhi8MKc9Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC4F2806694;
+        Tue, 26 Oct 2021 08:23:26 +0000 (UTC)
+Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01A145DF21;
+        Tue, 26 Oct 2021 08:23:13 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: don't issue request directly in case that current is to be blocked
+Date:   Tue, 26 Oct 2021 16:22:57 +0800
+Message-Id: <20211026082257.2889890-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211025094437.2837701-7-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 05:44:35PM +0800, Ming Lei wrote:
-> So far loop dio requires the following conditions:
-> 
-> 1) lo->lo_offset is aligned with backing queue's logical block size
-> 
-> 2) loop queue's logical block size is <= backing queue's logical block
->    size
+When flushing plug list in case that current will be blocked, we can't
+issue request directly because ->queue_rq() may sleep, otherwise scheduler
+may complain.
 
-And both these checks absolutely do make sense.  We should not drop
-them and gets us into the messy state of mixed direct and buffered
-I/O.
+Fixes: dc5fc361d891 ("block: attempt direct issue of plug list")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c19dfa8ea65e..9840b15f505b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2223,7 +2223,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 		return;
+ 	plug->rq_count = 0;
+ 
+-	if (!plug->multiple_queues && !plug->has_elevator) {
++	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
+ 		blk_mq_plug_issue_direct(plug, from_schedule);
+ 		if (rq_list_empty(plug->mq_list))
+ 			return;
+-- 
+2.31.1
+
