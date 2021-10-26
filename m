@@ -2,63 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE758C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 14:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CF4C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 14:44:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABF8C60E74
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 14:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B53F60F70
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 14:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236048AbhJZOq6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 10:46:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59292 "EHLO
+        id S235176AbhJZOrC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 10:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235176AbhJZOq6 (ORCPT
+        with ESMTP id S234301AbhJZOrC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 10:46:58 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB4CC061767
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 07:44:34 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id lx5-20020a17090b4b0500b001a262880e99so1882483pjb.5
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 07:44:34 -0700 (PDT)
+        Tue, 26 Oct 2021 10:47:02 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B6DC061745
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 07:44:38 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id fv3so5113801pjb.3
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 07:44:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=av0r/rjVqFrB/l7qERXJM+4hS0XcNVLfoNKN5vMbJNg=;
-        b=fQCuSISujQ+sp4jiaR2E3exaiwEYxJwlV49WSqAxrPz8tjID4RK9dUcdYjmYSArsLN
-         okRmNoxVVFxY50rCcK3bONQSE0Re5Q4qqvWpnnJY9ONfiJM0SA/Ok/XB9E7rdEhIZ/Uz
-         4skmvpbX5fSta7u6VMRNW3H94ocQ9YwBGIMd2mpvjPtefnKml9woJY4Jk6N17UDeFb2k
-         nkWr2Cl+nsf/X8K/M1vklGlm6NoD83XAvXz6x+vy3NC1F6an3D0TbHoCHcdyC0KtPkhA
-         g4zWU4JM8bWS6/P/GS46nl54uzxY+GMfhHSKgHMtCsTaRqS4BqwmGYQqcKxMfC8uQe3u
-         EeOw==
+        bh=ly7k9CuyPcCQDb18QLtWsqzNg6+IbpjdsL/kryn3NgU=;
+        b=WmjwgQu6+TO064uFSi79wF65OO1SboRZY8s6dhJKSzKclD/aGhQnzUa4UTTLiIl1X5
+         uPhgRlGs5C2MOsBp39MdWFg8xht5zS77jLDFyB1NgeA/TJf4s6hjUKpxTP12SLgyl5h0
+         SK4Eo/TbjHcqxYFfQpu8EQ3KcwFTjz6bA9Ygywn9MvkyY2eefetLo4SPbv+sSW9Cbrzp
+         PrqxUedCkbE2lazOGBSmZx0LDWzYrCIFnV+7/tPbBJIZhQ57PWPd/+cjcjIev1Xj52Xn
+         JVymIqVOHXG3QA/n/8F0IFflavWubesYz8yY/J0JrBGTokeCMYIjvtVFHt61xSCHA+qp
+         F3CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=av0r/rjVqFrB/l7qERXJM+4hS0XcNVLfoNKN5vMbJNg=;
-        b=zXvzSOs7ZSoAeApGw8DNYg1qAx/5k15Zt72xW5ySEvQmEVaUWHUSqrJFsYaFaYdNiX
-         klj0BDPG0aQW/nDpU8JjLL7ZWuQPptCUX0TDVepfcMIGjIvRZp1qxQsdekR9D9N9NPX/
-         +9KC9SNFKi70iYmVzrX0TJcEEO8nDnXqupcfOkazyBlMGcse7q33DP3lk9iD748en0M6
-         VSeWozjVhJGsjS+L9NXkOmClXC+v2B71SvmuqSI6kbZgqPAen8zIHE4v5U83yOSwQvTL
-         QNAmJdS1Tddsb7i0tT/XCWwS/IPxTKelBRRXwfKNzo/A0RF6pXWLwU8fY4kuXXzrZDV6
-         ZA5Q==
-X-Gm-Message-State: AOAM532dRofDbFGHTrNlojZ4yIhOq2cR9wF5w2Vw0CdWeCGZs4s5g9LG
-        mE502tor2UGn/o7voeFTPk8P
-X-Google-Smtp-Source: ABdhPJyTDsD97vcyR2KGqe10jzWQryeC853DoaBsvwg3J1QWs9+FnNpyFRuyRjDckKsjLlrUuPA1hg==
-X-Received: by 2002:a17:90b:1d86:: with SMTP id pf6mr38167103pjb.20.1635259473908;
-        Tue, 26 Oct 2021 07:44:33 -0700 (PDT)
+        bh=ly7k9CuyPcCQDb18QLtWsqzNg6+IbpjdsL/kryn3NgU=;
+        b=ERIhfAH8mnjlPBwuzFVYesW4fIyq628o2ndKjJppd0Sjd/GAFbZl+w4DHIm6JKNyvr
+         zJM9OGQ8nuTsPtwv6jVMdvlhfx6bjrgdWufccb0Ukxx9DrhPflvtLxIQC7jWLcF5+a8c
+         sYUZrifC0ntmlCwD+x1fo1j0mQE9vd/5h3N0/GzFjMMl2Wb/cDoDwHyutREawLwiModU
+         JqVHVLvaNm6j66C6xjQhMl7XAIFZG3JEnmnFoop5PukioUOogQkeJTHFfBDxUtWRweV8
+         Pa29rpSxRxESbST1hmvChtpAVVkfWoHpXwLAAeKb2TisoGOEwDrrUrpEWjPo/c6vEg51
+         xqVg==
+X-Gm-Message-State: AOAM533Tswl4I1hFIi2wcOXkXWr9Zt46n+rfEfCXwSVQYgS0tUp5IMM0
+        P6ouRQ59y7DJWptHyipC26tJ
+X-Google-Smtp-Source: ABdhPJx4eVB58yN7jp+NWdqjvjbKiIEhH9j0mGRLGoM7kNZBiU5TOXPUCa7s1YYZcNDkVLBgoh7T4g==
+X-Received: by 2002:a17:90a:bd0f:: with SMTP id y15mr20965938pjr.186.1635259477910;
+        Tue, 26 Oct 2021 07:44:37 -0700 (PDT)
 Received: from localhost ([139.177.225.237])
-        by smtp.gmail.com with ESMTPSA id p9sm22418175pfn.7.2021.10.26.07.44.32
+        by smtp.gmail.com with ESMTPSA id pc18sm1297676pjb.0.2021.10.26.07.44.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 07:44:32 -0700 (PDT)
+        Tue, 26 Oct 2021 07:44:36 -0700 (PDT)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     axboe@kernel.dk, hch@lst.de, josef@toxicpanda.com, mst@redhat.com,
         jasowang@redhat.com, stefanha@redhat.com, kwolf@redhat.com
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v3 3/4] loop: Use blk_validate_block_size() to validate block size
-Date:   Tue, 26 Oct 2021 22:40:14 +0800
-Message-Id: <20211026144015.188-4-xieyongji@bytedance.com>
+Subject: [PATCH v3 4/4] virtio-blk: Use blk_validate_block_size() to validate block size
+Date:   Tue, 26 Oct 2021 22:40:15 +0800
+Message-Id: <20211026144015.188-5-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211026144015.188-1-xieyongji@bytedance.com>
 References: <20211026144015.188-1-xieyongji@bytedance.com>
@@ -68,56 +68,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove loop_validate_block_size() and use the block layer helper
-to validate block size.
+The block layer can't support a block size larger than
+page size yet. And a block size that's too small or
+not a power of two won't work either. If a misconfigured
+device presents an invalid block size in configuration space,
+it will result in the kernel crash something like below:
+
+[  506.154324] BUG: kernel NULL pointer dereference, address: 0000000000000008
+[  506.160416] RIP: 0010:create_empty_buffers+0x24/0x100
+[  506.174302] Call Trace:
+[  506.174651]  create_page_buffers+0x4d/0x60
+[  506.175207]  block_read_full_page+0x50/0x380
+[  506.175798]  ? __mod_lruvec_page_state+0x60/0xa0
+[  506.176412]  ? __add_to_page_cache_locked+0x1b2/0x390
+[  506.177085]  ? blkdev_direct_IO+0x4a0/0x4a0
+[  506.177644]  ? scan_shadow_nodes+0x30/0x30
+[  506.178206]  ? lru_cache_add+0x42/0x60
+[  506.178716]  do_read_cache_page+0x695/0x740
+[  506.179278]  ? read_part_sector+0xe0/0xe0
+[  506.179821]  read_part_sector+0x36/0xe0
+[  506.180337]  adfspart_check_ICS+0x32/0x320
+[  506.180890]  ? snprintf+0x45/0x70
+[  506.181350]  ? read_part_sector+0xe0/0xe0
+[  506.181906]  bdev_disk_changed+0x229/0x5c0
+[  506.182483]  blkdev_get_whole+0x6d/0x90
+[  506.183013]  blkdev_get_by_dev+0x122/0x2d0
+[  506.183562]  device_add_disk+0x39e/0x3c0
+[  506.184472]  virtblk_probe+0x3f8/0x79b [virtio_blk]
+[  506.185461]  virtio_dev_probe+0x15e/0x1d0 [virtio]
+
+So let's use a block layer helper to validate the block size.
 
 Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 ---
- drivers/block/loop.c | 17 ++---------------
- 1 file changed, 2 insertions(+), 15 deletions(-)
+ drivers/block/virtio_blk.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 7bf4686af774..dfc72a1f6500 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -273,19 +273,6 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- }
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 303caf2d17d0..fd086179f980 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -815,9 +815,17 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
+ 				   struct virtio_blk_config, blk_size,
+ 				   &blk_size);
+-	if (!err)
++	if (!err) {
++		err = blk_validate_block_size(blk_size);
++		if (err) {
++			dev_err(&vdev->dev,
++				"virtio_blk: invalid block size: 0x%x\n",
++				blk_size);
++			goto out_cleanup_disk;
++		}
++
+ 		blk_queue_logical_block_size(q, blk_size);
+-	else
++	} else
+ 		blk_size = queue_logical_block_size(q);
  
- /**
-- * loop_validate_block_size() - validates the passed in block size
-- * @bsize: size to validate
-- */
--static int
--loop_validate_block_size(unsigned short bsize)
--{
--	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
--		return -EINVAL;
--
--	return 0;
--}
--
--/**
-  * loop_set_size() - sets device size and notifies userspace
-  * @lo: struct loop_device to set the size for
-  * @size: new size of the loop device
-@@ -1236,7 +1223,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	}
- 
- 	if (config->block_size) {
--		error = loop_validate_block_size(config->block_size);
-+		error = blk_validate_block_size(config->block_size);
- 		if (error)
- 			goto out_unlock;
- 	}
-@@ -1759,7 +1746,7 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- 	if (lo->lo_state != Lo_bound)
- 		return -ENXIO;
- 
--	err = loop_validate_block_size(arg);
-+	err = blk_validate_block_size(arg);
- 	if (err)
- 		return err;
- 
+ 	/* Use topology information if available */
 -- 
 2.11.0
 
