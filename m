@@ -2,126 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFDAC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 08:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35632C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 08:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E0DB60E75
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 08:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BCFC61078
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 08:48:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231324AbhJZImh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 04:42:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60332 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbhJZImg (ORCPT
+        id S234381AbhJZIuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 04:50:46 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:48794 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234356AbhJZIup (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 04:42:36 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA0CC061745;
-        Tue, 26 Oct 2021 01:40:12 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id bq11so15988547lfb.10;
-        Tue, 26 Oct 2021 01:40:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ijOwKzeaXpFPGRIQxSXTmMn90o1TvbGRWLX4tLalZBE=;
-        b=PJINZiPWegrX910mJuZJ713rquPCluWA0Lx2UZb4WFQoFKts339Bonp7bWsaAoIHoK
-         Nf6mdCS73gzJfIELnIHC69/wPqKYd+lBQ320JiUoIlZxG5plcWIZEhoKKx78bTC4UETm
-         N7/gFEQc3qS+7TOndhqU/NnIb/ZfU1fXE+H/AXrKarqcDjatlZHSLGrTffPq6AWu976U
-         AO0rhOSZVpP+bwRb+dovqzd627J2e21KytWXTZv01Va2uU4kUk6f6Miude+s/yskOj6+
-         ywGOsjfRjR9ZNi6aNT9H1Q9D7OZHoSDX7OTCYd6F4G8pybBMiwGcqDR0FcB6SFBET7h7
-         13LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ijOwKzeaXpFPGRIQxSXTmMn90o1TvbGRWLX4tLalZBE=;
-        b=I6Cg/SUdjpQGD7V0FGlS37DKR9VHWGWYdaSs2bL3+5+4wo63qsKtoFJXWL7nDV6cL9
-         1I3f/VsiWfqsajY3XEAUlMu1E9EK6ceq+NEwtM8m8cupoaCY54HlUfoeXmubr9jmeOUY
-         ETFvKaERLz6oQeedSImATuvSQi+OXtszYkNE3TlUoQClgvMNE0Ywv1f6C3vB6b3VubPQ
-         3UvsMRzzU/pYv+jZB1WZqUzZPExnm+4lI/ihUhL2Pp+D1bWDJZwmfiUBEC9awzhu0Nhq
-         rF3ziGvFiNbe0dDWs4HRFiFt0sINJ7gkp4IdQXFwe0H+Pwd+umY5TM2TGqlPK1LFBX/e
-         dsiA==
-X-Gm-Message-State: AOAM531dFOcNBakUWmlsGsjgYwAhA0kjDuyfDZPQ8E16+drJiumSWI9l
-        6ZIEgshd2ZNyGkftHartqSWmH0wRfxc=
-X-Google-Smtp-Source: ABdhPJyVM55cZxyXsaUnOKovtCvp/RyyGdUD5eyXSBE1KGuHQNRBc3+guwHQRmPWIqK5Z+cCGWxMcA==
-X-Received: by 2002:a05:6512:23a9:: with SMTP id c41mr20365392lfv.573.1635237610634;
-        Tue, 26 Oct 2021 01:40:10 -0700 (PDT)
-Received: from [192.168.2.145] (46-138-41-28.dynamic.spd-mgts.ru. [46.138.41.28])
-        by smtp.googlemail.com with ESMTPSA id u4sm331486lff.198.2021.10.26.01.40.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Oct 2021 01:40:10 -0700 (PDT)
-Subject: Re: linux-next: Tree for Oct 25
+        Tue, 26 Oct 2021 04:50:45 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 95A69218F6;
+        Tue, 26 Oct 2021 08:48:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1635238099; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q+98+lPkGDb22QCcyWAKWfGYWjs17jCOmjdrdsgCACM=;
+        b=brGyZg1VELqA3lLz8/GxVtAGDO5KLJV+h6TxCRn5ziptc07WGQnvihKlqw0Fi8jRY5zdYo
+        7oR4y9Ib1kNhPYt4gIgjqgboaKR/iaC/9646T3WjqNJrrmM/6G0pDjzn/xkQhGjExHGTyV
+        dhah+BW2dpu+75lhjQ2C4K/zNgtcMwg=
+Received: from suse.cz (unknown [10.100.224.162])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id DA608A3B84;
+        Tue, 26 Oct 2021 08:48:18 +0000 (UTC)
+Date:   Tue, 26 Oct 2021 10:48:18 +0200
+From:   Petr Mladek <pmladek@suse.com>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <20211025204921.73cb3011@canb.auug.org.au>
- <82bbf33e-918f-da01-95e6-9b2cc1b8b610@gmail.com> <YXdZxzAPejKyE8Oi@T590>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <82558c85-d3be-e158-54f1-b3067f15fa21@gmail.com>
-Date:   Tue, 26 Oct 2021 11:40:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+Cc:     Miroslav Benes <mbenes@suse.cz>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        live-patching@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YXfA0jfazCPDTEBw@alley>
+References: <YWm68xUnAofop3PZ@bombadil.infradead.org>
+ <YWq3Z++uoJ/kcp+3@T590>
+ <YW3LuzaPhW96jSBK@bombadil.infradead.org>
+ <YW4uwep3BCe9Vxq8@T590>
+ <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
+ <YW6OptglA6UykZg/@T590>
+ <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
+ <YW/KEsfWJMIPnz76@T590>
+ <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
+ <YW/q70dLyF+YudyF@T590>
 MIME-Version: 1.0
-In-Reply-To: <YXdZxzAPejKyE8Oi@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YW/q70dLyF+YudyF@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-26.10.2021 04:28, Ming Lei пишет:
-> On Tue, Oct 26, 2021 at 01:11:07AM +0300, Dmitry Osipenko wrote:
->> Hello,
->>
->> Recent -next has this new warning splat coming from MMC, please take a look.
->>
->>  ------------[ cut here ]------------
->>  WARNING: CPU: 0 PID: 525 at kernel/sched/core.c:9477 __might_sleep+0x65/0x68
->>  do not call blocking ops when !TASK_RUNNING; state=2 set at [<4316eb02>] prepare_to_wait+0x2e/0xb8
->>  Modules linked in:
->>  CPU: 0 PID: 525 Comm: Xorg Tainted: G        W         5.15.0-rc6-next-20211025-00226-g89ccd6948ec3 #5
->>  Hardware name: NVIDIA Tegra SoC (Flattened Device Tree)
->>  (unwind_backtrace) from [<c01089f9>] (show_stack+0x11/0x14)
->>  (show_stack) from [<c0afacb9>] (dump_stack_lvl+0x2b/0x34)
->>  (dump_stack_lvl) from [<c011f689>] (__warn+0xa1/0xe8)
->>  (__warn) from [<c0af6729>] (warn_slowpath_fmt+0x65/0x7c)
->>  (warn_slowpath_fmt) from [<c01421b9>] (__might_sleep+0x65/0x68)
->>  (__might_sleep) from [<c07eb377>] (mmc_blk_rw_wait+0x2f/0x118)
->>  (mmc_blk_rw_wait) from [<c07eba11>] (mmc_blk_mq_issue_rq+0x219/0x71c)
->>  (mmc_blk_mq_issue_rq) from [<c07ec199>] (mmc_mq_queue_rq+0xf9/0x200)
->>  (mmc_mq_queue_rq) from [<c04ad247>] (__blk_mq_try_issue_directly+0xcb/0x100)
->>  (__blk_mq_try_issue_directly) from [<c04adb89>] (blk_mq_request_issue_directly+0x2d/0x48)
->>  (blk_mq_request_issue_directly) from [<c04adcf3>] (blk_mq_flush_plug_list+0x14f/0x1f4)
->>  (blk_mq_flush_plug_list) from [<c04a5313>] (blk_flush_plug+0x83/0xb8)
->>  (blk_flush_plug) from [<c0b013cb>] (io_schedule+0x2b/0x3c)
->>  (io_schedule) from [<c0b01a17>] (bit_wait_io+0xf/0x48)
+On Wed 2021-10-20 18:09:51, Ming Lei wrote:
+> On Wed, Oct 20, 2021 at 10:19:27AM +0200, Miroslav Benes wrote:
+> > On Wed, 20 Oct 2021, Ming Lei wrote:
+> > 
+> > > On Wed, Oct 20, 2021 at 08:43:37AM +0200, Miroslav Benes wrote:
+> > > > On Tue, 19 Oct 2021, Ming Lei wrote:
+> > > > 
+> > > > > On Tue, Oct 19, 2021 at 08:23:51AM +0200, Miroslav Benes wrote:
+> > > > > > > > By you only addressing the deadlock as a requirement on approach a) you are
+> > > > > > > > forgetting that there *may* already be present drivers which *do* implement
+> > > > > > > > such patterns in the kernel. I worked on addressing the deadlock because
+> > > > > > > > I was informed livepatching *did* have that issue as well and so very
+> > > > > > > > likely a generic solution to the deadlock could be beneficial to other
+> > > > > > > > random drivers.
+> > > > > > > 
+> > > > > > > In-tree zram doesn't have such deadlock, if livepatching has such AA deadlock,
+> > > > > > > just fixed it, and seems it has been fixed by 3ec24776bfd0.
+> > > > > > 
+> > > > > > I would not call it a fix. It is a kind of ugly workaround because the 
+> > > > > > generic infrastructure lacked (lacks) the proper support in my opinion. 
+> > > > > > Luis is trying to fix that.
+> > > > > 
+> > > > > What is the proper support of the generic infrastructure? I am not
+> > > > > familiar with livepatching's model(especially with module unload), you mean
+> > > > > livepatching have to do the following way from sysfs:
+> > > > > 
+> > > > > 1) during module exit:
+> > > > > 	
+> > > > > 	mutex_lock(lp_lock);
+> > > > > 	kobject_put(lp_kobj);
+> > > > > 	mutex_unlock(lp_lock);
+> > > > > 	
+> > > > > 2) show()/store() method of attributes of lp_kobj
+> > > > > 	
+> > > > > 	mutex_lock(lp_lock)
+> > > > > 	...
+> > > > > 	mutex_unlock(lp_lock)
+> > > > 
+> > > > Yes, this was exactly the case. We then reworked it a lot (see 
+> > > > 958ef1e39d24 ("livepatch: Simplify API by removing registration step"), so 
+> > > > now the call sequence is different. kobject_put() is basically offloaded 
+> > > > to a workqueue scheduled right from the store() method. Meaning that 
+> > > > Luis's work would probably not help us currently, but on the other hand 
+> > > > the issues with AA deadlock were one of the main drivers of the redesign 
+> > > > (if I remember correctly). There were other reasons too as the changelog 
+> > > > of the commit describes.
+> > > > 
+> > > > So, from my perspective, if there was a way to easily synchronize between 
+> > > > a data cleanup from module_exit callback and sysfs/kernfs operations, it 
+> > > > could spare people many headaches.
+> > > 
+> > > kobject_del() is supposed to do so, but you can't hold a shared lock
+> > > which is required in show()/store() method. Once kobject_del() returns,
+> > > no pending show()/store() any more.
+> > > 
+> > > The question is that why one shared lock is required for livepatching to
+> > > delete the kobject. What are you protecting when you delete one kobject?
+> > 
+> > I think it boils down to the fact that we embed kobject statically to 
+> > structures which livepatch uses to maintain data. That is discouraged 
+> > generally, but all the attempts to implement it correctly were utter 
+> > failures.
 > 
-> The following patch should fix the issue:
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a71aeed7b987..bee9cb2a44cb 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2223,7 +2223,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
->  		return;
->  	plug->rq_count = 0;
->  
-> -	if (!plug->multiple_queues && !plug->has_elevator) {
-> +	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
->  		blk_mq_plug_issue_direct(plug, from_schedule);
->  		if (rq_list_empty(plug->mq_list))
->  			return;
-> 
+> OK, then it isn't one common usage, in which kobject covers the release
+> of the external object. What is the exact kobject in livepatching?
 
-Thank you!
+Below are more details about the livepatch code. I hope that it will
+help you to see if zram has similar problems or not.
 
-Tested-by: Dmitry Osipenko <digetx@gmail.com>
+We have kobject in three structures: klp_func, klp_object, and
+klp_patch, see include/linux/livepatch.h.
+
+These structures have to be statically defined in the module sources
+because they define what is livepatched, see
+samples/livepatch/livepatch-sample.c
+
+The kobject is used there to show information about the patch, patched
+objects, and patched functions, in sysfs. And most importantly,
+the sysfs interface can be used to disable the livepatch.
+
+The problem with static structures is that the module must stay
+in the memory as long as the sysfs interface exists. It can be
+solved in module_exit() callback. It could wait until the sysfs
+interface is destroyed.
+
+kobject API does not support this scenario. The relase() callbacks
+are called asynchronously. It expects that the structure is bundled
+in a dynamically allocated structure.  As a result, the sysfs
+interface can be removed even after the module removal.
+
+The livepatching might create the dynamic structures by duplicating
+the structures defined in the module statically. It might safe us
+some headaches with kobject release. But it would also need an extra code
+that would need to be maintained. The structure constrains strings
+than need to be duplicated and later freed...
+
+
+> But kobject_del() won't release the kobject, you shouldn't need the lock
+> to delete kobject first. After the kobject is deleted, no any show() and
+> store() any more, isn't such sync[1] you expected?
+
+Livepatch code never called kobject_del() under a lock. It would cause
+the obvious deadlock. The historic code only waited in the
+module_exit() callback until the sysfs interface was removed.
+
+It has changed in the commit 958ef1e39d24d6cb8bf2a740 ("livepatch:
+Simplify API by removing registration step"). The livepatch could
+never get enabled again after it was disabled now. The sysfs interface
+is removed when the livepatch gets disabled. The module could
+be removed only after the sysfs interface is destroyed, see
+the module_put() in klp_free_patch_finish().
+
+The livepatch code uses workqueue because the livepatch can be
+disabled via sysfs interface. It obviously could not wait until
+the sysfs interface is removed in the sysfs write() callback
+that triggered the removal.
+
+HTH,
+Petr
