@@ -2,106 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98509C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB74C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:43:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 798C660F46
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:29:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F6BE6023B
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:43:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234651AbhJZBbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 21:31:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40379 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234465AbhJZBbU (ORCPT
+        id S231829AbhJZBp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 21:45:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52724 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230183AbhJZBpZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 21:31:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635211737;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oBsGXv55wWpplGjyxCfLIopyx/VwLnsEwvC3TZf8Ruo=;
-        b=NPtkJC08RpkXsEX6baBApRCE6SclQemhLMEKQiXg4m1IqFAVZVP3RH4yDNEwGkOZW6ncBM
-        PviR1d1DNFfXPMkOktKB69D5YHGncMd31Yf6DeMbP7pGFV1ElThkAs/z1dk4+ggEzmfyTr
-        M0R3AlOhnKBNZbE9XnFPmdNPm6QsEPQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-Usvy8dpZOTeXQXE67Jz7Jg-1; Mon, 25 Oct 2021 21:28:53 -0400
-X-MC-Unique: Usvy8dpZOTeXQXE67Jz7Jg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 114CB872FF3;
-        Tue, 26 Oct 2021 01:28:52 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A2ED15D6BA;
-        Tue, 26 Oct 2021 01:28:44 +0000 (UTC)
-Date:   Tue, 26 Oct 2021 09:28:39 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dmitry Osipenko <digetx@gmail.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: linux-next: Tree for Oct 25
-Message-ID: <YXdZxzAPejKyE8Oi@T590>
-References: <20211025204921.73cb3011@canb.auug.org.au>
- <82bbf33e-918f-da01-95e6-9b2cc1b8b610@gmail.com>
+        Mon, 25 Oct 2021 21:45:25 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB690C061745
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 18:43:02 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id m26so12708609pff.3
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 18:43:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=e3QNntbi6F0Q5EQIPy2H7a8oNts2Eyp4p/Xn7HNIof4=;
+        b=6I9ExCZXDjetUnWB97k4kiOjvXsb46qPrDkZKZEtP0yYIvx8GFEPOVESL8tETTem0s
+         uMxYAvOYuVABEFafvkY+CfHrJhIxDvRe9M262+xBUmx1zsVSJMhWgzgtccK5H3xfSZ7o
+         nqVxXoJ3pAOGeWyevOLIbM9sU15/was3trfrEXpHPaDYMLU2qcUAvmVm4mBqoQGLVzZi
+         kfAFaTlu5+s76CRog1FBM7RWYrJZnG+EpPLJFn0c0GIaBfRvNspnRLEG1zhgrofS4aPq
+         BYBoyZ3XjCWaSCwQqT6mLEwFgtBemVUOklCfwWfOBv/l6vq27zpEUfcnSJZy+r/gt600
+         nnJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=e3QNntbi6F0Q5EQIPy2H7a8oNts2Eyp4p/Xn7HNIof4=;
+        b=ynWlf7N3MpWPItLxx94c2GQQulDNS40jMTntVp2nspWYExA39645pye+g+RrU7aWnb
+         7X2Wdb3HkB1JuDBj4J8N7bQASBNOeMAlO9VAuQlZSYMuXnlk7qT/G47YxcY9MnJMcKWQ
+         3NXvJSUWzINqERwCPpA+wr6TCnFFDeUDqv/3WumW5YSYCODcSQ9S7+K/WKNcEpC5Su/9
+         ax6oLAUp+rvrMuC5cXJGsc41W3MB+MVUFFVfspKXktTmXmO3GdkBAB78YlMxAl/ckCoG
+         DjpaPJci1/crU2Hh6ueZ+NmpbEFG3lP9BhHy9b7WxwFd6VVEAboioM50YTQr0G4zflh8
+         /njQ==
+X-Gm-Message-State: AOAM532SM6s40kl/jJQOwVR0gXoOhDzQowBoPEdHtlqVnJy0J+QWdqup
+        mAhHMMmuxTq/hcs9VteAKp81eOi5l6ZwMDQYMqaPpg==
+X-Google-Smtp-Source: ABdhPJy1bgYCv5vnItFJsKHYvhi32488pwwKAHbT9aXBTMl76S4vhvH/WbPtblFWCNALYE4rFvqzmVg5ElJIAz3kVaM=
+X-Received: by 2002:a05:6a00:15c8:b0:44d:9f7e:ece2 with SMTP id
+ o8-20020a056a0015c800b0044d9f7eece2mr22508213pfu.86.1635212582401; Mon, 25
+ Oct 2021 18:43:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <82bbf33e-918f-da01-95e6-9b2cc1b8b610@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20211019073641.2323410-1-hch@lst.de> <20211019073641.2323410-3-hch@lst.de>
+ <YXFtwcAC0WyxIWIC@angband.pl> <20211022055515.GA21767@lst.de> <CAPcyv4joX3K36ovKn2K95iDtW77jJwoAgAs5JSRMcETff=-brg@mail.gmail.com>
+In-Reply-To: <CAPcyv4joX3K36ovKn2K95iDtW77jJwoAgAs5JSRMcETff=-brg@mail.gmail.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Mon, 25 Oct 2021 18:42:51 -0700
+Message-ID: <CAPcyv4gFCRs_OJ1TutBi-tmWWS2pU_D+bqJVwCcp=7dCMkhGEw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] memremap: remove support for external pgmap refcounts
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Adam Borowski <kilobyte@angband.pl>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>,
+        Linux MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 26, 2021 at 01:11:07AM +0300, Dmitry Osipenko wrote:
-> Hello,
-> 
-> Recent -next has this new warning splat coming from MMC, please take a look.
-> 
->  ------------[ cut here ]------------
->  WARNING: CPU: 0 PID: 525 at kernel/sched/core.c:9477 __might_sleep+0x65/0x68
->  do not call blocking ops when !TASK_RUNNING; state=2 set at [<4316eb02>] prepare_to_wait+0x2e/0xb8
->  Modules linked in:
->  CPU: 0 PID: 525 Comm: Xorg Tainted: G        W         5.15.0-rc6-next-20211025-00226-g89ccd6948ec3 #5
->  Hardware name: NVIDIA Tegra SoC (Flattened Device Tree)
->  (unwind_backtrace) from [<c01089f9>] (show_stack+0x11/0x14)
->  (show_stack) from [<c0afacb9>] (dump_stack_lvl+0x2b/0x34)
->  (dump_stack_lvl) from [<c011f689>] (__warn+0xa1/0xe8)
->  (__warn) from [<c0af6729>] (warn_slowpath_fmt+0x65/0x7c)
->  (warn_slowpath_fmt) from [<c01421b9>] (__might_sleep+0x65/0x68)
->  (__might_sleep) from [<c07eb377>] (mmc_blk_rw_wait+0x2f/0x118)
->  (mmc_blk_rw_wait) from [<c07eba11>] (mmc_blk_mq_issue_rq+0x219/0x71c)
->  (mmc_blk_mq_issue_rq) from [<c07ec199>] (mmc_mq_queue_rq+0xf9/0x200)
->  (mmc_mq_queue_rq) from [<c04ad247>] (__blk_mq_try_issue_directly+0xcb/0x100)
->  (__blk_mq_try_issue_directly) from [<c04adb89>] (blk_mq_request_issue_directly+0x2d/0x48)
->  (blk_mq_request_issue_directly) from [<c04adcf3>] (blk_mq_flush_plug_list+0x14f/0x1f4)
->  (blk_mq_flush_plug_list) from [<c04a5313>] (blk_flush_plug+0x83/0xb8)
->  (blk_flush_plug) from [<c0b013cb>] (io_schedule+0x2b/0x3c)
->  (io_schedule) from [<c0b01a17>] (bit_wait_io+0xf/0x48)
+On Fri, Oct 22, 2021 at 8:43 AM Dan Williams <dan.j.williams@intel.com> wrote:
+>
+> On Thu, Oct 21, 2021 at 10:55 PM Christoph Hellwig <hch@lst.de> wrote:
+> >
+> > On Thu, Oct 21, 2021 at 03:40:17PM +0200, Adam Borowski wrote:
+> > > This breaks at least drivers/pci/p2pdma.c:222
+> >
+> > Indeed.  I've updated this patch, but the fix we need to urgently
+> > get into 5.15-rc is the first one only anyway.
+> >
+> > nvdimm maintainers, can you please act on it ASAP?
+>
+> Yes, I have been pulled in many directions this past week, but I do
+> plan to get this queued for v5.15-rc7.
 
-The following patch should fix the issue:
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a71aeed7b987..bee9cb2a44cb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2223,7 +2223,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 		return;
- 	plug->rq_count = 0;
- 
--	if (!plug->multiple_queues && !plug->has_elevator) {
-+	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
- 		blk_mq_plug_issue_direct(plug, from_schedule);
- 		if (rq_list_empty(plug->mq_list))
- 			return;
-
--- 
-Ming
-
+Ok, this is passing all my tests and will be pushed out to -next tonight.
