@@ -2,86 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB74C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D59DC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 02:29:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F6BE6023B
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FCCE60FC2
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 02:29:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231829AbhJZBp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 21:45:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52724 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbhJZBpZ (ORCPT
+        id S234164AbhJZCcN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 22:32:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28948 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229998AbhJZCcM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 21:45:25 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB690C061745
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 18:43:02 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id m26so12708609pff.3
-        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 18:43:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e3QNntbi6F0Q5EQIPy2H7a8oNts2Eyp4p/Xn7HNIof4=;
-        b=6I9ExCZXDjetUnWB97k4kiOjvXsb46qPrDkZKZEtP0yYIvx8GFEPOVESL8tETTem0s
-         uMxYAvOYuVABEFafvkY+CfHrJhIxDvRe9M262+xBUmx1zsVSJMhWgzgtccK5H3xfSZ7o
-         nqVxXoJ3pAOGeWyevOLIbM9sU15/was3trfrEXpHPaDYMLU2qcUAvmVm4mBqoQGLVzZi
-         kfAFaTlu5+s76CRog1FBM7RWYrJZnG+EpPLJFn0c0GIaBfRvNspnRLEG1zhgrofS4aPq
-         BYBoyZ3XjCWaSCwQqT6mLEwFgtBemVUOklCfwWfOBv/l6vq27zpEUfcnSJZy+r/gt600
-         nnJQ==
+        Mon, 25 Oct 2021 22:32:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635215389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bK/ePsOXvnwATuPJ538FYYy/I3va7wErG+x6S0m8LPc=;
+        b=Q36tLKepzd3J0S5Q+d4NHzg4le38tLEMEgU1YPTi9fQ8HlkDJ7u1Xo6ZnBoq3sxQMMD3H2
+        Gr59T568yDfb1XdolfVGx2Cl2/aDNxNa8NvOv0MH8AUkpcdi1SNc81Y179bEbZM9ZuEiAq
+        +PKH5xsk/QiOzscpEJy/vxRjf6S0//E=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-516-janJkhV-Otu1GUpn4bhKxQ-1; Mon, 25 Oct 2021 22:29:47 -0400
+X-MC-Unique: janJkhV-Otu1GUpn4bhKxQ-1
+Received: by mail-lj1-f199.google.com with SMTP id v13-20020a2e2f0d000000b0021126b5cca2so3642536ljv.19
+        for <linux-block@vger.kernel.org>; Mon, 25 Oct 2021 19:29:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=e3QNntbi6F0Q5EQIPy2H7a8oNts2Eyp4p/Xn7HNIof4=;
-        b=ynWlf7N3MpWPItLxx94c2GQQulDNS40jMTntVp2nspWYExA39645pye+g+RrU7aWnb
-         7X2Wdb3HkB1JuDBj4J8N7bQASBNOeMAlO9VAuQlZSYMuXnlk7qT/G47YxcY9MnJMcKWQ
-         3NXvJSUWzINqERwCPpA+wr6TCnFFDeUDqv/3WumW5YSYCODcSQ9S7+K/WKNcEpC5Su/9
-         ax6oLAUp+rvrMuC5cXJGsc41W3MB+MVUFFVfspKXktTmXmO3GdkBAB78YlMxAl/ckCoG
-         DjpaPJci1/crU2Hh6ueZ+NmpbEFG3lP9BhHy9b7WxwFd6VVEAboioM50YTQr0G4zflh8
-         /njQ==
-X-Gm-Message-State: AOAM532SM6s40kl/jJQOwVR0gXoOhDzQowBoPEdHtlqVnJy0J+QWdqup
-        mAhHMMmuxTq/hcs9VteAKp81eOi5l6ZwMDQYMqaPpg==
-X-Google-Smtp-Source: ABdhPJy1bgYCv5vnItFJsKHYvhi32488pwwKAHbT9aXBTMl76S4vhvH/WbPtblFWCNALYE4rFvqzmVg5ElJIAz3kVaM=
-X-Received: by 2002:a05:6a00:15c8:b0:44d:9f7e:ece2 with SMTP id
- o8-20020a056a0015c800b0044d9f7eece2mr22508213pfu.86.1635212582401; Mon, 25
- Oct 2021 18:43:02 -0700 (PDT)
+        bh=bK/ePsOXvnwATuPJ538FYYy/I3va7wErG+x6S0m8LPc=;
+        b=1Q9drMDADZLtvvjnSIBGscIQ3/olqDIaC0j+Mug9NL6+IKZZe0/qhG7bzwTsLFzcSm
+         U5/mVSn9qxbo+3Prw136FRn1NxgLZWhTug0th6Qg2n9DTYOU7Go5e7fnhjmk3J12Wmop
+         7ch/BQuG58PQyPHKwjuNAtepqyl5b0IznZavybEJxuyP6SyA6jlUVjdBdkGXn2MBdoQo
+         wDjffNHEHpqEGxeu//ZRHTBgosZ0FnDvid4FyfKaCi4xBo3E09LlgMj4Ldax1vXnky+2
+         s6jP+inj0KfVDC9tQQltXaArBthvryWCheKsbZfJiIn2eSyaemCqRe+9Q7jGHqg2YT2s
+         4VAg==
+X-Gm-Message-State: AOAM532qLBGhug9dUWczL28aaiU7kV9Sp1KCHEcRoCTON16n/7KsYk0c
+        jBXo5GFuImX2oqXg+vf59b2Sa7+y+F54XJw7ShAjXXDZL6I6uUqw+QVW57veZxM+fa/NN4i5Q7v
+        YZ+pom9aqWangd/0KaxaPL9MS6V5IaYAkXsQiWUA=
+X-Received: by 2002:a2e:8846:: with SMTP id z6mr1572325ljj.277.1635215386497;
+        Mon, 25 Oct 2021 19:29:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJynH2p5Q/d3q8po75eyLScuoBHurmQzxoMQYZvDuVwpXkiyjRKbg3lG4lyNps31IP9RfRnyLeR+hJ3uxAAQOeI=
+X-Received: by 2002:a2e:8846:: with SMTP id z6mr1572308ljj.277.1635215386353;
+ Mon, 25 Oct 2021 19:29:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211019073641.2323410-1-hch@lst.de> <20211019073641.2323410-3-hch@lst.de>
- <YXFtwcAC0WyxIWIC@angband.pl> <20211022055515.GA21767@lst.de> <CAPcyv4joX3K36ovKn2K95iDtW77jJwoAgAs5JSRMcETff=-brg@mail.gmail.com>
-In-Reply-To: <CAPcyv4joX3K36ovKn2K95iDtW77jJwoAgAs5JSRMcETff=-brg@mail.gmail.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 25 Oct 2021 18:42:51 -0700
-Message-ID: <CAPcyv4gFCRs_OJ1TutBi-tmWWS2pU_D+bqJVwCcp=7dCMkhGEw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] memremap: remove support for external pgmap refcounts
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Adam Borowski <kilobyte@angband.pl>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Linux NVDIMM <nvdimm@lists.linux.dev>,
-        Linux MM <linux-mm@kvack.org>
+References: <20211025102240.22801-1-colin.i.king@gmail.com>
+In-Reply-To: <20211025102240.22801-1-colin.i.king@gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 26 Oct 2021 10:29:35 +0800
+Message-ID: <CACGkMEv2UOaf0phkXYsV=L3fn3BCxXUj-Vx3o1MeYQhvY_B-wg@mail.gmail.com>
+Subject: Re: [PATCH][next] virtio_blk: Fix spelling mistake: "advertisted" -> "advertised"
+To:     Colin Ian King <colin.i.king@googlemail.com>
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 8:43 AM Dan Williams <dan.j.williams@intel.com> wrote:
+On Mon, Oct 25, 2021 at 6:22 PM Colin Ian King
+<colin.i.king@googlemail.com> wrote:
 >
-> On Thu, Oct 21, 2021 at 10:55 PM Christoph Hellwig <hch@lst.de> wrote:
-> >
-> > On Thu, Oct 21, 2021 at 03:40:17PM +0200, Adam Borowski wrote:
-> > > This breaks at least drivers/pci/p2pdma.c:222
-> >
-> > Indeed.  I've updated this patch, but the fix we need to urgently
-> > get into 5.15-rc is the first one only anyway.
-> >
-> > nvdimm maintainers, can you please act on it ASAP?
+> There is a spelling mistake in a dev_err error message. Fix it.
 >
-> Yes, I have been pulled in many directions this past week, but I do
-> plan to get this queued for v5.15-rc7.
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
 
-Ok, this is passing all my tests and will be pushed out to -next tonight.
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+>  drivers/block/virtio_blk.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index c336d9bb9105..9dd0099d2bd2 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -560,7 +560,7 @@ static int init_vq(struct virtio_blk *vblk)
+>         if (err)
+>                 num_vqs = 1;
+>         if (!err && !num_vqs) {
+> -               dev_err(&vdev->dev, "MQ advertisted but zero queues reported\n");
+> +               dev_err(&vdev->dev, "MQ advertised but zero queues reported\n");
+>                 return -EINVAL;
+>         }
+>
+> --
+> 2.32.0
+>
+
