@@ -2,101 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D08D7C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF458C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:19:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B295361090
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:02:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7B816109D
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:19:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236300AbhJZREb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 13:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34936 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbhJZRE0 (ORCPT
+        id S237751AbhJZRWA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 13:22:00 -0400
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:51314 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237595AbhJZRWA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 13:04:26 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD49C061745;
-        Tue, 26 Oct 2021 10:02:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rokadze8fRogRPO3TrlkJtrH8Z7jdFewFpbGPuZXCIM=; b=Qu7hbKOTAdEdBAA2y8tI88Y2/9
-        fLNwaKezOpXserGMaIVWN2jN15mgeYqvk8M/nMFdvuU5t2HO/FTeOt9d2UnO/Ggl4TZKbTQdsz+G4
-        nXL1XP7usNiHTBSnuvt5MSW3VpiWZscPz5mEn0nHDheFG/gaH7XQRVOfMfyO9X9MK1IREmP9s72mA
-        QTDix5gCEW/5udqqkrYa156daZNZ2zGDGhygkQ21zCMafu9t/D+JajvGykPFMZdU/SiIGrSpnAD0A
-        1UKOvtUSFjhuxsuXZjboMKtwJV73xZGh8YYSz/Tknj3RKEaQ8H8Afu4sGA/11uH8N2/HPJ0IdzpiW
-        RZAtoISw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mfPpV-002Yak-03; Tue, 26 Oct 2021 17:01:41 +0000
-Date:   Tue, 26 Oct 2021 10:01:40 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>,
-        Julia Lawall <julia.lawall@inria.fr>
-Cc:     Petr Mladek <pmladek@suse.com>, Miroslav Benes <mbenes@suse.cz>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YXg0dFZ+6qHw7d0g@bombadil.infradead.org>
-References: <YW3LuzaPhW96jSBK@bombadil.infradead.org>
- <YW4uwep3BCe9Vxq8@T590>
- <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
- <YW6OptglA6UykZg/@T590>
- <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
- <YW/KEsfWJMIPnz76@T590>
- <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
- <YW/q70dLyF+YudyF@T590>
- <YXfA0jfazCPDTEBw@alley>
- <YXgguuAY5iEUIV0u@T590>
+        Tue, 26 Oct 2021 13:22:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635268776;
+        bh=52xK43kRKfdluKoJGhYc3FsNA0B0U9qwYIxYqNUo/Iw=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=Y+ZTU/RWspPBQdmW8KVwKWskjBGUVY4y199yzzfSAAr0vrc2yN3u5cfK4+fi6OgCd
+         z2r/D/Bhn2z1fddQMw92AWLWnW8umxrjthG9ihGXq3cV+wq7hx6dDcGIbWaNSROabk
+         3609xkxHuyWyisXX4o7tyFQ1VlTXSqVkAxlngN6I=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 7AE9E12805D0;
+        Tue, 26 Oct 2021 13:19:36 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id xPGqYtobtT2F; Tue, 26 Oct 2021 13:19:36 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635268776;
+        bh=52xK43kRKfdluKoJGhYc3FsNA0B0U9qwYIxYqNUo/Iw=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=Y+ZTU/RWspPBQdmW8KVwKWskjBGUVY4y199yzzfSAAr0vrc2yN3u5cfK4+fi6OgCd
+         z2r/D/Bhn2z1fddQMw92AWLWnW8umxrjthG9ihGXq3cV+wq7hx6dDcGIbWaNSROabk
+         3609xkxHuyWyisXX4o7tyFQ1VlTXSqVkAxlngN6I=
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id A7A291280518;
+        Tue, 26 Oct 2021 13:19:35 -0400 (EDT)
+Message-ID: <7ed11ee1f8beca9a27c0cb2eb0dcea4dbd557961.camel@HansenPartnership.com>
+Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
+Cc:     axboe@kernel.dk, alim.akhtar@samsung.com, avri.altman@wdc.com,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Date:   Tue, 26 Oct 2021 13:19:34 -0400
+In-Reply-To: <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
+References: <20211026071204.1709318-1-hch@lst.de>
+         <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXgguuAY5iEUIV0u@T590>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 26, 2021 at 11:37:30PM +0800, Ming Lei wrote:
-> On Tue, Oct 26, 2021 at 10:48:18AM +0200, Petr Mladek wrote:
-> > Livepatch code never called kobject_del() under a lock. It would cause
-> > the obvious deadlock.
-
-Never?
-
-> > The historic code only waited in the
-> > module_exit() callback until the sysfs interface was removed.
+On Tue, 2021-10-26 at 09:36 -0700, Bart Van Assche wrote:
+> On 10/26/21 12:12 AM, Christoph Hellwig wrote:
+> > The HPB support added this merge window is fundanetally flawed as
+> > it
+>                                               ^^^^^^^^^^^^
+>                                               fundanetally ->
+> fundamentally
 > 
-> OK, then Luis shouldn't consider livepatching as one such issue to solve
-> with one generic solution.
+> Since the implementation can be reworked not to use
+> blk_insert_cloned_request() I'm not sure using the word
+> "fundamentally" is appropriate.
 
-It's not what I was told when the deadlock was found with zram, so I was
-informed quite the contrary.
+I'm not so sure about that.  The READ BUFFER implementation runs from a
+work queue and looks fine.  The WRITE BUFFER implementation is trying
+to spawn a second command to precede the queued command which is a
+fundamental problem for the block API.  It's not clear to me that the
+WRITE BUFFER can be fixed because of the tying to the sent command ...
+but like I said, the standard is proprietary so I can't look at it to
+see if there are alternative ways of achieving the same effect.
 
-I'm working on a generic coccinelle patch which hunts for actual cases
-using iteration (a feature of coccinelle for complex searches). The
-search is pretty involved, so I don't think I'll have an answer to this
-soon.
+James
 
-Since the question of how generic this deadlock is remains questionable,
-I think it makes sense to put the generic deadlock fix off the table for
-now, and we address this once we have a more concrete search with
-coccinelle.
 
-But to say we *don't* have drivers which can cause this is obviously
-wrong as well, from a cursory search so far. But let's wait and see how
-big this list actually is.
-
-I'll drop the deadlock generic fixes and move on with at least a starter
-kernfs / sysfs tests.
-
-  Luis
