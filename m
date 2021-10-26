@@ -2,118 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5A7C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 22:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B32BEC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:16:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71DF560FE8
-	for <linux-block@archiver.kernel.org>; Mon, 25 Oct 2021 22:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CB6E60F70
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 01:16:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232583AbhJYWNd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Oct 2021 18:13:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33604 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbhJYWNd (ORCPT
+        id S236126AbhJZBSo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Oct 2021 21:18:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58103 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235244AbhJZBSn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Oct 2021 18:13:33 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57791C061745;
-        Mon, 25 Oct 2021 15:11:10 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 65so10664460ljf.9;
-        Mon, 25 Oct 2021 15:11:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jnJPOeCbQXa02500VcgaQpnDnVBb4y7OeBcRepQOJq0=;
-        b=ay5psKIRkBjd/drFSzxVQXV78+YaUjt8TGBwMYrMohRTTLX5W9L4tjaAACRe+4NEY0
-         eDHHXy+O/F6xam8TZDrcfOjFjGUnX1eAzZ1pvAmlqXwW++LIQJLgXrHLVwelI4P1mIrr
-         G5cgC39ICPEpOpvOCojMZaOY8DEXqeUxZxXSETXmnzbLA5HrfxTBXnJWIpgqXMo9SqFL
-         wOY3mgFZTW4FaApb4Oih8uIRt9r6SLmCaeqAPuSkmWfNibYrDnOwxmYQdz+k8AzcAeYZ
-         6pwThrN/pDFPHh5GnINv86rwPzaVGjhdBMRlIBJ5FHRtlP7Cc45qI3pgLe8lHAe2rqOx
-         jHQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jnJPOeCbQXa02500VcgaQpnDnVBb4y7OeBcRepQOJq0=;
-        b=36Lr7QGZeCMMZJKAwgHh98CHyXrWQTedthWizJNY4hM3wO213dGIa4x8cgM2MrgMxw
-         J/f8nid4/ZMkS08k5Ra6o1tw1xlQnSwLXYXCG6OaC6M25tHor2zjOQDQiQ+xX32VWjhG
-         gSEXTyGKiGEJCQR+mUhS7NTFbXAtAFMeOYICjuH07c9FDvAIU9nr5+0wfAdWMfvNlexq
-         7iGw4bHQ/XDaypH9cZWnlvDHMX9bQWlqwPsxYdq+/s4QRTPrphW6QArgNQlk1AloKOYv
-         nCroOttAJihFiPHB3uq/AFfRFQpCsgP4nOUn0oObxvDGAoSQ857u1Vb1SsVGZpgrCpnc
-         TIJw==
-X-Gm-Message-State: AOAM530gIH5fv9P17uRJ75NiOXSFvG9pbKe4p04AgYJDPKoNz52eBOqy
-        Wx+U0437eeEEij49xsQHcNOYZNP4HK8=
-X-Google-Smtp-Source: ABdhPJzVz2+3mDSiHAbS68O8OXJLf6tYIH7yzJl3LHe2d/01jTz8Ko+MYn31pgWwaBWJYVfeIQnv3A==
-X-Received: by 2002:a2e:9801:: with SMTP id a1mr21663460ljj.183.1635199868527;
-        Mon, 25 Oct 2021 15:11:08 -0700 (PDT)
-Received: from [192.168.2.145] (46-138-41-28.dynamic.spd-mgts.ru. [46.138.41.28])
-        by smtp.googlemail.com with ESMTPSA id z13sm1833844ljk.70.2021.10.25.15.11.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 15:11:08 -0700 (PDT)
-Subject: Re: linux-next: Tree for Oct 25
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <20211025204921.73cb3011@canb.auug.org.au>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <82bbf33e-918f-da01-95e6-9b2cc1b8b610@gmail.com>
-Date:   Tue, 26 Oct 2021 01:11:07 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Mon, 25 Oct 2021 21:18:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635210980;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jfiPujvajSt/Eqv/RmBTO+98PuBtkyX6dQIgXln24os=;
+        b=BDoerQDmTPXGrcYxyFzd/g4SimMLz/RyxxzDh2bgMBiT3StW27x4jqb/b6vxJBxxf6M49z
+        NYl2DC/Oj9ly6abLaXbvmj4renr/d2Hn1OUBnZ+LDAOVpj5Q96qTPd7LZHS429vJ8YX8+Z
+        h2Bty6YrcZdZaCygyFJoa2HMWVLFbM0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-MXMeZOZmOpSKBFY7l5OBSg-1; Mon, 25 Oct 2021 21:16:18 -0400
+X-MC-Unique: MXMeZOZmOpSKBFY7l5OBSg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D21AB1006ADE
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 01:15:59 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF1E560CA1;
+        Tue, 26 Oct 2021 01:15:56 +0000 (UTC)
+Date:   Tue, 26 Oct 2021 09:15:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Bruno Goncalves <bgoncalv@redhat.com>,
+        skt-results-master@redhat.com, ming.lei@redhat.com
+Subject: Re: [bug report] WARNING: CPU: 109 PID: 739473 at
+ block/blk-stat.c:218 blk_free_queue_stats+0x3c/0x80
+Message-ID: <YXdWx2oDmKJBRsBa@T590>
+References: <CAHj4cs9w7_thDw-DN11GaoA+HH9YVAMHmrAZhi_rA24xhbTYOA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20211025204921.73cb3011@canb.auug.org.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHj4cs9w7_thDw-DN11GaoA+HH9YVAMHmrAZhi_rA24xhbTYOA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue, Oct 19, 2021 at 12:13:22PM +0800, Yi Zhang wrote:
+> Hello
+> Below WARNING was triggered with blktests block/001 on ppc64le/aarch64
+> during CKI tests, pls help check it, thanks.
+> 
+>   Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+>             Commit: b199567fe754 - Merge branch 'for-5.16/bdev-size'
+> into for-next
+> 
 
-Recent -next has this new warning splat coming from MMC, please take a look.
+Hello Yi,
 
- ------------[ cut here ]------------
- WARNING: CPU: 0 PID: 525 at kernel/sched/core.c:9477 __might_sleep+0x65/0x68
- do not call blocking ops when !TASK_RUNNING; state=2 set at [<4316eb02>] prepare_to_wait+0x2e/0xb8
- Modules linked in:
- CPU: 0 PID: 525 Comm: Xorg Tainted: G        W         5.15.0-rc6-next-20211025-00226-g89ccd6948ec3 #5
- Hardware name: NVIDIA Tegra SoC (Flattened Device Tree)
- (unwind_backtrace) from [<c01089f9>] (show_stack+0x11/0x14)
- (show_stack) from [<c0afacb9>] (dump_stack_lvl+0x2b/0x34)
- (dump_stack_lvl) from [<c011f689>] (__warn+0xa1/0xe8)
- (__warn) from [<c0af6729>] (warn_slowpath_fmt+0x65/0x7c)
- (warn_slowpath_fmt) from [<c01421b9>] (__might_sleep+0x65/0x68)
- (__might_sleep) from [<c07eb377>] (mmc_blk_rw_wait+0x2f/0x118)
- (mmc_blk_rw_wait) from [<c07eba11>] (mmc_blk_mq_issue_rq+0x219/0x71c)
- (mmc_blk_mq_issue_rq) from [<c07ec199>] (mmc_mq_queue_rq+0xf9/0x200)
- (mmc_mq_queue_rq) from [<c04ad247>] (__blk_mq_try_issue_directly+0xcb/0x100)
- (__blk_mq_try_issue_directly) from [<c04adb89>] (blk_mq_request_issue_directly+0x2d/0x48)
- (blk_mq_request_issue_directly) from [<c04adcf3>] (blk_mq_flush_plug_list+0x14f/0x1f4)
- (blk_mq_flush_plug_list) from [<c04a5313>] (blk_flush_plug+0x83/0xb8)
- (blk_flush_plug) from [<c0b013cb>] (io_schedule+0x2b/0x3c)
- (io_schedule) from [<c0b01a17>] (bit_wait_io+0xf/0x48)
- (bit_wait_io) from [<c0b01783>] (__wait_on_bit+0x3f/0x88)
- (__wait_on_bit) from [<c0b01823>] (out_of_line_wait_on_bit+0x57/0x68)
- (out_of_line_wait_on_bit) from [<c03539c1>] (ext4_read_bh+0xb1/0xb4)
- (ext4_read_bh) from [<c03146b3>] (__read_extent_tree_block+0xa7/0x134)
- (__read_extent_tree_block) from [<c031526f>] (ext4_find_extent+0x13b/0x2fc)
- (ext4_find_extent) from [<c0317da5>] (ext4_ext_map_blocks+0x4d/0x1160)
- (ext4_ext_map_blocks) from [<c03286c3>] (ext4_map_blocks+0x1bf/0x428)
- (ext4_map_blocks) from [<c03436b1>] (ext4_mpage_readpages+0x399/0x660)
- (ext4_mpage_readpages) from [<c02322d9>] (read_pages+0x51/0x18c)
- (read_pages) from [<c02324f5>] (page_cache_ra_unbounded+0xe1/0x174)
- (page_cache_ra_unbounded) from [<c02299c1>] (filemap_get_pages+0xc5/0x524)
- (filemap_get_pages) from [<c0229eff>] (filemap_read+0xdf/0x2fc)
- (filemap_read) from [<c028bae9>] (vfs_read+0x151/0x23c)
- (vfs_read) from [<c028bf4b>] (ksys_read+0x47/0x98)
- (ksys_read) from [<c01000a1>] (ret_fast_syscall+0x1/0x16)
- Exception stack(0xc593ffa8 to 0xc593fff0)
-  
+Can you try the following patch?
+
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 80943c123c3e..45143af78d90 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -589,16 +589,6 @@ void del_gendisk(struct gendisk *disk)
+ 	 * Prevent new I/O from crossing bio_queue_enter().
+ 	 */
+ 	blk_queue_start_drain(q);
+-	blk_mq_freeze_queue_wait(q);
+-
+-	rq_qos_exit(q);
+-	blk_sync_queue(q);
+-	blk_flush_integrity();
+-	/*
+-	 * Allow using passthrough request again after the queue is torn down.
+-	 */
+-	blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
+-	__blk_mq_unfreeze_queue(q, true);
+ 
+ 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+ 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+@@ -621,6 +611,18 @@ void del_gendisk(struct gendisk *disk)
+ 		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+ 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+ 	device_del(disk_to_dev(disk));
++
++	blk_mq_freeze_queue_wait(q);
++
++	rq_qos_exit(q);
++	blk_sync_queue(q);
++	blk_flush_integrity();
++	/*
++	 * Allow using passthrough request again after the queue is torn down.
++	 */
++	blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
++	__blk_mq_unfreeze_queue(q, true);
++
+ }
+ EXPORT_SYMBOL(del_gendisk);
+ 
+
+
+-- 
+Ming
+
