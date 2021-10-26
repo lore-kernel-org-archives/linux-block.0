@@ -2,109 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE6EC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7186EC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:35:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53E416103C
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:25:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 450DB61040
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 17:35:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237777AbhJZR2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 13:28:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40332 "EHLO
+        id S234735AbhJZRh3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 13:37:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237780AbhJZR15 (ORCPT
+        with ESMTP id S233382AbhJZRh2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 13:27:57 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E66C061745
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 10:25:33 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id w10so18150746ilc.13
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 10:25:33 -0700 (PDT)
+        Tue, 26 Oct 2021 13:37:28 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC41C061745
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 10:35:05 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id v1-20020a17090a088100b001a21156830bso2929851pjc.1
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 10:35:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eRyfWMKtLbbwfUe78MgpwTKyNG2DhD4qRhOw6hMcN3A=;
-        b=6jR4PITb12iW50VjhwN5AsYzKaM1pZkI7vhoOuk7YZuycenGt6jZOXKntSQ82ybm9u
-         N/bHrqh23MX6Xbb1zq1XV/AISB5S2oGkQoMa4j3WaBrCig/EaZgRUUknI9WaeBz3Y3ri
-         VNwihD+NCHntcFYCBBlJPsj+c7oLrWFI1nG7sul/68ihSStBAJ63dRmlzLd3K/JXjalV
-         G80qv3xKqEDnQs6L3a6Z9xEYi0a4PjC2uliRki6LTViBDM1It97emYni3JZ31+Oe7c0L
-         SUo+0NyVf5G00prYJPUskySyQHmaCuzPuqVLCGUza3yxmq4VHC04mjhqSi79ysXuKrOe
-         M5RA==
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=of5GtbZqbhHVx+dOWsGvvpEIVNxdSQaBpNzwnrsb+Ao=;
+        b=xCUtyySmV659y3OQ1UzoNs5pioWuKK9jNxl066g2uPoS+5a36qt0I6esU+8lXztjOw
+         aPgxdD6Zi/w+lTehbGFiG6M3KnBDLuoFEU4hp28ZMqaKQgaLya9aZ3DyqGDFsUY4wtwd
+         TcFd/Kjgv4/Tj2FoGzikncy4F4GaqvubgASmrqRv/pGVEzDLETqSUSIKO9ZYSLvTcxkY
+         QkWQzNIISK8tdBbgcX/bgdZoGcLoc5t+jXRhakbvYX+bX+L+BBKxnLqiaMZRMgB3NPoH
+         BcVp4vUJxyrvS7vsBSi5gxCQpjcXNLzDLawGM7MaEi+hFcVWiJfp6cRjhLHTaxrXY6ux
+         x18Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eRyfWMKtLbbwfUe78MgpwTKyNG2DhD4qRhOw6hMcN3A=;
-        b=FVtl5807LfdfyesLS+bpAPQtd9a9Eo/ev3YKhXwF0aQKANZnFOBdGDHUXP6r9HzMn9
-         CmB8ZU6hp407N7n+TlG3qSs5KnBmtd7hgFCrrgH3+PSP81xCE9bYLe/frjGR/c2xCxAb
-         xpoRpAvivwO51sMyhe4LXc38oF9/Mb3ufXm64Z9zyiOmoiFHtXvzDgUX5GmjmNT5bPKF
-         0ccKEvP+Dqn32p2DJDOOzgjlXJAJunF/Y2TyZ+s5MMHrDVwLkS8Vtl4IFm8P4Gi2qqEb
-         ltd9esEVGvSHrAK5QtF9vGL2Fpn7mLJIEd+v9xd+69XVknzQBHN0m+SeL7w6N29WLPRx
-         Kdvg==
-X-Gm-Message-State: AOAM532Lgse9dk3MenKtGtu2EleGS1EkSOlEKwAv6c+MRHdet+lxi4VL
-        zDMZplMoW1KQZwDhzTpIBoS6ex5FwUQbew==
-X-Google-Smtp-Source: ABdhPJysundZiuH9mj4mrKaC9yQ7XDwTmT9Ji3/Q7aROlf90iW2iA+Fsqc4h7GsO1a1/+gcAYeqynw==
-X-Received: by 2002:a05:6e02:10c7:: with SMTP id s7mr15851132ilj.172.1635269132859;
-        Tue, 26 Oct 2021 10:25:32 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id 81sm10218112iou.21.2021.10.26.10.25.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Oct 2021 10:25:32 -0700 (PDT)
-Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
-Cc:     alim.akhtar@samsung.com, avri.altman@wdc.com,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20211026071204.1709318-1-hch@lst.de>
- <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
- <7ed11ee1f8beca9a27c0cb2eb0dcea4dbd557961.camel@HansenPartnership.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <870e986c-08dd-2fa2-a593-0f97e10d6df5@kernel.dk>
-Date:   Tue, 26 Oct 2021 11:25:31 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=of5GtbZqbhHVx+dOWsGvvpEIVNxdSQaBpNzwnrsb+Ao=;
+        b=iwh2ky3XHZd99p0VwKjfGfqnTorbutnuSwQTZzzMkJm7ef3PzR9PFW8IcO90jUlP8p
+         9SMtgVH6yyZzDU3c9i0CeLZrMMqubf5SbomJwuUsHj3xRUFGwsVeoKZQ5+u4pPYdZlWf
+         hkpT1d1rAWxrZoc75NWM1hwY5JtjuE/KrSuZwJYj9gNPDXwZSmYFLm/dQkVYOiSFQj55
+         HR7O0qjBx4w+EXHylAk6z52Ad7TPATynEAfLdREX21CEvmanaEDFF+TLUKYALEy28PWO
+         uYnYJZdFmoZYOxA2sRX8g8sXZkRZ3gi1GrZcYOt6pZ/NBVwMi5hUfjdqpicVCM85koLR
+         R8Bw==
+X-Gm-Message-State: AOAM532ktKOugVMTl06DWSL6xNro2vDOposk99EpG6SDu82DnhQ6goYL
+        43vTQXUrAv+42gGoRMsUGo9r79OMejYXS8HbusHkWi/rog8=
+X-Google-Smtp-Source: ABdhPJz6b1TQqXnVPsNW0kwH4xwJkTCzWqY09iZhEhC7plTMGhoiQ7DXEfRBokhKtNXhaHwO5xhksNz/0m/FDjsjodY=
+X-Received: by 2002:a17:902:8a97:b0:13e:6e77:af59 with SMTP id
+ p23-20020a1709028a9700b0013e6e77af59mr23361883plo.4.1635269704573; Tue, 26
+ Oct 2021 10:35:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7ed11ee1f8beca9a27c0cb2eb0dcea4dbd557961.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20211019073641.2323410-1-hch@lst.de> <20211019073641.2323410-3-hch@lst.de>
+ <YXFtwcAC0WyxIWIC@angband.pl> <20211022055515.GA21767@lst.de>
+ <CAPcyv4joX3K36ovKn2K95iDtW77jJwoAgAs5JSRMcETff=-brg@mail.gmail.com>
+ <CAPcyv4gFCRs_OJ1TutBi-tmWWS2pU_D+bqJVwCcp=7dCMkhGEw@mail.gmail.com> <20211026055352.GA30117@lst.de>
+In-Reply-To: <20211026055352.GA30117@lst.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Tue, 26 Oct 2021 10:34:53 -0700
+Message-ID: <CAPcyv4iuE6xErQJm+eBodsoVWvJdxRAK7k3KcPrzuVjV49CDgQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] memremap: remove support for external pgmap refcounts
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Adam Borowski <kilobyte@angband.pl>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
+        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>,
+        Linux MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/26/21 11:19 AM, James Bottomley wrote:
-> On Tue, 2021-10-26 at 09:36 -0700, Bart Van Assche wrote:
->> On 10/26/21 12:12 AM, Christoph Hellwig wrote:
->>> The HPB support added this merge window is fundanetally flawed as
->>> it
->>                                               ^^^^^^^^^^^^
->>                                               fundanetally ->
->> fundamentally
->>
->> Since the implementation can be reworked not to use
->> blk_insert_cloned_request() I'm not sure using the word
->> "fundamentally" is appropriate.
-> 
-> I'm not so sure about that.  The READ BUFFER implementation runs from a
-> work queue and looks fine.  The WRITE BUFFER implementation is trying
-> to spawn a second command to precede the queued command which is a
-> fundamental problem for the block API.  It's not clear to me that the
-> WRITE BUFFER can be fixed because of the tying to the sent command ...
-> but like I said, the standard is proprietary so I can't look at it to
-> see if there are alternative ways of achieving the same effect.
+On Mon, Oct 25, 2021 at 10:54 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Mon, Oct 25, 2021 at 06:42:51PM -0700, Dan Williams wrote:
+> > On Fri, Oct 22, 2021 at 8:43 AM Dan Williams <dan.j.williams@intel.com> wrote:
+> > >
+> > > On Thu, Oct 21, 2021 at 10:55 PM Christoph Hellwig <hch@lst.de> wrote:
+> > > >
+> > > > On Thu, Oct 21, 2021 at 03:40:17PM +0200, Adam Borowski wrote:
+> > > > > This breaks at least drivers/pci/p2pdma.c:222
+> > > >
+> > > > Indeed.  I've updated this patch, but the fix we need to urgently
+> > > > get into 5.15-rc is the first one only anyway.
+> > > >
+> > > > nvdimm maintainers, can you please act on it ASAP?
+> > >
+> > > Yes, I have been pulled in many directions this past week, but I do
+> > > plan to get this queued for v5.15-rc7.
+> >
+> > Ok, this is passing all my tests and will be pushed out to -next tonight.
+>
+> FYI, patch 2 needs a trivial compile fix for the p2p case.  But I suspect
+> given how late in the cycle we are you're only picking up patch 1 anyway.
 
-Is there a model in which this can actually work? If not, or if we
-aren't sure, I think we'd be better off just reverting the parts
-involved with that block layer misuse. Simply marking it broken is a
-half measure that doesn't really solve anything (except send a message).
-
-IMHO, it should be reverted and the clone usage we currently export be
-moved into dm for now. That'll prevent further abuse of this in the
-future.
-
--- 
-Jens Axboe
-
+Yeah, patch1 I'll push for v5.15-final and patch2 for v5.16-rc1. Send
+me that fixed up patch and I'll queue it up.
