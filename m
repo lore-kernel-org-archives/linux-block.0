@@ -2,111 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D831C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 10:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB445C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 13:04:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03A8A60295
-	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 10:12:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD25260F6F
+	for <linux-block@archiver.kernel.org>; Tue, 26 Oct 2021 13:04:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234520AbhJZKPC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 06:15:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42504 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234341AbhJZKPB (ORCPT
+        id S236130AbhJZNGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 09:06:43 -0400
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:51254 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236129AbhJZNGn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 06:15:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635243158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=MUWeAnkmCXxskoYpNhqSlCYbD0/gmEs3noUV5WuWzjE=;
-        b=g3W1X0jRjb1ky838MI4GsvRpXnXK+W3cD8xuPdjYjXLFV8Y06ZQXOgZ6kmbJmzpmosU4BO
-        kKVmNu6Z+MyHLKzGGzc3qL0DUvITZ6chXpgFMW6umg3c/8kZVkf2cTXy6hGLBtUxRlFFg5
-        s7aqq9VZi0I6Iqqp4EPnsb7dwNZwgmc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-JJbJ0wL9PKqLZr8yehxJlg-1; Tue, 26 Oct 2021 06:12:36 -0400
-X-MC-Unique: JJbJ0wL9PKqLZr8yehxJlg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 26 Oct 2021 09:06:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635253459;
+        bh=VNpiwuvlu3wcbtCV3obWrd1KExtIuUa1np0HXZKsSbo=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=LCCCLK7Y2sQIDHsKyUGC/35Ajst1wXD/4mLKAJNo9jb6Qg2CS9AwaB3m3GaCEW8NK
+         q05VbeQ/vA4zH1LHkj8bnrUViZMqj/bmg6g/oJyZlpyV67bwa+hQcqP1tlIE/XpbqC
+         UR/mtBtK8fPtmO4kUGhkPbZ1ldDGkZy9XTzk8Tnc=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 3F1DF128049B;
+        Tue, 26 Oct 2021 09:04:19 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id BvZh_1pq-bvr; Tue, 26 Oct 2021 09:04:19 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635253459;
+        bh=VNpiwuvlu3wcbtCV3obWrd1KExtIuUa1np0HXZKsSbo=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=LCCCLK7Y2sQIDHsKyUGC/35Ajst1wXD/4mLKAJNo9jb6Qg2CS9AwaB3m3GaCEW8NK
+         q05VbeQ/vA4zH1LHkj8bnrUViZMqj/bmg6g/oJyZlpyV67bwa+hQcqP1tlIE/XpbqC
+         UR/mtBtK8fPtmO4kUGhkPbZ1ldDGkZy9XTzk8Tnc=
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 892BC18414A2;
-        Tue, 26 Oct 2021 10:12:35 +0000 (UTC)
-Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6A515D6BA;
-        Tue, 26 Oct 2021 10:12:22 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH] block: drain queue after disk is removed from sysfs
-Date:   Tue, 26 Oct 2021 18:12:04 +0800
-Message-Id: <20211026101204.2897166-1-ming.lei@redhat.com>
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 64A60128045F;
+        Tue, 26 Oct 2021 09:04:18 -0400 (EDT)
+Message-ID: <0ea55be8c300f098b17e21d185a49e24b81b9c2b.camel@HansenPartnership.com>
+Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com
+Cc:     axboe@kernel.dk, alim.akhtar@samsung.com, avri.altman@wdc.com,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Date:   Tue, 26 Oct 2021 09:04:16 -0400
+In-Reply-To: <3088804d-16f0-8f19-590e-8651bb5ef949@opensource.wdc.com>
+References: <20211026071204.1709318-1-hch@lst.de>
+         <3088804d-16f0-8f19-590e-8651bb5ef949@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before removing disk from sysfs, userspace still may change queue via
-sysfs, such as switching elevator or setting wbt latency, both may
-reinitialize wbt, then the warning in blk_free_queue_stats() will be
-triggered since rq_qos_exit() is moved to del_gendisk().
+On Tue, 2021-10-26 at 16:24 +0900, Damien Le Moal wrote:
+> On 2021/10/26 16:12, Christoph Hellwig wrote:
+> > The HPB support added this merge window is fundanetally
 
-Fixes the issue by moving draining queue & tearing down after disk is
-removed from sysfs, at that time no one can come into queue's
-store()/show().
+And s/n/m/ while you're at it: fundamentally
 
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
-Fixes: 8e141f9eb803 ("block: drain file system I/O on del_gendisk")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/genhd.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+Otherwise:
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 64f83c4aee99..2052aeffa39b 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -589,16 +589,6 @@ void del_gendisk(struct gendisk *disk)
- 	 * Prevent new I/O from crossing bio_queue_enter().
- 	 */
- 	blk_queue_start_drain(q);
--	blk_mq_freeze_queue_wait(q);
--
--	rq_qos_exit(q);
--	blk_sync_queue(q);
--	blk_flush_integrity();
--	/*
--	 * Allow using passthrough request again after the queue is torn down.
--	 */
--	blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
--	__blk_mq_unfreeze_queue(q, true);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
-@@ -621,6 +611,18 @@ void del_gendisk(struct gendisk *disk)
- 		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
- 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
- 	device_del(disk_to_dev(disk));
-+
-+	blk_mq_freeze_queue_wait(q);
-+
-+	rq_qos_exit(q);
-+	blk_sync_queue(q);
-+	blk_flush_integrity();
-+	/*
-+	 * Allow using passthrough request again after the queue is torn down.
-+	 */
-+	blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
-+	__blk_mq_unfreeze_queue(q, true);
-+
- }
- EXPORT_SYMBOL(del_gendisk);
- 
--- 
-2.31.1
+Reviewed-by: James E.J. Bottomley <jejb@linux.ibm.com>
+
+James
+
+> >  flawed as it uses blk_insert_cloned_request to insert a cloned
+> > request onto the same queue as the one that the original request
+> > came from, leading to all kinds of issues in blk-mq accounting (in
+> > addition to this API being a special case for dm-mpath that should
+> > not see other users).
+> > 
+> > Mark is as BROKEN as the non-intrusive alternative to a last minute
+> 
+> s/Mark is/Mark it
+> 
+> > large scale revert.
+> > 
+> > Fixes: f02bc9754a68 ("scsi: ufs: ufshpb: Introduce Host Performance
+> > Buffer
+> > feature")
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  drivers/scsi/ufs/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/scsi/ufs/Kconfig b/drivers/scsi/ufs/Kconfig
+> > index 432df76e6318a..7835d9082aae4 100644
+> > --- a/drivers/scsi/ufs/Kconfig
+> > +++ b/drivers/scsi/ufs/Kconfig
+> > @@ -186,7 +186,7 @@ config SCSI_UFS_CRYPTO
+> >  
+> >  config SCSI_UFS_HPB
+> >  	bool "Support UFS Host Performance Booster"
+> > -	depends on SCSI_UFSHCD
+> > +	depends on SCSI_UFSHCD && BROKEN
+> >  	help
+> >  	  The UFS HPB feature improves random read performance. It
+> > caches
+> >  	  L2P (logical to physical) map of UFS to host DRAM. The driver
+> > uses HPB
+> > 
+> 
+> Otherwise, looks good to me.
+> 
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> 
+
 
