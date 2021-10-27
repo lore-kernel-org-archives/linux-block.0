@@ -2,102 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0191AC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 12:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA63C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 12:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEAA8610A4
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 12:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5F5161052
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 12:58:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241844AbhJ0MYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Oct 2021 08:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42570 "EHLO
+        id S235988AbhJ0NAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Oct 2021 09:00:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241846AbhJ0MYC (ORCPT
+        with ESMTP id S235978AbhJ0NAj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Oct 2021 08:24:02 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E99C061745
-        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 05:21:37 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id b194-20020a1c1bcb000000b0032cd7b47853so1048086wmb.5
-        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 05:21:37 -0700 (PDT)
+        Wed, 27 Oct 2021 09:00:39 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6472CC061570
+        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 05:58:14 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id l7so2811514iln.8
+        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 05:58:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=baeDNJqUEMF5KJZcKkua2oxmhlA7b2HKEDmgofMMaIM=;
-        b=bth39+snAD/GmR9yoPqP4F3fXDWBqoKWAlSRbtcNsfQypa84DkK9KyQlzw1OUFGe+k
-         m5K4wuW/X69N7k8xpgMs1tkisssvVHBM0oFDfbTyaFvzor+c3lYhk8+olJlPNjEAYPAf
-         sR4id8Eq47g6UN+jCf7lO3EsmwktodNdqO9IqyRcg57b3XjYqOb1XA6SmRn/lVhUzrmI
-         U0LAc95nxHrMBEHyRWr2PoHEh5qyHjJxL2gJS5v5SZvHLvMsQFJm15RIN9/Ziu3q9or1
-         ZNQibjsW/Weoau+myXj0hQLjFzX1JtzYbcFhtONVM7JeoPAjD55EGRRPYwPE0bGKc9Rn
-         O7TQ==
+        bh=OAfWmTaRe7pHC3CPK7jHu1Q8nkOk9ofq4JEqSWOqlWU=;
+        b=Nw8pR8eAjmZXk9/Wy1RCa/7DpxHQO0isSnErnvdwFrRa2JNbbH/WRI1by/8ephB1Gf
+         YnZUE2wPfiOk3lGIeq4pRkhkNRV58O3w1tIujFMKC16oXm1KgO86qAhXg/eyoqSe9m9i
+         hsriwoUsoFHzJWj/bA2towwtK0PiLrnuJ2lZccQpuAOfA/RBmsL0DaNOhBj2Yp9wcKaA
+         Bf1wFkfBGmTYmOc0S/8ucVTVi9exPX+bfZQBby0TmHkMQa/voQ2wRjopqh/essDZkYtE
+         CwW/hHfpepg2s6SK3Pig16B6a7Q+azCO9Tnj7+l9I/X681XK4pdqntQeHd5RfnqcOqIn
+         8KQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=baeDNJqUEMF5KJZcKkua2oxmhlA7b2HKEDmgofMMaIM=;
-        b=r3A5UR3O1ncSQSOGz/HKpmL3XK9UtKxHFk5L3Wv2bJU646I6tkLc9KI/1AF1bWDOPP
-         fbLfH7HSrUkr6lwSW0Gs24pXlsSBlWU8jMExgBoiz0JHd7xO6trZ9GGQVxSRiYK6NO3Y
-         gF28YEj0t9TKa3hCZr/Ojqj3lU/CUgFGG5pPGPso4sh+Sc1w0zSXDfCikFTLbAABckLg
-         OLMmz2dBo5doDYARhpcUavMp3YwFDv/b+ECEMd272iOmWlulbsBMK29fxWcEFomP/sim
-         2QLXN72ZkgKAVYkAirf4StulkgdSG4S7gFw4ds5qMsqzLGL1vwVIQxPI+Wf7an/V8YqW
-         qIZA==
-X-Gm-Message-State: AOAM5313uEDiqaV8uuHqamd041DKQU9Q8a9oxVR2G923H4q+VLfUaLZA
-        BwnKbIsLpv6pe+YdGWUjJS3nJl3IdRY=
-X-Google-Smtp-Source: ABdhPJz/gm7PC31LP3/ZNiPmmpHp4pDEAGKld6urmybxe6d2o1D3t2wAn4d9/Bu7ygTAI/ODM48Xwg==
-X-Received: by 2002:a1c:e90a:: with SMTP id q10mr5491753wmc.108.1635337295740;
-        Wed, 27 Oct 2021 05:21:35 -0700 (PDT)
-Received: from 127.0.0.1localhost ([148.252.132.100])
-        by smtp.gmail.com with ESMTPSA id d8sm22738807wrv.80.2021.10.27.05.21.34
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=OAfWmTaRe7pHC3CPK7jHu1Q8nkOk9ofq4JEqSWOqlWU=;
+        b=yfUVTNkW+Q/cytBA+cVnaVXN+siYFbONoHgau2OMum7QLiIRUPA3NPNy1Pm7ifP5S1
+         yAHWggCcBz0/JXJfs3j7Fs+RKfKH/EUIRPo7XTN5IdUpMcZHEaGbVGAveuLhtPk5X+cE
+         9n2QC0roQ+yxswSiqgY9QtIc295Kzk1DBct1x3x3rqswUcAn+F+L/anrhxcWqPBMQqsw
+         BxRxzK4rd02Zyy70whLsC8gujWc9uou6Y30J+CRrkF27nCBKBAQNUmDFVPQbCPuFWX7l
+         cwjC7j7fQKK20xUPpUai6oRrl8F7RbuaRQ+nYptMgS+wZHIgBpMmarMNZxqD5X+ZabzY
+         k7xA==
+X-Gm-Message-State: AOAM53280zsuI/HV/A2b0qalFJGj2mJr9dVBO08fQt5slEH9TFLFT8yg
+        /AHS2+BSCpid4FqwdWr2aNsILyyWBE4JGg==
+X-Google-Smtp-Source: ABdhPJx98fLoa3a8Vzk5HS/NXtf+T2yWik5oX5SEM1utMMEzq1hKLilyta1uFAbLUtgjsZma8hA6CA==
+X-Received: by 2002:a05:6e02:1a86:: with SMTP id k6mr19228229ilv.192.1635339493629;
+        Wed, 27 Oct 2021 05:58:13 -0700 (PDT)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id z26sm11439326ioe.9.2021.10.27.05.58.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 05:21:35 -0700 (PDT)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH v2 4/4] block: add async version of bio_set_polled
-Date:   Wed, 27 Oct 2021 13:21:10 +0100
-Message-Id: <8fa137885164a5d05fadcff4c3521da8d5a83d00.1635337135.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <cover.1635337135.git.asml.silence@gmail.com>
-References: <cover.1635337135.git.asml.silence@gmail.com>
+        Wed, 27 Oct 2021 05:58:13 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20211026060115.753746-1-shinichiro.kawasaki@wdc.com>
+References: <20211026060115.753746-1-shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH v2] block: Fix partition check for host-aware zoned block devices
+Message-Id: <163533949070.284890.10151015414486229996.b4-ty@kernel.dk>
+Date:   Wed, 27 Oct 2021 06:58:10 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we know that a iocb is async we can optimise bio_set_polled() a bit,
-add a new helper bio_set_polled_async().
+On Tue, 26 Oct 2021 15:01:15 +0900, Shin'ichiro Kawasaki wrote:
+> Commit a33df75c6328 ("block: use an xarray for disk->part_tbl") modified
+> the method to check partition existence in host-aware zoned block
+> devices from disk_has_partitions() helper function call to empty check
+> of xarray disk->part_tbl. However, disk->part_tbl always has single
+> entry for disk->part0 and never becomes empty. This resulted in the
+> host-aware zoned devices always judged to have partitions, and it made
+> the sysfs queue/zoned attribute to be "none" instead of "host-aware"
+> regardless of partition existence in the devices.
+> 
+> [...]
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/fops.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Applied, thanks!
 
-diff --git a/block/fops.c b/block/fops.c
-index 8594852bd344..a2f492e50782 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -358,14 +358,13 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		task_io_account_write(bio->bi_iter.bi_size);
- 	}
- 
--	if (iocb->ki_flags & IOCB_NOWAIT)
--		bio->bi_opf |= REQ_NOWAIT;
--
- 	if (iocb->ki_flags & IOCB_HIPRI) {
--		bio_set_polled(bio, iocb);
-+		bio->bi_opf |= REQ_POLLED | REQ_NOWAIT;
- 		submit_bio(bio);
- 		WRITE_ONCE(iocb->private, bio);
- 	} else {
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			bio->bi_opf |= REQ_NOWAIT;
- 		submit_bio(bio);
- 	}
- 	return -EIOCBQUEUED;
+[1/1] block: Fix partition check for host-aware zoned block devices
+      commit: e0c60d0102a5ad3475401e1a2faa3d3623eefce4
+
+Best regards,
 -- 
-2.33.1
+Jens Axboe
+
 
