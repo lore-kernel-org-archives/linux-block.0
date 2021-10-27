@@ -2,162 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3BFC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE8BC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:36:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1DC56023F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B051760232
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:36:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235152AbhJ0C2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 22:28:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45931 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234704AbhJ0C2Y (ORCPT
+        id S236807AbhJ0Ci3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 22:38:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232502AbhJ0Ci2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 22:28:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635301559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6GFlJ/1yKhFUIfKvLc15dlLwuXZ5oRP74dAa8t2k6+Q=;
-        b=R+gAe9p6547UrvTjrpYawCdKt3s9sNESv60eB2IY6BQVnE5s9+2g5e5jM6cACHm/lg9vI3
-        6ZeEgqO9iYzNWPB2TTJ0NEGI4PQZf/WQujEZEMRXcT0LI8hOjxxRyWAfJ9dBCTguqdSako
-        VvkugYg76sNdqnr7CF1OOhrmflmn0Fo=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-BWpoDePcO8-jFm8xG1CUKg-1; Tue, 26 Oct 2021 22:25:57 -0400
-X-MC-Unique: BWpoDePcO8-jFm8xG1CUKg-1
-Received: by mail-lf1-f71.google.com with SMTP id k15-20020a0565123d8f00b003ffb31e2ea9so633399lfv.17
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:25:57 -0700 (PDT)
+        Tue, 26 Oct 2021 22:38:28 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B249C061570
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:36:04 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id i14so1769436ioa.13
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:36:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rBbyfwAA1XAbf3WeQ5smM9kbfwrjNTyxKkIdng8HT9Y=;
+        b=vJzRhOZ9fLujLSobp74paNSqSjQKV1HMPhAiJLDFYWwWaDFrTAQxuD6S3NUkaUK6Fm
+         MIfK1hAAbvgf0o8MA2h+E4NNyGZxeogQY4S22GluvPsFoj/QRGyGbCo+w+7JM5rhscp5
+         c0ugqQXz4DtaWEJdHz3X7Ctv3RmjFDlJ7Sf4GzXWvqe2ToFMr643m9/O0gzSS5r7501V
+         s7iIfefFwNQpZp2VqqtFXk2kKj8rLS5TEcQTFQsFIsZ3hUwnoJRe0Ralb5BQb18jeAnR
+         reDMP33A0owJDHG1kqgpWIJrh2JwS7VNjHkZuPcvA6xxoyVr9FtMk+Be0xqYialVxC6q
+         FCqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6GFlJ/1yKhFUIfKvLc15dlLwuXZ5oRP74dAa8t2k6+Q=;
-        b=NediIu5F1VDlN1ZQYncElhHTqEwH9RoQonry9fwIS8WDJeWMwuDOjT8ryHrZgp6xES
-         hexBF2+Tt4GxZ7I/mj/26Un7XPY70xdkKxBMM18s/mwpAVRZ7gkrCifBmGcF67z945E9
-         BxJ5TBAiagStCi1HvmAO4LllwvZqxa/uGthGYtXfsaT6cp54hga4jSH4YD4CZ520kb4S
-         SqjjV+V0VHQuZnQzAp41M/oaz3v22r1pa3dgv9zw8tZI05/wIZx2Ydm/F5fgv4iN0Jwg
-         55CoehhaWbcRsrls8XHHkM6ZGaV7MshT+gBVxUwWsXog6u+tSG4yL/SH41Hxiiz4HmoH
-         HFHw==
-X-Gm-Message-State: AOAM532K+JgA1NC9DWeDGCWEe/hxsBXCpF7BOmpWxxUTH8FdqCua2PUR
-        21E+498sQh0uJIw/F4bJpPXy0eAmdsVUQZrpD6LPh6CJpM0eF36K9DWE0EeviMnMw1Y83DmmrQT
-        apHifrTfy9UebaKEs+f/8Ch7sSfDZc7BM+6Jz+2A=
-X-Received: by 2002:a2e:9bd0:: with SMTP id w16mr30330446ljj.390.1635301556302;
-        Tue, 26 Oct 2021 19:25:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyQdnnd/xWCIZeeT9sZ/haOAoAxaIqIaaCuSXpSmlcCRhwKiVY87HUDouxpPgrTwnPJdBUj/W/7upQh+L04WTI=
-X-Received: by 2002:a2e:9bd0:: with SMTP id w16mr30330429ljj.390.1635301556076;
- Tue, 26 Oct 2021 19:25:56 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rBbyfwAA1XAbf3WeQ5smM9kbfwrjNTyxKkIdng8HT9Y=;
+        b=b6G5CRx6YaLmM94Lir6E6nEYm2JVEr2Rm5ItCqRNcRJ9GlENWlD1IktDZ64lbOdhLp
+         b/+gAz6lb3nEllXgRJsq1onl0MOW3TXcXYl8k2m2XdVuvK7G5V+kZNlnzh6ulLRnkJgx
+         kLBVsVM+uQAq8/HSSpcJNHtv6UShsV6yeA60U9bu7ArzkCmSdSuUCzTODmtcBStMd4B7
+         ItEDxgkeNUSrBATeRWeX2+KM6BH7tHioq0EspB5uQ+mgq/9Qon7f9KeZAlO0mY+Gg9y8
+         FRaT9vMg9PNDEig/zPzb8USODqAEsheCP/ltISm1iBGcDZ8cxovD1suwX3Fkzsjk6lFD
+         7xuA==
+X-Gm-Message-State: AOAM532dFQEuTOn5dJizQKw2V9QXxf0OxB1IElwaSj5LPM7PvoEFLK/h
+        yH7obu0ahjfMdfiBfdHI8Crew6gPDlBxwg==
+X-Google-Smtp-Source: ABdhPJwdIu7jiSIbCj0s8s2gh1tNpz+wEU3tdkATO3cGG8TGLClU7M9VwulX5QxsBe7byDDFE1T3FA==
+X-Received: by 2002:a05:6602:2b06:: with SMTP id p6mr18221430iov.17.1635302163774;
+        Tue, 26 Oct 2021 19:36:03 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id y20sm9201208ilq.74.2021.10.26.19.36.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Oct 2021 19:36:03 -0700 (PDT)
+Subject: Re: [PATCH 2/2] block: attempt direct issue of plug list
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     linux-block@vger.kernel.org, hch@lst.de
+References: <20211019120834.595160-1-axboe@kernel.dk>
+ <20211019120834.595160-3-axboe@kernel.dk>
+ <20211027011347.GA3111117@roeck-us.net>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8e0583e5-8c34-336b-9f46-0586f4db9c5f@kernel.dk>
+Date:   Tue, 26 Oct 2021 20:36:01 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210806142914.70556-1-pkalever@redhat.com> <20210806142914.70556-3-pkalever@redhat.com>
- <YUL/DGZiUnQQGHVX@T590>
-In-Reply-To: <YUL/DGZiUnQQGHVX@T590>
-From:   Prasanna Kalever <pkalever@redhat.com>
-Date:   Wed, 27 Oct 2021 07:55:44 +0530
-Message-ID: <CANwsLLG0WuD4ZGZv_DX3AZtQMrHX1Az-aNvFY0DK6R+UxVwu8w@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] nbd: reset the queue/io_timeout to default on disconnect
-To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Cc:     Ilya Dryomov <idryomov@redhat.com>, Xiubo Li <xiubli@redhat.com>,
-        Prasanna Kumar Kalever <prasanna.kalever@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20211027011347.GA3111117@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 16, 2021 at 1:53 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Fri, Aug 06, 2021 at 07:59:14PM +0530, pkalever@redhat.com wrote:
-> > From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-> >
-> > Without any changes to NBD_ATTR_TIMEOUT (default is 30 secs),
-> > $ rbd-nbd map rbd-pool/image0 --try-netlink
-> > /dev/nbd0
-> > $ cat /sys/block/nbd0/queue/io_timeout
-> > 30000
-> > $ rbd-nbd unmap /dev/nbd0
-> > $ cat /sys/block/nbd0/queue/io_timeout
-> > 30000
-> >
-> > Now user sets NBD_ATTR_TIMEOUT to 60,
-> > $ rbd-nbd map rbd-pool/image0 --try-netlink --io-timeout 60
-> > /dev/nbd0
-> > $ cat /sys/block/nbd0/queue/io_timeout
-> > 60000
-> > $ rbd-nbd unmap /dev/nbd0
-> > $ cat /sys/block/nbd0/queue/io_timeout
-> > 60000
-> >
-> > Now user doesn't alter NBD_ATTR_TIMEOUT, but sysfs still shows it as 60,
-> > $ rbd-nbd map rbd-pool/image0 --try-netlink
-> > /dev/nbd0
-> > $ cat /sys/block/nbd0/queue/io_timeout
-> > 60000
-> > $ rbd-nbd unmap /dev/nbd0
-> > $ cat /sys/block/nbd0/queue/io_timeout
-> > 60000
-> >
-> > The problem exists with ioctl interface too.
-> >
-> > Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-> > ---
-> >  drivers/block/nbd.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > index 16a1a14b1fd1..a45aabc4914b 100644
-> > --- a/drivers/block/nbd.c
-> > +++ b/drivers/block/nbd.c
-> > @@ -158,6 +158,7 @@ static void nbd_connect_reply(struct genl_info *info, int index);
-> >  static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info);
-> >  static void nbd_dead_link_work(struct work_struct *work);
-> >  static void nbd_disconnect_and_put(struct nbd_device *nbd);
-> > +static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout);
-> >
-> >  static inline struct device *nbd_to_dev(struct nbd_device *nbd)
-> >  {
-> > @@ -1250,7 +1251,7 @@ static void nbd_config_put(struct nbd_device *nbd)
-> >                       destroy_workqueue(nbd->recv_workq);
-> >               nbd->recv_workq = NULL;
-> >
-> > -             nbd->tag_set.timeout = 0;
-> > +             nbd_set_cmd_timeout(nbd, 0);
-> >               nbd->disk->queue->limits.discard_granularity = 0;
-> >               nbd->disk->queue->limits.discard_alignment = 0;
-> >               blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
-> > @@ -2124,6 +2125,10 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
-> >       if (ret)
-> >               goto out;
-> >
-> > +     /*
-> > +      * On reconfigure, if NBD_ATTR_TIMEOUT is not provided, we will
-> > +      * continue to use the cmd timeout provided with connect initially.
-> > +      */
-> >       if (info->attrs[NBD_ATTR_TIMEOUT])
-> >               nbd_set_cmd_timeout(nbd,
-> >                                   nla_get_u64(info->attrs[NBD_ATTR_TIMEOUT]));
-> > --
-> > 2.31.1
-> >
->
-> Looks fine:
->
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+On 10/26/21 7:13 PM, Guenter Roeck wrote:
+> Hi,
+> 
+> On Tue, Oct 19, 2021 at 06:08:34AM -0600, Jens Axboe wrote:
+>> If we have just one queue type in the plug list, then we can extend our
+>> direct issue to cover a full plug list as well.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> This patch results in a number of warning tracebacks in linux-next.
+> Reverting it fixes the problem. Example tracebacks and bisect result
+> attached.
 
-Thanks for the review Ming.
-Attempting to bring this to the top again for more reviews/acks.
+See other replies in this thread, it's fixed in the curren tree.
 
-
-Thanks!
---
-Prasanna
-
-
->
-> --
-> Ming
->
+-- 
+Jens Axboe
 
