@@ -2,107 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76BD6C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 14:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC435C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 14:38:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 547AE60F6F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 14:28:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB9C760F56
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 14:38:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242562AbhJ0Oae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Oct 2021 10:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
+        id S238845AbhJ0OlH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Oct 2021 10:41:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242556AbhJ0Oad (ORCPT
+        with ESMTP id S238805AbhJ0OlG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Oct 2021 10:30:33 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A83BC061570;
-        Wed, 27 Oct 2021 07:28:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1KiXvZSEv7u0TMNxDkm/8GeTyuUOS2eLIKnX1ZpOfDU=; b=raBwmGRGud2Nulo6ceSvmmFwxW
-        765wjTHu35TF/PK97lqZlBigzDF0BesGgPJBxXHTFPhVHqwVMCxbbpc/axD2wxN5QkGHRlFfWe75u
-        Vi/uDG6hPXh3o69NhQEd3aNW62Hpb5ovqPBifM+Alunt1AcfBZSDhGaba0wsKfa68ttzsuT0sOlZS
-        D9YmborK2KVSDHFIAGXBMSAUTk5axrvJvSTdhseh9MXkOzRSr25d/LCUOQw7WpoP5AGd0fvxrig4u
-        Ub2+MYpgmXtvQySsHJ0Wf0Bi/eSvLkYsz0GI9EDSNcEkyLBGmfK/9x8o3+AuavxpZO8nQaushinyG
-        X6LqMnTg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mfju8-00579x-Pc; Wed, 27 Oct 2021 14:27:48 +0000
-Date:   Wed, 27 Oct 2021 07:27:48 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Miroslav Benes <mbenes@suse.cz>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Petr Mladek <pmladek@suse.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YXlh5K7FyeBXNafM@bombadil.infradead.org>
-References: <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
- <YW6OptglA6UykZg/@T590>
- <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
- <YW/KEsfWJMIPnz76@T590>
- <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
- <YW/q70dLyF+YudyF@T590>
- <YXfA0jfazCPDTEBw@alley>
- <YXgguuAY5iEUIV0u@T590>
- <YXg0dFZ+6qHw7d0g@bombadil.infradead.org>
- <alpine.LSU.2.21.2110271343290.3655@pobox.suse.cz>
+        Wed, 27 Oct 2021 10:41:06 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157D8C061745
+        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 07:38:41 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id l7so3168784iln.8
+        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 07:38:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=AXihn/8PvH62ldISnz4SaTA+BeQjkNpRep7BwZH9kSs=;
+        b=e9ZbK1qROGrN6+Mx2BjbAK7HAVDu8JPEPy7/j29XZSgqK9lCtCNlee8sxK7nDm47MQ
+         I+kLX9BoMh21LAPvciWReSu1rn9hIyFhc8uBCD1fqoSL3ttcWPDFb4xhqrNk793m6e0X
+         zGVDjKTWUEhqC7wQr8M7klhdv9ExB6zlpxbT0161JH11yi/fVmuVAlC3yQEcKQPhqiOR
+         z9tH25FsPPhDclWOPuRtaANGCCFb/W0EU9Hj85u0V+1pxk3n/M2BfnJ9dkYZl7M78bjC
+         wbZ0Eie939QG/tIQHVpy08JODl4Bfm621Y3ZyB6AXFi75DKGmmVzziHs5aTpGD3yu31r
+         wG/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AXihn/8PvH62ldISnz4SaTA+BeQjkNpRep7BwZH9kSs=;
+        b=fgmr6mone+LPcNk0P9tASG6+JBIxownPkyofWHvzqRiJeaVH2EpUVSDID61afTR/2u
+         umE6iwK7JloBx6yRT+EVoFkwd5r8HQNe1b1kp24wOInH8hcEsl3w3D2Ci4FOcxXXJPTA
+         IJc5PBEU1cJwtMdy1m90gLHPB32PTK6HuKJnQ3tZuIT31pq1bwH3Xrff7JAQp1uhJMlN
+         xPh1s/3jIKhHDjVLC7Wue2mLJaaRwQaggtkZYinuoKfmxFV8BX8/425WIzu5bPar0at6
+         QvYXBWoOKxWv5NrCUps/9MbCZUKbbctnTuYi9vWWTPUXZQS0zmRAVBlFjnQrW+fl2jnA
+         XAfw==
+X-Gm-Message-State: AOAM532hSdCRQDWtHn1MXNyqvm3DNeoDU1ensUADTG5hsliQfwsMneGd
+        4d+/0e+G55aFlpRUIeCdDHaSwiVIKys5GA==
+X-Google-Smtp-Source: ABdhPJyrjIHC/dGkhJmuYKIrlgOR3lXq62bJXZMMcXGurmSrRJeq7MYl9DVwxr42vCxpELLDNEijXA==
+X-Received: by 2002:a92:b00c:: with SMTP id x12mr17857719ilh.37.1635345520174;
+        Wed, 27 Oct 2021 07:38:40 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id x13sm63875ile.9.2021.10.27.07.38.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 07:38:39 -0700 (PDT)
+Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
+To:     Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, alim.akhtar@samsung.com,
+        avri.altman@wdc.com, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
+ <7ed11ee1f8beca9a27c0cb2eb0dcea4dbd557961.camel@HansenPartnership.com>
+ <870e986c-08dd-2fa2-a593-0f97e10d6df5@kernel.dk>
+ <4438ab72-7da0-33de-ecc9-91c3c179eca7@acm.org>
+ <c3d85be5-2708-ea50-09ac-2285928bbe0e@kernel.dk>
+ <36729509daa80fd48453e8a3a1b5c23750948e6c.camel@HansenPartnership.com>
+ <yq1ee873av4.fsf@ca-mkp.ca.oracle.com>
+ <679b4d3b-778e-47cd-d53f-f7bf77315f7c@acm.org> <20211027052724.GA8946@lst.de>
+ <b8aec3cb-75f1-3e1f-1dfc-5d77322b736f@acm.org>
+ <20211027141231.GA2338303@dhcp-10-100-145-180.wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <804aabca-35cd-e22b-1108-b82be38f6885@kernel.dk>
+Date:   Wed, 27 Oct 2021 08:38:36 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.21.2110271343290.3655@pobox.suse.cz>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20211027141231.GA2338303@dhcp-10-100-145-180.wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 27, 2021 at 01:57:40PM +0200, Miroslav Benes wrote:
-> On Tue, 26 Oct 2021, Luis Chamberlain wrote:
+On 10/27/21 8:12 AM, Keith Busch wrote:
+> On Wed, Oct 27, 2021 at 06:16:19AM -0700, Bart Van Assche wrote:
+>> On 10/26/21 10:27 PM, Christoph Hellwig wrote:
+>>> On Tue, Oct 26, 2021 at 01:10:47PM -0700, Bart Van Assche wrote:
+>>>> If blk_insert_cloned_request() is moved into the device mapper then I
+>>>> think that blk_mq_request_issue_directly() will need to be exported.
+>>>
+>>> Which is even worse.
+>>>
+>>>> How
+>>>> about the (totally untested) patch below for removing the
+>>>> blk_insert_cloned_request() call from the UFS-HPB code?
+>>>
+>>> Which again doesn't fix anything.  The problem is that it fans out one
+>>> request into two on the same queue, not the specific interface used.
+>>
+>> That patch fixes the reported issue, namely removing the additional accounting
+>> caused by calling blk_insert_cloned_request(). Please explain why it is
+>> considered wrong to fan out one request into two. That code could be reworked
+>> such that the block layer is not involved as Adrian Hunter explained. However,
+>> before someone spends time on making these changes I think that someone should
+>> provide more information about why it is considered wrong to fan out one request
+>> into two.
 > 
-> > On Tue, Oct 26, 2021 at 11:37:30PM +0800, Ming Lei wrote:
-> > > OK, then Luis shouldn't consider livepatching as one such issue to solve
-> > > with one generic solution.
-> > 
-> > It's not what I was told when the deadlock was found with zram, so I was
-> > informed quite the contrary.
-> 
-> From my perspective, it is quite easy to get it wrong due to either a lack 
-> of generic support, or missing rules/documentation.
+> The original request consumes a tag from that queue's tagset. If the
+> lifetime of that tag depends on that same queue having another free tag,
+> you can deadlock.
 
-Indeed. I agree some level of guidence is needed, even if subtle, rather
-than tribal knowledge. I'll start off with the test_sysfs demo'ing what
-not to do and documenting this there. I don't think it makes sense to
-formalize yet documentation for "though shalt not do this" generically
-until a full depth search is done with Coccinelle.
+And to expand on that, one potential solution would be to require as
+many reserved tags as normal tags, and have the cloned/direct insert
+grab requests out of the reserved pool. That guarantees the forward
+progress that is currently violated by randomly requiring an extra tag.
 
-> So if this thread 
-> leads to "do not share locks between a module removal and a sysfs 
-> operation" strict rule, it would be at least something.
+-- 
+Jens Axboe
 
-I think that's where we are at. I'll wait to complete my coccinelle
-deadlock hunt patch to complete the full search, and that could be
-useful to *warn* aboute new use cases, so to prevent this deadlock
-in the future. Until then I agree that the complexity introduced is
-not worth it given the evidence of users, but the full evidence of
-actual users still remains to be determined. A perfect job left to
-advances with Coccinelle.
-
-> In the same 
-> manner as Luis proposed to document try_module_get() expectations.
-
-Right and so sysfs ops using try_module_get() *still* remains safe,
-and so will keep that patch in my next iteration because there *are*
-*many* uses cases for that.
-
-  Luis
