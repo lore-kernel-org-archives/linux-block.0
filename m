@@ -2,92 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA63C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 12:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F8ADC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 13:16:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5F5161052
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 12:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E7EF60F6F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 13:16:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235988AbhJ0NAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Oct 2021 09:00:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51164 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235978AbhJ0NAj (ORCPT
+        id S237051AbhJ0NSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Oct 2021 09:18:48 -0400
+Received: from mail-pf1-f177.google.com ([209.85.210.177]:45642 "EHLO
+        mail-pf1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236464AbhJ0NSs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Oct 2021 09:00:39 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6472CC061570
-        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 05:58:14 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id l7so2811514iln.8
-        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 05:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=OAfWmTaRe7pHC3CPK7jHu1Q8nkOk9ofq4JEqSWOqlWU=;
-        b=Nw8pR8eAjmZXk9/Wy1RCa/7DpxHQO0isSnErnvdwFrRa2JNbbH/WRI1by/8ephB1Gf
-         YnZUE2wPfiOk3lGIeq4pRkhkNRV58O3w1tIujFMKC16oXm1KgO86qAhXg/eyoqSe9m9i
-         hsriwoUsoFHzJWj/bA2towwtK0PiLrnuJ2lZccQpuAOfA/RBmsL0DaNOhBj2Yp9wcKaA
-         Bf1wFkfBGmTYmOc0S/8ucVTVi9exPX+bfZQBby0TmHkMQa/voQ2wRjopqh/essDZkYtE
-         CwW/hHfpepg2s6SK3Pig16B6a7Q+azCO9Tnj7+l9I/X681XK4pdqntQeHd5RfnqcOqIn
-         8KQg==
+        Wed, 27 Oct 2021 09:18:48 -0400
+Received: by mail-pf1-f177.google.com with SMTP id f11so2681383pfc.12;
+        Wed, 27 Oct 2021 06:16:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=OAfWmTaRe7pHC3CPK7jHu1Q8nkOk9ofq4JEqSWOqlWU=;
-        b=yfUVTNkW+Q/cytBA+cVnaVXN+siYFbONoHgau2OMum7QLiIRUPA3NPNy1Pm7ifP5S1
-         yAHWggCcBz0/JXJfs3j7Fs+RKfKH/EUIRPo7XTN5IdUpMcZHEaGbVGAveuLhtPk5X+cE
-         9n2QC0roQ+yxswSiqgY9QtIc295Kzk1DBct1x3x3rqswUcAn+F+L/anrhxcWqPBMQqsw
-         BxRxzK4rd02Zyy70whLsC8gujWc9uou6Y30J+CRrkF27nCBKBAQNUmDFVPQbCPuFWX7l
-         cwjC7j7fQKK20xUPpUai6oRrl8F7RbuaRQ+nYptMgS+wZHIgBpMmarMNZxqD5X+ZabzY
-         k7xA==
-X-Gm-Message-State: AOAM53280zsuI/HV/A2b0qalFJGj2mJr9dVBO08fQt5slEH9TFLFT8yg
-        /AHS2+BSCpid4FqwdWr2aNsILyyWBE4JGg==
-X-Google-Smtp-Source: ABdhPJx98fLoa3a8Vzk5HS/NXtf+T2yWik5oX5SEM1utMMEzq1hKLilyta1uFAbLUtgjsZma8hA6CA==
-X-Received: by 2002:a05:6e02:1a86:: with SMTP id k6mr19228229ilv.192.1635339493629;
-        Wed, 27 Oct 2021 05:58:13 -0700 (PDT)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id z26sm11439326ioe.9.2021.10.27.05.58.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 05:58:13 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20211026060115.753746-1-shinichiro.kawasaki@wdc.com>
-References: <20211026060115.753746-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH v2] block: Fix partition check for host-aware zoned block devices
-Message-Id: <163533949070.284890.10151015414486229996.b4-ty@kernel.dk>
-Date:   Wed, 27 Oct 2021 06:58:10 -0600
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RxGdKvpK4OULd8cS2o0dRz2hnuGIH9NxZACigE+2c3o=;
+        b=0hJU7OYJ57SKm6TwWg4o2uMAwYWTRHCwQSnuTi0wm+q8s7W4ISGRbtFrTdGnao6/MF
+         5NLbmDusZsIolJaSmyIEJTR4fuiP78zt0r6JE5ptppO8yRbGIPqnNJGDb+oS8wqqtNKW
+         ElQu8ZdMJjyUHqreYagz1pA2VXTL0e1a26Hnp703fLgIqnIFVTBeTC7svX1eeMOC5kjF
+         +mDnfpo8Er2QpSI+AI00KSvriZfKMpyLyohnW2WXivC5oI9uvkK6Twzh7tw8YznkMRm7
+         q2uQX9Dm1yWRKYa4NdgXB7rZihrQA0MUKQOAALVPExwrmW/j8lka025VzliWzF9CE0nX
+         XF5Q==
+X-Gm-Message-State: AOAM532vmPS+bUvm9uZI7FzBNASr0o6hP9GrSIYeQwXl/U1i1MUen0nS
+        fn9uwab6qx/vygDr7b583J9gBeML1eo=
+X-Google-Smtp-Source: ABdhPJwQuj8Y+OK3dVAEU+H0eFs40hz4YLj2tBsARNnGsRdeT2i6wXcAZBZ2XmC0rwYKEQ5bCsuDKg==
+X-Received: by 2002:aa7:8246:0:b0:44b:4870:1b09 with SMTP id e6-20020aa78246000000b0044b48701b09mr33249471pfn.82.1635340581882;
+        Wed, 27 Oct 2021 06:16:21 -0700 (PDT)
+Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id t22sm7404113pfg.63.2021.10.27.06.16.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 06:16:20 -0700 (PDT)
+Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jens Axboe <axboe@kernel.dk>, Jaegeuk Kim <jaegeuk@kernel.org>,
+        alim.akhtar@samsung.com, avri.altman@wdc.com,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20211026071204.1709318-1-hch@lst.de>
+ <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
+ <7ed11ee1f8beca9a27c0cb2eb0dcea4dbd557961.camel@HansenPartnership.com>
+ <870e986c-08dd-2fa2-a593-0f97e10d6df5@kernel.dk>
+ <4438ab72-7da0-33de-ecc9-91c3c179eca7@acm.org>
+ <c3d85be5-2708-ea50-09ac-2285928bbe0e@kernel.dk>
+ <36729509daa80fd48453e8a3a1b5c23750948e6c.camel@HansenPartnership.com>
+ <yq1ee873av4.fsf@ca-mkp.ca.oracle.com>
+ <679b4d3b-778e-47cd-d53f-f7bf77315f7c@acm.org> <20211027052724.GA8946@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <b8aec3cb-75f1-3e1f-1dfc-5d77322b736f@acm.org>
+Date:   Wed, 27 Oct 2021 06:16:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211027052724.GA8946@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 26 Oct 2021 15:01:15 +0900, Shin'ichiro Kawasaki wrote:
-> Commit a33df75c6328 ("block: use an xarray for disk->part_tbl") modified
-> the method to check partition existence in host-aware zoned block
-> devices from disk_has_partitions() helper function call to empty check
-> of xarray disk->part_tbl. However, disk->part_tbl always has single
-> entry for disk->part0 and never becomes empty. This resulted in the
-> host-aware zoned devices always judged to have partitions, and it made
-> the sysfs queue/zoned attribute to be "none" instead of "host-aware"
-> regardless of partition existence in the devices.
+On 10/26/21 10:27 PM, Christoph Hellwig wrote:
+> On Tue, Oct 26, 2021 at 01:10:47PM -0700, Bart Van Assche wrote:
+>> If blk_insert_cloned_request() is moved into the device mapper then I
+>> think that blk_mq_request_issue_directly() will need to be exported.
 > 
-> [...]
+> Which is even worse.
+> 
+>> How
+>> about the (totally untested) patch below for removing the
+>> blk_insert_cloned_request() call from the UFS-HPB code?
+> 
+> Which again doesn't fix anything.  The problem is that it fans out one
+> request into two on the same queue, not the specific interface used.
 
-Applied, thanks!
+That patch fixes the reported issue, namely removing the additional accounting
+caused by calling blk_insert_cloned_request(). Please explain why it is
+considered wrong to fan out one request into two. That code could be reworked
+such that the block layer is not involved as Adrian Hunter explained. However,
+before someone spends time on making these changes I think that someone should
+provide more information about why it is considered wrong to fan out one request
+into two.
 
-[1/1] block: Fix partition check for host-aware zoned block devices
-      commit: e0c60d0102a5ad3475401e1a2faa3d3623eefce4
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
+Bart.
