@@ -2,92 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE8BC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E1DC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:37:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B051760232
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:36:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5649F603E5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236807AbhJ0Ci3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 22:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51590 "EHLO
+        id S238106AbhJ0Cjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 22:39:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232502AbhJ0Ci2 (ORCPT
+        with ESMTP id S238055AbhJ0Cjk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 22:38:28 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B249C061570
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:36:04 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id i14so1769436ioa.13
-        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:36:04 -0700 (PDT)
+        Tue, 26 Oct 2021 22:39:40 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE92C061570
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:37:16 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id s3so1462414ild.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Oct 2021 19:37:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rBbyfwAA1XAbf3WeQ5smM9kbfwrjNTyxKkIdng8HT9Y=;
-        b=vJzRhOZ9fLujLSobp74paNSqSjQKV1HMPhAiJLDFYWwWaDFrTAQxuD6S3NUkaUK6Fm
-         MIfK1hAAbvgf0o8MA2h+E4NNyGZxeogQY4S22GluvPsFoj/QRGyGbCo+w+7JM5rhscp5
-         c0ugqQXz4DtaWEJdHz3X7Ctv3RmjFDlJ7Sf4GzXWvqe2ToFMr643m9/O0gzSS5r7501V
-         s7iIfefFwNQpZp2VqqtFXk2kKj8rLS5TEcQTFQsFIsZ3hUwnoJRe0Ralb5BQb18jeAnR
-         reDMP33A0owJDHG1kqgpWIJrh2JwS7VNjHkZuPcvA6xxoyVr9FtMk+Be0xqYialVxC6q
-         FCqQ==
+        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
+         :content-transfer-encoding;
+        bh=6o4Jj7d3h3HnMmJFr4RezFW9sdNBU0zeofjveXMsVGU=;
+        b=qPLNsPnFXjo1YyOEOkhFWKP3fmJ7VQmjWutKOpHyo66Pbt4vxaSgGFFaa0CYfbMXne
+         2eAZri8Eaf8vVwVSAFkYUIIA6tNSi84A+G5ucQSlsIRrBKjgGQzr06++f5Ih7mNE7Xfr
+         /FRaAJjhvAVVG3Ap//WX/S++QfKxaXRUC3GUHfhuS/ycsZdMnx2A8Pm2CBmjZH1qeztd
+         7Frgk19scfz87xBHggAxWEXDxpEnCL+7/xVllrpXydxi5WoAXPUbZAKsyW8GXFBuO9bQ
+         cLsLHgUIE/6tKtMdY7OFL4Ee/AbBcVjjwB4Vm1SJ1hO1kMdzkDu30EMYds/Qc4xaSSXo
+         u4vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rBbyfwAA1XAbf3WeQ5smM9kbfwrjNTyxKkIdng8HT9Y=;
-        b=b6G5CRx6YaLmM94Lir6E6nEYm2JVEr2Rm5ItCqRNcRJ9GlENWlD1IktDZ64lbOdhLp
-         b/+gAz6lb3nEllXgRJsq1onl0MOW3TXcXYl8k2m2XdVuvK7G5V+kZNlnzh6ulLRnkJgx
-         kLBVsVM+uQAq8/HSSpcJNHtv6UShsV6yeA60U9bu7ArzkCmSdSuUCzTODmtcBStMd4B7
-         ItEDxgkeNUSrBATeRWeX2+KM6BH7tHioq0EspB5uQ+mgq/9Qon7f9KeZAlO0mY+Gg9y8
-         FRaT9vMg9PNDEig/zPzb8USODqAEsheCP/ltISm1iBGcDZ8cxovD1suwX3Fkzsjk6lFD
-         7xuA==
-X-Gm-Message-State: AOAM532dFQEuTOn5dJizQKw2V9QXxf0OxB1IElwaSj5LPM7PvoEFLK/h
-        yH7obu0ahjfMdfiBfdHI8Crew6gPDlBxwg==
-X-Google-Smtp-Source: ABdhPJwdIu7jiSIbCj0s8s2gh1tNpz+wEU3tdkATO3cGG8TGLClU7M9VwulX5QxsBe7byDDFE1T3FA==
-X-Received: by 2002:a05:6602:2b06:: with SMTP id p6mr18221430iov.17.1635302163774;
-        Tue, 26 Oct 2021 19:36:03 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id y20sm9201208ilq.74.2021.10.26.19.36.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Oct 2021 19:36:03 -0700 (PDT)
-Subject: Re: [PATCH 2/2] block: attempt direct issue of plug list
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     linux-block@vger.kernel.org, hch@lst.de
-References: <20211019120834.595160-1-axboe@kernel.dk>
- <20211019120834.595160-3-axboe@kernel.dk>
- <20211027011347.GA3111117@roeck-us.net>
+        h=x-gm-message-state:from:to:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=6o4Jj7d3h3HnMmJFr4RezFW9sdNBU0zeofjveXMsVGU=;
+        b=3hfAjTGINXXg3ogGAppazo0j96iqloHQMlgPLpecvWcldmv6WKw21xzMgSXXeDXMaw
+         KhUHiq97BTJXpMS14jLK2ijT7MFhlqjx7VGp5IC4qCv8YEZdmQqJdzZfjpYbnzzLLQiG
+         sIKYFtBeBL3+J2n20M4bP9gixYib7Vldb2Yw+gl3PirBallI+voVDlEJKtJmnaCHf4kU
+         RgXTyHQpPA41zZJT/IaxrEXl9R6ICxs1Paa6wymPqOgWNbbU0nQl5siuvxUl7MEQ1AGO
+         p6GE8Mcq+ZkJWcNz+RqjYDDiSgoRRlt+vA8Jxkmb2FI74K9LA6tWgZsaJc52ZrOBFfEx
+         IbFA==
+X-Gm-Message-State: AOAM532tldSfeeRyNrqznC2+HsFkbxv0XzwV/us8JrJwqRIWBRrS9GQY
+        RZqbTe1YXJrWNqQzLQ9rudqxYQ==
+X-Google-Smtp-Source: ABdhPJywDcUyyeuzFIbTn9qWO1uXrG8erMYGoMp0sn6FkMQj+soeLGrFE9hY7PwGiZWeesPL/7X9eA==
+X-Received: by 2002:a05:6e02:16c9:: with SMTP id 9mr511999ilx.166.1635302235543;
+        Tue, 26 Oct 2021 19:37:15 -0700 (PDT)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id h14sm317124ils.75.2021.10.26.19.37.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Oct 2021 19:37:15 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8e0583e5-8c34-336b-9f46-0586f4db9c5f@kernel.dk>
-Date:   Tue, 26 Oct 2021 20:36:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     linux-scsi@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20211027022223.183838-1-damien.lemoal@wdc.com>
+References: <20211027022223.183838-1-damien.lemoal@wdc.com>
+Subject: Re: (subset) [PATCH v9 0/5] Initial support for multi-actuator HDDs
+Message-Id: <163530223418.276156.7177973323512699858.b4-ty@kernel.dk>
+Date:   Tue, 26 Oct 2021 20:37:14 -0600
 MIME-Version: 1.0
-In-Reply-To: <20211027011347.GA3111117@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/26/21 7:13 PM, Guenter Roeck wrote:
-> Hi,
+On Wed, 27 Oct 2021 11:22:18 +0900, Damien Le Moal wrote:
+> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 > 
-> On Tue, Oct 19, 2021 at 06:08:34AM -0600, Jens Axboe wrote:
->> If we have just one queue type in the plug list, then we can extend our
->> direct issue to cover a full plug list as well.
->>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Single LUN multi-actuator hard-disks are cappable to seek and execute
+> multiple commands in parallel. This capability is exposed to the host
+> using the Concurrent Positioning Ranges VPD page (SCSI) and Log (ATA).
+> Each positioning range describes the contiguous set of LBAs that an
+> actuator serves.
 > 
-> This patch results in a number of warning tracebacks in linux-next.
-> Reverting it fixes the problem. Example tracebacks and bisect result
-> attached.
+> [...]
 
-See other replies in this thread, it's fixed in the curren tree.
+Applied, thanks!
 
+[1/5] block: Add independent access ranges support
+      commit: a2247f19ee1c5ad75ef095cdfb909a3244b88aa8
+
+Best regards,
 -- 
 Jens Axboe
+
 
