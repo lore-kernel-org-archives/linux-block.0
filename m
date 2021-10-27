@@ -2,178 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52320C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 01:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B587C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:16:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F53461090
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 01:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 419B9610A0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 02:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236307AbhJ0BjG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Oct 2021 21:39:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38148 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233859AbhJ0BjG (ORCPT
+        id S235444AbhJ0CSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Oct 2021 22:18:32 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:63343 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232231AbhJ0CSc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Oct 2021 21:39:06 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB954C061570;
-        Tue, 26 Oct 2021 18:36:41 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id om14so819192pjb.5;
-        Tue, 26 Oct 2021 18:36:41 -0700 (PDT)
+        Tue, 26 Oct 2021 22:18:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1635300967; x=1666836967;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=stW/q5jy2sGtMyTXyx+Rm6QUozWSuaQyfN34M5ARkZg=;
+  b=JHm4197FYERAelnAMvZxN15n4taGrp4VSiPATIPUgXtlvmTzmHz8+2er
+   6L2FtFTjlxtqUL93m/nh8tdxD/Y74uOgYnLvti0JuXw0U9evvBEoBrABg
+   8ss4v5HvL2POxaNSx5Z9WsepIqF0TY4dhKo6NsGm+5EYGmK90Yp95Phh3
+   0LUaaRexMpC2QYt+rM6oABAJholvV4wwi4dvhjIJ1OubaozZPDrNNKT1a
+   FH/imWeOzcn04nEVr2ykcez27RtqFqGxUvCarho8AOtYOVzu4Op5kaSGY
+   9DTDX0KGhIU/coR/zyuOoyKEZs0FexVhB5HaGYVyuuvma9xUJVN6xI/q4
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.87,184,1631548800"; 
+   d="scan'208";a="183924390"
+Received: from mail-mw2nam10lp2105.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.105])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2021 10:16:06 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uym0u1X2P/VnT4I3B5/AG32YzWIkXG4HHwimluO1eJXGkPl2SVTaKKKx3jUvQ1XkeSE+fjGWaOp3Qx03hBDDtFnDEQht1sDgMs6kEMK2hm96/wJESLR3E8auG8daeoVzHqX7lDdJgwk+M0vKJRutNMTVwMYPGLo50e4XxuHz+C0ApQph0D7pOs4QzFVQDSru02dLxWGmuURNPOKI13GN4fxhhsSCzAT8amiTFTtNGj+OkMHidHF8Xe3I0Ee57yw3SFkwq4CvjFQ/MABFlVGESIVfKzcBLKkii/yHNuL3jFqdSwAFCxlCCyhgiUITCLUkUeWFu8fjlB4tQbUMkwMx+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=stW/q5jy2sGtMyTXyx+Rm6QUozWSuaQyfN34M5ARkZg=;
+ b=YxCTGWxdHD2j9iL2ymNGbuiv+3dDgYvloHcovIzuOzHTnug1M5wjc+JPGcR06M32RJVHl5bOqbZJ9OoK2/HsLOkLxGOQkb9A7nqeyXOs8VjiB7YZiG0B3V6ZHCKUtQq3q5mmj96yU2wCplOEMxltTuzVblEC0cxBsDtUI//CD0hFVAxsAVo7NM4hglAW5lfnsA9RPIQt6IUTVnLR5qVyPurDLC0nu9Z7Xp1KHpZBGcSDKHN0secc1truxNxvXZ6z63PXbDM0swuKDhf20DeSyvFmtZzzHdNXWObdVEWpygKEhZ29hq9HZuKZ+A4WYzlmQTiMdcz/ElCcHNK+ib+rZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=2IHNA2fXYADlXjRPovEvAoEBKPPVrmHJ+49kPrQUUx8=;
-        b=anh7nkq/rB4GJmVgoZIrzaWeld/r6WvQGJJdmKqeioG0hqJAKO01NRWZEjms30q7fH
-         zyGk/6HTxDd+JptB/hLnKP48yLs1LHUhJX8e1A7/hg+VYxEqEzCybi6C2Fx04dDHgTCz
-         Dv6lKCpnmNlebfDv7Oqv5mjHKJys3ne55IhDgS3E8p1L7HPMUpjl1i3oXVCZXiXZH2TK
-         Zb+kXYrpEMTgecmmnn8rzOR8hUkV8Ycuy2goYeprHwyr+3s7LSdslX+Phsh7DtunADWg
-         r9OV8/Nh6ol8klqecPh7N1WksiPkvtqskwmRAg49Tpecw+2akUXB2gSH8UJJe4t47kWh
-         rWog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=2IHNA2fXYADlXjRPovEvAoEBKPPVrmHJ+49kPrQUUx8=;
-        b=Wg24fA7vtPNHg757esxXqKwlrq8tz5tnIGUzuldDlOgev7x+2v/zn4LaDkea8k3Fds
-         c4xqWroKcrObDJfZ2ezAdh2G+Ogm1140cwK590rEi6yRwoGwdomemVXncjRwt2LO79uJ
-         L/82DPqh1AbJZ/d2QVLvR5z+KRid+3hX5n0H/Uc+vV0rq0w488n1QY6vzzQOQsiy0Ocb
-         BoGrGL2VKjlsWtnHLvRRbwhopAPI6600zvNVSswf0GLFSIWE2bZJsImrHPiij88LxVbX
-         YRnVaibhEXTMau0yf8TordVN92mhUBGB84F6V8UMTtQe1K2WK/Shx6pJFRurD0wzcMbD
-         bAog==
-X-Gm-Message-State: AOAM530MM8gl0RJXvbJqmPm9wQkSCeTp5LrhZTOFziDPk/pASDl4XQtC
-        qZoq1yfiC6VCKTLe/JJsFigzL16GlWUJs5gZggC54xKypkE7VXec0g==
-X-Google-Smtp-Source: ABdhPJz4d/y3JFLggkil9NvSLSDyNevf2mCsaDGNHos7ck/vbXXC58jf4jhfcHXff2s4GwRLH7BJSY1lftTKLLSgLv4=
-X-Received: by 2002:a17:90a:6b0b:: with SMTP id v11mr2603478pjj.178.1635298600994;
- Tue, 26 Oct 2021 18:36:40 -0700 (PDT)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=stW/q5jy2sGtMyTXyx+Rm6QUozWSuaQyfN34M5ARkZg=;
+ b=Pk9YGzt9f2YqAn8qFxnPS68kia23cEQ58ZZKSmVK+1Rwgg2M1vX7iBnfX8RmyD8uwqFh+JL383gvG7GRnSDzjyBQUCMldx1WA8A/AOPDvam9fcFkDoSrLCUxsMo9H7oLmMCB/HwU93PgB7zLVRJ8zdLrQim337h9lQtNbLEl/DE=
+Received: from SJ0PR04MB7184.namprd04.prod.outlook.com (2603:10b6:a03:291::7)
+ by BYAPR04MB5573.namprd04.prod.outlook.com (2603:10b6:a03:e2::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Wed, 27 Oct
+ 2021 02:16:06 +0000
+Received: from SJ0PR04MB7184.namprd04.prod.outlook.com
+ ([fe80::30f6:c28:984d:bd79]) by SJ0PR04MB7184.namprd04.prod.outlook.com
+ ([fe80::30f6:c28:984d:bd79%5]) with mapi id 15.20.4628.020; Wed, 27 Oct 2021
+ 02:16:06 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>, Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH 2/2] block: attempt direct issue of plug list
+Thread-Topic: [PATCH 2/2] block: attempt direct issue of plug list
+Thread-Index: AQHXyik1fmcfNAtqKkq85KdLXlrYzqvlWyeAgADBt4A=
+Date:   Wed, 27 Oct 2021 02:16:06 +0000
+Message-ID: <20211027021605.wk2hvwxlztabjjm5@shindev>
+References: <20211019120834.595160-1-axboe@kernel.dk>
+ <20211019120834.595160-3-axboe@kernel.dk>
+ <20211026052036.xdsw6ejx2e2n7jhi@shindev>
+ <e8930e4f-0359-9218-3006-14463d7fe68c@kernel.dk>
+In-Reply-To: <e8930e4f-0359-9218-3006-14463d7fe68c@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d87057f7-c09b-4cf3-26e0-08d998efbbbf
+x-ms-traffictypediagnostic: BYAPR04MB5573:
+x-microsoft-antispam-prvs: <BYAPR04MB557381BB7525E89B42459F5FED859@BYAPR04MB5573.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:51;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: U6XxSICZ/vA82BwSTyzbt1POCYevWIim2uSuNO0WL97ALK+W5cUqnjdVcpBCR8IarkVcqvASVqsTtCW9Fj1P6s8nAi15POKjJPa3kMJ5FmYpXiEpDYElUJjRrYwKDC1bxrf+EgVtyeCx87SZg5j+E9DOA3G4mCtruM9tt+jRk+p4SUJRb2GSuO8Xdxb7VnjOtekvN3t2mDFxYxfZXVq/RntjBtBFdB4vPzrWKhEY2pQe2q4RlDdGJTIXky/Fli31agxGFFLZpgc3BIfO4UfIFqJxvCfzQbZGh3JeCCGY/M7gBhZP3L5i4FIHdf+LCVGjIWzKyn/lpQUQ+fKmr1+IvV36RHMiq1/TbAqWW3tNXwa/2qSjAVlxAFd9rYptyK3LyGrFdEODys/8aqG+iBGV/pgo5OpeZREISlHsYMrR1DamxZT86J/OXcJa6sRJxkBFwMhlv7sTpKV3WGGqG4J6XzB/O0wStaThaskpqXG6urlo20EEB/sW52jO37Kx8cCLt0JZFXQYt9noS6an17QqfevRRWyyCFgbF8StY3lNZPJ0R1WkFy/XS0t0D2ru//Hj7CEpa1Uwn0kDMuSivDyrjyT1cs7bvn7HHRdIotbfnNMbtgD6hsXOmxoPfuNziOLYm8YuGErc9vyI08eWB3/GV3MfMeOajvNvpRZv3+tGBxiqHaC6fUCrVfgk5XJ8FA0CQyKYdqwlvBRGbyf8THXhXZm6Ji0rMj+E8CHgbooCr1M951/pLwpdHqlJ9ZrkhBuH7mqRyCEI62qqxqJmL4efgpn+bhv5JH8ffPKaRjo+d/s=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR04MB7184.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(366004)(8676002)(64756008)(66476007)(38100700002)(83380400001)(38070700005)(6486002)(9686003)(76116006)(91956017)(66946007)(6506007)(122000001)(82960400001)(8936002)(1076003)(316002)(33716001)(86362001)(2906002)(4326008)(54906003)(66446008)(53546011)(66556008)(6916009)(5660300002)(71200400001)(186003)(966005)(44832011)(508600001)(6512007)(26005)(4744005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?nn5y/Jd8BDpCG+UT0gWP2Aljh08M+U//9ykeSjqI00bTpNjxdtNP4Za87d2B?=
+ =?us-ascii?Q?hF+aDitPKOhDnCaBXsew2qyveoE2mT5oi/+lEYmvYZDtY1cYlk+rw5rFkKoK?=
+ =?us-ascii?Q?MURAqALHdy1xv2czfGmpDD3TmdNjuXjDTGrU569su+vGn1AMt2s5neiTyLTq?=
+ =?us-ascii?Q?Z86BmLyYeUSLOqdR5yJV8AS72ZIZ3DH0D+8SSqWORIPQHoyhsA131tBHGb7D?=
+ =?us-ascii?Q?1n856xHvrim/62biCt2b51ddz2xjQVoBv73EdsjQlxHy7F5OvjsmHVlKbSdP?=
+ =?us-ascii?Q?2LScwTDmYDyhFKMOhtIaCMEagoxd8PbOj72v2xRvD+6fUoq9z/+Edp8Uooms?=
+ =?us-ascii?Q?IshCgAw/TzMU+BMOp1a1GInEKXQMWNJLj6FEWXKzdhzrEHVE51X2L41+c0q2?=
+ =?us-ascii?Q?7zBn+MaTZ9qaiacuKd6BL7IXSg0xkbQOsuBKXb552Tg3r3Tl48FqmxB/kMol?=
+ =?us-ascii?Q?Pv7wpMjKJFwULmVQts6GckRPmjFcft5croT3d1g46rfoKQgbP7Dky8qnT23v?=
+ =?us-ascii?Q?K7tCsjiRLx14Nh0Bs0PFs8EEvQWIERhBrKzMLjT+xjGxxkdudFH4/UdN/4V2?=
+ =?us-ascii?Q?CfRK4bu7GSQdpD6F/Yv1JcSDoRtWASU/YIOabIpmCcxbK0qxoCQvQ9LFm3A4?=
+ =?us-ascii?Q?kO5i6yq6CDDltX/kDh36oZMC7aLLu3+ErtfZRXrHEfk2iCMiiPxubqUi10KH?=
+ =?us-ascii?Q?TBwT+92dGQjvAY5vSFnwZoZidQ1yCj83umV0NikcQZ9JR4MU8FEdW6H0rJju?=
+ =?us-ascii?Q?+fxdRbNy9DsvMGHG9JK20G9J3rDQSE3EqojqG7ah2ZcXnQa2pO9Y2rAgo7xF?=
+ =?us-ascii?Q?ENrgVShzOucxZwBHAS6d5yqm4Q/3u3LW4ZbELyyD3zoYHRPciQP/CfIks3Y0?=
+ =?us-ascii?Q?hNmZh/iZTldnrXsyf9lwmczE3wIWC8O9jDG1iIN80KizdJWT7eCnxzle+VA0?=
+ =?us-ascii?Q?2HNoQpNcyE/WXJm1Y+5rHhUcCB3wjFup3BDqHJAOtgABR9TDRLUKh75HMajH?=
+ =?us-ascii?Q?a7539C1glW/TeTqePT5IHBKhXNQWxQSLM1iFGAaMWYuh8boVHjEzd4ow7qPr?=
+ =?us-ascii?Q?xDVc8TAa8SEyXnKi4wyQ4OSCnlWVAztu9L01Z6KToTXSO/gVG/qFg4eVt3lx?=
+ =?us-ascii?Q?tvTsvwsvSx/qpNYzuG4Ythovilc9+cZsj/3GzH+GuGaFwuyeyhQe7G2+MBlm?=
+ =?us-ascii?Q?9+CWQNKLmk539fsRqEZBZPYObxe94BUhAyAfsy9yF90wroWjIs1hLYaYd4db?=
+ =?us-ascii?Q?0UtjkgXyvhtmekBVvWFDF6Bq2GVaWlJYxCIA+5iSU+3W3ONVeCzEVoJj6KOD?=
+ =?us-ascii?Q?vYcp33HSjEFpxyMq5zErM1p0W5Mk/gSiYDl7nqa40ChKfNUMxUz6zbRCpE9V?=
+ =?us-ascii?Q?MqsmCXzhDi1bB2CGjGb1gQQlpFGRHtI4Pl622PLB2qeQLxr8zop9AAFQMbQW?=
+ =?us-ascii?Q?9Cag/Cwz7ATPjWIwAjjgrBinXNUnHzx+9OdCZAkUU9tXP5Kx/5YtxGlnK69C?=
+ =?us-ascii?Q?fq5jvwJxFi8IpFQU8YjbyP5yY404EHV47oGFkbULjfe+qS44ks07c/EVMHyb?=
+ =?us-ascii?Q?GdIQ9W8zEgLLJrXXmRGTH88j02r+eGqMwxkGECDBIEPYMtYm7pSzJL+ABsWB?=
+ =?us-ascii?Q?9Fxlzhd4chcgcakcYkFDDx3JxX5q0TubaggCZOJ5axEW8xMiLd+13sO0NHW5?=
+ =?us-ascii?Q?4RZvOn//z1Hk0fNl0xGjcTuBLco=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <95CF87B7DC75DA4A8CF8A5644B418A0C@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-From:   Hao Sun <sunhao.th@gmail.com>
-Date:   Wed, 27 Oct 2021 09:36:27 +0800
-Message-ID: <CACkBjsZbCD-UfwDyggifu5DWugrYOhECbiqQu_MdquOqyz5iew@mail.gmail.com>
-Subject: general protection fault in reset_interrupt
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        efremov@linux.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR04MB7184.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d87057f7-c09b-4cf3-26e0-08d998efbbbf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2021 02:16:06.2535
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SexcFVNi6d6Xg/LoQFeeVuBja2BhKBY/ZoyqzWPOMKNHaCo5EXGN8WRWNiOfpy/92/6/of/CCltAj3AK3yGAeOJZ4GIF6m282KqTjp8Q8LY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5573
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Oct 26, 2021 / 08:42, Jens Axboe wrote:
+> On 10/25/21 11:20 PM, Shinichiro Kawasaki wrote:
+> > On Oct 19, 2021 / 06:08, Jens Axboe wrote:
+> >> If we have just one queue type in the plug list, then we can extend ou=
+r
+> >> direct issue to cover a full plug list as well.
+> >>
+> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >=20
+> > Hi Jens, I tried out for-next branch and observed A WARNING "do not cal=
+l
+> > blocking ops when !TASK_RUNNING" [1]. Reverting this patch from the for=
+-next
+> > branch, the warning disappears. The warning was triggered when mkfs.xfs=
+ is
+> > run for memory backed null_blk devices with "none" scheduler.
 
-When using Healer to fuzz the latest Linux kernel, the following crash
-was triggered.
+(snip)
 
-HEAD commit: 519d81956ee2 Linux 5.15-rc6
-git tree: upstream
-console output:
-https://drive.google.com/file/d/1bzxncErwj8l-KA-R-jLCUajYQMReiAWX/view?usp=sharing
-kernel config: https://drive.google.com/file/d/12PUnxIM1EPBgW4ZJmI7WJBRaY1lA83an/view?usp=sharing
-Syzlang reproducer:
-https://drive.google.com/file/d/1IOQR_MqiSkN8y0m3UjFZcP9l5QcBnCIv/view?usp=sharing
+>=20
+> This one should fix it:
+>=20
+> https://git.kernel.dk/cgit/linux-block/commit/?h=3Dfor-5.16/block&id=3Dff=
+1552232b3612edff43a95746a4e78e231ef3d4
 
-Sorry, I don't have a C reproducer for this crash, hope the Syzlang
-reproducer and symbolized report can help.
-If you fix this issue, please add the following tag to the commit:
-Reported-by: Hao Sun <sunhao.th@gmail.com>
+I confirmed that the patch fixes the warning. Good. Thank you Ming, Jens.
 
-floppy0: Unable to send byte 6f to FDC. Fdc=0 Status=d0
-
-floppy driver state
--------------------
-now=4295008404 last interrupt=4295008403 diff=1 last called
-handler=reset_interrupt
-timeout_message=floppy start
-last output bytes:
-10 90 4294978780
- 7 80 4294978780
- 0 90 4294978780
- 8 80 4294978780
- f 80 4294978780
- 0 90 4294978780
- 1 90 4294978780
- 8 80 4294978780
- 4 80 4294978785
- 0 90 4294978785
- f 80 4294978785
- 0 90 4294978785
- 8 80 4294978785
- 0 90 4294978785
-d8 80 4295008402
- 8 80 4295008403
- 8 80 4295008403
- 8 80 4295008403
- 8 80 4295008403
-d8 80 4295008404
-last result at 4295008403
-last redo_fd_request at 4295008403
-status=d0
-fdc_busy=1
-floppy_work.func=floppy_work_workfn
-timer_function=ffffffff8476f5f0 expires=298
-cont=ffffffff89fe0d80
-current_req=0000000000000000
-command_status=-1
-
-general protection fault, probably for non-canonical address
-0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 1 PID: 10 Comm: kworker/u8:1 Not tainted 5.15.0-rc6 #4
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.13.0-1ubuntu1.1 04/01/2014
-Workqueue: floppy floppy_work_workfn
-RIP: 0010:reset_interrupt+0xef/0x140 drivers/block/floppy.c:1792
-Code: fc 84 db 0f 85 71 58 8e 04 e8 4d 4d ff fc 48 8b 1d 86 47 db 0b
-48 b8 00 00 00 00 00 fc ff df 48 8d 7b 08 48 89 fa 48 c1 ea 03 <80> 3c
-02 00 75 40 48 8b 43 08 5b ff e0 e8 0f dd 46 fd eb a8 e8 08
-RSP: 0018:ffffc900006d7d28 EFLAGS: 00010212
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff8880118d9c80
-RDX: 0000000000000001 RSI: ffff8880118d9c80 RDI: 0000000000000008
-RBP: ffffffff8c482f00 R08: ffffffff84771173 R09: 0000000000000000
-R10: 0000000000000001 R11: fffffbfff1adb1ba R12: ffffc900006d7dc8
-R13: ffffffff8c482f10 R14: ffff888011968000 R15: ffff888010c71800
-FS:  0000000000000000(0000) GS:ffff888135c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3397e36db8 CR3: 0000000020a83000 CR4: 0000000000350ee0
-Call Trace:
- process_one_work+0x9df/0x16d0 kernel/workqueue.c:2297
- worker_thread+0x90/0xed0 kernel/workqueue.c:2444
- kthread+0x3e5/0x4d0 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-Modules linked in:
-Dumping ftrace buffer:
-   (ftrace buffer empty)
----[ end trace 24ebcf9665bb7032 ]---
-RIP: 0010:reset_interrupt+0xef/0x140 drivers/block/floppy.c:1792
-Code: fc 84 db 0f 85 71 58 8e 04 e8 4d 4d ff fc 48 8b 1d 86 47 db 0b
-48 b8 00 00 00 00 00 fc ff df 48 8d 7b 08 48 89 fa 48 c1 ea 03 <80> 3c
-02 00 75 40 48 8b 43 08 5b ff e0 e8 0f dd 46 fd eb a8 e8 08
-RSP: 0018:ffffc900006d7d28 EFLAGS: 00010212
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff8880118d9c80
-RDX: 0000000000000001 RSI: ffff8880118d9c80 RDI: 0000000000000008
-RBP: ffffffff8c482f00 R08: ffffffff84771173 R09: 0000000000000000
-R10: 0000000000000001 R11: fffffbfff1adb1ba R12: ffffc900006d7dc8
-R13: ffffffff8c482f10 R14: ffff888011968000 R15: ffff888010c71800
-FS:  0000000000000000(0000) GS:ffff888063f00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000100000000 CR3: 00000000277d1000 CR4: 0000000000350ee0
-----------------
-Code disassembly (best guess):
-   0: fc                    cld
-   1: 84 db                test   %bl,%bl
-   3: 0f 85 71 58 8e 04    jne    0x48e587a
-   9: e8 4d 4d ff fc        callq  0xfcff4d5b
-   e: 48 8b 1d 86 47 db 0b mov    0xbdb4786(%rip),%rbx        # 0xbdb479b
-  15: 48 b8 00 00 00 00 00 movabs $0xdffffc0000000000,%rax
-  1c: fc ff df
-  1f: 48 8d 7b 08          lea    0x8(%rbx),%rdi
-  23: 48 89 fa              mov    %rdi,%rdx
-  26: 48 c1 ea 03          shr    $0x3,%rdx
-* 2a: 80 3c 02 00          cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e: 75 40                jne    0x70
-  30: 48 8b 43 08          mov    0x8(%rbx),%rax
-  34: 5b                    pop    %rbx
-  35: ff e0                jmpq   *%rax
-  37: e8 0f dd 46 fd        callq  0xfd46dd4b
-  3c: eb a8                jmp    0xffffffe6
-  3e: e8                    .byte 0xe8
-  3f: 08                    .byte 0x8
+--=20
+Best Regards,
+Shin'ichiro Kawasaki=
