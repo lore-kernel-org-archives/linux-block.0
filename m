@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EA9C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B07CC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 700B661106
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8313D61107
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbhJ1L1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230185AbhJ1L1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 28 Oct 2021 07:27:01 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:57628 "EHLO mta-01.yadro.com"
+Received: from mta-02.yadro.com ([89.207.88.252]:57642 "EHLO mta-01.yadro.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230059AbhJ1L1A (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 07:27:00 -0400
+        id S230126AbhJ1L1B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Oct 2021 07:27:01 -0400
 Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id 2978346154;
+        by mta-01.yadro.com (Postfix) with ESMTP id 2C7D64616B;
         Thu, 28 Oct 2021 11:24:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
         content-type:content-type:content-transfer-encoding:mime-version
         :references:in-reply-to:x-mailer:message-id:date:date:subject
         :subject:from:from:received:received:received; s=mta-01; t=
-        1635420271; x=1637234672; bh=YXHgbGA2lhrUJAZurjL9cY1iWV1Um0NwCFc
-        4s9CDP2Q=; b=VNAvups4zh8tcDA22CsB6Px0v0e+p1fuT5OmgV5B53oH8EOOTB/
-        r8GOL2xm7OyfSt26S+clgfqAFMbYrMBvgQWXvbNMnRvxMi47dsFmRsSpDKz0jzRP
-        /36i8BrWe35OBOqwX3T8/sBIELuybBT7T2qjv6KwfHvBsPG0AzL6h8bU=
+        1635420271; x=1637234672; bh=8Be58/dAPBmvYIlI3IDXDz0Dc4G9SVTmLL1
+        LsMKwS+I=; b=tnz85F+YVu48KgFtF+oegooA0PZDODAkmdrpfJ+5IgaP8aJU156
+        LYrdkEZmGWKs46RtgZyEEN89wNjIPX8CaW7S+hKrxuWNu/Zcj4gZ5UzCUDFi9Ew7
+        fASKuKxRWq9GrT1QMZfkhr8WDEBK1LtJuf4CcjORFdPSic3qIVQSnMb0=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
         by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id aTbt68cat-uT; Thu, 28 Oct 2021 14:24:31 +0300 (MSK)
+        with ESMTP id z1fD6xYj8AEw; Thu, 28 Oct 2021 14:24:31 +0300 (MSK)
 Received: from T-EXCH-04.corp.yadro.com (t-exch-04.corp.yadro.com [172.17.100.104])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 3204D46184;
-        Thu, 28 Oct 2021 14:24:31 +0300 (MSK)
+        by mta-01.yadro.com (Postfix) with ESMTPS id BDF9246179;
+        Thu, 28 Oct 2021 14:24:30 +0300 (MSK)
 Received: from localhost.localdomain (10.199.10.99) by
  T-EXCH-04.corp.yadro.com (172.17.100.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
- 15.1.669.32; Thu, 28 Oct 2021 14:24:30 +0300
+ 15.1.669.32; Thu, 28 Oct 2021 14:24:29 +0300
 From:   "Alexander V. Buev" <a.buev@yadro.com>
 To:     <linux-block@vger.kernel.org>
 CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>,
         "Alexander V. Buev" <a.buev@yadro.com>
-Subject: [PATCH 3/3] block: fops: handle IOCB_USE_PI in direct IO
-Date:   Thu, 28 Oct 2021 14:24:06 +0300
-Message-ID: <20211028112406.101314-4-a.buev@yadro.com>
+Subject: [PATCH 2/3] block: io_uring: add IO_WITH_PI flag to SQE
+Date:   Thu, 28 Oct 2021 14:24:05 +0300
+Message-ID: <20211028112406.101314-3-a.buev@yadro.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211028112406.101314-1-a.buev@yadro.com>
 References: <20211028112406.101314-1-a.buev@yadro.com>
@@ -60,140 +60,138 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Check that the size of integrity data correspond to device integrity
-profile and data size. Split integrity data to the different bio's
-in case of to big orginal bio (together with normal data).
-Correct offset/size checking at blkdev layer in read/write_iter
-functions.
+Add new IOSQE_IO_WITH_PI flag to sqe struct flags.
+Add IOCB_USE_PI flag to kiocb struct flags.
+Correct range checking at uring layer in case of
+READV/WRITEV operations with IOCB_USE_PI.
+
+Based on: https://patchwork.kernel.org/patch/11405557/
 
 Signed-off-by: Alexander V. Buev <a.buev@yadro.com>
 ---
- block/fops.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ fs/io_uring.c                 | 32 +++++++++++++++++++++++++++++---
+ include/linux/fs.h            |  1 +
+ include/uapi/linux/io_uring.h |  3 +++
+ 3 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index 1e970c247e0e..74040314f5f3 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -197,12 +197,39 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 	struct blk_plug plug;
- 	struct blkdev_dio *dio;
- 	struct bio *bio;
-+	struct iovec *pi_iov, _pi_iov;
- 	bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
- 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
- 	loff_t pos = iocb->ki_pos;
- 	blk_qc_t qc = BLK_QC_T_NONE;
- 	int ret = 0;
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index bc18af5e0a93..bce8488fb849 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -105,7 +105,7 @@
  
-+	if (iocb->ki_flags & IOCB_USE_PI) {
-+		struct blk_integrity *bi = blk_get_integrity(bdev->bd_disk);
-+		unsigned int intervals;
-+
-+		/* Last iovec contains protection information. */
-+		if (!iter->nr_segs)
+ #define SQE_VALID_FLAGS	(IOSQE_FIXED_FILE|IOSQE_IO_DRAIN|IOSQE_IO_LINK|	\
+ 				IOSQE_IO_HARDLINK | IOSQE_ASYNC | \
+-				IOSQE_BUFFER_SELECT)
++				IOSQE_BUFFER_SELECT | IOSQE_IO_WITH_PI)
+ #define IO_REQ_CLEAN_FLAGS (REQ_F_BUFFER_SELECTED | REQ_F_NEED_CLEANUP | \
+ 				REQ_F_POLLED | REQ_F_INFLIGHT | REQ_F_CREDS)
+ 
+@@ -726,6 +726,7 @@ enum {
+ 	REQ_F_HARDLINK_BIT	= IOSQE_IO_HARDLINK_BIT,
+ 	REQ_F_FORCE_ASYNC_BIT	= IOSQE_ASYNC_BIT,
+ 	REQ_F_BUFFER_SELECT_BIT	= IOSQE_BUFFER_SELECT_BIT,
++	REQ_F_IO_WITH_PI_BIT    = IOSQE_IO_WITH_PI_BIT,
+ 
+ 	/* first byte is taken by user flags, shift it to not overlap */
+ 	REQ_F_FAIL_BIT		= 8,
+@@ -2850,6 +2851,13 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	if (unlikely(ret))
+ 		return ret;
+ 
++	if (sqe->flags & IOSQE_IO_WITH_PI) {
++		if (!(req->file->f_flags & O_DIRECT))
 +			return -EINVAL;
 +
-+		iter->nr_segs--;
-+		pi_iov = (struct iovec *)(iter->iov + iter->nr_segs);
-+
-+		/* TODO: seems iter is in charge of this check ? */
-+		if (pi_iov->iov_len > iter->count)
-+			return -EINVAL;
-+
-+		iter->count -= pi_iov->iov_len;
-+
-+		intervals = bio_integrity_intervals(bi, iter->count >> 9);
-+		if (unlikely(intervals * bi->tuple_size > pi_iov->iov_len)) {
-+			pr_err("Integrity & data size mismatch data=%lu integrity=%u intervals=%u tupple=%u",
-+				iter->count, (unsigned int)pi_iov->iov_len,
-+				intervals, bi->tuple_size);
-+				return -EINVAL;
-+		}
++		kiocb->ki_flags |= IOCB_USE_PI;
 +	}
 +
- 	if ((pos | iov_iter_alignment(iter)) &
- 	    (bdev_logical_block_size(bdev) - 1))
- 		return -EINVAL;
-@@ -258,6 +285,17 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 		dio->size += bio->bi_iter.bi_size;
- 		pos += bio->bi_iter.bi_size;
+ 	/*
+ 	 * If the file is marked O_NONBLOCK, still allow retry for it if it
+ 	 * supports async. Otherwise it's impossible to use O_NONBLOCK files
+@@ -3451,6 +3459,7 @@ static int io_read(struct io_kiocb *req, unsigned int issue_flags)
+ 	bool force_nonblock = issue_flags & IO_URING_F_NONBLOCK;
+ 	struct iov_iter_state __state, *state;
+ 	ssize_t ret, ret2;
++	size_t iov_data_size;
  
-+		/* in case we can't add all data to one bio */
-+		/* we must split integrity too */
-+
-+		if (iocb->ki_flags & IOCB_USE_PI) {
-+			struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+
-+			_pi_iov.iov_base =  pi_iov->iov_base;
-+			_pi_iov.iov_base += bio_integrity_bytes(bi, (dio->size-bio->bi_iter.bi_size) >> 9);
-+			_pi_iov.iov_len  = bio_integrity_bytes(bi, bio->bi_iter.bi_size >> 9);
-+		}
-+
- 		nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS);
- 		if (!nr_pages) {
- 			bool polled = false;
-@@ -267,6 +305,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 				polled = true;
- 			}
- 
-+			/* Add protection information to bio */
-+			if (iocb->ki_flags & IOCB_USE_PI) {
-+				ret = bio_integrity_add_pi_iovec(bio, &_pi_iov);
-+				if (ret) {
-+					bio->bi_status = BLK_STS_IOERR;
-+					bio_endio(bio);
-+					break;
-+				}
-+			}
-+
- 			qc = submit_bio(bio);
- 
- 			if (polled)
-@@ -288,6 +336,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 			atomic_inc(&dio->ref);
- 		}
- 
-+
-+		if (iocb->ki_flags & IOCB_USE_PI) {
-+			ret = bio_integrity_add_pi_iovec(bio, &_pi_iov);
-+			if (ret) {
-+				bio->bi_status = BLK_STS_IOERR;
-+				bio_endio(bio);
-+				break;
-+			}
-+		}
-+
- 		submit_bio(bio);
- 		bio = bio_alloc(GFP_KERNEL, nr_pages);
+ 	if (rw) {
+ 		iter = &rw->iter;
+@@ -3483,7 +3492,15 @@ static int io_read(struct io_kiocb *req, unsigned int issue_flags)
+ 		return ret ?: -EAGAIN;
  	}
-@@ -509,6 +567,12 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
- 		return -EOPNOTSUPP;
  
-+	if (iocb->ki_flags & IOCB_USE_PI) {
-+		if (from->nr_segs < 2)
-+			return -EINVAL;
-+		size += from->iov[from->nr_segs-1].iov_len;
+-	ret = rw_verify_area(READ, req->file, io_kiocb_ppos(kiocb), req->result);
++	iov_data_size = req->result;
++	/* in case of PI present we must verify ranges only by data size */
++	if (req->opcode == IORING_OP_READV &&
++	     kiocb->ki_flags & IOCB_USE_PI &&
++	     iter->nr_segs >= 2) {
++		iov_data_size -= iter->iov[iter->nr_segs-1].iov_len;
 +	}
 +
- 	size -= iocb->ki_pos;
- 	if (iov_iter_count(from) > size) {
- 		shorted = iov_iter_count(from) - size;
-@@ -537,6 +601,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 		return 0;
++	ret = rw_verify_area(READ, req->file, io_kiocb_ppos(kiocb), iov_data_size);
+ 	if (unlikely(ret)) {
+ 		kfree(iovec);
+ 		return ret;
+@@ -3586,6 +3603,7 @@ static int io_write(struct io_kiocb *req, unsigned int issue_flags)
+ 	bool force_nonblock = issue_flags & IO_URING_F_NONBLOCK;
+ 	struct iov_iter_state __state, *state;
+ 	ssize_t ret, ret2;
++	size_t iov_data_size;
  
- 	size -= pos;
-+
-+	if (iocb->ki_flags & IOCB_USE_PI) {
-+		if (to->nr_segs < 2)
-+			return -EINVAL;
-+		size += to->iov[to->nr_segs-1].iov_len;
+ 	if (rw) {
+ 		iter = &rw->iter;
+@@ -3616,7 +3634,15 @@ static int io_write(struct io_kiocb *req, unsigned int issue_flags)
+ 	    (req->flags & REQ_F_ISREG))
+ 		goto copy_iov;
+ 
+-	ret = rw_verify_area(WRITE, req->file, io_kiocb_ppos(kiocb), req->result);
++	iov_data_size = req->result;
++	/* in case of PI present we must verify ranges only by data size */
++	if (req->opcode == IORING_OP_WRITEV &&
++	     kiocb->ki_flags & IOCB_USE_PI &&
++	     iter->nr_segs >= 2) {
++		iov_data_size -= iter->iov[iter->nr_segs-1].iov_len;
 +	}
 +
- 	if (iov_iter_count(to) > size) {
- 		shorted = iov_iter_count(to) - size;
- 		iov_iter_truncate(to, size);
++	ret = rw_verify_area(WRITE, req->file, io_kiocb_ppos(kiocb), iov_data_size);
+ 	if (unlikely(ret))
+ 		goto out_free;
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index e7a633353fd2..874afc7bc28b 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -321,6 +321,7 @@ enum rw_hint {
+ #define IOCB_NOIO		(1 << 20)
+ /* can use bio alloc cache */
+ #define IOCB_ALLOC_CACHE	(1 << 21)
++#define IOCB_USE_PI		(1 << 22)
+ 
+ struct kiocb {
+ 	struct file		*ki_filp;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index b270a07b285e..6b2dd4449ea5 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -70,6 +70,7 @@ enum {
+ 	IOSQE_IO_HARDLINK_BIT,
+ 	IOSQE_ASYNC_BIT,
+ 	IOSQE_BUFFER_SELECT_BIT,
++	IOSQE_IO_WITH_PI_BIT,
+ };
+ 
+ /*
+@@ -87,6 +88,8 @@ enum {
+ #define IOSQE_ASYNC		(1U << IOSQE_ASYNC_BIT)
+ /* select buffer from sqe->buf_group */
+ #define IOSQE_BUFFER_SELECT	(1U << IOSQE_BUFFER_SELECT_BIT)
++/* perform IO with PI (protection information) */
++#define IOSQE_IO_WITH_PI	(1U << IOSQE_IO_WITH_PI_BIT)
+ 
+ /*
+  * io_uring_setup() flags
 -- 
 2.33.0
 
