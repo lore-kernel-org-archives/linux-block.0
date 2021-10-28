@@ -2,101 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3E0C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 20:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EB6C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 20:36:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 61FD660F0F
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 20:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F7AD60F0F
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 20:36:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbhJ1Ufp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Oct 2021 16:35:45 -0400
-Received: from bedivere.hansenpartnership.com ([96.44.175.130]:51762 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230323AbhJ1Ufp (ORCPT
+        id S230380AbhJ1Uie (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Oct 2021 16:38:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59072 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230323AbhJ1Uie (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 16:35:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1635453198;
-        bh=cSZBm0trHz1EnFTZoBXBXvs8X4Y8AfvRTslBGZ+VMEU=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=T7A0/ovwPsaP1m0wEvOR2VhCtiZMK9rRu+OM/OaqVp11IBHMkHXp0pd8+AtIxsPdF
-         L1L4NtVxekNGT/TF3F2ryXi+WYhuW8X2lsyFShDk0BPnB2U/BfrfoKIGpcM9kfInDS
-         fy30iPfEdFd/3B30/j7gN4tAWcJTYKp7s5DPkrZw=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 12FD21280CAB;
-        Thu, 28 Oct 2021 16:33:18 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ETgKuIeG6ep6; Thu, 28 Oct 2021 16:33:18 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1635453197;
-        bh=cSZBm0trHz1EnFTZoBXBXvs8X4Y8AfvRTslBGZ+VMEU=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=RQ2V1m0kPrFTWeAUpbc7TfIpKCj17D/qdRGUrl052MNYP8DPpk89EnjTMbHhK63Yd
-         2tGuMY94LlZXWm3VQWbFOHDpV7QzD7NkN8VxX4yKfvR/SjFC6PnG54SccGtiuH/JL+
-         XLQnjMsqzSIGwg5NWCjzwzzZxl9c/vTvkhoN2dHM=
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 178EA1280CA9;
-        Thu, 28 Oct 2021 16:33:17 -0400 (EDT)
-Message-ID: <4f16a99974be6f2a0f207d5ca7327719cdf4e36e.camel@HansenPartnership.com>
-Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        alim.akhtar@samsung.com, avri.altman@wdc.com,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Daejun Park <daejun7.park@samsung.com>
-Date:   Thu, 28 Oct 2021 16:33:15 -0400
-In-Reply-To: <a6af2ce7-4a03-ab0c-67cd-c58022e5ded1@acm.org>
-References: <20211026071204.1709318-1-hch@lst.de>
-         <99641481-523a-e5a9-db48-dac2b547b4bd@acm.org>
-         <7ed11ee1f8beca9a27c0cb2eb0dcea4dbd557961.camel@HansenPartnership.com>
-         <870e986c-08dd-2fa2-a593-0f97e10d6df5@kernel.dk>
-         <4438ab72-7da0-33de-ecc9-91c3c179eca7@acm.org>
-         <c3d85be5-2708-ea50-09ac-2285928bbe0e@kernel.dk>
-         <36729509daa80fd48453e8a3a1b5c23750948e6c.camel@HansenPartnership.com>
-         <yq1ee873av4.fsf@ca-mkp.ca.oracle.com>
-         <679b4d3b-778e-47cd-d53f-f7bf77315f7c@acm.org>
-         <20211027052724.GA8946@lst.de>
-         <b2bcc13ccdc584962128a69fa5992936068e1a9b.camel@HansenPartnership.com>
-         <a6af2ce7-4a03-ab0c-67cd-c58022e5ded1@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        Thu, 28 Oct 2021 16:38:34 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC0BC061570;
+        Thu, 28 Oct 2021 13:36:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=LX6K9oTgNbH+UMBpyJZsK97HkfDlA20CVm5u+Vv4f3E=; b=32L6dRGIMGbYnYxVZLsriMubkW
+        nzw7Knt3nRE7Fv6kpBPY+RAqS3+eiiayJxQQ4y3Dto7quWrYM3fxgwk5lFo7Z/BU/bA2zqcLFAGOT
+        xefHURRhmruyq+4C81a47La954GM+/05xztPqn3NBPOBAUZ/pBW2aH7eOS9yzZ+vLJMZCiLIb9EDp
+        Sj0rf0Aej+DkA9wQi0F4aPnO3VO98uOjfPEIifYVUzmG+uZuDaYa+tJ9qKqYun/uKFtVnK5vSxiXM
+        uMvFHFuCGyjR1LiO4bKL8i4HXZxCu1+hvRizuYyILCytWMBT9pdPh1ybatDrEoJMZmCrgCHlDmCuQ
+        sSl9MUmQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mgC84-0093FY-U8; Thu, 28 Oct 2021 20:36:04 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH] zram: use ATTRIBUTE_GROUPS
+Date:   Thu, 28 Oct 2021 13:36:00 -0700
+Message-Id: <20211028203600.2157356-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-10-28 at 13:21 -0700, Bart Van Assche wrote:
-[...]
-> Hi James,
-> 
-> The help with trying to find a solution is appreciated.
-> 
-> One of the software developers who is familiar with HPB explained to
-> me that READ BUFFER and WRITE BUFFER commands may be received in an
-> arbitrary order by UFS devices. The UFS HPB spec requires UFS devices
-> to be able to stash up to 128 such pairs. I'm concerned that leaving
-> out WRITE BUFFER commands only will break the HPB protocol in a
-> subtle way.
+Embrace ATTRIBUTE_GROUPS to avoid boiler plate code.
+This should not introduce any functional changes.
 
-Based on the publicly available information (the hotstorage paper) I
-don't belive it can.  The Samsung guys also appear to confirm that the
-use of WRITE BUFFER is simply an optimzation for large requests:
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/block/zram/zram_drv.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-https://lore.kernel.org/all/20211025051654epcms2p36b259d237eb2b8b885210148118c5d3f@epcms2p3/
-
-As did the excerpt from the spec you posted.  It will cause slowdowns
-for reads of > 32kb, because they have to go through the native FTL
-lookup now, but there shouldn't be any functional change.  Unless
-there's anything else in the proprietary spec that contradicts this?
-
-James
-
-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index fcaf2750f68f..268f727f7cba 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1874,14 +1874,7 @@ static struct attribute *zram_disk_attrs[] = {
+ 	NULL,
+ };
+ 
+-static const struct attribute_group zram_disk_attr_group = {
+-	.attrs = zram_disk_attrs,
+-};
+-
+-static const struct attribute_group *zram_disk_attr_groups[] = {
+-	&zram_disk_attr_group,
+-	NULL,
+-};
++ATTRIBUTE_GROUPS(zram_disk);
+ 
+ /*
+  * Allocate and initialize new zram device. the function returns
+@@ -1953,7 +1946,7 @@ static int zram_add(void)
+ 		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
+ 
+ 	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
+-	device_add_disk(NULL, zram->disk, zram_disk_attr_groups);
++	device_add_disk(NULL, zram->disk, zram_disk_groups);
+ 
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ 
+-- 
+2.33.0
 
