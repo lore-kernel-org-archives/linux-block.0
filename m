@@ -2,96 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B19C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 20:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB82C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 00:42:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9D03610A4
-	for <linux-block@archiver.kernel.org>; Wed, 27 Oct 2021 20:16:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A2F5610C7
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 00:42:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238966AbhJ0USt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Oct 2021 16:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39488 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239125AbhJ0USs (ORCPT
+        id S229523AbhJ1ApI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Oct 2021 20:45:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20714 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229437AbhJ1ApH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Oct 2021 16:18:48 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB77C061570
-        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 13:16:23 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id h196so5290641iof.2
-        for <linux-block@vger.kernel.org>; Wed, 27 Oct 2021 13:16:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=LjqtuKqFcXICmEO8DHfW9oWVMqViCZUkTv+u2qOQRJE=;
-        b=KuMjthfzFhs0jK3AOFpblR8xZlZVm6q0z4TLSnjUhqXDXOi4Ll6dDA2+z6kI+9lIYa
-         w5P2ygcPS4qczrFtKPmS7Ccg4ws2sZpgU26vVHDpHsS8/uOcARKoqvAxOEUM/hbqiHaK
-         zhEzcjDMEOZhMNyCQLQCK0YCLJwL9q0v6xK5BynD6Y6gSFi+noyloZUHcltMIac7N9Fq
-         XTELJqnhHRsSs4NTmmZkKQ8kGQyqA7+O9hqu0dZ7Ncho0W+bOpvSwg8oly13QvVjJsiq
-         s4win3Lo+0ss2ww17hLS4GwWuO28c+/ewZMhfksh0fuXQC86RNsY9yt6UvmIs5zGieHX
-         4xNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=LjqtuKqFcXICmEO8DHfW9oWVMqViCZUkTv+u2qOQRJE=;
-        b=E1TDAMpPRmvcnCRsgx9Rxd+uawedVTLbgHnH27lA+PK66nZC8/jMnuGIkUaPXTHAvM
-         9rOjNBcYqCxGslJswUTIKuJQhkPq/YDVCk9vW6IKJtTbyBUFA+AzKtlHIWa0LUf+bNgU
-         fvgVBReMgXm02EKESB6YJ69jYeYUwdn+TOpzSgaUTH0bTUgy3Ra228oHUX5o65GZA1bq
-         G5Zg+66BMt3fImTMc3f2C6OGJQ6H5VPk2vBfG3q2PzgyEkvdp5+NeCxWNGv0VSCU6zs4
-         EP2OUvy6Jv97T6HehUGH1etsHq14U55X1+2bw8CecOCOBcxJdfrSfujR2/CKTArwerX7
-         yoaA==
-X-Gm-Message-State: AOAM533UMEAlvEy9STmUcxvlEYfFlTJFBRgpGV3W7OLMszn47KkDuiGZ
-        vv5ieRdxjNwoCte3W8OHnZjSNw==
-X-Google-Smtp-Source: ABdhPJzjKGWTU7Qj+ZS/+X6wIjVKvNDsihkCZ+0ht8OW7V4lQgdI5hSbFvSWgvIzOVN/9L+2pQ/5LQ==
-X-Received: by 2002:a02:8484:: with SMTP id f4mr15430jai.140.1635365782499;
-        Wed, 27 Oct 2021 13:16:22 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id j15sm513419ile.65.2021.10.27.13.16.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 13:16:22 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     kwolf@redhat.com, hch@lst.de, stefanha@redhat.com,
-        jasowang@redhat.com, mst@redhat.com,
-        Xie Yongji <xieyongji@bytedance.com>, josef@toxicpanda.com
-Cc:     virtualization@lists.linux-foundation.org, nbd@other.debian.org,
-        linux-block@vger.kernel.org
-In-Reply-To: <20211026144015.188-1-xieyongji@bytedance.com>
-References: <20211026144015.188-1-xieyongji@bytedance.com>
-Subject: Re: [PATCH v3 0/4] Add blk_validate_block_size() helper for drivers to validate block size
-Message-Id: <163536578184.77381.1471415825529034425.b4-ty@kernel.dk>
-Date:   Wed, 27 Oct 2021 14:16:21 -0600
+        Wed, 27 Oct 2021 20:45:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635381761;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fghCXlqFJqhbevuBMyBOvHVtTIBGNx/lQY5qSJ6s38o=;
+        b=davxydxvNj/KCkqKQimLrliJbK/YsCDPNvomi0S4s22/N4BnKZgg/ngZ+wIZ2RCvpfNY2i
+        n7u7+G0EU9zIUkRGefci29K9tM53FAABeJs6B5PA4THwsnFrB+ECNrMugqBoTea6qM0tYn
+        1lKyNBni++1Hy13+bV0VY/B/TUqaHiE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-548-9WvrQj6JPgaXxotGUun5xQ-1; Wed, 27 Oct 2021 20:42:36 -0400
+X-MC-Unique: 9WvrQj6JPgaXxotGUun5xQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5517818414A0;
+        Thu, 28 Oct 2021 00:42:34 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C87C71A26A;
+        Thu, 28 Oct 2021 00:42:24 +0000 (UTC)
+Date:   Thu, 28 Oct 2021 08:42:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, alim.akhtar@samsung.com,
+        avri.altman@wdc.com, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH] scsi: ufs: mark HPB support as BROKEN
+Message-ID: <YXnx7EIFMTH8czLa@T590>
+References: <679b4d3b-778e-47cd-d53f-f7bf77315f7c@acm.org>
+ <20211027052724.GA8946@lst.de>
+ <b8aec3cb-75f1-3e1f-1dfc-5d77322b736f@acm.org>
+ <20211027141231.GA2338303@dhcp-10-100-145-180.wdc.com>
+ <YXlqSRLHuIFiMLY7@T590>
+ <3f43feaa-5c3a-9e4c-ebc1-c982b0723e7e@kernel.dk>
+ <YXltPgRTxe+Xn66i@T590>
+ <yq1wnlyzday.fsf@ca-mkp.ca.oracle.com>
+ <YXl3H39vHAj2+SSL@T590>
+ <20211027161632.GB2338303@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211027161632.GB2338303@dhcp-10-100-145-180.wdc.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 26 Oct 2021 22:40:11 +0800, Xie Yongji wrote:
-> The block layer can't support the block size larger than
-> page size yet, so driver needs to validate the block size
-> before setting it. Now this validation is done in device drivers
-> with some duplicated codes. This series tries to add a block
-> layer helper for it and makes loop driver, nbd driver and
-> virtio-blk driver use it.
+On Wed, Oct 27, 2021 at 09:16:32AM -0700, Keith Busch wrote:
+> On Wed, Oct 27, 2021 at 11:58:23PM +0800, Ming Lei wrote:
+> > On Wed, Oct 27, 2021 at 11:44:04AM -0400, Martin K. Petersen wrote:
+> > > 
+> > > Ming,
+> > > 
+> > > > request with scsi_cmnd may be allocated by the ufshpb driver, even it
+> > > > should be fine to call ufshcd_queuecommand() directly for this driver
+> > > > private IO, if the tag can be reused. One example is scsi_ioctl_reset().
+> > > 
+> > > scsi_ioctl_reset() allocates a new request, though, so that doesn't
+> > > solve the forward progress guarantee. Whereas eh puts the saved request
+> > > on the stack.
+> > 
+> > What I meant is to use one totally ufshpb private command allocated from
+> > private slab to replace the spawned request, which is sent to ufshcd_queuecommand()
+> > directly, so forward progress is guaranteed if the blk-mq request's tag can be
+> > reused for issuing this private command. This approach takes a bit effort,
+> > but avoids tags reservation.
+> > 
+> > Yeah, it is cleaner to use reserved tag for the spawned request, but we
+> > need to know:
+> > 
+> > 1) how many queue depth for the hba? If it is small, even 1 reservation
+> > can affect performance.
+> > 
+> > 2) how many inflight write buffer commands are to be supported? Or how many
+> > is enough for obtaining expected performance? If the number is big, reserved
+> > tags can't work.
 > 
-> [...]
+> The original and clone are not dispatched to hardware concurrently, so I
+> don't think the reserved_tags need to subtract from the generic ones.
+> The original request already accounts for the hardware resource, so the
+> clone doesn't need to consume another one.
 
-Applied, thanks!
+Yeah, that is why I thought the tag could be reused for the spawned(cloned)
+request, but it needs ufshpb developer to confirm, or at least
+ufshcd_queuecommand() can handle this situation. If that is true, it isn't
+necessary to use reserve tags, since the current blk-mq implementation
+requires to reserve real hardware tags space, which has to take normal
+tags.
 
-[1/4] block: Add a helper to validate the block size
-      commit: 570b1cac477643cbf01a45fa5d018430a1fddbce
-[2/4] nbd: Use blk_validate_block_size() to validate block size
-      commit: c4318d6cd038472d13e08a54a9035863c8c160bd
-[3/4] loop: Use blk_validate_block_size() to validate block size
-      commit: af3c570fb0df422b4906ebd11c1bf363d89961d5
-[4/4] virtio-blk: Use blk_validate_block_size() to validate block size
-      commit: 57a13a5b8157d9a8606490aaa1b805bafe6c37e1
 
-Best regards,
--- 
-Jens Axboe
-
+thanks,
+Ming
 
