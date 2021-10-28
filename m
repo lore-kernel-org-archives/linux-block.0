@@ -2,144 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8553C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 18:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F31C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 19:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB494610E5
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 18:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 991DE610EA
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 19:12:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230466AbhJ1SNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Oct 2021 14:13:44 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:47562 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbhJ1SNn (ORCPT
+        id S230460AbhJ1TPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Oct 2021 15:15:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24636 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230104AbhJ1TPM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 14:13:43 -0400
-Received: from [10.137.106.139] (unknown [131.107.159.11])
-        by linux.microsoft.com (Postfix) with ESMTPSA id A2C8B209F33F;
-        Thu, 28 Oct 2021 11:11:15 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A2C8B209F33F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1635444675;
-        bh=xaWJlPOkgwmSC4Z42bn0ksBEBLLvZTO2Sn6BQavTIXo=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=dDNeeyMjx4g/tOoo4kJSDD/tgC63NmK5mmzKrPpNd382Z9+2QjW8Wa6rQwM4sdcvw
-         531P0qZXyZDSmmRmcXSG2JPJ3jsx+kPTha80B2J4xzECdL9HF/RUMZKv9GBd2gjNq0
-         XoPOT+KetImd5KipF13ipc3zU3OfsWUMxl99upBA=
-Message-ID: <9b2695ac-f6db-ac75-5451-4ea9667ce04f@linux.microsoft.com>
-Date:   Thu, 28 Oct 2021 11:11:15 -0700
+        Thu, 28 Oct 2021 15:15:12 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19SIrgk2012944;
+        Thu, 28 Oct 2021 19:12:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=ebibBSYuRWkCtxrn1KkmUUuESiFbXtwYxHn5Cd26fCA=;
+ b=Uqkk9bMWM2FTB0WpV5sd41cW11Vye6fBu96JRJdpbrnxMgDIwtgWzj05e32N7Wv+RcFH
+ zwyuZ3f9SnEdlUZA70GPeugXmWODoS6XhF1JYivlHMPccTzX7tm2TDvuJUm5lLHLySwY
+ H4Awa5nZyORDF+IEOArEUYIqclh1OFXQdKotF3bH8IYHprLSwuCIULkofaTZp+XkVWwz
+ eummuH/XCyv5iVNq9ceJer4ko7WWgZLY0hosoGC8RMPGNL65Lnc4o+1IGjxVSqBDrd5R
+ vbEYzf6ZPaqPN5FgAFKgXJKpuxMHtLQeg2cK17+9vqKqzeVALeoLGP+ZylEPJaddrhqv zQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c01ht8c2r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Oct 2021 19:12:34 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19SIsI5A013875;
+        Thu, 28 Oct 2021 19:12:34 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c01ht8c28-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Oct 2021 19:12:34 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19SJ9tRr007690;
+        Thu, 28 Oct 2021 19:12:32 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 3bx4eexyxm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 Oct 2021 19:12:32 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19SJCVgO27722020
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 Oct 2021 19:12:31 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 915C87805E;
+        Thu, 28 Oct 2021 19:12:31 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 214E97805C;
+        Thu, 28 Oct 2021 19:12:30 +0000 (GMT)
+Received: from jarvis.int.hansenpartnership.com (unknown [9.163.12.226])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 28 Oct 2021 19:12:29 +0000 (GMT)
+Message-ID: <1d7c1faf6b6fa71599b5157ae95fc48ce479b722.camel@linux.ibm.com>
+Subject: Re: [PATCH] scsi: ufs: Fix proper API to send HPB pre-request
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     Bart Van Assche <bvanassche@acm.org>, daejun7.park@samsung.com,
+        ALIM AKHTAR <alim.akhtar@samsung.com>,
+        "avri.altman@wdc.com" <avri.altman@wdc.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "huobean@gmail.com" <huobean@gmail.com>,
+        Keoseong Park <keosung.park@samsung.com>
+Cc:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Date:   Thu, 28 Oct 2021 15:12:28 -0400
+In-Reply-To: <0d66b6d0-26c6-573f-e2a0-022e22c47b52@acm.org>
+References: <CGME20211027223619epcms2p60bbc74c9ba9757c58709a99acd0892ff@epcms2p6>
+         <20211027223619epcms2p60bbc74c9ba9757c58709a99acd0892ff@epcms2p6>
+         <0f9229c3c4c7859524411a47db96a3b53ac89c90.camel@linux.ibm.com>
+         <0d66b6d0-26c6-573f-e2a0-022e22c47b52@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [RFC PATCH v7 12/16] fsverity|security: add security hooks to
- fsverity digest and signature
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     corbet@lwn.net, axboe@kernel.dk, agk@redhat.com,
-        snitzer@redhat.com, tytso@mit.edu, paul@paul-moore.com,
-        eparis@redhat.com, jmorris@namei.org, serge@hallyn.com,
-        jannh@google.com, dm-devel@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-audit@redhat.com,
-        linux-security-module@vger.kernel.org
-References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
- <1634151995-16266-13-git-send-email-deven.desai@linux.microsoft.com>
- <YWcyYBuNppjrVOe2@gmail.com>
- <9089bdb0-b28a-9fa0-c510-00fa275af621@linux.microsoft.com>
- <YWngaVdvMyWBlITZ@gmail.com>
- <f027e3fa-2f70-0cdb-ac7b-255cee68edbb@linux.microsoft.com>
- <YXodhzYto5BRxqYO@sol.localdomain>
-From:   Deven Bowers <deven.desai@linux.microsoft.com>
-In-Reply-To: <YXodhzYto5BRxqYO@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4B3mIsVrLwJIeGbeNInSr2oVIvBI_rTL
+X-Proofpoint-ORIG-GUID: FpfuV6G84xVFFiEnWk0hP3ynd-Ezr7d6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-28_05,2021-10-26_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 impostorscore=0 spamscore=0 malwarescore=0
+ adultscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0
+ mlxlogscore=999 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2110280100
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, 2021-10-28 at 08:59 -0700, Bart Van Assche wrote:
+> On 10/28/21 7:28 AM, James Bottomley wrote:
+> > If the block people are happy with this, then I'm OK with it, but
+> > it
+> > doesn't look like you've solved the fanout deadlock problem because
+> > this new mechanism is still going to allocate a new tag.
+> 
+> (+Jens, Christoph and linux-block)
+> 
+> Hi James,
+> 
+> My understanding is that the UFS HPB code makes ufshcd_queuecommand()
+> return SCSI_MLQUEUE_HOST_BUSY if the pool with pre-allocated requests
+> is exhausted. This will make the SCSI core reissue a SCSI command
+> until completion of another command has freed up one of the pre-
+> allocated requests. This is not the most efficient approach but
+> should not trigger a deadlock.
 
-On 10/27/2021 8:48 PM, Eric Biggers wrote:
-> On Tue, Oct 26, 2021 at 12:03:53PM -0700, Deven Bowers wrote:
->>>> The proposed LSM (IPE) of this series will be the only one to need
->>>> this information at the  moment. IPE’s goal is to have provide
->>>> trust-based access control. Trust and Integrity are tied together,
->>>> as you cannot prove trust without proving integrity.
->>> I think you mean authenticity, not integrity?
->> I’ve heard a lot of people use these terms in overloaded ways.
->>
->> If we’re working with the definition of authenticity being
->> “the property that a resource was _actually_ sent/created by a
->> party”, and integrity being “the property that a resource was not
->> modified from a point of time”, then yes. Though the statement isn’t
->> false, though, because you’d need to prove integrity in the process of
->> proving authenticity.
->>
->> If not, could you clarify what you mean by authenticity and integrity,
->> so that we can use consistent definitions?
-> In cryptography, integrity normally means knowing whether data has been
-> non-maliciously changed, while authenticity means knowing whether data is from a
-> particular source, which implies knowing whether it has been changed at all
-> (whether maliciously or not).  Consider that there are "Message Authentication
-> Codes" (MACs) and "Authenticated Encryption", not "Message Integrity Codes" and
-> "Intact Encryption".
->
-> Unfortunately lots of people do overload "integrity" to mean authenticity, so
-> you're not alone.  But it's confusing, so if you're going to do that then please
-> make sure to clearly explain what you mean.
->
->>> Also how does this differ from IMA?  I know that IMA doesn't support fs-verity
->>> file hashes, but that could be changed.  Why not extend IMA to cover your use
->>> case(s)?
->> We looked at extending IMA to cover our requirements extensively the past
->> year
->> based on feedback the last time I posted these patches. We implemented a
->> prototype that had half of our requirements, but found it resulted in a
->> large change list that would result in a large amount of pain in respect
->> to maintenance, in addition to other more architectural concerns about the
->> implementation. We weren’t convinced it was the correct direction, for our
->> needs.
->>
->> There was a presentation done at LSS 2021 around this prototype done by my
->> colleague, Fan, who authored this patch and implemented the aforementioned
->> prototype.
->>
->> In general, IMA provides a whole suite of amazing functionality when it
->> comes to everything integrity, as the fs-verity documentation states
->> itself:
->>
->>     IMA specifies a system-wide policy that specifies which
->>     files are hashed and what to do with those hashes, such
->>     as log them, authenticate them, or add them to a
->>     measurement list.
->>
->> Instead, IPE provides a fine-tuned way to _only_ enforce an access control
->> policy to these files based on the defined trust requirements in the policy,
->> under various contexts, (you might have different requirements for what
->> executes in a general purpose, versus loadable kernel modules, for example).
->> It will never provide bother to log, measure, or revalidate these hashes
->> because
->> that’s not its purpose. This is why it belongs at the LSM layer instead of
->> the
->> integrity subsystem layer, as it is providing access control based on a
->> policy,
->> versus providing deep integrations with the actual integrity claim.
->>
->> IPE is trying to be agnostic to how precisely “trust” is provided, as
->> opposed to be deeply integrated into the mechanism that provides
->> “trust”.
-> IMA doesn't require logging or "measuring" hashes, though.  Those are just some
-> of its supported features.  And I thought the IMA developers were planning to
-> add support for fs-verity hashes, and that it wouldn't require an entirely new
-> architecture to do so.
->
-> Anyway, while it does sound to me like you're duplicating IMA, I don't really
-> have a horse in this race, and I defer to the IMA developers on this.  I trust
-> that you've been engaging with them?  This patchset isn't even Cc'ed to
-> linux-integrity, so it's unclear that's been happening.
-That was entirely my mistake. Mimi and the linux-integrity list was CC'd 
-on previous
-versions (Roberto actually added the list to his responses) - when I was 
-reconstructing
-the To: line with get-maintainers.pl, the list didn't pop up and I did 
-not remember to
-add it manually. I've corrected my mailing script to re-add them again.
+I think the deadlock is triggered if the system is down to its last
+reserved request on the memory clearing device and the next entry in
+the queue for this device is one which does a fanout so we can't
+service it with the single reserved request we have left for the
+purposes of making forward progress.  Sending it back doesn't help,
+assuming this is the only memory clearing path, because retrying it
+won't help ... we have to succeed with a request on this path to move
+forward with clearing memory.
+
+I think this problem could be solved by processing the WRITE BUFFER and
+the request serially by hijacking the request sent down, but we can't
+solve it if we try to allocate a new request.
+
+James
+
+
