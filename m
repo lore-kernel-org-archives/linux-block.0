@@ -2,104 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC82C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E70E7C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B525D610CB
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7E72610CA
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbhJ1QBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Oct 2021 12:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52452 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbhJ1QBD (ORCPT
+        id S229846AbhJ1QBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Oct 2021 12:01:55 -0400
+Received: from mail-pf1-f182.google.com ([209.85.210.182]:44585 "EHLO
+        mail-pf1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229565AbhJ1QBy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 12:01:03 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D063EC061570
-        for <linux-block@vger.kernel.org>; Thu, 28 Oct 2021 08:58:35 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id j35-20020a05600c1c2300b0032caeca81b7so4946438wms.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Oct 2021 08:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=CZ+88hwHts574bnAylE3naMBO9XkXlnONWenPRHFnic=;
-        b=NZUBENnqux3jfd0C9v2Cxr9g+WN3nWNc0ETGXFv9bL19B3oXEcN+g+VOyme6ijhDch
-         5n93/n0MQCj433gA5nvfOpnWQEEiBFdoasREHD2KgZE8D8Y1x2q68dJbwy8vuMOPEwvM
-         K8qBNcpYrrArwAG/qMf6uhn55hXwshqgtUqGMNZ8f9eip6CdGIR7c8+FmdkGQ27mKyef
-         PfNm2XIikkdvJtEiJHpFthr3diLWOOCxYZaEz0HOFvExc/8/j+vMVS1eI/SHq2Qwi8ex
-         UhveAWczdNj1EMbQPYZlXy0Hi9NZaGOIHXx0vJNFPEcdTboxV/2TQhuSHCd0KAA7Eeob
-         x7mw==
+        Thu, 28 Oct 2021 12:01:54 -0400
+Received: by mail-pf1-f182.google.com with SMTP id a26so6367975pfr.11;
+        Thu, 28 Oct 2021 08:59:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=CZ+88hwHts574bnAylE3naMBO9XkXlnONWenPRHFnic=;
-        b=QJUD1TWgrzQXNNvpLWng+ArVlQrWKEVJtqFV8YtoxDwHTowUKtHgrpib2DUJHnue92
-         5RTNLWULLsf0sBKynnGNKFP1B4hvp7o0l75aMfil49eYr6xhhSIB3kP/QesWtsSHE2jc
-         7AD+7uWaxoMPVF/q6x3QExxnLsl3RiYKVs06NxeZFrTnuFksqptGfbLoaxfH9R9mE0Rg
-         0qjW2IYI/RDJom4jUOGn5rHqwa1A4MA0H9oi3MMyZxsn69R5UlmqkDuQQF/uSXH8LlO0
-         9LyqRcDzFhPHsYs8ywGPCIDtkB67Okpx7cK34nh8iEJ66sPuBxI3L/lDslKFGW4G9NCX
-         4jmA==
-X-Gm-Message-State: AOAM5338n9UnKyE0hqIVFt5Vz8/RfvE1jPqSyRi1mAtG8tDitOUTV9JF
-        kIKFINrEAvH6KwKNklc1XcQPABs6ipk=
-X-Google-Smtp-Source: ABdhPJzHKrpeqcysDn9pKyxTTJ7YV9SEktLhCNLvNS9Ohk1HXMQ9GTF1mnITxy3NkIyzt2a6fUmiTw==
-X-Received: by 2002:a05:600c:246:: with SMTP id 6mr5404878wmj.91.1635436714453;
-        Thu, 28 Oct 2021 08:58:34 -0700 (PDT)
-Received: from [192.168.8.198] ([148.252.129.16])
-        by smtp.gmail.com with ESMTPSA id w14sm2720324wmi.37.2021.10.28.08.58.33
+        bh=mutmdOYDUUCIr7fsjnojaxA7hpGsA4ENUDLCt5JOY4I=;
+        b=y63pQaiv38WpHndacsR/qIH43xuAeJaJ35FUg7aDF71YnUOOAIlatPuRxeeja/t10j
+         Fj2CMUFa8NE5Dfls9n8pcFv85hmWTl7nPbBX457SCnMt1c+c8HO5enya2m/51fS+h6NZ
+         3Nuxv0xrWznSvu1W+rnXlmdvZnvmjg+/LIBN4sMhxJf0GlliTxDUPbie3NlogRfNLO2f
+         FCZPaPY9vZuxCohQkxAnPnX1hS824bDuBn1TmgMqaG/o/ZwJsgAHWOO6Bz9Xy8esSuip
+         dZUsPTg4fZ+yvFtCKoqSt7ww4U0PZWD8a95wcpc5evvJCJZa8yBXuJ2B6m0QN1etCT2y
+         rPyw==
+X-Gm-Message-State: AOAM533s2Wg2+SpLmjh8oTi92dcIHTnHmH2fSz+oEMBmrBZqHQ6cXOf0
+        pHjWRq2ERakhYWzo3vmAi4s=
+X-Google-Smtp-Source: ABdhPJw43XHWUaPDTIONgfMBhNXAohT/s8KNJwA0G0AWfx76mUEi3hjfoqSlZJyR+rzMAbYwSu8yVA==
+X-Received: by 2002:a05:6a00:5e:b0:47e:603f:26bb with SMTP id i30-20020a056a00005e00b0047e603f26bbmr803311pfk.18.1635436767495;
+        Thu, 28 Oct 2021 08:59:27 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:e816:bd0d:426c:f959])
+        by smtp.gmail.com with ESMTPSA id u4sm8123016pjg.54.2021.10.28.08.59.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Oct 2021 08:58:34 -0700 (PDT)
-Message-ID: <64016c86-188e-916e-662d-b33431dec946@gmail.com>
-Date:   Thu, 28 Oct 2021 16:56:40 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/3] implement direct IO with integrity
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>,
-        Mikhail Malygin <m.malygin@yadro.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Alexander Buev <a.buev@yadro.com>,
+        Thu, 28 Oct 2021 08:59:26 -0700 (PDT)
+Subject: Re: [PATCH] scsi: ufs: Fix proper API to send HPB pre-request
+To:     jejb@linux.ibm.com, daejun7.park@samsung.com,
+        ALIM AKHTAR <alim.akhtar@samsung.com>,
+        "avri.altman@wdc.com" <avri.altman@wdc.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "huobean@gmail.com" <huobean@gmail.com>,
+        Keoseong Park <keosung.park@samsung.com>
+Cc:     "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux@yadro.com" <linux@yadro.com>
-References: <20211028112406.101314-1-a.buev@yadro.com>
- <bc336e90-378e-6016-ea1c-d519290dce5f@kernel.dk>
- <20211028151851.GC9468@lst.de>
- <85a4c250-c189-db5f-0625-2aa4bd1305f8@kernel.dk>
- <AAD8717C-E050-47C0-B8C9-119C8F51B47D@yadro.com>
- <14dcfef2-ac21-35a2-a97b-9cee39b079a1@kernel.dk>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <14dcfef2-ac21-35a2-a97b-9cee39b079a1@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+References: <CGME20211027223619epcms2p60bbc74c9ba9757c58709a99acd0892ff@epcms2p6>
+ <20211027223619epcms2p60bbc74c9ba9757c58709a99acd0892ff@epcms2p6>
+ <0f9229c3c4c7859524411a47db96a3b53ac89c90.camel@linux.ibm.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <0d66b6d0-26c6-573f-e2a0-022e22c47b52@acm.org>
+Date:   Thu, 28 Oct 2021 08:59:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <0f9229c3c4c7859524411a47db96a3b53ac89c90.camel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/28/21 16:50, Jens Axboe wrote:
-> On 10/28/21 9:44 AM, Mikhail Malygin wrote:
->> Thanks for the feedback, we’ll submit and updated version of the series.
->>
->> The only question is regarding uapi: should we add a separate opcodes
->> for read/write or use existing opcodes with the flag in the
->> io_uring_sqe.rw_flags field?
->>
->> The flag was discussed in the another submission, where it was
->> considered to be a better approach over opcodes:
->> https://patchwork.kernel.org/project/linux-block/patch/20200226083719.4389-2-bob.liu@oracle.com/
-> 
-> Separate opcodes is, at least to me, definitely the way to go. Just
-> looking at the code needing to tap into weird spots for PI is enough to
-> make that call. On top of that, it also allows you to cleanly define
-> this command and (hopefully?) avoid that weirdness with implied PI in
-> the last iovec.
+On 10/28/21 7:28 AM, James Bottomley wrote:
+> If the block people are happy with this, then I'm OK with it, but it
+> doesn't look like you've solved the fanout deadlock problem because
+> this new mechanism is still going to allocate a new tag.
 
-Reminds me struggles with writing encoded data to btrfs. I believe
-Omar did go for RWF_ENCODED flag, right?
+(+Jens, Christoph and linux-block)
 
--- 
-Pavel Begunkov
+Hi James,
+
+My understanding is that the UFS HPB code makes ufshcd_queuecommand()
+return SCSI_MLQUEUE_HOST_BUSY if the pool with pre-allocated requests is
+exhausted. This will make the SCSI core reissue a SCSI command until
+completion of another command has freed up one of the pre-allocated
+requests. This is not the most efficient approach but should not trigger
+a deadlock.
+
+Thanks,
+
+Bart.
