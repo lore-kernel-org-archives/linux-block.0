@@ -2,123 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3984C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 17:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8553C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 18:11:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8513C610D2
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 17:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB494610E5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 18:11:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230380AbhJ1Rrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Oct 2021 13:47:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48796 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230361AbhJ1Rrv (ORCPT
+        id S230466AbhJ1SNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Oct 2021 14:13:44 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:47562 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230435AbhJ1SNn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 13:47:51 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00328C061570
-        for <linux-block@vger.kernel.org>; Thu, 28 Oct 2021 10:45:23 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id x9so171382ilu.6
-        for <linux-block@vger.kernel.org>; Thu, 28 Oct 2021 10:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=nqvCR2bN5552JctZBnW09VLBBN76DPfLRHu4EA4nWLA=;
-        b=hyykRwvj4oo1gpi9zgHXAGPqNsDcsV3DgOZw4jZZSpSIxxoESwm2foqE5+2Fqr21Pl
-         /HL9Vrz062i9BP/vByI1+Tji7AFOtBuKLwWu0M3VEOunF+t1DWW+J0E6z6SBU6ncTmVF
-         2WRoX7ExtcAgBQ3NKdzQnt7sg3owAqMCQFgfYdo9vbECKmR4aEfdZZzUbeW7wvj69y2v
-         e/KJcHcENNbFAA60U8FPylWq1QddfoXkgrwgZ3006xCcAJtRfM3369A1CS6DWdLwkwyf
-         t29TRIwXq5YuidLb8IfWPSmkg2VqwJYFX8nssr8wBRg47zHe+QC8Ft6UaZsbIG/hLsXn
-         xDzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nqvCR2bN5552JctZBnW09VLBBN76DPfLRHu4EA4nWLA=;
-        b=wetIT+OX7yvSMCNc8IrX3vHBXWkCdu1Hbr9JfY3lOBSCGQ4pzSWh3q2RluK4SJkCDg
-         pGJs5NyUpQL8xf9zaNemPV4Wr3Pl1dAIJs2XyDaYRifWWeZopcHIuFvTZcMN+DSbJCDZ
-         dP85eJ5lDTz4UPfEWuPtpKYN8PwRBYi5qlzrOwYbvbgFQHYqw0awKS5DBmFc1ZeVjGcf
-         3s+hd8ylBaw87H1ALYM/V80YXky5ps1SC8AzLbF1ZJHU9XYvccN8NRZUp1G7IlYHZl/d
-         xn1lOyQuZ/WwjSVHGAcZGtyO2UMXViNAUznikX5MQZlH4KNTfzlFNpw5JLPWNHQOy0Jl
-         cA8A==
-X-Gm-Message-State: AOAM530TakwjQ6xa3/TuHD57wGDggkoU76Mz9f45abUH/g8QofYsDJcC
-        0KXnUGij5rpigmZwZRvkzr/Ryg==
-X-Google-Smtp-Source: ABdhPJwTo0GsDmIPSo/DC5JGZZXjisP0tBkrjOYzEY7gALmUxkpiG4fyDvrLRnKB2d6DI1w6XVqZgg==
-X-Received: by 2002:a05:6e02:1a2d:: with SMTP id g13mr4526865ile.153.1635443123325;
-        Thu, 28 Oct 2021 10:45:23 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id r11sm2197067ill.20.2021.10.28.10.45.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Oct 2021 10:45:22 -0700 (PDT)
-Subject: Re: [PATCH 0/3] implement direct IO with integrity
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        Mikhail Malygin <m.malygin@yadro.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Alexander Buev <a.buev@yadro.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux@yadro.com" <linux@yadro.com>
-References: <20211028112406.101314-1-a.buev@yadro.com>
- <bc336e90-378e-6016-ea1c-d519290dce5f@kernel.dk>
- <20211028151851.GC9468@lst.de>
- <85a4c250-c189-db5f-0625-2aa4bd1305f8@kernel.dk>
- <AAD8717C-E050-47C0-B8C9-119C8F51B47D@yadro.com>
- <14dcfef2-ac21-35a2-a97b-9cee39b079a1@kernel.dk>
- <64016c86-188e-916e-662d-b33431dec946@gmail.com>
- <bc0dc601-8e5a-800a-e3c4-d2dfdabb96fb@kernel.dk>
- <e44e0928-bc01-06df-4bd7-cb120efeed50@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6afe0247-f6c4-8ab9-2b49-8c02e2704757@kernel.dk>
-Date:   Thu, 28 Oct 2021 11:45:21 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 28 Oct 2021 14:13:43 -0400
+Received: from [10.137.106.139] (unknown [131.107.159.11])
+        by linux.microsoft.com (Postfix) with ESMTPSA id A2C8B209F33F;
+        Thu, 28 Oct 2021 11:11:15 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A2C8B209F33F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1635444675;
+        bh=xaWJlPOkgwmSC4Z42bn0ksBEBLLvZTO2Sn6BQavTIXo=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=dDNeeyMjx4g/tOoo4kJSDD/tgC63NmK5mmzKrPpNd382Z9+2QjW8Wa6rQwM4sdcvw
+         531P0qZXyZDSmmRmcXSG2JPJ3jsx+kPTha80B2J4xzECdL9HF/RUMZKv9GBd2gjNq0
+         XoPOT+KetImd5KipF13ipc3zU3OfsWUMxl99upBA=
+Message-ID: <9b2695ac-f6db-ac75-5451-4ea9667ce04f@linux.microsoft.com>
+Date:   Thu, 28 Oct 2021 11:11:15 -0700
 MIME-Version: 1.0
-In-Reply-To: <e44e0928-bc01-06df-4bd7-cb120efeed50@gmail.com>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [RFC PATCH v7 12/16] fsverity|security: add security hooks to
+ fsverity digest and signature
 Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     corbet@lwn.net, axboe@kernel.dk, agk@redhat.com,
+        snitzer@redhat.com, tytso@mit.edu, paul@paul-moore.com,
+        eparis@redhat.com, jmorris@namei.org, serge@hallyn.com,
+        jannh@google.com, dm-devel@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-audit@redhat.com,
+        linux-security-module@vger.kernel.org
+References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1634151995-16266-13-git-send-email-deven.desai@linux.microsoft.com>
+ <YWcyYBuNppjrVOe2@gmail.com>
+ <9089bdb0-b28a-9fa0-c510-00fa275af621@linux.microsoft.com>
+ <YWngaVdvMyWBlITZ@gmail.com>
+ <f027e3fa-2f70-0cdb-ac7b-255cee68edbb@linux.microsoft.com>
+ <YXodhzYto5BRxqYO@sol.localdomain>
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+In-Reply-To: <YXodhzYto5BRxqYO@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/28/21 11:11 AM, Pavel Begunkov wrote:
-> On 10/28/21 17:22, Jens Axboe wrote:
->> On 10/28/21 9:56 AM, Pavel Begunkov wrote:
->>> On 10/28/21 16:50, Jens Axboe wrote:
->>>> On 10/28/21 9:44 AM, Mikhail Malygin wrote:
->>>>> Thanks for the feedback, we’ll submit and updated version of the series.
->>>>>
->>>>> The only question is regarding uapi: should we add a separate opcodes
->>>>> for read/write or use existing opcodes with the flag in the
->>>>> io_uring_sqe.rw_flags field?
->>>>>
->>>>> The flag was discussed in the another submission, where it was
->>>>> considered to be a better approach over opcodes:
->>>>> https://patchwork.kernel.org/project/linux-block/patch/20200226083719.4389-2-bob.liu@oracle.com/
->>>>
->>>> Separate opcodes is, at least to me, definitely the way to go. Just
->>>> looking at the code needing to tap into weird spots for PI is enough to
->>>> make that call. On top of that, it also allows you to cleanly define
->>>> this command and (hopefully?) avoid that weirdness with implied PI in
->>>> the last iovec.
->>>
->>> Reminds me struggles with writing encoded data to btrfs. I believe
->>> Omar did go for RWF_ENCODED flag, right?
+
+On 10/27/2021 8:48 PM, Eric Biggers wrote:
+> On Tue, Oct 26, 2021 at 12:03:53PM -0700, Deven Bowers wrote:
+>>>> The proposed LSM (IPE) of this series will be the only one to need
+>>>> this information at the  moment. IPE’s goal is to have provide
+>>>> trust-based access control. Trust and Integrity are tied together,
+>>>> as you cannot prove trust without proving integrity.
+>>> I think you mean authenticity, not integrity?
+>> I’ve heard a lot of people use these terms in overloaded ways.
 >>
->> Exactly the same problem, yes. It ends up being pretty miserable, and
->> there's no reason to go through that misery when we're not bound by only
->> passing in an iovec.
-> 
-> I agree that a new opcode is better, at least we can keep the overhead
-> out of the common path, but RWF_ENCODED was having similar problems
-> (e.g. passing metadata in iov), so that's interesting why RWF was chosen
-> in the end. Is it only to support readv/writev(2) or something else?
-
-To shoe horn it in via an existing interface, I don't think anybody
-wanted to add yet another read/write API just to cater to that.
-
--- 
-Jens Axboe
-
+>> If we’re working with the definition of authenticity being
+>> “the property that a resource was _actually_ sent/created by a
+>> party”, and integrity being “the property that a resource was not
+>> modified from a point of time”, then yes. Though the statement isn’t
+>> false, though, because you’d need to prove integrity in the process of
+>> proving authenticity.
+>>
+>> If not, could you clarify what you mean by authenticity and integrity,
+>> so that we can use consistent definitions?
+> In cryptography, integrity normally means knowing whether data has been
+> non-maliciously changed, while authenticity means knowing whether data is from a
+> particular source, which implies knowing whether it has been changed at all
+> (whether maliciously or not).  Consider that there are "Message Authentication
+> Codes" (MACs) and "Authenticated Encryption", not "Message Integrity Codes" and
+> "Intact Encryption".
+>
+> Unfortunately lots of people do overload "integrity" to mean authenticity, so
+> you're not alone.  But it's confusing, so if you're going to do that then please
+> make sure to clearly explain what you mean.
+>
+>>> Also how does this differ from IMA?  I know that IMA doesn't support fs-verity
+>>> file hashes, but that could be changed.  Why not extend IMA to cover your use
+>>> case(s)?
+>> We looked at extending IMA to cover our requirements extensively the past
+>> year
+>> based on feedback the last time I posted these patches. We implemented a
+>> prototype that had half of our requirements, but found it resulted in a
+>> large change list that would result in a large amount of pain in respect
+>> to maintenance, in addition to other more architectural concerns about the
+>> implementation. We weren’t convinced it was the correct direction, for our
+>> needs.
+>>
+>> There was a presentation done at LSS 2021 around this prototype done by my
+>> colleague, Fan, who authored this patch and implemented the aforementioned
+>> prototype.
+>>
+>> In general, IMA provides a whole suite of amazing functionality when it
+>> comes to everything integrity, as the fs-verity documentation states
+>> itself:
+>>
+>>     IMA specifies a system-wide policy that specifies which
+>>     files are hashed and what to do with those hashes, such
+>>     as log them, authenticate them, or add them to a
+>>     measurement list.
+>>
+>> Instead, IPE provides a fine-tuned way to _only_ enforce an access control
+>> policy to these files based on the defined trust requirements in the policy,
+>> under various contexts, (you might have different requirements for what
+>> executes in a general purpose, versus loadable kernel modules, for example).
+>> It will never provide bother to log, measure, or revalidate these hashes
+>> because
+>> that’s not its purpose. This is why it belongs at the LSM layer instead of
+>> the
+>> integrity subsystem layer, as it is providing access control based on a
+>> policy,
+>> versus providing deep integrations with the actual integrity claim.
+>>
+>> IPE is trying to be agnostic to how precisely “trust” is provided, as
+>> opposed to be deeply integrated into the mechanism that provides
+>> “trust”.
+> IMA doesn't require logging or "measuring" hashes, though.  Those are just some
+> of its supported features.  And I thought the IMA developers were planning to
+> add support for fs-verity hashes, and that it wouldn't require an entirely new
+> architecture to do so.
+>
+> Anyway, while it does sound to me like you're duplicating IMA, I don't really
+> have a horse in this race, and I defer to the IMA developers on this.  I trust
+> that you've been engaging with them?  This patchset isn't even Cc'ed to
+> linux-integrity, so it's unclear that's been happening.
+That was entirely my mistake. Mimi and the linux-integrity list was CC'd 
+on previous
+versions (Roberto actually added the list to his responses) - when I was 
+reconstructing
+the To: line with get-maintainers.pl, the list didn't pop up and I did 
+not remember to
+add it manually. I've corrected my mailing script to re-add them again.
