@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC40C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EA9C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F4E5610FC
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 700B661106
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 11:24:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbhJ1L1A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Oct 2021 07:27:00 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:57620 "EHLO mta-01.yadro.com"
+        id S230183AbhJ1L1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Oct 2021 07:27:01 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:57628 "EHLO mta-01.yadro.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230059AbhJ1L07 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 07:26:59 -0400
+        id S230059AbhJ1L1A (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Oct 2021 07:27:00 -0400
 Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id C5B9346135;
-        Thu, 28 Oct 2021 11:24:31 +0000 (UTC)
+        by mta-01.yadro.com (Postfix) with ESMTP id 2978346154;
+        Thu, 28 Oct 2021 11:24:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
         content-type:content-type:content-transfer-encoding:mime-version
         :references:in-reply-to:x-mailer:message-id:date:date:subject
         :subject:from:from:received:received:received; s=mta-01; t=
-        1635420270; x=1637234671; bh=4B/rAEPYo20jGjPuCtJGk6mJajIKKxoTdjg
-        Phu043iM=; b=S11n9AOD/LgO3xmohaHzbDWv1HMcSmYa1ucAL7/tshKE9tzNvSL
-        LFr2Ax4lVVpddmZ0YF50UMSCB8qbaf7GTwk9cwBnpBbr4RkgZwv9t9Zzo0sCIi9j
-        VLCdd+jOaUwKi5f/mDbDRErD+NFbhXCoJUJBae+S86EO6mJUzf/9/8uA=
+        1635420271; x=1637234672; bh=YXHgbGA2lhrUJAZurjL9cY1iWV1Um0NwCFc
+        4s9CDP2Q=; b=VNAvups4zh8tcDA22CsB6Px0v0e+p1fuT5OmgV5B53oH8EOOTB/
+        r8GOL2xm7OyfSt26S+clgfqAFMbYrMBvgQWXvbNMnRvxMi47dsFmRsSpDKz0jzRP
+        /36i8BrWe35OBOqwX3T8/sBIELuybBT7T2qjv6KwfHvBsPG0AzL6h8bU=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
         by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id af87XvTwx6ZC; Thu, 28 Oct 2021 14:24:30 +0300 (MSK)
+        with ESMTP id aTbt68cat-uT; Thu, 28 Oct 2021 14:24:31 +0300 (MSK)
 Received: from T-EXCH-04.corp.yadro.com (t-exch-04.corp.yadro.com [172.17.100.104])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 6132046108;
-        Thu, 28 Oct 2021 14:24:30 +0300 (MSK)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 3204D46184;
+        Thu, 28 Oct 2021 14:24:31 +0300 (MSK)
 Received: from localhost.localdomain (10.199.10.99) by
  T-EXCH-04.corp.yadro.com (172.17.100.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
- 15.1.669.32; Thu, 28 Oct 2021 14:24:29 +0300
+ 15.1.669.32; Thu, 28 Oct 2021 14:24:30 +0300
 From:   "Alexander V. Buev" <a.buev@yadro.com>
 To:     <linux-block@vger.kernel.org>
 CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>,
         "Alexander V. Buev" <a.buev@yadro.com>
-Subject: [PATCH 1/3] block: bio-integrity: add PI iovec to bio
-Date:   Thu, 28 Oct 2021 14:24:04 +0300
-Message-ID: <20211028112406.101314-2-a.buev@yadro.com>
+Subject: [PATCH 3/3] block: fops: handle IOCB_USE_PI in direct IO
+Date:   Thu, 28 Oct 2021 14:24:06 +0300
+Message-ID: <20211028112406.101314-4-a.buev@yadro.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211028112406.101314-1-a.buev@yadro.com>
 References: <20211028112406.101314-1-a.buev@yadro.com>
@@ -60,208 +60,140 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Added functions to attach user PI iovec pages to bio
-and release this pages via bio_integrity_free.
+Check that the size of integrity data correspond to device integrity
+profile and data size. Split integrity data to the different bio's
+in case of to big orginal bio (together with normal data).
+Correct offset/size checking at blkdev layer in read/write_iter
+functions.
 
 Signed-off-by: Alexander V. Buev <a.buev@yadro.com>
 ---
- block/bio-integrity.c | 124 +++++++++++++++++++++++++++++++++++++++++-
- include/linux/bio.h   |   8 +++
- 2 files changed, 131 insertions(+), 1 deletion(-)
+ block/fops.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 6b47cddbbca1..3e12cfa806ff 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -5,11 +5,11 @@
-  * Copyright (C) 2007, 2008, 2009 Oracle Corporation
-  * Written by: Martin K. Petersen <martin.petersen@oracle.com>
-  */
--
- #include <linux/blkdev.h>
- #include <linux/mempool.h>
- #include <linux/export.h>
- #include <linux/bio.h>
-+#include <linux/uio.h>
- #include <linux/workqueue.h>
- #include <linux/slab.h>
- #include "blk.h"
-@@ -91,6 +91,17 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
- }
- EXPORT_SYMBOL(bio_integrity_alloc);
+diff --git a/block/fops.c b/block/fops.c
+index 1e970c247e0e..74040314f5f3 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -197,12 +197,39 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 	struct blk_plug plug;
+ 	struct blkdev_dio *dio;
+ 	struct bio *bio;
++	struct iovec *pi_iov, _pi_iov;
+ 	bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
+ 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
+ 	loff_t pos = iocb->ki_pos;
+ 	blk_qc_t qc = BLK_QC_T_NONE;
+ 	int ret = 0;
  
-+void bio_integrity_payload_release_pages(struct bio_integrity_payload *bip)
-+{
-+	unsigned short i;
-+	struct bio_vec *bv;
++	if (iocb->ki_flags & IOCB_USE_PI) {
++		struct blk_integrity *bi = blk_get_integrity(bdev->bd_disk);
++		unsigned int intervals;
 +
-+	for (i = 0; i < bip->bip_vcnt; ++i) {
-+		bv = bip->bip_vec + i;
-+		put_page(bv->bv_page);
-+	}
-+}
++		/* Last iovec contains protection information. */
++		if (!iter->nr_segs)
++			return -EINVAL;
 +
- /**
-  * bio_integrity_free - Free bio integrity payload
-  * @bio:	bio containing bip to be freed
-@@ -105,6 +116,10 @@ void bio_integrity_free(struct bio *bio)
- 
- 	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
- 		kfree(bvec_virt(bip->bip_vec));
-+	else
-+		if (bip->bip_flags & BIP_RELEASE_PAGES) {
-+			bio_integrity_payload_release_pages(bip);
++		iter->nr_segs--;
++		pi_iov = (struct iovec *)(iter->iov + iter->nr_segs);
++
++		/* TODO: seems iter is in charge of this check ? */
++		if (pi_iov->iov_len > iter->count)
++			return -EINVAL;
++
++		iter->count -= pi_iov->iov_len;
++
++		intervals = bio_integrity_intervals(bi, iter->count >> 9);
++		if (unlikely(intervals * bi->tuple_size > pi_iov->iov_len)) {
++			pr_err("Integrity & data size mismatch data=%lu integrity=%u intervals=%u tupple=%u",
++				iter->count, (unsigned int)pi_iov->iov_len,
++				intervals, bi->tuple_size);
++				return -EINVAL;
 +		}
++	}
++
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
+@@ -258,6 +285,17 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 		dio->size += bio->bi_iter.bi_size;
+ 		pos += bio->bi_iter.bi_size;
  
- 	__bio_integrity_free(bs, bip);
- 	bio->bi_integrity = NULL;
-@@ -377,6 +392,113 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
- 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
- }
- 
-+#define __MAX_ONSTACK_PI_PAGES (8)
-+/**
-+ * bio_integrity_add_pi_iovec - Add PI io vector
-+ * @bio:	bio whose integrity vector to update
-+ * @pi_iov:	iovec added to @bio's integrity
-+ *
-+ * Description: Pins pages for *pi_iov and appends them to @bio's integrity.
-+ */
-+int bio_integrity_add_pi_iovec(struct bio *bio, struct iovec *pi_iov)
-+{
-+	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+	struct bio_integrity_payload *bip;
-+	struct page *pi_pages[__MAX_ONSTACK_PI_PAGES];
-+	struct page **pi_page = pi_pages;
-+	struct iov_iter pi_iter;
-+	int nr_vec_page = 0;
-+	int ret = 0, intervals = 0;
-+	bool is_write = op_is_write(bio_op(bio));
-+	ssize_t size, pg_num;
-+	size_t offset;
-+	size_t len;
++		/* in case we can't add all data to one bio */
++		/* we must split integrity too */
 +
-+	if (unlikely(!bi)) {
-+		pr_err("The disk is not integrity capable");
-+		return -EINVAL;
-+	}
++		if (iocb->ki_flags & IOCB_USE_PI) {
++			struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
 +
-+	nr_vec_page = (pi_iov->iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	nr_vec_page += 1; // we need this die to data of size N pages can be pinned to N+1 page
-+
-+	if (unlikely(nr_vec_page > __MAX_ONSTACK_PI_PAGES)) {
-+		pi_page = kcalloc(nr_vec_page, sizeof(struct pi_page *), GFP_NOIO);
-+		if (!pi_page)
-+			return -ENOMEM;
-+	}
-+
-+	intervals = bio_integrity_intervals(bi, bio_sectors(bio));
-+	if (unlikely(intervals * bi->tuple_size < pi_iov->iov_len)) {
-+		pr_err("Interval number is wrong, intervals=%d, bi->tuple_size=%d, pi_iov->iov_len=%u",
-+			(int)intervals, (int)bi->tuple_size,
-+			(unsigned int)pi_iov->iov_len);
-+
-+		ret = -EINVAL;
-+		goto exit;
-+	}
-+
-+	bip = bio_integrity_alloc(bio, GFP_NOIO, nr_vec_page);
-+	if (IS_ERR(bip)) {
-+		ret = PTR_ERR(bip);
-+		goto exit;
-+	}
-+
-+	bip->bip_iter.bi_size = pi_iov->iov_len;
-+	bip->bio_iter = bio->bi_iter;
-+	bip_set_seed(bip, bio->bi_iter.bi_sector);
-+
-+	if (bi->flags & BLK_INTEGRITY_IP_CHECKSUM)
-+		bip->bip_flags |= BIP_IP_CHECKSUM;
-+
-+	iov_iter_init(&pi_iter, is_write ?  WRITE : READ, pi_iov, 1, pi_iov->iov_len);
-+
-+	// pin user data to pages
-+	size = iov_iter_get_pages(&pi_iter, pi_page, LONG_MAX, nr_vec_page, &offset);
-+	if (unlikely(size < 0)) {
-+		pr_err("Failed to pin PI buffer to page");
-+		ret = -EFAULT;
-+		goto exit;
-+	}
-+
-+	// calc count of pined pages
-+	if (size > (PAGE_SIZE-offset)) {
-+		size = DIV_ROUND_UP(size - (PAGE_SIZE-offset), PAGE_SIZE)+1;
-+	} else
-+		size = 1;
-+
-+	// fill bio integrity biovecs the given pages
-+	len = pi_iov->iov_len;
-+	for (pg_num = 0; pg_num < size; ++pg_num) {
-+		size_t sz;
-+
-+		offset = (pg_num)?0:offset;
-+		sz = PAGE_SIZE-offset;
-+		if (sz > len)
-+			sz = len;
-+		ret = bio_integrity_add_page(bio, pi_page[pg_num], sz, offset);
-+		if (unlikely(ret != sz)) {
-+			ret = -ENOMEM;
-+			goto exit;
++			_pi_iov.iov_base =  pi_iov->iov_base;
++			_pi_iov.iov_base += bio_integrity_bytes(bi, (dio->size-bio->bi_iter.bi_size) >> 9);
++			_pi_iov.iov_len  = bio_integrity_bytes(bi, bio->bi_iter.bi_size >> 9);
 +		}
-+		len -= sz;
-+		bip->bip_flags |= BIP_RELEASE_PAGES;
++
+ 		nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS);
+ 		if (!nr_pages) {
+ 			bool polled = false;
+@@ -267,6 +305,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 				polled = true;
+ 			}
+ 
++			/* Add protection information to bio */
++			if (iocb->ki_flags & IOCB_USE_PI) {
++				ret = bio_integrity_add_pi_iovec(bio, &_pi_iov);
++				if (ret) {
++					bio->bi_status = BLK_STS_IOERR;
++					bio_endio(bio);
++					break;
++				}
++			}
++
+ 			qc = submit_bio(bio);
+ 
+ 			if (polled)
+@@ -288,6 +336,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 			atomic_inc(&dio->ref);
+ 		}
+ 
++
++		if (iocb->ki_flags & IOCB_USE_PI) {
++			ret = bio_integrity_add_pi_iovec(bio, &_pi_iov);
++			if (ret) {
++				bio->bi_status = BLK_STS_IOERR;
++				bio_endio(bio);
++				break;
++			}
++		}
++
+ 		submit_bio(bio);
+ 		bio = bio_alloc(GFP_KERNEL, nr_pages);
+ 	}
+@@ -509,6 +567,12 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
+ 		return -EOPNOTSUPP;
+ 
++	if (iocb->ki_flags & IOCB_USE_PI) {
++		if (from->nr_segs < 2)
++			return -EINVAL;
++		size += from->iov[from->nr_segs-1].iov_len;
 +	}
 +
-+	ret = 0;
-+
-+exit:
-+
-+	if (ret && bip->bip_flags & BIP_RELEASE_PAGES)
-+		bio_integrity_payload_release_pages(bip);
-+
-+	if (pi_page != pi_pages)
-+		kfree(pi_page);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(bio_integrity_add_pi_iovec);
-+
- /**
-  * bio_integrity_trim - Trim integrity vector
-  * @bio:	bio whose integrity vector to update
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 00952e92eae1..57a4dd0b81ff 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -319,6 +319,7 @@ enum bip_flags {
- 	BIP_CTRL_NOCHECK	= 1 << 2, /* disable HBA integrity checking */
- 	BIP_DISK_NOCHECK	= 1 << 3, /* disable disk integrity checking */
- 	BIP_IP_CHECKSUM		= 1 << 4, /* IP checksum */
-+	BIP_RELEASE_PAGES	= 1 << 5, /* release pages after io completion */
- };
+ 	size -= iocb->ki_pos;
+ 	if (iov_iter_count(from) > size) {
+ 		shorted = iov_iter_count(from) - size;
+@@ -537,6 +601,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 		return 0;
  
- /*
-@@ -706,6 +707,7 @@ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, un
- extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
- extern bool bio_integrity_prep(struct bio *);
- extern void bio_integrity_advance(struct bio *, unsigned int);
-+extern int bio_integrity_add_pi_iovec(struct bio *bio, struct iovec *pi_iov);
- extern void bio_integrity_trim(struct bio *);
- extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
- extern int bioset_integrity_create(struct bio_set *, int);
-@@ -746,6 +748,12 @@ static inline void bio_integrity_advance(struct bio *bio,
- 	return;
- }
- 
-+static inline int bio_integrity_add_pi_iovec(struct bio *bio,
-+					struct iovec *pi_iov)
-+{
-+	return 0;
-+}
+ 	size -= pos;
 +
- static inline void bio_integrity_trim(struct bio *bio)
- {
- 	return;
++	if (iocb->ki_flags & IOCB_USE_PI) {
++		if (to->nr_segs < 2)
++			return -EINVAL;
++		size += to->iov[to->nr_segs-1].iov_len;
++	}
++
+ 	if (iov_iter_count(to) > size) {
+ 		shorted = iov_iter_count(to) - size;
+ 		iov_iter_truncate(to, size);
 -- 
 2.33.0
 
