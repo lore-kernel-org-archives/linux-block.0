@@ -2,113 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D079C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:25:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160D9C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:44:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05D0F60FF2
-	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDA0760F56
+	for <linux-block@archiver.kernel.org>; Thu, 28 Oct 2021 15:44:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbhJ1P2F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Oct 2021 11:28:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44918 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbhJ1P2E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Oct 2021 11:28:04 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF42C061570
-        for <linux-block@vger.kernel.org>; Thu, 28 Oct 2021 08:25:37 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id d63so8634429iof.4
-        for <linux-block@vger.kernel.org>; Thu, 28 Oct 2021 08:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wUWXhhVRru9kRKSmy99IaKlF8j2z8G347SeB+YX4Gxs=;
-        b=4CAFXdcRI2I4pVOqs2NNc49cg6ljizmPxngcgvYDEqB2roEPmHKiIXM9V2JojNoIVd
-         MWd6N1+UB400QlE3kCJCmy7cCL2Nic8WdIBAZIFjmPHKmHNsrgmgyM47vsCaBgxCBQqt
-         s4IIRqDBhMDwCKR9Hz9bZBI9FyC1GsD/2SCh7OcQh5+8fJFWTs/DLAkj6Yj7/rUQYF+H
-         qDr/RJ+NHHAD7dYlQtr/r719x3o4FKyAzumGH7kLD1pt8Yq6x/5YuJOG72+TEOvNW6f3
-         sb+nddX+WUjuCsQtO+7Owx3ivqKTVpEFUq12sWZPsGI/Hqb5jD6E9YQUjNlr6ky4f7og
-         x9jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wUWXhhVRru9kRKSmy99IaKlF8j2z8G347SeB+YX4Gxs=;
-        b=0sBygWte6i9f3IfOohQOQSa/yLBqcIoSeRq6DPYOjeD/RBEUdLj3mNbXFxhAZ9TUwB
-         N76a0QfdZbWSVG4mSfpUi8jTtyfFogac4BGHPXel9osFv2YiYFxGUvvSBBDbdM8mNSYo
-         cd+HGvv/l6XucidWy00+aNq/sOxSB6OBVMMyO1Sp8sYGIGwGsIujpDu0AsdTbdJY+tmg
-         ZdorKLm0Ax93ehvwr0suoxOAEbYbuZwLghX0jfYtUvf8l1cs3J8ViMxI1m66WH7cGjB1
-         nF+Kzc+GhIMOLeH+Zmlm6fVr+XmCYiXGbCREyjdm3k5hq+sbeUh3SgpV4YXRFGuVLMrR
-         1XQQ==
-X-Gm-Message-State: AOAM531C41FniF5oLHMEQQvJK1O1yN1FFRa3/wXJFwnQ3Cfe/1pu2jDJ
-        TIGI+eu+d7dMnXty+aa6Og1b3Q==
-X-Google-Smtp-Source: ABdhPJxSXfG3JyBU8OF9SsE7nRnkxpncTSNbc/c5msfrGSRFvghii1MYR0Uhs3T3Py0c2Njq0oYPbQ==
-X-Received: by 2002:a05:6602:1651:: with SMTP id y17mr3535485iow.114.1635434737009;
-        Thu, 28 Oct 2021 08:25:37 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id l14sm1937279iow.27.2021.10.28.08.25.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Oct 2021 08:25:36 -0700 (PDT)
-Subject: Re: [PATCH 0/3] implement direct IO with integrity
-From:   Jens Axboe <axboe@kernel.dk>
-To:     "Alexander V. Buev" <a.buev@yadro.com>, linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
+        id S230126AbhJ1Pqr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Oct 2021 11:46:47 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:49162 "EHLO mta-01.yadro.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229946AbhJ1Pqq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Oct 2021 11:46:46 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id 5BE564403A;
+        Thu, 28 Oct 2021 15:44:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        mime-version:content-transfer-encoding:content-id:content-type
+        :content-type:content-language:accept-language:in-reply-to
+        :references:message-id:date:date:subject:subject:from:from
+        :received:received:received:received; s=mta-01; t=1635435855; x=
+        1637250256; bh=p5CINr2Cl2CInJJHW943Rc6amxtNs1dnYkvYwOkCJPE=; b=s
+        pFvdcvkI6CPw1qXp8jDbcZRCMqRc61q9CbWC1yx5BzSIRTQOk9Ekmdfxc2iv94mo
+        1KrmY9iwsI8PfbasVJtJ5g77ZQD2rJEN/cm1DUASF0dbNiv074H8oQzr0IUj3OCZ
+        PiCEabDYG1ta4Py9yv40aFufdRyIlBPjwOdAqELjJg=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id GOZRe_H_HnOo; Thu, 28 Oct 2021 18:44:15 +0300 (MSK)
+Received: from T-EXCH-03.corp.yadro.com (t-exch-03.corp.yadro.com [172.17.100.103])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 43E2F460E5;
+        Thu, 28 Oct 2021 18:44:15 +0300 (MSK)
+Received: from T-EXCH-04.corp.yadro.com (172.17.100.104) by
+ T-EXCH-03.corp.yadro.com (172.17.100.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
+ 15.1.669.32; Thu, 28 Oct 2021 18:44:14 +0300
+Received: from T-EXCH-04.corp.yadro.com ([fe80::d8c5:6f0a:3d48:18df]) by
+ T-EXCH-04.corp.yadro.com ([fe80::d8c5:6f0a:3d48:18df%15]) with mapi id
+ 15.01.0669.032; Thu, 28 Oct 2021 18:44:14 +0300
+From:   Mikhail Malygin <m.malygin@yadro.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+CC:     Alexander Buev <a.buev@yadro.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+        "linux@yadro.com" <linux@yadro.com>
+Subject: Re: [PATCH 0/3] implement direct IO with integrity
+Thread-Topic: [PATCH 0/3] implement direct IO with integrity
+Thread-Index: AQHXy+5fTd3x555CfUaTUdCnXfPwjqvoUniAgAABmoCAAACJAIAABo2A
+Date:   Thu, 28 Oct 2021 15:44:14 +0000
+Message-ID: <AAD8717C-E050-47C0-B8C9-119C8F51B47D@yadro.com>
 References: <20211028112406.101314-1-a.buev@yadro.com>
  <bc336e90-378e-6016-ea1c-d519290dce5f@kernel.dk>
-Message-ID: <a715566f-ecab-1ecc-a3c7-7f1cd8b9c6d5@kernel.dk>
-Date:   Thu, 28 Oct 2021 09:25:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <bc336e90-378e-6016-ea1c-d519290dce5f@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+ <20211028151851.GC9468@lst.de>
+ <85a4c250-c189-db5f-0625-2aa4bd1305f8@kernel.dk>
+In-Reply-To: <85a4c250-c189-db5f-0625-2aa4bd1305f8@kernel.dk>
+Accept-Language: en-US, ru-RU
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [172.17.128.39]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FD6D64178F2FDA4AAE1D21ED4B3363FE@yadro.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/28/21 9:13 AM, Jens Axboe wrote:
-> On 10/28/21 5:24 AM, Alexander V. Buev wrote:
->> This series of patches makes possible to do direct block IO
->> with integrity payload using io uring kernel interface.
->> Userspace app can utilize READV/WRITEV operation with a new 
->> (unused before) flag in sqe struct to mark IO request as 
->> "request with integrity payload". 
->> When this flag is set, the last of provided iovecs
->> must contain pointer and length of this integrity payload.
->>
->> Alexander V. Buev (3):
->>   block: bio-integrity: add PI iovec to bio
->>   block: io_uring: add IO_WITH_PI flag to SQE
->>   block: fops: handle IOCB_USE_PI in direct IO
->>
->>  block/bio-integrity.c         | 124 +++++++++++++++++++++++++++++++++-
->>  block/fops.c                  |  71 +++++++++++++++++++
->>  fs/io_uring.c                 |  32 ++++++++-
->>  include/linux/bio.h           |   8 +++
->>  include/linux/fs.h            |   1 +
->>  include/uapi/linux/io_uring.h |   3 +
->>  6 files changed, 235 insertions(+), 4 deletions(-)
-> 
-> A couple of suggestions on this:
-> 
-> 1) Don't think we need an IOSQE flag, those are mostly reserved for
->    modifiers that apply to (mostly) all kinds of requests
-> 2) I think this would be cleaner as a separate command, rather than
->    need odd adjustments and iov assumptions. That also gets it out
->    of the fast path.
-> 
-> I'd add IORING_OP_READV_PI and IORING_OP_WRITEV_PI for this, I think
-> you'd end up with a much cleaner implementation that way.
-
-Oh, and please do CC io-uring on changes that touch it.
-
--- 
-Jens Axboe
-
+VGhhbmtzIGZvciB0aGUgZmVlZGJhY2ssIHdl4oCZbGwgc3VibWl0IGFuZCB1cGRhdGVkIHZlcnNp
+b24gb2YgdGhlIHNlcmllcy4NCg0KVGhlIG9ubHkgcXVlc3Rpb24gaXMgcmVnYXJkaW5nIHVhcGk6
+IHNob3VsZCB3ZSBhZGQgYSBzZXBhcmF0ZSBvcGNvZGVzIGZvciByZWFkL3dyaXRlIG9yIHVzZSBl
+eGlzdGluZyBvcGNvZGVzIHdpdGggdGhlIGZsYWcgaW4gdGhlIGlvX3VyaW5nX3NxZS5yd19mbGFn
+cyBmaWVsZD8NCg0KVGhlIGZsYWcgd2FzIGRpc2N1c3NlZCBpbiB0aGUgYW5vdGhlciBzdWJtaXNz
+aW9uLCB3aGVyZSBpdCB3YXMgY29uc2lkZXJlZCB0byBiZSBhIGJldHRlciBhcHByb2FjaCBvdmVy
+IG9wY29kZXM6IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC1ibG9j
+ay9wYXRjaC8yMDIwMDIyNjA4MzcxOS40Mzg5LTItYm9iLmxpdUBvcmFjbGUuY29tLw0KDQpUaGFu
+a3MsDQpNaWtoYWlsDQoNCj4gT24gMjggT2N0IDIwMjEsIGF0IDE4OjIwLCBKZW5zIEF4Ym9lIDxh
+eGJvZUBrZXJuZWwuZGs+IHdyb3RlOg0KPiANCj4gT24gMTAvMjgvMjEgOToxOCBBTSwgQ2hyaXN0
+b3BoIEhlbGx3aWcgd3JvdGU6DQo+PiBPbiBUaHUsIE9jdCAyOCwgMjAyMSBhdCAwOToxMzowN0FN
+IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPj4+IEEgY291cGxlIG9mIHN1Z2dlc3Rpb25zIG9u
+IHRoaXM6DQo+Pj4gDQo+Pj4gMSkgRG9uJ3QgdGhpbmsgd2UgbmVlZCBhbiBJT1NRRSBmbGFnLCB0
+aG9zZSBhcmUgbW9zdGx5IHJlc2VydmVkIGZvcg0KPj4+ICAgbW9kaWZpZXJzIHRoYXQgYXBwbHkg
+dG8gKG1vc3RseSkgYWxsIGtpbmRzIG9mIHJlcXVlc3RzDQo+Pj4gMikgSSB0aGluayB0aGlzIHdv
+dWxkIGJlIGNsZWFuZXIgYXMgYSBzZXBhcmF0ZSBjb21tYW5kLCByYXRoZXIgdGhhbg0KPj4+ICAg
+bmVlZCBvZGQgYWRqdXN0bWVudHMgYW5kIGlvdiBhc3N1bXB0aW9ucy4gVGhhdCBhbHNvIGdldHMg
+aXQgb3V0DQo+Pj4gICBvZiB0aGUgZmFzdCBwYXRoLg0KPj4+IA0KPj4+IEknZCBhZGQgSU9SSU5H
+X09QX1JFQURWX1BJIGFuZCBJT1JJTkdfT1BfV1JJVEVWX1BJIGZvciB0aGlzLCBJIHRoaW5rDQo+
+Pj4geW91J2QgZW5kIHVwIHdpdGggYSBtdWNoIGNsZWFuZXIgaW1wbGVtZW50YXRpb24gdGhhdCB3
+YXkuDQo+PiANCj4+IEFncmVlZC4gIEkgYWxzbyB3b25kZXIgaWYgd2UgY291bGQgZG8gc2FuZXIg
+cGFyYW10ZXIgcGFzc2luZy4NCj4+IEUuZy4gcGFzcyBhIHNlcGFyYXRlIHBvaW50ZXIgdG8gdGhl
+IFBJIGRhdGEgaWYgd2UgZmluZCBzcGFjZSBmb3INCj4+IHRoYXQgc29tZXdoZXJlIGluIHRoZSBT
+UUUuDQo+IA0KPiBZZWFoLCB0aGUgd2hvbGUgInB1dCBQSSBpbiB0aGUgbGFzdCBpb3ZlYyIgbWFr
+ZXMgdGhlIGNvZGUgcmVhbGx5IHVnbHkNCj4gZGVhbGluZyB3aXRoIGl0LiBXb3VsZCBiZSBhIGxv
+dCBjbGVhbmVyIHRvIHNlcGFyYXRlIHRoZSB0d28uIElNSE8gdGhpcw0KPiBpcyBsYXJnZWx5IGEg
+d29yay1hcm91bmQgdGhhdCB5b3UnZCBhcHBseSB0byBzeXNjYWxsIGludGVyZmFjZXMgdGhhdA0K
+PiBvbmx5IHRha2UgdGhlIGlvdmVjLCBidXQgd2UgZG9uJ3QgbmVlZCB0byB3b3JrIGFyb3VuZCBp
+dCBoZXJlIGlmIHdlIGNhbg0KPiBkZWZpbmUgYSBjbGVhbiBjb21tYW5kIHVwZnJvbnQuDQo+IA0K
+PiBBbmQgaWYgd2UgZG9uJ3QgbmVlZCB2ZWN0b3JlZCByZXF1ZXN0cyBmb3IgdGhlIGRhdGEgcGFy
+dCwgdGhlbiBldmVuDQo+IGJldHRlci4gVGhhdCBvbmUgbWlnaHQgbm90IGJlIGZlYXNpYmxlLCBi
+dXQgZmlndXJlZCBJJ2QgdG9zcyBpdCBvdXQNCj4gdGhlcmUuDQo+IA0KPiAtLSANCj4gSmVucyBB
+eGJvZQ0KPiANCg0K
