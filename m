@@ -2,119 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5C2C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 07:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BCDC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 15:35:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6286D6101E
-	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 07:30:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1FD060F93
+	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 15:35:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbhJ3Hd0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Oct 2021 03:33:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45736 "EHLO
+        id S230285AbhJ3Ph4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Oct 2021 11:37:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230365AbhJ3Hd0 (ORCPT
+        with ESMTP id S230086AbhJ3Phz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Oct 2021 03:33:26 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98FEEC061570;
-        Sat, 30 Oct 2021 00:30:56 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id g10so46003896edj.1;
-        Sat, 30 Oct 2021 00:30:56 -0700 (PDT)
+        Sat, 30 Oct 2021 11:37:55 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DDAC061570
+        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 08:35:25 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id i14so16164159ioa.13
+        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 08:35:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AXA9li2tKaCAh14FXsDbXXTUi0RI8sNogEieGoLqb+8=;
-        b=axr/sf5j7zbTlZhUbEMOp9lAm1nB2D0HIl6wzTTyU+7SsS9bxLRtjW4oZBD9gW0XYv
-         Y65WLMNBBIwUKiFQomMSP2pSP3giubrA8etRSD6Lwko7VtkxyLJ0j/2EMSQWQTQcpQjk
-         FE8+JWvz+7wvgOVxKAYKxV8c47GLbnGP78rHq8Mk4CGviniy+iIs+JzGOCnWwYjwaGNe
-         atkPMuaYjRlIB3HM/98oH0fznUrjZpBpJZWxneykzhoG8JT2XEUjqIEbBMkuLjIYmu5o
-         h18JAyFDXlqJEsbJj3ZK5HRuXWduTB1hTXcVucARreA18vWWCdTghKD8AQzGz7WLZdaL
-         tBQw==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=f0VQ2JX5AOK/Ek0/MqjwIs7xw0kREUgashuR5g3imFs=;
+        b=Zh2tC6Z9VNRR+OTeVJuhyHtzSAjhrZRw/IW88z2gmyDfu/ZYlt6fOHzJe259sKpVT9
+         odFn2u5LEQd4c7piFbk5haaRxdVMlrtFCEQhvd5dgWSX7RfOWNva0eBMrxVsgm3GZCq3
+         oINMxfw730inZpAkkVM1YBuGYwVoMOHVrBPJ7kPHfKxwg3adZybVfjVQRRu8kJ+pI1pV
+         oxWPwcWShHRgIAKAJvHW6EG8TZ+BUjcIkUdat55QahJm0NtzbR/ecz6qdD7YM9XQjBfG
+         ANz8ZClgYR6hsQXj175+ZqN4pcC87mbqjsZV9GB8tHFALlAogObPy1H80SyxYG7Q/Xey
+         hu1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=AXA9li2tKaCAh14FXsDbXXTUi0RI8sNogEieGoLqb+8=;
-        b=VhtYVUEAGPqZVX5ZK+Hh2ZeOGRQHqfodltszy1BOcseRH+lXrAGi8NZdSh6+nX8D/A
-         3Owa2wdXudj9IOuff3UitTe+KQlfDoefzGD+87uuZaT+DAxRzmuprZI94npFFGfnWJZG
-         H1BmZUtHW5I5ax5sA/YOFa7RA1RTRzRvWHsHHVNU5sHpreJWUv+NBQ+aqN+KQvpM2rPX
-         PZPpuOnTHIxU95fxcRC1HIWzixUNPUg8BExMjgEa3yhNh1y2znWGS+rj3OQ4mbSgj1Jb
-         aSq5V8aQ8aLySvzAFbhILtoJIKckZXBEVFA7xpy1oU3w2UTTauaxLqSzjRJfe7xcGWXR
-         UMgw==
-X-Gm-Message-State: AOAM532y8guqHJtmOhc71SYdTGnYVM7PNkJ3YrwpE5gg2OoT3tg4cryZ
-        HeSEG0NmRDsA8ThCkRIiGvp5gKPohnirqg==
-X-Google-Smtp-Source: ABdhPJzTOTbbnH5GhbmXasFImzXRKTkVVGI9UfKfoznVSt4xMwp11bnR08bhkGYUjrg6/hMkKPg02g==
-X-Received: by 2002:a05:6402:42c8:: with SMTP id i8mr22479340edc.349.1635579055253;
-        Sat, 30 Oct 2021 00:30:55 -0700 (PDT)
-Received: from eldamar (80-218-24-251.dclient.hispeed.ch. [80.218.24.251])
-        by smtp.gmail.com with ESMTPSA id f22sm4827173edu.26.2021.10.30.00.30.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Oct 2021 00:30:54 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Date:   Sat, 30 Oct 2021 09:30:54 +0200
-From:   Salvatore Bonaccorso <carnil@debian.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Daniel Black <daniel@mariadb.org>, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org
-Subject: Re: uring regression - lost write request
-Message-ID: <YXz0roPH+stjFygk@eldamar.lan>
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
- <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=f0VQ2JX5AOK/Ek0/MqjwIs7xw0kREUgashuR5g3imFs=;
+        b=gBZi1RH0opVyPFx8ba9JUoVSmkg2A3Do7Bt1werxBMIMcr8Qf0coa8rrxfpK/+Ab0M
+         QGnATNM0RRRBGf2zgpG+vVhxIoCCilKJ3QawSvOpS+Xujva+u0KIEEysJdyPRGWn2NKg
+         MU8T/pDqo9wRR2/S2vmbNKuP9l1/JY8JQg+j5yejGBRD8QEu/m/nSkVl1LjN7pdJ6Lta
+         OP9vooRvmzDaacgY/oKHFRk0mMZoLEGkBTrSmLyQaatPU0wddkK0tQcQfWZIYPt6Mixz
+         Ul2Xtd/MipLT1pOUbLmA15ZEBR55OfqfCfJWYOSeAeQTEQed01QXEXigS4vTRExtzQjw
+         3SQw==
+X-Gm-Message-State: AOAM531ASXbfeRRXWBVUJaGu4SI+iuhyoJuYTXrv8tYAu3myzq+sFp5M
+        H5HIwqTMDuY/MD87wCbQSxBqHcuis3oAZA==
+X-Google-Smtp-Source: ABdhPJz9g40AOVUsyawdg6hGVSaTGKx7CRf4yTpNTk04xL3Y8P60iZBlurb6KMgLTeDEwGZrcF2Yfg==
+X-Received: by 2002:a05:6602:158a:: with SMTP id e10mr12878034iow.157.1635608124287;
+        Sat, 30 Oct 2021 08:35:24 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id a20sm5166990iow.5.2021.10.30.08.35.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 30 Oct 2021 08:35:23 -0700 (PDT)
+Subject: Re: [PATCH for-next] blk-mq: fix redundant check of !e expression
+To:     =?UTF-8?Q?J=ce=b5an_Sacren?= <sakiwit@gmail.com>,
+        linux-block@vger.kernel.org
+References: <20211029202945.3052-1-sakiwit@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b312c21a-3391-deb2-02df-639b34a30b22@kernel.dk>
+Date:   Sat, 30 Oct 2021 09:35:21 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
+In-Reply-To: <20211029202945.3052-1-sakiwit@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Daniel,
-
-On Mon, Oct 25, 2021 at 12:25:01PM +0100, Pavel Begunkov wrote:
-> On 10/25/21 12:09, Daniel Black wrote:
-> > On Mon, Oct 25, 2021 at 8:59 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
-> > > 
-> > > On 10/22/21 10:10, Pavel Begunkov wrote:
-> > > > On 10/22/21 04:12, Daniel Black wrote:
-> > > > > Sometime after 5.11 and is fixed in 5.15-rcX (rc6 extensively tested
-> > > > > over last few days) is a kernel regression we are tracing in
-> > > > > https://jira.mariadb.org/browse/MDEV-26674 and
-> > > > > https://jira.mariadb.org/browse/MDEV-26555
-> > > > > 5.10 and early across many distros and hardware appear not to have a problem.
-> > > > > 
-> > > > > I'd appreciate some help identifying a 5.14 linux stable patch
-> > > > > suitable as I observe the fault in mainline 5.14.14 (built
-> > > > 
-> > > > Cc: io-uring@vger.kernel.org
-> > > > 
-> > > > Let me try to remember anything relevant from 5.15,
-> > > > Thanks for letting know
-> > > 
-> > > Daniel, following the links I found this:
-> > > 
-> > > "From: Daniel Black <daniel@mariadb.org>
-> > > ...
-> > > The good news is I've validated that the linux mainline 5.14.14 build
-> > > from https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.14.14/ has
-> > > actually fixed this problem."
-> > > 
-> > > To be clear, is the mainline 5.14 kernel affected with the issue?
-> > > Or does the problem exists only in debian/etc. kernel trees?
-> > 
-> > Thanks Pavel for looking.
-> > 
-> > I'm retesting https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.14.14/
-> > in earnest. I did get some assertions, but they may have been
-> > unrelated. The testing continues...
+On 10/29/21 2:29 PM, Jεan Sacren wrote:
+> From: Jean Sacren <sakiwit@gmail.com>
 > 
-> Thanks for the work on pinpointing it. I'll wait for your conclusion
-> then, it'll give us an idea what we should look for.
+> In the if branch, e is checked.  In the else branch, ->dispatch_busy is
+> merely a number and has no effect on !e.  We should remove the check of
+> !e since it is always true.
 
-Were you able to pinpoint the issue?
+Applied, thanks.
 
-Regards,
-Salvatore
+-- 
+Jens Axboe
+
