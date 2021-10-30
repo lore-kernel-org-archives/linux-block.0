@@ -2,83 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BCDC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 15:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E163BC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 17:03:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1FD060F93
-	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 15:35:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B991860F21
+	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 17:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230285AbhJ3Ph4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Oct 2021 11:37:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37348 "EHLO
+        id S229734AbhJ3RGS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Oct 2021 13:06:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbhJ3Phz (ORCPT
+        with ESMTP id S229474AbhJ3RGR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Oct 2021 11:37:55 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DDAC061570
-        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 08:35:25 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id i14so16164159ioa.13
-        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 08:35:24 -0700 (PDT)
+        Sat, 30 Oct 2021 13:06:17 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71658C061570
+        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 10:03:47 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id v65so16419220ioe.5
+        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 10:03:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=f0VQ2JX5AOK/Ek0/MqjwIs7xw0kREUgashuR5g3imFs=;
-        b=Zh2tC6Z9VNRR+OTeVJuhyHtzSAjhrZRw/IW88z2gmyDfu/ZYlt6fOHzJe259sKpVT9
-         odFn2u5LEQd4c7piFbk5haaRxdVMlrtFCEQhvd5dgWSX7RfOWNva0eBMrxVsgm3GZCq3
-         oINMxfw730inZpAkkVM1YBuGYwVoMOHVrBPJ7kPHfKxwg3adZybVfjVQRRu8kJ+pI1pV
-         oxWPwcWShHRgIAKAJvHW6EG8TZ+BUjcIkUdat55QahJm0NtzbR/ecz6qdD7YM9XQjBfG
-         ANz8ZClgYR6hsQXj175+ZqN4pcC87mbqjsZV9GB8tHFALlAogObPy1H80SyxYG7Q/Xey
-         hu1g==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=mxOtNLa1eAMR0wpGD1VMaJkJmBISmLqnmjVIAsRcHvc=;
+        b=TxRznXHiVxPacqnwtNIIT0ht6nYzSE2RDLvhKozr3LBin/ehB9sdFZDpWWjj4OSd+b
+         wNVCVAvLw46JGTiAgUNZvEmvOxN66IADWaxYxM1QrR9lkXlSakotxqRDVZM1H74gZzC3
+         dptCLtGLLsAefANWtuy2n0rGMRlWfacf/IHiKhBgdqwAXaaJe6kpIkKpb32JNyUJDsPQ
+         h2JfNkORS5+nxcLRKrwXOlVNT9+6p7ra3ZV/bu0Di5bdLiqfxKarFy4zEtd9fllr2oYp
+         7Q6VyWuncWNiiodyabAkyjZysJUsC526HyMFP48mdzk4scwMLVB6FI1dgulKgRvL0IOy
+         PuLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=f0VQ2JX5AOK/Ek0/MqjwIs7xw0kREUgashuR5g3imFs=;
-        b=gBZi1RH0opVyPFx8ba9JUoVSmkg2A3Do7Bt1werxBMIMcr8Qf0coa8rrxfpK/+Ab0M
-         QGnATNM0RRRBGf2zgpG+vVhxIoCCilKJ3QawSvOpS+Xujva+u0KIEEysJdyPRGWn2NKg
-         MU8T/pDqo9wRR2/S2vmbNKuP9l1/JY8JQg+j5yejGBRD8QEu/m/nSkVl1LjN7pdJ6Lta
-         OP9vooRvmzDaacgY/oKHFRk0mMZoLEGkBTrSmLyQaatPU0wddkK0tQcQfWZIYPt6Mixz
-         Ul2Xtd/MipLT1pOUbLmA15ZEBR55OfqfCfJWYOSeAeQTEQed01QXEXigS4vTRExtzQjw
-         3SQw==
-X-Gm-Message-State: AOAM531ASXbfeRRXWBVUJaGu4SI+iuhyoJuYTXrv8tYAu3myzq+sFp5M
-        H5HIwqTMDuY/MD87wCbQSxBqHcuis3oAZA==
-X-Google-Smtp-Source: ABdhPJz9g40AOVUsyawdg6hGVSaTGKx7CRf4yTpNTk04xL3Y8P60iZBlurb6KMgLTeDEwGZrcF2Yfg==
-X-Received: by 2002:a05:6602:158a:: with SMTP id e10mr12878034iow.157.1635608124287;
-        Sat, 30 Oct 2021 08:35:24 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id a20sm5166990iow.5.2021.10.30.08.35.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Oct 2021 08:35:23 -0700 (PDT)
-Subject: Re: [PATCH for-next] blk-mq: fix redundant check of !e expression
-To:     =?UTF-8?Q?J=ce=b5an_Sacren?= <sakiwit@gmail.com>,
-        linux-block@vger.kernel.org
-References: <20211029202945.3052-1-sakiwit@gmail.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=mxOtNLa1eAMR0wpGD1VMaJkJmBISmLqnmjVIAsRcHvc=;
+        b=o8fvQl5qNmb4n3quGrBH3JtigbFMJNY07BDzKxs+rfs3gxvQ0baAftzWem5uWuDMcI
+         vZW8eGtUlCHf7txSdyauUpdd0uvoc2vO30veuW0g1YNpecfQe6VGRxwruxyy+UhDkE9T
+         O7Y6y2jCYE722u7UCLW1pdIu4mxBfJB7AUrrTSqe3wiqef4GqV7TTRLAs8fdn1rb9t19
+         4Vn0BppF3tVzb6prDlNfJz5nE0e5YicRDnKleyQbnqGhhwbFWeyOJQ9ztcBjrFwjTVL3
+         dKB+T66iuiv3fUV+aUmc+986ritzlc+T0zUjtR1REP7/MQNoUbBawEMsAZqkgErGm1mF
+         CVUA==
+X-Gm-Message-State: AOAM530h1ASImiGwWEYiJWBXObluqTGbZ7etdHGbGf8kTYb8Pu6UKXA0
+        eWbbygVlILaBA4NRqZmIGcA1zUfMRUhtVg==
+X-Google-Smtp-Source: ABdhPJzMkwx+8CSrFVSVUQuPKJKJNsEs+j3d0vp9XLDv6RRzhAFgLrCeu1vNWGVlfsmYjr2iZBeQpQ==
+X-Received: by 2002:a05:6602:2a44:: with SMTP id k4mr13067137iov.56.1635613426348;
+        Sat, 30 Oct 2021 10:03:46 -0700 (PDT)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id z26sm4948483ioe.9.2021.10.30.10.03.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Oct 2021 10:03:45 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b312c21a-3391-deb2-02df-639b34a30b22@kernel.dk>
-Date:   Sat, 30 Oct 2021 09:35:21 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     kbusch@kernel.org, dan.j.williams@intel.com, richard@nod.at,
+        jim@jtan.com, vishal.l.verma@intel.com, dave.jiang@intel.com,
+        miquel.raynal@bootlin.com, vigneshr@ti.com, ngupta@vflare.org,
+        ira.weiny@intel.com, senozhatsky@chromium.org, hch@lst.de,
+        paulus@samba.org, Luis Chamberlain <mcgrof@kernel.org>,
+        sagi@grimberg.me, mpe@ellerman.id.au, minchan@kernel.org,
+        geoff@infradead.org, benh@kernel.crashing.org
+Cc:     linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        nvdimm@lists.linux.dev, linux-block@vger.kernel.org
+In-Reply-To: <20211015235219.2191207-1-mcgrof@kernel.org>
+References: <20211015235219.2191207-1-mcgrof@kernel.org>
+Subject: Re: (subset) [PATCH 00/13] block: add_disk() error handling stragglers
+Message-Id: <163561342513.76453.10042066842818606438.b4-ty@kernel.dk>
+Date:   Sat, 30 Oct 2021 11:03:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <20211029202945.3052-1-sakiwit@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/29/21 2:29 PM, Jεan Sacren wrote:
-> From: Jean Sacren <sakiwit@gmail.com>
+On Fri, 15 Oct 2021 16:52:06 -0700, Luis Chamberlain wrote:
+> This patch set consists of al the straggler drivers for which we have
+> have no patch reviews done for yet. I'd like to ask for folks to please
+> consider chiming in, specially if you're the maintainer for the driver.
+> Additionally if you can specify if you'll take the patch in yourself or
+> if you want Jens to take it, that'd be great too.
 > 
-> In the if branch, e is checked.  In the else branch, ->dispatch_busy is
-> merely a number and has no effect on !e.  We should remove the check of
-> !e since it is always true.
+> Luis Chamberlain (13):
+>   block/brd: add error handling support for add_disk()
+>   nvme-multipath: add error handling support for add_disk()
+>   nvdimm/btt: do not call del_gendisk() if not needed
+>   nvdimm/btt: use goto error labels on btt_blk_init()
+>   nvdimm/btt: add error handling support for add_disk()
+>   nvdimm/blk: avoid calling del_gendisk() on early failures
+>   nvdimm/blk: add error handling support for add_disk()
+>   zram: add error handling support for add_disk()
+>   z2ram: add error handling support for add_disk()
+>   ps3disk: add error handling support for add_disk()
+>   ps3vram: add error handling support for add_disk()
+>   block/sunvdc: add error handling support for add_disk()
+>   mtd/ubi/block: add error handling support for add_disk()
+> 
+> [...]
 
-Applied, thanks.
+Applied, thanks!
 
+[08/13] zram: add error handling support for add_disk()
+        commit: 5e2e1cc4131cf4d21629c94331f2351b7dc8b87c
+[10/13] ps3disk: add error handling support for add_disk()
+        commit: ff4cbe0fcf5d749f76040f782f0618656cd23e33
+[11/13] ps3vram: add error handling support for add_disk()
+        commit: 3c30883acab1d20ecbd3c48dc12b147b51548742
+
+Best regards,
 -- 
 Jens Axboe
+
 
