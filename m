@@ -2,109 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEDEC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 17:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D8FDC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 31 Oct 2021 17:47:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 685C0603E8
-	for <linux-block@archiver.kernel.org>; Sat, 30 Oct 2021 17:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E740D61039
+	for <linux-block@archiver.kernel.org>; Sun, 31 Oct 2021 17:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230041AbhJ3RKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Oct 2021 13:10:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57198 "EHLO
+        id S229853AbhJaRuF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Oct 2021 13:50:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229474AbhJ3RKS (ORCPT
+        with ESMTP id S229732AbhJaRuF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Oct 2021 13:10:18 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8687CC061570
-        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 10:07:48 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id d63so16471046iof.4
-        for <linux-block@vger.kernel.org>; Sat, 30 Oct 2021 10:07:48 -0700 (PDT)
+        Sun, 31 Oct 2021 13:50:05 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31220C061570
+        for <linux-block@vger.kernel.org>; Sun, 31 Oct 2021 10:47:33 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id na16-20020a17090b4c1000b0019f5bb661f9so10929376pjb.0
+        for <linux-block@vger.kernel.org>; Sun, 31 Oct 2021 10:47:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=cj7b4WzzJcmZ+tVCjhkRXyXcKv7YSLzrxMjWUHMImLY=;
-        b=Wopv4tcWqOAJZGqYx1oWAbH++R5QUK3biTMI/xiKmgq8kzd4BjfbTwqyki2cw/dKMZ
-         zMePBAMmf+SLZ1e8obk5O2B8EqEDPivRKlRqkehfknMQ8MNLufX0ul/cJWZhewILt5Oh
-         6lHlndFiey7eEaiN0hgGC39LpO35JqvHs71OpDs0TY9XL4bVtIavn6nIEfmea/hq+LZm
-         LUd2MMSVR+UBeThxm8no9AVI+Lkwbvjh/Wd3YPAJax1gQlPv8O8NjJriy/LoIbj10SRd
-         9zfUre2XtVMt8acixbfHpVQ/bS6vxPEHVT/7jgMGiywvDrcUkISQerA52lYJTtjCW/Wj
-         XOoA==
+        d=intel-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7MuoEHjjO8VeJaVuFed8XWzS0lEfBBHPNJTbN9pP/Kk=;
+        b=4tOJMdKFSRsgNH+AUIYaqm2kjoYMRFX1rF2DJJ+SkN3TxFcC6WFZTlfZ/p19kQbT9K
+         3ucowaD3UjTRl1wxq0AhkO2grIrwJ1CUzZL9iaOW9qQruYwZiNTLyT8xPdcntcGZTnKO
+         oHouSuIItcBdIuUQi3se1/cFTWoJaoIMfatJqvTJNtdVS5k8eQGd7+SN6PbVUPLsaGtZ
+         l1ZNkN5xiSBdq4V2xHL4j3AS7JUzTTQy6aixWFwT8tGnH7btlFyMUA6OKqRZ3rOIuHsc
+         1ZLLqjh17RQWY85HyaOON7GqX1MfrrlXjw7ctSAkgQItKO1cowEaIPOliTgHjuC8pBHM
+         Mnbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=cj7b4WzzJcmZ+tVCjhkRXyXcKv7YSLzrxMjWUHMImLY=;
-        b=6GsZMjRT4WjMiDnt8J3QbLbo4Enhz/OU/Z4Y5JkttQ1BE3UPCpV2ofr1kdKVse7WQn
-         v/mtw0kPP6X08XXLjB/xg/Mh90DipUnHFY0FyMGKKbM6VvU/6CVPZvr47fQnYHxQIxF1
-         6iPe94iboUsPsECGFSZodYYO4pXQ9FIr2ZL0ddICCllnb9LEqdHi9VdDnKCxeqzGE8FG
-         goc9c/X2Scp/rKKRoyqmamc5jDQ0ceszrNVsYWIj4baZdSFotC9kKsTvwr3gwHotv861
-         63Hh9MTqXFCePdRsCFqk8rf6wjfQw6ecNBFAiNBuwEVzB0tSBPr2/t/B0u/tU5ArOiPH
-         ooMw==
-X-Gm-Message-State: AOAM532YchTqZkMlk7TbtZnHx13pW5j1+odMMNYsxX5LeBlDJb5CHBnH
-        vavg9TP9fDLQMTeWHrh0b+Ke5A==
-X-Google-Smtp-Source: ABdhPJzTVX/ZyGI7Pmdgi3Ji0UX3geoz9OnmwOkoYIKCEwZOPpGwJ2EvLzYUymZf8Uzb5XEpGHWwDg==
-X-Received: by 2002:a02:cbb1:: with SMTP id v17mr13623686jap.51.1635613667880;
-        Sat, 30 Oct 2021 10:07:47 -0700 (PDT)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id o8sm5504963ilu.2.2021.10.30.10.07.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Oct 2021 10:07:47 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     vigneshr@ti.com, richard@nod.at, geoff@infradead.org,
-        vishal.l.verma@intel.com, kbusch@kernel.org, sagi@grimberg.me,
-        minchan@kernel.org, mpe@ellerman.id.au, ira.weiny@intel.com,
-        hch@lst.de, senozhatsky@chromium.org, dave.jiang@intel.com,
-        miquel.raynal@bootlin.com, paulus@samba.org,
-        dan.j.williams@intel.com, benh@kernel.crashing.org, jim@jtan.com,
-        ngupta@vflare.org, Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-mtd@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        nvdimm@lists.linux.dev, linux-kernel@vger.kernel.org
-In-Reply-To: <20211015235219.2191207-1-mcgrof@kernel.org>
-References: <20211015235219.2191207-1-mcgrof@kernel.org>
-Subject: Re: (subset) [PATCH 00/13] block: add_disk() error handling stragglers
-Message-Id: <163561366669.77445.6593243934116934390.b4-ty@kernel.dk>
-Date:   Sat, 30 Oct 2021 11:07:46 -0600
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7MuoEHjjO8VeJaVuFed8XWzS0lEfBBHPNJTbN9pP/Kk=;
+        b=Gdy2QaguGX3iPHl6pd3zZIdrAfLubo3nwdzuuD/c3BMUH5fLK93jDN1StZSGysdRCd
+         5zK7IxUXztTcK4fCJqjzBwgvqArlhMfnqyzi0ZM/YnV0OXxmha3DUK19td+eYTpYCBwY
+         UrtVNtXleH9Yfy0ptzWXjah8HjlAjBI9oke6Lo/u9QZt4VsOpPCb8C9WGsTD8qytA4EJ
+         lzWZvO0nyi3jbb3Mjbl3EjKj2vbQ+Dg7O5fOIxHWi+Ve776zgB4YXU2oGGbCK2FgwKoY
+         efyCFmnc3ldz2QLw2mte+3fGyKo6I+5n6PgyzyRG/iA6VnSixL4fQgyDCAQI88o8euup
+         1cIw==
+X-Gm-Message-State: AOAM530c7Fek09UqrtkdTeERyY+KTa/w4ZYZo0lUXRV2Zdqck5DaoiOx
+        422YN1BPi/juIVvNuo9bzXoKzy0rD080n/mpASBx+g==
+X-Google-Smtp-Source: ABdhPJyA7Laj0AUg2FKVlcU7XOrNA0zdW+Ju6E23SLHq82Op6ARxl3h9QltxEajuidxiYWqVOR7E35WaYaY6PyVeaf4=
+X-Received: by 2002:a17:902:8a97:b0:13e:6e77:af59 with SMTP id
+ p23-20020a1709028a9700b0013e6e77af59mr20648644plo.4.1635702452583; Sun, 31
+ Oct 2021 10:47:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20211015235219.2191207-1-mcgrof@kernel.org> <20211015235219.2191207-4-mcgrof@kernel.org>
+In-Reply-To: <20211015235219.2191207-4-mcgrof@kernel.org>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Sun, 31 Oct 2021 10:47:22 -0700
+Message-ID: <CAPcyv4gU0q=UhDhGoDjK1mwS8WNcWYUXgEb7Rd8Amqr1XFs6ow@mail.gmail.com>
+Subject: Re: [PATCH 03/13] nvdimm/btt: do not call del_gendisk() if not needed
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Geoff Levand <geoff@infradead.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, Jim Paris <jim@jtan.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>, senozhatsky@chromium.org,
+        Richard Weinberger <richard@nod.at>, miquel.raynal@bootlin.com,
+        vigneshr@ti.com, Vishal L Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Weiny, Ira" <ira.weiny@intel.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-mtd@lists.infradead.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>,
+        linux-nvme@lists.infradead.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 15 Oct 2021 16:52:06 -0700, Luis Chamberlain wrote:
-> This patch set consists of al the straggler drivers for which we have
-> have no patch reviews done for yet. I'd like to ask for folks to please
-> consider chiming in, specially if you're the maintainer for the driver.
-> Additionally if you can specify if you'll take the patch in yourself or
-> if you want Jens to take it, that'd be great too.
-> 
-> Luis Chamberlain (13):
->   block/brd: add error handling support for add_disk()
->   nvme-multipath: add error handling support for add_disk()
->   nvdimm/btt: do not call del_gendisk() if not needed
->   nvdimm/btt: use goto error labels on btt_blk_init()
->   nvdimm/btt: add error handling support for add_disk()
->   nvdimm/blk: avoid calling del_gendisk() on early failures
->   nvdimm/blk: add error handling support for add_disk()
->   zram: add error handling support for add_disk()
->   z2ram: add error handling support for add_disk()
->   ps3disk: add error handling support for add_disk()
->   ps3vram: add error handling support for add_disk()
->   block/sunvdc: add error handling support for add_disk()
->   mtd/ubi/block: add error handling support for add_disk()
-> 
-> [...]
+On Fri, Oct 15, 2021 at 4:53 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> We know we don't need del_gendisk() if we haven't added
+> the disk, so just skip it. This should fix a bug on older
+> kernels, as del_gendisk() became able to deal with
+> disks not added only recently, after the patch titled
+> "block: add flag for add_disk() completion notation".
 
-Applied, thanks!
+Perhaps put this in:
 
-[01/13] block/brd: add error handling support for add_disk()
-        commit: e1528830bd4ebf435d91c154e309e6e028336210
+    commit $abbrev_commit ("block: add flag for add_disk() completion notation")
 
-Best regards,
--- 
-Jens Axboe
+...format, but I can't seem to find that commit?
 
+If you're touching the changelog how about one that clarifies the
+impact and drops "we"?
 
+"del_gendisk() is not required if the disk has not been added. On
+kernels prior to commit $abbrev_commit ("block: add flag for
+add_disk() completion notation")
+it is mandatory to not call del_gendisk() if the underlying device has
+not been through device_add()."
+
+Fixes: 41cd8b70c37a ("libnvdimm, btt: add support for blk integrity")
+
+With that you can add:
+
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
