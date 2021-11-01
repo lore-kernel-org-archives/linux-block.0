@@ -2,93 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5A6C4332F
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 19:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36004C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 20:01:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 061D761053
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 19:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 165E060FC4
+	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 20:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbhKAT4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Nov 2021 15:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45388 "EHLO
+        id S230011AbhKAUET (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Nov 2021 16:04:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbhKAT4q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 15:56:46 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ECAAC061764
-        for <linux-block@vger.kernel.org>; Mon,  1 Nov 2021 12:54:13 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id w10so19622641ilc.13
-        for <linux-block@vger.kernel.org>; Mon, 01 Nov 2021 12:54:13 -0700 (PDT)
+        with ESMTP id S229883AbhKAUES (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 16:04:18 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F3EC061714
+        for <linux-block@vger.kernel.org>; Mon,  1 Nov 2021 13:01:44 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id v20so12387551plo.7
+        for <linux-block@vger.kernel.org>; Mon, 01 Nov 2021 13:01:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=koQbBQ21p1fsQdBlT5oLumJMTocgWXeZsx4RpVzAmQY=;
-        b=XnM6Ww1xAQ4aJAntWmx/aW6fEB3s9w9ALEa1XdlQXpgI819xGeGCnMWiLcvoQX33dd
-         D7BSLvA2/wXUDFmEIGAPnBRlHzmebowZAOS6qqTbgLyHyN1JGeUO1YwXcdP00kFSPKTV
-         +HtxkrwnQcjhih+8t2e30Rk2ZvuzfciWz9EF2pL0dLPAer/y3psjbe6/Il0RsGa0HUrM
-         jyhH3vJ8AtNvd/o5N0EVRqwnpqwcCxCuXjMxD3hdxL/Ytw9jxluTRp5DoWHn8bhmoka2
-         0uJ07IuLEylCjtLg8i99QDwsVhFEti7bB0w9fWk5l4GiXFkod8uWQD02VkJGzGn0Z3z3
-         O3gw==
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:in-reply-to:content-transfer-encoding;
+        bh=//qLyozC7UQaBdURgH8zYX1NEvcJQYYYqxcLEEiD/C0=;
+        b=peBqNdpy1901jw2VuRMcFADsSNPGF2oy8Kr3JTH5yjMnOZlkZ7FUSw2c+AbfaWojkL
+         u1kye+XZNhbFlI5FANhCGhNvqQHCaD9wlL60y6neZNgZ/aE7uJjVYizEhfyP6ZywkXtd
+         VSlfE1AYfiWuUjtlNT8xjq+tksH6x+z3jhxKPvjYXr1KWwMFrJmFKVkxzcAS6n7gLy3E
+         oI2RURVtjxWVv2m6FeAnrJhrHm9UQQMiNHUIMbsCd8Pngg7Kg9l3w5subPAqC9lA2D3C
+         eIoQThPd3PQcZcDEC9f7/1QFI5rMb1H1J0rxWNXhl8LkFxqbRFuzEvySsq6t/MVzOznT
+         usaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=koQbBQ21p1fsQdBlT5oLumJMTocgWXeZsx4RpVzAmQY=;
-        b=yqT8TNInmxTpbMHD9uJnoJWXcrRIqYSyYY7Enjkk872MisrKIcETcvOPUsMW6VfxX1
-         VPlqxi0zdQM3Gqm+mVz8h1rZtyRaQuN31lCBv4qloD5pGtICoKb0AjDJ49MN63TKEo6k
-         jcJ069+bxke/w2LonWNWXsVSuAaD0Ql4S0Cjmrz36+7laKNZWrw0TXVfQ1++AW/+2EEr
-         k1kxadd4tz7Q1HcdLJrIQLtRgO9BJKwkTfjNEFyCZY6bZhTT6xXt1eCeJKF94ibnrQOz
-         //tpLtR+j5m3UEYnoQh/+R9QeZaZQqQOpKkBh9CxF9VhqHh24BISM5OtaS3nkvGzth9b
-         mxCA==
-X-Gm-Message-State: AOAM5320xo8+tX7dk2s5uLziYaKRhyKSjJA3vTBHBKI2bvcQPlGPSDG9
-        EXUdrysJgsmV9GjUXDR29JixiQ==
-X-Google-Smtp-Source: ABdhPJy/9YCvWsy4CcYhHnrFyE0rT2z+RApGafmCg/y4Tz/3v9B8FSsOihEyIPkQmLe0tOe8OerETw==
-X-Received: by 2002:a05:6e02:1e02:: with SMTP id g2mr21957731ila.67.1635796452720;
-        Mon, 01 Nov 2021 12:54:12 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h14sm8440390ils.75.2021.11.01.12.54.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 12:54:12 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     dm-devel@redhat.com, Yi Zhang <yi.zhang@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20211021145918.2691762-1-ming.lei@redhat.com>
-References: <20211021145918.2691762-1-ming.lei@redhat.com>
-Subject: Re: [PATCH 0/3] block: keep quiesce & unquiesce balanced for scsi/dm
-Message-Id: <163579645206.169811.345176407474716806.b4-ty@kernel.dk>
-Date:   Mon, 01 Nov 2021 13:54:12 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
+         :content-transfer-encoding;
+        bh=//qLyozC7UQaBdURgH8zYX1NEvcJQYYYqxcLEEiD/C0=;
+        b=wLeolZghY1d2XC27XggriUuM2tNlD2tcBEVNMJqCfGJvrOwodl/nGg4cfc3oVs0bKj
+         FeyxG0Xr3V0VhTLahTwfP0mSFH170elFegkXZmlzbeJj+1M9EsQ4EmxQIcU2HG3XNViQ
+         PLLH01GLx81JsnBnSM4OObzaVG8NYQpmfoD001cX6r7/OQZfTL2p4AX2v8q3PgatLsRl
+         liQgGn6S3BEFa/SQsR39zJxpggg9rthG/ZEKH1Rf4yX93cmZg0nWn+i9KnywF+0eaX6d
+         k2AuynKlD60Z0pT+rdL9yLNElcV/ZxCIRFjgwIqGkvljYMIV7nJsKcoTREOlqSnBMYRY
+         r6WQ==
+X-Gm-Message-State: AOAM530NLYC5yVHHadU20HcTuTXP/Q4WB8JEGLIP041VOQNkcjLMrKBk
+        7vr34f1zYADAPKg5PXtOxRK5NA==
+X-Google-Smtp-Source: ABdhPJzxz3cnVsLDaAL1jCkkJjFC5U9ToZGS8xlNZ6wLOTkNhl62tXI+5y13i4LrDg7zVvr5wX7rbA==
+X-Received: by 2002:a17:902:c407:b0:13f:68f:6753 with SMTP id k7-20020a170902c40700b0013f068f6753mr26985851plk.39.1635796903499;
+        Mon, 01 Nov 2021 13:01:43 -0700 (PDT)
+Received: from [192.168.254.17] ([50.39.160.154])
+        by smtp.gmail.com with ESMTPSA id mr2sm258610pjb.25.2021.11.01.13.01.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Nov 2021 13:01:43 -0700 (PDT)
+Message-ID: <2bf04f26-4e82-a822-90ce-4c28e2c0e407@linaro.org>
+Date:   Mon, 1 Nov 2021 13:01:42 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: general protection fault in del_gendisk
+Content-Language: en-US
+From:   Tadeusz Struk <tadeusz.struk@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <7468db5d-55b4-07c9-628a-9a60419d9121@linaro.org>
+In-Reply-To: <7468db5d-55b4-07c9-628a-9a60419d9121@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 21 Oct 2021 22:59:15 +0800, Ming Lei wrote:
-> Recently we merge the patch of e70feb8b3e68 ("blk-mq: support concurrent queue
-> quiesce/unquiesce") for fixing race between driver and block layer wrt.
-> queue quiesce.
+On 10/29/21 12:13, Tadeusz Struk wrote:
+> Hi,
+> I'm looking at a bug found by the syzkaller robot [1], and I just wanted
+> to confirm that my understanding is correct, and the issue can be closed.
+> First, the kernel is configured with some fault injections enabled:
 > 
-> Yi reported that srp/002 is broken with this patch, turns out scsi and
-> dm don't keep the two balanced actually.
+> CONFIG_FAULT_INJECTION=y
+> CONFIG_FAILSLAB=y
+> CONFIG_FAIL_PAGE_ALLOC=y
 > 
-> [...]
+> The test adds loop devices, which causes some entries in sysfs to be created.
+> It does some magic with ioctls, which calls:
+> __device_add_disk() -> register_disk()
+> which eventually triggers sysfs_create_files() and it crashes there,
+> in line 627 [2], because the fault injector logic triggers it.
+> That can be seen in the trace [3]:
+> [   34.089707][ T1813] FAULT_INJECTION: forcing a failure.
+> 
+> Sysfs code returns a -ENOMEM error, but because the __device_add_disk()
+> implementation mostly uses void function, and doesn't return on errors [4]
+> it goes farther, hits some warnings, like:
+> disk_add_events() -> sysfs_create_files() -> sysfs_create_file_ns() - > WARN()
+> and eventually triggers general protection fault in sysfs code, and panics there.
+> 
+> I think for this to recover and return an error to the caller via ioctl()
+> the __device_add_disk() code would need be reworked to handle errors,
+> and return errors to the caller.
+> My question is: is it implemented like this by design? Are there any plans
+> to make it fail more gracefully?
 
-Applied, thanks!
+Hi,
+Any comments on this one?
 
-[1/3] scsi: avoid to quiesce sdev->request_queue two times
-      commit: 256117fb3b4f8832d6b29485d49d37ccc4c314d5
-[2/3] scsi: make sure that request queue queiesce and unquiesce balanced
-      commit: fba9539fc2109740e70e77c303dec50d1411e11f
-[3/3] dm: don't stop request queue after the dm device is suspended
-      commit: e719593760c34fbf346fc6e348113e042feb5f63
-
-Best regards,
 -- 
-Jens Axboe
-
-
+Thanks,
+Tadeusz
