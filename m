@@ -2,164 +2,201 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94197C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 07:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BFDC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 08:06:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AE276008E
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 07:28:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 207FF610E5
+	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 08:06:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231290AbhKAHbQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Nov 2021 03:31:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45528 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231302AbhKAHbN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 03:31:13 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CE9C0613F5
-        for <linux-block@vger.kernel.org>; Mon,  1 Nov 2021 00:28:33 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id g8so61651811edb.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Nov 2021 00:28:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mariadb.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4R9B/sJ3SkTmwgevgezogVNj0pw+/Ioeg5KdJ4MvjgQ=;
-        b=gZR+2VGt9qWwrm0WE2K4p5YrT7DEJAgqzpUnAK4wT2EH+9ztMw7pGswfd2pJZh/Vx/
-         Yhjbgv9A0yupny49Yus6xKvrbcsLFh5NKXN2WntiFu0A4wk2U9bnlL8RNO87J7dYN5dU
-         vf4xH0lVB88odXLa0KYlOF70htkDxZ0k513ZUFWHerlBA5j0quNN5rl8ZzN8ymRSWZC/
-         j2e2pjHu3HGnMDMbgZumo+BcDaCAu3wkuWu6BC12EF2Dad7Xgs8iz1+AGHJYdc+RNY89
-         XzsLi5/9ygwZX3crTqm//iM40n3UfZith8hdsbbzzSmMiUoHbVCvjUIQxLE8d32/xR3Z
-         e6HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4R9B/sJ3SkTmwgevgezogVNj0pw+/Ioeg5KdJ4MvjgQ=;
-        b=UqIeCnI1o4rUsQhCWuuXgTNS2fLLUx4lrii1U9NVL6GVxsJkY3EV9cxaBCoag6EE0C
-         7ybyUzHpbRwjQFsg6Ok53aaYbSJz0otJRMqwnWciUtOY3LOqFa8SQat80ZMb6ImcTqt5
-         aFFrNGJK3QohDBJ0LYi4Z1xN3HAd2Ehme92JcWkr8QQ+6f7yu6N58L7uWntsedJvrw0b
-         uFrTXVK5ud+DgGO8DSdL7Q4FoGb2HIIbcBbfKRD5Br5HSARFBc1gkAmwycBtZe29NTOg
-         WG9IL30t6JCgBWs1EruiHpFFw1Xwv1q6C3wh0MFibJXX3Y+tCwF5m3bnUAt0DP+Dh8Nh
-         ykBg==
-X-Gm-Message-State: AOAM531aET9o8qrCfQOlPwGzd488azCCRCDuBcq+zX0p4RfZKdF+ub7y
-        MPTt9fHhKZxTweVCMH9B759NtTcEzTBuVzNkjzQzYvYSYN/FTQ==
-X-Google-Smtp-Source: ABdhPJx4TkhqePAQREHt6jMQNaImJqUkrdYWmhMNAyhCDD4C0bFqSidFL4tq20PRQ8u2UOjMVGv9FfNeo1c4Je+fSr0=
-X-Received: by 2002:a50:da48:: with SMTP id a8mr38843227edk.146.1635751711791;
- Mon, 01 Nov 2021 00:28:31 -0700 (PDT)
+        id S231749AbhKAIJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Nov 2021 04:09:04 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:26141 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231806AbhKAII6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 04:08:58 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4HjQXs1cxxz1DHxH;
+        Mon,  1 Nov 2021 16:04:13 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Mon, 1 Nov 2021 16:06:12 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Mon, 1 Nov 2021 16:06:11 +0800
+Subject: Re: [PATCH 0/2] nbd: fix sanity check for first_minor
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>, <josef@toxicpanda.com>,
+        <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
+        <luomeng12@huawei.com>, Christoph Hellwig <hch@lst.de>
+References: <20211021122936.758221-1-yukuai3@huawei.com>
+ <72fb140d-609b-c035-bdd6-d2b8639c116b@gmail.com>
+ <17182476-e5bf-f493-9d9b-fedb2d9c8e1a@huawei.com>
+ <92d9f001-f77b-8263-53a6-aab83daccef9@huawei.com>
+ <9199b0a5-8286-024f-1343-ea386140c206@huawei.com>
+Message-ID: <7f899408-a01c-6300-9296-b5335ab259aa@huawei.com>
+Date:   Mon, 1 Nov 2021 16:06:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com> <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com> <YXz0roPH+stjFygk@eldamar.lan>
-In-Reply-To: <YXz0roPH+stjFygk@eldamar.lan>
-From:   Daniel Black <daniel@mariadb.org>
-Date:   Mon, 1 Nov 2021 18:28:19 +1100
-Message-ID: <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
-Subject: Re: uring regression - lost write request
-To:     Salvatore Bonaccorso <carnil@debian.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: multipart/mixed; boundary="000000000000b9096305cfb51f27"
+In-Reply-To: <9199b0a5-8286-024f-1343-ea386140c206@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000b9096305cfb51f27
-Content-Type: text/plain; charset="UTF-8"
-
-On Sat, Oct 30, 2021 at 6:30 PM Salvatore Bonaccorso <carnil@debian.org> wrote:
-
-> > > I'm retesting https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.14.14/
-> > > in earnest. I did get some assertions, but they may have been
-> > > unrelated. The testing continues...
-> >
-> > Thanks for the work on pinpointing it. I'll wait for your conclusion
-> > then, it'll give us an idea what we should look for.
->
-> Were you able to pinpoint the issue?
-
-Retesting on the ubuntu mainline 5.14.14 and 5.14.15 was unable to
-reproduce the issue in a VM.
-
-Using Fedora (34) 5.14.14 and 5.14.15 kernel I am reasonably able to
-reproduce this, and it is now reported as
-https://bugzilla.redhat.com/show_bug.cgi?id=2018882.
-
-I've so far been unable to reproduce this issue on 5.15.0-rc7 inside a
-(Ubuntu-21.10) VM.
-
-Marko did using a other heavy flushing sysbench script (modified
-version attached - slightly lower specs, and can be used on distro
-install) was able to see the fault (qps goes to 0) using Debian sid
-userspace and 5.15-rc6/5.15-rc7 Ubuntu mainline kernels.
-https://jira.mariadb.org/browse/MDEV-26674?focusedCommentId=203645&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-203645
-
-Note if using a mariadb-10.6.5 (not quite released), there's a change
-of defaults to avoid this bug, mtr options
---mysqld=--innodb_use_native_aio=1 --nowarnings  will test this
-however.
-
---000000000000b9096305cfb51f27
-Content-Type: application/x-shellscript; name="Mariarebench-MDEV-23855.sh"
-Content-Disposition: attachment; filename="Mariarebench-MDEV-23855.sh"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kvgbyqjq0>
-X-Attachment-Id: f_kvgbyqjq0
-
-IyEvYmluL2Jhc2gKc2V0IC14IC12CjogJHtTUkNUUkVFPS9tYXJpYWRiLzEwLjVtfQo6ICR7TURJ
-Uj0vZGV2L3NobS8xMC41bX0KSURJUj0kQkxEVFJFRS9pbmNsdWRlCjogJHtURElSPS90bXAvc2J0
-ZXN0fQpMRF9MSUJSQVJZX1BBVEg9IiRNRElSL2xpYm15c3FsIgpNWVNRTF9TT0NLPSRURElSL215
-c3FsZC5zb2NrCk1ZU1FMX1VTRVI9cm9vdApCRU5DSF9USU1FPTEyMDAKQkVOQ0hfVEhSRUFEUz0i
-OCIKIyBGcmVxdWVudGx5IHVzZWQgdGVzdHM6IG9sdHBfdXBkYXRlX2luZGV4LCBvbHRwX3VwZGF0
-ZV9ub25faW5kZXgsIG9sdHBfcmVhZF93cml0ZSwgY29ubmVjdCwgb2x0cF9yZWFkX29ubHksIG9s
-dHBfcG9pbnRfc2VsZWN0ClNZU0JFTkNIPSJzeXNiZW5jaCAvdXNyL3NoYXJlL3N5c2JlbmNoL29s
-dHBfdXBkYXRlX2luZGV4Lmx1YSBcCiAgLS1teXNxbC1zb2NrZXQ9JE1ZU1FMX1NPQ0sgXAogIC0t
-bXlzcWwtdXNlcj0kTVlTUUxfVVNFUiBcCiAgLS1teXNxbC1kYj10ZXN0IFwKICAtLXBlcmNlbnRp
-bGU9OTkgXAogIC0tdGFibGVzPTggXAogIC0tdGFibGVfc2l6ZT0yMDAwMDAiClBGUz1vZmYKICAj
-LS1teXNxbF9zdG9yYWdlX2VuZ2luZT1hcmlhIC0tcG9pbnRfc2VsZWN0cz0xMDAwIC0tc2ltcGxl
-X3Jhbmdlcz0wIC0tc3VtX3Jhbmdlcz0wIC0tb3JkZXJfcmFuZ2VzPTAgLS1kaXN0aW5jdF9yYW5n
-ZXM9MCBcCiAgIy0tYXJpYS1wYWdlY2FjaGUtYnVmZmVyLXNpemU9MjA0OE0gXAojcm0gLXJmICIk
-VERJUiIKI2NkICRNRElSCm15c3FsX2luc3RhbGxfZGIgLS11c2VyPSIkVVNFUk5BTUUiIC0tZGF0
-YWRpcj0iJFRESVIiIC0tYXV0aC1yb290LWF1dGhlbnRpY2F0aW9uLW1ldGhvZD1ub3JtYWwKI2Nk
-IC4uLwpudW1hY3RsIC0tY3B1bm9kZWJpbmQgMCAtLWxvY2FsYWxsb2MgXApteXNxbGQgLS1uby1k
-ZWZhdWx0cyAtLWdkYiAtLWNvcmUtZmlsZSAtLWxvb3NlLWRlYnVnLXN5bmMtdGltZW91dD0zMDAg
-LS1pbm5vZGIgXAogIC0tZGF0YWRpcj0iJFRESVIiICAtLXNvY2tldD0kTVlTUUxfU09DSyBcCiAg
-LS1pbm5vZGJfbG9nX2ZpbGVfc2l6ZT0yNTZNXAogIC0taW5ub2RiX2J1ZmZlcl9wb29sX3NpemU9
-OEcgXAogIC0taW5ub2RiX2lvX2NhcGFjaXR5PTcwMDAwXAogIC0taW5ub2RiX2lvX2NhcGFjaXR5
-X21heD05MDAwMCBcCiAgLS1pbm5vZGJfZmx1c2hfbG9nX2F0X3RyeF9jb21taXQ9MCBcCiAgLS1p
-bm5vZGJfYWRhcHRpdmVfZmx1c2hpbmdfbHdtPTAgXAogIC0taW5ub2RiX2ZpbGUtcGVyLXRhYmxl
-PTEgXAogIC0taW5ub2RiLWZhc3Qtc2h1dGRvd249MCBcCiAgLS1pbm5vZGItZmx1c2gtbWV0aG9k
-PU9fRElSRUNUIFwKICAtLWlubm9kYl9mbHVzaF9zeW5jPTEgXAogIC0taW5ub2RiX2xydV9zY2Fu
-X2RlcHRoPTEwMjQgXAogIC0taW5ub2RiX2xydV9mbHVzaF9zaXplPTI1NiBcClwKICAtLW1heC1j
-b25uZWN0aW9ucz0yMDQ4IFwKICAtLXRhYmxlX29wZW5fY2FjaGU9NDA5NiBcCiAgLS1tYXhfcHJl
-cGFyZWRfc3RtdF9jb3VudD0xMDQ4NTc2IFwKICAtLWFyaWEtY2hlY2twb2ludC1pbnRlcnZhbD0w
-IFwKXAogIC0tbG9vc2UtcGVyZm9ybWFuY2Utc2NoZW1hLWNvbnN1bWVyLWV2ZW50c193YWl0c19j
-dXJyZW50PW9uIFwKICAtLWxvb3NlLXBlcmZvcm1hbmNlLXNjaGVtYS1jb25zdW1lci1ldmVudHNf
-c3RhdGVtZW50c19jdXJyZW50PW9mZiBcCiAgLS1sb29zZS1wZXJmb3JtYW5jZS1zY2hlbWEtY29u
-c3VtZXItc3RhdGVtZW50c19kaWdlc3Q9b2ZmIFwKICAtLWxvb3NlLXBlcmZvcm1hbmNlLXNjaGVt
-YS1pbnN0cnVtZW50PSclPW9mZicgXAogIC0tbG9vc2UtcGVyZm9ybWFuY2Utc2NoZW1hLWluc3Ry
-dW1lbnQ9J3dhaXQvc3luY2gvbXV0ZXgvJT1vbicgXAogIC0tbG9vc2UtcGVyZm9ybWFuY2Utc2No
-ZW1hLWluc3RydW1lbnQ9J3dhaXQvc3luY2gvcndsb2NrLyU9b24nIFwKICAtLWxvb3NlLXBlcmZv
-cm1hbmNlLXNjaGVtYT0kUEZTID4gIiRURElSIi9teXNxbGQuZXJyIDI+JjEgJgp0aW1lbz02MDAK
-ZWNobyAtbiAid2FpdGluZyBmb3Igc2VydmVyIHRvIGNvbWUgdXAgIgp3aGlsZSBbICR0aW1lbyAt
-Z3QgMCBdCmRvCiAgbXlzcWxhZG1pbiAtUyAkTVlTUUxfU09DSyAtdSAkTVlTUUxfVVNFUiAtYiAt
-cyBwaW5nICYmIGJyZWFrCiAgZWNobyAtbiAiLiIKICB0aW1lbz0kKCgkdGltZW8gLSAxKSkKICBz
-bGVlcCAxCmRvbmUKCmlmIFsgJHRpbWVvIC1lcSAwIF0KdGhlbgogIGVjaG8gIiBzZXJ2ZXIgbm90
-IHN0YXJ0aW5nISBBYm9ydCEiCiAgYnJlYWsKZmkKCm51bWFjdGwgLS1jcHVub2RlYmluZCAwIC0t
-bG9jYWxhbGxvYyAkU1lTQkVOQ0ggLS10aHJlYWRzPSRCRU5DSF9USFJFQURTIGNsZWFudXAgfHwg
-ZWNobyBhbHJlYWR5IGNsZWFuCm51bWFjdGwgLS1jcHVub2RlYmluZCAwIC0tbG9jYWxhbGxvYyAk
-U1lTQkVOQ0ggLS10aHJlYWRzPSRCRU5DSF9USFJFQURTIHByZXBhcmUKCmZvciBpIGluICRCRU5D
-SF9USFJFQURTCmRvCiAgbXlzcWwgLS1uby1kZWZhdWx0cyAtdSAkTVlTUUxfVVNFUiAtUyAkTVlT
-UUxfU09DSyAtZSAidHJ1bmNhdGUgdGFibGUgZXZlbnRzX3dhaXRzX3N1bW1hcnlfZ2xvYmFsX2J5
-X2V2ZW50X25hbWUiIHBlcmZvcm1hbmNlX3NjaGVtYQogIG51bWFjdGwgLS1jcHVub2RlYmluZCAw
-IC0tbG9jYWxhbGxvYyAkU1lTQkVOQ0ggLS1yYW5kLXNlZWQ9NDIgLS1yYW5kLXR5cGU9dW5pZm9y
-bSAtLW1heC1yZXF1ZXN0cz0wIC0tdGltZT0kQkVOQ0hfVElNRSAtLXJlcG9ydC1pbnRlcnZhbD01
-IC0tdGhyZWFkcz0kaSBydW4KICBbICIkUEZTIiA9ICJvZmYiIF0gfHwKICBteXNxbCAtdSAkTVlT
-UUxfVVNFUiAtUyAkTVlTUUxfU09DSyAtZQogICJzZWxlY3QgRVZFTlRfTkFNRSxDT1VOVF9TVEFS
-LFJPVU5EKFNVTV9USU1FUl9XQUlULzEwMDAwMDAwMDAwMDAsMikgQVMgU0VDT05EUyxTVU1fVElN
-RVJfV0FJVCxNSU5fVElNRVJfV0FJVCxBVkdfVElNRVJfV0FJVCxNQVhfVElNRVJfV0FJVCBcCiAg
-ZnJvbSBwZXJmb3JtYW5jZV9zY2hlbWEuZXZlbnRzX3dhaXRzX3N1bW1hcnlfZ2xvYmFsX2J5X2V2
-ZW50X25hbWUgb3JkZXIgYnkgc3VtX3RpbWVyX3dhaXQgZGVzYyBsaW1pdCAyMCIgcGVyZm9ybWFu
-Y2Vfc2NoZW1hCmRvbmUKCiMkU1lTQkVOQ0ggY2xlYW51cApteXNxbGFkbWluIC11ICRNWVNRTF9V
-U0VSIC1TICRNWVNRTF9TT0NLIHNodXRkb3duCg==
---000000000000b9096305cfb51f27--
+On 2021/10/25 21:41, yukuai (C) wrote:
+> On 2021/10/21 21:37, yukuai (C) wrote:
+>> On 2021/10/21 21:13, yukuai (C) wrote:
+>>> On 2021/10/21 20:35, Pavel Skripkin wrote:
+>>>> On 10/21/21 15:29, Yu Kuai wrote:
+>>>>> Yu Kuai (2):
+>>>>>    nbd: fix max value for 'first_minor'
+>>>>>    nbd: fix possible overflow for 'first_minor' in nbd_dev_add()
+>>>>>
+>>>>>   drivers/block/nbd.c | 6 +++---
+>>>>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>>>>
+>>>>
+>>>> Hi, Yu!
+>>>>
+>>>> Thank you for the fix, but this wrong check should be just removed, 
+>>>> since root case of wrong sysfs file creation was fixed, as Christoph 
+>>>> said [1]
+>>
+>> Hi, Christoph
+>>
+>> By the way, if we remove the checking, there will be two kernel warnings
+>> when the problem happens. Maybe keeping the checking is better?
+> 
+> friendly ping ...
+friendly ping ...
+>>
+>> [   19.860640] sysfs: cannot create duplicate filename '/dev/block/43:0'
+>> [   19.861659] CPU: 1 PID: 872 Comm: modprobe Not tainted 
+>> 5.15.0-rc6-next-20211020-00001-g2f1
+>> [   19.863175] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+>> BIOS ?-20190727_0738364
+>> [   19.865183] Call Trace:
+>> [   19.866512]  <TASK>
+>> [   19.866863]  ? dump_stack_lvl+0x73/0x9f
+>> [   19.867941]  ? dump_stack+0x13/0x1b
+>> [   19.868475]  ? sysfs_warn_dup.cold+0x27/0x45
+>> [   19.869075]  ? sysfs_do_create_link_sd.isra.0+0x131/0x150
+>> [   19.869818]  ? sysfs_create_link+0x29/0x60
+>> [   19.870459]  ? device_add+0xbd6/0xf60
+>> [   19.871032]  ? _printk+0x5f/0x7d
+>> [   19.871518]  ? device_add_disk+0x153/0x5d0
+>> [   19.872160]  ? nbd_dev_add+0x30e/0x470 [nbd]
+>> [   19.872828]  ? 0xffffffffc0060000
+>> [   19.873332]  ? nbd_init+0x1dc/0x1000 [nbd]
+>> [   19.873924]  ? do_one_initcall+0x71/0x3a0
+>> [   19.874534]  ? gcov_event+0x70/0x690
+>> [   19.875058]  ? do_init_module+0xa6/0x350
+>> [   19.875587]  ? load_module+0x2587/0x2720
+>> [   19.876130]  ? kernel_read+0x31/0xb0
+>> [   19.876638]  ? kernel_read_file+0x15a/0x360
+>> [   19.877271]  ? __do_sys_finit_module+0xe5/0x190
+>> [   19.877951]  ? __do_sys_finit_module+0xe5/0x190
+>> [   19.878563]  ? __x64_sys_finit_module+0x1e/0x30
+>> [   19.879182]  ? do_syscall_64+0x35/0x80
+>> [   19.879700]  ? entry_SYSCALL_64_after_hwframe+0x44/0xae
+>> [   19.880413]  </TASK>
+>> [   19.880806] ------------[ cut here ]------------
+>> [   19.881502] WARNING: CPU: 1 PID: 872 at block/genhd.c:543 
+>> device_add_disk+0x2af/0x5d0
+>> [   19.882695] Modules linked in: nbd(+)
+>> [   19.883290] CPU: 1 PID: 872 Comm: modprobe Not tainted 
+>> 5.15.0-rc6-next-20211020-00001-g2f1
+>> [   19.884823] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+>> BIOS ?-20190727_0738364
+>> [   19.886866] RIP: 0010:device_add_disk+0x2af/0x5d0
+>> [   19.887606] Code: 6e f2 f2 0b 01 49 8b 76 48 48 8b 3d db 03 f3 0b 
+>> e8 f6 ec a9 ff 48 83 050
+>> [   19.890456] RSP: 0018:ffffc90000e47c70 EFLAGS: 00010202
+>> [   19.891293] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 
+>> 00000000000ae001
+>> [   19.892274] RDX: 00000000000ac001 RSI: ffffffff91b5906b RDI: 
+>> 0000000000000000
+>> [   19.893318] RBP: ffff8881034ad600 R08: 0000000000000000 R09: 
+>> ffffffff915e2e69
+>> [   19.894425] R10: 0000000000000014 R11: 0000000000000001 R12: 
+>> 00000000ffffffef
+>> [   19.895544] R13: 0000000000000000 R14: ffff88817d720600 R15: 
+>> ffff88817d720648
+>> [   19.896652] FS:  00007fc08c7a7040(0000) GS:ffff88882f640000(0000) 
+>> knlGS:0000000000000000
+>> [   19.897902] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [   19.898768] CR2: 00007fc08bcf0395 CR3: 000000017c467000 CR4: 
+>> 00000000000006e0
+>> [   19.899754] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+>> 0000000000000000
+>> [   19.900856] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+>> 0000000000000400
+>> [   19.901989] Call Trace:
+>> [   19.902387]  <TASK>
+>> [   19.902732]  nbd_dev_add+0x30e/0x470 [nbd]
+>> [   19.903395]  ? 0xffffffffc0060000
+>> [   19.903917]  nbd_init+0x1dc/0x1000 [nbd]
+>> [   19.904536]  do_one_initcall+0x71/0x3a0
+>> [   19.905166]  ? gcov_event+0x70/0x690
+>> [   19.905745]  do_init_module+0xa6/0x350
+>> [   19.906351]  load_module+0x2587/0x2720
+>> [   19.906932]  ? kernel_read+0x31/0xb0
+>> [   19.907509]  ? kernel_read_file+0x15a/0x360
+>> [   19.908195]  ? __do_sys_finit_module+0xe5/0x190
+>> [   19.908894]  __do_sys_finit_module+0xe5/0x190
+>> [   19.909591]  __x64_sys_finit_module+0x1e/0x30
+>> [   19.910289]  do_syscall_64+0x35/0x80
+>> [   19.910855]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+>> [   19.911652] RIP: 0033:0x7fc08bc7a4e9
+>> [   19.912231] Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 
+>> 00 48 89 f8 48 89 f7 488
+>> [   19.915026] RSP: 002b:00007fff0ddf6fd8 EFLAGS: 00000246 ORIG_RAX: 
+>> 0000000000000139
+>> [   19.916080] RAX: ffffffffffffffda RBX: 00005596400853e0 RCX: 
+>> 00007fc08bc7a4e9
+>> [   19.917180] RDX: 0000000000000000 RSI: 000055963fe1bc26 RDI: 
+>> 0000000000000003
+>> [   19.918302] RBP: 000055963fe1bc26 R08: 0000000000000000 R09: 
+>> 0000000000000000
+>> [   19.919412] R10: 0000000000000003 R11: 0000000000000246 R12: 
+>> 0000000000000000
+>> [   19.920524] R13: 00005596400854f0 R14: 0000000000040000 R15: 
+>> 00005596400853e0
+>> [   19.921629]  </TASK>
+>> [   19.922005] ---[ end trace e09ecf130812479d ]---
+>>
+>> Thanks,
+>> Kuai
+>>>
+>>> Hi, Pavel
+>>>
+>>> Thanks for your response, with the root cause fixed, patch 1 is not
+>>> needed anymore. However, the overflow case in patch 2 is still
+>>> possible.
+>>>
+>>> Does anyone plan to remove the checking?
+>>>
+>>> Thanks,
+>>> Kuai
+>>>>
+>>>>
+>>>>
+>>>>
+>>>> [1] https://lore.kernel.org/lkml/20211011073556.GA10735@lst.de/
+>>>>
+>>>>
+>>>>
+>>>> With regards,
+>>>> Pavel Skripkin
+>>>> .
+>>>>
