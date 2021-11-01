@@ -2,74 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C02C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 17:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAD0C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 19:42:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1C19610E5
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 17:54:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0E0961053
+	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 19:42:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230451AbhKAR4p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Nov 2021 13:56:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37650 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229802AbhKAR4p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Nov 2021 13:56:45 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 00C82610D2;
-        Mon,  1 Nov 2021 17:54:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635789251;
-        bh=lYi2aGJ1ooV9VTgAd9ni2Aq8I8gmC2AMQ2WBvVmGyXo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=USAxOoUpoPthTp0gPLaP0Dmz+IrOklnbz3hxfaINU34HdN1KKLosqti5cOqQYAaqx
-         vAzwAmlRKJCS4A+x3oMJQC9AcOKtiJT2KoUaJ4cme5I1NotGS1dDN/bvui3u93bbcE
-         B3Rn9jI2etOBKHaGzpWpNSKH8+DKvAoPRJRFBtf6N1zm28ciWQseguItfGTE8S5SGE
-         gJyHvhjcrWhkpnG1mmJggGByc6GpS8LMJMtHSKeqjbFpDR5Mxh0w5yTRZEV8GrOCxe
-         BxgY+sBpcZee82y2ujQ1VYBu2NSTbwyTRob4gcnvVGQ+X4+T1CrWDHjF0DwblF8aJB
-         gzM9v7RS/EqpQ==
-Date:   Mon, 1 Nov 2021 10:54:09 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Message-ID: <20211101175409.GA2651512@dhcp-10-100-145-180.wdc.com>
-References: <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
- <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
- <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
- <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
- <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
- <fbe69cc0-36ea-c096-d247-f201bad979f4@acm.org>
- <20211008064925.oyjxbmngghr2yovr@mpHalley.local>
- <2a65e231-11dd-d5cc-c330-90314f6a8eae@nvidia.com>
- <ba6c099b-42bf-4c7d-a923-00e7758fc835@suse.de>
- <5edcab45-afc6-3766-cede-f859da2934d1@acm.org>
+        id S229931AbhKATox (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Nov 2021 15:44:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229896AbhKATov (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 15:44:51 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8D2C061714
+        for <linux-block@vger.kernel.org>; Mon,  1 Nov 2021 12:42:18 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id r194so22902219iod.7
+        for <linux-block@vger.kernel.org>; Mon, 01 Nov 2021 12:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=SXS5BeSCNTzQoE9Sro7+pSKTW9UOhz2EeDahCPvEpJo=;
+        b=0d41FruYFOkqyRyz3PH/OvFVwbzqwmGMvjH9kACfkBZ5EDQt0LN9OEW+Ea0HW1UYnl
+         Kj2gQqIIRe9Q4JltBmsExIup/FBf1hU0AQM7N9Ymgt7J25sl1GC5ZDP0L6MXwM2YYGY3
+         hLdjC0KWzOBOLFHFXn4dSBK/3i3BhMd40QTpp0C16erjzvjgrAaA8rD1UhVhA8e9iN8H
+         3r3eqQY4vmRwMrdC6p/OCUti4IPX0VpFfON6MLM/dx5TemEqnxhvfA9RM+LfWwe8WLLp
+         NDAl7ITuX3WUws4sc37q9/ERJyO3mRJKm5f6PVY1cZaxUOt2R3QmKBPiYOVHWcByHAAf
+         DG7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=SXS5BeSCNTzQoE9Sro7+pSKTW9UOhz2EeDahCPvEpJo=;
+        b=3dfWHa3pdOuJEieHgvokUffltrJ/o236GNDJ+g8u1Se1HVzTh8f+cHgadyLCUk8tEg
+         +De8G7F0qHClUJziMbTUQQEWQbmQstnLKmfRA0pRp+0nEDDZ+Q9ynbobeCuIR+PBFFMZ
+         2d3ORgg3J81Qob9F66yh49aMcNOGdpdNQNTSF5NX7u6qtUx3h06KTzgGtF/4SplUMdj7
+         y9TRjyMSIMxSUpNb2RLiMPEWot+Y8VmkHTNtt9wlg1MzyDyOn5RknjH9+VjJz6yDf+pm
+         o4DSalnR5Z5eUqqe3oBiveYSEqpV3Ah4rKED+cmf6s1Fc/qTuKZRSq1/onAVvfXS3/Ux
+         X49A==
+X-Gm-Message-State: AOAM533hjRO0OW/lrvg9FAL4BXBM3XL2jr0CCs1tcqYDE/7mfG+FHpwg
+        sT6NUmGDo7r1ZxoAu0U/4iL8srK4iyLHSw==
+X-Google-Smtp-Source: ABdhPJwPT4ACmw5M28/kfqP2w88nF6HyPNjPf3lN688EHfMmJh5kxBqB+Tq5R2A3cWHhT+WlR6HYeg==
+X-Received: by 2002:a5d:9493:: with SMTP id v19mr21977570ioj.34.1635795737162;
+        Mon, 01 Nov 2021 12:42:17 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id k16sm8335046ior.50.2021.11.01.12.42.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Nov 2021 12:42:16 -0700 (PDT)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: replace always false argument with 'false'
+Message-ID: <7d6a5cde-1a98-55ef-4094-d9286d51fecd@kernel.dk>
+Date:   Mon, 1 Nov 2021 13:42:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5edcab45-afc6-3766-cede-f859da2934d1@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 29, 2021 at 09:15:43AM -0700, Bart Van Assche wrote:
-> On 10/28/21 10:51 PM, Hannes Reinecke wrote:
-> > Also Keith presented his work on a simple zone-based remapping block device, which included an in-kernel copy offload facility.
-> > Idea is to lift that as a standalone patch such that we can use it a fallback (ie software) implementation if no other copy offload mechanism is available.
-> 
-> Is a link to the presentation available?
+A previous commit fixed up the condition for doing direct issue, but that
+left the 'from_schedule' argument dead inside the branch. Replace it with
+'false'.
 
-Thanks for the interest.
+Fixes: ff1552232b36 ("blk-mq: don't issue request directly in case that current is to be blocked")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-I didn't post them online as the conference didn't provide it, and I
-don't think the slides would be particularly interesting without the
-prepared speech anyway.
+---
 
-The presentation described a simple prototype implementing a redirection
-table on zone block devices. There was one bullet point explaining how a
-generic kernel implementation would be an improvement. For zoned block
-devices, an "append" like copy offload would be an even better option.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4787d5b74aa3..8aed6cea3a34 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2227,7 +2227,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	plug->rq_count = 0;
+ 
+ 	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
+-		blk_mq_plug_issue_direct(plug, from_schedule);
++		blk_mq_plug_issue_direct(plug, false);
+ 		if (rq_list_empty(plug->mq_list))
+ 			return;
+ 	}
+
+-- 
+Jens Axboe
+
