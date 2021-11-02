@@ -2,147 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CD7C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 12:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1418AC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 13:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 207FD610A3
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 12:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F17066108F
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 13:04:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231176AbhKBNCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 09:02:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
+        id S231265AbhKBNHA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 09:07:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230347AbhKBNBz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 09:01:55 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCC2C061714
-        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 05:59:20 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id x9so14181595ilu.6
-        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 05:59:20 -0700 (PDT)
+        with ESMTP id S230504AbhKBNG6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 09:06:58 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C82FC061714
+        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 06:04:20 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id ay20so4203416qkb.7
+        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 06:04:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=iYiRp0l1uhYjvBkGrtc0hnMXWU1AiLYZRHqgAfjylr0=;
-        b=kcxt2J1mhW7sBpvFZNbRqM6hkrFV66WlENLfeuZmetnkPYCkQMHSFUdSug9x4+sPK8
-         peRB0nEwdDsXLa1WsvW5p6617nA8yXpp6EY6WNDLtMPSD2shExXn/GI1Tpn1wdIhhg++
-         AictJVJSoUCvSmqzlgvf4295rmRhVdsRGymy6MPWQVBhz7dr5k5CqSFmBxEi9u+FCrq3
-         evca0xlUbk0i6l3XrJwseCp2d7gHz/NhcwGopUuqpyXLzb6ye21VCnG9RntUM6UmFZVA
-         HUx5z9IWc4TwguqgKX8+/mstIQR5jqPuDVSV9e94QJ3Ydv9sJlWDYvWJBwcTjE2TFHnt
-         E+hw==
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Dn4BqaMm8E/Ym9b6CTx4iFhLLdRskhG8/BnMWQZMYiA=;
+        b=CV7GUn5h7t+R98AniHQ+e3FbXFOMEsvZSd1hvuNMLgjeEftTO6nejnTl8CX3JEks84
+         BrapEDNZbfWvf92QCz0OUemnwTATzFp37+VH//NuzccwImZ92esGMPDXXoqCuNIynyNX
+         nyo3+OojZlZreduNyWOMdGQjy6xy2QhhQBbv10q8vmkX0R6az/sP1MXcB89v7TeiMEss
+         2cKH6f+rR5UqoGtizvM0KK/8l1nLerqgDl2QbZ6ozhAF9GREznf2k99QroLvyvq7si5W
+         kzi7SJOc/AObDiez/X8TwMNpd05WjseQc8SLwlzFMBH1kqlL3Z6P6cqVkzIuVl56U+of
+         AzWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iYiRp0l1uhYjvBkGrtc0hnMXWU1AiLYZRHqgAfjylr0=;
-        b=vdbng6zkIuDHHxqe2hKoFEFfpFqVFyhemdXAHbBhRdu07J7QSweAP6MEO4CpYV5iHQ
-         zkOKCVic2ZqASEY82eNhx3RLtsnXViS4eu14TNw216ibghezT+f/Q6Oe0QCcnYm49MUx
-         YuzJzSJNxPdBk/NQzkqL4/WL4Wy+Negx4xhPzjzA3P1u3eoYD/V9Kfg16rT0ErbSMJJC
-         1lcKbJmep0Dkz9CRNwXF0chZytgB7EMcmtlhrZJSwVzYhk4z1lOgwW3JekR2K/4RQ58k
-         RXmmowJ7k+Av20wWOXRD/20AF+CmJQUOa5BAeLuRT+GYstSeeCWPJE+18XRv6U71uz2v
-         F0vw==
-X-Gm-Message-State: AOAM5335ePr+fFcUrhstNLAc04ZWRiUQ5xYGOGSMwe3jJFoM39f6gcZu
-        nNkwZl/LAHUccrW3B7SGLQdY9Q==
-X-Google-Smtp-Source: ABdhPJxvALWLpyGcrXCgpmlgX6E6EkmrZY0JmhIZnPbQeBAVBX9qvNHL5hCeTbm0c8VWV+BBzmukow==
-X-Received: by 2002:a05:6e02:e41:: with SMTP id l1mr20381671ilk.139.1635857960219;
-        Tue, 02 Nov 2021 05:59:20 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id m2sm4904622iow.6.2021.11.02.05.59.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 05:59:19 -0700 (PDT)
-Subject: Re: [PATCH 2/3] scsi: make sure that request queue queiesce and
- unquiesce balanced
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com
-References: <20211021145918.2691762-1-ming.lei@redhat.com>
- <20211021145918.2691762-3-ming.lei@redhat.com>
- <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8cbc1be6-15a5-ed34-53f1-081a05025d34@kernel.dk>
-Date:   Tue, 2 Nov 2021 06:59:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Dn4BqaMm8E/Ym9b6CTx4iFhLLdRskhG8/BnMWQZMYiA=;
+        b=PghWfPAZZQOe5dcYE8Vx0WLA/rM+ef8fogv+hEMfUbBjfcAHW7BBafyTHEN45udTBL
+         kETF1hqItHCHEaN+s8lyhjJcPqmdvauPyry+dfAPOyLkC7TkdSyOk2XEqogS0eOmLIFX
+         ejG25Rs7/7vZfhVJ60xIE6ShvqPd5JYn19HLznE8g5dGnymyTgiNTcSNPXGRC0X6OUCA
+         1tcldOCb41AZrlkMQ+uWBE7K12frnEf71TfNZh9jFwAkEieIhmJarHe8m3rY1XiS7raE
+         70Vv9cVVaeICQIfMtwvDuqbJ2MiDDQNL8QarPGbl4GB8TOaIFWYwgEBuLy/BApZvS85i
+         IJsA==
+X-Gm-Message-State: AOAM533oqrDClP4YnlKTZBNpDE0g//ZkDMQUNI3LR7QLYhMAz5h23TwJ
+        UYUar+d/rntjB8CJdLOibIXOPg==
+X-Google-Smtp-Source: ABdhPJwM+zF/tlJ4BLYeH2ZKxc5LHh/BOCcEJcjNkHrZZDYjDhcr8F0U+JBW/PrHDJZEppOhOYYJqg==
+X-Received: by 2002:a05:620a:4015:: with SMTP id h21mr28584785qko.300.1635858259569;
+        Tue, 02 Nov 2021 06:04:19 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id u185sm11980615qkd.48.2021.11.02.06.04.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Nov 2021 06:04:19 -0700 (PDT)
+Date:   Tue, 2 Nov 2021 09:04:16 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Ye Bin <yebin10@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next v4 0/4] Fix hungtask when nbd_config_put and sanity
+ check for first_minor
+Message-ID: <YYE3UK//36MbVzC3@localhost.localdomain>
+References: <20211102015237.2309763-1-yebin10@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211102015237.2309763-1-yebin10@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/1/21 7:43 PM, James Bottomley wrote:
-> On Thu, 2021-10-21 at 22:59 +0800, Ming Lei wrote:
->> For fixing queue quiesce race between driver and block layer(elevator
->> switch, update nr_requests, ...), we need to support concurrent
->> quiesce
->> and unquiesce, which requires the two call balanced.
->>
->> It isn't easy to audit that in all scsi drivers, especially the two
->> may
->> be called from different contexts, so do it in scsi core with one
->> per-device
->> bit flag & global spinlock, basically zero cost since request queue
->> quiesce
->> is seldom triggered.
->>
->> Reported-by: Yi Zhang <yi.zhang@redhat.com>
->> Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue
->> quiesce/unquiesce")
->> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->> ---
->>  drivers/scsi/scsi_lib.c    | 45 ++++++++++++++++++++++++++++++----
->> ----
->>  include/scsi/scsi_device.h |  1 +
->>  2 files changed, 37 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
->> index 51fcd46be265..414f4daf8005 100644
->> --- a/drivers/scsi/scsi_lib.c
->> +++ b/drivers/scsi/scsi_lib.c
->> @@ -2638,6 +2638,40 @@ static int
->> __scsi_internal_device_block_nowait(struct scsi_device *sdev)
->>  	return 0;
->>  }
->>  
->> +static DEFINE_SPINLOCK(sdev_queue_stop_lock);
->> +
->> +void scsi_start_queue(struct scsi_device *sdev)
->> +{
->> +	bool need_start;
->> +	unsigned long flags;
->> +
->> +	spin_lock_irqsave(&sdev_queue_stop_lock, flags);
->> +	need_start = sdev->queue_stopped;
->> +	sdev->queue_stopped = 0;
->> +	spin_unlock_irqrestore(&sdev_queue_stop_lock, flags);
->> +
->> +	if (need_start)
->> +		blk_mq_unquiesce_queue(sdev->request_queue);
+On Tue, Nov 02, 2021 at 09:52:33AM +0800, Ye Bin wrote:
+> This patchset include two patchsets as follows:
+> 1. Fix hungtask when nbd_config_put
+> https://patchwork.kernel.org/project/linux-block/list/?series=573381
+> 2. nbd: fix sanity check for first_minor
+> https://lore.kernel.org/linux-block/20211021122936.758221-1-yukuai3@huawei.com/
 > 
-> Well, this is a classic atomic pattern:
+> I have consulted with Yu Kuai, and his modification has also been confirmed by him.
 > 
-> if (cmpxchg(&sdev->queue_stopped, 1, 0))
-> 	blk_mq_unquiesce_queue(sdev->request_queue);
+> Ye Bin (2):
+>   nbd: Fix incorrect error handle when first_minor is illegal in
+>     nbd_dev_add
+>   nbd: Fix hungtask when nbd_config_put
 > 
-> The reason to do it with atomics rather than spinlocks is
+> Yu Kuai (2):
+>   nbd: fix max value for 'first_minor'
+>   nbd: fix possible overflow for 'first_minor' in nbd_dev_add()
 > 
->    1. no need to disable interrupts: atomics are locked
->    2. faster because a spinlock takes an exclusive line every time but the
->       read to check the value can be in shared mode in cmpxchg
->    3. it's just shorter and better code.
+>  drivers/block/nbd.c | 42 +++++++++++++++++++-----------------------
+>  1 file changed, 19 insertions(+), 23 deletions(-)
 > 
-> The only minor downside is queue_stopped now needs to be a u32.
 
-Are you fine with the change as-is, or do you want it redone? I
-can drop the SCSI parts and just queue up the dm fix. Personally
-I think it'd be better to get it fixed upfront.
+Perfect, thanks guys, you can add
 
--- 
-Jens Axboe
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
+to the series,
+
+Josef
