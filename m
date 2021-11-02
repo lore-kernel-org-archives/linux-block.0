@@ -2,127 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E98C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1E4C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:54:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32F4B60F56
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:43:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E94E460F56
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbhKBBqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Nov 2021 21:46:05 -0400
-Received: from bedivere.hansenpartnership.com ([96.44.175.130]:52562 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229479AbhKBBqF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Nov 2021 21:46:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1635817410;
-        bh=FZUkYKuDKg058Pg46ijjCbmsyqBvT/Cy51LUuz29wLE=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=RM/9KsV6QVoExFGw/bPBfrpeHnLxBFA7RtBtiHpvObU7NPmQnn1T/zEnIOlKNd90t
-         cwYNnBRrXdsgNSv4rLcn/qWYk2TZp8oKnQxO+FaK4QD649xFMkHYYRnUj9LU5ct/r/
-         iq5BH1kOvuW5tdLuXz49L9NcM43cSmVkYPBkbHKQ=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id C82DB1280A86;
-        Mon,  1 Nov 2021 21:43:30 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id woUwEHJk3ESK; Mon,  1 Nov 2021 21:43:30 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1635817410;
-        bh=FZUkYKuDKg058Pg46ijjCbmsyqBvT/Cy51LUuz29wLE=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=RM/9KsV6QVoExFGw/bPBfrpeHnLxBFA7RtBtiHpvObU7NPmQnn1T/zEnIOlKNd90t
-         cwYNnBRrXdsgNSv4rLcn/qWYk2TZp8oKnQxO+FaK4QD649xFMkHYYRnUj9LU5ct/r/
-         iq5BH1kOvuW5tdLuXz49L9NcM43cSmVkYPBkbHKQ=
-Received: from [172.20.40.112] (unknown [12.248.214.166])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 187A912809EF;
-        Mon,  1 Nov 2021 21:43:30 -0400 (EDT)
-Message-ID: <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
-Subject: Re: [PATCH 2/3] scsi: make sure that request queue queiesce and
- unquiesce balanced
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com
-Date:   Mon, 01 Nov 2021 21:43:27 -0400
-In-Reply-To: <20211021145918.2691762-3-ming.lei@redhat.com>
-References: <20211021145918.2691762-1-ming.lei@redhat.com>
-         <20211021145918.2691762-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        id S229526AbhKBB47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Nov 2021 21:56:59 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:30892 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229486AbhKBB47 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 21:56:59 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HjtBC32Nkzcb4n;
+        Tue,  2 Nov 2021 09:49:39 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Tue, 2 Nov 2021 09:54:19 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Tue, 2 Nov
+ 2021 09:54:18 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <yukuai3@huawei.com>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+Subject: [PATCH] blk-cgroup: fix missing put device in error path from blkg_conf_pref()
+Date:   Tue, 2 Nov 2021 10:07:05 +0800
+Message-ID: <20211102020705.2321858-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-10-21 at 22:59 +0800, Ming Lei wrote:
-> For fixing queue quiesce race between driver and block layer(elevator
-> switch, update nr_requests, ...), we need to support concurrent
-> quiesce
-> and unquiesce, which requires the two call balanced.
-> 
-> It isn't easy to audit that in all scsi drivers, especially the two
-> may
-> be called from different contexts, so do it in scsi core with one
-> per-device
-> bit flag & global spinlock, basically zero cost since request queue
-> quiesce
-> is seldom triggered.
-> 
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue
-> quiesce/unquiesce")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/scsi/scsi_lib.c    | 45 ++++++++++++++++++++++++++++++----
-> ----
->  include/scsi/scsi_device.h |  1 +
->  2 files changed, 37 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index 51fcd46be265..414f4daf8005 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -2638,6 +2638,40 @@ static int
-> __scsi_internal_device_block_nowait(struct scsi_device *sdev)
->  	return 0;
->  }
->  
-> +static DEFINE_SPINLOCK(sdev_queue_stop_lock);
-> +
-> +void scsi_start_queue(struct scsi_device *sdev)
-> +{
-> +	bool need_start;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&sdev_queue_stop_lock, flags);
-> +	need_start = sdev->queue_stopped;
-> +	sdev->queue_stopped = 0;
-> +	spin_unlock_irqrestore(&sdev_queue_stop_lock, flags);
-> +
-> +	if (need_start)
-> +		blk_mq_unquiesce_queue(sdev->request_queue);
+If blk_queue_enter() failed due to queue is dying, the
+blkdev_put_no_open() is needed because blkcg_conf_open_bdev() succeeded.
 
-Well, this is a classic atomic pattern:
+Fixes: 0c9d338c8443 ("blk-cgroup: synchronize blkg creation against policy deactivation")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-cgroup.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-if (cmpxchg(&sdev->queue_stopped, 1, 0))
-	blk_mq_unquiesce_queue(sdev->request_queue);
-
-The reason to do it with atomics rather than spinlocks is
-
-   1. no need to disable interrupts: atomics are locked
-   2. faster because a spinlock takes an exclusive line every time but the
-      read to check the value can be in shared mode in cmpxchg
-   3. it's just shorter and better code.
-
-The only minor downside is queue_stopped now needs to be a u32.
-
-James
-
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 88b1fce90520..663aabfeba18 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -640,7 +640,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 	 */
+ 	ret = blk_queue_enter(q, 0);
+ 	if (ret)
+-		return ret;
++		goto fail;
+ 
+ 	rcu_read_lock();
+ 	spin_lock_irq(&q->queue_lock);
+@@ -676,13 +676,13 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		new_blkg = blkg_alloc(pos, q, GFP_KERNEL);
+ 		if (unlikely(!new_blkg)) {
+ 			ret = -ENOMEM;
+-			goto fail;
++			goto fail_exit_queue;
+ 		}
+ 
+ 		if (radix_tree_preload(GFP_KERNEL)) {
+ 			blkg_free(new_blkg);
+ 			ret = -ENOMEM;
+-			goto fail;
++			goto fail_exit_queue;
+ 		}
+ 
+ 		rcu_read_lock();
+@@ -722,9 +722,10 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ fail_unlock:
+ 	spin_unlock_irq(&q->queue_lock);
+ 	rcu_read_unlock();
++fail_exit_queue:
++	blk_queue_exit(q);
+ fail:
+ 	blkdev_put_no_open(bdev);
+-	blk_queue_exit(q);
+ 	/*
+ 	 * If queue was bypassing, we should retry.  Do so after a
+ 	 * short msleep().  It isn't strictly necessary but queue
+-- 
+2.31.1
 
