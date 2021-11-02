@@ -2,197 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB367C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 15:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57401C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 15:24:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBF4660EB4
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 15:23:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3955160EB4
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 15:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232761AbhKBPZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 11:25:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbhKBPZw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 11:25:52 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FD9CC061714
-        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 08:23:17 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id l8so4437891ilv.3
-        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 08:23:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Dq1+aKehJc03boWXeB1kqazmkNMh3AMMJ1l2GKENLAU=;
-        b=aJCBLpO9cA7efmHEpW5s59wQ2/gmAAlcjpKlBJiD9vaPs5O5Cd23qhE3XMwRwYRorM
-         kAozbOh5MfDGhWF3lRYIZNSEKt09zn1Iye5gw3RMi23NawzGBOr/jEwyri0G1bFuFLMV
-         y1l20KB12aCRFOzmAAaCJDrx6ML3H4NdmyfUTkGAlgArnYipYtHQ5wbmS6zX5I72MXjr
-         h3mxu/TDT1RaWbu2T3zSLhrj5/4Ub9uX1JmEAZ902Dxs+7Uo+E6fhKm9H9YNdiwHElkE
-         nby1mz08p2UhJoQAafEIlGl7GxZlN3fgYdUj08Zv3K8PMjqPhshAsQi6GrQY6ZQjVrC2
-         1+0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Dq1+aKehJc03boWXeB1kqazmkNMh3AMMJ1l2GKENLAU=;
-        b=F11LQGLo4WyO+fY1Lvqst5krq2NdlhCOlPJWTHtxp9XW9LBvEOGpYXxcqnEx98SEAc
-         yNIrhuunElme4AFDHC/0FITGugVK3LByBakC2BVlEYUT9foIt+E/cn7IggoasjsKPokI
-         w2eX6hJTGr7uC7au5yTkc8pIk/ew2qdByBCU+07G3IOu3OeU165pK+Ke7zPvEwTGAXFn
-         1ubJJIiT5Kxgkjr5yUkp/ADe/Ai8kvfpjloIM8mRd2IphY6/ACfsV/s4RQwhuxhWGJWb
-         kMng4+xUX3Br+kpk2HpefJZigk1mTLJVeRg5we5PV4VmwDy5pMDPolyexDw/khXfb6zg
-         lqGg==
-X-Gm-Message-State: AOAM5308OqY789Ev1uCaeZZPlgu1Zf0/3BtN4fIGsqaz56y1hK7rEW0P
-        dBbfopd9YMb0pHsDmP5kudQFoNtpxRZ4gA==
-X-Google-Smtp-Source: ABdhPJxv2k3pQVyoW8GqH8u7msuRG3Ydo+Gq6ZcmQREjkUs8YA10UxRT5JpCbwM9y6KEqAqRgGQ6xg==
-X-Received: by 2002:a92:520f:: with SMTP id g15mr16484783ilb.217.1635866596900;
-        Tue, 02 Nov 2021 08:23:16 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id o1sm9653839ilj.41.2021.11.02.08.23.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 08:23:16 -0700 (PDT)
-Subject: Re: [PATCH 3/3] blk-mq: update hctx->nr_active in
- blk_mq_end_request_batch()
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20211102133502.3619184-1-ming.lei@redhat.com>
- <20211102133502.3619184-4-ming.lei@redhat.com>
- <922449db-73a7-efaf-52ef-d386edf77953@kernel.dk> <YYFDz1AQqDoglgyu@T590>
- <dda27cef-a3fc-03e7-0c28-c4b24600438e@kernel.dk> <YYFUaaLNOExwJ5P1@T590>
- <e35c2b06-361c-9291-a922-62f10b5c4e00@kernel.dk>
-Message-ID: <5ef789a1-5e85-5400-e82d-4a200a780759@kernel.dk>
-Date:   Tue, 2 Nov 2021 09:23:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232625AbhKBP0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 11:26:49 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:56644 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231721AbhKBP0t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 11:26:49 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 4CF42218B8;
+        Tue,  2 Nov 2021 15:24:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1635866650; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=20RoZlkpCStiyYhOpg9TxIwqB6XP6FGIk+CxFOjfgeQ=;
+        b=mH/HYqrgUC286FNV17ooHrSpqz0QxJaEA4gqCu8YSuFavlUVjcNclsFdd9vpEcjU4T1EWe
+        bCwYUnf+FgIGtgAvlwyq0SvUiSpGIPfWdx0lQnbh1+ec9SrxF+L+fnbM15px/lY04IQ1m3
+        VwstO6btwTo9UpMWzrGrsBPlQOpP034=
+Received: from suse.cz (unknown [10.100.216.66])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 3278AA3B83;
+        Tue,  2 Nov 2021 15:24:09 +0000 (UTC)
+Date:   Tue, 2 Nov 2021 16:24:06 +0100
+From:   Petr Mladek <pmladek@suse.com>
+To:     Miroslav Benes <mbenes@suse.cz>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        live-patching@vger.kernel.org
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YYFYFrnhwPiyOtst@alley>
+References: <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
+ <YW6OptglA6UykZg/@T590>
+ <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
+ <YW/KEsfWJMIPnz76@T590>
+ <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
+ <YW/q70dLyF+YudyF@T590>
+ <YXfA0jfazCPDTEBw@alley>
+ <YXgguuAY5iEUIV0u@T590>
+ <YXg0dFZ+6qHw7d0g@bombadil.infradead.org>
+ <alpine.LSU.2.21.2110271343290.3655@pobox.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <e35c2b06-361c-9291-a922-62f10b5c4e00@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LSU.2.21.2110271343290.3655@pobox.suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/2/21 9:20 AM, Jens Axboe wrote:
-> On 11/2/21 9:08 AM, Ming Lei wrote:
->> On Tue, Nov 02, 2021 at 08:57:41AM -0600, Jens Axboe wrote:
->>> On 11/2/21 7:57 AM, Ming Lei wrote:
->>>> On Tue, Nov 02, 2021 at 07:47:44AM -0600, Jens Axboe wrote:
->>>>> On 11/2/21 7:35 AM, Ming Lei wrote:
->>>>>> In case of shared tags and none io sched, batched completion still may
->>>>>> be run into, and hctx->nr_active is accounted when getting driver tag,
->>>>>> so it has to be updated in blk_mq_end_request_batch().
->>>>>>
->>>>>> Otherwise, hctx->nr_active may become same with queue depth, then
->>>>>> hctx_may_queue() always return false, then io hang is caused.
->>>>>>
->>>>>> Fixes the issue by updating the counter in batched way.
->>>>>>
->>>>>> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>>>>> Fixes: f794f3351f26 ("block: add support for blk_mq_end_request_batch()")
->>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>>>>> ---
->>>>>>  block/blk-mq.c | 15 +++++++++++++--
->>>>>>  block/blk-mq.h | 12 +++++++++---
->>>>>>  2 files changed, 22 insertions(+), 5 deletions(-)
->>>>>>
->>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>>> index 07eb1412760b..0dbe75034f61 100644
->>>>>> --- a/block/blk-mq.c
->>>>>> +++ b/block/blk-mq.c
->>>>>> @@ -825,6 +825,7 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
->>>>>>  	struct blk_mq_hw_ctx *cur_hctx = NULL;
->>>>>>  	struct request *rq;
->>>>>>  	u64 now = 0;
->>>>>> +	int active = 0;
->>>>>>  
->>>>>>  	if (iob->need_ts)
->>>>>>  		now = ktime_get_ns();
->>>>>> @@ -846,16 +847,26 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
->>>>>>  		rq_qos_done(rq->q, rq);
->>>>>>  
->>>>>>  		if (nr_tags == TAG_COMP_BATCH || cur_hctx != rq->mq_hctx) {
->>>>>> -			if (cur_hctx)
->>>>>> +			if (cur_hctx) {
->>>>>> +				if (active)
->>>>>> +					__blk_mq_sub_active_requests(cur_hctx,
->>>>>> +							active);
->>>>>>  				blk_mq_flush_tag_batch(cur_hctx, tags, nr_tags);
->>>>>> +			}
->>>>>>  			nr_tags = 0;
->>>>>> +			active = 0;
->>>>>>  			cur_hctx = rq->mq_hctx;
->>>>>>  		}
->>>>>>  		tags[nr_tags++] = rq->tag;
->>>>>> +		if (rq->rq_flags & RQF_MQ_INFLIGHT)
->>>>>> +			active++;
->>>>>
->>>>> Are there any cases where either none or all of requests have the
->>>>> flag set, and hence active == nr_tags?
->>>>
->>>> none and BLK_MQ_F_TAG_QUEUE_SHARED, and Shinichiro only observed the
->>>> issue on two NSs.
->>>
->>> Maybe I wasn't clear enough. What I'm saying is that either all of the
->>> requests will have RQF_MQ_INFLIGHT set, or none of them. Hence active
->>> should be either 0, or == nr_tags.
->>
->> Yeah, that is right since BLK_MQ_F_TAG_QUEUE_SHARED is updated after
->> queue is frozen. Meantime blk_mq_end_request_batch() is only called
->> for ending successfully completed requests.
->>
->> Will do that in V2.
+On Wed 2021-10-27 13:57:40, Miroslav Benes wrote:
+> On Tue, 26 Oct 2021, Luis Chamberlain wrote:
 > 
-> Thanks, then it just becomes a single check in blk_mq_flush_tag_batch(),
-> which is a lot better than per-request.
+> > On Tue, Oct 26, 2021 at 11:37:30PM +0800, Ming Lei wrote:
+> > > On Tue, Oct 26, 2021 at 10:48:18AM +0200, Petr Mladek wrote:
+> > > > Livepatch code never called kobject_del() under a lock. It would cause
+> > > > the obvious deadlock.
 
-Something like this, untested. FWIW, I did apply 1-2 from this series,
-so just do a v2 of 3/3 and that should do it.
+I have to correct myself. IMHO, the deadlock is far from obvious. I
+always get lost in the code and the documentation is not clear.
+I always get lost.
 
+> >
+> > Never?
+> 
+> kobject_put() to be precise.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 02f70dc06ced..18dee9af4487 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -817,6 +817,8 @@ static inline void blk_mq_flush_tag_batch(struct blk_mq_hw_ctx *hctx,
- 	struct request_queue *q = hctx->queue;
- 
- 	blk_mq_put_tags(hctx->tags, tag_array, nr_tags);
-+	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
-+		__blk_mq_sub_active_requests(hctx, nr_tags);
- 	percpu_ref_put_many(&q->q_usage_counter, nr_tags);
- }
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 28859fc5faee..cb0b5482ca5e 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -225,12 +225,18 @@ static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx)
- 		atomic_inc(&hctx->nr_active);
- }
- 
--static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx)
-+static inline void __blk_mq_sub_active_requests(struct blk_mq_hw_ctx *hctx,
-+		int val)
- {
- 	if (blk_mq_is_shared_tags(hctx->flags))
--		atomic_dec(&hctx->queue->nr_active_requests_shared_tags);
-+		atomic_sub(val, &hctx->queue->nr_active_requests_shared_tags);
- 	else
--		atomic_dec(&hctx->nr_active);
-+		atomic_sub(val, &hctx->nr_active);
-+}
-+
-+static inline void __blk_mq_dec_active_requests(struct blk_mq_hw_ctx *hctx)
-+{
-+	__blk_mq_sub_active_requests(hctx, 1);
- }
- 
- static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
+IMHO, the problem is actually with kobject_del() that gets blocked
+until the sysfs interface gets removed. kobject_put() will have
+the same problem only when the clean up is not delayed.
 
 
--- 
-Jens Axboe
+> When I started working on the support for module/live patches removal, 
+> calling kobject_put() under our klp_mutex lock was the obvious first 
+> choice given how the code was structured, but I ran into problems with 
+> deadlocks immediately. So it was changed to async approach with the 
+> workqueue. Thus the mainline code has never suffered from this, but we 
+> knew about the issues.
+>  
+> > > > The historic code only waited in the
+> > > > module_exit() callback until the sysfs interface was removed.
+> > > 
+> > > OK, then Luis shouldn't consider livepatching as one such issue to solve
+> > > with one generic solution.
+> > 
+> > It's not what I was told when the deadlock was found with zram, so I was
+> > informed quite the contrary.
+> 
+> >From my perspective, it is quite easy to get it wrong due to either a lack 
+> of generic support, or missing rules/documentation. So if this thread 
+> leads to "do not share locks between a module removal and a sysfs 
+> operation" strict rule, it would be at least something. In the same 
+> manner as Luis proposed to document try_module_get() expectations.
 
+The rule "do not share locks between a module removal and a sysfs
+operation" is not clear to me.
+
+IMHO, there are the following rules:
+
+1. rule: kobject_del() or kobject_put() must not be called under a lock that
+	 is used by store()/show() callbacks.
+
+   reason: kobject_del() waits until the sysfs interface is destroyed.
+	 It has to wait until all store()/show() callbacks are finished.
+
+
+2. rule: kobject_del()/kobject_put() must not be called from the
+	related store() callbacks.
+
+   reason: same as in 1st rule.
+
+
+3. rule: module_exit() must wait until all release() callbacks are called
+	 when kobject are static.
+
+   reason: kobject_put() must be called to clean up internal
+	dependencies. The clean up might be done asynchronously
+	and need access to the kobject structure.
+
+
+Best Regards,
+Petr
+
+PS: I am sorry if I am messing things. I want to be sure that we are
+    all talking about the same and understand it the same way.
+    
