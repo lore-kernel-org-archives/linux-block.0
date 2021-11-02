@@ -2,189 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFD9C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F81AC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:57:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7353460F58
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:52:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AA1F60C4B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:57:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232753AbhKBOyu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 10:54:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47158 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233838AbhKBOyp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 10:54:45 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC03C061714
-        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 07:52:10 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id h2so22115794ili.11
-        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 07:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=WAgm1SAm4X0FYW2rU/FS9LeENK/vmRBg+l/CIt4wHbI=;
-        b=hW4HTnS5Uowx8NBxztTYPhN+gbmRQyGzV7y5E0cJqNSRRoHZVulRejadRrM2JLGx2z
-         B1M+tqr0uEs1PP69Pg8daGzLc73TIiCkHqcvpXWtqhBALrVzeMkbbOxMCKdKYTP4snPa
-         bi88k4cgzPD48R2ywqcbDS0+0xOi6lyTtFGabQhq3b0llTfALbwITDJ0AJfhObAK3bew
-         l2xemmS1biN7pPw2FPaAItXcCJqLLNLKPv4AXExbUD6RZRx9AOSi3e0VaAC4k64NmxUS
-         kEY+zMjp5oxygzDswN8iDr6R3AGAHxGnRLnnXpaBIfx8sIo8tgLnidyzDXA/ZgXY4ZGh
-         EoAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WAgm1SAm4X0FYW2rU/FS9LeENK/vmRBg+l/CIt4wHbI=;
-        b=ekVmpy7nBhl+OcnG0aUqS5f7Uo6B31n+N6bD8gZabdA8pczSvIsiQaW9EADCEkhnz3
-         8+TsQzRqGjwW+as6rHJqJg30JCeZc9HNV9UyFHWagjGDuBfIQZnyJZVgAVl2848iRdoc
-         E54WEUnzKf9YyMOo1c0kkMLL5ZeHEmEzSj7eKJ7UtQQqchhWIlrttIDA/8wxGtAIejN8
-         T2o0Zri5txmjS2kS4mccxOXnJN0YEIS9bDZuqViGIu0lUCcIgnzW9IEfAfEOqPzAlbRk
-         O3Dun5stvjsTmjui9HKlajPkSMAfYjC7B+mDnQz71qPMgoF9wBZU9Fcz58eaHhJE+ujf
-         d8cQ==
-X-Gm-Message-State: AOAM532tdlQJklwNoTLIsHPfSr0dLOzRggitE7HJGmKuy8CoW0CHYrDY
-        x34GFu8uVVKv1Z58IghpqLT7gg==
-X-Google-Smtp-Source: ABdhPJygwe3kBQ9KqqZTmFFDPKCSSltYP6EKpwTkMKVUdlFgCks3+DwlVvdITVyOMBaQB5Yru0TiLQ==
-X-Received: by 2002:a05:6e02:1be2:: with SMTP id y2mr21593663ilv.22.1635864729956;
-        Tue, 02 Nov 2021 07:52:09 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c11sm9298983ilm.74.2021.11.02.07.52.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 07:52:09 -0700 (PDT)
-Subject: Re: [PATCH 2/3] scsi: make sure that request queue queiesce and
- unquiesce balanced
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com
-References: <20211021145918.2691762-1-ming.lei@redhat.com>
- <20211021145918.2691762-3-ming.lei@redhat.com>
- <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
- <8cbc1be6-15a5-ed34-53f1-081a05025d34@kernel.dk>
- <a7bae1c4c3d6b08487b96cb3aa86d4fab1a0abcc.camel@HansenPartnership.com>
- <1ab71603-0104-2071-02c9-d6c22e3aa275@kernel.dk>
- <042056b5-6fea-1bcf-bfae-274f23e9e5c5@kernel.dk>
- <461ac99c7d9d4493f37d2b8377ec3f05ce8a2735.camel@HansenPartnership.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2ae8db2f-2455-e43c-4197-d9fd92ef94c0@kernel.dk>
-Date:   Tue, 2 Nov 2021 08:52:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S234585AbhKBPAB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 11:00:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30584 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234785AbhKBO7N (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Nov 2021 10:59:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635864997;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YG2VGNtE+69cPxmqVydtAL5vxJZLZtIYVVth/K03gCo=;
+        b=XSEhU5dXP0h3cXByjFo2RLYrWRcMFJRi7FT4KBugkHi0HxNJ7g7WJFcWJ0SThp5FCMk25k
+        NS7G1jR/p9SnmhLC0Y7VLaAPdug6/aTfOVJqz1RxeKy5mRKViJaKiVlASjxzL6hUJB9G2T
+        Z53cMEGkPIVdST+x2XxaLrKBvDAmCk4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-0K9G4ltAMemdXrbZ-quSRA-1; Tue, 02 Nov 2021 10:56:34 -0400
+X-MC-Unique: 0K9G4ltAMemdXrbZ-quSRA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C01F810A8E07;
+        Tue,  2 Nov 2021 14:56:30 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3B2D60657;
+        Tue,  2 Nov 2021 14:56:19 +0000 (UTC)
+Date:   Tue, 2 Nov 2021 22:56:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     Miroslav Benes <mbenes@suse.cz>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        live-patching@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
+Message-ID: <YYFRjpJcIaZ1AQRS@T590>
+References: <YW4uwep3BCe9Vxq8@T590>
+ <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
+ <YW6OptglA6UykZg/@T590>
+ <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
+ <YW/KEsfWJMIPnz76@T590>
+ <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
+ <YW/q70dLyF+YudyF@T590>
+ <YXfA0jfazCPDTEBw@alley>
+ <YXgguuAY5iEUIV0u@T590>
+ <YYFH85CmVOYIMdYh@alley>
 MIME-Version: 1.0
-In-Reply-To: <461ac99c7d9d4493f37d2b8377ec3f05ce8a2735.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YYFH85CmVOYIMdYh@alley>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/2/21 8:47 AM, James Bottomley wrote:
-> On Tue, 2021-11-02 at 08:41 -0600, Jens Axboe wrote:
->> On 11/2/21 8:36 AM, Jens Axboe wrote:
->>> On 11/2/21 8:33 AM, James Bottomley wrote:
->>>> On Tue, 2021-11-02 at 06:59 -0600, Jens Axboe wrote:
->>>>> On 11/1/21 7:43 PM, James Bottomley wrote:
->>>>>> On Thu, 2021-10-21 at 22:59 +0800, Ming Lei wrote:
->>>>>>> For fixing queue quiesce race between driver and block
->>>>>>> layer(elevator switch, update nr_requests, ...), we need to
->>>>>>> support concurrent quiesce and unquiesce, which requires
->>>>>>> the two
->>>>>>> call balanced.
->>>>>>>
->>>>>>> It isn't easy to audit that in all scsi drivers, especially
->>>>>>> the two may be called from different contexts, so do it in
->>>>>>> scsi core with one per-device bit flag & global spinlock,
->>>>>>> basically zero cost since request queue quiesce is seldom
->>>>>>> triggered.
->>>>>>>
->>>>>>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
->>>>>>> Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue
->>>>>>> quiesce/unquiesce")
->>>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>>>>>> ---
->>>>>>>  drivers/scsi/scsi_lib.c    | 45
->>>>>>> ++++++++++++++++++++++++++++++
->>>>>>> ----
->>>>>>> ----
->>>>>>>  include/scsi/scsi_device.h |  1 +
->>>>>>>  2 files changed, 37 insertions(+), 9 deletions(-)
->>>>>>>
->>>>>>> diff --git a/drivers/scsi/scsi_lib.c
->>>>>>> b/drivers/scsi/scsi_lib.c
->>>>>>> index 51fcd46be265..414f4daf8005 100644
->>>>>>> --- a/drivers/scsi/scsi_lib.c
->>>>>>> +++ b/drivers/scsi/scsi_lib.c
->>>>>>> @@ -2638,6 +2638,40 @@ static int
->>>>>>> __scsi_internal_device_block_nowait(struct scsi_device
->>>>>>> *sdev)
->>>>>>>  	return 0;
->>>>>>>  }
->>>>>>>  
->>>>>>> +static DEFINE_SPINLOCK(sdev_queue_stop_lock);
->>>>>>> +
->>>>>>> +void scsi_start_queue(struct scsi_device *sdev)
->>>>>>> +{
->>>>>>> +	bool need_start;
->>>>>>> +	unsigned long flags;
->>>>>>> +
->>>>>>> +	spin_lock_irqsave(&sdev_queue_stop_lock, flags);
->>>>>>> +	need_start = sdev->queue_stopped;
->>>>>>> +	sdev->queue_stopped = 0;
->>>>>>> +	spin_unlock_irqrestore(&sdev_queue_stop_lock, flags);
->>>>>>> +
->>>>>>> +	if (need_start)
->>>>>>> +		blk_mq_unquiesce_queue(sdev->request_queue);
->>>>>>
->>>>>> Well, this is a classic atomic pattern:
->>>>>>
->>>>>> if (cmpxchg(&sdev->queue_stopped, 1, 0))
->>>>>> 	blk_mq_unquiesce_queue(sdev->request_queue);
->>>>>>
->>>>>> The reason to do it with atomics rather than spinlocks is
->>>>>>
->>>>>>    1. no need to disable interrupts: atomics are locked
->>>>>>    2. faster because a spinlock takes an exclusive line every
->>>>>> time but the
->>>>>>       read to check the value can be in shared mode in
->>>>>> cmpxchg
->>>>>>    3. it's just shorter and better code.
->>>>>>
->>>>>> The only minor downside is queue_stopped now needs to be a
->>>>>> u32.
->>>>>
->>>>> Are you fine with the change as-is, or do you want it redone? I
->>>>> can drop the SCSI parts and just queue up the dm fix.
->>>>> Personally I think it'd be better to get it fixed upfront.
->>>>
->>>> Well, given the path isn't hot, I don't really care.  However,
->>>> what I don't want is to have to continually bat back patches from
->>>> the make work code churners trying to update this code for being
->>>> the wrong pattern.  I think at the very least it needs a comment
->>>> saying why we chose a suboptimal pattern to try to forestall
->>>> this.
->>>
->>> Right, with a comment it's probably better. And as you said, since
->>> it's not a hot path, don't think we'd be revisiting it anyway.
->>>
->>> I'll amend the patch with a comment.
->>
->> I started adding the comment and took another look at this, and that
->> made me change my mind. We really should make this a cmpxcgh, it's
->> not even using a device lock here.
->>
->> I've dropped the two SCSI patches for now, Ming can you resend? If
->> James agrees, I really think queue_stopped should just have the type
->> changed and the patch redone with that using cmpxcgh().
+On Tue, Nov 02, 2021 at 03:15:15PM +0100, Petr Mladek wrote:
+> On Tue 2021-10-26 23:37:30, Ming Lei wrote:
+> > On Tue, Oct 26, 2021 at 10:48:18AM +0200, Petr Mladek wrote:
+> > > Below are more details about the livepatch code. I hope that it will
+> > > help you to see if zram has similar problems or not.
+> > > 
+> > > We have kobject in three structures: klp_func, klp_object, and
+> > > klp_patch, see include/linux/livepatch.h.
+> > > 
+> > > These structures have to be statically defined in the module sources
+> > > because they define what is livepatched, see
+> > > samples/livepatch/livepatch-sample.c
+> > > 
+> > > The kobject is used there to show information about the patch, patched
+> > > objects, and patched functions, in sysfs. And most importantly,
+> > > the sysfs interface can be used to disable the livepatch.
+> > > 
+> > > The problem with static structures is that the module must stay
+> > > in the memory as long as the sysfs interface exists. It can be
+> > > solved in module_exit() callback. It could wait until the sysfs
+> > > interface is destroyed.
+> > > 
+> > > kobject API does not support this scenario. The relase() callbacks
+> > 
+> > kobject_delete() is for supporting this scenario, that is why we don't
+> > need to grab module refcnt before calling show()/store() of the
+> > kobject's attributes.
+> > 
+> > kobject_delete() can be called in module_exit(), then any show()/store()
+> > will be done after kobject_delete() returns.
 > 
-> Well, that's what I suggested originally, so I agree ... I don't think
-> 31 more bytes is going to be a huge burden to scsi_device.
-          ^^^^
+> I am a bit confused. I do not see kobject_delete() anywhere in kernel
+> sources.
+> 
+> I see only kobject_del() and kobject_put(). AFAIK, they do _not_
+> guarantee that either the sysfs interface was destroyed or
+> the release callbacks were called. For example, see
+> schedule_delayed_work(&kobj->release, delay) in kobject_release().
 
-Bits? :-)
+After kobject_del() returns, no one can call run into show()/store(),
+and all pending show()/store() are drained meantime. But yes, the release
+handler may still be called later, and the kobject has to be freed
+during or before module_exit().
 
--- 
-Jens Axboe
+https://lore.kernel.org/lkml/20211101112548.3364086-2-ming.lei@redhat.com/
+
+> 
+> By other words, anyone could still be using either the sysfs interface
+> or the related structures after kobject_del() or kobject_put()
+> returns.
+
+No, no one can do that after kobject_del() returns.
+
+> 
+> IMHO, kobject API does not support static structures and module
+> removal.
+
+But so far klp_patch can only be defined as static instance, and it
+depends on the implementation, especially the release handler.
+
+
+Thanks,
+Ming
 
