@@ -2,135 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28C3C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 16:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5F1C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 16:53:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABB2960EBB
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 16:49:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42D4860EE3
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 16:53:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235000AbhKBQwT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 12:52:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45704 "EHLO
+        id S234665AbhKBQz6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 12:55:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234610AbhKBQvv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 12:51:51 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E670CC0797BA;
-        Tue,  2 Nov 2021 09:26:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZpP/HZLv604vtvae1cO/0WFon0sSJn671oAr7ZIWFxw=; b=UCimNJ3QWb++sHLFKw51gCkQKn
-        WWEC2X/M7um3LJKy9tXa7f8JPMslxJ5A40mI4Vct+q0Sv3gcUEgGzPrTFydyq7LDj4xgM8jIgE+YV
-        X3uJS07PEiYfQYOrNERQyGwoz4X0qZhFpi7WHnrxKGXUXB6VAT6jwbyJRPrTKcwzCTgUhlBeArX0X
-        zO89RZAmitmlNeBzM3i1PuQboNrclSbxS3a89BcNAExHk3J5/aTm3inLRkEvgG8Qe8rIDc2Dp0p5R
-        RjMjMh0QsXI8sIp4RfVofx0u3LD67AbwsVH9w4I/TlAdY/7UhPA3WEEHPuDBki1Eo1czIcKWZnbaH
-        DvYH7+8w==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mhwbY-002IBJ-2M; Tue, 02 Nov 2021 16:25:44 +0000
-Date:   Tue, 2 Nov 2021 09:25:44 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Miroslav Benes <mbenes@suse.cz>, Ming Lei <ming.lei@redhat.com>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YYFmiAAYIA2X7Uv5@bombadil.infradead.org>
-References: <YW6OptglA6UykZg/@T590>
- <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
- <YW/KEsfWJMIPnz76@T590>
- <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
- <YW/q70dLyF+YudyF@T590>
- <YXfA0jfazCPDTEBw@alley>
- <YXgguuAY5iEUIV0u@T590>
- <YXg0dFZ+6qHw7d0g@bombadil.infradead.org>
- <alpine.LSU.2.21.2110271343290.3655@pobox.suse.cz>
- <YYFYFrnhwPiyOtst@alley>
+        with ESMTP id S234870AbhKBQzU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 12:55:20 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4149DC0432DB
+        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 09:50:48 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id q127so25329030iod.12
+        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 09:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=+dbQrmv/b1RygKbYKHH/vVKFe1UJLRUyNsf2ThtHMLg=;
+        b=yYUlBfR+AahwtMsc9t/bT1wxlAjiqYn6KCVtPJwRowvsrx3AKmWyImkeE9GwPnjJ/g
+         9r8CWW3DzzktOW7KdJ+OlIqgqGDN1GfijyeI05jbdMtmJF193edHIUXQLSK9qrKKIyXc
+         T3JJONJyx5Ui4jL4+9JYAlXgszMrv5YS53243mpOSaHZW+vpWNY/DKFeFrNLfikhUSAs
+         TqLnNYfmmG1kaL5GvME/9tzK12cAe65XdZwEZwJPsuySH6PEDukX5HldaRI3zrpv09JU
+         MVKABNXst6dfW9eTPFe4MtfuaE+J6UIZH1IgVyzy7sBLEs2j6IvB4JJcqYqTePNI7bKG
+         7Sjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=+dbQrmv/b1RygKbYKHH/vVKFe1UJLRUyNsf2ThtHMLg=;
+        b=l+QtJwjp4ehojclmS/+5lfJtq3x9jN/AOUPgB+KgIZcDWQBpp+sHxShOX/hfh9J9ql
+         WLOsrgbA7/4MO68bH4+P2gJf7h6M4kZGjEEPY0wtwVPRbkO+2PlLtEqyhobHYXmABcK+
+         GPDCp/6lWYjmvt92UYMmFkH+6RBCprMEeoO1U56RYH1d1gIBOxcS/Gt+NnrxVaKQF7q/
+         JzaE5vEQQXS/Acn1qSxvw2MoG+ILL7NciJnzcqCo4PXTc4prZi/kwPkerxzJjMn3+cTM
+         BSI4wBZK5i7RHwrxwcVxuLG3R2SPksUsOvBW0Ku0hDInkbd9YgRWZgkqY4zdDqMSCFc4
+         43ag==
+X-Gm-Message-State: AOAM530zvzGTRuu9m/vYIxPsPNlg7LZswjd3CUohAZmKPVX6mvslNxvD
+        WAFGd/CI+w5bJhUqWaNhEPiSJg==
+X-Google-Smtp-Source: ABdhPJx6UgcW+UNHqi1soE/BIyhBzdbWrSlvz2f+AJjxo6tGbxRgXfr43Pew7zrdEGjiWWyR9zQoKw==
+X-Received: by 2002:a05:6638:a2d:: with SMTP id 13mr28494972jao.12.1635871847575;
+        Tue, 02 Nov 2021 09:50:47 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id g17sm4870213iow.20.2021.11.02.09.50.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Nov 2021 09:50:47 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     nbd@other.debian.org, linux-block@vger.kernel.org,
+        Ye Bin <yebin10@huawei.com>, josef@toxicpanda.com
+Cc:     linux-kernel@vger.kernel.org
+In-Reply-To: <20211102015237.2309763-1-yebin10@huawei.com>
+References: <20211102015237.2309763-1-yebin10@huawei.com>
+Subject: Re: [PATCH -next v4 0/4] Fix hungtask when nbd_config_put and sanity check for first_minor
+Message-Id: <163587184699.364332.2099486260392695081.b4-ty@kernel.dk>
+Date:   Tue, 02 Nov 2021 10:50:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YYFYFrnhwPiyOtst@alley>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 02, 2021 at 04:24:06PM +0100, Petr Mladek wrote:
-> On Wed 2021-10-27 13:57:40, Miroslav Benes wrote:
-> > >From my perspective, it is quite easy to get it wrong due to either a lack 
-> > of generic support, or missing rules/documentation. So if this thread 
-> > leads to "do not share locks between a module removal and a sysfs 
-> > operation" strict rule, it would be at least something. In the same 
-> > manner as Luis proposed to document try_module_get() expectations.
+On Tue, 2 Nov 2021 09:52:33 +0800, Ye Bin wrote:
+> This patchset include two patchsets as follows:
+> 1. Fix hungtask when nbd_config_put
+> https://patchwork.kernel.org/project/linux-block/list/?series=573381
+> 2. nbd: fix sanity check for first_minor
+> https://lore.kernel.org/linux-block/20211021122936.758221-1-yukuai3@huawei.com/
 > 
-> The rule "do not share locks between a module removal and a sysfs
-> operation" is not clear to me.
-
-That's exactly it. It *is* not. The test_sysfs selftest will hopefully
-help with this. But I'll wait to take a final position on whether or not
-a generic fix should be merged until the Coccinelle patch which looks
-for all uses cases completes.
-
-So I think that once that Coccinelle hunt is done for the deadlock, we
-should also remind folks of the potential deadlock and some of the rules
-you mentioned below so that if we take a position that we don't support
-this, we at least inform developers why and what to avoid. If Coccinelle
-finds quite a bit of cases, then perhaps evaluating the generic fix
-might be worth evaluating.
-
-> IMHO, there are the following rules:
+> I have consulted with Yu Kuai, and his modification has also been confirmed by him.
 > 
-> 1. rule: kobject_del() or kobject_put() must not be called under a lock that
-> 	 is used by store()/show() callbacks.
-> 
->    reason: kobject_del() waits until the sysfs interface is destroyed.
-> 	 It has to wait until all store()/show() callbacks are finished.
+> [...]
 
-Right, this is what actually started this entire conversation.
+Applied, thanks!
 
-Note that as Ming pointed out, the generic kernfs fix I proposed would
-only cover the case when kobject_del() ends up being called on module
-exit, so it would not cover the cases where perhaps kobject_del() might
-be called outside of module exit, and so the cope of the possible
-deadlock then increases in scope.
+[1/4] nbd: fix max value for 'first_minor'
+      commit: e4c4871a73944353ea23e319de27ef73ce546623
+[2/4] nbd: fix possible overflow for 'first_minor' in nbd_dev_add()
+      commit: 940c264984fd1457918393c49674f6b39ee16506
+[3/4] nbd: Fix incorrect error handle when first_minor is illegal in nbd_dev_add
+      commit: 69beb62ff0d1723a750eebe1c4d01da573d7cd19
+[4/4] nbd: Fix hungtask when nbd_config_put
+      commit: e2daec488c57069a4a431d5b752f50294c4bf273
 
-Likewise, the Coccinelle hunt I'm trying would only cover the module
-exit case. I'm a bit of afraid of the complexity of a generic hunt
-as expresed in rule 1.
+Best regards,
+-- 
+Jens Axboe
 
-> 
-> 2. rule: kobject_del()/kobject_put() must not be called from the
-> 	related store() callbacks.
-> 
->    reason: same as in 1st rule.
 
-Sensible corollary.
-
-Given tha the exact kobjet_del() / kobject_put() which must not be
-called from the respective sysfs ops depends on which kobject is
-underneath the device for which the sysfs ops is being created,
-it would make this hunt in Coccinelle a bit tricky. My current iteration
-of a coccinelle hunt cheats and looks at any sysfs looking op and
-ensures a module exit exists.
-
-> 3. rule: module_exit() must wait until all release() callbacks are called
-> 	 when kobject are static.
-> 
->    reason: kobject_put() must be called to clean up internal
-> 	dependencies. The clean up might be done asynchronously
-> 	and need access to the kobject structure.
-
-This might be an easier rule to implement a respective Coccinelle rule
-for.
-
-  Luis
