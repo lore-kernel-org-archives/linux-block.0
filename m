@@ -2,91 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C39BC433EF
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 23:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6688AC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 00:26:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7C3760E9C
-	for <linux-block@archiver.kernel.org>; Mon,  1 Nov 2021 23:51:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B38560EE3
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 00:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbhKAXxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Nov 2021 19:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42866 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230396AbhKAXxl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 19:53:41 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B47CC061714
-        for <linux-block@vger.kernel.org>; Mon,  1 Nov 2021 16:51:07 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id k22so10365377ljk.5
-        for <linux-block@vger.kernel.org>; Mon, 01 Nov 2021 16:51:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IzV7K8wfEn1u0q7SJBtFTB4z48oxUhXRtNS/oDaEJ0Y=;
-        b=MYMOaSZ89diox646KLhP3f/90t0Utb/n67qq0RwjIh8qUHkMVGhuBwXEQ7deCpK0bg
-         sohjpP520/sbSQz4cgyBRNZQLxd/is4CvxCteCaNAQ5kd/3GKsw0E0oZh/lBcximVAal
-         pTAwEeUMjtVJ92P0uX3DHJyvCuj2E82USIywY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IzV7K8wfEn1u0q7SJBtFTB4z48oxUhXRtNS/oDaEJ0Y=;
-        b=zcQ5FDQ7hG0s45bpfnS4uAg93dgaWBDQRg4NbBawM0H8a/rgLa1lRR7JmGDCEFfau8
-         p0pYduyfS7iRxts1KscXokq2R0ARQ3pAHRKpPcEtmuS1HuonsXzaE91wrRg6EsALpq6e
-         sjRnwIkDBMlKsM0tmiKSvCIOq2al2OlYRfNQTb27/6mSNtrtLwokaA65JsmNEVPyIDzn
-         y8dKgalthxJIejBl4HQ8B0qtUUjquA61aw77KGUjVzcjMxMSqQRR9eFMEN+P5vnXjbnV
-         56sS9AAWxuohhQCkjdyBiMV/JR3+uVpuof3wfe+zMq3sKvmo+BrrNl9RZ5jJ7lehx7OL
-         Fvxg==
-X-Gm-Message-State: AOAM5324DnaVjWhxAjAPMIouq+b5znRJTN1jopSU16VELO7Zrxrzdqtb
-        3epnyfzwpqIivY+ddNvDMdb7Pz95is73rBm4
-X-Google-Smtp-Source: ABdhPJzM8GC8QwOhTfh4gxzzX7dwPnHnwaBbegcFi8nF+rgRiYQOyQKoNz+ys0Jlv+yhbC0PnSFNJA==
-X-Received: by 2002:a2e:bc24:: with SMTP id b36mr35595455ljf.54.1635810665330;
-        Mon, 01 Nov 2021 16:51:05 -0700 (PDT)
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com. [209.85.167.42])
-        by smtp.gmail.com with ESMTPSA id o5sm508533lfo.85.2021.11.01.16.51.04
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Nov 2021 16:51:04 -0700 (PDT)
-Received: by mail-lf1-f42.google.com with SMTP id l13so39412898lfg.6
-        for <linux-block@vger.kernel.org>; Mon, 01 Nov 2021 16:51:04 -0700 (PDT)
-X-Received: by 2002:a05:6512:10c3:: with SMTP id k3mr31657503lfg.150.1635810664533;
- Mon, 01 Nov 2021 16:51:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <f870c029-140d-3e77-dcd1-1890025b5795@kernel.dk>
- <CAHk-=wii3c_VebHJxEyqU5P6FKjOLirYHQm+0=oaL59DNi-t1A@mail.gmail.com> <71c40f9b-7f83-be81-18cf-297077db005c@kernel.dk>
-In-Reply-To: <71c40f9b-7f83-be81-18cf-297077db005c@kernel.dk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 1 Nov 2021 16:50:48 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wh6dwyg9XMxiBB9or2oofXea7VY_hMjm4-0_9YU8o+LZQ@mail.gmail.com>
-Message-ID: <CAHk-=wh6dwyg9XMxiBB9or2oofXea7VY_hMjm4-0_9YU8o+LZQ@mail.gmail.com>
-Subject: Re: [GIT PULL] bdev size cleanups
+        id S229491AbhKBA3L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Nov 2021 20:29:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46036 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229480AbhKBA3K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Nov 2021 20:29:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635812796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h/iG4UfnOzpRX++zCnwAK8pPSjk1Qgs5k+asw8ejvyI=;
+        b=EJG43X1/GA8pTAMRqfgfHfk4BU3CPKD2qewbjLAMtz8kwKWkbR81TQqfxufjbx3pPk+T0g
+        zxkGInQynsKwoR2eYCsUD202xq8/hWddKUq0MrBLPH26X4llgctavk9kABzxkUYnHEFPdy
+        gb9kqNuaArV6kFnqrNadaoeH7WuI+VY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-jzTa7Hl-NkqOep9IpjG_TA-1; Mon, 01 Nov 2021 20:26:33 -0400
+X-MC-Unique: jzTa7Hl-NkqOep9IpjG_TA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8048E80572F;
+        Tue,  2 Nov 2021 00:26:32 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41DF71980E;
+        Tue,  2 Nov 2021 00:26:27 +0000 (UTC)
+Date:   Tue, 2 Nov 2021 08:26:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: replace always false argument with 'false'
+Message-ID: <YYCFr6mjciIwqT2W@T590>
+References: <7d6a5cde-1a98-55ef-4094-d9286d51fecd@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d6a5cde-1a98-55ef-4094-d9286d51fecd@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 1, 2021 at 4:20 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Yes, probably safer just to make bdev_nr_bytes() return sector_t as
-> well, even if loff_t isn't strictly wrong.
+On Mon, Nov 01, 2021 at 01:42:16PM -0600, Jens Axboe wrote:
+> A previous commit fixed up the condition for doing direct issue, but that
+> left the 'from_schedule' argument dead inside the branch. Replace it with
+> 'false'.
+> 
+> Fixes: ff1552232b36 ("blk-mq: don't issue request directly in case that current is to be blocked")
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4787d5b74aa3..8aed6cea3a34 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2227,7 +2227,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>  	plug->rq_count = 0;
+>  
+>  	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
+> -		blk_mq_plug_issue_direct(plug, from_schedule);
+> +		blk_mq_plug_issue_direct(plug, false);
+>  		if (rq_list_empty(plug->mq_list))
+>  			return;
 
-Well, that would actually change the sign of some of the existing
-comparisons. Possibly changing their meaning entirely..
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-So having 'loff_t' being signed may be an odd choice for a byte size,
-but it is what it is. At least the current set of cleanups seemed to
-keep the type logic the same when it changed i_size_read() to be
-bdev_nr_bytes() instead.
+-- 
+Ming
 
-Changing it to 'sector_t' not only doesn't make conceptual sense when
-it's a byte count, it might also be dangerous.
-
-So my reaction was really that it wasn't obvious that bdev_nr_bytes()
-did the shift in the right type.. It does happen to do that, but
-historically sector_t was the smaller type.
-
-            Linus
