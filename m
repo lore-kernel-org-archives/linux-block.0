@@ -2,137 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F81AC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 703DBC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:58:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AA1F60C4B
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:57:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55C3C60F02
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:58:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234585AbhKBPAB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 11:00:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30584 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234785AbhKBO7N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Nov 2021 10:59:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635864997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YG2VGNtE+69cPxmqVydtAL5vxJZLZtIYVVth/K03gCo=;
-        b=XSEhU5dXP0h3cXByjFo2RLYrWRcMFJRi7FT4KBugkHi0HxNJ7g7WJFcWJ0SThp5FCMk25k
-        NS7G1jR/p9SnmhLC0Y7VLaAPdug6/aTfOVJqz1RxeKy5mRKViJaKiVlASjxzL6hUJB9G2T
-        Z53cMEGkPIVdST+x2XxaLrKBvDAmCk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-0K9G4ltAMemdXrbZ-quSRA-1; Tue, 02 Nov 2021 10:56:34 -0400
-X-MC-Unique: 0K9G4ltAMemdXrbZ-quSRA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C01F810A8E07;
-        Tue,  2 Nov 2021 14:56:30 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3B2D60657;
-        Tue,  2 Nov 2021 14:56:19 +0000 (UTC)
-Date:   Tue, 2 Nov 2021 22:56:14 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Miroslav Benes <mbenes@suse.cz>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YYFRjpJcIaZ1AQRS@T590>
-References: <YW4uwep3BCe9Vxq8@T590>
- <alpine.LSU.2.21.2110190820590.15009@pobox.suse.cz>
- <YW6OptglA6UykZg/@T590>
- <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
- <YW/KEsfWJMIPnz76@T590>
- <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
- <YW/q70dLyF+YudyF@T590>
- <YXfA0jfazCPDTEBw@alley>
- <YXgguuAY5iEUIV0u@T590>
- <YYFH85CmVOYIMdYh@alley>
+        id S233410AbhKBPAq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 11:00:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233391AbhKBPAl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 11:00:41 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32BBCC061767
+        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 07:57:43 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id y11so2076098oih.7
+        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 07:57:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=b86LoqP3mj8sq0aqHiMmlLOqMZ686wPnib/3+RPLK5w=;
+        b=j9MegoVe32X6LWLGXFH6KfrHNKBwPIE6A4DwFjAmkZY4b5dyW+9avw7T/HdjNCWk1V
+         7dKVp6/duBCNlFZwsMJg/g/qDKukTvrr5hAiNkHfgsMG+FmNVtA3HtgmLn/wOAdIXUZZ
+         qcH7ENmPQ0Xu7MAn3EFWVn2uc1ajDQP81Oh8EFwh77e3rWrW8yOYgPZPOKHJuVPil+qq
+         OxxUJ6e6neqyIKElQGMyGSrEOgdfWphy/hK0PX68j6DE+OqsJJ4R1dBoTe2uI/zeHchf
+         ljP32z5u24QdZyDQ2Sjo4wh/9YxjnBRENF876u2qur7UPLMdvJEkUh5Wv+kDLdl3VFaZ
+         AOqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=b86LoqP3mj8sq0aqHiMmlLOqMZ686wPnib/3+RPLK5w=;
+        b=h+wSi5cXE0IbxmPaUXCjpB5Hz8dykivjXmYCLvtW5tDpCrO7s/xrtD+kTy2kT3kpJF
+         aUY5u7fBabFdpMF1AsjL9CLzhMdVGePaa4RW/yt1ZXajyO+h3LMj6jyciKFSS/L26JMc
+         MbFJALXlN0/7o4iU4PCOTIqPrUa1ZXWiFWB6XjzLRYYJ04x2UA9UfDEBxhG7+/pljW/A
+         FzEYie7pQdKHHTXXk/0tLVar/k2b4cZpsDOrs7kugPM4suabxceReOfO0CeHWE5zpUTt
+         HI/wcTFtQ4VkquhnBxrqK7vImDbwTIoj8UX4yrV9e7lCfqn55/Xw1JFx/BM9ANJ6vdEA
+         nmJg==
+X-Gm-Message-State: AOAM533ftzOGuDbQo6njXlsMMiDOA7whri83ZNE4K6p1605PPY/dJ+IX
+        zEXbsTADWYBO/8HKT7AXCBh7UYsLJLy4Bg==
+X-Google-Smtp-Source: ABdhPJycZUc09qnSZuRnNvOQViBsvZRd4FPrvBe//oJxuSisQQ6tE38ALRKsIqtgE+ilGCvqQ64wmA==
+X-Received: by 2002:aca:ba55:: with SMTP id k82mr1860586oif.167.1635865062481;
+        Tue, 02 Nov 2021 07:57:42 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id p133sm4902111oia.11.2021.11.02.07.57.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Nov 2021 07:57:42 -0700 (PDT)
+Subject: Re: [PATCH 3/3] blk-mq: update hctx->nr_active in
+ blk_mq_end_request_batch()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20211102133502.3619184-1-ming.lei@redhat.com>
+ <20211102133502.3619184-4-ming.lei@redhat.com>
+ <922449db-73a7-efaf-52ef-d386edf77953@kernel.dk> <YYFDz1AQqDoglgyu@T590>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <dda27cef-a3fc-03e7-0c28-c4b24600438e@kernel.dk>
+Date:   Tue, 2 Nov 2021 08:57:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YYFH85CmVOYIMdYh@alley>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <YYFDz1AQqDoglgyu@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 02, 2021 at 03:15:15PM +0100, Petr Mladek wrote:
-> On Tue 2021-10-26 23:37:30, Ming Lei wrote:
-> > On Tue, Oct 26, 2021 at 10:48:18AM +0200, Petr Mladek wrote:
-> > > Below are more details about the livepatch code. I hope that it will
-> > > help you to see if zram has similar problems or not.
-> > > 
-> > > We have kobject in three structures: klp_func, klp_object, and
-> > > klp_patch, see include/linux/livepatch.h.
-> > > 
-> > > These structures have to be statically defined in the module sources
-> > > because they define what is livepatched, see
-> > > samples/livepatch/livepatch-sample.c
-> > > 
-> > > The kobject is used there to show information about the patch, patched
-> > > objects, and patched functions, in sysfs. And most importantly,
-> > > the sysfs interface can be used to disable the livepatch.
-> > > 
-> > > The problem with static structures is that the module must stay
-> > > in the memory as long as the sysfs interface exists. It can be
-> > > solved in module_exit() callback. It could wait until the sysfs
-> > > interface is destroyed.
-> > > 
-> > > kobject API does not support this scenario. The relase() callbacks
-> > 
-> > kobject_delete() is for supporting this scenario, that is why we don't
-> > need to grab module refcnt before calling show()/store() of the
-> > kobject's attributes.
-> > 
-> > kobject_delete() can be called in module_exit(), then any show()/store()
-> > will be done after kobject_delete() returns.
+On 11/2/21 7:57 AM, Ming Lei wrote:
+> On Tue, Nov 02, 2021 at 07:47:44AM -0600, Jens Axboe wrote:
+>> On 11/2/21 7:35 AM, Ming Lei wrote:
+>>> In case of shared tags and none io sched, batched completion still may
+>>> be run into, and hctx->nr_active is accounted when getting driver tag,
+>>> so it has to be updated in blk_mq_end_request_batch().
+>>>
+>>> Otherwise, hctx->nr_active may become same with queue depth, then
+>>> hctx_may_queue() always return false, then io hang is caused.
+>>>
+>>> Fixes the issue by updating the counter in batched way.
+>>>
+>>> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>> Fixes: f794f3351f26 ("block: add support for blk_mq_end_request_batch()")
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>>  block/blk-mq.c | 15 +++++++++++++--
+>>>  block/blk-mq.h | 12 +++++++++---
+>>>  2 files changed, 22 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>> index 07eb1412760b..0dbe75034f61 100644
+>>> --- a/block/blk-mq.c
+>>> +++ b/block/blk-mq.c
+>>> @@ -825,6 +825,7 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
+>>>  	struct blk_mq_hw_ctx *cur_hctx = NULL;
+>>>  	struct request *rq;
+>>>  	u64 now = 0;
+>>> +	int active = 0;
+>>>  
+>>>  	if (iob->need_ts)
+>>>  		now = ktime_get_ns();
+>>> @@ -846,16 +847,26 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
+>>>  		rq_qos_done(rq->q, rq);
+>>>  
+>>>  		if (nr_tags == TAG_COMP_BATCH || cur_hctx != rq->mq_hctx) {
+>>> -			if (cur_hctx)
+>>> +			if (cur_hctx) {
+>>> +				if (active)
+>>> +					__blk_mq_sub_active_requests(cur_hctx,
+>>> +							active);
+>>>  				blk_mq_flush_tag_batch(cur_hctx, tags, nr_tags);
+>>> +			}
+>>>  			nr_tags = 0;
+>>> +			active = 0;
+>>>  			cur_hctx = rq->mq_hctx;
+>>>  		}
+>>>  		tags[nr_tags++] = rq->tag;
+>>> +		if (rq->rq_flags & RQF_MQ_INFLIGHT)
+>>> +			active++;
+>>
+>> Are there any cases where either none or all of requests have the
+>> flag set, and hence active == nr_tags?
 > 
-> I am a bit confused. I do not see kobject_delete() anywhere in kernel
-> sources.
-> 
-> I see only kobject_del() and kobject_put(). AFAIK, they do _not_
-> guarantee that either the sysfs interface was destroyed or
-> the release callbacks were called. For example, see
-> schedule_delayed_work(&kobj->release, delay) in kobject_release().
+> none and BLK_MQ_F_TAG_QUEUE_SHARED, and Shinichiro only observed the
+> issue on two NSs.
 
-After kobject_del() returns, no one can call run into show()/store(),
-and all pending show()/store() are drained meantime. But yes, the release
-handler may still be called later, and the kobject has to be freed
-during or before module_exit().
+Maybe I wasn't clear enough. What I'm saying is that either all of the
+requests will have RQF_MQ_INFLIGHT set, or none of them. Hence active
+should be either 0, or == nr_tags.
 
-https://lore.kernel.org/lkml/20211101112548.3364086-2-ming.lei@redhat.com/
+That's the hypothesis that I wanted to check, because if that's true,
+then we can do this in a better way.
 
-> 
-> By other words, anyone could still be using either the sysfs interface
-> or the related structures after kobject_del() or kobject_put()
-> returns.
-
-No, no one can do that after kobject_del() returns.
-
-> 
-> IMHO, kobject API does not support static structures and module
-> removal.
-
-But so far klp_patch can only be defined as static instance, and it
-depends on the implementation, especially the release handler.
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
