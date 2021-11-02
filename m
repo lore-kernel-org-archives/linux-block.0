@@ -2,205 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37544C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E98C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:43:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D98D61053
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32F4B60F56
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 01:43:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230140AbhKBBmd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Nov 2021 21:42:33 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:30891 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229803AbhKBBmb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Nov 2021 21:42:31 -0400
-Received: from dggeme754-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HjssV03cmzcb2L;
-        Tue,  2 Nov 2021 09:35:10 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by dggeme754-chm.china.huawei.com
- (10.3.19.100) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.15; Tue, 2
- Nov 2021 09:39:52 +0800
-From:   Ye Bin <yebin10@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
-CC:     <linux-kernel@vger.kernel.org>, Ye Bin <yebin10@huawei.com>
-Subject: [PATCH -next v4 4/4] nbd: Fix hungtask when nbd_config_put
-Date:   Tue, 2 Nov 2021 09:52:37 +0800
-Message-ID: <20211102015237.2309763-5-yebin10@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211102015237.2309763-1-yebin10@huawei.com>
-References: <20211102015237.2309763-1-yebin10@huawei.com>
+        id S229498AbhKBBqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Nov 2021 21:46:05 -0400
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:52562 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229479AbhKBBqF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Nov 2021 21:46:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635817410;
+        bh=FZUkYKuDKg058Pg46ijjCbmsyqBvT/Cy51LUuz29wLE=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=RM/9KsV6QVoExFGw/bPBfrpeHnLxBFA7RtBtiHpvObU7NPmQnn1T/zEnIOlKNd90t
+         cwYNnBRrXdsgNSv4rLcn/qWYk2TZp8oKnQxO+FaK4QD649xFMkHYYRnUj9LU5ct/r/
+         iq5BH1kOvuW5tdLuXz49L9NcM43cSmVkYPBkbHKQ=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id C82DB1280A86;
+        Mon,  1 Nov 2021 21:43:30 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id woUwEHJk3ESK; Mon,  1 Nov 2021 21:43:30 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1635817410;
+        bh=FZUkYKuDKg058Pg46ijjCbmsyqBvT/Cy51LUuz29wLE=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=RM/9KsV6QVoExFGw/bPBfrpeHnLxBFA7RtBtiHpvObU7NPmQnn1T/zEnIOlKNd90t
+         cwYNnBRrXdsgNSv4rLcn/qWYk2TZp8oKnQxO+FaK4QD649xFMkHYYRnUj9LU5ct/r/
+         iq5BH1kOvuW5tdLuXz49L9NcM43cSmVkYPBkbHKQ=
+Received: from [172.20.40.112] (unknown [12.248.214.166])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 187A912809EF;
+        Mon,  1 Nov 2021 21:43:30 -0400 (EDT)
+Message-ID: <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
+Subject: Re: [PATCH 2/3] scsi: make sure that request queue queiesce and
+ unquiesce balanced
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com
+Date:   Mon, 01 Nov 2021 21:43:27 -0400
+In-Reply-To: <20211021145918.2691762-3-ming.lei@redhat.com>
+References: <20211021145918.2691762-1-ming.lei@redhat.com>
+         <20211021145918.2691762-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggeme754-chm.china.huawei.com (10.3.19.100)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I got follow issue:
-[  247.381177] INFO: task kworker/u10:0:47 blocked for more than 120 seconds.
-[  247.382644]       Not tainted 4.19.90-dirty #140
-[  247.383502] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  247.385027] Call Trace:
-[  247.388384]  schedule+0xb8/0x3c0
-[  247.388966]  schedule_timeout+0x2b4/0x380
-[  247.392815]  wait_for_completion+0x367/0x510
-[  247.397713]  flush_workqueue+0x32b/0x1340
-[  247.402700]  drain_workqueue+0xda/0x3c0
-[  247.403442]  destroy_workqueue+0x7b/0x690
-[  247.405014]  nbd_config_put.cold+0x2f9/0x5b6
-[  247.405823]  recv_work+0x1fd/0x2b0
-[  247.406485]  process_one_work+0x70b/0x1610
-[  247.407262]  worker_thread+0x5a9/0x1060
-[  247.408699]  kthread+0x35e/0x430
-[  247.410918]  ret_from_fork+0x1f/0x30
+On Thu, 2021-10-21 at 22:59 +0800, Ming Lei wrote:
+> For fixing queue quiesce race between driver and block layer(elevator
+> switch, update nr_requests, ...), we need to support concurrent
+> quiesce
+> and unquiesce, which requires the two call balanced.
+> 
+> It isn't easy to audit that in all scsi drivers, especially the two
+> may
+> be called from different contexts, so do it in scsi core with one
+> per-device
+> bit flag & global spinlock, basically zero cost since request queue
+> quiesce
+> is seldom triggered.
+> 
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue
+> quiesce/unquiesce")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/scsi/scsi_lib.c    | 45 ++++++++++++++++++++++++++++++----
+> ----
+>  include/scsi/scsi_device.h |  1 +
+>  2 files changed, 37 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 51fcd46be265..414f4daf8005 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -2638,6 +2638,40 @@ static int
+> __scsi_internal_device_block_nowait(struct scsi_device *sdev)
+>  	return 0;
+>  }
+>  
+> +static DEFINE_SPINLOCK(sdev_queue_stop_lock);
+> +
+> +void scsi_start_queue(struct scsi_device *sdev)
+> +{
+> +	bool need_start;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&sdev_queue_stop_lock, flags);
+> +	need_start = sdev->queue_stopped;
+> +	sdev->queue_stopped = 0;
+> +	spin_unlock_irqrestore(&sdev_queue_stop_lock, flags);
+> +
+> +	if (need_start)
+> +		blk_mq_unquiesce_queue(sdev->request_queue);
 
-We can reproduce issue as follows:
-1. Inject memory fault in nbd_start_device
--1244,10 +1248,18 @@ static int nbd_start_device(struct nbd_device *nbd)
-        nbd_dev_dbg_init(nbd);
-        for (i = 0; i < num_connections; i++) {
-                struct recv_thread_args *args;
--
--               args = kzalloc(sizeof(*args), GFP_KERNEL);
-+
-+               if (i == 1) {
-+                       args = NULL;
-+                       printk("%s: inject malloc error\n", __func__);
-+               }
-+               else
-+                       args = kzalloc(sizeof(*args), GFP_KERNEL);
-2. Inject delay in recv_work
--757,6 +760,8 @@ static void recv_work(struct work_struct *work)
+Well, this is a classic atomic pattern:
 
-                blk_mq_complete_request(blk_mq_rq_from_pdu(cmd));
-        }
-+       printk("%s: comm=%s pid=%d\n", __func__, current->comm, current->pid);
-+       mdelay(5 * 1000);
-        nbd_config_put(nbd);
-        atomic_dec(&config->recv_threads);
-        wake_up(&config->recv_wq);
-3. Create nbd server
-nbd-server 8000 /tmp/disk
-4. Create nbd client
-nbd-client localhost 8000 /dev/nbd1
-Then will trigger above issue.
+if (cmpxchg(&sdev->queue_stopped, 1, 0))
+	blk_mq_unquiesce_queue(sdev->request_queue);
 
-Reason is when add delay in recv_work, lead to release the last reference
-of 'nbd->config_refs'. nbd_config_put will call flush_workqueue to make
-all work finish. Obviously, it will lead to deadloop.
-To solve this issue, according to Josef's suggestion move 'recv_work'
-init from start device to nbd_dev_add, then destroy 'recv_work'when
-nbd device teardown.
+The reason to do it with atomics rather than spinlocks is
 
-Signed-off-by: Ye Bin <yebin10@huawei.com>
----
- drivers/block/nbd.c | 36 ++++++++++++++++--------------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+   1. no need to disable interrupts: atomics are locked
+   2. faster because a spinlock takes an exclusive line every time but the
+      read to check the value can be in shared mode in cmpxchg
+   3. it's just shorter and better code.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 88dc0c49631c..ef31f81d7b31 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -260,7 +260,7 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	mutex_lock(&nbd_index_mutex);
- 	idr_remove(&nbd_index_idr, nbd->index);
- 	mutex_unlock(&nbd_index_mutex);
--
-+	destroy_workqueue(nbd->recv_workq);
- 	kfree(nbd);
- }
- 
-@@ -1314,10 +1314,6 @@ static void nbd_config_put(struct nbd_device *nbd)
- 		kfree(nbd->config);
- 		nbd->config = NULL;
- 
--		if (nbd->recv_workq)
--			destroy_workqueue(nbd->recv_workq);
--		nbd->recv_workq = NULL;
--
- 		nbd->tag_set.timeout = 0;
- 		nbd->disk->queue->limits.discard_granularity = 0;
- 		nbd->disk->queue->limits.discard_alignment = 0;
-@@ -1346,14 +1342,6 @@ static int nbd_start_device(struct nbd_device *nbd)
- 		return -EINVAL;
- 	}
- 
--	nbd->recv_workq = alloc_workqueue("knbd%d-recv",
--					  WQ_MEM_RECLAIM | WQ_HIGHPRI |
--					  WQ_UNBOUND, 0, nbd->index);
--	if (!nbd->recv_workq) {
--		dev_err(disk_to_dev(nbd->disk), "Could not allocate knbd recv work queue.\n");
--		return -ENOMEM;
--	}
--
- 	blk_mq_update_nr_hw_queues(&nbd->tag_set, config->num_connections);
- 	nbd->pid = task_pid_nr(current);
- 
-@@ -1779,6 +1767,15 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	}
- 	nbd->disk = disk;
- 
-+	nbd->recv_workq = alloc_workqueue("nbd%d-recv",
-+					  WQ_MEM_RECLAIM | WQ_HIGHPRI |
-+					  WQ_UNBOUND, 0, nbd->index);
-+	if (!nbd->recv_workq) {
-+		dev_err(disk_to_dev(nbd->disk), "Could not allocate knbd recv work queue.\n");
-+		err = -ENOMEM;
-+		goto out_err_disk;
-+	}
-+
- 	/*
- 	 * Tell the block layer that we are not a rotational device
- 	 */
-@@ -1809,7 +1806,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	disk->first_minor = index << part_shift;
- 	if (disk->first_minor < index || disk->first_minor > MINORMASK) {
- 		err = -EINVAL;
--		goto out_err_disk;
-+		goto out_free_work;
- 	}
- 
- 	disk->minors = 1 << part_shift;
-@@ -1818,7 +1815,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	sprintf(disk->disk_name, "nbd%d", index);
- 	err = add_disk(disk);
- 	if (err)
--		goto out_err_disk;
-+		goto out_free_work;
- 
- 	/*
- 	 * Now publish the device.
-@@ -1827,6 +1824,8 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	nbd_total_devices++;
- 	return nbd;
- 
-+out_free_work:
-+	destroy_workqueue(nbd->recv_workq);
- out_err_disk:
- 	blk_cleanup_disk(disk);
- out_free_idr:
-@@ -2082,13 +2081,10 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
- 	nbd_disconnect(nbd);
- 	sock_shutdown(nbd);
- 	/*
--	 * Make sure recv thread has finished, so it does not drop the last
--	 * config ref and try to destroy the workqueue from inside the work
--	 * queue. And this also ensure that we can safely call nbd_clear_que()
-+	 * Make sure recv thread has finished, we can safely call nbd_clear_que()
- 	 * to cancel the inflight I/Os.
- 	 */
--	if (nbd->recv_workq)
--		flush_workqueue(nbd->recv_workq);
-+	flush_workqueue(nbd->recv_workq);
- 	nbd_clear_que(nbd);
- 	nbd->task_setup = NULL;
- 	mutex_unlock(&nbd->config_lock);
--- 
-2.31.1
+The only minor downside is queue_stopped now needs to be a u32.
+
+James
+
 
