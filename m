@@ -2,118 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBBD0C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 13:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9A6C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:02:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1ECA60EDF
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 13:57:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1267460EDF
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 14:02:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231161AbhKBOAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 10:00:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49658 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231348AbhKBOAX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Nov 2021 10:00:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635861467;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=I1z5tRr3ZGJF45UtoRAB1ZvSOjDWZRiUGmxZduFxiFI=;
-        b=LVDaIqH36GlA79w3vXiJQVdtP1sFpbjOTz4YsyQR8aTXOs/s3g9SGo7rSzEaxsons570g/
-        oJioMbeCWUWOhP2COUb1KfkddSnfsUmyK/7kIWl0KzessA8MdtTCLcpvcTWn6RlShm84l8
-        kV+ab1Ig+dR/c+1elkEDQ3+U4GIJh4o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-AmgyrCzsMWCn48DRo-cf8w-1; Tue, 02 Nov 2021 09:57:43 -0400
-X-MC-Unique: AmgyrCzsMWCn48DRo-cf8w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC05456C9C;
-        Tue,  2 Nov 2021 13:57:42 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BB8B26E40;
-        Tue,  2 Nov 2021 13:57:39 +0000 (UTC)
-Date:   Tue, 2 Nov 2021 21:57:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        ming.lei@redhat.com
-Subject: Re: [PATCH 3/3] blk-mq: update hctx->nr_active in
- blk_mq_end_request_batch()
-Message-ID: <YYFDz1AQqDoglgyu@T590>
-References: <20211102133502.3619184-1-ming.lei@redhat.com>
- <20211102133502.3619184-4-ming.lei@redhat.com>
- <922449db-73a7-efaf-52ef-d386edf77953@kernel.dk>
+        id S231437AbhKBOEz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 10:04:55 -0400
+Received: from mail-ua1-f54.google.com ([209.85.222.54]:33362 "EHLO
+        mail-ua1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231361AbhKBOEx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 10:04:53 -0400
+Received: by mail-ua1-f54.google.com with SMTP id b17so28030309uas.0;
+        Tue, 02 Nov 2021 07:02:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0hNhuZg6Cxc7k0N24ygUKVsmLdEaO62oHzQ30OZqTpE=;
+        b=2V6hUMM979WF85WDbbBnLwIzEAWfheMSaNglPLrcnObxdyIiucLoJccbuqMl7VBteO
+         U8OX+/dzkIytby7fP0eM8JV71dv1MKmgpx1FGiBn+Z5mumxSubkF2sShSwuEpi5GWbPa
+         e6Lbz3XFTL4M9zOZmuiaxBMHVLTOqsgj6Zo1+rvEGcJa+EiH8oq1AKtFDrZlhY01g6FW
+         mnEQczOjakL8576wBcYPGwB6Jtg4f1PT/EPhx5JNOsBnbDJq+xk9nGjV4+vej51KzHij
+         ueaGzHwJyKLz86+wrK4XIJgvVDobdl/K0hOTV1iUUVcZPFx0OCA7sNlFbF2Qs/sRRO3J
+         iQyA==
+X-Gm-Message-State: AOAM531buhpOLMIwCK/u6Qqbo2MabhJSMHK9X3K4e4ANJMyenM4EtFs0
+        f7EADXtHKRRefGUUDyeVxssO3MGUVi2nNw==
+X-Google-Smtp-Source: ABdhPJxEK9LI51bWELabOBYCJnzIef2fBXg+KjRRsBev/Xoodp2x3vbp7O1m2shsCFCtodlNc4vWOA==
+X-Received: by 2002:a05:6102:c4b:: with SMTP id y11mr4040039vss.48.1635861737805;
+        Tue, 02 Nov 2021 07:02:17 -0700 (PDT)
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com. [209.85.222.54])
+        by smtp.gmail.com with ESMTPSA id u204sm415385vsu.6.2021.11.02.07.02.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Nov 2021 07:02:16 -0700 (PDT)
+Received: by mail-ua1-f54.google.com with SMTP id az37so9857264uab.13;
+        Tue, 02 Nov 2021 07:02:16 -0700 (PDT)
+X-Received: by 2002:a67:ee41:: with SMTP id g1mr13720887vsp.41.1635861736345;
+ Tue, 02 Nov 2021 07:02:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <922449db-73a7-efaf-52ef-d386edf77953@kernel.dk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20211027022223.183838-1-damien.lemoal@wdc.com>
+ <20211027022223.183838-4-damien.lemoal@wdc.com> <alpine.DEB.2.22.394.2111021130020.2311589@ramsan.of.borg>
+ <63c29948-24ac-1cc3-5c1a-1e5b82c9b19f@opensource.wdc.com>
+In-Reply-To: <63c29948-24ac-1cc3-5c1a-1e5b82c9b19f@opensource.wdc.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 2 Nov 2021 15:02:05 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVyUDp1YMkq7e7tu30L=7U7-WV-Ota5KdMddUivUzt50Q@mail.gmail.com>
+Message-ID: <CAMuHMdVyUDp1YMkq7e7tu30L=7U7-WV-Ota5KdMddUivUzt50Q@mail.gmail.com>
+Subject: Re: [PATCH v9 3/5] libata: support concurrent positioning ranges log
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        scsi <linux-scsi@vger.kernel.org>, linux-renesas@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 02, 2021 at 07:47:44AM -0600, Jens Axboe wrote:
-> On 11/2/21 7:35 AM, Ming Lei wrote:
-> > In case of shared tags and none io sched, batched completion still may
-> > be run into, and hctx->nr_active is accounted when getting driver tag,
-> > so it has to be updated in blk_mq_end_request_batch().
-> > 
-> > Otherwise, hctx->nr_active may become same with queue depth, then
-> > hctx_may_queue() always return false, then io hang is caused.
-> > 
-> > Fixes the issue by updating the counter in batched way.
-> > 
-> > Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > Fixes: f794f3351f26 ("block: add support for blk_mq_end_request_batch()")
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-mq.c | 15 +++++++++++++--
-> >  block/blk-mq.h | 12 +++++++++---
-> >  2 files changed, 22 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 07eb1412760b..0dbe75034f61 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -825,6 +825,7 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
-> >  	struct blk_mq_hw_ctx *cur_hctx = NULL;
-> >  	struct request *rq;
-> >  	u64 now = 0;
-> > +	int active = 0;
-> >  
-> >  	if (iob->need_ts)
-> >  		now = ktime_get_ns();
-> > @@ -846,16 +847,26 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
-> >  		rq_qos_done(rq->q, rq);
-> >  
-> >  		if (nr_tags == TAG_COMP_BATCH || cur_hctx != rq->mq_hctx) {
-> > -			if (cur_hctx)
-> > +			if (cur_hctx) {
-> > +				if (active)
-> > +					__blk_mq_sub_active_requests(cur_hctx,
-> > +							active);
-> >  				blk_mq_flush_tag_batch(cur_hctx, tags, nr_tags);
-> > +			}
-> >  			nr_tags = 0;
-> > +			active = 0;
-> >  			cur_hctx = rq->mq_hctx;
-> >  		}
-> >  		tags[nr_tags++] = rq->tag;
-> > +		if (rq->rq_flags & RQF_MQ_INFLIGHT)
-> > +			active++;
-> 
-> Are there any cases where either none or all of requests have the flag set, and
-> hence active == nr_tags?
+Hi Damien,
 
-none and BLK_MQ_F_TAG_QUEUE_SHARED, and Shinichiro only observed the
-issue on two NSs.
+On Tue, Nov 2, 2021 at 12:42 PM Damien Le Moal
+<damien.lemoal@opensource.wdc.com> wrote:
+> On 2021/11/02 19:40, Geert Uytterhoeven wrote:
+> > On Wed, 27 Oct 2021, Damien Le Moal wrote:
+> >> Add support to discover if an ATA device supports the Concurrent
+> >> Positioning Ranges data log (address 0x47), indicating that the device
+> >> is capable of seeking to multiple different locations in parallel using
+> >> multiple actuators serving different LBA ranges.
+> >>
+> >> Also add support to translate the concurrent positioning ranges log
+> >> into its equivalent Concurrent Positioning Ranges VPD page B9h in
+> >> libata-scsi.c.
+> >>
+> >> The format of the Concurrent Positioning Ranges Log is defined in ACS-5
+> >> r9.
+> >>
+> >> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> >
+> > Thanks for your patch, which is now commit fe22e1c2f705676a ("libata:
+> > support concurrent positioning ranges log") upstream.
+> >
+> > During resume from s2ram on Renesas Salvator-XS, I now see more scary
+> > messages than before:
+> >
+> >       ata1: link resume succeeded after 1 retries
+> >       ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+> >      +ata1.00: qc timeout (cmd 0x2f)
+> >      +ata1.00: Read log page 0x00 failed, Emask 0x4
+> >      +ata1.00: ATA Identify Device Log not supported
+> >      +ata1.00: failed to set xfermode (err_mask=0x40)
+> >       ata1: link resume succeeded after 1 retries
+> >       ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+> >      +ata1.00: ATA Identify Device Log not supported
+> >      +ata1.00: ATA Identify Device Log not supported
+> >       ata1.00: configured for UDMA/133
+> >
+> > I guess this is expected?
+>
+> Nope, it is not. The problem is actually not the concurrent positioning log, or
+> any other log, being supported or not.
+>
+> Notice the qc timeout ? On device scan after coming out of sleep, or even simply
+> doing a rmmod ahci+modprobe ahci, the read log commands issued during device
+> revalidate timeout fairly easily as they are issued while the drive is not
+> necessarilly fully restarted yet. These errors happen fairly easily due to the
+> command timeout setting in libata being too short, I think, for the "restart"
+> case. On a clean boot, they do not happen as longer timeouts are used in that case.
+>
+> I identified this problem recently while testing stuff: I was doing rmmod of ata
+> modules and then modprobe of newly compiled modules for tests and noticed these
+> timeouts. Increasing the timeout values, they disappear. I am however still
+> scratching my head about the best way to address this. Still digging about this
+> to first make sure this is really about timeouts being set too short.
 
+There's indeed something timing-related going on.  Sometimes I get
+during resume (s2idle or s2ram):
 
-Thanks,
-Ming
+    ata1.00: qc timeout (cmd 0x2f)
+    ata1.00: Read log page 0x00 failed, Emask 0x4
+    ata1.00: ATA Identify Device Log not supported
+    ata1.00: failed to set xfermode (err_mask=0x40)
+    ata1.00: limiting speed to UDMA/133:PIO3
+    ata1: link resume succeeded after 1 retries
+    ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+    ata1.00: NODEV after polling detection
+    ata1.00: revalidation failed (errno=-2)
+    ata1.00: disabled
+    ata1: link resume succeeded after 1 retries
+    ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+    sd 0:0:0:0: [sda] Start/Stop Unit failed: Result: hostbyte=0x04
+driverbyte=DRIVER_OK
+    sd 0:0:0:0: [sda] Read Capacity(16) failed: Result: hostbyte=0x04
+driverbyte=DRIVER_OK
+    sd 0:0:0:0: [sda] Sense not available.
+    sd 0:0:0:0: [sda] Read Capacity(10) failed: Result: hostbyte=0x04
+driverbyte=DRIVER_OK
+    sd 0:0:0:0: [sda] Sense not available.
+    sd 0:0:0:0: [sda] 0 512-byte logical blocks: (0 B/0 B)
+    sda: detected capacity change from 320173056 to 0
 
+after which the drive is no longer functional...
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
