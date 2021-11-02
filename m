@@ -2,113 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36631C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 12:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CD7C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 12:59:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EA2C6108F
-	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 12:59:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 207FD610A3
+	for <linux-block@archiver.kernel.org>; Tue,  2 Nov 2021 12:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231314AbhKBNBh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 09:01:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44421 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231340AbhKBNBh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Nov 2021 09:01:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635857942;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ap4rayfMy+LgBzDf4WHAGO+fWE9T54+/CMboo6Kyto4=;
-        b=DBQRYIIsvRdmW3ZgrMLuG+DOd1DYVP5IEsIG9yYWCv0UN8Vc9xEt1Qzp4DtI0xBw0EiljC
-        isb6wH6LLNqf+mcSESScVe9r/veP6Fd9los0zhpnGP5Sg5nHjU9GE3OZJy8xpjuwAM/ZFM
-        /mJqR8fcx1yUfub/sCXLvP408y/RPTI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-AukYeLysOsOb8aApGnWQtQ-1; Tue, 02 Nov 2021 08:59:01 -0400
-X-MC-Unique: AukYeLysOsOb8aApGnWQtQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B283E100B700;
-        Tue,  2 Nov 2021 12:58:59 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 379F95D740;
-        Tue,  2 Nov 2021 12:58:05 +0000 (UTC)
-Date:   Tue, 2 Nov 2021 20:58:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org,
+        id S231176AbhKBNCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 09:02:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230347AbhKBNBz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 09:01:55 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCC2C061714
+        for <linux-block@vger.kernel.org>; Tue,  2 Nov 2021 05:59:20 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id x9so14181595ilu.6
+        for <linux-block@vger.kernel.org>; Tue, 02 Nov 2021 05:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=iYiRp0l1uhYjvBkGrtc0hnMXWU1AiLYZRHqgAfjylr0=;
+        b=kcxt2J1mhW7sBpvFZNbRqM6hkrFV66WlENLfeuZmetnkPYCkQMHSFUdSug9x4+sPK8
+         peRB0nEwdDsXLa1WsvW5p6617nA8yXpp6EY6WNDLtMPSD2shExXn/GI1Tpn1wdIhhg++
+         AictJVJSoUCvSmqzlgvf4295rmRhVdsRGymy6MPWQVBhz7dr5k5CqSFmBxEi9u+FCrq3
+         evca0xlUbk0i6l3XrJwseCp2d7gHz/NhcwGopUuqpyXLzb6ye21VCnG9RntUM6UmFZVA
+         HUx5z9IWc4TwguqgKX8+/mstIQR5jqPuDVSV9e94QJ3Ydv9sJlWDYvWJBwcTjE2TFHnt
+         E+hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iYiRp0l1uhYjvBkGrtc0hnMXWU1AiLYZRHqgAfjylr0=;
+        b=vdbng6zkIuDHHxqe2hKoFEFfpFqVFyhemdXAHbBhRdu07J7QSweAP6MEO4CpYV5iHQ
+         zkOKCVic2ZqASEY82eNhx3RLtsnXViS4eu14TNw216ibghezT+f/Q6Oe0QCcnYm49MUx
+         YuzJzSJNxPdBk/NQzkqL4/WL4Wy+Negx4xhPzjzA3P1u3eoYD/V9Kfg16rT0ErbSMJJC
+         1lcKbJmep0Dkz9CRNwXF0chZytgB7EMcmtlhrZJSwVzYhk4z1lOgwW3JekR2K/4RQ58k
+         RXmmowJ7k+Av20wWOXRD/20AF+CmJQUOa5BAeLuRT+GYstSeeCWPJE+18XRv6U71uz2v
+         F0vw==
+X-Gm-Message-State: AOAM5335ePr+fFcUrhstNLAc04ZWRiUQ5xYGOGSMwe3jJFoM39f6gcZu
+        nNkwZl/LAHUccrW3B7SGLQdY9Q==
+X-Google-Smtp-Source: ABdhPJxvALWLpyGcrXCgpmlgX6E6EkmrZY0JmhIZnPbQeBAVBX9qvNHL5hCeTbm0c8VWV+BBzmukow==
+X-Received: by 2002:a05:6e02:e41:: with SMTP id l1mr20381671ilk.139.1635857960219;
+        Tue, 02 Nov 2021 05:59:20 -0700 (PDT)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id m2sm4904622iow.6.2021.11.02.05.59.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Nov 2021 05:59:19 -0700 (PDT)
+Subject: Re: [PATCH 2/3] scsi: make sure that request queue queiesce and
+ unquiesce balanced
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         linux-scsi@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
         dm-devel@redhat.com
-Subject: Re: [PATCH 2/3] scsi: make sure that request queue queiesce and
- unquiesce balanced
-Message-ID: <YYE12XJ66QWpr4Fo@T590>
 References: <20211021145918.2691762-1-ming.lei@redhat.com>
  <20211021145918.2691762-3-ming.lei@redhat.com>
  <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8cbc1be6-15a5-ed34-53f1-081a05025d34@kernel.dk>
+Date:   Tue, 2 Nov 2021 06:59:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <10c279f54ed0b24cb1ac0861f9a407e6b64f64da.camel@HansenPartnership.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi James,
-
-On Mon, Nov 01, 2021 at 09:43:27PM -0400, James Bottomley wrote:
+On 11/1/21 7:43 PM, James Bottomley wrote:
 > On Thu, 2021-10-21 at 22:59 +0800, Ming Lei wrote:
-> > For fixing queue quiesce race between driver and block layer(elevator
-> > switch, update nr_requests, ...), we need to support concurrent
-> > quiesce
-> > and unquiesce, which requires the two call balanced.
-> > 
-> > It isn't easy to audit that in all scsi drivers, especially the two
-> > may
-> > be called from different contexts, so do it in scsi core with one
-> > per-device
-> > bit flag & global spinlock, basically zero cost since request queue
-> > quiesce
-> > is seldom triggered.
-> > 
-> > Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> > Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue
-> > quiesce/unquiesce")
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/scsi/scsi_lib.c    | 45 ++++++++++++++++++++++++++++++----
-> > ----
-> >  include/scsi/scsi_device.h |  1 +
-> >  2 files changed, 37 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > index 51fcd46be265..414f4daf8005 100644
-> > --- a/drivers/scsi/scsi_lib.c
-> > +++ b/drivers/scsi/scsi_lib.c
-> > @@ -2638,6 +2638,40 @@ static int
-> > __scsi_internal_device_block_nowait(struct scsi_device *sdev)
-> >  	return 0;
-> >  }
-> >  
-> > +static DEFINE_SPINLOCK(sdev_queue_stop_lock);
-> > +
-> > +void scsi_start_queue(struct scsi_device *sdev)
-> > +{
-> > +	bool need_start;
-> > +	unsigned long flags;
-> > +
-> > +	spin_lock_irqsave(&sdev_queue_stop_lock, flags);
-> > +	need_start = sdev->queue_stopped;
-> > +	sdev->queue_stopped = 0;
-> > +	spin_unlock_irqrestore(&sdev_queue_stop_lock, flags);
-> > +
-> > +	if (need_start)
-> > +		blk_mq_unquiesce_queue(sdev->request_queue);
+>> For fixing queue quiesce race between driver and block layer(elevator
+>> switch, update nr_requests, ...), we need to support concurrent
+>> quiesce
+>> and unquiesce, which requires the two call balanced.
+>>
+>> It isn't easy to audit that in all scsi drivers, especially the two
+>> may
+>> be called from different contexts, so do it in scsi core with one
+>> per-device
+>> bit flag & global spinlock, basically zero cost since request queue
+>> quiesce
+>> is seldom triggered.
+>>
+>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+>> Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue
+>> quiesce/unquiesce")
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> ---
+>>  drivers/scsi/scsi_lib.c    | 45 ++++++++++++++++++++++++++++++----
+>> ----
+>>  include/scsi/scsi_device.h |  1 +
+>>  2 files changed, 37 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+>> index 51fcd46be265..414f4daf8005 100644
+>> --- a/drivers/scsi/scsi_lib.c
+>> +++ b/drivers/scsi/scsi_lib.c
+>> @@ -2638,6 +2638,40 @@ static int
+>> __scsi_internal_device_block_nowait(struct scsi_device *sdev)
+>>  	return 0;
+>>  }
+>>  
+>> +static DEFINE_SPINLOCK(sdev_queue_stop_lock);
+>> +
+>> +void scsi_start_queue(struct scsi_device *sdev)
+>> +{
+>> +	bool need_start;
+>> +	unsigned long flags;
+>> +
+>> +	spin_lock_irqsave(&sdev_queue_stop_lock, flags);
+>> +	need_start = sdev->queue_stopped;
+>> +	sdev->queue_stopped = 0;
+>> +	spin_unlock_irqrestore(&sdev_queue_stop_lock, flags);
+>> +
+>> +	if (need_start)
+>> +		blk_mq_unquiesce_queue(sdev->request_queue);
 > 
 > Well, this is a classic atomic pattern:
 > 
@@ -121,16 +136,13 @@ On Mon, Nov 01, 2021 at 09:43:27PM -0400, James Bottomley wrote:
 >    2. faster because a spinlock takes an exclusive line every time but the
 >       read to check the value can be in shared mode in cmpxchg
 >    3. it's just shorter and better code.
-
-You are right, I agree.
-
 > 
 > The only minor downside is queue_stopped now needs to be a u32.
 
-Yeah, that is the reason I don't take this atomic way since it needs to
-add one extra u32 into 'struct scsi_device'.
+Are you fine with the change as-is, or do you want it redone? I
+can drop the SCSI parts and just queue up the dm fix. Personally
+I think it'd be better to get it fixed upfront.
 
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
