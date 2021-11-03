@@ -2,164 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD51C43217
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 00:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E849C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 00:11:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD6BA60F02
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 00:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89A38610FD
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 00:11:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbhKCAEw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Nov 2021 20:04:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52465 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229960AbhKCAEv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Nov 2021 20:04:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635897735;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cqJQisP1QPS+4wMPSGYJMWn3HlqeTze3DoRoDxtXcVY=;
-        b=HREh8hWlhCgMqnmW/rKxDYygvwAt8SSNUhm4H8YMAx63BGkzY6M+DiHyuytBICRUvXaJd7
-        wrlLV9KA407LrIwk5Lr2aSi9c6oYdSBIBORSW92Es0R9hZzRB/xlpF5E0e5+UD+VE261vK
-        p01/+OTvkf6cX0p9W7AgLS9JPVJzJ60=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-bzhDjEpxNyW8kBJ_BBDKpQ-1; Tue, 02 Nov 2021 20:02:14 -0400
-X-MC-Unique: bzhDjEpxNyW8kBJ_BBDKpQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E769A8066EB;
-        Wed,  3 Nov 2021 00:02:09 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9128C60C0F;
-        Wed,  3 Nov 2021 00:01:49 +0000 (UTC)
-Date:   Wed, 3 Nov 2021 08:01:45 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Petr Mladek <pmladek@suse.com>, Miroslav Benes <mbenes@suse.cz>,
-        Julia Lawall <julia.lawall@inria.fr>,
+        id S232689AbhKCANl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Nov 2021 20:13:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34524 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232682AbhKCANk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Nov 2021 20:13:40 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5952DC061714;
+        Tue,  2 Nov 2021 17:11:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=yiusFCW+f2K0ALHpFvDau6vHV1OaeV9ZhqUB3iArawg=; b=H3i3P/paQQyo18OlORiZcA7r0B
+        +YeBijwe8hPcFbRYtNWNI45FDMMZfW/e+XSx3ky8cIP05TeFW7ANNvmd2mXLMMS1Hpd8Whbj/eFkR
+        YJ6ioeR4dr2sSK/1ZBz9e9oL4+vZ58EfniVNDcH6MOJpxCIDCJCdCT6gMEkUhPNykHGaUpKYFoabq
+        uRbBazNnswQdE+yh5dAF23euhaKmAjo8bP3mbyVGVyzuCH8O4220oZ8CgOWZ2loc663vkvM1HXMXJ
+        oShxcfv3/5JtGpMI5NgD+OVwGQzz98d/FK/iYltgZ8Sg2iZLeqC5rPjCc0JFrrlCa7XAjTTR8n4+B
+        oTCJo9mw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mi3rO-003aHh-An; Wed, 03 Nov 2021 00:10:34 +0000
+Date:   Tue, 2 Nov 2021 17:10:34 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Geoff Levand <geoff@infradead.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        minchan@kernel.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        tglx@linutronix.de, keescook@chromium.org, rostedt@goodmis.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH v8 11/12] zram: fix crashes with cpu hotplug multistate
-Message-ID: <YYHRaYlglX84lxB6@T590>
-References: <alpine.LSU.2.21.2110200835490.26817@pobox.suse.cz>
- <YW/KEsfWJMIPnz76@T590>
- <alpine.LSU.2.21.2110201014400.26817@pobox.suse.cz>
- <YW/q70dLyF+YudyF@T590>
- <YXfA0jfazCPDTEBw@alley>
- <YXgguuAY5iEUIV0u@T590>
- <YXg0dFZ+6qHw7d0g@bombadil.infradead.org>
- <alpine.LSU.2.21.2110271343290.3655@pobox.suse.cz>
- <YYFYFrnhwPiyOtst@alley>
- <YYFmiAAYIA2X7Uv5@bombadil.infradead.org>
+        Paul Mackerras <paulus@samba.org>, Jim Paris <jim@jtan.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>, senozhatsky@chromium.org,
+        Richard Weinberger <richard@nod.at>, miquel.raynal@bootlin.com,
+        vigneshr@ti.com, Vishal L Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Weiny, Ira" <ira.weiny@intel.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-mtd@lists.infradead.org,
+        Linux NVDIMM <nvdimm@lists.linux.dev>,
+        linux-nvme@lists.infradead.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 06/13] nvdimm/blk: avoid calling del_gendisk() on early
+ failures
+Message-ID: <YYHTejXKvsGoDlOa@bombadil.infradead.org>
+References: <20211015235219.2191207-1-mcgrof@kernel.org>
+ <20211015235219.2191207-7-mcgrof@kernel.org>
+ <CAPcyv4j+xLT=5RUodHWgnPjNq6t5OcmX1oM2zK2ML0U+OS_16Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YYFmiAAYIA2X7Uv5@bombadil.infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CAPcyv4j+xLT=5RUodHWgnPjNq6t5OcmX1oM2zK2ML0U+OS_16Q@mail.gmail.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 02, 2021 at 09:25:44AM -0700, Luis Chamberlain wrote:
-> On Tue, Nov 02, 2021 at 04:24:06PM +0100, Petr Mladek wrote:
-> > On Wed 2021-10-27 13:57:40, Miroslav Benes wrote:
-> > > >From my perspective, it is quite easy to get it wrong due to either a lack 
-> > > of generic support, or missing rules/documentation. So if this thread 
-> > > leads to "do not share locks between a module removal and a sysfs 
-> > > operation" strict rule, it would be at least something. In the same 
-> > > manner as Luis proposed to document try_module_get() expectations.
-> > 
-> > The rule "do not share locks between a module removal and a sysfs
-> > operation" is not clear to me.
+On Fri, Oct 15, 2021 at 05:13:48PM -0700, Dan Williams wrote:
+> On Fri, Oct 15, 2021 at 4:53 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >
+> > If nd_integrity_init() fails we'd get del_gendisk() called,
+> > but that's not correct as we should only call that if we're
+> > done with device_add_disk(). Fix this by providing unwinding
+> > prior to the devm call being registered and moving the devm
+> > registration to the very end.
+> >
+> > This should fix calling del_gendisk() if nd_integrity_init()
+> > fails. I only spotted this issue through code inspection. It
+> > does not fix any real world bug.
+> >
 > 
-> That's exactly it. It *is* not. The test_sysfs selftest will hopefully
-> help with this. But I'll wait to take a final position on whether or not
-> a generic fix should be merged until the Coccinelle patch which looks
-> for all uses cases completes.
-> 
-> So I think that once that Coccinelle hunt is done for the deadlock, we
-> should also remind folks of the potential deadlock and some of the rules
-> you mentioned below so that if we take a position that we don't support
-> this, we at least inform developers why and what to avoid. If Coccinelle
-> finds quite a bit of cases, then perhaps evaluating the generic fix
-> might be worth evaluating.
-> 
-> > IMHO, there are the following rules:
-> > 
-> > 1. rule: kobject_del() or kobject_put() must not be called under a lock that
-> > 	 is used by store()/show() callbacks.
-> > 
-> >    reason: kobject_del() waits until the sysfs interface is destroyed.
-> > 	 It has to wait until all store()/show() callbacks are finished.
-> 
-> Right, this is what actually started this entire conversation.
-> 
-> Note that as Ming pointed out, the generic kernfs fix I proposed would
-> only cover the case when kobject_del() ends up being called on module
-> exit, so it would not cover the cases where perhaps kobject_del() might
-> be called outside of module exit, and so the cope of the possible
-> deadlock then increases in scope.
-> 
-> Likewise, the Coccinelle hunt I'm trying would only cover the module
-> exit case. I'm a bit of afraid of the complexity of a generic hunt
-> as expresed in rule 1.
+> Just fyi, I'm preparing patches to delete this driver completely as it
+> is unused by any shipping platform. I hope to get that removal into
+> v5.16.
 
-Question is that why one shared lock is required between kobject_del()
-and its show()/store(), both zram and livepatch needn't that. Is it
-one common usage?
+Curious if are you going to nuking it on v5.16? Otherwise it would stand
+in the way of the last few patches to add __must_check for the final
+add_disk() error handling changes.
 
-> 
-> > 
-> > 2. rule: kobject_del()/kobject_put() must not be called from the
-> > 	related store() callbacks.
-> > 
-> >    reason: same as in 1st rule.
-> 
-> Sensible corollary.
-> 
-> Given tha the exact kobjet_del() / kobject_put() which must not be
-> called from the respective sysfs ops depends on which kobject is
-> underneath the device for which the sysfs ops is being created,
-> it would make this hunt in Coccinelle a bit tricky. My current iteration
-> of a coccinelle hunt cheats and looks at any sysfs looking op and
-> ensures a module exit exists.
-
-Actually kernfs/sysfs provides interface for supporting deleting
-kobject/attr from the attr's show()/store(), see example of
-sdev_store_delete(), and the livepatch example:
-
-https://lore.kernel.org/lkml/20211102145932.3623108-4-ming.lei@redhat.com/
-
-> 
-> > 3. rule: module_exit() must wait until all release() callbacks are called
-> > 	 when kobject are static.
-> > 
-> >    reason: kobject_put() must be called to clean up internal
-> > 	dependencies. The clean up might be done asynchronously
-> > 	and need access to the kobject structure.
-> 
-> This might be an easier rule to implement a respective Coccinelle rule
-> for.
-
-If kobject_del() is done in module_exit() or before module_exit(),
-kobject should have been freed in module_exit() via kobject_put().
-
-But yes, it can be asynchronously because of CONFIG_DEBUG_KOBJECT_RELEASE,
-seems like one real issue.
-
-
-Thanks,
-Ming
-
+  Luis
