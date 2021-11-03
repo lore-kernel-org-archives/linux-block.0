@@ -2,94 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C039DC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CE1C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:07:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A95EE60F02
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:07:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 459AA60F39
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:07:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232638AbhKCQKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 12:10:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47962 "EHLO mail.kernel.org"
+        id S232815AbhKCQKK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 12:10:10 -0400
+Received: from verein.lst.de ([213.95.11.211]:60110 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232495AbhKCQKC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Nov 2021 12:10:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A3ACF60187;
-        Wed,  3 Nov 2021 16:07:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635955645;
-        bh=HI1d8Ki7XHeU436KYocWDREMb6YuJHmjxGeSPjBNdn0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gROgrH2o7fIf/Z8BC3P3I7jIaV+Ed06V8JUvCtn3ra7zgcQpk+ktH/AJ5JTPHTnUI
-         yX7MmaxdR6SS/thfSYpjLJ0oK8nUEPKaC5pN+HNr9LeRAQ4sNnJXNxTT76fNBg9fpZ
-         bJDbosWJTgMD6uPR+jEVwhjZmxtHn52LrG4tyAEL4/rsYr27l8vA3prclkgl8q8Xge
-         gyDDM1mAPifTl+/585DqfrIdYmzh4nRfAOZV6fV+O84fWEtNtqNx8DaA7D35ces7eq
-         PDPmiNd3OwRAz/DPEUXkgwlZAbvR7LbwWrDhaR8E5gZGhxKI2Y8S2RY07UJ19lH4vl
-         n6Yo+34QE2ngA==
-Date:   Wed, 3 Nov 2021 09:07:25 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 21/21] xfs: Support multi-page folios
-Message-ID: <20211103160725.GN24307@magnolia>
-References: <20211101203929.954622-1-willy@infradead.org>
- <20211101203929.954622-22-willy@infradead.org>
+        id S232799AbhKCQKH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Nov 2021 12:10:07 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CE53C68AFE; Wed,  3 Nov 2021 17:07:28 +0100 (CET)
+Date:   Wed, 3 Nov 2021 17:07:28 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, hch@lst.de, penguin-kernel@i-love.sakura.ne.jp,
+        dan.j.williams@intel.com, vishal.l.verma@intel.com,
+        dave.jiang@intel.com, ira.weiny@intel.com, richard@nod.at,
+        miquel.raynal@bootlin.com, vigneshr@ti.com, efremov@linux.com,
+        song@kernel.org, martin.petersen@oracle.com, hare@suse.de,
+        jack@suse.cz, ming.lei@redhat.com, tj@kernel.org,
+        linux-mtd@lists.infradead.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 09/13] block/sunvdc: add error handling support for
+ add_disk()
+Message-ID: <20211103160728.GI31562@lst.de>
+References: <20211103122157.1215783-1-mcgrof@kernel.org> <20211103122157.1215783-10-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211101203929.954622-22-willy@infradead.org>
+In-Reply-To: <20211103122157.1215783-10-mcgrof@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 01, 2021 at 08:39:29PM +0000, Matthew Wilcox (Oracle) wrote:
-> Now that iomap has been converted, XFS is multi-page folio safe.
-> Indicate to the VFS that it can now create multi-page folios for XFS.
+On Wed, Nov 03, 2021 at 05:21:53AM -0700, Luis Chamberlain wrote:
+> We never checked for errors on add_disk() as this function
+> returned void. Now that this is fixed, use the shiny new
+> error handling.
 > 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> We re-use the same free tag call, so we also add a label for
+> that as well.
 
-Provisional
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Looks good,
 
-...assuming you've run generic/521 and generic/522 (fsx) and generic/476
-(fsstress) through the grinder for several days?
-
-And just for laughs, could you run those three (for an hour or two) with
-
-MKFS_OPTIONS='-m reflink=0,rmapbt=0 -d rtinherit=1 -r extsize=28k,rtdev=/dev/XXX'
-
-just to see how well multipage folios deal with 4k blocks allocated in
-chunks of 28k on the realtime device?  Pretty please? :D
-
---D
-
-> ---
->  fs/xfs/xfs_icache.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/fs/xfs/xfs_icache.c b/fs/xfs/xfs_icache.c
-> index f2210d927481..804507c82455 100644
-> --- a/fs/xfs/xfs_icache.c
-> +++ b/fs/xfs/xfs_icache.c
-> @@ -87,6 +87,7 @@ xfs_inode_alloc(
->  	/* VFS doesn't initialise i_mode or i_state! */
->  	VFS_I(ip)->i_mode = 0;
->  	VFS_I(ip)->i_state = 0;
-> +	mapping_set_large_folios(VFS_I(ip)->i_mapping);
->  
->  	XFS_STATS_INC(mp, vn_active);
->  	ASSERT(atomic_read(&ip->i_pincount) == 0);
-> @@ -336,6 +337,7 @@ xfs_reinit_inode(
->  	inode->i_rdev = dev;
->  	inode->i_uid = uid;
->  	inode->i_gid = gid;
-> +	mapping_set_large_folios(inode->i_mapping);
->  	return error;
->  }
->  
-> -- 
-> 2.33.0
-> 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
