@@ -2,152 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB4EC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 14:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD69C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 14:57:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB3EE60EB4
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 14:26:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1A3960FC4
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 14:57:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231590AbhKCO31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 10:29:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57672 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231464AbhKCO31 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 10:29:27 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D36C061203
-        for <linux-block@vger.kernel.org>; Wed,  3 Nov 2021 07:26:51 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id l7-20020a0568302b0700b0055ae988dcc8so533503otv.12
-        for <linux-block@vger.kernel.org>; Wed, 03 Nov 2021 07:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=exiSlzVIncQIxFBUT8HCr0towS1NwDCfsCiYPfWjIV4=;
-        b=5zZnZN0IwmGLGcc1nkWXBld+SdMjKgun/CfnAwspWkUGwnO2+/3QeF6MyRa1oFdet9
-         GyBLxYdoKLDD7QPhj20+i/AuECXLF1RftDB0pcJkIdH4D7CScNAvWPBXCoURJ0X4IHcK
-         0jO77q4cff3GIJ9qCZNVfVFEbfvsLRvWFt+ziY6XQdbD++A+3hGb55tO30ENWR7z0+hm
-         7chiWgLLM+cWbA6TT6aeqelQ1qtgnu+Qj0BKUg3z3LWNsxpMtvnkA93W/zf+kmkFvggl
-         s/6rWWJ2/auQb3TPfcNkKipxU0mxHxzibLaW4KiU3F6ykfkwUGnTTt8VszpnOb/l+yoL
-         JOVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=exiSlzVIncQIxFBUT8HCr0towS1NwDCfsCiYPfWjIV4=;
-        b=ZIWvw17q2SkmCvyezH3/CZoC0/nWD9HFZBeA37bQ2nQrETQ7bxEpI5O49smZLYdSAS
-         HrrwNoPaIEbL7qyVAps6o1qU7n4XclNMo32JuQGw448KZIJYv8yVSFQeXyiZOpyScufW
-         CH+LEMgcjpIyxmki1cffpCKwCFmBLL9xqxfyH60JkPRm/wQHFuKAI/idA98MjY2zUUxr
-         NnnOrT8d8cRr2jRNf15a1ZInF1qo/1FuoHuz/onVETDdA6TpHxrquxDdmNN6mhbMnIkF
-         /+W9G09Yabp88kG7vxqtB8oazdlPRYLz9K+d8qNxheu9Lp0ES25s5j/mZkVvP/dF4Vhw
-         Nvww==
-X-Gm-Message-State: AOAM530vHmnDX3x/KjanEIxytCSEYnATWHkbOkGhiomd9cJGdg0Btbdb
-        lxuXyXOh/MvoOSFRQ2YwRpkdOQ==
-X-Google-Smtp-Source: ABdhPJxbSPPeaPKn3z/FwQEVmXU2PePgeamR1u/tq03bE12VQT3O1DlMtDzlZtvDZX2o9hDHIlldQg==
-X-Received: by 2002:a9d:6a4d:: with SMTP id h13mr17879177otn.293.1635949610229;
-        Wed, 03 Nov 2021 07:26:50 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id a8sm567130otr.3.2021.11.03.07.26.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Nov 2021 07:26:49 -0700 (PDT)
-Subject: Re: [bug report] WARNING: CPU: 1 PID: 1386 at
- block/blk-mq-sched.c:432 blk_mq_sched_insert_request+0x54/0x178
+        id S230132AbhKCPAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 11:00:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:43498 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229946AbhKCPAc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Nov 2021 11:00:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635951476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LDHCvF9JXT/8jTOqvQCcp1l7Mgf1eNK7gPBy8xcyz3o=;
+        b=FC8IVLDT+rnzILCaASM0iTqL4/vMXk2xObQAYSC7nLrQV2KH73KAgyoOYHOCoWbn2LFsXd
+        kA1Vbyk4WaO3aUCJmW6OVUX1DQfTBrLPC50ucLPEhbddDHyosSy8jTJINzwYrt2m1lmlrQ
+        BPEdOG1w+fy8O85rfbSNsZ+SoUcKiQc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-K2rIGKLxPOmJ_8elFrekpQ-1; Wed, 03 Nov 2021 10:57:54 -0400
+X-MC-Unique: K2rIGKLxPOmJ_8elFrekpQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A05611235AA1;
+        Wed,  3 Nov 2021 14:57:53 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D842479449;
+        Wed,  3 Nov 2021 14:57:05 +0000 (UTC)
+Date:   Wed, 3 Nov 2021 22:57:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Steffen Maier <maier@linux.ibm.com>,
+Cc:     Jens Axboe <axboe@kernel.dk>, Steffen Maier <maier@linux.ibm.com>,
         linux-block <linux-block@vger.kernel.org>,
         Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
+        linux-scsi <linux-scsi@vger.kernel.org>, ming.lei@redhat.com
+Subject: Re: [bug report] WARNING: CPU: 1 PID: 1386 at
+ block/blk-mq-sched.c:432 blk_mq_sched_insert_request+0x54/0x178
+Message-ID: <YYKjPIoMR04HrcWp@T590>
 References: <YYIHXGSb2O5va0vA@T590>
  <85F2E9AC-385F-4BCA-BD3C-7A093442F87F@kernel.dk>
  <733e1dcd-36a1-903e-709a-5ebe5f491564@kernel.dk>
  <CAHj4cs8U-Tboc-i-ZpK2-7euPZNsHja_6SWs6Ap0ywddStLC_A@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8fc1ed4c-457e-19f8-50ac-328067644e21@kernel.dk>
-Date:   Wed, 3 Nov 2021 08:26:49 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAHj4cs8U-Tboc-i-ZpK2-7euPZNsHja_6SWs6Ap0ywddStLC_A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHj4cs8U-Tboc-i-ZpK2-7euPZNsHja_6SWs6Ap0ywddStLC_A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/3/21 7:59 AM, Yi Zhang wrote:
+On Wed, Nov 03, 2021 at 09:59:02PM +0800, Yi Zhang wrote:
 > On Wed, Nov 3, 2021 at 7:59 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 11/2/21 9:54 PM, Jens Axboe wrote:
->>> On Nov 2, 2021, at 9:52 PM, Ming Lei <ming.lei@redhat.com> wrote:
->>>>
->>>> ﻿On Tue, Nov 02, 2021 at 09:21:10PM -0600, Jens Axboe wrote:
->>>>>> On 11/2/21 8:21 PM, Yi Zhang wrote:
->>>>>>>>
->>>>>>>> Can either one of you try with this patch? Won't fix anything, but it'll
->>>>>>>> hopefully shine a bit of light on the issue.
->>>>>>>>
->>>>>> Hi Jens
->>>>>>
->>>>>> Here is the full log:
->>>>>
->>>>> Thanks! I think I see what it could be - can you try this one as well,
->>>>> would like to confirm that the condition I think is triggering is what
->>>>> is triggering.
->>>>>
->>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>> index 07eb1412760b..81dede885231 100644
->>>>> --- a/block/blk-mq.c
->>>>> +++ b/block/blk-mq.c
->>>>> @@ -2515,6 +2515,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>>>>    if (plug && plug->cached_rq) {
->>>>>        rq = rq_list_pop(&plug->cached_rq);
->>>>>        INIT_LIST_HEAD(&rq->queuelist);
->>>>> +        WARN_ON_ONCE(q->elevator && !(rq->rq_flags & RQF_ELV));
->>>>> +        WARN_ON_ONCE(!q->elevator && (rq->rq_flags & RQF_ELV));
->>>>>    } else {
->>>>>        struct blk_mq_alloc_data data = {
->>>>>            .q        = q,
->>>>> @@ -2535,6 +2537,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>>>>                bio_wouldblock_error(bio);
->>>>>            goto queue_exit;
->>>>>        }
->>>>> +        WARN_ON_ONCE(q->elevator && !(rq->rq_flags & RQF_ELV));
->>>>> +        WARN_ON_ONCE(!q->elevator && (rq->rq_flags & RQF_ELV));
->>>>
->>>> Hello Jens,
->>>>
->>>> I guess the issue could be the following code run without grabbing
->>>> ->q_usage_counter from blk_mq_alloc_request() and blk_mq_alloc_request_hctx().
->>>>
->>>> .rq_flags       = q->elevator ? RQF_ELV : 0,
->>>>
->>>> then elevator is switched to real one from none, and check on q->elevator
->>>> becomes not consistent.
->>>
->>> Indeed, that’s where I was going with this. I have a patch, testing it
->>> locally but it’s getting late. Will send it out tomorrow. The nice
->>> benefit is that it allows dropping the weird ref get on plug flush,
->>> and batches getting the refs as well.
->>
->> Yi/Steffen, can you try pulling this into your test kernel:
->>
->> git://git.kernel.dk/linux-block for-next
->>
->> and see if it fixes the issue for you. Thanks!
+> >
+> > On 11/2/21 9:54 PM, Jens Axboe wrote:
+> > > On Nov 2, 2021, at 9:52 PM, Ming Lei <ming.lei@redhat.com> wrote:
+> > >>
+> > >> ﻿On Tue, Nov 02, 2021 at 09:21:10PM -0600, Jens Axboe wrote:
+> > >>>> On 11/2/21 8:21 PM, Yi Zhang wrote:
+> > >>>>>>
+> > >>>>>> Can either one of you try with this patch? Won't fix anything, but it'll
+> > >>>>>> hopefully shine a bit of light on the issue.
+> > >>>>>>
+> > >>>> Hi Jens
+> > >>>>
+> > >>>> Here is the full log:
+> > >>>
+> > >>> Thanks! I think I see what it could be - can you try this one as well,
+> > >>> would like to confirm that the condition I think is triggering is what
+> > >>> is triggering.
+> > >>>
+> > >>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > >>> index 07eb1412760b..81dede885231 100644
+> > >>> --- a/block/blk-mq.c
+> > >>> +++ b/block/blk-mq.c
+> > >>> @@ -2515,6 +2515,8 @@ void blk_mq_submit_bio(struct bio *bio)
+> > >>>    if (plug && plug->cached_rq) {
+> > >>>        rq = rq_list_pop(&plug->cached_rq);
+> > >>>        INIT_LIST_HEAD(&rq->queuelist);
+> > >>> +        WARN_ON_ONCE(q->elevator && !(rq->rq_flags & RQF_ELV));
+> > >>> +        WARN_ON_ONCE(!q->elevator && (rq->rq_flags & RQF_ELV));
+> > >>>    } else {
+> > >>>        struct blk_mq_alloc_data data = {
+> > >>>            .q        = q,
+> > >>> @@ -2535,6 +2537,8 @@ void blk_mq_submit_bio(struct bio *bio)
+> > >>>                bio_wouldblock_error(bio);
+> > >>>            goto queue_exit;
+> > >>>        }
+> > >>> +        WARN_ON_ONCE(q->elevator && !(rq->rq_flags & RQF_ELV));
+> > >>> +        WARN_ON_ONCE(!q->elevator && (rq->rq_flags & RQF_ELV));
+> > >>
+> > >> Hello Jens,
+> > >>
+> > >> I guess the issue could be the following code run without grabbing
+> > >> ->q_usage_counter from blk_mq_alloc_request() and blk_mq_alloc_request_hctx().
+> > >>
+> > >> .rq_flags       = q->elevator ? RQF_ELV : 0,
+> > >>
+> > >> then elevator is switched to real one from none, and check on q->elevator
+> > >> becomes not consistent.
+> > >
+> > > Indeed, that’s where I was going with this. I have a patch, testing it
+> > > locally but it’s getting late. Will send it out tomorrow. The nice
+> > > benefit is that it allows dropping the weird ref get on plug flush,
+> > > and batches getting the refs as well.
+> >
+> > Yi/Steffen, can you try pulling this into your test kernel:
+> >
+> > git://git.kernel.dk/linux-block for-next
+> >
+> > and see if it fixes the issue for you. Thanks!
 > 
-> It still can be reproduced with the latest linux-block/for-next, here
-> is the log
+> It still can be reproduced with the latest linux-block/for-next, here is the log
 > 
-> fab2914e46eb (HEAD, new/for-next) Merge branch 'for-5.16/drivers' into
-> for-next
+> fab2914e46eb (HEAD, new/for-next) Merge branch 'for-5.16/drivers' into for-next
 
-Funky! Thanks for re-testing, I guess I need to think even harder about
-this. Can't seem to reproduce it here at all, which makes it a bit
-harder to poke at.
+Hi Yi,
 
--- 
-Jens Axboe
+Please try the following change:
+
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e1e64964a31b..eb634a9c61ff 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -494,7 +494,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		.q		= q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
+-		.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 		.nr_tags	= 1,
+ 	};
+ 	struct request *rq;
+@@ -504,6 +503,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
++	data.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 	rq = __blk_mq_alloc_requests(&data);
+ 	if (!rq)
+ 		goto out_queue_exit;
+@@ -524,7 +524,6 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 		.q		= q,
+ 		.flags		= flags,
+ 		.cmd_flags	= op,
+-		.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 		.nr_tags	= 1,
+ 	};
+ 	u64 alloc_time_ns = 0;
+@@ -551,6 +550,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
++	data.rq_flags	= q->elevator ? RQF_ELV : 0,
+ 
+ 	/*
+ 	 * Check if the hardware context is actually mapped to anything.
+
+Thanks,
+Ming
 
