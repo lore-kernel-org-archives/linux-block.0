@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C73C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 18:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F1AC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 18:13:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00C7B61058
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 18:13:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C37761058
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 18:13:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbhKCSPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 14:15:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53738 "EHLO
+        id S231392AbhKCSQJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 14:16:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbhKCSPu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 14:15:50 -0400
+        with ESMTP id S231345AbhKCSQE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 14:16:04 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6558C061205;
-        Wed,  3 Nov 2021 11:13:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289E4C061714;
+        Wed,  3 Nov 2021 11:13:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=pg4gmNh1LJ/nJ2qn9IZ5B5DKTs052Xo7JbSGIRJ4CBY=; b=UlxwZ9krS4KJ4r4Dqasl2+CTo0
-        EfsyopjYdRXZgXXR96x/6AACGYVghBcfIH/fmLoEKO2DfnkswXtYopRhHsRN87qJjksj+VznQVo+L
-        aqt1VtsEjrtlXz4LeHtElYrtctCpYpJ/O4+Q/OTpnqggyuMRIrHSh7rayGaAsLbla4a64+pj/h8C7
-        kana7ZpQR3xzUvvlPNN2LJIlljpJ45Q+7RXedSTZsX+VI80SaUC9/HwxpGBSG3kRonbSZHdjDR3Ap
-        vqVD24mVtQwraNDgLfpYWDqNrUQJUbHrpcK1We7cBimN1yIg9I4q2PYFdpJzLAjMPT5RIcZ2Xl4zv
-        kS1FH0zA==;
+        bh=7+hD9NoEwudZFuVmk78ozQWIhfst9nLgIC7pZG4lA28=; b=yDjLlasRgH999cIdBWjfzGuZbW
+        B3XBm7aKgSPbukHcGcr7RzETO/d3SVEFhPofIkpxrYjBIY0BdyGALIg1ydwPaK8bdjrnfDOagXmAd
+        jgpq1vYIKoDtYLA75wWO9HkV4JCSN65NZPn9rpQiPkjmZSa57AhF8m95lOPyA5dXOho1JEbn5VkXZ
+        iIp/oNrKA9pgi5ZBBQSPHR8lOlp9ss+kRZJp7McUbYD75D9j8A1Wyfx+RcurggTKL9VkI8X86XAhY
+        czFjXnL6OWFkNGriWDtFCoTIz1qvY55Ok7ebNwzjr0v7pMu6lKEOFns2gjg5691qhhNCH3GIloQ0Z
+        T5CGZQpw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1miKku-0068XR-1B; Wed, 03 Nov 2021 18:13:00 +0000
+        id 1miKkt-0068XJ-Tc; Wed, 03 Nov 2021 18:12:59 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, hch@lst.de, penguin-kernel@i-love.sakura.ne.jp,
         dan.j.williams@intel.com, vishal.l.verma@intel.com,
@@ -39,9 +39,9 @@ To:     axboe@kernel.dk, hch@lst.de, penguin-kernel@i-love.sakura.ne.jp,
 Cc:     linux-mtd@lists.infradead.org, linux-scsi@vger.kernel.org,
         linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 4/4] block: add __must_check for *add_disk*() callers
-Date:   Wed,  3 Nov 2021 11:12:58 -0700
-Message-Id: <20211103181258.1462704-5-mcgrof@kernel.org>
+Subject: [PATCH v4 2/4] ataflop: address add_disk() error handling on probe
+Date:   Wed,  3 Nov 2021 11:12:56 -0700
+Message-Id: <20211103181258.1462704-3-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211103181258.1462704-1-mcgrof@kernel.org>
 References: <20211103181258.1462704-1-mcgrof@kernel.org>
@@ -52,57 +52,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we have done a spring cleaning on all drivers and added
-error checking / handling, let's keep it that way and ensure
-no new drivers fail to stick with it.
+We need to cleanup resources on the probe() callback registered
+with __register_blkdev(), now that add_disk() error handling is
+supported. Address this.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/genhd.c         | 6 +++---
- include/linux/genhd.h | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/block/ataflop.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 2f5b7e24e88a..2263f7862241 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -394,8 +394,8 @@ static void disk_scan_partitions(struct gendisk *disk)
-  * This function registers the partitioning information in @disk
-  * with the kernel.
-  */
--int device_add_disk(struct device *parent, struct gendisk *disk,
--		     const struct attribute_group **groups)
-+int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups)
- 
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index 170dd193cef6..e981b351f37e 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -2012,6 +2012,7 @@ static void ataflop_probe(dev_t dev)
  {
- 	struct device *ddev = disk_to_dev(disk);
-@@ -542,7 +542,7 @@ int device_add_disk(struct device *parent, struct gendisk *disk,
- out_free_ext_minor:
- 	if (disk->major == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(disk->first_minor);
--	return WARN_ON_ONCE(ret); /* keep until all callers handle errors */
-+	return ret;
- }
- EXPORT_SYMBOL(device_add_disk);
+ 	int drive = MINOR(dev) & 3;
+ 	int type  = MINOR(dev) >> 2;
++	int err = 0;
  
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 59eabbc3a36b..f7d6810e68b3 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -205,9 +205,9 @@ static inline dev_t disk_devt(struct gendisk *disk)
- void disk_uevent(struct gendisk *disk, enum kobject_action action);
- 
- /* block/genhd.c */
--int device_add_disk(struct device *parent, struct gendisk *disk,
--		const struct attribute_group **groups);
--static inline int add_disk(struct gendisk *disk)
-+int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups);
-+static inline int __must_check add_disk(struct gendisk *disk)
- {
- 	return device_add_disk(NULL, disk, NULL);
+ 	if (type)
+ 		type--;
+@@ -2019,11 +2020,20 @@ static void ataflop_probe(dev_t dev)
+ 	if (drive >= FD_MAX_UNITS || type >= NUM_DISK_MINORS)
+ 		return;
+ 	if (!unit[drive].disk[type]) {
+-		if (ataflop_alloc_disk(drive, type) == 0) {
+-			add_disk(unit[drive].disk[type]);
+-			unit[drive].registered[type] = true;
++		err = ataflop_alloc_disk(drive, type);
++		if (err == 0) {
++			err = add_disk(unit[drive].disk[type]);
++			if (err)
++				goto err_out;
++			else
++				unit[drive].registered[type] = true;
+ 		}
+ 	}
++	return;
++
++err_out:
++	blk_cleanup_disk(unit[drive].disk[type]);
++	unit[drive].disk[type] = NULL;
  }
+ 
+ static void atari_floppy_cleanup(void)
 -- 
 2.33.0
 
