@@ -2,97 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAB4C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 21:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C989AC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 21:47:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6222D610A8
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 21:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA37061108
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 21:47:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230198AbhKCVny (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 17:43:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbhKCVnx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 17:43:53 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FEF6C061714;
-        Wed,  3 Nov 2021 14:41:16 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id s19-20020a056830125300b0055ad9673606so4213142otp.0;
-        Wed, 03 Nov 2021 14:41:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Aw/gEqUH4lCNeAQ5cpXRMPQZYEQ427CSvFShVqQiYz4=;
-        b=UFhD7yFOLohYb7ltHU4wZ8LhbZyhE4O6RIztyk3k9+uDl0nxfoMRYwBZER1Zvo54NE
-         U3ENN8JdAiXe04dEprIp5huZ6VkyDOARyIqVNkVyz1i+XcYuah3dT5rxYhYRS5esvzDv
-         +b01jUkNP6mpHJBlYAC0UpQgBGqgNXvLQ6XxuMEtYCVAkaAIbw10BBoneqGDGet8IxHW
-         gOZ9ZfqbnrFtxFN6FTebQ1UFI2xiCbgOl1nkNihDGvlOmwMCnm7M09WOAT6MBdHUzhx7
-         RPvj/nvOIcAEwAp6OWEnriqM3gY9/q6H3O4DetY+aBKbmsYC3M61O06ywWcW6ZurAcxw
-         I89w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=Aw/gEqUH4lCNeAQ5cpXRMPQZYEQ427CSvFShVqQiYz4=;
-        b=QVOx0wE1eqNZIh6qIo+55qnNQVFqlUUQoARqheSksxYKzn3Q4+wHNRn6CfSw6VuGrx
-         uu5qyNzAV6rzgzTsUKSjZfmMrNiwOnlCLbTeXCcLbeXIcwZ3gGqpS8CdojZ34RwmEQTv
-         +r20OhqO8EBRxg+akw2fAgnWE+VZil2CZf0Y0wgyutO6ggctsBH+dkkVIF+TQqKjgSFr
-         POwsDvbxWjmFKDNDk9dfmnkxoKCn5K0Y85PJSElK6ToAEBFAcYbsREodHKbWpyZSP1AV
-         JaqRuVevowMD7fLk1HIsb47Q0JitLqYxC3wL+NxgTVdDu4nyeZYQwd2o7dOXfO7B6VG8
-         mFcA==
-X-Gm-Message-State: AOAM531XVLM8kReM9sINWP0SZVSxxmY3/in09MxtuUOFW8j4WLkXGB7n
-        PGa6r26Hxvx2Sj0XNhP2ayc=
-X-Google-Smtp-Source: ABdhPJwaLFyVJbiS7LNNkYZpkEJ6gwfP12GZJNtdBQKrzxaKRUBP9Ug39JsBXj5SYi0xJyGVIqd1tQ==
-X-Received: by 2002:a05:6830:1ad5:: with SMTP id r21mr35294027otc.192.1635975675462;
-        Wed, 03 Nov 2021 14:41:15 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id t12sm912756oth.21.2021.11.03.14.41.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 14:41:14 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Wed, 3 Nov 2021 14:41:13 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
+        id S230070AbhKCVu2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 17:50:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51570 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229893AbhKCVu2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Nov 2021 17:50:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BBC42610EA;
+        Wed,  3 Nov 2021 21:47:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635976071;
+        bh=zhegc8RGRtnZcKCFy3G7/EmGHED7fhIgJj67GgO1DOA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HkzfxsfgEn/RnmbZglyHKda8kzVsvjdRsWZafBGF0ene6XtRTW1EQxG3BH3Fa+jyh
+         +Ed0bVgvwAfQPaML+dDdCl1RSqE4AjVvEyOenXuAuwGvt6QXzig7eU6lpt5VwYVBW9
+         2/F4x+pmZQ8mzL2oQVmvAXPmzhnZkTIV1u14B0z5Jv0xVowWYgy+S9DFDe7B5Iz5p+
+         aE8Dv64nVWu2Kju1u8Z/P5TVqyBU5Q2vXVuDWN28E1Zd57uI6yI8y1/IXMGzNeWaGQ
+         MAXcB6xkt5q4jRaxKHXwuWGnR9JoeESRxDwbiFP1Ta1vKxMkhfHgwlbsi9zNxEPD+b
+         yrYnPUbzUExMA==
+Date:   Wed, 3 Nov 2021 14:47:48 -0700
+From:   Keith Busch <kbusch@kernel.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] block: add rq_flags to struct blk_mq_alloc_data
-Message-ID: <20211103214113.GA3354463@roeck-us.net>
-References: <20211019153300.623322-1-axboe@kernel.dk>
- <20211019153300.623322-2-axboe@kernel.dk>
- <20211103195411.GA3156469@roeck-us.net>
- <ef74ff48-6d9c-f39c-aff2-8a820440c953@kernel.dk>
+Cc:     kernel test robot <oliver.sang@intel.com>, lkp@lists.01.org,
+        lkp@intel.com, linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: [nvme] f9c499bbbf: nvme nvme0: Identify Controller failed (16641)
+Message-ID: <20211103214748.GA2654474@dhcp-10-100-145-180.wdc.com>
+References: <20211103141454.GA30634@xsang-OptiPlex-9020>
+ <e6f09b9b-386a-8a26-7c4b-c528791f7c9a@kernel.dk>
+ <20211103213853.GA2654246@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ef74ff48-6d9c-f39c-aff2-8a820440c953@kernel.dk>
+In-Reply-To: <20211103213853.GA2654246@dhcp-10-100-145-180.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 03, 2021 at 01:56:29PM -0600, Jens Axboe wrote:
-> On 11/3/21 1:54 PM, Guenter Roeck wrote:
-> > Hi,
+On Wed, Nov 03, 2021 at 02:38:53PM -0700, Keith Busch wrote:
+> On Wed, Nov 03, 2021 at 01:51:18PM -0600, Jens Axboe wrote:
+> > On 11/3/21 8:14 AM, kernel test robot wrote:
+> > > 
+> > > 
+> > > Greeting,
+> > > 
+> > > FYI, we noticed the following commit (built with gcc-9):
+> > > 
+> > > commit: f9c499bbbf603389abad60d1931c16b2f96dee06 ("[PATCH 1/2] nvme: move command clear into the various setup helpers")
+> > > url: https://github.com/0day-ci/linux/commits/Jens-Axboe/nvme-move-command-clear-into-the-various-setup-helpers/20211018-214956
+> > > base: https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git 519d81956ee277b4419c723adfb154603c2565ba
+> > > patch link: https://lore.kernel.org/linux-block/20211018124934.235658-2-axboe@kernel.dk
+> > > 
+> > > in testcase: will-it-scale
+> > > version: will-it-scale-x86_64-a34a85c-1_20211029
+> > > with following parameters:
+> > > 
+> > > 	nr_task: 50%
+> > > 	mode: process
+> > > 	test: readseek1
+> > > 	cpufreq_governor: performance
+> > > 	ucode: 0x700001e
+> > > 
+> > > test-description: Will It Scale takes a testcase and runs it from 1 through to n parallel copies to see if the testcase will scale. It builds both a process and threads based test in order to see any differences between the two.
+> > > test-url: https://github.com/antonblanchard/will-it-scale
+> > > 
+> > > 
+> > > on test machine: 144 threads 4 sockets Intel(R) Xeon(R) Gold 5318H CPU @ 2.50GHz with 128G memory
+> > > 
+> > > caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+> > > 
+> > > 
+> > > 
+> > > 
+> > > If you fix the issue, kindly add following tag
+> > > Reported-by: kernel test robot <oliver.sang@intel.com>
+> > > 
+> > > 
+> > > [   38.907274][  T868] nvme nvme0: pci function 0000:24:00.0
+> > > [   38.924627][ T1103] scsi host0: ahci
+> > > 0m.
+> > > [   38.948010][  T773] nvme nvme0: Identify Controller failed (16641)
+> > > [   38.951220][ T1103] scsi host1: ahci
+> > > [   38.954193][  T773] nvme nvme0: Removing after probe failure status: -5
 > > 
-> > On Tue, Oct 19, 2021 at 09:32:57AM -0600, Jens Axboe wrote:
-> >> There's a hole here we can use, and it's faster to set this earlier
-> >> rather than need to check q->elevator multiple times.
-> >>
-> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> > 
-> > This patch results in a warning backtrace with one of my qemu
-> > boot tests.
+> > This is odd, looks like it's saying invalid opcode. Looking at the probe
+> > path, it's pretty standard and the command passed in is cleared already.
+> > So not quite sure why the patch would make a difference here. I'll
+> > poke at it.
 > 
-> Should be fixed in the current tree, will go out soonish. If you
-> have time, can you pull in:
-> 
-> git://git.kernel.dk/linux-block for-next
-> 
-> into -git and see if it fixes it for you?
->
+> It's actually an Invalid Queue Identifier error (0x4101). That error
+> makes no sense for an Identify command, so it sounds like the controller
+> observed a different opcode than the driver intended to send, which
+> seems odd; I didn't observe any problems and I'm pretty sure I'm running
+> the same code. I'll take a second look as well.
 
-Yes, it looks like the problem has been fixed in your for-next branch.
+The git url that was used in this test points to commit:
 
-Thanks,
-Guenter
+  https://github.com/0day-ci/linux/commit/f9c499bbbf603389abad60d1931c16b2f96dee06
+
+And that commit has an extra memset in the REQ_OP_DRV_IN/OUT case, and
+it doesn't belong there. I don't see that memset in the upstream commit,
+Did the bot pick up the wrong patch?
