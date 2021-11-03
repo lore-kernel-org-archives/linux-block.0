@@ -2,266 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C489C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 15:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3636C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 15:54:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E591861108
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 15:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C442860E9B
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 15:54:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231827AbhKCPv7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 11:51:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48338 "EHLO
+        id S231898AbhKCP5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 11:57:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbhKCPv7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 11:51:59 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D20C061714
-        for <linux-block@vger.kernel.org>; Wed,  3 Nov 2021 08:49:22 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id l7-20020a0568302b0700b0055ae988dcc8so898696otv.12
-        for <linux-block@vger.kernel.org>; Wed, 03 Nov 2021 08:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ewSsd6XR8qbYjVgR5ujjdd+2JU9HO5p9Hk1fOmxW4zQ=;
-        b=gSfGpRfOUwYjOXoLJ6f133kPAWlTQtT6BGCY7bbf9btdFtF8r4VQaDFQUbZLmLA/mY
-         KefSETQpjCAZ1U0YFiHiOlY2Aw762ggrBGyACdrg0LhgJ1Ftw4i65SxflXHhEWj6wsdw
-         l4esiNrnfoimFeExnU/CySCWnjW/eUu6yHM4aHtTnRG2ZxCT63PXG02icCJi4+zlXD5W
-         gKFIwfdPav37md1WWK9f2j0b5jU9wzta/1wh/IBplj3kXyeLCM0uYauahfy2D42tHRus
-         Xw+0oQXC1KH2kgSY2M3ITs3khfnMxlQ1abrUAhzIuYFdmfJ5O3yLoJ4mGc8NMnJrtmSf
-         l/+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ewSsd6XR8qbYjVgR5ujjdd+2JU9HO5p9Hk1fOmxW4zQ=;
-        b=WRjqpkqSqwWaRfBOROe4dYjzBuqHINNe9a0jnqjeobyBgLNxhnvKKCazR+KCJ9HfDq
-         Xt0qS2NP4igegYXzeOeSRuY8r3bxmxpzd9ep4H9S1txzaqmNpeQ62TwBMbjtOT15mLft
-         xqG2ef0fanyfGchmkxU1iy//ReWJdAv7KxzCsWcu7ZGzh+Ue+tYf+zEVVZXEBMcRBccW
-         P6eT7Bp/rf81mhU0F4qHTqhdRH2741OU5QYFIzVTbDsBlWwug/RER28YjA8I1cBd/P4X
-         QO8RSAXST6P4Q8h1ZsJJn2Y22wqxG5o7bhO6wF+tdKQ+H2SeIx/Uh4bi/6bYfqSs+5+C
-         VxfA==
-X-Gm-Message-State: AOAM533ykLNDHLWDL/Entl/bY/XlYUKq1AwROMlfZ6cZnf06V/uhAO3H
-        PP9Yvdfx0YlxNJPRiH4FhkKUFg==
-X-Google-Smtp-Source: ABdhPJwko5sE9srWP+M5ni+4q/2RcrUxLvX6r3mt5VOs5g7gumPUPAHTLDReT6FMb428KzMdG8dIsQ==
-X-Received: by 2002:a9d:2247:: with SMTP id o65mr33649948ota.265.1635954561688;
-        Wed, 03 Nov 2021 08:49:21 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q6sm651739otv.6.2021.11.03.08.49.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Nov 2021 08:49:21 -0700 (PDT)
-Subject: Re: [bug report] WARNING: CPU: 1 PID: 1386 at
- block/blk-mq-sched.c:432 blk_mq_sched_insert_request+0x54/0x178
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>,
-        Steffen Maier <maier@linux.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-References: <YYIHXGSb2O5va0vA@T590>
- <85F2E9AC-385F-4BCA-BD3C-7A093442F87F@kernel.dk>
- <733e1dcd-36a1-903e-709a-5ebe5f491564@kernel.dk>
- <CAHj4cs8U-Tboc-i-ZpK2-7euPZNsHja_6SWs6Ap0ywddStLC_A@mail.gmail.com>
- <YYKjPIoMR04HrcWp@T590> <2a3b12f7-ea1b-c843-8370-8086ae2993ec@kernel.dk>
- <9d38a844-233b-26e4-ed36-f6a3f453bb92@kernel.dk> <YYKnv9VNR7NgdU5p@T590>
- <30e8f85a-bc43-675f-6594-93c2c60ebd18@kernel.dk>
-Message-ID: <44d88e28-9e06-3b2b-e6e3-7acb96df7d83@kernel.dk>
-Date:   Wed, 3 Nov 2021 09:49:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S232102AbhKCP5c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 11:57:32 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6702C061714;
+        Wed,  3 Nov 2021 08:54:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=OrHZfcODQam8SYKtC3Lj9MXWr83XzejExt/jJ8/GaiA=; b=kIf1jB08vxK2+2uoEHR3BYtha+
+        2o8bvNTvMsNJM16+W18FdOTHBPzWFBQL7XA9Fq9Kq7zQPai8jwq1oEIXPTDP4Akf+zpRKCJ4/2SrF
+        C3bOlxB27VecrXKlkZk8Yt53OtwohVG+PNM8znTpcwwRG+NR8rmjPUUy9jpE/GBusVUZSsz1sT6py
+        7n0bpx4CPLuvcsTr9r8/nNA47g6Ufniwbgt52lgdGr+Lv0JMiYGlJxRDFQ/C01VrkOOHcM0obKMgW
+        iF3fCoqq8pTju8mm3WHLy64p3YzZ4JLfBpvRUmHTwQ1m2PxKSjogq2aMRqBxgKiclM95b9y1sDorC
+        zYLHPfAg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1miIbC-005c6F-1n; Wed, 03 Nov 2021 15:54:50 +0000
+Date:   Wed, 3 Nov 2021 08:54:50 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 18/21] iomap: Convert iomap_add_to_ioend to take a folio
+Message-ID: <YYKwyudsHOmPthUP@infradead.org>
+References: <20211101203929.954622-1-willy@infradead.org>
+ <20211101203929.954622-19-willy@infradead.org>
+ <YYDoMltwjNKtJaWR@infradead.org>
+ <YYGfUuItAyTNax5V@casper.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <30e8f85a-bc43-675f-6594-93c2c60ebd18@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YYGfUuItAyTNax5V@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/3/21 9:41 AM, Jens Axboe wrote:
-> On 11/3/21 9:16 AM, Ming Lei wrote:
->> On Wed, Nov 03, 2021 at 09:10:17AM -0600, Jens Axboe wrote:
->>> On 11/3/21 9:03 AM, Jens Axboe wrote:
->>>> On 11/3/21 8:57 AM, Ming Lei wrote:
->>>>> On Wed, Nov 03, 2021 at 09:59:02PM +0800, Yi Zhang wrote:
->>>>>> On Wed, Nov 3, 2021 at 7:59 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>
->>>>>>> On 11/2/21 9:54 PM, Jens Axboe wrote:
->>>>>>>> On Nov 2, 2021, at 9:52 PM, Ming Lei <ming.lei@redhat.com> wrote:
->>>>>>>>>
->>>>>>>>> ﻿On Tue, Nov 02, 2021 at 09:21:10PM -0600, Jens Axboe wrote:
->>>>>>>>>>> On 11/2/21 8:21 PM, Yi Zhang wrote:
->>>>>>>>>>>>>
->>>>>>>>>>>>> Can either one of you try with this patch? Won't fix anything, but it'll
->>>>>>>>>>>>> hopefully shine a bit of light on the issue.
->>>>>>>>>>>>>
->>>>>>>>>>> Hi Jens
->>>>>>>>>>>
->>>>>>>>>>> Here is the full log:
->>>>>>>>>>
->>>>>>>>>> Thanks! I think I see what it could be - can you try this one as well,
->>>>>>>>>> would like to confirm that the condition I think is triggering is what
->>>>>>>>>> is triggering.
->>>>>>>>>>
->>>>>>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>>>>>>> index 07eb1412760b..81dede885231 100644
->>>>>>>>>> --- a/block/blk-mq.c
->>>>>>>>>> +++ b/block/blk-mq.c
->>>>>>>>>> @@ -2515,6 +2515,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>>>>>>>>>    if (plug && plug->cached_rq) {
->>>>>>>>>>        rq = rq_list_pop(&plug->cached_rq);
->>>>>>>>>>        INIT_LIST_HEAD(&rq->queuelist);
->>>>>>>>>> +        WARN_ON_ONCE(q->elevator && !(rq->rq_flags & RQF_ELV));
->>>>>>>>>> +        WARN_ON_ONCE(!q->elevator && (rq->rq_flags & RQF_ELV));
->>>>>>>>>>    } else {
->>>>>>>>>>        struct blk_mq_alloc_data data = {
->>>>>>>>>>            .q        = q,
->>>>>>>>>> @@ -2535,6 +2537,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>>>>>>>>>                bio_wouldblock_error(bio);
->>>>>>>>>>            goto queue_exit;
->>>>>>>>>>        }
->>>>>>>>>> +        WARN_ON_ONCE(q->elevator && !(rq->rq_flags & RQF_ELV));
->>>>>>>>>> +        WARN_ON_ONCE(!q->elevator && (rq->rq_flags & RQF_ELV));
->>>>>>>>>
->>>>>>>>> Hello Jens,
->>>>>>>>>
->>>>>>>>> I guess the issue could be the following code run without grabbing
->>>>>>>>> ->q_usage_counter from blk_mq_alloc_request() and blk_mq_alloc_request_hctx().
->>>>>>>>>
->>>>>>>>> .rq_flags       = q->elevator ? RQF_ELV : 0,
->>>>>>>>>
->>>>>>>>> then elevator is switched to real one from none, and check on q->elevator
->>>>>>>>> becomes not consistent.
->>>>>>>>
->>>>>>>> Indeed, that’s where I was going with this. I have a patch, testing it
->>>>>>>> locally but it’s getting late. Will send it out tomorrow. The nice
->>>>>>>> benefit is that it allows dropping the weird ref get on plug flush,
->>>>>>>> and batches getting the refs as well.
->>>>>>>
->>>>>>> Yi/Steffen, can you try pulling this into your test kernel:
->>>>>>>
->>>>>>> git://git.kernel.dk/linux-block for-next
->>>>>>>
->>>>>>> and see if it fixes the issue for you. Thanks!
->>>>>>
->>>>>> It still can be reproduced with the latest linux-block/for-next, here is the log
->>>>>>
->>>>>> fab2914e46eb (HEAD, new/for-next) Merge branch 'for-5.16/drivers' into for-next
->>>>>
->>>>> Hi Yi,
->>>>>
->>>>> Please try the following change:
->>>>>
->>>>>
->>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>> index e1e64964a31b..eb634a9c61ff 100644
->>>>> --- a/block/blk-mq.c
->>>>> +++ b/block/blk-mq.c
->>>>> @@ -494,7 +494,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
->>>>>  		.q		= q,
->>>>>  		.flags		= flags,
->>>>>  		.cmd_flags	= op,
->>>>> -		.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>>>  		.nr_tags	= 1,
->>>>>  	};
->>>>>  	struct request *rq;
->>>>> @@ -504,6 +503,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
->>>>>  	if (ret)
->>>>>  		return ERR_PTR(ret);
->>>>>  
->>>>> +	data.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>>>  	rq = __blk_mq_alloc_requests(&data);
->>>>>  	if (!rq)
->>>>>  		goto out_queue_exit;
->>>>> @@ -524,7 +524,6 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->>>>>  		.q		= q,
->>>>>  		.flags		= flags,
->>>>>  		.cmd_flags	= op,
->>>>> -		.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>>>  		.nr_tags	= 1,
->>>>>  	};
->>>>>  	u64 alloc_time_ns = 0;
->>>>> @@ -551,6 +550,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->>>>>  	ret = blk_queue_enter(q, flags);
->>>>>  	if (ret)
->>>>>  		return ERR_PTR(ret);
->>>>> +	data.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>>
->>>> Don't think that will compile, but I guess the point is that we can't do
->>>> this assignment before queue enter, in case we're in the midst of
->>>> switching schedulers. Which is indeed a valid concern.
->>>
->>> Something like the below. Maybe? On top of the for-next that was already
->>> pulled in.
->>>
->>>
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index b01e05e02277..121f1898d529 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -433,9 +433,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
->>>  	if (data->cmd_flags & REQ_NOWAIT)
->>>  		data->flags |= BLK_MQ_REQ_NOWAIT;
->>>  
->>> -	if (data->rq_flags & RQF_ELV) {
->>> +	if (q->elevator) {
->>>  		struct elevator_queue *e = q->elevator;
->>>  
->>> +		data->rq_flags |= RQF_ELV;
->>> +
->>>  		/*
->>>  		 * Flush/passthrough requests are special and go directly to the
->>>  		 * dispatch list. Don't include reserved tags in the
->>> @@ -494,7 +496,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
->>>  		.q		= q,
->>>  		.flags		= flags,
->>>  		.cmd_flags	= op,
->>> -		.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>  		.nr_tags	= 1,
->>>  	};
->>>  	struct request *rq;
->>> @@ -524,7 +525,6 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->>>  		.q		= q,
->>>  		.flags		= flags,
->>>  		.cmd_flags	= op,
->>> -		.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>  		.nr_tags	= 1,
->>>  	};
->>>  	u64 alloc_time_ns = 0;
->>> @@ -565,6 +565,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
->>>  
->>>  	if (!q->elevator)
->>>  		blk_mq_tag_busy(data.hctx);
->>> +	else
->>> +		data.rq_flags |= RQF_ELV;
->>>  
->>>  	ret = -EWOULDBLOCK;
->>>  	tag = blk_mq_get_tag(&data);
->>> @@ -2560,7 +2562,6 @@ void blk_mq_submit_bio(struct bio *bio)
->>>  			.q		= q,
->>>  			.nr_tags	= 1,
->>>  			.cmd_flags	= bio->bi_opf,
->>> -			.rq_flags	= q->elevator ? RQF_ELV : 0,
->>>  		};
->>
->> The above patch looks fine.
->>
->> BTW, 9ede85cb670c ("block: move queue enter logic into
->> blk_mq_submit_bio()") moves the queue enter into blk_mq_submit_bio(),
->> which seems dangerous, especially blk_mq_sched_bio_merge() needs
->> hctx/ctx which requires q_usage_counter to be grabbed.
+On Tue, Nov 02, 2021 at 08:28:02PM +0000, Matthew Wilcox wrote:
+> On Tue, Nov 02, 2021 at 12:26:42AM -0700, Christoph Hellwig wrote:
+> > Looking at the code not part of the context this looks fine.  But I
+> > really wonder if this (and also the blocks change above) would be
+> > better off being split into separate, clearly documented patches.
 > 
-> I think the best solution is to enter just for that as well, and just
-> retain that enter state. I'll update the patch, there's some real fixes
-> in there too for the batched alloc. Will post them later today.
+> How do these three patches look?  I retained your R-b on all three since
+> I figured the one you offered below was good for all of them.
 
-Is it needed, though? As far as I can tell, it's only needed
-persistently for having the IO inflight, otherwise if the premise is
-that the queue can just go away, we're in trouble before that too. And I
-don't think that's the case.
+Sounds good, and the patches looks good. Minor nitpicks below:
 
--- 
-Jens Axboe
+> Rename end_offset to end_pos and file_offset to pos to match the
+> rest of the file.  Simplify the loop by calculating nblocks
+> up front instead of each time around the loop.
+
+Might be worth mentioning why it changes the types from u64 to loff_t.
+
+>  	/*
+> -	 * Walk through the page to find areas to write back. If we run off the
+> -	 * end of the current map or find the current map invalid, grab a new
+> -	 * one.
+> +	 * Walk through the folio to find areas to write back. If we
+> +	 * run off the end of the current map or find the current map
+> +	 * invalid, grab a new one.
+
+No real need for reflowing the comment, it still fits just fine even
+with the folio change.
+
+> Rename end_offset to end_pos and offset_into_page to poff to match the
+> rest of the file.  Simplify the handling of the last page straddling
+> i_size.
+
+... by doing the EOF check purely based on the byte granularity i_size
+instead of converting to a pgoff prematurely.
+
+> +	isize = i_size_read(inode);
+> +	end_pos = page_offset(page) + PAGE_SIZE;
+> +	if (end_pos - 1 >= isize) {
+
+Wouldn't this check be more obvious as:
+
+	if (end_pos > i_size) {
 
