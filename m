@@ -2,94 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954E1C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2338EC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:02:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72E6E6056B
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F04A960F39
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 16:02:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232633AbhKCQEx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 12:04:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43214 "EHLO mail.kernel.org"
+        id S232681AbhKCQFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 12:05:25 -0400
+Received: from verein.lst.de ([213.95.11.211]:59983 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232621AbhKCQEw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Nov 2021 12:04:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 128EB60F39;
-        Wed,  3 Nov 2021 16:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635955336;
-        bh=u5i16BEePwX4WEXCbo2JNpQXuAFbW+rjoTHBDvqeohg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=L4+wON+EMB/OFHnYytPqWyw/GK5JtmmvlAHuFX3bcttqFurJTmQslmPfADYkBsOCV
-         KfL/VMKcqRofy+VNs2aCGIVLg0KBQHxHH/vMtGAq1HE/ONx8bv0++a0TH4/DppmjSx
-         GSiqT7RqoudEznlgQvGeiI7i+VvYyjfDTQ4qozpxVqLyZH3kDJi3Q2xJYAgDRyBjAJ
-         dBC8S7BmgpKaC1uRlfZnv8XuvvXdnCsnoo86KbksLt2ndPrIWNyckGch4jRj3TAtoe
-         nLgMKxYlSGqSpJN2tjz6w6B1NSw5z8cqFRhAvGJh8VrCiwbHFdix0k4f093tvdffEJ
-         soX9UkuQh2ckQ==
-Date:   Wed, 3 Nov 2021 09:02:15 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 19/21] iomap: Convert iomap_migrate_page to use folios
-Message-ID: <20211103160215.GL24307@magnolia>
-References: <20211101203929.954622-1-willy@infradead.org>
- <20211101203929.954622-20-willy@infradead.org>
+        id S232680AbhKCQFY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Nov 2021 12:05:24 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B962E68AA6; Wed,  3 Nov 2021 17:02:43 +0100 (CET)
+Date:   Wed, 3 Nov 2021 17:02:43 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     axboe@kernel.dk, hch@lst.de, penguin-kernel@i-love.sakura.ne.jp,
+        dan.j.williams@intel.com, vishal.l.verma@intel.com,
+        dave.jiang@intel.com, ira.weiny@intel.com, richard@nod.at,
+        miquel.raynal@bootlin.com, vigneshr@ti.com, efremov@linux.com,
+        song@kernel.org, martin.petersen@oracle.com, hare@suse.de,
+        jack@suse.cz, ming.lei@redhat.com, tj@kernel.org,
+        linux-mtd@lists.infradead.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/13] nvdimm/btt: do not call del_gendisk() if not
+ needed
+Message-ID: <20211103160243.GA31562@lst.de>
+References: <20211103122157.1215783-1-mcgrof@kernel.org> <20211103122157.1215783-2-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211101203929.954622-20-willy@infradead.org>
+In-Reply-To: <20211103122157.1215783-2-mcgrof@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 01, 2021 at 08:39:27PM +0000, Matthew Wilcox (Oracle) wrote:
-> The arguments are still pages for now, but we can use folios internally
-> and cut out a lot of calls to compound_head().
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+On Wed, Nov 03, 2021 at 05:21:45AM -0700, Luis Chamberlain wrote:
+> del_gendisk() is not required if the disk has not been added.
+> On kernels prior to commit 40b3a52ffc5bc3 ("block: add a sanity
+> check for a live disk in del_gendisk") it is mandatory to not
+> call del_gendisk() if the underlying device has not been through
+> device_add().
 
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+And even with the sanity check is it wrong, and will trigger a WARN_ON.
+So maybe this commit log could use a little update?
 
---D
+With that fixed I think this should go into 5.16 and -stable.
 
-> ---
->  fs/iomap/buffered-io.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 2436933dfe42..3b93fdfedb72 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -493,19 +493,21 @@ int
->  iomap_migrate_page(struct address_space *mapping, struct page *newpage,
->  		struct page *page, enum migrate_mode mode)
->  {
-> +	struct folio *folio = page_folio(page);
-> +	struct folio *newfolio = page_folio(newpage);
->  	int ret;
->  
-> -	ret = migrate_page_move_mapping(mapping, newpage, page, 0);
-> +	ret = folio_migrate_mapping(mapping, newfolio, folio, 0);
->  	if (ret != MIGRATEPAGE_SUCCESS)
->  		return ret;
->  
-> -	if (page_has_private(page))
-> -		attach_page_private(newpage, detach_page_private(page));
-> +	if (folio_test_private(folio))
-> +		folio_attach_private(newfolio, folio_detach_private(folio));
->  
->  	if (mode != MIGRATE_SYNC_NO_COPY)
-> -		migrate_page_copy(newpage, page);
-> +		folio_migrate_copy(newfolio, folio);
->  	else
-> -		migrate_page_states(newpage, page);
-> +		folio_migrate_flags(newfolio, folio);
->  	return MIGRATEPAGE_SUCCESS;
->  }
->  EXPORT_SYMBOL_GPL(iomap_migrate_page);
-> -- 
-> 2.33.0
-> 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
