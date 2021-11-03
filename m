@@ -2,159 +2,1148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D86AAC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 08:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C50C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 09:42:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDCDF61175
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 08:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2000D6115B
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 09:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbhKCIQg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 04:16:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39228 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230352AbhKCIQg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Nov 2021 04:16:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BE50C6109F;
-        Wed,  3 Nov 2021 08:13:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1635927240;
-        bh=cvnO3VXO3eEGiZjcVHRPmpCT0NgPoK7q7TLN7iveUuY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jNj5W+lqDaQY9imi2Xoyab595Ln4rEhlp9Gr5215r0pz33TbmYf19xHeREceDdJZU
-         u8seREOoHbBiMsr/sOSZr/2YiNAX/mMia7yeFkIORb9sGtjMvIzO90CFCZoB03o6df
-         kP57VHCQOPdc8RpwUlw7P8jdZtquwieyYH6j6nq0=
-Date:   Wed, 3 Nov 2021 09:13:57 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [bug report] kernel null pointer observed with blktests srp/006
- on 5.14.15
-Message-ID: <YYJExddmf7FQiM/h@kroah.com>
-References: <CAHj4cs-QxAmz=pM=cd1UJEg+HRUH_yMf5jDnBbirgW1oq1CaKw@mail.gmail.com>
- <YYH80vbE8DnCG94r@T590>
+        id S231757AbhKCJpa convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 05:45:30 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4053 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231278AbhKCJpa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 05:45:30 -0400
+Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HkhYp5KCwz6805y;
+        Wed,  3 Nov 2021 17:39:26 +0800 (CST)
+Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
+ fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Wed, 3 Nov 2021 10:42:50 +0100
+Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
+ fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.015;
+ Wed, 3 Nov 2021 10:42:50 +0100
+From:   Roberto Sassu <roberto.sassu@huawei.com>
+To:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "paul@paul-moore.com" <paul@paul-moore.com>,
+        "eparis@redhat.com" <eparis@redhat.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>
+CC:     "jannh@google.com" <jannh@google.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-audit@redhat.com" <linux-audit@redhat.com>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+Subject: RE: [RFC PATCH v7 04/16] ipe: add userspace interface
+Thread-Topic: [RFC PATCH v7 04/16] ipe: add userspace interface
+Thread-Index: AQHXwGV7cbwXMswBLU2KTt0KTt9u0qvxq5Ew
+Date:   Wed, 3 Nov 2021 09:42:50 +0000
+Message-ID: <601a323495b745f0a060e67f03af2337@huawei.com>
+References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1634151995-16266-5-git-send-email-deven.desai@linux.microsoft.com>
+In-Reply-To: <1634151995-16266-5-git-send-email-deven.desai@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.204.63.33]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YYH80vbE8DnCG94r@T590>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 03, 2021 at 11:06:58AM +0800, Ming Lei wrote:
-> On Tue, Nov 02, 2021 at 03:31:43PM +0800, Yi Zhang wrote:
-> > Hello
-> > 
-> > Below null pointer was triggered with blktests srp/006 on aarch64, pls
-> > help check it, thanks.
+> From: deven.desai@linux.microsoft.com
+> [mailto:deven.desai@linux.microsoft.com]
+> From: Deven Bowers <deven.desai@linux.microsoft.com>
 > 
-> ...
+> As is typical with LSMs, IPE uses securityfs as its interface with
+> userspace. for a complete list of the interfaces and the respective
+> inputs/outputs, please see the documentation under
+> admin-guide/LSM/ipe.rst
 > 
-> > [  491.786766] Unable to handle kernel paging request at virtual
-> > address ffff8000096f9438
-> > [  491.794676] Mem abort info:
-> > [  491.797480]   ESR = 0x96000007
-> > [  491.800527]   EC = 0x25: DABT (current EL), IL = 32 bits
-> > [  491.805833]   SET = 0, FnV = 0
-> > [  491.808896]   EA = 0, S1PTW = 0
-> > [  491.812028]   FSC = 0x07: level 3 translation fault
-> > [  491.816901] Data abort info:
-> > [  491.819769]   ISV = 0, ISS = 0x00000007
-> > [  491.823593]   CM = 0, WnR = 0
-> > [  491.826553] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000f82320000
-> > [  491.833243] [ffff8000096f9438] pgd=1000000fff0ff003,
-> > p4d=1000000fff0ff003, pud=1000000fff0fe003, pmd=100000010c48a003,
-> > pte=0000000000000000
-> > [  491.845768] Internal error: Oops: 96000007 [#1] SMP
-> > [  491.850636] Modules linked in: target_core_user uio
-> > target_core_pscsi target_core_file ib_srpt target_core_iblock
-> > target_core_mod rdma_cm iw_cm ib_cm scsi_debug rdma_rxe ib_uverbs
-> > ip6_udp_tunnel udp_tunnel null_blk dm_service_time ib_umad
-> > crc32_generic scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_multipath
-> > ib_core rfkill sunrpc vfat fat joydev be2net nicvf cavium_ptp
-> > mdio_thunder cavium_rng_vf nicpf thunderx_edac mdio_cavium thunder_bgx
-> > thunder_xcv cavium_rng ipmi_ssif ipmi_devintf ipmi_msghandler fuse
-> > zram ip_tables xfs ast i2c_algo_bit drm_vram_helper drm_kms_helper
-> > syscopyarea sysfillrect sysimgblt fb_sys_fops crct10dif_ce cec
-> > ghash_ce drm_ttm_helper ttm drm i2c_thunderx thunderx_mmc aes_neon_bs
-> > [last unloaded: scsi_transport_srp]
-> > [  491.915381] CPU: 6 PID: 11622 Comm: multipathd Not tainted 5.14.15 #1
-> > [  491.921812] Hardware name: GIGABYTE R120-T34-00/MT30-GS2-00, BIOS
-> > F02 08/06/2019
-> > [  491.929196] pstate: 20400005 (nzCv daif +PAN -UAO -TCO BTYPE=--)
-> > [  491.935192] pc : scsi_mq_exit_request+0x28/0x60
-> > [  491.939721] lr : blk_mq_free_rqs+0x7c/0x1ec
-> > [  491.943897] sp : ffff800016a536c0
-> > [  491.947200] x29: ffff800016a536c0 x28: ffff0001375b8000 x27: 0000000000000131
-> > [  491.954330] x26: ffff000102bb5c28 x25: ffff0001333d1000 x24: ffff0001333d1200
-> > [  491.961460] x23: 0000000000000000 x22: ffff0001386870a8 x21: 0000000000000000
-> > [  491.968589] x20: 0000000000000001 x19: ffff00010d878128 x18: ffffffffffffffff
-> > [  491.975719] x17: 5342555300355f66 x16: 6d745f697363732f x15: 0000000000000000
-> > [  491.982848] x14: 0000000000000000 x13: 0000000000000030 x12: 0101010101010101
-> > [  491.989977] x11: ffff8000114a1298 x10: 0000000000001c90 x9 : ffff800010764030
-> > [  491.997109] x8 : ffff0001375b9cf0 x7 : 0000000000000004 x6 : 00000002a7f08498
-> > [  492.004242] x5 : 0000000000000001 x4 : ffff000130092128 x3 : ffff800010b1e7e0
-> > [  492.011371] x2 : 0000000000000000 x1 : ffff8000096f93f0 x0 : ffff000138687000
-> > [  492.018501] Call trace:
-> > [  492.020937]  scsi_mq_exit_request+0x28/0x60
-> > [  492.025112]  blk_mq_free_rqs+0x7c/0x1ec
-> > [  492.028939]  blk_mq_free_tag_set+0x58/0x100
-> > [  492.033113]  scsi_mq_destroy_tags+0x20/0x30
-> > [  492.037286]  scsi_host_dev_release+0x9c/0x100
-> > [  492.041633]  device_release+0x40/0xa0
-> > [  492.045286]  kobject_cleanup+0x4c/0x180
-> > [  492.049115]  kobject_put+0x50/0xd0
-> > [  492.052510]  put_device+0x20/0x30
-> > [  492.055819]  scsi_target_dev_release+0x34/0x44
-> > [  492.060253]  device_release+0x40/0xa0
-> > [  492.063905]  kobject_cleanup+0x4c/0x180
-> > [  492.067732]  kobject_put+0x50/0xd0
-> > [  492.071124]  put_device+0x20/0x30
-> > [  492.074428]  scsi_device_dev_release_usercontext+0x228/0x244
-> > [  492.080079]  execute_in_process_context+0x50/0xa0
-> > [  492.084775]  scsi_device_dev_release+0x28/0x3c
-> > [  492.089208]  device_release+0x40/0xa0
-> > [  492.092860]  kobject_cleanup+0x4c/0x180
-> > [  492.096686]  kobject_put+0x50/0xd0
-> > [  492.100081]  put_device+0x20/0x30
-> > [  492.103396]  scsi_device_put+0x38/0x50
-> > [  492.107140]  sd_release151]  free_multipath+0x80/0xc0 [dm_multipath]
-> > [  492.132109]  multipath_dtr+0x38/0x50 [dm_multipath]
-> > [  492.136980]  dm_table_destroy+0x68/0x150
-> > [  492.140892]  __dm_destroy+0x138/0x204
-> > [  492.144548]  dm_destroy+0x20/0x30
-> > [  492.147859]  dev_remove+0x144/0x1e0
-> > [  492.151339]  ctl_ioctl+0x278/0x4d0
-> > [  492.154731]  dm_ctl_ioctl+0x1c/0x30
-> > [  492.158210]  __arm64_sys_ioctl+0xb4/0x100
-> > [  492.162212]  invoke_syscall+0x50/0x120
-> > [  492.165955]  el0_svc_common+0x48/0x100
-> > [  492.169694]  do_el0_svc+0x34/0xa0
-> > [  492.173000]  el0_svc+0x2c/0x54
-> > [  492.176048]  el0t_64_sync_handler+0xa4/0x130
-> > [  492.180307]  el0t_64_sync+0x19c/0x1a0
-> > [  492.183962] Code: f9000bf3 9104a033 f9403000 f9404c01 (f9402422)
-> > [  492.190068] ---[ end trace dbfeac019a702ce7 ]---
-> > [  492.194678] Kernel panic - not syncing: Oops: Fatal exception
-> > [  492.200431] SMP: stopping secondary CPUs
-> > [  492.204354] Kernel Offset: 0x80000 from 0xffff800010000000
-> > [  492.209828] PHYS_OFFSET: 0x0
-> > [  492.212697] CPU features: 0x00180051,20800a40
-> > [  492.217043] Memory Limit: none
-> > [  492.220102] ---[ end Kernel panic - not syncing: Oops: Fatal exception ]---
+> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> ---
 > 
-> Hi Yi,
+> Relevant changes since v6:
+>   * Refactor series to:
+>       1. Support a context structure, enabling easier testing
+>   * Split up patch 03/12 into two parts:
+>       1. parser [02/16]
+>       2. userspace interface [04/16] (this patch)
+>   * Interface changes:
+>       1. "raw" was renamed to "pkcs7" and made read only
+>       2. "raw"'s write functionality (update a policy) moved to "update"
+>       3. introduced "version", "policy_name" nodes.
+>       4. "content" renamed to "policy"
+>       5. The boot policy can now be updated like any other policy.
 > 
-> It was fixed by f2b85040acec ("scsi: core: Put LLD module refcnt after SCSI device
-> is released"), look not ported to 5.14.y yet.
+> ---
+>  security/ipe/Makefile   |   2 +
+>  security/ipe/ctx.c      | 121 +++++++++
+>  security/ipe/ctx.h      |   6 +
+>  security/ipe/fs.c       | 170 +++++++++++++
+>  security/ipe/fs.h       |  13 +
+>  security/ipe/policy.c   |  41 ++++
+>  security/ipe/policy.h   |   4 +
+>  security/ipe/policyfs.c | 528 ++++++++++++++++++++++++++++++++++++++++
+>  8 files changed, 885 insertions(+)
+>  create mode 100644 security/ipe/fs.c
+>  create mode 100644 security/ipe/fs.h
+>  create mode 100644 security/ipe/policyfs.c
+> 
+> diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+> index 0db69f13e82a..d5660a17364c 100644
+> --- a/security/ipe/Makefile
+> +++ b/security/ipe/Makefile
+> @@ -10,9 +10,11 @@ ccflags-y := -I$(srctree)/security/ipe/modules
+>  obj-$(CONFIG_SECURITY_IPE) += \
+>  	ctx.o \
+>  	eval.o \
+> +	fs.o \
+>  	hooks.o \
+>  	ipe.o \
+>  	modules.o \
+>  	parsers/ \
+>  	parsers.o \
+>  	policy.o \
+> +	policyfs.o \
+> diff --git a/security/ipe/ctx.c b/security/ipe/ctx.c
+> index 9274e51eff52..664c671a4f9c 100644
+> --- a/security/ipe/ctx.c
+> +++ b/security/ipe/ctx.c
+> @@ -13,6 +13,29 @@
+>  #include <linux/refcount.h>
+>  #include <linux/spinlock.h>
+> 
+> +/**
+> + * ver_to_u64: convert an internal ipe_policy_version to a u64
+> + * @p: Policy to extract the version from
+> + *
+> + * Bits (LSB is index 0):
+> + *	[48,32] -> Major
+> + *	[32,16] -> Minor
+> + *	[16, 0] -> Revision
+> + *
+> + * Return:
+> + * u64 version of the embedded version structure.
+> + */
+> +static inline u64 ver_to_u64(const struct ipe_policy *const p)
+> +{
+> +	u64 r = 0;
+> +
+> +	r = (((u64)p->parsed->version.major) << 32)
+> +	  | (((u64)p->parsed->version.minor) << 16)
+> +	  | ((u64)(p->parsed->version.rev));
+> +
+> +	return r;
+> +}
+> +
+>  /**
+>   * ipe_current_ctx: Helper to retrieve the ipe_context for the current task.
+>   *
+> @@ -96,6 +119,7 @@ static void free_ctx_work(struct work_struct *const
+> work)
+>  	list_for_each_entry(p, &ctx->policies, next)
+>  		ipe_put_policy(p);
+> 
+> +	securityfs_remove(ctx->policy_root);
+>  	kfree(ctx);
+>  }
+> 
+> @@ -160,6 +184,9 @@ void ipe_remove_policy(struct ipe_policy *p)
+>   * ipe_add_policy: Associate @p with @ctx
+>   * @ctx: Supplies a pointer to the ipe_context structure to associate @p with.
+>   * @p: Supplies a pointer to the ipe_policy structure to associate.
+> + *
+> + * This will increase @p's reference count by one.
+> + *
+>   */
+>  void ipe_add_policy(struct ipe_context *ctx, struct ipe_policy *p)
+>  {
+> @@ -168,7 +195,101 @@ void ipe_add_policy(struct ipe_context *ctx, struct
+> ipe_policy *p)
+>  	list_add_tail(&p->next, &ctx->policies);
+>  	refcount_inc(&p->refcount);
+>  	spin_unlock(&ctx->lock);
+> +}
+> +
+> +/**
+> + * ipe_replace_policy: Replace @old with @new in the list of policies in @ctx
+> + * @ctx: Supplies the context object to manipulate.
+> + * @old: Supplies a pointer to the ipe_policy to replace with @new
+> + * @new: Supplies a pointer to the ipe_policy structure to replace @old with
+> + */
+> +int ipe_replace_policy(struct ipe_policy *old, struct ipe_policy *new)
+> +{
+> +	int rc = -EINVAL;
+> +	struct ipe_context *ctx;
+> +	struct ipe_policy *cursor;
+> +	struct ipe_policy *p = NULL;
+> +
+> +	ctx = ipe_get_ctx_rcu(old->ctx);
+> +	if (!ctx)
+> +		return -ENOENT;
+> +
+> +	spin_lock(&ctx->lock);
+> +	list_for_each_entry(cursor, &ctx->policies, next) {
+> +		if (!strcmp(old->parsed->name, cursor->parsed->name)) {
+> +			if (ipe_is_policy_active(old)) {
+> +				if (ver_to_u64(old) > ver_to_u64(new))
+> +					break;
+> +				rcu_assign_pointer(ctx->active_policy, new);
+> +			}
+> +			list_replace_init(&cursor->next, &new->next);
+> +			refcount_inc(&new->refcount);
+> +			rcu_assign_pointer(new->ctx, old->ctx);
+> +			p = cursor;
+> +			rc = 0;
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock(&ctx->lock);
+> +	synchronize_rcu();
+> +
+> +	ipe_put_policy(p);
+> +	ipe_put_ctx(ctx);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * ipe_set_active_pol: Make @p the active policy.
+> + * @p: Supplies a pointer to the policy to make active.
+> + */
+> +int ipe_set_active_pol(const struct ipe_policy *p)
+> +{
+> +	int rc = 0;
+> +	struct ipe_policy *ap = NULL;
+> +	struct ipe_context *ctx = NULL;
+> +
+> +	ctx = ipe_get_ctx_rcu(p->ctx);
+> +	if (!ctx) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	ap = ipe_get_policy_rcu(ctx->active_policy);
+> +	if (ap && ver_to_u64(ap) > ver_to_u64(p)) {
+> +		rc = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	spin_lock(&ctx->lock);
+> +	rcu_assign_pointer(ctx->active_policy, p);
+> +	spin_unlock(&ctx->lock);
+>  	synchronize_rcu();
+> +
+> +out:
+> +	ipe_put_policy(ap);
+> +	ipe_put_ctx(ctx);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * ipe_is_policy_active: Determine wehther @p is the active policy
+> + * @p: Supplies a pointer to the policy to check.
+> + *
+> + * Return:
+> + * true - @p is the active policy of @ctx
+> + * false - @p is not the active policy of @ctx
+> + */
+> +bool ipe_is_policy_active(const struct ipe_policy *p)
+> +{
+> +	bool rv;
+> +	struct ipe_context *ctx;
+> +
+> +	rcu_read_lock();
+> +	ctx = rcu_dereference(p->ctx);
+> +	rv = !IS_ERR_OR_NULL(ctx) && rcu_access_pointer(ctx->active_policy)
+> == p;
+> +	rcu_read_unlock();
+> +
+> +	return rv;
+>  }
+> 
+>  /**
+> diff --git a/security/ipe/ctx.h b/security/ipe/ctx.h
+> index a0da92da818c..fe11fb767788 100644
+> --- a/security/ipe/ctx.h
+> +++ b/security/ipe/ctx.h
+> @@ -7,6 +7,7 @@
+> 
+>  #include <linux/sched.h>
+>  #include <linux/types.h>
+> +#include <linux/dcache.h>
+>  #include <linux/refcount.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/workqueue.h>
+> @@ -20,6 +21,8 @@ struct ipe_context {
+> 
+>  	struct list_head policies; /* type: ipe_policy */
+> 
+> +	struct dentry *policy_root;
+> +
+>  	struct work_struct free_work;
+>  };
+> 
+> @@ -30,5 +33,8 @@ struct ipe_context *ipe_get_ctx_rcu(struct ipe_context
+> __rcu *ctx);
+>  void ipe_put_ctx(struct ipe_context *ctx);
+>  void ipe_add_policy(struct ipe_context *ctx, struct ipe_policy *p);
+>  void ipe_remove_policy(struct ipe_policy *p);
+> +int ipe_replace_policy(struct ipe_policy *old, struct ipe_policy *new);
+> +int ipe_set_active_pol(const struct ipe_policy *p);
+> +bool ipe_is_policy_active(const struct ipe_policy *p);
+> 
+>  #endif /* IPE_CONTEXT_H */
+> diff --git a/security/ipe/fs.c b/security/ipe/fs.c
+> new file mode 100644
+> index 000000000000..10ad23f8bf92
+> --- /dev/null
+> +++ b/security/ipe/fs.c
+> @@ -0,0 +1,170 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) Microsoft Corporation. All rights reserved.
+> + */
+> +#include "ipe.h"
+> +#include "fs.h"
+> +#include "policy.h"
+> +
+> +#include <linux/dcache.h>
+> +#include <linux/security.h>
+> +
+> +static struct dentry *np __ro_after_init;
+> +static struct dentry *root __ro_after_init;
+> +static struct dentry *config __ro_after_init;
+> +
+> +/**
+> + * new_policy: Write handler for the securityfs node, "ipe/new_policy"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Suppleis a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t new_policy(struct file *f, const char __user *data,
+> +			  size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	char *copy = NULL;
+> +	struct ipe_policy *p = NULL;
+> +	struct ipe_context *ctx = NULL;
+> +
+> +	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
+> +		return -EPERM;
+> +
+> +	ctx = ipe_current_ctx();
+> +
+> +	copy = memdup_user_nul(data, len);
+> +	if (IS_ERR(copy)) {
+> +		rc = PTR_ERR(copy);
+> +		goto err;
+> +	}
+> +
+> +	p = ipe_new_policy(NULL, 0, copy, len);
+> +	if (IS_ERR(p)) {
+> +		rc = PTR_ERR(p);
+> +		goto err;
+> +	}
+> +
+> +	rc = ipe_new_policyfs_node(ctx, p);
+> +	if (rc)
+> +		goto err;
+> +
+> +	ipe_add_policy(ctx, p);
+> +err:
+> +	ipe_put_policy(p);
+> +	ipe_put_ctx(ctx);
+> +	return (rc < 0) ? rc : len;
+> +}
+> +
+> +/**
+> + * get_config: Read handler for the securityfs node, "ipe/config"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Supplies a buffer passed to the read syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t get_config(struct file *f, char __user *data, size_t len,
+> +			  loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	char *buf = NULL;
+> +	size_t buflen = 0;
+> +	char tmp[30] = { 0 };
+> +	struct ipe_parser *p = NULL;
+> +	struct ipe_module *m = NULL;
+> +
+> +	for (p = __start_ipe_parsers; p < __end_ipe_parsers; ++p)
+> +		buflen += snprintf(NULL, 0, "%s=%d\n", p->first_token, p-
+> >version);
+> +	for (m = __start_ipe_modules; m < __end_ipe_modules; ++m)
+> +		buflen += snprintf(NULL, 0, "%s=%d\n", m->name, m->version);
+> +
+> +	++buflen;
+> +	buf = kzalloc(buflen, GFP_KERNEL);
+> +	if (!buf) {
+> +		rc = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	for (p = __start_ipe_parsers; p < __end_ipe_parsers; ++p) {
+> +		memset(tmp, 0x0, ARRAY_SIZE(tmp));
+> +		scnprintf(tmp, ARRAY_SIZE(tmp), "%s=%d\n", p->first_token, p-
+> >version);
+> +		strcat(buf, tmp);
+> +	}
+> +
+> +	for (m = __start_ipe_modules; m < __end_ipe_modules; ++m) {
+> +		memset(tmp, 0x0, ARRAY_SIZE(tmp));
+> +		scnprintf(tmp, ARRAY_SIZE(tmp), "%s=%d\n", m->name, m-
+> >version);
+> +		strcat(buf, tmp);
+> +	}
+> +
+> +	rc = simple_read_from_buffer(data, len, offset, buf, buflen);
+> +out:
+> +	kfree(buf);
+> +	return rc;
+> +}
+> +
+> +static const struct file_operations cfg_fops = {
+> +	.read = get_config,
+> +};
+> +
+> +static const struct file_operations np_fops = {
+> +	.write = new_policy,
+> +};
+> +
+> +/**
+> + * ipe_init_securityfs: Initialize IPE's securityfs tree at fsinit
+> + *
+> + * Return:
+> + * !0 - Error
+> + * 0 - OK
+> + */
+> +static int __init ipe_init_securityfs(void)
+> +{
+> +	int rc = 0;
+> +	struct ipe_context *ctx = NULL;
+> +
+> +	ctx = ipe_current_ctx();
 
-Did anyone ask for it to be backported to stable kernels yet?  I don't
-see a request, nor was stable@vger cc:ed on the signed-off-by: line, so
-how were we to know to pick this up?
+Hi Deven
 
-Anyway, I've now done so...
+the instruction above should be executed only if IPE LSM is
+enabled. Otherwise, the kernel panics due to the illegal access
+to the security blob of the task.
 
-thanks,
+Roberto
 
-greg k-h
+HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
+Managing Director: Li Peng, Zhong Ronghua
+
+> +
+> +	root = securityfs_create_dir("ipe", NULL);
+> +	if (IS_ERR(root)) {
+> +		rc = PTR_ERR(root);
+> +		goto err;
+> +	}
+> +
+> +	np = securityfs_create_file("new_policy", 0200, root, NULL, &np_fops);
+> +	if (IS_ERR(np)) {
+> +		rc = PTR_ERR(np);
+> +		goto err;
+> +	}
+> +
+> +	config = securityfs_create_file("config", 0400, root, NULL,
+> +					&cfg_fops);
+> +	if (IS_ERR(config)) {
+> +		rc = PTR_ERR(config);
+> +		goto err;
+> +	}
+> +
+> +	ctx->policy_root = securityfs_create_dir("policies", root);
+> +	if (IS_ERR(ctx->policy_root)) {
+> +		rc = PTR_ERR(ctx->policy_root);
+> +		goto err;
+> +	}
+> +
+> +	return 0;
+> +err:
+> +	securityfs_remove(np);
+> +	securityfs_remove(root);
+> +	securityfs_remove(config);
+> +	securityfs_remove(ctx->policy_root);
+> +	return rc;
+> +}
+> +
+> +fs_initcall(ipe_init_securityfs);
+> diff --git a/security/ipe/fs.h b/security/ipe/fs.h
+> new file mode 100644
+> index 000000000000..4ab2f4e8c454
+> --- /dev/null
+> +++ b/security/ipe/fs.h
+> @@ -0,0 +1,13 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) Microsoft Corporation. All rights reserved.
+> + */
+> +
+> +#ifndef IPE_FS_H
+> +#define IPE_FS_H
+> +
+> +void ipe_soft_del_policyfs(struct ipe_policy *p);
+> +int ipe_new_policyfs_node(struct ipe_context *ctx, struct ipe_policy *p);
+> +void ipe_del_policyfs_node(struct ipe_policy *p);
+> +
+> +#endif /* IPE_FS_H */
+> diff --git a/security/ipe/policy.c b/security/ipe/policy.c
+> index 8970f96453d6..b766824cc08f 100644
+> --- a/security/ipe/policy.c
+> +++ b/security/ipe/policy.c
+> @@ -4,6 +4,7 @@
+>   */
+> 
+>  #include "ipe.h"
+> +#include "fs.h"
+>  #include "policy.h"
+>  #include "ipe_parser.h"
+>  #include "modules.h"
+> @@ -867,6 +868,8 @@ void ipe_put_policy(struct ipe_policy *p)
+>  	if (IS_ERR_OR_NULL(p) || !refcount_dec_and_test(&p->refcount))
+>  		return;
+> 
+> +	ipe_del_policyfs_node(p);
+> +	securityfs_remove(p->policyfs);
+>  	free_parsed_policy(p->parsed);
+>  	if (!p->pkcs7)
+>  		kfree(p->text);
+> @@ -911,6 +914,44 @@ static int set_pkcs7_data(void *ctx, const void *data,
+> size_t len,
+>  	return 0;
+>  }
+> 
+> +/**
+> + * ipe_update_policy: parse a new policy and replace @old with it.
+> + * @old: Supplies a pointer to the policy to replace
+> + * @text: Supplies a pointer to the plain text policy
+> + * @textlen: Supplies the length of @text
+> + * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message.
+> + * @pkcs7len: Supplies the length of @pkcs7len
+> + *
+> + * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
+> + * ipe_new_policy.
+> + *
+> + * Return:
+> + * !IS_ERR - OK
+> + */
+> +struct ipe_policy *ipe_update_policy(struct ipe_policy *old,
+> +				     const char *text, size_t textlen,
+> +				     const char *pkcs7, size_t pkcs7len)
+> +{
+> +	int rc = 0;
+> +	struct ipe_policy *new;
+> +
+> +	new = ipe_new_policy(text, textlen, pkcs7, pkcs7len);
+> +	if (IS_ERR(new)) {
+> +		rc = PTR_ERR(new);
+> +		goto err;
+> +	}
+> +
+> +	if (strcmp(new->parsed->name, old->parsed->name)) {
+> +		rc = -EINVAL;
+> +		goto err;
+> +	}
+> +
+> +	rc = ipe_replace_policy(old, new);
+> +err:
+> +	ipe_put_policy(new);
+> +	return (rc < 0) ? ERR_PTR(rc) : new;
+> +}
+> +
+>  /**
+>   * ipe_new_policy: allocate and parse an ipe_policy structure.
+>   *
+> diff --git a/security/ipe/policy.h b/security/ipe/policy.h
+> index 2b5041c5a75a..6818f6405dd0 100644
+> --- a/security/ipe/policy.h
+> +++ b/security/ipe/policy.h
+> @@ -88,12 +88,16 @@ struct ipe_policy {
+> 
+>  	refcount_t	refcount;
+> 
+> +	struct dentry *policyfs;
+>  	struct list_head next;		/* type: ipe_policy */
+>  	struct ipe_context __rcu *ctx;
+>  };
+> 
+>  struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
+>  				  const char *pkcs7, size_t pkcs7len);
+> +struct ipe_policy *ipe_update_policy(struct ipe_policy *old, const char *text,
+> +				     size_t textlen, const char *pkcs7,
+> +				     size_t pkcs7len);
+>  void ipe_put_policy(struct ipe_policy *pol);
+>  bool ipe_is_op_alias(int op, const enum ipe_operation **map, size_t *size);
+>  struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p);
+> diff --git a/security/ipe/policyfs.c b/security/ipe/policyfs.c
+> new file mode 100644
+> index 000000000000..d34c22e99225
+> --- /dev/null
+> +++ b/security/ipe/policyfs.c
+> @@ -0,0 +1,528 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) Microsoft Corporation. All rights reserved.
+> + */
+> +#include "ipe.h"
+> +#include "policy.h"
+> +#include "fs.h"
+> +
+> +#include <linux/fs.h>
+> +#include <linux/namei.h>
+> +#include <linux/types.h>
+> +#include <linux/dcache.h>
+> +#include <linux/security.h>
+> +
+> +#define MAX_VERSION_SIZE ARRAY_SIZE("65535.65535.65535")
+> +
+> +/**
+> + * find_policy: Follow the i_private field of a dentry, returning the address
+> + *		of the resulting policy structure.
+> + * @f: Securityfs object that contains a link to the dentry containing the
+> + *     policy structure.
+> + *
+> + * Return:
+> + * Always-Valid Address Pointer
+> + */
+> +static inline struct ipe_policy __rcu **find_policy(struct file *f)
+> +{
+> +	struct dentry *link;
+> +
+> +	link = d_inode(f->f_path.dentry)->i_private;
+> +
+> +	return (struct ipe_policy __rcu **)&(d_inode(link)->i_private);
+> +}
+> +
+> +/**
+> + * ipefs_file: defines a file in securityfs
+> + */
+> +struct ipefs_file {
+> +	const char	*name;
+> +	umode_t		access;
+> +	const struct	file_operations *fops;
+> +};
+> +
+> +/**
+> + * read_pkcs7: Read handler for the securityfs node,
+> + *	       "ipe/policies/$name/pkcs7"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Suppleis a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * @data will be populated with the pkcs7 blob representing the policy
+> + * on success. If the policy is unsigned (like the boot policy), this
+> + * will return -ENOENT.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t read_pkcs7(struct file *f, char __user *data,
+> +			  size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	struct ipe_policy *p = NULL;
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p)
+> +		return -ENOENT;
+> +
+> +	if (!p->pkcs7) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	rc = simple_read_from_buffer(data, len, offset, p->pkcs7, p->pkcs7len);
+> +
+> +out:
+> +	ipe_put_policy(p);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * read_policy: Read handler for the securityfs node,
+> + *		"ipe/policies/$name/policy"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Suppleis a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * @data will be populated with the plain-text version of the policy
+> + * on success.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t read_policy(struct file *f, char __user *data,
+> +			   size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	struct ipe_policy *p = NULL;
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p)
+> +		return -ENOENT;
+> +
+> +	rc = simple_read_from_buffer(data, len, offset, p->text, p->textlen);
+> +
+> +	ipe_put_policy(p);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * read_name: Read handler for the securityfs node,
+> + *	      "ipe/policies/$name/name"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Suppleis a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * @data will be populated with the policy_name attribute on success
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t read_name(struct file *f, char __user *data,
+> +			 size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	struct ipe_policy *p = NULL;
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p)
+> +		return -ENOENT;
+> +
+> +	rc = simple_read_from_buffer(data, len, offset, p->parsed->name,
+> +				     strlen(p->parsed->name));
+> +
+> +	ipe_put_policy(p);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * read_version: Read handler for the securityfs node,
+> + *		 "ipe/policies/$name/version"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Suppleis a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * @data will be populated with the version string on success.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t read_version(struct file *f, char __user *data,
+> +			    size_t len, loff_t *offset)
+> +{
+> +	ssize_t rc = 0;
+> +	size_t bufsize = 0;
+> +	struct ipe_policy *p = NULL;
+> +	char buffer[MAX_VERSION_SIZE] = { 0 };
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p)
+> +		return -ENOENT;
+> +
+> +	bufsize = scnprintf(buffer, ARRAY_SIZE(buffer), "%hu.%hu.%hu",
+> +			    p->parsed->version.major, p->parsed->version.minor,
+> +			    p->parsed->version.rev);
+> +
+> +	rc = simple_read_from_buffer(data, len, offset, buffer, bufsize);
+> +
+> +	ipe_put_policy(p);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * setactive: Write handler for the securityfs node,
+> + *	      "ipe/policies/$name/active"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Supplies a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t setactive(struct file *f, const char __user *data,
+> +			 size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	bool value = false;
+> +	struct ipe_policy *p = NULL;
+> +	struct ipe_context *ctx = NULL;
+> +
+> +	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
+> +		return -EPERM;
+> +
+> +	rc = kstrtobool_from_user(data, len, &value);
+> +	if (rc)
+> +		goto out;
+> +
+> +	if (!value) {
+> +		rc = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	ctx = ipe_get_ctx_rcu(p->ctx);
+> +	if (!ctx) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	rc = ipe_set_active_pol(p);
+> +
+> +out:
+> +	ipe_put_ctx(ctx);
+> +	ipe_put_policy(p);
+> +	return (rc < 0) ? rc : len;
+> +}
+> +
+> +/**
+> + * getactive: Read handler for the securityfs node,
+> + *	      "ipe/policies/$name/active"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Suppleis a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * @data will be populated with the 1 or 0 depending on if the
+> + * corresponding policy is active.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t getactive(struct file *f, char __user *data,
+> +			 size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	const char *str;
+> +	struct ipe_policy *p = NULL;
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	str = ipe_is_policy_active(p) ? "1" : "0";
+> +	rc = simple_read_from_buffer(data, len, offset, str, 2);
+> +
+> +out:
+> +	ipe_put_policy(p);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * update_policy: Write handler for the securityfs node,
+> + *		  "ipe/policies/$name/active"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Supplies a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * On success this updates the policy represented by $name,
+> + * in-place.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t update_policy(struct file *f, const char __user *data,
+> +			     size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	char *copy = NULL;
+> +	struct ipe_policy *new = NULL;
+> +	struct ipe_policy *old = NULL;
+> +	struct ipe_context *ctx = NULL;
+> +	struct ipe_policy __rcu **addr = NULL;
+> +
+> +	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
+> +		return -EPERM;
+> +
+> +	ctx = ipe_current_ctx();
+> +	if (!ctx)
+> +		return -ENOENT;
+> +
+> +	addr = find_policy(f);
+> +	old = ipe_get_policy_rcu(*addr);
+> +	if (!old) {
+> +		rc = -ENOENT;
+> +		goto err;
+> +	}
+> +
+> +	copy = memdup_user(data, len);
+> +	if (IS_ERR(copy)) {
+> +		rc = PTR_ERR(copy);
+> +		goto err;
+> +	}
+> +
+> +	new = ipe_update_policy(old, NULL, 0, copy, len);
+> +	if (IS_ERR(new)) {
+> +		rc = PTR_ERR(new);
+> +		goto err;
+> +	}
+> +
+> +	spin_lock(&ctx->lock);
+> +	rcu_assign_pointer(*addr, new);
+> +	spin_unlock(&ctx->lock);
+> +	synchronize_rcu();
+> +
+> +	swap(new->policyfs, old->policyfs);
+> +
+> +	kfree(copy);
+> +	ipe_put_ctx(ctx);
+> +	ipe_put_policy(old);
+> +	return len;
+> +err:
+> +	kfree(copy);
+> +	ipe_put_ctx(ctx);
+> +	ipe_put_policy(new);
+> +	ipe_put_policy(old);
+> +	return rc;
+> +}
+> +
+> +/**
+> + * delete_policy: write handler for securityfs dir, "ipe/policies/$name/delete"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Supplies a buffer passed to the write syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * On success this deletes the policy represented by $name.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t delete_policy(struct file *f, const char __user *data,
+> +			     size_t len, loff_t *offset)
+> +{
+> +	int rc = 0;
+> +	bool value = false;
+> +	struct ipe_policy *p = NULL;
+> +	struct ipe_context *ctx = NULL;
+> +
+> +	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
+> +		return -EPERM;
+> +
+> +	rc = kstrtobool_from_user(data, len, &value);
+> +	if (rc)
+> +		goto out;
+> +
+> +	if (!value) {
+> +		rc = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	p = ipe_get_policy_rcu(*find_policy(f));
+> +	if (!p) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	if (ipe_is_policy_active(p)) {
+> +		rc = -EPERM;
+> +		goto out;
+> +	}
+> +
+> +	ctx = ipe_get_ctx_rcu(p->ctx);
+> +	if (!ctx) {
+> +		rc = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	ipe_remove_policy(p);
+> +out:
+> +	ipe_put_ctx(ctx);
+> +	ipe_put_policy(p);
+> +	return (rc < 0) ? rc : len;
+> +}
+> +
+> +static const struct file_operations content_fops = {
+> +	.read = read_policy,
+> +};
+> +
+> +static const struct file_operations pkcs7_fops = {
+> +	.read = read_pkcs7,
+> +};
+> +
+> +static const struct file_operations name_fops = {
+> +	.read = read_name,
+> +};
+> +
+> +static const struct file_operations ver_fops = {
+> +	.read = read_version,
+> +};
+> +
+> +static const struct file_operations active_fops = {
+> +	.write = setactive,
+> +	.read = getactive,
+> +};
+> +
+> +static const struct file_operations update_fops = {
+> +	.write = update_policy,
+> +};
+> +
+> +static const struct file_operations delete_fops = {
+> +	.write = delete_policy,
+> +};
+> +
+> +/**
+> + * policy_subdir: files under a policy subdirectory
+> + */
+> +static const struct ipefs_file policy_subdir[] = {
+> +	{ "pkcs7", 0444, &pkcs7_fops },
+> +	{ "policy", 0444, &content_fops },
+> +	{ "name", 0444, &name_fops },
+> +	{ "version", 0444, &ver_fops },
+> +	{ "active", 0600, &active_fops },
+> +	{ "update", 0200, &update_fops },
+> +	{ "delete", 0200, &delete_fops },
+> +};
+> +
+> +/**
+> + * soft_del_policyfs - soft delete the policyfs tree, preventing new
+> + *		       accesses to the interfaces for this policy.
+> + * @p - Policy to soft delete the tree for.
+> + */
+> +static void soft_del_policyfs(struct ipe_policy *p)
+> +{
+> +	struct inode *ino = NULL;
+> +	struct ipe_policy __rcu **addr = NULL;
+> +
+> +	ino = d_inode(p->policyfs);
+> +	addr = (struct ipe_policy __rcu **)&ino->i_private;
+> +
+> +	inode_lock(ino);
+> +	rcu_assign_pointer(*addr, NULL);
+> +	inode_unlock(ino);
+> +	synchronize_rcu();
+> +}
+> +
+> +/**
+> + * ipe_del_policyfs_node: Delete a securityfs entry for @p
+> + * @p: Supplies a pointer to the policy to delete a securityfs entry for.
+> + */
+> +void ipe_del_policyfs_node(struct ipe_policy *p)
+> +{
+> +	size_t i = 0;
+> +	struct dentry *d = NULL;
+> +	const struct ipefs_file *f = NULL;
+> +
+> +	if (IS_ERR_OR_NULL(p->policyfs))
+> +		return;
+> +
+> +	soft_del_policyfs(p);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(policy_subdir); ++i) {
+> +		f = &policy_subdir[i];
+> +
+> +		d = lookup_positive_unlocked(f->name, p->policyfs,
+> +					     strlen(f->name));
+> +		if (IS_ERR(d))
+> +			continue;
+> +
+> +		securityfs_remove(d);
+> +		dput(d);
+> +	}
+> +
+> +	securityfs_remove(p->policyfs);
+> +}
+> +
+> +/**
+> + * ipe_new_policyfs_node: Create a securityfs entry for @p
+> + * @ctx: Supplies a pointer to a context structure that contains the root of
+> + *	 the policy tree.
+> + * @p: Supplies a pointer to the policy to create a securityfs entry for.
+> + *
+> + * Return:
+> + * 0 - OK
+> + * !0 - Error
+> + */
+> +int ipe_new_policyfs_node(struct ipe_context *ctx, struct ipe_policy *p)
+> +{
+> +	int rc = 0;
+> +	size_t i = 0;
+> +	struct dentry *d = NULL;
+> +	struct ipe_policy **addr = NULL;
+> +	const struct ipefs_file *f = NULL;
+> +
+> +	p->policyfs = securityfs_create_dir(p->parsed->name, ctx->policy_root);
+> +	if (IS_ERR(p->policyfs)) {
+> +		rc = PTR_ERR(p->policyfs);
+> +		goto err;
+> +	}
+> +
+> +	addr = (struct ipe_policy **)&(d_inode(p->policyfs)->i_private);
+> +	*addr = p;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(policy_subdir); ++i) {
+> +		f = &policy_subdir[i];
+> +
+> +		d = securityfs_create_file(f->name, f->access, p->policyfs, p-
+> >policyfs,
+> +					   f->fops);
+> +		if (IS_ERR(d)) {
+> +			rc = PTR_ERR(d);
+> +			goto err;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +err:
+> +	ipe_del_policyfs_node(p);
+> +	return rc;
+> +}
+> --
+> 2.33.0
+
