@@ -2,86 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E06C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 06:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A67C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 07:11:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75AA8610E8
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 06:49:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0E5D611C0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 07:11:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231724AbhKCGwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 02:52:17 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:59842 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231558AbhKCGwR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 02:52:17 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 05557218DF;
-        Wed,  3 Nov 2021 06:49:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1635922180; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=BeqVs7y0PI+aBH3DeB1M2f+3yZUqahLHqE7Hzgy+EJo=;
-        b=R5L4WQK+wXV3nHvLJ4hHEsR9nLyxOTg9Z3Q/+zV6LZa6hhohX0GYVU9vmVhaRVopX4tkXp
-        V6keVBoNWjK6RDrW7bDbfltv/lrOw6077qdg3ikuehx/AuYCKesh/eGo9oGLiwdUPc4Rto
-        zcOmzkGcTcKTdhyLZWINlJLd6JRh6nM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1635922180;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=BeqVs7y0PI+aBH3DeB1M2f+3yZUqahLHqE7Hzgy+EJo=;
-        b=VtGgvg151s/10ETivKGWnzhWyHA0G7328V47y5IgzURZugzaOk1/HoWlaPK3ufg6fKcp1D
-        8reQg+in1gmopJBA==
-Received: from suse.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id D7C2C2C150;
-        Wed,  3 Nov 2021 06:49:37 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>, stable@vger.kernel.org
-Subject: [PATCH] bcache: fix use-after-free problem in bcache_device_free()
-Date:   Wed,  3 Nov 2021 14:49:17 +0800
-Message-Id: <20211103064917.67383-1-colyli@suse.de>
-X-Mailer: git-send-email 2.31.1
+        id S231913AbhKCHOG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 03:14:06 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:14705 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230152AbhKCHOG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 03:14:06 -0400
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HkdDd2flkzZcSr;
+        Wed,  3 Nov 2021 15:09:21 +0800 (CST)
+Received: from [127.0.0.1] (10.40.193.166) by dggeme756-chm.china.huawei.com
+ (10.3.19.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.15; Wed, 3
+ Nov 2021 15:11:25 +0800
+Subject: Re: [PATCH 14/16] block: switch polling to be bio based
+To:     Christoph Hellwig <hch@lst.de>
+References: <20211012111226.760968-1-hch@lst.de>
+ <20211012111226.760968-15-hch@lst.de>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>
+From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <beb633f4-4508-ea53-4a34-adf0f20cda85@hisilicon.com>
+Date:   Wed, 3 Nov 2021 15:11:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 MIME-Version: 1.0
+In-Reply-To: <20211012111226.760968-15-hch@lst.de>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggeme756-chm.china.huawei.com (10.3.19.102)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In bcache_device_free(), pointer disk is referenced still in
-ida_simple_remove() after blk_cleanup_disk() gets called on this
-pointer. This may cause a potential panic by use-after-free on the
-disk pointer.
+Hi Christoph,
 
-This patch fixes the problem by calling blk_cleanup_disk() after
-ida_simple_remove().
 
-Fixes: bc70852fd104 ("bcache: convert to blk_alloc_disk/blk_cleanup_disk")
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: stable@vger.kernel.org # v5.14+
----
- drivers/md/bcache/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ÔÚ 2021/10/12 19:12, Christoph Hellwig Ð´µÀ:
+> Replace the blk_poll interface that requires the caller to keep a queue
+> and cookie from the submissions with polling based on the bio.
+>
+> Polling for the bio itself leads to a few advantages:
+>
+>   - the cookie construction can made entirely private in blk-mq.c
+>   - the caller does not need to remember the request_queue and cookie
+>     separately and thus sidesteps their lifetime issues
+>   - keeping the device and the cookie inside the bio allows to trivially
+>     support polling BIOs remapping by stacking drivers
+>   - a lot of code to propagate the cookie back up the submission path can
+>     be removed entirely.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Tested-by: Mark Wunderlich <mark.wunderlich@intel.com>
+> ---
+......
+>   /**
+>    * blk_cloned_rq_check_limits - Helper function to check a cloned request
+>    *                              for the new queue limits
+> diff --git a/block/blk-exec.c b/block/blk-exec.c
+> index 1fa7f25e57262..55f0cd34b37b9 100644
+> --- a/block/blk-exec.c
+> +++ b/block/blk-exec.c
+> @@ -65,13 +65,19 @@ EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
+>   
+>   static bool blk_rq_is_poll(struct request *rq)
+>   {
+> -	return rq->mq_hctx && rq->mq_hctx->type == HCTX_TYPE_POLL;
+> +	if (!rq->mq_hctx)
+> +		return false;
+> +	if (rq->mq_hctx->type != HCTX_TYPE_POLL)
+> +		return false;
+> +	if (WARN_ON_ONCE(!rq->bio))
+> +		return false;
+> +	return true;
+>   }
+>   
+>   static void blk_rq_poll_completion(struct request *rq, struct completion *wait)
+>   {
+>   	do {
+> -		blk_poll(rq->q, request_to_qc_t(rq->mq_hctx, rq), 0);
+> +		bio_poll(rq->bio, 0);
+>   		cond_resched();
+>   	} while (!completion_done(wait));
+>   }
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 4a9a65dff95e..86b9e355c583 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -885,9 +885,9 @@ static void bcache_device_free(struct bcache_device *d)
- 		bcache_device_detach(d);
- 
- 	if (disk) {
--		blk_cleanup_disk(disk);
- 		ida_simple_remove(&bcache_device_idx,
- 				  first_minor_to_idx(disk->first_minor));
-+		blk_cleanup_disk(disk);
- 	}
- 
- 	bioset_exit(&d->bio_split);
--- 
-2.31.1
+For some scsi command sent by function __scsi_execute() without data, it 
+has request but no bio (bufflen = 0),
+then how to use bio_poll() for them ?
+
+Best Regards,
+Xiang Chen
 
