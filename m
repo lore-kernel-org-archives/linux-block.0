@@ -2,77 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1E9C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 12:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E16C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 13:03:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51F9860FC4
-	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 12:50:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C09A660F90
+	for <linux-block@archiver.kernel.org>; Wed,  3 Nov 2021 13:03:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230435AbhKCMwr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 08:52:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35580 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230282AbhKCMwq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 08:52:46 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78026C061714;
-        Wed,  3 Nov 2021 05:50:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=AWxSgl03y6hj3Uclf1xozKOXfzyGEIJRVjgfKOuJfpg=; b=YuVMiK6AS8CrpAonDsTY6eSJVb
-        OugD9VsmoHFM7boGrHLu1QNyCytMHEg5N91zyXYRxpdssp5JyGumIRtnDLczTlyGZjvjxZbOfVUSu
-        u7Voc9B6hX01wrjNWQ52S3RodehRg4jMLvQ7dSctJVKuaig11MUJMUNnKJGQ5WGkcgnzrRHpn9oh5
-        x/pOcow5cBk8Muleo21zE8sYrnuJLCICJrc7wSzHPq5g/+Wq5jS8KofnVayU2t4XMSZRBm5+nWZ3M
-        x3Iz+x5zsxxIyb8HG/mzwYgDPnbD82Aniau6Qs8ra5Wo6Cw+aWZbw0HF5+o76aMPh3S6teWu+26zG
-        uYXZsPyw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1miFgM-005Cll-UN; Wed, 03 Nov 2021 12:48:29 +0000
-Date:   Wed, 3 Nov 2021 12:47:58 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 15/21] iomap: Convert iomap_write_begin and
- iomap_write_end to folios
-Message-ID: <YYKE/ohWPf7jUBM/@casper.infradead.org>
-References: <20211101203929.954622-1-willy@infradead.org>
- <20211101203929.954622-16-willy@infradead.org>
- <20211102232215.GG2237511@magnolia>
- <YYH+wfNdgubpqtyP@casper.infradead.org>
+        id S230152AbhKCNFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 09:05:54 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:46046 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230282AbhKCNFx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 09:05:53 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id B13D31FD2F;
+        Wed,  3 Nov 2021 13:03:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1635944596; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kERbFomJtixBSTf3DWzetUiiZGKnZYtXYJTmsvXJBN0=;
+        b=oHYRtCvtUZaaev+8ylQRtHFmy9evH2fsjVR90cUDv5sWBjt9vvIqy4vmq9BmgObBi+ako5
+        Gjjiq/aYqDNxIf2/W5KmPqulBGRJGYyrIoyJc0dYM5Nz+7Nc01EXmc7VN9FWQLJkOjxLk2
+        sYOtWli4N3Z9e2Ap1YapkPKUcpbLWsg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1635944596;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kERbFomJtixBSTf3DWzetUiiZGKnZYtXYJTmsvXJBN0=;
+        b=UokhT6tkK5Qc/c2rjP+8q6evDRE9QtE2yJC7/eBsM4P+l0CsfsHF6MIFDNb/3eMdmKvuPb
+        qWJOkDqUOMc3t4Cw==
+Received: from quack2.suse.cz (jack.udp.ovpn1.nue.suse.de [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id D6E152C144;
+        Wed,  3 Nov 2021 13:03:12 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 156EC1E10D0; Wed,  3 Nov 2021 14:03:14 +0100 (CET)
+Date:   Wed, 3 Nov 2021 14:03:14 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 4/8] bfq: Limit number of requests consumed by each cgroup
+Message-ID: <20211103130314.GC20482@quack2.suse.cz>
+References: <20211006164110.10817-1-jack@suse.cz>
+ <20211006173157.6906-4-jack@suse.cz>
+ <20211102181658.GA63407@blackbody.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YYH+wfNdgubpqtyP@casper.infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211102181658.GA63407@blackbody.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 03, 2021 at 03:15:13AM +0000, Matthew Wilcox wrote:
-> On Tue, Nov 02, 2021 at 04:22:15PM -0700, Darrick J. Wong wrote:
-> > > +	page = folio_file_page(folio, pos >> PAGE_SHIFT);
-> > 
-> > Isn't this only needed in the BUFFER_HEAD case?
-> 
-> Good catch.  Want me to fold this in?
-> 
-> @@ -632,12 +631,12 @@ static int iomap_write_begin(const struct iomap_iter *iter, loff_t pos,
->                 goto out_no_page;
->         }
->  
-> -       page = folio_file_page(folio, pos >> PAGE_SHIFT);
->         if (srcmap->type == IOMAP_INLINE)
->                 status = iomap_write_begin_inline(iter, folio);
-> -       else if (srcmap->flags & IOMAP_F_BUFFER_HEAD)
-> +       else if (srcmap->flags & IOMAP_F_BUFFER_HEAD) {
-> +               struct page *page = folio_file_page(folio, pos >> PAGE_SHIFT);
->                 status = __block_write_begin_int(page, pos, len, NULL, srcmap);
+Hello,
 
-On second thoughts, this is silly.  __block_write_begin_int() doesn't
-want the precise page (because it constructs buffer_heads and attaches
-them to the passed-in page).  I should just pass &folio->page here.
-And __block_write_begin_int() should be converted to take a folio
-at some point.
+On Tue 02-11-21 19:16:58, Michal Koutný wrote:
+> On Wed, Oct 06, 2021 at 07:31:43PM +0200, Jan Kara <jack@suse.cz> wrote:
+> > +	for (level--; level >= 0; level--) {
+> > +		entity = entities[level];
+> > +		if (level > 0) {
+> > +			wsum = bfq_entity_service_tree(entity)->wsum;
+> > +		} else {
+> > +			int i;
+> > +			/*
+> > +			 * For bfqq itself we take into account service trees
+> > +			 * of all higher priority classes and multiply their
+> > +			 * weights so that low prio queue from higher class
+> > +			 * gets more requests than high prio queue from lower
+> > +			 * class.
+> > +			 */
+> > +			wsum = 0;
+> > +			for (i = 0; i <= class_idx; i++) {
+> > +				wsum = wsum * IOPRIO_BE_NR +
+> > +					sched_data->service_tree[i].wsum;
+> > +			}
+> > +		}
+> > +		limit = DIV_ROUND_CLOSEST(limit * entity->weight, wsum);
+> 
+> This scheme caught my eye. You mutliply (tree) weights by a factor
+> depending on the class when counting the wsum but then you don't apply
+> the same scaling for the evaluated entity in the numerator.
+
+Since we stop the loop at bfq_class_idx(entity) I don't think scaling of
+the numerator makes sense - effectively when all the processes having IO to
+submit (these are accounted in wsum) are in the same IO priority class, the
+above code collapses to just:
+
+  limit = limit * entity->weight / sched_data->service_tree[bfq_class_idx(entity)].wsum
+
+I.e., we scale available tags proportionally to bfq_queue weight (which
+scales linearly with IO priority).
+
+When there are processes say both in RT and BE IO priority classes, then a
+process in RT class still uses the above formula - i.e., as if all tags
+available for a cgroup are split proportionally only among active tasks in
+RT IO priority class. So in principle it can happen that there would be no
+tag left for a process in lower IO priority class - and that is fine, we
+don't care, because we don't want to submit IO from lower IO priority class
+while there is still IO in higher IO priority class.
+
+Now consider a situation for a process in BE IO priority class in this
+setting. All processes in BE class can together occupy at most BE_wsum /
+(RT_wsum * IOPRIO_BE_NR + BE_wsum) fraction of tags. This is admittedly
+somewhat arbitrary fraction but it makes sure for each process in RT class
+there are at least as many tags left as for the highest priority process in
+BE class.
+
+> IOW, I think there should be something like
+> 	scale = (level > 0) ? 1 : int_pow(IOPRIO_BE_NR, BFQ_IOPRIO_CLASSES - bfq_class_idx(entity));
+> 	limit = DIV_ROUND_CLOSEST(limit * entity->weight * scale, wsum);
+> 
+> For instance, if there are two cgroups (level=1) with weights 100 and
+> 200, and each cgroup has a single IOPRIO_CLASS_BE entity (level=0) in
+> it, the `limit` distribution would honor the ratio of weights from
+> level=1 (100:200) but it would artificially lower the absolute amount of
+> allowed tags. If I am not mistaken, that would be reduced by factor
+> 1/BFQ_IOPRIO_CLASSES.
+
+I don't see where my code would lead to available number of tags being
+artifically lower as you write - in your example wsum for RT class would be
+0 so effectively all terms of the formula for that class will cancel out.
+As I wrote above, the highest active IO priority class effectively allows
+processes in this class to consume all tags available for a cgroup. If
+there are lower IO priority classes active as well, we allow them to
+consume some tags but never allow them to consume all of them...
+
+> Also if I consider it more broadly, is this supposed to match/extend
+> bfq_io_prio_to_weight() calculation?
+
+Yes, this is kind of an extension of bfq_io_prio_to_weight() that allows
+some comparison of queues from different IO priority classes.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
