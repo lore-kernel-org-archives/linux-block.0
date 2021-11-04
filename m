@@ -2,65 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C076C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 08:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 792CEC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 08:46:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7674B61215
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 08:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BBB46121F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 08:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbhKDInW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 04:43:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48868 "EHLO
+        id S230329AbhKDIsh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 04:48:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230363AbhKDInW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 04:43:22 -0400
+        with ESMTP id S230152AbhKDIsh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 04:48:37 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77918C061714;
-        Thu,  4 Nov 2021 01:40:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A1CC061714;
+        Thu,  4 Nov 2021 01:45:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kM6GrF6SJ88sCE1yx7wY0xKWNFrPLecWgtod0L4NR4w=; b=eZrGZ78iepNkbX/hRBtrDBUFnH
-        rXQkIGGEGfraz7hIhy7RLwcpD8gu2De7+5PfCRciTMwUL2r7eO9TyeAIqNE/D83YWypHcea3htyJG
-        xIne7L7Tri87hyXmfHcCwImnkWM2Wdtot7bOkWVVfFaz6UqbJwBmL8vbNWAaLTJp0oJJ+76L/zVSv
-        6Py7hRAL3exjBIcT+ZKebQ/r6DSzB6sF3QrWwLxwuUu3hzk2K+E9HBC3/ejfcoN0ZV012ZX8LgWqN
-        nyyuLF1/OMIYdI2Dyj4PHXsL1gD+dgstDOjtCTdUKgZ0nOYVnlUff7pYGPIosNHQVVOIakh30bCQg
-        uw9d2l1w==;
+        bh=7iBaCS/d5Ua+JXj2sb0aBgjdhf9t0ks4cVnD/dhnPg4=; b=Sy5caejkHBqEJWat87JYiV2E7o
+        xN4fxNuQKUvqlyxn6l1GhS1C7p33kyp3840sWv3zhJuhDGsXoRvA/Mw/rZU3ABeZtIOoZEvZbytPk
+        n/OYlVPyHwmIFU4Ki3tznXCLdjxwhZp9volR61ca5wREAvov7bY8KtagwljKtGJb7gz3uXcXr/nCR
+        sufmpRJ1jnqKNwHdePPi3qOK4owftb78lFrGGfevUTkB6KLTY3iqIKTydLYSBKBqCXAJRp0kKZJHx
+        o6NP8px+a2CBekep80n5kbSQalD9Z9MUQ+0f+fcmoF88piQcXd3ZTj/bpMbYJP7nQEU2M5hjGN9wl
+        mg3q4gsQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1miYIb-008LJP-VR; Thu, 04 Nov 2021 08:40:41 +0000
-Date:   Thu, 4 Nov 2021 01:40:41 -0700
+        id 1miYNg-008MAt-Uo; Thu, 04 Nov 2021 08:45:56 +0000
+Date:   Thu, 4 Nov 2021 01:45:56 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 18/21] iomap: Convert iomap_add_to_ioend to take a folio
-Message-ID: <YYOciWjJJe6L4cyZ@infradead.org>
-References: <20211101203929.954622-1-willy@infradead.org>
- <20211101203929.954622-19-willy@infradead.org>
- <YYDoMltwjNKtJaWR@infradead.org>
- <YYGfUuItAyTNax5V@casper.infradead.org>
- <YYKwyudsHOmPthUP@infradead.org>
- <YYNUoONKjuo6Izfz@casper.infradead.org>
- <YYOcGK43XbnumvHi@infradead.org>
+To:     Wu Bo <wubo40@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linfeilong@huawei.com
+Subject: Re: [PATCH 0/2] add error handling support for add_disk()
+Message-ID: <YYOdxHEklLAIwNwo@infradead.org>
+References: <1636014799-20156-1-git-send-email-wubo40@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YYOcGK43XbnumvHi@infradead.org>
+In-Reply-To: <1636014799-20156-1-git-send-email-wubo40@huawei.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 04, 2021 at 01:38:48AM -0700, Christoph Hellwig wrote:
-> > I _think_ we restrict the maximum file size to 2^63 - 1 to avoid i_size
-> > ever being negative.  But that means that end_pos might be 2^63 (ie
-> > LONG_MIN), so we need to subtract one from it to get the right answer.
-> > Maybe worth a comment?
-> 
-> Yes, please.
-
-Or we should stick to the u64 type that the existing code uses to side
-step that whole issue..
+Luis has an outstanding series that also covers these two drivers.
