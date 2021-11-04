@@ -2,55 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED86FC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2704C4332F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:36:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF0C161168
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE74C61212
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:36:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbhKDRia (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 13:38:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58482 "EHLO
+        id S233928AbhKDRjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 13:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231924AbhKDRi3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 13:38:29 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96418C061714
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 10:35:51 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id t21-20020a9d7295000000b0055bf1807972so1178816otj.8
-        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 10:35:51 -0700 (PDT)
+        with ESMTP id S233922AbhKDRjH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 13:39:07 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10D2C061714
+        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 10:36:29 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id p11-20020a9d4e0b000000b0055a5741bff7so9313271otf.2
+        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 10:36:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VT96vZeIQqx6ZVf5lI+gTTdo5LCZsvVbKRsx6QokeTw=;
-        b=k2T5UYMBHoHE7u8Ugfn52bpsXiEsZuMqex+8VmOeIHXqun3zQ+5ctjZgnPI7XdFFkC
-         ZpoGoQQBpoBpHvTptDCCuHyHzWNiVOO0VBJ7UaXyMxwjGEy9lit3ohfWNEQ0XXT2USBK
-         a9hRMmPt3Yat7IgmHjzu4GyoigEdOannz3yj5N7YicM8sQk5U6h0KAcNh1jZ53KP3MBT
-         8Y5ujTQRKZqjMnVWyJVeIhXwuo+i9xkokldNzI2kAgYA1fqQZPDjL4rfB5hR/l3uGB0S
-         66VXEtzZeGnyFIXLPxJDDSkYO3TN10v95ab7h1HiN+mxJkYUTVM/bHwbhff5S8r4cwmG
-         mJFA==
+        bh=SNflTKuhJeup8uJxUkdnnXBFpeHypWR4LuxBzBUB9SU=;
+        b=K/yzhI87P5uXcBJ6Wuh6Wmjtw1mHuZmf+yDrfUhU5EZLfQQ8JKCO4ru9d5hVuHl1w2
+         O++4+MvPr2DMKiH4TosHACcTOCKcFVlLE7lzs8gkvMyQY0ucWgJ12Cevabau11JVToYZ
+         DZY7w863fPz/uhAYrEcfUUSXxLfLJRAo9deoDHPb3guRE6nKtZAEQlpYaiiEkkXVCaN2
+         BQPh7MKZoxeCJaN813LdJGky/YektDGFixnBktesBKd59K7GE86q6pYgF+ywQt1JRvIq
+         P2sTGkj+izLUifB3NT90yznqe0Er/EBxU35Ef8yVndoQEONn9YRNI4KLhCtJQ7Oghh7z
+         MI2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=VT96vZeIQqx6ZVf5lI+gTTdo5LCZsvVbKRsx6QokeTw=;
-        b=qHcwE8dOYC+VeTAQ8sQ2XOPjqJVuWo/RHXv8QsABoupo9M+bLDuOm4AvCyS3/tIUfd
-         E/IP31omw1TmXg7vKhVDxTTdoCKCIO+fa8nDGXWzuVpqCaXwdGxTNVysl+Vv1tyv4Y6q
-         EdxCdOVAvqkep7t11ozfeCdRF+pgZVTzLoltUv0l2luc+5bnG3w4nkQbOe0A5Qfshs0T
-         kpEjL1W5cmMWDfImITckmLlWCFOE5MlV6CQL4w7/fR6e51XMVHBEwZOxW63E1FVM+9AI
-         srwQTLWJU+tS9ZSRhSeMeiv8TwC6Q8xZcl/vyaMPFuR7BZ8V3DOpa2MgweFJB1LxI60t
-         g+cg==
-X-Gm-Message-State: AOAM530JeU0OHkQYUJnpFwrXCyirlPeS2ukxc+pFnsUNyUVc1gsDQgqQ
-        JgrLob5Wblth9pltdf8DfSOr9xCOqA5dNg==
-X-Google-Smtp-Source: ABdhPJx8Qu8Aj9IGu581dq4eQ02qv5eCabrvlQ7cd1utWaMKVrYrK++8g7XE6xHuwk5z0nN1eA90Yw==
-X-Received: by 2002:a05:6830:23a3:: with SMTP id m3mr38861894ots.111.1636047350765;
-        Thu, 04 Nov 2021 10:35:50 -0700 (PDT)
+        bh=SNflTKuhJeup8uJxUkdnnXBFpeHypWR4LuxBzBUB9SU=;
+        b=U3ddL08fqI3+MKjShBzNwiY27xIS+vU/IObi0SrKOObI7h5c98kucC23VN++/ds8sD
+         50nO9luy2FaAoAnNnvMy+GDkJSu4RTpe4KuaSel6snJ919xQ2thNSC46+CsF9dhMx0ae
+         YwYUPuAK0JSPrmsixf3pwN2vCpfM8to6+tAUMEXbvQEFqyHM08CL+mtaDqbXEuCEn35W
+         fEJ8Eg48ZUgbhGm+ObbK7BfwvRnV2KGH9P8MiswvhI+99Vg6jKJlyvMst3jnE5Uw9We9
+         njukPtkx+G/ojSXjEKxoWMeKEcSzbvDjgvDxh6nLBI8IY+GaLrBf8mZMcrREw6WKNLIL
+         MgKw==
+X-Gm-Message-State: AOAM532mhXy1n4HLqA2yPAAJ32fMrrf2FWBU26kkIyBkg+/gj5nlLt0B
+        ngkS8OX/SNh8o/54ZBYsTKePV7AIrsv0jg==
+X-Google-Smtp-Source: ABdhPJy9iQx3I9qOlSowmJIH154LJcC0xAZRCwSJlqgLkEDse3KMAp9z1mzzeduY42zlDiDlkJIQxw==
+X-Received: by 2002:a9d:744d:: with SMTP id p13mr31013147otk.295.1636047388790;
+        Thu, 04 Nov 2021 10:36:28 -0700 (PDT)
 Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s9sm1608435oic.14.2021.11.04.10.35.50
+        by smtp.gmail.com with ESMTPSA id v1sm1476527oof.8.2021.11.04.10.36.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Nov 2021 10:35:50 -0700 (PDT)
+        Thu, 04 Nov 2021 10:36:28 -0700 (PDT)
 Subject: Re: [PATCH 3/4] block: move queue enter logic into
  blk_mq_submit_bio()
 To:     Christoph Hellwig <hch@infradead.org>
@@ -58,15 +58,14 @@ Cc:     linux-block@vger.kernel.org
 References: <20211103183222.180268-1-axboe@kernel.dk>
  <20211103183222.180268-4-axboe@kernel.dk> <YYOjcuEExwJN1eiw@infradead.org>
  <ff6be121-5753-fe5f-90dc-8703da656d53@kernel.dk>
- <4d92696b-41a3-b0f3-90de-5b41555f011d@kernel.dk>
- <YYQZQKDBAUhQnqsq@infradead.org>
+ <YYQYyEljsvANMP3q@infradead.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <33138951-e79e-caa3-efbb-465af41c7b56@kernel.dk>
-Date:   Thu, 4 Nov 2021 11:35:49 -0600
+Message-ID: <97ae421d-6942-eb24-337a-103fd8898fc7@kernel.dk>
+Date:   Thu, 4 Nov 2021 11:36:27 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YYQZQKDBAUhQnqsq@infradead.org>
+In-Reply-To: <YYQYyEljsvANMP3q@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,53 +73,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/21 11:32 AM, Christoph Hellwig wrote:
-> On Thu, Nov 04, 2021 at 06:14:30AM -0600, Jens Axboe wrote:
->> To player it safer, I would suggest we fold in something like the
->> below. That keeps the submit_checks() under the queue enter.
+On 11/4/21 11:30 AM, Christoph Hellwig wrote:
+> On Thu, Nov 04, 2021 at 05:41:35AM -0600, Jens Axboe wrote:
+>>>>  	if (!submit_bio_checks(bio) || !blk_crypto_bio_prep(&bio))
+>>>> -		goto queue_exit;
+>>>> +		return;
+>>>
+>>> This is broken, we really ant the submit checks under freeze
+>>> protection to make sure the parameters can't be changed underneath
+>>> us.
+>>
+>> Which parameters are you worried about in submit_bio_checks()? I don't
+>> immediately see anything that would make me worry about it.
 > 
-> Yes, this looks much better.  Nit below:
+> Mostly checks if certain operations are supported or not, as
+> revalidation could clear those.
 > 
->>  	struct block_device *bdev = bio->bi_bdev;
->>  	struct request_queue *q = bdev_get_queue(bdev);
->> @@ -868,14 +868,13 @@ static void __submit_bio(struct bio *bio)
->>  {
->>  	struct gendisk *disk = bio->bi_bdev->bd_disk;
->>  
->> -	if (!submit_bio_checks(bio) || !blk_crypto_bio_prep(&bio))
->> -		return;
->>  	if (!disk->fops->submit_bio) {
->>  		blk_mq_submit_bio(bio);
->>  	} else {
->>  		if (unlikely(bio_queue_enter(bio) != 0))
->>  			return;
->> -		disk->fops->submit_bio(bio);
->> +		if (submit_bio_checks(bio) && blk_crypto_bio_prep(&bio))
->> +			disk->fops->submit_bio(bio);
->>  		blk_queue_exit(disk->queue);
->>  	}
+>>> This looks weird, as blk_try_enter_queue is already called by
+>>> bio_queue_enter.
+>>
+>> It's just for avoiding a pointless call into bio_queue_enter(), which
+>> isn't needed it blk_try_enter_queue() is successful. The latter is short
+>> and small and can be inlined, while bio_queue_enter() is a lot bigger.
 > 
-> A this point moving the whole ->submit_bio based branch into a
-> helper probably makes sense as well.
+> If this is so impotant let's operated with an inlined bio_queue_enter
+> that calls out of line into slow path instead of open coding it
+> like this.
 
-Sure, I can do that.
+Sure, I can do that instead.
 
->> +	if (unlikely(!blk_crypto_bio_prep(&bio)))
->> +		return;
->> +
->>  	blk_queue_bounce(q, &bio);
->>  	if (blk_may_split(q, bio))
->>  		__blk_queue_split(q, &bio, &nr_segs);
->> @@ -2551,6 +2554,8 @@ void blk_mq_submit_bio(struct bio *bio)
->>  
->>  		if (unlikely(!blk_mq_queue_enter(q, bio)))
->>  			return;
->> +		if (unlikely(!submit_bio_checks(bio)))
->> +			goto put_exit;
+>>>>  	} else {
+>>>>  		struct blk_mq_alloc_data data = {
+>>>>  			.q		= q,
+>>>> @@ -2528,6 +2534,11 @@ void blk_mq_submit_bio(struct bio *bio)
+>>>>  			.cmd_flags	= bio->bi_opf,
+>>>>  		};
+>>>>  
+>>>> +		if (unlikely(!blk_mq_queue_enter(q, bio)))
+>>>> +			return;
+>>>> +
+>>>> +		rq_qos_throttle(q, bio);
+>>>> +
+>>>
+>>> At some point the code in this !cached branch really needs to move
+>>> into a helper..
+>>
+>> Like in the next patch?
 > 
-> This now skips the checks for the cached request case, doesn't it?
+> No, I mean the !cached case which is a lot more convoluted.
 
-It did, I did add that when folding it in though.
+Yeah, a helper there might be appropriate. I'll write it up.
 
 -- 
 Jens Axboe
