@@ -2,73 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8739CC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 00:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12AE9C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 03:35:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 647D5611CB
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 00:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAA4060296
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 03:35:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230059AbhKDAP0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 20:15:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
+        id S229968AbhKDDiK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Nov 2021 23:38:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230055AbhKDAPZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 20:15:25 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB228C061714
-        for <linux-block@vger.kernel.org>; Wed,  3 Nov 2021 17:12:48 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id 127so4084796pfu.1
-        for <linux-block@vger.kernel.org>; Wed, 03 Nov 2021 17:12:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aiFlDDoPphFdax8t3+vgi2ejhvKpRDh7/No/Q/VIr2I=;
-        b=BAEynWMdMRlkSSJY0srpBlBYJednmmqF1G63NosmIWMc0Q+4AJMFCNhqfAA76CdAnd
-         CcNTmdL8gzyOISWADvYFLtFUQ0nGsMVl2CLvzGTVmznszFkr5aNbQy/B8JBL58X3OprP
-         WxabcSYcDyX1quSThfoypWjtfjH5u0Eswijcg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aiFlDDoPphFdax8t3+vgi2ejhvKpRDh7/No/Q/VIr2I=;
-        b=GixIXpK4zLi5JjqsED1y76YVlM5fdwCxJDnc6mDN9+b9HbqFs5/3t5w9UXc9J7pNk3
-         Jtl0AK3jWaX841yHL/jKzIBF5FDY6VJtAH6Nf1b5Cl5wUgzh1EsyeOMREmIw5FeJbdN6
-         0dqlmez9grnXmXRzkwJc/N3AFXwiov6PUU8Icr8sJFXrzGdmBp0UkrfOIPz6LTSzPDqI
-         +5dYqmVXLUfssFnktbuvX5Rv8Ykkx6qidrIhFsObuJKVTBuJ665oKDyPAXpHHkgl1SKM
-         J5qfrQD3Q7Gntk87h3qftv8i64EyTv/dyb8X4F+R/knD1rxn7SaBqNUM5KSsOs7keuR+
-         Ft8Q==
-X-Gm-Message-State: AOAM531pqNsBazkGUYDAtOtdI7fRfynW5X3G2obI7SCPOj5a5rIov6aT
-        jktyf9cTpoaA8HppTYQ8CBTvwAeBLDpnIQ==
-X-Google-Smtp-Source: ABdhPJzBJoVbv76VuMfMN12dqt6obL+TqZohnLnrn1g1oB1WAOtxkRDgcTnQgY3Mdh8HUJU/6MlJ9A==
-X-Received: by 2002:a63:8bc3:: with SMTP id j186mr23601334pge.250.1635984768491;
-        Wed, 03 Nov 2021 17:12:48 -0700 (PDT)
-Received: from google.com ([2409:10:2e40:5100:1f56:281c:d78b:3f3a])
-        by smtp.gmail.com with ESMTPSA id f11sm3831765pfc.116.2021.11.03.17.12.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 17:12:48 -0700 (PDT)
-Date:   Thu, 4 Nov 2021 09:12:43 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, minchan@kernel.org,
-        ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: use ATTRIBUTE_GROUPS
-Message-ID: <YYMle7jh+i5j+b5q@google.com>
-References: <20211028203600.2157356-1-mcgrof@kernel.org>
+        with ESMTP id S229913AbhKDDiK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 23:38:10 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB804C061714;
+        Wed,  3 Nov 2021 20:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0O/VdyfANdJRg4X3F77zWL20vmq21Xlj10FoIbPmDkE=; b=jXZGpKzaK03F2BR+7PinT0OlJM
+        ZNizT4HqpvIaU/hRL/n+3hKgQMBVNEyXMcqV1WTcWASGCcrLdsqUoJIWpfdJO+9L5ujPVRT/jUg1p
+        Gri+yTKxVjmkfg7SOmKbdctrPULlzYmpxE3gBJ5x8LoN2NQn+j1a4y6spJX7ZNurwOsczJ6hWclXj
+        xReNyIJkXWCRsqxcdE8bEpOeAVaWoHqaEJ4xMn4IZLpt6IcgbPseaC//ZTTvFY7We1p50jWd8hO40
+        24KTepIf6d0j2PheqbZBHyrcg4Z/KGlRcMQfCGzQqe4XHPB85NYE+SOdcqaYPb6XRI2Z4pzZmeGKR
+        N4q4L1PQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1miTVg-005dkV-Bf; Thu, 04 Nov 2021 03:34:07 +0000
+Date:   Thu, 4 Nov 2021 03:33:52 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 18/21] iomap: Convert iomap_add_to_ioend to take a folio
+Message-ID: <YYNUoONKjuo6Izfz@casper.infradead.org>
+References: <20211101203929.954622-1-willy@infradead.org>
+ <20211101203929.954622-19-willy@infradead.org>
+ <YYDoMltwjNKtJaWR@infradead.org>
+ <YYGfUuItAyTNax5V@casper.infradead.org>
+ <YYKwyudsHOmPthUP@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211028203600.2157356-1-mcgrof@kernel.org>
+In-Reply-To: <YYKwyudsHOmPthUP@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (21/10/28 13:36), Luis Chamberlain wrote:
-> Embrace ATTRIBUTE_GROUPS to avoid boiler plate code.
-> This should not introduce any functional changes.
+On Wed, Nov 03, 2021 at 08:54:50AM -0700, Christoph Hellwig wrote:
+> > -	 * Walk through the page to find areas to write back. If we run off the
+> > -	 * end of the current map or find the current map invalid, grab a new
+> > -	 * one.
+> > +	 * Walk through the folio to find areas to write back. If we
+> > +	 * run off the end of the current map or find the current map
+> > +	 * invalid, grab a new one.
 > 
+> No real need for reflowing the comment, it still fits just fine even
+> with the folio change.
 
-Cc-ing Andrew  (20211028203600.2157356-1-mcgrof@kernel.org)
+Sure, but I don't like using column 79, unless it's better to.  We're on
+three lines anyway; may as well make better use of that third line.
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> > +	isize = i_size_read(inode);
+> > +	end_pos = page_offset(page) + PAGE_SIZE;
+> > +	if (end_pos - 1 >= isize) {
+> 
+> Wouldn't this check be more obvious as:
+> 
+> 	if (end_pos > i_size) {
+
+I _think_ we restrict the maximum file size to 2^63 - 1 to avoid i_size
+ever being negative.  But that means that end_pos might be 2^63 (ie
+LONG_MIN), so we need to subtract one from it to get the right answer.
+Maybe worth a comment?
