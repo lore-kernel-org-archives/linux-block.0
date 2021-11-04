@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A29A6C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 18:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB6CC4332F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 18:22:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8238A611EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 18:22:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C4696121F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 18:22:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234112AbhKDSYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 14:24:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40954 "EHLO
+        id S231956AbhKDSYs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 14:24:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234080AbhKDSYr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 14:24:47 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E3FC061714
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 11:22:08 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id bg25so9952542oib.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 11:22:08 -0700 (PDT)
+        with ESMTP id S234080AbhKDSYs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 14:24:48 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDFE3C061203
+        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 11:22:09 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id g25-20020a9d5f99000000b0055af3d227e8so5047625oti.11
+        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 11:22:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=iUVdiKdE3UtLDrSJ4ppTvX/REgJOcEw5TGAopy8ZtZU=;
-        b=b1BJAdCEj6dG21jDoA7a0zw9fEykYkNP82YHbmI/x9hd1uvkJPdEnBv+2VAlFSdQLR
-         Qd7kBU6A2pLDo2GfSY7WGuW8fG4AtzpU39TZC/RmdQNM5g+BdfTFcA44yVWh3XPgvyJp
-         vYL6mOP1TGMrYFL8cE3wXIumZQ2+966hu6km0neDAmIwck89qlgqKkaPHSXDp7G3sEGb
-         mudl0UkHVbk2euTLXbGSr5z5GzsIUwk6xjVpw8eK6bH1eO28txAjwGXvZPQRKofV4t9L
-         e84XLn/+wo4gA/IizecZzfuPoQ6Tr428pQMMIuV52G1VgtrfLC8gpU0aWHJx7fX+T21V
-         OcPg==
+        bh=oMc2U7aNLUIipa0Yuo51ied8PbRQ1VYWGknVm8Hbf/o=;
+        b=zvP89dK+wAjOY7J8KSr2URtt/u15Mn8DiUuOpYm9KgId9HKCvCqMYUFscjRYP8A7wU
+         fP2/qYhovtIuI0vS6SCCCTD1pC0xJ/QbDnlDMChotogjuWUJ+mPN+ZP8dutGdePyP6s/
+         sCz3GtOK6vw6O8idI135I5opq5+0KaE2hp0oeiR3Umn997eDUXKaMWIgReQde+5JPljv
+         w+o8cB8SVPDTb31x6jaYgqDXxRqhgd8LPTS3j4Qwl5BYB9G32mZhF3cXr1j9/hzDTKyB
+         OCQAi8haOEUoxuNmE7V2psjF+YvvidXeD9I0z0/xNiG3rtQxcxrWiPMh1FPYGl9fAbzT
+         oPjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=iUVdiKdE3UtLDrSJ4ppTvX/REgJOcEw5TGAopy8ZtZU=;
-        b=IyDCFEbAdq+2j6ByKbJ1QDHl8UeNyfV0EbWKeqNRs+HC2idxlFUohAp6h592zZ00rY
-         VXUnPDhGqbgAG47L6Y5Rywip5z1OKj8unZLeewSIWhzEr1jkquANtGwlGad4nOlUI72F
-         FgtX8HG8/Y+8KELZ68mMSYkZqxBJK4rtCCbT+P2J/GGC/FZ+JngYx0UXpH5gMJBwPOgC
-         SSDIFQ0oyPCj215OAydN+alBCVLAju0k6eqa2P4vkD24pFdptKB+g9jN+HA3NYPA1urA
-         sC+o03P2348uWl5DEJq0OVNePOvm/2KXNl0hP9Vur8acxv17AZsITZ8TyUU1CEplvKd7
-         HV7g==
-X-Gm-Message-State: AOAM532UutJf1l3TU3OOUOqQ5l0UMst7LCzNNluxiDjV6tLNKcxxWnWk
-        SWf3MgNxvUWWxFdslhBShIP4Rc+uO0utkQ==
-X-Google-Smtp-Source: ABdhPJzAz6cdk0dnoos9/zg76frPvqbQhFvU+umzOy70maDAWS7YvbyKUFF3NdelHGbxfQU6XXIcmw==
-X-Received: by 2002:a05:6808:1686:: with SMTP id bb6mr17856955oib.40.1636050127892;
-        Thu, 04 Nov 2021 11:22:07 -0700 (PDT)
+        bh=oMc2U7aNLUIipa0Yuo51ied8PbRQ1VYWGknVm8Hbf/o=;
+        b=cDvx75TSZSBHHT63Fdll4eg56DbPUwxugWWdfnRIyBXTUMt1ptSGwBeSjcT3OjI7ZQ
+         XjiOjP7rsuqirD8AvALtFjkXhT6qmZ/ZANLgmc1nyUAkmTwQjnBoaNhpl71ucHkjLTQ6
+         1QfIbfNnO9B1CNv4HjTr9ic+j0/xoknk92T2zmi8TNK6IaRB1S6sio4MQwSVctLWWu8t
+         P4iZd+3xfGFcwtu32r6OqO74Og2kQVNfxvVWKinzRubqWBHMsRSUElJ6+FV6YEVauxh0
+         CZlB9iPC1zwyD0Dix+dEb1zvNHAbFt+/E01LPiKjRvBWV9720kWJ8tjRE6DOiilLjHRA
+         Lohg==
+X-Gm-Message-State: AOAM5303Rf/VIatnaD+faBN15BXHo5YZd5woi53rflTCe+RBxFiot9ol
+        HSvGXsYs9Gn40bo8zd60qSTzGfMopPUNqw==
+X-Google-Smtp-Source: ABdhPJyP4GYxXWbfq1Aev9Ox9ubH42hSotUry9+nb1CjztufvgDdlMVIaTgOLQJNiomEXijJldwUKQ==
+X-Received: by 2002:a05:6830:16c6:: with SMTP id l6mr14819276otr.315.1636050128938;
+        Thu, 04 Nov 2021 11:22:08 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s206sm1595445oia.33.2021.11.04.11.22.07
+        by smtp.gmail.com with ESMTPSA id s206sm1595445oia.33.2021.11.04.11.22.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 11:22:07 -0700 (PDT)
+        Thu, 04 Nov 2021 11:22:08 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     hch@infradead.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/5] block: have plug stored requests hold references to the queue
-Date:   Thu,  4 Nov 2021 12:21:57 -0600
-Message-Id: <20211104182201.83906-2-axboe@kernel.dk>
+Subject: [PATCH 2/5] block: split request allocation components into helpers
+Date:   Thu,  4 Nov 2021 12:21:58 -0600
+Message-Id: <20211104182201.83906-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211104182201.83906-1-axboe@kernel.dk>
 References: <20211104182201.83906-1-axboe@kernel.dk>
@@ -65,62 +65,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Requests that were stored in the cache deliberately didn't hold an enter
-reference to the queue, instead we grabbed one every time we pulled a
-request out of there. That made for awkward logic on freeing the remainder
-of the cached list, if needed, where we had to artificially raise the
-queue usage count before each free.
+This is in preparation for a fix, but serves as a cleanup as well moving
+the cached vs regular alloc logic out of blk_mq_submit_bio().
 
-Grab references up front for cached plug requests. That's safer, and also
-more efficient.
-
-Fixes: 47c122e35d7e ("block: pre-allocate requests if plug is started and is a batch")
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-core.c | 2 +-
- block/blk-mq.c   | 7 ++++---
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ block/blk-mq.c | 71 ++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 48 insertions(+), 23 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fd389a16013c..c2d267b6f910 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1643,7 +1643,7 @@ void blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- 		flush_plug_callbacks(plug, from_schedule);
- 	if (!rq_list_empty(plug->mq_list))
- 		blk_mq_flush_plug_list(plug, from_schedule);
--	if (unlikely(!from_schedule && plug->cached_rq))
-+	if (unlikely(!rq_list_empty(plug->cached_rq)))
- 		blk_mq_free_plug_rqs(plug);
- }
- 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c68aa0a332e1..5498454c2164 100644
+index 5498454c2164..dcb413297a96 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -410,7 +410,10 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
- 		tag_mask &= ~(1UL << i);
- 		rq = blk_mq_rq_ctx_init(data, tags, tag, alloc_time_ns);
- 		rq_list_add(data->cached_rq, rq);
-+		nr++;
- 	}
-+	/* caller already holds a reference, add for remainder */
-+	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
- 	data->nr_tags -= nr;
- 
- 	return rq_list_pop(data->cached_rq);
-@@ -630,10 +633,8 @@ void blk_mq_free_plug_rqs(struct blk_plug *plug)
- {
- 	struct request *rq;
- 
--	while ((rq = rq_list_pop(&plug->cached_rq)) != NULL) {
--		percpu_ref_get(&rq->q->q_usage_counter);
-+	while ((rq = rq_list_pop(&plug->cached_rq)) != NULL)
- 		blk_mq_free_request(rq);
--	}
+@@ -2478,6 +2478,51 @@ static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
+ 	return BLK_MAX_REQUEST_COUNT;
  }
  
- static void req_bio_endio(struct request *rq, struct bio *bio,
++static struct request *blk_mq_get_new_requests(struct request_queue *q,
++					       struct blk_plug *plug,
++					       struct bio *bio)
++{
++	struct blk_mq_alloc_data data = {
++		.q		= q,
++		.nr_tags	= 1,
++		.cmd_flags	= bio->bi_opf,
++	};
++	struct request *rq;
++
++	if (plug) {
++		data.nr_tags = plug->nr_ios;
++		plug->nr_ios = 1;
++		data.cached_rq = &plug->cached_rq;
++	}
++
++	rq = __blk_mq_alloc_requests(&data);
++	if (rq)
++		return rq;
++
++	rq_qos_cleanup(q, bio);
++	if (bio->bi_opf & REQ_NOWAIT)
++		bio_wouldblock_error(bio);
++	return NULL;
++}
++
++static inline struct request *blk_mq_get_request(struct request_queue *q,
++						 struct blk_plug *plug,
++						 struct bio *bio)
++{
++	if (plug) {
++		struct request *rq;
++
++		rq = rq_list_peek(&plug->cached_rq);
++		if (rq) {
++			plug->cached_rq = rq_list_next(rq);
++			INIT_LIST_HEAD(&rq->queuelist);
++			return rq;
++		}
++	}
++
++	return blk_mq_get_new_requests(q, plug, bio);
++}
++
+ /**
+  * blk_mq_submit_bio - Create and send a request to block device.
+  * @bio: Bio pointer.
+@@ -2518,29 +2563,9 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	rq_qos_throttle(q, bio);
+ 
+ 	plug = blk_mq_plug(q, bio);
+-	if (plug && plug->cached_rq) {
+-		rq = rq_list_pop(&plug->cached_rq);
+-		INIT_LIST_HEAD(&rq->queuelist);
+-	} else {
+-		struct blk_mq_alloc_data data = {
+-			.q		= q,
+-			.nr_tags	= 1,
+-			.cmd_flags	= bio->bi_opf,
+-		};
+-
+-		if (plug) {
+-			data.nr_tags = plug->nr_ios;
+-			plug->nr_ios = 1;
+-			data.cached_rq = &plug->cached_rq;
+-		}
+-		rq = __blk_mq_alloc_requests(&data);
+-		if (unlikely(!rq)) {
+-			rq_qos_cleanup(q, bio);
+-			if (bio->bi_opf & REQ_NOWAIT)
+-				bio_wouldblock_error(bio);
+-			goto queue_exit;
+-		}
+-	}
++	rq = blk_mq_get_request(q, plug, bio);
++	if (unlikely(!rq))
++		goto queue_exit;
+ 
+ 	trace_block_getrq(bio);
+ 
 -- 
 2.33.1
 
