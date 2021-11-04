@@ -2,149 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03624C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 11:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B02C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 11:45:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEB5B611EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 11:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CC7E61205
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 11:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231365AbhKDLoP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 07:44:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33144 "EHLO
+        id S231171AbhKDLsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 07:48:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbhKDLoP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 07:44:15 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61CA7C061714
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 04:41:37 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id l8so5850053ilv.3
-        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 04:41:37 -0700 (PDT)
+        with ESMTP id S230344AbhKDLs3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 07:48:29 -0400
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1029EC061203
+        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 04:45:52 -0700 (PDT)
+Received: by mail-il1-x134.google.com with SMTP id f10so5862537ilu.5
+        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 04:45:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lQJLpIyALbgHLicql0qBfTiQWTS6b6fJLI43yG1kOi8=;
-        b=iZR5Qvr2iM2mn+OsQjxvX8FvsMH7ECKWdTi1Ey25L7X9VdjsCzSMELB62Av7YOPcEU
-         HHTsiteFakYvJWqK1r6JJrmIcE1NMe94GPC7dJe41mDyXDZhcVXJ2djGmG4uuqWqo3t0
-         lGfA4e+6CajUpq0Xv3QnFELu2UCAee1tdK7WDhNnwMCoRFNgESYHbe5+b8sdveikcMBP
-         OQCq/fNi3ZMjGtijHCnoK9i00cxlk2o4NUVHEg6LLqCGWCXkVRZUioySzNkydcnKarE+
-         15AId06xKFYCnq2eDp1kscXGeHobId6Q60oqp/Ya4li4chTGHXSi/KkPApPZlurr3wTy
-         LqRQ==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=S1qFS1jMjwj/T0yJQwZvrrHWJoJ7Nzy4g0iaJHKu/8U=;
+        b=Kd3s6O7ChYxD9JC6o9s9ReXrYG1jiSKr+18sYKuUvK89lUyVpf0eG7b+uSXK34Gjf7
+         h1WOCyJp3hLuBR6JE4DrkqZ+l+SJdVtnPtx7iTdRTdzeQAHoU+ZV0RuzzA/0MhcP5Lqb
+         oihE40aHorH9SIPFZQThFxbYXzQbwzfBCD9gnA4z9aXbbIMQNf/A3rG83aPprvRbGGGY
+         KCsWxxH6Jlb2I0cGChxp2trAmEFOmfDJSMH/1RGdUSh4WeQJBAZy1nVnhcmGLHUoTdnk
+         qFASVJhNjRtKqYiVmmTyVo5llX2i0tNIwn2jkZNMHA5nny/1Kb4ohSFFph+Qy1R7uvuu
+         kDtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lQJLpIyALbgHLicql0qBfTiQWTS6b6fJLI43yG1kOi8=;
-        b=VabAz65lrNO48LpeGBfxaM+JbzBe9adKJGQPF0EhHE0ZyZJmEBbPZizzwvg973jnUh
-         XA1VV7lQEJfXZYbHwmzf+qqtclYLpVLoEvgHInpf9WuufbYiLap/ynrov6ngvJtMOUWz
-         aSKlP/YIL9ND9BfnmTVnbhZyXpzBtUiF5ESbG5FpwCAMbh81mzjRhu/jJ28oVlBoOKim
-         SDCvUmV+8ISLsnCk8Jv6ql7e3R921MYOlQNPEDGLAgG2vjC+3RbTmyjwPHdbbYTLNAwH
-         u4QSu4qeLa93gSff22e2N/EJ7nX71CY6mcn4WqVeLk2B90gqtVg0FC3MPAPPi2LHIt8f
-         R1yg==
-X-Gm-Message-State: AOAM531ZGWg0Ru0qcFdZuyluTyrzlirLbPFPB3oxEDoQw49ofhcYDhUr
-        DDariN5d3/Cls+L4j5ZAmxCWZfIuvcwGew==
-X-Google-Smtp-Source: ABdhPJyb4qVJKX1HNyPEKDKCXR8oCLXFEmsdkL4Zr/0RE+dOFVpkg/kCBeVe3Cadtgx15J2AVv69Lw==
-X-Received: by 2002:a05:6e02:1649:: with SMTP id v9mr15505630ilu.113.1636026096549;
-        Thu, 04 Nov 2021 04:41:36 -0700 (PDT)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id c3sm2752227ili.33.2021.11.04.04.41.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Nov 2021 04:41:36 -0700 (PDT)
-Subject: Re: [PATCH 3/4] block: move queue enter logic into
- blk_mq_submit_bio()
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org
-References: <20211103183222.180268-1-axboe@kernel.dk>
- <20211103183222.180268-4-axboe@kernel.dk> <YYOjcuEExwJN1eiw@infradead.org>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=S1qFS1jMjwj/T0yJQwZvrrHWJoJ7Nzy4g0iaJHKu/8U=;
+        b=jGn5GRTGGZztPA9Mb1MZoZwEHdfCF4bKbXejsiZf7DNwI7NNfxX1XpU+Ak5v+bx+4J
+         pgvQl9n8u4HjVXhWAyCfZaAe/kwWrXdUBFD4fPUHYwDrGNDkt62Y47p58Ue8pPXOFYCY
+         bspeVVwbsLMDSO3EcOkX2WI1xV7M43oDa1RWRKRyHpM273Xnzhi1bSJSnCgBJ3i2Nprs
+         umWHJbWmB/BummolspGjNzc6V3MjtUSlYsNPrkoAKCBL7O9h2U1bRuoxvTlui9xj/oWG
+         lHHEMYrvB1AB3VDPDVAaWI/mQgjg6rODAG8UKR+zkUYQowKPKW+4M3Y8DDrzVDxQuLCY
+         Ic4g==
+X-Gm-Message-State: AOAM530DU6iMUxme1GfGcqjyeWfq/TR8JVQ2+oBY/2l9mzB8jVZtjrqH
+        4IfVTkM/DWfQej9+NG/YOVWRFA==
+X-Google-Smtp-Source: ABdhPJyl8OV+Jv4v6fXzPNd9zMbs4veLJQA2Z1RiJSGD2iP94vwTsc+5cbT4GjalzBM1M8ol8RVTOQ==
+X-Received: by 2002:a05:6e02:1646:: with SMTP id v6mr36447239ilu.282.1636026351484;
+        Thu, 04 Nov 2021 04:45:51 -0700 (PDT)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id c4sm2395231ioo.48.2021.11.04.04.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Nov 2021 04:45:51 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ff6be121-5753-fe5f-90dc-8703da656d53@kernel.dk>
-Date:   Thu, 4 Nov 2021 05:41:35 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     lars.ellenberg@linbit.com, Wu Bo <wubo40@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, mcgrof@kernel.org,
+        linfeilong@huawei.com, linux-block@vger.kernel.org
+In-Reply-To: <1636013229-26309-1-git-send-email-wubo40@huawei.com>
+References: <1636013229-26309-1-git-send-email-wubo40@huawei.com>
+Subject: Re: [PATCH] drbd: Fix double free problem in drbd_create_device
+Message-Id: <163602635079.21562.17386310945369487784.b4-ty@kernel.dk>
+Date:   Thu, 04 Nov 2021 05:45:50 -0600
 MIME-Version: 1.0
-In-Reply-To: <YYOjcuEExwJN1eiw@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/21 3:10 AM, Christoph Hellwig wrote:
-> On Wed, Nov 03, 2021 at 12:32:21PM -0600, Jens Axboe wrote:
->> Retain the old logic for the fops based submit, but for our internal
->> blk_mq_submit_bio(), move the queue entering logic into the core
->> function itself.
+On Thu, 4 Nov 2021 16:07:09 +0800, Wu Bo wrote:
+> In drbd_create_device(), the 'out_no_io_page' lable has called
+> blk_cleanup_disk() when return failed.
 > 
-> Can you explain the why?  I guess you want to skip the extra reference
-> for the cached requests now that they already have one.  But please
-> state that, and explain why it is a fix, as to me it just seems like
-> another little optimization.
-
-It's just pointless to grab double references, and counter productive
-too.
-
->> We need to be a bit careful if going into the scheduler, as a scheduler
->> or queue mappings can arbitrarily change before we have entered the queue.
->> Have the bio scheduler mapping do that separately, it's a very cheap
->> operation compared to actually doing merging locking and lookups.
+> So remove the 'out_cleanup_disk' lable to avoid double free the
+> disk pointer.
 > 
-> So just don't do the merges for cache requets and side step this
-> extra bio_queue_enter for that case?
-
-I'd be fine with that, but it's a bit of a chicken and egg situation as
-we don't know. I guess we could move the plugged request check earlier,
-and just bypass merging there. Though that makes it a special case
-thing, and it's generally useful now. Not sure that would be a good
-idea.
-
->> -	if (unlikely(bio_queue_enter(bio) != 0))
->> -		return;
->> -
->>  	if (!submit_bio_checks(bio) || !blk_crypto_bio_prep(&bio))
->> -		goto queue_exit;
->> +		return;
 > 
-> This is broken, we really ant the submit checks under freeze
-> protection to make sure the parameters can't be changed underneath
-> us.
+> [...]
 
-Which parameters are you worried about in submit_bio_checks()? I don't
-immediately see anything that would make me worry about it.
+Applied, thanks!
 
->> +static inline bool blk_mq_queue_enter(struct request_queue *q, struct bio *bio)
->> +{
->> +	if (!blk_try_enter_queue(q, false) && bio_queue_enter(bio))
->> +		return false;
->> +	return true;
->> +}
-> 
-> This looks weird, as blk_try_enter_queue is already called by
-> bio_queue_enter.
+[1/1] drbd: Fix double free problem in drbd_create_device
+      commit: 27548088ac628109f70eb0b1eb521d035844dba8
 
-It's just for avoiding a pointless call into bio_queue_enter(), which
-isn't needed it blk_try_enter_queue() is successful. The latter is short
-and small and can be inlined, while bio_queue_enter() is a lot bigger.
-
->>  	} else {
->>  		struct blk_mq_alloc_data data = {
->>  			.q		= q,
->> @@ -2528,6 +2534,11 @@ void blk_mq_submit_bio(struct bio *bio)
->>  			.cmd_flags	= bio->bi_opf,
->>  		};
->>  
->> +		if (unlikely(!blk_mq_queue_enter(q, bio)))
->> +			return;
->> +
->> +		rq_qos_throttle(q, bio);
->> +
-> 
-> At some point the code in this !cached branch really needs to move
-> into a helper..
-
-Like in the next patch?
-
+Best regards,
 -- 
 Jens Axboe
+
 
