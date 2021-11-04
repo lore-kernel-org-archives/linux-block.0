@@ -2,102 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D27EC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 21:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 454DEC43219
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 22:37:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20F9961250
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 21:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 252CD61251
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 22:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbhKDVP7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 17:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230162AbhKDVP7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 17:15:59 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E86FEC061714
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 14:13:20 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id s24so9460876plp.0
-        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 14:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=52DV6cBtZaYVrnaaoETDY/1/+4li/7mcMcQzrTKASaE=;
-        b=dhm0HG5uS2DYZmlkJ0e77pWwlX5dcW6f4WUgAWsrnsWrw74VFQslkVOTMmHQV3dnhX
-         F48cJsuqZJrjQjXjqKgM2u3JImoQxAyy9jMAQFjdI8fX9oYfg4ufRg2DBAnCIy3bx50i
-         YmiYgJ7diuDCXaz8ZAUnitxdfyh8nCzyvbRFDXxAi/nYPdIF4JP+CAqnng5mMOe1+gCv
-         iJXbya6Gh9ymo8riINFWLQVFUK8stslLnPYPCAmck7jnmgO1NejYFISZLMU7GLcMTwIw
-         45ekL33Ru7GdMIPNLpsa6uPLvv4uJmpsALMowlSK1z9LilXhqOMuq0BlFrG1SNqwkx/q
-         hlSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=52DV6cBtZaYVrnaaoETDY/1/+4li/7mcMcQzrTKASaE=;
-        b=JLFSWaOVNkVVg+uuOHsSa7eUB0PDRzCADApllQMsVeWC6JFGOTjf4F+N8tmaM2vW/0
-         0KCNutqUYL3inNPNAed3Hp4D66MIoZmRqrYSprXAzGfznog+0qqAh8VYVTv3O1vIOGYi
-         yi4jEfKGpOjMQpN3TnT76ezl67CNGD8jES58zlle3TBImxHbWQPrfutNrP9R/amloZyy
-         vLW7Px27MP24TgXAYK4grX4RbKv0Tud90LG3i5X+eZumOKUSvPDuYln6MM/gle+EDplF
-         dVWsOtfRzubesc5e8TDRkfL6tkXYMcsr5W/h/i/MlRPMUHNhSyqjUejLBLiCYPOPg061
-         25sw==
-X-Gm-Message-State: AOAM531ijzsnApQkhRRTBM1nS9Csz2Lf22vDngLILfxgNmN5X0AE/Myv
-        7htk2y/96WldBZrSNSbLS7ax9lfwXMoe5C7b
-X-Google-Smtp-Source: ABdhPJwFY8OWcPOvpq1llJQs+iqj25mhYkBEdEKAslQUmAZPN2+D0NWZVgQT72CkaUj2goJPilzgPA==
-X-Received: by 2002:a17:902:7d89:b0:13c:a5e1:f0f1 with SMTP id a9-20020a1709027d8900b0013ca5e1f0f1mr46840415plm.24.1636060399965;
-        Thu, 04 Nov 2021 14:13:19 -0700 (PDT)
-Received: from ?IPv6:2600:380:b436:eb3a:fef9:fbe6:909f:2d6a? ([2600:380:b436:eb3a:fef9:fbe6:909f:2d6a])
-        by smtp.gmail.com with ESMTPSA id m22sm5707863pfo.176.2021.11.04.14.13.18
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Nov 2021 14:13:19 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: use new bdev_nr_bytes() helper for
- blkdev_{read,write}_iter()
-Message-ID: <a72767cd-3c6d-47f7-80f4-aa025a17b2cb@kernel.dk>
-Date:   Thu, 4 Nov 2021 15:13:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232180AbhKDWkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 18:40:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41180 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229587AbhKDWkU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Nov 2021 18:40:20 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B13666112E;
+        Thu,  4 Nov 2021 22:37:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1636065461;
+        bh=d0SlTjW092+hNldgcKqMvjRj8A4fH3dQeSYxjCXIE+c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=p2Z1NXGFJcrDHRSJ4YsljTKXDwTIDfXjPxjuw4cAkJqfDVc7cASUlgwflC88tOweV
+         JFP5arOcXbccjl5/V+EMbowyZTqn0MQ4afVsp5xV3ebPz89zxsZB5eQJoiOoRAUyM3
+         vuWV/QVVj/EJhT6iJoToF4AGQnqZIXLhmWwXYe+0wuAmdxpFNjA+HlW8qMhcs90gRl
+         XhCLuHp8KdWMvBLiFUBTKBvwZgadkK57w6drNa6+5g6puakjnWhz/GhxocC1DYtZh0
+         IicrB7Jg7pWPnaBNvAuE6xBflXcJyk8Y1t2dmz+iFrFE+plPRYZ2Ly3cgts6eM5evQ
+         uI+hx3W5popiw==
+Date:   Thu, 4 Nov 2021 15:37:36 -0700
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "song@kernel.org" <song@kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: Re: [RFC PATCH 0/8] block: add support for REQ_OP_VERIFY
+Message-ID: <20211104223736.GA2655721@dhcp-10-100-145-180.wdc.com>
+References: <20211104064634.4481-1-chaitanyak@nvidia.com>
+ <20211104071439.GA21927@lst.de>
+ <661bcadd-a030-4a72-81ae-ef15080f0241@nvidia.com>
+ <20211104173235.GI2237511@magnolia>
+ <20211104173431.GA31740@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211104173431.GA31740@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have new helpers for this, use them rather than the slower inode
-size reads. This makes the read/write path consistent with most of
-the rest of block as well.
-    
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+On Thu, Nov 04, 2021 at 06:34:31PM +0100, Christoph Hellwig wrote:
+> On Thu, Nov 04, 2021 at 10:32:35AM -0700, Darrick J. Wong wrote:
+> > I also wonder if it would be useful (since we're already having a
+> > discussion elsewhere about data integrity syscalls for pmem) to be able
+> > to call this sort of thing against files?  In which case we'd want
+> > another preadv2 flag or something, and then plumb all that through the
+> > vfs/iomap as needed?
+> 
+> IFF we do this (can't answer if there is a need) we should not
+> overload read with it.  It is an operation that does not return
+> data but just a status, so let's not get into that mess.
 
----
-
-diff --git a/block/fops.c b/block/fops.c
-index a2f492e50782..d5de5451fb08 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -527,7 +527,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- {
- 	struct block_device *bdev = iocb->ki_filp->private_data;
- 	struct inode *bd_inode = bdev->bd_inode;
--	loff_t size = i_size_read(bd_inode);
-+	loff_t size = bdev_nr_bytes(bdev);
- 	struct blk_plug plug;
- 	size_t shorted = 0;
- 	ssize_t ret;
-@@ -565,7 +565,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
- {
- 	struct block_device *bdev = iocb->ki_filp->private_data;
--	loff_t size = i_size_read(bdev->bd_inode);
-+	loff_t size = bdev_nr_bytes(bdev);
- 	loff_t pos = iocb->ki_pos;
- 	size_t shorted = 0;
- 	ssize_t ret;
-
--- 
-Jens Axboe
-
+If there is a need for this, a new io_uring opcode seems like the
+appropirate user facing interface for it.
