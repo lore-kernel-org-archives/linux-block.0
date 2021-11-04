@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E315EC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 15:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA92C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 15:22:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C97EB61216
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 15:22:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBDBB60F70
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 15:22:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbhKDPYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 11:24:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55772 "EHLO
+        id S231341AbhKDPYs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 11:24:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231450AbhKDPYr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 11:24:47 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46FBFC061714
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 08:22:09 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id c2-20020a056830348200b0055a46c889a8so8723054otu.5
-        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 08:22:09 -0700 (PDT)
+        with ESMTP id S231450AbhKDPYs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 11:24:48 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DDAFC061714
+        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 08:22:10 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id x70so9785504oix.6
+        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 08:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Bsj5ZLlquf/pPLdn6lhiC7/HYQDntfsyVm6vIVzVNlU=;
-        b=AfH/GRjr0rU3aByHLtinkU2lHLDEQ7zFDv3L0CLAmNk+sMGtOAzWkNNF49Lg2iLsoC
-         CHxy1/dpVIV+MYl1NpZbOodSqX0/TBbi8DH05AIavAC4VpsnLBcTZNCvWJX11ldsti/N
-         nyVv6kcDBTClfE5hQuPbb9my98r9M4Bc58jnvCXH+flsmnyPzAcJAePyV5DhqvoBpdXj
-         BmgdRg9gdChBi0pcbWRenEYWLe4xq8qkSE94ipS8xNFEpn+EIqOltIhKYrU2NYjDWpJK
-         fND9T161ITF5tJt/ZaOYQez1T/zez4ENiVYooWfVs9bVASQOsVwl30lGtbEipVkvIYvj
-         JOVQ==
+        bh=kRxjSFq+0VTJ4ZG+Y4lSjzqOLks9JeezG9aPZtfPP6k=;
+        b=iQPky7+1EhF69oCXE18y/gsqgkkW7dov/PzkOImXTe5knrDpa2Y051Js9k5p98Cpmf
+         WdGLC9I2FCyfnougmah8i1N6/mAH5rpHcIMdIoRGBor2zpbfazuUDZoo38uobEmljJdp
+         +apW3FAjDDoCB5wowv1/jGyQ0e7zrhU9UxRzx2mz2xVppFKXJ31InnOzBOjO6VLRsKQx
+         aJdS0JPxkYpX0DJapm6fIQ3J9bBvfFdiCpC1SKLQyOj0idaW/YbTjdSlskfvPLi+rkme
+         lgAZDfeMe5PZMdoGX8mC7QOAA9cqEwygIxYHE6E8y84wTRqYYar/RUPve2i3pERyiUIY
+         0VCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Bsj5ZLlquf/pPLdn6lhiC7/HYQDntfsyVm6vIVzVNlU=;
-        b=xdwSvwA5G0DwdSf/RzLMCcK1RMVa88/s2zVgwET4hkA0x92EuAhT5Ya3PId+zQZoMk
-         a6yPUKy70HGO2j22wBhumcauIQuhU2IkRRzDejG3ElUVHBk6vA7OcPbtbI1yhVSK5Vul
-         7h/83yiEiOE9hp7NwMY+GOzLUL3SrqMdi4HqRJtzaPdV/fBl40vvmtUOiaZDmui5hYWn
-         /zK+I3r2N3FDIwuhRd44o+OK5UAgILiWstGpwew0w79vjoyJC9LNzujAtWbQZmlXMLhA
-         TGvRFGCA77STRVdNRCjU9TTaks9BxNszGYIpO+Sn2YArL4hZ2yBBh8u4FO4J4XLJ4gCF
-         7Yiw==
-X-Gm-Message-State: AOAM531J3R8a9P0VdgVcT/OXonvexTrr91qHU9xO57Hk+4vlP6BHKlRy
-        pUsV53r2s2o7jWgrdHbsrNw+koihHoG7Mg==
-X-Google-Smtp-Source: ABdhPJwuoOUSJL6lAc9NTU1el/i3Lj+5LRC4d+3l8UABkXHiOgd5a+aFyPJ6xF/vQMAs9A4ceoKXXA==
-X-Received: by 2002:a9d:f67:: with SMTP id 94mr11254034ott.32.1636039328466;
-        Thu, 04 Nov 2021 08:22:08 -0700 (PDT)
+        bh=kRxjSFq+0VTJ4ZG+Y4lSjzqOLks9JeezG9aPZtfPP6k=;
+        b=Oao8BP0uudGvZWFeiGR03r1hPHIC7ZJkFx3jPvc1MUiIK/mnu/BGGqJ3o5r1Z3oB8X
+         SguYiZvF0hNwvPa7lgAJ5YEv5xY2qi0u44j2ugAs9ZjmEGzYhfg5ONF4tcVI8EXrwWhO
+         U88vck9IOsewC62FCiN53bY1PrVI794ju0ZVwCRTYIARLw0YPa4ng/TPJrcy9daCljjR
+         ZOX/+u2ZJkcR1sRFjnrcw7sWN2J8TNmF4XVoz0V51AkO6fT3NDY7Nrc+FP1wQikonpIK
+         s5xme+yM9CVA3QW2b4mP7HwkA9qdXNlpApk5ZgyJ6+eOiQlEKYdZWaKwMaJpPQgX5+h4
+         FI3A==
+X-Gm-Message-State: AOAM531M8kMSreS9w5jtfMlP0wg9npMJECjGYygSvMjYkOA0oQ5Y0z6y
+        XMsG2HOmTTna1/UfnjKQtfPg8ix6tx7CPw==
+X-Google-Smtp-Source: ABdhPJxfcySE8gWJUZHPUHhAub+oHJfKexQJUYspU3Uj+4/yzOOE4J0EmLYVD+dkMxvjHH41Loyemw==
+X-Received: by 2002:a54:4f82:: with SMTP id g2mr16214898oiy.134.1636039329379;
+        Thu, 04 Nov 2021 08:22:09 -0700 (PDT)
 Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id k2sm1023925oiw.7.2021.11.04.08.22.07
+        by smtp.gmail.com with ESMTPSA id k2sm1023925oiw.7.2021.11.04.08.22.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 08:22:08 -0700 (PDT)
+        Thu, 04 Nov 2021 08:22:09 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/5] block: make blk_try_enter_queue() available for blk-mq
-Date:   Thu,  4 Nov 2021 09:22:01 -0600
-Message-Id: <20211104152204.57360-3-axboe@kernel.dk>
+Subject: [PATCH 3/5] block: move plug rq alloc into helper
+Date:   Thu,  4 Nov 2021 09:22:02 -0600
+Message-Id: <20211104152204.57360-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211104152204.57360-1-axboe@kernel.dk>
 References: <20211104152204.57360-1-axboe@kernel.dk>
@@ -65,94 +65,55 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just a prep patch for shifting the queue enter logic.
+This is in preparation for a fix, but serves as a cleanup as well moving
+the plugged request logic out of blk_mq_submit_bio().
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-core.c | 26 +-------------------------
- block/blk.h      | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+), 25 deletions(-)
+ block/blk-mq.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c2d267b6f910..e00f5a2287cc 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -386,30 +386,6 @@ void blk_cleanup_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_cleanup_queue);
- 
--static bool blk_try_enter_queue(struct request_queue *q, bool pm)
--{
--	rcu_read_lock();
--	if (!percpu_ref_tryget_live_rcu(&q->q_usage_counter))
--		goto fail;
--
--	/*
--	 * The code that increments the pm_only counter must ensure that the
--	 * counter is globally visible before the queue is unfrozen.
--	 */
--	if (blk_queue_pm_only(q) &&
--	    (!pm || queue_rpm_status(q) == RPM_SUSPENDED))
--		goto fail_put;
--
--	rcu_read_unlock();
--	return true;
--
--fail_put:
--	blk_queue_exit(q);
--fail:
--	rcu_read_unlock();
--	return false;
--}
--
- /**
-  * blk_queue_enter() - try to increase q->q_usage_counter
-  * @q: request queue pointer
-@@ -442,7 +418,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 	return 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5498454c2164..f7f36d5ed25a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2478,6 +2478,23 @@ static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
+ 	return BLK_MAX_REQUEST_COUNT;
  }
  
--static inline int bio_queue_enter(struct bio *bio)
-+int bio_queue_enter(struct bio *bio)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 
-diff --git a/block/blk.h b/block/blk.h
-index 7afffd548daf..f7371d3b1522 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -55,6 +55,31 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
- void blk_freeze_queue(struct request_queue *q);
- void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- void blk_queue_start_drain(struct request_queue *q);
-+int bio_queue_enter(struct bio *bio);
-+
-+static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
++static inline struct request *blk_get_plug_request(struct request_queue *q,
++						   struct blk_plug *plug,
++						   struct bio *bio)
 +{
-+	rcu_read_lock();
-+	if (!percpu_ref_tryget_live_rcu(&q->q_usage_counter))
-+		goto fail;
++	struct request *rq;
 +
-+	/*
-+	 * The code that increments the pm_only counter must ensure that the
-+	 * counter is globally visible before the queue is unfrozen.
-+	 */
-+	if (blk_queue_pm_only(q) &&
-+	    (!pm || queue_rpm_status(q) == RPM_SUSPENDED))
-+		goto fail_put;
-+
-+	rcu_read_unlock();
-+	return true;
-+
-+fail_put:
-+	blk_queue_exit(q);
-+fail:
-+	rcu_read_unlock();
-+	return false;
++	if (!plug)
++		return NULL;
++	rq = rq_list_peek(&plug->cached_rq);
++	if (rq) {
++		plug->cached_rq = rq_list_next(rq);
++		INIT_LIST_HEAD(&rq->queuelist);
++		return rq;
++	}
++	return NULL;
 +}
++
+ /**
+  * blk_mq_submit_bio - Create and send a request to block device.
+  * @bio: Bio pointer.
+@@ -2518,10 +2535,8 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	rq_qos_throttle(q, bio);
  
- #define BIO_INLINE_VECS 4
- struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
+ 	plug = blk_mq_plug(q, bio);
+-	if (plug && plug->cached_rq) {
+-		rq = rq_list_pop(&plug->cached_rq);
+-		INIT_LIST_HEAD(&rq->queuelist);
+-	} else {
++	rq = blk_get_plug_request(q, plug, bio);
++	if (!rq) {
+ 		struct blk_mq_alloc_data data = {
+ 			.q		= q,
+ 			.nr_tags	= 1,
 -- 
 2.33.1
 
