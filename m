@@ -2,77 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A285C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 19:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2905C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 19:30:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3746B61212
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 19:30:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 833F461216
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 19:30:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231538AbhKDTco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 15:32:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56404 "EHLO
+        id S230511AbhKDTdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 15:33:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230511AbhKDTco (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 15:32:44 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9EEC061714;
-        Thu,  4 Nov 2021 12:30:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=PsZGxYZJ1vXnhzJHZV0TXIJJbA2U4NKdfuAv3fOctvc=; b=PPqIjiNNj2vnP1ZZKH427cyEZS
-        Ze4+vDT+HmiL047OGJvvDQHvezq1cQC1mhfBoBGWv2D/fB9QNHvhp/FnURWxVdWbR6Z6PRp7ueEnq
-        d7Uns436Z03Fb9PjdURc5MT2PNotZUKnxFBEUIdOlo5welZZ4xIyY7RE+cZPmwjrI1i+iU8sT8D1L
-        N6WSHofEpzg1YRbIuxov2o0XcCwOHHEilEStyKyKg1Xq84rGv4fsk8eb77/zcMBwy2xIMwWJsJlXT
-        tb/TQ2irgU4a8/J+SkcPnHxaOPEdIom8BiNsJWG9xjFNB0zgTcBQTM16j1FN/Mec909FSrmf6Vg8H
-        ouk8HkmQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1miiQy-009srx-BB; Thu, 04 Nov 2021 19:30:00 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, hare@suse.de, hch@infradead.org, wubo40@huawei.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH] block: fix bd_holder_dir kobject_create_and_add() error handling
-Date:   Thu,  4 Nov 2021 12:29:59 -0700
-Message-Id: <20211104192959.2355827-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S229804AbhKDTdK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 15:33:10 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F39CEC061714
+        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 12:30:31 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id q33-20020a056830442100b0055abeab1e9aso9741625otv.7
+        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 12:30:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MeYisuq+vUW9J7l2Lr88HFx0iiLWmgDecqeDwjZ+2qk=;
+        b=zuSHtViCEWnQsJsL6q/0tDVx87LUy0SMqpxq/NvvoXTYQN3B7hzy84TR3VgaFEyMDb
+         /728d4PYphMiunkdXoYyo436T3+xHt9CWSmq8TpEsKfb8ENYY50lJ8sfGMe2puctoQqf
+         JgopvIEG8reC9eyRaapkqpQAXXjGdFVj4yZ1fmDtBOUo0AbVbcgRs7JMcIRbaEhUfGiR
+         Nyr4/ZtlLuey5bwsmNYwta4cR5onAurKy1b9TQxfkKOV+mIh6SYDGmP3+/0PrwYt1Zuu
+         QWuAJqBu/1aCAeDF/W5wCaMkqYVNHLiyIq2oqcCoiXVzDmwdKWXwGz8zSWkZqCvAtcbR
+         1RGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MeYisuq+vUW9J7l2Lr88HFx0iiLWmgDecqeDwjZ+2qk=;
+        b=8Mru3GthYZwFS5dEY3NNtbD1+uKoWKk6SjMbVIzWyFyb+xGu4x4qK8caOyt8cvAkmP
+         7sSz04bv9Nck4bDyJ2LdJq3iFTs3Ik2voK4jDU8Bd+962XhvHC+33qgECGOnaForDwaB
+         15BD7zNXqezxeIfSx4QrAUsno4Vl9qBfzUgeajW6+3MAvqC0tJlfUfSIHYUF4+mP01wj
+         eQIf4IMPfgphv1v9ICL5iO3ynBmXgnSTUv8bPCT2To85RrI7bH0jvnDCCAvC1l/mMb3s
+         YWzqNAvvBrfR0mCGbHKKrYEMpBzuhKbM4k9nYBqGJT2qMprZR98xq7Qy12GBeJD8y1lb
+         U6Rg==
+X-Gm-Message-State: AOAM531FCnl70QmYQ3IQaauH42rb+zorLSGjxLplHGy0y2AFIcfZtKrb
+        TMKrcchriRobUxhidqhUXZedJg==
+X-Google-Smtp-Source: ABdhPJxg+y91Jbc69Q+2+Q/MVoYSU62FQZhW1K7X1KyYAgqlwTtC4svfwTPJkXab0YjZpf9Jg5J82g==
+X-Received: by 2002:a05:6830:2b1f:: with SMTP id l31mr32042959otv.333.1636054231348;
+        Thu, 04 Nov 2021 12:30:31 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id n10sm1748848ooj.42.2021.11.04.12.30.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Nov 2021 12:30:30 -0700 (PDT)
+Subject: Re: [PATCH] block: fix bd_holder_dir kobject_create_and_add() error
+ handling
+To:     Luis Chamberlain <mcgrof@kernel.org>, hare@suse.de,
+        hch@infradead.org, wubo40@huawei.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211104192959.2355827-1-mcgrof@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <993a116a-72bf-9304-1577-3f2e4300daeb@kernel.dk>
+Date:   Thu, 4 Nov 2021 13:30:29 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20211104192959.2355827-1-mcgrof@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 83cbce957446 ("block: add error handling for device_add_disk /
-add_disk") added error handling to device_add_disk(), however the goto
-label for the bd_holder_dir kobject_create_and_add() failure did not set
-the return value correctly, and so we can end up in a situation where
-kobject_create_and_add() fails but we report success.
+On 11/4/21 1:29 PM, Luis Chamberlain wrote:
+> Commit 83cbce957446 ("block: add error handling for device_add_disk /
+> add_disk") added error handling to device_add_disk(), however the goto
+> label for the bd_holder_dir kobject_create_and_add() failure did not set
+> the return value correctly, and so we can end up in a situation where
+> kobject_create_and_add() fails but we report success.
 
-Fixes: 83cbce957446 ("block: add error handling for device_add_disk / add_disk")
-Reported-by: Wu Bo <wubo40@huawei.com>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- block/genhd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I'm just going to fold this one in, as it's top-of-tree.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 2263f7862241..c5392cc24d37 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -472,8 +472,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 
- 	disk->part0->bd_holder_dir =
- 		kobject_create_and_add("holders", &ddev->kobj);
--	if (!disk->part0->bd_holder_dir)
-+	if (!disk->part0->bd_holder_dir) {
-+		ret = -ENOMEM;
- 		goto out_del_integrity;
-+	}
- 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
- 	if (!disk->slave_dir) {
- 		ret = -ENOMEM;
 -- 
-2.33.0
+Jens Axboe
 
