@@ -2,175 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B92CC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 16:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C275DC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:08:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64CC461183
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 16:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A802860F56
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:08:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231714AbhKDRBo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 13:01:44 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:53428 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231616AbhKDRBn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 13:01:43 -0400
-Received: from [10.137.106.139] (unknown [131.107.159.11])
-        by linux.microsoft.com (Postfix) with ESMTPSA id D817320ABA92;
-        Thu,  4 Nov 2021 09:59:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D817320ABA92
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1636045145;
-        bh=6Fhu1fVrlEM+zAeqzfl+2y2B+pfRDcedOWmMzTvJw68=;
-        h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-        b=qbxZqAsxfR+uZTMqf4wXUs1iyN/O0A9xneB0ugX07sKH4oYoJGlekFy5vbq79mK1h
-         MMnPCiWKoOKbLKYoMjOY7jqTP6yv1bSanJLOzZSGaLn8s1dJOojCUNY6+wZZJ0vs69
-         Mu73irmZ7f10kfbIy2N+gkfEspEQ5jrQWbygMak4=
-Message-ID: <bd189273-7640-e135-9ca3-e6f3b909b3a1@linux.microsoft.com>
-Date:   Thu, 4 Nov 2021 09:59:04 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-From:   Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [RFC PATCH v7 07/16] ipe: add auditing support
-To:     Steve Grubb <sgrubb@redhat.com>, corbet@lwn.net, axboe@kernel.dk,
-        agk@redhat.com, snitzer@redhat.com, ebiggers@kernel.org,
-        tytso@mit.edu, paul@paul-moore.com, eparis@redhat.com,
-        jmorris@namei.org, serge@hallyn.com, linux-audit@redhat.com
-Cc:     linux-security-module@vger.kernel.org, linux-doc@vger.kernel.org,
-        jannh@google.com, linux-fscrypt@vger.kernel.org,
+        id S231253AbhKDRKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 13:10:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52102 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231186AbhKDRKj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 13:10:39 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DE9C061714;
+        Thu,  4 Nov 2021 10:08:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+        bh=5lMkOS6mdqYvX76YLp0lHMCiGc25jm9/Te+lsE56UR4=; b=lEfQifSXneL5FWvCpOeIubdwcS
+        8LeSf6tgQGAHL9mRAu5cvd46X33AckfG/Ki6acBx+9KXSYYeXBcm8o5pXvOZ5/hHnMkOVvHqKsQvE
+        jTv9nXCn2U+/3dDX8VUaKrUF6OjVo5DW+lJgPIqp4NEZGdssywtWjuSKz9ZZo4LcCTkoCfQfxu+U7
+        OPHXscK0LTmg3e3Pwh5Xo2/ioPlJpGEsBn7LHE8eFx5TSjL34xQntK/CqKlpD43+fR1OJsZJufinX
+        aqGZkGaCqZEeHjA0jYr5AMuOtILAzkCbpYAQ06RiO3CXmmL6/T5R3dmExFNTCzyP8LK2Rutb1dKCg
+        h8UztIxg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1migDJ-009ada-E1; Thu, 04 Nov 2021 17:07:45 +0000
+Date:   Thu, 4 Nov 2021 10:07:45 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, martin.petersen@oracle.com
+Cc:     miquel.raynal@bootlin.com, hare@suse.de, jack@suse.cz, hch@lst.de,
+        song@kernel.org, dave.jiang@intel.com, richard@nod.at,
+        vishal.l.verma@intel.com, penguin-kernel@i-love.sakura.ne.jp,
+        tj@kernel.org, ira.weiny@intel.com, vigneshr@ti.com,
+        dan.j.williams@intel.com, ming.lei@redhat.com, efremov@linux.com,
+        linux-raid@vger.kernel.org, linux-mtd@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
- <2159283.iZASKD2KPV@x2>
- <8802b1ff-3028-642a-22c5-bc4896450a60@linux.microsoft.com>
- <1898302.usQuhbGJ8B@x2>
-Content-Language: en-US
-In-Reply-To: <1898302.usQuhbGJ8B@x2>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v5 00/14] last set for add_disk() error handling
+Message-ID: <YYQTYctDjaxU2tkQ@bombadil.infradead.org>
+References: <20211103230437.1639990-1-mcgrof@kernel.org>
+ <163602655191.22491.10844091970007142957.b4-ty@kernel.dk>
+ <4764286a-99b4-39f7-ce5c-9e88cee1a538@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <4764286a-99b4-39f7-ce5c-9e88cee1a538@kernel.dk>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Nov 04, 2021 at 06:53:34AM -0600, Jens Axboe wrote:
+> On 11/4/21 5:49 AM, Jens Axboe wrote:
+> > On Wed, 3 Nov 2021 16:04:23 -0700, Luis Chamberlain wrote:
+> >> Jens,
+> >>
+> >> as requested, I've folded all pending changes into this series. This
+> >> v5 pegs on Christoph's reviewed-by tags and since I was respinning I
+> >> modified the ataprobe and floppy driver changes as he suggested.
+> >>
+> >> I think this is it. The world of floppy has been exciting for v5.16.
+> >>
+> >> [...]
+> > 
+> > Applied, thanks!
+> > 
+> > [01/14] nvdimm/btt: use goto error labels on btt_blk_init()
+> >         commit: 2762ff06aa49e3a13fb4b779120f4f8c12c39fd1
+> > [02/14] nvdimm/btt: add error handling support for add_disk()
+> >         commit: 16be7974ff5d0a5cd9f345571c3eac1c3f6ba6de
+> > [03/14] nvdimm/blk: avoid calling del_gendisk() on early failures
+> >         commit: b7421afcec0c77ab58633587ddc29d53e6eb95af
+> > [04/14] nvdimm/blk: add error handling support for add_disk()
+> >         commit: dc104f4bb2d0a652dee010e47bc89c1ad2ab37c9
+> > [05/14] nvdimm/pmem: cleanup the disk if pmem_release_disk() is yet assigned
+> >         commit: accf58afb689f81daadde24080ea1164ad2db75f
+> > [06/14] nvdimm/pmem: use add_disk() error handling
+> >         commit: 5a192ccc32e2981f721343c750b8cfb4c3f41007
+> > [07/14] z2ram: add error handling support for add_disk()
+> >         commit: 15733754ccf35c49d2f36a7ac51adc8b975c1c78
+> > [08/14] block/sunvdc: add error handling support for add_disk()
+> >         commit: f583eaef0af39b792d74e39721b5ba4b6948a270
+> > [09/14] mtd/ubi/block: add error handling support for add_disk()
+> >         commit: ed73919124b2e48490adbbe48ffe885a2a4c6fee
+> > [10/14] ataflop: remove ataflop_probe_lock mutex
+> >         commit: 4ddb85d36613c45bde00d368bf9f357bd0708a0c
+> > [11/14] block: update __register_blkdev() probe documentation
+> >         commit: 26e06f5b13671d194d67ae8e2b66f524ab174153
+> > [12/14] ataflop: address add_disk() error handling on probe
+> >         commit: 46a7db492e7a27408bc164cbe6424683e79529b0
+> > [13/14] floppy: address add_disk() error handling on probe
+> >         commit: ec28fcc6cfcd418d20038ad2c492e87bf3a9f026
+> > [14/14] block: add __must_check for *add_disk*() callers
+> >         commit: 1698712d85ec2f128fc7e7c5dc2018b5ed2b7cf6
+> 
+> rivers/scsi/sd.c: In function ‘sd_probe’:
+> drivers/scsi/sd.c:3573:9: warning: ignoring return value of ‘device_add_disk’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+>  3573 |         device_add_disk(dev, gd, NULL);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/scsi/sr.c: In function ‘sr_probe’:
+> drivers/scsi/sr.c:731:9: warning: ignoring return value of ‘device_add_disk’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+>   731 |         device_add_disk(&sdev->sdev_gendev, disk, NULL);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> 
+> Dropping the last two patches...
 
-On 11/2/2021 12:44 PM, Steve Grubb wrote:
-> Hello,
->
-> On Friday, October 15, 2021 3:25:47 PM EDT Deven Bowers wrote:
->> On 10/13/2021 1:02 PM, Steve Grubb wrote:
->>> On Wednesday, October 13, 2021 3:06:26 PM EDT
->>> deven.desai@linux.microsoft.com> 
->>> wrote:
->>>> Users of IPE require a way to identify when and why an operation fails,
->>>> allowing them to both respond to violations of policy and be notified
->>>> of potentially malicious actions on their systens with respect to IPE
->>>> itself.
->>> Would you mind sending examples of audit events so that we can see what
->>> the end result is? Some people add them to the commit text. But we still
->>> need to see what they look like.
->> Sure, sorry. I’ll add them to the commit description (and the documentation
->> patch at the end) for v8 – In the interest of asynchronous feedback, I’ve
->> copied the relevant examples:
-> Thanks for sending these. This helps.
->
->   
->> AUDIT1420 IPE ctx_pid=229 ctx_op=EXECUTE ctx_hook=MMAP ctx_enforce=0
->> ctx_comm="grep" ctx_pathname="/usr/lib/libc-2.23.so"
->> ctx_ino=532 ctx_dev=vda rule="DEFAULT op=EXECUTE action=DENY"
-> Question...why do all of these have a ctx_  prefix?
+Martin K Peterson has the respective patches needed queued up on his tree
+for v5.16:
 
-Ah, the ctx_ was because these fields are all grouped in ipe in a 
-context (ctx)
-structure. An private version (pre-v1) had these grouped like:
+https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=5.16/scsi-staging&id=e9d658c2175b95a8f091b12ddefb271683aeacd9
+https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=5.16/scsi-staging&id=2a7a891f4c406822801ecd676b076c64de072c9e
 
-    ctx={ pid=229 comm="grep" op=EXECUTE ... }
+Would the last patch be sent once that gets to Linus?
 
-But during an internal review, it was brought up that the grouping is likely
-non-standard and to cause more issues than its worth instead of just 
-prefixing
-the field with ctx_. Now that I think about it a bit more, the context is
-implicit, so the prefix and grouping doesn't make sense.
+Also curious why drop the last two patches instead just the last one for
+now?
 
-> Is it possible to trigger an audit context so that the audit machinery
-> collects all of this stuff in  it's own way? Which means you could drop
-> everything execept op, hook, enforce, rule, and action.
-
-I could do something internal in IPE that will create the context in the 
-right
-way. As far as inside the audit stack it looks like the closest analogue 
-would
-be common_lsm_audit - which fixes the type to be AVC. I don't think 
-adding another
-form of AVC is appropriate?
-
-I could also either extend common_lsm_audit to accept a type parameter, or
-make a more generalized function as part of the audit framework. Do you have
-a preference? Paul, do you have a preference?
-
-> We also have a field dictionary here:
-> https://github.com/linux-audit/audit-documentation/blob/main/specs/fields/
-> field-dictionary.csv
->
-> which names the known fields and how they should be formatted. If there is a
-> collision where they are something else and cannot be in the same format,
-> then we make a new name and hopefully update the dictionary. For example, if
-> you are collecting a process id, use pid and not ctx_pid so that it matches a
-> known definition.
-
-Wow. I didn't know about this - it should be pretty easy to change the 
-fields
-to follow this mapping. Almost everything has a correlation already. It 
-looks
-like there would be only one collision with hook being currently defined
-with netfilter. Everything else would be new (e.g. rule), or could map
-an existingfield.
-> Also, I don't thnk these events can stand on their own. Who did this action?
-> You have the pid, but no uid, auid, or session_id.
-
-It makes sense to add these fields; and it'd be taken care of with your 
-suggestion
-above to make the audit context just gathers this information in its 
-own, consistent
-way.
-
-> Hope this helps...
->
-> -Steve
->
->   
->> AUDIT1420 IPE ctx_pid=229 ctx_op=EXECUTE ctx_hook=MMAP ctx_enforce=0
->> ctx_comm="grep" ctx_pathname="/usr/lib/libc-2.23.so"
->> ctx_ino=532 ctx_dev=vda rule="DEFAULT action=DENY"
->>
->> AUDIT1420 IPE ctx_pid=253 ctx_op=EXECUTE ctx_hook=MMAP ctx_enforce=1
->> ctx_comm="anon" rule="DEFAULT op=EXECUTE action=DENY"
->>
->> These three audit records represent various types of results after
->> evaluating
->> the trust of a resource. The first two differ in the rule that was
->> matched in
->> IPE's policy, the first being an operation-specific default, the second
->> being
->> a global default. The third is an example of what is audited when anonymous
->> memory is blocked (as there is no way to verify the trust of an anonymous
->> page).
->>
->> The remaining three events, AUDIT_TRUST_POLICY_LOAD (1421),
->> AUDIT_TRUST_POLICY_ACTIVATE (1422), and AUDIT_TRUST_STATUS (1423) have this
->> form:
->>
->> AUDIT1421 IPE policy_name="my-policy" policy_version=0.0.0
->> <hash_alg_name>=<hash>
->> AUDIT1422 IPE policy_name="my-policy" policy_version=0.0.0
->> <hash_alg_name>=<hash>
->> AUDIT1423 IPE enforce=1
->>
->> The 1421 (AUDIT_TRUST_POLICY_LOAD) event represents a new policy was loaded
->> into the kernel, but not is not marked as the policy to enforce. The
->>
->> The 1422 (AUDIT_TRUST_POLICY_ACTIVATE) event represents a policy that was
->> already loaded was made the enforcing policy.
->>
->> The 1423 (AUDIT_TRUST_STATUS) event represents a switch between
->> permissive and
->> enforce, it is added in 08/16 (the following patch)
+  Luis
