@@ -2,162 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CDCC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F3CC4332F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:12:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 864FB60F56
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:10:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 432F861260
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 17:12:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232065AbhKDRN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 13:13:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231971AbhKDRN3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 13:13:29 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60A6C061205
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 10:10:50 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id o83so10298822oif.4
-        for <linux-block@vger.kernel.org>; Thu, 04 Nov 2021 10:10:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=SevfzmLSoiSwyaqVR0wq8id+v0W8G6ODuu7UIBW98Ck=;
-        b=FI/9ZNYr6/fAExz91u+4IwEk/Sxb4E3n6n+OTpB6yV1R775Z6Rzn9wDuRKyhtHW7Yh
-         l0iXs/DRJdBCFSmFd1drvVOSND9tg7xbhdWhPlV+E7agORgDq700oVfwOrZafut+uTjL
-         wZsxQZh6zgZB+DNENjftVxGc9YpUsDAGiRyi//LUZnHzRHIRnbOFxBpPg8XrR9F7ikSf
-         UDIo8ruFN9iOwT6B1ti3FGya6rHDXaX1OIjfzbF69TkBR2jACv9yQMF30HkEsRnr62o1
-         dHzC2TUCo67saJOtouCkKq8r/H4VDxeLV8YfMGOr2rul3DM4MH9og7FmH1N3/1TnIjKp
-         FZGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SevfzmLSoiSwyaqVR0wq8id+v0W8G6ODuu7UIBW98Ck=;
-        b=Ys4U702aVaTW1MeuygRQkK3lUbMj/f9zDJblUe4jZrJAad4ybjFAdCQJPCu89yDAVu
-         xDGxxjwZk98O5KCB7t7RSNrVYpwM0H1m4MCipswygnD+h1fOnP4+mLMjHnGOdAuhD7PR
-         ZkFeqtCgThEEehOeV1+rea4OxpsZFGn80MvIByEuraX4G6U0psUYqYkG0Jb/O6JuN4KD
-         c9/XcSNqhxp4iWIHYNMo70FxF8OM7L+XXgoQdmjpFFNQOFwitR0kiB8bw+Y5Au4QBJ8R
-         WsLMYTL3wtWCcsxWdUwi3Vl0NezQ0v8SBDWhu8K+DfAoyT1ZzFaO0q0rbA8acIQqEAgX
-         Ying==
-X-Gm-Message-State: AOAM533yT96nhyXAKEWRNbB+JQ6ckSS3Eq4XoMFctZ/RSsXiXjMaTJdy
-        2Jv4Y3T3QUsFGXnz7vPoaVEeqg==
-X-Google-Smtp-Source: ABdhPJwKmmjP4pd9sA9tjR2/ScYq3sGmtX9vWhgQjNflbjsCxPsKiictYttp6KRG05oAopieT+rW4g==
-X-Received: by 2002:aca:3fd7:: with SMTP id m206mr16918071oia.162.1636045850000;
-        Thu, 04 Nov 2021 10:10:50 -0700 (PDT)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id a13sm1599171oiy.9.2021.11.04.10.10.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Nov 2021 10:10:49 -0700 (PDT)
-Subject: Re: [PATCH v5 00/14] last set for add_disk() error handling
-To:     Luis Chamberlain <mcgrof@kernel.org>, martin.petersen@oracle.com
-Cc:     miquel.raynal@bootlin.com, hare@suse.de, jack@suse.cz, hch@lst.de,
-        song@kernel.org, dave.jiang@intel.com, richard@nod.at,
-        vishal.l.verma@intel.com, penguin-kernel@i-love.sakura.ne.jp,
-        tj@kernel.org, ira.weiny@intel.com, vigneshr@ti.com,
-        dan.j.williams@intel.com, ming.lei@redhat.com, efremov@linux.com,
-        linux-raid@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20211103230437.1639990-1-mcgrof@kernel.org>
- <163602655191.22491.10844091970007142957.b4-ty@kernel.dk>
- <4764286a-99b4-39f7-ce5c-9e88cee1a538@kernel.dk>
- <YYQTYctDjaxU2tkQ@bombadil.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <377b472e-b788-df12-f9cd-7fc7b0887dc0@kernel.dk>
-Date:   Thu, 4 Nov 2021 11:10:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232632AbhKDROv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 13:14:51 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:55138 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232614AbhKDROt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 13:14:49 -0400
+Received: from [10.137.106.139] (unknown [131.107.159.11])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 5ED1720ABA94;
+        Thu,  4 Nov 2021 10:12:10 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5ED1720ABA94
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1636045930;
+        bh=qEPw2InKnsvskNfMVAs79ETCgoEtkA0LqlU3T/wm4UU=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=TOKjsjpHy/6jP6DASOEiio4+SFbY1bV2zRvkMssy96xZM0i5VxP1rkA4e/T9SCZ6P
+         4waObN9FPi2nFKpG56+iXnUxO+7Q+NmeIx/NfccfBZOI2tCSlSsiK5C+0559jeIH7u
+         f+DR+oor43nyIe7u/bOblKF60y+83HkhuOSbu32Q=
+Message-ID: <8d12dcf4-165d-9db6-5a42-591bc8b97c00@linux.microsoft.com>
+Date:   Thu, 4 Nov 2021 10:12:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <YYQTYctDjaxU2tkQ@bombadil.infradead.org>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [RFC PATCH v7 12/16] fsverity|security: add security hooks to
+ fsverity digest and signature
 Content-Language: en-US
+To:     Roberto Sassu <roberto.sassu@huawei.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     "corbet@lwn.net" <corbet@lwn.net>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "paul@paul-moore.com" <paul@paul-moore.com>,
+        "eparis@redhat.com" <eparis@redhat.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "jannh@google.com" <jannh@google.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-audit@redhat.com" <linux-audit@redhat.com>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1634151995-16266-13-git-send-email-deven.desai@linux.microsoft.com>
+ <YWcyYBuNppjrVOe2@gmail.com>
+ <9089bdb0-b28a-9fa0-c510-00fa275af621@linux.microsoft.com>
+ <0b4c9a91afb441b085ec914118617ee7@huawei.com>
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+In-Reply-To: <0b4c9a91afb441b085ec914118617ee7@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/4/21 11:07 AM, Luis Chamberlain wrote:
-> On Thu, Nov 04, 2021 at 06:53:34AM -0600, Jens Axboe wrote:
->> On 11/4/21 5:49 AM, Jens Axboe wrote:
->>> On Wed, 3 Nov 2021 16:04:23 -0700, Luis Chamberlain wrote:
->>>> Jens,
+
+On 11/3/2021 5:28 AM, Roberto Sassu wrote:
+>> From: Deven Bowers [mailto:deven.desai@linux.microsoft.com]
+>> Sent: Friday, October 15, 2021 9:26 PM
+>> On 10/13/2021 12:24 PM, Eric Biggers wrote:
+>>> On Wed, Oct 13, 2021 at 12:06:31PM -0700,
+>> deven.desai@linux.microsoft.com wrote:
+>>>> From: Fan Wu <wufan@linux.microsoft.com>
 >>>>
->>>> as requested, I've folded all pending changes into this series. This
->>>> v5 pegs on Christoph's reviewed-by tags and since I was respinning I
->>>> modified the ataprobe and floppy driver changes as he suggested.
->>>>
->>>> I think this is it. The world of floppy has been exciting for v5.16.
->>>>
->>>> [...]
->>>
->>> Applied, thanks!
->>>
->>> [01/14] nvdimm/btt: use goto error labels on btt_blk_init()
->>>         commit: 2762ff06aa49e3a13fb4b779120f4f8c12c39fd1
->>> [02/14] nvdimm/btt: add error handling support for add_disk()
->>>         commit: 16be7974ff5d0a5cd9f345571c3eac1c3f6ba6de
->>> [03/14] nvdimm/blk: avoid calling del_gendisk() on early failures
->>>         commit: b7421afcec0c77ab58633587ddc29d53e6eb95af
->>> [04/14] nvdimm/blk: add error handling support for add_disk()
->>>         commit: dc104f4bb2d0a652dee010e47bc89c1ad2ab37c9
->>> [05/14] nvdimm/pmem: cleanup the disk if pmem_release_disk() is yet assigned
->>>         commit: accf58afb689f81daadde24080ea1164ad2db75f
->>> [06/14] nvdimm/pmem: use add_disk() error handling
->>>         commit: 5a192ccc32e2981f721343c750b8cfb4c3f41007
->>> [07/14] z2ram: add error handling support for add_disk()
->>>         commit: 15733754ccf35c49d2f36a7ac51adc8b975c1c78
->>> [08/14] block/sunvdc: add error handling support for add_disk()
->>>         commit: f583eaef0af39b792d74e39721b5ba4b6948a270
->>> [09/14] mtd/ubi/block: add error handling support for add_disk()
->>>         commit: ed73919124b2e48490adbbe48ffe885a2a4c6fee
->>> [10/14] ataflop: remove ataflop_probe_lock mutex
->>>         commit: 4ddb85d36613c45bde00d368bf9f357bd0708a0c
->>> [11/14] block: update __register_blkdev() probe documentation
->>>         commit: 26e06f5b13671d194d67ae8e2b66f524ab174153
->>> [12/14] ataflop: address add_disk() error handling on probe
->>>         commit: 46a7db492e7a27408bc164cbe6424683e79529b0
->>> [13/14] floppy: address add_disk() error handling on probe
->>>         commit: ec28fcc6cfcd418d20038ad2c492e87bf3a9f026
->>> [14/14] block: add __must_check for *add_disk*() callers
->>>         commit: 1698712d85ec2f128fc7e7c5dc2018b5ed2b7cf6
->>
->> rivers/scsi/sd.c: In function ‘sd_probe’:
->> drivers/scsi/sd.c:3573:9: warning: ignoring return value of ‘device_add_disk’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
->>  3573 |         device_add_disk(dev, gd, NULL);
->>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/scsi/sr.c: In function ‘sr_probe’:
->> drivers/scsi/sr.c:731:9: warning: ignoring return value of ‘device_add_disk’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
->>   731 |         device_add_disk(&sdev->sdev_gendev, disk, NULL);
->>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->>
->> Dropping the last two patches...
-> 
-> Martin K Peterson has the respective patches needed queued up on his tree
-> for v5.16:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=5.16/scsi-staging&id=e9d658c2175b95a8f091b12ddefb271683aeacd9
-> https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git/commit/?h=5.16/scsi-staging&id=2a7a891f4c406822801ecd676b076c64de072c9e
-> 
-> Would the last patch be sent once that gets to Linus?
+>>>> Add security_inode_setsecurity to fsverity signature verification.
+>>>> This can let LSMs save the signature data and digest hashes provided
+>>>> by fsverity.
+>>> Can you elaborate on why LSMs need this information?
+>> The proposed LSM (IPE) of this series will be the only one to need
+>> this information at the  moment. IPE’s goal is to have provide
+>> trust-based access control. Trust and Integrity are tied together,
+>> as you cannot prove trust without proving integrity.
+> I wanted to go back on this question.
+>
+> It seems, at least for fsverity, that you could obtain the
+> root digest at run-time, without storing it in a security blob.
+>
+> I thought I should use fsverity_get_info() but the fsverity_info
+> structure is not exported (it is defined in fs/verity/fsverity_private.h).
+>
+> Then, I defined a new function, fsverity_get_file_digest() to copy
+> the file_digest member of fsverity_info to a buffer and to pass
+> the associated hash algorithm.
+>
+> With that, the code of evaluate() for DIGLIM becomes:
+>
+>          info = fsverity_get_info(file_inode(ctx->file));
+>          if (info)
+>                  ret = fsverity_get_file_digest(info, buffer, sizeof(buffer), &algo);
+>
+>          if (!strcmp(expect->data, "diglim") && ret > 0) {
+>                  ret = diglim_digest_get_info(buffer, algo, COMPACT_FILE, &modifiers, &actions);
+>                  if (!ret)
+>                          return true;
+>          }
+This would work with the digest with a bit more code in fs-verity. It
+also has benefits if there are other callers who want this information.
 
-But that dependency wasn't clear in the patches posted, and it leaves me
-wondering if there are others? I obviously can't queue up a patch that
-adds a must_check to a function, when we still have callers that don't
-properly check it.
+I was planning on grouping the digest and signature into 
+apublic_key_signature
+structure in v8 to pass the digest, digest algorithm,digest size, signature
+and signature size (as opposed to defining a new structfor this purpose),
+reducing the number of LSM hook calls down to one functionin fsverity.
 
-That should have been made clear, and that last patch never should've
-been part of the series. Please send it once Linus's tree has all
-callers checking the result.
+I think both approaches have merit. fsverity_get_file_digest is more useful
+if there are callers outside of LSMs that want this information. The LSM 
+hook
+is cleaner if only LSMs want this information.
 
-> Also curious why drop the last two patches instead just the last one for
-> now?
+At least, at the moment, it seems like it's only IPE who wants this 
+information,
+and it's not like it won't be able to change later if the need arises, 
+as this
+is all implementation details that wouldn't effect the end-user.
 
-Sorry, meant just the last one.
-
--- 
-Jens Axboe
+I'll defer to Eric - his opinion holds the most weight, as fsverity would be
+the main code affected in either case.
 
