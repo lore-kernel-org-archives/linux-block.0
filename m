@@ -2,82 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4D9C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 03:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C09C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 04:02:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A71D860724
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 03:44:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0B8B611C3
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 04:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbhKDDrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Nov 2021 23:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229913AbhKDDrE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Nov 2021 23:47:04 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 879ABC061714;
-        Wed,  3 Nov 2021 20:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cnhGo81+/Ft3W318LxOJ86hyjf+30Zc+kGoqFQuytcs=; b=Vx/zAxB+JeDPoimpTG7jtXsasE
-        HC05BdpaUL3S+bzRlf9/foDJ4xpkfkF8aaN1uji8zCwY5rr2l6KnuawISqxz6I1X8bwq1KtN3QbN8
-        tM7v3iSm0+qzSpMkm8A3/S83siOGhCJbLTdWniVREHn2Fk0FBzntbqyY8zeEN2Ew/+24WDKK5DuCh
-        OSmXYGrJ40Wwbdb5kOq/qIgHR0UE9UOtFzFZPbfd4Le0RGGmtyXzr12DPyitNWZRBo9e/TTcSGX+y
-        TiCNsbmqZwvXWdnjVE9iAt1WdHebh7wXT72p986IUJgTwUw1GPemdGfBpLILYcYFEvd4G5WTudUBG
-        SCgfrLjQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1miTeA-005duZ-0r; Thu, 04 Nov 2021 03:43:05 +0000
-Date:   Thu, 4 Nov 2021 03:42:37 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 18/21] iomap: Convert iomap_add_to_ioend to take a folio
-Message-ID: <YYNWrSyPCabrcRfr@casper.infradead.org>
-References: <20211101203929.954622-1-willy@infradead.org>
- <20211101203929.954622-19-willy@infradead.org>
- <YYDoMltwjNKtJaWR@infradead.org>
- <YYGfUuItAyTNax5V@casper.infradead.org>
- <20211103160057.GH24333@magnolia>
+        id S230150AbhKDEFJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 00:05:09 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:25357 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230119AbhKDEFG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 00:05:06 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Hl8x04JDJzbhXG;
+        Thu,  4 Nov 2021 11:57:40 +0800 (CST)
+Received: from dggpeml500019.china.huawei.com (7.185.36.137) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Thu, 4 Nov 2021 12:02:25 +0800
+Received: from huawei.com (10.175.124.27) by dggpeml500019.china.huawei.com
+ (7.185.36.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Thu, 4 Nov
+ 2021 12:02:25 +0800
+From:   Wu Bo <wubo40@huawei.com>
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <linfeilong@huawei.com>,
+        <wubo40@huawei.com>
+Subject: [PATCH] nbd: code clean for kiocb_done()
+Date:   Thu, 4 Nov 2021 12:34:32 +0800
+Message-ID: <1636000472-3092-1-git-send-email-wubo40@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211103160057.GH24333@magnolia>
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500019.china.huawei.com (7.185.36.137)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 03, 2021 at 09:00:57AM -0700, Darrick J. Wong wrote:
-> > -			wpc->ops->discard_folio(page_folio(page), file_offset);
-> > +			wpc->ops->discard_folio(folio, pos);
-> 
-> /me wonders why this wouldn't have been done in whichever patch added
-> folio as a local variable, but fmeh, the end result is the same:
+A simple code clean for nbd_genl_status()
 
-Found it and fixed it.
+Signed-off-by: Wu Bo <wubo40@huawei.com>
+---
+ drivers/block/nbd.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> > @@ -1474,17 +1474,15 @@ iomap_do_writepage(struct page *page, struct writeback_control *wbc, void *data)
-> >  		 * memory is zeroed when mapped, and writes to that region are
-> >  		 * not written out to the file."
-> >  		 */
-> > -		zero_user_segment(page, poff, PAGE_SIZE);
-> > -
-> > -		/* Adjust the end_offset to the end of file */
-> > +		zero_user_segment(&folio->page, poff, folio_size(folio));
-> 
-> Question: is &folio->page != page here?  I guess the idea is that we
-> have a (potentially multi-page) folio straddling i_size, and we need to
-> zero everything in the whole folio after i_size.  But then why not pass
-> the whole folio?
-
-Ugh, thanks.  You made me realise that zero_user_segments() is still
-conditional on CONFIG_TRANSPARENT_HUGEPAGE.  It's a relic of when I
-was going to do all of this with THP; before I switched to the folio
-mental model.
-
-So now we're going to get folio_zero_segments(), folio_zero_segment()
-and folio_zero_range().
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b47b2a8..175ea97 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2375,7 +2375,6 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
+ 	reply_head = genlmsg_put_reply(reply, info, &nbd_genl_family, 0,
+ 				       NBD_CMD_STATUS);
+ 	if (!reply_head) {
+-		nlmsg_free(reply);
+ 		goto out;
+ 	}
+ 
+@@ -2383,7 +2382,6 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
+ 	if (index == -1) {
+ 		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
+ 		if (ret) {
+-			nlmsg_free(reply);
+ 			goto out;
+ 		}
+ 	} else {
+@@ -2392,7 +2390,6 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
+ 		if (nbd) {
+ 			ret = populate_nbd_status(nbd, reply);
+ 			if (ret) {
+-				nlmsg_free(reply);
+ 				goto out;
+ 			}
+ 		}
+@@ -2401,6 +2398,8 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
+ 	genlmsg_end(reply, reply_head);
+ 	ret = genlmsg_reply(reply, info);
+ out:
++	if (reply)
++		nlmsg_free(reply);
+ 	mutex_unlock(&nbd_index_mutex);
+ 	return ret;
+ }
+-- 
+1.8.3.1
 
