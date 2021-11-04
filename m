@@ -2,92 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BFAC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 04:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C53D5C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 04:25:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B797460EB8
-	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 04:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0D7D611C4
+	for <linux-block@archiver.kernel.org>; Thu,  4 Nov 2021 04:25:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbhKDEJI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Nov 2021 00:09:08 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:14713 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbhKDEJH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 00:09:07 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Hl94h1yzqzZckp;
-        Thu,  4 Nov 2021 12:04:20 +0800 (CST)
-Received: from dggpeml500019.china.huawei.com (7.185.36.137) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Thu, 4 Nov 2021 12:06:16 +0800
-Received: from huawei.com (10.175.124.27) by dggpeml500019.china.huawei.com
- (7.185.36.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Thu, 4 Nov
- 2021 12:06:16 +0800
-From:   Wu Bo <wubo40@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <linfeilong@huawei.com>,
-        <wubo40@huawei.com>
-Subject: [PATCH RESEND] nbd: code clean for nbd_genl_status()
-Date:   Thu, 4 Nov 2021 12:38:23 +0800
-Message-ID: <1636000703-13217-1-git-send-email-wubo40@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S229729AbhKDE2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Nov 2021 00:28:09 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:59350 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229866AbhKDE2H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Nov 2021 00:28:07 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 7BA521F782;
+        Thu,  4 Nov 2021 04:25:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1635999928; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yntzhDNIJrkZKWGzY5nRMMPO6e41UbyPYEXGXhOKLqY=;
+        b=URZCXGAqp/tkaOz9zrdP0Jh2crQFHTBqi0DRxG0ePuDRt3IkDhjnflJanRtmavZrL7Yic3
+        4c/3AMqY82ASkjxUkDiRI1bnXp7lnkSvW58kJtspWAbR0NeksUbnypPD2X9PbeUH85EJnb
+        p9WF3ApdgryUm22L4j5IXkytqFqWpfc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1635999928;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yntzhDNIJrkZKWGzY5nRMMPO6e41UbyPYEXGXhOKLqY=;
+        b=CD4hIV85y16wNABlLj4KuB3EpZ+qWavoRNGnKdahVA3hRqnHZ7qVzkD/j59pCim2fPh7LK
+        x0TwkbVgBdaLDwAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1941513DA3;
+        Thu,  4 Nov 2021 04:25:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 7JdINbZgg2FrUQAAMHmgww
+        (envelope-from <colyli@suse.de>); Thu, 04 Nov 2021 04:25:26 +0000
+Message-ID: <9e23e103-40ff-963f-739f-730da4d5fe3f@suse.de>
+Date:   Thu, 4 Nov 2021 12:25:25 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500019.china.huawei.com (7.185.36.137)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.1
+Subject: Re: [PATCH] bcache: Revert "bcache: use bvec_virt"
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, stable@vger.kernel.org
+References: <20211103151041.70516-1-colyli@suse.de>
+ <20211103154644.GA30686@lst.de>
+ <1d1180e0-32bc-e571-3252-ce496508d2b5@suse.de> <20211103161955.GA394@lst.de>
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <20211103161955.GA394@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A simple code clean for nbd_genl_status()
+On 11/4/21 12:19 AM, Christoph Hellwig wrote:
+> On Thu, Nov 04, 2021 at 12:11:45AM +0800, Coly Li wrote:
+>>> fresh page for each vec, and bio_for_each_segment_all iterates page
+>>> by page.  IFF there is an offset there is proble in the surrounding
+>>> code as bch_bio_alloc_pages assumes that it is called on a freshly
+>>> allocate and initialized bio.
+>> Yes, the offset is modified in bch_bio_alloc_pages().
+> Where?   In my upstream copy of bch_bio_alloc_pages there is no bv_offset
+> manipulation, and I could not see how such a manipulation would make
+> sense.
 
-Signed-off-by: Wu Bo <wubo40@huawei.com>
----
- drivers/block/nbd.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Forgive my typo. It was bch_bio_map() before bch_bio_alloc_pages(), both 
+in do_btree_node_write() and in util.c, bv->bv_offset is set by,
+     bv->bv_offset = base ? offset_in_page(base) : 0;
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b47b2a8..175ea97 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2375,7 +2375,6 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
- 	reply_head = genlmsg_put_reply(reply, info, &nbd_genl_family, 0,
- 				       NBD_CMD_STATUS);
- 	if (!reply_head) {
--		nlmsg_free(reply);
- 		goto out;
- 	}
- 
-@@ -2383,7 +2382,6 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
- 	if (index == -1) {
- 		ret = idr_for_each(&nbd_index_idr, &status_cb, reply);
- 		if (ret) {
--			nlmsg_free(reply);
- 			goto out;
- 		}
- 	} else {
-@@ -2392,7 +2390,6 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
- 		if (nbd) {
- 			ret = populate_nbd_status(nbd, reply);
- 			if (ret) {
--				nlmsg_free(reply);
- 				goto out;
- 			}
- 		}
-@@ -2401,6 +2398,8 @@ static int nbd_genl_status(struct sk_buff *skb, struct genl_info *info)
- 	genlmsg_end(reply, reply_head);
- 	ret = genlmsg_reply(reply, info);
- out:
-+	if (reply)
-+		nlmsg_free(reply);
- 	mutex_unlock(&nbd_index_mutex);
- 	return ret;
- }
--- 
-1.8.3.1
+Here base is bset *i which is initialized in do_btree_node_write() as,
+     struct bset *i = btree_bset_last(b);
 
+The unit size of bset is 1 bcache-defined-block size, minimized value is 
+512.
+
+>> Normally the bcache
+>> defined block size is 4KB so the issue was not triggered frequently. I
+>> found it during testing my nvdimm enabling code for bcache, where I happen
+>> to make the bcache defined block size to non-4KB. The offset is from the
+>> previous written bkey set, which the minimized unit size is 1
+>> bcache-defined-block-size.
+> So you have some out of tree changes here?  Copying a PAGE_SIZE into
+> a 'segment' bvec just does not make any sense if there is an offset,
+> as segments are defined as bvecs that do not span page boundaries.
+>
+> I suspect the best thing to do in do_btree_node_write would be something
+> like the patch below instead of poking into the internals here, but I'd
+> also really like to understand the root cause as it does point to a bug
+> somewhere else.
+>
+>
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 93b67b8d31c3d..f69914848f32f 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -378,8 +378,8 @@ static void do_btree_node_write(struct btree *b)
+>   		struct bvec_iter_all iter_all;
+>   
+>   		bio_for_each_segment_all(bv, b->bio, iter_all) {
+> -			memcpy(bvec_virt(bv), addr, PAGE_SIZE);
+> -			addr += PAGE_SIZE;
+> +			memcpy_to_bvec(bvec_virt(bv), addr);
+> +			addr += bv->bv_len;
+>   		}
+>   
+>   		bch_submit_bbio(b->bio, b->c, &k.key, 0);
+
+The above change doesn't work, still observe panic[1].
+
+Before calling bio_for_each_segment_all(), void *addr is calculated by,
+     void *addr = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
+which is a page size aligned address.  When writing down a dirty btree 
+node, it requires whole page to be written. Your original patch works 
+fine when there is not previously unwirtten keys in the page as previous 
+bkey set (and corrupts memory when bv->bv_offset is non-zero). The above 
+change seems missing the part in offset [0, bv->bv_offset] inside the 
+dirty page, I am not sure how the bellowed panic happens by the above 
+change, it seems like wild pointer from the missing part of btree node 
+when iterating the btree.
+
+If you don't want to directly access members inside struct bio_vec, is 
+there something like page_base(vb) which returns bv->bv_page ?
+
+Thanks.
+
+Coly Li
+
+
+
+[1] the panic message starts like,
+
+[ 1926.350362] ------------[ cut here ]------------
+[ 1926.405603] kernel BUG at ./include/linux/highmem.h:316!
+[ 1926.469172] invalid opcode: 0000 [#1] SMP DEBUG_PAGEALLOC NOPTI
+[ 1926.540006] CPU: 10 PID: 477 Comm: kworker/10:2 Kdump: loaded 
+Tainted: G            E     5.15.0-59.27-default+ #57
+[ 1926.350362 1926.540009] Hardware name: Lenovo ThinkSystem SR650 
+-[7X05CTO1WW]-/-[7X05CTO1WW]-, BIOS -[IVE164L-2.80]- 10/23/2020
+[ 1926.540010] Workqueue: bcache bch_data_insert_keys [bcache]
+[ 1926.806482] RIP: 0010:__bch_btree_node_write+0x662/0x690 [bcache]
+<snipped>
