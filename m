@@ -2,113 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 111F1C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 11:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA350C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 14:33:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5C266126A
-	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 11:13:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A244461244
+	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 14:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbhKELQS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Nov 2021 07:16:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39241 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232115AbhKELQR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Nov 2021 07:16:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636110817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4L8AX+w4Ke7CRvZlZWNnuwq05ggdhTDpEkQn90YoaUI=;
-        b=ETxQO7lTOOnfw0QZbGRZe94WKz7BHwxphep0yKL3lLB9H4yGEknuCqj5BohBiYFgPDRECG
-        GvG1IuYHnCOajkaJxgpXEDRqQ42votD6wLIm445MyPic3RH1Cokus+kx2b5fqIt5LmFYVp
-        kWvli9bewJ+sRLkIHVLoucnKqLtgAl0=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-480-RUJbpceNMI-agePYi9CkDA-1; Fri, 05 Nov 2021 07:13:36 -0400
-X-MC-Unique: RUJbpceNMI-agePYi9CkDA-1
-Received: by mail-yb1-f197.google.com with SMTP id l28-20020a25b31c000000b005c27dd4987bso12974158ybj.18
-        for <linux-block@vger.kernel.org>; Fri, 05 Nov 2021 04:13:36 -0700 (PDT)
+        id S233230AbhKEOgW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Nov 2021 10:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56306 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233259AbhKEOgW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Nov 2021 10:36:22 -0400
+Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02B1C061714
+        for <linux-block@vger.kernel.org>; Fri,  5 Nov 2021 07:33:42 -0700 (PDT)
+Received: by mail-oo1-xc2a.google.com with SMTP id m37-20020a4a9528000000b002b83955f771so3049132ooi.7
+        for <linux-block@vger.kernel.org>; Fri, 05 Nov 2021 07:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Gxt0C+WfTPpT7LA1LNZfzoe3TbHJPTsUQ10BMxP8OfE=;
+        b=QN/b0MPHozm4vFdnEXNbmL5h5FqwRTx0/K7GAEZE1t/1BDaMaKwwIOJrfDPNuSh3Tv
+         gaFCwCjhbilDlYy8do952R8VM978X6rWK+lnOpMseEmvLaJj3MLr+Fe/5+7Q961BeJaf
+         5qMHeH/wFYX+7vQtHUv49iKm8sqhPG6Z09orRmWauec2DFiQx0CJN9+vqNWeHc2/xc+k
+         K/GR+zDLzWKx1oRwoQXtA1DRVaqTwYXDuTFBeR6eaDxTN1LC5V5/EjN3eJbtYvStW3Au
+         rlzPEAzK07mo9bd86ipZpVb8CKusAdy2wOn7KMt1WkcJAbgVAQM6Pfl/Vwd6ooClKQQT
+         WIbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4L8AX+w4Ke7CRvZlZWNnuwq05ggdhTDpEkQn90YoaUI=;
-        b=kNLtPHSFNcT03eRYDLnPWeyN1IsUocgthkO/pdie+j17L1N2E1SgZvxsvZgx3XbvO1
-         IlXIEirlbkteg4H4TkVHL9U1Avqjxx5+SLqWutJ5vdInfR+CMdqFoZBeVm7VW4+asIQk
-         15jIuH1w1Dz78s4bneKVxKbZUwpwHAU7z/2CoshIxIrh/WaQa44GU79RMBbPcb0v007I
-         GchcShOCW2UdHNha+mc2oDZZVFwabm5UlbbEWJj2aLuxIduAliY1Q3y2HEXUkuHShawq
-         zS1h5ksZwD57/id4jnAxF0CP8pt1doyUQrbjg8VUkvJ7GpP1SuMZhznrX5jQ06zyQYFT
-         PaFg==
-X-Gm-Message-State: AOAM533ganybMheg8Yn1BTM7nAXvvr4/mnI8LbdM5knBIxuUU+6Y7/IJ
-        r8GcHOe5fKa49vF7np+0TJw4u9k4iM+YRW31+FcUArLQ2UX8gk+noMmAa+IjcdKMACZSWzOnDUT
-        k+fzOWvRpAbnJJbUhlIUcmkH9dnEQCOoEJ5yaKoQ=
-X-Received: by 2002:a25:b9cc:: with SMTP id y12mr40238508ybj.153.1636110816231;
-        Fri, 05 Nov 2021 04:13:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGfbLlFgufRWMb5+uWNgX/+6tRc/bcxOQyuxeETqdgetXoJntR9Gi/r7ki1/xNipfvY/9Efcsm2BSJbU6sLOg=
-X-Received: by 2002:a25:b9cc:: with SMTP id y12mr40238481ybj.153.1636110816070;
- Fri, 05 Nov 2021 04:13:36 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Gxt0C+WfTPpT7LA1LNZfzoe3TbHJPTsUQ10BMxP8OfE=;
+        b=1MYbPAvZ9fkfx6OCRwXWBqQ4eFcTsxdti3DMmhKP8BworJWdBZkj0Oco9ZcZ42aPQp
+         mMiCISRqE1Z1K5HbTk3mL8UDZuLbe2xTeXS2VauIUfnmzaZ5AVmyHNqUJ1RchiWODLcY
+         StHaDlzBjy3uMCIcKSlmrU5eTppOXFLNdRIhdpoFfrgPMbejfeqeHetYMrOmYwmRlnFp
+         rXon/dZi5Xza9PO2GyfoOo98z8sP6Cs9txAv1u/FQmKx2OV3DzhizEbJOIgUeSUyu3ES
+         +4Btha/0Zrw5C/nnNvLAYcUcZItqbpCa9n47blet832KP8piNmu0YTyEL6tHVywRtvZk
+         sbeQ==
+X-Gm-Message-State: AOAM532U8vVn2HZzCX8zB7QcxpjYiHXxM/Rh263Q6MEwm2kTWlzIUPaH
+        98G6cT0N6ej9hyI5CrZiZd8o6SHvkjmjxg==
+X-Google-Smtp-Source: ABdhPJzMZ96DQn0ak2np3KvxPM9hvl31Ea5AVqWtxImQHRQ+YR0MAixOz6pvs366cjOrn0h0Z2XgHw==
+X-Received: by 2002:a4a:9707:: with SMTP id u7mr8596663ooi.29.1636122821464;
+        Fri, 05 Nov 2021 07:33:41 -0700 (PDT)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id y18sm913790oov.29.2021.11.05.07.33.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Nov 2021 07:33:41 -0700 (PDT)
+Subject: Re: block: please restore 2d52c58b9c9b ("block, bfq: honor
+ already-setup queue merges")
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>,
+        linux-block <linux-block@vger.kernel.org>
+References: <65495934-09fe-55b0-62a9-c649dc9940ba@applied-asynchrony.com>
+ <a66f5127-8b0b-d21a-eda5-73968255b52c@kernel.dk>
+ <672815A0-3C5B-4DCD-9583-24497FC31D5D@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <86cf1cbe-c905-f83f-1c57-2a53a1e084d9@kernel.dk>
+Date:   Fri, 5 Nov 2021 08:33:40 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <YYIHXGSb2O5va0vA@T590> <85F2E9AC-385F-4BCA-BD3C-7A093442F87F@kernel.dk>
- <CAHj4cs-pTYoksSQDjfFpK13Xtg0jB6EOvhfOZu5cDHowZa=ueg@mail.gmail.com> <f95deb32-59a0-1fc1-b7b2-92583a5ef4de@kernel.dk>
-In-Reply-To: <f95deb32-59a0-1fc1-b7b2-92583a5ef4de@kernel.dk>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Fri, 5 Nov 2021 19:13:24 +0800
-Message-ID: <CAHj4cs_HyO5yJvP-2ZGZynioBeFWvmBS63PSo=W24+h0dBm1rg@mail.gmail.com>
-Subject: Re: [bug report] WARNING: CPU: 1 PID: 1386 at block/blk-mq-sched.c:432
- blk_mq_sched_insert_request+0x54/0x178
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Steffen Maier <maier@linux.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <672815A0-3C5B-4DCD-9583-24497FC31D5D@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 4, 2021 at 3:03 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 11/2/21 10:00 PM, Yi Zhang wrote:
-> >>>
-> >>> Hello Jens,
-> >>>
-> >>> I guess the issue could be the following code run without grabbing
-> >>> ->q_usage_counter from blk_mq_alloc_request() and blk_mq_alloc_reques=
-t_hctx().
-> >>>
-> >>> .rq_flags       =3D q->elevator ? RQF_ELV : 0,
-> >>>
-> >>> then elevator is switched to real one from none, and check on q->elev=
-ator
-> >>> becomes not consistent.
-> >>
-> >> Indeed, that=E2=80=99s where I was going with this. I have a patch, te=
-sting it locally but it=E2=80=99s getting late. Will send it out tomorrow. =
-The nice benefit is that it allows dropping the weird ref get on plug flush=
-, and batches getting the refs as well.
-> >>
-> >
-> > Hi Jens
-> > Here is the log in case you still need it. :)
->
-> Can you retry with the updated for-next pulled into -git?
+On 11/5/21 3:43 AM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 4 nov 2021, alle ore 15:41, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> On 11/4/21 8:04 AM, Holger Hoffstätte wrote:
+>>>
+>>> Hi Jens,
+>>>
+>>> a simple no-code request:
+>>>
+>>> Commit d29bd41428cf ("block, bfq: reset last_bfqq_created on group change")
+>>> fixed a UAF in bfq, which was previously worked-around by ebc69e897e17
+>>> ("Revert "block, bfq: honor already-setup queue merges"").
+>>>
+>>> However since then the original commit 2d52c58b9c9b was never restored.
+>>>
+>>> Reinstating 2d52c58b9c9b has so far not resulted in any problems for me,
+>>> and I think it would be nice to bring it back in early just to get
+>>> feedback as early as possible in this cycle.
+>>
+>> Adding Paolo.
+>>
+> 
+> Yep, now that we have the fix, we should restore that commit.
 
-Hi Jens
+Please send a patch that does that then, with the rationale included
+in the commit message on why it's now safe to do so.
 
-Sorry for the delay, the issue cannot be reproduced now.
-
->
-> --
-> Jens Axboe
->
-
-
---=20
-Best Regards,
-  Yi Zhang
+-- 
+Jens Axboe
 
