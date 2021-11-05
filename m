@@ -2,57 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C17F2C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 05:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 110AEC433FE
+	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 07:05:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AF2B6127C
-	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 05:41:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB0416124F
+	for <linux-block@archiver.kernel.org>; Fri,  5 Nov 2021 07:05:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231403AbhKEFnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Nov 2021 01:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49916 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbhKEFnx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Nov 2021 01:43:53 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3484EC061714
-        for <linux-block@vger.kernel.org>; Thu,  4 Nov 2021 22:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jDsjMMZ/chDIayukiIYjUUPrC4Llh76SzUaEEaohn+A=; b=vmio49edrORYcwZGqC0KOiGxVh
-        2oSGss816T7Uz+7E3l4uvEJaWgLXz+KUGISNL1GPomT2sq9UbRKEdI5tvGaugPQE7h9U+0rOLvmSu
-        BztA0wgWzTKCzbuq9iw4Rk0gTERoeIClVMVlQak2hEvnxBgCxRyg5lC8fe9qSxvcpDkbTaKDlhXj5
-        f3huQnXBDytsMd1sDKFMGxTMTG/Y8y5IaQUbYsQrUBt7F0b2WeRAUZHFaL594ISXqzBqJrPIw1agZ
-        hgUg+44eso03rjslYtnOtkuckeG3PUU3LD7A1FhP2kxjL/L06q99uhAjzYfAD4vJ59vyZUwTet+YN
-        fSQcZpEw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1miryT-00Ae5v-CS; Fri, 05 Nov 2021 05:41:13 +0000
-Date:   Thu, 4 Nov 2021 22:41:13 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: use new bdev_nr_bytes() helper for
- blkdev_{read,write}_iter()
-Message-ID: <YYTD+fWMjUIflBdd@infradead.org>
-References: <a72767cd-3c6d-47f7-80f4-aa025a17b2cb@kernel.dk>
+        id S229916AbhKEHHk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Nov 2021 03:07:40 -0400
+Received: from peace.netnation.com ([204.174.223.2]:42632 "EHLO
+        peace.netnation.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229494AbhKEHHk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Nov 2021 03:07:40 -0400
+X-Greylist: delayed 1115 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Nov 2021 03:07:39 EDT
+Received: from sim by peace.netnation.com with local (Exim 4.92)
+        (envelope-from <sim@hostway.ca>)
+        id 1miszX-000710-5C; Thu, 04 Nov 2021 23:46:23 -0700
+Date:   Thu, 4 Nov 2021 23:46:23 -0700
+From:   Simon Kirby <sim@hostway.ca>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Unreliable disk detection order in 5.x
+Message-ID: <20211105064623.GD32560@hostway.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a72767cd-3c6d-47f7-80f4-aa025a17b2cb@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 04, 2021 at 03:13:17PM -0600, Jens Axboe wrote:
-> We have new helpers for this, use them rather than the slower inode
-> size reads. This makes the read/write path consistent with most of
-> the rest of block as well.
->     
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+I'm seeing disk detection order changing across reboots on 5.x kernels
+(5.4, 5.10, 5.14), but not 4.9, 4.14, 4.19, with megaraid_sas (Dell
+PERC_H700). With 13 disks and 5.14.14, the order changes almost always.
 
-Looks good,
+I did initially try to bisect this issue, but it seems to become more
+rare in earlier kernels, and there are some non-booting problems between
+4.x and 5.x.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The most common effect is swapping of sda with sdb, or two neighboring
+devices in the list; for example:
+
+# diff -u lsblk-S-5.10.0 lsblk-S-5.10.0-2
+--- lsblk-S-5.10.0      2021-11-04 15:23:23.767008360 -0400
++++ lsblk-S-5.10.0-2    2021-11-04 17:34:37.748310196 -0400
+@@ -1,6 +1,6 @@
+ NAME HCTL       TYPE VENDOR   MODEL      REV TRAN
+-sda  0:2:0:0    disk DELL     PERC_H700 2.10
+-sdb  0:2:2:0    disk DELL     PERC_H700 2.10
++sda  0:2:2:0    disk DELL     PERC_H700 2.10
++sdb  0:2:0:0    disk DELL     PERC_H700 2.10
+ sdc  0:2:3:0    disk DELL     PERC_H700 2.10
+ sdd  0:2:4:0    disk DELL     PERC_H700 2.10
+ sde  0:2:5:0    disk DELL     PERC_H700 2.10
+
+This is happening on vendor (Debian 5.10.0) and home-built kernels, and
+on a variety of hosts. On all kernels, the detection printks come up in
+an interesting order, but in older kernels, it always ends up with an
+sd-name that is ordered by SCSI ID ascending:
+
+[    2.289776] sd 0:2:0:0: [sda] 999030784 512-byte logical blocks: (512 GB/476 GiB)
+[    2.289918] sd 0:2:4:0: [sdd] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.289947] sd 0:2:3:0: [sdc] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.290032] sd 0:2:6:0: [sdf] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.290210] sd 0:2:7:0: [sdg] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.290248] sd 0:2:9:0: [sdi] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.290323] sd 0:2:2:0: [sdb] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.290461] sd 0:2:5:0: [sde] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+[    2.290476] sd 0:2:8:0: [sdh] 11719933952 512-byte logical blocks: (6.00 TB/5.46 TiB)
+
+Full "dmesg" is saved here: https://0x.ca/sim/ref/5.10.0/dmesg
+
+Any ideas on suggestions on what I could use to track down what changed
+here, or ideas on what might have influenced it?
+
+Simon-
