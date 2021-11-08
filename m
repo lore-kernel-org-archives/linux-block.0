@@ -2,83 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5854EC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 12:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6D5C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 13:23:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E97C61288
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 12:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE12F6120D
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 13:23:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231401AbhKHMF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Nov 2021 07:05:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59386 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238100AbhKHMF5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Nov 2021 07:05:57 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1FBA1611C0;
-        Mon,  8 Nov 2021 12:03:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1636372993;
-        bh=iUquAhK1pe6WbCgNnyN0FkZoVabpGTyRukbbNwh8Ics=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=y6zI3G9dq6IwJdQXThAO6mGGpwKucH6IDfn9LTiIY39bPb2D7bsOKHuoEl6LAn39F
-         gUQOY83+OShPjZZaCZY3VmL3lZimX4A2/bNzx0YjdsyycJsGid/X2YaAzPrc+58qfX
-         VM/INvaaJ6CbILWI8JpAAjZcWwi+VnVue2Kbytv8=
-Date:   Mon, 8 Nov 2021 13:03:10 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     Kumaravel.Thiagarajan@microchip.com,
-        Pragash.Mangalapandian@microchip.com, Sundararaman.H@microchip.com,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-        linux-mtd@lists.infradead.org
-Subject: Re: Reg: New MFD Driver for my PCIe Device
-Message-ID: <YYkR/szsDirtj1FP@kroah.com>
-References: <CH0PR11MB5380F5BD18F15014BA8B8479E9919@CH0PR11MB5380.namprd11.prod.outlook.com>
- <YYkEP62JRb4rCuXQ@google.com>
- <YYkGkEiPb+6J62hn@kroah.com>
- <YYkJsbbHH6wdPvB9@google.com>
+        id S239920AbhKHN0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Nov 2021 08:26:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54080 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239916AbhKHN0Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Nov 2021 08:26:16 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B159C061714
+        for <linux-block@vger.kernel.org>; Mon,  8 Nov 2021 05:23:32 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id y16so1175282ioc.8
+        for <linux-block@vger.kernel.org>; Mon, 08 Nov 2021 05:23:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=zx65JLNOcPnDI4dtvkfbte1frN4DHKsfW28wO+xNDk8=;
+        b=N3p7mfBsF/b9XqjFOHzoQvKO+snYbEhyySBtvG0xgYU1ZjzuKhBlmLTNLyy6bqL741
+         EY/2FkRQ4ytvnA8pTw2ae46JWzb5yJVZgaKn2rk5osCACt9kmM1rFMFnfZN1wAFFcj8c
+         Hw2Uj9jBBYHOUmuRxKQSkx9cT6xRPkdHkNLgmN73XEJUPQYTHjQmJXHuvt9OcxbnvRCx
+         3JfH/EBj9jHUPMiT+pf6IFxAab4ZXt5kphAa4yZYMXBnuWkgkqlIT1zwoTeV2jYjfK7t
+         bU21n16ZnV7IpSzPXnxqxKI/rq4NvBjERACJi0H1nxHfA2RsBs7RDoDGtopw3nECtuCj
+         pDyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=zx65JLNOcPnDI4dtvkfbte1frN4DHKsfW28wO+xNDk8=;
+        b=0whU4c7NXUqWmpK0rWpNKlOcYcch5l/1a1AJd0jeZNZp/ThthDprrCD7dWR1ZaTIxX
+         StMWJZDreqgMe8bbWbFWwdCPkdr4BSKBqcCAvDCSDnlSRGhCQb2zHozGYZ4/mPgCo3OO
+         p+IM7PALV6gB6mCBqURi1E1qalaCDKyiz7xXXG2bXGfJlJu2pdCvhFzBSEvh0kFjrC0r
+         FNwxO0Ma+0obPC9uN1rtsfmHrkaOUYciHLXJkGC8BK+JiQSoU5y5Bl0khzR0ap8kUcZW
+         iB8IRqfd7jjzoFgKsp9siRkpxKns0uUVKL4aHteTUiNK7MZREiPinassyQerpfgEbEVc
+         XEUw==
+X-Gm-Message-State: AOAM533b3FCYkBPtDs+TNgzn/w2hYdoab+lGb5L6VbGbCfZgR7aMi9x9
+        nxG9BsJ12/qTXQmS3N1IoAKH+Q==
+X-Google-Smtp-Source: ABdhPJw5WAMhm8dqmbV0nJCeP1M4lOIsqvKRPj/3pqL9uPEGRkLn5aG9pzKCY3t0f1xHb1Orja2+EA==
+X-Received: by 2002:a5e:d602:: with SMTP id w2mr4824918iom.121.1636377811696;
+        Mon, 08 Nov 2021 05:23:31 -0800 (PST)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id c7sm1192920iob.28.2021.11.08.05.23.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Nov 2021 05:23:31 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Coly Li <colyli@suse.de>
+Cc:     stable@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+In-Reply-To: <20211103151041.70516-1-colyli@suse.de>
+References: <20211103151041.70516-1-colyli@suse.de>
+Subject: Re: [PATCH] bcache: Revert "bcache: use bvec_virt"
+Message-Id: <163637780949.313555.17062223275836707712.b4-ty@kernel.dk>
+Date:   Mon, 08 Nov 2021 06:23:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YYkJsbbHH6wdPvB9@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 08, 2021 at 11:27:45AM +0000, Lee Jones wrote:
-> On Mon, 08 Nov 2021, Greg KH wrote:
-> > On Mon, Nov 08, 2021 at 11:04:31AM +0000, Lee Jones wrote:
-> > > On Mon, 08 Nov 2021, Kumaravel.Thiagarajan@microchip.com wrote:
-> > > 
-> > > > Dear Lee Jones,
-> > > > 
-> > > > I am Kumaravel Thiagarajan from Microchip, India and I am new to Linux Kernel development.
-> > > > 
-> > > > I am currently working on linux kernel driver for one of our PCIe based devices whose BAR 0 maps interface registers for a gpio controller, an OTP memory device controller and an EEPROM device controller into the host processor's memory space.
-> > > > 
-> > > > Based on earlier inputs from Linus Walleij, I have developed this as a multi-function device driver - First MFD driver (drivers/mfd) gets loaded for the PCIe device and then it spawns two child devices for OTP/EEPROM and GPIO separately.
-> > > 
-> > > You may wish to speak with Greg about your architectural decisions.
-> > > 
-> > > He usually dislikes the creation of platform devices from PCI ones.
-> > 
-> > Yes, that is NOT ok.
-> > 
-> > Platform devices are only for devices that are actually on a platform
-> > (i.e. described by DT or other firmware types).
+On Wed, 3 Nov 2021 23:10:41 +0800, Coly Li wrote:
+> This reverts commit 2fd3e5efe791946be0957c8e1eed9560b541fe46.
 > 
-> This is probably a bit of an over-simplification.  Lots of legitimate
-> platform devices are actually described by DT et al.
+> The above commit replaces page_address(bv->bv_page) by bvec_virt(bv) to
+> avoid directly access to bv->bv_page, but in situation bv->bv_offset is
+> not zero and page_address(bv->bv_page) is not equal to bvec_virt(bv). In
+> such case a memory corruption may happen because memory in next page is
+> tainted by following line in do_btree_node_write(),
+> 	memcpy(bvec_virt(bv), addr, PAGE_SIZE);
+> 
+> [...]
 
-We are in violent agreement here, that is what I was trying to say :)
+Applied, thanks!
 
-> However, it is true that devices which reside on definite buses; PCI,
-> USB, PCMIA, SCSI, Thunderbolt, etc should not spawn their children off
-> as platform devices.
+[1/1] bcache: Revert "bcache: use bvec_virt"
+      commit: 2878feaed543c35f9dbbe6d8ce36fb67ac803eef
 
-Agreed, that is not ok, as those are not what the platform device code
-was designed for.
+Best regards,
+-- 
+Jens Axboe
 
-thanks,
 
-greg k-h
