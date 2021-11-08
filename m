@@ -2,129 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 865C3C4332F
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 15:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A587C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 16:42:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 721C56120D
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 15:13:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25BFD61181
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 16:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235272AbhKHPPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Nov 2021 10:15:48 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:12228 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238807AbhKHPNT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Nov 2021 10:13:19 -0500
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20211108151031euoutp018b25c99a9573b4d41f202c070c840c81~1msnc0NO50988409884euoutp01e
-        for <linux-block@vger.kernel.org>; Mon,  8 Nov 2021 15:10:31 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20211108151031euoutp018b25c99a9573b4d41f202c070c840c81~1msnc0NO50988409884euoutp01e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1636384231;
-        bh=JfQftMPNSQ0nii0JnsaUG6Ori1dCx6yZ3qkFWx2SfFM=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=e08QPkuoRc9oRH6DVkasNd56Hcz2YeuMBJ9BMoYJpB3sgnIbtR1hKmtqEqzE1a96Q
-         TDkpn+jv6NXMiTNi3b6V9wcMyFO8cJaLdFRZtamZP9tGi2zF6+wKBuRm3Au5C8pmw9
-         UUlkO/9eCh50IaRnu8EWMD21Zsh3UmdcyTc/8XpE=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20211108151031eucas1p19d18dc9223db3ff5f4974b0b9e17e4fe~1msnKEJiK1761717617eucas1p1u;
-        Mon,  8 Nov 2021 15:10:31 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id B7.F2.09887.7ED39816; Mon,  8
-        Nov 2021 15:10:31 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b~1msmsT00u1342513425eucas1p22;
-        Mon,  8 Nov 2021 15:10:30 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20211108151030eusmtrp2eda5415ac7edc4e8d5e566081944a0e8~1msmrwLEM1701917019eusmtrp2_;
-        Mon,  8 Nov 2021 15:10:30 +0000 (GMT)
-X-AuditID: cbfec7f4-471ff7000000269f-cf-61893de77bf3
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 84.D6.09404.6ED39816; Mon,  8
-        Nov 2021 15:10:30 +0000 (GMT)
-Received: from localhost (unknown [106.210.248.42]) by eusmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20211108151030eusmtip108f33d57af8b73a39e25b8cecc7a97ea~1msmOL4GQ1942019420eusmtip1Y;
-        Mon,  8 Nov 2021 15:10:30 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Pankaj Raghav <pankydev8@gmail.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH v2] block: Remove the redundant empty list check in
- blk_flush_plug
-Date:   Mon,  8 Nov 2021 20:40:11 +0530
-Message-Id: <20211108151011.256796-1-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
+        id S240130AbhKHQos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Nov 2021 11:44:48 -0500
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:34198 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236528AbhKHQos (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Nov 2021 11:44:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1636389723;
+        bh=lpuLhbP5D8y7Rh++3/m1gJ/kmzDRQihOj3d0Ea3+naw=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=vGp3HXQPGECmrit0ElRfIxrq4UE5s9ccP2I5N4d1tx20bGxFJQirlcN25WzOorCX1
+         c+hY1TzUrSDiD8rZK9oHTJNaB7MtpRngWZi0Yw52XwCWC8j5HeoFLrPIFwRqofowOL
+         y6ommqbMLoQDxDhuGatF3WLs1OICVeJc/gIxOxHc=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 8F42112804CC;
+        Mon,  8 Nov 2021 11:42:03 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id u_heyEEjYIWy; Mon,  8 Nov 2021 11:42:03 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1636389723;
+        bh=lpuLhbP5D8y7Rh++3/m1gJ/kmzDRQihOj3d0Ea3+naw=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=vGp3HXQPGECmrit0ElRfIxrq4UE5s9ccP2I5N4d1tx20bGxFJQirlcN25WzOorCX1
+         c+hY1TzUrSDiD8rZK9oHTJNaB7MtpRngWZi0Yw52XwCWC8j5HeoFLrPIFwRqofowOL
+         y6ommqbMLoQDxDhuGatF3WLs1OICVeJc/gIxOxHc=
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id C56881280492;
+        Mon,  8 Nov 2021 11:42:02 -0500 (EST)
+Message-ID: <08f0e186093b0d5067347a1376228010cb4cc7f4.camel@HansenPartnership.com>
+Subject: Re: [PATCH 3/4] scsi: make sure that request queue queiesce and
+ unquiesce balanced
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Date:   Mon, 08 Nov 2021 11:42:01 -0500
+In-Reply-To: <20211103034305.3691555-4-ming.lei@redhat.com>
+References: <20211103034305.3691555-1-ming.lei@redhat.com>
+         <20211103034305.3691555-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrJIsWRmVeSWpSXmKPExsWy7djPc7rPbTsTDVqvc1usvtvPZrH3lrbF
-        56Ut7BZrbj5lcWDx2DnrLrvH5bOlHn1bVjF6fN4kF8ASxWWTkpqTWZZapG+XwJWxc+4VpoJW
-        9oqG/qeMDYxfWLsYOTkkBEwk3i67xdbFyMUhJLCCUeLsmr0sEM4XRompm7cxQzifGSV+XFjH
-        DNPy5P9yJojEckaJ4//2s0I4Lxgl7p65C1TFwcEmoCXR2MkO0iAioCDR83slG4jNLJAjselx
-        L9ggYYEQib5zB8BqWARUJc68vgVm8wpYSax42QB1n7zEzEvfoeKCEidnPmGBmCMv0bx1Nth1
-        EgI/2SVWH//FDtHgInH1VisbhC0s8er4Fqi4jMT/nfOZIOzJjBLHViVCNK9nlGjpXsAKcrSE
-        gLVE35kcEJNZQFNi/S59iKijRM+mNAiTT+LGW0GIC/gkJm2bzgwR5pXoaBOCmK0ksfPnE6id
-        EhKXm+awQNgeElfn7AZ7SkggVuLOkaOsExgVZiH5axaSv2YhnLCAkXkVo3hqaXFuemqxUV5q
-        uV5xYm5xaV66XnJ+7iZGYOo4/e/4lx2My1991DvEyMTBeIhRgoNZSYT33tGORCHelMTKqtSi
-        /Pii0pzU4kOM0hwsSuK8In8aEoUE0hNLUrNTUwtSi2CyTBycUg1MK67zbNYWqhAR2/vXyeM7
-        by6T7IOHMxTulrkfbL508tjhvex3XjOHWMzXsXnOcG7FqUNJKZlG4b+bG3LXm547qSRV1ndY
-        9IUXy577FdlvubW3HKvlXz/bSJl7lb/zsTyzFV5X50/4vtpjjUf8JfPit5O5GR92rMitd/6d
-        48HVLyK/ZdmPSw066j9eRwWnzgjvlPvCtIpl6yS30+9kQ04fzPIRn5+Xqt+m/+MTj9VUhmRJ
-        4cOOXff7XOR5tzqv2nlMeneuOf+8YrcjX/I8TxV+/qU+93nEga28kznOXt5sJNnxg+PrpOBE
-        ntXO/B/SL865V6G6at3v4stHpeLuzLUw3C2r//LOG31hE65aG63DSizFGYmGWsxFxYkA1kNC
-        FIwDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrALMWRmVeSWpSXmKPExsVy+t/xu7rPbDsTDY5u4rNYfbefzWLvLW2L
-        z0tb2C3W3HzK4sDisXPWXXaPy2dLPfq2rGL0+LxJLoAlSs+mKL+0JFUhI7+4xFYp2tDCSM/Q
-        0kLPyMRSz9DYPNbKyFRJ384mJTUnsyy1SN8uQS9j59wrTAWt7BUN/U8ZGxi/sHYxcnJICJhI
-        PPm/nKmLkYtDSGApo0T7hOtMEAkJidsLmxghbGGJP9e62CCKnjFKnJ4+A6ibg4NNQEuisZMd
-        pEZEQEGi5/dKNhCbWSBPYvGjy8wgJcICQRI3JgqChFkEVCXOvL4FVs4rYCWx4mUD1A3yEjMv
-        fYeKC0qcnPmEBWKMvETz1tnMExj5ZiFJzUKSWsDItIpRJLW0ODc9t9hIrzgxt7g0L10vOT93
-        EyMwaLcd+7llB+PKVx/1DjEycTAeYpTgYFYS4b13tCNRiDclsbIqtSg/vqg0J7X4EKMp0H0T
-        maVEk/OBcZNXEm9oZmBqaGJmaWBqaWasJM7rWQDUJJCeWJKanZpakFoE08fEwSnVwDQ/7aL5
-        GxehSuXrV9rvMl4pZptYMcfxu/qjYnP9i5oXimSU2jhkbV7lyqXuXfx455fSzafyNjf/Pqh+
-        MNzTkHu3w42IQ9Us3+R2z41J37YikIl9C0NVS3HXlmev1VK6PxV/9T2y9J/2RWGlL94+PxRu
-        3sv3ua/hItEZoj8/z2vChjnbjrg+FZofPWXfjjcXFXTc3QIUl7X89w6aMOnnxKQjMQYn8rc4
-        xs7sfiN9UVbfZraAWZb1e4NklvmtShXq6TwPfienLNRhtZsTulny4Wu5Nao6NqlWGq0H2Jtn
-        JxnWdv19c53rY+Qk+2Vrap6elrh3c/mvjvqs922fT18+3G4YwRWc97FvukjkpXuRwkosxRmJ
-        hlrMRcWJAKFsKFbjAgAA
-X-CMS-MailID: 20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b
-References: <CGME20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b@eucas1p2.samsung.com>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The callee: blk_mq_flush_plug_list already has an empty list check for
-plug->mq_list. Remove the check for empty list from the
-caller:blk_flush_plug.
+On Wed, 2021-11-03 at 11:43 +0800, Ming Lei wrote:
+[...]
+> +void scsi_start_queue(struct scsi_device *sdev)
+> +{
+> +	if (cmpxchg(&sdev->queue_stopped, 1, 0))
+> +		blk_mq_unquiesce_queue(sdev->request_queue);
+> +}
+> +
+> +static void scsi_stop_queue(struct scsi_device *sdev, bool nowait)
+> +{
+> +	if (!cmpxchg(&sdev->queue_stopped, 0, 1)) {
+> +		if (nowait)
+> +			blk_mq_quiesce_queue_nowait(sdev-
+> >request_queue);
+> +		else
+> +			blk_mq_quiesce_queue(sdev->request_queue);
+> +	} else {
+> +		if (!nowait)
+> +			blk_mq_wait_quiesce_done(sdev->request_queue);
+> +	}
+> +}
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- block/blk-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This looks counter intuitive.  I assume it's done so that if we call
+scsi_stop_queue when the queue has already been stopped, it waits until
+the queue is actually quiesced before returning so the behaviour is the
+same in the !nowait case?  Some sort of comment explaining that would
+be useful.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b043de2baaac..a309e7cca218 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1588,8 +1588,8 @@ void blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- {
- 	if (!list_empty(&plug->cb_list))
- 		flush_plug_callbacks(plug, from_schedule);
--	if (!rq_list_empty(plug->mq_list))
--		blk_mq_flush_plug_list(plug, from_schedule);
-+
-+	blk_mq_flush_plug_list(plug, from_schedule);
- 	/*
- 	 * Unconditionally flush out cached requests, even if the unplug
- 	 * event came from schedule. Since we know hold references to the
--- 
-2.25.1
+James
+
+
 
