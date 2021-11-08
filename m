@@ -2,260 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A9DC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 03:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E114C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 04:10:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E55D761378
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 03:04:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E854561381
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 04:10:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235532AbhKHDGq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Nov 2021 22:06:46 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:27120 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230128AbhKHDGp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Nov 2021 22:06:45 -0500
-Received: from dggeme754-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4HnbVg2QVKz1DJBW;
-        Mon,  8 Nov 2021 11:01:47 +0800 (CST)
-Received: from [10.174.178.185] (10.174.178.185) by
- dggeme754-chm.china.huawei.com (10.3.19.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.15; Mon, 8 Nov 2021 11:03:57 +0800
-Subject: Re: [PATCH] blk-mq: don't free tags if the tag_set is used by other
- device in queue initialztion
-To:     Ming Lei <ming.lei@redhat.com>
-References: <20211106092331.3162749-1-yukuai3@huawei.com>
- <YYh+CrMZb4RPLFKs@T590> <618886B4.6050909@huawei.com> <YYiIeUzqszx0g3Zs@T590>
-CC:     Yu Kuai <yukuai3@huawei.com>, <axboe@kernel.dk>, <ast@kernel.org>,
-        <daniel@iogearbox.net>, <andrii@kernel.org>, <kbusch@kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-From:   yebin <yebin10@huawei.com>
-Message-ID: <6188939D.7090100@huawei.com>
-Date:   Mon, 8 Nov 2021 11:03:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.1.0
+        id S236542AbhKHENT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Nov 2021 23:13:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236536AbhKHENS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Nov 2021 23:13:18 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B981FC061570;
+        Sun,  7 Nov 2021 20:10:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=ktUs3uTQ8/E5fdzFkqY1zH7fnzNTHiKLIPKl79EDTvQ=; b=rz69hoxIcde3ZSkZGxzrx8B3G3
+        NZ6ipfKdYo7Dgv0EQAZqiT/2KjOgglkGFI5PCGdSzPIFGuNMW7Pg6mYhHUqsdM2/uAWAfEcIZdixl
+        dri2cK+oMRkmy/8S11UkympF9k6ohjmCUXcasgTnz1SpbJEy8bvwlPeuSB9EH8ju9xPAGstrkMhA+
+        VN1hfVqbAuwlG+Krp34Fg6ez5l2mxpIboxKVvpzl1ASZvTKcOBquL19nrC9NL14ro8LjvQrl5JSAD
+        ae4HVB0MXWulOgw5oTH1VoWBTwWupJgDaOi29ZoE5sG6qg8QXyndUsWfjxEjr3a9hyLoLSTg3kkTd
+        O1qRXaZA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mjvur-0089Qy-Hv; Mon, 08 Nov 2021 04:06:26 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     "Darrick J . Wong " <djwong@kernel.org>
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH v2 00/28] iomap/xfs folio patches
+Date:   Mon,  8 Nov 2021 04:05:23 +0000
+Message-Id: <20211108040551.1942823-1-willy@infradead.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <YYiIeUzqszx0g3Zs@T590>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.185]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggeme754-chm.china.huawei.com (10.3.19.100)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patchset converts XFS & iomap to use folios, and gets them to a
+state where they can handle multi-page folios.  Applying these patches
+is not yet sufficient to actually start using multi-page folios for
+XFS; more page cache changes are needed.  I don't anticipate needing to
+touch XFS again until we're at the point where we want to convert the
+aops to be type-safe.  It completes an xfstests run with no unexpected
+failures.  Most of these patches have been posted before and I've retained
+acks/reviews where I thought them reasonable.  Some patches are new.
 
+v2:
+ - Added review tags from Jens, Darrick & Christoph (thanks!)
+ - Added folio_zero_* wrappers around zero_user_*()
+ - Added a patch to rename AS_THP_SUPPORT
+ - Added a patch to convert __block_write_begin_int() to take a folio
+ - Split the iomap_add_to_ioend() patch into three
+ - Updated changelog of bio_add_folio() (Jens)
+ - Adjusted whitespace of bio patches (Christoph, Jens)
+ - Improved changelog of readahead conversion to explain why the put_page()
+   disappeared (Christoph)
+ - Add a patch to zero an entire folio at a time, instead of limiting to
+   a page
+ - Switch pos & end_pos back to being u64 from loff_t
+ - Call block_write_end() and ->page_done with the head page of the folio,
+   as that's what those functions expect.
 
-On 2021/11/8 10:16, Ming Lei wrote:
-> On Mon, Nov 08, 2021 at 10:08:52AM +0800, yebin wrote:
->>
->> On 2021/11/8 9:31, Ming Lei wrote:
->>> On Sat, Nov 06, 2021 at 05:23:31PM +0800, Yu Kuai wrote:
->>>> Our test report a UAF on v5.10:
->>>>
->>>> [ 1446.674930] ==================================================================
->>>> [ 1446.675970] BUG: KASAN: use-after-free in blk_mq_get_driver_tag+0x9a4/0xa90
->>>> [ 1446.676902] Read of size 8 at addr ffff8880185afd10 by task kworker/1:2/12348
->>>> [ 1446.677851]
->>>> [ 1446.678073] CPU: 1 PID: 12348 Comm: kworker/1:2 Not tainted 5.10.0-10177-gc9c81b1e346a #2
->>>> [ 1446.679168] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->>>> [ 1446.680692] Workqueue: kthrotld blk_throtl_dispatch_work_fn
->>>> [ 1446.681448] Call Trace:
->>>> [ 1446.681800]  dump_stack+0x9b/0xce
->>>> [ 1446.682259]  ? blk_mq_get_driver_tag+0x9a4/0xa90
->>>> [ 1446.682916]  print_address_description.constprop.6+0x3e/0x60
->>>> [ 1446.683688]  ? __cpuidle_text_end+0x5/0x5
->>>> [ 1446.684239]  ? vprintk_func+0x6b/0x120
->>>> [ 1446.684748]  ? blk_mq_get_driver_tag+0x9a4/0xa90
->>>> [ 1446.685373]  ? blk_mq_get_driver_tag+0x9a4/0xa90
->>>> [ 1446.685999]  kasan_report.cold.9+0x22/0x3a
->>>> [ 1446.686559]  ? blk_mq_get_driver_tag+0x9a4/0xa90
->>>> [ 1446.687186]  blk_mq_get_driver_tag+0x9a4/0xa90
->>>> [ 1446.687785]  blk_mq_dispatch_rq_list+0x21a/0x1d40
->>>> [ 1446.688427]  ? __sbitmap_get_word+0xc3/0xe0
->>>> [ 1446.688992]  ? blk_mq_dequeue_from_ctx+0x960/0x960
->>>> [ 1446.689641]  ? _raw_spin_lock+0x7a/0xd0
->>>> [ 1446.690164]  ? _raw_spin_lock_irq+0xd0/0xd0
->>>> [ 1446.690727]  ? sbitmap_get_shallow+0x3c9/0x4e0
->>>> [ 1446.691329]  ? sbitmap_any_bit_set+0x128/0x190
->>>> [ 1446.691928]  ? kyber_completed_request+0x290/0x290
->>>> [ 1446.692576]  __blk_mq_do_dispatch_sched+0x394/0x830
->>>> [ 1446.693237]  ? blk_mq_sched_request_inserted+0x100/0x100
->>>> [ 1446.693948]  ? __blk_queue_split+0x31d/0x1380
->>>> [ 1446.694540]  ? blk_integrity_merge_bio+0xc1/0x370
->>>> [ 1446.695182]  ? ll_back_merge_fn+0x694/0x1490
->>>> [ 1446.695758]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
->>>> [ 1446.696484]  ? bio_attempt_back_merge+0x1cc/0x340
->>>> [ 1446.697121]  ? blk_mq_do_dispatch_ctx+0x570/0x570
->>>> [ 1446.697756]  ? _raw_spin_lock+0x7a/0xd0
->>>> [ 1446.698279]  blk_mq_sched_dispatch_requests+0xdf/0x140
->>>> [ 1446.698967]  __blk_mq_run_hw_queue+0xc0/0x270
->>>> [ 1446.699561]  __blk_mq_delay_run_hw_queue+0x4cc/0x550
->>>> [ 1446.700231]  ? kyber_has_work+0x9a/0x140
->>>> [ 1446.700760]  ? kyber_completed_request+0x290/0x290
->>>> [ 1446.701407]  blk_mq_run_hw_queue+0x13b/0x2b0
->>>> [ 1446.701982]  ? kyber_has_work+0x140/0x140
->>>> [ 1446.702593]  blk_mq_sched_insert_requests+0x1de/0x390
->>>> [ 1446.703309]  blk_mq_flush_plug_list+0x4b4/0x760
->>>> [ 1446.703946]  ? blk_mq_insert_requests+0x4b0/0x4b0
->>>> [ 1446.704644]  ? __bpf_trace_block_bio_complete+0x30/0x30
->>>> [ 1446.705408]  blk_flush_plug_list+0x2c5/0x480
->>>> [ 1446.706026]  ? blk_insert_cloned_request+0x460/0x460
->>>> [ 1446.706717]  ? _raw_spin_lock_irq+0x7b/0xd0
->>>> [ 1446.707292]  ? _raw_spin_lock_irqsave+0xe0/0xe0
->>>> [ 1446.707901]  ? set_next_entity+0x235/0x2210
->>>> [ 1446.708471]  blk_finish_plug+0x55/0xa0
->>>> [ 1446.708980]  blk_throtl_dispatch_work_fn+0x23b/0x2e0
->>>> [ 1446.709653]  ? tg_prfill_limit+0x8a0/0x8a0
->>>> [ 1446.710216]  ? read_word_at_a_time+0xe/0x20
->>>> [ 1446.710780]  ? strscpy+0x9a/0x320
->>>> [ 1446.711236]  process_one_work+0x6d4/0xfe0
->>>> [ 1446.711778]  worker_thread+0x91/0xc80
->>>> [ 1446.712281]  ? __kthread_parkme+0xb0/0x110
->>>> [ 1446.712834]  ? process_one_work+0xfe0/0xfe0
->>>> [ 1446.713400]  kthread+0x32d/0x3f0
->>>> [ 1446.713840]  ? kthread_park+0x170/0x170
->>>> [ 1446.714362]  ret_from_fork+0x1f/0x30
->>>> [ 1446.714846]
->>>> [ 1446.715062] Allocated by task 1:
->>>> [ 1446.715509]  kasan_save_stack+0x19/0x40
->>>> [ 1446.716026]  __kasan_kmalloc.constprop.1+0xc1/0xd0
->>>> [ 1446.716673]  blk_mq_init_tags+0x6d/0x330
->>>> [ 1446.717207]  blk_mq_alloc_rq_map+0x50/0x1c0
->>>> [ 1446.717769]  __blk_mq_alloc_map_and_request+0xe5/0x320
->>>> [ 1446.718459]  blk_mq_alloc_tag_set+0x679/0xdc0
->>>> [ 1446.719050]  scsi_add_host_with_dma.cold.3+0xa0/0x5db
->>>> [ 1446.719736]  virtscsi_probe+0x7bf/0xbd0
->>>> [ 1446.720265]  virtio_dev_probe+0x402/0x6c0
->>>> [ 1446.720808]  really_probe+0x276/0xde0
->>>> [ 1446.721320]  driver_probe_device+0x267/0x3d0
->>>> [ 1446.721892]  device_driver_attach+0xfe/0x140
->>>> [ 1446.722491]  __driver_attach+0x13a/0x2c0
->>>> [ 1446.723037]  bus_for_each_dev+0x146/0x1c0
->>>> [ 1446.723603]  bus_add_driver+0x3fc/0x680
->>>> [ 1446.724145]  driver_register+0x1c0/0x400
->>>> [ 1446.724693]  init+0xa2/0xe8
->>>> [ 1446.725091]  do_one_initcall+0x9e/0x310
->>>> [ 1446.725626]  kernel_init_freeable+0xc56/0xcb9
->>>> [ 1446.726231]  kernel_init+0x11/0x198
->>>> [ 1446.726714]  ret_from_fork+0x1f/0x30
->>>> [ 1446.727212]
->>>> [ 1446.727433] Freed by task 26992:
->>>> [ 1446.727882]  kasan_save_stack+0x19/0x40
->>>> [ 1446.728420]  kasan_set_track+0x1c/0x30
->>>> [ 1446.728943]  kasan_set_free_info+0x1b/0x30
->>>> [ 1446.729517]  __kasan_slab_free+0x111/0x160
->>>> [ 1446.730084]  kfree+0xb8/0x520
->>>> [ 1446.730507]  blk_mq_free_map_and_requests+0x10b/0x1b0
->>>> [ 1446.731206]  blk_mq_realloc_hw_ctxs+0x8cb/0x15b0
->>>> [ 1446.731844]  blk_mq_init_allocated_queue+0x374/0x1380
->>>> [ 1446.732540]  blk_mq_init_queue_data+0x7f/0xd0
->>>> [ 1446.733155]  scsi_mq_alloc_queue+0x45/0x170
->>>> [ 1446.733730]  scsi_alloc_sdev+0x73c/0xb20
->>>> [ 1446.734281]  scsi_probe_and_add_lun+0x9a6/0x2d90
->>>> [ 1446.734916]  __scsi_scan_target+0x208/0xc50
->>>> [ 1446.735500]  scsi_scan_channel.part.3+0x113/0x170
->>>> [ 1446.736149]  scsi_scan_host_selected+0x25a/0x360
->>>> [ 1446.736783]  store_scan+0x290/0x2d0
->>>> [ 1446.737275]  dev_attr_store+0x55/0x80
->>>> [ 1446.737782]  sysfs_kf_write+0x132/0x190
->>>> [ 1446.738313]  kernfs_fop_write_iter+0x319/0x4b0
->>>> [ 1446.738921]  new_sync_write+0x40e/0x5c0
->>>> [ 1446.739429]  vfs_write+0x519/0x720
->>>> [ 1446.739877]  ksys_write+0xf8/0x1f0
->>>> [ 1446.740332]  do_syscall_64+0x2d/0x40
->>>> [ 1446.740802]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>>> [ 1446.741462]
->>>> [ 1446.741670] The buggy address belongs to the object at ffff8880185afd00
->>>> [ 1446.741670]  which belongs to the cache kmalloc-256 of size 256
->>>> [ 1446.743276] The buggy address is located 16 bytes inside of
->>>> [ 1446.743276]  256-byte region [ffff8880185afd00, ffff8880185afe00)
->>>> [ 1446.744765] The buggy address belongs to the page:
->>>> [ 1446.745416] page:ffffea0000616b00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x185ac
->>>> [ 1446.746694] head:ffffea0000616b00 order:2 compound_mapcount:0 compound_pincount:0
->>>> [ 1446.747719] flags: 0x1fffff80010200(slab|head)
->>>> [ 1446.748337] raw: 001fffff80010200 ffffea00006a3208 ffffea000061bf08 ffff88801004f240
->>>> [ 1446.749404] raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
->>>> [ 1446.750455] page dumped because: kasan: bad access detected
->>>> [ 1446.751227]
->>>> [ 1446.751445] Memory state around the buggy address:
->>>> [ 1446.752102]  ffff8880185afc00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>>> [ 1446.753090]  ffff8880185afc80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>>> [ 1446.754079] >ffff8880185afd00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>>> [ 1446.755065]                          ^
->>>> [ 1446.755589]  ffff8880185afd80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>>> [ 1446.756574]  ffff8880185afe00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>>> [ 1446.757566] ==================================================================
->>>>
->>>> Flag 'BLK_MQ_F_TAG_QUEUE_SHARED' will be set if the second device on the
->>>> same host initializes it's queue successfully. However, if the second
->>>> device failed to allocate memory in blk_mq_alloc_and_init_hctx() from
->>>> blk_mq_realloc_hw_ctxs() from blk_mq_init_allocated_queue(),
->>>> __blk_mq_free_map_and_rqs() will be called on error path, and if
->>>> 'BLK_MQ_TAG_HCTX_SHARED' is not set, 'tag_set->tags' will be freed
->>>> while it's still used by the first device.
->>>>
->>>> Fix the problem by checking if 'tag_set->tag_list' is emptly before
->>>> freeing 'tag_set->tag' during queue initialization.
->>>>
->>>> Fixes: 868f2f0b7206 ("blk-mq: dynamic h/w context count")
->>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>>> ---
->>>>    block/blk-mq.c | 12 ++++++++++--
->>>>    1 file changed, 10 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>> index 3527ee251a85..529ad8c47377 100644
->>>> --- a/block/blk-mq.c
->>>> +++ b/block/blk-mq.c
->>>> @@ -3571,7 +3571,7 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
->>>>    }
->>>>    static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->>>> -						struct request_queue *q)
->>>> +				   struct request_queue *q)
->>>>    {
->>>>    	int i, j, end;
->>>>    	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
->>>> @@ -3636,9 +3636,17 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->>>>    	for (; j < end; j++) {
->>>>    		struct blk_mq_hw_ctx *hctx = hctxs[j];
->>>> +		bool free_tags = !blk_mq_is_shared_tags(set->flags) &&
->>>> +			!q->nr_hw_queues && list_empty(&set->tag_list);
->>>>    		if (hctx) {
->>>> -			__blk_mq_free_map_and_rqs(set, j);
->>>> +			/*
->>>> +			 * tags should not be freed if other device is using the
->>>> +			 * tagset. q->nr_hw_queues is zero means current
->>>> +			 * function is called from queue initialization.
->>>> +			 */
->>>> +			if (free_tags)
->>>> +				__blk_mq_free_map_and_rqs(set, j);
->>>>    			blk_mq_exit_hctx(q, set, hctx, j);
->>>>    			hctxs[j] = NULL;
->>> __blk_mq_free_map_and_rqs() isn't supposed to call in
->>> blk_mq_realloc_hw_ctxs(), so why can't we simply remove it here?
->> __blk_mq_update_nr_hw_queues
->>      blk_mq_realloc_hw_ctxs
->>          if (q->nr_hw_queues != set->nr_hw_queues)
->>              set->nr_hw_queues = prev_nr_hw_queues;
->> If 'tag_set' expansion failed, 'set->nr_hw_queues' will fallback previous
->> value. So If we don't
->> call '__blk_mq_free_map_and_rqs' to release the newly allocated hardware
->> context will lead to
->> memory leak.
-> Then the correct way is to move the freeing of extra map_and_tags into
-> __blk_mq_update_nr_hw_queues() where it is safe and supposed to do such
-> thing.
->
->
-> Thanks,
-> Ming
->
-> .
-Good idea, i will send V2 according to your  suggestion.
-(Yu Kuai entrusted me to deal with this issue.)
+I intend to push patch 1 upstream myself (before 5.16), but I've included
+it here to avoid nasty messages from the build-bots.  I can probably
+persuade Linus to take patches 2-4 as well if Darrick's not comfortable
+taking them as part of the iomap changes.
+
+These changes are also available at:
+  git://git.infradead.org/users/willy/pagecache.git heads/folio-iomap
+
+I intend to rebase that branch to include any further R-b tags (some of
+the patches are new and don't have reviews).
+
+Matthew Wilcox (Oracle) (28):
+  csky,sparc: Declare flush_dcache_folio()
+  mm: Add functions to zero portions of a folio
+  fs: Remove FS_THP_SUPPORT
+  fs: Rename AS_THP_SUPPORT and mapping_thp_support
+  block: Add bio_add_folio()
+  block: Add bio_for_each_folio_all()
+  fs/buffer: Convert __block_write_begin_int() to take a folio
+  iomap: Convert to_iomap_page to take a folio
+  iomap: Convert iomap_page_create to take a folio
+  iomap: Convert iomap_page_release to take a folio
+  iomap: Convert iomap_releasepage to use a folio
+  iomap: Add iomap_invalidate_folio
+  iomap: Pass the iomap_page into iomap_set_range_uptodate
+  iomap: Convert bio completions to use folios
+  iomap: Use folio offsets instead of page offsets
+  iomap: Convert iomap_read_inline_data to take a folio
+  iomap: Convert readahead and readpage to use a folio
+  iomap: Convert iomap_page_mkwrite to use a folio
+  iomap: Convert __iomap_zero_iter to use a folio
+  iomap: Convert iomap_write_begin() and iomap_write_end() to folios
+  iomap: Convert iomap_write_end_inline to take a folio
+  iomap,xfs: Convert ->discard_page to ->discard_folio
+  iomap: Simplify iomap_writepage_map()
+  iomap: Simplify iomap_do_writepage()
+  iomap: Convert iomap_add_to_ioend() to take a folio
+  iomap: Convert iomap_migrate_page() to use folios
+  iomap: Support multi-page folios in invalidatepage
+  xfs: Support multi-page folios
+
+ Documentation/core-api/kernel-api.rst  |   1 +
+ arch/csky/abiv1/inc/abi/cacheflush.h   |   1 +
+ arch/csky/abiv2/inc/abi/cacheflush.h   |   2 +
+ arch/sparc/include/asm/cacheflush_32.h |   1 +
+ arch/sparc/include/asm/cacheflush_64.h |   1 +
+ block/bio.c                            |  22 ++
+ fs/buffer.c                            |  22 +-
+ fs/inode.c                             |   2 -
+ fs/internal.h                          |   2 +-
+ fs/iomap/buffered-io.c                 | 506 +++++++++++++------------
+ fs/xfs/xfs_aops.c                      |  24 +-
+ fs/xfs/xfs_icache.c                    |   2 +
+ include/linux/bio.h                    |  56 ++-
+ include/linux/fs.h                     |   1 -
+ include/linux/highmem.h                |  44 ++-
+ include/linux/iomap.h                  |   3 +-
+ include/linux/pagemap.h                |  26 +-
+ mm/highmem.c                           |   2 -
+ mm/shmem.c                             |   3 +-
+ 19 files changed, 431 insertions(+), 290 deletions(-)
+
+-- 
+2.33.0
 
