@@ -2,180 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3428AC433EF
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 13:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 865C3C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 15:13:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DF4861152
-	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 13:24:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 721C56120D
+	for <linux-block@archiver.kernel.org>; Mon,  8 Nov 2021 15:13:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239925AbhKHN0q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Nov 2021 08:26:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239923AbhKHN0j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Nov 2021 08:26:39 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C505C061570
-        for <linux-block@vger.kernel.org>; Mon,  8 Nov 2021 05:23:55 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id i9so16826114ilu.8
-        for <linux-block@vger.kernel.org>; Mon, 08 Nov 2021 05:23:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=AnpldSz3otw9Jo0sWSLAINlNywRhKkiZCwWlVFH1Tuc=;
-        b=EBpEQQMWgC391drJLWUg9P/Pabqv632lsBuA6+xFeRwrUALIG30VR/dac0y1qmw49v
-         soFeQtErRskJmRND34tM1PNQjm9nSSQ3x0M1toYUnluC90eR3EQix1qWjcdHjbvZkvmZ
-         9sBX9en13VeamPq1OGXXygnxCAWn0xPnDh8z/FVSGDOaCuM11bYqs2DQ9UYPR1117Sg7
-         FLxvxJaW0xewRAqfsHrU9pKMGO4Si6i8/U8Mqbc7woZ3npJY9sGy4cx/eN15QYLPw5xs
-         Gr4j0MNz3faAwj4QBfGp6GMmvibkRgAPniwC+Flkyg+SbiI6rpOnXBI+Iq7YQVUNh7yO
-         E4sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=AnpldSz3otw9Jo0sWSLAINlNywRhKkiZCwWlVFH1Tuc=;
-        b=QQPAT0tBC87VmSKpCbcwhAh4kasebYuMWpJlWB2BacISv/OQYpeerO9sqdPBSddRip
-         gcrIkQZTVnQdEezj60PFPUxDv2LUr0ccHwZTiuEm2mTiGJOEgsuOceCfSoKYXdX+QOo/
-         jhuk+pkP+Q5OJiDxnYIXCDPkTvA5YxVHG+r4DezswI/FKyWSY+FEgYJ4zmUhRT1QrO7N
-         eucuOqG0c4V7seEAvm6k1owFsSoLdpKA9wjOOgv2/TYdyVE4oF63qooqNQwEeuwO6FQR
-         BK1WikdKzYUJy192YbjSLC+41vwmJU8Ma5tKV1OgeprhbtkdP+8QIs0j18c4X0Oqeycp
-         KYdA==
-X-Gm-Message-State: AOAM530a47pZMnXZ3lvYHlm/5S6hbnaiu/u8EygoDTiPbXBSg3XairKQ
-        PenMvpC/3b6EtnZFui3JYsZM6A==
-X-Google-Smtp-Source: ABdhPJzwbFDOLxfbBZcf8nDM3RhfXB89Ylbm3V5SRZDXDHr7vO0PAqEYQe3JbILtTxC/1Eoeq2E9Jg==
-X-Received: by 2002:a05:6e02:180b:: with SMTP id a11mr21208721ilv.82.1636377834260;
-        Mon, 08 Nov 2021 05:23:54 -0800 (PST)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id u12sm6964619iop.52.2021.11.08.05.23.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Nov 2021 05:23:53 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ye Bin <yebin10@huawei.com>
-Cc:     Yu Kuai <yukuai3@huawei.com>, ming.lei@redhat.com
-In-Reply-To: <20211108074019.1058843-1-yebin10@huawei.com>
-References: <20211108074019.1058843-1-yebin10@huawei.com>
-Subject: Re: [PATCH -next v2] blk-mq: don't free tags if the tag_set is used by other device in queue initialztion
-Message-Id: <163637783213.313782.2685614076983672835.b4-ty@kernel.dk>
-Date:   Mon, 08 Nov 2021 06:23:52 -0700
+        id S235272AbhKHPPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Nov 2021 10:15:48 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:12228 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238807AbhKHPNT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Nov 2021 10:13:19 -0500
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20211108151031euoutp018b25c99a9573b4d41f202c070c840c81~1msnc0NO50988409884euoutp01e
+        for <linux-block@vger.kernel.org>; Mon,  8 Nov 2021 15:10:31 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20211108151031euoutp018b25c99a9573b4d41f202c070c840c81~1msnc0NO50988409884euoutp01e
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1636384231;
+        bh=JfQftMPNSQ0nii0JnsaUG6Ori1dCx6yZ3qkFWx2SfFM=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=e08QPkuoRc9oRH6DVkasNd56Hcz2YeuMBJ9BMoYJpB3sgnIbtR1hKmtqEqzE1a96Q
+         TDkpn+jv6NXMiTNi3b6V9wcMyFO8cJaLdFRZtamZP9tGi2zF6+wKBuRm3Au5C8pmw9
+         UUlkO/9eCh50IaRnu8EWMD21Zsh3UmdcyTc/8XpE=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20211108151031eucas1p19d18dc9223db3ff5f4974b0b9e17e4fe~1msnKEJiK1761717617eucas1p1u;
+        Mon,  8 Nov 2021 15:10:31 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id B7.F2.09887.7ED39816; Mon,  8
+        Nov 2021 15:10:31 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b~1msmsT00u1342513425eucas1p22;
+        Mon,  8 Nov 2021 15:10:30 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20211108151030eusmtrp2eda5415ac7edc4e8d5e566081944a0e8~1msmrwLEM1701917019eusmtrp2_;
+        Mon,  8 Nov 2021 15:10:30 +0000 (GMT)
+X-AuditID: cbfec7f4-471ff7000000269f-cf-61893de77bf3
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 84.D6.09404.6ED39816; Mon,  8
+        Nov 2021 15:10:30 +0000 (GMT)
+Received: from localhost (unknown [106.210.248.42]) by eusmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20211108151030eusmtip108f33d57af8b73a39e25b8cecc7a97ea~1msmOL4GQ1942019420eusmtip1Y;
+        Mon,  8 Nov 2021 15:10:30 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Pankaj Raghav <pankydev8@gmail.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: [PATCH v2] block: Remove the redundant empty list check in
+ blk_flush_plug
+Date:   Mon,  8 Nov 2021 20:40:11 +0530
+Message-Id: <20211108151011.256796-1-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrJIsWRmVeSWpSXmKPExsWy7djPc7rPbTsTDVqvc1usvtvPZrH3lrbF
+        56Ut7BZrbj5lcWDx2DnrLrvH5bOlHn1bVjF6fN4kF8ASxWWTkpqTWZZapG+XwJWxc+4VpoJW
+        9oqG/qeMDYxfWLsYOTkkBEwk3i67xdbFyMUhJLCCUeLsmr0sEM4XRompm7cxQzifGSV+XFjH
+        DNPy5P9yJojEckaJ4//2s0I4Lxgl7p65C1TFwcEmoCXR2MkO0iAioCDR83slG4jNLJAjselx
+        L9ggYYEQib5zB8BqWARUJc68vgVm8wpYSax42QB1n7zEzEvfoeKCEidnPmGBmCMv0bx1Nth1
+        EgI/2SVWH//FDtHgInH1VisbhC0s8er4Fqi4jMT/nfOZIOzJjBLHViVCNK9nlGjpXsAKcrSE
+        gLVE35kcEJNZQFNi/S59iKijRM+mNAiTT+LGW0GIC/gkJm2bzgwR5pXoaBOCmK0ksfPnE6id
+        EhKXm+awQNgeElfn7AZ7SkggVuLOkaOsExgVZiH5axaSv2YhnLCAkXkVo3hqaXFuemqxUV5q
+        uV5xYm5xaV66XnJ+7iZGYOo4/e/4lx2My1991DvEyMTBeIhRgoNZSYT33tGORCHelMTKqtSi
+        /Pii0pzU4kOM0hwsSuK8In8aEoUE0hNLUrNTUwtSi2CyTBycUg1MK67zbNYWqhAR2/vXyeM7
+        by6T7IOHMxTulrkfbL508tjhvex3XjOHWMzXsXnOcG7FqUNJKZlG4b+bG3LXm547qSRV1ndY
+        9IUXy577FdlvubW3HKvlXz/bSJl7lb/zsTyzFV5X50/4vtpjjUf8JfPit5O5GR92rMitd/6d
+        48HVLyK/ZdmPSw066j9eRwWnzgjvlPvCtIpl6yS30+9kQ04fzPIRn5+Xqt+m/+MTj9VUhmRJ
+        4cOOXff7XOR5tzqv2nlMeneuOf+8YrcjX/I8TxV+/qU+93nEga28kznOXt5sJNnxg+PrpOBE
+        ntXO/B/SL865V6G6at3v4stHpeLuzLUw3C2r//LOG31hE65aG63DSizFGYmGWsxFxYkA1kNC
+        FIwDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrALMWRmVeSWpSXmKPExsVy+t/xu7rPbDsTDY5u4rNYfbefzWLvLW2L
+        z0tb2C3W3HzK4sDisXPWXXaPy2dLPfq2rGL0+LxJLoAlSs+mKL+0JFUhI7+4xFYp2tDCSM/Q
+        0kLPyMRSz9DYPNbKyFRJ384mJTUnsyy1SN8uQS9j59wrTAWt7BUN/U8ZGxi/sHYxcnJICJhI
+        PPm/nKmLkYtDSGApo0T7hOtMEAkJidsLmxghbGGJP9e62CCKnjFKnJ4+A6ibg4NNQEuisZMd
+        pEZEQEGi5/dKNhCbWSBPYvGjy8wgJcICQRI3JgqChFkEVCXOvL4FVs4rYCWx4mUD1A3yEjMv
+        fYeKC0qcnPmEBWKMvETz1tnMExj5ZiFJzUKSWsDItIpRJLW0ODc9t9hIrzgxt7g0L10vOT93
+        EyMwaLcd+7llB+PKVx/1DjEycTAeYpTgYFYS4b13tCNRiDclsbIqtSg/vqg0J7X4EKMp0H0T
+        maVEk/OBcZNXEm9oZmBqaGJmaWBqaWasJM7rWQDUJJCeWJKanZpakFoE08fEwSnVwDQ/7aL5
+        GxehSuXrV9rvMl4pZptYMcfxu/qjYnP9i5oXimSU2jhkbV7lyqXuXfx455fSzafyNjf/Pqh+
+        MNzTkHu3w42IQ9Us3+R2z41J37YikIl9C0NVS3HXlmev1VK6PxV/9T2y9J/2RWGlL94+PxRu
+        3sv3ua/hItEZoj8/z2vChjnbjrg+FZofPWXfjjcXFXTc3QIUl7X89w6aMOnnxKQjMQYn8rc4
+        xs7sfiN9UVbfZraAWZb1e4NklvmtShXq6TwPfienLNRhtZsTulny4Wu5Nao6NqlWGq0H2Jtn
+        JxnWdv19c53rY+Qk+2Vrap6elrh3c/mvjvqs922fT18+3G4YwRWc97FvukjkpXuRwkosxRmJ
+        hlrMRcWJAKFsKFbjAgAA
+X-CMS-MailID: 20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b
+References: <CGME20211108151030eucas1p257602208c9a532f3d0e002d7a81b308b@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 8 Nov 2021 15:40:19 +0800, Ye Bin wrote:
-> We got UAF report on v5.10 as follows:
-> [ 1446.674930] ==================================================================
-> [ 1446.675970] BUG: KASAN: use-after-free in blk_mq_get_driver_tag+0x9a4/0xa90
-> [ 1446.676902] Read of size 8 at addr ffff8880185afd10 by task kworker/1:2/12348
-> [ 1446.677851]
-> [ 1446.678073] CPU: 1 PID: 12348 Comm: kworker/1:2 Not tainted 5.10.0-10177-gc9c81b1e346a #2
-> [ 1446.679168] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> [ 1446.680692] Workqueue: kthrotld blk_throtl_dispatch_work_fn
-> [ 1446.681448] Call Trace:
-> [ 1446.681800]  dump_stack+0x9b/0xce
-> [ 1446.682916]  print_address_description.constprop.6+0x3e/0x60
-> [ 1446.685999]  kasan_report.cold.9+0x22/0x3a
-> [ 1446.687186]  blk_mq_get_driver_tag+0x9a4/0xa90
-> [ 1446.687785]  blk_mq_dispatch_rq_list+0x21a/0x1d40
-> [ 1446.692576]  __blk_mq_do_dispatch_sched+0x394/0x830
-> [ 1446.695758]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
-> [ 1446.698279]  blk_mq_sched_dispatch_requests+0xdf/0x140
-> [ 1446.698967]  __blk_mq_run_hw_queue+0xc0/0x270
-> [ 1446.699561]  __blk_mq_delay_run_hw_queue+0x4cc/0x550
-> [ 1446.701407]  blk_mq_run_hw_queue+0x13b/0x2b0
-> [ 1446.702593]  blk_mq_sched_insert_requests+0x1de/0x390
-> [ 1446.703309]  blk_mq_flush_plug_list+0x4b4/0x760
-> [ 1446.705408]  blk_flush_plug_list+0x2c5/0x480
-> [ 1446.708471]  blk_finish_plug+0x55/0xa0
-> [ 1446.708980]  blk_throtl_dispatch_work_fn+0x23b/0x2e0
-> [ 1446.711236]  process_one_work+0x6d4/0xfe0
-> [ 1446.711778]  worker_thread+0x91/0xc80
-> [ 1446.713400]  kthread+0x32d/0x3f0
-> [ 1446.714362]  ret_from_fork+0x1f/0x30
-> [ 1446.714846]
-> [ 1446.715062] Allocated by task 1:
-> [ 1446.715509]  kasan_save_stack+0x19/0x40
-> [ 1446.716026]  __kasan_kmalloc.constprop.1+0xc1/0xd0
-> [ 1446.716673]  blk_mq_init_tags+0x6d/0x330
-> [ 1446.717207]  blk_mq_alloc_rq_map+0x50/0x1c0
-> [ 1446.717769]  __blk_mq_alloc_map_and_request+0xe5/0x320
-> [ 1446.718459]  blk_mq_alloc_tag_set+0x679/0xdc0
-> [ 1446.719050]  scsi_add_host_with_dma.cold.3+0xa0/0x5db
-> [ 1446.719736]  virtscsi_probe+0x7bf/0xbd0
-> [ 1446.720265]  virtio_dev_probe+0x402/0x6c0
-> [ 1446.720808]  really_probe+0x276/0xde0
-> [ 1446.721320]  driver_probe_device+0x267/0x3d0
-> [ 1446.721892]  device_driver_attach+0xfe/0x140
-> [ 1446.722491]  __driver_attach+0x13a/0x2c0
-> [ 1446.723037]  bus_for_each_dev+0x146/0x1c0
-> [ 1446.723603]  bus_add_driver+0x3fc/0x680
-> [ 1446.724145]  driver_register+0x1c0/0x400
-> [ 1446.724693]  init+0xa2/0xe8
-> [ 1446.725091]  do_one_initcall+0x9e/0x310
-> [ 1446.725626]  kernel_init_freeable+0xc56/0xcb9
-> [ 1446.726231]  kernel_init+0x11/0x198
-> [ 1446.726714]  ret_from_fork+0x1f/0x30
-> [ 1446.727212]
-> [ 1446.727433] Freed by task 26992:
-> [ 1446.727882]  kasan_save_stack+0x19/0x40
-> [ 1446.728420]  kasan_set_track+0x1c/0x30
-> [ 1446.728943]  kasan_set_free_info+0x1b/0x30
-> [ 1446.729517]  __kasan_slab_free+0x111/0x160
-> [ 1446.730084]  kfree+0xb8/0x520
-> [ 1446.730507]  blk_mq_free_map_and_requests+0x10b/0x1b0
-> [ 1446.731206]  blk_mq_realloc_hw_ctxs+0x8cb/0x15b0
-> [ 1446.731844]  blk_mq_init_allocated_queue+0x374/0x1380
-> [ 1446.732540]  blk_mq_init_queue_data+0x7f/0xd0
-> [ 1446.733155]  scsi_mq_alloc_queue+0x45/0x170
-> [ 1446.733730]  scsi_alloc_sdev+0x73c/0xb20
-> [ 1446.734281]  scsi_probe_and_add_lun+0x9a6/0x2d90
-> [ 1446.734916]  __scsi_scan_target+0x208/0xc50
-> [ 1446.735500]  scsi_scan_channel.part.3+0x113/0x170
-> [ 1446.736149]  scsi_scan_host_selected+0x25a/0x360
-> [ 1446.736783]  store_scan+0x290/0x2d0
-> [ 1446.737275]  dev_attr_store+0x55/0x80
-> [ 1446.737782]  sysfs_kf_write+0x132/0x190
-> [ 1446.738313]  kernfs_fop_write_iter+0x319/0x4b0
-> [ 1446.738921]  new_sync_write+0x40e/0x5c0
-> [ 1446.739429]  vfs_write+0x519/0x720
-> [ 1446.739877]  ksys_write+0xf8/0x1f0
-> [ 1446.740332]  do_syscall_64+0x2d/0x40
-> [ 1446.740802]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> [ 1446.741462]
-> [ 1446.741670] The buggy address belongs to the object at ffff8880185afd00
-> [ 1446.741670]  which belongs to the cache kmalloc-256 of size 256
-> [ 1446.743276] The buggy address is located 16 bytes inside of
-> [ 1446.743276]  256-byte region [ffff8880185afd00, ffff8880185afe00)
-> [ 1446.744765] The buggy address belongs to the page:
-> [ 1446.745416] page:ffffea0000616b00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x185ac
-> [ 1446.746694] head:ffffea0000616b00 order:2 compound_mapcount:0 compound_pincount:0
-> [ 1446.747719] flags: 0x1fffff80010200(slab|head)
-> [ 1446.748337] raw: 001fffff80010200 ffffea00006a3208 ffffea000061bf08 ffff88801004f240
-> [ 1446.749404] raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
-> [ 1446.750455] page dumped because: kasan: bad access detected
-> [ 1446.751227]
-> [ 1446.751445] Memory state around the buggy address:
-> [ 1446.752102]  ffff8880185afc00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [ 1446.753090]  ffff8880185afc80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [ 1446.754079] >ffff8880185afd00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [ 1446.755065]                          ^
-> [ 1446.755589]  ffff8880185afd80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [ 1446.756574]  ffff8880185afe00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [ 1446.757566] ==================================================================
-> 
-> [...]
+The callee: blk_mq_flush_plug_list already has an empty list check for
+plug->mq_list. Remove the check for empty list from the
+caller:blk_flush_plug.
 
-Applied, thanks!
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ block/blk-core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-[1/1] blk-mq: don't free tags if the tag_set is used by other device in queue initialztion
-      commit: a846a8e6c9a5949582c5a6a8bbc83a7d27fd891e
-
-Best regards,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b043de2baaac..a309e7cca218 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1588,8 +1588,8 @@ void blk_flush_plug(struct blk_plug *plug, bool from_schedule)
+ {
+ 	if (!list_empty(&plug->cb_list))
+ 		flush_plug_callbacks(plug, from_schedule);
+-	if (!rq_list_empty(plug->mq_list))
+-		blk_mq_flush_plug_list(plug, from_schedule);
++
++	blk_mq_flush_plug_list(plug, from_schedule);
+ 	/*
+ 	 * Unconditionally flush out cached requests, even if the unplug
+ 	 * event came from schedule. Since we know hold references to the
 -- 
-Jens Axboe
-
+2.25.1
 
