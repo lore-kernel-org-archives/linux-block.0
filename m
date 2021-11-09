@@ -2,94 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB15C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 07:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D4FC433FE
+	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 08:03:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C05361175
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 07:13:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 241BF611BD
+	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 08:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243559AbhKIHPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Nov 2021 02:15:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60100 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243544AbhKIHPz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Nov 2021 02:15:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636441989;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZBXST5SY/iHsjHdapMGVNWxCqE+5TZwYeA8Pjjh71lY=;
-        b=AcBNyQQMCfhNU+/5Z3IkmP1UElrdFOtYHworih3JcOkTWmwP5TKrYzAC8l+xrWpojMlCQC
-        zYGntSHCZV/rQIjAE+M774mmn9WMobVgiGx0AZae5y7jpyaPx0Xwy9ewUqVbKd+m6AC097
-        EmmqLI6jHKNevdfu+DetCv3rnz47F0w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-MztoMq5oM8O-J46rTTR1lw-1; Tue, 09 Nov 2021 02:13:06 -0500
-X-MC-Unique: MztoMq5oM8O-J46rTTR1lw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1DFD802C91;
-        Tue,  9 Nov 2021 07:13:04 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A52AC5F4F4;
-        Tue,  9 Nov 2021 07:12:54 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH V2 4/4] nvme: wait until quiesce is done
-Date:   Tue,  9 Nov 2021 15:11:44 +0800
-Message-Id: <20211109071144.181581-5-ming.lei@redhat.com>
-In-Reply-To: <20211109071144.181581-1-ming.lei@redhat.com>
-References: <20211109071144.181581-1-ming.lei@redhat.com>
+        id S243907AbhKIIFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Nov 2021 03:05:54 -0500
+Received: from verein.lst.de ([213.95.11.211]:48956 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236699AbhKIIFy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Nov 2021 03:05:54 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2CB7467373; Tue,  9 Nov 2021 09:03:07 +0100 (CET)
+Date:   Tue, 9 Nov 2021 09:03:07 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Coly Li <colyli@suse.de>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] bcache: Revert "bcache: use bvec_virt"
+Message-ID: <20211109080307.GA28368@lst.de>
+References: <20211103151041.70516-1-colyli@suse.de> <0bfbf514-4036-23ff-436a-01e0b7eba67e@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0bfbf514-4036-23ff-436a-01e0b7eba67e@suse.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVMe uses one atomic flag to check if quiesce is needed. If quiesce is
-started, the helper returns immediately. This way is wrong, since we
-have to wait until quiesce is done.
+On Mon, Nov 08, 2021 at 04:16:51PM +0800, Coly Li wrote:
+> Since now we don't have a better alternative patch yet, and this issue 
+> should be fixed ASAP. Could you please take it firstly. And I will work 
+> with Christoph for a better change (maybe large and not trivial) later for 
+> next merge window?
 
-Fixes: e70feb8b3e68 ("blk-mq: support concurrent queue quiesce/unquiesce")
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/core.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 838b5e2058be..4b5de8f5435a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -4518,6 +4518,8 @@ static void nvme_stop_ns_queue(struct nvme_ns *ns)
- {
- 	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
- 		blk_mq_quiesce_queue(ns->queue);
-+	else
-+		blk_mq_wait_quiesce_done(ns->queue);
- }
- 
- /*
-@@ -4637,6 +4639,8 @@ void nvme_stop_admin_queue(struct nvme_ctrl *ctrl)
- {
- 	if (!test_and_set_bit(NVME_CTRL_ADMIN_Q_STOPPED, &ctrl->flags))
- 		blk_mq_quiesce_queue(ctrl->admin_q);
-+	else
-+		blk_mq_wait_quiesce_done(ctrl->admin_q);
- }
- EXPORT_SYMBOL_GPL(nvme_stop_admin_queue);
- 
--- 
-2.31.1
-
+fine with me.
