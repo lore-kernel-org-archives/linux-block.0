@@ -2,101 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEA4C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 22:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5254C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 22:58:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FC5361208
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 22:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C6A0610CF
+	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 22:58:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236636AbhKIWNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Nov 2021 17:13:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49072 "EHLO
+        id S237674AbhKIXBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Nov 2021 18:01:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235998AbhKIWNo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Nov 2021 17:13:44 -0500
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8EFC061764
-        for <linux-block@vger.kernel.org>; Tue,  9 Nov 2021 14:10:58 -0800 (PST)
-Received: by mail-il1-x136.google.com with SMTP id j28so360596ila.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Nov 2021 14:10:58 -0800 (PST)
+        with ESMTP id S241461AbhKIXBY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Nov 2021 18:01:24 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9FBCC061230
+        for <linux-block@vger.kernel.org>; Tue,  9 Nov 2021 14:58:14 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id v11so2647601edc.9
+        for <linux-block@vger.kernel.org>; Tue, 09 Nov 2021 14:58:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=I4CD5j9e6+8ZN+DcD8qclyLUPhPpswPfYN2h/ob3YkI=;
-        b=E7BtWxCfIHWFcxehf2XUgRRybhiyPsIO+JoyGtGQCR8qoi/8kDW/9HNpnVdvRytNgt
-         hM+aUapS5Tug97ke57SpXuna+LyrS518IoRIhcKe6P9BySo50G9scY0LpWU7FMF4hq/i
-         7kUmza67SfKPl1cowaZRgfxVPFE83N4DU0cKWUmm4CjmsT28r4gpwCLfz7XXl+1Ktcog
-         6W9BDCuyC/isI5p9DUzSaGfF0kk/gmTXgGXpHLD9XR+IEvL3vSqSbZZRtswDSyrJph1N
-         7w+2khyTSramUELyaCC9GFeMoaSsnCkaYaHmZ6o5yDU6E7EfCegMkCv4YSnkyl5VVLAQ
-         Y8kA==
+        d=mariadb.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=piVw7EQFiHd4yQr382mTiOSVMWD2myq2lpTp7X6eA3k=;
+        b=O9CVHBq6fW+VYtGUwY7auFg42mdgiZ6EoM67vnO7Hnhax3TN4kIevGCFBAJvT9EunP
+         26OsuxNhaTTNJUfY8PyTws2pMxGcU4PZlQp5J7S61j4fuCKeoiT85ON25cJKEy6P9S0Y
+         afPCgJ0ZxvqgMBq8E1ZbhQwWUDGq5CEd0eRtINKk9nCoCuQSQaCbCDQkC3hsa+y6NxMt
+         ilWyv/7z0LyQb/f/nSh9OmYhNXTNzap1QBKbMexdmH0wYndHv+VV4kkqTXiwPwYOvgdg
+         aTKVFEOhNXGqQL3st+oyNekNX28t4y2y/h6RCtEWJqu8+60beAZLIfyGws8DPfpKTlkX
+         UVdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=I4CD5j9e6+8ZN+DcD8qclyLUPhPpswPfYN2h/ob3YkI=;
-        b=SSEoa06SI+KTIBRYOey/5P7lipS4VVNKCn7JvdDITkY3v86W2m9k2lWwAGF0gUVRWB
-         wwNk0PCc7HBDupbyKgs7f2Lr7eqiTlJ2e5xvQpp2Q9UQzhE0FrczVbCD5bwe14Ytzafi
-         GXKA4r1q9ASuNfe9JaZrbz5qTG3yfAig2S+ds/3EVsUeE0mzAhABj1t0OyL7Q5PMRIJj
-         +Hq3RXEBKousG2+44gy6QtlWHbsKB3w+RVqm9fl2rhPevHQgxeTcMj6AOub/Fuo3Fww4
-         C3z9CzJglvz+JzVIuDcu75JPFRWyQbhxahGcO8AkPwF724G/l+vV7YN1k3a2/0l20RgR
-         lcww==
-X-Gm-Message-State: AOAM5301+eTmNYZhE0yqRvFIhmyrrJ6RkArWF/NoT5kRSq2JLb+q0JMl
-        e6speddW6QSczQVfNk/r4e+yeBEED+wCakxB
-X-Google-Smtp-Source: ABdhPJzFurz5WIRsUbrmKIigH58w6XBVWpW5sGPp5lsyYnuOfn1cgqh4tQEglCdLeoqJwLLALglceg==
-X-Received: by 2002:a92:c241:: with SMTP id k1mr7511019ilo.207.1636495857569;
-        Tue, 09 Nov 2021 14:10:57 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id z9sm5508874ile.29.2021.11.09.14.10.56
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Nov 2021 14:10:57 -0800 (PST)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: use enum type for blk_mq_alloc_data->rq_flags
-Message-ID: <1a4b790b-8074-1f67-24f5-662400b2976e@kernel.dk>
-Date:   Tue, 9 Nov 2021 15:10:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=piVw7EQFiHd4yQr382mTiOSVMWD2myq2lpTp7X6eA3k=;
+        b=4feCzgL43nQavlZjrOEY2IQBpeKdrBHWutC7KPxfNMLc8XwF90OtV5oZRPYFu55F9B
+         uzPVQqplqib82oYJwTN4sAYiX49Tw/GMl135mUPIo1IeK0h0DYDz06xGcT3BMiKr/aPD
+         T1auo2d5gfhxLFgiGsfDcjaD6haJ6vKshYrgnYVRLtcwepTImILcZn5QszGLwyK35IbV
+         oHwitc0hSErEkRCnaPSXU/tPiaHm2lq27dlBmJawtZeAC+Ytu79d2N2tSSqqicA91+V+
+         RC+yI5tRQHxHHtnisUIiF/BAifeT/KLgqcBlT0jYgaGl+6R10bULHRasynBos7oDEX3b
+         gaBg==
+X-Gm-Message-State: AOAM532fMJqERoo/jA8rhUpnh+/zCPEwR827DOxav43ZX5zpO/sh8ZnM
+        1EYG2jBqhV+BOZAPHViOf0EB+gqZpkxTqo5BYgtIIg==
+X-Google-Smtp-Source: ABdhPJzlwcZnxz7msbWulktUOOQ9sLZGkeFb0OLKMvRh0D/3C7m/Xg2Ze/gLLrInjFuqa48yUkcnt3S5mV8QbwryQEg=
+X-Received: by 2002:a17:906:ff47:: with SMTP id zo7mr14675046ejb.148.1636498693361;
+ Tue, 09 Nov 2021 14:58:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com> <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
+ <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
+ <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com> <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+In-Reply-To: <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+From:   Daniel Black <daniel@mariadb.org>
+Date:   Wed, 10 Nov 2021 09:58:02 +1100
+Message-ID: <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+Subject: Re: uring regression - lost write request
+To:     Salvatore Bonaccorso <carnil@debian.org>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kernel test robot reports that we now trigger some sparse warnings:
+> On Sat, Oct 30, 2021 at 6:30 PM Salvatore Bonaccorso <carnil@debian.org> wrote:
+> > Were you able to pinpoint the issue?
 
-block/blk-mq.h:169:32: sparse: sparse: restricted req_flags_t degrades to integer
-block/blk-mq.h:169:32: sparse: sparse: restricted req_flags_t degrades to integer
-block/blk-mq.h:169:32: sparse: sparse: restricted req_flags_t degrades to integer
+While I have been unable to reproduce this on a single cpu, Marko can
+repeat a stall on a dual Broadwell chipset on kernels:
 
-which is due to ->rq_flags being an unsigned int, rather than the
-stronger type req_flags_t enum.
+* 5.15.1 - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.1
+* 5.14.16 - https://packages.debian.org/sid/linux-image-5.14.0-4-amd64
 
-Change the type to req_flags_t to silence this warning.
+Detailed observations:
+https://jira.mariadb.org/browse/MDEV-26674
 
-Fixes: 56f8da642bd8 ("block: add rq_flags to struct blk_mq_alloc_data")
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+The previous script has been adapted to use MariaDB-10.6 package and
+sysbench to demonstrate a workload, I've changed Marko's script to
+work with the distro packages and use innodb_use_native_aio=1.
 
----
+MariaDB packages:
 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cb0b5482ca5e..39370bbdf3b6 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -149,7 +149,7 @@ struct blk_mq_alloc_data {
- 	blk_mq_req_flags_t flags;
- 	unsigned int shallow_depth;
- 	unsigned int cmd_flags;
--	unsigned int rq_flags;
-+	req_flags_t rq_flags;
- 
- 	/* allocate multiple requests/tags in one go */
- 	unsigned int nr_tags;
+https://mariadb.org/download/?t=repo-config
+(needs a distro that has liburing userspace libraries as standard support)
 
--- 
-Jens Axboe
+Script:
 
+https://jira.mariadb.org/secure/attachment/60358/Mariabench-MDEV-26674-io_uring-1
+
+The state is achieved either when the sysbench prepare stalls, or the
+tps printed at 5 second intervals falls to 0.
