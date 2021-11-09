@@ -2,78 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C66A8C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 11:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A8DC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 11:59:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4467610F8
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 11:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A110561131
+	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 11:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236370AbhKILKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Nov 2021 06:10:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46680 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231769AbhKILKc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Nov 2021 06:10:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636456065;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S236228AbhKIMBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Nov 2021 07:01:52 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:47288 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230195AbhKIMBv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Nov 2021 07:01:51 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 6564221B08;
+        Tue,  9 Nov 2021 11:59:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1636459145; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=CrYyyygQC2FA/fyF5htlTTOHYjbqbyMexoHDgjkjXJQ=;
-        b=abfRZ1YcPkv0d2gkf0XswLe/BOmb9UYC+25xfvVSRLmJ88lp+95bT/CrbmyxDyCnPou/pl
-        AiiACeASNddCkhyLG0V7Rhky5VlG7MGGkJAUGA4HjvYKMAXtXtt7jFz9k6bc1bjyL/Zbmu
-        24vXKhbfeVlhHGpEic4qNtktNk3zzP0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-82O9RqiDOCOH59zhEKzMPw-1; Tue, 09 Nov 2021 06:07:42 -0500
-X-MC-Unique: 82O9RqiDOCOH59zhEKzMPw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AD218B78BC;
-        Tue,  9 Nov 2021 11:07:41 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 109BC60244;
-        Tue,  9 Nov 2021 11:07:30 +0000 (UTC)
-Date:   Tue, 9 Nov 2021 19:07:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        bh=kWfOoKUSMAxQs7BfFXviialmW/N6MLWRRUypkIbqsfQ=;
+        b=Js7uvoCnBi18AlY3u61jvZbDkmh+MNi26trD+kJ0QWimNTdbp9bXzjBrAhMJGAJPJ27+/r
+        GLf0w+OjPGAhkBmGYsoJ2Yk0RrTVg0zGv5XlbMjLQtsRjs8kOIvtks4EeXUIXFvuhMjrpT
+        vGESrgTrG9+nIl8D/TBSusE+NFw590w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1636459145;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kWfOoKUSMAxQs7BfFXviialmW/N6MLWRRUypkIbqsfQ=;
+        b=gATf/+brKN/XcYO2iQiFoK34ZjSORlGdlKRsTf3gzur1xYX87ee15Viy62DR0tKWNnnkgg
+        loPUj/i4M1u5wFAg==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id 2FB72A3B83;
+        Tue,  9 Nov 2021 11:59:04 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id BC3191E14ED; Tue,  9 Nov 2021 12:59:04 +0100 (CET)
+Date:   Tue, 9 Nov 2021 12:59:04 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Jan Kara <jack@suse.cz>, Damien Le Moal <Damien.LeMoal@wdc.com>
 Subject: Re: [PATCH 0/2] block: Fix stale page cache of discard or zero out
  ioctl
-Message-ID: <YYpWbnPK+K1kQ3Z4@T590>
+Message-ID: <20211109115904.GC5955@quack2.suse.cz>
 References: <20211109104723.835533-1-shinichiro.kawasaki@wdc.com>
+ <YYpWbnPK+K1kQ3Z4@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211109104723.835533-1-shinichiro.kawasaki@wdc.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <YYpWbnPK+K1kQ3Z4@T590>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 09, 2021 at 07:47:21PM +0900, Shin'ichiro Kawasaki wrote:
-> When BLKDISCARD or BLKZEROOUT ioctl race with data read, stale page cache is
-> left. This patch series have two fox patches for the stale page cache. Same
-> fix approach was used as blkdev_fallocate() [1].
+On Tue 09-11-21 19:07:26, Ming Lei wrote:
+> On Tue, Nov 09, 2021 at 07:47:21PM +0900, Shin'ichiro Kawasaki wrote:
+> > When BLKDISCARD or BLKZEROOUT ioctl race with data read, stale page cache is
+> > left. This patch series have two fox patches for the stale page cache. Same
+> > fix approach was used as blkdev_fallocate() [1].
+> > 
+> > [1] https://marc.info/?l=linux-block&m=163236463716836
+> > 
+> > Shin'ichiro Kawasaki (2):
+> >   block: Hold invalidate_lock in BLKDISCARD ioctl
+> >   block: Hold invalidate_lock in BLKZEROOUT ioctl
+> > 
+> >  block/ioctl.c | 24 ++++++++++++++++++------
+> >  1 file changed, 18 insertions(+), 6 deletions(-)
 > 
-> [1] https://marc.info/?l=linux-block&m=163236463716836
+> Yeah, the discard ioctl needs such fixes too, seems it isn't triggered
+> in the test disk of my test VM when running block/009.
 > 
-> Shin'ichiro Kawasaki (2):
->   block: Hold invalidate_lock in BLKDISCARD ioctl
->   block: Hold invalidate_lock in BLKZEROOUT ioctl
-> 
->  block/ioctl.c | 24 ++++++++++++++++++------
->  1 file changed, 18 insertions(+), 6 deletions(-)
+> BTW, BLKRESETZONE may need the fix too.
 
-Yeah, the discard ioctl needs such fixes too, seems it isn't triggered
-in the test disk of my test VM when running block/009.
+Yeah, it seems like that.
 
-BTW, BLKRESETZONE may need the fix too.
-
-
-Thanks,
-Ming
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
