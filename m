@@ -2,50 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06910C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 12:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 838C8C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 13:02:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E153A6103C
-	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 12:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73C086103C
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 13:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231641AbhKJNBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Nov 2021 08:01:47 -0500
-Received: from verein.lst.de ([213.95.11.211]:54404 "EHLO verein.lst.de"
+        id S231989AbhKJNFV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Nov 2021 08:05:21 -0500
+Received: from verein.lst.de ([213.95.11.211]:54415 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231460AbhKJNBq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Nov 2021 08:01:46 -0500
+        id S231151AbhKJNFS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Nov 2021 08:05:18 -0500
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2872768AA6; Wed, 10 Nov 2021 13:58:57 +0100 (CET)
-Date:   Wed, 10 Nov 2021 13:58:56 +0100
+        id 503CE68AA6; Wed, 10 Nov 2021 14:02:28 +0100 (CET)
+Date:   Wed, 10 Nov 2021 14:02:28 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: sorting out the freeze / quiesce mess
-Message-ID: <20211110125856.GA25614@lst.de>
-References: <20211110091407.GA8396@lst.de> <YYuQ9mhHtDNDVFQ3@T590>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org,
+        czhong@redhat.com
+Subject: Re: [PATCH] block: avoid to touch unloaded module instance when
+ opening bdev
+Message-ID: <20211110130228.GB25614@lst.de>
+References: <20211110095511.294645-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YYuQ9mhHtDNDVFQ3@T590>
+In-Reply-To: <20211110095511.294645-1-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 05:29:26PM +0800, Ming Lei wrote:
-> On Wed, Nov 10, 2021 at 10:14:07AM +0100, Christoph Hellwig wrote:
-> > Hi Jens and Ming,
-> > 
-> > I've been looking into properly supporting queue freezing for bio based
-> > drivers (that is only release q_usage_counter on bio completion for them).
-> > And the deeper I look into the code the more I'm confused by us having
-> > the blk_mq_quiesce* interface in addition to blk_freeze_queue.  What
-> > is a good reason to do a quiesce separately from a freeze?
-> 
-> freeze can make sure that all requests are done, quiesce can make sure that
-> dispatch critical area(covered by hctx lock/unlock) is done.
+The technical change looks good, but this comment not only has quite
+a few of grammar issues, but also seems rather pointless:
 
-Yeah, but why do we need to still call quiesce after we just did a
-freeze, which is about half of the users?
+> +	/*
+> +	 * New open() will be failed since disk becomes not alive, and old
+> +	 * open() has either grabbed the module refcnt or been failed in
+> +	 * case of deleting from module_exit(), so disk->fops->owner won't
+> +	 * be unloaded if the disk is opened.
+> +	 */
+>  	mutex_lock(&disk->open_mutex);
+>  	remove_inode_hash(disk->part0->bd_inode);
+>  	blk_drop_partitions(disk);
+> -- 
+> 2.31.1
+---end quoted 
