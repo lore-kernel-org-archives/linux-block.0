@@ -2,124 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CE0C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 18:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9437C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 19:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6DAD6117A
-	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 18:01:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B8906108B
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 19:08:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230429AbhKJSEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Nov 2021 13:04:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230388AbhKJSEf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Nov 2021 13:04:35 -0500
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64531C061764
-        for <linux-block@vger.kernel.org>; Wed, 10 Nov 2021 10:01:47 -0800 (PST)
-Received: by mail-il1-x134.google.com with SMTP id x9so3387585ilu.6
-        for <linux-block@vger.kernel.org>; Wed, 10 Nov 2021 10:01:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oEzJJiHFWM5Q25Ic6vhipp19khMatwmxv64pMEfUho0=;
-        b=c0N0SVnGHRvWrPGle2jKaNhWFsmOyLn4pK3vnGVrQdvq5vnvGtTjLfR/qVzJFc9OQy
-         CI4IJoVukwG/IPW6NhBDpyWT83unxHJa39FOMWGvIJt5D9isMdFuHTlCIX+fOSyuf1Vy
-         6q7NuNjOUUDG638v6MVNTnFTywBe4NhVo8tve7V0U1o0tH7BicBxSHaIiAciDEWBVvXL
-         3P/XasMT2VgZredzPA3Vi7euEsysqZdiwpRdPIdpiTjBJmybeabf+NIi9xlliv/h2FQd
-         YEDVnQdaVcOWtVw57O5J2k/LCBR7wNYFEP+Y6MkHLo4sfzaX8u+PJ60rZikhmdJO7XED
-         lU4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oEzJJiHFWM5Q25Ic6vhipp19khMatwmxv64pMEfUho0=;
-        b=q7Hdhj0WSUQgk5RWRPcGRD8PzBJBbdLUN4sSAj/5FKlAZ5RNiONHy1nv2yz/vMvQVo
-         6S3Cc9uOh5fz+wsvHHdDl3wA0/nT1ACJ2ADlBZYpHJekRaPk9ckJMQlxBvvxGHdr+00O
-         i/AoTrulowk73u89XO59LgrFFUr7PUD+vEaUtGUU3qXK+MhZ4amNGCXrPc4uIQcJXf+q
-         2LYZ9oAXjVma/0w0sX58X1/Mg5zk39vrSxCkc+NdhBfKwKT4sO1ayesUmN5UgSSuRMg0
-         dBtCvtcOetL5bE/nt5rzJDlfMebhaAQEIGQQVPAstz8riQkLQtvtNUE2SyTHZkC9VK5T
-         OBaQ==
-X-Gm-Message-State: AOAM532cD3eapYZIXHq4wWnS699MrYMbUCDbxbmmlBC/RxJ8w2Q9kItY
-        l/RG1bW+l3wuQ/j/5vHGQhmLLA==
-X-Google-Smtp-Source: ABdhPJz2ZPZNmbDINSAwJySv0j0YfRDlhzeFQEdLuM9Frg99ehdXFzudNbjbGee8Btu586SeP79mtA==
-X-Received: by 2002:a92:c8c6:: with SMTP id c6mr609640ilq.54.1636567306646;
-        Wed, 10 Nov 2021 10:01:46 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id f15sm366491ila.68.2021.11.10.10.01.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Nov 2021 10:01:46 -0800 (PST)
-Subject: Re: uring regression - lost write request
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Daniel Black <daniel@mariadb.org>,
-        Salvatore Bonaccorso <carnil@debian.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
- <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
- <YXz0roPH+stjFygk@eldamar.lan>
- <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
- <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
- <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
-Message-ID: <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
-Date:   Wed, 10 Nov 2021 11:01:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232711AbhKJTLo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Nov 2021 14:11:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34630 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232689AbhKJTLn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Nov 2021 14:11:43 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B84C961077;
+        Wed, 10 Nov 2021 19:08:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1636571335;
+        bh=/nlf8a6pijn/h9Jdun7z44dTvfnUp17fW2yftSoPyRI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KI2Dy0nHL566ZVbhotl37oq3zis86my26aRiwp23gDxMbYLh4CW2ATAArBqyACntA
+         PdAmISJzZ4fxYBJ9UhMhAEIdM8N2kEWrA31LetW0jWXNY79LZvPU4M3B0w99rZnluf
+         9+tMU62qpoEf9qc0LjufjQa8czLmCMzHeP5ldgmyE4fT75bI9bYA/B13nya1S6YmAQ
+         LWXs+JOk0EB+kvsJRy3UXPk0XaVpnF0b9Ws+SPNaIUvmKiFKxIK2M5vCdEjeJ0XCzR
+         1uqjWsFEHdqA4MXiiNocLTXraZWbQ83HppyRyu+HXnuptAydLfTcJIF7NTrQjPOKh9
+         VqAvFrp8IrWnA==
+Date:   Wed, 10 Nov 2021 11:08:54 -0800
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] f2fs: provide a way to attach HIPRI for Direct IO
+Message-ID: <YYwYxv4s1ZzBZRtC@google.com>
+References: <20211109021336.3796538-1-jaegeuk@kernel.org>
+ <YYqkWWZZsMW49/xu@infradead.org>
+ <042997ce-8382-40fe-4840-25f40a84c4bf@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <042997ce-8382-40fe-4840-25f40a84c4bf@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/9/21 4:24 PM, Jens Axboe wrote:
-> On 11/9/21 3:58 PM, Daniel Black wrote:
->>> On Sat, Oct 30, 2021 at 6:30 PM Salvatore Bonaccorso <carnil@debian.org> wrote:
->>>> Were you able to pinpoint the issue?
->>
->> While I have been unable to reproduce this on a single cpu, Marko can
->> repeat a stall on a dual Broadwell chipset on kernels:
->>
->> * 5.15.1 - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.1
->> * 5.14.16 - https://packages.debian.org/sid/linux-image-5.14.0-4-amd64
->>
->> Detailed observations:
->> https://jira.mariadb.org/browse/MDEV-26674
->>
->> The previous script has been adapted to use MariaDB-10.6 package and
->> sysbench to demonstrate a workload, I've changed Marko's script to
->> work with the distro packages and use innodb_use_native_aio=1.
->>
->> MariaDB packages:
->>
->> https://mariadb.org/download/?t=repo-config
->> (needs a distro that has liburing userspace libraries as standard support)
->>
->> Script:
->>
->> https://jira.mariadb.org/secure/attachment/60358/Mariabench-MDEV-26674-io_uring-1
->>
->> The state is achieved either when the sysbench prepare stalls, or the
->> tps printed at 5 second intervals falls to 0.
+On 11/09, Jens Axboe wrote:
+> On 11/9/21 9:39 AM, Christoph Hellwig wrote:
+> > On Mon, Nov 08, 2021 at 06:13:36PM -0800, Jaegeuk Kim wrote:
+> >> This patch adds a way to attach HIPRI by expanding the existing sysfs's
+> >> data_io_flag. User can measure IO performance by enabling it.
+> > 
+> > NAK.  This flag should only be used when explicitly specified by
+> > the submitter of the I/O.
 > 
-> Thanks, this is most useful! I'll take a look at this.
+> Yes, this cannot be set in the middle for a multitude of reasons. I wonder
+> if we should add a comment to that effect near the definition of it.
 
-Would it be possible to turn this into a full reproducer script?
-Something that someone that knows nothing about mysqld/mariadb can just
-run and have it reproduce. If I install the 10.6 packages from above,
-then it doesn't seem to use io_uring or be linked against liburing.
+Not surprising. I was wondering we can add this for testing purpose only.
+Btw, is there a reasonable way that filesystem can use IO polling?
 
-The script also seems to assume that various things are setup
-appropriately, like SRCTREE, MDIR, etc.
-
--- 
-Jens Axboe
-
+> 
+> -- 
+> Jens Axboe
