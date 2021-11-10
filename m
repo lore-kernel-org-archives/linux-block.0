@@ -2,113 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2CB1C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 23:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBDEC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 00:29:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD68E61184
-	for <linux-block@archiver.kernel.org>; Tue,  9 Nov 2021 23:24:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED907611CA
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 00:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231726AbhKIX1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Nov 2021 18:27:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37428 "EHLO
+        id S230492AbhKJAcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Nov 2021 19:32:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbhKIX1T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Nov 2021 18:27:19 -0500
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8783C061764
-        for <linux-block@vger.kernel.org>; Tue,  9 Nov 2021 15:24:32 -0800 (PST)
-Received: by mail-il1-x131.google.com with SMTP id x9so493280ilu.6
-        for <linux-block@vger.kernel.org>; Tue, 09 Nov 2021 15:24:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AaoatZyayFuinmUndTcOWSj3T2uLwGHcTSEK0zSn6qQ=;
-        b=bTKXEG+/7wCt8GWogC9x57iF+C2lnGsmdxmTLs8YBayY6ONSyTu/4BNxvCiAEU6qKg
-         rx+GWYUUhsMMlRIEAcdZM1LMgMozTtGcH5MV7m49U4K36e07gFcKdeJvhxXM8bcCy9PV
-         gi7/ZOzli91pVaCrAdFjaUPlc/sP87700k/nLc+TH448lUMMul6jBrOwNM9nRdXnBr9x
-         O+c1gFaxjVMRyVF7oCL7/+Y5Wxw4sYzIzgPGSeXWg77xa3Ch36Ii2CGP6e/NruVSWj9j
-         Em22MQcVLEgVfActTJYR9lAnT3IiWQzt7PeVkOg4Et6U+8wxfZ9YNBCtPSTKLkTEnbQ9
-         xUqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AaoatZyayFuinmUndTcOWSj3T2uLwGHcTSEK0zSn6qQ=;
-        b=LgS3rDt87uR/vshLEiqoESie9WzAQhg/AGR9b4372397vI6EeJVSQDjdnQqMbDpwEz
-         UURfHHMOS0kkxLlmN3oSAWOC5X2keh+5QHXPsA+fSBSFIWQkQMICHL+UonWkU1Vzz/H9
-         GFCxu8mW8sPUJNbbssV4lScD/9NLEgck4O4o9bUOEDn0OxJWFeDVyffsgcY1rWnqNHv1
-         5fbDEd80TsBm6j3xqPst1W2RDNbvH3akXd2m8dmrXwIlcGzzDdlxLR/dgqDGsqGyr5WP
-         dMcDkwsE+xXUvcd3CZvq927ld+69NK7np513ZdgqvMoZTo6SodrrHhx7YFklngx4xByY
-         lmKg==
-X-Gm-Message-State: AOAM5311jaV5+DdC2R9oOlzHoWHCJoIQ18KGCkgD9mnSOL4HKy8Yaya5
-        simsDGoYT3LzbJltlve6sUStOA==
-X-Google-Smtp-Source: ABdhPJzp9wNp0X16zpAwujYjUJ0HtaomjX38GrwBg9O4KCwyWiIuuVeMNzQbK5n8JNrOreq1LGjWEw==
-X-Received: by 2002:a05:6e02:1e04:: with SMTP id g4mr8381002ila.187.1636500271999;
-        Tue, 09 Nov 2021 15:24:31 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id i15sm13260842ila.12.2021.11.09.15.24.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Nov 2021 15:24:31 -0800 (PST)
-Subject: Re: uring regression - lost write request
-To:     Daniel Black <daniel@mariadb.org>,
-        Salvatore Bonaccorso <carnil@debian.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
- <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
- <YXz0roPH+stjFygk@eldamar.lan>
- <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
- <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
-Date:   Tue, 9 Nov 2021 16:24:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S230484AbhKJAck (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Nov 2021 19:32:40 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DFAC061764;
+        Tue,  9 Nov 2021 16:29:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=GXszyetCwwu5olwD1jYlisbHXeHdeSqds9gFGfTpmiw=; b=4u2WqKa4u3E4Wr/St42zwuYB4f
+        TfCRBC6+XeCU+jtb1AC1msjZpgMD2jLu6vwq76fvUdVlhscsFl6au/FrTkB8hpAgL1wPnDiLlBQcC
+        /6a/5xo9quwXh1J5swEKHgVYtpLEZuGguuC5DvWWCrnHYVVyVM0d8uDK84WYcuqgU7ZyFu/H39QRx
+        7B0gMtOmhiTrinaA1mU8FLUrSoyiAsdyj9YJiDLY1Syyu78ubgrom+xp+COlkgoQsluUksfikF0AJ
+        dJLjbfUSItPTFOEe8+NIuVQh32n+rTOGeCcSJaT665oSxtDGSOGBymialoENHpmJcmxmL2VJ1vSoR
+        fp+zDQoQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mkbUt-004C08-HU; Wed, 10 Nov 2021 00:29:51 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, hare@suse.de, hch@infradead.org, jack@suse.cz,
+        tj@kernel.org, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] block: add __must_check for *add_disk*() callers
+Date:   Tue,  9 Nov 2021 16:29:49 -0800
+Message-Id: <20211110002949.999380-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/9/21 3:58 PM, Daniel Black wrote:
->> On Sat, Oct 30, 2021 at 6:30 PM Salvatore Bonaccorso <carnil@debian.org> wrote:
->>> Were you able to pinpoint the issue?
-> 
-> While I have been unable to reproduce this on a single cpu, Marko can
-> repeat a stall on a dual Broadwell chipset on kernels:
-> 
-> * 5.15.1 - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.1
-> * 5.14.16 - https://packages.debian.org/sid/linux-image-5.14.0-4-amd64
-> 
-> Detailed observations:
-> https://jira.mariadb.org/browse/MDEV-26674
-> 
-> The previous script has been adapted to use MariaDB-10.6 package and
-> sysbench to demonstrate a workload, I've changed Marko's script to
-> work with the distro packages and use innodb_use_native_aio=1.
-> 
-> MariaDB packages:
-> 
-> https://mariadb.org/download/?t=repo-config
-> (needs a distro that has liburing userspace libraries as standard support)
-> 
-> Script:
-> 
-> https://jira.mariadb.org/secure/attachment/60358/Mariabench-MDEV-26674-io_uring-1
-> 
-> The state is achieved either when the sysbench prepare stalls, or the
-> tps printed at 5 second intervals falls to 0.
+Now that we have done a spring cleaning on all drivers and added
+error checking / handling, let's keep it that way and ensure
+no new drivers fail to stick with it.
 
-Thanks, this is most useful! I'll take a look at this.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
 
+OK this is ready now as Linus has merged all the add_disk() error
+handling changes.
+
+ block/genhd.c         | 6 +++---
+ include/linux/genhd.h | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index ca2fbab1d425..c5392cc24d37 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -394,8 +394,8 @@ static void disk_scan_partitions(struct gendisk *disk)
+  * This function registers the partitioning information in @disk
+  * with the kernel.
+  */
+-int device_add_disk(struct device *parent, struct gendisk *disk,
+-		     const struct attribute_group **groups)
++int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
++				 const struct attribute_group **groups)
+ 
+ {
+ 	struct device *ddev = disk_to_dev(disk);
+@@ -544,7 +544,7 @@ int device_add_disk(struct device *parent, struct gendisk *disk,
+ out_free_ext_minor:
+ 	if (disk->major == BLOCK_EXT_MAJOR)
+ 		blk_free_ext_minor(disk->first_minor);
+-	return WARN_ON_ONCE(ret); /* keep until all callers handle errors */
++	return ret;
+ }
+ EXPORT_SYMBOL(device_add_disk);
+ 
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 462634b4b48f..74c410263113 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -205,9 +205,9 @@ static inline dev_t disk_devt(struct gendisk *disk)
+ void disk_uevent(struct gendisk *disk, enum kobject_action action);
+ 
+ /* block/genhd.c */
+-int device_add_disk(struct device *parent, struct gendisk *disk,
+-		const struct attribute_group **groups);
+-static inline int add_disk(struct gendisk *disk)
++int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
++				 const struct attribute_group **groups);
++static inline int __must_check add_disk(struct gendisk *disk)
+ {
+ 	return device_add_disk(NULL, disk, NULL);
+ }
 -- 
-Jens Axboe
+2.33.0
 
