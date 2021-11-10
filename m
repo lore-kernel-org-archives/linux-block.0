@@ -2,131 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86951C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 17:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CE0C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 18:01:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D18161002
-	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 17:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6DAD6117A
+	for <linux-block@archiver.kernel.org>; Wed, 10 Nov 2021 18:01:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232659AbhKJRvj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Nov 2021 12:51:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59206 "EHLO
+        id S230429AbhKJSEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Nov 2021 13:04:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231527AbhKJRvd (ORCPT
+        with ESMTP id S230388AbhKJSEf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Nov 2021 12:51:33 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC008C061220
-        for <linux-block@vger.kernel.org>; Wed, 10 Nov 2021 09:48:23 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id g17so8340360ybe.13
-        for <linux-block@vger.kernel.org>; Wed, 10 Nov 2021 09:48:23 -0800 (PST)
+        Wed, 10 Nov 2021 13:04:35 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64531C061764
+        for <linux-block@vger.kernel.org>; Wed, 10 Nov 2021 10:01:47 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id x9so3387585ilu.6
+        for <linux-block@vger.kernel.org>; Wed, 10 Nov 2021 10:01:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kNHVVa6gv7z3dFlgEcituEPBx6aIWi4uliGKTG3gzjI=;
-        b=qLmXdLt4YOVMgrzsS5BXEUYiJevmzqMjguHecWqoDcWTEsy74/p4NvsXb/LRZFkqGJ
-         KhCWxNDSNHskY6KB2iMjRPfe5Y3fqFyPGxIytmN+X0UAayfYz6lOPXpDfqtRvdGdHmzi
-         FtF0aZ5WCHIP3ioTdmDGtdqhYagHRZjSY8+p0rMVnVsMSfymyS/fXWqdGZnsf42PNfgE
-         mNQw8LAQCVeiTEquV2CIvo9/bLSPNT0zxilW25HhKQu21qKwI/DTvxEWCzOQidlHTyY3
-         RL5T2R6A2hNmaBfGnO3ZDvB7UGeuWCeqOy7HkG1FKg7y+9C69m7/xZJGTyPrdXquocIS
-         NFIA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=oEzJJiHFWM5Q25Ic6vhipp19khMatwmxv64pMEfUho0=;
+        b=c0N0SVnGHRvWrPGle2jKaNhWFsmOyLn4pK3vnGVrQdvq5vnvGtTjLfR/qVzJFc9OQy
+         CI4IJoVukwG/IPW6NhBDpyWT83unxHJa39FOMWGvIJt5D9isMdFuHTlCIX+fOSyuf1Vy
+         6q7NuNjOUUDG638v6MVNTnFTywBe4NhVo8tve7V0U1o0tH7BicBxSHaIiAciDEWBVvXL
+         3P/XasMT2VgZredzPA3Vi7euEsysqZdiwpRdPIdpiTjBJmybeabf+NIi9xlliv/h2FQd
+         YEDVnQdaVcOWtVw57O5J2k/LCBR7wNYFEP+Y6MkHLo4sfzaX8u+PJ60rZikhmdJO7XED
+         lU4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kNHVVa6gv7z3dFlgEcituEPBx6aIWi4uliGKTG3gzjI=;
-        b=qpl204yhuybxRbI53dLFCY2++liZA307AT+beYKA3xM/nWsUBQ0S3S/3hy1NMijKZi
-         iQkhhPkOvIxh6fr9sIqD7uWEWa1i8mkMaTxANTYsMzNtufCorMG5mJAUHLVeELGcNXTW
-         4UAgMvHb3dhT+IBj4DAt2rfuJzTilg0PUUA30ZFd+BpqTwAwDQvWB/fELzwIiuXO2gOL
-         PvEHqQCpLKFPywVZdxRp1P9EpO7hE1k+d87nbTkTBDpbc2HqXEyk+8JJ5jmod2fJ+q2M
-         khI95uRSgdmeee6iFVEPwL7AbhDwAV81KK06hVNaBAxWq4YfO56Wb4Y9alEYu38KuDij
-         tJhg==
-X-Gm-Message-State: AOAM531GFqMe7xs5tLWMrpKZrhh6Z/hZqsZdnbLmJT8I7axx2VNbt5Hz
-        mBBWcvOxXFX41ANTX+H6sqmCyVJxr2d6lQ/QHl89Gg==
-X-Google-Smtp-Source: ABdhPJzrykT3dyEuXyJOwpTgNgF1rS/2Zem47Hc09Yaees7H87Arp4lp7y5GOAaNmY0j3HE0mpPOPMhKiENFNoOsu3w=
-X-Received: by 2002:a25:2f58:: with SMTP id v85mr1047967ybv.487.1636566502780;
- Wed, 10 Nov 2021 09:48:22 -0800 (PST)
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oEzJJiHFWM5Q25Ic6vhipp19khMatwmxv64pMEfUho0=;
+        b=q7Hdhj0WSUQgk5RWRPcGRD8PzBJBbdLUN4sSAj/5FKlAZ5RNiONHy1nv2yz/vMvQVo
+         6S3Cc9uOh5fz+wsvHHdDl3wA0/nT1ACJ2ADlBZYpHJekRaPk9ckJMQlxBvvxGHdr+00O
+         i/AoTrulowk73u89XO59LgrFFUr7PUD+vEaUtGUU3qXK+MhZ4amNGCXrPc4uIQcJXf+q
+         2LYZ9oAXjVma/0w0sX58X1/Mg5zk39vrSxCkc+NdhBfKwKT4sO1ayesUmN5UgSSuRMg0
+         dBtCvtcOetL5bE/nt5rzJDlfMebhaAQEIGQQVPAstz8riQkLQtvtNUE2SyTHZkC9VK5T
+         OBaQ==
+X-Gm-Message-State: AOAM532cD3eapYZIXHq4wWnS699MrYMbUCDbxbmmlBC/RxJ8w2Q9kItY
+        l/RG1bW+l3wuQ/j/5vHGQhmLLA==
+X-Google-Smtp-Source: ABdhPJz2ZPZNmbDINSAwJySv0j0YfRDlhzeFQEdLuM9Frg99ehdXFzudNbjbGee8Btu586SeP79mtA==
+X-Received: by 2002:a92:c8c6:: with SMTP id c6mr609640ilq.54.1636567306646;
+        Wed, 10 Nov 2021 10:01:46 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id f15sm366491ila.68.2021.11.10.10.01.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Nov 2021 10:01:46 -0800 (PST)
+Subject: Re: uring regression - lost write request
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Daniel Black <daniel@mariadb.org>,
+        Salvatore Bonaccorso <carnil@debian.org>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
+ <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
+ <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
+ <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
+ <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+ <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+ <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
+Message-ID: <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
+Date:   Wed, 10 Nov 2021 11:01:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1636558597-248294-1-git-send-email-quic_c_gdjako@quicinc.com>
- <20211110161402.GB174703@worktop.programming.kicks-ass.net> <1fd2d97b-7c83-3a82-ada3-46ec5025c3b1@kernel.org>
-In-Reply-To: <1fd2d97b-7c83-3a82-ada3-46ec5025c3b1@kernel.org>
-From:   Suren Baghdasaryan <surenb@google.com>
-Date:   Wed, 10 Nov 2021 09:48:10 -0800
-Message-ID: <CAJuCfpFP2VP_t_tP27w=k4HDhm=jv=G2C56mM_kbs6wqux+DhA@mail.gmail.com>
-Subject: Re: [RFC] psi: Add additional PSI counters for each type of memory pressure
-To:     Georgi Djakov <djakov@kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Georgi Djakov <quic_c_gdjako@quicinc.com>, hannes@cmpxchg.org,
-        vincent.guittot@linaro.org, juri.lelli@redhat.com,
-        mingo@redhat.com, rostedt@goodmis.org, bsegall@google.com,
-        mgorman@suse.de, bristot@redhat.com, mhocko@kernel.org,
-        vdavydov.dev@gmail.com, tj@kernel.org, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        akpm@linux-foundation.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 8:46 AM Georgi Djakov <djakov@kernel.org> wrote:
->
->
-> On 10.11.21 18:14, Peter Zijlstra wrote:
-> > On Wed, Nov 10, 2021 at 07:36:37AM -0800, Georgi Djakov wrote:
-> >> @@ -21,7 +19,18 @@ enum psi_task_count {
-> >>       * don't have to special case any state tracking for it.
-> >>       */
-> >>      NR_ONCPU,
-> >> -    NR_PSI_TASK_COUNTS = 4,
-> >> +    NR_BLK_CGROUP_THROTTLE,
-> >> +    NR_BIO,
-> >> +    NR_COMPACTION,
-> >> +    NR_THRASHING,
-> >> +    NR_CGROUP_RECLAIM_HIGH,
-> >> +    NR_CGROUP_RECLAIM_HIGH_SLEEP,
-> >> +    NR_CGROUP_TRY_CHARGE,
-> >> +    NR_DIRECT_COMPACTION,
-> >> +    NR_DIRECT_RECLAIM,
-> >> +    NR_READ_SWAPPAGE,
-> >> +    NR_KSWAPD,
-> >> +    NR_PSI_TASK_COUNTS = 16,
-> >>   };
-> >>
-> >
-> >> @@ -51,9 +80,20 @@ enum psi_states {
-> >>      PSI_MEM_FULL,
-> >>      PSI_CPU_SOME,
-> >>      PSI_CPU_FULL,
-> >> +    PSI_BLK_CGROUP_THROTTLE,
-> >> +    PSI_BIO,
-> >> +    PSI_COMPACTION,
-> >> +    PSI_THRASHING,
-> >> +    PSI_CGROUP_RECLAIM_HIGH,
-> >> +    PSI_CGROUP_RECLAIM_HIGH_SLEEP,
-> >> +    PSI_CGROUP_TRY_CHARGE,
-> >> +    PSI_DIRECT_COMPACTION,
-> >> +    PSI_DIRECT_RECLAIM,
-> >> +    PSI_READ_SWAPPAGE,
-> >> +    PSI_KSWAPD,
-> >>      /* Only per-CPU, to weigh the CPU in the global average: */
-> >>      PSI_NONIDLE,
-> >> -    NR_PSI_STATES = 7,
-> >> +    NR_PSI_STATES = 18,
-> >>   };
-> >
-> > Have you considered what this does to psi_group_cpu's size and layout
-> > and the impact thereof on performance?
->
-> Thanks, i will definitely add some numbers in case there are no other
-> major arguments against this RFC patch.
+On 11/9/21 4:24 PM, Jens Axboe wrote:
+> On 11/9/21 3:58 PM, Daniel Black wrote:
+>>> On Sat, Oct 30, 2021 at 6:30 PM Salvatore Bonaccorso <carnil@debian.org> wrote:
+>>>> Were you able to pinpoint the issue?
+>>
+>> While I have been unable to reproduce this on a single cpu, Marko can
+>> repeat a stall on a dual Broadwell chipset on kernels:
+>>
+>> * 5.15.1 - https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.1
+>> * 5.14.16 - https://packages.debian.org/sid/linux-image-5.14.0-4-amd64
+>>
+>> Detailed observations:
+>> https://jira.mariadb.org/browse/MDEV-26674
+>>
+>> The previous script has been adapted to use MariaDB-10.6 package and
+>> sysbench to demonstrate a workload, I've changed Marko's script to
+>> work with the distro packages and use innodb_use_native_aio=1.
+>>
+>> MariaDB packages:
+>>
+>> https://mariadb.org/download/?t=repo-config
+>> (needs a distro that has liburing userspace libraries as standard support)
+>>
+>> Script:
+>>
+>> https://jira.mariadb.org/secure/attachment/60358/Mariabench-MDEV-26674-io_uring-1
+>>
+>> The state is achieved either when the sysbench prepare stalls, or the
+>> tps printed at 5 second intervals falls to 0.
+> 
+> Thanks, this is most useful! I'll take a look at this.
 
-Please CC me too in the future postings.
-Thanks,
-Suren.
+Would it be possible to turn this into a full reproducer script?
+Something that someone that knows nothing about mysqld/mariadb can just
+run and have it reproduce. If I install the 10.6 packages from above,
+then it doesn't seem to use io_uring or be linked against liburing.
 
->
-> BR,
-> Georgi
->
+The script also seems to assume that various things are setup
+appropriately, like SRCTREE, MDIR, etc.
+
+-- 
+Jens Axboe
+
