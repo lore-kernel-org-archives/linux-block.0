@@ -2,116 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C482C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 14:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB6CC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 15:14:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3691B61284
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 14:58:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E70CC61252
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 15:14:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233963AbhKKPBN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Nov 2021 10:01:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233945AbhKKPBG (ORCPT
+        id S230177AbhKKPRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Nov 2021 10:17:31 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:64501 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233857AbhKKPRb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Nov 2021 10:01:06 -0500
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC0BC06127A
-        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 06:58:17 -0800 (PST)
-Received: by mail-io1-xd2f.google.com with SMTP id r8so7247580iog.7
-        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 06:58:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xH4G5EWmEO3Cm+J1KziqMfm5OFh7gOaSK4pkTpUqJBc=;
-        b=lCIJm2lhqKedI/BXtw1jG3ffeq/SJpMhHnEJ+j5h569Ghs8Q4b3CLLA4DaaeDo0FqE
-         Ql/19nRV6VOLPWDAnM/AsHp2CbupkkHgyVQYGWBeqe6q9K6QFs4PTtp+sHCBR7w1Idjc
-         vjF4cRjh6FuzwLoLSUhojsjSbHhNDCt6vMQa4NSKkLM7yOwscVQNz8wq5fm1BbSrWjSK
-         v6TZpBG1wCYzSO0kZWAUsQlk6AlGKTA4+Bz5uoqLVFYCyFnnseJsWDg0yYitaZ6Gt3M9
-         5VzEJwH0OM6eNPuaDXXjn9J+Oo6ZUCm9WivCvDrJlYexRRQzwHqudzvpQY1T8Hm55oIF
-         IHGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xH4G5EWmEO3Cm+J1KziqMfm5OFh7gOaSK4pkTpUqJBc=;
-        b=iA4msTiXxZ+u8GHVJL0jWqSoJQU+EkWDhYn/l/4CVSyzeo9aNqiY/gGi/fsmdUAoPN
-         nxO4b+BNNPUypMiIfmDFlkWCO+erlMlzR/wZCNFD032fKvzoBAflkkSMDP268Dc+rWEd
-         eUG5EgSnDuX74AVTVogm8sogaVqcPziIN/fDQflwZt2qjDBimlPLOoUdJqSC85r4FPFl
-         JfRbPwYtNJ6UJu5cKkaFfRC0aSt7lXlaSj26PkftxsDQhIjTKZj33az4h0VM1uSCNbUm
-         KFxLTlEGExb0k560lhdnhEXfptEh+bc4Xm9Qcp7bonzrAuDg9QGyO9bBSUW3J/U1ZiTZ
-         9nqA==
-X-Gm-Message-State: AOAM5331x4voShgaIHruceITB/ZczReiuCixU30qMxhbh1XyohZ7lZrL
-        YzMJOIH+JcuVvCMnKnV2qBV30A==
-X-Google-Smtp-Source: ABdhPJywJeyb/MW01D8GCBuzZTzHlqG3pVdHjDzUgDKx/23VQ3L2ju099dBQ+fUSgQ1FF8+3Qf9ntw==
-X-Received: by 2002:a02:7105:: with SMTP id n5mr5789512jac.64.1636642697129;
-        Thu, 11 Nov 2021 06:58:17 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c3sm2040663ili.33.2021.11.11.06.58.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 06:58:16 -0800 (PST)
-Subject: Re: uring regression - lost write request
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Daniel Black <daniel@mariadb.org>
-Cc:     Salvatore Bonaccorso <carnil@debian.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
- <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
- <YXz0roPH+stjFygk@eldamar.lan>
- <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
- <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
- <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
- <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
- <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
- <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk>
-Message-ID: <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
-Date:   Thu, 11 Nov 2021 07:58:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 11 Nov 2021 10:17:31 -0500
+Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1ABFEQGY024589;
+        Fri, 12 Nov 2021 00:14:26 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
+ Fri, 12 Nov 2021 00:14:26 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1ABFEQ3w024582
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 12 Nov 2021 00:14:26 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <9e583550-7cc8-e8a9-59bf-69d415fffe16@i-love.sakura.ne.jp>
+Date:   Fri, 12 Nov 2021 00:14:25 +0900
 MIME-Version: 1.0
-In-Reply-To: <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [syzbot] possible deadlock in __loop_clr_fd (3)
 Content-Language: en-US
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <00000000000089436205d07229eb@google.com>
+ <0e91a4b0-ef91-0e60-c0fc-e03da3b65d57@I-love.SAKURA.ne.jp>
+ <YYxqHhzEwCqhsy1Y@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+In-Reply-To: <YYxqHhzEwCqhsy1Y@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/11/21 7:30 AM, Jens Axboe wrote:
-> On 11/10/21 11:52 PM, Daniel Black wrote:
->>> Would it be possible to turn this into a full reproducer script?
->>> Something that someone that knows nothing about mysqld/mariadb can just
->>> run and have it reproduce. If I install the 10.6 packages from above,
->>> then it doesn't seem to use io_uring or be linked against liburing.
->>
->> Sorry Jens.
->>
->> Hope containers are ok.
+On 2021/11/11 9:55, Dan Schatzberg wrote:
+>> . Can you somehow call destroy_workqueue() without holding a lock (e.g.
+>> breaking &lo->lo_mutex => (wq_completion)loop$M dependency chain by
+>> making sure that below change is safe) ?
 > 
-> Don't think I have a way to run that, don't even know what podman is
-> and nor does my distro. I'll google a bit and see if I can get this
-> running.
+> It's really not clear to me - the lo_mutex protects a lot of entry
+> points (ioctls and others) and it's hard to tell if the observed state
+> will be sane if they can race in the middle of __loop_clr_fd.
 > 
-> I'm fine building from source and running from there, as long as I
-> know what to do. Would that make it any easier? It definitely would
-> for me :-)
 
-The podman approach seemed to work, and I was able to run all three
-steps. Didn't see any hangs. I'm going to try again dropping down
-the innodb pool size (box only has 32G of RAM).
+I'm not familiar with the block layer, but I think it is clear.
+We check lo_state with lo_mutex held.
+The loop functions fail if lo_state is not what each function expected.
 
-The storage can do a lot more than 5k IOPS, I'm going to try ramping
-that up.
+Is blk_mq_freeze_queue() for waiting for "loop_queue_work() from loop_queue_rq()" to
+complete and for blocking further loop_queue_rq() until blk_mq_unfreeze_queue() ?
+If yes, we need to call blk_mq_freeze_queue() before destroy_workqueue().
+But I think lo_state is helping us, like a patch shown below.
 
-Does your reproducer box have multiple NUMA nodes, or is it a single
-socket/nod box?
 
+
+From e36f23c081e0b8ed08239f4e3fbc954b4d7d3feb Mon Sep 17 00:00:00 2001
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Date: Thu, 11 Nov 2021 23:55:43 +0900
+Subject: [PATCH] loop: destroy workqueue without holding locks
+
+syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
+commit 87579e9b7d8dc36e ("loop: use worker per cgroup instead of kworker")
+is calling destroy_workqueue() with lo->lo_mutex held.
+
+Since all functions where lo->lo_state matters are already checking
+lo->lo_state with lo->lo_mutex held (in order to avoid racing with e.g.
+ioctl(LOOP_CTL_REMOVE)), and __loop_clr_fd() can be called from either
+ioctl(LOOP_CLR_FD) or close(), lo->lo_state == Lo_rundown is considered
+as an exclusive lock for __loop_clr_fd(). Therefore, it is safe to
+temporarily drop lo->lo_mutex when calling destroy_workqueue().
+
+Link: https://syzkaller.appspot.com/bug?extid=63614029dfb79abd4383 [1]
+Reported-by: syzbot <syzbot+63614029dfb79abd4383@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/block/loop.c | 34 +++++++++++++++++++++++++---------
+ 1 file changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index a154cab6cd98..b98ec1c2d950 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1104,16 +1104,20 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	 */
+ 
+ 	mutex_lock(&lo->lo_mutex);
+-	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
+-		err = -ENXIO;
+-		goto out_unlock;
+-	}
++	/*
++	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
++	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
++	 * lo->lo_state has changed while waiting for lo->lo_mutex.
++	 */
++	BUG_ON(lo->lo_state != Lo_rundown);
+ 
++	/*
++	 * Since ioctl(LOOP_CLR_FD) depends on lo->lo_state == Lo_bound, it is
++	 * a sign of something going wrong if lo->lo_backing_file was not
++	 * assigned by ioctl(LOOP_SET_FD) or ioctl(LOOP_CONFIGURE).
++	 */
+ 	filp = lo->lo_backing_file;
+-	if (filp == NULL) {
+-		err = -EINVAL;
+-		goto out_unlock;
+-	}
++	BUG_ON(!filp);
+ 
+ 	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
+ 		blk_queue_write_cache(lo->lo_queue, false, false);
+@@ -1121,7 +1125,20 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	/* freeze request queue during the transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
++	/*
++	 * To avoid circular locking dependency, call destroy_workqueue()
++	 * without holding lo->lo_mutex.
++	 */
++	mutex_unlock(&lo->lo_mutex);
+ 	destroy_workqueue(lo->workqueue);
++	mutex_lock(&lo->lo_mutex);
++
++	/*
++	 * As explained above, lo->lo_state cannot be changed while waiting for
++	 * lo->lo_mutex.
++	 */
++	BUG_ON(lo->lo_state != Lo_rundown);
++
+ 	spin_lock_irq(&lo->lo_work_lock);
+ 	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
+ 				idle_list) {
+@@ -1156,7 +1173,6 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	lo_number = lo->lo_number;
+ 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+-out_unlock:
+ 	mutex_unlock(&lo->lo_mutex);
+ 	if (partscan) {
+ 		/*
 -- 
-Jens Axboe
+2.18.4
+
 
