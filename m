@@ -2,74 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC2AC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 12:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F589C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 12:58:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08E2561267
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 12:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A990611C9
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 12:58:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232778AbhKKMJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Nov 2021 07:09:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48367 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232318AbhKKMJC (ORCPT
+        id S232883AbhKKNBb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Nov 2021 08:01:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35372 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232647AbhKKNBa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Nov 2021 07:09:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636632372;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fHQHjtQ2HtSwcNWHV1xAbliIto05tchAMgw+CQxuMds=;
-        b=NglCR4e+kMyqF1zN4rjHd6/xYXt/Vhgp8JjPxzoGExgA1f2PdH3+mRAd3r+F2Wh5047H7n
-        OcbBpnnnnSsQq37OkervtmDAHCcjYCM9YWh+qMeW0jewRlUNm6LuY0IkHep7JHB4Mj0gPQ
-        tcHaXvhw08ZFocHFIBabkg615acnDNI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-BNiJ9pHxNOCqVQ-lU58NDw-1; Thu, 11 Nov 2021 07:06:07 -0500
-X-MC-Unique: BNiJ9pHxNOCqVQ-lU58NDw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 612E880DDE1;
-        Thu, 11 Nov 2021 12:06:06 +0000 (UTC)
-Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B4ED956A9A;
-        Thu, 11 Nov 2021 12:05:54 +0000 (UTC)
-Date:   Thu, 11 Nov 2021 20:05:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [PATCH] block: Hold invalidate_lock in BLKRESETZONE ioctl
-Message-ID: <YY0HHSR/c+8eg1rD@T590>
-References: <20211111085238.942492-1-shinichiro.kawasaki@wdc.com>
+        Thu, 11 Nov 2021 08:01:30 -0500
+Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [IPv6:2a02:1800:120:4::f00:13])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4EBC061767
+        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 04:58:41 -0800 (PST)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:c018:2195:47a6:f384])
+        by baptiste.telenet-ops.be with bizsmtp
+        id H0ye2600816Lvom010yeZi; Thu, 11 Nov 2021 13:58:38 +0100
+Received: from geert (helo=localhost)
+        by ramsan.of.borg with local-esmtp (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1ml9f4-00BfVd-2I; Thu, 11 Nov 2021 13:58:38 +0100
+Date:   Thu, 11 Nov 2021 13:58:38 +0100 (CET)
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+X-X-Sender: geert@ramsan.of.borg
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/5] block: move queue enter logic into
+ blk_mq_submit_bio()
+In-Reply-To: <87ee0091-9c2f-50e8-c8f2-dcebebb9de48@kernel.dk>
+Message-ID: <alpine.DEB.2.22.394.2111111350150.2780761@ramsan.of.borg>
+References: <20211104182201.83906-1-axboe@kernel.dk> <20211104182201.83906-5-axboe@kernel.dk> <YYQoLzMn7+s9hxpX@infradead.org> <2865c289-7014-2250-0f5b-a9ed8770d0ec@kernel.dk> <YYQo4ougXZvgv11X@infradead.org> <8c6163f4-0c0f-5254-5f79-9074f5a73cfe@kernel.dk>
+ <461c4758-2675-1d11-ac8a-6f25ef01d781@kernel.dk> <YYQr3jl3avsuOUAJ@infradead.org> <3d29a5ce-aace-6198-3ea9-e6f603e74aa1@kernel.dk> <YYQuyt2/y1MgzRi0@infradead.org> <87ee0091-9c2f-50e8-c8f2-dcebebb9de48@kernel.dk>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211111085238.942492-1-shinichiro.kawasaki@wdc.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 05:52:38PM +0900, Shin'ichiro Kawasaki wrote:
-> When BLKRESETZONE ioctl and data read race, the data read leaves stale
-> page cache. The commit e5113505904e ("block: Discard page cache of zone
-> reset target range") added page cache truncation to avoid stale page
-> cache after the ioctl. However, the stale page cache still can be read
-> during the reset zone operation for the ioctl. To avoid the stale page
-> cache completely, hold invalidate_lock of the block device file mapping.
-> 
-> Fixes: e5113505904e ("block: Discard page cache of zone reset target range")
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Cc: stable@vger.kernel.org # v5.15
-> ---
+ 	Hi Jens,
 
-Looks fine:
+On Thu, 4 Nov 2021, Jens Axboe wrote:
+> On 11/4/21 1:04 PM, Christoph Hellwig wrote:
+>> On Thu, Nov 04, 2021 at 01:02:54PM -0600, Jens Axboe wrote:
+>>> On 11/4/21 12:52 PM, Christoph Hellwig wrote:
+>>>> Looks good:
+>>>>
+>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>>
+>>> So these two are now:
+>>>
+>>> https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.16/block&id=c98cb5bbdab10d187aff9b4e386210eb2332af96
+>>>
+>>> which is the one I sent here, and then the next one gets cleaned up to
+>>> remove that queue enter helper:
+>>>
+>>> https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.16/block&id=7f930eb31eeb07f1b606b3316d8ad3ab6a92905b
+>>>
+>>> Can I add your reviewed-by to this last one as well? Only change is the
+>>> removal of blk_mq_enter_queue() and the weird construct there, it's just
+>>> bio_queue_enter() now.
+>>
+>> Sure.
+>
+> Thanks, prematurely already done, as you could tell :-)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+The updated version is now commit 900e080752025f00 ("block: move queue
+enter logic into blk_mq_submit_bio()") in Linus' tree.
 
--- 
-Ming
+I have bisected failures on m68k/atari (on ARAnyM, using nfhd as the
+root device) to this commit, e.g.:
+
+     sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+     sd 0:0:0:0: [sda] tag#0 Sense Key : Illegal Request [current]
+     sd 0:0:0:0: [sda] tag#0 Add. Sense: Invalid field in cdb
+     sd 0:0:0:0: [sda] tag#0 CDB: Write(10) 2a 08 00 00 00 01 00 00 08 00
+     critical target error, dev sda, sector 1 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
+     Buffer I/O error on dev sda1, logical block 0, lost sync page write
+
+     EXT4-fs (sda1): I/O error while writing superblock
+     sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
+     sd 0:0:0:0: [sda] tag#0 Sense Key : Illegal Request [current]
+     sd 0:0:0:0: [sda] tag#0 Add. Sense: Invalid field in cdb
+     sd 0:0:0:0: [sda] tag#0 CDB: Write(10) 2a 08 00 00 00 01 00 00 08 00
+     critical target error, dev sda, sector 1 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
+     Buffer I/O error on dev sda1, logical block 0, lost sync page write
+     EXT4-fs (sda1): I/O error while writing superblock
+
+This may happen either when mounting the root file system (leading to an
+unable to mount root fs panic), or later (leading to a read-only
+rootfs).
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
 
