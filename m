@@ -2,95 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D719C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 10:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC2AC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 12:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E4E961247
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 10:37:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08E2561267
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 12:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232318AbhKKKkQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Nov 2021 05:40:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60074 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230256AbhKKKkQ (ORCPT
+        id S232778AbhKKMJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Nov 2021 07:09:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48367 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232318AbhKKMJC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Nov 2021 05:40:16 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903C6C061766;
-        Thu, 11 Nov 2021 02:37:27 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id n85so5224995pfd.10;
-        Thu, 11 Nov 2021 02:37:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TsdgksjzIgtw7/d4jST9JcU2EdYuVW+gAM2jdZ5dk8s=;
-        b=eFm/kf4UZg9lOvY/C8KDN/+7dL/ps+IYCMQtb2bn7Ap29kRo8Uz08oWe/3kTOjpnfA
-         zmxj1ks5z4EA0kWOy0b0rlj/GeXAZg8Q03oELBpfzoOR7i/PPcKCBh5BRkYms3NtkNgP
-         l7jVQAVPfTxUB/NIKCuPQomC1EALGVDp9jZqlYMvEywAYFaXVRn5HsTOf7LC4eGBojLE
-         rNnTwbiGdiIJkw4BVeC/26P8Mhl1MtYqS/5BUvImF/DMHvdWtPI9Ri2V/8Bm2c0AXR2v
-         yeVtIQNLq5cFhD4A++ZLUZOHVZr78fvXMMQrkZYNGoocU0hggv33+h+fFhiYGRlYV0w0
-         R0+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TsdgksjzIgtw7/d4jST9JcU2EdYuVW+gAM2jdZ5dk8s=;
-        b=8MOKYk/IQ7oGCid4CxleWYMiy7znMwxeQ+SA1m8F2u4PWr96wYfMZKpIXaADeAjTp5
-         8VTVKO0s6tuIuHrz6fJzes8xIt41mf3c3KFblWeaYCKEP/C3X2fDExinueHm9vKxTgHA
-         Jl5iDeeSFRbBUafeIFDB2pA3mGYXHfWk+RQb6XOUjh/c2YFv9MiVuFlnsCMcphIgsgyD
-         0rBvF11seTL8/eAEIqK3AzGVNcJqE2xkQgOOqnWcT74K8s01h03Vgq0lwl7TIF8I94+Q
-         7lNfqgkEx4LZkTBPHdDwtl7N8lNdxTj+8boRLQ970xjDgOvyoYeKCXez2HOgZG3lL+iu
-         oZZQ==
-X-Gm-Message-State: AOAM530gHH8mSkvr8UO/CSanRrz+CjQ45kc9Ju8pxo28CMkucv9BvH1R
-        46UWXS+x49wph58pANgQuZkJbFtuKAw=
-X-Google-Smtp-Source: ABdhPJwe54+KwEJg+g2Q3mweAMYeskRKlDhb9UiTQmH2gRWCxHZi9DuqngGwgRjh6sKgT3gh4I2+PA==
-X-Received: by 2002:a63:6747:: with SMTP id b68mr3784340pgc.371.1636627047223;
-        Thu, 11 Nov 2021 02:37:27 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id p2sm2072018pja.55.2021.11.11.02.37.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Nov 2021 02:37:26 -0800 (PST)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: zhang.mingyu@zte.com.cn
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhang Mingyu <zhang.mingyu@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] blk-mq:Use BUG_ON instead of if condition followed by BUG.
-Date:   Thu, 11 Nov 2021 10:37:22 +0000
-Message-Id: <20211111103722.1650-1-zhang.mingyu@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Thu, 11 Nov 2021 07:09:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636632372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fHQHjtQ2HtSwcNWHV1xAbliIto05tchAMgw+CQxuMds=;
+        b=NglCR4e+kMyqF1zN4rjHd6/xYXt/Vhgp8JjPxzoGExgA1f2PdH3+mRAd3r+F2Wh5047H7n
+        OcbBpnnnnSsQq37OkervtmDAHCcjYCM9YWh+qMeW0jewRlUNm6LuY0IkHep7JHB4Mj0gPQ
+        tcHaXvhw08ZFocHFIBabkg615acnDNI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-BNiJ9pHxNOCqVQ-lU58NDw-1; Thu, 11 Nov 2021 07:06:07 -0500
+X-MC-Unique: BNiJ9pHxNOCqVQ-lU58NDw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 612E880DDE1;
+        Thu, 11 Nov 2021 12:06:06 +0000 (UTC)
+Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B4ED956A9A;
+        Thu, 11 Nov 2021 12:05:54 +0000 (UTC)
+Date:   Thu, 11 Nov 2021 20:05:49 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH] block: Hold invalidate_lock in BLKRESETZONE ioctl
+Message-ID: <YY0HHSR/c+8eg1rD@T590>
+References: <20211111085238.942492-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211111085238.942492-1-shinichiro.kawasaki@wdc.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhang Mingyu <zhang.mingyu@zte.com.cn>
+On Thu, Nov 11, 2021 at 05:52:38PM +0900, Shin'ichiro Kawasaki wrote:
+> When BLKRESETZONE ioctl and data read race, the data read leaves stale
+> page cache. The commit e5113505904e ("block: Discard page cache of zone
+> reset target range") added page cache truncation to avoid stale page
+> cache after the ioctl. However, the stale page cache still can be read
+> during the reset zone operation for the ioctl. To avoid the stale page
+> cache completely, hold invalidate_lock of the block device file mapping.
+> 
+> Fixes: e5113505904e ("block: Discard page cache of zone reset target range")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Cc: stable@vger.kernel.org # v5.15
+> ---
 
-This issue was detected with the help of Coccinelle.
+Looks fine:
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Zhang Mingyu <zhang.mingyu@zte.com.cn>
----
- block/blk-mq.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7c5c8a26c8fc..05bffbc6b8ff 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -818,8 +818,7 @@ EXPORT_SYMBOL(__blk_mq_end_request);
- 
- void blk_mq_end_request(struct request *rq, blk_status_t error)
- {
--	if (blk_update_request(rq, error, blk_rq_bytes(rq)))
--		BUG();
-+	BUG_ON(blk_update_request(rq, error, blk_rq_bytes(rq)));
- 	__blk_mq_end_request(rq, error);
- }
- EXPORT_SYMBOL(blk_mq_end_request);
 -- 
-2.25.1
+Ming
 
