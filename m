@@ -2,81 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E6DC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 22:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731C7C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 23:44:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30668610A2
-	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 22:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54EA46134F
+	for <linux-block@archiver.kernel.org>; Thu, 11 Nov 2021 23:44:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbhKKWUY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Nov 2021 17:20:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49794 "EHLO
+        id S231918AbhKKXrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Nov 2021 18:47:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233800AbhKKWUU (ORCPT
+        with ESMTP id S233817AbhKKXrW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Nov 2021 17:20:20 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEFBBC0613F5
-        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 14:17:30 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id m14so6741881pfc.9
-        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 14:17:30 -0800 (PST)
+        Thu, 11 Nov 2021 18:47:22 -0500
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C44C061766
+        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 15:44:32 -0800 (PST)
+Received: by mail-io1-xd2f.google.com with SMTP id k22so8951498iol.13
+        for <linux-block@vger.kernel.org>; Thu, 11 Nov 2021 15:44:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
+        h=subject:from:to:cc:references:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=881bqaV4hOap+5xQX5kYGENA1lHJDDc/LK2wouh04/k=;
-        b=lURGxsyLxjwY2FLfmOdVKa6x+z0tmb8723/Wmnx/91MO5iATSiP3Tda3zVpMZM16Zl
-         Od1RUF3Djh+m+0N9Vjl/q+pys4kON8TlcJX/DvZo7Hzj0lLYDx7ErWdc9GpdPAJy+eHy
-         KuNB3EIH1AhflR743qsX4lFCk1nTr+ebT0ickIk3lt7eYOnM3jnthChvdJHr/LtalCkl
-         h2o2/K67r9djwcJpS1km8ZG0beLzgdDnpyqVQxnRw+aYlyO+Q7DHSuHSft6wtks0n35F
-         ZVPX6zZTJFL6HZFgCgroBMf3uxGkQ6q6B77b0FXh5+o6nNIIh66h7SPN/HsvztcKU0KC
-         hfHw==
+        bh=d/vF4gWVr7gN1VOXDk8YsDYstYG81xw1J0wiAfdP4FA=;
+        b=76ax/4hmSHXpGZ6ChPTsN79a/IJfhq4LEhmF+/NDxlPraEQntT3UAzZ71SH2Xj10eh
+         RPEk/2NUaAUayCqY4TRurEKal/VLvRU+ChGvGWiv7DkjhWJ0fMH04o+ocy8g6XB7N/xf
+         PJVuaTn8/t3Y3HW+DtI0sDNUv0akwHCMIhn+leK478OAbNlKS5moizAqM4dl1bl6RoPy
+         hnCzxk6PlMpr3zosE1kIedNEY+LMgxQviecTLA8PHPvDppgaPmS2XUBpZpQUUeubJfKs
+         ZJlNaqwq9vchhBc1PIEHdQwKX+EMff59Nonj2Dr40O0N//r94vL691Vfc+Nnd8EukjDR
+         EAlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=881bqaV4hOap+5xQX5kYGENA1lHJDDc/LK2wouh04/k=;
-        b=Yn7k3eL+baIg9hgbd1EDNhuPUxnfoZ7VZRoLFY8go+2VUba9nriivklrhCuIKAmVwT
-         vQhKu/QLh1CQpFr9tEGxdC55/4OZA7z5AbJlFZPlF+Yx3eg6IdXHfN5i6eaTkvW7mWI6
-         ggqMHpDNAAia8yr/2VAIIaTmI8NIoQhVSmkW9qC4CX+Vod4BcZtO+fivdjggp64sq7yj
-         aStiGljzqF2Jty40RxvXVgsvW/ojqYJ8xqarWWJUQh79AD7MelrlzsDm2GO6yuQfVTHk
-         QKgdCVUXJ7GY2BxoE2ZSw6KUy3KCouHdNoTWvRwf5afpHVdqylv6wJcF3wQU3ObXfRfY
-         xDcQ==
-X-Gm-Message-State: AOAM532krsSeepJruK67/XFPHLIa47+V+sad7kxcJqkRBtnf9M0LmEsg
-        yb58koELYSyk9nvPb6mYC9NhOg==
-X-Google-Smtp-Source: ABdhPJw2vEEg9ikhuL3ArMhJNkVkpLOsXJgqkmWLKQN8kNxJd0fg+jWpb10iW4yKIvsf4MI2BQwA7Q==
-X-Received: by 2002:a05:6a00:1310:b0:494:672b:1e97 with SMTP id j16-20020a056a00131000b00494672b1e97mr9795873pfu.77.1636669050416;
-        Thu, 11 Nov 2021 14:17:30 -0800 (PST)
-Received: from ?IPv6:2600:380:b520:3c36:289a:c960:2525:2be4? ([2600:380:b520:3c36:289a:c960:2525:2be4])
-        by smtp.gmail.com with ESMTPSA id mp12sm8996462pjb.39.2021.11.11.14.17.29
+        bh=d/vF4gWVr7gN1VOXDk8YsDYstYG81xw1J0wiAfdP4FA=;
+        b=OuZq2svi7QUVOnC8meg1PrIlQvHXKVyVbA+MEOU/msiY70J9SakQ0NLmHnfM6wS60f
+         SdTgW0rPCRJBN+0nVbpI7aS8RjqekkAUWgimpLConto1X/cGLTKlvVI6R1k6lLRigFXS
+         fzrDUNcaDgGx++LjEMLAaA+twpDGe3MTH7Bp4qr9uPHbuJlt2XcWXpS9vYksOa69wPO1
+         w9HWt3H/BR/LX/EDDf7qgY9CnysbJBRe2aW1pK9K5e+F9WdyQcYprKs0D7G5vX77+a3Y
+         QLnqu5p+aAezsWyVqtlR1QTyb0fNQlYHdbsLhsgihnYaWyT952EWbp8aDNDKjcivUeNr
+         RPPA==
+X-Gm-Message-State: AOAM532fD7WoWpDkOs1AjZGzr+BUqqBEVAnumuQqh4YsW7vrMpxaoH+f
+        A7Ujf1uXklZ5WSHmoZEF4mmPqw==
+X-Google-Smtp-Source: ABdhPJyJ8YL2+f/3GTRYeUWywuhUqcyuhepb3+X+8djAebP3fkUYMjWCJAFv3lpC3A4VXXIXIYff7Q==
+X-Received: by 2002:a05:6638:2178:: with SMTP id p24mr8308438jak.142.1636674272044;
+        Thu, 11 Nov 2021 15:44:32 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id l2sm2683006ils.82.2021.11.11.15.44.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 14:17:29 -0800 (PST)
-Subject: Re: [PATCH 4/5] block: move queue enter logic into
- blk_mq_submit_bio()
-To:     Ming Lei <ming.lei@redhat.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <YYQo4ougXZvgv11X@infradead.org>
- <8c6163f4-0c0f-5254-5f79-9074f5a73cfe@kernel.dk>
- <461c4758-2675-1d11-ac8a-6f25ef01d781@kernel.dk>
- <YYQr3jl3avsuOUAJ@infradead.org>
- <3d29a5ce-aace-6198-3ea9-e6f603e74aa1@kernel.dk>
- <YYQuyt2/y1MgzRi0@infradead.org>
- <87ee0091-9c2f-50e8-c8f2-dcebebb9de48@kernel.dk>
- <alpine.DEB.2.22.394.2111111350150.2780761@ramsan.of.borg>
- <YY0eVnbjmHmPZ3M4@T590>
- <CAMuHMdWTiF3MpcwHc=jCGLoBtTngzXTLHsYSYKPyfLBFBn8B2g@mail.gmail.com>
- <YY01hzAuvmeMxO+0@T590>
+        Thu, 11 Nov 2021 15:44:31 -0800 (PST)
+Subject: Re: uring regression - lost write request
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <17ce59ff-bc8c-e8c8-22e1-96605440629a@kernel.dk>
-Date:   Thu, 11 Nov 2021 15:17:27 -0700
+To:     Daniel Black <daniel@mariadb.org>
+Cc:     Salvatore Bonaccorso <carnil@debian.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com>
+ <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
+ <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
+ <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
+ <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+ <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+ <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
+ <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
+ <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
+ <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk>
+ <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
+ <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
+ <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
+ <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+Message-ID: <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+Date:   Thu, 11 Nov 2021 16:44:29 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YY01hzAuvmeMxO+0@T590>
+In-Reply-To: <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,105 +88,142 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/11/21 8:23 AM, Ming Lei wrote:
-> Hi Geert,
-> 
-> On Thu, Nov 11, 2021 at 03:51:28PM +0100, Geert Uytterhoeven wrote:
->> Hi Ming,
->>
->> On Thu, Nov 11, 2021 at 2:45 PM Ming Lei <ming.lei@redhat.com> wrote:
->>> On Thu, Nov 11, 2021 at 01:58:38PM +0100, Geert Uytterhoeven wrote:
->>>> On Thu, 4 Nov 2021, Jens Axboe wrote:
->>>>> On 11/4/21 1:04 PM, Christoph Hellwig wrote:
->>>>>> On Thu, Nov 04, 2021 at 01:02:54PM -0600, Jens Axboe wrote:
->>>>>>> On 11/4/21 12:52 PM, Christoph Hellwig wrote:
->>>>>>>> Looks good:
->>>>>>>>
->>>>>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+On 11/11/21 10:28 AM, Jens Axboe wrote:
+> On 11/11/21 9:55 AM, Jens Axboe wrote:
+>> On 11/11/21 9:19 AM, Jens Axboe wrote:
+>>> On 11/11/21 8:29 AM, Jens Axboe wrote:
+>>>> On 11/11/21 7:58 AM, Jens Axboe wrote:
+>>>>> On 11/11/21 7:30 AM, Jens Axboe wrote:
+>>>>>> On 11/10/21 11:52 PM, Daniel Black wrote:
+>>>>>>>> Would it be possible to turn this into a full reproducer script?
+>>>>>>>> Something that someone that knows nothing about mysqld/mariadb can just
+>>>>>>>> run and have it reproduce. If I install the 10.6 packages from above,
+>>>>>>>> then it doesn't seem to use io_uring or be linked against liburing.
 >>>>>>>
->>>>>>> So these two are now:
+>>>>>>> Sorry Jens.
 >>>>>>>
->>>>>>> https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.16/block&id=c98cb5bbdab10d187aff9b4e386210eb2332af96
->>>>>>>
->>>>>>> which is the one I sent here, and then the next one gets cleaned up to
->>>>>>> remove that queue enter helper:
->>>>>>>
->>>>>>> https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.16/block&id=7f930eb31eeb07f1b606b3316d8ad3ab6a92905b
->>>>>>>
->>>>>>> Can I add your reviewed-by to this last one as well? Only change is the
->>>>>>> removal of blk_mq_enter_queue() and the weird construct there, it's just
->>>>>>> bio_queue_enter() now.
+>>>>>>> Hope containers are ok.
 >>>>>>
->>>>>> Sure.
+>>>>>> Don't think I have a way to run that, don't even know what podman is
+>>>>>> and nor does my distro. I'll google a bit and see if I can get this
+>>>>>> running.
+>>>>>>
+>>>>>> I'm fine building from source and running from there, as long as I
+>>>>>> know what to do. Would that make it any easier? It definitely would
+>>>>>> for me :-)
 >>>>>
->>>>> Thanks, prematurely already done, as you could tell :-)
+>>>>> The podman approach seemed to work, and I was able to run all three
+>>>>> steps. Didn't see any hangs. I'm going to try again dropping down
+>>>>> the innodb pool size (box only has 32G of RAM).
+>>>>>
+>>>>> The storage can do a lot more than 5k IOPS, I'm going to try ramping
+>>>>> that up.
+>>>>>
+>>>>> Does your reproducer box have multiple NUMA nodes, or is it a single
+>>>>> socket/nod box?
 >>>>
->>>> The updated version is now commit 900e080752025f00 ("block: move queue
->>>> enter logic into blk_mq_submit_bio()") in Linus' tree.
->>>>
->>>> I have bisected failures on m68k/atari (on ARAnyM, using nfhd as the
->>>> root device) to this commit, e.g.:
->>>>
->>>>     sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
->>>>     sd 0:0:0:0: [sda] tag#0 Sense Key : Illegal Request [current]
->>>>     sd 0:0:0:0: [sda] tag#0 Add. Sense: Invalid field in cdb
->>>>     sd 0:0:0:0: [sda] tag#0 CDB: Write(10) 2a 08 00 00 00 01 00 00 08 00
->>>>     critical target error, dev sda, sector 1 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
->>>>     Buffer I/O error on dev sda1, logical block 0, lost sync page write
->>>>
->>>>     EXT4-fs (sda1): I/O error while writing superblock
->>>>     sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_OK cmd_age=0s
->>>>     sd 0:0:0:0: [sda] tag#0 Sense Key : Illegal Request [current]
->>>>     sd 0:0:0:0: [sda] tag#0 Add. Sense: Invalid field in cdb
->>>>     sd 0:0:0:0: [sda] tag#0 CDB: Write(10) 2a 08 00 00 00 01 00 00 08 00
->>>>     critical target error, dev sda, sector 1 op 0x1:(WRITE) flags 0x20800 phys_seg 1 prio class 0
->>>>     Buffer I/O error on dev sda1, logical block 0, lost sync page write
->>>>     EXT4-fs (sda1): I/O error while writing superblock
->>>>
->>>> This may happen either when mounting the root file system (leading to an
->>>> unable to mount root fs panic), or later (leading to a read-only
->>>> rootfs).
+>>>> Doesn't seem to reproduce for me on current -git. What file system are
+>>>> you using?
 >>>
->>> BTW, today I just found that hang in blk_mq_freeze_queue_wait() is
->>> caused by commit 900e080752025f00, and the following patch can fix it:
+>>> I seem to be able to hit it with ext4, guessing it has more cases that
+>>> punt to buffered IO. As I initially suspected, I think this is a race
+>>> with buffered file write hashing. I have a debug patch that just turns
+>>> a regular non-numa box into multi nodes, may or may not be needed be
+>>> needed to hit this, but I definitely can now. Looks like this:
 >>>
->>> - blk-mq: don't grab ->q_usage_counter in blk_mq_sched_bio_merge
+>>> Node7 DUMP                                                                      
+>>> index=0, nr_w=1, max=128, r=0, f=1, h=0                                         
+>>>   w=ffff8f5e8b8470c0, hashed=1/0, flags=2                                       
+>>>   w=ffff8f5e95a9b8c0, hashed=1/0, flags=2                                       
+>>> index=1, nr_w=0, max=127877, r=0, f=0, h=0                                      
+>>> free_list                                                                       
+>>>   worker=ffff8f5eaf2e0540                                                       
+>>> all_list                                                                        
+>>>   worker=ffff8f5eaf2e0540
 >>>
->>> https://lore.kernel.org/linux-block/20211111085650.GA476@lst.de/T/#m759b88fda094a65ebf29bc81b780967cdaf9cf28
+>>> where we seed node7 in this case having two work items pending, but the
+>>> worker state is stalled on hash.
 >>>
->>> Maybe you can try the above patch.
+>>> The hash logic was rewritten as part of the io-wq worker threads being
+>>> changed for 5.11 iirc, which is why that was my initial suspicion here.
+>>>
+>>> I'll take a look at this and make a test patch. Looks like you are able
+>>> to test self-built kernels, is that correct?
 >>
->> Thanks! I have applied both patches, but it doesn't make a difference.
+>> Can you try with this patch? It's against -git, but it will apply to
+>> 5.15 as well.
 > 
-> Thanks for your test!
-> 
-> Can you try the following patch?
-> 
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index f511db395c7f..a5ab2f2e9f67 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2517,7 +2517,6 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
->  	struct blk_mq_alloc_data data = {
->  		.q		= q,
->  		.nr_tags	= 1,
-> -		.cmd_flags	= bio->bi_opf,
->  	};
->  	struct request *rq;
->  
-> @@ -2525,6 +2524,7 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
->  		return NULL;
->  	if (unlikely(!submit_bio_checks(bio)))
->  		goto put_exit;
-> +	data.cmd_flags	= bio->bi_opf;
->  	if (blk_mq_attempt_bio_merge(q, bio, nsegs, same_queue_rq))
->  		goto put_exit;
+> I think that one covered one potential gap, but I just managed to
+> reproduce a stall even with it. So hang on testing that one, I'll send
+> you something more complete when I have confidence in it.
 
-That's definitely a real fix, akin to the other pre-enter variants, this
-one just post checks. Geert, can you give this a whirl?
+Alright, give this one a go if you can. Against -git, but will apply to
+5.15 as well.
 
-Ming, would you mind sending this as a real patch?
+
+diff --git a/fs/io-wq.c b/fs/io-wq.c
+index afd955d53db9..88202de519f6 100644
+--- a/fs/io-wq.c
++++ b/fs/io-wq.c
+@@ -423,9 +423,10 @@ static inline unsigned int io_get_work_hash(struct io_wq_work *work)
+ 	return work->flags >> IO_WQ_HASH_SHIFT;
+ }
+ 
+-static void io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
++static bool io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
+ {
+ 	struct io_wq *wq = wqe->wq;
++	bool ret = false;
+ 
+ 	spin_lock_irq(&wq->hash->wait.lock);
+ 	if (list_empty(&wqe->wait.entry)) {
+@@ -433,9 +434,11 @@ static void io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
+ 		if (!test_bit(hash, &wq->hash->map)) {
+ 			__set_current_state(TASK_RUNNING);
+ 			list_del_init(&wqe->wait.entry);
++			ret = true;
+ 		}
+ 	}
+ 	spin_unlock_irq(&wq->hash->wait.lock);
++	return ret;
+ }
+ 
+ static struct io_wq_work *io_get_next_work(struct io_wqe_acct *acct,
+@@ -475,14 +478,21 @@ static struct io_wq_work *io_get_next_work(struct io_wqe_acct *acct,
+ 	}
+ 
+ 	if (stall_hash != -1U) {
++		bool unstalled;
++
+ 		/*
+ 		 * Set this before dropping the lock to avoid racing with new
+ 		 * work being added and clearing the stalled bit.
+ 		 */
+ 		set_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+ 		raw_spin_unlock(&wqe->lock);
+-		io_wait_on_hash(wqe, stall_hash);
++		unstalled = io_wait_on_hash(wqe, stall_hash);
+ 		raw_spin_lock(&wqe->lock);
++		if (unstalled) {
++			clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
++			if (wq_has_sleeper(&wqe->wq->hash->wait))
++				wake_up(&wqe->wq->hash->wait);
++		}
+ 	}
+ 
+ 	return NULL;
+@@ -564,8 +574,11 @@ static void io_worker_handle_work(struct io_worker *worker)
+ 				io_wqe_enqueue(wqe, linked);
+ 
+ 			if (hash != -1U && !next_hashed) {
++				/* serialize hash clear with wake_up() */
++				spin_lock_irq(&wq->hash->wait.lock);
+ 				clear_bit(hash, &wq->hash->map);
+ 				clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
++				spin_unlock_irq(&wq->hash->wait.lock);
+ 				if (wq_has_sleeper(&wq->hash->wait))
+ 					wake_up(&wq->hash->wait);
+ 				raw_spin_lock(&wqe->lock);
 
 -- 
 Jens Axboe
