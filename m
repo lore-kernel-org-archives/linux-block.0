@@ -2,119 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2404C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 13:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF75CC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 15:19:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF86661075
-	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 13:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8BCF61057
+	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 15:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232299AbhKLNwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Nov 2021 08:52:53 -0500
-Received: from mail-ua1-f46.google.com ([209.85.222.46]:41639 "EHLO
-        mail-ua1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233894AbhKLNwv (ORCPT
+        id S232194AbhKLPW2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Nov 2021 10:22:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42988 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229959AbhKLPW1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Nov 2021 08:52:51 -0500
-Received: by mail-ua1-f46.google.com with SMTP id p37so17231513uae.8
-        for <linux-block@vger.kernel.org>; Fri, 12 Nov 2021 05:50:01 -0800 (PST)
+        Fri, 12 Nov 2021 10:22:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636730376;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VFN3YfKrrN4rviirmH1lG0NY9uufAM6YHK0vPxccEaw=;
+        b=IEmTYYOVu8mnNf8dncwvv63iPXnTzw+SDFVpHEr5SCq5O1ZxbPCmPqq7Wdw97KhFccVCcs
+        PpvF0X6sLfvePo+htyPszZOVP9OPJFw+TC9+/jUt+DHqLVkcJdZ2V8c3AfrjHJX4R0Iaf/
+        vTUFGcudgKajU4OGV7+iJCc739D3CyQ=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352-yCiOJOSHOSO1uHJYOeNEVw-1; Fri, 12 Nov 2021 10:19:35 -0500
+X-MC-Unique: yCiOJOSHOSO1uHJYOeNEVw-1
+Received: by mail-qv1-f71.google.com with SMTP id kd7-20020a056214400700b003b54713452cso8580755qvb.13
+        for <linux-block@vger.kernel.org>; Fri, 12 Nov 2021 07:19:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GUdQZVhiyhie97TXNa+YUpmmFObDGKydL5DM8l6Do+U=;
-        b=EUAoZSHSrltihmWeeIR9+Urgn9/H62ebZqciqjoViNd9tOEzURAUKUHQv2hHJmAeF+
-         SiWG5E5yjIncG6P6ZAG/9ESCe5eW8PwJiK+R1lfI4ZJARe4XvqVzN0/3V9TpW+Bh+cjH
-         ELqQp8FJoISDpqgTfkjQ1tIXH73OqcSGorfE/MMHidCOiXjI15fhAV2VN/8tv/J+gjez
-         CXRrCO0B4upwzRdTxeCKbC7DRbR86bNDTokdveDtv/w9La5Fo8ml8TyrHbYsOUrxHM4z
-         Z3BpmuyMeH5EKlWpwX2+AIqS44+c9r7L77JU5dNqE9iUKW7I4SYwJDoEl2/Fu/f8Agye
-         a2hA==
-X-Gm-Message-State: AOAM531oe+CJ7NSrQzf4lcB7wK5nq4k9eeCMefXRZVaUflZdYUym6Cem
-        OKm6jOOcweEuBV4Yc4oacDPguWkN2zG8Eg==
-X-Google-Smtp-Source: ABdhPJyvqsVLEbFi9xVnjDiS3D98sL58PGl4bbEAcaps0eUslVwdmzN6lJL8MXNoU1MDeqZ0FDNsNw==
-X-Received: by 2002:a05:6102:d94:: with SMTP id d20mr10631504vst.12.1636725000353;
-        Fri, 12 Nov 2021 05:50:00 -0800 (PST)
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com. [209.85.222.46])
-        by smtp.gmail.com with ESMTPSA id s22sm3961694vkm.28.2021.11.12.05.49.59
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Nov 2021 05:49:59 -0800 (PST)
-Received: by mail-ua1-f46.google.com with SMTP id p37so17231383uae.8
-        for <linux-block@vger.kernel.org>; Fri, 12 Nov 2021 05:49:59 -0800 (PST)
-X-Received: by 2002:a9f:2431:: with SMTP id 46mr22724510uaq.114.1636724999518;
- Fri, 12 Nov 2021 05:49:59 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VFN3YfKrrN4rviirmH1lG0NY9uufAM6YHK0vPxccEaw=;
+        b=rJ8Oo/qKAaHL25oW+oX7emphomOYvu7JozNXkJFjPTH/fonZTQ6P1JK7BCNdEWzIPy
+         PGbQ6mHDnw8qvwsfMF7rC6QXN8BuKRfTldVinHbLXM9w6PDygluoesgzWRbDZTdV1/G0
+         gI469D29+/QxfNR/r26XFb5pA6PaGA5d8X63EAJF1Um5w04C32b4/KwG/kcq9vaPGa+Q
+         K47QGf2LIT/vk46sdD6tyaTTMcUEQPJuEq0PBqwPqrsJB+VbYa38/C2h3ZMHgRUzldDA
+         8BDP1LiFrjBm19w9n+L6t9YHSPKcOZ7hF5bWyll3EtafjVohr9Pn5SIrFclQLIQ5cyeJ
+         UyRA==
+X-Gm-Message-State: AOAM533W3W2ZqUeHZjB7/8Pc0KV2diHwJdYw8X1YyjDSoIxAdkCi4Oe+
+        qgiBR+z0YTgX22A4N70fLLY8+TsEoRkphETfVbYxftD0AeqVutVVP9bASrH1XxZbumEXIiiEeMN
+        VDv1T3opldS5HAzO4Y3mZoA==
+X-Received: by 2002:a37:2f02:: with SMTP id v2mr13127477qkh.232.1636730375040;
+        Fri, 12 Nov 2021 07:19:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxk6sSDPzw7jrkKAxFn/K0PAx9HKUToVCIsJBG7fV34DkkAlHg0N9AMoil4JWoJAqjFdQQ15g==
+X-Received: by 2002:a37:2f02:: with SMTP id v2mr13127438qkh.232.1636730374828;
+        Fri, 12 Nov 2021 07:19:34 -0800 (PST)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id az14sm2791255qkb.125.2021.11.12.07.19.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Nov 2021 07:19:34 -0800 (PST)
+Date:   Fri, 12 Nov 2021 10:19:33 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "song@kernel.org" <song@kernel.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: Re: [RFC PATCH 8/8] md: add support for REQ_OP_VERIFY
+Message-ID: <YY6GBaSypKNPZnBj@redhat.com>
+References: <20211104064634.4481-1-chaitanyak@nvidia.com>
+ <20211104064634.4481-9-chaitanyak@nvidia.com>
+ <d770a769-7f2c-bb10-a3bd-0aca371a724e@nvidia.com>
 MIME-Version: 1.0
-References: <20211112081137.406930-1-ming.lei@redhat.com> <20211112082140.GA30681@lst.de>
- <YY4nv5eQUTOF5Wfv@T590> <20211112084441.GA32120@lst.de> <YY5iUwZ2TVtfqfXN@T590>
-In-Reply-To: <YY5iUwZ2TVtfqfXN@T590>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 12 Nov 2021 14:49:48 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUJFfWOyBAFE4GuK7yohGUVd+9qOkhUz1r7ZMsinJNzDQ@mail.gmail.com>
-Message-ID: <CAMuHMdUJFfWOyBAFE4GuK7yohGUVd+9qOkhUz1r7ZMsinJNzDQ@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: setup blk_mq_alloc_data.cmd_flags after
- submit_bio_checks() is done
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d770a769-7f2c-bb10-a3bd-0aca371a724e@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Thu, Nov 11 2021 at  3:13P -0500,
+Chaitanya Kulkarni <chaitanyak@nvidia.com> wrote:
 
-On Fri, Nov 12, 2021 at 1:47 PM Ming Lei <ming.lei@redhat.com> wrote:
-> On Fri, Nov 12, 2021 at 09:44:41AM +0100, Christoph Hellwig wrote:
-> > On Fri, Nov 12, 2021 at 04:37:19PM +0800, Ming Lei wrote:
-> > > > can only be used for reads, and no fua can be set if the preallocating
-> > > > I/O didn't use fua, etc.
-> > > >
-> > > > What are the pitfalls of just chanigng cmd_flags?
-> > >
-> > > Then we need to check cmd_flags carefully, such as hctx->type has to
-> > > be same, flush & passthrough flags has to be same, that said all
-> > > ->cmd_flags used for allocating rqs have to be same with the following
-> > > bio->bi_opf.
-> > >
-> > > In usual cases, I guess all IOs submitted from same plug batch should be
-> > > same type. If not, we can switch to change cmd_flags.
-> >
-> > Jens: is this a limit fitting into your use cases?
-> >
-> > I guess as a quick fix this rejecting different flags is probably the
-> > best we can do for now, but I suspect we'll want to eventually relax
-> > them.
->
-> rw mixed workload will be affected, so I think we need to switch to
-> change cmd_flags, how about the following patch?
->
-> From 9ab77b7adee768272944c20b7cffc8abdb85a35b Mon Sep 17 00:00:00 2001
-> From: Ming Lei <ming.lei@redhat.com>
-> Date: Fri, 12 Nov 2021 08:14:38 +0800
-> Subject: [PATCH] blk-mq: fix filesystem I/O request allocation
->
-> submit_bio_checks() may update bio->bi_opf, so we have to initialize
-> blk_mq_alloc_data.cmd_flags with bio->bi_opf after submit_bio_checks()
-> returns when allocating new request.
->
-> In case of using cached request, fallback to allocate new request if
-> cached rq isn't compatible with the incoming bio, otherwise change
-> rq->cmd_flags with incoming bio->bi_opf.
->
-> Fixes: 900e080752025f00 ("block: move queue enter logic into blk_mq_submit_bio()")
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> On 11/3/2021 11:46 PM, Chaitanya Kulkarni wrote:
+> > From: Chaitanya Kulkarni <kch@nvidia.com>
+> > 
+> > Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> 
+> I want to make sure the new REQ_OP_VERIFY is compatible with the
+> dm side as it is a generic interface.
+> 
+> Any comments on the dm side ? It will help me to respin the series for
+> V1 of this proposal.
 
-Thanks, this alternative patch seems to work fine, too.
-Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+I can review, but have you tested your XFS scrub usecase ontop of
+the various DM devices you modified?
 
-Gr{oetje,eeting}s,
+Also, you seem to have missed Keith's suggestion of using io_uring to
+expose this capability.  If you happen to go that route: making sure
+DM has required io_uring capabilities would be needed (IIRC there
+were/are some lingering patches from Ming Lei to facilitate more
+efficient io_uring on DM.. I'll try to find, could be I'm wrong).
 
-                        Geert
+Mike
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
