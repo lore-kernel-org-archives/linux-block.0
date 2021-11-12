@@ -2,64 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FF7C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 06:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00709C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 06:38:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D68A60F45
-	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 06:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C903D60FE7
+	for <linux-block@archiver.kernel.org>; Fri, 12 Nov 2021 06:38:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbhKLGjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Nov 2021 01:39:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbhKLGjJ (ORCPT
+        id S231179AbhKLGld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Nov 2021 01:41:33 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:60434 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230510AbhKLGld (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Nov 2021 01:39:09 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38120C061766;
-        Thu, 11 Nov 2021 22:36:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Db8t6F5Pbuj2JoJiAWFEwe5cDXdV62Gu4CZa5mkhUh4=; b=c9DyYwf5ZnZWztWVdZUh5hclM+
-        BCUeh4UhA2/Npd7iLsfqFjsLSlpluvMUcLhpjKQR1JyfsIJOt8l5wmK6ZI7+HMpO1+wkcnqXS0/d1
-        ukyVyPJMIM1WXxFnT+aIgs99Ch/NlJoNdbs82duR9Voc4XzrKGcHBrIMUS9yp5EkTBlcFTwldBR9L
-        YY6OUowYS7II4/HUvNd+gApruf81teCcBEkBkD+bPsLLKClDI5m1/szCFeQ2kspSt2LvlDczk6k7h
-        hgwT05zfgtGzVUn/h2zIgZNUvFjdqW8vaPQSRUl8PRbir1YEPisIN0efgxmAPuCvp62fQF9aYhFCv
-        ZCwolUrg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mlQAc-009XEz-19; Fri, 12 Nov 2021 06:36:18 +0000
-Date:   Thu, 11 Nov 2021 22:36:18 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Tadeusz Struk <tadeusz.struk@linaro.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: general protection fault in del_gendisk
-Message-ID: <YY4LYofN+yppiHDy@infradead.org>
-References: <7468db5d-55b4-07c9-628a-9a60419d9121@linaro.org>
- <2bf04f26-4e82-a822-90ce-4c28e2c0e407@linaro.org>
- <90d72173-edd8-79d9-b680-b1d47ab78150@kernel.dk>
- <YYDehlqjWUKizzmB@infradead.org>
- <0423c908-00c9-e22b-38cc-bae899f18834@linaro.org>
+        Fri, 12 Nov 2021 01:41:33 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 400011FDC2;
+        Fri, 12 Nov 2021 06:38:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1636699122; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F0AeuLoQoqPgRm/bAZHOgHvLyaVbuwOOkX4rxNvhHtE=;
+        b=iAuqX44yP59ZfT5cL7ss6h1AYYfwjgI9KtUGBAszMwLv17ZC6I4SsBEn5GhLj54WAi+2IL
+        sw6UyHBH/qXSdZVSwpFLplQbA+ygnhJsNliTy14zbu6DdYeFLpxf3eX7VEdKu49sQ0odEm
+        x0ESFsSeSDdtvcq7Izh3Gg/JTwlSuTg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1636699122;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F0AeuLoQoqPgRm/bAZHOgHvLyaVbuwOOkX4rxNvhHtE=;
+        b=igvxTD/QPfEVjB3LPOIQCD+3H1L9n0D4IuLhzfn65AMd4+wpaIQ5w3C+e42zf9zUSOcowZ
+        +8l1e8bVmAHx02Dw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1B47413E3D;
+        Fri, 12 Nov 2021 06:38:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 6/HxBfILjmF4XgAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 12 Nov 2021 06:38:42 +0000
+Subject: Re: Unreliable disk detection order in 5.x
+To:     Phillip Susi <phill@thesusis.net>
+Cc:     Simon Kirby <sim@hostway.ca>, Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20211105064623.GD32560@hostway.ca>
+ <9c14628f-4d23-dedf-3cdc-4b4266d5a694@opensource.wdc.com>
+ <20211107022410.GA6530@hostway.ca>
+ <ce4f925f-cbf9-9bbb-4bde-dd57059e3c84@acm.org>
+ <20211111010106.GA27431@hostway.ca>
+ <67af6917-653c-28a9-368a-db9599620bfa@suse.de>
+ <87pmr65j1i.fsf@vps.thesusis.net>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <ebefa00b-12ea-07d0-095a-bbb9ab834a3f@suse.de>
+Date:   Fri, 12 Nov 2021 07:38:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0423c908-00c9-e22b-38cc-bae899f18834@linaro.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <87pmr65j1i.fsf@vps.thesusis.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 08, 2021 at 11:19:35AM -0800, Tadeusz Struk wrote:
-> I have ran this on the latest mainline. I can confirm that the errors are
-> nicely handled there. It triggers a warning and panics in device_add_disk()
-> because of:
-> return WARN_ON_ONCE(ret); /* keep until all callers handle errors */
-> and
-> Kernel panic - not syncing: panic_on_warn set ...
+On 11/12/21 1:11 AM, Phillip Susi wrote:
+> 
+> Hannes Reinecke <hare@suse.de> writes:
+> 
+>> Why is by-uuid not available?
+>> The uuid is the disk-internal unique identification, and to my
+>> knowledge all recent SCSI and SATA drives implement them.
+>> So where is the problem here?
+> 
+> It is probably just an oversight by the udev rules that create the
+> by-uuid links.
+> 
+So shouldn't we rather fix this?
 
-The WARRN_ON will go away once all drivers are fixed.  And no, it does
-not panic the kernel unless you set an obscure sysctl asking for it to
-panic on warnings, in which case you get what you ask for.
+Putting in some udev rules is always easier than trying to 'fix' things 
+in the kernel.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
