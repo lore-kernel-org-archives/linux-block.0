@@ -2,123 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB98C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 07:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8484C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 12:09:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0C4F60FE7
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 07:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC3AB60D42
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 12:09:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbhKNGuM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Nov 2021 01:50:12 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:50844 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbhKNGuL (ORCPT
+        id S235762AbhKNMMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Nov 2021 07:12:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236090AbhKNMMd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Nov 2021 01:50:11 -0500
-Received: by mail-il1-f199.google.com with SMTP id d10-20020a92360a000000b002756b12323bso8051473ila.17
-        for <linux-block@vger.kernel.org>; Sat, 13 Nov 2021 22:47:18 -0800 (PST)
+        Sun, 14 Nov 2021 07:12:33 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2FBDC061200
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 04:09:38 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id v7so37991193ybq.0
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 04:09:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=GxHh7Xf9qDW0bNwOyf54n9RvWNxiu2gzljLfng7W7Hs=;
+        b=MdzNFKvZCjQLgS4svb85EjWOd4iKxSAKRoMKmMHggzgzimxZPsmu/wDxNWqifIRXS/
+         xbitv67PKHF+EzCh7/aNts0d7m9cW9DAasFEN6hi6pKUqc6AX09jF6nO9EEEAFezntOe
+         lXs36kchylgNtauz/+8uhRlBSzyL28R30UyQ6H8cOv5QeIwJUW5oLAnRI0Bc3lvK3r11
+         QdRHVJPtJnhgx8wO7DOI2JoAZPDbvv6qSngkcfdA73Iv6ZxgUeEUZmTS5tlu0uYwj9B1
+         q7SxxuhsPjcdTgP4GfvybUmUvXXdjC6i+ISOI/PaoakXA77Ty2tSHQTCwEkNNdCL7HCZ
+         8h8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=LCwzLR4I63yDgwhrq1dWlJa+/GBTxd12sS+YpVFDcXs=;
-        b=PT/xzlI6l/nEN3vQiN0a++FpklpPqLbqDpxJwca2VQkpIXOdTbI84VjnHY4wy0qxSh
-         H8k7xDRGN2Hf70qXRV34tSaWBNsM+7cMiFXzwQz0GPo8s5OsfZBsaNbk8A5LpvJ+yar+
-         I/4vVrj7dflH2YTh7loOEn83PZ1xaLc93ipEaps/upQPApsSzCMNo26ccMutj34ApTRV
-         yhrc5V7LVfYx3e89ZzmDt070GNp70FqeytbNvJRNWNYYB8JI3kKmK3agw+IZrQx6CNQ1
-         o6o7sfYLTYYdubZIS6HwuFCfsyLwjdB4+jJS+qxw/gmCHMLR92vs/YLf41R4l360yUFl
-         L5nQ==
-X-Gm-Message-State: AOAM5312x236fqvPqMRZZ612y5hKCFOIgh0UzJDUXfKObN6dixKfIk1Y
-        J8ZckfDcpXhcNEIBqwrbxdaWqvqpTC++BvKh5KzMm4Y6Py/c
-X-Google-Smtp-Source: ABdhPJwwTOOYHPAL+ZpWXWpvlEqGQoWNgRHMFSbeqmhUOyuNAwHFv+HIejP7cywip6RyjIBwbhDrg1RlwMafznDslU4FFiT9A4J/
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=GxHh7Xf9qDW0bNwOyf54n9RvWNxiu2gzljLfng7W7Hs=;
+        b=mxP+4H3a31WRR8fgrsNaeG40vOhZmEK/gsdMxjEcyGdzVUCidrtMsLDhN8J9KSJxNL
+         Dvu+fqp5OPtyR87XUUorC0rIIgQxiH/yGTB1yK8WTYyRRYLNCYKl5QmbziKATpT0fhGB
+         NRk0jaG3oBUw94K2f3VmKHIivGS5x9Ha8ySIxTr/DSpl7tnsfXJHpwJqt1+MsXZBr7tR
+         xtegNqbNsZMgXyJ/KWW6iCKZVVTCaqwhhGMiUqp/1m9NvfbgbjF+PsCdxb7y9Dfx8+cr
+         4Xh1QSydyotqH+AKBum6zUIBg7gba2G2N4k9aJ4gO6veqvtxP5dFRgLTs0UDyn7YQ5hT
+         SITw==
+X-Gm-Message-State: AOAM533SALexLxLqcG4zjI156V9au70+5vKe1k9y2cNqPFe1M+AkRgko
+        UbYFvUHGNslcQHsZhjnuIS/Glk9YU23R9sxGmnDTfgCJkMw=
+X-Google-Smtp-Source: ABdhPJx0hsSZTaEs7tigcFfIDCmp7AjeBpcFnFGKYb69sB00DmnfLErIkudgBCbo1e00ev9435KtN1glpHXDq0loeeo=
+X-Received: by 2002:a25:24d4:: with SMTP id k203mr32909890ybk.365.1636891777823;
+ Sun, 14 Nov 2021 04:09:37 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a92:2a06:: with SMTP id r6mr16851877ile.34.1636872437900;
- Sat, 13 Nov 2021 22:47:17 -0800 (PST)
-Date:   Sat, 13 Nov 2021 22:47:17 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000342e7105d0ba10d0@google.com>
-Subject: [syzbot] WARNING in nbd_dev_add (2)
-From:   syzbot <syzbot+5e8112c15ddb3db8416d@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+From:   Turritopsis Dohrnii Teo En Ming <ceo.teo.en.ming@gmail.com>
+Date:   Sun, 14 Nov 2021 20:09:34 +0800
+Message-ID: <CAMEJMGEYEKvsfy-U5=Om9bO_mCk0jGtK0z0YoU2Z5kowmszqcw@mail.gmail.com>
+Subject: I discovered that Aruba Instant On 1930 24G 4SFP/SFP+ JL682A Switch
+ is Running an Operating System with Linux Kernel 4.4.120!
+To:     linux-block@vger.kernel.org
+Cc:     ceo@teo-en-ming-corp.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Subject: I discovered that Aruba Instant On 1930 24G 4SFP/SFP+ JL682A
+Switch is Running an Operating System with Linux Kernel 4.4.120!
 
-syzbot found the following issue on:
+Good day from Singapore,
 
-HEAD commit:    cb690f5238d7 Merge tag 'for-5.16/drivers-2021-11-09' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17736888b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9d7259f0deb293aa
-dashboard link: https://syzkaller.appspot.com/bug?extid=5e8112c15ddb3db8416d
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+I discovered that Aruba Instant On 1930 24G 4SFP/SFP+ JL682A Switch is
+Running an Operating System with Linux Kernel 4.4.120!
 
-Unfortunately, I don't have any reproducer for this issue yet.
+INTRODUCTION
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5e8112c15ddb3db8416d@syzkaller.appspotmail.com
+My name is Mr. Turritopsis Dohrnii Teo En Ming, 43 years old as of 14
+Nov 2021. I live in Singapore. Presently I am an IT Consultant with a
+Systems Integrator (SI)/computer firm in Singapore. I am also a Linux
+and open source software and information technology enthusiast.
 
-RDX: 0000000000000000 RSI: 0000000020000380 RDI: 0000000000000005
-RBP: 00007f2388d2e1d0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007ffcef734a5f R14: 00007f2388d2e300 R15: 0000000000022000
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5223 at block/genhd.c:547 device_add_disk+0x338/0xef0 block/genhd.c:547
-Modules linked in:
-CPU: 1 PID: 5223 Comm: syz-executor.3 Not tainted 5.15.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:device_add_disk+0x338/0xef0 block/genhd.c:547
-Code: 74 08 3c 03 0f 8e 93 09 00 00 8b 5d 00 bf 03 01 00 00 89 de e8 39 ee ae fd 81 fb 03 01 00 00 0f 84 16 02 00 00 e8 08 ec ae fd <0f> 0b 41 bc 01 00 00 00 e8 fb eb ae fd 44 89 e0 48 83 c4 38 5b 5d
-RSP: 0018:ffffc90019027460 EFLAGS: 00010246
-RAX: 0000000000040000 RBX: 000000000000002b RCX: ffffc9000fb72000
-RDX: 0000000000040000 RSI: ffffffff83c8d798 RDI: 0000000000000003
-RBP: ffff88807652f000 R08: 0000000000000103 R09: ffff888016beea43
-R10: ffffffff83c8d787 R11: 0000000000000000 R12: 00000000ffffffea
-R13: ffff88807652f080 R14: ffff88807652f008 R15: ffff888016beea08
-FS:  00007f2388d2e700(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2bc23000 CR3: 0000000034919000 CR4: 0000000000350ee0
-Call Trace:
- <TASK>
- add_disk include/linux/genhd.h:212 [inline]
- nbd_dev_add+0x8d9/0xcd0 drivers/block/nbd.c:1818
- nbd_genl_connect+0x11f3/0x1930 drivers/block/nbd.c:1948
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
- genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2491
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
- netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1345
- netlink_sendmsg+0x86d/0xda0 net/netlink/af_netlink.c:1916
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:724
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2409
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2463
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2492
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f238b7b8ae9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f2388d2e188 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f238b8cbf60 RCX: 00007f238b7b8ae9
-RDX: 0000000000000000 RSI: 0000000020000380 RDI: 0000000000000005
-RBP: 00007f2388d2e1d0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007ffcef734a5f R14: 00007f2388d2e300 R15: 0000000000022000
- </TASK>
+You can read my autobiography on my redundant blogs. The title of my
+autobiography is:
+
+=E2=80=9CAutobiography of Singaporean Targeted Individual Mr. Turritopsis
+Dohrnii Teo En Ming (Very First Draft, Lots More to Add in Future)=E2=80=9D
+
+Links to my redundant blogs (Blogger and WordPress) can be found in my
+email signature below. These are my main blogs.
+
+I have three other redundant blogs, namely:
+
+https://teo-en-ming.tumblr.com/
+
+https://teo-en-ming.medium.com/
+
+https://teo-en-ming.livejournal.com/
+
+Future/subsequent versions of my autobiography will be published on my
+redundant blogs.
+
+My Blog Books (in PDF format) are also available for download on my
+redundant blogs.
+
+Over the years, I have published many guides, howtos, tutorials, and
+information technology articles on my redundant blogs. I hope that
+they are of use to information technology professionals.
+
+Thank you very much.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+
+-----BEGIN EMAIL SIGNATURE-----
+
+The Gospel for all Targeted Individuals (TIs):
+
+[The New York Times] Microwave Weapons Are Prime Suspect in Ills of
+U.S. Embassy Workers
+
+Link:
+https://www.nytimes.com/2018/09/01/science/sonic-attack-cuba-microwave.html
+
+***************************************************************************=
+*****************
+
+Singaporean Targeted Individual Mr. Turritopsis Dohrnii Teo En Ming's
+Academic Qualifications as at 14 Feb 2019 and refugee seeking attempts
+at the United Nations Refugee Agency Bangkok (21 Mar 2017), in Taiwan
+(5 Aug 2019) and Australia (25 Dec 2019 to 9 Jan 2020):
+
+[1] https://tdtemcerts.wordpress.com/
+
+[2] https://tdtemcerts.blogspot.sg/
+
+[3] https://www.scribd.com/user/270125049/Teo-En-Ming
+
+-----END EMAIL SIGNATURE-----
