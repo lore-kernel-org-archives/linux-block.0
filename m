@@ -2,171 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5C4C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 18:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9682AC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:33:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A11E60F51
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 18:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6353D6112E
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233136AbhKNS0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Nov 2021 13:26:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41802 "EHLO
+        id S233998AbhKNUgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Nov 2021 15:36:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230194AbhKNS0O (ORCPT
+        with ESMTP id S234985AbhKNUgm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Nov 2021 13:26:14 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17FCC061766
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 10:23:19 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id z26so18308114iod.10
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 10:23:19 -0800 (PST)
+        Sun, 14 Nov 2021 15:36:42 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB62BC061766
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:33:45 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id z10so35970026edc.11
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:33:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=NEgiKsV/nj37AplLJghWcA2B0XU+8MeUnV382KJC88c=;
-        b=imx4KobIejxnrqLWPj30+iofk0L684kSz1MxAyJiJMpAtLC008ntZwxRx+q9qaceES
-         GW8y+Se3O7r3v0L4rODlTLW0J/mtzMYy3QHnWqRfiWm4HRkyOPcH7au8h5SsPdgnP60l
-         /LR5r+y9v3dbfgBBGKsqG2XzJOmp0mExgkRpMlqiFEfLhF5V6wBFEz8Dcvi1QjiGNhW6
-         iT3XYZGEZlAanAcQyYOjBRa1gUvxb9/s9gfvWRZadZTtdok3bKN713RayXCHV4/XxPyJ
-         cWMokiPbaThil1cpDA2Dl9UYgadCzyZ6kTapnifUN8B+SCiaPvaGMGlo/N20VwiT1Yc6
-         2aCQ==
+        d=mariadb.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=FtN0fh6H4C16icsZhgHAYB3+VBhG91m0rQocjJHzONI=;
+        b=APBsZkWBFt56Raz0u1lXNZ02U1/kqeW1r752dTElA2IwTyarebhrvC/0R2ukCYa1kC
+         U1AiEkqDNV7BYHWOa0mSIXdmdFXuGAifpIshM3XOSULne0M+wsXVg0a2xJi124ssRQeC
+         elcvkCDGa1bHyZLj7vlvB2EJOqQezFJ1S1/P6ViamKA79lEdcclNdoKLvHZGKEP38Jki
+         5gs7ReV1UZwsK/o89wKk7ZYszLRSX5HOIe1zLLcudJFStS5CHvS0Sckm33pPI3wGU61z
+         AsyEGqScP5pdwSQTW6AL4JP9qt4u3dN+xpW1GLTZEwb2DSa5vqvZQKv1T2QHjCSQtzlI
+         UhEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NEgiKsV/nj37AplLJghWcA2B0XU+8MeUnV382KJC88c=;
-        b=KFx0pCV+lBMD3L+EK4Dnp1wE1tKcaJncZEt7jKGHjeuG3S5U8X1NPoPizHst7TquHi
-         bCgiH36Fr5P8ftNoySBI40iWCOOfkYCi0m3Z+1zUa7mJvtDLMqZaK5oju/dxa0rkeDgz
-         vI+15gFqLK3ZibwAhvQilYhWp94KPVU0L7E0ZZlyG9MrKVICnLbSLuz4UnogVONhIG1f
-         a9LQ9tmgFYW/rIv547XDv42T1twHf6ZVyMzVEWZ6Wl87pIMBsKWW3O/XBdsadN6kQ1jk
-         YRWtzVB3OSGlMWTQquHYoHoLOJaNi4Hi+aXANKb+pzE1GQ80gL6Xni+P6LdVSziTKp72
-         hVPQ==
-X-Gm-Message-State: AOAM533IW1WMfo2pS7pNHLtdpE4fBuY5tDu6G3Cw5p2Uprx3GPEosW8u
-        bVjezeA1bQZVHtl7JEzw2vvxeF86//JA1eCd
-X-Google-Smtp-Source: ABdhPJy4eu4BtwxqwE1JL9gvA9qhfR51Px1qPs03jQYlNcy1wQXO+RJlQeFEtvkITQa0duh9sQchPA==
-X-Received: by 2002:a05:6638:144f:: with SMTP id l15mr24450034jad.21.1636914198777;
-        Sun, 14 Nov 2021 10:23:18 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id h17sm7856235ilj.69.2021.11.14.10.23.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Nov 2021 10:23:18 -0800 (PST)
-Subject: Re: raid0 vs io_uring
-To:     Avi Kivity <avi@scylladb.com>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org
-References: <c978931b-d3ba-89c7-52ef-30eddf740ba6@scylladb.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ee22cbab-950f-cdb0-7ef0-5ea0fe67c628@kernel.dk>
-Date:   Sun, 14 Nov 2021 11:23:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FtN0fh6H4C16icsZhgHAYB3+VBhG91m0rQocjJHzONI=;
+        b=2DoeUUKSuHNIorkhS46yq6WD88VVvWYvqHVfRM0xNiLj0lppMlO2NFoS4Lma0LG4z4
+         RolMzGGwwVbBRACCUwx0u04wUqdCpF0L5a0/YsKHHMbygk2p3nhRP3pSOmem2L5XtKYF
+         qSE/6cHKliQWKkW67n+lSJJyLjr5WgbyZdcsNfjyeNN2prBmvM88Nu4tkIFKEc7mHbVA
+         sRjSPcj+mjS/fdqzFhabrvIe7ipevmTQiwnX0gqSyYunoJ0Lnx3w0GTdSDmp4m72CkkE
+         zx/laNMtm03WoHysHCHUdhNAsak4fEiCArrRnZO2TI+T20zL4DzK/DyeUtAa8ASN/ydC
+         G9RQ==
+X-Gm-Message-State: AOAM530Mjw2f1lsVTFCrcQbapayz9s1LCfR8NHg+z4jnl+XzGf8i3WZW
+        9sum8vmZvR2dHYko8N5hJ2IEh5kmL+s43icJaNYB1Q==
+X-Google-Smtp-Source: ABdhPJxq11ysxdTBdauVuZV4JYTyah4JmuH0XIEQIrQchgljPnRKKL1sFro2K+4CzVNJh5sePQGQQ7KS/BhzLINwmGg=
+X-Received: by 2002:a17:906:8256:: with SMTP id f22mr36751059ejx.207.1636922024419;
+ Sun, 14 Nov 2021 12:33:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c978931b-d3ba-89c7-52ef-30eddf740ba6@scylladb.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com> <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
+ <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
+ <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com> <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+ <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+ <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk> <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
+ <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
+ <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk> <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
+ <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk> <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk> <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+ <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+In-Reply-To: <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+From:   Daniel Black <daniel@mariadb.org>
+Date:   Mon, 15 Nov 2021 07:33:33 +1100
+Message-ID: <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+Subject: Re: uring regression - lost write request
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Salvatore Bonaccorso <carnil@debian.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/14/21 10:07 AM, Avi Kivity wrote:
-> Running a trivial randread, direct=1 fio workload against a RAID-0 
-> composed of some nvme devices, I see this pattern:
-> 
-> 
->               fio-7066  [009]  1800.209865: function: io_submit_sqes
->               fio-7066  [009]  1800.209866: function:                
-> rcu_read_unlock_strict
->               fio-7066  [009]  1800.209866: function:                
-> io_submit_sqe
->               fio-7066  [009]  1800.209866: function:                   
-> io_init_req
->               fio-7066  [009]  1800.209866: 
-> function:                      io_file_get
->               fio-7066  [009]  1800.209866: 
-> function:                         fget_many
->               fio-7066  [009]  1800.209866: 
-> function:                            __fget_files
->               fio-7066  [009]  1800.209867: 
-> function:                               rcu_read_unlock_strict
->               fio-7066  [009]  1800.209867: function:                   
-> io_req_prep
->               fio-7066  [009]  1800.209867: 
-> function:                      io_prep_rw
->               fio-7066  [009]  1800.209867: function:                   
-> io_queue_sqe
->               fio-7066  [009]  1800.209867: 
-> function:                      io_req_defer
->               fio-7066  [009]  1800.209867: 
-> function:                      __io_queue_sqe
->               fio-7066  [009]  1800.209868: 
-> function:                         io_issue_sqe
->               fio-7066  [009]  1800.209868: 
-> function:                            io_read
->               fio-7066  [009]  1800.209868: 
-> function:                               io_import_iovec
->               fio-7066  [009]  1800.209868: 
-> function:                               __io_file_supports_async
->               fio-7066  [009]  1800.209868: 
-> function:                                  I_BDEV
->               fio-7066  [009]  1800.209868: 
-> function:                               __kmalloc
->               fio-7066  [009]  1800.209868: 
-> function:                                  kmalloc_slab
->               fio-7066  [009]  1800.209868: function: __cond_resched
->               fio-7066  [009]  1800.209868: function:                
-> rcu_all_qs
->               fio-7066  [009]  1800.209869: function: should_failslab
->               fio-7066  [009]  1800.209869: 
-> function:                               io_req_map_rw
->               fio-7066  [009]  1800.209869: 
-> function:                         io_arm_poll_handler
->               fio-7066  [009]  1800.209869: 
-> function:                         io_queue_async_work
->               fio-7066  [009]  1800.209869: 
-> function:                            io_prep_async_link
->               fio-7066  [009]  1800.209869: 
-> function:                               io_prep_async_work
->               fio-7066  [009]  1800.209870: 
-> function:                            io_wq_enqueue
->               fio-7066  [009]  1800.209870: 
-> function:                               io_wqe_enqueue
->               fio-7066  [009]  1800.209870: 
-> function:                                  _raw_spin_lock_irqsave
->               fio-7066  [009]  1800.209870: function: 
-> _raw_spin_unlock_irqrestore
-> 
-> 
-> 
->  From which I deduce that __io_file_supports_async() (today named 
-> __io_file_supports_nowait) returns false, and therefore every io_uring 
-> operation is bounced to a workqueue with the resulting great loss in 
-> performance.
-> 
-> 
-> However, I also see NOWAIT is part of the default set of flags:
-> 
-> 
-> #define QUEUE_FLAG_MQ_DEFAULT   ((1 << QUEUE_FLAG_IO_STAT) |            \
->                                   (1 << QUEUE_FLAG_SAME_COMP) |          \
->                                   (1 << QUEUE_FLAG_NOWAIT))
-> 
-> and I don't see that md touches it (I do see that dm plays with it).
-> 
-> 
-> So, what's the story? does md not support NOWAIT? If so, that's a huge 
-> blow to io_uring with md. If it does, are there any clues about why I 
-> see requests bouncing to a workqueue?
+On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Alright, give this one a go if you can. Against -git, but will apply to
+> 5.15 as well.
 
-That is indeed the story, dm supports it but md doesn't just yet. It's
-being worked on right now, though:
 
-https://lore.kernel.org/linux-raid/20211101215143.1580-1-vverma@digitalocean.com/
+Works. Thank you very much.
 
-Should be pretty simple, and then we can push to -stable as well.
+https://jira.mariadb.org/browse/MDEV-26674?page=3Dcom.atlassian.jira.plugin=
+.system.issuetabpanels:comment-tabpanel&focusedCommentId=3D205599#comment-2=
+05599
 
--- 
-Jens Axboe
+Tested-by: Marko M=C3=A4kel=C3=A4 <marko.makela@mariadb.com>
 
+
+>
+>
+> diff --git a/fs/io-wq.c b/fs/io-wq.c
+> index afd955d53db9..88202de519f6 100644
+> --- a/fs/io-wq.c
+> +++ b/fs/io-wq.c
+> @@ -423,9 +423,10 @@ static inline unsigned int io_get_work_hash(struct i=
+o_wq_work *work)
+>         return work->flags >> IO_WQ_HASH_SHIFT;
+>  }
+>
+> -static void io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
+> +static bool io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
+>  {
+>         struct io_wq *wq =3D wqe->wq;
+> +       bool ret =3D false;
+>
+>         spin_lock_irq(&wq->hash->wait.lock);
+>         if (list_empty(&wqe->wait.entry)) {
+> @@ -433,9 +434,11 @@ static void io_wait_on_hash(struct io_wqe *wqe, unsi=
+gned int hash)
+>                 if (!test_bit(hash, &wq->hash->map)) {
+>                         __set_current_state(TASK_RUNNING);
+>                         list_del_init(&wqe->wait.entry);
+> +                       ret =3D true;
+>                 }
+>         }
+>         spin_unlock_irq(&wq->hash->wait.lock);
+> +       return ret;
+>  }
+>
+>  static struct io_wq_work *io_get_next_work(struct io_wqe_acct *acct,
+> @@ -475,14 +478,21 @@ static struct io_wq_work *io_get_next_work(struct i=
+o_wqe_acct *acct,
+>         }
+>
+>         if (stall_hash !=3D -1U) {
+> +               bool unstalled;
+> +
+>                 /*
+>                  * Set this before dropping the lock to avoid racing with=
+ new
+>                  * work being added and clearing the stalled bit.
+>                  */
+>                 set_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+>                 raw_spin_unlock(&wqe->lock);
+> -               io_wait_on_hash(wqe, stall_hash);
+> +               unstalled =3D io_wait_on_hash(wqe, stall_hash);
+>                 raw_spin_lock(&wqe->lock);
+> +               if (unstalled) {
+> +                       clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+> +                       if (wq_has_sleeper(&wqe->wq->hash->wait))
+> +                               wake_up(&wqe->wq->hash->wait);
+> +               }
+>         }
+>
+>         return NULL;
+> @@ -564,8 +574,11 @@ static void io_worker_handle_work(struct io_worker *=
+worker)
+>                                 io_wqe_enqueue(wqe, linked);
+>
+>                         if (hash !=3D -1U && !next_hashed) {
+> +                               /* serialize hash clear with wake_up() */
+> +                               spin_lock_irq(&wq->hash->wait.lock);
+>                                 clear_bit(hash, &wq->hash->map);
+>                                 clear_bit(IO_ACCT_STALLED_BIT, &acct->fla=
+gs);
+> +                               spin_unlock_irq(&wq->hash->wait.lock);
+>                                 if (wq_has_sleeper(&wq->hash->wait))
+>                                         wake_up(&wq->hash->wait);
+>                                 raw_spin_lock(&wqe->lock);
+>
+> --
+> Jens Axboe
+>
