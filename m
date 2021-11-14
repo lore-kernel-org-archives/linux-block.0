@@ -2,166 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9682AC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3842DC433F5
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:55:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6353D6112E
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01905610F9
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:55:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233998AbhKNUgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Nov 2021 15:36:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
+        id S236234AbhKNU6U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Nov 2021 15:58:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234985AbhKNUgm (ORCPT
+        with ESMTP id S236232AbhKNU6S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Nov 2021 15:36:42 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB62BC061766
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:33:45 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id z10so35970026edc.11
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:33:45 -0800 (PST)
+        Sun, 14 Nov 2021 15:58:18 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44C4CC061766
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:55:24 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id k22so18522917iol.13
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:55:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mariadb.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=FtN0fh6H4C16icsZhgHAYB3+VBhG91m0rQocjJHzONI=;
-        b=APBsZkWBFt56Raz0u1lXNZ02U1/kqeW1r752dTElA2IwTyarebhrvC/0R2ukCYa1kC
-         U1AiEkqDNV7BYHWOa0mSIXdmdFXuGAifpIshM3XOSULne0M+wsXVg0a2xJi124ssRQeC
-         elcvkCDGa1bHyZLj7vlvB2EJOqQezFJ1S1/P6ViamKA79lEdcclNdoKLvHZGKEP38Jki
-         5gs7ReV1UZwsK/o89wKk7ZYszLRSX5HOIe1zLLcudJFStS5CHvS0Sckm33pPI3wGU61z
-         AsyEGqScP5pdwSQTW6AL4JP9qt4u3dN+xpW1GLTZEwb2DSa5vqvZQKv1T2QHjCSQtzlI
-         UhEA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vnrrgUlslUtgQe5ZPoXgYoB8Ny1MSFL5eMSCV1rYDUE=;
+        b=n2m0gMtldmYpPXsUbVYEx5I8faeNqP6HLFRz7mOkwhupuLGzFixSvXlt31rAJHRncW
+         TYbYiSul/fXsM91lF/UVaf96N6dLJ2yFnleatQf9xDFKyfj+LCyvKKCj8PJWyBFozE8E
+         ZTjmGg1xgZtiv0xRGpvI/wlpTbmneAM+Vv+bCS8gUpcb55LvKJUM+ftEH5KgaLL2btdx
+         kYTyIWvk/JQjpCtAD0y3WiimdPc925deQbfg6+6kEMzQwgRrJ1g17wu4JigtLVPbUUIC
+         4Csswn5Cc8MVF6JMe1+oIsVTBTdE+2Ob+hMmmhxeuwZNBfM2NpfARW/V1VDVQrfbusGj
+         Fl4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=FtN0fh6H4C16icsZhgHAYB3+VBhG91m0rQocjJHzONI=;
-        b=2DoeUUKSuHNIorkhS46yq6WD88VVvWYvqHVfRM0xNiLj0lppMlO2NFoS4Lma0LG4z4
-         RolMzGGwwVbBRACCUwx0u04wUqdCpF0L5a0/YsKHHMbygk2p3nhRP3pSOmem2L5XtKYF
-         qSE/6cHKliQWKkW67n+lSJJyLjr5WgbyZdcsNfjyeNN2prBmvM88Nu4tkIFKEc7mHbVA
-         sRjSPcj+mjS/fdqzFhabrvIe7ipevmTQiwnX0gqSyYunoJ0Lnx3w0GTdSDmp4m72CkkE
-         zx/laNMtm03WoHysHCHUdhNAsak4fEiCArrRnZO2TI+T20zL4DzK/DyeUtAa8ASN/ydC
-         G9RQ==
-X-Gm-Message-State: AOAM530Mjw2f1lsVTFCrcQbapayz9s1LCfR8NHg+z4jnl+XzGf8i3WZW
-        9sum8vmZvR2dHYko8N5hJ2IEh5kmL+s43icJaNYB1Q==
-X-Google-Smtp-Source: ABdhPJxq11ysxdTBdauVuZV4JYTyah4JmuH0XIEQIrQchgljPnRKKL1sFro2K+4CzVNJh5sePQGQQ7KS/BhzLINwmGg=
-X-Received: by 2002:a17:906:8256:: with SMTP id f22mr36751059ejx.207.1636922024419;
- Sun, 14 Nov 2021 12:33:44 -0800 (PST)
-MIME-Version: 1.0
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <77f9feaa-2d65-c0f5-8e55-5f8210d6a4c6@gmail.com> <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com> <YXz0roPH+stjFygk@eldamar.lan>
- <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
- <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
- <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk> <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
- <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
- <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk> <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
- <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk> <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
- <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk> <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
- <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
-In-Reply-To: <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
-From:   Daniel Black <daniel@mariadb.org>
-Date:   Mon, 15 Nov 2021 07:33:33 +1100
-Message-ID: <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vnrrgUlslUtgQe5ZPoXgYoB8Ny1MSFL5eMSCV1rYDUE=;
+        b=m4vJiCwUjboxP9EW7Bwsuj3EK/mkezRcZX47g+eDJR7rezS1zkqM2zBJ8lfWndNn+5
+         M8XOwlRSQzabSuCwIEGGJCTBfRjT4A6sPcPr7hIyYd/4VaO4e20KBoeoKWlEU1aq2ANG
+         BKOEeK6ekUEzW+hGwsyMIE8D058P2XIaBvBPRD7eX3x0+JWdykpLq17ug4RkTYpXMwao
+         O1iU9CulJ6NKjOQwLEKmHSS6ZrVKd2VRo7pFHmMb/ll4qRu9jmVgrps3dS82PjFcVcwx
+         wF1YyTJNMtT+cbUw1TzKkxk3+VvqDBBdrviA/DOSLHA3wMN+z3si44XAsHrOthXVv/ma
+         BKVA==
+X-Gm-Message-State: AOAM532e8SUgJ4yPqXa0qNF3nZxwTAmEBODPivnhS982PYCfFuXwZ8fn
+        NOhZx0p4i1Bja73M721FCUJ+Bw==
+X-Google-Smtp-Source: ABdhPJykvT2tu9oqZDQSQZiO4FtXm65JDqct0FZyOkbGCoXAwdl+pn38AL5+JD5wAI4bLz5caMmIUQ==
+X-Received: by 2002:a5d:8451:: with SMTP id w17mr22666918ior.139.1636923322965;
+        Sun, 14 Nov 2021 12:55:22 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id g10sm9442396ila.34.2021.11.14.12.55.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Nov 2021 12:55:22 -0800 (PST)
 Subject: Re: uring regression - lost write request
-To:     Jens Axboe <axboe@kernel.dk>
+To:     Daniel Black <daniel@mariadb.org>
 Cc:     Salvatore Bonaccorso <carnil@debian.org>,
         Pavel Begunkov <asml.silence@gmail.com>,
         linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
+ <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
+ <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
+ <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+ <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+ <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
+ <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
+ <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
+ <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk>
+ <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
+ <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
+ <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
+ <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+ <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+ <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
+Date:   Sun, 14 Nov 2021 13:55:20 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Alright, give this one a go if you can. Against -git, but will apply to
-> 5.15 as well.
+On 11/14/21 1:33 PM, Daniel Black wrote:
+> On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Alright, give this one a go if you can. Against -git, but will apply to
+>> 5.15 as well.
+> 
+> 
+> Works. Thank you very much.
+> 
+> https://jira.mariadb.org/browse/MDEV-26674?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=205599#comment-205599
+> 
+> Tested-by: Marko Mäkelä <marko.makela@mariadb.com>
 
+Awesome, thanks so much for reporting and testing. All bugs are shallow
+when given a reproducer, that certainly helped a ton in figuring out
+what this was and nailing a fix.
 
-Works. Thank you very much.
+The patch is already upstream (and in the 5.15 stable queue), and I
+provided 5.14 patches too.
 
-https://jira.mariadb.org/browse/MDEV-26674?page=3Dcom.atlassian.jira.plugin=
-.system.issuetabpanels:comment-tabpanel&focusedCommentId=3D205599#comment-2=
-05599
+-- 
+Jens Axboe
 
-Tested-by: Marko M=C3=A4kel=C3=A4 <marko.makela@mariadb.com>
-
-
->
->
-> diff --git a/fs/io-wq.c b/fs/io-wq.c
-> index afd955d53db9..88202de519f6 100644
-> --- a/fs/io-wq.c
-> +++ b/fs/io-wq.c
-> @@ -423,9 +423,10 @@ static inline unsigned int io_get_work_hash(struct i=
-o_wq_work *work)
->         return work->flags >> IO_WQ_HASH_SHIFT;
->  }
->
-> -static void io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
-> +static bool io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
->  {
->         struct io_wq *wq =3D wqe->wq;
-> +       bool ret =3D false;
->
->         spin_lock_irq(&wq->hash->wait.lock);
->         if (list_empty(&wqe->wait.entry)) {
-> @@ -433,9 +434,11 @@ static void io_wait_on_hash(struct io_wqe *wqe, unsi=
-gned int hash)
->                 if (!test_bit(hash, &wq->hash->map)) {
->                         __set_current_state(TASK_RUNNING);
->                         list_del_init(&wqe->wait.entry);
-> +                       ret =3D true;
->                 }
->         }
->         spin_unlock_irq(&wq->hash->wait.lock);
-> +       return ret;
->  }
->
->  static struct io_wq_work *io_get_next_work(struct io_wqe_acct *acct,
-> @@ -475,14 +478,21 @@ static struct io_wq_work *io_get_next_work(struct i=
-o_wqe_acct *acct,
->         }
->
->         if (stall_hash !=3D -1U) {
-> +               bool unstalled;
-> +
->                 /*
->                  * Set this before dropping the lock to avoid racing with=
- new
->                  * work being added and clearing the stalled bit.
->                  */
->                 set_bit(IO_ACCT_STALLED_BIT, &acct->flags);
->                 raw_spin_unlock(&wqe->lock);
-> -               io_wait_on_hash(wqe, stall_hash);
-> +               unstalled =3D io_wait_on_hash(wqe, stall_hash);
->                 raw_spin_lock(&wqe->lock);
-> +               if (unstalled) {
-> +                       clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
-> +                       if (wq_has_sleeper(&wqe->wq->hash->wait))
-> +                               wake_up(&wqe->wq->hash->wait);
-> +               }
->         }
->
->         return NULL;
-> @@ -564,8 +574,11 @@ static void io_worker_handle_work(struct io_worker *=
-worker)
->                                 io_wqe_enqueue(wqe, linked);
->
->                         if (hash !=3D -1U && !next_hashed) {
-> +                               /* serialize hash clear with wake_up() */
-> +                               spin_lock_irq(&wq->hash->wait.lock);
->                                 clear_bit(hash, &wq->hash->map);
->                                 clear_bit(IO_ACCT_STALLED_BIT, &acct->fla=
-gs);
-> +                               spin_unlock_irq(&wq->hash->wait.lock);
->                                 if (wq_has_sleeper(&wq->hash->wait))
->                                         wake_up(&wq->hash->wait);
->                                 raw_spin_lock(&wqe->lock);
->
-> --
-> Jens Axboe
->
