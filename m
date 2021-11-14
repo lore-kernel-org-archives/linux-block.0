@@ -2,71 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3842DC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E17E0C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 21:02:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01905610F9
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 20:55:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB2EA61183
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 21:02:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236234AbhKNU6U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Nov 2021 15:58:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46868 "EHLO
+        id S236292AbhKNVFn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Nov 2021 16:05:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbhKNU6S (ORCPT
+        with ESMTP id S236232AbhKNVFl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Nov 2021 15:58:18 -0500
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44C4CC061766
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:55:24 -0800 (PST)
-Received: by mail-io1-xd2e.google.com with SMTP id k22so18522917iol.13
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 12:55:24 -0800 (PST)
+        Sun, 14 Nov 2021 16:05:41 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09070C061746;
+        Sun, 14 Nov 2021 13:02:46 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id 133so12236067wme.0;
+        Sun, 14 Nov 2021 13:02:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vnrrgUlslUtgQe5ZPoXgYoB8Ny1MSFL5eMSCV1rYDUE=;
-        b=n2m0gMtldmYpPXsUbVYEx5I8faeNqP6HLFRz7mOkwhupuLGzFixSvXlt31rAJHRncW
-         TYbYiSul/fXsM91lF/UVaf96N6dLJ2yFnleatQf9xDFKyfj+LCyvKKCj8PJWyBFozE8E
-         ZTjmGg1xgZtiv0xRGpvI/wlpTbmneAM+Vv+bCS8gUpcb55LvKJUM+ftEH5KgaLL2btdx
-         kYTyIWvk/JQjpCtAD0y3WiimdPc925deQbfg6+6kEMzQwgRrJ1g17wu4JigtLVPbUUIC
-         4Csswn5Cc8MVF6JMe1+oIsVTBTdE+2Ob+hMmmhxeuwZNBfM2NpfARW/V1VDVQrfbusGj
-         Fl4Q==
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=1kCy14pWiHQLUZiqCYxumS5NGr0vdPf3t+I8K1dk1SM=;
+        b=USv5uFzF44loWe33r7DI2XgFiT4OSWX5r1GSWI9VG6Otc6KbgeVe7FcaogmHQro2iV
+         GqwO5f3hmfpGENPZLLY9W5xE2eJMmfJeX3lMIYEtQy/DHBmMABuzxFkhSUtH4BV/XW80
+         S6C1jCbw5y7HD6w3zM2SImeJSSafkEM274od/qsd5LVCvw4ZyH66bpFcGLEDIL0/6fw2
+         dthW4z1CldQzS+IXIMKvU0GMAp1iGiAlsnHNh1N7Ro2hQEcc60ihWm24WqJdgvBVejeQ
+         aVKduvTCMp7i6PFl8n6DQSCu827rkEBAfUbfiqrA2SX8o/6GGhK+cueBGlRtf9xXLWtM
+         fnSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vnrrgUlslUtgQe5ZPoXgYoB8Ny1MSFL5eMSCV1rYDUE=;
-        b=m4vJiCwUjboxP9EW7Bwsuj3EK/mkezRcZX47g+eDJR7rezS1zkqM2zBJ8lfWndNn+5
-         M8XOwlRSQzabSuCwIEGGJCTBfRjT4A6sPcPr7hIyYd/4VaO4e20KBoeoKWlEU1aq2ANG
-         BKOEeK6ekUEzW+hGwsyMIE8D058P2XIaBvBPRD7eX3x0+JWdykpLq17ug4RkTYpXMwao
-         O1iU9CulJ6NKjOQwLEKmHSS6ZrVKd2VRo7pFHmMb/ll4qRu9jmVgrps3dS82PjFcVcwx
-         wF1YyTJNMtT+cbUw1TzKkxk3+VvqDBBdrviA/DOSLHA3wMN+z3si44XAsHrOthXVv/ma
-         BKVA==
-X-Gm-Message-State: AOAM532e8SUgJ4yPqXa0qNF3nZxwTAmEBODPivnhS982PYCfFuXwZ8fn
-        NOhZx0p4i1Bja73M721FCUJ+Bw==
-X-Google-Smtp-Source: ABdhPJykvT2tu9oqZDQSQZiO4FtXm65JDqct0FZyOkbGCoXAwdl+pn38AL5+JD5wAI4bLz5caMmIUQ==
-X-Received: by 2002:a5d:8451:: with SMTP id w17mr22666918ior.139.1636923322965;
-        Sun, 14 Nov 2021 12:55:22 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id g10sm9442396ila.34.2021.11.14.12.55.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Nov 2021 12:55:22 -0800 (PST)
-Subject: Re: uring regression - lost write request
-To:     Daniel Black <daniel@mariadb.org>
-Cc:     Salvatore Bonaccorso <carnil@debian.org>,
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to;
+        bh=1kCy14pWiHQLUZiqCYxumS5NGr0vdPf3t+I8K1dk1SM=;
+        b=VPFmNRc6PszTQeqHLstO96DmZipjxmGjQm0U/nXz6qIzmv3SiTvSCSlwhdFasWA6wC
+         n+VS76P2fw7F49HavuBh3dt08Q+PtYqvuDhQl7NVvZRnrqeN9gd/fWfI0zdx6P/zXOSJ
+         NTBj6ymmItdE2y4Zqhu7lW9eagfb1NfxnOHs2ATLfHGnIWTx1ciLFrSgUyzvfpDubw0w
+         nz1f+h7ZfaVt8dwhbYkGEIqA8TwAbJW2LLcCdGGY//hkZWWh7ObhJbUE68tcHbOHDlDA
+         VX2DOXM9weeVUM/212/sIJJBoEy9k98tn0env81VWTGSM7SN4IEqSYcROOuD2INxbl/w
+         Rneg==
+X-Gm-Message-State: AOAM531NfVoMND6QBcXOWlzsmziLdLQooCklUaUnL8Y56emVo9Pp4Am6
+        IkYluPOuqvQvEwqnYVbJ9jCb8ciLSL31Om3Z
+X-Google-Smtp-Source: ABdhPJylkn8Rkgv8jlM6y7AvEhBNM6ZGbJ+xVxjllXxmCYC+caDe2HaNNj7Viu+6fBOVf6IQDjTZTg==
+X-Received: by 2002:a1c:1bd8:: with SMTP id b207mr54136148wmb.114.1636923764108;
+        Sun, 14 Nov 2021 13:02:44 -0800 (PST)
+Received: from eldamar (80-218-24-251.dclient.hispeed.ch. [80.218.24.251])
+        by smtp.gmail.com with ESMTPSA id e18sm12260857wrs.48.2021.11.14.13.02.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Nov 2021 13:02:43 -0800 (PST)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Date:   Sun, 14 Nov 2021 22:02:42 +0100
+From:   Salvatore Bonaccorso <carnil@debian.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Daniel Black <daniel@mariadb.org>,
         Pavel Begunkov <asml.silence@gmail.com>,
         linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com>
- <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com>
- <YXz0roPH+stjFygk@eldamar.lan>
- <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
- <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
- <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
- <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
- <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
+Subject: Re: uring regression - lost write request
+Message-ID: <YZF5csKMKfKBeIyN@eldamar.lan>
+References: <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
  <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk>
  <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
  <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
@@ -75,40 +70,43 @@ References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
  <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
  <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
  <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
-Date:   Sun, 14 Nov 2021 13:55:20 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/14/21 1:33 PM, Daniel Black wrote:
-> On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> Alright, give this one a go if you can. Against -git, but will apply to
->> 5.15 as well.
-> 
-> 
-> Works. Thank you very much.
-> 
-> https://jira.mariadb.org/browse/MDEV-26674?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=205599#comment-205599
-> 
-> Tested-by: Marko M√§kel√§ <marko.makela@mariadb.com>
+Hi,
 
-Awesome, thanks so much for reporting and testing. All bugs are shallow
-when given a reproducer, that certainly helped a ton in figuring out
-what this was and nailing a fix.
+On Sun, Nov 14, 2021 at 01:55:20PM -0700, Jens Axboe wrote:
+> On 11/14/21 1:33 PM, Daniel Black wrote:
+> > On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> Alright, give this one a go if you can. Against -git, but will apply to
+> >> 5.15 as well.
+> > 
+> > 
+> > Works. Thank you very much.
+> > 
+> > https://jira.mariadb.org/browse/MDEV-26674?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=205599#comment-205599
+> > 
+> > Tested-by: Marko M‰kel‰ <marko.makela@mariadb.com>
+> 
+> Awesome, thanks so much for reporting and testing. All bugs are shallow
+> when given a reproducer, that certainly helped a ton in figuring out
+> what this was and nailing a fix.
+> 
+> The patch is already upstream (and in the 5.15 stable queue), and I
+> provided 5.14 patches too.
 
-The patch is already upstream (and in the 5.15 stable queue), and I
-provided 5.14 patches too.
+FTR, I cherry-picked as well the respective commit for Debian's upload
+of 5.15.2-1~exp1 to experimental as
+https://salsa.debian.org/kernel-team/linux/-/commit/657413869fa29b97ec886cf62a420ab43b935fff
+.
 
--- 
-Jens Axboe
-
+Regards,
+Salvatore
