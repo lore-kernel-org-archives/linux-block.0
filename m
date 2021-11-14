@@ -2,136 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8484C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 12:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77911C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 17:12:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC3AB60D42
-	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 12:09:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62E566023F
+	for <linux-block@archiver.kernel.org>; Sun, 14 Nov 2021 17:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235762AbhKNMMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Nov 2021 07:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
+        id S236180AbhKNRNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Nov 2021 12:13:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236090AbhKNMMd (ORCPT
+        with ESMTP id S236629AbhKNRLm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Nov 2021 07:12:33 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2FBDC061200
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 04:09:38 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id v7so37991193ybq.0
-        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 04:09:38 -0800 (PST)
+        Sun, 14 Nov 2021 12:11:42 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DCBC079785
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 09:07:46 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id c8so60612429ede.13
+        for <linux-block@vger.kernel.org>; Sun, 14 Nov 2021 09:07:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=GxHh7Xf9qDW0bNwOyf54n9RvWNxiu2gzljLfng7W7Hs=;
-        b=MdzNFKvZCjQLgS4svb85EjWOd4iKxSAKRoMKmMHggzgzimxZPsmu/wDxNWqifIRXS/
-         xbitv67PKHF+EzCh7/aNts0d7m9cW9DAasFEN6hi6pKUqc6AX09jF6nO9EEEAFezntOe
-         lXs36kchylgNtauz/+8uhRlBSzyL28R30UyQ6H8cOv5QeIwJUW5oLAnRI0Bc3lvK3r11
-         QdRHVJPtJnhgx8wO7DOI2JoAZPDbvv6qSngkcfdA73Iv6ZxgUeEUZmTS5tlu0uYwj9B1
-         q7SxxuhsPjcdTgP4GfvybUmUvXXdjC6i+ISOI/PaoakXA77Ty2tSHQTCwEkNNdCL7HCZ
-         8h8w==
+        d=scylladb-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:from
+         :subject:organization:content-transfer-encoding;
+        bh=/DEnz5yaCpSMfDnRZMBEGZJoD5p4D1PtNdciI4GtM3Y=;
+        b=GCLPuwnAj2qeDLuAvmA3DHUgnJ9jgqwPeeD3aOJa3P4USDSFu0TdLsy38Xj6Mhp9lM
+         DPHLX7XVjpTWPeSHT2QZT/wUmty9fdyfwfaxe/HxUHJdsSDSyM6Hgv7e2s6dBGhdUpeM
+         +5WZ/uvAKi5naBP0NjouCyovNh6+kGXQcfMFUqLu9UB6GqeNSq1Li6Iv5b+DOpPFqkzR
+         opEL/O0T9j8anwVjiwMtjHsno/SEJQtzb8SLLb5BYfYnzYj4cniVz2YmDQEO1ftGd5Xl
+         btDjFC6fcX2ADKdn5rUpHzXi8yJ872PQyGXJDSbF7yCluvCzDiH1WiYcGTRdUfCPIwGi
+         KPVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:from:subject:organization
          :content-transfer-encoding;
-        bh=GxHh7Xf9qDW0bNwOyf54n9RvWNxiu2gzljLfng7W7Hs=;
-        b=mxP+4H3a31WRR8fgrsNaeG40vOhZmEK/gsdMxjEcyGdzVUCidrtMsLDhN8J9KSJxNL
-         Dvu+fqp5OPtyR87XUUorC0rIIgQxiH/yGTB1yK8WTYyRRYLNCYKl5QmbziKATpT0fhGB
-         NRk0jaG3oBUw94K2f3VmKHIivGS5x9Ha8ySIxTr/DSpl7tnsfXJHpwJqt1+MsXZBr7tR
-         xtegNqbNsZMgXyJ/KWW6iCKZVVTCaqwhhGMiUqp/1m9NvfbgbjF+PsCdxb7y9Dfx8+cr
-         4Xh1QSydyotqH+AKBum6zUIBg7gba2G2N4k9aJ4gO6veqvtxP5dFRgLTs0UDyn7YQ5hT
-         SITw==
-X-Gm-Message-State: AOAM533SALexLxLqcG4zjI156V9au70+5vKe1k9y2cNqPFe1M+AkRgko
-        UbYFvUHGNslcQHsZhjnuIS/Glk9YU23R9sxGmnDTfgCJkMw=
-X-Google-Smtp-Source: ABdhPJx0hsSZTaEs7tigcFfIDCmp7AjeBpcFnFGKYb69sB00DmnfLErIkudgBCbo1e00ev9435KtN1glpHXDq0loeeo=
-X-Received: by 2002:a25:24d4:: with SMTP id k203mr32909890ybk.365.1636891777823;
- Sun, 14 Nov 2021 04:09:37 -0800 (PST)
+        bh=/DEnz5yaCpSMfDnRZMBEGZJoD5p4D1PtNdciI4GtM3Y=;
+        b=0/ooZiUxxFX29Kc9oSv+ZPVbdMx10vZMn1kVxrNXr9U6yPeOhJQjKsxwi/NytlDQK6
+         HHxta41XHkwvgFo6jfzRj/gwOGFimddjY9MHD3SNbAVewKJk07jczvmWIyDW4QCVdUDZ
+         ahNkwUB/HzTYSHKkq6yFse+EEKpq268mndwCTFnPgBEcn1EV0Dpddu0b06lcN6AKW/dd
+         RYwGY6Ce5RZpS1DrhVxNCCspd1VSC5CRdRWvlASDYR4h/p5OQOV6lNOtxgnLoulRpD4p
+         4+PMLvd1pwIBl0krcxpQvrKxZOKaOgYCQs2tNbRZb9F6V9gI/j8dmQwznLVY3dNqDWKB
+         N/Pg==
+X-Gm-Message-State: AOAM53318Dz2AsO1BaG1jZVT9NB505d3PA+oTbclE4H4G5fClnj8OPoP
+        iXTLJj6n2UjtZBU0wbdR0JrrV7q3BH/kCw==
+X-Google-Smtp-Source: ABdhPJw7+z5D5zA3qZ6s9mQaJPHppcUHChXr5YE/yJp0HkInPA5p0gFq2DLg3dXm7DJJ3fat62aXeQ==
+X-Received: by 2002:a05:6402:2712:: with SMTP id y18mr44597083edd.212.1636909664378;
+        Sun, 14 Nov 2021 09:07:44 -0800 (PST)
+Received: from [10.0.0.1] (system.cloudius-systems.com. [199.203.229.89])
+        by smtp.gmail.com with ESMTPSA id c7sm5344966ejd.91.2021.11.14.09.07.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Nov 2021 09:07:43 -0800 (PST)
+Message-ID: <c978931b-d3ba-89c7-52ef-30eddf740ba6@scylladb.com>
+Date:   Sun, 14 Nov 2021 19:07:41 +0200
 MIME-Version: 1.0
-From:   Turritopsis Dohrnii Teo En Ming <ceo.teo.en.ming@gmail.com>
-Date:   Sun, 14 Nov 2021 20:09:34 +0800
-Message-ID: <CAMEJMGEYEKvsfy-U5=Om9bO_mCk0jGtK0z0YoU2Z5kowmszqcw@mail.gmail.com>
-Subject: I discovered that Aruba Instant On 1930 24G 4SFP/SFP+ JL682A Switch
- is Running an Operating System with Linux Kernel 4.4.120!
-To:     linux-block@vger.kernel.org
-Cc:     ceo@teo-en-ming-corp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Content-Language: en-US
+To:     Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org
+From:   Avi Kivity <avi@scylladb.com>
+Subject: raid0 vs io_uring
+Organization: ScyllaDB
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Subject: I discovered that Aruba Instant On 1930 24G 4SFP/SFP+ JL682A
-Switch is Running an Operating System with Linux Kernel 4.4.120!
-
-Good day from Singapore,
-
-I discovered that Aruba Instant On 1930 24G 4SFP/SFP+ JL682A Switch is
-Running an Operating System with Linux Kernel 4.4.120!
-
-INTRODUCTION
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-My name is Mr. Turritopsis Dohrnii Teo En Ming, 43 years old as of 14
-Nov 2021. I live in Singapore. Presently I am an IT Consultant with a
-Systems Integrator (SI)/computer firm in Singapore. I am also a Linux
-and open source software and information technology enthusiast.
-
-You can read my autobiography on my redundant blogs. The title of my
-autobiography is:
-
-=E2=80=9CAutobiography of Singaporean Targeted Individual Mr. Turritopsis
-Dohrnii Teo En Ming (Very First Draft, Lots More to Add in Future)=E2=80=9D
-
-Links to my redundant blogs (Blogger and WordPress) can be found in my
-email signature below. These are my main blogs.
-
-I have three other redundant blogs, namely:
-
-https://teo-en-ming.tumblr.com/
-
-https://teo-en-ming.medium.com/
-
-https://teo-en-ming.livejournal.com/
-
-Future/subsequent versions of my autobiography will be published on my
-redundant blogs.
-
-My Blog Books (in PDF format) are also available for download on my
-redundant blogs.
-
-Over the years, I have published many guides, howtos, tutorials, and
-information technology articles on my redundant blogs. I hope that
-they are of use to information technology professionals.
-
-Thank you very much.
+Running a trivial randread, direct=1 fio workload against a RAID-0 
+composed of some nvme devices, I see this pattern:
 
 
+              fio-7066  [009]  1800.209865: function: io_submit_sqes
+              fio-7066  [009]  1800.209866: function:                
+rcu_read_unlock_strict
+              fio-7066  [009]  1800.209866: function:                
+io_submit_sqe
+              fio-7066  [009]  1800.209866: function:                   
+io_init_req
+              fio-7066  [009]  1800.209866: 
+function:                      io_file_get
+              fio-7066  [009]  1800.209866: 
+function:                         fget_many
+              fio-7066  [009]  1800.209866: 
+function:                            __fget_files
+              fio-7066  [009]  1800.209867: 
+function:                               rcu_read_unlock_strict
+              fio-7066  [009]  1800.209867: function:                   
+io_req_prep
+              fio-7066  [009]  1800.209867: 
+function:                      io_prep_rw
+              fio-7066  [009]  1800.209867: function:                   
+io_queue_sqe
+              fio-7066  [009]  1800.209867: 
+function:                      io_req_defer
+              fio-7066  [009]  1800.209867: 
+function:                      __io_queue_sqe
+              fio-7066  [009]  1800.209868: 
+function:                         io_issue_sqe
+              fio-7066  [009]  1800.209868: 
+function:                            io_read
+              fio-7066  [009]  1800.209868: 
+function:                               io_import_iovec
+              fio-7066  [009]  1800.209868: 
+function:                               __io_file_supports_async
+              fio-7066  [009]  1800.209868: 
+function:                                  I_BDEV
+              fio-7066  [009]  1800.209868: 
+function:                               __kmalloc
+              fio-7066  [009]  1800.209868: 
+function:                                  kmalloc_slab
+              fio-7066  [009]  1800.209868: function: __cond_resched
+              fio-7066  [009]  1800.209868: function:                
+rcu_all_qs
+              fio-7066  [009]  1800.209869: function: should_failslab
+              fio-7066  [009]  1800.209869: 
+function:                               io_req_map_rw
+              fio-7066  [009]  1800.209869: 
+function:                         io_arm_poll_handler
+              fio-7066  [009]  1800.209869: 
+function:                         io_queue_async_work
+              fio-7066  [009]  1800.209869: 
+function:                            io_prep_async_link
+              fio-7066  [009]  1800.209869: 
+function:                               io_prep_async_work
+              fio-7066  [009]  1800.209870: 
+function:                            io_wq_enqueue
+              fio-7066  [009]  1800.209870: 
+function:                               io_wqe_enqueue
+              fio-7066  [009]  1800.209870: 
+function:                                  _raw_spin_lock_irqsave
+              fio-7066  [009]  1800.209870: function: 
+_raw_spin_unlock_irqrestore
 
 
 
------BEGIN EMAIL SIGNATURE-----
+ From which I deduce that __io_file_supports_async() (today named 
+__io_file_supports_nowait) returns false, and therefore every io_uring 
+operation is bounced to a workqueue with the resulting great loss in 
+performance.
 
-The Gospel for all Targeted Individuals (TIs):
 
-[The New York Times] Microwave Weapons Are Prime Suspect in Ills of
-U.S. Embassy Workers
+However, I also see NOWAIT is part of the default set of flags:
 
-Link:
-https://www.nytimes.com/2018/09/01/science/sonic-attack-cuba-microwave.html
 
-***************************************************************************=
-*****************
+#define QUEUE_FLAG_MQ_DEFAULT   ((1 << QUEUE_FLAG_IO_STAT) |            \
+                                  (1 << QUEUE_FLAG_SAME_COMP) |          \
+                                  (1 << QUEUE_FLAG_NOWAIT))
 
-Singaporean Targeted Individual Mr. Turritopsis Dohrnii Teo En Ming's
-Academic Qualifications as at 14 Feb 2019 and refugee seeking attempts
-at the United Nations Refugee Agency Bangkok (21 Mar 2017), in Taiwan
-(5 Aug 2019) and Australia (25 Dec 2019 to 9 Jan 2020):
+and I don't see that md touches it (I do see that dm plays with it).
 
-[1] https://tdtemcerts.wordpress.com/
 
-[2] https://tdtemcerts.blogspot.sg/
+So, what's the story? does md not support NOWAIT? If so, that's a huge 
+blow to io_uring with md. If it does, are there any clues about why I 
+see requests bouncing to a workqueue?
 
-[3] https://www.scribd.com/user/270125049/Teo-En-Ming
-
------END EMAIL SIGNATURE-----
