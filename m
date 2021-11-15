@@ -2,196 +2,337 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 756EEC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 14:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BE6C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 14:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B55261BFA
-	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 14:40:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C47F63223
+	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 14:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235254AbhKOOnk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Nov 2021 09:43:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58370 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232158AbhKOOn0 (ORCPT
+        id S236243AbhKOPBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Nov 2021 10:01:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44986 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232166AbhKOPAz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Nov 2021 09:43:26 -0500
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FBDC061570
-        for <linux-block@vger.kernel.org>; Mon, 15 Nov 2021 06:40:27 -0800 (PST)
-Received: by mail-il1-x12c.google.com with SMTP id i12so16876345ila.12
-        for <linux-block@vger.kernel.org>; Mon, 15 Nov 2021 06:40:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=THx+QpR1KF4fxo25IMLRna/kbmWFp1uPvNC37xHQcpo=;
-        b=3XMMkL55ToaC2LxfngBhurWV3ts2w5UY+VStn9ZGCHOFvW04BbF2tdGMM5litV9keu
-         vf/q6TlmrJeURnW06eZ/QX8ciDuj8QoFyr50Qi/4qDmXhnBMUscQcUGqNg8WE/5L+dqE
-         oRYpYFl4lGKlN0BepUmdGQVCd0A+PiuFKL3K0AZwxWa5bp3Ml++CRKTYqRahe+9ax2c9
-         BDtrSe2ERqLvNaCirDfvmDmGia/3y0arH3pxT8KUUg/gRF8QtGAmguORHDd1/al7pv51
-         ksGAzhmZXegRAmyR/FNTZD37SAtSwU2+xJcAZBF17vJw6RaOll++I8HeuALQCznm25Fa
-         6A3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=THx+QpR1KF4fxo25IMLRna/kbmWFp1uPvNC37xHQcpo=;
-        b=XyRhfgrrCIsVAg7xH02v5HqziG/MO9rj7OYv6dtPulkA51vkV7Fy5XH6D8kgXo7zWe
-         tCurgEiHc3L72DEnZbja6nnJOgY81s053GnMMEikNPOROyIG4nUl8HTFo5SVlREoduUB
-         LliV9orxPRNo0LctNV1fR5N1NCOz6PIgv1ld/AUGMzm0aYEaIEs2fLUvojFdY8tcUSZX
-         kXeG0p4IWlDi8UcdPVogjWUCAaAVL+mV0tTP8hpazQTswz5RM8XJSL7Uv+ufmA8xMWTq
-         3YvUNNP62BeENFRoLttbjFjOU+UyparGHn8n3TiKPtp2Zb6abaRTze4B+VNfWLWbwGKE
-         Jamg==
-X-Gm-Message-State: AOAM5301xQ27au+tFuP+A9l7w+5N3Wd37nHPeSJvDg4hIY5Ve3qRBKDH
-        d4uFcGc9QAfWJFQR2whXX/u8cA==
-X-Google-Smtp-Source: ABdhPJxs3FxJRu9miHpPUlcKGRm5la5CZAhagJO8dPv9HCIBIhWrpHcx1l/SC0rPQQru3AUZHi2f4Q==
-X-Received: by 2002:a05:6e02:20ea:: with SMTP id q10mr21957288ilv.10.1636987226312;
-        Mon, 15 Nov 2021 06:40:26 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id c11sm8891673ilm.74.2021.11.15.06.40.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Nov 2021 06:40:25 -0800 (PST)
-Subject: Re: [PATCH] blk-mq: sync blk-mq queue in both blk_cleanup_queue and
- disk_release()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, ChanghuiZhong <czhong@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-scsi@vger.kernel.org
-References: <20211115075650.578051-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8bd0c95a-919c-3fd4-99bf-7d98400fe4a6@kernel.dk>
-Date:   Mon, 15 Nov 2021 07:40:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 15 Nov 2021 10:00:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636988280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bl5iR7NfjbR8sx3eIZdcmulpmPvggVFfksNMu4z4r1I=;
+        b=Mooh1PT9pdSI+RGumLgzPLfU6lWjQj4UOf1/1nYRkw6z5RLkNcJ6H1KFpF8hKZCvcTdfLu
+        puwI5Xslkzmbd/dnNm1E0EgdC9tiX/ZLVGzL6OUc7xNq/nKSo2phcbhdPeOQCLNz2dSnI9
+        nmOhUaUMg/taXtwVy3SUUvUjoZJweYA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-Gc4GI4teOGyA1vNyb6nbUA-1; Mon, 15 Nov 2021 09:57:58 -0500
+X-MC-Unique: Gc4GI4teOGyA1vNyb6nbUA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D528887D54F;
+        Mon, 15 Nov 2021 14:57:56 +0000 (UTC)
+Received: from T590 (ovpn-8-36.pek2.redhat.com [10.72.8.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D339219811;
+        Mon, 15 Nov 2021 14:57:51 +0000 (UTC)
+Date:   Mon, 15 Nov 2021 22:57:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Haris Iqbal <haris.iqbal@ionos.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        sashal@kernel.org, jack@suse.cz, Jinpu Wang <jinpu.wang@ionos.com>,
+        Danil Kipnis <danil.kipnis@ionos.com>, ming.lei@rehdat.com
+Subject: Re: Observing an fio hang with RNBD device in the latest v5.10.78
+ Linux kernel
+Message-ID: <YZJ1aty1WVkW55aI@T590>
+References: <CAJpMwyixY_-AbMvtGGMBWBO3+oOEF9fuWHkYpLWDbXo3dcAGfg@mail.gmail.com>
+ <YYsiqUpLdNtshZms@T590>
+ <CAJpMwyhv0ccnLc1YjJypGs6khar+GjfgmBUH_f-ugo9hpM1Pig@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20211115075650.578051-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJpMwyhv0ccnLc1YjJypGs6khar+GjfgmBUH_f-ugo9hpM1Pig@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/15/21 12:56 AM, Ming Lei wrote:
-> For avoiding to slow down queue destroy, we don't call
-> blk_mq_quiesce_queue() in blk_cleanup_queue(), instead of delaying to
-> sync blk-mq queue in blk_release_queue().
+On Mon, Nov 15, 2021 at 02:01:32PM +0100, Haris Iqbal wrote:
+> On Wed, Nov 10, 2021 at 2:39 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Hello Haris,
+> >
+> > On Tue, Nov 09, 2021 at 10:32:32AM +0100, Haris Iqbal wrote:
+> > > Hi,
+> > >
+> > > We are observing an fio hang with the latest v5.10.78 Linux kernel
+> > > version with RNBD. The setup is as follows,
+> > >
+> > > On the server side, 16 nullblk devices.
+> > > On the client side, map those 16 block devices through RNBD-RTRS.
+> > > Change the scheduler for those RNBD block devices to mq-deadline.
+> > >
+> > > Run fios with the following configuration.
+> > >
+> > > [global]
+> > > description=Emulation of Storage Server Access Pattern
+> > > bssplit=512/20:1k/16:2k/9:4k/12:8k/19:16k/10:32k/8:64k/4
+> > > fadvise_hint=0
+> > > rw=randrw:2
+> > > direct=1
+> > > random_distribution=zipf:1.2
+> > > time_based=1
+> > > runtime=60
+> > > ramp_time=1
+> > > ioengine=libaio
+> > > iodepth=128
+> > > iodepth_batch_submit=128
+> > > iodepth_batch_complete=128
+> > > numjobs=1
+> > > group_reporting
+> > >
+> > >
+> > > [job1]
+> > > filename=/dev/rnbd0
+> > > [job2]
+> > > filename=/dev/rnbd1
+> > > [job3]
+> > > filename=/dev/rnbd2
+> > > [job4]
+> > > filename=/dev/rnbd3
+> > > [job5]
+> > > filename=/dev/rnbd4
+> > > [job6]
+> > > filename=/dev/rnbd5
+> > > [job7]
+> > > filename=/dev/rnbd6
+> > > [job8]
+> > > filename=/dev/rnbd7
+> > > [job9]
+> > > filename=/dev/rnbd8
+> > > [job10]
+> > > filename=/dev/rnbd9
+> > > [job11]
+> > > filename=/dev/rnbd10
+> > > [job12]
+> > > filename=/dev/rnbd11
+> > > [job13]
+> > > filename=/dev/rnbd12
+> > > [job14]
+> > > filename=/dev/rnbd13
+> > > [job15]
+> > > filename=/dev/rnbd14
+> > > [job16]
+> > > filename=/dev/rnbd15
+> > >
+> > > Some of the fio threads hangs and the fio never finishes.
+> > >
+> > > fio fio.ini
+> > > job1: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job2: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job3: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job4: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job5: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job6: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job7: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job8: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job9: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job10: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job11: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job12: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job13: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job14: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job15: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > job16: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > fio-3.12
+> > > Starting 16 processes
+> > > Jobs: 16 (f=12):
+> > > [m(3),/(2),m(5),/(1),m(1),/(1),m(3)][0.0%][r=130MiB/s,w=130MiB/s][r=14.7k,w=14.7k
+> > > IOPS][eta 04d:07h:4
+> > > Jobs: 15 (f=11):
+> > > [m(3),/(2),m(5),/(1),_(1),/(1),m(3)][51.2%][r=7395KiB/s,w=6481KiB/s][r=770,w=766
+> > > IOPS][eta 01m:01s]
+> > > Jobs: 15 (f=11): [m(3),/(2),m(5),/(1),_(1),/(1),m(3)][52.7%][eta 01m:01s]
+> > >
+> > > We checked the block devices, and there are requests waiting in their
+> > > fifo (not on all devices, just few whose corresponding fio threads are
+> > > hung).
+> > >
+> > > $ cat /sys/kernel/debug/block/rnbd0/sched/read_fifo_list
+> > > 00000000ce398aec {.op=READ, .cmd_flags=,
+> > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > .internal_tag=209}
+> > > 000000005ec82450 {.op=READ, .cmd_flags=,
+> > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > .internal_tag=210}
+> > >
+> > > $ cat /sys/kernel/debug/block/rnbd0/sched/write_fifo_list
+> > > 000000000c1557f5 {.op=WRITE, .cmd_flags=SYNC|IDLE,
+> > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > .internal_tag=195}
+> > > 00000000fc6bfd98 {.op=WRITE, .cmd_flags=SYNC|IDLE,
+> > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > .internal_tag=199}
+> > > 000000009ef7c802 {.op=WRITE, .cmd_flags=SYNC|IDLE,
+> > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > .internal_tag=217}
+> >
+> > Can you post the whole debugfs log for rnbd0?
+> >
+> > (cd /sys/kernel/debug/block/rnbd0 && find . -type f -exec grep -aH . {} \;)
 > 
-> However, this way has caused kernel oops[1], reported by Changhui. The log
-> shows that scsi_device can be freed before running blk_release_queue(),
-> which is expected too since scsi_device is released after the scsi disk
-> is closed and the scsi_device is removed.
-> 
-> Fixes the issue by sync blk-mq in both blk_cleanup_queue() and
-> disk_release():
-> 
-> 1) when disk_release() is run, the disk has been closed, and any sync
-> dispatch activities have been done, so sync blk-mq queue is enough to quiesce
-> filesystem dispatch activity.
-> 
-> 2) in blk_cleanup_queue(), we only focus on passthrough request, and
-> passthrough request is always explicitly allocated & freed by
-> passthrough request caller, so once queue is frozen, all sync dispatch activity
-> for passthrough request has been done, then it is enough to sync blk-mq queue
-> for avoiding to run any dispatch activity.
-> 
-> [1] kernel panic log
-> [12622.769416] BUG: kernel NULL pointer dereference, address: 0000000000000300
-> [12622.777186] #PF: supervisor read access in kernel mode
-> [12622.782918] #PF: error_code(0x0000) - not-present page
-> [12622.788649] PGD 0 P4D 0
-> [12622.791474] Oops: 0000 [#1] PREEMPT SMP PTI
-> [12622.796138] CPU: 10 PID: 744 Comm: kworker/10:1H Kdump: loaded Not tainted 5.15.0+ #1
-> [12622.804877] Hardware name: Dell Inc. PowerEdge R730/0H21J3, BIOS 1.5.4 10/002/2015
-> [12622.813321] Workqueue: kblockd blk_mq_run_work_fn
-> [12622.818572] RIP: 0010:sbitmap_get+0x75/0x190
-> [12622.823336] Code: 85 80 00 00 00 41 8b 57 08 85 d2 0f 84 b1 00 00 00 45 31 e4 48 63 cd 48 8d 1c 49 48 c1 e3 06 49 03 5f 10 4c 8d 6b 40 83 f0 01 <48> 8b 33 44 89 f2 4c 89 ef 0f b6 c8 e8 fa f3 ff ff 83 f8 ff 75 58
-> [12622.844290] RSP: 0018:ffffb00a446dbd40 EFLAGS: 00010202
-> [12622.850120] RAX: 0000000000000001 RBX: 0000000000000300 RCX: 0000000000000004
-> [12622.858082] RDX: 0000000000000006 RSI: 0000000000000082 RDI: ffffa0b7a2dfe030
-> [12622.866042] RBP: 0000000000000004 R08: 0000000000000001 R09: ffffa0b742721334
-> [12622.874003] R10: 0000000000000008 R11: 0000000000000008 R12: 0000000000000000
-> [12622.881964] R13: 0000000000000340 R14: 0000000000000000 R15: ffffa0b7a2dfe030
-> [12622.889926] FS:  0000000000000000(0000) GS:ffffa0baafb40000(0000) knlGS:0000000000000000
-> [12622.898956] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [12622.905367] CR2: 0000000000000300 CR3: 0000000641210001 CR4: 00000000001706e0
-> [12622.913328] Call Trace:
-> [12622.916055]  <TASK>
-> [12622.918394]  scsi_mq_get_budget+0x1a/0x110
-> [12622.922969]  __blk_mq_do_dispatch_sched+0x1d4/0x320
-> [12622.928404]  ? pick_next_task_fair+0x39/0x390
-> [12622.933268]  __blk_mq_sched_dispatch_requests+0xf4/0x140
-> [12622.939194]  blk_mq_sched_dispatch_requests+0x30/0x60
-> [12622.944829]  __blk_mq_run_hw_queue+0x30/0xa0
-> [12622.949593]  process_one_work+0x1e8/0x3c0
-> [12622.954059]  worker_thread+0x50/0x3b0
-> [12622.958144]  ? rescuer_thread+0x370/0x370
-> [12622.962616]  kthread+0x158/0x180
-> [12622.966218]  ? set_kthread_struct+0x40/0x40
-> [12622.970884]  ret_from_fork+0x22/0x30
-> [12622.974875]  </TASK>
-> [12622.977309] Modules linked in: scsi_debug rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache netfs sunrpc dm_multipath intel_rapl_msr intel_rapl_common dell_wmi_descriptor sb_edac rfkill video x86_pkg_temp_thermal intel_powerclamp dcdbas coretemp kvm_intel kvm mgag200 irqbypass i2c_algo_bit rapl drm_kms_helper ipmi_ssif intel_cstate intel_uncore syscopyarea sysfillrect sysimgblt fb_sys_fops pcspkr cec mei_me lpc_ich mei ipmi_si ipmi_devintf ipmi_msghandler acpi_power_meter drm fuse xfs libcrc32c sr_mod cdrom sd_mod t10_pi sg ixgbe ahci libahci crct10dif_pclmul crc32_pclmul crc32c_intel libata megaraid_sas ghash_clmulni_intel tg3 wdat_wdt mdio dca wmi dm_mirror dm_region_hash dm_log dm_mod [last unloaded: scsi_debug]
-> 
-> Reported-by: ChanghuiZhong <czhong@redhat.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: linux-scsi@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c  |  4 +++-
->  block/blk-mq.c    | 13 +++++++++++++
->  block/blk-mq.h    |  2 ++
->  block/blk-sysfs.c | 10 ----------
->  block/genhd.c     |  2 ++
->  5 files changed, 20 insertions(+), 11 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 9ee32f85d74e..78710567cf69 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -363,8 +363,10 @@ void blk_cleanup_queue(struct request_queue *q)
->  	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
->  
->  	blk_sync_queue(q);
-> -	if (queue_is_mq(q))
-> +	if (queue_is_mq(q)) {
-> +		blk_mq_sync_queue(q);
->  		blk_mq_exit_queue(q);
-> +	}
->  
->  	/*
->  	 * In theory, request pool of sched_tags belongs to request queue.
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 3ab34c4f20da..36260ce0b9ec 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4417,6 +4417,19 @@ unsigned int blk_mq_rq_cpu(struct request *rq)
->  }
->  EXPORT_SYMBOL(blk_mq_rq_cpu);
->  
-> +void blk_mq_sync_queue(struct request_queue *q)
-> +{
-> +	if (queue_is_mq(q)) {
-> +		struct blk_mq_hw_ctx *hctx;
-> +		int i;
-> +
-> +		cancel_delayed_work_sync(&q->requeue_work);
-> +
-> +		queue_for_each_hw_ctx(q, hctx, i)
-> +			cancel_delayed_work_sync(&hctx->run_work);
-> +	}
-> +}
+> Attached the logfile.
 
-Fix looks good to me, but let's rename this function
-blk_mq_cancel_work_sync() instead, as that pretty much tells you what it
-does without needing to look it up. sync_queue() could have a drastically
-different meaning, since 'sync' is a bit overloaded on the storage
-front.
+logfile just shows that there are requests in scheduler queue.
 
--- 
-Jens Axboe
+> 
+> >
+> > >
+> > >
+> > > Potential points which fixes the hang
+> > >
+> > > 1) Using no scheduler (none) on the client side RNBD block devices
+> > > results in no hang.
+> > >
+> > > 2) In the fio config, changing the line "iodepth_batch_complete=128"
+> > > to the following fixes the hang,
+> > > iodepth_batch_complete_min=1
+> > > iodepth_batch_complete_max=128
+> > > OR,
+> > > iodepth_batch_complete=0
+> > >
+> > > 3) We also tracked down the version from which the hang started. The
+> > > hang started with v5.10.50, and the following commit was one which
+> > > results in the hang
+> > >
+> > > commit 512106ae2355813a5eb84e8dc908628d52856890
+> > > Author: Ming Lei <ming.lei@redhat.com>
+> > > Date:   Fri Jun 25 10:02:48 2021 +0800
+> > >
+> > >     blk-mq: update hctx->dispatch_busy in case of real scheduler
+> > >
+> > >     [ Upstream commit cb9516be7708a2a18ec0a19fe3a225b5b3bc92c7 ]
+> > >
+> > >     Commit 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> > >     starts to support io batching submission by using hctx->dispatch_busy.
+> > >
+> > >     However, blk_mq_update_dispatch_busy() isn't changed to update
+> > > hctx->dispatch_busy
+> > >     in that commit, so fix the issue by updating hctx->dispatch_busy in case
+> > >     of real scheduler.
+> > >
+> > >     Reported-by: Jan Kara <jack@suse.cz>
+> > >     Reviewed-by: Jan Kara <jack@suse.cz>
+> > >     Fixes: 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> > >     Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > >     Link: https://lore.kernel.org/r/20210625020248.1630497-1-ming.lei@redhat.com
+> > >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > >     Signed-off-by: Sasha Levin <sashal@kernel.org>
+> > >
+> > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > index 00d6ed2fe812..a368eb6dc647 100644
+> > > --- a/block/blk-mq.c
+> > > +++ b/block/blk-mq.c
+> > > @@ -1242,9 +1242,6 @@ static void blk_mq_update_dispatch_busy(struct
+> > > blk_mq_hw_ctx *hctx, bool busy)
+> > >  {
+> > >         unsigned int ewma;
+> > >
+> > > -       if (hctx->queue->elevator)
+> > > -               return;
+> > > -
+> > >         ewma = hctx->dispatch_busy;
+> > >
+> > >         if (!ewma && !busy)
+> > >
+> > > We reverted the commit and tested and there is no hang.
+> > >
+> > > 4) Lastly, we tested newer version like 5.13, and there is NO hang in
+> > > that also. Hence, probably some other change fixed it.
+> >
+> > Can you observe the issue on v5.10? Maybe there is one pre-patch of commit cb9516be7708
+> > ("blk-mq: update hctx->dispatch_busy in case of real scheduler merged")
+> > which is missed to 5.10.y.
+> 
+> If you mean v5.10.0, then no, I see no hang there. As I mentioned
+> before, there is no hang till v5.10.49.
+> 
+> >
+> > And not remember that there is fix for commit cb9516be7708 in mainline.
+> >
+> > commit cb9516be7708 is merged to v5.14, instead of v5.13, did you test v5.14 or v5.15?
+> >
+> > BTW, commit cb9516be7708 should just affect performance, not supposed to cause
+> > hang.
+> 
+> True. It does look like that from the small code change.
+
+->dispatch_busy just affects the batching size for dequeuing request
+from scheduler queue, see the following code in
+__blk_mq_do_dispatch_sched():
+
+        if (hctx->dispatch_busy)
+                max_dispatch = 1;
+        else
+                max_dispatch = hctx->queue->nr_requests;
+
+
+Also see blk_mq_do_dispatch_sched():
+
+static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+{
+        int ret;
+
+        do {
+                ret = __blk_mq_do_dispatch_sched(hctx);
+        } while (ret == 1);
+
+        return ret;
+}
+
+If any request can be dispatched to driver, blk-mq will continue to
+dispatch until -EAGAIN or 0 is returned from __blk_mq_do_dispatch_sched().
+
+In case of -EAGAIN, blk-mq will try again to dispatch request and run
+queue asynchronously if another -EAGAIN is returend.
+
+In case of 0 returned, blk_mq_dispatch_rq_list() can't make progress,
+the request will be moved to hctx->dispatch, and blk-mq covers the
+re-run uueue until all requests in hctx->dispatch are dispatched, then
+still dispatch request from scheduler queue.
+
+So the current code has provided forward-progress, and I don't see how
+patch 'blk-mq: update hctx->dispatch_busy in case of real scheduler' can
+cause this issue.
+
+Also not see any request in hctx->dispatch from debugfs log.
+
+> 
+> I wasn't able to test in v5.14 and v5.15 because we are seeing some
+> other errors in those versions, most probably related to the
+> rdma-core/rxe driver.
+
+I'd rather see test result on upstream kernel of v5.14 or v5.15 or recent
+v5.15-rc.
+
+
+
+Thanks,
+Ming
 
