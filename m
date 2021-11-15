@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 079F4C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 18:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E90C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 20:36:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF85161AF0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 18:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAFA263238
+	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 20:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243464AbhKOTBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Nov 2021 14:01:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59670 "EHLO mail.kernel.org"
+        id S232326AbhKOUjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Nov 2021 15:39:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45388 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243487AbhKOS7x (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Nov 2021 13:59:53 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CC62661AF0;
-        Mon, 15 Nov 2021 18:13:37 +0000 (UTC)
+        id S1344098AbhKOTXW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Nov 2021 14:23:22 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 73952633BF;
+        Mon, 15 Nov 2021 18:51:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1637000018;
+        s=korg; t=1637002312;
         bh=FUUzhV0aQZHF45SsL1ZUN80Nlr/CDWDn2vwQsaJOprA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=txSQUiLHLMPauq79XP83qM40+deBMJKNZBbzNgC0Lo3Cx2koho3l2AlbKaZoVFyLd
-         ZdP2dkWfNKseSJkhHH/fDvn5ueIFSYuozsZdijrqZcz3TO6ry8KHWsJ9bQjsYFwLDG
-         p8VR/ZjsalLu0pqGYO451WL52EuYjqqdCi0uaMaI=
+        b=a4E/bT5O0EjMQueJBw6lrwhJLjCoISqMM4lT8rTAY/nLx30tKhlMbGPYiIdtkSLsa
+         ltEPsrsEJGGpfWjCQ+pXh/FgEVh/K0+sZJP59veJ04iDIqNIbcAidPizuhzY9Z6L9M
+         k37UGei1KazV6czxQQQmkXK5LDzeV1VVpV2EueeQ=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         stable@vger.kernel.org, Michael Schmitz <schmitzmic@gmail.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.14 508/849] block: ataflop: more blk-mq refactoring fixes
-Date:   Mon, 15 Nov 2021 17:59:51 +0100
-Message-Id: <20211115165437.471352298@linuxfoundation.org>
+Subject: [PATCH 5.15 517/917] block: ataflop: more blk-mq refactoring fixes
+Date:   Mon, 15 Nov 2021 18:00:12 +0100
+Message-Id: <20211115165446.303997101@linuxfoundation.org>
 X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211115165419.961798833@linuxfoundation.org>
-References: <20211115165419.961798833@linuxfoundation.org>
+In-Reply-To: <20211115165428.722074685@linuxfoundation.org>
+References: <20211115165428.722074685@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
