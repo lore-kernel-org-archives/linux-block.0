@@ -2,88 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D045C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5100CC433EF
 	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 22:24:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 487F463259
+	by mail.kernel.org (Postfix) with ESMTP id 39E2163243
 	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 22:24:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346796AbhKOW1F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Nov 2021 17:27:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47710 "EHLO
+        id S240189AbhKOW0s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Nov 2021 17:26:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347024AbhKOWVO (ORCPT
+        with ESMTP id S1346023AbhKOWRz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Nov 2021 17:21:14 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFD42C02555A;
-        Mon, 15 Nov 2021 13:38:04 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id 188so15697884pgb.7;
-        Mon, 15 Nov 2021 13:38:04 -0800 (PST)
+        Mon, 15 Nov 2021 17:17:55 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51AB2C03E03F;
+        Mon, 15 Nov 2021 13:37:24 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id x131so16157514pfc.12;
+        Mon, 15 Nov 2021 13:37:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=VPVmrbQVel0mA72if0mZWdLyJ4gRhL/uwg+URLpfYkE=;
-        b=CUHZ/mHKViMS9M8ILAx4J8v1IB1bL7pb4V+2Jc/fQqJmJ4Xf2KyzHJ1t6JrYP9EFX9
-         KgiVyDD6/sejqc98LZaUQ1iK0aSnCodS3sU71BRUpbUC1KcJbb+4M3GLLuhdyBBo/9Oz
-         vQrfsQUWXOSrWzWc68qGSeWfhBN6LqjfasdFEhWNiUqA7fRLPyz1v1u3HyOtnYdJ1Aha
-         dVmZDPZ87tS9eOLoqAIiZnj3mCS42EeEk5A66e1Ysrpd+ywUXpoCCUEiwZxtjFsbzcfD
-         Pdx5nY/BzV6BlAX0QyY6IjT02XND9xS9GDq7UbLnXiPLJ1XccC4Z5rbAAzslT70i0uWv
-         uXyQ==
+        bh=Sy0cBwSY9OB0AfhJQItSKu5D9CkSMvp3AC0Bk6Ha4VQ=;
+        b=pN6KNRwqQkwkOps2PgEPNWx6ZqE9B6BEhhsEEiyYN7MYDinla+sbz/gXcJ2ygSQhJq
+         7z3VZJaa/DEz0KQ58iKtuRH5SsFuyQ92/N6vUoBv/9dDKUW7K7qPAkRKPuN2kQpuAGZ8
+         8Ei+42gAjmPc8TZL5pV8KQvgGGYy6VZFv6X6zQQ8F8Nk4XJqV+TdlZ8g/beGlO7knjdu
+         iTWmYMHh7t3zasaqNfMIvD99JnxyeSZMC8mEVBacCZbIvI/L8zZQOG6nxXoXnBUyQc2W
+         inCJcZdDwvNBZlTM7IsZkrub7/Q+/9X1vrdlI6g6z5gULncLtvNH/cwVtPaotIizYEZp
+         mEAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to;
-        bh=VPVmrbQVel0mA72if0mZWdLyJ4gRhL/uwg+URLpfYkE=;
-        b=plkbBnHM1tPJBg5yiHXXJ4Kxom2NIKth4bkjKNFk0byh1k472zWGjthdlfHlZsH0SJ
-         YJLVWThKAlXc592TVidiDj2sWghfmafUPwmbKHsmHipw394kqoIGil2Va49WOnFVOhXg
-         KFxenqMsKhtyTI+4+h5LKE4bp3EXk/zE22mrPPsm61F3J6YmPeH+l3ob0D5HQTMKgrO9
-         Q4MPsoD6mc7bcqy7ObmNp/MZDpOKeHEflBVsGk6+YxmfIycUL/LoykMONfJ+VD9h+QCR
-         /6QMCsF8NKFYBT7FsFVJq6AbGG2Hordn6kd4LjTx/vzm1ZITL7+RTzmgJvV9LWWqudI3
-         8slQ==
-X-Gm-Message-State: AOAM530T8Lg6BSQy6ZGnPTBnsnaILeyyf+xxPQkU/rINtTuJS0CvVqY3
-        9by6qyHajwYND0uILFo9QeXRnvwO71vhimDT
-X-Google-Smtp-Source: ABdhPJyYigmgnN+saypor+aJ9s3iqqA70d9Ql7CehyLHbL4vlGM/gb4O6Xq8thqvwWJjho7VO9jcNA==
-X-Received: by 2002:a63:5c6:: with SMTP id 189mr1396152pgf.187.1637012284358;
-        Mon, 15 Nov 2021 13:38:04 -0800 (PST)
+        bh=Sy0cBwSY9OB0AfhJQItSKu5D9CkSMvp3AC0Bk6Ha4VQ=;
+        b=ILTjJp16jW+/3Eb83+PE8tgG24cY5t2gcCUt2a/e7zSh9LDzqmI/J23NTijDE44aaD
+         FWtEPO/LJ4iT3qTpqRUwAtn8RaHAzm3i+ookMGttAIvwMeNEGcCy+prxQAAuFa6NF8gU
+         P1rZFnDLtBfpasLoVdsLEx+PXo9vVsHa2o0hr1BKgAhL3jJAKjTRaTLjK4eJUO5wy4x4
+         G1C7xiys0vn8njphMxwF+hnJ8acq0nV0UnB7nNbmSdtxK+zx4SQBHKm9NKtOudheoRoo
+         7CfLlHVfpyO/4N7p4z1L05GTEAUDY719VaW4erY9Qqj1iFxHjn4SvdbiyTNr8DpJO6jZ
+         XFmQ==
+X-Gm-Message-State: AOAM532SwLwgCbANeNPrmrq7B06vu85lyQHsiw1GJB+Bg46Sm3glvH5a
+        ha+EM3xNI5ArIPQCpvagKD8=
+X-Google-Smtp-Source: ABdhPJzxoEiP+heMxH0Z2jUQxgSXbZsg9q3n2L2yj/seOLNJg38GYvnglBfSC4AtOVzpjRUom5ybYw==
+X-Received: by 2002:a63:4e09:: with SMTP id c9mr1401145pgb.83.1637012243829;
+        Mon, 15 Nov 2021 13:37:23 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id f19sm10758886pgj.7.2021.11.15.13.38.03
+        by smtp.gmail.com with ESMTPSA id ls14sm243463pjb.49.2021.11.15.13.37.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 13:38:03 -0800 (PST)
+        Mon, 15 Nov 2021 13:37:23 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 15 Nov 2021 11:38:02 -1000
+Date:   Mon, 15 Nov 2021 11:37:21 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-iocost: drop selecting undefined BLK_RQ_IO_DATA_LEN
-Message-ID: <YZLTOnv3PDmQMTKY@slm.duckdns.org>
-References: <20211112093728.3237-1-lukas.bulwahn@gmail.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH] blk-cgroup: fix missing put device in error path from
+ blkg_conf_pref()
+Message-ID: <YZLTEZS66QqRxjuX@slm.duckdns.org>
+References: <20211102020705.2321858-1-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211112093728.3237-1-lukas.bulwahn@gmail.com>
+In-Reply-To: <20211102020705.2321858-1-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 10:37:28AM +0100, Lukas Bulwahn wrote:
-> Commit cd006509b0a9 ("blk-iocost: account for IO size when testing
-> latencies") selects the non-existing config BLK_RQ_IO_DATA_LEN in
-> config BLK_CGROUP_IOCOST.
+On Tue, Nov 02, 2021 at 10:07:05AM +0800, Yu Kuai wrote:
+> If blk_queue_enter() failed due to queue is dying, the
+> blkdev_put_no_open() is needed because blkcg_conf_open_bdev() succeeded.
 > 
-> Hence, ./scripts/checkkconfigsymbols.py warns:
-> 
->   BLK_RQ_IO_DATA_LEN
->   Referencing files: block/Kconfig
-> 
-> Probably, this select is just some unintended left-over from an earlier
-> draft version; BLK_RQ_IO_DATA_LEN was never defined in any commit in the
-> repository. So, drop this dead select to an undefined config.
-> 
-> Fixes: cd006509b0a9 ("blk-iocost: account for IO size when testing latencies")
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> Fixes: 0c9d338c8443 ("blk-cgroup: synchronize blkg creation against policy deactivation")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
 Acked-by: Tejun Heo <tj@kernel.org>
 
