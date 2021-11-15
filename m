@@ -2,259 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E90C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 20:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E907C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 20:36:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAFA263238
-	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 20:36:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27C0263238
+	for <linux-block@archiver.kernel.org>; Mon, 15 Nov 2021 20:36:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232326AbhKOUjJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Nov 2021 15:39:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45388 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344098AbhKOTXW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Nov 2021 14:23:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 73952633BF;
-        Mon, 15 Nov 2021 18:51:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1637002312;
-        bh=FUUzhV0aQZHF45SsL1ZUN80Nlr/CDWDn2vwQsaJOprA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a4E/bT5O0EjMQueJBw6lrwhJLjCoISqMM4lT8rTAY/nLx30tKhlMbGPYiIdtkSLsa
-         ltEPsrsEJGGpfWjCQ+pXh/FgEVh/K0+sZJP59veJ04iDIqNIbcAidPizuhzY9Z6L9M
-         k37UGei1KazV6czxQQQmkXK5LDzeV1VVpV2EueeQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Michael Schmitz <schmitzmic@gmail.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15 517/917] block: ataflop: more blk-mq refactoring fixes
-Date:   Mon, 15 Nov 2021 18:00:12 +0100
-Message-Id: <20211115165446.303997101@linuxfoundation.org>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211115165428.722074685@linuxfoundation.org>
-References: <20211115165428.722074685@linuxfoundation.org>
-User-Agent: quilt/0.66
+        id S1347191AbhKOUj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Nov 2021 15:39:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349292AbhKOUGV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Nov 2021 15:06:21 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C7BC061766;
+        Mon, 15 Nov 2021 11:23:35 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id r132so13281383pgr.9;
+        Mon, 15 Nov 2021 11:23:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:references:cc:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding;
+        bh=qOdfviDawrnQEmhpbh1EywiWPqwK+XMcwjxkSzr6gBk=;
+        b=HEkPVJxufusC0xGDUimU2ECSru8wAVsuOgcAa8mlub4XtZUF5G3IcbwWQX055kI0vN
+         fBqpLpMOyLtDlrWfXIabCgTjMqIQ1Kwr1qOlgn/DD0v/67O2U/NhM2gNFom2rhtrqQmG
+         guHygzAopddmSAnLOH/zFdVNaCIbJYhs7lO1D8epA2ZJxfx1aSplQWN9olV5TsZcn8jX
+         rpUJJI8oSA+cE1QK6veuJ1Waakhw9taGs43e5/VLg88jPSq1RClcTnSmXB/GTqUj/A9R
+         D4YOtQHsi0l8U3Ty9uMJRcbhsmXS15HC+pl780dd1n8ucfwz2YUyEmQ0cRRuP5llYNYr
+         d2oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
+        bh=qOdfviDawrnQEmhpbh1EywiWPqwK+XMcwjxkSzr6gBk=;
+        b=s9Gn6kSEqsUrCwI75mnQTBEC7W552PIQ9a1pIT1l2KVYZEimNyNiUHXD09/GsHnl56
+         kPPW2Lhanszmc97N70eCRFMDFU/5PkGeu2/MsxfpDOzNM6TDouJyfRAwN+AeDatgfs5r
+         JXbcrOtmwOWFVthCSqn2DRt0hwm3yv0bdMs1AaMftr2KGMyhlGED6J1xbxzvdwwWXhkc
+         5mn6nW5MFbCn3V16oIfrEu4rrJ+XPoUYQv8otxPc3zQMQliF6tvAiXl6WZ/U3OAxy3f1
+         JziSVIkdaSYdQofm+r1gd9gd4SlHdDnv3WltWm+aOLMNn4c4zf47OQ8DJVGcYPwmzmQj
+         1PRg==
+X-Gm-Message-State: AOAM531KxCh5TLEo30mwIvBv2UPR1j06R/EG0tXvy7Br7DrAA1/W2PLp
+        6AmTpaqBt4rG30x7PHUkLF/ccPQAbbw=
+X-Google-Smtp-Source: ABdhPJwjTnI3d8c95mBsQVyrQZ2iPHzV2zKNNllAo0wR0AEqNf1JWUnfLlHrZ4LFO1foDav+Q+JZxA==
+X-Received: by 2002:aa7:9004:0:b0:4a2:e58e:9442 with SMTP id m4-20020aa79004000000b004a2e58e9442mr952983pfo.24.1637004215201;
+        Mon, 15 Nov 2021 11:23:35 -0800 (PST)
+Received: from [10.1.1.26] (222-155-101-117-fibre.sparkbb.co.nz. [222.155.101.117])
+        by smtp.gmail.com with ESMTPSA id a23sm4871537pgl.37.2021.11.15.11.23.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Nov 2021 11:23:34 -0800 (PST)
+Subject: Re: [PATCH 4/5] block: move queue enter logic into
+ blk_mq_submit_bio()
+To:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <461c4758-2675-1d11-ac8a-6f25ef01d781@kernel.dk>
+ <YYQr3jl3avsuOUAJ@infradead.org>
+ <3d29a5ce-aace-6198-3ea9-e6f603e74aa1@kernel.dk>
+ <YYQuyt2/y1MgzRi0@infradead.org>
+ <87ee0091-9c2f-50e8-c8f2-dcebebb9de48@kernel.dk>
+ <alpine.DEB.2.22.394.2111111350150.2780761@ramsan.of.borg>
+ <YY0eVnbjmHmPZ3M4@T590>
+ <CAMuHMdWTiF3MpcwHc=jCGLoBtTngzXTLHsYSYKPyfLBFBn8B2g@mail.gmail.com>
+ <YY01hzAuvmeMxO+0@T590> <17ce59ff-bc8c-e8c8-22e1-96605440629a@kernel.dk>
+ <YY246bCP+wKw0Z2c@T590>
+ <CAMuHMdV30yvjam8i0Z4Nsu=e1YhPaRb4E1bAtw7=268v6TnrJg@mail.gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <ee78b20c-36f0-408d-87d0-b8b75a66110d@gmail.com>
+Date:   Tue, 16 Nov 2021 08:23:27 +1300
+User-Agent: Mozilla/5.0 (X11; Linux ppc64; rv:45.0) Gecko/20100101
+ Thunderbird/45.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdV30yvjam8i0Z4Nsu=e1YhPaRb4E1bAtw7=268v6TnrJg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Michael Schmitz <schmitzmic@gmail.com>
+On 12/11/21 20:51, Geert Uytterhoeven wrote:
+[...]
+>>>>>> BTW, today I just found that hang in blk_mq_freeze_queue_wait() is
+>>>>>> caused by commit 900e080752025f00, and the following patch can fix it:
+>>>>>>
+>>>>>> - blk-mq: don't grab ->q_usage_counter in blk_mq_sched_bio_merge
+>>>>>>
+>>>>>> https://lore.kernel.org/linux-block/20211111085650.GA476@lst.de/T/#m759b88fda094a65ebf29bc81b780967cdaf9cf28
+>>>>>>
+>>>>>> Maybe you can try the above patch.
+>>>>>
+>>>>> Thanks! I have applied both patches, but it doesn't make a difference.
+>>>>
+>>>> Thanks for your test!
+>>>>
+>>>> Can you try the following patch?
+>
+> [...]
+>
+>>> That's definitely a real fix, akin to the other pre-enter variants, this
+>>> one just post checks. Geert, can you give this a whirl?
+>
+> With both of
+>
+>     blk-mq: don't grab ->q_usage_counter in blk_mq_sched_bio_merge
+>     blk-mq: rename blk_attempt_bio_merge
+>
+> applied, and the version above, I no longer saw the error, but the
+> boot sometimes hangs after:
+>
+>     ext3 filesystem being remounted at / supports timestamps until
+> 2038 (0x7fffffff)
+>
+> I don't know how easy that is to trigger: it hung on my first try, but
+> the second and third tries it booted fully into old Debian userspace.
+>
+>>> Ming, would you mind sending this as a real patch?
+>>
+>> The above patch may not be enough, since submit_bio_checks() is done in
+>> case of using cached request, so how about the following patch(un-tested)?
+>
+> Worked fine in five subsequent boots. Thanks!
+> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-[ Upstream commit d28e4dff085c5a87025c9a0a85fb798bd8e9ca17 ]
+For good measure: block-5.16-2021-11-13 tested fine running IO stress 
+tests on a mix of IDE and SCSI disks, only one of those supporting DPO/FUA.
 
-As it turns out, my earlier patch in commit 86d46fdaa12a (block:
-ataflop: fix breakage introduced at blk-mq refactoring) was
-incomplete. This patch fixes any remaining issues found during
-more testing and code review.
+Using
 
-Requests exceeding 4 k are handled in 4k segments but
-__blk_mq_end_request() is never called on these (still
-sectors outstanding on the request). With redo_fd_request()
-removed, there is no provision to kick off processing of the
-next segment, causing requests exceeding 4k to hang. (By
-setting /sys/block/fd0/queue/max_sectors_k <= 4 as workaround,
-this behaviour can be avoided).
+WARN_ON(rq->cmd_flags & REQ_FUA && !sdkp->DPOFUA);
 
-Instead of reintroducing redo_fd_request(), requeue the remainder
-of the request by calling blk_mq_requeue_request() on incomplete
-requests (i.e. when blk_update_request() still returns true), and
-rely on the block layer to queue the residual as new request.
+in sd.c:sd_setup_read_write_cmnd(), nothing seen in the logs.
 
-Both error handling and formatting needs to release the
-ST-DMA lock, so call finish_fdc() on these (this was previously
-handled by redo_fd_request()). finish_fdc() may be called
-legitimately without the ST-DMA lock held - make sure we only
-release the lock if we actually held it. In a similar way,
-early exit due to errors in ataflop_queue_rq() must release
-the lock.
+Cheers,
 
-After minor errors, fd_error sets up to recalibrate the drive
-but never re-runs the current operation (another task handled by
-redo_fd_request() before). Call do_fd_action() to get the next
-steps (seek, retry read/write) underway.
-
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Fixes: 6ec3938cff95f (ataflop: convert to blk-mq)
-CC: linux-block@vger.kernel.org
-Link: https://lore.kernel.org/r/20211024002013.9332-1-schmitzmic@gmail.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/ataflop.c | 45 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 39 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index bbb64331cf8f4..4947e41f89b7d 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -456,10 +456,20 @@ static DEFINE_TIMER(fd_timer, check_change);
- 	
- static void fd_end_request_cur(blk_status_t err)
- {
-+	DPRINT(("fd_end_request_cur(), bytes %d of %d\n",
-+		blk_rq_cur_bytes(fd_request),
-+		blk_rq_bytes(fd_request)));
-+
- 	if (!blk_update_request(fd_request, err,
- 				blk_rq_cur_bytes(fd_request))) {
-+		DPRINT(("calling __blk_mq_end_request()\n"));
- 		__blk_mq_end_request(fd_request, err);
- 		fd_request = NULL;
-+	} else {
-+		/* requeue rest of request */
-+		DPRINT(("calling blk_mq_requeue_request()\n"));
-+		blk_mq_requeue_request(fd_request, true);
-+		fd_request = NULL;
- 	}
- }
- 
-@@ -697,12 +707,21 @@ static void fd_error( void )
- 	if (fd_request->error_count >= MAX_ERRORS) {
- 		printk(KERN_ERR "fd%d: too many errors.\n", SelectedDrive );
- 		fd_end_request_cur(BLK_STS_IOERR);
-+		finish_fdc();
-+		return;
- 	}
- 	else if (fd_request->error_count == RECALIBRATE_ERRORS) {
- 		printk(KERN_WARNING "fd%d: recalibrating\n", SelectedDrive );
- 		if (SelectedDrive != -1)
- 			SUD.track = -1;
- 	}
-+	/* need to re-run request to recalibrate */
-+	atari_disable_irq( IRQ_MFP_FDC );
-+
-+	setup_req_params( SelectedDrive );
-+	do_fd_action( SelectedDrive );
-+
-+	atari_enable_irq( IRQ_MFP_FDC );
- }
- 
- 
-@@ -729,8 +748,10 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
- 	if (type) {
- 		type--;
- 		if (type >= NUM_DISK_MINORS ||
--		    minor2disktype[type].drive_types > DriveType)
-+		    minor2disktype[type].drive_types > DriveType) {
-+			finish_fdc();
- 			return -EINVAL;
-+		}
- 	}
- 
- 	q = unit[drive].disk[type]->queue;
-@@ -748,6 +769,7 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
- 	}
- 
- 	if (!UDT || desc->track >= UDT->blocks/UDT->spt/2 || desc->head >= 2) {
-+		finish_fdc();
- 		ret = -EINVAL;
- 		goto out;
- 	}
-@@ -788,6 +810,7 @@ static int do_format(int drive, int type, struct atari_format_descr *desc)
- 
- 	wait_for_completion(&format_wait);
- 
-+	finish_fdc();
- 	ret = FormatError ? -EIO : 0;
- out:
- 	blk_mq_unquiesce_queue(q);
-@@ -822,6 +845,7 @@ static void do_fd_action( int drive )
- 		    else {
- 			/* all sectors finished */
- 			fd_end_request_cur(BLK_STS_OK);
-+			finish_fdc();
- 			return;
- 		    }
- 		}
-@@ -1225,8 +1249,8 @@ static void fd_rwsec_done1(int status)
- 	}
- 	else {
- 		/* all sectors finished */
--		finish_fdc();
- 		fd_end_request_cur(BLK_STS_OK);
-+		finish_fdc();
- 	}
- 	return;
-   
-@@ -1348,7 +1372,7 @@ static void fd_times_out(struct timer_list *unused)
- 
- static void finish_fdc( void )
- {
--	if (!NeedSeek) {
-+	if (!NeedSeek || !stdma_is_locked_by(floppy_irq)) {
- 		finish_fdc_done( 0 );
- 	}
- 	else {
-@@ -1383,7 +1407,8 @@ static void finish_fdc_done( int dummy )
- 	start_motor_off_timer();
- 
- 	local_irq_save(flags);
--	stdma_release();
-+	if (stdma_is_locked_by(floppy_irq))
-+		stdma_release();
- 	local_irq_restore(flags);
- 
- 	DPRINT(("finish_fdc() finished\n"));
-@@ -1480,7 +1505,9 @@ static blk_status_t ataflop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	int drive = floppy - unit;
- 	int type = floppy->type;
- 
--	DPRINT(("Queue request: drive %d type %d last %d\n", drive, type, bd->last));
-+	DPRINT(("Queue request: drive %d type %d sectors %d of %d last %d\n",
-+		drive, type, blk_rq_cur_sectors(bd->rq),
-+		blk_rq_sectors(bd->rq), bd->last));
- 
- 	spin_lock_irq(&ataflop_lock);
- 	if (fd_request) {
-@@ -1502,6 +1529,7 @@ static blk_status_t ataflop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* drive not connected */
- 		printk(KERN_ERR "Unknown Device: fd%d\n", drive );
- 		fd_end_request_cur(BLK_STS_IOERR);
-+		stdma_release();
- 		goto out;
- 	}
- 		
-@@ -1518,11 +1546,13 @@ static blk_status_t ataflop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		if (--type >= NUM_DISK_MINORS) {
- 			printk(KERN_WARNING "fd%d: invalid disk format", drive );
- 			fd_end_request_cur(BLK_STS_IOERR);
-+			stdma_release();
- 			goto out;
- 		}
- 		if (minor2disktype[type].drive_types > DriveType)  {
- 			printk(KERN_WARNING "fd%d: unsupported disk format", drive );
- 			fd_end_request_cur(BLK_STS_IOERR);
-+			stdma_release();
- 			goto out;
- 		}
- 		type = minor2disktype[type].index;
-@@ -1623,6 +1653,7 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 		/* what if type > 0 here? Overwrite specified entry ? */
- 		if (type) {
- 		        /* refuse to re-set a predefined type for now */
-+			finish_fdc();
- 			return -EINVAL;
- 		}
- 
-@@ -1690,8 +1721,10 @@ static int fd_locked_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 		/* sanity check */
- 		if (setprm.track != dtp->blocks/dtp->spt/2 ||
--		    setprm.head != 2)
-+		    setprm.head != 2) {
-+			finish_fdc();
- 			return -EINVAL;
-+		}
- 
- 		UDT = dtp;
- 		set_capacity(disk, UDT->blocks);
--- 
-2.33.0
+	Michael
 
 
-
+>
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+>
+> In personal conversations with technical people, I call myself a hacker. But
+> when I'm talking to journalists I just say "programmer" or something like that.
+>                                 -- Linus Torvalds
+>
