@@ -2,61 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B7FC4167B
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 06:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77EAC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 08:32:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 376AD63299
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 06:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE33A611ED
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 08:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234515AbhKPGkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 01:40:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44272 "EHLO
+        id S232020AbhKPIfB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 03:35:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234460AbhKPGkk (ORCPT
+        with ESMTP id S231863AbhKPIfA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 01:40:40 -0500
+        Tue, 16 Nov 2021 03:35:00 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84CE8C079784;
-        Mon, 15 Nov 2021 22:33:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2068AC061570;
+        Tue, 16 Nov 2021 00:32:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HC6Dgegab7Q5ywGVPZerihzK6ieT/qmHCnJlr5hbOe0=; b=qSfpEjoo0bl9E+6cAQG05Cv21e
-        C7i+5MHqJOzbrZrLN90Fdgb6mkBazsdctZM/b3EVc6flilW8k3v6rnCbwTUPUhBX1kw+t6iHtRXm9
-        bzI+7CQLhspG0RNSdfn8btQZvaxsPw4GWB3ZUd0gw1URWuTbYclGDvkYYw35xUbHi5m9iOGMmmXxP
-        hfFlSht0YXTFQ/FtWdBilD5x2nhgWNmmm7NxQRiiR4mh8KmANZkG0AqumRXzdDXKBE9S+iwM6odcv
-        fXdjH7vslgcQmc9w/LqRfuYs62lcgfAKKJ+1YHwzbkl9MVnc5vkfsQxe+uFlxgCPRy9lTvjtOVds5
-        R1J8Q8KA==;
+        bh=fiwmf+S4eS/bBuUt94ax6RoYl4bLvkHz0Y7NqOMkkK8=; b=ePoP4KeW6qvLcFkQYEz6yGWYtB
+        XYrkDUawFpJc4ANK/rpBwY/OcdHnAMxlZa7YTc3cZyv+Cm38lHNP5h7BCHQ5MYgeWPIqbDGSiUysm
+        3s7WK48Kc2fsdBXYcqlndJ/b8fHZ3foNJEjuDwVE/D+ghpy//wu2sVupecCayXRAZ2mk96FJm8NDg
+        nvEz/dzeq14Jt2ELJXdpj/nzQ4BhjFSBE6F7nH8Dy1zeatPYQ5ITNQ8HfpQ3laoGY8vrNh9+bqG02
+        dv3yU3IyeEmTvaMJbOGALwsd/7gDdTipt5n3oa58TFrcI4Q2R1Bb8fD4Z7F9cLY6OhQKclX/FEQ6B
+        Z9pIJb9w==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mms2S-000Qzi-HD; Tue, 16 Nov 2021 06:33:52 +0000
-Date:   Mon, 15 Nov 2021 22:33:52 -0800
+        id 1mmtsl-000jx1-Hf; Tue, 16 Nov 2021 08:31:59 +0000
+Date:   Tue, 16 Nov 2021 00:31:59 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Darrick J . Wong " <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 04/28] fs: Rename AS_THP_SUPPORT and
- mapping_thp_support
-Message-ID: <YZNQ0Pg7mjYNoMXm@infradead.org>
-References: <20211108040551.1942823-1-willy@infradead.org>
- <20211108040551.1942823-5-willy@infradead.org>
- <YYo0L60o7ThqGzlX@infradead.org>
- <YZKEyrrH4SjqV8W7@casper.infradead.org>
+To:     NeilBrown <neilb@suse.de>
+Cc:     Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@suse.de>, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 12/13] MM: use AIO/DIO for reads from SWP_FS_OPS
+ swap-space
+Message-ID: <YZNsf5yvfb8+SiqB@infradead.org>
+References: <163702956672.25805.16457749992977493579.stgit@noble.brown>
+ <163703064458.25805.6777856691611196478.stgit@noble.brown>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YZKEyrrH4SjqV8W7@casper.infradead.org>
+In-Reply-To: <163703064458.25805.6777856691611196478.stgit@noble.brown>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 04:03:22PM +0000, Matthew Wilcox wrote:
-> I think I prefer the term 'large' to 'multi'.  What would you think to
-> this patch (not on top of any particular branch; just to show the scope
-> of it ...)
+On Tue, Nov 16, 2021 at 01:44:04PM +1100, NeilBrown wrote:
+> When pages a read from SWP_FS_OPS swap-space, the reads are submitted as
+> separate reads for each page.  This is generally less efficient than
+> larger reads.
+> 
+> We can use the block-plugging infrastructure to delay submitting the
+> read request until multiple contigious pages have been collected.  This
+> requires using ->direct_IO to submit the read (as ->readpages isn't
+> suitable for swap).
 
-I don't really care either way. Just be consistent and maybe add a
-comment here and there..
+Abusing the block code here seems little ugly.  Also this won't
+compile if CONFIG_BLOCK is not set, will it?
+
+What is the problem with just batching up manually?
+
+> +	/* nofs needs as ->direct_IO may take the same mutex it takes for write */
+
+Overly long line.
