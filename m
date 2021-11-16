@@ -2,111 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21AB2C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 17:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E770DC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 21:46:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2F4361A02
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 17:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFCBE61A64
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 21:46:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239273AbhKPSCi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 13:02:38 -0500
-Received: from mail-pf1-f172.google.com ([209.85.210.172]:41980 "EHLO
-        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239160AbhKPSCi (ORCPT
+        id S229733AbhKPVtT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 16:49:19 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:37832 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229593AbhKPVtS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 13:02:38 -0500
-Received: by mail-pf1-f172.google.com with SMTP id g19so94720pfb.8;
-        Tue, 16 Nov 2021 09:59:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=HMNPM/fgk1MNRXov4s8Yb+E4mhC1XJHGgm4p3VUdnQM=;
-        b=pOrvZqwi74KB2+C67j5XXkSPmyNHGS0Z01NZQR4/oOnwKAt60Zw0F3GJnuL1sBzfHN
-         dee8j2mL51kNzFG4K6rVXzi986YO7LZo0U+oQxyPsu3SvS5Jp/H0lK6FVJ35/damGmaj
-         oMPaFzT5PWqRVH9F8XSxUNs1uXBGk6E7nJrAnZ8bJtpwvT7VI1LvdcGHXebVGuXgPE/H
-         AN2J0VL75RVHAm2JZotUArIcdnJ2Ze8GmtjVv9yO02r1X8yM+2cMFq/b5gUnUkw+UOkq
-         Z8TE6gsEI/ifezEmbPHVayNlRVg5ZB+iR8Y8Yx841g0gQNU7uNYww3L7wE50K1aHI4ea
-         9TUA==
-X-Gm-Message-State: AOAM531OxgAmWgjAJFUO1NgB9V7RlNAidf1rrGGEZwJF0FFZNtazO88J
-        IOGtt22kKNoJE4Frsdjz1pk=
-X-Google-Smtp-Source: ABdhPJzQD9bdY0VMmDxiCswmvq2I7y2fm9Zu6J87Vg5yOKJcwCnM9HD6kc+dZh6uUa9ezmqsxHqBag==
-X-Received: by 2002:a63:b241:: with SMTP id t1mr604217pgo.154.1637085580607;
-        Tue, 16 Nov 2021 09:59:40 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id v16sm15096386pgo.71.2021.11.16.09.59.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Nov 2021 09:59:39 -0800 (PST)
-Message-ID: <ab4ec640-9a89-ea25-fe68-85bae2ae5d8d@acm.org>
-Date:   Tue, 16 Nov 2021 09:59:37 -0800
+        Tue, 16 Nov 2021 16:49:18 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 54BE31FD37;
+        Tue, 16 Nov 2021 21:46:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637099180; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=c/L9KoKoaxSnL1Jn59yhmyWCrQE61s5MuhLMctoNPdU=;
+        b=RgzNBBALsJ0q2yi+k2olZ09hFBSCYQFALEp/JjAQDq4nLpSfYjvvHEg/Rm9JLSsbPvmYIs
+        X1evb7fGBb8VJfZEYPFkOMAiTGB3YXTFqpRDKvTtVMmoYY0R7t2eFXRqWtnrXdxxnMfzkg
+        7IG93MR8RpuFfCBsFoXHmz4cMLRBtpQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637099180;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=c/L9KoKoaxSnL1Jn59yhmyWCrQE61s5MuhLMctoNPdU=;
+        b=e+eCzDrgx+fAWEyBwRLIBGiZi7tt3MdyveQGsQYTzDZEZFb0WOrqhV0aryshHyw5hHZAhx
+        tDlLcC5pWj2rVHAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 70BAB13C5E;
+        Tue, 16 Nov 2021 21:46:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id C1WzC6kmlGG1IAAAMHmgww
+        (envelope-from <neilb@suse.de>); Tue, 16 Nov 2021 21:46:17 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Content-Language: en-US
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-References: <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
- <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
- <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
- <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
- <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
- <fbe69cc0-36ea-c096-d247-f201bad979f4@acm.org>
- <20211008064925.oyjxbmngghr2yovr@mpHalley.local>
- <2a65e231-11dd-d5cc-c330-90314f6a8eae@nvidia.com>
- <20211029081447.ativv64dofpqq22m@ArmHalley.local>
- <20211103192700.clqzvvillfnml2nu@mpHalley-2>
- <20211116134324.hbs3tp5proxootd7@ArmHalley.localdomain>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20211116134324.hbs3tp5proxootd7@ArmHalley.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From:   "NeilBrown" <neilb@suse.de>
+To:     "Christoph Hellwig" <hch@infradead.org>
+Cc:     "Trond Myklebust" <trond.myklebust@hammerspace.com>,
+        "Anna Schumaker" <anna.schumaker@netapp.com>,
+        "Chuck Lever" <chuck.lever@oracle.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Mel Gorman" <mgorman@suse.de>, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 12/13] MM: use AIO/DIO for reads from SWP_FS_OPS swap-space
+In-reply-to: <YZNsf5yvfb8+SiqB@infradead.org>
+References: <163702956672.25805.16457749992977493579.stgit@noble.brown>,
+ <163703064458.25805.6777856691611196478.stgit@noble.brown>,
+ <YZNsf5yvfb8+SiqB@infradead.org>
+Date:   Wed, 17 Nov 2021 08:46:14 +1100
+Message-id: <163709917463.13692.6685266362531701682@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/16/21 05:43, Javier González wrote:
->              - Here, we need copy emulation to support encryption 
-> without dealing with HW issues and garbage
+On Tue, 16 Nov 2021, Christoph Hellwig wrote:
+> On Tue, Nov 16, 2021 at 01:44:04PM +1100, NeilBrown wrote:
+> > When pages a read from SWP_FS_OPS swap-space, the reads are submitted as
+> > separate reads for each page.  This is generally less efficient than
+> > larger reads.
+> >=20
+> > We can use the block-plugging infrastructure to delay submitting the
+> > read request until multiple contigious pages have been collected.  This
+> > requires using ->direct_IO to submit the read (as ->readpages isn't
+> > suitable for swap).
+>=20
+> Abusing the block code here seems little ugly.  Also this won't
+> compile if CONFIG_BLOCK is not set, will it?
 
-Hi Javier,
+There is nothing really block-layer-specific about the plugging
+interfaces.  I think it would be quite reasonable to move them to lib/
+But you are correct that currently without CONFIG_BLOCK the code will
+compile but not work.
 
-Thanks very much for having taken notes and also for having shared 
-these. Regarding the above comment, after the meeting I learned that the 
-above is not correct. Encryption in Android is LBA independent and hence 
-it should be possible to offload F2FS garbage collection in Android once 
-the (UFS) storage controller supports this.
+>=20
+> What is the problem with just batching up manually?
 
-For the general case, I propose to let the dm-crypt driver decide 
-whether or not to offload data copying since that driver knows whether 
-or not data copying can be offloaded.
+That would require a bigger change to common code, which would only
+benefit one user.  The plugging mechanism works well for batching
+requests to a block device.  Why not use it for non-block-devices too?
 
 Thanks,
+NeilBrown
 
-Bart.
+
+>=20
+> > +	/* nofs needs as ->direct_IO may take the same mutex it takes for write=
+ */
+>=20
+> Overly long line.
+>=20
+>=20
