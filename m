@@ -2,196 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC27C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 13:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF515C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 14:20:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24EAF61B49
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 13:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFCC861175
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 14:20:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236763AbhKPNq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 08:46:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236741AbhKPNqX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 08:46:23 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB444C061570
-        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 05:43:26 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id x15so88081512edv.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 05:43:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KRYob5UpR+HW1UgJCdrQVrkG2CB+gcAgwD9AJ1Q6jl8=;
-        b=McbNpWKdQv3snjiBdKVjiCMPrmcuVNKLy58ZVz8ly2z0KQlalBGOOYQIYxCtwWRqkR
-         N0YStnPB7SqmKlST3AaDjU3xT385xq8vmeT93EA9zlXhobbyQf7XFwJ+kWKVR8Ghsw8O
-         rNR7rZyCycl/+D19EN+oFfcpp94opyYH3WOISiPNdg36NMcR3HTNeWcV9/XeNya+IUDE
-         oYZka/qD1VqAR8QwQAVa05b3XDntn9SmmnF+3fY736rtZ1V6PG8wG7NKuqv3sQtfbX/U
-         MuaRZmiRvUtEMsjohHyGe02gIBaJJcD9LTvOV89ofuTMBow/cbJCnTrBvITqTlCrKIMb
-         X/PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KRYob5UpR+HW1UgJCdrQVrkG2CB+gcAgwD9AJ1Q6jl8=;
-        b=d1xFjBcmhms9ccu+M/vtsCU/ZXspHgVjlB6zaDyLsgPWsL+WvxplGqOnA4DP0W0dyT
-         etH9+GXDfNJvnnOLxRgMsNst4Dp7wPOnd6Cw74kgmYnPHbD1JL+pX5b3qL5uMsQmCSMZ
-         EhF+teA/ayh3D5Q+ZBohhZ5pHSv8EMBq04HbIJ8CjbcK6OS+ae8cg4ARzExm/cCF5D73
-         M6fIid5FQZgdV7/FPXT3ASj51rDA1i8Q8neh3mfI65wcwt5hvzQLOUgoStlCyIRh2fwr
-         Cpaz+srIoWrtqzmQLI6RnAh23Axl2MDMMO0jtVmG5pRKiQJXgMTJPxXi3forWbs6Va8g
-         rGhw==
-X-Gm-Message-State: AOAM532sqDo/jKbz/EqBZC9xhVPkvoEJhjzGSEvwGe0JPoLQA7TxNQuj
-        BbYn1v6a2Mh2/naBqQ/kVVTtyg==
-X-Google-Smtp-Source: ABdhPJxUIBIRGuiudLhLqlGGmXvbEWTLx3ubRxQoIdfOPt1u04Vu3kDjMVkYGgkbKcw0d0AJNIREWQ==
-X-Received: by 2002:a17:907:9801:: with SMTP id ji1mr10190475ejc.170.1637070205347;
-        Tue, 16 Nov 2021 05:43:25 -0800 (PST)
-Received: from localhost (5.186.126.13.cgn.fibianet.dk. [5.186.126.13])
-        by smtp.gmail.com with ESMTPSA id i5sm8426046ejw.121.2021.11.16.05.43.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 05:43:24 -0800 (PST)
-Date:   Tue, 16 Nov 2021 14:43:24 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Message-ID: <20211116134324.hbs3tp5proxootd7@ArmHalley.localdomain>
-References: <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
- <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
- <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
- <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
- <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
- <fbe69cc0-36ea-c096-d247-f201bad979f4@acm.org>
- <20211008064925.oyjxbmngghr2yovr@mpHalley.local>
- <2a65e231-11dd-d5cc-c330-90314f6a8eae@nvidia.com>
- <20211029081447.ativv64dofpqq22m@ArmHalley.local>
- <20211103192700.clqzvvillfnml2nu@mpHalley-2>
+        id S237340AbhKPOXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 09:23:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40274 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237417AbhKPOX0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Nov 2021 09:23:26 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 65FE261502;
+        Tue, 16 Nov 2021 14:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1637072429;
+        bh=Q20/g1l8rwfLVJucsg0fsXG7lkYQoLbtbOKw8Cy6Wn0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qADXFzDwg9EW9wLcTrtUHzWXjLxmsdUkga0I4W3t+MTAQ3ikfHGNlOUnlYaars6ID
+         Xpjfgd0pEt+aTx/WCvXBbxtfTK16YV0hYvBqYUE+wSVh7H3ZBbc9/jZHOgKFLBuCQt
+         GErLyMDwwaGObxBDjnLipH8mF6JiZ3xovAWxsJEQ=
+Date:   Tue, 16 Nov 2021 15:20:26 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Kumaravel.Thiagarajan@microchip.com
+Cc:     lee.jones@linaro.org, Pragash.Mangalapandian@microchip.com,
+        Sundararaman.H@microchip.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, miquel.raynal@bootlin.com,
+        richard@nod.at, vigneshr@ti.com, linux-mtd@lists.infradead.org,
+        LakshmiPraveen.Kopparthi@microchip.com
+Subject: Re: Reg: New MFD Driver for my PCIe Device
+Message-ID: <YZO+KktO3OhDEtlq@kroah.com>
+References: <CH0PR11MB5380F5BD18F15014BA8B8479E9919@CH0PR11MB5380.namprd11.prod.outlook.com>
+ <YYkEP62JRb4rCuXQ@google.com>
+ <YYkGkEiPb+6J62hn@kroah.com>
+ <YYkJsbbHH6wdPvB9@google.com>
+ <YYkR/szsDirtj1FP@kroah.com>
+ <CH0PR11MB5380791976D5837E024D5679E9999@CH0PR11MB5380.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211103192700.clqzvvillfnml2nu@mpHalley-2>
+In-Reply-To: <CH0PR11MB5380791976D5837E024D5679E9999@CH0PR11MB5380.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+On Tue, Nov 16, 2021 at 11:34:24AM +0000, Kumaravel.Thiagarajan@microchip.com wrote:
+> Dear Greg K-H & Lee Jones,
+> 
+> Thanks for your inputs and I need more of your help to understand things better.
+> 
+> I took this MFD route not just based on the recommendation from Linus Walleij but also based on the kernel documentation @ /Documentation/driver-api/driver-model/platform.rst which states as below.
+> 
+> "Rarely, a platform_device will be connected through a segment of some other kind of bus; but its registers will still be directly addressable."
+> 
+> I visualized these two (GPIO controller & OTP/EEPROM controller) devices as platform devices present on the same PCI function and these two devices are not detectable unless the base PCI function driver enumerates them and anyway their registers are directly addressable.
+> Hence, I thought that the platform driver architecture is inclusive of devices like this.
 
-Thanks for attending the call on Copy Offload yesterday. Here you have
-the meeting notes and 2 specific actions before we proceed with another
-version of the patchset.
+Sorry, but no.  Again, platform devices are ONLY for actual platform
+devices, not "things on a device that happens to be on another bus
+device".  Like PCI devices.
 
-We will work on a version of the use-case matrix internally and reply
-here in the next couple of days.
+That is what the auxiliary bus code was written for, please read
+Documentation/driver-api/auxiliary_bus.rst for how to use it.
 
-Please, add to the notes and the matrix as you see fit.
+> Please let me know your comments.
+> 
+> Also please let me know if I can talk to any of you over a webex call to get clarifications on my further doubts.
 
-Thanks,
-Javier
+Email works best, video chats for every patch review does not scale at
+all :)
 
-----
+thanks,
 
-ATTENDEES
-
-- Adam
-- Arnav
-- Chaitanya
-- Himashu
-- Johannes
-- Kanchan
-- Keith
-- Martin
-- Mikulas
-- Niklas
-- Nitesh
-- Selva
-- Vincent
-- Bart
-
-NOTES
-
-- MD and DM are hard requirements
-	- We need support for all the main users of the block layer
-	- Same problem with crypto and integrity
-- Martin would be OK with separating Simple Copy in ZNS and Copy Offload
-- Why did Mikulas work not get upstream?
-	- Timing was an issue
-		- Use-case was about copying data across VMs
-		- No HW vendor support
-		- Hard from a protocol perspective
-			- At that point, SCSI was still adding support in the spec
-			- MSFT could not implement extended copy command in the target (destination) device.
-				- This is what triggered the token-based implementation
-				- This triggered array vendors to implement support for copy offload as token-based. This allows mixing with normal read / write workloads
-			- Martin lost the implementation and dropped it
-
-DIRECTION
-
-- Keeping the IOCTL interface is an option. It might make sense to move from IOCTL to io_uring opcode
-- Martin is happy to do the SCSIpart if the block layer API is upstreamed
-- Token-based implementationis the norm. This allows mixing normal read / write workloads to avoid DoS
-	- This is the direction as opposed to the extended copy command
-	- It addresses problems when integrating with DM and simplifies command multiplexing a single bio into many
-	- It simplifies multiple bios
-	- We should explore Mikulas approach with pointers.
-- Use-cases
-	- ZNS GC
-	- dm-kcopyd
-	- file system GC
-	- fabrics offload to the storage node
-	- copy_file_range
-- It is OK to implement support incrementally, but the interface needs to support all customers of the block layer
-	- OK to not support specific DMs (e.g., RAID5)
-	- We should support DM and MD as a framework and the personalities that are needed. Inspiration in integrity
-		- dm-linear
-		- dm-crypt and dm-verify are needed for F2FSuse-case in Androd
-			- Here, we need copy emulation to support encryption without dealing with HW issues and garbage
-- User-interface can wait and be carried out on the side
-- Maybe it makes sense to start with internal users
-	- copy_file_range
-	- F2FS GC, btrfs GC
-- User-space should be allowed to do anything and kernel-space can chop the command accordingly
-- We need to define the heuristics of the sizes
-- User-space should only work on block devices (no other constructs that are protocol-specific) . Export capabilities in sysfs
-	- Need copy domains to be exposed in sysfs
-	- We need to start with bdev to bdev in block layer
-	- Not specific requirement on multi-namespace in NVMe, but it should be extendable
-	- Plumbing will support all use-cases
-- Try to start with one in-kernel consumer
-- Emulation is a must
-	- Needed for failed I/Os
-	- Expose capabilities so that users can decide
-- We can get help from btrfs and F2FS folks
-- The use case for GC and for copy are different. We might have to reflect this in the interface, but the internal plumbing should allow both paths to be maintained as a single one.
-
-ACTIONS
-
-- [ ] Make a list of use-cases that we want to support in each specification and pick 1-2 examples for MD, DM. Make sure that the interfaces support this
-- [ ] Vendors: Ask internally what is the recommended size for copy, if
-   any
-
+greg k-h
