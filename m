@@ -2,73 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E77EAC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 08:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 383C8C4167B
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 09:01:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE33A611ED
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 08:32:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24CA363219
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 09:01:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232020AbhKPIfB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 03:35:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231863AbhKPIfA (ORCPT
+        id S232727AbhKPJEg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 04:04:36 -0500
+Received: from mail.bizjoindeal.pl ([80.211.97.164]:57938 "EHLO
+        mail.bizjoindeal.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232740AbhKPJEa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 03:35:00 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2068AC061570;
-        Tue, 16 Nov 2021 00:32:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=fiwmf+S4eS/bBuUt94ax6RoYl4bLvkHz0Y7NqOMkkK8=; b=ePoP4KeW6qvLcFkQYEz6yGWYtB
-        XYrkDUawFpJc4ANK/rpBwY/OcdHnAMxlZa7YTc3cZyv+Cm38lHNP5h7BCHQ5MYgeWPIqbDGSiUysm
-        3s7WK48Kc2fsdBXYcqlndJ/b8fHZ3foNJEjuDwVE/D+ghpy//wu2sVupecCayXRAZ2mk96FJm8NDg
-        nvEz/dzeq14Jt2ELJXdpj/nzQ4BhjFSBE6F7nH8Dy1zeatPYQ5ITNQ8HfpQ3laoGY8vrNh9+bqG02
-        dv3yU3IyeEmTvaMJbOGALwsd/7gDdTipt5n3oa58TFrcI4Q2R1Bb8fD4Z7F9cLY6OhQKclX/FEQ6B
-        Z9pIJb9w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mmtsl-000jx1-Hf; Tue, 16 Nov 2021 08:31:59 +0000
-Date:   Tue, 16 Nov 2021 00:31:59 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     NeilBrown <neilb@suse.de>
-Cc:     Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@suse.de>, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 12/13] MM: use AIO/DIO for reads from SWP_FS_OPS
- swap-space
-Message-ID: <YZNsf5yvfb8+SiqB@infradead.org>
-References: <163702956672.25805.16457749992977493579.stgit@noble.brown>
- <163703064458.25805.6777856691611196478.stgit@noble.brown>
+        Tue, 16 Nov 2021 04:04:30 -0500
+Received: by mail.bizjoindeal.pl (Postfix, from userid 1001)
+        id C4E6DA1F78; Tue, 16 Nov 2021 08:51:27 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bizjoindeal.pl;
+        s=mail; t=1637052700;
+        bh=JZuQ1fK7zFtz2oeUB7Xfid9vb7kUywdmDd2OluR8ywA=;
+        h=Date:From:To:Subject:From;
+        b=RMF98kGX++2UQpSKarP0zFEVrhdP66T2lBhIJkrbW36sbyqUKwgt8dWDsEkiY2NQV
+         I4Obsh8I9Mf0aEAstMHpJPQBAfRF/h+kfS2Y8c9u4yTc7q4mzXpdQ2FNbiGn+M/aO2
+         31YeDxvCFdMQlDBCyqvaf7XpvtxPAfukJW19/SEKXHb0Y0315aUOxXdR3Gz+gvWRXo
+         qNUcGbAt4OnhzC1sceLrxT0vvJJ8jFgvnVhwwhd33VjciSezFg7RvwW7yW3P5h+/2J
+         AGmFNkd9owpOrgdJo5OpoQkx8tPHt8B9zhRx95g9d34zkb5/C4YL9GHR2xZYi4vveJ
+         kn2b2dVFsOlZQ==
+Received: by mail.bizjoindeal.pl for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 08:51:12 GMT
+Message-ID: <20211116074500-0.1.60.f0wa.0.ybck5ihmoc@bizjoindeal.pl>
+Date:   Tue, 16 Nov 2021 08:51:12 GMT
+From:   "Dorian Kwiatkowski" <dorian.kwiatkowski@bizjoindeal.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Fotowoltaika dla firm
+X-Mailer: mail.bizjoindeal.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <163703064458.25805.6777856691611196478.stgit@noble.brown>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 01:44:04PM +1100, NeilBrown wrote:
-> When pages a read from SWP_FS_OPS swap-space, the reads are submitted as
-> separate reads for each page.  This is generally less efficient than
-> larger reads.
-> 
-> We can use the block-plugging infrastructure to delay submitting the
-> read request until multiple contigious pages have been collected.  This
-> requires using ->direct_IO to submit the read (as ->readpages isn't
-> suitable for swap).
+Dzie=C5=84 dobry,
 
-Abusing the block code here seems little ugly.  Also this won't
-compile if CONFIG_BLOCK is not set, will it?
+kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC dostrzegam mo=C5=BC=
+liwo=C5=9B=C4=87 redukcji op=C5=82at za pr=C4=85d.
 
-What is the problem with just batching up manually?
+Odpowiednio dobrana instalacja fotowoltaiczna to rozwi=C4=85zanie, kt=C3=B3=
+re pozwala wygenerowa=C4=87 spore oszcz=C4=99dno=C5=9Bci w skali roku.
 
-> +	/* nofs needs as ->direct_IO may take the same mutex it takes for write */
+Chcia=C5=82bym porozmawia=C4=87 z Pa=C5=84stwem o tego typu rozwi=C4=85za=
+niu, a tak=C5=BCe przedstawi=C4=87 wst=C4=99pne kalkulacje.
 
-Overly long line.
+Czy s=C4=85 Pa=C5=84stwo zainteresowani?
+
+Pozdrawiam,
+Dorian Kwiatkowski
