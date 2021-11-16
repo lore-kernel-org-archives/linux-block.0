@@ -2,72 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D46BC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 15:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7ABC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 15:43:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A1E860F38
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 15:42:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A972861407
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 15:43:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238401AbhKPPpD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 10:45:03 -0500
-Received: from mail-io1-f71.google.com ([209.85.166.71]:42716 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238407AbhKPPoN (ORCPT
+        id S238428AbhKPPqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 10:46:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238439AbhKPPpr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 10:44:13 -0500
-Received: by mail-io1-f71.google.com with SMTP id n25-20020a056602341900b005e7a312f86dso12390560ioz.9
-        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 07:41:16 -0800 (PST)
+        Tue, 16 Nov 2021 10:45:47 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE2E3C061225
+        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 07:42:41 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id x10so26671229ioj.9
+        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 07:42:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=qZTHx1FvTHabhubW5uLJTFw9g14LfOUphosZneheXs4=;
+        b=w3QG6GtaZbgUU/+dtPJdAPWmz2QGCSQsvGWcNOjVgJzNUtppuN3BuL6C793MwPsZco
+         vmpfKXeKJF5z9hGpGvKNH8qXEqsKBJa//YA7/NsmjWcI7ePjzc707vdTSfxUa5RRaze5
+         3toFmyOzFAODOhoRXNXy8XE81gD/Au+qO9TNc22HyPGVBXVWCATQQdOuwc6p5jiP16Is
+         FP5Ce9W3ANlg3rjI9JLET3UWo2rETlyvy6UcENgodYMRaZHNJWlwtdwsfmXl3uDpZN13
+         8Ed7vKFVvUydjzwgPptOkIz5BNiPjJ1+CwafmBa/wPySHb5HrIHRnpnmEkmI0ZDscVCv
+         lU3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=yEoiAOZNXI+7ziHDgUkTx2Lv3WSs9sv/eVLYHQ4c5qs=;
-        b=pFair8I7G48S6Vfvt+LNW50rtKHDB1xZe8MfRlB3Gn624VFzA5+0iEpejysz5D8cxu
-         g8Z5jSIgEuK9XDGun2VgNYNpCmFhXqT8sJkUQvuAoFvLmGA1EUIMkiuRWeI/Sv7Zwlhg
-         uBUS7KulC/0RoEQ94hyWjA4aHb/qnyAuuMPj5m9x6KLqP//TSlSZVsmqznZP3AxY8ThH
-         rZbxlDOPxwhXPa8ddOxWMwag35dnXVTSRjlhil1SgPZYt3H+VKBgv2PndAzGcv6Uyzkz
-         s6UIFyuBZ13DsWTpI4TKwIsBawxzyravt4WtkAmrbKUPVBocvsq28cgKSn+tfwutvXwT
-         SP9A==
-X-Gm-Message-State: AOAM531OIlkuOvzTGyJ9cTZ1cod8Mt+tO0AwUYsrvc1RyMAFjD4KEU54
-        2A62bCTkalDLw2Irm84bJDkzP+LAkaMTMyBPYmHjO1Eyg3Di
-X-Google-Smtp-Source: ABdhPJz2QvP079zeX/CSMbBjUQ4yB0Z21xR5DrHse56nG8ecxlTTNjG5d/4SrtAzw+M2+watkTiawRFrq6/9vJ1WSz68jkvpCbf8
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1847:: with SMTP id b7mr5243399ilv.102.1637077275827;
- Tue, 16 Nov 2021 07:41:15 -0800 (PST)
-Date:   Tue, 16 Nov 2021 07:41:15 -0800
-In-Reply-To: <00000000000009a2c505bbcaed68@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007ee63e05d0e9c172@google.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qZTHx1FvTHabhubW5uLJTFw9g14LfOUphosZneheXs4=;
+        b=BVfaiDjeqWJJW4xr7EHIC2tuO9nhKAnnMy0+Fh/O8jbneHp+xxop87sLiK7SJJd+zS
+         jCuL0h2LtoM3bOlMU4RyNQHIExNHNQjLzkt366uQFGUPmVsLzg3A40o6RY1TspMOZIQ8
+         /OYRJJfB4W52vaFi5u1JC2XJw4NrH2XF5SPZaGLBdmL7Kd45T7pkLQkgYl+iIyS7LAXF
+         tWL7sRZU+b0rUrEMiwKnu6x9pX2/4/haND1RmCllCG7C1hCHeGe4MLytgY2qQ3D8Heb9
+         Myn5H2idHziTG7mF3p5t9xEuxZSJN3FvrVBfEuakGbUAE5snzq7JDxc0mbwDhvISUO7y
+         mZPw==
+X-Gm-Message-State: AOAM532CT9EzNKvF0aIaBaH8NsYvXm9u4uLixodnmNynd3+nwPsmotwR
+        LuoLPno+i9nClQwhRz6THmRAx582uK1wZvZ3
+X-Google-Smtp-Source: ABdhPJyrpIfc2UW9Rx72NBiL5cdgp4TrZ59GyNqn8h8b6TcBQy++Dv52FlJE6Vv7QfaAlwnjezgwfQ==
+X-Received: by 2002:a02:a601:: with SMTP id c1mr6313123jam.114.1637077361081;
+        Tue, 16 Nov 2021 07:42:41 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id o10sm9609624ioa.26.2021.11.16.07.42.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Nov 2021 07:42:40 -0800 (PST)
 Subject: Re: [syzbot] INFO: rcu detected stall in __hrtimer_run_queues
-From:   syzbot <syzbot+de9526ade17c659d8336@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, fweisbec@gmail.com, hch@lst.de, hdanton@sina.com,
+To:     syzbot <syzbot+de9526ade17c659d8336@syzkaller.appspotmail.com>,
+        fweisbec@gmail.com, hch@lst.de, hdanton@sina.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         mingo@kernel.org, paulmck@kernel.org,
         syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
+References: <0000000000007ee63e05d0e9c172@google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <097631ea-d781-c4e1-aa0e-d921a7a2e69e@kernel.dk>
+Date:   Tue, 16 Nov 2021 08:42:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <0000000000007ee63e05d0e9c172@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On 11/16/21 8:41 AM, syzbot wrote:
+> syzbot suspects this issue was fixed by commit:
+> 
+> commit b60876296847e6cd7f1da4b8b7f0f31399d59aa1
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Fri Oct 15 21:03:52 2021 +0000
+> 
+>     block: improve layout of struct request
 
-commit b60876296847e6cd7f1da4b8b7f0f31399d59aa1
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Fri Oct 15 21:03:52 2021 +0000
+No functional changes in that patch, so looks like a fluky bisection.
 
-    block: improve layout of struct request
+-- 
+Jens Axboe
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=137f2d01b00000
-start commit:   f40ddce88593 Linux 5.11
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e53d04227c52a0df
-dashboard link: https://syzkaller.appspot.com/bug?extid=de9526ade17c659d8336
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17a81012d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1282b6d2d00000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: block: improve layout of struct request
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
