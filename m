@@ -2,119 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23498C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 13:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC27C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 13:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0854D613D0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 13:17:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24EAF61B49
+	for <linux-block@archiver.kernel.org>; Tue, 16 Nov 2021 13:43:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236562AbhKPNUr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 08:20:47 -0500
-Received: from pv50p00im-ztbu10011701.me.com ([17.58.6.53]:43831 "EHLO
-        pv50p00im-ztbu10011701.me.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232753AbhKPNUq (ORCPT
+        id S236763AbhKPNq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 08:46:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236741AbhKPNqX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 08:20:46 -0500
-X-Greylist: delayed 417 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Nov 2021 08:20:46 EST
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai;
-        t=1637068251; bh=D6fqXzn7nucldDdZ09YcVxbRKPlu/uYTTAEh1lmhBTE=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=FQWvlUJkJ5Agu7iTa0E+U2jCVGcy0t8UCBG5ZDgIby86Oll/KA3eJVt0W7DmRiJgd
-         YAOVZ0ny1o1H9CrkXpSSLxHe2+ktdHbknkml04xixfEgFk0GOVco6Pzc26lYFHN8U/
-         kF5PIf/ozA/KLrm7a526gS1U+jNmncRhTofsv6SjANdX6FOr9pVHYLgeEGgFY8YSC6
-         zPg83o6zFpvxgQpDl1n/eexTdkX9aNVGmqdOkik7mY9A03e8WqiMOiP02XJPBdDXsk
-         P375BAjoHYOtTHBPD7FVJUuMvZaF05arjL5XD7ztxhmzw8jmOdX7w8/2E1/4qTc0Sh
-         i8lri8L00dt/w==
-Received: from xiongwei.. (unknown [120.245.2.201])
-        by pv50p00im-ztbu10011701.me.com (Postfix) with ESMTPSA id 058B28A0407;
-        Tue, 16 Nov 2021 13:10:48 +0000 (UTC)
-From:   sxwjean@me.com
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Xiongwei Song <sxwjean@gmail.com>
-Subject: [PATCH] floppy: Add max size check for user space request
-Date:   Tue, 16 Nov 2021 21:10:33 +0800
-Message-Id: <20211116131033.27685-1-sxwjean@me.com>
-X-Mailer: git-send-email 2.30.2
+        Tue, 16 Nov 2021 08:46:23 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB444C061570
+        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 05:43:26 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id x15so88081512edv.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 05:43:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KRYob5UpR+HW1UgJCdrQVrkG2CB+gcAgwD9AJ1Q6jl8=;
+        b=McbNpWKdQv3snjiBdKVjiCMPrmcuVNKLy58ZVz8ly2z0KQlalBGOOYQIYxCtwWRqkR
+         N0YStnPB7SqmKlST3AaDjU3xT385xq8vmeT93EA9zlXhobbyQf7XFwJ+kWKVR8Ghsw8O
+         rNR7rZyCycl/+D19EN+oFfcpp94opyYH3WOISiPNdg36NMcR3HTNeWcV9/XeNya+IUDE
+         oYZka/qD1VqAR8QwQAVa05b3XDntn9SmmnF+3fY736rtZ1V6PG8wG7NKuqv3sQtfbX/U
+         MuaRZmiRvUtEMsjohHyGe02gIBaJJcD9LTvOV89ofuTMBow/cbJCnTrBvITqTlCrKIMb
+         X/PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KRYob5UpR+HW1UgJCdrQVrkG2CB+gcAgwD9AJ1Q6jl8=;
+        b=d1xFjBcmhms9ccu+M/vtsCU/ZXspHgVjlB6zaDyLsgPWsL+WvxplGqOnA4DP0W0dyT
+         etH9+GXDfNJvnnOLxRgMsNst4Dp7wPOnd6Cw74kgmYnPHbD1JL+pX5b3qL5uMsQmCSMZ
+         EhF+teA/ayh3D5Q+ZBohhZ5pHSv8EMBq04HbIJ8CjbcK6OS+ae8cg4ARzExm/cCF5D73
+         M6fIid5FQZgdV7/FPXT3ASj51rDA1i8Q8neh3mfI65wcwt5hvzQLOUgoStlCyIRh2fwr
+         Cpaz+srIoWrtqzmQLI6RnAh23Axl2MDMMO0jtVmG5pRKiQJXgMTJPxXi3forWbs6Va8g
+         rGhw==
+X-Gm-Message-State: AOAM532sqDo/jKbz/EqBZC9xhVPkvoEJhjzGSEvwGe0JPoLQA7TxNQuj
+        BbYn1v6a2Mh2/naBqQ/kVVTtyg==
+X-Google-Smtp-Source: ABdhPJxUIBIRGuiudLhLqlGGmXvbEWTLx3ubRxQoIdfOPt1u04Vu3kDjMVkYGgkbKcw0d0AJNIREWQ==
+X-Received: by 2002:a17:907:9801:: with SMTP id ji1mr10190475ejc.170.1637070205347;
+        Tue, 16 Nov 2021 05:43:25 -0800 (PST)
+Received: from localhost (5.186.126.13.cgn.fibianet.dk. [5.186.126.13])
+        by smtp.gmail.com with ESMTPSA id i5sm8426046ejw.121.2021.11.16.05.43.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 05:43:24 -0800 (PST)
+Date:   Tue, 16 Nov 2021 14:43:24 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "msnitzer@redhat.com" <msnitzer@redhat.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "rwheeler@redhat.com" <rwheeler@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Vincent Fu <vincent.fu@samsung.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+Message-ID: <20211116134324.hbs3tp5proxootd7@ArmHalley.localdomain>
+References: <PH0PR04MB74161CD0BD15882BBD8838AB9B529@PH0PR04MB7416.namprd04.prod.outlook.com>
+ <CGME20210928191342eucas1p23448dcd51b23495fa67cdc017e77435c@eucas1p2.samsung.com>
+ <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
+ <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
+ <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
+ <fbe69cc0-36ea-c096-d247-f201bad979f4@acm.org>
+ <20211008064925.oyjxbmngghr2yovr@mpHalley.local>
+ <2a65e231-11dd-d5cc-c330-90314f6a8eae@nvidia.com>
+ <20211029081447.ativv64dofpqq22m@ArmHalley.local>
+ <20211103192700.clqzvvillfnml2nu@mpHalley-2>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.425,18.0.790
- definitions=2021-11-16_02:2021-11-16,2021-11-16 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 clxscore=1011 mlxscore=0
- mlxlogscore=913 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-2009150000 definitions=main-2111160068
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20211103192700.clqzvvillfnml2nu@mpHalley-2>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiongwei Song <sxwjean@gmail.com>
+Hi all,
 
-We need to check the max request size that is from user space before
-allocating pages. If the request size exceeds the limit, return -EINVAL.
-This check can avoid the warning below from page allocator.
+Thanks for attending the call on Copy Offload yesterday. Here you have
+the meeting notes and 2 specific actions before we proceed with another
+version of the patchset.
 
-WARNING: CPU: 3 PID: 16525 at mm/page_alloc.c:5344 current_gfp_context include/linux/sched/mm.h:195 [inline]
-WARNING: CPU: 3 PID: 16525 at mm/page_alloc.c:5344 __alloc_pages+0x45d/0x500 mm/page_alloc.c:5356
-Modules linked in:
-CPU: 3 PID: 16525 Comm: syz-executor.3 Not tainted 5.15.0-syzkaller #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:__alloc_pages+0x45d/0x500 mm/page_alloc.c:5344
-Code: be c9 00 00 00 48 c7 c7 20 4a 97 89 c6 05 62 32 a7 0b 01 e8 74 9a 42 07 e9 6a ff ff ff 0f 0b e9 a0 fd ff ff 40 80 e5 3f eb 88 <0f> 0b e9 18 ff ff ff 4c 89 ef 44 89 e6 45 31 ed e8 1e 76 ff ff e9
-RSP: 0018:ffffc90023b87850 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 1ffff92004770f0b RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 0000000000000033 RDI: 0000000000010cc1
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff81bb4686 R11: 0000000000000001 R12: ffffffff902c1960
-R13: 0000000000000033 R14: 0000000000000000 R15: ffff88804cf64a30
-FS:  0000000000000000(0000) GS:ffff88802cd00000(0063) knlGS:00000000f44b4b40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 000000002c921000 CR3: 000000004f507000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- alloc_pages+0x1a7/0x300 mm/mempolicy.c:2191
- __get_free_pages+0x8/0x40 mm/page_alloc.c:5418
- raw_cmd_copyin drivers/block/floppy.c:3113 [inline]
- raw_cmd_ioctl drivers/block/floppy.c:3160 [inline]
- fd_locked_ioctl+0x12e5/0x2820 drivers/block/floppy.c:3528
- fd_ioctl drivers/block/floppy.c:3555 [inline]
- fd_compat_ioctl+0x891/0x1b60 drivers/block/floppy.c:3869
- compat_blkdev_ioctl+0x3b8/0x810 block/ioctl.c:662
- __do_compat_sys_ioctl+0x1c7/0x290 fs/ioctl.c:972
- do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
- __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
- do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:203
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+We will work on a version of the use-case matrix internally and reply
+here in the next couple of days.
 
-Reported-by: syzbot+23a02c7df2cf2bc93fa2@syzkaller.appspotmail.com
-Signed-off-by: Xiongwei Song <sxwjean@gmail.com>
----
- drivers/block/floppy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Please, add to the notes and the matrix as you see fit.
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index c4267da716fe..52112ed59dd0 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -3081,6 +3081,8 @@ static void raw_cmd_free(struct floppy_raw_cmd **ptr)
- 	}
- }
- 
-+#define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
-+
- static int raw_cmd_copyin(int cmd, void __user *param,
- 				 struct floppy_raw_cmd **rcmd)
- {
-@@ -3108,7 +3110,7 @@ static int raw_cmd_copyin(int cmd, void __user *param,
- 	ptr->resultcode = 0;
- 
- 	if (ptr->flags & (FD_RAW_READ | FD_RAW_WRITE)) {
--		if (ptr->length <= 0)
-+		if (ptr->length <= 0 || ptr->length >= MAX_LEN)
- 			return -EINVAL;
- 		ptr->kernel_data = (char *)fd_dma_mem_alloc(ptr->length);
- 		fallback_on_nodma_alloc(&ptr->kernel_data, ptr->length);
--- 
-2.30.2
+Thanks,
+Javier
+
+----
+
+ATTENDEES
+
+- Adam
+- Arnav
+- Chaitanya
+- Himashu
+- Johannes
+- Kanchan
+- Keith
+- Martin
+- Mikulas
+- Niklas
+- Nitesh
+- Selva
+- Vincent
+- Bart
+
+NOTES
+
+- MD and DM are hard requirements
+	- We need support for all the main users of the block layer
+	- Same problem with crypto and integrity
+- Martin would be OK with separating Simple Copy in ZNS and Copy Offload
+- Why did Mikulas work not get upstream?
+	- Timing was an issue
+		- Use-case was about copying data across VMs
+		- No HW vendor support
+		- Hard from a protocol perspective
+			- At that point, SCSI was still adding support in the spec
+			- MSFT could not implement extended copy command in the target (destination) device.
+				- This is what triggered the token-based implementation
+				- This triggered array vendors to implement support for copy offload as token-based. This allows mixing with normal read / write workloads
+			- Martin lost the implementation and dropped it
+
+DIRECTION
+
+- Keeping the IOCTL interface is an option. It might make sense to move from IOCTL to io_uring opcode
+- Martin is happy to do the SCSIpart if the block layer API is upstreamed
+- Token-based implementationis the norm. This allows mixing normal read / write workloads to avoid DoS
+	- This is the direction as opposed to the extended copy command
+	- It addresses problems when integrating with DM and simplifies command multiplexing a single bio into many
+	- It simplifies multiple bios
+	- We should explore Mikulas approach with pointers.
+- Use-cases
+	- ZNS GC
+	- dm-kcopyd
+	- file system GC
+	- fabrics offload to the storage node
+	- copy_file_range
+- It is OK to implement support incrementally, but the interface needs to support all customers of the block layer
+	- OK to not support specific DMs (e.g., RAID5)
+	- We should support DM and MD as a framework and the personalities that are needed. Inspiration in integrity
+		- dm-linear
+		- dm-crypt and dm-verify are needed for F2FSuse-case in Androd
+			- Here, we need copy emulation to support encryption without dealing with HW issues and garbage
+- User-interface can wait and be carried out on the side
+- Maybe it makes sense to start with internal users
+	- copy_file_range
+	- F2FS GC, btrfs GC
+- User-space should be allowed to do anything and kernel-space can chop the command accordingly
+- We need to define the heuristics of the sizes
+- User-space should only work on block devices (no other constructs that are protocol-specific) . Export capabilities in sysfs
+	- Need copy domains to be exposed in sysfs
+	- We need to start with bdev to bdev in block layer
+	- Not specific requirement on multi-namespace in NVMe, but it should be extendable
+	- Plumbing will support all use-cases
+- Try to start with one in-kernel consumer
+- Emulation is a must
+	- Needed for failed I/Os
+	- Expose capabilities so that users can decide
+- We can get help from btrfs and F2FS folks
+- The use case for GC and for copy are different. We might have to reflect this in the interface, but the internal plumbing should allow both paths to be maintained as a single one.
+
+ACTIONS
+
+- [ ] Make a list of use-cases that we want to support in each specification and pick 1-2 examples for MD, DM. Make sure that the interfaces support this
+- [ ] Vendors: Ask internally what is the recommended size for copy, if
+   any
 
