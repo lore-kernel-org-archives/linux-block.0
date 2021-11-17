@@ -2,107 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33E8C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 15:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA5BC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 15:55:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9868615A4
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 15:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6091860EE4
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 15:55:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238782AbhKQPzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 10:55:45 -0500
-Received: from mail-pl1-f182.google.com ([209.85.214.182]:35741 "EHLO
-        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232883AbhKQPzp (ORCPT
+        id S233158AbhKQP6c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 10:58:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229815AbhKQP6b (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 10:55:45 -0500
-Received: by mail-pl1-f182.google.com with SMTP id b13so2553074plg.2;
-        Wed, 17 Nov 2021 07:52:46 -0800 (PST)
+        Wed, 17 Nov 2021 10:58:31 -0500
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59943C061570
+        for <linux-block@vger.kernel.org>; Wed, 17 Nov 2021 07:55:33 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id w15so3278082ill.2
+        for <linux-block@vger.kernel.org>; Wed, 17 Nov 2021 07:55:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6Ct/WdnHEgJHH8QHvcb/w5m2k+Fmtukz/MihX0JhM98=;
+        b=AqDR18QXb2d93ScaXIxLoR2kTmsb0wTcA0fONcFbskLHbrIERtsfFrTJfEYH5NDAm2
+         njrvREtSzlsq6NgXOa3OL3EmN7oq9W0Syh7sSVeWEe2OCHKnZ2aOMv8pzxnxHtd3Pss1
+         1IOTw92KL/7S5pfiqZXPMBRSatrFVH+vjcLR9I/S4EWQ0L3amkP+kVSseFEfCBC+xOOY
+         Fdqsf/C9hzrdJIs3SemTRozgqRB6r0auj77mcGOcSXzEYCnBQGJkaT0vsO80IWrFfZ6Z
+         W94HiYCZg+z77WV5qYIRm0F2xnTxv/4B7qZ7YmRDFNuYXs0O1BMOD+K4XzLA+/yJ0D4K
+         mHAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hfy7Gp3+JeXESUrx1Gbx2zkhaFaWF3TcaVpxpcqkTgE=;
-        b=qliwbOrww5KAByjnOAqAYU5fek/NrZUvH7eY+dDZM7UqhdnVR5neFcIHQ+0an6XM95
-         SoLEiXXxsOeE+eiPLP9uQlfsgMIna3ufOlS3dHtI/UjFJ7P49BTDLf825BeX1yhi9l4N
-         IrVo6OUzxRgQYCu1uun7xj+nylmLS/my2zOBv5B/B/mDHm8xeh34sUunSNQFSb0i11NS
-         zk9boeJkswrB2g9WE2D30PpLA/QWFa1o1cXSQZmYGAe3yc3mHuA9cU+qmI7IFfhlGhDu
-         nLK8X0uayuzOYOatTvzyCfThPukntPeA/6GlT+K4DIjwvygVcS6+aDPa95jzSzlfsZri
-         Y7JA==
-X-Gm-Message-State: AOAM531QVClcfiB0dfynaPuIMczq+klFEdsDuZ5vf5OZ/kTi2as9QO8R
-        AWSk+7S6lYbA5PcWifXpzQs=
-X-Google-Smtp-Source: ABdhPJxm8WqyX8LthpnLwyvUjiFp2PmfTmFgScb1CA1TW0//yPGqt3+fmIM8D+HX4+Lp5dSpUb7G3w==
-X-Received: by 2002:a17:90a:d70a:: with SMTP id y10mr855973pju.36.1637164366198;
-        Wed, 17 Nov 2021 07:52:46 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id h196sm71706pfe.216.2021.11.17.07.52.44
+        bh=6Ct/WdnHEgJHH8QHvcb/w5m2k+Fmtukz/MihX0JhM98=;
+        b=ghZ42wPZCv/MB7cIgE4r5ec1fjjqQGw/5htBeUDHrpu2oLYJIPSpiFvT7SszXDtZTP
+         y8XlEs4keEh9yZNf1MBor3SnhK45nchdQCFgwK0ASedPk/q1mC3vA4UTmhuwbQXcV6qz
+         4hXiig1A57RXK1hfRI9KZqcFcn8xoIM8cxVIOiP1e/w6UXgP2YZUziDbiuzizlzcgNcq
+         dQN6TGcgFk/mKHAnbuwjUWYO+VUigSmcOJKJRrqxfZwliKwJ1E8P2b7qRcvenlLfqRJU
+         /E5C0XUmqb9xgTh5C6fPeIJjL6MN/h5wg9n40PjrKI2go2Zw63E4y0rB/m8x3sKHMh2R
+         QqZA==
+X-Gm-Message-State: AOAM5309bXI7YpsDL/RSBkefk3QYPXkgVG6MJoFK7LmOvXCvLU1WUQne
+        7snJF0yARvKin5TICn6T91dLyX5lDHzLPsmN
+X-Google-Smtp-Source: ABdhPJzvAXO19d9GRlPVNAKrGO0RcLsSceLuHiCGEmJPF/HBVdQ4EynRCpOPelmOz1TcLigcGHMUjw==
+X-Received: by 2002:a05:6e02:604:: with SMTP id t4mr10812420ils.129.1637164532636;
+        Wed, 17 Nov 2021 07:55:32 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id l2sm123832ils.82.2021.11.17.07.55.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Nov 2021 07:52:45 -0800 (PST)
-Message-ID: <553c2a78-1902-aa10-6cc6-a76cbd14364c@acm.org>
-Date:   Wed, 17 Nov 2021 07:52:43 -0800
+        Wed, 17 Nov 2021 07:55:32 -0800 (PST)
+Subject: Re: [PATCH 4/4] nvme: add support for mq_ops->queue_rqs()
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org
+References: <20211117033807.185715-1-axboe@kernel.dk>
+ <20211117033807.185715-5-axboe@kernel.dk> <YZS/tKW/I55Kus+D@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <7ead0d6b-a976-6a33-3d07-2ad06e159b8c@kernel.dk>
+Date:   Wed, 17 Nov 2021 08:55:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+In-Reply-To: <YZS/tKW/I55Kus+D@infradead.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-References: <20210928191340.dcoj7qrclpudtjbo@mpHalley.domain_not_set.invalid>
- <c2d0dff9-ad6d-c32b-f439-00b7ee955d69@acm.org>
- <20211006100523.7xrr3qpwtby3bw3a@mpHalley.domain_not_set.invalid>
- <fbe69cc0-36ea-c096-d247-f201bad979f4@acm.org>
- <20211008064925.oyjxbmngghr2yovr@mpHalley.local>
- <2a65e231-11dd-d5cc-c330-90314f6a8eae@nvidia.com>
- <20211029081447.ativv64dofpqq22m@ArmHalley.local>
- <20211103192700.clqzvvillfnml2nu@mpHalley-2>
- <20211116134324.hbs3tp5proxootd7@ArmHalley.localdomain>
- <ab4ec640-9a89-ea25-fe68-85bae2ae5d8d@acm.org>
- <20211117125224.z36hp2crpj4fwngc@ArmHalley.local>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20211117125224.z36hp2crpj4fwngc@ArmHalley.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/17/21 04:53, Javier González wrote:
-> Thanks for sharing this. We will make sure that DM / MD are supported
-> and then we can cover examples. Hopefully, you guys can help with the
-> bits for dm-crypt to make the decision to offload when it make sense.
+On 11/17/21 1:39 AM, Christoph Hellwig wrote:
+> On Tue, Nov 16, 2021 at 08:38:07PM -0700, Jens Axboe wrote:
+>> This enables the block layer to send us a full plug list of requests
+>> that need submitting. The block layer guarantees that they all belong
+>> to the same queue, but we do have to check the hardware queue mapping
+>> for each request.
+>>
+>> If errors are encountered, leave them in the passed in list. Then the
+>> block layer will handle them individually.
+>>
+>> This is good for about a 4% improvement in peak performance, taking us
+>> from 9.6M to 10M IOPS/core.
+> 
+> The concept looks sensible, but the loop in nvme_queue_rqs is a complete
+> mess to follow. What about something like this (untested) on top?
 
-Will ask around to learn who should work on this.
+Let me take a closer look.
 
-> I will update the notes to keep them alive. Maybe we can have them open
-> in your github page?
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index 13722cc400c2c..555a7609580c7 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -509,21 +509,6 @@ static inline void nvme_copy_cmd(struct nvme_queue *nvmeq,
+>  		nvmeq->sq_tail = 0;
+>  }
+>  
+> -/**
+> - * nvme_submit_cmd() - Copy a command into a queue and ring the doorbell
+> - * @nvmeq: The queue to use
+> - * @cmd: The command to send
+> - * @write_sq: whether to write to the SQ doorbell
+> - */
+> -static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd,
+> -			    bool write_sq)
+> -{
+> -	spin_lock(&nvmeq->sq_lock);
+> -	nvme_copy_cmd(nvmeq, cmd);
+> -	nvme_write_sq_db(nvmeq, write_sq);
+> -	spin_unlock(&nvmeq->sq_lock);
+> -}
 
-Feel free to submit a pull request.
+You really don't like helpers? Code generation wise it doesn't matter,
+but without this and the copy helper we do end up having some trivial
+duplicated code...
 
-Thanks,
+-- 
+Jens Axboe
 
-Bart.
