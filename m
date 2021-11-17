@@ -2,222 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CA0C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 13:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E807C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 13:25:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CCCE61052
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 13:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F185C6140D
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 13:25:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231693AbhKQNRE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 08:17:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235640AbhKQNRE (ORCPT
+        id S237411AbhKQN2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 08:28:41 -0500
+Received: from mail-lf1-f50.google.com ([209.85.167.50]:34683 "EHLO
+        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232627AbhKQN2k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 08:17:04 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E90C061570;
-        Wed, 17 Nov 2021 05:14:05 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id u3so8314887lfl.2;
-        Wed, 17 Nov 2021 05:14:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:mime-version:subject:message-id:date:cc:to;
-        bh=bGbWYoqOp4VoWzvoiIP9woCc0L8iKhtKFSf31az8TBo=;
-        b=eyBE44VSd7ab4IXTIPId7qSYnMLT7/5/0F/mhyFNjDyXBWWw4Hvg4Cmb95bjNV2UnI
-         /xapd/yaXfOSOfjQc3yGcSQw0Ppuc0HfkZV4oGdgBEPsLDENT8OVvl4hY25l4aP54O8M
-         OW23J42Z15KXzkMAcAsI9sefwyMU88teXV15Ivxl+psIbk9iAojbXb/3ehD1UXgEz8/5
-         s/4wn5xb2OAGxCKrQIzAHoTWbYZmoKYsAoK63TyYTHakL74lYOXvJWnvt7J7FpPlF5n4
-         Iv07HipgC14POcwxq+uiCXeCd0EXFGDcKDXdT72nvOVeI+xuLavsxmnIn4xqTZeL7+nz
-         ECfg==
+        Wed, 17 Nov 2021 08:28:40 -0500
+Received: by mail-lf1-f50.google.com with SMTP id n12so8511190lfe.1;
+        Wed, 17 Nov 2021 05:25:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:mime-version:subject:message-id:date:cc:to;
-        bh=bGbWYoqOp4VoWzvoiIP9woCc0L8iKhtKFSf31az8TBo=;
-        b=syP0xFjB9kzQEf+v97rSd3GOdi0mCrOPDLkAsf6FtW53PV3kydtROSGKpnUkranYEI
-         AaLUmA48wGrdsqEe6rW/j+zduZzA+DgBTqwgTpWyAiG2lCGoOWIyUU9hsPRCCENX5ruz
-         corQqRmJboqYiyy86tjVDcTvH6Mf8Vjeb7woNBTp7XPlfdQeaOK8yRGIWH4PfpQOE4x3
-         pRineUqZ1fyrdCwdYg4DSW9aQmZFVHzLqH1J+0mRjsVdGN9KJKgffjShTIPvkoxkIvfx
-         gxTMerdPAoiCVEfM12ei+SDC1GkoOb6YkaXUSI+LW72acqfAb3cRcoqLRL9kclLaczjX
-         qVyw==
-X-Gm-Message-State: AOAM531r+qYQfT0bhrhOVxepLaY5FQadTs78+EWhmdgcJQRpBMA7EF/L
-        YbmbNRh8/JOQNSATrrWmSv7+4yY3POCUkzNt
-X-Google-Smtp-Source: ABdhPJy/saBY9U/b8p+qOeevpjAIp3B9fq+zvwpUI4j5veCcZctHxfJl0Axx0OhT6A6O52YWOjRBIw==
-X-Received: by 2002:a05:6512:33c8:: with SMTP id d8mr15217715lfg.573.1637154844178;
-        Wed, 17 Nov 2021 05:14:04 -0800 (PST)
-Received: from smtpclient.apple ([5.8.48.45])
-        by smtp.gmail.com with ESMTPSA id d22sm1695935lfe.158.2021.11.17.05.14.02
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 17 Nov 2021 05:14:03 -0800 (PST)
-From:   Alexey Lyashkov <alexey.lyashkov@gmail.com>
-Content-Type: multipart/mixed;
-        boundary="Apple-Mail=_C6614723-5315-4C39-B42C-A71A3AFDF89B"
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: T10 DIX bug for the md raid with 4k block devices
-Message-Id: <08E36BA8-FD6F-42A0-8411-0A3B54FDD0DD@gmail.com>
-Date:   Wed, 17 Nov 2021 16:14:02 +0300
-Cc:     linux-block@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, yann.livis@hpe.com
-To:     linux-scsi@vger.kernel.org
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ktgvYN1PoD/4uPIKFT1eS+g9vqs5gmujrNkL090jjTA=;
+        b=5HYurOLfyJc4xwBC3PKYmtFnLychZr3iM0HCIN4s31rPZmDfzcIT4UPRHQHjaAZ1ls
+         xfykQ55hvs+/4866urWnMQJoNkx+dKLVkqMaJ3wRZj4lnBDJxadFIEu7Ntn7aOlNfP9S
+         bcKa/MFGeXs3wEDX1y8BuZ+IEGeF0ZEcxuOmHzp4nXD8H5pFpa/TtvqAoCHp99tXCg7P
+         ybf5kEgnWa5DzjR7ddn1o1mN5nYe3U9Q1JIlavjHZqrWXdF9dYpB0Jl3bOZX+4ZMjqfq
+         SuL1pxwwKpWCXqdykxytL121EqpBvy8ARbwX/YAsl2XXZjBzHGEGper+ws0CI1KsLpAe
+         jRDw==
+X-Gm-Message-State: AOAM5334rzCerS9RfUO9c9PGGQTc+CvzP2zqEMyXiA5U6kcsXPj5J2hk
+        U6aVAXIlm6d9w4R8DwKOpZo=
+X-Google-Smtp-Source: ABdhPJyvhhpGPikx//laywZPo+7A3uM4GU4myRTkPh+RkSLCta75O3gDxYpSyAQsN6XZgWfabhKnWA==
+X-Received: by 2002:a2e:8143:: with SMTP id t3mr7783494ljg.18.1637155540527;
+        Wed, 17 Nov 2021 05:25:40 -0800 (PST)
+Received: from [10.68.32.40] (broadband-109-173-81-86.ip.moscow.rt.ru. [109.173.81.86])
+        by smtp.gmail.com with ESMTPSA id x12sm2117971lfa.243.2021.11.17.05.25.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Nov 2021 05:25:39 -0800 (PST)
+Message-ID: <0d05bdd9-b962-2f63-c0d8-b87ab593ea1b@linux.com>
+Date:   Wed, 17 Nov 2021 16:25:39 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] floppy: Add max size check for user space request
+Content-Language: en-US
+To:     sxwjean@me.com, axboe@kernel.dk, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Xiongwei Song <sxwjean@gmail.com>
+References: <20211116131033.27685-1-sxwjean@me.com>
+From:   Denis Efremov <efremov@linux.com>
+In-Reply-To: <20211116131033.27685-1-sxwjean@me.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
---Apple-Mail=_C6614723-5315-4C39-B42C-A71A3AFDF89B
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+On 11/16/21 16:10, sxwjean@me.com wrote:
+> From: Xiongwei Song <sxwjean@gmail.com>
+> 
+> We need to check the max request size that is from user space before
+> allocating pages. If the request size exceeds the limit, return -EINVAL.
+> This check can avoid the warning below from page allocator.
 
-Hello All,
+Thank you for the patch. Applied,
+https://github.com/evdenis/linux-floppy/commit/3c2d8686849713e3267b972038bb649c8f093345
 
-I was requested to create a raid0 device on top NVMe with 4k block size =
-and DPS2 enabled.
-But this config failed in case bio_intergrity_pre called before =
-bio_split.
-Some research pointed me to the two fixes related to my problem,
-first was=20
-commit f36ea50ca0043e7b1204feaf1d2ba6bd68c08d36
-Author: Wen Xiong <wenxiong@linux.vnet.ibm.com>
-Date:   Wed May 10 08:54:11 2017 -0500
+I will send it to Jens by the of the week.
 
-    blk-mq: NVMe 512B/4K+T10 DIF/DIX format returns I/O error on dd with =
-split op
+Regards,
+Denis
 
-    When formatting NVMe to 512B/4K + T10 DIf/DIX, dd with split op =
-returns
-    "Input/output error". Looks block layer split the bio after calling
-    bio_integrity_prep(bio). This patch fixes the issue.
-
-and second was
-commit e4dc9a4c31fe10d1751c542702afc85be8a5c56a
-Author: Israel Rukshin <israelr@mellanox.com>
-Date:   Wed Dec 11 17:36:02 2019 +0200
-
-    scsi: target/iblock: Fix protection error with blocks greater than =
-512B
-
-=E2=80=A6
-But both ideas not acceptable for me and i continue a research.
-Block io trace pointed me to the three functions called in my case, it =
-is
-t10_pi_generate, bio_integrity_advance, t10_pi_type1_prepare.
-
-Looking in code - t10_pi_generate generate a ref_tag based on =
-=E2=80=9Cvirtual=E2=80=9D block number (512b base), and =
-t10_pi_type1_prepare - converts this data to the the real ref_tag (aka =
-device block number), but sometimes it=E2=80=99s don=E2=80=99t mapped.
-Looking to the=20
-void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
-{
-        struct bio_integrity_payload *bip =3D bio_integrity(bio);
-        struct blk_integrity *bi =3D blk_get_integrity(bio->bi_disk);
-        unsigned bytes =3D bio_integrity_bytes(bi, bytes_done >> 9);
-        bip->bip_iter.bi_sector +=3D bytes_done >> 9;
-        bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
-}
-
-it have shit an iterator in the 512b block size base it looks right, but =
-wait=E2=80=A6=20
-static blk_status_t t10_pi_generate(struct blk_integrity_iter *iter,
-                csum_fn *fn, enum t10_dif_type type)
-{
-        unsigned int i;
-
-        for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
-                struct t10_pi_tuple *pi =3D iter->prot_buf;
-
-
-                iter->seed++; <<<
-        }
-
-        return BLK_STS_OK;
-}
-
-t10_pi_generate / t10_pi_type1_prepare have just a increment by =E2=80=9C1=
-=E2=80=9D for the integrity internal which is 4k in my case,
-so any bio_integrity_advance call will be move an iterator outside of =
-generated sequence and t10_pi_type1_prepare can=E2=80=99t be found a =
-good virt sector for the mapping.
-Changing an increment by =E2=80=9C1=E2=80=9D to be related to the real =
-integrity size solve a problem completely.
-Attached patch passed my own testing on raid0 with 4k block size.=20
-
-
---Apple-Mail=_C6614723-5315-4C39-B42C-A71A3AFDF89B
-Content-Disposition: attachment;
-	filename=t10-pi-fix-intergrity-iterator.patch
-Content-Type: application/octet-stream;
-	x-unix-mode=0777;
-	name="t10-pi-fix-intergrity-iterator.patch"
-Content-Transfer-Encoding: quoted-printable
-
-=46rom=206a8f488be163f8ff33897177d7b744dd70a77203=20Mon=20Sep=2017=20=
-00:00:00=202001=0AFrom:=20Alexey=20Lyashkov=20<umka@cloudlinux.com>=0A=
-Date:=20Wed,=2017=20Nov=202021=2016:09:20=20+0300=0ASubject:=20[PATCH]=20=
-t10-pi:=20fix=20intergrity=20iterator=0A=0AIntegrity=20iterator=20should=20=
-be=20in=20the=20SECTOR_SIZE=20units,=0Anot=20an=20count=20interity=20=
-intervals=20to=20make=20bio_integrity_advance=0Abe=20happy=20on=20=
-bio_split.=0A=0ASigned-off-by:=20Alexey=20Lyashkov=20=
-<alexey.lyashkov@gmail.com>=0A---=0A=20block/t10-pi.c=20|=2014=20=
-++++++++++----=0A=201=20file=20changed,=2010=20insertions(+),=204=20=
-deletions(-)=0A=0Adiff=20--git=20a/block/t10-pi.c=20b/block/t10-pi.c=0A=
-index=2025a52a2a09a8..bbdecead214e=20100644=0A---=20a/block/t10-pi.c=0A=
-+++=20b/block/t10-pi.c=0A@@=20-31,6=20+31,7=20@@=20static=20blk_status_t=20=
-t10_pi_generate(struct=20blk_integrity_iter=20*iter,=0A=20=09=09csum_fn=20=
-*fn,=20enum=20t10_dif_type=20type)=0A=20{=0A=20=09unsigned=20int=20i;=0A=
-+=09unsigned=20int=20pi_size=20=3D=20iter->interval=20>>=20SECTOR_SHIFT;=0A=
-=20=0A=20=09for=20(i=20=3D=200=20;=20i=20<=20iter->data_size=20;=20i=20=
-+=3D=20iter->interval)=20{=0A=20=09=09struct=20t10_pi_tuple=20*pi=20=3D=20=
-iter->prot_buf;=0A@@=20-45,7=20+46,7=20@@=20static=20blk_status_t=20=
-t10_pi_generate(struct=20blk_integrity_iter=20*iter,=0A=20=0A=20=09=09=
-iter->data_buf=20+=3D=20iter->interval;=0A=20=09=09iter->prot_buf=20+=3D=20=
-sizeof(struct=20t10_pi_tuple);=0A-=09=09iter->seed++;=0A+=09=09=
-iter->seed+=3D=20pi_size;=0A=20=09}=0A=20=0A=20=09return=20BLK_STS_OK;=0A=
-@@=20-55,6=20+56,7=20@@=20static=20blk_status_t=20t10_pi_verify(struct=20=
-blk_integrity_iter=20*iter,=0A=20=09=09csum_fn=20*fn,=20enum=20=
-t10_dif_type=20type)=0A=20{=0A=20=09unsigned=20int=20i;=0A+=09unsigned=20=
-int=20pi_size=20=3D=20iter->interval=20>>=20SECTOR_SHIFT;=0A=20=0A=20=09=
-BUG_ON(type=20=3D=3D=20T10_PI_TYPE0_PROTECTION);=0A=20=0A@@=20-94,7=20=
-+96,7=20@@=20static=20blk_status_t=20t10_pi_verify(struct=20=
-blk_integrity_iter=20*iter,=0A=20next:=0A=20=09=09iter->data_buf=20+=3D=20=
-iter->interval;=0A=20=09=09iter->prot_buf=20+=3D=20sizeof(struct=20=
-t10_pi_tuple);=0A-=09=09iter->seed++;=0A+=09=09iter->seed=20+=3D=20=
-pi_size;=0A=20=09}=0A=20=0A=20=09return=20BLK_STS_OK;=0A@@=20-135,6=20=
-+137,7=20@@=20static=20void=20t10_pi_type1_prepare(struct=20request=20=
-*rq)=0A=20=09const=20int=20tuple_sz=20=3D=20rq->q->integrity.tuple_size;=0A=
-=20=09u32=20ref_tag=20=3D=20t10_pi_ref_tag(rq);=0A=20=09struct=20bio=20=
-*bio;=0A+=09unsigned=20int=20pi_size=20=3D=201=20<<=20=
-(rq->q->integrity.interval_exp=20-=20SECTOR_SHIFT);=0A=20=0A=20=09=
-__rq_for_each_bio(bio,=20rq)=20{=0A=20=09=09struct=20=
-bio_integrity_payload=20*bip=20=3D=20bio_integrity(bio);=0A@@=20-156,7=20=
-+159,8=20@@=20static=20void=20t10_pi_type1_prepare(struct=20request=20=
-*rq)=0A=20=0A=20=09=09=09=09if=20(be32_to_cpu(pi->ref_tag)=20=3D=3D=20=
-virt)=0A=20=09=09=09=09=09pi->ref_tag=20=3D=20cpu_to_be32(ref_tag);=0A-=09=
-=09=09=09virt++;=0A+=0A+=09=09=09=09virt=20+=3D=20pi_size;=0A=20=09=09=09=
-=09ref_tag++;=0A=20=09=09=09=09p=20+=3D=20tuple_sz;=0A=20=09=09=09}=0A@@=20=
--185,6=20+189,7=20@@=20static=20void=20t10_pi_type1_complete(struct=20=
-request=20*rq,=20unsigned=20int=20nr_bytes)=0A=20=09const=20int=20=
-tuple_sz=20=3D=20rq->q->integrity.tuple_size;=0A=20=09u32=20ref_tag=20=3D=20=
-t10_pi_ref_tag(rq);=0A=20=09struct=20bio=20*bio;=0A+=09unsigned=20int=20=
-pi_size=20=3D=201=20<<=20(rq->q->integrity.interval_exp=20-=20=
-SECTOR_SHIFT);=0A=20=0A=20=09__rq_for_each_bio(bio,=20rq)=20{=0A=20=09=09=
-struct=20bio_integrity_payload=20*bip=20=3D=20bio_integrity(bio);=0A@@=20=
--202,7=20+207,8=20@@=20static=20void=20t10_pi_type1_complete(struct=20=
-request=20*rq,=20unsigned=20int=20nr_bytes)=0A=20=0A=20=09=09=09=09if=20=
-(be32_to_cpu(pi->ref_tag)=20=3D=3D=20ref_tag)=0A=20=09=09=09=09=09=
-pi->ref_tag=20=3D=20cpu_to_be32(virt);=0A-=09=09=09=09virt++;=0A+=0A+=09=09=
-=09=09virt+=3D=20pi_size;=0A=20=09=09=09=09ref_tag++;=0A=20=09=09=09=09=
-intervals--;=0A=20=09=09=09=09p=20+=3D=20tuple_sz;=0A--=20=0A2.27.0=0A=0A=
-
---Apple-Mail=_C6614723-5315-4C39-B42C-A71A3AFDF89B
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
-
-
-
-Alex
---Apple-Mail=_C6614723-5315-4C39-B42C-A71A3AFDF89B--
+> 
+> WARNING: CPU: 3 PID: 16525 at mm/page_alloc.c:5344 current_gfp_context include/linux/sched/mm.h:195 [inline]
+> WARNING: CPU: 3 PID: 16525 at mm/page_alloc.c:5344 __alloc_pages+0x45d/0x500 mm/page_alloc.c:5356
+> Modules linked in:
+> CPU: 3 PID: 16525 Comm: syz-executor.3 Not tainted 5.15.0-syzkaller #0
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+> RIP: 0010:__alloc_pages+0x45d/0x500 mm/page_alloc.c:5344
+> Code: be c9 00 00 00 48 c7 c7 20 4a 97 89 c6 05 62 32 a7 0b 01 e8 74 9a 42 07 e9 6a ff ff ff 0f 0b e9 a0 fd ff ff 40 80 e5 3f eb 88 <0f> 0b e9 18 ff ff ff 4c 89 ef 44 89 e6 45 31 ed e8 1e 76 ff ff e9
+> RSP: 0018:ffffc90023b87850 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 1ffff92004770f0b RCX: dffffc0000000000
+> RDX: 0000000000000000 RSI: 0000000000000033 RDI: 0000000000010cc1
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+> R10: ffffffff81bb4686 R11: 0000000000000001 R12: ffffffff902c1960
+> R13: 0000000000000033 R14: 0000000000000000 R15: ffff88804cf64a30
+> FS:  0000000000000000(0000) GS:ffff88802cd00000(0063) knlGS:00000000f44b4b40
+> CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+> CR2: 000000002c921000 CR3: 000000004f507000 CR4: 0000000000150ee0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  alloc_pages+0x1a7/0x300 mm/mempolicy.c:2191
+>  __get_free_pages+0x8/0x40 mm/page_alloc.c:5418
+>  raw_cmd_copyin drivers/block/floppy.c:3113 [inline]
+>  raw_cmd_ioctl drivers/block/floppy.c:3160 [inline]
+>  fd_locked_ioctl+0x12e5/0x2820 drivers/block/floppy.c:3528
+>  fd_ioctl drivers/block/floppy.c:3555 [inline]
+>  fd_compat_ioctl+0x891/0x1b60 drivers/block/floppy.c:3869
+>  compat_blkdev_ioctl+0x3b8/0x810 block/ioctl.c:662
+>  __do_compat_sys_ioctl+0x1c7/0x290 fs/ioctl.c:972
+>  do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+>  __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
+>  do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:203
+>  entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+> 
+> Reported-by: syzbot+23a02c7df2cf2bc93fa2@syzkaller.appspotmail.com
+> Signed-off-by: Xiongwei Song <sxwjean@gmail.com>
+> ---
+>  drivers/block/floppy.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index c4267da716fe..52112ed59dd0 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -3081,6 +3081,8 @@ static void raw_cmd_free(struct floppy_raw_cmd **ptr)
+>  	}
+>  }
+>  
+> +#define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
+> +
+>  static int raw_cmd_copyin(int cmd, void __user *param,
+>  				 struct floppy_raw_cmd **rcmd)
+>  {
+> @@ -3108,7 +3110,7 @@ static int raw_cmd_copyin(int cmd, void __user *param,
+>  	ptr->resultcode = 0;
+>  
+>  	if (ptr->flags & (FD_RAW_READ | FD_RAW_WRITE)) {
+> -		if (ptr->length <= 0)
+> +		if (ptr->length <= 0 || ptr->length >= MAX_LEN)
+>  			return -EINVAL;
+>  		ptr->kernel_data = (char *)fd_dma_mem_alloc(ptr->length);
+>  		fallback_on_nodma_alloc(&ptr->kernel_data, ptr->length);
+> 
