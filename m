@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C82CC43217
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45399C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:14:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 853AF61C4F
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25EE962F90
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbhKQGRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S233351AbhKQGRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 17 Nov 2021 01:17:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56028 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbhKQGRT (ORCPT
+        with ESMTP id S232300AbhKQGRT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 17 Nov 2021 01:17:19 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89416C061764;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F7BC061767;
         Tue, 16 Nov 2021 22:14:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=HhvXg+t7CvF5Dfw/VnDXlrbf8FkqH0fuHrNXW8+Oqr8=; b=FxS3D+VuBXJ/jOvsk0iJE5Cggq
-        hkKiK142RJlaFO/l+aubED/UoDKZ2kPpK50OfE/MBdMUVjohYmcQl/FLgv6arNchvlJYlich92nGL
-        DQi29H+smSKkz4WVGjnDOrCMpUwFv8bIvih9K8kD0ss+w09bhp5wfVIrcsBzr9DvLcg5DpdN8NW5T
-        WuPgmkStUGBbSh8N25NgtYprZf7dwMe411c8dnN9CRXd/uFOZ5SCt7+Tid7NzcghzZ5ZYP+Cwtx8g
-        Y0jeZxrwQZyj+SFX2CVshrV8phri0oFthR//YoF0ntBvqKx29EhpqMqSEeuCpgpc00FBWnA45H4S4
-        1TW0pTqQ==;
+        bh=B5W4T0FJ3gk7XDJbVOEv8wyaVixGSlICP7LZCQ2Vt60=; b=PpHW+4xxxLkPpXHIkvdTcUdodH
+        FR8uxhRsUF0VS4H9e2LnN0wdH2kFZhESvE6U8eWCdWPewlEYA6OGHWjScPQThz5UxThEBhibJukDN
+        bt2KOm1DNWJqFHlpbUd8sEOENuJWte281IFte1DHGsT42a8shsKW5I8CQ23nWKjS6Pd/PvQ/8yxbZ
+        53XpGAdkhd8YakpmZzpanxl4+R4iz+/pK/1X495uod/s/w1tXwUwg7cS1WoyHKYSTDESs4RmC8gZo
+        h86Xp0K/Sry0eai9BRh0CVTrGvIDmYKmxhhIz2p/Sz/1l82UC9zLTO6tkqt5LukzuQN4N1mF+dqdH
+        Ot9ZerLw==;
 Received: from 213-225-5-109.nat.highway.a1.net ([213.225.5.109] helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mnECt-007MEP-8v; Wed, 17 Nov 2021 06:14:08 +0000
+        id 1mnECx-007MEp-TD; Wed, 17 Nov 2021 06:14:12 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -39,9 +39,9 @@ Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
         Vignesh Raghavendra <vigneshr@ti.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-mtd@lists.infradead.org
-Subject: [PATCH 01/11] block: move blk_rq_err_bytes to scsi
-Date:   Wed, 17 Nov 2021 07:13:54 +0100
-Message-Id: <20211117061404.331732-2-hch@lst.de>
+Subject: [PATCH 04/11] blk-mq: move blk_mq_flush_plug_list
+Date:   Wed, 17 Nov 2021 07:13:57 +0100
+Message-Id: <20211117061404.331732-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211117061404.331732-1-hch@lst.de>
 References: <20211117061404.331732-1-hch@lst.de>
@@ -52,148 +52,217 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_rq_err_bytes is only used by the scsi midlayer, so move it there.
+Move blk_mq_flush_plug_list and blk_mq_plug_issue_direct down in blk-mq.c
+to prepare for marking blk_mq_request_issue_directly static without the
+need of a forward declaration.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c        | 41 ----------------------------------------
- drivers/scsi/scsi_lib.c | 42 ++++++++++++++++++++++++++++++++++++++++-
- include/linux/blk-mq.h  |  3 ---
- 3 files changed, 41 insertions(+), 45 deletions(-)
+ block/blk-mq.c | 184 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 92 insertions(+), 92 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9ee32f85d74e1..e27a659973965 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1173,47 +1173,6 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c33411f9ce898..d70a470c9c1f1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2308,98 +2308,6 @@ static void blk_mq_commit_rqs(struct blk_mq_hw_ctx *hctx, int *queued,
+ 	*queued = 0;
  }
- EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
  
--/**
-- * blk_rq_err_bytes - determine number of bytes till the next failure boundary
-- * @rq: request to examine
-- *
-- * Description:
-- *     A request could be merge of IOs which require different failure
-- *     handling.  This function determines the number of bytes which
-- *     can be failed from the beginning of the request without
-- *     crossing into area which need to be retried further.
-- *
-- * Return:
-- *     The number of bytes to fail.
-- */
--unsigned int blk_rq_err_bytes(const struct request *rq)
+-static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
 -{
--	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
--	unsigned int bytes = 0;
--	struct bio *bio;
+-	struct blk_mq_hw_ctx *hctx = NULL;
+-	struct request *rq;
+-	int queued = 0;
+-	int errors = 0;
 -
--	if (!(rq->rq_flags & RQF_MIXED_MERGE))
--		return blk_rq_bytes(rq);
+-	while ((rq = rq_list_pop(&plug->mq_list))) {
+-		bool last = rq_list_empty(plug->mq_list);
+-		blk_status_t ret;
 -
--	/*
--	 * Currently the only 'mixing' which can happen is between
--	 * different fastfail types.  We can safely fail portions
--	 * which have all the failfast bits that the first one has -
--	 * the ones which are at least as eager to fail as the first
--	 * one.
--	 */
--	for (bio = rq->bio; bio; bio = bio->bi_next) {
--		if ((bio->bi_opf & ff) != ff)
+-		if (hctx != rq->mq_hctx) {
+-			if (hctx)
+-				blk_mq_commit_rqs(hctx, &queued, from_schedule);
+-			hctx = rq->mq_hctx;
+-		}
+-
+-		ret = blk_mq_request_issue_directly(rq, last);
+-		switch (ret) {
+-		case BLK_STS_OK:
+-			queued++;
 -			break;
--		bytes += bio->bi_iter.bi_size;
+-		case BLK_STS_RESOURCE:
+-		case BLK_STS_DEV_RESOURCE:
+-			blk_mq_request_bypass_insert(rq, false, last);
+-			blk_mq_commit_rqs(hctx, &queued, from_schedule);
+-			return;
+-		default:
+-			blk_mq_end_request(rq, ret);
+-			errors++;
+-			break;
+-		}
 -	}
 -
--	/* this could lead to infinite loop */
--	BUG_ON(blk_rq_bytes(rq) && !bytes);
--	return bytes;
+-	/*
+-	 * If we didn't flush the entire list, we could have told the driver
+-	 * there was more coming, but that turned out to be a lie.
+-	 */
+-	if (errors)
+-		blk_mq_commit_rqs(hctx, &queued, from_schedule);
 -}
--EXPORT_SYMBOL_GPL(blk_rq_err_bytes);
 -
- static void update_io_ticks(struct block_device *part, unsigned long now,
- 		bool end)
+-void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+-{
+-	struct blk_mq_hw_ctx *this_hctx;
+-	struct blk_mq_ctx *this_ctx;
+-	unsigned int depth;
+-	LIST_HEAD(list);
+-
+-	if (rq_list_empty(plug->mq_list))
+-		return;
+-	plug->rq_count = 0;
+-
+-	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
+-		blk_mq_plug_issue_direct(plug, false);
+-		if (rq_list_empty(plug->mq_list))
+-			return;
+-	}
+-
+-	this_hctx = NULL;
+-	this_ctx = NULL;
+-	depth = 0;
+-	do {
+-		struct request *rq;
+-
+-		rq = rq_list_pop(&plug->mq_list);
+-
+-		if (!this_hctx) {
+-			this_hctx = rq->mq_hctx;
+-			this_ctx = rq->mq_ctx;
+-		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx) {
+-			trace_block_unplug(this_hctx->queue, depth,
+-						!from_schedule);
+-			blk_mq_sched_insert_requests(this_hctx, this_ctx,
+-						&list, from_schedule);
+-			depth = 0;
+-			this_hctx = rq->mq_hctx;
+-			this_ctx = rq->mq_ctx;
+-
+-		}
+-
+-		list_add(&rq->queuelist, &list);
+-		depth++;
+-	} while (!rq_list_empty(plug->mq_list));
+-
+-	if (!list_empty(&list)) {
+-		trace_block_unplug(this_hctx->queue, depth, !from_schedule);
+-		blk_mq_sched_insert_requests(this_hctx, this_ctx, &list,
+-						from_schedule);
+-	}
+-}
+-
+ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
+ 		unsigned int nr_segs)
  {
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 621d841d819a3..5e8b5ecb3245a 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -617,6 +617,46 @@ static blk_status_t scsi_result_to_blk_status(struct scsi_cmnd *cmd, int result)
- 	}
+@@ -2539,6 +2447,98 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+ 	return ret;
  }
  
-+/**
-+ * scsi_rq_err_bytes - determine number of bytes till the next failure boundary
-+ * @rq: request to examine
-+ *
-+ * Description:
-+ *     A request could be merge of IOs which require different failure
-+ *     handling.  This function determines the number of bytes which
-+ *     can be failed from the beginning of the request without
-+ *     crossing into area which need to be retried further.
-+ *
-+ * Return:
-+ *     The number of bytes to fail.
-+ */
-+static unsigned int scsi_rq_err_bytes(const struct request *rq)
++static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
 +{
-+	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
-+	unsigned int bytes = 0;
-+	struct bio *bio;
++	struct blk_mq_hw_ctx *hctx = NULL;
++	struct request *rq;
++	int queued = 0;
++	int errors = 0;
 +
-+	if (!(rq->rq_flags & RQF_MIXED_MERGE))
-+		return blk_rq_bytes(rq);
++	while ((rq = rq_list_pop(&plug->mq_list))) {
++		bool last = rq_list_empty(plug->mq_list);
++		blk_status_t ret;
 +
-+	/*
-+	 * Currently the only 'mixing' which can happen is between
-+	 * different fastfail types.  We can safely fail portions
-+	 * which have all the failfast bits that the first one has -
-+	 * the ones which are at least as eager to fail as the first
-+	 * one.
-+	 */
-+	for (bio = rq->bio; bio; bio = bio->bi_next) {
-+		if ((bio->bi_opf & ff) != ff)
++		if (hctx != rq->mq_hctx) {
++			if (hctx)
++				blk_mq_commit_rqs(hctx, &queued, from_schedule);
++			hctx = rq->mq_hctx;
++		}
++
++		ret = blk_mq_request_issue_directly(rq, last);
++		switch (ret) {
++		case BLK_STS_OK:
++			queued++;
 +			break;
-+		bytes += bio->bi_iter.bi_size;
++		case BLK_STS_RESOURCE:
++		case BLK_STS_DEV_RESOURCE:
++			blk_mq_request_bypass_insert(rq, false, last);
++			blk_mq_commit_rqs(hctx, &queued, from_schedule);
++			return;
++		default:
++			blk_mq_end_request(rq, ret);
++			errors++;
++			break;
++		}
 +	}
 +
-+	/* this could lead to infinite loop */
-+	BUG_ON(blk_rq_bytes(rq) && !bytes);
-+	return bytes;
++	/*
++	 * If we didn't flush the entire list, we could have told the driver
++	 * there was more coming, but that turned out to be a lie.
++	 */
++	if (errors)
++		blk_mq_commit_rqs(hctx, &queued, from_schedule);
 +}
 +
- /* Helper for scsi_io_completion() when "reprep" action required. */
- static void scsi_io_completion_reprep(struct scsi_cmnd *cmd,
- 				      struct request_queue *q)
-@@ -794,7 +834,7 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
- 				scsi_print_command(cmd);
- 			}
- 		}
--		if (!scsi_end_request(req, blk_stat, blk_rq_err_bytes(req)))
-+		if (!scsi_end_request(req, blk_stat, scsi_rq_err_bytes(req)))
- 			return;
- 		fallthrough;
- 	case ACTION_REPREP:
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2949d9ac74849..a78d9a0f2a1be 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -947,7 +947,6 @@ struct req_iterator {
-  * blk_rq_pos()			: the current sector
-  * blk_rq_bytes()		: bytes left in the entire request
-  * blk_rq_cur_bytes()		: bytes left in the current segment
-- * blk_rq_err_bytes()		: bytes left till the next error boundary
-  * blk_rq_sectors()		: sectors left in the entire request
-  * blk_rq_cur_sectors()		: sectors left in the current segment
-  * blk_rq_stats_sectors()	: sectors of the entire request used for stats
-@@ -971,8 +970,6 @@ static inline int blk_rq_cur_bytes(const struct request *rq)
- 	return bio_iovec(rq->bio).bv_len;
- }
- 
--unsigned int blk_rq_err_bytes(const struct request *rq);
--
- static inline unsigned int blk_rq_sectors(const struct request *rq)
++void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
++{
++	struct blk_mq_hw_ctx *this_hctx;
++	struct blk_mq_ctx *this_ctx;
++	unsigned int depth;
++	LIST_HEAD(list);
++
++	if (rq_list_empty(plug->mq_list))
++		return;
++	plug->rq_count = 0;
++
++	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
++		blk_mq_plug_issue_direct(plug, false);
++		if (rq_list_empty(plug->mq_list))
++			return;
++	}
++
++	this_hctx = NULL;
++	this_ctx = NULL;
++	depth = 0;
++	do {
++		struct request *rq;
++
++		rq = rq_list_pop(&plug->mq_list);
++
++		if (!this_hctx) {
++			this_hctx = rq->mq_hctx;
++			this_ctx = rq->mq_ctx;
++		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx) {
++			trace_block_unplug(this_hctx->queue, depth,
++						!from_schedule);
++			blk_mq_sched_insert_requests(this_hctx, this_ctx,
++						&list, from_schedule);
++			depth = 0;
++			this_hctx = rq->mq_hctx;
++			this_ctx = rq->mq_ctx;
++
++		}
++
++		list_add(&rq->queuelist, &list);
++		depth++;
++	} while (!rq_list_empty(plug->mq_list));
++
++	if (!list_empty(&list)) {
++		trace_block_unplug(this_hctx->queue, depth, !from_schedule);
++		blk_mq_sched_insert_requests(this_hctx, this_ctx, &list,
++						from_schedule);
++	}
++}
++
+ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct list_head *list)
  {
- 	return blk_rq_bytes(rq) >> SECTOR_SHIFT;
 -- 
 2.30.2
 
