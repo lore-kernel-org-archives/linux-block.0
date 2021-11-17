@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E40C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 03:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC24C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 03:38:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D259661BE1
+	by mail.kernel.org (Postfix) with ESMTP id F2BB561545
 	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 03:38:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbhKQDlK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 22:41:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49718 "EHLO
+        id S230255AbhKQDlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 22:41:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbhKQDlJ (ORCPT
+        with ESMTP id S231200AbhKQDlK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 22:41:09 -0500
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EFDC061570
+        Tue, 16 Nov 2021 22:41:10 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8913FC061746
         for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 19:38:12 -0800 (PST)
-Received: by mail-io1-xd2d.google.com with SMTP id k22so1255878iol.13
-        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 19:38:11 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id e144so1329402iof.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 19:38:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=3CAui2JMitf1Xwb6TPXFbbW7kvaykln1ulpIaFQ2nLM=;
-        b=Y5WGtLQxH2C0dni/BwVp7cYSTyYyohZ5DmlM12NpOdda0naLnwDTgU+H6vygFr1pri
-         lc1kowFbPAzW0nDgJvvYV6s6QR2wYRlWdLfE5VJZmVoljnoy6jCSRgCkbiqCviAP23NZ
-         gwvSldVPzfD3quCAFvyz4JkBzerN2MzMCayUjSguqo5f3bQOdExGfQpBzEANhfHibg2Q
-         lLCpBSidzlBEcDtbLcd+ff2b6vCnjCtG9rovhxNXSR7dalqRxVd0/163YFYdnea4g714
-         v7lRgP0mjSRJsKvA4uljvSd99C5CHohcfz3E+Yb38x70PIu0dqQRCjpmaIeUQPBm1vXa
-         ukaQ==
+        bh=4G4Mjbe7lIxc74U3KrDv4l8eTOrTW6gu4gjlLQHEK0k=;
+        b=svSwfhjyuJgA0GF2D87eQFGI5pFplJPSMvBTs/0mfTeYw4kcKixtMfAbV6jkqytx2v
+         cuJEfJvMmFAT0XvF6tZfVGgR0OGXIUrAAjHhmb6/qNHGCIC+VvHWAT81VivB8T23MZxi
+         iwUAujSuaWgvxSJaduwFUqo/IC5vrUDtoFfS939AlQTIIb0AvWPp2E8eDIOgDgJwaB1o
+         zGuBwkXH6emCIhjAzsKmjpy41S7LuUez7+uX4bge+QTf8o1embOyHlcg241newWd0cGu
+         znDOxjw/OEweSyzj6t1qW3MD4AGF9MfqYVz2hhGPncI/Uzu5N6oiX9oWc2Q/FUEbANo7
+         GjPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3CAui2JMitf1Xwb6TPXFbbW7kvaykln1ulpIaFQ2nLM=;
-        b=5TOK8kDtcYK9OxMtYB5YOuLfsOeJDaOf4yjdkupHHZAbt9E9NUDtjx2M3gRFuPa2bA
-         IYxHc/vhX9ChsBLjLAZehMXC0RejOuvSDwXtSzp67srSIHqtMVnxl50Yf1sTGpHHtrd3
-         5OYU8OADf4+qy7xCzruBU2xRI1XMatKRvrlvuwzhiBP6A9OOkGFhgx6kGUWEHaie6Rx/
-         uzfxYP4Vs6WWo9mglBxfvhupihyxYCcyqpCxdYW451P2xdEZSs0CYVnm4WSSIoE1K6xO
-         4abT3MQLFjETawpRIg7DL3mm1nqPou0eHuKthTsP/IqWseQYqRGtK3x9GN18IqhBZ6O7
-         VL5A==
-X-Gm-Message-State: AOAM531KAUdpbovToi0DO/tRYSVskkLKjjM4sAf7tzbg0aZ6TkhyZ/HO
-        9IxPFBvQUNZYdZJdyz4LFxYdUcFKQD4nB3zv
-X-Google-Smtp-Source: ABdhPJwebyYKedlR+7B02BArNNq+dvUyBW9K/OXHNzZBKNMrJ9/h0poDWD81bXLbP+khNGWzi++u5g==
-X-Received: by 2002:a05:6602:328a:: with SMTP id d10mr8670131ioz.175.1637120291220;
+        bh=4G4Mjbe7lIxc74U3KrDv4l8eTOrTW6gu4gjlLQHEK0k=;
+        b=Mj0AbdK193fa/605yRKpi8xIC220PHRj7wGpE1tf4+Gc3DGevcfN++2T85Mm2Dp2UL
+         8shWZlmOJrpL6+LhBCsXpsxv5yVCaXawLQ7n5oJm68etivrsEd6brXhzeGdWyyYKHgPE
+         Gg1ogiej7kNuRAIq+cIVzpJFEv8vp+J80hGzAZLiMe0MSKtWaKxad4Ox57J1CntCja3i
+         T+c26UYUQwg/sUDtAtcaQMcxI9VlBkox4ixg+nBt5xWJ2meZYutt55ZPoQnF5zrQ4aK3
+         Wzp0djfNGuDhUEMujy90JHNcLxuTZaifKoN3AcLNWnd0i5jZDE0ZGCBaKjPOMk5z6bsP
+         nFgQ==
+X-Gm-Message-State: AOAM532NQ5UwBA17olM4eCJ39gCq3SFrl1KLU6EE3xcu6LnMZTeW1NDb
+        2xXqWsQDvsmUm2EPYUe88bcgEEVGCMZlcnfl
+X-Google-Smtp-Source: ABdhPJyTr1DRMagYOjMA2OQv6txRKgU6H9uQM+mP9atjqXqq3LW6IIRd8jh8hlmCpGBOJ2eYkqftNQ==
+X-Received: by 2002:a05:6638:3899:: with SMTP id b25mr10321264jav.39.1637120291851;
         Tue, 16 Nov 2021 19:38:11 -0800 (PST)
 Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id l13sm12563693ios.49.2021.11.16.19.38.10
+        by smtp.gmail.com with ESMTPSA id l13sm12563693ios.49.2021.11.16.19.38.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 19:38:10 -0800 (PST)
+        Tue, 16 Nov 2021 19:38:11 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     hch@infradead.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/4] block: add mq_ops->queue_rqs hook
-Date:   Tue, 16 Nov 2021 20:38:04 -0700
-Message-Id: <20211117033807.185715-2-axboe@kernel.dk>
+Subject: [PATCH 2/4] nvme: split command copy into a helper
+Date:   Tue, 16 Nov 2021 20:38:05 -0700
+Message-Id: <20211117033807.185715-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211117033807.185715-1-axboe@kernel.dk>
 References: <20211117033807.185715-1-axboe@kernel.dk>
@@ -66,70 +66,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we have a list of requests in our plug list, send it to the driver in
-one go, if possible. The driver must set mq_ops->queue_rqs() to support
-this, if not the usual one-by-one path is used.
+We'll need it for batched submit as well.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c         | 17 +++++++++++++++++
- include/linux/blk-mq.h |  8 ++++++++
- 2 files changed, 25 insertions(+)
+ drivers/nvme/host/pci.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9b4e79e2ac1e..005715206b16 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2208,6 +2208,19 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 	int queued = 0;
- 	int errors = 0;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index c89f74ea00d4..c33cd1177b37 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -501,6 +501,15 @@ static inline void nvme_write_sq_db(struct nvme_queue *nvmeq, bool write_sq)
+ 	nvmeq->last_sq_tail = nvmeq->sq_tail;
+ }
  
-+	/*
-+	 * Peek first request and see if we have a ->queue_rqs() hook. If we
-+	 * do, we can dispatch the whole plug list in one go. We already know
-+	 * at this point that all requests belong to the same queue, caller
-+	 * must ensure that's the case.
-+	 */
-+	rq = rq_list_peek(&plug->mq_list);
-+	if (rq->q->mq_ops->queue_rqs) {
-+		rq->q->mq_ops->queue_rqs(&plug->mq_list);
-+		if (rq_list_empty(plug->mq_list))
-+			return;
-+	}
++static inline void nvme_copy_cmd(struct nvme_queue *nvmeq,
++				 struct nvme_command *cmd)
++{
++	memcpy(nvmeq->sq_cmds + (nvmeq->sq_tail << nvmeq->sqes), cmd,
++		sizeof(*cmd));
++	if (++nvmeq->sq_tail == nvmeq->q_depth)
++		nvmeq->sq_tail = 0;
++}
 +
- 	while ((rq = rq_list_pop(&plug->mq_list))) {
- 		bool last = rq_list_empty(plug->mq_list);
- 		blk_status_t ret;
-@@ -2256,6 +2269,10 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 
- 	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
- 		blk_mq_plug_issue_direct(plug, false);
-+		/*
-+		 * Expected case, all requests got dispatched. If not, fall
-+		 * through to individual dispatch of the remainder.
-+		 */
- 		if (rq_list_empty(plug->mq_list))
- 			return;
- 	}
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 3ba1e750067b..897cf475e7eb 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -503,6 +503,14 @@ struct blk_mq_ops {
- 	 */
- 	void (*commit_rqs)(struct blk_mq_hw_ctx *);
- 
-+	/**
-+	 * @queue_rqs: Queue a list of new requests. Driver is guaranteed
-+	 * that each request belongs to the same queue. If the driver doesn't
-+	 * empty the @rqlist completely, then the rest will be queued
-+	 * individually by the block layer upon return.
-+	 */
-+	void (*queue_rqs)(struct request **rqlist);
-+
- 	/**
- 	 * @get_budget: Reserve budget before queue request, once .queue_rq is
- 	 * run, it is driver's responsibility to release the
+ /**
+  * nvme_submit_cmd() - Copy a command into a queue and ring the doorbell
+  * @nvmeq: The queue to use
+@@ -511,10 +520,7 @@ static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd,
+ 			    bool write_sq)
+ {
+ 	spin_lock(&nvmeq->sq_lock);
+-	memcpy(nvmeq->sq_cmds + (nvmeq->sq_tail << nvmeq->sqes),
+-	       cmd, sizeof(*cmd));
+-	if (++nvmeq->sq_tail == nvmeq->q_depth)
+-		nvmeq->sq_tail = 0;
++	nvme_copy_cmd(nvmeq, cmd);
+ 	nvme_write_sq_db(nvmeq, write_sq);
+ 	spin_unlock(&nvmeq->sq_lock);
+ }
 -- 
 2.33.1
 
