@@ -2,108 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4321AC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64736C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 10:19:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B8FA61B42
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46DB661BAA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 10:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235570AbhKQJze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 04:55:34 -0500
-Received: from mail-vk1-f172.google.com ([209.85.221.172]:37681 "EHLO
-        mail-vk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235627AbhKQJze (ORCPT
+        id S236199AbhKQKWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 05:22:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:33522 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232776AbhKQKWs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 04:55:34 -0500
-Received: by mail-vk1-f172.google.com with SMTP id e64so1274204vke.4;
-        Wed, 17 Nov 2021 01:52:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DaTH6dG+9OWuk5kLfq7Obj05Cb3d8CS7ODxUbCSsHLY=;
-        b=hehaOcivLeOZdPbXAUg/kY+nfhCojFZMe0c6M69o03c3uv8qcZnwFWp4IOgi1l2vt7
-         UBA7qhewIqoXF65TbLxYUt0wu/fJocko09gIk1cv+6W5CWKBEaKU4lgvKphRB+H4CPtO
-         ymmCmpCOxapu5msM5ZWnBk8FGJy6H0Z7SW38cHvQxPBS097I5hovy+IrLnumlvm8IL0p
-         mRhPJEYOnw3hD1QKyzODDbLDSJywakOeaspcDHimCRL3oLHTrJIJVfM0guZXpnFoxhzQ
-         xGQbGwB8FJvPuSOzDUKJ5493f4wUgLrMj0RQRsoniRfuqFvnrIuphrBhvdhVamyCkQAM
-         nyIA==
-X-Gm-Message-State: AOAM531VjGmBN0Q5SnBJW3xHrVUD+kCul7nmBo0TPepYRRLju62p/dKN
-        GUF44W7PiXotyGI2lcW055/eVwzdnuY42g==
-X-Google-Smtp-Source: ABdhPJxssKJnTS7lyevwjlZazaFRI63UxBqJV9h9WuFWesZ19yrFdAj3a41H0urJq5N56aVs1v0HBg==
-X-Received: by 2002:a05:6122:1696:: with SMTP id 22mr86804241vkl.2.1637142755296;
-        Wed, 17 Nov 2021 01:52:35 -0800 (PST)
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com. [209.85.222.43])
-        by smtp.gmail.com with ESMTPSA id y22sm12106344vsy.33.2021.11.17.01.52.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Nov 2021 01:52:34 -0800 (PST)
-Received: by mail-ua1-f43.google.com with SMTP id ay21so4488549uab.12;
-        Wed, 17 Nov 2021 01:52:34 -0800 (PST)
-X-Received: by 2002:a05:6102:2910:: with SMTP id cz16mr66332901vsb.9.1637142754433;
- Wed, 17 Nov 2021 01:52:34 -0800 (PST)
+        Wed, 17 Nov 2021 05:22:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637144389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iKe2mE7c3MFaKZJJkx5RnwvPm+0OFhFwmWEBATWZjlU=;
+        b=D3qyLTs9p5JnPkd9EVQikfW99MwGNbd4REiCz6MDG8jQeIVsBb1+3kQj4G3RoypzOJ8g0f
+        FOLA8RupSCzy/Iz/lkskKG+IPSaP65Sd2WnbJzfTfCCnFUuheoD1AVlGKklFNxsQhbcA0h
+        B5Pf7EiKt7gp7wcvzGUma9AKY1tPAt8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-HLZTN7yAO6WuHuzwrqJWWw-1; Wed, 17 Nov 2021 05:19:46 -0500
+X-MC-Unique: HLZTN7yAO6WuHuzwrqJWWw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5C901023F4E;
+        Wed, 17 Nov 2021 10:19:44 +0000 (UTC)
+Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7025E19E7E;
+        Wed, 17 Nov 2021 10:19:33 +0000 (UTC)
+Date:   Wed, 17 Nov 2021 18:19:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     yangerkun <yangerkun@huawei.com>
+Cc:     damien.lemoal@wdc.com, axboe@kernel.dk, miquel.raynal@bootlin.com,
+        richard@nod.at, vigneshr@ti.com, linux-block@vger.kernel.org,
+        linux-mtd@lists.infradead.org, yi.zhang@huawei.com,
+        yebin10@huawei.com, houtao1@huawei.com, ming.lei@redhat.com
+Subject: Re: [QUESTION] blk_mq_freeze_queue in elevator_init_mq
+Message-ID: <YZTXMZRxvb5Orsdo@T590>
+References: <d9113bf8-4654-cb04-f79c-38e11493cb2c@huawei.com>
+ <YZS4FYxtxYAXjtFJ@T590>
+ <d9ca8e57-55b8-96f8-e5fd-6103c8b1fa4b@huawei.com>
 MIME-Version: 1.0
-References: <20211108040551.1942823-1-willy@infradead.org> <20211108040551.1942823-2-willy@infradead.org>
- <YYozKaEXemjKwEar@infradead.org> <YZKCx1cwBXOZcTA4@casper.infradead.org>
- <YZNQnd887/TcPH7H@infradead.org> <YZQnWU9ABBlXJKa5@casper.infradead.org>
-In-Reply-To: <YZQnWU9ABBlXJKa5@casper.infradead.org>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 17 Nov 2021 10:52:23 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXhUbMK8Sp1Zj-cNMSK2Tq1bZ3egX_LXihQpmHULkBk_Q@mail.gmail.com>
-Message-ID: <CAMuHMdXhUbMK8Sp1Zj-cNMSK2Tq1bZ3egX_LXihQpmHULkBk_Q@mail.gmail.com>
-Subject: Re: [PATCH v2 01/28] csky,sparc: Declare flush_dcache_folio()
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d9ca8e57-55b8-96f8-e5fd-6103c8b1fa4b@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 17, 2021 at 2:22 AM Matthew Wilcox <willy@infradead.org> wrote:
-> On Mon, Nov 15, 2021 at 10:33:01PM -0800, Christoph Hellwig wrote:
-> > I see how this works no, but it is pretty horrible.  Why not something
-> > simple like the patch below?  If/when an architecture actually
-> > wants to override flush_dcache_folio we can find out how to best do
-> > it:
->
-> I'll stick this one into -next and see if anything blows up:
->
-> From 14f55de74c68a3eb058cfdbf81414148b9bdaac7 Mon Sep 17 00:00:00 2001
-> From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-> Date: Sat, 6 Nov 2021 17:13:35 -0400
-> Subject: [PATCH] Add linux/cacheflush.h
->
-> Many architectures do not include asm-generic/cacheflush.h, so turn
-> the includes on their head and add linux/cacheflush.h which includes
-> asm/cacheflush.h.
->
-> Move the flush_dcache_folio() declaration from asm-generic/cacheflush.h
-> to linux/cacheflush.h and change linux/highmem.h to include
-> linux/cacheflush.h instead of asm/cacheflush.h so that all necessary
-> places will see flush_dcache_folio().
->
-> More functions should have their default implementations moved in the
-> future, but those are for follow-on patches.  This fixes csky, sparc and
-> sparc64 which were missed in the commit which added flush_dcache_folio().
->
-> Fixes: 08b0b0059bf1 ("mm: Add flush_dcache_folio()")
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+On Wed, Nov 17, 2021 at 05:00:22PM +0800, yangerkun wrote:
+> 
+> 
+> On 2021/11/17 16:06, Ming Lei wrote:
+> > On Wed, Nov 17, 2021 at 11:37:13AM +0800, yangerkun wrote:
+> > > Nowdays we meet the boot regression while enable lots of mtdblock
+> > 
+> > What is your boot regression? Any dmesg log?
+> 
+> The result is that when boot with 5.10 kernel compare with 4.4, 5.10
+> will consume about 1.6s more...
 
->  arch/m68k/include/asm/cacheflush_mm.h |  1 -
+OK, I understand the issue now, and please try the attached patch
+which depends on the following one:
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-5.16&id=2a19b28f7929866e1cec92a3619f4de9f2d20005
 
-Gr{oetje,eeting}s,
 
-                        Geert
+diff --git a/block/elevator.c b/block/elevator.c
+index 1f39f6e8ebb9..19a78d5516ba 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -694,12 +694,18 @@ void elevator_init_mq(struct request_queue *q)
+ 	if (!e)
+ 		return;
+ 
++	/*
++	 * We are called before adding disk, when there isn't any FS I/O,
++	 * so freezing queue plus canceling dispatch work is enough to
++	 * drain any dispatch activities originated from passthrough
++	 * requests, then no need to quiesce queue which may add long boot
++	 * latency, especially when lots of disks are involved.
++	 */
+ 	blk_mq_freeze_queue(q);
+-	blk_mq_quiesce_queue(q);
++	blk_mq_cancel_work_sync(q);
+ 
+ 	err = blk_mq_init_sched(q, e);
+ 
+-	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 
+ 	if (err) {
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+
+thanks,
+Ming
+
