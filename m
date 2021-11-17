@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEEBC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE280C4707A
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3153C6152B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF44A630EF
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240981AbhKQV5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 16:57:36 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:58770 "EHLO
+        id S241011AbhKQV5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 16:57:40 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:58876 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240859AbhKQV5Y (ORCPT
+        with ESMTP id S240924AbhKQV52 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 16:57:24 -0500
+        Wed, 17 Nov 2021 16:57:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=tg4MegziDOSUr28d0QYX7YlGwKcxOm361uD6F0v6Nwc=; b=Pb03cCUZARE127q4WVQ0eWvolp
-        Mb1diotmJvqpeDeBK8Nzlb75G1AR4AD6o7+xcf8NlVFo0jWRBZKQZkwe1gCSszhKpi/1O1OhwbgYK
-        3ckD0YQ/amhEZITCdX7U5pN8qEyXkXJK86WnazusJs2E9tZHFN6lAJRmCFPJB4mJo/axNYMIAJnYT
-        XG6WVzpkeomCYr0DkreuBgTRZn5mjna/lx9MQP/UhKznpV/ZTDtPuX5oXoDZWif6Ga9ZylOR5RxwG
-        cG0sbb8nVRTh9h/CVz7CxWFITPcV8QEmMsfO/UY/U6GoVRU4UNqFUMYB+Vhw1lVpP1RT4efZSt718
-        xk864lBQ==;
+        bh=3aZ2AYK60CEaIE70gWhhj4/fir+nnPw5quNT7e3qCog=; b=NJEPejp0LpTJMPJAQBDQ1MYs1+
+        3UL1xqlHQNFve4AhubcfvJKHkXFRnbIFuwZ8T2e1///MP9tlXlO+pNXwRGzqvcbNPNKG4mNp/jios
+        Q83WLonVf6I8Rsgwt3nmUmvdLiZ9bkPYSIxdIhcuIg8oUL71wZh4T6i412CYWLfvGDfmjM96tej1y
+        /7oe4Y7hqf+VYC2Uo+9Oq0Ec8U78z6glajffd7td9yLaKsDHcdY6E5m1ST+5YQH32wUItt0YxBvkx
+        b++3RG4kf7n8gFxLoWSWWwW+IiIORy8KMkFbkAFplbYybYTd7KzFgDj8DXHUJxwJKJ4bxEEixnMKk
+        oLyUObBQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mnSsn-000Zo7-24; Wed, 17 Nov 2021 14:54:21 -0700
+        id 1mnSsr-000Zo3-Jf; Wed, 17 Nov 2021 14:54:27 -0700
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mnSsm-00010Q-22; Wed, 17 Nov 2021 14:54:20 -0700
+        id 1mnSsi-0000z4-N4; Wed, 17 Nov 2021 14:54:16 -0700
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -55,131 +55,57 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 17 Nov 2021 14:54:10 -0700
-Message-Id: <20211117215410.3695-24-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Date:   Wed, 17 Nov 2021 14:53:53 -0700
+Message-Id: <20211117215410.3695-7-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211117215410.3695-1-logang@deltatee.com>
 References: <20211117215410.3695-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, jhubbard@nvidia.com, jgg@nvidia.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v4 23/23] nvme-pci: allow mmaping the CMB in userspace
+Subject: [PATCH v4 06/23] dma-mapping: allow EREMOTEIO return code for P2PDMA transfers
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allow userspace to obtain CMB memory by mmaping the controller's
-char device. The mmap call allocates and returns a hunk of CMB memory,
-(the offset is ignored) so userspace does not have control over the
-address within the CMB.
-
-A VMA allocated in this way will only be usable by drivers that set
-FOLL_PCI_P2PDMA when calling GUP. And inter-device support will be
-checked the first time the pages are mapped for DMA.
-
-Currently this is only supported by O_DIRECT to an PCI NVMe device
-or through the NVMe passthrough IOCTL.
+Add EREMOTEIO error return to dma_map_sgtable() which will be used
+by .map_sg() implementations that detect P2PDMA pages that the
+underlying DMA device cannot access.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/nvme/host/core.c | 15 +++++++++++++++
- drivers/nvme/host/nvme.h |  2 ++
- drivers/nvme/host/pci.c  | 18 ++++++++++++++++++
- 3 files changed, 35 insertions(+)
+ kernel/dma/mapping.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 344414351314..39ad592cacdc 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3111,6 +3111,10 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
- 	}
+diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
+index 9478eccd1c8e..c056a1468189 100644
+--- a/kernel/dma/mapping.c
++++ b/kernel/dma/mapping.c
+@@ -197,7 +197,7 @@ static int __dma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
+ 	if (ents > 0)
+ 		debug_dma_map_sg(dev, sg, nents, ents, dir, attrs);
+ 	else if (WARN_ON_ONCE(ents != -EINVAL && ents != -ENOMEM &&
+-			      ents != -EIO))
++			      ents != -EIO && ents != -EREMOTEIO))
+ 		return -EIO;
  
- 	file->private_data = ctrl;
-+
-+	if (ctrl->ops->mmap_file_open)
-+		ctrl->ops->mmap_file_open(ctrl, file);
-+
- 	return 0;
- }
- 
-@@ -3124,12 +3128,23 @@ static int nvme_dev_release(struct inode *inode, struct file *file)
- 	return 0;
- }
- 
-+static int nvme_dev_mmap(struct file *file, struct vm_area_struct *vma)
-+{
-+	struct nvme_ctrl *ctrl = file->private_data;
-+
-+	if (!ctrl->ops->mmap_cmb)
-+		return -ENODEV;
-+
-+	return ctrl->ops->mmap_cmb(ctrl, vma);
-+}
-+
- static const struct file_operations nvme_dev_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= nvme_dev_open,
- 	.release	= nvme_dev_release,
- 	.unlocked_ioctl	= nvme_dev_ioctl,
- 	.compat_ioctl	= compat_ptr_ioctl,
-+	.mmap		= nvme_dev_mmap,
- };
- 
- static ssize_t nvme_sysfs_reset(struct device *dev,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a9f60b12a32b..5fdc1a2027e9 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -494,6 +494,8 @@ struct nvme_ctrl_ops {
- 	void (*delete_ctrl)(struct nvme_ctrl *ctrl);
- 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
- 	bool (*supports_pci_p2pdma)(struct nvme_ctrl *ctrl);
-+	void (*mmap_file_open)(struct nvme_ctrl *ctrl, struct file *file);
-+	int (*mmap_cmb)(struct nvme_ctrl *ctrl, struct vm_area_struct *vma);
- };
- 
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 3f2bd1efe076..05d6e7284000 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2896,6 +2896,22 @@ static bool nvme_pci_supports_pci_p2pdma(struct nvme_ctrl *ctrl)
- 	return dma_pci_p2pdma_supported(dev->dev);
- }
- 
-+static void nvme_pci_mmap_file_open(struct nvme_ctrl *ctrl,
-+				    struct file *file)
-+{
-+	struct pci_dev *pdev = to_pci_dev(to_nvme_dev(ctrl)->dev);
-+
-+	pci_p2pdma_mmap_file_open(pdev, file);
-+}
-+
-+static int nvme_pci_mmap_cmb(struct nvme_ctrl *ctrl,
-+			     struct vm_area_struct *vma)
-+{
-+	struct pci_dev *pdev = to_pci_dev(to_nvme_dev(ctrl)->dev);
-+
-+	return pci_mmap_p2pmem(pdev, vma);
-+}
-+
- static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.name			= "pcie",
- 	.module			= THIS_MODULE,
-@@ -2907,6 +2923,8 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.submit_async_event	= nvme_pci_submit_async_event,
- 	.get_address		= nvme_pci_get_address,
- 	.supports_pci_p2pdma	= nvme_pci_supports_pci_p2pdma,
-+	.mmap_file_open		= nvme_pci_mmap_file_open,
-+	.mmap_cmb		= nvme_pci_mmap_cmb,
- };
- 
- static int nvme_dev_map(struct nvme_dev *dev)
+ 	return ents;
+@@ -255,6 +255,8 @@ EXPORT_SYMBOL(dma_map_sg_attrs);
+  *		complete the mapping. Should succeed if retried later.
+  *   -EIO	Legacy error code with an unknown meaning. eg. this is
+  *		returned if a lower level call returned DMA_MAPPING_ERROR.
++ *   -EREMOTEIO	The DMA device cannot access P2PDMA memory specified in
++ *		the sg_table. This will not succeed if retried.
+  */
+ int dma_map_sgtable(struct device *dev, struct sg_table *sgt,
+ 		    enum dma_data_direction dir, unsigned long attrs)
 -- 
 2.30.2
 
