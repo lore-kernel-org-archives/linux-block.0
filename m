@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A691C43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A409C433FE
 	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:55:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 746186321B
+	by mail.kernel.org (Postfix) with ESMTP id 58B3061BD4
 	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:55:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241047AbhKQV6F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 16:58:05 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:58808 "EHLO
+        id S240845AbhKQV6E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 16:58:04 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:58942 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240888AbhKQV5Y (ORCPT
+        with ESMTP id S240952AbhKQV5a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 16:57:24 -0500
+        Wed, 17 Nov 2021 16:57:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=sIc/9Jpqra/LKYpNc8AVq+YZr9rqCBlMcxeI5w63K9Y=; b=qAabCTSl24l5BPvqCkqk+aNO4/
-        l35sVoSDBpDSDJegtE06JXOxgptVuWcQMTEEDcHsf/4NUk1ro2yykE8tjlzom72mEdysLMvuAgtbk
-        ZIwgZV926G/lls+vdnSCqpFNiddcie5w4eYAYXjAlPhN9KwlMFD/REUCWD1/Y1q2ZVF9+ZcyQx1Oa
-        /9TWPeQqZwLldM3CCv1ewJqp2oSn+FS8HZOy019zMRBJDPKUBd1lgp+ARI37C0vqIf3g+SEoXX1IM
-        o5AdWxaEKpA5xfkKjzbcuAqzS9I3fzsRYWRZQwdJI1cbLKFcSqF7ZgjmSLkO1miMCsmGDBy/hmwts
-        +kTYNZ8g==;
+        bh=xZbUylKBSsKfa1WupiMgdNHqVWdsfajuGq94ozdCsxA=; b=GQlvthLNky1Ky13tzwnFV9+STl
+        yKfZhCVsQdK2MmEPPJiMZH5riLcsVNf83eF9sbIHhNKsW0n9WG0LUW+5elS2RueHaagktsGbjMZ81
+        OEFSLcSXg8M0/yIAaAEzNv462Alz0H4tlYy7fVmlbqasT17gZH1oAwd/O19UYT3QbCfwfjlYOrhog
+        5Od1fosmn1C1HbjslATTBPFB+vkg7JjdnH8o7Ob4bnZ6pyLC9gICvkqNHu2pZxhUcFX3cI+NyQViy
+        DrPOrHcN5bRtOthfaKp8mWE3IjgMNej3PuepjvFAeOqIbYej+zPFrubWmASudppnvuxv7CO8mqKQ1
+        BKz/PSUQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mnSso-000Zo5-Mj; Wed, 17 Nov 2021 14:54:23 -0700
+        id 1mnSss-000Zo7-ES; Wed, 17 Nov 2021 14:54:27 -0700
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mnSsk-0000zw-TA; Wed, 17 Nov 2021 14:54:18 -0700
+        id 1mnSsf-0000z0-WE; Wed, 17 Nov 2021 14:54:14 -0700
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -55,94 +55,164 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 17 Nov 2021 14:54:04 -0700
-Message-Id: <20211117215410.3695-18-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Date:   Wed, 17 Nov 2021 14:53:52 -0700
+Message-Id: <20211117215410.3695-6-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211117215410.3695-1-logang@deltatee.com>
 References: <20211117215410.3695-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, bhelgaas@google.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v4 17/23] block: add check when merging zone device pages
+Subject: [PATCH v4 05/23] PCI/P2PDMA: Introduce helpers for dma_map_sg implementations
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consecutive zone device pages should not be merged into the same sgl
-or bvec segment with other types of pages or if they belong to different
-pgmaps. Otherwise getting the pgmap of a given segment is not possible
-without scanning the entire segment. This helper returns true either if
-both pages are not zone device pages or both pages are zone device
-pages with the same pgmap.
+Add pci_p2pdma_map_segment() as a helper for simple dma_map_sg()
+implementations. It takes an scatterlist segment that must point to a
+pci_p2pdma struct page and will map it if the mapping requires a bus
+address.
 
-Add a helper to determine if zone device pages are mergeable and use
-this helper in page_is_mergeable().
+The return value indicates whether the mapping required a bus address
+or whether the caller still needs to map the segment normally. If the
+segment should not be mapped, -EREMOTEIO is returned.
+
+This helper uses a state structure to track the changes to the
+pgmap across calls and avoid needing to lookup into the xarray for
+every page.
+
+Also add pci_p2pdma_map_bus_segment() which is useful for IOMMU
+dma_map_sg() implementations where the sg segment containing the page
+differs from the sg segment containing the DMA address.
+
+Prototypes for these helpers are added to dma-map-ops.h as they are only
+useful to dma map implementations and don't need to pollute the public
+pci-p2pdma header.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 ---
- block/bio.c        |  2 ++
- include/linux/mm.h | 23 +++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ drivers/pci/p2pdma.c        | 59 +++++++++++++++++++++++++++++++++++++
+ include/linux/dma-map-ops.h | 21 +++++++++++++
+ 2 files changed, 80 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index 15ab0d6d1c06..f4e2e30d7a24 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -803,6 +803,8 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 		return false;
- 	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
- 		return false;
-+	if (!zone_device_pages_are_mergeable(bv->bv_page, page))
-+		return false;
- 
- 	*same_page = ((vec_end_addr & PAGE_MASK) == page_addr);
- 	if (*same_page)
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 65cb27cebbab..3367d936b256 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1118,6 +1118,24 @@ static inline bool is_zone_device_page(const struct page *page)
- {
- 	return page_zonenum(page) == ZONE_DEVICE;
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 02a13a5ac680..6ad3a8816677 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -944,6 +944,65 @@ void pci_p2pdma_unmap_sg_attrs(struct device *dev, struct scatterlist *sg,
  }
-+
-+/*
-+ * Consecutive zone device pages should not be merged into the same sgl
-+ * or bvec segment with other types of pages or if they belong to different
-+ * pgmaps. Otherwise getting the pgmap of a given segment is not possible
-+ * without scanning the entire segment. This helper returns true either if
-+ * both pages are not zone device pages or both pages are zone device pages
-+ * with the same pgmap.
+ EXPORT_SYMBOL_GPL(pci_p2pdma_unmap_sg_attrs);
+ 
++/**
++ * pci_p2pdma_map_segment - map an sg segment determining the mapping type
++ * @state: State structure that should be declared outside of the for_each_sg()
++ *	loop and initialized to zero.
++ * @dev: DMA device that's doing the mapping operation
++ * @sg: scatterlist segment to map
++ *
++ * This is a helper to be used by non-IOMMU dma_map_sg() implementations where
++ * the sg segment is the same for the page_link and the dma_address.
++ *
++ * Attempt to map a single segment in an SGL with the PCI bus address.
++ * The segment must point to a PCI P2PDMA page and thus must be
++ * wrapped in a is_pci_p2pdma_page(sg_page(sg)) check.
++ *
++ * Returns the type of mapping used and maps the page if the type is
++ * PCI_P2PDMA_MAP_BUS_ADDR.
 + */
-+static inline bool zone_device_pages_are_mergeable(const struct page *a,
-+						   const struct page *b)
++enum pci_p2pdma_map_type
++pci_p2pdma_map_segment(struct pci_p2pdma_map_state *state, struct device *dev,
++		       struct scatterlist *sg)
 +{
-+	if (is_zone_device_page(a) != is_zone_device_page(b))
-+		return false;
-+	if (!is_zone_device_page(a))
-+		return true;
-+	return a->pgmap == b->pgmap;
++	if (state->pgmap != sg_page(sg)->pgmap) {
++		state->pgmap = sg_page(sg)->pgmap;
++		state->map = pci_p2pdma_map_type(state->pgmap, dev);
++		state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
++	}
++
++	if (state->map == PCI_P2PDMA_MAP_BUS_ADDR) {
++		sg->dma_address = sg_phys(sg) + state->bus_off;
++		sg_dma_len(sg) = sg->length;
++		sg_dma_mark_bus_address(sg);
++	}
++
++	return state->map;
 +}
- extern void memmap_init_zone_device(struct zone *, unsigned long,
- 				    unsigned long, struct dev_pagemap *);
- #else
-@@ -1125,6 +1143,11 @@ static inline bool is_zone_device_page(const struct page *page)
- {
- 	return false;
- }
-+static inline bool zone_device_pages_are_mergeable(const struct page *a,
-+						   const struct page *b)
++
++/**
++ * pci_p2pdma_map_bus_segment - map an sg segment pre determined to
++ *	be mapped with PCI_P2PDMA_MAP_BUS_ADDR
++ * @pg_sg: scatterlist segment with the page to map
++ * @dma_sg: scatterlist segment to assign a DMA address to
++ *
++ * This is a helper for iommu dma_map_sg() implementations when the
++ * segment for the DMA address differs from the segment containing the
++ * source page.
++ *
++ * pci_p2pdma_map_type() must have already been called on the pg_sg and
++ * returned PCI_P2PDMA_MAP_BUS_ADDR.
++ */
++void pci_p2pdma_map_bus_segment(struct scatterlist *pg_sg,
++				struct scatterlist *dma_sg)
 +{
-+	return true;
++	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(sg_page(pg_sg)->pgmap);
++
++	dma_sg->dma_address = sg_phys(pg_sg) + pgmap->bus_offset;
++	sg_dma_len(dma_sg) = pg_sg->length;
++	sg_dma_mark_bus_address(dma_sg);
 +}
- #endif
++
+ /**
+  * pci_p2pdma_enable_store - parse a configfs/sysfs attribute store
+  *		to enable p2pdma
+diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
+index d693a0e33bac..752f91e5eb5d 100644
+--- a/include/linux/dma-map-ops.h
++++ b/include/linux/dma-map-ops.h
+@@ -413,15 +413,36 @@ enum pci_p2pdma_map_type {
+ 	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+ };
  
- static inline bool is_zone_movable_page(const struct page *page)
++struct pci_p2pdma_map_state {
++	struct dev_pagemap *pgmap;
++	int map;
++	u64 bus_off;
++};
++
+ #ifdef CONFIG_PCI_P2PDMA
+ enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+ 					     struct device *dev);
++enum pci_p2pdma_map_type
++pci_p2pdma_map_segment(struct pci_p2pdma_map_state *state, struct device *dev,
++		       struct scatterlist *sg);
++void pci_p2pdma_map_bus_segment(struct scatterlist *pg_sg,
++				struct scatterlist *dma_sg);
+ #else /* CONFIG_PCI_P2PDMA */
+ static inline enum pci_p2pdma_map_type
+ pci_p2pdma_map_type(struct dev_pagemap *pgmap, struct device *dev)
+ {
+ 	return PCI_P2PDMA_MAP_NOT_SUPPORTED;
+ }
++static inline enum pci_p2pdma_map_type
++pci_p2pdma_map_segment(struct pci_p2pdma_map_state *state, struct device *dev,
++		       struct scatterlist *sg)
++{
++	return PCI_P2PDMA_MAP_NOT_SUPPORTED;
++}
++static inline void pci_p2pdma_map_bus_segment(struct scatterlist *pg_sg,
++					      struct scatterlist *dma_sg)
++{
++}
+ #endif /* CONFIG_PCI_P2PDMA */
+ 
+ #endif /* _LINUX_DMA_MAP_OPS_H */
 -- 
 2.30.2
 
