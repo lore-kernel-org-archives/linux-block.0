@@ -2,103 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DFEC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 02:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC28DC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 03:37:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D735563215
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 02:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B18AC61545
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 03:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbhKQC1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 21:27:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58856 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229733AbhKQC1W (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 21:27:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BE7CC619E5;
-        Wed, 17 Nov 2021 02:24:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637115864;
-        bh=DGQEM1Zf8auR873ZCW559ed3Fgo53vyTpyTP7XMCRNc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jDAI0ts5Gz6TtiNPLF8upmSauHZtFdbT4eVdFFnLxzyzXA1werh6xNNvuCqPWH74r
-         eGVCzOnYRHCaRKwI/EVvQoFpVdI9gHJZD65Pm2dHjzus6Ei3I4N26LP9f5J4A3hIWC
-         AyE/qVeA2OYBujC3GrnYLMvhQ858+5o4eJxkM+U9ax4yM9ffix+i3uEElySkoip0FT
-         O5Tpyd6ho1FFefsOYxwN1wtduLpPLkljfrO//ZaCWxMC+MnRR5e7SPi/0XL3l0JQPx
-         3u5EplPguD/4ypepveN2gQqCyxM3sX0CwEo3e/IQPAQmjHW2SSJyX7+DtMR5YJ6V7q
-         RWQhPna40kgUg==
-Date:   Tue, 16 Nov 2021 18:24:24 -0800
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v2 19/28] iomap: Convert __iomap_zero_iter to use a folio
-Message-ID: <20211117022424.GJ24307@magnolia>
-References: <20211108040551.1942823-1-willy@infradead.org>
- <20211108040551.1942823-20-willy@infradead.org>
+        id S229614AbhKQDkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 22:40:14 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:26321 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231200AbhKQDkO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Nov 2021 22:40:14 -0500
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Hv7ll5dHkzbhyW;
+        Wed, 17 Nov 2021 11:32:19 +0800 (CST)
+Received: from kwepemm600019.china.huawei.com (7.193.23.64) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 17 Nov 2021 11:37:14 +0800
+Received: from [10.174.177.210] (10.174.177.210) by
+ kwepemm600019.china.huawei.com (7.193.23.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Wed, 17 Nov 2021 11:37:13 +0800
+To:     <ming.lei@redhat.com>, <damien.lemoal@wdc.com>, <axboe@kernel.dk>,
+        <miquel.raynal@bootlin.com>, <richard@nod.at>, <vigneshr@ti.com>
+CC:     <linux-block@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+        <yangerkun@huawei.com>, <yi.zhang@huawei.com>,
+        <yebin10@huawei.com>, <houtao1@huawei.com>
+From:   yangerkun <yangerkun@huawei.com>
+Subject: [QUESTION] blk_mq_freeze_queue in elevator_init_mq
+Message-ID: <d9113bf8-4654-cb04-f79c-38e11493cb2c@huawei.com>
+Date:   Wed, 17 Nov 2021 11:37:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211108040551.1942823-20-willy@infradead.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.177.210]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600019.china.huawei.com (7.193.23.64)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 08, 2021 at 04:05:42AM +0000, Matthew Wilcox (Oracle) wrote:
-> The zero iterator can work in folio-sized chunks instead of page-sized
-> chunks.  This will save a lot of page cache lookups if the file is cached
-> in multi-page folios.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Nowdays we meet the boot regression while enable lots of mtdblock
+compare with 4.4. The main reason was that the blk_mq_freeze_queue in
+elevator_init_mq will wait a RCU gap which want to make sure no IO will
+happen while blk_mq_init_sched.
 
-hch's dax decoupling series notwithstanding,
+Other module like loop meets this problem too and has been fix with
+follow patches:
 
-Though TBH I am kinda wondering how the two of you plan to resolve those
-kinds of differences -- I haven't looked at that series, though I think
-this one's been waiting in the wings for longer?
+  2112f5c1330a loop: Select I/O scheduler 'none' from inside add_disk()
+  90b7198001f2 blk-mq: Introduce the BLK_MQ_F_NO_SCHED_BY_DEFAULT flag
 
-Heck, I wonder how Matthew plans to merge all this given that it touches
-mm, fs, block, and iomap...?
+They change the default IO scheduler for loop to 'none'. So no need to
+call blk_mq_freeze_queue and blk_mq_init_sched. But it seems not
+appropriate for mtdblocks. Mtdblocks can use 'mq-deadline' to help
+optimize the random write with the help of mtdblock's cache. Once change
+to 'none', we may meet the regression for random write.
 
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+commit 737eb78e82d52d35df166d29af32bf61992de71d
+Author: Damien Le Moal <damien.lemoal@wdc.com>
+Date:   Thu Sep 5 18:51:33 2019 +0900
 
---D
+     block: Delay default elevator initialization
 
-> ---
->  fs/iomap/buffered-io.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 64e54981b651..9c61d12028ca 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -881,17 +881,20 @@ EXPORT_SYMBOL_GPL(iomap_file_unshare);
->  
->  static s64 __iomap_zero_iter(struct iomap_iter *iter, loff_t pos, u64 length)
->  {
-> +	struct folio *folio;
->  	struct page *page;
->  	int status;
-> -	unsigned offset = offset_in_page(pos);
-> -	unsigned bytes = min_t(u64, PAGE_SIZE - offset, length);
-> +	size_t offset, bytes;
->  
-> -	status = iomap_write_begin(iter, pos, bytes, &page);
-> +	status = iomap_write_begin(iter, pos, length, &page);
->  	if (status)
->  		return status;
-> +	folio = page_folio(page);
->  
-> -	zero_user(page, offset, bytes);
-> -	mark_page_accessed(page);
-> +	offset = offset_in_folio(folio, pos);
-> +	bytes = min_t(u64, folio_size(folio) - offset, length);
-> +	folio_zero_range(folio, offset, bytes);
-> +	folio_mark_accessed(folio);
->  
->  	return iomap_write_end(iter, pos, bytes, bytes, page);
->  }
-> -- 
-> 2.33.0
-> 
+     ...
+
+     Additionally, to make sure that the elevator initialization is never
+     done while requests are in-flight (there should be none when the device
+     driver calls device_add_disk()), freeze and quiesce the device request
+     queue before calling blk_mq_init_sched() in elevator_init_mq().
+     ...
+
+This commit add blk_mq_freeze_queue in elevator_init_mq which try to
+make sure no in-flight request while we go through blk_mq_init_sched.
+But does there any drivers can leave IO alive while we go through
+elevator_init_mq？ And if no, maybe we can just remove this logical to
+fix the regression...
+.
+.
