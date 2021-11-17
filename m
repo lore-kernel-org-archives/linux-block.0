@@ -2,150 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D11C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 04:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 754AAC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 04:31:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D6E961BFB
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 04:31:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59E2A61BFA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 04:31:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbhKQEe0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 23:34:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40150 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231983AbhKQEe0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 23:34:26 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4C98661BF9;
-        Wed, 17 Nov 2021 04:31:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637123488;
-        bh=HuY9YRYrFBAz77ILgr6umLsyClVsfHdg4hJxm0f/Ixc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PlHoa7CLhR+ZAGPTtPrbPTwWOhwLayvxj4uRkcCTP0Ye8EuSE1Qtk4z9xi3GaOeyH
-         WmBMudLg9E3TjSGyB0hJuduJ2+/6amJYTjhHtVZGY+I8YxfBU4moJZmI189j7mw/xX
-         Jm8sx0Bp2RzB07KGWhWpyJ2BUJwankuxvzPsycTmqWySepC+3OK7v+auPJZYytzs08
-         xNn8jcVz5Br1w6bj0lQzxgDTSnRwS9wZh4LSP0CfWjPrR1GKmDTm4Lj/j1wXidPNOy
-         CQ3NhguvBvf3pzKrpYZokUScu9NxexINTRd6LxmTMn63/LR7aluhZhNgczhrzM9mT1
-         aZCZlP8r4gsoQ==
-Date:   Tue, 16 Nov 2021 20:31:27 -0800
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 20/28] iomap: Convert iomap_write_begin() and
- iomap_write_end() to folios
-Message-ID: <20211117043127.GK24307@magnolia>
-References: <20211108040551.1942823-1-willy@infradead.org>
- <20211108040551.1942823-21-willy@infradead.org>
+        id S231425AbhKQEeh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 23:34:37 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:43800 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233084AbhKQEeg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Nov 2021 23:34:36 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 188C5212C9;
+        Wed, 17 Nov 2021 04:31:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637123498; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LR7oS0QBuwyr6aqAxtE7ckvRLKf85Sqp8tA5knq0q3M=;
+        b=lUg9TRuhaYSI9swGvSpkctbJ/tPKbaJsNjvsrhrksRAY4ZCsL7ubiL+rMTUbE7laumxWxR
+        /Uw3NMgtb2qiwj7s5ubvLpXmsB6eODXrJd7SdOpF6jqyII6YpTeF5RegqQ62pPE7uX6pno
+        1q9iKwt7nswJjy9Mu1SIA1Ls2WyW8dQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637123498;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LR7oS0QBuwyr6aqAxtE7ckvRLKf85Sqp8tA5knq0q3M=;
+        b=yQ5OcbXpj8m2ePUgpw9LpryUv8x4qtS/tAv9z/I/GgZneC1q5bpKDd8fvNIal+oSmO6D0C
+        HI6Faw06STIVhvCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0A47F13BC3;
+        Wed, 17 Nov 2021 04:31:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id f07OLqiFlGGRGAAAMHmgww
+        (envelope-from <neilb@suse.de>); Wed, 17 Nov 2021 04:31:36 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211108040551.1942823-21-willy@infradead.org>
+From:   "NeilBrown" <neilb@suse.de>
+To:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH] FAT: use blkdev_issue_flush() instead of congestion_wait()
+Date:   Wed, 17 Nov 2021 15:31:34 +1100
+Message-id: <163712349419.13692.2859038330142282757@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 08, 2021 at 04:05:43AM +0000, Matthew Wilcox (Oracle) wrote:
-> These functions still only work in PAGE_SIZE chunks, but there are
-> fewer conversions from tail to head pages as a result of this patch.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/iomap/buffered-io.c | 66 ++++++++++++++++++++----------------------
->  1 file changed, 31 insertions(+), 35 deletions(-)
-> 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 9c61d12028ca..f4ae200adc4c 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
 
-<snip>
+congestion_wait() in this context is just a sleep - block devices do not
+in general support congestion signalling any more.
 
-> @@ -741,6 +737,7 @@ static loff_t iomap_write_iter(struct iomap_iter *iter, struct iov_iter *i)
->  	long status = 0;
->  
->  	do {
-> +		struct folio *folio;
->  		struct page *page;
->  		unsigned long offset;	/* Offset into pagecache page */
->  		unsigned long bytes;	/* Bytes to write to page */
-> @@ -764,16 +761,17 @@ static loff_t iomap_write_iter(struct iomap_iter *iter, struct iov_iter *i)
->  			break;
->  		}
->  
-> -		status = iomap_write_begin(iter, pos, bytes, &page);
-> +		status = iomap_write_begin(iter, pos, bytes, &folio);
->  		if (unlikely(status))
->  			break;
->  
-> +		page = folio_file_page(folio, pos >> PAGE_SHIFT);
->  		if (mapping_writably_mapped(iter->inode->i_mapping))
->  			flush_dcache_page(page);
->  
->  		copied = copy_page_from_iter_atomic(page, offset, bytes, i);
+The goal here is to wait for any recently written data to get to
+storage.  This can be achieved using blkdev_issue_flush().
 
-Hrmm.  In principle (or I guess even a subsequent patch), if we had
-multi-page folios, could we simply loop the pages in the folio instead
-of doing a single page and then calling back into iomap_write_begin to
-get (probably) the same folio?
+Signed-off-by: NeilBrown <neilb@suse.de>
+---
+ fs/fat/file.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This looks like a fairly straightforward conversion, but I was wondering
-about that one little point...
+diff --git a/fs/fat/file.c b/fs/fat/file.c
+index 13855ba49cd9..c50a52f40e37 100644
+--- a/fs/fat/file.c
++++ b/fs/fat/file.c
+@@ -175,9 +175,9 @@ long fat_generic_ioctl(struct file *filp, unsigned int cm=
+d, unsigned long arg)
+ static int fat_file_release(struct inode *inode, struct file *filp)
+ {
+ 	if ((filp->f_mode & FMODE_WRITE) &&
+-	     MSDOS_SB(inode->i_sb)->options.flush) {
++	    MSDOS_SB(inode->i_sb)->options.flush) {
+ 		fat_flush_inodes(inode->i_sb, inode, NULL);
+-		congestion_wait(BLK_RW_ASYNC, HZ/10);
++		blkdev_issue_flush(inode->i_sb->s_bdev);
+ 	}
+ 	return 0;
+ }
+--=20
+2.33.1
 
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-
---D
-
->  
-> -		status = iomap_write_end(iter, pos, bytes, copied, page);
-> +		status = iomap_write_end(iter, pos, bytes, copied, folio);
->  
->  		if (unlikely(copied != status))
->  			iov_iter_revert(i, copied - status);
-> @@ -839,13 +837,13 @@ static loff_t iomap_unshare_iter(struct iomap_iter *iter)
->  	do {
->  		unsigned long offset = offset_in_page(pos);
->  		unsigned long bytes = min_t(loff_t, PAGE_SIZE - offset, length);
-> -		struct page *page;
-> +		struct folio *folio;
->  
-> -		status = iomap_write_begin(iter, pos, bytes, &page);
-> +		status = iomap_write_begin(iter, pos, bytes, &folio);
->  		if (unlikely(status))
->  			return status;
->  
-> -		status = iomap_write_end(iter, pos, bytes, bytes, page);
-> +		status = iomap_write_end(iter, pos, bytes, bytes, folio);
->  		if (WARN_ON_ONCE(status == 0))
->  			return -EIO;
->  
-> @@ -882,21 +880,19 @@ EXPORT_SYMBOL_GPL(iomap_file_unshare);
->  static s64 __iomap_zero_iter(struct iomap_iter *iter, loff_t pos, u64 length)
->  {
->  	struct folio *folio;
-> -	struct page *page;
->  	int status;
->  	size_t offset, bytes;
->  
-> -	status = iomap_write_begin(iter, pos, length, &page);
-> +	status = iomap_write_begin(iter, pos, length, &folio);
->  	if (status)
->  		return status;
-> -	folio = page_folio(page);
->  
->  	offset = offset_in_folio(folio, pos);
->  	bytes = min_t(u64, folio_size(folio) - offset, length);
->  	folio_zero_range(folio, offset, bytes);
->  	folio_mark_accessed(folio);
->  
-> -	return iomap_write_end(iter, pos, bytes, bytes, page);
-> +	return iomap_write_end(iter, pos, bytes, bytes, folio);
->  }
->  
->  static loff_t iomap_zero_iter(struct iomap_iter *iter, bool *did_zero)
-> -- 
-> 2.33.0
-> 
