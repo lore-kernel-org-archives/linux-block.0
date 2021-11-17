@@ -2,134 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F21AEC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759B7C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF7E161BF5
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A62161BD3
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231167AbhKQJDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 04:03:38 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:14950 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234857AbhKQJD2 (ORCPT
+        id S234559AbhKQJXU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 04:23:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60382 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235056AbhKQJXS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 04:03:28 -0500
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HvGzb5rp3zZd6F;
-        Wed, 17 Nov 2021 16:58:03 +0800 (CST)
-Received: from kwepemm600019.china.huawei.com (7.193.23.64) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 17 Nov 2021 17:00:24 +0800
-Received: from [10.174.177.210] (10.174.177.210) by
- kwepemm600019.china.huawei.com (7.193.23.64) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Wed, 17 Nov 2021 17:00:23 +0800
-Subject: Re: [QUESTION] blk_mq_freeze_queue in elevator_init_mq
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <damien.lemoal@wdc.com>, <axboe@kernel.dk>,
-        <miquel.raynal@bootlin.com>, <richard@nod.at>, <vigneshr@ti.com>,
-        <linux-block@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <yi.zhang@huawei.com>, <yebin10@huawei.com>, <houtao1@huawei.com>
-References: <d9113bf8-4654-cb04-f79c-38e11493cb2c@huawei.com>
- <YZS4FYxtxYAXjtFJ@T590>
-From:   yangerkun <yangerkun@huawei.com>
-Message-ID: <d9ca8e57-55b8-96f8-e5fd-6103c8b1fa4b@huawei.com>
-Date:   Wed, 17 Nov 2021 17:00:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        Wed, 17 Nov 2021 04:23:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637140820;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=77rEDu/reg/YJ6amwbhAgjZqXAbfYRFP4sr85cH8gm4=;
+        b=ag+dyQo2AvlxAw6gQe94MJ2D+ZgiT5Ref0HtOjcHpzUQsrwCrMmwRYz/Dg6u6doh/Qfk/c
+        MaKGUCCShVkoXB6a4C6Ir5ZIzIMXaVCk1s4w+NyIMpa/+j11yA3xPAMz4Ffe7miWnq1gUP
+        JYbJQGYtE5h+wztniBqz6QcxnClp2fs=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-571-5sjyeyKpOzajjyBXehv2eA-1; Wed, 17 Nov 2021 04:20:18 -0500
+X-MC-Unique: 5sjyeyKpOzajjyBXehv2eA-1
+Received: by mail-ed1-f70.google.com with SMTP id r16-20020a056402019000b003e6cbb77ed2so1570491edv.10
+        for <linux-block@vger.kernel.org>; Wed, 17 Nov 2021 01:20:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=77rEDu/reg/YJ6amwbhAgjZqXAbfYRFP4sr85cH8gm4=;
+        b=ZHstyE489Uay1AzWD9EOGadabPqZfU96WCXezVsxyy/edv4YG8P1s84SdAuvbO3ctM
+         J8xZaAg4LXWLgK4q9QzDFKmTT04AZ6x5HLAJb45sEFT2r2QSPAGcCDj7jTUUymyz0I0g
+         ZzVUjTTBqDbqakHuO2TO0/IOFxubXapPmdrI/73Mw+nGESoRO/XEFimnXQywbm6udAoG
+         UYtv0wPd/FKAYyukI+uukeVKQN4BMqEjGEmbBdazGbzb+FfwWcDoNhfV77SIwW1sQBU0
+         fVX75Tz4weC7qz/lwtkBB5MFhrnD/j6QFUMBV7T4szZKwC5MkiuTMcNTy3e4k4YRn7x9
+         XLkQ==
+X-Gm-Message-State: AOAM5335CNt7QE6+rqxxpXt9acg7k2n4Uulk6x5IpqTZWUIzr4k24Ukt
+        w0LglgvwKQZpwZccHX7ZLiIDAh1Pewgu3qRsXVeTJ725LqFVfhHCCHmejV9dFT4U/MTyjT2cAHP
+        6K2TXFox8i/Uc4qywknaTPXw=
+X-Received: by 2002:aa7:c714:: with SMTP id i20mr19958655edq.180.1637140817840;
+        Wed, 17 Nov 2021 01:20:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwYtu97PwkW2A1yYGpWopI7K1d4sbVlbcdvIekk7lLEy/KSy29AQt851GD79KmBNlKEUMRrUw==
+X-Received: by 2002:aa7:c714:: with SMTP id i20mr19958629edq.180.1637140817719;
+        Wed, 17 Nov 2021 01:20:17 -0800 (PST)
+Received: from steredhat (host-87-10-72-39.retail.telecomitalia.it. [87.10.72.39])
+        by smtp.gmail.com with ESMTPSA id hw8sm9777163ejc.58.2021.11.17.01.20.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Nov 2021 01:20:17 -0800 (PST)
+Date:   Wed, 17 Nov 2021 10:20:14 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     cgel.zte@gmail.com
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        stefanha@redhat.com, axboe@kernel.dk,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ye Guojin <ye.guojin@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: Re: [PATCH] virtio-blk: modify the value type of num in
+ virtio_queue_rq()
+Message-ID: <20211117092014.qyqhtg2y5etoxrqe@steredhat>
+References: <20211117063955.160777-1-ye.guojin@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <YZS4FYxtxYAXjtFJ@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.177.210]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600019.china.huawei.com (7.193.23.64)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20211117063955.160777-1-ye.guojin@zte.com.cn>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Nov 17, 2021 at 06:39:55AM +0000, cgel.zte@gmail.com wrote:
+>From: Ye Guojin <ye.guojin@zte.com.cn>
+>
+>This was found by coccicheck:
+>./drivers/block/virtio_blk.c, 334, 14-17, WARNING Unsigned expression
+>compared with zero  num < 0
+>
 
+We should add the Fixes tag:
 
-On 2021/11/17 16:06, Ming Lei wrote:
-> On Wed, Nov 17, 2021 at 11:37:13AM +0800, yangerkun wrote:
->> Nowdays we meet the boot regression while enable lots of mtdblock
-> 
-> What is your boot regression? Any dmesg log?
+Fixes: 02746e26c39e ("virtio-blk: avoid preallocating big SGL for data")
 
-The result is that when boot with 5.10 kernel compare with 4.4, 5.10
-will consume about 1.6s more...
-> 
->> compare with 4.4. The main reason was that the blk_mq_freeze_queue in
->> elevator_init_mq will wait a RCU gap which want to make sure no IO will
->> happen while blk_mq_init_sched.
-> 
-> There isn't RCU grace period implied in the blk_mq_freeze_queue() called
-> from elevator_init_mq(), because the .q_usage_counter works at atomic mode
-> at that time.
-> 
->>
->> Other module like loop meets this problem too and has been fix with
-> 
-> Again, what is the problem?
+>Reported-by: Zeal Robot <zealci@zte.com.cn>
+>Signed-off-by: Ye Guojin <ye.guojin@zte.com.cn>
+>---
+> drivers/block/virtio_blk.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+>index 97bf051a50ce..eed1666eff31 100644
+>--- a/drivers/block/virtio_blk.c
+>+++ b/drivers/block/virtio_blk.c
+>@@ -316,7 +316,7 @@ static blk_status_t virtio_queue_rq(struct 
+>blk_mq_hw_ctx *hctx,
+> 	struct request *req = bd->rq;
+> 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+> 	unsigned long flags;
+>-	unsigned int num;
+>+	int num;
+> 	int qid = hctx->queue_num;
+> 	bool notify = false;
+> 	blk_status_t status;
+>-- 
+>2.25.1
+>
 
-commit 2112f5c1330a671fa852051d85cb9eadc05d7eb7
-Author: Bart Van Assche <bvanassche@acm.org>
-Date:   Thu Aug 5 10:42:00 2021 -0700
+The patch LGTM.
 
-     loop: Select I/O scheduler 'none' from inside add_disk()
+With the Fixes tag added:
 
-     ...
-     e.g. via a udev rule. This approach has an advantage compared to 
-changing
-     the I/O scheduler from userspace from 'mq-deadline' into 'none', namely
-     that synchronize_rcu() does not get called.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Actually, we has meets this problem too 
-before(https://www.spinics.net/lists/linux-block/msg70660.html).
-
-
-> 
->> follow patches:
->>
->>   2112f5c1330a loop: Select I/O scheduler 'none' from inside add_disk()
->>   90b7198001f2 blk-mq: Introduce the BLK_MQ_F_NO_SCHED_BY_DEFAULT flag
->>
->> They change the default IO scheduler for loop to 'none'. So no need to
->> call blk_mq_freeze_queue and blk_mq_init_sched. But it seems not
->> appropriate for mtdblocks. Mtdblocks can use 'mq-deadline' to help
->> optimize the random write with the help of mtdblock's cache. Once change
->> to 'none', we may meet the regression for random write.
->>
->> commit 737eb78e82d52d35df166d29af32bf61992de71d
->> Author: Damien Le Moal <damien.lemoal@wdc.com>
->> Date:   Thu Sep 5 18:51:33 2019 +0900
->>
->>      block: Delay default elevator initialization
->>
->>      ...
->>
->>      Additionally, to make sure that the elevator initialization is never
->>      done while requests are in-flight (there should be none when the device
->>      driver calls device_add_disk()), freeze and quiesce the device request
->>      queue before calling blk_mq_init_sched() in elevator_init_mq().
->>      ...
->>
->> This commit add blk_mq_freeze_queue in elevator_init_mq which try to
->> make sure no in-flight request while we go through blk_mq_init_sched.
->> But does there any drivers can leave IO alive while we go through
->> elevator_init_mq？ And if no, maybe we can just remove this logical to
->> fix the regression...
-> 
-> SCSI should have passthrough requests at that moment.
-> 
-> 
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
