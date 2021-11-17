@@ -2,96 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C466C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 01:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DF9C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 02:20:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60E8160F38
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 01:04:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C63463212
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 02:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbhKQBHC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Nov 2021 20:07:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43462 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbhKQBHC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Nov 2021 20:07:02 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E195CC061570;
-        Tue, 16 Nov 2021 17:04:04 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id g18so1027756pfk.5;
-        Tue, 16 Nov 2021 17:04:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PLz5baL/tForuA6NLmg8XFMsVJ3OJ6G5avfxPN9wfAY=;
-        b=CkHizIwo5OxrH6SXMtbFaBo3rxwHUxfjaYQqiQXz2DG4k37ZPaiTMLniKDmBOEYATR
-         m3NFrhQCYldaZCZRLdM++qdG+mkLTik41OH67xg1jaWt3Gz8jH2zkJqAXcUoLuPpJNwr
-         a7+Iq2UkHkQAANfQ5gvMuaCvpIPB5LbL0b51sVBNMdnBDjbIoEB0ujCNjNhF/FCTBoLq
-         aSQ+OS81elts5Tre9UNFtGkR9+gcmDWlcMaVmFd9EYWtsodEyX740N7WRAOPsrRcx/BV
-         f+Jr0PYJwF3Z3NzFAWp1mwRjsMB0/ei2In+9mI79i3swOtidWcCeWFU4eyERo0mJHkWe
-         dSNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PLz5baL/tForuA6NLmg8XFMsVJ3OJ6G5avfxPN9wfAY=;
-        b=u+lapJqTswyUZ2HDPNHSsQkmBRm8hErbNs3aeSmEdTaxwmhyRlRJ72BOdtbTM6d8xZ
-         7CG9h6ePFPeTNSWduFeymBs4DlUVeReRq4fkx4xKnCkEyKAmpTDF1Uono3+ndID2aORN
-         lumSc8ChGMVAhtByFkEJs5FTtQAiPyJdqvEmwDIjaoXdRT3N7kFdRExOu39lfkH2ezZE
-         tTqALoHcKkeNQXQnMpEzZC0T8OG8CVhcJsO9s+4Xl/lYWdLnBb3d6VlSUSqVdxWNpX9o
-         U4VYXTfMuwLkyvc6VV8mVUxD6In2nqloEg685GFnHmraEF4DtiuYUlMUUVYXGmE0Q8jY
-         a1qw==
-X-Gm-Message-State: AOAM533agdw1T3LS9G5VMuLVV9vBNsc0Oupnl9IIuJuPqTtzL7jUIz8j
-        1FySHglMtU/LURiUbSWzsK5TeIQUtWk=
-X-Google-Smtp-Source: ABdhPJxjCw37K4wG9Bj2g5qb8rvxH1zYGXCDFKGyeao3JLec2qMsk8dqqvU+XtDp1LRq+E9ueWczxQ==
-X-Received: by 2002:a63:920b:: with SMTP id o11mr2455453pgd.314.1637111044472;
-        Tue, 16 Nov 2021 17:04:04 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id b15sm19638050pfv.48.2021.11.16.17.04.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 17:04:03 -0800 (PST)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: deng.changcheng@zte.com.cn
-To:     tj@kernel.org
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Changcheng Deng <deng.changcheng@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] block: Use div64_ul instead of do_div
-Date:   Wed, 17 Nov 2021 01:03:58 +0000
-Message-Id: <20211117010358.158313-1-deng.changcheng@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        id S230224AbhKQCXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Nov 2021 21:23:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57406 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229544AbhKQCXn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Nov 2021 21:23:43 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7ACB361A02;
+        Wed, 17 Nov 2021 02:20:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637115645;
+        bh=iDWosObnHm99i06fmmb/ibxReLZuqcaTJgnFQrMovjI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GQsgwu9bKobTRau2zYYHf2QuET4megCLNghaVvKhsR1XO57RRlK8hgRlaf4Wjw+Wg
+         WcC6YTeiUXrq64iW2J0QZgAx3ERmSkP0H6Kp2ee3VryzZWTEmNAoKOp2zfOTgY1pZz
+         6DKG/KETf3imixg4+WTwCNXYDPy21lL2RRRSspGZRz2gJ5HSUu0+X6g9PU1EElsjbq
+         JcRzq6B8Vvg/0r6jJY7lTdC93kd+Bcfi5b68Pzu3MLYa3SKTh8jblaNxOqe6T06dGB
+         eqy0mpnI/xUcOW+ftqfHUxOmkqTuj+UpGYPKE+RVvCRc1IvcGH2SHVUBFgnkKmTK8V
+         GxYeZvPJawdbQ==
+Date:   Tue, 16 Nov 2021 18:20:45 -0800
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 12/28] iomap: Add iomap_invalidate_folio
+Message-ID: <20211117022045.GI24307@magnolia>
+References: <20211108040551.1942823-1-willy@infradead.org>
+ <20211108040551.1942823-13-willy@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211108040551.1942823-13-willy@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Changcheng Deng <deng.changcheng@zte.com.cn>
+On Mon, Nov 08, 2021 at 04:05:35AM +0000, Matthew Wilcox (Oracle) wrote:
+> Keep iomap_invalidatepage around as a wrapper for use in address_space
+> operations.
+> 
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-do_div() does a 64-by-32 division. If the divisor is unsigned long, using
-div64_ul can avoid truncation to 32-bit.
+Looks good to me,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
----
- block/blk-throttle.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--D
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 39bb6e68a9a2..2db635d66617 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1903,7 +1903,7 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 
- 	if (tg->bps[READ][LIMIT_LOW]) {
- 		bps = tg->last_bytes_disp[READ] * HZ;
--		do_div(bps, elapsed_time);
-+		div64_ul(bps, elapsed_time);
- 		if (bps >= tg->bps[READ][LIMIT_LOW])
- 			tg->last_low_overflow_time[READ] = now;
- 	}
--- 
-2.25.1
-
+> ---
+>  fs/iomap/buffered-io.c | 20 ++++++++++++--------
+>  include/linux/iomap.h  |  1 +
+>  2 files changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> index 49f96fdadcb4..b7cbe4d202d8 100644
+> --- a/fs/iomap/buffered-io.c
+> +++ b/fs/iomap/buffered-io.c
+> @@ -468,23 +468,27 @@ iomap_releasepage(struct page *page, gfp_t gfp_mask)
+>  }
+>  EXPORT_SYMBOL_GPL(iomap_releasepage);
+>  
+> -void
+> -iomap_invalidatepage(struct page *page, unsigned int offset, unsigned int len)
+> +void iomap_invalidate_folio(struct folio *folio, size_t offset, size_t len)
+>  {
+> -	struct folio *folio = page_folio(page);
+> -
+> -	trace_iomap_invalidatepage(page->mapping->host, offset, len);
+> +	trace_iomap_invalidatepage(folio->mapping->host, offset, len);
+>  
+>  	/*
+>  	 * If we're invalidating the entire page, clear the dirty state from it
+>  	 * and release it to avoid unnecessary buildup of the LRU.
+>  	 */
+> -	if (offset == 0 && len == PAGE_SIZE) {
+> -		WARN_ON_ONCE(PageWriteback(page));
+> -		cancel_dirty_page(page);
+> +	if (offset == 0 && len == folio_size(folio)) {
+> +		WARN_ON_ONCE(folio_test_writeback(folio));
+> +		folio_cancel_dirty(folio);
+>  		iomap_page_release(folio);
+>  	}
+>  }
+> +EXPORT_SYMBOL_GPL(iomap_invalidate_folio);
+> +
+> +void iomap_invalidatepage(struct page *page, unsigned int offset,
+> +		unsigned int len)
+> +{
+> +	iomap_invalidate_folio(page_folio(page), offset, len);
+> +}
+>  EXPORT_SYMBOL_GPL(iomap_invalidatepage);
+>  
+>  #ifdef CONFIG_MIGRATION
+> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+> index 6d1b08d0ae93..29491fb9c5ba 100644
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -225,6 +225,7 @@ void iomap_readahead(struct readahead_control *, const struct iomap_ops *ops);
+>  int iomap_is_partially_uptodate(struct page *page, unsigned long from,
+>  		unsigned long count);
+>  int iomap_releasepage(struct page *page, gfp_t gfp_mask);
+> +void iomap_invalidate_folio(struct folio *folio, size_t offset, size_t len);
+>  void iomap_invalidatepage(struct page *page, unsigned int offset,
+>  		unsigned int len);
+>  #ifdef CONFIG_MIGRATION
+> -- 
+> 2.33.0
+> 
