@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBC2C43217
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D79C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:55:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0954061544
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:54:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CE4E61265
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 21:55:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241029AbhKQV5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 16:57:43 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:58868 "EHLO
+        id S240990AbhKQV6F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 16:58:05 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:58760 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240922AbhKQV52 (ORCPT
+        with ESMTP id S240873AbhKQV5Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 16:57:28 -0500
+        Wed, 17 Nov 2021 16:57:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=lVFs012FiYfAIteDPcswFBDVkI4GWpBL3gjXvYfdIeM=; b=GppN5m7z3WB0EpXi+ZraKJV/CS
-        ZpaD/UdGV63gZkSTqxrX+PcM1/Vcl17gzDqAZdzEYJuoFcJCDSRcFE2SP+YS5GMtrKDCoKSw18rjg
-        JITKEZUYuR35cvZVAdgoOc4A38gUsCcQE3rjHyyFPvIaEIyBGeyzLdZW1akL/yFC9pGlMrQNXlpPr
-        jTYR2deXIrTxeuXAl1+jO9mZGMH3Dyk1vFaKo0pBFxMbKh2FhUcym2k12XmMKtD21IHXBbBN8sxEU
-        JALEElFfCVLOk6c/JiAmhyuxYibtkSJ2lX4XChYIUS+pV3Lh8HNraGTDdq335YfzDmZcju2vjWYrj
-        Z2ynp7nw==;
+        bh=eTDwkIdh5VVB1A6kvJWI8S8U3pygCOVAXIxj1iLgIvE=; b=SQppbxuiwygLRJ7DQxog7ZaSod
+        0RRBTWAKJOw8Ex6wR262KavH+Sz3+W3gwMLbzGhuJjKb8TIX9XyAV4Siaq0AqFBEH7RrGWVJ4GXcA
+        5TuBux3E/JXhT4m1N/mC0TpVjFCtMbYExyKx3R2mzgxOJkGEosdVBf7WtrBrwqvzW+aVsftmuewbY
+        I30+UP5IXAJSIsF8Oflm3I1t0acYWm9XvXJMljxucAU6vqDU6fDZy8hF/jA0Cp4c5pSQ9UGRsOObi
+        GxifhDD07oL9ZxpIfJsKPpDcPZlLr9bcRh8gHUbqdjhDZ9b/b54L5oLjNfC8cK/lpvWdoZliu63np
+        7oERExbQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mnSsr-000Zo6-Ir; Wed, 17 Nov 2021 14:54:27 -0700
+        id 1mnSsi-000Zo4-TD; Wed, 17 Nov 2021 14:54:18 -0700
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1mnSsj-0000zA-0h; Wed, 17 Nov 2021 14:54:17 -0700
+        id 1mnSsd-0000yo-Oo; Wed, 17 Nov 2021 14:54:11 -0700
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -57,8 +57,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Jason Gunthorpe <jgg@nvidia.com>
-Date:   Wed, 17 Nov 2021 14:53:55 -0700
-Message-Id: <20211117215410.3695-9-logang@deltatee.com>
+Date:   Wed, 17 Nov 2021 14:53:48 -0700
+Message-Id: <20211117215410.3695-2-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211117215410.3695-1-logang@deltatee.com>
 References: <20211117215410.3695-1-logang@deltatee.com>
@@ -67,100 +67,80 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, jhubbard@nvidia.com, jgg@nvidia.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v4 08/23] dma-mapping: add flags to dma_map_ops to indicate PCI P2PDMA support
+Subject: [PATCH v4 01/23] lib/scatterlist: cleanup macros into static inline functions
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a flags member to the dma_map_ops structure with one flag to
-indicate support for PCI P2PDMA.
+Convert the sg_is_chain(), sg_is_last() and sg_chain_ptr() macros
+into static inline functions. There's no reason for these to be macros
+and static inline are generally preferred these days.
 
-Also, add a helper to check if a device supports PCI P2PDMA.
+Also introduce the SG_PAGE_LINK_MASK define so the P2PDMA work, which is
+adding another bit to this mask, can do so more easily.
 
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- include/linux/dma-map-ops.h | 10 ++++++++++
- include/linux/dma-mapping.h |  5 +++++
- kernel/dma/mapping.c        | 18 ++++++++++++++++++
- 3 files changed, 33 insertions(+)
+ include/linux/scatterlist.h | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
-index 752f91e5eb5d..4d4161d58ce0 100644
---- a/include/linux/dma-map-ops.h
-+++ b/include/linux/dma-map-ops.h
-@@ -11,7 +11,17 @@
- 
- struct cma;
- 
-+/*
-+ * Values for struct dma_map_ops.flags:
-+ *
-+ * DMA_F_PCI_P2PDMA_SUPPORTED: Indicates the dma_map_ops implementation can
-+ * handle PCI P2PDMA pages in the map_sg/unmap_sg operation.
-+ */
-+#define DMA_F_PCI_P2PDMA_SUPPORTED     (1 << 0)
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 266754a55327..7ff9d6386c12 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -69,10 +69,27 @@ struct sg_append_table {
+  * a valid sg entry, or whether it points to the start of a new scatterlist.
+  * Those low bits are there for everyone! (thanks mason :-)
+  */
+-#define sg_is_chain(sg)		((sg)->page_link & SG_CHAIN)
+-#define sg_is_last(sg)		((sg)->page_link & SG_END)
+-#define sg_chain_ptr(sg)	\
+-	((struct scatterlist *) ((sg)->page_link & ~(SG_CHAIN | SG_END)))
++#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END)
 +
- struct dma_map_ops {
-+	unsigned int flags;
-+
- 	void *(*alloc)(struct device *dev, size_t size,
- 			dma_addr_t *dma_handle, gfp_t gfp,
- 			unsigned long attrs);
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index dca2b1355bb1..f7c61b2b4b5e 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -140,6 +140,7 @@ int dma_mmap_attrs(struct device *dev, struct vm_area_struct *vma,
- 		unsigned long attrs);
- bool dma_can_mmap(struct device *dev);
- int dma_supported(struct device *dev, u64 mask);
-+bool dma_pci_p2pdma_supported(struct device *dev);
- int dma_set_mask(struct device *dev, u64 mask);
- int dma_set_coherent_mask(struct device *dev, u64 mask);
- u64 dma_get_required_mask(struct device *dev);
-@@ -250,6 +251,10 @@ static inline int dma_supported(struct device *dev, u64 mask)
- {
- 	return 0;
- }
-+static inline bool dma_pci_p2pdma_supported(struct device *dev)
++static inline unsigned int __sg_flags(struct scatterlist *sg)
 +{
-+	return false;
++	return sg->page_link & SG_PAGE_LINK_MASK;
 +}
- static inline int dma_set_mask(struct device *dev, u64 mask)
- {
- 	return -EIO;
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index c056a1468189..74858326ef94 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -724,6 +724,24 @@ int dma_supported(struct device *dev, u64 mask)
- }
- EXPORT_SYMBOL(dma_supported);
- 
-+bool dma_pci_p2pdma_supported(struct device *dev)
++
++static inline struct scatterlist *sg_chain_ptr(struct scatterlist *sg)
 +{
-+	const struct dma_map_ops *ops = get_dma_ops(dev);
-+
-+	/* if ops is not set, dma direct will be used which supports P2PDMA */
-+	if (!ops)
-+		return true;
-+
-+	/*
-+	 * Note: dma_ops_bypass is not checked here because P2PDMA should
-+	 * not be used with dma mapping ops that do not have support even
-+	 * if the specific device is bypassing them.
-+	 */
-+
-+	return ops->flags & DMA_F_PCI_P2PDMA_SUPPORTED;
++	return (struct scatterlist *)(sg->page_link & ~SG_PAGE_LINK_MASK);
 +}
-+EXPORT_SYMBOL_GPL(dma_pci_p2pdma_supported);
 +
- #ifdef CONFIG_ARCH_HAS_DMA_SET_MASK
- void arch_dma_set_mask(struct device *dev, u64 mask);
- #else
++static inline bool sg_is_chain(struct scatterlist *sg)
++{
++	return __sg_flags(sg) & SG_CHAIN;
++}
++
++static inline bool sg_is_last(struct scatterlist *sg)
++{
++	return __sg_flags(sg) & SG_END;
++}
+ 
+ /**
+  * sg_assign_page - Assign a given page to an SG entry
+@@ -92,7 +109,7 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
+ 	 * In order for the low bit stealing approach to work, pages
+ 	 * must be aligned at a 32-bit boundary as a minimum.
+ 	 */
+-	BUG_ON((unsigned long) page & (SG_CHAIN | SG_END));
++	BUG_ON((unsigned long)page & SG_PAGE_LINK_MASK);
+ #ifdef CONFIG_DEBUG_SG
+ 	BUG_ON(sg_is_chain(sg));
+ #endif
+@@ -126,7 +143,7 @@ static inline struct page *sg_page(struct scatterlist *sg)
+ #ifdef CONFIG_DEBUG_SG
+ 	BUG_ON(sg_is_chain(sg));
+ #endif
+-	return (struct page *)((sg)->page_link & ~(SG_CHAIN | SG_END));
++	return (struct page *)((sg)->page_link & ~SG_PAGE_LINK_MASK);
+ }
+ 
+ /**
 -- 
 2.30.2
 
