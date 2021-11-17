@@ -2,133 +2,348 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC08C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 11:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83964C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 12:00:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E70C161BC1
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 11:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6791261BD4
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 12:00:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235043AbhKQMC0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 07:02:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58098 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233413AbhKQMC0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 07:02:26 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B292D617E4;
-        Wed, 17 Nov 2021 11:59:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637150367;
-        bh=3VkAAaG7XekBNhPpSck/JA2xiaber5NXQa8cQ2pAVN0=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=g0Knyuo03AwutmPiAVFqaevkW6XvEIlCgJPE9+YQIgZ/2N1rwgEX0kd49fVHPsTXm
-         PlhnVub/1VusBy8MVQt4719/8C/7CXqg0Wi5pgWPrwp24KfI5zJpIzWIhrvR2Zw3Z2
-         IdCgnqDnTcPfcI2Bfz7/52s/YQSkQzlXE30kj4YIBqt3SJ6e1vC0HRj7j2nusORpjj
-         02Bu5d63aBl89cRTVygPs1Un1oYeEFG0kjlhd4jy28zNf/NVrwxQiued200laePWcl
-         oRBoUgy+8araG5wrjZS/sxXXFEo7CD2do7mlj3UXDicO2ievH4EzdlQzne7pJbgcAe
-         a8b43Og58xWYA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 840235C0AF4; Wed, 17 Nov 2021 03:59:27 -0800 (PST)
-Date:   Wed, 17 Nov 2021 03:59:27 -0800
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     syzbot <syzbot+de9526ade17c659d8336@syzkaller.appspotmail.com>,
-        fweisbec@gmail.com, hch@lst.de, hdanton@sina.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@kernel.org, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-Subject: Re: [syzbot] INFO: rcu detected stall in __hrtimer_run_queues
-Message-ID: <20211117115927.GZ641268@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <0000000000007ee63e05d0e9c172@google.com>
- <097631ea-d781-c4e1-aa0e-d921a7a2e69e@kernel.dk>
+        id S237088AbhKQMDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 07:03:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56415 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233413AbhKQMDm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Nov 2021 07:03:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637150443;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bX797gKamI9NftC8wUF5/GgX3tDJPag/5O8r1WmtR7o=;
+        b=D9HpyfKxUYyxE+seuoDPktKhVgziCcG3nbpDU0YVXTGvSEISKlnzUX4BFI+O6TIZy8FHJW
+        2d3zxlu6UUjmstTskxGZFcLX0O5Q88848ZjqJmssEol/CULkVFUCZVdbx08iiZOoBgkl6E
+        MhwN8zHXibVkX7IiOE0CI7/R52yzrbE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-hcgAX8dZPcaKpczDgIs5Bw-1; Wed, 17 Nov 2021 07:00:40 -0500
+X-MC-Unique: hcgAX8dZPcaKpczDgIs5Bw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A385910144E3;
+        Wed, 17 Nov 2021 12:00:38 +0000 (UTC)
+Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B646100EBAD;
+        Wed, 17 Nov 2021 12:00:28 +0000 (UTC)
+Date:   Wed, 17 Nov 2021 20:00:24 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Haris Iqbal <haris.iqbal@ionos.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        sashal@kernel.org, jack@suse.cz, Jinpu Wang <jinpu.wang@ionos.com>,
+        Danil Kipnis <danil.kipnis@ionos.com>
+Subject: Re: Observing an fio hang with RNBD device in the latest v5.10.78
+ Linux kernel
+Message-ID: <YZTu2OQ0JW0FVHW0@T590>
+References: <CAJpMwyixY_-AbMvtGGMBWBO3+oOEF9fuWHkYpLWDbXo3dcAGfg@mail.gmail.com>
+ <YYsiqUpLdNtshZms@T590>
+ <CAJpMwyhv0ccnLc1YjJypGs6khar+GjfgmBUH_f-ugo9hpM1Pig@mail.gmail.com>
+ <YZJ1aty1WVkW55aI@T590>
+ <CAJpMwyj4--c7OKdo2e_V4F87bX=CqKCpgYsRR4h1PvAYzUrkwA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <097631ea-d781-c4e1-aa0e-d921a7a2e69e@kernel.dk>
+In-Reply-To: <CAJpMwyj4--c7OKdo2e_V4F87bX=CqKCpgYsRR4h1PvAYzUrkwA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 08:42:39AM -0700, Jens Axboe wrote:
-> On 11/16/21 8:41 AM, syzbot wrote:
-> > syzbot suspects this issue was fixed by commit:
-> > 
-> > commit b60876296847e6cd7f1da4b8b7f0f31399d59aa1
-> > Author: Jens Axboe <axboe@kernel.dk>
-> > Date:   Fri Oct 15 21:03:52 2021 +0000
-> > 
-> >     block: improve layout of struct request
+On Wed, Nov 17, 2021 at 12:50:54PM +0100, Haris Iqbal wrote:
+> On Mon, Nov 15, 2021 at 3:58 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Mon, Nov 15, 2021 at 02:01:32PM +0100, Haris Iqbal wrote:
+> > > On Wed, Nov 10, 2021 at 2:39 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > Hello Haris,
+> > > >
+> > > > On Tue, Nov 09, 2021 at 10:32:32AM +0100, Haris Iqbal wrote:
+> > > > > Hi,
+> > > > >
+> > > > > We are observing an fio hang with the latest v5.10.78 Linux kernel
+> > > > > version with RNBD. The setup is as follows,
+> > > > >
+> > > > > On the server side, 16 nullblk devices.
+> > > > > On the client side, map those 16 block devices through RNBD-RTRS.
+> > > > > Change the scheduler for those RNBD block devices to mq-deadline.
+> > > > >
+> > > > > Run fios with the following configuration.
+> > > > >
+> > > > > [global]
+> > > > > description=Emulation of Storage Server Access Pattern
+> > > > > bssplit=512/20:1k/16:2k/9:4k/12:8k/19:16k/10:32k/8:64k/4
+> > > > > fadvise_hint=0
+> > > > > rw=randrw:2
+> > > > > direct=1
+> > > > > random_distribution=zipf:1.2
+> > > > > time_based=1
+> > > > > runtime=60
+> > > > > ramp_time=1
+> > > > > ioengine=libaio
+> > > > > iodepth=128
+> > > > > iodepth_batch_submit=128
+> > > > > iodepth_batch_complete=128
+> > > > > numjobs=1
+> > > > > group_reporting
+> > > > >
+> > > > >
+> > > > > [job1]
+> > > > > filename=/dev/rnbd0
+> > > > > [job2]
+> > > > > filename=/dev/rnbd1
+> > > > > [job3]
+> > > > > filename=/dev/rnbd2
+> > > > > [job4]
+> > > > > filename=/dev/rnbd3
+> > > > > [job5]
+> > > > > filename=/dev/rnbd4
+> > > > > [job6]
+> > > > > filename=/dev/rnbd5
+> > > > > [job7]
+> > > > > filename=/dev/rnbd6
+> > > > > [job8]
+> > > > > filename=/dev/rnbd7
+> > > > > [job9]
+> > > > > filename=/dev/rnbd8
+> > > > > [job10]
+> > > > > filename=/dev/rnbd9
+> > > > > [job11]
+> > > > > filename=/dev/rnbd10
+> > > > > [job12]
+> > > > > filename=/dev/rnbd11
+> > > > > [job13]
+> > > > > filename=/dev/rnbd12
+> > > > > [job14]
+> > > > > filename=/dev/rnbd13
+> > > > > [job15]
+> > > > > filename=/dev/rnbd14
+> > > > > [job16]
+> > > > > filename=/dev/rnbd15
+> > > > >
+> > > > > Some of the fio threads hangs and the fio never finishes.
+> > > > >
+> > > > > fio fio.ini
+> > > > > job1: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job2: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job3: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job4: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job5: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job6: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job7: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job8: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job9: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job10: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job11: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job12: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job13: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job14: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job15: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > job16: (g=0): rw=randrw, bs=(R) 512B-64.0KiB, (W) 512B-64.0KiB, (T)
+> > > > > 512B-64.0KiB, ioengine=libaio, iodepth=128
+> > > > > fio-3.12
+> > > > > Starting 16 processes
+> > > > > Jobs: 16 (f=12):
+> > > > > [m(3),/(2),m(5),/(1),m(1),/(1),m(3)][0.0%][r=130MiB/s,w=130MiB/s][r=14.7k,w=14.7k
+> > > > > IOPS][eta 04d:07h:4
+> > > > > Jobs: 15 (f=11):
+> > > > > [m(3),/(2),m(5),/(1),_(1),/(1),m(3)][51.2%][r=7395KiB/s,w=6481KiB/s][r=770,w=766
+> > > > > IOPS][eta 01m:01s]
+> > > > > Jobs: 15 (f=11): [m(3),/(2),m(5),/(1),_(1),/(1),m(3)][52.7%][eta 01m:01s]
+> > > > >
+> > > > > We checked the block devices, and there are requests waiting in their
+> > > > > fifo (not on all devices, just few whose corresponding fio threads are
+> > > > > hung).
+> > > > >
+> > > > > $ cat /sys/kernel/debug/block/rnbd0/sched/read_fifo_list
+> > > > > 00000000ce398aec {.op=READ, .cmd_flags=,
+> > > > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > > > .internal_tag=209}
+> > > > > 000000005ec82450 {.op=READ, .cmd_flags=,
+> > > > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > > > .internal_tag=210}
+> > > > >
+> > > > > $ cat /sys/kernel/debug/block/rnbd0/sched/write_fifo_list
+> > > > > 000000000c1557f5 {.op=WRITE, .cmd_flags=SYNC|IDLE,
+> > > > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > > > .internal_tag=195}
+> > > > > 00000000fc6bfd98 {.op=WRITE, .cmd_flags=SYNC|IDLE,
+> > > > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > > > .internal_tag=199}
+> > > > > 000000009ef7c802 {.op=WRITE, .cmd_flags=SYNC|IDLE,
+> > > > > .rq_flags=SORTED|ELVPRIV|IO_STAT|HASHED, .state=idle, .tag=-1,
+> > > > > .internal_tag=217}
+> > > >
+> > > > Can you post the whole debugfs log for rnbd0?
+> > > >
+> > > > (cd /sys/kernel/debug/block/rnbd0 && find . -type f -exec grep -aH . {} \;)
+> > >
+> > > Attached the logfile.
+> >
+> > logfile just shows that there are requests in scheduler queue.
+> >
+> > >
+> > > >
+> > > > >
+> > > > >
+> > > > > Potential points which fixes the hang
+> > > > >
+> > > > > 1) Using no scheduler (none) on the client side RNBD block devices
+> > > > > results in no hang.
+> > > > >
+> > > > > 2) In the fio config, changing the line "iodepth_batch_complete=128"
+> > > > > to the following fixes the hang,
+> > > > > iodepth_batch_complete_min=1
+> > > > > iodepth_batch_complete_max=128
+> > > > > OR,
+> > > > > iodepth_batch_complete=0
+> > > > >
+> > > > > 3) We also tracked down the version from which the hang started. The
+> > > > > hang started with v5.10.50, and the following commit was one which
+> > > > > results in the hang
+> > > > >
+> > > > > commit 512106ae2355813a5eb84e8dc908628d52856890
+> > > > > Author: Ming Lei <ming.lei@redhat.com>
+> > > > > Date:   Fri Jun 25 10:02:48 2021 +0800
+> > > > >
+> > > > >     blk-mq: update hctx->dispatch_busy in case of real scheduler
+> > > > >
+> > > > >     [ Upstream commit cb9516be7708a2a18ec0a19fe3a225b5b3bc92c7 ]
+> > > > >
+> > > > >     Commit 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> > > > >     starts to support io batching submission by using hctx->dispatch_busy.
+> > > > >
+> > > > >     However, blk_mq_update_dispatch_busy() isn't changed to update
+> > > > > hctx->dispatch_busy
+> > > > >     in that commit, so fix the issue by updating hctx->dispatch_busy in case
+> > > > >     of real scheduler.
+> > > > >
+> > > > >     Reported-by: Jan Kara <jack@suse.cz>
+> > > > >     Reviewed-by: Jan Kara <jack@suse.cz>
+> > > > >     Fixes: 6e6fcbc27e77 ("blk-mq: support batching dispatch in case of io")
+> > > > >     Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > >     Link: https://lore.kernel.org/r/20210625020248.1630497-1-ming.lei@redhat.com
+> > > > >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > > > >     Signed-off-by: Sasha Levin <sashal@kernel.org>
+> > > > >
+> > > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > > > index 00d6ed2fe812..a368eb6dc647 100644
+> > > > > --- a/block/blk-mq.c
+> > > > > +++ b/block/blk-mq.c
+> > > > > @@ -1242,9 +1242,6 @@ static void blk_mq_update_dispatch_busy(struct
+> > > > > blk_mq_hw_ctx *hctx, bool busy)
+> > > > >  {
+> > > > >         unsigned int ewma;
+> > > > >
+> > > > > -       if (hctx->queue->elevator)
+> > > > > -               return;
+> > > > > -
+> > > > >         ewma = hctx->dispatch_busy;
+> > > > >
+> > > > >         if (!ewma && !busy)
+> > > > >
+> > > > > We reverted the commit and tested and there is no hang.
+> > > > >
+> > > > > 4) Lastly, we tested newer version like 5.13, and there is NO hang in
+> > > > > that also. Hence, probably some other change fixed it.
+> > > >
+> > > > Can you observe the issue on v5.10? Maybe there is one pre-patch of commit cb9516be7708
+> > > > ("blk-mq: update hctx->dispatch_busy in case of real scheduler merged")
+> > > > which is missed to 5.10.y.
+> > >
+> > > If you mean v5.10.0, then no, I see no hang there. As I mentioned
+> > > before, there is no hang till v5.10.49.
+> > >
+> > > >
+> > > > And not remember that there is fix for commit cb9516be7708 in mainline.
+> > > >
+> > > > commit cb9516be7708 is merged to v5.14, instead of v5.13, did you test v5.14 or v5.15?
+> > > >
+> > > > BTW, commit cb9516be7708 should just affect performance, not supposed to cause
+> > > > hang.
+> > >
+> > > True. It does look like that from the small code change.
+> >
+> > ->dispatch_busy just affects the batching size for dequeuing request
+> > from scheduler queue, see the following code in
+> > __blk_mq_do_dispatch_sched():
+> >
+> >         if (hctx->dispatch_busy)
+> >                 max_dispatch = 1;
+> >         else
+> >                 max_dispatch = hctx->queue->nr_requests;
+> >
+> >
+> > Also see blk_mq_do_dispatch_sched():
+> >
+> > static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > {
+> >         int ret;
+> >
+> >         do {
+> >                 ret = __blk_mq_do_dispatch_sched(hctx);
+> >         } while (ret == 1);
+> >
+> >         return ret;
+> > }
+> >
+> > If any request can be dispatched to driver, blk-mq will continue to
+> > dispatch until -EAGAIN or 0 is returned from __blk_mq_do_dispatch_sched().
+> >
+> > In case of -EAGAIN, blk-mq will try again to dispatch request and run
+> > queue asynchronously if another -EAGAIN is returend.
+> >
+> > In case of 0 returned, blk_mq_dispatch_rq_list() can't make progress,
+> > the request will be moved to hctx->dispatch, and blk-mq covers the
+> > re-run uueue until all requests in hctx->dispatch are dispatched, then
+> > still dispatch request from scheduler queue.
+> >
+> > So the current code has provided forward-progress, and I don't see how
+> > patch 'blk-mq: update hctx->dispatch_busy in case of real scheduler' can
+> > cause this issue.
+> >
+> > Also not see any request in hctx->dispatch from debugfs log.
+> >
+> > >
+> > > I wasn't able to test in v5.14 and v5.15 because we are seeing some
+> > > other errors in those versions, most probably related to the
+> > > rdma-core/rxe driver.
+> >
+> > I'd rather see test result on upstream kernel of v5.14 or v5.15 or recent
+> > v5.15-rc.
 > 
-> No functional changes in that patch, so looks like a fluky bisection.
+> We were finally able to test in 5.15.2, and there is no hang.
 
-I am seeing an intermittent (and rather strange) stall warnings on
-v5.16-rc1.  This is a self-detected stall from the idle loop.  The
-reason that this is strange is that the usual reason that a CPU stalls
-in the idle loop is due to a long-running interrupt, in which case
-you would expect other CPUs to detect the stall.
+OK, that is expected.
 
-Reproduce using RCU's TRE07 scenario, except that the MTBF looks to be
-several hundred hours.  But I ran this scenario long enough on v5.15-rc*
-to be confident that this stall warning is a regression introduced
-recently.
+Maybe some fixes aren't backported to stable tree. If RNBD can work on
+mainline, git-bisect may figure out which patches are missed.
 
-And the reason is that the CPU, despite being in the idle loop, is not
-marked as idle from an RCU perspective (see the "idle=d59/0/0x1"):
 
- rcu:     0-...!: (13 ticks this GP) idle=d59/0/0x1 softirq=281261
-/281261 fqs=1
-  (t=2199037 jiffies g=249449 q=5)
- NMI backtrace for cpu 0
- CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.16.0-rc1 #4571
- Hardware name: Red Hat KVM/RHEL-AV, BIOS 1.13.0-2.module_el8.5.0+
-746+bbd5d70c 04/01/2014
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x33/0x42
-  nmi_cpu_backtrace.cold.6+0x30/0x70
-  ? lapic_can_unplug_cpu+0x70/0x70
-  nmi_trigger_cpumask_backtrace+0xbf/0xd0
-  rcu_dump_cpu_stacks+0xc0/0x120
-  rcu_sched_clock_irq.cold.110+0x15a/0x312
-  ? get_nohz_timer_target+0x60/0x190
-  ? lock_timer_base+0x62/0x80
-  ? account_process_tick+0xd4/0x160
-  ? tick_sched_handle.isra.24+0x40/0x40
-  update_process_times+0x8e/0xc0
-  tick_sched_handle.isra.24+0x30/0x40
-  tick_sched_timer+0x6a/0x80
-  __hrtimer_run_queues+0xfc/0x2a0
-  hrtimer_interrupt+0x105/0x220
-  ? resched_curr+0x1e/0xc0
-  __sysvec_apic_timer_interrupt+0x7a/0x160
-  sysvec_apic_timer_interrupt+0x85/0xb0
-  </IRQ>
-  <TASK>
-  asm_sysvec_apic_timer_interrupt+0x12/0x20
- RIP: 0010:default_idle+0xb/0x10
- Code: ff 48 89 df e8 16 5c 90 ff eb d7 e8 bf 82 ff ff cc cc cc cc
- cc cc cc cc cc cc cc cc cc cc cc eb 07 0f 00 2d df 92 41 00 fb f4 <c3> 0f 1f 40
- 00 65 48 8b 04 25 00 ad 01 00 f0 80 48 02 20 48 8b 10
- RSP: 0018:ffffffff9dc03e98 EFLAGS: 00000202
- RAX: ffffffff9d3ed200 RBX: 0000000000000000 RCX: 0000000000000000
- RDX: 0000000000000000 RSI: ffffffff9da3e0a1 RDI: ffffffff9da683ae
- RBP: ffffffff9de86050 R08: 00000000e141ad57 R09: ffffa03c5f229d40
- R10: 0000000000002400 R11: 0000000000002400 R12: 0000000000000000
- R13: 0000000000000000 R14: ffffffffffffffff R15: ffffffff9dc14940
-  ? __cpuidle_text_start+0x8/0x8
-  ? __cpuidle_text_start+0x8/0x8
-  default_idle_call+0x28/0xd0
-  do_idle+0x1fb/0x290
-  cpu_startup_entry+0x14/0x20
-  start_kernel+0x659/0x680
-  secondary_startup_64_no_verify+0xc2/0xcb
-  </TASK>
+thanks,
+Ming
 
-The usual reason for this odd situation is that someone forgot an
-irq_enter() or added an extra irq_exit().  Or likewise for a number of
-similar functions that tell RCU to start/stop ignoring the current CPU:
-nmi_enter(), nmi_exit(), rcu_*_enter(), rcu_*_exit(), and so on.
-
-Adding the x86 list on CC.
-
-							Thanx, Paul
