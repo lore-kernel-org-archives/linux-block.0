@@ -2,117 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759B7C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4321AC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:52:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A62161BD3
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:20:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B8FA61B42
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 09:52:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234559AbhKQJXU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 04:23:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60382 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235056AbhKQJXS (ORCPT
+        id S235570AbhKQJze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 04:55:34 -0500
+Received: from mail-vk1-f172.google.com ([209.85.221.172]:37681 "EHLO
+        mail-vk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235627AbhKQJze (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 04:23:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637140820;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=77rEDu/reg/YJ6amwbhAgjZqXAbfYRFP4sr85cH8gm4=;
-        b=ag+dyQo2AvlxAw6gQe94MJ2D+ZgiT5Ref0HtOjcHpzUQsrwCrMmwRYz/Dg6u6doh/Qfk/c
-        MaKGUCCShVkoXB6a4C6Ir5ZIzIMXaVCk1s4w+NyIMpa/+j11yA3xPAMz4Ffe7miWnq1gUP
-        JYbJQGYtE5h+wztniBqz6QcxnClp2fs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-5sjyeyKpOzajjyBXehv2eA-1; Wed, 17 Nov 2021 04:20:18 -0500
-X-MC-Unique: 5sjyeyKpOzajjyBXehv2eA-1
-Received: by mail-ed1-f70.google.com with SMTP id r16-20020a056402019000b003e6cbb77ed2so1570491edv.10
-        for <linux-block@vger.kernel.org>; Wed, 17 Nov 2021 01:20:18 -0800 (PST)
+        Wed, 17 Nov 2021 04:55:34 -0500
+Received: by mail-vk1-f172.google.com with SMTP id e64so1274204vke.4;
+        Wed, 17 Nov 2021 01:52:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=77rEDu/reg/YJ6amwbhAgjZqXAbfYRFP4sr85cH8gm4=;
-        b=ZHstyE489Uay1AzWD9EOGadabPqZfU96WCXezVsxyy/edv4YG8P1s84SdAuvbO3ctM
-         J8xZaAg4LXWLgK4q9QzDFKmTT04AZ6x5HLAJb45sEFT2r2QSPAGcCDj7jTUUymyz0I0g
-         ZzVUjTTBqDbqakHuO2TO0/IOFxubXapPmdrI/73Mw+nGESoRO/XEFimnXQywbm6udAoG
-         UYtv0wPd/FKAYyukI+uukeVKQN4BMqEjGEmbBdazGbzb+FfwWcDoNhfV77SIwW1sQBU0
-         fVX75Tz4weC7qz/lwtkBB5MFhrnD/j6QFUMBV7T4szZKwC5MkiuTMcNTy3e4k4YRn7x9
-         XLkQ==
-X-Gm-Message-State: AOAM5335CNt7QE6+rqxxpXt9acg7k2n4Uulk6x5IpqTZWUIzr4k24Ukt
-        w0LglgvwKQZpwZccHX7ZLiIDAh1Pewgu3qRsXVeTJ725LqFVfhHCCHmejV9dFT4U/MTyjT2cAHP
-        6K2TXFox8i/Uc4qywknaTPXw=
-X-Received: by 2002:aa7:c714:: with SMTP id i20mr19958655edq.180.1637140817840;
-        Wed, 17 Nov 2021 01:20:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwYtu97PwkW2A1yYGpWopI7K1d4sbVlbcdvIekk7lLEy/KSy29AQt851GD79KmBNlKEUMRrUw==
-X-Received: by 2002:aa7:c714:: with SMTP id i20mr19958629edq.180.1637140817719;
-        Wed, 17 Nov 2021 01:20:17 -0800 (PST)
-Received: from steredhat (host-87-10-72-39.retail.telecomitalia.it. [87.10.72.39])
-        by smtp.gmail.com with ESMTPSA id hw8sm9777163ejc.58.2021.11.17.01.20.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 01:20:17 -0800 (PST)
-Date:   Wed, 17 Nov 2021 10:20:14 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     cgel.zte@gmail.com
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ye Guojin <ye.guojin@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: Re: [PATCH] virtio-blk: modify the value type of num in
- virtio_queue_rq()
-Message-ID: <20211117092014.qyqhtg2y5etoxrqe@steredhat>
-References: <20211117063955.160777-1-ye.guojin@zte.com.cn>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DaTH6dG+9OWuk5kLfq7Obj05Cb3d8CS7ODxUbCSsHLY=;
+        b=hehaOcivLeOZdPbXAUg/kY+nfhCojFZMe0c6M69o03c3uv8qcZnwFWp4IOgi1l2vt7
+         UBA7qhewIqoXF65TbLxYUt0wu/fJocko09gIk1cv+6W5CWKBEaKU4lgvKphRB+H4CPtO
+         ymmCmpCOxapu5msM5ZWnBk8FGJy6H0Z7SW38cHvQxPBS097I5hovy+IrLnumlvm8IL0p
+         mRhPJEYOnw3hD1QKyzODDbLDSJywakOeaspcDHimCRL3oLHTrJIJVfM0guZXpnFoxhzQ
+         xGQbGwB8FJvPuSOzDUKJ5493f4wUgLrMj0RQRsoniRfuqFvnrIuphrBhvdhVamyCkQAM
+         nyIA==
+X-Gm-Message-State: AOAM531VjGmBN0Q5SnBJW3xHrVUD+kCul7nmBo0TPepYRRLju62p/dKN
+        GUF44W7PiXotyGI2lcW055/eVwzdnuY42g==
+X-Google-Smtp-Source: ABdhPJxssKJnTS7lyevwjlZazaFRI63UxBqJV9h9WuFWesZ19yrFdAj3a41H0urJq5N56aVs1v0HBg==
+X-Received: by 2002:a05:6122:1696:: with SMTP id 22mr86804241vkl.2.1637142755296;
+        Wed, 17 Nov 2021 01:52:35 -0800 (PST)
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com. [209.85.222.43])
+        by smtp.gmail.com with ESMTPSA id y22sm12106344vsy.33.2021.11.17.01.52.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Nov 2021 01:52:34 -0800 (PST)
+Received: by mail-ua1-f43.google.com with SMTP id ay21so4488549uab.12;
+        Wed, 17 Nov 2021 01:52:34 -0800 (PST)
+X-Received: by 2002:a05:6102:2910:: with SMTP id cz16mr66332901vsb.9.1637142754433;
+ Wed, 17 Nov 2021 01:52:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20211117063955.160777-1-ye.guojin@zte.com.cn>
+References: <20211108040551.1942823-1-willy@infradead.org> <20211108040551.1942823-2-willy@infradead.org>
+ <YYozKaEXemjKwEar@infradead.org> <YZKCx1cwBXOZcTA4@casper.infradead.org>
+ <YZNQnd887/TcPH7H@infradead.org> <YZQnWU9ABBlXJKa5@casper.infradead.org>
+In-Reply-To: <YZQnWU9ABBlXJKa5@casper.infradead.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Wed, 17 Nov 2021 10:52:23 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXhUbMK8Sp1Zj-cNMSK2Tq1bZ3egX_LXihQpmHULkBk_Q@mail.gmail.com>
+Message-ID: <CAMuHMdXhUbMK8Sp1Zj-cNMSK2Tq1bZ3egX_LXihQpmHULkBk_Q@mail.gmail.com>
+Subject: Re: [PATCH v2 01/28] csky,sparc: Declare flush_dcache_folio()
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 17, 2021 at 06:39:55AM +0000, cgel.zte@gmail.com wrote:
->From: Ye Guojin <ye.guojin@zte.com.cn>
+On Wed, Nov 17, 2021 at 2:22 AM Matthew Wilcox <willy@infradead.org> wrote:
+> On Mon, Nov 15, 2021 at 10:33:01PM -0800, Christoph Hellwig wrote:
+> > I see how this works no, but it is pretty horrible.  Why not something
+> > simple like the patch below?  If/when an architecture actually
+> > wants to override flush_dcache_folio we can find out how to best do
+> > it:
 >
->This was found by coccicheck:
->./drivers/block/virtio_blk.c, 334, 14-17, WARNING Unsigned expression
->compared with zero  num < 0
+> I'll stick this one into -next and see if anything blows up:
 >
-
-We should add the Fixes tag:
-
-Fixes: 02746e26c39e ("virtio-blk: avoid preallocating big SGL for data")
-
->Reported-by: Zeal Robot <zealci@zte.com.cn>
->Signed-off-by: Ye Guojin <ye.guojin@zte.com.cn>
->---
-> drivers/block/virtio_blk.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> From 14f55de74c68a3eb058cfdbf81414148b9bdaac7 Mon Sep 17 00:00:00 2001
+> From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+> Date: Sat, 6 Nov 2021 17:13:35 -0400
+> Subject: [PATCH] Add linux/cacheflush.h
 >
->diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
->index 97bf051a50ce..eed1666eff31 100644
->--- a/drivers/block/virtio_blk.c
->+++ b/drivers/block/virtio_blk.c
->@@ -316,7 +316,7 @@ static blk_status_t virtio_queue_rq(struct 
->blk_mq_hw_ctx *hctx,
-> 	struct request *req = bd->rq;
-> 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-> 	unsigned long flags;
->-	unsigned int num;
->+	int num;
-> 	int qid = hctx->queue_num;
-> 	bool notify = false;
-> 	blk_status_t status;
->-- 
->2.25.1
+> Many architectures do not include asm-generic/cacheflush.h, so turn
+> the includes on their head and add linux/cacheflush.h which includes
+> asm/cacheflush.h.
 >
+> Move the flush_dcache_folio() declaration from asm-generic/cacheflush.h
+> to linux/cacheflush.h and change linux/highmem.h to include
+> linux/cacheflush.h instead of asm/cacheflush.h so that all necessary
+> places will see flush_dcache_folio().
+>
+> More functions should have their default implementations moved in the
+> future, but those are for follow-on patches.  This fixes csky, sparc and
+> sparc64 which were missed in the commit which added flush_dcache_folio().
+>
+> Fixes: 08b0b0059bf1 ("mm: Add flush_dcache_folio()")
+> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-The patch LGTM.
+>  arch/m68k/include/asm/cacheflush_mm.h |  1 -
 
-With the Fixes tag added:
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Gr{oetje,eeting}s,
 
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
