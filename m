@@ -2,84 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C343C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FABC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:15:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB65E61B2B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:14:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6487161BFA
+	for <linux-block@archiver.kernel.org>; Wed, 17 Nov 2021 06:15:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233620AbhKQGRe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Nov 2021 01:17:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56098 "EHLO
+        id S232268AbhKQGSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Nov 2021 01:18:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233573AbhKQGR2 (ORCPT
+        with ESMTP id S231726AbhKQGSa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Nov 2021 01:17:28 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5582C061206;
-        Tue, 16 Nov 2021 22:14:29 -0800 (PST)
+        Wed, 17 Nov 2021 01:18:30 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7612CC061570
+        for <linux-block@vger.kernel.org>; Tue, 16 Nov 2021 22:15:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=viN/M0s94isJpAI9XG+tAyGwzk5B+gYmCJUD6Ta5toY=; b=DmCyOSBxb/zzr/09ETedwRIi2e
-        wWu/BkxWyRBfumSegeofjM4bpJqi0m9vEI6i0xBOuwI9Gwh9MMNARP0J1F9Vi9I05uDZZCDVSr+W7
-        v9lYzYgc/g9CT+TAXDZrBx3TfrOM9xdGQVNfZ5UL98rTwqUPY69IfH0kbS2cMcJum/4sAFZCyejEl
-        Ld9+aLsy/l6DJB7tm7Tuw0xxCu6mDG81/dFRT8+GIjorxEdkJ7tDF6hlJWRn+vUKnOlAoGTIyotui
-        COsMsboULPAegSzeAsB1bqpm86SsCfyVxLTBY193JUQFR0jleXGT9xRyU2za1UJ6jIBPeHLvLrHJd
-        qU0PwygQ==;
-Received: from 213-225-5-109.nat.highway.a1.net ([213.225.5.109] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mnED9-007MHU-OQ; Wed, 17 Nov 2021 06:14:24 +0000
-From:   Christoph Hellwig <hch@lst.de>
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=JP6fWNgfli7JWoW2de76zunE7n6LuUO2BZDB33kQ8mM=; b=uWDbbSR2G+P1TwJLX2dKw7mQPt
+        lYMKXwD3hFwkQ+CzoYKYbdNt1HZG3nSOSiKW1HOv6HpoGBrnrWbzOpVkQgPqWUv9gdqas8/mj6iuX
+        AEkLR/jU52NHHkRMtfE9Rxhcptv3PrOPA5Mu1LUxqBOVVaSk17L/8yYHSqm68+aU9W1Ptbic8gk6k
+        prsT0C7ug05IfvQjyXBEgn0mOQCAwtIR933wbfFzeeMDtmMKNGYDEjUV2rvpxKg0aqkZkFGdjRfOV
+        dEALJGSjTxXrpXU/yDlRjA48YlKjNFBLFhK4o4OYtsfMJL+Y7WCJboAQ9p1DCulRs/ONf3Bhb2UVf
+        iMpWOl/w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mnEEG-003QMv-3Z; Wed, 17 Nov 2021 06:15:32 +0000
+Date:   Tue, 16 Nov 2021 22:15:32 -0800
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mtd@lists.infradead.org
-Subject: [PATCH 11/11] block: don't include blk-mq headers in blk-core.c
-Date:   Wed, 17 Nov 2021 07:14:04 +0100
-Message-Id: <20211117061404.331732-12-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211117061404.331732-1-hch@lst.de>
-References: <20211117061404.331732-1-hch@lst.de>
+Cc:     linux-block@vger.kernel.org, hch@infradead.org
+Subject: Re: [PATCH 2/4] nvme: split command copy into a helper
+Message-ID: <YZSeBFhNvkYsiA2T@infradead.org>
+References: <20211117033807.185715-1-axboe@kernel.dk>
+ <20211117033807.185715-3-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211117033807.185715-3-axboe@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All request based code is in the blk-mq files now.
+On Tue, Nov 16, 2021 at 08:38:05PM -0700, Jens Axboe wrote:
+>  /**
+>   * nvme_submit_cmd() - Copy a command into a queue and ring the doorbell
+>   * @nvmeq: The queue to use
+> @@ -511,10 +520,7 @@ static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd,
+>  			    bool write_sq)
+>  {
+>  	spin_lock(&nvmeq->sq_lock);
+> -	memcpy(nvmeq->sq_cmds + (nvmeq->sq_tail << nvmeq->sqes),
+> -	       cmd, sizeof(*cmd));
+> -	if (++nvmeq->sq_tail == nvmeq->q_depth)
+> -		nvmeq->sq_tail = 0;
+> +	nvme_copy_cmd(nvmeq, cmd);
+>  	nvme_write_sq_db(nvmeq, write_sq);
+>  	spin_unlock(&nvmeq->sq_lock);
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5722c1d9da09c..ee54b34d5e99c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -16,7 +16,6 @@
- #include <linux/module.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
--#include <linux/blk-mq.h>
- #include <linux/blk-pm.h>
- #include <linux/blk-integrity.h>
- #include <linux/highmem.h>
-@@ -47,8 +46,6 @@
- #include <trace/events/block.h>
- 
- #include "blk.h"
--#include "blk-mq.h"
--#include "blk-mq-sched.h"
- #include "blk-pm.h"
- #include "blk-throttle.h"
- 
--- 
-2.30.2
-
+Given that nvme_submit_cmd only has two callers, I'd be tempted to just
+open code in the callers rather than creating a deep callchain here.
