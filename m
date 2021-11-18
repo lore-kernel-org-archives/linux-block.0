@@ -2,123 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8DCFC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Nov 2021 15:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A16C3C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 18 Nov 2021 15:31:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 919C361B31
-	for <linux-block@archiver.kernel.org>; Thu, 18 Nov 2021 15:24:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86D656126A
+	for <linux-block@archiver.kernel.org>; Thu, 18 Nov 2021 15:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232088AbhKRP1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Nov 2021 10:27:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231777AbhKRP1c (ORCPT
+        id S232370AbhKRPd7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Nov 2021 10:33:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60322 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232392AbhKRPdy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Nov 2021 10:27:32 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE58DC061574
-        for <linux-block@vger.kernel.org>; Thu, 18 Nov 2021 07:24:31 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id x9so6812979ilu.6
-        for <linux-block@vger.kernel.org>; Thu, 18 Nov 2021 07:24:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=O+/LXAwdkIJFE9KERkHFyTHYhgjPDJwSFxMMHTdX3yg=;
-        b=zBgJto18usU1xmq60M/0PBBdZEdin6MxUciyiMPmsRm9qlqmMppb67SSa8ExVBDlU0
-         wMIMQB4F2uNjgBspW9AUAlLe9EdMZagx6Rw1bo3z9mBb+ChKlYuY023xwH7+4mqCB5VR
-         28utk188sEDlpfgFJZ3bUToDJwh7ta11qg2TsiHU4DmE0/hLFb2s6IMMzKqHd3CoJarX
-         leI/RkYcuY9ShLCIT2USQboFiPMG+8K1u9hjvChxmToKwaVWHJ5Vu67XtNT6KkP4JK5b
-         M6pScDfMWb/7d9+klkgpUmswb5SRm4iY9TO0N0KEN4YreO/SfqghCDKbeS2uLRFWovX2
-         fW8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=O+/LXAwdkIJFE9KERkHFyTHYhgjPDJwSFxMMHTdX3yg=;
-        b=ophv8kUR1xwkuSaHbT/wVhr7Du0nQ3WX9lb0TUhSLZI9oJt1XoODTemQloY45K7kb4
-         t3acSc95l4PE29o/5r+FrnhLMYQtIwTBEcKnL6GTvVawoiJaPRz+odKovOWWxvhWpJ0L
-         ni7Izil8lAsOx99+2czmrf7kCQDwtiA3cQghajla8yJ8gt2td+eXIsB4F0pCE2vVXZ+x
-         zaGJIGnAnB+cw+Sus5lnU/hRyu4GMio6ivOYHhBGX9dzMAmrYUbXeymJMtGAXyB5IEP3
-         bkI71cN3BNt7DgvkQ8DjaLgiFdjrADdAkVA6gwbOp961e3o5dMWLJpPWdB52nx4uN3g4
-         DNCA==
-X-Gm-Message-State: AOAM533kbBLQp8SmToBpj7jT+MKRjwHigPNCYyEgejlAWRJ0VF1G2I2L
-        60UMURXlXvC1LpYPXW0tJ6KPGw==
-X-Google-Smtp-Source: ABdhPJw1CWvXIjvXMCPpD5KBZHirebHOwrkAQuXnPfp/9QlIOYGfAXP3exXDWUrnkjPXIosCNhmHQg==
-X-Received: by 2002:a05:6e02:1c0c:: with SMTP id l12mr16760032ilh.84.1637249071369;
-        Thu, 18 Nov 2021 07:24:31 -0800 (PST)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id p18sm73311iov.44.2021.11.18.07.24.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 07:24:31 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-mtd@lists.infradead.org,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Richard Weinberger <richard@nod.at>,
-        linux-scsi@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20211117061404.331732-1-hch@lst.de>
-References: <20211117061404.331732-1-hch@lst.de>
-Subject: Re: move all struct request releated code out of blk-core.c (rebased)
-Message-Id: <163724907076.288457.4311609107060829308.b4-ty@kernel.dk>
-Date:   Thu, 18 Nov 2021 08:24:30 -0700
+        Thu, 18 Nov 2021 10:33:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637249454;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0qXyzCLpKoHJxB72U/n7U27y7fSMiqUaVNkT1qDnIaM=;
+        b=OYH65+6rLhpoDCjuJfEV/Sy0MIy37tyMuHjJn2W/WV6TD6v/uqba4WQGw5OxoX5Ea8VtP0
+        f4xu0c9uw54sTeZkxyW7n7+3fY5CSECtjgnwrRN+WxTs/SOxsKe2teI8JmkyzSycurxpUD
+        0+1fmvka4yUkupxcA7IMcfQqntMI4yE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-198-0aBF_Nn0Nr25IYed0YKBWA-1; Thu, 18 Nov 2021 10:30:50 -0500
+X-MC-Unique: 0aBF_Nn0Nr25IYed0YKBWA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B38A71006AA3;
+        Thu, 18 Nov 2021 15:30:49 +0000 (UTC)
+Received: from localhost (ovpn-8-36.pek2.redhat.com [10.72.8.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E55F1179B3;
+        Thu, 18 Nov 2021 15:30:48 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Yi Zhang <yi.zhang@redhat.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] blk-mq: don't insert FUA request with data into scheduler queue
+Date:   Thu, 18 Nov 2021 23:30:41 +0800
+Message-Id: <20211118153041.2163228-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 17 Nov 2021 07:13:53 +0100, Christoph Hellwig wrote:
-> this series (against the for-5.16/passthrough-flag branch) removes the
-> remaining struct request related code from blk-core.c and cleans up a
-> few related bits around that.
-> 
-> Diffstat:
->  b/block/Makefile            |    2
->  b/block/blk-core.c          |  341 --------------------------
->  b/block/blk-mq.c            |  573 ++++++++++++++++++++++++++++++++++++--------
->  b/block/blk-mq.h            |    3
->  b/block/blk.h               |   33 --
->  b/drivers/mtd/mtd_blkdevs.c |   10
->  b/drivers/mtd/ubi/block.c   |    6
->  b/drivers/scsi/scsi_lib.c   |   42 +++
->  b/include/linux/blk-mq.h    |   13
->  block/blk-exec.c            |  116 --------
->  10 files changed, 552 insertions(+), 587 deletions(-)
-> 
-> [...]
+We never insert flush request into scheduler queue before.
 
-Applied, thanks!
+Recently commit d92ca9d8348f ("blk-mq: don't handle non-flush requests in
+blk_insert_flush") tries to handle FUA data request as normal request.
+This way has caused warning[1] in mq-deadline dd_exit_sched() or io hang in
+case of kyber since RQF_ELVPRIV isn't set for flush request, then
+->finish_request won't be called.
 
-[01/11] block: move blk_rq_err_bytes to scsi
-        commit: 6ace6442a37e17d56a1c54f55bea48ac796f869d
-[02/11] block: remove rq_flush_dcache_pages
-        commit: 01ed1e78789a2e3d7a895ca38706a4fb1a6146d0
-[03/11] block: remove blk-exec.c
-        commit: 9048707b1d8f8aebcf23e5b5b143ad1de2a93b34
-[04/11] blk-mq: move blk_mq_flush_plug_list
-        commit: 33af852518417ed7a90703c572e58cc99bef4770
-[05/11] block: move request based cloning helpers to blk-mq.c
-        commit: 432f3b8863dc44ac224e231dbe1b0038b5aa4239
-[06/11] block: move blk_rq_init to blk-mq.c
-        commit: 8586ee1a36a8f690492a7b7ee8f31c514d65957d
-[07/11] block: move blk_steal_bios to blk-mq.c
-        commit: 4ef40a1dc9ebeaa87cb53f16641d439d4ebcfdd0
-[08/11] block: move blk_account_io_{start,done} to blk-mq.c
-        commit: 1bdc7c540b455837af9d736e5f0abb77cfce3e62
-[09/11] block: move blk_dump_rq_flags to blk-mq.c
-        commit: 8a77648954e63f6654042567e31794bfd5ea02a5
-[10/11] block: move blk_print_req_error to blk-mq.c
-        commit: 065c87d65d74ac24bfc3bbc43de068ba99188b1c
-[11/11] block: don't include blk-mq headers in blk-core.c
-        commit: d94d230a3711ac85af1c3cd484419a4a81193387
+Fix the issue by inserting FUA data request with blk_mq_request_bypass_insert()
+when the device supports FUA, just like what we did before.
 
-Best regards,
+[1] https://lore.kernel.org/linux-block/CAHj4cs-_vkTW=dAzbZYGxpEWSpzpcmaNeY1R=vH311+9vMUSdg@mail.gmail.com/
+
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Fixes: d92ca9d8348f ("blk-mq: don't handle non-flush requests in blk_insert_flush")
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-flush.c | 12 ++++++------
+ block/blk-mq.c    |  4 +++-
+ block/blk.h       |  2 +-
+ 3 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 8e364bda5166..1fce6d16e6d3 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -379,7 +379,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+  * @rq is being submitted.  Analyze what needs to be done and put it on the
+  * right queue.
+  */
+-bool blk_insert_flush(struct request *rq)
++void blk_insert_flush(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 	unsigned long fflags = q->queue_flags;	/* may change, cache */
+@@ -409,7 +409,7 @@ bool blk_insert_flush(struct request *rq)
+ 	 */
+ 	if (!policy) {
+ 		blk_mq_end_request(rq, 0);
+-		return true;
++		return;
+ 	}
+ 
+ 	BUG_ON(rq->bio != rq->biotail); /*assumes zero or single bio rq */
+@@ -420,8 +420,10 @@ bool blk_insert_flush(struct request *rq)
+ 	 * for normal execution.
+ 	 */
+ 	if ((policy & REQ_FSEQ_DATA) &&
+-	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH)))
+-		return false;
++	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
++		blk_mq_request_bypass_insert(rq, false, true);
++		return;
++	}
+ 
+ 	/*
+ 	 * @rq should go through flush machinery.  Mark it part of flush
+@@ -437,8 +439,6 @@ bool blk_insert_flush(struct request *rq)
+ 	spin_lock_irq(&fq->mq_flush_lock);
+ 	blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
+ 	spin_unlock_irq(&fq->mq_flush_lock);
+-
+-	return true;
+ }
+ 
+ /**
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c219271f9d6a..fa1a00d71b61 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2647,8 +2647,10 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		return;
+ 	}
+ 
+-	if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
++	if (op_is_flush(bio->bi_opf)) {
++		blk_insert_flush(rq);
+ 		return;
++	}
+ 
+ 	if (plug && (q->nr_hw_queues == 1 ||
+ 	    blk_mq_is_shared_tags(rq->mq_hctx->flags) ||
+diff --git a/block/blk.h b/block/blk.h
+index 4a910742cce9..7c6f7635bff0 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -272,7 +272,7 @@ void __blk_account_io_done(struct request *req, u64 now);
+  */
+ #define ELV_ON_HASH(rq) ((rq)->rq_flags & RQF_HASHED)
+ 
+-bool blk_insert_flush(struct request *rq);
++void blk_insert_flush(struct request *rq);
+ 
+ int elevator_switch_mq(struct request_queue *q,
+ 			      struct elevator_type *new_e);
 -- 
-Jens Axboe
-
+2.31.1
 
