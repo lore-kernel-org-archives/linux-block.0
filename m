@@ -2,94 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32518C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 01:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 635A8C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 01:55:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DC7861284
-	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 01:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C94861A09
+	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 01:55:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233482AbhKSBx2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Nov 2021 20:53:28 -0500
-Received: from pv50p00im-ztdg10022001.me.com ([17.58.6.58]:33552 "EHLO
-        pv50p00im-ztdg10022001.me.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232967AbhKSBx2 (ORCPT
+        id S233992AbhKSB6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Nov 2021 20:58:15 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:21683 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234077AbhKSB6O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Nov 2021 20:53:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-        s=1a1hai; t=1637286627;
-        bh=BSbFce/h/GBa2nVTyfybsr361g4utAySlsL0pTR1A10=;
-        h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:To;
-        b=o6K5V3kqhYUtBqjn8J3Msxns2ewDkEPQ7ZbNSma9ud47CkhvxK8YIFMmzR7cNVdPI
-         VHuFX8n1zcPFjZqLk0riaKoHu67SPjgGMPXt+wytJp5cqlKv3yYacnYbzVaYwJ1ve9
-         0wMfoaoKUasAd5zUAwEM9pVpgdBwazRhtZK5wrX6bmJ6KiBAYNJn7U/igGYhnNwR+p
-         a8qSt149iO9Mcqe/nNn+wKVZIzQHSJXUyBSF9UapJVO5i7vkBc4MgC982B0IX8H0uf
-         887K4cE46Ocor38yra1j+0chSrs78W+04H6MFCLeHNdXXrmsrLwK7m8otDGWgSgExX
-         NzXze90EBCaQQ==
-Received: from smtpclient.apple (unknown [122.96.45.34])
-        by pv50p00im-ztdg10022001.me.com (Postfix) with ESMTPSA id 4CB40A046A;
-        Fri, 19 Nov 2021 01:50:26 +0000 (UTC)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   wangyangbo <yangbonis@icloud.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH] loop: mask loop_control_ioctl parameter only as minor
-Date:   Fri, 19 Nov 2021 09:50:14 +0800
-Message-Id: <94A72A7C-0E1A-4C61-ADDE-9BACEA91FDB5@icloud.com>
-References: <c685d6dc-3918-6ee5-df59-f2d814635228@I-love.SAKURA.ne.jp>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <c685d6dc-3918-6ee5-df59-f2d814635228@I-love.SAKURA.ne.jp>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-X-Mailer: iPhone Mail (19B74)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.425,18.0.790
- definitions=2021-11-19_01:2021-11-17,2021-11-18 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 clxscore=1015 mlxscore=0
- mlxlogscore=895 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-2009150000 definitions=main-2111190006
+        Thu, 18 Nov 2021 20:58:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1637286913; x=1668822913;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aG5LqWTsRucrm11BXz0YXxnhDV4aHDGwps3zTPHMqJE=;
+  b=BP4+05P4ndoTbllwHtMTEMkK3nWKcCGrEK3H+kci3Fbue39ffYzBc+CU
+   1ljK3yOd2HKV3i8OxPjw/9tukBk9NiFpMOIl+s/5/s5NNHo3/cyjxSysj
+   b0KOhWQ3KuS5/obTntJ1D4j6m2Uc+xVaUp1KnNR40uryoHPIFQJZ1QrJG
+   k7N4BouMYdWja/p7BnZxXi/ruE7+b9GD6Cj1P5KiEOIidUcsmMroHn7JL
+   SOyjktnumQvSeNQ41hjz+jbiTkaQ2e4b5PqtUtolgieV4bdoqcEErQ41b
+   ttOBSlPS4WilkW2NZW/rqeQ8aGpRo8raj++/6WFDLEIGwsYQORjmaPR5L
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.87,246,1631548800"; 
+   d="scan'208";a="185023353"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Nov 2021 09:55:13 +0800
+IronPort-SDR: wKfF/ZQqfDeoeEB8ufnW4SMq3sFW0i4PD64tlcSVDRBTQfGOPYGtRmOVU2B9CvzZJvD8fKSUO2
+ 6teQU9kdAMFDTvDSVUYH9RHnZyeR0iooupUyV9SWYWQ8PWCldoSyFiLxqDwI+31i1sveOV4jf0
+ rywRGplQ0YowFceWrXySyJI22xyyYBD04h7E001GNZKDFQsKGUyaU8H4Di2igVH4hVNfOKhL7D
+ rilYzgCWr2e84ZKqfD0fJ8UdKWPFXrkJT33DeA70CAKzmdE4ayUR74tHe6Wc9jEiWV8WIKJiaM
+ cWt3MgVVyRO3QkJPPYa2diRv
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2021 17:30:12 -0800
+IronPort-SDR: zK3bKQguGjKITmkvrQW1pED8LZ5HK6fEEEwlsvaSVACa0fDKd0NIrSHAG/JS2kr5bbCvf5HmRg
+ Nr5ow00DWsGnElcR5lEdQZaKFoz+asQPEhAKUOWyi+/YXNoYnGPkBtHGj7O/M9ucl+Z9G0zDPD
+ xDJCQrBMSLDcViOkwvQ3r73dAVfLwfeFBUtPCKhDhnQWvrfErqQz3S04OoMK1TM0b9yqbnHsIs
+ FaNlHSJ8iU1/BmHZAG4+N5KbjafAG9KXBqoddG2kBtNJsxqO5R2p1U6G5nqLTW+Gr5oIfZf4A1
+ pE0=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2021 17:55:13 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4HwKVm3Wqtz1RtVn
+        for <linux-block@vger.kernel.org>; Thu, 18 Nov 2021 17:55:12 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1637286911; x=1639878912; bh=aG5LqWTsRucrm11BXz0YXxnhDV4aHDGwps3
+        zTPHMqJE=; b=VpQNF3zKxOX2dSZG2/BE4JWXNTW1W8qVMBK7MSAE3T8EE0w2411
+        4y+8PyG8xkTPPzwX47/PIwGnteq5/IAsGQGjFrlJ1RICr1JMaw0gRAAmi9anFVqN
+        5fcD1EozGlszJ9b0xp5i4SHEk8jkRG5Lzq77b6FnKvmsn/bqBlMcSzVVWiDOsitN
+        gwv+BmTpUwAbC6Mnom3v6VQrenA1Z7yi/qOzTeatMgmEfGxVBFKcwSmRlOH37msm
+        naV775kTDj4nySbJ3K0R8sZ5zAMiMgDJO1EDYCMJ+123gSDAjKiGu+h2eCneVzw+
+        dGgCQv3Ox6d3FoHjOefDxyOdMcwQzBUuJIQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Qky4gUof4aIe for <linux-block@vger.kernel.org>;
+        Thu, 18 Nov 2021 17:55:11 -0800 (PST)
+Received: from [10.225.54.48] (unknown [10.225.54.48])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4HwKVk4Pkyz1RtVl;
+        Thu, 18 Nov 2021 17:55:10 -0800 (PST)
+Message-ID: <df37d57e-86e1-56dd-54b7-f3d7b96ffd56@opensource.wdc.com>
+Date:   Fri, 19 Nov 2021 10:55:08 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.1
+Subject: Re: [PATCH 5.15] block: Add a helper to validate the block size
+Content-Language: en-US
+To:     Tadeusz Struk <tadeusz.struk@linaro.org>, stable@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+662448179365dddc1880@syzkaller.appspotmail.com,
+        xieyongji@bytedance.com
+References: <7e6c4c23-f071-f33b-7bd4-da11980d34c6@linaro.org>
+ <20211118235738.1128085-1-tadeusz.struk@linaro.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital
+In-Reply-To: <20211118235738.1128085-1-tadeusz.struk@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2021/11/19 8:57, Tadeusz Struk wrote:
+> From: Xie Yongji <xieyongji@bytedance.com>
+> 
+> From: Xie Yongji <xieyongji@bytedance.com>
+> 
+> There are some duplicated codes to validate the block
+> size in block drivers. This limitation actually comes
+> from block layer, so this patch tries to add a new block
+> layer helper for that.
+> 
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> Link: https://lore.kernel.org/r/20211026144015.188-2-xieyongji@bytedance.com
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@linaro.org>
+> ---
+>  include/linux/blkdev.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 683aee365420..5b03795ae33b 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -54,6 +54,14 @@ struct blk_keyslot_manager;
+>   */
+>  #define BLKCG_MAX_POLS		6
+>  
+> +static inline int blk_validate_block_size(unsigned int bsize)
+> +{
+> +	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>  typedef void (rq_end_io_fn)(struct request *, blk_status_t);
+>  
+>  /*
+> 
 
+But where is this used in 5.15 ? I do not see any callers for this.
+So why backport it ?
 
-> On Nov 18, 2021, at 22:15, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.j=
-p> wrote:
->=20
-> =EF=BB=BFOn 2021/11/18 11:36, wangyangbo wrote:
->> @@ -2170,11 +2170,11 @@ static long loop_control_ioctl(struct file *file,=
- unsigned int cmd,
->> {
->>    switch (cmd) {
->>    case LOOP_CTL_ADD:
->> -        return loop_add(parm);
->> +        return loop_add(MINOR(parm));
->=20
-> Better to return -EINVAL or something if out of minor range?
-Definitely, EINVAL or EDOM, which do you think is better?
-
->=20
->>    case LOOP_CTL_REMOVE:
->> -        return loop_control_remove(parm);
->> +        return loop_control_remove(MINOR(parm));
->=20
-> This is bad, for this change makes
->=20
->    if (idx < 0) {
->        pr_warn("deleting an unspecified loop device is not supported.\n");=
-
->        return -EINVAL;
->    }
->=20
-> dead code by masking the argument to 0-1048575 range.
-
-But ioctl param is unsigned long, I think this need to sanitize.
-
->>    case LOOP_CTL_GET_FREE:
->> -        return loop_control_get_free(parm);
->> +        return loop_control_get_free(MINOR(parm));
->=20
-> This is pointless, for the passed argument is not used.
-> By the way, didn't someone already propose removal of this argument?
-
-I don't find this in mail list, but I would like to sanitize that code.=
+-- 
+Damien Le Moal
+Western Digital Research
