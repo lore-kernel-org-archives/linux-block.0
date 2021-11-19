@@ -2,85 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2BBC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 08:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CFC5C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 08:09:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BFB6615E3
-	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 08:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF8016117A
+	for <linux-block@archiver.kernel.org>; Fri, 19 Nov 2021 08:09:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232790AbhKSILA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Nov 2021 03:11:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31877 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233159AbhKSIK7 (ORCPT
+        id S233172AbhKSIMf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Nov 2021 03:12:35 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:31887 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229998AbhKSIMf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Nov 2021 03:10:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637309277;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ipnE/EI0GvCqJ5PVyC0OVTD4Ij9X5Qe/Shm20MG1/ss=;
-        b=EHtIVBnviGtpUztl4k9GrnmXz3C/V+vgZ83AdOgvp26OZkTuJEK9xkuYoVai2thNV98BWq
-        ZRsNdVU9eSbrwE1DIvNgj/FdmRZADh1Nt2ysI8HJLAOBuBCQKGuGbg9+V0TGco8SmcVthd
-        XjDYBw5Evvzs4oivb7h8yd/hKHeqLNQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-268-QdXGj-sAOQSDsJwrLABK7Q-1; Fri, 19 Nov 2021 03:07:53 -0500
-X-MC-Unique: QdXGj-sAOQSDsJwrLABK7Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97DB4102CB2A;
-        Fri, 19 Nov 2021 08:07:52 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 73FC9604CC;
-        Fri, 19 Nov 2021 08:07:35 +0000 (UTC)
-Date:   Fri, 19 Nov 2021 16:07:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH] blk-mq: don't insert FUA request with data into
- scheduler queue
-Message-ID: <YZdbQiaQPPvbXSkR@T590>
-References: <20211118153041.2163228-1-ming.lei@redhat.com>
- <20211119060857.GA15001@lst.de>
+        Fri, 19 Nov 2021 03:12:35 -0500
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HwThz4tYfzcbJD;
+        Fri, 19 Nov 2021 16:04:35 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 19 Nov 2021 16:09:32 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Fri, 19 Nov 2021 16:09:31 +0800
+Subject: Re: [PATCH] blk-cgroup: fix missing put device in error path from
+ blkg_conf_pref()
+To:     <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211102020705.2321858-1-yukuai3@huawei.com>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <26541322-e064-d39f-ed39-b463a3cea092@huawei.com>
+Date:   Fri, 19 Nov 2021 16:09:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211119060857.GA15001@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20211102020705.2321858-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 07:08:58AM +0100, Christoph Hellwig wrote:
-> On Thu, Nov 18, 2021 at 11:30:41PM +0800, Ming Lei wrote:
-> > We never insert flush request into scheduler queue before.
-> > 
-> > Recently commit d92ca9d8348f ("blk-mq: don't handle non-flush requests in
-> > blk_insert_flush") tries to handle FUA data request as normal request.
-> > This way has caused warning[1] in mq-deadline dd_exit_sched() or io hang in
-> > case of kyber since RQF_ELVPRIV isn't set for flush request, then
-> > ->finish_request won't be called.
-> > 
-> > Fix the issue by inserting FUA data request with blk_mq_request_bypass_insert()
-> > when the device supports FUA, just like what we did before.
-> 
-> How we did end up with REQ_ELV set for this request?
+On 2021/11/02 10:07, Yu Kuai wrote:
+Hi, Jens
 
-We set REQ_ELV for any request if q->elevator isn't NULL, see
-__blk_mq_alloc_requests(), and REQ_ELV is just for replacing the check on
-q->elevator. If we clear REQ_ELV for flush rq, other problem may be caused,
-such as blk_mq_rq_ctx_init() may be confused.
-
-Also flush request is always inserted to hctx->dispatch directly, either
-before commit d92ca9d8348f or being queued via requeue in current code.
-
-
+friendly ping ...
 
 Thanks,
-Ming
-
+Kuai
+> If blk_queue_enter() failed due to queue is dying, the
+> blkdev_put_no_open() is needed because blkcg_conf_open_bdev() succeeded.
+> 
+> Fixes: 0c9d338c8443 ("blk-cgroup: synchronize blkg creation against policy deactivation")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/blk-cgroup.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 88b1fce90520..663aabfeba18 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -640,7 +640,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+>   	 */
+>   	ret = blk_queue_enter(q, 0);
+>   	if (ret)
+> -		return ret;
+> +		goto fail;
+>   
+>   	rcu_read_lock();
+>   	spin_lock_irq(&q->queue_lock);
+> @@ -676,13 +676,13 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+>   		new_blkg = blkg_alloc(pos, q, GFP_KERNEL);
+>   		if (unlikely(!new_blkg)) {
+>   			ret = -ENOMEM;
+> -			goto fail;
+> +			goto fail_exit_queue;
+>   		}
+>   
+>   		if (radix_tree_preload(GFP_KERNEL)) {
+>   			blkg_free(new_blkg);
+>   			ret = -ENOMEM;
+> -			goto fail;
+> +			goto fail_exit_queue;
+>   		}
+>   
+>   		rcu_read_lock();
+> @@ -722,9 +722,10 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+>   fail_unlock:
+>   	spin_unlock_irq(&q->queue_lock);
+>   	rcu_read_unlock();
+> +fail_exit_queue:
+> +	blk_queue_exit(q);
+>   fail:
+>   	blkdev_put_no_open(bdev);
+> -	blk_queue_exit(q);
+>   	/*
+>   	 * If queue was bypassing, we should retry.  Do so after a
+>   	 * short msleep().  It isn't strictly necessary but queue
+> 
