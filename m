@@ -2,86 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A29C43219
-	for <linux-block@archiver.kernel.org>; Sat, 20 Nov 2021 15:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3493BC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 20 Nov 2021 16:17:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237650AbhKTP3I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Nov 2021 10:29:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41470 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230038AbhKTP3I (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Nov 2021 10:29:08 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E5B5B60EB6;
-        Sat, 20 Nov 2021 15:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637421964;
-        bh=sL04+7/Tziaw15CHiE2bty/Bv6qeql7yB4oQSwHL8Rw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=N35/MX+Bk5IfQeZQiu16BeV4YuD31Ephij5WJvzDmZ2G+K+MjYa+HWqb1ahmMn5Hb
-         8nTHe95BsmdqkyFWylC9DLYJd5w68+maTSegSteQm994SJN2V2euBCo7o5awfS7MX1
-         1EqL1r1uDdGsdYVLkB0LepzAMd/DMg1DnO37cYnq/TOnx6T6gg4l1tr4VYZFrfdNBr
-         fu07uKG0PLQcKTAn5J7IOkR76pmhpIN6NdZJHm5NPKAY2SAGobyGEmgVfnmJURZZPl
-         Ncx/4o043Jc/OWEbZSwAM5dDl3KRkS71kl4wzNRFF/bIFRAmgFMC+aeEM6/O5rxXi9
-         UVuYgRSm1FojA==
-Date:   Sat, 20 Nov 2021 07:26:02 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Peter Chen <peter.chen@kernel.org>
-Cc:     bpf@vger.kernel.org, axboe@kernel.dk,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, yuq825@gmail.com, robdclark@gmail.com,
-        sean@poorly.run, christian.koenig@amd.com, ray.huang@amd.com,
-        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-        hkelam@marvell.com, jingoohan1@gmail.com,
-        lorenzo.pieralisi@arm.com, robh@kernel.org, kw@linux.com,
-        bhelgaas@google.com, krzysztof.kozlowski@canonical.com,
-        mani@kernel.org, pawell@cadence.com, rogerq@kernel.org,
-        a-govindraju@ti.com, gregkh@linuxfoundation.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
-        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, sj@kernel.org, akpm@linux-foundation.org,
-        thomas.hellstrom@linux.intel.com, matthew.auld@intel.com,
-        colin.king@intel.com, geert@linux-m68k.org,
-        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, lima@lists.freedesktop.org,
-        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH bpf] treewide: add missing includes masked by cgroup ->
- bpf dependency
-Message-ID: <20211120072602.22f9e722@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20211120073011.GA36650@Peter>
-References: <20211120035253.72074-1-kuba@kernel.org>
-        <20211120073011.GA36650@Peter>
+        id S236475AbhKTQUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Nov 2021 11:20:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34828 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231669AbhKTQUk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 20 Nov 2021 11:20:40 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2306CC061574
+        for <linux-block@vger.kernel.org>; Sat, 20 Nov 2021 08:17:37 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id e8so13426116ilu.9
+        for <linux-block@vger.kernel.org>; Sat, 20 Nov 2021 08:17:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=SMdm/vn45pWhSHaS5Fj8BcoJtdhVTwarYoTYdEzKVYw=;
+        b=zytv2wQOPwr3FcZm+lP2a5XsREQkL5GUW/NULujtmiAMnIjHghj+ziwFo10Wo/SBDg
+         DDyXp3GPUNcXumo4YSx7u6HqliiZsLLXETMIhDcmBKgPkKII69YRPgJNybDrxPmExisK
+         VRYHWUkVkPza/i1j1AXmi4YUo6uZU5Bjsq6ekcfZFM3/ckSzedJCJW+PlUyGJmjgi84e
+         HBzKl7etMg5Unv92FS3MxqfooQyzS9x/LtkIxwB6fgtObz9HtnvSHxlnLmFN9kfzK1Ik
+         xMUwTPL4+iRAvKoq/uGjvejjdg0dkwbOPDMqBjix+N8uEl4AW/pIT5MPF88cL29+4Fwh
+         apVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=SMdm/vn45pWhSHaS5Fj8BcoJtdhVTwarYoTYdEzKVYw=;
+        b=gFR0CqMH2dhlgZ+cAQyu/v/ewI2WvXuegRD/AoMWRK87E9/TYcPKvnh4jHeFkx3DPr
+         NMtlhcevoMFV4c7KloTHfuk7o7Zc915xCMF2udMrh63VBzk18Q6mYzSLfndvU3DbiF/X
+         Xfi9UhFgzzMWmk5uXC9sCYadiHduEVZRD2it6LXfBgH5bofwXbvqs7btB3UEnPO7cgsj
+         Zh/pjjAdPXH0cEDTXtnFke8aHfihuQzAuf5QIJr7j23YPv1FjHPmpfZRAyTK6Bv1kqgK
+         sP52MMpYwtmh3mb177DRkRlehxnrSlYzi8mQNhp5+I5Z9VG8A0BiuNk5JLIrdSuWtem0
+         2rSA==
+X-Gm-Message-State: AOAM533Qoqc5xD56fAlBFswJZkf+nm+WSlTiIk8jX1oDaW2ToGmoicBr
+        2tiCxvUa/XkN8ePqSv1jHInMn8/rz9YYFpH1
+X-Google-Smtp-Source: ABdhPJwZZrPdAeSQ+Cc39sY4VaAjfXTjc/Xg1ee9VOfqiAP5XS1b6fbMwnNi0VFdhbiw11CepEfthw==
+X-Received: by 2002:a92:b00c:: with SMTP id x12mr3718109ilh.260.1637425056174;
+        Sat, 20 Nov 2021 08:17:36 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id b15sm1896737iln.36.2021.11.20.08.17.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Nov 2021 08:17:35 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.16-rc2
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <5db84f8b-877c-230a-2b1d-f83109d886c0@kernel.dk>
+Date:   Sat, 20 Nov 2021 09:17:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 20 Nov 2021 15:30:11 +0800 Peter Chen wrote:
-> > diff --git a/drivers/usb/cdns3/host.c b/drivers/usb/cdns3/host.c
-> > index 84dadfa726aa..9643b905e2d8 100644
-> > --- a/drivers/usb/cdns3/host.c
-> > +++ b/drivers/usb/cdns3/host.c
-> > @@ -10,6 +10,7 @@
-> >   */
-> > =20
-> >  #include <linux/platform_device.h>
-> > +#include <linux/slab.h> =20
->=20
-> Should be "#include <linux/module.h>"?
+Hi Linus,
 
-Why? Different files are missing different includes, this one needs
-slab.h:
+A set of fixes that should go into this release:
 
-../drivers/usb/cdns3/host.c: In function =E2=80=98__cdns_host_init=E2=80=99:
-../drivers/usb/cdns3/host.c:86:2: error: implicit declaration of function =
-=E2=80=98kfree=E2=80=99; did you mean =E2=80=98vfree=E2=80=99? [-Werror=3Di=
-mplicit-function-declaration]
-  kfree(cdns->xhci_plat_data);
-  ^~~~~
-  vfree
+- Flip a cap check to avoid a selinux error (Alistair)
+
+- Fix for a regression this merge window where we can miss a queue ref
+  put (me)
+
+- Un-mark pstore-blk as broken, as the condition that triggered that
+  change has been rectified (Kees)
+
+- Queue quiesce and sync fixes (Ming)
+
+- FUA insertion fix (Ming)
+
+- blk-cgroup error path put fix (Yu)
+
+Please pull!
+
+
+The following changes since commit fa55b7dcdc43c1aa1ba12bca9d2dd4318c2a0dbf:
+
+  Linux 5.16-rc1 (2021-11-14 13:56:52 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-11-19
+
+for you to fetch changes up to 2b504bd4841bccbf3eb83c1fec229b65956ad8ad:
+
+  blk-mq: don't insert FUA request with data into scheduler queue (2021-11-19 06:28:18 -0700)
+
+----------------------------------------------------------------
+block-5.16-2021-11-19
+
+----------------------------------------------------------------
+Alistair Delva (1):
+      block: Check ADMIN before NICE for IOPRIO_CLASS_RT
+
+Jens Axboe (1):
+      block: fix missing queue put in error path
+
+Kees Cook (1):
+      Revert "mark pstore-blk as broken"
+
+Ming Lei (3):
+      blk-mq: cancel blk-mq dispatch work in both blk_cleanup_queue and disk_release()
+      block: avoid to quiesce queue in elevator_init_mq
+      blk-mq: don't insert FUA request with data into scheduler queue
+
+Yu Kuai (1):
+      blk-cgroup: fix missing put device in error path from blkg_conf_pref()
+
+ block/blk-cgroup.c |  9 +++++----
+ block/blk-core.c   |  4 +++-
+ block/blk-flush.c  | 12 ++++++------
+ block/blk-mq.c     | 33 ++++++++++++++++++++++++---------
+ block/blk-mq.h     |  2 ++
+ block/blk-sysfs.c  | 10 ----------
+ block/blk.h        |  2 +-
+ block/elevator.c   | 10 ++++++++--
+ block/genhd.c      |  2 ++
+ block/ioprio.c     |  9 ++++++++-
+ fs/pstore/Kconfig  |  1 -
+ 11 files changed, 59 insertions(+), 35 deletions(-)
+
+-- 
+Jens Axboe
+
