@@ -2,128 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97A6C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 20 Nov 2021 03:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA693C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 20 Nov 2021 04:47:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236361AbhKTECW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Nov 2021 23:02:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37050 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236167AbhKTECV (ORCPT
+        id S232509AbhKTEu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Nov 2021 23:50:58 -0500
+Received: from mail-wm1-f42.google.com ([209.85.128.42]:41923 "EHLO
+        mail-wm1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229554AbhKTEu6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Nov 2021 23:02:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637380758;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7jCE40jKoyCHYgJNTQgwVs3JjoQYLOmzMBpItFwtg4M=;
-        b=E7Yh7ZSrjPXwAZ8y1WyMXTLXgfo6MamFzqiz94/6TM46OaBihj2IbTwXmusgjgE2Pmj0xe
-        GacVwQfnwLu1oijYD+liS9dnDRlTfxk68+8tWPOobxk/WKcOusi1F23tziwpt9xVmC9v1k
-        q7KjE3nBOuBsGM6xF2EjRW/pMPfz0CE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-470-E1ObOZQiMXCqC1R3C1Jitg-1; Fri, 19 Nov 2021 22:59:16 -0500
-X-MC-Unique: E1ObOZQiMXCqC1R3C1Jitg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC88E806689;
-        Sat, 20 Nov 2021 03:59:15 +0000 (UTC)
-Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E475119811;
-        Sat, 20 Nov 2021 03:59:02 +0000 (UTC)
-Date:   Sat, 20 Nov 2021 11:58:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Tim Walker <tim.t.walker@seagate.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Yi Zhang <yi.zhang@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] blk-mq: don't insert FUA request with data into
- scheduler queue
-Message-ID: <YZhygSJylK4WeRNq@T590>
-References: <20211118153041.2163228-1-ming.lei@redhat.com>
- <163732851304.44181.8545954410705439362.b4-ty@kernel.dk>
- <BFC93946-13B3-43EC-9E30-8A980CD5234F@seagate.com>
- <3DEFF083-6C67-4864-81A5-454A7DAC16C0@seagate.com>
+        Fri, 19 Nov 2021 23:50:58 -0500
+Received: by mail-wm1-f42.google.com with SMTP id f7-20020a1c1f07000000b0032ee11917ceso9053434wmf.0;
+        Fri, 19 Nov 2021 20:47:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=aEc6h6UZDj3RJe5zAVD0JZ752OLm/zol4/Bf6vq8of0=;
+        b=b5mCfltW8LGdF8w25Iyvax/w4kKycegKpfM00zO+rWxE7w1jWLsZzuVIKW/zIKrZzo
+         iMeV0qF4YoACt/BWKpRpEltpbbwMYztGEluprMXW/vVX7s1YB6BEEDzbqVWKqwYEqP1k
+         I6YdNFc2o7o8qqiqeOMViH5hF/HaSEFQlFyY+qB41fzcSYudEqjg08Nt9nDvkBxNTf5P
+         Sazwu36SW15evYB8bUL8ovkvTrtTSuMX1xV0GCR1V9MPOnJQCuPF2UAwyNUpzmsXRh89
+         2Uel8zf0os0WXrDav2p4S48ja1uSiLn33QuAEn/SSfnHN1ubUxZ/qOECHSgyS12w/83R
+         3pJw==
+X-Gm-Message-State: AOAM5321YvsM3Rz9+4IE1efeBg8yYArQB6q4mN+TqMrHrjTIIHpBEQ/m
+        OC0Tbda5A42JJqOAHZ5ZRTo=
+X-Google-Smtp-Source: ABdhPJwP2k7ucavsfoGlZJcK5To078c9aGO6heH2BJxEfkGEB243/CpxoDU2gn26fg/Nug2rn0s9+Q==
+X-Received: by 2002:a1c:4d0b:: with SMTP id o11mr6635748wmh.68.1637383673623;
+        Fri, 19 Nov 2021 20:47:53 -0800 (PST)
+Received: from rocinante ([95.155.85.46])
+        by smtp.gmail.com with ESMTPSA id l16sm1722475wmq.46.2021.11.19.20.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Nov 2021 20:47:53 -0800 (PST)
+Date:   Sat, 20 Nov 2021 05:47:50 +0100
+From:   Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     bpf@vger.kernel.org, axboe@kernel.dk,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, yuq825@gmail.com, robdclark@gmail.com,
+        sean@poorly.run, christian.koenig@amd.com, ray.huang@amd.com,
+        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+        hkelam@marvell.com, jingoohan1@gmail.com,
+        lorenzo.pieralisi@arm.com, robh@kernel.org, bhelgaas@google.com,
+        krzysztof.kozlowski@canonical.com, mani@kernel.org,
+        pawell@cadence.com, peter.chen@kernel.org, rogerq@kernel.org,
+        a-govindraju@ti.com, gregkh@linuxfoundation.org, ast@kernel.org,
+        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, sj@kernel.org, akpm@linux-foundation.org,
+        thomas.hellstrom@linux.intel.com, matthew.auld@intel.com,
+        colin.king@intel.com, geert@linux-m68k.org,
+        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, lima@lists.freedesktop.org,
+        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH bpf] treewide: add missing includes masked by cgroup ->
+ bpf dependency
+Message-ID: <YZh99tLi9sekmJ3T@rocinante>
+References: <20211120035253.72074-1-kuba@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3DEFF083-6C67-4864-81A5-454A7DAC16C0@seagate.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20211120035253.72074-1-kuba@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 04:49:34PM +0000, Tim Walker wrote:
-> 
-> 
-> ﻿On  19 Nov 2021 Tim Walker wrote:
-> 
-> >
-> >
-> >On Thu, 18 Nov 2021 23:30:41 +0800, Ming Lei wrote:
-> >> We never insert flush request into scheduler queue before.
-> >>
-> >> Recently commit d92ca9d8348f ("blk-mq: don't handle non-flush requests in
-> >> blk_insert_flush") tries to handle FUA data request as normal request.
-> >> This way has caused warning[1] in mq-deadline dd_exit_sched() or io hang in
-> >> case of kyber since RQF_ELVPRIV isn't set for flush request, then
-> >> ->finish_request won't be called.
-> >>
-> >> [...]
-> >
-> >Applied, thanks!
-> >
-> >[1/1] blk-mq: don't insert FUA request with data into scheduler queue
-> >      commit: 2b504bd4841bccbf3eb83c1fec229b65956ad8ad
-> >
-> >Best regards,
-> >--
-> >Jens Axboe
-> >
-> >
-> >
-> 
-> I know the discussion is over, >
+Hi Jakub,
 
-This thread is just for fixing one recent regression caused by queuing
-FUA data into scheduler queue, and actually direct dispach has
-been done for very long time, but I don't mean it is reasonable.
+[...]
+>  drivers/pci/controller/dwc/pci-exynos.c               | 1 +
+>  drivers/pci/controller/dwc/pcie-qcom-ep.c             | 1 +
 
-> but I can't figure out why we treat FUA as a flush. A FUA write only
-> applies to the command at hand, and is not required to flush any previous
-> command's data from the device's volatile write cache. Similarly for a
-> read request - servicing a read from media is really more the rule than
-> the exception (lots of workload dependencies here...), so why would a
-> FUA read bypass the scheduler?
+Happy to give 
 
-Is there linux kernel FUA read users? Just run a quick grep, seems FUA
-is just used for sync write.
+Acked-by: Krzysztof Wilczyński <kw@linux.com>
 
-> The device is always free to service any request from media or cache (
-> as long as it follows the applicable volatile write and read cache settings),
-> so normally we don't know how it is treating the request, so it doesn't seem
-> to matter. 
-> 
-> Consider a FUA write: Why does the fact that we intend that write to bypass
-> the device volatile write cache mean it should bypass the scheduler? All the
-> other traffic-shaping algorithms that help effectively schedule writes are
-> still applicable. E.g. we know we can delay/coalesce them a bit to allow
-> reads to be prioritized, but I can't figure out why we would fast-track a
-> FUA write. Isn't the value to the system for scheduling still valid, even
-> though we are forcing the data to go to media?
+for the the PCI drivers.  Thank you!
 
-It shouldn't be hard to to queue FUA into scheduler, but details need to
-consider, such as, if FUA can be merged with normal IO, maybe others.
-
-Also do you have any test or benchmark result to support the change of
-queuing FUA to scheduler?
-
-
-Thanks,
-Ming
-
+	Krzysztof
