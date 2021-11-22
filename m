@@ -2,53 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 027CCC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 22 Nov 2021 09:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 821ECC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 22 Nov 2021 09:29:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232276AbhKVJDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Nov 2021 04:03:44 -0500
-Received: from verein.lst.de ([213.95.11.211]:57054 "EHLO verein.lst.de"
+        id S239059AbhKVJci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Nov 2021 04:32:38 -0500
+Received: from mga05.intel.com ([192.55.52.43]:53776 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229716AbhKVJDn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Nov 2021 04:03:43 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BF4BD68AA6; Mon, 22 Nov 2021 10:00:31 +0100 (CET)
-Date:   Mon, 22 Nov 2021 10:00:31 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 2/5] blk-mq: rename hctx_lock & hctx_unlock
-Message-ID: <20211122090031.GA28870@lst.de>
-References: <20211119021849.2259254-1-ming.lei@redhat.com> <20211119021849.2259254-3-ming.lei@redhat.com>
+        id S230447AbhKVJch (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Nov 2021 04:32:37 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10175"; a="320980423"
+X-IronPort-AV: E=Sophos;i="5.87,254,1631602800"; 
+   d="scan'208";a="320980423"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 01:29:31 -0800
+X-IronPort-AV: E=Sophos;i="5.87,254,1631602800"; 
+   d="scan'208";a="508879579"
+Received: from rmcdonax-mobl.ger.corp.intel.com (HELO localhost) ([10.252.19.217])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 01:29:13 -0800
+From:   Jani Nikula <jani.nikula@linux.intel.com>
+To:     Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org
+Cc:     Jakub Kicinski <kuba@kernel.org>, axboe@kernel.dk,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        yuq825@gmail.com, robdclark@gmail.com, sean@poorly.run,
+        christian.koenig@amd.com, ray.huang@amd.com, sgoutham@marvell.com,
+        gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+        jingoohan1@gmail.com, lorenzo.pieralisi@arm.com, robh@kernel.org,
+        kw@linux.com, bhelgaas@google.com,
+        krzysztof.kozlowski@canonical.com, mani@kernel.org,
+        pawell@cadence.com, peter.chen@kernel.org, rogerq@kernel.org,
+        a-govindraju@ti.com, gregkh@linuxfoundation.org, ast@kernel.org,
+        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, sj@kernel.org, akpm@linux-foundation.org,
+        thomas.hellstrom@linux.intel.com, matthew.auld@intel.com,
+        colin.king@intel.com, geert@linux-m68k.org,
+        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, lima@lists.freedesktop.org,
+        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH bpf] treewide: add missing includes masked by cgroup ->
+ bpf dependency
+In-Reply-To: <20211120035253.72074-1-kuba@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20211120035253.72074-1-kuba@kernel.org>
+Date:   Mon, 22 Nov 2021 11:29:10 +0200
+Message-ID: <87fsroo7x5.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211119021849.2259254-3-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 10:18:46AM +0800, Ming Lei wrote:
-> +static inline void queue_unlock(struct request_queue *q, bool blocking,
-> +		int srcu_idx)
+On Fri, 19 Nov 2021, Jakub Kicinski <kuba@kernel.org> wrote:
+> cgroup.h (therefore swap.h, therefore half of the universe)
+> includes bpf.h which in turn includes module.h and slab.h.
+> Since we're about to get rid of that dependency we need
+> to clean things up.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: axboe@kernel.dk
+> CC: maarten.lankhorst@linux.intel.com
+> CC: mripard@kernel.org
+> CC: tzimmermann@suse.de
+> CC: airlied@linux.ie
+> CC: daniel@ffwll.ch
+> CC: jani.nikula@linux.intel.com
+> CC: joonas.lahtinen@linux.intel.com
+> CC: rodrigo.vivi@intel.com
+> CC: yuq825@gmail.com
+> CC: robdclark@gmail.com
+> CC: sean@poorly.run
+> CC: christian.koenig@amd.com
+> CC: ray.huang@amd.com
+> CC: sgoutham@marvell.com
+> CC: gakula@marvell.com
+> CC: sbhatta@marvell.com
+> CC: hkelam@marvell.com
+> CC: jingoohan1@gmail.com
+> CC: lorenzo.pieralisi@arm.com
+> CC: robh@kernel.org
+> CC: kw@linux.com
+> CC: bhelgaas@google.com
+> CC: krzysztof.kozlowski@canonical.com
+> CC: mani@kernel.org
+> CC: pawell@cadence.com
+> CC: peter.chen@kernel.org
+> CC: rogerq@kernel.org
+> CC: a-govindraju@ti.com
+> CC: gregkh@linuxfoundation.org
+> CC: ast@kernel.org
+> CC: daniel@iogearbox.net
+> CC: andrii@kernel.org
+> CC: kafai@fb.com
+> CC: songliubraving@fb.com
+> CC: yhs@fb.com
+> CC: john.fastabend@gmail.com
+> CC: kpsingh@kernel.org
+> CC: sj@kernel.org
+> CC: akpm@linux-foundation.org
+> CC: thomas.hellstrom@linux.intel.com
+> CC: matthew.auld@intel.com
+> CC: colin.king@intel.com
+> CC: geert@linux-m68k.org
+> CC: linux-block@vger.kernel.org
+> CC: dri-devel@lists.freedesktop.org
+> CC: intel-gfx@lists.freedesktop.org
+> CC: lima@lists.freedesktop.org
+> CC: linux-arm-msm@vger.kernel.org
+> CC: freedreno@lists.freedesktop.org
+> CC: linux-pci@vger.kernel.org
+> CC: linux-arm-kernel@lists.infradead.org
+> CC: linux-samsung-soc@vger.kernel.org
+> CC: linux-usb@vger.kernel.org
+> CC: bpf@vger.kernel.org
+> CC: linux-mm@kvack.org
+>
+> Well, let's see if this makes it thru email servers...
+> ---
+>  block/fops.c                                          | 1 +
+>  drivers/gpu/drm/drm_gem_shmem_helper.c                | 1 +
+>  drivers/gpu/drm/i915/gt/intel_gtt.c                   | 1 +
+>  drivers/gpu/drm/i915/i915_request.c                   | 1 +
 
-I don't think this is a good name, as it can be easily confused with
-q->queue_lock.
+For the i915 parts,
 
-> +	__releases(q->srcu)
->  {
-> -	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-> +	if (!blocking)
->  		rcu_read_unlock();
->  	else
-> -		srcu_read_unlock(hctx->queue->srcu, srcu_idx);
-> +		srcu_read_unlock(q->srcu, srcu_idx);
->  }
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 
-I think you want to make BLK_MQ_F_BLOCKING accessible from the
-request_queue instead of passing the extra argument as well.
+
+-- 
+Jani Nikula, Intel Open Source Graphics Center
