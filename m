@@ -2,138 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 821ECC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Nov 2021 09:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7426C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 22 Nov 2021 13:06:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239059AbhKVJci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Nov 2021 04:32:38 -0500
-Received: from mga05.intel.com ([192.55.52.43]:53776 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230447AbhKVJch (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Nov 2021 04:32:37 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10175"; a="320980423"
-X-IronPort-AV: E=Sophos;i="5.87,254,1631602800"; 
-   d="scan'208";a="320980423"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 01:29:31 -0800
-X-IronPort-AV: E=Sophos;i="5.87,254,1631602800"; 
-   d="scan'208";a="508879579"
-Received: from rmcdonax-mobl.ger.corp.intel.com (HELO localhost) ([10.252.19.217])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 01:29:13 -0800
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org
-Cc:     Jakub Kicinski <kuba@kernel.org>, axboe@kernel.dk,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        yuq825@gmail.com, robdclark@gmail.com, sean@poorly.run,
-        christian.koenig@amd.com, ray.huang@amd.com, sgoutham@marvell.com,
-        gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
-        jingoohan1@gmail.com, lorenzo.pieralisi@arm.com, robh@kernel.org,
-        kw@linux.com, bhelgaas@google.com,
-        krzysztof.kozlowski@canonical.com, mani@kernel.org,
-        pawell@cadence.com, peter.chen@kernel.org, rogerq@kernel.org,
-        a-govindraju@ti.com, gregkh@linuxfoundation.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
-        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, sj@kernel.org, akpm@linux-foundation.org,
-        thomas.hellstrom@linux.intel.com, matthew.auld@intel.com,
-        colin.king@intel.com, geert@linux-m68k.org,
-        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, lima@lists.freedesktop.org,
-        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH bpf] treewide: add missing includes masked by cgroup ->
- bpf dependency
-In-Reply-To: <20211120035253.72074-1-kuba@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20211120035253.72074-1-kuba@kernel.org>
-Date:   Mon, 22 Nov 2021 11:29:10 +0200
-Message-ID: <87fsroo7x5.fsf@intel.com>
+        id S235156AbhKVNJg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Nov 2021 08:09:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55378 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229797AbhKVNJg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Nov 2021 08:09:36 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79BBCC061574;
+        Mon, 22 Nov 2021 05:06:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=M0AE+ZplCG2vjHuG8BzMEuw7b+ZVgcj/t/lpsJgxGc4=; b=IWFNx6Of/NY/pZDFOc5W+F7qHu
+        FH8Jyq1Dxm4uaYFWacBeOBfZU1yfsX4sXTjxuv/xBaqlWxQ7qoZ1m2403HQ9P2+0bQEuKsUOGJP6I
+        nZqlyUuDRHGAJQiv7ofh7Cv+cpngte6QBea8oEnF39HmRigGsDgNXt93yVxMsuYii2IYbam60Fdqo
+        fm7L3wLh1BKMuZM8vz7D8gYKU+kIerIEztew9MqVhVsp2NoiHZ6ihbFrS2BQ1bJ25HL/qFFc3hc8l
+        GA/VaNN4Au+UnlMkKifQH+F/x+aKYe+5ic7NI1Vb5vssFi7GVbEkYpEYt3u0QWY4Yc6dNqxNUHlSz
+        rECUybfg==;
+Received: from [2001:4bb8:180:22b2:9649:4579:dcf9:9fb2] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mp91e-00CrqS-0H; Mon, 22 Nov 2021 13:06:27 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>, linux-block@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: cleanup and simplify the gendisk flags
+Date:   Mon, 22 Nov 2021 14:06:11 +0100
+Message-Id: <20211122130625.1136848-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 19 Nov 2021, Jakub Kicinski <kuba@kernel.org> wrote:
-> cgroup.h (therefore swap.h, therefore half of the universe)
-> includes bpf.h which in turn includes module.h and slab.h.
-> Since we're about to get rid of that dependency we need
-> to clean things up.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: axboe@kernel.dk
-> CC: maarten.lankhorst@linux.intel.com
-> CC: mripard@kernel.org
-> CC: tzimmermann@suse.de
-> CC: airlied@linux.ie
-> CC: daniel@ffwll.ch
-> CC: jani.nikula@linux.intel.com
-> CC: joonas.lahtinen@linux.intel.com
-> CC: rodrigo.vivi@intel.com
-> CC: yuq825@gmail.com
-> CC: robdclark@gmail.com
-> CC: sean@poorly.run
-> CC: christian.koenig@amd.com
-> CC: ray.huang@amd.com
-> CC: sgoutham@marvell.com
-> CC: gakula@marvell.com
-> CC: sbhatta@marvell.com
-> CC: hkelam@marvell.com
-> CC: jingoohan1@gmail.com
-> CC: lorenzo.pieralisi@arm.com
-> CC: robh@kernel.org
-> CC: kw@linux.com
-> CC: bhelgaas@google.com
-> CC: krzysztof.kozlowski@canonical.com
-> CC: mani@kernel.org
-> CC: pawell@cadence.com
-> CC: peter.chen@kernel.org
-> CC: rogerq@kernel.org
-> CC: a-govindraju@ti.com
-> CC: gregkh@linuxfoundation.org
-> CC: ast@kernel.org
-> CC: daniel@iogearbox.net
-> CC: andrii@kernel.org
-> CC: kafai@fb.com
-> CC: songliubraving@fb.com
-> CC: yhs@fb.com
-> CC: john.fastabend@gmail.com
-> CC: kpsingh@kernel.org
-> CC: sj@kernel.org
-> CC: akpm@linux-foundation.org
-> CC: thomas.hellstrom@linux.intel.com
-> CC: matthew.auld@intel.com
-> CC: colin.king@intel.com
-> CC: geert@linux-m68k.org
-> CC: linux-block@vger.kernel.org
-> CC: dri-devel@lists.freedesktop.org
-> CC: intel-gfx@lists.freedesktop.org
-> CC: lima@lists.freedesktop.org
-> CC: linux-arm-msm@vger.kernel.org
-> CC: freedreno@lists.freedesktop.org
-> CC: linux-pci@vger.kernel.org
-> CC: linux-arm-kernel@lists.infradead.org
-> CC: linux-samsung-soc@vger.kernel.org
-> CC: linux-usb@vger.kernel.org
-> CC: bpf@vger.kernel.org
-> CC: linux-mm@kvack.org
->
-> Well, let's see if this makes it thru email servers...
-> ---
->  block/fops.c                                          | 1 +
->  drivers/gpu/drm/drm_gem_shmem_helper.c                | 1 +
->  drivers/gpu/drm/i915/gt/intel_gtt.c                   | 1 +
->  drivers/gpu/drm/i915/i915_request.c                   | 1 +
+Ho Jens,
 
-For the i915 parts,
+the gendisk flags have been a complete mess for a while.  This series
+tries to untangle them as much as easily possible.
 
-Acked-by: Jani Nikula <jani.nikula@intel.com>
-
-
--- 
-Jani Nikula, Intel Open Source Graphics Center
+Diffstat:
+ block/bdev.c                       |    5 --
+ block/blk.h                        |    1 
+ block/genhd.c                      |   41 +++++++----------
+ block/ioctl.c                      |   31 ++-----------
+ block/partitions/core.c            |   24 ++++------
+ drivers/block/amiflop.c            |    1 
+ drivers/block/ataflop.c            |    1 
+ drivers/block/brd.c                |    1 
+ drivers/block/drbd/drbd_main.c     |    1 
+ drivers/block/floppy.c             |    1 
+ drivers/block/loop.c               |    9 +--
+ drivers/block/n64cart.c            |    2 
+ drivers/block/null_blk/main.c      |    1 
+ drivers/block/paride/pcd.c         |    3 -
+ drivers/block/paride/pf.c          |    1 
+ drivers/block/pktcdvd.c            |    2 
+ drivers/block/ps3vram.c            |    1 
+ drivers/block/rbd.c                |    6 --
+ drivers/block/sunvdc.c             |   17 +++----
+ drivers/block/swim.c               |    1 
+ drivers/block/swim3.c              |    2 
+ drivers/block/virtio_blk.c         |    1 
+ drivers/block/xen-blkback/xenbus.c |    2 
+ drivers/block/xen-blkfront.c       |   26 ++++-------
+ drivers/block/z2ram.c              |    1 
+ drivers/block/zram/zram_drv.c      |    1 
+ drivers/cdrom/gdrom.c              |    1 
+ drivers/md/dm.c                    |    1 
+ drivers/md/md.c                    |    5 --
+ drivers/mmc/core/block.c           |    4 -
+ drivers/mtd/ubi/block.c            |    1 
+ drivers/scsi/sd.c                  |    1 
+ drivers/scsi/sr.c                  |    6 +-
+ include/linux/genhd.h              |   85 +++++++++----------------------------
+ 34 files changed, 104 insertions(+), 183 deletions(-)
