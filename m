@@ -2,57 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BB9C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 00:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F007AC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 02:33:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231191AbhKWAx3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Nov 2021 19:53:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59374 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230287AbhKWAx0 (ORCPT
+        id S232101AbhKWCgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Nov 2021 21:36:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229672AbhKWCgM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Nov 2021 19:53:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637628618;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DI4xwS67uWRtAxPmd/QWkrE2V3axVpG5d7on5DAy23Y=;
-        b=ZzKFRGBYAewdo+f6bRmA2PK+1ihlUsbckyfjJN1kzes73seEn5B0PEHhfbZwRLm9xrPSrc
-        pfmA1JHngu40d/WUdJTxRr67T4yZGcIHp9gTvfCUgGZV7RvmTEtIor3JLSY1zFKx1LvVPs
-        awiETU7amQzMyV9qAaPU5jMWEoLfE8w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-90-huY-HsI9NSWPK7g6JCr7YQ-1; Mon, 22 Nov 2021 19:50:17 -0500
-X-MC-Unique: huY-HsI9NSWPK7g6JCr7YQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BE2E802B52;
-        Tue, 23 Nov 2021 00:50:16 +0000 (UTC)
-Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 70E0856A92;
-        Tue, 23 Nov 2021 00:50:08 +0000 (UTC)
-Date:   Tue, 23 Nov 2021 08:50:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        czhong@redhat.com
-Subject: Re: [PATCH V2 1/1] block: avoid to touch unloaded module instance
- when opening bdev
-Message-ID: <YZw6un6PYKE+mAMG@T590>
-References: <20211111020343.316126-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        Mon, 22 Nov 2021 21:36:12 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9973C061574
+        for <linux-block@vger.kernel.org>; Mon, 22 Nov 2021 18:33:05 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id z6so17869002pfe.7
+        for <linux-block@vger.kernel.org>; Mon, 22 Nov 2021 18:33:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=GT3BrIp6Sqi+pjtinYwRjvxYhrTrniHs38/R3fS0FLs=;
+        b=Qry/75aSljjgrGN1yVlRgSqSvXMfElL+COWC7VlAblzwIZLeKyjp/dOoJFf3rV1FK1
+         /Bc5MG6LHLIKSbLAHydtvDQZyAn6ckLxeBcSkIqXfGp1GiZRSbhgqgaqHbIPHSKMtR3V
+         I5Mexf4OB+NWb6je/jCapVvahW2Clx/6TnhmPy+BOAWbrfL2+V+Mf3V3tO0rqNj/sAmn
+         EAR8gM7py5M/l2692W36rNBBxkbuYj6ZgDYo72J0RRu9mpxONExxKP3aJBbk7dFlrafO
+         BbKAbYUBQjp+mB7k53oLYH/PWK9/bdUYhqBu+u6ygy7156iyCfl3qgQjKZUdQgIG9IM9
+         79iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=GT3BrIp6Sqi+pjtinYwRjvxYhrTrniHs38/R3fS0FLs=;
+        b=weMllCm5tMUwq/EY2LY6RJuT8r3XAwcnr0V45k5IckC2GbRtt9VFlVX5XdFcuw3JAJ
+         nQNUsv84BA9vBdjuKSQnH7cwjs5j2nU5Af8CYUeOgaGjOBR7uOLgPEIXPJFpICCwCpUw
+         XK3MPTi1wcRj/Isu1+tCdslhlpSaL9Hfd6K7wpyvCHWXelv7wvs6XZfQ3Ef+tYbmB27L
+         PXHk2G9EGT1Zs9sSfJXQAnmW4/K3ETkjVWRIjIoIFUHaHTzRCpphPTGAB4r1/d7Vqs3r
+         XsHvtDt9Gjfiz1XkprTFLEuQkOlh4JEzSFSV4AFFeg6/VBw/Y06AAvMoUpF2xjKq3CmW
+         MKaw==
+X-Gm-Message-State: AOAM530pcj4ld0hfjRXwKFRJXpudXlkiGbO21xvjl/mdkomCRpeSxBAU
+        jJlVzmsGPpeIypL7+Umhd859HQ==
+X-Google-Smtp-Source: ABdhPJyYfknlzLLnTVYa1LcvLYrzEzpqFrseXhzA8m/vzfNmnL6pnL7M4lJNquEBpnELhcYi8cbELw==
+X-Received: by 2002:a63:2a97:: with SMTP id q145mr1303696pgq.217.1637634785210;
+        Mon, 22 Nov 2021 18:33:05 -0800 (PST)
+Received: from [127.0.1.1] ([2620:10d:c090:400::5:684])
+        by smtp.gmail.com with ESMTPSA id pi17sm21672987pjb.34.2021.11.22.18.33.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Nov 2021 18:33:04 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     czhong@redhat.com, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org
 In-Reply-To: <20211111020343.316126-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20211111020343.316126-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2 1/1] block: avoid to touch unloaded module instance when opening bdev
+Message-Id: <163763478264.306783.15055872737165970743.b4-ty@kernel.dk>
+Date:   Mon, 22 Nov 2021 19:33:02 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 10:03:43AM +0800, Ming Lei wrote:
+On Thu, 11 Nov 2021 10:03:43 +0800, Ming Lei wrote:
 > disk->fops->owner is grabbed in blkdev_get_no_open() after the disk
 > kobject refcount is increased. This way can't make sure that
 > disk->fops->owner is still alive since del_gendisk() still can move
@@ -64,21 +76,15 @@ On Thu, Nov 11, 2021 at 10:03:43AM +0800, Ming Lei wrote:
 > in del_gendisk(). Meantime new open() won't succeed because disk
 > becomes not alive.
 > 
-> This way is reasonable because blkdev_get_no_open() needn't to touch
-> disk->fops or defined callbacks.
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: czhong@redhat.com
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
-> 	- remove comment as suggested by Christoph
-> 	- improve commit log a bit
+> [...]
 
-Hi Jens,
+Applied, thanks!
 
-Ping...
+[1/1] block: avoid to touch unloaded module instance when opening bdev
+      (no commit info)
 
-Thanks,
-Ming
+Best regards,
+-- 
+Jens Axboe
+
 
