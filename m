@@ -2,85 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5872C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 16:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25143C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 16:10:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237437AbhKWQMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 11:12:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58066 "EHLO
+        id S238670AbhKWQNd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Nov 2021 11:13:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235846AbhKWQMk (ORCPT
+        with ESMTP id S235846AbhKWQNd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 11:12:40 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4B1C061574
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 08:09:32 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id w4so11077297ilv.12
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 08:09:32 -0800 (PST)
+        Tue, 23 Nov 2021 11:13:33 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD816C061574
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 08:10:24 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id m9so28707992iop.0
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 08:10:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wbq1wdAD5orHC86D/BsHRhBIQAuwYNMeNPz9gn+UzTg=;
-        b=XR+4SSCbKkjQDcPAiN8w3+nrK3ChSyNPVLegz1WyyaXkrSmwMTJL+eTaAMOg0Fj549
-         sHy6Wo9lhmAxD9iv+hZGouMxZheNP0LhW+mUREitDW5kAjOzXivCVRWH856T/xlB5MSj
-         Cci0OnH/eoeU+uPNJtuuJlirj22/PTLGch4LNy29Mx92Rby4gai+gEvfbNHdsA0PLgA7
-         3k/uCazZa5QPGMQA4zE6bYDEW5X0WLWE5PkFfdp+k5xY9C7btWV1wvG3VFPNjtKTbeu0
-         SCF/oeZgA6dVKCHoKzkb+pGeRxo3KhZLIQ+aAc5Dbuu30ZioJZpiRz3JzxiN9SA3ZTuG
-         rH6Q==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=BBzlLrTrS/IeOvojVG6B2YAMmVNucDgXMCrBKUQHp3A=;
+        b=KM9m/9NO16jrFQdtSOl7VuCSuvSZnB0mKzK6rU/bX1rphB9E6lzkSgXDh98JB1wXiT
+         jN8i5gQJ04SZpipP/jqEUSJs8hZVP2kl4oH6rUEuy4hiE0LVCtJzlqKjRcodnFw30AiK
+         3Dr3YQ3kZk3fxDHP7R3lg3zLIG0VxbQos3Ac9OoObyFe3b9kZZ8C97gsHsJjAW2BIxwq
+         UxxRgHSkcvj6Od6dIRNmLO3ysIjIGdJRa4IcCF++BlNZKlCFKWZpRJa5AESVI7y/0rov
+         UPjGSFN6LS7XZEkH4aS0UFRyyGqYxrtYD9bxy6SCJ6/K1RbF694f6ZK6qK/UtpkpZbgK
+         UJKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wbq1wdAD5orHC86D/BsHRhBIQAuwYNMeNPz9gn+UzTg=;
-        b=j+NNA8aJsFMDyHWsY2hWvchMLWCldfwyB4c0ETvNBgTQsLiYGDcaFiczOZbeCaEdRZ
-         FDhkQUQxlRDbaqCYo2Qomhpym5BP1mUo5n++Mkd+vPNA+fh39ise9m3/WKmS9JgmV5Ju
-         3SVy9vA5Rw1Hrm3cFXGaAAAFj2V5MTekLzcc2fQnzg1lHjFEteW8TFzZt3w8qFOym6LM
-         kYZ4W7hLWM7xgemzO/lN9u6qEUgUTwEfEyX/weA+4PNj0YZXPcljT3R5iLoaY0iYYOzX
-         KanRMO3klXpI/A30JqvrsZIVzcHeWU/9nBGFZljtJvcZnkLB109Y10Oe+4D0bd6LQYkU
-         c6kQ==
-X-Gm-Message-State: AOAM531LsP6IUsYWpYnSb40AtCxJdreIijdJl2tT/qygFae+YEl/qDDd
-        J0mqGF9h1nQThU1cUGKqxsoIXS1yOyOwSana
-X-Google-Smtp-Source: ABdhPJzJOidZFp1eBzxKqykKluSpwAM61xPE3hn7PKfI5mAVYTCfl2hT9obhr2fDfKKTezHvMLoG9Q==
-X-Received: by 2002:a05:6e02:1e02:: with SMTP id g2mr7024904ila.290.1637683771774;
-        Tue, 23 Nov 2021 08:09:31 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id f15sm7398862ila.68.2021.11.23.08.09.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Nov 2021 08:09:31 -0800 (PST)
-Subject: Re: [PATCH 3/3] blk-mq: cleanup request allocation
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20211123160443.1315598-1-hch@lst.de>
- <20211123160443.1315598-4-hch@lst.de>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=BBzlLrTrS/IeOvojVG6B2YAMmVNucDgXMCrBKUQHp3A=;
+        b=7bjzeApykuLMFs5iI0ilp+oKWnSTjFdnS2sVzfW3yf1aihjuamh7J/Sud9HPRou8Vh
+         3WKVTKEY3Taviez6+5ROMxcB4KAtr1QFmoPCqWOeTO8NKoztGFesl4VTFTHvsxB6YBGv
+         ExlDG9XUUtmuSnQECShfKsbOwdwG6Mkxhj/SNM+OVc5iyzIDfA9a5j0pqSGB+b+s0XlC
+         bzUFhziv2HcdSjEB930VIFjWTNuo9+fHew02jBBKtcM8zNSE08prIZTQ/nX4yHtsLhWK
+         3kGKiMteKAWU7rEzEF1WnV5M2Gcs+FkhgXzb/tG3z+y2lZU1DQMPgW/q36AXavFDNj29
+         ldZQ==
+X-Gm-Message-State: AOAM533hGdshTQwA16t/CTaQ2Zj2JXuqjXYCIF+dAfdaBcUt5HknmlIQ
+        DEH+9CD5o27+3hNYeMuoMtBltbhFoug/MGgE
+X-Google-Smtp-Source: ABdhPJz026wQv9Aw2uRTbLzf/nFtsrGS58vFhx0zbszKyXiSWAlSuNrIsMrQqy/FSQgRny8ysi2nUw==
+X-Received: by 2002:a5e:8a41:: with SMTP id o1mr7092945iom.131.1637683824237;
+        Tue, 23 Nov 2021 08:10:24 -0800 (PST)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id a13sm7538001ilc.34.2021.11.23.08.10.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 08:10:23 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6ec32c2f-1f08-b09a-d36a-5da4327026b9@kernel.dk>
-Date:   Tue, 23 Nov 2021 09:09:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+In-Reply-To: <20211122130625.1136848-1-hch@lst.de>
+References: <20211122130625.1136848-1-hch@lst.de>
+Subject: Re: cleanup and simplify the gendisk flags
+Message-Id: <163768382336.322883.1673932002776910278.b4-ty@kernel.dk>
+Date:   Tue, 23 Nov 2021 09:10:23 -0700
 MIME-Version: 1.0
-In-Reply-To: <20211123160443.1315598-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/23/21 9:04 AM, Christoph Hellwig wrote:
-> Refactor the request alloction so that blk_mq_get_cached_request tries
-> to find a cached request first, and the entirely separate and now
-> self contained blk_mq_get_new_requests allocates one or more requests
-> if that is not possible.
+On Mon, 22 Nov 2021 14:06:11 +0100, Christoph Hellwig wrote:
+> Ho Jens,
 > 
-> There is a small change in behavior as submit_bio_checks is called
-> twice now if a cached request is present but can't be used, but that
-> is a small price to pay for unwinding this code.
+> the gendisk flags have been a complete mess for a while.  This series
+> tries to untangle them as much as easily possible.
+> 
+> Diffstat:
+>  block/bdev.c                       |    5 --
+>  block/blk.h                        |    1
+>  block/genhd.c                      |   41 +++++++----------
+>  block/ioctl.c                      |   31 ++-----------
+>  block/partitions/core.c            |   24 ++++------
+>  drivers/block/amiflop.c            |    1
+>  drivers/block/ataflop.c            |    1
+>  drivers/block/brd.c                |    1
+>  drivers/block/drbd/drbd_main.c     |    1
+>  drivers/block/floppy.c             |    1
+>  drivers/block/loop.c               |    9 +--
+>  drivers/block/n64cart.c            |    2
+>  drivers/block/null_blk/main.c      |    1
+>  drivers/block/paride/pcd.c         |    3 -
+>  drivers/block/paride/pf.c          |    1
+>  drivers/block/pktcdvd.c            |    2
+>  drivers/block/ps3vram.c            |    1
+>  drivers/block/rbd.c                |    6 --
+>  drivers/block/sunvdc.c             |   17 +++----
+>  drivers/block/swim.c               |    1
+>  drivers/block/swim3.c              |    2
+>  drivers/block/virtio_blk.c         |    1
+>  drivers/block/xen-blkback/xenbus.c |    2
+>  drivers/block/xen-blkfront.c       |   26 ++++-------
+>  drivers/block/z2ram.c              |    1
+>  drivers/block/zram/zram_drv.c      |    1
+>  drivers/cdrom/gdrom.c              |    1
+>  drivers/md/dm.c                    |    1
+>  drivers/md/md.c                    |    5 --
+>  drivers/mmc/core/block.c           |    4 -
+>  drivers/mtd/ubi/block.c            |    1
+>  drivers/scsi/sd.c                  |    1
+>  drivers/scsi/sr.c                  |    6 +-
+>  include/linux/genhd.h              |   85 +++++++++----------------------------
+>  34 files changed, 104 insertions(+), 183 deletions(-)
+> 
+> [...]
 
-I don't think that's an issue, the only side effect that matters here
-is the remap which is tracked in the bio anyway.
+Applied, thanks!
 
+[01/14] block: move GENHD_FL_NATIVE_CAPACITY to disk->state
+        (no commit info)
+[02/14] block: move GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE to disk->event_flags
+        (no commit info)
+[03/14] block: remove GENHD_FL_CD
+        (no commit info)
+[04/14] block: remove a dead check in show_partition
+        (no commit info)
+[05/14] block: merge disk_scan_partitions and blkdev_reread_part
+        (no commit info)
+[06/14] block: rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART
+        (no commit info)
+[07/14] block: remove the GENHD_FL_HIDDEN check in blkdev_get_no_open
+        (no commit info)
+[08/14] null_blk: don't suppress partitioning information
+        (no commit info)
+[09/14] mmc: don't set GENHD_FL_SUPPRESS_PARTITION_INFO
+        (no commit info)
+[10/14] block: remove GENHD_FL_SUPPRESS_PARTITION_INFO
+        (no commit info)
+[11/14] block: remove GENHD_FL_EXT_DEVT
+        (no commit info)
+[12/14] block: don't set GENHD_FL_NO_PART for hidden gendisks
+        (no commit info)
+[13/14] block: cleanup the GENHD_FL_* definitions
+        (no commit info)
+[14/14] sr: set GENHD_FL_REMOVABLE earlier
+        (no commit info)
+
+Best regards,
 -- 
 Jens Axboe
+
 
