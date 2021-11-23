@@ -2,173 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E79C43219
-	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 13:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CF6C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 16:04:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235579AbhKWNWx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 08:22:53 -0500
-Received: from mail-oo1-f46.google.com ([209.85.161.46]:43647 "EHLO
-        mail-oo1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233234AbhKWNWw (ORCPT
+        id S234423AbhKWQHy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Nov 2021 11:07:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56936 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238648AbhKWQHy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 08:22:52 -0500
-Received: by mail-oo1-f46.google.com with SMTP id w5-20020a4a2745000000b002c2649b8d5fso6966387oow.10;
-        Tue, 23 Nov 2021 05:19:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sxbm5nZuxDktECFOUcgXGTkmQEJlkXm+UQAvKfd0Kcw=;
-        b=mvIZSRRstoDDJUR3+mmLSzn8fqBURUL2JlI4/Frf4C5a1N1wjF+v56uIhWx1YQ6hIU
-         2dRlJni8qcx7RNXE/GL3pu+VAv4UTqUgv0o0BPxl1qPIMETntN/kFAcnpoZUrd76KegU
-         EKQW2pSud38zRmUCW7u3aRvEpqa57hx5kLNxJpFfSThGzmmlFeGfKmPN1gM2ntWdyv6r
-         2K2zy/YtYJXicIGjMq8lQO4aP9dlCmJCRrZ18lWH4dxrRs0a7kbT707/Ermt9GwlRTOZ
-         iHZj2FfFaNhu+t2/hEMpJXlTJejai2RmZvQ9M4xDAe0JogPrmv2xKN1LX2XKwKVhUUIN
-         EpOg==
-X-Gm-Message-State: AOAM531CX/cyV9bldIBySkzO0zA6rfPkTAyy3w7GuJYD/LNAvoOh+1Pk
-        WbbJ3XOnhaH2aQ5OION/ViKK3GF1OW9tVoWM0vM=
-X-Google-Smtp-Source: ABdhPJx4LJPjPNqz/sXcVDWL5tamzih4SOz6Sq7UGTbN97hIVt3zgoG90+osvpCrjRpDoZ3z/WaeE3Jdprr6Jm1J/tY=
-X-Received: by 2002:a4a:1d82:: with SMTP id 124mr2868847oog.91.1637673583839;
- Tue, 23 Nov 2021 05:19:43 -0800 (PST)
+        Tue, 23 Nov 2021 11:07:54 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DECCC061574
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 08:04:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=djW/qdZ3Sgk4+5+RxipOwD9i6p4U5T+mpsKcYt4yccc=; b=KDuqFHOYaSFcpT2oYtgM1lEGAB
+        oBp59AXFmaFryndJhObAjZIF+oLUWEqZhTiHrGgK2fpRYOSdM7jGhlWfnpRn+YGCyMBFoPVNqY3oC
+        FFCn55u1ouDnsTqCNovmsZkn5o9/uCCphsrJk5EkW6TnWT6OtF1vUtLzIcy1RbfrN2ObP58LybWOP
+        GgIdbWOc2WqD03rDcymy0FoMQnp8G/3J5PF1XAvsEf1CngP1TYq0my9VNQeXN2MzVTLkCN7Xuknvf
+        SoaJUVBz5mnVw+jA6BNDvnQW4Z1XnD2CXOTL3cKcTy/2zN7mZuQhQ1kM7uPKW51p0WQEPNpE3UWL3
+        iGez34kw==;
+Received: from [2001:4bb8:191:f9ce:a710:1fc3:2b4:5435] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mpYHj-00FRhe-GU; Tue, 23 Nov 2021 16:04:44 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: cleanup blk_mq_submit_bio
+Date:   Tue, 23 Nov 2021 17:04:40 +0100
+Message-Id: <20211123160443.1315598-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20210818060533.3569517-1-keescook@chromium.org> <20210818060533.3569517-13-keescook@chromium.org>
-In-Reply-To: <20210818060533.3569517-13-keescook@chromium.org>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 23 Nov 2021 14:19:25 +0100
-Message-ID: <CAJZ5v0iS3qMgdab1S-NzGfeLLXV=S6p5Qx8AaqJ50rsUngS=LA@mail.gmail.com>
-Subject: Re: [PATCH v2 12/63] thermal: intel: int340x_thermal: Use
- struct_group() for memcpy() region
-To:     Kees Cook <keescook@chromium.org>, Zhang Rui <rui.zhang@intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "open list:NETWORKING DRIVERS (WIRELESS)" 
-        <linux-wireless@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 8:08 AM Kees Cook <keescook@chromium.org> wrote:
->
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memcpy(), avoid intentionally writing across
-> neighboring fields.
->
-> Use struct_group() in struct art around members weight, and ac[0-9]_max,
-> so they can be referenced together. This will allow memcpy() and sizeof()
-> to more easily reason about sizes, improve readability, and avoid future
-> warnings about writing beyond the end of weight.
->
-> "pahole" shows no size nor member offset changes to struct art.
-> "objdump -d" shows no meaningful object code changes (i.e. only source
-> line number induced differences).
->
-> Cc: Zhang Rui <rui.zhang@intel.com>
-> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: Amit Kucheria <amitk@kernel.org>
-> Cc: linux-pm@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Hi Jens,
 
-Rui, Srinivas, any comments here?
-
-> ---
->  .../intel/int340x_thermal/acpi_thermal_rel.c  |  5 +-
->  .../intel/int340x_thermal/acpi_thermal_rel.h  | 48 ++++++++++---------
->  2 files changed, 29 insertions(+), 24 deletions(-)
->
-> diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
-> index a478cff8162a..e90690a234c4 100644
-> --- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
-> +++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
-> @@ -250,8 +250,9 @@ static int fill_art(char __user *ubuf)
->                 get_single_name(arts[i].source, art_user[i].source_device);
->                 get_single_name(arts[i].target, art_user[i].target_device);
->                 /* copy the rest int data in addition to source and target */
-> -               memcpy(&art_user[i].weight, &arts[i].weight,
-> -                       sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
-> +               BUILD_BUG_ON(sizeof(art_user[i].data) !=
-> +                            sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
-> +               memcpy(&art_user[i].data, &arts[i].data, sizeof(art_user[i].data));
->         }
->
->         if (copy_to_user(ubuf, art_user, art_len))
-> diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
-> index 58822575fd54..78d942477035 100644
-> --- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
-> +++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
-> @@ -17,17 +17,19 @@
->  struct art {
->         acpi_handle source;
->         acpi_handle target;
-> -       u64 weight;
-> -       u64 ac0_max;
-> -       u64 ac1_max;
-> -       u64 ac2_max;
-> -       u64 ac3_max;
-> -       u64 ac4_max;
-> -       u64 ac5_max;
-> -       u64 ac6_max;
-> -       u64 ac7_max;
-> -       u64 ac8_max;
-> -       u64 ac9_max;
-> +       struct_group(data,
-> +               u64 weight;
-> +               u64 ac0_max;
-> +               u64 ac1_max;
-> +               u64 ac2_max;
-> +               u64 ac3_max;
-> +               u64 ac4_max;
-> +               u64 ac5_max;
-> +               u64 ac6_max;
-> +               u64 ac7_max;
-> +               u64 ac8_max;
-> +               u64 ac9_max;
-> +       );
->  } __packed;
->
->  struct trt {
-> @@ -47,17 +49,19 @@ union art_object {
->         struct {
->                 char source_device[8]; /* ACPI single name */
->                 char target_device[8]; /* ACPI single name */
-> -               u64 weight;
-> -               u64 ac0_max_level;
-> -               u64 ac1_max_level;
-> -               u64 ac2_max_level;
-> -               u64 ac3_max_level;
-> -               u64 ac4_max_level;
-> -               u64 ac5_max_level;
-> -               u64 ac6_max_level;
-> -               u64 ac7_max_level;
-> -               u64 ac8_max_level;
-> -               u64 ac9_max_level;
-> +               struct_group(data,
-> +                       u64 weight;
-> +                       u64 ac0_max_level;
-> +                       u64 ac1_max_level;
-> +                       u64 ac2_max_level;
-> +                       u64 ac3_max_level;
-> +                       u64 ac4_max_level;
-> +                       u64 ac5_max_level;
-> +                       u64 ac6_max_level;
-> +                       u64 ac7_max_level;
-> +                       u64 ac8_max_level;
-> +                       u64 ac9_max_level;
-> +               );
->         };
->         u64 __data[ACPI_NR_ART_ELEMENTS];
->  };
-> --
-> 2.30.2
->
+this series refactors and cleans up the blk_mq_submit_bio path.
