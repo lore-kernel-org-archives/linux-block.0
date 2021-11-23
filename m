@@ -2,137 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34130C4321E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB3DC43219
 	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 10:32:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235337AbhKWKfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235353AbhKWKfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 23 Nov 2021 05:35:09 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:57482 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235353AbhKWKfH (ORCPT
+Received: from smtp-out1.suse.de ([195.135.220.28]:49846 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235374AbhKWKfH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 23 Nov 2021 05:35:07 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id AA7A31FD5D;
+        by smtp-out1.suse.de (Postfix) with ESMTP id B2253218D9;
         Tue, 23 Nov 2021 10:31:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1637663518; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tp7/8R1LmG938qy5axq4MAM3rTPHcg6t4envA+5B7xo=;
-        b=nWKMVABmByzQ3zIZXP3PskKizx2tX1Mqr+Pf2KBjmUG3iwAxsWcQjJHrpsH03tbnL0jAXY
-        qKl03DPMDL4yP9vI3Z6jB62aUBjhHcHMoTassp3vwuL/5NfJb5w8GvmvemVrHlnYHvoGKF
-        T0TSd8w1/WTOKnFL3z5ZTkitJK1jXtQ=
+        bh=BH7S/OpH+gkhMsrqND9Xt/TftQRsgfuZzb4OF6N9Mzc=;
+        b=KsCzrLjJRLsM15i2TXuuyH0hllw6Pb/0unHLmDpTm6EycMd/Vy0hm59Kv7GMGlYXbtMuFt
+        PJRDDkmh9P9pLBJw/oHRebderaDkUhTqehItTgSxKe5/xygCNa0OPXyWmA+B5hZiR6zntl
+        9W8S7yCanKwTjzUIzhZZu2m66rcZp0w=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1637663518;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tp7/8R1LmG938qy5axq4MAM3rTPHcg6t4envA+5B7xo=;
-        b=5VWSmDXIotZmyjURxtK9epV88adVeYS06QX7iGIl2/1X5l+Au7HiUEFNvdnL1t+pa4pcdk
-        Tq1fRW8eVnWrwkAQ==
+        bh=BH7S/OpH+gkhMsrqND9Xt/TftQRsgfuZzb4OF6N9Mzc=;
+        b=m1By3R5Xi6g86VDl/knmdpiVoTe/lKPSDYGMHhXFnk4dZjwfD3mjtu/Kzk3JCHGsHLLjnZ
+        ftNUpvC5U93EfbAg==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id A290AA3B89;
+        by relay2.suse.de (Postfix) with ESMTP id A2AEEA3B8A;
         Tue, 23 Nov 2021 10:31:58 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 759C71E3B01; Tue, 23 Nov 2021 11:31:58 +0100 (CET)
+        id 720F51E37A2; Tue, 23 Nov 2021 11:31:58 +0100 (CET)
 From:   Jan Kara <jack@suse.cz>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     <linux-block@vger.kernel.org>,
         Paolo Valente <paolo.valente@linaro.org>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH 6/8] bfq: Provide helper to generate bfqq name
-Date:   Tue, 23 Nov 2021 11:29:18 +0100
-Message-Id: <20211123103158.17284-6-jack@suse.cz>
+Subject: [PATCH 5/8] bfq: Limit waker detection in time
+Date:   Tue, 23 Nov 2021 11:29:17 +0100
+Message-Id: <20211123103158.17284-5-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211123101109.20879-1-jack@suse.cz>
 References: <20211123101109.20879-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2907; h=from:subject; bh=lIW8uaLgOKwWPQwZ8mubQz8UhMz485reSQkalNeN/dQ=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhnMJ9yHX8wjbtONKgxP8uQ+RM1kSJK6/bTo5GIH08 iqxLYvSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYZzCfQAKCRCcnaoHP2RA2W68CA DomDxuKwQ1TF80s8mqC0OabqkJZ7FzI5l/oe2me/iNX79EWPItu3vY8jXTLyKO4Z8h998eTHKLgiJn WzJoM/g1rpRSTAhA/Ed5pATLQe5Epzg3tXtRVMM7KCt2w41qmRjXVY+YjvY2L7q1XjHv1Zd8R/gYOM 9A3evRzxyTWcl+Zr1ZVN2l8Gpgl8emQ5pGg8yWBvulSNTHU5mI+saFU2SQr77Q2ragYHMLm9brzuA3 QRlS3mqSHQEq9tDR/Ka7BYVXxvZCRO5tHwOe08u5cDmZWAC/F4WU57aHDlcDVc7M0w6OKRVduAUTm8 2Xm0oLINT2MhHfm2eeyucVhgt7UjSH
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5592; h=from:subject; bh=+TxTo74N+Fa0vjyIwPePiBNaNXYsNQXaNsWpa1qw9Co=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhnMJ8kMMwsCxBGiOdvWCx7HlKkh/OT4xt7JWvdKhj /Xmr6xSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYZzCfAAKCRCcnaoHP2RA2ZthB/ 9MH8CCaaL5AKGRpexkCTs3yCxjZmMEhcACaQfMAk9tEI3sop+Y2p7bnm3atP2vf9BX8Lc5cB55K7YD NKOCD9ijfX4JsvbURAweqdQLAHcfEMsA9CaP7sIf87ZBoEB8oQWMZHiR/SxuTOCWY+J5ogYvHSisPF ge5fxG33ApHtBoVQ150WMRjYpzetzTSYlgud0IIoOfxbcfou8GiKC2l57NdWlYgyxgDAgq/pluO2H6 lsWg2WUVVSy0ECthRHbBUDi7ZLbJs8TOPuCWCjmJ0w/Bu9I9CMEb5jQoo+fzNgpX2SRCiMgSyEOHEO S/KLvI+4tylls8tJNGyF0i83vIvdiN
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of having helper formating bfqq pid, provide a helper to
-generate full bfqq name as used in the traces. It saves some code
-duplication and will save more in the coming tracepoints.
+Currently, when process A starts issuing requests shortly after process
+B has completed some IO three times in a row, we decide that B is a
+"waker" of A meaning that completing IO of B is needed for A to make
+progress and generally stop separating A's and B's IO much. This logic
+is useful to avoid unnecessary idling and thus throughput loss for cases
+where workload needs to switch e.g. between the process and the
+journaling thread doing IO. However the detection heuristic tends to
+frequently give false positives when A and B are fighting IO bandwidth
+and other processes aren't doing much IO as we are basically deemed to
+eventually accumulate three occurences of a situation where one process
+starts issuing requests after the other has completed some IO. To reduce
+these false positives, cancel the waker detection also if we didn't
+accumulate three detected wakeups within given timeout. The rationale is
+that if wakeups are really rare, the pointless idling doesn't hurt
+throughput that much anyway.
+
+This significantly reduces false waker detection for workload like:
+
+[global]
+directory=/mnt/repro/
+rw=write
+size=8g
+time_based
+runtime=30
+ramp_time=10
+blocksize=1m
+direct=0
+ioengine=sync
+
+[slowwriter]
+numjobs=1
+fsync=200
+
+[fastwriter]
+numjobs=1
+fsync=200
 
 Acked-by: Paolo Valente <paolo.valente@linaro.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.h | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ block/bfq-iosched.c | 38 +++++++++++++++++++++++---------------
+ block/bfq-iosched.h |  2 ++
+ 2 files changed, 25 insertions(+), 15 deletions(-)
 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 36ee407cebc6..73eab70cefdb 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2091,20 +2091,19 @@ static void bfq_update_io_intensity(struct bfq_queue *bfqq, u64 now_ns)
+  * aspect, see the comments on the choice of the queue for injection
+  * in bfq_select_queue().
+  *
+- * Turning back to the detection of a waker queue, a queue Q is deemed
+- * as a waker queue for bfqq if, for three consecutive times, bfqq
+- * happens to become non empty right after a request of Q has been
+- * completed. In this respect, even if bfqq is empty, we do not check
+- * for a waker if it still has some in-flight I/O. In fact, in this
+- * case bfqq is actually still being served by the drive, and may
+- * receive new I/O on the completion of some of the in-flight
+- * requests. In particular, on the first time, Q is tentatively set as
+- * a candidate waker queue, while on the third consecutive time that Q
+- * is detected, the field waker_bfqq is set to Q, to confirm that Q is
+- * a waker queue for bfqq. These detection steps are performed only if
+- * bfqq has a long think time, so as to make it more likely that
+- * bfqq's I/O is actually being blocked by a synchronization. This
+- * last filter, plus the above three-times requirement, make false
++ * Turning back to the detection of a waker queue, a queue Q is deemed as a
++ * waker queue for bfqq if, for three consecutive times, bfqq happens to become
++ * non empty right after a request of Q has been completed within given
++ * timeout. In this respect, even if bfqq is empty, we do not check for a waker
++ * if it still has some in-flight I/O. In fact, in this case bfqq is actually
++ * still being served by the drive, and may receive new I/O on the completion
++ * of some of the in-flight requests. In particular, on the first time, Q is
++ * tentatively set as a candidate waker queue, while on the third consecutive
++ * time that Q is detected, the field waker_bfqq is set to Q, to confirm that Q
++ * is a waker queue for bfqq. These detection steps are performed only if bfqq
++ * has a long think time, so as to make it more likely that bfqq's I/O is
++ * actually being blocked by a synchronization. This last filter, plus the
++ * above three-times requirement and time limit for detection, make false
+  * positives less likely.
+  *
+  * NOTE
+@@ -2136,8 +2135,16 @@ static void bfq_check_waker(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	    bfqd->last_completed_rq_bfqq == bfqq->waker_bfqq)
+ 		return;
+ 
++	/*
++	 * We reset waker detection logic also if too much time has passed
++ 	 * since the first detection. If wakeups are rare, pointless idling
++	 * doesn't hurt throughput that much. The condition below makes sure
++	 * we do not uselessly idle blocking waker in more than 1/64 cases. 
++	 */
+ 	if (bfqd->last_completed_rq_bfqq !=
+-	    bfqq->tentative_waker_bfqq) {
++	    bfqq->tentative_waker_bfqq ||
++	    now_ns > bfqq->waker_detection_started +
++					128 * (u64)bfqd->bfq_slice_idle) {
+ 		/*
+ 		 * First synchronization detected with a
+ 		 * candidate waker queue, or with a different
+@@ -2146,6 +2153,7 @@ static void bfq_check_waker(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		bfqq->tentative_waker_bfqq =
+ 			bfqd->last_completed_rq_bfqq;
+ 		bfqq->num_waker_detections = 1;
++		bfqq->waker_detection_started = now_ns;
+ 	} else /* Same tentative waker queue detected again */
+ 		bfqq->num_waker_detections++;
+ 
 diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index bb8180c52a31..07288b9da389 100644
+index 820cb8c2d1fe..bb8180c52a31 100644
 --- a/block/bfq-iosched.h
 +++ b/block/bfq-iosched.h
-@@ -25,7 +25,7 @@
- #define BFQ_DEFAULT_GRP_IOPRIO	0
- #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
+@@ -388,6 +388,8 @@ struct bfq_queue {
+ 	struct bfq_queue *tentative_waker_bfqq;
+ 	/* number of times the same tentative waker has been detected */
+ 	unsigned int num_waker_detections;
++	/* time when we started considering this waker */
++	u64 waker_detection_started;
  
--#define MAX_PID_STR_LENGTH 12
-+#define MAX_BFQQ_NAME_LENGTH 16
- 
- /*
-  * Soft real-time applications are extremely more latency sensitive
-@@ -1083,26 +1083,27 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- /* --------------- end of interface of B-WF2Q+ ---------------- */
- 
- /* Logging facilities. */
--static inline void bfq_pid_to_str(int pid, char *str, int len)
-+static inline void bfq_bfqq_name(struct bfq_queue *bfqq, char *str, int len)
- {
--	if (pid != -1)
--		snprintf(str, len, "%d", pid);
-+	char type = bfq_bfqq_sync(bfqq) ? 'S' : 'A';
-+
-+	if (bfqq->pid != -1)
-+		snprintf(str, len, "bfq%d%c", bfqq->pid, type);
- 	else
--		snprintf(str, len, "SHARED-");
-+		snprintf(str, len, "bfqSHARED-%c", type);
- }
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
--	char pid_str[MAX_PID_STR_LENGTH];	\
-+	char pid_str[MAX_BFQQ_NAME_LENGTH];				\
- 	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
- 		break;							\
--	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
-+	bfq_bfqq_name((bfqq), pid_str, MAX_BFQQ_NAME_LENGTH);		\
- 	blk_add_cgroup_trace_msg((bfqd)->queue,				\
- 			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
--			"bfq%s%c " fmt, pid_str,			\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
-+			"%s " fmt, pid_str, ##args);			\
- } while (0)
- 
- #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
-@@ -1113,13 +1114,11 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...) do {	\
--	char pid_str[MAX_PID_STR_LENGTH];	\
-+	char pid_str[MAX_BFQQ_NAME_LENGTH];				\
- 	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
- 		break;							\
--	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
--	blk_add_trace_msg((bfqd)->queue, "bfq%s%c " fmt, pid_str,	\
--			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
--				##args);	\
-+	bfq_bfqq_name((bfqq), pid_str, MAX_BFQQ_NAME_LENGTH);		\
-+	blk_add_trace_msg((bfqd)->queue, "%s " fmt, pid_str, ##args);	\
- } while (0)
- #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)		do {} while (0)
- 
+ 	/* node for woken_list, see below */
+ 	struct hlist_node woken_list_node;
 -- 
 2.26.2
 
