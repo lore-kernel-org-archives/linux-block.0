@@ -2,97 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1479EC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 12:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E79C43219
+	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 13:19:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236754AbhKWMyq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 07:54:46 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44260 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234548AbhKWMyq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 07:54:46 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 57D3560F9F;
-        Tue, 23 Nov 2021 12:51:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637671898;
-        bh=wIrWQf7YDEFEE/QQ99FQt/AhMw3wdmvSFHVUP3uKPJM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QGkZLrvRZ8KTMwcjmn6QaI1qSGzu+DoXhu8PQwdm/+cC5pDtmTATs6POIbgvzvvxo
-         dvx+KAr/Q+u+JS9xVPk6U+7MmUsBqP+41x4NGLkHYCxIDvlSTvBzSwwSfjybOfj2nq
-         TWRsQoUsqmsGmFLBAmPGIX/fzXnDaxy9cZciaQXE+GdZ9Q0gggepiKZXZcNrbqfcrR
-         nHkhXzC+DvQ0+sPze3evyAcW6a63+vYer0kxBjG7JGzCBaYsm5sgS1HDHOjsFSlWxO
-         c9lRiHDTKp2sG2VkVB8n9OMhlpaRH11oqA5Gp/3+CBjyqqPEmeO+zBNBu7sa5kiK9F
-         SG13871QjbYqQ==
-Date:   Tue, 23 Nov 2021 20:51:08 +0800
-From:   Peter Chen <peter.chen@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     bpf@vger.kernel.org, axboe@kernel.dk,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, yuq825@gmail.com, robdclark@gmail.com,
-        sean@poorly.run, christian.koenig@amd.com, ray.huang@amd.com,
-        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-        hkelam@marvell.com, jingoohan1@gmail.com,
-        lorenzo.pieralisi@arm.com, robh@kernel.org, kw@linux.com,
-        bhelgaas@google.com, krzysztof.kozlowski@canonical.com,
-        mani@kernel.org, pawell@cadence.com, rogerq@kernel.org,
-        a-govindraju@ti.com, gregkh@linuxfoundation.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
-        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, sj@kernel.org, akpm@linux-foundation.org,
-        thomas.hellstrom@linux.intel.com, matthew.auld@intel.com,
-        colin.king@intel.com, geert@linux-m68k.org,
-        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, lima@lists.freedesktop.org,
-        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH bpf] treewide: add missing includes masked by cgroup ->
- bpf dependency
-Message-ID: <20211123125108.GA4453@Peter>
-References: <20211120035253.72074-1-kuba@kernel.org>
- <20211120073011.GA36650@Peter>
- <20211120072602.22f9e722@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        id S235579AbhKWNWx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Nov 2021 08:22:53 -0500
+Received: from mail-oo1-f46.google.com ([209.85.161.46]:43647 "EHLO
+        mail-oo1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233234AbhKWNWw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Nov 2021 08:22:52 -0500
+Received: by mail-oo1-f46.google.com with SMTP id w5-20020a4a2745000000b002c2649b8d5fso6966387oow.10;
+        Tue, 23 Nov 2021 05:19:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sxbm5nZuxDktECFOUcgXGTkmQEJlkXm+UQAvKfd0Kcw=;
+        b=mvIZSRRstoDDJUR3+mmLSzn8fqBURUL2JlI4/Frf4C5a1N1wjF+v56uIhWx1YQ6hIU
+         2dRlJni8qcx7RNXE/GL3pu+VAv4UTqUgv0o0BPxl1qPIMETntN/kFAcnpoZUrd76KegU
+         EKQW2pSud38zRmUCW7u3aRvEpqa57hx5kLNxJpFfSThGzmmlFeGfKmPN1gM2ntWdyv6r
+         2K2zy/YtYJXicIGjMq8lQO4aP9dlCmJCRrZ18lWH4dxrRs0a7kbT707/Ermt9GwlRTOZ
+         iHZj2FfFaNhu+t2/hEMpJXlTJejai2RmZvQ9M4xDAe0JogPrmv2xKN1LX2XKwKVhUUIN
+         EpOg==
+X-Gm-Message-State: AOAM531CX/cyV9bldIBySkzO0zA6rfPkTAyy3w7GuJYD/LNAvoOh+1Pk
+        WbbJ3XOnhaH2aQ5OION/ViKK3GF1OW9tVoWM0vM=
+X-Google-Smtp-Source: ABdhPJx4LJPjPNqz/sXcVDWL5tamzih4SOz6Sq7UGTbN97hIVt3zgoG90+osvpCrjRpDoZ3z/WaeE3Jdprr6Jm1J/tY=
+X-Received: by 2002:a4a:1d82:: with SMTP id 124mr2868847oog.91.1637673583839;
+ Tue, 23 Nov 2021 05:19:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211120072602.22f9e722@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+References: <20210818060533.3569517-1-keescook@chromium.org> <20210818060533.3569517-13-keescook@chromium.org>
+In-Reply-To: <20210818060533.3569517-13-keescook@chromium.org>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Tue, 23 Nov 2021 14:19:25 +0100
+Message-ID: <CAJZ5v0iS3qMgdab1S-NzGfeLLXV=S6p5Qx8AaqJ50rsUngS=LA@mail.gmail.com>
+Subject: Re: [PATCH v2 12/63] thermal: intel: int340x_thermal: Use
+ struct_group() for memcpy() region
+To:     Kees Cook <keescook@chromium.org>, Zhang Rui <rui.zhang@intel.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "open list:NETWORKING DRIVERS (WIRELESS)" 
+        <linux-wireless@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21-11-20 07:26:02, Jakub Kicinski wrote:
-> On Sat, 20 Nov 2021 15:30:11 +0800 Peter Chen wrote:
-> > > diff --git a/drivers/usb/cdns3/host.c b/drivers/usb/cdns3/host.c
-> > > index 84dadfa726aa..9643b905e2d8 100644
-> > > --- a/drivers/usb/cdns3/host.c
-> > > +++ b/drivers/usb/cdns3/host.c
-> > > @@ -10,6 +10,7 @@
-> > >   */
-> > >  
-> > >  #include <linux/platform_device.h>
-> > > +#include <linux/slab.h>  
-> > 
-> > Should be "#include <linux/module.h>"?
-> 
-> Why? Different files are missing different includes, this one needs
-> slab.h:
-> 
-> ../drivers/usb/cdns3/host.c: In function ‘__cdns_host_init’:
-> ../drivers/usb/cdns3/host.c:86:2: error: implicit declaration of function ‘kfree’; did you mean ‘vfree’? [-Werror=implicit-function-declaration]
->   kfree(cdns->xhci_plat_data);
->   ^~~~~
->   vfree
+On Wed, Aug 18, 2021 at 8:08 AM Kees Cook <keescook@chromium.org> wrote:
+>
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memcpy(), avoid intentionally writing across
+> neighboring fields.
+>
+> Use struct_group() in struct art around members weight, and ac[0-9]_max,
+> so they can be referenced together. This will allow memcpy() and sizeof()
+> to more easily reason about sizes, improve readability, and avoid future
+> warnings about writing beyond the end of weight.
+>
+> "pahole" shows no size nor member offset changes to struct art.
+> "objdump -d" shows no meaningful object code changes (i.e. only source
+> line number induced differences).
+>
+> Cc: Zhang Rui <rui.zhang@intel.com>
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: Amit Kucheria <amitk@kernel.org>
+> Cc: linux-pm@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Oh, my fault.
+Rui, Srinivas, any comments here?
 
-Acked-by: Peter Chen <peter.chen@kernel.org>
-
--- 
-
-Thanks,
-Peter Chen
-
+> ---
+>  .../intel/int340x_thermal/acpi_thermal_rel.c  |  5 +-
+>  .../intel/int340x_thermal/acpi_thermal_rel.h  | 48 ++++++++++---------
+>  2 files changed, 29 insertions(+), 24 deletions(-)
+>
+> diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> index a478cff8162a..e90690a234c4 100644
+> --- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> +++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.c
+> @@ -250,8 +250,9 @@ static int fill_art(char __user *ubuf)
+>                 get_single_name(arts[i].source, art_user[i].source_device);
+>                 get_single_name(arts[i].target, art_user[i].target_device);
+>                 /* copy the rest int data in addition to source and target */
+> -               memcpy(&art_user[i].weight, &arts[i].weight,
+> -                       sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
+> +               BUILD_BUG_ON(sizeof(art_user[i].data) !=
+> +                            sizeof(u64) * (ACPI_NR_ART_ELEMENTS - 2));
+> +               memcpy(&art_user[i].data, &arts[i].data, sizeof(art_user[i].data));
+>         }
+>
+>         if (copy_to_user(ubuf, art_user, art_len))
+> diff --git a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> index 58822575fd54..78d942477035 100644
+> --- a/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> +++ b/drivers/thermal/intel/int340x_thermal/acpi_thermal_rel.h
+> @@ -17,17 +17,19 @@
+>  struct art {
+>         acpi_handle source;
+>         acpi_handle target;
+> -       u64 weight;
+> -       u64 ac0_max;
+> -       u64 ac1_max;
+> -       u64 ac2_max;
+> -       u64 ac3_max;
+> -       u64 ac4_max;
+> -       u64 ac5_max;
+> -       u64 ac6_max;
+> -       u64 ac7_max;
+> -       u64 ac8_max;
+> -       u64 ac9_max;
+> +       struct_group(data,
+> +               u64 weight;
+> +               u64 ac0_max;
+> +               u64 ac1_max;
+> +               u64 ac2_max;
+> +               u64 ac3_max;
+> +               u64 ac4_max;
+> +               u64 ac5_max;
+> +               u64 ac6_max;
+> +               u64 ac7_max;
+> +               u64 ac8_max;
+> +               u64 ac9_max;
+> +       );
+>  } __packed;
+>
+>  struct trt {
+> @@ -47,17 +49,19 @@ union art_object {
+>         struct {
+>                 char source_device[8]; /* ACPI single name */
+>                 char target_device[8]; /* ACPI single name */
+> -               u64 weight;
+> -               u64 ac0_max_level;
+> -               u64 ac1_max_level;
+> -               u64 ac2_max_level;
+> -               u64 ac3_max_level;
+> -               u64 ac4_max_level;
+> -               u64 ac5_max_level;
+> -               u64 ac6_max_level;
+> -               u64 ac7_max_level;
+> -               u64 ac8_max_level;
+> -               u64 ac9_max_level;
+> +               struct_group(data,
+> +                       u64 weight;
+> +                       u64 ac0_max_level;
+> +                       u64 ac1_max_level;
+> +                       u64 ac2_max_level;
+> +                       u64 ac3_max_level;
+> +                       u64 ac4_max_level;
+> +                       u64 ac5_max_level;
+> +                       u64 ac6_max_level;
+> +                       u64 ac7_max_level;
+> +                       u64 ac8_max_level;
+> +                       u64 ac9_max_level;
+> +               );
+>         };
+>         u64 __data[ACPI_NR_ART_ELEMENTS];
+>  };
+> --
+> 2.30.2
+>
