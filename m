@@ -2,145 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 425B4C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 18:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2E8C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 23 Nov 2021 18:58:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238378AbhKWS4h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 13:56:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40458 "EHLO
+        id S231643AbhKWTBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Nov 2021 14:01:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238515AbhKWS4g (ORCPT
+        with ESMTP id S230197AbhKWTBw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 13:56:36 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76ACFC061574
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 10:53:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=z8Xr/Z/0PP4SdcHgiteRdf2lJOhryKJbOn4LkfOh/n4=; b=HHVqFkzf3Vi/9BIOzpnjdaAuyz
-        uVOEqMZ51btQaR2AIwTAShduq7mtJQ71/TOCVt7+3rbnR9+JjMDC9VsGB0X+K3PPIqTBWGKhP/1Pr
-        t308DyPQio0BfHHwhZYtOJQLXBXmzIQ4McmNpz0hTj2W+5CGLg33z/WQzEaLRJVwflZkwp0SMWx2d
-        gytUrkK32Df/8IZcTKaRlBscL7i5ZDy8ig2N4zoTIMYzk+klnVggcS38hghiXzN823Z879MxQ7mpA
-        mlQQCWMOpD4BsX9QuiKiiGGcT2jh1i0Q7EMNGC6Y783Gtkfbu2vnezqW79OOBj7wmi8HOa+P++PHJ
-        5tAYDJzQ==;
-Received: from [2001:4bb8:191:f9ce:a710:1fc3:2b4:5435] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mpauz-00FzTk-VG; Tue, 23 Nov 2021 18:53:26 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
+        Tue, 23 Nov 2021 14:01:52 -0500
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE63C061574
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 10:58:43 -0800 (PST)
+Received: by mail-il1-x132.google.com with SMTP id j7so33749ilk.13
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 10:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=jsTPCCOIpmIL1a5Q1LdHjXMSuDgKbZ1B3NL6RXNxgaI=;
+        b=YugQ8mNXY9oZTvMGkqv0XTeNFHhiIV0+JkMYKalxzpwan8lDUwM6/YaSFXka3/d4HI
+         p3NMC33WS7EsyFtNxXpTYDFw9J+uGAm0bkynxk4NcGpotqVv/Lb/eGvcZb+mErmSJKTk
+         ojcy7cTw37bGxalx4CLe5HGtmfU3Hujo7Qog/tPenKVLixXbhFatcKreOl6UcmqbwRUb
+         PPCNbYx3j6eWktr6uSciTOe6ONUxjmklV0JPaFKyDctHnoIwqnSAgXjhKtaUOFozVh8+
+         JubuntHnktGXcNMWHbHqufHDGxfiruhclB5Cn5ZNj2rw/4QNlTxWjbuech2EFjcK5DMG
+         WVCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jsTPCCOIpmIL1a5Q1LdHjXMSuDgKbZ1B3NL6RXNxgaI=;
+        b=QV4Qa2un94aokdzVUEAGBvnRRCGvd4l/DVXGiLq2Tjqz3lrBJbSBjS9VcuynF3mmzd
+         q3kOWtsK47hpFwHzBT7r08tN8JDhKcB3d45QRLVnbvYOn8hQ6lqAmS1GF99XqTCEmPlk
+         d6BZcQ+rjSqDdY8JxjVnNWfOUqQQN/OgzTKhRKZEaGa81KqTK/G5Anw44A8hPb5Pm0oz
+         4Qp/Y3IdV1cjaB9hzMadeKz3ML2kjclh3DBSlcFNqfNk9AenATQxAFonG8cTZYI0Zo7b
+         W2G9hQlp8Kvnni9xgnsHpmxSTHsD2drA6z7A1CUFnECzAGpsuKCrCTOnnA+HC0gvjcLo
+         9oHw==
+X-Gm-Message-State: AOAM532Vh5SLguqtjbk0Wiedc4Q0DAUP45vZjlKIwF5ZFzi2Fp8iW6Er
+        xlaLxx+Sbk5qoWN/01D43g5itCO7b6/2vbTu
+X-Google-Smtp-Source: ABdhPJx5lQSvpeqMq+6MIYUlOSCztTxzPemv+agTx8X+tzRVEPqaNGkm1KyG/LoMSpzzAxhjENwh6Q==
+X-Received: by 2002:a92:c14a:: with SMTP id b10mr7378654ilh.161.1637693923025;
+        Tue, 23 Nov 2021 10:58:43 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id k7sm5507244iov.40.2021.11.23.10.58.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Nov 2021 10:58:42 -0800 (PST)
+Subject: Re: [PATCH 3/3] block: only allocate poll_stats if there's a user of
+ them
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 8/8] block: don't include <linux/part_stat.h> in blk.h
-Date:   Tue, 23 Nov 2021 19:53:12 +0100
-Message-Id: <20211123185312.1432157-9-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211123185312.1432157-1-hch@lst.de>
-References: <20211123185312.1432157-1-hch@lst.de>
+References: <20211123171058.346084-1-axboe@kernel.dk>
+ <20211123171058.346084-4-axboe@kernel.dk> <YZ03/OVZcJ+KlfFm@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b24a297d-3d57-7f8d-1932-da614454b28d@kernel.dk>
+Date:   Tue, 23 Nov 2021 11:58:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YZ03/OVZcJ+KlfFm@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Not needed, shift it into the source files that need it instead.
+On 11/23/21 11:50 AM, Christoph Hellwig wrote:
+>> +	spin_lock_irq(&q->stats->lock);
+>> +	if (q->poll_stat) {
+>> +		spin_unlock_irq(&q->stats->lock);
+>> +		kfree(poll_stat);
+>> +		return true;
+>> +	}
+>> +	q->poll_stat = poll_stat;
+>> +	spin_unlock_irq(&q->stats->lock);
+> 
+> If we'd use a cmpxchg to install the pointer we could keep the
+> blk_queue_stats definition private.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-cgroup.c | 1 +
- block/blk-core.c   | 1 +
- block/blk-flush.c  | 1 +
- block/blk-merge.c  | 1 +
- block/blk-mq.c     | 1 +
- block/blk.h        | 1 -
- block/genhd.c      | 1 +
- 7 files changed, 6 insertions(+), 1 deletion(-)
+How about we just move this alloc+enable logic into blk-stat.c instead?
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 663aabfeba183..650f7e27989f1 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -30,6 +30,7 @@
- #include <linux/blk-cgroup.h>
- #include <linux/tracehook.h>
- #include <linux/psi.h>
-+#include <linux/part_stat.h>
- #include "blk.h"
- #include "blk-ioprio.h"
- #include "blk-throttle.h"
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f9b77f4ce3703..143cc21db5ef5 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -39,6 +39,7 @@
- #include <linux/debugfs.h>
- #include <linux/bpf.h>
- #include <linux/psi.h>
-+#include <linux/part_stat.h>
- #include <linux/sched/sysctl.h>
- #include <linux/blk-crypto.h>
- 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 86ee50455e414..902e80e48e4ae 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -69,6 +69,7 @@
- #include <linux/blkdev.h>
- #include <linux/gfp.h>
- #include <linux/blk-mq.h>
-+#include <linux/part_stat.h>
- 
- #include "blk.h"
- #include "blk-mq.h"
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 456fb88c49b1d..e07f5a1ae86e2 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -8,6 +8,7 @@
- #include <linux/blkdev.h>
- #include <linux/blk-integrity.h>
- #include <linux/scatterlist.h>
-+#include <linux/part_stat.h>
- 
- #include <trace/events/block.h>
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cb41c441aa8fa..871220a038225 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -29,6 +29,7 @@
- #include <linux/prefetch.h>
- #include <linux/blk-crypto.h>
- #include <linux/sched/sysctl.h>
-+#include <linux/part_stat.h>
- 
- #include <trace/events/block.h>
- 
-diff --git a/block/blk.h b/block/blk.h
-index 4089aeffca4b0..a57c84654d0a1 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -2,7 +2,6 @@
- #ifndef BLK_INTERNAL_H
- #define BLK_INTERNAL_H
- 
--#include <linux/part_stat.h>
- #include <linux/blk-crypto.h>
- #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
- #include <xen/xen.h>
-diff --git a/block/genhd.c b/block/genhd.c
-index 01606db8c625d..5179a4f00fba5 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -25,6 +25,7 @@
- #include <linux/log2.h>
- #include <linux/pm_runtime.h>
- #include <linux/badblocks.h>
-+#include <linux/part_stat.h>
- 
- #include "blk.h"
- #include "blk-mq-sched.h"
 -- 
-2.30.2
+Jens Axboe
 
