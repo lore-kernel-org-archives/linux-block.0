@@ -2,131 +2,377 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB27C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 16:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08BD6C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 21:59:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348517AbhKXQZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Nov 2021 11:25:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46572 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348649AbhKXQZf (ORCPT
+        id S231315AbhKXWCR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 17:02:17 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:49514 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243780AbhKXWCP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Nov 2021 11:25:35 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B06C06175A
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 08:22:17 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id z26so3896409iod.10
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 08:22:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GX8R3seDFFcTdZihLtId/pnOciYQhUcd/QvMkMeTn0U=;
-        b=DglVO79AH9SiBHPmRRSXep1ayYTA1xohiCwaqJCQUNZ8p/x9rKrshGgBrOLoRDcZNJ
-         GL8BDy0i21ONyGEzFfwRHGSo3f8XgeaewArssJCdKr7dVMUViE3Z6ozOo4AtxTx51CeO
-         Nr5qKSnv+tVtvDew8mhBDpP6SGhcKa5WBX1SXjDlrEJSv/208IEEXRqBaWg9I+a+UHDZ
-         q0Ap+U07FiVMboSZxOrliOUKsP1KYasMDCmV5vTuH5slebDki5THECSAtr4gk+15rsfg
-         LHHgi7lR7Avs9GG9HLdQf9u5jA2T+RVmSPgRT5attze3tqViJnpZo+/im6rqsTzBpWuQ
-         byKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GX8R3seDFFcTdZihLtId/pnOciYQhUcd/QvMkMeTn0U=;
-        b=fpA9UiWYtWtCwFu1W59q9sDlzLIXiGEmaH3Whf5X+untnS+XyoEETvnKpsk1jTUKTi
-         Ef7ZQb0ywuijjfvWaO6PAPWNJN3zS5FeC6UqPwCIarqXWSSGFoKv43Weph0uUGQpz5SE
-         PQJYI5qL6bCYArX0WfIn2R9ZaKPdKncgeXD6b7XB8yk09JuJtQ+gvLARbTaoubOsNWxc
-         gXSov4PuXzu8QXLUS9Ch4aUr1jKuGOfhS2r/H2Sv0zZ8xpDrHTdhy/vGAX22qMuei1iF
-         +oQxqqlENXVme+YQUFYVG8o9u4Vwnv1T1FSvSo/HoOMRocAbuZFMStxagpTPHj5Mklfn
-         d99A==
-X-Gm-Message-State: AOAM532GqXaS6ZGDJjiIr8PO6ygcTixUNxO+XwCyl8siBRB+7i6/GjW3
-        66POJ20fGMjOFRS46VHKVWHIjw==
-X-Google-Smtp-Source: ABdhPJwBSGybvTA8tEQhbGJ0d4B5Ph2RKqURV9Kz5Vz8p6UP0uWNL1rPJfuu1v2UzNQZfpC0QNIUvg==
-X-Received: by 2002:a05:6602:2ac5:: with SMTP id m5mr15784015iov.156.1637770936957;
-        Wed, 24 Nov 2021 08:22:16 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v62sm175257iof.31.2021.11.24.08.22.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Nov 2021 08:22:16 -0800 (PST)
-Subject: Re: uring regression - lost write request
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Daniel Black <daniel@mariadb.org>,
-        Salvatore Bonaccorso <carnil@debian.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        stable@vger.kernel.org
-References: <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
- <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
- <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
- <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
- <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
- <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
- <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
- <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
- <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk>
- <98f8a00f-c634-4a1a-4eba-f97be5b2e801@kernel.dk> <YZ5lvtfqsZEllUJq@kroah.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c0a7ac89-2a8c-b1e3-00c2-96ee259582b4@kernel.dk>
-Date:   Wed, 24 Nov 2021 09:22:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 24 Nov 2021 17:02:15 -0500
+Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1AOLwrF6037341;
+        Thu, 25 Nov 2021 06:58:54 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
+ Thu, 25 Nov 2021 06:58:53 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1AOLwrCI037338
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Thu, 25 Nov 2021 06:58:53 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <84a861dc-6d50-81c0-8e8b-461ef59f4c01@i-love.sakura.ne.jp>
+Date:   Thu, 25 Nov 2021 06:58:54 +0900
 MIME-Version: 1.0
-In-Reply-To: <YZ5lvtfqsZEllUJq@kroah.com>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To:     linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: [PATCH] loop: replace loop_validate_mutex with loop_validate_spinlock
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/24/21 9:18 AM, Greg Kroah-Hartman wrote:
-> On Wed, Nov 24, 2021 at 09:10:25AM -0700, Jens Axboe wrote:
->> On 11/24/21 8:28 AM, Jens Axboe wrote:
->>> On 11/23/21 8:27 PM, Daniel Black wrote:
->>>> On Mon, Nov 15, 2021 at 7:55 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>
->>>>> On 11/14/21 1:33 PM, Daniel Black wrote:
->>>>>> On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>
->>>>>>> Alright, give this one a go if you can. Against -git, but will apply to
->>>>>>> 5.15 as well.
->>>>>>
->>>>>>
->>>>>> Works. Thank you very much.
->>>>>>
->>>>>> https://jira.mariadb.org/browse/MDEV-26674?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=205599#comment-205599
->>>>>>
->>>>>> Tested-by: Marko Mäkelä <marko.makela@mariadb.com>
->>>>>
->>>>> The patch is already upstream (and in the 5.15 stable queue), and I
->>>>> provided 5.14 patches too.
->>>>
->>>> Jens,
->>>>
->>>> I'm getting the same reproducer on 5.14.20
->>>> (https://bugzilla.redhat.com/show_bug.cgi?id=2018882#c3) though the
->>>> backport change logs indicate 5.14.19 has the patch.
->>>>
->>>> Anything missing?
->>>
->>> We might also need another patch that isn't in stable, I'm attaching
->>> it here. Any chance you can run 5.14.20/21 with this applied? If not,
->>> I'll do some sanity checking here and push it to -stable.
->>
->> Looks good to me - Greg, would you mind queueing this up for
->> 5.14-stable?
-> 
-> 5.14 is end-of-life and not getting any more releases (the front page of
-> kernel.org should show that.)
+Commit 3ce6e1f662a91097 ("loop: reintroduce global lock for safe
+loop_validate_file() traversal") had to use a mutex in order to avoid
+AB-BA deadlock. But commit c895b784c699224d ("loop: don't hold lo_mutex
+during __loop_clr_fd()") suggested me that we can also avoid AB-BA
+deadlock without a mutex if we use dedicated state for individual
+operations.
 
-Oh, well I guess that settles that...
+Thus, introduce Lo_binding state in order to allow loop_change_fd() and
+loop_configure() to do their operations without holding lo_mutex, and
+update loop_validate_file() to use a global spinlock.
 
-> If this needs to go anywhere else, please let me know.
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/block/loop.c | 153 +++++++++++++++++--------------------------
+ drivers/block/loop.h |   1 +
+ 2 files changed, 60 insertions(+), 94 deletions(-)
 
-Should be fine, previous 5.10 isn't affected and 5.15 is fine too as it
-already has the patch.
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ba76319b5544..3dfb39d38235 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -88,46 +88,46 @@
+ 
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_ctl_mutex);
+-static DEFINE_MUTEX(loop_validate_mutex);
++static DEFINE_SPINLOCK(loop_validate_spinlock);
+ 
+-/**
+- * loop_global_lock_killable() - take locks for safe loop_validate_file() test
+- *
+- * @lo: struct loop_device
+- * @global: true if @lo is about to bind another "struct loop_device", false otherwise
+- *
+- * Returns 0 on success, -EINTR otherwise.
+- *
+- * Since loop_validate_file() traverses on other "struct loop_device" if
+- * is_loop_device() is true, we need a global lock for serializing concurrent
+- * loop_configure()/loop_change_fd()/__loop_clr_fd() calls.
+- */
+-static int loop_global_lock_killable(struct loop_device *lo, bool global)
++static bool loop_try_update_state_locked(struct loop_device *lo, const int old, const int new)
+ {
+-	int err;
++	bool ret = false;
+ 
+-	if (global) {
+-		err = mutex_lock_killable(&loop_validate_mutex);
+-		if (err)
+-			return err;
++	lockdep_assert_held(&lo->lo_mutex);
++	spin_lock(&loop_validate_spinlock);
++	if (lo->lo_state == old) {
++		lo->lo_state = new;
++		ret = true;
+ 	}
+-	err = mutex_lock_killable(&lo->lo_mutex);
+-	if (err && global)
+-		mutex_unlock(&loop_validate_mutex);
+-	return err;
++	spin_unlock(&loop_validate_spinlock);
++	return ret;
+ }
+ 
+-/**
+- * loop_global_unlock() - release locks taken by loop_global_lock_killable()
+- *
+- * @lo: struct loop_device
+- * @global: true if @lo was about to bind another "struct loop_device", false otherwise
+- */
+-static void loop_global_unlock(struct loop_device *lo, bool global)
++static bool loop_try_update_state(struct loop_device *lo, const int old, const int new)
+ {
++	bool ret;
++
++	if (mutex_lock_killable(&lo->lo_mutex))
++		return false;
++	ret = loop_try_update_state_locked(lo, old, new);
++	mutex_unlock(&lo->lo_mutex);
++	return ret;
++}
++
++static void loop_update_state_locked(struct loop_device *lo, const int state)
++{
++	lockdep_assert_held(&lo->lo_mutex);
++	spin_lock(&loop_validate_spinlock);
++	lo->lo_state = state;
++	spin_unlock(&loop_validate_spinlock);
++}
++
++static void loop_update_state(struct loop_device *lo, const int state)
++{
++	mutex_lock(&lo->lo_mutex);
++	loop_update_state_locked(lo, state);
+ 	mutex_unlock(&lo->lo_mutex);
+-	if (global)
+-		mutex_unlock(&loop_validate_mutex);
+ }
+ 
+ static int max_part;
+@@ -532,25 +532,28 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
+ {
+ 	struct inode	*inode = file->f_mapping->host;
+ 	struct file	*f = file;
++	int		err = 0;
+ 
+ 	/* Avoid recursion */
++	spin_lock(&loop_validate_spinlock);
+ 	while (is_loop_device(f)) {
+ 		struct loop_device *l;
+ 
+-		lockdep_assert_held(&loop_validate_mutex);
+-		if (f->f_mapping->host->i_rdev == bdev->bd_dev)
+-			return -EBADF;
+-
++		if (f->f_mapping->host->i_rdev == bdev->bd_dev) {
++			err = -EBADF;
++			break;
++		}
+ 		l = I_BDEV(f->f_mapping->host)->bd_disk->private_data;
+-		if (l->lo_state != Lo_bound)
+-			return -EINVAL;
+-		/* Order wrt setting lo->lo_backing_file in loop_configure(). */
+-		rmb();
++		if (l->lo_state != Lo_bound) {
++			err = -EINVAL;
++			break;
++		}
+ 		f = l->lo_backing_file;
+ 	}
+-	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
+-		return -EINVAL;
+-	return 0;
++	if (!err && !S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
++		err = -EINVAL;
++	spin_unlock(&loop_validate_spinlock);
++	return err;
+ }
+ 
+ /*
+@@ -568,17 +571,12 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	struct file *old_file;
+ 	int error;
+ 	bool partscan;
+-	bool is_loop;
+ 
+ 	if (!file)
+ 		return -EBADF;
+-	is_loop = is_loop_device(file);
+-	error = loop_global_lock_killable(lo, is_loop);
+-	if (error)
+-		goto out_putf;
+ 	error = -ENXIO;
+-	if (lo->lo_state != Lo_bound)
+-		goto out_err;
++	if (!loop_try_update_state(lo, Lo_bound, Lo_binding))
++		goto out_putf;
+ 
+ 	/* the loop device has to be read-only */
+ 	error = -EINVAL;
+@@ -608,16 +606,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+-	loop_global_unlock(lo, is_loop);
++	loop_update_state(lo, Lo_bound);
+ 
+-	/*
+-	 * Flush loop_validate_file() before fput(), for l->lo_backing_file
+-	 * might be pointing at old_file which might be the last reference.
+-	 */
+-	if (!is_loop) {
+-		mutex_lock(&loop_validate_mutex);
+-		mutex_unlock(&loop_validate_mutex);
+-	}
+ 	/*
+ 	 * We must drop file reference outside of lo_mutex as dropping
+ 	 * the file ref can take open_mutex which creates circular locking
+@@ -629,7 +619,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	return 0;
+ 
+ out_err:
+-	loop_global_unlock(lo, is_loop);
++	loop_update_state(lo, Lo_bound);
+ out_putf:
+ 	fput(file);
+ 	return error;
+@@ -953,11 +943,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	loff_t size;
+ 	bool partscan;
+ 	unsigned short bsize;
+-	bool is_loop;
+ 
+ 	if (!file)
+ 		return -EBADF;
+-	is_loop = is_loop_device(file);
+ 
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
+@@ -972,13 +960,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 			goto out_putf;
+ 	}
+ 
+-	error = loop_global_lock_killable(lo, is_loop);
+-	if (error)
+-		goto out_bdev;
+-
+ 	error = -EBUSY;
+-	if (lo->lo_state != Lo_unbound)
+-		goto out_unlock;
++	if (!loop_try_update_state(lo, Lo_unbound, Lo_binding))
++		goto out_bdev;
+ 
+ 	error = loop_validate_file(file, bdev);
+ 	if (error)
+@@ -1053,17 +1037,13 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	size = get_loop_size(lo, file);
+ 	loop_set_size(lo, size);
+ 
+-	/* Order wrt reading lo_state in loop_validate_file(). */
+-	wmb();
+-
+-	lo->lo_state = Lo_bound;
+ 	if (part_shift)
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	if (partscan)
+ 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART;
+ 
+-	loop_global_unlock(lo, is_loop);
++	loop_update_state(lo, Lo_bound);
+ 	if (partscan)
+ 		loop_reread_partitions(lo);
+ 	if (!(mode & FMODE_EXCL))
+@@ -1071,7 +1051,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	return 0;
+ 
+ out_unlock:
+-	loop_global_unlock(lo, is_loop);
++	loop_update_state(lo, Lo_unbound);
+ out_bdev:
+ 	if (!(mode & FMODE_EXCL))
+ 		bd_abort_claiming(bdev, loop_configure);
+@@ -1088,18 +1068,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 	struct loop_worker *pos, *worker;
+ 
+-	/*
+-	 * Flush loop_configure() and loop_change_fd(). It is acceptable for
+-	 * loop_validate_file() to succeed, for actual clear operation has not
+-	 * started yet.
+-	 */
+-	mutex_lock(&loop_validate_mutex);
+-	mutex_unlock(&loop_validate_mutex);
+-	/*
+-	 * loop_validate_file() now fails because l->lo_state != Lo_bound
+-	 * became visible.
+-	 */
+-
+ 	/*
+ 	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
+ 	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
+@@ -1181,9 +1149,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	lo->lo_flags = 0;
+ 	if (!part_shift)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
+-	mutex_lock(&lo->lo_mutex);
+-	lo->lo_state = Lo_unbound;
+-	mutex_unlock(&lo->lo_mutex);
++	loop_update_state(lo, Lo_unbound);
+ 
+ 	/*
+ 	 * Need not hold lo_mutex to fput backing file. Calling fput holding
+@@ -1219,7 +1185,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 		mutex_unlock(&lo->lo_mutex);
+ 		return 0;
+ 	}
+-	lo->lo_state = Lo_rundown;
++	loop_update_state_locked(lo, Lo_rundown);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+ 	__loop_clr_fd(lo, false);
+@@ -1739,9 +1705,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		goto out_unlock;
+ 
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+-		if (lo->lo_state != Lo_bound)
++		if (!loop_try_update_state_locked(lo, Lo_bound, Lo_rundown))
+ 			goto out_unlock;
+-		lo->lo_state = Lo_rundown;
+ 		mutex_unlock(&lo->lo_mutex);
+ 		/*
+ 		 * In autoclear mode, stop the loop thread
+@@ -1953,7 +1918,6 @@ static int loop_add(int i)
+ 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
+ 	if (!lo)
+ 		goto out;
+-	lo->lo_state = Lo_unbound;
+ 
+ 	err = mutex_lock_killable(&loop_ctl_mutex);
+ 	if (err)
+@@ -2024,6 +1988,7 @@ static int loop_add(int i)
+ 		disk->flags |= GENHD_FL_NO_PART;
+ 	atomic_set(&lo->lo_refcnt, 0);
+ 	mutex_init(&lo->lo_mutex);
++	loop_update_state(lo, Lo_unbound);
+ 	lo->lo_number		= i;
+ 	spin_lock_init(&lo->lo_lock);
+ 	spin_lock_init(&lo->lo_work_lock);
+@@ -2119,7 +2084,7 @@ static int loop_control_remove(int idx)
+ 		goto mark_visible;
+ 	}
+ 	/* Mark this loop device no longer open()-able. */
+-	lo->lo_state = Lo_deleting;
++	loop_update_state_locked(lo, Lo_deleting);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+ 	loop_remove(lo);
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 082d4b6bfc6a..56b9392737b2 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -19,6 +19,7 @@
+ /* Possible states of device */
+ enum {
+ 	Lo_unbound,
++	Lo_binding,
+ 	Lo_bound,
+ 	Lo_rundown,
+ 	Lo_deleting,
 -- 
-Jens Axboe
+2.18.4
 
