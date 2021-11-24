@@ -2,335 +2,551 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4424C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 16:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 598FFC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 16:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242689AbhKXQDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Nov 2021 11:03:54 -0500
-Received: from mail-il1-f200.google.com ([209.85.166.200]:34594 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348314AbhKXQDi (ORCPT
+        id S242670AbhKXQNm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 11:13:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43776 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242598AbhKXQNh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Nov 2021 11:03:38 -0500
-Received: by mail-il1-f200.google.com with SMTP id e1-20020a056e020b2100b00299addac2a4so2154042ilu.1
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 08:00:29 -0800 (PST)
+        Wed, 24 Nov 2021 11:13:37 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442ACC061574
+        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 08:10:27 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id y16so3857682ioc.8
+        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 08:10:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language;
+        bh=5JFV8OOrlpEiXRvxxXIRx3QBohQI3UDhC+RUdQmv1J0=;
+        b=pSHombFXI+tPzc1zNv3rt9mv0LondDWOecIqVn5Vgmg86q1c+Ws1fe/LTjDaprRGzb
+         wL6ytwVSAE0lZ/Mq5eoEk7ShOYSOEF2tQFXlTjEacHMFx8yBkzPrA5z38FRGXgbTkRsu
+         /mrJENkz91+kDiGYbzOqMx3yss8+ZuHLBwefnsxTgWnnBi8gEaeZl5/D3Bp1P/FO0z8s
+         RSLs7wPTztgmsZdy2ti/IdQ+VtWKekTOWpuM6a7kT/cTGExzr2BYlRgh6psnmfKR6Jhl
+         1mW5cdAWK5HrYzRe2wh3l6Itsq5BaW+S0w81SobvINkNPb/SES3C1jpUppv2rGfouDeZ
+         7k2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=+ZNciu7HbiMJYkkN0h2daz6frE5XM098ZZFBi/fMcmc=;
-        b=GojE67Ks/bM4gc70szSNTJRQEbuip6eMl3q746QVFeut3WWeksOOMpw1TNM42Sux2d
-         Dl4JaCaLDLs3YgqdiOweKHUQgE/XPnW0ESpXUoGIPhk7eXfbmO76DLt5hjT5z/2VzwFW
-         p+jzqJHYgMSS79fXtJHOfXsXMlYfT/b16MmHc2ThQCfaKZPiS1QKbeuFr8rmsvEp5Lb9
-         8lk41O3JKSPhjRGoPpalJZRDMuLp7hbvcxTYcuv1p/O+q1p5v6ZQ4UgA40dprMwJFl3k
-         xIdHqNBwgUOVuCC3b7+N6iiAhyu909/SS2ZNAFSXMyUALkifm9nyQmUJxA0GW0zgh44I
-         qbMQ==
-X-Gm-Message-State: AOAM530gZ4utlxasqsT2ic1gBsCvrpUtiEiISgma/Fe0itJhlULczvd6
-        DtDQU445+t7oaqEebzp8ifhf7J40lMDEZoaZ7LoCMlcSNznG
-X-Google-Smtp-Source: ABdhPJyCqv1ryqS3XGV1f904M1aAcA3M03JWwQUplZpcLnDRDV4wB3SUL5xt+jp5C03xEkO/00gDdb9oqusOzpMMcvoORHzTSRIs
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language;
+        bh=5JFV8OOrlpEiXRvxxXIRx3QBohQI3UDhC+RUdQmv1J0=;
+        b=0tKV7NQR2xohprfCpfRUcqCSFirW7T6Hb28fnaaiZ9sOWd501ns940LePtxmyilQGZ
+         Y5PUT8ythWbjEnk5dK4kgwrcyRr0iC3C2hkit/hL+crxx4FH2/g5zxpvMKzOW0gLANpV
+         2j2JiMUCXCdNTy8+7YiKY2uN5O2eKPwGMpcR1RLMMsbnslJwnYq5ZFhzVyc1IEhsRjmB
+         cW5dymjIjWu40Hx/BGBBy2URMzgDvsY9oWGQnpPTJOvQTAl+DD6CLwgcDhNWo+jhly5t
+         4+J9wOB8cficnJ2jkMuVNYnNLouvZilSbFeQhbsLg1gOjcdiTIkoicyeO+Vi/kl4gk1v
+         j/Og==
+X-Gm-Message-State: AOAM531AUo0OvF/eOWcArKWub3kHV3wDvmPFE3z0Q2Tl4E1G0eFe5gIH
+        U3fWnbxtmCyGtWKcwRt9S6X6Ig==
+X-Google-Smtp-Source: ABdhPJwaToTLmiQjaY3vBf5Es2u/aT4IhHLcVgsMmEjG28ONWy0ceySd3aK+1VxmNZZ2vl+p+YIPww==
+X-Received: by 2002:a5d:944a:: with SMTP id x10mr14903565ior.18.1637770226650;
+        Wed, 24 Nov 2021 08:10:26 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id y8sm137249iox.32.2021.11.24.08.10.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Nov 2021 08:10:26 -0800 (PST)
+Subject: Re: uring regression - lost write request
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Daniel Black <daniel@mariadb.org>
+Cc:     Salvatore Bonaccorso <carnil@debian.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        stable@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+ <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+ <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk>
+ <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
+ <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
+ <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk>
+ <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
+ <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
+ <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
+ <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+ <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+ <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+ <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
+ <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
+ <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk>
+Message-ID: <98f8a00f-c634-4a1a-4eba-f97be5b2e801@kernel.dk>
+Date:   Wed, 24 Nov 2021 09:10:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Received: by 2002:a92:c54d:: with SMTP id a13mr13988683ilj.143.1637769628710;
- Wed, 24 Nov 2021 08:00:28 -0800 (PST)
-Date:   Wed, 24 Nov 2021 08:00:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f17e3505d18af405@google.com>
-Subject: [syzbot] possible deadlock in bd_register_pending_holders (2)
-From:   syzbot <syzbot+4b74d06c264d2c1e5af3@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk>
+Content-Type: multipart/mixed;
+ boundary="------------808A073775A4081ECB9B4918"
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+This is a multi-part message in MIME format.
+--------------808A073775A4081ECB9B4918
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-syzbot found the following issue on:
+On 11/24/21 8:28 AM, Jens Axboe wrote:
+> On 11/23/21 8:27 PM, Daniel Black wrote:
+>> On Mon, Nov 15, 2021 at 7:55 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>
+>>> On 11/14/21 1:33 PM, Daniel Black wrote:
+>>>> On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>
+>>>>> Alright, give this one a go if you can. Against -git, but will apply to
+>>>>> 5.15 as well.
+>>>>
+>>>>
+>>>> Works. Thank you very much.
+>>>>
+>>>> https://jira.mariadb.org/browse/MDEV-26674?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=205599#comment-205599
+>>>>
+>>>> Tested-by: Marko Mäkelä <marko.makela@mariadb.com>
+>>>
+>>> The patch is already upstream (and in the 5.15 stable queue), and I
+>>> provided 5.14 patches too.
+>>
+>> Jens,
+>>
+>> I'm getting the same reproducer on 5.14.20
+>> (https://bugzilla.redhat.com/show_bug.cgi?id=2018882#c3) though the
+>> backport change logs indicate 5.14.19 has the patch.
+>>
+>> Anything missing?
+> 
+> We might also need another patch that isn't in stable, I'm attaching
+> it here. Any chance you can run 5.14.20/21 with this applied? If not,
+> I'll do some sanity checking here and push it to -stable.
 
-HEAD commit:    a90af8f15bdc Merge tag 'libata-5.16-rc2' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10575be6b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6c3ab72998e7f1a4
-dashboard link: https://syzkaller.appspot.com/bug?extid=4b74d06c264d2c1e5af3
-compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
+Looks good to me - Greg, would you mind queueing this up for
+5.14-stable?
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4b74d06c264d2c1e5af3@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-5.16.0-rc1-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor.3/4793 is trying to acquire lock:
-ffff88801fc2f118 (&disk->open_mutex){+.+.}-{3:3}, at: bd_register_pending_holders+0x32/0x370 block/holder.c:161
-
-but task is already holding lock:
-ffffffff8d8dbf88 (disks_mutex){+.+.}-{3:3}, at: md_alloc+0x32/0xbc0 drivers/md/md.c:5658
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #9 (disks_mutex){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
-       md_alloc+0x32/0xbc0 drivers/md/md.c:5658
-       blk_request_module+0x19d/0x1c0 block/genhd.c:690
-       blkdev_get_no_open+0x37/0x180 block/bdev.c:742
-       blkdev_get_by_dev+0x84/0xb80 block/bdev.c:806
-       swsusp_check+0xb0/0x2b0 kernel/power/swap.c:1520
-       software_resume+0xc8/0x3d0 kernel/power/hibernate.c:979
-       resume_store+0xdc/0x120 kernel/power/hibernate.c:1181
-       kernfs_fop_write_iter+0x3b6/0x510 fs/kernfs/file.c:296
-       call_write_iter include/linux/fs.h:2162 [inline]
-       new_sync_write fs/read_write.c:503 [inline]
-       vfs_write+0xb11/0xe90 fs/read_write.c:590
-       ksys_write+0x18f/0x2c0 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #8 (major_names_lock){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
-       blk_request_module+0x2f/0x1c0 block/genhd.c:687
-       blkdev_get_no_open+0x37/0x180 block/bdev.c:742
-       blkdev_get_by_dev+0x84/0xb80 block/bdev.c:806
-       swsusp_check+0xb0/0x2b0 kernel/power/swap.c:1520
-       software_resume+0xc8/0x3d0 kernel/power/hibernate.c:979
-       resume_store+0xdc/0x120 kernel/power/hibernate.c:1181
-       kernfs_fop_write_iter+0x3b6/0x510 fs/kernfs/file.c:296
-       call_write_iter include/linux/fs.h:2162 [inline]
-       new_sync_write fs/read_write.c:503 [inline]
-       vfs_write+0xb11/0xe90 fs/read_write.c:590
-       ksys_write+0x18f/0x2c0 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #7 (system_transition_mutex/1){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
-       software_resume+0x7a/0x3d0 kernel/power/hibernate.c:934
-       resume_store+0xdc/0x120 kernel/power/hibernate.c:1181
-       kernfs_fop_write_iter+0x3b6/0x510 fs/kernfs/file.c:296
-       call_write_iter include/linux/fs.h:2162 [inline]
-       new_sync_write fs/read_write.c:503 [inline]
-       vfs_write+0xb11/0xe90 fs/read_write.c:590
-       ksys_write+0x18f/0x2c0 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #6 (&of->mutex){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
-       kernfs_seq_start+0x50/0x3b0 fs/kernfs/file.c:112
-       seq_read_iter+0x401/0xdc0 fs/seq_file.c:225
-       call_read_iter include/linux/fs.h:2156 [inline]
-       new_sync_read fs/read_write.c:400 [inline]
-       vfs_read+0xaf9/0xe60 fs/read_write.c:481
-       ksys_read+0x18f/0x2c0 fs/read_write.c:619
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #5 (&p->lock){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
-       seq_read_iter+0xb6/0xdc0 fs/seq_file.c:182
-       call_read_iter include/linux/fs.h:2156 [inline]
-       generic_file_splice_read+0x482/0x760 fs/splice.c:311
-       do_splice_to fs/splice.c:796 [inline]
-       splice_direct_to_actor+0x45f/0xd00 fs/splice.c:870
-       do_splice_direct+0x291/0x3e0 fs/splice.c:979
-       do_sendfile+0x6fe/0x1040 fs/read_write.c:1245
-       __do_sys_sendfile64 fs/read_write.c:1310 [inline]
-       __se_sys_sendfile64+0x171/0x1d0 fs/read_write.c:1296
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #4 (sb_writers#3){.+.+}-{0:0}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       percpu_down_read include/linux/percpu-rwsem.h:51 [inline]
-       __sb_start_write include/linux/fs.h:1810 [inline]
-       sb_start_write include/linux/fs.h:1880 [inline]
-       file_start_write include/linux/fs.h:3009 [inline]
-       lo_write_bvec drivers/block/loop.c:242 [inline]
-       lo_write_simple drivers/block/loop.c:265 [inline]
-       do_req_filebacked drivers/block/loop.c:494 [inline]
-       loop_handle_cmd drivers/block/loop.c:1857 [inline]
-       loop_process_work+0x1682/0x22d0 drivers/block/loop.c:1897
-       process_one_work+0x853/0x1140 kernel/workqueue.c:2298
-       worker_thread+0xac1/0x1320 kernel/workqueue.c:2445
-       kthread+0x468/0x490 kernel/kthread.c:327
-       ret_from_fork+0x1f/0x30
-
--> #3 ((work_completion)(&lo->rootcg_work)){+.+.}-{0:0}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       process_one_work+0x827/0x1140 kernel/workqueue.c:2274
-       worker_thread+0xac1/0x1320 kernel/workqueue.c:2445
-       kthread+0x468/0x490 kernel/kthread.c:327
-       ret_from_fork+0x1f/0x30
-
--> #2 ((wq_completion)loop5){+.+.}-{0:0}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       flush_workqueue+0x18e/0x16b0 kernel/workqueue.c:2818
-       drain_workqueue+0xc3/0x3a0 kernel/workqueue.c:2983
-       destroy_workqueue+0x7d/0xed0 kernel/workqueue.c:4420
-       __loop_clr_fd+0x1ec/0x9b0 drivers/block/loop.c:1124
-       blkdev_put_whole block/bdev.c:694 [inline]
-       blkdev_put+0x477/0x7b0 block/bdev.c:956
-       deactivate_locked_super+0xa7/0xf0 fs/super.c:335
-       cleanup_mnt+0x462/0x510 fs/namespace.c:1137
-       task_work_run+0x146/0x1c0 kernel/task_work.c:164
-       tracehook_notify_resume include/linux/tracehook.h:189 [inline]
-       exit_to_user_mode_loop kernel/entry/common.c:175 [inline]
-       exit_to_user_mode_prepare+0x209/0x220 kernel/entry/common.c:207
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
-       syscall_exit_to_user_mode+0x2e/0x70 kernel/entry/common.c:300
-       do_syscall_64+0x53/0xd0 arch/x86/entry/common.c:86
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #1 (&lo->lo_mutex){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_killable_nested+0x1a/0x20 kernel/locking/mutex.c:807
-       lo_open+0x68/0x100 drivers/block/loop.c:1733
-       blkdev_get_whole+0x8c/0x3d0 block/bdev.c:671
-       blkdev_get_by_dev+0x298/0xb80 block/bdev.c:826
-       blkdev_open+0x137/0x2f0 block/fops.c:501
-       do_dentry_open+0x78b/0x1020 fs/open.c:822
-       do_open fs/namei.c:3426 [inline]
-       path_openat+0x2896/0x3660 fs/namei.c:3559
-       do_filp_open+0x277/0x4f0 fs/namei.c:3586
-       do_sys_openat2+0x13b/0x500 fs/open.c:1212
-       do_sys_open fs/open.c:1228 [inline]
-       __do_sys_open fs/open.c:1236 [inline]
-       __se_sys_open fs/open.c:1232 [inline]
-       __x64_sys_open+0x221/0x270 fs/open.c:1232
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #0 (&disk->open_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3063 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3186 [inline]
-       validate_chain+0x1dfb/0x8240 kernel/locking/lockdep.c:3801
-       __lock_acquire+0x1382/0x2b00 kernel/locking/lockdep.c:5027
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
-       __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
-       __mutex_lock kernel/locking/mutex.c:740 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
-       bd_register_pending_holders+0x32/0x370 block/holder.c:161
-       device_add_disk+0x4d4/0xe00 block/genhd.c:485
-       add_disk include/linux/genhd.h:212 [inline]
-       md_alloc+0x819/0xbc0 drivers/md/md.c:5717
-       blk_request_module+0x19d/0x1c0 block/genhd.c:690
-       blkdev_get_no_open+0x37/0x180 block/bdev.c:742
-       blkdev_get_by_dev+0x84/0xb80 block/bdev.c:806
-       swsusp_check+0xb0/0x2b0 kernel/power/swap.c:1520
-       software_resume+0xc8/0x3d0 kernel/power/hibernate.c:979
-       resume_store+0xdc/0x120 kernel/power/hibernate.c:1181
-       kernfs_fop_write_iter+0x3b6/0x510 fs/kernfs/file.c:296
-       call_write_iter include/linux/fs.h:2162 [inline]
-       new_sync_write fs/read_write.c:503 [inline]
-       vfs_write+0xb11/0xe90 fs/read_write.c:590
-       ksys_write+0x18f/0x2c0 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
-Chain exists of:
-  &disk->open_mutex --> major_names_lock --> disks_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(disks_mutex);
-                               lock(major_names_lock);
-                               lock(disks_mutex);
-  lock(&disk->open_mutex);
-
- *** DEADLOCK ***
-
-7 locks held by syz-executor.3/4793:
- #0: ffff88807d658af0 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x24e/0x2f0 fs/file.c:990
- #1: ffff88807eb10460 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x2b5/0xe90 fs/read_write.c:586
- #2: ffff88803209ec88 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1f3/0x510 fs/kernfs/file.c:287
- #3: ffff888015d9c830 (kn->active#624){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x217/0x510 fs/kernfs/file.c:288
- #4: ffffffff8c9d5ce8 (system_transition_mutex/1){+.+.}-{3:3}, at: software_resume+0x7a/0x3d0 kernel/power/hibernate.c:934
- #5: ffffffff8d1116a8 (major_names_lock){+.+.}-{3:3}, at: blk_request_module+0x2f/0x1c0 block/genhd.c:687
- #6: ffffffff8d8dbf88 (disks_mutex){+.+.}-{3:3}, at: md_alloc+0x32/0xbc0 drivers/md/md.c:5658
-
-stack backtrace:
-CPU: 1 PID: 4793 Comm: syz-executor.3 Not tainted 5.16.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1dc/0x2d8 lib/dump_stack.c:106
- check_noncircular+0x2f9/0x3b0 kernel/locking/lockdep.c:2143
- check_prev_add kernel/locking/lockdep.c:3063 [inline]
- check_prevs_add kernel/locking/lockdep.c:3186 [inline]
- validate_chain+0x1dfb/0x8240 kernel/locking/lockdep.c:3801
- __lock_acquire+0x1382/0x2b00 kernel/locking/lockdep.c:5027
- lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5637
- __mutex_lock_common+0x1d5/0x2590 kernel/locking/mutex.c:607
- __mutex_lock kernel/locking/mutex.c:740 [inline]
- mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:792
- bd_register_pending_holders+0x32/0x370 block/holder.c:161
- device_add_disk+0x4d4/0xe00 block/genhd.c:485
- add_disk include/linux/genhd.h:212 [inline]
- md_alloc+0x819/0xbc0 drivers/md/md.c:5717
- blk_request_module+0x19d/0x1c0 block/genhd.c:690
- blkdev_get_no_open+0x37/0x180 block/bdev.c:742
- blkdev_get_by_dev+0x84/0xb80 block/bdev.c:806
- swsusp_check+0xb0/0x2b0 kernel/power/swap.c:1520
- software_resume+0xc8/0x3d0 kernel/power/hibernate.c:979
- resume_store+0xdc/0x120 kernel/power/hibernate.c:1181
- kernfs_fop_write_iter+0x3b6/0x510 fs/kernfs/file.c:296
- call_write_iter include/linux/fs.h:2162 [inline]
- new_sync_write fs/read_write.c:503 [inline]
- vfs_write+0xb11/0xe90 fs/read_write.c:590
- ksys_write+0x18f/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7faf24dbbae9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007faf22331188 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007faf24ecef60 RCX: 00007faf24dbbae9
-RDX: 000000004000fdef RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00007faf24e15f6d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffedf87dfff R14: 00007faf22331300 R15: 0000000000022000
- </TASK>
-PM: Image not found (code -5)
+-- 
+Jens Axboe
 
 
+--------------808A073775A4081ECB9B4918
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-io-wq-split-bounded-and-unbounded-work-into-separate.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-io-wq-split-bounded-and-unbounded-work-into-separate.pa";
+ filename*1="tch"
+
+From 99e6a29dbda79e5e050be1ffd38dd36622f61af5 Mon Sep 17 00:00:00 2001
+From: Jens Axboe <axboe@kernel.dk>
+Date: Wed, 24 Nov 2021 08:26:11 -0700
+Subject: [PATCH] io-wq: split bounded and unbounded work into separate lists
+
+commit f95dc207b93da9c88ddbb7741ec3730c6657b88e upstream.
+
+We've got a few issues that all boil down to the fact that we have one
+list of pending work items, yet two different types of workers to
+serve them. This causes some oddities around workers switching type and
+even hashed work vs regular work on the same bounded list.
+
+Just separate them out cleanly, similarly to how we already do
+accounting of what is running. That provides a clean separation and
+removes some corner cases that can cause stalls when handling IO
+that is punted to io-wq.
+
+Fixes: ecc53c48c13d ("io-wq: check max_worker limits if a worker transitions bound state")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ fs/io-wq.c | 156 +++++++++++++++++++++++------------------------------
+ 1 file changed, 68 insertions(+), 88 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/fs/io-wq.c b/fs/io-wq.c
+index 0890d85ba285..7d63299b4776 100644
+--- a/fs/io-wq.c
++++ b/fs/io-wq.c
+@@ -32,7 +32,7 @@ enum {
+ };
+ 
+ enum {
+-	IO_WQE_FLAG_STALLED	= 1,	/* stalled on hash */
++	IO_ACCT_STALLED_BIT	= 0,	/* stalled on hash */
+ };
+ 
+ /*
+@@ -71,25 +71,24 @@ struct io_wqe_acct {
+ 	unsigned max_workers;
+ 	int index;
+ 	atomic_t nr_running;
++	struct io_wq_work_list work_list;
++	unsigned long flags;
+ };
+ 
+ enum {
+ 	IO_WQ_ACCT_BOUND,
+ 	IO_WQ_ACCT_UNBOUND,
++	IO_WQ_ACCT_NR,
+ };
+ 
+ /*
+  * Per-node worker thread pool
+  */
+ struct io_wqe {
+-	struct {
+-		raw_spinlock_t lock;
+-		struct io_wq_work_list work_list;
+-		unsigned flags;
+-	} ____cacheline_aligned_in_smp;
++	raw_spinlock_t lock;
++	struct io_wqe_acct acct[2];
+ 
+ 	int node;
+-	struct io_wqe_acct acct[2];
+ 
+ 	struct hlist_nulls_head free_list;
+ 	struct list_head all_list;
+@@ -195,11 +194,10 @@ static void io_worker_exit(struct io_worker *worker)
+ 	do_exit(0);
+ }
+ 
+-static inline bool io_wqe_run_queue(struct io_wqe *wqe)
+-	__must_hold(wqe->lock)
++static inline bool io_acct_run_queue(struct io_wqe_acct *acct)
+ {
+-	if (!wq_list_empty(&wqe->work_list) &&
+-	    !(wqe->flags & IO_WQE_FLAG_STALLED))
++	if (!wq_list_empty(&acct->work_list) &&
++	    !test_bit(IO_ACCT_STALLED_BIT, &acct->flags))
+ 		return true;
+ 	return false;
+ }
+@@ -208,7 +206,8 @@ static inline bool io_wqe_run_queue(struct io_wqe *wqe)
+  * Check head of free list for an available worker. If one isn't available,
+  * caller must create one.
+  */
+-static bool io_wqe_activate_free_worker(struct io_wqe *wqe)
++static bool io_wqe_activate_free_worker(struct io_wqe *wqe,
++					struct io_wqe_acct *acct)
+ 	__must_hold(RCU)
+ {
+ 	struct hlist_nulls_node *n;
+@@ -222,6 +221,10 @@ static bool io_wqe_activate_free_worker(struct io_wqe *wqe)
+ 	hlist_nulls_for_each_entry_rcu(worker, n, &wqe->free_list, nulls_node) {
+ 		if (!io_worker_get(worker))
+ 			continue;
++		if (io_wqe_get_acct(worker) != acct) {
++			io_worker_release(worker);
++			continue;
++		}
+ 		if (wake_up_process(worker->task)) {
+ 			io_worker_release(worker);
+ 			return true;
+@@ -340,7 +343,7 @@ static void io_wqe_dec_running(struct io_worker *worker)
+ 	if (!(worker->flags & IO_WORKER_F_UP))
+ 		return;
+ 
+-	if (atomic_dec_and_test(&acct->nr_running) && io_wqe_run_queue(wqe)) {
++	if (atomic_dec_and_test(&acct->nr_running) && io_acct_run_queue(acct)) {
+ 		atomic_inc(&acct->nr_running);
+ 		atomic_inc(&wqe->wq->worker_refs);
+ 		io_queue_worker_create(wqe, worker, acct);
+@@ -355,29 +358,10 @@ static void __io_worker_busy(struct io_wqe *wqe, struct io_worker *worker,
+ 			     struct io_wq_work *work)
+ 	__must_hold(wqe->lock)
+ {
+-	bool worker_bound, work_bound;
+-
+-	BUILD_BUG_ON((IO_WQ_ACCT_UNBOUND ^ IO_WQ_ACCT_BOUND) != 1);
+-
+ 	if (worker->flags & IO_WORKER_F_FREE) {
+ 		worker->flags &= ~IO_WORKER_F_FREE;
+ 		hlist_nulls_del_init_rcu(&worker->nulls_node);
+ 	}
+-
+-	/*
+-	 * If worker is moving from bound to unbound (or vice versa), then
+-	 * ensure we update the running accounting.
+-	 */
+-	worker_bound = (worker->flags & IO_WORKER_F_BOUND) != 0;
+-	work_bound = (work->flags & IO_WQ_WORK_UNBOUND) == 0;
+-	if (worker_bound != work_bound) {
+-		int index = work_bound ? IO_WQ_ACCT_UNBOUND : IO_WQ_ACCT_BOUND;
+-		io_wqe_dec_running(worker);
+-		worker->flags ^= IO_WORKER_F_BOUND;
+-		wqe->acct[index].nr_workers--;
+-		wqe->acct[index ^ 1].nr_workers++;
+-		io_wqe_inc_running(worker);
+-	 }
+ }
+ 
+ /*
+@@ -419,44 +403,23 @@ static bool io_wait_on_hash(struct io_wqe *wqe, unsigned int hash)
+ 	return ret;
+ }
+ 
+-/*
+- * We can always run the work if the worker is currently the same type as
+- * the work (eg both are bound, or both are unbound). If they are not the
+- * same, only allow it if incrementing the worker count would be allowed.
+- */
+-static bool io_worker_can_run_work(struct io_worker *worker,
+-				   struct io_wq_work *work)
+-{
+-	struct io_wqe_acct *acct;
+-
+-	if (!(worker->flags & IO_WORKER_F_BOUND) !=
+-	    !(work->flags & IO_WQ_WORK_UNBOUND))
+-		return true;
+-
+-	/* not the same type, check if we'd go over the limit */
+-	acct = io_work_get_acct(worker->wqe, work);
+-	return acct->nr_workers < acct->max_workers;
+-}
+-
+-static struct io_wq_work *io_get_next_work(struct io_wqe *wqe,
++static struct io_wq_work *io_get_next_work(struct io_wqe_acct *acct,
+ 					   struct io_worker *worker)
+ 	__must_hold(wqe->lock)
+ {
+ 	struct io_wq_work_node *node, *prev;
+ 	struct io_wq_work *work, *tail;
+ 	unsigned int stall_hash = -1U;
++	struct io_wqe *wqe = worker->wqe;
+ 
+-	wq_list_for_each(node, prev, &wqe->work_list) {
++	wq_list_for_each(node, prev, &acct->work_list) {
+ 		unsigned int hash;
+ 
+ 		work = container_of(node, struct io_wq_work, list);
+ 
+-		if (!io_worker_can_run_work(worker, work))
+-			break;
+-
+ 		/* not hashed, can run anytime */
+ 		if (!io_wq_is_hashed(work)) {
+-			wq_list_del(&wqe->work_list, node, prev);
++			wq_list_del(&acct->work_list, node, prev);
+ 			return work;
+ 		}
+ 
+@@ -467,7 +430,7 @@ static struct io_wq_work *io_get_next_work(struct io_wqe *wqe,
+ 		/* hashed, can run if not already running */
+ 		if (!test_and_set_bit(hash, &wqe->wq->hash->map)) {
+ 			wqe->hash_tail[hash] = NULL;
+-			wq_list_cut(&wqe->work_list, &tail->list, prev);
++			wq_list_cut(&acct->work_list, &tail->list, prev);
+ 			return work;
+ 		}
+ 		if (stall_hash == -1U)
+@@ -483,12 +446,12 @@ static struct io_wq_work *io_get_next_work(struct io_wqe *wqe,
+ 		 * Set this before dropping the lock to avoid racing with new
+ 		 * work being added and clearing the stalled bit.
+ 		 */
+-		wqe->flags |= IO_WQE_FLAG_STALLED;
++		set_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+ 		raw_spin_unlock(&wqe->lock);
+ 		unstalled = io_wait_on_hash(wqe, stall_hash);
+ 		raw_spin_lock(&wqe->lock);
+ 		if (unstalled) {
+-			wqe->flags &= ~IO_WQE_FLAG_STALLED;
++			clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+ 			if (wq_has_sleeper(&wqe->wq->hash->wait))
+ 				wake_up(&wqe->wq->hash->wait);
+ 		}
+@@ -525,6 +488,7 @@ static void io_wqe_enqueue(struct io_wqe *wqe, struct io_wq_work *work);
+ static void io_worker_handle_work(struct io_worker *worker)
+ 	__releases(wqe->lock)
+ {
++	struct io_wqe_acct *acct = io_wqe_get_acct(worker);
+ 	struct io_wqe *wqe = worker->wqe;
+ 	struct io_wq *wq = wqe->wq;
+ 	bool do_kill = test_bit(IO_WQ_BIT_EXIT, &wq->state);
+@@ -539,7 +503,7 @@ static void io_worker_handle_work(struct io_worker *worker)
+ 		 * can't make progress, any work completion or insertion will
+ 		 * clear the stalled flag.
+ 		 */
+-		work = io_get_next_work(wqe, worker);
++		work = io_get_next_work(acct, worker);
+ 		if (work)
+ 			__io_worker_busy(wqe, worker, work);
+ 
+@@ -575,7 +539,7 @@ static void io_worker_handle_work(struct io_worker *worker)
+ 				/* serialize hash clear with wake_up() */
+ 				spin_lock_irq(&wq->hash->wait.lock);
+ 				clear_bit(hash, &wq->hash->map);
+-				wqe->flags &= ~IO_WQE_FLAG_STALLED;
++				clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+ 				spin_unlock_irq(&wq->hash->wait.lock);
+ 				if (wq_has_sleeper(&wq->hash->wait))
+ 					wake_up(&wq->hash->wait);
+@@ -594,6 +558,7 @@ static void io_worker_handle_work(struct io_worker *worker)
+ static int io_wqe_worker(void *data)
+ {
+ 	struct io_worker *worker = data;
++	struct io_wqe_acct *acct = io_wqe_get_acct(worker);
+ 	struct io_wqe *wqe = worker->wqe;
+ 	struct io_wq *wq = wqe->wq;
+ 	char buf[TASK_COMM_LEN];
+@@ -609,7 +574,7 @@ static int io_wqe_worker(void *data)
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ loop:
+ 		raw_spin_lock_irq(&wqe->lock);
+-		if (io_wqe_run_queue(wqe)) {
++		if (io_acct_run_queue(acct)) {
+ 			io_worker_handle_work(worker);
+ 			goto loop;
+ 		}
+@@ -777,12 +742,13 @@ static void io_run_cancel(struct io_wq_work *work, struct io_wqe *wqe)
+ 
+ static void io_wqe_insert_work(struct io_wqe *wqe, struct io_wq_work *work)
+ {
++	struct io_wqe_acct *acct = io_work_get_acct(wqe, work);
+ 	unsigned int hash;
+ 	struct io_wq_work *tail;
+ 
+ 	if (!io_wq_is_hashed(work)) {
+ append:
+-		wq_list_add_tail(&work->list, &wqe->work_list);
++		wq_list_add_tail(&work->list, &acct->work_list);
+ 		return;
+ 	}
+ 
+@@ -792,7 +758,7 @@ static void io_wqe_insert_work(struct io_wqe *wqe, struct io_wq_work *work)
+ 	if (!tail)
+ 		goto append;
+ 
+-	wq_list_add_after(&work->list, &tail->list, &wqe->work_list);
++	wq_list_add_after(&work->list, &tail->list, &acct->work_list);
+ }
+ 
+ static void io_wqe_enqueue(struct io_wqe *wqe, struct io_wq_work *work)
+@@ -814,10 +780,10 @@ static void io_wqe_enqueue(struct io_wqe *wqe, struct io_wq_work *work)
+ 
+ 	raw_spin_lock_irqsave(&wqe->lock, flags);
+ 	io_wqe_insert_work(wqe, work);
+-	wqe->flags &= ~IO_WQE_FLAG_STALLED;
++	clear_bit(IO_ACCT_STALLED_BIT, &acct->flags);
+ 
+ 	rcu_read_lock();
+-	do_create = !io_wqe_activate_free_worker(wqe);
++	do_create = !io_wqe_activate_free_worker(wqe, acct);
+ 	rcu_read_unlock();
+ 
+ 	raw_spin_unlock_irqrestore(&wqe->lock, flags);
+@@ -870,6 +836,7 @@ static inline void io_wqe_remove_pending(struct io_wqe *wqe,
+ 					 struct io_wq_work *work,
+ 					 struct io_wq_work_node *prev)
+ {
++	struct io_wqe_acct *acct = io_work_get_acct(wqe, work);
+ 	unsigned int hash = io_get_work_hash(work);
+ 	struct io_wq_work *prev_work = NULL;
+ 
+@@ -881,7 +848,7 @@ static inline void io_wqe_remove_pending(struct io_wqe *wqe,
+ 		else
+ 			wqe->hash_tail[hash] = NULL;
+ 	}
+-	wq_list_del(&wqe->work_list, &work->list, prev);
++	wq_list_del(&acct->work_list, &work->list, prev);
+ }
+ 
+ static void io_wqe_cancel_pending_work(struct io_wqe *wqe,
+@@ -890,22 +857,27 @@ static void io_wqe_cancel_pending_work(struct io_wqe *wqe,
+ 	struct io_wq_work_node *node, *prev;
+ 	struct io_wq_work *work;
+ 	unsigned long flags;
++	int i;
+ 
+ retry:
+ 	raw_spin_lock_irqsave(&wqe->lock, flags);
+-	wq_list_for_each(node, prev, &wqe->work_list) {
+-		work = container_of(node, struct io_wq_work, list);
+-		if (!match->fn(work, match->data))
+-			continue;
+-		io_wqe_remove_pending(wqe, work, prev);
+-		raw_spin_unlock_irqrestore(&wqe->lock, flags);
+-		io_run_cancel(work, wqe);
+-		match->nr_pending++;
+-		if (!match->cancel_all)
+-			return;
++	for (i = 0; i < IO_WQ_ACCT_NR; i++) {
++		struct io_wqe_acct *acct = io_get_acct(wqe, i == 0);
+ 
+-		/* not safe to continue after unlock */
+-		goto retry;
++		wq_list_for_each(node, prev, &acct->work_list) {
++			work = container_of(node, struct io_wq_work, list);
++			if (!match->fn(work, match->data))
++				continue;
++			io_wqe_remove_pending(wqe, work, prev);
++			raw_spin_unlock_irqrestore(&wqe->lock, flags);
++			io_run_cancel(work, wqe);
++			match->nr_pending++;
++			if (!match->cancel_all)
++				return;
++
++			/* not safe to continue after unlock */
++			goto retry;
++		}
+ 	}
+ 	raw_spin_unlock_irqrestore(&wqe->lock, flags);
+ }
+@@ -966,18 +938,24 @@ static int io_wqe_hash_wake(struct wait_queue_entry *wait, unsigned mode,
+ 			    int sync, void *key)
+ {
+ 	struct io_wqe *wqe = container_of(wait, struct io_wqe, wait);
++	int i;
+ 
+ 	list_del_init(&wait->entry);
+ 
+ 	rcu_read_lock();
+-	io_wqe_activate_free_worker(wqe);
++	for (i = 0; i < IO_WQ_ACCT_NR; i++) {
++		struct io_wqe_acct *acct = &wqe->acct[i];
++
++		if (test_and_clear_bit(IO_ACCT_STALLED_BIT, &acct->flags))
++			io_wqe_activate_free_worker(wqe, acct);
++	}
+ 	rcu_read_unlock();
+ 	return 1;
+ }
+ 
+ struct io_wq *io_wq_create(unsigned bounded, struct io_wq_data *data)
+ {
+-	int ret, node;
++	int ret, node, i;
+ 	struct io_wq *wq;
+ 
+ 	if (WARN_ON_ONCE(!data->free_work || !data->do_work))
+@@ -1012,18 +990,20 @@ struct io_wq *io_wq_create(unsigned bounded, struct io_wq_data *data)
+ 		cpumask_copy(wqe->cpu_mask, cpumask_of_node(node));
+ 		wq->wqes[node] = wqe;
+ 		wqe->node = alloc_node;
+-		wqe->acct[IO_WQ_ACCT_BOUND].index = IO_WQ_ACCT_BOUND;
+-		wqe->acct[IO_WQ_ACCT_UNBOUND].index = IO_WQ_ACCT_UNBOUND;
+ 		wqe->acct[IO_WQ_ACCT_BOUND].max_workers = bounded;
+-		atomic_set(&wqe->acct[IO_WQ_ACCT_BOUND].nr_running, 0);
+ 		wqe->acct[IO_WQ_ACCT_UNBOUND].max_workers =
+ 					task_rlimit(current, RLIMIT_NPROC);
+-		atomic_set(&wqe->acct[IO_WQ_ACCT_UNBOUND].nr_running, 0);
+-		wqe->wait.func = io_wqe_hash_wake;
+ 		INIT_LIST_HEAD(&wqe->wait.entry);
++		wqe->wait.func = io_wqe_hash_wake;
++		for (i = 0; i < IO_WQ_ACCT_NR; i++) {
++			struct io_wqe_acct *acct = &wqe->acct[i];
++
++			acct->index = i;
++			atomic_set(&acct->nr_running, 0);
++			INIT_WQ_LIST(&acct->work_list);
++		}
+ 		wqe->wq = wq;
+ 		raw_spin_lock_init(&wqe->lock);
+-		INIT_WQ_LIST(&wqe->work_list);
+ 		INIT_HLIST_NULLS_HEAD(&wqe->free_list, 0);
+ 		INIT_LIST_HEAD(&wqe->all_list);
+ 	}
+-- 
+2.34.0
+
+
+--------------808A073775A4081ECB9B4918--
