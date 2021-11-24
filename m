@@ -2,162 +2,201 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF3FC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 03:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C38C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 06:29:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233418AbhKXECM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 23:02:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
+        id S233994AbhKXGcI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 01:32:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232269AbhKXECM (ORCPT
+        with ESMTP id S233387AbhKXGcI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 23:02:12 -0500
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F0EC061574
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:59:03 -0800 (PST)
-Received: by mail-qt1-x833.google.com with SMTP id n15so1469484qta.0
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:59:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FLGJgEePI4OpXm0xDpudyx4k3wJI9GzavZRCOYQCuYU=;
-        b=f4wMII+wD1aVedVSWEDL4k51ZQ1n29efpmduFalGGJ4Z0GYti2+U+Cwsxc9idMIehL
-         gVTOVvRMuXcqeE7gHJPPlMj3jx9au1DxIIGBtkNtWRnVQduTxOzxki9xw//21VGrcgZa
-         KH+/0HRqrQYYWGi8uS7Sib34mXIFAF8aGY+beLor/PNycaLzknwNMxCnz1g4nMegEjCp
-         +bmJvz0qqmiBE/UbN0cQ3tGNx0sqjHKTUT1x7++VrvpuuR59ET2UtHQjpOYVn0RtdnRv
-         tcfNO7Sn1e7wk+m5Vy0MrQorLwhcE3dtYlfz68LfWkov0xLCAuvVqp4DhISG6JZJdich
-         5sXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FLGJgEePI4OpXm0xDpudyx4k3wJI9GzavZRCOYQCuYU=;
-        b=F70rEn3JPlrbwQJcFXNlxc03PlBKjoj6HvR2yZyDw+EsXU/tFLv94aVlZntiZfpLax
-         b94NW3Hm6/6IsPg1T78RCb2dQR3tRF3xmQ4WjLdb00nKO1IVuqEYQolZeHSvSL2Lq65q
-         eD7OMyA2OGOY1iWrXPkFtBf3Hk8oD5yhy9EQf85nxmr/N5SttrPc93LF0ZXL0EWjxPmV
-         6en3U5BoI+dMikoJXIX28cr+TNbTx50WE3aD7HPHSwsLjnMYZJ93mdXC6KLXzEsgxqoo
-         t2rq5DOe/MzV+FLY5grY2MVHhevDDfQcc3JCZUdZ/H1n98AAOF9lfJ1dKnGHrYoq5/Ac
-         X84A==
-X-Gm-Message-State: AOAM530ep4MLjr8dHDRKXi7pSiLJXRK6DVYnAa3X+XIsmBWO9oQau0+d
-        uVnaGpJhPkjoDXk0cD/bGZ22rZnHzL4=
-X-Google-Smtp-Source: ABdhPJxc886yK8I5BPXeBLMx3/yqygYXNXwsbAYfKd25/7AcQCzRfSt6ICZGxYlkYwYXqZwoR4K0cg==
-X-Received: by 2002:a05:622a:346:: with SMTP id r6mr3255745qtw.78.1637726341945;
-        Tue, 23 Nov 2021 19:59:01 -0800 (PST)
-Received: from godwin.fios-router.home (pool-108-18-207-184.washdc.fios.verizon.net. [108.18.207.184])
-        by smtp.gmail.com with ESMTPSA id c3sm7759851qkp.47.2021.11.23.19.59.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Nov 2021 19:59:01 -0800 (PST)
-From:   Sean Anderson <seanga2@gmail.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Tejun Heo <tj@kernel.org>,
-        Yanfei Xu <yanfei.xu@windriver.com>,
-        Sean Anderson <seanga2@gmail.com>
-Subject: [PATCH] block: Fix two memory leaks in blkcg_init_queue
-Date:   Tue, 23 Nov 2021 22:58:58 -0500
-Message-Id: <20211124035858.1657142-1-seanga2@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        Wed, 24 Nov 2021 01:32:08 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF5DC061574
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 22:28:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=eQm62iVzamGF1NbPJeYM6wsIBenXDFL9LJXPcF8bV/U=; b=fXkR1qa90pbho7Jcv7eKAdQUDZ
+        J5gDdYQMr5S/a1l+tL9LJ6ZnIRctQ85E3Xlpk/7Wxe2QiegpQNvQcah+mJawU2OLlAwgB/LY0hciz
+        3nGFWGVr7eiRNV8SP9dS3w/8Ih1MEOth63Y1+sfX5L9DXnuliJ34wGuVIqdngc3dFU8wwEku8zinh
+        vFhKmuVYH5yfJPxT4+67pl5MTYr81TAlkadvitz3rTHkknv3O3lz9MmC9DEz5DDc1hlT6R3wKaNaY
+        R9niQtESM9QehZFpaynH6qqCxpuffuyPptmQ5rIX/EJJp2XoecGx2zczVwcWfqWnSBHFmA6iChmZV
+        lmuY4B7g==;
+Received: from [2001:4bb8:191:f9ce:313b:d079:67e3:886] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mplm4-000XPa-AO; Wed, 24 Nov 2021 06:28:57 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH v2] blk-mq: cleanup request allocation
+Date:   Wed, 24 Nov 2021 07:28:56 +0100
+Message-Id: <20211124062856.1444266-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The ioprio and iolatency rqos never get free'd on error or queue exit, causing
-the following leaks:
+Refactor the request alloction so that blk_mq_get_cached_request tries
+to find a cached request first, and the entirely separate and now
+self contained blk_mq_get_new_requests allocates one or more requests
+if that is not possible.
 
-unreferenced object 0xffff97b143bc0900 (size 64):
-  comm "kworker/u2:3", pid 101, jiffies 4294877468 (age 159.967s)
-  hex dump (first 32 bytes):
-    00 15 f9 86 ff ff ff ff 60 f4 cf 45 b1 97 ff ff  ........`..E....
-    03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<0000000063d10c99>] blk_ioprio_init+0x25/0xe0
-    [<000000005dd8844d>] blkcg_init_queue+0x8d/0x140
-    [<00000000bd7aac9b>] blk_alloc_queue+0x1ef/0x280
-    [<0000000044d961f9>] blk_mq_init_queue+0x1a/0x60
-    [<0000000031908ee1>] scsi_alloc_sdev+0x20f/0x370
-    [<00000000e99f53d3>] scsi_probe_and_add_lun+0x9db/0xe10
-    [<00000000942c5af3>] __scsi_scan_target+0xfc/0x5b0
-    [<000000007194bb8f>] scsi_scan_channel+0x58/0x90
-    [<00000000ebf8a49b>] scsi_scan_host_selected+0xe9/0x120
-    [<00000000f745ec7d>] do_scan_async+0x18/0x160
-    [<000000006f6ff8ca>] async_run_entry_fn+0x30/0x130
-    [<000000003d813304>] process_one_work+0x1e8/0x3c0
-    [<0000000020b6d54d>] worker_thread+0x50/0x3c0
-    [<000000007fc10a0f>] kthread+0x132/0x160
-    [<0000000010197ee2>] ret_from_fork+0x22/0x30
-unreferenced object 0xffff97b143da4360 (size 96):
-  comm "kworker/u2:3", pid 101, jiffies 4294877468 (age 159.987s)
-  hex dump (first 32 bytes):
-    40 1b f9 86 ff ff ff ff 60 f4 cf 45 b1 97 ff ff  @.......`..E....
-    01 00 00 00 00 00 00 00 00 09 bc 43 b1 97 ff ff  ...........C....
-  backtrace:
-    [<000000000ffb4700>] blk_iolatency_init+0x25/0x160
-    [<00000000c4cdb872>] blkcg_init_queue+0xc7/0x140
-    [<00000000bd7aac9b>] blk_alloc_queue+0x1ef/0x280
-    [<0000000044d961f9>] blk_mq_init_queue+0x1a/0x60
-    [<0000000031908ee1>] scsi_alloc_sdev+0x20f/0x370
-    [<00000000e99f53d3>] scsi_probe_and_add_lun+0x9db/0xe10
-    [<00000000942c5af3>] __scsi_scan_target+0xfc/0x5b0
-    [<000000007194bb8f>] scsi_scan_channel+0x58/0x90
-    [<00000000ebf8a49b>] scsi_scan_host_selected+0xe9/0x120
-    [<00000000f745ec7d>] do_scan_async+0x18/0x160
-    [<000000006f6ff8ca>] async_run_entry_fn+0x30/0x130
-    [<000000003d813304>] process_one_work+0x1e8/0x3c0
-    [<0000000020b6d54d>] worker_thread+0x50/0x3c0
-    [<000000007fc10a0f>] kthread+0x132/0x160
-    [<0000000010197ee2>] ret_from_fork+0x22/0x30
+There is a small change in behavior as submit_bio_checks is called
+twice now if a cached request is present but can't be used, but that
+is a small price to pay for unwinding this code.
 
-Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
-Fixes: 556910e39249 ("block: Introduce the ioprio rq-qos policy")
-Signed-off-by: Sean Anderson <seanga2@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
 
- block/blk-cgroup.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Changes since v1:
+ - rebased to the latests for-5.17/block tree
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 663aabfeba18..ced5ee637405 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -32,6 +32,7 @@
- #include <linux/psi.h>
- #include "blk.h"
- #include "blk-ioprio.h"
-+#include "blk-rq-qos.h"
- #include "blk-throttle.h"
+ block/blk-mq.c | 90 +++++++++++++++++++++-----------------------------
+ 1 file changed, 38 insertions(+), 52 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cb41c441aa8fa..0704a1400663b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2716,8 +2716,12 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 	};
+ 	struct request *rq;
  
- /*
-@@ -1200,16 +1201,18 @@ int blkcg_init_queue(struct request_queue *q)
+-	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
++	if (unlikely(bio_queue_enter(bio)))
+ 		return NULL;
++	if (unlikely(!submit_bio_checks(bio)))
++		goto queue_exit;
++	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
++		goto queue_exit;
  
- 	ret = blk_throtl_init(q);
- 	if (ret)
--		goto err_destroy_all;
-+		goto err_qos_exit;
+ 	rq_qos_throttle(q, bio);
  
- 	ret = blk_iolatency_init(q);
- 	if (ret) {
- 		blk_throtl_exit(q);
--		goto err_destroy_all;
-+		goto err_qos_exit;
+@@ -2728,64 +2732,44 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
  	}
  
- 	return 0;
+ 	rq = __blk_mq_alloc_requests(&data);
+-	if (rq)
+-		return rq;
++	if (!rq)
++		goto fail;
++	return rq;
  
-+err_qos_exit:
-+	rq_qos_exit(q);
- err_destroy_all:
- 	blkg_destroy_all(q);
- 	return ret;
-@@ -1229,6 +1232,7 @@ int blkcg_init_queue(struct request_queue *q)
-  */
- void blkcg_exit_queue(struct request_queue *q)
- {
-+	rq_qos_exit(q);
- 	blkg_destroy_all(q);
- 	blk_throtl_exit(q);
++fail:
+ 	rq_qos_cleanup(q, bio);
+ 	if (bio->bi_opf & REQ_NOWAIT)
+ 		bio_wouldblock_error(bio);
+-
++queue_exit:
++	blk_queue_exit(q);
+ 	return NULL;
  }
+ 
+-static inline bool blk_mq_can_use_cached_rq(struct request *rq, struct bio *bio)
+-{
+-	if (blk_mq_get_hctx_type(bio->bi_opf) != rq->mq_hctx->type)
+-		return false;
+-
+-	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
+-		return false;
+-
+-	return true;
+-}
+-
+-static inline struct request *blk_mq_get_request(struct request_queue *q,
+-						 struct blk_plug *plug,
+-						 struct bio *bio,
+-						 unsigned int nsegs)
++static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
++		struct blk_plug *plug, struct bio *bio, unsigned int nsegs)
+ {
+ 	struct request *rq;
+-	bool checked = false;
+ 
+-	if (plug) {
+-		rq = rq_list_peek(&plug->cached_rq);
+-		if (rq && rq->q == q) {
+-			if (unlikely(!submit_bio_checks(bio)))
+-				return NULL;
+-			if (blk_mq_attempt_bio_merge(q, bio, nsegs))
+-				return NULL;
+-			checked = true;
+-			if (!blk_mq_can_use_cached_rq(rq, bio))
+-				goto fallback;
+-			rq->cmd_flags = bio->bi_opf;
+-			plug->cached_rq = rq_list_next(rq);
+-			INIT_LIST_HEAD(&rq->queuelist);
+-			rq_qos_throttle(q, bio);
+-			return rq;
+-		}
+-	}
++	if (!plug)
++		return NULL;
++	rq = rq_list_peek(&plug->cached_rq);
++	if (!rq || rq->q != q)
++		return NULL;
+ 
+-fallback:
+-	if (unlikely(bio_queue_enter(bio)))
++	if (unlikely(!submit_bio_checks(bio)))
+ 		return NULL;
+-	if (unlikely(!checked && !submit_bio_checks(bio)))
+-		goto out_put;
+-	rq = blk_mq_get_new_requests(q, plug, bio, nsegs);
+-	if (rq)
+-		return rq;
+-out_put:
+-	blk_queue_exit(q);
+-	return NULL;
++	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
++		return NULL;
++	if (blk_mq_get_hctx_type(bio->bi_opf) != rq->mq_hctx->type)
++		return NULL;
++	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
++		return NULL;
++
++	rq->cmd_flags = bio->bi_opf;
++	plug->cached_rq = rq_list_next(rq);
++	INIT_LIST_HEAD(&rq->queuelist);
++	rq_qos_throttle(q, bio);
++	return rq;
+ }
+ 
+ /**
+@@ -2804,9 +2788,9 @@ static inline struct request *blk_mq_get_request(struct request_queue *q,
+ void blk_mq_submit_bio(struct bio *bio)
+ {
+ 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
++	struct blk_plug *plug = blk_mq_plug(q, bio);
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+ 	struct request *rq;
+-	struct blk_plug *plug;
+ 	unsigned int nr_segs = 1;
+ 	blk_status_t ret;
+ 
+@@ -2820,10 +2804,12 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	if (!bio_integrity_prep(bio))
+ 		return;
+ 
+-	plug = blk_mq_plug(q, bio);
+-	rq = blk_mq_get_request(q, plug, bio, nr_segs);
+-	if (unlikely(!rq))
+-		return;
++	rq = blk_mq_get_cached_request(q, plug, bio, nr_segs);
++	if (!rq) {
++		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
++		if (unlikely(!rq))
++			return;
++	}
+ 
+ 	trace_block_getrq(bio);
+ 
 -- 
-2.33.0
+2.30.2
 
