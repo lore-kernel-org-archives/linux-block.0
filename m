@@ -2,130 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 546B5C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 03:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF3FC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 03:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240826AbhKXDan (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 22:30:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43342 "EHLO
+        id S233418AbhKXECM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Nov 2021 23:02:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240495AbhKXDan (ORCPT
+        with ESMTP id S232269AbhKXECM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 22:30:43 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6543C061714
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:27:33 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id r25so3832983edq.7
-        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:27:33 -0800 (PST)
+        Tue, 23 Nov 2021 23:02:12 -0500
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F0EC061574
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:59:03 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id n15so1469484qta.0
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:59:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mariadb.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=D3mlwxctVc4YiNL6SnhzyJ7Y2X2Dj6ittHGw+Kf7k0k=;
-        b=FQFEgmxbILrG5odT1Ghdmx+0mB51dD6nTOs2uX5aQJDin9DYe/wkkczPtxjcJag/fC
-         XAlCINVzNG6gNeiGEzmCsRZ2QH3AsLSuGxi0Vsl4Mm9UD1iZboHxKvnB1JAy4Bjjbyt+
-         +m7uDe6YdsvE+k1rfVp85v/8zhTdsWSP7ZfPc7cQEuVy9minHTpXQjT9U6V0bhd4gncD
-         4kW3gsQ7FZfMNgv09yYwtrl6HkzCj79fbf7FgCUmlA6hi88hRKf+yiH4ebF6QInaoSIh
-         ZZ/OP6qO/EfBMxR8wIn20wXbNJI6wZMp30DGSuI5vUf5NKaNoBi4K7fiI46X8EE57Aho
-         8sEQ==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FLGJgEePI4OpXm0xDpudyx4k3wJI9GzavZRCOYQCuYU=;
+        b=f4wMII+wD1aVedVSWEDL4k51ZQ1n29efpmduFalGGJ4Z0GYti2+U+Cwsxc9idMIehL
+         gVTOVvRMuXcqeE7gHJPPlMj3jx9au1DxIIGBtkNtWRnVQduTxOzxki9xw//21VGrcgZa
+         KH+/0HRqrQYYWGi8uS7Sib34mXIFAF8aGY+beLor/PNycaLzknwNMxCnz1g4nMegEjCp
+         +bmJvz0qqmiBE/UbN0cQ3tGNx0sqjHKTUT1x7++VrvpuuR59ET2UtHQjpOYVn0RtdnRv
+         tcfNO7Sn1e7wk+m5Vy0MrQorLwhcE3dtYlfz68LfWkov0xLCAuvVqp4DhISG6JZJdich
+         5sXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=D3mlwxctVc4YiNL6SnhzyJ7Y2X2Dj6ittHGw+Kf7k0k=;
-        b=b2ctibKxPMwyfy0oAloHgBBn6rKWu9M8Eoqbnwxd/xkIZy4ry2q7FNEQRI7wcoiUJV
-         ftbCay+RzbWYRFMDinG3bLmc6v2Uog3wsLCtIG75yft4t/oChVc1aGbAModPf5mF2NcO
-         NigtXgnH8K0KuJ2IGInAnl6Rha7eMotE29vH5hN5F8hJtBr17AUf6nGMq9LhUnQ4O2JP
-         kQEza2psLuNDmj7AL1mOmMQNMdnjTABfEUNQ9fiEAUu9i+1qnxqmPKarwl8kQkc5/D0n
-         7ycSh3IDlaLj4omLpMpcrPbJ1sA0hL+csgwUHQ3eLPSZXjvmfeUAKdGCV6NeERIoqX0X
-         PEfQ==
-X-Gm-Message-State: AOAM5325nlKMQm6D+MVgUcMujaUCH91avbXY7qjjzgi4PrFUjxzyNruj
-        XWGjhvW0yuFyO6S8mq+rQJexwid3q5hcRztIT4K/Ug==
-X-Google-Smtp-Source: ABdhPJxEX3C0q6ga3rdCbtItwvoOsWDSpxLt++YGtTOkdlHeJP27dulf3Jmz7XeNV7OAQLgXeItWjRxmNtT7gDbl9Zk=
-X-Received: by 2002:a05:6402:40d3:: with SMTP id z19mr19351146edb.185.1637724452475;
- Tue, 23 Nov 2021 19:27:32 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FLGJgEePI4OpXm0xDpudyx4k3wJI9GzavZRCOYQCuYU=;
+        b=F70rEn3JPlrbwQJcFXNlxc03PlBKjoj6HvR2yZyDw+EsXU/tFLv94aVlZntiZfpLax
+         b94NW3Hm6/6IsPg1T78RCb2dQR3tRF3xmQ4WjLdb00nKO1IVuqEYQolZeHSvSL2Lq65q
+         eD7OMyA2OGOY1iWrXPkFtBf3Hk8oD5yhy9EQf85nxmr/N5SttrPc93LF0ZXL0EWjxPmV
+         6en3U5BoI+dMikoJXIX28cr+TNbTx50WE3aD7HPHSwsLjnMYZJ93mdXC6KLXzEsgxqoo
+         t2rq5DOe/MzV+FLY5grY2MVHhevDDfQcc3JCZUdZ/H1n98AAOF9lfJ1dKnGHrYoq5/Ac
+         X84A==
+X-Gm-Message-State: AOAM530ep4MLjr8dHDRKXi7pSiLJXRK6DVYnAa3X+XIsmBWO9oQau0+d
+        uVnaGpJhPkjoDXk0cD/bGZ22rZnHzL4=
+X-Google-Smtp-Source: ABdhPJxc886yK8I5BPXeBLMx3/yqygYXNXwsbAYfKd25/7AcQCzRfSt6ICZGxYlkYwYXqZwoR4K0cg==
+X-Received: by 2002:a05:622a:346:: with SMTP id r6mr3255745qtw.78.1637726341945;
+        Tue, 23 Nov 2021 19:59:01 -0800 (PST)
+Received: from godwin.fios-router.home (pool-108-18-207-184.washdc.fios.verizon.net. [108.18.207.184])
+        by smtp.gmail.com with ESMTPSA id c3sm7759851qkp.47.2021.11.23.19.59.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 19:59:01 -0800 (PST)
+From:   Sean Anderson <seanga2@gmail.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Tejun Heo <tj@kernel.org>,
+        Yanfei Xu <yanfei.xu@windriver.com>,
+        Sean Anderson <seanga2@gmail.com>
+Subject: [PATCH] block: Fix two memory leaks in blkcg_init_queue
+Date:   Tue, 23 Nov 2021 22:58:58 -0500
+Message-Id: <20211124035858.1657142-1-seanga2@gmail.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
- <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com> <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
- <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com> <YXz0roPH+stjFygk@eldamar.lan>
- <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
- <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
- <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk> <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
- <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
- <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk> <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
- <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk> <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
- <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk> <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
- <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk> <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
- <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
-In-Reply-To: <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
-From:   Daniel Black <daniel@mariadb.org>
-Date:   Wed, 24 Nov 2021 14:27:21 +1100
-Message-ID: <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
-Subject: Re: uring regression - lost write request
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Salvatore Bonaccorso <carnil@debian.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 7:55 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 11/14/21 1:33 PM, Daniel Black wrote:
-> > On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
-> >>
-> >> Alright, give this one a go if you can. Against -git, but will apply t=
-o
-> >> 5.15 as well.
-> >
-> >
-> > Works. Thank you very much.
-> >
-> > https://jira.mariadb.org/browse/MDEV-26674?page=3Dcom.atlassian.jira.pl=
-ugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=3D205599#comme=
-nt-205599
-> >
-> > Tested-by: Marko M=C3=A4kel=C3=A4 <marko.makela@mariadb.com>
->
-> The patch is already upstream (and in the 5.15 stable queue), and I
-> provided 5.14 patches too.
+The ioprio and iolatency rqos never get free'd on error or queue exit, causing
+the following leaks:
 
-Jens,
+unreferenced object 0xffff97b143bc0900 (size 64):
+  comm "kworker/u2:3", pid 101, jiffies 4294877468 (age 159.967s)
+  hex dump (first 32 bytes):
+    00 15 f9 86 ff ff ff ff 60 f4 cf 45 b1 97 ff ff  ........`..E....
+    03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<0000000063d10c99>] blk_ioprio_init+0x25/0xe0
+    [<000000005dd8844d>] blkcg_init_queue+0x8d/0x140
+    [<00000000bd7aac9b>] blk_alloc_queue+0x1ef/0x280
+    [<0000000044d961f9>] blk_mq_init_queue+0x1a/0x60
+    [<0000000031908ee1>] scsi_alloc_sdev+0x20f/0x370
+    [<00000000e99f53d3>] scsi_probe_and_add_lun+0x9db/0xe10
+    [<00000000942c5af3>] __scsi_scan_target+0xfc/0x5b0
+    [<000000007194bb8f>] scsi_scan_channel+0x58/0x90
+    [<00000000ebf8a49b>] scsi_scan_host_selected+0xe9/0x120
+    [<00000000f745ec7d>] do_scan_async+0x18/0x160
+    [<000000006f6ff8ca>] async_run_entry_fn+0x30/0x130
+    [<000000003d813304>] process_one_work+0x1e8/0x3c0
+    [<0000000020b6d54d>] worker_thread+0x50/0x3c0
+    [<000000007fc10a0f>] kthread+0x132/0x160
+    [<0000000010197ee2>] ret_from_fork+0x22/0x30
+unreferenced object 0xffff97b143da4360 (size 96):
+  comm "kworker/u2:3", pid 101, jiffies 4294877468 (age 159.987s)
+  hex dump (first 32 bytes):
+    40 1b f9 86 ff ff ff ff 60 f4 cf 45 b1 97 ff ff  @.......`..E....
+    01 00 00 00 00 00 00 00 00 09 bc 43 b1 97 ff ff  ...........C....
+  backtrace:
+    [<000000000ffb4700>] blk_iolatency_init+0x25/0x160
+    [<00000000c4cdb872>] blkcg_init_queue+0xc7/0x140
+    [<00000000bd7aac9b>] blk_alloc_queue+0x1ef/0x280
+    [<0000000044d961f9>] blk_mq_init_queue+0x1a/0x60
+    [<0000000031908ee1>] scsi_alloc_sdev+0x20f/0x370
+    [<00000000e99f53d3>] scsi_probe_and_add_lun+0x9db/0xe10
+    [<00000000942c5af3>] __scsi_scan_target+0xfc/0x5b0
+    [<000000007194bb8f>] scsi_scan_channel+0x58/0x90
+    [<00000000ebf8a49b>] scsi_scan_host_selected+0xe9/0x120
+    [<00000000f745ec7d>] do_scan_async+0x18/0x160
+    [<000000006f6ff8ca>] async_run_entry_fn+0x30/0x130
+    [<000000003d813304>] process_one_work+0x1e8/0x3c0
+    [<0000000020b6d54d>] worker_thread+0x50/0x3c0
+    [<000000007fc10a0f>] kthread+0x132/0x160
+    [<0000000010197ee2>] ret_from_fork+0x22/0x30
 
-I'm getting the same reproducer on 5.14.20
-(https://bugzilla.redhat.com/show_bug.cgi?id=3D2018882#c3) though the
-backport change logs indicate 5.14.19 has the patch.
+Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
+Fixes: 556910e39249 ("block: Introduce the ioprio rq-qos policy")
+Signed-off-by: Sean Anderson <seanga2@gmail.com>
+---
 
-Anything missing?
+ block/blk-cgroup.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-ext4 again (my mount is /dev/mapper/fedora_localhost--live-home on
-/home type ext4 (rw,relatime,seclabel)).
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 663aabfeba18..ced5ee637405 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -32,6 +32,7 @@
+ #include <linux/psi.h>
+ #include "blk.h"
+ #include "blk-ioprio.h"
++#include "blk-rq-qos.h"
+ #include "blk-throttle.h"
+ 
+ /*
+@@ -1200,16 +1201,18 @@ int blkcg_init_queue(struct request_queue *q)
+ 
+ 	ret = blk_throtl_init(q);
+ 	if (ret)
+-		goto err_destroy_all;
++		goto err_qos_exit;
+ 
+ 	ret = blk_iolatency_init(q);
+ 	if (ret) {
+ 		blk_throtl_exit(q);
+-		goto err_destroy_all;
++		goto err_qos_exit;
+ 	}
+ 
+ 	return 0;
+ 
++err_qos_exit:
++	rq_qos_exit(q);
+ err_destroy_all:
+ 	blkg_destroy_all(q);
+ 	return ret;
+@@ -1229,6 +1232,7 @@ int blkcg_init_queue(struct request_queue *q)
+  */
+ void blkcg_exit_queue(struct request_queue *q)
+ {
++	rq_qos_exit(q);
+ 	blkg_destroy_all(q);
+ 	blk_throtl_exit(q);
+ }
+-- 
+2.33.0
 
-previous container should work, thought a source option is there:
-
-build deps: liburing-dev, bison, libevent-dev, ncurses-dev, c++
-libraries/compiler
-
-git clone --branch 10.6 --single-branch
-https://github.com/MariaDB/server mariadb-server
-(cd mariadb-server; git submodule update --init --recursive)
-mkdir build-mariadb-server
-cd build-mariadb-server
-cmake -DPLUGIN_{MROONGA,ROCKSDB,CONNECT,SPIDER,SPHINX,S3,COLUMNSTORE}=3DNO
-../mariadb-server
-(ensure liburing userspace is picked up)
-cmake --build . --parallel
-mysql-test/mtr  --mysqld=3D--innodb_use_native_aio=3D1 --nowarnings
---parallel=3D4 --force encryption.innochecksum{,,,,,}
-
-Adding to mtr: --mysqld=3D--innodb_io_capacity=3D50000
---mysqld=3D--innodb_io_capacity_max=3D90000 will probably trip this
-quicker.
-
-
-5.15.3 is good (https://jira.mariadb.org/browse/MDEV-26674?focusedCommentId=
-=3D206787&page=3Dcom.atlassian.jira.plugin.system.issuetabpanels:comment-ta=
-bpanel#comment-206787).
