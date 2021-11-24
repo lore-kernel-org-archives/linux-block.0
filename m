@@ -2,106 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B893BC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 01:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 546B5C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 03:27:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230132AbhKXBlo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Nov 2021 20:41:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45658 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229729AbhKXBlo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Nov 2021 20:41:44 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 69BA560555
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 01:38:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637717915;
-        bh=0loXintXG2WGKke7uLOT/uavnU8gaf/DZhFFOSI6HlU=;
-        h=From:To:Subject:Date:From;
-        b=Hz2EuyftdRUkU1qnsO6M7AV6IZVUBaZkvR7mJNYTYGvrYRBVQ7hJtKwc2cnZv+tKy
-         6AJw0/oPm12seRZiue3H+0rsQ2EYj07FLjCJdCBN0QbQ4UWrKLjOXCQj1z8ZVEQq4v
-         oHL8IkxEtBaS679TfyKsEd+5wYxD3vNgfjbGnv3H2DDOQdp2iNi920GaGIy0ljaVIW
-         uydOfXQeoL2NdaMMQzK/SMJ0wwavSYP1vowNCoVLRWd8X1PH+hjYVEwpISsZSo10Vh
-         o1lYVhDsZrX/0GILxh+jEg6BFpFx2UA6CXcuRXM574IBBV4DjDSv2yXSes3XpUy/HT
-         clLereAAEiJGA==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org
-Subject: [PATCH] blk-crypto: remove blk_crypto_unregister()
-Date:   Tue, 23 Nov 2021 17:37:33 -0800
-Message-Id: <20211124013733.347612-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.34.0
+        id S240826AbhKXDan (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Nov 2021 22:30:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43342 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240495AbhKXDan (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Nov 2021 22:30:43 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6543C061714
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:27:33 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id r25so3832983edq.7
+        for <linux-block@vger.kernel.org>; Tue, 23 Nov 2021 19:27:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mariadb.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=D3mlwxctVc4YiNL6SnhzyJ7Y2X2Dj6ittHGw+Kf7k0k=;
+        b=FQFEgmxbILrG5odT1Ghdmx+0mB51dD6nTOs2uX5aQJDin9DYe/wkkczPtxjcJag/fC
+         XAlCINVzNG6gNeiGEzmCsRZ2QH3AsLSuGxi0Vsl4Mm9UD1iZboHxKvnB1JAy4Bjjbyt+
+         +m7uDe6YdsvE+k1rfVp85v/8zhTdsWSP7ZfPc7cQEuVy9minHTpXQjT9U6V0bhd4gncD
+         4kW3gsQ7FZfMNgv09yYwtrl6HkzCj79fbf7FgCUmlA6hi88hRKf+yiH4ebF6QInaoSIh
+         ZZ/OP6qO/EfBMxR8wIn20wXbNJI6wZMp30DGSuI5vUf5NKaNoBi4K7fiI46X8EE57Aho
+         8sEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=D3mlwxctVc4YiNL6SnhzyJ7Y2X2Dj6ittHGw+Kf7k0k=;
+        b=b2ctibKxPMwyfy0oAloHgBBn6rKWu9M8Eoqbnwxd/xkIZy4ry2q7FNEQRI7wcoiUJV
+         ftbCay+RzbWYRFMDinG3bLmc6v2Uog3wsLCtIG75yft4t/oChVc1aGbAModPf5mF2NcO
+         NigtXgnH8K0KuJ2IGInAnl6Rha7eMotE29vH5hN5F8hJtBr17AUf6nGMq9LhUnQ4O2JP
+         kQEza2psLuNDmj7AL1mOmMQNMdnjTABfEUNQ9fiEAUu9i+1qnxqmPKarwl8kQkc5/D0n
+         7ycSh3IDlaLj4omLpMpcrPbJ1sA0hL+csgwUHQ3eLPSZXjvmfeUAKdGCV6NeERIoqX0X
+         PEfQ==
+X-Gm-Message-State: AOAM5325nlKMQm6D+MVgUcMujaUCH91avbXY7qjjzgi4PrFUjxzyNruj
+        XWGjhvW0yuFyO6S8mq+rQJexwid3q5hcRztIT4K/Ug==
+X-Google-Smtp-Source: ABdhPJxEX3C0q6ga3rdCbtItwvoOsWDSpxLt++YGtTOkdlHeJP27dulf3Jmz7XeNV7OAQLgXeItWjRxmNtT7gDbl9Zk=
+X-Received: by 2002:a05:6402:40d3:: with SMTP id z19mr19351146edb.185.1637724452475;
+ Tue, 23 Nov 2021 19:27:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CABVffENnJ8JkP7EtuUTqi+VkJDBFU37w1UXe4Q3cB7-ixxh0VA@mail.gmail.com>
+ <8cd3d258-91b8-c9b2-106c-01b577cc44d4@gmail.com> <CABVffEOMVbQ+MynbcNfD7KEA5Mwqdwm1YuOKgRWnpySboQSkSg@mail.gmail.com>
+ <23555381-2bea-f63a-1715-a80edd3ee27f@gmail.com> <YXz0roPH+stjFygk@eldamar.lan>
+ <CABVffEO4mBTuiLzvny1G1ocO7PvTpKYTCS5TO2fbaevu2TqdGQ@mail.gmail.com>
+ <CABVffEMy+gWfkuEg4UOTZe3p_k0Ryxey921Hw2De8MyE=JafeA@mail.gmail.com>
+ <f4f2ff29-abdd-b448-f58f-7ea99c35eb2b@kernel.dk> <ef299d5b-cc48-6c92-024d-27024b671fd3@kernel.dk>
+ <CABVffEOpuViC9OyOuZg28sRfGK4GRc8cV0CnkOU2cM0RJyRhPw@mail.gmail.com>
+ <e9b4d07e-d43d-9b3c-ac4c-f8b88bb987d4@kernel.dk> <1bd48c9b-c462-115c-d077-1b724d7e4d10@kernel.dk>
+ <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk> <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk> <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+ <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk> <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+ <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
+In-Reply-To: <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
+From:   Daniel Black <daniel@mariadb.org>
+Date:   Wed, 24 Nov 2021 14:27:21 +1100
+Message-ID: <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
+Subject: Re: uring regression - lost write request
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Salvatore Bonaccorso <carnil@debian.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Mon, Nov 15, 2021 at 7:55 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 11/14/21 1:33 PM, Daniel Black wrote:
+> > On Fri, Nov 12, 2021 at 10:44 AM Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> Alright, give this one a go if you can. Against -git, but will apply t=
+o
+> >> 5.15 as well.
+> >
+> >
+> > Works. Thank you very much.
+> >
+> > https://jira.mariadb.org/browse/MDEV-26674?page=3Dcom.atlassian.jira.pl=
+ugin.system.issuetabpanels:comment-tabpanel&focusedCommentId=3D205599#comme=
+nt-205599
+> >
+> > Tested-by: Marko M=C3=A4kel=C3=A4 <marko.makela@mariadb.com>
+>
+> The patch is already upstream (and in the 5.15 stable queue), and I
+> provided 5.14 patches too.
 
-This function is trivial and is only used in one place.  Having this
-function is misleading because it implies that blk_crypto_register()
-needs to be paired with blk_crypto_unregister(), which is not the case.
-Just set disk->queue->crypto_profile to NULL directly.
+Jens,
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- block/blk-crypto-profile.c | 5 -----
- block/blk-integrity.c      | 2 +-
- include/linux/blkdev.h     | 4 ----
- 3 files changed, 1 insertion(+), 10 deletions(-)
+I'm getting the same reproducer on 5.14.20
+(https://bugzilla.redhat.com/show_bug.cgi?id=3D2018882#c3) though the
+backport change logs indicate 5.14.19 has the patch.
 
-diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
-index 605ba0626a5c0..96c511967386d 100644
---- a/block/blk-crypto-profile.c
-+++ b/block/blk-crypto-profile.c
-@@ -463,11 +463,6 @@ bool blk_crypto_register(struct blk_crypto_profile *profile,
- }
- EXPORT_SYMBOL_GPL(blk_crypto_register);
- 
--void blk_crypto_unregister(struct request_queue *q)
--{
--	q->crypto_profile = NULL;
--}
--
- /**
-  * blk_crypto_intersect_capabilities() - restrict supported crypto capabilities
-  *					 by child device
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index d670d54e5f7ac..69eed260a8239 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -411,7 +411,7 @@ void blk_integrity_register(struct gendisk *disk, struct blk_integrity *template
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
- 	if (disk->queue->crypto_profile) {
- 		pr_warn("blk-integrity: Integrity and hardware inline encryption are not supported together. Disabling hardware inline encryption.\n");
--		blk_crypto_unregister(disk->queue);
-+		disk->queue->crypto_profile = NULL;
- 	}
- #endif
- }
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bd4370baccca3..26cad06ed9f8d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1171,8 +1171,6 @@ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned lo
- bool blk_crypto_register(struct blk_crypto_profile *profile,
- 			 struct request_queue *q);
- 
--void blk_crypto_unregister(struct request_queue *q);
--
- #else /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
- static inline bool blk_crypto_register(struct blk_crypto_profile *profile,
-@@ -1181,8 +1179,6 @@ static inline bool blk_crypto_register(struct blk_crypto_profile *profile,
- 	return true;
- }
- 
--static inline void blk_crypto_unregister(struct request_queue *q) { }
--
- #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
- enum blk_unique_id {
+Anything missing?
 
-base-commit: 136057256686de39cc3a07c2e39ef6bc43003ff6
--- 
-2.34.0
+ext4 again (my mount is /dev/mapper/fedora_localhost--live-home on
+/home type ext4 (rw,relatime,seclabel)).
 
+previous container should work, thought a source option is there:
+
+build deps: liburing-dev, bison, libevent-dev, ncurses-dev, c++
+libraries/compiler
+
+git clone --branch 10.6 --single-branch
+https://github.com/MariaDB/server mariadb-server
+(cd mariadb-server; git submodule update --init --recursive)
+mkdir build-mariadb-server
+cd build-mariadb-server
+cmake -DPLUGIN_{MROONGA,ROCKSDB,CONNECT,SPIDER,SPHINX,S3,COLUMNSTORE}=3DNO
+../mariadb-server
+(ensure liburing userspace is picked up)
+cmake --build . --parallel
+mysql-test/mtr  --mysqld=3D--innodb_use_native_aio=3D1 --nowarnings
+--parallel=3D4 --force encryption.innochecksum{,,,,,}
+
+Adding to mtr: --mysqld=3D--innodb_io_capacity=3D50000
+--mysqld=3D--innodb_io_capacity_max=3D90000 will probably trip this
+quicker.
+
+
+5.15.3 is good (https://jira.mariadb.org/browse/MDEV-26674?focusedCommentId=
+=3D206787&page=3Dcom.atlassian.jira.plugin.system.issuetabpanels:comment-ta=
+bpanel#comment-206787).
