@@ -2,93 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD75C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 14:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890EC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 14:35:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352322AbhKXO3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Nov 2021 09:29:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46994 "EHLO
+        id S1356666AbhKXOiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 09:38:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354529AbhKXO2k (ORCPT
+        with ESMTP id S1350936AbhKXOiF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Nov 2021 09:28:40 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6AE7C09349C
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 04:52:39 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id np3so2460618pjb.4
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 04:52:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HhjBXu1spqUIZjkRdjpzeyORochpjVOEaVaDPxXcrPQ=;
-        b=cozjCge9C5AJHrR7oEYfC4H5dkIzE4za65ooehhEDODirMwBkx44ZasUqVRuZQWujJ
-         gLcIRvV2ytmSyoMtPwV80a2ov7/8xQ8F1jN5Ka31YHmLtjCcpMevKvVosXcWfN2c+1Jb
-         sV9VuliLm+ijvS95fU15IHh1dAfRS0JY5T/eRapNdd5VKoQS12ad14Q8IKrfsM5Ls79s
-         +wJWEcutl90kr4ajU07j2aDzMdR6bggL30DiCD9kEh79V0+Jm+jKS6+PK4IDwqf9H1hW
-         TfT+0Wg8VC52+FegNo/hpFCCOH+j+qgxOPShKmr7dzLp+Z5U7IRnM1TjEZA9SiceaVOa
-         X8oA==
+        Wed, 24 Nov 2021 09:38:05 -0500
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11B7EC1E9D8C;
+        Wed, 24 Nov 2021 05:33:50 -0800 (PST)
+Received: by mail-ot1-x335.google.com with SMTP id 35-20020a9d08a6000000b00579cd5e605eso4357929otf.0;
+        Wed, 24 Nov 2021 05:33:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HhjBXu1spqUIZjkRdjpzeyORochpjVOEaVaDPxXcrPQ=;
-        b=RH5NEAucN6SkB+uUBoijw55COWSs/ihcVvLBoenchPRsKvO5oKX4pHE2SX1q5JP8tI
-         7hcTc+uH0mCK+2opYHXeeNUaXKt1yPJOH4arOXBDARjHN1dkjvVQVwCXBDJnohqpFc38
-         cXgC4b5xoz9Ea1rN7QXVpVW1uOGMtcwZokbrZNGGSi+dCahgyW6XcCo6/ds/z8VDG/Rs
-         IPbKRY8TPLGr2oxqOi5PYFjNKFL0Oq/kO6TZDpBJqs0XTaSRRpFQsTpfFMOEXVcn0/uz
-         4dP0Od46KQf551SyTbKS4jeIxsjoOj9YfGbjZ8+Y9dLcaa9AjP/EiZGTpdQ4P0GqU1kJ
-         f+Kg==
-X-Gm-Message-State: AOAM532VKHRsfttYAq0ot8kZd9mHeg+Q7Tkq/+B/G3ZpYtxGWO1dTomm
-        b0/ZtcJ/ZLHl5A4JNx3NXmUwiaqgdsP27w==
-X-Google-Smtp-Source: ABdhPJzZFmFUqoKwaz3+cRX0U2oYcE7QkVtC4kMstCgBFC/exmSsTzJol9/zOHRltI3kymN3X2Yefw==
-X-Received: by 2002:a17:903:22c6:b0:141:fac1:b722 with SMTP id y6-20020a17090322c600b00141fac1b722mr18412923plg.23.1637758359382;
-        Wed, 24 Nov 2021 04:52:39 -0800 (PST)
-Received: from localhost ([182.65.219.35])
-        by smtp.gmail.com with ESMTPSA id u38sm18378941pfg.0.2021.11.24.04.52.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Nov 2021 04:52:38 -0800 (PST)
-Date:   Wed, 24 Nov 2021 18:22:36 +0530
-From:   Pankaj Raghav <pankydev8@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, p.raghav@samsung.com
-Subject: Re: [PATCH 1/2] block: only allocate poll_stats if there's a user of
- them
-Message-ID: <20211124125236.s7h7e2tunjxt3r3j@quentin>
-References: <20211123191518.413917-1-axboe@kernel.dk>
- <20211123191518.413917-2-axboe@kernel.dk>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=091FqIUggUob/ZEgOD1UGmSVx8eqHMlVt+VyvTQhn6A=;
+        b=5alA6/f+UhETRaXz3Ziw0Mbfo79WBHXEc9krzNgtd01IqyNVmRhY/0lZB/P6eLDJQW
+         eoZjcdR6rFE3pNseQfZ/D4cF20VQuAdK9siwpsGXViPdZGdSZj5I7hCVl20qAoKihTGU
+         9Y2cOZqzkmtsFqHF2VURZQn4cJm3wj70y+AFGjSq6Sge2gQczR5OFVvJJdJ6IFzUWzxq
+         IVi22hsX9WOChk0ReYeUTGW+sRirou0ll7bhp3yZtfxQJtiPER1ed37a6y9j3340xgjb
+         ErontMp+30VXcxUe44s8V4vCUHh05Mex6eQ39n7jGM/fHZcBKylMk53BPCN8cbtkTZqx
+         +ZjA==
+X-Gm-Message-State: AOAM531TyN2EynZbSlLf7LBYl1nok7NN7r4Hxj4bx77v+XJxg7AIKRGn
+        uytjIbBVqRFhWWLNCZpA+SzEgd93DpVRF3YhMW0=
+X-Google-Smtp-Source: ABdhPJzQoNI/Fsb1RYaYMIo8ITBU8mCa/gSsaWPVLoUcuICuMNXnffh1kRK/Zt6rxw8a35LfxbFQ+4vJZ0v59kljSMQ=
+X-Received: by 2002:a05:6830:348f:: with SMTP id c15mr13170421otu.254.1637760829265;
+ Wed, 24 Nov 2021 05:33:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211123191518.413917-2-axboe@kernel.dk>
+References: <20210818060533.3569517-1-keescook@chromium.org>
+ <20210818060533.3569517-13-keescook@chromium.org> <CAJZ5v0iS3qMgdab1S-NzGfeLLXV=S6p5Qx8AaqJ50rsUngS=LA@mail.gmail.com>
+ <c5d1ee1f3b59bf18591a164c185650c77ec8aba7.camel@linux.intel.com>
+In-Reply-To: <c5d1ee1f3b59bf18591a164c185650c77ec8aba7.camel@linux.intel.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Wed, 24 Nov 2021 14:33:38 +0100
+Message-ID: <CAJZ5v0i61F9SpwfER8o5J_Kf=J9dJUv-qd+bG9hcL42X2eMRtw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/63] thermal: intel: int340x_thermal: Use
+ struct_group() for memcpy() region
+To:     Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Kees Cook <keescook@chromium.org>
+Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "open list:NETWORKING DRIVERS (WIRELESS)" 
+        <linux-wireless@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        linux-staging@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Wed, Nov 24, 2021 at 12:53 AM Srinivas Pandruvada
+<srinivas.pandruvada@linux.intel.com> wrote:
+>
+> On Tue, 2021-11-23 at 14:19 +0100, Rafael J. Wysocki wrote:
+> > On Wed, Aug 18, 2021 at 8:08 AM Kees Cook <keescook@chromium.org>
+> > wrote:
+> > >
+> > > In preparation for FORTIFY_SOURCE performing compile-time and run-
+> > > time
+> > > field bounds checking for memcpy(), avoid intentionally writing
+> > > across
+> > > neighboring fields.
+> > >
+> > > Use struct_group() in struct art around members weight, and ac[0-
+> > > 9]_max,
+> > > so they can be referenced together. This will allow memcpy() and
+> > > sizeof()
+> > > to more easily reason about sizes, improve readability, and avoid
+> > > future
+> > > warnings about writing beyond the end of weight.
+> > >
+> > > "pahole" shows no size nor member offset changes to struct art.
+> > > "objdump -d" shows no meaningful object code changes (i.e. only
+> > > source
+> > > line number induced differences).
+> > >
+> > > Cc: Zhang Rui <rui.zhang@intel.com>
+> > > Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> > > Cc: Amit Kucheria <amitk@kernel.org>
+> > > Cc: linux-pm@vger.kernel.org
+> > > Signed-off-by: Kees Cook <keescook@chromium.org>
+> >
+> > Rui, Srinivas, any comments here?
+> Looks good.
+> Reviewed-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
 
-On Tue, Nov 23, 2021 at 12:15:18PM -0700, Jens Axboe wrote:
-> +bool blk_stats_alloc_enable(struct request_queue *q)
-> +{
-> +	struct blk_rq_stat *poll_stat;
-> +
-> +	poll_stat = kcalloc(BLK_MQ_POLL_STATS_BKTS, sizeof(*poll_stat),
-> +				GFP_ATOMIC);
-> +	if (!poll_stat)
-> +		return false;
-> +
-> +	if (cmpxchg(&q->poll_stat, poll_stat, NULL) != poll_stat) {
-Isn't the logic inverted here? As we already check for non-NULL
-q->poll_stat at the caller side, shouldn't it be:
-
-if (cmpxchg(&q->poll_stat, NULL, poll_stat) != NULL) {
-
-> +		kfree(poll_stat);
-> +		return true;
-> +	}
-> +
-> -- 
-> 2.34.0
-> 
-Regards,
-Pankaj
+Applied as 5.17 material, thank you!
