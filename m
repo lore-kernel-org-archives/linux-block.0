@@ -2,98 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D8AC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 15:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B1AC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 15:33:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232892AbhKXPcr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Nov 2021 10:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33974 "EHLO
+        id S241152AbhKXPgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 10:36:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbhKXPcq (ORCPT
+        with ESMTP id S233084AbhKXPgX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Nov 2021 10:32:46 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9486C061574
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 07:29:36 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id w4so2818234ilv.12
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 07:29:36 -0800 (PST)
+        Wed, 24 Nov 2021 10:36:23 -0500
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4473C061574
+        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 07:33:13 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id m5so2820479ilh.11
+        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 07:33:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rrhZzQDUHJIQTmg6CJB/zIDIB4fKU/4VePYDTiFCM24=;
-        b=6WOXuf8vNnnqTemrJS2e1qVKDzZmmXev0ma1C2pBEm+jg0jPl6b15OWnUO1ab2yj36
-         DXKTL/PnmbsYLVskeeBh40H4yCuyJVO0Pamap/2nXVp5c3zd6sj9sTnH9dBfF+7Pov84
-         P87h5+hj9Nsq+ezTzdhFKvnEVdid6xKJsq7SV93Qk2m17LEuQARmtlqltILgutMOECVO
-         T3Xki3WOspQFeFQQ5EPHei6cWKiPEZpsZnpX9a6RznzMXpw5D5w8XaaS9Wb26n1Bv4ZE
-         F+rn2Q1Svoy5OGkN67lAxVl0eCvhNmtIqZ8BESe6QQOzqRL4ytltNuZ9aCas1P/6Qnbk
-         mXHw==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=BBtCmD2MQFTaWFeeEHSOlHt6RS4bbLfi7lLls7v1YUk=;
+        b=8PZ1Or4eqfQ69TBJd3XFJhYUcRQRjM0Ls+0EsLk8TFO4tojlLZ5tlYZSyNt2vk4TBk
+         pm5XgXarg+MMUxZLLSFRJywqKj+GBn+Vb1IfVd+jTl6CJScc9IR8cX9Xw+wx4mKmuTqb
+         O8YDAxsS+l8DR0dH1cDUXfBbysne/6A1IA6kXUBjg4oHzQmtglp93gG+9o/paBJemXM6
+         9uFdRhnCYOJU6FpLj55ZkE8Fk9a1BPXMzprTcR3M0s0h3qUK2ztARhhFzeI+6Mn23RXJ
+         QU0CgzPQd84u9AUYpH4xsrTHJ6l4ds6JsaMlPiQXhvbZQKdJUAtjTwxR87A0c3SfW2Z7
+         2zdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rrhZzQDUHJIQTmg6CJB/zIDIB4fKU/4VePYDTiFCM24=;
-        b=4bv/VLHm2CwuL9zmPhI05m9O1hRucGX2eNgalLLhyOztvJI3d+9ykfxF0p0QH3qlmB
-         O7A6j7nmgWwJq1Z7gYeJolwT5kopIx6acYpVgNz8FKIqhK9v5m8SFTvNdC6mSO2U4AWH
-         enI6JzBjhVtnZP2XuebFXk4erWsfKv6elkHsYuZprAQQbp/MFR5qmroUoiILfTfAnXMz
-         HQzaHMTSJ6W08DsogK1giwhACBOml6UKh+pMvuQYvwB65JYx08cTPJfBSD2LE4r76U90
-         Ak9BjflfR5669VI2ve5ngRfKmnqbjRSzBSNwHNq8haR8mWHPccq+Vf2pmsPnTTnunDsv
-         uu/A==
-X-Gm-Message-State: AOAM532kE5XUq4/+PBoHdNVbG//otXTcfSqOT2f2AKy5VnOIhIGtG19K
-        RrraY5HtA33aVcQxvdbpdv3HOg==
-X-Google-Smtp-Source: ABdhPJxkFlRHVM9OlG5+7rg2MTm6jqHUnus79+leW0HqbkVM2xmauoaaLAA8qDQM/tnLPYDBhnnYOw==
-X-Received: by 2002:a05:6e02:1707:: with SMTP id u7mr14508546ill.210.1637767776368;
-        Wed, 24 Nov 2021 07:29:36 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x10sm71366ilv.72.2021.11.24.07.29.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Nov 2021 07:29:36 -0800 (PST)
-Subject: Re: [PATCH 1/2] block: only allocate poll_stats if there's a user of
- them
-To:     Pankaj Raghav <pankydev8@gmail.com>
-Cc:     linux-block@vger.kernel.org, p.raghav@samsung.com
-References: <20211123191518.413917-1-axboe@kernel.dk>
- <20211123191518.413917-2-axboe@kernel.dk>
- <20211124125236.s7h7e2tunjxt3r3j@quentin>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=BBtCmD2MQFTaWFeeEHSOlHt6RS4bbLfi7lLls7v1YUk=;
+        b=vRGAvoktgH4b02LlnXoCq9qAh2AovbSyJgZ4hjlIOH9fkzfHPp4S54k5mizBRkJYYA
+         rFDxayXdf2weRF+3cbGzaAhmvONgf9dQRQDPeKo0UpzkNjY92S8EMcV0DGKTfQ/45gKK
+         Aj/emMK4i1/S2UhBFWlAitYibi9DhrIip6sSQTOi7KQCzdIMDaP+X1bRT9Udxk5Sg0BB
+         r1baUJebWeEBt5GW2iWxY4OK/uA7LrFs3xl+cPGX905A7gAv5CMK1GOjFIOS7m+1Sfm3
+         qt8tNrbMRzEL+Deqs6XyPIW4f9wfLvuTBbH387flnJbTOag2tKQX//MWtngMs9Ff83xD
+         zgzw==
+X-Gm-Message-State: AOAM530nz+zycWynjTmIAUlSTC8tSVyepbrL4wFbhqwxbhbpBL7BWNHw
+        5capNBjCbGy2kaycsX1qPYd6X3V61MCs44Vm
+X-Google-Smtp-Source: ABdhPJw6I4uIghnAFZccDkM+PqqJkjpgiU+WkmXVDk5e3fhydD2GNozl16hmTh3GV+ssK229pP5sEw==
+X-Received: by 2002:a05:6e02:b45:: with SMTP id f5mr14683876ilu.118.1637767993096;
+        Wed, 24 Nov 2021 07:33:13 -0800 (PST)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id w12sm90497ilu.45.2021.11.24.07.33.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Nov 2021 07:33:12 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c5589736-54d8-541a-9a28-00deab848a84@kernel.dk>
-Date:   Wed, 24 Nov 2021 08:29:35 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20211123185312.1432157-1-hch@lst.de>
+References: <20211123185312.1432157-1-hch@lst.de>
+Subject: Re: decruft blk.h
+Message-Id: <163776799226.460672.492936987391984746.b4-ty@kernel.dk>
+Date:   Wed, 24 Nov 2021 08:33:12 -0700
 MIME-Version: 1.0
-In-Reply-To: <20211124125236.s7h7e2tunjxt3r3j@quentin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/24/21 5:52 AM, Pankaj Raghav wrote:
-> Hi Jens,
+On Tue, 23 Nov 2021 19:53:04 +0100, Christoph Hellwig wrote:
+> this series cleans up blk.h by moving various bits that are not needed
+> out of it.
 > 
-> On Tue, Nov 23, 2021 at 12:15:18PM -0700, Jens Axboe wrote:
->> +bool blk_stats_alloc_enable(struct request_queue *q)
->> +{
->> +	struct blk_rq_stat *poll_stat;
->> +
->> +	poll_stat = kcalloc(BLK_MQ_POLL_STATS_BKTS, sizeof(*poll_stat),
->> +				GFP_ATOMIC);
->> +	if (!poll_stat)
->> +		return false;
->> +
->> +	if (cmpxchg(&q->poll_stat, poll_stat, NULL) != poll_stat) {
-> Isn't the logic inverted here? As we already check for non-NULL
-> q->poll_stat at the caller side, shouldn't it be:
+> Diffstat:
+>  blk-cgroup.c     |    1 +
+>  blk-core.c       |    2 ++
+>  blk-flush.c      |    7 +++++++
+>  blk-ioc.c        |    1 +
+>  blk-merge.c      |    2 ++
+>  blk-mq-debugfs.c |    1 +
+>  blk-mq.c         |    1 +
+>  blk-sysfs.c      |    3 ++-
+>  blk-throttle.c   |    1 +
+>  blk.h            |   22 +---------------------
+>  elevator.c       |   10 +++++++---
+>  genhd.c          |    2 ++
+>  12 files changed, 28 insertions(+), 25 deletions(-)
 > 
-> if (cmpxchg(&q->poll_stat, NULL, poll_stat) != NULL) {
+> [...]
 
-Yes, I did fix that one up right after sending this out, here's the
-patch:
+Applied, thanks!
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.17/block&id=987567fece249eabb14406e4e52f427e679d8461
+[1/8] block: move blk_get_flush_queue to blk-flush.c
+      commit: b717f549c852e72ddf7c1140702da9e27ffaca7c
+[2/8] block: remove elevator_exit
+      commit: b4ef8cf4ee9cdf8d3f77f265028ddfcda7da47c0
+[3/8] block: remove the e argument to elevator_exit
+      commit: 9bd06db7f49c0c60b0368a21c8d25cd3f356c1b6
+[4/8] block: don't include blk-mq-sched.h in blk.h
+      commit: 10e69ae57a1d4a026de15a9c9058c79ecd47e287
+[5/8] block: don't include blk-mq.h in blk.h
+      commit: c6d21307452ddda76dd132d0a6aa99e8ebf0a9bb
+[6/8] block: don't include <linux/blk-mq.h> in blk.h
+      commit: 8ac269b7ebd5329c287fcd644f89508abf605d1f
+[7/8] block: don't include <linux/idr.h> in blk.h
+      commit: 65db5bdc941eab6e3d2adee483d1cb0ec70a39ad
+[8/8] block: don't include <linux/part_stat.h> in blk.h
+      commit: b1d1d48b8b3a90b4eb28fe3222ca57c6266e211c
 
+Best regards,
 -- 
 Jens Axboe
+
 
