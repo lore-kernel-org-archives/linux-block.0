@@ -2,137 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5993C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 13:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47392C4167D
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 13:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355186AbhKYNmD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 08:42:03 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:41360 "EHLO
+        id S1355125AbhKYNmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 08:42:04 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:41388 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355123AbhKYNkB (ORCPT
+        with ESMTP id S1355187AbhKYNkC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 08:40:01 -0500
+        Thu, 25 Nov 2021 08:40:02 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 2D19D1FD3C;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 48E9B1FD3E;
         Thu, 25 Nov 2021 13:36:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1637847409; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IJC+I6441CyaNwmEv5MXgQPNM6NbVhZ0Rc4qTVwE4aw=;
-        b=LqeSv9HC+RfvgAkEMdRsJ5UTtUdhBdqQ8TUDMn4+zYRYi3rNHmfJg8SCYnBB2THrtoOOb/
-        12ujvmfqImvn6KS5NG7/hegGbZMPJY/8r4DclVE5hrJugXCkQT1P/bXnyOLNYklZ+jJKdz
-        ue2B29cXjD5qdnRGHkVpWe7dFLJrtjg=
+        bh=tp7/8R1LmG938qy5axq4MAM3rTPHcg6t4envA+5B7xo=;
+        b=3T7Onr75W/3Pb5XE1BtgINaZS2yM2qRJCNtA9Xw0IyP8h7EaDNW348AQ9R6/XHDhCVMH0E
+        d09SUKc0aj5K2zlTnUGX9z+o5Wojf+u44dN7YAaLIrneh2JJYiHJ2DMj0EzMJIH6sXD0og
+        gy9NBCD9gLjLtAvCpomGY+JWruZdYWM=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1637847409;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IJC+I6441CyaNwmEv5MXgQPNM6NbVhZ0Rc4qTVwE4aw=;
-        b=CyQWnfZl54s7qj3s1BtCe1aYX5qeD7ChWC/K/T1TrZSmAmbMYsob7tT7DQR4pmXATMUPaM
-        e7widr3iu1s3WVBw==
+        bh=tp7/8R1LmG938qy5axq4MAM3rTPHcg6t4envA+5B7xo=;
+        b=vJ1ZZt7i0Tyvjtjdpr6ZhcXxxEs3NpBuR8Dvo+CoqZSUO5e1Tg8Z4+0rbrJ8YfJABMHAs2
+        6fKXJOiWRXHChMBA==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 1D553A3B8D;
+        by relay2.suse.de (Postfix) with ESMTP id 3D59BA3B92;
         Thu, 25 Nov 2021 13:36:49 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id E3B7B1E0BD3; Thu, 25 Nov 2021 14:36:45 +0100 (CET)
+        id 041EE1F2CE6; Thu, 25 Nov 2021 14:36:46 +0100 (CET)
 From:   Jan Kara <jack@suse.cz>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     <linux-block@vger.kernel.org>,
         Paolo Valente <paolo.valente@linaro.org>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/8] block: Provide blk_mq_sched_get_icq()
-Date:   Thu, 25 Nov 2021 14:36:34 +0100
-Message-Id: <20211125133645.27483-1-jack@suse.cz>
+Subject: [PATCH 6/8] bfq: Provide helper to generate bfqq name
+Date:   Thu, 25 Nov 2021 14:36:39 +0100
+Message-Id: <20211125133645.27483-6-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211125133131.14018-1-jack@suse.cz>
 References: <20211125133131.14018-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2286; h=from:subject; bh=CyorICWMZ55H6dqfkHqRSC8ZUzyfheG60RAO3agFGPc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhn5Fi5NUt8jSjiPHIbir7sDJXAgr+vm+RpPZXD8wM Zayd+J+JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYZ+RYgAKCRCcnaoHP2RA2TNXCA DqIhU2VGSh+XL8qyCB79ybzreoaFSM3pi1K3DsVCYGBNRdsLQwe0SrPGoMuC/s0fwsSLNVyFJpYEi2 NFSXJ3JkSD823UtMfbmmCzvVst4DcP4A4s7/+Dm463qMpVFLnH950FW5ehF73TPlsraqH/O1L/OYYF Bjg7qhfwyoyjtAeiGpno3mO+gMoK5Dkn1MMxRgezocUmlntd6MUUA+y8gQoX8PO2OFsBVBG6a3xxM6 trDH88FZeJTz72oZKa/isIehAcVfphM6iwetBueH7VuV/qaE4Wkzp+AtP1iwQ0rjqWHhse64UZgEtE DK7pCpGroEkdVIuHNjSMg55RyeYDo7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2907; h=from:subject; bh=lIW8uaLgOKwWPQwZ8mubQz8UhMz485reSQkalNeN/dQ=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhn5FnyHX8wjbtONKgxP8uQ+RM1kSJK6/bTo5GIH08 iqxLYvSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYZ+RZwAKCRCcnaoHP2RA2cjACA C/96X+C8pdJZSPVH+wCrW6B4Elu6Uv7Refvr508sMEDjN7CyXhexjTq1UHG8CDGEHb7y75ubI0KviP mjrqLGHyamP26Yxt0vV5Oj4p+YKTDc2xiUWiWgzbLxSK6D5zYI8DGZveDs98bdqGKSeGm3iw/FelKa F+0IfrOl/e7Ca8nxm7UEhlh6DYuxocmYrZxVQBUvyQGlWyPugTCqSKcR5y1Ys35NkYLdqFHMjSrkbZ LbvA/8RGieh8Vjk4Tso3Vd72FC+0bRXRLX4qgnQA9ankX4nQ6XhzJDC32xGj2eK+mzKLSHfw3LX3xI I38Q6vt9OAzC63PKMKKciVq5hP5agY
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently we lookup ICQ only after the request is allocated. However BFQ
-will want to decide how many scheduler tags it allows a given bfq queue
-(effectively a process) to consume based on cgroup weight. So provide a
-function blk_mq_sched_get_icq() so that BFQ can lookup ICQ earlier.
+Instead of having helper formating bfqq pid, provide a helper to
+generate full bfqq name as used in the traces. It saves some code
+duplication and will save more in the coming tracepoints.
 
 Acked-by: Paolo Valente <paolo.valente@linaro.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq-sched.c | 26 +++++++++++++++-----------
- block/blk-mq-sched.h |  1 +
- 2 files changed, 16 insertions(+), 11 deletions(-)
+ block/bfq-iosched.h | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index b942b38000e5..98c6a97729f2 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -18,9 +18,8 @@
- #include "blk-mq-tag.h"
- #include "blk-wbt.h"
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index bb8180c52a31..07288b9da389 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -25,7 +25,7 @@
+ #define BFQ_DEFAULT_GRP_IOPRIO	0
+ #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
  
--void blk_mq_sched_assign_ioc(struct request *rq)
-+struct io_cq *blk_mq_sched_get_icq(struct request_queue *q)
+-#define MAX_PID_STR_LENGTH 12
++#define MAX_BFQQ_NAME_LENGTH 16
+ 
+ /*
+  * Soft real-time applications are extremely more latency sensitive
+@@ -1083,26 +1083,27 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+ /* --------------- end of interface of B-WF2Q+ ---------------- */
+ 
+ /* Logging facilities. */
+-static inline void bfq_pid_to_str(int pid, char *str, int len)
++static inline void bfq_bfqq_name(struct bfq_queue *bfqq, char *str, int len)
  {
--	struct request_queue *q = rq->q;
- 	struct io_context *ioc;
- 	struct io_cq *icq;
- 
-@@ -28,22 +27,27 @@ void blk_mq_sched_assign_ioc(struct request *rq)
- 	if (unlikely(!current->io_context))
- 		create_task_io_context(current, GFP_ATOMIC, q->node);
- 
--	/*
--	 * May not have an IO context if it's a passthrough request
--	 */
-+	/* May not have an IO context if context creation failed */
- 	ioc = current->io_context;
- 	if (!ioc)
--		return;
-+		return NULL;
- 
- 	spin_lock_irq(&q->queue_lock);
- 	icq = ioc_lookup_icq(ioc, q);
- 	spin_unlock_irq(&q->queue_lock);
-+	if (icq)
-+		return icq;
-+	return ioc_create_icq(ioc, q, GFP_ATOMIC);
-+}
-+EXPORT_SYMBOL(blk_mq_sched_get_icq);
- 
--	if (!icq) {
--		icq = ioc_create_icq(ioc, q, GFP_ATOMIC);
--		if (!icq)
--			return;
--	}
-+void blk_mq_sched_assign_ioc(struct request *rq)
-+{
-+	struct io_cq *icq;
+-	if (pid != -1)
+-		snprintf(str, len, "%d", pid);
++	char type = bfq_bfqq_sync(bfqq) ? 'S' : 'A';
 +
-+	icq = blk_mq_sched_get_icq(rq->q);
-+	if (!icq)
-+		return;
- 	get_io_context(icq->ioc);
- 	rq->elv.icq = icq;
++	if (bfqq->pid != -1)
++		snprintf(str, len, "bfq%d%c", bfqq->pid, type);
+ 	else
+-		snprintf(str, len, "SHARED-");
++		snprintf(str, len, "bfqSHARED-%c", type);
  }
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 25d1034952b6..add651ec06da 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -8,6 +8,7 @@
  
- #define MAX_SCHED_RQ (16 * BLKDEV_DEFAULT_RQ)
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
  
-+struct io_cq *blk_mq_sched_get_icq(struct request_queue *q);
- void blk_mq_sched_assign_ioc(struct request *rq);
+ #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
+-	char pid_str[MAX_PID_STR_LENGTH];	\
++	char pid_str[MAX_BFQQ_NAME_LENGTH];				\
+ 	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
+ 		break;							\
+-	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
++	bfq_bfqq_name((bfqq), pid_str, MAX_BFQQ_NAME_LENGTH);		\
+ 	blk_add_cgroup_trace_msg((bfqd)->queue,				\
+ 			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
+-			"bfq%s%c " fmt, pid_str,			\
+-			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
++			"%s " fmt, pid_str, ##args);			\
+ } while (0)
  
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)	do {			\
+@@ -1113,13 +1114,11 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ #else /* CONFIG_BFQ_GROUP_IOSCHED */
+ 
+ #define bfq_log_bfqq(bfqd, bfqq, fmt, args...) do {	\
+-	char pid_str[MAX_PID_STR_LENGTH];	\
++	char pid_str[MAX_BFQQ_NAME_LENGTH];				\
+ 	if (likely(!blk_trace_note_message_enabled((bfqd)->queue)))	\
+ 		break;							\
+-	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
+-	blk_add_trace_msg((bfqd)->queue, "bfq%s%c " fmt, pid_str,	\
+-			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
+-				##args);	\
++	bfq_bfqq_name((bfqq), pid_str, MAX_BFQQ_NAME_LENGTH);		\
++	blk_add_trace_msg((bfqd)->queue, "%s " fmt, pid_str, ##args);	\
+ } while (0)
+ #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)		do {} while (0)
+ 
 -- 
 2.26.2
 
