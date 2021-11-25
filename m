@@ -2,102 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D652C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BFEC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:16:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234771AbhKYQQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 11:16:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54790 "EHLO
+        id S241865AbhKYQTV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 11:19:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233947AbhKYQOz (ORCPT
+        with ESMTP id S244227AbhKYQRV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 11:14:55 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF5EC06175E
-        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:00:01 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id j7so6236804ilk.13
-        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:00:01 -0800 (PST)
+        Thu, 25 Nov 2021 11:17:21 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C891C0619D8
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:02:47 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id a11so6017894ilj.6
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:02:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=W1H1/OqzWONOwkmnXRSgAJv5ASwvwk/7xQAco2zbWHo=;
-        b=XwaR+PwrvisMARVt1o6TSNK2p/Khrsc0ZfcfF0nb7xykVxfQ1MMwUDtLSEMqBYq8MM
-         Ld3ZTi/Wz0rxYUwnmqwsRGCA2lpZInWU+X4IYL+4uOaHknzqo1OuoiYueVZzlxz3qefq
-         IZ16ukK7esv4b1ICSRngpjOXkQf4wbHlm/63Wr3dkFSfngKsv4hQDgLQuXSFH3bun+yB
-         NkfbI7sdsiE5MtBXSNDsg39cJ2GgtHu6pRV06mHkpGuRvuK/XtfXwlQp86e7E5TebReB
-         YW6ln7vndswlc8vQBTg0gVBGMJgNXckiY6Dv6tQHvu8joBeENaRxyWz6nLocUowBQiY+
-         y6Vg==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=0qAsEjnbb+VBv+AENbl+pjNbqQq05jQJQ3B0sc5CN1o=;
+        b=xoIVEah/yh6mbI/sTwuQBY2+5aG7QjEShDVHENIHR6HMi2eWgKaYjeuFYemOjMYwFn
+         y/sdFbjOLN96YrH9DUbfuONrnJXfRJuJSGOZXquDQXbWXHGtcdo7SVfwo7einHnKcX7Y
+         /OkK0gJqmVtl85aPQbFH7x/pzIvs/D5ry+1/KbFBm+If/pugrl4M5l0UHfum5G8MZFs3
+         0bXMOV7BFM4j7Ay4trnMhdbqXM9OztUG57C6pGSKZxjmVbpZz7bhvd7yNreBam1ZV7tu
+         dRI8XEMnmpCIbkjikuapV38wB1KVPG7IFPeC6Ck2478/keOqm0PAybExAQvRjmdROth1
+         ZowQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=W1H1/OqzWONOwkmnXRSgAJv5ASwvwk/7xQAco2zbWHo=;
-        b=7klrZIpK/Ew3W6ld+ruZrLlyTJYAcCEu77yBhJKPR0d05Ijm80beumsHvEf69E+fM4
-         1ILPekczejZHw81so0HrBRnjqVsbuuBJoYY5fWxqtinCLZaFvsW5vqHDHW7s5DECK5Fn
-         VZ2pwbD9vYjFrvz6VfNXnGWvxvBvmHkiNOEYi7YwCmKXAMS8BSzR4KCEayVfcUPO8VLH
-         MGsLjrp88AUvoo+g+Ad5tKI59xwze/ZowLCtf5gD0D5w+rOhvTW4SIYo0e5ypa/AmLee
-         SO7GMkc/1Lt8Kz4Viy56X9e2Gvf4IK53VVcRfH8wPkA3GevMkwIkWVGw6/82gJ6epTKP
-         M2NQ==
-X-Gm-Message-State: AOAM5309WRFhcUp23cWKHq8T56x9Ldq5l9Yr+LnyVCrJhynapaI/TdNn
-        Z87eDMq7HoHfZwTzv32ZMydUQv6jK5ntllgh
-X-Google-Smtp-Source: ABdhPJx/leFzevbJKm39V27GTB1Oc+k6/sVr/7S6H/KUHJwP7sTZSdamwZ1Q62CT8XyRv8TctjIBvg==
-X-Received: by 2002:a92:da0f:: with SMTP id z15mr23607377ilm.151.1637856000854;
-        Thu, 25 Nov 2021 08:00:00 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id o1sm1627267ilj.41.2021.11.25.07.59.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Nov 2021 08:00:00 -0800 (PST)
-Subject: Re: [GIT PULL] nvme fixes for Linux 5.16
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YZ+X/qGC6/w3bp2c@infradead.org>
- <c55bc6b0-b98e-07f5-b808-83814ad8981a@kernel.dk>
- <YZ+mI9a1Jd2/zNkh@infradead.org>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=0qAsEjnbb+VBv+AENbl+pjNbqQq05jQJQ3B0sc5CN1o=;
+        b=ShYUyjo89N7Jp3ls/7Ph0tyqWMMn7cHcosvfk7IHVWxSg4XzKti0x9Cafuz8nsUs8T
+         hCHer+kJhTz4WpbWzWV1cZc0e2XZ6O145S4rOqJb3wdVuJFaiTpoPgHuNoJM/0FG+1CB
+         wXvi/F+m3GrSqIW2ewlQPnlyVnE4TAURyfMiBMxg2HFSIvzBXhB5to71QQTrzw79P1yJ
+         PiBSzFsixqlHD9cm/Fc2H8Km8dIOF0LMbLgQH/wWNLAAea3m14Rycf+wK/kCWVHBZT/b
+         rbBI8LyODWfnObnE5UgFEu9i5VNtJ2irvyUcPqy4q4hrxdg8cFIRjYKJOC7vJmOtYkU2
+         b0LA==
+X-Gm-Message-State: AOAM533ilkV+4IWGOzdLHxUvXXL8t5ypZY5SDmxf4HpPKZxe03DXhhxJ
+        9/+muGe4/yRqkpZoDA8DLyxixQ==
+X-Google-Smtp-Source: ABdhPJyixIBxXmOozDydsBZA2OLvJCu4BqZVnzvh5NVkni2M5UbdJ7H0NHuxx7ZbmashZSux8a1gEw==
+X-Received: by 2002:a05:6e02:1945:: with SMTP id x5mr15135285ilu.287.1637856166608;
+        Thu, 25 Nov 2021 08:02:46 -0800 (PST)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id 11sm1737108ilt.63.2021.11.25.08.02.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Nov 2021 08:02:46 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9d933bfa-eeec-2b9a-ab91-aa1140a41f62@kernel.dk>
-Date:   Thu, 25 Nov 2021 08:59:57 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>, tglx@linutronix.de,
+        Christoph Hellwig <hch@infradead.org>
+In-Reply-To: <20211025070658.1565848-1-bigeasy@linutronix.de>
+References: <20211025070658.1565848-1-bigeasy@linutronix.de>
+Subject: Re: [PATCH v3 0/2] blk-mq: Allow to complete requests directly
+Message-Id: <163785616389.524013.4459386805250526075.b4-ty@kernel.dk>
+Date:   Thu, 25 Nov 2021 09:02:43 -0700
 MIME-Version: 1.0
-In-Reply-To: <YZ+mI9a1Jd2/zNkh@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/25/21 8:05 AM, Christoph Hellwig wrote:
-> On Thu, Nov 25, 2021 at 07:55:38AM -0700, Jens Axboe wrote:
->> On 11/25/21 7:04 AM, Christoph Hellwig wrote:
->>>  drivers/nvme/host/core.c          | 29 +++++++++++++++++--
->>>  drivers/nvme/host/fabrics.c       |  3 ++
->>>  drivers/nvme/host/tcp.c           | 61 +++++++++++++++++++--------------------
->>>  drivers/nvme/target/io-cmd-file.c |  2 ++
->>>  drivers/nvme/target/tcp.c         | 44 ++++++++++++++++++++--------
->>>  5 files changed, 93 insertions(+), 46 deletions(-)
->>
->> This doesn't match what I get:
->>
->>  drivers/nvme/host/core.c          | 29 +++++++++++++++++++---
->>  drivers/nvme/host/fabrics.c       |  3 +++
->>  drivers/nvme/host/tcp.c           | 61 +++++++++++++++++++++++-----------------------
->>  drivers/nvme/target/io-cmd-file.c |  4 ++-
->>  drivers/nvme/target/tcp.c         | 44 ++++++++++++++++++++++++---------
->>  5 files changed, 94 insertions(+), 47 deletions(-)
->>
->> Hmm?
+On Mon, 25 Oct 2021 09:06:56 +0200, Sebastian Andrzej Siewior wrote:
+> v2…v3:
+>  - Align arguments with the begin of the function name
+>    (blk_mq_complete_request_direct).
 > 
-> Looks like the diffstt doesn't include the the requested reformatting
-> in io-cmd-file.c.  But I have no idea why.
+> v1…v2:
+>  - Drop the SCSI patch for now.
+>  - Make blk_mq_complete_request_direct() call the completion handler
+>    directly instead going through struct chain (Jens and hch might had
+>    the same in mind).
+> 
+> [...]
 
-Funky... I pulled it and pushed it out, just double check if it looks
-consistent with what you expect.
+Applied, thanks!
 
+[1/2] blk-mq: Add blk_mq_complete_request_direct()
+      commit: f783a8cc7d0701bcfb1ee0989a2227250c847178
+[2/2] mmc: core: Use blk_mq_complete_request_direct().
+      commit: a5d6aee0c81f86fc83950567b8b6988bf8ca6ff1
+
+Best regards,
 -- 
 Jens Axboe
+
 
