@@ -2,97 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A96C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DB7C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356400AbhKYQU4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 11:20:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54790 "EHLO
+        id S238586AbhKYQsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 11:48:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233853AbhKYQS4 (ORCPT
+        with ESMTP id S240328AbhKYQqI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 11:18:56 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7814BC0619EE
-        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:04:03 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id r2so6258933ilb.10
-        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:04:03 -0800 (PST)
+        Thu, 25 Nov 2021 11:46:08 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C0F3C0613F4;
+        Thu, 25 Nov 2021 08:21:10 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id z6so4889449plk.6;
+        Thu, 25 Nov 2021 08:21:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=OkKUNCT1f1HRDTRORUnetTlpyJRQGtvGhJfeDdMLDQs=;
-        b=HcMvPBm7qcTWcKrT9zGZLXAQ5tsQFl+o2FWvclvqUK6satMqQlgo9rj10CKECpSj2F
-         /d42l9wbhd0uP6RnpHsRHe4+1RJ9s6cy+5pOx3tb+QJ/sUvXDD+XYSJqo+jD37X2wvut
-         ggC/RsT1lmd9ltnX9naDbhfGj6ATBTyfpWn4MwTu/tI+Q/eDaZBu88sypE1cRVVZrbMV
-         +G+CqxIAiL9VzDsRRNzTNAv3Ome8OXsBS6xWTwej4o0u0x/DI4zl4GLeCs/lZ9PT0qy4
-         cBluWg5BtXSAMYbkQ/OGkMce7rx1EXrV0eX0eRR23XUifRwGgs5IR2IP7te6MoxCsa3S
-         GHXg==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DrbLxcTRIr7XI7NN202x3ewaW1KuzI3sJcKCkLAzcmM=;
+        b=eA+6e4w/ezBqGCpY3Pun4HZFK3eTUelIhd2INadnJK6U9EDT0C2iuabO21nkJe7co3
+         o5cnx02pBObO8CBFHp+4nQAxZtRV+0H5kD6VUPvhLZmpx6akXCOJA8GKPPxP5Ql+vSOF
+         nvxTyVPQ/fllOZ2YtphAylFiTdHV4IYu0vryeC4hi1mlXBAHQPtWAUE80DPmoi6hQvJS
+         3PVPw1zLVmtK3nBJTyCnTJOYBZniHlMa0fy2gs93Mxvkj3AbC9vzDByLYuIcKYTfDgXF
+         zCQIGN/R+W/w01EZWn/ismo/gEdG7hQ7+HERbjCWy5xFk0F0PZOE72redURGw3+cAx//
+         9B7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=OkKUNCT1f1HRDTRORUnetTlpyJRQGtvGhJfeDdMLDQs=;
-        b=Kjd77FqcLkW0lAV/kQTwObuyckvQD65eu4BMP5JoqdCKuZni/uyuNTaQM5M78/w92u
-         MCvmHAN69pw9pFGTyODt/BPgCQVXzH6z0Ho2S1Ud+S/nJsZ9TdV5QsYx2Enqck9bj1Di
-         AoX/kbSuu5ghUJTRAtzbyInBnh3O5r9LAauDCd2cKXV/SxrANL7LW+IzqqJaT4bXI47y
-         SNnGE5OMD2GVnpXYBObLplSKrkQIXSKAamrpsNr0IHpskv0F35dNe8IYT3IYQwQp3adR
-         rx4rqA+7d8yqJ0UR2AtHdH8+7pc7CiSUXo4tdEm4kzHppcpZrMHr0XmRgvMso156FBCj
-         GjmQ==
-X-Gm-Message-State: AOAM531mwwyPnu0Fm8aSZouIFVyBVJFAywBENjAPmd3wdQS3/Jr7RBFC
-        5EDDM59n7Qo6+9fX6Rko4FNj0wMxEIbDBHoN
-X-Google-Smtp-Source: ABdhPJxlL6fbgyT7lTn8YwOEVRCjsEx9UAwga7f5YncNxtM2FcFdDXl4gQ5WCpZFcvqXN3ffqwDGzA==
-X-Received: by 2002:a05:6e02:15c4:: with SMTP id q4mr25183812ilu.133.1637856242909;
-        Thu, 25 Nov 2021 08:04:02 -0800 (PST)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id y8sm1684553iox.32.2021.11.25.08.04.02
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DrbLxcTRIr7XI7NN202x3ewaW1KuzI3sJcKCkLAzcmM=;
+        b=3bYhYAbskmVBMGSEmdo84eItD2wNoCCPhJQaCC2ryVMml9zvyShqPEI6FT7VWOWBLy
+         3wXUQJ8ynXyjREo6C6aUNc3VOaN3gUPMmOMwWBuIIn1O3GRghAkmjtyI+2O0yMERkSBr
+         oPmdTXn4cyWYpSN+6M0tQD6CKifLn9W8LjmpMEhWPWtCJXUXIexYZz2erlU62aqnEUVp
+         LvgU0zhpa84Wk7O2gjSleR6pChKvc+w4VkMBkjE1fepD4/tmMdf7v7fTa10Q4vXkoJhW
+         Y+RYWaVPQ8D+nsbenpTnbALqzxxip1+cy7EwsBuP3ZeY3z67foemkSd2PqgYBkgllqHj
+         RAUQ==
+X-Gm-Message-State: AOAM532Fg/6iYJwUVJB59R2aEe27o636faeBeWrGtUOjEyehrPA9lCzI
+        g+SAHxgQ8Nn+5ItvgX9/TTA=
+X-Google-Smtp-Source: ABdhPJxsPhjikOXxK/FanZR/y7bHOeNPfej/eLeGxgNWY3N8O9RzC7HzghgJhix7hGxdN6Eco7ovtg==
+X-Received: by 2002:a17:902:c745:b0:143:d220:9196 with SMTP id q5-20020a170902c74500b00143d2209196mr31489461plq.74.1637857269919;
+        Thu, 25 Nov 2021 08:21:09 -0800 (PST)
+Received: from debian11-dev-61.localdomain (192.243.120.180.16clouds.com. [192.243.120.180])
+        by smtp.gmail.com with ESMTPSA id 63sm3919685pfz.119.2021.11.25.08.21.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Nov 2021 08:04:02 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20211125133645.27483-1-jack@suse.cz>
-References: <20211125133131.14018-1-jack@suse.cz> <20211125133645.27483-1-jack@suse.cz>
-Subject: Re: [PATCH 1/8] block: Provide blk_mq_sched_get_icq()
-Message-Id: <163785624040.524816.16236422623575839115.b4-ty@kernel.dk>
-Date:   Thu, 25 Nov 2021 09:04:00 -0700
+        Thu, 25 Nov 2021 08:21:09 -0800 (PST)
+From:   davidcomponentone@gmail.com
+X-Google-Original-From: yang.guang5@zte.com.cn
+To:     axboe@kernel.dk
+Cc:     davidcomponentone@gmail.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yang Guang <yang.guang5@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH v2] block: fix parameter not described warning
+Date:   Fri, 26 Nov 2021 00:20:55 +0800
+Message-Id: <acf6fdca867ff78a13099ea6615ac39d69bbfc9b.1637825871.git.yang.guang5@zte.com.cn>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 25 Nov 2021 14:36:34 +0100, Jan Kara wrote:
-> Currently we lookup ICQ only after the request is allocated. However BFQ
-> will want to decide how many scheduler tags it allows a given bfq queue
-> (effectively a process) to consume based on cgroup weight. So provide a
-> function blk_mq_sched_get_icq() so that BFQ can lookup ICQ earlier.
-> 
-> 
+From: Yang Guang <yang.guang5@zte.com.cn>
 
-Applied, thanks!
+The build warning:
+block/blk-core.c:968: warning: Function parameter or member 'iob'
+not described in 'bio_poll'.
 
-[1/8] block: Provide blk_mq_sched_get_icq()
-      commit: 4896c4e64ba5d5d5acdbcf68c5910dd4f6d8fa62
-[2/8] bfq: Track number of allocated requests in bfq_entity
-      commit: 421165c5bb2e7c7480290a229ea7a24512237494
-[3/8] bfq: Store full bitmap depth in bfq_data
-      commit: e0ef40059557df144110865953ea4c0b87c11ac5
-[4/8] bfq: Limit number of requests consumed by each cgroup
-      commit: 3d7a7c45e29d5d1f5a9622557acb47443e8b6e28
-[5/8] bfq: Limit waker detection in time
-      commit: d7eb68e3958fc91711f5df981c517fec9da35c42
-[6/8] bfq: Provide helper to generate bfqq name
-      commit: 2bbd0f81ac7050bfd537437a65579d49bc2128c1
-[7/8] bfq: Log waker detections
-      commit: e330e2ab2c40e624029cf208c9505cad2b3c81fd
-[8/8] bfq: Do not let waker requests skip proper accounting
-      commit: b488606166844e7fb03e5995dbc9d608bbd57c05
+Fixes: 5a72e899ceb4 ("block: add a struct io_comp_batch argument to fops->iopoll()")
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Yang Guang <yang.guang5@zte.com.cn>
 
-Best regards,
+---
+
+Changes in v2:
+- Add fixes tag
+---
+ block/blk-core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 143cc21db5ef..b0660c9df852 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -958,6 +958,7 @@ EXPORT_SYMBOL(submit_bio);
+ /**
+  * bio_poll - poll for BIO completions
+  * @bio: bio to poll for
++ * @iob: batches of IO
+  * @flags: BLK_POLL_* flags that control the behavior
+  *
+  * Poll for completions on queue associated with the bio. Returns number of
 -- 
-Jens Axboe
-
+2.30.2
 
