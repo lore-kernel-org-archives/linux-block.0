@@ -2,92 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB372C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 01:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9B4C43217
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 01:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238030AbhKYBuR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Nov 2021 20:50:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60216 "EHLO
+        id S1347877AbhKYBuS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 20:50:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351945AbhKYBsP (ORCPT
+        with ESMTP id S1352733AbhKYBsR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Nov 2021 20:48:15 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B023C07E5C3;
-        Wed, 24 Nov 2021 16:54:29 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id y7so3285847plp.0;
-        Wed, 24 Nov 2021 16:54:29 -0800 (PST)
+        Wed, 24 Nov 2021 20:48:17 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2BFC07E5C7
+        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 16:56:49 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id v23so5459430iom.12
+        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 16:56:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hfw9u2dgKWMvFM+zv9k6Og/5ORjy5xYA+ZKABDcLG0I=;
-        b=JPf4Zlb8stgQin4wu9U2SPJdBOkXEjJWj5xZpZsGHWHV3aHFQE+ZeTUtD8S/iHDceh
-         KB+GfVzT4+7ap93df0I/eZIORH50vjjvF0cFsxLkid4ySMGflKVwfCXpyiAtjFeLilee
-         bI4kSU9yxEsDo71/cIht2ygmqTBn1SuoT1SNQpA5jNO8U64xL8heOc6ciVq+NlTl2DQA
-         293snpeq6DPCfxlpoHIsVLylODjvc0kLIZAdc5AY2SGmoMCliUaed47bXaI6ossDa2ki
-         6KjpDZsxl+NGbahSaTiE8ziV6jr2qr2lRJxt+cpF09NMel/hDng+gr35vPYvbr7xibi/
-         JT8A==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=YQECEZaOSnuAkiPU2V5NI9wzqYl9rSxziHehNSDY9mc=;
+        b=yEj/CgFCl/hr7Oo3i9m5Nq1jZp8DDu5fJZn9grSTIdtkREa9BgrmMdMoxW7Hk9w/Rc
+         4RSM6Ui1OmasykZGf3GtxV+dvcW7MOBJ6E5EgQpZ1Aq9n7pNRrRnz2v0LcCrhTqj6jcs
+         +tetlBrOZb0QPcTsvZGx8HRaGIzbm1pTvGMym5EdjReNaHQz+eluzHtkLsnGNv/Mjjlz
+         pXCuS+S2f7gm8dXB+TjZnZtVlxV8L1Eljkt4Wwdf2qLnTFjQHh/AwAZo7+vcmOiR49g3
+         lNaAtKzbQIFdxFnLWPt3ZElqk3LTjgc0qB4a9DwG3BYAFBnSPpVs4BkOzf90NrKorDtk
+         +8nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hfw9u2dgKWMvFM+zv9k6Og/5ORjy5xYA+ZKABDcLG0I=;
-        b=S9i14o3WWB5XdiIeTBmMziM0X3Ag2b8Bw53dyHSd3hq2nYWsc4htkTQs52KCj3psf1
-         Ol8F2/nGeACAl4Wd9yVesehfQ6PzL++QOoldJ6aEeMhviWDR3L63SkP6YwcmoF5CLvfo
-         0zHCrDlUGjyp6u1bWBpHDaDKIB+MUISdQMYhYZ8GNxN/F+OLJwXnfUgyM1XuNZf5Jt80
-         9vAiAp955aswwBVfEjuyhyv4wRJPhkPVKSROPDTCJFv5+Mm1nzR1iRSopIt9aipLq7zs
-         BkzfYv2ZeLwC/CWiq37MGHqmYjoSJq3XIONeS3nFdyL9cgXHNXomznBKflSzwuoLLsEH
-         6EWA==
-X-Gm-Message-State: AOAM532JNAfrYnmObg93h9ZA5Cz3TXa+9wGBMF0piZt2XtVMlkQc2m0s
-        f7nNH1JSMef5+RxZH/spkws=
-X-Google-Smtp-Source: ABdhPJxW9UHirSi0C8d6l7D4hHExfez0M7O4YPi0gKSOyE2fv/HPLMQk9KyfcTe8oXt67764zowOXA==
-X-Received: by 2002:a17:902:c7d5:b0:143:72b7:2ca5 with SMTP id r21-20020a170902c7d500b0014372b72ca5mr25069292pla.20.1637801669207;
-        Wed, 24 Nov 2021 16:54:29 -0800 (PST)
-Received: from debian11-dev-61.localdomain (192.243.120.180.16clouds.com. [192.243.120.180])
-        by smtp.gmail.com with ESMTPSA id f18sm888112pfk.105.2021.11.24.16.54.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Nov 2021 16:54:28 -0800 (PST)
-From:   davidcomponentone@gmail.com
-X-Google-Original-From: yang.guang5@zte.com.cn
-To:     axboe@kernel.dk
-Cc:     davidcomponentone@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yang Guang <yang.guang5@zte.com.cn>,
+        bh=YQECEZaOSnuAkiPU2V5NI9wzqYl9rSxziHehNSDY9mc=;
+        b=Yi8AnwxyvfQJWWiesYQC2NOVpQdOY35Y6qdfnYATyZKgq6NrMu0s0Bsg9b4ddJ+nVf
+         C/W10I3Nh5rbeMgvbbG+ErkgG1CobEQRqj/gGomkJuHE9h281zK9A/cYL0/crdJfD2qz
+         swPbHOXmCALULNqmOt2qHiBKjtxUa9yQB6ay7Gcplahhs6U58fHvDE8J30KV0fe9FTXQ
+         41uu8I/cz1tIJvWv1D6vRuHu+PJy9kIBqMJvxxIXillBd/NWPQwARQ6VvL9EGn3GP6OA
+         ED6klUGVXORWKJrVxPP1qW+dLPLGTJbAScD1kv6p6h+jrSFKlG97LjAPYMKjYkcGSoq9
+         lfqg==
+X-Gm-Message-State: AOAM532dlpCP6za0z70wMu0CAO+ER6fFTOVxm6H75u7DcfoXJTJ/+U7z
+        PfnjdqYaIV+zIT7QUzthKKQAdA==
+X-Google-Smtp-Source: ABdhPJwWVqRdKf3NBnTqyTGlkAHlIY6XUp+YcgmQT7OkghhTzfdemlFqdTBdXPGbLVqoNQM0fCzxnw==
+X-Received: by 2002:a05:6602:19a:: with SMTP id m26mr19954552ioo.162.1637801808369;
+        Wed, 24 Nov 2021 16:56:48 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id v23sm778469ioj.4.2021.11.24.16.56.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Nov 2021 16:56:47 -0800 (PST)
+Subject: Re: [PATCH] block: fix parameter not described warning
+To:     davidcomponentone@gmail.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yang Guang <yang.guang5@zte.com.cn>,
         Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] block: fix parameter not described warning
-Date:   Thu, 25 Nov 2021 08:54:15 +0800
-Message-Id: <3ece7228314e89177d022cd514215d8c76485fb8.1637735436.git.yang.guang5@zte.com.cn>
-X-Mailer: git-send-email 2.30.2
+References: <3ece7228314e89177d022cd514215d8c76485fb8.1637735436.git.yang.guang5@zte.com.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0145c2a3-4648-ef7b-6f7f-d15a95231327@kernel.dk>
+Date:   Wed, 24 Nov 2021 17:56:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <3ece7228314e89177d022cd514215d8c76485fb8.1637735436.git.yang.guang5@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yang Guang <yang.guang5@zte.com.cn>
+On 11/24/21 5:54 PM, davidcomponentone@gmail.com wrote:
+> From: Yang Guang <yang.guang5@zte.com.cn>
+> 
+> The build warning:
+> block/blk-core.c:968: warning: Function parameter or member 'iob'
+> not described in 'bio_poll'.
 
-The build warning:
-block/blk-core.c:968: warning: Function parameter or member 'iob'
-not described in 'bio_poll'.
+Can you add a Fixes tag as well?
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Yang Guang <yang.guang5@zte.com.cn>
----
- block/blk-core.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6ae8297b033f..2053d1b0e90e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -956,6 +956,7 @@ EXPORT_SYMBOL(submit_bio);
- /**
-  * bio_poll - poll for BIO completions
-  * @bio: bio to poll for
-+ * @iob: batches of IO
-  * @flags: BLK_POLL_* flags that control the behavior
-  *
-  * Poll for completions on queue associated with the bio. Returns number of
 -- 
-2.30.2
+Jens Axboe
 
