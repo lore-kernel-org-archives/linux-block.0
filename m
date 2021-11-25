@@ -2,498 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB149C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 09:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EF6C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 11:04:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354125AbhKYJnG convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 04:43:06 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4166 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345599AbhKYJlF (ORCPT
+        id S229982AbhKYLIJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 06:08:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33644 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238074AbhKYLGI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 04:41:05 -0500
-Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J0CTC59hfz67yHr;
-        Thu, 25 Nov 2021 17:37:19 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 25 Nov 2021 10:37:52 +0100
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
- Thu, 25 Nov 2021 10:37:52 +0100
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "eparis@redhat.com" <eparis@redhat.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>
-CC:     "jannh@google.com" <jannh@google.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-audit@redhat.com" <linux-audit@redhat.com>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "tusharsu@linux.microsoft.com" <tusharsu@linux.microsoft.com>
-Subject: RE: [RFC PATCH v7 11/16] ipe: add support for dm-verity as a trust
- provider
-Thread-Topic: [RFC PATCH v7 11/16] ipe: add support for dm-verity as a trust
- provider
-Thread-Index: AQHXwGWKgSExirn2CUCoXyZKYCfiOKwUOhXA
-Date:   Thu, 25 Nov 2021 09:37:51 +0000
-Message-ID: <721462c3da064d359ca3c83845298ccf@huawei.com>
-References: <1634151995-16266-1-git-send-email-deven.desai@linux.microsoft.com>
- <1634151995-16266-12-git-send-email-deven.desai@linux.microsoft.com>
-In-Reply-To: <1634151995-16266-12-git-send-email-deven.desai@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.204.63.33]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thu, 25 Nov 2021 06:06:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637838177;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=riKTGmB1twtXdrYnwEH5vMw1b0PhVceFsEem714JIPU=;
+        b=ZkgK29el+Q+SGri23MD8/KXzegHQTs+3acO1SL1EFiXRpQOW74UfYE4P1M/HotvDe0PPHH
+        XtNKla8l3TX/zpc0T0jcN8X1uQqAcHgbZQpQdBvyXeUnFVe7Z0a9Yc2Y7pXn4RqnNDX4zh
+        nrHhykVD/4bE1E9A7q0KD94ne8GpadU=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-446-ZdW8HS7xMLSm-3Zyi2lPEQ-1; Thu, 25 Nov 2021 06:02:55 -0500
+X-MC-Unique: ZdW8HS7xMLSm-3Zyi2lPEQ-1
+Received: by mail-yb1-f199.google.com with SMTP id j204-20020a2523d5000000b005c21574c704so5769924ybj.13
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 03:02:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=riKTGmB1twtXdrYnwEH5vMw1b0PhVceFsEem714JIPU=;
+        b=FEPj8MNJk0pvZxxNUdWRT5gz0e0hUfq3HEFg1cMHQ3tco7hfO9DD3Mu4UKXCVY+eFf
+         ltScK8Q7mx5voHYetRyWiZC5HaDnZBpGq3pwgnMxjzoO8+Mc90oxgykFLFc4H4nkjeTo
+         UBko5kV6y/XgBgKTHOzNPG4BI3G/H5BfidSPqLraZMpGN3iP3qW5OWMV2+YVXuqL3XJ9
+         41qBRhQsyQLsJhfZgJTvGEnZMZyJU9998UUJUnphTbk6cpG35g9FPo0cci2FSVFao6ef
+         l5t0zwN+zpKhbZzVxYPHIwfFZ0QSQSnJ4aBhGgil0QIEklT1aqvv1jfQJ3Mgw0cIKGoM
+         ZhoQ==
+X-Gm-Message-State: AOAM532gUY5ewpRT6w/gYOUpXlGpIwlFzSP72qAkPybUsn4/0M7Ygmuc
+        uoUqjWB0P7aCefecN2p0tqiQ3hhBQdyqD/XdFb+7K7eDTHgZdkm9/gO5cB8hRFuaQMgbYzrMm2T
+        zYAJBAtGd89l2KUueWoKE+Rnc8HVa/CAYyAuNOhI=
+X-Received: by 2002:a25:6b4e:: with SMTP id o14mr5372593ybm.86.1637838174952;
+        Thu, 25 Nov 2021 03:02:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxpkWZmt2pKPvauNh+F7iZxY9Q2/1ctu1VXYsw13F4nPFsi0XGLz8nhBBbH+aUOP0Ejo0VSn9O9TL9tRmQ7c60=
+X-Received: by 2002:a25:6b4e:: with SMTP id o14mr5372561ybm.86.1637838174665;
+ Thu, 25 Nov 2021 03:02:54 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Thu, 25 Nov 2021 19:02:43 +0800
+Message-ID: <CAHj4cs8=xDxBZF62-OekAGtHDtP6ynALKXm7fK2D2ChpNXnGAw@mail.gmail.com>
+Subject: [bug report] WARNING at block/mq-deadline.c:600 dd_exit_sched+0x1c6/0x260
+ triggered with blktests block/031
+To:     linux-block <linux-block@vger.kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> From: deven.desai@linux.microsoft.com
-> [mailto:deven.desai@linux.microsoft.com]
-> Sent: Wednesday, October 13, 2021 9:07 PM
-> From: Deven Bowers <deven.desai@linux.microsoft.com>
-> 
-> Allows author of IPE policy to indicate trust for a singular dm-verity
-> volume, identified by roothash, through "dmverity_roothash" and all
-> signed dm-verity volumes, through "dmverity_signature".
-> 
-> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> ---
-> 
-> Relevant changes since v6:
->   * Squash patch 08/12, 10/12 to [11/16]
-> 
-> ---
->  security/ipe/eval.c                       |  5 ++
->  security/ipe/eval.h                       | 10 +++
->  security/ipe/hooks.c                      | 48 ++++++++++++++
->  security/ipe/hooks.h                      |  6 ++
->  security/ipe/ipe.c                        |  9 +++
->  security/ipe/ipe.h                        |  3 +
->  security/ipe/modules/Kconfig              | 23 +++++++
->  security/ipe/modules/Makefile             |  2 +
->  security/ipe/modules/dmverity_roothash.c  | 80 +++++++++++++++++++++++
->  security/ipe/modules/dmverity_signature.c | 25 +++++++
->  10 files changed, 211 insertions(+)
->  create mode 100644 security/ipe/modules/dmverity_roothash.c
->  create mode 100644 security/ipe/modules/dmverity_signature.c
-> 
-> diff --git a/security/ipe/eval.c b/security/ipe/eval.c
-> index 361efccebad4..facc05c753f4 100644
-> --- a/security/ipe/eval.c
-> +++ b/security/ipe/eval.c
-> @@ -23,6 +23,7 @@ static struct super_block *pinned_sb;
->  static DEFINE_SPINLOCK(pin_lock);
-> 
->  #define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
-> +#define FILE_BLOCK_DEV(f) (FILE_SUPERBLOCK(f)->s_bdev)
-> 
->  /**
->   * pin_sb: pin the underlying superblock of @f, marking it as trusted
-> @@ -95,6 +96,10 @@ static struct ipe_eval_ctx *build_ctx(const struct file *file,
->  	ctx->hook = hook;
->  	ctx->ci_ctx = ipe_current_ctx();
->  	ctx->from_init_sb = from_pinned(file);
-> +	if (file) {
-> +		if (FILE_BLOCK_DEV(file))
-> +			ctx->ipe_bdev = ipe_bdev(FILE_BLOCK_DEV(file));
-> +	}
-> 
->  	return ctx;
->  }
-> diff --git a/security/ipe/eval.h b/security/ipe/eval.h
-> index 42fb7fdf2599..25d2d8d55702 100644
-> --- a/security/ipe/eval.h
-> +++ b/security/ipe/eval.h
-> @@ -13,6 +13,14 @@
->  #include "hooks.h"
->  #include "policy.h"
-> 
-> +struct ipe_bdev {
-> +	const u8       *sigdata;
-> +	size_t		siglen;
-> +
-> +	const u8       *hash;
-> +	size_t		hashlen;
-> +};
-> +
->  struct ipe_eval_ctx {
->  	enum ipe_hook hook;
->  	enum ipe_operation op;
-> @@ -20,6 +28,8 @@ struct ipe_eval_ctx {
->  	const struct file *file;
->  	struct ipe_context *ci_ctx;
-> 
-> +	const struct ipe_bdev *ipe_bdev;
-> +
->  	bool from_init_sb;
->  };
-> 
-> diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
-> index 2d4a4f0eead0..470fb48e490c 100644
-> --- a/security/ipe/hooks.c
-> +++ b/security/ipe/hooks.c
-> @@ -13,6 +13,7 @@
->  #include <linux/types.h>
->  #include <linux/refcount.h>
->  #include <linux/rcupdate.h>
-> +#include <linux/blk_types.h>
->  #include <linux/binfmts.h>
->  #include <linux/mman.h>
-> 
-> @@ -219,3 +220,50 @@ void ipe_sb_free_security(struct super_block *mnt_sb)
->  {
->  	ipe_invalidate_pinned_sb(mnt_sb);
->  }
-> +
-> +/**
-> + * ipe_bdev_free_security: free nested structures within IPE's LSM blob
-> + *			   in block_devices
-> + * @bdev: Supplies a pointer to a block_device that contains the structure
-> + *	  to free.
-> + */
-> +void ipe_bdev_free_security(struct block_device *bdev)
-> +{
-> +	struct ipe_bdev *blob = ipe_bdev(bdev);
-> +
-> +	kfree(blob->sigdata);
-> +}
-> +
-> +/**
-> + * ipe_bdev_setsecurity: associate some data from the block device layer
-> + *			 with IPE's LSM blob.
-> + * @bdev: Supplies a pointer to a block_device that contains the LSM blob.
-> + * @key: Supplies the string key that uniquely identifies the value.
-> + * @value: Supplies the value to store.
-> + * @len: The length of @value.
-> + */
-> +int ipe_bdev_setsecurity(struct block_device *bdev, const char *key,
-> +			 const void *value, size_t len)
-> +{
-> +	struct ipe_bdev *blob = ipe_bdev(bdev);
-> +
-> +	if (!strcmp(key, DM_VERITY_SIGNATURE_SEC_NAME)) {
-> +		blob->siglen = len;
-> +		blob->sigdata = kmemdup(value, len, GFP_KERNEL);
-> +		if (!blob->sigdata)
-> +			return -ENOMEM;
-> +
-> +		return 0;
-> +	}
-> +
-> +	if (!strcmp(key, DM_VERITY_ROOTHASH_SEC_NAME)) {
-> +		blob->hashlen = len;
-> +		blob->hash = kmemdup(value, len, GFP_KERNEL);
-> +		if (!blob->hash)
-> +			return -ENOMEM;
-> +
-> +		return 0;
-> +	}
-> +
-> +	return -ENOSYS;
-> +}
-> diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
-> index e7f107ab5620..285f35187188 100644
-> --- a/security/ipe/hooks.h
-> +++ b/security/ipe/hooks.h
-> @@ -10,6 +10,7 @@
->  #include <linux/sched.h>
->  #include <linux/binfmts.h>
->  #include <linux/security.h>
-> +#include <linux/device-mapper.h>
-> 
->  enum ipe_hook {
->  	ipe_hook_exec = 0,
-> @@ -40,4 +41,9 @@ int ipe_on_kernel_load_data(enum kernel_load_data_id
-> id, bool contents);
-> 
->  void ipe_sb_free_security(struct super_block *mnt_sb);
-> 
-> +void ipe_bdev_free_security(struct block_device *bdev);
-> +
-> +int ipe_bdev_setsecurity(struct block_device *bdev, const char *key,
-> +			 const void *value, size_t len);
-> +
->  #endif /* IPE_HOOKS_H */
-> diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
-> index 1382d50078ec..215936cb4574 100644
-> --- a/security/ipe/ipe.c
-> +++ b/security/ipe/ipe.c
-> @@ -9,6 +9,7 @@
->  #include "ipe_parser.h"
->  #include "modules/ipe_module.h"
->  #include "modules.h"
-> +#include "eval.h"
-> 
->  #include <linux/fs.h>
->  #include <linux/sched.h>
-> @@ -20,8 +21,14 @@
-> 
->  struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
->  	.lbs_task = sizeof(struct ipe_context __rcu *),
-> +	.lbs_bdev = sizeof(struct ipe_bdev),
->  };
-> 
-> +struct ipe_bdev *ipe_bdev(struct block_device *b)
-> +{
-> +	return b->security + ipe_blobs.lbs_bdev;
-> +}
-> +
->  static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
->  	LSM_HOOK_INIT(task_alloc, ipe_task_alloc),
->  	LSM_HOOK_INIT(task_free, ipe_task_free),
-> @@ -31,6 +38,8 @@ static struct security_hook_list ipe_hooks[]
-> __lsm_ro_after_init = {
->  	LSM_HOOK_INIT(kernel_read_file, ipe_on_kernel_read),
->  	LSM_HOOK_INIT(kernel_load_data, ipe_on_kernel_load_data),
->  	LSM_HOOK_INIT(sb_free_security, ipe_sb_free_security),
-> +	LSM_HOOK_INIT(bdev_free_security, ipe_bdev_free_security),
-> +	LSM_HOOK_INIT(bdev_setsecurity, ipe_bdev_setsecurity),
->  };
-> 
->  /**
-> diff --git a/security/ipe/ipe.h b/security/ipe/ipe.h
-> index ad16d2bebfec..6b4c7e07f204 100644
-> --- a/security/ipe/ipe.h
-> +++ b/security/ipe/ipe.h
-> @@ -14,10 +14,13 @@
-> 
->  #include <linux/types.h>
->  #include <linux/sched.h>
-> +#include <linux/blk_types.h>
->  #include <linux/lsm_hooks.h>
-> 
->  extern struct lsm_blob_sizes ipe_blobs;
->  extern struct ipe_parser __start_ipe_parsers[], __end_ipe_parsers[];
->  extern struct ipe_module __start_ipe_modules[], __end_ipe_modules[];
-> 
-> +struct ipe_bdev *ipe_bdev(struct block_device *b);
-> +
->  #endif /* IPE_H */
-> diff --git a/security/ipe/modules/Kconfig b/security/ipe/modules/Kconfig
-> index fad96ba534e2..a6ea06cf0737 100644
-> --- a/security/ipe/modules/Kconfig
-> +++ b/security/ipe/modules/Kconfig
-> @@ -16,5 +16,28 @@ config IPE_PROP_BOOT_VERIFIED
-> 
->  	  If unsure, answer N.
-> 
-> +config IPE_PROP_DM_VERITY_SIGNATURE
-> +	bool "Enable support for signed dm-verity volumes"
-> +	depends on DM_VERITY_VERIFY_ROOTHASH_SIG
-> +	default Y
-> +	help
-> +	  This option enables the property 'dmverity_signature' in
-> +	  IPE policy. This property evaluates to TRUE when a file
-> +	  is evaluated against a dm-verity volume that was mounted
-> +	  with a signed root-hash.
-> +
-> +	  If unsure, answer Y.
-> +
-> +config IPE_PROP_DM_VERITY_ROOTHASH
-> +	bool "Enable support for dm-verity volumes"
-> +	depends on DM_VERITY
-> +	default Y
-> +	help
-> +	  This option enables the property 'dmverity_roothash' in
-> +	  IPE policy. This property evaluates to TRUE when a file
-> +	  is evaluated against a dm-verity volume whose root hash
-> +	  matches the supplied value.
-> +
-> +	  If unsure, answer Y.
-> 
->  endmenu
-> diff --git a/security/ipe/modules/Makefile b/security/ipe/modules/Makefile
-> index e0045ec65434..84fadce85193 100644
-> --- a/security/ipe/modules/Makefile
-> +++ b/security/ipe/modules/Makefile
-> @@ -6,3 +6,5 @@
->  #
-> 
->  obj-$(CONFIG_IPE_PROP_BOOT_VERIFIED) += boot_verified.o
-> +obj-$(CONFIG_IPE_PROP_DM_VERITY_SIGNATURE) += dmverity_signature.o
-> +obj-$(CONFIG_IPE_PROP_DM_VERITY_ROOTHASH) += dmverity_roothash.o
-> diff --git a/security/ipe/modules/dmverity_roothash.c
-> b/security/ipe/modules/dmverity_roothash.c
-> new file mode 100644
-> index 000000000000..0f82bec3b842
-> --- /dev/null
-> +++ b/security/ipe/modules/dmverity_roothash.c
-> @@ -0,0 +1,80 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) Microsoft Corporation. All rights reserved.
-> + */
-> +
-> +#include "ipe_module.h"
-> +
-> +#include <linux/fs.h>
-> +#include <linux/types.h>
-> +
-> +struct counted_array {
-> +	size_t	len;
-> +	u8     *data;
-> +};
-> +
-> +static int dvrh_parse(const char *valstr, void **value)
-> +{
-> +	int rv = 0;
-> +	struct counted_array *arr;
-> +
-> +	arr = kzalloc(sizeof(*arr), GFP_KERNEL);
-> +	if (!arr) {
-> +		rv = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	arr->len = (strlen(valstr) / 2);
-> +
-> +	arr->data = kzalloc(arr->len, GFP_KERNEL);
-> +	if (!arr->data) {
-> +		rv = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	rv = hex2bin(arr->data, valstr, arr->len);
-> +	if (rv != 0)
-> +		goto err2;
-> +
-> +	*value = arr;
-> +	return rv;
-> +err2:
-> +	kfree(arr->data);
-> +err:
-> +	kfree(arr);
-> +	return rv;
-> +}
-> +
-> +static bool dvrh_eval(const struct ipe_eval_ctx *ctx, const void *val)
-> +{
-> +	const u8 *src;
-> +	struct counted_array *expect = (struct counted_array *)val;
-> +
-> +	if (!ctx->ipe_bdev)
-> +		return false;
-> +
-> +	if (ctx->ipe_bdev->hashlen != expect->len)
-> +		return false;
-> +
-> +	src = ctx->ipe_bdev->hash;
-> +
-> +	return !memcmp(expect->data, src, expect->len);
+Hello
 
-Hi Deven
+blktests block/031 triggered below WARNING with latest
+linux-block/for-next[1], pls check it.
 
-I was curious to see if determining the property at run-time
-could apply also to dm-verity. It seems it could be done
-(I omit some checks, I also keep the expected value in hex
-format):
+[1]
+f0afafc21027 (HEAD, origin/for-next) Merge branch 'for-5.17/io_uring'
+into for-next
 
----
-        md = dm_get_md(file_inode(ctx->file)->i_sb->s_dev);
-        table = dm_get_live_table(md, &srcu_idx);
-        num_targets = dm_table_get_num_targets(table);
+[2]
+[ 1801.516136] run blktests block/031 at 2021-11-25 05:51:22
+[ 1801.691193] null_blk: module loaded
+[ 1847.593539] ------------[ cut here ]------------
+[ 1847.598906] statistics for priority 1: i 90452 m 0 d 182486 c 90326
+[ 1847.606024] WARNING: CPU: 8 PID: 12958 at block/mq-deadline.c:600
+dd_exit_sched+0x1c6/0x260
+[ 1847.615439] Modules linked in: null_blk sr_mod cdrom
+rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache
+netfs rfkill sunrpc vfat fat dm_multipath intel_rapl_msr
+intel_rapl_common sb_edac x86_pkg_temp_thermal intel_powerclamp
+coretemp kvm_intel kvm mgag200 i2c_algo_bit drm_kms_helper irqbypass
+crct10dif_pclmul crc32_pclmul syscopyarea ghash_clmulni_intel
+sysfillrect rapl sysimgblt intel_cstate fb_sys_fops iTCO_wdt
+iTCO_vendor_support drm intel_uncore pcspkr cdc_ether mxm_wmi usbnet
+mii lpc_ich ipmi_ssif mei_me mei ipmi_si ipmi_devintf ipmi_msghandler
+acpi_power_meter acpi_pad xfs libcrc32c sd_mod sg nvme crc32c_intel
+nvme_core t10_pi ahci libahci tg3 libata megaraid_sas wmi dm_mirror
+dm_region_hash dm_log dm_mod [last unloaded: null_blk]
+[ 1847.691165] CPU: 8 PID: 12958 Comm: rmdir Tainted: G S
+  5.16.0-rc2+ #2
+[ 1847.699888] Hardware name: Dell Inc. PowerEdge R730xd/=C9=B2\xdePow,
+BIOS 2.13.0 05/14/2021
+[ 1847.708633] RIP: 0010:dd_exit_sched+0x1c6/0x260
+[ 1847.713782] Code: 34 48 89 f8 48 c1 e8 03 42 0f b6 04 38 84 c0 74
+04 3c 03 7e 63 8b 55 30 41 89 d9 44 89 f6 48 c7 c7 a0 f3 47 a5 e8 6e
+09 28 01 <0f> 0b e9 08 ff ff ff 0f 0b e9 e0 fe ff ff 48 89 d7 48 89 14
+24 e8
+[ 1847.734845] RSP: 0018:ffff88816917fb18 EFLAGS: 00010282
+[ 1847.740763] RAX: 0000000000000000 RBX: 00000000000160d6 RCX: 00000000000=
+00000
+[ 1847.748810] RDX: 0000000000000001 RSI: ffffffffa548e4a0 RDI: ffffffffa89=
+e2c40
+[ 1847.756856] RBP: ffff8882b8584880 R08: ffffed103cb3fad1 R09: ffffed103cb=
+3fad1
+[ 1847.764901] R10: ffff8881e59fd687 R11: ffffed103cb3fad0 R12: ffff8882b85=
+84800
+[ 1847.772936] R13: ffff8882b8584948 R14: 0000000000000001 R15: dffffc00000=
+00000
+[ 1847.780974] FS:  00007f50bb899540(0000) GS:ffff8881e5800000(0000)
+knlGS:0000000000000000
+[ 1847.790078] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1847.796574] CR2: 000055bb317c00a8 CR3: 0000000139ecc003 CR4: 00000000001=
+706e0
+[ 1847.804608] Call Trace:
+[ 1847.807418]  <TASK>
+[ 1847.810232]  blk_mq_exit_sched+0x1db/0x2d0
+[ 1847.814888]  ? blk_release_queue+0xda/0x2d0
+[ 1847.819674]  elevator_exit+0x44/0x60
+[ 1847.823752]  blk_release_queue+0x13a/0x2d0
+[ 1847.828416]  kobject_release+0x10c/0x3a0
+[ 1847.832893]  disk_release+0x195/0x250
+[ 1847.837066]  device_release+0x9b/0x210
+[ 1847.841333]  kobject_release+0x10c/0x3a0
+[ 1847.845799]  null_del_dev.part.36+0x1e5/0x500 [null_blk]
+[ 1847.851837]  nullb_group_drop_item+0xa4/0xd0 [null_blk]
+[ 1847.857754]  configfs_rmdir+0x631/0x830
+[ 1847.862185]  ? configfs_unregister_subsystem+0x500/0x500
+[ 1847.868226]  vfs_rmdir+0x150/0x4c0
+[ 1847.872124]  do_rmdir+0x1bd/0x330
+[ 1847.876260]  ? __x64_sys_mkdir+0x80/0x80
+[ 1847.880741]  ? __check_object_size+0x272/0x330
+[ 1847.885805]  ? strncpy_from_user+0x66/0x340
+[ 1847.890554]  ? lockdep_hardirqs_on+0x79/0x100
+[ 1847.895522]  ? getname_flags+0xf8/0x510
+[ 1847.899907]  __x64_sys_rmdir+0x3e/0x50
+[ 1847.904197]  do_syscall_64+0x3a/0x80
+[ 1847.908275]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[ 1847.913995] RIP: 0033:0x7f50bb39f1cb
+[ 1847.918062] Code: 73 01 c3 48 8b 0d bd fc 2c 00 f7 d8 64 89 01 48
+83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 54 00 00
+00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 8d fc 2c 00 f7 d8 64 89
+01 48
+[ 1847.939096] RSP: 002b:00007ffc5d7789c8 EFLAGS: 00000246 ORIG_RAX:
+0000000000000054
+[ 1847.947629] RAX: ffffffffffffffda RBX: 00007ffc5d779271 RCX: 00007f50bb3=
+9f1cb
+[ 1847.955690] RDX: 00007f50bb6725c0 RSI: 0000000000000001 RDI: 00007ffc5d7=
+79271
+[ 1847.963729] RBP: 00007ffc5d778af8 R08: 0000000000000000 R09: 00000000000=
+00000
+[ 1847.971768] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000=
+00002
+[ 1847.979804] R13: 00007f50bb66f374 R14: 0000000000000000 R15: 00000000000=
+00000
+[ 1847.987916]  </TASK>
+[ 1847.990429] irq event stamp: 25523
+[ 1847.994295] hardirqs last  enabled at (25533): [<ffffffffa2d97e02>]
+__up_console_sem+0x52/0x60
+[ 1848.003992] hardirqs last disabled at (25542): [<ffffffffa2d97de7>]
+__up_console_sem+0x37/0x60
+[ 1848.013675] softirqs last  enabled at (25344): [<ffffffffa500064a>]
+__do_softirq+0x64a/0xa4c
+[ 1848.023200] softirqs last disabled at (25247): [<ffffffffa2c149ae>]
+irq_exit_rcu+0x1ce/0x250
+[ 1848.032702] ---[ end trace 622a93ec5416c956 ]---
 
-        for (i = 0; i < num_targets; i++) {
-                struct dm_target *ti = dm_table_get_target(table, i);
 
-                if (strcmp(ti->type->name, "verity"))
-                        continue;
 
-                ti->type->status(ti, STATUSTYPE_IMA, 0, result, sizeof(result));
-        }
-
-        dm_put_live_table(md, srcu_idx);
-        dm_put(md);
-
-        root_digest_ptr = strstr(result, "root_digest=");
-        return !strncmp(expect->data, root_digest_ptr + 12, expect->len);
----
-
-Only dm_table_get_target() is not exported yet, but I guess it could
-be. dm_table_get_num_targets() is exported.
-
-With this code, you would not have to manage security blobs
-outside IPE. Maybe you could add a blob for the super block, so
-that you verify the dm-verity property just once per filesystem.
-
-Roberto
-
-HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
-Managing Director: Li Peng, Zhong Ronghua
-
-> +}
-> +
-> +static int dvrh_free(void **val)
-> +{
-> +	struct counted_array *expect = (struct counted_array *)val;
-> +
-> +	kfree(expect->data);
-> +	kfree(expect);
-> +
-> +	return 0;
-> +}
-> +
-> +IPE_MODULE(dvrh) = {
-> +	.name = "dmverity_roothash",
-> +	.version = 1,
-> +	.parse = dvrh_parse,
-> +	.free = dvrh_free,
-> +	.eval = dvrh_eval,
-> +};
-> diff --git a/security/ipe/modules/dmverity_signature.c
-> b/security/ipe/modules/dmverity_signature.c
-> new file mode 100644
-> index 000000000000..08746fcbcb3e
-> --- /dev/null
-> +++ b/security/ipe/modules/dmverity_signature.c
-> @@ -0,0 +1,25 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) Microsoft Corporation. All rights reserved.
-> + */
-> +
-> +#include "ipe_module.h"
-> +
-> +#include <linux/fs.h>
-> +#include <linux/types.h>
-> +
-> +static bool dvv_eval(const struct ipe_eval_ctx *ctx, const void *val)
-> +{
-> +	bool expect = (bool)val;
-> +	bool eval = ctx->ipe_bdev && (!!ctx->ipe_bdev->sigdata);
-> +
-> +	return expect == eval;
-> +}
-> +
-> +IPE_MODULE(dvv) = {
-> +	.name = "dmverity_signature",
-> +	.version = 1,
-> +	.parse = ipe_bool_parse,
-> +	.free = NULL,
-> +	.eval = dvv_eval,
-> +};
-> --
-> 2.33.0
+--=20
+Best Regards,
+  Yi Zhang
 
