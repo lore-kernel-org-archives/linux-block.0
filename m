@@ -2,61 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA07C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1953C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 17:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239302AbhKYQyL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 11:54:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34674 "EHLO
+        id S243130AbhKYRYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 12:24:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231229AbhKYQwK (ORCPT
+        with ESMTP id S238288AbhKYRYK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 11:52:10 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D24FAC0613E0
-        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:42:49 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id k21so8261242ioh.4
-        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:42:49 -0800 (PST)
+        Thu, 25 Nov 2021 12:24:10 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8883AC061375
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 09:11:08 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id x6so8245133iol.13
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 09:11:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=ZcB2KnJeF64dOXF1V0U7NNaRUXTvT0BPNf7KL5t8HuU=;
-        b=bZGyFu+wu2BzC1tyqW4Hq5FJz/kWNE67C0hblr44aTh2i2lGSFyNQ9/cAW+wc8QX+M
-         oICSudFOro3nVwuMEr5DDk/wf5xUgOIYcl2rawsaghKcW1sWsug8jLjNQYZnsQPd0hz5
-         WXA8KP4CHj5IG1gZKo252529SyB65/o1l6eTjmbtD11r8nDj2fG4ieUXQemfSEO3+7hi
-         /PFH4YOFVPUKvKJSrn6JPHevloOTg/UI7hYOgasORQqSVZy+nwCSNSoIHqfpdhFIxTuo
-         Fh1IApNKy5yeOnpnn3gtRCjya0W6uDnUXb7n0GHDOkgoZ3UQ9O7LSBygW8l2+nO5Vk46
-         fT3w==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=DRbNy34LFTYJZ4PmJRBEOK4pAtCounE3z5hGbxu2tJw=;
+        b=cmSSChLr0hznhgNLogLW3A9kM31FlaOruR25XArlP/11Dum3xcFjZegD3xEnXXlwL2
+         EMPTDMwfyV6lf+kVt5X1L3c4SwHY07KSODoUFde9nIQZ1lz+Xe6EZIy8N0plW/OWtaOB
+         vOT9FhcwUYMRujhDxOe90pWJsaVLFZGsCQuY6qx0DGDqGkHJ7ORYBBVuPVI0cOh5AwD/
+         CnkmAYcq/OHitd0MDrbCIUQUjBQ5AjdRtVwPzt/l9nh/2dSrXwy7POOyr56fJpDmdw6S
+         gU6oEUUe9P4H3rQymiuZ0rs4ptDj/SmzXUdVp+LSk9OkWguJ8Wnbs0n9+Q70dZSEpNE3
+         2Wew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=ZcB2KnJeF64dOXF1V0U7NNaRUXTvT0BPNf7KL5t8HuU=;
-        b=qO3IvYfiaf8pe5ZRGi+ZU4ZAZBx7HGtSjBpdyIqsG9QZecLeU/PyNRFUZa6YNMqOv9
-         wOMmxubAV79VZMKfsQG1YM/AzJdWM6j/bJmArFcVB0RLwLXK4yB38aSksGyUKkrO2JSM
-         iPqPeZMsD2Pc+eofGkShW6c9BsyAy3qv74JP2nSFCaaWIubl+B09aT85o3H4ATd6M86l
-         fAq4/9hsNLVHapbgcU/ddYJdU3P6fa3YPzpfxqe6I5XElknmYsVCyu4N2F9ZZcuV2Vt1
-         R/H36Zq2BznNSrvmzNtt+eEiD/E4kXWA8bSj77gJ5ZJ/0eSwuR4PY6+JxWvf5ooFuszt
-         xt0g==
-X-Gm-Message-State: AOAM533ACipMxu9jpT24bPaTGj33ixE5asqzIbpoHiXZVLMEXMfQlld7
-        4gBqjCOysRiubBVZ/9MhpPHU/Q+4Ak0sxCI+
-X-Google-Smtp-Source: ABdhPJxFhkE273OmyWzyR5Tu+0LEuQrOnH74zGdEUqYeQvkm8wkAsle7oRdWa121iERi+NbYAMnbwA==
-X-Received: by 2002:a02:a708:: with SMTP id k8mr30860181jam.26.1637858569023;
-        Thu, 25 Nov 2021 08:42:49 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DRbNy34LFTYJZ4PmJRBEOK4pAtCounE3z5hGbxu2tJw=;
+        b=1Pa6OoZFylQEVx5masxwS6+Q4NLMDDinfXgOhv+BUwi+Is7QxBtjUkB1+NsB6MmF2n
+         mBpoH7+migZzRliUyFWPCu1iubNbpumBUIO3j7Zp75pHajAXvSpzeC64/Ox5deXP9StV
+         Yb37BOT/bBYeWj2gVl23TAn6BSv4VbZvN1+N1ZWDVCqLGaRBJMcgxM0vpRI1Uj2gWHSi
+         3GKFoc9tPNywprNe2iV+ac140HAJl/B3r9PxaN58nlyLgou/DcFLpCk8nrxS50vvuDw5
+         g3tjhT703pX0jrNcvfQ1Vegf5g1g4mxrx/XWO8Hk+/q+bzfHQt5J+qckbCq/hzcalvlh
+         miDg==
+X-Gm-Message-State: AOAM531Upxu1qb/Oz+gQwuL+1JCmXNRSAylLY6b1KvBmn2Uwp+7yBkHB
+        IWSiAJaD8pKhtSPOTonrTP3RLw==
+X-Google-Smtp-Source: ABdhPJy3qO38k+rwRNWfSIV8GHKZ0b4x3vzXuhrJ8iz4pX7oHJ0jXid6qB4LXMoKKQzmnI4WgdhqXQ==
+X-Received: by 2002:a05:6638:2191:: with SMTP id s17mr32430885jaj.67.1637860267798;
+        Thu, 25 Nov 2021 09:11:07 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id d2sm1866586ilv.73.2021.11.25.08.42.48
+        by smtp.gmail.com with ESMTPSA id h11sm1998376ili.30.2021.11.25.09.11.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Nov 2021 08:42:48 -0800 (PST)
+        Thu, 25 Nov 2021 09:11:07 -0800 (PST)
+Subject: Re: uring regression - lost write request
+To:     Stefan Metzmacher <metze@samba.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Daniel Black <daniel@mariadb.org>,
+        Salvatore Bonaccorso <carnil@debian.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        stable@vger.kernel.org
+References: <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
+ <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
+ <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+ <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+ <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+ <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
+ <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
+ <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk>
+ <98f8a00f-c634-4a1a-4eba-f97be5b2e801@kernel.dk> <YZ5lvtfqsZEllUJq@kroah.com>
+ <c0a7ac89-2a8c-b1e3-00c2-96ee259582b4@kernel.dk>
+ <96d6241f-7bf0-cefe-947e-ee03d83fb828@samba.org>
+ <6d6fc76f-880a-938d-64dd-527e6be3009e@kernel.dk>
+ <5217de38-d166-de32-c115-fd34399eb234@samba.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.16-rc3
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <ddc913c4-9789-ca29-6cba-60ac173fc2e1@kernel.dk>
-Date:   Thu, 25 Nov 2021 09:42:48 -0700
+Message-ID: <1714eba7-dfa7-b08c-dd29-ae4ea616041f@kernel.dk>
+Date:   Thu, 25 Nov 2021 10:11:06 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <5217de38-d166-de32-c115-fd34399eb234@samba.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,75 +85,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 11/25/21 9:35 AM, Stefan Metzmacher wrote:
+> Am 25.11.21 um 01:58 schrieb Jens Axboe:
+>> On 11/24/21 3:52 PM, Stefan Metzmacher wrote:
+>>> Hi Jens,
+>>>
+>>>>>> Looks good to me - Greg, would you mind queueing this up for
+>>>>>> 5.14-stable?
+>>>>>
+>>>>> 5.14 is end-of-life and not getting any more releases (the front page of
+>>>>> kernel.org should show that.)
+>>>>
+>>>> Oh, well I guess that settles that...
+>>>>
+>>>>> If this needs to go anywhere else, please let me know.
+>>>>
+>>>> Should be fine, previous 5.10 isn't affected and 5.15 is fine too as it
+>>>> already has the patch.
+>>>
+>>> Are 5.11 and 5.13 are affected, these are hwe kernels for ubuntu,
+>>> I may need to open a bug for them...
+>>
+>> Please do, then we can help get the appropriate patches lined up for
+>> 5.11/13. They should need the same set, basically what ended up in 5.14
+>> plus the one I posted today.
+> 
+> Ok, I've created https://bugs.launchpad.net/bugs/1952222
+> 
+> Let's see what happens...
 
-- NVMe pull request via Christoph:
-	- Add a NO APST quirk for a Kioxia device (Enzo Matsumiya)
-	- Fix write zeroes pi (Klaus Jensen)
-	- Various TCP transport fixes (Maurizio Lombardi and
-	  Varun Prakash)
-	- Ignore invalid fast_io_fail_tmo values (Maurizio Lombardi)
-	- Use IOCB_NOWAIT only if the filesystem supports it
-	  (Maurizio Lombardi)
-
-- Module loading fix (Ming)
-
-- Kerneldoc warning fix (Yang)
-
-Please pull!
-
-
-The following changes since commit 2b504bd4841bccbf3eb83c1fec229b65956ad8ad:
-
-  blk-mq: don't insert FUA request with data into scheduler queue (2021-11-19 06:28:18 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-11-25
-
-for you to fetch changes up to e30028ace8459ea096b093fc204f0d5e8fc3b6ae:
-
-  block: fix parameter not described warning (2021-11-25 09:32:19 -0700)
-
-----------------------------------------------------------------
-block-5.16-2021-11-25
-
-----------------------------------------------------------------
-Enzo Matsumiya (1):
-      nvme-pci: add NO APST quirk for Kioxia device
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.16-2021-11-25' of git://git.infradead.org/nvme into block-5.16
-
-Klaus Jensen (1):
-      nvme: fix write zeroes pi
-
-Maurizio Lombardi (6):
-      nvmet-tcp: fix a race condition between release_queue and io_work
-      nvmet-tcp: add an helper to free the cmd buffers
-      nvmet-tcp: fix memory leak when performing a controller reset
-      nvme-tcp: fix memory leak when freeing a queue
-      nvme-fabrics: ignore invalid fast_io_fail_tmo values
-      nvmet: use IOCB_NOWAIT only if the filesystem supports it
-
-Ming Lei (1):
-      block: avoid to touch unloaded module instance when opening bdev
-
-Varun Prakash (2):
-      nvmet-tcp: fix incomplete data digest send
-      nvme-tcp: validate R2T PDU in nvme_tcp_handle_r2t()
-
-Yang Guang (1):
-      block: fix parameter not described warning
-
- block/bdev.c                      | 12 ++++----
- block/blk-core.c                  |  1 +
- drivers/nvme/host/core.c          | 29 +++++++++++++++++--
- drivers/nvme/host/fabrics.c       |  3 ++
- drivers/nvme/host/tcp.c           | 61 +++++++++++++++++++--------------------
- drivers/nvme/target/io-cmd-file.c |  4 ++-
- drivers/nvme/target/tcp.c         | 44 ++++++++++++++++++++--------
- 7 files changed, 102 insertions(+), 52 deletions(-)
+Let me know if I can help, should probably prepare a set for 5.11-stable
+and 5.13-stable, but I don't know if the above kernels already have some
+patches applied past last stable release of each...
 
 -- 
 Jens Axboe
