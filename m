@@ -2,61 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 023A0C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A196C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 16:49:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237604AbhKYQwJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 11:52:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
+        id S1356649AbhKYQwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 11:52:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346102AbhKYQuI (ORCPT
+        with ESMTP id S231229AbhKYQuI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 25 Nov 2021 11:50:08 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17383C06139B;
-        Thu, 25 Nov 2021 08:35:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Date:Message-ID:From:Cc:To;
-        bh=KZ8p9IqkJMuifV3MoPHGueQyyLNb1ZlJH3HXVXKtYds=; b=22YKaGJiAO8MfCRiOBCwgb0TF7
-        zxRB/OnQgaFpdRXtdQcKl9r9TLSTu5Lj/zSi+h+k67sgV2njLo8/0WX4Q9aJtVsy2YyFxOphdQD+4
-        em5tSndd/MRNlsBbbd21LtQ7b0H+NZHYl80OBxis9RncITiWkgpnrbFBYlXiuDqPIK3l25Jo97EIk
-        EUd4Lzv6fJ7tOT6mEiMW/kICzAD7iuDSo10aUShvGVy7izLLTklDqxx3nVQIqQvidJHY8lqCu+SZZ
-        AwuNj9OHu/amsO0hAtxKCstiwDmwyplE0olCIlrP81FwfSkZnUJKQ8ize15/6hiz0kOyq8GFwM9vO
-        kX2nrYqf2tjrsdSUfo/EIx2o0pvLHQK9IzSLC+bfWaOA6AK1pfOIVkUCIK8eLvNkeL4zv+9tL2Yw9
-        B/1EVhxTO72fHiR0xXnEQflGE9LVcDuevJL4VrhxqkIpPsiDA4NgpvzJeoT4wdpm1GanSCdkAHDCw
-        jhPa3Y/Px9g75XQBJJMRcMJT;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mqHie-008xAS-Fr; Thu, 25 Nov 2021 16:35:32 +0000
-Subject: Re: uring regression - lost write request
-To:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Daniel Black <daniel@mariadb.org>,
-        Salvatore Bonaccorso <carnil@debian.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        stable@vger.kernel.org
-References: <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
- <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
- <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
- <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
- <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
- <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
- <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
- <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
- <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk>
- <98f8a00f-c634-4a1a-4eba-f97be5b2e801@kernel.dk> <YZ5lvtfqsZEllUJq@kroah.com>
- <c0a7ac89-2a8c-b1e3-00c2-96ee259582b4@kernel.dk>
- <96d6241f-7bf0-cefe-947e-ee03d83fb828@samba.org>
- <6d6fc76f-880a-938d-64dd-527e6be3009e@kernel.dk>
-From:   Stefan Metzmacher <metze@samba.org>
-Message-ID: <5217de38-d166-de32-c115-fd34399eb234@samba.org>
-Date:   Thu, 25 Nov 2021 17:35:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE93AC06139E
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:36:46 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id v23so8182521iom.12
+        for <linux-block@vger.kernel.org>; Thu, 25 Nov 2021 08:36:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=O1ZDNgn834WbCkz4HbANyUMJbAE8lQOkVdODgu49duE=;
+        b=lpBtjs5FChdGoxM3f15NbuZmNklhn03BhbUEubWPMNmwedM/+bTWqXmWthWmxZ4eFy
+         cx3gsFVeZru24lHPWxX1gHP0780oaBUx1yhZPAk5q7N1difFx+8v9iz2SNd2KJ21rpmo
+         aYCCefR9+DyIrZ6agFO1gpHnrTIJ00/cfdqRTexetffiJyTbXJ8hfTtU+fvKKrdwCvWG
+         B+7N1NkMhsKLl2RqweSAhuJJWs0yzf7sZekHRycWvAMFX1fiAKehPmovrpNSfCCs7kf5
+         6tHjd3QtJ5IVd2iSuzBCeqNon2M90x/7aARh+/SB5fnlV9K8SbjgkqL16cfrjo7PZh4D
+         paCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=O1ZDNgn834WbCkz4HbANyUMJbAE8lQOkVdODgu49duE=;
+        b=oB54XveOEgDjDkZA36lxZmFesWraZ3zB4b0dBzKYw8RIPZjpDyVk/Qk+SCOsdNbzoJ
+         K6Qd3fb16o7aEhwk/A6eSkYkj8IKFGHI7fpLjs2bvbgSCcRYhkoksfCz0NKf3VIheZIk
+         MOPmmTGaWUy9EHkJyw6mQEsJt//I3LjVKQtPR8xHxdwEWNPOXobhi50/PLuKrH02rJSV
+         lVQTqeDDRw3VTC7rnBe4t9f8334bXZlqoPaztrqRSdzddHfSswbnKTEBvsjgjUL8itLz
+         3wlDDEOCiGjQsoP1R+Iy3bs29/P8zan9uQ9JlfOqU9/rYQTq86VCfVFrz2MaIgDDEEvq
+         LVcg==
+X-Gm-Message-State: AOAM531qSn9ncRi2yeN3YVlFv27Q/ux74z0dA45PIlk2cGfX6698MHKU
+        kjjPUrqbS/zMBFuyPFDv5DtfIA==
+X-Google-Smtp-Source: ABdhPJywbE+wGzJAR6pUFsTE7EziAsQyLRWt+geVKbMSftt+6s5knBMhPsAdy474yBpSGE+51wfrOg==
+X-Received: by 2002:a05:6602:14cd:: with SMTP id b13mr26816851iow.203.1637858206013;
+        Thu, 25 Nov 2021 08:36:46 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id i1sm1871909ilm.5.2021.11.25.08.36.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Nov 2021 08:36:45 -0800 (PST)
+Subject: Re: [PATCH v2] block: fix parameter not described warning
+To:     davidcomponentone@gmail.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yang Guang <yang.guang5@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+References: <acf6fdca867ff78a13099ea6615ac39d69bbfc9b.1637825871.git.yang.guang5@zte.com.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6b11ce2f-fdea-1cfa-10f1-44e5664d64ed@kernel.dk>
+Date:   Thu, 25 Nov 2021 09:36:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <6d6fc76f-880a-938d-64dd-527e6be3009e@kernel.dk>
+In-Reply-To: <acf6fdca867ff78a13099ea6615ac39d69bbfc9b.1637825871.git.yang.guang5@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,33 +69,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 25.11.21 um 01:58 schrieb Jens Axboe:
-> On 11/24/21 3:52 PM, Stefan Metzmacher wrote:
->> Hi Jens,
->>
->>>>> Looks good to me - Greg, would you mind queueing this up for
->>>>> 5.14-stable?
->>>>
->>>> 5.14 is end-of-life and not getting any more releases (the front page of
->>>> kernel.org should show that.)
->>>
->>> Oh, well I guess that settles that...
->>>
->>>> If this needs to go anywhere else, please let me know.
->>>
->>> Should be fine, previous 5.10 isn't affected and 5.15 is fine too as it
->>> already has the patch.
->>
->> Are 5.11 and 5.13 are affected, these are hwe kernels for ubuntu,
->> I may need to open a bug for them...
+On 11/25/21 9:20 AM, davidcomponentone@gmail.com wrote:
+> From: Yang Guang <yang.guang5@zte.com.cn>
 > 
-> Please do, then we can help get the appropriate patches lined up for
-> 5.11/13. They should need the same set, basically what ended up in 5.14
-> plus the one I posted today.
+> The build warning:
+> block/blk-core.c:968: warning: Function parameter or member 'iob'
+> not described in 'bio_poll'.
 
-Ok, I've created https://bugs.launchpad.net/bugs/1952222
+Applied, thanks.
 
-Let's see what happens...
-
-metze
+-- 
+Jens Axboe
 
