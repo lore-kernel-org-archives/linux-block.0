@@ -2,115 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F00C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 24 Nov 2021 22:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB372C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 01:47:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345385AbhKXXAn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Nov 2021 18:00:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52452 "EHLO
+        id S238030AbhKYBuR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Nov 2021 20:50:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344585AbhKXXAn (ORCPT
+        with ESMTP id S1351945AbhKYBsP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Nov 2021 18:00:43 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD37C061746
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 14:57:33 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id v1so17209324edx.2
-        for <linux-block@vger.kernel.org>; Wed, 24 Nov 2021 14:57:33 -0800 (PST)
+        Wed, 24 Nov 2021 20:48:15 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B023C07E5C3;
+        Wed, 24 Nov 2021 16:54:29 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id y7so3285847plp.0;
+        Wed, 24 Nov 2021 16:54:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mariadb.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kZ/Cy6oKXJuBsBkSEe6ykahv0AudUP/LRivoV/mGkv8=;
-        b=h6z6PNmew3L4EmqJUapMfQ73aM5Al6Ba8eOAJne3KmFdTj+9v3dIY0888+LVi6HgH/
-         RGesLXW9XCNayvrRP+Zr0FR9FYv7KAT5y+wGzw7/09dI1SIjE0Ru0TNkB2XLHSELQZB+
-         KOtfTyGGgIY4xWB0efZL6NOemCCtdXSRTgCrMrUI9/62iuEaLtBjnj3LbChvbTTdqVhQ
-         Ja5tgqB3wD/Vm7n66s/mxMWeaevH5sfarctFry44bmyIxE4i0Rhj+b4sfxAeWVEbKoSn
-         e/Ss3/NGDfYpzJGlx3WoPodQjnWCVa1lRGaISALPwm3uZPEqeNG6OoGmUBnRt5vzjCYD
-         wNIQ==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hfw9u2dgKWMvFM+zv9k6Og/5ORjy5xYA+ZKABDcLG0I=;
+        b=JPf4Zlb8stgQin4wu9U2SPJdBOkXEjJWj5xZpZsGHWHV3aHFQE+ZeTUtD8S/iHDceh
+         KB+GfVzT4+7ap93df0I/eZIORH50vjjvF0cFsxLkid4ySMGflKVwfCXpyiAtjFeLilee
+         bI4kSU9yxEsDo71/cIht2ygmqTBn1SuoT1SNQpA5jNO8U64xL8heOc6ciVq+NlTl2DQA
+         293snpeq6DPCfxlpoHIsVLylODjvc0kLIZAdc5AY2SGmoMCliUaed47bXaI6ossDa2ki
+         6KjpDZsxl+NGbahSaTiE8ziV6jr2qr2lRJxt+cpF09NMel/hDng+gr35vPYvbr7xibi/
+         JT8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kZ/Cy6oKXJuBsBkSEe6ykahv0AudUP/LRivoV/mGkv8=;
-        b=3PMTiYrGW0bjz/YqDRABQhaCfCoCIQuSK3FaL7losfIVaujXr2tWU1H4fuDip2gwtn
-         fK732rmNnsLOtdOTsf/ewkuAB544tz/P+X1FsLYAWx7P71kLWZhKzTqdOUrzbHpML3+Z
-         rzcs4Ig0AJx1/wrr75d62pYICUw0FGHSBH4o3DbnbqQFn0UWTd2IClcCkqzNECrufk1N
-         RWs5b5uN1YtfZQV567eAeW9hzqOWfeoVdIpX4HP4P2A65iqctGZobNmMu2XYGV/sMfX7
-         deTlcqTsY5ED0+a5H6tBMQxyCet5nW7g5jbRGwojxDnj31e2X0NkYNXSU2NcXS0W2Oiu
-         nB5w==
-X-Gm-Message-State: AOAM532sCwPpEgsDuznQYK6b2y87AUxXYTwuE0SfkRuQPcOcKCVpzDpO
-        5DvmiqsBsEHJIjWNCs6Cke7xPkGAVUUbR6r89S1Vkw==
-X-Google-Smtp-Source: ABdhPJwCs5NYY9EfCsQ1LswfyhANXYbQm96NTJsvs5s8M3oFoYX9ZbguIlfrjP1n+0r1RIbD1X3X7+YlLgVzYWGTcs0=
-X-Received: by 2002:a05:6402:90c:: with SMTP id g12mr31022237edz.217.1637794651674;
- Wed, 24 Nov 2021 14:57:31 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hfw9u2dgKWMvFM+zv9k6Og/5ORjy5xYA+ZKABDcLG0I=;
+        b=S9i14o3WWB5XdiIeTBmMziM0X3Ag2b8Bw53dyHSd3hq2nYWsc4htkTQs52KCj3psf1
+         Ol8F2/nGeACAl4Wd9yVesehfQ6PzL++QOoldJ6aEeMhviWDR3L63SkP6YwcmoF5CLvfo
+         0zHCrDlUGjyp6u1bWBpHDaDKIB+MUISdQMYhYZ8GNxN/F+OLJwXnfUgyM1XuNZf5Jt80
+         9vAiAp955aswwBVfEjuyhyv4wRJPhkPVKSROPDTCJFv5+Mm1nzR1iRSopIt9aipLq7zs
+         BkzfYv2ZeLwC/CWiq37MGHqmYjoSJq3XIONeS3nFdyL9cgXHNXomznBKflSzwuoLLsEH
+         6EWA==
+X-Gm-Message-State: AOAM532JNAfrYnmObg93h9ZA5Cz3TXa+9wGBMF0piZt2XtVMlkQc2m0s
+        f7nNH1JSMef5+RxZH/spkws=
+X-Google-Smtp-Source: ABdhPJxW9UHirSi0C8d6l7D4hHExfez0M7O4YPi0gKSOyE2fv/HPLMQk9KyfcTe8oXt67764zowOXA==
+X-Received: by 2002:a17:902:c7d5:b0:143:72b7:2ca5 with SMTP id r21-20020a170902c7d500b0014372b72ca5mr25069292pla.20.1637801669207;
+        Wed, 24 Nov 2021 16:54:29 -0800 (PST)
+Received: from debian11-dev-61.localdomain (192.243.120.180.16clouds.com. [192.243.120.180])
+        by smtp.gmail.com with ESMTPSA id f18sm888112pfk.105.2021.11.24.16.54.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Nov 2021 16:54:28 -0800 (PST)
+From:   davidcomponentone@gmail.com
+X-Google-Original-From: yang.guang5@zte.com.cn
+To:     axboe@kernel.dk
+Cc:     davidcomponentone@gmail.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yang Guang <yang.guang5@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] block: fix parameter not described warning
+Date:   Thu, 25 Nov 2021 08:54:15 +0800
+Message-Id: <3ece7228314e89177d022cd514215d8c76485fb8.1637735436.git.yang.guang5@zte.com.cn>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
- <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk> <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
- <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk> <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
- <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
- <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk> <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
- <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk> <98f8a00f-c634-4a1a-4eba-f97be5b2e801@kernel.dk>
- <YZ5lvtfqsZEllUJq@kroah.com> <c0a7ac89-2a8c-b1e3-00c2-96ee259582b4@kernel.dk>
-In-Reply-To: <c0a7ac89-2a8c-b1e3-00c2-96ee259582b4@kernel.dk>
-From:   Daniel Black <daniel@mariadb.org>
-Date:   Thu, 25 Nov 2021 09:57:20 +1100
-Message-ID: <CABVffEOXe=mhyW_-Ynz4Z9g_UxvVAms662vQjN9UBfF9NhWu8g@mail.gmail.com>
-Subject: Re: uring regression - lost write request
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Salvatore Bonaccorso <carnil@debian.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 25, 2021 at 3:22 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 11/24/21 9:18 AM, Greg Kroah-Hartman wrote:
-> > On Wed, Nov 24, 2021 at 09:10:25AM -0700, Jens Axboe wrote:
-> >> On 11/24/21 8:28 AM, Jens Axboe wrote:
-> >>> On 11/23/21 8:27 PM, Daniel Black wrote:
-> >>>> On Mon, Nov 15, 2021 at 7:55 AM Jens Axboe <axboe@kernel.dk> wrote:
+From: Yang Guang <yang.guang5@zte.com.cn>
 
-> >>>> I'm getting the same reproducer on 5.14.20
-> >>>> (https://bugzilla.redhat.com/show_bug.cgi?id=2018882#c3) though the
-> >>>> backport change logs indicate 5.14.19 has the patch.
-> >>>>
-> >>>> Anything missing?
-> >>>
-> >>> We might also need another patch that isn't in stable, I'm attaching
-> >>> it here. Any chance you can run 5.14.20/21 with this applied? If not,
-> >>> I'll do some sanity checking here and push it to -stable.
-> >>
-> >> Looks good to me - Greg, would you mind queueing this up for
-> >> 5.14-stable?
-> >
-> > 5.14 is end-of-life and not getting any more releases (the front page of
-> > kernel.org should show that.)
->
-> Oh, well I guess that settles that...
+The build warning:
+block/blk-core.c:968: warning: Function parameter or member 'iob'
+not described in 'bio_poll'.
 
-Certainly does. Thanks for looking and finding the patch.
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Yang Guang <yang.guang5@zte.com.cn>
+---
+ block/blk-core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> > If this needs to go anywhere else, please let me know.
->
-> Should be fine, previous 5.10 isn't affected and 5.15 is fine too as it
-> already has the patch.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 6ae8297b033f..2053d1b0e90e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -956,6 +956,7 @@ EXPORT_SYMBOL(submit_bio);
+ /**
+  * bio_poll - poll for BIO completions
+  * @bio: bio to poll for
++ * @iob: batches of IO
+  * @flags: BLK_POLL_* flags that control the behavior
+  *
+  * Poll for completions on queue associated with the bio. Returns number of
+-- 
+2.30.2
 
-Thank you
-
-https://github.com/MariaDB/server/commit/de7db5517de11a58d57d2a41d0bc6f38b6f92dd8
-
-On Thu, Nov 25, 2021 at 9:52 AM Stefan Metzmacher <metze@samba.org> wrote:
-> Are 5.11 and 5.13 are affected,
-
-Yes.
-
-> these are hwe kernels for ubuntu,
-> I may need to open a bug for them...
-
-Yes please.
