@@ -2,59 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A165C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 19:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64005C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 21:07:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231186AbhKYTRH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 14:17:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52546 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232601AbhKYTPH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 14:15:07 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id E209D60C3F;
-        Thu, 25 Nov 2021 19:11:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637867515;
-        bh=gKjRkYpD62fJYC387aD9GPFsdSjimkz88oXnOTlNxvc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=lKB4tRmzjw64lI7WJ4nYSt0Emor9bVAFnXfP+ycIVl8jBeqMHoJWAqT2Tdlnh8CQE
-         V3hUrBoHsyezZ2m/n7R9hak+we1jsMc1GNTuM+DjHKXmCpTzPEgt0MygcF2AUc55cz
-         Yy1YE2/GHJ8YP7twPZWMG4eNbid1u5csfbvno3e7E4YOfYYXM1+78VgifpK52SMtTh
-         MclB6y2BdbMM7m4ZUDUzSeloBLAyvrxn0hSh4P7lfrrboBhSgHvXlAcVj5Vn1I9oc+
-         9BiIPI/jXwEclU02ZiaaLPWj6ZfOMmKTTcuWXuon/8CqwKyK+ffDppQkGl2uVmKX9L
-         w5pqWvpk4DIXg==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id D2E0B60A0A;
-        Thu, 25 Nov 2021 19:11:55 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 5.16-rc3
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ddc913c4-9789-ca29-6cba-60ac173fc2e1@kernel.dk>
-References: <ddc913c4-9789-ca29-6cba-60ac173fc2e1@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ddc913c4-9789-ca29-6cba-60ac173fc2e1@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.16-2021-11-25
-X-PR-Tracked-Commit-Id: e30028ace8459ea096b093fc204f0d5e8fc3b6ae
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8ced7ca3570333998ad2088d5a6275701970e28e
-Message-Id: <163786751580.29201.1645397282997047987.pr-tracker-bot@kernel.org>
-Date:   Thu, 25 Nov 2021 19:11:55 +0000
+        id S237400AbhKYVKb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 16:10:31 -0500
+Received: from mailbackend.panix.com ([166.84.1.89]:30564 "EHLO
+        mailbackend.panix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231621AbhKYVIb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Nov 2021 16:08:31 -0500
+Received: from [192.168.126.80] (ip98-184-250-31.oc.oc.cox.net [98.184.250.31])
+        by mailbackend.panix.com (Postfix) with ESMTPSA id 4J0Vl1638fz2sJY;
+        Thu, 25 Nov 2021 16:05:17 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
+        t=1637874318; bh=/phpLN81VHGxqAiAfyH0Geo3FSMKK9AauWc37cUnhQE=;
+        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
+        b=eGCNwMmEWIkD/rVJtOna7ZeyO9BUB8nxnWHdUeU1wb8TDU9rJphJ2/XTvCX+Xo76w
+         BYhE2efhCHKaIpq7XwKimblUSrkrVGVxnfzyUGPAeJZsbwHXZetcZWVFWYNWILFK7p
+         ub0IKxBXH+WxWHmc8eBrEbYQKVHigme0nXEvLnNw=
+Date:   Thu, 25 Nov 2021 13:05:16 -0800 (PST)
+From:   "Kenneth R. Crudup" <kenny@panix.com>
+Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org,
+        "Kenneth R. Crudup" <kenny@panix.com>
+Subject: Re: Write I/O queue hangup at random on recent Linus' kernels
+In-Reply-To: <b9c2681f-e63a-4d3b-913d-d8a75e2c2ea0@kernel.dk>
+Message-ID: <be6a783-97db-c3bf-b16f-e8c62b14755d@panix.com>
+References: <b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com> <b9c2681f-e63a-4d3b-913d-d8a75e2c2ea0@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Thu, 25 Nov 2021 09:42:48 -0700:
 
-> git://git.kernel.dk/linux-block.git tags/block-5.16-2021-11-25
+On Tue, 23 Nov 2021, Jens Axboe wrote:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8ced7ca3570333998ad2088d5a6275701970e28e
+> It looks like some missed accounting. You can just disable wbt for now, would
+> be a useful data point to see if that fixes it. Just do:
 
-Thank you!
+> echo 0 > /sys/block/nvme0n1/queue/wbt_lat_usec
+
+> and that will disable writeback throttling on that device.
+
+It's been about 48 hours and haven't seen the issue since doing this.
+
+	-Kenny
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
