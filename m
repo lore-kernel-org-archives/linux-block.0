@@ -2,401 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42192C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 15:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1251DC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 16:28:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349785AbhKZPVH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Nov 2021 10:21:07 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:59849 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354208AbhKZPTG (ORCPT
+        id S238745AbhKZQbR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Nov 2021 11:31:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49224 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239200AbhKZQ3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Nov 2021 10:19:06 -0500
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1AQFFZWE060612;
-        Sat, 27 Nov 2021 00:15:35 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Sat, 27 Nov 2021 00:15:35 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1AQFFYvx060606
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 27 Nov 2021 00:15:35 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <fffda32f-848a-712b-f50e-8a6d7d086039@i-love.sakura.ne.jp>
-Date:   Sat, 27 Nov 2021 00:15:29 +0900
+        Fri, 26 Nov 2021 11:29:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637943963;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9/Bls/Z9SllhxVc+L2vI8snOWy5+HK1l2H7LEdHdi3c=;
+        b=dCHgZUEtDbLFmamrAIYL4TC1BSQ4oH7sB3ZlQF66Tx9oQu1v8tnjAH71j4DIxumUdubF/h
+        1MC81waPkl7W59mQU73iwK8hEUi/etGgSlG750qkao/cInyr+jZ0R2j7lzMu7Cqt+44BG4
+        agTGGNzMJfa0YU5ifATewAlk/pBQaxg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-56-aMWYqcR7NfKOLe4UwN3MLw-1; Fri, 26 Nov 2021 11:26:02 -0500
+X-MC-Unique: aMWYqcR7NfKOLe4UwN3MLw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 790541F2DB
+        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 16:25:49 +0000 (UTC)
+Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C91CE7E645;
+        Fri, 26 Nov 2021 16:25:02 +0000 (UTC)
+Date:   Sat, 27 Nov 2021 00:24:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Subject: Re: [bug report] WARNING at block/mq-deadline.c:600
+ dd_exit_sched+0x1c6/0x260 triggered with blktests block/031
+Message-ID: <YaEKWPlAmDJYV6Si@T590>
+References: <CAHj4cs8=xDxBZF62-OekAGtHDtP6ynALKXm7fK2D2ChpNXnGAw@mail.gmail.com>
+ <YaBGI7bR/9ot514F@T590>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: [PATCH v2] loop: replace loop_validate_mutex with
- loop_validate_spinlock
-Content-Language: en-US
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     linux-block <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
-References: <84a861dc-6d50-81c0-8e8b-461ef59f4c01@i-love.sakura.ne.jp>
-In-Reply-To: <84a861dc-6d50-81c0-8e8b-461ef59f4c01@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YaBGI7bR/9ot514F@T590>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit c895b784c699224d ("loop: don't hold lo_mutex during
-__loop_clr_fd()") suggested me that we can also stop holding lo_mutex
-for the remaining operations if we use dedicated state for the remaining
-operations. Therefore, introduce Lo_binding state in order to allow
-loop_change_fd() and loop_configure() to do their operations without
-holding lo_mutex.
+On Fri, Nov 26, 2021 at 10:27:47AM +0800, Ming Lei wrote:
+> Hi Yi,
+> 
+> On Thu, Nov 25, 2021 at 07:02:43PM +0800, Yi Zhang wrote:
+> > Hello
+> > 
+> > blktests block/031 triggered below WARNING with latest
+> > linux-block/for-next[1], pls check it.
+> > 
+> > [1]
+> > f0afafc21027 (HEAD, origin/for-next) Merge branch 'for-5.17/io_uring'
+> > into for-next
+> 
+> After running block/031 for several times in today's linus tree, not
+> reproduce the issue:
 
-Then, it will look strange that loop_configure(), loop_change_fd() and
-__loop_clr_fd() need to conditionally hold loop_validate_mutex for doing
-their operations. Now that lo_mutex is held by these functions only when
-asserting/updating lo_state, let's also replace loop_validate_mutex with
-loop_validate_spinlock which is held only when asserting/updating lo_state.
-As a bonus, code for conditional locking and tricky barrier usages are
-removed.
+Yi, it should be one for-5.17/block only issue, please test the
+following patch:
 
-This change will break blktests.loop/006 [1], but I don't think that this
-breakage is considered as a regression because nobody except fuzzers would
-want to attempt ioctl(loop_fd, LOOP_CLR_FD, 0) and ioctl(other_loop_fd,
-LOOP_SET_FD, loop_fd) concurrently. Such attempt was hitting NULL pointer
-dereference till commit 310ca162d779efee ("block/loop: Use global lock for
-ioctl() operation.") and from commit 6cc8e7430801fa23 ("loop: scale loop
-device by introducing per device lock") till commit 3ce6e1f662a91097
-("loop: reintroduce global lock for safe loop_validate_file() traversal").
-This patch changes conflicting operations to fail instead of succeeding
-via serialization, for an apparently successful response from conflicting
-operations is unusable.
 
-Link: https://github.com/osandov/blktests/blob/577caa7d2b4a50ae9d4cb85fc4da864b1d54ea37/tests/loop/006 [1]
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+From 13b6abb5545f08bbe7dfea34a1bfc186e04932ac Mon Sep 17 00:00:00 2001
+From: Ming Lei <ming.lei@redhat.com>
+Date: Sat, 27 Nov 2021 00:19:43 +0800
+Subject: [PATCH] blk-mq: use bio->bi_opf after bio is checked
+
+bio->bi_opf isn't finalized before checking the bio, so use it after
+submit_bio_checks() returns.
+
+Fixes: f1880d26e517 ("blk-mq: cleanup request allocation")
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
-Changes in v2:
-  Update patch description.
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- drivers/block/loop.c | 153 +++++++++++++++++--------------------------
- drivers/block/loop.h |   1 +
- 2 files changed, 60 insertions(+), 94 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ba76319b5544..3dfb39d38235 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -88,46 +88,46 @@
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 82491ab676fb..b57c4373e59b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2712,7 +2712,6 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+ 		.nr_tags	= 1,
+-		.cmd_flags	= bio->bi_opf,
+ 	};
+ 	struct request *rq;
  
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
--static DEFINE_MUTEX(loop_validate_mutex);
-+static DEFINE_SPINLOCK(loop_validate_spinlock);
+@@ -2725,6 +2724,8 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
  
--/**
-- * loop_global_lock_killable() - take locks for safe loop_validate_file() test
-- *
-- * @lo: struct loop_device
-- * @global: true if @lo is about to bind another "struct loop_device", false otherwise
-- *
-- * Returns 0 on success, -EINTR otherwise.
-- *
-- * Since loop_validate_file() traverses on other "struct loop_device" if
-- * is_loop_device() is true, we need a global lock for serializing concurrent
-- * loop_configure()/loop_change_fd()/__loop_clr_fd() calls.
-- */
--static int loop_global_lock_killable(struct loop_device *lo, bool global)
-+static bool loop_try_update_state_locked(struct loop_device *lo, const int old, const int new)
- {
--	int err;
-+	bool ret = false;
+ 	rq_qos_throttle(q, bio);
  
--	if (global) {
--		err = mutex_lock_killable(&loop_validate_mutex);
--		if (err)
--			return err;
-+	lockdep_assert_held(&lo->lo_mutex);
-+	spin_lock(&loop_validate_spinlock);
-+	if (lo->lo_state == old) {
-+		lo->lo_state = new;
-+		ret = true;
- 	}
--	err = mutex_lock_killable(&lo->lo_mutex);
--	if (err && global)
--		mutex_unlock(&loop_validate_mutex);
--	return err;
-+	spin_unlock(&loop_validate_spinlock);
-+	return ret;
- }
- 
--/**
-- * loop_global_unlock() - release locks taken by loop_global_lock_killable()
-- *
-- * @lo: struct loop_device
-- * @global: true if @lo was about to bind another "struct loop_device", false otherwise
-- */
--static void loop_global_unlock(struct loop_device *lo, bool global)
-+static bool loop_try_update_state(struct loop_device *lo, const int old, const int new)
- {
-+	bool ret;
-+
-+	if (mutex_lock_killable(&lo->lo_mutex))
-+		return false;
-+	ret = loop_try_update_state_locked(lo, old, new);
-+	mutex_unlock(&lo->lo_mutex);
-+	return ret;
-+}
-+
-+static void loop_update_state_locked(struct loop_device *lo, const int state)
-+{
-+	lockdep_assert_held(&lo->lo_mutex);
-+	spin_lock(&loop_validate_spinlock);
-+	lo->lo_state = state;
-+	spin_unlock(&loop_validate_spinlock);
-+}
-+
-+static void loop_update_state(struct loop_device *lo, const int state)
-+{
-+	mutex_lock(&lo->lo_mutex);
-+	loop_update_state_locked(lo, state);
- 	mutex_unlock(&lo->lo_mutex);
--	if (global)
--		mutex_unlock(&loop_validate_mutex);
- }
- 
- static int max_part;
-@@ -532,25 +532,28 @@ static int loop_validate_file(struct file *file, struct block_device *bdev)
- {
- 	struct inode	*inode = file->f_mapping->host;
- 	struct file	*f = file;
-+	int		err = 0;
- 
- 	/* Avoid recursion */
-+	spin_lock(&loop_validate_spinlock);
- 	while (is_loop_device(f)) {
- 		struct loop_device *l;
- 
--		lockdep_assert_held(&loop_validate_mutex);
--		if (f->f_mapping->host->i_rdev == bdev->bd_dev)
--			return -EBADF;
--
-+		if (f->f_mapping->host->i_rdev == bdev->bd_dev) {
-+			err = -EBADF;
-+			break;
-+		}
- 		l = I_BDEV(f->f_mapping->host)->bd_disk->private_data;
--		if (l->lo_state != Lo_bound)
--			return -EINVAL;
--		/* Order wrt setting lo->lo_backing_file in loop_configure(). */
--		rmb();
-+		if (l->lo_state != Lo_bound) {
-+			err = -EINVAL;
-+			break;
-+		}
- 		f = l->lo_backing_file;
- 	}
--	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
--		return -EINVAL;
--	return 0;
-+	if (!err && !S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
-+		err = -EINVAL;
-+	spin_unlock(&loop_validate_spinlock);
-+	return err;
- }
- 
- /*
-@@ -568,17 +571,12 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	struct file *old_file;
- 	int error;
- 	bool partscan;
--	bool is_loop;
- 
- 	if (!file)
- 		return -EBADF;
--	is_loop = is_loop_device(file);
--	error = loop_global_lock_killable(lo, is_loop);
--	if (error)
--		goto out_putf;
- 	error = -ENXIO;
--	if (lo->lo_state != Lo_bound)
--		goto out_err;
-+	if (!loop_try_update_state(lo, Lo_bound, Lo_binding))
-+		goto out_putf;
- 
- 	/* the loop device has to be read-only */
- 	error = -EINVAL;
-@@ -608,16 +606,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
--	loop_global_unlock(lo, is_loop);
-+	loop_update_state(lo, Lo_bound);
- 
--	/*
--	 * Flush loop_validate_file() before fput(), for l->lo_backing_file
--	 * might be pointing at old_file which might be the last reference.
--	 */
--	if (!is_loop) {
--		mutex_lock(&loop_validate_mutex);
--		mutex_unlock(&loop_validate_mutex);
--	}
- 	/*
- 	 * We must drop file reference outside of lo_mutex as dropping
- 	 * the file ref can take open_mutex which creates circular locking
-@@ -629,7 +619,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	return 0;
- 
- out_err:
--	loop_global_unlock(lo, is_loop);
-+	loop_update_state(lo, Lo_bound);
- out_putf:
- 	fput(file);
- 	return error;
-@@ -953,11 +943,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	loff_t size;
- 	bool partscan;
- 	unsigned short bsize;
--	bool is_loop;
- 
- 	if (!file)
- 		return -EBADF;
--	is_loop = is_loop_device(file);
- 
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
-@@ -972,13 +960,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 			goto out_putf;
- 	}
- 
--	error = loop_global_lock_killable(lo, is_loop);
--	if (error)
--		goto out_bdev;
--
- 	error = -EBUSY;
--	if (lo->lo_state != Lo_unbound)
--		goto out_unlock;
-+	if (!loop_try_update_state(lo, Lo_unbound, Lo_binding))
-+		goto out_bdev;
- 
- 	error = loop_validate_file(file, bdev);
- 	if (error)
-@@ -1053,17 +1037,13 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	size = get_loop_size(lo, file);
- 	loop_set_size(lo, size);
- 
--	/* Order wrt reading lo_state in loop_validate_file(). */
--	wmb();
--
--	lo->lo_state = Lo_bound;
- 	if (part_shift)
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 	if (partscan)
- 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART;
- 
--	loop_global_unlock(lo, is_loop);
-+	loop_update_state(lo, Lo_bound);
- 	if (partscan)
- 		loop_reread_partitions(lo);
- 	if (!(mode & FMODE_EXCL))
-@@ -1071,7 +1051,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return 0;
- 
- out_unlock:
--	loop_global_unlock(lo, is_loop);
-+	loop_update_state(lo, Lo_unbound);
- out_bdev:
- 	if (!(mode & FMODE_EXCL))
- 		bd_abort_claiming(bdev, loop_configure);
-@@ -1088,18 +1068,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	gfp_t gfp = lo->old_gfp_mask;
- 	struct loop_worker *pos, *worker;
- 
--	/*
--	 * Flush loop_configure() and loop_change_fd(). It is acceptable for
--	 * loop_validate_file() to succeed, for actual clear operation has not
--	 * started yet.
--	 */
--	mutex_lock(&loop_validate_mutex);
--	mutex_unlock(&loop_validate_mutex);
--	/*
--	 * loop_validate_file() now fails because l->lo_state != Lo_bound
--	 * became visible.
--	 */
--
- 	/*
- 	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
- 	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
-@@ -1181,9 +1149,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	lo->lo_flags = 0;
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
--	mutex_lock(&lo->lo_mutex);
--	lo->lo_state = Lo_unbound;
--	mutex_unlock(&lo->lo_mutex);
-+	loop_update_state(lo, Lo_unbound);
- 
- 	/*
- 	 * Need not hold lo_mutex to fput backing file. Calling fput holding
-@@ -1219,7 +1185,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 		mutex_unlock(&lo->lo_mutex);
- 		return 0;
- 	}
--	lo->lo_state = Lo_rundown;
-+	loop_update_state_locked(lo, Lo_rundown);
- 	mutex_unlock(&lo->lo_mutex);
- 
- 	__loop_clr_fd(lo, false);
-@@ -1739,9 +1705,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		goto out_unlock;
- 
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
--		if (lo->lo_state != Lo_bound)
-+		if (!loop_try_update_state_locked(lo, Lo_bound, Lo_rundown))
- 			goto out_unlock;
--		lo->lo_state = Lo_rundown;
- 		mutex_unlock(&lo->lo_mutex);
- 		/*
- 		 * In autoclear mode, stop the loop thread
-@@ -1953,7 +1918,6 @@ static int loop_add(int i)
- 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
- 	if (!lo)
- 		goto out;
--	lo->lo_state = Lo_unbound;
- 
- 	err = mutex_lock_killable(&loop_ctl_mutex);
- 	if (err)
-@@ -2024,6 +1988,7 @@ static int loop_add(int i)
- 		disk->flags |= GENHD_FL_NO_PART;
- 	atomic_set(&lo->lo_refcnt, 0);
- 	mutex_init(&lo->lo_mutex);
-+	loop_update_state(lo, Lo_unbound);
- 	lo->lo_number		= i;
- 	spin_lock_init(&lo->lo_lock);
- 	spin_lock_init(&lo->lo_work_lock);
-@@ -2119,7 +2084,7 @@ static int loop_control_remove(int idx)
- 		goto mark_visible;
- 	}
- 	/* Mark this loop device no longer open()-able. */
--	lo->lo_state = Lo_deleting;
-+	loop_update_state_locked(lo, Lo_deleting);
- 	mutex_unlock(&lo->lo_mutex);
- 
- 	loop_remove(lo);
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 082d4b6bfc6a..56b9392737b2 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -19,6 +19,7 @@
- /* Possible states of device */
- enum {
- 	Lo_unbound,
-+	Lo_binding,
- 	Lo_bound,
- 	Lo_rundown,
- 	Lo_deleting,
++	/* ->bi_opf is finalized after submit_bio_checks() returns */
++	data.cmd_flags	= bio->bi_opf;
+ 	if (plug) {
+ 		data.nr_tags = plug->nr_ios;
+ 		plug->nr_ios = 1;
 -- 
-2.18.4
+2.31.1
 
+
+
+Thanks, 
+Ming
 
