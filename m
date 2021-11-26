@@ -2,117 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1251DC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 16:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A81C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 16:38:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238745AbhKZQbR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Nov 2021 11:31:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49224 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239200AbhKZQ3R (ORCPT
+        id S1351776AbhKZQll (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Nov 2021 11:41:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35500 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238996AbhKZQjk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Nov 2021 11:29:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637943963;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9/Bls/Z9SllhxVc+L2vI8snOWy5+HK1l2H7LEdHdi3c=;
-        b=dCHgZUEtDbLFmamrAIYL4TC1BSQ4oH7sB3ZlQF66Tx9oQu1v8tnjAH71j4DIxumUdubF/h
-        1MC81waPkl7W59mQU73iwK8hEUi/etGgSlG750qkao/cInyr+jZ0R2j7lzMu7Cqt+44BG4
-        agTGGNzMJfa0YU5ifATewAlk/pBQaxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-56-aMWYqcR7NfKOLe4UwN3MLw-1; Fri, 26 Nov 2021 11:26:02 -0500
-X-MC-Unique: aMWYqcR7NfKOLe4UwN3MLw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 790541F2DB
-        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 16:25:49 +0000 (UTC)
-Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C91CE7E645;
-        Fri, 26 Nov 2021 16:25:02 +0000 (UTC)
-Date:   Sat, 27 Nov 2021 00:24:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     linux-block <linux-block@vger.kernel.org>
-Subject: Re: [bug report] WARNING at block/mq-deadline.c:600
- dd_exit_sched+0x1c6/0x260 triggered with blktests block/031
-Message-ID: <YaEKWPlAmDJYV6Si@T590>
-References: <CAHj4cs8=xDxBZF62-OekAGtHDtP6ynALKXm7fK2D2ChpNXnGAw@mail.gmail.com>
- <YaBGI7bR/9ot514F@T590>
+        Fri, 26 Nov 2021 11:39:40 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2301DC0617A5
+        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 08:21:12 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id e8so9536777ilu.9
+        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 08:21:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=8VUNi0tD7aQvypwML4HzjsEbW1rI3hjQtUP8+ss6If0=;
+        b=tiFtDeV4VI7HTx7QGq828pPLHGOSSOOZfsnKzpIZSxl0Z8dMQO3JCNWZt3mj20VGPV
+         39x8/Mi7xvvYT3B9hKry2pYfPYQjJWCvQdP3cGqTw6hXD/FvUoRO+9G5eHUg3fzik974
+         x8CXwGcoblMwDKQZsYIygelsQCzPjCdrebuI8S3Cn9GnEbprVOjyyKldhTWFu0WCXV2Z
+         rZMA4OB2zY5dcSQj2x62IEE6v89ZiZe05t0ePjvRsqK6PwGXtCFekjK8OcNmuxeS3eoo
+         nUnlIhhU5HD1XtTZhqxCJAaqpFknjw8uj9RXSrgKBzyCAEibiJU7RN5ylTVOFjlSiUtA
+         aYUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8VUNi0tD7aQvypwML4HzjsEbW1rI3hjQtUP8+ss6If0=;
+        b=HtavN8WK94bqEIkXMWnOYfxOcSrenHiMEWY49qvVLFEdQHEKDMc88tYVMqZqDc6rff
+         8OgKdsCbKPvR2QormYtK+uQJTYMGQnbolE/4JG67uCLEXIi4Hp5VSUd8uk4BSNajRGrc
+         zePOp4Y2N/F6umTlJbV7qjOpHhsqWCFPh+Fnx+I82Lz736Qk7/o3KUlqoDAsq+9cxQVb
+         HO1cz4B89GDK2U6YGNEDvkvF8Fr+WWG4ccQmYQR8dOAMUbwANs1PtLxEZkZvq0h1es8l
+         45kXd0zcSQLX+m1NpYlPpxEGAts2VyeREw9Wm2SR/qzY9Of4txQvs9cVI4+TYlGeUgJn
+         176Q==
+X-Gm-Message-State: AOAM531Neo0mm8LduCCWj90modh1iU1DMDssGju8Qdw/KO8VHU8FzxLJ
+        St+i4REgQfuWyMvZDB8lz7+Yaw==
+X-Google-Smtp-Source: ABdhPJybNYibW8zTuWoXZTMyZ1XkGSGSJv0u6HcEEA+PMrayvKIUYJiOizJH0VBCU83Si2l/osxpyA==
+X-Received: by 2002:a05:6e02:219a:: with SMTP id j26mr30543481ila.323.1637943671345;
+        Fri, 26 Nov 2021 08:21:11 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id j15sm3528017ilu.64.2021.11.26.08.21.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Nov 2021 08:21:10 -0800 (PST)
+Subject: Re: I/O hang with v5.16-rc2
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+References: <20211126095352.bkbrvtgfcmfj3wkj@shindev>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <124f86f8-91db-3a02-702d-5c26b22de107@kernel.dk>
+Date:   Fri, 26 Nov 2021 09:21:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaBGI7bR/9ot514F@T590>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20211126095352.bkbrvtgfcmfj3wkj@shindev>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 26, 2021 at 10:27:47AM +0800, Ming Lei wrote:
-> Hi Yi,
+On 11/26/21 2:53 AM, Shinichiro Kawasaki wrote:
+> I ran my test set on v5.16-rc2 and observed a process hang. The test work load
+> repeats file creation on xfs on dm-zoned. This dm-zoned device is on top of 3
+> dm-linear devices. One of them is dm-linear device on non-zoned NVMe device as
+> the cache of the dm-zoned device. The other two are dm-linear devices on zoned
+> SMR HDDs. So far, the hang is recreated 100% with my test system.
 > 
-> On Thu, Nov 25, 2021 at 07:02:43PM +0800, Yi Zhang wrote:
-> > Hello
-> > 
-> > blktests block/031 triggered below WARNING with latest
-> > linux-block/for-next[1], pls check it.
-> > 
-> > [1]
-> > f0afafc21027 (HEAD, origin/for-next) Merge branch 'for-5.17/io_uring'
-> > into for-next
+> The kernel message [2] reported hanging tasks. In the call stack, I observe
+> wbt_wait(). Also I observed "inflight 1" value in the "rqos/wbt/inflight"
+> attribute of debug sysfs.
 > 
-> After running block/031 for several times in today's linus tree, not
-> reproduce the issue:
+> # grep -R . /sys/kernel/debug/block/nvme0n1 | grep inflight
+> /sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:0: inflight 1
+> /sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:1: inflight 0
+> /sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:2: inflight 0
+> 
+> These symptoms look related to another issue reported to linux-block [1]. As
+> discussed in that thread, I set 0 to /sys/block/nvme0n1/queue/wbt_lat_usec.
+> With this setting, I observed the hang disappeared. Then this hang I observe
+> also related to writeback throttling for the NVMe device.
+> 
+> I bisected and found the commit 4f5022453acd ("nvme: wire up completion batching
+> for the IRQ path") is the trigger commit. I reverted this commit from v5.16-rc2,
+> and observed the hang disappeared.
+> 
+> Wish this report helps.
+> 
+> 
+> [1] https://lore.kernel.org/linux-block/b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com
 
-Yi, it should be one for-5.17/block only issue, please test the
-following patch:
+Yes looks the same as that one, and that commit was indeed my suspicion
+on what could potentially cause the accounting discrepancy. I'll take a
+look at this.
 
-
-From 13b6abb5545f08bbe7dfea34a1bfc186e04932ac Mon Sep 17 00:00:00 2001
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 27 Nov 2021 00:19:43 +0800
-Subject: [PATCH] blk-mq: use bio->bi_opf after bio is checked
-
-bio->bi_opf isn't finalized before checking the bio, so use it after
-submit_bio_checks() returns.
-
-Fixes: f1880d26e517 ("blk-mq: cleanup request allocation")
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 82491ab676fb..b57c4373e59b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2712,7 +2712,6 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 	struct blk_mq_alloc_data data = {
- 		.q		= q,
- 		.nr_tags	= 1,
--		.cmd_flags	= bio->bi_opf,
- 	};
- 	struct request *rq;
- 
-@@ -2725,6 +2724,8 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 
- 	rq_qos_throttle(q, bio);
- 
-+	/* ->bi_opf is finalized after submit_bio_checks() returns */
-+	data.cmd_flags	= bio->bi_opf;
- 	if (plug) {
- 		data.nr_tags = plug->nr_ios;
- 		plug->nr_ios = 1;
 -- 
-2.31.1
-
-
-
-Thanks, 
-Ming
+Jens Axboe
 
