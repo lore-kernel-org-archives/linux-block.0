@@ -2,97 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FB6C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 17:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A752C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 17:12:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbhKZRKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Nov 2021 12:10:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41850 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235047AbhKZRIv (ORCPT
+        id S235669AbhKZRPN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Nov 2021 12:15:13 -0500
+Received: from mailbackend.panix.com ([166.84.1.89]:39424 "EHLO
+        mailbackend.panix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235976AbhKZRNM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Nov 2021 12:08:51 -0500
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D970CC08E88C
-        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 08:38:54 -0800 (PST)
-Received: by mail-io1-xd33.google.com with SMTP id e144so12069291iof.3
-        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 08:38:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vsDYyD+cqa31UWbKWn3gas7TG3YgDSdxqBh84x5L8ZQ=;
-        b=4ESDl6lIvAIA7bOq6LGoDfK7Gwkb+PT9CmrOAImhA+cOokgC/h2sx79QIXCzGh3gGV
-         yLvyHVLMsBufmmzCdxxhsOe3eh+/0o/hKya/BTEsAT87tDg1ePxhKm4YlmI1MQLJ20Nu
-         wOKeL+/5fpRhAKikI5Pwr/4R+f6vjkHbdxvXZ/L3HymKTWt2t10skpHnfXNUvTkumCJE
-         9YH3ITIqSmXXmlQvD1F3JDX5PzzvffQ6k7tmqmYjuM1nKAHTSnaDxlcCD6GGU4Y2eZxV
-         Js/SoxwpXFtCLkwvnSrZ2350LWT78HEWFdfzF3NIbEll8FQQgKIa0ln/zJZ5Vp0RO4LP
-         LQFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vsDYyD+cqa31UWbKWn3gas7TG3YgDSdxqBh84x5L8ZQ=;
-        b=4UCdPUNdcNqKR+u0Hu9r0dztb1Z7fteAlYsilbA+4D5Dv+hUHttw1OQqlAxzqBmEB5
-         N3ynqcfLFWZhfh0ujimR92skCP2+piYq7u2FO1Sxx1vYP7JbUeQT+0VFeibDPUAmxRep
-         Y096wpUfU7uKulotR8yKGtA7aAR8I1A7d8K8JtjUU7Q/uIAD9PR6vsS6wnzxERC3qyuZ
-         Lf6F6VHA9QsaXvV5igHBmKF7HuDk11ol3fEWq3ugZITiKGWG4R3Nw7j1fz6jGd4/Eff/
-         Y+l4Avmfz17srmWtVrHKJ/Ytaqii7c4eadU1Tz7CvUmt3zlmGy9aGfJpDcgehPBCB84v
-         r0HA==
-X-Gm-Message-State: AOAM532OwYvIv0G9mUvbd3akRuE43M8xNqVFVhbJ4RFydsZiM6zL3Ia5
-        WZgMoMfJogM2tJP6A+jW9nPjzEZnfIqEzjsC
-X-Google-Smtp-Source: ABdhPJy6Fr2SyRiPCTw5yO6VHzXFMZvuF8L8jxBUn5IVGPHs47ZI+wXZFvxdK9nYItMMuXbDqmFINw==
-X-Received: by 2002:a05:6638:144f:: with SMTP id l15mr41933014jad.21.1637944734024;
-        Fri, 26 Nov 2021 08:38:54 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id i8sm3817392ilu.84.2021.11.26.08.38.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Nov 2021 08:38:53 -0800 (PST)
-Subject: Re: [bug report] WARNING at block/mq-deadline.c:600
- dd_exit_sched+0x1c6/0x260 triggered with blktests block/031
-To:     Ming Lei <ming.lei@redhat.com>, Yi Zhang <yi.zhang@redhat.com>
-Cc:     linux-block <linux-block@vger.kernel.org>
-References: <CAHj4cs8=xDxBZF62-OekAGtHDtP6ynALKXm7fK2D2ChpNXnGAw@mail.gmail.com>
- <YaBGI7bR/9ot514F@T590> <YaEKWPlAmDJYV6Si@T590>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d909e3a1-942a-efe8-0f8a-f1206676a40f@kernel.dk>
-Date:   Fri, 26 Nov 2021 09:38:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 26 Nov 2021 12:13:12 -0500
+Received: from [192.168.126.80] (ip98-184-250-31.oc.oc.cox.net [98.184.250.31])
+        by mailbackend.panix.com (Postfix) with ESMTPSA id 4J11T20VG8z2s8g;
+        Fri, 26 Nov 2021 12:09:57 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
+        t=1637946598; bh=GTIWo+vkIgU91xH2aEgvdisvV1t6NuTWucivVzjGD88=;
+        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
+        b=FR3wRs4snD+sJVhgRXdkjCuO9pDOmRfuJPuD+thdDNttOZ8iYz/py2bPQPPOQtqTx
+         6QaR2l5VRmHVqyMjL3+Qc9WpAZt86i3nkzQxKb0bT7YWJtjbjshd7i01543vKu55RY
+         yQ0c0RSK4B4YUC/Vm63AlW9UbtFE9ck0stSLTrp0=
+Date:   Fri, 26 Nov 2021 09:09:56 -0800 (PST)
+From:   "Kenneth R. Crudup" <kenny@panix.com>
+Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "Kenneth R. Crudup" <kenny@panix.com>
+Subject: Re: Write I/O queue hangup at random on recent Linus' kernels
+In-Reply-To: <903be817-4118-f34e-1b35-a0108045590f@kernel.dk>
+Message-ID: <143c4f76-658-887f-5c8-f454785ac99c@panix.com>
+References: <b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com> <b9c2681f-e63a-4d3b-913d-d8a75e2c2ea0@kernel.dk> <be6a783-97db-c3bf-b16f-e8c62b14755d@panix.com> <17206ea6-506d-b1de-09e8-c935ff308bd6@kernel.dk> <903be817-4118-f34e-1b35-a0108045590f@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <YaEKWPlAmDJYV6Si@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/21 9:24 AM, Ming Lei wrote:
-> On Fri, Nov 26, 2021 at 10:27:47AM +0800, Ming Lei wrote:
->> Hi Yi,
->>
->> On Thu, Nov 25, 2021 at 07:02:43PM +0800, Yi Zhang wrote:
->>> Hello
->>>
->>> blktests block/031 triggered below WARNING with latest
->>> linux-block/for-next[1], pls check it.
->>>
->>> [1]
->>> f0afafc21027 (HEAD, origin/for-next) Merge branch 'for-5.17/io_uring'
->>> into for-next
->>
->> After running block/031 for several times in today's linus tree, not
->> reproduce the issue:
-> 
-> Yi, it should be one for-5.17/block only issue, please test the
-> following patch:
+On Fri, 26 Nov 2021, Jens Axboe wrote:
 
-Good catch, again - can't believe this keeps biting us, guess we just
-have to get used to this pattern. Though not expecting many changes
-there in the future, so maybe not a huge issue.
+> Can you apply this on top of 5.16-rc2 or current -git and see if it fixes
+> it for you?
+
+Applied and trying; fingers crossed!
+
+	-Kenny
 
 -- 
-Jens Axboe
-
+Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
