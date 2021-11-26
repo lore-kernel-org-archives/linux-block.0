@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A710C4167D
-	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 12:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C113AC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 13:03:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234489AbhKZMjf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Nov 2021 07:39:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38310 "EHLO
+        id S230207AbhKZNG0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Nov 2021 08:06:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232097AbhKZMh3 (ORCPT
+        with ESMTP id S230006AbhKZNE0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Nov 2021 07:37:29 -0500
+        Fri, 26 Nov 2021 08:04:26 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1BAC08EAE8;
-        Fri, 26 Nov 2021 03:58:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF360C06174A;
+        Fri, 26 Nov 2021 04:18:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=H7FEXl9MZgmEtU6V92VxqIMPFtemYzuFK5Tr4nLAwe0=; b=M8P09Stm7lyegv9a5lskPOwcUt
-        /efI18zri/4O2JqAV5riXD4mDWJqBgKF9c6u4n8fqEkUG21ZwxA2GvI8AJeShtLlYZyCHIy+dA5PI
-        RIRnprLmY+64vwfgEq6VDJU9Oqjga/FLxzTGBFv3UH6QpYb4MI6WKdBY7BCYNPykfigdm/V3iAtEj
-        IsVjtssWq71vAhNAvFC+X6B49NJ72/ugV8dIox973SZgxS2VGALOVeKtaHT0MEtudisraJuFWGOkI
-        FMU7VWLNanRqAzC4Znb4tH5b4IpZfOib++EpQt0g2x65vLt4Kmp6jnn9+C+d0xpls2MuIKi1APhAV
-        38gerq/Q==;
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=Xa7hqASrrdIfGtS8qaD3qdcF3OYpNGlFpwwMebmiLrE=; b=fI5pv/RH+6N3RO2WI1bmtIPlGd
+        ZDq9FMvDyvuuFP6RO8GNEx5tLSQOdgcaQOmIJTmOPzJOrWsEulis4zqVUMb9Knf9cOgsuRq/N+4we
+        evxfnOe51eFgOs3Dbc14pfx5WKzfG5BhTvCHWnfQtf5iLYJulF1XgIGzoIN9HCGK9jaylpfwhCIxG
+        2+r2DF2WZEe9UGELBF5Z+RntIJokJnxfVpmAEK132BPGg9K00G2ZRwXNvDEgwMNUtpIeE1i9hk/mM
+        RzBrQ67t9P27ZWVW95iHz6mDsmIyO1OuJb3APm1kNtPx/XMW324YzOii54uuTWMvBB2A7wUJ11dfM
+        huamnjTw==;
 Received: from [2001:4bb8:191:f9ce:bae8:5658:102a:5491] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mqZsC-00ASMQ-4e; Fri, 26 Nov 2021 11:58:37 +0000
+        id 1mqaB1-00AWFm-0W; Fri, 26 Nov 2021 12:18:03 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Paolo Valente <paolo.valente@linaro.org>, Jan Kara <jack@suse.cz>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: [PATCH 13/14] block: simplify ioc_create_icq
-Date:   Fri, 26 Nov 2021 12:58:16 +0100
-Message-Id: <20211126115817.2087431-14-hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-block@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Subject: remove ->rq_disk v2
+Date:   Fri, 26 Nov 2021 13:17:57 +0100
+Message-Id: <20211126121802.2090656-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211126115817.2087431-1-hch@lst.de>
-References: <20211126115817.2087431-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -47,60 +47,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the ioc and gfp_mask argument, which are hard coded by the caller.
+Hi Jens,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-ioc.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+this series removes the rq_disk field in struct request, which isn't
+needed now that we can get the disk from the request_queue.
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index 5bfe810496fca..c56648f7cad47 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -389,9 +389,7 @@ EXPORT_SYMBOL(ioc_lookup_icq);
- 
- /**
-  * ioc_create_icq - create and link io_cq
-- * @ioc: io_context of interest
-  * @q: request_queue of interest
-- * @gfp_mask: allocation mask
-  *
-  * Make sure io_cq linking @ioc and @q exists.  If icq doesn't exist, they
-  * will be created using @gfp_mask.
-@@ -399,19 +397,19 @@ EXPORT_SYMBOL(ioc_lookup_icq);
-  * The caller is responsible for ensuring @ioc won't go away and @q is
-  * alive and will stay alive until this function returns.
-  */
--static struct io_cq *ioc_create_icq(struct io_context *ioc,
--		struct request_queue *q, gfp_t gfp_mask)
-+static struct io_cq *ioc_create_icq(struct request_queue *q)
- {
-+	struct io_context *ioc = current->io_context;
- 	struct elevator_type *et = q->elevator->type;
- 	struct io_cq *icq;
- 
- 	/* allocate stuff */
--	icq = kmem_cache_alloc_node(et->icq_cache, gfp_mask | __GFP_ZERO,
-+	icq = kmem_cache_alloc_node(et->icq_cache, GFP_ATOMIC | __GFP_ZERO,
- 				    q->node);
- 	if (!icq)
- 		return NULL;
- 
--	if (radix_tree_maybe_preload(gfp_mask) < 0) {
-+	if (radix_tree_maybe_preload(GFP_ATOMIC) < 0) {
- 		kmem_cache_free(et->icq_cache, icq);
- 		return NULL;
- 	}
-@@ -461,7 +459,7 @@ struct io_cq *ioc_find_get_icq(struct request_queue *q)
- 	}
- 
- 	if (!icq) {
--		icq = ioc_create_icq(ioc, q, GFP_ATOMIC);
-+		icq = ioc_create_icq(q);
- 		if (!icq) {
- 			put_io_context(ioc);
- 			return NULL;
--- 
-2.30.2
+Changes since v1:
+ - rebased to the latests for-5.17/block tree
 
+Diffstat:
+ block/blk-flush.c                  |    3 --
+ block/blk-merge.c                  |    7 ------
+ block/blk-mq.c                     |   24 +++++++-------------
+ block/blk.h                        |    2 -
+ block/bsg-lib.c                    |    2 -
+ drivers/block/amiflop.c            |    2 -
+ drivers/block/ataflop.c            |    6 ++---
+ drivers/block/floppy.c             |    6 ++---
+ drivers/block/mtip32xx/mtip32xx.c  |    2 -
+ drivers/block/null_blk/trace.h     |    2 -
+ drivers/block/paride/pcd.c         |    2 -
+ drivers/block/paride/pd.c          |    6 ++---
+ drivers/block/paride/pf.c          |    4 +--
+ drivers/block/pktcdvd.c            |    2 -
+ drivers/block/rnbd/rnbd-clt.c      |    4 +--
+ drivers/block/sunvdc.c             |    2 -
+ drivers/block/sx8.c                |    4 +--
+ drivers/block/virtio_blk.c         |    2 -
+ drivers/md/dm-mpath.c              |    1 
+ drivers/mmc/core/block.c           |   12 +++++-----
+ drivers/mtd/mtd_blkdevs.c          |   10 +-------
+ drivers/nvme/host/core.c           |    4 +--
+ drivers/nvme/host/fault_inject.c   |    2 -
+ drivers/nvme/host/pci.c            |    7 ++----
+ drivers/nvme/host/trace.h          |    6 ++---
+ drivers/nvme/target/passthru.c     |    3 --
+ drivers/scsi/ch.c                  |    2 -
+ drivers/scsi/scsi_bsg.c            |    2 -
+ drivers/scsi/scsi_error.c          |    2 -
+ drivers/scsi/scsi_ioctl.c          |   43 ++++++++++++++-----------------------
+ drivers/scsi/scsi_lib.c            |    5 ++--
+ drivers/scsi/scsi_logging.c        |    4 ++-
+ drivers/scsi/sd.c                  |   26 +++++++++++-----------
+ drivers/scsi/sd_zbc.c              |    8 +++---
+ drivers/scsi/sg.c                  |    6 ++---
+ drivers/scsi/sr.c                  |   11 ++++-----
+ drivers/scsi/st.c                  |    4 +--
+ drivers/scsi/ufs/ufshpb.c          |    4 +--
+ drivers/scsi/virtio_scsi.c         |    2 -
+ drivers/target/target_core_pscsi.c |    2 -
+ drivers/usb/storage/transport.c    |    2 -
+ include/linux/blk-mq.h             |   11 ++-------
+ include/scsi/scsi_cmnd.h           |    2 -
+ include/scsi/scsi_device.h         |    4 +--
+ include/scsi/scsi_ioctl.h          |    4 +--
+ include/trace/events/block.h       |    8 +++---
+ kernel/trace/blktrace.c            |    2 -
+ 47 files changed, 124 insertions(+), 157 deletions(-)
