@@ -2,56 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9403CC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 25 Nov 2021 21:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D217C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 26 Nov 2021 02:30:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357199AbhKYVQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Nov 2021 16:16:51 -0500
-Received: from mailbackend.panix.com ([166.84.1.89]:32349 "EHLO
-        mailbackend.panix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357070AbhKYVOv (ORCPT
+        id S243672AbhKZCdT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Nov 2021 21:33:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49092 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1357642AbhKZCbQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Nov 2021 16:14:51 -0500
-Received: from [192.168.126.80] (ip98-184-250-31.oc.oc.cox.net [98.184.250.31])
-        by mailbackend.panix.com (Postfix) with ESMTPSA id 4J0VtL06xBz2sbg;
-        Thu, 25 Nov 2021 16:11:37 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
-        t=1637874698; bh=fVNYCI2o8Gl3FzZCspvrDjT0dqKVQsui7DbLR5TdBCE=;
-        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
-        b=A7Ls6wj2XBnwsNg2MULnSOPdQxNiIvfc1TqbPbMJBwbHI04fPzby4HhYqHFjrwn/R
-         tlAf210tFs5xMn9gdb7U85XN77OiXCbUp81PCx/xJKGLcJKyHQ+yeItR9LODMNn4np
-         XmY3POWRNhMqhXfN5jYFiGWqm4aMNeqx6RPVRWcU=
-Date:   Thu, 25 Nov 2021 13:11:36 -0800 (PST)
-From:   "Kenneth R. Crudup" <kenny@panix.com>
-Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
-To:     Jens Axboe <axboe@kernel.dk>
-cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: Write I/O queue hangup at random on recent Linus' kernels
-In-Reply-To: <17206ea6-506d-b1de-09e8-c935ff308bd6@kernel.dk>
-Message-ID: <66abbccd-aff0-9b6d-5aa3-f0f17eb4b12f@panix.com>
-References: <b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com> <b9c2681f-e63a-4d3b-913d-d8a75e2c2ea0@kernel.dk> <be6a783-97db-c3bf-b16f-e8c62b14755d@panix.com> <17206ea6-506d-b1de-09e8-c935ff308bd6@kernel.dk>
+        Thu, 25 Nov 2021 21:31:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637893683;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bpqpk+A6MWDqeCE+Wx9fqhfdeDYKPkiWWGLmDWm0KV8=;
+        b=O5g4AsfsvCH5ZbiAXKnnWeOfftqL0nQIekyHKjfCw6h34dOidet/SmetGLN/Ebqj3dNfsU
+        BUrFmE8xIvfas9HQ3nNKeSQKwBcf+tafQhiz+c5F2DeruJGJJ9RneWwNvICxVDRKRzQDD9
+        corH/NsIWVvw5rwY+zhwgU8wFC+xQTk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-516-GzfM0-iHOiia8Hn7zibt1g-1; Thu, 25 Nov 2021 21:28:02 -0500
+X-MC-Unique: GzfM0-iHOiia8Hn7zibt1g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42B2F1006AA2
+        for <linux-block@vger.kernel.org>; Fri, 26 Nov 2021 02:28:01 +0000 (UTC)
+Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A8794604CC;
+        Fri, 26 Nov 2021 02:27:52 +0000 (UTC)
+Date:   Fri, 26 Nov 2021 10:27:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Subject: Re: [bug report] WARNING at block/mq-deadline.c:600
+ dd_exit_sched+0x1c6/0x260 triggered with blktests block/031
+Message-ID: <YaBGI7bR/9ot514F@T590>
+References: <CAHj4cs8=xDxBZF62-OekAGtHDtP6ynALKXm7fK2D2ChpNXnGAw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHj4cs8=xDxBZF62-OekAGtHDtP6ynALKXm7fK2D2ChpNXnGAw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Yi,
 
-On Thu, 25 Nov 2021, Jens Axboe wrote:
+On Thu, Nov 25, 2021 at 07:02:43PM +0800, Yi Zhang wrote:
+> Hello
+> 
+> blktests block/031 triggered below WARNING with latest
+> linux-block/for-next[1], pls check it.
+> 
+> [1]
+> f0afafc21027 (HEAD, origin/for-next) Merge branch 'for-5.17/io_uring'
+> into for-next
 
->>> echo 0 > /sys/block/nvme0n1/queue/wbt_lat_usec
+After running block/031 for several times in today's linus tree, not
+reproduce the issue:
 
->> It's been about 48 hours and haven't seen the issue since doing this.
+[root@ktest-09 blktests]# uname -a
+Linux ktest-09 5.16.0-rc2_up+ #47 SMP PREEMPT Thu Nov 25 21:14:38 EST 2021 x86_64 x86_64 x86_64 GNU/Linux
+[root@ktest-09 blktests]# ./check block/031
+block/031 (do IO on null-blk with a host tag set)            [passed]
+    runtime  30.302s  ...  30.298s
 
-> Great, thanks for verifying. From your report 5.16-rc2 has the issue, is
-> 5.15 fine?
+Both for-5.17/block and for-5.17/io_uring have been rebased on v5.16-rc2,
+maybe you can try the test again with latest block tree and see if it
+can be reproduced.
 
-I can check that out sometime in the next few days, but IIRC I pretty sure the
-issue hadn't surfaced before the 3rd or 4th of November. I pull from master
-at least every 2-3 days, so there's at least a timeframe.
 
-	-Kenny
+Thanks, 
+Ming
 
--- 
-Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
