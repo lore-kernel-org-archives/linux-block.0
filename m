@@ -2,69 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 622BAC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 13:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3775C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 16:06:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354960AbhK0NvB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 08:51:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55752 "EHLO
+        id S1347000AbhK0QJr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 11:09:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239495AbhK0NtB (ORCPT
+        with ESMTP id S1355398AbhK0QHq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 08:49:01 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 097D9C06175B
-        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 05:45:47 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id b187so3807755iof.11
-        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 05:45:47 -0800 (PST)
+        Sat, 27 Nov 2021 11:07:46 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22B4C061746
+        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:04:31 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id b187so4156634iof.11
+        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:04:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JmnC0XUwnd3NXwem01y5/D96/rbWb8lsqxD14QKG/1c=;
-        b=HZhTyAVmRFToGMNVHvlCXW1gJAQYB5o1Hml5BSgmHHCsb38yb5m012Zrldto9JSxgK
-         oGWFxLSIbmeVbLIikNlHV1ATyvOcINhlaH+ksPuQ40q6jU24cWPikGju2Uo16Lyryn7t
-         KHun/7H6Ve+q3zYFFfmmFZbMNl0XK823YkEOchlQYykm0rWEHAOFE0s/DaOxP+JvtptQ
-         GBIwBBVxuBhIm0+V7uokJXKH6d1JvFoXSv5+SdHIjXq7Pfpyg4O+FVE04l8llBx6KAvq
-         sGe8yMKtcdelXwQD/MMa0HsD9ETs+h3nMdIuWj7YMIjJB2XJh2I9j1W/1xvHYPNlSNav
-         6LIg==
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=6gEzggS/SNiTxE1Mw/WTJYP8e0XPDcQofR9+8vWZpss=;
+        b=1C4/3gvEGBoS4Xi5mGoT8/nJs01juaR0OIP14nrgMZWfpi1Eit5mNc1WxtDntDGLFr
+         FPuqYATKQLfoJf0YT1fyrX3amFBJglONBRDbSx3UkAzASY//2YEi8WpiT+cfkvqLeVPA
+         8YmNpbY4ey05VeNNASxev6T2HijyStOcuSYWU+pE7geKgdpWUT4eRa9xOYQ6GLmc+JvL
+         k35yJogCUbh+U3pC+QOIOLbdTqcTP+yYvOEEmlc8UaTPn2XIarNoCZxUYvEtNJU4S2Ec
+         PQWI9B5WD0oS2wOR1Er1vg30Vb5LR9IPCJh1wsyBBElpdkIZ9+hVrZUtuEqykzfRnJCs
+         YuEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JmnC0XUwnd3NXwem01y5/D96/rbWb8lsqxD14QKG/1c=;
-        b=cwyO8zk5T3uv2MB+c/KenPc3Y6krnmHLezGoWQM9nxKqRvVkxfOgS2ZfpV6kWe/ZIX
-         ANIEo1I869Nx4ANXD2OpdW1gs9DLKo9kW4il12KQYSr0n5IpQY7A5P1/IKtxQCL+MKZW
-         2xCKorqwJhvQOI2sb0XOLeyR2hz5rSM3GQc+ayS8nVkzRcGlnxouCA20ThCAUZJltsTo
-         QzyzLUNe2Y7Qly7CeSvOY/Q5+zsGCO5CI+tPXKaHhR6SIyMgqLBv89lTO9njmKmWlmAR
-         2JhWml4dMuNROEymg0JuAxTY+WQ6y+hr//87auHEuVtDiuW8w1auhq0tZpSsTJLUbVPA
-         5coQ==
-X-Gm-Message-State: AOAM532a9xWeYWhARYfhiuqJQDxk9XkmeMHZUxK60x/1a00q79YJOOsc
-        dzh7pJFV7KFN+myo5nm9HRRjWg==
-X-Google-Smtp-Source: ABdhPJy3v11jfrfIR7ecsdwNqCpygwA/8xQtf7akRjQLoefSYFmyO0PXiOGM3gPB0NV1T6FR8lGP1A==
-X-Received: by 2002:a05:6638:160c:: with SMTP id x12mr50671483jas.60.1638020746405;
-        Sat, 27 Nov 2021 05:45:46 -0800 (PST)
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=6gEzggS/SNiTxE1Mw/WTJYP8e0XPDcQofR9+8vWZpss=;
+        b=K5jI4V5fxNZxeJglrr9eadxeQY2QBWau8+K3I2MzL6QSbokIwVpW0yosKdmjKrRXLf
+         5qtQZ8TkxsOIPHqhs2X2Tqegg1KOLC548HcDNs/UprN5JVRqxM2vMWONH/2qUnABkEnN
+         yPfYRGgOlRmhEcVFIz9CmFrNQ/2RVtPL35KXrJurBFn7Qemm9+Xebuzz7VNf6Z9fdERe
+         3YhlVMjPSSAaHE5Yt1Pymyo8e60rhYcPHQSgJ/OSI6/QEipjpJbcpfI4uH2ftLUdjLGt
+         VkKPWa3w9i4UL5yW43AC7yhFOtBxxByQ0XYUk/0+G115xvV9juikTRMckw6V9J3oiByT
+         zy3Q==
+X-Gm-Message-State: AOAM532JZtdtWTLTvZ7TAgF0brKU+Ibz8yIAYDFAryPLOy94X5G5ifUk
+        Ap0u+YAd9DpOkaSQXTuGN17/XBzQExsBod9j
+X-Google-Smtp-Source: ABdhPJx018rKThEkMD7ZVFJL+of+NMUj3fuNwO7BbK9JdZ9afMruZJ4J8V6er1EvrlTE1RDd/fWhtQ==
+X-Received: by 2002:a05:6638:1648:: with SMTP id a8mr57259098jat.92.1638029070802;
+        Sat, 27 Nov 2021 08:04:30 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id x14sm6136862ilu.53.2021.11.27.05.45.45
+        by smtp.gmail.com with ESMTPSA id j21sm5020077ila.6.2021.11.27.08.04.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Nov 2021 05:45:46 -0800 (PST)
-Subject: Re: I/O hang with v5.16-rc2
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-References: <20211126095352.bkbrvtgfcmfj3wkj@shindev>
- <124f86f8-91db-3a02-702d-5c26b22de107@kernel.dk>
- <e1b65eee-e8c8-e98d-d2f7-5e35eca46651@kernel.dk>
- <20211127023803.ytrqsde5r4ydqn7m@shindev>
+        Sat, 27 Nov 2021 08:04:30 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8986cd0a-51b8-3c44-faa4-592d3cba895a@kernel.dk>
-Date:   Sat, 27 Nov 2021 06:45:45 -0700
+Subject: [GIT PULL] Block followup fixes for 5.16-rc3
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <def53d9f-f655-3435-6804-be4482816eed@kernel.dk>
+Date:   Sat, 27 Nov 2021 09:04:29 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20211127023803.ytrqsde5r4ydqn7m@shindev>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,48 +64,46 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/21 7:38 PM, Shinichiro Kawasaki wrote:
-> On Nov 26, 2021 / 09:55, Jens Axboe wrote:
->> On 11/26/21 9:21 AM, Jens Axboe wrote:
->>> On 11/26/21 2:53 AM, Shinichiro Kawasaki wrote:
->>>> I ran my test set on v5.16-rc2 and observed a process hang. The test work load
->>>> repeats file creation on xfs on dm-zoned. This dm-zoned device is on top of 3
->>>> dm-linear devices. One of them is dm-linear device on non-zoned NVMe device as
->>>> the cache of the dm-zoned device. The other two are dm-linear devices on zoned
->>>> SMR HDDs. So far, the hang is recreated 100% with my test system.
->>>>
->>>> The kernel message [2] reported hanging tasks. In the call stack, I observe
->>>> wbt_wait(). Also I observed "inflight 1" value in the "rqos/wbt/inflight"
->>>> attribute of debug sysfs.
->>>>
->>>> # grep -R . /sys/kernel/debug/block/nvme0n1 | grep inflight
->>>> /sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:0: inflight 1
->>>> /sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:1: inflight 0
->>>> /sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:2: inflight 0
->>>>
->>>> These symptoms look related to another issue reported to linux-block [1]. As
->>>> discussed in that thread, I set 0 to /sys/block/nvme0n1/queue/wbt_lat_usec.
->>>> With this setting, I observed the hang disappeared. Then this hang I observe
->>>> also related to writeback throttling for the NVMe device.
->>>>
->>>> I bisected and found the commit 4f5022453acd ("nvme: wire up completion batching
->>>> for the IRQ path") is the trigger commit. I reverted this commit from v5.16-rc2,
->>>> and observed the hang disappeared.
->>>>
->>>> Wish this report helps.
->>>>
->>>>
->>>> [1] https://lore.kernel.org/linux-block/b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com
->>>
->>> Yes looks the same as that one, and that commit was indeed my suspicion
->>> on what could potentially cause the accounting discrepancy. I'll take a
->>> look at this.
->>
->> I sent out a patch in the other thread, please give that a whirl.
-> 
-> With the patch on v5.16-rc2, the hang symptom disappeared. Thank you!
+Hi Linus,
 
-Great, thanks for reporting and testing.
+Turns out that the flushing out of pending fixes before the Thanksgiving
+break didn't quite work out in terms of timing, so here's a followup
+pull request.
+
+- rq_qos_done() should be called regardless of whether or not we're the
+  final put of the request, it's not related to the freeing of the
+  state. This fixes an IO stall with wbt that a few users have reported,
+  a regression in this release.
+
+- Only define zram_wb_devops if it's used, fixing a compilation warning
+  for some compilers.
+
+Please pull!
+
+
+The following changes since commit e30028ace8459ea096b093fc204f0d5e8fc3b6ae:
+
+  block: fix parameter not described warning (2021-11-25 09:32:19 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-11-27
+
+for you to fetch changes up to d422f40163087408b56290156ba233fc5ada53e4:
+
+  zram: only make zram_wb_devops for CONFIG_ZRAM_WRITEBACK (2021-11-26 09:57:32 -0700)
+
+----------------------------------------------------------------
+block-5.16-2021-11-27
+
+----------------------------------------------------------------
+Jens Axboe (2):
+      block: call rq_qos_done() before ref check in batch completions
+      zram: only make zram_wb_devops for CONFIG_ZRAM_WRITEBACK
+
+ block/blk-mq.c                | 3 ++-
+ drivers/block/zram/zram_drv.c | 2 ++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 -- 
 Jens Axboe
