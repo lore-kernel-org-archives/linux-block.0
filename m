@@ -2,109 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3775C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 16:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2511FC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 16:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347000AbhK0QJr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 11:09:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
+        id S1355689AbhK0QN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 11:13:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355398AbhK0QHq (ORCPT
+        with ESMTP id S1355587AbhK0QLZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 11:07:46 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22B4C061746
-        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:04:31 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id b187so4156634iof.11
-        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:04:31 -0800 (PST)
+        Sat, 27 Nov 2021 11:11:25 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7F6C06175C
+        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:08:10 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id i6so12282981ila.0
+        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:08:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=6gEzggS/SNiTxE1Mw/WTJYP8e0XPDcQofR9+8vWZpss=;
-        b=1C4/3gvEGBoS4Xi5mGoT8/nJs01juaR0OIP14nrgMZWfpi1Eit5mNc1WxtDntDGLFr
-         FPuqYATKQLfoJf0YT1fyrX3amFBJglONBRDbSx3UkAzASY//2YEi8WpiT+cfkvqLeVPA
-         8YmNpbY4ey05VeNNASxev6T2HijyStOcuSYWU+pE7geKgdpWUT4eRa9xOYQ6GLmc+JvL
-         k35yJogCUbh+U3pC+QOIOLbdTqcTP+yYvOEEmlc8UaTPn2XIarNoCZxUYvEtNJU4S2Ec
-         PQWI9B5WD0oS2wOR1Er1vg30Vb5LR9IPCJh1wsyBBElpdkIZ9+hVrZUtuEqykzfRnJCs
-         YuEg==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=TFDhWEFT78dShTBpt1jDJLJmhPVNkWFwTNPna2oPguo=;
+        b=GK/pZ5QTqcJI2AxmD/RUUIKx9wmTTFRfN/aYljxGFwdgArDuR553KbgYli8X/J7s5i
+         +wNOvaftc/CrRwLhCAUj4ubCTN2BBVKoObvsSij2ix+N0SrJfumV9hhmjbTPYigXsSAr
+         VU4iEukug05xaVGCa8Ze+hOPy6on7KEGPqHJHenr0c9qSQ5PFMu7DHkQGAMHa4VrQiTd
+         p3NgWEBDtq19h3cZKry0rBlxkn5vZxlS1svJ2fnAOj+GHnFSslOSw7kZwX909VmX3Z6l
+         0gS+z8r+vdlNJ5D6IpW/qQSIlk8jz1WlSFhK1WTCA2ARxO1dY27C1Bfj13A0HgxwfWcq
+         px3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=6gEzggS/SNiTxE1Mw/WTJYP8e0XPDcQofR9+8vWZpss=;
-        b=K5jI4V5fxNZxeJglrr9eadxeQY2QBWau8+K3I2MzL6QSbokIwVpW0yosKdmjKrRXLf
-         5qtQZ8TkxsOIPHqhs2X2Tqegg1KOLC548HcDNs/UprN5JVRqxM2vMWONH/2qUnABkEnN
-         yPfYRGgOlRmhEcVFIz9CmFrNQ/2RVtPL35KXrJurBFn7Qemm9+Xebuzz7VNf6Z9fdERe
-         3YhlVMjPSSAaHE5Yt1Pymyo8e60rhYcPHQSgJ/OSI6/QEipjpJbcpfI4uH2ftLUdjLGt
-         VkKPWa3w9i4UL5yW43AC7yhFOtBxxByQ0XYUk/0+G115xvV9juikTRMckw6V9J3oiByT
-         zy3Q==
-X-Gm-Message-State: AOAM532JZtdtWTLTvZ7TAgF0brKU+Ibz8yIAYDFAryPLOy94X5G5ifUk
-        Ap0u+YAd9DpOkaSQXTuGN17/XBzQExsBod9j
-X-Google-Smtp-Source: ABdhPJx018rKThEkMD7ZVFJL+of+NMUj3fuNwO7BbK9JdZ9afMruZJ4J8V6er1EvrlTE1RDd/fWhtQ==
-X-Received: by 2002:a05:6638:1648:: with SMTP id a8mr57259098jat.92.1638029070802;
-        Sat, 27 Nov 2021 08:04:30 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j21sm5020077ila.6.2021.11.27.08.04.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Nov 2021 08:04:30 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=TFDhWEFT78dShTBpt1jDJLJmhPVNkWFwTNPna2oPguo=;
+        b=aHclLBxu5FtcsEkeAaxGIVpWwNcQevpLQn0M7big/nj1IbN/PKVMltygPxfpvWSy88
+         /pHUqLiZTdZFYd86ij4hCtGxdeWeCx9brCRG/TFBX8xutrTTJT1gHyKAEsSQ5lFa463i
+         6jkOwlpbYuuNAOJctNs2syGfjORORuZsgiugvVhwNk+6cJD/5GUaFwHROzwYPeELVHlM
+         ttPNEhaqp2Kcuqz2aQVkrGVxgJglY5E5xW6ie/09dtmtX/CvFS2oC+VQudKoSuY4+461
+         6ns5VAvnFYr5JZrYrlHDuCzyePpU1p8G+zhdP1dc0VEZK6gfWmi0xVDftJmUN2qj/uGg
+         /gqQ==
+X-Gm-Message-State: AOAM533aKNiRP39XHOP8bo02QQOi+LA62J5E4ew3HycIqdDw+/ABetpZ
+        xgKENXYdyVlckMp7GaO38wTTElUpooEU/Ioa
+X-Google-Smtp-Source: ABdhPJxTUvu/yog86X7sXAzysQZ0PRii7gNhy4t3Bzsc/U+kNjfBWOSEtkiCPuZjmyw37LRUBi6MEg==
+X-Received: by 2002:a05:6e02:1a8b:: with SMTP id k11mr28610456ilv.52.1638029289097;
+        Sat, 27 Nov 2021 08:08:09 -0800 (PST)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id d12sm5749981ilg.85.2021.11.27.08.08.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Nov 2021 08:08:08 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block followup fixes for 5.16-rc3
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <def53d9f-f655-3435-6804-be4482816eed@kernel.dk>
-Date:   Sat, 27 Nov 2021 09:04:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     linux-block@vger.kernel.org,
+        Colin Ian King <colin.i.king@googlemail.com>
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20211126230652.1175636-1-colin.i.king@gmail.com>
+References: <20211126230652.1175636-1-colin.i.king@gmail.com>
+Subject: Re: [PATCH] block: Remove redundant initialization of variable ret
+Message-Id: <163802928837.10246.12448995088826384297.b4-ty@kernel.dk>
+Date:   Sat, 27 Nov 2021 09:08:08 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, 26 Nov 2021 23:06:52 +0000, Colin Ian King wrote:
+> The variable ret is being initialized with a value that is never
+> read, it is being updated later on. The assignment is redundant and
+> can be removed.
+> 
+> 
 
-Turns out that the flushing out of pending fixes before the Thanksgiving
-break didn't quite work out in terms of timing, so here's a followup
-pull request.
+Applied, thanks!
 
-- rq_qos_done() should be called regardless of whether or not we're the
-  final put of the request, it's not related to the freeing of the
-  state. This fixes an IO stall with wbt that a few users have reported,
-  a regression in this release.
+[1/1] block: Remove redundant initialization of variable ret
+      commit: a77f46727daa3febf99663ab1a43c86cf3c2b957
 
-- Only define zram_wb_devops if it's used, fixing a compilation warning
-  for some compilers.
-
-Please pull!
-
-
-The following changes since commit e30028ace8459ea096b093fc204f0d5e8fc3b6ae:
-
-  block: fix parameter not described warning (2021-11-25 09:32:19 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-11-27
-
-for you to fetch changes up to d422f40163087408b56290156ba233fc5ada53e4:
-
-  zram: only make zram_wb_devops for CONFIG_ZRAM_WRITEBACK (2021-11-26 09:57:32 -0700)
-
-----------------------------------------------------------------
-block-5.16-2021-11-27
-
-----------------------------------------------------------------
-Jens Axboe (2):
-      block: call rq_qos_done() before ref check in batch completions
-      zram: only make zram_wb_devops for CONFIG_ZRAM_WRITEBACK
-
- block/blk-mq.c                | 3 ++-
- drivers/block/zram/zram_drv.c | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
+Best regards,
 -- 
 Jens Axboe
+
 
