@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE18C4332F
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 10:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 554B4C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 10:00:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354162AbhK0KEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 05:04:04 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:27304 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353731AbhK0KCE (ORCPT
+        id S1354209AbhK0KEI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 05:04:08 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:28110 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353783AbhK0KCG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 05:02:04 -0500
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J1Rs02W9fzbj4D;
-        Sat, 27 Nov 2021 17:58:44 +0800 (CST)
+        Sat, 27 Nov 2021 05:02:06 -0500
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J1Rp56tk8z1DH9w;
+        Sat, 27 Nov 2021 17:56:13 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 27 Nov 2021 17:58:48 +0800
+ 15.1.2308.20; Sat, 27 Nov 2021 17:58:50 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Sat, 27 Nov
- 2021 17:58:47 +0800
+ 2021 17:58:49 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <hch@infradead.org>, <tj@kernel.org>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH 1/4] Revert "blk-throttle: remove tg_drain_bios"
-Date:   Sat, 27 Nov 2021 18:10:56 +0800
-Message-ID: <20211127101059.477405-2-yukuai3@huawei.com>
+Subject: [PATCH 3/4] blk-throtl: introduce blk_throtl_cancel_bios()
+Date:   Sat, 27 Nov 2021 18:10:58 +0800
+Message-ID: <20211127101059.477405-4-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211127101059.477405-1-yukuai3@huawei.com>
 References: <20211127101059.477405-1-yukuai3@huawei.com>
@@ -45,46 +45,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit 32e3374304c7c317c05a61f3ddc315dbd46424f2.
+This function is used to cancel all throttled bios. Noted this
+modification is mainly from revertion of commit b77412372b68
+("blk-throttle: remove blk_throtl_drain").
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-throttle.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ block/blk-throttle.c | 37 +++++++++++++++++++++++++++++++++++++
+ block/blk-throttle.h |  2 ++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 39bb6e68a9a2..230e300c5856 100644
+index 25822c88bea1..b31ae8a2c8b5 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -2257,6 +2257,28 @@ void blk_throtl_bio_endio(struct bio *bio)
+@@ -2280,6 +2280,43 @@ static void tg_drain_bios(struct throtl_service_queue *parent_sq)
+ 	}
  }
- #endif
  
-+/*
-+ * Dispatch all bios from all children tg's queued on @parent_sq.  On
-+ * return, @parent_sq is guaranteed to not have any active children tg's
-+ * and all bios from previously active tg's are on @parent_sq->bio_lists[].
++/**
++ * blk_throtl_cancel_bios - cancel throttled bios
++ * @q: request_queue to cancel throttled bios for
++ *
++ * This function is called to error all currently throttled bios on @q.
 + */
-+static void tg_drain_bios(struct throtl_service_queue *parent_sq)
++void blk_throtl_cancel_bios(struct request_queue *q)
 +{
-+	struct throtl_grp *tg;
++	struct throtl_data *td = q->td;
++	struct blkcg_gq *blkg;
++	struct cgroup_subsys_state *pos_css;
++	struct bio *bio;
++	int rw;
 +
-+	while ((tg = throtl_rb_first(parent_sq))) {
-+		struct throtl_service_queue *sq = &tg->service_queue;
-+		struct bio *bio;
++	rcu_read_lock();
 +
-+		throtl_dequeue_tg(tg);
++	/*
++	 * Drain each tg while doing post-order walk on the blkg tree, so
++	 * that all bios are propagated to td->service_queue.  It'd be
++	 * better to walk service_queue tree directly but blkg walk is
++	 * easier.
++	 */
++	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
++		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
 +
-+		while ((bio = throtl_peek_queued(&sq->queued[READ])))
-+			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+		while ((bio = throtl_peek_queued(&sq->queued[WRITE])))
-+			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+	}
++	/* finally, transfer bios from top-level tg's into the td */
++	tg_drain_bios(&td->service_queue);
++
++	rcu_read_unlock();
++
++	/* all bios now should be in td->service_queue, cancel them */
++	for (rw = READ; rw <= WRITE; rw++)
++		while ((bio = throtl_pop_queued(&td->service_queue.queued[rw],
++						NULL)))
++			bio_io_error(bio);
 +}
 +
  int blk_throtl_init(struct request_queue *q)
  {
  	struct throtl_data *td;
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index 175f03abd9e4..9d67d5139954 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -160,12 +160,14 @@ static inline void blk_throtl_exit(struct request_queue *q) { }
+ static inline void blk_throtl_register_queue(struct request_queue *q) { }
+ static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
+ static inline bool blk_throtl_bio(struct bio *bio) { return false; }
++#define blk_throtl_cancel_bios(q)  do { } while (0)
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ int blk_throtl_init(struct request_queue *q);
+ void blk_throtl_exit(struct request_queue *q);
+ void blk_throtl_register_queue(struct request_queue *q);
+ void blk_throtl_charge_bio_split(struct bio *bio);
+ bool __blk_throtl_bio(struct bio *bio);
++void blk_throtl_cancel_bios(struct request_queue *q);
+ static inline bool blk_throtl_bio(struct bio *bio)
+ {
+ 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
 -- 
 2.31.1
 
