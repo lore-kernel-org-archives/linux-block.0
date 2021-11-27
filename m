@@ -2,186 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DC4C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 11:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED140C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 13:42:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232727AbhK0Lco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 06:32:44 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:59857 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237706AbhK0Lao (ORCPT
+        id S1351395AbhK0Npj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 08:45:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54558 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234742AbhK0Nni (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 06:30:44 -0500
-Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1ARBRGpt032943;
-        Sat, 27 Nov 2021 20:27:16 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
- Sat, 27 Nov 2021 20:27:16 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1ARBRFr9032940
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sat, 27 Nov 2021 20:27:16 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
-Date:   Sat, 27 Nov 2021 20:27:12 +0900
+        Sat, 27 Nov 2021 08:43:38 -0500
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE75C061746
+        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 05:40:24 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id e144so14906384iof.3
+        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 05:40:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=pAk1TP9fOrGOonsoRH4nSjoD6pOV/b1FqN+da3AqBqk=;
+        b=ibLv/XaSsqfTW3f6aFIXN5xZVzYz7AzhRaoLoOGsHFBdOR+hl4qi0iccdhYG9v5Hbr
+         c1nQUTCGts8iw9I0f7agQWlwHKPL91qRigHRrfl6znNOCGxhDHzznio8RlRvwYJEYkey
+         jjsT/dTVpzIqA8wKnFAydvFBdugnwT85vJpO/9Yx4rF8VLAzo0Y+lh+dFozqxawnu+xd
+         1F2iSn8dzH8wKrZzERy405GS8Pui5XivUb2WhE5FJqU5bftUfW0L+qUTW6LJ1bslTr1S
+         i/as6FZmyUQzFu0AF5+xwiXW3k55Cl5vuPpweqg/CAMq9bjOAsi7NkzC6A4HoBjZQeRv
+         Taxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=pAk1TP9fOrGOonsoRH4nSjoD6pOV/b1FqN+da3AqBqk=;
+        b=NS40IS5YoXf44Rk6AUx1M/qV5nKypRv1zp+iUmElYFknAsCefutyPJsLtUNwaXD1z+
+         HHV+d/SKPq9Rg59ppxMoLpQsQMqCqFaq/Lp84di4St3EiOdMLj0XP5O2Px/WEkANCMHJ
+         jVufhbPiTrxMPpq1F9XW2s4Cqf35VFa9vy6OPJ5gW9QM1lDkbvlmiO5KqTGM77L0t/BM
+         15lVNINmu+0/kGnfhc1pPn2QKNknavPSN2+ZRrhQiAIgrpbyvAKTtG1+YUrkPiQXa6cZ
+         q8Uvky7XW3hBVjAOoAxzRSLfL67SrpUYM7HBjhuh69XgoDf3DA3junlAAAX+PL070AGk
+         /FIg==
+X-Gm-Message-State: AOAM532VIviF860PSqrvkqog5A+Po5KCGx+x97h/PRMEp1AnVbdTCA93
+        igj+jQd79fAPBPWBB3vF4TX2f1Dp2BilOlO2
+X-Google-Smtp-Source: ABdhPJxj8LyRJoYC/2UaHln5kGew89xFSBNPBZbid2TJqWausDUKj9kqSjMQm4MWMo7uQeoIsO4o1w==
+X-Received: by 2002:a05:6602:2d04:: with SMTP id c4mr47351019iow.56.1638020423493;
+        Sat, 27 Nov 2021 05:40:23 -0800 (PST)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id s9sm5090151iow.48.2021.11.27.05.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Nov 2021 05:40:23 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>, linux-rdma@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>
+In-Reply-To: <20211126115817.2087431-1-hch@lst.de>
+References: <20211126115817.2087431-1-hch@lst.de>
+Subject: Re: cleanup I/O context handling
+Message-Id: <163802042046.623756.9169975969414207413.b4-ty@kernel.dk>
+Date:   Sat, 27 Nov 2021 06:40:20 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [syzbot] possible deadlock in blkdev_put (2)
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-References: <0000000000007f2f5405d1bfe618@google.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <0000000000007f2f5405d1bfe618@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello.
+On Fri, 26 Nov 2021 12:58:03 +0100, Christoph Hellwig wrote:
+> this series does a little spring cleaning of the I/O context handling/
+> 
+> Subject:
+>  block/bfq-iosched.c                   |   41 ++++++------
+>  block/blk-ioc.c                       |  115 +++++++++++++++++++++++++---------
+>  block/blk-mq-sched.c                  |   35 ----------
+>  block/blk-mq-sched.h                  |    3
+>  block/blk-mq.c                        |   14 ----
+>  block/blk.h                           |    8 --
+>  drivers/infiniband/hw/qib/qib_verbs.c |    4 -
+>  include/linux/iocontext.h             |   40 +++--------
+>  kernel/fork.c                         |   26 -------
+>  9 files changed, 128 insertions(+), 158 deletions(-)
+> 
+> [...]
 
-> HEAD commit:    f81e94e91878 Add linux-next specific files for 20211125
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16366216b00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=be9183de0824e4d7
-> dashboard link: https://syzkaller.appspot.com/bug?extid=643e4ce4b6ad1347d372
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Applied, thanks!
 
-This looks unsolvable as long as flush_workqueue() is called with disk->open_mutex
-held. I think we need to call flush_workqueue() without holding disk->open_mutex.
+[01/14] RDMA/qib: rename copy_io to qib_copy_io
+        commit: aa6c81e0dbe5ed782cc4cdb9274eaf1e14c07983
+[02/14] fork: move copy_io to block/blk-ioc.c
+        commit: 8a8d3786e0ea1793eca69d1e071141bff16d55d7
+[03/14] bfq: simplify bfq_bic_lookup
+        commit: 91d84d8eef716bfba98263493945897beff5e26a
+[04/14] bfq: use bfq_bic_lookup in bfq_limit_depth
+        commit: 4d6d46def2117d08edf72b080e768da8e3d36fe8
+[05/14] Revert "block: Provide blk_mq_sched_get_icq()"
+        commit: b2b522fb21b1a3dd10a1419884562114ab653bec
+[06/14] block: mark put_io_context_active static
+        commit: 6b939dcfa41384d18478ec34083ed64b3c485876
+[07/14] block: move blk_mq_sched_assign_ioc to blk-ioc.c
+        commit: 0afb8931998dad3d4ed125684e2dc74fca7b1714
+[08/14] block: move the remaining elv.icq handling to the I/O scheduler
+        commit: f390716138b4c5c32b883a047f9a1f38ef5b8c0f
+[09/14] block: remove get_io_context_active
+        commit: b9e117800715bad4920bc8ab8b286ffdedb22979
+[10/14] block: factor out a alloc_io_context helper
+        commit: a3335d4269a799c85395cb1a0712dd54b54f6497
+[11/14] block: use alloc_io_context in __copy_io
+        commit: 6767435a95a26560c2460e43aa26d00fb5b50e71
+[12/14] block: return the io_context from create_task_io_context
+        commit: af04d9b6c9037c4ff4312a8e1e58fd96a05c3ca5
+[13/14] block: simplify ioc_create_icq
+        commit: 22e0aa975c1fc52e05d9e9aa637e4833370eefb6
+[14/14] block: simplify ioc_lookup_icq
+        commit: c3ad7dd4999b6f4603dcdbbea0b7860c9c02bd86
 
-Since disk->fops->open == lo_open and bdev->bd_disk->fops->release == lo_release
-and blkdev_put() calls bdev->bd_disk->fops->release() right before dropping
-disk->open_mutex, is dropping disk->open_mutex inside lo_release (something like
-below) possible?
+Best regards,
+-- 
+Jens Axboe
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 3dfb39d38235..0fde1842686a 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1057,17 +1057,17 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 		bd_abort_claiming(bdev, loop_configure);
- out_putf:
- 	fput(file);
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	return error;
- }
- 
--static void __loop_clr_fd(struct loop_device *lo, bool release)
-+static void __loop_clr_fd(struct loop_device *lo)
- {
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
- 	struct loop_worker *pos, *worker;
- 
- 	/*
- 	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
- 	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
-@@ -1117,28 +1117,26 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
- 
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
- 		int err;
- 
- 		/*
--		 * open_mutex has been held already in release path, so don't
--		 * acquire it if this function is called in such case.
-+		 * If the reread partition is from release path, lo_refcnt is
-+		 * already zero.
- 		 *
- 		 * If the reread partition isn't from release path, lo_refcnt
- 		 * must be at least one and it can only become zero when the
- 		 * current holder is released.
- 		 */
--		if (!release)
--			mutex_lock(&lo->lo_disk->open_mutex);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		err = bdev_disk_changed(lo->lo_disk, false);
--		if (!release)
--			mutex_unlock(&lo->lo_disk->open_mutex);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo->lo_number, err);
- 		/* Device is gone, no point in returning error */
- 	}
- 
- 	/*
- 	 * lo->lo_state is set to Lo_unbound here after above partscan has
-@@ -1183,17 +1181,17 @@ static int loop_clr_fd(struct loop_device *lo)
- 	if (atomic_read(&lo->lo_refcnt) > 1) {
- 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
- 		mutex_unlock(&lo->lo_mutex);
- 		return 0;
- 	}
- 	loop_update_state_locked(lo, Lo_rundown);
- 	mutex_unlock(&lo->lo_mutex);
- 
--	__loop_clr_fd(lo, false);
-+	__loop_clr_fd(lo);
- 	return 0;
- }
- 
- static int
- loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- {
- 	int err;
- 	int prev_lo_flags;
-@@ -1683,17 +1681,17 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- static int lo_open(struct block_device *bdev, fmode_t mode)
- {
- 	struct loop_device *lo = bdev->bd_disk->private_data;
- 	int err;
- 
- 	err = mutex_lock_killable(&lo->lo_mutex);
- 	if (err)
- 		return err;
--	if (lo->lo_state == Lo_deleting)
-+	if (lo->lo_state == Lo_deleting || lo->lo_state == Lo_rundown)
- 		err = -ENXIO;
- 	else
- 		atomic_inc(&lo->lo_refcnt);
- 	mutex_unlock(&lo->lo_mutex);
- 	return err;
- }
- 
- static void lo_release(struct gendisk *disk, fmode_t mode)
-@@ -1706,18 +1704,27 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
- 		if (!loop_try_update_state_locked(lo, Lo_bound, Lo_rundown))
- 			goto out_unlock;
- 		mutex_unlock(&lo->lo_mutex);
- 		/*
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
-+		 *
-+		 * Since calling flush_workqueue() with open_mutex held causes
-+		 * circular locking dependency problem, call __loop_clr_fd()
-+		 * without open_mutex. Use lo->lo_state == Lo_rundown condition
-+		 * for preventing lo_open() from incrementing lo_refcnt, for
-+		 * calling __loop_clr_fd() without open_mutex might result in
-+		 * entering lo_open() before lo_release() completes.
- 		 */
--		__loop_clr_fd(lo, true);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
-+		__loop_clr_fd(lo);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
- 		 * but flush possible ongoing bios in thread.
- 		 */
- 		blk_mq_freeze_queue(lo->lo_queue);
- 		blk_mq_unfreeze_queue(lo->lo_queue);
 
