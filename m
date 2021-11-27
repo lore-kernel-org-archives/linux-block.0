@@ -2,104 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 366D7C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 10:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0B7C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 10:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354346AbhK0KEP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 05:04:15 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:28181 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353795AbhK0KCN (ORCPT
+        id S1353897AbhK0KEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 05:04:37 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:27305 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353889AbhK0KCh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 05:02:13 -0500
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J1Rq346b6z8vg2;
-        Sat, 27 Nov 2021 17:57:03 +0800 (CST)
+        Sat, 27 Nov 2021 05:02:37 -0500
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J1Rsd2703zbj7m;
+        Sat, 27 Nov 2021 17:59:17 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 27 Nov 2021 17:58:49 +0800
+ 15.1.2308.20; Sat, 27 Nov 2021 17:59:21 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Sat, 27 Nov
- 2021 17:58:48 +0800
+ 2021 17:59:20 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
-To:     <hch@infradead.org>, <tj@kernel.org>, <axboe@kernel.dk>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH 2/4] blk-throtl: don't warn in tg_drain_bios()
-Date:   Sat, 27 Nov 2021 18:10:57 +0800
-Message-ID: <20211127101059.477405-3-yukuai3@huawei.com>
+Subject: [PATCH RFC 0/9] support concurrent sync io for bfq on a specail occasion
+Date:   Sat, 27 Nov 2021 18:11:23 +0800
+Message-ID: <20211127101132.486806-1-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211127101059.477405-1-yukuai3@huawei.com>
-References: <20211127101059.477405-1-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-tg_drain_bios() will iterate until throtl_rb_first() return NULL,
-don't warn in such situation.
+Bfq can't handle sync io concurrently as long as the io are not issued
+from root group currently.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Previous patch set:
+https://lore.kernel.org/lkml/20211014014556.3597008-2-yukuai3@huawei.com/t/
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 230e300c5856..25822c88bea1 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -497,12 +497,13 @@ static void throtl_pd_free(struct blkg_policy_data *pd)
- }
- 
- static struct throtl_grp *
--throtl_rb_first(struct throtl_service_queue *parent_sq)
-+throtl_rb_first(struct throtl_service_queue *parent_sq, bool warn)
- {
- 	struct rb_node *n;
- 
- 	n = rb_first_cached(&parent_sq->pending_tree);
--	WARN_ON_ONCE(!n);
-+	if (warn)
-+		WARN_ON_ONCE(!n);
- 	if (!n)
- 		return NULL;
- 	return rb_entry_tg(n);
-@@ -520,7 +521,7 @@ static void update_min_dispatch_time(struct throtl_service_queue *parent_sq)
- {
- 	struct throtl_grp *tg;
- 
--	tg = throtl_rb_first(parent_sq);
-+	tg = throtl_rb_first(parent_sq, true);
- 	if (!tg)
- 		return;
- 
-@@ -1089,7 +1090,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
- 		if (!parent_sq->nr_pending)
- 			break;
- 
--		tg = throtl_rb_first(parent_sq);
-+		tg = throtl_rb_first(parent_sq, true);
- 		if (!tg)
- 			break;
- 
-@@ -2266,7 +2267,7 @@ static void tg_drain_bios(struct throtl_service_queue *parent_sq)
- {
- 	struct throtl_grp *tg;
- 
--	while ((tg = throtl_rb_first(parent_sq))) {
-+	while ((tg = throtl_rb_first(parent_sq, false))) {
- 		struct throtl_service_queue *sq = &tg->service_queue;
- 		struct bio *bio;
- 
+During implemting the method mentioned by the above patch set, I found
+more problems that will block implemting concurrent sync io. The
+modifications of this patch set are as follows:
+
+1) count root group into 'num_groups_with_pending_reqs';
+2) don't idle if 'num_groups_with_pending_reqs' is 1;
+3) If the group doesn't have pending requests while it's child groups
+have pending requests, don't count the group.
+4) Once the group doesn't have pending requests, decrease
+'num_groups_with_pending_reqs' immediately. Don't delay to when all
+it's child groups don't have pending requests.
+
+Noted that I just tested basic functionality of this patchset, and I
+think it's better to see if anyone have suggestions or better
+solutions.
+
+Yu Kuai (9):
+  block, bfq: add new apis to iterate bfq entities
+  block, bfq: apply news apis where root group is not expected
+  block, bfq: handle the case when for_each_entity() access root group
+  block, bfq: count root group into 'num_groups_with_pending_reqs'
+  block, bfq: do not idle if only one cgroup is activated
+  block, bfq: only count group that the bfq_queue belongs to
+  block, bfq: record how many queues have pending requests in bfq_group
+  block, bfq: move forward __bfq_weights_tree_remove()
+  block, bfq: decrease 'num_groups_with_pending_reqs' earlier
+
+ block/bfq-cgroup.c  |  3 +-
+ block/bfq-iosched.c | 92 +++++++++++++++++++++++----------------------
+ block/bfq-iosched.h | 41 +++++++++++++-------
+ block/bfq-wf2q.c    | 44 +++++++++++++++-------
+ 4 files changed, 106 insertions(+), 74 deletions(-)
+
 -- 
 2.31.1
 
