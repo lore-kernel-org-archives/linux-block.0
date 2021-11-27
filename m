@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E8DC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 10:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C419C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 10:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354683AbhK0KEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 05:04:45 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:16311 "EHLO
+        id S1354734AbhK0KEr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 05:04:47 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:27306 "EHLO
         szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354075AbhK0KCm (ORCPT
+        with ESMTP id S1354047AbhK0KCj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 05:02:42 -0500
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J1RsF4FY5z91Ct;
-        Sat, 27 Nov 2021 17:58:57 +0800 (CST)
+        Sat, 27 Nov 2021 05:02:39 -0500
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J1Rsh0gJ6zbj81;
+        Sat, 27 Nov 2021 17:59:20 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
  dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 27 Nov 2021 17:59:26 +0800
+ 15.1.2308.20; Sat, 27 Nov 2021 17:59:24 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Sat, 27 Nov
- 2021 17:59:25 +0800
+ 2021 17:59:23 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH RFC 7/9] block, bfq: record how many queues have pending requests in bfq_group
-Date:   Sat, 27 Nov 2021 18:11:30 +0800
-Message-ID: <20211127101132.486806-8-yukuai3@huawei.com>
+Subject: [PATCH RFC 4/9] block, bfq: count root group into 'num_groups_with_pending_reqs'
+Date:   Sat, 27 Nov 2021 18:11:27 +0800
+Message-ID: <20211127101132.486806-5-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211127101132.486806-1-yukuai3@huawei.com>
 References: <20211127101132.486806-1-yukuai3@huawei.com>
@@ -45,77 +45,52 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Prepare to decrease 'num_groups_with_pending_reqs' earlier.
+Root group is not counted into 'num_groups_with_pending_reqs' because
+'entity->parent' is set to NULL for child entities, thus
+for_each_entity() can't access root group.
+
+This patch set root_group's entity to 'entity->parent' for child
+entities, It's okay with previous patches handle the case that
+for_each_entity() access root group.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-cgroup.c  |  1 +
- block/bfq-iosched.c | 21 +++++++++++++++++++++
- block/bfq-iosched.h |  1 +
- 3 files changed, 23 insertions(+)
+ block/bfq-cgroup.c  | 2 +-
+ block/bfq-iosched.h | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 9c36deda4ed4..d6f7e96ec852 100644
+index 24a5c5329bcd..9c36deda4ed4 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
- 				   */
- 	bfqg->bfqd = bfqd;
- 	bfqg->active_entities = 0;
-+	bfqg->num_entities_with_pending_reqs = 0;
- 	bfqg->rq_pos_tree = RB_ROOT;
+@@ -436,7 +436,7 @@ void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg)
+ 		 */
+ 		bfqg_and_blkg_get(bfqg);
+ 	}
+-	entity->parent = bfqg->my_entity; /* NULL for root group */
++	entity->parent = &bfqg->entity;
+ 	entity->sched_data = &bfqg->sched_data;
  }
- 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 63e4e13db92f..e3c31db4bffb 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -825,6 +825,16 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- inc_counter:
- 	bfqq->weight_counter->num_active++;
- 	bfqq->ref++;
-+
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	if (!entity->in_groups_with_pending_reqs) {
-+		struct bfq_group *bfqg =
-+			container_of(entity->parent, struct bfq_group, entity);
-+
-+		entity->in_groups_with_pending_reqs = true;
-+		bfqg->num_entities_with_pending_reqs++;
-+	}
-+#endif
- }
- 
- /*
-@@ -841,6 +851,17 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
- 		return;
- 
- 	bfqq->weight_counter->num_active--;
-+
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	if (bfqq->entity.in_groups_with_pending_reqs) {
-+		struct bfq_group *bfqg = container_of(bfqq->entity.parent,
-+				struct bfq_group, entity);
-+
-+		bfqq->entity.in_groups_with_pending_reqs = false;
-+		bfqg->num_entities_with_pending_reqs--;
-+	}
-+#endif
-+
- 	if (bfqq->weight_counter->num_active > 0)
- 		goto reset_entity_pointer;
  
 diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 515eb2604a37..df08bff89a70 100644
+index ef875b8046e5..515eb2604a37 100644
 --- a/block/bfq-iosched.h
 +++ b/block/bfq-iosched.h
-@@ -937,6 +937,7 @@ struct bfq_group {
- 	struct bfq_entity *my_entity;
+@@ -1021,13 +1021,14 @@ extern struct blkcg_policy blkcg_policy_bfq;
+ /* - interface of the internal hierarchical B-WF2Q+ scheduler - */
  
- 	int active_entities;
-+	int num_entities_with_pending_reqs;
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+-/* stop at one of the child entities of the root group */
++/* stop at root group */
+ #define for_each_entity(entity)	\
+ 	for (; entity ; entity = entity->parent)
  
- 	struct rb_root rq_pos_tree;
+ #define is_root_entity(entity) \
+ 	(entity->sched_data == NULL)
+ 
++/* stop at one of the child entities of the root group */
+ #define for_each_entity_not_root(entity) \
+ 	for (; entity && !is_root_entity(entity); entity = entity->parent)
  
 -- 
 2.31.1
