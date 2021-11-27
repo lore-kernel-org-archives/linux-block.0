@@ -2,64 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8894FC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 16:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DDE7C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 17:24:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238091AbhK0QyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 11:54:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
+        id S232316AbhK0R1P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 12:27:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238092AbhK0QwY (ORCPT
+        with ESMTP id S235413AbhK0RZP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 11:52:24 -0500
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F667C061756
-        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:49:09 -0800 (PST)
-Received: by mail-il1-x136.google.com with SMTP id s11so5099928ilv.3
-        for <linux-block@vger.kernel.org>; Sat, 27 Nov 2021 08:49:09 -0800 (PST)
+        Sat, 27 Nov 2021 12:25:15 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3785DC06175B;
+        Sat, 27 Nov 2021 09:21:07 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id d9so5171152wrw.4;
+        Sat, 27 Nov 2021 09:21:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=74KPh8uSppZNL+D6j5siIoZQyA62KjAQqI0tS1Kt2ew=;
-        b=c1av8W8YwZl0rYTuLK41+9Y6KbEjsC054OmipQjloy3iXYC7YyFXB2Wtp+ZXxxoRIv
-         w+2A5+9S6UJOj82FhyfbX6/sYgPT7QR4FW52XxB49Zw/HrDH+S9dcxSlUmarUsj3cjbk
-         S997QYhw6+Vi21IGwDYKTezdwn03IlEIC9rAW7VmJrAC+7yG1SfSqBn3DhIzRio4K0JE
-         iv74BA10O+6qSfhwztZzv5GPrZ4cuFRAMH7zLRsJvFKQSWFTcjHqkkFqkhBgfi3YT5qp
-         YXHGWDFyvA7KxYYwJDvDnj3qqyyH1jGOgaTRcU+EnvvBNLJ+PJ9SejG9pqhb1UfntRh6
-         hbqQ==
+        d=googlemail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uY2tL9qhFrzI8JAAY9tCjldOg3akMXRLK2477GuQImA=;
+        b=H+NdGFnAvugCC8rNPmCbHvhKjbupanM/bZP25WuRkD4e8aY9HLoB8+6Bb8VZnlaa8A
+         qwZB5mUSVcfWjdmr4R+lyJw6CKsi+rxwi44GsugDSI3VvnaYp42arO6kWZpISg4riLIb
+         rRjYya0wjgqdvIsOPar9rdqgERtj/g+PLohKNs2D6Zf0uKt3ETgWMzG2abfu70H45GrC
+         p9wKtF0iJusVRxiisTJIw/HnEDmpls8WIwJZ5cg7ddYuBdAajWBfxGYXwoEm0zNsLgbc
+         dp1gJcqwbgCZOHqEaYRxcXfTodkrnrEh6xylg73nz1US6eXjDciv5Vmgk94XtnkbqefG
+         zYlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=74KPh8uSppZNL+D6j5siIoZQyA62KjAQqI0tS1Kt2ew=;
-        b=dlxqQLSOuE9zPwC0BNZamfaTojFi0GhtTMJQ5fwUWIObbdAQeKzorM19o3wK9zZjRM
-         apsGKnBDArRekLgVhLdusKS1omGYtUhnSt+Szt9gMf+YehucbAdqFrAqjtinqPH5XSXt
-         ji4/u7o7bu10VN7vIegDmgZj/AjjSNMXwaAwKKGAfgs9PBBojQ92HR05DM74e9pEkZWl
-         5qh90jJVLxJm8VzXw8IgsnjI0rUYD27JVBtlBa901tdEX7LasW16IhVVqEQlI3wYO9MI
-         0NGy9WjnmVCRxZrZ0zj3K9vEI41gjiZe07bzpjGoe8inQk/DFu/KgY2I3W9F2oCmHIas
-         gpAQ==
-X-Gm-Message-State: AOAM530VMLeOXP1H5yWTp76jU2hrZvr8yLKQ30aOtx7GalzQv/5zs8qL
-        kkJISXMf13Nd1pcru/9sLEvP1A==
-X-Google-Smtp-Source: ABdhPJzVO6OubbKRB4/DxJw16wVuobuViqS9/AcFVO+7BaRidIpnYUeZLIcUTT54fZ6eWNYxFicUbg==
-X-Received: by 2002:a05:6e02:188f:: with SMTP id o15mr10128692ilu.269.1638031748183;
-        Sat, 27 Nov 2021 08:49:08 -0800 (PST)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id a4sm5201613ild.52.2021.11.27.08.49.07
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uY2tL9qhFrzI8JAAY9tCjldOg3akMXRLK2477GuQImA=;
+        b=fNaPiVn2XmqeSa+eHFMHJML7SriRtoxxq1irk1kdjbhysaC4/qRT71ldpfxJnLjxWR
+         hYqM17gi64+blc54ZyHavF+ZRvEJpZ66M4lnzN3TI6jIY3G9GwUc4MyEbucjlLCMn9qU
+         ToO5G1CNVETZEkXiuZYiRlEYn6oLNwXOlJ95LgwEgows4TCMP97H1SMRFvaXFMifSbPz
+         CyrPRg5e8OLTcHAi/v2A4P60OI6RNZ/2q1ZfSfPFlpN/SjZLlR6mZufhPspyVFa1h/Ni
+         iujbm47hL9ihHaN0vMaBio+0qoqPnHDXOqSM/tSQn6smRnxjnD7RLARfp0EXRnmYK/GM
+         yy2A==
+X-Gm-Message-State: AOAM532+zXKZABOnY93SA+vkdKPX3+eRPDQJFWqwrirs8eNgIGwXWOyg
+        OnNVUppcrXkoeA==
+X-Google-Smtp-Source: ABdhPJzCIXEHX9OSLEoedHwOkytNNervPV6S1X3Zig+KJ2ybnw6WLYz9rx8s4dr0p7t7Ujo/eCQTMQ==
+X-Received: by 2002:a5d:66cd:: with SMTP id k13mr21821581wrw.517.1638033665798;
+        Sat, 27 Nov 2021 09:21:05 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id l5sm15666441wms.16.2021.11.27.09.21.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Nov 2021 08:49:07 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Vignesh Raghavendra <vigneshr@ti.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Richard Weinberger <richard@nod.at>,
-        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-In-Reply-To: <20211126121802.2090656-1-hch@lst.de>
-References: <20211126121802.2090656-1-hch@lst.de>
-Subject: Re: remove ->rq_disk v2
-Message-Id: <163803174742.18774.4130157406940181436.b4-ty@kernel.dk>
-Date:   Sat, 27 Nov 2021 09:49:07 -0700
+        Sat, 27 Nov 2021 09:21:05 -0800 (PST)
+From:   Colin Ian King <colin.i.king@googlemail.com>
+X-Google-Original-From: Colin Ian King <colin.i.king@gmail.com>
+To:     Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Jens Axboe <axboe@kernel.dk>, ceph-devel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] rbd: make const pointer speaces a static const array
+Date:   Sat, 27 Nov 2021 17:21:04 +0000
+Message-Id: <20211127172104.102994-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -67,80 +66,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 26 Nov 2021 13:17:57 +0100, Christoph Hellwig wrote:
-> this series removes the rq_disk field in struct request, which isn't
-> needed now that we can get the disk from the request_queue.
-> 
-> Changes since v1:
->  - rebased to the latests for-5.17/block tree
-> 
-> Diffstat:
->  block/blk-flush.c                  |    3 --
->  block/blk-merge.c                  |    7 ------
->  block/blk-mq.c                     |   24 +++++++-------------
->  block/blk.h                        |    2 -
->  block/bsg-lib.c                    |    2 -
->  drivers/block/amiflop.c            |    2 -
->  drivers/block/ataflop.c            |    6 ++---
->  drivers/block/floppy.c             |    6 ++---
->  drivers/block/mtip32xx/mtip32xx.c  |    2 -
->  drivers/block/null_blk/trace.h     |    2 -
->  drivers/block/paride/pcd.c         |    2 -
->  drivers/block/paride/pd.c          |    6 ++---
->  drivers/block/paride/pf.c          |    4 +--
->  drivers/block/pktcdvd.c            |    2 -
->  drivers/block/rnbd/rnbd-clt.c      |    4 +--
->  drivers/block/sunvdc.c             |    2 -
->  drivers/block/sx8.c                |    4 +--
->  drivers/block/virtio_blk.c         |    2 -
->  drivers/md/dm-mpath.c              |    1
->  drivers/mmc/core/block.c           |   12 +++++-----
->  drivers/mtd/mtd_blkdevs.c          |   10 +-------
->  drivers/nvme/host/core.c           |    4 +--
->  drivers/nvme/host/fault_inject.c   |    2 -
->  drivers/nvme/host/pci.c            |    7 ++----
->  drivers/nvme/host/trace.h          |    6 ++---
->  drivers/nvme/target/passthru.c     |    3 --
->  drivers/scsi/ch.c                  |    2 -
->  drivers/scsi/scsi_bsg.c            |    2 -
->  drivers/scsi/scsi_error.c          |    2 -
->  drivers/scsi/scsi_ioctl.c          |   43 ++++++++++++++-----------------------
->  drivers/scsi/scsi_lib.c            |    5 ++--
->  drivers/scsi/scsi_logging.c        |    4 ++-
->  drivers/scsi/sd.c                  |   26 +++++++++++-----------
->  drivers/scsi/sd_zbc.c              |    8 +++---
->  drivers/scsi/sg.c                  |    6 ++---
->  drivers/scsi/sr.c                  |   11 ++++-----
->  drivers/scsi/st.c                  |    4 +--
->  drivers/scsi/ufs/ufshpb.c          |    4 +--
->  drivers/scsi/virtio_scsi.c         |    2 -
->  drivers/target/target_core_pscsi.c |    2 -
->  drivers/usb/storage/transport.c    |    2 -
->  include/linux/blk-mq.h             |   11 ++-------
->  include/scsi/scsi_cmnd.h           |    2 -
->  include/scsi/scsi_device.h         |    4 +--
->  include/scsi/scsi_ioctl.h          |    4 +--
->  include/trace/events/block.h       |    8 +++---
->  kernel/trace/blktrace.c            |    2 -
->  47 files changed, 124 insertions(+), 157 deletions(-)
-> 
-> [...]
+Don't populate the const array spaces on the stack but make it static
+const and make the pointer an array to remove a dereference. Shrinks
+object code a little too.  Also clean up intent, currently it is spaces
+and should be a tab.
 
-Applied, thanks!
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/block/rbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[1/5] mtd_blkdevs: remove the sector out of range check in do_blktrans_request
-      commit: c9e9ff5c8923f562091bebcd72164206cb48f08b
-[2/5] block: don't check ->rq_disk in merges
-      commit: e14b671dc11db224aad647a51581ee0320e132f7
-[3/5] block: remove the ->rq_disk field in struct request
-      commit: dc6d79f09226f4b4ff50dfa689c6982962ca53d1
-[4/5] block: remove the gendisk argument to blk_execute_rq
-      commit: 3d5ff0d19d14d9d2576f12621608600f562cef5c
-[5/5] scsi: remove the gendisk argument to scsi_ioctl
-      commit: 6273dc67219580d76880cb930d9fa97c52feee20
-
-Best regards,
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 8f140da1efe3..de7ede6aa95a 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -6189,7 +6189,7 @@ static inline size_t next_token(const char **buf)
+         * These are the characters that produce nonzero for
+         * isspace() in the "C" and "POSIX" locales.
+         */
+-        const char *spaces = " \f\n\r\t\v";
++	static const char spaces[] = " \f\n\r\t\v";
+ 
+         *buf += strspn(*buf, spaces);	/* Find start of token */
+ 
 -- 
-Jens Axboe
-
+2.33.1
 
