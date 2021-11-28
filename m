@@ -2,136 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FA0C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 05:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C570C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 07:44:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232851AbhK1GAn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Nov 2021 01:00:43 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:46046 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232766AbhK1F6m (ORCPT
+        id S1355151AbhK1HsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Nov 2021 02:48:13 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:52418 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230135AbhK1HqL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Nov 2021 00:58:42 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A2DEF1FCA1;
-        Sun, 28 Nov 2021 05:53:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1638078812; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HLucbzsCxyRVu0nLz48aeNMN8EZoET87ZEzYBa+Em3A=;
-        b=ubOl6sspNw4Tqq+6q9ujI2DpJ2OU/HgSZ+45jF5agOrB33/xe/VVTS2qshY75Tvy4tivMz
-        Crl8nw4LHviw7YQ5VaOurEFtYUwY/sHSb4T8rBd4ClZ/RCNKpZdag9SmGeDoTkKGetyky1
-        QOMGxbyYL48Cod8S31v/HGE53/L9IPg=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id ABE8D13446;
-        Sun, 28 Nov 2021 05:53:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id EHW2HlsZo2G7fAAAMHmgww
-        (envelope-from <wqu@suse.com>); Sun, 28 Nov 2021 05:53:31 +0000
-From:   Qu Wenruo <wqu@suse.com>
-To:     linux-btrfs@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH RFC 10/11] btrfs: remove btrfs_bio_ctrl::len_to_stripe_boundary
-Date:   Sun, 28 Nov 2021 13:52:58 +0800
-Message-Id: <20211128055259.39249-11-wqu@suse.com>
-X-Mailer: git-send-email 2.34.0
-In-Reply-To: <20211128055259.39249-1-wqu@suse.com>
-References: <20211128055259.39249-1-wqu@suse.com>
+        Sun, 28 Nov 2021 02:46:11 -0500
+Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1AS7gdgM042784;
+        Sun, 28 Nov 2021 16:42:39 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
+ Sun, 28 Nov 2021 16:42:39 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1AS7gcT4042780
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sun, 28 Nov 2021 16:42:38 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
+Date:   Sun, 28 Nov 2021 16:42:35 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [syzbot] possible deadlock in blkdev_put (2)
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Dave Chinner <dchinner@redhat.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <0000000000007f2f5405d1bfe618@google.com>
+ <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
+ <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
+In-Reply-To: <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since we can split bio at btrfs_map_bio() time, there is no need to do
-bio split for stripe boundaries at submit_extent_page() time.
+On 2021/11/28 14:32, Tetsuo Handa wrote:
+> If we can unconditionally start __loop_clr_fd() upon ioctl(LOOP_CLR_FD), I think
+> we can avoid circular locking between disk->open_mutex and flush_workqueue().
 
-Signed-off-by: Qu Wenruo <wqu@suse.com>
----
- fs/btrfs/extent_io.c | 23 ++---------------------
- fs/btrfs/extent_io.h |  1 -
- 2 files changed, 2 insertions(+), 22 deletions(-)
+Too bad. There is ioctl(LOOP_SET_STATUS) which allows forcing __loop_clr_fd() to be
+called without ioctl(LOOP_CLR_FD). We have to support __loop_clr_fd() upon lo_release().
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 91013c1dce25..9c845b2c50f8 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -3295,7 +3295,7 @@ static int btrfs_bio_add_page(struct btrfs_bio_ctrl *bio_ctrl,
- 
- 	ASSERT(bio);
- 	/* The limit should be calculated when bio_ctrl->bio is allocated */
--	ASSERT(bio_ctrl->len_to_oe_boundary && bio_ctrl->len_to_stripe_boundary);
-+	ASSERT(bio_ctrl->len_to_oe_boundary);
- 	if (bio_ctrl->bio_flags != bio_flags)
- 		return 0;
- 
-@@ -3306,9 +3306,7 @@ static int btrfs_bio_add_page(struct btrfs_bio_ctrl *bio_ctrl,
- 	if (!contig)
- 		return 0;
- 
--	real_size = min(bio_ctrl->len_to_oe_boundary,
--			bio_ctrl->len_to_stripe_boundary) - bio_size;
--	real_size = min(real_size, size);
-+	real_size = min(bio_ctrl->len_to_oe_boundary - bio_size, size);
- 
- 	/*
- 	 * If real_size is 0, never call bio_add_*_page(), as even size is 0,
-@@ -3329,11 +3327,8 @@ static int calc_bio_boundaries(struct btrfs_bio_ctrl *bio_ctrl,
- 			       struct btrfs_inode *inode, u64 file_offset)
- {
- 	struct btrfs_fs_info *fs_info = inode->root->fs_info;
--	struct btrfs_io_geometry geom;
- 	struct btrfs_ordered_extent *ordered;
--	struct extent_map *em;
- 	u64 logical = (bio_ctrl->bio->bi_iter.bi_sector << SECTOR_SHIFT);
--	int ret;
- 
- 	/*
- 	 * Pages for compressed extent are never submitted to disk directly,
-@@ -3344,22 +3339,8 @@ static int calc_bio_boundaries(struct btrfs_bio_ctrl *bio_ctrl,
- 	 */
- 	if (bio_ctrl->bio_flags & EXTENT_BIO_COMPRESSED) {
- 		bio_ctrl->len_to_oe_boundary = U32_MAX;
--		bio_ctrl->len_to_stripe_boundary = U32_MAX;
- 		return 0;
- 	}
--	em = btrfs_get_chunk_map(fs_info, logical, fs_info->sectorsize);
--	if (IS_ERR(em))
--		return PTR_ERR(em);
--	ret = btrfs_get_io_geometry(fs_info, em, btrfs_op(bio_ctrl->bio),
--				    logical, &geom);
--	free_extent_map(em);
--	if (ret < 0) {
--		return ret;
--	}
--	if (geom.len > U32_MAX)
--		bio_ctrl->len_to_stripe_boundary = U32_MAX;
--	else
--		bio_ctrl->len_to_stripe_boundary = (u32)geom.len;
- 
- 	if (!btrfs_is_zoned(fs_info) ||
- 	    bio_op(bio_ctrl->bio) != REQ_OP_ZONE_APPEND) {
-diff --git a/fs/btrfs/extent_io.h b/fs/btrfs/extent_io.h
-index cb727b77ecda..b4897597b445 100644
---- a/fs/btrfs/extent_io.h
-+++ b/fs/btrfs/extent_io.h
-@@ -109,7 +109,6 @@ struct extent_buffer {
- struct btrfs_bio_ctrl {
- 	struct bio *bio;
- 	unsigned long bio_flags;
--	u32 len_to_stripe_boundary;
- 	u32 len_to_oe_boundary;
- };
- 
--- 
-2.34.0
+Is dropping disk->open_mutex inside lo_release()
+( https://lkml.kernel.org/r/e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp ) possible?
 
