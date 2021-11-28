@@ -2,250 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F39FC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 05:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C0FC433F5
+	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 05:55:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231703AbhK1Fij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Nov 2021 00:38:39 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:65387 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbhK1Fgj (ORCPT
+        id S231162AbhK1F6f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Nov 2021 00:58:35 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:35600 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232433AbhK1F4f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Nov 2021 00:36:39 -0500
-Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1AS5WtF9026713;
-        Sun, 28 Nov 2021 14:32:55 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
- Sun, 28 Nov 2021 14:32:55 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1AS5WsOp026707
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 28 Nov 2021 14:32:55 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
-Date:   Sun, 28 Nov 2021 14:32:51 +0900
+        Sun, 28 Nov 2021 00:56:35 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CC2B1212FE;
+        Sun, 28 Nov 2021 05:53:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1638078798; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=R5VqbzqFLYhWPzWWAG74/Iyhe9WC86tkvhs07IhqDPA=;
+        b=ag/ZTDWAApyaSCJX+ttf8l9j+GLkAAX870dPBfVn5LDwC5ZNgMhhRPeCEc1RQ1YcDBarPy
+        5uOafDPTLOtI7hRLFCrtREt439GrCwX8qtdbmILbWfKAaW2v55+l2PzYtRojj7c3RNKSo/
+        cSLGSti/DzBV/SjP2+PyjrvA/DAlPxQ=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5BCCD13446;
+        Sun, 28 Nov 2021 05:53:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id puH8Ck0Zo2G7fAAAMHmgww
+        (envelope-from <wqu@suse.com>); Sun, 28 Nov 2021 05:53:17 +0000
+From:   Qu Wenruo <wqu@suse.com>
+To:     linux-btrfs@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH RFC 00/11] btrfs: split bio at btrfs_map_bio() time
+Date:   Sun, 28 Nov 2021 13:52:48 +0800
+Message-Id: <20211128055259.39249-1-wqu@suse.com>
+X-Mailer: git-send-email 2.34.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [syzbot] possible deadlock in blkdev_put (2)
-Content-Language: en-US
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Dave Chinner <dchinner@redhat.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <0000000000007f2f5405d1bfe618@google.com>
- <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
-In-Reply-To: <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello.
+[BACKGROUND]
 
-On 2021/11/27 20:27, Tetsuo Handa wrote:
-> Hello.
-> 
->> HEAD commit:    f81e94e91878 Add linux-next specific files for 20211125
->> git tree:       linux-next
->> console output: https://syzkaller.appspot.com/x/log.txt?x=16366216b00000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=be9183de0824e4d7
->> dashboard link: https://syzkaller.appspot.com/bug?extid=643e4ce4b6ad1347d372
->> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> 
-> This looks unsolvable as long as flush_workqueue() is called with disk->open_mutex
-> held. I think we need to call flush_workqueue() without holding disk->open_mutex.
+Currently btrfs never uses bio_split() to split its bio against RAID
+stripe boundaries.
 
-Commit a1ecac3b0656a682 ("loop: Make explicit loop device destruction lazy") changed
+Instead inside btrfs we check our stripe boundary everytime we allocate
+a new bio, and ensure the new bio never cross stripe boundaries.
 
-	if (lo->lo_refcnt > 1)  /* we needed one fd for the ioctl */
-		return -EBUSY;
+[PROBLEMS]
 
-in loop_clr_fd() to
+Although this works fine, it's against the common practice used in
+stacked drivers, and is making the effort to convert to iomap harder.
 
-	if (lo->lo_refcnt > 1) {
-		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
-		mutex_unlock(&lo->lo_ctl_mutex);
-		return 0;
-	}
+There is also an hidden burden, every time we allocate a new bio, we uses
+BIO_MAX_BVECS, but since we know the boundaries, for RAID0/RAID10 we can
+only fit at most 16 pages (fixed 64K stripe size, and 4K page size),
+wasting the 256 slots we allocated.
 
-but how does lo_refcnt matter here?
-What happens if we ignore lo->lo_refcnt > 1 check (i.e. allow this loop device
-to tear down even if somebody else (likely blkid via udev) is still accessing
-this loop device) ?
+[CHALLENGES]
 
-lo_open() increments lo->lo_refcnt with lo->lo_mutex held. However, since
-loop_clr_fd() releases lo->lo_mutex before calling __loop_clr_fd(), setting
-LO_FLAGS_AUTOCLEAR flag based on whether there is somebody else accessing
-this loop device is racy. That is, __loop_clr_fd() might be already started
-by the moment blkid via udev calls lo_open(). lo_open() by blkid via udev will
-succeed and blkid would access loop device in Lo_rundown state.
+To change the situation, this patchset attempts to improve the situation
+by moving the bio split into btrfs_map_bio() time, so upper layer should
+no longer bother the bio split against RAID stripes or even chunk
+boundaries.
 
-That is, userspace programs can tolerate accessing loop devide in Lo_rundown
-state. Then, why not unconditionally start __loop_clr_fd() instead of unreliably
-setting LO_FLAGS_AUTOCLEAR flag (i.e. force loop device destruction instead of
-making loop device destruction lazy) ?
+But there are several challenges:
 
-If we can unconditionally start __loop_clr_fd() upon ioctl(LOOP_CLR_FD), I think
-we can avoid circular locking between disk->open_mutex and flush_workqueue().
+- Conflicts in various endio functions
+  There is a special endio function, end_workqueue_bio(), that if a bio
+  has this endio function, and get split, we will double free the
+  btrfs_end_io_wq_cache.
 
----
- drivers/block/loop.c | 86 +++++++-------------------------------------
- 1 file changed, 12 insertions(+), 74 deletions(-)
+  And some hidden RAID56 endio also has this problem.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 3dfb39d38235..cd82c8a5c8d5 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -680,9 +680,7 @@ static ssize_t loop_attr_sizelimit_show(struct loop_device *lo, char *buf)
- 
- static ssize_t loop_attr_autoclear_show(struct loop_device *lo, char *buf)
- {
--	int autoclear = (lo->lo_flags & LO_FLAGS_AUTOCLEAR);
--
--	return sprintf(buf, "%s\n", autoclear ? "1" : "0");
-+	return sprintf(buf, "%s\n", "0");
- }
- 
- static ssize_t loop_attr_partscan_show(struct loop_device *lo, char *buf)
-@@ -1062,20 +1060,13 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return error;
- }
- 
--static void __loop_clr_fd(struct loop_device *lo, bool release)
-+static int loop_clr_fd(struct loop_device *lo)
- {
- 	struct file *filp;
--	gfp_t gfp = lo->old_gfp_mask;
- 	struct loop_worker *pos, *worker;
- 
--	/*
--	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
--	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
--	 * lo->lo_state has changed while waiting for lo->lo_mutex.
--	 */
--	mutex_lock(&lo->lo_mutex);
--	BUG_ON(lo->lo_state != Lo_rundown);
--	mutex_unlock(&lo->lo_mutex);
-+	if (!loop_try_update_state(lo, Lo_bound, Lo_rundown))
-+		return -ENXIO;
- 
- 	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
- 		blk_queue_write_cache(lo->lo_queue, false, false);
-@@ -1111,7 +1102,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	loop_sysfs_exit(lo);
- 	/* let user-space know about this change */
- 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
--	mapping_set_gfp_mask(filp->f_mapping, gfp);
-+	mapping_set_gfp_mask(filp->f_mapping, lo->old_gfp_mask);
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
-@@ -1122,18 +1113,12 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 		int err;
- 
- 		/*
--		 * open_mutex has been held already in release path, so don't
--		 * acquire it if this function is called in such case.
--		 *
--		 * If the reread partition isn't from release path, lo_refcnt
--		 * must be at least one and it can only become zero when the
--		 * current holder is released.
-+		 * lo_refcnt must be at least one and it can only become zero
-+		 * when the current holder is released.
- 		 */
--		if (!release)
--			mutex_lock(&lo->lo_disk->open_mutex);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		err = bdev_disk_changed(lo->lo_disk, false);
--		if (!release)
--			mutex_unlock(&lo->lo_disk->open_mutex);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo->lo_number, err);
-@@ -1142,7 +1127,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 
- 	/*
- 	 * lo->lo_state is set to Lo_unbound here after above partscan has
--	 * finished. There cannot be anybody else entering __loop_clr_fd() as
-+	 * finished. There cannot be anybody else entering loop_clr_fd() as
- 	 * Lo_rundown state protects us from all the other places trying to
- 	 * change the 'lo' device.
- 	 */
-@@ -1157,38 +1142,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	 * fput can take open_mutex which is usually taken before lo_mutex.
- 	 */
- 	fput(filp);
--}
--
--static int loop_clr_fd(struct loop_device *lo)
--{
--	int err;
--
--	err = mutex_lock_killable(&lo->lo_mutex);
--	if (err)
--		return err;
--	if (lo->lo_state != Lo_bound) {
--		mutex_unlock(&lo->lo_mutex);
--		return -ENXIO;
--	}
--	/*
--	 * If we've explicitly asked to tear down the loop device,
--	 * and it has an elevated reference count, set it for auto-teardown when
--	 * the last reference goes away. This stops $!~#$@ udev from
--	 * preventing teardown because it decided that it needs to run blkid on
--	 * the loopback device whenever they appear. xfstests is notorious for
--	 * failing tests because blkid via udev races with a losetup
--	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
--	 * command to fail with EBUSY.
--	 */
--	if (atomic_read(&lo->lo_refcnt) > 1) {
--		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
--		mutex_unlock(&lo->lo_mutex);
--		return 0;
--	}
--	loop_update_state_locked(lo, Lo_rundown);
--	mutex_unlock(&lo->lo_mutex);
--
--	__loop_clr_fd(lo, false);
- 	return 0;
- }
- 
-@@ -1703,26 +1656,11 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 	mutex_lock(&lo->lo_mutex);
- 	if (atomic_dec_return(&lo->lo_refcnt))
- 		goto out_unlock;
--
--	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
--		if (!loop_try_update_state_locked(lo, Lo_bound, Lo_rundown))
--			goto out_unlock;
--		mutex_unlock(&lo->lo_mutex);
--		/*
--		 * In autoclear mode, stop the loop thread
--		 * and remove configuration after last close.
--		 */
--		__loop_clr_fd(lo, true);
--		return;
--	} else if (lo->lo_state == Lo_bound) {
--		/*
--		 * Otherwise keep thread (if running) and config,
--		 * but flush possible ongoing bios in thread.
--		 */
-+	/* If still bound, flush request queue. */
-+	if (lo->lo_state == Lo_bound) {
- 		blk_mq_freeze_queue(lo->lo_queue);
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- 	}
--
- out_unlock:
- 	mutex_unlock(&lo->lo_mutex);
- }
+  For RAID56 problems, it's remaining to be solved in the v1 version.
+  But for end_workqueue_bio() it can be moved after bios been split.
+
+- Checksum verification
+  Currently we rely on btrfs_bio::csum to contain the checksum for the
+  whole bio.
+  If one bio get split, csum will no longer points to the correct
+  location for the split bio.
+
+  This can be solved by introducing btrfs_bio::offset_to_original, and
+  use that new member to calculate where we should read csum from.
+
+  For the parent bio, it still has btrfs_bio::csum for the whole bio,
+  thus it can still free it correctly.
+
+- Independent endio for each split bio
+  Unlike stack drivers, for RAID10 btrfs needs to try its best effort to
+  read every sectors, to handle the following case:
+
+  Dev 1	(missing) | D1 (X) |
+  Dev 2 (OK)	  | D1 (V) |
+  Dev 3 (OK)	  | D2 (V) |
+  Dev 4 (OK)	  | D2 (X) |
+
+  In the above RAID10 case, dev1 is missing, and although dev4 is fine,
+  its D2 sector is corrupted (by bit rot or whatever).
+
+  If we use bio_chain(), read bio for both D1 and D2 will be split, and
+  since D1 is missing, the whole D1 and D2 read will be marked as error,
+  thus we will try to read from dev2 and dev4.
+
+  But D2 in dev4 has csum mismatch, we can only rebuild D1 and D2
+  correctly from dev2:D1 and dev3:D2.
+
+  This patchset resolve this by saving bi_iter into btrfs_bio::iter, and
+  uses that at endio to iterate only the split part of an bio.
+  Other than this, existing read/write page endio functions can handle
+  them properly without problem.
+
+[RFC]
+The patchset is only lightly tested, as there is still some endio
+conflicts in the ancient RAID56 code.
+
+But despite that, regular buffered read/write and repair should work
+without problem.
+
+This patchset is sent because above mentioned challenges, all the
+solutions need extra review/feedback, not only from btrfs community but
+also block layer community, to determine if this is really the best
+solution.
+
+Qu Wenruo (11):
+  btrfs: update an stale comment on btrfs_submit_bio_hook()
+  btrfs: refactor btrfs_map_bio()
+  btrfs: move btrfs_bio_wq_end_io() calls into submit_stripe_bio()
+  btrfs: introduce btrfs_bio_split() helper
+  btrfs: save bio::bi_iter into btrfs_bio::iter before submitting
+  btrfs: make end_bio_extent_readpage() to handle split bio properly
+  btrfs: make end_bio_extent_*_writepage() to handle split biot properly
+  btrfs: allow btrfs_map_bio() to split bio according to chunk stripe
+    boundaries
+  btrfs: remove bio split operations in btrfs_submit_direct()
+  btrfs: remove btrfs_bio_ctrl::len_to_stripe_boundary
+  btrfs: temporarily disable RAID56
+
+ fs/btrfs/compression.c |   7 +-
+ fs/btrfs/ctree.h       |   5 +-
+ fs/btrfs/disk-io.c     |   9 +-
+ fs/btrfs/extent_io.c   | 183 +++++++++++++++++++++++++++--------------
+ fs/btrfs/extent_io.h   |   3 +-
+ fs/btrfs/inode.c       | 153 +++++++++++-----------------------
+ fs/btrfs/raid56.c      |   2 +
+ fs/btrfs/volumes.c     | 138 ++++++++++++++++++++++++-------
+ fs/btrfs/volumes.h     |  72 +++++++++++++++-
+ 9 files changed, 358 insertions(+), 214 deletions(-)
+
 -- 
-2.18.4
+2.34.0
 
