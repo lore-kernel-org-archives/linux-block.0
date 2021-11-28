@@ -2,168 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06904C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 08:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96B7C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 10:42:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343984AbhK1ITv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Nov 2021 03:19:51 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:44782 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356950AbhK1IRu (ORCPT
+        id S234612AbhK1KpR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Nov 2021 05:45:17 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:40866 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235416AbhK1KnR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Nov 2021 03:17:50 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Sun, 28 Nov 2021 05:43:17 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7EBF6B80B5F;
-        Sun, 28 Nov 2021 08:14:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD3F1C004E1;
-        Sun, 28 Nov 2021 08:14:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1638087272;
-        bh=39xPZMfe1ibuiHjcR8GPwApROOOXNw4PxPfnXkQy+GA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bTVi1qpOMK3snj3/5ngTGJBwNOtzVHs6mmhM7bpLN2Ylw7BStAeJBwg+ljnNqImWZ
-         GJF0n6LGABUqLnff6dpEUz3OopAoWIvmyR+6cd/4B3EaStgj6mJ/iqaWRy/CM3Fh7s
-         YIqq4s/fj/XxocPyvN10jawk/Ii1e5eiWoNokMBg=
-Date:   Sun, 28 Nov 2021 09:14:28 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Eric Biggers <ebiggers@kernel.org>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 64E462170C;
+        Sun, 28 Nov 2021 10:40:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1638096000; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9DkhicfqLgdXO/jo7jYDrCXnxFhkX5WqR1peT7wdlYw=;
+        b=C5C+XClBXZ+iT3kyeVBwoKht0lHSh8c7+AFc6a8qmWCd/v7iVdImwgGur1UTeBAqKOHGMO
+        O9iTzatgwDXk48NuT9TeOUVOdapBCnrqQ9JatN/Ki7BbC4g3e/dVM1ntceZT54QERW0PHl
+        7K2kRTiKJtkgg7nteArajg3ZV5LArn0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1638096000;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9DkhicfqLgdXO/jo7jYDrCXnxFhkX5WqR1peT7wdlYw=;
+        b=pplJvuI3Zc/0Xjxia1FxB1WAPVmkDDGqPv+bm9OhREjYebk9AyJM5pWaO/ocRNg7rrznhu
+        IVKBiozYvlk/haAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3BBF813446;
+        Sun, 28 Nov 2021 10:40:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id dCMDDYBco2GdSAAAMHmgww
+        (envelope-from <hare@suse.de>); Sun, 28 Nov 2021 10:40:00 +0000
+Subject: Re: [PATCH RFT 1/3] blk-mq: Drop busy_iter_fn blk_mq_hw_ctx argument
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 3/3] blk-crypto: show crypto capabilities in sysfs
-Message-ID: <YaM6ZJUByYXaI3/X@kroah.com>
-References: <20211126212514.173334-1-ebiggers@kernel.org>
- <20211126212514.173334-4-ebiggers@kernel.org>
- <YaH1CmHClx5WvDWD@kroah.com>
- <YaKZUu0tQc8bblmI@sol.localdomain>
+        ming.lei@redhat.com, kashyap.desai@broadcom.com
+References: <1635852455-39935-1-git-send-email-john.garry@huawei.com>
+ <1635852455-39935-2-git-send-email-john.garry@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <395729f9-7885-cc76-9055-7467af84c2e3@suse.de>
+Date:   Sun, 28 Nov 2021 11:39:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaKZUu0tQc8bblmI@sol.localdomain>
+In-Reply-To: <1635852455-39935-2-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 27, 2021 at 12:47:14PM -0800, Eric Biggers wrote:
-> Hi Greg, thanks for the review!
+On 11/2/21 12:27 PM, John Garry wrote:
+> The only user of blk_mq_hw_ctx blk_mq_hw_ctx argument is
+> blk_mq_rq_inflight().
 > 
-> On Sat, Nov 27, 2021 at 10:06:18AM +0100, Greg KH wrote:
-> > > diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-> > > index 3f569d5324857..252939f340459 100644
-> > > --- a/Documentation/block/queue-sysfs.rst
-> > > +++ b/Documentation/block/queue-sysfs.rst
-> > 
-> > Why is all of this information not in Documentation/ABI/ like the rest
-> > of the kernel's sysfs information?  When it is there it can be
-> > automatically tested as well.
-> > 
-> > Please don't add new entries to the wrong place if at all possible.
+> Function blk_mq_rq_inflight() uses the hctx to find the associated request
+> queue to match against the request. However this same check is already
+> done in caller bt_iter(), so drop this check.
 > 
-> Some of the block queue attributes are documented in
-> Documentation/ABI/testing/sysfs-block, but Documentation/block/queue-sysfs.rst
-> seems to be the authoritative source in practice.  I checked all QUEUE_*_ENTRY
-> in block/blk-sysfs.c, and I got:
+> With that change there are no more users of busy_iter_fn blk_mq_hw_ctx
+> argument, so drop the argument.
 > 
-> - 16 attributes are documented in both places
-> - 23 attributes are documented in Documentation/block/ only
-> - 0 attributes are documented in Documentation/ABI/ only
-> - 2 attributes ("virt_boundary_mask" and "stable_writes") not documented in
->   either place
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> ---
+>   block/blk-mq-tag.c     |  2 +-
+>   block/blk-mq.c         | 17 ++++++++---------
+>   include/linux/blk-mq.h |  3 +--
+>   3 files changed, 10 insertions(+), 12 deletions(-)
 > 
-> So most block queue attributes are documented only in Documentation/block/.  And
-> if I added my new attributes to Documentation/ABI/ only, as you're requesting,
-> they would be the only block queue attributes that would be documented in only
-> that place.  I think that would make things worse, as then there would be no
-> authoritative source anymore.
+Reviewed-by Hannes Reinecke <hare@suse.de>
 
-I agree, it should all move to the proper location in Documentation/ABI/
-as that is where all sysfs attributes need to be documented.  Block
-queues are not special here.
+Cheers,
 
-> If both you and the block people agree that *all* block queue attributes should
-> be documented in Documentation/ABI/ only, I'd be glad to send a separate patch
-> that adds anything missing to Documentation/ABI/testing/sysfs-block, then
-> removes Documentation/block/queue-sysfs.rst.  (BTW, shouldn't it really be in
-> Documentation/ABI/stable/?  This ABI has been around a long time, so surely
-> users are relying on it.)  But it doesn't seem fair to block this patch on that.
-
-"stable" is fine with me, people abuse "testing" by throwing everything
-into it.
-
-> 
-> > > +static ssize_t blk_crypto_max_dun_bits_show(struct blk_crypto_profile *profile,
-> > > +					    struct blk_crypto_attr *attr,
-> > > +					    char *page)
-> > > +{
-> > > +	return sprintf(page, "%u\n", 8 * profile->max_dun_bytes_supported);
-> > 
-> > sysfs_emit() please, for this, and all other show functions.
-> 
-> Sure.  Note that in .show() functions kernel-wide, it appears that sprintf() is
-> much more commonly used than sysfs_emit().  Is there any plan to convert these?
-> As-is, if people use existing code as a reference, it will be "wrong" most of
-> the time, which is unfortunate.
-
-Doing a wholesale replacement across the kernel is a pain and disruptive
-and not really needed.  But for all new code, please use the new
-functions.  If you want to convert your driver/subsystem to the new
-functions, no objection from me!
-
-> > > +}
-> > > +
-> > > +static ssize_t blk_crypto_num_keyslots_show(struct blk_crypto_profile *profile,
-> > > +					    struct blk_crypto_attr *attr,
-> > > +					    char *page)
-> > > +{
-> > > +	return sprintf(page, "%u\n", profile->num_slots);
-> > > +}
-> > > +
-> > > +#define BLK_CRYPTO_RO_ATTR(_name)			\
-> > > +static struct blk_crypto_attr blk_crypto_##_name = {	\
-> > > +	.attr	= { .name = #_name, .mode = 0444 },	\
-> > 
-> > __ATTR_RO()?
-> 
-> Sure.  This would require removing the "blk_crypto_" prefix from the .show()
-> functions, which I'd prefer to have, but it doesn't really matter.
-
-Ah, you are right, but I think using the default macros sometimes can be
-nicer as they are easier to verify you are doing things correctly.
-
-> > > +static const struct attribute_group *blk_crypto_attr_groups[] = {
-> > > +	&blk_crypto_attr_group,
-> > > +	&blk_crypto_modes_attr_group,
-> > > +	NULL,
-> > > +};
-> > 
-> > ATTRIBUTE_GROUP()?
-> > 
-> > Hm, maybe not, but I think it could be used here.
-> 
-> ATTRIBUTE_GROUP() doesn't exist; probably you're referring to
-> ATTRIBUTE_GROUPS()?  ATTRIBUTE_GROUPS() is only usable when there is only one
-> attribute group.  In this case, there are two attribute groups.
-
-You are right, sorry.
-
-> > > +static int __init blk_crypto_sysfs_init(void)
-> > > +{
-> > > +	int i;
-> > > +
-> > > +	BUILD_BUG_ON(BLK_ENCRYPTION_MODE_INVALID != 0);
-> > > +	for (i = 1; i < BLK_ENCRYPTION_MODE_MAX; i++) {
-> > > +		struct blk_crypto_attr *attr = &__blk_crypto_mode_attrs[i];
-> > 
-> > sysfs_attr_init() might be needed here, have you run with lockdep
-> > enabled?
-> 
-> It's not needed because __blk_crypto_mode_attrs isn't dynamically allocated
-> memory.  Yes, I've run with lockdep enabled.
-
-Ok, good, just checking.
-
-thanks,
-
-greg k-h
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
