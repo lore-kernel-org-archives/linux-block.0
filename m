@@ -2,150 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 350D6C43217
-	for <linux-block@archiver.kernel.org>; Sat, 27 Nov 2021 20:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B15C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 28 Nov 2021 00:13:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356187AbhK0Uwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Nov 2021 15:52:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356189AbhK0Uuc (ORCPT
+        id S230255AbhK1AQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Nov 2021 19:16:52 -0500
+Received: from mailbackend.panix.com ([166.84.1.89]:18586 "EHLO
+        mailbackend.panix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232262AbhK1AOv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Nov 2021 15:50:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957DAC06173E;
-        Sat, 27 Nov 2021 12:47:17 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2023F60EBA;
-        Sat, 27 Nov 2021 20:47:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5151AC53FBF;
-        Sat, 27 Nov 2021 20:47:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638046036;
-        bh=O4AOA3hg7SG1Jg74rGGBd8CqOtGpbieu02r8pImJFdI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uK4xCSwIbwrQGTBi31USheI5kl20x0nVkVULMI4oObB7oTTQ5V43Ywh2ARwQS6aiM
-         j75zETBU7LNKTwwd936o5Y7WlY0ecXvW15CEjOjFBtadzt++x0uDbjD3ojo2vs+qhL
-         svu60MJeCrMDE2b927nl0xcL8uqKTq3WiRcu9Q3Tdk+JQvS5z/mkJzu1Lr4bjNHbCY
-         fYaqnCWEBDrbRMAwQBCqa9iGulNlebclTWFwIX6RXu5yXh/bHmZ/eYwFY3eXK/sBPK
-         8yc0Okuvs3WkIi6lNezRp+77StTzbT4q31aONLkabHNtAOHhwEYP7YqO4Tc0cI6T+2
-         gp0tq8EmanVyQ==
-Date:   Sat, 27 Nov 2021 12:47:14 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 3/3] blk-crypto: show crypto capabilities in sysfs
-Message-ID: <YaKZUu0tQc8bblmI@sol.localdomain>
-References: <20211126212514.173334-1-ebiggers@kernel.org>
- <20211126212514.173334-4-ebiggers@kernel.org>
- <YaH1CmHClx5WvDWD@kroah.com>
+        Sat, 27 Nov 2021 19:14:51 -0500
+Received: from xps-7390.lan (mobile-166-172-187-190.mycingular.net [166.172.187.190])
+        by mailbackend.panix.com (Postfix) with ESMTPSA id 4J1pn21bDvz3rvq;
+        Sat, 27 Nov 2021 19:11:34 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
+        t=1638058295; bh=54ypOB+ijgfXMIzAJ3Y0gyBZ73m6bLpMirz7eYhg7Zw=;
+        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
+        b=RO/d+G0ZjwEhnybrmtseZs4rGg4ih6PNn2ORJl6olZDHHDZeVY4XrkB5PuIQsJRQT
+         /CBkkcqNI9d4KcEgltil+OO6NhblXO1crj4UtUN9pr7u8RH/ESo4dJOwEB8HEbyIqX
+         xKO8ta54U/AsaAF5DSC7rUQ0V4XextNQxIAZxHqc=
+Date:   Sat, 27 Nov 2021 16:11:31 -0800 (PST)
+From:   "Kenneth R. Crudup" <kenny@panix.com>
+Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "Kenneth R. Crudup" <kenny@panix.com>
+Subject: Re: Write I/O queue hangup at random on recent Linus' kernels
+In-Reply-To: <a4d728c2-703d-66be-bffd-3bfde0fddf41@kernel.dk>
+Message-ID: <b549b4ce-4156-eaab-a146-1fa52f51b642@panix.com>
+References: <b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com> <b9c2681f-e63a-4d3b-913d-d8a75e2c2ea0@kernel.dk> <be6a783-97db-c3bf-b16f-e8c62b14755d@panix.com> <17206ea6-506d-b1de-09e8-c935ff308bd6@kernel.dk> <903be817-4118-f34e-1b35-a0108045590f@kernel.dk>
+ <986e942b-d430-783b-5b1c-4525d4a94e48@panix.com> <ddc41b84-c414-006a-0840-250281caf1e5@kernel.dk> <1ff86d55-f39d-f88b-b8d-b6dfbd2f1b19@panix.com> <a4d728c2-703d-66be-bffd-3bfde0fddf41@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaH1CmHClx5WvDWD@kroah.com>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Greg, thanks for the review!
 
-On Sat, Nov 27, 2021 at 10:06:18AM +0100, Greg KH wrote:
-> > diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-> > index 3f569d5324857..252939f340459 100644
-> > --- a/Documentation/block/queue-sysfs.rst
-> > +++ b/Documentation/block/queue-sysfs.rst
-> 
-> Why is all of this information not in Documentation/ABI/ like the rest
-> of the kernel's sysfs information?  When it is there it can be
-> automatically tested as well.
-> 
-> Please don't add new entries to the wrong place if at all possible.
+On Fri, 26 Nov 2021, Jens Axboe wrote:
 
-Some of the block queue attributes are documented in
-Documentation/ABI/testing/sysfs-block, but Documentation/block/queue-sysfs.rst
-seems to be the authoritative source in practice.  I checked all QUEUE_*_ENTRY
-in block/blk-sysfs.c, and I got:
+>>> That said, I'm pretty confident in the fix,
 
-- 16 attributes are documented in both places
-- 23 attributes are documented in Documentation/block/ only
-- 0 attributes are documented in Documentation/ABI/ only
-- 2 attributes ("virt_boundary_mask" and "stable_writes") not documented in
-  either place
+Moot point kinda, as I see the fix in Linus' master, but yeah, it's working here.
 
-So most block queue attributes are documented only in Documentation/block/.  And
-if I added my new attributes to Documentation/ABI/ only, as you're requesting,
-they would be the only block queue attributes that would be documented in only
-that place.  I think that would make things worse, as then there would be no
-authoritative source anymore.
+	-Kenny
 
-If both you and the block people agree that *all* block queue attributes should
-be documented in Documentation/ABI/ only, I'd be glad to send a separate patch
-that adds anything missing to Documentation/ABI/testing/sysfs-block, then
-removes Documentation/block/queue-sysfs.rst.  (BTW, shouldn't it really be in
-Documentation/ABI/stable/?  This ABI has been around a long time, so surely
-users are relying on it.)  But it doesn't seem fair to block this patch on that.
-
-> > +static ssize_t blk_crypto_max_dun_bits_show(struct blk_crypto_profile *profile,
-> > +					    struct blk_crypto_attr *attr,
-> > +					    char *page)
-> > +{
-> > +	return sprintf(page, "%u\n", 8 * profile->max_dun_bytes_supported);
-> 
-> sysfs_emit() please, for this, and all other show functions.
-
-Sure.  Note that in .show() functions kernel-wide, it appears that sprintf() is
-much more commonly used than sysfs_emit().  Is there any plan to convert these?
-As-is, if people use existing code as a reference, it will be "wrong" most of
-the time, which is unfortunate.
-
-> > +}
-> > +
-> > +static ssize_t blk_crypto_num_keyslots_show(struct blk_crypto_profile *profile,
-> > +					    struct blk_crypto_attr *attr,
-> > +					    char *page)
-> > +{
-> > +	return sprintf(page, "%u\n", profile->num_slots);
-> > +}
-> > +
-> > +#define BLK_CRYPTO_RO_ATTR(_name)			\
-> > +static struct blk_crypto_attr blk_crypto_##_name = {	\
-> > +	.attr	= { .name = #_name, .mode = 0444 },	\
-> 
-> __ATTR_RO()?
-
-Sure.  This would require removing the "blk_crypto_" prefix from the .show()
-functions, which I'd prefer to have, but it doesn't really matter.
-
-> > +static const struct attribute_group *blk_crypto_attr_groups[] = {
-> > +	&blk_crypto_attr_group,
-> > +	&blk_crypto_modes_attr_group,
-> > +	NULL,
-> > +};
-> 
-> ATTRIBUTE_GROUP()?
-> 
-> Hm, maybe not, but I think it could be used here.
-
-ATTRIBUTE_GROUP() doesn't exist; probably you're referring to
-ATTRIBUTE_GROUPS()?  ATTRIBUTE_GROUPS() is only usable when there is only one
-attribute group.  In this case, there are two attribute groups.
-
-> > +static int __init blk_crypto_sysfs_init(void)
-> > +{
-> > +	int i;
-> > +
-> > +	BUILD_BUG_ON(BLK_ENCRYPTION_MODE_INVALID != 0);
-> > +	for (i = 1; i < BLK_ENCRYPTION_MODE_MAX; i++) {
-> > +		struct blk_crypto_attr *attr = &__blk_crypto_mode_attrs[i];
-> 
-> sysfs_attr_init() might be needed here, have you run with lockdep
-> enabled?
-
-It's not needed because __blk_crypto_mode_attrs isn't dynamically allocated
-memory.  Yes, I've run with lockdep enabled.
-
-- Eric
+-- 
+Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
