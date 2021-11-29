@@ -2,98 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48ED2C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 22:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EA8C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 23:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233429AbhK2WfY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Nov 2021 17:35:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60646 "EHLO
+        id S231758AbhK2XKg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Nov 2021 18:10:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233512AbhK2We7 (ORCPT
+        with ESMTP id S236824AbhK2XJx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Nov 2021 17:34:59 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5E5C03AA35;
-        Mon, 29 Nov 2021 10:19:21 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id p18so12827410plf.13;
-        Mon, 29 Nov 2021 10:19:21 -0800 (PST)
+        Mon, 29 Nov 2021 18:09:53 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0151C03AA25;
+        Mon, 29 Nov 2021 10:16:53 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id g18so17779289pfk.5;
+        Mon, 29 Nov 2021 10:16:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=nQZmy4cGScvJRiDlRHVd4gzuHUav0YqXgvVm+3n0P84=;
-        b=d+idyvNHakWhb7W1cxj73/tcSGYR8+qLm/NoDZ5ro8n/DN2vzjKEcrinrJ7bGnxsxr
-         ATXdS+Yuj/kLjB3k/3WmB6m8jR6+CPKUNX7CaL8NTFh4SFSYZVEbfTYN6oQaBXmGiYYn
-         /YFwxy+i9nc1fgZiycYoZ8J02PptokM9xDCHIrMYX9gw/ivMB9Kksq3D2tc3Y+GcZd0N
-         gpR63e1UH/iJGTfuLblGo9mB95uJIPLfhQQ3RD9jLogaPJps05xd+48YX2DJPkLXsyWA
-         p7bOLMTIxKdL4DtGjELnyNkYcqi6hiKHx521vudwlewk105i33Dj1kJRUqexxOpG6GJx
-         3N6g==
+        bh=U/lV8E1L2sRsBwRPS+If7j1bCTz7XAKccet53yRJUbM=;
+        b=E/V2jd5RtTT4t+mQMJCGTXfQJ5vhNpgk9p5ctLDOVJ2smfpN9GfGuTsgwFgP6gSR4q
+         9isZVjEZ4A6h4kyVfNn0GB8jbgo1EFcyVyIrmGH9jWdFfwTgQcbIcQMtYYM8tPZJKoIN
+         ZhNbUdFhmq4JZv4Om/B9nwLYWZabIjp+QtpSpnm7HYDTrwAPg9dqulgC13L61gpdYkVI
+         HOR82Zo6pY5INibMkwItuLjQ0tlA+qEp21FDsrc0acq1oJb8nNKruIARFunKoJ56rMu4
+         FfXc4XbveK3z2cLWl9LX+SiG6pC72bGbLrz6Q/OY0//UcVQqTcNeyxDXYQQL5P68KvRH
+         OCFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to;
-        bh=nQZmy4cGScvJRiDlRHVd4gzuHUav0YqXgvVm+3n0P84=;
-        b=T6khnYSbATvnRy8YB6LN91bLwYHcDxFgq+im1z2hEHtrQvGg78xCaFWaDS3+hToNTf
-         oEJdzrN7RfVrXVN/nUsmUm4i/Kq3XDB9Nuo1LU9rcFf63w3VZbah7C+IIQ4+6U/rWm95
-         oXjTT6pGNg3ALo9NvYGIoFYX7drGaif+Tu3LIGKCk5l0pT7raCMzNObgz12PbCYMZ6gU
-         U1+BrFHZsSU2W0ijALN2iJ2+6aC057s8dVvvSngxoghaFRkbrEnOU1GWZYatt6uwcuLA
-         kwHXq4NpmY4T9+pMbZWDAtaVdxPbaTLVefvmHnIvmcL0BjTEbO1npZ7UVm3IsA6w+zJw
-         0jcA==
-X-Gm-Message-State: AOAM532rr2UVtV0KAduyaJaVZbPZUSuddyNPQFRGzDRFW1x+bSZiI+Z1
-        +rD1M5qauz99tWpGWMRdZMc=
-X-Google-Smtp-Source: ABdhPJyvtHz/445hnKl3EGzHXHqBM5YNV/8eO0nxOvmV8HzDYz0ncry4gmJxh1n1KeYP2g7jf09mWQ==
-X-Received: by 2002:a17:90b:4c02:: with SMTP id na2mr26447pjb.94.1638209960962;
-        Mon, 29 Nov 2021 10:19:20 -0800 (PST)
+        bh=U/lV8E1L2sRsBwRPS+If7j1bCTz7XAKccet53yRJUbM=;
+        b=cFN0SWmsVMlsr3AwCtAkATdFyU98UN69LKu/Bn0fOYCio0/3z5LBkVdGmBUWp+tIGw
+         G+tG3Nt/9jN3erlBr0eO+QArg22qzC9EHTvS7gXGHt5EExj918XilhVeABISYidVUD7g
+         IsgQidN30twv9Xe+gh/pgpaw2x8bEDcQ1Fhryi+dg8tfUGSlMLmbDgbgSjr9Uo1glB7q
+         aRmAVPZZEgSDrF6dzOn9T+hyvoFkEodBSFwVJhj2/6s4Ica74zupY6Bvt24BmqJp9Nkf
+         49m2zFJSjvWrafg01376qnuqvVtIeHglnK10YoWQT/RZAgIc8/yxqiQln8+jM2kCW6rP
+         /X0A==
+X-Gm-Message-State: AOAM530MKqdCiZnlWltYFY1q47U/40QgjZGCTAwrEAlRRp+IaYU1Ci60
+        Qm2oGy0L1s3ELecGsV7PI2QZwLupU0lN1w==
+X-Google-Smtp-Source: ABdhPJyjw0DqgX3V+/kqLgS46RggjIjDjIjz1Z1EXIzQIKoG9/8p67gg4EJRQI20HFPRJMOpCuAOlw==
+X-Received: by 2002:aa7:870d:0:b0:49f:e41d:4f8d with SMTP id b13-20020aa7870d000000b0049fe41d4f8dmr42145998pfo.16.1638209813407;
+        Mon, 29 Nov 2021 10:16:53 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id l4sm19518598pfc.121.2021.11.29.10.19.18
+        by smtp.gmail.com with ESMTPSA id nn4sm22937pjb.38.2021.11.29.10.16.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 10:19:18 -0800 (PST)
+        Mon, 29 Nov 2021 10:16:52 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 29 Nov 2021 08:19:17 -1000
+Date:   Mon, 29 Nov 2021 08:16:51 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     cgel.zte@gmail.com
+To:     Laibin Qiu <qiulaibin@huawei.com>
 Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zealci@zte.com.cn, deng.changcheng@zte.com.cn
-Subject: Re: [PATCH v2] block: Use div64_ul instead of do_div
-Message-ID: <YaUZpZYI71K66Zka@slm.duckdns.org>
-References: <20211117010358.158313-1-deng.changcheng@zte.com.cn>
- <20211118034033.163550-1-deng.changcheng@zte.com.cn>
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] blk-throttle: Set BIO_THROTTLED when bio has been
+ throttled
+Message-ID: <YaUZExR6v8IdZUeM@slm.duckdns.org>
+References: <20211118131551.810931-1-qiulaibin@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211118034033.163550-1-deng.changcheng@zte.com.cn>
+In-Reply-To: <20211118131551.810931-1-qiulaibin@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 03:40:33AM +0000, cgel.zte@gmail.com wrote:
-> From: Changcheng Deng <deng.changcheng@zte.com.cn>
+Hello,
+
+On Thu, Nov 18, 2021 at 09:15:51PM +0800, Laibin Qiu wrote:
+> 1.In current process, all bio will set the BIO_THROTTLED flag
+> after __blk_throtl_bio().
 > 
-> do_div() does a 64-by-32 division. Here the divisor is an unsigned long
-> which on some platforms is 64 bit wide. So use div64_ul instead of do_div
-> to avoid a possible truncation.
+> 2.If bio needs to be throttled, it will start the timer and
+> stop submit bio directly. Bio will submit in blk_throtl_dispatch_work_fn()
+> when the timer expires. But in the current process, if bio is throttled.
+> The BIO_THROTTLED will be set to bio after timer start. If the bio
+> has been completed, it may cause use-after-free.
 > 
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
-> ---
->  block/blk-throttle.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+> Fix this by move BIO_THROTTLED set before timer set.
+
+Have you tried reproducing and confirming the above in any way?
+
 > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 39bb6e68a9a2..2db635d66617 100644
+> index 39bb6e68a9a2..ddfbff4465d5 100644
 > --- a/block/blk-throttle.c
 > +++ b/block/blk-throttle.c
-> @@ -1903,7 +1903,7 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+> @@ -2149,6 +2149,7 @@ bool __blk_throtl_bio(struct bio *bio)
+>  	td->nr_queued[rw]++;
+>  	throtl_add_bio_tg(bio, qn, tg);
+>  	throttled = true;
+> +	bio_set_flag(bio, BIO_THROTTLED);
 >  
->  	if (tg->bps[READ][LIMIT_LOW]) {
->  		bps = tg->last_bytes_disp[READ] * HZ;
-> -		do_div(bps, elapsed_time);
-> +		bps = div64_ul(bps, elapsed_time);
+>  	/*
+>  	 * Update @tg's dispatch time and force schedule dispatch if @tg
+> @@ -2163,7 +2164,6 @@ bool __blk_throtl_bio(struct bio *bio)
+>  
+>  out_unlock:
+>  	spin_unlock_irq(&q->queue_lock);
+> -	bio_set_flag(bio, BIO_THROTTLED);
 
-Yeah, the divisor is ulong for whatever reason but the thing is in jiffies.
-I have a hard time imagining it overflowing 32bit. I'm not sure how useful
-this patch is.
+Because it seems wrong in two ways:
+
+* This function is called synchronously on the issue path. The bio isn't
+  seen by the queue and device driver yet and nothing can race to issue it
+  before this function returns.
+
+* Now we're not setting BIO_THROTTLED when we're taking a different return
+  path through the out_unlock label and risks calling back into blk_throtl
+  again on the same bio.
+
+In general, if you think you spotted an issue, please try to trigger it in
+however way possible to confirm that the issue is real.
+
+Thanks.
 
 -- 
 tejun
