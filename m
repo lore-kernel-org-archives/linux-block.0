@@ -2,94 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFB3C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 10:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AD9C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 10:38:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239192AbhK2Kb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Nov 2021 05:31:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56678 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232949AbhK2K34 (ORCPT
+        id S239043AbhK2KmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Nov 2021 05:42:10 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:55043 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346963AbhK2KkJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Nov 2021 05:29:56 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AT8g2hV024506;
-        Mon, 29 Nov 2021 10:26:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type : subject :
- from : in-reply-to : date : cc : message-id : references : to :
- content-transfer-encoding : mime-version; s=pp1;
- bh=DpQapP1iYdDs9/blA8KcABzBjpVNbUS1R/t6HOOXaKI=;
- b=huWPmO5IXvT+ZD9GVH9lh/R/1QFQkR504l/tJzIK+oJNv9GeQ2xpX1DjqurzCGr95YRx
- e0IJEJb4omrnfdCx6ANiOhEUbUDPt8FTmR4Iequ2KEEqxY7QOznpsbwoCiV3VUW0k55p
- Cm5cJJZ2c1mQfyX12whCqSOWefqrFmchq7zvJxMenfxL+HfThLjatRpGcvVNT7wwmfGR
- MmaSTGIpQEE+PKnNFLAUTOXUixAERB50ApzUpBV1O/VEyHFJzKJ76AxodnBN8hpXvctP
- 80XxbPtbvLCxHvnbv3ffguvJRhw6pIbKVxRMEtVm6w8hp+cTsifgqE7NsLHNa4Ti+LRN 5g== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cmujxtcch-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Nov 2021 10:26:30 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ATAESHf001089;
-        Mon, 29 Nov 2021 10:26:28 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ckca93ebw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Nov 2021 10:26:28 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ATAQQDi24772880
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Nov 2021 10:26:26 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14C06A4068;
-        Mon, 29 Nov 2021 10:26:26 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E88C3A4065;
-        Mon, 29 Nov 2021 10:26:24 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.195.37.93])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 29 Nov 2021 10:26:24 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Subject: Re: [linux-next] Read-only file system after boot (powerpc)
-From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
-In-Reply-To: <20211129095947.GA32642@lst.de>
-Date:   Mon, 29 Nov 2021 15:56:23 +0530
-Cc:     linux-block@vger.kernel.org, linux-next@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Jens Axboe <axboe@kernel.dk>
-Message-Id: <2CD932C2-A553-4676-B73C-5A65198F73F2@linux.vnet.ibm.com>
-References: <87F94FF1-5D9D-475B-B083-C101DDB7A108@linux.vnet.ibm.com>
- <20211129095947.GA32642@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bPKF31uG6UyOWzoO02wEdCcmEm-HtxG_
-X-Proofpoint-GUID: bPKF31uG6UyOWzoO02wEdCcmEm-HtxG_
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Mon, 29 Nov 2021 05:40:09 -0500
+Received: from fsav112.sakura.ne.jp (fsav112.sakura.ne.jp [27.133.134.239])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1ATAaYbg056564;
+        Mon, 29 Nov 2021 19:36:34 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav112.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp);
+ Mon, 29 Nov 2021 19:36:34 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1ATAaWHR056557
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 29 Nov 2021 19:36:33 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
+Date:   Mon, 29 Nov 2021 19:36:27 +0900
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-29_07,2021-11-28_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- mlxscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111290049
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [syzbot] possible deadlock in blkdev_put (2)
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, Dave Chinner <dchinner@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <0000000000007f2f5405d1bfe618@google.com>
+ <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
+ <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
+ <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
+ <YaSpkRHgEMXrcn5i@infradead.org>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+In-Reply-To: <YaSpkRHgEMXrcn5i@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2021/11/29 19:21, Christoph Hellwig wrote:
+> On Sun, Nov 28, 2021 at 04:42:35PM +0900, Tetsuo Handa wrote:
+>> Is dropping disk->open_mutex inside lo_release()
+>> ( https://lkml.kernel.org/r/e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp ) possible?
+> 
+> I don't think we can drop open_mutex inside ->release. What is the
+> problem with offloading the clearing to a different context than the
+> one that calls ->release?
+> 
 
-> On 29-Nov-2021, at 3:29 PM, Christoph Hellwig <hch@lst.de> wrote:
->=20
-> Can you check if your tree already includes this commit:
->=20
-> https://git.kernel.dk/cgit/linux-block/commit/?h=3Dfor-5.17/block&id=3D3f=
-39d47d7ad858c024bd777f5f2a86fa7f6a9f14
->=20
-> and if not see if that fixes the problem?
+Offloading to a WQ context?
 
-Thanks. Yes, this patch fixes the problem for me.
+If the caller just want to call ioctl(LOOP_CTL_GET_FREE) followed by
+ioctl(LOOP_CONFIGURE), deferring __loop_clr_fd() would be fine.
 
--Sachin
-
+But the caller might want to unmount as soon as fput(filp) from __loop_clr_fd() completes.
+I think we need to wait for __loop_clr_fd() from lo_release() to complete.
