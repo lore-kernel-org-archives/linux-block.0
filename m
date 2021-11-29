@@ -2,53 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7DDC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 13:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDB1C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 14:00:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344502AbhK2NH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Nov 2021 08:07:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346202AbhK2NF2 (ORCPT
+        id S230376AbhK2OD5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Nov 2021 09:03:57 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:27314 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240180AbhK2OBp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Nov 2021 08:05:28 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD8AC08EB4B;
-        Mon, 29 Nov 2021 03:47:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=sS1UF3+KLoSiOG3o2982PPolKEnQICmz9dBEx8rZQgw=; b=3ozHs8KOkUIsJOlFd0kIUXHuQE
-        8W7ozvGgn/gfccir/W0Zdzs1P+oLIVQmqy9uvTxeViJ0XUHe4og1HjqPJH5PAP0TvoPcAZGeQuUZm
-        NgsUmcU4MvqxyRSRCq1g5+3cW23OYcK1wTmLTNP/C1db3o0/2X0bQKnC1wpR6LIx1DMoQRISHv8ry
-        sFpVFPeTskMa2fNZ70RJ022TbWhKFn5e4aWGVq61F5oB19iSA2jzatZMFLhCCsafrq9lAVNAtkPTC
-        tJVcPI085lNsnv+aZHS8m/VOVjKqYXIkYqJ5scgGik1GzjEJ03K6I18UpmAI9lZsFRPzbvXxcrt99
-        ImFKw4IQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mrf7n-000ZHY-Gy; Mon, 29 Nov 2021 11:47:11 +0000
-Date:   Mon, 29 Nov 2021 03:47:11 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     hch@infradead.org, tj@kernel.org, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+        Mon, 29 Nov 2021 09:01:45 -0500
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J2n4W1fdRzbjD0;
+        Mon, 29 Nov 2021 21:58:19 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 29 Nov 2021 21:58:25 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 29 Nov 2021 21:58:24 +0800
 Subject: Re: [PATCH 3/4] blk-throtl: introduce blk_throtl_cancel_bios()
-Message-ID: <YaS9v+x2ofp+9jQn@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
 References: <20211127101059.477405-1-yukuai3@huawei.com>
- <20211127101059.477405-4-yukuai3@huawei.com>
+ <20211127101059.477405-4-yukuai3@huawei.com> <YaS9v+x2ofp+9jQn@infradead.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <6085a86d-ddc8-8d06-e6d6-cee15fb962bc@huawei.com>
+Date:   Mon, 29 Nov 2021 21:58:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211127101059.477405-4-yukuai3@huawei.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YaS9v+x2ofp+9jQn@infradead.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 27, 2021 at 06:10:58PM +0800, Yu Kuai wrote:
-> This function is used to cancel all throttled bios. Noted this
-> modification is mainly from revertion of commit b77412372b68
-> ("blk-throttle: remove blk_throtl_drain").
+On 2021/11/29 19:47, Christoph Hellwig wrote:
+> On Sat, Nov 27, 2021 at 06:10:58PM +0800, Yu Kuai wrote:
+>> This function is used to cancel all throttled bios. Noted this
+>> modification is mainly from revertion of commit b77412372b68
+>> ("blk-throttle: remove blk_throtl_drain").
+> 
+> This should also go into the last patch.
+> .
+> 
 
-This should also go into the last patch.
+I'll merge patch 1,3,4 into one patch,
+
+Thanks,
+Kuai
