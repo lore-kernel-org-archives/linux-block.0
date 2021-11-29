@@ -2,86 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1B3C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 16:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A3C2C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 29 Nov 2021 17:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233621AbhK2QOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Nov 2021 11:14:46 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:51980 "EHLO
+        id S1347288AbhK2RQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Nov 2021 12:16:34 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:55290 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233837AbhK2QMo (ORCPT
+        with ESMTP id S239871AbhK2ROe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Nov 2021 11:12:44 -0500
+        Mon, 29 Nov 2021 12:14:34 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 94C3F1FCA1;
-        Mon, 29 Nov 2021 16:09:25 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id 8FE2C1FCA1;
+        Mon, 29 Nov 2021 17:11:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1638202165; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1638205875; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dlR9rlDvG2U7ujaNwRk+7nvnEIkWhGGTTtizeJOJEAg=;
-        b=uAzB3SZnqEyc9NrTEvDsGi8r77PTjkxxWJ7BuFQhbfnSSe+IERGRMZE9lOfqJ6o9J2DzLC
-        AXuqsnc2todWHYS4tFIb63uFMr61GrirXxcLrHpzb35OTD1vKDi+OCgMRwuT4pk0TuhMGq
-        54ErrrSYI9SBtb1l3JNGYdG2RKkxx6g=
+        bh=W99YQayPw77wzqXrx6MLXl/dSR3NLPlo5KdeeMbjv2s=;
+        b=BXp+b30+BGkNmEJB4Oq4HGpNDwueooCz+LMEk1UUiZU3/P2dK/AxKjp0IpfqzPlMdfWRAa
+        tA+rXNjtgOKNguPjhFaUuOCQZ2nWVZ7fYHFWnTBzJV9vdmWQxw138VelsEfBzWB8pNlPop
+        imT8qRFKtiV/44U3cQCVXL71XyWxuaU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1638202165;
+        s=susede2_ed25519; t=1638205875;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dlR9rlDvG2U7ujaNwRk+7nvnEIkWhGGTTtizeJOJEAg=;
-        b=y1NfIGreYeU1F2IEd9GZsuD3PbLo10m25VszRjMz3aFzpqul9iiMiD16BJybcSML9Fkm/x
-        +Dt8hXSoyI/zbJAg==
+        bh=W99YQayPw77wzqXrx6MLXl/dSR3NLPlo5KdeeMbjv2s=;
+        b=a8YoAADl546MO/ok6S7UfrVJBGzQ39c1AaASnakkJ+fm8p7rWXgv9zdGmrgY5AKuZT57j8
+        y/n5IzGDpSioyBBw==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 858E3A3B85;
-        Mon, 29 Nov 2021 16:09:25 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 7FA7AA3B87;
+        Mon, 29 Nov 2021 17:11:15 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 480761E13A9; Mon, 29 Nov 2021 17:09:25 +0100 (CET)
-Date:   Mon, 29 Nov 2021 17:09:25 +0100
+        id 5FBA21E1494; Mon, 29 Nov 2021 18:11:15 +0100 (CET)
+Date:   Mon, 29 Nov 2021 18:11:15 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jan Kara <jack@suse.cz>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 04/14] bfq: use bfq_bic_lookup in bfq_limit_depth
-Message-ID: <20211129160925.GB29512@quack2.suse.cz>
-References: <20211126115817.2087431-1-hch@lst.de>
- <20211126115817.2087431-5-hch@lst.de>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org, fvogt@suse.de, cgroups@vger.kernel.org
+Subject: Re: Use after free with BFQ and cgroups
+Message-ID: <20211129171115.GC29512@quack2.suse.cz>
+References: <20211125172809.GC19572@quack2.suse.cz>
+ <20211126144724.GA31093@blackbody.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20211126115817.2087431-5-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211126144724.GA31093@blackbody.suse.cz>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 26-11-21 12:58:07, Christoph Hellwig wrote:
-> No need to create a new I/O context if there is none present yet in
-> ->limit_depth.
+On Fri 26-11-21 15:47:24, Michal Koutný wrote:
+> Hello.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/bfq-iosched.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On Thu, Nov 25, 2021 at 06:28:09PM +0100, Jan Kara <jack@suse.cz> wrote:
+> [...]
+> +Cc cgroups ML
+> https://lore.kernel.org/linux-block/20211125172809.GC19572@quack2.suse.cz/
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index c990c6409c119..ecc2e57e68630 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -663,7 +663,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
->  static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
->  {
->  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
-> -	struct bfq_io_cq *bic = icq_to_bic(blk_mq_sched_get_icq(data->q));
-> +	struct bfq_io_cq *bic = bfq_bic_lookup(data->q);
+> 
+> I understand there are more objects than blkcgs but I assume it can
+> eventually boil down to blkcg references, so I suggest another
+> alternative. (But I may easily miss the relations between BFQ objects,
+> so consider this only high-level opinion.)
+> 
+> > After some poking, looking into crashdumps, and applying some debug patches
+> > the following seems to be happening: We have a process P in blkcg G. Now
+> > G is taken offline so bfq_group is cleaned up in bfq_pd_offline() but P
+> > still holds reference to G from its bfq_queue. Then P submits IO, G gets
+> > inserted into service tree despite being already offline.
+> 
+> (If G is offline, P can only be zombie, just saying. (I guess it can
+> still be Q's IO on behalf of G.))
+> 
+> IIUC, the reference to G is only held by P. If the G reference is copied
+> into another structure (the service tree) it should get another
+> reference. My naïve proposal would be css_get(). (1)
 
-Maybe I'm missing something but bfq_limit_depth() needs to know to which
-BFQ queue (and consequently blkcg) this IO is going to be added. And to be
-able to lookup this queue we are using IO context. So AFAICT we need the
-IO context allocated already in bfq_limit_depth()?
+So I was looking into this puzzle. The answer is following:
+
+The process P (podman, pid 2571) is currently attached to the root cgroup
+but it has io_context with BFQ queue that points to the already-offline G
+as a parent. The bio is thus associated with the root cgroup (via
+bio->bi_blkg) but BFQ uses io_context to lookup the BFQ queue where IO
+should be queued and then uses its parent to determine blkg which it should
+be charged and thus gets to the dying cgroup.
+
+Apparently P got recently moved from G to the root cgroup and there was
+reference left in the BFQ queue structure to G.
+
+> > IO completes, P exits, bfq_queue pointing to G gets destroyed, the
+> > last reference to G is dropped, G gets freed although is it still
+> > inserted in the service tree.  Eventually someone trips over the freed
+> > memory.
+> 
+> Isn't it the bfq_queue.bfq_entity that's inserted in the service tree
+> (not blkcg G)?
+
+Yes, it is. But the entity is part of bfq_group structure which is the pd
+for the blkcg.
+
+> You write bfq_queue is destroyed, shouldn't that remove it from the
+> service tree? (2)
+
+Yes, BFQ queue is removed from the service trees on destruction. But its
+parent - bfq_group - is not removed from its service tree. And that's where
+we hit the problem.
+
+> > Now I was looking into how to best fix this. There are several
+> > possibilities and I'm not sure which one to pick so that's why I'm writing
+> > to you. bfq_pd_offline() is walking all entities in service trees and
+> > trying to get rid of references to bfq_group (by reparenting entities).
+> > Is this guaranteed to see all entities that point to G? From the scenario
+> > I'm observing it seems this can miss entities pointing to G - e.g. if they
+> > are in idle tree, we will just remove them from the idle tree but we won't
+> > change entity->parent so they still point to G. This can be seen as one
+> > culprit of the bug.
+> 
+> There can be two types of references to blkcg (transitively via
+> bfq_group):
+> a) "plain" (just a pointer stored somewhere),
+> b) "pinned" (marked by css_get() of the respective blkcg).
+> 
+> The bfq_pd_offline() callback should erase all plain references (e.g. by
+> reparenting) or poke the holders of pinned references to release (unpin)
+> them eventually (so that blkcg goes away).
+> 
+> I reckon it's not possible to traverse all references in the
+> bfq_pd_offline().
+
+So bfq_pd_offline() does erase all plain references AFAICT. But later it
+can create new plain references (service tree) from the existing "pinned"
+ones and once pinned references go away, those created plain references
+cause trouble. And the more I'm looking into this the more I'm convinced
+bfq_pd_offline() should be more careful and remove also the pinned
+references from bfq queues. It actually does it for most queues but it can
+currently miss some... I'll look into that.
+
+Thanks for your very good questions and hints!
 
 								Honza
 -- 
