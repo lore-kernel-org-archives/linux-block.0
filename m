@@ -2,161 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B380AC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 14:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1CDC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 14:51:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242221AbhK3OqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 09:46:16 -0500
-Received: from mga18.intel.com ([134.134.136.126]:50064 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242163AbhK3OqP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 09:46:15 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10183"; a="223107403"
-X-IronPort-AV: E=Sophos;i="5.87,276,1631602800"; 
-   d="scan'208";a="223107403"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2021 06:42:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,276,1631602800"; 
-   d="scan'208";a="595449490"
-Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 30 Nov 2021 06:42:53 -0800
-Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1ms4LM-000DQw-DF; Tue, 30 Nov 2021 14:42:52 +0000
-Date:   Tue, 30 Nov 2021 22:42:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH V2 1/5] blk-mq: remove hctx_lock and hctx_unlock
-Message-ID: <202111302217.rEsBycwv-lkp@intel.com>
-References: <20211130073752.3005936-2-ming.lei@redhat.com>
+        id S242829AbhK3OyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 09:54:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242805AbhK3OxE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Nov 2021 09:53:04 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA48FC0613FE;
+        Tue, 30 Nov 2021 06:48:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9118EB817FA;
+        Tue, 30 Nov 2021 14:48:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69441C53FC1;
+        Tue, 30 Nov 2021 14:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638283721;
+        bh=ulE/ml8MDwvJiy9A3ZP+AfxT1W13k+6jFHrs5x1pOWE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LTvYZLpcddVbLJV3gdDCoMjNeHtAnsIe6e1xqMLo5JFB6ViHpTnscJwH1xr048iXs
+         Kjq9xsaq2toFizQLB4OmV7bFsDSmhMBXdGackVpuJcdxN/K2NWp9py6OeHPcV3ADFz
+         Put6YU9D8vL52owOqIAdVXMmMYDwpqcGrxYAOzwZ2LYQPYEPPK3zpb+zK4a0tgGm69
+         +oPb6zb2osP2HjR79h9mGb1DRyYJHm/BQxRDwJ9QT4Tlmt0zBy9iyHCslXSuPejzIT
+         Gq8rGDfJvJkFlaNDx/VJUDcDBSXv2hWVKSLXKlEji08PTCNvYnYbTOxd9iRT61TJ6O
+         HZyUMh3ACjoNA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        czhong@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 32/68] block: avoid to touch unloaded module instance when opening bdev
+Date:   Tue, 30 Nov 2021 09:46:28 -0500
+Message-Id: <20211130144707.944580-32-sashal@kernel.org>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20211130144707.944580-1-sashal@kernel.org>
+References: <20211130144707.944580-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211130073752.3005936-2-ming.lei@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+From: Ming Lei <ming.lei@redhat.com>
 
-Thank you for the patch! Perhaps something to improve:
+[ Upstream commit efcf5932230b9472cfdbe01c858726f29ac5ec7d ]
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on mkp-scsi/for-next v5.16-rc3 next-20211130]
-[cannot apply to linux-nvme/for-next hch-configfs/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+disk->fops->owner is grabbed in blkdev_get_no_open() after the disk
+kobject refcount is increased. This way can't make sure that
+disk->fops->owner is still alive since del_gendisk() still can move
+on if the kobject refcount of disk is grabbed by open() and
+disk->fops->open() isn't called yet.
 
-url:    https://github.com/0day-ci/linux/commits/Ming-Lei/blk-mq-quiesce-improvement/20211130-154015
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: hexagon-randconfig-r045-20211129 (https://download.01.org/0day-ci/archive/20211130/202111302217.rEsBycwv-lkp@intel.com/config)
-compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 25eb7fa01d7ebbe67648ea03841cda55b4239ab2)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/4575a8b36e3a56fa87b1f77e0064fc2ec36ebb7c
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Ming-Lei/blk-mq-quiesce-improvement/20211130-154015
-        git checkout 4575a8b36e3a56fa87b1f77e0064fc2ec36ebb7c
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash
+Fixes the issue by moving try_module_get() into blkdev_get_by_dev()
+with ->open_mutex() held, then we can drain the in-progress open()
+in del_gendisk(). Meantime new open() won't succeed because disk
+becomes not alive.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+This way is reasonable because blkdev_get_no_open() needn't to touch
+disk->fops or defined callbacks.
 
-All warnings (new ones prefixed by >>):
-
->> block/blk-mq.c:2482:2: warning: '(' and '{' tokens introducing statement expression appear in different macro expansion contexts [-Wcompound-token-split-by-macro]
-           blk_mq_run_dispatch_ops(hctx,
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-mq.c:1079:3: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                   ^
-   block/blk-mq.c:2483:3: note: '{' token is here
-                   {
-                   ^
-   block/blk-mq.c:1079:4: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                    ^~~~~~~~~~~~
->> block/blk-mq.c:2489:3: warning: '}' and ')' tokens terminating statement expression appear in different macro expansion contexts [-Wcompound-token-split-by-macro]
-                   }
-                   ^
-   block/blk-mq.c:1079:4: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                    ^~~~~~~~~~~~
-   block/blk-mq.c:2482:2: note: ')' token is here
-           blk_mq_run_dispatch_ops(hctx,
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-mq.c:1079:16: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                                ^
->> block/blk-mq.c:2482:2: warning: '(' and '{' tokens introducing statement expression appear in different macro expansion contexts [-Wcompound-token-split-by-macro]
-           blk_mq_run_dispatch_ops(hctx,
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-mq.c:1086:3: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                   ^
-   block/blk-mq.c:2483:3: note: '{' token is here
-                   {
-                   ^
-   block/blk-mq.c:1086:4: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                    ^~~~~~~~~~~~
->> block/blk-mq.c:2489:3: warning: '}' and ')' tokens terminating statement expression appear in different macro expansion contexts [-Wcompound-token-split-by-macro]
-                   }
-                   ^
-   block/blk-mq.c:1086:4: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                    ^~~~~~~~~~~~
-   block/blk-mq.c:2482:2: note: ')' token is here
-           blk_mq_run_dispatch_ops(hctx,
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-mq.c:1086:16: note: expanded from macro 'blk_mq_run_dispatch_ops'
-                   (dispatch_ops);                                 \
-                                ^
-   4 warnings generated.
-
-
-vim +2482 block/blk-mq.c
-
-  2466	
-  2467	/**
-  2468	 * blk_mq_try_issue_directly - Try to send a request directly to device driver.
-  2469	 * @hctx: Pointer of the associated hardware queue.
-  2470	 * @rq: Pointer to request to be sent.
-  2471	 *
-  2472	 * If the device has enough resources to accept a new request now, send the
-  2473	 * request directly to device driver. Else, insert at hctx->dispatch queue, so
-  2474	 * we can try send it another time in the future. Requests inserted at this
-  2475	 * queue have higher priority.
-  2476	 */
-  2477	static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-  2478			struct request *rq)
-  2479	{
-  2480		blk_status_t ret;
-  2481	
-> 2482		blk_mq_run_dispatch_ops(hctx,
-  2483			{
-  2484			ret = __blk_mq_try_issue_directly(hctx, rq, false, true);
-  2485			if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
-  2486				blk_mq_request_bypass_insert(rq, false, true);
-  2487			else if (ret != BLK_STS_OK)
-  2488				blk_mq_end_request(rq, ret);
-> 2489			}
-  2490		);
-  2491	}
-  2492	
-
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: czhong@redhat.com
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20211111020343.316126-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ block/bdev.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 485a258b0ab37..e52af269004bc 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -750,8 +750,7 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+ 
+ 	if (!bdev)
+ 		return NULL;
+-	if ((bdev->bd_disk->flags & GENHD_FL_HIDDEN) ||
+-	    !try_module_get(bdev->bd_disk->fops->owner)) {
++	if ((bdev->bd_disk->flags & GENHD_FL_HIDDEN)) {
+ 		put_device(&bdev->bd_device);
+ 		return NULL;
+ 	}
+@@ -761,7 +760,6 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+ 
+ void blkdev_put_no_open(struct block_device *bdev)
+ {
+-	module_put(bdev->bd_disk->fops->owner);
+ 	put_device(&bdev->bd_device);
+ }
+ 
+@@ -817,12 +815,14 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 	ret = -ENXIO;
+ 	if (!disk_live(disk))
+ 		goto abort_claiming;
++	if (!try_module_get(disk->fops->owner))
++		goto abort_claiming;
+ 	if (bdev_is_partition(bdev))
+ 		ret = blkdev_get_part(bdev, mode);
+ 	else
+ 		ret = blkdev_get_whole(bdev, mode);
+ 	if (ret)
+-		goto abort_claiming;
++		goto put_module;
+ 	if (mode & FMODE_EXCL) {
+ 		bd_finish_claiming(bdev, holder);
+ 
+@@ -844,7 +844,8 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 	if (unblock_events)
+ 		disk_unblock_events(disk);
+ 	return bdev;
+-
++put_module:
++	module_put(disk->fops->owner);
+ abort_claiming:
+ 	if (mode & FMODE_EXCL)
+ 		bd_abort_claiming(bdev, holder);
+@@ -953,6 +954,7 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
+ 		blkdev_put_whole(bdev, mode);
+ 	mutex_unlock(&disk->open_mutex);
+ 
++	module_put(disk->fops->owner);
+ 	blkdev_put_no_open(bdev);
+ }
+ EXPORT_SYMBOL(blkdev_put);
+-- 
+2.33.0
+
