@@ -2,96 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233C0C43217
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 10:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24A5C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 11:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232593AbhK3K32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 05:29:28 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:57240 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231216AbhK3K32 (ORCPT
+        id S237222AbhK3LNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:13:13 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:48244 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237212AbhK3LNL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 05:29:28 -0500
+        Tue, 30 Nov 2021 06:13:11 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 68A0A1FD54;
-        Tue, 30 Nov 2021 10:26:08 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTP id 9B8A82170C;
+        Tue, 30 Nov 2021 11:09:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1638267968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1638270581; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=z5xCEVo0syBfMr10VXyOKlSSa7AIkvzHoHu5qOQ831U=;
-        b=Ehj/n/0S1aIOtvrf60msYTs9x6aRPhc0h2lYX55ZFZZbAfQoiRCgdqf+1gdszAFP6SHeA7
-        lrn/4FQyp1+WZTOnPa5WnmtpdZ5Egr8/HVauwv1n1zyFKUb3UbPtvKIfK2xaZBUcFnP4kU
-        gcxYkTyRpgxTb3vPP9eNnmVULxUFtZ0=
+        bh=wbsFCrlaCNIiei6i9NjlZM3Pbtz2W7UBXNwVzac9ddg=;
+        b=y1oEmd8F/ewZMTrDi/AJJIGbjwYGm1A71Z5biF+P4D94Mu69IpL9T9xslKbTLtJbrc5y8H
+        Q9ygrf5Xdo9XV7HlpehgFcKI27TiuOuxLzdhqsKhKxO4oCNHpp4dyCQHVDRDEAAoodPcvA
+        aaLRKWVJSkJi2d2LATH1EvgzIkc1JPU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1638267968;
+        s=susede2_ed25519; t=1638270581;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=z5xCEVo0syBfMr10VXyOKlSSa7AIkvzHoHu5qOQ831U=;
-        b=JNSZmXxUgK9AdcmXgqwCyTReCETZhPtpITQihG7Hxsceudc7LL9eD+CExzmSZ56W50joba
-        E3FlzKVEczHmVpAw==
+        bh=wbsFCrlaCNIiei6i9NjlZM3Pbtz2W7UBXNwVzac9ddg=;
+        b=5Ls7osqyqNo4nUavg2oJ8nJlsJolrTDlP8irv7GiT9urdpHAjWKCChYhfLWqWBr4blxTKN
+        YWtc13oaGbvSlPCA==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 0C6B2A3B83;
-        Tue, 30 Nov 2021 10:26:07 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 6E1ACA3B84;
+        Tue, 30 Nov 2021 11:09:41 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 7B7FD1E14AC; Tue, 30 Nov 2021 11:26:06 +0100 (CET)
-Date:   Tue, 30 Nov 2021 11:26:06 +0100
+        id B5B381F2CAE; Tue, 30 Nov 2021 12:09:35 +0100 (CET)
+Date:   Tue, 30 Nov 2021 12:09:35 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
         Paolo Valente <paolo.valente@linaro.org>,
         Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 04/14] bfq: use bfq_bic_lookup in bfq_limit_depth
-Message-ID: <20211130102606.GA7174@quack2.suse.cz>
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>
+Subject: Re: cleanup I/O context handling
+Message-ID: <20211130110935.GD7174@quack2.suse.cz>
 References: <20211126115817.2087431-1-hch@lst.de>
- <20211126115817.2087431-5-hch@lst.de>
- <20211129160925.GB29512@quack2.suse.cz>
- <20211130063955.GA10268@lst.de>
+ <163802042046.623756.9169975969414207413.b4-ty@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211130063955.GA10268@lst.de>
+In-Reply-To: <163802042046.623756.9169975969414207413.b4-ty@kernel.dk>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 30-11-21 07:39:55, Christoph Hellwig wrote:
-> On Mon, Nov 29, 2021 at 05:09:25PM +0100, Jan Kara wrote:
-> > On Fri 26-11-21 12:58:07, Christoph Hellwig wrote:
-> > > No need to create a new I/O context if there is none present yet in
-> > > ->limit_depth.
-> > > 
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > ---
-> > >  block/bfq-iosched.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> > > index c990c6409c119..ecc2e57e68630 100644
-> > > --- a/block/bfq-iosched.c
-> > > +++ b/block/bfq-iosched.c
-> > > @@ -663,7 +663,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
-> > >  static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
-> > >  {
-> > >  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
-> > > -	struct bfq_io_cq *bic = icq_to_bic(blk_mq_sched_get_icq(data->q));
-> > > +	struct bfq_io_cq *bic = bfq_bic_lookup(data->q);
+On Sat 27-11-21 06:40:20, Jens Axboe wrote:
+> On Fri, 26 Nov 2021 12:58:03 +0100, Christoph Hellwig wrote:
+> > this series does a little spring cleaning of the I/O context handling/
 > > 
-> > Maybe I'm missing something but bfq_limit_depth() needs to know to which
-> > BFQ queue (and consequently blkcg) this IO is going to be added. And to be
-> > able to lookup this queue we are using IO context. So AFAICT we need the
-> > IO context allocated already in bfq_limit_depth()?
+> > Subject:
+> >  block/bfq-iosched.c                   |   41 ++++++------
+> >  block/blk-ioc.c                       |  115 +++++++++++++++++++++++++---------
+> >  block/blk-mq-sched.c                  |   35 ----------
+> >  block/blk-mq-sched.h                  |    3
+> >  block/blk-mq.c                        |   14 ----
+> >  block/blk.h                           |    8 --
+> >  drivers/infiniband/hw/qib/qib_verbs.c |    4 -
+> >  include/linux/iocontext.h             |   40 +++--------
+> >  kernel/fork.c                         |   26 -------
+> >  9 files changed, 128 insertions(+), 158 deletions(-)
+> > 
+> > [...]
 > 
-> But by allocating it you won't now anything, as it will still be empty.
+> Applied, thanks!
 
-You're right, we'll create only IO context and corresponding bfq_io_cq but
-we won't actually create bfqq in bfq_limit_depth() anyway and without that
-bfq_limit_depth() isn't going to do more. So your patch indeed does not
-change anything in that regard.
+FWIW I've read the whole series now and it looks good to me so feel free to
+add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
 -- 
