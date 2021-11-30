@@ -2,106 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5782C4167E
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 12:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0ABC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 12:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231269AbhK3Mun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 07:50:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59734 "EHLO
+        id S230497AbhK3NA5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 08:00:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232057AbhK3MuY (ORCPT
+        with ESMTP id S230264AbhK3NA4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 07:50:24 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 937ECC061758
-        for <linux-block@vger.kernel.org>; Tue, 30 Nov 2021 04:46:53 -0800 (PST)
+        Tue, 30 Nov 2021 08:00:56 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969A9C061574
+        for <linux-block@vger.kernel.org>; Tue, 30 Nov 2021 04:57:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=iL5jVPLBFjqePJhzbCCqDcgjcEvuK8+6S3TmGqGptZw=; b=JHwZEpDugvXi8QTLNknIS+Jkar
-        /Hvg13eiTERV65ru9e25M1MoMEnHd1Yf/VWzdqKs81DmC3isgGQxW7QjQrKbxbB5wbYIX7wZBwOhu
-        EMlC/SOHolJVQ0pqna0rQsF+XtjRjyXQvBzFvGQEn6mMsSiik+e8GtqO0+9KVTYRlm6VyAIgdA+c0
-        ovFiZlWz6aHFWWyBKgze6a+RbVFVQ0EM7+iXHConypDtcUw2SnG2UD8OaHsEDn1IytavctTx9hbbR
-        wM07JR+zmqslzNd0rc49TGxhs604++nYgZDP0NitRxAAX8k0vyRioKQZP6PksnihX3GqKBJIgUWlT
-        rNBjW38A==;
-Received: from [2001:4bb8:184:4a23:f08:7851:5d49:c683] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ms2X4-00CFcq-K2; Tue, 30 Nov 2021 12:46:51 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Paolo Valente <paolo.valente@linaro.org>, Jan Kara <jack@suse.cz>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 6/7] block: cleanup ioc_clear_queue
-Date:   Tue, 30 Nov 2021 13:46:35 +0100
-Message-Id: <20211130124636.2505904-7-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211130124636.2505904-1-hch@lst.de>
-References: <20211130124636.2505904-1-hch@lst.de>
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=yT8bkU4N1cVruLzq6XIiOr/QpqYSfaJq5dzTtWIkH5Q=; b=IT0dkj2oewIb6CBotNkurIOLZq
+        AWxdeZsxUIPUVpHv1tjqzRlmoPudFo7xkhxqENvhztEQSUs3ha+S295OwZIieYgNg8lVaPgwyOA26
+        Ix5dxDesRFG5N5yRFlTrIrFQTJnev58M24vc5BLNAGqGEheSwzRilGpHR2B/TPDMa1iR6pfS1rjzN
+        SVro1Tmi1IGCwMiy1W67Vk1uk6rmqJBIdVVf93f9VQHiasc0uJ3YdVxp9Kg/DlqR+TrpyWtX3/2e0
+        vipk49/Hv9Cl0qzi/Kb4yOMVyFGTyJiZcZNjTzXalXWYLm/C8A/RG5QYKPaGJ1exFw24rsWwhuzqT
+        Cy1PMaMw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ms2hP-005CBo-GU; Tue, 30 Nov 2021 12:57:31 +0000
+Date:   Tue, 30 Nov 2021 04:57:31 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Dave Chinner <dchinner@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [syzbot] possible deadlock in blkdev_put (2)
+Message-ID: <YaYfu0H2k0PSQL6W@infradead.org>
+References: <0000000000007f2f5405d1bfe618@google.com>
+ <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
+ <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
+ <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
+ <YaSpkRHgEMXrcn5i@infradead.org>
+ <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fold __ioc_clear_queue into ioc_clear_queue, remove the spurious RCU
-criticial section and unify the irq locking style.
+On Mon, Nov 29, 2021 at 07:36:27PM +0900, Tetsuo Handa wrote:
+> If the caller just want to call ioctl(LOOP_CTL_GET_FREE) followed by
+> ioctl(LOOP_CONFIGURE), deferring __loop_clr_fd() would be fine.
+> 
+> But the caller might want to unmount as soon as fput(filp) from __loop_clr_fd() completes.
+> I think we need to wait for __loop_clr_fd() from lo_release() to complete.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-ioc.c | 31 +++++++++----------------------
- 1 file changed, 9 insertions(+), 22 deletions(-)
-
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index 902bca2b273ba..32ae006e1b3e8 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -192,27 +192,6 @@ void exit_io_context(struct task_struct *task)
- 	}
- }
- 
--static void __ioc_clear_queue(struct list_head *icq_list)
--{
--	unsigned long flags;
--
--	rcu_read_lock();
--	while (!list_empty(icq_list)) {
--		struct io_cq *icq = list_entry(icq_list->next,
--						struct io_cq, q_node);
--		struct io_context *ioc = icq->ioc;
--
--		spin_lock_irqsave(&ioc->lock, flags);
--		if (icq->flags & ICQ_DESTROYED) {
--			spin_unlock_irqrestore(&ioc->lock, flags);
--			continue;
--		}
--		ioc_destroy_icq(icq);
--		spin_unlock_irqrestore(&ioc->lock, flags);
--	}
--	rcu_read_unlock();
--}
--
- /**
-  * ioc_clear_queue - break any ioc association with the specified queue
-  * @q: request_queue being cleared
-@@ -227,7 +206,15 @@ void ioc_clear_queue(struct request_queue *q)
- 	list_splice_init(&q->icq_list, &icq_list);
- 	spin_unlock_irq(&q->queue_lock);
- 
--	__ioc_clear_queue(&icq_list);
-+	while (!list_empty(&icq_list)) {
-+		struct io_cq *icq =
-+			list_entry(icq_list.next, struct io_cq, q_node);
-+
-+		spin_lock_irq(&icq->ioc->lock);
-+		if (!(icq->flags & ICQ_DESTROYED))
-+			ioc_destroy_icq(icq);
-+		spin_unlock_irq(&icq->ioc->lock);
-+	}
- }
- 
- static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
--- 
-2.30.2
-
+Anything else could have a reference to this or other files as well.
+So I can't see how deferring the clear to a different context can be
+any kind of problem in practice.
