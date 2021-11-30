@@ -2,177 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 552FAC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 01:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34860C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 02:34:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235056AbhK3BIr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Nov 2021 20:08:47 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:28127 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230144AbhK3BIp (ORCPT
+        id S237606AbhK3Chb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Nov 2021 21:37:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31940 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237602AbhK3Chb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Nov 2021 20:08:45 -0500
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J33q96rv2z1DJnw;
-        Tue, 30 Nov 2021 09:02:45 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 30 Nov 2021 09:05:24 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Tue, 30 Nov
- 2021 09:05:23 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <hch@infradead.org>, <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH v2 2/2] block: cancel all throttled bios in del_gendisk()
-Date:   Tue, 30 Nov 2021 09:17:30 +0800
-Message-ID: <20211130011730.2584339-3-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211130011730.2584339-1-yukuai3@huawei.com>
-References: <20211130011730.2584339-1-yukuai3@huawei.com>
+        Mon, 29 Nov 2021 21:37:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638239652;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BwYQSMaKGhnVjdlg6/XWIcbt1mryEgoJl23wrK4HkPE=;
+        b=MjpKCvioQIROX5ptNgXJ0u/CdU7WVdDV48kGDHZWZpvWxz6XRs1MjCxDvJcxxm9AFsABVD
+        V2d8gw2DiLli5ob+PXzUDEJb/rh8+Y79SmfdX0jUMbF79JRx6XDrIjpIw9+PBzS8u9gI6o
+        JJtuRsiDR0vI8Qbc3w+2LDqKS8Eo72k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-164-N5HmpV_gOPu2964hsrRfPg-1; Mon, 29 Nov 2021 21:34:08 -0500
+X-MC-Unique: N5HmpV_gOPu2964hsrRfPg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 370F183DD22;
+        Tue, 30 Nov 2021 02:34:07 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 67DA610016FE;
+        Tue, 30 Nov 2021 02:33:13 +0000 (UTC)
+Date:   Tue, 30 Nov 2021 10:33:08 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 3/5] blk-mq: add helper of blk_mq_global_quiesce_wait()
+Message-ID: <YaWNZF3ZYWPQBSbk@T590>
+References: <20211119021849.2259254-1-ming.lei@redhat.com>
+ <20211119021849.2259254-4-ming.lei@redhat.com>
+ <8f6b6452-9abb-fd89-0262-9fb9d00d42a5@grimberg.me>
+ <YZuagPbZJ6CjiUNi@T590>
+ <38b9661e-c5b8-ae18-f2ab-b30f9d3e7115@grimberg.me>
+ <YZwzEBtFug6JEmMZ@T590>
+ <a3ea006a-738b-af69-4dd5-f33444e3559d@grimberg.me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a3ea006a-738b-af69-4dd5-f33444e3559d@grimberg.me>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Throttled bios can't be issued after del_gendisk() is done, thus
-it's better to cancel them immediately rather than waiting for
-throttle is done.
+On Tue, Nov 23, 2021 at 11:00:45AM +0200, Sagi Grimberg wrote:
+> 
+> > > > > > Add helper of blk_mq_global_quiesce_wait() for supporting to quiesce
+> > > > > > queues in parallel, then we can just wait once if global quiesce wait
+> > > > > > is allowed.
+> > > > > 
+> > > > > blk_mq_global_quiesce_wait() is a poor name... global is scope-less and
+> > > > > obviously it has a scope.
+> > > > 
+> > > > How about blk_mq_shared_quiesce_wait()? or any suggestion?
+> > > 
+> > > Shared between what?
+> > 
+> > All request queues in one host-wide, both scsi and nvme has such
+> > requirement.
+> > 
+> > > 
+> > > Maybe if the queue has a non-blocking tagset, it can have a "quiesced"
+> > > flag that is cleared in unquiesce? then the callers can just continue
+> > > to iterate but will only wait the rcu grace period once.
+> > 
+> > Yeah, that is what these patches try to implement.
+> 
+> I was suggesting to "hide" it in the interface.
+> Maybe something like:
+> --
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8799fa73ef34..627b631db1f9 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -263,14 +263,18 @@ void blk_mq_wait_quiesce_done(struct request_queue *q)
+>         unsigned int i;
+>         bool rcu = false;
+> 
+> +       if (!q->has_srcu && q->quiesced)
+> +               return;
+>         queue_for_each_hw_ctx(q, hctx, i) {
+>                 if (hctx->flags & BLK_MQ_F_BLOCKING)
+>                         synchronize_srcu(hctx->srcu);
+>                 else
+>                         rcu = true;
+>         }
+> -       if (rcu)
+> +       if (rcu) {
+>                 synchronize_rcu();
+> +               q->quiesced = true;
+> +       }
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_wait_quiesce_done);
+> 
+> @@ -308,6 +312,7 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+>         } else if (!--q->quiesce_depth) {
+>                 blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+>                 run_queue = true;
+> +               q->quiesced = false;
 
-For example, if user thread is throttled with low bps while it's
-issuing large io, and the device is deleted. The user thread will
-wait for a long time for io to return.
+Different request queues are passed to blk_mq_wait_quiesce_done() during
+the iteration, so marking 'quiesced' doesn't make any difference here.
 
-Noted this patch is mainly from revertion of commit 32e3374304c7
-("blk-throttle: remove tg_drain_bios") and commit b77412372b68
-("blk-throttle: remove blk_throtl_drain").
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 59 ++++++++++++++++++++++++++++++++++++++++++++
- block/blk-throttle.h |  2 ++
- block/genhd.c        |  2 ++
- 3 files changed, 63 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index f7244190cb2f..64fd4d61cbfe 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2260,6 +2260,65 @@ void blk_throtl_bio_endio(struct bio *bio)
- }
- #endif
- 
-+/*
-+ * Dispatch all bios from all children tg's queued on @parent_sq.  On
-+ * return, @parent_sq is guaranteed to not have any active children tg's
-+ * and all bios from previously active tg's are on @parent_sq->bio_lists[].
-+ */
-+static void tg_drain_bios(struct throtl_service_queue *parent_sq)
-+{
-+	struct throtl_grp *tg;
-+
-+	while ((tg = throtl_rb_first(parent_sq))) {
-+		struct throtl_service_queue *sq = &tg->service_queue;
-+		struct bio *bio;
-+
-+		throtl_dequeue_tg(tg);
-+
-+		while ((bio = throtl_peek_queued(&sq->queued[READ])))
-+			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+		while ((bio = throtl_peek_queued(&sq->queued[WRITE])))
-+			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+	}
-+}
-+
-+/**
-+ * blk_throtl_cancel_bios - cancel throttled bios
-+ * @q: request_queue to cancel throttled bios for
-+ *
-+ * This function is called to error all currently throttled bios on @q.
-+ */
-+void blk_throtl_cancel_bios(struct request_queue *q)
-+{
-+	struct throtl_data *td = q->td;
-+	struct blkcg_gq *blkg;
-+	struct cgroup_subsys_state *pos_css;
-+	struct bio *bio;
-+	int rw;
-+
-+	rcu_read_lock();
-+
-+	/*
-+	 * Drain each tg while doing post-order walk on the blkg tree, so
-+	 * that all bios are propagated to td->service_queue.  It'd be
-+	 * better to walk service_queue tree directly but blkg walk is
-+	 * easier.
-+	 */
-+	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
-+		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
-+
-+	/* finally, transfer bios from top-level tg's into the td */
-+	tg_drain_bios(&td->service_queue);
-+
-+	rcu_read_unlock();
-+
-+	/* all bios now should be in td->service_queue, cancel them */
-+	for (rw = READ; rw <= WRITE; rw++)
-+		while ((bio = throtl_pop_queued(&td->service_queue.queued[rw],
-+						NULL)))
-+			bio_io_error(bio);
-+}
-+
- int blk_throtl_init(struct request_queue *q)
- {
- 	struct throtl_data *td;
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 175f03abd9e4..9d67d5139954 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -160,12 +160,14 @@ static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
- static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
-+#define blk_throtl_cancel_bios(q)  do { } while (0)
- #else /* CONFIG_BLK_DEV_THROTTLING */
- int blk_throtl_init(struct request_queue *q);
- void blk_throtl_exit(struct request_queue *q);
- void blk_throtl_register_queue(struct request_queue *q);
- void blk_throtl_charge_bio_split(struct bio *bio);
- bool __blk_throtl_bio(struct bio *bio);
-+void blk_throtl_cancel_bios(struct request_queue *q);
- static inline bool blk_throtl_bio(struct bio *bio)
- {
- 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
-diff --git a/block/genhd.c b/block/genhd.c
-index 8e9cbf23c510..24fa3356d164 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -28,6 +28,7 @@
- 
- #include "blk.h"
- #include "blk-rq-qos.h"
-+#include "blk-throttle.h"
- 
- static struct kobject *block_depr;
- 
-@@ -619,6 +620,7 @@ void del_gendisk(struct gendisk *disk)
- 
- 	blk_mq_freeze_queue_wait(q);
- 
-+	blk_throtl_cancel_bios(q);
- 	rq_qos_exit(q);
- 	blk_sync_queue(q);
- 	blk_flush_integrity();
--- 
-2.31.1
+Thanks,
+Ming
 
