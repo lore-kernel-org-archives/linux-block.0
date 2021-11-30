@@ -2,85 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24A5C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 11:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 974D0C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 11:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237222AbhK3LNN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 06:13:13 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:48244 "EHLO
+        id S229891AbhK3Lxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:53:48 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:50070 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237212AbhK3LNL (ORCPT
+        with ESMTP id S229552AbhK3Lxi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:13:11 -0500
+        Tue, 30 Nov 2021 06:53:38 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 9B8A82170C;
-        Tue, 30 Nov 2021 11:09:41 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTP id 935FF21138;
+        Tue, 30 Nov 2021 11:50:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1638270581; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1638273018; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wbsFCrlaCNIiei6i9NjlZM3Pbtz2W7UBXNwVzac9ddg=;
-        b=y1oEmd8F/ewZMTrDi/AJJIGbjwYGm1A71Z5biF+P4D94Mu69IpL9T9xslKbTLtJbrc5y8H
-        Q9ygrf5Xdo9XV7HlpehgFcKI27TiuOuxLzdhqsKhKxO4oCNHpp4dyCQHVDRDEAAoodPcvA
-        aaLRKWVJSkJi2d2LATH1EvgzIkc1JPU=
+        bh=3g3Z2MHUwUd1U35Ol3NxlY4iDKazpPykX0gbbPMrAWY=;
+        b=j4vu2nuSB4Pk+hKkNIuqa7F6LZdF7W1GGIWqnax9L/VHC/0fyfYcOTDJl4j5sH6CJsJzKh
+        VJ69Xlqk6w6rpEDZ5ZwBqlDBFKt/5ICKSnHIchMp8pQ/eexjcGzUKq6Zo3hBtrXkv3bL/a
+        ZT1YlOGtfNoYRjatIyx9onATTlp4s1Q=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1638270581;
+        s=susede2_ed25519; t=1638273018;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wbsFCrlaCNIiei6i9NjlZM3Pbtz2W7UBXNwVzac9ddg=;
-        b=5Ls7osqyqNo4nUavg2oJ8nJlsJolrTDlP8irv7GiT9urdpHAjWKCChYhfLWqWBr4blxTKN
-        YWtc13oaGbvSlPCA==
+        bh=3g3Z2MHUwUd1U35Ol3NxlY4iDKazpPykX0gbbPMrAWY=;
+        b=ehUdP68vAtmSHTHJYSSDA5CqwkeARFhp8yhXfq1ZRbaz2ccFKhGOo1QmtlPepq2JBM8fuF
+        lnxvddYgPR/UMZBA==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 6E1ACA3B84;
-        Tue, 30 Nov 2021 11:09:41 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id F0DAAA3B87;
+        Tue, 30 Nov 2021 11:50:17 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id B5B381F2CAE; Tue, 30 Nov 2021 12:09:35 +0100 (CET)
-Date:   Tue, 30 Nov 2021 12:09:35 +0100
+        id 857C61F2CAE; Tue, 30 Nov 2021 12:50:10 +0100 (CET)
+Date:   Tue, 30 Nov 2021 12:50:10 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Jan Kara <jack@suse.cz>,
         Paolo Valente <paolo.valente@linaro.org>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>
-Subject: Re: cleanup I/O context handling
-Message-ID: <20211130110935.GD7174@quack2.suse.cz>
-References: <20211126115817.2087431-1-hch@lst.de>
- <163802042046.623756.9169975969414207413.b4-ty@kernel.dk>
+        linux-block@vger.kernel.org, fvogdt@suse.de,
+        cgroups@vger.kernel.org
+Subject: Re: Use after free with BFQ and cgroups
+Message-ID: <20211130115010.GF7174@quack2.suse.cz>
+References: <20211125172809.GC19572@quack2.suse.cz>
+ <20211126144724.GA31093@blackbody.suse.cz>
+ <YaUKCoK39FlZK9m5@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <163802042046.623756.9169975969414207413.b4-ty@kernel.dk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YaUKCoK39FlZK9m5@slm.duckdns.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat 27-11-21 06:40:20, Jens Axboe wrote:
-> On Fri, 26 Nov 2021 12:58:03 +0100, Christoph Hellwig wrote:
-> > this series does a little spring cleaning of the I/O context handling/
-> > 
-> > Subject:
-> >  block/bfq-iosched.c                   |   41 ++++++------
-> >  block/blk-ioc.c                       |  115 +++++++++++++++++++++++++---------
-> >  block/blk-mq-sched.c                  |   35 ----------
-> >  block/blk-mq-sched.h                  |    3
-> >  block/blk-mq.c                        |   14 ----
-> >  block/blk.h                           |    8 --
-> >  drivers/infiniband/hw/qib/qib_verbs.c |    4 -
-> >  include/linux/iocontext.h             |   40 +++--------
-> >  kernel/fork.c                         |   26 -------
-> >  9 files changed, 128 insertions(+), 158 deletions(-)
-> > 
-> > [...]
+On Mon 29-11-21 07:12:42, Tejun Heo wrote:
+> On Fri, Nov 26, 2021 at 03:47:24PM +0100, Michal Koutný wrote:
+> > The question here is how long would stay the offlined blkcgs around if
+> > they were directly pinned upon the IO submission. If it's unbound, then
+> > reparenting makes more sense.
 > 
-> Applied, thanks!
+> It should be fine to pin whatever's necessary while related IOs are in
+> flight and percpu_ref used for css refcnting isn't gonna make any noticeable
+> difference in terms of overhead.
 
-FWIW I've read the whole series now and it looks good to me so feel free to
-add:
+Yes, holding cgroup ref from IO would be fine. But that is not really our
+problem.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+The problem is bfq_queue associated with a task effectively holds a
+reference to the potentially dead cgroup and the reference can stay there
+until the task (that itself got reparented to the root cgroup) exits. So I
+think we need to reparent these bfq_queue structures as well to avoid
+holding cgroup in zombie state excessively long.
 
 								Honza
 -- 
