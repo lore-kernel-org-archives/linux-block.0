@@ -2,75 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 741ACC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 08:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 233C0C43217
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 10:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239772AbhK3Iua (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 03:50:30 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:55654 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239770AbhK3IuX (ORCPT
+        id S232593AbhK3K32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 05:29:28 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:57240 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231216AbhK3K32 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 03:50:23 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 78D40CE1828;
-        Tue, 30 Nov 2021 08:47:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29A3FC53FC1;
-        Tue, 30 Nov 2021 08:47:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1638262021;
-        bh=sKKgJm4IeJL19jVxGxafCC/+cpVZuuY5RM3ezPC40jo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=byeOI0EMHN3rkdANUi0cCgpOHafWsUBW7mDP+rX7yVje97Jl38E+FhzzpiQZLHrpl
-         LHqd+c0n99kjDbOCPdDp+oP08/R6o+328OuSp9mbi04WTCgo8o66gzDB4iazYRGcdG
-         9p6w/ZfUPjQnys/bRgUDvpLNVlqSX41N7Y1Eg0kg=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     tim@cyberelk.net, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH] paride: fix up build warning on mips platforms
-Date:   Tue, 30 Nov 2021 09:46:26 +0100
-Message-Id: <20211130084626.3215987-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.34.1
+        Tue, 30 Nov 2021 05:29:28 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 68A0A1FD54;
+        Tue, 30 Nov 2021 10:26:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1638267968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=z5xCEVo0syBfMr10VXyOKlSSa7AIkvzHoHu5qOQ831U=;
+        b=Ehj/n/0S1aIOtvrf60msYTs9x6aRPhc0h2lYX55ZFZZbAfQoiRCgdqf+1gdszAFP6SHeA7
+        lrn/4FQyp1+WZTOnPa5WnmtpdZ5Egr8/HVauwv1n1zyFKUb3UbPtvKIfK2xaZBUcFnP4kU
+        gcxYkTyRpgxTb3vPP9eNnmVULxUFtZ0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1638267968;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=z5xCEVo0syBfMr10VXyOKlSSa7AIkvzHoHu5qOQ831U=;
+        b=JNSZmXxUgK9AdcmXgqwCyTReCETZhPtpITQihG7Hxsceudc7LL9eD+CExzmSZ56W50joba
+        E3FlzKVEczHmVpAw==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id 0C6B2A3B83;
+        Tue, 30 Nov 2021 10:26:07 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 7B7FD1E14AC; Tue, 30 Nov 2021 11:26:06 +0100 (CET)
+Date:   Tue, 30 Nov 2021 11:26:06 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 04/14] bfq: use bfq_bic_lookup in bfq_limit_depth
+Message-ID: <20211130102606.GA7174@quack2.suse.cz>
+References: <20211126115817.2087431-1-hch@lst.de>
+ <20211126115817.2087431-5-hch@lst.de>
+ <20211129160925.GB29512@quack2.suse.cz>
+ <20211130063955.GA10268@lst.de>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=861; h=from:subject; bh=sKKgJm4IeJL19jVxGxafCC/+cpVZuuY5RM3ezPC40jo=; b=owGbwMvMwCRo6H6F97bub03G02pJDIlLn9yPO6wUdO3CzAl3q6Rqbr15tVinImOj+ndVvUU1LFV3 P75V6IhlYRBkYpAVU2T5so3n6P6KQ4pehranYeawMoEMYeDiFICJhEYyzNM51+y9RyBk3u6ARzf8q8 8Vr727zI1hnkFDjPZ2/jvxpe90PE92HvzakeuWBgA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211130063955.GA10268@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-MIPS include files define "PC" so when building the paride driver the
-following build warning shows up:
+On Tue 30-11-21 07:39:55, Christoph Hellwig wrote:
+> On Mon, Nov 29, 2021 at 05:09:25PM +0100, Jan Kara wrote:
+> > On Fri 26-11-21 12:58:07, Christoph Hellwig wrote:
+> > > No need to create a new I/O context if there is none present yet in
+> > > ->limit_depth.
+> > > 
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > > ---
+> > >  block/bfq-iosched.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> > > index c990c6409c119..ecc2e57e68630 100644
+> > > --- a/block/bfq-iosched.c
+> > > +++ b/block/bfq-iosched.c
+> > > @@ -663,7 +663,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
+> > >  static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
+> > >  {
+> > >  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
+> > > -	struct bfq_io_cq *bic = icq_to_bic(blk_mq_sched_get_icq(data->q));
+> > > +	struct bfq_io_cq *bic = bfq_bic_lookup(data->q);
+> > 
+> > Maybe I'm missing something but bfq_limit_depth() needs to know to which
+> > BFQ queue (and consequently blkcg) this IO is going to be added. And to be
+> > able to lookup this queue we are using IO context. So AFAICT we need the
+> > IO context allocated already in bfq_limit_depth()?
+> 
+> But by allocating it you won't now anything, as it will still be empty.
 
-	rivers/block/paride/bpck.c:32: warning: "PC" redefined
+You're right, we'll create only IO context and corresponding bfq_io_cq but
+we won't actually create bfqq in bfq_limit_depth() anyway and without that
+bfq_limit_depth() isn't going to do more. So your patch indeed does not
+change anything in that regard.
 
-Fix this by undefining PC before redefining it as is done for other
-defines in this driver.
-
-Cc: Tim Waugh <tim@cyberelk.net>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/block/paride/bpck.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/block/paride/bpck.c b/drivers/block/paride/bpck.c
-index f5f63ca2889d..d880a9465e9b 100644
---- a/drivers/block/paride/bpck.c
-+++ b/drivers/block/paride/bpck.c
-@@ -28,6 +28,7 @@
- 
- #undef r2
- #undef w2
-+#undef PC
- 
- #define PC			pi->private
- #define r2()			(PC=(in_p(2) & 0xff))
+								Honza
 -- 
-2.34.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
