@@ -2,85 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E84C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 16:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6650C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 16:26:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242231AbhK3Q1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 11:27:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55126 "EHLO
+        id S243744AbhK3Q3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 11:29:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239179AbhK3Q1Q (ORCPT
+        with ESMTP id S239752AbhK3Q3j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:27:16 -0500
-Received: from michel.telenet-ops.be (michel.telenet-ops.be [IPv6:2a02:1800:110:4::f00:18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11095C061574
-        for <linux-block@vger.kernel.org>; Tue, 30 Nov 2021 08:23:56 -0800 (PST)
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed10:8920:40aa:e125:4a65])
-        by michel.telenet-ops.be with bizsmtp
-        id QgPo2600v173Tg306gPoqr; Tue, 30 Nov 2021 17:23:54 +0100
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1ms5v2-001YvT-9R; Tue, 30 Nov 2021 17:23:48 +0100
-Received: from geert by rox.of.borg with local (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1ms5v1-00GlJG-RE; Tue, 30 Nov 2021 17:23:47 +0100
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     Michael Walle <michael@walle.cc>, Pratyush Yadav <p.yadav@ti.com>,
-        linux-mtd@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH/RFC -nxt] mtd_blkdevs: Set GENHD_FL_NO_PART
-Date:   Tue, 30 Nov 2021 17:23:46 +0100
-Message-Id: <c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.25.1
+        Tue, 30 Nov 2021 11:29:39 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2C9C061574;
+        Tue, 30 Nov 2021 08:26:20 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id 8so21146419pfo.4;
+        Tue, 30 Nov 2021 08:26:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=c5SAYFCCSK5GacjcTQ47eQM20SEI2kSoxxYyDX/fm7g=;
+        b=WuEA+bpfKYR9NLIIrwBgv9GJy2Sqs3GbI0IIf9pwMJMXsSCI1YQlAwXknLH/wTYAJD
+         iGJxHYd9gWOMumxRX60SU8m9X3a96QJvwABQJSaLk/UwYX0oTzfvE1+mD/pTCPZVc0wX
+         nwyTRT6H3nMscuCpww4ouTekbvVnImtzQkpCVviTPQrvcD3++XkUgRUtDbtMgc7kfIOS
+         v9YgrBcEvackhH95vp53qGHa4xAKTe1iz3Dcs5hW3xJm1hr3bo+M8kG/vVt5vEAtyGLx
+         pvSMzYNsPvDpfVl30+ppF1Aec1+VsyI9Ru7Iz3AJ2tJGdoavpTMIp8Og6Cbz837agOq1
+         KPdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=c5SAYFCCSK5GacjcTQ47eQM20SEI2kSoxxYyDX/fm7g=;
+        b=JnJl4Y1JpgbmL+Xjl0/uNUm+a58z8sPdBTnsLwNVD8HE7LR2wUs3MtZhYKtDnzegJb
+         38XljqFB1hZIBQeWtYU5Ei3FtzD8dXoqMmKFJbGo3VrJ27Rm3mw19gs5rCh1ud4tC/W1
+         OsIXjtaVinTwcEt9uzPAJ7hbdWpmavX+LgVIgF4ceMu/j5YF4fBcsaq32C12m7oIcChI
+         /CxqCjlg5Q0jMWUhb90dtVBkqZWgpPabwKji8M/gwfBSJE+q1DEtq0TmD+ksfAqM/FAO
+         UtGOII/hK3CJQcBQThY4wR9y6eWGRuJ/QzuCX2755cKr7FB12qHEAOe6hcvMl/Na+PKT
+         fOig==
+X-Gm-Message-State: AOAM53375HM5BGH848UKM/vCJUDTQ2Fn3bNY/xPot426i7REu61tJx0N
+        cEizeNijI7UGRklte6W8cQs=
+X-Google-Smtp-Source: ABdhPJzkO44MwB9FWMocPI631L8m3xRRVHgB04ObRgITFxLjJHORH5qdg1/C4bh1hAr4YDR0Yy8zQA==
+X-Received: by 2002:a05:6a00:15c5:b0:4a0:3c1:4f43 with SMTP id o5-20020a056a0015c500b004a003c14f43mr47791127pfu.33.1638289579628;
+        Tue, 30 Nov 2021 08:26:19 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id p10sm20876523pff.173.2021.11.30.08.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 08:26:19 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 30 Nov 2021 06:26:18 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     hch@infradead.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v2 2/2] block: cancel all throttled bios in del_gendisk()
+Message-ID: <YaZQqjjygHGFEdbx@slm.duckdns.org>
+References: <20211130011730.2584339-1-yukuai3@huawei.com>
+ <20211130011730.2584339-3-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211130011730.2584339-3-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When DT declares the partitions of an spi-nor device using
-"fixed-partitions", the individual mtdblockN partitions are now scanned
-for partitition tables, which should not happen.
+Hello,
 
-Fix this by setting the GENHD_FL_NO_PART flag in the MTD block layer
-interface.
+On Tue, Nov 30, 2021 at 09:17:30AM +0800, Yu Kuai wrote:
+> +void blk_throtl_cancel_bios(struct request_queue *q)
+> +{
+> +	struct throtl_data *td = q->td;
+> +	struct blkcg_gq *blkg;
+> +	struct cgroup_subsys_state *pos_css;
+> +	struct bio *bio;
+> +	int rw;
+> +
+> +	rcu_read_lock();
 
-Fixes: 1ebe2e5f9d68e94c ("block: remove GENHD_FL_EXT_DEVT")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-Seen with e.g. arch/arm/boot/dts/r8a7791-koelsch.dts.
-I only noticed because I have debug code to measure QSPI performance,
-which informed me about 8 x 512 bytes being read from each partition
-detected.
+So, all of the draining is being performed without holding the q lock, which
+*might* be okay given that we're in the del_gendisk path but is likely risky
+- ie. there can still be timers or whatever racing against it.
 
-RFC as I'm not sure this is correct in all cases.
-I did verify that in the absence of "fixed-partitions", the spi-nor
-device is not scanned for partitions before and after commit
-1ebe2e5f9d68e94c.
----
- drivers/mtd/mtd_blkdevs.c | 1 +
- 1 file changed, 1 insertion(+)
+Thanks.
 
-diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-index 113f86df76038575..95c84faa794d22c6 100644
---- a/drivers/mtd/mtd_blkdevs.c
-+++ b/drivers/mtd/mtd_blkdevs.c
-@@ -345,6 +345,7 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
- 	gd->first_minor = (new->devnum) << tr->part_bits;
- 	gd->minors = 1 << tr->part_bits;
- 	gd->fops = &mtd_block_ops;
-+	gd->flags |= GENHD_FL_NO_PART;
- 
- 	if (tr->part_bits)
- 		if (new->devnum < 26)
 -- 
-2.25.1
-
+tejun
