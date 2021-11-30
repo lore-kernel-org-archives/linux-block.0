@@ -2,82 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EEAC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 04:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0BDAC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 06:39:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238165AbhK3EIw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Nov 2021 23:08:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53104 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238083AbhK3EIn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Nov 2021 23:08:43 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC00AC061574;
-        Mon, 29 Nov 2021 20:05:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 2F16ECE13AB;
-        Tue, 30 Nov 2021 04:05:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DB07C53FC7;
-        Tue, 30 Nov 2021 04:05:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638245121;
-        bh=gZL3YiEbDYaALjslD7r/yjn7clyqtIQcn/3AlzuZLWY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=oa8BuM5+uLqUS9KjAe9mYaTqU15U37M//eHUkiM91ODNLoQh04fh4CzUO8gp89YyO
-         AQutY/IKskV5b5vINhQBJ+RlkZyuA1rmOo/14cOQaGVBxHvqYWmjK/Oh0nQNLnkgbT
-         dCEsO0o8SG0FbmisSctaJmciIY1UGei9KS41JCL6OaZC6ihPOqu0CBndk/fawnxdTT
-         OxZnjB8b7IJezLquJ9I63r8jnXnebcoqtWIGWZQ3JEUbu1d1Kqt8irmvyX+bMZyloX
-         KMIW0vBGVLmnQTudwKkXFQSo+mJTn2el4g+4M7RN1Rpa4z4nBcV3ukbJtO5y13nSLh
-         O4psSvCM+CkbA==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-mmc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v2 0/3] block: show crypto capabilities in sysfs
-Date:   Mon, 29 Nov 2021 20:03:03 -0800
-Message-Id: <20211130040306.148925-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        id S238687AbhK3GnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 01:43:17 -0500
+Received: from verein.lst.de ([213.95.11.211]:57112 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233768AbhK3GnR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Nov 2021 01:43:17 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 5AB1C68B05; Tue, 30 Nov 2021 07:39:55 +0100 (CET)
+Date:   Tue, 30 Nov 2021 07:39:55 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 04/14] bfq: use bfq_bic_lookup in bfq_limit_depth
+Message-ID: <20211130063955.GA10268@lst.de>
+References: <20211126115817.2087431-1-hch@lst.de> <20211126115817.2087431-5-hch@lst.de> <20211129160925.GB29512@quack2.suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211129160925.GB29512@quack2.suse.cz>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This series adds sysfs files that expose the inline encryption
-capabilities of request queues.
+On Mon, Nov 29, 2021 at 05:09:25PM +0100, Jan Kara wrote:
+> On Fri 26-11-21 12:58:07, Christoph Hellwig wrote:
+> > No need to create a new I/O context if there is none present yet in
+> > ->limit_depth.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  block/bfq-iosched.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> > index c990c6409c119..ecc2e57e68630 100644
+> > --- a/block/bfq-iosched.c
+> > +++ b/block/bfq-iosched.c
+> > @@ -663,7 +663,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
+> >  static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
+> >  {
+> >  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
+> > -	struct bfq_io_cq *bic = icq_to_bic(blk_mq_sched_get_icq(data->q));
+> > +	struct bfq_io_cq *bic = bfq_bic_lookup(data->q);
+> 
+> Maybe I'm missing something but bfq_limit_depth() needs to know to which
+> BFQ queue (and consequently blkcg) this IO is going to be added. And to be
+> able to lookup this queue we are using IO context. So AFAICT we need the
+> IO context allocated already in bfq_limit_depth()?
 
-Patches 1 and 2 are some related cleanups for existing blk-sysfs code.
-Patch 3 is the real change; see there for more details.
-
-This applies to linux-block/for-next.
-
-Changed v1 => v2:
-   - Use sysfs_emit() instead of sprintf().
-   - Use __ATTR_RO().
-
-Eric Biggers (3):
-  block: simplify calling convention of elv_unregister_queue()
-  block: don't delete queue kobject before its children
-  blk-crypto: show crypto capabilities in sysfs
-
- Documentation/block/queue-sysfs.rst |  30 +++++
- block/Makefile                      |   3 +-
- block/blk-crypto-internal.h         |  12 ++
- block/blk-crypto-sysfs.c            | 172 ++++++++++++++++++++++++++++
- block/blk-crypto.c                  |   3 +
- block/blk-sysfs.c                   |  17 ++-
- block/elevator.c                    |   8 +-
- include/linux/blkdev.h              |   1 +
- 8 files changed, 236 insertions(+), 10 deletions(-)
- create mode 100644 block/blk-crypto-sysfs.c
-
-
-base-commit: c2626d30f312afc341158e07bf088f5a23b4eeeb
--- 
-2.34.1
-
+But by allocating it you won't now anything, as it will still be empty.
