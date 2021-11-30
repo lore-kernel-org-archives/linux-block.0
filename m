@@ -2,89 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6650C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 16:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF50C43217
+	for <linux-block@archiver.kernel.org>; Tue, 30 Nov 2021 17:26:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243744AbhK3Q3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Nov 2021 11:29:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239752AbhK3Q3j (ORCPT
+        id S244791AbhK3R3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Nov 2021 12:29:44 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:39964 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244759AbhK3R3i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:29:39 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2C9C061574;
-        Tue, 30 Nov 2021 08:26:20 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id 8so21146419pfo.4;
-        Tue, 30 Nov 2021 08:26:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=c5SAYFCCSK5GacjcTQ47eQM20SEI2kSoxxYyDX/fm7g=;
-        b=WuEA+bpfKYR9NLIIrwBgv9GJy2Sqs3GbI0IIf9pwMJMXsSCI1YQlAwXknLH/wTYAJD
-         iGJxHYd9gWOMumxRX60SU8m9X3a96QJvwABQJSaLk/UwYX0oTzfvE1+mD/pTCPZVc0wX
-         nwyTRT6H3nMscuCpww4ouTekbvVnImtzQkpCVviTPQrvcD3++XkUgRUtDbtMgc7kfIOS
-         v9YgrBcEvackhH95vp53qGHa4xAKTe1iz3Dcs5hW3xJm1hr3bo+M8kG/vVt5vEAtyGLx
-         pvSMzYNsPvDpfVl30+ppF1Aec1+VsyI9Ru7Iz3AJ2tJGdoavpTMIp8Og6Cbz837agOq1
-         KPdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=c5SAYFCCSK5GacjcTQ47eQM20SEI2kSoxxYyDX/fm7g=;
-        b=JnJl4Y1JpgbmL+Xjl0/uNUm+a58z8sPdBTnsLwNVD8HE7LR2wUs3MtZhYKtDnzegJb
-         38XljqFB1hZIBQeWtYU5Ei3FtzD8dXoqMmKFJbGo3VrJ27Rm3mw19gs5rCh1ud4tC/W1
-         OsIXjtaVinTwcEt9uzPAJ7hbdWpmavX+LgVIgF4ceMu/j5YF4fBcsaq32C12m7oIcChI
-         /CxqCjlg5Q0jMWUhb90dtVBkqZWgpPabwKji8M/gwfBSJE+q1DEtq0TmD+ksfAqM/FAO
-         UtGOII/hK3CJQcBQThY4wR9y6eWGRuJ/QzuCX2755cKr7FB12qHEAOe6hcvMl/Na+PKT
-         fOig==
-X-Gm-Message-State: AOAM53375HM5BGH848UKM/vCJUDTQ2Fn3bNY/xPot426i7REu61tJx0N
-        cEizeNijI7UGRklte6W8cQs=
-X-Google-Smtp-Source: ABdhPJzkO44MwB9FWMocPI631L8m3xRRVHgB04ObRgITFxLjJHORH5qdg1/C4bh1hAr4YDR0Yy8zQA==
-X-Received: by 2002:a05:6a00:15c5:b0:4a0:3c1:4f43 with SMTP id o5-20020a056a0015c500b004a003c14f43mr47791127pfu.33.1638289579628;
-        Tue, 30 Nov 2021 08:26:19 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id p10sm20876523pff.173.2021.11.30.08.26.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 08:26:19 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 30 Nov 2021 06:26:18 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     hch@infradead.org, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v2 2/2] block: cancel all throttled bios in del_gendisk()
-Message-ID: <YaZQqjjygHGFEdbx@slm.duckdns.org>
-References: <20211130011730.2584339-1-yukuai3@huawei.com>
- <20211130011730.2584339-3-yukuai3@huawei.com>
+        Tue, 30 Nov 2021 12:29:38 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 67E901FD58;
+        Tue, 30 Nov 2021 17:26:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1638293178; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NpXR8cesEpaXwf1l0yApMqvd7vXLbxaojNWyd3jEXho=;
+        b=SUa1UuHi7RsBdnhufWt9HOmW+/cbUrFFt//JvbQU0dxNGVGsEPoz0ItVgonJmydbdmacdG
+        1zYd0HqSFCOgu8jJMC7anCCFTfK7JkG0LAoj24YXRCodCZ7EzvcdF8wivj2in6lGjw2hGT
+        XyvJCbLJQWq6Cb27MZjENMND++LjPnU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1638293178;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NpXR8cesEpaXwf1l0yApMqvd7vXLbxaojNWyd3jEXho=;
+        b=UKWGOAr6/u8xxNo7nWBsUuGiTXtdu0go0FyJVYUzw3GBIuYdOvzzgExyYn9dDxh1gUqXT6
+        mJ/5oSPgSqvo9VBQ==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id 0EFC7A3B87;
+        Tue, 30 Nov 2021 17:26:18 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 9A5AC1E1494; Tue, 30 Nov 2021 18:26:13 +0100 (CET)
+Date:   Tue, 30 Nov 2021 18:26:13 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 6/7] block: cleanup ioc_clear_queue
+Message-ID: <20211130172613.GL7174@quack2.suse.cz>
+References: <20211130124636.2505904-1-hch@lst.de>
+ <20211130124636.2505904-7-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211130011730.2584339-3-yukuai3@huawei.com>
+In-Reply-To: <20211130124636.2505904-7-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue 30-11-21 13:46:35, Christoph Hellwig wrote:
+> Fold __ioc_clear_queue into ioc_clear_queue, remove the spurious RCU
+> criticial section and unify the irq locking style.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-ioc.c | 31 +++++++++----------------------
+>  1 file changed, 9 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> index 902bca2b273ba..32ae006e1b3e8 100644
+> --- a/block/blk-ioc.c
+> +++ b/block/blk-ioc.c
+> @@ -192,27 +192,6 @@ void exit_io_context(struct task_struct *task)
+>  	}
+>  }
+>  
+> -static void __ioc_clear_queue(struct list_head *icq_list)
+> -{
+> -	unsigned long flags;
+> -
+> -	rcu_read_lock();
+> -	while (!list_empty(icq_list)) {
+> -		struct io_cq *icq = list_entry(icq_list->next,
+> -						struct io_cq, q_node);
+> -		struct io_context *ioc = icq->ioc;
+> -
+> -		spin_lock_irqsave(&ioc->lock, flags);
+> -		if (icq->flags & ICQ_DESTROYED) {
+> -			spin_unlock_irqrestore(&ioc->lock, flags);
+> -			continue;
+> -		}
+> -		ioc_destroy_icq(icq);
+> -		spin_unlock_irqrestore(&ioc->lock, flags);
+> -	}
+> -	rcu_read_unlock();
+> -}
+> -
+>  /**
+>   * ioc_clear_queue - break any ioc association with the specified queue
+>   * @q: request_queue being cleared
+> @@ -227,7 +206,15 @@ void ioc_clear_queue(struct request_queue *q)
+>  	list_splice_init(&q->icq_list, &icq_list);
+>  	spin_unlock_irq(&q->queue_lock);
+>  
+> -	__ioc_clear_queue(&icq_list);
 
-On Tue, Nov 30, 2021 at 09:17:30AM +0800, Yu Kuai wrote:
-> +void blk_throtl_cancel_bios(struct request_queue *q)
-> +{
-> +	struct throtl_data *td = q->td;
-> +	struct blkcg_gq *blkg;
-> +	struct cgroup_subsys_state *pos_css;
-> +	struct bio *bio;
-> +	int rw;
+> +	while (!list_empty(&icq_list)) {
+> +		struct io_cq *icq =
+> +			list_entry(icq_list.next, struct io_cq, q_node);
+
+I'm not quite sure about dropping the rcu protection here. This function
+generally runs without any protection so what guards us against icq being
+freed just after we've got its pointer from the list?
+
+								Honza
+
 > +
-> +	rcu_read_lock();
-
-So, all of the draining is being performed without holding the q lock, which
-*might* be okay given that we're in the del_gendisk path but is likely risky
-- ie. there can still be timers or whatever racing against it.
-
-Thanks.
-
+> +		spin_lock_irq(&icq->ioc->lock);
+> +		if (!(icq->flags & ICQ_DESTROYED))
+> +			ioc_destroy_icq(icq);
+> +		spin_unlock_irq(&icq->ioc->lock);
+> +	}
+>  }
+>  
+>  static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
+> -- 
+> 2.30.2
+> 
 -- 
-tejun
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
