@@ -2,155 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A78C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 16:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF916C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 17:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239021AbhLAQwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 11:52:35 -0500
-Received: from mga18.intel.com ([134.134.136.126]:56264 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239013AbhLAQwc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Dec 2021 11:52:32 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10185"; a="223374341"
-X-IronPort-AV: E=Sophos;i="5.87,279,1631602800"; 
-   d="scan'208";a="223374341"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2021 08:48:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,279,1631602800"; 
-   d="scan'208";a="500322530"
-Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 01 Dec 2021 08:48:38 -0800
-Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1msSmc-000F9K-0V; Wed, 01 Dec 2021 16:48:38 +0000
-Date:   Thu, 2 Dec 2021 00:47:38 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>
-Cc:     kbuild-all@lists.01.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        fvogt@suse.de, Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, stable@vger.kernel.org,
-        Fabian Vogt <fvogt@suse.com>
-Subject: Re: [PATCH] bfq: Fix use-after-free with cgroups
-Message-ID: <202112020023.Klrg0J1F-lkp@intel.com>
-References: <20211201133439.3309-1-jack@suse.cz>
+        id S242454AbhLAREm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 12:04:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52992 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238178AbhLAREl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 12:04:41 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D72C061574;
+        Wed,  1 Dec 2021 09:01:20 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id z6so18194458plk.6;
+        Wed, 01 Dec 2021 09:01:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TNnID0pM8oD7D3r3FRXAh0e1o2KiMtfDSMZ8UHjXvhI=;
+        b=dA/1Ba+LXxVdHk43lnRtTzYYDEZnm1SeoS0qMwFyrvslSljbrcih2aHLkBv/eg0g/S
+         Rf8+0rtVJULopDo6OM56rZ6WqrqPJ4CTvtRnO+l86qBYKxO3quT+wQApFx6yvrrWYODt
+         xNl1JJhBLj7Yj1fmVIZJ7BDT891ygHW2J5ZOsniAQRXzPJQ3CEK7euX1Lg6spl9S1Gw/
+         4TWulikB7LeCxicPmwmN9MH4Mbq/oh/w7VG6FcNqc7w8VTvgj1HE9coW4lWeVOSX9+Sa
+         hmeWoS1nBVuWI8NXlK+9QgRojQ2NLvpzV27X3zhhHlxRKCLFX0UrGEnSceae5jt3myoG
+         NCRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=TNnID0pM8oD7D3r3FRXAh0e1o2KiMtfDSMZ8UHjXvhI=;
+        b=pi4btKJQxRCiGu9EqLlrD3Q3FRx3/miXUd6gZkf/1JhRn1j2+n+jMVOe+Ty+uQavXc
+         7C5cCMB7XlACFNu6xKzyOGni4JUN8dcQWmqYa+PPYdqIjvIC66R2Sv0k59MsjxY3niWH
+         VsHY7HWUd/rYAT1kNXO13zk2O+Kr/q7dlOJ7pHXmK7D/XkNcG85VMEU8kXPexkZ+ekUm
+         IPTwogCG1uK5xKvhlk9r3ryfS691ClctvNZACZDt0Tyk/7k2gKO3ExVVYavVUJYPVBCU
+         AF4bXWS1Wc7H7ckxM87dLwAF8UTMAnyA1FwhmRhdn/rQq2d4S1y6dOXeqEL15RSwbj5g
+         JKBA==
+X-Gm-Message-State: AOAM532W1aaICziJ7NGYBk4kSzPTEaxoxp43gmyXYvIMXKeM81ifLnlK
+        QyP71rdBT/JJDBQvtySHFLY=
+X-Google-Smtp-Source: ABdhPJyucVvt/YfqtQdG9SrG4xh3otrVYdY1njG/WRE4qIYlqfDx+AqWitbJBKNWj5dlcvS8Q71cHw==
+X-Received: by 2002:a17:90a:c08a:: with SMTP id o10mr9052451pjs.44.1638378079307;
+        Wed, 01 Dec 2021 09:01:19 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id q21sm211287pgm.83.2021.12.01.09.01.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Dec 2021 09:01:18 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 1 Dec 2021 07:01:17 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     hch@infradead.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v3 2/2] block: cancel all throttled bios in del_gendisk()
+Message-ID: <YaeqXU82Nta+PhF6@slm.duckdns.org>
+References: <20211201094014.330165-1-yukuai3@huawei.com>
+ <20211201094014.330165-3-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211201133439.3309-1-jack@suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20211201094014.330165-3-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jan,
+On Wed, Dec 01, 2021 at 05:40:14PM +0800, Yu Kuai wrote:
+> +	/*
+> +	 * hold queue_lock to prevent concurrent with dispatching
+> +	 * throttled bios by timer.
+> +	 */
+> +	spin_lock_irq(&q->queue_lock);
+> +	rcu_read_lock();
 
-I love your patch! Yet something to improve:
+Can you see whether it still needs rcu_read_lock() while holding queue_lock?
+Now that all RCU flavors are merged, I think just holding the queue_lock
+should be enough here.
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on v5.16-rc3 next-20211201]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Looks good otherwise.
 
-url:    https://github.com/0day-ci/linux/commits/Jan-Kara/bfq-Fix-use-after-free-with-cgroups/20211201-213549
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: um-i386_defconfig (https://download.01.org/0day-ci/archive/20211202/202112020023.Klrg0J1F-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/0day-ci/linux/commit/2154a2da8d69308aca6bb431da2d4d9e3e687daa
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Jan-Kara/bfq-Fix-use-after-free-with-cgroups/20211201-213549
-        git checkout 2154a2da8d69308aca6bb431da2d4d9e3e687daa
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 O=build_dir ARCH=um SUBARCH=i386 SHELL=/bin/bash block/
+Thanks.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   block/bfq-iosched.c: In function 'bfq_init_bfqq':
->> block/bfq-iosched.c:5472:44: error: 'struct bfq_group' has no member named 'children'
-    5472 |  hlist_add_head(&bfqq->children_node, &bfqg->children);
-         |                                            ^~
-
-
-vim +5472 block/bfq-iosched.c
-
-  5460	
-  5461	static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_group *bfqg,
-  5462				  struct bfq_queue *bfqq, struct bfq_io_cq *bic,
-  5463				  pid_t pid, int is_sync)
-  5464	{
-  5465		u64 now_ns = ktime_get_ns();
-  5466	
-  5467		RB_CLEAR_NODE(&bfqq->entity.rb_node);
-  5468		INIT_LIST_HEAD(&bfqq->fifo);
-  5469		INIT_HLIST_NODE(&bfqq->burst_list_node);
-  5470		INIT_HLIST_NODE(&bfqq->woken_list_node);
-  5471		INIT_HLIST_HEAD(&bfqq->woken_list);
-> 5472		hlist_add_head(&bfqq->children_node, &bfqg->children);
-  5473	
-  5474		bfqq->ref = 0;
-  5475		bfqq->bfqd = bfqd;
-  5476	
-  5477		if (bic)
-  5478			bfq_set_next_ioprio_data(bfqq, bic);
-  5479	
-  5480		if (is_sync) {
-  5481			/*
-  5482			 * No need to mark as has_short_ttime if in
-  5483			 * idle_class, because no device idling is performed
-  5484			 * for queues in idle class
-  5485			 */
-  5486			if (!bfq_class_idle(bfqq))
-  5487				/* tentatively mark as has_short_ttime */
-  5488				bfq_mark_bfqq_has_short_ttime(bfqq);
-  5489			bfq_mark_bfqq_sync(bfqq);
-  5490			bfq_mark_bfqq_just_created(bfqq);
-  5491		} else
-  5492			bfq_clear_bfqq_sync(bfqq);
-  5493	
-  5494		/* set end request to minus infinity from now */
-  5495		bfqq->ttime.last_end_request = now_ns + 1;
-  5496	
-  5497		bfqq->creation_time = jiffies;
-  5498	
-  5499		bfqq->io_start_time = now_ns;
-  5500	
-  5501		bfq_mark_bfqq_IO_bound(bfqq);
-  5502	
-  5503		bfqq->pid = pid;
-  5504	
-  5505		/* Tentative initial value to trade off between thr and lat */
-  5506		bfqq->max_budget = (2 * bfq_max_budget(bfqd)) / 3;
-  5507		bfqq->budget_timeout = bfq_smallest_from_now();
-  5508	
-  5509		bfqq->wr_coeff = 1;
-  5510		bfqq->last_wr_start_finish = jiffies;
-  5511		bfqq->wr_start_at_switch_to_srt = bfq_smallest_from_now();
-  5512		bfqq->split_time = bfq_smallest_from_now();
-  5513	
-  5514		/*
-  5515		 * To not forget the possibly high bandwidth consumed by a
-  5516		 * process/queue in the recent past,
-  5517		 * bfq_bfqq_softrt_next_start() returns a value at least equal
-  5518		 * to the current value of bfqq->soft_rt_next_start (see
-  5519		 * comments on bfq_bfqq_softrt_next_start).  Set
-  5520		 * soft_rt_next_start to now, to mean that bfqq has consumed
-  5521		 * no bandwidth so far.
-  5522		 */
-  5523		bfqq->soft_rt_next_start = jiffies;
-  5524	
-  5525		/* first request is almost certainly seeky */
-  5526		bfqq->seek_history = 1;
-  5527	}
-  5528	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+-- 
+tejun
