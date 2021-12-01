@@ -2,375 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B5CC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 13:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E61CC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 14:35:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243150AbhLANiW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 08:38:22 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:54398 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242170AbhLANiV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 08:38:21 -0500
+        id S1350559AbhLAOjB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 09:39:01 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:50290 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350147AbhLAOg7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 09:36:59 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 8E9D8212BD;
-        Wed,  1 Dec 2021 13:34:59 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id A16061FD58;
+        Wed,  1 Dec 2021 14:33:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1638365699; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=gurDmUOafm3mwOpNX64OhGslotUnt78gPkPeCT6HfLU=;
-        b=oLNPDyr4cZPTn/7wSizXWoot7t9fLYYZY+wQNL/k3OpyoHQHKPYPrZMZVvtgRewhnP9awj
-        niy1HZA8gAbSJ/XP/CsLjhi8ts3p6lvFRhFmlAjS7G6BRxt5xjgMnhDAyu7MNmSFrV+D4s
-        9Dbta182v/xIa+JqCZluY/5aKCWZKRM=
+        t=1638369217; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r9UBP124hYeNa6TVrkzFZrhQX94Y5SsEsxzU99CDkX8=;
+        b=pRQ6T9DQ0B9+XgWAebtWR1+dYCFK8DwFhU4JnqYP7p6cAYHJMQCjT+bsuutVQJsUD/+oKq
+        c7wBArNzckput3JS2y0FlAePf2u/qMkuFQqtWexWemO+XbPbILvIiaBrFkyBjZUi5nDZH/
+        8foVAUpvOm/Vr38QPSJuaq34ENVnXg8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1638365699;
+        s=susede2_ed25519; t=1638369217;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=gurDmUOafm3mwOpNX64OhGslotUnt78gPkPeCT6HfLU=;
-        b=Dh7RbBk7SvQ6+xL0cqaCEtg11oqsRYtMJ+u+zcZER1VOc7qOT/eZF+UO7TS7LmngHbPVom
-        3rkGCKSXLpj2dfDQ==
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r9UBP124hYeNa6TVrkzFZrhQX94Y5SsEsxzU99CDkX8=;
+        b=RlnVClIOHWrSCBv11TafUtJ9WAFb9LTSOza+hdjvuP7GhQ3dRFx35hkI3aJy6ud4DGOhIE
+        6X90zLQn03oDKkAQ==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 73298A3B81;
-        Wed,  1 Dec 2021 13:34:59 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 9110FA3B81;
+        Wed,  1 Dec 2021 14:33:37 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 3508E1E1494; Wed,  1 Dec 2021 14:34:56 +0100 (CET)
+        id 5F3311E1494; Wed,  1 Dec 2021 15:33:36 +0100 (CET)
+Date:   Wed, 1 Dec 2021 15:33:36 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-        fvogt@suse.de, Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, stable@vger.kernel.org,
-        Fabian Vogt <fvogt@suse.com>
-Subject: [PATCH] bfq: Fix use-after-free with cgroups
-Date:   Wed,  1 Dec 2021 14:34:39 +0100
-Message-Id: <20211201133439.3309-1-jack@suse.cz>
-X-Mailer: git-send-email 2.26.2
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 6/7] block: cleanup ioc_clear_queue
+Message-ID: <20211201143336.GB1815@quack2.suse.cz>
+References: <20211130124636.2505904-1-hch@lst.de>
+ <20211130124636.2505904-7-hch@lst.de>
+ <20211130172613.GL7174@quack2.suse.cz>
+ <20211201072702.GB31765@lst.de>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=12070; h=from:subject; bh=2R7rNGuET/rLWpMpWD51onEfSay6CK66QeUzkaAAJWk=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhp3npUCyJlVrzIGGOH8eTPz6DDaJr713I8cXrpGxr zXn8ZMCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYad56QAKCRCcnaoHP2RA2do8CA CZ512YYEl6bjWA2ZPF7JdyH9uNhlGWKfmiLp9n4Khi3/+xLxWjPRdZPHUrm570acietow3UXVMDiED pM1Iseu2dhSNs+bhA1UxQiipXJJKLLY756M3UZKG7xkO89RsXdSEobFffVZUdA5zgeSVKedB5VnjRG aow6u4kUt2kNregLSYKAEqSxVEQqkzggsVb/8685Uuk2k4gP4sdBKs7AdIJJGx6DsL7Dkw4/SIDPha fHye2z4iPylgPhr0WIii1ZcPDbZ7SMqQ11y9kgjn+RW5bZoOMF3gwUEi61VZj98OAOSkc0JY8xolHi tH+NjZLu/2GiIKi7sp0S9iNPFF/s9L
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211201072702.GB31765@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BFQ started crashing with 5.15-based kernels like:
+On Wed 01-12-21 08:27:02, Christoph Hellwig wrote:
+> On Tue, Nov 30, 2021 at 06:26:13PM +0100, Jan Kara wrote:
+> > I'm not quite sure about dropping the rcu protection here. This function
+> > generally runs without any protection so what guards us against icq being
+> > freed just after we've got its pointer from the list?
+> 
+> How does the RCU protection scheme work for the icq lookups?
+> ioc_lookup_icq takes it and then drops it before getting any kind
+> of refcount, so this all looks weird.  But I guess you are right that
+> I should probably keep this cargo culted scheme unless I have an
+> actual plan on how this could work.
 
-BUG: KASAN: use-after-free in rb_erase (lib/rbtree.c:262 lib/rbtr
-Read of size 8 at addr ffff888008193098 by task bash/1472
+I agree the RCU there looks like a bit of cargo-cult and would need better
+documentation if nothing else. But I think the logic behind RCU protection
+inside __ioc_clear_queue() is that you can safely acquire ioc->lock and
+check ICQ_DESTROYED flag - which should be set if ioc got already freed, if
+not set, you hold the ioc->lock so you won the race to free the ioc.
+For ioc_lookup_icq() I'm not sure what's going on there, there RCU looks
+completely pointless.
 
-CPU: 0 PID: 1472 Comm: bash Tainted: G            E     5.15.2-0.
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1
-Call Trace:
-rb_erase (lib/rbtree.c:262 lib/rbtree.c:445)
-bfq_idle_extract (block/bfq-wf2q.c:356)
-bfq_put_idle_entity (block/bfq-wf2q.c:660)
-bfq_bfqq_served (block/bfq-wf2q.c:833)
-bfq_dispatch_request (block/bfq-iosched.c:4870 block/bfq-iosched.
-__blk_mq_do_dispatch_sched (block/blk-mq-sched.c:150)
-__blk_mq_sched_dispatch_requests (block/blk-mq-sched.c:215 block/
-blk_mq_sched_dispatch_requests (block/blk-mq-sched.c:360)
-blk_mq_sched_insert_requests (include/linux/percpu-refcount.h:174
-blk_mq_flush_plug_list (include/linux/list.h:282 block/blk-mq.c:1
-blk_flush_plug_list (block/blk-core.c:1722)
-blk_finish_plug (block/blk-core.c:1745 block/blk-core.c:1739)
-read_pages (include/linux/list.h:282 mm/readahead.c:152)
-page_cache_ra_unbounded (mm/readahead.c:212 (discriminator 2))
-filemap_fault (mm/filemap.c:2982 mm/filemap.c:3074)
-__do_fault (mm/memory.c:3858)
-__handle_mm_fault (mm/memory.c:4182 mm/memory.c:4310 mm/memory.c:
-handle_mm_fault (mm/memory.c:4801)
+> While we're at it:  I don't see how put put_io_context could
+> be called under q->queue_lock and thus actually need the whole
+> workqueue scheme.
 
-After some analysis we've found out that the culprit of the problem is
-that some task is reparented from cgroup G to the root cgroup and G is
-offlined. But a bfq_queue in task's IO context still points to G as its
-parent and thus when task submits more IO, G is inserted into service
-trees. Once the task exits and bfq_queue is destroyed, the last
-reference to G is dropped as well and G is freed but it is still linked
-from service trees causing use-after-free issues sometime later.
+I don't see that either but I think in the past an equivalent of
+blk_mq_free_request() could get called during request merging while holding
+all the locks (I have just recently fixed a deadlock due to this in BFQ by
+postponing freeing of merged requests to the caller) and
+blk_mq_free_request() will call put_io_context(). So at this point I don't
+think it is needed anymore.
 
-Fix the problem by tracking all bfq_queues that point to a particular
-cgroup as their parent and reparent them when the cgroup is going
-offline.
+> Then again we really need to do an audit on queue_lock and split it into
+> actually documented locks now that the old request code is gone.
 
-CC: stable@vger.kernel.org
-Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
-Tested-by: Fabian Vogt <fvogt@suse.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/bfq-cgroup.c  | 100 ++++++--------------------------------------
- block/bfq-iosched.c |  54 ++++++++++++------------
- block/bfq-iosched.h |   6 +++
- 3 files changed, 47 insertions(+), 113 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 24a5c5329bcd..519e6291e98e 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -666,6 +666,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
- 	else if (entity->on_st_or_in_serv)
- 		bfq_put_idle_entity(bfq_entity_service_tree(entity), entity);
-+	hlist_del(&bfqq->children_node);
- 	bfqg_and_blkg_put(bfqq_group(bfqq));
- 
- 	if (entity->parent &&
-@@ -678,6 +679,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	entity->sched_data = &bfqg->sched_data;
- 	/* pin down bfqg and its associated blkg  */
- 	bfqg_and_blkg_get(bfqg);
-+	hlist_add_head(&bfqq->children_node, &bfqg->children);
- 
- 	if (bfq_bfqq_busy(bfqq)) {
- 		if (unlikely(!bfqd->nonrot_with_queueing))
-@@ -810,68 +812,13 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
- 	rcu_read_unlock();
- }
- 
--/**
-- * bfq_flush_idle_tree - deactivate any entity on the idle tree of @st.
-- * @st: the service tree being flushed.
-- */
--static void bfq_flush_idle_tree(struct bfq_service_tree *st)
--{
--	struct bfq_entity *entity = st->first_idle;
--
--	for (; entity ; entity = st->first_idle)
--		__bfq_deactivate_entity(entity, false);
--}
--
--/**
-- * bfq_reparent_leaf_entity - move leaf entity to the root_group.
-- * @bfqd: the device data structure with the root group.
-- * @entity: the entity to move, if entity is a leaf; or the parent entity
-- *	    of an active leaf entity to move, if entity is not a leaf.
-- */
--static void bfq_reparent_leaf_entity(struct bfq_data *bfqd,
--				     struct bfq_entity *entity,
--				     int ioprio_class)
-+static void bfq_reparent_children(struct bfq_data *bfqd, struct bfq_group *bfqg)
- {
- 	struct bfq_queue *bfqq;
--	struct bfq_entity *child_entity = entity;
--
--	while (child_entity->my_sched_data) { /* leaf not reached yet */
--		struct bfq_sched_data *child_sd = child_entity->my_sched_data;
--		struct bfq_service_tree *child_st = child_sd->service_tree +
--			ioprio_class;
--		struct rb_root *child_active = &child_st->active;
--
--		child_entity = bfq_entity_of(rb_first(child_active));
--
--		if (!child_entity)
--			child_entity = child_sd->in_service_entity;
--	}
--
--	bfqq = bfq_entity_to_bfqq(child_entity);
--	bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
--}
--
--/**
-- * bfq_reparent_active_queues - move to the root group all active queues.
-- * @bfqd: the device data structure with the root group.
-- * @bfqg: the group to move from.
-- * @st: the service tree to start the search from.
-- */
--static void bfq_reparent_active_queues(struct bfq_data *bfqd,
--				       struct bfq_group *bfqg,
--				       struct bfq_service_tree *st,
--				       int ioprio_class)
--{
--	struct rb_root *active = &st->active;
--	struct bfq_entity *entity;
--
--	while ((entity = bfq_entity_of(rb_first(active))))
--		bfq_reparent_leaf_entity(bfqd, entity, ioprio_class);
-+	struct hlist_node *next;
- 
--	if (bfqg->sched_data.in_service_entity)
--		bfq_reparent_leaf_entity(bfqd,
--					 bfqg->sched_data.in_service_entity,
--					 ioprio_class);
-+	hlist_for_each_entry_safe(bfqq, next, &bfqg->children, children_node)
-+		bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
- }
- 
- /**
-@@ -897,38 +844,17 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
- 		goto put_async_queues;
- 
- 	/*
--	 * Empty all service_trees belonging to this group before
--	 * deactivating the group itself.
-+	 * Reparent all bfqqs under this bfq group. This will also empty all
-+	 * service_trees belonging to this group before deactivating the group
-+	 * itself.
- 	 */
-+	bfq_reparent_children(bfqd, bfqg);
-+
- 	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++) {
- 		st = bfqg->sched_data.service_tree + i;
- 
--		/*
--		 * It may happen that some queues are still active
--		 * (busy) upon group destruction (if the corresponding
--		 * processes have been forced to terminate). We move
--		 * all the leaf entities corresponding to these queues
--		 * to the root_group.
--		 * Also, it may happen that the group has an entity
--		 * in service, which is disconnected from the active
--		 * tree: it must be moved, too.
--		 * There is no need to put the sync queues, as the
--		 * scheduler has taken no reference.
--		 */
--		bfq_reparent_active_queues(bfqd, bfqg, st, i);
--
--		/*
--		 * The idle tree may still contain bfq_queues
--		 * belonging to exited task because they never
--		 * migrated to a different cgroup from the one being
--		 * destroyed now. In addition, even
--		 * bfq_reparent_active_queues() may happen to add some
--		 * entities to the idle tree. It happens if, in some
--		 * of the calls to bfq_bfqq_move() performed by
--		 * bfq_reparent_active_queues(), the queue to move is
--		 * empty and gets expired.
--		 */
--		bfq_flush_idle_tree(st);
-+		WARN_ON_ONCE(!RB_EMPTY_ROOT(&st->active));
-+		WARN_ON_ONCE(!RB_EMPTY_ROOT(&st->idle));
- 	}
- 
- 	__bfq_deactivate_entity(entity, false);
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index fec18118dc30..8f33f6b91d05 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5163,6 +5163,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
- 	if (bfqq->bfqd && bfqq->bfqd->last_completed_rq_bfqq == bfqq)
- 		bfqq->bfqd->last_completed_rq_bfqq = NULL;
- 
-+	hlist_del(&bfqq->children_node);
- 	kmem_cache_free(bfq_pool, bfqq);
- 	bfqg_and_blkg_put(bfqg);
- }
-@@ -5337,8 +5338,9 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
- 		bfq_set_next_ioprio_data(bfqq, bic);
- }
- 
--static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
--			  struct bfq_io_cq *bic, pid_t pid, int is_sync)
-+static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_group *bfqg,
-+			  struct bfq_queue *bfqq, struct bfq_io_cq *bic,
-+			  pid_t pid, int is_sync)
- {
- 	u64 now_ns = ktime_get_ns();
- 
-@@ -5347,6 +5349,7 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	INIT_HLIST_NODE(&bfqq->burst_list_node);
- 	INIT_HLIST_NODE(&bfqq->woken_list_node);
- 	INIT_HLIST_HEAD(&bfqq->woken_list);
-+	hlist_add_head(&bfqq->children_node, &bfqg->children);
- 
- 	bfqq->ref = 0;
- 	bfqq->bfqd = bfqd;
-@@ -5600,8 +5603,7 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 				     bfqd->queue->node);
- 
- 	if (bfqq) {
--		bfq_init_bfqq(bfqd, bfqq, bic, current->pid,
--			      is_sync);
-+		bfq_init_bfqq(bfqd, bfqg, bfqq, bic, current->pid, is_sync);
- 		bfq_init_entity(&bfqq->entity, bfqg);
- 		bfq_log_bfqq(bfqd, bfqq, "allocated");
- 	} else {
-@@ -6908,6 +6910,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
- 
- 	hrtimer_cancel(&bfqd->idle_slice_timer);
- 
-+	hlist_del(&bfqd->oom_bfqq.children_node);
- 	/* release oom-queue reference to root group */
- 	bfqg_and_blkg_put(bfqd->root_group);
- 
-@@ -6959,28 +6962,6 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	q->elevator = eq;
- 	spin_unlock_irq(&q->queue_lock);
- 
--	/*
--	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
--	 * Grab a permanent reference to it, so that the normal code flow
--	 * will not attempt to free it.
--	 */
--	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, NULL, 1, 0);
--	bfqd->oom_bfqq.ref++;
--	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
--	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
--	bfqd->oom_bfqq.entity.new_weight =
--		bfq_ioprio_to_weight(bfqd->oom_bfqq.new_ioprio);
--
--	/* oom_bfqq does not participate to bursts */
--	bfq_clear_bfqq_just_created(&bfqd->oom_bfqq);
--
--	/*
--	 * Trigger weight initialization, according to ioprio, at the
--	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
--	 * class won't be changed any more.
--	 */
--	bfqd->oom_bfqq.entity.prio_changed = 1;
--
- 	bfqd->queue = q;
- 
- 	INIT_LIST_HEAD(&bfqd->dispatch);
-@@ -7059,6 +7040,27 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 		goto out_free;
- 	bfq_init_root_group(bfqd->root_group, bfqd);
- 	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
-+	/*
-+	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
-+	 * Grab a permanent reference to it, so that the normal code flow
-+	 * will not attempt to free it.
-+	 */
-+	bfq_init_bfqq(bfqd, bfqd->root_group, &bfqd->oom_bfqq, NULL, 1, 0);
-+	bfqd->oom_bfqq.ref++;
-+	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
-+	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
-+	bfqd->oom_bfqq.entity.new_weight =
-+		bfq_ioprio_to_weight(bfqd->oom_bfqq.new_ioprio);
-+
-+	/* oom_bfqq does not participate to bursts */
-+	bfq_clear_bfqq_just_created(&bfqd->oom_bfqq);
-+
-+	/*
-+	 * Trigger weight initialization, according to ioprio, at the
-+	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
-+	 * class won't be changed any more.
-+	 */
-+	bfqd->oom_bfqq.entity.prio_changed = 1;
- 
- 	wbt_disable_default(q);
- 	return 0;
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index a73488eec8a4..a1984959d6be 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -292,6 +292,9 @@ struct bfq_queue {
- 
- 	/* node for active/idle bfqq list inside parent bfqd */
- 	struct list_head bfqq_list;
-+	/* Member of parent's bfqg children list */
-+	struct hlist_node children_node;
-+
- 
- 	/* associated @bfq_ttime struct */
- 	struct bfq_ttime ttime;
-@@ -929,6 +932,9 @@ struct bfq_group {
- 	struct bfq_entity entity;
- 	struct bfq_sched_data sched_data;
- 
-+	/* bfq_queues under this entity */
-+	struct hlist_head children;
-+
- 	void *bfqd;
- 
- 	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
+A worthy goal :)
+								Honza
 -- 
-2.26.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
