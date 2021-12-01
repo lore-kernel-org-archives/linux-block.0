@@ -2,256 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27086C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 14:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25313C43219
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 16:37:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350585AbhLAOrS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 09:47:18 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:54041 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350882AbhLAOpI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 09:45:08 -0500
-Received: from fsav120.sakura.ne.jp (fsav120.sakura.ne.jp [27.133.134.247])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1B1EfOgw005674;
-        Wed, 1 Dec 2021 23:41:24 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav120.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp);
- Wed, 01 Dec 2021 23:41:24 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1B1EfOum005668
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 1 Dec 2021 23:41:24 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
-Date:   Wed, 1 Dec 2021 23:41:23 +0900
+        id S1351375AbhLAQlQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 11:41:16 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4186 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351287AbhLAQlQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 11:41:16 -0500
+Received: from fraeml714-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J44Vk07Fjz67ts3;
+        Thu,  2 Dec 2021 00:37:02 +0800 (CST)
+Received: from roberto-ThinkStation-P620.huawei.com (10.204.63.22) by
+ fraeml714-chm.china.huawei.com (10.206.15.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 1 Dec 2021 17:37:51 +0100
+From:   Roberto Sassu <roberto.sassu@huawei.com>
+To:     <deven.desai@linux.microsoft.com>, <corbet@lwn.net>,
+        <axboe@kernel.dk>, <agk@redhat.com>, <snitzer@redhat.com>,
+        <ebiggers@kernel.org>, <tytso@mit.edu>, <paul@paul-moore.com>,
+        <eparis@redhat.com>, <jmorris@namei.org>, <serge@hallyn.com>
+CC:     <jannh@google.com>, <dm-devel@redhat.com>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-fscrypt@vger.kernel.org>,
+        <linux-audit@redhat.com>, <linux-security-module@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <tusharsu@linux.microsoft.com>,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Subject: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
+Date:   Wed, 1 Dec 2021 17:37:08 +0100
+Message-ID: <20211201163708.3578176-1-roberto.sassu@huawei.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
+References: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: [PATCH] loop: make autoclear operation asynchronous
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, Dave Chinner <dchinner@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <0000000000007f2f5405d1bfe618@google.com>
- <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
- <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
- <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
- <YaSpkRHgEMXrcn5i@infradead.org>
- <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
- <YaYfu0H2k0PSQL6W@infradead.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <YaYfu0H2k0PSQL6W@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.204.63.22]
+X-ClientProxiedBy: lhreml751-chm.china.huawei.com (10.201.108.201) To
+ fraeml714-chm.china.huawei.com (10.206.15.33)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/11/30 21:57, Christoph Hellwig wrote:
-> On Mon, Nov 29, 2021 at 07:36:27PM +0900, Tetsuo Handa wrote:
->> If the caller just want to call ioctl(LOOP_CTL_GET_FREE) followed by
->> ioctl(LOOP_CONFIGURE), deferring __loop_clr_fd() would be fine.
->>
->> But the caller might want to unmount as soon as fput(filp) from __loop_clr_fd() completes.
->> I think we need to wait for __loop_clr_fd() from lo_release() to complete.
-> 
-> Anything else could have a reference to this or other files as well.
-> So I can't see how deferring the clear to a different context can be
-> any kind of problem in practice.
-> 
+Users of the device mapper driver might want to obtain a device status,
+with status types defined in the status_type_t enumerator.
 
-OK. Here is a patch.
-Is this better than temporarily dropping disk->open_mutex ?
+If a function to get the status is exported by the device mapper, when
+compiled as a module, it is not suitable to use by callers compiled builtin
+in the kernel.
 
-From 1405d604f1a0aa153de595f607726f0dcbe5c784 Mon Sep 17 00:00:00 2001
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Date: Wed, 1 Dec 2021 23:31:20 +0900
-Subject: [PATCH] loop: make autoclear operation asynchronous
+Introduce the real function to get the status, _dm_get_status(), in the
+device mapper module, and add the stub dm_get_status() in dm-builtin.c, so
+that it can be invoked by builtin callers.
 
-syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
-commit 87579e9b7d8dc36e ("loop: use worker per cgroup instead of kworker")
-is calling destroy_workqueue() with disk->open_mutex held.
+The stub calls the real function if the device mapper is compiled builtin
+or the module has been loaded. Calls to the real function are safely
+disabled if the module is unloaded. The race condition is avoided by
+incrementing the reference count of the module.
 
-This circular dependency cannot be broken unless we call __loop_clr_fd()
-without holding disk->open_mutex. There are two approaches.
+_dm_get_status() invokes the status() method for each device mapper table,
+which writes a string to the supplied buffer as output. The buffer might
+contain multiple strings concatenated together. If there is not enough
+space available, the string is truncated and a termination character is put
+at the end.
 
-One is to temporarily drop disk->open_mutex when calling __loop_clr_fd().
-
-  -  __loop_clr_fd(lo, true);
-  +  mutex_unlock(&lo->lo_disk->open_mutex);
-  +  __loop_clr_fd(lo, false);
-  +  mutex_lock(&lo->lo_disk->open_mutex);
-
-This should work because
-
-  (a) __loop_clr_fd() can be called without disk->open_mutex held, and
-      takes disk->open_mutex if needed when called by ioctl(LOOP_CLR_FD)
-
-  (b) lo_release() is called by blkdev_put_whole() via
-      bdev->bd_disk->fops->release from blkdev_put() (maybe via
-      blkdev_put_part()) immediately before dropping disk->open_mutex
-
-  (c) there is no resource to protect after dropping disk->open_mutex
-      till blkdev_put() completes
-
-are true.
-
-The other is to defer __loop_clr_fd() to a WQ context. This should work
-given that
-
-  (d) refcount on resources accessed by __loop_clr_fd() are taken before
-      blkdev_put() drops refcount
-
-  (e) refcount on resources accessed by __loop_clr_fd() are dropped after
-      __loop_clr_fd() completes
-
-  (f) the caller is not trying to e.g. unmount as soon as returning from
-      loop_release()
-
-  (g) the WQ context does not introduce new locking problems
-
-are true. This patch implements (d) and (e).
-
-Link: https://syzkaller.appspot.com/bug?extid=643e4ce4b6ad1347d372 [1]
-Reported-by: syzbot <syzbot+643e4ce4b6ad1347d372@syzkaller.appspotmail.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
 ---
- drivers/block/loop.c | 65 ++++++++++++++++++++++++--------------------
- drivers/block/loop.h |  1 +
- 2 files changed, 37 insertions(+), 29 deletions(-)
+ drivers/md/dm-builtin.c       | 13 +++++++
+ drivers/md/dm-core.h          |  5 +++
+ drivers/md/dm.c               | 71 +++++++++++++++++++++++++++++++++++
+ include/linux/device-mapper.h |  3 ++
+ 4 files changed, 92 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ba76319b5544..7f4ea06534c2 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1082,7 +1082,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return error;
+diff --git a/drivers/md/dm-builtin.c b/drivers/md/dm-builtin.c
+index 8eb52e425141..cc1e9c27ab41 100644
+--- a/drivers/md/dm-builtin.c
++++ b/drivers/md/dm-builtin.c
+@@ -47,3 +47,16 @@ void dm_kobject_release(struct kobject *kobj)
  }
  
--static void __loop_clr_fd(struct loop_device *lo, bool release)
-+static void __loop_clr_fd(struct loop_device *lo)
+ EXPORT_SYMBOL(dm_kobject_release);
++
++dm_get_status_fn status_fn;
++EXPORT_SYMBOL(status_fn);
++
++ssize_t dm_get_status(dev_t dev, status_type_t type, const char *target_name,
++		      u8 *buf, size_t buf_len)
++{
++	if (status_fn)
++		return status_fn(dev, type, target_name, buf, buf_len);
++
++	return -EOPNOTSUPP;
++}
++EXPORT_SYMBOL(dm_get_status);
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index b855fef4f38a..6600ec260558 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -259,4 +259,9 @@ extern atomic_t dm_global_event_nr;
+ extern wait_queue_head_t dm_global_eventq;
+ void dm_issue_global_event(void);
+ 
++typedef ssize_t (*dm_get_status_fn)(dev_t dev, status_type_t type,
++				    const char *target_name, u8 *buf,
++				    size_t buf_len);
++
++extern dm_get_status_fn status_fn;
+ #endif
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 662742a310cb..55e59a4e3661 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -192,6 +192,74 @@ static unsigned dm_get_numa_node(void)
+ 					 DM_NUMA_NODE, num_online_nodes() - 1);
+ }
+ 
++static ssize_t _dm_get_status(dev_t dev, status_type_t type,
++			      const char *target_name, u8 *buf, size_t buf_len)
++{
++	struct mapped_device *md;
++	struct dm_table *table;
++	u8 *buf_ptr = buf;
++	ssize_t len, res = 0;
++	int srcu_idx, num_targets, i;
++
++	if (buf_len > INT_MAX)
++		return -EINVAL;
++
++	if (!buf_len)
++		return buf_len;
++
++	if (!try_module_get(THIS_MODULE))
++		return -EBUSY;
++
++	md = dm_get_md(dev);
++	if (!md) {
++		res = -ENOENT;
++		goto out_module;
++	}
++
++	table = dm_get_live_table(md, &srcu_idx);
++	if (!table) {
++		res = -ENOENT;
++		goto out_md;
++	}
++
++	memset(buf, 0, buf_len);
++
++	num_targets = dm_table_get_num_targets(table);
++
++	for (i = 0; i < num_targets; i++) {
++		struct dm_target *ti = dm_table_get_target(table, i);
++
++		if (!ti)
++			continue;
++
++		if (target_name && strcmp(ti->type->name, target_name))
++			continue;
++
++		if (!ti->type->status)
++			continue;
++
++		ti->type->status(ti, type, 0, buf_ptr, buf + buf_len - buf_ptr);
++
++		if (!*buf_ptr)
++			continue;
++
++		len = strlen(buf_ptr);
++		buf_ptr += len + 1;
++
++		if (buf_ptr == buf + buf_len)
++			break;
++
++		res += len + 1;
++	}
++
++	dm_put_live_table(md, srcu_idx);
++out_md:
++	dm_put(md);
++out_module:
++	module_put(THIS_MODULE);
++	return res;
++}
++
+ static int __init local_init(void)
  {
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
-@@ -1144,8 +1144,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	/* let user-space know about this change */
- 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- 	mapping_set_gfp_mask(filp->f_mapping, gfp);
--	/* This is safe: open() is still holding a reference. */
--	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
-@@ -1153,44 +1151,52 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
- 		int err;
- 
--		/*
--		 * open_mutex has been held already in release path, so don't
--		 * acquire it if this function is called in such case.
--		 *
--		 * If the reread partition isn't from release path, lo_refcnt
--		 * must be at least one and it can only become zero when the
--		 * current holder is released.
--		 */
--		if (!release)
--			mutex_lock(&lo->lo_disk->open_mutex);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		err = bdev_disk_changed(lo->lo_disk, false);
--		if (!release)
--			mutex_unlock(&lo->lo_disk->open_mutex);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo->lo_number, err);
- 		/* Device is gone, no point in returning error */
+ 	int r;
+@@ -275,6 +343,7 @@ static int __init dm_init(void)
+ 			goto bad;
  	}
  
--	/*
--	 * lo->lo_state is set to Lo_unbound here after above partscan has
--	 * finished. There cannot be anybody else entering __loop_clr_fd() as
--	 * Lo_rundown state protects us from all the other places trying to
--	 * change the 'lo' device.
--	 */
- 	lo->lo_flags = 0;
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
-+
-+	fput(filp);
-+}
-+
-+static void loop_rundown_completed(struct loop_device *lo)
-+{
- 	mutex_lock(&lo->lo_mutex);
- 	lo->lo_state = Lo_unbound;
- 	mutex_unlock(&lo->lo_mutex);
-+	module_put(THIS_MODULE);
-+}
- 
--	/*
--	 * Need not hold lo_mutex to fput backing file. Calling fput holding
--	 * lo_mutex triggers a circular lock dependency possibility warning as
--	 * fput can take open_mutex which is usually taken before lo_mutex.
--	 */
--	fput(filp);
-+static void loop_rundown_workfn(struct work_struct *work)
-+{
-+	struct loop_device *lo = container_of(work, struct loop_device,
-+					      rundown_work);
-+	struct block_device *bdev = lo->lo_device;
-+	struct gendisk *disk = lo->lo_disk;
-+
-+	__loop_clr_fd(lo);
-+	kobject_put(&bdev->bd_device.kobj);
-+	module_put(disk->fops->owner);
-+	loop_rundown_completed(lo);
-+}
-+
-+static void loop_schedule_rundown(struct loop_device *lo)
-+{
-+	struct block_device *bdev = lo->lo_device;
-+	struct gendisk *disk = lo->lo_disk;
-+
-+	__module_get(disk->fops->owner);
-+	kobject_get(&bdev->bd_device.kobj);
-+	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
-+	queue_work(system_long_wq, &lo->rundown_work);
- }
- 
- static int loop_clr_fd(struct loop_device *lo)
-@@ -1222,7 +1228,8 @@ static int loop_clr_fd(struct loop_device *lo)
- 	lo->lo_state = Lo_rundown;
- 	mutex_unlock(&lo->lo_mutex);
- 
--	__loop_clr_fd(lo, false);
-+	__loop_clr_fd(lo);
-+	loop_rundown_completed(lo);
++	status_fn = _dm_get_status;
  	return 0;
- }
+ bad:
+ 	while (i--)
+@@ -287,6 +356,8 @@ static void __exit dm_exit(void)
+ {
+ 	int i = ARRAY_SIZE(_exits);
  
-@@ -1747,7 +1754,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		__loop_clr_fd(lo, true);
-+		loop_schedule_rundown(lo);
- 		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 082d4b6bfc6a..918a7a2dc025 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -56,6 +56,7 @@ struct loop_device {
- 	struct gendisk		*lo_disk;
- 	struct mutex		lo_mutex;
- 	bool			idr_visible;
-+	struct work_struct      rundown_work;
- };
++	status_fn = NULL;
++
+ 	while (i--)
+ 		_exits[i]();
  
- struct loop_cmd {
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index a7df155ea49b..d97b296d3104 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -487,6 +487,9 @@ int dm_report_zones(struct block_device *bdev, sector_t start, sector_t sector,
+ 		    struct dm_report_zones_args *args, unsigned int nr_zones);
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
++ssize_t dm_get_status(dev_t dev, status_type_t type, const char *target_name,
++		      u8 *buf, size_t buf_len);
++
+ /*
+  * Device mapper functions to parse and create devices specified by the
+  * parameter "dm-mod.create="
 -- 
-2.18.4
+2.32.0
+
