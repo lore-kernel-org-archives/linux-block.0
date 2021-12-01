@@ -2,277 +2,375 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AD5C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 11:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B5CC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 13:35:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243511AbhLALzo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 06:55:44 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:28440 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242696AbhLALzn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Dec 2021 06:55:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1638359541;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+Q4HooFv11pqrWVUHIip413F+RXiUXFmwHrK/GvFa7M=;
-        b=eOScaPtLXC0wVCcQLGsWMK4kZMU2xcP6MBIdpo8Uh+hCMCRVenp08tZI1pbz2sbeQz+R3M
-        lKY++oOIYa5cuLrfry9AzuYqlzmLRKp0MVZnYS6bIt9xATukSKrtaFSDw/rDnbZgMyDlcj
-        8Em+dJheUAG15DPQKWygB58DorDCH+o=
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
- (mail-ve1eur01lp2058.outbound.protection.outlook.com [104.47.1.58]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- de-mta-17-I13DmbMGPYqV2F7LT0Znrw-1; Wed, 01 Dec 2021 12:52:20 +0100
-X-MC-Unique: I13DmbMGPYqV2F7LT0Znrw-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iIU82rOB3Rmc39W/7qusdUI43HH88NSzigUBQ1m/3KwwtFGWHVAHtzkgiu9LjpgSzkjycOpHpAx5CCV+VpzcnvwJ1SkCXMrxGwdPVbKbt5SlP+I+nsfa3UG9xa5qZTCP7MwN/0AiLgr0CURT5Eo9ZvooBj1oFR3gYn+JwibXWG7WVLksypJk+ArYsObffjzzBUcP8UqEx3DexygEoCmX2knSz8/O8/61qUPmmdW5rNb+fy5z9bnLoycr3pUkMTu9zzqZ179xh/5eV5en2MufdUT5vQ/P4ipjgLPPcUG0vw1SMwKfOCM2Wxz7cNQoicmZERYWc8w5EQ/SAgDmpl5XxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+Q4HooFv11pqrWVUHIip413F+RXiUXFmwHrK/GvFa7M=;
- b=cddp8qVrwwPYA4WOLuIZVg90sE983XpzZrIuTEFCbUMFxpAaHjSn0tFT1U8a4lDP8Jl6emz5iC7VMn8nDUqvajZ0pyAwTnpLhFnruadS5qnpGm/YQtf7EvzrPBJw08Sn3AVOuPQ5TQI0wHLcUqIXwhnjftogzpjbe26pbiRZkbH5LaK9hvJV0IopAuoPsdN3rJ2RHAR907aGTUevEgEv9ICyWEPJU47/uCqXwO7iM/KIvO/sOTK2j/2TK745b5VzbOzHUl6eheMKXqMIsHtPStig7k3pG/a2GTWAtpcgNRkgOenX9ie8eYR/2t6DcBVbQO4K3o1q8ysoW3srHCqP6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from DB9PR04MB9426.eurprd04.prod.outlook.com (2603:10a6:10:36a::14)
- by DU2PR04MB8661.eurprd04.prod.outlook.com (2603:10a6:10:2dc::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Wed, 1 Dec
- 2021 11:52:19 +0000
-Received: from DB9PR04MB9426.eurprd04.prod.outlook.com
- ([fe80::ed16:bc50:4079:9286]) by DB9PR04MB9426.eurprd04.prod.outlook.com
- ([fe80::ed16:bc50:4079:9286%9]) with mapi id 15.20.4734.023; Wed, 1 Dec 2021
- 11:52:19 +0000
-Message-ID: <a2320b53-8af2-575b-9589-faf1f1bb41a6@suse.com>
-Date:   Wed, 1 Dec 2021 19:52:09 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH 02/17] btrfs: save bio::bi_iter into btrfs_bio::iter
- before submitting
-Content-Language: en-US
-From:   Qu Wenruo <wqu@suse.com>
-To:     linux-btrfs@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com
-References: <20211201051756.53742-1-wqu@suse.com>
- <20211201051756.53742-3-wqu@suse.com>
-In-Reply-To: <20211201051756.53742-3-wqu@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR06CA0024.namprd06.prod.outlook.com
- (2603:10b6:a03:d4::37) To DB9PR04MB9426.eurprd04.prod.outlook.com
- (2603:10a6:10:36a::14)
+        id S243150AbhLANiW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 08:38:22 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:54398 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242170AbhLANiV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 08:38:21 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 8E9D8212BD;
+        Wed,  1 Dec 2021 13:34:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1638365699; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=gurDmUOafm3mwOpNX64OhGslotUnt78gPkPeCT6HfLU=;
+        b=oLNPDyr4cZPTn/7wSizXWoot7t9fLYYZY+wQNL/k3OpyoHQHKPYPrZMZVvtgRewhnP9awj
+        niy1HZA8gAbSJ/XP/CsLjhi8ts3p6lvFRhFmlAjS7G6BRxt5xjgMnhDAyu7MNmSFrV+D4s
+        9Dbta182v/xIa+JqCZluY/5aKCWZKRM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1638365699;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=gurDmUOafm3mwOpNX64OhGslotUnt78gPkPeCT6HfLU=;
+        b=Dh7RbBk7SvQ6+xL0cqaCEtg11oqsRYtMJ+u+zcZER1VOc7qOT/eZF+UO7TS7LmngHbPVom
+        3rkGCKSXLpj2dfDQ==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id 73298A3B81;
+        Wed,  1 Dec 2021 13:34:59 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 3508E1E1494; Wed,  1 Dec 2021 14:34:56 +0100 (CET)
+From:   Jan Kara <jack@suse.cz>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+        fvogt@suse.de, Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, stable@vger.kernel.org,
+        Fabian Vogt <fvogt@suse.com>
+Subject: [PATCH] bfq: Fix use-after-free with cgroups
+Date:   Wed,  1 Dec 2021 14:34:39 +0100
+Message-Id: <20211201133439.3309-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Received: from [0.0.0.0] (149.28.201.231) by BYAPR06CA0024.namprd06.prod.outlook.com (2603:10b6:a03:d4::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.22 via Frontend Transport; Wed, 1 Dec 2021 11:52:17 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bcd10129-c6d3-48d3-bd13-08d9b4c10701
-X-MS-TrafficTypeDiagnostic: DU2PR04MB8661:
-X-Microsoft-Antispam-PRVS: <DU2PR04MB86611D0A8DEDD06C3C939782D6689@DU2PR04MB8661.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dwjXlWY7OaAX3FjmnRDOMJyL7DCpucG331v1aOomUjcf5zg4w2py+fW9ZwY0DkglSxOr+ActtsYOWAesINSBvgqAPGOWO/oTVpb14+oe+640+4trHBP7Ep+gjMlUwqtGCs8Yv6xZz1ctVts9zL7VhVlt6zSnEDUJM2/EsOxAMRHzqMQlfXR1bB9JB5N4WBFlbxg0b7x1PSJf1athBU6Ai4rVLOtIVP6sguRJFktfTu0/jo56fl+yNtvOXLt8dRieyHag70kBXUPo1pLypzrgUSNKuUzFyU3AP7x76Q5AbOLE0RtlTVyYSV9Cgd1zvlJIN2mSN6ugTTwXJe6rhaUbWX+cZP/QDePHpYVKQoYIRhZJSy1aw7J4wSbEqAEISirOuA+QFA+JiBfC+rOAz/XVbu+Y6VSx/Xmrvd2p9oovCoXYRpJhBLqqac8Ar0sS6wctt7HpRhHJtmcBfyWfglIuXa1AQEN032OwpHh6qcy1EicOWp6K4BX0eCgRK0mkOME8FkVo3n6Dwv/eXfeLsI0QPRXEky9nNCK76UdBjF0zJN7maGLPYxOGJtP46wrSmU9vRA2d5RDBuU+8kVIoPxgsrUH6ED+R2dIx+th0TFFoB20Ty+Q/HoZNLbpXGfF3Vk58wWDOOcJ1lqXlXMAprJQC4Rt+9iVeArPLgPD7WfUQ02zdaMpVfZaFl4BV+A/rThJS2qb419JBMbgUqj9N0+AkbEuGscgItJggZsEI8JOFn8xLLdH8M2M8XmbvQf36wip3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9426.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(6706004)(66556008)(26005)(2906002)(16576012)(31696002)(83380400001)(8676002)(53546011)(36756003)(5660300002)(316002)(508600001)(8936002)(86362001)(6486002)(66476007)(38100700002)(6916009)(6666004)(31686004)(956004)(66946007)(2616005)(186003)(4326008)(78286007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WHBBS2xEOStJeFBMY0E1Lzc2RE5uYS8xY095T3NnZEZ4cFBobE5XRGxtUW92?=
- =?utf-8?B?cllqWGljSXZPOHlqYXhRZDE4ZWV6cWZzSUlUTUROR0YxNGw2RHpzemwyOGoy?=
- =?utf-8?B?c3RyaWE3UUE4THRBWERPZ3FLR3pnZVNtS1RuYUNHeHlFZm9vanltT0lwYTBD?=
- =?utf-8?B?WFNPMStRSjZlUkdvRnBzZVZPc3JnK01IR09UajlTdWtsL3VCeXZVYjE5Y3Zy?=
- =?utf-8?B?RFFwMC9uWDJjdEIxTmtoU1l4OGVaS1kySXlzNElYU2J3b2I2cHlOWlZtUGEx?=
- =?utf-8?B?MEpROVE3TTVmZGk0c21TWkw2RFFjaENjaTdTN3ZaVUJTNHU0cXhEMldnWE5N?=
- =?utf-8?B?WkxHUUpPYW1CeGRRaFo2a2R6YVBaSytqMFU1eWxFYWEySmxRM0lmMTAvNGV3?=
- =?utf-8?B?TzMyZDJ5SlA0N0EvU09KRHNEVHk5SkUwU09zRzJtVzF5dm5OUGNCSUtRSmtK?=
- =?utf-8?B?RllmL09xc0lOT0RsWXM5VkJja1NlRC9Jb2E2UGc0UjdnZlNHQkdHaUszRzYy?=
- =?utf-8?B?WGVIQjBiYlBMdTg0Tlk1RVhxUk5LaW45KzU0MS93L1BNd3llSnhDS1VrbVdG?=
- =?utf-8?B?NWhIQTB1UFZzcWJFNjcrZUkyclprQ05WaSs1NFg2YndwUVN6NjIvanFYWUly?=
- =?utf-8?B?NzRSbGVnSU5MUVFOZ0VIb0NzSTEvQ1ppZXdtOWg0SEYvamc3RXRvVmJjSmJ0?=
- =?utf-8?B?K1l6U0M1aUtqQmpKR3NJVy9KL2l4MmNjck5JeWF1N0VJeWQzMGUxcHNTOFgw?=
- =?utf-8?B?THVwNlFRYmIxeTJtSDJRcGVIVFVUWjhYeDVzSkxyT2FETGFBUnEyQ3YrV3Ay?=
- =?utf-8?B?NmM5WFlWTjZNVDlGb3A3NXRPUnAzaExiN2FHMUY5V0M1MXQyZUNxc1FFSHpl?=
- =?utf-8?B?VXdMeEYvRHh2Uk5SM01adWg3cXRzZm9TWnp1ZTVKa24zQjVmZ0ZmSUlzQ1VG?=
- =?utf-8?B?ZzVFcnMxeTM2TkRTWHpXeTJubTY0Z3EyS2V2cnVPdFJyYnpHSklLNUcyQ3Fj?=
- =?utf-8?B?aDc2TUZEd0JMbE53VzVNNi9uNHl0WmVDY3doVVlvWkFWUHl0d0pSOU9oM3FG?=
- =?utf-8?B?Tk5DbmVyTVpFY2xFem5DVSs1Wjkvc3daa1lycWhSQ3FZZXJJYXRIWmRLMU1U?=
- =?utf-8?B?Q0xwaS9FaU9wV3RrUW0rVFFNZ0RsVUZyNEhsbm9vMGd0alNDdDR4UkxQWnZI?=
- =?utf-8?B?OFBPMTRFbDl6dGtCZ2hnZE1jc1pVU2xOT3dnVnN2Ykp3WlJOZ0tJa21rUDk3?=
- =?utf-8?B?RUhFcXVVYXhJUkd0MFlOOUMrZm5lR2pqQWUxVmV0WTNKRUNLMEJOZ00xcm5n?=
- =?utf-8?B?YVRZdHBRN0V6My9MT3lZcUVxcHp4VjhnbXZtWHRZMzg5TkFCdkpJbjRTb2o5?=
- =?utf-8?B?RWtWWVhZRXdxdVhXQ21BRzMrdG45Y2FobFdTK0N6TndWZlZ4TEY1WnZLTWpC?=
- =?utf-8?B?UUlTQkpzaVlPU2FhTlJkZXdmdElZZ3dkRnJWSEFYaGtjMFUvQ0JmQWVjb3Y5?=
- =?utf-8?B?Y3ExckE3bHQ4TC9SOUozTTFYbzMrZ2ZYaXE2SjFzL0VqOXNuZnhxa2UwODU2?=
- =?utf-8?B?TmJPN0UybzVWRXpFS0RrbmVnbW1DMTc5aVMvcU8xMHlONmhCVm43Q2tsMUo0?=
- =?utf-8?B?elpESVJuYUpIR2VxbC9TbytwSEZNNzRlQi9oeng5S0VTSFZVNDdzMmtXQjlM?=
- =?utf-8?B?REhPR3VQa0EyMUNiNGhndDhxem5oS1pVcmtYbGhnM1kvRS9LVzBmelRyUDNn?=
- =?utf-8?B?eTZtV0hnSkcvMWVXU0VRWmVZUUhsaGZqUkszNGVBVUwxdHZxRGhPb2dRb0NL?=
- =?utf-8?B?Q1JORjdzdDJNY2xBRDV3SEpOQzA2Y25kOWVIb3REZUEwSnlJeW5wUWNpTmll?=
- =?utf-8?B?M0hMTnNuL1d2NEdlbExtaGkrOFZiZ3p1Q0NwbUtIWTZldkJTSUlBc0N5SE4r?=
- =?utf-8?B?NldBQkwwQWFlS1dzbUc5Vk1UdzBiVjM4bEtTN0w4MnFORGxkYTgwc0NiZGNh?=
- =?utf-8?B?NEhBQ240a3J6R25HekNQd2NCMGxZVmN2dU9PelVnV3Nmdk9obFZWZi9wK1pa?=
- =?utf-8?B?OGxZdEx0ejgxMVdmNWdkeHRtRkZDQ1Z2RVpGbE9yNUVpQzBiUExrZTljY05i?=
- =?utf-8?Q?tWKI=3D?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bcd10129-c6d3-48d3-bd13-08d9b4c10701
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9426.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2021 11:52:19.1705
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hGskQKR/eJSDmWmTLXbwUf75ntrWOTmPL8hvksaeYUIPL2cZ5tAETnYGNUfr8D7K
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8661
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12070; h=from:subject; bh=2R7rNGuET/rLWpMpWD51onEfSay6CK66QeUzkaAAJWk=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhp3npUCyJlVrzIGGOH8eTPz6DDaJr713I8cXrpGxr zXn8ZMCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYad56QAKCRCcnaoHP2RA2do8CA CZ512YYEl6bjWA2ZPF7JdyH9uNhlGWKfmiLp9n4Khi3/+xLxWjPRdZPHUrm570acietow3UXVMDiED pM1Iseu2dhSNs+bhA1UxQiipXJJKLLY756M3UZKG7xkO89RsXdSEobFffVZUdA5zgeSVKedB5VnjRG aow6u4kUt2kNregLSYKAEqSxVEQqkzggsVb/8685Uuk2k4gP4sdBKs7AdIJJGx6DsL7Dkw4/SIDPha fHye2z4iPylgPhr0WIii1ZcPDbZ7SMqQ11y9kgjn+RW5bZoOMF3gwUEi61VZj98OAOSkc0JY8xolHi tH+NjZLu/2GiIKi7sp0S9iNPFF/s9L
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+BFQ started crashing with 5.15-based kernels like:
 
+BUG: KASAN: use-after-free in rb_erase (lib/rbtree.c:262 lib/rbtr
+Read of size 8 at addr ffff888008193098 by task bash/1472
 
-On 2021/12/1 13:17, Qu Wenruo wrote:
-> Since block layer will advance bio::bi_iter, at endio time we can no
-> longer rely on bio::bi_iter for split bio.
-> 
-> But for the incoming btrfs_bio split at btrfs_map_bio() time, we have to
-> ensure endio function is only executed for the split range, not the
-> whole original bio.
-> 
-> Thus this patch will introduce a new helper, btrfs_bio_save_iter(), to
-> save bi_iter into btrfs_bio::iter.
-> 
-> The following call sites need this helper call:
-> 
-> - btrfs_submit_compressed_read()
->    For compressed read. For compressed write it doesn't really care as
->    they use ordered extent.
-> 
-> - raid56_parity_write()
-> - raid56_parity_recovery()
->    For RAID56.
-> 
-> - submit_stripe_bio()
->    For all other cases.
+CPU: 0 PID: 1472 Comm: bash Tainted: G            E     5.15.2-0.
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1
+Call Trace:
+rb_erase (lib/rbtree.c:262 lib/rbtree.c:445)
+bfq_idle_extract (block/bfq-wf2q.c:356)
+bfq_put_idle_entity (block/bfq-wf2q.c:660)
+bfq_bfqq_served (block/bfq-wf2q.c:833)
+bfq_dispatch_request (block/bfq-iosched.c:4870 block/bfq-iosched.
+__blk_mq_do_dispatch_sched (block/blk-mq-sched.c:150)
+__blk_mq_sched_dispatch_requests (block/blk-mq-sched.c:215 block/
+blk_mq_sched_dispatch_requests (block/blk-mq-sched.c:360)
+blk_mq_sched_insert_requests (include/linux/percpu-refcount.h:174
+blk_mq_flush_plug_list (include/linux/list.h:282 block/blk-mq.c:1
+blk_flush_plug_list (block/blk-core.c:1722)
+blk_finish_plug (block/blk-core.c:1745 block/blk-core.c:1739)
+read_pages (include/linux/list.h:282 mm/readahead.c:152)
+page_cache_ra_unbounded (mm/readahead.c:212 (discriminator 2))
+filemap_fault (mm/filemap.c:2982 mm/filemap.c:3074)
+__do_fault (mm/memory.c:3858)
+__handle_mm_fault (mm/memory.c:4182 mm/memory.c:4310 mm/memory.c:
+handle_mm_fault (mm/memory.c:4801)
 
-These are not enough.
+After some analysis we've found out that the culprit of the problem is
+that some task is reparented from cgroup G to the root cgroup and G is
+offlined. But a bfq_queue in task's IO context still points to G as its
+parent and thus when task submits more IO, G is inserted into service
+trees. Once the task exits and bfq_queue is destroyed, the last
+reference to G is dropped as well and G is freed but it is still linked
+from service trees causing use-after-free issues sometime later.
 
-There are cases where we allocate a bio but without going through 
-btrfs_map_bio(), and error out.
+Fix the problem by tracking all bfq_queues that point to a particular
+cgroup as their parent and reparent them when the cgroup is going
+offline.
 
-In that case, those bios don't have bbio::iter, and can cause errors in 
-generic/475 related to data/metadata writeback failure.
+CC: stable@vger.kernel.org
+Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
+Tested-by: Fabian Vogt <fvogt@suse.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/bfq-cgroup.c  | 100 ++++++--------------------------------------
+ block/bfq-iosched.c |  54 ++++++++++++------------
+ block/bfq-iosched.h |   6 +++
+ 3 files changed, 47 insertions(+), 113 deletions(-)
 
-Fixed in my github repo, by just adding more btrfs_bio_save_iter() calls 
-in error paths.
-
-Thanks,
-Qu
-> 
-> Signed-off-by: Qu Wenruo <wqu@suse.com>
-> ---
->   fs/btrfs/compression.c |  3 +++
->   fs/btrfs/raid56.c      |  2 ++
->   fs/btrfs/volumes.c     | 14 ++++++++++++++
->   fs/btrfs/volumes.h     | 18 ++++++++++++++++++
->   4 files changed, 37 insertions(+)
-> 
-> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-> index e776956d5bc9..cc8d13369f53 100644
-> --- a/fs/btrfs/compression.c
-> +++ b/fs/btrfs/compression.c
-> @@ -870,6 +870,9 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
->   	/* include any pages we added in add_ra-bio_pages */
->   	cb->len = bio->bi_iter.bi_size;
->   
-> +	/* Save bi_iter so that end_bio_extent_readpage() won't freak out. */
-> +	btrfs_bio_save_iter(btrfs_bio(bio));
-> +
->   	while (cur_disk_byte < disk_bytenr + compressed_len) {
->   		u64 offset = cur_disk_byte - disk_bytenr;
->   		unsigned int index = offset >> PAGE_SHIFT;
-> diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
-> index 0e239a4c3b26..13e726c88a81 100644
-> --- a/fs/btrfs/raid56.c
-> +++ b/fs/btrfs/raid56.c
-> @@ -1731,6 +1731,7 @@ int raid56_parity_write(struct bio *bio, struct btrfs_io_context *bioc,
->   		return PTR_ERR(rbio);
->   	}
->   	bio_list_add(&rbio->bio_list, bio);
-> +	btrfs_bio_save_iter(btrfs_bio(bio));
->   	rbio->bio_list_bytes = bio->bi_iter.bi_size;
->   	rbio->operation = BTRFS_RBIO_WRITE;
->   
-> @@ -2135,6 +2136,7 @@ int raid56_parity_recover(struct bio *bio, struct btrfs_io_context *bioc,
->   
->   	rbio->operation = BTRFS_RBIO_READ_REBUILD;
->   	bio_list_add(&rbio->bio_list, bio);
-> +	btrfs_bio_save_iter(btrfs_bio(bio));
->   	rbio->bio_list_bytes = bio->bi_iter.bi_size;
->   
->   	rbio->faila = find_logical_bio_stripe(rbio, bio);
-> diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-> index f38c230111be..b70037cc1a51 100644
-> --- a/fs/btrfs/volumes.c
-> +++ b/fs/btrfs/volumes.c
-> @@ -6829,6 +6829,20 @@ blk_status_t btrfs_map_bio(struct btrfs_fs_info *fs_info, struct bio *bio,
->   		BUG();
->   	}
->   
-> +	/*
-> +	 * At endio time, bi_iter is no longer reliable, thus we have to save
-> +	 * current bi_iter into btrfs_bio so that even for split bio we can
-> +	 * iterate only the split part.
-> +	 *
-> +	 * And this has to be done before any bioc error, as endio functions
-> +	 * will rely on bbio::iter.
-> +	 *
-> +	 * For bio create by btrfs_bio_slit() or btrfs_bio_clone*(), it's
-> +	 * already set, but we can still have original bio which has its
-> +	 * iter not initialized.
-> +	 */
-> +	btrfs_bio_save_iter(btrfs_bio(bio));
-> +
->   	for (dev_nr = 0; dev_nr < total_devs; dev_nr++) {
->   		dev = bioc->stripes[dev_nr].dev;
->   		if (!dev || !dev->bdev || test_bit(BTRFS_DEV_STATE_MISSING,
-> diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
-> index 3b8130680749..f9178d2c2fd6 100644
-> --- a/fs/btrfs/volumes.h
-> +++ b/fs/btrfs/volumes.h
-> @@ -334,6 +334,12 @@ struct btrfs_bio {
->   	struct btrfs_device *device;
->   	u8 *csum;
->   	u8 csum_inline[BTRFS_BIO_INLINE_CSUM_SIZE];
-> +	/*
-> +	 * Saved bio::bi_iter before submission.
-> +	 *
-> +	 * This allows us to interate the cloned/split bio properly, as at
-> +	 * endio time bio::bi_iter is no longer reliable.
-> +	 */
->   	struct bvec_iter iter;
->   
->   	/*
-> @@ -356,6 +362,18 @@ static inline void btrfs_bio_free_csum(struct btrfs_bio *bbio)
->   	}
->   }
->   
-> +/*
-> + * To save bbio::bio->bi_iter into bbio::iter so for callers who need the
-> + * original bi_iter can access the original part of the bio.
-> + * This is especially important for the incoming split btrfs_bio, which needs
-> + * to call its endio for and only for the split range.
-> + */
-> +static inline void btrfs_bio_save_iter(struct btrfs_bio *bbio)
-> +{
-> +	if (!bbio->iter.bi_size)
-> +		bbio->iter = bbio->bio.bi_iter;
-> +}
-> +
->   struct btrfs_io_stripe {
->   	struct btrfs_device *dev;
->   	u64 physical;
-> 
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 24a5c5329bcd..519e6291e98e 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -666,6 +666,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
+ 	else if (entity->on_st_or_in_serv)
+ 		bfq_put_idle_entity(bfq_entity_service_tree(entity), entity);
++	hlist_del(&bfqq->children_node);
+ 	bfqg_and_blkg_put(bfqq_group(bfqq));
+ 
+ 	if (entity->parent &&
+@@ -678,6 +679,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	entity->sched_data = &bfqg->sched_data;
+ 	/* pin down bfqg and its associated blkg  */
+ 	bfqg_and_blkg_get(bfqg);
++	hlist_add_head(&bfqq->children_node, &bfqg->children);
+ 
+ 	if (bfq_bfqq_busy(bfqq)) {
+ 		if (unlikely(!bfqd->nonrot_with_queueing))
+@@ -810,68 +812,13 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
+ 	rcu_read_unlock();
+ }
+ 
+-/**
+- * bfq_flush_idle_tree - deactivate any entity on the idle tree of @st.
+- * @st: the service tree being flushed.
+- */
+-static void bfq_flush_idle_tree(struct bfq_service_tree *st)
+-{
+-	struct bfq_entity *entity = st->first_idle;
+-
+-	for (; entity ; entity = st->first_idle)
+-		__bfq_deactivate_entity(entity, false);
+-}
+-
+-/**
+- * bfq_reparent_leaf_entity - move leaf entity to the root_group.
+- * @bfqd: the device data structure with the root group.
+- * @entity: the entity to move, if entity is a leaf; or the parent entity
+- *	    of an active leaf entity to move, if entity is not a leaf.
+- */
+-static void bfq_reparent_leaf_entity(struct bfq_data *bfqd,
+-				     struct bfq_entity *entity,
+-				     int ioprio_class)
++static void bfq_reparent_children(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ {
+ 	struct bfq_queue *bfqq;
+-	struct bfq_entity *child_entity = entity;
+-
+-	while (child_entity->my_sched_data) { /* leaf not reached yet */
+-		struct bfq_sched_data *child_sd = child_entity->my_sched_data;
+-		struct bfq_service_tree *child_st = child_sd->service_tree +
+-			ioprio_class;
+-		struct rb_root *child_active = &child_st->active;
+-
+-		child_entity = bfq_entity_of(rb_first(child_active));
+-
+-		if (!child_entity)
+-			child_entity = child_sd->in_service_entity;
+-	}
+-
+-	bfqq = bfq_entity_to_bfqq(child_entity);
+-	bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
+-}
+-
+-/**
+- * bfq_reparent_active_queues - move to the root group all active queues.
+- * @bfqd: the device data structure with the root group.
+- * @bfqg: the group to move from.
+- * @st: the service tree to start the search from.
+- */
+-static void bfq_reparent_active_queues(struct bfq_data *bfqd,
+-				       struct bfq_group *bfqg,
+-				       struct bfq_service_tree *st,
+-				       int ioprio_class)
+-{
+-	struct rb_root *active = &st->active;
+-	struct bfq_entity *entity;
+-
+-	while ((entity = bfq_entity_of(rb_first(active))))
+-		bfq_reparent_leaf_entity(bfqd, entity, ioprio_class);
++	struct hlist_node *next;
+ 
+-	if (bfqg->sched_data.in_service_entity)
+-		bfq_reparent_leaf_entity(bfqd,
+-					 bfqg->sched_data.in_service_entity,
+-					 ioprio_class);
++	hlist_for_each_entry_safe(bfqq, next, &bfqg->children, children_node)
++		bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
+ }
+ 
+ /**
+@@ -897,38 +844,17 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
+ 		goto put_async_queues;
+ 
+ 	/*
+-	 * Empty all service_trees belonging to this group before
+-	 * deactivating the group itself.
++	 * Reparent all bfqqs under this bfq group. This will also empty all
++	 * service_trees belonging to this group before deactivating the group
++	 * itself.
+ 	 */
++	bfq_reparent_children(bfqd, bfqg);
++
+ 	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++) {
+ 		st = bfqg->sched_data.service_tree + i;
+ 
+-		/*
+-		 * It may happen that some queues are still active
+-		 * (busy) upon group destruction (if the corresponding
+-		 * processes have been forced to terminate). We move
+-		 * all the leaf entities corresponding to these queues
+-		 * to the root_group.
+-		 * Also, it may happen that the group has an entity
+-		 * in service, which is disconnected from the active
+-		 * tree: it must be moved, too.
+-		 * There is no need to put the sync queues, as the
+-		 * scheduler has taken no reference.
+-		 */
+-		bfq_reparent_active_queues(bfqd, bfqg, st, i);
+-
+-		/*
+-		 * The idle tree may still contain bfq_queues
+-		 * belonging to exited task because they never
+-		 * migrated to a different cgroup from the one being
+-		 * destroyed now. In addition, even
+-		 * bfq_reparent_active_queues() may happen to add some
+-		 * entities to the idle tree. It happens if, in some
+-		 * of the calls to bfq_bfqq_move() performed by
+-		 * bfq_reparent_active_queues(), the queue to move is
+-		 * empty and gets expired.
+-		 */
+-		bfq_flush_idle_tree(st);
++		WARN_ON_ONCE(!RB_EMPTY_ROOT(&st->active));
++		WARN_ON_ONCE(!RB_EMPTY_ROOT(&st->idle));
+ 	}
+ 
+ 	__bfq_deactivate_entity(entity, false);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index fec18118dc30..8f33f6b91d05 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5163,6 +5163,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 	if (bfqq->bfqd && bfqq->bfqd->last_completed_rq_bfqq == bfqq)
+ 		bfqq->bfqd->last_completed_rq_bfqq = NULL;
+ 
++	hlist_del(&bfqq->children_node);
+ 	kmem_cache_free(bfq_pool, bfqq);
+ 	bfqg_and_blkg_put(bfqg);
+ }
+@@ -5337,8 +5338,9 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+ 		bfq_set_next_ioprio_data(bfqq, bic);
+ }
+ 
+-static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+-			  struct bfq_io_cq *bic, pid_t pid, int is_sync)
++static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_group *bfqg,
++			  struct bfq_queue *bfqq, struct bfq_io_cq *bic,
++			  pid_t pid, int is_sync)
+ {
+ 	u64 now_ns = ktime_get_ns();
+ 
+@@ -5347,6 +5349,7 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	INIT_HLIST_NODE(&bfqq->burst_list_node);
+ 	INIT_HLIST_NODE(&bfqq->woken_list_node);
+ 	INIT_HLIST_HEAD(&bfqq->woken_list);
++	hlist_add_head(&bfqq->children_node, &bfqg->children);
+ 
+ 	bfqq->ref = 0;
+ 	bfqq->bfqd = bfqd;
+@@ -5600,8 +5603,7 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
+ 				     bfqd->queue->node);
+ 
+ 	if (bfqq) {
+-		bfq_init_bfqq(bfqd, bfqq, bic, current->pid,
+-			      is_sync);
++		bfq_init_bfqq(bfqd, bfqg, bfqq, bic, current->pid, is_sync);
+ 		bfq_init_entity(&bfqq->entity, bfqg);
+ 		bfq_log_bfqq(bfqd, bfqq, "allocated");
+ 	} else {
+@@ -6908,6 +6910,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+ 
+ 	hrtimer_cancel(&bfqd->idle_slice_timer);
+ 
++	hlist_del(&bfqd->oom_bfqq.children_node);
+ 	/* release oom-queue reference to root group */
+ 	bfqg_and_blkg_put(bfqd->root_group);
+ 
+@@ -6959,28 +6962,6 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	q->elevator = eq;
+ 	spin_unlock_irq(&q->queue_lock);
+ 
+-	/*
+-	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
+-	 * Grab a permanent reference to it, so that the normal code flow
+-	 * will not attempt to free it.
+-	 */
+-	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, NULL, 1, 0);
+-	bfqd->oom_bfqq.ref++;
+-	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
+-	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
+-	bfqd->oom_bfqq.entity.new_weight =
+-		bfq_ioprio_to_weight(bfqd->oom_bfqq.new_ioprio);
+-
+-	/* oom_bfqq does not participate to bursts */
+-	bfq_clear_bfqq_just_created(&bfqd->oom_bfqq);
+-
+-	/*
+-	 * Trigger weight initialization, according to ioprio, at the
+-	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
+-	 * class won't be changed any more.
+-	 */
+-	bfqd->oom_bfqq.entity.prio_changed = 1;
+-
+ 	bfqd->queue = q;
+ 
+ 	INIT_LIST_HEAD(&bfqd->dispatch);
+@@ -7059,6 +7040,27 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 		goto out_free;
+ 	bfq_init_root_group(bfqd->root_group, bfqd);
+ 	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
++	/*
++	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
++	 * Grab a permanent reference to it, so that the normal code flow
++	 * will not attempt to free it.
++	 */
++	bfq_init_bfqq(bfqd, bfqd->root_group, &bfqd->oom_bfqq, NULL, 1, 0);
++	bfqd->oom_bfqq.ref++;
++	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
++	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
++	bfqd->oom_bfqq.entity.new_weight =
++		bfq_ioprio_to_weight(bfqd->oom_bfqq.new_ioprio);
++
++	/* oom_bfqq does not participate to bursts */
++	bfq_clear_bfqq_just_created(&bfqd->oom_bfqq);
++
++	/*
++	 * Trigger weight initialization, according to ioprio, at the
++	 * oom_bfqq's first activation. The oom_bfqq's ioprio and ioprio
++	 * class won't be changed any more.
++	 */
++	bfqd->oom_bfqq.entity.prio_changed = 1;
+ 
+ 	wbt_disable_default(q);
+ 	return 0;
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index a73488eec8a4..a1984959d6be 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -292,6 +292,9 @@ struct bfq_queue {
+ 
+ 	/* node for active/idle bfqq list inside parent bfqd */
+ 	struct list_head bfqq_list;
++	/* Member of parent's bfqg children list */
++	struct hlist_node children_node;
++
+ 
+ 	/* associated @bfq_ttime struct */
+ 	struct bfq_ttime ttime;
+@@ -929,6 +932,9 @@ struct bfq_group {
+ 	struct bfq_entity entity;
+ 	struct bfq_sched_data sched_data;
+ 
++	/* bfq_queues under this entity */
++	struct hlist_head children;
++
+ 	void *bfqd;
+ 
+ 	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
+-- 
+2.26.2
 
