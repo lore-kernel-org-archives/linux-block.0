@@ -2,108 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 749E5C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 09:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAAEC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 09:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348109AbhLAJDr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 04:03:47 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:45492 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236969AbhLAJDr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 04:03:47 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 664D0212B8;
-        Wed,  1 Dec 2021 09:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638349225; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DvU9WOqQxuHtnAuEXjV4GD1n4RLlFIXDYVXvgUC7354=;
-        b=1o3oGHPAOuUL4G7Vy+shm75HBgD+KsWoecUT6MIOS7ieR9j6A56puG7phFrfrBDvgX/WLZ
-        JhnZNALK4+qhJrhc0D0K6Mklv9LiKQ09QCJcmddxInIWN9exXlyoWPWxu67JliT/J670co
-        V+eT8R35rjCi+ulkfXc2haMYdMQRd4U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638349225;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DvU9WOqQxuHtnAuEXjV4GD1n4RLlFIXDYVXvgUC7354=;
-        b=ytoiF+w1Q5Bqi7iRUcq2kUzl4qToaIU1QEUc15cRA5pTr7AUJ2meaXtOp9g59HmhHli7tu
-        yHI4az2CbJ6VxLAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5819413BAA;
-        Wed,  1 Dec 2021 09:00:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sv5AFak5p2EYOwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 01 Dec 2021 09:00:25 +0000
-Subject: Re: [PATCH 0/7] docs: consolidate sysfs-block into Documentation/ABI/
-To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-doc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-References: <20211201084524.25660-1-ebiggers@kernel.org>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <91d14cdc-643c-58a8-37b7-af9d20747d2b@suse.de>
-Date:   Wed, 1 Dec 2021 10:00:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S1348206AbhLAJ3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 04:29:44 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:28207 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348199AbhLAJ3m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 04:29:42 -0500
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J3tvT1J3Mz8vnn;
+        Wed,  1 Dec 2021 17:24:21 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 1 Dec 2021 17:26:19 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 1 Dec 2021 17:26:18 +0800
+Subject: Re: [PATCH v2 2/2] block: cancel all throttled bios in del_gendisk()
+To:     Tejun Heo <tj@kernel.org>
+CC:     <hch@infradead.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20211130011730.2584339-1-yukuai3@huawei.com>
+ <20211130011730.2584339-3-yukuai3@huawei.com>
+ <YaZQqjjygHGFEdbx@slm.duckdns.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <a30bfafa-82ed-0ac1-deac-afb83f29c805@huawei.com>
+Date:   Wed, 1 Dec 2021 17:26:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20211201084524.25660-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <YaZQqjjygHGFEdbx@slm.duckdns.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/1/21 9:45 AM, Eric Biggers wrote:
-> This series consolidates the documentation for /sys/block/<disk>/queue/
-> into Documentation/ABI/, where it is supposed to go (as per Greg KH:
-> https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
+ÔÚ 2021/12/01 0:26, Tejun Heo Ð´µÀ:
+> Hello,
 > 
-> This series also updates MAINTAINERS to associate the block
-> documentation with the block layer.
+> On Tue, Nov 30, 2021 at 09:17:30AM +0800, Yu Kuai wrote:
+>> +void blk_throtl_cancel_bios(struct request_queue *q)
+>> +{
+>> +	struct throtl_data *td = q->td;
+>> +	struct blkcg_gq *blkg;
+>> +	struct cgroup_subsys_state *pos_css;
+>> +	struct bio *bio;
+>> +	int rw;
+>> +
+>> +	rcu_read_lock();
 > 
-> This series applies to linux-block/for-next.
-> 
-> Eric Biggers (7):
->   docs: sysfs-block: sort alphabetically
->   docs: sysfs-block: add contact for nomerges
->   docs: sysfs-block: fill in missing documentation from queue-sysfs.rst
->   docs: sysfs-block: document stable_writes
->   docs: sysfs-block: document virt_boundary_mask
->   docs: block: remove queue-sysfs.rst
->   MAINTAINERS: add entries for block layer documentation
-> 
->  Documentation/ABI/testing/sysfs-block | 766 ++++++++++++++++++--------
->  Documentation/block/index.rst         |   1 -
->  Documentation/block/queue-sysfs.rst   | 321 -----------
->  MAINTAINERS                           |   2 +
->  4 files changed, 545 insertions(+), 545 deletions(-)
->  delete mode 100644 Documentation/block/queue-sysfs.rst
-> 
-> 
-> base-commit: c2626d30f312afc341158e07bf088f5a23b4eeeb
-> 
-Yay.
+> So, all of the draining is being performed without holding the q lock, which
+> *might* be okay given that we're in the del_gendisk path but is likely risky
+> - ie. there can still be timers or whatever racing against it.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+I'll hold queue_lock to draining bios in next iteration,
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 NÃ¼rnberg
-HRB 36809 (AG NÃ¼rnberg), GF: Felix ImendÃ¶rffer
+Thanks,
+Kuai
+> 
+> Thanks.
+> 
