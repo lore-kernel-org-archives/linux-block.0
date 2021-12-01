@@ -2,43 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC552C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 08:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0B8C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 08:47:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242097AbhLAIuc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 03:50:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52010 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242116AbhLAIu2 (ORCPT
+        id S1348040AbhLAIub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 03:50:31 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:44302 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235121AbhLAIu2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 03:50:28 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A35F5C061748;
-        Wed,  1 Dec 2021 00:47:07 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 9A3CDCE1D93;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9D8BBB81E02;
+        Wed,  1 Dec 2021 08:47:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ECC1C53FD2;
         Wed,  1 Dec 2021 08:47:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 929F8C53FCC;
-        Wed,  1 Dec 2021 08:47:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638348423;
-        bh=WbKTeCRnxW9Ttmyl/8kUYqs6+/857mqJZxSpNXy7dBI=;
+        s=k20201202; t=1638348425;
+        bh=P5+NXg5HMcIdPPlWbNAW89KB6/B8KR+od0PmtwzgInY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aVoU8YohSHaXAY+Ev00Fwo2/IvZ7tLMon27ZNFJ6UOti0tyFcahym1m28NzZ509YE
-         w6WZC4XgU+TTjTDyI92GH6vBqeBkEo28JQwJP0luWm9KvmpeFBWfk5ow/415XG8aMV
-         Q2AKbnm0P+gEOGKClp3A/vXVVGSkOmgZQdkN/13+A0mt6IWQ3VoW/AnL+rp4fNwBMg
-         Pv9Q1NvXF3bGaZg9Gk+1WFN/HR4bflmHPhqqKMMp48PXOrW4rOeg8etWcSswcBrCAv
-         uWE3+g+zXxruO+tCAtgTAIdPCaMfyvT6y5QUnC97m5hITjrhBPEYDP8sLhZYEb/Tg/
-         kBQQ8vcETsJIQ==
+        b=nf1mFnU+YcmvlN4Ep9gMRdKpVvamU9bJu7XbIfwOsR7NvGrzQhQ5TCT5F30O30R7s
+         OJnwy9DwRij5XIjQm2SQb+Em8J3rsxBkamHvf7gRpERBciQduwxzP0WbXMkdIY94Oo
+         YXoF/nEYaqGS7+99/pfwNsjlOtD22dJJXPehKUWiY0B6+WgeoKxu3+AaXscIW2f5DS
+         m+P/+6aaHOv61es+eDuU02gHP67gAVTsDdu4v6U0DqN6N0sNx+Rlrk6vVAZNzb6NOT
+         Es0TxNvVs0tSwrNox53WX82dtzPXf4fOAoDxhFBLIilp2O2+EW4vt/6TWgCDkWSIG5
+         WLJ4Xu2OPXGsg==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-doc@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/7] docs: sysfs-block: sort alphabetically
-Date:   Wed,  1 Dec 2021 00:45:18 -0800
-Message-Id: <20211201084524.25660-2-ebiggers@kernel.org>
+Subject: [PATCH 6/7] docs: block: remove queue-sysfs.rst
+Date:   Wed,  1 Dec 2021 00:45:23 -0800
+Message-Id: <20211201084524.25660-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20211201084524.25660-1-ebiggers@kernel.org>
 References: <20211201084524.25660-1-ebiggers@kernel.org>
@@ -50,506 +47,355 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Sort the documentation for the files alphabetically by file path so that
-there is a logical order and it's clear where to add new files.
-
-With two small exceptions, this patch doesn't change the documentation
-itself and just reorders it:
-
-- In /sys/block/<disk>/<part>/stat, I replaced <part> with <partition>
-  to be consistent with the other files.
-- The description for /sys/block/<disk>/<part>/stat referred to another
-  file "above", which I reworded.
+This has been replaced by Documentation/ABI/testing/sysfs-block, which
+is the correct place for sysfs documentation.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- Documentation/ABI/testing/sysfs-block | 385 ++++++++++++++------------
- 1 file changed, 203 insertions(+), 182 deletions(-)
+ Documentation/block/index.rst       |   1 -
+ Documentation/block/queue-sysfs.rst | 321 ----------------------------
+ 2 files changed, 322 deletions(-)
+ delete mode 100644 Documentation/block/queue-sysfs.rst
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index b16b0c45a272e..9febd53a5ebe8 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -1,31 +1,37 @@
--What:		/sys/block/<disk>/stat
--Date:		February 2008
--Contact:	Jerome Marchand <jmarchan@redhat.com>
-+What:		/sys/block/<disk>/alignment_offset
-+Date:		April 2009
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
- Description:
--		The /sys/block/<disk>/stat files displays the I/O
--		statistics of disk <disk>. They contain 11 fields:
-+		Storage devices may report a physical block size that is
-+		bigger than the logical block size (for instance a drive
-+		with 4KB physical sectors exposing 512-byte logical
-+		blocks to the operating system).  This parameter
-+		indicates how many bytes the beginning of the device is
-+		offset from the disk's natural alignment.
- 
--		==  ==============================================
--		 1  reads completed successfully
--		 2  reads merged
--		 3  sectors read
--		 4  time spent reading (ms)
--		 5  writes completed
--		 6  writes merged
--		 7  sectors written
--		 8  time spent writing (ms)
--		 9  I/Os currently in progress
--		10  time spent doing I/Os (ms)
--		11  weighted time spent doing I/Os (ms)
--		12  discards completed
--		13  discards merged
--		14  sectors discarded
--		15  time spent discarding (ms)
--		16  flush requests completed
--		17  time spent flushing (ms)
--		==  ==============================================
- 
--		For more details refer Documentation/admin-guide/iostats.rst
-+What:		/sys/block/<disk>/discard_alignment
-+Date:		May 2011
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-+Description:
-+		Devices that support discard functionality may
-+		internally allocate space in units that are bigger than
-+		the exported logical block size. The discard_alignment
-+		parameter indicates how many bytes the beginning of the
-+		device is offset from the internal allocation unit's
-+		natural alignment.
-+
-+
-+What:		/sys/block/<disk>/diskseq
-+Date:		February 2021
-+Contact:	Matteo Croce <mcroce@microsoft.com>
-+Description:
-+		The /sys/block/<disk>/diskseq files reports the disk
-+		sequence number, which is a monotonically increasing
-+		number assigned to every drive.
-+		Some devices, like the loop device, refresh such number
-+		every time the backing file is changed.
-+		The value type is 64 bit unsigned.
- 
- 
- What:		/sys/block/<disk>/inflight
-@@ -44,26 +50,12 @@ Description:
- 		and for SCSI device also its queue_depth.
- 
- 
--What:		/sys/block/<disk>/diskseq
--Date:		February 2021
--Contact:	Matteo Croce <mcroce@microsoft.com>
--Description:
--		The /sys/block/<disk>/diskseq files reports the disk
--		sequence number, which is a monotonically increasing
--		number assigned to every drive.
--		Some devices, like the loop device, refresh such number
--		every time the backing file is changed.
--		The value type is 64 bit unsigned.
+diff --git a/Documentation/block/index.rst b/Documentation/block/index.rst
+index 86dcf7159f990..3a41495dd77b5 100644
+--- a/Documentation/block/index.rst
++++ b/Documentation/block/index.rst
+@@ -20,7 +20,6 @@ Block
+    kyber-iosched
+    null_blk
+    pr
+-   queue-sysfs
+    request
+    stat
+    switching-sched
+diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
+deleted file mode 100644
+index 3f569d5324857..0000000000000
+--- a/Documentation/block/queue-sysfs.rst
++++ /dev/null
+@@ -1,321 +0,0 @@
+-=================
+-Queue sysfs files
+-=================
 -
+-This text file will detail the queue files that are located in the sysfs tree
+-for each block device. Note that stacked devices typically do not export
+-any settings, since their queue merely functions as a remapping target.
+-These files are the ones found in the /sys/block/xxx/queue/ directory.
 -
--What:		/sys/block/<disk>/<part>/stat
--Date:		February 2008
--Contact:	Jerome Marchand <jmarchan@redhat.com>
-+What:		/sys/block/<disk>/integrity/device_is_integrity_capable
-+Date:		July 2014
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
- Description:
--		The /sys/block/<disk>/<part>/stat files display the
--		I/O statistics of partition <part>. The format is the
--		same as the above-written /sys/block/<disk>/stat
--		format.
-+		Indicates whether a storage device is capable of storing
-+		integrity metadata. Set if the device is T10 PI-capable.
- 
- 
- What:		/sys/block/<disk>/integrity/format
-@@ -74,6 +66,15 @@ Description:
- 		E.g. T10-DIF-TYPE1-CRC.
- 
- 
-+What:		/sys/block/<disk>/integrity/protection_interval_bytes
-+Date:		July 2015
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-+Description:
-+		Describes the number of data bytes which are protected
-+		by one integrity tuple. Typically the device's logical
-+		block size.
-+
-+
- What:		/sys/block/<disk>/integrity/read_verify
- Date:		June 2008
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-@@ -91,21 +92,6 @@ Description:
- 		512 bytes of data.
- 
- 
--What:		/sys/block/<disk>/integrity/device_is_integrity_capable
--Date:		July 2014
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		Indicates whether a storage device is capable of storing
--		integrity metadata. Set if the device is T10 PI-capable.
+-Files denoted with a RO postfix are readonly and the RW postfix means
+-read-write.
 -
--What:		/sys/block/<disk>/integrity/protection_interval_bytes
--Date:		July 2015
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		Describes the number of data bytes which are protected
--		by one integrity tuple. Typically the device's logical
--		block size.
+-add_random (RW)
+----------------
+-This file allows to turn off the disk entropy contribution. Default
+-value of this file is '1'(on).
 -
- What:		/sys/block/<disk>/integrity/write_generate
- Date:		June 2008
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-@@ -114,16 +100,6 @@ Description:
- 		generate checksums for write requests bound for
- 		devices that support receiving integrity metadata.
- 
--What:		/sys/block/<disk>/alignment_offset
--Date:		April 2009
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		Storage devices may report a physical block size that is
--		bigger than the logical block size (for instance a drive
--		with 4KB physical sectors exposing 512-byte logical
--		blocks to the operating system).  This parameter
--		indicates how many bytes the beginning of the device is
--		offset from the disk's natural alignment.
- 
- What:		/sys/block/<disk>/<partition>/alignment_offset
- Date:		April 2009
-@@ -136,76 +112,6 @@ Description:
- 		indicates how many bytes the beginning of the partition
- 		is offset from the disk's natural alignment.
- 
--What:		/sys/block/<disk>/queue/logical_block_size
--Date:		May 2009
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		This is the smallest unit the storage device can
--		address.  It is typically 512 bytes.
+-chunk_sectors (RO)
+-------------------
+-This has different meaning depending on the type of the block device.
+-For a RAID device (dm-raid), chunk_sectors indicates the size in 512B sectors
+-of the RAID volume stripe segment. For a zoned block device, either host-aware
+-or host-managed, chunk_sectors indicates the size in 512B sectors of the zones
+-of the device, with the eventual exception of the last zone of the device which
+-may be smaller.
 -
--What:		/sys/block/<disk>/queue/physical_block_size
--Date:		May 2009
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		This is the smallest unit a physical storage device can
--		write atomically.  It is usually the same as the logical
--		block size but may be bigger.  One example is SATA
--		drives with 4KB sectors that expose a 512-byte logical
--		block size to the operating system.  For stacked block
--		devices the physical_block_size variable contains the
--		maximum physical_block_size of the component devices.
+-dax (RO)
+---------
+-This file indicates whether the device supports Direct Access (DAX),
+-used by CPU-addressable storage to bypass the pagecache.  It shows '1'
+-if true, '0' if not.
 -
--What:		/sys/block/<disk>/queue/minimum_io_size
--Date:		April 2009
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		Storage devices may report a granularity or preferred
--		minimum I/O size which is the smallest request the
--		device can perform without incurring a performance
--		penalty.  For disk drives this is often the physical
--		block size.  For RAID arrays it is often the stripe
--		chunk size.  A properly aligned multiple of
--		minimum_io_size is the preferred request size for
--		workloads where a high number of I/O operations is
--		desired.
+-discard_granularity (RO)
+-------------------------
+-This shows the size of internal allocation of the device in bytes, if
+-reported by the device. A value of '0' means device does not support
+-the discard functionality.
 -
--What:		/sys/block/<disk>/queue/optimal_io_size
--Date:		April 2009
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		Storage devices may report an optimal I/O size, which is
--		the device's preferred unit for sustained I/O.  This is
--		rarely reported for disk drives.  For RAID arrays it is
--		usually the stripe width or the internal track size.  A
--		properly aligned multiple of optimal_io_size is the
--		preferred request size for workloads where sustained
--		throughput is desired.  If no optimal I/O size is
--		reported this file contains 0.
+-discard_max_hw_bytes (RO)
+--------------------------
+-Devices that support discard functionality may have internal limits on
+-the number of bytes that can be trimmed or unmapped in a single operation.
+-The `discard_max_hw_bytes` parameter is set by the device driver to the
+-maximum number of bytes that can be discarded in a single operation.
+-Discard requests issued to the device must not exceed this limit.
+-A `discard_max_hw_bytes` value of 0 means that the device does not support
+-discard functionality.
 -
--What:		/sys/block/<disk>/queue/nomerges
--Date:		January 2010
--Contact:
--Description:
--		Standard I/O elevator operations include attempts to
--		merge contiguous I/Os. For known random I/O loads these
--		attempts will always fail and result in extra cycles
--		being spent in the kernel. This allows one to turn off
--		this behavior on one of two ways: When set to 1, complex
--		merge checks are disabled, but the simple one-shot merges
--		with the previous I/O request are enabled. When set to 2,
--		all merge tries are disabled. The default value is 0 -
--		which enables all types of merge tries.
+-discard_max_bytes (RW)
+-----------------------
+-While discard_max_hw_bytes is the hardware limit for the device, this
+-setting is the software limit. Some devices exhibit large latencies when
+-large discards are issued, setting this value lower will make Linux issue
+-smaller discards and potentially help reduce latencies induced by large
+-discard operations.
 -
--What:		/sys/block/<disk>/discard_alignment
--Date:		May 2011
--Contact:	Martin K. Petersen <martin.petersen@oracle.com>
--Description:
--		Devices that support discard functionality may
--		internally allocate space in units that are bigger than
--		the exported logical block size. The discard_alignment
--		parameter indicates how many bytes the beginning of the
--		device is offset from the internal allocation unit's
--		natural alignment.
- 
- What:		/sys/block/<disk>/<partition>/discard_alignment
- Date:		May 2011
-@@ -218,6 +124,30 @@ Description:
- 		partition is offset from the internal allocation unit's
- 		natural alignment.
- 
-+
-+What:		/sys/block/<disk>/<partition>/stat
-+Date:		February 2008
-+Contact:	Jerome Marchand <jmarchan@redhat.com>
-+Description:
-+		The /sys/block/<disk>/<partition>/stat files display the
-+		I/O statistics of partition <partition>. The format is the
-+		same as the format of /sys/block/<disk>/stat.
-+
-+
-+What:		/sys/block/<disk>/queue/chunk_sectors
-+Date:		September 2016
-+Contact:	Hannes Reinecke <hare@suse.com>
-+Description:
-+		chunk_sectors has different meaning depending on the type
-+		of the disk. For a RAID device (dm-raid), chunk_sectors
-+		indicates the size in 512B sectors of the RAID volume
-+		stripe segment. For a zoned block device, either
-+		host-aware or host-managed, chunk_sectors indicates the
-+		size in 512B sectors of the zones of the device, with
-+		the eventual exception of the last zone of the device
-+		which may be smaller.
-+
-+
- What:		/sys/block/<disk>/queue/discard_granularity
- Date:		May 2011
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-@@ -231,6 +161,7 @@ Description:
- 		physical block size. A discard_granularity of 0 means
- 		that the device does not support discard functionality.
- 
-+
- What:		/sys/block/<disk>/queue/discard_max_bytes
- Date:		May 2011
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-@@ -247,6 +178,7 @@ Description:
- 		value of 0 means that the device does not support
- 		discard functionality.
- 
-+
- What:		/sys/block/<disk>/queue/discard_zeroes_data
- Date:		May 2011
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-@@ -254,6 +186,111 @@ Description:
- 		Will always return 0.  Don't rely on any specific behavior
- 		for discards, and don't read this file.
- 
-+
-+What:		/sys/block/<disk>/queue/io_timeout
-+Date:		November 2018
-+Contact:	Weiping Zhang <zhangweiping@didiglobal.com>
-+Description:
-+		io_timeout is the request timeout in milliseconds. If a request
-+		does not complete in this time then the block driver timeout
-+		handler is invoked. That timeout handler can decide to retry
-+		the request, to fail it or to start a device recovery strategy.
-+
-+
-+What:		/sys/block/<disk>/queue/logical_block_size
-+Date:		May 2009
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-+Description:
-+		This is the smallest unit the storage device can
-+		address.  It is typically 512 bytes.
-+
-+
-+What:		/sys/block/<disk>/queue/max_active_zones
-+Date:		July 2020
-+Contact:	Niklas Cassel <niklas.cassel@wdc.com>
-+Description:
-+		For zoned block devices (zoned attribute indicating
-+		"host-managed" or "host-aware"), the sum of zones belonging to
-+		any of the zone states: EXPLICIT OPEN, IMPLICIT OPEN or CLOSED,
-+		is limited by this value. If this value is 0, there is no limit.
-+
-+
-+What:		/sys/block/<disk>/queue/max_open_zones
-+Date:		July 2020
-+Contact:	Niklas Cassel <niklas.cassel@wdc.com>
-+Description:
-+		For zoned block devices (zoned attribute indicating
-+		"host-managed" or "host-aware"), the sum of zones belonging to
-+		any of the zone states: EXPLICIT OPEN or IMPLICIT OPEN,
-+		is limited by this value. If this value is 0, there is no limit.
-+
-+
-+What:		/sys/block/<disk>/queue/minimum_io_size
-+Date:		April 2009
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-+Description:
-+		Storage devices may report a granularity or preferred
-+		minimum I/O size which is the smallest request the
-+		device can perform without incurring a performance
-+		penalty.  For disk drives this is often the physical
-+		block size.  For RAID arrays it is often the stripe
-+		chunk size.  A properly aligned multiple of
-+		minimum_io_size is the preferred request size for
-+		workloads where a high number of I/O operations is
-+		desired.
-+
-+
-+What:		/sys/block/<disk>/queue/nomerges
-+Date:		January 2010
-+Contact:
-+Description:
-+		Standard I/O elevator operations include attempts to
-+		merge contiguous I/Os. For known random I/O loads these
-+		attempts will always fail and result in extra cycles
-+		being spent in the kernel. This allows one to turn off
-+		this behavior on one of two ways: When set to 1, complex
-+		merge checks are disabled, but the simple one-shot merges
-+		with the previous I/O request are enabled. When set to 2,
-+		all merge tries are disabled. The default value is 0 -
-+		which enables all types of merge tries.
-+
-+
-+What:		/sys/block/<disk>/queue/nr_zones
-+Date:		November 2018
-+Contact:	Damien Le Moal <damien.lemoal@wdc.com>
-+Description:
-+		nr_zones indicates the total number of zones of a zoned block
-+		device ("host-aware" or "host-managed" zone model). For regular
-+		block devices, the value is always 0.
-+
-+
-+What:		/sys/block/<disk>/queue/optimal_io_size
-+Date:		April 2009
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-+Description:
-+		Storage devices may report an optimal I/O size, which is
-+		the device's preferred unit for sustained I/O.  This is
-+		rarely reported for disk drives.  For RAID arrays it is
-+		usually the stripe width or the internal track size.  A
-+		properly aligned multiple of optimal_io_size is the
-+		preferred request size for workloads where sustained
-+		throughput is desired.  If no optimal I/O size is
-+		reported this file contains 0.
-+
-+
-+What:		/sys/block/<disk>/queue/physical_block_size
-+Date:		May 2009
-+Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-+Description:
-+		This is the smallest unit a physical storage device can
-+		write atomically.  It is usually the same as the logical
-+		block size but may be bigger.  One example is SATA
-+		drives with 4KB sectors that expose a 512-byte logical
-+		block size to the operating system.  For stacked block
-+		devices the physical_block_size variable contains the
-+		maximum physical_block_size of the component devices.
-+
-+
- What:		/sys/block/<disk>/queue/write_same_max_bytes
- Date:		January 2012
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-@@ -267,6 +304,7 @@ Description:
- 		write_same_max_bytes is 0, write same is not supported
- 		by the device.
- 
-+
- What:		/sys/block/<disk>/queue/write_zeroes_max_bytes
- Date:		November 2016
- Contact:	Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-@@ -280,6 +318,7 @@ Description:
- 		write_zeroes_max_bytes is 0, write zeroes is not supported
- 		by the device.
- 
-+
- What:		/sys/block/<disk>/queue/zoned
- Date:		September 2016
- Contact:	Damien Le Moal <damien.lemoal@wdc.com>
-@@ -297,50 +336,32 @@ Description:
- 		zone commands, they will be treated as regular block
- 		devices and zoned will report "none".
- 
--What:		/sys/block/<disk>/queue/nr_zones
--Date:		November 2018
--Contact:	Damien Le Moal <damien.lemoal@wdc.com>
--Description:
--		nr_zones indicates the total number of zones of a zoned block
--		device ("host-aware" or "host-managed" zone model). For regular
--		block devices, the value is always 0.
- 
--What:		/sys/block/<disk>/queue/max_active_zones
--Date:		July 2020
--Contact:	Niklas Cassel <niklas.cassel@wdc.com>
--Description:
--		For zoned block devices (zoned attribute indicating
--		"host-managed" or "host-aware"), the sum of zones belonging to
--		any of the zone states: EXPLICIT OPEN, IMPLICIT OPEN or CLOSED,
--		is limited by this value. If this value is 0, there is no limit.
+-discard_zeroes_data (RO)
+-------------------------
+-Obsolete. Always zero.
 -
--What:		/sys/block/<disk>/queue/max_open_zones
--Date:		July 2020
--Contact:	Niklas Cassel <niklas.cassel@wdc.com>
-+What:		/sys/block/<disk>/stat
-+Date:		February 2008
-+Contact:	Jerome Marchand <jmarchan@redhat.com>
- Description:
--		For zoned block devices (zoned attribute indicating
--		"host-managed" or "host-aware"), the sum of zones belonging to
--		any of the zone states: EXPLICIT OPEN or IMPLICIT OPEN,
--		is limited by this value. If this value is 0, there is no limit.
-+		The /sys/block/<disk>/stat files displays the I/O
-+		statistics of disk <disk>. They contain 11 fields:
- 
--What:		/sys/block/<disk>/queue/chunk_sectors
--Date:		September 2016
--Contact:	Hannes Reinecke <hare@suse.com>
--Description:
--		chunk_sectors has different meaning depending on the type
--		of the disk. For a RAID device (dm-raid), chunk_sectors
--		indicates the size in 512B sectors of the RAID volume
--		stripe segment. For a zoned block device, either
--		host-aware or host-managed, chunk_sectors indicates the
--		size in 512B sectors of the zones of the device, with
--		the eventual exception of the last zone of the device
--		which may be smaller.
-+		==  ==============================================
-+		 1  reads completed successfully
-+		 2  reads merged
-+		 3  sectors read
-+		 4  time spent reading (ms)
-+		 5  writes completed
-+		 6  writes merged
-+		 7  sectors written
-+		 8  time spent writing (ms)
-+		 9  I/Os currently in progress
-+		10  time spent doing I/Os (ms)
-+		11  weighted time spent doing I/Os (ms)
-+		12  discards completed
-+		13  discards merged
-+		14  sectors discarded
-+		15  time spent discarding (ms)
-+		16  flush requests completed
-+		17  time spent flushing (ms)
-+		==  ==============================================
- 
--What:		/sys/block/<disk>/queue/io_timeout
--Date:		November 2018
--Contact:	Weiping Zhang <zhangweiping@didiglobal.com>
--Description:
--		io_timeout is the request timeout in milliseconds. If a request
--		does not complete in this time then the block driver timeout
--		handler is invoked. That timeout handler can decide to retry
--		the request, to fail it or to start a device recovery strategy.
-+		For more details refer Documentation/admin-guide/iostats.rst
-
-base-commit: c2626d30f312afc341158e07bf088f5a23b4eeeb
+-fua (RO)
+---------
+-Whether or not the block driver supports the FUA flag for write requests.
+-FUA stands for Force Unit Access. If the FUA flag is set that means that
+-write requests must bypass the volatile cache of the storage device.
+-
+-hw_sector_size (RO)
+--------------------
+-This is the hardware sector size of the device, in bytes.
+-
+-io_poll (RW)
+-------------
+-When read, this file shows whether polling is enabled (1) or disabled
+-(0).  Writing '0' to this file will disable polling for this device.
+-Writing any non-zero value will enable this feature.
+-
+-io_poll_delay (RW)
+-------------------
+-If polling is enabled, this controls what kind of polling will be
+-performed. It defaults to -1, which is classic polling. In this mode,
+-the CPU will repeatedly ask for completions without giving up any time.
+-If set to 0, a hybrid polling mode is used, where the kernel will attempt
+-to make an educated guess at when the IO will complete. Based on this
+-guess, the kernel will put the process issuing IO to sleep for an amount
+-of time, before entering a classic poll loop. This mode might be a
+-little slower than pure classic polling, but it will be more efficient.
+-If set to a value larger than 0, the kernel will put the process issuing
+-IO to sleep for this amount of microseconds before entering classic
+-polling.
+-
+-io_timeout (RW)
+----------------
+-io_timeout is the request timeout in milliseconds. If a request does not
+-complete in this time then the block driver timeout handler is invoked.
+-That timeout handler can decide to retry the request, to fail it or to start
+-a device recovery strategy.
+-
+-iostats (RW)
+--------------
+-This file is used to control (on/off) the iostats accounting of the
+-disk.
+-
+-logical_block_size (RO)
+------------------------
+-This is the logical block size of the device, in bytes.
+-
+-max_discard_segments (RO)
+--------------------------
+-The maximum number of DMA scatter/gather entries in a discard request.
+-
+-max_hw_sectors_kb (RO)
+-----------------------
+-This is the maximum number of kilobytes supported in a single data transfer.
+-
+-max_integrity_segments (RO)
+----------------------------
+-Maximum number of elements in a DMA scatter/gather list with integrity
+-data that will be submitted by the block layer core to the associated
+-block driver.
+-
+-max_active_zones (RO)
+----------------------
+-For zoned block devices (zoned attribute indicating "host-managed" or
+-"host-aware"), the sum of zones belonging to any of the zone states:
+-EXPLICIT OPEN, IMPLICIT OPEN or CLOSED, is limited by this value.
+-If this value is 0, there is no limit.
+-
+-If the host attempts to exceed this limit, the driver should report this error
+-with BLK_STS_ZONE_ACTIVE_RESOURCE, which user space may see as the EOVERFLOW
+-errno.
+-
+-max_open_zones (RO)
+--------------------
+-For zoned block devices (zoned attribute indicating "host-managed" or
+-"host-aware"), the sum of zones belonging to any of the zone states:
+-EXPLICIT OPEN or IMPLICIT OPEN, is limited by this value.
+-If this value is 0, there is no limit.
+-
+-If the host attempts to exceed this limit, the driver should report this error
+-with BLK_STS_ZONE_OPEN_RESOURCE, which user space may see as the ETOOMANYREFS
+-errno.
+-
+-max_sectors_kb (RW)
+--------------------
+-This is the maximum number of kilobytes that the block layer will allow
+-for a filesystem request. Must be smaller than or equal to the maximum
+-size allowed by the hardware.
+-
+-max_segments (RO)
+------------------
+-Maximum number of elements in a DMA scatter/gather list that is submitted
+-to the associated block driver.
+-
+-max_segment_size (RO)
+----------------------
+-Maximum size in bytes of a single element in a DMA scatter/gather list.
+-
+-minimum_io_size (RO)
+---------------------
+-This is the smallest preferred IO size reported by the device.
+-
+-nomerges (RW)
+--------------
+-This enables the user to disable the lookup logic involved with IO
+-merging requests in the block layer. By default (0) all merges are
+-enabled. When set to 1 only simple one-hit merges will be tried. When
+-set to 2 no merge algorithms will be tried (including one-hit or more
+-complex tree/hash lookups).
+-
+-nr_requests (RW)
+-----------------
+-This controls how many requests may be allocated in the block layer for
+-read or write requests. Note that the total allocated number may be twice
+-this amount, since it applies only to reads or writes (not the accumulated
+-sum).
+-
+-To avoid priority inversion through request starvation, a request
+-queue maintains a separate request pool per each cgroup when
+-CONFIG_BLK_CGROUP is enabled, and this parameter applies to each such
+-per-block-cgroup request pool.  IOW, if there are N block cgroups,
+-each request queue may have up to N request pools, each independently
+-regulated by nr_requests.
+-
+-nr_zones (RO)
+--------------
+-For zoned block devices (zoned attribute indicating "host-managed" or
+-"host-aware"), this indicates the total number of zones of the device.
+-This is always 0 for regular block devices.
+-
+-optimal_io_size (RO)
+---------------------
+-This is the optimal IO size reported by the device.
+-
+-physical_block_size (RO)
+-------------------------
+-This is the physical block size of device, in bytes.
+-
+-read_ahead_kb (RW)
+-------------------
+-Maximum number of kilobytes to read-ahead for filesystems on this block
+-device.
+-
+-rotational (RW)
+----------------
+-This file is used to stat if the device is of rotational type or
+-non-rotational type.
+-
+-rq_affinity (RW)
+-----------------
+-If this option is '1', the block layer will migrate request completions to the
+-cpu "group" that originally submitted the request. For some workloads this
+-provides a significant reduction in CPU cycles due to caching effects.
+-
+-For storage configurations that need to maximize distribution of completion
+-processing setting this option to '2' forces the completion to run on the
+-requesting cpu (bypassing the "group" aggregation logic).
+-
+-scheduler (RW)
+---------------
+-When read, this file will display the current and available IO schedulers
+-for this block device. The currently active IO scheduler will be enclosed
+-in [] brackets. Writing an IO scheduler name to this file will switch
+-control of this block device to that new IO scheduler. Note that writing
+-an IO scheduler name to this file will attempt to load that IO scheduler
+-module, if it isn't already present in the system.
+-
+-write_cache (RW)
+-----------------
+-When read, this file will display whether the device has write back
+-caching enabled or not. It will return "write back" for the former
+-case, and "write through" for the latter. Writing to this file can
+-change the kernels view of the device, but it doesn't alter the
+-device state. This means that it might not be safe to toggle the
+-setting from "write back" to "write through", since that will also
+-eliminate cache flushes issued by the kernel.
+-
+-write_same_max_bytes (RO)
+--------------------------
+-This is the number of bytes the device can write in a single write-same
+-command.  A value of '0' means write-same is not supported by this
+-device.
+-
+-wbt_lat_usec (RW)
+------------------
+-If the device is registered for writeback throttling, then this file shows
+-the target minimum read latency. If this latency is exceeded in a given
+-window of time (see wb_window_usec), then the writeback throttling will start
+-scaling back writes. Writing a value of '0' to this file disables the
+-feature. Writing a value of '-1' to this file resets the value to the
+-default setting.
+-
+-throttle_sample_time (RW)
+--------------------------
+-This is the time window that blk-throttle samples data, in millisecond.
+-blk-throttle makes decision based on the samplings. Lower time means cgroups
+-have more smooth throughput, but higher CPU overhead. This exists only when
+-CONFIG_BLK_DEV_THROTTLING_LOW is enabled.
+-
+-write_zeroes_max_bytes (RO)
+----------------------------
+-For block drivers that support REQ_OP_WRITE_ZEROES, the maximum number of
+-bytes that can be zeroed at once. The value 0 means that REQ_OP_WRITE_ZEROES
+-is not supported.
+-
+-zone_append_max_bytes (RO)
+---------------------------
+-This is the maximum number of bytes that can be written to a sequential
+-zone of a zoned block device using a zone append write operation
+-(REQ_OP_ZONE_APPEND). This value is always 0 for regular block devices.
+-
+-zoned (RO)
+-----------
+-This indicates if the device is a zoned block device and the zone model of the
+-device if it is indeed zoned. The possible values indicated by zoned are
+-"none" for regular block devices and "host-aware" or "host-managed" for zoned
+-block devices. The characteristics of host-aware and host-managed zoned block
+-devices are described in the ZBC (Zoned Block Commands) and ZAC
+-(Zoned Device ATA Command Set) standards. These standards also define the
+-"drive-managed" zone model. However, since drive-managed zoned block devices
+-do not support zone commands, they will be treated as regular block devices
+-and zoned will report "none".
+-
+-zone_write_granularity (RO)
+----------------------------
+-This indicates the alignment constraint, in bytes, for write operations in
+-sequential zones of zoned block devices (devices with a zoned attributed
+-that reports "host-managed" or "host-aware"). This value is always 0 for
+-regular block devices.
+-
+-independent_access_ranges (RO)
+-------------------------------
+-
+-The presence of this sub-directory of the /sys/block/xxx/queue/ directory
+-indicates that the device is capable of executing requests targeting
+-different sector ranges in parallel. For instance, single LUN multi-actuator
+-hard-disks will have an independent_access_ranges directory if the device
+-correctly advertizes the sector ranges of its actuators.
+-
+-The independent_access_ranges directory contains one directory per access
+-range, with each range described using the sector (RO) attribute file to
+-indicate the first sector of the range and the nr_sectors (RO) attribute file
+-to indicate the total number of sectors in the range starting from the first
+-sector of the range.  For example, a dual-actuator hard-disk will have the
+-following independent_access_ranges entries.::
+-
+-        $ tree /sys/block/<device>/queue/independent_access_ranges/
+-        /sys/block/<device>/queue/independent_access_ranges/
+-        |-- 0
+-        |   |-- nr_sectors
+-        |   `-- sector
+-        `-- 1
+-            |-- nr_sectors
+-            `-- sector
+-
+-The sector and nr_sectors attributes use 512B sector unit, regardless of
+-the actual block size of the device. Independent access ranges do not
+-overlap and include all sectors within the device capacity. The access
+-ranges are numbered in increasing order of the range start sector,
+-that is, the sector attribute of range 0 always has the value 0.
+-
+-Jens Axboe <jens.axboe@oracle.com>, February 2009
 -- 
 2.34.1
 
