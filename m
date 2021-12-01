@@ -2,68 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB38CC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 07:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0BDC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Dec 2021 07:23:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232517AbhLAHOk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Dec 2021 02:14:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58002 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347109AbhLAHOk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Dec 2021 02:14:40 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB13AC061574
-        for <linux-block@vger.kernel.org>; Tue, 30 Nov 2021 23:11:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id EC157CE1C91
-        for <linux-block@vger.kernel.org>; Wed,  1 Dec 2021 07:11:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C10A6C53FCC;
-        Wed,  1 Dec 2021 07:11:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1638342676;
-        bh=Eu6q86jxzxhUQPoYNyhalPx1LxUiHi1MZSvHbSR96CE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VPqkfhRCo7jYRKdny71KtcOFOX07JRz+PfTnNBbKvV6TqB4rVTH0LmGTMwglGDpce
-         /zMJVvONnyXNk1TsW1cvo23Kfgml8Ep5T/vbQVFRDa026VZl98y+F3CAcEz3U5aoBB
-         Rgr1QbLUybUuPgho3Vq4v8diZCDqcJz7ou1Q3hu8=
-Date:   Wed, 1 Dec 2021 08:11:11 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Kumaravel.Thiagarajan@microchip.com
-Cc:     lee.jones@linaro.org, Pragash.Mangalapandian@microchip.com,
-        Sundararaman.H@microchip.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, miquel.raynal@bootlin.com,
-        richard@nod.at, vigneshr@ti.com, linux-mtd@lists.infradead.org,
-        LakshmiPraveen.Kopparthi@microchip.com, Ronnie.Kunin@microchip.com
-Subject: Re: Reg: New MFD Driver for my PCIe Device
-Message-ID: <YacgD5QXJPg/AwDH@kroah.com>
-References: <YYkEP62JRb4rCuXQ@google.com>
- <YYkGkEiPb+6J62hn@kroah.com>
- <YYkJsbbHH6wdPvB9@google.com>
- <YYkR/szsDirtj1FP@kroah.com>
- <CH0PR11MB5380791976D5837E024D5679E9999@CH0PR11MB5380.namprd11.prod.outlook.com>
- <YZO+KktO3OhDEtlq@kroah.com>
- <CH0PR11MB5380439460BADE102D91C18AE99C9@CH0PR11MB5380.namprd11.prod.outlook.com>
- <YZe6TPrf4Drh7HpI@kroah.com>
- <CH0PR11MB5380DAC79E3D01C7D1D6008AE9609@CH0PR11MB5380.namprd11.prod.outlook.com>
- <BL1PR11MB538172ECC1F112D2F6E0D734E9679@BL1PR11MB5381.namprd11.prod.outlook.com>
+        id S1347248AbhLAH0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Dec 2021 02:26:54 -0500
+Received: from verein.lst.de ([213.95.11.211]:33811 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1347247AbhLAH0x (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Dec 2021 02:26:53 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 373BF68B05; Wed,  1 Dec 2021 08:23:29 +0100 (CET)
+Date:   Wed, 1 Dec 2021 08:23:28 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Michael Walle <michael@walle.cc>,
+        Pratyush Yadav <p.yadav@ti.com>, linux-mtd@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH/RFC -nxt] mtd_blkdevs: Set GENHD_FL_NO_PART
+Message-ID: <20211201072328.GA31765@lst.de>
+References: <c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BL1PR11MB538172ECC1F112D2F6E0D734E9679@BL1PR11MB5381.namprd11.prod.outlook.com>
+In-Reply-To: <c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 05:42:14PM +0000, Kumaravel.Thiagarajan@microchip.com wrote:
-> Dear Greg KH,
+On Tue, Nov 30, 2021 at 05:23:46PM +0100, Geert Uytterhoeven wrote:
+> When DT declares the partitions of an spi-nor device using
+> "fixed-partitions", the individual mtdblockN partitions are now scanned
+> for partitition tables, which should not happen.
 > 
-> In case you missed my last email below, I have tried to answer your questions in that email.
-> Please let me know if you have any further questions or concerns.
+> Fix this by setting the GENHD_FL_NO_PART flag in the MTD block layer
+> interface.
+> 
+> Fixes: 1ebe2e5f9d68e94c ("block: remove GENHD_FL_EXT_DEVT")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> Seen with e.g. arch/arm/boot/dts/r8a7791-koelsch.dts.
+> I only noticed because I have debug code to measure QSPI performance,
+> which informed me about 8 x 512 bytes being read from each partition
+> detected.
+> 
+> RFC as I'm not sure this is correct in all cases.
+> I did verify that in the absence of "fixed-partitions", the spi-nor
+> device is not scanned for partitions before and after commit
+> 1ebe2e5f9d68e94c.
 
-At the moment, no, I was waiting for patches to comment further.
-
-thanks,
-
-greg k-h
+As far as I can tell mtd fixed partitions have nothing to do with
+the block layer concept of partitions.  What kind of behavior change
+did you see?
