@@ -2,58 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36410C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 07:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4C2C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 07:59:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237008AbhLBH0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 02:26:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235587AbhLBH0K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 02:26:10 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44DFC061574
-        for <linux-block@vger.kernel.org>; Wed,  1 Dec 2021 23:22:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZEm4NKlnD2xdC0wOI5Dvvxiv+XRhz6MwJwttUFJzceY=; b=gX/qOJmN88SpZk0jKWWrQDaFAu
-        xKTKhZhbae2Y4NwbAOKdxmiaZmRI+kHWR1N16NId+ZYAV+J+UZ/75vG3mF/Nh+A3x1IenH8UJPGCl
-        +uSaM9hUyec9xnOSj9TO6UT1ncNGBBfNZjhXmruObwWKMoIBkwavTIpDTePH7fG8+Nhl9yLq0+E9T
-        S4Oa3gYMKp/15tqU9E3AwC6GGtNz5VtCn47BG6RRFDVyBNRuEfu9TsPoLsd+QTZIoUAKjufmO6uSX
-        cVZrBPnzhW/pAr1EPRLqLuqGAczCi+KCJ68MECz8svhjbK7+nNzpAXOntErqW7dIZAcvXKi5VV8E0
-        2ZZeNjMA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1msgQV-00BAvr-Ot; Thu, 02 Dec 2021 07:22:43 +0000
-Date:   Wed, 1 Dec 2021 23:22:43 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Dave Chinner <dchinner@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] loop: make autoclear operation asynchronous
-Message-ID: <Yah0Q//l+I+eM+kf@infradead.org>
-References: <0000000000007f2f5405d1bfe618@google.com>
- <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
- <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
- <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
- <YaSpkRHgEMXrcn5i@infradead.org>
- <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
- <YaYfu0H2k0PSQL6W@infradead.org>
- <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
+        id S1355934AbhLBIDE convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 03:03:04 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4189 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230274AbhLBIDD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 03:03:03 -0500
+Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J4StZ1WDLz67x6V;
+        Thu,  2 Dec 2021 15:55:34 +0800 (CST)
+Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
+ fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 2 Dec 2021 08:59:39 +0100
+Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
+ fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
+ Thu, 2 Dec 2021 08:59:39 +0100
+From:   Roberto Sassu <roberto.sassu@huawei.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "paul@paul-moore.com" <paul@paul-moore.com>,
+        "eparis@redhat.com" <eparis@redhat.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "jannh@google.com" <jannh@google.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-audit@redhat.com" <linux-audit@redhat.com>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "tusharsu@linux.microsoft.com" <tusharsu@linux.microsoft.com>
+Subject: RE: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
+Thread-Topic: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
+Thread-Index: AQHX5tHI6VSZDPA0J0GM0KIP7fuaeKweu+CAgAAaFvA=
+Date:   Thu, 2 Dec 2021 07:59:38 +0000
+Message-ID: <e57d2d23ec7845febb79ca4476c73fcb@huawei.com>
+References: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
+ <20211201163708.3578176-1-roberto.sassu@huawei.com>
+ <Yahz1SYRG1CQIh0z@infradead.org>
+In-Reply-To: <Yahz1SYRG1CQIh0z@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.204.63.33]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 01, 2021 at 11:41:23PM +0900, Tetsuo Handa wrote:
-> OK. Here is a patch.
-> Is this better than temporarily dropping disk->open_mutex ?
+> From: Christoph Hellwig [mailto:hch@infradead.org]
+> Sent: Thursday, December 2, 2021 8:21 AM
+> On Wed, Dec 01, 2021 at 05:37:08PM +0100, Roberto Sassu wrote:
+> > Users of the device mapper driver might want to obtain a device status,
+> > with status types defined in the status_type_t enumerator.
+> 
+> The patch looks really odd.  And without the corresponding user of your
+> new functionality it is entirely unreviewable anyway.
 
-This looks much better, and also cleans up the horrible locking warts
-in __loop_clr_fd.
+Hi Christoph
+
+ok, I will send it together with a patch for a not yet accepted
+software, Integrity Policy Enforcement (IPE), that will be
+the primary user of the introduced functionality.
+
+Regarding the patch itself, could you please provide a more
+detailed explanation?
+
+Thanks
+
+Roberto
+
+HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
+Managing Director: Li Peng, Zhong Ronghua
