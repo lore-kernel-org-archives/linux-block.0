@@ -2,103 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE43C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 12:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D12D0C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 12:52:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346782AbhLBMcV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 07:32:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240476AbhLBMcU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 07:32:20 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86552C06174A
-        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 04:28:58 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id o20so114623594eds.10
-        for <linux-block@vger.kernel.org>; Thu, 02 Dec 2021 04:28:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yIHJduGhi+IgJjblRtFiKjHLP7Ao4GSCzCbgjV6AI0g=;
-        b=bEYsv4wF853W8UKT+8STBH1C/eBQtC+ON3Re4sV3zlkHai540cHzD6xE96e+vYUGZi
-         UiohbLIkxHnwTZfDMk8iBLuuZC1mkyxp+elc2Tf9JiPj9KoORf+AfZ+2kv8le9J9oo7X
-         lm/NBTxhXW4+XeCD2V/KGi9weCBYzO1T6Rc+PzBInJF1bevBYSVqQO7J3gCUriljU9nr
-         FAHXa71KoufMw1NkUz2bQnW9uZUm+9EdfJHuxCZwSpEaKB6GCghqJGU8t4DAgaKVsEJ9
-         pGJ8mZC7zq3UTM1ntOtki3tLCO0ktvnYf0xTP8MdHcy821ym/i1+0j6sccsMWHLCfqAL
-         4huQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yIHJduGhi+IgJjblRtFiKjHLP7Ao4GSCzCbgjV6AI0g=;
-        b=JqSUGuAkIpki+GOVhSrI8ogUe1DNzbXyEgn4V/dV2JnxlMCI1iZTqitGDqv3CL1tZq
-         O0I3jFHOIFS4Pa22tUP5WcjZu3RoxYrLsSHKvfIJQSiOIU5ubSjYRhVkC8C4Z490/k/j
-         FGQTJPf7CwJ7dU1oW8M2ZezClhOa1JUBTdaKJnvwOMMvl7gHfLFa6coqCCDAm1Qy9bcg
-         x7jWuIJP+H2dFysMiULX+v2LeWqVTDOX3C689DdcP+l6x6uoKB/5eumYUsxVPSlAGhtn
-         gylsSfFiNgQCglAwIv04rG6+ChrE2z2esn3lRVsL1L3nAqUeW+vgRkgqI6iG47kolqIS
-         DVyQ==
-X-Gm-Message-State: AOAM531yn1hgh7A7OAnEB7RSHvOrBkYO4e+kL7pZr7rthTib8g1mVjBT
-        Q4UGsqt0CyZ8bujxUCPErVfMKNxQxFY0CG3ERaBLlw==
-X-Google-Smtp-Source: ABdhPJwVLTfOeFrJH1vtaO5VgCmVt8kl/7m1GwfsGdFPILzfElCaVjFePEsuiYfj32fzPRUhQkb9mSEvHSNwJ50Wmo0=
-X-Received: by 2002:a05:6402:4389:: with SMTP id o9mr17620193edc.138.1638448137066;
- Thu, 02 Dec 2021 04:28:57 -0800 (PST)
+        id S1358119AbhLBM4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 07:56:11 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:29082 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1358143AbhLBM4J (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 07:56:09 -0500
+Received: from kwepemi100004.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J4bQK1FZCz1DJn3;
+        Thu,  2 Dec 2021 20:50:01 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100004.china.huawei.com (7.221.188.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 2 Dec 2021 20:52:43 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Thu, 2 Dec
+ 2021 20:52:43 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <hch@infradead.org>, <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH v4 1/2] blk-throtl: move WARN_ON_ONCE() from throtl_rb_first() to it's caller
+Date:   Thu, 2 Dec 2021 21:04:39 +0800
+Message-ID: <20211202130440.1943847-2-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211202130440.1943847-1-yukuai3@huawei.com>
+References: <20211202130440.1943847-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-References: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
-In-Reply-To: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
-From:   Anders Roxell <anders.roxell@linaro.org>
-Date:   Thu, 2 Dec 2021 13:28:46 +0100
-Message-ID: <CADYN=9KeKhZ-OSbx1QHKYfXu+p-nXVjubbay1sXd_g75LLSZRg@mail.gmail.com>
-Subject: Re: [next] WARNING: CPU: 2 PID: 66 at kernel/locking/rwsem.c:1298 __up_read
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        sean@geanix.com, Miquel Raynal <miquel.raynal@bootlin.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mtd@lists.infradead.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Boris Brezillon <boris.brezillon@collabora.com>,
-        =?UTF-8?B?RGFuaWVsIETDrWF6?= <daniel.diaz@linaro.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 30 Nov 2021 at 18:01, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
->
-> [Please ignore this email if it is already reported]
->
-> Regression found on qemu_arm64.
-> Following kernel warnings reported on Linux next-20211130 while booting.
+Prepare to reintroduce tg_drain_bios(), which will iterate until
+throtl_rb_first() return NULL.
 
-I bisected down to 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-throttle.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-and when I reverted 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT") and the
-3 releated patches so patch 1ebe2e5f9d68 was reverted cleanly I
-managed to boot without
-a warning.
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 39bb6e68a9a2..fdd57878e862 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -502,7 +502,6 @@ throtl_rb_first(struct throtl_service_queue *parent_sq)
+ 	struct rb_node *n;
+ 
+ 	n = rb_first_cached(&parent_sq->pending_tree);
+-	WARN_ON_ONCE(!n);
+ 	if (!n)
+ 		return NULL;
+ 	return rb_entry_tg(n);
+@@ -521,7 +520,7 @@ static void update_min_dispatch_time(struct throtl_service_queue *parent_sq)
+ 	struct throtl_grp *tg;
+ 
+ 	tg = throtl_rb_first(parent_sq);
+-	if (!tg)
++	if (WARN_ON_ONCE(!tg))
+ 		return;
+ 
+ 	parent_sq->first_pending_disptime = tg->disptime;
+@@ -1090,7 +1089,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 			break;
+ 
+ 		tg = throtl_rb_first(parent_sq);
+-		if (!tg)
++		if (WARN_ON_ONCE(!tg))
+ 			break;
+ 
+ 		if (time_before(jiffies, tg->disptime))
+-- 
+2.31.1
 
-Related patches from next-20211130:
-9f18db572c97 ("block: don't set GENHD_FL_NO_PART for hidden gendisks")
-430cc5d3ab4d ("block: cleanup the GENHD_FL_* definitions")
-a4561f9fccc5 ("sr: set GENHD_FL_REMOVABLE earlier")
-
-With this said, if I revert 9d6abd489e70 ("mtd: core: protect access
-to MTD devices while in suspend")
-I didn't see the warning either.
-
-Any idea what can be wrong here or what a fix could be?
-
-Only apply this patch from Geert
-https://lore.kernel.org/lkml/c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be/
-makes the warning go away too.
-
-Cheers,
-Anders
