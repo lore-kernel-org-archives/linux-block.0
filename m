@@ -2,101 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DBFC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 13:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1C3C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 14:40:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358203AbhLBNXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 08:23:38 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:47208 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358205AbhLBNX2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 08:23:28 -0500
-Received: from localhost (unknown [IPv6:2a01:e0a:2c:6930:5cf4:84a1:2763:fe0d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: bbrezillon)
-        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 3D6ED1F46508;
-        Thu,  2 Dec 2021 13:20:02 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=collabora.com; s=mail;
-        t=1638451203; bh=wb6wZrB6CrdpvFdY2JMiuIUqjBwm6A1CO87QchUy4nY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VTlDz/Ax+F1uGBBpltQyoVCsgarU84mFF+UVCQ3Ukd1WYVMSYH24U2Ds10bXtejP/
-         oqeCyXLz8vWrZ6Mbqi/an1/lKblkS5KXhcCf83fmupll0eap/8+6jh4DIqrnrB/6f/
-         7tBhmcL8nwln0MGuK+0MXef6RxJcWkV3/FhC5qFyA1p4jdI5PS7IXfTVh3r7zMrV5C
-         HQWiP5uP8DAGLMzJ3BKM9AE+kGYXevP9Rm7hGQ/rhVZrnoMx8ySBGWsYC+GmjOfUq9
-         5d+75dS2Kqj6Ce22hJDIYkXlKO077WosM14tAZsvzC7o2NRZrKV58nEtdNl1EiSn7f
-         v0+jYgypeLofA==
-Date:   Thu, 2 Dec 2021 14:19:58 +0100
-From:   Boris Brezillon <boris.brezillon@collabora.com>
-To:     Anders Roxell <anders.roxell@linaro.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        sean@geanix.com, Miquel Raynal <miquel.raynal@bootlin.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mtd@lists.infradead.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Daniel =?UTF-8?B?RMOtYXo=?= <daniel.diaz@linaro.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [next] WARNING: CPU: 2 PID: 66 at kernel/locking/rwsem.c:1298
- __up_read
-Message-ID: <20211202141958.638f224b@collabora.com>
-In-Reply-To: <CADYN=9KeKhZ-OSbx1QHKYfXu+p-nXVjubbay1sXd_g75LLSZRg@mail.gmail.com>
-References: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
-        <CADYN=9KeKhZ-OSbx1QHKYfXu+p-nXVjubbay1sXd_g75LLSZRg@mail.gmail.com>
-Organization: Collabora
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.30; x86_64-redhat-linux-gnu)
+        id S1358659AbhLBOn1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 09:43:27 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:63363 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1358654AbhLBOn0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 09:43:26 -0500
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1B2EdiSJ040116;
+        Thu, 2 Dec 2021 23:39:44 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Thu, 02 Dec 2021 23:39:44 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1B2EdhN4040111
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Thu, 2 Dec 2021 23:39:44 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <3f4d1916-8e70-8914-57ba-7291f40765ae@i-love.sakura.ne.jp>
+Date:   Thu, 2 Dec 2021 23:39:42 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [PATCH] loop: make autoclear operation asynchronous
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <0000000000007f2f5405d1bfe618@google.com>
+ <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
+ <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
+ <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
+ <YaSpkRHgEMXrcn5i@infradead.org>
+ <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
+ <YaYfu0H2k0PSQL6W@infradead.org>
+ <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
+ <20211202121615.GC1815@quack2.suse.cz>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+In-Reply-To: <20211202121615.GC1815@quack2.suse.cz>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2 Dec 2021 13:28:46 +0100
-Anders Roxell <anders.roxell@linaro.org> wrote:
+On 2021/12/02 21:16, Jan Kara wrote:
+> Why not scheduling this using task_work_add()? It solves the locking
+> context problems, has generally lower overhead than normal work (no need to
+> schedule), and avoids possible unexpected side-effects of releasing
+> loopback device later. Also task work is specifically designed so that one
+> task work can queue another task work so we should be fine using it.
 
-> On Tue, 30 Nov 2021 at 18:01, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> >
-> > [Please ignore this email if it is already reported]
-> >
-> > Regression found on qemu_arm64.
-> > Following kernel warnings reported on Linux next-20211130 while booting.  
-> 
-> I bisected down to 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
-> 
-> and when I reverted 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT") and the
-> 3 releated patches so patch 1ebe2e5f9d68 was reverted cleanly I
-> managed to boot without
-> a warning.
-> 
-> Related patches from next-20211130:
-> 9f18db572c97 ("block: don't set GENHD_FL_NO_PART for hidden gendisks")
-> 430cc5d3ab4d ("block: cleanup the GENHD_FL_* definitions")
-> a4561f9fccc5 ("sr: set GENHD_FL_REMOVABLE earlier")
-> 
-> With this said, if I revert 9d6abd489e70 ("mtd: core: protect access
-> to MTD devices while in suspend")
-> I didn't see the warning either.
+Indeed. But that will make really no difference between synchronous approach
+( https://lkml.kernel.org/r/fb6adcdc-fb56-3b90-355b-3f5a81220f2b@i-love.sakura.ne.jp )
+and asynchronous approach
+( https://lkml.kernel.org/r/d1f760f9-cdb2-f40d-33d8-bfa517c731be@i-love.sakura.ne.jp ), for
+disk->open_mutex is the only lock held when lo_release() is called.
 
-I think 9d6abd489e70 ("mtd: core: protect access to MTD devices while
-in suspend") is at fault here. Miquel, would you mind
-reverting/dropping the "mtd: core: protect access to mtd devices while
-in  suspend" series?
+Both approaches allow __loop_clr_fd() to run with no lock held, and both approaches
+need to be aware of what actions are taken by blkdev_put() before and after dropping
+disk->open_mutex. And bdev->bd_disk->fops->release() is the last action taken before
+dropping disk->open_mutex.
 
-> 
-> Any idea what can be wrong here or what a fix could be?
-> 
-> Only apply this patch from Geert
-> https://lore.kernel.org/lkml/c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be/
-> makes the warning go away too.
-> 
-> Cheers,
-> Anders
+What is so happier with preventing what will be done after disk->open_mutex is dropped
+by blkdev_put() (i.e. __module_get() + kobject_get() before blkdev_put() calls
+kobject_put() + module_put(), and kobject_put() + module_put() upon task_work_run()),
+compared to doing things that can be done without disk->open_mutex (i.e. calling
+__loop_clr_fd() without disk->open_mutex) ?
 
