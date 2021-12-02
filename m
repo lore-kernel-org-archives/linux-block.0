@@ -2,101 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DAEC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 12:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE43C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 12:29:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231908AbhLBMTs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 07:19:48 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:47178 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357729AbhLBMTm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 07:19:42 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 098B11FD39;
-        Thu,  2 Dec 2021 12:16:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1638447376; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bqHORWyAMXkhsNEMrkzaUn7507eNGMZOmslhy4VR9yo=;
-        b=cBSv4MAP8Sa8gXojzQoLvq6SgSKFR6F0AebY6CtStfeegpMEvBW1v//aCpdVOaLXuta9tl
-        20RLKf7X+zqCfe+YE6ZQVGNiaiFbrPZpmHeIU6YPWS4XIHXCeqwnOA33wTjlIZ3xnFYVm6
-        6ylAiFGDw5g0Dg6smKZ44EjavOLeEfk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1638447376;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bqHORWyAMXkhsNEMrkzaUn7507eNGMZOmslhy4VR9yo=;
-        b=d2j+YG3lvPfnPKIpLGfRwAq+DyCUrSMUdg47KcqC0t5MygTcIyOXW5UkUd3n8ePacQJunu
-        eIQOiYuvIALaClAA==
-Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id CCEB8A4759;
-        Thu,  2 Dec 2021 12:16:15 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 5B2361F2CB1; Thu,  2 Dec 2021 13:16:15 +0100 (CET)
-Date:   Thu, 2 Dec 2021 13:16:15 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Dave Chinner <dchinner@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] loop: make autoclear operation asynchronous
-Message-ID: <20211202121615.GC1815@quack2.suse.cz>
-References: <0000000000007f2f5405d1bfe618@google.com>
- <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
- <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
- <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
- <YaSpkRHgEMXrcn5i@infradead.org>
- <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
- <YaYfu0H2k0PSQL6W@infradead.org>
- <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
+        id S1346782AbhLBMcV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 07:32:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240476AbhLBMcU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 07:32:20 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86552C06174A
+        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 04:28:58 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id o20so114623594eds.10
+        for <linux-block@vger.kernel.org>; Thu, 02 Dec 2021 04:28:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yIHJduGhi+IgJjblRtFiKjHLP7Ao4GSCzCbgjV6AI0g=;
+        b=bEYsv4wF853W8UKT+8STBH1C/eBQtC+ON3Re4sV3zlkHai540cHzD6xE96e+vYUGZi
+         UiohbLIkxHnwTZfDMk8iBLuuZC1mkyxp+elc2Tf9JiPj9KoORf+AfZ+2kv8le9J9oo7X
+         lm/NBTxhXW4+XeCD2V/KGi9weCBYzO1T6Rc+PzBInJF1bevBYSVqQO7J3gCUriljU9nr
+         FAHXa71KoufMw1NkUz2bQnW9uZUm+9EdfJHuxCZwSpEaKB6GCghqJGU8t4DAgaKVsEJ9
+         pGJ8mZC7zq3UTM1ntOtki3tLCO0ktvnYf0xTP8MdHcy821ym/i1+0j6sccsMWHLCfqAL
+         4huQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yIHJduGhi+IgJjblRtFiKjHLP7Ao4GSCzCbgjV6AI0g=;
+        b=JqSUGuAkIpki+GOVhSrI8ogUe1DNzbXyEgn4V/dV2JnxlMCI1iZTqitGDqv3CL1tZq
+         O0I3jFHOIFS4Pa22tUP5WcjZu3RoxYrLsSHKvfIJQSiOIU5ubSjYRhVkC8C4Z490/k/j
+         FGQTJPf7CwJ7dU1oW8M2ZezClhOa1JUBTdaKJnvwOMMvl7gHfLFa6coqCCDAm1Qy9bcg
+         x7jWuIJP+H2dFysMiULX+v2LeWqVTDOX3C689DdcP+l6x6uoKB/5eumYUsxVPSlAGhtn
+         gylsSfFiNgQCglAwIv04rG6+ChrE2z2esn3lRVsL1L3nAqUeW+vgRkgqI6iG47kolqIS
+         DVyQ==
+X-Gm-Message-State: AOAM531yn1hgh7A7OAnEB7RSHvOrBkYO4e+kL7pZr7rthTib8g1mVjBT
+        Q4UGsqt0CyZ8bujxUCPErVfMKNxQxFY0CG3ERaBLlw==
+X-Google-Smtp-Source: ABdhPJwVLTfOeFrJH1vtaO5VgCmVt8kl/7m1GwfsGdFPILzfElCaVjFePEsuiYfj32fzPRUhQkb9mSEvHSNwJ50Wmo0=
+X-Received: by 2002:a05:6402:4389:: with SMTP id o9mr17620193edc.138.1638448137066;
+ Thu, 02 Dec 2021 04:28:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
+In-Reply-To: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
+From:   Anders Roxell <anders.roxell@linaro.org>
+Date:   Thu, 2 Dec 2021 13:28:46 +0100
+Message-ID: <CADYN=9KeKhZ-OSbx1QHKYfXu+p-nXVjubbay1sXd_g75LLSZRg@mail.gmail.com>
+Subject: Re: [next] WARNING: CPU: 2 PID: 66 at kernel/locking/rwsem.c:1298 __up_read
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        sean@geanix.com, Miquel Raynal <miquel.raynal@bootlin.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mtd@lists.infradead.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Boris Brezillon <boris.brezillon@collabora.com>,
+        =?UTF-8?B?RGFuaWVsIETDrWF6?= <daniel.diaz@linaro.org>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 01-12-21 23:41:23, Tetsuo Handa wrote:
-> On 2021/11/30 21:57, Christoph Hellwig wrote:
-> > On Mon, Nov 29, 2021 at 07:36:27PM +0900, Tetsuo Handa wrote:
-> >> If the caller just want to call ioctl(LOOP_CTL_GET_FREE) followed by
-> >> ioctl(LOOP_CONFIGURE), deferring __loop_clr_fd() would be fine.
-> >>
-> >> But the caller might want to unmount as soon as fput(filp) from __loop_clr_fd() completes.
-> >> I think we need to wait for __loop_clr_fd() from lo_release() to complete.
-> > 
-> > Anything else could have a reference to this or other files as well.
-> > So I can't see how deferring the clear to a different context can be
-> > any kind of problem in practice.
-> > 
-> 
-> OK. Here is a patch.
-> Is this better than temporarily dropping disk->open_mutex ?
+On Tue, 30 Nov 2021 at 18:01, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>
+> [Please ignore this email if it is already reported]
+>
+> Regression found on qemu_arm64.
+> Following kernel warnings reported on Linux next-20211130 while booting.
 
-The patch looks good to me. Just one suggestion for improvement:
+I bisected down to 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
 
-> +static void loop_schedule_rundown(struct loop_device *lo)
-> +{
-> +	struct block_device *bdev = lo->lo_device;
-> +	struct gendisk *disk = lo->lo_disk;
-> +
-> +	__module_get(disk->fops->owner);
-> +	kobject_get(&bdev->bd_device.kobj);
-> +	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
-> +	queue_work(system_long_wq, &lo->rundown_work);
->  }
+and when I reverted 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT") and the
+3 releated patches so patch 1ebe2e5f9d68 was reverted cleanly I
+managed to boot without
+a warning.
 
-Why not scheduling this using task_work_add()? It solves the locking
-context problems, has generally lower overhead than normal work (no need to
-schedule), and avoids possible unexpected side-effects of releasing
-loopback device later. Also task work is specifically designed so that one
-task work can queue another task work so we should be fine using it.
+Related patches from next-20211130:
+9f18db572c97 ("block: don't set GENHD_FL_NO_PART for hidden gendisks")
+430cc5d3ab4d ("block: cleanup the GENHD_FL_* definitions")
+a4561f9fccc5 ("sr: set GENHD_FL_REMOVABLE earlier")
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+With this said, if I revert 9d6abd489e70 ("mtd: core: protect access
+to MTD devices while in suspend")
+I didn't see the warning either.
+
+Any idea what can be wrong here or what a fix could be?
+
+Only apply this patch from Geert
+https://lore.kernel.org/lkml/c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be/
+makes the warning go away too.
+
+Cheers,
+Anders
