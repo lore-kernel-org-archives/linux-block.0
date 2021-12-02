@@ -2,135 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD86EC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 09:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2857C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 10:34:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356469AbhLBJdZ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 04:33:25 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4190 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356461AbhLBJdS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 04:33:18 -0500
-Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J4Vtg2HNKz67YrM;
-        Thu,  2 Dec 2021 17:25:47 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 2 Dec 2021 10:29:52 +0100
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
- Thu, 2 Dec 2021 10:29:52 +0100
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "eparis@redhat.com" <eparis@redhat.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "jannh@google.com" <jannh@google.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-audit@redhat.com" <linux-audit@redhat.com>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "tusharsu@linux.microsoft.com" <tusharsu@linux.microsoft.com>
-Subject: RE: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
-Thread-Topic: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
-Thread-Index: AQHX5tHI6VSZDPA0J0GM0KIP7fuaeKweu+CAgAAaFvD///01gIAAEg9Q
-Date:   Thu, 2 Dec 2021 09:29:52 +0000
-Message-ID: <b4bf4a384b334cdab1522b3b082bd088@huawei.com>
-References: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
- <20211201163708.3578176-1-roberto.sassu@huawei.com>
- <Yahz1SYRG1CQIh0z@infradead.org>
- <e57d2d23ec7845febb79ca4476c73fcb@huawei.com>
- <YaiHX+dWNUlmsNac@infradead.org>
-In-Reply-To: <YaiHX+dWNUlmsNac@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.204.63.33]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S241228AbhLBKiP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 05:38:15 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:63462 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233849AbhLBKiP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 05:38:15 -0500
+Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1B2AYb9V083651;
+        Thu, 2 Dec 2021 19:34:37 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
+ Thu, 02 Dec 2021 19:34:37 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1B2AYaCJ083646
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Thu, 2 Dec 2021 19:34:37 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <d1f760f9-cdb2-f40d-33d8-bfa517c731be@i-love.sakura.ne.jp>
+Date:   Thu, 2 Dec 2021 19:34:34 +0900
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block <linux-block@vger.kernel.org>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: [PATCH (resend)] loop: make autoclear operation asynchronous
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> From: Christoph Hellwig [mailto:hch@infradead.org]
-> Sent: Thursday, December 2, 2021 9:44 AM
-> On Thu, Dec 02, 2021 at 07:59:38AM +0000, Roberto Sassu wrote:
-> > ok, I will send it together with a patch for a not yet accepted
-> > software, Integrity Policy Enforcement (IPE), that will be
-> > the primary user of the introduced functionality.
-> >
-> > Regarding the patch itself, could you please provide a more
-> > detailed explanation?
-> 
-> We don't build things into the kernel just as hooks.  So in doubt you
-> need to restructured the code.  And that a security module pokes into
-> a random block driver is a big hint that whatever you're trying to do is
-> completely broken.
+syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
+commit 87579e9b7d8dc36e ("loop: use worker per cgroup instead of kworker")
+is calling destroy_workqueue() with disk->open_mutex held.
 
-I will add more context to the discussion.
+This circular dependency cannot be broken unless we call __loop_clr_fd()
+without holding disk->open_mutex. Therefore, defer __loop_clr_fd() from
+lo_release() to a WQ context.
 
-The problem being solved is how to grant access to files
-which satisfy a property defined in the policy.
+Link: https://syzkaller.appspot.com/bug?extid=643e4ce4b6ad1347d372 [1]
+Reported-by: syzbot <syzbot+643e4ce4b6ad1347d372@syzkaller.appspotmail.com>
+Suggested-by: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/block/loop.c | 65 ++++++++++++++++++++++++--------------------
+ drivers/block/loop.h |  1 +
+ 2 files changed, 37 insertions(+), 29 deletions(-)
 
-For example, a policy enforced by IPE could be:
-
-policy_name="AllowDMVerityKmodules" policy_version=0.0.1
-DEFAULT action=ALLOW
-DEFAULT op=KMODULE action=DENY
-op=KMODULE dmverity_roothash=3c64aae64ae5e8ca781df4d1fbff7c02cb78c4f18a79198263db192cc7f7ba11 action=ALLOW
-
-This would require IPE to obtain somehow this property.
-
-So far, there are two different approaches. The first one,
-proposed by the IPE authors was to define a new LSM hook
-for block devices, to append a security blob for those devices,
-and to store the dm-verity root digest as soon as this information
-can be determined. IPE will then access the security blob at
-run-time and will match the blob content with the property
-value in the policy.
-
-The second one I'm proposing is to directly retrieve the
-information at run-time, when files are accessed, and to
-possibly cache the result of the evaluation per filesystem.
-This would avoid to the introduction of a new LSM hook
-and to append a security blob for the purpose of passing
-information from the device mapper driver to IPE.
-
-Security blobs are usually used to store LSM-specific
-information such as a label (or a reference of it). Sometimes,
-when the label must be stored persistently, the subsystem
-responsible for this task, such as the VFS, uses subsystem-defined
-methods to retrieve the label from the storage and copy it to
-the security blob.
-
-In this case, it is not an LSM-specific information but rather
-an existing property of another subsystem IPE is interested in.
-Since LSMs need anyway to inspect the object before making
-the security decision, they could directly retrieve the information
-that is already available, instead of making it redundant.
-
-Even if I would prefer the second option, it would be fine for
-me if the first is adopted.
-
-Roberto
-
-HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
-Managing Director: Li Peng, Zhong Ronghua
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ba76319b5544..7f4ea06534c2 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1082,7 +1082,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	return error;
+ }
+ 
+-static void __loop_clr_fd(struct loop_device *lo, bool release)
++static void __loop_clr_fd(struct loop_device *lo)
+ {
+ 	struct file *filp;
+ 	gfp_t gfp = lo->old_gfp_mask;
+@@ -1144,8 +1144,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	/* let user-space know about this change */
+ 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+ 	mapping_set_gfp_mask(filp->f_mapping, gfp);
+-	/* This is safe: open() is still holding a reference. */
+-	module_put(THIS_MODULE);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
+ 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+@@ -1153,44 +1151,52 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
+ 		int err;
+ 
+-		/*
+-		 * open_mutex has been held already in release path, so don't
+-		 * acquire it if this function is called in such case.
+-		 *
+-		 * If the reread partition isn't from release path, lo_refcnt
+-		 * must be at least one and it can only become zero when the
+-		 * current holder is released.
+-		 */
+-		if (!release)
+-			mutex_lock(&lo->lo_disk->open_mutex);
++		mutex_lock(&lo->lo_disk->open_mutex);
+ 		err = bdev_disk_changed(lo->lo_disk, false);
+-		if (!release)
+-			mutex_unlock(&lo->lo_disk->open_mutex);
++		mutex_unlock(&lo->lo_disk->open_mutex);
+ 		if (err)
+ 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
+ 				__func__, lo->lo_number, err);
+ 		/* Device is gone, no point in returning error */
+ 	}
+ 
+-	/*
+-	 * lo->lo_state is set to Lo_unbound here after above partscan has
+-	 * finished. There cannot be anybody else entering __loop_clr_fd() as
+-	 * Lo_rundown state protects us from all the other places trying to
+-	 * change the 'lo' device.
+-	 */
+ 	lo->lo_flags = 0;
+ 	if (!part_shift)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
++
++	fput(filp);
++}
++
++static void loop_rundown_completed(struct loop_device *lo)
++{
+ 	mutex_lock(&lo->lo_mutex);
+ 	lo->lo_state = Lo_unbound;
+ 	mutex_unlock(&lo->lo_mutex);
++	module_put(THIS_MODULE);
++}
+ 
+-	/*
+-	 * Need not hold lo_mutex to fput backing file. Calling fput holding
+-	 * lo_mutex triggers a circular lock dependency possibility warning as
+-	 * fput can take open_mutex which is usually taken before lo_mutex.
+-	 */
+-	fput(filp);
++static void loop_rundown_workfn(struct work_struct *work)
++{
++	struct loop_device *lo = container_of(work, struct loop_device,
++					      rundown_work);
++	struct block_device *bdev = lo->lo_device;
++	struct gendisk *disk = lo->lo_disk;
++
++	__loop_clr_fd(lo);
++	kobject_put(&bdev->bd_device.kobj);
++	module_put(disk->fops->owner);
++	loop_rundown_completed(lo);
++}
++
++static void loop_schedule_rundown(struct loop_device *lo)
++{
++	struct block_device *bdev = lo->lo_device;
++	struct gendisk *disk = lo->lo_disk;
++
++	__module_get(disk->fops->owner);
++	kobject_get(&bdev->bd_device.kobj);
++	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
++	queue_work(system_long_wq, &lo->rundown_work);
+ }
+ 
+ static int loop_clr_fd(struct loop_device *lo)
+@@ -1222,7 +1228,8 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	lo->lo_state = Lo_rundown;
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	__loop_clr_fd(lo, false);
++	__loop_clr_fd(lo);
++	loop_rundown_completed(lo);
+ 	return 0;
+ }
+ 
+@@ -1747,7 +1754,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		__loop_clr_fd(lo, true);
++		loop_schedule_rundown(lo);
+ 		return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 082d4b6bfc6a..918a7a2dc025 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -56,6 +56,7 @@ struct loop_device {
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
+ 	bool			idr_visible;
++	struct work_struct      rundown_work;
+ };
+ 
+ struct loop_cmd {
+-- 
+2.18.4
