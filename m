@@ -2,101 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEE7C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 19:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5350AC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 19:32:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376642AbhLBTKo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 14:10:44 -0500
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:57136 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376638AbhLBTKn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 14:10:43 -0500
-Received: from [192.168.1.18] ([86.243.171.122])
-        by smtp.orange.fr with ESMTPA
-        id srQMm8a6iHQrlsrQMmWszZ; Thu, 02 Dec 2021 20:07:19 +0100
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Thu, 02 Dec 2021 20:07:19 +0100
-X-ME-IP: 86.243.171.122
-Subject: Re: [PATCH] xen-blkfront: Use the bitmap API when applicable
-To:     Joe Perches <joe@perches.com>, Juergen Gross <jgross@suse.com>,
-        boris.ostrovsky@oracle.com, sstabellini@kernel.org,
-        roger.pau@citrix.com, axboe@kernel.dk
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <1c73cf8eaff02ea19439ec676c063e592d273cfe.1638392965.git.christophe.jaillet@wanadoo.fr>
- <c529a221-f444-ad26-11ff-f693401c9429@suse.com>
- <d8f87c17-75d1-2e6b-65e1-23adc75bb515@wanadoo.fr>
- <6fcddba84070c021eb92aa9a5ff15fb2a47e9acb.camel@perches.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Message-ID: <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
-Date:   Thu, 2 Dec 2021 20:07:17 +0100
+        id S242916AbhLBTgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 14:36:10 -0500
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:45927 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235481AbhLBTgK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 14:36:10 -0500
+Received: by mail-pg1-f171.google.com with SMTP id 133so719316pgc.12;
+        Thu, 02 Dec 2021 11:32:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CuO9SlAMyySc2N7/ycy5VD46Nz+8cG+KHA0nnkbmkHc=;
+        b=T0Da/RnwA5q6xNMFJx73ePeDRsWsnmeCnH/DWkxxLz+MNDuGjZyU7piUq1KFZBRZaz
+         LJm7ENMiV1jwSey+BXuNAFFVrnFzs6qVgYYKPTNh0AbQd3PYmbkj1Qt1tSeA5apKfUmH
+         9LM41+zXybxG+JLYTWN6ZUcFehBcjOv05Sh3kFuabS1+V0H03/axWUZTs5r4K6ui2cW4
+         KsoSXfVvjfBlyl7XG8FL829L5hdDxjS/L9xFR8GVGmSst5g8F05qOdsTc8D/usT4rNoO
+         hlHh9h72qYa3SrL7a1Rzx+pnHZQNtHcPm4xHnvbbVynhE5oY+8WINX1A5RK6H87nDpY6
+         0lOg==
+X-Gm-Message-State: AOAM530dhG3QE6O2dubf6FX8ixrxCUe0v+v6gAXT8KNyz5LCtbwxDvh0
+        9tplpNDwvVSMhsUwjFzdIXWafRgTufo=
+X-Google-Smtp-Source: ABdhPJybkg0jKh/Q6ZJqyLfjyFgX8JgM9tzmXPG2O7rRG6t2vjJ5+cthEcId8+b+3rzJLlcKtHqafw==
+X-Received: by 2002:a63:5c05:: with SMTP id q5mr892811pgb.599.1638473566667;
+        Thu, 02 Dec 2021 11:32:46 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:fac5:b2eb:ef0d:f30b])
+        by smtp.gmail.com with ESMTPSA id f15sm561950pfe.171.2021.12.02.11.32.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Dec 2021 11:32:45 -0800 (PST)
+Subject: Re: [PATCH 0/7] docs: consolidate sysfs-block into Documentation/ABI/
+To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-doc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+References: <20211201084524.25660-1-ebiggers@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <0bf11301-4085-f4a1-eeed-c65d0e5563b4@acm.org>
+Date:   Thu, 2 Dec 2021 11:32:45 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <6fcddba84070c021eb92aa9a5ff15fb2a47e9acb.camel@perches.com>
+In-Reply-To: <20211201084524.25660-1-ebiggers@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Le 02/12/2021 à 19:16, Joe Perches a écrit :
-> On Thu, 2021-12-02 at 19:12 +0100, Christophe JAILLET wrote:
->> Le 02/12/2021 à 07:12, Juergen Gross a écrit :
->>> On 01.12.21 22:10, Christophe JAILLET wrote:
->>>> Use 'bitmap_zalloc()' to simplify code, improve the semantic and avoid
->>>> some open-coded arithmetic in allocator arguments.
->>>>
->>>> Also change the corresponding 'kfree()' into 'bitmap_free()' to keep
->>>> consistency.
->>>>
->>>> Use 'bitmap_copy()' to avoid an explicit 'memcpy()'
-> []
->>>> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> []
->>>> @@ -442,16 +442,14 @@ static int xlbd_reserve_minors(unsigned int
->>>> minor, unsigned int nr)
->>>>        if (end > nr_minors) {
->>>>            unsigned long *bitmap, *old;
->>>> -        bitmap = kcalloc(BITS_TO_LONGS(end), sizeof(*bitmap),
->>>> -                 GFP_KERNEL);
->>>> +        bitmap = bitmap_zalloc(end, GFP_KERNEL);
->>>>            if (bitmap == NULL)
->>>>                return -ENOMEM;
->>>>            spin_lock(&minor_lock);
->>>>            if (end > nr_minors) {
->>>>                old = minors;
->>>> -            memcpy(bitmap, minors,
->>>> -                   BITS_TO_LONGS(nr_minors) * sizeof(*bitmap));
->>>> +            bitmap_copy(bitmap, minors, nr_minors);
->>>>                minors = bitmap;
->>>>                nr_minors = BITS_TO_LONGS(end) * BITS_PER_LONG;
+On 12/1/21 12:45 AM, Eric Biggers wrote:
+> This series consolidates the documentation for /sys/block/<disk>/queue/
+> into Documentation/ABI/, where it is supposed to go (as per Greg KH:
+> https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
 > 
-> 		nr_minors = end;
-> ?
+> This series also updates MAINTAINERS to associate the block
+> documentation with the block layer.
 > 
+> This series applies to linux-block/for-next.
+> 
+> Eric Biggers (7):
+>    docs: sysfs-block: sort alphabetically
+>    docs: sysfs-block: add contact for nomerges
+>    docs: sysfs-block: fill in missing documentation from queue-sysfs.rst
+>    docs: sysfs-block: document stable_writes
+>    docs: sysfs-block: document virt_boundary_mask
+>    docs: block: remove queue-sysfs.rst
+>    MAINTAINERS: add entries for block layer documentation
+> 
+>   Documentation/ABI/testing/sysfs-block | 766 ++++++++++++++++++--------
+>   Documentation/block/index.rst         |   1 -
+>   Documentation/block/queue-sysfs.rst   | 321 -----------
+>   MAINTAINERS                           |   2 +
+>   4 files changed, 545 insertions(+), 545 deletions(-)
+>   delete mode 100644 Documentation/block/queue-sysfs.rst
 
-No,
-My understanding of the code is that if we lack space (end > nr_minors), 
-we need to allocate more. In such a case, we want to keep track of what 
-we have allocated, not what we needed.
-The "padding" bits in the "long align" allocation, can be used later.
+How about adding a patch that moves Documentation/ABI/testing/sysfs-block
+to Documentation/ABI/stable/sysfs-block? The block layer sysfs ABI is used
+widely by user space software and is considered stable.
 
-first call
-----------
-end = 65
-nr_minors = 63
+Thanks,
 
---> we need some space
---> we allocate 2 longs = 128 bits
---> we now use 65 bits of these 128 bits
-
-new call
---------
-end = 68
-nr_minors = 128 (from previous call)
---> no need to reallocate
-
-CJ
+Bart.
