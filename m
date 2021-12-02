@@ -2,91 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4468C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 15:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 133EBC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 16:50:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237530AbhLBPkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 10:40:51 -0500
-Received: from mailbackend.panix.com ([166.84.1.89]:60364 "EHLO
-        mailbackend.panix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233165AbhLBPkv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 10:40:51 -0500
-Received: from xps-7390.lan (50-233-66-25-static.hfc.comcastbusiness.net [50.233.66.25])
-        by mailbackend.panix.com (Postfix) with ESMTPSA id 4J4g7W0QqVz2jCv;
-        Thu,  2 Dec 2021 10:37:26 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
-        t=1638459447; bh=dbKm0N0V3+vmx7loDcn20Anbh9JDyOpiRkOKnYCaoPo=;
-        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
-        b=A7kKY5Je6s5F+dwDSFtlTMCWbUVWbq9JEsNVRFpg6ZFGq6fmQ1UUeLeXnMbRDBhsn
-         BtdVL5OPgxJ0b3FT8zipfDsiS5pO5uhkVwXWUeevTkneiIemJaYBXpyzJ1kqRR0PI7
-         /e7O8ej/mv7oXZUrp+gru9VOcZ3QJYW+ge2XFneY=
-Date:   Thu, 2 Dec 2021 07:37:26 -0800 (PST)
-From:   "Kenneth R. Crudup" <kenny@panix.com>
-Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
-To:     Jens Axboe <axboe@kernel.dk>
-cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org,
-        shinichiro.kawasaki@wdc.com
-Subject: Re: Write I/O queue hangup at random on recent Linus' kernels
-In-Reply-To: <4429eed8-b9b9-6943-f76-6ea38d695248@panix.com>
-Message-ID: <a2eb227a-a4dc-e4e7-d3ea-567778bfc9c0@panix.com>
-References: <b3ba57a7-d363-9c17-c4be-9dbe86875@panix.com> <b9c2681f-e63a-4d3b-913d-d8a75e2c2ea0@kernel.dk> <be6a783-97db-c3bf-b16f-e8c62b14755d@panix.com> <4429eed8-b9b9-6943-f76-6ea38d695248@panix.com>
+        id S1359716AbhLBQxr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 11:53:47 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:57322 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1359727AbhLBQxp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 11:53:45 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 260BC2170C;
+        Thu,  2 Dec 2021 16:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1638463822; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=B5c8jd312OU++3RBvwTLKAqm2dX4TEtVdTF/pGzwaMU=;
+        b=ERGiyyAjqJwCriXlkkBwKYNIVm5nfhXbZQtznCFpuRSgkuGGnHiW5+L7iun6EDRILZDXKl
+        S6w6GzOZ3iXyerJDBxg7VVTuB21DKsMPdfSLTc1lhoRKCVVI/yFR6l+H3sG7VPtUDQc22P
+        tR8LEGsLjs1s2jm2wC47VF3t+1D6UWU=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0630A13E9E;
+        Thu,  2 Dec 2021 16:50:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id JObvAE75qGE3JQAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 02 Dec 2021 16:50:22 +0000
+Date:   Thu, 2 Dec 2021 17:50:20 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     cgel.zte@gmail.com
+Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zealci@zte.com.cn, deng.changcheng@zte.com.cn
+Subject: Re: [PATCH v2] block: Use div64_ul instead of do_div
+Message-ID: <20211202165020.GC16798@blackbody.suse.cz>
+References: <20211117010358.158313-1-deng.changcheng@zte.com.cn>
+ <20211118034033.163550-1-deng.changcheng@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="kORqDWCi7qDJ0mEj"
+Content-Disposition: inline
+In-Reply-To: <20211118034033.163550-1-deng.changcheng@zte.com.cn>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 2 Dec 2021, Kenneth R. Crudup wrote:
+--kORqDWCi7qDJ0mEj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->   $ egrep -r . $(sudo find /sys/block/*/ -name inflight )
->
-> ... but they were all zeros.
+Hello.
 
-... and similarly:
+On Thu, Nov 18, 2021 at 03:40:33AM +0000, cgel.zte@gmail.com wrote:
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
 
-----
-$ sudo egrep -r . $(sudo find /sys/kernel/debug/block/ -name inflight)
-/sys/kernel/debug/block/mmcblk0/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/mmcblk0/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/mmcblk0/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/sda/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/sda/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/sda/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/nvme0n1/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop7/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop7/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop7/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop6/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop6/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop6/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop5/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop5/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop5/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop4/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop4/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop4/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop3/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop3/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop3/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop2/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop2/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop2/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop1/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop1/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop1/rqos/wbt/inflight:2: inflight 0
-/sys/kernel/debug/block/loop0/rqos/wbt/inflight:0: inflight 0
-/sys/kernel/debug/block/loop0/rqos/wbt/inflight:1: inflight 0
-/sys/kernel/debug/block/loop0/rqos/wbt/inflight:2: inflight 0
-----
+Just feedback to the bot or to you -- the same do_div() is in the same
+function for writes too. I think the processing shouldn't stop at the
+first occurence.
 
-(... but just now, I got a delayed popup from my UI, which then went back to
-being unresponsive again)
+Michal
 
-	-Kenny
 
--- 
-Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
+--kORqDWCi7qDJ0mEj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTiq06H1IhXbF2mqzsiXqxkP0JkRwUCYaj5PgAKCRAiXqxkP0Jk
+RyzZAQCz0MBVSF0oVpol11+mBLRmq7R1xgXflAx9rH3/Ge9yJwD/eURdhzAfYNm4
+ZPElCRbhAn62Wi1zRHKFeFh8Ca4WBgI=
+=ydev
+-----END PGP SIGNATURE-----
+
+--kORqDWCi7qDJ0mEj--
