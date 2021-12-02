@@ -2,93 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB29C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 21:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B382C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 23:24:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348995AbhLBVJG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 16:09:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
+        id S1349401AbhLBX1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 18:27:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbhLBVJG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 16:09:06 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D4BC06174A;
-        Thu,  2 Dec 2021 13:05:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 131A062823;
-        Thu,  2 Dec 2021 21:05:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C48C00446;
-        Thu,  2 Dec 2021 21:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638479141;
-        bh=jsmwirm9+n4y1de5SlVlUsgGkQ+0+JkYKJK4UcdA6yo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PC+uosLGtHEq010bYO0YoOq6FmJxT8jEUyFo0eCtLTjsh0OU+ObBFTs4jIVWJMWGS
-         hBkH1zIfMWwOIwwG7NDyx0dF98fJj2EU8rxGCTS/T5CyZufDykMchquS+kxxEJ60cv
-         /3PrySqzHKwg52IbqybreF8PfYreylby6gXQIp057aKsiieJgyIsUggSmtYqHLlER0
-         tkjAdDVOiwCyCfnM0WKZZ3JWitjt2vJnejeRap/0Y5VeC064zNTefpEjhmsNOGe1rq
-         dflPdXGf78XZ3AUr62BRwG64F0kiZZ25PRHyOx3GUP3Hy3al9sR2BUFrA6F9wYTO6y
-         iU62IXrnxZLcQ==
-Date:   Thu, 2 Dec 2021 13:05:39 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-doc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] docs: consolidate sysfs-block into Documentation/ABI/
-Message-ID: <Yak1I/xolvLIOtkf@sol.localdomain>
-References: <20211201084524.25660-1-ebiggers@kernel.org>
- <0bf11301-4085-f4a1-eeed-c65d0e5563b4@acm.org>
+        with ESMTP id S244230AbhLBX1l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 18:27:41 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1ACFC06174A
+        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 15:24:18 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id k21so1596564ioh.4
+        for <linux-block@vger.kernel.org>; Thu, 02 Dec 2021 15:24:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=NLDDw1pqgSFWCbeKySen1cv6lFv+DqvXYym5kKf0q4s=;
+        b=mZCsJDK8loRnEhs1PHBAcK+4zZR5uR5yZrJTL53/yNDbJGFGg3d6+oKTFcAo5+uicQ
+         /JuRrE7MFqz99uE9qsrjp6PN1OKCn8NXK6xATr1rDNHhL3N5aPzKDq6ZgdFwA5scRVJl
+         Xo838GyR70XH0XIulYstak7JT/rvLJ8Jn4yIga2Cti7TnY8H18vaxllHUP7PNr4NcvKx
+         gsQWc6BlbknwaJqEUz08+lyclM8lo6QfUMJ9VTg31f2vBfvJaLV0PakTQzPhbCwulN0Z
+         rUqqyjE3MJ38LNYTjgY/bisrF6UmE3R4Lx7xswL2ZAO8AZEUXxeFaWj5CKftd46RIkHS
+         0aUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=NLDDw1pqgSFWCbeKySen1cv6lFv+DqvXYym5kKf0q4s=;
+        b=WeFXPh+SZcUAuivbrm9Oi+/E1pI7j2UgIrVT/6zzDsfa5+eykPLoUNYGF1yWYx0LGs
+         E+Gll2sxz13AbBDqe9Bxey5jXwHF3d7EvsHJOANvWSLh4XXsrH6qO1Ud29Vbi2G2yU9F
+         d6Mr8WQIvQhG4fFQTq3//Yl+6cEtuHUETbnTCByDySPZPvJZCr3bZIOKXVWJFE+pK9uw
+         0zwa6x+VKRpJSwyn+V8kaDPO2tpyDQemiWjQYDAoq+2a4a/DxkgGL29U8/qb+uYD7EL6
+         K18pqCqDFbWudHHKCnW8Cd+HiVBmDrC67RUgCC/z5tjn0TVRWCcMnGMBslj/DPzKJvYB
+         /Awg==
+X-Gm-Message-State: AOAM532Pl6j8N4NUbs6YAQIDKeTXKoeCD26drtvd++6RFag0LEuEi2xi
+        wPYQPhJBQFkpeiQW95xkqpWGMC9LXmXKWg8+
+X-Google-Smtp-Source: ABdhPJxKXoNYer6IUg2VNbco2TTVgn2gGULZpd15LSrIlBDh/DG/mXm99yvW1npuIEUPfWqpr5aftQ==
+X-Received: by 2002:a05:6602:3422:: with SMTP id n34mr3289994ioz.7.1638487458048;
+        Thu, 02 Dec 2021 15:24:18 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id m2sm637168iob.21.2021.12.02.15.24.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Dec 2021 15:24:17 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        io-uring <io-uring@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH RFC] block: enable bio allocation cache for IRQ driven IO
+Message-ID: <c24fe04b-6a46-93b2-a6a6-a77606a1084c@kernel.dk>
+Date:   Thu, 2 Dec 2021 16:24:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0bf11301-4085-f4a1-eeed-c65d0e5563b4@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 02, 2021 at 11:32:45AM -0800, Bart Van Assche wrote:
-> On 12/1/21 12:45 AM, Eric Biggers wrote:
-> > This series consolidates the documentation for /sys/block/<disk>/queue/
-> > into Documentation/ABI/, where it is supposed to go (as per Greg KH:
-> > https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
-> > 
-> > This series also updates MAINTAINERS to associate the block
-> > documentation with the block layer.
-> > 
-> > This series applies to linux-block/for-next.
-> > 
-> > Eric Biggers (7):
-> >    docs: sysfs-block: sort alphabetically
-> >    docs: sysfs-block: add contact for nomerges
-> >    docs: sysfs-block: fill in missing documentation from queue-sysfs.rst
-> >    docs: sysfs-block: document stable_writes
-> >    docs: sysfs-block: document virt_boundary_mask
-> >    docs: block: remove queue-sysfs.rst
-> >    MAINTAINERS: add entries for block layer documentation
-> > 
-> >   Documentation/ABI/testing/sysfs-block | 766 ++++++++++++++++++--------
-> >   Documentation/block/index.rst         |   1 -
-> >   Documentation/block/queue-sysfs.rst   | 321 -----------
-> >   MAINTAINERS                           |   2 +
-> >   4 files changed, 545 insertions(+), 545 deletions(-)
-> >   delete mode 100644 Documentation/block/queue-sysfs.rst
-> 
-> How about adding a patch that moves Documentation/ABI/testing/sysfs-block
-> to Documentation/ABI/stable/sysfs-block? The block layer sysfs ABI is used
-> widely by user space software and is considered stable.
-> 
+We currently cannot use the bio recycling allocation cache for IRQ driven
+IO, as the cache isn't IRQ safe (by design).
 
-That would make sense.  I decided not to include it in this patch series since
-some of the sysfs-block files were added recently, so may not be as "stable" as
-ones that have been around for 18 years, and because about 90% of the sysfs
-documentation is in the "testing" directory anyway so it is not unusual.  So I
-felt it should be a separate change.
+Add a way for the completion side to pass back a bio that needs freeing,
+so we can do it from the io_uring side. io_uring completions always
+run in task context.
 
-I think these patches should go in first, and then I can send a separate patch
-that moves the file to the stable directory, if there is no objection to it.
+This is good for about a 13% improvement in IRQ driven IO, taking us from
+around 6.3M/core to 7.1M/core IOPS.
 
-- Eric
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+Open to suggestions on how to potentially do this cleaner. The below
+obviously works, but ideally we'd want to run the whole end_io handler
+from this context rather than just the bio put. That would enable
+further optimizations in this area.
+
+But the wins are rather large as-is.
+
+diff --git a/block/fops.c b/block/fops.c
+index 10015e1a5b01..9cea5b60f044 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -295,14 +295,19 @@ static void blkdev_bio_end_io_async(struct bio *bio)
+ 		ret = blk_status_to_errno(bio->bi_status);
+ 	}
+ 
+-	iocb->ki_complete(iocb, ret);
+-
+ 	if (dio->flags & DIO_SHOULD_DIRTY) {
+ 		bio_check_pages_dirty(bio);
+ 	} else {
+ 		bio_release_pages(bio, false);
+-		bio_put(bio);
++		if (iocb->ki_flags & IOCB_BIO_PASSBACK) {
++			iocb->ki_flags |= IOCB_PRIV_IS_BIO;
++			iocb->private = bio;
++		} else {
++			bio_put(bio);
++		}
+ 	}
++
++	iocb->ki_complete(iocb, ret);
+ }
+ 
+ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 4591bcb79b1f..5644628b8cb7 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2770,6 +2770,9 @@ static void io_req_task_complete(struct io_kiocb *req, bool *locked)
+ 	unsigned int cflags = io_put_rw_kbuf(req);
+ 	int res = req->result;
+ 
++	if (req->rw.kiocb.ki_flags & IOCB_PRIV_IS_BIO)
++		bio_put(req->rw.kiocb.private);
++
+ 	if (*locked) {
+ 		io_req_complete_state(req, res, cflags);
+ 		io_req_add_compl_list(req);
+@@ -2966,6 +2969,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	} else {
+ 		if (kiocb->ki_flags & IOCB_HIPRI)
+ 			return -EINVAL;
++		kiocb->ki_flags |= IOCB_ALLOC_CACHE | IOCB_BIO_PASSBACK;
+ 		kiocb->ki_complete = io_complete_rw;
+ 	}
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 0cc4f5fd4cfe..1e9d86955e3d 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -322,6 +322,10 @@ enum rw_hint {
+ #define IOCB_NOIO		(1 << 20)
+ /* can use bio alloc cache */
+ #define IOCB_ALLOC_CACHE	(1 << 21)
++/* iocb supports bio passback */
++#define IOCB_BIO_PASSBACK	(1 << 22)
++/* iocb->private holds bio to put */
++#define IOCB_PRIV_IS_BIO	(1 << 23)
+ 
+ struct kiocb {
+ 	struct file		*ki_filp;
+
+-- 
+Jens Axboe
+
