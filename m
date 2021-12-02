@@ -2,78 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1C3C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 14:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75948C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 14:48:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358659AbhLBOn1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 09:43:27 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:63363 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358654AbhLBOn0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 09:43:26 -0500
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1B2EdiSJ040116;
-        Thu, 2 Dec 2021 23:39:44 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Thu, 02 Dec 2021 23:39:44 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1B2EdhN4040111
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 2 Dec 2021 23:39:44 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <3f4d1916-8e70-8914-57ba-7291f40765ae@i-love.sakura.ne.jp>
-Date:   Thu, 2 Dec 2021 23:39:42 +0900
+        id S1358786AbhLBOvo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 09:51:44 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:37838 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1358773AbhLBOvo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 09:51:44 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8A2891FD39;
+        Thu,  2 Dec 2021 14:48:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1638456499; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uwqW9ELU+jGK+NuQi1+7a6QT/l3WZTEzYW+bZJoKIeE=;
+        b=f9ZXzJf5LFpiT2X6TuRjVMvl6xAFciKyA0CiIMnb+s4fe5nZbXqN/KrOEQUzdnXC5p6jaN
+        prcl+l0b/5mXSDm+s9ldnuXK2ukzBA08x4tNnsAFX21tb0bpdVwoVBBZzg1HekS75f2Tkr
+        vIZVI5E9e57ZVzlPy9MutotpTmVQJ/k=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A50613DFC;
+        Thu,  2 Dec 2021 14:48:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ssm1GLPcqGFnbQAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 02 Dec 2021 14:48:19 +0000
+Date:   Thu, 2 Dec 2021 15:48:18 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     hch@infradead.org, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v4 2/2] block: cancel all throttled bios in del_gendisk()
+Message-ID: <20211202144818.GB16798@blackbody.suse.cz>
+References: <20211202130440.1943847-1-yukuai3@huawei.com>
+ <20211202130440.1943847-3-yukuai3@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH] loop: make autoclear operation asynchronous
-Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <0000000000007f2f5405d1bfe618@google.com>
- <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
- <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
- <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
- <YaSpkRHgEMXrcn5i@infradead.org>
- <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
- <YaYfu0H2k0PSQL6W@infradead.org>
- <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
- <20211202121615.GC1815@quack2.suse.cz>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <20211202121615.GC1815@quack2.suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="PNTmBPCT7hxwcZjr"
+Content-Disposition: inline
+In-Reply-To: <20211202130440.1943847-3-yukuai3@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/12/02 21:16, Jan Kara wrote:
-> Why not scheduling this using task_work_add()? It solves the locking
-> context problems, has generally lower overhead than normal work (no need to
-> schedule), and avoids possible unexpected side-effects of releasing
-> loopback device later. Also task work is specifically designed so that one
-> task work can queue another task work so we should be fine using it.
 
-Indeed. But that will make really no difference between synchronous approach
-( https://lkml.kernel.org/r/fb6adcdc-fb56-3b90-355b-3f5a81220f2b@i-love.sakura.ne.jp )
-and asynchronous approach
-( https://lkml.kernel.org/r/d1f760f9-cdb2-f40d-33d8-bfa517c731be@i-love.sakura.ne.jp ), for
-disk->open_mutex is the only lock held when lo_release() is called.
+--PNTmBPCT7hxwcZjr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Both approaches allow __loop_clr_fd() to run with no lock held, and both approaches
-need to be aware of what actions are taken by blkdev_put() before and after dropping
-disk->open_mutex. And bdev->bd_disk->fops->release() is the last action taken before
-dropping disk->open_mutex.
+Hello Kuai.
 
-What is so happier with preventing what will be done after disk->open_mutex is dropped
-by blkdev_put() (i.e. __module_get() + kobject_get() before blkdev_put() calls
-kobject_put() + module_put(), and kobject_put() + module_put() upon task_work_run()),
-compared to doing things that can be done without disk->open_mutex (i.e. calling
-__loop_clr_fd() without disk->open_mutex) ?
+On Thu, Dec 02, 2021 at 09:04:40PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+> For example, if user thread is throttled with low bps while it's
+> issuing large io, and the device is deleted. The user thread will
+> wait for a long time for io to return.
 
+Do I understand correctly the "long time" here is
+outstanding_IO_size/throttled_bandwidth? Or are you getting at some
+other cause/longer time?
+
+> +void blk_throtl_cancel_bios(struct request_queue *q)
+> +{
+> +	struct throtl_data *td = q->td;
+> +	struct bio_list bio_list_on_stack;
+> +	struct blkcg_gq *blkg;
+> +	struct cgroup_subsys_state *pos_css;
+> +	struct bio *bio;
+> +	int rw;
+> +
+> +	bio_list_init(&bio_list_on_stack);
+> +
+> +	/*
+> +	 * hold queue_lock to prevent concurrent with dispatching
+> +	 * throttled bios by timer.
+> +	 */
+> +	spin_lock_irq(&q->queue_lock);
+
+You've replaced the rcu_read_lock() with the queue lock but...
+
+> +
+> +	/*
+> +	 * Drain each tg while doing post-order walk on the blkg tree, so
+> +	 * that all bios are propagated to td->service_queue.  It'd be
+> +	 * better to walk service_queue tree directly but blkg walk is
+> +	 * easier.
+> +	 */
+> +	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
+> +		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
+
+...you also need the rcu_read_lock() here since you may encounter a
+(descendant) blkcg that's removed concurrently.
+
+(I may miss some consequences of doing this under the queue_lock so if
+the concurrent removal is ruled out, please make a comment about it.)
+
+
+Regards,
+Michal
+
+--PNTmBPCT7hxwcZjr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTiq06H1IhXbF2mqzsiXqxkP0JkRwUCYajcogAKCRAiXqxkP0Jk
+R7cGAQCsIq9mNSSTJzsqhyqoxiLByxVHzsfKjVpMEXCOTKOJoQD8CF2+/060Ii8J
+cTwQpo66d266frtmJFTvhKDWHeInGww=
+=H8f7
+-----END PGP SIGNATURE-----
+
+--PNTmBPCT7hxwcZjr--
