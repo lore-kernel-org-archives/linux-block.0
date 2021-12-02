@@ -2,74 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADD6C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 09:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD86EC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 09:30:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345881AbhLBJLN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 04:11:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:47629 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231655AbhLBJLM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Dec 2021 04:11:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638436070;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=v+k8pdJBak3oYRQppvBNAIgu4tzDjk5s659PenQPp8s=;
-        b=U29lb5mG3bzgITvYDEsVM2Pw/UgtYoPuP/CyxMODITg+miqAthPIA+k7yDuFC5GW81jQAY
-        CMFtuj+a6/9GHPych9hE3/n0UD1ezvw3ZI+xVX2UZJhT8cno+zwk1GOQxHDSF3P9pag0Vr
-        tvEq4z+AD1tENyRASeYsqJBzB9MoQ3M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-159-EtPPsDcGMYOYnYGaawJ8Ng-1; Thu, 02 Dec 2021 04:07:46 -0500
-X-MC-Unique: EtPPsDcGMYOYnYGaawJ8Ng-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFAE61934100;
-        Thu,  2 Dec 2021 09:07:45 +0000 (UTC)
-Received: from localhost (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D4D475D9CA;
-        Thu,  2 Dec 2021 09:07:44 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq: check q->poll_stat in queue_poll_stat_show
-Date:   Thu,  2 Dec 2021 17:07:16 +0800
-Message-Id: <20211202090716.3292244-1-ming.lei@redhat.com>
+        id S1356469AbhLBJdZ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 04:33:25 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4190 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1356461AbhLBJdS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 04:33:18 -0500
+Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J4Vtg2HNKz67YrM;
+        Thu,  2 Dec 2021 17:25:47 +0800 (CST)
+Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
+ fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 2 Dec 2021 10:29:52 +0100
+Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
+ fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
+ Thu, 2 Dec 2021 10:29:52 +0100
+From:   Roberto Sassu <roberto.sassu@huawei.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "paul@paul-moore.com" <paul@paul-moore.com>,
+        "eparis@redhat.com" <eparis@redhat.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "jannh@google.com" <jannh@google.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-audit@redhat.com" <linux-audit@redhat.com>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "tusharsu@linux.microsoft.com" <tusharsu@linux.microsoft.com>
+Subject: RE: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
+Thread-Topic: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
+Thread-Index: AQHX5tHI6VSZDPA0J0GM0KIP7fuaeKweu+CAgAAaFvD///01gIAAEg9Q
+Date:   Thu, 2 Dec 2021 09:29:52 +0000
+Message-ID: <b4bf4a384b334cdab1522b3b082bd088@huawei.com>
+References: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
+ <20211201163708.3578176-1-roberto.sassu@huawei.com>
+ <Yahz1SYRG1CQIh0z@infradead.org>
+ <e57d2d23ec7845febb79ca4476c73fcb@huawei.com>
+ <YaiHX+dWNUlmsNac@infradead.org>
+In-Reply-To: <YaiHX+dWNUlmsNac@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.204.63.33]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Without checking q->poll_stat in queue_poll_stat_show(), kernel panic
-may be caused if q->poll_stat isn't allocated.
+> From: Christoph Hellwig [mailto:hch@infradead.org]
+> Sent: Thursday, December 2, 2021 9:44 AM
+> On Thu, Dec 02, 2021 at 07:59:38AM +0000, Roberto Sassu wrote:
+> > ok, I will send it together with a patch for a not yet accepted
+> > software, Integrity Policy Enforcement (IPE), that will be
+> > the primary user of the introduced functionality.
+> >
+> > Regarding the patch itself, could you please provide a more
+> > detailed explanation?
+> 
+> We don't build things into the kernel just as hooks.  So in doubt you
+> need to restructured the code.  And that a security module pokes into
+> a random block driver is a big hint that whatever you're trying to do is
+> completely broken.
 
-Fixes: 48b5c1fbcd8c ("block: only allocate poll_stats if there's a user of them")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-debugfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+I will add more context to the discussion.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7f27dca3a45e..3a790eb4995c 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -30,6 +30,9 @@ static int queue_poll_stat_show(void *data, struct seq_file *m)
- 	struct request_queue *q = data;
- 	int bucket;
- 
-+	if (!q->poll_stat)
-+		return 0;
-+
- 	for (bucket = 0; bucket < (BLK_MQ_POLL_STATS_BKTS / 2); bucket++) {
- 		seq_printf(m, "read  (%d Bytes): ", 1 << (9 + bucket));
- 		print_stat(m, &q->poll_stat[2 * bucket]);
--- 
-2.31.1
+The problem being solved is how to grant access to files
+which satisfy a property defined in the policy.
 
+For example, a policy enforced by IPE could be:
+
+policy_name="AllowDMVerityKmodules" policy_version=0.0.1
+DEFAULT action=ALLOW
+DEFAULT op=KMODULE action=DENY
+op=KMODULE dmverity_roothash=3c64aae64ae5e8ca781df4d1fbff7c02cb78c4f18a79198263db192cc7f7ba11 action=ALLOW
+
+This would require IPE to obtain somehow this property.
+
+So far, there are two different approaches. The first one,
+proposed by the IPE authors was to define a new LSM hook
+for block devices, to append a security blob for those devices,
+and to store the dm-verity root digest as soon as this information
+can be determined. IPE will then access the security blob at
+run-time and will match the blob content with the property
+value in the policy.
+
+The second one I'm proposing is to directly retrieve the
+information at run-time, when files are accessed, and to
+possibly cache the result of the evaluation per filesystem.
+This would avoid to the introduction of a new LSM hook
+and to append a security blob for the purpose of passing
+information from the device mapper driver to IPE.
+
+Security blobs are usually used to store LSM-specific
+information such as a label (or a reference of it). Sometimes,
+when the label must be stored persistently, the subsystem
+responsible for this task, such as the VFS, uses subsystem-defined
+methods to retrieve the label from the storage and copy it to
+the security blob.
+
+In this case, it is not an LSM-specific information but rather
+an existing property of another subsystem IPE is interested in.
+Since LSMs need anyway to inspect the object before making
+the security decision, they could directly retrieve the information
+that is already available, instead of making it redundant.
+
+Even if I would prefer the second option, it would be fine for
+me if the first is adopted.
+
+Roberto
+
+HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
+Managing Director: Li Peng, Zhong Ronghua
