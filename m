@@ -2,39 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C53C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 11:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DAEC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 12:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241502AbhLBLHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 06:07:18 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:56580 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357146AbhLBLHR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 06:07:17 -0500
-Received: from fsav118.sakura.ne.jp (fsav118.sakura.ne.jp [27.133.134.245])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1B2B3c0Q012863;
-        Thu, 2 Dec 2021 20:03:38 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav118.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav118.sakura.ne.jp);
- Thu, 02 Dec 2021 20:03:38 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav118.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1B2B3bt6012858
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 2 Dec 2021 20:03:38 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <fb6adcdc-fb56-3b90-355b-3f5a81220f2b@i-love.sakura.ne.jp>
-Date:   Thu, 2 Dec 2021 20:03:35 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH] loop: make autoclear operation asynchronous
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, Dave Chinner <dchinner@redhat.com>,
+        id S231908AbhLBMTs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 07:19:48 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:47178 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1357729AbhLBMTm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 07:19:42 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 098B11FD39;
+        Thu,  2 Dec 2021 12:16:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1638447376; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bqHORWyAMXkhsNEMrkzaUn7507eNGMZOmslhy4VR9yo=;
+        b=cBSv4MAP8Sa8gXojzQoLvq6SgSKFR6F0AebY6CtStfeegpMEvBW1v//aCpdVOaLXuta9tl
+        20RLKf7X+zqCfe+YE6ZQVGNiaiFbrPZpmHeIU6YPWS4XIHXCeqwnOA33wTjlIZ3xnFYVm6
+        6ylAiFGDw5g0Dg6smKZ44EjavOLeEfk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1638447376;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bqHORWyAMXkhsNEMrkzaUn7507eNGMZOmslhy4VR9yo=;
+        b=d2j+YG3lvPfnPKIpLGfRwAq+DyCUrSMUdg47KcqC0t5MygTcIyOXW5UkUd3n8ePacQJunu
+        eIQOiYuvIALaClAA==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id CCEB8A4759;
+        Thu,  2 Dec 2021 12:16:15 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 5B2361F2CB1; Thu,  2 Dec 2021 13:16:15 +0100 (CET)
+Date:   Thu, 2 Dec 2021 13:16:15 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Dave Chinner <dchinner@redhat.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] loop: make autoclear operation asynchronous
+Message-ID: <20211202121615.GC1815@quack2.suse.cz>
 References: <0000000000007f2f5405d1bfe618@google.com>
  <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
  <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
@@ -43,115 +51,52 @@ References: <0000000000007f2f5405d1bfe618@google.com>
  <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
  <YaYfu0H2k0PSQL6W@infradead.org>
  <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
- <Yah0Q//l+I+eM+kf@infradead.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <Yah0Q//l+I+eM+kf@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/12/02 16:22, Christoph Hellwig wrote:
-> On Wed, Dec 01, 2021 at 11:41:23PM +0900, Tetsuo Handa wrote:
->> OK. Here is a patch.
->> Is this better than temporarily dropping disk->open_mutex ?
+On Wed 01-12-21 23:41:23, Tetsuo Handa wrote:
+> On 2021/11/30 21:57, Christoph Hellwig wrote:
+> > On Mon, Nov 29, 2021 at 07:36:27PM +0900, Tetsuo Handa wrote:
+> >> If the caller just want to call ioctl(LOOP_CTL_GET_FREE) followed by
+> >> ioctl(LOOP_CONFIGURE), deferring __loop_clr_fd() would be fine.
+> >>
+> >> But the caller might want to unmount as soon as fput(filp) from __loop_clr_fd() completes.
+> >> I think we need to wait for __loop_clr_fd() from lo_release() to complete.
+> > 
+> > Anything else could have a reference to this or other files as well.
+> > So I can't see how deferring the clear to a different context can be
+> > any kind of problem in practice.
+> > 
 > 
-> This looks much better, and also cleans up the horrible locking warts
-> in __loop_clr_fd.
-> 
+> OK. Here is a patch.
+> Is this better than temporarily dropping disk->open_mutex ?
 
-What "the horrible locking warts" refer to? Below approach temporarily
-drops disk->open_mutex. I think there is no locking difference between
-synchronous and asynchronous...
+The patch looks good to me. Just one suggestion for improvement:
 
-Anyway, I resent
-https://lkml.kernel.org/r/d1f760f9-cdb2-f40d-33d8-bfa517c731be@i-love.sakura.ne.jp
-in order to apply before "loop: replace loop_validate_mutex with loop_validate_spinlock".
+> +static void loop_schedule_rundown(struct loop_device *lo)
+> +{
+> +	struct block_device *bdev = lo->lo_device;
+> +	struct gendisk *disk = lo->lo_disk;
+> +
+> +	__module_get(disk->fops->owner);
+> +	kobject_get(&bdev->bd_device.kobj);
+> +	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
+> +	queue_work(system_long_wq, &lo->rundown_work);
+>  }
 
----
- drivers/block/loop.c | 33 +++++++--------------------------
- 1 file changed, 7 insertions(+), 26 deletions(-)
+Why not scheduling this using task_work_add()? It solves the locking
+context problems, has generally lower overhead than normal work (no need to
+schedule), and avoids possible unexpected side-effects of releasing
+loopback device later. Also task work is specifically designed so that one
+task work can queue another task work so we should be fine using it.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ba76319b5544..31d3fbe67fea 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1082,7 +1082,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return error;
- }
- 
--static void __loop_clr_fd(struct loop_device *lo, bool release)
-+static void __loop_clr_fd(struct loop_device *lo)
- {
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
-@@ -1153,31 +1153,15 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
- 		int err;
- 
--		/*
--		 * open_mutex has been held already in release path, so don't
--		 * acquire it if this function is called in such case.
--		 *
--		 * If the reread partition isn't from release path, lo_refcnt
--		 * must be at least one and it can only become zero when the
--		 * current holder is released.
--		 */
--		if (!release)
--			mutex_lock(&lo->lo_disk->open_mutex);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		err = bdev_disk_changed(lo->lo_disk, false);
--		if (!release)
--			mutex_unlock(&lo->lo_disk->open_mutex);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo->lo_number, err);
- 		/* Device is gone, no point in returning error */
- 	}
- 
--	/*
--	 * lo->lo_state is set to Lo_unbound here after above partscan has
--	 * finished. There cannot be anybody else entering __loop_clr_fd() as
--	 * Lo_rundown state protects us from all the other places trying to
--	 * change the 'lo' device.
--	 */
- 	lo->lo_flags = 0;
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
-@@ -1185,11 +1169,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	lo->lo_state = Lo_unbound;
- 	mutex_unlock(&lo->lo_mutex);
- 
--	/*
--	 * Need not hold lo_mutex to fput backing file. Calling fput holding
--	 * lo_mutex triggers a circular lock dependency possibility warning as
--	 * fput can take open_mutex which is usually taken before lo_mutex.
--	 */
- 	fput(filp);
- }
- 
-@@ -1222,7 +1201,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	lo->lo_state = Lo_rundown;
- 	mutex_unlock(&lo->lo_mutex);
- 
--	__loop_clr_fd(lo, false);
-+	__loop_clr_fd(lo);
- 	return 0;
- }
- 
-@@ -1747,7 +1726,9 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		__loop_clr_fd(lo, true);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
-+		__loop_clr_fd(lo);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
+								Honza
 -- 
-2.18.4
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
