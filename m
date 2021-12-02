@@ -2,89 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5350AC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 19:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED557C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 19:47:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242916AbhLBTgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 14:36:10 -0500
-Received: from mail-pg1-f171.google.com ([209.85.215.171]:45927 "EHLO
-        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235481AbhLBTgK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 14:36:10 -0500
-Received: by mail-pg1-f171.google.com with SMTP id 133so719316pgc.12;
-        Thu, 02 Dec 2021 11:32:47 -0800 (PST)
+        id S242702AbhLBTvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 14:51:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53360 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242685AbhLBTvH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 14:51:07 -0500
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FAFC06174A
+        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 11:47:44 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id 15so536160ilq.2
+        for <linux-block@vger.kernel.org>; Thu, 02 Dec 2021 11:47:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WhG8Om5YrW40AWnCbrH78RLdzfbKXDgLUjKuZhfkQ1U=;
+        b=Q6lVVmzyf5T/2pXwtG63t7z3u5a3T65IfL8IhJO/hL7HBNF50T4dM5qmoH/ueaEynA
+         Nav7xW4WdqVT/Kt2QtQY80PUxKoajSL83dITfAnZATY3CHumn4jeHPobMJhb/3ppi+fk
+         EgjrZYfQwuFitRM8CHiqZ4mbkp17K1lzSPhKE6+SHiU6b7VoEFGWUpS18yWEKdQOacQK
+         WY7GmydyHIoPP6O/u5C0f2SRTPNwOydFU82UC3rvHnP/EuxhVjr5nBvJHCGQXs8ZMQ31
+         oLiJDpXbP7s//sl2sPYKD+BKUA6YplSTXionEaQNRfLbHhxjjZOublTCBAgirretoBHO
+         gkPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=CuO9SlAMyySc2N7/ycy5VD46Nz+8cG+KHA0nnkbmkHc=;
-        b=T0Da/RnwA5q6xNMFJx73ePeDRsWsnmeCnH/DWkxxLz+MNDuGjZyU7piUq1KFZBRZaz
-         LJm7ENMiV1jwSey+BXuNAFFVrnFzs6qVgYYKPTNh0AbQd3PYmbkj1Qt1tSeA5apKfUmH
-         9LM41+zXybxG+JLYTWN6ZUcFehBcjOv05Sh3kFuabS1+V0H03/axWUZTs5r4K6ui2cW4
-         KsoSXfVvjfBlyl7XG8FL829L5hdDxjS/L9xFR8GVGmSst5g8F05qOdsTc8D/usT4rNoO
-         hlHh9h72qYa3SrL7a1Rzx+pnHZQNtHcPm4xHnvbbVynhE5oY+8WINX1A5RK6H87nDpY6
-         0lOg==
-X-Gm-Message-State: AOAM530dhG3QE6O2dubf6FX8ixrxCUe0v+v6gAXT8KNyz5LCtbwxDvh0
-        9tplpNDwvVSMhsUwjFzdIXWafRgTufo=
-X-Google-Smtp-Source: ABdhPJybkg0jKh/Q6ZJqyLfjyFgX8JgM9tzmXPG2O7rRG6t2vjJ5+cthEcId8+b+3rzJLlcKtHqafw==
-X-Received: by 2002:a63:5c05:: with SMTP id q5mr892811pgb.599.1638473566667;
-        Thu, 02 Dec 2021 11:32:46 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:fac5:b2eb:ef0d:f30b])
-        by smtp.gmail.com with ESMTPSA id f15sm561950pfe.171.2021.12.02.11.32.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 11:32:45 -0800 (PST)
-Subject: Re: [PATCH 0/7] docs: consolidate sysfs-block into Documentation/ABI/
-To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-doc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-References: <20211201084524.25660-1-ebiggers@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <0bf11301-4085-f4a1-eeed-c65d0e5563b4@acm.org>
-Date:   Thu, 2 Dec 2021 11:32:45 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        bh=WhG8Om5YrW40AWnCbrH78RLdzfbKXDgLUjKuZhfkQ1U=;
+        b=UBuhJHF+q11rwtun+0vcHFx4ee+/bqHHAfZPMfyQ1FQF0V9g7lbSQVU2R+dht8e/e1
+         N7qNWR/Bgai+MOZki359Dmora04FkekD7HpP7mlq+gH8UIxgFTmcPgF5DnQm4Nklvm8d
+         68cRI5kcSO5kB/26MwtK91U2FDmAFuuO6w3NetZJ9FCRgH0D9MCHY/ZhvacY5vTLZEDS
+         63WzrMcbnf69J9oPYDwzJfXP2hdC5I9LmJpO+aTPxrbIDBHjCVw3kYUQjOsMm8oj5EMR
+         dIDV432UKcGvKe2dZiGddCGCSxy03z5MQM3XrUwECA0tp5iRv/GOnMoUFeeaBBNwkz+T
+         7r5w==
+X-Gm-Message-State: AOAM530tumMpYhV5X/+NiRtr+V8H4U4hGYxNkWdkVrMHiFooj9p8dOl8
+        t7Yq5pteLJoaljRok4+70xZoBHtEDyN0l8sM
+X-Google-Smtp-Source: ABdhPJxR40zMVXJKTc0z8tVmu1wPatWEkGWl8bReZLVU5tJeKhgq0apf7ODZ2VrqaMKQQEsbitN4UQ==
+X-Received: by 2002:a92:cf52:: with SMTP id c18mr18358836ilr.226.1638474463750;
+        Thu, 02 Dec 2021 11:47:43 -0800 (PST)
+Received: from p1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id 18sm359477iln.83.2021.12.02.11.47.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Dec 2021 11:47:43 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Cc:     hch@infradead.org
+Subject: [PATCH 0/2] Fix bio merge off cached request path
+Date:   Thu,  2 Dec 2021 12:47:39 -0700
+Message-Id: <20211202194741.810957-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <20211201084524.25660-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/1/21 12:45 AM, Eric Biggers wrote:
-> This series consolidates the documentation for /sys/block/<disk>/queue/
-> into Documentation/ABI/, where it is supposed to go (as per Greg KH:
-> https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
-> 
-> This series also updates MAINTAINERS to associate the block
-> documentation with the block layer.
-> 
-> This series applies to linux-block/for-next.
-> 
-> Eric Biggers (7):
->    docs: sysfs-block: sort alphabetically
->    docs: sysfs-block: add contact for nomerges
->    docs: sysfs-block: fill in missing documentation from queue-sysfs.rst
->    docs: sysfs-block: document stable_writes
->    docs: sysfs-block: document virt_boundary_mask
->    docs: block: remove queue-sysfs.rst
->    MAINTAINERS: add entries for block layer documentation
-> 
->   Documentation/ABI/testing/sysfs-block | 766 ++++++++++++++++++--------
->   Documentation/block/index.rst         |   1 -
->   Documentation/block/queue-sysfs.rst   | 321 -----------
->   MAINTAINERS                           |   2 +
->   4 files changed, 545 insertions(+), 545 deletions(-)
->   delete mode 100644 Documentation/block/queue-sysfs.rst
+Hi,
 
-How about adding a patch that moves Documentation/ABI/testing/sysfs-block
-to Documentation/ABI/stable/sysfs-block? The block layer sysfs ABI is used
-widely by user space software and is considered stable.
+#1 is just a cleanup, #2 fixes the real issue here that's leading to
+crashes for me.
 
-Thanks,
+-- 
+Jens Axboe
 
-Bart.
+
