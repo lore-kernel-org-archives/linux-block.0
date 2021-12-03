@@ -2,67 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8342DC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 11:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37644C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 12:07:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235049AbhLCLFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 06:05:06 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:53773 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbhLCLFG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 06:05:06 -0500
-Received: from fsav112.sakura.ne.jp (fsav112.sakura.ne.jp [27.133.134.239])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1B3B1Nth038235;
-        Fri, 3 Dec 2021 20:01:23 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav112.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp);
- Fri, 03 Dec 2021 20:01:23 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1B3B1MQF038226
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 3 Dec 2021 20:01:23 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <0291d903-0778-01ff-927f-97df2810262e@i-love.sakura.ne.jp>
-Date:   Fri, 3 Dec 2021 20:01:23 +0900
+        id S1380702AbhLCMLM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 07:11:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23554 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1380698AbhLCMLK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 Dec 2021 07:11:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638533266;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=A+aL4b1qbG6ce9e16aJ2C0tZTa3iGfgtYcVuUqFE1/0=;
+        b=EcefwPCIL43B2iHwkY37EjOCe/wL6zpuaR54R9RdGnS0oFaLu4Giv0AW0P8mWaeeXjYzd5
+        wX2iawf0P0TCg1inth0xSqPbaWZcgmR2Jjo3FSxe88gclDWPVZwOS6cndxfvI2tyEVOnum
+        /i/xJ12eiu6q+SnWjaq246BDQtosiac=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-300-Zdv-eWcrNLqZc0seP5QygA-1; Fri, 03 Dec 2021 07:07:42 -0500
+X-MC-Unique: Zdv-eWcrNLqZc0seP5QygA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4F1B1023F50;
+        Fri,  3 Dec 2021 12:07:41 +0000 (UTC)
+Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ACF47944B;
+        Fri,  3 Dec 2021 12:07:09 +0000 (UTC)
+Date:   Fri, 3 Dec 2021 20:07:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] null_blk: allow zero poll queues
+Message-ID: <YaoIaAMSut0UGhy1@T590>
+References: <20211203023935.3424042-1-ming.lei@redhat.com>
+ <20211203100133.gdut65jrb6z6eodr@shindev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH] loop: make autoclear operation asynchronous
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-Cc:     Dave Chinner <dchinner@redhat.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-References: <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
- <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
- <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
- <YaSpkRHgEMXrcn5i@infradead.org>
- <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
- <YaYfu0H2k0PSQL6W@infradead.org>
- <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
- <20211202121615.GC1815@quack2.suse.cz>
- <3f4d1916-8e70-8914-57ba-7291f40765ae@i-love.sakura.ne.jp>
- <20211202180500.GA30284@quack2.suse.cz> <Yam+TsPF1jaKM+Am@infradead.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <Yam+TsPF1jaKM+Am@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211203100133.gdut65jrb6z6eodr@shindev>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/12/03 15:50, Christoph Hellwig wrote:
-> task_work_add sounds nice, but it is currently not exported which might
-> be for a reason (I don't really have any experience with it).
+Hi Shinichiro,
 
-I didn't find a reason not to export. But generally task_work_add() users
-seem to implement a fallback which uses a WQ in case task_work_add() failed
-(i.e. exit_task_work() was already called from do_exit()) or task_work_add()
-cannot be used (e.g. the caller is a kernel thread).
+On Fri, Dec 03, 2021 at 10:01:33AM +0000, Shinichiro Kawasaki wrote:
+> On Dec 03, 2021 / 10:39, Ming Lei wrote:
+> > There isn't any reason to not allow zero poll queues from user
+> > viewpoint.
+> > 
+> > Also sometimes we need to compare io poll between poll mode and irq
+> > mode, so not allowing poll queues is bad.
+> > 
+> > Fixes: 15dfc662ef31 ("null_blk: Fix handling of submit_queues and poll_queues attributes")
+> > Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Hi Ming,
+> 
+> It is good to know that the zero poll queues is useful. Having said that, I
+> observe zero division error [1] with your patch and the commands below. Don' we
+> need some more code changes to avoid the error?
+> 
+> # modprobe null_blk
+> # cd /sys/kernel/config/nullb
+> # mkdir test
+> # echo 0 > test/poll_queues
+> # echo 1 > test/power
+> Segmentation fault
 
-I don't know if there is possibility that a kernel thread calls blkdev_put(),
-but implementing the fallback path after all requires WQ. Thus, I think that
-starting from WQ only and see if something breaks is fine.
+I guess the following change may fix the error:
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 20534a2daf17..96c55d06401d 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1892,7 +1892,7 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+ 	if (g_shared_tag_bitmap)
+ 		set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
+ 	set->driver_data = nullb;
+-	if (g_poll_queues)
++	if (poll_queues)
+ 		set->nr_maps = 3;
+ 	else
+ 		set->nr_maps = 1;
+
+
+
+
+Thanks,
+Ming
 
