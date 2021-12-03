@@ -2,152 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CECDC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 16:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF9DC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 16:16:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236968AbhLCQOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 11:14:05 -0500
-Received: from smtprelay0235.hostedemail.com ([216.40.44.235]:44414 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229943AbhLCQOF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Dec 2021 11:14:05 -0500
-Received: from omf12.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 0E2FB180AF868;
-        Fri,  3 Dec 2021 16:10:40 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf12.hostedemail.com (Postfix) with ESMTPA id 564242D;
-        Fri,  3 Dec 2021 16:10:38 +0000 (UTC)
-Message-ID: <737d7d96deec73039699d62cd42b26b8862ae373.camel@perches.com>
-Subject: Re: [PATCH] xen-blkfront: Use the bitmap API when applicable
-From:   Joe Perches <joe@perches.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Juergen Gross <jgross@suse.com>, boris.ostrovsky@oracle.com,
-        sstabellini@kernel.org, roger.pau@citrix.com, axboe@kernel.dk
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Date:   Fri, 03 Dec 2021 08:10:37 -0800
-In-Reply-To: <1e9291c6-48bb-88e5-37dc-f604cfa4c4db@wanadoo.fr>
-References: <1c73cf8eaff02ea19439ec676c063e592d273cfe.1638392965.git.christophe.jaillet@wanadoo.fr>
-         <c529a221-f444-ad26-11ff-f693401c9429@suse.com>
-         <d8f87c17-75d1-2e6b-65e1-23adc75bb515@wanadoo.fr>
-         <6fcddba84070c021eb92aa9a5ff15fb2a47e9acb.camel@perches.com>
-         <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
-         <863f2cddacac590d581cda09d548ee0a652df8a1.camel@perches.com>
-         <1e9291c6-48bb-88e5-37dc-f604cfa4c4db@wanadoo.fr>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1ubuntu2 
+        id S238599AbhLCQUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 11:20:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236022AbhLCQUT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 11:20:19 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FCAC061751
+        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 08:16:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=z5lBZX9MrCtSgBxcdrFbiXIPCPltTB5SEppdL+CtI5s=; b=WT3vXA/jKvgz7yn6wK1ZtFRz8s
+        iVMqFKwQZv6Ww0lbYQkqNFGSpSIUFmK+6IxLMpZe9bHtV/Ligi3BsudrFzfX9LwiILs2iigvf6nGJ
+        e1wV9ri53sgZfuGb9CsWUAtIO/+trNQuX1ERIdT5v9SlaBPrbQzPSI7eOQPJyi7zsKsW2viYnS+VH
+        4PI+XKlfBQbSSl8FDT87pTy2EPgHcMtglGYsD5zAoa1gZ7S2ifXRmV9VvdLlcD3w/kDdYMNR7AufJ
+        q79O/Q/Tsx+BE2UvmlVG0Wbx/QmJuTscZOzuoXpFMWUTUIlhru3WMTbA3WQgb5p+AOoW60lN2aiDF
+        w456jtNQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mtBEz-009KtR-T8; Fri, 03 Dec 2021 16:16:54 +0000
+Date:   Fri, 3 Dec 2021 16:16:53 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 1/2] mm: move filemap_range_needs_writeback() into header
+Message-ID: <YapC9cl6qsOAjzNj@casper.infradead.org>
+References: <20211203153829.298893-1-axboe@kernel.dk>
+ <20211203153829.298893-2-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 564242D
-X-Stat-Signature: skzu1e47gn4yh4br1u6yk3izt6hqdaja
-X-Rspamd-Server: rspamout03
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1/Cp6pUluPgKVCI9lR+/9PfIk4J2JPI1hA=
-X-HE-Tag: 1638547838-500636
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211203153829.298893-2-axboe@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2021-12-03 at 16:54 +0100, Christophe JAILLET wrote:
-> Le 03/12/2021 à 04:03, Joe Perches a écrit :
-> > On Thu, 2021-12-02 at 20:07 +0100, Christophe JAILLET wrote:
-> > > Le 02/12/2021 à 19:16, Joe Perches a écrit :
-> > > > On Thu, 2021-12-02 at 19:12 +0100, Christophe JAILLET wrote:
-> > > > > Le 02/12/2021 à 07:12, Juergen Gross a écrit :
-> > > > > > On 01.12.21 22:10, Christophe JAILLET wrote:
-> > > > > > > Use 'bitmap_zalloc()' to simplify code, improve the semantic and avoid
-> > > > > > > some open-coded arithmetic in allocator arguments.
-> > > > > > > 
-> > > > > > > Also change the corresponding 'kfree()' into 'bitmap_free()' to keep
-> > > > > > > consistency.
-> > > > > > > 
-> > > > > > > Use 'bitmap_copy()' to avoid an explicit 'memcpy()'
-> > > > []
-> > > > > > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > > > []
-> > > > > > > @@ -442,16 +442,14 @@ static int xlbd_reserve_minors(unsigned int
-> > > > > > > minor, unsigned int nr)
-> > > > > > >         if (end > nr_minors) {
-> > > > > > >             unsigned long *bitmap, *old;
-> > > > > > > -        bitmap = kcalloc(BITS_TO_LONGS(end), sizeof(*bitmap),
-> > > > > > > -                 GFP_KERNEL);
-> > > > > > > +        bitmap = bitmap_zalloc(end, GFP_KERNEL);
-> > > > > > >             if (bitmap == NULL)
-> > > > > > >                 return -ENOMEM;
-> > > > > > >             spin_lock(&minor_lock);
-> > > > > > >             if (end > nr_minors) {
-> > > > > > >                 old = minors;
-> > > > > > > -            memcpy(bitmap, minors,
-> > > > > > > -                   BITS_TO_LONGS(nr_minors) * sizeof(*bitmap));
-> > > > > > > +            bitmap_copy(bitmap, minors, nr_minors);
-> > > > > > >                 minors = bitmap;
-> > > > > > >                 nr_minors = BITS_TO_LONGS(end) * BITS_PER_LONG;
-> > > > 
-> > > > 		nr_minors = end;
-> > > > ?
-> > > > 
-> > > 
-> > > No,
-> > > My understanding of the code is that if we lack space (end > nr_minors),
-> > > we need to allocate more. In such a case, we want to keep track of what
-> > > we have allocated, not what we needed.
-> > > The "padding" bits in the "long align" allocation, can be used later.
-> > 
-> > > 
-> > > first call
-> > > ----------
-> > > end = 65
-> > > nr_minors = 63
-> > > 
-> > > --> we need some space
-> > > --> we allocate 2 longs = 128 bits
-> > > --> we now use 65 bits of these 128 bits
-> > 
-> > or 96, 32 or 64 bit longs remember.
-> 
-> 32 and 64 for sure, but I was not aware of 96. On which arch?
+On Fri, Dec 03, 2021 at 08:38:28AM -0700, Jens Axboe wrote:
+> +++ b/include/linux/fs.h
 
-For more clarity that should have been a period instead of comma after 96.
+fs.h is the wrong place for these functions; they're pagecache
+functionality, so they should be in pagemap.h.
 
+> +/* Returns true if writeback might be needed or already in progress. */
+> +static inline bool mapping_needs_writeback(struct address_space *mapping)
+> +{
+> +	return mapping->nrpages;
+> +}
 
-> > The initial allocation is now bitmap_zalloc which
-> > specifies only bits and the nr_minors is then in
-> > BITS_TO_LONGS(bits) * BITS_PER_LONG
-> > 
-> > Perhaps that assumes too much about the internal
-> > implementation of bitmap_alloc
-> 
-> I get your point now, and I agree with you.
-> 
-> Maybe something as what is done in mc-entity.c?
-> Explicitly require more bits (which will be allocated anyway), instead 
-> of taking advantage (read "hoping") that it will be done.
+I don't like this function -- mapping_needs_writeback says to me that it
+tests a flag in mapping->flags.  Plus, it does exactly the same thing as
+!mapping_empty(), so perhaps ...
 
-Sure, that's sensible.
+> +static inline bool filemap_range_needs_writeback(struct address_space *mapping,
+> +						 loff_t start_byte,
+> +						 loff_t end_byte)
+> +{
+> +	if (!mapping_needs_writeback(mapping))
+> +		return false;
 
-> Could be:
-> 
-> @@ -440,26 +440,25 @@ static int xlbd_reserve_minors(unsigned int minor, 
-> unsigned int nr)
->   	int rc;
-> 
->   	if (end > nr_minors) {
->   		unsigned long *bitmap, *old;
-> 
-> -		bitmap = kcalloc(BITS_TO_LONGS(end), sizeof(*bitmap),
-> -				 GFP_KERNEL);
-> +		end = ALIGN(end, BITS_PER_LONG);
+just make this
+	if (mapping_empty(mapping))
+		return false;
 
-Though it may be more sensible to use some other alignment
-like round_up and not use BITS_PER_LONG at all as the
-number of these may not be dependent on 32/64 bit arches
-at all.
-
-Maybe something like:
-
-#define GROW_MINORS	64
-
-		end = round_up(nr_minors, GROW_MINORS);
-
-etc...
-
+Other than that, no objections to making this static inline.
