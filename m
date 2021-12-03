@@ -2,153 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B382C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  2 Dec 2021 23:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B47AC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 02:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349401AbhLBX1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 18:27:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244230AbhLBX1l (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 18:27:41 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1ACFC06174A
-        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 15:24:18 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id k21so1596564ioh.4
-        for <linux-block@vger.kernel.org>; Thu, 02 Dec 2021 15:24:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=NLDDw1pqgSFWCbeKySen1cv6lFv+DqvXYym5kKf0q4s=;
-        b=mZCsJDK8loRnEhs1PHBAcK+4zZR5uR5yZrJTL53/yNDbJGFGg3d6+oKTFcAo5+uicQ
-         /JuRrE7MFqz99uE9qsrjp6PN1OKCn8NXK6xATr1rDNHhL3N5aPzKDq6ZgdFwA5scRVJl
-         Xo838GyR70XH0XIulYstak7JT/rvLJ8Jn4yIga2Cti7TnY8H18vaxllHUP7PNr4NcvKx
-         gsQWc6BlbknwaJqEUz08+lyclM8lo6QfUMJ9VTg31f2vBfvJaLV0PakTQzPhbCwulN0Z
-         rUqqyjE3MJ38LNYTjgY/bisrF6UmE3R4Lx7xswL2ZAO8AZEUXxeFaWj5CKftd46RIkHS
-         0aUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=NLDDw1pqgSFWCbeKySen1cv6lFv+DqvXYym5kKf0q4s=;
-        b=WeFXPh+SZcUAuivbrm9Oi+/E1pI7j2UgIrVT/6zzDsfa5+eykPLoUNYGF1yWYx0LGs
-         E+Gll2sxz13AbBDqe9Bxey5jXwHF3d7EvsHJOANvWSLh4XXsrH6qO1Ud29Vbi2G2yU9F
-         d6Mr8WQIvQhG4fFQTq3//Yl+6cEtuHUETbnTCByDySPZPvJZCr3bZIOKXVWJFE+pK9uw
-         0zwa6x+VKRpJSwyn+V8kaDPO2tpyDQemiWjQYDAoq+2a4a/DxkgGL29U8/qb+uYD7EL6
-         K18pqCqDFbWudHHKCnW8Cd+HiVBmDrC67RUgCC/z5tjn0TVRWCcMnGMBslj/DPzKJvYB
-         /Awg==
-X-Gm-Message-State: AOAM532Pl6j8N4NUbs6YAQIDKeTXKoeCD26drtvd++6RFag0LEuEi2xi
-        wPYQPhJBQFkpeiQW95xkqpWGMC9LXmXKWg8+
-X-Google-Smtp-Source: ABdhPJxKXoNYer6IUg2VNbco2TTVgn2gGULZpd15LSrIlBDh/DG/mXm99yvW1npuIEUPfWqpr5aftQ==
-X-Received: by 2002:a05:6602:3422:: with SMTP id n34mr3289994ioz.7.1638487458048;
-        Thu, 02 Dec 2021 15:24:18 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id m2sm637168iob.21.2021.12.02.15.24.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 15:24:17 -0800 (PST)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        io-uring <io-uring@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH RFC] block: enable bio allocation cache for IRQ driven IO
-Message-ID: <c24fe04b-6a46-93b2-a6a6-a77606a1084c@kernel.dk>
-Date:   Thu, 2 Dec 2021 16:24:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1350014AbhLCCka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 21:40:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52889 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235868AbhLCCka (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Dec 2021 21:40:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638499026;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cUmqcFXaJLqAnlPBUxGnNVcTZaJNix4zhFJS3I1qJQw=;
+        b=aTm8+u25f+/2Po6EHUJteATbIhy69dZT27a4Tf2VQas+SO3gFkRlBw+lWHmQkFlJHW5u23
+        0IsOuUIrwewoxRPkdmvUZ/WAxXiwgmpV6+XT1cLuRvE9UmDhuye3MYcKlI4Hj35FCZlmRc
+        NLTjt7PIKv65zV2kQhhtKWXZAaQh71E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-163-QKAfUyAOMqyl-fPake4Bng-1; Thu, 02 Dec 2021 21:37:05 -0500
+X-MC-Unique: QKAfUyAOMqyl-fPake4Bng-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4531801B10;
+        Fri,  3 Dec 2021 02:37:03 +0000 (UTC)
+Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1EA2100EBAD;
+        Fri,  3 Dec 2021 02:36:06 +0000 (UTC)
+Date:   Fri, 3 Dec 2021 10:36:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, hch@infradead.org
+Subject: Re: [PATCH 2/2] block: fix double bio queue when merging in cached
+ request path
+Message-ID: <YamCkkHUDluZLDxE@T590>
+References: <20211202194741.810957-1-axboe@kernel.dk>
+ <20211202194741.810957-3-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211202194741.810957-3-axboe@kernel.dk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We currently cannot use the bio recycling allocation cache for IRQ driven
-IO, as the cache isn't IRQ safe (by design).
+On Thu, Dec 02, 2021 at 12:47:41PM -0700, Jens Axboe wrote:
+> When we attempt to merge off the cached request path, we return NULL
+> if successful. This makes the caller believe that it's should allocate
+> a new request, and hence we end up with the bio both merged and associated
+> with a new request. This, predictably, leads to all sorts of crashes.
+> 
+> Pass in a pointer to the bio pointer, and clear it for the merge case.
+> Then the caller knows that the bio is already queued, and no new requests
+> need to get allocated.
+> 
+> Fixes: 5b13bc8a3fd5 ("blk-mq: cleanup request allocation")
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Add a way for the completion side to pass back a bio that needs freeing,
-so we can do it from the io_uring side. io_uring completions always
-run in task context.
+Io hang in io_uring workload can't be triggered any more with this
+patch:
 
-This is good for about a 13% improvement in IRQ driven IO, taking us from
-around 6.3M/core to 7.1M/core IOPS.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-Open to suggestions on how to potentially do this cleaner. The below
-obviously works, but ideally we'd want to run the whole end_io handler
-from this context rather than just the bio put. That would enable
-further optimizations in this area.
-
-But the wins are rather large as-is.
-
-diff --git a/block/fops.c b/block/fops.c
-index 10015e1a5b01..9cea5b60f044 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -295,14 +295,19 @@ static void blkdev_bio_end_io_async(struct bio *bio)
- 		ret = blk_status_to_errno(bio->bi_status);
- 	}
- 
--	iocb->ki_complete(iocb, ret);
--
- 	if (dio->flags & DIO_SHOULD_DIRTY) {
- 		bio_check_pages_dirty(bio);
- 	} else {
- 		bio_release_pages(bio, false);
--		bio_put(bio);
-+		if (iocb->ki_flags & IOCB_BIO_PASSBACK) {
-+			iocb->ki_flags |= IOCB_PRIV_IS_BIO;
-+			iocb->private = bio;
-+		} else {
-+			bio_put(bio);
-+		}
- 	}
-+
-+	iocb->ki_complete(iocb, ret);
- }
- 
- static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 4591bcb79b1f..5644628b8cb7 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2770,6 +2770,9 @@ static void io_req_task_complete(struct io_kiocb *req, bool *locked)
- 	unsigned int cflags = io_put_rw_kbuf(req);
- 	int res = req->result;
- 
-+	if (req->rw.kiocb.ki_flags & IOCB_PRIV_IS_BIO)
-+		bio_put(req->rw.kiocb.private);
-+
- 	if (*locked) {
- 		io_req_complete_state(req, res, cflags);
- 		io_req_add_compl_list(req);
-@@ -2966,6 +2969,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	} else {
- 		if (kiocb->ki_flags & IOCB_HIPRI)
- 			return -EINVAL;
-+		kiocb->ki_flags |= IOCB_ALLOC_CACHE | IOCB_BIO_PASSBACK;
- 		kiocb->ki_complete = io_complete_rw;
- 	}
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 0cc4f5fd4cfe..1e9d86955e3d 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -322,6 +322,10 @@ enum rw_hint {
- #define IOCB_NOIO		(1 << 20)
- /* can use bio alloc cache */
- #define IOCB_ALLOC_CACHE	(1 << 21)
-+/* iocb supports bio passback */
-+#define IOCB_BIO_PASSBACK	(1 << 22)
-+/* iocb->private holds bio to put */
-+#define IOCB_PRIV_IS_BIO	(1 << 23)
- 
- struct kiocb {
- 	struct file		*ki_filp;
 
 -- 
-Jens Axboe
+Ming
 
