@@ -2,85 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54813C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 07:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBCFC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 07:50:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244080AbhLCHrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 02:47:35 -0500
-Received: from mail-qv1-f52.google.com ([209.85.219.52]:43622 "EHLO
-        mail-qv1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378957AbhLCHr0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 02:47:26 -0500
-Received: by mail-qv1-f52.google.com with SMTP id j9so1969940qvm.10;
-        Thu, 02 Dec 2021 23:44:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=yoWs+PQyv74WJgIH/n8CVu6zibGf1hIQseWJziXNagc=;
-        b=qrpv8K7TedhNzbZAYC+fOzgtCjShxLDZS6iaNSrPBnDAJuI//YObaj4E6bNMFEBY3W
-         IYMgnRRWMwziLbvx0Ty23BkuGHzP/XvtZzURiyLprQhwmA/pmAPklss6fHwKxpgaNWPW
-         vSt7/LILVikPBPhLqEx3cF96Sr+KOkkTA7b5MQv83xR0MachJJQds4utU8mow1XNm4+f
-         39P+ydImxgB8y6/XTxvbYhIDFSMHcRA505PS4jbO9KWIeo6TdbinH/EUXBb8F3F4yH+j
-         5vN4aCDl6YGy3F869xnfkSDkeVksIbrFAvvbcHgDlB/qhhU0C/ktZ9DALY5/7MyVGE5Q
-         CRLQ==
-X-Gm-Message-State: AOAM531RsregNlWbQgU3JGE2cXFbmF+r3hAjp33CJyE8d90xKEgmtUkP
-        j+dhOEnlpxTv5pSwcldJQs+6j3i8f9Y=
-X-Google-Smtp-Source: ABdhPJxVeZ+d7hec3YqPGJNBqE1cxPXxGtNWyC+Ls1jy4iKipaeOmpFQLs/YC493tYyNKP907pfZag==
-X-Received: by 2002:ad4:4ee4:: with SMTP id dv4mr17712867qvb.59.1638517442789;
-        Thu, 02 Dec 2021 23:44:02 -0800 (PST)
-Received: from [192.168.1.110] ([213.87.144.207])
-        by smtp.gmail.com with ESMTPSA id m20sm1693351qkp.112.2021.12.02.23.44.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 23:44:02 -0800 (PST)
-Message-ID: <045df549-6805-0a02-a634-81aca7d98db5@linux.com>
-Date:   Fri, 3 Dec 2021 10:42:53 +0300
+        id S1379000AbhLCHx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 02:53:57 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:32876 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1378991AbhLCHx4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 02:53:56 -0500
+Received: from kwepemi100009.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4J54k64k7Nzcbn4;
+        Fri,  3 Dec 2021 15:50:22 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100009.china.huawei.com (7.221.188.242) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 3 Dec 2021 15:50:30 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 3 Dec 2021 15:50:30 +0800
+Subject: Re: [PATCH v4 2/2] block: cancel all throttled bios in del_gendisk()
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <hch@infradead.org>, <tj@kernel.org>, <axboe@kernel.dk>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211202130440.1943847-1-yukuai3@huawei.com>
+ <20211202130440.1943847-3-yukuai3@huawei.com>
+ <20211202144818.GB16798@blackbody.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <95825098-a532-a0e4-9ed0-0b5f2a0e5f04@huawei.com>
+Date:   Fri, 3 Dec 2021 15:50:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Linux-kernel <linux-kernel@vger.kernel.org>
-From:   Denis Efremov <efremov@linux.com>
-Subject: [GIT PULL] Floppy patches for 5.17
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20211202144818.GB16798@blackbody.suse.cz>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+在 2021/12/02 22:48, Michal Koutný 写道:
+> Hello Kuai.
+> 
+> On Thu, Dec 02, 2021 at 09:04:40PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>> For example, if user thread is throttled with low bps while it's
+>> issuing large io, and the device is deleted. The user thread will
+>> wait for a long time for io to return.
+> 
+> Do I understand correctly the "long time" here is
+> outstanding_IO_size/throttled_bandwidth? Or are you getting at some
 
-The following changes since commit 2bfdbe8b7ebd17b5331071071a910fbabc64b436:
+Hi, Michal
 
-  null_blk: allow zero poll queues (2021-12-02 19:57:47 -0700)
+Yes, this is exactly what I mean.
+> other cause/longer time?
+> 
+>> +void blk_throtl_cancel_bios(struct request_queue *q)
+>> +{
+>> +	struct throtl_data *td = q->td;
+>> +	struct bio_list bio_list_on_stack;
+>> +	struct blkcg_gq *blkg;
+>> +	struct cgroup_subsys_state *pos_css;
+>> +	struct bio *bio;
+>> +	int rw;
+>> +
+>> +	bio_list_init(&bio_list_on_stack);
+>> +
+>> +	/*
+>> +	 * hold queue_lock to prevent concurrent with dispatching
+>> +	 * throttled bios by timer.
+>> +	 */
+>> +	spin_lock_irq(&q->queue_lock);
+> 
+> You've replaced the rcu_read_lock() with the queue lock but...
+> 
+>> +
+>> +	/*
+>> +	 * Drain each tg while doing post-order walk on the blkg tree, so
+>> +	 * that all bios are propagated to td->service_queue.  It'd be
+>> +	 * better to walk service_queue tree directly but blkg walk is
+>> +	 * easier.
+>> +	 */
+>> +	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
+>> +		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
+> 
+> ...you also need the rcu_read_lock() here since you may encounter a
+> (descendant) blkcg that's removed concurrently.
 
-are available in the Git repository at:
+blkg_destroy() is protected by the queue_lock，so I think queue_lock can
+protect such concurrent scenario.
 
-  https://github.com/evdenis/linux-floppy tags/floppy-for-5.17
-
-for you to fetch changes up to 9fae059d4cd88229661b3eccb0409f723129e5bd:
-
-  floppy: Add max size check for user space request (2021-12-03 09:54:34 +0300)
-
-Please, pull
-
-----------------------------------------------------------------
-Floppy patches for 5.17
-
-Two patches. The patch from Tasos Sahanidis fixes a hung when the module
-tries to read a broken floppy while ejecting it. The patch from Xiongwei
-Song suppresses a syzkaller warning about allocation size.
-
-Signed-off-by: Denis Efremov <efremov@linux.com>
-
-----------------------------------------------------------------
-Tasos Sahanidis (1):
-      floppy: Fix hang in watchdog when disk is ejected
-
-Xiongwei Song (1):
-      floppy: Add max size check for user space request
-
- drivers/block/floppy.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Thanks,
+Kuai
+> 
+> (I may miss some consequences of doing this under the queue_lock so if
+> the concurrent removal is ruled out, please make a comment about it.)
+> 
+> 
+> Regards,
+> Michal
+> 
