@@ -2,78 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D124C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 08:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A01E5C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 08:26:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378844AbhLCIUf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 03:20:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32434 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238936AbhLCIUf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Dec 2021 03:20:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638519431;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=nlYXiKMvLZQg0xZi8ZllLflsaYbX8g/D0UlDyA2AWSI=;
-        b=ZJhr1scaaDeugfn8991a1us0xY2kxAI25tnVpSfLzdL+Lz2xFLlUk5n5KbOymV/6Kr+qr5
-        CORLYTaZ4RFAxHsM8rwdJtBP1fNOCpzsObNTQy5AX6vCb0IUZkFf2X99VPyZTCdZyl9MMo
-        Z6XrktX51lFmWj4VLDfeMjEk0ZzkSGA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-200-uHg33CnhM56Iey0VfChACQ-1; Fri, 03 Dec 2021 03:17:10 -0500
-X-MC-Unique: uHg33CnhM56Iey0VfChACQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25D101090821;
-        Fri,  3 Dec 2021 08:17:09 +0000 (UTC)
-Received: from localhost (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6575410016F4;
-        Fri,  3 Dec 2021 08:17:08 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: null_blk: batched complete poll requests
-Date:   Fri,  3 Dec 2021 16:17:03 +0800
-Message-Id: <20211203081703.3506020-1-ming.lei@redhat.com>
+        id S1379146AbhLCI3b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 03:29:31 -0500
+Received: from mail-ua1-f41.google.com ([209.85.222.41]:36789 "EHLO
+        mail-ua1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1379143AbhLCI3a (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 03:29:30 -0500
+Received: by mail-ua1-f41.google.com with SMTP id r15so4055170uao.3;
+        Fri, 03 Dec 2021 00:26:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nv8Jf49U8dHM6/sJsWSvwazrQnskBUzISoulkhKft80=;
+        b=L8t0rXDY8x2xXDbYuVWHPhDDMNxKk8NRu2hPgywrWYG3Kn3fSl/zEFZIenOJgCL6Hd
+         A3Fd5RMtWOTjVRLupH9fPusTqO4HXIVTWKjpfJBH0RzpeVkEGFnd1ebx9uip4NGOKjRn
+         eaNXT1kLbQMADNIcmf+iPL82y3Thf4OCHqxw/aqMZi1W+ixLPGczvPnn+pm/6+4Q1gfB
+         n0RV33ubNKQNnyoIs/ewKnR06b3ul75XRDqZvgYgn+wpu9uNE52BA1rumQM35DlUe3fY
+         DvCyaA2hkK+qwtXTs5xDAkvPoaVN2HatmfByB0kXZhUfBNMAfU9XbPosPiqLoWPxuFhJ
+         VyQg==
+X-Gm-Message-State: AOAM532X1mjDOKgcOB5Nqy6DTWosErW6TdnKDr+Y+SXIOfu9f39tn0GT
+        DlCphxBkKxo8ZYXQoIi8CQNwKfv0BE8Rncg9
+X-Google-Smtp-Source: ABdhPJyfSjm1n2ApUicTHkaVFy01cgH9A3aFLoRzPLPE++w/ueLdUaz2mW4rH0r5UQpmSrDQmryCPA==
+X-Received: by 2002:a67:e114:: with SMTP id d20mr20213817vsl.5.1638519966445;
+        Fri, 03 Dec 2021 00:26:06 -0800 (PST)
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com. [209.85.222.42])
+        by smtp.gmail.com with ESMTPSA id q20sm362299uae.17.2021.12.03.00.26.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Dec 2021 00:26:06 -0800 (PST)
+Received: by mail-ua1-f42.google.com with SMTP id t13so3985314uad.9;
+        Fri, 03 Dec 2021 00:26:06 -0800 (PST)
+X-Received: by 2002:a05:6102:c89:: with SMTP id f9mr19521165vst.68.1638519963327;
+ Fri, 03 Dec 2021 00:26:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be>
+ <20211203065726.GA3072@lst.de>
+In-Reply-To: <20211203065726.GA3072@lst.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 3 Dec 2021 09:25:51 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWR3hwBho3wDBPjGm4q==qrQn3PLdZN9CfVwX-aOMUW0A@mail.gmail.com>
+Message-ID: <CAMuHMdWR3hwBho3wDBPjGm4q==qrQn3PLdZN9CfVwX-aOMUW0A@mail.gmail.com>
+Subject: Re: [PATCH/RFC -nxt] mtd_blkdevs: Set GENHD_FL_NO_PART
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Michael Walle <michael@walle.cc>,
+        Pratyush Yadav <p.yadav@ti.com>,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        linux-block@vger.kernel.org,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Complete poll requests via blk_mq_add_to_batch() and
-blk_mq_end_request_batch(), so that we can cover batched complete
-code path by running null_blk test.
+Hi Christoph,
 
-Meantime this way shows ~14% IOPS boost on 't/io_uring /dev/nullb0'
-in my test.
+On Fri, Dec 3, 2021 at 7:57 AM Christoph Hellwig <hch@lst.de> wrote:
+> I think we need the patch below to restore the old behavior where a
+> partitions scan happens only for those sub-drivers that do report a
+> partition shift.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/null_blk/main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index b4ff5ae1f70c..20534a2daf17 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1574,7 +1574,9 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 		cmd = blk_mq_rq_to_pdu(req);
- 		cmd->error = null_process_cmd(cmd, req_op(req), blk_rq_pos(req),
- 						blk_rq_sectors(req));
--		end_cmd(cmd);
-+		if (!blk_mq_add_to_batch(req, iob, cmd->error,
-+					blk_mq_end_request_batch))
-+			end_cmd(cmd);
- 		nr++;
- 	}
- 
--- 
-2.31.1
+> MTD maintainers: is this intentional that raw mtdblock does not support
+> partitions, but the various "FTL" modules do?
+>
+> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+> index 113f86df76038..57a22d2ebaeca 100644
+> --- a/drivers/mtd/mtd_blkdevs.c
+> +++ b/drivers/mtd/mtd_blkdevs.c
+> @@ -345,6 +345,8 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+>         gd->first_minor = (new->devnum) << tr->part_bits;
+>         gd->minors = 1 << tr->part_bits;
+>         gd->fops = &mtd_block_ops;
+> +       if (!tr->part_bits)
+> +               gd->flags |= GENHD_FL_NO_PART;
 
+Move this into the "else" branch of the test below?
+
+>         if (tr->part_bits)
+>                 if (new->devnum < 26)
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
