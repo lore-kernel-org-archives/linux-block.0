@@ -2,84 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67479C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 02:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3586CC433FE
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 03:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243536AbhLCDBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 22:01:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37244 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242005AbhLCDBU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Dec 2021 22:01:20 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6877DC06174A
-        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 18:57:57 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id t8so1395415ilu.8
-        for <linux-block@vger.kernel.org>; Thu, 02 Dec 2021 18:57:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=6X7KHTzv1KndbnPEFJDUymxroGE661H/W/HnmgndvsI=;
-        b=oScf3C/9S3zhS+2xiEPmr/TB0sbU7LBLQhejIzBHb+QVzyABlXMdOD/8WVxHuDpvJo
-         KuXMMOxbBUsDloxAX2v+DN0NK/xkBwcnpxWVv3Lj6rgTIM/h/hfx0bLqTlvyIbsjqYIv
-         XVLDM+5LQHavvbbEvMXqLf4XsdytJ5H2XpADtu1mRe3TJ8pppw3qMGCHrQbj4N3AwS1I
-         cTuMQk+cViYw/J8kfv5bqkjqqwvSkzMV2Y9ba9DtdtDVYU2ty5vQgog5wtO7yU4eZoPx
-         BHhXghpb6o2zgxM8FgSd44g6JQ7Z8By+JOSHeTSsXYwt8xi03dpeHrvFCAE9Dtgxrmis
-         kAiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=6X7KHTzv1KndbnPEFJDUymxroGE661H/W/HnmgndvsI=;
-        b=6oTafQZW3YEWXWugaxE/piS35oNgi048+r5R2HKweBX355gGxjdWNmZgMlWLdbMhNy
-         1eDBl9Kct+ZaPJm3egtukCkRQ2LIBdpPOWHd9zF7EcaIBuAZNnJEqllwfJDPLkvSuCGm
-         +A5ULH/zAnnfSrmxwUABd6gObfPN8mk9IRskxtLsYlujOG1PeuvDXQ7ufL3FuFfRPMVv
-         nioJtAuGAbanuM5sB/xhz8bnWkGeX7tWn7QQzKBPDL23PO9b1iucaBjVGwwj/XrteTas
-         YCdcgBHsy2SoDmehwruXO7gZ6228Ez39zz1kmEE8+i2uSG8eJJFymaZ9H7HccXjMdg3f
-         FevA==
-X-Gm-Message-State: AOAM532zOLir/rVizkB9fPn+KbwxTgomM/v2BS0fqwjgIoFtLtKVSWsC
-        sgZ/a1+ymOHLugL9ER0N3Pw9gVoQBSRzIqS3
-X-Google-Smtp-Source: ABdhPJzqdbAH5rPVnf0TYnM4azPcipTEpuUcGsLHoawbqFsXBLREOTCP9/fAgSOsT8Xq1OsRLgQjqg==
-X-Received: by 2002:a05:6e02:1ba8:: with SMTP id n8mr18874161ili.254.1638500276733;
-        Thu, 02 Dec 2021 18:57:56 -0800 (PST)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id w19sm1254877iov.12.2021.12.02.18.57.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Dec 2021 18:57:56 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20211203023935.3424042-1-ming.lei@redhat.com>
-References: <20211203023935.3424042-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] null_blk: allow zero poll queues
-Message-Id: <163850027619.228927.313747953937341896.b4-ty@kernel.dk>
-Date:   Thu, 02 Dec 2021 19:57:56 -0700
+        id S1378340AbhLCDHB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Dec 2021 22:07:01 -0500
+Received: from smtprelay0154.hostedemail.com ([216.40.44.154]:42294 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1350790AbhLCDHA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Dec 2021 22:07:00 -0500
+Received: from omf06.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay01.hostedemail.com (Postfix) with ESMTP id 140B9101369A0;
+        Fri,  3 Dec 2021 03:03:35 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf06.hostedemail.com (Postfix) with ESMTPA id 6DDA420015;
+        Fri,  3 Dec 2021 03:03:32 +0000 (UTC)
+Message-ID: <863f2cddacac590d581cda09d548ee0a652df8a1.camel@perches.com>
+Subject: Re: [PATCH] xen-blkfront: Use the bitmap API when applicable
+From:   Joe Perches <joe@perches.com>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Juergen Gross <jgross@suse.com>, boris.ostrovsky@oracle.com,
+        sstabellini@kernel.org, roger.pau@citrix.com, axboe@kernel.dk
+Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Date:   Thu, 02 Dec 2021 19:03:32 -0800
+In-Reply-To: <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
+References: <1c73cf8eaff02ea19439ec676c063e592d273cfe.1638392965.git.christophe.jaillet@wanadoo.fr>
+         <c529a221-f444-ad26-11ff-f693401c9429@suse.com>
+         <d8f87c17-75d1-2e6b-65e1-23adc75bb515@wanadoo.fr>
+         <6fcddba84070c021eb92aa9a5ff15fb2a47e9acb.camel@perches.com>
+         <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.4-1ubuntu2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Stat-Signature: dsgan1p8pchxr8wbecis6grq8tsez18d
+X-Rspamd-Server: rspamout01
+X-Rspamd-Queue-Id: 6DDA420015
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1/U5Pxt1pAwSKl1eR87urKf9gGDN2xSyaw=
+X-HE-Tag: 1638500612-192617
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 3 Dec 2021 10:39:35 +0800, Ming Lei wrote:
-> There isn't any reason to not allow zero poll queues from user
-> viewpoint.
+On Thu, 2021-12-02 at 20:07 +0100, Christophe JAILLET wrote:
+> Le 02/12/2021 à 19:16, Joe Perches a écrit :
+> > On Thu, 2021-12-02 at 19:12 +0100, Christophe JAILLET wrote:
+> > > Le 02/12/2021 à 07:12, Juergen Gross a écrit :
+> > > > On 01.12.21 22:10, Christophe JAILLET wrote:
+> > > > > Use 'bitmap_zalloc()' to simplify code, improve the semantic and avoid
+> > > > > some open-coded arithmetic in allocator arguments.
+> > > > > 
+> > > > > Also change the corresponding 'kfree()' into 'bitmap_free()' to keep
+> > > > > consistency.
+> > > > > 
+> > > > > Use 'bitmap_copy()' to avoid an explicit 'memcpy()'
+> > []
+> > > > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> > []
+> > > > > @@ -442,16 +442,14 @@ static int xlbd_reserve_minors(unsigned int
+> > > > > minor, unsigned int nr)
+> > > > >        if (end > nr_minors) {
+> > > > >            unsigned long *bitmap, *old;
+> > > > > -        bitmap = kcalloc(BITS_TO_LONGS(end), sizeof(*bitmap),
+> > > > > -                 GFP_KERNEL);
+> > > > > +        bitmap = bitmap_zalloc(end, GFP_KERNEL);
+> > > > >            if (bitmap == NULL)
+> > > > >                return -ENOMEM;
+> > > > >            spin_lock(&minor_lock);
+> > > > >            if (end > nr_minors) {
+> > > > >                old = minors;
+> > > > > -            memcpy(bitmap, minors,
+> > > > > -                   BITS_TO_LONGS(nr_minors) * sizeof(*bitmap));
+> > > > > +            bitmap_copy(bitmap, minors, nr_minors);
+> > > > >                minors = bitmap;
+> > > > >                nr_minors = BITS_TO_LONGS(end) * BITS_PER_LONG;
+> > 
+> > 		nr_minors = end;
+> > ?
+> > 
 > 
-> Also sometimes we need to compare io poll between poll mode and irq
-> mode, so not allowing poll queues is bad.
+> No,
+> My understanding of the code is that if we lack space (end > nr_minors), 
+> we need to allocate more. In such a case, we want to keep track of what 
+> we have allocated, not what we needed.
+> The "padding" bits in the "long align" allocation, can be used later.
+
 > 
+> first call
+> ----------
+> end = 65
+> nr_minors = 63
 > 
-> [...]
+> --> we need some space
+> --> we allocate 2 longs = 128 bits
+> --> we now use 65 bits of these 128 bits
 
-Applied, thanks!
+or 96, 32 or 64 bit longs remember.
 
-[1/1] null_blk: allow zero poll queues
-      commit: 2bfdbe8b7ebd17b5331071071a910fbabc64b436
+> 
+> new call
+> --------
+> end = 68
+> nr_minors = 128 (from previous call)
 
-Best regards,
--- 
-Jens Axboe
+The initial allocation is now bitmap_zalloc which
+specifies only bits and the nr_minors is then in
+BITS_TO_LONGS(bits) * BITS_PER_LONG
+
+Perhaps that assumes too much about the internal
+implementation of bitmap_alloc
+
 
 
