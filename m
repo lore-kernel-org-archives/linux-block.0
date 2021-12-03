@@ -2,130 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 013C5C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 10:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C73FC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 10:27:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379855AbhLCKYc convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 05:24:32 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4193 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379862AbhLCKXz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 05:23:55 -0500
-Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J582D1KjQz67wM9;
-        Fri,  3 Dec 2021 18:19:32 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 3 Dec 2021 11:20:27 +0100
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
- Fri, 3 Dec 2021 11:20:27 +0100
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "eparis@redhat.com" <eparis@redhat.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "jannh@google.com" <jannh@google.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-audit@redhat.com" <linux-audit@redhat.com>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "tusharsu@linux.microsoft.com" <tusharsu@linux.microsoft.com>
-Subject: RE: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
-Thread-Topic: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
-Thread-Index: AQHX5tHI6VSZDPA0J0GM0KIP7fuaeKweu+CAgAAaFvD///01gIAAEg9QgAFg9oCAAC4FMA==
-Date:   Fri, 3 Dec 2021 10:20:27 +0000
-Message-ID: <28208b7f142f4295ac5c857af5cffe07@huawei.com>
-References: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
- <20211201163708.3578176-1-roberto.sassu@huawei.com>
- <Yahz1SYRG1CQIh0z@infradead.org>
- <e57d2d23ec7845febb79ca4476c73fcb@huawei.com>
- <YaiHX+dWNUlmsNac@infradead.org>
- <b4bf4a384b334cdab1522b3b082bd088@huawei.com>
- <Yam+m9eiLxIamGXm@infradead.org>
-In-Reply-To: <Yam+m9eiLxIamGXm@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.204.63.33]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S239477AbhLCKbG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 05:31:06 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:37546 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235349AbhLCKbF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 05:31:05 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id D8E38212C6;
+        Fri,  3 Dec 2021 10:27:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1638527260; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DvmP4cB/KNSRMgh4UcYVFP3x4fPHzjzEcFBhVdgCru0=;
+        b=MhFZ5ke24T5q0Sb3wHgjIeX2G1ZCb5g6d41PhS8Trge8RFGVLrwzMO/HycD4Jd2kNRV7bz
+        LrhPHTIzUonH7t8N+MMz6ch2dmM1oBJQagD7Ep3UpZ4/paqZtZNwk4JwzY92h8umG1HitZ
+        tMhsu1WaLNQpPDIgIacn1YgtL6q7hC8=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B86D713CF5;
+        Fri,  3 Dec 2021 10:27:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vRFZLBzxqWFoDwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Fri, 03 Dec 2021 10:27:40 +0000
+Date:   Fri, 3 Dec 2021 11:27:39 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     hch@infradead.org, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v4 2/2] block: cancel all throttled bios in del_gendisk()
+Message-ID: <20211203102739.GB64349@blackbody.suse.cz>
+References: <20211202130440.1943847-1-yukuai3@huawei.com>
+ <20211202130440.1943847-3-yukuai3@huawei.com>
+ <20211202144818.GB16798@blackbody.suse.cz>
+ <95825098-a532-a0e4-9ed0-0b5f2a0e5f04@huawei.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
+Content-Disposition: inline
+In-Reply-To: <95825098-a532-a0e4-9ed0-0b5f2a0e5f04@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> From: Christoph Hellwig [mailto:hch@infradead.org]
-> Sent: Friday, December 3, 2021 7:52 AM
-> On Thu, Dec 02, 2021 at 09:29:52AM +0000, Roberto Sassu wrote:
-> > The problem being solved is how to grant access to files
-> > which satisfy a property defined in the policy.
-> 
-> If you have want to enforce access to files in the block layer using
-> a specific stacking block driver you don't just have one layering
-> violation but a bunch of them.  Please go back to the drawing board.
 
-Ok. I write my thoughts here, so that it is easier to align.
+--tjCHc7DPkfUGtrlw
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-dm-verity provides block-level integrity, which means that
-the block layer itself is responsible to not pass data to the
-upper layer, the filesystem, if a block is found corrupted.
+On Fri, Dec 03, 2021 at 03:50:01PM +0800, "yukuai (C)" <yukuai3@huawei.com>=
+ wrote:
+> blkg_destroy() is protected by the queue_lock=EF=BC=8Cso I think queue_lo=
+ck can
+> protect such concurrent scenario.
 
-The dm-verity root digest represents the immutable state
-of the block device. dm-verity is still responsible to enforce
-accesses to the block device according to the root digest
-passed at device setup time. Nothing changes, the block
-layer still detects data corruption against the passed
-reference value.
+blkg_destroy() is not as destroying :-) as actual free, you should
+synchronize against (the queue_lock ensures this for
+pd_free_fn=3Dthrotl_pd_free but you may still trip on blkcg after
+blkcg_css_free()).
 
-The task of the security layer is to decide whether or not
-the root digest passed at device setup time is acceptable,
-e.g. it represents a device containing genuine files coming
-from a software vendor.
+[Actually, I think you should see a warning in your situation if you
+enable CONFIG_PROVE_RCU.]
 
-The mandatory policy can be enforced at different layers,
-depending on whether the security controls are placed.
-A possibility would be to deny mounting block devices that
-don't satisfy the mandatory policy.
+HTH,
+Michal
 
-However, if the mandatory policy wants only to restrict
-execution of approved files and allowing the rest, making
-the decision at the block layer is too coarse and restrictive.
-It would force the user to mount only approved block
-devices. The security layer must operate on files to enforce
-this policy.
+--tjCHc7DPkfUGtrlw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-Now probably there is the part where there is no agreement.
+-----BEGIN PGP SIGNATURE-----
 
-The integrity property of a block device applies also to the
-files on the filesystem mounted from that device. User space
-programs cannot access files in that filesystem coming from a
-device with a different dm-verity root digest, or files stored
-in a corrupted block device.
+iHUEARYIAB0WIQTiq06H1IhXbF2mqzsiXqxkP0JkRwUCYanxCgAKCRAiXqxkP0Jk
+R3lBAP4oljvRynKApFVPUyqI5k6NuqpWC4Yv1Ll3PdCiKrZkiwEAtozR8aRyinFF
+NPyhhAKCpdU+IAXi7JXzqU982GQDEAs=
+=YebJ
+-----END PGP SIGNATURE-----
 
-If what I wrote is correct, that the integrity property is preserved
-across the layers, this would give enough flexibility to enforce
-policies at a higher layer, although that property is guaranteed
-by a lower layer.
-
-Roberto
-
-HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
-Managing Director: Li Peng, Zhong Ronghua
+--tjCHc7DPkfUGtrlw--
