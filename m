@@ -2,117 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3586CC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 03:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5381FC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 06:51:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378340AbhLCDHB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Dec 2021 22:07:01 -0500
-Received: from smtprelay0154.hostedemail.com ([216.40.44.154]:42294 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1350790AbhLCDHA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Dec 2021 22:07:00 -0500
-Received: from omf06.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay01.hostedemail.com (Postfix) with ESMTP id 140B9101369A0;
-        Fri,  3 Dec 2021 03:03:35 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf06.hostedemail.com (Postfix) with ESMTPA id 6DDA420015;
-        Fri,  3 Dec 2021 03:03:32 +0000 (UTC)
-Message-ID: <863f2cddacac590d581cda09d548ee0a652df8a1.camel@perches.com>
-Subject: Re: [PATCH] xen-blkfront: Use the bitmap API when applicable
-From:   Joe Perches <joe@perches.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Juergen Gross <jgross@suse.com>, boris.ostrovsky@oracle.com,
-        sstabellini@kernel.org, roger.pau@citrix.com, axboe@kernel.dk
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Date:   Thu, 02 Dec 2021 19:03:32 -0800
-In-Reply-To: <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
-References: <1c73cf8eaff02ea19439ec676c063e592d273cfe.1638392965.git.christophe.jaillet@wanadoo.fr>
-         <c529a221-f444-ad26-11ff-f693401c9429@suse.com>
-         <d8f87c17-75d1-2e6b-65e1-23adc75bb515@wanadoo.fr>
-         <6fcddba84070c021eb92aa9a5ff15fb2a47e9acb.camel@perches.com>
-         <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1ubuntu2 
+        id S234789AbhLCGyZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 01:54:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233948AbhLCGyZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 01:54:25 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19F7C06174A
+        for <linux-block@vger.kernel.org>; Thu,  2 Dec 2021 22:51:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Pfny0GJjCHHK2KbapJgU+GM/Y7sre0HuCTAnjsBcoXg=; b=PhAzEEIoZZgevKe261hym14xio
+        1mjuiBWeRJIGk7Vr70I+oqZTEQFXldSRlfULaPNfrBY52G4GdhTvNPblJ7OJY/+Cxx3wl6P8HQYxG
+        nnm1ftR8+YnML9PAXeoCtduXLcXHh171EmpKguMTbhrCNK0inMsPv06WgYkuK+FRh/bqNTKPO+WTF
+        jAeOFqWOFrtGSbw622yW6cmDrLheDAQHqCcMTqcZrJR1CNyx177YVmfNyBzK3Rd3liuXNptCmXGEz
+        RL3Gy4TtTJQUCCxGEoYM062S7dZrqJxJ5aUcHq0oFCAT9oyxoWA9o0WJ+v7W+IiJfgbrbYprCJHlD
+        oi2tETTQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mt2PG-00EcPd-1n; Fri, 03 Dec 2021 06:50:54 +0000
+Date:   Thu, 2 Dec 2021 22:50:54 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] loop: make autoclear operation asynchronous
+Message-ID: <Yam+TsPF1jaKM+Am@infradead.org>
+References: <e4bdc6b1-701d-6cc1-5d42-65564d2aa089@I-love.SAKURA.ne.jp>
+ <bb3c04cf-3955-74d5-1e75-ae37a44f2197@i-love.sakura.ne.jp>
+ <20c6dcbd-1b71-eaee-5213-02ded93951fc@i-love.sakura.ne.jp>
+ <YaSpkRHgEMXrcn5i@infradead.org>
+ <baeeebb3-c04e-ce0a-cb1d-56eb4a7e1914@i-love.sakura.ne.jp>
+ <YaYfu0H2k0PSQL6W@infradead.org>
+ <de6ec247-4a2d-7c3e-3700-90604f88e901@i-love.sakura.ne.jp>
+ <20211202121615.GC1815@quack2.suse.cz>
+ <3f4d1916-8e70-8914-57ba-7291f40765ae@i-love.sakura.ne.jp>
+ <20211202180500.GA30284@quack2.suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Stat-Signature: dsgan1p8pchxr8wbecis6grq8tsez18d
-X-Rspamd-Server: rspamout01
-X-Rspamd-Queue-Id: 6DDA420015
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1/U5Pxt1pAwSKl1eR87urKf9gGDN2xSyaw=
-X-HE-Tag: 1638500612-192617
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211202180500.GA30284@quack2.suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-12-02 at 20:07 +0100, Christophe JAILLET wrote:
-> Le 02/12/2021 à 19:16, Joe Perches a écrit :
-> > On Thu, 2021-12-02 at 19:12 +0100, Christophe JAILLET wrote:
-> > > Le 02/12/2021 à 07:12, Juergen Gross a écrit :
-> > > > On 01.12.21 22:10, Christophe JAILLET wrote:
-> > > > > Use 'bitmap_zalloc()' to simplify code, improve the semantic and avoid
-> > > > > some open-coded arithmetic in allocator arguments.
-> > > > > 
-> > > > > Also change the corresponding 'kfree()' into 'bitmap_free()' to keep
-> > > > > consistency.
-> > > > > 
-> > > > > Use 'bitmap_copy()' to avoid an explicit 'memcpy()'
-> > []
-> > > > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > []
-> > > > > @@ -442,16 +442,14 @@ static int xlbd_reserve_minors(unsigned int
-> > > > > minor, unsigned int nr)
-> > > > >        if (end > nr_minors) {
-> > > > >            unsigned long *bitmap, *old;
-> > > > > -        bitmap = kcalloc(BITS_TO_LONGS(end), sizeof(*bitmap),
-> > > > > -                 GFP_KERNEL);
-> > > > > +        bitmap = bitmap_zalloc(end, GFP_KERNEL);
-> > > > >            if (bitmap == NULL)
-> > > > >                return -ENOMEM;
-> > > > >            spin_lock(&minor_lock);
-> > > > >            if (end > nr_minors) {
-> > > > >                old = minors;
-> > > > > -            memcpy(bitmap, minors,
-> > > > > -                   BITS_TO_LONGS(nr_minors) * sizeof(*bitmap));
-> > > > > +            bitmap_copy(bitmap, minors, nr_minors);
-> > > > >                minors = bitmap;
-> > > > >                nr_minors = BITS_TO_LONGS(end) * BITS_PER_LONG;
-> > 
-> > 		nr_minors = end;
-> > ?
-> > 
-> 
-> No,
-> My understanding of the code is that if we lack space (end > nr_minors), 
-> we need to allocate more. In such a case, we want to keep track of what 
-> we have allocated, not what we needed.
-> The "padding" bits in the "long align" allocation, can be used later.
+On Thu, Dec 02, 2021 at 07:05:00PM +0100, Jan Kara wrote:
+> So the advantage of using task work instead of just dropping open_mutex
+> before calling __loop_clr_fd() is that if something in block/bdev.c ever
+> changes and starts relying on open_mutex being held throughout blkdev_put()
+> then loop device handling will not suddently become broken. Generally it is
+> a bad practice to drop locks (even temporarily) upper layers have acquired.
+> Sometimes it is inevitable in in this case we can avoid that... So I'd
+> prefer if we used task work instead of dropping open_mutex inside loop
+> driver. Not sure what's Christoph's opinion though, I don't feel *that*
+> strongly about it.
 
-> 
-> first call
-> ----------
-> end = 65
-> nr_minors = 63
-> 
-> --> we need some space
-> --> we allocate 2 longs = 128 bits
-> --> we now use 65 bits of these 128 bits
+Dropping the lock is a complete no go a it doesn't allow proper
+reasoning about the locking scheme in the block layer.
 
-or 96, 32 or 64 bit longs remember.
-
-> 
-> new call
-> --------
-> end = 68
-> nr_minors = 128 (from previous call)
-
-The initial allocation is now bitmap_zalloc which
-specifies only bits and the nr_minors is then in
-BITS_TO_LONGS(bits) * BITS_PER_LONG
-
-Perhaps that assumes too much about the internal
-implementation of bitmap_alloc
-
-
-
+task_work_add sounds nice, but it is currently not exported which might
+be for a reason (I don't really have any experience with it).
