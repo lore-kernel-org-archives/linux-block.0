@@ -2,117 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA9D7C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CC7C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:34:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352195AbhLCNTw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 08:19:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44869 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352205AbhLCNTw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Dec 2021 08:19:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638537388;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=i5L34vCBxXxbCUbwvcEKUuee7nqESnn4K1ksjXFvRoI=;
-        b=i1buKTIpXfPrLM+ZADBp6E73RL5Ryn55qBLdgVLVnq9jxCy3lMGX7VNHdmg8s2NGMGPtNw
-        ZmWM/JmBm/VgSNSW3ay+pY+0yoGDAB1Sy+m+KdPYPpH4Mv/bQF8RGCoiwtgJ/tRonY3lvX
-        VZYOeGndGMHsQwsWYxQ1xconl1AutOU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-527-XZGSCsdYN4mYAPn9JublTQ-1; Fri, 03 Dec 2021 08:16:27 -0500
-X-MC-Unique: XZGSCsdYN4mYAPn9JublTQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0EF5760D0;
-        Fri,  3 Dec 2021 13:16:21 +0000 (UTC)
-Received: from localhost (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA8A77AB41;
-        Fri,  3 Dec 2021 13:16:20 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/4] blk-mq: run dispatch lock once in case of issuing from list
-Date:   Fri,  3 Dec 2021 21:15:34 +0800
-Message-Id: <20211203131534.3668411-5-ming.lei@redhat.com>
-In-Reply-To: <20211203131534.3668411-1-ming.lei@redhat.com>
-References: <20211203131534.3668411-1-ming.lei@redhat.com>
+        id S1381145AbhLCNiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 08:38:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1381025AbhLCNiH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 08:38:07 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AA9C061757
+        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 05:34:42 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id m15so3014970pgu.11
+        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 05:34:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+Jw+1DAkEpMPquyy06OpnL80g0kP8AF6oi7t4fzPGrM=;
+        b=L40QUGP+WuRlQNC85VC536NTQGpCq8l6b5iQfMvTFbzoiJhecLqqlDR78BWNKEWRpB
+         ytbTeaFjxIWjLA6AiDZtFDujW3ZA8yp6wPly4m+wCMxmDagNu8+dOBCUctioCUWaTgnX
+         wXECgUu5c2zH1UXDlfYjq5RGY6+xEE2rgArC9kXor8KKfbMCQ4bO+IcMBW/nYhs+00Az
+         Z1OSYjtU6F8z/AIE/xTK4NQEg8qoP1TRg7gdTGIAJhMyouDVDbgEAtJ13+bWwDBzvczw
+         fPB0UHa8vq09QnvBhJ9GrCCgqmJbpvavEC1mClFS1n2264K88mcwJIplZ/EPlB+nQrXP
+         fpSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+Jw+1DAkEpMPquyy06OpnL80g0kP8AF6oi7t4fzPGrM=;
+        b=mprxLeb7tyr+Ir1VpkQxTa4mX0mRAqCnTdCP+Zgy8ffjAki++6kuuBMEu6eCGkKdZL
+         y1rFT8GYwEzfRwVsayvD+CyPj/Zx93rcXpe1KLgEqluPZwh1owUALdXv3VyKnouxGVea
+         bavoMEza5Zvl3uKSAn0d/SmMwNAUXy7Lpx7lIRxv1PoHemv5w/S0fKjkwA/YL0liRuOI
+         uC9eof43flfFwpDb8YekuwKiplaSc2tijOsLlQtOY8ug3ElKtMLRXnu/dweBPwUb+0aN
+         M44DCmrM2BDfwPfXIGDZ8/1t6b055n3yKgAz8O1RRFNWzADbYMMNN9LU4UD18MrcwAzR
+         qwiQ==
+X-Gm-Message-State: AOAM530WsAID/Vi6tpDTZhQx50OKTgbFfv/aqXuoMgeVPtLccKmHEQ6t
+        e07Srhm5B0yxMUVqEWfovQQDU5FQTSSJUeOw
+X-Google-Smtp-Source: ABdhPJy0b1pn574F65BbUvvYUGrn7KOMvMD4CEOrTWzvIB929yMLeT60FzJf+ufpAlo+InrjY08eew==
+X-Received: by 2002:a05:6a00:16c6:b0:4a8:261d:6013 with SMTP id l6-20020a056a0016c600b004a8261d6013mr18874970pfc.82.1638538482260;
+        Fri, 03 Dec 2021 05:34:42 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id j7sm3362607pfu.164.2021.12.03.05.34.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Dec 2021 05:34:41 -0800 (PST)
+Subject: Re: [GIT PULL] Floppy patches for 5.17
+To:     Denis Efremov <efremov@linux.com>
+Cc:     linux-block@vger.kernel.org,
+        Linux-kernel <linux-kernel@vger.kernel.org>
+References: <045df549-6805-0a02-a634-81aca7d98db5@linux.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2272e5d7-aacf-46b4-9008-27776381c92b@kernel.dk>
+Date:   Fri, 3 Dec 2021 06:34:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <045df549-6805-0a02-a634-81aca7d98db5@linux.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It isn't necessary to call blk_mq_run_dispatch_ops() once for issuing
-single request directly, and enough to do it one time when issuing from
-whole list.
+On 12/3/21 12:42 AM, Denis Efremov wrote:
+> Hi Jens,
+> 
+> The following changes since commit 2bfdbe8b7ebd17b5331071071a910fbabc64b436:
+> 
+>   null_blk: allow zero poll queues (2021-12-02 19:57:47 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://github.com/evdenis/linux-floppy tags/floppy-for-5.17
+> 
+> for you to fetch changes up to 9fae059d4cd88229661b3eccb0409f723129e5bd:
+> 
+>   floppy: Add max size check for user space request (2021-12-03 09:54:34 +0300)
+> 
+> Please, pull
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c |  3 ++-
- block/blk-mq.c       | 14 ++++++--------
- 2 files changed, 8 insertions(+), 9 deletions(-)
+Pulled, thanks.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 0d7257848f7e..55488ba97823 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -475,7 +475,8 @@ void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		 * us one extra enqueue & dequeue to sw queue.
- 		 */
- 		if (!hctx->dispatch_busy && !run_queue_async) {
--			blk_mq_try_issue_list_directly(hctx, list);
-+			blk_mq_run_dispatch_ops(hctx->queue,
-+				blk_mq_try_issue_list_directly(hctx, list));
- 			if (list_empty(list))
- 				goto out;
- 		}
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 03dc76f92555..fa464a3e2f9a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2464,12 +2464,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
- {
--	blk_status_t ret;
--	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
--
--	blk_mq_run_dispatch_ops(rq->q,
--		ret = __blk_mq_try_issue_directly(hctx, rq, true, last));
--	return ret;
-+	return __blk_mq_try_issue_directly(rq->mq_hctx, rq, true, last);
- }
- 
- static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
-@@ -2526,7 +2521,8 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	plug->rq_count = 0;
- 
- 	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
--		blk_mq_plug_issue_direct(plug, false);
-+		blk_mq_run_dispatch_ops(plug->mq_list->q,
-+				blk_mq_plug_issue_direct(plug, false));
- 		if (rq_list_empty(plug->mq_list))
- 			return;
- 	}
-@@ -2867,7 +2863,9 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
- 	 * bypass a potential scheduler on the bottom device for
- 	 * insert.
- 	 */
--	return blk_mq_request_issue_directly(rq, true);
-+	blk_mq_run_dispatch_ops(rq->q,
-+			ret = blk_mq_request_issue_directly(rq, true));
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
- 
 -- 
-2.31.1
+Jens Axboe
 
