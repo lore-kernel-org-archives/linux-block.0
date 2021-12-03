@@ -2,103 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D4FC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76AEAC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381210AbhLCNo5 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 08:44:57 -0500
-Received: from relay1-d.mail.gandi.net ([217.70.183.193]:32895 "EHLO
-        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381211AbhLCNow (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 08:44:52 -0500
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id 4F7CC240011;
-        Fri,  3 Dec 2021 13:41:24 +0000 (UTC)
-Date:   Fri, 3 Dec 2021 14:41:23 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Boris Brezillon <boris.brezillon@collabora.com>
-Cc:     Anders Roxell <anders.roxell@linaro.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        sean@geanix.com, Geert Uytterhoeven <geert+renesas@glider.be>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-mtd@lists.infradead.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Daniel =?UTF-8?B?RMOtYXo=?= <daniel.diaz@linaro.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [next] WARNING: CPU: 2 PID: 66 at kernel/locking/rwsem.c:1298
- __up_read
-Message-ID: <20211203144123.16c49eb4@xps13>
-In-Reply-To: <20211202141958.638f224b@collabora.com>
-References: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
-        <CADYN=9KeKhZ-OSbx1QHKYfXu+p-nXVjubbay1sXd_g75LLSZRg@mail.gmail.com>
-        <20211202141958.638f224b@collabora.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S236989AbhLCOBM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 09:01:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46124 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1357669AbhLCOBM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 09:01:12 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46CB9C06173E
+        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 05:57:48 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id o14so2165658plg.5
+        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 05:57:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UoZWC68WXb6mazC3pqenH9WxgAly43t6xWEqxWg7z3o=;
+        b=d9MZjXXoH5BjkL7ioUEAHPO5yEsxSDlxb0l3O/UxBt4KxXpde6bZw0V6kLGKWNbHyk
+         nqIM5MUJTZpe5DMtQ2ZKi4lTf/0VF6QhdLf6ZvsVCGThy2XDXsYpA8l1lyTAtq93Pval
+         gdoOYZtyVg9fSHdltCT3B4qsZtpvPEnVZidRDhIAgdeivVW7o/BAbngp6IpoT2y40NJB
+         NihUKdEdb3J2azCOrjWt2S0T6BYmPq0sDQZzgY/8McWixQiuhknYp1Ci2pldmFrk9RWj
+         Yv2D7R5sUQIka3uUn8VBpxDKQwQ+1tlmIjwsitjQCLs/ZJtu/NqfL8tdK+GlYviVSB/H
+         od+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UoZWC68WXb6mazC3pqenH9WxgAly43t6xWEqxWg7z3o=;
+        b=rI1qgFRi2/pyKuR88+cmrlXaIFjRiY41reeFOKHE2enhtq/LjJ3wOrGh8tOt+jechy
+         JI7llds6G383BdCiJk4kr4FMgjOTQd6Pp4XugrGCVAshheVw4bnthnnEoXJW31I+CCT1
+         lyc8yd9z1+79L1YanbZsI5Z6YQGekXXn5/92anOQI9brlBX5oFjvnJ5KpSAnomj07vu/
+         cL1LX7QqUD6Rk0zKAZZAR1uE4uF/eg6tBQndSjdf7MMvUiVWXPK+JgMS1GO4Q2QIQh2O
+         psivGDQlQJEKJT0klG6wf3GakM53/MZLiH28gwJBDuAkbkfAJQGIJ908+OSZwYlaNxq0
+         79PA==
+X-Gm-Message-State: AOAM530Q/Y2owXLnYL0BsD1KbHKo6jR3dZIzRdUGbOP8DVjYffFQ4g7+
+        5AGxUN3dh39J4y0Ljw7zMh0q9U92e+sUBsc3
+X-Google-Smtp-Source: ABdhPJxvhQAd2SDcP6DQE4v2muj980pYIGDgF8Gxhm741DPK2sEKljn7peUo3mUxZjB+0Y3E/HSiUg==
+X-Received: by 2002:a17:90b:11c1:: with SMTP id gv1mr14163725pjb.208.1638539867493;
+        Fri, 03 Dec 2021 05:57:47 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id p124sm3407409pfg.110.2021.12.03.05.57.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Dec 2021 05:57:47 -0800 (PST)
+Subject: Re: [PATCH 0/4] blk-mq: improve dispatch lock & quiesce
+ implementation
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+References: <20211203131534.3668411-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ba10d6b2-3274-0dec-c726-da3fe99b9e68@kernel.dk>
+Date:   Fri, 3 Dec 2021 06:57:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20211203131534.3668411-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-boris.brezillon@collabora.com wrote on Thu, 2 Dec 2021 14:19:58 +0100:
-
-> On Thu, 2 Dec 2021 13:28:46 +0100
-> Anders Roxell <anders.roxell@linaro.org> wrote:
+On 12/3/21 6:15 AM, Ming Lei wrote:
+> Hello,
 > 
-> > On Tue, 30 Nov 2021 at 18:01, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:  
-> > >
-> > > [Please ignore this email if it is already reported]
-> > >
-> > > Regression found on qemu_arm64.
-> > > Following kernel warnings reported on Linux next-20211130 while booting.    
-> > 
-> > I bisected down to 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
-> > 
-> > and when I reverted 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT") and the
-> > 3 releated patches so patch 1ebe2e5f9d68 was reverted cleanly I
-> > managed to boot without
-> > a warning.
-> > 
-> > Related patches from next-20211130:
-> > 9f18db572c97 ("block: don't set GENHD_FL_NO_PART for hidden gendisks")
-> > 430cc5d3ab4d ("block: cleanup the GENHD_FL_* definitions")
-> > a4561f9fccc5 ("sr: set GENHD_FL_REMOVABLE earlier")
-> > 
-> > With this said, if I revert 9d6abd489e70 ("mtd: core: protect access
-> > to MTD devices while in suspend")
-> > I didn't see the warning either.  
+> The 1st patch replaces hctx_lock/hctx_unlock with
+> blk_mq_run_dispatch_ops(), so that the fast dispatch code path gets
+> optimized a bit.
 > 
-> I think 9d6abd489e70 ("mtd: core: protect access to MTD devices while
-> in suspend") is at fault here. Miquel, would you mind
-> reverting/dropping the "mtd: core: protect access to mtd devices while
-> in  suspend" series?
-
-FYI I've just dropped the entire series. The change will probably be
-effective in linux-next starting from next Monday.
-
+> The 2nd patch moves srcu from hctx into request queue.
 > 
-> > 
-> > Any idea what can be wrong here or what a fix could be?
-> > 
-> > Only apply this patch from Geert
-> > https://lore.kernel.org/lkml/c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be/
-> > makes the warning go away too.
-> > 
-> > Cheers,
-> > Anders  
-> 
+> The last two patches call blk_mq_run_dispatch_ops once in case of
+> issuing directly from list.
 
+Looks good, and makes it easier to do the list issue on top of as well.
+I'll take a closer look, thanks.
 
-Thanks,
-Miquèl
+-- 
+Jens Axboe
+
