@@ -2,135 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38564C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 15:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AFCCC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 15:48:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381851AbhLCPmB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 10:42:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41172 "EHLO
+        id S1381795AbhLCPvi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 10:51:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381867AbhLCPmA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 10:42:00 -0500
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 142DEC061353
-        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 07:38:36 -0800 (PST)
-Received: by mail-il1-x133.google.com with SMTP id j21so3089724ila.5
-        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 07:38:36 -0800 (PST)
+        with ESMTP id S233978AbhLCPvh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 10:51:37 -0500
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC115C061751
+        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 07:48:13 -0800 (PST)
+Received: by mail-io1-xd2d.google.com with SMTP id x10so4212832ioj.9
+        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 07:48:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=n0F2twjIx4NmxUZNO6rvzL0OidoPYFlJudXfQWPXRJI=;
-        b=HOYS28dB+hf7PjSdhk0KEDvwuC5KVLlJPN5YqZZZeFpwh8+wgfG6WE3Y7xlAXUNK00
-         riELvOdzKOTEmTmSBb+trw1x9oUpxw1UZqyOjnz0zLRLXYcMCcS3dmjaOmUffQVxQyWs
-         4VeJjqwe+mOtQ3u133rotKSCR5U3vawPNBedcF8wtFZrah9Ajeb42I9KLxdKj2NWFEz0
-         QvdC9dbengdqfr5dpD50D/WlahrRAOc/wEUI6yZgsHVrufF5mOX6Zcih6rKfmf3jVo/D
-         nD3idtZJws1ItQ71mu/xBTJWti1NjCa85o7CVYgFxv2x/IhSO9uVmXXEEPD6/2MAedbG
-         bScw==
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=t2bN3F7oqoSjZAwsulJk98loMpOyO12UfxzfXla3UbQ=;
+        b=w9Ow/wcOG08uDdfPo5Neh8pZgC3d6sZsrm/g1fkh2nFFZguhpy2i0fCcLl7osjBKk3
+         D95tY+wcveLpiqJtfhwH8zO3XsHget1H1oseuvQGJfNjud0pywbmBg2zvKWIbK1Ruaos
+         nSrBCdYhMwis2YuD2gJT1XbbSkXhqt+y84L97/cQupJAdUT7FjIDCraGtWhTipCWHQAf
+         Q4rTCvkdR/RljFpecgaX+OZGwzKJfCjf4QNH3lBMYckVhP26OPG3feIZvcgu6aNwPuL2
+         L4Xcu4oWR1GLu86a/tqq1JNq5BwYBrFqHIp0zqbstsBCkIQ8xin6/o24bNeJNCdXJ2vb
+         3o4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=n0F2twjIx4NmxUZNO6rvzL0OidoPYFlJudXfQWPXRJI=;
-        b=3MZwkHx40L7awQmscW1UuDiQDgNEFj6JdXkSvpiSNJ52UsETY7+Zl/lFKRPrewKjfg
-         ocI8W54sGyQznirvh+3cwJd2szuH99d+Pcjl4HtHC+y5iS0CHThBupDbFinmDg/qVjeB
-         P5s7y96YidWVwsvqvSjhBOey2zVlJpPan7coEynlhvgnI10mlqPlNZHblqnqb5sY4zw9
-         Opvw+91cqEeXAc00ldOpmzv1Qb/lpsaASOnJB/OZLY0z9PHqrQTARcCpgKXU0YbRdgPw
-         63R1U+XrUiUf/bsnx6cxMDcNJImRHg21mknJmpkm1WwYE7QmNRv0VxELixAcLuznh9WM
-         pJ/A==
-X-Gm-Message-State: AOAM532mIFTYyJy1yKTkKI+aKJ014mqC/bJCDLH/gn0Swehm1w/k+R3p
-        t9EDLQLUpcJiMYoJ/5tQXt98QLzT8nwKkhwK
-X-Google-Smtp-Source: ABdhPJypBb2scW85GQGRdq2BTbwmtkv74gMtEvSbk1YgLbiD/4HFcK6ryenFEVuW9Pac/1fyDooBww==
-X-Received: by 2002:a92:4a04:: with SMTP id m4mr18093924ilf.103.1638545915002;
-        Fri, 03 Dec 2021 07:38:35 -0800 (PST)
-Received: from p1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c15sm1753042ilq.50.2021.12.03.07.38.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 07:38:34 -0800 (PST)
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=t2bN3F7oqoSjZAwsulJk98loMpOyO12UfxzfXla3UbQ=;
+        b=Pf2cFbeeSaKgRs8ItwF2b5d7Z/UlEeErh5nyGQlqhfp6hbWzAo420S4yYxsw5aVfb6
+         JGtsV6JO9aSEEGO3PK8EjW8ZPi/+dhA1afzqAT5ogT5jdzn1r0G1yaqmAeO7qnzSjbaG
+         pKSZKYWx2kQjKUDgM37OxdyTSFKEXnILs+mBx5vwrbN/99gI3ODTCocIL15ACrGDBvcA
+         u8GDlBlFjkN8c/z+Qcgm4iKcJyImmKHYJPCT/fF1sxYUYu3tMIa3RG0s2gk5+GdfBrbD
+         JWx6b1zAw9R0ePi1ZFK06V/P5meuPgreJa8WG/rhXRdmYjyPkeC5qQ76qrbFJkoIx8nO
+         uV3Q==
+X-Gm-Message-State: AOAM532QN+ri6A89mkTtIT30yTlCla63M7f9ENXw9B9a+VvNSbN23l5T
+        TaROMzhmRJldDW5drenRk3wGCnrtfoDE3cfa
+X-Google-Smtp-Source: ABdhPJzKeMKq2kYJJ7gl4ByLjIjeozUVc7OaesXILtY+O1pmhJpkKThbuqs7woRlzvRN9KTYctkqFw==
+X-Received: by 2002:a05:6638:d46:: with SMTP id d6mr24412593jak.129.1638546493028;
+        Fri, 03 Dec 2021 07:48:13 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id f11sm2345027ila.17.2021.12.03.07.48.12
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Dec 2021 07:48:12 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, linux-mm@kvack.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] block: move direct_IO into our own read_iter handler
-Date:   Fri,  3 Dec 2021 08:38:29 -0700
-Message-Id: <20211203153829.298893-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20211203153829.298893-1-axboe@kernel.dk>
-References: <20211203153829.298893-1-axboe@kernel.dk>
+Subject: [PATCH] block: avoid clearing blk_mq_alloc_data unnecessarily
+Message-ID: <1ba89cb7-e53c-78c3-1fe4-db9908851e63@kernel.dk>
+Date:   Fri, 3 Dec 2021 08:48:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Don't call into generic_file_read_iter() if we know it's O_DIRECT, just
-set it up ourselves and call our own handler. This avoids an indirect call
-for O_DIRECT.
-
-Fall back to filemap_read() if we fail.
+We already set almost all of what we need here, just the non-plug
+path needs to set nr_tags and clear cached.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/fops.c | 37 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 5 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index 93bb5bf66f69..10015e1a5b01 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -566,21 +566,48 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+---
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4dc0837f874d..eba34af1c5eb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2664,7 +2664,7 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
  {
- 	struct block_device *bdev = iocb->ki_filp->private_data;
- 	loff_t size = bdev_nr_bytes(bdev);
-+	size_t count = iov_iter_count(to);
- 	loff_t pos = iocb->ki_pos;
- 	size_t shorted = 0;
--	ssize_t ret;
-+	ssize_t ret = 0;
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+-		.nr_tags	= 1,
++		.shallow_depth	= 0
+ 	};
+ 	struct request *rq;
  
--	if (unlikely(pos + iov_iter_count(to) > size)) {
-+	if (unlikely(pos + count > size)) {
- 		if (pos >= size)
- 			return 0;
- 		size -= pos;
--		if (iov_iter_count(to) > size) {
--			shorted = iov_iter_count(to) - size;
-+		if (count > size) {
-+			shorted = count - size;
- 			iov_iter_truncate(to, size);
- 		}
+@@ -2683,6 +2683,9 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 		data.nr_tags = plug->nr_ios;
+ 		plug->nr_ios = 1;
+ 		data.cached_rq = &plug->cached_rq;
++	} else {
++		data.nr_tags = 1;
++		data.cached_rq = NULL;
  	}
  
--	ret = generic_file_read_iter(iocb, to);
-+	if (iocb->ki_flags & IOCB_DIRECT) {
-+		struct address_space *mapping = iocb->ki_filp->f_mapping;
-+
-+		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			if (filemap_range_needs_writeback(mapping, iocb->ki_pos,
-+						iocb->ki_pos + count - 1))
-+				return -EAGAIN;
-+		} else {
-+			ret = filemap_write_and_wait_range(mapping,
-+						iocb->ki_pos,
-+					        iocb->ki_pos + count - 1);
-+			if (ret < 0)
-+				return ret;
-+		}
-+
-+		file_accessed(iocb->ki_filp);
-+
-+		ret = blkdev_direct_IO(iocb, to);
-+		if (ret >= 0) {
-+			iocb->ki_pos += ret;
-+			count -= ret;
-+		}
-+		if (ret < 0 || !count)
-+			return ret;
-+	}
-+
-+	ret = filemap_read(iocb, to, ret);
- 
- 	if (unlikely(shorted))
- 		iov_iter_reexpand(to, iov_iter_count(to) + shorted);
+ 	rq = __blk_mq_alloc_requests(&data);
+
 -- 
-2.34.1
+Jens Axboe
 
