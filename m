@@ -2,83 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72F0C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:36:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D4FC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:41:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381253AbhLCNkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 08:40:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41244 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381252AbhLCNkO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 08:40:14 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8725C06173E
-        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 05:36:50 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id x7so2410881pjn.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 05:36:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=MOLQR8mevyA52OCMDtB/DQRrywquOz+wMeEsbV16LIg=;
-        b=ltUmekMqU6NCuW7ZfwjdyfSwV1ZwnH9MUuWhsL4eeYmqhTXI+gRbkC02O4wDEGGcPE
-         PB1k/QHQWSdTj7eJluviedCHuG7dOqLmX7+/PkRXsSB3QTSb4wHx7nU7jQlTQV1AiGxh
-         fJJn9Lk7FkBq+ee8jcP4nkYhbNUW3GydovdpI9Ff92IK6mN1DzW8wvqqTYgT/qyXQG8h
-         93I9Xx+P9Vw/v9ZGv445DrVOxdQfbrjyOWS3v227iw2EJxYD7Bg+vWlAgafPiJ0Huj0K
-         ckntJGpdDzcVcPsV2bA7s9Nro8NxZ2PlFtuCgxOYUaqMlUrvnu7BrWwk4jFNkL+kCZEL
-         oGmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=MOLQR8mevyA52OCMDtB/DQRrywquOz+wMeEsbV16LIg=;
-        b=N3//9zhtI/vJhnIkYoSm4X0B/F0ZqyFil15ZxiYY6PI6o/Z7+aKAnCZoNr5PZ6B03J
-         JPQpNGu6vTcV1uAE/WpcRs6IUGwHTDYTuu2hCAHfs2JiXEe1M+IQjnxYVCRvlqsFxPwx
-         uCu2InC0UkWkdjHURLZMIptvl63+VxcqO0FMu+O0L/yMqYjWeFQHPa8fWyJLSCI6ta2Z
-         t1Ol/hWL6EJPq4OqVst7BCUpSYOcPtCh52/ri/aYCpOvy2yxmxuzxLCPv+Rk12Hx/4aG
-         vB9UwYlgK4VsYGiqY0RGWpxHZ66n/uyWn7ntp5Cp4+yk2W27Oc/kk7gkaTED1yU1QzqH
-         ZJ4g==
-X-Gm-Message-State: AOAM532jJhSKY9W1/L5dAz2JgQTdqVjMklTUQSrYGwiAH4wa/CFHOXAU
-        QdFHczc3ejiyZx4domWQG/7AcvdghUOEhLNa
-X-Google-Smtp-Source: ABdhPJwdSOK+P6oeZ4YEuC/pr40/cq8XIBVnsza2S4XGK1SFZzdUhXC1HuHEfeQHFR+6qmO9JZ++eQ==
-X-Received: by 2002:a17:902:e5c9:b0:142:53c4:478d with SMTP id u9-20020a170902e5c900b0014253c4478dmr22138189plf.33.1638538609972;
-        Fri, 03 Dec 2021 05:36:49 -0800 (PST)
-Received: from [127.0.1.1] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id ot7sm5986837pjb.21.2021.12.03.05.36.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 05:36:49 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20211203081703.3506020-1-ming.lei@redhat.com>
-References: <20211203081703.3506020-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: null_blk: batched complete poll requests
-Message-Id: <163853860815.273619.13690960637416723178.b4-ty@kernel.dk>
-Date:   Fri, 03 Dec 2021 06:36:48 -0700
+        id S1381210AbhLCNo5 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 08:44:57 -0500
+Received: from relay1-d.mail.gandi.net ([217.70.183.193]:32895 "EHLO
+        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1381211AbhLCNow (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 08:44:52 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id 4F7CC240011;
+        Fri,  3 Dec 2021 13:41:24 +0000 (UTC)
+Date:   Fri, 3 Dec 2021 14:41:23 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Boris Brezillon <boris.brezillon@collabora.com>
+Cc:     Anders Roxell <anders.roxell@linaro.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        sean@geanix.com, Geert Uytterhoeven <geert+renesas@glider.be>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-mtd@lists.infradead.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Daniel =?UTF-8?B?RMOtYXo=?= <daniel.diaz@linaro.org>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [next] WARNING: CPU: 2 PID: 66 at kernel/locking/rwsem.c:1298
+ __up_read
+Message-ID: <20211203144123.16c49eb4@xps13>
+In-Reply-To: <20211202141958.638f224b@collabora.com>
+References: <CA+G9fYuupqqemLbgoVL2kYL4d2AtZLBo1xcshWWae7gX5Ln-iA@mail.gmail.com>
+        <CADYN=9KeKhZ-OSbx1QHKYfXu+p-nXVjubbay1sXd_g75LLSZRg@mail.gmail.com>
+        <20211202141958.638f224b@collabora.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 3 Dec 2021 16:17:03 +0800, Ming Lei wrote:
-> Complete poll requests via blk_mq_add_to_batch() and
-> blk_mq_end_request_batch(), so that we can cover batched complete
-> code path by running null_blk test.
+Hello,
+
+boris.brezillon@collabora.com wrote on Thu, 2 Dec 2021 14:19:58 +0100:
+
+> On Thu, 2 Dec 2021 13:28:46 +0100
+> Anders Roxell <anders.roxell@linaro.org> wrote:
 > 
-> Meantime this way shows ~14% IOPS boost on 't/io_uring /dev/nullb0'
-> in my test.
+> > On Tue, 30 Nov 2021 at 18:01, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:  
+> > >
+> > > [Please ignore this email if it is already reported]
+> > >
+> > > Regression found on qemu_arm64.
+> > > Following kernel warnings reported on Linux next-20211130 while booting.    
+> > 
+> > I bisected down to 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
+> > 
+> > and when I reverted 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT") and the
+> > 3 releated patches so patch 1ebe2e5f9d68 was reverted cleanly I
+> > managed to boot without
+> > a warning.
+> > 
+> > Related patches from next-20211130:
+> > 9f18db572c97 ("block: don't set GENHD_FL_NO_PART for hidden gendisks")
+> > 430cc5d3ab4d ("block: cleanup the GENHD_FL_* definitions")
+> > a4561f9fccc5 ("sr: set GENHD_FL_REMOVABLE earlier")
+> > 
+> > With this said, if I revert 9d6abd489e70 ("mtd: core: protect access
+> > to MTD devices while in suspend")
+> > I didn't see the warning either.  
 > 
-> [...]
+> I think 9d6abd489e70 ("mtd: core: protect access to MTD devices while
+> in suspend") is at fault here. Miquel, would you mind
+> reverting/dropping the "mtd: core: protect access to mtd devices while
+> in  suspend" series?
 
-Applied, thanks!
+FYI I've just dropped the entire series. The change will probably be
+effective in linux-next starting from next Monday.
 
-[1/1] block: null_blk: batched complete poll requests
-      commit: 2385ebf38f94d4f7761b1e9a4973d04753da02c2
+> 
+> > 
+> > Any idea what can be wrong here or what a fix could be?
+> > 
+> > Only apply this patch from Geert
+> > https://lore.kernel.org/lkml/c26dfdf9ce56e92d23530a09db386b283e62845d.1638289204.git.geert+renesas@glider.be/
+> > makes the warning go away too.
+> > 
+> > Cheers,
+> > Anders  
+> 
 
-Best regards,
--- 
-Jens Axboe
 
-
+Thanks,
+Miquèl
