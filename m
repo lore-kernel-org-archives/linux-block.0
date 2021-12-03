@@ -2,90 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CC7C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D72F0C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 13:36:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381145AbhLCNiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 08:38:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
+        id S1381253AbhLCNkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 08:40:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381025AbhLCNiH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 08:38:07 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AA9C061757
-        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 05:34:42 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id m15so3014970pgu.11
-        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 05:34:42 -0800 (PST)
+        with ESMTP id S1381252AbhLCNkO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 08:40:14 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8725C06173E
+        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 05:36:50 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id x7so2410881pjn.0
+        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 05:36:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+Jw+1DAkEpMPquyy06OpnL80g0kP8AF6oi7t4fzPGrM=;
-        b=L40QUGP+WuRlQNC85VC536NTQGpCq8l6b5iQfMvTFbzoiJhecLqqlDR78BWNKEWRpB
-         ytbTeaFjxIWjLA6AiDZtFDujW3ZA8yp6wPly4m+wCMxmDagNu8+dOBCUctioCUWaTgnX
-         wXECgUu5c2zH1UXDlfYjq5RGY6+xEE2rgArC9kXor8KKfbMCQ4bO+IcMBW/nYhs+00Az
-         Z1OSYjtU6F8z/AIE/xTK4NQEg8qoP1TRg7gdTGIAJhMyouDVDbgEAtJ13+bWwDBzvczw
-         fPB0UHa8vq09QnvBhJ9GrCCgqmJbpvavEC1mClFS1n2264K88mcwJIplZ/EPlB+nQrXP
-         fpSg==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=MOLQR8mevyA52OCMDtB/DQRrywquOz+wMeEsbV16LIg=;
+        b=ltUmekMqU6NCuW7ZfwjdyfSwV1ZwnH9MUuWhsL4eeYmqhTXI+gRbkC02O4wDEGGcPE
+         PB1k/QHQWSdTj7eJluviedCHuG7dOqLmX7+/PkRXsSB3QTSb4wHx7nU7jQlTQV1AiGxh
+         fJJn9Lk7FkBq+ee8jcP4nkYhbNUW3GydovdpI9Ff92IK6mN1DzW8wvqqTYgT/qyXQG8h
+         93I9Xx+P9Vw/v9ZGv445DrVOxdQfbrjyOWS3v227iw2EJxYD7Bg+vWlAgafPiJ0Huj0K
+         ckntJGpdDzcVcPsV2bA7s9Nro8NxZ2PlFtuCgxOYUaqMlUrvnu7BrWwk4jFNkL+kCZEL
+         oGmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+Jw+1DAkEpMPquyy06OpnL80g0kP8AF6oi7t4fzPGrM=;
-        b=mprxLeb7tyr+Ir1VpkQxTa4mX0mRAqCnTdCP+Zgy8ffjAki++6kuuBMEu6eCGkKdZL
-         y1rFT8GYwEzfRwVsayvD+CyPj/Zx93rcXpe1KLgEqluPZwh1owUALdXv3VyKnouxGVea
-         bavoMEza5Zvl3uKSAn0d/SmMwNAUXy7Lpx7lIRxv1PoHemv5w/S0fKjkwA/YL0liRuOI
-         uC9eof43flfFwpDb8YekuwKiplaSc2tijOsLlQtOY8ug3ElKtMLRXnu/dweBPwUb+0aN
-         M44DCmrM2BDfwPfXIGDZ8/1t6b055n3yKgAz8O1RRFNWzADbYMMNN9LU4UD18MrcwAzR
-         qwiQ==
-X-Gm-Message-State: AOAM530WsAID/Vi6tpDTZhQx50OKTgbFfv/aqXuoMgeVPtLccKmHEQ6t
-        e07Srhm5B0yxMUVqEWfovQQDU5FQTSSJUeOw
-X-Google-Smtp-Source: ABdhPJy0b1pn574F65BbUvvYUGrn7KOMvMD4CEOrTWzvIB929yMLeT60FzJf+ufpAlo+InrjY08eew==
-X-Received: by 2002:a05:6a00:16c6:b0:4a8:261d:6013 with SMTP id l6-20020a056a0016c600b004a8261d6013mr18874970pfc.82.1638538482260;
-        Fri, 03 Dec 2021 05:34:42 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j7sm3362607pfu.164.2021.12.03.05.34.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Dec 2021 05:34:41 -0800 (PST)
-Subject: Re: [GIT PULL] Floppy patches for 5.17
-To:     Denis Efremov <efremov@linux.com>
-Cc:     linux-block@vger.kernel.org,
-        Linux-kernel <linux-kernel@vger.kernel.org>
-References: <045df549-6805-0a02-a634-81aca7d98db5@linux.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=MOLQR8mevyA52OCMDtB/DQRrywquOz+wMeEsbV16LIg=;
+        b=N3//9zhtI/vJhnIkYoSm4X0B/F0ZqyFil15ZxiYY6PI6o/Z7+aKAnCZoNr5PZ6B03J
+         JPQpNGu6vTcV1uAE/WpcRs6IUGwHTDYTuu2hCAHfs2JiXEe1M+IQjnxYVCRvlqsFxPwx
+         uCu2InC0UkWkdjHURLZMIptvl63+VxcqO0FMu+O0L/yMqYjWeFQHPa8fWyJLSCI6ta2Z
+         t1Ol/hWL6EJPq4OqVst7BCUpSYOcPtCh52/ri/aYCpOvy2yxmxuzxLCPv+Rk12Hx/4aG
+         vB9UwYlgK4VsYGiqY0RGWpxHZ66n/uyWn7ntp5Cp4+yk2W27Oc/kk7gkaTED1yU1QzqH
+         ZJ4g==
+X-Gm-Message-State: AOAM532jJhSKY9W1/L5dAz2JgQTdqVjMklTUQSrYGwiAH4wa/CFHOXAU
+        QdFHczc3ejiyZx4domWQG/7AcvdghUOEhLNa
+X-Google-Smtp-Source: ABdhPJwdSOK+P6oeZ4YEuC/pr40/cq8XIBVnsza2S4XGK1SFZzdUhXC1HuHEfeQHFR+6qmO9JZ++eQ==
+X-Received: by 2002:a17:902:e5c9:b0:142:53c4:478d with SMTP id u9-20020a170902e5c900b0014253c4478dmr22138189plf.33.1638538609972;
+        Fri, 03 Dec 2021 05:36:49 -0800 (PST)
+Received: from [127.0.1.1] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id ot7sm5986837pjb.21.2021.12.03.05.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Dec 2021 05:36:49 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2272e5d7-aacf-46b4-9008-27776381c92b@kernel.dk>
-Date:   Fri, 3 Dec 2021 06:34:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20211203081703.3506020-1-ming.lei@redhat.com>
+References: <20211203081703.3506020-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: null_blk: batched complete poll requests
+Message-Id: <163853860815.273619.13690960637416723178.b4-ty@kernel.dk>
+Date:   Fri, 03 Dec 2021 06:36:48 -0700
 MIME-Version: 1.0
-In-Reply-To: <045df549-6805-0a02-a634-81aca7d98db5@linux.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/3/21 12:42 AM, Denis Efremov wrote:
-> Hi Jens,
+On Fri, 3 Dec 2021 16:17:03 +0800, Ming Lei wrote:
+> Complete poll requests via blk_mq_add_to_batch() and
+> blk_mq_end_request_batch(), so that we can cover batched complete
+> code path by running null_blk test.
 > 
-> The following changes since commit 2bfdbe8b7ebd17b5331071071a910fbabc64b436:
+> Meantime this way shows ~14% IOPS boost on 't/io_uring /dev/nullb0'
+> in my test.
 > 
->   null_blk: allow zero poll queues (2021-12-02 19:57:47 -0700)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/evdenis/linux-floppy tags/floppy-for-5.17
-> 
-> for you to fetch changes up to 9fae059d4cd88229661b3eccb0409f723129e5bd:
-> 
->   floppy: Add max size check for user space request (2021-12-03 09:54:34 +0300)
-> 
-> Please, pull
+> [...]
 
-Pulled, thanks.
+Applied, thanks!
 
+[1/1] block: null_blk: batched complete poll requests
+      commit: 2385ebf38f94d4f7761b1e9a4973d04753da02c2
+
+Best regards,
 -- 
 Jens Axboe
+
 
