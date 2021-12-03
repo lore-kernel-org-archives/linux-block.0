@@ -2,106 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7576BC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 19:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 457E0C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 19:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353227AbhLCTNI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 14:13:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33464 "EHLO
+        id S1353253AbhLCTNg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 14:13:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344093AbhLCTNF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 14:13:05 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F90C061751
-        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 11:09:41 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id p13so3789442pfw.2
-        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 11:09:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1+IcsWlHKhBlBvu1qEIJjd7+fBRe9hWKiFkgC7AgVn8=;
-        b=qMOpALv0YRVU6bM2Nhr6i3G9mvYp/1ZI4ftafuss3wOwGmLNPKdIsoygM0ucM2Fwrm
-         OKq3jlwH0zvltJrZF3VFrCafFxRtrAkmFuf62J5OpkL99rpcKyj+gYvfPpcGr1gApfoU
-         V/nMatv0LE9nrRRq6uQDr9IOj8lySL2OFiWBLRCNI3xUAFwjWUAhyvrsvB+/1FwKnqoc
-         9wzTwu231a5+XjRsoLm085ZTfI/f4FolwG6YO5SS2RwMJbuKnoQTEq4IFy4cOoBnPO0i
-         42kgZuNUIWUVbHZCna0R6U4RsXSiaKLnqICn+0SMMnIkoCXzxZcQshZAbSLS6Htjqb23
-         0GjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1+IcsWlHKhBlBvu1qEIJjd7+fBRe9hWKiFkgC7AgVn8=;
-        b=WQdUcjqyyMMTb8w2LYEQPKF4uy78JFJRLS34Tfty3z+qSCCILncYIZiBRThR6mD7n4
-         NACkonNZZND7FpeOQlq38o2wRaf0NBm52tYqLNaoeu6sZoWG//NZhV50vC7jzVTicYEh
-         RuczD1FFOY+qvlOUp9Br4IJGEHt/xIh/SSeIGSE3aCaam1ocIlI1JNppRFj/OdXfQlGX
-         hi6qELJ23O5Vu2JcO0SkwoiPGhPMo/lHtzA/GTpR5SqPnKuCvXvY60ihVLuvR356O79T
-         tb1/k/fi4RudiMGnBl+XULORymY6D+NC31JuNDxcJCnGUPHyIe8grJf/jBzjjvlqj23+
-         5HWg==
-X-Gm-Message-State: AOAM530LGEjTTA7G5j5A5EIKdBEsDb2Fuzm43WH6vUKUIf5U1hr/1/pp
-        RJ/WXpFY9yDuCkWTHYlaM8QIGg==
-X-Google-Smtp-Source: ABdhPJyumXfOqHJei3KoVpScj60uiK1Xgi20WATKU+zPu3LuTE5MYtc55FZjI9X6SNIWq95ZWNP8Og==
-X-Received: by 2002:a63:914c:: with SMTP id l73mr5962074pge.384.1638558581140;
-        Fri, 03 Dec 2021 11:09:41 -0800 (PST)
-Received: from ?IPv6:2600:380:7445:97b0:c22:6d1:fc86:abf7? ([2600:380:7445:97b0:c22:6d1:fc86:abf7])
-        by smtp.gmail.com with ESMTPSA id g21sm4031877pfc.95.2021.12.03.11.09.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Dec 2021 11:09:40 -0800 (PST)
-Subject: Re: [PATCH 1/2] mm: move filemap_range_needs_writeback() into header
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-mm@kvack.org
-References: <20211203153829.298893-1-axboe@kernel.dk>
- <20211203153829.298893-2-axboe@kernel.dk>
- <YapC9cl6qsOAjzNj@casper.infradead.org>
- <f94d0fe4-1fc9-4c2d-f666-8ccf4251b950@kernel.dk>
- <5e92c117-0cdb-9ea6-3f1c-912e683c4e51@kernel.dk>
- <89810ae4-7c9b-ec8f-5450-ef8dc51ad8a4@kernel.dk>
- <97e253f7-d945-0c6b-3d8b-dcf597f04f69@kernel.dk>
- <YapYAt7+r7K0aQ3+@casper.infradead.org>
- <e386e230-4eef-f4da-f327-9b0f1d33fe47@kernel.dk>
- <9cabdcc3-e760-bab5-edfe-ae225e5d4db9@kernel.dk>
- <Yapeosr1ByRBEdgT@casper.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <aaccdffc-876d-ab24-787c-09725ca3d929@kernel.dk>
-Date:   Fri, 3 Dec 2021 12:09:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S1344093AbhLCTNf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 14:13:35 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D261C061751;
+        Fri,  3 Dec 2021 11:10:10 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3A2ED62C68;
+        Fri,  3 Dec 2021 19:10:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C5B0C53FD0;
+        Fri,  3 Dec 2021 19:10:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638558609;
+        bh=60mi6p08U2wbwvB97Xgf4RVXwcC9c+P0q4JsuFDiPOI=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=uQZ/0KBBwOlmv3heoNYQUyaiMcNeBzGSS7RGwLrUa1wvnnZZQ6T1aiotEpZc9+H1z
+         suTSmGKxpgS0c6XVGVxaalBJmrlSSeOStYBqFjdMzEM6uEaV7mDiaiERaCljh6lClu
+         y4ZeXl8bU86S0Tlh1qM71hMLRLoJ42fEBPac2QnYi8LwMmxeQwBlOG69sUpBZ0dwu6
+         xIWcpHtOouVmuoukYE96Ve65pWnv8OAvBZnBZ7lis61qy71Izg3SQMHOwLTAYKOLk2
+         iFIkS8YvN30sqDOF+sQImtsnqnMxvHc1VQ8rHRM/6ZRUBTOBloBH7A1DsAO4wP+3JL
+         fMwQadF7d2iGQ==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 76F2C60A95;
+        Fri,  3 Dec 2021 19:10:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <Yapeosr1ByRBEdgT@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v2] treewide: add missing includes masked by cgroup -> bpf
+ dependency
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <163855860948.24022.9001786774413649159.git-patchwork-notify@kernel.org>
+Date:   Fri, 03 Dec 2021 19:10:09 +0000
+References: <20211202203400.1208663-1-kuba@kernel.org>
+In-Reply-To: <20211202203400.1208663-1-kuba@kernel.org>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     bpf@vger.kernel.org, kw@linux.com, peter.chen@kernel.org,
+        sj@kernel.org, jani.nikula@intel.com, axboe@kernel.dk,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@linux.ie, daniel@ffwll.ch,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, yuq825@gmail.com, robdclark@gmail.com,
+        sean@poorly.run, christian.koenig@amd.com, ray.huang@amd.com,
+        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+        hkelam@marvell.com, jingoohan1@gmail.com,
+        lorenzo.pieralisi@arm.com, robh@kernel.org, bhelgaas@google.com,
+        krzysztof.kozlowski@canonical.com, mani@kernel.org,
+        pawell@cadence.com, rogerq@kernel.org, a-govindraju@ti.com,
+        gregkh@linuxfoundation.org, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        john.fastabend@gmail.com, kpsingh@kernel.org,
+        akpm@linux-foundation.org, thomas.hellstrom@linux.intel.com,
+        matthew.auld@intel.com, colin.king@intel.com, geert@linux-m68k.org,
+        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, lima@lists.freedesktop.org,
+        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-mm@kvack.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/3/21 11:14 AM, Matthew Wilcox wrote:
-> On Fri, Dec 03, 2021 at 11:01:14AM -0700, Jens Axboe wrote:
->> On 12/3/21 10:57 AM, Jens Axboe wrote:
->>>> I'm happy with this, if you just move it to pagemap.h
->>>
->>> OK, I'll try it out.
->>
->> Wasn't too bad at all, actually just highlighted that I missed removing
->> the previous declaration of filemap_range_needs_writeback() in fs.h
->> I'll do a full compile and test, but this seems sane.
->>
->> commit 63c6b3846b77041d239d5b5b5a907b5c82a21c4c
->> Author: Jens Axboe <axboe@kernel.dk>
->> Date:   Thu Oct 28 08:47:05 2021 -0600
->>
->>     mm: move filemap_range_needs_writeback() into header
->>     
->>     No functional changes in this patch, just in preparation for efficiently
->>     calling this light function from the block O_DIRECT handling.
->>     
->>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Hello:
+
+This patch was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Thu,  2 Dec 2021 12:34:00 -0800 you wrote:
+> cgroup.h (therefore swap.h, therefore half of the universe)
+> includes bpf.h which in turn includes module.h and slab.h.
+> Since we're about to get rid of that dependency we need
+> to clean things up.
 > 
-> Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> v2: drop the cpu.h include from cacheinfo.h, it's not necessary
+> and it makes riscv sensitive to ordering of include files.
+> 
+> [...]
 
-Great, thanks for the review Willy!
+Here is the summary with links:
+  - [bpf,v2] treewide: add missing includes masked by cgroup -> bpf dependency
+    https://git.kernel.org/bpf/bpf/c/8581fd402a0c
 
+You are awesome, thank you!
 -- 
-Jens Axboe
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
