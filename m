@@ -2,149 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E65C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  4 Dec 2021 01:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0909DC433F5
+	for <linux-block@archiver.kernel.org>; Sat,  4 Dec 2021 03:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384001AbhLDBj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 20:39:28 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:62625 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384008AbhLDBj1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 20:39:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1638581763; x=1670117763;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=xqQ5Tjmd65Fuffx2mqt1BYceC+4uPY5LI4AtXehrhcU=;
-  b=o6a1JNillb8s2vklMnt41mP1BTOSDD/FuzaupiE+T8FqRZMuX03dDY0I
-   uzoe9RGNxQZRX65Y2USKPD0L6djqU4rn71cUJPUdNIzR0gagGnXZ/wiAO
-   C6IQN1/w3J9r84s5Y5o8JPnER29rhvT1eGGSJyPY7RaXUorVJHjZass0y
-   h+u7eo55obaNbV/57nhTva2suVlaVo28tjAB8KsUlSbYs9qbjZuoCRVSv
-   dM6LvenmhsGsOe5iYC0Gvwc8Jo4q6IWhGsmSEo52YWhkKuJb/BndKN2OZ
-   mqOs97Lv/u/5+93WO82BN2wCFQq4puW+5khKbEH+xrgNknAy+hQaqqOsf
-   w==;
-X-IronPort-AV: E=Sophos;i="5.87,286,1631548800"; 
-   d="scan'208";a="291398520"
-Received: from mail-bn8nam12lp2168.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.168])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Dec 2021 09:36:02 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ctCiTa791jg6YZpY6N77PUExIxmPNMja/KQnFKwQzXoYBwHvyPRPZnermJYnCKA+ucorFmlvXKa+F4ROzO6/+USQrFFhFv+B1ml0mRdkXMWmGCogUpGAlRdiQP5p9PylvxplgJ9Ffr2MEfMOFIj9XRFV6Cm371310a3e/2v94qcXVahfZ6/9W7hVr8oQwW8vGFb/5j3ffAjEfoX1M63/M0NYC8qYk/dX1JK+VE6RlHvLMsJImhrEFOboMrDS92voe1zWQynEaaieN67qsSHEBObwOZuc256xu7RjAtXerjqZyNR0Dq+St1+5AOzXz+n0ekpOnL9ELqGWSxX3DjoFag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xqQ5Tjmd65Fuffx2mqt1BYceC+4uPY5LI4AtXehrhcU=;
- b=gvEFRzZtTUvSa+xJxRWwf5ldbM0hEVVO1MMKl4Ds7NgcSfh0oFIPJg+Zi6hywPjGF5QbGMJrvgOBB6GzXMmXbYmM8UBkP229Nr/yf/ALJKvzje9BSzhH3bjMeZxEhA7DGY8FRAbLN3bcxqZjQHTZqlZt8bYBv9U2xtcjlAMNg7Bc6ilkQ150MXHH11Sdlvr/wYTpceRAr8vBiTVYgWITGWvlsI5p+D2/OgjfuOkbXO4EYyLUT/PhjAwlMCJMQJKRIL4a1Uud9WkiYWwUqZabwkgFfCV/iUI74UfQ20l2xy9j0Z3RsLWnGRAyRbwQM+8KsK9WU5/fuwJDuSkKs5CfWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xqQ5Tjmd65Fuffx2mqt1BYceC+4uPY5LI4AtXehrhcU=;
- b=L0mJgF2O9u1m0ce4J3Lrc5ITWLz5h72KiQ912PwpQ4ijs9OEo4VHEIXef1C2R8pMLxGSF41+/nHL54DjuWLENjNPaAqay2F0aggLRGirNyCnjD1ZwqD4alrZJUhkxSS79APZCS1qGz8ybGr/0Wu5vRfo3EpLWyDadf4HAdnTU7E=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DM8PR04MB7989.namprd04.prod.outlook.com (2603:10b6:8:f::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4734.23; Sat, 4 Dec 2021 01:36:00 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::28ae:301e:551e:a62e]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::28ae:301e:551e:a62e%5]) with mapi id 15.20.4734.028; Sat, 4 Dec 2021
- 01:36:00 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2] null_blk: allow zero poll queues
-Thread-Topic: [PATCH V2] null_blk: allow zero poll queues
-Thread-Index: AQHX6Eb7Cs5SXvZ3O0ieh809OWrnVKwhjgaA
-Date:   Sat, 4 Dec 2021 01:35:59 +0000
-Message-ID: <20211204013559.olzfnuhxdnza3agk@shindev>
-References: <20211203130907.3667775-1-ming.lei@redhat.com>
-In-Reply-To: <20211203130907.3667775-1-ming.lei@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 76219105-7e8f-4268-b8c3-08d9b6c66d32
-x-ms-traffictypediagnostic: DM8PR04MB7989:
-x-microsoft-antispam-prvs: <DM8PR04MB7989F8D38DD03FFBA795EB69ED6B9@DM8PR04MB7989.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: vg3i6RkZTpxXlnZHGydhiC9QockhgiPuUH2aZ99DsQa9iVX033Zd0vPNf8UZWhlW+1FJxaNkv8z5zoCwcTtqoqwWdxEz7uidGnu+5HmTD9k6Sm5sVb98UIXGE9txDVJ+qIKKPHQpFektXZWxZqoH1dvGqK8uok8PD5lDI6aTGmDcQqD1PIsGa9j8c1iWxLc9yGha6E6hzyIAci5p52LOv4xE7ldjq0zXBSmYyNOfLnbTMpBlYT0NWC0/vu/ogQHT28ISZ4bpPV0iG2yuI2Yie+sZaeDMemlwksgDZEy2CegYQGP2FxYn880Vcr9QpRcKMDAyf0R+/tHbHqDQ2VfEMksYjDQpevh72dDGl5NX2c5gTPVOwGDJ+500e/cztMU0NT+xus0PmhnlW4cg5ciRhiBBmeNqcEKJA5/ADYPe/Z14Mr5gJHEhf5F2v9k/3JmcI7gsmZVWPfnwh0O4c/k/ZjYtJd7AaZP9GFSk3Gi6Y2OAofWFYfyvwKZKCHHtmAA5ZoW7MzSvM11xfdX5InCukpz5PJLI6gRBzv1z1MSiFs+T/DPJ96fzcmUoUyAuzseJqaE9I5WawaJnJ7mh6H46x4XLhuj32RSkaDRI9E8dHU083T7Tvh66h0dMV8nJbUrJXixIWJiamZzEtO8nH9kyySALSnK3gLqkOC7T7Cn30CeAtX9GAQF2IdNbRfSb/kN1PNlw3QARERdkZHOd9TpGPQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(366004)(66946007)(6512007)(6916009)(6506007)(54906003)(122000001)(66446008)(66476007)(76116006)(64756008)(71200400001)(6486002)(66556008)(2906002)(82960400001)(1076003)(4744005)(26005)(38100700002)(86362001)(5660300002)(9686003)(44832011)(186003)(508600001)(8936002)(4326008)(38070700005)(33716001)(91956017)(8676002)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oarWCSA8w5zrH6IJevDphi5DElBmvowHEmMhT2KazA48BOpxgptecTvXp96M?=
- =?us-ascii?Q?gpol44fVtngmKHoKzxl5PAMZgzze0YC1eJZAnJTJuDOTYsW2uXMUtbLYVC0a?=
- =?us-ascii?Q?oNPENDjnZD9KnIZzFR6p3pIO4S6iy9sUN1Hk7b9DJp03IrJRvlWTe+gE+CO9?=
- =?us-ascii?Q?bJ6Tmbpy0nVosYRbGykNemL+jnan/h/yo2mDXeKldnu/Yb9Iujt/B0glhQeZ?=
- =?us-ascii?Q?LbMY+7xEo17w2R3PVpEBa8Z3BE43De+xXtelcBG0G7zM3Oefmg69cyCarTHm?=
- =?us-ascii?Q?pGAgk8AiaaCs7kncQWwh9edMP5WMEPJeI7gDyK7C7EbLcmhhZYtA3d1lSjYb?=
- =?us-ascii?Q?yec5KsNbvMUuHXhGAVReSHBrgi6NalMAstKpShZsCCm6jFiXKCbjbdZfl++Q?=
- =?us-ascii?Q?G7N6Lot23fBfUKjRbVoVjhXskwOtEbuvNqlUDiGVIkcXuHg6NdNi+nxPm3P9?=
- =?us-ascii?Q?7owb4AfzXIll6T37l4Yp0lBZinTHjS0zwtF3nP/rTeq+tXQFWlSENWmmbXnM?=
- =?us-ascii?Q?o5v3isvmcOEv11kbhUVSQuWhp4tUXREiElCh9KyiwwyYB+sIiAzwocuiYjeC?=
- =?us-ascii?Q?wx1Dp8EcYUpGZJxeFviIs3kyTL6rA0Vuow+qgqqL8vl0ZyyTG2jfx8D9mV6A?=
- =?us-ascii?Q?trkzj8Xp5574eX3LvyhP9g6eirOA3cwf4OeltzoV4PtVNivdMOOmEdMt0EYN?=
- =?us-ascii?Q?GjDkAAJtTy6P2u2tEuWIrR6mc4Tr+/dnzM84Pmbb5btZYzevM5lsJX4PUdGH?=
- =?us-ascii?Q?d9Jxa89y1RfwzH4Ut8KzeiPx+HxspceAP+fl7+aRfs2B7Z5sirgiZQeXxKDb?=
- =?us-ascii?Q?qisXMdMcgopZRdeWimWEQk+hE4iAYWFFjIoxVX9fqVRsYyWW3bBMh8qMF7jw?=
- =?us-ascii?Q?Jx1KYzYBqG0us3y58GfaC1bkHu9PhWHQb7chJI2DzddB4GaHIKgMg1bzeVrF?=
- =?us-ascii?Q?qwE08qJXRtpw+K41usFbbE4Ur52k0tKZ8pXmwWAAleggDfn2P0IhYr0CFb7+?=
- =?us-ascii?Q?4OmshpLXzz+wEvfc3J+2HglYovtSepT3m6AFalD+mV13D+BVD1g0kn3q9pUV?=
- =?us-ascii?Q?IfZvRol4GzDt02v/y5rmuGWwEoQrEEg5+wiOZkAwoWAEpqAO/iP1G3gcN8h6?=
- =?us-ascii?Q?OnlUPJ7Vfd4+KsxAgt368cQhJv+BttEiXIdU4SeDwe5KY6M8B7qvFaMoH45C?=
- =?us-ascii?Q?EoKiKHv+d77MvHxGPo8sw1rIYs+rqL50oehNi91huS6+M2BKhzro9anvGtSo?=
- =?us-ascii?Q?nJGKyCVGXjitRVy3j+yz1LVfxvml/Ly0DBrl4sdPE3y8ppAqyS/kgptTYA3R?=
- =?us-ascii?Q?PXDWxfPa7i8Mo4C6uudSMD7SBjktUJoZD02lxqgMcO1vBZlgXjhHql3enHAS?=
- =?us-ascii?Q?3w6qDTZ+bu+v5URYSQWhwwEdkIhg9vtDHRUF++Vt/e6wdpiEfqQXhXjDvsQ7?=
- =?us-ascii?Q?296mjdHw9QzqNFXdibf6Gqzb0Yf9wp1eByCFH+Db1eY6PTsgrJJbslvBiz7o?=
- =?us-ascii?Q?Dp6WhNfMgGl9RFdQ3RquIEe+8AoSXTwcHIqb8TaLMYF4HzYpX5HcTzQpor5f?=
- =?us-ascii?Q?cMlWhagTNEEhCdeHVDjPgYU5fdJwp0vK2aGI8v8Hjqe/S2Wgv89QRNZQfLMW?=
- =?us-ascii?Q?xobqwThgKvX8133+jyzERzmd0YNW4zmM9JghEL0xV8DIavAM/Eoq82KBAm6H?=
- =?us-ascii?Q?RVFbsWXc+KAV0RyDJXHx3Q0Fh2c=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <41E3523FE2B82145833A038165E39C8F@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S243599AbhLDDGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 22:06:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53465 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232665AbhLDDGg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 Dec 2021 22:06:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638586991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=Fg21z4HWRrnGfVx0ChGSiSzsxzAGO0T2bD7rH2Iy6BU=;
+        b=AYVlmwrvqCj6L6CoftbydkeC5YUhsK6NcE9Zr3geizquMjdODni/Hpc9MR1lcI7x3RmyBO
+        Wdnqtbr0Nh4k1jPDYUy41m50vw6o0M4AsKjYKnOKxvH2ktTbFtWIU5VM2ezE4xz0wc+kq9
+        VxVQuBhqxagBKst0BocjtOHO0hMvx3U=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-124-jfmfwT8lPKmyPZEmHDdKvA-1; Fri, 03 Dec 2021 22:03:10 -0500
+X-MC-Unique: jfmfwT8lPKmyPZEmHDdKvA-1
+Received: by mail-yb1-f197.google.com with SMTP id q198-20020a25d9cf000000b005f7a6a84f9fso9793649ybg.6
+        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 19:03:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Fg21z4HWRrnGfVx0ChGSiSzsxzAGO0T2bD7rH2Iy6BU=;
+        b=E/duVl4c24/KeuFSgGfe5bt7wmMsqIlrU5sCPy7A6uN/Qz2X6EuUdaIGRzJ1t1Gz9Q
+         pyMMciMgZufsmMNFWT76yCOTahy5x7eRKDbicAj/OahFFzMSN5VfqjDWtsAhHEFUzyr3
+         SRwhvy5ByGWSCJgoYzxhGkWO4tY603h0f6pNl+It3/+HxhHh1ERY9F2aJAM9ZUA/NhVh
+         HV+/dsVbrIlQ84ND4h1naOqLrIoioe9Rkq3D91sb6w7iCO1Nn5hqhb+ZJo5rEWpNSp3W
+         xGP16353lOy8ph/RaTFaEVaarb4JWR50ZrrZXxiq/JLnezmc9rdQy3DX7SgZJ8pgvNpT
+         f9vA==
+X-Gm-Message-State: AOAM53397rQvufaITCQfji1ePKquj23cdd58SLPyvyEYUJEmUnc2qC6K
+        y0xQ366PF/eBVRKc6/dNnyYuvls8pKd2N3CeoqHGi3F6nVQ1GbNEutwWVJFsfWMAVFGv700i6Mn
+        LRBWrs9mDGgjyOoGNeJuIgn/rPKnz7+L801zIQgg=
+X-Received: by 2002:a25:c091:: with SMTP id c139mr29006267ybf.275.1638586989764;
+        Fri, 03 Dec 2021 19:03:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy7WhL1Grk0b76BeRVpxZMnNXB2LfmSUay3qEX7Zjt2B6DMH5MC5Cs50UqFfl6wfsnsYGokv6rDj0tNsqaFBUk=
+X-Received: by 2002:a25:c091:: with SMTP id c139mr29006242ybf.275.1638586989483;
+ Fri, 03 Dec 2021 19:03:09 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76219105-7e8f-4268-b8c3-08d9b6c66d32
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2021 01:36:00.0301
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OPIvbdpHkb1c2MxKCL9DfS8gb7TKHm4mzbzL4PkU9lUCo+VpBFFT1ojmwXEs266HHx/oY4gyPoLXaFS/TGeUxm3dcBnux44CzmURjBnCYpY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR04MB7989
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Sat, 4 Dec 2021 11:02:58 +0800
+Message-ID: <CAHj4cs8_tVET3_8ERuH1zVb7_T6sJ8b8fwQ5eUHN3JQWAr6Z8w@mail.gmail.com>
+Subject: [bug report] blktests nvme/014 flush operation failed with
+ "Interrupted system call"
+To:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Dec 03, 2021 / 21:09, Ming Lei wrote:
-> There isn't any reason to not allow zero poll queues from user
-> viewpoint.
->=20
-> Also sometimes we need to compare io poll between poll mode and irq
-> mode, so not allowing poll queues is bad.
->=20
-> Fixes: 15dfc662ef31 ("null_blk: Fix handling of submit_queues and poll_qu=
-eues attributes")
-> Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Hello
 
-Thank you for the fix. Looks good to me.
+I found blktests nvme/014 failed on the latest 5.16.0-rc3, and it also
+exists on the previous 5.13 kernel, pls help check it, thanks.
 
-Reviewed-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+# nvme_trtype=rdma ./check nvme/014
+nvme/014 (flush a NVMeOF block device-backed ns)             [failed]
+    runtime  97.035s  ...  83.405s
+    --- tests/nvme/014.out 2021-12-03 00:46:30.921272359 -0500
+    +++ /root/blktests/results/nodev/nvme/014.out.bad 2021-12-03
+20:39:24.005327680 -0500
+    @@ -1,6 +1,6 @@
+     Running nvme/014
+     91fdba0d-f87b-4c25-b80f-db7be1418b9e
+     uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+    -NVMe Flush: success
+    +flush: Interrupted system call
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
+     Test complete
+# use_siw=1 nvme_trtype=rdma ./check nvme/014
+nvme/014 (flush a NVMeOF block device-backed ns)             [failed]
+    runtime  83.405s  ...  120.337s
+    --- tests/nvme/014.out 2021-12-03 00:46:30.921272359 -0500
+    +++ /root/blktests/results/nodev/nvme/014.out.bad 2021-12-03
+20:41:37.716947252 -0500
+    @@ -1,6 +1,6 @@
+     Running nvme/014
+     91fdba0d-f87b-4c25-b80f-db7be1418b9e
+     uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+    -NVMe Flush: success
+    +flush: Interrupted system call
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
+     Test complete
 
---=20
+dmesg:
+[29543.065568] run blktests nvme/014 at 2021-12-03 20:38:00
+[29543.376558] rdma_rxe: loaded
+[29543.384075] eno1 speed is unknown, defaulting to 1000
+[29543.389149] eno1 speed is unknown, defaulting to 1000
+[29543.394225] eno1 speed is unknown, defaulting to 1000
+[29543.400686] infiniband eno1_rxe: set down
+[29543.404714] infiniband eno1_rxe: added eno1
+[29543.408903] eno1 speed is unknown, defaulting to 1000
+[29543.415984] eno1 speed is unknown, defaulting to 1000
+[29543.422624] eno2 speed is unknown, defaulting to 1000
+[29543.427686] eno2 speed is unknown, defaulting to 1000
+[29543.432760] eno2 speed is unknown, defaulting to 1000
+[29543.439219] infiniband eno2_rxe: set down
+[29543.443239] infiniband eno2_rxe: added eno2
+[29543.447436] eno2 speed is unknown, defaulting to 1000
+[29543.454519] eno1 speed is unknown, defaulting to 1000
+[29543.459609] eno2 speed is unknown, defaulting to 1000
+[29543.467662] infiniband eno3_rxe: set active
+[29543.471866] infiniband eno3_rxe: added eno3
+[29543.478492] eno1 speed is unknown, defaulting to 1000
+[29543.483595] eno2 speed is unknown, defaulting to 1000
+[29543.490194] eno4 speed is unknown, defaulting to 1000
+[29543.495271] eno4 speed is unknown, defaulting to 1000
+[29543.500340] eno4 speed is unknown, defaulting to 1000
+[29543.506811] infiniband eno4_rxe: set down
+[29543.510824] infiniband eno4_rxe: added eno4
+[29543.515014] eno4 speed is unknown, defaulting to 1000
+[29543.522209] eno1 speed is unknown, defaulting to 1000
+[29543.527301] eno2 speed is unknown, defaulting to 1000
+[29543.532395] eno4 speed is unknown, defaulting to 1000
+[29543.549896] loop0: detected capacity change from 0 to 2097152
+[29543.565549] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+[29543.581003] nvmet_rdma: enabling port 0 (10.16.219.1:4420)
+[29543.610378] nvmet: creating nvm controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:4c4c4544-0033-3110-8030-b5c04f505932.
+[29543.624775] nvme nvme0: creating 48 I/O queues.
+[29543.671829] nvme nvme0: mapped 48/0/0 default/read/poll queues.
+[29543.682993] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
+10.16.219.1:4420
+[29548.707044] nvme nvme0: using deprecated NVME_IOCTL_IO_CMD ioctl on
+the char device!
+[29578.830401] nvme nvme0: I/O 94 QID 35 timeout
+[29578.834769] nvme nvme0: starting error recovery
+[29578.848426] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+[29578.883367] nvme nvme0: Property Set error: 880, offset 0x14
+[29587.534052] nvmet: ctrl 1 keep-alive timer (5 seconds) expired!
+[29587.539984] nvmet: ctrl 1 fatal error occurred!
+[29626.587132] eno1 speed is unknown, defaulting to 1000
+[29626.592232] eno2 speed is unknown, defaulting to 1000
+[29626.597333] eno4 speed is unknown, defaulting to 1000
+[29626.615065] rdma_rxe: rxe-ah pool destroyed with unfree'd elem
+[29626.625808] rdma_rxe: unloaded
+[29639.841924] run blktests nvme/014 at 2021-12-03 20:39:37
+[29640.065389] SoftiWARP attached
+[29640.072754] eno1 speed is unknown, defaulting to 1000
+[29640.077817] eno1 speed is unknown, defaulting to 1000
+[29640.082892] eno1 speed is unknown, defaulting to 1000
+[29640.089949] eno1 speed is unknown, defaulting to 1000
+[29640.096517] eno2 speed is unknown, defaulting to 1000
+[29640.101579] eno2 speed is unknown, defaulting to 1000
+[29640.106658] eno2 speed is unknown, defaulting to 1000
+[29640.113763] eno1 speed is unknown, defaulting to 1000
+[29640.118865] eno2 speed is unknown, defaulting to 1000
+[29640.127341] eno1 speed is unknown, defaulting to 1000
+[29640.132427] eno2 speed is unknown, defaulting to 1000
+[29640.138937] eno4 speed is unknown, defaulting to 1000
+[29640.143992] eno4 speed is unknown, defaulting to 1000
+[29640.149070] eno4 speed is unknown, defaulting to 1000
+[29640.156219] eno1 speed is unknown, defaulting to 1000
+[29640.161330] eno2 speed is unknown, defaulting to 1000
+[29640.166422] eno4 speed is unknown, defaulting to 1000
+[29640.183772] loop0: detected capacity change from 0 to 2097152
+[29640.204078] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+[29640.221508] iwpm_register_pid: Unable to send a nlmsg (client = 2)
+[29640.227720] nvmet_rdma: enabling port 0 (10.16.219.1:4420)
+[29640.239086] nvmet: creating nvm controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:4c4c4544-0033-3110-8030-b5c04f505932.
+[29640.253493] nvme nvme0: creating 48 I/O queues.
+[29640.304443] nvme nvme0: mapped 48/0/0 default/read/poll queues.
+[29640.315630] nvme nvme0: new ctrl: NQN "blktests-subsystem-1", addr
+10.16.219.1:4420
+[29645.276648] nvme nvme0: using deprecated NVME_IOCTL_IO_CMD ioctl on
+the char device!
+[29675.595074] nvme nvme0: I/O 83 QID 17 timeout
+[29675.599446] nvme nvme0: starting error recovery
+[29675.616070] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+[29675.669023] nvme nvme0: Property Set error: 880, offset 0x14
+[29683.786764] nvmet: ctrl 1 keep-alive timer (5 seconds) expired!
+[29683.792690] nvmet: ctrl 1 fatal error occurred!
+[29760.282291] eno1 speed is unknown, defaulting to 1000
+[29760.287387] eno2 speed is unknown, defaulting to 1000
+[29760.292481] eno4 speed is unknown, defaulting to 1000
+[29760.306468] SoftiWARP detached
+
+
+-- 
 Best Regards,
-Shin'ichiro Kawasaki=
+  Yi Zhang
+
