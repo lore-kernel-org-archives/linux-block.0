@@ -2,161 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BFAC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  3 Dec 2021 21:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7AEC433EF
+	for <linux-block@archiver.kernel.org>; Sat,  4 Dec 2021 01:34:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383271AbhLCVtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Dec 2021 16:49:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40562 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236204AbhLCVtW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 16:49:22 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADDFFC061751
-        for <linux-block@vger.kernel.org>; Fri,  3 Dec 2021 13:45:57 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id q17so2979341plr.11
-        for <linux-block@vger.kernel.org>; Fri, 03 Dec 2021 13:45:57 -0800 (PST)
+        id S1383984AbhLDBhu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Dec 2021 20:37:50 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:37065 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237601AbhLDBhu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Dec 2021 20:37:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1638581665; x=1670117665;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=odcyRRKSa3pZ2XY+o6QRSax37Nz0Ec4Md6r2XTitAhg=;
+  b=OV8lv2aDiJBhys3d0QSON9NVUwfKMIQFQRC4PEjZEm/o2ODLtskLikCd
+   07Z8Rca6azQ4xSCm8rYKBjqioe3XesU8SsvBBBUO+9k4uY5CnFHfE+Xsf
+   xjDt2ZnewiovuJ80PxCv459sIPsTEbUHDHZSZesHVAythQUNB6c7L2xs2
+   uz0fIcDDXhgpEJmqyahWWYtEHFf15WxLUEYdAG2tUsBwl2vDbwSZc3cWf
+   CnXIb4Jc/NXGKEScEaq56q/bOvN5NnufKKvZxqd2shdenMzU5Cm6oMMCL
+   VypT02y3ido5d3o4jvg94BkN6xbENzWJdnHdx9Ib41VdCUNfnENkqvKwa
+   w==;
+X-IronPort-AV: E=Sophos;i="5.87,286,1631548800"; 
+   d="scan'208";a="299272419"
+Received: from mail-dm6nam10lp2102.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.102])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Dec 2021 09:34:17 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NzERp7eFu3arpkot9mK1sHmvcSrE9Sj3eLKgPWvpDiLWQq7MdQnxbe7CIoaSxeQoNU/er2moWl8zguh1WP3G6rI0lh2yPqTqbqWZwjRkGtLchGdwbDc16b4K7EN1+3hvg861Q8DHhxxoZEKYiNEtFJIsxC3LGoOiv7ulfkRoq59HIb+cHIxDyO14RsjM/8PfKqFDe6zwRJVwxRvlGBTU9raacHCgxHwgcZs+i9gLVG3GxFiFw1i6HCvQxjlUdM/E6dk/lDJZd7r/eMVIrXgk6d+XXp1JWAdq7uVbzPB6g5XPLwYhMKUpj+qX/yHDZk7LinU8rG0V10GyKYKvf3Vj9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yTwRkLScQec3DZHMma8C/nXSlajEPvEe8gGYgBgy8/Q=;
+ b=Hnq1W/xyqamLoS9ekwQ5L6QYoNMPvbBXzpWsnz1F7N9wbBeqWhP+2siL1E6KXpqBv1bzL/+01D9c115Kke9czSt1Ft3M/g4PsnS1nSXgECQ5E1T0t4rwjOBM0X7irpTHd5LNuT1903IGow/oB7FX+Sa4B3WXJ+DXvGES5yW9N7sbuFENJ01hwooE6os2bAlT/3u76VPDt3JPMGwuzleGfWeeDpnHsnKdqkKVsZcIv+DaNrjh70sncu/Pykj3gzSCbEMOWml1ywwIAKfREbhnTp8mKcG9uYLfwQGLGg/WTa33ak6QRF8TOtO7SpdTRqImE5ID1VG1dqdMwCXPMPEm9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=o9zV3AsUZv3pbYT8ZjfgRU03aeoO//Fo4QIP9poWU10=;
-        b=O9dRHmm+b/fSAJP61fkqyLIKKrC932Ckx8rkC8pOe2OdQfHAn1+hnqLbjSdP9HvSLU
-         VtEa9hdPdc8JiuZNf/aSdpn25KLqOTvEgOgAnznvWgmwbvk5te1OgglAmnuGf8UDBeFL
-         2CgcPcLYAC3oXQU9jQIjSRe9KEBwZk0ZZ0gDlDAvj8LNQ8eJhecOS2A7TbexTanGNw2R
-         3LLH56MBqaEe6KLl7icZXXzWMtpcsfSFJoW4IgRlphYjmz4RjuZ21B/zDNljczxuy66k
-         QRPGmS8ffOfguC4hLvFMkCqi4g9UU/J0oyPp10RD3WgLZZ+5uUB1hAVPYr9YsBclzTP3
-         +OJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=o9zV3AsUZv3pbYT8ZjfgRU03aeoO//Fo4QIP9poWU10=;
-        b=OYFvJhKPOAW8qaBwq6Q0vEZIMYYIoyyNp5O2IAgHAU4QoAAWY5DVtdqWpwOa5Vu+U5
-         eXeA7QvaemBq721gqfuGrvq9CPodBixBuVdiSRh8FopyodJ0NzKmepCYD/LqsUaKZwOq
-         452xZQHJSjN0L/bI2lcaxWbEWqRxunLHg0/ezoMUxmFhEHS2Fd6rIhCCW4upwTrJZqvs
-         mPthcKgJ5/FjLLiR1F4IXK2VNV/Iv/qAv1NZNLqb6lf1e4oW3NCZdGpotTo7YM3QsOlo
-         4RjjWkcUqvKEw8UdjEJqhywM+3JHtSj7k58aLRZHBe7WyKrCZ4FmN5mLs74HVLtz2KuN
-         qU+A==
-X-Gm-Message-State: AOAM533obwUwvE8x1eHzwlz7TnpOTUjtOUVmEIcj5wpVsShb9bKBjls4
-        NfR97O1kQc7/liu3JW5teNSXAzxFNC2tCieV
-X-Google-Smtp-Source: ABdhPJwm5/Pin5+Uog1HvCngT5V4+Ahn+yrA4GFB6w1uHITyV+zEh9CiOMWTmUiW7fh94H39ZzWsVA==
-X-Received: by 2002:a17:903:24d:b0:143:beb5:b6b1 with SMTP id j13-20020a170903024d00b00143beb5b6b1mr25758780plh.54.1638567956943;
-        Fri, 03 Dec 2021 13:45:56 -0800 (PST)
-Received: from localhost.localdomain ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id f4sm4436225pfj.61.2021.12.03.13.45.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 13:45:56 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/4] nvme: add support for mq_ops->queue_rqs()
-Date:   Fri,  3 Dec 2021 14:45:44 -0700
-Message-Id: <20211203214544.343460-5-axboe@kernel.dk>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20211203214544.343460-1-axboe@kernel.dk>
-References: <20211203214544.343460-1-axboe@kernel.dk>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yTwRkLScQec3DZHMma8C/nXSlajEPvEe8gGYgBgy8/Q=;
+ b=ZbjN71BECjAajkJ4MZ0AyTjKBYR89qN5DJb29dcWeYTFtcntUuTgoOuo7sRGdzLrOCBG/J2WT2pItE58CCkX86wfQH6096OcoovYArIfQPfhB5/zVtCRAHBTdd81KzVPEo+hPUooR2zfi2yf8GgQD+hgrJjfiKPNxFL+JtpUrOA=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ DM8PR04MB8184.namprd04.prod.outlook.com (2603:10b6:8::7) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4734.23; Sat, 4 Dec 2021 01:34:16 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::28ae:301e:551e:a62e]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::28ae:301e:551e:a62e%5]) with mapi id 15.20.4734.028; Sat, 4 Dec 2021
+ 01:34:16 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] null_blk: allow zero poll queues
+Thread-Topic: [PATCH] null_blk: allow zero poll queues
+Thread-Index: AQHX5+8R3HrF+EUnsUq/7/xCqs+zYqwgiaKAgAAjEQCAAOGGgA==
+Date:   Sat, 4 Dec 2021 01:34:16 +0000
+Message-ID: <20211204013415.kofojnrzjwt6bseu@shindev>
+References: <20211203023935.3424042-1-ming.lei@redhat.com>
+ <20211203100133.gdut65jrb6z6eodr@shindev> <YaoIaAMSut0UGhy1@T590>
+In-Reply-To: <YaoIaAMSut0UGhy1@T590>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a310f3ea-e070-49e9-ece6-08d9b6c62f90
+x-ms-traffictypediagnostic: DM8PR04MB8184:
+x-microsoft-antispam-prvs: <DM8PR04MB818472836906CC4388FA0767ED6B9@DM8PR04MB8184.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:3826;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: PWHzHThRB3PF93dRHjw+iFYrtjQl+2pmqLGJ4pSUCWS9+JE8D2HaMk/xGn35oNT8bRM2ZvZpa3C8evpI0KjIAEmLSNUeBvzTUB3KMhiMwMcSIa/bf68Q8kaRHjhCfneXOVve1foV+dYrM9oGgJTAWm/2ukPZIXkj40BPwkbJrMHmc+Gtb2os3G9rRMvj0NkByNOQmymZn7ngSCWFlbp1rnoAroRSeyZ7wXMRDlOBHEWtt0f6n5BnoRTDEd6kd82p/aD1Pwe1HccBB/b0Ci3cLaJSkIiD6OY6hFU035hb4Z1guZgku5Q/E24SC6sPVp9c450TuKQgYBTDH5B/HzvZGG4iR8/RsDNgy95Ag3UKjqXCYmCD4yyM238Rid2VdOIjeJNK1Le9Gn9DEjPqtdY9qJDGgOWfln1UFxN5p2C7vNVU8FJSXyz6zxpOJRKNM6TANP6mm46B7AWCfbIxkn4clPOc+u7uox0Wddrxpol1f22D4YUnrN/cHjC9vrZ/ZpfSOCIYCfc4TYX9P+ZUXan3qNJV4nRnlak3KzsVeL3TFl2VE/Zu/fWRnnV/iSEcqcEXxCoSTYnr6IY5lYFw9Nugc3Zhn+h7hkJIotQGwHbxI39gjmRliPYzkzj0wIOxFv1U4hp7KON1bVwdmVaD9pucUqY4rNhzjYPR+RWvRXIQNZNIb6YxBrq0RLczbJB/k45wVnWA65m9oEHDd8kh2S6uSA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(4636009)(366004)(8676002)(86362001)(54906003)(8936002)(82960400001)(71200400001)(66476007)(38100700002)(5660300002)(2906002)(6506007)(44832011)(64756008)(33716001)(4326008)(6916009)(508600001)(316002)(76116006)(91956017)(83380400001)(38070700005)(6512007)(66946007)(9686003)(186003)(26005)(66446008)(66556008)(122000001)(6486002)(1076003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?aTCrIr/1a4yaw5FlbZwdoABzFoY79Xz1zOAkZI9R82AsaXOcKUMDpcAX+GJb?=
+ =?us-ascii?Q?LokAfPNYDHvcldgBbwFSjDLwfv6GMAkzDt259Tq40PfIBaRcwx5VJGTYXAQt?=
+ =?us-ascii?Q?BmmTQifWwa2B7ox5+U67vOPwtmKx5JUr9T7xeoi1vcv7FcsIItIgYQHrSTAA?=
+ =?us-ascii?Q?b7fv7NhE0DYSl5Cn1jjDB5tWtaTqTQFEVxISdFkLLTIBtzljfFs+lTK+hD/+?=
+ =?us-ascii?Q?VeTiFAYx4FtIyv77yMbR5/YDNvq2E4DHiZH4LHlkLoj2/gtWNi1SYD9lj74X?=
+ =?us-ascii?Q?nYhTIzFM6C40Igm6tkmB8a2ts8Dkg6xi8KbP+Het7jzy9sU7KXNXgfGL7Z9s?=
+ =?us-ascii?Q?TAh0D7YkPiLU/8UfeSVxVNMLC0C8I6vpJ3SYNKzCZpZTpvCNPT1STO4jPxX1?=
+ =?us-ascii?Q?qzA2saiDZchcxGGU/PJn8rmNzdDl6HvFp8iDQvlxqmwY7TKNiEE0u1wknPs6?=
+ =?us-ascii?Q?KRxyrRsd9dYOVLU9+OAC/gWIeLzJjjyOC348E9U78rzNv9fW9O9ll7ZFIY8S?=
+ =?us-ascii?Q?8tybhgxhq1Micmsl+w4k6DzDLUR+9uefdAueVULbU2yRmuP1NXAooQUOvViK?=
+ =?us-ascii?Q?cL1Rju60WTA6+WWDy285jlPE7A0PhaYVJCnqr09JSR6H+ZzGEtOTvYYVccE8?=
+ =?us-ascii?Q?awf5DDj6jh0AFusRL5vsWqLIi91208Xn/rl4FLmEmfgaTb84ngW+0E18C1ai?=
+ =?us-ascii?Q?E/FAHmipxA3yTIj7F7Lo+bnbpHmJUBWxEQLVIPco+222NWjNtYR1QNSsdb5l?=
+ =?us-ascii?Q?2kWjrLe471WxJBV+rKFwjll0BPn5AkA957mz67viSuhbTBMnH7eAgGvqo64E?=
+ =?us-ascii?Q?3hVXXd5VvkvhH8pDPfdqOgDmkcSO1gvtTUfqdtgRsQQZPyjIJMvdIDkL+1bR?=
+ =?us-ascii?Q?mFmExGKyjQIaGYmlSwPiU4xNu9K/Qti7VJjEJjCGUar9HwAgZ0AzrwVIW+Pn?=
+ =?us-ascii?Q?0xfJOVX5EECYc8D/DOkj+3HjzJaM8rbSLfr8fscJ5V9pzhdwueSRk0nzIWtg?=
+ =?us-ascii?Q?A/eHbPWqxUqCwrKdM9G/qf0zcwTev6zM2YKKOzEkiGzBOtr5E3uEcA0IlXqB?=
+ =?us-ascii?Q?rcknVMorn19aRawD/C6chbZPa1caksrsS835PDBE20jow6a6jyxHadGuL+c8?=
+ =?us-ascii?Q?ON2YgCr8q0gqRC6i9Q3YrCNFQu7reu1h7RLEJJOvpp08qSKh8pjJyKygViZZ?=
+ =?us-ascii?Q?QNCUDm0fc8gevESzmHkPbcyVzCq1UM0x1Yp67DF+hBzujJgUBF/RPgJFPBzn?=
+ =?us-ascii?Q?n02Qg9qXc9z2oFvUwQnTpZrmEpICvfjzMvs+WV5xy0BmbOtbbniIbondWGo5?=
+ =?us-ascii?Q?88L52yp4NAv2hsHYPuqJcXCK8ErR6D/6W4+sj6kl/FSDY7Mu7BF8UMCrm8ns?=
+ =?us-ascii?Q?Bs1aT1IIm4MqmQnF6ow+ovDniQ9dzJGJasIBtmR1nSbjqi2mKR9ZOQFWVFT6?=
+ =?us-ascii?Q?iv0Xx1FVLjq/Iy7IWNP6xqpiSbk4ct9119uB75TmcAafoFLKxOABiFaCapR7?=
+ =?us-ascii?Q?Cj5SmFGaV291HVJWng5X0xBzuMnOfskyXxNUUfqRg8acnGAegeLCWVBLiRDG?=
+ =?us-ascii?Q?IXtdkItIrYHqxWNX3yi73ABkM8N+bvJUzHUpXpi96etCnUdVpzzizMM1q2q1?=
+ =?us-ascii?Q?c0NuP/eTNanEdOAehrzL54pQoQC6J1buOnhBarFYXtM6wlQ0q2zvbT7qMZQl?=
+ =?us-ascii?Q?xtmSawnB4yPdoCKhP7jgKn2uwWk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9651221030AF0C4F86F0E7A5E2B89FD8@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a310f3ea-e070-49e9-ece6-08d9b6c62f90
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2021 01:34:16.6098
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X9TcjkwBenrTWXYWYtP6uCAO8gCyQ89RjLDnZycmYUuFVMvxVhq0bGh+FCOLJH6Az6Izah9gJc/Jkz/KEq6nPJ5J3CF9KGy7oYmgb5L7+NY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR04MB8184
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This enables the block layer to send us a full plug list of requests
-that need submitting. The block layer guarantees that they all belong
-to the same queue, but we do have to check the hardware queue mapping
-for each request.
+On Dec 03, 2021 / 20:07, Ming Lei wrote:
+> Hi Shinichiro,
+>=20
+> On Fri, Dec 03, 2021 at 10:01:33AM +0000, Shinichiro Kawasaki wrote:
+> > On Dec 03, 2021 / 10:39, Ming Lei wrote:
+> > > There isn't any reason to not allow zero poll queues from user
+> > > viewpoint.
+> > >=20
+> > > Also sometimes we need to compare io poll between poll mode and irq
+> > > mode, so not allowing poll queues is bad.
+> > >=20
+> > > Fixes: 15dfc662ef31 ("null_blk: Fix handling of submit_queues and pol=
+l_queues attributes")
+> > > Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >=20
+> > Hi Ming,
+> >=20
+> > It is good to know that the zero poll queues is useful. Having said tha=
+t, I
+> > observe zero division error [1] with your patch and the commands below.=
+ Don' we
+> > need some more code changes to avoid the error?
+> >=20
+> > # modprobe null_blk
+> > # cd /sys/kernel/config/nullb
+> > # mkdir test
+> > # echo 0 > test/poll_queues
+> > # echo 1 > test/power
+> > Segmentation fault
+>=20
+> I guess the following change may fix the error:
+>=20
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
+c
+> index 20534a2daf17..96c55d06401d 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -1892,7 +1892,7 @@ static int null_init_tag_set(struct nullb *nullb, s=
+truct blk_mq_tag_set *set)
+>  	if (g_shared_tag_bitmap)
+>  		set->flags |=3D BLK_MQ_F_TAG_HCTX_SHARED;
+>  	set->driver_data =3D nullb;
+> -	if (g_poll_queues)
+> +	if (poll_queues)
+>  		set->nr_maps =3D 3;
+>  	else
+>  		set->nr_maps =3D 1;
+>=20
 
-If errors are encountered, leave them in the passed in list. Then the
-block layer will handle them individually.
+Yes, I confirmed that this change avoids the error. Thank you!
 
-This is good for about a 4% improvement in peak performance, taking us
-from 9.6M to 10M IOPS/core.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/nvme/host/pci.c | 61 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6be6b1ab4285..197aa45ef7ef 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -981,6 +981,66 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct request **rqlist)
-+{
-+	spin_lock(&nvmeq->sq_lock);
-+	while (!rq_list_empty(*rqlist)) {
-+		struct request *req = rq_list_pop(rqlist);
-+		struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+
-+		memcpy(nvmeq->sq_cmds + (nvmeq->sq_tail << nvmeq->sqes),
-+				absolute_pointer(&iod->cmd), sizeof(iod->cmd));
-+		if (++nvmeq->sq_tail == nvmeq->q_depth)
-+			nvmeq->sq_tail = 0;
-+	}
-+	nvme_write_sq_db(nvmeq, true);
-+	spin_unlock(&nvmeq->sq_lock);
-+}
-+
-+static bool nvme_prep_rq_batch(struct nvme_queue *nvmeq, struct request *req)
-+{
-+	/*
-+	 * We should not need to do this, but we're still using this to
-+	 * ensure we can drain requests on a dying queue.
-+	 */
-+	if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)))
-+		return false;
-+	if (unlikely(!nvme_check_ready(&nvmeq->dev->ctrl, req, true)))
-+		return false;
-+
-+	req->mq_hctx->tags->rqs[req->tag] = req;
-+	return nvme_prep_rq(nvmeq->dev, req) == BLK_STS_OK;
-+}
-+
-+static void nvme_queue_rqs(struct request **rqlist)
-+{
-+	struct request *req = rq_list_peek(rqlist), *prev = NULL;
-+	struct request *requeue_list = NULL;
-+
-+	do {
-+		struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
-+
-+		if (!nvme_prep_rq_batch(nvmeq, req)) {
-+			/* detach 'req' and add to remainder list */
-+			if (prev)
-+				prev->rq_next = req->rq_next;
-+			rq_list_add(&requeue_list, req);
-+		} else {
-+			prev = req;
-+		}
-+
-+		req = rq_list_next(req);
-+		if (!req || (prev && req->mq_hctx != prev->mq_hctx)) {
-+			/* detach rest of list, and submit */
-+			prev->rq_next = NULL;
-+			nvme_submit_cmds(nvmeq, rqlist);
-+			*rqlist = req;
-+		}
-+	} while (req);
-+
-+	*rqlist = requeue_list;
-+}
-+
- static __always_inline void nvme_pci_unmap_rq(struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-@@ -1678,6 +1738,7 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
- 
- static const struct blk_mq_ops nvme_mq_ops = {
- 	.queue_rq	= nvme_queue_rq,
-+	.queue_rqs	= nvme_queue_rqs,
- 	.complete	= nvme_pci_complete_rq,
- 	.commit_rqs	= nvme_commit_rqs,
- 	.init_hctx	= nvme_init_hctx,
--- 
-2.34.1
-
+--=20
+Best Regards,
+Shin'ichiro Kawasaki=
