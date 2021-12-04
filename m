@@ -2,67 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9F2C433F5
-	for <linux-block@archiver.kernel.org>; Sat,  4 Dec 2021 07:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D946C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  4 Dec 2021 08:03:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244794AbhLDHJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 4 Dec 2021 02:09:07 -0500
-Received: from smtprelay0106.hostedemail.com ([216.40.44.106]:41772 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S243085AbhLDHJH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 4 Dec 2021 02:09:07 -0500
-Received: from omf09.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay06.hostedemail.com (Postfix) with ESMTP id 9057818224D70;
-        Sat,  4 Dec 2021 07:05:39 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf09.hostedemail.com (Postfix) with ESMTPA id 0CAE82002C;
-        Sat,  4 Dec 2021 07:05:37 +0000 (UTC)
-Message-ID: <06f74e760966a090027bcfec8c22e97bc040e933.camel@perches.com>
-Subject: Re: [PATCH] xen-blkfront: Use the bitmap API when applicable
-From:   Joe Perches <joe@perches.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>, sstabellini@kernel.org,
-        roger.pau@citrix.com, axboe@kernel.dk
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Date:   Fri, 03 Dec 2021 23:05:37 -0800
-In-Reply-To: <f9a5bc6c-347b-8243-2784-04199ef879c2@wanadoo.fr>
-References: <1c73cf8eaff02ea19439ec676c063e592d273cfe.1638392965.git.christophe.jaillet@wanadoo.fr>
-         <c529a221-f444-ad26-11ff-f693401c9429@suse.com>
-         <d8f87c17-75d1-2e6b-65e1-23adc75bb515@wanadoo.fr>
-         <6fcddba84070c021eb92aa9a5ff15fb2a47e9acb.camel@perches.com>
-         <3d71577f-dabe-6e1a-4b03-2a44f304b702@wanadoo.fr>
-         <863f2cddacac590d581cda09d548ee0a652df8a1.camel@perches.com>
-         <1e9291c6-48bb-88e5-37dc-f604cfa4c4db@wanadoo.fr>
-         <a6dd44e2-6ea6-d085-0131-1e9bac49461a@oracle.com>
-         <f9a5bc6c-347b-8243-2784-04199ef879c2@wanadoo.fr>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1ubuntu2 
+        id S1354885AbhLDIHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 4 Dec 2021 03:07:22 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:29087 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1354766AbhLDIHW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 4 Dec 2021 03:07:22 -0500
+Received: from kwepemi100009.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J5hw54n6Rz1DJl2;
+        Sat,  4 Dec 2021 16:01:09 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100009.china.huawei.com (7.221.188.242) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 4 Dec 2021 16:03:54 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 4 Dec 2021 16:03:54 +0800
+Subject: Re: [PATCH v4 2/2] block: cancel all throttled bios in del_gendisk()
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <hch@infradead.org>, <tj@kernel.org>, <axboe@kernel.dk>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211202130440.1943847-1-yukuai3@huawei.com>
+ <20211202130440.1943847-3-yukuai3@huawei.com>
+ <20211202144818.GB16798@blackbody.suse.cz>
+ <95825098-a532-a0e4-9ed0-0b5f2a0e5f04@huawei.com>
+ <20211203102739.GB64349@blackbody.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <c8a16fe9-4ad2-682d-0d34-1049dc217d62@huawei.com>
+Date:   Sat, 4 Dec 2021 16:03:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: kghtzb7181hs7t5uegz983zku95oz1k9
-X-Rspamd-Server: rspamout02
-X-Rspamd-Queue-Id: 0CAE82002C
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18WQvFgT880/VPxHgQ21iyOmrOfGf3TeLs=
-X-HE-Tag: 1638601537-186527
+In-Reply-To: <20211203102739.GB64349@blackbody.suse.cz>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 2021-12-04 at 07:57 +0100, Christophe JAILLET wrote:
-> So, maybe adding an "official" 'bitmap_size()' (which is already 
-> existing and duplicated in a few places) would ease things.
+在 2021/12/03 18:27, Michal Koutný 写道:
+> On Fri, Dec 03, 2021 at 03:50:01PM +0800, "yukuai (C)" <yukuai3@huawei.com> wrote:
+>> blkg_destroy() is protected by the queue_lock，so I think queue_lock can
+>> protect such concurrent scenario.
 > 
-> It would replace the 'nr_minors = BITS_TO_LONGS(end) * BITS_PER_LONG;' 
-> and hide the implementation details of the bitmap API.
+> blkg_destroy() is not as destroying :-) as actual free, you should
+> synchronize against (the queue_lock ensures this for
+> pd_free_fn=throtl_pd_free but you may still trip on blkcg after
+> blkcg_css_free()).
+
+Hi, Michal
+
+I was thinking that if there are active blkgs, holding queue_lock will 
+ensure blkcg won't be freed. However, if there are no active blkgs in
+the first place, it seems right rcu_read_lock() can prevent this
+iteration concurrent with css_release->css_release_work_fn->
+css_free_rwork_fn.
+
+By the way, does spin_lock can guarantee this since it disables preempt
+like what rcu_read_lock() does?
+
+Thanks,
+Kuai
+
 > 
-> Something like:
-> static __always_inline size_t bitmap_size(unsigned long nr_bits)
-> {
-> 	return BITS_TO_LONGS(nr_bits) * sizeof(long);
-> }
-
-Or maybe a bitmap_realloc
-
+> [Actually, I think you should see a warning in your situation if you
+> enable CONFIG_PROVE_RCU.]
+> 
+> HTH,
+> Michal
+> 
