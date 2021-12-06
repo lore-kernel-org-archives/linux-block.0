@@ -2,291 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F8EC4167B
-	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 22:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 289F2C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 23:28:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376287AbhLFXCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 18:02:52 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:15870 "EHLO
-        alexa-out-sd-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1377162AbhLFXCo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Dec 2021 18:02:44 -0500
+        id S1347953AbhLFXcD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Dec 2021 18:32:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239127AbhLFXcD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 18:32:03 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B95C0613F8
+        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 15:28:33 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id j6-20020a17090a588600b001a78a5ce46aso545631pji.0
+        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 15:28:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1638831555; x=1670367555;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=NmElV7T+xzPa6AFGYUpxLexgr3R7EJAkax7bo6Hf2K0=;
-  b=HSMzcP5U8wku5t0X37e2TEqc7X5MsGdXZQE/93HYImdzDH6SChTucqTx
-   xi7ohUrsDDQO54NUNyxJllUgwtaRzSxUalCW5Sfy//Q7KZhX36cE2JUqW
-   c/rOx7vhmE9biAKTl8ZPgvTKNpTIKG5Z83SGH+pPXPepDvPkwUVMlH8AM
-   Q=;
-Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 06 Dec 2021 14:59:12 -0800
-X-QCInternal: smtphost
-Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
-  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2021 14:59:12 -0800
-Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
- nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.922.19; Mon, 6 Dec 2021 14:59:12 -0800
-Received: from gabriel.qualcomm.com (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.922.19; Mon, 6 Dec 2021
- 14:59:11 -0800
-From:   Gaurav Kashyap <quic_gaurkash@quicinc.com>
-To:     <linux-scsi@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-CC:     <linux-mmc@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-fscrypt@vger.kernel.org>, <thara.gopinath@linaro.org>,
-        <quic_neersoni@quicinc.com>, <dineshg@quicinc.com>,
-        Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Subject: [PATCH 09/10] soc: qcom: support for generate, import and prepare key
-Date:   Mon, 6 Dec 2021 14:57:24 -0800
-Message-ID: <20211206225725.77512-10-quic_gaurkash@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
-References: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=iYlong7BFeAPBAo6aJJAOLFXmMpt5I92OzI5hHT+4DQ=;
+        b=ZFk8Cpau3VRTYxRul9UaQIlSGM1KPnxNcxeXeHXgHZ1BacepQ3f1pgT4knSx9jmYc+
+         MC3RIYSKIZjytMmU+O0sZzWJ1Lc+lpKz3pOqma7LdlkdgiHo0ZHwOvixT+EJ95A+zKai
+         2UISRN7nlqeo9huTXdu07jKzUWlLecF5mo29Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=iYlong7BFeAPBAo6aJJAOLFXmMpt5I92OzI5hHT+4DQ=;
+        b=dg4anMetov4g7l2docZPSOQZ6KSVSabOuxoSLmDyV8Mta/wenxyys/RSMfCb47vTw4
+         ojm2g7zuyfA72xwzVR8d+aH8IbuhO84Xeiruk5VOYoI9HykMtnudxF/VTwMffZUfXL23
+         CPwIvcWrOPA+VhkMKrX1BVCrNBApI1Kz+EyXObWL4qwA8Bu8CRjpnofhu+WrGMKXxJYw
+         /g+H0bsde8L8v8ofOco/FogpI3wkOLUSy4uVXM/4lkw3gooe85xhV/EJOlRtBsk7Lr/S
+         1Hvp4TaqUrG+F7Mz2dy8RbeyA9TwoEEHfKw86zAsCqQCLWTqMAuJCxaMdcvotdZW7PLy
+         G0LA==
+X-Gm-Message-State: AOAM530YdlmMGhCWykAUQdyhQ7hs5hAeCH1n6j1yxIgYSNlTBqe1RkeA
+        2erqRgBNhoQVLq2OiaKUN2brxQ==
+X-Google-Smtp-Source: ABdhPJyCWRhj7VPjT3NxliyEgMqe+IoDoJvad+ognPbn+ZXCLt+PZpfUdmrv3Mxw6QhEAAsGSoanww==
+X-Received: by 2002:a17:90b:4b4d:: with SMTP id mi13mr2027431pjb.192.1638833313291;
+        Mon, 06 Dec 2021 15:28:33 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id h13sm10625918pgg.16.2021.12.06.15.28.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Dec 2021 15:28:33 -0800 (PST)
+Date:   Mon, 6 Dec 2021 15:28:32 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <202112061455.F23512C3CB@keescook>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
+ <CAHk-=wjXmGt9-JQp-wvup4y2tFNUCVjvx2W7MHzuAaxpryP4mg@mail.gmail.com>
+ <282666e2-93d4-0302-b2d0-47d03395a6d4@kernel.dk>
+ <202112061247.C5CD07E3C@keescook>
+ <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implements the vops for generate, prepare and import key
-apis and hooks it up the scm calls defined for them.
-Key management has to be done from Qualcomm Trustzone as only
-it can interface with HWKM.
+On Mon, Dec 06, 2021 at 01:17:17PM -0800, Linus Torvalds wrote:
+> End result: atomics are _better_ in the overflow case, and it's why
+> the page counters could not use the garbage that is refcount_t, and
+> instead did it properly.
+> 
+> See? In absolutely neither case is recount_t "safer". It's only worse.
 
-Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
----
- drivers/scsi/ufs/ufs-qcom-ice.c   | 22 ++++++++
- drivers/scsi/ufs/ufs-qcom.c       |  3 ++
- drivers/scsi/ufs/ufs-qcom.h       | 12 +++++
- drivers/soc/qcom/qti-ice-common.c | 89 ++++++++++++++++++++++++++++---
- include/linux/qti-ice-common.h    |  8 +++
- 5 files changed, 128 insertions(+), 6 deletions(-)
+Right, I understand your objection; it is valid. One of the dimensions of
+"safe" is "not exploitable", which is _also_ a valid concern. As you
+say, refcount_t works for the "never make them all handle overflows
+properly" case, and I'm fine with using something else where we need a
+better set of behaviors.
 
-diff --git a/drivers/scsi/ufs/ufs-qcom-ice.c b/drivers/scsi/ufs/ufs-qcom-ice.c
-index c8305aab6714..7f0485553d75 100644
---- a/drivers/scsi/ufs/ufs-qcom-ice.c
-+++ b/drivers/scsi/ufs/ufs-qcom-ice.c
-@@ -130,3 +130,25 @@ int ufs_qcom_ice_derive_sw_secret(struct ufs_hba *hba, const u8 *wrapped_key,
- 					wrapped_key, wrapped_key_size,
- 					sw_secret);
- }
-+
-+int ufs_qcom_ice_generate_key(
-+	u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
-+{
-+	return qti_ice_generate_key(longterm_wrapped_key);
-+}
-+
-+int ufs_qcom_ice_prepare_key(const u8 *longterm_wrapped_key,
-+		unsigned int longterm_wrapped_key_size,
-+		u8 ephemerally_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
-+{
-+	return qti_ice_prepare_key(longterm_wrapped_key, longterm_wrapped_key_size,
-+				   ephemerally_wrapped_key);
-+}
-+
-+int ufs_qcom_ice_import_key(const u8 *imported_key,
-+		unsigned int imported_key_size,
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
-+{
-+	return qti_ice_import_key(imported_key, imported_key_size,
-+				   longterm_wrapped_key);
-+}
-diff --git a/drivers/scsi/ufs/ufs-qcom.c b/drivers/scsi/ufs/ufs-qcom.c
-index 9f85332fbe64..cbd472844065 100644
---- a/drivers/scsi/ufs/ufs-qcom.c
-+++ b/drivers/scsi/ufs/ufs-qcom.c
-@@ -1496,6 +1496,9 @@ static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
- 	.config_scaling_param = ufs_qcom_config_scaling_param,
- 	.program_key		= ufs_qcom_ice_program_key,
- 	.derive_secret		= ufs_qcom_ice_derive_sw_secret,
-+	.generate_key		= ufs_qcom_ice_generate_key,
-+	.prepare_key		= ufs_qcom_ice_prepare_key,
-+	.import_key		= ufs_qcom_ice_import_key,
- };
- 
- /**
-diff --git a/drivers/scsi/ufs/ufs-qcom.h b/drivers/scsi/ufs/ufs-qcom.h
-index e7da3d1dc3c7..1f8ed9adb28f 100644
---- a/drivers/scsi/ufs/ufs-qcom.h
-+++ b/drivers/scsi/ufs/ufs-qcom.h
-@@ -259,6 +259,14 @@ int ufs_qcom_ice_program_key(struct ufs_hba *hba,
- int ufs_qcom_ice_derive_sw_secret(struct ufs_hba *hba, const u8 *wrapped_key,
- 				  unsigned int wrapped_key_size,
- 				  u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE]);
-+int ufs_qcom_ice_generate_key(
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE]);
-+int ufs_qcom_ice_prepare_key(const u8 *longterm_wrapped_key,
-+		unsigned int longterm_wrapped_key_size,
-+		u8 ephemerally_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE]);
-+int ufs_qcom_ice_import_key(const u8 *imported_key,
-+		unsigned int imported_key_size,
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE]);
- #else
- static inline int ufs_qcom_ice_init(struct ufs_qcom_host *host)
- {
-@@ -273,6 +281,10 @@ static inline int ufs_qcom_ice_resume(struct ufs_qcom_host *host)
- 	return 0;
- }
- #define ufs_qcom_ice_program_key NULL
-+#define ufs_qcom_ice_derive_sw_secret NULL
-+#define ufs_qcom_ice_generate_key NULL
-+#define ufs_qcom_ice_prepare_key NULL
-+#define ufs_qcom_ice_import_key NULL
- #endif /* !CONFIG_SCSI_UFS_CRYPTO */
- 
- #endif /* UFS_QCOM_H_ */
-diff --git a/drivers/soc/qcom/qti-ice-common.c b/drivers/soc/qcom/qti-ice-common.c
-index 76703afa4834..cc035f1a1d42 100644
---- a/drivers/soc/qcom/qti-ice-common.c
-+++ b/drivers/soc/qcom/qti-ice-common.c
-@@ -13,13 +13,21 @@
- 
- #define QTI_ICE_MAX_BIST_CHECK_COUNT    100
- #define QTI_AES_256_XTS_KEY_RAW_SIZE	64
-+#define QTI_HWKM_WRAPPED_KEY_SIZE_V1	68
-+#define QTI_HWKM_WRAPPED_KEY_SIZE_V2	100
- 
- /*
-  * ICE resets during power collapse and HWKM has to be
-  * reconfigured which can be kept track with this flag.
-  */
- static bool qti_hwkm_init_done;
--static int hwkm_version;
-+static int qti_hwkm_version;
-+
-+/*
-+ * Size of the wrapped key returned by HWKM, which varies with
-+ * hwkm version
-+ */
-+static unsigned int qti_hwkm_wrapped_key_size;
- 
- union crypto_cfg {
- 	__le32 regval;
-@@ -45,10 +53,13 @@ static bool qti_ice_supported(const struct ice_mmio_data *mmio)
- 		return false;
- 	}
- 
--	if ((major >= 4) || ((major == 3) && (minor == 2) && (step >= 1)))
--		hwkm_version = 2;
--	else
--		hwkm_version = 1;
-+	if ((major >= 4) || ((major == 3) && (minor == 2) && (step >= 1))) {
-+		qti_hwkm_wrapped_key_size = QTI_HWKM_WRAPPED_KEY_SIZE_V2;
-+		qti_hwkm_version = 2;
-+	} else {
-+		qti_hwkm_wrapped_key_size = QTI_HWKM_WRAPPED_KEY_SIZE_V1;
-+		qti_hwkm_version = 1;
-+	}
- 
- 	pr_info("Found QC Inline Crypto Engine (ICE) v%d.%d.%d\n",
- 		 major, minor, step);
-@@ -168,7 +179,7 @@ static int qti_ice_program_wrapped_key(const struct ice_mmio_data *mmio,
- 	 * won't work.
- 	 */
- 	if (!qti_hwkm_init_done) {
--		err = qti_ice_hwkm_init(mmio, hwkm_version);
-+		err = qti_ice_hwkm_init(mmio, qti_hwkm_version);
- 		if (err) {
- 			pr_err("%s: Error initializing hwkm, err = %d",
- 							__func__, err);
-@@ -322,4 +333,70 @@ int qti_ice_derive_sw_secret(const struct ice_mmio_data *mmio,
- }
- EXPORT_SYMBOL_GPL(qti_ice_derive_sw_secret);
- 
-+/**
-+ * qti_ice_generate_key() - Generate a wrapped key for inline encryption
-+ * @longterm_wrapped_key: wrapped key that is generated, which is at most
-+ *                        BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE in size.
-+ *
-+ * Make a scm call into trustzone to generate a wrapped key for storage
-+ * encryption using hwkm.
-+ *
-+ * Return: 0 on success; err on failure.
-+ */
-+int qti_ice_generate_key(
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
-+{
-+	return qcom_scm_generate_ice_key(longterm_wrapped_key,
-+			       qti_hwkm_wrapped_key_size);
-+}
-+EXPORT_SYMBOL_GPL(qti_ice_generate_key);
-+
-+/**
-+ * qti_ice_prepare_key() - Prepare a longterm wrapped key for inline encryption
-+ * @longterm_wrapped_key: wrapped key that is generated,
-+ * @longterm_wrapped_key_size: size of the longterm wrapped_key
-+ * @ephemerally_wrapped_key: wrapped key returned which has been wrapped with
-+ *                           a per-boot ephemeral key, size of which is at most
-+ *                           BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE
-+ *
-+ * Make a scm call into trustzone to prepare a wrapped key for storage
-+ * encryption by rewrapping the longterm wrapped key with a per boot ephemeral
-+ * key using hwkm.
-+ *
-+ * Return: 0 on success; err on failure.
-+ */
-+int qti_ice_prepare_key(const u8 *longterm_wrapped_key,
-+		unsigned int longterm_wrapped_key_size,
-+		u8 ephemerally_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
-+{
-+	return qcom_scm_prepare_ice_key(longterm_wrapped_key,
-+				    longterm_wrapped_key_size,
-+				    ephemerally_wrapped_key,
-+				    qti_hwkm_wrapped_key_size);
-+}
-+EXPORT_SYMBOL_GPL(qti_ice_prepare_key);
-+
-+/**
-+ * qti_ice_import_key() - Importa raw key for inline encryption
-+ * @imported_key: raw key that has to be imported
-+ * @imported_key_size: size of the imported key
-+ * @longterm_wrapped_key: longterm wrapped key returned which has been wrapped
-+ *                        after imporint the raw key using hwkm.
-+ *
-+ * Make a scm call into trustzone to import a raw key for storage encryption
-+ * and generating a longterm wrapped key using hwkm.
-+ *
-+ * Return: 0 on success; err on failure.
-+ */
-+int qti_ice_import_key(const u8 *imported_key,
-+		unsigned int imported_key_size,
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
-+{
-+	return qcom_scm_import_ice_key(imported_key,
-+				    imported_key_size,
-+				    longterm_wrapped_key,
-+				    qti_hwkm_wrapped_key_size);
-+}
-+EXPORT_SYMBOL_GPL(qti_ice_import_key);
-+
- MODULE_LICENSE("GPL v2");
-diff --git a/include/linux/qti-ice-common.h b/include/linux/qti-ice-common.h
-index e329afeba113..cae5275ee1d9 100644
---- a/include/linux/qti-ice-common.h
-+++ b/include/linux/qti-ice-common.h
-@@ -28,5 +28,13 @@ int qti_ice_derive_sw_secret(const struct ice_mmio_data *mmio,
- 			     const u8 *wrapped_key,
- 			     unsigned int wrapped_key_size,
- 			     u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE]);
-+int qti_ice_generate_key(
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE]);
-+int qti_ice_prepare_key(const u8 *longterm_wrapped_key,
-+		unsigned int longterm_wrapped_key_size,
-+		u8 ephemerally_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE]);
-+int qti_ice_import_key(const u8 *imported_key,
-+		unsigned int imported__key_size,
-+		u8 longterm_wrapped_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE]);
- 
- #endif /* _QTI_ICE_COMMON_H */
+> I like Jens' patches. They take the _good_ code - the code we use for
+> page counters - and make that proper interface available to others.
+
+I am fine with whatever can be made safe in all dimensions, but I don't
+want to lose sight of the exploitability dimension. This is a lot like
+the BUG vs WARN situation: BUG is unfixable because there is no recovery.
+WARN allows the code to do something sensible in the pathological case,
+but the code needs to have been designed to handle that case. The
+widely used older atomic_t reference counting code pattern had no path
+to handling failure.
+
+In the proposed API, we get a warning (sometimes) in bad states, but
+there is no handling of the broken reference counter. For example,
+with atomic_ref_inc_not_zero():
+
+- there's no __must_check hint for callers to actually check it happened
+- overflow is silent, so wrapping around to 1 and then having a
+  call to atomic_ref_put_and_test() has no protection against exploitation
+  at all. This particular code pattern mistake (missed "put") is the
+  fundamental path to nearly all the refcount overflow exploits of the
+  past couple decades. e.g. see:
+	- CVE-2016-0728 - Keyring refcount overflow.
+	  Exploit: https://www.exploit-db.com/exploits/39277/
+	- CVE-2016-4558 - BPF reference count mishandling.
+          Explot: https://www.exploit-db.com/exploits/39773/
+  Losing that protection is just inviting these exploits back again (of
+  which we've had none in the past few years).
+
+For the API generally, nothing about the type stops someone from
+accidentally using the standard atomic_t helpers instead, accidentally
+bypassing any potential WARNs. It should do something similar to
+refcount_t so the compiler can help guide people correctly instead of
+blindly accepting an accident.
+
+And if we're speaking to safety/robustness generally, where are the unit
+tests, run-time tests (LKDTM provides this for refcount_t so it should
+be easy to repurpose them), kern-doc, etc?
+
+I'm not arguing for refcount_t -- I'm arguing for an API that isn't a
+regression of features that have been protecting the kernel from bugs.
+
 -- 
-2.17.1
-
+Kees Cook
