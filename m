@@ -2,141 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 563F5C43217
-	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 10:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC5DC433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 11:12:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241979AbhLFLBR convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 06:01:17 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4201 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241972AbhLFLBN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 06:01:13 -0500
-Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J70hy1Svhz67wK2;
-        Mon,  6 Dec 2021 18:56:02 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 6 Dec 2021 11:57:41 +0100
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
- Mon, 6 Dec 2021 11:57:41 +0100
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     Roberto Sassu <roberto.sassu@huawei.com>,
-        Christoph Hellwig <hch@infradead.org>
-CC:     "deven.desai@linux.microsoft.com" <deven.desai@linux.microsoft.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "eparis@redhat.com" <eparis@redhat.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "jannh@google.com" <jannh@google.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-audit@redhat.com" <linux-audit@redhat.com>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "tusharsu@linux.microsoft.com" <tusharsu@linux.microsoft.com>
-Subject: RE: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
-Thread-Topic: [RFC][PATCH] device mapper: Add builtin function dm_get_status()
-Thread-Index: AQHX5tHI6VSZDPA0J0GM0KIP7fuaeKweu+CAgAAaFvD///01gIAAEg9QgAFg9oCAAC4FMIAE3cYA
-Date:   Mon, 6 Dec 2021 10:57:41 +0000
-Message-ID: <e38392762299459890eee792a3a7cb09@huawei.com>
-References: <81d5e825-1ee2-8f6b-cd9d-07b0f8bd36d3@linux.microsoft.com>
- <20211201163708.3578176-1-roberto.sassu@huawei.com>
- <Yahz1SYRG1CQIh0z@infradead.org>
- <e57d2d23ec7845febb79ca4476c73fcb@huawei.com>
- <YaiHX+dWNUlmsNac@infradead.org>
- <b4bf4a384b334cdab1522b3b082bd088@huawei.com>
- <Yam+m9eiLxIamGXm@infradead.org>
- <28208b7f142f4295ac5c857af5cffe07@huawei.com>
-In-Reply-To: <28208b7f142f4295ac5c857af5cffe07@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.204.63.33]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S242200AbhLFLQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Dec 2021 06:16:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58266 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236157AbhLFLQU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Dec 2021 06:16:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638789171;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l9ryFPPWiRsFSsrjykSWsCrHONpTXKQcjfhU8bkis7c=;
+        b=X0piEsNIF2jK28FwuBuHL3LSIhmAaFCeIW1t9L2oZzOd8YpTLJgy2teFO7sILacdu3tDOK
+        3vfXLdmoXW9q2FS2i+Sx1HZ2eqKC04vajrp1lVBtbZMQhxaEGjPHRnwoQzbBfuouIpN46D
+        JsAGVdAI08L1GKLkGWsHDhsnUk5KHMc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-367-q_4wBqa0N3in1rI3F-RbGA-1; Mon, 06 Dec 2021 06:12:48 -0500
+X-MC-Unique: q_4wBqa0N3in1rI3F-RbGA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61DDC190D340;
+        Mon,  6 Dec 2021 11:12:47 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 92DC610013D6;
+        Mon,  6 Dec 2021 11:12:18 +0000 (UTC)
+Date:   Mon, 6 Dec 2021 19:12:13 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] blk-mq: remove hctx_lock and hctx_unlock
+Message-ID: <Ya3wDS/UNzQXoYpQ@T590>
+References: <20211203131534.3668411-1-ming.lei@redhat.com>
+ <20211203131534.3668411-2-ming.lei@redhat.com>
+ <CGME20211206103121eucas1p2ac12934f15129fe77d7f8d95c02fe447@eucas1p2.samsung.com>
+ <8b6e48b0-c55d-1583-1146-b18bf4eaf94a@samsung.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8b6e48b0-c55d-1583-1146-b18bf4eaf94a@samsung.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> From: Roberto Sassu [mailto:roberto.sassu@huawei.com]
-> Sent: Friday, December 3, 2021 11:20 AM
-> > From: Christoph Hellwig [mailto:hch@infradead.org]
-> > Sent: Friday, December 3, 2021 7:52 AM
-> > On Thu, Dec 02, 2021 at 09:29:52AM +0000, Roberto Sassu wrote:
-> > > The problem being solved is how to grant access to files
-> > > which satisfy a property defined in the policy.
+On Mon, Dec 06, 2021 at 11:31:21AM +0100, Marek Szyprowski wrote:
+> Hi,
+> 
+> On 03.12.2021 14:15, Ming Lei wrote:
+> > Remove hctx_lock and hctx_unlock, and add one helper of
+> > blk_mq_run_dispatch_ops() to run code block defined in dispatch_ops
+> > with rcu/srcu read held.
 > >
-> > If you have want to enforce access to files in the block layer using
-> > a specific stacking block driver you don't just have one layering
-> > violation but a bunch of them.  Please go back to the drawing board.
+> > Compared with hctx_lock()/hctx_unlock():
+> >
+> > 1) remove 2 branch to 1, so we just need to check
+> > (hctx->flags & BLK_MQ_F_BLOCKING) once when running one dispatch_ops
+> >
+> > 2) srcu_idx needn't to be touched in case of non-blocking
+> >
+> > 3) might_sleep_if() can be moved to the blocking branch
+> >
+> > Also put the added blk_mq_run_dispatch_ops() in private header, so that
+> > the following patch can use it out of blk-mq.c.
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > 
-> Ok. I write my thoughts here, so that it is easier to align.
+> This patch landed in linux next-20211206 as commit 2a904d00855f 
+> ("blk-mq: remove hctx_lock and hctx_unlock"). It introduces a following 
+> 'BUG' warning on my test systems (ARM/ARM64-based boards with rootfs on 
+> SD card or eMMC):
 > 
-> dm-verity provides block-level integrity, which means that
-> the block layer itself is responsible to not pass data to the
-> upper layer, the filesystem, if a block is found corrupted.
-> 
-> The dm-verity root digest represents the immutable state
-> of the block device. dm-verity is still responsible to enforce
-> accesses to the block device according to the root digest
-> passed at device setup time. Nothing changes, the block
-> layer still detects data corruption against the passed
-> reference value.
-> 
-> The task of the security layer is to decide whether or not
-> the root digest passed at device setup time is acceptable,
-> e.g. it represents a device containing genuine files coming
-> from a software vendor.
-> 
-> The mandatory policy can be enforced at different layers,
-> depending on whether the security controls are placed.
-> A possibility would be to deny mounting block devices that
-> don't satisfy the mandatory policy.
-> 
-> However, if the mandatory policy wants only to restrict
-> execution of approved files and allowing the rest, making
-> the decision at the block layer is too coarse and restrictive.
-> It would force the user to mount only approved block
-> devices. The security layer must operate on files to enforce
-> this policy.
-> 
-> Now probably there is the part where there is no agreement.
-> 
-> The integrity property of a block device applies also to the
-> files on the filesystem mounted from that device. User space
-> programs cannot access files in that filesystem coming from a
-> device with a different dm-verity root digest, or files stored
-> in a corrupted block device.
-> 
-> If what I wrote is correct, that the integrity property is preserved
-> across the layers, this would give enough flexibility to enforce
-> policies at a higher layer, although that property is guaranteed
-> by a lower layer.
+> BUG: sleeping function called from invalid context at block/blk-mq.c:2060
+> in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 249, name: 
+> kworker/0:3H
+> preempt_count: 1, expected: 0
+> RCU nest depth: 0, expected: 0
+> 4 locks held by kworker/0:3H/249:
+>   #0: c1d782a8 ((wq_completion)mmc_complete){+.+.}-{0:0}, at: 
+> process_one_work+0x21c/0x7ec
+>   #1: c3b59f18 ((work_completion)(&mq->complete_work)){+.+.}-{0:0}, at: 
+> process_one_work+0x21c/0x7ec
+>   #2: c1d7858c (&mq->complete_lock){+.+.}-{3:3}, at: 
+> mmc_blk_mq_complete_prev_req.part.3+0x2c/0x234
+>   #3: c1f7a1b4 (&fq->mq_flush_lock){....}-{2:2}, at: 
+> mq_flush_data_end_io+0x68/0x124
 
-Hi Christoph
+It should be fixed by the attached patch.
 
-did I address your concerns? If yes, I could send the new patch
-set, including the patch that uses the new functionality.
+From bce4d1bf7ab4ac4c04a65eca67705567e9d5f0c0 Mon Sep 17 00:00:00 2001
+From: Ming Lei <ming.lei@redhat.com>
+Date: Mon, 6 Dec 2021 15:54:11 +0800
+Subject: [PATCH] blk-mq: don't run might_sleep() if the operation needn't
+ blocking
 
-Thanks
+The operation protected via blk_mq_run_dispatch_ops() in blk_mq_run_hw_queue
+won't sleep, so don't run might_sleep() for it.
 
-Roberto
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 2 +-
+ block/blk-mq.h | 7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
-Managing Director: Li Peng, Zhong Ronghua
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 537295f6e0e9..0bf3523dd1f5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2048,7 +2048,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
+ 	 * quiesced.
+ 	 */
+-	blk_mq_run_dispatch_ops(hctx->queue,
++	__blk_mq_run_dispatch_ops(hctx->queue, false,
+ 		need_run = !blk_queue_quiesced(hctx->queue) &&
+ 		blk_mq_hctx_has_pending(hctx));
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index d62004e2d531..948791ea2a3e 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -375,7 +375,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ }
+ 
+ /* run the code block in @dispatch_ops with rcu/srcu read lock held */
+-#define blk_mq_run_dispatch_ops(q, dispatch_ops)		\
++#define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
+ do {								\
+ 	if (!blk_queue_has_srcu(q)) {				\
+ 		rcu_read_lock();				\
+@@ -384,11 +384,14 @@ do {								\
+ 	} else {						\
+ 		int srcu_idx;					\
+ 								\
+-		might_sleep();					\
++		might_sleep_if(check_sleep);			\
+ 		srcu_idx = srcu_read_lock((q)->srcu);		\
+ 		(dispatch_ops);					\
+ 		srcu_read_unlock((q)->srcu, srcu_idx);		\
+ 	}							\
+ } while (0)
+ 
++#define blk_mq_run_dispatch_ops(q, dispatch_ops)		\
++	__blk_mq_run_dispatch_ops(q, true, dispatch_ops)	\
++
+ #endif
+-- 
+2.31.1
+
+
+Thanks,
+Ming
+
