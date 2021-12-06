@@ -2,81 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D3CC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 16:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF02C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 17:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238421AbhLFQuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 11:50:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51488 "EHLO
+        id S236864AbhLFRXa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Dec 2021 12:23:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238455AbhLFQuw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 11:50:52 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6586FC061746
-        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 08:47:23 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id y16so13687546ioc.8
-        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 08:47:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=/0SXgGX28/0RTN9QU/DsVtJokxlTQv3WbGSp7DGmXk4=;
-        b=vFQjbp94JtKeOaM/W9yQ5MY4cFN7z0qA2qA2iJRdW07pfEvtmD/kzxr3XwN0QTkDhJ
-         daZkRrl4YOK3MV6id76gF4QeaRUv8z35S5stpG/Wi0po2NMTBELs01zHvhs08no3ySY8
-         YwywKRobhW1iRMqYsUsM0Ce+6+JM1tpQ4CK8s26d5eemYcpUQriAs+C86+FXdfWQMLc2
-         mGDUtvyvBg1PQdVoE24+SCnizqVNYJJjRSz63HmtwVyEH5/3P2wnuqMxZGVD9XpCVDXl
-         nnHfvuCiAqca3AA26dY6hJQbnZLjFYDadLZsKozq9CqnnQWYGMgDQtmDU14ndMXDqSsa
-         prJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=/0SXgGX28/0RTN9QU/DsVtJokxlTQv3WbGSp7DGmXk4=;
-        b=UigZne0cZYoX2Q7gtkHdVp3OH5F31lKMmSPWhbYeHeWMp2Tgc17qAqSFhKurxoRxe5
-         Fb+yOhZVgGxMJlhRtJOw08jO66dRbAB3KUXHGzuzDlh5jyoWKFXV5TnGVqVL7ReUx5kt
-         XTfbOu7oYttSltb4/+g76/yXL54gnK0rVrC9xYuQU79UuPFOOAH2t6gYvfRR0NsjRnwy
-         HGkhiEm/ZrX8RBeS/NhvJYUVzluCJ6Zt9wzFJcr10Q6/IQOMneouSeWN/uI7rGbsC8/c
-         KLu9sJNs63EVL1jjAsI8Klho0vHQPgH2hNYZ97qnAovsScy0Kj9WpzQZXuAFXElVrZgu
-         WSng==
-X-Gm-Message-State: AOAM532TjLat24x/yy5rPE6z4W4773a8yr4V5F5dJzkel438s/LgtJXO
-        ujEEUlMb/+su1QXJ1yag4X0Dow==
-X-Google-Smtp-Source: ABdhPJxPuaBBKCW2wE1RbRqHqrMZuoqdQw4DulT5czheg7CyIsvbAohHPYPb+2Y15IHcw3V3ctPJ/A==
-X-Received: by 2002:a05:6602:2f11:: with SMTP id q17mr35828341iow.75.1638809242834;
-        Mon, 06 Dec 2021 08:47:22 -0800 (PST)
-Received: from x1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q12sm1289618ilo.60.2021.12.06.08.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 08:47:22 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     miquel.raynal@bootlin.com, Christoph Hellwig <hch@lst.de>,
-        vigneshr@ti.com, richard@nod.at
-Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
-        linux-block@vger.kernel.org, linux-mtd@lists.infradead.org
-In-Reply-To: <20211206070409.2836165-1-hch@lst.de>
-References: <20211206070409.2836165-1-hch@lst.de>
-Subject: Re: [PATCH] mtd_blkdevs: don't scan partitions for plain mtdblock
-Message-Id: <163880924220.67311.13119218479398937498.b4-ty@kernel.dk>
-Date:   Mon, 06 Dec 2021 09:47:22 -0700
+        with ESMTP id S236862AbhLFRXa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 12:23:30 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439A5C061746;
+        Mon,  6 Dec 2021 09:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=y2+LK337slwbMibrfKzeQe6vLD/fHL8se/F3eRlVIUY=; b=jg+q0dqRHwv2mAbPr4kkpD8yyq
+        l+Pws/qrNO2O55Cz66hnH8YJOzYmahN8/4SA2umFaWM5Gb8FGHzM6I2rQCMH4Toa5AWzptBIQKoIO
+        CnrifM5rZy2uHNO59rIsM5cgtRXd50JQ4ySvNt7hO3j1xR/sZRRHXGVQ2So3mBesjJ2pE9OzRHA/t
+        LY/dTp6Hd6wkVPVr97E1SGcHHpHq1/mFBGGPEcgaTrTAYcO270AC0P7d5+VKpGWlWS3xIbUdzLDKb
+        E97rp1cRTNXLqqsAKUQ8EBqrRvLyU8WBG4/7QTtp+15MyiJ7JbMd8gosqL5fn1tZKf9GtxkmQUgyR
+        +g0YFtPQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1muHee-005TRZ-Ig; Mon, 06 Dec 2021 17:19:57 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3356B300252;
+        Mon,  6 Dec 2021 18:19:56 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 1D99C2019F824; Mon,  6 Dec 2021 18:19:56 +0100 (CET)
+Date:   Mon, 6 Dec 2021 18:19:56 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        keescook@chromium.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <Ya5GPJm+S1sgpDGj@hirez.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
+ <dbe2b14c-5f0a-80dd-b661-d0a7c74ba230@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbe2b14c-5f0a-80dd-b661-d0a7c74ba230@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 6 Dec 2021 08:04:09 +0100, Christoph Hellwig wrote:
-> mtdblock / mtdblock_ro set part_bits to 0 and thus nevever scanned
-> partitions.  Restore that behavior by setting the GENHD_FL_NO_PART flag.
+On Mon, Dec 06, 2021 at 09:32:06AM -0700, Jens Axboe wrote:
+> On 12/6/21 1:31 AM, Peter Zijlstra wrote:
+> > On Sun, Dec 05, 2021 at 10:53:49PM -0800, Christoph Hellwig wrote:
+> >> On Fri, Dec 03, 2021 at 08:35:40AM -0700, Jens Axboe wrote:
+> >>> refcount_t is not as expensive as it used to be, but it's still more
+> >>> expensive than the io_uring method of using atomic_t and just checking
+> >>> for potential over/underflow.
+> >>>
+> >>> This borrows that same implementation, which in turn is based on the
+> >>> mm implementation from Linus.
+> >>
+> >> If refcount_t isn't good enough for a normal kernel fast path we have
+> >> a problem.  Can we discuss that with the maintainers instead of coming
+> >> up with our home grown schemes again?
+> > 
+> > Quite; and for something that pretends to be about performance, it also
+> > lacks any actual numbers to back that claim.
 > 
-> 
+> I can certainly generate that, it was already done for the two previous
+> similar conversions though.
 
-Applied, thanks!
-
-[1/1] mtd_blkdevs: don't scan partitions for plain mtdblock
-      commit: 776b54e97a7d993ba23696e032426d5dea5bbe70
-
-Best regards,
--- 
-Jens Axboe
-
-
+I've never seen those :-(
