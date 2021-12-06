@@ -2,81 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA0AC433EF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 16:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D3CC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 16:47:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232416AbhLFQht (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 11:37:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47136 "EHLO
+        id S238421AbhLFQuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Dec 2021 11:50:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346166AbhLFQhh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 11:37:37 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0D6C061354
-        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 08:34:08 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id z26so13591505iod.10
-        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 08:34:08 -0800 (PST)
+        with ESMTP id S238455AbhLFQuw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 11:50:52 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6586FC061746
+        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 08:47:23 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id y16so13687546ioc.8
+        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 08:47:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Xk31PphXoMoIH/ehoy/CT9pHIKKPfGZ3GFu0zDuVzVg=;
-        b=TwDfZv/n8StAAgFVS/+H8P1RDGfrj2D99UPrFWXLxtihrzqI/pEW75KJ6YGnmIkjnm
-         7bCPsJLtdwYtWrPEFaOga66g62lx8pyzW6ccrlO31uF2LJaS+8A4IC+uF9Sro3+xrYZe
-         VAu09N2Yd+a6ea1mdmAYmzuX6i15YTPOHwaEuXtLlioi9Djs8IA/+B1J/FGRmDiaESh9
-         dqLluI0ed1mSSFP0ima/no4GP6scnyRKTxh6K/kIMd/lnSPmX6drgDTbiO20HNQQyLyn
-         jK20n339CpykNilHy+urXjchkW2hmogNzTyVzhLIO0MEa8UcxIdcNySsVRkS68raIs+C
-         LA3g==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=/0SXgGX28/0RTN9QU/DsVtJokxlTQv3WbGSp7DGmXk4=;
+        b=vFQjbp94JtKeOaM/W9yQ5MY4cFN7z0qA2qA2iJRdW07pfEvtmD/kzxr3XwN0QTkDhJ
+         daZkRrl4YOK3MV6id76gF4QeaRUv8z35S5stpG/Wi0po2NMTBELs01zHvhs08no3ySY8
+         YwywKRobhW1iRMqYsUsM0Ce+6+JM1tpQ4CK8s26d5eemYcpUQriAs+C86+FXdfWQMLc2
+         mGDUtvyvBg1PQdVoE24+SCnizqVNYJJjRSz63HmtwVyEH5/3P2wnuqMxZGVD9XpCVDXl
+         nnHfvuCiAqca3AA26dY6hJQbnZLjFYDadLZsKozq9CqnnQWYGMgDQtmDU14ndMXDqSsa
+         prJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Xk31PphXoMoIH/ehoy/CT9pHIKKPfGZ3GFu0zDuVzVg=;
-        b=RJva8VA0nD/vYzs3YVdIA32FR29b4eJTiILYv5TuogGiAP6Q4rYTB+sLqDgT6UAmP/
-         rW6P3VII9EPeSGG23yU03tUK8/hNiZUycMhroS48EE3wPXwjJgQ8e2AKSoUH/5A5WqLx
-         AFmTnIeP0N+f6QZWGlLPQoOh6jkdAdoTAMSvJy8yReElNHqL3sj267D5GUrRKe5OAZ+q
-         9sdt93jpupNlcMZJxRCakL8tYOELokOYP8GJNoo7ud9PJByJ8tkCt4kYBGHRgbogBfQG
-         O85ZCyRil3l5pUBdWDeyMbzwt7vTgcwxVESKGXwKfMLtcgrW+ii9fEEQqwNi43n9ttqL
-         9l0Q==
-X-Gm-Message-State: AOAM532M5z7QA8P8yWhBBptj5uKgl99Uv2oWgJkTxAwy7xOfaQal8trn
-        VlXbR5sSg2eHGYpYHWad/3PDuehi+QTu2HkJ
-X-Google-Smtp-Source: ABdhPJyp9wBjPHAPtAD+wy5f2rNHnIz16twtbAp/y48m0rYs3+5WFnH+6tFhpLiljJ9FNQ+AZNzoPA==
-X-Received: by 2002:a02:a91a:: with SMTP id n26mr42646695jam.46.1638808447570;
-        Mon, 06 Dec 2021 08:34:07 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h1sm7975827iow.31.2021.12.06.08.34.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Dec 2021 08:34:07 -0800 (PST)
-Subject: Re: [PATCH] block: avoid clearing blk_mq_alloc_data unnecessarily
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <1ba89cb7-e53c-78c3-1fe4-db9908851e63@kernel.dk>
- <Ya20vUb8cldTe4kI@infradead.org>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=/0SXgGX28/0RTN9QU/DsVtJokxlTQv3WbGSp7DGmXk4=;
+        b=UigZne0cZYoX2Q7gtkHdVp3OH5F31lKMmSPWhbYeHeWMp2Tgc17qAqSFhKurxoRxe5
+         Fb+yOhZVgGxMJlhRtJOw08jO66dRbAB3KUXHGzuzDlh5jyoWKFXV5TnGVqVL7ReUx5kt
+         XTfbOu7oYttSltb4/+g76/yXL54gnK0rVrC9xYuQU79UuPFOOAH2t6gYvfRR0NsjRnwy
+         HGkhiEm/ZrX8RBeS/NhvJYUVzluCJ6Zt9wzFJcr10Q6/IQOMneouSeWN/uI7rGbsC8/c
+         KLu9sJNs63EVL1jjAsI8Klho0vHQPgH2hNYZ97qnAovsScy0Kj9WpzQZXuAFXElVrZgu
+         WSng==
+X-Gm-Message-State: AOAM532TjLat24x/yy5rPE6z4W4773a8yr4V5F5dJzkel438s/LgtJXO
+        ujEEUlMb/+su1QXJ1yag4X0Dow==
+X-Google-Smtp-Source: ABdhPJxPuaBBKCW2wE1RbRqHqrMZuoqdQw4DulT5czheg7CyIsvbAohHPYPb+2Y15IHcw3V3ctPJ/A==
+X-Received: by 2002:a05:6602:2f11:: with SMTP id q17mr35828341iow.75.1638809242834;
+        Mon, 06 Dec 2021 08:47:22 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id q12sm1289618ilo.60.2021.12.06.08.47.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Dec 2021 08:47:22 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <55daad21-0da7-d6ab-cdc9-3f8f509ec91a@kernel.dk>
-Date:   Mon, 6 Dec 2021 09:34:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     miquel.raynal@bootlin.com, Christoph Hellwig <hch@lst.de>,
+        vigneshr@ti.com, richard@nod.at
+Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
+        linux-block@vger.kernel.org, linux-mtd@lists.infradead.org
+In-Reply-To: <20211206070409.2836165-1-hch@lst.de>
+References: <20211206070409.2836165-1-hch@lst.de>
+Subject: Re: [PATCH] mtd_blkdevs: don't scan partitions for plain mtdblock
+Message-Id: <163880924220.67311.13119218479398937498.b4-ty@kernel.dk>
+Date:   Mon, 06 Dec 2021 09:47:22 -0700
 MIME-Version: 1.0
-In-Reply-To: <Ya20vUb8cldTe4kI@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/5/21 11:59 PM, Christoph Hellwig wrote:
-> On Fri, Dec 03, 2021 at 08:48:09AM -0700, Jens Axboe wrote:
->> We already set almost all of what we need here, just the non-plug
->> path needs to set nr_tags and clear cached.
+On Mon, 6 Dec 2021 08:04:09 +0100, Christoph Hellwig wrote:
+> mtdblock / mtdblock_ro set part_bits to 0 and thus nevever scanned
+> partitions.  Restore that behavior by setting the GENHD_FL_NO_PART flag.
 > 
-> How does this avoid clearing?  All partial initializers zero the rest of
-> the structure.
+> 
 
-Yep this is garbage, I'll just drop it.
+Applied, thanks!
 
+[1/1] mtd_blkdevs: don't scan partitions for plain mtdblock
+      commit: 776b54e97a7d993ba23696e032426d5dea5bbe70
+
+Best regards,
 -- 
 Jens Axboe
+
 
