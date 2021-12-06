@@ -2,134 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E95EC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 21:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 494F5C43217
+	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 22:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350893AbhLFVVJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 16:21:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59644 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351096AbhLFVVG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 16:21:06 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CF5C0613F8
-        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 13:17:36 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id v1so48484844edx.2
-        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 13:17:36 -0800 (PST)
+        id S1376521AbhLFXCD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Dec 2021 18:02:03 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:24676 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1359564AbhLFXCD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 18:02:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JO2IWhnphPSYCFUexakELVjEvf2J2IXcJ5uKztle0+I=;
-        b=W7xIySANjVFarMf5vuIrBmPHB2Azy+jRK+7H+vkSa6q5fkxiWR98ODDWY7IlBrlK2C
-         UJAWT+skk9pyUI6iJu0ednt8cVK2C7n3TwtqlFIxZ64sSjQtPdTlc42vVh1gTeF1eD5H
-         5hH1w4uRtrEdC8GEK6+zNcoVDSlKXCSTPcZTE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JO2IWhnphPSYCFUexakELVjEvf2J2IXcJ5uKztle0+I=;
-        b=4+OcMflvN2DM7QrSxHQwSWmMbMZ8QUQqGAEYJ9/lggnImA2ANqIqSrotmIHnvgZaUt
-         CLf5lDqMgQsx5ef/xdeZ8pes1Ia4fwnbOHfhzYZzHrWY+BXkEVVZvr3MTcuoSZdX3IJE
-         Ybq83T6yyb0COeLjBvbElh7q5DmSTua9O5Fx98uWzbXZMOplqTiT4wFesd3RkosSBbXz
-         e/mAqM4w3G5l86OJEx3GPLKYm5huiFniWu1DD6z1mmiIzdHjjJ++nNcSZ9NF+9gnuOYX
-         POSxw/yWjp0p+yVmEn3NFA9qka8F7umRbsORpyzO6B+HvCuTAzuEcnlNPRXrLSye9wGC
-         5Kiw==
-X-Gm-Message-State: AOAM530uqx+k9upJgRtU0Eue27V0QilaR2ct5hiu1DQGLmCGdJJzc6Ke
-        uJ0N//mCILHsz5YaN6m/aeBFg14qvnSTLp4G
-X-Google-Smtp-Source: ABdhPJz1z116/zLrHOEgQlm/RR4foMeQRl0rvdqWlAzEPV5zIAQrigUgHQHkzcVeZkUEL6tPXwC47w==
-X-Received: by 2002:a05:6402:35d2:: with SMTP id z18mr2418548edc.188.1638825454883;
-        Mon, 06 Dec 2021 13:17:34 -0800 (PST)
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
-        by smtp.gmail.com with ESMTPSA id jz4sm7223557ejc.19.2021.12.06.13.17.34
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Dec 2021 13:17:34 -0800 (PST)
-Received: by mail-wm1-f54.google.com with SMTP id m25-20020a7bcb99000000b0033aa12cdd33so541635wmi.1
-        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 13:17:34 -0800 (PST)
-X-Received: by 2002:a1c:800e:: with SMTP id b14mr1338191wmd.155.1638825454105;
- Mon, 06 Dec 2021 13:17:34 -0800 (PST)
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1638831514; x=1670367514;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=zoqnyRmkSd5RO5BU5otfubBRWktBekjMrFhDCqc/zdw=;
+  b=y/Dd/yc/PbinDqbqiETddAsC7OlZiMCBwNvAkV/Gvj43GbNWXp4Ma8td
+   yL9z6wvS7Ri7tJsGZ8UiVIqp4sT3NTAfcrQOkpsLWls7t3mMMhfx5+ZEe
+   6wubAngCRhG8lxbAQ+ERw8N1bsumss8wLA9pogm3yTFikDCUWJWg7vIx3
+   A=;
+Received: from ironmsg09-lv.qualcomm.com ([10.47.202.153])
+  by alexa-out.qualcomm.com with ESMTP; 06 Dec 2021 14:58:33 -0800
+X-QCInternal: smtphost
+Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
+  by ironmsg09-lv.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2021 14:58:33 -0800
+Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
+ nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.922.19; Mon, 6 Dec 2021 14:58:32 -0800
+Received: from gabriel.qualcomm.com (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.922.19; Mon, 6 Dec 2021
+ 14:58:32 -0800
+From:   Gaurav Kashyap <quic_gaurkash@quicinc.com>
+To:     <linux-scsi@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
+CC:     <linux-mmc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <thara.gopinath@linaro.org>,
+        <quic_neersoni@quicinc.com>, <dineshg@quicinc.com>,
+        Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Subject: [PATCH 00/10] Add wrapped key support for Qualcomm ICE
+Date:   Mon, 6 Dec 2021 14:57:15 -0800
+Message-ID: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org> <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
- <CAHk-=wjXmGt9-JQp-wvup4y2tFNUCVjvx2W7MHzuAaxpryP4mg@mail.gmail.com>
- <282666e2-93d4-0302-b2d0-47d03395a6d4@kernel.dk> <202112061247.C5CD07E3C@keescook>
-In-Reply-To: <202112061247.C5CD07E3C@keescook>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 6 Dec 2021 13:17:17 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com>
-Message-ID: <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com>
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 6, 2021 at 12:51 PM Kees Cook <keescook@chromium.org> wrote:
->
-> I'd like core code to be safe too, though. :)
+These patches add support to Qualcomm ICE for hardware
+wrapped keys and are made on top of Eric Bigger's set of changes to
+support wrapped keys.
+Found here: https://lore.kernel.org/linux-block/20210916174928.65529-1-ebiggers@kernel.org).
+Explanation and use of hardware-wrapped-keys can be found here:
+Documentation/block/inline-encryption.rst
 
-I've told you before, and I'll tell you again: 'refcount_t' is not "safe".
+The first patch however is not related to wrapped keys. It is
+for moving ICE functionality into a shared library which both ufs and
+sdhci can use. The patch for sdhc-msm will be uploaded later.
 
-refcount_t is pure garbage, and is HORRID.
+Wrapped keys are supported in Qualcomm's ICE engine using
+a proprietary hardware module known as Hardware Key Manager (HWKM).
+The patches are revolved around that and testing for them
+can be done only on a HWKM supported Qualcomm device.
 
-The saturating arithmetic is a fundamental and fatal flaw. It is pure
-and utter crap.
+Testing:
+Test platform: SM8350 HDK/MTP
+Engineering trustzone image (based on sm8350) is required to test
+this feature. This is because of version changes of HWKM.
+HWKM version 2 and moving forward has a lot of restrictions on the
+key management due to which the launched SM8350 solution (based on v1)
+cannot be used and some modifications are required in trustzone.
 
-It means that you *cannot* recover from mistakes, and the refcount
-code is broken.
+The ideal scenario is to test by mounting initramfs on an upstream
+kernel and then using the fscrypt tool to setup directories with
+encryption policies. Testing and development for that is still under way.
 
-Stop calling it "safe" or arguing that it protects against anything at all.
+All the SCM calls however were individually tested from UFS by invoking
+a test API on bootup which is not part of these patchsets.
 
-It is literally and objectively WORSE than what the page counting code
-does using atomics.
+Gaurav Kashyap (10):
+  soc: qcom: new common library for ICE functionality
+  scsi: ufs: qcom: move ICE functionality to common library
+  qcom_scm: scm call for deriving a software secret
+  soc: qcom: add HWKM library for storage encryption
+  scsi: ufs: prepare to support wrapped keys
+  soc: qcom: add wrapped key support for ICE
+  qcom_scm: scm call for create, prepare and import keys
+  scsi: ufs: add support for generate, import and prepare keys
+  soc: qcom: support for generate, import and prepare key
+  arm64: dts: qcom: sm8350: add ice and hwkm mappings
 
-I don't know why you cannot seem to admit to that. refcount_t is
-misdesigned in a very fundamental way.
+ arch/arm64/boot/dts/qcom/sm8350.dtsi |   5 +-
+ drivers/firmware/qcom_scm.c          | 286 +++++++++++++++++++
+ drivers/firmware/qcom_scm.h          |   4 +
+ drivers/scsi/ufs/Kconfig             |   1 +
+ drivers/scsi/ufs/ufs-qcom-ice.c      | 227 +++++----------
+ drivers/scsi/ufs/ufs-qcom.c          |   4 +
+ drivers/scsi/ufs/ufs-qcom.h          |  22 +-
+ drivers/scsi/ufs/ufshcd-crypto.c     |  96 ++++++-
+ drivers/scsi/ufs/ufshcd.h            |  20 +-
+ drivers/soc/qcom/Kconfig             |   7 +
+ drivers/soc/qcom/Makefile            |   1 +
+ drivers/soc/qcom/qti-ice-common.c    | 402 +++++++++++++++++++++++++++
+ drivers/soc/qcom/qti-ice-hwkm.c      | 111 ++++++++
+ drivers/soc/qcom/qti-ice-regs.h      | 264 ++++++++++++++++++
+ include/linux/qcom_scm.h             |  30 +-
+ include/linux/qti-ice-common.h       |  40 +++
+ 16 files changed, 1345 insertions(+), 175 deletions(-)
+ create mode 100644 drivers/soc/qcom/qti-ice-common.c
+ create mode 100644 drivers/soc/qcom/qti-ice-hwkm.c
+ create mode 100644 drivers/soc/qcom/qti-ice-regs.h
+ create mode 100644 include/linux/qti-ice-common.h
 
-It generates horrible code, but it also generates actively BROKEN
-code. Saturation is not the answer. Saturation is the question, and
-the answer is "No".
+-- 
+2.17.1
 
-And no, anybody who thinks that saturation is "safe" is just lying to
-themselves and others.
-
-The most realistic main worry for refcounting tends to be underflow,
-and the whole recount underflow situation is no better than an atomic
-with a warning.
-
-Because by the time the underflow is detected, it's already too late -
-the "decrement to zero" was what resulted in the data being free'd -
-so the whole "decrement past zero" is when things have already gone
-south earlier, and all you can do is warn.
-
-End result: atomics with warnings are no worse in the underflow case.
-
-And the overflow case where the saturation is 'safe", has been
-literally mis-designed to not be recoverable, so refcount_t is
-literally broken.
-
-End result: atomics are _better_ in the overflow case, and it's why
-the page counters could not use the garbage that is refcount_t, and
-instead did it properly.
-
-See? In absolutely neither case is recount_t "safer". It's only worse.
-
-I like Jens' patches. They take the _good_ code - the code we use for
-page counters - and make that proper interface available to others.
-
-Not the broken refcount_t code that is unfixable, and only good for
-"we have a thousand drivers, let them wallow in this thing because we
-can never make them all handle overflows properly".
-
-And every single core use of refcount_t that doesn't have a million
-random drivers using it should be converted to use that proper atomic
-interface.
-
-                    Linus
