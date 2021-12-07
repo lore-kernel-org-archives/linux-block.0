@@ -2,276 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D490C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 13:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14BDC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 13:41:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237073AbhLGNb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Dec 2021 08:31:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58372 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230374AbhLGNb5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 08:31:57 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC9FC061574;
-        Tue,  7 Dec 2021 05:28:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/fZaDO/odrN9iFMuMmWNdl1apctGbvcx2zlxK6ccYN0=; b=IsD3rgGAwrXgSBKcypdqDqzRHB
-        xmCJPdLZfJ0XqDFGf8VUH2PGOlAFOpGPC0I8yfuKIEUX1yMcOlAgBQ/dSh3nUOj/0q6ulWhqoi8Bb
-        6fx427IZobJEGeJ0Heyz+CuUqGWN3YdbuOxTgg/Ba1wN8jJjBkx1LMMoLyasFV9vWxF1Avpi72dCt
-        A34ILzE0p9rPLRCigl3CccJm3MCYV/4zFl/cl3qHlufXPxJsYNVCFJLDAVooNS6yqvkUXxpLF7riU
-        UD7bhA7KfBm70I31Zmarq4btqfSWpY2wtMSPOfxMYvWuqXOU3zemyEIi8mL31gRQER0OHd17k7QWI
-        5u57CaaA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1muaW7-007NP4-5a; Tue, 07 Dec 2021 13:28:24 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A0A0F300237;
-        Tue,  7 Dec 2021 14:28:22 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 89DEE202A40B1; Tue,  7 Dec 2021 14:28:22 +0100 (CET)
-Date:   Tue, 7 Dec 2021 14:28:22 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
+        id S229812AbhLGNok (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 08:44:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15868 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232672AbhLGNoj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Dec 2021 08:44:39 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B7BoTp7015816;
+        Tue, 7 Dec 2021 13:41:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OU67932s9nPXbInNV9ogc8XM5cXxloEWToSoDXNc828=;
+ b=KONEItXu11n5n8/pFOihjGDyJXOCKovdYRzP867i440qiVpfxozs8bZLzgfH4yESt5+z
+ jeADFM917CX5lqETNrsIL5aqTtDnSmXfqZVd2xKRPoVG8h4pzCbD0afldJqoMzhl0wXR
+ tVm55SYK2VVj2AnowYG1iAv0CQgkx+czQtCdk+wUaPLk8Ddssl9RrSNWudg1grseHXED
+ +o4kGBElTUmg7uHrxxBkqnK5ecPPKDaSTibyFqnmE+/s0qQT5jGaCLSmZifVrL98UqkN
+ dyuX3VvPkQbBACIbedBMjUiBxsjWBOjn7fvFEWNDwVc6BBi7onN+698Ua3W9W0wtSVHt zA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ct4e45qqu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Dec 2021 13:41:08 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B7DSSLd022346;
+        Tue, 7 Dec 2021 13:41:07 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ct4e45qpq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Dec 2021 13:41:07 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B7DXAq5022137;
+        Tue, 7 Dec 2021 13:41:04 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3cqyyaptrv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Dec 2021 13:41:04 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B7DXLdc25755974
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Dec 2021 13:33:21 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0D9BD42041;
+        Tue,  7 Dec 2021 13:41:02 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB48842045;
+        Tue,  7 Dec 2021 13:41:01 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.49.113])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue,  7 Dec 2021 13:41:01 +0000 (GMT)
+Date:   Tue, 7 Dec 2021 14:40:59 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        keescook@chromium.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-Message-ID: <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org>
- <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+        Bruno Goncalves <bgoncalv@redhat.com>,
+        Changhui Zhong <czhong@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        skt-results-master@redhat.com, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [bug report][bisected] WARNING: CPU: 4 PID: 10482 at
+ block/mq-deadline.c:597 dd_exit_sched+0x198/0x1d0'
+Message-ID: <20211207144059.679de0b1.pasic@linux.ibm.com>
+In-Reply-To: <CAHj4cs96tX1ozhw5tKC-3XrFvOtSvPPNjMsi=C3Q05uvxCvAnw@mail.gmail.com>
+References: <20211207104000.1360015-1-pasic@linux.ibm.com>
+        <CAHj4cs96tX1ozhw5tKC-3XrFvOtSvPPNjMsi=C3Q05uvxCvAnw@mail.gmail.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ug986Gnl2Faf0IVctDA1XDNwX0AAacEz
+X-Proofpoint-GUID: _nIZf_-DQ_I7WJYBUUsbGCJtsrthGa0M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-07_06,2021-12-06_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ clxscore=1015 lowpriorityscore=0 impostorscore=0 mlxscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112070081
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 07, 2021 at 12:26:24PM +0100, Peter Zijlstra wrote:
-> On Sun, Dec 05, 2021 at 10:53:49PM -0800, Christoph Hellwig wrote:
-> 
-> > > +#define req_ref_zero_or_close_to_overflow(req)	\
-> > > +	((unsigned int) atomic_read(&(req->ref)) + 127u <= 127u)
-> > > +
-> > > +static inline bool req_ref_inc_not_zero(struct request *req)
-> > > +{
-> > > +	return atomic_inc_not_zero(&req->ref);
-> > > +}
-> > > +
-> > > +static inline bool req_ref_put_and_test(struct request *req)
-> > > +{
-> > > +	WARN_ON_ONCE(req_ref_zero_or_close_to_overflow(req));
-> > > +	return atomic_dec_and_test(&req->ref);
-> > > +}
-> 
-> So it's just about these two ops, right?
-> 
-> Now, afaict refcount_inc_not_zero() doesn't actually generate terrible
-> code here's the fast-path of kernel/events/core.c:ring_buffer_get()
-> 
-> refcount_inc_not_zero():
-> 
->     a9d0:       41 54                   push   %r12
->     a9d2:       49 89 fc                mov    %rdi,%r12
->     a9d5:       e8 00 00 00 00          call   a9da <ring_buffer_get+0xa>       a9d6: R_X86_64_PLT32    __rcu_read_lock-0x4
->     a9da:       4d 8b a4 24 c8 02 00 00         mov    0x2c8(%r12),%r12
->     a9e2:       4d 85 e4                test   %r12,%r12
->     a9e5:       74 24                   je     aa0b <ring_buffer_get+0x3b>
->     a9e7:       41 8b 14 24             mov    (%r12),%edx
->     a9eb:       85 d2                   test   %edx,%edx
->     a9ed:       74 1c                   je     aa0b <ring_buffer_get+0x3b>
->     a9ef:       8d 4a 01                lea    0x1(%rdx),%ecx
-> *   a9f2:       89 d0                   mov    %edx,%eax
->     a9f4:       f0 41 0f b1 0c 24       lock cmpxchg %ecx,(%r12)
->     a9fa:       75 32                   jne    aa2e <ring_buffer_get+0x5e>
-> *   a9fc:       09 ca                   or     %ecx,%edx
-> *   a9fe:       78 19                   js     aa19 <ring_buffer_get+0x49>
->     aa00:       e8 00 00 00 00          call   aa05 <ring_buffer_get+0x35>      aa01: R_X86_64_PLT32    __rcu_read_unlock-0x4
->     aa05:       4c 89 e0                mov    %r12,%rax
->     aa08:       41 5c                   pop    %r12
->     aa0a:       c3                      ret
-> 
-> The * marked instructions are the difference, vs atomic_inc_not_zero():
-> 
->     a9d0:       41 54                   push   %r12
->     a9d2:       49 89 fc                mov    %rdi,%r12
->     a9d5:       e8 00 00 00 00          call   a9da <ring_buffer_get+0xa>       a9d6: R_X86_64_PLT32    __rcu_read_lock-0x4
->     a9da:       4d 8b a4 24 c8 02 00 00         mov    0x2c8(%r12),%r12
->     a9e2:       4d 85 e4                test   %r12,%r12
->     a9e5:       74 1e                   je     aa05 <ring_buffer_get+0x35>
->     a9e7:       41 8b 04 24             mov    (%r12),%eax
->     a9eb:       85 c0                   test   %eax,%eax
->     a9ed:       74 16                   je     aa05 <ring_buffer_get+0x35>
->     a9ef:       8d 50 01                lea    0x1(%rax),%edx
->     a9f2:       f0 41 0f b1 14 24       lock cmpxchg %edx,(%r12)
->     a9f8:       75 f1                   jne    a9eb <ring_buffer_get+0x1b>
->     a9fa:       e8 00 00 00 00          call   a9ff <ring_buffer_get+0x2f>      a9fb: R_X86_64_PLT32    __rcu_read_unlock-0x4
->     a9ff:       4c 89 e0                mov    %r12,%rax
->     aa02:       41 5c                   pop    %r12
->     aa04:       c3                      ret
-> 
-> 
-> Now, ring_buffer_put(), which uses refcount_dec_and_test():
-> 
-> refcount_dec_and_test()
-> 
->     aa40:       b8 ff ff ff ff          mov    $0xffffffff,%eax
->     aa45:       f0 0f c1 07             lock xadd %eax,(%rdi)
->     aa49:       83 f8 01                cmp    $0x1,%eax
->     aa4c:       74 05                   je     aa53 <ring_buffer_put+0x13>
->     aa4e:       85 c0                   test   %eax,%eax
->     aa50:       7e 1e                   jle    aa70 <ring_buffer_put+0x30>
->     aa52:       c3                      ret
-> 
-> atomic_dec_and_test():
-> 
->     aa40:       f0 ff 0f                lock decl (%rdi)
->     aa43:       75 1d                   jne    aa62 <ring_buffer_put+0x22>
-> 
->     ...
-> 
->     aa62:       c3                      ret
-> 
-> Has a larger difference, which is fixable with the below patch, leading
-> to:
-> 
-> 
->     a9f0:       f0 ff 0f                lock decl (%rdi)
->     a9f3:       74 03                   je     a9f8 <ring_buffer_put+0x8>
->     a9f5:       7c 1e                   jl     aa15 <ring_buffer_put+0x25>
->     a9f7:       c3                      ret
-> 
-> 
-> So where exactly is the performance fail? Is it purely the mess made of
-> refcount_dec_and_test() ?
-> 
+On Tue, 7 Dec 2021 19:14:23 +0800
+Yi Zhang <yi.zhang@redhat.com> wrote:
 
-For refcount_inc(), as extracted from alloc_perf_context(), I get:
+> > What is the status of this?  
+> 
+> Hi Halil
+> This issue should be already fixed, here is the commit:
+> 
+> commit 2b504bd4841bccbf3eb83c1fec229b65956ad8ad (tag: block-5.16-2021-11-19)
 
-    4b68:       b8 01 00 00 00          mov    $0x1,%eax
-    4b6d:       f0 0f c1 43 28          lock xadd %eax,0x28(%rbx)
-    4b72:       85 c0                   test   %eax,%eax
-    4b74:       74 1b                   je     4b91 <alloc_perf_context+0xf1>
-    4b76:       8d 50 01                lea    0x1(%rax),%edx
-    4b79:       09 c2                   or     %eax,%edx
-    4b7b:       78 20                   js     4b9d <alloc_perf_context+0xfd>
+Thank you very much! We haven't seen this in a while, and it is very
+likely that this commit indeed fixes our symptoms as well! I didn't find
+it because I looked for 'Fixes: e0d78afeb8d1', sorry :D
 
-the best I can seem to find is: https://godbolt.org/z/ne5o6eEEW
-
-    4b68:	b8 01 00 00 00       	mov    $0x1,%eax
-    4b6d:	f0 0f c1 07          	lock xadd %eax,(%rdi)
-    4b71:	83 c0 01             	add    $0x1,%eax
-    4b74:	74 16                	je     4b8c <alloc_perf_context+0xec>
-    4b76:	78 20                	js     4b98 <alloc_perf_context+0xf8>
-
-per the below updated patch. Still, not really pretty, but loads better
-I'd say.
-
-
----
- arch/x86/include/asm/refcount.h | 48 +++++++++++++++++++++++++++++++++++++++++
- include/linux/refcount.h        |  6 ++++++
- 2 files changed, 54 insertions(+)
-
-diff --git a/arch/x86/include/asm/refcount.h b/arch/x86/include/asm/refcount.h
-new file mode 100644
-index 000000000000..b32b4a5e0f37
---- /dev/null
-+++ b/arch/x86/include/asm/refcount.h
-@@ -0,0 +1,48 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_X86_REFCOUNT_H
-+#define _ASM_X86_REFCOUNT_H
-+
-+#define refcount_dec_and_test refcount_dec_and_test
-+static inline bool refcount_dec_and_test(refcount_t *r)
-+{
-+	asm_volatile_goto (LOCK_PREFIX "decl %[var]\n\t"
-+			   "jz %l[cc_zero]\n\t"
-+			   "jl %l[cc_error]"
-+			   : : [var] "m" (r->refs.counter)
-+			   : "memory"
-+			   : cc_zero, cc_error);
-+	return false;
-+
-+cc_zero:
-+	return true;
-+
-+cc_error:
-+	refcount_warn_saturate(r, REFCOUNT_SUB_UAF);
-+	return false;
-+}
-+
-+#define refcount_inc refcount_inc
-+static inline void refcount_inc(refcount_t *r)
-+{
-+	int one = 1;
-+
-+	asm_volatile_goto (LOCK_PREFIX "xaddl %%eax, %[var]\n\t"
-+			   "addl $1, %%eax\n\t"
-+			   "je %l[cc_zero]\n\t"
-+			   "js %l[cc_error]"
-+			   : : [var] "m" (r->refs.counter), "a" (one)
-+			   : "memory"
-+			   : cc_zero, cc_error);
-+
-+	return;
-+
-+cc_zero:
-+	refcount_warn_saturate(r, REFCOUNT_ADD_UAF);
-+	return;
-+
-+cc_error:
-+	refcount_warn_saturate(r, REFCOUNT_ADD_OVF);
-+	return;
-+}
-+
-+#endif
-diff --git a/include/linux/refcount.h b/include/linux/refcount.h
-index b8a6e387f8f9..3ea5757c0b35 100644
---- a/include/linux/refcount.h
-+++ b/include/linux/refcount.h
-@@ -147,6 +147,8 @@ static inline unsigned int refcount_read(const refcount_t *r)
- 	return atomic_read(&r->refs);
- }
- 
-+#include <asm/refcount.h>
-+
- static inline __must_check bool __refcount_add_not_zero(int i, refcount_t *r, int *oldp)
- {
- 	int old = refcount_read(r);
-@@ -262,10 +264,12 @@ static inline void __refcount_inc(refcount_t *r, int *oldp)
-  * Will WARN if the refcount is 0, as this represents a possible use-after-free
-  * condition.
-  */
-+#ifndef refcount_inc
- static inline void refcount_inc(refcount_t *r)
- {
- 	__refcount_inc(r, NULL);
- }
-+#endif
- 
- static inline __must_check bool __refcount_sub_and_test(int i, refcount_t *r, int *oldp)
- {
-@@ -328,10 +332,12 @@ static inline __must_check bool __refcount_dec_and_test(refcount_t *r, int *oldp
-  *
-  * Return: true if the resulting refcount is 0, false otherwise
-  */
-+#ifndef refcount_dec_and_test
- static inline __must_check bool refcount_dec_and_test(refcount_t *r)
- {
- 	return __refcount_dec_and_test(r, NULL);
- }
-+#endif
- 
- static inline void __refcount_dec(refcount_t *r, int *oldp)
- {
+Have a great day!
