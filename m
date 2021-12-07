@@ -2,58 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A370DC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 04:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B0CC43217
+	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 09:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236331AbhLGE7o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 23:59:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51474 "EHLO
+        id S234178AbhLGJiJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 04:38:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236300AbhLGE7n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 23:59:43 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B7EC061746
-        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 20:56:14 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id h24so9401947pjq.2
-        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 20:56:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Vfk7CqoztkD1HFR8OkKYPFrRCf+3sHfsZdA7qyQ/7N0=;
-        b=EcOcbfCOFRfSCWQ46N29k7xqIx+75pRxi1/vKhuibKum+tm4X1t/qcoZFgUwCFhTys
-         D8vGkMMpTqY6Gu7aJ1uJNtkkDeZxFNes3Z2qquBc5gO32LtUwVgvQLUfbS6zCCBsehfD
-         jWUPZkF0YAGCIGc439scNe2cLzA8wo/SwBpIc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Vfk7CqoztkD1HFR8OkKYPFrRCf+3sHfsZdA7qyQ/7N0=;
-        b=iG6KXRD3ms475vQPQgMGc86upJ275h/iH5BwQd5ySlyiBjJRKSrhc3MBzolqYtYMtv
-         OPPXO6VWzfa757uAIF6bus2Jcyh6iZEx3CmRtSplqHu8OtooIrbcPNZMeb50BWI9uNlb
-         sXcEddVIHJRlebpnw6Bx5j3wt/PzV1bex53NFHd0+SLlTfVVbzRfKVG+MU2k1GdBnjQ8
-         Poqpjb0wN/8+J5ATXhUKtdMVA+E6jQMbKlj0Fac0GBD5kxPIHLhfRlrSwjP/Q9ub9rBz
-         bn0Y8Y0UVDVtA6EPdbqPg6wSmuaHeWMoeurYsWeD+txD0Uy/IFeXDKLShspYbTyqC8wA
-         ld8Q==
-X-Gm-Message-State: AOAM533jhvqWb/vahll7CR7vsKOqFLVbukDpEDCllt1KMsxpVWefdjvH
-        KtK90Y8rDZUZfnhHCDiOmKrWmG3OqsajpQ==
-X-Google-Smtp-Source: ABdhPJyKERAriy5ko5uP7qvV/cSmj/QqxhbhuhGGsvjUxznfwAESoUpWMKn4Z5RZXnqAQOczzv27+g==
-X-Received: by 2002:a17:902:b08a:b0:142:51be:57e2 with SMTP id p10-20020a170902b08a00b0014251be57e2mr48470411plr.53.1638852973792;
-        Mon, 06 Dec 2021 20:56:13 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id t67sm13888134pfd.24.2021.12.06.20.56.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 20:56:13 -0800 (PST)
-Date:   Mon, 6 Dec 2021 20:56:12 -0800
-From:   Kees Cook <keescook@chromium.org>
+        with ESMTP id S234128AbhLGJiG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 04:38:06 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38FE2C0611F7;
+        Tue,  7 Dec 2021 01:34:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pouzREswlR8li/pK7iHt7FL48EntonyRD78cYY8XFO4=; b=FAKI+lzH9+BsA5g3k5n3Ig/boR
+        euWO3M0j1Wtsb/EDaFBy6jAT9Xp8bI7qs3dsFhDvAfJ29fRO3t/nocMaB0x9ioI/rtffjnK+dIlOm
+        0edQrMwQmhhnrS4iiQHopaHSZJ4HPQWr8S45/lLn22s6IAT/aGgn1EI11hh6YRd2z7H6DqzbPnkaA
+        59XgSfWFlgMs9C4HgNxXx7wPvpd7Cjd1D4dbH8k0Pv6g4VIz390X8rWsTYMO/7SDwBqL6veyc2UGS
+        oxnFgHfa/6EK//YnZShQvnXt9kqwcGkfFHAB44GB9RYCQuM10273XJVGW4nmFgdjMCR/r8rUZpGzj
+        uUhoXkaA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1muWrn-002jho-Rk; Tue, 07 Dec 2021 09:34:32 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 322493002DB;
+        Tue,  7 Dec 2021 10:34:30 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id CB4DD201D2FE9; Tue,  7 Dec 2021 10:34:30 +0100 (CET)
+Date:   Tue, 7 Dec 2021 10:34:30 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
+Cc:     Kees Cook <keescook@chromium.org>, Jens Axboe <axboe@kernel.dk>,
         Christoph Hellwig <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] block: switch to atomic_t for request references
-Message-ID: <202112062004.EFB6BFE1@keescook>
+Message-ID: <Ya8qptlJ4yLVUSBi@hirez.programming.kicks-ass.net>
 References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
  <Ya2zfVAwh4aQ7KVd@infradead.org>
  <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
@@ -72,43 +62,28 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On Mon, Dec 06, 2021 at 04:13:00PM -0800, Linus Torvalds wrote:
-> On Mon, Dec 6, 2021 at 3:28 PM Kees Cook <keescook@chromium.org> wrote:
-> >
-> > I'm not arguing for refcount_t -- I'm arguing for an API that isn't a
-> > regression of features that have been protecting the kernel from bugs.
+
+> Fix it to not unnecessarily use expensive compare-and-exchange loops,
+> when you can safely just race a bit, safe in the knowledge that you're
+> not going to race 2**31 times.
 > 
-> Maybe somebody could actually just fix refcount_t instead. Somebody
-> who cares about that currently horrendously bad interface.
+> IOW, I think that "try_get_page()" function is basically the *much*
+> superior version of what is currently a broken "refcount_inc()".
 > 
-> Fix it to not do the fundamentally broken saturation that actively
-> destroys state: fix it to have a safe "try to increment", instead of
-> an unsafe "increment and do bad things".
+> And yes, it does warn about that overflow case that you claim only
+> refcount_t does. And does so without the broken semantics that
+> refcount h as.
 
-There would need to be a pretty hefty transition -- there are a lot of
-refcount_inc() uses that would need checking and error handling (which
-might not be sane to add to ancient drivers):
+I think you should perhaps look at the current code again. Those cmpxchg
+loops are gone. The only cmpxchg loop that's still there is for
+add_not_zero(), and that is the exact same loop we have for
+atomic_inc_not_zero(v) := atomic_add_unless(v,1,0) :=
+atomic_fetch_add_unless(v,1,0) != 0.
 
-      2 block
-      2 crypto
-      2 ipc
-      2 virt
-      3 mm
-      4 sound
-      5 rust
-     10 arch
-     13 security
-     31 kernel
-     88 include
-    192 fs
-    192 net
-    358 drivers
+The rest is exactly that LOCK XADD and assume you don't race 2^31 bits
+worth.
 
-refcount_inc_not_zero() already uses __must_check, etc.
+Now, it could be GCC generates atrociously bad code simply because it
+doesn't know it can use the flags from the XADD in which case we can
+look at doing an arch asm implementation.
 
-I'm not afraid of giant transitions, but this could be pretty tricky.
-I'm open to ideas. Maybe a treewide change of refcount_inc() ->
-refcount_inc_saturating() and then start fixing all the _unsafe() cases
-where a sensible error path could be created and tested?
-
--- 
-Kees Cook
