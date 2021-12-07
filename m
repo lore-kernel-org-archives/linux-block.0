@@ -2,103 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C293C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 16:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DB0C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 16:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239548AbhLGQR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Dec 2021 11:17:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42254 "EHLO
+        id S239578AbhLGQVh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 11:21:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239546AbhLGQR3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 11:17:29 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF86C061574
-        for <linux-block@vger.kernel.org>; Tue,  7 Dec 2021 08:13:58 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id l25so58784230eda.11
-        for <linux-block@vger.kernel.org>; Tue, 07 Dec 2021 08:13:58 -0800 (PST)
+        with ESMTP id S239561AbhLGQVe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 11:21:34 -0500
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D0EFC061746
+        for <linux-block@vger.kernel.org>; Tue,  7 Dec 2021 08:18:04 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id r2so14339624ilb.10
+        for <linux-block@vger.kernel.org>; Tue, 07 Dec 2021 08:18:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SwPB+JhWs3rhc/KUIs5o7e8MHxx1rjeX2nly04y/rhI=;
-        b=WXs/H+X0iq64oI6ybEXVgw5Oq3co1L94LFoO0+Jdl36KnxOqZNwGS1DjBdRt3d9oP0
-         hZ21CrfUB+EGbcCUIQanY949m4C8dgey0lQP8AwFHZ4ItDVKWeX7eljHRVkWA0cgRwzE
-         d5HYCj/66Pn5lDO/4WYCgsTCjAZG9E4rj3krc=
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=98f/j99AuJzhZ6H5G/BaaKmxrlUIJ+qa/P4gIH2gWOw=;
+        b=se7fm4oskX7jefsflWX65qMvO6PKk5Vo6IwV/PRz7zFtyMYQE2iYOK+wEqcMZjY9o5
+         S8JlXR/lfXvbuJxbpBCafNY3X9IjzakaxHaxWi+6u5yTDiqlf4xinpJGOtr+ARR4kuC/
+         TUgwJYSg6a761I8ND1z2BOf3gmjtfygD2UFF5u9v53BvNAtsn4Ez9qxLVyUkyUeF6Kr4
+         QcLbfhCZE3Cbb7ORBHhC0iCAx6xvBUnMhySVGFRuGoxEA9wGqsXA7ChauWsCcf9dF3yB
+         s15PRFBIhzw2QiBoEHdZbNScPYUsAR+1CWyqDum1MsWOTjRcs7NN/TzPtgtrEG9sKbe1
+         2GZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SwPB+JhWs3rhc/KUIs5o7e8MHxx1rjeX2nly04y/rhI=;
-        b=oNuB+Q7EeTcMR7gFXyB6Q0UfK0Jbt6u410ZiFiaNgKUhfdyXM0xFfVu9BoaAncNADr
-         2cLH5s7NabqbNcGS0x8ri7iGSYsrC/IbNo2VHZV1AELEq0BMuoYw3e5nk9KV+Q1PM4A8
-         G+KQpgOpqh6syJfn/mVCAXs/4cTgpVG4eslhjqjca0ARrE+ygjJvHU9/5UPfSqRPMq7j
-         txHcPpCXq8UbcUc5rcy2sTcvwW8sAExfJcx1IMgBALGxBMvzjOF1iQzYIDUNEkYBGPUO
-         V3n/YQk+AdxLXVGVzCbwgFrB3ekMyNXQO2REmEIBRhoJka+ODduS7jA2vAmZ+Ezq4oeE
-         kYOw==
-X-Gm-Message-State: AOAM533YzaswWrW2HbFNE7ybSmV9S4wgmG8jLsJOqPU8Emrj0vupx46K
-        511CH2nQG1/c2qN7QVhYaOKrrq0V1FGOyAJu
-X-Google-Smtp-Source: ABdhPJzyE8bmR3SUkHSe3Zz40jkQKzRJGS1zSELGm/6nCfzkxZxgsZw4rMolL5JT7gWmq7GxbZvX2w==
-X-Received: by 2002:a17:906:e85:: with SMTP id p5mr362790ejf.159.1638893635501;
-        Tue, 07 Dec 2021 08:13:55 -0800 (PST)
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com. [209.85.128.45])
-        by smtp.gmail.com with ESMTPSA id s16sm103750edt.30.2021.12.07.08.13.54
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Dec 2021 08:13:55 -0800 (PST)
-Received: by mail-wm1-f45.google.com with SMTP id o29so11200366wms.2
-        for <linux-block@vger.kernel.org>; Tue, 07 Dec 2021 08:13:54 -0800 (PST)
-X-Received: by 2002:a05:600c:4e07:: with SMTP id b7mr8239503wmq.8.1638893634718;
- Tue, 07 Dec 2021 08:13:54 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=98f/j99AuJzhZ6H5G/BaaKmxrlUIJ+qa/P4gIH2gWOw=;
+        b=vliJY6T3e9Bp5ebN/5YqGiD2v5zL1j0GeXcIgL64c912gpEif7FIMwIkikPpl3B1uI
+         psng1ss3utGk2PjgaejWoQwqXVu3VF9sQnp2VNUXpRuBCnOOsWvr67KOUsL5UZK0CcCq
+         OBeqCwAgrM/uGgD1reYvp6C5yoNXJ0nUuaLmw6j8cdtmMH7FwNte9insAkBwtE3Wv5tZ
+         XTTTgHKHREYs+4MCa71PKfe8sCDIhxT8zvvtVL/H9spDGr2nr1nihexhEDFJdr5Z7G5e
+         VlFO+C3sXv4IlRMVeHAFeNrTI51aeHPg+ORM+YxT1tm8Fxk6k0fV+f1/OWjrrlrmshI8
+         e6HA==
+X-Gm-Message-State: AOAM530pCVQnh3aqe7oYbyTta4loHuOpLjUDFf+RThABQm+GkNDYwwDH
+        2SyuaWEc2X4Ct8UR3aCnDnpuZ6nA+2ZWox8m
+X-Google-Smtp-Source: ABdhPJz111zaVwF/YHQfSDLhMEcjob8y5Likudp/zcGxdQ9NGB8pmN5q3jD2siCFohjNC35oN8G9ag==
+X-Received: by 2002:a92:8751:: with SMTP id d17mr380244ilm.148.1638893883342;
+        Tue, 07 Dec 2021 08:18:03 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id w10sm95941ill.36.2021.12.07.08.18.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 08:18:02 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     John Garry <john.garry@huawei.com>
+Cc:     linux-block@vger.kernel.org, kashyap.desai@broadcom.com,
+        linux-kernel@vger.kernel.org, hare@suse.de, ming.lei@redhat.com
+In-Reply-To: <1638794990-137490-1-git-send-email-john.garry@huawei.com>
+References: <1638794990-137490-1-git-send-email-john.garry@huawei.com>
+Subject: Re: [PATCH v2 0/3] blk-mq: Optimise blk_mq_queue_tag_busy_iter() for shared tags
+Message-Id: <163889388252.160645.10327363566878499665.b4-ty@kernel.dk>
+Date:   Tue, 07 Dec 2021 09:18:02 -0700
 MIME-Version: 1.0
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org> <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
- <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
-In-Reply-To: <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 7 Dec 2021 08:13:38 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjtvUDbbcXw0iqAPn3dmZK+RnqVMFrU9i53HzvPtWx_vw@mail.gmail.com>
-Message-ID: <CAHk-=wjtvUDbbcXw0iqAPn3dmZK+RnqVMFrU9i53HzvPtWx_vw@mail.gmail.com>
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 7, 2021 at 5:28 AM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> +#define refcount_dec_and_test refcount_dec_and_test
-> +static inline bool refcount_dec_and_test(refcount_t *r)
-> +{
-> +       asm_volatile_goto (LOCK_PREFIX "decl %[var]\n\t"
-> +                          "jz %l[cc_zero]\n\t"
-> +                          "jl %l[cc_error]"
-> +                          : : [var] "m" (r->refs.counter)
-> +                          : "memory"
-> +                          : cc_zero, cc_error);
-> +       return false;
-> +
-> +cc_zero:
-> +       return true;
-> +
-> +cc_error:
-> +       refcount_warn_saturate(r, REFCOUNT_SUB_UAF);
-> +       return false;
-> +}
+On Mon, 6 Dec 2021 20:49:47 +0800, John Garry wrote:
+> In [0] Kashyap reports high CPU usage for blk_mq_queue_tag_busy_iter()
+> and callees for shared tags.
+> 
+> Indeed blk_mq_queue_tag_busy_iter() would be less optimum for moving to
+> shared tags, but it was not optimum previously.
+> 
+> This series optimises by having only a single iter (per regular and resv
+> tags) for the shared tags, instead of an iter per HW queue.
+> 
+> [...]
 
-Please don't add broken arch-specific helpers that are useless for
-anything else than the broken refcount_t use.
+Applied, thanks!
 
-Make it return three return values, call it atomic_dec_and_test_ref()
-or something like that, and now people can use it without having to
-use a refcount_t.
+[1/3] blk-mq: Drop busy_iter_fn blk_mq_hw_ctx argument
+      (no commit info)
+[2/3] blk-mq: Delete busy_iter_fn
+      (no commit info)
+[3/3] blk-mq: Optimise blk_mq_queue_tag_busy_iter() for shared tags
+      (no commit info)
 
-Nobody really wants two different error cases anyway. The fact that
-refcount_warn_saturate() has different cases is only an annoyance.
+Best regards,
+-- 
+Jens Axboe
 
-             Linus
+
