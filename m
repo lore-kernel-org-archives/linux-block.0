@@ -2,126 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 289F2C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  6 Dec 2021 23:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8484AC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 00:13:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347953AbhLFXcD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Dec 2021 18:32:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
+        id S1351463AbhLGAQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Dec 2021 19:16:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239127AbhLFXcD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 18:32:03 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B95C0613F8
-        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 15:28:33 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id j6-20020a17090a588600b001a78a5ce46aso545631pji.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 15:28:33 -0800 (PST)
+        with ESMTP id S1350331AbhLGAQt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Dec 2021 19:16:49 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216E0C061746
+        for <linux-block@vger.kernel.org>; Mon,  6 Dec 2021 16:13:20 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id r25so49671472edq.7
+        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 16:13:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iYlong7BFeAPBAo6aJJAOLFXmMpt5I92OzI5hHT+4DQ=;
-        b=ZFk8Cpau3VRTYxRul9UaQIlSGM1KPnxNcxeXeHXgHZ1BacepQ3f1pgT4knSx9jmYc+
-         MC3RIYSKIZjytMmU+O0sZzWJ1Lc+lpKz3pOqma7LdlkdgiHo0ZHwOvixT+EJ95A+zKai
-         2UISRN7nlqeo9huTXdu07jKzUWlLecF5mo29Q=
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lZ4NTQl4vqWUi0q6qLDZFhtehtmC6acMk0BEOAwbblk=;
+        b=THF2y8xIsbgj5uAmVksnApdBv0DkrP52LvcVJCs49feiZbKcjSFTUV7i34T5SFjKsj
+         W8X6BM/2tJM6v4IENQbUJNn/c2/8x0+v2Jf86RR/4zzOaqoziLA6pCEdcJ7HNAmPe5kL
+         a2MqXb/XXou6gEQllsBvCq+OuNsrCaOkkLk+I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iYlong7BFeAPBAo6aJJAOLFXmMpt5I92OzI5hHT+4DQ=;
-        b=dg4anMetov4g7l2docZPSOQZ6KSVSabOuxoSLmDyV8Mta/wenxyys/RSMfCb47vTw4
-         ojm2g7zuyfA72xwzVR8d+aH8IbuhO84Xeiruk5VOYoI9HykMtnudxF/VTwMffZUfXL23
-         CPwIvcWrOPA+VhkMKrX1BVCrNBApI1Kz+EyXObWL4qwA8Bu8CRjpnofhu+WrGMKXxJYw
-         /g+H0bsde8L8v8ofOco/FogpI3wkOLUSy4uVXM/4lkw3gooe85xhV/EJOlRtBsk7Lr/S
-         1Hvp4TaqUrG+F7Mz2dy8RbeyA9TwoEEHfKw86zAsCqQCLWTqMAuJCxaMdcvotdZW7PLy
-         G0LA==
-X-Gm-Message-State: AOAM530YdlmMGhCWykAUQdyhQ7hs5hAeCH1n6j1yxIgYSNlTBqe1RkeA
-        2erqRgBNhoQVLq2OiaKUN2brxQ==
-X-Google-Smtp-Source: ABdhPJyCWRhj7VPjT3NxliyEgMqe+IoDoJvad+ognPbn+ZXCLt+PZpfUdmrv3Mxw6QhEAAsGSoanww==
-X-Received: by 2002:a17:90b:4b4d:: with SMTP id mi13mr2027431pjb.192.1638833313291;
-        Mon, 06 Dec 2021 15:28:33 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id h13sm10625918pgg.16.2021.12.06.15.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 15:28:33 -0800 (PST)
-Date:   Mon, 6 Dec 2021 15:28:32 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lZ4NTQl4vqWUi0q6qLDZFhtehtmC6acMk0BEOAwbblk=;
+        b=eq56W0OyfRwlr3UQvGFZQopLcmt2fV4+0xrNUfRs1J+d4WMTMPLbfVN+TZ/xTbCsc4
+         xg07GVAt9Hop7BLcL7u6qY8iKgT2sAwQG1ZGOz2YvrUc9g/i4rOYEerwPHJq+g4C/F/p
+         XXAyI3bPDy2sfRKNbaWGgjJF12cTSS1SVds30WFgbo20A425l9Xx40VfDHpij8tnA0BU
+         omkbXClqHnIL4y4ENnpEkVYJUEuChQtNlGYeKhKRCKDYrH7yed4wsG3Z1r23+/FRrdyj
+         FazGBmsLQuGVqPvkDp43i0MEFr6CiFdmGSccXV7nFxnuC2TDenONQ99HtVag3rGTguje
+         kDjQ==
+X-Gm-Message-State: AOAM5337zpLZgNu+NUEZ56Gmfueqqv9S9aoe+ly5ZiMyNQ96Cpj3e4eS
+        V9y3K9OIgQpxA6ed+znnrpcHkMH+K5u3X7h4
+X-Google-Smtp-Source: ABdhPJwCv+cErPbwf0P9t57EUaGHrhwW15spKkVNIrmBHH7Jpb/OEz0q/gFXZySzHD3ITRON/JakjA==
+X-Received: by 2002:a17:907:7f8c:: with SMTP id qk12mr48848383ejc.169.1638835998267;
+        Mon, 06 Dec 2021 16:13:18 -0800 (PST)
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com. [209.85.128.48])
+        by smtp.gmail.com with ESMTPSA id ho30sm7734067ejc.30.2021.12.06.16.13.16
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Dec 2021 16:13:17 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id m25-20020a7bcb99000000b0033aa12cdd33so704649wmi.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Dec 2021 16:13:16 -0800 (PST)
+X-Received: by 2002:a05:600c:22ce:: with SMTP id 14mr2274622wmg.152.1638835996701;
+ Mon, 06 Dec 2021 16:13:16 -0800 (PST)
+MIME-Version: 1.0
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org> <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
+ <CAHk-=wjXmGt9-JQp-wvup4y2tFNUCVjvx2W7MHzuAaxpryP4mg@mail.gmail.com>
+ <282666e2-93d4-0302-b2d0-47d03395a6d4@kernel.dk> <202112061247.C5CD07E3C@keescook>
+ <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com> <202112061455.F23512C3CB@keescook>
+In-Reply-To: <202112061455.F23512C3CB@keescook>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 6 Dec 2021 16:13:00 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whLU+dk7EmPu5UC6DDSd76_dO4bVd4BkvxmR4W5-mmAgg@mail.gmail.com>
+Message-ID: <CAHk-=whLU+dk7EmPu5UC6DDSd76_dO4bVd4BkvxmR4W5-mmAgg@mail.gmail.com>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+To:     Kees Cook <keescook@chromium.org>
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Peter Zijlstra <peterz@infradead.org>,
         Christoph Hellwig <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-Message-ID: <202112061455.F23512C3CB@keescook>
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org>
- <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
- <CAHk-=wjXmGt9-JQp-wvup4y2tFNUCVjvx2W7MHzuAaxpryP4mg@mail.gmail.com>
- <282666e2-93d4-0302-b2d0-47d03395a6d4@kernel.dk>
- <202112061247.C5CD07E3C@keescook>
- <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wh0RhnMfZG6xQJ=yHTgmPTaxjQOo1Q2=r+_ZR56yiRi4A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 06, 2021 at 01:17:17PM -0800, Linus Torvalds wrote:
-> End result: atomics are _better_ in the overflow case, and it's why
-> the page counters could not use the garbage that is refcount_t, and
-> instead did it properly.
-> 
-> See? In absolutely neither case is recount_t "safer". It's only worse.
+On Mon, Dec 6, 2021 at 3:28 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> I'm not arguing for refcount_t -- I'm arguing for an API that isn't a
+> regression of features that have been protecting the kernel from bugs.
 
-Right, I understand your objection; it is valid. One of the dimensions of
-"safe" is "not exploitable", which is _also_ a valid concern. As you
-say, refcount_t works for the "never make them all handle overflows
-properly" case, and I'm fine with using something else where we need a
-better set of behaviors.
+Maybe somebody could actually just fix refcount_t instead. Somebody
+who cares about that currently horrendously bad interface.
 
-> I like Jens' patches. They take the _good_ code - the code we use for
-> page counters - and make that proper interface available to others.
+Fix it to not do the fundamentally broken saturation that actively
+destroys state: fix it to have a safe "try to increment", instead of
+an unsafe "increment and do bad things".
 
-I am fine with whatever can be made safe in all dimensions, but I don't
-want to lose sight of the exploitability dimension. This is a lot like
-the BUG vs WARN situation: BUG is unfixable because there is no recovery.
-WARN allows the code to do something sensible in the pathological case,
-but the code needs to have been designed to handle that case. The
-widely used older atomic_t reference counting code pattern had no path
-to handling failure.
+Fix it to not unnecessarily use expensive compare-and-exchange loops,
+when you can safely just race a bit, safe in the knowledge that you're
+not going to race 2**31 times.
 
-In the proposed API, we get a warning (sometimes) in bad states, but
-there is no handling of the broken reference counter. For example,
-with atomic_ref_inc_not_zero():
+IOW, I think that "try_get_page()" function is basically the *much*
+superior version of what is currently a broken "refcount_inc()".
 
-- there's no __must_check hint for callers to actually check it happened
-- overflow is silent, so wrapping around to 1 and then having a
-  call to atomic_ref_put_and_test() has no protection against exploitation
-  at all. This particular code pattern mistake (missed "put") is the
-  fundamental path to nearly all the refcount overflow exploits of the
-  past couple decades. e.g. see:
-	- CVE-2016-0728 - Keyring refcount overflow.
-	  Exploit: https://www.exploit-db.com/exploits/39277/
-	- CVE-2016-4558 - BPF reference count mishandling.
-          Explot: https://www.exploit-db.com/exploits/39773/
-  Losing that protection is just inviting these exploits back again (of
-  which we've had none in the past few years).
+And yes, it does warn about that overflow case that you claim only
+refcount_t does. And does so without the broken semantics that
+refcount h as.
 
-For the API generally, nothing about the type stops someone from
-accidentally using the standard atomic_t helpers instead, accidentally
-bypassing any potential WARNs. It should do something similar to
-refcount_t so the compiler can help guide people correctly instead of
-blindly accepting an accident.
-
-And if we're speaking to safety/robustness generally, where are the unit
-tests, run-time tests (LKDTM provides this for refcount_t so it should
-be easy to repurpose them), kern-doc, etc?
-
-I'm not arguing for refcount_t -- I'm arguing for an API that isn't a
-regression of features that have been protecting the kernel from bugs.
-
--- 
-Kees Cook
+                Linus
