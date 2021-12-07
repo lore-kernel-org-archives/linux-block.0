@@ -2,59 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E06C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 14:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4A9C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 15:51:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238274AbhLGO50 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Dec 2021 09:57:26 -0500
-Received: from mail.itouring.de ([85.10.202.141]:57962 "EHLO mail.itouring.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238271AbhLGO50 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Dec 2021 09:57:26 -0500
-Received: from tux.applied-asynchrony.com (p5ddd7e1c.dip0.t-ipconnect.de [93.221.126.28])
-        by mail.itouring.de (Postfix) with ESMTPSA id 616B1103761;
-        Tue,  7 Dec 2021 15:53:54 +0100 (CET)
-Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
-        by tux.applied-asynchrony.com (Postfix) with ESMTP id 1A09BF01601;
-        Tue,  7 Dec 2021 15:53:54 +0100 (CET)
-Subject: Re: [PATCH] bfq: Fix use-after-free with cgroups
-To:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>, fvogt@suse.de,
-        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
-        stable@vger.kernel.org, Fabian Vogt <fvogt@suse.com>
-References: <20211201133439.3309-1-jack@suse.cz>
-From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <28ded939-6339-c9e1-c0a3-ff84fb197eed@applied-asynchrony.com>
-Date:   Tue, 7 Dec 2021 15:53:54 +0100
+        id S239125AbhLGPzZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 10:55:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239147AbhLGPzY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 10:55:24 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6618C061574;
+        Tue,  7 Dec 2021 07:51:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Omuu2IL2OK0Xy2Bz2WLuZj2MwATjLBReQ+BfkCIXGQ8=; b=RT8HK855qgvzHgWRlY0lHKikpo
+        a19XI/xuH8/aeLDz6I+UuuAkNWQYxdsffiPmWGn96pGzYlxAwt1ymEW34239cr38cZTKw95IIoz5p
+        HCnmF8kFXggD0JS3HsAWN+T6gtiIcL9za+i04McRdYkE4N6QPEFv21KNds26BEq7Psmb2u535Yto4
+        ZoENft3BqeMwgWQ0rney95iz6a/hCKHK1iR5Yq67rbTqp4oUtUryRn9gXen3XlTfwreEAlvEIOMfy
+        /JNB8y3Af8Ueee4eHGMWdw9bMZQTxo/3J+9/8REuxYwH2OEv9O4LnmzVjW5kv5SbOPt+YUAjYEj+l
+        utJ4GcXg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1muckv-002nE3-7v; Tue, 07 Dec 2021 15:51:49 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 709A3300237;
+        Tue,  7 Dec 2021 16:51:48 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 5BCB0201CA1F6; Tue,  7 Dec 2021 16:51:48 +0100 (CET)
+Date:   Tue, 7 Dec 2021 16:51:48 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        keescook@chromium.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <Ya+DFKo6JVuu++cX@hirez.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+ <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-In-Reply-To: <20211201133439.3309-1-jack@suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Dec 07, 2021 at 02:28:22PM +0100, Peter Zijlstra wrote:
+> +static inline void refcount_inc(refcount_t *r)
+> +{
+> +	int one = 1;
+> +
+> +	asm_volatile_goto (LOCK_PREFIX "xaddl %%eax, %[var]\n\t"
+> +			   "addl $1, %%eax\n\t"
+> +			   "je %l[cc_zero]\n\t"
+> +			   "js %l[cc_error]"
+> +			   : : [var] "m" (r->refs.counter), "a" (one)
+> +			   : "memory"
+> +			   : cc_zero, cc_error);
 
-On 2021-12-01 14:34, Jan Kara wrote:
-> BFQ started crashing with 5.15-based kernels like:
-> 
-> BUG: KASAN: use-after-free in rb_erase (lib/rbtree.c:262 lib/rbtr
-> Read of size 8 at addr ffff888008193098 by task bash/1472
-[snip]
++       asm_volatile_goto (LOCK_PREFIX "xaddl %[reg], %[var]\n\t"
++                          "addl $1, %[reg]\n\t"
++                          "jz %l[cc_zero]\n\t"
++                          "js %l[cc_error]"
++                          : : [var] "m" (r->refs.counter), [reg] "r" (1)
++                          : "memory"
++                          : cc_zero, cc_error);
 
-This does not compile when CONFIG_BFQ_GROUP_IOSCHED is disabled.
-I know the patch is meant for the case where it is enabled, but still..
+Is of course a better implementation, but I'm not sure I actually
+understand this code. Afaict: add $1,%[reg], will only set ZF when
+%[reg] was -1 such that the result is now 0.
 
-block/bfq-iosched.c: In function 'bfq_init_bfqq':
-block/bfq-iosched.c:5362:51: error: 'struct bfq_group' has no member named 'children'
-  5362 |         hlist_add_head(&bfqq->children_node, &bfqg->children);
-       |                                                   ^~
-make[1]: *** [scripts/Makefile.build:277: block/bfq-iosched.o] Error 1
-
-Probably just needs a few more ifdefs :)
-
-cheers
-Holger
+But that's not what the code said; is this GCC going funny in the head
+or should I just stop staring at this...
