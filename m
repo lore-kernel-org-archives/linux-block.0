@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B0CC43217
-	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 09:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BA9C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Dec 2021 10:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234178AbhLGJiJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Dec 2021 04:38:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
+        id S229919AbhLGKeO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 05:34:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234128AbhLGJiG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 04:38:06 -0500
+        with ESMTP id S229878AbhLGKeM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 05:34:12 -0500
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38FE2C0611F7;
-        Tue,  7 Dec 2021 01:34:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ACB7C061746;
+        Tue,  7 Dec 2021 02:30:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pouzREswlR8li/pK7iHt7FL48EntonyRD78cYY8XFO4=; b=FAKI+lzH9+BsA5g3k5n3Ig/boR
-        euWO3M0j1Wtsb/EDaFBy6jAT9Xp8bI7qs3dsFhDvAfJ29fRO3t/nocMaB0x9ioI/rtffjnK+dIlOm
-        0edQrMwQmhhnrS4iiQHopaHSZJ4HPQWr8S45/lLn22s6IAT/aGgn1EI11hh6YRd2z7H6DqzbPnkaA
-        59XgSfWFlgMs9C4HgNxXx7wPvpd7Cjd1D4dbH8k0Pv6g4VIz390X8rWsTYMO/7SDwBqL6veyc2UGS
-        oxnFgHfa/6EK//YnZShQvnXt9kqwcGkfFHAB44GB9RYCQuM10273XJVGW4nmFgdjMCR/r8rUZpGzj
-        uUhoXkaA==;
+        bh=ub6iik2lU0lg+71v5tGKDkXADgSKb2Jmgh0OwCSCJ5c=; b=Xc7n+lEf635a/0yKfgNDoFWV+k
+        gnnOHCSxbRQVDnSoj9HZKvM4Oq26pWhZKqGJYWTuQcAikzF9EUifIKnwMDV1wm2nM8jX0h153FhJS
+        kdWgB49vSgcLE/+V4THl2rMnOCNIx5yTAnPkwD0wP8OrxiK/9vQZT4DYfpofegPibTpHxIDG2KAU1
+        ygrHVE3GynewFSd/SN5byode5ZZfjBvl3vfxXoAjMes0VWJ8pfIZiL0b2E495XfA+qcoNlx7bD84i
+        d4W6z8oHoVOiMDPQLbODOi9Xpm+8xqmwspquQWf1TfMPN1VA3n4oRbjAiHtnd+WE5RFL5j3Mib2Us
+        EDqIBaMw==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1muWrn-002jho-Rk; Tue, 07 Dec 2021 09:34:32 +0000
+        id 1muXk6-002kJj-2z; Tue, 07 Dec 2021 10:30:38 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 322493002DB;
-        Tue,  7 Dec 2021 10:34:30 +0100 (CET)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B2F9230002F;
+        Tue,  7 Dec 2021 11:30:37 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id CB4DD201D2FE9; Tue,  7 Dec 2021 10:34:30 +0100 (CET)
-Date:   Tue, 7 Dec 2021 10:34:30 +0100
+        id 9EF1B202A40B1; Tue,  7 Dec 2021 11:30:37 +0100 (CET)
+Date:   Tue, 7 Dec 2021 11:30:37 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Kees Cook <keescook@chromium.org>, Jens Axboe <axboe@kernel.dk>,
@@ -43,7 +43,7 @@ Cc:     Kees Cook <keescook@chromium.org>, Jens Axboe <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] block: switch to atomic_t for request references
-Message-ID: <Ya8qptlJ4yLVUSBi@hirez.programming.kicks-ass.net>
+Message-ID: <Ya83zQRVUCRRYNHQ@hirez.programming.kicks-ass.net>
 References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
  <Ya2zfVAwh4aQ7KVd@infradead.org>
  <Ya3KZiLg5lYjsGcQ@hirez.programming.kicks-ass.net>
@@ -63,10 +63,6 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Mon, Dec 06, 2021 at 04:13:00PM -0800, Linus Torvalds wrote:
 
-> Fix it to not unnecessarily use expensive compare-and-exchange loops,
-> when you can safely just race a bit, safe in the knowledge that you're
-> not going to race 2**31 times.
-> 
 > IOW, I think that "try_get_page()" function is basically the *much*
 > superior version of what is currently a broken "refcount_inc()".
 > 
@@ -74,16 +70,10 @@ On Mon, Dec 06, 2021 at 04:13:00PM -0800, Linus Torvalds wrote:
 > refcount_t does. And does so without the broken semantics that
 > refcount h as.
 
-I think you should perhaps look at the current code again. Those cmpxchg
-loops are gone. The only cmpxchg loop that's still there is for
-add_not_zero(), and that is the exact same loop we have for
-atomic_inc_not_zero(v) := atomic_add_unless(v,1,0) :=
-atomic_fetch_add_unless(v,1,0) != 0.
+That places the burden of the unlikely overflow case on the user. Now
+every driver author needs to consider the overflow case and have a
+corresponding error path. How many bugs will that introduce?
 
-The rest is exactly that LOCK XADD and assume you don't race 2^31 bits
-worth.
-
-Now, it could be GCC generates atrociously bad code simply because it
-doesn't know it can use the flags from the XADD in which case we can
-look at doing an arch asm implementation.
+Why is saturation; iow. leaking the memory, a worse option than having
+bad/broken/never-tested error paths all over the kernel?
 
