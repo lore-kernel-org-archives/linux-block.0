@@ -2,40 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE10C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 00:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96C4C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 00:57:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239031AbhLHBBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Dec 2021 20:01:04 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:38684 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238916AbhLHBBC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 20:01:02 -0500
+        id S239047AbhLHBBP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 20:01:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53536 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239086AbhLHBBE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 20:01:04 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0031C061746;
+        Tue,  7 Dec 2021 16:57:33 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 63158CE1F58;
+        by sin.source.kernel.org (Postfix) with ESMTPS id ED8DCCE1F42;
+        Wed,  8 Dec 2021 00:57:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE118C341C5;
         Wed,  8 Dec 2021 00:57:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E2B4C341C5;
-        Wed,  8 Dec 2021 00:57:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638925047;
-        bh=eyFDhLZXXF0TjsoOyaqwW+4RWrrRXJe67NtK8tlN9nU=;
+        s=k20201202; t=1638925050;
+        bh=doXw0FYXEv55XwbYN1486+6hyhzPsD7PUsHDWpGZ1no=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DVjbNvLQuFmbAP9T/11p/89kLj7Oi0EXGjmXyQXHEr3brp8pnfWh0bAaV13fzpr7O
-         VyworE4Dy6N7sXvrhdMO+sAlWeMlLI0Ky/0m1mRd5vC2KvjaKGdHkuy4bovpeloEi8
-         oxGro/wbwN/+O+6hLr/C6OOT3EUoxHZGV6RxSfLYCdpSsuAXXJRo4oYSlb5gfrDqpK
-         T0xtb/FTw3+psumUKUzYEXC9yUoRDcsPvWQgufFSY9eF5X4O8i5krVoR57i8FcJCdx
-         0w6CwDjTZfqpxmcKkQEFaHwrPyzR1AJjYs97VdrpCF04Z6h9uieizfVR2d3j+lvIu4
-         1Jkn9NvtZG9Hw==
+        b=ESTxpbjv8+14Eiq3kOAgxzpInZ3e1a0+97xQRcb3YLLeUwa+XCczhp0Wq+ytPr0fm
+         E4TOErkwSQOjByTuyBSuJkOQkozjHMpgR5UkG0I16hjyL8p1eSW/7yhzrTa0GQ48BO
+         cx4hX1/OVH1xHmg0RBneFVrltGyVegc95ODPD3pyjVIKNYvrXTlq3eBT8Xy18mmZ/h
+         p25mtqd3Gq9CaHTC7jjZepRzo2pGv8tLGXvnByXDLIKiZciGegUq7sRCGd2CfD9aca
+         KJDLSBdZj6N+NwtmHDakm3X+I3VTHWFSfPHKbHNvz7XHbDXf7TTkFpzgmVfLj1CXD8
+         HGNg9GYhvuy+g==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-doc@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/8] docs: sysfs-block: move to stable directory
-Date:   Tue,  7 Dec 2021 16:56:33 -0800
-Message-Id: <20211208005640.102814-2-ebiggers@kernel.org>
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH v2 8/8] MAINTAINERS: add entries for block layer documentation
+Date:   Tue,  7 Dec 2021 16:56:40 -0800
+Message-Id: <20211208005640.102814-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20211208005640.102814-1-ebiggers@kernel.org>
 References: <20211208005640.102814-1-ebiggers@kernel.org>
@@ -47,19 +50,29 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The block layer sysfs ABI is widely used by userspace software and is
-considered stable.
+Include Documentation/block/ and Documentation/ABI/stable/sysfs-block in
+the "BLOCK LAYER" maintainers file entry.
 
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- Documentation/ABI/{testing => stable}/sysfs-block | 0
- 1 file changed, 0 insertions(+), 0 deletions(-)
- rename Documentation/ABI/{testing => stable}/sysfs-block (100%)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/stable/sysfs-block
-similarity index 100%
-rename from Documentation/ABI/testing/sysfs-block
-rename to Documentation/ABI/stable/sysfs-block
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 360e9aa0205d6..19db69dda15af 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3380,6 +3380,8 @@ M:	Jens Axboe <axboe@kernel.dk>
+ L:	linux-block@vger.kernel.org
+ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
++F:	Documentation/ABI/stable/sysfs-block
++F:	Documentation/block/
+ F:	block/
+ F:	drivers/block/
+ F:	include/linux/blk*
 -- 
 2.34.1
 
