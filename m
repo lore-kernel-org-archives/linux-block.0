@@ -2,69 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 367B0C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 18:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE18C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 18:44:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235235AbhLHSjC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 13:39:02 -0500
-Received: from mail-pj1-f42.google.com ([209.85.216.42]:43597 "EHLO
-        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbhLHSjB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 13:39:01 -0500
-Received: by mail-pj1-f42.google.com with SMTP id nh10-20020a17090b364a00b001a69adad5ebso2805954pjb.2;
-        Wed, 08 Dec 2021 10:35:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iRb91wcfGIDc8fcHqi52mmmZ+5JRO93HKexzRfoxhTw=;
-        b=0sbGFfynF9CJ/gGBKFUUmN5nV2uCaw8VHIT6oPg+JkKmB7/izD8FT6eQSc+Ji3+fgh
-         zD4HMFYmzYyECpyQf4G1E6XE/uJ7aZCyEMKO0i0Ovh1QiirHne8jRVSb60ETqFlFh+CO
-         ecjJ+IJkDC1tQvlAeG7V9ndRdgNOqAJHbofArWgfJ67YU5RKKf+KlilcxbfLfcXEiqC0
-         7HyoWDf9fZ19nBKZMqLT9qQGJOEpS0XPfTC5xAQQ/hu1Qf3f5mcli6hIjZRFAVnEA3Iq
-         oLv/CGXevjI7FS3/YddtQSPiTFdTROJhxcTBSOU9r79fqjSEi9pZyx7/MvJ1VTz5XvLf
-         KuoQ==
-X-Gm-Message-State: AOAM533AlR/ceYpQ2iVcsyvI1xpsV2ZNeT/vpCpblCoA9ILy+ckN1IOE
-        DiTS/BVDf+5ZpYgUVEaVk2tkse1hNpY=
-X-Google-Smtp-Source: ABdhPJwWKyyuwJcPF6t+KrhFcMVvum6dWIO1YIUA1g4+Vz2/S5LJBnBRkyx80vYcDtc89Z3yF1erJQ==
-X-Received: by 2002:a17:90a:bf8a:: with SMTP id d10mr9110777pjs.67.1638988529056;
-        Wed, 08 Dec 2021 10:35:29 -0800 (PST)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:18af:8865:db7e:6769])
-        by smtp.gmail.com with ESMTPSA id h8sm4633810pfh.10.2021.12.08.10.35.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 10:35:28 -0800 (PST)
-Subject: Re: [PATCH v2 0/8] docs: consolidate sysfs-block into
- Documentation/ABI/
-To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-doc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-References: <20211208005640.102814-1-ebiggers@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <32b52a87-7616-a128-bb97-b73e2125d84a@acm.org>
-Date:   Wed, 8 Dec 2021 10:35:27 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S232201AbhLHSrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 13:47:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229528AbhLHSru (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 13:47:50 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A5AC061746;
+        Wed,  8 Dec 2021 10:44:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=DF+dconE3SyxHkFOPtT8h4ddd65yeGgzGwY/+sd6zHo=; b=O4zmVoNULTBNMMa4iBzZfgvruC
+        wHQF/J+G5kwKPYQJ7TEp/0kvtekcho+V9vDT7Jy0sMp2EBcFXjo+60FF0P6YpcK2Xxb7B1mYPfEfP
+        uxfVfxu3lxAkqgRPWqkePYWViDIxlDtGIR5TCvAd4IZ0ENouisSiI1f7ehO/1EwJdyvykkNo26z9/
+        ZbxES3f/RGMYlykHOiL7Y06QoPN2B8E/LMNh+hIN/3hdwKk1liejyt75jEt37qdKPb24xlk4UjY6d
+        GJ3KsD9X0RfEc/+nivYMJExAs17FSRLZYVeXhPn9Wj6IinYJ4YimxTPyTY1tyoLeOWsphFOxqRLKz
+        +y7puJXA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mv1vK-000ECB-It; Wed, 08 Dec 2021 18:44:14 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 277CC9811F7; Wed,  8 Dec 2021 19:44:16 +0100 (CET)
+Date:   Wed, 8 Dec 2021 19:44:16 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <20211208184416.GY16608@worktop.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+ <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
+ <20211207202831.GA18361@worktop.programming.kicks-ass.net>
+ <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
+ <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
+ <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20211208005640.102814-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/7/21 4:56 PM, Eric Biggers wrote:
-> This series consolidates the documentation for /sys/block/<disk>/queue/
-> into Documentation/ABI/, where it is supposed to go (as per Greg KH:
-> https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
+On Wed, Dec 08, 2021 at 10:00:04AM -0800, Linus Torvalds wrote:
+> On Wed, Dec 8, 2021 at 9:07 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > IOW, the effective range becomes: [1..INT_MIN], which is a bit
+> > counter-intuitive, but then so is most of this stuff.
 > 
-> This series also updates MAINTAINERS to associate the block
-> documentation with the block layer.
+> I'd suggest not codifying it too strictly, because the exact range at
+> the upper end might depend on what is convenient for an architecture
+> to do.
+> 
+> For x86, 'xadd' has odd semantics in that the flags register is about
+> the *new* state, but the returned value is about the *old* state.
 
-Thank you for having done this work! Once my two comments are addressed,
-feel free to add the following to all patches in this series:
+From testing xadd had different flags from add; I've not yet looked at
+the SDM to see what it said on the matter.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> That means that on x86, some things are cheaper to test based on the
+> pre-inc/dec values, and other things are cheaper to test based on the
+> post-inc/dec ones.
+> 
+> It's also why for "page->_mapcount" we have the "free" value being -1,
+> not 0, and the refcount is "off by one". It makes the special cases of
+> "increment from zero" and "decrement to zero" be very easy and
+> straightforward to test for.
+> 
+> That might be an option for an "atomic_ref" type - with our existing
+> "page_mapcount()" code being the thing we'd convert first, and make be
+> the example for it.
+> 
+> I think it should also make the error cases be very easy to check for
+> without extra tests. If you make "decrement from zero" be the "ok, now
+> it's free", then that shows in the carry flag. But otherwise, if SF or
+> OF is set, it's an error.  That means we can use the regular atomics
+> and flags (although not "dec" and "inc", since we'd care about CF).
+> 
+> So on x86, I think "atomic_dec_ref()" could be
+> 
+>         lock subl $1,ptr
+>         jc now_its_free
+>         jl this_is_an_error
+> 
+> if we end up having that "off by one" model.
+> 
+> And importantly, "atomic_inc_ref()" would be just
+> 
+>         lock incl ptr
+>         jle this_is_an_error
+> 
+> and this avoids us having to have the value in a register and test it
+> separately.
+> 
+> So your suggestion is _close_, but note how you can't do the "inc_ofl"
+> without that "off-by-one" model.
+> 
+> And again - I might have gotten the exact flag test instructions
+> wrong. That's what you get for not actually doing serious assembly
+> language for a couple of decades.
+
+Yeah; I don't have it all in-cache either; I'll go through it tomorrow
+or something to see what I can make of it.
+
+Meanwhile I did send out what I had.
