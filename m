@@ -2,74 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BA6C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 13:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA913C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 17:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233893AbhLHNIe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 08:08:34 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4233 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbhLHNId (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 08:08:33 -0500
-Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J8HMy27vdz67rqf;
-        Wed,  8 Dec 2021 21:00:46 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 8 Dec 2021 14:04:59 +0100
-Received: from [10.47.91.245] (10.47.91.245) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Wed, 8 Dec
- 2021 13:04:59 +0000
-Subject: Re: [PATCH RFT 0/3] blk-mq: Optimise blk_mq_queue_tag_busy_iter() for
- shared tags
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ming.lei@redhat.com>, <hare@suse.de>
-References: <1635852455-39935-1-git-send-email-john.garry@huawei.com>
- <7fba1b1e-63a6-6315-e5ca-6d5ae9de6dbb@huawei.com>
- <b18285f4aa0e8be796aea19cdfde0293@mail.gmail.com>
- <9859e133-e3b8-4e53-dfad-cbf75ed3102f@huawei.com>
- <9b092ca49e9b5415772cd950a3c12584@mail.gmail.com>
- <fbdf64cd-7d31-f470-b93c-5b42a1e1cf40@huawei.com>
- <e6069080-61e7-4345-8ff3-a26756a1c76c@huawei.com>
- <205b1962196d64a93184dc4023499e2e@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <ef0df45a-f248-b729-5fef-393efe68b205@huawei.com>
-Date:   Wed, 8 Dec 2021 13:04:40 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S234440AbhLHRLP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 12:11:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50700 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231757AbhLHRLP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 12:11:15 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D46C061746;
+        Wed,  8 Dec 2021 09:07:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=T1bNpG+EBOuRlHH8vImEKgCRxGudYeuCoNpTVnj0b+c=; b=VQLqA4SbOYcUyV3Ay2a3uirOb+
+        zPz16CQN+Ni4oG3lBL9zWnoct6F6pLblHGiRJ04BQeKAjAAsjTg6uENPONkuYEMSYbRj2h+O6wqXq
+        WOM0HWJWqoLiwuRxD6QiwL8NKwS6XiQVycxNwtcP6vwe5nDXelhkuOpl/StENXkPUiU6T5asw6Bdh
+        IAfj7yNOVAbm9ONZrCWATl3IJ9QhMK4Iez17APXSiwnodzb9q1e06nhabTjH7k+6Wz8j0daKoz6cR
+        wvMYtzmGhfJSvxcFLW3LgddO03Szgxfa51bEka8oejnpOBtvToJiYTDoEQgOFCVOpyVZZ4rVwOn6L
+        4+x1+REQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mv0Po-008blB-SJ; Wed, 08 Dec 2021 17:07:38 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 64A7D3000E6;
+        Wed,  8 Dec 2021 18:07:36 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 2B091264EB862; Wed,  8 Dec 2021 18:07:36 +0100 (CET)
+Date:   Wed, 8 Dec 2021 18:07:36 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+ <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
+ <20211207202831.GA18361@worktop.programming.kicks-ass.net>
+ <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <205b1962196d64a93184dc4023499e2e@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.91.245]
-X-ClientProxiedBy: lhreml724-chm.china.huawei.com (10.201.108.75) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/12/2021 10:03, Kashyap Desai wrote:
->> note: I will now resend for 5.17 and add your tested-by, please let me
->> know if
->> unhappy about that.
-> John - 5.17 should be OK. I am doing additional testing and so far no issue.
+On Tue, Dec 07, 2021 at 03:23:02PM -0800, Linus Torvalds wrote:
+> On Tue, Dec 7, 2021 at 12:28 PM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > Argh.. __atomic_add_fetch() != __atomic_fetch_add(); much confusion for
+> > GCC having both. With the right primitive it becomes:
+> >
+> >         movl    $1, %eax
+> >         lock xaddl      %eax, (%rdi)
+> >         testl   %eax, %eax
+> >         je      .L5
+> >         js      .L6
+> >
+> > Which makes a whole lot more sense.
 > 
-> Tested-by: Kashyap Desai<kashyap.desai@broadcom.com>
+> Note that the above misses the case where the old value was MAX_INT
+> and the result now became negative.
 > 
+> That isn't a _problem_, of course. I think it's fine. But if you cared
+> about it, you'd have to do something like
 
-Hi Kashyap,
+Hm....
 
-On a related topic, you mentioned in an earlier discussion another 
-possible regression you saw around 5.11 or 5.12, unrelated to shared 
-tags transition:
-https://lore.kernel.org/linux-block/e4e92abbe9d52bcba6b8cc6c91c442cc@mail.gmail.com/
+> But if you don't care about the MAX_INT overflow and make the overflow
+> boundary be the next increment, then just make it be one error case:
+> 
+> >         movl    $1, %eax
+> >         lock xaddl      %eax, (%rdi)
+> >         testl   %eax, %eax
+> >         jle      .L5
+> 
+> and then (if you absolutely have to distinguish them) you can test eax
+> again in the slow path.
 
-Did you come to any conclusion on that?
+Suppose:
 
-Thanks,
-John
+  inc(): overflow when old value is negative or zero
+  dec(): overflow when new value is negative or zero
+
+That gives:
+
+  inc(INT_MAX) is allowed
+  dec(INT_MIN) is allowed
+
+IOW, the effective range becomes: [1..INT_MIN], which is a bit
+counter-intuitive, but then so is most of this stuff.
+
+Therefore can write this like:
+
+#define atomic_inc_ofl(v, label)
+do {
+	int old = atomic_fetch_inc(v);
+	if (unlikely(old <= 0))
+		goto label;
+} while (0)
+
+#define atomic_dec_ofl(v, label)
+do {
+	int new = atomic_dec_return(v);
+	if (unlikely(new <= 0))
+		goto label;
+} while (0)
+
+#define atomic_dec_and_test_ofl(v, label)
+({
+	bool ret = false;
+	int new = atomic_dec_return(&r->refs);
+	if (unlikely(new < 0))
+		goto label;
+	if (unlikely(new == 0)
+		ret = true;
+	ret;
+})
+
+For a consistent set of primitives, right?
+
+Which already gives better code-gen than we have today.
+
+But that then also means we can write dec_ofl as:
+
+	lock decl %[var]
+	jle %l1
+
+and dec_and_test_ofl() like:
+
+	lock decl %[var]
+	jl %l2
+	je %l[__zero]
+
+Lemme finisht the patches and send that out after dinner.
