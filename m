@@ -2,67 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68862C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 12:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BA6C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 13:05:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233782AbhLHM5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 07:57:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47012 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbhLHM5D (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 07:57:03 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 066F2C061746;
-        Wed,  8 Dec 2021 04:53:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=XoLdah4Vhal5BMwdRxmj89JX830AjtudjkfO7UjNrhQ=; b=mb7VDEXoLh0hh3nq3LaUmRU/uJ
-        u+2Mx5oXT+8M6uZbP/70Zdtoxz58tkS8+Er8ZDFqnsmyYVv8M17wJXMUtrx4k9U+435bMBfTcjk9S
-        PWKLuuG3WlXXPcfNHRNtXJ7DWSB9bAtvbFDjlGLG4/7SCuYg/sKq0VTcQBl8BS8zZybrt0lnkz9cu
-        X+SPRH92tW3/Gp+hHdFU31w1SZPRGjXstBPYFMEttR9ybSQS/4XqO3KSmS/COf76KXom4Z2jtrSah
-        P/51STuBRXPFHBzLuoB000bO0Wv8u+jYzfSUHlSoMG0stvEQve68Sce7wLMTn6pDsJDW3K4ysoFlm
-        Tpcz2srQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1muwRv-00Cbun-AQ; Wed, 08 Dec 2021 12:53:31 +0000
-Date:   Wed, 8 Dec 2021 04:53:31 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Lucas De Marchi <lucas.demarchi@intel.com>
-Cc:     linux-modules@vger.kernel.org, live-patching@vger.kernel.org,
-        fstests@vger.kernel.org, linux-block@vger.kernel.org, hare@suse.de,
-        dgilbert@interlog.com, jeyu@kernel.org, osandov@fb.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] libkmod-module: add support for a patient module
- removal option
-Message-ID: <YbCqy320/twxxCRb@bombadil.infradead.org>
-References: <20210810051602.3067384-1-mcgrof@kernel.org>
- <20210810051602.3067384-4-mcgrof@kernel.org>
- <20210923085156.scmf5wxr2phc356b@ldmartin-desk2>
- <YVJyIGXN/TR8zdU9@bombadil.infradead.org>
- <20210929184810.adrqpsvlfybnc5qt@ldmartin-desk2>
- <YZLBPGtm2vF2DsTk@bombadil.infradead.org>
+        id S233893AbhLHNIe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 08:08:34 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4233 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229757AbhLHNId (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 08:08:33 -0500
+Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4J8HMy27vdz67rqf;
+        Wed,  8 Dec 2021 21:00:46 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 8 Dec 2021 14:04:59 +0100
+Received: from [10.47.91.245] (10.47.91.245) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Wed, 8 Dec
+ 2021 13:04:59 +0000
+Subject: Re: [PATCH RFT 0/3] blk-mq: Optimise blk_mq_queue_tag_busy_iter() for
+ shared tags
+To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ming.lei@redhat.com>, <hare@suse.de>
+References: <1635852455-39935-1-git-send-email-john.garry@huawei.com>
+ <7fba1b1e-63a6-6315-e5ca-6d5ae9de6dbb@huawei.com>
+ <b18285f4aa0e8be796aea19cdfde0293@mail.gmail.com>
+ <9859e133-e3b8-4e53-dfad-cbf75ed3102f@huawei.com>
+ <9b092ca49e9b5415772cd950a3c12584@mail.gmail.com>
+ <fbdf64cd-7d31-f470-b93c-5b42a1e1cf40@huawei.com>
+ <e6069080-61e7-4345-8ff3-a26756a1c76c@huawei.com>
+ <205b1962196d64a93184dc4023499e2e@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <ef0df45a-f248-b729-5fef-393efe68b205@huawei.com>
+Date:   Wed, 8 Dec 2021 13:04:40 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YZLBPGtm2vF2DsTk@bombadil.infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <205b1962196d64a93184dc4023499e2e@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.91.245]
+X-ClientProxiedBy: lhreml724-chm.china.huawei.com (10.201.108.75) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 12:21:16PM -0800, Luis Chamberlain wrote:
-> On Wed, Sep 29, 2021 at 11:48:31AM -0700, Lucas De Marchi wrote:
-> > > Sorry don't follow. And since I have one day before vacation, I suppose
-> > > I won't get to this until I get back. But I'd be happy if you massage
-> > > it as you see fit as you're used to the code base and I'm sure have
-> > > a better idea of what likely is best for the library.
-> > 
-> > 
-> > sure, np. I will take a look as time permits.
+On 06/12/2021 10:03, Kashyap Desai wrote:
+>> note: I will now resend for 5.17 and add your tested-by, please let me
+>> know if
+>> unhappy about that.
+> John - 5.17 should be OK. I am doing additional testing and so far no issue.
 > 
-> Just a friendly poke.
+> Tested-by: Kashyap Desai<kashyap.desai@broadcom.com>
+> 
 
-Just another friendy poke.
+Hi Kashyap,
 
-  Luis
+On a related topic, you mentioned in an earlier discussion another 
+possible regression you saw around 5.11 or 5.12, unrelated to shared 
+tags transition:
+https://lore.kernel.org/linux-block/e4e92abbe9d52bcba6b8cc6c91c442cc@mail.gmail.com/
+
+Did you come to any conclusion on that?
+
+Thanks,
+John
