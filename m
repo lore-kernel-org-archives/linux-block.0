@@ -2,91 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 670DBC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 19:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6189C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 20:32:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236415AbhLHT2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 14:28:51 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:36938 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236188AbhLHT2r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 14:28:47 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 0E699CE232B;
-        Wed,  8 Dec 2021 19:25:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1000C341CF;
-        Wed,  8 Dec 2021 19:25:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638991512;
-        bh=vP6f/W58TP3IqHAcgDPaq9RdV/xPL90lUKpkB6Lv618=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pNOqjKq7ezrlERusPHPdRP9XugUOMPlfIQ4iSdbzrYdSDe/ejHEbZ8yn7W6HVOE6i
-         aECrEKgA5A1JdZaeKiuHv5bLYBt23Dc4vKSUvbUpjRxxpOjMMdhWwrc53tvAOa6h7u
-         4sNA9wEVcDYqW2sLsTbQHPqI40/noCEp3/+JdvVm680MQ+6kaqJqntknG5c+4jJkXW
-         AB6QmECkW8aJMS5ifFiOMZg1cfyj85mQ8FmoZu2XSIGI2Pn/CH0coxWYTAypXp518K
-         /DdLyDDDpqFtieYy10VoFwc0n97ihKmw81j52Wl+RfVON8dh8E9JsJa3NMMKRX/o9+
-         grptupHmds9pg==
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>
-Cc:     "Rafael J . Wysocki" <rafael@kernel.org>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
-        Vaibhav Gupta <vaibhavgupta40@gmail.com>,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: [PATCH v5 4/4] rsxx: Drop PCI legacy power management
-Date:   Wed,  8 Dec 2021 13:24:49 -0600
-Message-Id: <20211208192449.146076-5-helgaas@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211208192449.146076-1-helgaas@kernel.org>
-References: <20211208192449.146076-1-helgaas@kernel.org>
+        id S236904AbhLHUg0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 15:36:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231801AbhLHUg0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 15:36:26 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31C14C061746;
+        Wed,  8 Dec 2021 12:32:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/C1sx1Rrf17DkOHTiufRn+52P0irAvrEcXdsH2isf/0=; b=d2XLwSUa03ZKr1j4c51VJu+89D
+        BM5dTs8cSS6rCwSdXkAf7/GwPOE+zJVPJhAOvO+FcAFjzORw2wj6pVX+8WNK/2LWVHX5ry+0u5BHY
+        a38APjCYxx1FHtkSQ/xJOSP1yXu7W6Bl7087ZDe1JlO3k8mO6AQ+rFMDnUHprn1GdPVD50UXmyU5I
+        nM846QGaezcjj87lGm7smvmHXFtql1iNA1r0HZadj4zmA5JoTlzf3DD9ACdgGs5SHrwg7iM5fJl6r
+        t0nXOaTbKn0VXEVsXD7/+GwwuX2+lV/kE2BSMAKiWlXsELODsia+aANEN3KneBUc45sABauDmZ2Ao
+        nhFmsteA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mv3cP-008khH-M6; Wed, 08 Dec 2021 20:32:50 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 96FBC9811F7; Wed,  8 Dec 2021 21:32:50 +0100 (CET)
+Date:   Wed, 8 Dec 2021 21:32:50 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <20211208203250.GA16608@worktop.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+ <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
+ <20211207202831.GA18361@worktop.programming.kicks-ass.net>
+ <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
+ <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
+ <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
+ <20211208184416.GY16608@worktop.programming.kicks-ass.net>
+ <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bjorn Helgaas <bhelgaas@google.com>
+On Wed, Dec 08, 2021 at 10:50:10AM -0800, Linus Torvalds wrote:
+> On Wed, Dec 8, 2021 at 10:44 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > From testing xadd had different flags from add; I've not yet looked at
+> > the SDM to see what it said on the matter.
+> 
+> That should not be the case. Just checked, and it just says
+> 
+>   "The CF, PF, AF, SF, ZF, and OF flags are set according to the
+> result of the addition, which is stored in the destination operand"
 
-The rsxx driver doesn't support device suspend, so remove
-rsxx_pci_suspend(), the legacy PCI .suspend() method, completely.
-
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
----
- drivers/block/rsxx/core.c | 7 -------
- 1 file changed, 7 deletions(-)
-
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index 8d9d69f5dfbc..19b85d16d711 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -1037,12 +1037,6 @@ static void rsxx_pci_remove(struct pci_dev *dev)
- 	kfree(card);
- }
- 
--static int rsxx_pci_suspend(struct pci_dev *dev, pm_message_t state)
--{
--	/* We don't support suspend at this time. */
--	return -ENOSYS;
--}
--
- static void rsxx_pci_shutdown(struct pci_dev *dev)
- {
- 	struct rsxx_cardinfo *card = pci_get_drvdata(dev);
-@@ -1083,7 +1077,6 @@ static struct pci_driver rsxx_pci_driver = {
- 	.id_table	= rsxx_pci_ids,
- 	.probe		= rsxx_pci_probe,
- 	.remove		= rsxx_pci_remove,
--	.suspend	= rsxx_pci_suspend,
- 	.shutdown	= rsxx_pci_shutdown,
- 	.err_handler    = &rsxx_err_handler,
- };
--- 
-2.25.1
-
+I got the constraints wrong :/ They match now.
