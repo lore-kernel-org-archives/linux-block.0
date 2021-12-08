@@ -2,73 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0ACAC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 00:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBDFC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 00:36:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242790AbhLHA0u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Dec 2021 19:26:50 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:53508 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242784AbhLHA0t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 19:26:49 -0500
+        id S232174AbhLHAju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Dec 2021 19:39:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229503AbhLHAjt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Dec 2021 19:39:49 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C905C061574;
+        Tue,  7 Dec 2021 16:36:18 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 275DFCE1ECD;
-        Wed,  8 Dec 2021 00:23:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1151DC341C3;
-        Wed,  8 Dec 2021 00:23:14 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id C6A11CE1D63;
+        Wed,  8 Dec 2021 00:36:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95194C341C3;
+        Wed,  8 Dec 2021 00:36:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638922994;
-        bh=0ZNt76/nvy/Rqz+ZKBk5k6H1mK9LdC/GVtTbQ4FcSLw=;
+        s=k20201202; t=1638923774;
+        bh=7SzqkW8JF55HGh0LF16R7xhuRyiyRTDHwS0M3iF277g=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Isx9oospbcHINu/yBa+FlYf26Ceaq8XFoWJ5pUqYhBY9t0eMc4FGLJuUTrJma/UwH
-         0+3Ye9kjKtg+uqEMSmOVP/t7TApEJcGU+RHDtGRJqH3D8ZHVbiX26fVCigHZfXSwQg
-         l8ijbht+pecHIkJNCy43T8tuGQ0P1j1jNiEe5bZJ+m4d/GGvaew1+TbocpUIpbOj1l
-         xr/3RByIR06tfvIx1cH0sSFlf7G+vRCwv5dPhsCY/q11Y9vaJ8qquLKa3bu0iiOovM
-         AzZVmLQ4FLjce4+OPJOe46AljvQhQwDSM21ccGbG909BXMTCA6xpkGAIbPZHVnFUmI
-         RLlCwYmeuHlRg==
-Date:   Tue, 7 Dec 2021 16:23:12 -0800
+        b=Ps+HYLd2q1aVVELfDF+wMAHNTcoP6JDd83AlbUrxoBy0D6IetmkzNQwfB/g8QtBn6
+         TFazPXtqUVsNYa6yyDRSOIvc5Rn5RInHU9Kfr3/Wig7ONTPBkDFpCSPwnQYgSkwBDm
+         b+LeE+7n2XdM9bqIW5+VehCqVdJkKucR3MSe4btsBQNzXISNttOnbqh3UO1dKspUL7
+         3CZHYUdvNEMu3AuT5Kd53Lz15L9MuhSdybhTwtqmCudwZLlDtHtvM8OdqXeMK5EPUU
+         pB96khOg4Io266M1EHxY0MOtEMFgqxrrWkvQzu1n4H2W98ZTmtYnACKnYLEKg7qCe1
+         47ZNOjfH6Gv/Q==
+Date:   Tue, 7 Dec 2021 16:36:13 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gaurav Kashyap <gaurkash@qti.qualcomm.com>
-Cc:     "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "thara.gopinath@linaro.org" <thara.gopinath@linaro.org>,
-        "asutoshd@codeaurora.org" <asutoshd@codeaurora.org>
-Subject: Re: [PATCH 0/4] Adds wrapped key support for inline storage
- encryption
-Message-ID: <Ya/68GveS/hWhJD3@sol.localdomain>
-References: <20211103231840.115521-1-quic_gaurkash@quicinc.com>
- <YYRjbCDhEt8Vh1xv@gmail.com>
- <BYAPR02MB4071BFEFB87D0B2E4FC98C9EE26F9@BYAPR02MB4071.namprd02.prod.outlook.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-doc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/7] docs: consolidate sysfs-block into Documentation/ABI/
+Message-ID: <Ya/9/RsStgLUnEyy@sol.localdomain>
+References: <20211201084524.25660-1-ebiggers@kernel.org>
+ <0bf11301-4085-f4a1-eeed-c65d0e5563b4@acm.org>
+ <Yak1I/xolvLIOtkf@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR02MB4071BFEFB87D0B2E4FC98C9EE26F9@BYAPR02MB4071.namprd02.prod.outlook.com>
+In-Reply-To: <Yak1I/xolvLIOtkf@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 08, 2021 at 12:09:03AM +0000, Gaurav Kashyap wrote:
-> Hey Eric, here are the answers to some of the questions across all the patches
+On Thu, Dec 02, 2021 at 01:05:39PM -0800, Eric Biggers wrote:
+> On Thu, Dec 02, 2021 at 11:32:45AM -0800, Bart Van Assche wrote:
+> > On 12/1/21 12:45 AM, Eric Biggers wrote:
+> > > This series consolidates the documentation for /sys/block/<disk>/queue/
+> > > into Documentation/ABI/, where it is supposed to go (as per Greg KH:
+> > > https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
+> > > 
+> > > This series also updates MAINTAINERS to associate the block
+> > > documentation with the block layer.
+> > > 
+> > > This series applies to linux-block/for-next.
+> > > 
+> > > Eric Biggers (7):
+> > >    docs: sysfs-block: sort alphabetically
+> > >    docs: sysfs-block: add contact for nomerges
+> > >    docs: sysfs-block: fill in missing documentation from queue-sysfs.rst
+> > >    docs: sysfs-block: document stable_writes
+> > >    docs: sysfs-block: document virt_boundary_mask
+> > >    docs: block: remove queue-sysfs.rst
+> > >    MAINTAINERS: add entries for block layer documentation
+> > > 
+> > >   Documentation/ABI/testing/sysfs-block | 766 ++++++++++++++++++--------
+> > >   Documentation/block/index.rst         |   1 -
+> > >   Documentation/block/queue-sysfs.rst   | 321 -----------
+> > >   MAINTAINERS                           |   2 +
+> > >   4 files changed, 545 insertions(+), 545 deletions(-)
+> > >   delete mode 100644 Documentation/block/queue-sysfs.rst
+> > 
+> > How about adding a patch that moves Documentation/ABI/testing/sysfs-block
+> > to Documentation/ABI/stable/sysfs-block? The block layer sysfs ABI is used
+> > widely by user space software and is considered stable.
+> > 
 > 
-> > Also, at runtime, does any of the Qualcomm hardware support multiple key
-> > types, and if so can they be used at the same time?
+> That would make sense.  I decided not to include it in this patch series since
+> some of the sysfs-block files were added recently, so may not be as "stable" as
+> ones that have been around for 18 years, and because about 90% of the sysfs
+> documentation is in the "testing" directory anyway so it is not unusual.  So I
+> felt it should be a separate change.
 > 
-> Currently, with hardware key manager data path, there is no support for
-> standard keys. So, when HWKM is being used, only wrapped keys are supported.
-> If standard keys need to be supported, it can be, but modifications are
-> required within trustzone.
+> I think these patches should go in first, and then I can send a separate patch
+> that moves the file to the stable directory, if there is no objection to it.
+> 
 
-Do the SoCs support both key types though, just not at the same time?  E.g. when
-the ufs_qcom driver loads on SM8350, could it choose to expose either standard
-key support or wrapped key support, or is it predetermined by the hardware
-and/or firmware?  If the driver has a choice, then there should be a kernel
-module parameter (module_param()) that controls it, so that the user can choose
-which key type they want when they boot their kernel.
+Since no one has objected and this series hasn't been applied yet, I guess I'll
+just go ahead and send out a new series which includes the renaming to stable.
 
 - Eric
