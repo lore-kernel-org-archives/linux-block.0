@@ -2,70 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6189C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 20:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A8AC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 22:34:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236904AbhLHUg0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 15:36:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42606 "EHLO
+        id S231431AbhLHWiJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 17:38:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231801AbhLHUg0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 15:36:26 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31C14C061746;
-        Wed,  8 Dec 2021 12:32:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/C1sx1Rrf17DkOHTiufRn+52P0irAvrEcXdsH2isf/0=; b=d2XLwSUa03ZKr1j4c51VJu+89D
-        BM5dTs8cSS6rCwSdXkAf7/GwPOE+zJVPJhAOvO+FcAFjzORw2wj6pVX+8WNK/2LWVHX5ry+0u5BHY
-        a38APjCYxx1FHtkSQ/xJOSP1yXu7W6Bl7087ZDe1JlO3k8mO6AQ+rFMDnUHprn1GdPVD50UXmyU5I
-        nM846QGaezcjj87lGm7smvmHXFtql1iNA1r0HZadj4zmA5JoTlzf3DD9ACdgGs5SHrwg7iM5fJl6r
-        t0nXOaTbKn0VXEVsXD7/+GwwuX2+lV/kE2BSMAKiWlXsELODsia+aANEN3KneBUc45sABauDmZ2Ao
-        nhFmsteA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mv3cP-008khH-M6; Wed, 08 Dec 2021 20:32:50 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 96FBC9811F7; Wed,  8 Dec 2021 21:32:50 +0100 (CET)
-Date:   Wed, 8 Dec 2021 21:32:50 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-Message-ID: <20211208203250.GA16608@worktop.programming.kicks-ass.net>
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org>
- <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
- <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
- <20211207202831.GA18361@worktop.programming.kicks-ass.net>
- <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
- <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
- <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
- <20211208184416.GY16608@worktop.programming.kicks-ass.net>
- <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
+        with ESMTP id S229533AbhLHWiI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 17:38:08 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E8C0C061746;
+        Wed,  8 Dec 2021 14:34:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 58EF1CE23C4;
+        Wed,  8 Dec 2021 22:34:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53291C00446;
+        Wed,  8 Dec 2021 22:34:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639002872;
+        bh=vrWumqdF9FcUSCqyl/Y7iRjjHDoOqLA415fQumlLiVs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qjg4BERRFnE3aBRdaHQEiuroVYGpV64miBHiRR+d3iY8lHi6CkkgMpUY5DVaVNGas
+         E6JlHavNdO5b2pLmvULjNvqqFckyhNNJncPr91qbv9K6p+9JcQIpKok9Lh628Nmlxm
+         hJpctMeqOdSIJg1FVwLI+UMvvhG9MRmC1++e0uC4BloS2EnOizK55o5nCvnNqCjdE+
+         0qiwplCSzvQjhhCy/Va4Zi4zUR1q+jcIGONp4D8py+ejoLCLU7cM4Z3OxfutBEhh3x
+         s5xjLOTpLW1Yl/SKmrps0XW9skEWj7z86iPHPUvdtzt1QxuvkaQGQ2IlpS1SLWtTkU
+         szdoVMS3mUK7A==
+Date:   Wed, 8 Dec 2021 14:34:30 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-doc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v2 5/8] docs: sysfs-block: document stable_writes
+Message-ID: <YbEy9tKDwf5Jthl1@gmail.com>
+References: <20211208005640.102814-1-ebiggers@kernel.org>
+ <20211208005640.102814-6-ebiggers@kernel.org>
+ <7d9f9469-5347-780a-c560-77fca6e7008b@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
+In-Reply-To: <7d9f9469-5347-780a-c560-77fca6e7008b@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 08, 2021 at 10:50:10AM -0800, Linus Torvalds wrote:
-> On Wed, Dec 8, 2021 at 10:44 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> >
-> > From testing xadd had different flags from add; I've not yet looked at
-> > the SDM to see what it said on the matter.
+On Wed, Dec 08, 2021 at 10:01:10AM -0800, Bart Van Assche wrote:
+> On 12/7/21 4:56 PM, Eric Biggers wrote:
+> > +What:		/sys/block/<disk>/queue/stable_writes
+> > +Date:		September 2020
+> > +Contact:	linux-block@vger.kernel.org
+> > +Description:
+> > +		[RW] If the device requires that memory must not be modified
+> > +		while it is being written out to disk, this file will contain
+> > +		'1'.  Otherwise it will contain '0'.  This file is writable for
+> > +		testing purposes.
 > 
-> That should not be the case. Just checked, and it just says
+> Hmm ... doesn't this attribute apply to the process of transferring data from
+> host memory to the device instead of to writing to the disk? Whether data goes
+> to the storage device cache or to the storage medium itself depends on attributes
+> like FUA.
 > 
->   "The CF, PF, AF, SF, ZF, and OF flags are set according to the
-> result of the addition, which is stored in the destination operand"
 
-I got the constraints wrong :/ They match now.
+Yes, I meant "written out to disk" in the general sense of writeback, not in the
+sense of when the data reaches its final destination.  I'm not sure what the
+best way to explain it is.  I think it's more than just "the process of
+transferring data from host memory to the device", as that is just part of a
+write request, whereas stable_writes applies to whole requests.  How about:
+
+		[RW] This file will contain '1' if memory must not be modified
+		while it is being used in a write request to this device.  When
+		this is the case and the kernel is performing writeback of a
+		page, the kernel will wait for writeback to complete before
+		allowing the page to be modified again, rather than allowing
+		immediate modification as is normally the case.  This
+		restriction arises when the device accesses the memory multiple
+		times where the same data must be seen every time -- for
+		example, once to calculate a checksum and once to actually write
+		the data.  If no such restriction exists, this file will contain
+		'0'.  This file is writable for testing purposes.
+
+- Eric
