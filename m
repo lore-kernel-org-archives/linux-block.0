@@ -2,103 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE6BC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 18:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF18C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 18:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238718AbhLHSRf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 13:17:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238716AbhLHSRf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 13:17:35 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9ECCC061746;
-        Wed,  8 Dec 2021 10:14:02 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id t5so11427370edd.0;
-        Wed, 08 Dec 2021 10:14:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=mcPtzo6Mc48uKJRt67ru8n5CsPPRYIExPhncNpI7X2U=;
-        b=goXuzERkzrBi7PF/ABRAY1JlIs3T/p3DGwgarHIhPWMngpKnVtN9muwoQuIhthQ1NN
-         zu0CBT1/MlwJRmmtEDNGxf/ZHeEC2rBDjr4kFQgoJrfo8Na+hSQaiCi5PGwBaEOV/mH6
-         vAHhFmrqiM5gTqW6X7u2X/qt1ZjzNHcjkH9KjJK1pVeIAfvZ6MCBnRAwRQHjMigg6yA5
-         H1zZ76N2M9rUbzVSvbxpPNI8ePx7NKLGarBs4ocit/b4hUz0P26Gamqe2cC/ttpmgTfU
-         bkLgZDkKDpmQkDUn66gsWxvnUl4dg2G0gP8lNiefnKFHwPWoAofoN/uspG8Fz4d3YO+Q
-         0Wvg==
+        id S238948AbhLHSgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 13:36:54 -0500
+Received: from mail-pj1-f52.google.com ([209.85.216.52]:40837 "EHLO
+        mail-pj1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238954AbhLHSgy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 13:36:54 -0500
+Received: by mail-pj1-f52.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so4958890pjb.5;
+        Wed, 08 Dec 2021 10:33:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=mcPtzo6Mc48uKJRt67ru8n5CsPPRYIExPhncNpI7X2U=;
-        b=OU0/mbSvuDGZijCpQE95b5rvONPMY9t1PWvMlrFWcQ0bDgniZr6XqVpa3ougUbmfdC
-         6xWBzw4XI7mOxSVjC6d7iMxNQjehpgWFdHJGwSfxTDqmVvPOqgGLuVkrFl92joPLVseE
-         0KOV5+YzouMZjS8guZ4CAhctc+FkxOGpYw+71hn3LEudFQBtZ7WsWWpH+vN9zgXFjCRt
-         mfq1Ix4DDxCZdUK4V2jNBDTwYosJDx9nxkgStUF5rf1R/pR7gnWEUEjX4f50rrTolq1h
-         r2hI6xPD/Mv5VoqeGksGE5MLV7sByorpace2e1CWnkj+HqniO2f15pVClAoHloQfpBBB
-         KpmQ==
-X-Gm-Message-State: AOAM530kkHPxr02HRzstc2L1OvrVdAMWsQdbWbI5dzlRvcfLwN4iFq0d
-        GuFmLXZ3J2uSXvrHwptQqdg=
-X-Google-Smtp-Source: ABdhPJwKPHdX+gzCJKNjuLehVfaV7WepeVwMXkhb/qivYPPrqm60yAGGQkEMaewHZREDIhU8WsEcSQ==
-X-Received: by 2002:a17:906:4793:: with SMTP id cw19mr9065810ejc.387.1638987241581;
-        Wed, 08 Dec 2021 10:14:01 -0800 (PST)
-Received: from [192.168.8.198] ([148.252.128.29])
-        by smtp.gmail.com with ESMTPSA id o8sm2616767edc.25.2021.12.08.10.14.00
+        bh=0Ul403YxVr/GYiftUiCG88hiiZr2s1PeGaJxvBdtsT8=;
+        b=waOTwsqIlHCwDEtIDB3KWcTvg/u19QLAOeY1PXovzEZzZqOQ7PY7Oe7T6v2Oyxo+HV
+         VszBg6XtrVgBIVDBjnXEZhF/0lXSbc6nOIm8n0fwWoHCVhy6Th+PZW+0D1dVVNmFZA75
+         Qoqfcnc0HrviC31T/1qUOVq6B1tNqWNj9Yr2SmaIocNWx2Fr+Ih7n+XQ2AbrjP11cGIn
+         oW9ZSVcopp/2X4Vvkv/2E5kkphxhvuEio+6NwnqnKmajgyEypg4fUORFAky2XlZHNCnr
+         6wJfKMrEUbTW0BoSq4EM71aEvjzOWad0p+aFGwZMiBEYKfNlO3XCIQ1PiaRgtlX5Jq9w
+         B4ig==
+X-Gm-Message-State: AOAM533di1mprs6xpQPSaQbTDhDRNp9zFYPcEBx47L5iB4fRSmnXDn2a
+        RTj/hjCPxUOeTBJu2qjWgZE=
+X-Google-Smtp-Source: ABdhPJwtZaHD65Ey7j2mBc/tceKRoVjtndShk4+nAhyRh6rjPUEY9qXnLiu0tO8JWWe/JkawlVxYpA==
+X-Received: by 2002:a17:90b:3b82:: with SMTP id pc2mr9383862pjb.120.1638988401779;
+        Wed, 08 Dec 2021 10:33:21 -0800 (PST)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:18af:8865:db7e:6769])
+        by smtp.gmail.com with ESMTPSA id n15sm3248400pgs.59.2021.12.08.10.33.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 10:14:00 -0800 (PST)
-Message-ID: <02bcc03a-f5e1-bc7d-b4f1-323dd4495080@gmail.com>
-Date:   Wed, 8 Dec 2021 18:14:01 +0000
+        Wed, 08 Dec 2021 10:33:20 -0800 (PST)
+Subject: Re: [PATCH v2 6/8] docs: sysfs-block: document virt_boundary_mask
+To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-doc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+References: <20211208005640.102814-1-ebiggers@kernel.org>
+ <20211208005640.102814-7-ebiggers@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <13462e59-82f3-d6fc-a84e-2cf3083e0cc7@acm.org>
+Date:   Wed, 8 Dec 2021 10:33:19 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [syzbot] KASAN: use-after-free Write in io_submit_one
+In-Reply-To: <20211208005640.102814-7-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     syzbot <syzbot+3587cbbc6e1868796292@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, bcrl@kvack.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-References: <000000000000ad0e4105d29b6b0f@google.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <000000000000ad0e4105d29b6b0f@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/8/21 05:04, syzbot wrote:
-> syzbot has bisected this issue to:
-> 
-> commit 54a88eb838d37af930c9f19e1930a4fba6789cb5
-> Author: Pavel Begunkov <asml.silence@gmail.com>
-> Date:   Sat Oct 23 16:21:32 2021 +0000
-> 
->      block: add single bio async direct IO helper
+On 12/7/21 4:56 PM, Eric Biggers wrote:
+> +What:		/sys/block/<disk>/queue/virt_boundary_mask
+> +Date:		April 2021
+> +Contact:	linux-block@vger.kernel.org
+> +Description:
+> +		[RO] This file shows the I/O segment alignment mask for the
+> +		block device.  I/O requests to this device will be split between
+> +		segments wherever either the end of the previous segment or the
+> +		beginning of the current segment is not aligned to
+> +		virt_boundary_mask + 1 bytes.
 
-Looks that's the same George reported yesterday, a fix is queued:
-https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.16&id=75feae73a28020e492fbad2323245455ef69d687
+"I/O segment alignment" looks confusing to me. My understanding is that this
+attribute refers to the alignment of the internal data buffer boundaries and not
+to the alignment of the offset on the storage medium. The name "virt_boundary"
+refers to the property that if all internal boundaries are a multiple of
+(virt_boundary_mask + 1) then an MMU with page size (virt_boundary_mask + 1) can
+map the entire data buffer onto a contiguous range of virtual addresses. E.g.
+RDMA adapters have an MMU that can do this. Several drivers that set this
+attribute support a storage controller that does not have an internal MMU. As an
+example, the NVMe core sets this mask since the NVMe specification requires that
+only the first element in a PRP list has a non-zero offset. From the NVMe
+specification: "PRP entries contained within a PRP List shall have a memory page
+offset of 0h. If a second PRP entry is present within a command, it shall have a
+memory page offset of 0h. In both cases, the entries are memory".
 
-#syz fix: block: fix single bio async DIO error handling
-
-
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1615e2b9b00000
-> start commit:   04fe99a8d936 Add linux-next specific files for 20211207
-> git tree:       linux-next
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1515e2b9b00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1115e2b9b00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=4589399873466942
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3587cbbc6e1868796292
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17db884db00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14e9eabdb00000
-> 
-> Reported-by: syzbot+3587cbbc6e1868796292@syzkaller.appspotmail.com
-> Fixes: 54a88eb838d3 ("block: add single bio async direct IO helper")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> 
-
--- 
-Pavel Begunkov
+Bart.
