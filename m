@@ -2,125 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EC3C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 12:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0CDC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 12:53:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233739AbhLHMxA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 07:53:00 -0500
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:38639 "EHLO
-        mail-wr1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231773AbhLHMxA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 07:53:00 -0500
-Received: by mail-wr1-f52.google.com with SMTP id q3so3915651wru.5;
-        Wed, 08 Dec 2021 04:49:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FYH/sRLBPleRFcKivJ4eo0TXpFe+PUcyhNxulaKbV2g=;
-        b=aGC5AT9vTr7cdWqyniU1CQx2d2KgkaHudtaF7UD/8oU2aZTlBKZh8uvPM8F1bmmYqG
-         CHelqYWrNqbd5mMONDs5/x71oIy/qBRcnZ8vKfhV+z7C6Oel6VOiwLqQEt+Z6Rb6NdVQ
-         X0MRtbZ9BgjqvYgzRRoqGMnoHSA/IOMMqv0OTVqpe8XjfnBxRTr6YJbH6IYjNoAxdePX
-         OgdMGD6xEOoSVz/XcgepgxEgNKb7sy+q3b6Zj/A6Nq3ZtZhrNG8M/hTiZEBRTwmKWvlN
-         66zaVxRqz04m+rt3JZfq7H4qfKR/vHqNBXKHdAHFXJgONtUiUNWbtfXPHUR/lhAhk0HK
-         fIIg==
-X-Gm-Message-State: AOAM533TsuUc2Tbqs8JM64VwZl0F7WoEk/yR6kww5XzvCRAkKBLhH/zO
-        QkD2Fj4NSHa8OBoPl/NMDQw=
-X-Google-Smtp-Source: ABdhPJwqgeHzS+IbEYPxPRtwHZ6X78/4f9whMBS/JU960T1maZxl3zWma4xGqPiC4FUDcCF7ARBw4Q==
-X-Received: by 2002:a5d:6244:: with SMTP id m4mr60754430wrv.186.1638967767449;
-        Wed, 08 Dec 2021 04:49:27 -0800 (PST)
-Received: from [192.168.64.123] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id j40sm5699863wms.19.2021.12.08.04.49.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 04:49:26 -0800 (PST)
-Subject: Re: [PATCH 3/5] blk-mq: add helper of blk_mq_global_quiesce_wait()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-References: <20211119021849.2259254-1-ming.lei@redhat.com>
- <20211119021849.2259254-4-ming.lei@redhat.com>
- <8f6b6452-9abb-fd89-0262-9fb9d00d42a5@grimberg.me> <YZuagPbZJ6CjiUNi@T590>
- <38b9661e-c5b8-ae18-f2ab-b30f9d3e7115@grimberg.me> <YZwzEBtFug6JEmMZ@T590>
- <a3ea006a-738b-af69-4dd5-f33444e3559d@grimberg.me> <YaWNZF3ZYWPQBSbk@T590>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <4394200f-782b-5d75-4570-79a1f63110b1@grimberg.me>
-Date:   Wed, 8 Dec 2021 14:49:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S233811AbhLHM4k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 07:56:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229751AbhLHM4k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 07:56:40 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CF42C061746
+        for <linux-block@vger.kernel.org>; Wed,  8 Dec 2021 04:53:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ndwi3X4GBmotrLQ61fzAGl+hHcE4ZqvK9ei6WuQ1B0s=; b=4U/fHZdlTbKgMrSE+63Tk3dFlO
+        fVhiibBlTVN5DZdPbC6ETDdcik5bPXT5YvpZla33DrlhkJ4wJjN16LzmySUXUKkyJC8t9GshmM39i
+        hlS+ypiiJGJxLiYA41OTWOmTziGNS7V3wvzhKnrHZkcCJ1O4wnGbUBrfuhRaIY3EG0Lyl7u+nBbM2
+        3gQL4b+JnPnxj/M5/+OW8Zx+tgX5/63PimN9LatEGp7SbdbCEgG4Kd5Fo/tGO3lYfccnyJ2Dzk1gV
+        kWueklMAQ9+aKpjnFj0jtRizxjzG7wdmFn+UHhIa0QxiSRALL92IjL3x0hnhOzR5vAaXKJ+bcqbVK
+        Y+24F6Hw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1muwRU-00Cbjn-Sy; Wed, 08 Dec 2021 12:53:04 +0000
+Date:   Wed, 8 Dec 2021 04:53:04 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "dwagner@suse.de" <dwagner@suse.de>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] blktests: replace module removal with patient module
+ removal
+Message-ID: <YbCqsDQxzk0Q0hSl@bombadil.infradead.org>
+References: <20211116172926.587062-1-mcgrof@kernel.org>
+ <bdef0665-255d-3de8-ceac-d5ca638b1484@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <YaWNZF3ZYWPQBSbk@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bdef0665-255d-3de8-ceac-d5ca638b1484@nvidia.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 11/30/21 4:33 AM, Ming Lei wrote:
-> On Tue, Nov 23, 2021 at 11:00:45AM +0200, Sagi Grimberg wrote:
->>
->>>>>>> Add helper of blk_mq_global_quiesce_wait() for supporting to quiesce
->>>>>>> queues in parallel, then we can just wait once if global quiesce wait
->>>>>>> is allowed.
->>>>>>
->>>>>> blk_mq_global_quiesce_wait() is a poor name... global is scope-less and
->>>>>> obviously it has a scope.
->>>>>
->>>>> How about blk_mq_shared_quiesce_wait()? or any suggestion?
->>>>
->>>> Shared between what?
->>>
->>> All request queues in one host-wide, both scsi and nvme has such
->>> requirement.
->>>
->>>>
->>>> Maybe if the queue has a non-blocking tagset, it can have a "quiesced"
->>>> flag that is cleared in unquiesce? then the callers can just continue
->>>> to iterate but will only wait the rcu grace period once.
->>>
->>> Yeah, that is what these patches try to implement.
->>
->> I was suggesting to "hide" it in the interface.
->> Maybe something like:
->> --
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8799fa73ef34..627b631db1f9 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -263,14 +263,18 @@ void blk_mq_wait_quiesce_done(struct request_queue *q)
->>          unsigned int i;
->>          bool rcu = false;
->>
->> +       if (!q->has_srcu && q->quiesced)
->> +               return;
->>          queue_for_each_hw_ctx(q, hctx, i) {
->>                  if (hctx->flags & BLK_MQ_F_BLOCKING)
->>                          synchronize_srcu(hctx->srcu);
->>                  else
->>                          rcu = true;
->>          }
->> -       if (rcu)
->> +       if (rcu) {
->>                  synchronize_rcu();
->> +               q->quiesced = true;
->> +       }
->>   }
->>   EXPORT_SYMBOL_GPL(blk_mq_wait_quiesce_done);
->>
->> @@ -308,6 +312,7 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
->>          } else if (!--q->quiesce_depth) {
->>                  blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
->>                  run_queue = true;
->> +               q->quiesced = false;
+On Thu, Nov 18, 2021 at 01:38:49AM +0000, Chaitanya Kulkarni wrote:
+> On 11/16/21 09:29, Luis Chamberlain wrote:
+> > A long time ago, in a galaxy far, far away...
+> > 
+> > I ran into some odd scsi_debug false positives with fstests. This
+> > prompted me to look into them given these false positives prevents
+> > me from moving forward with establishing a test baseline with high
+> > number of cycles. That is, this stupid issue was prevening creating
+> > high confidence in testing.
+> > 
+> > I reported it [0] and exchanged some ideas with Doug. However, in
+> > the end, despite efforts to help things with scsi_debug there were
+> > still issues lingering which seemed to defy our expectations upstream.
+> > One of the last hanging fruit issues is and always has been that
+> > userspace expectations for proper module removal has been broken,
+> > so in the end I have demonstrated this is a generic issue [1].
+> > 
+> > Long ago a WAIT option for module removal was added... that was then
+> > removed as it was deemed not needed as folks couldn't figure out when
+> > these races happened. The races are actually pretty easy to trigger, it
+> > was just never properly documented. A simpe blkdev_open() will easily
+> > bump a module refcnt, and these days many thing scan do that sort of
+> > thing.
+> > 
+> > The proper solution is to implement then a patient module removal
+> > on kmod and patches have been sent for that and those patches are
+> > under review. In the meantime we need a work around to open code a
+> > similar solution for users of old versions of kmod. I sent an open
+> > coded solution for fstests about since August 19th and has been used
+> > there for a few months now. Now that that stuff is merged and tested
+> > in fstests with more exposure, its time to match parity on blktests.
+> > 
+> > I've tested blktests with this for things which I can run virtually
+> > for a while now. More wider testig is welcomed.
+> > 
+> > [0] https://bugzilla.kernel.org/show_bug.cgi?id=212337
+> > [1] https://bugzilla.kernel.org/show_bug.cgi?id=214015
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> >
 > 
-> Different request queues are passed to blk_mq_wait_quiesce_done() during
-> the iteration, so marking 'quiesced' doesn't make any difference here.
+> Thanks for having this work done and explaining the importance of it.
+> 
+> Give me couple of days, I'll provide you a feedback after I finish my
+> testing of your patch.
 
-I actually meant q->tag_set->quiesced, such that the flag will be
-used in the tag_set reference. This way this sharing will be kept
-hidden from the callers.
+How did testing go?
+
+  Luis
