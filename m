@@ -2,96 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D381BC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 18:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71073C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 19:25:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239388AbhLHSyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 13:54:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239391AbhLHSyB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 13:54:01 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947A0C061746
-        for <linux-block@vger.kernel.org>; Wed,  8 Dec 2021 10:50:29 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id g14so11279039edb.8
-        for <linux-block@vger.kernel.org>; Wed, 08 Dec 2021 10:50:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cVu+O4vH5omtpZHli6o4+BSn/vNd8K1dVv76VMkPfw0=;
-        b=hxpEnYwFcKlq8sBmKIy6fV/wFHJP+w//gnub12IeP/XY+A4StkFrp8oYTzStdwgW+e
-         o5K6lPylJLMKsMrMhwkRVwQUt4NRetfVjq5mpMK9ZdxxBjsDPZMBtpGFmuTRsWxdQO4g
-         ltDPV4sSnrogfkVl24vXLNkHxLbxQ1Henxlkk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cVu+O4vH5omtpZHli6o4+BSn/vNd8K1dVv76VMkPfw0=;
-        b=mem0doR+6x8FKxlTIsu+jHbR1PXruhTkK+8nrXwNQ0jgg7EUBjKzBlEImVTQJV43OX
-         +Xv7hI0aCzIAfsqq4S6M/mNr1iVnL6ZjEpvp01F8djDUlO+Nqd7/7aJfRqgQTF1cH95I
-         gUBZrs/xm+oP33IhR5LG0shXjxS211SXTcv6W3SJw2C4HUEZm/d4/seeld9//jdD+ee3
-         7/0TKCxzzPhBfBjb9udsmEC2466Y8wrS7Y+DLrB4ZZ14nob6VBPqNiJSFGTURZXbw731
-         8PoT9nemvPmFPQ7d9TGhVnQmQgz4ssqkcj3DEBHvYg0c4p/ki90Ezkbx5DZjApHbBpSa
-         kfew==
-X-Gm-Message-State: AOAM5337+l742QAxktU8ivz6RjDTogYICiucFrYn5aONHtSz6SSogMvJ
-        BIcP5sU+jIwEp2FRj0gY1ot/fT6mBBM1f1yyeYQ=
-X-Google-Smtp-Source: ABdhPJyM53Z3ikCRorfCVNHJLQMVTLw0CjKz0aH0X7z1r757EtbwidaTDI4NEZVqTH5yLrgidakPog==
-X-Received: by 2002:aa7:ce1a:: with SMTP id d26mr21379426edv.189.1638989427973;
-        Wed, 08 Dec 2021 10:50:27 -0800 (PST)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com. [209.85.221.48])
-        by smtp.gmail.com with ESMTPSA id h10sm2428085edj.1.2021.12.08.10.50.26
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 10:50:26 -0800 (PST)
-Received: by mail-wr1-f48.google.com with SMTP id o13so5645727wrs.12
-        for <linux-block@vger.kernel.org>; Wed, 08 Dec 2021 10:50:26 -0800 (PST)
-X-Received: by 2002:adf:e5c7:: with SMTP id a7mr580297wrn.318.1638989426416;
- Wed, 08 Dec 2021 10:50:26 -0800 (PST)
+        id S231373AbhLHT2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 14:28:38 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:36846 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229710AbhLHT2h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 14:28:37 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 258A7CE232C;
+        Wed,  8 Dec 2021 19:25:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD8FFC00446;
+        Wed,  8 Dec 2021 19:25:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638991502;
+        bh=oSILA5JRSWyhwLLRJf0zlbR7eHgbv9S0Wl5DNCBoeJk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=QwBVXpu2zThzLZ9ZvmcOFQCW4j663oc7ofJUxIBabGfhpWwOWSOlffUtk+fVU7WQI
+         wK67+yKRopTuOorBSrCEmdOD3OZzjnNvNLYcITIoYWWbFZyu35u77JzwiJAAS6ODy5
+         j/XJk/PUzKaszscbXyE9/8LehzuLvZR4wAN4gP12Aa5wZ4L4MB5Lil8IlCvHsIix78
+         XQ0NLdvvtaVPkf+342UFGQ6gaN9jcdFY7OWyryPpP6gS+hnDzuX7RAqBQrS0+DKNqQ
+         0v5a9IrOJamud6AVzFQibkcWuxPHcF3YG9XCfjvH3YW+FY3FwE5PPkJ6xWtgcy1N14
+         umdwcdgl4zATQ==
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>
+Cc:     "Rafael J . Wysocki" <rafael@kernel.org>,
+        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
+        Vaibhav Gupta <vaibhavgupta40@gmail.com>,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: [PATCH v5 0/4] block: convert to generic power management
+Date:   Wed,  8 Dec 2021 13:24:45 -0600
+Message-Id: <20211208192449.146076-1-helgaas@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org> <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
- <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net> <20211207202831.GA18361@worktop.programming.kicks-ass.net>
- <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
- <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net> <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
- <20211208184416.GY16608@worktop.programming.kicks-ass.net>
-In-Reply-To: <20211208184416.GY16608@worktop.programming.kicks-ass.net>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 8 Dec 2021 10:50:10 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
-Message-ID: <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 8, 2021 at 10:44 AM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> From testing xadd had different flags from add; I've not yet looked at
-> the SDM to see what it said on the matter.
+From: Bjorn Helgaas <bhelgaas@google.com>
 
-That should not be the case. Just checked, and it just says
+This is a repost of patches from Vaibhav to convert from legacy PCI power
+management to generic power management.  The most recent posting is here:
 
-  "The CF, PF, AF, SF, ZF, and OF flags are set according to the
-result of the addition, which is stored in the destination operand"
+  https://lore.kernel.org/all/20210114115423.52414-1-vaibhavgupta40@gmail.com/
 
-which shows that I was confused about 'xadd' - I thought it returned
-the old value in the register ("fetch_add"). It doesn't. It returns
-the new one ("add_fetch"). And then 'fetch_add' ends up undoing it by
-doing a sub or whatever.
+Vaibhav has converted around 180 drivers to generic power management, and
+over 100 of those conversions have made it upstream.  If we can finish off
+the remaining ones, we'll be able to remove quite a bit of ugly legacy code
+from the PCI core.
 
-So the actual returned value and the flags should match on x86.
+I updated the commit logs to try to make it easier to verify these.
 
-Other architectures have the "return old value" model, which does mean
-that my "different architectures can have different preferences for
-which one to test" argument was right, even if I got xadd wrong.
+I also added a couple trivial mtip32xx cleanup patches in the same area and
+changed the rsxx patch to completely drop the PM ops since the driver
+doesn't support PM at all.
 
-               Linus
+Bjorn Helgaas (3):
+  mtip32xx: remove pointless drvdata checking
+  mtip32xx: remove pointless drvdata lookups
+  rsxx: Drop PCI legacy power management
+
+Vaibhav Gupta (1):
+  mtip32xx: convert to generic power management
+
+ drivers/block/mtip32xx/mtip32xx.c | 86 ++++++++-----------------------
+ drivers/block/rsxx/core.c         |  7 ---
+ 2 files changed, 22 insertions(+), 71 deletions(-)
+
+-- 
+2.25.1
+
