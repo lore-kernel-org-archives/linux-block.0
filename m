@@ -2,85 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC55FC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 22:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF8AC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 22:59:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236539AbhLHWmD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 17:42:03 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:53220 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233943AbhLHWmD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 17:42:03 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 9D96ECE23FC;
-        Wed,  8 Dec 2021 22:38:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 973BDC00446;
-        Wed,  8 Dec 2021 22:38:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639003107;
-        bh=8fExRh+afZIO7FELL5sgjxjuaNK9bqeYqXxeg5IkSs4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JalaltZ+6ymFW1LxrO+4PKYgOp26hko3WXqHPkAmcQNFYtoBG8PSAZaRbH8B6HpZ+
-         Uo7drmbepb+Tn+Ws0IkwWIwAh4nLHkE/Y4xDqSoLSOPFDuj0E4wXaZSTPR6fBVcEnp
-         6XJ+8LaGekY6C7qe+BGVcFMwQHxgApjaxoUsVoL1qFIScAWtOTvgqnd7YviOwllZMd
-         2oBLGyR6YJXx2c0FAQI78Y8ammiV1nEaBsOcw24s/9upuxuxCySjimLSPBkUZU5izd
-         Lwtgsj/4qbmkeP4Xk4eEGp+CMD4mNTxKRRmc0vqXETe/gqeeN2TfMLk4qWbhEB3Sod
-         VdM7f6//mLrFQ==
-Date:   Wed, 8 Dec 2021 14:38:26 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
+        id S240915AbhLHXCj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 18:02:39 -0500
+Received: from mail-pj1-f43.google.com ([209.85.216.43]:41592 "EHLO
+        mail-pj1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240729AbhLHXCj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 18:02:39 -0500
+Received: by mail-pj1-f43.google.com with SMTP id gx15-20020a17090b124f00b001a695f3734aso3385929pjb.0;
+        Wed, 08 Dec 2021 14:59:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=upn5pCTEbLoqxAzE9pPLnLbRKo8NrWejD9fWmOQQq6A=;
+        b=7zMqCwD7Ixt/qAdGJHw6eGNfXKeZf+LiYnjD4bS2xXr+aFtPikIbFY5zUOlRQUcJte
+         Bl1xp4K9LOXtcVsM5+SM87h9SqoNI1sCVENx4WWbsy4ekkpZjDYNPJSOkEyuJr20C4X7
+         X38wTnhYBidQP5rzWbJY4WLZTeDumq+o1hSNI5cRFzTN28RDrm7pMecEm+/dgBkpUK2L
+         4MdB+6z1poLfhUX2+ytvZ5tgXnPkU9ggVXfYKJvVs+TcwUF0xHmi8CncMTOFJc01BMfe
+         Cw0DHAJpfW98kTrlxtFVD9LB73XXUfakOl97FPlEo4gHRtJ9L9q6xallRJPnoBFEIPYM
+         31/g==
+X-Gm-Message-State: AOAM532i3UokRhJ6SsXw/ROgzlfnnhGPsHrG0s9gcV/l/tKw1eSHp/cK
+        Kjijx2nXQjE/RKpJMfeXGYs=
+X-Google-Smtp-Source: ABdhPJzC6On7oHVJPBngf8TPLy2ERLA7zL/IiPmRnpomSCFak06QwtXDRgh7S5Y0l35e++5qLMRWfw==
+X-Received: by 2002:a17:902:c643:b0:141:cf6b:6999 with SMTP id s3-20020a170902c64300b00141cf6b6999mr63193988pls.80.1639004346367;
+        Wed, 08 Dec 2021 14:59:06 -0800 (PST)
+Received: from ?IPv6:2620:0:1000:2514:2f89:deb4:72f3:8a11? ([2620:0:1000:2514:2f89:deb4:72f3:8a11])
+        by smtp.gmail.com with ESMTPSA id mz7sm7261715pjb.7.2021.12.08.14.59.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Dec 2021 14:59:05 -0800 (PST)
+Subject: Re: [PATCH v2 5/8] docs: sysfs-block: document stable_writes
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         linux-doc@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v2 6/8] docs: sysfs-block: document virt_boundary_mask
-Message-ID: <YbEz4pq2xMfAufwJ@gmail.com>
 References: <20211208005640.102814-1-ebiggers@kernel.org>
- <20211208005640.102814-7-ebiggers@kernel.org>
- <13462e59-82f3-d6fc-a84e-2cf3083e0cc7@acm.org>
+ <20211208005640.102814-6-ebiggers@kernel.org>
+ <7d9f9469-5347-780a-c560-77fca6e7008b@acm.org> <YbEy9tKDwf5Jthl1@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <b8422f2f-b9cb-7914-b94a-559de8315371@acm.org>
+Date:   Wed, 8 Dec 2021 14:59:03 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <13462e59-82f3-d6fc-a84e-2cf3083e0cc7@acm.org>
+In-Reply-To: <YbEy9tKDwf5Jthl1@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 08, 2021 at 10:33:19AM -0800, Bart Van Assche wrote:
-> On 12/7/21 4:56 PM, Eric Biggers wrote:
-> > +What:		/sys/block/<disk>/queue/virt_boundary_mask
-> > +Date:		April 2021
-> > +Contact:	linux-block@vger.kernel.org
-> > +Description:
-> > +		[RO] This file shows the I/O segment alignment mask for the
-> > +		block device.  I/O requests to this device will be split between
-> > +		segments wherever either the end of the previous segment or the
-> > +		beginning of the current segment is not aligned to
-> > +		virt_boundary_mask + 1 bytes.
+On 12/8/21 2:34 PM, Eric Biggers wrote:
+> Yes, I meant "written out to disk" in the general sense of writeback, not in the
+> sense of when the data reaches its final destination.  I'm not sure what the
+> best way to explain it is.  I think it's more than just "the process of
+> transferring data from host memory to the device", as that is just part of a
+> write request, whereas stable_writes applies to whole requests.  How about:
 > 
-> "I/O segment alignment" looks confusing to me. My understanding is that this
-> attribute refers to the alignment of the internal data buffer boundaries and not
-> to the alignment of the offset on the storage medium. The name "virt_boundary"
-> refers to the property that if all internal boundaries are a multiple of
-> (virt_boundary_mask + 1) then an MMU with page size (virt_boundary_mask + 1) can
-> map the entire data buffer onto a contiguous range of virtual addresses. E.g.
-> RDMA adapters have an MMU that can do this. Several drivers that set this
-> attribute support a storage controller that does not have an internal MMU. As an
-> example, the NVMe core sets this mask since the NVMe specification requires that
-> only the first element in a PRP list has a non-zero offset. From the NVMe
-> specification: "PRP entries contained within a PRP List shall have a memory page
-> offset of 0h. If a second PRP entry is present within a command, it shall have a
-> memory page offset of 0h. In both cases, the entries are memory".
+> 		[RW] This file will contain '1' if memory must not be modified
+> 		while it is being used in a write request to this device.  When
+> 		this is the case and the kernel is performing writeback of a
+> 		page, the kernel will wait for writeback to complete before
+> 		allowing the page to be modified again, rather than allowing
+> 		immediate modification as is normally the case.  This
+> 		restriction arises when the device accesses the memory multiple
+> 		times where the same data must be seen every time -- for
+> 		example, once to calculate a checksum and once to actually write
+> 		the data.  If no such restriction exists, this file will contain
+> 		'0'.  This file is writable for testing purposes.
 
-Sure, I meant for it to be talking about the memory addresses.  How about this:
+The above sounds good to me.
 
-		[RO] This file shows the I/O segment memory alignment mask for
-		the block device.  I/O requests to this device will be split
-		between segments wherever either the memory address of the end
-		of the previous segment or the memory address of the beginning
-		of the current segment is not aligned to virt_boundary_mask + 1
-		bytes.
+Thanks,
 
-- Eric
+Bart.
