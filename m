@@ -2,256 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B7BAC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 05:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1912DC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  8 Dec 2021 07:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbhLHFIt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Dec 2021 00:08:49 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:56952 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbhLHFIt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 00:08:49 -0500
-Received: by mail-il1-f197.google.com with SMTP id i5-20020a056e0212c500b002a3f73c5f1dso1331494ilm.23
-        for <linux-block@vger.kernel.org>; Tue, 07 Dec 2021 21:05:18 -0800 (PST)
+        id S244595AbhLHH63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Dec 2021 02:58:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34134 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244593AbhLHH62 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Dec 2021 02:58:28 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93783C061574;
+        Tue,  7 Dec 2021 23:54:56 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id j5-20020a17090a318500b001a6c749e697so3572858pjb.1;
+        Tue, 07 Dec 2021 23:54:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=K4Osc3q+VBWbQkYh7l8AUOiu9D9jC931YuaG+3vWxJI=;
+        b=S0YBVlZoNy50MSGaguNVlkwl6JZ9/jJ8PE8I+EzGrzP/G9yJzWkC3gKohYvrb4nSdm
+         E275b7huDkqUn2BnlYjqwKvD7V200W8d9Fq8ADWVTcTV7/sMnYOo8oh9fT+C77X5Tryq
+         dRGLfcYuDiqYdxEEuAaiQ+a8DY2q7o9rOJRc63acE6QIbJd4nLCNmiGPJF85+l58Fat5
+         JqV96uKzWQSXYc6KcPLvW5y8HrRFfHVzWGxHOO0hLZrI4zoLnFt+w2Tz7GlNzIYGefHF
+         +78jKxPhlACczkXW/O9+KUiisNqTvkneaV5LHbe6HgRqsZJASsDgOBc1Vzkq7YAbt6Ue
+         EPHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=t/a2vUiotzqqgjMJvwYSkM0MlwqccHzkT5S+jPOz1Uc=;
-        b=FT/Bf+EXmHPRGxIxv3LpsG9uSRwQzG49JuluOTTe1ZQmEwRAnJBR8BS5P4zkQkJxj6
-         /c/KzhLAKzlkgUZ5W0SkelSBM0cvTtWq1lrQyPIgRJiVEc3tHAwR/ajSuJpPCKCBWYnX
-         h4PySYtRJNe6ZDj82Z9g9xaXQK0/yKyonePYJlOup0olY5/gu9PA/5sa8D4bwuxDjT81
-         8aoVtTGicfk4fbCWfPNQvTsz21FbFIBLFHDlDh4mnn5449+j9fzYLMrL266oD7jk4/zM
-         ygPliGVcqbzIS8guHyhDdaAsvJZ83eTPHIe+rm1O/8wSIRUuZjSFTBPWLzxgEkouAhM0
-         XMZA==
-X-Gm-Message-State: AOAM533/ntCmnxdouv3MB3RmAkW2GXTgUeO8pu4R5FSMNEEuO+UERGUW
-        CIhZn1BHPYa/M4tA4rnso7tKQzTRE+3C7gSl/Qk26I6WAVGZ
-X-Google-Smtp-Source: ABdhPJzsynK9xcyIHbDj8sgxe9i9xmDWyeXIkjU4BI+2jkT8BGNW2oGfAMtwdT5ZaQmBMCgxmnWRqAZ6Gz0J6Ai2N1gurX8fIiyk
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=K4Osc3q+VBWbQkYh7l8AUOiu9D9jC931YuaG+3vWxJI=;
+        b=mFcCKDYlMGb/PEnthxl3J1TZ2fKd55QxNYR+Y41OU71ZyT9kLelHCGHG6HdL8zEm1z
+         kih8O9FyAoU/72bGWFNGaqiyQnFwmDCnSis21Xy8wcmjaa2ZbIgOR8wbKULKsmHRk4To
+         F5Ddo/wvFog2X5HeCfMel92gWOud9PQX3iO7+y/zKlDd3a12Ffrbsb3vnZnpe+6CJ2Rt
+         qlTaKwTa5pYxm58ddeGQiedXe1ghjdSqIbr6O7kxyb7h23WIsC4pIqocHvW8AlXeKsSj
+         S/pn1YmauyZaC0SQXNxjFOsNINzughJIrqSFPUo4o7/s4HgV5UnFpaV5nZbmngn10tto
+         5vEw==
+X-Gm-Message-State: AOAM533w9qexlxIGHzemDm028aqEPoEpia3/2esT6/Fc5oOFHIrR5bTw
+        +AOj5Q7tlpoarY0xltTSVlA=
+X-Google-Smtp-Source: ABdhPJz8m6DjDz9mzLD1b6n3QNRvChd8+Ms915++fQFXWshCyjx5qaNHaFhdLmKYAnUW3QMxHKW82g==
+X-Received: by 2002:a17:902:c713:b0:141:bbb2:1ec7 with SMTP id p19-20020a170902c71300b00141bbb21ec7mr57721343plp.57.1638950096205;
+        Tue, 07 Dec 2021 23:54:56 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id m13sm1710195pgt.22.2021.12.07.23.54.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 23:54:55 -0800 (PST)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: luo.penghao@zte.com.cn
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luo penghao <luo.penghao@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH linux-next] loop: Remove redundant assignments and parentheses
+Date:   Wed,  8 Dec 2021 07:54:52 +0000
+Message-Id: <20211208075452.404867-1-luo.penghao@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1906:: with SMTP id w6mr4228685ilu.192.1638939917936;
- Tue, 07 Dec 2021 21:05:17 -0800 (PST)
-Date:   Tue, 07 Dec 2021 21:05:17 -0800
-In-Reply-To: <0000000000007f2f5405d1bfe618@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009debe105d29b6fb4@google.com>
-Subject: Re: [syzbot] possible deadlock in blkdev_put (2)
-From:   syzbot <syzbot+643e4ce4b6ad1347d372@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+From: luo penghao <luo.penghao@zte.com.cn>
 
-HEAD commit:    04fe99a8d936 Add linux-next specific files for 20211207
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1315e2b9b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4589399873466942
-dashboard link: https://syzkaller.appspot.com/bug?extid=643e4ce4b6ad1347d372
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11bb96ceb00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15ad1badb00000
+The assignment of node has been done during initialization, and
+the parentheses are meaningless according to the priority.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+643e4ce4b6ad1347d372@syzkaller.appspotmail.com
+drivers/block/loop.c:1001:19: warning
+Value stored to 'node' during its initialization is never read
 
-======================================================
-WARNING: possible circular locking dependency detected
-5.16.0-rc4-next-20211207-syzkaller #0 Not tainted
-------------------------------------------------------
-systemd-udevd/7081 is trying to acquire lock:
-ffff88802358c938 ((wq_completion)loop3){+.+.}-{0:0}, at: flush_workqueue+0xe1/0x15b0 kernel/workqueue.c:2835
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: luo penghao <luo.penghao@zte.com.cn>
+---
+ drivers/block/loop.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-but task is already holding lock:
-ffff88801a57a118 (&disk->open_mutex){+.+.}-{3:3}, at: blkdev_put+0x99/0x980 block/bdev.c:907
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index dfc72a1..0b74cbe 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -985,7 +985,7 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
+ 
+ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ {
+-	struct rb_node **node = &(lo->worker_tree.rb_node), *parent = NULL;
++	struct rb_node **node = &lo->worker_tree.rb_node, *parent = NULL;
+ 	struct loop_worker *cur_worker, *worker = NULL;
+ 	struct work_struct *work;
+ 	struct list_head *cmd_list;
+@@ -995,8 +995,6 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 	if (queue_on_root_worker(cmd->blkcg_css))
+ 		goto queue_work;
+ 
+-	node = &lo->worker_tree.rb_node;
+-
+ 	while (*node) {
+ 		parent = *node;
+ 		cur_worker = container_of(*node, struct loop_worker, rb_node);
+-- 
+2.15.2
 
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #6 (&disk->open_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:607 [inline]
-       __mutex_lock+0x12f/0x12f0 kernel/locking/mutex.c:740
-       blkdev_get_by_dev.part.0+0x40e/0xc70 block/bdev.c:809
-       blkdev_get_by_dev+0x6b/0x80 block/bdev.c:852
-       swsusp_check+0x97/0x2f0 kernel/power/swap.c:1520
-       software_resume.part.0+0x102/0x1f0 kernel/power/hibernate.c:979
-       software_resume kernel/power/hibernate.c:86 [inline]
-       resume_store+0x161/0x190 kernel/power/hibernate.c:1181
-       kobj_attr_store+0x50/0x80 lib/kobject.c:856
-       sysfs_kf_write+0x110/0x160 fs/sysfs/file.c:136
-       kernfs_fop_write_iter+0x342/0x500 fs/kernfs/file.c:296
-       call_write_iter include/linux/fs.h:2079 [inline]
-       new_sync_write+0x429/0x660 fs/read_write.c:503
-       vfs_write+0x7cd/0xae0 fs/read_write.c:590
-       ksys_write+0x12d/0x250 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #5 (system_transition_mutex/1){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:607 [inline]
-       __mutex_lock+0x12f/0x12f0 kernel/locking/mutex.c:740
-       software_resume.part.0+0x19/0x1f0 kernel/power/hibernate.c:934
-       software_resume kernel/power/hibernate.c:86 [inline]
-       resume_store+0x161/0x190 kernel/power/hibernate.c:1181
-       kobj_attr_store+0x50/0x80 lib/kobject.c:856
-       sysfs_kf_write+0x110/0x160 fs/sysfs/file.c:136
-       kernfs_fop_write_iter+0x342/0x500 fs/kernfs/file.c:296
-       call_write_iter include/linux/fs.h:2079 [inline]
-       new_sync_write+0x429/0x660 fs/read_write.c:503
-       vfs_write+0x7cd/0xae0 fs/read_write.c:590
-       ksys_write+0x12d/0x250 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #4 (&of->mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:607 [inline]
-       __mutex_lock+0x12f/0x12f0 kernel/locking/mutex.c:740
-       kernfs_seq_start+0x4b/0x260 fs/kernfs/file.c:112
-       seq_read_iter+0x2c7/0x1240 fs/seq_file.c:225
-       kernfs_fop_read_iter+0x44f/0x5f0 fs/kernfs/file.c:241
-       call_read_iter include/linux/fs.h:2073 [inline]
-       new_sync_read+0x421/0x6e0 fs/read_write.c:400
-       vfs_read+0x35c/0x600 fs/read_write.c:481
-       ksys_read+0x12d/0x250 fs/read_write.c:619
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #3 (&p->lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:607 [inline]
-       __mutex_lock+0x12f/0x12f0 kernel/locking/mutex.c:740
-       seq_read_iter+0xdf/0x1240 fs/seq_file.c:182
-       call_read_iter include/linux/fs.h:2073 [inline]
-       generic_file_splice_read+0x453/0x6d0 fs/splice.c:311
-       do_splice_to+0x1bf/0x250 fs/splice.c:796
-       splice_direct_to_actor+0x2c2/0x8c0 fs/splice.c:870
-       do_splice_direct+0x1b3/0x280 fs/splice.c:979
-       do_sendfile+0xaf2/0x1250 fs/read_write.c:1245
-       __do_sys_sendfile64 fs/read_write.c:1310 [inline]
-       __se_sys_sendfile64 fs/read_write.c:1296 [inline]
-       __x64_sys_sendfile64+0x1cc/0x210 fs/read_write.c:1296
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #2 (sb_writers#3){.+.+}-{0:0}:
-       percpu_down_read include/linux/percpu-rwsem.h:51 [inline]
-       __sb_start_write include/linux/fs.h:1727 [inline]
-       sb_start_write include/linux/fs.h:1797 [inline]
-       file_start_write include/linux/fs.h:2942 [inline]
-       lo_write_bvec drivers/block/loop.c:242 [inline]
-       lo_write_simple drivers/block/loop.c:265 [inline]
-       do_req_filebacked drivers/block/loop.c:494 [inline]
-       loop_handle_cmd drivers/block/loop.c:1846 [inline]
-       loop_process_work+0x1499/0x1db0 drivers/block/loop.c:1886
-       process_one_work+0x9b2/0x1690 kernel/workqueue.c:2318
-       worker_thread+0x658/0x11f0 kernel/workqueue.c:2465
-       kthread+0x405/0x4f0 kernel/kthread.c:345
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
--> #1 ((work_completion)(&lo->rootcg_work)){+.+.}-{0:0}:
-       process_one_work+0x921/0x1690 kernel/workqueue.c:2294
-       worker_thread+0x658/0x11f0 kernel/workqueue.c:2465
-       kthread+0x405/0x4f0 kernel/kthread.c:345
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
--> #0 ((wq_completion)loop3){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3063 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3186 [inline]
-       validate_chain kernel/locking/lockdep.c:3801 [inline]
-       __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5027
-       lock_acquire kernel/locking/lockdep.c:5637 [inline]
-       lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5602
-       flush_workqueue+0x110/0x15b0 kernel/workqueue.c:2838
-       drain_workqueue+0x1a5/0x3c0 kernel/workqueue.c:3003
-       destroy_workqueue+0x71/0x800 kernel/workqueue.c:4440
-       __loop_clr_fd+0x1ab/0xe20 drivers/block/loop.c:1118
-       lo_release+0x1ac/0x1f0 drivers/block/loop.c:1750
-       blkdev_put_whole block/bdev.c:694 [inline]
-       blkdev_put+0x2de/0x980 block/bdev.c:949
-       blkdev_close+0x6a/0x80 block/fops.c:516
-       __fput+0x286/0x9f0 fs/file_table.c:311
-       task_work_run+0xdd/0x1a0 kernel/task_work.c:164
-       tracehook_notify_resume include/linux/tracehook.h:189 [inline]
-       exit_to_user_mode_loop kernel/entry/common.c:175 [inline]
-       exit_to_user_mode_prepare+0x27e/0x290 kernel/entry/common.c:207
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
-       syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
-       do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
-Chain exists of:
-  (wq_completion)loop3 --> system_transition_mutex/1 --> &disk->open_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&disk->open_mutex);
-                               lock(system_transition_mutex/1);
-                               lock(&disk->open_mutex);
-  lock((wq_completion)loop3);
-
- *** DEADLOCK ***
-
-1 lock held by systemd-udevd/7081:
- #0: ffff88801a57a118 (&disk->open_mutex){+.+.}-{3:3}, at: blkdev_put+0x99/0x980 block/bdev.c:907
-
-stack backtrace:
-CPU: 1 PID: 7081 Comm: systemd-udevd Not tainted 5.16.0-rc4-next-20211207-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2143
- check_prev_add kernel/locking/lockdep.c:3063 [inline]
- check_prevs_add kernel/locking/lockdep.c:3186 [inline]
- validate_chain kernel/locking/lockdep.c:3801 [inline]
- __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5027
- lock_acquire kernel/locking/lockdep.c:5637 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5602
- flush_workqueue+0x110/0x15b0 kernel/workqueue.c:2838
- drain_workqueue+0x1a5/0x3c0 kernel/workqueue.c:3003
- destroy_workqueue+0x71/0x800 kernel/workqueue.c:4440
- __loop_clr_fd+0x1ab/0xe20 drivers/block/loop.c:1118
- lo_release+0x1ac/0x1f0 drivers/block/loop.c:1750
- blkdev_put_whole block/bdev.c:694 [inline]
- blkdev_put+0x2de/0x980 block/bdev.c:949
- blkdev_close+0x6a/0x80 block/fops.c:516
- __fput+0x286/0x9f0 fs/file_table.c:311
- task_work_run+0xdd/0x1a0 kernel/task_work.c:164
- tracehook_notify_resume include/linux/tracehook.h:189 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:175 [inline]
- exit_to_user_mode_prepare+0x27e/0x290 kernel/entry/common.c:207
- __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
- syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
- do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f5387c2b270
-Code: 73 01 c3 48 8b 0d 38 7d 20 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 59 c1 20 00 00 75 10 b8 03 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 ee fb ff ff 48 89 04 24
-RSP: 002b:00007ffce06abcb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000007 RCX: 00007f5387c2b270
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000007
-RBP: 00007f5388ae5710 R08: 00005621f86a7af0 R09: 00005621f86b5700
-R10: 00007f5388ae58c0 R11: 0000000000000246 R12: 0000000000000000
-R13: 00005621f86a3e40 R14: 0000000000000003 R15: 000000000000000e
- </TASK>
-I/O error, dev loop2, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-I/O error, dev loop2, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-I/O error, dev loop2, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-Buffer I/O error on dev loop2, logical block 0, async page read
-I/O error, dev loop3, sector 1 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-Buffer I/O error on dev loop3, logical block 1, async page read
-I/O error, dev loop3, sector 1 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-Buffer I/O error on dev loop3, logical block 1, async page read
 
