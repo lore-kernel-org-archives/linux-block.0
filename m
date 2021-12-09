@@ -2,70 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2ACBC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  9 Dec 2021 19:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81220C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  9 Dec 2021 21:38:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbhLITDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Dec 2021 14:03:54 -0500
-Received: from mail-pl1-f177.google.com ([209.85.214.177]:33581 "EHLO
-        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbhLITDy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 14:03:54 -0500
-Received: by mail-pl1-f177.google.com with SMTP id y7so4642088plp.0;
-        Thu, 09 Dec 2021 11:00:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Y5WLCqS4oNc0B1PWaXC9NLJsjv2DgMhZyXGdTfRBzWA=;
-        b=LyW0qtm5fHCIOCDe7nPNj5ZjkFLZqqwz/5bRzOoGpVBWHJn4c03s9zMoNKxOtawmtN
-         ZbmFQgSkFIdXM4I/xYbhYixNXnXgrajeJ0J1RkPPdzq1Y/UePnpmKZUqRGtTorvVS0tE
-         kAKTvZJpuKHSCdblRK17DP1vtkUtyNrgvKgQdZ7UVhlGo+PfE5wfXKijoj+rZ7YsMs/d
-         Ojl7cqcYWzHHkh+TBq0/QF1256cnMo8RjpTrkBsHiKsYhe3VWtZu9lieJKbZkBxqZqJ+
-         zTF00mBmZDCS1p9z0pGeBhfUVw514Z2M6oQhhR1tnedRc1WB0C8KdDecGPi7U54qJr++
-         h5OQ==
-X-Gm-Message-State: AOAM531+6PTZtOhxgakZZAXrjjHsmC0NFiAUghEfHDckpkYFxlF9aok3
-        q5e9dk5sUKUzsbaNBYcxuMY=
-X-Google-Smtp-Source: ABdhPJyRCWX4C0QwOJfqX18IofvfAJ4UX5G4Sj9+JeujP7WTbWENzrXr2tworBPXvHqHktjeVgu94A==
-X-Received: by 2002:a17:903:22c4:b0:141:deda:a744 with SMTP id y4-20020a17090322c400b00141dedaa744mr70258352plg.25.1639076420392;
-        Thu, 09 Dec 2021 11:00:20 -0800 (PST)
-Received: from ?IPv6:2620:0:1000:2514:4f5b:f494:7264:b4d4? ([2620:0:1000:2514:4f5b:f494:7264:b4d4])
-        by smtp.gmail.com with ESMTPSA id h8sm359669pgj.26.2021.12.09.11.00.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 11:00:19 -0800 (PST)
-Subject: Re: [PATCH v3 1/3] block: simplify calling convention of
- elv_unregister_queue()
-To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-mmc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Hannes Reinecke <hare@suse.de>
-References: <20211208013534.136590-1-ebiggers@kernel.org>
- <20211208013534.136590-2-ebiggers@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <ddb37191-c838-2c45-6a9e-a8eb02d18e8b@acm.org>
-Date:   Thu, 9 Dec 2021 11:00:17 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S231417AbhLIVln (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Dec 2021 16:41:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229505AbhLIVlm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 16:41:42 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE84C061746;
+        Thu,  9 Dec 2021 13:38:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=P2aQ91d+0Nay119c7Hm3YaZibGVAqClk58OZHKt3Xl4=; b=cnU75D1qm7eep+zg67cBjnjU5u
+        lEicByKXRIZocx5wZq6zz69Ru+PEst/T/YMAfJlX9bjLZTJ8RFLbUZKTb7yq0FGSeTxuxDF318g3Y
+        8bDeqcD4guFJ52AXIO0Ol8Ursu1fyiEL9Fp/krOOOBTH3HOk2GMcRtjxSB5RzR8ZNL9nkRwlqzYVQ
+        J45nCMz4FrZPTnutzDjny73jdO6DYA3AS5OPoFC1bjbRmniOLrddvCkhqnTDaOBBoaMPlby6StiVt
+        aI9kKhleNDxAgoxqQbGxfIEGg2Hmgi85JF43BUH+QueHj7/+g31cgvjKM0v661QxPAY3HpdxM6Xws
+        eNT/Cpag==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mvR75-009kVO-PD; Thu, 09 Dec 2021 21:38:04 +0000
+Date:   Thu, 9 Dec 2021 21:38:03 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     "Darrick J . Wong " <djwong@kernel.org>
+Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 19/28] iomap: Convert __iomap_zero_iter to use a folio
+Message-ID: <YbJ3O1qf+9p/HWka@casper.infradead.org>
+References: <20211108040551.1942823-1-willy@infradead.org>
+ <20211108040551.1942823-20-willy@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20211208013534.136590-2-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211108040551.1942823-20-willy@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/7/21 5:35 PM, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Make elv_unregister_queue() a no-op if q->elevator is NULL or is not
-> registered.
-> 
-> This simplifies the existing callers, as well as the future caller in
-> the error path of blk_register_queue().
-> 
-> Also don't bother checking whether q is NULL, since it never is.
+On Mon, Nov 08, 2021 at 04:05:42AM +0000, Matthew Wilcox (Oracle) wrote:
+> +++ b/fs/iomap/buffered-io.c
+> @@ -881,17 +881,20 @@ EXPORT_SYMBOL_GPL(iomap_file_unshare);
+>  
+>  static s64 __iomap_zero_iter(struct iomap_iter *iter, loff_t pos, u64 length)
+>  {
+> +	struct folio *folio;
+>  	struct page *page;
+>  	int status;
+> -	unsigned offset = offset_in_page(pos);
+> -	unsigned bytes = min_t(u64, PAGE_SIZE - offset, length);
+> +	size_t offset, bytes;
+>  
+> -	status = iomap_write_begin(iter, pos, bytes, &page);
+> +	status = iomap_write_begin(iter, pos, length, &page);
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+This turned out to be buggy.  Darrick and I figured out why his tests
+were failing and mine weren't; this only shows up with a 4kB block
+size filesystem and I was only testing with 1kB block size filesystems.
+(at least on x86; I haven't figured out why it passes with 1kB block size
+filesystems, so I'm not sure what would be true on other filesystems).
+iomap_write_begin() is not prepared to deal with a length that spans a
+page boundary.  So I'm replacing this patch with the following patches
+(whitespace damaged; pick them up from
+https://git.infradead.org/users/willy/linux.git/tag/refs/tags/iomap-folio-5.17c
+if you want to compile them):
+
+commit 412212960b72
+Author: Matthew Wilcox (Oracle) <willy@infradead.org>
+Date:   Thu Dec 9 15:47:44 2021 -0500
+
+    iomap: Allow iomap_write_begin() to be called with the full length
+
+    In the future, we want write_begin to know the entire length of the
+    write so that it can choose to allocate large folios.  Pass the full
+    length in from __iomap_zero_iter() and limit it where necessary.
+
+    Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+
+diff --git a/fs/gfs2/bmap.c b/fs/gfs2/bmap.c
+index d67108489148..9270db17c435 100644
+--- a/fs/gfs2/bmap.c
++++ b/fs/gfs2/bmap.c
+@@ -968,6 +968,9 @@ static int gfs2_iomap_page_prepare(struct inode *inode, loff_t pos,
+        struct gfs2_sbd *sdp = GFS2_SB(inode);
+        unsigned int blocks;
+
++       /* gfs2 does not support large folios yet */
++       if (len > PAGE_SIZE)
++               len = PAGE_SIZE;
+        blocks = ((pos & blockmask) + len + blockmask) >> inode->i_blkbits;
+        return gfs2_trans_begin(sdp, RES_DINODE + blocks, 0);
+ }
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 8d7a67655b60..67fcd3b9928d 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -632,6 +632,8 @@ static int iomap_write_begin(const struct iomap_iter *iter, loff_t pos,
+                goto out_no_page;
+        }
+        folio = page_folio(page);
++       if (pos + len > folio_pos(folio) + folio_size(folio))
++               len = folio_pos(folio) + folio_size(folio) - pos;
+
+        if (srcmap->type == IOMAP_INLINE)
+                status = iomap_write_begin_inline(iter, page);
+@@ -891,16 +893,19 @@ static s64 __iomap_zero_iter(struct iomap_iter *iter, loff
+_t pos, u64 length)
+        struct page *page;
+        int status;
+        unsigned offset = offset_in_page(pos);
+-       unsigned bytes = min_t(u64, PAGE_SIZE - offset, length);
+
+-       status = iomap_write_begin(iter, pos, bytes, &page);
++       if (length > UINT_MAX)
++               length = UINT_MAX;
++       status = iomap_write_begin(iter, pos, length, &page);
+        if (status)
+                return status;
++       if (length > PAGE_SIZE - offset)
++               length = PAGE_SIZE - offset;
+
+-       zero_user(page, offset, bytes);
++       zero_user(page, offset, length);
+        mark_page_accessed(page);
+
+-       return iomap_write_end(iter, pos, bytes, bytes, page);
++       return iomap_write_end(iter, pos, length, length, page);
+ }
+
+ static loff_t iomap_zero_iter(struct iomap_iter *iter, bool *did_zero)
+
+
+commit 78c747a1b3a1
+Author: Matthew Wilcox (Oracle) <willy@infradead.org>
+Date:   Fri Nov 5 14:24:09 2021 -0400
+
+    iomap: Convert __iomap_zero_iter to use a folio
+    
+    The zero iterator can work in folio-sized chunks instead of page-sized
+    chunks.  This will save a lot of page cache lookups if the file is cached
+    in large folios.
+    
+    Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 67fcd3b9928d..bbde6d4f27cd 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -890,20 +890,23 @@ EXPORT_SYMBOL_GPL(iomap_file_unshare);
+ 
+ static s64 __iomap_zero_iter(struct iomap_iter *iter, loff_t pos, u64 length)
+ {
++       struct folio *folio;
+        struct page *page;
+        int status;
+-       unsigned offset = offset_in_page(pos);
++       size_t offset;
+ 
+        if (length > UINT_MAX)
+                length = UINT_MAX;
+        status = iomap_write_begin(iter, pos, length, &page);
+        if (status)
+                return status;
+-       if (length > PAGE_SIZE - offset)
+-               length = PAGE_SIZE - offset;
++       folio = page_folio(page);
+ 
+-       zero_user(page, offset, length);
+-       mark_page_accessed(page);
++       offset = offset_in_folio(folio, pos);
++       if (length > folio_size(folio) - offset)
++               length = folio_size(folio) - offset;
++       folio_zero_range(folio, offset, length);
++       folio_mark_accessed(folio);
+ 
+        return iomap_write_end(iter, pos, length, length, page);
+ }
+
+
+The xfstests that Darrick identified as failing all passed.  Running a
+full sweep now; then I'll re-run with a 1kB filesystem to be sure that
+still passes.  Then I'll send another pull request.
