@@ -2,92 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEAC2C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 00:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CE0C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 02:03:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234861AbhLJA3y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Dec 2021 19:29:54 -0500
-Received: from smtp.hosts.co.uk ([85.233.160.19]:15643 "EHLO smtp.hosts.co.uk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234860AbhLJA3y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Dec 2021 19:29:54 -0500
-X-Greylist: delayed 18332 seconds by postgrey-1.27 at vger.kernel.org; Thu, 09 Dec 2021 19:29:54 EST
-Received: from host81-132-12-162.range81-132.btcentralplus.com ([81.132.12.162] helo=[192.168.1.218])
-        by smtp.hosts.co.uk with esmtpa (Exim)
-        (envelope-from <antlists@youngman.org.uk>)
-        id 1mvOIK-0002D4-EG; Thu, 09 Dec 2021 18:37:29 +0000
-Message-ID: <8f24c6f7-1799-e318-1b6c-e54083229b8b@youngman.org.uk>
-Date:   Thu, 9 Dec 2021 18:37:26 +0000
+        id S235718AbhLJCG7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Dec 2021 21:06:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31940 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231148AbhLJCG6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Dec 2021 21:06:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639101804;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1777qpxXy+ZqI8dbPbWtlD5bwoogfer6ZBV0Xkzt0Ts=;
+        b=Fw0++REutrax2R4E5woi1D/9qh+8AMtaFxe+p0n3IYI6TowcoTjyNn0DI83BqoDq4VBdX4
+        4s0yYnJjbS567G6rD0doEP393eAtAgh9J2fGRBFjZ77AbY0VLybzskI1iARoK/uZ4GNjRn
+        64dJcR1l9tlyPWzhBQ/vYYzYupLVBUU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-13-ehU7CmpdOeaaqgsc8xHoqA-1; Thu, 09 Dec 2021 21:03:21 -0500
+X-MC-Unique: ehU7CmpdOeaaqgsc8xHoqA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 728AD1006AA0;
+        Fri, 10 Dec 2021 02:03:19 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DF8260BF1;
+        Fri, 10 Dec 2021 02:02:56 +0000 (UTC)
+Date:   Fri, 10 Dec 2021 10:02:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 3/5] blk-mq: add helper of blk_mq_global_quiesce_wait()
+Message-ID: <YbK1TLTkHrut1FJ+@T590>
+References: <20211119021849.2259254-1-ming.lei@redhat.com>
+ <20211119021849.2259254-4-ming.lei@redhat.com>
+ <8f6b6452-9abb-fd89-0262-9fb9d00d42a5@grimberg.me>
+ <YZuagPbZJ6CjiUNi@T590>
+ <38b9661e-c5b8-ae18-f2ab-b30f9d3e7115@grimberg.me>
+ <YZwzEBtFug6JEmMZ@T590>
+ <a3ea006a-738b-af69-4dd5-f33444e3559d@grimberg.me>
+ <YaWNZF3ZYWPQBSbk@T590>
+ <4394200f-782b-5d75-4570-79a1f63110b1@grimberg.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Subject: Re: [PATCH v3 3/6] badblocks: improvement badblocks_set() for
- multiple ranges handling
-Content-Language: en-US
-To:     Geliang Tang <geliang.tang@suse.com>, Coly Li <colyli@suse.de>
-Cc:     nvdimm@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Jens Axboe <axboe@kernel.dk>, NeilBrown <neilb@suse.de>,
-        Vishal L Verma <vishal.l.verma@intel.com>
-References: <20211202125245.76699-1-colyli@suse.de>
- <20211202125245.76699-4-colyli@suse.de>
- <20211209072859.GB26976@dhcp-10-157-36-190>
-From:   Wols Lists <antlists@youngman.org.uk>
-In-Reply-To: <20211209072859.GB26976@dhcp-10-157-36-190>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4394200f-782b-5d75-4570-79a1f63110b1@grimberg.me>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/12/2021 07:28, Geliang Tang wrote:
-> On Thu, Dec 02, 2021 at 08:52:41PM +0800, Coly Li wrote:
->> Recently I received a bug report that current badblocks code does not
+On Wed, Dec 08, 2021 at 02:49:25PM +0200, Sagi Grimberg wrote:
+> 
+> 
+> On 11/30/21 4:33 AM, Ming Lei wrote:
+> > On Tue, Nov 23, 2021 at 11:00:45AM +0200, Sagi Grimberg wrote:
+> > > 
+> > > > > > > > Add helper of blk_mq_global_quiesce_wait() for supporting to quiesce
+> > > > > > > > queues in parallel, then we can just wait once if global quiesce wait
+> > > > > > > > is allowed.
+> > > > > > > 
+> > > > > > > blk_mq_global_quiesce_wait() is a poor name... global is scope-less and
+> > > > > > > obviously it has a scope.
+> > > > > > 
+> > > > > > How about blk_mq_shared_quiesce_wait()? or any suggestion?
+> > > > > 
+> > > > > Shared between what?
+> > > > 
+> > > > All request queues in one host-wide, both scsi and nvme has such
+> > > > requirement.
+> > > > 
+> > > > > 
+> > > > > Maybe if the queue has a non-blocking tagset, it can have a "quiesced"
+> > > > > flag that is cleared in unquiesce? then the callers can just continue
+> > > > > to iterate but will only wait the rcu grace period once.
+> > > > 
+> > > > Yeah, that is what these patches try to implement.
+> > > 
+> > > I was suggesting to "hide" it in the interface.
+> > > Maybe something like:
+> > > --
+> > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > index 8799fa73ef34..627b631db1f9 100644
+> > > --- a/block/blk-mq.c
+> > > +++ b/block/blk-mq.c
+> > > @@ -263,14 +263,18 @@ void blk_mq_wait_quiesce_done(struct request_queue *q)
+> > >          unsigned int i;
+> > >          bool rcu = false;
+> > > 
+> > > +       if (!q->has_srcu && q->quiesced)
+> > > +               return;
+> > >          queue_for_each_hw_ctx(q, hctx, i) {
+> > >                  if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > >                          synchronize_srcu(hctx->srcu);
+> > >                  else
+> > >                          rcu = true;
+> > >          }
+> > > -       if (rcu)
+> > > +       if (rcu) {
+> > >                  synchronize_rcu();
+> > > +               q->quiesced = true;
+> > > +       }
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(blk_mq_wait_quiesce_done);
+> > > 
+> > > @@ -308,6 +312,7 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+> > >          } else if (!--q->quiesce_depth) {
+> > >                  blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+> > >                  run_queue = true;
+> > > +               q->quiesced = false;
+> > 
+> > Different request queues are passed to blk_mq_wait_quiesce_done() during
+> > the iteration, so marking 'quiesced' doesn't make any difference here.
+> 
+> I actually meant q->tag_set->quiesced, such that the flag will be
+> used in the tag_set reference. This way this sharing will be kept
+> hidden from the callers.
 
-> 
->> + *        +--------+----+
->> + *        |    S   | E  |
->> + *        +--------+----+
->> + * 2.2) The setting range size == already set range size
->> + * 2.2.1) If S and E are both acked or unacked range, the setting range S can
->> + *    be merged into existing bad range E. The result is,
->> + *        +-------------+
->> + *        |      S      |
->> + *        +-------------+
->> + * 2.2.2) If S is uncked setting and E is acked, the setting will be denied, and
-> 
-> uncked -> unacked
-> 
->> + *    the result is,
->> + *        +-------------+
->> + *        |      E      |
->> + *        +-------------+
->> + * 2.2.3) If S is acked setting and E is unacked, range S can overwirte all of
+That looks easy, but not true really from API viewpoint, q->tag_set has different
+lifetime which is covered by driver, not mention other request queues may touch
+q->tag_set->quiesced from other code path, so things will become much complicated,
+also what is the meaning of quiesced state for tagset wide?
 
-overwirte -> overwrite
+Here I prefer to philosophy of 'Worse is better'[1], and simplicity over perfection
+by adding one simple helper of blk_mq_shared_quiesce_wait() for improving the case
+very easily.
 
->> +      bad blocks range E. The result is,
->> + *        +-------------+
->> + *        |      S      |
->> + *        +-------------+
->> + * 2.3) The setting range size > already set range size
->> + *        +-------------------+
->> + *        |          S        |
->> + *        +-------------------+
->> + *        +-------------+
->> + *        |      E      |
->> + *        +-------------+
->> + *    For such situation, the setting range S can be treated as two parts, the
->> + *    first part (S1) is as same size as the already set range E, the second
->> + *    part (S2) is the rest of setting range.
->> + *        +-------------+-----+        +-------------+       +-----+
->> + *        |    S1       | S2  |        |     S1      |       | S2  |
->> + *        +-------------+-----+  ===>  +-------------+       +-----+
->> + *        +-------------+              +-------------+
->> + *        |      E      |              |      E      |
->> + *        +-------------+              +-------------+
->> + *    Now we only focus on how to handle the setting range S1 and already set
->> + *    range E, which are already explained in 1.2), for the rest S2 it will be
-> 
-Cheers,
-Wol
+[1] ihttps://ipfs.fleek.co/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/Unix_philosophy.html
+
+
+Thanks,
+Ming
+
