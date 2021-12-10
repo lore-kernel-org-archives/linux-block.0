@@ -2,96 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21675C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 10:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF5EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 11:35:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236965AbhLJLAu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 06:00:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233200AbhLJLAu (ORCPT
+        id S240582AbhLJLjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 06:39:11 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:29177 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235161AbhLJLjL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 06:00:50 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBF9C061746;
-        Fri, 10 Dec 2021 02:57:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OsOjeqiwkNxCtbDHziimwLseQVWVs4KvQXBDBXX7iTs=; b=TZEtFFzFTNNvMMb3H+Z3Fil3Z7
-        DorNuCP8VxmyH2bxGRLBzv5+0Epaf8fDRIQu4SwfR97UssQkEk8pIPTwchhoSN6RsB00B2c1frMBF
-        JhiQbKmt4cmAuceGle1iiWpjmwAKZ1IlvBPSeFvsZmxHw529zs0uJ4WKqvsTOTV9xQ1GHuKjkr0dh
-        +suDZns4j/q7zGT60+nWerCFlihD2yeR6vJZL+ht7V2XEk160bVD9keLl4Hi1HZRvIwx0Vu0hsVZS
-        ftC1JKMw3HrOQUFH0bsTktbaLC4USq241E4RemRMFVulnXSohfCMW9y1JIcZqUvxM9zHUV29Fo1p1
-        sROF1Zog==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvdaR-00AFr6-Li; Fri, 10 Dec 2021 10:57:12 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 74F6830026A;
-        Fri, 10 Dec 2021 11:57:11 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 60C142B2FBDFB; Fri, 10 Dec 2021 11:57:11 +0100 (CET)
-Date:   Fri, 10 Dec 2021 11:57:11 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: switch to atomic_t for request references
-Message-ID: <YbMyh6YBs9t8Pate@hirez.programming.kicks-ass.net>
-References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
- <Ya2zfVAwh4aQ7KVd@infradead.org>
- <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
- <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
- <20211207202831.GA18361@worktop.programming.kicks-ass.net>
- <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
- <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
- <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
- <20211208184416.GY16608@worktop.programming.kicks-ass.net>
- <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
+        Fri, 10 Dec 2021 06:39:11 -0500
+Received: from canpemm500008.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J9TLG4PYwz8whn;
+        Fri, 10 Dec 2021 19:33:26 +0800 (CST)
+Received: from localhost.huawei.com (10.175.124.27) by
+ canpemm500008.china.huawei.com (7.192.105.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 10 Dec 2021 19:35:33 +0800
+From:   Li Jinlin <lijinlin3@huawei.com>
+To:     <song@kernel.org>, <philipp.reisner@linbit.com>,
+        <lars.ellenberg@linbit.com>, <axboe@kernel.dk>, <hare@suse.de>,
+        <jack@suse.cz>, <ming.lei@redhat.com>, <tj@kernel.org>,
+        <mcgrof@kernel.org>
+CC:     <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linfeilong@huawei.com>
+Subject: [PATCH v3 0/3] Fix undefined behaviour during device synchronization
+Date:   Fri, 10 Dec 2021 20:06:28 +0800
+Message-ID: <20211210120631.2578505-1-lijinlin3@huawei.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500008.china.huawei.com (7.192.105.151)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 08, 2021 at 10:50:10AM -0800, Linus Torvalds wrote:
-> On Wed, Dec 8, 2021 at 10:44 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> >
-> > From testing xadd had different flags from add; I've not yet looked at
-> > the SDM to see what it said on the matter.
-> 
-> That should not be the case. Just checked, and it just says
-> 
->   "The CF, PF, AF, SF, ZF, and OF flags are set according to the
-> result of the addition, which is stored in the destination operand"
-> 
-> which shows that I was confused about 'xadd' - I thought it returned
-> the old value in the register ("fetch_add"). It doesn't. It returns
-> the new one ("add_fetch"). And then 'fetch_add' ends up undoing it by
-> doing a sub or whatever.
-> 
-> So the actual returned value and the flags should match on x86.
-> 
-> Other architectures have the "return old value" model, which does mean
-> that my "different architectures can have different preferences for
-> which one to test" argument was right, even if I got xadd wrong.
+md/drbd drivers use 'signed int' variable to track sync vs non-sync IO,
+and judge whether sync IO needs to be throttled by signed comparison.
+If the value of the variable is greater than INT_MAX or close to
+INT_MAX, some undefined behavior may occur.
 
-I think XADD does return old too; SDM states:
+Fix by using 64bit signed integer type.
 
-"Exchanges the first operand (destination operand) with the second
-operand (source operand), then loads the sum of the two values into the
-destination operand. The destination operand can be a register or a
-memory location; the source operand is a register."
+differences to v2:
+- Don't move sync_io variable form struct gendisk to struct md_rdev
+  in these patch
+- fix typo in suject
 
-So it first exchanges and then adds. Which is why the flags are set for
-add, not exchange.
+The v2 "md: Fix undefined behaviour in is_mddev_idle" patch
+differences to v1:
+- add ubsan info in message
+- use 64bit signed integer type instead of long type;
+- move sync_io variable form struct gendisk to struct md_rdev, and 
+  modify md_sync_acct() and md_sync_acct_bio() to fit for this change.
+
+Li Jinlin (3):
+  md: Fix undefined behaviour in is_mddev_idle
+  drbd: Fix undefined behaviour in drbd_rs_c_min_rate_throttle
+  drbd: Remove useless variable in struct drbd_device
+
+ drivers/block/drbd/drbd_bitmap.c   |  2 +-
+ drivers/block/drbd/drbd_int.h      |  5 ++---
+ drivers/block/drbd/drbd_main.c     |  3 +--
+ drivers/block/drbd/drbd_receiver.c | 12 ++++++------
+ drivers/block/drbd/drbd_state.c    |  1 -
+ drivers/block/drbd/drbd_worker.c   |  5 ++---
+ drivers/md/md.c                    |  6 +++---
+ drivers/md/md.h                    |  4 ++--
+ include/linux/genhd.h              |  2 +-
+ 9 files changed, 18 insertions(+), 22 deletions(-)
+
+-- 
+2.27.0
+
