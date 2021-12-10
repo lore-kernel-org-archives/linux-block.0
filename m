@@ -2,67 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0CAC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 10:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F62C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 10:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239799AbhLJKE0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 05:04:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49956 "EHLO
+        id S239870AbhLJKJt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 05:09:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234244AbhLJKEZ (ORCPT
+        with ESMTP id S236507AbhLJKJs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 05:04:25 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00305C061746
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 02:00:50 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id x15so28786475edv.1
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 02:00:50 -0800 (PST)
+        Fri, 10 Dec 2021 05:09:48 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B2FC0617A1
+        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 02:06:13 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id t5so27875259edd.0
+        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 02:06:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=O70batPj3wvi7RLrp3X+l52GyfZpEV965rgDfVwXWZY=;
-        b=nwrUIMOWOU4Q7yQqvPcI8A0eut+VItBwApaqSOQ+7tajte458rjWZjpOj5X8gek9ym
-         KNcvP0d6nah96lj4Uo1XXJAsRAD6FzdqerX+6KvqepB1GzUCjMY9dej0p2bfBRyGAEBs
-         eBajnOnM4yEoi8h6ZvLXUKd+Xh/IbjlK0HQWNWQhKlEhvTzRrFEXk6XjpJWncNA8OCvz
-         Jbc1y4sSDIcnlWVkWnwbGTRTqs2qmO5MvBtYlazwt2qViCfH5npWoN6A+0sQMCWMOP8v
-         0QTwsn6HfD4mneH4/49vSCl6EbDPRQAU3b33Fi0bzV0uuBfpTAZ4EJqHFWWZDkio675n
-         o4fQ==
+        bh=lC142Yo8coIpvvVUqN6aAJckxOOmW7Kkcqr32G1U5wQ=;
+        b=YirHdbJ/8fHvaGzvPOOudtZaOKZcTRdBFtDjdO1hmXL9O4K9D87KqrQ1Ap9pd9QlFP
+         H3sUgfmdP2N4yKurHlVRbhkt5gZOg0lM+e19Y3svTo/dvTfX6H36xgUyHme2dxly4Gvk
+         w9bgVjEmNv8Mue0+0e7ZiZ+SKI2vPfHq5MEvSsb5A40po863heD6Duoq/Kqg6IfY0dHf
+         2cp8hDtCRBl3YghjzvvpvYcnS7RNI1WHooBWkC2uBCFd13WNSyUdCmraD0T24rJ8kFZu
+         5EphrR/MLO6IE/aRHdF4mGAWtPr68E27D/1JFsdrU40aCsr1fUkN1JQAvI/qkCNE97Ll
+         PECg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=O70batPj3wvi7RLrp3X+l52GyfZpEV965rgDfVwXWZY=;
-        b=YGh1RAdiX3/ju9UArtiLGqMZYg47jKI+jwri0KYBI/mjSUC7j4XzbSgkxYqDjrICLI
-         nlYVHEO2Ct/MhB1ThjJk+heJznXgkRrPjf7B77cX9Qw3kmJw0QKrGXbLmXl2Tni59q8i
-         4kW5vDThrJ/bzunz5D6S/EmdC+GRmOiAUVtv0fKs/0AMBmlwP2tfDD2MyH28zoD9XI+a
-         isk8jRgPMWA3u4HShAIcyPZbWNyNHjAF0Ia4KD9fbdg3l27K38uv4/mF8b4yW+riP8Dv
-         rRx4nOgc3nTLkMfOe/Gt3DYLzRwFPRGQjTmRiQd8Jbc1D09WZoeC8B6WaoGKVb6mToI6
-         T5RQ==
-X-Gm-Message-State: AOAM531uyi/IYVR9zPeH6cNC8QQlO2+MKQvjtCyPfXlmVnun1/NF30BC
-        gRzkK89RXTdxCwNygjrU3SZzF43LtZwP4A==
-X-Google-Smtp-Source: ABdhPJzVXx7aPKj2tvaSKP6WsRk3Q77ORMfERfBZXTHM+e/h9EvNk5zEsT8ijNh7uMtX3ingxiqqXg==
-X-Received: by 2002:a50:e003:: with SMTP id e3mr36877353edl.374.1639130439406;
-        Fri, 10 Dec 2021 02:00:39 -0800 (PST)
+        bh=lC142Yo8coIpvvVUqN6aAJckxOOmW7Kkcqr32G1U5wQ=;
+        b=T0694aZ6IxnCtv0TQNbaeEiswerLk4Ne/QNQsRnF4p25cSs0FWqJPtZLdRU+8QFB59
+         sbLP4L3XkchFzfZI40iT+5AO19X1GMm8HpZiOG4PfrbM5oeR+WLy/wPz+zuM8N0yDP8U
+         HpplFplzP+XeC7Fo/1uLWt+yCFhiuEbPI83S9sNAQLjZPvNmiezXXrfivm6XMo/ZniuX
+         PDUo5JVypTj5HRe6kVzGV0czmDt8u4b/qA5gLIqmzWfxPWRv2w3O7wgrYWbvazLpBIsl
+         PTr2TCbfl4RhpCfJKZ5ZohJgM8q3Y2klwSBKW1H5vCskYfqoOrBZCfzvOjyR0/zvBYOX
+         wJAg==
+X-Gm-Message-State: AOAM532fhsVXIpZPwE5by8gfgR0Ov5Z2PFPi/QiqAQENSvjTri1iA+X0
+        AUiqTh07HyxEB0QgySVlPhfcxQ==
+X-Google-Smtp-Source: ABdhPJzogiO1NzTpvwYLW1ZNFCxCS9CKr9ffg97FkXtE+uP8BYAkzNgef5FE3TFs5mdlwrLo4x6g7w==
+X-Received: by 2002:a17:906:3647:: with SMTP id r7mr23404107ejb.124.1639130772299;
+        Fri, 10 Dec 2021 02:06:12 -0800 (PST)
 Received: from [192.168.1.8] (net-93-70-85-65.cust.vodafonedsl.it. [93.70.85.65])
-        by smtp.gmail.com with ESMTPSA id og38sm1183171ejc.5.2021.12.10.02.00.38
+        by smtp.gmail.com with ESMTPSA id ht7sm1251619ejc.27.2021.12.10.02.06.11
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Dec 2021 02:00:38 -0800 (PST)
+        Fri, 10 Dec 2021 02:06:11 -0800 (PST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH RFC 8/9] block, bfq: move forward
- __bfq_weights_tree_remove()
+Subject: Re: [PATCH RFC 3/9] block, bfq: handle the case when
+ for_each_entity() access root group
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20211127101132.486806-9-yukuai3@huawei.com>
-Date:   Fri, 10 Dec 2021 11:00:37 +0100
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com
+In-Reply-To: <20211127101132.486806-4-yukuai3@huawei.com>
+Date:   Fri, 10 Dec 2021 11:06:10 +0100
+Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <FA78962A-DC03-4A1F-9B79-D085A4908E5E@linaro.org>
+Message-Id: <4C1444A3-8268-4F4E-99D0-76704E69C43E@linaro.org>
 References: <20211127101132.486806-1-yukuai3@huawei.com>
- <20211127101132.486806-9-yukuai3@huawei.com>
+ <20211127101132.486806-4-yukuai3@huawei.com>
 To:     Yu Kuai <yukuai3@huawei.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
@@ -74,52 +74,101 @@ X-Mailing-List: linux-block@vger.kernel.org
 > Il giorno 27 nov 2021, alle ore 11:11, Yu Kuai <yukuai3@huawei.com> ha =
 scritto:
 >=20
-> Prepare to decrease 'num_groups_with_pending_reqs' earlier.
+> Prevent null-ptr-deref after counting root group into
+> 'num_groups_with_pending_reqs'.
 >=20
 > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 > ---
-> block/bfq-iosched.c | 13 +++++--------
-> 1 file changed, 5 insertions(+), 8 deletions(-)
+> block/bfq-iosched.c |  2 +-
+> block/bfq-wf2q.c    | 17 +++++++++++++----
+> 2 files changed, 14 insertions(+), 5 deletions(-)
 >=20
 > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index e3c31db4bffb..4239b3996e23 100644
+> index 3262d062e21f..47722f931ee3 100644
 > --- a/block/bfq-iosched.c
 > +++ b/block/bfq-iosched.c
-> @@ -882,6 +882,10 @@ void bfq_weights_tree_remove(struct bfq_data =
+> @@ -864,7 +864,7 @@ void bfq_weights_tree_remove(struct bfq_data =
 *bfqd,
-> {
-> 	struct bfq_entity *entity =3D bfqq->entity.parent;
->=20
-> +	bfqq->ref++;
-> +	__bfq_weights_tree_remove(bfqd, bfqq,
-> +				  &bfqd->queue_weights_tree);
-> +
 > 	for_each_entity(entity) {
 > 		struct bfq_sched_data *sd =3D entity->my_sched_data;
 >=20
-> @@ -916,14 +920,7 @@ void bfq_weights_tree_remove(struct bfq_data =
-*bfqd,
-> 		}
-> 	}
->=20
-> -	/*
-> -	 * Next function is invoked last, because it causes bfqq to be
-> -	 * freed if the following holds: bfqq is not in service and
-> -	 * has no dispatched request. DO NOT use bfqq after the next
-> -	 * function invocation.
-> -	 */
-> -	__bfq_weights_tree_remove(bfqd, bfqq,
-> -				  &bfqd->queue_weights_tree);
-> +	bfq_put_queue(bfqq);
-> }
->=20
+> -		if (sd->next_in_service || sd->in_service_entity) {
+> +		if (sd && (sd->next_in_service || =
+sd->in_service_entity)) {
 
-why it is not dangerous any longer to invoke __bfq_weights_tree_remove =
-earlier, and the comment can be removed?
+Explain with some comment this additional check.
 
 Paolo
 
-> /*
+> 			/*
+> 			 * entity is still active, because either
+> 			 * next_in_service or in_service_entity is not
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index 67e32481e455..6693765ff3a0 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -965,6 +965,13 @@ static void __bfq_activate_entity(struct =
+bfq_entity *entity,
+> 	bool backshifted =3D false;
+> 	unsigned long long min_vstart;
+>=20
+> +	if (is_root_entity(entity))
+> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
+> +		goto update;
+> +#else
+> +		return;
+> +#endif
+> +
+> 	/* See comments on bfq_fqq_update_budg_for_activation */
+> 	if (non_blocking_wait_rq && bfq_gt(st->vtime, entity->finish)) {
+> 		backshifted =3D true;
+> @@ -999,7 +1006,10 @@ static void __bfq_activate_entity(struct =
+bfq_entity *entity,
+> 		entity->on_st_or_in_serv =3D true;
+> 	}
+>=20
+> +	bfq_update_fin_time_enqueue(entity, st, backshifted);
+> +
+> #ifdef CONFIG_BFQ_GROUP_IOSCHED
+> +update:
+> 	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
+> 		struct bfq_group *bfqg =3D
+> 			container_of(entity, struct bfq_group, entity);
+> @@ -1011,8 +1021,6 @@ static void __bfq_activate_entity(struct =
+bfq_entity *entity,
+> 		}
+> 	}
+> #endif
+> -
+> -	bfq_update_fin_time_enqueue(entity, st, backshifted);
+> }
+>=20
+> /**
+> @@ -1102,7 +1110,8 @@ static void __bfq_activate_requeue_entity(struct =
+bfq_entity *entity,
+> {
+> 	struct bfq_service_tree *st =3D bfq_entity_service_tree(entity);
+>=20
+> -	if (sd->in_service_entity =3D=3D entity || entity->tree =3D=3D =
+&st->active)
+> +	if (sd && (sd->in_service_entity =3D=3D entity ||
+> +		   entity->tree =3D=3D &st->active))
+> 		 /*
+> 		  * in service or already queued on the active tree,
+> 		  * requeue or reposition
+> @@ -1140,7 +1149,7 @@ static void bfq_activate_requeue_entity(struct =
+bfq_entity *entity,
+> 		sd =3D entity->sched_data;
+> 		__bfq_activate_requeue_entity(entity, sd, =
+non_blocking_wait_rq);
+>=20
+> -		if (!bfq_update_next_in_service(sd, entity, expiration) =
+&&
+> +		if (sd && !bfq_update_next_in_service(sd, entity, =
+expiration) &&
+> 		    !requeue)
+> 			break;
+> 	}
 > --=20
 > 2.31.1
 >=20
