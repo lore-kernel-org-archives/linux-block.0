@@ -2,23 +2,23 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF5EC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 11:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FFC8C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 11:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240582AbhLJLjL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 06:39:11 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:29177 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235161AbhLJLjL (ORCPT
+        id S240624AbhLJLjN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 06:39:13 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16365 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240600AbhLJLjM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 06:39:11 -0500
-Received: from canpemm500008.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J9TLG4PYwz8whn;
-        Fri, 10 Dec 2021 19:33:26 +0800 (CST)
+        Fri, 10 Dec 2021 06:39:12 -0500
+Received: from canpemm500008.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J9TN01fwWz92ly;
+        Fri, 10 Dec 2021 19:34:56 +0800 (CST)
 Received: from localhost.huawei.com (10.175.124.27) by
  canpemm500008.china.huawei.com (7.192.105.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 10 Dec 2021 19:35:33 +0800
+ 15.1.2308.20; Fri, 10 Dec 2021 19:35:35 +0800
 From:   Li Jinlin <lijinlin3@huawei.com>
 To:     <song@kernel.org>, <philipp.reisner@linbit.com>,
         <lars.ellenberg@linbit.com>, <axboe@kernel.dk>, <hare@suse.de>,
@@ -26,10 +26,12 @@ To:     <song@kernel.org>, <philipp.reisner@linbit.com>,
         <mcgrof@kernel.org>
 CC:     <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linfeilong@huawei.com>
-Subject: [PATCH v3 0/3] Fix undefined behaviour during device synchronization
-Date:   Fri, 10 Dec 2021 20:06:28 +0800
-Message-ID: <20211210120631.2578505-1-lijinlin3@huawei.com>
+Subject: [PATCH v3 3/3] drbd: Remove useless variable in struct drbd_device
+Date:   Fri, 10 Dec 2021 20:06:31 +0800
+Message-ID: <20211210120631.2578505-4-lijinlin3@huawei.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20211210120631.2578505-1-lijinlin3@huawei.com>
+References: <20211210120631.2578505-1-lijinlin3@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -41,41 +43,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-md/drbd drivers use 'signed int' variable to track sync vs non-sync IO,
-and judge whether sync IO needs to be throttled by signed comparison.
-If the value of the variable is greater than INT_MAX or close to
-INT_MAX, some undefined behavior may occur.
+rs_last_sect_ev is unused since added in 1d7734a0df02, so just remove it.
 
-Fix by using 64bit signed integer type.
+Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
+---
+ drivers/block/drbd/drbd_int.h    | 1 -
+ drivers/block/drbd/drbd_main.c   | 1 -
+ drivers/block/drbd/drbd_state.c  | 1 -
+ drivers/block/drbd/drbd_worker.c | 1 -
+ 4 files changed, 4 deletions(-)
 
-differences to v2:
-- Don't move sync_io variable form struct gendisk to struct md_rdev
-  in these patch
-- fix typo in suject
-
-The v2 "md: Fix undefined behaviour in is_mddev_idle" patch
-differences to v1:
-- add ubsan info in message
-- use 64bit signed integer type instead of long type;
-- move sync_io variable form struct gendisk to struct md_rdev, and 
-  modify md_sync_acct() and md_sync_acct_bio() to fit for this change.
-
-Li Jinlin (3):
-  md: Fix undefined behaviour in is_mddev_idle
-  drbd: Fix undefined behaviour in drbd_rs_c_min_rate_throttle
-  drbd: Remove useless variable in struct drbd_device
-
- drivers/block/drbd/drbd_bitmap.c   |  2 +-
- drivers/block/drbd/drbd_int.h      |  5 ++---
- drivers/block/drbd/drbd_main.c     |  3 +--
- drivers/block/drbd/drbd_receiver.c | 12 ++++++------
- drivers/block/drbd/drbd_state.c    |  1 -
- drivers/block/drbd/drbd_worker.c   |  5 ++---
- drivers/md/md.c                    |  6 +++---
- drivers/md/md.h                    |  4 ++--
- include/linux/genhd.h              |  2 +-
- 9 files changed, 18 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index 1b71adc07e83..a163141aff1b 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -955,7 +955,6 @@ struct drbd_device {
+ 	char congestion_reason;  /* Why we where congested... */
+ 	atomic_t rs_sect_in; /* for incoming resync data rate, SyncTarget */
+ 	atomic64_t rs_sect_ev; /* for submitted resync data rate, both */
+-	int rs_last_sect_ev; /* counter to compare with */
+ 	s64 rs_last_events;  /* counter of read or write "events" (unit sectors)
+ 			      * on the lower level device when we last looked. */
+ 	int c_sync_rate; /* current resync rate after syncer throttle magic */
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index ea057bd60541..f1fa03c69809 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2046,7 +2046,6 @@ void drbd_device_cleanup(struct drbd_device *device)
+ 	device->rs_total     =
+ 	device->rs_failed    = 0;
+ 	device->rs_last_events = 0;
+-	device->rs_last_sect_ev = 0;
+ 	for (i = 0; i < DRBD_SYNC_MARKS; i++) {
+ 		device->rs_mark_left[i] = 0;
+ 		device->rs_mark_time[i] = 0;
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+index b8a27818ab3f..4a6c69133c62 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -1389,7 +1389,6 @@ _drbd_set_state(struct drbd_device *device, union drbd_state ns,
+ 
+ 		set_ov_position(device, ns.conn);
+ 		device->rs_start = now;
+-		device->rs_last_sect_ev = 0;
+ 		device->ov_last_oos_size = 0;
+ 		device->ov_last_oos_start = 0;
+ 
+diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+index a4edd0a9c875..45ae4abd355a 100644
+--- a/drivers/block/drbd/drbd_worker.c
++++ b/drivers/block/drbd/drbd_worker.c
+@@ -1829,7 +1829,6 @@ void drbd_start_resync(struct drbd_device *device, enum drbd_conns side)
+ 		device->rs_failed    = 0;
+ 		device->rs_paused    = 0;
+ 		device->rs_same_csum = 0;
+-		device->rs_last_sect_ev = 0;
+ 		device->rs_total     = tw;
+ 		device->rs_start     = now;
+ 		for (i = 0; i < DRBD_SYNC_MARKS; i++) {
 -- 
 2.27.0
 
