@@ -2,99 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA04AC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 04:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33AA8C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 04:22:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232841AbhLJEHH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Dec 2021 23:07:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229993AbhLJEHH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 23:07:07 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F46C061746;
-        Thu,  9 Dec 2021 20:03:32 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id d9so12938771wrw.4;
-        Thu, 09 Dec 2021 20:03:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=CX8RPFqWxmhuiVbKNQ4FRnbHGl327frRd5MQyfbYU5o=;
-        b=gF15qU7H86VsfHkH5dvEwXaU6pwrAQRoAM9ACkVgTztIk+3Oe5hgQezjI9qPSCBoq5
-         mv0Mto9epFcD2qmvVeN6sf7Ll0r7BPct95e1WYHjQZJO7bsym6lV1hDMEKHMNa3OUK8y
-         SybSqJpT59V707aaxpOdyF9bGosVVdyNokx6JmorOkiS1pkpzk1BaRjKD7d6E7j5+RIO
-         Tk9x69xmOlFi0VKbmewJ4t/2Map/AzA72kGXvuVRVh2EulwhYO7+MFV7Og/HhBa8u7Mm
-         1pC8vgPDeO3NBbl/ri1/0Lf5LR8frp4nf3fluKl27ALp3SPrgP8Y8uCmjr6rLmbv6HpK
-         AWMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-transfer-encoding:content-language;
-        bh=CX8RPFqWxmhuiVbKNQ4FRnbHGl327frRd5MQyfbYU5o=;
-        b=QQBFOLHFHwQKFMZHQlV1JWsxXm9wlUCVHjrajQaMrsEDRJdTKlP2XQN4sJhUNkGHaZ
-         MUkS9UgMCHEw8Ns5tB0YuDnlLoe6pEywGJewphQJHJoWkUJEJVgyvdO1ZU8cWfLreNbZ
-         jlnuvvcvIOX2OyOGyCTDRf52xa/LQ80Aeqmm7d6vf1YeZm13EcKCa5ZQKuIs4X4G6asN
-         KbPSV5ltzmli7HKcIXvqA8VnTW8P7eHagVxkW1PVPg8pl5zxeBJ5OAceFM9Jottgj3gj
-         SBaK/ngxVKRzaQStP3iPSBbKF7Mnr/fA2i3DHOBjO7/UDrb9jSG9+oaVHwT6KyabxdR0
-         RPvg==
-X-Gm-Message-State: AOAM532lePwXegwWPAiYm3NRydypeuCyseEDLcFh+JIROHAbZrqd2z50
-        NQA5KI9yRPr6chnfZS9gw4DAyqbZMd0=
-X-Google-Smtp-Source: ABdhPJzNWBRz8n5l9oVvAMN8CaCdXKNp96mYCPWqVksi4l0aMDnqVZBSY6WLQj1QAyepGPFSj8X/tw==
-X-Received: by 2002:adf:dbcb:: with SMTP id e11mr10649331wrj.575.1639109011215;
-        Thu, 09 Dec 2021 20:03:31 -0800 (PST)
-Received: from [10.184.0.6] ([85.203.46.180])
-        by smtp.gmail.com with ESMTPSA id f3sm1302374wrm.96.2021.12.09.20.03.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 20:03:30 -0800 (PST)
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: [BUG] fs: possible ABBA deadlocks in do_thaw_all_callback() and
- freeze_bdev()
-To:     viro@zeniv.linux.org.uk, andrea@suse.de, axboe@kernel.dk,
-        hch@infradead.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Message-ID: <bcc39dfd-3734-bb82-b327-8445aedef605@gmail.com>
-Date:   Fri, 10 Dec 2021 12:03:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S229767AbhLJEZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Dec 2021 23:25:36 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:54560 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234263AbhLJEZg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 23:25:36 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 01D08210FC;
+        Fri, 10 Dec 2021 04:22:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1639110121; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aSE2Lgjco575OzMlHvq9304OLpBdxyI6RgPuZG9KlBU=;
+        b=xBvPeVqn6EbDDOXOZIB2UkFOjmNJ6mvwPuUV6b+JWBHMVIM4RyBtay9lDbWA0/Np9g1r4I
+        rJvvYxAVndFfJxiQHT2Q8W4Zgc589PqD6P5LhgXik+iVe3Ak4q9+uU7FUT7UfHza6FXFvC
+        b2paScM1YuHRNGndzvF7bcben2dSw7U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1639110121;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aSE2Lgjco575OzMlHvq9304OLpBdxyI6RgPuZG9KlBU=;
+        b=JTu+oXSzg6dgwW28SJhcDFYDaa563iMyamE67yL0LMBlRiraU1IO5yCM1UudaE0lAAhkdT
+        7cOkSnLyVYAvn4Dg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A656E13DC8;
+        Fri, 10 Dec 2021 04:21:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id fiIdGefVsmFJSwAAMHmgww
+        (envelope-from <neilb@suse.de>); Fri, 10 Dec 2021 04:21:59 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+From:   "NeilBrown" <neilb@suse.de>
+To:     "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH] FAT: use blkdev_issue_flush() instead of congestion_wait()
+In-reply-to: <874k84hi5q.fsf@mail.parknet.co.jp>
+References: <163712349419.13692.2859038330142282757@noble.neil.brown.name>,
+ <87ee79yiik.fsf@mail.parknet.co.jp>,
+ <163754226639.13692.10449616189734943162@noble.neil.brown.name>,
+ <874k84hi5q.fsf@mail.parknet.co.jp>
+Date:   Fri, 10 Dec 2021 15:21:56 +1100
+Message-id: <163911011670.9928.6438117555175130033@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Mon, 22 Nov 2021, OGAWA Hirofumi wrote:
+> "NeilBrown" <neilb@suse.de> writes:
+>=20
+> > On Sun, 21 Nov 2021, OGAWA Hirofumi wrote:
+> >> "NeilBrown" <neilb@suse.de> writes:
+> >>=20
+> >> > congestion_wait() in this context is just a sleep - block devices do n=
+ot
+> >> > in general support congestion signalling any more.
+> >> >
+> >> > The goal here is to wait for any recently written data to get to
+> >> > storage.  This can be achieved using blkdev_issue_flush().
+> >>=20
+> >> Purpose of flush option should be for making umount faster, not data
+> >> integrity. (but current flush implement is strange at several places, IM=
+O)
+> >
+> > I don't think that is true.  I believe the purpose of the flush option
+> > is to write out data as soon as a file is closed, so that if the media
+> > is removed without first unmounting, the data is more likely to be safe.
+> > That is why the commit which introduce it:
+> >  Commit ae78bf9c4f5f ("[PATCH] add -o flush for fat")
+> > particularly mentions "removable media".
+>=20
+> Right. This was to make the removable device usage better (but sync
+> option is too slow).
+>=20
+> e.g.
+>     # cp -a /foo/source /mnt/fatfs
+>=20
+>     # umount <don't too slow>
+>     or
+>     <do other thing, and forget umount>
 
-My static analysis tool reports several possible ABBA deadlocks in Linux 
-5.10:
+or use GUI to drag a file to the removable device, wait for the copy to
+appear to finish, then pull the device.
 
-do_thaw_all_callback()
-   down_write(&sb->s_umount); --> Line 1028 (Lock A)
-   emergency_thaw_bdev()
-     thaw_bdev()
-       mutex_lock(&bdev->bd_fsfreeze_mutex); --> Line 602 (Lock B)
+sync is too slow as it flush each change to storage as it happens.  Each
+block, each FA-Table update etc.
 
-freeze_bdev()
-   mutex_lock(&bdev->bd_fsfreeze_mutex); --> Line 556 (Lock B)
-   freeze_super()
-     down_write(&sb->s_umount); --> Line 1716 (Lock A)
-     down_write(&sb->s_umount); --> Line 1738 (Lock A)
-   deactivate_super()
-     down_write(&s->s_umount); --> Line 365 (Lock A)
+"-o flush" does the flush as file-close rather than on each write.
+But it still needs to provide the same safety.  i.e. write and flush and
+wait.
 
-When do_thaw_all_callback() and freeze_bdev() are concurrently executed, 
-the deadlocks can occur.
+>=20
+> >> So, I don't think the issue_flush is not proper for it (flush is very
+> >> slow on some usb thumb), and rather I think it is better off to just
+> >> remove the congestion_wait().
+> >
+> > We already call blkdev_issue_flush() on fsync.  With my patch, a simple
+> > close() effective becomes an fsync() and a close().  I think that is
+> > completely consistent with the purpose of "-o flush".
+>=20
+> It makes much slower above "cp -a" part. So I think it is overkill.
 
-I am not quite sure whether these possible deadlocks are real and how to 
-fix them if them are real.
-Any feedback would be appreciated, thanks :)
+There doesn't seem to be any point to "-o flush" if it doesn't promise
+anything.  Without the blkdeV_issue_flush() we have no guarantee that
+the data is safe after the file is closed - do we?
+Certainly it will be slower than without "-o flush", but that is the
+price you pay for safety.
 
-Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+However, if you are adamant then let's just put in a timeout.
+Patch to follow.
 
-
-Best wishes,
-Jia-Ju Bai
-
+Thanks,
+NeilBrown
