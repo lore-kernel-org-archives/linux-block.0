@@ -2,84 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EA0C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 04:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5CAC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 04:46:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232860AbhLJEfj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Dec 2021 23:35:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232002AbhLJEfj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 23:35:39 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BF7C061746
-        for <linux-block@vger.kernel.org>; Thu,  9 Dec 2021 20:32:04 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id k64so7360811pfd.11
-        for <linux-block@vger.kernel.org>; Thu, 09 Dec 2021 20:32:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
-         :content-transfer-encoding;
-        bh=o4utMKsAD4+lDfqffsHB92w5ky25vFSj2x9h0rnJxbM=;
-        b=ZQ6nUYUWj45WnZEBH9THy1ZOfYNF5uDb/Gm9U6epKXMzzFdmEaJpY7kIhEH3K8DqkF
-         1E4507Fu/gfjs69Z1/QypmMmhS+RYuzVk9p9FghrixJpfaB6QBEeybRvq55/hVSG6EGh
-         6iyynPPGlpX1FrxV38QuoVHyRNIxusE6lDNhW+3Xp4yorG/JZZ//MQWg0wdxAdV5ouuB
-         Rj+zADu8Ns0Tqbje8pbyLVZirIFY/zlzLHfYv5ftm+24Dh5kj1JN2qybHHsjjiroOX+5
-         gCePc2fprgLf56CbiF085YfxfKWn8ErJ+xJ4xpwy024hJV5aOIqitMacK/xyVsU7/6Y0
-         S10Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=o4utMKsAD4+lDfqffsHB92w5ky25vFSj2x9h0rnJxbM=;
-        b=Ntw5FpYEo5BOiFXRQA2jFbLpvif669tBSOZ35kuXO6J2fPntOppMsOKTHFtw0dwlrk
-         GbLfmLWe6UIhQ6Vh8awiVB8xOYrGMkBh5eL2+2/aMNX9BgAQdKImKyWnzi08lbCsjP96
-         5x7ZyoxrtsQSLN9t86LJnWcKnKch0qguObNXr13NV5arPYQ+R8SxJ0OxvcNWyvFc5TS7
-         2D2U24DE62dyAJxIVIIfTV5AWGde7cX6svhNo0Le1wA2epAfwiGAzrIPSlzrqV3EoEtS
-         hesKjrDRoz7Wq6WPyNvnkGZhb6Gry36emWqWgDhBwJF+1cyEEmEQ38L7HCwh595vwdBG
-         sqww==
-X-Gm-Message-State: AOAM530YWoZ0vSXqQRtqQnpLNQs7kYEYEPWRRqpABwhur+zbx9Ra9uXp
-        8HYXLBzPiA1HyXIGKoKEGMoo+CixHNfZ8g==
-X-Google-Smtp-Source: ABdhPJwRsw58t/w5EjdSopIo9vKuV+6Q33Q979I1kPe56+/qs2GM2sv5T/WYGIiyv52awVgrruu0BQ==
-X-Received: by 2002:a63:2c8c:: with SMTP id s134mr37414199pgs.221.1639110724158;
-        Thu, 09 Dec 2021 20:32:04 -0800 (PST)
-Received: from [172.20.4.26] ([66.185.175.30])
-        by smtp.gmail.com with ESMTPSA id q32sm1104068pja.4.2021.12.09.20.32.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Dec 2021 20:32:03 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, NeilBrown <neilb@suse.de>,
-        Christoph Hellwig <hch@infradead.org>
-In-Reply-To: <163910843527.9928.857338663717630212@noble.neil.brown.name>
-References: <163712340344.13692.2840899631949534137@noble.neil.brown.name>, <YZTx/93/9cjYW4zI@infradead.org>, <163910839418.9928.16399258868028694519@noble.neil.brown.name> <163910843527.9928.857338663717630212@noble.neil.brown.name>
-Subject: Re: [PATCH v3] pktdvd: stop using bdi congestion framework.
-Message-Id: <163911072211.490552.3194609024939007082.b4-ty@kernel.dk>
-Date:   Thu, 09 Dec 2021 21:32:02 -0700
+        id S234447AbhLJEtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Dec 2021 23:49:45 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:15716 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229481AbhLJEtp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 23:49:45 -0500
+Received: from canpemm500008.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4J9JF016htzZffX;
+        Fri, 10 Dec 2021 12:43:16 +0800 (CST)
+Received: from localhost.huawei.com (10.175.124.27) by
+ canpemm500008.china.huawei.com (7.192.105.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 10 Dec 2021 12:46:08 +0800
+From:   Li Jinlin <lijinlin3@huawei.com>
+To:     <song@kernel.org>, <philipp.reisner@linbit.com>,
+        <lars.ellenberg@linbit.com>, <axboe@kernel.dk>, <hare@suse.de>,
+        <jack@suse.cz>, <ming.lei@redhat.com>, <tj@kernel.org>,
+        <mcgrof@kernel.org>, <mcroce@microsoft.com>
+CC:     <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <drbd-dev@lists.linbit.com>,
+        <linfeilong@huawei.com>
+Subject: [PATCH 0/3] Fix undefined behaviour during device synchronization
+Date:   Fri, 10 Dec 2021 13:17:04 +0800
+Message-ID: <20211210051707.2202646-1-lijinlin3@huawei.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500008.china.huawei.com (7.192.105.151)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 10 Dec 2021 14:53:55 +1100, NeilBrown wrote:
-> From afac2a88e6a256ffde7040c4191a2bae5df7f5f3 Mon Sep 17 00:00:00 2001
-> From: NeilBrown <neilb@suse.de>
-> Date: Wed, 29 Sep 2021 14:24:01 +1000
-> Subject: [PATCH] pktdvd: stop using bdi congestion framework.
-> 
-> The bdi congestion framework isn't widely used and should be
-> deprecated.
-> 
-> [...]
+md/drbd drivers use 'signed int' variable to track sync vs non-sync IO,
+and judge whether sync IO needs to be throttled by signed comparison.
+If the value of the variable is greater than INT_MAX or close to
+INT_MAX, some undefined behavior may occur.
 
-Applied, thanks!
+Fix by using 64bit signed integer type.
 
-[1/1] pktdvd: stop using bdi congestion framework.
-      commit: db67097aa6f2587b44055f2e16db72a11e17faef
+The v2 "md: Fix undefined behaviour in is_mddev_idle" patch
+differences to v1:
+- add ubsan info in message
+- use 64bit signed integer type instead of long type;
+- move sync_io variable form struct gendisk to struct md_rdev, and 
+  modify md_sync_acct() and md_sync_acct_bio() to fit for this change.
 
-Best regards,
+Li Jinlin (3):
+  md: Fix undefined behaviour in is_mddev_idle
+  drdb: Fix undefined behaviour in drbd_rs_c_min_rate_throttle
+  drdb: Remove useless variable in struct drbd_device
+
+ drivers/block/drbd/drbd_bitmap.c   |  2 +-
+ drivers/block/drbd/drbd_int.h      |  5 ++---
+ drivers/block/drbd/drbd_main.c     |  3 +--
+ drivers/block/drbd/drbd_receiver.c | 12 ++++++------
+ drivers/block/drbd/drbd_state.c    |  1 -
+ drivers/block/drbd/drbd_worker.c   |  5 ++---
+ drivers/md/md.c                    |  6 +++---
+ drivers/md/md.h                    | 13 +++++++++----
+ drivers/md/raid1.c                 |  4 ++--
+ drivers/md/raid10.c                | 24 ++++++++++++------------
+ drivers/md/raid5.c                 |  4 ++--
+ include/linux/genhd.h              |  1 -
+ 12 files changed, 40 insertions(+), 40 deletions(-)
+
 -- 
-Jens Axboe
-
+2.27.0
 
