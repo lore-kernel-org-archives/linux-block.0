@@ -2,167 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E05AC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 10:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21675C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 10:57:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234981AbhLJK1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 05:27:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55388 "EHLO
+        id S236965AbhLJLAu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 06:00:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233714AbhLJK1S (ORCPT
+        with ESMTP id S233200AbhLJLAu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 05:27:18 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54591C061746
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 02:23:43 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id e3so28768729edu.4
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 02:23:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=RhcNME8TKvIC091+E24ipgQ5jFFJHEZIioS3/i94A5g=;
-        b=kEqCxBLp0pqz7dfAy1XCRSof85ZGCTYONFa/fsiyuXgzpTTPNVCktFtmb8KnJZbgGS
-         ZKKlecZz0D9P2mux41wenBzPhLv+o64L3zqNieN7xdWyZEwyaQo1JRkx8p6Snuwc9MJ5
-         M1t2m6BKGwRHC58CgBxQlptDEuQ/+W/7VNvKE0lWSnfdvLAFiqUy/mQgWbN491oCTt89
-         b/0YzB8vygER+4TFEg8xNftOYJhRcU+LzJ5riekqX0e78UNWQprxxi9gpIEO093rljWZ
-         cNtWusFHtgeRhL5BeS+YtzGPMSU1UUcYHV/lJY86zJ8j/gbkje7WBAH967OX2gZ2naTm
-         9aKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=RhcNME8TKvIC091+E24ipgQ5jFFJHEZIioS3/i94A5g=;
-        b=gX1b0UPx/M7Idb9y4trdcQUrweJEXY/GUbffliIIs2z6oyu9K7iBYAe4tGbVctrMMY
-         ymOa304DPIUdDrBUR5WIQRDTgdLJxQDPloO4zL5TuYo1xjddm+mTLA2YGX/8sijdRkou
-         a/BAXSziFEkQQRkTr+8eLKF6dKeZvU9p+VvA9m/78xE9oI6BMkXqmLo5EhntfZcRDE5E
-         4ISG2XI5KrDUYW0PedpDn49qpwLn3fyv0VcI9eODinPolcb7kKA8z1Q7DcH8qLSG9Qt8
-         X1BPDRyjSupPw7ReHKhTKy2pMR+WTiTPXKGn2PQJI05T2hpDQSx28mVSdAUBtTdcts1p
-         JfKg==
-X-Gm-Message-State: AOAM532fNj9CGjwcdRvip8D3E77o+oX4YoT7jfAvv4JLhDd4cpIV6XXz
-        Aw4zd+vpl3xq7C3PvLjQNufpuA==
-X-Google-Smtp-Source: ABdhPJxNfvUrlfghsa7j6MH2qZEdLiTNPzA5t1H66pFeQgizIuDaKpX047Lu4EglWFUBwgyiWAYX9Q==
-X-Received: by 2002:a50:9ea6:: with SMTP id a35mr36702766edf.400.1639131821500;
-        Fri, 10 Dec 2021 02:23:41 -0800 (PST)
-Received: from [192.168.1.8] (net-93-70-85-65.cust.vodafonedsl.it. [93.70.85.65])
-        by smtp.gmail.com with ESMTPSA id j4sm1194278edk.64.2021.12.10.02.23.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Dec 2021 02:23:41 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH RFC 0/9] support concurrent sync io for bfq on a specail
- occasion
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <809b90cc-20ba-c4fd-8c29-b9e3123c1cef@huawei.com>
-Date:   Fri, 10 Dec 2021 11:23:39 +0100
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F9F1D3F7-2C76-4301-944B-0BD1A2A5FE83@linaro.org>
-References: <20211127101132.486806-1-yukuai3@huawei.com>
- <D3FF0820-6A51-46A1-A363-8FFA8CCD2851@linaro.org>
- <809b90cc-20ba-c4fd-8c29-b9e3123c1cef@huawei.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Fri, 10 Dec 2021 06:00:50 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBF9C061746;
+        Fri, 10 Dec 2021 02:57:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=OsOjeqiwkNxCtbDHziimwLseQVWVs4KvQXBDBXX7iTs=; b=TZEtFFzFTNNvMMb3H+Z3Fil3Z7
+        DorNuCP8VxmyH2bxGRLBzv5+0Epaf8fDRIQu4SwfR97UssQkEk8pIPTwchhoSN6RsB00B2c1frMBF
+        JhiQbKmt4cmAuceGle1iiWpjmwAKZ1IlvBPSeFvsZmxHw529zs0uJ4WKqvsTOTV9xQ1GHuKjkr0dh
+        +suDZns4j/q7zGT60+nWerCFlihD2yeR6vJZL+ht7V2XEk160bVD9keLl4Hi1HZRvIwx0Vu0hsVZS
+        ftC1JKMw3HrOQUFH0bsTktbaLC4USq241E4RemRMFVulnXSohfCMW9y1JIcZqUvxM9zHUV29Fo1p1
+        sROF1Zog==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mvdaR-00AFr6-Li; Fri, 10 Dec 2021 10:57:12 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 74F6830026A;
+        Fri, 10 Dec 2021 11:57:11 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 60C142B2FBDFB; Fri, 10 Dec 2021 11:57:11 +0100 (CET)
+Date:   Fri, 10 Dec 2021 11:57:11 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <YbMyh6YBs9t8Pate@hirez.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+ <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
+ <20211207202831.GA18361@worktop.programming.kicks-ass.net>
+ <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
+ <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
+ <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
+ <20211208184416.GY16608@worktop.programming.kicks-ass.net>
+ <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wg6reEPRY6ZDNA=3=cGRyK1csKhw0p3Ug57Z9by_Ev9Hw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Dec 08, 2021 at 10:50:10AM -0800, Linus Torvalds wrote:
+> On Wed, Dec 8, 2021 at 10:44 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > From testing xadd had different flags from add; I've not yet looked at
+> > the SDM to see what it said on the matter.
+> 
+> That should not be the case. Just checked, and it just says
+> 
+>   "The CF, PF, AF, SF, ZF, and OF flags are set according to the
+> result of the addition, which is stored in the destination operand"
+> 
+> which shows that I was confused about 'xadd' - I thought it returned
+> the old value in the register ("fetch_add"). It doesn't. It returns
+> the new one ("add_fetch"). And then 'fetch_add' ends up undoing it by
+> doing a sub or whatever.
+> 
+> So the actual returned value and the flags should match on x86.
+> 
+> Other architectures have the "return old value" model, which does mean
+> that my "different architectures can have different preferences for
+> which one to test" argument was right, even if I got xadd wrong.
 
+I think XADD does return old too; SDM states:
 
-> Il giorno 10 dic 2021, alle ore 10:50, yukuai (C) <yukuai3@huawei.com> =
-ha scritto:
->=20
-> =E5=9C=A8 2021/12/10 17:20, Paolo Valente =E5=86=99=E9=81=93:
->>> Il giorno 27 nov 2021, alle ore 11:11, Yu Kuai <yukuai3@huawei.com> =
-ha scritto:
->>>=20
->>> Bfq can't handle sync io concurrently as long as the io are not =
-issued
->>> from root group currently.
->>>=20
->>> Previous patch set:
->>> =
-https://lore.kernel.org/lkml/20211014014556.3597008-2-yukuai3@huawei.com/t=
-/
->>>=20
->>> During implemting the method mentioned by the above patch set, I =
-found
->>> more problems that will block implemting concurrent sync io. The
->>> modifications of this patch set are as follows:
->>>=20
->>> 1) count root group into 'num_groups_with_pending_reqs';
->>> 2) don't idle if 'num_groups_with_pending_reqs' is 1;
->>> 3) If the group doesn't have pending requests while it's child =
-groups
->>> have pending requests, don't count the group.
->> Why don't yo count the parent group? It seems to me that we should =
-count it.
-> Hi, Paolo
->=20
-> For example, we only issue io in child group c2(root->c1->c2),
-> 'num_groups_with_pending_reqs' will end up greater than 1, thus it's
-> impossible to handle sync io concurrently. Thus I don't count root and
-> c1, only count c2.
+"Exchanges the first operand (destination operand) with the second
+operand (source operand), then loads the sum of the two values into the
+destination operand. The destination operand can be a register or a
+memory location; the source operand is a register."
 
-Right!
-
-Please explain this clearly in comments.
-
-
->>> 4) Once the group doesn't have pending requests, decrease
->>> 'num_groups_with_pending_reqs' immediately. Don't delay to when all
->>> it's child groups don't have pending requests.
->>>=20
->> I guess this action is related to 3).
-> Yes, if c1, c2 are both active, and then c1 don't have any pending =
-reqs,
-> I want to decrease num_groups_with_pending_reqs to 1 immediately.
-
-I'll check this point directly on the patch that does this decrement,
-because something is not clear to me.
-
-Thanks,
-Paolo
-
->  So
-> that sync io on c2 can be handled concurrently.
->=20
-
-
-> Thanks,
-> Kuai
->=20
->> Thanks,
->> Paolo
->>> Noted that I just tested basic functionality of this patchset, and I
->>> think it's better to see if anyone have suggestions or better
->>> solutions.
->>>=20
->>> Yu Kuai (9):
->>>  block, bfq: add new apis to iterate bfq entities
->>>  block, bfq: apply news apis where root group is not expected
->>>  block, bfq: handle the case when for_each_entity() access root =
-group
->>>  block, bfq: count root group into 'num_groups_with_pending_reqs'
->>>  block, bfq: do not idle if only one cgroup is activated
->>>  block, bfq: only count group that the bfq_queue belongs to
->>>  block, bfq: record how many queues have pending requests in =
-bfq_group
->>>  block, bfq: move forward __bfq_weights_tree_remove()
->>>  block, bfq: decrease 'num_groups_with_pending_reqs' earlier
->>>=20
->>> block/bfq-cgroup.c  |  3 +-
->>> block/bfq-iosched.c | 92 =
-+++++++++++++++++++++++----------------------
->>> block/bfq-iosched.h | 41 +++++++++++++-------
->>> block/bfq-wf2q.c    | 44 +++++++++++++++-------
->>> 4 files changed, 106 insertions(+), 74 deletions(-)
->>>=20
->>> --=20
->>> 2.31.1
->>>=20
->> .
-
+So it first exchanges and then adds. Which is why the flags are set for
+add, not exchange.
