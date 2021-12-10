@@ -2,123 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E564C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 16:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61733C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 17:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240734AbhLJQXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 11:23:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54048 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240729AbhLJQXd (ORCPT
+        id S240408AbhLJRdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 12:33:20 -0500
+Received: from mail-pf1-f178.google.com ([209.85.210.178]:44975 "EHLO
+        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237989AbhLJRdT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 11:23:33 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF0BC061746;
-        Fri, 10 Dec 2021 08:19:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bQKwfN6aNXQHwZHVhA6OGDeJq601xLR25UKpfXdatfo=; b=Ny6DjNqSEJVyWgTkBORi1+Qc5+
-        mTW8Dvfx/YQzImCymApCZt5oni3kLQlybqFiCyhkEtUPVZddxMNq3u+pmG/lI2pTWKww+cbRvdt5t
-        tt/eXhAT2/0tVIT6ZAgcw+IO7jmIhf0t/BeVI0U7m16EZRLz3ac8r7JsPTe+6LnztWXdfexApGpFP
-        l9xNSLTLhILrGX2J6QmjgIXS172OmUzsbV7PMUpHMkPn9RUP4deCgpL8nBtH8yeH13MYRcA7gY9q2
-        twhDOsj1mkRXvTCf4XAC5tp1XcNR5vbR0p9D95Kv9ZqnnS9A6a8iI2lxkFciOzpe670m9guZmC2Ej
-        zrZnaEVg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvick-00ATZt-5Y; Fri, 10 Dec 2021 16:19:54 +0000
-Date:   Fri, 10 Dec 2021 16:19:54 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     "Darrick J . Wong " <djwong@kernel.org>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v2 19/28] iomap: Convert __iomap_zero_iter to use a folio
-Message-ID: <YbN+KqqCG0032NMG@casper.infradead.org>
-References: <20211108040551.1942823-1-willy@infradead.org>
- <20211108040551.1942823-20-willy@infradead.org>
- <YbJ3O1qf+9p/HWka@casper.infradead.org>
+        Fri, 10 Dec 2021 12:33:19 -0500
+Received: by mail-pf1-f178.google.com with SMTP id k64so9019740pfd.11;
+        Fri, 10 Dec 2021 09:29:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=C29RQmhBlCkkPpuJ/eOeU2rF+9gMdwncIV/icJVqVFM=;
+        b=xTnMw339uMefKqhiBXs0Qbm3Kd3pv1pRZKdlLMegA7b4eEYwG3cJs8aFi/bv4/F6+L
+         Oq0m80eB+ewsVeisNImKuVlZrvrGaOC5+raxl9xmnOT4vUmAQAV5O2IoLrgKUV0Jg+W6
+         zgtY9L5sbMqJg3W82kj4zpwDUCoXSNoTf+CXJ8KO1Qi0eh8jABUJtuntITmh53t2INpI
+         8wFJKxpkSpw4r73k4azz7ENLHftM2IYwpQ7nQGtb08GIYk41uXidVOcHwJLxlorrOpui
+         NwFsvdbf0TUiaBxzJuSBipMfCG/JyMmn1NMUMH0PRHrnMN+Kx7uA8Op2Il2Xt68485A2
+         tn8w==
+X-Gm-Message-State: AOAM533/MRJEJ7V4lGMysqLyb+auggbAG8h+wktGpcXpQl20JdmiJZd/
+        VEVucS80rysxVOfs+tmY5x8=
+X-Google-Smtp-Source: ABdhPJxnPaA1x86sHWiX3QwNKGliVcR0m6wJyrK4PSHjfL6CnHM332Nci95Wz2p6qphK0zmUz2YIAw==
+X-Received: by 2002:a63:5c5f:: with SMTP id n31mr40214965pgm.348.1639157383889;
+        Fri, 10 Dec 2021 09:29:43 -0800 (PST)
+Received: from ?IPv6:2620:0:1000:2514:85ed:ea0b:339:7b11? ([2620:0:1000:2514:85ed:ea0b:339:7b11])
+        by smtp.gmail.com with ESMTPSA id c3sm3926878pfv.67.2021.12.10.09.29.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Dec 2021 09:29:43 -0800 (PST)
+Subject: Re: [PATCH v3 3/3] blk-crypto: show crypto capabilities in sysfs
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mmc@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+References: <20211208013534.136590-1-ebiggers@kernel.org>
+ <20211208013534.136590-4-ebiggers@kernel.org>
+ <6ff4d074-7508-4f4c-de06-f36899668168@acm.org>
+ <YbKT/lcp6iZ+lD4n@sol.localdomain> <YbL2uUqV0GWFOitE@kroah.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <cb29756b-8b21-5b4d-f107-b5573945d7ab@acm.org>
+Date:   Fri, 10 Dec 2021 09:29:41 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YbJ3O1qf+9p/HWka@casper.infradead.org>
+In-Reply-To: <YbL2uUqV0GWFOitE@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 09, 2021 at 09:38:03PM +0000, Matthew Wilcox wrote:
-> @@ -891,16 +893,19 @@ static s64 __iomap_zero_iter(struct iomap_iter *iter, loff
-> _t pos, u64 length)
->         struct page *page;
->         int status;
->         unsigned offset = offset_in_page(pos);
-> -       unsigned bytes = min_t(u64, PAGE_SIZE - offset, length);
-> 
-> -       status = iomap_write_begin(iter, pos, bytes, &page);
-> +       if (length > UINT_MAX)
-> +               length = UINT_MAX;
-> +       status = iomap_write_begin(iter, pos, length, &page);
->         if (status)
->                 return status;
-> +       if (length > PAGE_SIZE - offset)
-> +               length = PAGE_SIZE - offset;
-> 
-> -       zero_user(page, offset, bytes);
-> +       zero_user(page, offset, length);
->         mark_page_accessed(page);
-> 
-> -       return iomap_write_end(iter, pos, bytes, bytes, page);
-> +       return iomap_write_end(iter, pos, length, length, page);
->  }
+On 12/9/21 10:42 PM, Greg Kroah-Hartman wrote:
+> A single hex value makes sense to me.
 
-After attempting the merge with Christoph's ill-timed refactoring,
-I decided that eliding the use of 'bytes' here was the wrong approach,
-because it very much needs to be put back in for the merge.
+Hi Greg,
 
-Here's the merge as I have it:
+I'm not enthusiast about this approach because:
+(a) A single hex value can be confused with a number. Reporting a bitfield in
+     hex format is not sufficient to prevent confusion with a number.
+(b) No other block layer sysfs attribute follows this encoding scheme.
+(c) This encoding enforces the restriction that data unit sizes are a power of
+     two. Is there anything fundamental in encryption that restricts data unit
+     sizes to a power of two? I don't know the answer myself.
 
-diff --cc fs/iomap/buffered-io.c
-index f3176cf90351,d1aa0f0e7fd5..40356db3e856
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@@ -888,19 -926,12 +904,23 @@@ static loff_t iomap_zero_iter(struct io
-                return length;
+Thanks,
 
-        do {
--               unsigned offset = offset_in_page(pos);
--               size_t bytes = min_t(u64, PAGE_SIZE - offset, length);
--               struct page *page;
- -              s64 bytes;
-++              struct folio *folio;
- +              int status;
-++              size_t offset;
-++              size_t bytes = min_t(u64, SIZE_MAX, length);
- +
--               status = iomap_write_begin(iter, pos, bytes, &page);
-++              status = iomap_write_begin(iter, pos, bytes, &folio);
- +              if (status)
- +                      return status;
- +
--               zero_user(page, offset, bytes);
--               mark_page_accessed(page);
-++              offset = offset_in_folio(folio, pos);
-++              if (bytes > folio_size(folio) - offset)
-++                      bytes = folio_size(folio) - offset;
-++
-++              folio_zero_range(folio, offset, bytes);
-++              folio_mark_accessed(folio);
-
--               bytes = iomap_write_end(iter, pos, bytes, bytes, page);
- -              if (IS_DAX(iter->inode))
- -                      bytes = dax_iomap_zero(pos, length, iomap);
- -              else
- -                      bytes = __iomap_zero_iter(iter, pos, length);
-++              bytes = iomap_write_end(iter, pos, bytes, bytes, folio);
-                if (bytes < 0)
-                        return bytes;
-
-I've pushed out a new tag:
-
-https://git.infradead.org/users/willy/linux.git/shortlog/refs/tags/iomap-folio-5.17d
-
+Bart.
