@@ -2,100 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6301CC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 04:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EA0C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 04:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236575AbhLJE03 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Dec 2021 23:26:29 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:54572 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236574AbhLJE03 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 23:26:29 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 2DB65210EC;
-        Fri, 10 Dec 2021 04:22:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639110174; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=05F1XNqYCPJh3EiL4B2RX1wiUBf2ZN/JkZnZQ0ZnDro=;
-        b=G37VrAZcAqCcQbzrxziS1LCnKkw59bqdkqojPCgjX6cRL22Ot3vg2VqwvKlsALU/BAOeBM
-        0iFRGP82dRiaSxwuFJWTVNQ8rE2Rpl4JuffWtolomkDTTgKoEvC6iU/i4/HH4+YH9Q0XPs
-        1D7LKNArI1knDPUrgHSK86Ixrx1Uj7I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639110174;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=05F1XNqYCPJh3EiL4B2RX1wiUBf2ZN/JkZnZQ0ZnDro=;
-        b=FHoQ7jTcDsRaq9e2bjgHZHi30Ia0Xwt8LdBeNQVrrenQDiFBIntP0JknO2/936A/42fdhz
-        PtzMq4NsqUL9emCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C94F313DC8;
-        Fri, 10 Dec 2021 04:22:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Yko5IRzWsmF5SwAAMHmgww
-        (envelope-from <neilb@suse.de>); Fri, 10 Dec 2021 04:22:52 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+        id S232860AbhLJEfj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Dec 2021 23:35:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60458 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232002AbhLJEfj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Dec 2021 23:35:39 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BF7C061746
+        for <linux-block@vger.kernel.org>; Thu,  9 Dec 2021 20:32:04 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id k64so7360811pfd.11
+        for <linux-block@vger.kernel.org>; Thu, 09 Dec 2021 20:32:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
+         :content-transfer-encoding;
+        bh=o4utMKsAD4+lDfqffsHB92w5ky25vFSj2x9h0rnJxbM=;
+        b=ZQ6nUYUWj45WnZEBH9THy1ZOfYNF5uDb/Gm9U6epKXMzzFdmEaJpY7kIhEH3K8DqkF
+         1E4507Fu/gfjs69Z1/QypmMmhS+RYuzVk9p9FghrixJpfaB6QBEeybRvq55/hVSG6EGh
+         6iyynPPGlpX1FrxV38QuoVHyRNIxusE6lDNhW+3Xp4yorG/JZZ//MQWg0wdxAdV5ouuB
+         Rj+zADu8Ns0Tqbje8pbyLVZirIFY/zlzLHfYv5ftm+24Dh5kj1JN2qybHHsjjiroOX+5
+         gCePc2fprgLf56CbiF085YfxfKWn8ErJ+xJ4xpwy024hJV5aOIqitMacK/xyVsU7/6Y0
+         S10Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=o4utMKsAD4+lDfqffsHB92w5ky25vFSj2x9h0rnJxbM=;
+        b=Ntw5FpYEo5BOiFXRQA2jFbLpvif669tBSOZ35kuXO6J2fPntOppMsOKTHFtw0dwlrk
+         GbLfmLWe6UIhQ6Vh8awiVB8xOYrGMkBh5eL2+2/aMNX9BgAQdKImKyWnzi08lbCsjP96
+         5x7ZyoxrtsQSLN9t86LJnWcKnKch0qguObNXr13NV5arPYQ+R8SxJ0OxvcNWyvFc5TS7
+         2D2U24DE62dyAJxIVIIfTV5AWGde7cX6svhNo0Le1wA2epAfwiGAzrIPSlzrqV3EoEtS
+         hesKjrDRoz7Wq6WPyNvnkGZhb6Gry36emWqWgDhBwJF+1cyEEmEQ38L7HCwh595vwdBG
+         sqww==
+X-Gm-Message-State: AOAM530YWoZ0vSXqQRtqQnpLNQs7kYEYEPWRRqpABwhur+zbx9Ra9uXp
+        8HYXLBzPiA1HyXIGKoKEGMoo+CixHNfZ8g==
+X-Google-Smtp-Source: ABdhPJwRsw58t/w5EjdSopIo9vKuV+6Q33Q979I1kPe56+/qs2GM2sv5T/WYGIiyv52awVgrruu0BQ==
+X-Received: by 2002:a63:2c8c:: with SMTP id s134mr37414199pgs.221.1639110724158;
+        Thu, 09 Dec 2021 20:32:04 -0800 (PST)
+Received: from [172.20.4.26] ([66.185.175.30])
+        by smtp.gmail.com with ESMTPSA id q32sm1104068pja.4.2021.12.09.20.32.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Dec 2021 20:32:03 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, NeilBrown <neilb@suse.de>,
+        Christoph Hellwig <hch@infradead.org>
+In-Reply-To: <163910843527.9928.857338663717630212@noble.neil.brown.name>
+References: <163712340344.13692.2840899631949534137@noble.neil.brown.name>, <YZTx/93/9cjYW4zI@infradead.org>, <163910839418.9928.16399258868028694519@noble.neil.brown.name> <163910843527.9928.857338663717630212@noble.neil.brown.name>
+Subject: Re: [PATCH v3] pktdvd: stop using bdi congestion framework.
+Message-Id: <163911072211.490552.3194609024939007082.b4-ty@kernel.dk>
+Date:   Thu, 09 Dec 2021 21:32:02 -0700
 MIME-Version: 1.0
-From:   "NeilBrown" <neilb@suse.de>
-To:     "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        "Christoph Hellwig" <hch@infradead.org>
-Subject: [PATCH v2] FAT: use schedule_timeout_uninterruptible() instead of
- congestion_wait()
-In-reply-to: <163911011670.9928.6438117555175130033@noble.neil.brown.name>
-References: <163712349419.13692.2859038330142282757@noble.neil.brown.name>,
- <87ee79yiik.fsf@mail.parknet.co.jp>,
- <163754226639.13692.10449616189734943162@noble.neil.brown.name>,
- <874k84hi5q.fsf@mail.parknet.co.jp>,
- <163911011670.9928.6438117555175130033@noble.neil.brown.name>
-Date:   Fri, 10 Dec 2021 15:22:49 +1100
-Message-id: <163911016975.9928.6568675782275129@noble.neil.brown.name>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, 10 Dec 2021 14:53:55 +1100, NeilBrown wrote:
+> From afac2a88e6a256ffde7040c4191a2bae5df7f5f3 Mon Sep 17 00:00:00 2001
+> From: NeilBrown <neilb@suse.de>
+> Date: Wed, 29 Sep 2021 14:24:01 +1000
+> Subject: [PATCH] pktdvd: stop using bdi congestion framework.
+> 
+> The bdi congestion framework isn't widely used and should be
+> deprecated.
+> 
+> [...]
 
-congestion_wait() in this context is just a sleep - block devices do not
-in general support congestion signalling any more.
+Applied, thanks!
 
-The goal here is to wait for any recently written data to get to
-storage.  blkdev_issue_flush() is thought to be too expensive, so
-replace congestion_wait() with an explicit timeout.
+[1/1] pktdvd: stop using bdi congestion framework.
+      commit: db67097aa6f2587b44055f2e16db72a11e17faef
 
-Signed-off-by: NeilBrown <neilb@suse.de>
----
- fs/fat/file.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Best regards,
+-- 
+Jens Axboe
 
-diff --git a/fs/fat/file.c b/fs/fat/file.c
-index 13855ba49cd9..2321fb3eded5 100644
---- a/fs/fat/file.c
-+++ b/fs/fat/file.c
-@@ -175,9 +175,9 @@ long fat_generic_ioctl(struct file *filp, unsigned int cm=
-d, unsigned long arg)
- static int fat_file_release(struct inode *inode, struct file *filp)
- {
- 	if ((filp->f_mode & FMODE_WRITE) &&
--	     MSDOS_SB(inode->i_sb)->options.flush) {
-+	    MSDOS_SB(inode->i_sb)->options.flush) {
- 		fat_flush_inodes(inode->i_sb, inode, NULL);
--		congestion_wait(BLK_RW_ASYNC, HZ/10);
-+		schedule_timeout_uninterruptible(HZ/10);
- 	}
- 	return 0;
- }
---=20
-2.34.1
 
