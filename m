@@ -2,78 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6401AC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 13:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC5DC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 16:05:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234194AbhLJNsh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 08:48:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45778 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbhLJNsg (ORCPT
+        id S235710AbhLJQIu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 11:08:50 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:44616 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234571AbhLJQIt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 08:48:36 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B676C061746
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 05:45:02 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id i12so8512383pfd.6
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 05:45:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zocsZqbIpXZdqvpCYwUWFrEIkd60Xqe+FQJzj1rvev4=;
-        b=AbQhCDpQ0Ehd4y6VRCU9Xp+w2iQGThwL+NrLq8mt0bnUP2hycyjxRZBLqD3ukR45J5
-         qpwkggjvZhxJ/8D9Ohs4B8DQxubXC1f9fecars+MacsJzSKZo4J5BbwFhDliV9Xv+ppM
-         y7xSOYpUxM+tdGoQr1obbDGMz8eCwBpgHqkgSnM9UB4O4ZM8zrx8rWVAXQE6Dr5ydL5i
-         cpltsrsYQiBtptl3QfPCJtsq6xUkhMAwEh3eUkeEciXfdg2xlkZXNGTNkC6SB30pbu0r
-         R4wpD0Mfm8YH/tJdRbebkzuWhXZYaxdYkvOP664IIZxelc43tMFReJp/K2GlUVZsJQGg
-         eq6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zocsZqbIpXZdqvpCYwUWFrEIkd60Xqe+FQJzj1rvev4=;
-        b=eWPblUzGLBIndmkq3rER34pRNzO+e/NHtqjShYxQioJFJ7lJMVN3z7B6HM3/NQJsFK
-         DxCxdjcpXbO6p/kaTLa1KVwT1xyxHpJr0KAHLslL/qSAbQZ9IEDcHo62JuSSSYQLo4SB
-         PATBmIH3jswo2lIPaO7cXdVGHljfHRZYVJVflfHXTp68+tbwTvzGV3Z1d8k6VNjv8uRt
-         wX6bHPxi0Eue0fKHLEd2lAyTI844iMUtPS7nuqVkmdQ8H4A/wk079ple77qpGd2/lsk2
-         7zTLmvBghROZmzIb0BkedWFHRHxcLQ+vz9dAuM/Do4X+2Ff4VENz8LJORKDLjHkTWXMj
-         uidw==
-X-Gm-Message-State: AOAM532Ked0tDOc8oYyy/G3/jXaaGQhgVPxbOGjgYaTau4IaoG4DvoOd
-        EU/QwVOpzTLe5IYrHvo0Yq1uAw==
-X-Google-Smtp-Source: ABdhPJwlCLpg1648Cq9/sjohU1cgq2MOES4F7USfuo1J6BYOQRwajmcZVxBHWuHjb7DNs9Um6rzvFQ==
-X-Received: by 2002:a63:d04:: with SMTP id c4mr35264634pgl.472.1639143901579;
-        Fri, 10 Dec 2021 05:45:01 -0800 (PST)
-Received: from [172.20.4.26] ([66.185.175.30])
-        by smtp.gmail.com with ESMTPSA id ot7sm13827753pjb.21.2021.12.10.05.45.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 05:45:00 -0800 (PST)
-Subject: Re: [GIT PULL] nvme fixes for Linux 5.16
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YbLwmaLqilKEW0Q/@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <97bdd109-4854-459c-ca05-8c5c7c4ac9b0@kernel.dk>
-Date:   Fri, 10 Dec 2021 06:44:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 10 Dec 2021 11:08:49 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 3AB5E1F3A1;
+        Fri, 10 Dec 2021 16:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1639152313; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=jjPtiexGkN3NZLjX3LwKoZF566v6QWUX9HxDUptVdfU=;
+        b=iDf4n02B9snfo446+wymbxvl9Ca+v2nM/LPUsAgjcJnmtzqclKXcQr6xT+G8Xvat/jwIWF
+        oLueuBr2iT/inTHxlcsoSgBWXOrveAc4gdGMqSLJBAYqtOU0CHEx5w9k2+cw/oWEWMYuU1
+        AgAqV7FQZ2gqNmcMotIvbinWkJ+eeS4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1639152313;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=jjPtiexGkN3NZLjX3LwKoZF566v6QWUX9HxDUptVdfU=;
+        b=I44wiUMOB0lrQfSN826Wevbfr2yDp6wl3wflj7gNuMbREFQB2hEMaNaKI3Tpj+cR9XotbJ
+        a77h2IvLneNxpbCQ==
+Received: from suse.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
+        by relay2.suse.de (Postfix) with ESMTP id 2F480A3B92;
+        Fri, 10 Dec 2021 16:05:07 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     nvdimm@lists.linux.dev, linux-raid@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Geliang Tang <geliang.tang@suse.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>,
+        Wols Lists <antlists@youngman.org.uk>
+Subject: [PATCH v5 0/7] badblocks improvement for multiple bad block ranges
+Date:   Sat, 11 Dec 2021 00:04:49 +0800
+Message-Id: <20211210160456.56816-1-colyli@suse.de>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <YbLwmaLqilKEW0Q/@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/9/21 11:15 PM, Christoph Hellwig wrote:
-> git://git.infradead.org/nvme.git tags/nvme-5.16-2021-12-10
+Hi folks,
 
-Pulled, thanks.
+This is the v5 effort to improve badblocks code APIs to handle multiple
+ranges in bad block table.
+
+Comparing to previous v4 series, the changes in v5 series include,
+- Typos in code comments which are pointed out by Geliang Tang and
+  Wols Lists.
+- Drop extra local variables in helper routines which suggested by
+  Geliang Tang.
+- Change the user space testing code with all above changes.
+
+There is NO in-memory or on-disk format change in the whole series, all
+existing API and data structures are consistent. This series just only
+improve the code algorithm to handle more corner cases, the interfaces
+are same and consistency to all existing callers (md raid and nvdimm
+drivers).
+
+The original motivation of the change is from the requirement from our
+customer, that current badblocks routines don't handle multiple ranges.
+For example if the bad block setting range covers multiple ranges from
+bad block table, only the first two bad block ranges merged and rested
+ranges are intact. The expected behavior should be all the covered
+ranges to be handled.
+
+All the patches are tested by modified user space code and the code
+logic works as expected. The modified user space testing code is
+provided in the last patch. The testing code is an example how the
+improved code is tested.
+
+The whole change is divided into 6 patches to make the code review more
+clear and easier. If people prefer, I'd like to post a single large
+patch finally after the code review accomplished.
+
+Please review the code and response. Thank you all in advance.
+
+Coly Li
+
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Geliang Tang <geliang.tang@suse.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: NeilBrown <neilb@suse.de>
+Cc: Richard Fan <richard.fan@suse.com>
+Cc: Vishal L Verma <vishal.l.verma@intel.com>
+Cc: Wols Lists <antlists@youngman.org.uk>
+---
+
+Coly Li (6):
+  badblocks: add more helper structure and routines in badblocks.h
+  badblocks: add helper routines for badblock ranges handling
+  badblocks: improve badblocks_set() for multiple ranges handling
+  badblocks: improve badblocks_clear() for multiple ranges handling
+  badblocks: improve badblocks_check() for multiple ranges handling
+  badblocks: switch to the improved badblock handling code
+Coly Li (1):
+  test: user space code to test badblocks APIs
+
+ block/badblocks.c         | 1604 ++++++++++++++++++++++++++++++-------
+ include/linux/badblocks.h |   30 +
+ 2 files changed, 1339 insertions(+), 295 deletions(-)
 
 -- 
-Jens Axboe
+2.31.1
 
