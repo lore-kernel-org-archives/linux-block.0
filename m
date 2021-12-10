@@ -2,66 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F273EC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 17:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66798C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 18:21:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244435AbhLJRs6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 12:48:58 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:52386 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240884AbhLJRs5 (ORCPT
+        id S231864AbhLJSYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 13:24:42 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:55034 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232317AbhLJSYm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 12:48:57 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 10 Dec 2021 13:24:42 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 6BC45CE2C34;
-        Fri, 10 Dec 2021 17:45:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF9DC00446;
-        Fri, 10 Dec 2021 17:45:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639158318;
-        bh=h2+tsYbJOupsl375+icjqBHrs1cW+BMfkxLDD2UUNjc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PREYSS3TNe1zdeN12rSffhatLuWwieDm/d6zoldD+m6/eJKQUOmMQyMOlmpDi2eXr
-         S4qKoLFiIro1Cqh/SUVwQMR/+Y7USkq6r4/20tv8hmMY1s4OqntEeTXQUgEu1V75P9
-         kmGVRc2Jnt+J19PE3547Tt1XR5PMTMzqR1+kr3T0+f3aZSnQnMMNFQxbwTyI25BG54
-         HurnMHdeP/AJWMIOtrINJJ6TssmfEI6hSsP+vceGE/rX87Kl4lsjIT/SDpG5LQBOAO
-         xVdjd4I71vg8kO8qc/nsu2TLDpcjefIBLkkGt1ag3SIHHzt0ALntatttaKK27+NZYO
-         I+LqcuN0mcZrw==
-Date:   Fri, 10 Dec 2021 09:45:16 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-mmc@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v3 3/3] blk-crypto: show crypto capabilities in sysfs
-Message-ID: <YbOSLC9SNelqwD+g@sol.localdomain>
-References: <20211208013534.136590-1-ebiggers@kernel.org>
- <20211208013534.136590-4-ebiggers@kernel.org>
- <6ff4d074-7508-4f4c-de06-f36899668168@acm.org>
- <YbKT/lcp6iZ+lD4n@sol.localdomain>
- <YbL2uUqV0GWFOitE@kroah.com>
- <cb29756b-8b21-5b4d-f107-b5573945d7ab@acm.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 65AE41F37E;
+        Fri, 10 Dec 2021 18:21:05 +0000 (UTC)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0F43313BFF;
+        Fri, 10 Dec 2021 18:21:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ZsWJM46as2HgKAAAMHmgww
+        (envelope-from <dave@stgolabs.net>); Fri, 10 Dec 2021 18:21:02 +0000
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     axboe@kernel.dk
+Cc:     oleg@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dave@stgolabs.net,
+        Davidlohr Bueso <dbueso@suse.de>
+Subject: [PATCH] block: fix ioprio_get(IOPRIO_WHO_PGRP) vs setuid(2)
+Date:   Fri, 10 Dec 2021 10:20:58 -0800
+Message-Id: <20211210182058.43417-1-dave@stgolabs.net>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cb29756b-8b21-5b4d-f107-b5573945d7ab@acm.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 09:29:41AM -0800, Bart Van Assche wrote:
-> (c) This encoding enforces the restriction that data unit sizes are a power of
->     two. Is there anything fundamental in encryption that restricts data unit
->     sizes to a power of two? I don't know the answer myself.
+do_each_pid_thread(PIDTYPE_PGID) can race with a concurrent
+change_pid(PIDTYPE_PGID) that can move the task from one hlist
+to another while iterating. Serialize ioprio_get to take
+the tasklist_lock in this case, just like it's set counterpart.
 
-Well, the data unit size has to evenly divide the size of the request (for
-requests that have an encryption context which specifies that data unit size).
-So if the data unit size was, say, 1536 bytes, then all requests would have to
-be multiples of 1536 bytes.  That has a factor of 3 in it, so it would be
-impossible to make any power-of-2 size request.  That sounds pretty impractical;
-it's hard to see how and why we would ever support such a thing.
+Fixes: d69b78ba1de (ioprio: grab rcu_read_lock in sys_ioprio_{set,get}())
+Acked-by: Oleg Nesterov <oleg@redhat.com>
+Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
+---
+This is basically a resend of https://lore.kernel.org/all/20200817003148.23691-3-dave@stgolabs.net/
+with Oleg's ack and without the ioprio_set part as this was fixed
+later after this patch was lost for whatever reason.
 
-- Eric
+ block/ioprio.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/block/ioprio.c b/block/ioprio.c
+index 313c14a70bbd..6f01d35a5145 100644
+--- a/block/ioprio.c
++++ b/block/ioprio.c
+@@ -220,6 +220,7 @@ SYSCALL_DEFINE2(ioprio_get, int, which, int, who)
+ 				pgrp = task_pgrp(current);
+ 			else
+ 				pgrp = find_vpid(who);
++			read_lock(&tasklist_lock);
+ 			do_each_pid_thread(pgrp, PIDTYPE_PGID, p) {
+ 				tmpio = get_task_ioprio(p);
+ 				if (tmpio < 0)
+@@ -229,6 +230,8 @@ SYSCALL_DEFINE2(ioprio_get, int, which, int, who)
+ 				else
+ 					ret = ioprio_best(ret, tmpio);
+ 			} while_each_pid_thread(pgrp, PIDTYPE_PGID, p);
++			read_unlock(&tasklist_lock);
++
+ 			break;
+ 		case IOPRIO_WHO_USER:
+ 			uid = make_kuid(current_user_ns(), who);
+-- 
+2.26.2
+
