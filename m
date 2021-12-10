@@ -2,103 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EA4C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 08:04:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2246EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 08:19:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238136AbhLJIIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 03:08:25 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:32901 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238135AbhLJIIY (ORCPT
+        id S238413AbhLJIX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 03:23:26 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16357 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238389AbhLJIX0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 03:08:24 -0500
-Received: from kwepemi500005.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4J9NjG4pVgzcdVk;
-        Fri, 10 Dec 2021 16:04:34 +0800 (CST)
+        Fri, 10 Dec 2021 03:23:26 -0500
+Received: from kwepemi100005.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J9P254Sqlz93L6;
+        Fri, 10 Dec 2021 16:19:09 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500005.china.huawei.com (7.221.188.179) with Microsoft SMTP Server
+ kwepemi100005.china.huawei.com (7.221.188.155) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 10 Dec 2021 16:04:48 +0800
+ 15.1.2308.20; Fri, 10 Dec 2021 16:19:49 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Fri, 10 Dec
- 2021 16:04:47 +0800
+ 2021 16:19:48 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
-To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>, <tj@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+To:     <tj@kernel.org>, <mkoutny@suse.com>, <hch@infradead.org>,
+        <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH RFC] block, bfq: update pos_root for idle bfq_queue in bfq_bfqq_move()
-Date:   Fri, 10 Dec 2021 16:16:41 +0800
-Message-ID: <20211210081641.3025060-1-yukuai3@huawei.com>
+Subject: [PATCH v5 0/2] cancel all throttled bios in del_gendisk()
+Date:   Fri, 10 Dec 2021 16:31:41 +0800
+Message-ID: <20211210083143.3181535-1-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-During code review, we found that if bfqq is not busy in
-bfq_bfqq_move(), bfq_pos_tree_add_move() won't be called for the bfqq,
-thus bfqq->pos_root still points to the old bfqg. However, the ref
-that bfqq hold for the old bfqg will be released, so it's possible
-that the old bfqg can be freed. This is problematic because the freed
-bfqg can still be accessed by bfqq->pos_root.
+If del_gendisk() is done when some io are still throttled, such io
+will not be handled until the throttle is done, which is not
+necessary.
 
-Fix the problem by calling bfq_pos_tree_add_move() for idle bfqq
-as well.
+Changes in v2:
+ - move WARN_ON_ONCE() from throtl_rb_first() to it's caller
+ - merge some patches into one.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/bfq-cgroup.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Changes in v3:
+ - some code optimization in patch 1
+ - hold queue lock to cancel bios in patch 2
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 24a5c5329bcd..85f34c29b909 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -645,6 +645,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		   struct bfq_group *bfqg)
- {
- 	struct bfq_entity *entity = &bfqq->entity;
-+	struct bfq_group *old_parent = bfqq_group(bfqq);
- 
- 	/*
- 	 * Get extra reference to prevent bfqq from being freed in
-@@ -666,7 +667,6 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
- 	else if (entity->on_st_or_in_serv)
- 		bfq_put_idle_entity(bfq_entity_service_tree(entity), entity);
--	bfqg_and_blkg_put(bfqq_group(bfqq));
- 
- 	if (entity->parent &&
- 	    entity->parent->last_bfqq_created == bfqq)
-@@ -679,11 +679,16 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	/* pin down bfqg and its associated blkg  */
- 	bfqg_and_blkg_get(bfqg);
- 
--	if (bfq_bfqq_busy(bfqq)) {
--		if (unlikely(!bfqd->nonrot_with_queueing))
--			bfq_pos_tree_add_move(bfqd, bfqq);
-+	/*
-+	 * Don't leave the pos_root to old bfqg, since the ref to old bfqg will
-+	 * be released and the bfqg might be freed.
-+	 */
-+	if (unlikely(!bfqd->nonrot_with_queueing))
-+		bfq_pos_tree_add_move(bfqd, bfqq);
-+	bfqg_and_blkg_put(old_parent);
-+
-+	if (bfq_bfqq_busy(bfqq))
- 		bfq_activate_bfqq(bfqd, bfqq);
--	}
- 
- 	if (!bfqd->in_service_queue && !bfqd->rq_in_driver)
- 		bfq_schedule_dispatch(bfqd);
+Changes in v4:
+ - delete rcu_read_lock() and rcu_read_unlock() in patch 2
+
+Changes in v5:
+ - add comment about rcu lock
+
+Yu Kuai (2):
+  blk-throtl: move WARN_ON_ONCE() from throtl_rb_first() to it's caller
+  block: cancel all throttled bios in del_gendisk()
+
+ block/blk-throttle.c | 75 ++++++++++++++++++++++++++++++++++++++++++--
+ block/blk-throttle.h |  2 ++
+ block/genhd.c        |  2 ++
+ 3 files changed, 76 insertions(+), 3 deletions(-)
+
 -- 
 2.31.1
 
