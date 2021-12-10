@@ -2,189 +2,220 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9768C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 11:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1788EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Dec 2021 12:38:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232860AbhLJMBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 07:01:08 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:47924 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229664AbhLJMBI (ORCPT
+        id S240966AbhLJMlx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 07:41:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58334 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241113AbhLJMlu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 07:01:08 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        Fri, 10 Dec 2021 07:41:50 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F95C0617A2;
+        Fri, 10 Dec 2021 04:38:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=upZrkzNRX4XwrRuwRkvlfne+DDf3aGO8UN9C87AyJrw=; b=AMUb+1e88kQ2/eFpzwALfCt98m
+        Fr8Y6upZSgYpSJT5Daumr8MEkczw0xGhK10Qsx9iP949U0MC3xRS+btFouA2AvKmPq1iRakx/vGMB
+        XMeI1Uta4T2/cLThA0U6H9Iv805FdebVCDM1tqrl65n4HXoWA9hu5cE4SgfJ24Gr2T5s8t19F8XW2
+        KN9uwTQPjS604+QUbdLIImF0QM17RNykDaUdxKAq1+moHgGRBW75Pbm0c2lZ5NZhgCT2vwKtiI3o0
+        /jZM4pJQBfWam57JJvZ04genUd4X2BBH8qQaCrnLAXcGjwR8QAlNrmeQIeNojwQjbZE6P+kFwwomv
+        BwbR3scg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mvfA8-00AJyT-RP; Fri, 10 Dec 2021 12:38:09 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 2777C1F3A0;
-        Fri, 10 Dec 2021 11:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639137452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UGqTpPfwCs8oR8Xk7BbaQyH4TxPdYCJW+wRAyjcb1jA=;
-        b=GxujRQKr8kTHW6BgLKXN7cesdcK5g4mrvAjy2ijTC8S5o45G3NDAoNbj52b6dKYukmfgGj
-        I3BbsNBbq9/IYSVZM23rmB60lrmsJvphwGPTW+CzEzYJ0dNu1hWh9qtxyjcF7R3P3SV2qL
-        8DLfVGWxoLc2VdDTWqMsU5HZiQ7LP24=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639137452;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UGqTpPfwCs8oR8Xk7BbaQyH4TxPdYCJW+wRAyjcb1jA=;
-        b=fYFBwEd9CeYR605E1fzzGEqZpAMN0R+tt0vmupkEFsl59zNCKFlIAYKqnn/pJfKfTjg5tl
-        9fRknwhnez8BnSAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EE3B413C1D;
-        Fri, 10 Dec 2021 11:57:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id SX0zOatAs2HqeQAAMHmgww
-        (envelope-from <hare@suse.de>); Fri, 10 Dec 2021 11:57:31 +0000
-To:     Li Jinlin <lijinlin3@huawei.com>, song@kernel.org,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        axboe@kernel.dk, jack@suse.cz, ming.lei@redhat.com, tj@kernel.org,
-        mcgrof@kernel.org
-Cc:     linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linfeilong@huawei.com
-References: <20211210120631.2578505-1-lijinlin3@huawei.com>
- <20211210120631.2578505-2-lijinlin3@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v3 1/3] md: Fix undefined behaviour in is_mddev_idle
-Message-ID: <65d045bc-45d2-9e02-f0f7-7a0f51504eb9@suse.de>
-Date:   Fri, 10 Dec 2021 12:57:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 5431D3001C0;
+        Fri, 10 Dec 2021 13:38:07 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 118E92B3C36BD; Fri, 10 Dec 2021 13:38:07 +0100 (CET)
+Date:   Fri, 10 Dec 2021 13:38:07 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] block: switch to atomic_t for request references
+Message-ID: <YbNKLwMm+hv14WZs@hirez.programming.kicks-ass.net>
+References: <9f2ad6f1-c1bb-dfac-95c8-7d9eaa7110cc@kernel.dk>
+ <Ya2zfVAwh4aQ7KVd@infradead.org>
+ <Ya9E4HDK/LskTV+z@hirez.programming.kicks-ass.net>
+ <Ya9hdlBuWYUWRQzs@hirez.programming.kicks-ass.net>
+ <20211207202831.GA18361@worktop.programming.kicks-ass.net>
+ <CAHk-=wg=yTX5DQ7xxD7xNhhaaEQw1POT2HQ9U0afYB+6aBTs6A@mail.gmail.com>
+ <YbDmWFM5Kh1J2YqS@hirez.programming.kicks-ass.net>
+ <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20211210120631.2578505-2-lijinlin3@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiFLbv2M9gRkh6_Zkwiza17QP0gJLAL7AgDqDArGBGpSQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/10/21 1:06 PM, Li Jinlin wrote:
-> UBSAN reports this problem:
-> 
-> [ 5984.281385] UBSAN: Undefined behaviour in drivers/md/md.c:8175:15
-> [ 5984.281390] signed integer overflow:
-> [ 5984.281393] -2147483291 - 2072033152 cannot be represented in type 'int'
-> [ 5984.281400] CPU: 25 PID: 1854 Comm: md101_resync Kdump: loaded Not tainted 4.19.90
-> [ 5984.281404] Hardware name: Huawei TaiShan 200 (Model 5280)/BC82AMDDA
-> [ 5984.281406] Call trace:
-> [ 5984.281415]  dump_backtrace+0x0/0x310
-> [ 5984.281418]  show_stack+0x28/0x38
-> [ 5984.281425]  dump_stack+0xec/0x15c
-> [ 5984.281430]  ubsan_epilogue+0x18/0x84
-> [ 5984.281434]  handle_overflow+0x14c/0x19c
-> [ 5984.281439]  __ubsan_handle_sub_overflow+0x34/0x44
-> [ 5984.281445]  is_mddev_idle+0x338/0x3d8
-> [ 5984.281449]  md_do_sync+0x1bb8/0x1cf8
-> [ 5984.281452]  md_thread+0x220/0x288
-> [ 5984.281457]  kthread+0x1d8/0x1e0
-> [ 5984.281461]  ret_from_fork+0x10/0x18
-> 
-> When the stat aacum of the disk is greater than INT_MAX, its
-> value becomes negative after casting to 'int', which may lead
-> to overflow after subtracting a positive number. In the same
-> way, when the value of sync_io is greater than INT_MAX,
-> overflow may also occur. These situations will lead to
-> undefined behavior.
-> 
-> Otherwise, if the stat accum of the disk is close to INT_MAX
-> when creating raid arrays, the initial value of last_events
-> would be set close to INT_MAX when mddev initializes IO
-> event counters. 'curr_events - rdev->last_events > 64' will
-> always false during synchronization. If all the disks of mddev
-> are in this case, is_mddev_idle() will always return 1, which
-> may cause non-sync IO is very slow.
-> 
-> Fix by using atomic64_t type for sync_io, and using s64 type
-> for curr_events/last_events.
-> 
-> Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
-> ---
->  drivers/md/md.c       | 6 +++---
->  drivers/md/md.h       | 4 ++--
->  include/linux/genhd.h | 2 +-
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index 5111ed966947..be73a5ae6864 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -8429,14 +8429,14 @@ static int is_mddev_idle(struct mddev *mddev, int init)
->  {
->  	struct md_rdev *rdev;
->  	int idle;
-> -	int curr_events;
-> +	s64 curr_events;
->  
->  	idle = 1;
->  	rcu_read_lock();
->  	rdev_for_each_rcu(rdev, mddev) {
->  		struct gendisk *disk = rdev->bdev->bd_disk;
-> -		curr_events = (int)part_stat_read_accum(disk->part0, sectors) -
-> -			      atomic_read(&disk->sync_io);
-> +		curr_events = (s64)part_stat_read_accum(disk->part0, sectors) -
-> +			      atomic64_read(&disk->sync_io);
->  		/* sync IO will cause sync_io to increase before the disk_stats
->  		 * as sync_io is counted when a request starts, and
->  		 * disk_stats is counted when it completes.
-> diff --git a/drivers/md/md.h b/drivers/md/md.h
-> index 53ea7a6961de..e00d6730da13 100644
-> --- a/drivers/md/md.h
-> +++ b/drivers/md/md.h
-> @@ -50,7 +50,7 @@ struct md_rdev {
->  
->  	sector_t sectors;		/* Device size (in 512bytes sectors) */
->  	struct mddev *mddev;		/* RAID array if running */
-> -	int last_events;		/* IO event timestamp */
-> +	s64 last_events;		/* IO event timestamp */
->  
->  	/*
->  	 * If meta_bdev is non-NULL, it means that a separate device is
-> @@ -551,7 +551,7 @@ extern void mddev_unlock(struct mddev *mddev);
->  
->  static inline void md_sync_acct(struct block_device *bdev, unsigned long nr_sectors)
->  {
-> -	atomic_add(nr_sectors, &bdev->bd_disk->sync_io);
-> +	atomic64_add(nr_sectors, &bdev->bd_disk->sync_io);
->  }
->  
->  static inline void md_sync_acct_bio(struct bio *bio, unsigned long nr_sectors)
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index 74c410263113..efa7884de11b 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -150,7 +150,7 @@ struct gendisk {
->  	struct list_head slave_bdevs;
->  #endif
->  	struct timer_rand_state *random;
-> -	atomic_t sync_io;		/* RAID */
-> +	atomic64_t sync_io;		/* RAID */
->  	struct disk_events *ev;
->  #ifdef  CONFIG_BLK_DEV_INTEGRITY
->  	struct kobject integrity_kobj;
-> 
-You haven't answered my question.
-This patch has exactly the same problem than the original, only shifted
-to LONG_MAX instead of INT_MAX.
+On Wed, Dec 08, 2021 at 10:00:04AM -0800, Linus Torvalds wrote:
 
-Have you considered decreasing 'sync_io' in the endio handler, and then
-just using the 'sync_io' value to figure out if sync_io is active?
+> It's also why for "page->_mapcount" we have the "free" value being -1,
+> not 0, and the refcount is "off by one". It makes the special cases of
+> "increment from zero" and "decrement to zero" be very easy and
+> straightforward to test for.
+> 
+> That might be an option for an "atomic_ref" type - with our existing
+> "page_mapcount()" code being the thing we'd convert first, and make be
+> the example for it.
+> 
+> I think it should also make the error cases be very easy to check for
+> without extra tests. If you make "decrement from zero" be the "ok, now
+> it's free", then that shows in the carry flag. But otherwise, if SF or
+> OF is set, it's an error.  That means we can use the regular atomics
+> and flags (although not "dec" and "inc", since we'd care about CF).
+> 
+> So on x86, I think "atomic_dec_ref()" could be
+> 
+>         lock subl $1,ptr
+>         jc now_its_free
+>         jl this_is_an_error
+> 
+> if we end up having that "off by one" model.
+> 
+> And importantly, "atomic_inc_ref()" would be just
+> 
+>         lock incl ptr
+>         jle this_is_an_error
+> 
+> and this avoids us having to have the value in a register and test it
+> separately.
+> 
+> So your suggestion is _close_, but note how you can't do the "inc_ofl"
+> without that "off-by-one" model.
+> 
+> And again - I might have gotten the exact flag test instructions
+> wrong. That's what you get for not actually doing serious assembly
+> language for a couple of decades.
 
-Cheers,
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+add(         -3):       CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0       | sub(         -3):     CF=0 PF=1 AF=0 ZF=0 SF=1 ... OF=0
+add(         -2):       CF=0 PF=1 AF=0 ZF=0 SF=1 ... OF=0       | sub(         -2):     CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0
+add(         -1):       CF=1 PF=1 AF=1 ZF=1 SF=0 ... OF=0       | sub(         -1):     CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0
+add(          0):       CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0       | sub(          0):     CF=1 PF=1 AF=1 ZF=0 SF=1 ... OF=0
+add(          1):       CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0       | sub(          1):     CF=0 PF=1 AF=0 ZF=1 SF=0 ... OF=0
+add(          2):       CF=0 PF=1 AF=0 ZF=0 SF=0 ... OF=0       | sub(          2):     CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0
+add(          3):       CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0       | sub(          3):     CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0
+               :                                                |               :
+add( 2147483645):       CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0       | sub( 2147483645):     CF=0 PF=1 AF=0 ZF=0 SF=0 ... OF=0
+add( 2147483646):       CF=0 PF=1 AF=0 ZF=0 SF=0 ... OF=0       | sub( 2147483646):     CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0
+add( 2147483647):       CF=0 PF=1 AF=1 ZF=0 SF=1 ... OF=1       | sub( 2147483647):     CF=0 PF=0 AF=0 ZF=0 SF=0 ... OF=0
+add(-2147483648):       CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0       | sub(-2147483648):     CF=0 PF=1 AF=1 ZF=0 SF=0 ... OF=1
+add(-2147483647):       CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0       | sub(-2147483647):     CF=0 PF=1 AF=0 ZF=0 SF=1 ... OF=0
+add(-2147483646):       CF=0 PF=1 AF=0 ZF=0 SF=1 ... OF=0       | sub(-2147483646):     CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0
+add(-2147483645):       CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0       | sub(-2147483645):     CF=0 PF=0 AF=0 ZF=0 SF=1 ... OF=0
+
+So:
+
+e := z
+l := s!=o
+
+inc()						inc()
+	lock inc %[var]                     		mov       $-1, %[reg]
+	jle	error-zero-or-negative          	lock xadd %[reg], %[var]
+                                                	test      %[reg], %[reg]
+                                                	jle	  error-zero-or-negative
+                                                
+dec()                                           dec()
+	lock sub $1, %[var]                     	lock dec %[var]
+	jc	error-to-zero                   	jle	error-zero-or-negative
+	jl	error-from-negative             
+                                                
+dec_and_test()                                  dec_and_test()
+	lock sub $1, %[var]                     	lock dec %[var]
+	jc	do-free                         	jl	error-from-negative
+	jl	error-from-negative             	je	do-free
+
+
+Should work I suppose, and gives [-1, INT_MIN] as operating range. It
+adds a single branch instruction (which should be default predicted
+not-taken due to being a forward jump IIRC) but makes inc a lot smaller.
+
+
+Except I've no sane idea how to make it work with the rest of
+refcount_t. The best I can seem to come up with is something like:
+
+#define ATOMIC_OFL_OFFSET	1
+
+static inline int refcount_read(const refcount_t *r)
+{
+	return atomic_read(&r->refs) + ATOMIC_OFL_OFFSET;
+}
+
+static inline void refcount_set(refcount_t *r, int n)
+{
+	atomic_set(&r->refs, n - ATOMIC_OFL_OFFSET);
+}
+
+static inline __must_check bool __refcount_add_not_zero(int i, refcount_t *r, int *oldp)
+{
+	int old = atomic_read(&r->refs);
+
+	do {
+		if (old == -ATOMIC_OFL)
+			break;
+	} while (!atomic_try_cmpxchg_relaxed(&r->refs, &old, old + i));
+
+	old += ATOMIC_OFL_OFFSET;
+
+	if (oldp)
+		*oldp = old;
+
+	if (unlikely(old < 0 || (i > 1 && old + i < 0)))
+		refcount_warn_saturate(r, REFCOUNT_ADD_NOT_ZERO_OVF);
+
+	return old;
+}
+
+static inline void __refcount_add(int i, refcount_t *, int *oldp)
+{
+	int old = atomic_fetch_add_relaxed(i, &r->refs) + ATOMIC_OFL_OFFSET;
+
+	if (oldp)
+		*oldp = old;
+
+	if (unlikely(!old))
+		refcount_warn_saturate(r, REFCOUNT_ADD_UAF);
+	if (unlikely(old < 0 || old + i < 0)
+		refcount_warn_saturate(r, REFCOUNT_ADD_OVF);
+}
+
+And have the generic code have: ATOMIC_OFL_OFFSET == 0.
+
+Do we *really* want to do that ?
+
+With the above, __refcount_add_not_zero(), for the common case of: @i=1,
+@oldp=NULL we get:
+
+    a8f7:       41 8b 04 24             mov    (%r12),%eax
+    a8fb:       83 f8 ff                cmp    $0xffffffff,%eax
+    a8fe:       74 1a                   je     a91a <ring_buffer_get+0x3a>
+    a900:       8d 50 01                lea    0x1(%rax),%edx
+    a903:       f0 41 0f b1 14 24       lock cmpxchg %edx,(%r12)
+    a909:       75 f0                   jne    a8fb <ring_buffer_get+0x1b>
+    a90b:       85 d2                   test   %edx,%edx
+    a90d:       78 19                   js     a928 <ring_buffer_get+0x48>
+
+Which is actually really nice because i == ATOMIC_OFL_OFFSET.
+
+Anybody? For now I think I'll drop the documentation patch and do this
+scheme as the last patch in the series for v2.
+
+Also, Mark suggested I rename the new primitives to:
+atomic_*_overflow().
