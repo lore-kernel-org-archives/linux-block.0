@@ -2,113 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB66DC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 11 Dec 2021 02:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA53C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 11 Dec 2021 02:10:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243095AbhLKCIr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Dec 2021 21:08:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48694 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244426AbhLKCI0 (ORCPT
+        id S232824AbhLKCOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Dec 2021 21:14:30 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:29181 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229596AbhLKCOa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Dec 2021 21:08:26 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 085CBC0617A1
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 18:04:51 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id d11so870475pgl.1
-        for <linux-block@vger.kernel.org>; Fri, 10 Dec 2021 18:04:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=2S8/I20Ezd/HLw6sc+AWiuN7klMREXmDQI1IahWHKQA=;
-        b=6fM9O1Dh/P1lWRQ3SMkvNku8Ph06gI7kJMWiYxUHz3X9Nb0HHP6CsFLuy6JJbjVqt/
-         kYY2kJdZwjFVV4qinsy6RA1x8KQ2+RyqSeqiMVWtCEVU9ci4hKSF88eQRH74qv7ihE6Q
-         brqWWhoTcGwYUf8Ca3M5y+WV3VhDqKlIGGlwNXI2WttfWgiSFXAwdwk2Py05M/z1NUUA
-         9fF94bS/Fw3MGD1qnixQ2yZwP7Ngq1Hy7oW3uPHYvy9/VAi7h1sXXShKXPhdOLKIINPI
-         ZTucxmEpUkKbd4FC2kAwmiXrZtWEVJZE1ANiEIX1qoHx+sQ6BHrEsUub8Ayxf7F9u4ip
-         TWtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2S8/I20Ezd/HLw6sc+AWiuN7klMREXmDQI1IahWHKQA=;
-        b=kaQjkyCI7koGacTTA0k+gVyyn2TkC1WK1VaLs2CxoL2rOP4qm1x9L8mw/sApLVZmMa
-         HWXrz8+U7UOjOlvQUfYOR8MwHfGssciIo1siMThHxaCiNGjTbuh3L9V6kUc1vTnGeFVh
-         DIkImCkdtscJFqIUpSvN6+hXEFFNlf62yNbnU5m637IGhaOJiCIjZHPNwatOnfg0yJeF
-         zaEjs8ZfIAAYonvizywECnzOZ4P4lWQSeOmye/C3wo4y2Rvp2I9QMeRIpPLpdNLOUtsO
-         aDrnGHb4N33BgyfzPWNfdqE17kqrH9NIeF5qxa6bdVoaFB5TiEguX3+tcNErSKDSCxqE
-         5Pkw==
-X-Gm-Message-State: AOAM531E7kRIYtLe/GV9SjC0V9FxQ3+djwwQuiUhDglabg1iMXenrJ0U
-        RsQBPyGDF+uuBErcem0+j59HSA==
-X-Google-Smtp-Source: ABdhPJzRP3MBItZpg6nAIkTDSO2bM6xHpEVEXCUCFKSIS6assdVuUWT7a0rrwdfVSe6hVc1kRpbCTQ==
-X-Received: by 2002:a05:6a00:1681:b0:4a8:2462:ba0a with SMTP id k1-20020a056a00168100b004a82462ba0amr21272811pfc.75.1639188290374;
-        Fri, 10 Dec 2021 18:04:50 -0800 (PST)
-Received: from [172.20.4.26] ([66.185.175.30])
-        by smtp.gmail.com with ESMTPSA id nm13sm244380pjb.56.2021.12.10.18.04.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 18:04:49 -0800 (PST)
-Subject: Re: Random high CPU utilization in blk-mq with the none scheduler
-To:     Dexuan Cui <decui@microsoft.com>,
-        "'ming.lei@redhat.com'" <ming.lei@redhat.com>,
-        'Christoph Hellwig' <hch@lst.de>,
-        "'linux-block@vger.kernel.org'" <linux-block@vger.kernel.org>
-Cc:     Long Li <longli@microsoft.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>
-References: <BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com>
- <BYAPR21MB1270DCE17A0FE017AF3272F1BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b80bfe9a-bece-1f32-3d2a-fb4d94b1fa8c@kernel.dk>
-Date:   Fri, 10 Dec 2021 19:04:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 10 Dec 2021 21:14:30 -0500
+Received: from kwepemi500006.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J9rmC4Vr3z8vlC;
+        Sat, 11 Dec 2021 10:08:43 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500006.china.huawei.com (7.221.188.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 11 Dec 2021 10:10:52 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 11 Dec 2021 10:10:51 +0800
+Subject: Re: [PATCH RFC 9/9] block, bfq: decrease
+ 'num_groups_with_pending_reqs' earlier
+To:     Paolo Valente <paolo.valente@linaro.org>
+CC:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211127101132.486806-1-yukuai3@huawei.com>
+ <20211127101132.486806-10-yukuai3@huawei.com>
+ <AA66019E-FD14-4821-B53D-0C56EEC38828@linaro.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <4765e7f8-48b7-3bc6-5eb6-1dc0a569233d@huawei.com>
+Date:   Sat, 11 Dec 2021 10:10:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR21MB1270DCE17A0FE017AF3272F1BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <AA66019E-FD14-4821-B53D-0C56EEC38828@linaro.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/10/21 6:29 PM, Dexuan Cui wrote:
->> From: Dexuan Cui
->> Sent: Thursday, December 9, 2021 7:30 PM
+ÔÚ 2021/12/10 18:21, Paolo Valente Ð´µÀ:
+> 
+>> Il giorno 27 nov 2021, alle ore 11:11, Yu Kuai<yukuai3@huawei.com>  ha scritto:
 >>
->> Hi all,
->> I found a random high CPU utilization issue with some database benchmark
->> program running on a 192-CPU virtual machine (VM). Originally the issue
->> was found with RHEL 8.4 and Ubuntu 20.04, and further tests show that the
->> issue also reproduces with the latest upstream stable kernel v5.15.7, but
->> *not* with v5.16-rc1. It looks like someone resolved the issue in v5.16-rc1
->> recently?
+>> Currently 'num_groups_with_pending_reqs' won't be decreased when
+>> the group doesn't have any pending requests, while any child group
+>> have any pending requests. The decrement is delayed to when all the
+>> child groups doesn't have any pending requests.
+>>
+>> For example:
+>> 1) t1 issue sync io on root group, t2 and t3 issue sync io on the same
+>> child group. num_groups_with_pending_reqs is 2 now.
+>> 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 and
+>> t3 still can't be handled concurrently.
+>>
+>> Fix the problem by decreasing 'num_groups_with_pending_reqs'
+>> immediately upon the deactivation of last entity of the group.
+>>
+> I don't understand this patch clearly.
 > 
-> I did git-bisect on the linux-block tree's for-5.16/block branch and this patch
-> resolves the random high CPU utilization issue (I'm not sure how):
-> 	dc5fc361d891 ("block: attempt direct issue of plug list")
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.16/block&id=dc5fc361d891e089dfd9c0a975dc78041036b906
+> I understand your proposal not to count a group as with pending requests, in case no child process of the group has IO, but only its child groups have pending requests.
 > 
-> Do you think if it's easy to backport it to earlier versions like 5.10?
-> It looks like there are a lot of prerequisite patches.
+> So, entities here are only queues for this patch?
+> 
+> If they are only queues, I think it is still incorrect to remove the group from the count of groups with pending IO when all its child queues are deactivated, because there may still be unfinished IO for those queues.
 
-It's more likely the real fix is avoiding the repeated plug list scan,
-which I guess makes sense. That is this commit:
+Hi, Paolo
 
-commit d38a9c04c0d5637a828269dccb9703d42d40d42b
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Thu Oct 14 07:24:07 2021 -0600
+bfq_weights_tree_remove() will be called when all requests are completed
+in bfq_queue, thus I recored how many queues have pending requests
+through weights tree insertion and removal.(Details in patch 7)
 
-    block: only check previous entry for plug merge attempt
+Thus when calling bfq_weights_tree_remove() for bfqq, I can check if
+there are no queues have pending requests for parent bfqg:
 
-If that's the case, try 5.15.x again and do:
+if (!bfqg->num_entities_with_pending_reqs && -> no queues with pending reqs
+     entity->in_groups_with_pending_reqs) {   -> the group is counted
 
-echo 2 > /sys/block/<dev>/queue/nomerges
-
-for each drive you are using in the IO test, and see if that gets
-rid of the excess CPU usage.
-
--- 
-Jens Axboe
-
+Thanks,
+Kuai
+> 
+> Am I missing something?
+> 
+> Thanks,
+> Paolo
+> 
