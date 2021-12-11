@@ -2,108 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD42C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 11 Dec 2021 14:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAA9C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 11 Dec 2021 17:28:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbhLKOVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Dec 2021 09:21:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39378 "EHLO
+        id S231587AbhLKR2z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Dec 2021 12:28:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbhLKOVc (ORCPT
+        with ESMTP id S231567AbhLKR2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Dec 2021 09:21:32 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 981F0C061714
-        for <linux-block@vger.kernel.org>; Sat, 11 Dec 2021 06:21:32 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id g18so10990638pfk.5
-        for <linux-block@vger.kernel.org>; Sat, 11 Dec 2021 06:21:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=FekVagPR4dXcdP7uCFP0bvB/Z8TAk+0KsA2Qc/XbD5o=;
-        b=sfPz8A52lShEbmglLHjKdvUCMiUMbzRltBUE1sFRStCWOsJvUxFSDvYfisK6eNaknF
-         kGfBp0iV6g0jhJNvGFnicM0yEcIIW4DQm7IAubr3a6Q4zZU2qzzAJDWPpE/ya8r+hBmf
-         3OYDCEtNLbut33y8RBHEuOEoipKBXbca4Qar7aPvrYnDh9DCsMWyKFh+bT69QAauQBu1
-         zk/AsnW6cYsnOzSDuQilPoMYZAVTz0i3M16NnX+fijdl3aL+HT49GPcCWjoobyNdHURV
-         sK7yjc0y00Z8+2uqEykaVj27RUUOOYB/cvFBBRaO4wN5us0BJbrG7DslZ2yVi+xhSK8n
-         EI0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FekVagPR4dXcdP7uCFP0bvB/Z8TAk+0KsA2Qc/XbD5o=;
-        b=V/BkTFTVPZ181pIaavMLd8nH7L0ZVXDeXWg/MuRz8Ai3wc9VfU7V9FxMWrJ/tRdo95
-         gP49FUGHkSo0/+J7I+b2QNrW9BhstB0HEtkCOFMcl95U3aw8kKxKIs22YkpIwvEwwT3b
-         KoBfT0XJqeBdVEfwzkYyrCUmS4JWGcolt+NrY28JJYAYxalyuLghw+q/2VPpKFApP4RS
-         dpCZDa/tEvkJFiCqt8mjcn7VwNGcAwmkEzFAruUqPMHFmzyvUelsJWZdjfUIRw8MNIqJ
-         brSGhYGtsdgDb0v2Isr2VVrL9Za36kFxIjhIp1/55UaMN1+gH11I+iVSv2cpSlH6p6tB
-         8Wgg==
-X-Gm-Message-State: AOAM532TCJPKMy7vR2T1igw17NBaHFf91NXp5MoXuKG++8kOG6nz/Ace
-        ToO/CSaNdupTczAzGc6X3Aa6wQ==
-X-Google-Smtp-Source: ABdhPJwixsbfy1EcS7D11sG6Xm/+t6AUFl1VNzSPMMVewBfh8zL/+dyGLuyG6f/vL4/zQWBciSC5Fg==
-X-Received: by 2002:a63:5a18:: with SMTP id o24mr43568267pgb.459.1639232491977;
-        Sat, 11 Dec 2021 06:21:31 -0800 (PST)
-Received: from [172.20.4.26] ([66.185.175.30])
-        by smtp.gmail.com with ESMTPSA id q17sm7628946pfu.117.2021.12.11.06.21.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Dec 2021 06:21:31 -0800 (PST)
-Subject: Re: Random high CPU utilization in blk-mq with the none scheduler
-To:     Dexuan Cui <decui@microsoft.com>,
-        "'ming.lei@redhat.com'" <ming.lei@redhat.com>,
-        'Christoph Hellwig' <hch@lst.de>,
-        "'linux-block@vger.kernel.org'" <linux-block@vger.kernel.org>
-Cc:     Long Li <longli@microsoft.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>
-References: <BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com>
- <BYAPR21MB1270DCE17A0FE017AF3272F1BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
- <b80bfe9a-bece-1f32-3d2a-fb4d94b1fa8c@kernel.dk>
- <BYAPR21MB1270B5DAD526C42C070ECB9EBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
- <c5c8f95e-f430-6655-bab5-d2a2948ab81d@kernel.dk>
- <BYAPR21MB127011609EBF6567126EBF83BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
- <BYAPR21MB1270B53CFDDFD52AD942B3AEBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b4350274-7219-1d1f-7a39-3f445c081fd1@kernel.dk>
-Date:   Sat, 11 Dec 2021 07:21:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <BYAPR21MB1270B53CFDDFD52AD942B3AEBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Sat, 11 Dec 2021 12:28:52 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59848C061714
+        for <linux-block@vger.kernel.org>; Sat, 11 Dec 2021 09:28:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2341AB80B27
+        for <linux-block@vger.kernel.org>; Sat, 11 Dec 2021 17:28:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA5A2C341C8;
+        Sat, 11 Dec 2021 17:28:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639243729;
+        bh=FN2mkso79iKAnds5iJei/01CMiGTHDjz0KsDOOn7Mo4=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=uAmqwkCVfErm+YbBfk9QU/X3NZDCtHcN4y+CHXkR1tYJyHwe94o2TKxaJS1cPfh3J
+         /9uz6Y6QgfJ4HJAECBMsVD5griebMUia8BO1XpWvvjLWxrM0X/Dh3fOLpIpGF9U4qU
+         BvntVxWe1zlUH3ZF6BFMcLLRmwNFjI8UVV8ceQNOTGz4pFMkg4mQzugLxWK6rgQSWp
+         cjLWVvmlo8tmgrJ+mHkaLK9cpM6xhId7qflRj7eiyVudcDiYi/vT1bBJ1xVpN+eoOZ
+         dLiiR4NyA7SRmf5t8HddJbHM7Kpf8ZFWKv7L+Ve+EAVMNhxUyp1nTa5hQJ2H4ikdTs
+         9T7y4lojUqCPg==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id DB82660A36;
+        Sat, 11 Dec 2021 17:28:48 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 5.16-rc5
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <b2e03df4-5be8-4e82-54ad-4dfc9b9d47ac@kernel.dk>
+References: <b2e03df4-5be8-4e82-54ad-4dfc9b9d47ac@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <b2e03df4-5be8-4e82-54ad-4dfc9b9d47ac@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-10
+X-PR-Tracked-Commit-Id: 5eff363838654790f67f4bd564c5782967f67bcc
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: eccea80be2576dee642bc6cab20f1a242d58a08c
+Message-Id: <163924372889.9148.12068632187430685490.pr-tracker-bot@kernel.org>
+Date:   Sat, 11 Dec 2021 17:28:48 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/21 12:09 AM, Dexuan Cui wrote:
->> From: Dexuan Cui
->> Sent: Friday, December 10, 2021 7:45 PM
->>
->>> From: Jens Axboe <axboe@kernel.dk>
->>>
->>> Just out of curiosity, can you do:
->>>
->>> # perf record -a -g -- sleep 3
->>>
->>> when you see the excessive CPU usage, then attach the output of
->>>
->>> # perf report -g
->>>
->>> to a reply?
-> 
-> I realized you only asked for the output of "pref report -g", which
-> is much smaller. Please see the attachment for it. 
-> try_to_grab_pending() is the hottest function, e.g. see line 2479.
+The pull request you sent on Fri, 10 Dec 2021 23:09:52 -0700:
 
-Sorry, can you do:
+> git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-10
 
-# perf report -g --no-children
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/eccea80be2576dee642bc6cab20f1a242d58a08c
 
-instead?
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
