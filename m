@@ -2,121 +2,337 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9CFC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 12 Dec 2021 19:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8988FC433FE
+	for <linux-block@archiver.kernel.org>; Sun, 12 Dec 2021 19:34:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbhLLTTw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Dec 2021 14:19:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
+        id S229867AbhLLTeW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Dec 2021 14:34:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbhLLTTw (ORCPT
+        with ESMTP id S229711AbhLLTeW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Dec 2021 14:19:52 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35386C061714
-        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 11:19:52 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id z26so16234973iod.10
-        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 11:19:52 -0800 (PST)
+        Sun, 12 Dec 2021 14:34:22 -0500
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 459CAC061714
+        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 11:34:22 -0800 (PST)
+Received: by mail-io1-xd2d.google.com with SMTP id z26so16261441iod.10
+        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 11:34:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3lZYxpFHoHqMrCneiYqxM2dzSIurnwCBe+TMroYiJck=;
-        b=FBOecOtaMwOkhlDZ0/J2RlgSx2edE8HMAZwyEgihebjHlovFCXr5/KAvd7O9OPw0l0
-         oOHgGZnzouRALI68Xas2MduS55uPE8j3hcXN04AD50aAx0fDMyvGD3l5V4eQ6hTxItzb
-         pir4UzAIViHXY7iXSCeh2Eq/ZfANX0dHh6mF3AYt7msBYlyWunE+cuL3HB3qIPbgOBvJ
-         EVgpOYjUkYhW1fPm29YsuM2wcEhnQlwbgpp1BYY53+tEjXcztsIAcaCvC2DT+aQpe+4t
-         //R9qoZ4plzKwkyM9ksX62V4TLxHWne6Q+RkRBlK0vLaydXnpS8emzE723S1xju8Vnri
-         SbmA==
+        bh=lZ+l7uzShCuzC5tuwX4/K4z01/9IOyPLBkoQZ+OHhsw=;
+        b=NoFrd5QdLo/4V2EcaWiZDUQO2KjtIMNGke5SjBW309ZRPodaaJxrjmvw0QjlKb23p3
+         9fueuD9x3ies3yzEYI0fK0TJpdvGkC1V+Ku6igDiYEgg9RicbtdS0vTnhHfYVjAr7ksD
+         IzS7XadQKseEG3kjJFPoohvBdC+1Bl/lnRs+e82wOPesN7r8etOb3ZYknHeFzIVf6ue3
+         vs9p+ydJQVnJ8o2ivWEOK/f8deYHR60VqBVMlPYgh11C4nqzfW5RopXr05+OGwcyxLU1
+         bUJBuElgjcJQJjWBTr3tZfVQbt9nbJNexR6mJXoZ87tizWB/c3tMiGY72DtPQl34R2zn
+         Aw1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=3lZYxpFHoHqMrCneiYqxM2dzSIurnwCBe+TMroYiJck=;
-        b=Y4Kv6YCIzjPV5HrkYnZtjGaVGXG/5BArAIiWMIA69cnbatoVlv3fVMvDRpuh63AeAa
-         utV+iG3PFv+9RU/xMfX5Swi4qCkPt3Mn+TSQz/ff+Ud9F+gDrstLagzJ7E0G8UTa1pmP
-         E9BnGucaXjZKY/o4MelrzikcaFE50gDmSrf6QPFZM306sQW9qgBHaDkgx617mUJ5yLCM
-         +44CnnYnI61Ca3Fu3iYyTRzyW6ViV4bnJ/dxTwfRxiUN9GvBKaAkXPS7OIjoW7Qi9ksS
-         yB/hR+oxs0XEe66re0/fGXuEDuWBYwfbYCuKpeW7Is5l+vrWdW/YQBi6P4lpOpfzD0Hx
-         sEnw==
-X-Gm-Message-State: AOAM533A0LF1lSS1QZhxv0tTNoOBaFlCT8ji160zh5i74yocXLDRpzbv
-        WgTgtLAv7AU5QG6tEVI3HsJgIeyoeqhf0Q==
-X-Google-Smtp-Source: ABdhPJy8YauyTX8Vc2KXDIZeOSGmxTPw/AoCqg0BVxPbFoL9vjndnKCfeQRFl1tsYKRtdhtYNIQXNA==
-X-Received: by 2002:a5d:9ec2:: with SMTP id a2mr31833716ioe.44.1639336791259;
-        Sun, 12 Dec 2021 11:19:51 -0800 (PST)
+        bh=lZ+l7uzShCuzC5tuwX4/K4z01/9IOyPLBkoQZ+OHhsw=;
+        b=jNOQHWBNFq/OKDCH93vzxU+s2ANrRlj6t9JgsHjNXRyERte9UTvNT6hF8w0D9z/4lm
+         Bt5E55xszMRXwm2l7ItPrn13QDYDgxvtYrH/7nYQk/hK/GYVqwDfBLtaLwWdEzOCeOJA
+         cX5K/WvMfKWthWnvRU7/3UVRPz3r6hFz3Bs/ibRZDRF7xVe5p41as7FW5733ZVxEGMYj
+         C4xdwRH+fkcplobPsoqT6g+eNWSnYbZfzvypkHKc5pwsBUZ6NVasWJJFZ6K3K0Mhq8ui
+         UpsVqrPXtWFjMg67USlXQu/CFZB8rmidj0ednbqRWGNwFcNvQV4vDIKI8x2LsMRpBo3r
+         2IZg==
+X-Gm-Message-State: AOAM530Mu5DMdF7fGE98iycYiu16/rWJnCT4RkSfm0RbrPKxZFP6G1bD
+        fDS5lCg8zStnmBGmhGhFnBSlKg==
+X-Google-Smtp-Source: ABdhPJzb+GQE8PRRhWae99vXI1FIHjtNgKdXNg9egXcwgIbMZxFN4PpMfctVkEp+0Gu1GZQACUfjTg==
+X-Received: by 2002:a5d:9053:: with SMTP id v19mr30817254ioq.39.1639337661564;
+        Sun, 12 Dec 2021 11:34:21 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id 18sm5951719iln.83.2021.12.12.11.19.50
+        by smtp.gmail.com with ESMTPSA id r14sm7791572ill.70.2021.12.12.11.34.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Dec 2021 11:19:50 -0800 (PST)
-Subject: Re: [PATCH] mtd_blkdevs: don't scan partitions for plain mtdblock
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        "linux-mtd @ lists . infradead . org" <linux-mtd@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-References: <20211206070409.2836165-1-hch@lst.de>
- <4bc1b80c-9c43-ccd6-de78-09f9a1627cc8@kernel.dk>
- <CAMuHMdU0q-W0YSLqjazK32VuE5ZH+eE8H1vbv74o014Dw7wSXg@mail.gmail.com>
+        Sun, 12 Dec 2021 11:34:21 -0800 (PST)
+Subject: Re: [PATCH v13 02/12] bcache: initialize the nvm pages allocator
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Qiaowei Ren <qiaowei.ren@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <20211212170552.2812-1-colyli@suse.de>
+ <20211212170552.2812-3-colyli@suse.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <db998e18-6b2b-63b0-c00e-757778cecd89@kernel.dk>
-Date:   Sun, 12 Dec 2021 12:19:47 -0700
+Message-ID: <db3fe961-020a-1d0d-bfb8-d5229b50474f@kernel.dk>
+Date:   Sun, 12 Dec 2021 12:34:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdU0q-W0YSLqjazK32VuE5ZH+eE8H1vbv74o014Dw7wSXg@mail.gmail.com>
+In-Reply-To: <20211212170552.2812-3-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/12/21 3:02 AM, Geert Uytterhoeven wrote:
-> Hi Jens,
-> 
-> On Fri, Dec 10, 2021 at 7:52 PM Jens Axboe <axboe@kernel.dk> wrote:
->> On Mon, Dec 6, 2021 at 12:04 AM Christoph Hellwig <hch@lst.de> wrote:
->>> mtdblock / mtdblock_ro set part_bits to 0 and thus nevever scanned
->>> partitions.  Restore that behavior by setting the GENHD_FL_NO_PART flag.
->>>
->>> Fixes: 1ebe2e5f9d68e94c ("block: remove GENHD_FL_EXT_DEVT")
->>> Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->>> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> 
->>> @@ -355,9 +355,11 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
->>>                                  "%s%c%c", tr->name,
->>>                                  'a' - 1 + new->devnum / 26,
->>>                                  'a' + new->devnum % 26);
->>> -       else
->>> +       } else {
->>>                 snprintf(gd->disk_name, sizeof(gd->disk_name),
->>>                          "%s%d", tr->name, new->devnum);
->>> +               gd->flags |= GENHD_FL_NO_PART;
->>> +       }
->>
->> Not sure why I didn't spot this until now, but:
->>
->> drivers/mtd/mtd_blkdevs.c: In function ‘add_mtd_blktrans_dev’:
->> drivers/mtd/mtd_blkdevs.c:362:30: error: ‘GENHD_FL_NO_PART’ undeclared (first use in this function); did you mean ‘GENHD_FL_NO_PART_SCAN’?
->>   362 |                 gd->flags |= GENHD_FL_NO_PART;
->>       |                              ^~~~~~~~~~~~~~~~
->>       |                              GENHD_FL_NO_PART_SCAN
->> drivers/mtd/mtd_blkdevs.c:362:30: note: each undeclared identifier is reported only once for each function it appears in
->>
->> Hmm?
->>
->> I'm going to revert this one for now, not sure how it could've been
->> tested in this form.
-> 
-> Because next-20211130 and later have commit 46e7eac647b34ed4 ("block:
-> rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART").
+On 12/12/21 10:05 AM, Coly Li wrote:
+> diff --git a/drivers/md/bcache/nvmpg.c b/drivers/md/bcache/nvmpg.c
+> new file mode 100644
+> index 000000000000..b654bbbda03e
+> --- /dev/null
+> +++ b/drivers/md/bcache/nvmpg.c
+> @@ -0,0 +1,340 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Nvdimm page-buddy allocator
+> + *
+> + * Copyright (c) 2021, Intel Corporation.
+> + * Copyright (c) 2021, Qiaowei Ren <qiaowei.ren@intel.com>.
+> + * Copyright (c) 2021, Jianpeng Ma <jianpeng.ma@intel.com>.
+> + */
+> +
+> +#include "bcache.h"
+> +#include "nvmpg.h"
+> +
+> +#include <linux/slab.h>
+> +#include <linux/list.h>
+> +#include <linux/mutex.h>
+> +#include <linux/dax.h>
+> +#include <linux/pfn_t.h>
+> +#include <linux/libnvdimm.h>
+> +#include <linux/mm_types.h>
+> +#include <linux/err.h>
+> +#include <linux/pagemap.h>
+> +#include <linux/bitmap.h>
+> +#include <linux/blkdev.h>
+> +
+> +struct bch_nvmpg_set *global_nvmpg_set;
+> +
+> +void *bch_nvmpg_offset_to_ptr(unsigned long offset)
+> +{
+> +	int ns_id = BCH_NVMPG_GET_NS_ID(offset);
+> +	struct bch_nvmpg_ns *ns = global_nvmpg_set->ns_tbl[ns_id];
+> +
+> +	if (offset == 0)
+> +		return NULL;
+> +
+> +	ns_id = BCH_NVMPG_GET_NS_ID(offset);
+> +	ns = global_nvmpg_set->ns_tbl[ns_id];
+> +
+> +	if (ns)
+> +		return (void *)(ns->base_addr + BCH_NVMPG_GET_OFFSET(offset));
+> +
+> +	pr_err("Invalid ns_id %u\n", ns_id);
+> +	return NULL;
+> +}
+> +
+> +unsigned long bch_nvmpg_ptr_to_offset(struct bch_nvmpg_ns *ns, void *ptr)
+> +{
+> +	int ns_id = ns->ns_id;
+> +	unsigned long offset = (unsigned long)(ptr - ns->base_addr);
+> +
+> +	return BCH_NVMPG_OFFSET(ns_id, offset);
+> +}
+> +
+> +static void release_ns_tbl(struct bch_nvmpg_set *set)
+> +{
+> +	int i;
+> +	struct bch_nvmpg_ns *ns;
+> +
+> +	for (i = 0; i < BCH_NVMPG_NS_MAX; i++) {
+> +		ns = set->ns_tbl[i];
+> +		if (ns) {
+> +			fs_put_dax(ns->dax_dev);
+> +			blkdev_put(ns->bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
+> +			set->ns_tbl[i] = NULL;
+> +			set->attached_ns--;
+> +			kfree(ns);
+> +		}
+> +	}
+> +
+> +	if (set->attached_ns)
+> +		pr_err("unexpected attached_ns: %u\n", set->attached_ns);
+> +}
+> +
+> +static void release_nvmpg_set(struct bch_nvmpg_set *set)
+> +{
+> +	release_ns_tbl(set);
+> +	kfree(set);
+> +}
+> +
+> +/* Namespace 0 contains all meta data of the nvmpg allocation set */
+> +static int init_nvmpg_set_header(struct bch_nvmpg_ns *ns)
+> +{
+> +	struct bch_nvmpg_set_header *set_header;
+> +
+> +	if (ns->ns_id != 0) {
+> +		pr_err("unexpected ns_id %u for first nvmpg namespace.\n",
+> +		       ns->ns_id);
+> +		return -EINVAL;
+> +	}
+> +
+> +	set_header = bch_nvmpg_offset_to_ptr(ns->sb->set_header_offset);
+> +
+> +	mutex_lock(&global_nvmpg_set->lock);
+> +	global_nvmpg_set->set_header = set_header;
+> +	global_nvmpg_set->heads_size = set_header->size;
+> +	global_nvmpg_set->heads_used = set_header->used;
+> +	mutex_unlock(&global_nvmpg_set->lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static int attach_nvmpg_set(struct bch_nvmpg_ns *ns)
+> +{
+> +	struct bch_nvmpg_sb *sb = ns->sb;
+> +	int rc = 0;
+> +
+> +	mutex_lock(&global_nvmpg_set->lock);
+> +
+> +	if (global_nvmpg_set->ns_tbl[sb->this_ns]) {
+> +		pr_err("ns_id %u already attached.\n", ns->ns_id);
+> +		rc = -EEXIST;
+> +		goto unlock;
+> +	}
+> +
+> +	if (ns->ns_id != 0) {
+> +		pr_err("unexpected ns_id %u for first namespace.\n", ns->ns_id);
+> +		rc = -EINVAL;
+> +		goto unlock;
+> +	}
+> +
+> +	if (global_nvmpg_set->attached_ns > 0) {
+> +		pr_err("multiple namespace attaching not supported yet\n");
+> +		rc = -EOPNOTSUPP;
+> +		goto unlock;
+> +	}
+> +
+> +	if ((global_nvmpg_set->attached_ns + 1) > sb->total_ns) {
+> +		pr_err("namespace counters error: attached %u > total %u\n",
+> +		       global_nvmpg_set->attached_ns,
+> +		       global_nvmpg_set->total_ns);
+> +		rc = -EINVAL;
+> +		goto unlock;
+> +	}
+> +
+> +	memcpy(global_nvmpg_set->set_uuid, sb->set_uuid, 16);
+> +	global_nvmpg_set->ns_tbl[sb->this_ns] = ns;
+> +	global_nvmpg_set->attached_ns++;
+> +	global_nvmpg_set->total_ns = sb->total_ns;
+> +
+> +unlock:
+> +	mutex_unlock(&global_nvmpg_set->lock);
+> +	return rc;
+> +}
+> +
+> +static int read_nvdimm_meta_super(struct block_device *bdev,
+> +				  struct bch_nvmpg_ns *ns)
+> +{
+> +	struct page *page;
+> +	struct bch_nvmpg_sb *sb;
+> +	uint64_t expected_csum = 0;
+> +	int r;
+> +
+> +	page = read_cache_page_gfp(bdev->bd_inode->i_mapping,
+> +				BCH_NVMPG_SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
+> +
+> +	if (IS_ERR(page))
+> +		return -EIO;
+> +
+> +	sb = (struct bch_nvmpg_sb *)
+> +	     (page_address(page) + offset_in_page(BCH_NVMPG_SB_OFFSET));
+> +
+> +	r = -EINVAL;
+> +	expected_csum = csum_set(sb);
+> +	if (expected_csum != sb->csum) {
+> +		pr_info("csum is not match with expected one\n");
 
-I guess that explains it, it ended up in the wrong branch...
+"Checksum mismatch"
+
+would be more correct english, should it print the checksums as well?
+
+> +		goto put_page;
+> +	}
+> +
+> +	if (memcmp(sb->magic, bch_nvmpg_magic, 16)) {
+> +		pr_info("invalid bch_nvmpg_magic\n");
+> +		goto put_page;
+> +	}
+> +
+> +	if (sb->sb_offset !=
+> +	    BCH_NVMPG_OFFSET(sb->this_ns, BCH_NVMPG_SB_OFFSET)) {
+> +		pr_info("invalid superblock offset 0x%llx\n", sb->sb_offset);
+> +		goto put_page;
+> +	}
+> +
+> +	r = -EOPNOTSUPP;
+> +	if (sb->total_ns != 1) {
+> +		pr_info("multiple name space not supported yet.\n");
+> +		goto put_page;
+> +	}
+
+Please use namespace consistently.
+
+> +struct bch_nvmpg_ns *bch_register_namespace(const char *dev_path)
+> +{
+> +	struct bch_nvmpg_ns *ns = NULL;
+> +	struct bch_nvmpg_sb *sb = NULL;
+> +	char buf[BDEVNAME_SIZE];
+> +	struct block_device *bdev;
+> +	pgoff_t pgoff;
+> +	int id, err;
+> +	char *path;
+> +	long dax_ret = 0;
+> +
+> +	path = kstrndup(dev_path, 512, GFP_KERNEL);
+> +	if (!path) {
+> +		pr_err("kstrndup failed\n");
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+
+Really don't think we need that piece of information. Same for a lot of
+other places, you have a ton of pr_err() stuff that looks mostly like
+debugging.
+
+> +	ns->page_size = sb->page_size;
+> +	ns->pages_offset = sb->pages_offset;
+> +	ns->pages_total = sb->pages_total;
+> +	ns->sb = sb;
+> +	ns->free = 0;
+> +	ns->bdev = bdev;
+> +	ns->set = global_nvmpg_set;
+> +
+> +	err = attach_nvmpg_set(ns);
+> +	if (err < 0)
+> +		goto free_ns;
+> +
+> +	mutex_init(&ns->lock);
+> +
+> +	err = init_nvmpg_set_header(ns);
+> +	if (err < 0)
+> +		goto free_ns;
+
+Does this error path need to un-attach?
+> +int __init bch_nvmpg_init(void)
+> +{
+> +	global_nvmpg_set = kzalloc(sizeof(*global_nvmpg_set), GFP_KERNEL);
+> +	if (!global_nvmpg_set)
+> +		return -ENOMEM;
+> +
+> +	global_nvmpg_set->total_ns = 0;
+> +	mutex_init(&global_nvmpg_set->lock);
+> +
+> +	pr_info("bcache nvm init\n");
+
+Another useless pr debug print, just get rid of it (and others).
+
+> +void bch_nvmpg_exit(void)
+> +{
+> +	release_nvmpg_set(global_nvmpg_set);
+> +	pr_info("bcache nvm exit\n");
+> +}
+
+Ditto
+
 
 -- 
 Jens Axboe
