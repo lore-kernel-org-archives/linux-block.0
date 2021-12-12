@@ -2,113 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB282C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 12 Dec 2021 10:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 199F2C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 12 Dec 2021 17:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbhLLKDD convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Dec 2021 05:03:03 -0500
-Received: from mail-ua1-f47.google.com ([209.85.222.47]:35789 "EHLO
-        mail-ua1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbhLLKDC (ORCPT
+        id S230334AbhLLRGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Dec 2021 12:06:10 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:39722 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229618AbhLLRGJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Dec 2021 05:03:02 -0500
-Received: by mail-ua1-f47.google.com with SMTP id l24so24328556uak.2
-        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 02:03:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LgOMohw04LDTgliOMAxTx9ph3HfS1n9dnCmdkzOvyHo=;
-        b=gRdw7CcU2vDLCMRnYtggufz+MaV6LGCk5Fh9HM+ZAKcOxMetdsoPBEK8l/eSZHL2X5
-         mz22w3ecdcmgjjDF7t1GtCRa4x05xX4zf0WWvxFkyY53gU6BAJlYX35aqNHzSiT4zsQW
-         HM4nIF12J3dI5onMxEURn4xdCa0ZnxJUtGuGzq66/Cor7yKfA6RjPzbm944CrsiO3D1X
-         0jGYCvdW7xx9vjfC/wX8n8NmCGqTQz518OTtcDyXa5AJ1FvIWOp8F96SqyHgMPF/RPqp
-         L2XHrKFOO5Ok20wJfkR30qaSAIlpNRkcnvu5YmP0ADSrFX+Lv9LwaV8tbyKp/BkPEupl
-         RTZg==
-X-Gm-Message-State: AOAM530xPGqbw3EChhEs6/lIbpYUUuB87IS7y2KEr3C/lYkAwKTiL46w
-        2b6T1Tagt4gIMwq6eHOmz5GlVWqAQbkh6A==
-X-Google-Smtp-Source: ABdhPJxbxRLFUgcZQnpuye6d4lpAC7ESsLQSgG3gKREgZ4yLYN9w9bJs7RzhzRwJSR9wrcVK93Dxcg==
-X-Received: by 2002:a05:6102:199:: with SMTP id r25mr22629211vsq.44.1639303381991;
-        Sun, 12 Dec 2021 02:03:01 -0800 (PST)
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com. [209.85.222.51])
-        by smtp.gmail.com with ESMTPSA id u20sm3373443vke.0.2021.12.12.02.03.01
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Dec 2021 02:03:01 -0800 (PST)
-Received: by mail-ua1-f51.google.com with SMTP id p2so24236103uad.11
-        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 02:03:01 -0800 (PST)
-X-Received: by 2002:a05:6102:21dc:: with SMTP id r28mr23586293vsg.57.1639303381121;
- Sun, 12 Dec 2021 02:03:01 -0800 (PST)
+        Sun, 12 Dec 2021 12:06:09 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 5E0951F3B0;
+        Sun, 12 Dec 2021 17:06:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1639328768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NB+IVNIqaSUeJRB5/aK0UbHqVr2SlPfg+m65Jka1ij0=;
+        b=2KsrTxcQ61lf6et8SS04+NL7fPXc3kNXjTZneMqVK8Q0aSAmay/54k+m5bPcDTWCbBuLiD
+        sJeld9sQmTK+0qo6tWPaxyrQNB+fVDwU+gxqUdhvl23PBKqzNJHByZsc7QqP9yCxpPhIU2
+        vvtrRHPuH9LuTtjCCA/m4XX6BdFqnGk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1639328768;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NB+IVNIqaSUeJRB5/aK0UbHqVr2SlPfg+m65Jka1ij0=;
+        b=l0czxJlHlOd9QB1j/bRG7gFbYsiilts5DzRxfvpbKQy19mpT/HXlV5t9YI2y1kWE67gUOF
+        yhsfkiO0gYvl20AQ==
+Received: from suse.localdomain (unknown [10.163.16.22])
+        by relay2.suse.de (Postfix) with ESMTP id A66D2A3B83;
+        Sun, 12 Dec 2021 17:06:04 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>,
+        Ying Huang <ying.huang@intel.com>
+Subject: [PATCH v13 00/12] bcache for 5.17: enable NVDIMM for bcache journal
+Date:   Mon, 13 Dec 2021 01:05:40 +0800
+Message-Id: <20211212170552.2812-1-colyli@suse.de>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <20211206070409.2836165-1-hch@lst.de> <4bc1b80c-9c43-ccd6-de78-09f9a1627cc8@kernel.dk>
-In-Reply-To: <4bc1b80c-9c43-ccd6-de78-09f9a1627cc8@kernel.dk>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Sun, 12 Dec 2021 11:02:50 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdU0q-W0YSLqjazK32VuE5ZH+eE8H1vbv74o014Dw7wSXg@mail.gmail.com>
-Message-ID: <CAMuHMdU0q-W0YSLqjazK32VuE5ZH+eE8H1vbv74o014Dw7wSXg@mail.gmail.com>
-Subject: Re: [PATCH] mtd_blkdevs: don't scan partitions for plain mtdblock
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        "linux-mtd @ lists . infradead . org" <linux-mtd@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Jens,
 
-On Fri, Dec 10, 2021 at 7:52 PM Jens Axboe <axboe@kernel.dk> wrote:
-> On Mon, Dec 6, 2021 at 12:04 AM Christoph Hellwig <hch@lst.de> wrote:
-> > mtdblock / mtdblock_ro set part_bits to 0 and thus nevever scanned
-> > partitions.  Restore that behavior by setting the GENHD_FL_NO_PART flag.
-> >
-> > Fixes: 1ebe2e5f9d68e94c ("block: remove GENHD_FL_EXT_DEVT")
-> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+This is the v12 effort the enabling NVDIMM for bcache journal, the code
+is under testing for months and quite stable now. Please consider to
+take them for Linux v5.17 merge window.
 
-> > @@ -355,9 +355,11 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
-> >                                  "%s%c%c", tr->name,
-> >                                  'a' - 1 + new->devnum / 26,
-> >                                  'a' + new->devnum % 26);
-> > -       else
-> > +       } else {
-> >                 snprintf(gd->disk_name, sizeof(gd->disk_name),
-> >                          "%s%d", tr->name, new->devnum);
-> > +               gd->flags |= GENHD_FL_NO_PART;
-> > +       }
->
-> Not sure why I didn't spot this until now, but:
->
-> drivers/mtd/mtd_blkdevs.c: In function ‘add_mtd_blktrans_dev’:
-> drivers/mtd/mtd_blkdevs.c:362:30: error: ‘GENHD_FL_NO_PART’ undeclared (first use in this function); did you mean ‘GENHD_FL_NO_PART_SCAN’?
->   362 |                 gd->flags |= GENHD_FL_NO_PART;
->       |                              ^~~~~~~~~~~~~~~~
->       |                              GENHD_FL_NO_PART_SCAN
-> drivers/mtd/mtd_blkdevs.c:362:30: note: each undeclared identifier is reported only once for each function it appears in
->
-> Hmm?
->
-> I'm going to revert this one for now, not sure how it could've been
-> tested in this form.
+All current code logic and on-media format are consistent with previous
+v12 series. The major difference from v12 series include,
+- more typos in code comments and commit logs are fixed.
+- add kernel message to indicate only first range is used currently if
+  the NVDIMM namespace has multiple mapping ranges.
+- not export nvm-pages allocator APIs, it is unnecessary since currently 
+  only bcache uses them.
 
-Because next-20211130 and later have commit 46e7eac647b34ed4 ("block:
-rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART").
+Now all previous bcache related UAPI headers are all moved into bcache
+private code directory, there is no global headers exported to neither
+kernel or user source code.
 
-Gr{oetje,eeting}s,
+Bcache uses nvm-pages allocator to allocate pages from NVDIMM namespace
+for its journaling space. The nvm-pages allocator is a buddy-like
+allocator, which allocates size in power-of-2 pages from the NVDIMM
+namespace. User space tool 'bcache' has a new added '-M' option to
+format a NVDIMM namespace and register it via sysfs interface as a
+bcache meta device. The nvm-pages allocator code does a DAX mapping to
+map the whole namespace into system's memory address range, and allocate
+the pages to requestion like typical buddy allocator does. The major
+difference is nvm-pages allocator maintains the pages allocated to each
+requester by an allocation list which stored on NVDIMM too. Allocation
+list of different requester is tracked by a pre-defined UUID, all the
+pages tracked in all allocation lists are treated as allocated busy
+pages and won't be initialized into buddy system after the system
+reboots.
 
-                        Geert
+The bcache journal code may request a block of power-of-2 size pages
+from the nvm-pages allocator, normally it is a range of 256MB or 512MB
+continuous pages range. During meta data journaling, the in-memory jsets
+go into the calculated nvdimm pages location by kernel memcpy routine.
+So the journaling I/Os won't go into block device (e.g. SSD) anymore,
+the write and read for journal jsets happen on NVDIMM. 
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Intel developers Jianpeng Ma and Qiaowei Ren compose the initial code of
+nvm-pages allocator, the related patches are,
+- bcache: initialize the nvm-pages allocator
+- bcache: initialization of the buddy
+- bcache: bch_nvm_alloc_pages() of the buddy
+- bcache: bch_nvm_free_pages() of the buddy
+- bcache: get recs list head for allocated pages by specific uuid
+All the code depends on Linux libnvdimm and dax drivers, the bcache nvm-
+pages allocator can be treated as user of these two drivers.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+I modify the bcache code to recognize the nvm meta device feature,
+initialize journal on NVDIMM, and do journal I/Os on NVDIMM in the
+following patches,
+- bcache: add initial data structures for nvm pages
+- bcache: use bucket index to set GC_MARK_METADATA for journal buckets
+  in bch_btree_gc_finish()
+- bcache: add BCH_FEATURE_INCOMPAT_NVDIMM_META into incompat feature set
+- bcache: initialize bcache journal for NVDIMM meta device
+- bcache: support storing bcache journal into NVDIMM meta device
+- bcache: read jset from NVDIMM pages for journal replay
+- bcache: add sysfs interface register_nvdimm_meta to register NVDIMM
+  meta device
+
+All the code is EXPERIMENTAL, they won't be enabled by default until we
+feel the NVDIMM support is completed and stable. The current code has
+been tested internally for monthes, we don't observe any issue during
+all tests with or without enabling the configuration.
+
+Please consider to pick this series for Linux v5.17 merge window. If
+there is any issue detected, we will response in time and fix them ASAP.
+
+Thank you in advance.
+
+Coly Li
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Jianpeng Ma <jianpeng.ma@intel.com>
+Cc: Qiaowei Ren <qiaowei.ren@intel.com>
+Cc: Ying Huang <ying.huang@intel.com>
+---
+
+Coly Li (7):
+  bcache: add initial data structures for nvm pages
+  bcache: use bucket index to set GC_MARK_METADATA for journal buckets
+    in bch_btree_gc_finish()
+  bcache: add BCH_FEATURE_INCOMPAT_NVDIMM_META into incompat feature set
+  bcache: initialize bcache journal for NVDIMM meta device
+  bcache: support storing bcache journal into NVDIMM meta device
+  bcache: read jset from NVDIMM pages for journal replay
+  bcache: add sysfs interface register_nvdimm_meta to register NVDIMM
+    meta device
+
+Jianpeng Ma (5):
+  bcache: initialize the nvm pages allocator
+  bcache: initialization of the buddy
+  bcache: bch_nvmpg_alloc_pages() of the buddy
+  bcache: bch_nvmpg_free_pages() of the buddy allocator
+  bcache: get recs list head for allocated pages by specific uuid
+
+ drivers/md/bcache/Kconfig        |  10 +
+ drivers/md/bcache/Makefile       |   1 +
+ drivers/md/bcache/btree.c        |   6 +-
+ drivers/md/bcache/features.h     |   9 +
+ drivers/md/bcache/journal.c      | 321 +++++++++--
+ drivers/md/bcache/journal.h      |   2 +-
+ drivers/md/bcache/nvmpg.c        | 931 +++++++++++++++++++++++++++++++
+ drivers/md/bcache/nvmpg.h        | 128 +++++
+ drivers/md/bcache/nvmpg_format.h | 253 +++++++++
+ drivers/md/bcache/super.c        |  53 +-
+ 10 files changed, 1646 insertions(+), 68 deletions(-)
+ create mode 100644 drivers/md/bcache/nvmpg.c
+ create mode 100644 drivers/md/bcache/nvmpg.h
+ create mode 100644 drivers/md/bcache/nvmpg_format.h
+
+-- 
+2.31.1
+
