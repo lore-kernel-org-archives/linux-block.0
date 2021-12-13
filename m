@@ -2,125 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D40BCC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 07:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F3EC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 09:24:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbhLMHi1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 02:38:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49960 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232553AbhLMHi0 (ORCPT
+        id S233673AbhLMJYE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 04:24:04 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16368 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232011AbhLMJYE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 02:38:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639381105;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a/bulpOGfX7Ol3Co48vHOs47RkeTbU1WRhBnHDiLHQU=;
-        b=jGhCDwimIsqlDW0PCJGJth+mbZa7Ud0lV6qzxHOYSXkCh1HE0sKEh6reV5WQy00qVxmuuv
-        Iq5GCL40qh69a/1NqsMun14+4B0s3tD6KOK3mukpW6OR1SCjjTLE3nVP1WIOWGUmj+bXP3
-        koPA/kYmZ4jjGHdogb59eI8Rf1xP3EM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-546-mrNOIbXxNEa1MBVpMLU7NA-1; Mon, 13 Dec 2021 02:38:24 -0500
-X-MC-Unique: mrNOIbXxNEa1MBVpMLU7NA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14169344BE;
-        Mon, 13 Dec 2021 07:38:23 +0000 (UTC)
-Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4466F610A7;
-        Mon, 13 Dec 2021 07:38:11 +0000 (UTC)
-Date:   Mon, 13 Dec 2021 15:38:07 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dexuan Cui <decui@microsoft.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, 'Christoph Hellwig' <hch@lst.de>,
-        "'linux-block@vger.kernel.org'" <linux-block@vger.kernel.org>,
-        Long Li <longli@microsoft.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>
-Subject: Re: Random high CPU utilization in blk-mq with the none scheduler
-Message-ID: <Ybb4X00rfsjRgHj7@T590>
-References: <BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com>
- <BYAPR21MB1270DCE17A0FE017AF3272F1BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
- <b80bfe9a-bece-1f32-3d2a-fb4d94b1fa8c@kernel.dk>
- <BYAPR21MB1270B5DAD526C42C070ECB9EBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
- <Yba8nL4x9R6rmTYL@T590>
- <BYAPR21MB127006555030F7BFA47FDAABBF749@BYAPR21MB1270.namprd21.prod.outlook.com>
+        Mon, 13 Dec 2021 04:24:04 -0500
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JCGJl0wF2z923W;
+        Mon, 13 Dec 2021 17:23:19 +0800 (CST)
+Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 13 Dec 2021 17:24:01 +0800
+Received: from [10.174.177.69] (10.174.177.69) by
+ dggpemm500004.china.huawei.com (7.185.36.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 13 Dec 2021 17:24:01 +0800
+Message-ID: <03964258-10ff-7f19-10cb-ca4eccf72848@huawei.com>
+Date:   Mon, 13 Dec 2021 17:24:00 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR21MB127006555030F7BFA47FDAABBF749@BYAPR21MB1270.namprd21.prod.outlook.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH -next] blk-throttle: Set BIO_THROTTLED when bio has been
+ throttled
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20211118131551.810931-1-qiulaibin@huawei.com>
+ <YaUZExR6v8IdZUeM@slm.duckdns.org>
+From:   QiuLaibin <qiulaibin@huawei.com>
+In-Reply-To: <YaUZExR6v8IdZUeM@slm.duckdns.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.177.69]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500004.china.huawei.com (7.185.36.219)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 13, 2021 at 04:20:49AM +0000, Dexuan Cui wrote:
-> > From: Ming Lei <ming.lei@redhat.com>
-> >  ...
-> > Can you provide the following blk-mq debugfs log?
-> > 
-> > (cd /sys/kernel/debug/block/dm-N && find . -type f -exec grep -aH . {} \;)
-> > 
-> > (cd /sys/kernel/debug/block/sdN && find . -type f -exec grep -aH . {} \;)
-> > 
-> > And it is enough to just collect log from one dm-mpath & one underlying iscsi
-> > disk,
-> > so we can understand basic blk-mq setting, such as nr_hw_queues, queue
-> > depths, ...
-> > 
-> > Thanks,
-> > Ming
+Hi Tejun:
+
+Thanks for your reply.
+And the following is the stack of this problem:
+
+[112105.756554] BUG: KASAN: use-after-free in blk_throtl_bio+0x12f0/0x2c70
+
+[112105.763367] Call Trace:
+[112105.763889]  dump_stack+0x9b/0xce
+[112105.766343]  print_address_description.constprop.6+0x3e/0x60
+[112105.778343]  kasan_report.cold.9+0x22/0x3a
+[112105.780984]  blk_throtl_bio+0x12f0/0x2c70
+[112105.782759]  submit_bio_checks+0x701/0x1550
+[112105.803063]  submit_bio_noacct+0x83/0xc80
+[112105.807930]  submit_bio+0xa7/0x330
+[112105.808649]  mpage_readahead+0x380/0x500
+[112105.812982]  read_pages+0x1c1/0xbf0
+[112105.817575]  page_cache_ra_unbounded+0x471/0x6f0
+[112105.820014]  do_page_cache_ra+0xda/0x110
+[112105.824801]  ondemand_readahead+0x442/0xae0
+[112105.825631]  page_cache_async_ra+0x210/0x300
+[112105.826487]  generic_file_buffered_read+0x4d9/0x2130
+[112105.829308]  generic_file_read_iter+0x315/0x490
+[112105.831073]  blkdev_read_iter+0x113/0x1b0
+[112105.831885]  aio_read+0x2ad/0x450
+[112105.867371]  io_submit_one+0xc8e/0x1d60
+[112105.873391]  __se_sys_io_submit+0x125/0x350
+[112105.893371]  do_syscall_64+0x2d/0x40
+[112105.894072]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+[112105.925135] Allocated by task 26380:
+[112105.925866]  kasan_save_stack+0x19/0x40
+[112105.926666]  __kasan_kmalloc.constprop.2+0xc1/0xd0
+[112105.927644]  kmem_cache_alloc+0x146/0x440
+[112105.928704]  mempool_alloc+0x125/0x2f0
+[112105.929464]  bio_alloc_bioset+0x353/0x590
+[112105.930227]  mpage_alloc+0x3b/0x240
+[112105.932013]  do_mpage_readpage+0xddf/0x1ef0
+[112105.933302]  mpage_readahead+0x264/0x500
+[112105.934092]  read_pages+0x1c1/0xbf0
+[112105.934786]  page_cache_ra_unbounded+0x471/0x6f0
+[112105.935731]  do_page_cache_ra+0xda/0x110
+[112105.936542]  ondemand_readahead+0x442/0xae0
+[112105.937391]  page_cache_async_ra+0x210/0x300
+[112105.938269]  generic_file_buffered_read+0x4d9/0x2130
+[112105.939542]  generic_file_read_iter+0x315/0x490
+[112105.940539]  blkdev_read_iter+0x113/0x1b0
+[112105.941368]  aio_read+0x2ad/0x450
+[112105.942129]  io_submit_one+0xc8e/0x1d60
+[112105.942895]  __se_sys_io_submit+0x125/0x350
+[112105.943713]  do_syscall_64+0x2d/0x40
+[112105.948600]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+[112105.951025] Freed by task 0:
+[112105.951575]  kasan_save_stack+0x19/0x40
+[112105.952293]  kasan_set_track+0x1c/0x30
+[112105.952998]  kasan_set_free_info+0x1b/0x30
+[112105.953792]  __kasan_slab_free+0x111/0x160
+[112105.955805]  kmem_cache_free+0x94/0x460
+[112105.956724]  mempool_free+0xd6/0x320
+[112105.957667]  bio_free+0xe0/0x130
+[112105.958299]  bio_put+0xab/0xe0
+[112105.958901]  bio_endio+0x3a6/0x5d0
+[112105.959577]  blk_update_request+0x590/0x1370
+[112105.964202]  scsi_end_request+0x7d/0x400
+[112105.967260]  scsi_io_completion+0x1aa/0xe50
+[112105.968064]  scsi_softirq_done+0x11b/0x240
+[112105.968835]  blk_mq_complete_request+0xd4/0x120
+[112105.969734]  scsi_mq_done+0xf0/0x200
+[112105.974126]  virtscsi_vq_done+0xbc/0x150
+[112105.974904]  vring_interrupt+0x179/0x390
+[112105.975718]  __handle_irq_event_percpu+0xf7/0x490
+[112105.976630]  handle_irq_event_percpu+0x7b/0x160
+[112105.990310]  handle_irq_event+0xcc/0x170
+[112105.993845]  handle_edge_irq+0x215/0xb20
+[112105.994610]  common_interrupt+0x60/0x120
+[112106.006560]  asm_common_interrupt+0x1e/0x40
+
+On 2021/11/30 2:16, Tejun Heo wrote:
+> Hello,
 > 
-> Attached. I collected the logs for all the dm-* and sd* devices against
-> v5.16-rc4 with the 3 commits reverted:
-> b22809092c70 ("block: replace always false argument with 'false'")
-> ff1552232b36 ("blk-mq: don't issue request directly in case that current is to be blocked")
-> dc5fc361d891 ("block: attempt direct issue of plug list")
+> On Thu, Nov 18, 2021 at 09:15:51PM +0800, Laibin Qiu wrote:
+>> 1.In current process, all bio will set the BIO_THROTTLED flag
+>> after __blk_throtl_bio().
+>>
+>> 2.If bio needs to be throttled, it will start the timer and
+>> stop submit bio directly. Bio will submit in blk_throtl_dispatch_work_fn()
+>> when the timer expires. But in the current process, if bio is throttled.
+>> The BIO_THROTTLED will be set to bio after timer start. If the bio
+>> has been completed, it may cause use-after-free.
+>>
+>> Fix this by move BIO_THROTTLED set before timer set.
 > 
-> v5.16-rc4 does not reproduce the issue, so I'm pretty sure b22809092c70 is the
-> patch that resolves the excessive CPU usage.
+> Have you tried reproducing and confirming the above in any way?
+> 
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index 39bb6e68a9a2..ddfbff4465d5 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -2149,6 +2149,7 @@ bool __blk_throtl_bio(struct bio *bio)
+>>   	td->nr_queued[rw]++;
+>>   	throtl_add_bio_tg(bio, qn, tg);
+>>   	throttled = true;
+>> +	bio_set_flag(bio, BIO_THROTTLED);
+>>   
+>>   	/*
+>>   	 * Update @tg's dispatch time and force schedule dispatch if @tg
+>> @@ -2163,7 +2164,6 @@ bool __blk_throtl_bio(struct bio *bio)
+>>   
+>>   out_unlock:
+>>   	spin_unlock_irq(&q->queue_lock);
+>> -	bio_set_flag(bio, BIO_THROTTLED);
+> 
+> Because it seems wrong in two ways:
+> 
+> * This function is called synchronously on the issue path. The bio isn't
+>    seen by the queue and device driver yet and nothing can race to issue it
+>    before this function returns.
+> 
 
-From the log:
+The bio is under throttle here, this submit_bio return directly. And
+current process will queue a dispatch work by 
+throtl_schedule_pending_timer() to submit this bio before BIO_THROTTLED 
+flag set. If the bio is completed quickly after the dispatch work is 
+queued, UAF of bio will happen.
 
-1) dm-mpath:
-- queue depth: 2048
-- busy: 848, and 62 of them are in sw queue, so run queue is often
-  caused
-- nr_hw_queues: 1
-- dm-2 is in use, and dm-1/dm-3 is idle
-- dm-2's dispatch busy is 8, that should be the reason why excessive CPU
-usage is observed when flushing plug list without commit dc5fc361d891 in
-which hctx->dispatch_busy is just bypassed
+> * Now we're not setting BIO_THROTTLED when we're taking a different return
+>    path through the out_unlock label and risks calling back into blk_throtl
+>    again on the same bio.
+> 
 
-2) iscsi
-- dispatch_busy is 0
-- nr_hw_queues: 1
-- queue depth: 113
-- busy=~33, active_queues is 3, so each LUN/iscsi host is saturated
-- 23 active LUNs, 23 * 33 = 759 in-flight commands
+In my opinion, This flag can prevent the request from being throttled 
+multiple times. If the request itself does not need to be throttled, the 
+result of repeated entry will be the same.
+If necessary, I think we can use other methods to achieve this effect 
+for request does not need to be throttled.
+> In general, if you think you spotted an issue, please try to trigger it in
+> however way possible to confirm that the issue is real.
+> 
+> Thanks.
+> 
 
-The high CPU utilization may be caused by:
-
-1) big queue depth of dm mpath, the situation may be improved much if it
-is reduced to 1024 or 800. The max allowed inflight commands from iscsi
-hosts can be figured out, if dm's queue depth is much more than this number,
-the extra commands need to dispatch, and run queue can be scheduled
-immediately, so high CPU utilization is caused.
-
-2) single hw queue, so contention should be big, which should be avoided
-in big machine, nvme-tcp might be better than iscsi here
-
-3) iscsi io latency is a bit big
-
-Even CPU utilization is reduced by commit dc5fc361d891, io performance
-can't be good too with v5.16-rc, I guess.
-
-
-Thanks,
-Ming
-
+Best regards
