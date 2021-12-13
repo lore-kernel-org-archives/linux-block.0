@@ -2,201 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D676AC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 13:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD63C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 13:46:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237328AbhLMNPO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 08:15:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50196 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237320AbhLMNPM (ORCPT
+        id S237856AbhLMNqd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 08:46:33 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:45370 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232047AbhLMNqc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 08:15:12 -0500
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E39C061574
-        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 05:15:12 -0800 (PST)
-Received: by mail-qk1-x72d.google.com with SMTP id l25so4504651qkl.5
-        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 05:15:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=LhGeJIsrDqbZkrvp55CZ2Al0TxuKdXAqeSiyaE5Q4J0=;
-        b=d/FJ3XEX+vhUTIrPFABP4HsHBPuGOLFsy02+Si0KASqkO0HBbktFy/TU26YFz2pF+F
-         C0oyB/ndTmOcuGu8BVCFIruXzuTiwzbZZUXZ8C9nLRn1xpeiHreXdUCM8AkRGLK7gGAj
-         5ZBEVbhRQ8X1Igy1k3tmTLYQVGUYf64F1W7gM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=LhGeJIsrDqbZkrvp55CZ2Al0TxuKdXAqeSiyaE5Q4J0=;
-        b=ngyn9kPNAA7XEEAVTicMaQE2soL4smfQcl8pa+yiV82z+dONyRM0fg8BZj3SZKFNS0
-         /BdFMo8n/dq9EW4pv41/0Z3fTEdON4niTNmbSkKuJaY4R52xdfuxgCFsE2prdGQMulUk
-         b/+p5oRzzt8PFkRhhNiY8//9junYNM2DJ0Tz1Kl0vnXMezISd+v43hO5/wUm+ZLgZ0Yr
-         G8kk4GIUpSgS0guJRS/M8yzoNgC0qknmfOu+w4IqP9aU/Tg5SLbEcovgqaTGaCqKbmlx
-         35/ItpU2HZIKWBlzOgADdSk1fu17dcINMumWIsnFnD7x6EckTJpixgvSeXStCOhlzyXW
-         GvIQ==
-X-Gm-Message-State: AOAM5337KuYGeITHIckL0W7bdpkqnRli1ohapGOb4jnHhPcCrHr1wOjh
-        Ap23ILyBzoO7/0dfqUO30qMSJMfZXTYUoCsv+vbWLw==
-X-Google-Smtp-Source: ABdhPJwd00JUZHFaX58oUeC9BKtVkqVdjWEqcjw+A5+3N1+oG49i0xrFh+pr9MxmNpYTkmC2YUV3KVVHgR6y81OxdCY=
-X-Received: by 2002:a05:620a:8c7:: with SMTP id z7mr31770212qkz.772.1639401311206;
- Mon, 13 Dec 2021 05:15:11 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <1634550083-202815-1-git-send-email-john.garry@huawei.com>
- <163482611742.37241.15630114014516067630.b4-ty@kernel.dk> <0b928f7dbc2f3244afe8a475b547157f@mail.gmail.com>
- <3389cd7b-2934-8e82-b09a-a4fdb0f00ea3@huawei.com>
-In-Reply-To: <3389cd7b-2934-8e82-b09a-a4fdb0f00ea3@huawei.com>
+        Mon, 13 Dec 2021 08:46:32 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 731C71F3B9;
+        Mon, 13 Dec 2021 13:46:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1639403191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UyolFaM14P3cDEhuPoRNdfQMUKwyv7gy6T2mO+pB6xQ=;
+        b=yl41LBoGbpRPzv8MWlVP/S7tRtKgZDXkZBgCoeG85vG7FuG3gjQYUIwF26c29dYJm8sbPR
+        YLrT9c9xWsiRbxlIxxsPP55lYRe2vedNbZFXqpfvgpb9KNLX3Qewk/GNL0XPIlQNCsFmDT
+        2GUZipePriaBQtnjklCUhmoeML/u58Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1639403191;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UyolFaM14P3cDEhuPoRNdfQMUKwyv7gy6T2mO+pB6xQ=;
+        b=jsQdHM62n6CiQzQryvCuAGb4jgn+x0EJXupvcFt2HxjHrap6ixb9OWlbosUZXfw6kxIQo6
+        OuHQWfteTdVU38Cw==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id 5A7A5A3B81;
+        Mon, 13 Dec 2021 13:46:31 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 2A7C91E11F3; Mon, 13 Dec 2021 14:46:31 +0100 (CET)
+Date:   Mon, 13 Dec 2021 14:46:31 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Holger =?iso-8859-1?Q?Hoffst=E4tte?= 
+        <holger@applied-asynchrony.com>
+Cc:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        fvogt@suse.de, Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
+        stable@vger.kernel.org, Fabian Vogt <fvogt@suse.com>
+Subject: Re: [PATCH] bfq: Fix use-after-free with cgroups
+Message-ID: <20211213134631.GB14044@quack2.suse.cz>
+References: <20211201133439.3309-1-jack@suse.cz>
+ <28ded939-6339-c9e1-c0a3-ff84fb197eed@applied-asynchrony.com>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQH6ME5L8xUsgQGWU+HICvNEbBVHbgMhOjIaAXUFTUMCYESnuau0LnwQ
-Date:   Mon, 13 Dec 2021 18:45:09 +0530
-Message-ID: <deaaac7e5bcce4046725528bc250a799@mail.gmail.com>
-Subject: RE: [PATCH v2] blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
-To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hare@suse.de, ming.lei@redhat.com, linux-scsi@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000d1e53305d306dc51"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <28ded939-6339-c9e1-c0a3-ff84fb197eed@applied-asynchrony.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000d1e53305d306dc51
-Content-Type: text/plain; charset="UTF-8"
+On Tue 07-12-21 15:53:54, Holger Hoffstätte wrote:
+> 
+> On 2021-12-01 14:34, Jan Kara wrote:
+> > BFQ started crashing with 5.15-based kernels like:
+> > 
+> > BUG: KASAN: use-after-free in rb_erase (lib/rbtree.c:262 lib/rbtr
+> > Read of size 8 at addr ffff888008193098 by task bash/1472
+> [snip]
+> 
+> This does not compile when CONFIG_BFQ_GROUP_IOSCHED is disabled.
+> I know the patch is meant for the case where it is enabled, but still..
+> 
+> block/bfq-iosched.c: In function 'bfq_init_bfqq':
+> block/bfq-iosched.c:5362:51: error: 'struct bfq_group' has no member named 'children'
+>  5362 |         hlist_add_head(&bfqq->children_node, &bfqg->children);
+>       |                                                   ^~
+> make[1]: *** [scripts/Makefile.build:277: block/bfq-iosched.o] Error 1
+> 
+> Probably just needs a few more ifdefs :)
 
-> On 09/12/2021 13:52, Kashyap Desai wrote:
-> > + scsi mailing list
-> >
-> >> On Mon, 18 Oct 2021 17:41:23 +0800, John Garry wrote:
-> >>> Since it is now possible for a tagset to share a single set of tags,
-> >>> the iter function should not re-iter the tags for the count of #hw
-> >>> queues in that case. Rather it should just iter once.
-> > John - Recently we found issue of error hander thread never kicked off
-> > and this patch fix the issue.
-> > Without this patch, scsi error hander will not find correct host_busy
-> > counter.
-> >
-> > Take one simple case. There is one IO outstanding and that is getting
-> > timedout.
-> > Now SML wants to wake up EH thread only if, below condition met
-> > "scsi_host_busy(shost) == shost->host_failed"
-> >
-> > Without this patch, shared host tag enabled meagaraid_sas driver will
-> > find host_busy = actual outstanding * nr_hw_queues.
-> > Error handler thread will never be kicked-off.
-> >
-> > This patch is mandatory for fixing shared host tag feature and require
-> > to be part of stable kernel.
-> >
-> > Do you need more data for posting to stable kernel ?
->
-> To be clear, are you saying that you see the issue which patch "blk-mq:
-> Fix blk_mq_tagset_busy_iter() for shared tags" fixes before v5.16-rc?
->
-> This patch (now commit 0994c64eb415) and the commit which it is supposed
-> to fix, e155b0c238b2, will only be in v5.16, so I don't see anything which
-> is
-> needed in stable.
+Yep, already fixed that up locally. Thanks for notice.
 
-Hi John
+								Honza
 
-Yes. No need of posting this to stable.  There is still an issue which we
-are tracking. It is not always reproducible. I am injecting artificial Task
-abort on my setup to reproduce it.
-It happens on rhel8.5 most of the time. It is a timing issue so thinking of
-reproducing on other kernel as well.
-I am suspecting issue might be due to  missing commit -
-67f3b2f822b7e71cfc9b42dbd9f3144fa2933e0b of  [PATCH] blk-mq: avoid to
-iterate over stale request
-
-Whenever I notice the issue, there was a symptoms that host_busy is getting
-counted for each hctx individually. Let me collect more data and I will
-start another thread.
-
-Kashyap
-
->
-> Thanks,
-> John
-
---000000000000d1e53305d306dc51
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-P3lSxcw4Cg90iKHqfpwLnGNc9AGXHMxUCukpnAHRlivljilKHMx1ymb180BLmtF+ZLm6KrFLQWzB
-4KeiUOMtKM13wJrQubqTeZgB1XA+89jeLYlxagVsMyksdwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUkTOZp9jXE3yPj4ieKeDT
-OiNyCtswDQYJKoZIhvcNAQELBQADggEBABG1KCh7cLjStywh4S37nKE1eE8KPyAxDzQCkhxYLBVj
-gnnhaLmEOayEucPAsM1hCRAm/vR3RQ27lMXBGveCHaq9RZkzTjGSbzr8adOGK3CluPrasNf5StX3
-GSk4HwCapA39BDUrhnc/qG5vHwLrgA1jwAvSy8e/vn4F4h+KPrPoFNd1OnCafedbuiEXTqTkn5Rk
-vZ2AOTcSbxvmyKBMb/iu1vn7AAoui0d8GYCPoz8shf2iWMSUXVYJAMrtRHVJr47J5jlopF5F2ghC
-MzNfx6QsmJhYiRByd8L9sUOjp/DMgkC6H93PyYpYMiBGapgNf6UMsLg/1kx5DATNwhPAJbkxggJt
-MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxwO04DXOeYbZtr
-4mAwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPBDTv3SUsB0oxl5KRln5tMvO/YI
-e8KL3j99PpTVektBMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIx
-MTIxMzEzMTUxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
-AwQCATANBgkqhkiG9w0BAQEFAASCAQCuy6GPZ4EKBxYJi9c4uq8HS+FEpvXPvLq45rFv9uFp8Wui
-LEX7RAydYisNKBgzwDHYQ87Ag3VFDoGvFIB7mzSLtLG6Pd8wAC/PEowLTzm8CDy1LmhdAezYQyzN
-TKQDl1fM2VfOu8yNagfPvRgdM5CiPD1GSOHtkG+HDFGu5mB/QBj2lzmIigNZ9VCFIjNF1XIms6Wl
-ZWdFRBTS+0rkPQ7zvdG4kjCVAWWyi3A/kz+F1MIZkNm23ngYENk0BQXENLQDBZj2X5gg/MmnGaja
-ipBI7EJY+hjN1YfeaKJRQrvJOW+MUz0K8N+jJMVtv00lAETW+iqbCgpezYdYiqHIa4zT
---000000000000d1e53305d306dc51--
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
