@@ -2,140 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27C9C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 04:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 630F7C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 05:44:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229979AbhLMEZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Dec 2021 23:25:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbhLMEZA (ORCPT
+        id S231960AbhLMFok (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 00:44:40 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:44218 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230204AbhLMFok (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Dec 2021 23:25:00 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17008C06173F;
-        Sun, 12 Dec 2021 20:25:00 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so13723093pjc.4;
-        Sun, 12 Dec 2021 20:25:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=nPlyh9/dpW3O3t8/blbu6BlewNhMrFJiJO38ayFPy+g=;
-        b=BFcqocfsaJ8zJzKq5wOOO+rCG7IVIqszM9ONHKMfRwJsVl78GVPrXllJ55kXofe+ZS
-         bh25S0HH7biij/XoEvFRR57ZwVsa4rlfia/6UOci7qr7dnWnH0ShV0lG+/3xFQsJ9wVk
-         kvwL7lurLsgRHkrJJMvnr5yPVNynm1R45KwmcVJUQRdTkiUW3V6/W7ZJiLSNgkJJFG6/
-         NoMWFMnWwJrhgR0W1KDA+yurJZApyAsISVHnyjyI5iAZouQCON0V2v381ATiTOK8ZcFx
-         EqY+pZokz5D5wgPxW0jzNPi2bY2GClAA+GVnAYetq70MpRLXoQX1Rruxl40v6UhOHURi
-         lJjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=nPlyh9/dpW3O3t8/blbu6BlewNhMrFJiJO38ayFPy+g=;
-        b=n1l51tnQMaer0kQuBR6x8v3orhBwoV+tXZcp4ZPEa/WmIicxskBC1hiSlPvctdsdSy
-         rKvnWhjUJU1Uik4gde4TbWZUrunNWoazQCbY28WTbkFdbdicylKug1f/7DPpGTnZHd/+
-         HW0WLhFkGdj2G2CoIpR1LnGTTKRzNBukDLwVxja0BowVl0gh0vvGA6A0QLnZjc6g9WQ1
-         9x9+PQzRodiDNAn8/See2fRYueKs3cy7/0hD0F0P/qEQMWPV369XIiLRjCaP9LNg4Kyt
-         NHKMnrxuveXSw+dtiJwAqW5quKm/cFJ3vZnq7yYH9bS5eajhb/R+wtbV/tOREJ2PkbPs
-         OLMg==
-X-Gm-Message-State: AOAM5315DQBv9z/UPM4TFq6tnPqOE91kT447PSbvwQBcneyfwQYTVYy/
-        0/swfDBAJW2eklO3UPkyNdMubPlQDMDExAa9
-X-Google-Smtp-Source: ABdhPJzsL8+3eYnmECCiXuMFK2nXrD0sb+OTIahPuzg4bwVTPNH6eyaEidZzhdGaOacru/+uAhWcKA==
-X-Received: by 2002:a17:902:d2c7:b0:142:f06:e5fa with SMTP id n7-20020a170902d2c700b001420f06e5famr92749499plc.87.1639369499401;
-        Sun, 12 Dec 2021 20:24:59 -0800 (PST)
-Received: from archdragon (dragonet.kaist.ac.kr. [143.248.133.220])
-        by smtp.gmail.com with ESMTPSA id mq14sm5311123pjb.54.2021.12.12.20.24.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Dec 2021 20:24:58 -0800 (PST)
-Date:   Mon, 13 Dec 2021 13:22:23 +0900
-From:   "Dae R. Jeong" <threeearcat@gmail.com>
-To:     efremov@linux.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     yjkwon@kaist.ac.kr
-Subject: WARNING in schedule_bh
-Message-ID: <YbbKf6fU7y3GGZum@archdragon>
+        Mon, 13 Dec 2021 00:44:40 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id F2D43210F9;
+        Mon, 13 Dec 2021 05:44:38 +0000 (UTC)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F3E2713310;
+        Mon, 13 Dec 2021 05:44:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id lpw4EMTdtmEiVAAAMHmgww
+        (envelope-from <dave@stgolabs.net>); Mon, 13 Dec 2021 05:44:36 +0000
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     axboe@kernel.dk
+Cc:     bigeasy@linutronix.de, tglx@linutronix.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dave@stgolabs.net, Davidlohr Bueso <dbueso@suse.de>
+Subject: [PATCH] blk-mq: make synchronous hw_queue runs RT friendly
+Date:   Sun, 12 Dec 2021 21:44:25 -0800
+Message-Id: <20211213054425.28121-1-dave@stgolabs.net>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Disabling preemption for the synchronous part of __blk_mq_delay_run_hw_queue()
+is to ensure that the hw queue runs in the correct CPU. This does not play
+well with PREEMPT_RT as regular spinlocks can be taken at this time (such as
+the hctx->lock), triggering scheduling while atomic scenarios.
 
-During fuzzing, I observed a few warnings in the floppy driver, which
-seems similar with the one found by Syzkaller.
-(https://syzkaller.appspot.com/bug?id=7c17d936536dc3864e5df2d79ea11cdd946f81bf).
+Introduce regions to mark starting and ending such cases and allow RT to
+instead disable migration. While this actually better documents what is
+occurring (as it is not about preemption but CPU locality), doing so for the
+regular non-RT case can be too expensive. Similarly, instead of relying on
+preemption or migration tricks, the task could also be affined to the valid
+cpumask, but that too would be unnecessarily expensive.
 
-One of the warning reports is as follow:
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 11682 at drivers/block/floppy.c:1000 schedule_bh drivers/block/floppy.c:1000 [inline]
-WARNING: CPU: 2 PID: 11682 at drivers/block/floppy.c:1000 process_fd_request drivers/block/floppy.c:2851 [inline]
-WARNING: CPU: 2 PID: 11682 at drivers/block/floppy.c:1000 fd_locked_ioctl drivers/block/floppy.c:3506 [inline]
-WARNING: CPU: 2 PID: 11682 at drivers/block/floppy.c:1000 fd_ioctl+0x4825/0x4e90 drivers/block/floppy.c:3555
-Modules linked in:
-...
-(skipped)
-...
-Call Trace:
- <TASK>
- blkdev_ioctl+0x45f/0xb20 block/ioctl.c:609
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl+0x12c/0x1e0 fs/ioctl.c:860
- __x64_sys_ioctl+0x9e/0xe0 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x6f/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x478b29
-...
-(skipped)
-...
- </TASK>
-------------------------------------
+Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
+---
+ block/blk-mq.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-A similar warning seems to occur in places where schedule_bh() is
-called (e.g., floppy_queue_rq, floppy_interrupt, ...).
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8874a63ae952..d44b851fffba 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1841,6 +1841,30 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 	return next_cpu;
+ }
+ 
++/*
++ * Mark regions to ensure that a synchronous hardware queue
++ * runs on a correct CPU.
++ */
++#ifndef CONFIG_PREEMPT_RT
++static inline void blk_mq_start_sync_run_hw_queue(void)
++{
++	preempt_disable();
++}
++static inline void blk_mq_end_sync_run_hw_queue(void)
++{
++	preempt_enable();
++}
++#else
++static inline void blk_mq_start_sync_run_hw_queue(void)
++{
++	migrate_disable();
++}
++static inline void blk_mq_end_sync_run_hw_queue(void)
++{
++	migrate_enable();
++}
++#endif
++
+ /**
+  * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
+  * @hctx: Pointer to the hardware queue to run.
+@@ -1857,14 +1881,14 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		return;
+ 
+ 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
+-		int cpu = get_cpu();
+-		if (cpumask_test_cpu(cpu, hctx->cpumask)) {
++		blk_mq_start_sync_run_hw_queue();
++		if (cpumask_test_cpu(smp_processor_id(), hctx->cpumask)) {
+ 			__blk_mq_run_hw_queue(hctx);
+-			put_cpu();
++			blk_mq_end_sync_run_hw_queue();
+ 			return;
+ 		}
+ 
+-		put_cpu();
++		blk_mq_end_sync_run_hw_queue();
+ 	}
+ 
+ 	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+-- 
+2.26.2
 
-I am trying to understand why this happens. The below execution
-scenario is my best guess (but different with the above call
-trace). Since I don't fully understand the semantic of the floppy
-driver, please execuse me if this is wrong.
-
-
-fd_locked_ioctl(FDRESET)      kworkerd                                  floppy_interrupt
-  user_reset_fdc()
-    cont = &reset_cont;
-    wait_til_done(reset_fdc)
-      schedule_bh(reset_fdc)
-	  wait_event(command_done)
-                              reset_fdc()
-                                do_floppy = reset_interrupt
-                                /* triggering an interrupt
-                                   as stated in the comment */
-                                                                        handler = do_floppy // reset_interrupt
-                                                                        schedule_bh(handler)
-                              reset_interrupt()
-                                success_and_wakeup // reset_cont.redo
-								  genric_success()
-                                    generic_done(1)  // reset_cont.done
-                                      cont = &wakeup_cont
-                                  do_wakeup()      // wakeup_cont.redo
-                                    reschedule_timeout()
-                                    cont = NULL
-                                    wake_up(command_done) // fd_locked_ioctl() can now resume
-
-                              floppy_shutdown() // invoked by the above reschedule_timeout()
-                                process_fd_request() // cont is NULL by reset_interrupt()
-                                  schedule_bh(redo_fd_request)
-    process_fd_request()
-      schedule_bh(redo_fd_request) <- WARNING
-
-
-So, for me, concurrent execution of floppy_shutdown() and
-fd_locked_ioctl() is suspicious. Could you please check the above
-scenario is reasonable?
-
-
-Best regards,
-Dae R. Jeong.
