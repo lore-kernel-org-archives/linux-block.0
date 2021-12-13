@@ -2,89 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBE1C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 12 Dec 2021 20:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DE0C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 02:28:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231316AbhLLUWA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Dec 2021 15:22:00 -0500
-Received: from mail-il1-f181.google.com ([209.85.166.181]:35436 "EHLO
-        mail-il1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229648AbhLLUV7 (ORCPT
+        id S230208AbhLMC2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Dec 2021 21:28:50 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:37940 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229436AbhLMC2t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Dec 2021 15:21:59 -0500
-Received: by mail-il1-f181.google.com with SMTP id 15so13332508ilq.2
-        for <linux-block@vger.kernel.org>; Sun, 12 Dec 2021 12:21:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3Z4mT0au3JukqBAgU3oEmx9JeEJmI3L15TXOdiyyaWE=;
-        b=tnEFO82JXZXA1yetn0HsVo3L0AA8hefaR/S05ydySSU5LuVQthYkAMQVXzDjnTuxFR
-         Hxx+xb/Ccy2IPbqUR+mjjlLnRX1BhRGfOLJhrbQ9GVeb1bKUTnYeXl/2ip0FYwXm/e+J
-         T7zCFN+BUB7XoMlFQAH/jPZQIqpzmcoaTRbUjma92lnuQytUTjYcI2cd1vrUlEx/bOjU
-         wCmdgxGS60ZnhjOJH2mu7hqftgFQIJctUZXFKn9s41A4xzRZeoOmwdJWAYGMXvRkJKy1
-         5HCEwrw+be8eiINQtLXpW8hbGFZysETCiDGqTJjGDkrXI2W6ETWkPHenmCh4fBA8xmaU
-         EJ6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3Z4mT0au3JukqBAgU3oEmx9JeEJmI3L15TXOdiyyaWE=;
-        b=gMsf4DHg8h+mgen/s0oElkkPpsMH1Y2h056BkkLBjw4G0wj5lCbjsKawE3R/JUxBxA
-         57ciJ2qGLnKy0H2whNyzZIrKzGX38m7cgKmA39tmJ9JF/7QXbIte0Mk3IHpzW/fveeEc
-         tm6SP/SgzNagnVk/MqMn6cTgl6s7DWNc3MFw9NJy4lPMEj5ghmHmYvBpgiBd/A/J2tKD
-         3YxzLSh1tPdSS6IR+3ozIqQh5DqB5xYrevjfMkVdbzLw82/bi1OJvpG0yFE3Dh8DtWcI
-         8UYC2zwbEf16QmxZmQ64vuU8/a6o9Cr5cALdcjU+58nCEHUnB8LH51iW3ut1dabHEgRm
-         u7YA==
-X-Gm-Message-State: AOAM532DfdbSPju6O3U5dK9tp1oUm0gJt9wFOiAKAarNllXf6mkNr5yG
-        Vq3xVwGqmLNDJGRvFlM7uzcc0A==
-X-Google-Smtp-Source: ABdhPJzPCgA1sSc5tQmoiUVEoLkba9q01af7JSqG84BLWz05C+6LtxnO0nl1D96sWhMZRPvOyMLeow==
-X-Received: by 2002:a05:6e02:1baa:: with SMTP id n10mr26670307ili.117.1639340459226;
-        Sun, 12 Dec 2021 12:20:59 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id r18sm6285569ilh.59.2021.12.12.12.20.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Dec 2021 12:20:58 -0800 (PST)
-Subject: Re: [PATCH v13 00/12] bcache for 5.17: enable NVDIMM for bcache
- journal
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Jianpeng Ma <jianpeng.ma@intel.com>,
-        Qiaowei Ren <qiaowei.ren@intel.com>,
-        Ying Huang <ying.huang@intel.com>
-References: <20211212170552.2812-1-colyli@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5b08ac62-78c8-4b5a-eb8e-16739e8daa05@kernel.dk>
-Date:   Sun, 12 Dec 2021 13:20:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20211212170552.2812-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        Sun, 12 Dec 2021 21:28:49 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 4ECC72114E;
+        Mon, 13 Dec 2021 02:28:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1639362528; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=enfqsRJpLj7mhCGBT1hqlOexzdy735VnIW7MqPEc4uY=;
+        b=hOYOrMzUaXEuLFVDR2Q/aeqX2FGBpDSs0kF2jYmfWZGi7Mep+J+21X++4WpgubwcMh1FPi
+        VOGd+PwmNohxoLaCx33i8thFWpL9+8sn1ZjM1U51pd39XlVNS0vCkC205154tzfFb1gcOi
+        +mmxkXVBHo+Y92o17I2h8M/oP/H723I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1639362528;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=enfqsRJpLj7mhCGBT1hqlOexzdy735VnIW7MqPEc4uY=;
+        b=blrwoEFZy12BijwEUwE3KpTqMnBqge94k0X+Q6ygPQi5Cl6iIaeJNWDo19aHYKCumqHu/O
+        pKzh/s4sOimozpDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F223713310;
+        Mon, 13 Dec 2021 02:28:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id bfmMK96vtmEwJwAAMHmgww
+        (envelope-from <neilb@suse.de>); Mon, 13 Dec 2021 02:28:46 +0000
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+From:   "NeilBrown" <neilb@suse.de>
+To:     "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        "Christoph Hellwig" <hch@infradead.org>
+Subject: Re: [PATCH v2] FAT: use schedule_timeout_uninterruptible() instead of
+ congestion_wait()
+In-reply-to: <87h7bfmtqc.fsf@mail.parknet.co.jp>
+References: <163712349419.13692.2859038330142282757@noble.neil.brown.name>,
+ <87ee79yiik.fsf@mail.parknet.co.jp>,
+ <163754226639.13692.10449616189734943162@noble.neil.brown.name>,
+ <874k84hi5q.fsf@mail.parknet.co.jp>,
+ <163911011670.9928.6438117555175130033@noble.neil.brown.name>,
+ <163911016975.9928.6568675782275129@noble.neil.brown.name>,
+ <87h7bfmtqc.fsf@mail.parknet.co.jp>
+Date:   Mon, 13 Dec 2021 13:28:43 +1100
+Message-id: <163936252397.22433.9103044991910658320@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/12/21 10:05 AM, Coly Li wrote:
-> Hi Jens,
+On Sat, 11 Dec 2021, OGAWA Hirofumi wrote:
+> "NeilBrown" <neilb@suse.de> writes:
 > 
-> This is the v12 effort the enabling NVDIMM for bcache journal, the code
-> is under testing for months and quite stable now. Please consider to
-> take them for Linux v5.17 merge window.
+> > congestion_wait() in this context is just a sleep - block devices do not
+> > in general support congestion signalling any more.
+> >
+> > The goal here is to wait for any recently written data to get to
+> > storage.  blkdev_issue_flush() is thought to be too expensive, so
+> > replace congestion_wait() with an explicit timeout.
+> 
+> If just replace, the following looks better
+> 
+> 	set_current_state(TASK_UNINTERRUPTIBLE);
+> 	io_schedule_timeout(HZ/10);
+> 
+> Otherwise,
+> 
+> Acked-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
 
-As I've mentioned before, this really needs some thorough review from
-people not associated with the project. I spent a bit of time on the
-first section of the patches, and it doesn't look ready to me.
+Thanks.
+According to MAINTAINERS, I should send patches for this code to you,
+with the implication (I assumed) that you would forwarded them upstream
+if acceptable.
+But the fact that you have send mt an Acked-By seems to suggest that you
+won't be doing that.
+To whom should I send this patch with your acked-by?
 
-Do you have any tests for this new code? Any that exercise the error
-paths?
-
--- 
-Jens Axboe
-
+Thanks,
+NeilBrown
