@@ -2,106 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB381C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 03:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AA0C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 03:53:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229561AbhLMDXZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Dec 2021 22:23:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:58897 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229510AbhLMDXY (ORCPT
+        id S231529AbhLMDxx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Dec 2021 22:53:53 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:32913 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229724AbhLMDxx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Dec 2021 22:23:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639365803;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2skDNVKo25BiMyqDlfguThb2xQemx2Ye13yt8UEzpJ0=;
-        b=hSrdNCP8ThdY9IqdyF9DA8xp72RTW7NFk2Ljqyyc7T8S+VmdT4Tk6bql8LrMu+rk0V5rW2
-        N+Y/hVfeA+4pvJPq+N34o3wLvAXg8rdXWhqFsx6tKSQg9pnESn5cxTOzZq4F4JKVav47oF
-        TcC7XICzSllt2k4wJBpuBqsjA8BLXEQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-551-z2hyQz-JPIuS77Xbp7IOZw-1; Sun, 12 Dec 2021 22:23:22 -0500
-X-MC-Unique: z2hyQz-JPIuS77Xbp7IOZw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94621801B35;
-        Mon, 13 Dec 2021 03:23:20 +0000 (UTC)
-Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 634D54ABA9;
-        Mon, 13 Dec 2021 03:23:12 +0000 (UTC)
-Date:   Mon, 13 Dec 2021 11:23:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dexuan Cui <decui@microsoft.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, 'Christoph Hellwig' <hch@lst.de>,
-        "'linux-block@vger.kernel.org'" <linux-block@vger.kernel.org>,
-        Long Li <longli@microsoft.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>
-Subject: Re: Random high CPU utilization in blk-mq with the none scheduler
-Message-ID: <Yba8nL4x9R6rmTYL@T590>
-References: <BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com>
- <BYAPR21MB1270DCE17A0FE017AF3272F1BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
- <b80bfe9a-bece-1f32-3d2a-fb4d94b1fa8c@kernel.dk>
- <BYAPR21MB1270B5DAD526C42C070ECB9EBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
+        Sun, 12 Dec 2021 22:53:53 -0500
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JC70H4gDbzgY7T;
+        Mon, 13 Dec 2021 11:53:35 +0800 (CST)
+Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 13 Dec 2021 11:53:51 +0800
+Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
+ (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 13 Dec
+ 2021 11:53:51 +0800
+From:   Laibin Qiu <qiulaibin@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <yi.zhang@huawei.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] block/wbt: fix negative inflight counter when remove scsi device
+Date:   Mon, 13 Dec 2021 12:09:07 +0800
+Message-ID: <20211213040907.2669480-1-qiulaibin@huawei.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR21MB1270B5DAD526C42C070ECB9EBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500004.china.huawei.com (7.185.36.219)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Dexuan,
+Now that we disable wbt by set WBT_STATE_OFF_DEFAULT in
+wbt_disable_default() when switch elevator to bfq. And when
+we remove scsi device, wbt will be enabled by wbt_enable_default.
+If it become false positive between wbt_wait() and wbt_track()
+when submit write request.
 
-On Sat, Dec 11, 2021 at 03:10:43AM +0000, Dexuan Cui wrote:
-> > From: Jens Axboe <axboe@kernel.dk>
-> > Sent: Friday, December 10, 2021 6:05 PM
-> > ...
-> > It's more likely the real fix is avoiding the repeated plug list scan,
-> > which I guess makes sense. That is this commit:
-> > 
-> > commit d38a9c04c0d5637a828269dccb9703d42d40d42b
-> > Author: Jens Axboe <axboe@kernel.dk>
-> > Date:   Thu Oct 14 07:24:07 2021 -0600
-> > 
-> >     block: only check previous entry for plug merge attempt
-> > 
-> > If that's the case, try 5.15.x again and do:
-> > 
-> > echo 2 > /sys/block/<dev>/queue/nomerges
-> > 
-> > for each drive you are using in the IO test, and see if that gets
-> > rid of the excess CPU usage.
-> > 
-> > --
-> > Jens Axboe
-> 
-> Thanks for the reply! Unluckily this does not work.
-> 
-> I tried the below command:
-> 
-> for i in `ls /sys/block/*/queue/nomerges`; do echo 2 > $i; done
-> 
-> and verified that the "nomerges" are changed to "2", but the
-> excess CPU usage can still reproduce easily.
+The following is the scenario that triggered the problem.
 
-Can you provide the following blk-mq debugfs log?
+T1                          T2                           T3
+                            elevator_switch_mq
+                            bfq_init_queue
+                            wbt_disable_default <= Set
+                            rwb->enable_state (OFF)
+Submit_bio
+blk_mq_make_request
+rq_qos_throttle
+<= rwb->enable_state (OFF)
+                                                         scsi_remove_device
+                                                         sd_remove
+                                                         del_gendisk
+                                                         blk_unregister_queue
+                                                         elv_unregister_queue
+                                                         wbt_enable_default
+                                                         <= Set rwb->enable_state (ON)
+q_qos_track
+<= rwb->enable_state (ON)
+^^^^^^ this request will mark WBT_TRACKED without inflight add and will
+lead to drop rqw->inflight to -1 in wbt_done() which will trigger IO hung.
 
-(cd /sys/kernel/debug/block/dm-N && find . -type f -exec grep -aH . {} \;)
+Fix this by judge whether QUEUE_FLAG_REGISTERED is marked to distinguish
+scsi remove scene.
+Fixes: 76a8040817b4b ("blk-wbt: make sure throttle is enabled properly")
+Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+---
+ block/blk-wbt.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-(cd /sys/kernel/debug/block/sdN && find . -type f -exec grep -aH . {} \;)
-
-And it is enough to just collect log from one dm-mpath & one underlying iscsi disk,
-so we can understand basic blk-mq setting, such as nr_hw_queues, queue depths, ...
-
-
-
-Thanks,
-Ming
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 3ed71b8da887..537f77bb1365 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -637,6 +637,10 @@ void wbt_enable_default(struct request_queue *q)
+ {
+ 	struct rq_qos *rqos = wbt_rq_qos(q);
+ 
++	/* Queue not registered? Maybe shutting down... */
++	if (!blk_queue_registered(q))
++		return;
++
+ 	/* Throttling already enabled? */
+ 	if (rqos) {
+ 		if (RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
+@@ -644,10 +648,6 @@ void wbt_enable_default(struct request_queue *q)
+ 		return;
+ 	}
+ 
+-	/* Queue not registered? Maybe shutting down... */
+-	if (!blk_queue_registered(q))
+-		return;
+-
+ 	if (queue_is_mq(q) && IS_ENABLED(CONFIG_BLK_WBT_MQ))
+ 		wbt_init(q);
+ }
+-- 
+2.22.0
 
