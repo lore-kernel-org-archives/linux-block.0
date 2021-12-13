@@ -2,69 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E54BC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 18:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3334C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 18:27:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241636AbhLMSIw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 13:08:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241633AbhLMSIv (ORCPT
+        id S239764AbhLMS1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 13:27:44 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:44462 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231959AbhLMS1o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 13:08:51 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA73C061574;
-        Mon, 13 Dec 2021 10:08:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8oozV1IRwA/A2R6zNk07Fx/Spsm9jrjC4UBxcDZXjf8=; b=a6vpnrKVMF7x9NRBbcUvJJkaGU
-        RWh+pCMAqyR7ZiLSPPNcT98z7kIFfBf76Sqay4RnDh6+ugjgoWZ5sIX7XG5eFA2Cwip4P3s6Ntze9
-        Fja3JFi7V/R7KbQBODnprlW9WRKXx+Oxsbx8Mv5I9kTgeNAI0Js8pmN/ghN4SkLbov4UbrEOJSZNC
-        IFDopsbq4RMY821Yuh1RERU4vC8BEeyCfXb9ds/0vI7FfqyfgT6X7azS5w03GEKJVeul/XXOrczsb
-        z42C93gofmG/ain5V80l4WRqk/RvlQnREstO2qSp1Ycd3SvyvM8FMoH9apeXSCFxsB/uD+wrJiIHd
-        9CEqXj+w==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mwpkl-00D2OR-QG; Mon, 13 Dec 2021 18:08:47 +0000
-Date:   Mon, 13 Dec 2021 18:08:47 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Darrick J . Wong " <djwong@kernel.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 19/28] iomap: Convert __iomap_zero_iter to use a folio
-Message-ID: <YbeML8UdqwsooSPb@casper.infradead.org>
-References: <20211108040551.1942823-1-willy@infradead.org>
- <20211108040551.1942823-20-willy@infradead.org>
- <YbJ3O1qf+9p/HWka@casper.infradead.org>
- <YbN+KqqCG0032NMG@casper.infradead.org>
- <Ybb3nmf0hPXhlnOu@infradead.org>
+        Mon, 13 Dec 2021 13:27:44 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8DFAE212B9;
+        Mon, 13 Dec 2021 18:27:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1639420063; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nyX4WtQsOEX0hjLfikaCsWEmeAWGoTEXuzaIMFiNl7g=;
+        b=Fyvimeoy6q4dIgcDc0aZbRUNyR1EPrxNemXkfQA1BuYRnHLNrCI1YpY768oEFRq0zZnx+9
+        i1fpwz4KPRrSkWh5iWtAoo3rBHtx8qYjmKQ7fle7VBa56lYOkZfulq0n0/JeW1gMArlPHB
+        BxpjjvaUl1v9FsFaUH+Fh3YkAC2hE18=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 519F113EAE;
+        Mon, 13 Dec 2021 18:27:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id n3OkEJ+Qt2H4CgAAMHmgww
+        (envelope-from <nborisov@suse.com>); Mon, 13 Dec 2021 18:27:43 +0000
+Subject: Re: [PATCH] bdev: Improve lookup_bdev documentation
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20211213171113.3097631-1-willy@infradead.org>
+From:   Nikolay Borisov <nborisov@suse.com>
+Message-ID: <08c26d1d-c98c-838a-4752-f8e4304f86c8@suse.com>
+Date:   Mon, 13 Dec 2021 20:27:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ybb3nmf0hPXhlnOu@infradead.org>
+In-Reply-To: <20211213171113.3097631-1-willy@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Dec 12, 2021 at 11:34:54PM -0800, Christoph Hellwig wrote:
-> On Fri, Dec 10, 2021 at 04:19:54PM +0000, Matthew Wilcox wrote:
-> > After attempting the merge with Christoph's ill-timed refactoring,
+
+
+On 13.12.21 г. 19:11, Matthew Wilcox (Oracle) wrote:
+> Add a Context section and rewrite the rest to be clearer.
 > 
-> I did give you a headsup before..
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-I thought that was going in via Darrick's tree.  I had no idea Dan was
-going to take it.
+Reviewed-by: Nikolay Borisov <nborisov@suse.com>
 
-> > I decided that eliding the use of 'bytes' here was the wrong approach,
-> > because it very much needs to be put back in for the merge.
-> 
-> Is there any good reason to not just delay the iomp_zero_iter folio
-> conversion for now?
-
-It would hold up about half of the iomap folio conversion (~10 patches).
-I don't understand what the benefit is of your patch series.  Moving
-filesystems away from being bdev based just doesn't seem interesting
-to me.  Having DAX as an optional feature that some bdevs have seems
-like a far superior option.
