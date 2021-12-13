@@ -2,208 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4754C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 22:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 101C5C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 23:22:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243820AbhLMWqX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 17:46:23 -0500
-Received: from mail-il1-f200.google.com ([209.85.166.200]:54013 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243760AbhLMWqX (ORCPT
+        id S244138AbhLMXWw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 18:22:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237678AbhLMXWv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 17:46:23 -0500
-Received: by mail-il1-f200.google.com with SMTP id h9-20020a92c269000000b002ac5174da88so2844126ild.20
-        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 14:46:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=6slidn2uLEYo6Q9quCUllTZBd4MA2hHMb0ZjtiLaISk=;
-        b=yJRYBQ0DPvNLaXZk+3QgpK/QS9cCNzJOk4o1RFwYOfLeJtOusDEAgKqkE2dWdQqNtg
-         3DagsQ0mnVgscCOgjBVQqx5rDyOGRzPLTpJjZja5byXSnO6KTV5dYzWSpwG/UzD8Wt5+
-         8nZqCD0M/XB1pIaG1pAE+5cYW951bxPaS8FaLRh+jDl5UfVuv73R/TePaAGoC2psTKkb
-         mjezCV1T/fF3Mr56fOQy69zBRgBxVt3qPXfAaNhOeFvI2YLNT5bvQlx/S3UPNBOlFg6p
-         OufoMpD5KAsuCP70rCiImy3d81zFiN5oTYlQdUhDB8GFG2V80r4F2e2IJu+7kfEo18ZC
-         cHrQ==
-X-Gm-Message-State: AOAM533sVnQfuPLPikEeLTxyhr6Xu3TGUT8Z88uCDB8FZUD3vFWDfLBW
-        YEVSr0+sOCsmX6SMhOrtdohwL9nB44r3t19jfC2f/douPUcX
-X-Google-Smtp-Source: ABdhPJwEPv5XuqrZL8qEyaior1XLR9mNECqghXQzSzapQvn55xg83i1Ll/IacX3ZI3+i4TgL5mgRm+Y8oubsH3QOKLAdZ3Aoxtar
+        Mon, 13 Dec 2021 18:22:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AFFDC061574;
+        Mon, 13 Dec 2021 15:22:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 04043612BA;
+        Mon, 13 Dec 2021 23:22:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABC8C34601;
+        Mon, 13 Dec 2021 23:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639437770;
+        bh=u7Kel0+0ccO1Da8cNlI1rybWn6ykZj9EAsVVNG6GBDE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MkMAiGXcQjVPohxFUWXmZU4qt/FQxzeoBUMhTKM0zFWCesiFmdvg8OqTZB8umgLcU
+         0MIASMr4trRABy5lXotJp2JZdXYl5PuU2CaotpKaXA85qDJG/Bm67+Er6rEXKK6FT3
+         MTXiWZ/sQSus+J298YMe1TxwV0tY08ZlCCfCon39A9DYErBIwDtAKeBekW2pVd8gOl
+         Ru4jrrS5Exqx0QFY41+CWahrb7Hfn8jSweseQDDFMfeM0V7L88g08n0ZErECf/lWdz
+         YWbdsVjBF5dXR1DDlwIyQqwVxz+cCXGxc30zkWy+Yz/pZncOrjmEvxkrhECdx1DkGd
+         7XZinRD++8wQg==
+Date:   Mon, 13 Dec 2021 17:28:28 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-hardening@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Subject: Re: [PATCH] drbd: Use struct_group() to zero algs
+Message-ID: <20211213232828.GC60133@embeddedor>
+References: <20211118203712.1288866-1-keescook@chromium.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2186:: with SMTP id s6mr753535jaj.96.1639435582645;
- Mon, 13 Dec 2021 14:46:22 -0800 (PST)
-Date:   Mon, 13 Dec 2021 14:46:22 -0800
-In-Reply-To: <000000000000f5ccbf05cd8db7b0@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000892b3805d30ed738@google.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in __dev_queue_xmit (5)
-From:   syzbot <syzbot+b7be9429f37d15205470@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, justin@coraid.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211118203712.1288866-1-keescook@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On Thu, Nov 18, 2021 at 12:37:12PM -0800, Kees Cook wrote:
+> In preparation for FORTIFY_SOURCE performing compile-time and run-time
+> field bounds checking for memset(), avoid intentionally writing across
+> neighboring fields.
+> 
+> Add a struct_group() for the algs so that memset() can correctly reason
+> about the size.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-HEAD commit:    9b5bcb193a3b Merge branch 'dsa-tagger-storage'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17263269b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d0a94897bd9637ea
-dashboard link: https://syzkaller.appspot.com/bug?extid=b7be9429f37d15205470
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10983f4db00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11613eb1b00000
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b7be9429f37d15205470@syzkaller.appspotmail.com
+Thanks
+--
+Gustavo
 
-ieee802154 phy0 wpan0: encryption failed: -22
-ieee802154 phy1 wpan1: encryption failed: -22
-xfrm0 selects TX queue 0, but real number of TX queues is 0
-==================================================================
-BUG: KASAN: use-after-free in __dev_queue_xmit+0x3134/0x3640 net/core/dev.c:4073
-Read of size 8 at addr ffff88804610b408 by task aoe_tx0/1229
-
-CPU: 1 PID: 1229 Comm: aoe_tx0 Not tainted 5.16.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- print_address_description.constprop.0.cold+0x8d/0x320 mm/kasan/report.c:247
- __kasan_report mm/kasan/report.c:433 [inline]
- kasan_report.cold+0x83/0xdf mm/kasan/report.c:450
- __dev_queue_xmit+0x3134/0x3640 net/core/dev.c:4073
- tx+0x68/0xb0 drivers/block/aoe/aoenet.c:63
- kthread+0x1e7/0x3b0 drivers/block/aoe/aoecmd.c:1230
- kthread+0x405/0x4f0 kernel/kthread.c:327
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-
-Allocated by task 31625:
- kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:434 [inline]
- ____kasan_kmalloc mm/kasan/common.c:513 [inline]
- ____kasan_kmalloc mm/kasan/common.c:472 [inline]
- __kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:522
- kmalloc_node include/linux/slab.h:613 [inline]
- kvmalloc_node+0x61/0x120 mm/util.c:587
- kvmalloc include/linux/slab.h:741 [inline]
- kvzalloc include/linux/slab.h:749 [inline]
- netif_alloc_netdev_queues net/core/dev.c:9511 [inline]
- alloc_netdev_mqs+0x758/0xea0 net/core/dev.c:10208
- rtnl_create_link+0x936/0xb40 net/core/rtnetlink.c:3182
- __rtnl_newlink+0xf73/0x1750 net/core/rtnetlink.c:3447
- rtnl_newlink+0x64/0xa0 net/core/rtnetlink.c:3505
- rtnetlink_rcv_msg+0x413/0xb80 net/core/rtnetlink.c:5570
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2492
- netlink_unicast_kernel net/netlink/af_netlink.c:1315 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1341
- netlink_sendmsg+0x904/0xdf0 net/netlink/af_netlink.c:1917
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:724
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2409
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2463
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2492
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Freed by task 31625:
- kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
- kasan_set_track+0x21/0x30 mm/kasan/common.c:46
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:370
- ____kasan_slab_free mm/kasan/common.c:366 [inline]
- ____kasan_slab_free mm/kasan/common.c:328 [inline]
- __kasan_slab_free+0xff/0x130 mm/kasan/common.c:374
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:1723 [inline]
- slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1749
- slab_free mm/slub.c:3513 [inline]
- kfree+0xf6/0x560 mm/slub.c:4561
- kvfree+0x42/0x50 mm/util.c:620
- netif_free_tx_queues net/core/dev.c:9499 [inline]
- free_netdev+0xa7/0x5a0 net/core/dev.c:10265
- netdev_run_todo+0x882/0xa80 net/core/dev.c:9953
- rtnl_unlock net/core/rtnetlink.c:112 [inline]
- rtnetlink_rcv_msg+0x420/0xb80 net/core/rtnetlink.c:5571
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2492
- netlink_unicast_kernel net/netlink/af_netlink.c:1315 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1341
- netlink_sendmsg+0x904/0xdf0 net/netlink/af_netlink.c:1917
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:724
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2409
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2463
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2492
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-The buggy address belongs to the object at ffff88804610b400
- which belongs to the cache kmalloc-cg-512 of size 512
-The buggy address is located 8 bytes inside of
- 512-byte region [ffff88804610b400, ffff88804610b600)
-The buggy address belongs to the page:
-page:ffffea0001184200 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88804610b800 pfn:0x46108
-head:ffffea0001184200 order:2 compound_mapcount:0 compound_pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000010200 ffffea0001e4dc08 ffffea0001d68508 ffff888010c42dc0
-raw: ffff88804610b800 0000000000100009 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 3713, ts 1382028996406, free_ts 15275532588
- prep_new_page mm/page_alloc.c:2418 [inline]
- get_page_from_freelist+0xa72/0x2f50 mm/page_alloc.c:4149
- __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5369
- alloc_pages+0x1a7/0x300 mm/mempolicy.c:2191
- alloc_slab_page mm/slub.c:1793 [inline]
- allocate_slab mm/slub.c:1930 [inline]
- new_slab+0x32d/0x4a0 mm/slub.c:1993
- ___slab_alloc+0x918/0xfe0 mm/slub.c:3022
- __slab_alloc.constprop.0+0x4d/0xa0 mm/slub.c:3109
- slab_alloc_node mm/slub.c:3200 [inline]
- __kmalloc_node_track_caller+0x2cb/0x360 mm/slub.c:4956
- kmalloc_reserve net/core/skbuff.c:354 [inline]
- __alloc_skb+0xde/0x340 net/core/skbuff.c:426
- alloc_skb include/linux/skbuff.h:1129 [inline]
- alloc_skb_with_frags+0x93/0x620 net/core/skbuff.c:5930
- sock_alloc_send_pskb+0x793/0x920 net/core/sock.c:2581
- unix_dgram_sendmsg+0x414/0x1a10 net/unix/af_unix.c:1895
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:724
- sock_write_iter+0x289/0x3c0 net/socket.c:1057
- call_write_iter include/linux/fs.h:2162 [inline]
- new_sync_write+0x429/0x660 fs/read_write.c:503
- vfs_write+0x7cd/0xae0 fs/read_write.c:590
- ksys_write+0x1ee/0x250 fs/read_write.c:643
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1338 [inline]
- free_pcp_prepare+0x374/0x870 mm/page_alloc.c:1389
- free_unref_page_prepare mm/page_alloc.c:3309 [inline]
- free_unref_page+0x19/0x690 mm/page_alloc.c:3388
- free_contig_range+0xa8/0xf0 mm/page_alloc.c:9271
- destroy_args+0xa8/0x646 mm/debug_vm_pgtable.c:1016
- debug_vm_pgtable+0x2984/0x2a16 mm/debug_vm_pgtable.c:1330
- do_one_initcall+0x103/0x650 init/main.c:1297
- do_initcall_level init/main.c:1370 [inline]
- do_initcalls init/main.c:1386 [inline]
- do_basic_setup init/main.c:1405 [inline]
- kernel_init_freeable+0x6b1/0x73a init/main.c:1610
- kernel_init+0x1a/0x1d0 init/main.c:1499
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
-Memory state around the buggy address:
- ffff88804610b300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88804610b380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88804610b400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                      ^
- ffff88804610b480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88804610b500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
+> ---
+>  drivers/block/drbd/drbd_main.c     | 3 ++-
+>  drivers/block/drbd/drbd_protocol.h | 6 ++++--
+>  drivers/block/drbd/drbd_receiver.c | 3 ++-
+>  3 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+> index 53ba2dddba6e..feac72e323bd 100644
+> --- a/drivers/block/drbd/drbd_main.c
+> +++ b/drivers/block/drbd/drbd_main.c
+> @@ -729,7 +729,8 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
+>  	cmd = apv >= 89 ? P_SYNC_PARAM89 : P_SYNC_PARAM;
+>  
+>  	/* initialize verify_alg and csums_alg */
+> -	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
+> +	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
+> +	memset(&p->algs, 0, sizeof(p->algs));
+>  
+>  	if (get_ldev(peer_device->device)) {
+>  		dc = rcu_dereference(peer_device->device->ldev->disk_conf);
+> diff --git a/drivers/block/drbd/drbd_protocol.h b/drivers/block/drbd/drbd_protocol.h
+> index dea59c92ecc1..a882b65ab5d2 100644
+> --- a/drivers/block/drbd/drbd_protocol.h
+> +++ b/drivers/block/drbd/drbd_protocol.h
+> @@ -283,8 +283,10 @@ struct p_rs_param_89 {
+>  
+>  struct p_rs_param_95 {
+>  	u32 resync_rate;
+> -	char verify_alg[SHARED_SECRET_MAX];
+> -	char csums_alg[SHARED_SECRET_MAX];
+> +	struct_group(algs,
+> +		char verify_alg[SHARED_SECRET_MAX];
+> +		char csums_alg[SHARED_SECRET_MAX];
+> +	);
+>  	u32 c_plan_ahead;
+>  	u32 c_delay_target;
+>  	u32 c_fill_target;
+> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+> index 1f740e42e457..6df2539e215b 100644
+> --- a/drivers/block/drbd/drbd_receiver.c
+> +++ b/drivers/block/drbd/drbd_receiver.c
+> @@ -3921,7 +3921,8 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+>  
+>  	/* initialize verify_alg and csums_alg */
+>  	p = pi->data;
+> -	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
+> +	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
+> +	memset(&p->algs, 0, sizeof(p->algs));
+>  
+>  	err = drbd_recv_all(peer_device->connection, p, header_size);
+>  	if (err)
+> -- 
+> 2.30.2
+> 
+> 
+> 
+> 
