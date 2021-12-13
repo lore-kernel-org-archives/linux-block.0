@@ -2,106 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA47C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 22:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CB6C4167B
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 22:34:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243576AbhLMW3a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 17:29:30 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:35772 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243417AbhLMW3a (ORCPT
+        id S243741AbhLMWeA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 17:34:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243618AbhLMWdl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 17:29:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=7iaOSPYC++rVBoYT3QRUQDaMarUdPJ3RFeXKP6p9rM4=; b=b3dBhIgajJAvUk635a5T6J+46S
-        lWGtZao8HbOE8FQzCpvd1HGkyAd8ZKQCD7KmVuvwCjqFnOdp1/6fBQqIqviPbBW3OAlA7rK5mYuJp
-        ISX4VUGcdu+eaAVoI4XiQfUSuYbsqkyzs9pinzLkr8frDEOIvCPGPHWNLRXiDfjEtx6iopkOFseh7
-        3nVLEpOS4Euq+Xe2yxnR8Oqycsa1pui0qvcMZaJQZ7Y60d7xioQ6c13dSL4wCD4OmLA/3MOcr2wjy
-        ErkKSypS9r+JtZqxUMXBuukP7mxIR+F+TYmxzDEHKJktVg54mBubaL0dovEnkeXllV049o5n8uat3
-        N8KqHCbA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1mwtoY-0042Rf-6n; Mon, 13 Dec 2021 15:28:59 -0700
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-References: <20211117215410.3695-1-logang@deltatee.com>
- <20211117215410.3695-12-logang@deltatee.com>
- <e4fda995-6b50-0f74-0af7-4d790ab66ba9@nvidia.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <af6cda4f-9996-0aad-9278-1d41f824a070@deltatee.com>
-Date:   Mon, 13 Dec 2021 15:28:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Mon, 13 Dec 2021 17:33:41 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F1EC061748
+        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 14:33:40 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id x7so12930257pjn.0
+        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 14:33:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=JBrnYBdN57EoO3+g1W9Yge7xcXyekmtEM1h0EZo2kY8=;
+        b=eARJjq7XJszaMczlFn5jgZvZcSDXQXUrOCZYsx809qFqbE5oot7LUTLpKsKwE3rPC5
+         xtzFlR0r+1O5x6ORmle5Z1ZPwLkmR3mPBRDEcc0tbYNiOUNZY+k44IADAdzMVeDtWesq
+         WXdfYLSyn3KpUkOB70V/sqzVf12W5IOAIj8cY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=JBrnYBdN57EoO3+g1W9Yge7xcXyekmtEM1h0EZo2kY8=;
+        b=ri15CtNvQKgmQcyvZJB3FroaI01UQwEAfgotYvoRe3XeSGVgxgOuHA4DPcyTH/r9yw
+         3dGupjTSx44+J7jBlmPMH0Hp3OmkmzJXlGQLp+9+UhyB/zOe2vc2RvNQ6SA7OaaD8qRJ
+         Y9Fd17i8IjJ80KucxYgCpV6bXbC0bEE1JK0hCdcTMmcOcw2KJkFlbpIX26LTopbIaodY
+         o8Rf6FOzbrVdIw/Q0yXFR4UG2WJf+oufRikv87kQmmO2V01DFbMekZ1XLVH9CLlZRfmi
+         PmJFH1gdMvGDroHJyxRhBUBkBMyI7GtJO7zZUOSH9TZ60Gyz2Rm2o/D3I0ec3EQNJile
+         lkYA==
+X-Gm-Message-State: AOAM531xWIhvwkPL4v5wrkbwgUd+PtLqjbgbiaCdqCcc5KLhCjGYV9D5
+        xmAuJzBqZ2AbFayGU0UIOC93yw==
+X-Google-Smtp-Source: ABdhPJxe6o4hOFNGN6tkza4eHukpb5VYQzgGFvNJG64zJBWEIjooblWbxwzQ9Y8VbxpS6IcLW+ABAw==
+X-Received: by 2002:a17:90b:3a85:: with SMTP id om5mr1179078pjb.108.1639434820151;
+        Mon, 13 Dec 2021 14:33:40 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id k5sm7007688pgm.94.2021.12.13.14.33.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Dec 2021 14:33:37 -0800 (PST)
+From:   Kees Cook <keescook@chromium.org>
+To:     linux-hardening@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 10/17] drbd: Use struct_group() to zero algs
+Date:   Mon, 13 Dec 2021 14:33:24 -0800
+Message-Id: <20211213223331.135412-11-keescook@chromium.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211213223331.135412-1-keescook@chromium.org>
+References: <20211213223331.135412-1-keescook@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <e4fda995-6b50-0f74-0af7-4d790ab66ba9@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: mgurtovoy@nvidia.com, ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, chaitanyak@nvidia.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v4 11/23] nvme-pci: convert to using dma_map_sgtable()
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2581; h=from:subject; bh=t2kEV0qyDDwEqGOOcKtmt4HKQwDSfEhGz4Ec2s2rQhk=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBht8o5ttmUrgv272ZEuKN3uNPCU+YVuXyy31dW6tyg 6v3qUZSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYbfKOQAKCRCJcvTf3G3AJtsdEA CuG2SKVJaoKduvJ0fedusEp7JCfmREAhrfqmgjlsmxKbBlTuRSOlqMu5m+sn5NqqrYHdYdUzOJLjMj zIfASffWaGBS5406hCj75rRaABBwIyS6NZ/GawLEDPs6JJkurBCFoj1rqutTzXEkSgXWVcCwMvLELj ZOGASNONISKukk+wV4kuBgPqorR9mu58RyTouYjQJQUgcuUYL7roCJpOSekAjj5tc3TKqHSLW06ubP 63u2PshlQkvbxCG9rplXwxhFyBVNjNe1gk49r/TPN40XINzpHd/kMCRF5JTGkIsgadjWnTESMGwjmI e3oNjiIkpi27eT9i404SF/5HfIc+A6PJla/3OrUFVD4IDqu7L71l4zwMD+71OTmzI7SrSiLEcbiTRM eJr+uJce4HIrM/kwfBlSpep/hGUE41gfxquEBmaY7ExgofG5d7HmH45LtJhE5F9NfnxKyA4jnOiKU/ E3gV7dOcdG7UKphzp5kriupm1sABfzJZ/y+3+AbkgrZCyzmJ9JhkAJqXtZY+sex6nLMzZiMtfjJ1p2 P2MdtC5n17ycfxD2Tgo9/oGi92W5ecMFrJIyFoFFt86F+MNLZAMAfmfh3v9PoZWOEFMPx0YliQiNqC otRg0xK33NjN0aQiVHTn+/WQuGIAS34i2tZst0z8HKkYBZEYvHYfh2Z4dIxg==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+In preparation for FORTIFY_SOURCE performing compile-time and run-time
+field bounds checking for memset(), avoid intentionally writing across
+neighboring fields.
 
-On 2021-12-13 3:21 p.m., Chaitanya Kulkarni wrote:
-> 
->>   static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
->> -		struct request *req, struct nvme_rw_command *cmd, int entries)
->> +		struct request *req, struct nvme_rw_command *cmd)
->>   {
->>   	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
->>   	struct dma_pool *pool;
->>   	struct nvme_sgl_desc *sg_list;
->> -	struct scatterlist *sg = iod->sg;
->> +	struct scatterlist *sg = iod->sgt.sgl;
->> +	int entries = iod->sgt.nents;
-> 
-> I don't see use of newly added entries variable anywhere in
-> nvme_pci_setup_sgls(), what am I missing ?
+Add a struct_group() for the algs so that memset() can correctly reason
+about the size. "objdump -d" shows no changes to the executable
+instructions.
 
-'entries' is being moved out from the argument list of
-nvme_pci_setup_sgls(), so there are already uses in the function that
-don't show in the diff.
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/block/drbd/drbd_main.c     | 3 ++-
+ drivers/block/drbd/drbd_protocol.h | 6 ++++--
+ drivers/block/drbd/drbd_receiver.c | 3 ++-
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-> Also, type of entries variable should be unsigned int to match
-> the iod->sgt.nents.
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 07b3c6093e7d..6f450816c4fa 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -729,7 +729,8 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
+ 	cmd = apv >= 89 ? P_SYNC_PARAM89 : P_SYNC_PARAM;
+ 
+ 	/* initialize verify_alg and csums_alg */
+-	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
++	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
++	memset(&p->algs, 0, sizeof(p->algs));
+ 
+ 	if (get_ldev(peer_device->device)) {
+ 		dc = rcu_dereference(peer_device->device->ldev->disk_conf);
+diff --git a/drivers/block/drbd/drbd_protocol.h b/drivers/block/drbd/drbd_protocol.h
+index dea59c92ecc1..a882b65ab5d2 100644
+--- a/drivers/block/drbd/drbd_protocol.h
++++ b/drivers/block/drbd/drbd_protocol.h
+@@ -283,8 +283,10 @@ struct p_rs_param_89 {
+ 
+ struct p_rs_param_95 {
+ 	u32 resync_rate;
+-	char verify_alg[SHARED_SECRET_MAX];
+-	char csums_alg[SHARED_SECRET_MAX];
++	struct_group(algs,
++		char verify_alg[SHARED_SECRET_MAX];
++		char csums_alg[SHARED_SECRET_MAX];
++	);
+ 	u32 c_plan_ahead;
+ 	u32 c_delay_target;
+ 	u32 c_fill_target;
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 1f740e42e457..6df2539e215b 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -3921,7 +3921,8 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 
+ 	/* initialize verify_alg and csums_alg */
+ 	p = pi->data;
+-	memset(p->verify_alg, 0, 2 * SHARED_SECRET_MAX);
++	BUILD_BUG_ON(sizeof(p->algs) != 2 * SHARED_SECRET_MAX);
++	memset(&p->algs, 0, sizeof(p->algs));
+ 
+ 	err = drbd_recv_all(peer_device->connection, p, header_size);
+ 	if (err)
+-- 
+2.30.2
 
-Sure, I will fix that in the next version.
-
-Thanks for the reviews!
-
-Logan
