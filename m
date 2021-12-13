@@ -2,89 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD63C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 13:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95266C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 13:52:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237856AbhLMNqd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 08:46:33 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:45370 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232047AbhLMNqc (ORCPT
+        id S233766AbhLMNwI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 08:52:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59194 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233721AbhLMNwH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 08:46:32 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 731C71F3B9;
-        Mon, 13 Dec 2021 13:46:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1639403191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Mon, 13 Dec 2021 08:52:07 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E2FC061574;
+        Mon, 13 Dec 2021 05:52:07 -0800 (PST)
+Date:   Mon, 13 Dec 2021 14:52:03 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1639403525;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UyolFaM14P3cDEhuPoRNdfQMUKwyv7gy6T2mO+pB6xQ=;
-        b=yl41LBoGbpRPzv8MWlVP/S7tRtKgZDXkZBgCoeG85vG7FuG3gjQYUIwF26c29dYJm8sbPR
-        YLrT9c9xWsiRbxlIxxsPP55lYRe2vedNbZFXqpfvgpb9KNLX3Qewk/GNL0XPIlQNCsFmDT
-        2GUZipePriaBQtnjklCUhmoeML/u58Q=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1639403191;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        bh=QvPVVL5hpvPQZW/oXDRC/DMj/vt92LQqc7il/C/om5E=;
+        b=mqkZ6Jc5xXcDmuAdO97Toq7JmG47BpUZ6Iu1ABJnksS+UP43kYq7P45js4BOC5PEH0OUKh
+        lgZx2t+2bY/3ib3jXNVBMA/VBu9zoRcEfvsDU3SbfnajT8FGEyOCg9pcRCgupIfXOHnyKP
+        jxDzqy9bnzCgiQurvW89FiB2FnyaNBWZvXEHAtntJJ9lfhn3it1jp4KsNG2lUdPOsqRiJd
+        e+HDudPo8J6OOcZrZzWXoqdO6Z7ivh/ZVzisSpKNEpJQb46SFQVHZPy3r+21R+hoLAbCWe
+        VYApTPGIf3oPk3HJ+LdJmG/wm6RTUksOQKpAiAgKhLMp92984vrurr0CH7g4Rg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1639403525;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UyolFaM14P3cDEhuPoRNdfQMUKwyv7gy6T2mO+pB6xQ=;
-        b=jsQdHM62n6CiQzQryvCuAGb4jgn+x0EJXupvcFt2HxjHrap6ixb9OWlbosUZXfw6kxIQo6
-        OuHQWfteTdVU38Cw==
-Received: from quack2.suse.cz (unknown [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id 5A7A5A3B81;
-        Mon, 13 Dec 2021 13:46:31 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 2A7C91E11F3; Mon, 13 Dec 2021 14:46:31 +0100 (CET)
-Date:   Mon, 13 Dec 2021 14:46:31 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Holger =?iso-8859-1?Q?Hoffst=E4tte?= 
-        <holger@applied-asynchrony.com>
-Cc:     Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        fvogt@suse.de, Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
-        stable@vger.kernel.org, Fabian Vogt <fvogt@suse.com>
-Subject: Re: [PATCH] bfq: Fix use-after-free with cgroups
-Message-ID: <20211213134631.GB14044@quack2.suse.cz>
-References: <20211201133439.3309-1-jack@suse.cz>
- <28ded939-6339-c9e1-c0a3-ff84fb197eed@applied-asynchrony.com>
+        bh=QvPVVL5hpvPQZW/oXDRC/DMj/vt92LQqc7il/C/om5E=;
+        b=+zOpglHj8vaFsGfz/mTDMmpei6rOwTP3PUFcwWDgvt5w9P88HsIJIRZtJjoIF62rD5DFmc
+        WmB+4CARhU74rgCw==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Davidlohr Bueso <dave@stgolabs.net>, axboe@kernel.dk,
+        tglx@linutronix.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>
+Subject: Re: [PATCH] blk-mq: make synchronous hw_queue runs RT friendly
+Message-ID: <YbdQA0WDooPXGzQb@linutronix.de>
+References: <20211213054425.28121-1-dave@stgolabs.net>
+ <YbdFeHVnQbT0E5kR@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <28ded939-6339-c9e1-c0a3-ff84fb197eed@applied-asynchrony.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <YbdFeHVnQbT0E5kR@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 07-12-21 15:53:54, Holger Hoffstätte wrote:
-> 
-> On 2021-12-01 14:34, Jan Kara wrote:
-> > BFQ started crashing with 5.15-based kernels like:
-> > 
-> > BUG: KASAN: use-after-free in rb_erase (lib/rbtree.c:262 lib/rbtr
-> > Read of size 8 at addr ffff888008193098 by task bash/1472
-> [snip]
-> 
-> This does not compile when CONFIG_BFQ_GROUP_IOSCHED is disabled.
-> I know the patch is meant for the case where it is enabled, but still..
-> 
-> block/bfq-iosched.c: In function 'bfq_init_bfqq':
-> block/bfq-iosched.c:5362:51: error: 'struct bfq_group' has no member named 'children'
->  5362 |         hlist_add_head(&bfqq->children_node, &bfqg->children);
->       |                                                   ^~
-> make[1]: *** [scripts/Makefile.build:277: block/bfq-iosched.o] Error 1
-> 
-> Probably just needs a few more ifdefs :)
+On 2021-12-13 05:07:04 [-0800], Christoph Hellwig wrote:
+> But more importantly:  why isn't migrate_disable/enable doing the right
+> thing for !PREEMPT_RT to avoid this mess?
 
-Yep, already fixed that up locally. Thanks for notice.
+Thank you for asking the question.
 
-								Honza
-
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Sebastian
