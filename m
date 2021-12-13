@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4B6C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 02:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FA0C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 03:17:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbhLMCtR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Dec 2021 21:49:17 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:52122 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231293AbhLMCtQ (ORCPT
+        id S231420AbhLMDRc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Dec 2021 22:17:32 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:39416 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229709AbhLMDRb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Dec 2021 21:49:16 -0500
+        Sun, 12 Dec 2021 22:17:31 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 3EF4D1F3B0;
-        Mon, 13 Dec 2021 02:49:15 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id DAFC32114E;
+        Mon, 13 Dec 2021 03:17:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639363755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1639365449; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ARU1chUSDNNbEO0Gmuw+z4jcRaOzwHttZpVv4bXZVME=;
-        b=c+/6p2rTtmAaA+NWZr62ery+YWOgqmspY1w9O5n7qryWpA4hi1LkwmuPwcNYqcy86OpsVa
-        T9lQKdu0kurh6iIO7gkw18q1teD5Rok6yWovORBIY5gNtVuEACQ/rF0Nv1QQ6yFfhPAIDt
-        TqsZJ7Vn0ds4asvPPy4SdV9cXNCWFAY=
+        bh=2ouwu3rIILZdyNvJCYuDu81WB3rt0CZUyp9hytfG6M4=;
+        b=oFgdzjNketS5iKV6eS2mbjV5pQtJm+3g3a3WIjkFCcOhcbI0DYNKILX429SYKMy4MqY6oQ
+        iSOsNwRyx+mutVpkqbmhK0c8djykMJbiAsDTWFqc5ctUKXgY4u/YubHRBSMM7Beu2Ucy4Z
+        fwH2B9c5ID+ZgFAg0CllQKZq92o6/G4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639363755;
+        s=susede2_ed25519; t=1639365449;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ARU1chUSDNNbEO0Gmuw+z4jcRaOzwHttZpVv4bXZVME=;
-        b=P2E/S3Ksotww5zAfG0rehTW0+xH/GdzUOwA2yBfwCVas0vGSzH7qIQQKwVJ1rVy8o6pfcv
-        GUw2ATTgU+5XdbBA==
+        bh=2ouwu3rIILZdyNvJCYuDu81WB3rt0CZUyp9hytfG6M4=;
+        b=nm9KnkJTyUnbQj6v6Z7o56gmW+42O6Bz50+yQKiSTxqduOfma7q3oS1TQ88fxdvSoTs2aa
+        g8NLf11IfuosYGAQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CB88913310;
-        Mon, 13 Dec 2021 02:49:13 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 44BFD13425;
+        Mon, 13 Dec 2021 03:17:28 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id Z7zYIKm0tmHgKwAAMHmgww
-        (envelope-from <neilb@suse.de>); Mon, 13 Dec 2021 02:49:13 +0000
+        id N8PJAEi7tmGQMgAAMHmgww
+        (envelope-from <neilb@suse.de>); Mon, 13 Dec 2021 03:17:28 +0000
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 From:   "NeilBrown" <neilb@suse.de>
-To:     "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         "Christoph Hellwig" <hch@infradead.org>
-Subject: Re: [PATCH v2] FAT: use schedule_timeout_uninterruptible() instead of
- congestion_wait()
+Subject: [PATCH v3] FAT: use io_schedule_timeout() instead of congestion_wait()
 In-reply-to: <875yrtql2s.fsf@mail.parknet.co.jp>
 References: <163712349419.13692.2859038330142282757@noble.neil.brown.name>,
  <87ee79yiik.fsf@mail.parknet.co.jp>,
@@ -65,49 +65,55 @@ References: <163712349419.13692.2859038330142282757@noble.neil.brown.name>,
  <87h7bfmtqc.fsf@mail.parknet.co.jp>,
  <163936252397.22433.9103044991910658320@noble.neil.brown.name>,
  <875yrtql2s.fsf@mail.parknet.co.jp>
-Date:   Mon, 13 Dec 2021 13:49:07 +1100
-Message-id: <163936374739.22433.3300471788473733689@noble.neil.brown.name>
+Date:   Mon, 13 Dec 2021 14:17:25 +1100
+Message-id: <163936544519.22433.13400436295732112065@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 13 Dec 2021, OGAWA Hirofumi wrote:
-> "NeilBrown" <neilb@suse.de> writes:
->=20
-> > On Sat, 11 Dec 2021, OGAWA Hirofumi wrote:
-> >> "NeilBrown" <neilb@suse.de> writes:
-> >>=20
-> >> > congestion_wait() in this context is just a sleep - block devices do n=
-ot
-> >> > in general support congestion signalling any more.
-> >> >
-> >> > The goal here is to wait for any recently written data to get to
-> >> > storage.  blkdev_issue_flush() is thought to be too expensive, so
-> >> > replace congestion_wait() with an explicit timeout.
-> >>=20
-> >> If just replace, the following looks better
-> >>=20
-> >> 	set_current_state(TASK_UNINTERRUPTIBLE);
-> >> 	io_schedule_timeout(HZ/10);
-> >>=20
-> >> Otherwise,
-> >>=20
-> >> Acked-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-> >
-> > Thanks.
-> > According to MAINTAINERS, I should send patches for this code to you,
-> > with the implication (I assumed) that you would forwarded them upstream
-> > if acceptable.
-> > But the fact that you have send mt an Acked-By seems to suggest that you
-> > won't be doing that.
-> > To whom should I send this patch with your acked-by?
->=20
-> Ah, sorry. I have no repository. So FAT patches goes to linus tree via
-> akpm's help.
->=20
-> So "Cc: Andrew Morton <akpm@linux-foundation.org>" and my Acked-by
-> should work (or I will Cc as reply if need).
 
-Will do, thanks.
+congestion_wait() in this context is just a sleep - block devices do not
+support congestion signalling any more.
 
+The goal for this wait, which was introduced in Commit ae78bf9c4f5f
+("[PATCH] add -o flush for fat") is to wait for any recently written
+data to get to storage.  We currently have no direct mechanism to do
+this, so a simple wait that behaves identically to the current
+congestion_wait() is the best we can do.
+
+This is a step towards removing congestion_wait()
+
+Acked-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Signed-off-by: NeilBrown <neilb@suse.de>
+---
+
+Hi Andrew,
+ I believe you are an appropriate conduit for fs/fat patches once that
+ have been suitably acked.
+Thanks
 NeilBrown
+
+ fs/fat/file.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/fs/fat/file.c b/fs/fat/file.c
+index 13855ba49cd9..a5a309fcc7fa 100644
+--- a/fs/fat/file.c
++++ b/fs/fat/file.c
+@@ -175,9 +175,10 @@ long fat_generic_ioctl(struct file *filp, unsigned int c=
+md, unsigned long arg)
+ static int fat_file_release(struct inode *inode, struct file *filp)
+ {
+ 	if ((filp->f_mode & FMODE_WRITE) &&
+-	     MSDOS_SB(inode->i_sb)->options.flush) {
++	    MSDOS_SB(inode->i_sb)->options.flush) {
+ 		fat_flush_inodes(inode->i_sb, inode, NULL);
+-		congestion_wait(BLK_RW_ASYNC, HZ/10);
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		io_schedule_timeout(HZ/10);
+ 	}
+ 	return 0;
+ }
+--=20
+2.34.1
+
