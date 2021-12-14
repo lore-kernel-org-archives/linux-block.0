@@ -2,118 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3993C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 16:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD0DC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 16:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235482AbhLNQAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 11:00:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235484AbhLNP77 (ORCPT
+        id S235487AbhLNQB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 11:01:28 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:43348 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235492AbhLNQB2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 10:59:59 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A139C06173E
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 07:59:59 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id x10so24960899ioj.9
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 07:59:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=MF6LStIRWFGgSEcEVKAHb4dN3GxRLuGtLjkYzdVRCpE=;
-        b=K4cBVSIBzXg+4zqiU5l3zsc0nzYTWWwQDu+mVrQNMfo+KTCpltAsnDU7JIob7QCXlG
-         +oA+RIoifv5VL+sq0Xz4dygW5hK25QJLZMRk1JQG4vYo0F4dWH1Te4vwPnUHIlfuaV5l
-         43RPnpoUe567wJvbEgRwKvxbHZwLYMjrYQhgt0QHa7jZZmoOu0HisgIZJE/933Xok1ae
-         NF+gKpCluUeaJox83fAty25kg59A6+xBI2uP+TrOCegfgflHWEyDF02ShaIDc0rQpB2d
-         7R/wtcbFXYPJqx2M0ir8CQWAFiJCBMM/CIi16uuDjc6AILs6Vt1S7voCnV2hiDn1gy+T
-         qS4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MF6LStIRWFGgSEcEVKAHb4dN3GxRLuGtLjkYzdVRCpE=;
-        b=L9/a6rNPWVLb0CQVt3BTsSFn++begW4a9lAcTwjX6mz/5O59CMhE+AWXLP/YfdYdlp
-         nAEfaQnYTpl2f9fsdU+Y+ZwM/x4AS2csT19D5NI76edKrjrwfGeEZ69dMj7bYF0nd3sa
-         MtYyddnW4Ah0Dswzhb1WceWZ8FrA0XHjbwT1WPdMJbMOTf9aVmk5k8c8288CprM81I6i
-         9281latt0/FrOT65U/5ehReOvo4/0M3ugqi3/cC2Ry/reVnK6299QV2SMXcl0HFkA6du
-         KfgKdBTBAW4xRysaNhbzrF5DRMt3Sqo2ffWTNiZEu2KRtMufxKm34C/xN+dxOv/LU3ip
-         5Ucw==
-X-Gm-Message-State: AOAM532Uwsqx1uiz+ercrIm5O1OrHtBybiIplmp3gf1P2O7Xsjy6/nrT
-        F1Pd2KWHDPd2su9DBkziVZdKdA==
-X-Google-Smtp-Source: ABdhPJwEkZmU4sYbxh/NHebuI9ABjy19CjGqndiZ8xWalsvqywg9XwBW5TQtHDFjaslBJTD8q7pytQ==
-X-Received: by 2002:a02:834b:: with SMTP id w11mr3338949jag.622.1639497598564;
-        Tue, 14 Dec 2021 07:59:58 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s9sm173230ild.14.2021.12.14.07.59.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Dec 2021 07:59:58 -0800 (PST)
-Subject: Re: [PATCH] block: reduce kblockd_mod_delayed_work_on() CPU
- consumption
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-References: <bc529a3e-31d5-c266-8633-91095b346b19@kernel.dk>
- <YbiyhcbZmnNbed3O@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <53b6fac0-10cb-80ab-16e7-ee851b720d5e@kernel.dk>
-Date:   Tue, 14 Dec 2021 08:59:57 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 14 Dec 2021 11:01:28 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 19F711F383;
+        Tue, 14 Dec 2021 16:01:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1639497687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=n3ekWvhMehh73GkZVCxfKmDc4I3m/60wCz+HM3I+518=;
+        b=nZV1KbOW4/YCfHWDWvroOfT6F1jdK1JJPUaTOj79uNkpT8tdXLabxK93B59SUQj2hdaaYz
+        EXOZFOYbWr3hFRcSnBMqSugvEisXQzudk4tJ9HBEzi/FLn6JLV0iB1yO8gTPdbQUCer8gT
+        J/KYBntlDHNVdvfzA+66VBIP1xZZepo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1639497687;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=n3ekWvhMehh73GkZVCxfKmDc4I3m/60wCz+HM3I+518=;
+        b=TG09fXX7fWsveVRxhBBxshqP1n8BqDCfi8MGgJsQQdkRCRaT3IAuWPRgzl9Ob1n7dj0P1R
+        /4KINzgNTHMyOGDQ==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id 0DE23A3B85;
+        Tue, 14 Dec 2021 16:01:27 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id DED291F2C7E; Tue, 14 Dec 2021 17:01:26 +0100 (CET)
+Date:   Tue, 14 Dec 2021 17:01:26 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 10/11] block: fold create_task_io_context into
+ ioc_find_get_icq
+Message-ID: <20211214160126.GK14044@quack2.suse.cz>
+References: <20211209063131.18537-1-hch@lst.de>
+ <20211209063131.18537-11-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <YbiyhcbZmnNbed3O@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211209063131.18537-11-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/14/21 8:04 AM, Christoph Hellwig wrote:
-> On Tue, Dec 14, 2021 at 07:53:46AM -0700, Jens Axboe wrote:
->> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
->> running 24 disks and using the 'none' scheduler. This happens off the
->> flush path, because SCSI requires the queue to be restarted async, and
->> hence we're hammering on mod_delayed_work_on() to ensure that the work
->> item gets run appropriately.
->>
->> What we care about here is that the queue is run, and we don't need to
->> repeatedly re-arm the timer associated with the delayed work item. If we
->> check if the work item is pending upfront, then we don't really need to do
->> anything else. This is safe as theh work pending bit is cleared before a
->> work item is started.
->>
->> The only potential caveat here is if we have callers with wildly different
->> timeouts specified. That's generally not the case, so don't think we need
->> to care for that case.
+On Thu 09-12-21 07:31:30, Christoph Hellwig wrote:
+> Fold create_task_io_context into the only remaining caller.
 > 
-> So why not do a non-delayed queue_work for that case?  Might be good
-> to get the scsi and workqueue maintaines involved to understand the
-> issue a bit better first.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-We can probably get by with doing just that, and just ignore if a delayed
-work timer is already running.
+Looks good. Feel free to add:
 
-Dexuan, can you try this one?
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1378d084c770..c1833f95cb97 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1484,6 +1484,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
- int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
- 				unsigned long delay)
- {
-+	if (!delay)
-+		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
- 	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
- }
- EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+								Honza
 
+> ---
+>  block/blk-ioc.c | 43 ++++++++++++-------------------------------
+>  1 file changed, 12 insertions(+), 31 deletions(-)
+> 
+> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> index cff0e3bdae53c..dc7fb064fd5f7 100644
+> --- a/block/blk-ioc.c
+> +++ b/block/blk-ioc.c
+> @@ -238,36 +238,6 @@ static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
+>  	return ioc;
+>  }
+>  
+> -static struct io_context *create_task_io_context(struct task_struct *task,
+> -		gfp_t gfp_flags, int node)
+> -{
+> -	struct io_context *ioc;
+> -
+> -	ioc = alloc_io_context(gfp_flags, node);
+> -	if (!ioc)
+> -		return NULL;
+> -
+> -	/*
+> -	 * Try to install.  ioc shouldn't be installed if someone else
+> -	 * already did or @task, which isn't %current, is exiting.  Note
+> -	 * that we need to allow ioc creation on exiting %current as exit
+> -	 * path may issue IOs from e.g. exit_files().  The exit path is
+> -	 * responsible for not issuing IO after exit_io_context().
+> -	 */
+> -	task_lock(task);
+> -	if (!task->io_context &&
+> -	    (task == current || !(task->flags & PF_EXITING)))
+> -		task->io_context = ioc;
+> -	else
+> -		kmem_cache_free(iocontext_cachep, ioc);
+> -
+> -	ioc = task->io_context;
+> -	if (ioc)
+> -		get_io_context(ioc);
+> -	task_unlock(task);
+> -	return ioc;
+> -}
+> -
+>  int set_task_ioprio(struct task_struct *task, int ioprio)
+>  {
+>  	int err;
+> @@ -426,9 +396,20 @@ struct io_cq *ioc_find_get_icq(struct request_queue *q)
+>  	struct io_cq *icq = NULL;
+>  
+>  	if (unlikely(!ioc)) {
+> -		ioc = create_task_io_context(current, GFP_ATOMIC, q->node);
+> +		ioc = alloc_io_context(GFP_ATOMIC, q->node);
+>  		if (!ioc)
+>  			return NULL;
+> +
+> +		task_lock(current);
+> +		if (current->io_context) {
+> +			kmem_cache_free(iocontext_cachep, ioc);
+> +			ioc = current->io_context;
+> +		} else {
+> +			current->io_context = ioc;
+> +		}
+> +
+> +		get_io_context(ioc);
+> +		task_unlock(current);
+>  	} else {
+>  		get_io_context(ioc);
+>  
+> -- 
+> 2.30.2
+> 
 -- 
-Jens Axboe
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
