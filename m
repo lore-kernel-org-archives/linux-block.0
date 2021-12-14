@@ -2,53 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B9EC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 08:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 062CDC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 09:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbhLNIkm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 03:40:42 -0500
-Received: from mail.thebizzie.pl ([192.236.147.111]:41256 "EHLO
-        mail.thebizzie.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231887AbhLNIkl (ORCPT
+        id S232151AbhLNJMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 04:12:52 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:32917 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230062AbhLNJMu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 03:40:41 -0500
-X-Greylist: delayed 492 seconds by postgrey-1.27 at vger.kernel.org; Tue, 14 Dec 2021 03:40:41 EST
-Received: by mail.thebizzie.pl (Postfix, from userid 1002)
-        id 8D70E1816D3; Tue, 14 Dec 2021 08:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thebizzie.pl; s=mail;
-        t=1639470748; bh=kU+//Lu71IqgcFfjayWXuIc0mZtoyrYJc2YuqyU8eS8=;
-        h=Date:From:To:Subject:From;
-        b=RptwC1WPMyAQdatM5uX3Xa3YY6sKHcM257YBKVftWhaC8OiYWs4C25rsIPZtTK7q3
-         rBayWCZWoLsQqQklSUfok607nQzbShJ+zcIardxYD96A7yfnMqL7I8IdTItQVSctGb
-         Q2xEvfhqowvwiJccDkvb7y5ndBAPWtm1bhCqZNhSEhGERDMQbbyNAMehn5sn/Mm+Ab
-         /mklD20cmJjG6aGKfWIGNR7tD2+vOj3kju0KWvO+zQfwWt5oBXPnX3OLcmDnCGuEWH
-         KyUCcKz4dHhkL0eYHQNUAfJJIMe1arrG825gON0ClUKk/jsmhxhpzkgxP4nGdeIp72
-         9IW9HZEvy6VKw==
-Received: by mail.thebizzie.pl for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 08:31:44 GMT
-Message-ID: <20211214074500-0.1.7.2b1.0.gymjr8o6cj@thebizzie.pl>
-Date:   Tue, 14 Dec 2021 08:31:44 GMT
-From:   "Mateusz Adamczyk" <mateusz.adamczyk@thebizzie.pl>
-To:     <linux-block@vger.kernel.org>
-Subject: Wycena paneli fotowoltaicznych
-X-Mailer: mail.thebizzie.pl
+        Tue, 14 Dec 2021 04:12:50 -0500
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JCt1q6nyJzcbvP;
+        Tue, 14 Dec 2021 17:12:31 +0800 (CST)
+Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 14 Dec 2021 17:12:48 +0800
+Received: from [10.174.177.69] (10.174.177.69) by
+ dggpemm500004.china.huawei.com (7.185.36.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 14 Dec 2021 17:12:48 +0800
+Message-ID: <8c87a712-93fb-d794-6d08-cadf6452efc3@huawei.com>
+Date:   Tue, 14 Dec 2021 17:12:48 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH -next] blk-throttle: Set BIO_THROTTLED when bio has been
+ throttled
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20211118131551.810931-1-qiulaibin@huawei.com>
+ <YaUZExR6v8IdZUeM@slm.duckdns.org>
+ <03964258-10ff-7f19-10cb-ca4eccf72848@huawei.com>
+ <YbepLpyMPqP2ao3J@slm.duckdns.org>
+From:   QiuLaibin <qiulaibin@huawei.com>
+In-Reply-To: <YbepLpyMPqP2ao3J@slm.duckdns.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.177.69]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500004.china.huawei.com (7.185.36.219)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
-
-dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
-irm=C4=85.
-
-=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
-ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej nawet o 90%.
-
-Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
-ropozycji?
 
 
-Pozdrawiam,
-Mateusz Adamczyk
+On 2021/12/14 4:12, Tejun Heo wrote:
+> On Mon, Dec 13, 2021 at 05:24:00PM +0800, QiuLaibin wrote:
+>>> * This function is called synchronously on the issue path. The bio isn't
+>>>     seen by the queue and device driver yet and nothing can race to issue it
+>>>     before this function returns.
+>>>
+>>
+>> The bio is under throttle here, this submit_bio return directly. And
+>> current process will queue a dispatch work by
+>> throtl_schedule_pending_timer() to submit this bio before BIO_THROTTLED flag
+>> set. If the bio is completed quickly after the dispatch work is queued, UAF
+>> of bio will happen.
+> 
+> You are right, the timer can get to it. Can't it be solved by just
+> reordering spin_unlock and setting BIO_THROTTLED?
+> 
+
+I think it can be solved by setting BIO_THROTTLED before queue dispatch 
+work.
+
+>>> * Now we're not setting BIO_THROTTLED when we're taking a different return
+>>>     path through the out_unlock label and risks calling back into blk_throtl
+>>>     again on the same bio.
+>>>
+>>
+>> In my opinion, This flag can prevent the request from being throttled
+>> multiple times. If the request itself does not need to be throttled, the
+>> result of repeated entry will be the same.
+>> If necessary, I think we can use other methods to achieve this effect for
+>> request does not need to be throttled.
+> 
+> So that we don't change anything regarding this?
+> 
+
+I am thinking of adding a new bio tag (like BIO_THROTTLE_BYPASS) to 
+avoid those requests which do not need to be throttled to enter the 
+throttle multiple times.
+> Thanks.
+> 
