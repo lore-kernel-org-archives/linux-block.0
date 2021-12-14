@@ -2,119 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1ED0C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 13:15:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7EFC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 13:58:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234304AbhLNNPu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 08:15:50 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:28316 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234288AbhLNNPu (ORCPT
+        id S234615AbhLNN6Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 08:58:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234613AbhLNN6X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 08:15:50 -0500
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JCzQB0p1QzbjN4;
-        Tue, 14 Dec 2021 21:15:30 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 21:15:47 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Tue, 14 Dec
- 2021 21:15:47 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <ming.lei@redhat.com>, <hch@infradead.org>, <axboe@kernel.dk>
-CC:     <yi.zhang@huawei.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 -next] block/wbt: fix negative inflight counter when remove scsi device
-Date:   Tue, 14 Dec 2021 21:31:03 +0800
-Message-ID: <20211214133103.551813-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        Tue, 14 Dec 2021 08:58:23 -0500
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1337C061748
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:58:22 -0800 (PST)
+Received: by mail-il1-x12c.google.com with SMTP id l5so17508671ilv.7
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:58:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=IeJEDuwrHuRaa+Ik/SvG/4JB6lqbm2wKrnNt11uuG4A=;
+        b=wMb1zuONQwHdeid8S1mJv4yX2A2Yx3Z/jQ3x4ORQDBB7GS1EzW2Fmb33wZTbX8v2H7
+         vlHWBrKTa1fuyiHpwFLEwGL4ByT9HaNvQNinFzQlphTwm/GTRuFGTP0nZEtPedwOJC4s
+         AlTZTc01fPcj+twJQ5FmKV0qBKTeGPyCVEg46rJ3Whua4tLY2av7mihgHt/8RyrQ5C4Z
+         nGeM3Pqadn4UvSal3UTyBkY+8qXs4RVhEnku3LPJfF52pbvKyzkPKLTYmTMnauD+asfC
+         vzeOe7HKQJIacSFtyKrCc9WWAzxumDw5Ad4/u9iklppC9Fv5nJ398Igz/W1wjr8iUdbT
+         5joA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=IeJEDuwrHuRaa+Ik/SvG/4JB6lqbm2wKrnNt11uuG4A=;
+        b=gYIT2CEsTI7QXxeZP4Fu4t7+uz03acxR9DwqYTIu9GmMkEwZ3+jJQVGs2HkaJ8rUNn
+         eakKfxJN/C2uOYibzjUJF8gE6SBiVKnU09GMU9mQJZ+bZbaHUW5ex7qgufQ8HsmabE/P
+         HPDXDbCFZR25SoWccgqIwTy+zO7ExoUUZsZm3yo1vU2c2fe61Pr5IR4WF4f9aj8rYkEl
+         dOgi+sLx8zyypwhmrNmSp6uCVUMfRAcwVYyVA1BRhhhPGBEAQ7Rl4R0kJrtR3j5ifR+d
+         tRO97e1psbp1PLfXPT8aqYjF2BHd0DHPeSbs1kvfJtNi+SccGeApwPBFKqkznkwghhiE
+         OajA==
+X-Gm-Message-State: AOAM531O+yRob4lhG0f3gJ90491MC0iArTPaVhIbvV9TZTt6AAjy+mqd
+        ElAzNnr13dbsKHKcBv0sF46f/UDsXUdshA==
+X-Google-Smtp-Source: ABdhPJzS0xykloyo4HnzZbLCGjWJWacfLqAlkteSfczA+XZFmqRhXAa8qf2/F3kXzIhTSCgWu/URgQ==
+X-Received: by 2002:a05:6e02:1789:: with SMTP id y9mr3400069ilu.321.1639490302145;
+        Tue, 14 Dec 2021 05:58:22 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id q8sm9533638iow.47.2021.12.14.05.58.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Dec 2021 05:58:21 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, cgroups@vger.kernel.org
+In-Reply-To: <Ybfh86iSvpWKxhVM@slm.duckdns.org>
+References: <Ybfh86iSvpWKxhVM@slm.duckdns.org>
+Subject: Re: [PATCH for-5.16/block] iocost: Fix divide-by-zero on donation from low hweight cgroup
+Message-Id: <163949030003.173863.14081933851643062205.b4-ty@kernel.dk>
+Date:   Tue, 14 Dec 2021 06:58:20 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we disable wbt by set WBT_STATE_OFF_DEFAULT in
-wbt_disable_default() when switch elevator to bfq. And when
-we remove scsi device, wbt will be enabled by wbt_enable_default.
-If it become false positive between wbt_wait() and wbt_track()
-when submit write request.
+On Mon, 13 Dec 2021 14:14:43 -1000, Tejun Heo wrote:
+> The donation calculation logic assumes that the donor has non-zero
+> after-donation hweight, so the lowest active hweight a donating cgroup can
+> have is 2 so that it can donate 1 while keeping the other 1 for itself.
+> Earlier, we only donated from cgroups with sizable surpluses so this
+> condition was always true. However, with the precise donation algorithm
+> implemented, f1de2439ec43 ("blk-iocost: revamp donation amount
+> determination") made the donation amount calculation exact enabling even low
+> hweight cgroups to donate.
+> 
+> [...]
 
-The following is the scenario that triggered the problem.
+Applied, thanks!
 
-T1                          T2                           T3
-                            elevator_switch_mq
-                            bfq_init_queue
-                            wbt_disable_default <= Set
-                            rwb->enable_state (OFF)
-Submit_bio
-blk_mq_make_request
-rq_qos_throttle
-<= rwb->enable_state (OFF)
-                                                         scsi_remove_device
-                                                         sd_remove
-                                                         del_gendisk
-                                                         blk_unregister_queue
-                                                         elv_unregister_queue
-                                                         wbt_enable_default
-                                                         <= Set rwb->enable_state (ON)
-q_qos_track
-<= rwb->enable_state (ON)
-^^^^^^ this request will mark WBT_TRACKED without inflight add and will
-lead to drop rqw->inflight to -1 in wbt_done() which will trigger IO hung.
+[1/1] iocost: Fix divide-by-zero on donation from low hweight cgroup
+      commit: edaa26334c117a584add6053f48d63a988d25a6e
 
-Fix this by move wbt_enable_default() from elv_unregister to
-bfq_exit_queue(). Only re-enable wbt when bfq exit.
-Fixes: 76a8040817b4b ("blk-wbt: make sure throttle is enabled properly")
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
----
- block/bfq-iosched.c | 4 ++++
- block/elevator.c    | 2 --
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0c612a911696..8b7524450835 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6996,6 +6996,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
- {
- 	struct bfq_data *bfqd = e->elevator_data;
- 	struct bfq_queue *bfqq, *n;
-+	struct request_queue *q = bfqd->queue;
- 
- 	hrtimer_cancel(&bfqd->idle_slice_timer);
- 
-@@ -7019,6 +7020,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
- #endif
- 
- 	kfree(bfqd);
-+
-+	/* Re-enable throttling in case elevator disabled it */
-+	wbt_enable_default(q);
- }
- 
- static void bfq_init_root_group(struct bfq_group *root_group,
-diff --git a/block/elevator.c b/block/elevator.c
-index ec98aed39c4f..482df2a350fc 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -525,8 +525,6 @@ void elv_unregister_queue(struct request_queue *q)
- 		kobject_del(&e->kobj);
- 
- 		e->registered = 0;
--		/* Re-enable throttling in case elevator disabled it */
--		wbt_enable_default(q);
- 	}
- }
- 
+Best regards,
 -- 
-2.22.0
+Jens Axboe
+
 
