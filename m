@@ -2,109 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B783C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 04:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473E6C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 05:04:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229883AbhLNE1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 23:27:45 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:15729 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbhLNE1p (ORCPT
+        id S229768AbhLNFEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 00:04:34 -0500
+Received: from mail-pl1-f176.google.com ([209.85.214.176]:47023 "EHLO
+        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229775AbhLNFEd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 23:27:45 -0500
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JCldn35J4zZcFJ;
-        Tue, 14 Dec 2021 12:24:45 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 12:27:43 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Tue, 14 Dec
- 2021 12:27:42 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <hch@infradead.org>, <axboe@kernel.dk>
-CC:     <yi.zhang@huawei.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 -next] block/wbt: fix negative inflight counter when remove scsi device
-Date:   Tue, 14 Dec 2021 12:42:59 +0800
-Message-ID: <20211214044259.2656456-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        Tue, 14 Dec 2021 00:04:33 -0500
+Received: by mail-pl1-f176.google.com with SMTP id p18so12712660plf.13;
+        Mon, 13 Dec 2021 21:04:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=c2eV4osFi0ukdYwPMjLg4N3OH2klHkHbVnzvE6IHZ0A=;
+        b=wEqEV+/9CiNSZYZGSClvtFvEZalNUojZKZ8P8ayPuH+rE0zK0mAOAOx+wejIDryIYW
+         Xwqb/jaaxisYe8FhrUD9u6hbsjm01W9NTjt/KrU1DfC0LG0/yoA/8ZQgDrrpBJseIWS2
+         mWkR6q+5D0MtR5namKw9PrjYWDSVp5NsRa7Nk2ngu9cpjmtGdkUOr/m0oIPSWW/Ff1s8
+         gQNUkoBHRuX0moXura+ciwLptS7U/O4/bhbW4IFaQnVNqLbFzs4O3d61yjLtYtwSiMfo
+         j0ryFnaYBPXDmRHxHtmkObbFYvsqCtFfxsC8bqanTuYS+2NbOUUTcgNkH0yOlmbvZHYv
+         NV/Q==
+X-Gm-Message-State: AOAM533XgXoDd+09MvA8mPVBxyFp3+wRmP1GD87w4XHYPiZIPDKd0Mqd
+        Aqm2thvZjDhTq16EYH1AdpI=
+X-Google-Smtp-Source: ABdhPJwtMlRpUdDYK54zZy9LApP/DL9N5L+IrnomqaNOXiFC+OMI9PifWtvDjkZweUk0AUMLjAtr2A==
+X-Received: by 2002:a17:902:9f98:b0:144:e777:f88e with SMTP id g24-20020a1709029f9800b00144e777f88emr3021815plq.31.1639458272383;
+        Mon, 13 Dec 2021 21:04:32 -0800 (PST)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id me3sm688683pjb.35.2021.12.13.21.04.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Dec 2021 21:04:31 -0800 (PST)
+Message-ID: <a4b285ba-4a46-c94b-444e-d3c4f42c42c5@acm.org>
+Date:   Mon, 13 Dec 2021 21:04:29 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v3 3/3] blk-crypto: show crypto capabilities in sysfs
+Content-Language: en-US
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-mmc@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+References: <20211208013534.136590-1-ebiggers@kernel.org>
+ <20211208013534.136590-4-ebiggers@kernel.org>
+ <6ff4d074-7508-4f4c-de06-f36899668168@acm.org>
+ <YbKT/lcp6iZ+lD4n@sol.localdomain> <YbL2uUqV0GWFOitE@kroah.com>
+ <cb29756b-8b21-5b4d-f107-b5573945d7ab@acm.org> <YbSCYyAv1SmYy7mz@kroah.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <YbSCYyAv1SmYy7mz@kroah.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we disable wbt by set WBT_STATE_OFF_DEFAULT in
-wbt_disable_default() when switch elevator to bfq. And when
-we remove scsi device, wbt will be enabled by wbt_enable_default.
-If it become false positive between wbt_wait() and wbt_track()
-when submit write request.
+On 12/11/21 02:50, Greg Kroah-Hartman wrote:
+> On Fri, Dec 10, 2021 at 09:29:41AM -0800, Bart Van Assche wrote:
+>> (b) No other block layer sysfs attribute follows this encoding scheme.
+> 
+> Then follow what they do.  Do they have multiple values in a single
+> file?  If so, they are broken and we should change that.
 
-The following is the scenario that triggered the problem.
+Hi Greg,
 
-T1                          T2                           T3
-                            elevator_switch_mq
-                            bfq_init_queue
-                            wbt_disable_default <= Set
-                            rwb->enable_state (OFF)
-Submit_bio
-blk_mq_make_request
-rq_qos_throttle
-<= rwb->enable_state (OFF)
-                                                         scsi_remove_device
-                                                         sd_remove
-                                                         del_gendisk
-                                                         blk_unregister_queue
-                                                         elv_unregister_queue
-                                                         wbt_enable_default
-                                                         <= Set rwb->enable_state (ON)
-q_qos_track
-<= rwb->enable_state (ON)
-^^^^^^ this request will mark WBT_TRACKED without inflight add and will
-lead to drop rqw->inflight to -1 in wbt_done() which will trigger IO hung.
+The only other block layer sysfs attribute I know of that reports 
+multiple values is the queue/scheduler attribute. Here is an example of 
+the output that can be produced by reading that attribute:
 
-Fix this by move wbt_enable_default() from elv_unregister to
-elevator_switch_mq. Only re-enable wbt when scheduler switch.
-Fixes: 76a8040817b4b ("blk-wbt: make sure throttle is enabled properly")
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
----
- block/elevator.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+# cat /sys/block/sda/queue/scheduler
+[mq-deadline] kyber bfq none
 
-diff --git a/block/elevator.c b/block/elevator.c
-index ec98aed39c4f..de3cf1fa52fa 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -525,8 +525,6 @@ void elv_unregister_queue(struct request_queue *q)
- 		kobject_del(&e->kobj);
- 
- 		e->registered = 0;
--		/* Re-enable throttling in case elevator disabled it */
--		wbt_enable_default(q);
- 	}
- }
- 
-@@ -593,8 +591,11 @@ int elevator_switch_mq(struct request_queue *q,
- 	lockdep_assert_held(&q->sysfs_lock);
- 
- 	if (q->elevator) {
--		if (q->elevator->registered)
-+		if (q->elevator->registered) {
- 			elv_unregister_queue(q);
-+			/* Re-enable throttling in case elevator disabled it */
-+			wbt_enable_default(q);
-+		}
- 
- 		ioc_clear_queue(q);
- 		blk_mq_sched_free_rqs(q);
--- 
-2.22.0
+I don't think that changing the behavior of that attribute is an option 
+because that would break existing user space software, e.g. the 
+https://github.com/osandov/blktests/ test suite.
 
+Thanks,
+
+Bart.
