@@ -2,67 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C70C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 08:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B9EC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 08:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231719AbhLNIII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 03:08:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57440 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbhLNIII (ORCPT
+        id S231882AbhLNIkm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 03:40:42 -0500
+Received: from mail.thebizzie.pl ([192.236.147.111]:41256 "EHLO
+        mail.thebizzie.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231887AbhLNIkl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 03:08:08 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A88FC061574;
-        Tue, 14 Dec 2021 00:08:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=Qnx+VU+YQAKWtlCK0Z/caQGDrXD77wQzwT4eNh5ScGQ=; b=SMTuicLRt3cAYHFtHUTFUlQeIT
-        yiX9IhbbyS3h01s4D0Q2PJ8j6zssyQYQqFQn/MCQ5kd1MD9RwVn831cEIzeNF3dhkqKQqkNnEf3F/
-        CFBHKm0zawaalDEyvBM398d+oYTQCPOs+bdIf89H9Xax3sQOtn7jQv6AZrCV9UKFiWwsS2CfvsjvD
-        OgFRwIIhhERiaIqL315az3KpLmInNiy9ow6P+g+eaJy13fVvwoTW3m0uZ5UoZQQnaeqV+YWbTG0HT
-        DZ9mV6/FhZGYHNGwo1h6tuu0NElZldbkxBM44O3p+SGVac8DE/aMi1/PnUoH/iaD9REBugxVtfMyQ
-        ymVTFWoA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mx2qz-00CxmB-Cb; Tue, 14 Dec 2021 08:08:05 +0000
-Date:   Tue, 14 Dec 2021 00:08:05 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Davidlohr Bueso <dave@stgolabs.net>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        bigeasy@linutronix.de, tglx@linutronix.de,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Davidlohr Bueso <dbueso@suse.de>
-Subject: Re: [PATCH] blk-mq: make synchronous hw_queue runs RT friendly
-Message-ID: <YbhQ5b2qZN0Jpk5i@infradead.org>
-References: <20211213054425.28121-1-dave@stgolabs.net>
- <YbdFeHVnQbT0E5kR@infradead.org>
- <20211213190529.j54qikq7mk5zuc3o@offworld>
+        Tue, 14 Dec 2021 03:40:41 -0500
+X-Greylist: delayed 492 seconds by postgrey-1.27 at vger.kernel.org; Tue, 14 Dec 2021 03:40:41 EST
+Received: by mail.thebizzie.pl (Postfix, from userid 1002)
+        id 8D70E1816D3; Tue, 14 Dec 2021 08:32:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thebizzie.pl; s=mail;
+        t=1639470748; bh=kU+//Lu71IqgcFfjayWXuIc0mZtoyrYJc2YuqyU8eS8=;
+        h=Date:From:To:Subject:From;
+        b=RptwC1WPMyAQdatM5uX3Xa3YY6sKHcM257YBKVftWhaC8OiYWs4C25rsIPZtTK7q3
+         rBayWCZWoLsQqQklSUfok607nQzbShJ+zcIardxYD96A7yfnMqL7I8IdTItQVSctGb
+         Q2xEvfhqowvwiJccDkvb7y5ndBAPWtm1bhCqZNhSEhGERDMQbbyNAMehn5sn/Mm+Ab
+         /mklD20cmJjG6aGKfWIGNR7tD2+vOj3kju0KWvO+zQfwWt5oBXPnX3OLcmDnCGuEWH
+         KyUCcKz4dHhkL0eYHQNUAfJJIMe1arrG825gON0ClUKk/jsmhxhpzkgxP4nGdeIp72
+         9IW9HZEvy6VKw==
+Received: by mail.thebizzie.pl for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 08:31:44 GMT
+Message-ID: <20211214074500-0.1.7.2b1.0.gymjr8o6cj@thebizzie.pl>
+Date:   Tue, 14 Dec 2021 08:31:44 GMT
+From:   "Mateusz Adamczyk" <mateusz.adamczyk@thebizzie.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Wycena paneli fotowoltaicznych
+X-Mailer: mail.thebizzie.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211213190529.j54qikq7mk5zuc3o@offworld>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 13, 2021 at 11:05:29AM -0800, Davidlohr Bueso wrote:
-> On Mon, 13 Dec 2021, Christoph Hellwig wrote:
-> > But more importantly:  why isn't migrate_disable/enable doing the right
-> > thing for !PREEMPT_RT to avoid this mess?
-> 
-> Please see Peter's description of the situation in af449901b84.
+Dzie=C5=84 dobry,
 
-That explains why migrate_disable is a bad idea in PREEMPT_RT, not why it
-can't do something sensible for !PREEMPT_RT…
+dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
+irm=C4=85.
 
-> 
-> While I'm not at all a fan of sprinkling migrate_disabling around code,
-> I didn't want to add any overhead for the common case. If this, however,
-> were not an issue (if most cases are async runs, for example) the ideal
-> solution I think would be to just pin current to the hctx->cpumask.
+=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
+ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej nawet o 90%.
 
-sync running is the performance case.
+Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
+ropozycji?
+
+
+Pozdrawiam,
+Mateusz Adamczyk
