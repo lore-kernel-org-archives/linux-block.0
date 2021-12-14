@@ -2,87 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7EFC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 13:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5D2C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 13:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234615AbhLNN6Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 08:58:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
+        id S234630AbhLNN7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 08:59:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234613AbhLNN6X (ORCPT
+        with ESMTP id S234626AbhLNN7N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 08:58:23 -0500
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1337C061748
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:58:22 -0800 (PST)
-Received: by mail-il1-x12c.google.com with SMTP id l5so17508671ilv.7
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:58:22 -0800 (PST)
+        Tue, 14 Dec 2021 08:59:13 -0500
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8D2C061748
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:59:13 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id t7so1105072iln.12
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:59:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=IeJEDuwrHuRaa+Ik/SvG/4JB6lqbm2wKrnNt11uuG4A=;
-        b=wMb1zuONQwHdeid8S1mJv4yX2A2Yx3Z/jQ3x4ORQDBB7GS1EzW2Fmb33wZTbX8v2H7
-         vlHWBrKTa1fuyiHpwFLEwGL4ByT9HaNvQNinFzQlphTwm/GTRuFGTP0nZEtPedwOJC4s
-         AlTZTc01fPcj+twJQ5FmKV0qBKTeGPyCVEg46rJ3Whua4tLY2av7mihgHt/8RyrQ5C4Z
-         nGeM3Pqadn4UvSal3UTyBkY+8qXs4RVhEnku3LPJfF52pbvKyzkPKLTYmTMnauD+asfC
-         vzeOe7HKQJIacSFtyKrCc9WWAzxumDw5Ad4/u9iklppC9Fv5nJ398Igz/W1wjr8iUdbT
-         5joA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Vkt27jyKBc5TiS5qbM/sF3Ng+qiD9oaD9dpLTZFgFPg=;
+        b=kCqmAyxLCtc04xEUN622f2pBz4Sq5b3enBRS2WBkOfvzwPxyhZfT/xTcxVBQI7Ro+C
+         GMxC6qdBC8qslybcmpMnhV9JUVcL51Fh7OCNrXxWx74ljsvFLlkSz7QJIy+GJywgQhPm
+         80Mlb/xVqO6y2sKI/M6zY7QwlUAgX86e0LYpN4nA5qv6MdSl+8GvWKEGjpqPAWUNOnms
+         CJyQ18nl+nT+h/Agh3i3iTcEcaTggSq8bBWQxkNCI/i+VETqWOtABVk1KJFop+hCr1t2
+         gH7ytI82UxhJG7Qduh997UggOPKpEvGHdgDAKfbAULnmF+La/UaZDsCG/TlBqvenQVPj
+         KJcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=IeJEDuwrHuRaa+Ik/SvG/4JB6lqbm2wKrnNt11uuG4A=;
-        b=gYIT2CEsTI7QXxeZP4Fu4t7+uz03acxR9DwqYTIu9GmMkEwZ3+jJQVGs2HkaJ8rUNn
-         eakKfxJN/C2uOYibzjUJF8gE6SBiVKnU09GMU9mQJZ+bZbaHUW5ex7qgufQ8HsmabE/P
-         HPDXDbCFZR25SoWccgqIwTy+zO7ExoUUZsZm3yo1vU2c2fe61Pr5IR4WF4f9aj8rYkEl
-         dOgi+sLx8zyypwhmrNmSp6uCVUMfRAcwVYyVA1BRhhhPGBEAQ7Rl4R0kJrtR3j5ifR+d
-         tRO97e1psbp1PLfXPT8aqYjF2BHd0DHPeSbs1kvfJtNi+SccGeApwPBFKqkznkwghhiE
-         OajA==
-X-Gm-Message-State: AOAM531O+yRob4lhG0f3gJ90491MC0iArTPaVhIbvV9TZTt6AAjy+mqd
-        ElAzNnr13dbsKHKcBv0sF46f/UDsXUdshA==
-X-Google-Smtp-Source: ABdhPJzS0xykloyo4HnzZbLCGjWJWacfLqAlkteSfczA+XZFmqRhXAa8qf2/F3kXzIhTSCgWu/URgQ==
-X-Received: by 2002:a05:6e02:1789:: with SMTP id y9mr3400069ilu.321.1639490302145;
-        Tue, 14 Dec 2021 05:58:22 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Vkt27jyKBc5TiS5qbM/sF3Ng+qiD9oaD9dpLTZFgFPg=;
+        b=G5mnQinog+wV4S5bV6vX6TdqqL1mpuiLxNzP5Oa1WM4H68QizB3hiWVjoljhYhWKCo
+         gyx38QvjkFhkXFJ6O+IPHOV/bSw76Vvf3OiiBQP7/6A2Np/7Q3PwbiCy7qjv2ZQ2GecV
+         CE06N0XU2HA4PxqN3yVFoa/ClRGaHrcPZXEz6HnlHI0e5FnGvaZzBR98U+YUG7pFFOeQ
+         jMLToXV6CiqnDZMjLImZOS0bwfCvnolmzp0y39KWKOfy7CxRXroteypSerFFhq5E7DZa
+         q/bgA3BH8VfJiU2TnJ0el9y0ag7BOt3xroCW/yOI/MSvr05UolMbNHwG0e5c4lFy2BQL
+         g23w==
+X-Gm-Message-State: AOAM532vflvAr8yZ7XV3bbX/7IfoYU5fEodlAA98f0P+0b4vVIJee2Ou
+        KbAIfH8h8TEp8CCLWgAJr1r8lQ==
+X-Google-Smtp-Source: ABdhPJyT+360tMyccVsA34sWxQ0fjtyqpQ95UeHJXv9okxV27P74TnPV2Qys2chTJBB++ikJ8jqMRw==
+X-Received: by 2002:a05:6e02:1be5:: with SMTP id y5mr3679166ilv.156.1639490352892;
+        Tue, 14 Dec 2021 05:59:12 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id q8sm9533638iow.47.2021.12.14.05.58.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 05:58:21 -0800 (PST)
+        by smtp.gmail.com with ESMTPSA id x7sm8894631ilq.86.2021.12.14.05.59.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Dec 2021 05:59:12 -0800 (PST)
+Subject: Re: [PATCH v5 4/4] rsxx: Drop PCI legacy power management
+To:     Christoph Hellwig <hch@infradead.org>,
+        Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Joshua Morris <josh.h.morris@us.ibm.com>,
+        Philip Kelleher <pjk1939@linux.ibm.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
+        Vaibhav Gupta <vaibhavgupta40@gmail.com>,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>
+References: <20211208192449.146076-1-helgaas@kernel.org>
+ <20211208192449.146076-5-helgaas@kernel.org> <YbhN69IhTbGhvVeD@infradead.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, cgroups@vger.kernel.org
-In-Reply-To: <Ybfh86iSvpWKxhVM@slm.duckdns.org>
-References: <Ybfh86iSvpWKxhVM@slm.duckdns.org>
-Subject: Re: [PATCH for-5.16/block] iocost: Fix divide-by-zero on donation from low hweight cgroup
-Message-Id: <163949030003.173863.14081933851643062205.b4-ty@kernel.dk>
-Date:   Tue, 14 Dec 2021 06:58:20 -0700
+Message-ID: <4c856b61-6e16-1943-c816-3736b872aa06@kernel.dk>
+Date:   Tue, 14 Dec 2021 06:59:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YbhN69IhTbGhvVeD@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 13 Dec 2021 14:14:43 -1000, Tejun Heo wrote:
-> The donation calculation logic assumes that the donor has non-zero
-> after-donation hweight, so the lowest active hweight a donating cgroup can
-> have is 2 so that it can donate 1 while keeping the other 1 for itself.
-> Earlier, we only donated from cgroups with sizable surpluses so this
-> condition was always true. However, with the precise donation algorithm
-> implemented, f1de2439ec43 ("blk-iocost: revamp donation amount
-> determination") made the donation amount calculation exact enabling even low
-> hweight cgroups to donate.
-> 
-> [...]
+On 12/14/21 12:55 AM, Christoph Hellwig wrote:
+> Maybe it is time to just drop this driver?  It was never widly used,
+> seems unmaintained and uses a cumbersome own queueing layer instead
+> of blk-mq.
 
-Applied, thanks!
+I think so, but let's do that independently of this series.
 
-[1/1] iocost: Fix divide-by-zero on donation from low hweight cgroup
-      commit: edaa26334c117a584add6053f48d63a988d25a6e
-
-Best regards,
 -- 
 Jens Axboe
-
 
