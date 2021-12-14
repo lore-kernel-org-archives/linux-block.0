@@ -2,126 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39342C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 00:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475B9C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 00:54:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244525AbhLNAxu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 19:53:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45156 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231908AbhLNAxt (ORCPT
+        id S244532AbhLNAyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 19:54:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32560 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242849AbhLNAxy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 19:53:49 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA2A5C061574;
-        Mon, 13 Dec 2021 16:53:48 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 13 Dec 2021 19:53:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639443234;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fq9s0r164LWy02TJ0Ub018+SzHlr28SqOgtzWxq+oV4=;
+        b=BifMK2XU+t2hZQq6ZeVB3dNHRoaGj8Pm+OGTlHJvcD7ArpAmCjNb0Txy9itgBuqpM9cvch
+        OKxxozA07RPllJB1SVIJi2SNUkfkaRjxl+jLAs5AkW46zAhYTGIc67IkHYG5iIFKrETSN4
+        j7B5Do++AtovQSC52KvPbKzCsbMkwNM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-207-XzTfXDBKOjW5cHPDf_ur3Q-1; Mon, 13 Dec 2021 19:53:51 -0500
+X-MC-Unique: XzTfXDBKOjW5cHPDf_ur3Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 79E97B8122A;
-        Tue, 14 Dec 2021 00:53:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33D0C34600;
-        Tue, 14 Dec 2021 00:53:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639443226;
-        bh=NUueBP/VQKH6a8DQwX5d4UQ6rC+VsJnl6SBcExqoP8w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eocpukJGil5y40M1Tyytsu5840uWKhudl6vs/9OhwkhyorGXYZ7NrC2zWBjznUV9z
-         OXvr9AUWNYFL01i61DFZ7CtpVHQGwxQT/JM3NTngSZQXqf6M24cMJ87ajqlJOiQzcQ
-         O0CDQhVXU9pFdwp3ZiBuWNGdM/Y2DBtxIgGCDFi4AIunBBW6K1ynI7bunXPYmYd/Az
-         vaT+Q8RBL8ucUoXJe3H55zeI9e0YzlMNDF9yaZZ/25h1nhrJKNKzligXGrSKUlW2lY
-         iYVSN0QZTGt8+wBLhCJ5K8QsTp/S5Lh/0OOJXRYIeCfiplwmXr9sFtfCthyWveZbRZ
-         wVb/Ped2w1Gug==
-Date:   Mon, 13 Dec 2021 16:53:44 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, thara.gopinath@linaro.org,
-        quic_neersoni@quicinc.com, dineshg@quicinc.com
-Subject: Re: [PATCH 03/10] qcom_scm: scm call for deriving a software secret
-Message-ID: <YbfrGNIogV0diME/@gmail.com>
-References: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
- <20211206225725.77512-4-quic_gaurkash@quicinc.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F515593A8;
+        Tue, 14 Dec 2021 00:53:49 +0000 (UTC)
+Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 91D791007607;
+        Tue, 14 Dec 2021 00:53:31 +0000 (UTC)
+Date:   Tue, 14 Dec 2021 08:53:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dexuan Cui <decui@microsoft.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, 'Christoph Hellwig' <hch@lst.de>,
+        "'linux-block@vger.kernel.org'" <linux-block@vger.kernel.org>,
+        Long Li <longli@microsoft.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Subject: Re: Random high CPU utilization in blk-mq with the none scheduler
+Message-ID: <YbfrBpcV4hasdqQB@T590>
+References: <BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com>
+ <BYAPR21MB1270DCE17A0FE017AF3272F1BF729@BYAPR21MB1270.namprd21.prod.outlook.com>
+ <b80bfe9a-bece-1f32-3d2a-fb4d94b1fa8c@kernel.dk>
+ <BYAPR21MB1270B5DAD526C42C070ECB9EBF729@BYAPR21MB1270.namprd21.prod.outlook.com>
+ <Yba8nL4x9R6rmTYL@T590>
+ <BYAPR21MB127006555030F7BFA47FDAABBF749@BYAPR21MB1270.namprd21.prod.outlook.com>
+ <Ybb4X00rfsjRgHj7@T590>
+ <BYAPR21MB12706DCD5ED9FC7AB3EE2EEABF759@BYAPR21MB1270.namprd21.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211206225725.77512-4-quic_gaurkash@quicinc.com>
+In-Reply-To: <BYAPR21MB12706DCD5ED9FC7AB3EE2EEABF759@BYAPR21MB1270.namprd21.prod.outlook.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 06, 2021 at 02:57:18PM -0800, Gaurav Kashyap wrote:
-> Storage encryption requires fscrypt deriving a sw secret from
+On Tue, Dec 14, 2021 at 12:31:23AM +0000, Dexuan Cui wrote:
+> > From: Ming Lei <ming.lei@redhat.com>
+> > Sent: Sunday, December 12, 2021 11:38 PM
+> 
+> Ming, thanks so much for the detailed analysis!
+> 
+> > From the log:
+> > 
+> > 1) dm-mpath:
+> > - queue depth: 2048
+> > - busy: 848, and 62 of them are in sw queue, so run queue is often
+> >   caused
+> > - nr_hw_queues: 1
+> > - dm-2 is in use, and dm-1/dm-3 is idle
+> > - dm-2's dispatch busy is 8, that should be the reason why excessive CPU
+> > usage is observed when flushing plug list without commit dc5fc361d891 in
+> > which hctx->dispatch_busy is just bypassed
+> > 
+> > 2) iscsi
+> > - dispatch_busy is 0
+> > - nr_hw_queues: 1
+> > - queue depth: 113
+> > - busy=~33, active_queues is 3, so each LUN/iscsi host is saturated
+> > - 23 active LUNs, 23 * 33 = 759 in-flight commands
+> > 
+> > The high CPU utilization may be caused by:
+> > 
+> > 1) big queue depth of dm mpath, the situation may be improved much if it
+> > is reduced to 1024 or 800. The max allowed inflight commands from iscsi
+> > hosts can be figured out, if dm's queue depth is much more than this number,
+> > the extra commands need to dispatch, and run queue can be scheduled
+> > immediately, so high CPU utilization is caused.
+> 
+> I think you're correct:
+> with dm_mod.dm_mq_queue_depth=256, the max CPU utilization is 8%.
+> with dm_mod.dm_mq_queue_depth=400, the max CPU utilization is 12%. 
+> with dm_mod.dm_mq_queue_depth=800, the max CPU utilization is 88%.
+> 
+> The performance with queue_depth=800 is poor.
+> The performance with queue_depth=400 is good.
+> The performance with queue_depth=256 is also good, and there is only a 
+> small drop comared with the 400 case.
 
-As I mentioned on the previous version of this patchset, I think mentions of
-"fscrypt" should generally be avoided at the driver level.  Drivers don't know
-or care who is using block layer functionality.  It's better to think of the
-sw_secret support as simply one of the requirements for hardware-wrapped keys,
-alongside the other ones such as support for import_key, prepare_key, etc.
+That should be the reason why the issue isn't triggered in case of real
+io scheduler.
 
-> +/**
-> + * qcom_scm_derive_sw_secret() - Derive SW secret from wrapped encryption key
-> + * @wrapped_key: the wrapped key used for inline encryption
-> + * @wrapped_key_size: size of the wrapped key
-> + * @sw_secret: the secret to be derived which is at most the secret size
-> + * @secret_size: maximum size of the secret that is derived
-> + *
-> + * Derive a SW secret to be used for inline encryption using Qualcomm ICE.
+So far blk-mq doesn't provide way to adjust tags queue depth
+dynamically.
 
-The SW secret isn't used for inline encryption.  It's actually the opposite; the
-SW secret is used only for tasks that can't use inline encryption.
+But not understand reason of default dm_mq_queue_depth(2048), in this
+situation, each LUN can just queue 113/3 requests at most, and 3 LUNs
+are attached to single iscsi host.
 
-> + * For wrapped keys, the key needs to be unwrapped, in order to derive a
-> + * SW secret, which can be done only by the secure EE. So, it makes sense
-> + * for the secure EE to derive the sw secret and return to the kernel when
-> + * wrapped keys are used.
+Mike, can you share why the default dm_mq_queue_depth is so big? And
+seems it doesn't consider the underlying queue's queue depth. What is
+the biggest dm rq queue depth? which need to saturate all underlying paths?
 
-The second sentence above seems to be saying the same as the first.
+> 
+> > 2) single hw queue, so contention should be big, which should be avoided
+> > in big machine, nvme-tcp might be better than iscsi here
+> > 
+> > 3) iscsi io latency is a bit big
+> > 
+> > Even CPU utilization is reduced by commit dc5fc361d891, io performance
+> > can't be good too with v5.16-rc, I guess.
+> > 
+> > Thanks,
+> > Ming
+> 
+> Actually the I/O performance of v5.16-rc4 (commit dc5fc361d891 is included)
+> is good -- it's about the same as the case where v5.16-rc4 + reverting
+> dc5fc361d891 + dm_mod.dm_mq_queue_depth=400 (or 256).
 
-> + * Return: 0 on success; -errno on failure.
-> + */
-> +int qcom_scm_derive_sw_secret(const u8 *wrapped_key, u32 wrapped_key_size,
-> +			      u8 *sw_secret, u32 secret_size)
+The single hw queue may be the root cause of your issue, and there
+is only single run_work, which can be touched by all CPUs(~200) almost, so cache
+ping-pong could be very serious. 
 
-Is @secret_size really the "maximum size of the secret that is derived"?  That
-would imply that a shorter secret might be derived.  But if the return value is
-0 on success, then there is no way for callers to know what length was derived.
+Jens patch may improve it more or less, please test it.
 
-Can't the semantics be "derive exactly secret_size bytes"?  That would make much
-more sense.
+Thanks,
+Ming
 
-> diff --git a/include/linux/qcom_scm.h b/include/linux/qcom_scm.h
-> index c0475d1c9885..ccd764bdc357 100644
-> --- a/include/linux/qcom_scm.h
-> +++ b/include/linux/qcom_scm.h
-> @@ -103,6 +103,9 @@ extern int qcom_scm_ice_invalidate_key(u32 index);
->  extern int qcom_scm_ice_set_key(u32 index, const u8 *key, u32 key_size,
->  				enum qcom_scm_ice_cipher cipher,
->  				u32 data_unit_size);
-> +extern int qcom_scm_derive_sw_secret(const u8 *wrapped_key,
-> +				     u32 wrapped_key_size, u8 *sw_secret,
-> +				     u32 secret_size);
->  
->  extern bool qcom_scm_hdcp_available(void);
->  extern int qcom_scm_hdcp_req(struct qcom_scm_hdcp_req *req, u32 req_cnt,
-> @@ -169,6 +172,9 @@ static inline int qcom_scm_ice_invalidate_key(u32 index) { return -ENODEV; }
->  static inline int qcom_scm_ice_set_key(u32 index, const u8 *key, u32 key_size,
->  				       enum qcom_scm_ice_cipher cipher,
->  				       u32 data_unit_size) { return -ENODEV; }
-> +static inline int qcom_scm_derive_sw_secret(const u8 *wrapped_key,
-> +					u32 wrapped_key_size, u8 *sw_secret,
-> +					u32 secret_size) { return -ENODEV; }
->  
->  static inline bool qcom_scm_hdcp_available(void) { return false; }
->  static inline int qcom_scm_hdcp_req(struct qcom_scm_hdcp_req *req, u32 req_cnt,
-
-These "return -ENODEV" stubs don't exist in the latest kernel.  Can you make
-sure that you've developing on top of the latest kernel?  It looks like you
-based this patchset on top of my patchset
-https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git/log/?h=wrapped-keys-v2.
-But I had already sent out a newer version of it, based on v5.16-rc1:
-https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git/log/?h=wrapped-keys-v4.
-So please make sure you're using the most recent version.
-
-- Eric
