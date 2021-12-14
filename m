@@ -2,108 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C79C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 15:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3993C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 16:00:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235140AbhLNP40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 10:56:26 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:58354 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235464AbhLNP4X (ORCPT
+        id S235482AbhLNQAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 11:00:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235484AbhLNP77 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 10:56:23 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 50C7721136;
-        Tue, 14 Dec 2021 15:56:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1639497382; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dBAXG88ds40dDSc/+5tBHd2JLrBPM8T0624LrZOiMsk=;
-        b=iBmBsiGf9LeoTdLJGkm9n+dVurrcicX6uIXem0E7BU271sl2akwctkLx4MiGW5sgIIlRJy
-        rU91MOX0HCw7JhrCTF5LHCimO+DzfbEfZTiAy91G0WOBY8PG3STHZo32EXb1uA113qlMCY
-        VMPu/PK6F+JM/eE+QsR8S2nDWtbECcg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1639497382;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dBAXG88ds40dDSc/+5tBHd2JLrBPM8T0624LrZOiMsk=;
-        b=1O3Ro5Lw8ZgGIXqeQu/JteiwAmY9HWNNipwUJ/qrE1veFUxbNqF3KyTBIV3LS7AFqz6C5h
-        bk/gyEgF3hCOZMDw==
-Received: from quack2.suse.cz (unknown [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id 443B1A3B8E;
-        Tue, 14 Dec 2021 15:56:22 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 1D6591F2C7E; Tue, 14 Dec 2021 16:56:22 +0100 (CET)
-Date:   Tue, 14 Dec 2021 16:56:22 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 09/11] block: open code create_task_io_context in
- set_task_ioprio
-Message-ID: <20211214155622.GJ14044@quack2.suse.cz>
-References: <20211209063131.18537-1-hch@lst.de>
- <20211209063131.18537-10-hch@lst.de>
+        Tue, 14 Dec 2021 10:59:59 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A139C06173E
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 07:59:59 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id x10so24960899ioj.9
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 07:59:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MF6LStIRWFGgSEcEVKAHb4dN3GxRLuGtLjkYzdVRCpE=;
+        b=K4cBVSIBzXg+4zqiU5l3zsc0nzYTWWwQDu+mVrQNMfo+KTCpltAsnDU7JIob7QCXlG
+         +oA+RIoifv5VL+sq0Xz4dygW5hK25QJLZMRk1JQG4vYo0F4dWH1Te4vwPnUHIlfuaV5l
+         43RPnpoUe567wJvbEgRwKvxbHZwLYMjrYQhgt0QHa7jZZmoOu0HisgIZJE/933Xok1ae
+         NF+gKpCluUeaJox83fAty25kg59A6+xBI2uP+TrOCegfgflHWEyDF02ShaIDc0rQpB2d
+         7R/wtcbFXYPJqx2M0ir8CQWAFiJCBMM/CIi16uuDjc6AILs6Vt1S7voCnV2hiDn1gy+T
+         qS4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MF6LStIRWFGgSEcEVKAHb4dN3GxRLuGtLjkYzdVRCpE=;
+        b=L9/a6rNPWVLb0CQVt3BTsSFn++begW4a9lAcTwjX6mz/5O59CMhE+AWXLP/YfdYdlp
+         nAEfaQnYTpl2f9fsdU+Y+ZwM/x4AS2csT19D5NI76edKrjrwfGeEZ69dMj7bYF0nd3sa
+         MtYyddnW4Ah0Dswzhb1WceWZ8FrA0XHjbwT1WPdMJbMOTf9aVmk5k8c8288CprM81I6i
+         9281latt0/FrOT65U/5ehReOvo4/0M3ugqi3/cC2Ry/reVnK6299QV2SMXcl0HFkA6du
+         KfgKdBTBAW4xRysaNhbzrF5DRMt3Sqo2ffWTNiZEu2KRtMufxKm34C/xN+dxOv/LU3ip
+         5Ucw==
+X-Gm-Message-State: AOAM532Uwsqx1uiz+ercrIm5O1OrHtBybiIplmp3gf1P2O7Xsjy6/nrT
+        F1Pd2KWHDPd2su9DBkziVZdKdA==
+X-Google-Smtp-Source: ABdhPJwEkZmU4sYbxh/NHebuI9ABjy19CjGqndiZ8xWalsvqywg9XwBW5TQtHDFjaslBJTD8q7pytQ==
+X-Received: by 2002:a02:834b:: with SMTP id w11mr3338949jag.622.1639497598564;
+        Tue, 14 Dec 2021 07:59:58 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id s9sm173230ild.14.2021.12.14.07.59.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Dec 2021 07:59:58 -0800 (PST)
+Subject: Re: [PATCH] block: reduce kblockd_mod_delayed_work_on() CPU
+ consumption
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+References: <bc529a3e-31d5-c266-8633-91095b346b19@kernel.dk>
+ <YbiyhcbZmnNbed3O@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <53b6fac0-10cb-80ab-16e7-ee851b720d5e@kernel.dk>
+Date:   Tue, 14 Dec 2021 08:59:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211209063131.18537-10-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <YbiyhcbZmnNbed3O@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 09-12-21 07:31:29, Christoph Hellwig wrote:
-> The flow in set_task_ioprio can be simplified by simply open coding
-> create_task_io_context, which removes a refcount roundtrip on the I/O
-> context.
+On 12/14/21 8:04 AM, Christoph Hellwig wrote:
+> On Tue, Dec 14, 2021 at 07:53:46AM -0700, Jens Axboe wrote:
+>> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
+>> running 24 disks and using the 'none' scheduler. This happens off the
+>> flush path, because SCSI requires the queue to be restarted async, and
+>> hence we're hammering on mod_delayed_work_on() to ensure that the work
+>> item gets run appropriately.
+>>
+>> What we care about here is that the queue is run, and we don't need to
+>> repeatedly re-arm the timer associated with the delayed work item. If we
+>> check if the work item is pending upfront, then we don't really need to do
+>> anything else. This is safe as theh work pending bit is cleared before a
+>> work item is started.
+>>
+>> The only potential caveat here is if we have callers with wildly different
+>> timeouts specified. That's generally not the case, so don't think we need
+>> to care for that case.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> So why not do a non-delayed queue_work for that case?  Might be good
+> to get the scsi and workqueue maintaines involved to understand the
+> issue a bit better first.
 
-OK, why not :). Feel free to add:
+We can probably get by with doing just that, and just ignore if a delayed
+work timer is already running.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Dexuan, can you try this one?
 
-								Honza
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 1378d084c770..c1833f95cb97 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1484,6 +1484,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
+ int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
+ 				unsigned long delay)
+ {
++	if (!delay)
++		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
+ 	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
+ }
+ EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
 
-> ---
->  block/blk-ioc.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index 1ba7cfedca2d9..cff0e3bdae53c 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -291,12 +291,18 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
->  		struct io_context *ioc;
->  
->  		task_unlock(task);
-> -		ioc = create_task_io_context(task, GFP_ATOMIC, NUMA_NO_NODE);
-> -		if (ioc) {
-> -			ioc->ioprio = ioprio;
-> -			put_io_context(ioc);
-> +
-> +		ioc = alloc_io_context(GFP_ATOMIC, NUMA_NO_NODE);
-> +		if (!ioc)
-> +			return -ENOMEM;
-> +
-> +		task_lock(task);
-> +		if (task->io_context || (task->flags & PF_EXITING)) {
-> +			kmem_cache_free(iocontext_cachep, ioc);
-> +			ioc = task->io_context;
-> +		} else {
-> +			task->io_context = ioc;
->  		}
-> -		return 0;
->  	}
->  	task->io_context->ioprio = ioprio;
->  	task_unlock(task);
-> -- 
-> 2.30.2
-> 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
