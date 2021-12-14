@@ -2,233 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AC3C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 01:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE73C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 01:13:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241185AbhLNBIm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 20:08:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48602 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232173AbhLNBIk (ORCPT
+        id S242932AbhLNBN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 20:13:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34181 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232173AbhLNBN3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 20:08:40 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E60BC061574;
-        Mon, 13 Dec 2021 17:08:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 13 Dec 2021 20:13:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639444408;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3gTydd0924G7zLLa9vjnpFZ/IS4FVbudD6kWOndvAx0=;
+        b=TJQS5BKikq5gA6CJmDPEMH/GsYo/zpKLbiERc6qHygB4m6RVO8qixYvGKJ1hy+2yXRKC4c
+        qY6RunSXy7x+j7+G0j3IHGG06rXEgl3GPcm/m0rx0k/dN2yNbyMSDk+3gvPdqqYL+qIPCx
+        Qzm/xHUBiFzinFXp8+JQPUceoCavdCY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-594-J6NPJEsFN1m1ojS5zJyYrQ-1; Mon, 13 Dec 2021 20:13:25 -0500
+X-MC-Unique: J6NPJEsFN1m1ojS5zJyYrQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 29DE8B8049B;
-        Tue, 14 Dec 2021 01:08:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F15C34600;
-        Tue, 14 Dec 2021 01:08:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639444118;
-        bh=FteiA30kfkShJ4fDZk0nXaXA3DrH16cw48CWaVRSY8M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=M/FyZ+d+uslqvgWdCR7Tbdt6OGsVx5R2UZ4M9m8uquH3KM5Z48lpCd+nTwaG1t+gs
-         1frdwKkvb8//Im83a8WVV8nFgYQaHMhvoMVTiAgRbc7BQOUFksm9rJJC8lLesBVSSX
-         UodvOsel5grf39wOhZGU3tjSkCc2Q10a5utEopM24Dv/URHgX3h0FC/aIL5cHkmfjn
-         bZ3Z5W0z0X3dOp4v3Efk6gnQDu/qWCqfZDq81HY9NVUDmBjFLDwGIjQwluLWG3QkAG
-         64JUcPQ77n16D6k3G969QdhuaObjeHswD6QTjWA5nymn9sC6XsHses5PRTlY9lHLg+
-         bhnb1NeKR7UZg==
-Date:   Mon, 13 Dec 2021 17:08:36 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, thara.gopinath@linaro.org,
-        quic_neersoni@quicinc.com, dineshg@quicinc.com
-Subject: Re: [PATCH 04/10] soc: qcom: add HWKM library for storage encryption
-Message-ID: <YbfulLPhUNhd04xY@gmail.com>
-References: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
- <20211206225725.77512-5-quic_gaurkash@quicinc.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DE441006AA0;
+        Tue, 14 Dec 2021 01:13:24 +0000 (UTC)
+Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA4795F70B;
+        Tue, 14 Dec 2021 01:13:14 +0000 (UTC)
+Date:   Tue, 14 Dec 2021 09:13:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Laibin Qiu <qiulaibin@huawei.com>, axboe@kernel.dk,
+        yi.zhang@huawei.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] block/wbt: fix negative inflight counter when
+ remove scsi device
+Message-ID: <YbfvplNrBkuZUIyf@T590>
+References: <20211213040907.2669480-1-qiulaibin@huawei.com>
+ <YbeAAyWbkh5frMGc@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211206225725.77512-5-quic_gaurkash@quicinc.com>
+In-Reply-To: <YbeAAyWbkh5frMGc@infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 06, 2021 at 02:57:19PM -0800, Gaurav Kashyap wrote:
-> Wrapped keys should utilize hardware to protect the keys
-> used for storage encryption. Qualcomm's Inline Crypto Engine
-
-"should utilize" => "utilize"?
-
-> supports a hardware block called Hardware Key Manager (HWKM)
-> for key management.
+On Mon, Dec 13, 2021 at 09:16:51AM -0800, Christoph Hellwig wrote:
+> On Mon, Dec 13, 2021 at 12:09:07PM +0800, Laibin Qiu wrote:
+> > Submit_bio
+> >                                                          scsi_remove_device
+> >                                                          sd_remove
+> >                                                          del_gendisk
+> >                                                          blk_unregister_queue
+> >                                                          elv_unregister_queue
+> >                                                          wbt_enable_default
+> >                                                          <= Set rwb->enable_state (ON)
+> > q_qos_track
+> > <= rwb->enable_state (ON)
+> > ^^^^^^ this request will mark WBT_TRACKED without inflight add and will
+> > lead to drop rqw->inflight to -1 in wbt_done() which will trigger IO hung.
+> > 
+> > Fix this by judge whether QUEUE_FLAG_REGISTERED is marked to distinguish
+> > scsi remove scene.
+> > Fixes: 76a8040817b4b ("blk-wbt: make sure throttle is enabled properly")
+> > Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+> > ---
+> >  block/blk-wbt.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> > index 3ed71b8da887..537f77bb1365 100644
+> > --- a/block/blk-wbt.c
+> > +++ b/block/blk-wbt.c
+> > @@ -637,6 +637,10 @@ void wbt_enable_default(struct request_queue *q)
+> >  {
+> >  	struct rq_qos *rqos = wbt_rq_qos(q);
+> >  
+> > +	/* Queue not registered? Maybe shutting down... */
+> > +	if (!blk_queue_registered(q))
+> > +		return;
 > 
-> Although most of the interactions to this hardware block happens
-> via a secure execution environment, some initializations for the
-> slave present in ICE can be done from the kernel.
-> 
-> This can also be a placeholder for when the hardware provides more
-> capabilities to be accessed from the linux kernel in the future.
-> 
+> Wouldn't it make more sense to simply not call wbt_enable_default from
+> elv_unregister_queue?
 
-This commit message doesn't explain what this commit actually does.  Can you
-make that clearer?
+wbt_disable_default() is called in bfq_init_root_group(), so wbt_enable_default
+should be moved to bfq_exit_queue()?
 
-> diff --git a/drivers/soc/qcom/qti-ice-hwkm.c b/drivers/soc/qcom/qti-ice-hwkm.c
-> new file mode 100644
-> index 000000000000..3be6b350cd88
-> --- /dev/null
-> +++ b/drivers/soc/qcom/qti-ice-hwkm.c
-> @@ -0,0 +1,111 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * HWKM ICE library for storage encryption.
-> + *
-> + * Copyright (c) 2021, Qualcomm Innovation Center. All rights reserved.
-> + */
-> +
-> +#include <linux/qti-ice-common.h>
-> +#include "qti-ice-regs.h"
-> +
-> +static int qti_ice_hwkm_bist_status(const struct ice_mmio_data *mmio, int version)
-> +{
-> +	if (!qti_ice_hwkm_testb(mmio->ice_hwkm_mmio, QTI_HWKM_ICE_RG_TZ_KM_STATUS,
-> +			(version == 1) ? BIST_DONE_V1 : BIST_DONE_V2) ||
-> +	!qti_ice_hwkm_testb(mmio->ice_hwkm_mmio, QTI_HWKM_ICE_RG_TZ_KM_STATUS,
-> +			(version == 1) ? CRYPTO_LIB_BIST_DONE_V1 :
-> +			CRYPTO_LIB_BIST_DONE_V2) ||
-> +	!qti_ice_hwkm_testb(mmio->ice_hwkm_mmio, QTI_HWKM_ICE_RG_TZ_KM_STATUS,
-> +			(version == 1) ? BOOT_CMD_LIST1_DONE_V1 :
-> +			BOOT_CMD_LIST1_DONE_V2) ||
-> +	!qti_ice_hwkm_testb(mmio->ice_hwkm_mmio, QTI_HWKM_ICE_RG_TZ_KM_STATUS,
-> +			(version == 1) ? BOOT_CMD_LIST0_DONE_V1 :
-> +			BOOT_CMD_LIST0_DONE_V2) ||
-> +	!qti_ice_hwkm_testb(mmio->ice_hwkm_mmio, QTI_HWKM_ICE_RG_TZ_KM_STATUS,
-> +			(version == 1) ? KT_CLEAR_DONE_V1 :
-> +			KT_CLEAR_DONE_V2))
-> +		return -EINVAL;
-> +	return 0;
-> +}
 
-Long "if" statements are hard to read.  It would be more readable to have a
-separate "if" and "return -EINVAL" for each of these checks.
+Thanks,
+Ming
 
-> +static void qti_ice_hwkm_configure_ice_registers(
-> +				const struct ice_mmio_data *mmio)
-> +{
-> +	qti_ice_hwkm_writel(mmio->ice_hwkm_mmio, 0xffffffff,
-> +			    QTI_HWKM_ICE_RG_BANK0_AC_BANKN_BBAC_0);
-> +	qti_ice_hwkm_writel(mmio->ice_hwkm_mmio, 0xffffffff,
-> +			    QTI_HWKM_ICE_RG_BANK0_AC_BANKN_BBAC_1);
-> +	qti_ice_hwkm_writel(mmio->ice_hwkm_mmio, 0xffffffff,
-> +			    QTI_HWKM_ICE_RG_BANK0_AC_BANKN_BBAC_2);
-> +	qti_ice_hwkm_writel(mmio->ice_hwkm_mmio, 0xffffffff,
-> +			    QTI_HWKM_ICE_RG_BANK0_AC_BANKN_BBAC_3);
-> +	qti_ice_hwkm_writel(mmio->ice_hwkm_mmio, 0xffffffff,
-> +			    QTI_HWKM_ICE_RG_BANK0_AC_BANKN_BBAC_4);
-> +}
-> +
-> +static int qti_ice_hwkm_init_sequence(const struct ice_mmio_data *mmio,
-> +				      int version)
-> +{
-> +	u32 val = 0;
-> +
-> +	/*
-> +	 * Put ICE in standard mode, ICE defaults to legacy mode.
-> +	 * Legacy mode - ICE HWKM slave not supported.
-> +	 * Standard mode - ICE HWKM slave supported.
-> +	 *
-> +	 * Depending on the version of HWKM, it is controlled by different
-> +	 * registers in ICE.
-> +	 */
-> +	if (version >= 2) {
-> +		val = qti_ice_readl(mmio->ice_mmio, QTI_ICE_REGS_CONTROL);
-> +		val = val & 0xFFFFFFFE;
-> +		qti_ice_writel(mmio->ice_mmio, val, QTI_ICE_REGS_CONTROL);
-> +	} else {
-> +		qti_ice_hwkm_writel(mmio->ice_hwkm_mmio, 0x7,
-> +				    QTI_HWKM_ICE_RG_TZ_KM_CTL);
-> +	}
-
-So to use wrapped keys, ICE needs to be in "standard mode", and to use standard
-keys it needs to be in "legacy mode"?  That's confusing.  It would be helpful to
-explain this more clearly in a comment.
-
-> +
-> +	/* Check BIST status */
-> +	if (qti_ice_hwkm_bist_status(mmio, version))
-> +		return -EINVAL;
-
-Please spell out what BIST stands for.  It's "Built-In Self Test", right?
-
-> +
-> +	/*
-> +	 * Give register bank of the HWKM slave access to read and modify
-> +	 * the keyslots in ICE HWKM slave. Without this, trustzone will not
-> +	 * be able to program keys into ICE.
-> +	 */
-> +	qti_ice_hwkm_configure_ice_registers(mmio);
-> +
-> +	/* Disable CRC check */
-> +	qti_ice_hwkm_clearb(mmio->ice_hwkm_mmio, QTI_HWKM_ICE_RG_TZ_KM_CTL,
-> +			    CRC_CHECK_EN);
-> +
-> +	/* Set RSP_FIFO_FULL bit */
-> +	qti_ice_hwkm_setb(mmio->ice_hwkm_mmio,
-> +			QTI_HWKM_ICE_RG_BANK0_BANKN_IRQ_STATUS, RSP_FIFO_FULL);
-
-Please expand on comments as much as possible, so that people can understand not
-just what the code is doing but why it is doing it.  E.g., why does the CRC
-check need to be disabled, and why does the RSP_FIFO_FULL bit need to be set?
-
-> +/**
-> + * qti_ice_hwkm_init() - Initialize ICE HWKM hardware
-> + * @ice_mmio_data: contains ICE register mapping for i/o
-> + * @version: version of hwkm hardware
-> + *
-> + * Perform HWKM initialization in the ICE slave by going
-> + * through the slave initialization routine.The registers
-> + * can vary slightly based on the version.
-> + *
-> + * Return: 0 on success; err on failure.
-> + */
-> +
-> +int qti_ice_hwkm_init(const struct ice_mmio_data *mmio, int version)
-> +{
-> +	if (!mmio->ice_hwkm_mmio)
-> +		return -EINVAL;
-> +
-> +	return qti_ice_hwkm_init_sequence(mmio, version);
-> +}
-> +EXPORT_SYMBOL_GPL(qti_ice_hwkm_init);
-
-This function is only called from within the same kernel module, so it doesn't
-need to be an exported symbol.
-
-> +MODULE_LICENSE("GPL v2");
-
-The main source file for this module (qti-ice-common.c) already has a
-MODULE_LICENSE, so there shouldn't be a duplicate one here.  MODULE_LICENSE is
-for the whole module, not for individual source files.
-
-> +
-> +#define qti_ice_hwkm_readl(hwkm_mmio, reg)		\
-> +	(readl_relaxed(hwkm_mmio + (reg)))
-> +#define qti_ice_hwkm_writel(hwkm_mmio, val, reg)	\
-> +	(writel_relaxed((val), hwkm_mmio + (reg)))
-
-Why readl_relaxed() and writel_relaxed(), instead of readl() and writel()?
-
-> +static inline bool qti_ice_hwkm_testb(void __iomem *ice_hwkm_mmio,
-> +				      u32 reg, u8 nr)
-> +{
-> +	u32 val = qti_ice_hwkm_readl(ice_hwkm_mmio, reg);
-> +
-> +	val = (val >> nr) & 0x1;
-> +	if (val == 0)
-> +		return false;
-> +	return true;
-> +}
-
-This is unnecessarily verbose.  It could be just:
-
-	return qti_ice_hwkm_readl(ice_hwkm_mmio, reg) & (1U << nr);
-
-- Eric
