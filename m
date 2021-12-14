@@ -2,87 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E5AC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 13 Dec 2021 23:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B16E7C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 00:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244205AbhLMXbw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 18:31:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
+        id S244449AbhLNAOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 19:14:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244180AbhLMXbw (ORCPT
+        with ESMTP id S235853AbhLNAOq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 18:31:52 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B08C061748
-        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 15:31:52 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id m9so21107244iop.0
-        for <linux-block@vger.kernel.org>; Mon, 13 Dec 2021 15:31:52 -0800 (PST)
+        Mon, 13 Dec 2021 19:14:46 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A76C061574;
+        Mon, 13 Dec 2021 16:14:46 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id y7so12395656plp.0;
+        Mon, 13 Dec 2021 16:14:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=uiBzuM8r8ioHjMgApkzDHqgZYcstJX42l7Bsr3gpsPQ=;
-        b=t5KKyEzSTtUdvvCmw8pHFWdxwwHEeHi16sMm9QZiOaro0uLwYZlgCOp7jr9Isys+M7
-         5ppSfIhgO3I4V3FnrCcUhWUKUi3hta2TwJUoVWi5U9vMg8mYyhKXR2oJWeYCGzWLxl0m
-         OyeX+DDiKPvV5Ty4Ax5UUv2RyIlC8B5JYtaLeef7oML7UPzpdZ5g7nvBA9hu8lrJ5b2f
-         RSnpQJE4fYH7BEnjZp7t8cqXoPdJnHtediabkFbNzH//g56ewQBxdqMtjMIOxbFkGgZ/
-         8MDwE0uHmsU9r9EzVDJunsXbPCOWMMmluNJfCEjVEEzJ7bnFymFDSG3CyKZAsfZ1K+bE
-         bnyg==
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=tzFwrsyfocHR62i38nhleK4wzKa/CEfMJu2ZigK1O5w=;
+        b=lcSCrjdeXb4OGQkRbBVLySQJpkDXJwxXgCrAq0PkB9/TVlnHoBsS9JKjUiLX7+PF8/
+         bGTb2J6zGIa7VY9ZSbw3fmhyT8hBXv+fbZro2IpVkktck8BMChCNsOfBZLGgVxEAlxTf
+         D9YRTBwpElF/PL7TCi3h07jiLIK2EKuqfSw1CBmp1+ITsyVeHpUn3zGy4BX0UrRITkcH
+         jFEXNjNJTMDdPfAZLDRIchnQupvkmV8YmWB+emutN108nSrPU2M5t0sRurO1md/a7IFv
+         1pTp4UlBFMxE5wT1AUwsSvDKLWlvBzHEppsoVB/1gb7vrUvQkqgzShLpUqRxvjZdCqT9
+         r/iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=uiBzuM8r8ioHjMgApkzDHqgZYcstJX42l7Bsr3gpsPQ=;
-        b=WnPtEIyShczPlgQG6SECAp825mLFE0lM4k0yuZXqM3piVmgZxOZVS5IGDZTzdETw9O
-         OZoDp/6I5BA5O73n/BzgZAgAOcRW+Khe47dEqZiStbztwRSw7/vdoCma2JEp+OAVc+q/
-         4XA2I6LO6PVBfYHNyezEhZXe+HvRdj99MVBtwhSsQlPvXFHyzdzhGi/5EfRp88yyi/QZ
-         mE4tEE8QCQXrRD5nVLSqsmuLZMmc1LGLZbUc5WsV7aAZaLX390Yk/XMlELvRb2+wK7fz
-         8Iodayub46z7iwngYAPjPihKZ87bkHNoDya42EfEwjpRQ5QxtufP/Wio2MLHXqjMft34
-         0Uog==
-X-Gm-Message-State: AOAM531P88CUmSJaynCK1BeBHfSge/DLCzqaVOaK3EXNphoWlsOK0ZT9
-        q07B2deAJd4ZBdv8/bKolRriGw==
-X-Google-Smtp-Source: ABdhPJwZdCxAZbnRirMUyxwq3+dXPLxT+7soIgG+IIckJWFuR/FnyAlx+UYW7BSeafbgjw5za/3bgA==
-X-Received: by 2002:a6b:7e44:: with SMTP id k4mr1203769ioq.103.1639438311104;
-        Mon, 13 Dec 2021 15:31:51 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id d17sm7780949ilc.79.2021.12.13.15.31.50
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=tzFwrsyfocHR62i38nhleK4wzKa/CEfMJu2ZigK1O5w=;
+        b=1i9l+fm6Ugpo0AxYyZFNDnkLMfJOQBZFcHkwbckYl5nTUhPbwrwx+PMVc2Cf+sNP6o
+         Dtexr9L6BzbTZSbFgAQer/xwadX4pgVv2bqkMeSXXUxv3gMEXn4oxaBRCKZToqm4t37Q
+         ZwMnvyjtG/p7B1cQXKj1TVo4D5ZmxDZQmo/8ScceZaqFZafIS2f2PTqra9xYdYTgotSG
+         hp8IOrRjrwEjvKAWPRXwpKoQZjRHOSmrxmjiBhofTnG2a2HEGiRfq2fZZ/oGKBVTaeVA
+         yN2vP7mP4VLGnUtWWMMQgDqp7gRbjyoQE7lAehEXfK/X5capHoKVYg/d8Yyd+4Rv3sK4
+         5sBA==
+X-Gm-Message-State: AOAM53016NDyJGFGUMVuBGzAGFxXBi6htEsDrZU1vQ8hN9wy6PWPo6tk
+        djLDk5QsBOyW0xvsQtApEto=
+X-Google-Smtp-Source: ABdhPJxUIgDS9YvfFJGl7CoUTje8LXEkTHRd5Y7VFKoKvQD5SM40pAk+6TwIMGw72glEm5ZFJwSNow==
+X-Received: by 2002:a17:902:a605:b0:143:d289:f3fb with SMTP id u5-20020a170902a60500b00143d289f3fbmr1990855plq.41.1639440885403;
+        Mon, 13 Dec 2021 16:14:45 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id e15sm13551821pfv.131.2021.12.13.16.14.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 15:31:50 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Kees Cook <keescook@chromium.org>
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>
-In-Reply-To: <20211118203712.1288866-1-keescook@chromium.org>
-References: <20211118203712.1288866-1-keescook@chromium.org>
-Subject: Re: [PATCH] drbd: Use struct_group() to zero algs
-Message-Id: <163943830994.160816.6815884532342154175.b4-ty@kernel.dk>
-Date:   Mon, 13 Dec 2021 16:31:49 -0700
+        Mon, 13 Dec 2021 16:14:44 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 13 Dec 2021 14:14:43 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com
+Subject: [PATCH for-5.16/block] iocost: Fix divide-by-zero on donation from
+ low hweight cgroup
+Message-ID: <Ybfh86iSvpWKxhVM@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 18 Nov 2021 12:37:12 -0800, Kees Cook wrote:
-> In preparation for FORTIFY_SOURCE performing compile-time and run-time
-> field bounds checking for memset(), avoid intentionally writing across
-> neighboring fields.
-> 
-> Add a struct_group() for the algs so that memset() can correctly reason
-> about the size.
-> 
-> [...]
+The donation calculation logic assumes that the donor has non-zero
+after-donation hweight, so the lowest active hweight a donating cgroup can
+have is 2 so that it can donate 1 while keeping the other 1 for itself.
+Earlier, we only donated from cgroups with sizable surpluses so this
+condition was always true. However, with the precise donation algorithm
+implemented, f1de2439ec43 ("blk-iocost: revamp donation amount
+determination") made the donation amount calculation exact enabling even low
+hweight cgroups to donate.
 
-Applied, thanks!
+This means that in rare occasions, a cgroup with active hweight of 1 can
+enter donation calculation triggering the following warning and then a
+divide-by-zero oops.
 
-[1/1] drbd: Use struct_group() to zero algs
-      commit: 52a0cab35c568f896067641d8e07f798341954f5
+ WARNING: CPU: 4 PID: 0 at block/blk-iocost.c:1928 transfer_surpluses.cold+0x0/0x53 [884/94867]
+ ...
+ RIP: 0010:transfer_surpluses.cold+0x0/0x53                                                 
+ Code: 92 ff 48 c7 c7 28 d1 ab b5 65 48 8b 34 25 00 ae 01 00 48 81 c6 90 06 00 00 e8 8b 3f fe ff 48 c7 c0 ea ff ff ff e9 95 ff 92 ff <0f> 0b 48 c7 c7 30 da ab b5 e8 71 3f fe ff 4c 89 e8 4d 85 ed 74 0
+4                                                    
+ ...
+ Call Trace:                           
+  <IRQ>                                
+  ioc_timer_fn+0x1043/0x1390           
+  call_timer_fn+0xa1/0x2c0             
+  __run_timers.part.0+0x1ec/0x2e0      
+  run_timer_softirq+0x35/0x70          
+ ...
+ iocg: invalid donation weights in /a/b: active=1 donating=1 after=0
 
-Best regards,
--- 
-Jens Axboe
+Fix it by excluding cgroups w/ active hweight < 2 from donating. Excluding
+these extreme low hweight donations shouldn't affect work conservation in
+any meaningful way.
 
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Fixes: f1de2439ec43 ("blk-iocost: revamp donation amount determination")
+Cc: stable@vger.kernel.org # v5.10+
+---
+ block/blk-iocost.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index a5b37cc65b171..769b643942989 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2311,7 +2311,14 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 			hwm = current_hweight_max(iocg);
+ 			new_hwi = hweight_after_donation(iocg, old_hwi, hwm,
+ 							 usage, &now);
+-			if (new_hwi < hwm) {
++			/*
++			 * Donation calculation assumes hweight_after_donation
++			 * to be positive, a condition that a donor w/ hwa < 2
++			 * can't meet. Don't bother with donation if hwa is
++			 * below 2. It's not gonna make a meaningful difference
++			 * anyway.
++			 */
++			if (new_hwi < hwm && hwa >= 2) {
+ 				iocg->hweight_donating = hwa;
+ 				iocg->hweight_after_donation = new_hwi;
+ 				list_add(&iocg->surplus_list, &surpluses);
