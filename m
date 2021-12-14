@@ -2,124 +2,237 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B16E7C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 00:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BECAC43217
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 00:20:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244449AbhLNAOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Dec 2021 19:14:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235853AbhLNAOq (ORCPT
+        id S242336AbhLNAUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Dec 2021 19:20:50 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:49522 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235953AbhLNAUt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Dec 2021 19:14:46 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A76C061574;
-        Mon, 13 Dec 2021 16:14:46 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id y7so12395656plp.0;
-        Mon, 13 Dec 2021 16:14:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=tzFwrsyfocHR62i38nhleK4wzKa/CEfMJu2ZigK1O5w=;
-        b=lcSCrjdeXb4OGQkRbBVLySQJpkDXJwxXgCrAq0PkB9/TVlnHoBsS9JKjUiLX7+PF8/
-         bGTb2J6zGIa7VY9ZSbw3fmhyT8hBXv+fbZro2IpVkktck8BMChCNsOfBZLGgVxEAlxTf
-         D9YRTBwpElF/PL7TCi3h07jiLIK2EKuqfSw1CBmp1+ITsyVeHpUn3zGy4BX0UrRITkcH
-         jFEXNjNJTMDdPfAZLDRIchnQupvkmV8YmWB+emutN108nSrPU2M5t0sRurO1md/a7IFv
-         1pTp4UlBFMxE5wT1AUwsSvDKLWlvBzHEppsoVB/1gb7vrUvQkqgzShLpUqRxvjZdCqT9
-         r/iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=tzFwrsyfocHR62i38nhleK4wzKa/CEfMJu2ZigK1O5w=;
-        b=1i9l+fm6Ugpo0AxYyZFNDnkLMfJOQBZFcHkwbckYl5nTUhPbwrwx+PMVc2Cf+sNP6o
-         Dtexr9L6BzbTZSbFgAQer/xwadX4pgVv2bqkMeSXXUxv3gMEXn4oxaBRCKZToqm4t37Q
-         ZwMnvyjtG/p7B1cQXKj1TVo4D5ZmxDZQmo/8ScceZaqFZafIS2f2PTqra9xYdYTgotSG
-         hp8IOrRjrwEjvKAWPRXwpKoQZjRHOSmrxmjiBhofTnG2a2HEGiRfq2fZZ/oGKBVTaeVA
-         yN2vP7mP4VLGnUtWWMMQgDqp7gRbjyoQE7lAehEXfK/X5capHoKVYg/d8Yyd+4Rv3sK4
-         5sBA==
-X-Gm-Message-State: AOAM53016NDyJGFGUMVuBGzAGFxXBi6htEsDrZU1vQ8hN9wy6PWPo6tk
-        djLDk5QsBOyW0xvsQtApEto=
-X-Google-Smtp-Source: ABdhPJxUIgDS9YvfFJGl7CoUTje8LXEkTHRd5Y7VFKoKvQD5SM40pAk+6TwIMGw72glEm5ZFJwSNow==
-X-Received: by 2002:a17:902:a605:b0:143:d289:f3fb with SMTP id u5-20020a170902a60500b00143d289f3fbmr1990855plq.41.1639440885403;
-        Mon, 13 Dec 2021 16:14:45 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id e15sm13551821pfv.131.2021.12.13.16.14.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 16:14:44 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 13 Dec 2021 14:14:43 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCH for-5.16/block] iocost: Fix divide-by-zero on donation from
- low hweight cgroup
-Message-ID: <Ybfh86iSvpWKxhVM@slm.duckdns.org>
+        Mon, 13 Dec 2021 19:20:49 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 50024612C7;
+        Tue, 14 Dec 2021 00:20:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B9E4C34600;
+        Tue, 14 Dec 2021 00:20:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639441248;
+        bh=ePD2l1Wc65z3t8P+boLOjl1ci+wAuJ39q4mpx44dT98=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SLzWuoJIZ2wD+sJQihaZfjfcRClLNcO4k3Gtae5jIAiyCdW6s5uiF3U+M9pyb7sHa
+         gg5eIYLjhmcUlff6DhJrflN7S4wZzXLpV5ejqYfAFh0tGvJdrOO1bxyKuI8s/A0fKe
+         lCVbqh0aIxMCDYZ93YNntuXsKUK32ZWxKayBxrL+xJ9uLd1YbwLNxRQiBdA6CVs1/m
+         RzB1KgMEsAmnHy3QsunhMsfyku8BeIPdLv+FpfYs5r5ylEWP07qxffw8NbFFzr85Rz
+         75180Q/uXy3cnp+GMlBbbe+R7DZRQb199o1CCoLq0xuqJsK+uWmTWhTdiXY7bouJgl
+         EhXubkqZDZAxA==
+Date:   Mon, 13 Dec 2021 16:20:46 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Cc:     linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, thara.gopinath@linaro.org,
+        quic_neersoni@quicinc.com, dineshg@quicinc.com
+Subject: Re: [PATCH 01/10] soc: qcom: new common library for ICE functionality
+Message-ID: <YbfjXtQgLSLOFvBr@gmail.com>
+References: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
+ <20211206225725.77512-2-quic_gaurkash@quicinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20211206225725.77512-2-quic_gaurkash@quicinc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The donation calculation logic assumes that the donor has non-zero
-after-donation hweight, so the lowest active hweight a donating cgroup can
-have is 2 so that it can donate 1 while keeping the other 1 for itself.
-Earlier, we only donated from cgroups with sizable surpluses so this
-condition was always true. However, with the precise donation algorithm
-implemented, f1de2439ec43 ("blk-iocost: revamp donation amount
-determination") made the donation amount calculation exact enabling even low
-hweight cgroups to donate.
+On Mon, Dec 06, 2021 at 02:57:16PM -0800, Gaurav Kashyap wrote:
+> Add a new library which congregates all the ICE
+> functionality so that all storage controllers containing
+> ICE can utilize it.
 
-This means that in rare occasions, a cgroup with active hweight of 1 can
-enter donation calculation triggering the following warning and then a
-divide-by-zero oops.
+In commit messages and comments, please spell out "Inline Crypto Engine (ICE)"
+the first time it appears, so that people know what ICE means.
 
- WARNING: CPU: 4 PID: 0 at block/blk-iocost.c:1928 transfer_surpluses.cold+0x0/0x53 [884/94867]
- ...
- RIP: 0010:transfer_surpluses.cold+0x0/0x53                                                 
- Code: 92 ff 48 c7 c7 28 d1 ab b5 65 48 8b 34 25 00 ae 01 00 48 81 c6 90 06 00 00 e8 8b 3f fe ff 48 c7 c0 ea ff ff ff e9 95 ff 92 ff <0f> 0b 48 c7 c7 30 da ab b5 e8 71 3f fe ff 4c 89 e8 4d 85 ed 74 0
-4                                                    
- ...
- Call Trace:                           
-  <IRQ>                                
-  ioc_timer_fn+0x1043/0x1390           
-  call_timer_fn+0xa1/0x2c0             
-  __run_timers.part.0+0x1ec/0x2e0      
-  run_timer_softirq+0x35/0x70          
- ...
- iocg: invalid donation weights in /a/b: active=1 donating=1 after=0
+> diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
+> index 79b568f82a1c..a900f5ab6263 100644
+> --- a/drivers/soc/qcom/Kconfig
+> +++ b/drivers/soc/qcom/Kconfig
+> @@ -209,4 +209,11 @@ config QCOM_APR
+>  	  application processor and QDSP6. APR is
+>  	  used by audio driver to configure QDSP6
+>  	  ASM, ADM and AFE modules.
+> +
+> +config QTI_ICE_COMMON
+> +	tristate "QTI common ICE functionality"
 
-Fix it by excluding cgroups w/ active hweight < 2 from donating. Excluding
-these extreme low hweight donations shouldn't affect work conservation in
-any meaningful way.
+Since this is a library, it shouldn't be user-selectable, but rather just be
+selected by the other options that need it.  Putting a string after "tristate"
+makes it user-selectable; the string is the prompt string.  The line should just
+be "tristate", without a string afterwards.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Fixes: f1de2439ec43 ("blk-iocost: revamp donation amount determination")
-Cc: stable@vger.kernel.org # v5.10+
----
- block/blk-iocost.c |    9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> diff --git a/drivers/soc/qcom/qti-ice-common.c b/drivers/soc/qcom/qti-ice-common.c
+> new file mode 100644
+> index 000000000000..0c5b529201c5
+> --- /dev/null
+> +++ b/drivers/soc/qcom/qti-ice-common.c
+> @@ -0,0 +1,199 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Common ICE library for storage encryption.
+> + *
+> + * Copyright (c) 2021, Qualcomm Innovation Center. All rights reserved.
+> + */
+> +
+> +#include <linux/qti-ice-common.h>
+> +#include <linux/module.h>
+> +#include <linux/qcom_scm.h>
+> +#include <linux/delay.h>
+> +#include "qti-ice-regs.h"
+> +
+> +#define QTI_ICE_MAX_BIST_CHECK_COUNT    100
+> +#define QTI_AES_256_XTS_KEY_RAW_SIZE	64
+> +
+> +static bool qti_ice_supported(const struct ice_mmio_data *mmio)
+> +{
+> +	u32 regval = qti_ice_readl(mmio->ice_mmio, QTI_ICE_REGS_VERSION);
+> +	int major = regval >> 24;
+> +	int minor = (regval >> 16) & 0xFF;
+> +	int step = regval & 0xFFFF;
+> +
+> +	/* For now this driver only supports ICE version 3 and higher. */
+> +	if (major < 3) {
+> +		pr_warn("Unsupported ICE version: v%d.%d.%d\n",
+> +			 major, minor, step);
+> +		return false;
+> +	}
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index a5b37cc65b171..769b643942989 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2311,7 +2311,14 @@ static void ioc_timer_fn(struct timer_list *timer)
- 			hwm = current_hweight_max(iocg);
- 			new_hwi = hweight_after_donation(iocg, old_hwi, hwm,
- 							 usage, &now);
--			if (new_hwi < hwm) {
-+			/*
-+			 * Donation calculation assumes hweight_after_donation
-+			 * to be positive, a condition that a donor w/ hwa < 2
-+			 * can't meet. Don't bother with donation if hwa is
-+			 * below 2. It's not gonna make a meaningful difference
-+			 * anyway.
-+			 */
-+			if (new_hwi < hwm && hwa >= 2) {
- 				iocg->hweight_donating = hwa;
- 				iocg->hweight_after_donation = new_hwi;
- 				list_add(&iocg->surplus_list, &surpluses);
+For log messages associated with a device, the dev_*() functions should be used
+instead of pr_*().  How about including the relevant 'struct device *' in the
+struct ice_mmio_data?
+
+This comment applies to everywhere in qti-ice-common that is logging anything.
+
+> +/**
+> + * qti_ice_init() - Initialize ICE functionality
+> + * @ice_mmio_data: contains ICE register mapping for i/o
+> + *
+> + * Initialize ICE by checking the version for ICE support and
+> + * also checking the fuses blown.
+> + *
+> + * Return: 0 on success; -EINVAL on failure.
+> + */
+> +int qti_ice_init(const struct ice_mmio_data *mmio)
+> +{
+> +	if (!qti_ice_supported(mmio))
+> +		return -EINVAL;
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(qti_ice_init);
+
+Be more specific about what "failure" means here.  It means that the driver
+doesn't support the ICE hardware, right?  -ENODEV would be a more appropriate
+error code for this.  -EINVAL is a very generic error.
+
+> +static void qti_ice_low_power_and_optimization_enable(
+> +				const struct ice_mmio_data *mmio)
+> +{
+> +	u32 regval = qti_ice_readl(mmio->ice_mmio,
+> +				   QTI_ICE_REGS_ADVANCED_CONTROL);
+> +
+> +	/* Enable low power mode sequence
+> +	 * [0]-0,[1]-0,[2]-0,[3]-7,[4]-0,[5]-0,[6]-0,[7]-0,
+> +	 * Enable CONFIG_CLK_GATING, STREAM2_CLK_GATING and STREAM1_CLK_GATING
+> +	 */
+> +	regval |= 0x7000;
+> +	/* Optimization enable sequence*/
+> +	regval |= 0xD807100;
+> +	qti_ice_writel(mmio->ice_mmio, regval, QTI_ICE_REGS_ADVANCED_CONTROL);
+> +	/* Memory barrier - to ensure write completion before next transaction */
+> +	wmb();
+> +}
+
+This part changed slightly from the original code in
+drivers/scsi/ufs/ufs-qcom-ice.c and drivers/mmc/host/sdhci-msm.c.  What is the
+reason for these changes?  To be fair, I can't properly explain this part of the
+original code; I just did what some existing ICE code was doing.  But if it
+wasn't the correct or best way, it would be super useful to understand *why*
+this different version is really the correct/best way.
+
+Also note that the line "regval |= 0x7000;" is redundant.
+
+> +static int qti_ice_wait_bist_status(const struct ice_mmio_data *mmio)
+> +{
+> +	int count;
+> +	u32 regval;
+> +
+> +	for (count = 0; count < QTI_ICE_MAX_BIST_CHECK_COUNT; count++) {
+> +		regval = qti_ice_readl(mmio->ice_mmio,
+> +				       QTI_ICE_REGS_BIST_STATUS);
+> +		if (!(regval & QTI_ICE_BIST_STATUS_MASK))
+> +			break;
+> +		udelay(50);
+> +	}
+> +
+> +	if (regval) {
+> +		pr_err("%s: wait bist status failed, reg %d\n",
+> +			__func__, regval);
+> +		return -ETIMEDOUT;
+> +	}
+> +
+> +	return 0;
+> +}
+
+The copy of this in drivers/mmc/host/sdhci-msm.c is a bit nicer in that it uses
+the readl_poll_timeout() helper function, and it has a longer comment explaining
+it.  So I think you should use that version rather than the UFS version.
+
+> +/**
+> + * qti_ice_keyslot_program() - Program a key to an ICE slot
+> + * @ice_mmio_data: contains ICE register mapping for i/o
+> + * @crypto_key: key to be program, this can be wrapped or raw
+> + * @crypto_key_size: size of the key to be programmed
+> + * @slot: the keyslot at which the key should be programmed.
+> + * @data_unit_mask: mask for the dun which is part of the
+> + *                  crypto configuration.
+> + * @capid: capability index indicating the algorithm for the
+> + *         crypto configuration
+> + *
+> + * Program the passed in key to a slot in ICE.
+> + * The key that is passed in can either be a raw key or wrapped.
+> + * In both cases, due to access control of ICE for Qualcomm chipsets,
+> + * a scm call is used to program the key into ICE from trustzone.
+> + * Trustzone can differentiate between raw and wrapped keys.
+
+How does TrustZone differentiate between raw and wrapped keys?  I thought you
+had mentioned that only one is supported at a time on a particular SoC.
+
+> +int qti_ice_keyslot_program(const struct ice_mmio_data *mmio,
+> +			    const u8 *crypto_key, unsigned int crypto_key_size,
+> +			    unsigned int slot, u8 data_unit_mask, int capid)
+> +{
+> +	int err = 0;
+> +	int i = 0;
+> +	union {
+> +		u8 bytes[QTI_AES_256_XTS_KEY_RAW_SIZE];
+> +		u32 words[QTI_AES_256_XTS_KEY_RAW_SIZE / sizeof(u32)];
+> +	} key;
+> +
+> +	memcpy(key.bytes, crypto_key, crypto_key_size);
+
+This is assuming that wrapped keys aren't longer than raw AES-256-XTS keys,
+which isn't necessarily true.
+
+> +#define qti_ice_writel(mmio, val, reg)		\
+> +	writel_relaxed((val), mmio + (reg))
+> +#define qti_ice_readl(mmio, reg)		\
+> +	readl_relaxed(mmio + (reg))
+
+Previously, writel() and readl() were used instead of writel_relaxed() and
+readl_relaxed().  What is the reason for this change?  My understanding is that
+the *_relaxed() functions are harder to use correctly, so they shouldn't be used
+unless it's been carefully thought through and the extra performance is needed.
+
+- Eric
