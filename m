@@ -2,92 +2,280 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 062CDC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 09:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C45C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 10:53:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232151AbhLNJMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 04:12:52 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:32917 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbhLNJMu (ORCPT
+        id S233282AbhLNKx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 05:53:26 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:41582 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233298AbhLNKx0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 04:12:50 -0500
-Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JCt1q6nyJzcbvP;
-        Tue, 14 Dec 2021 17:12:31 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 17:12:48 +0800
-Received: from [10.174.177.69] (10.174.177.69) by
- dggpemm500004.china.huawei.com (7.185.36.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 17:12:48 +0800
-Message-ID: <8c87a712-93fb-d794-6d08-cadf6452efc3@huawei.com>
-Date:   Tue, 14 Dec 2021 17:12:48 +0800
+        Tue, 14 Dec 2021 05:53:26 -0500
+Received: by mail-il1-f198.google.com with SMTP id r1-20020a92cd81000000b002a3ae5f6ad9so17368266ilb.8
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 02:53:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=DolDY5Ko4Cw054urmPjM1ClKBfpsg/xAhiAiCYAewlE=;
+        b=IS0B0UUw5gPm7ebXdAvI2cEj7+gJvD3EOi3ejvOukhLcE2Hpw33t+d5hNa05q/IE+a
+         F1nPxk6J6ea8VfkMKhHDRU74zm2CYO7WyqoibGvS+G9RqMYlaiDhDpQZv8q+NJG3Pehn
+         peF+O1a0VjaxdZ5cYvErmx5lhhxG3wZwRaCNJaEpbRw3buoCWWJNCiC2sZX2+Zfx2GLf
+         Qa+EitOJunszDi4APlboRdjDTKFtk6g0NV5W12w8xt0xx/CqAf1wB8ErYD7qJEGJqQ7m
+         cMwwNTs0oMIAxHLRbuyUXm8bFwdn1LY0DYB6aE9uk4c6s3EYMvi7lZwBvZIcr2UfFzT3
+         ggZw==
+X-Gm-Message-State: AOAM531O/U69hpjnppIN1FzwD0/HxHG6pl2dSQtVqDIZcCqm7r1unuXF
+        sF5Puh2athvdbWrp6otkQwzVnWu54uR12G32dZdJguOlyERR
+X-Google-Smtp-Source: ABdhPJymddIVLLfaBgndEpb0oSf2RllM63rXh/irjbFXpwTAVMgJruxd1gAA4YVokS7Odqc7lcUCoYP5I+RXrAxlBQ80y9S/2kfI
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH -next] blk-throttle: Set BIO_THROTTLED when bio has been
- throttled
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20211118131551.810931-1-qiulaibin@huawei.com>
- <YaUZExR6v8IdZUeM@slm.duckdns.org>
- <03964258-10ff-7f19-10cb-ca4eccf72848@huawei.com>
- <YbepLpyMPqP2ao3J@slm.duckdns.org>
-From:   QiuLaibin <qiulaibin@huawei.com>
-In-Reply-To: <YbepLpyMPqP2ao3J@slm.duckdns.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.177.69]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a02:b0d6:: with SMTP id w22mr2238631jah.488.1639479206079;
+ Tue, 14 Dec 2021 02:53:26 -0800 (PST)
+Date:   Tue, 14 Dec 2021 02:53:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b1ef3205d318ff2c@google.com>
+Subject: [syzbot] KASAN: use-after-free Read in disk_release_events
+From:   syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    c741e49150db Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13b56f3ab00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=221ffc09e39ebbd1
+dashboard link: https://syzkaller.appspot.com/bug?extid=28a66a9fbc621c939000
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=158aa0bab00000
+
+Bisection is inconclusive: the issue happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1652706db00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1552706db00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1152706db00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com
+
+RBP: 00007fea03eac012 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe8991f3df R14: 00007fea035a6300 R15: 0000000000022000
+ </TASK>
+kobject_add_internal failed for md1 with -EEXIST, don't try to register things with the same name in the same directory.
+==================================================================
+BUG: KASAN: use-after-free in disk_release_events+0xbc/0xe0 block/disk-events.c:502
+Read of size 4 at addr ffff88801bb56ce8 by task syz-executor.2/9293
+
+CPU: 1 PID: 9293 Comm: syz-executor.2 Not tainted 5.16.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ print_address_description.constprop.0.cold+0x8d/0x320 mm/kasan/report.c:247
+ __kasan_report mm/kasan/report.c:433 [inline]
+ kasan_report.cold+0x83/0xdf mm/kasan/report.c:450
+ disk_release_events+0xbc/0xe0 block/disk-events.c:502
+ disk_release+0x106/0x260 block/genhd.c:1116
+ device_release+0x9f/0x240 drivers/base/core.c:2230
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3501
+ put_disk block/genhd.c:1372 [inline]
+ blk_cleanup_disk+0x6b/0x80 block/genhd.c:1388
+ md_alloc+0x96f/0x1080 drivers/md/md.c:5733
+ md_probe+0x69/0x70 drivers/md/md.c:5745
+ blk_request_module+0x111/0x1d0 block/genhd.c:690
+ blkdev_get_no_open+0xf4/0x160 block/bdev.c:742
+ blkdev_get_by_dev.part.0+0x22/0xc70 block/bdev.c:804
+ blkdev_get_by_dev+0x6b/0x80 block/bdev.c:860
+ blkdev_open+0x154/0x2e0 block/fops.c:502
+ do_dentry_open+0x4c8/0x1250 fs/open.c:822
+ do_open fs/namei.c:3426 [inline]
+ path_openat+0x1cad/0x2750 fs/namei.c:3559
+ do_filp_open+0x1aa/0x400 fs/namei.c:3586
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1212
+ do_sys_open fs/open.c:1228 [inline]
+ __do_sys_openat fs/open.c:1244 [inline]
+ __se_sys_openat fs/open.c:1239 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1239
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fea03e51b49
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fea035a6188 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 00007fea03f65028 RCX: 00007fea03e51b49
+RDX: 0000000000000000 RSI: 00000000200020c0 RDI: ffffffffffffff9c
+RBP: 00007fea03eac012 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe8991f3df R14: 00007fea035a6300 R15: 0000000000022000
+ </TASK>
+
+Allocated by task 9293:
+ kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:513 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:472 [inline]
+ __kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:522
+ kmalloc include/linux/slab.h:590 [inline]
+ kzalloc include/linux/slab.h:724 [inline]
+ disk_alloc_events+0xea/0x3d0 block/disk-events.c:454
+ device_add_disk+0x11b/0xef0 block/genhd.c:440
+ add_disk include/linux/genhd.h:212 [inline]
+ md_alloc+0x83c/0x1080 drivers/md/md.c:5717
+ md_probe+0x69/0x70 drivers/md/md.c:5745
+ blk_request_module+0x111/0x1d0 block/genhd.c:690
+ blkdev_get_no_open+0xf4/0x160 block/bdev.c:742
+ blkdev_get_by_dev.part.0+0x22/0xc70 block/bdev.c:804
+ blkdev_get_by_dev+0x6b/0x80 block/bdev.c:860
+ blkdev_open+0x154/0x2e0 block/fops.c:502
+ do_dentry_open+0x4c8/0x1250 fs/open.c:822
+ do_open fs/namei.c:3426 [inline]
+ path_openat+0x1cad/0x2750 fs/namei.c:3559
+ do_filp_open+0x1aa/0x400 fs/namei.c:3586
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1212
+ do_sys_open fs/open.c:1228 [inline]
+ __do_sys_openat fs/open.c:1244 [inline]
+ __se_sys_openat fs/open.c:1239 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1239
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Freed by task 9293:
+ kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
+ kasan_set_track+0x21/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:370
+ ____kasan_slab_free mm/kasan/common.c:366 [inline]
+ ____kasan_slab_free mm/kasan/common.c:328 [inline]
+ __kasan_slab_free+0xff/0x130 mm/kasan/common.c:374
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:1723 [inline]
+ slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1749
+ slab_free mm/slub.c:3513 [inline]
+ kfree+0xf6/0x560 mm/slub.c:4561
+ device_add_disk+0x2f2/0xef0 block/genhd.c:543
+ add_disk include/linux/genhd.h:212 [inline]
+ md_alloc+0x83c/0x1080 drivers/md/md.c:5717
+ md_probe+0x69/0x70 drivers/md/md.c:5745
+ blk_request_module+0x111/0x1d0 block/genhd.c:690
+ blkdev_get_no_open+0xf4/0x160 block/bdev.c:742
+ blkdev_get_by_dev.part.0+0x22/0xc70 block/bdev.c:804
+ blkdev_get_by_dev+0x6b/0x80 block/bdev.c:860
+ blkdev_open+0x154/0x2e0 block/fops.c:502
+ do_dentry_open+0x4c8/0x1250 fs/open.c:822
+ do_open fs/namei.c:3426 [inline]
+ path_openat+0x1cad/0x2750 fs/namei.c:3559
+ do_filp_open+0x1aa/0x400 fs/namei.c:3586
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1212
+ do_sys_open fs/open.c:1228 [inline]
+ __do_sys_openat fs/open.c:1244 [inline]
+ __se_sys_openat fs/open.c:1239 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1239
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff88801bb56c00
+ which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 232 bytes inside of
+ 512-byte region [ffff88801bb56c00, ffff88801bb56e00)
+The buggy address belongs to the page:
+page:ffffea00006ed500 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1bb54
+head:ffffea00006ed500 order:2 compound_mapcount:0 compound_pincount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000010200 0000000000000000 dead000000000001 ffff888010c41c80
+raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 3696, ts 1609592763682, free_ts 19592757874
+ prep_new_page mm/page_alloc.c:2418 [inline]
+ get_page_from_freelist+0xa72/0x2f50 mm/page_alloc.c:4149
+ __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5369
+ alloc_pages+0x1a7/0x300 mm/mempolicy.c:2191
+ alloc_slab_page mm/slub.c:1793 [inline]
+ allocate_slab mm/slub.c:1930 [inline]
+ new_slab+0x32d/0x4a0 mm/slub.c:1993
+ ___slab_alloc+0x918/0xfe0 mm/slub.c:3022
+ __slab_alloc.constprop.0+0x4d/0xa0 mm/slub.c:3109
+ slab_alloc_node mm/slub.c:3200 [inline]
+ __kmalloc_node_track_caller+0x2cb/0x360 mm/slub.c:4956
+ kmalloc_reserve net/core/skbuff.c:354 [inline]
+ __alloc_skb+0xde/0x340 net/core/skbuff.c:426
+ alloc_skb include/linux/skbuff.h:1126 [inline]
+ nlmsg_new include/net/netlink.h:953 [inline]
+ netlink_ack+0x1f0/0xa60 net/netlink/af_netlink.c:2431
+ netlink_rcv_skb+0x33d/0x420 net/netlink/af_netlink.c:2502
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x904/0xdf0 net/netlink/af_netlink.c:1921
+ sock_sendmsg_nosec net/socket.c:704 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:724
+ __sys_sendto+0x21c/0x320 net/socket.c:2036
+ __do_sys_sendto net/socket.c:2048 [inline]
+ __se_sys_sendto net/socket.c:2044 [inline]
+ __x64_sys_sendto+0xdd/0x1b0 net/socket.c:2044
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1338 [inline]
+ free_pcp_prepare+0x374/0x870 mm/page_alloc.c:1389
+ free_unref_page_prepare mm/page_alloc.c:3309 [inline]
+ free_unref_page+0x19/0x690 mm/page_alloc.c:3388
+ qlink_free mm/kasan/quarantine.c:146 [inline]
+ qlist_free_all+0x5a/0xc0 mm/kasan/quarantine.c:165
+ kasan_quarantine_reduce+0x180/0x200 mm/kasan/quarantine.c:272
+ __kasan_slab_alloc+0xa2/0xc0 mm/kasan/common.c:444
+ kasan_slab_alloc include/linux/kasan.h:259 [inline]
+ slab_post_alloc_hook mm/slab.h:519 [inline]
+ slab_alloc_node mm/slub.c:3234 [inline]
+ slab_alloc mm/slub.c:3242 [inline]
+ kmem_cache_alloc_trace+0x1e9/0x2c0 mm/slub.c:3259
+ kmalloc include/linux/slab.h:590 [inline]
+ kzalloc include/linux/slab.h:724 [inline]
+ kernfs_fop_open+0x2b9/0xd30 fs/kernfs/file.c:628
+ do_dentry_open+0x4c8/0x1250 fs/open.c:822
+ do_open fs/namei.c:3426 [inline]
+ path_openat+0x1cad/0x2750 fs/namei.c:3559
+ do_filp_open+0x1aa/0x400 fs/namei.c:3586
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1212
+ do_sys_open fs/open.c:1228 [inline]
+ __do_sys_openat fs/open.c:1244 [inline]
+ __se_sys_openat fs/open.c:1239 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1239
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Memory state around the buggy address:
+ ffff88801bb56b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88801bb56c00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88801bb56c80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                          ^
+ ffff88801bb56d00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88801bb56d80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
-On 2021/12/14 4:12, Tejun Heo wrote:
-> On Mon, Dec 13, 2021 at 05:24:00PM +0800, QiuLaibin wrote:
->>> * This function is called synchronously on the issue path. The bio isn't
->>>     seen by the queue and device driver yet and nothing can race to issue it
->>>     before this function returns.
->>>
->>
->> The bio is under throttle here, this submit_bio return directly. And
->> current process will queue a dispatch work by
->> throtl_schedule_pending_timer() to submit this bio before BIO_THROTTLED flag
->> set. If the bio is completed quickly after the dispatch work is queued, UAF
->> of bio will happen.
-> 
-> You are right, the timer can get to it. Can't it be solved by just
-> reordering spin_unlock and setting BIO_THROTTLED?
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I think it can be solved by setting BIO_THROTTLED before queue dispatch 
-work.
-
->>> * Now we're not setting BIO_THROTTLED when we're taking a different return
->>>     path through the out_unlock label and risks calling back into blk_throtl
->>>     again on the same bio.
->>>
->>
->> In my opinion, This flag can prevent the request from being throttled
->> multiple times. If the request itself does not need to be throttled, the
->> result of repeated entry will be the same.
->> If necessary, I think we can use other methods to achieve this effect for
->> request does not need to be throttled.
-> 
-> So that we don't change anything regarding this?
-> 
-
-I am thinking of adding a new bio tag (like BIO_THROTTLE_BYPASS) to 
-avoid those requests which do not need to be throttled to enter the 
-throttle multiple times.
-> Thanks.
-> 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
