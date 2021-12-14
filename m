@@ -2,141 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD0DC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 16:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FEEC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 17:57:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235487AbhLNQB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 11:01:28 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:43348 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235492AbhLNQB2 (ORCPT
+        id S236773AbhLNR5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 12:57:54 -0500
+Received: from smtp03.smtpout.orange.fr ([80.12.242.125]:53364 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236535AbhLNR5x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 11:01:28 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 19F711F383;
-        Tue, 14 Dec 2021 16:01:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1639497687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=n3ekWvhMehh73GkZVCxfKmDc4I3m/60wCz+HM3I+518=;
-        b=nZV1KbOW4/YCfHWDWvroOfT6F1jdK1JJPUaTOj79uNkpT8tdXLabxK93B59SUQj2hdaaYz
-        EXOZFOYbWr3hFRcSnBMqSugvEisXQzudk4tJ9HBEzi/FLn6JLV0iB1yO8gTPdbQUCer8gT
-        J/KYBntlDHNVdvfzA+66VBIP1xZZepo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1639497687;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=n3ekWvhMehh73GkZVCxfKmDc4I3m/60wCz+HM3I+518=;
-        b=TG09fXX7fWsveVRxhBBxshqP1n8BqDCfi8MGgJsQQdkRCRaT3IAuWPRgzl9Ob1n7dj0P1R
-        /4KINzgNTHMyOGDQ==
-Received: from quack2.suse.cz (unknown [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id 0DE23A3B85;
-        Tue, 14 Dec 2021 16:01:27 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id DED291F2C7E; Tue, 14 Dec 2021 17:01:26 +0100 (CET)
-Date:   Tue, 14 Dec 2021 17:01:26 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 10/11] block: fold create_task_io_context into
- ioc_find_get_icq
-Message-ID: <20211214160126.GK14044@quack2.suse.cz>
-References: <20211209063131.18537-1-hch@lst.de>
- <20211209063131.18537-11-hch@lst.de>
+        Tue, 14 Dec 2021 12:57:53 -0500
+Received: from [192.168.1.18] ([86.243.171.122])
+        by smtp.orange.fr with ESMTPA
+        id xC3hmDtUWIEdlxC3hmHzWx; Tue, 14 Dec 2021 18:57:51 +0100
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Tue, 14 Dec 2021 18:57:51 +0100
+X-ME-IP: 86.243.171.122
+Subject: Re: [PATCH v2] xen-blkfront: Use the bitmap API when applicable
+To:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
+Cc:     boris.ostrovsky@oracle.com, jgross@suse.com,
+        sstabellini@kernel.org, axboe@kernel.dk,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Newsgroups: gmane.linux.kernel.janitors,gmane.comp.emulators.xen.devel,gmane.linux.block,gmane.linux.kernel
+References: <d6f31db1d2542e1b4ba66d4cea80d3891678aa5a.1638476031.git.christophe.jaillet@wanadoo.fr>
+ <Ybh5G2ziyRXkz3WF@Air-de-Roger> <Ybh7KgtQt0/MFtyw@Air-de-Roger>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Message-ID: <14dbcf69-afc1-c11b-e1ad-e8453a80cc6e@wanadoo.fr>
+Date:   Tue, 14 Dec 2021 18:57:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211209063131.18537-11-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <Ybh7KgtQt0/MFtyw@Air-de-Roger>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 09-12-21 07:31:30, Christoph Hellwig wrote:
-> Fold create_task_io_context into the only remaining caller.
+Le 14/12/2021 à 12:08, Roger Pau Monné a écrit :
+> On Tue, Dec 14, 2021 at 11:59:39AM +0100, Roger Pau Monné wrote:
+>> On Thu, Dec 02, 2021 at 09:16:04PM +0100, Christophe JAILLET wrote:
+>>> Use 'bitmap_zalloc()' to simplify code, improve the semantic and avoid some
+>>> open-coded arithmetic in allocator arguments.
+>>>
+>>> Also change the corresponding 'kfree()' into 'bitmap_free()' to keep
+>>> consistency.
+>>>
+>>> Use 'bitmap_copy()' to avoid an explicit 'memcpy()'
+>>>
+>>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>>
+>> Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  block/blk-ioc.c | 43 ++++++++++++-------------------------------
->  1 file changed, 12 insertions(+), 31 deletions(-)
+> Oh, I see there's been further discussion on this to avoid relying
+> implicitly on the size of the bitmap being rounded to the size of an
+> unsigned long. I think a new version is expected then?
 > 
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index cff0e3bdae53c..dc7fb064fd5f7 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -238,36 +238,6 @@ static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
->  	return ioc;
->  }
->  
-> -static struct io_context *create_task_io_context(struct task_struct *task,
-> -		gfp_t gfp_flags, int node)
-> -{
-> -	struct io_context *ioc;
-> -
-> -	ioc = alloc_io_context(gfp_flags, node);
-> -	if (!ioc)
-> -		return NULL;
-> -
-> -	/*
-> -	 * Try to install.  ioc shouldn't be installed if someone else
-> -	 * already did or @task, which isn't %current, is exiting.  Note
-> -	 * that we need to allow ioc creation on exiting %current as exit
-> -	 * path may issue IOs from e.g. exit_files().  The exit path is
-> -	 * responsible for not issuing IO after exit_io_context().
-> -	 */
-> -	task_lock(task);
-> -	if (!task->io_context &&
-> -	    (task == current || !(task->flags & PF_EXITING)))
-> -		task->io_context = ioc;
-> -	else
-> -		kmem_cache_free(iocontext_cachep, ioc);
-> -
-> -	ioc = task->io_context;
-> -	if (ioc)
-> -		get_io_context(ioc);
-> -	task_unlock(task);
-> -	return ioc;
-> -}
-> -
->  int set_task_ioprio(struct task_struct *task, int ioprio)
->  {
->  	int err;
-> @@ -426,9 +396,20 @@ struct io_cq *ioc_find_get_icq(struct request_queue *q)
->  	struct io_cq *icq = NULL;
->  
->  	if (unlikely(!ioc)) {
-> -		ioc = create_task_io_context(current, GFP_ATOMIC, q->node);
-> +		ioc = alloc_io_context(GFP_ATOMIC, q->node);
->  		if (!ioc)
->  			return NULL;
-> +
-> +		task_lock(current);
-> +		if (current->io_context) {
-> +			kmem_cache_free(iocontext_cachep, ioc);
-> +			ioc = current->io_context;
-> +		} else {
-> +			current->io_context = ioc;
-> +		}
-> +
-> +		get_io_context(ioc);
-> +		task_unlock(current);
->  	} else {
->  		get_io_context(ioc);
->  
-> -- 
-> 2.30.2
+> Thanks, Roger.
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
+Yes, I'll send a patch in order to add a 'bitmap_size()'
+I'll update this patch when/if it is merged.
+
+You can drop it for now.
+
+CJ
