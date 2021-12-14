@@ -2,89 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5D2C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 13:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFF6C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 13:59:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234630AbhLNN7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 08:59:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
+        id S232428AbhLNN7q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 08:59:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234626AbhLNN7N (ORCPT
+        with ESMTP id S230013AbhLNN7p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 08:59:13 -0500
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8D2C061748
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:59:13 -0800 (PST)
-Received: by mail-il1-x133.google.com with SMTP id t7so1105072iln.12
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:59:13 -0800 (PST)
+        Tue, 14 Dec 2021 08:59:45 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48733C061574
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:59:45 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id z18so24184437iof.5
+        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 05:59:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Vkt27jyKBc5TiS5qbM/sF3Ng+qiD9oaD9dpLTZFgFPg=;
-        b=kCqmAyxLCtc04xEUN622f2pBz4Sq5b3enBRS2WBkOfvzwPxyhZfT/xTcxVBQI7Ro+C
-         GMxC6qdBC8qslybcmpMnhV9JUVcL51Fh7OCNrXxWx74ljsvFLlkSz7QJIy+GJywgQhPm
-         80Mlb/xVqO6y2sKI/M6zY7QwlUAgX86e0LYpN4nA5qv6MdSl+8GvWKEGjpqPAWUNOnms
-         CJyQ18nl+nT+h/Agh3i3iTcEcaTggSq8bBWQxkNCI/i+VETqWOtABVk1KJFop+hCr1t2
-         gH7ytI82UxhJG7Qduh997UggOPKpEvGHdgDAKfbAULnmF+La/UaZDsCG/TlBqvenQVPj
-         KJcg==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=DMsts4DALXAc/4OMVE7nKmsm4oHZCd35/gmAzU5+dTQ=;
+        b=lG6LuESlJ4B308I07WHHKuqx5O3r/OW65GXeh4wWWlyyI4EkzBAntlfV9dHOmlEolx
+         XaQzKVB/7WyJu3XPVzWIAPfOwvD4PVACuorAykKh2tjfEIF02MFBjXDliLF8086tRBv3
+         PrjZsxdgpLZTUoDcU16uFXTSHPMkR3PQ6+XemI3sNIQMaj2yvjlf3WlNOND8X824XtSF
+         E9UkZ0jg4ttFL8Xuwj3NHPQA0RP+Xuqa5Kb7UGHH05/nfa/S6XkFefA2llHOf65ioYcv
+         3E9BCfx5AmJv1g7/7RsnGo4Z3Iu1HDi2eLlwsQObttiLxJo9a+if8C+bO0YYeTodRAqY
+         Dg/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Vkt27jyKBc5TiS5qbM/sF3Ng+qiD9oaD9dpLTZFgFPg=;
-        b=G5mnQinog+wV4S5bV6vX6TdqqL1mpuiLxNzP5Oa1WM4H68QizB3hiWVjoljhYhWKCo
-         gyx38QvjkFhkXFJ6O+IPHOV/bSw76Vvf3OiiBQP7/6A2Np/7Q3PwbiCy7qjv2ZQ2GecV
-         CE06N0XU2HA4PxqN3yVFoa/ClRGaHrcPZXEz6HnlHI0e5FnGvaZzBR98U+YUG7pFFOeQ
-         jMLToXV6CiqnDZMjLImZOS0bwfCvnolmzp0y39KWKOfy7CxRXroteypSerFFhq5E7DZa
-         q/bgA3BH8VfJiU2TnJ0el9y0ag7BOt3xroCW/yOI/MSvr05UolMbNHwG0e5c4lFy2BQL
-         g23w==
-X-Gm-Message-State: AOAM532vflvAr8yZ7XV3bbX/7IfoYU5fEodlAA98f0P+0b4vVIJee2Ou
-        KbAIfH8h8TEp8CCLWgAJr1r8lQ==
-X-Google-Smtp-Source: ABdhPJyT+360tMyccVsA34sWxQ0fjtyqpQ95UeHJXv9okxV27P74TnPV2Qys2chTJBB++ikJ8jqMRw==
-X-Received: by 2002:a05:6e02:1be5:: with SMTP id y5mr3679166ilv.156.1639490352892;
-        Tue, 14 Dec 2021 05:59:12 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=DMsts4DALXAc/4OMVE7nKmsm4oHZCd35/gmAzU5+dTQ=;
+        b=1k0w4lMDg+QjaYspP/PjqtBh+VhpXQFL3Sd/fhPX+si6zd3xsF/omz+5IgAmztDJMW
+         XfarmkyMkGbBTmPK8w6WGo8NZ8szkusCuF98FQxH78Y3vmUXY2XUqabTYKuittE3J0r4
+         8lVBgblgmvXGNIenQy/Hjw6ep4sZ4ebE7aqKD+K4oPuIlPBoTx7iUVkIyjEf4pH4I/eA
+         4D0glS8cZSmwds1cTi7Ykgfp3720uJwpP8Gr/iqyFSlIJMZg+/ea2VZN91Lua3SM6aPs
+         5Ygcad6NQeG2NB/H0xjftOFAmCMgtq1KtIWyJ5uoSjZOSaWLz/XK8XoMcBd/dB5tIn6p
+         enlA==
+X-Gm-Message-State: AOAM531pR0yyf+poCMjuA+MUe+HFCOnLELer4r85dqd9bel1dNVODqTx
+        SPAKbSFDCa2iSQA8AkYmH94MIA==
+X-Google-Smtp-Source: ABdhPJy7KeYpJWVcc6tu3G+V+pMOg2OSAAl9uEPFaXTi58pXfepSftxLmnmO0y0O6J0QGX+ww67z8g==
+X-Received: by 2002:a05:6638:348f:: with SMTP id t15mr2867875jal.272.1639490384660;
+        Tue, 14 Dec 2021 05:59:44 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id x7sm8894631ilq.86.2021.12.14.05.59.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Dec 2021 05:59:12 -0800 (PST)
-Subject: Re: [PATCH v5 4/4] rsxx: Drop PCI legacy power management
-To:     Christoph Hellwig <hch@infradead.org>,
-        Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
+        by smtp.gmail.com with ESMTPSA id r18sm8793747ilh.59.2021.12.14.05.59.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Dec 2021 05:59:44 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Philip Kelleher <pjk1939@linux.ibm.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Joshua Morris <josh.h.morris@us.ibm.com>
+Cc:     linux-pci@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
+        linux-block@vger.kernel.org,
         "Rafael J . Wysocki" <rafael@kernel.org>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
         Vaibhav Gupta <vaibhavgupta40@gmail.com>,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
         linux-kernel@vger.kernel.org,
         linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>,
         Bjorn Helgaas <bhelgaas@google.com>
+In-Reply-To: <20211208192449.146076-1-helgaas@kernel.org>
 References: <20211208192449.146076-1-helgaas@kernel.org>
- <20211208192449.146076-5-helgaas@kernel.org> <YbhN69IhTbGhvVeD@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4c856b61-6e16-1943-c816-3736b872aa06@kernel.dk>
-Date:   Tue, 14 Dec 2021 06:59:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+Subject: Re: [PATCH v5 0/4] block: convert to generic power management
+Message-Id: <163949038206.174299.12080416577354381479.b4-ty@kernel.dk>
+Date:   Tue, 14 Dec 2021 06:59:42 -0700
 MIME-Version: 1.0
-In-Reply-To: <YbhN69IhTbGhvVeD@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/14/21 12:55 AM, Christoph Hellwig wrote:
-> Maybe it is time to just drop this driver?  It was never widly used,
-> seems unmaintained and uses a cumbersome own queueing layer instead
-> of blk-mq.
+On Wed, 8 Dec 2021 13:24:45 -0600, Bjorn Helgaas wrote:
+> From: Bjorn Helgaas <bhelgaas@google.com>
+> 
+> This is a repost of patches from Vaibhav to convert from legacy PCI power
+> management to generic power management.  The most recent posting is here:
+> 
+>   https://lore.kernel.org/all/20210114115423.52414-1-vaibhavgupta40@gmail.com/
+> 
+> [...]
 
-I think so, but let's do that independently of this series.
+Applied, thanks!
 
+[1/4] mtip32xx: remove pointless drvdata checking
+      commit: 2920417c98dbe4b58200c12fc9dc152834b76e42
+[2/4] mtip32xx: remove pointless drvdata lookups
+      commit: 9e541f142dab67264075baaf8fd2eb4423742c16
+[3/4] mtip32xx: convert to generic power management
+      commit: cd97b7e0d78009b45e08b92441d9562f9f37968c
+[4/4] rsxx: Drop PCI legacy power management
+      commit: ac6f6548fcb3c6da8ff1653a16c66fc1719a2a3e
+
+Best regards,
 -- 
 Jens Axboe
+
 
