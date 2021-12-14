@@ -2,103 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78229C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 15:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8945AC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 14 Dec 2021 15:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235395AbhLNPF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 10:05:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40846 "EHLO
+        id S235391AbhLNPFc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 10:05:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232989AbhLNPFT (ORCPT
+        with ESMTP id S233034AbhLNPFW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 10:05:19 -0500
+        Tue, 14 Dec 2021 10:05:22 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86AF6C061397;
-        Tue, 14 Dec 2021 07:04:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34C7FC06173F;
+        Tue, 14 Dec 2021 07:04:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qM3BdsaT/L84lBv+p9s7oavmQoACJ0UenogZIBw0Rzc=; b=T7ExDwUuFaOCaHYrh1uuxkBiON
-        5mBpX8Rt6gm39rmpZojDreW2aGB7o+VIjDi3S1mrTqf6AxiV+BDXBQlqq8wATGRWvkyIUNWxgmngi
-        /0QU8bhbtzrkoxHP9TZrDVhI5RxGVVdWjZ3HPSby5KFM9YnmM7efWHGiuNLHAqYwm1QunyNZ19zZ9
-        hHCGHLLLiukX2bZmgDRFUAocA4HmHEOiRP2RjWn/3fScxJhn8gdj6oPOOXc/rTVJPPNbZN2ExlotV
-        LASw4X5V/NIZ3C6NE5JDIyqDhwkuii0fk+og+QovQnTEm+1r/luOUMxjlwv0K83Vg40D3db7IE6oG
-        cctuLZeQ==;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=ui5YV0aeVP7dEhqvqwNnlAJ5WU
+        EoMxb4EgTylzHg8d2zwZ0O5fj5uHj2YqTqDlOivTBpqmiUwGaW7aN787MqcchjRhTiaLCFPGe0QZr
+        O/R8yUR3F/M+0WY36zGCT83uAHGyQ0U+g2RImpZRB/yazIYzfQiMOPFjjoeU7/zcbsvmwKb01mhFs
+        9j81SmavBFDjcWDZRGzj15hkCQ8vFCy9IZkry84kU/F2KXEDj/VN/SOX7+GNstE3fPSjb13NVXlmz
+        eyC9Zjf/zH8YWjRwJm8t96m5/PQWZ5hObSJEvoArT1A4fB9NmfdnOjrU++euS727dqgqA5Z3S0ZU7
+        GE9dPc+w==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mx9M5-00EZhX-PK; Tue, 14 Dec 2021 15:04:37 +0000
-Date:   Tue, 14 Dec 2021 07:04:37 -0800
+        id 1mx9ML-00EZm7-HK; Tue, 14 Dec 2021 15:04:53 +0000
+Date:   Tue, 14 Dec 2021 07:04:53 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH] block: reduce kblockd_mod_delayed_work_on() CPU
- consumption
-Message-ID: <YbiyhcbZmnNbed3O@infradead.org>
-References: <bc529a3e-31d5-c266-8633-91095b346b19@kernel.dk>
+To:     Laibin Qiu <qiulaibin@huawei.com>
+Cc:     ming.lei@redhat.com, hch@infradead.org, axboe@kernel.dk,
+        yi.zhang@huawei.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 -next] block/wbt: fix negative inflight counter when
+ remove scsi device
+Message-ID: <YbiylenMv750vap3@infradead.org>
+References: <20211214133103.551813-1-qiulaibin@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bc529a3e-31d5-c266-8633-91095b346b19@kernel.dk>
+In-Reply-To: <20211214133103.551813-1-qiulaibin@huawei.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 14, 2021 at 07:53:46AM -0700, Jens Axboe wrote:
-> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
-> running 24 disks and using the 'none' scheduler. This happens off the
-> flush path, because SCSI requires the queue to be restarted async, and
-> hence we're hammering on mod_delayed_work_on() to ensure that the work
-> item gets run appropriately.
-> 
-> What we care about here is that the queue is run, and we don't need to
-> repeatedly re-arm the timer associated with the delayed work item. If we
-> check if the work item is pending upfront, then we don't really need to do
-> anything else. This is safe as theh work pending bit is cleared before a
-> work item is started.
-> 
-> The only potential caveat here is if we have callers with wildly different
-> timeouts specified. That's generally not the case, so don't think we need
-> to care for that case.
+Looks good,
 
-So why not do a non-delayed queue_work for that case?  Might be good
-to get the scsi and workqueue maintaines involved to understand the
-issue a bit better first.
-
-> 
-> Reported-by: Dexuan Cui <decui@microsoft.com>
-> Link: https://lore.kernel.org/linux-block/BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com/
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 1378d084c770..4584fe709c15 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1484,7 +1484,16 @@ EXPORT_SYMBOL(kblockd_schedule_work);
->  int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
->  				unsigned long delay)
->  {
-> -	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
-> +	/*
-> +	 * Avoid hammering on work addition, if the work item is already
-> +	 * pending. This is safe the work pending state is cleared before
-> +	 * the work item is started, so if we see it set, then we know that
-> +	 * whatever was previously queued on the block side will get run by
-> +	 * an existing pending work item.
-> +	 */
-> +	if (!work_pending(&dwork->work))
-> +		return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
-> +	return true;
->  }
->  EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
->  
-> -- 
-> Jens Axboe
-> 
----end quoted text---
+Reviewed-by: Christoph Hellwig <hch@lst.de>
