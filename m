@@ -2,76 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0163C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 00:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88A5C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 02:43:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235538AbhLOATC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 19:19:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55654 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235202AbhLOATC (ORCPT
+        id S239276AbhLOCnH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 21:43:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45312 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229492AbhLOCnG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 19:19:02 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9A9C061574
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 16:19:02 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id z6so19184160pfe.7
-        for <linux-block@vger.kernel.org>; Tue, 14 Dec 2021 16:19:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1x03oaPkUEduYaXP+6bEK8BjeUoTKOnQMJBdvsxFtdY=;
-        b=s7iTYnBsewcvXMzdvbRLsHNhEmWSah4Gqr4XiaG3Cjy7cdydp4STbKHy/YOXlDJKZv
-         0wOeaKsLQ4pL36ocqatv6gcOJPeSonnf+cOw3S3MDFNbV9tum8jESNtM8FWIa3sD+z83
-         xnY2hKPofDetZ84WKxPlr6i+jIrR4+QEzPahs3IUQrb/MrwVWqHhExi0oXtwlE/ePpES
-         NhqiRRzkXsHzKi9mhPYWloqaECm4KrAd11eXJJKxP3w9/O+9D1p5nt/Pv1pgXDrQorta
-         dIzPSd+LRp4TlFcu4wzM5pbmDJ1WpKnwd+FKRmCuzlBC+TOiuRyjOoAbHtGXJA1YroAW
-         rhSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1x03oaPkUEduYaXP+6bEK8BjeUoTKOnQMJBdvsxFtdY=;
-        b=iaY+pOeQBv6EK9YZUtPW3u99QuLJ3Uz71BzYnvr1qTFPYxRPiytEdantF2lR73lGFK
-         nohD8cnjqdPnqIbDvTwzS7jNMhKJxvfyQtLNd7yww6Q4VRe6Yr1Zf5JwIfjvY8Gops2f
-         ZP3/dojsTZu+1BE9urJEppCUdnmsrZL/kHVW/OGJMCNtlXaIFrzaKgdIaeWwyQrsCoUE
-         wGn41Spncyvt0Tm12+Kma9qo7WMUT60kQRP139DTy3y2nhXN0IqTPApRzrRhwfCp79UP
-         Y4d5BBpLeP36PtP184E7HR175NHcowNm4wzbjqvO3JJwee3F3K61nRsYY58XAFfqjWdr
-         4a9Q==
-X-Gm-Message-State: AOAM5334BWcwsEgiz2BSaMdJeljT9PxX97qManH1sqZEYnCMmlpFSSkm
-        G5lFs84PM28PngTMPvnzwAXPZ3WzVYrn2w==
-X-Google-Smtp-Source: ABdhPJz3ZUnsHO86J6u4dpSR38i8MNEcmkgBcWmCTtminySn9DRzazSyBGCPj8W0InoXlLrMeH9jJQ==
-X-Received: by 2002:a65:684e:: with SMTP id q14mr5850724pgt.378.1639527541546;
-        Tue, 14 Dec 2021 16:19:01 -0800 (PST)
-Received: from relinquished.localdomain ([2620:10d:c090:400::5:9af0])
-        by smtp.gmail.com with ESMTPSA id on5sm125883pjb.23.2021.12.14.16.19.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 16:19:01 -0800 (PST)
-Date:   Tue, 14 Dec 2021 16:18:59 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: make queue stat accounting a reference
-Message-ID: <Ybk0c4KT3JAj/h9h@relinquished.localdomain>
-References: <d6819554-8632-e707-3037-773a6ee904cb@kernel.dk>
+        Tue, 14 Dec 2021 21:43:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639536186;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8DLlsO41QigibH8PvgeywfW84g0cBYW6u/y7bzR2aBw=;
+        b=byqf1sW5ledq0uaXQET6zUozjB0guIf/EjRLX1afGKZfqwwHM+n7yLzQo2RoHedYDQ89Xp
+        Yhya+P9FRoPe2B+XS/xD/RTvqci18MJopkZUy/kkHbMdAbVtRVh5WO3onx9HzHKv8YSyTq
+        i/T3Uk+EbAClAotuRvIzQVGF8mTPDN0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-368-CfEYZmnFMTmwPcZeZP2xcg-1; Tue, 14 Dec 2021 21:43:03 -0500
+X-MC-Unique: CfEYZmnFMTmwPcZeZP2xcg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0656801AAB;
+        Wed, 15 Dec 2021 02:43:01 +0000 (UTC)
+Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A57BE752C9;
+        Wed, 15 Dec 2021 02:42:41 +0000 (UTC)
+Date:   Wed, 15 Dec 2021 10:42:37 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Laibin Qiu <qiulaibin@huawei.com>
+Cc:     hch@infradead.org, axboe@kernel.dk, yi.zhang@huawei.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 -next] block/wbt: fix negative inflight counter when
+ remove scsi device
+Message-ID: <YblWHXkMU56gG8fT@T590>
+References: <20211214133103.551813-1-qiulaibin@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d6819554-8632-e707-3037-773a6ee904cb@kernel.dk>
+In-Reply-To: <20211214133103.551813-1-qiulaibin@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 14, 2021 at 05:02:57PM -0700, Jens Axboe wrote:
-> kyber turns on IO statistics when it is loaded on a queue, which means
-> that even if kyber is then later unloaded, we're still stuck with stats
-> enabled on the queue.
+On Tue, Dec 14, 2021 at 09:31:03PM +0800, Laibin Qiu wrote:
+> Now that we disable wbt by set WBT_STATE_OFF_DEFAULT in
+> wbt_disable_default() when switch elevator to bfq. And when
+> we remove scsi device, wbt will be enabled by wbt_enable_default.
+> If it become false positive between wbt_wait() and wbt_track()
+> when submit write request.
 > 
-> Change the account enabled from a bool to an int, and pair the enable call
-> with the equivalent disable call. This ensures that stats gets turned off
-> again appropriately.
+> The following is the scenario that triggered the problem.
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> T1                          T2                           T3
+>                             elevator_switch_mq
+>                             bfq_init_queue
+>                             wbt_disable_default <= Set
+>                             rwb->enable_state (OFF)
+> Submit_bio
+> blk_mq_make_request
+> rq_qos_throttle
+> <= rwb->enable_state (OFF)
+>                                                          scsi_remove_device
+>                                                          sd_remove
+>                                                          del_gendisk
+>                                                          blk_unregister_queue
+>                                                          elv_unregister_queue
+>                                                          wbt_enable_default
+>                                                          <= Set rwb->enable_state (ON)
+> q_qos_track
+> <= rwb->enable_state (ON)
+> ^^^^^^ this request will mark WBT_TRACKED without inflight add and will
+> lead to drop rqw->inflight to -1 in wbt_done() which will trigger IO hung.
+> 
+> Fix this by move wbt_enable_default() from elv_unregister to
+> bfq_exit_queue(). Only re-enable wbt when bfq exit.
+> Fixes: 76a8040817b4b ("blk-wbt: make sure throttle is enabled properly")
+> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+> ---
+>  block/bfq-iosched.c | 4 ++++
+>  block/elevator.c    | 2 --
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0c612a911696..8b7524450835 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -6996,6 +6996,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+>  {
+>  	struct bfq_data *bfqd = e->elevator_data;
+>  	struct bfq_queue *bfqq, *n;
+> +	struct request_queue *q = bfqd->queue;
+>  
+>  	hrtimer_cancel(&bfqd->idle_slice_timer);
+>  
+> @@ -7019,6 +7020,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
+>  #endif
+>  
+>  	kfree(bfqd);
+> +
+> +	/* Re-enable throttling in case elevator disabled it */
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Of course, bfq has disabled it, so the above comment is useless,
+otherwise looks fine:
+
+Reviewed-by: Ming Lei <ming.lei@rehdat.com>
+
+
+Thanks,
+Ming
+
