@@ -2,141 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF27C35295
-	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 16:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F669C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 16:21:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244103AbhLOPrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Dec 2021 10:47:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40218 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244121AbhLOPrd (ORCPT
+        id S244733AbhLOQVP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Dec 2021 11:21:15 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:1152 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244732AbhLOQVO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Dec 2021 10:47:33 -0500
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C15C06173E
-        for <linux-block@vger.kernel.org>; Wed, 15 Dec 2021 07:47:33 -0800 (PST)
-Received: by mail-io1-xd2e.google.com with SMTP id q72so30819172iod.12
-        for <linux-block@vger.kernel.org>; Wed, 15 Dec 2021 07:47:33 -0800 (PST)
+        Wed, 15 Dec 2021 11:21:14 -0500
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BFGB5F7013377;
+        Wed, 15 Dec 2021 16:21:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=QiMwb/MZ9Yc18256D+wjc89NwCfPxNB5dsV9LUNii5s=;
+ b=KgjH6OV8zh2m3n945J8p+E8C1PA1DkinpAAQ/ynxOijI01lC5xF9GW4SfnpKtmV15Ko2
+ dibnusaEvQyrnmgta7ITSE639u09gmPAq4XFcWJlZx/q/oXtVRu0JMTwYW0+ka5aDRC+
+ wYCeJdjo3Tw7XG6ogdMNfvfDwSIYDNK3i4ZE0HfzF4dFUpGAaLsmIezwfkkrQn9c/OmU
+ +WBCkfNni56YNo7mqK92n5OX+xvQ2Q44g9g94jTcNr1pTyViox+8UAvKh/GD9glE5cx7
+ jNc9oi8R1Td7K2DoTbKZ23Lt61599wPKJgsx3LRSBT40VdNb4Vlslpj6WICz27SCw4Qu BQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cyknp011f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Dec 2021 16:21:05 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BFGAeDe072039;
+        Wed, 15 Dec 2021 16:21:04 GMT
+Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam08lp2043.outbound.protection.outlook.com [104.47.74.43])
+        by aserp3020.oracle.com with ESMTP id 3cxmrc2ma1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Dec 2021 16:21:03 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CKix4rdGek3D8iqOZVAqafnCwEARV7yGW41sNWI+c+JncbrmHzfrGhQkClyuZ2d+dBWf0Sz081BsZy40c/9rm0ONNF7gCoDvSnBQN0KUk8t/NmAR7E/nU5Xv3kujQvOsOMwDNJwe0qs2MJybc1DOj22wdnnCZzyDwHFA5Orrk7rQnu9RlEiuy6tA8ZBn9VopWDtFvShpAWafCHfea/yLRPnOU1xJ0C3Rx5Fg3cvzKG2j0SSIapW10mEb1mMRxlexbyS+cCJYsLZqwGiBecq0nvbcnuJn4ERsV5vGN+P3zQa0Pqm8nNuhhgHOO1whATqETSTwHnNHhj1zWzZoG3krow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QiMwb/MZ9Yc18256D+wjc89NwCfPxNB5dsV9LUNii5s=;
+ b=PO2KVOLaNU5GPqe7U88l58wvCEj3689J8P/lkAJNDah0W8b+M8/xs1L/TPTwM0XeHiFV/BEjR7DE9K5fh1MDspZ/6XR/P/l21/pemHGQIdpF5d01tkOmJdd7Ew0L/W6atPZdkQo9CASy85BeSPUtDPFrEMpyxLeTyLTILkgTLvOeoYX8evD75/7oI/xVfW2HFFiMWYgMVC5s5Xj+P5DtIqnk73fQbYZSiaodRjzKw6NL9fF24CsRbc2muZ8mPkNU/kkvIjTWRNFBDfZ5p0kOYmZDeWX3ZDAzY5lw9E5A+v1OviPdwhzZdg/geDkOdIdL9vYqWg+X5WLa28a8I8trSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Iu6lyOnaMTy7MemYvvi3Bxaw7AqLa3colqgUgMHXSmo=;
-        b=VVcbjaBzvpEIbuIuHMMB8CxL39tmqtHZ5y1sCmA7AM8u79bXB8OKC5U0YSHSIa/5Zf
-         F7BwTwWnSspgzJOr7K/x8HMpiHc4Y2ixwMDpyVH7hfCmg1chcjrmMfeaWjNUr7CwjqHl
-         8nPizXmAC0uXsrfZijiDltTjhPWmsOyJlMCYfErkwSi5USvvpJJoyV6jDRbRNNo9aRTO
-         c3zPgD94v/phyzb8h9VOskNpVV2n6eFebOnk8XncHFKTv2xM7J1T6hBcyu3pY0GjdkLi
-         qmK1kahP5OXGHevWfLuEaW/ZHleVa2HkUtbZvDyys16ELxBMxzMruuh/dElkDQQhFX0d
-         3jEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Iu6lyOnaMTy7MemYvvi3Bxaw7AqLa3colqgUgMHXSmo=;
-        b=j2YU//5nYSRbiIZhe7j1zuhY72ypJrbMMxHrEFZeS1BSdeKmXJ3algbDQg/QwLf/SD
-         9kM8D/ZYG0OvaXnVmjE2l3oHRXL9LGlqtXsb8eE2fZX2Z4/5PCsX3L7BF+hEUCGPCef/
-         mf2x9MjmPvJh3tA5GGzuOjYVHNKT0htUC89mP5YgydbsdO6mJ+03rR2fpl8G0AlsIQoV
-         4WSbI+xdaDa7yoUea+dVRdQIi/6bV/btPsFMkRq9X0wyfcw38RpdQzBNHQX9RCf7GATU
-         aI7rIt0nabdEtSFyCzIei61O3BvOoLUopi6VKPL4JDMrPveE0ZY4BJt9lCPWHIrbq0M5
-         0oqw==
-X-Gm-Message-State: AOAM532Hm/D00+CLbo0hMR1G6QTXHTqAZvTnwXvztXVzfIwAGJ7yz553
-        yu9VvY77YIe3B8n/3rA1AatNxmKF3Oyquw==
-X-Google-Smtp-Source: ABdhPJxEkda4a+fRD6FqC3vWZV6kZBEINTn2orzVqaojlzMVtuz0RUCT/4EzU417l/ru2vZEEA1Vsw==
-X-Received: by 2002:a05:6638:168a:: with SMTP id f10mr6183956jat.279.1639583252426;
-        Wed, 15 Dec 2021 07:47:32 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id t6sm1155790ios.13.2021.12.15.07.47.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Dec 2021 07:47:31 -0800 (PST)
-Subject: Re: [PATCH v2] block: reduce kblockd_mod_delayed_work_on() CPU
- consumption
-To:     John Garry <john.garry@huawei.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Dexuan Cui <decui@microsoft.com>, Ming Lei <ming.lei@redhat.com>
-References: <0eb94fa3-a1d0-f9b3-fb51-c22eaad225a7@kernel.dk>
- <926c2348-23a1-5b32-1369-3deb3d6d1671@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c283fb12-30f5-93bd-06fc-f65c547cc94f@kernel.dk>
-Date:   Wed, 15 Dec 2021 08:47:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QiMwb/MZ9Yc18256D+wjc89NwCfPxNB5dsV9LUNii5s=;
+ b=HFSZbIsP/zeW5HrRl48gaqSw4QlotFkmK9euHYWX+KhcMGx+Hqj+WzsDzHuusDykXaYpZjlpqzLNptEipRBcjYgVYo3JuYn/59y0w0YEZov8S6/qbbJPt1RzmoanNfm54JW4QRqz1/OvIMA8alXDs5K00V73+8ahcm+hdHltD6U=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by CO6PR10MB5790.namprd10.prod.outlook.com
+ (2603:10b6:303:145::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Wed, 15 Dec
+ 2021 16:20:42 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::7194:c377:36cc:d9f0]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::7194:c377:36cc:d9f0%6]) with mapi id 15.20.4801.014; Wed, 15 Dec 2021
+ 16:20:41 +0000
+Date:   Wed, 15 Dec 2021 19:20:05 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Coly Li <colyli@suse.de>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, Jianpeng Ma <jianpeng.ma@intel.com>,
+        kernel test robot <lkp@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v13 03/12] bcache: initialization of the buddy
+Message-ID: <20211215162005.GA1978@kadam>
+References: <20211212170552.2812-1-colyli@suse.de>
+ <20211212170552.2812-4-colyli@suse.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211212170552.2812-4-colyli@suse.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: JN2P275CA0042.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::30)
+ To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
 MIME-Version: 1.0
-In-Reply-To: <926c2348-23a1-5b32-1369-3deb3d6d1671@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8ba30bb1-02fc-4f4d-c0d4-08d9bfe6d57d
+X-MS-TrafficTypeDiagnostic: CO6PR10MB5790:EE_
+X-Microsoft-Antispam-PRVS: <CO6PR10MB5790115287ECE7ADD605B36C8E769@CO6PR10MB5790.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: l0HrxwGgXkEkqeN5xZMAqzZoKScDqbiJn6n9AC5LYyqEO4McDH1oeMRpwdiW5JVtDyd8IXl3jpH1dj0jmN+eRdQwMyC97d/0diVpWxM2tnnpJMeY0/p7IbTlxNvVJU27I/IQmHQqMWkMRhPDWSeJMz7U/G0pAq8n5JSEkXUhmJsLQvHAfvqz7SBm8M7g0+FwD6m+nZiG1RE2ikH1gYkvM3h0i3DP8dRNJr22IDfPRWwy1w/YEUmEmTK+1Pc5RwJ4Jt641uSGpW0vxLNdUlJbH0vQDKmMQ5WmW+HFRmwmlBJb0gWj6/p7bJ47PuMK4UYn0eplrw0ZRTN1KBsHe7sYAJ47tloNO/r19488n/LIn9QaodWJNS8d0I5mk6dlHM3HZHyOr8yxUV0B0VKJemILHuDKN9TMr1wFe0yQVa7cpO+WZ+KHn/e/A1je1VN49JjT/vLCrHqqmSLwI3kZVkSdS17EngoeyR0Udi0VP66SdXiyDU77BiQYlfSNtLLT9B3xbmHB23+IFc/Lb//2cqXjtm1QbD63JcHT3FE0XCwUFUmDQBWYHarjylykWPbT5kbRxHIGP6MpB/YMlNb5ctLGzoTvBeCM+Nn4jx2kN8IIzY02F5WJA2FcdMkIYxfDTWhNi25GXph+uj6o1TphuVoBYknDQn6cl8qlAg9w6gzsJOWMqfPeYGC9aiMC64NTiKdoFVGKVkVCKuuzSbBhVRNtKQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(1076003)(2906002)(4326008)(4744005)(8676002)(186003)(26005)(38100700002)(5660300002)(38350700002)(6666004)(54906003)(6916009)(8936002)(6506007)(52116002)(44832011)(9686003)(86362001)(316002)(6486002)(6512007)(83380400001)(33656002)(7416002)(66946007)(66556008)(508600001)(66476007)(33716001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Lup8KDL08hB5a9+PCfHACKwgKyNAUKUseLwLgIxbkVNDgpk2SAx+i3HI4SLG?=
+ =?us-ascii?Q?jbApcECb3n6j8ixXMPudXnGzOMa8gUWXZgGXrCjTG5IcEHHyJ+1G9WFejqZX?=
+ =?us-ascii?Q?7CDkl6uEomxCrq6vL6uBlGIgi+FVuGNPu/AGCCIWzXMJamrO4unG0otwRtki?=
+ =?us-ascii?Q?Qd+2VugnQETdKx45mf4nbMEVwC8yRydSbp0NM2c8hA6FBY/Gr22p7VorbXR4?=
+ =?us-ascii?Q?Haxw1s2EGXK0XrTHrNPYzmCnFTGOdm1dkx3k/Ik1I3btlmfDDAIGcM/wMJ2q?=
+ =?us-ascii?Q?ez1nY24PnCmDzzonTPdIeWzW6JYQxi0wHUkWp/C8HwfMCayFhrXvzkxMT68f?=
+ =?us-ascii?Q?M5MJc6npK/P6VJDDBGuGvsvU2Y1dP/zL7GTIA/LSyuqECA2vwlDR6GcSNl3B?=
+ =?us-ascii?Q?5HgccTStAPOuDzI5b+Maoc+vdH6q2lvDRcLLjtD8lGGvcin6b2SppcCCNNeU?=
+ =?us-ascii?Q?CrlpEYkKeVSMXY1jZOd+q8G4NzloeqReMU74MjR+rm0t8iuW0dPcXoG6n8O/?=
+ =?us-ascii?Q?ae7Zq+koJDsaua12Wzr2cDQmN15Iy5wK5EMfDT+/zhCtBmkPSVs4dDvE6iUF?=
+ =?us-ascii?Q?RyrYf2PVb5He/rtGQvHmsFUWytAAJMTsa6dpMMb3gtjnR+RSp+AaSUa36uhj?=
+ =?us-ascii?Q?l8/A6lyadwejZlw6BSwId1ptJu1+f1YuPiHPjJHdbdP54FEpXHV8QE0qTZ2P?=
+ =?us-ascii?Q?xZComKPhslyHhiBwRPDF1bS0LY4dXW1FhANb4r7H9KPqET3P+6QE8OHOJB0A?=
+ =?us-ascii?Q?mKrDWCTHxyxCTXbZFqF0NoPWmXr9omhv0FKxLOo0UgyyFvElfNHHHHl/N3AL?=
+ =?us-ascii?Q?74iO0mcngCt0FeGOopctSAOJv79MRSz61o4WeitWfpymfnJ38KTTWr55GAYw?=
+ =?us-ascii?Q?VHi6sdnOuaoPdOCS48+FHCGyDbFPsEZKCttTuHZaf5UfOnNUm2X+iQ23GXTa?=
+ =?us-ascii?Q?y04qgDVaFlTIX5PMiLuLQk+1Ru5JDR7Ff6fe3ZdArMueizNH9xUx/gEEiHqe?=
+ =?us-ascii?Q?wpyxxPhJC/sAHsAqqERuy+YV0HWrwvu2XiKtmeqE3y43sLKRx7xeru8CTlMf?=
+ =?us-ascii?Q?wRlRux3vCsgl+b4gHD53qWca6Z4BIi0FY83KPc30ZLUWPvDL6natYiUgsGXW?=
+ =?us-ascii?Q?EgK9s54q99UMCImfpAoAtV4RQ9qjng/mR8a0aGk6nwxKp2dNCd2BFlI7yM8J?=
+ =?us-ascii?Q?1egH5qawGxguh0YdXHi7HBwnzGEIeQ58V+5nN/MnDw0X8S/vh9DwH0b7OcvE?=
+ =?us-ascii?Q?t13L8PxsnUbuuivpXj4ftML+zvhofrrfTucqa40cx94pKtW5mSAqZgipvmUF?=
+ =?us-ascii?Q?Hl3bfOAYmEnGOIbvzIjzQUNBlwHYswLLpePavuLDgvgReRwPMzZbhEMh4+Tq?=
+ =?us-ascii?Q?O5noTq3cq7i83Vo2M938LQIU5eK0pwXM/CqhahItBkrxLvuj3Mb94oE0YkvH?=
+ =?us-ascii?Q?dGM0ywcWO+M+JFrk2kPUg+aQkp60JdRgBFTiMakhrleedUAFeddxPF14S0fb?=
+ =?us-ascii?Q?4PkJLR4jyRZ95aJIsnlrUzkRJAG5vusyDc5wEfKtbaVOSLh/eVPmkHUeqtKT?=
+ =?us-ascii?Q?i0yPSN7RefCkTTF6EIXExo1oVmiN7sQJ4/7Bfm7cpd/zsl/64186E/CX0h7Z?=
+ =?us-ascii?Q?NMxjx18V+baAp1d2uQMMv9bW5sobQscsTQi1w+cQL7/rcnCQnTkb7BHnHtjd?=
+ =?us-ascii?Q?N/zpKKH845lv8QM1dl2Wo2xOTNY=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ba30bb1-02fc-4f4d-c0d4-08d9bfe6d57d
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2021 16:20:41.5645
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ixUYsUONA14cXqinjsXESbdHdYCChpt0aiGjL78cm9DWsU1l0oGe+V4sBljTBt7GVP84x1xrGR4jgrb6IYdvK5/QCn1wJieCjOKVy9qdIV4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR10MB5790
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10199 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=851 suspectscore=0 adultscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112150093
+X-Proofpoint-ORIG-GUID: Y3LbarhV4Pkr6bW1lLX2HhnHDlDGqKK2
+X-Proofpoint-GUID: Y3LbarhV4Pkr6bW1lLX2HhnHDlDGqKK2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/15/21 3:25 AM, John Garry wrote:
-> On 14/12/2021 20:49, Jens Axboe wrote:
->> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
->> running 24 disks and using the 'none' scheduler. This happens off the
->> sched restart path, because SCSI requires the queue to be restarted async,
->> and hence we're hammering on mod_delayed_work_on() to ensure that the work
->> item gets run appropriately.
->>
->> Avoid hammering on the timer and just use queue_work_on() if no delay
->> has been specified.
->>
->> Reported-and-tested-by: Dexuan Cui <decui@microsoft.com>
->> Link: https://lore.kernel.org/linux-block/BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com/
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>
->> ---
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 1378d084c770..c1833f95cb97 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -1484,6 +1484,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
->>   int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
->>   				unsigned long delay)
->>   {
->> +	if (!delay)
->> +		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
->>   	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
->>   }
->>   EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
->>
-> 
-> Hi Jens,
-> 
-> I have a related comment on the current code and interface it uses, if 
-> you don't mind, as I did wonder if we are doing a msec_to_jiffies(0 [not 
-> built-in const]) call somewhere.
-> 
-> So we pass msecs to blk-mq.c, and we do a msec_to_jiffies() call on it 
-> before calling kblockd_mod_delayed_work_on(). Now most/all callsites 
-> uses const value for the msec value, so if we did the msec_to_jiffies() 
-> conversion at the callsites and passed a jiffies value, it should be 
-> compiled out by gcc. This is my current __blk_mq_delay_run_hw_queue 
-> assembler:
-> 
-> 0000000000001ef0 <__blk_mq_delay_run_hw_queue>:
->      [snip]
->      2024: a942dfb6 ldp x22, x23, [x29, #40]
->      2028: 2a1503e0 mov w0, w21
->      202c: 94000000 bl 0 <__msecs_to_jiffies>
-> kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
->      2030: aa0003e2 mov x2, x0
->      2034: 91010261 add x1, x19, #0x40
->      2038: 2a1403e0 mov w0, w20
->      203c: 94000000 bl 0 <kblockd_mod_delayed_work_on>
-> 
-> I'm not sure if you would want to change so many APIs or if jiffies is 
-> sensible to pass or even any performance gain. Additionally Function 
-> blk_mq_delay_kick_requeue_list() would not see so much gain in such a 
-> change as msec value is not const. Any thoughts? Maybe testing 
-> performance would not do much harm.
+On Mon, Dec 13, 2021 at 01:05:43AM +0800, Coly Li wrote:
+> +	/*
+> +	 * parameters of bitmap_set/clear are unsigned int.
+> +	 * Given currently size of nvm is far from exceeding this limit,
+> +	 * so only add a WARN_ON message.
+> +	 */
+> +	WARN_ON(BITS_TO_LONGS(ns->pages_total) > UINT_MAX);
+> +	ns->pages_bitmap = kvcalloc(BITS_TO_LONGS(ns->pages_total),
+> +				    sizeof(unsigned long), GFP_KERNEL);
 
-In general I totally agree with you, it'd be smarter to flip the
-conversion so it can be done in a more efficient manner. At the same
-time, the queue delay running is not at all a fast path, so shouldn't
-really matter in practice.
+BITS_TO_LONGS() has a potential integer overflow if we're talking about
+truly giant numbers.  It will return zero if ns->pages_total is more
+than U64_MAX - 64.  In that case kvcalloc() will return ZERO_SIZE_PTR.
 
--- 
-Jens Axboe
+Btw, kvcalloc() will never let you allocate more than INT_MAX.  It will
+trigger a WARN_ONCE().  If people want to allocate more than 2GB of RAM
+then they have to plan ahead of time and use vmalloc().
+
+regards,
+dan carpenter
 
