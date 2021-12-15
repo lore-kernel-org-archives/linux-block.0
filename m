@@ -2,173 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFC2C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 12:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF27C35295
+	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 16:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbhLOM5m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Dec 2021 07:57:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21448 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229686AbhLOM5l (ORCPT
+        id S244103AbhLOPrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Dec 2021 10:47:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40218 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244121AbhLOPrd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Dec 2021 07:57:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639573061;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gbBXnTX3i0pGotRnsm5fy7R60ySCrQ0jVM7dlytIqDU=;
-        b=V2QsM8AQTJG+lcILn8TUVepZLOR1eRqdVOFF5qcjv5r60n5lY/mHRkEaqzi8PJKaHFBQvL
-        4tdvebS4J8nJt0KKNFC9ZPCl487HoPpQckhHGnqg5a2kRFHlf9megdXYSA+hZxqlQS4r/z
-        Svt/JnCxK0RaqYIQuR2zLG4vZrGdZ8k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-653-ttq6PNtHMyarGe1-dtwQgg-1; Wed, 15 Dec 2021 07:57:38 -0500
-X-MC-Unique: ttq6PNtHMyarGe1-dtwQgg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E78C1802C8F;
-        Wed, 15 Dec 2021 12:57:35 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A33A11970E;
-        Wed, 15 Dec 2021 12:56:52 +0000 (UTC)
-Date:   Wed, 15 Dec 2021 20:56:47 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>
-Cc:     luojiaxing <luojiaxing@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH] blk-mq: avoid to iterate over stale request
-Message-ID: <YbnmD6yW1v7YWizf@T590>
-References: <20210906065003.439019-1-ming.lei@redhat.com>
- <0d8666c9983158a4954f30f6b429e797@mail.gmail.com>
- <YblitnLqJtkK/xBt@T590>
- <86f2fb27dd6bc53fec3d8677c078937e@mail.gmail.com>
- <YbmhDNrnVLcfbK/l@T590>
- <3065cf1a25a99a2dd89e9065d679410e@mail.gmail.com>
+        Wed, 15 Dec 2021 10:47:33 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C15C06173E
+        for <linux-block@vger.kernel.org>; Wed, 15 Dec 2021 07:47:33 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id q72so30819172iod.12
+        for <linux-block@vger.kernel.org>; Wed, 15 Dec 2021 07:47:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Iu6lyOnaMTy7MemYvvi3Bxaw7AqLa3colqgUgMHXSmo=;
+        b=VVcbjaBzvpEIbuIuHMMB8CxL39tmqtHZ5y1sCmA7AM8u79bXB8OKC5U0YSHSIa/5Zf
+         F7BwTwWnSspgzJOr7K/x8HMpiHc4Y2ixwMDpyVH7hfCmg1chcjrmMfeaWjNUr7CwjqHl
+         8nPizXmAC0uXsrfZijiDltTjhPWmsOyJlMCYfErkwSi5USvvpJJoyV6jDRbRNNo9aRTO
+         c3zPgD94v/phyzb8h9VOskNpVV2n6eFebOnk8XncHFKTv2xM7J1T6hBcyu3pY0GjdkLi
+         qmK1kahP5OXGHevWfLuEaW/ZHleVa2HkUtbZvDyys16ELxBMxzMruuh/dElkDQQhFX0d
+         3jEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Iu6lyOnaMTy7MemYvvi3Bxaw7AqLa3colqgUgMHXSmo=;
+        b=j2YU//5nYSRbiIZhe7j1zuhY72ypJrbMMxHrEFZeS1BSdeKmXJ3algbDQg/QwLf/SD
+         9kM8D/ZYG0OvaXnVmjE2l3oHRXL9LGlqtXsb8eE2fZX2Z4/5PCsX3L7BF+hEUCGPCef/
+         mf2x9MjmPvJh3tA5GGzuOjYVHNKT0htUC89mP5YgydbsdO6mJ+03rR2fpl8G0AlsIQoV
+         4WSbI+xdaDa7yoUea+dVRdQIi/6bV/btPsFMkRq9X0wyfcw38RpdQzBNHQX9RCf7GATU
+         aI7rIt0nabdEtSFyCzIei61O3BvOoLUopi6VKPL4JDMrPveE0ZY4BJt9lCPWHIrbq0M5
+         0oqw==
+X-Gm-Message-State: AOAM532Hm/D00+CLbo0hMR1G6QTXHTqAZvTnwXvztXVzfIwAGJ7yz553
+        yu9VvY77YIe3B8n/3rA1AatNxmKF3Oyquw==
+X-Google-Smtp-Source: ABdhPJxEkda4a+fRD6FqC3vWZV6kZBEINTn2orzVqaojlzMVtuz0RUCT/4EzU417l/ru2vZEEA1Vsw==
+X-Received: by 2002:a05:6638:168a:: with SMTP id f10mr6183956jat.279.1639583252426;
+        Wed, 15 Dec 2021 07:47:32 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id t6sm1155790ios.13.2021.12.15.07.47.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Dec 2021 07:47:31 -0800 (PST)
+Subject: Re: [PATCH v2] block: reduce kblockd_mod_delayed_work_on() CPU
+ consumption
+To:     John Garry <john.garry@huawei.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Dexuan Cui <decui@microsoft.com>, Ming Lei <ming.lei@redhat.com>
+References: <0eb94fa3-a1d0-f9b3-fb51-c22eaad225a7@kernel.dk>
+ <926c2348-23a1-5b32-1369-3deb3d6d1671@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c283fb12-30f5-93bd-06fc-f65c547cc94f@kernel.dk>
+Date:   Wed, 15 Dec 2021 08:47:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3065cf1a25a99a2dd89e9065d679410e@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <926c2348-23a1-5b32-1369-3deb3d6d1671@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 15, 2021 at 02:15:51PM +0530, Kashyap Desai wrote:
-> > >
-> > > shared_tags->rqs[5] of hctx0 is having scmd = 0xAA (inflight command)
-> > > shared_tags->rqs[10] of hctx0 is having scmd = 0xAA (inflight command)
-> > > <- This is incorrect. While looping on hctx0 tags[], bitmap = 10 this
-> > > entry is also found which is actually outstanding on hctx1.
-> > > shared_tags->rqs[10] of hctx1 is having scmd = 0xBB (inflight command)
-> >
-> > Sorry, I am a bit confused, please look at the following code and
-> > blk_mq_find_and_get_req()(<-bt_tags_iter).
+On 12/15/21 3:25 AM, John Garry wrote:
+> On 14/12/2021 20:49, Jens Axboe wrote:
+>> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
+>> running 24 disks and using the 'none' scheduler. This happens off the
+>> sched restart path, because SCSI requires the queue to be restarted async,
+>> and hence we're hammering on mod_delayed_work_on() to ensure that the work
+>> item gets run appropriately.
+>>
+>> Avoid hammering on the timer and just use queue_work_on() if no delay
+>> has been specified.
+>>
+>> Reported-and-tested-by: Dexuan Cui <decui@microsoft.com>
+>> Link: https://lore.kernel.org/linux-block/BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com/
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>
+>> ---
+>>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 1378d084c770..c1833f95cb97 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -1484,6 +1484,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
+>>   int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
+>>   				unsigned long delay)
+>>   {
+>> +	if (!delay)
+>> +		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
+>>   	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
+>>   }
+>>   EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+>>
 > 
+> Hi Jens,
 > 
-> My issue is without shared tags. Below patch is certainly a fix for shared
-> tags (for 5.16-rc).
-> I have seen scsi eh deadlock issue on 5.15 kernel which does not have
-> shared tags (but it has shared bitmap.)
-
-OK, if you are talking about non-shared tags, your issue is exactly
-addressed by 67f3b2f822b7 blk-mq: avoid to iterate over stale request
-
+> I have a related comment on the current code and interface it uses, if 
+> you don't mind, as I did wonder if we are doing a msec_to_jiffies(0 [not 
+> built-in const]) call somewhere.
 > 
-> >
-> > void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
-> >                 busy_tag_iter_fn *fn, void *priv) {
-> >         unsigned int flags = tagset->flags;
-> >         int i, nr_tags;
-> >
-> >         nr_tags = blk_mq_is_shared_tags(flags) ? 1 :
-> tagset->nr_hw_queues;
-> >
-> >         for (i = 0; i < nr_tags; i++) {
-> >                 if (tagset->tags && tagset->tags[i])
-> >                         __blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
-> >                                               BT_TAG_ITER_STARTED);
-> >         }
-> > }
-> >
-> > In case of shared tags, only tagset->tags[0] is iterated over, so both
-> > 5 and 10 are checked, and shared_tags->rqs[5] and shared_tags->rqs[10]
-> > shouldn't just point to the two latest requests? How can both 0xAA &
-> 0xBB be
-> > retrieved from shared_tags->rqs[10]?
+> So we pass msecs to blk-mq.c, and we do a msec_to_jiffies() call on it 
+> before calling kblockd_mod_delayed_work_on(). Now most/all callsites 
+> uses const value for the msec value, so if we did the msec_to_jiffies() 
+> conversion at the callsites and passed a jiffies value, it should be 
+> compiled out by gcc. This is my current __blk_mq_delay_run_hw_queue 
+> assembler:
 > 
-> Since I am not talking about shared tags, you can remap same condition
-> now.
-> In 5.15 kernel (shared bitmap is enabled but not shared tags) -
-
-Shared bitmap and shared tags should have be same thing, that means all hw queues
-share same tag space.
-
-> blk_mq_tagset_busy_iter is called for each tags[] of nr_hw_queues times.
-> It will call  bt_tags_for_each()  for hctx0.tags->[], hctx1.tags->[] ..
-> Since tags->bitmap_tags is shared when it traverse hctx0.tags->[], it can
-
-If ->birtmap_tags is shared, only one tags should be iterated over, so
-the following commit was added:
-
-0994c64eb415 blk-mq: Fix blk_mq_tagset_busy_iter() for shared tags
-
-> find hctx0.tags[10].rq which is really stale entry.
-> If the same request which is stale @ hctx0.tags[10] is really outstanding
-> at some other tag#, stale entry will be counted in host_busy.
+> 0000000000001ef0 <__blk_mq_delay_run_hw_queue>:
+>      [snip]
+>      2024: a942dfb6 ldp x22, x23, [x29, #40]
+>      2028: 2a1503e0 mov w0, w21
+>      202c: 94000000 bl 0 <__msecs_to_jiffies>
+> kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+>      2030: aa0003e2 mov x2, x0
+>      2034: 91010261 add x1, x19, #0x40
+>      2038: 2a1403e0 mov w0, w20
+>      203c: 94000000 bl 0 <kblockd_mod_delayed_work_on>
 > 
-> >
-> > > Issue noticed by me is the exact same issue described @ below -
-> > > https://lore.kernel.org/linux-scsi/fe5cf6c4-ce5e-4a0f-f4ab-5c10539492c
-> > > b@hu
-> > > awei.com/
-> > >
-> > > Issue is only exposed to shared host tagset. I got the required
-> > > information. Thanks.
-> > >
-> > > Kashyap
-> > > >
-> > > > > count total 2 inflight commands instead of 1 from hctx0 context +
-> > > > > From
-> > > > > hctx1 context, we will count 1 inflight command = Total is 3.
-> > > > > Even though we read after some delay, host_busy will be incorrect.
-> > > > > We expect host_busy = 2 but it will return 3.
-> > > > >
-> > > > > This patch fix my issue explained above for shared host-tag case.
-> > > > > I am confused reading the commit message. You may not have
-> > > > > intentionally fix the issue as I explained but indirectly it fixes
-> > > > > my issue. Am I
-> > > correct ?
-> > > > >
-> > > > > What was an issue reported by Luojiaxiang ? I am interested to
-> > > > > know if issue reported by Luojiaxiang had shared host tagset
-> enabled ?
-> > > >
-> > > > https://lore.kernel.org/linux-scsi/fe5cf6c4-ce5e-4a0f-f4ab-
-> > > > 5c10539492cb@huawei.com/
-> > >
-> > > I check this. It is same issue as what I am seeing on Broadcom
-> > > controller only if shared host tagset is enabled.
-> >
-> > But 67f3b2f822b7 ("blk-mq: avoid to iterate over stale request") isn't
-> only for
-> > shared tags.
-> 
-> I mean, shared bitmap in my whole discussion. Megaraid_sas driver use
-> shared bitmap, so it is exposed and It is confirmed from this discussion.
-> Do we still have exposure (if "blk-mq: avoid to iterate over stale
-> request" is not part of kernel)  to mpi3mr type driver which does not use
-> shared bitmap but has nr_hw_queues > 1. ?
+> I'm not sure if you would want to change so many APIs or if jiffies is 
+> sensible to pass or even any performance gain. Additionally Function 
+> blk_mq_delay_kick_requeue_list() would not see so much gain in such a 
+> change as msec value is not const. Any thoughts? Maybe testing 
+> performance would not do much harm.
 
-Not sure I understand your poing, but patch "blk-mq: avoid to iterate over stale
-request" can cover both shared tags or not.
+In general I totally agree with you, it'd be smarter to flip the
+conversion so it can be done in a more efficient manner. At the same
+time, the queue delay running is not at all a fast path, so shouldn't
+really matter in practice.
 
-
-
-Thanks, 
-Ming
+-- 
+Jens Axboe
 
