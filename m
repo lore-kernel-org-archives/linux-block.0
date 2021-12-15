@@ -2,118 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88A5C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 02:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7CCC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 02:51:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239276AbhLOCnH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Dec 2021 21:43:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45312 "EHLO
+        id S233405AbhLOCvT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Dec 2021 21:51:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37579 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229492AbhLOCnG (ORCPT
+        by vger.kernel.org with ESMTP id S233288AbhLOCvS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Dec 2021 21:43:06 -0500
+        Tue, 14 Dec 2021 21:51:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639536186;
+        s=mimecast20190719; t=1639536678;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8DLlsO41QigibH8PvgeywfW84g0cBYW6u/y7bzR2aBw=;
-        b=byqf1sW5ledq0uaXQET6zUozjB0guIf/EjRLX1afGKZfqwwHM+n7yLzQo2RoHedYDQ89Xp
-        Yhya+P9FRoPe2B+XS/xD/RTvqci18MJopkZUy/kkHbMdAbVtRVh5WO3onx9HzHKv8YSyTq
-        i/T3Uk+EbAClAotuRvIzQVGF8mTPDN0=
+        bh=8k4wLWesikC0TwaBhFaKS2KZwCqUpEoGxYxwRrBzSY8=;
+        b=MbCGYHGAGRGFaNMA76LsvxeiyAwpktty1Xt7VejqkL73CQtoyhbX8aivMG4uE7NunXQ7O8
+        wZ73LFYTvrZgWQ4baWc3u5dyJYQfacx7MhRIfElgbPNT/c43E0+gWf8XbSX74a3NMK88Eq
+        l+Z7SjD2dmtnKOaMTgD4+JRvZDbVXrY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-368-CfEYZmnFMTmwPcZeZP2xcg-1; Tue, 14 Dec 2021 21:43:03 -0500
-X-MC-Unique: CfEYZmnFMTmwPcZeZP2xcg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-368-YrF1xOYKOLO1_JrSGxxkzg-1; Tue, 14 Dec 2021 21:51:15 -0500
+X-MC-Unique: YrF1xOYKOLO1_JrSGxxkzg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0656801AAB;
-        Wed, 15 Dec 2021 02:43:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8D4E10168C0;
+        Wed, 15 Dec 2021 02:51:13 +0000 (UTC)
 Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A57BE752C9;
-        Wed, 15 Dec 2021 02:42:41 +0000 (UTC)
-Date:   Wed, 15 Dec 2021 10:42:37 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6483A6FB9F;
+        Wed, 15 Dec 2021 02:51:11 +0000 (UTC)
+Date:   Wed, 15 Dec 2021 10:51:05 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Laibin Qiu <qiulaibin@huawei.com>
-Cc:     hch@infradead.org, axboe@kernel.dk, yi.zhang@huawei.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 -next] block/wbt: fix negative inflight counter when
- remove scsi device
-Message-ID: <YblWHXkMU56gG8fT@T590>
-References: <20211214133103.551813-1-qiulaibin@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Dexuan Cui <decui@microsoft.com>
+Subject: Re: [PATCH v2] block: reduce kblockd_mod_delayed_work_on() CPU
+ consumption
+Message-ID: <YblYGbONJip1hNfu@T590>
+References: <0eb94fa3-a1d0-f9b3-fb51-c22eaad225a7@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211214133103.551813-1-qiulaibin@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <0eb94fa3-a1d0-f9b3-fb51-c22eaad225a7@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 14, 2021 at 09:31:03PM +0800, Laibin Qiu wrote:
-> Now that we disable wbt by set WBT_STATE_OFF_DEFAULT in
-> wbt_disable_default() when switch elevator to bfq. And when
-> we remove scsi device, wbt will be enabled by wbt_enable_default.
-> If it become false positive between wbt_wait() and wbt_track()
-> when submit write request.
+On Tue, Dec 14, 2021 at 01:49:34PM -0700, Jens Axboe wrote:
+> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
+> running 24 disks and using the 'none' scheduler. This happens off the
+> sched restart path, because SCSI requires the queue to be restarted async,
+> and hence we're hammering on mod_delayed_work_on() to ensure that the work
+> item gets run appropriately.
 > 
-> The following is the scenario that triggered the problem.
+> Avoid hammering on the timer and just use queue_work_on() if no delay
+> has been specified.
 > 
-> T1                          T2                           T3
->                             elevator_switch_mq
->                             bfq_init_queue
->                             wbt_disable_default <= Set
->                             rwb->enable_state (OFF)
-> Submit_bio
-> blk_mq_make_request
-> rq_qos_throttle
-> <= rwb->enable_state (OFF)
->                                                          scsi_remove_device
->                                                          sd_remove
->                                                          del_gendisk
->                                                          blk_unregister_queue
->                                                          elv_unregister_queue
->                                                          wbt_enable_default
->                                                          <= Set rwb->enable_state (ON)
-> q_qos_track
-> <= rwb->enable_state (ON)
-> ^^^^^^ this request will mark WBT_TRACKED without inflight add and will
-> lead to drop rqw->inflight to -1 in wbt_done() which will trigger IO hung.
+> Reported-and-tested-by: Dexuan Cui <decui@microsoft.com>
+> Link: https://lore.kernel.org/linux-block/BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com/
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > 
-> Fix this by move wbt_enable_default() from elv_unregister to
-> bfq_exit_queue(). Only re-enable wbt when bfq exit.
-> Fixes: 76a8040817b4b ("blk-wbt: make sure throttle is enabled properly")
-> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
 > ---
->  block/bfq-iosched.c | 4 ++++
->  block/elevator.c    | 2 --
->  2 files changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 0c612a911696..8b7524450835 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -6996,6 +6996,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 1378d084c770..c1833f95cb97 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1484,6 +1484,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
+>  int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
+>  				unsigned long delay)
 >  {
->  	struct bfq_data *bfqd = e->elevator_data;
->  	struct bfq_queue *bfqq, *n;
-> +	struct request_queue *q = bfqd->queue;
->  
->  	hrtimer_cancel(&bfqd->idle_slice_timer);
->  
-> @@ -7019,6 +7020,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
->  #endif
->  
->  	kfree(bfqd);
-> +
-> +	/* Re-enable throttling in case elevator disabled it */
+> +	if (!delay)
+> +		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
+>  	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
 
-Of course, bfq has disabled it, so the above comment is useless,
-otherwise looks fine:
-
-Reviewed-by: Ming Lei <ming.lei@rehdat.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 
 Thanks,
