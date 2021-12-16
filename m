@@ -2,65 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9090C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C50C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:11:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238791AbhLPQFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:05:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38186 "EHLO
+        id S239064AbhLPQLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:11:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238785AbhLPQFo (ORCPT
+        with ESMTP id S239086AbhLPQLB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:05:44 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC76DC061574
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:44 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id z18so35805818iof.5
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:44 -0800 (PST)
+        Thu, 16 Dec 2021 11:11:01 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3973C06173F
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:11:01 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id p23so35834747iod.7
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:11:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=/PWmmDkqw4hfM6o+w9vrmK9zC/wyrsfBGmnpHNH1A4s=;
-        b=cZQk8FmAyyc4dLcZnnc4aVaa72YqVCZRdQ7I9wkBxidqK2R84aK3YnNFoJkKWR26BL
-         vTog6F1FcDQdAchOgFXsg5mNA+bSKdknh8fAeU22bmRev82PqjrmvE60YbMvp7BL0ADS
-         7EFAvQN+Hb9Liti7xR+iQfSq4ALn+vam4aXlIaYvsIWSNsN5KROKocReO3KStx/hTwxY
-         kbI92/9DCl8JYB4NzqA0IQRhF5gFVxAFoyR2GjAp+OFqkHh6+EOrn1+17rWsBKcaL5Mo
-         moykKhDJzWtOEAoacgrLq5fqbVMQtF2VoGXy8smC3nGyq7YG7bFySrJI0cotKZwtHMLC
-         CKRg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Pf9fb3BzOHZeasMBnE2TZjTYGuhuTLpt0IzZchAOoCI=;
+        b=NQwSmOIKRYtCZ8O7JeCgLi0TwGt6NJBkzli3xzYCC5hRJyGz+pXE0z4kPWP8dK2s8K
+         CThR58m6+8l47kQcItx8B/u5vuGliCy1XJHLA0LeHIxkdpzTFo9RYo3zzhc0BwZpboyH
+         VT5KIfY6etuxkW5JKNfQRkql/fawtfZUE15S8wUZwWx24qCDc5Xmhkf22vPl9EMxcwHP
+         5d+i8zdAsRogqDbcFXzuatpCbDabWAW+D5mpeQr0rAeZiUA45r36+6gt9Yp0eundGRjD
+         zSELaljHEoVnrB0BtOlHiPB/uV3hAd0mSqM8i4nfKkHK193AwSEXjk1JReNmRO815ZO5
+         zqLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/PWmmDkqw4hfM6o+w9vrmK9zC/wyrsfBGmnpHNH1A4s=;
-        b=igpBtT47llKkLEmkBtgMj5WMhvBkLBxQqBFAzb+EP3LhFt+cF+n58iNM4hTu+KuGwN
-         HMWnwIOcY8Y0ukYCJQKzUVGpBnYONFXPhr/hI2aqNyOeTTSNT/ZVRvmOmoOnci8OGgjx
-         VAxuY/hSOlZQupMyCQToAEXTgxcBikld3RWmudvozeWqmH30dJQnrxVeun/AoW1F8m3s
-         UDbl9io7jbWY/7hCHcMwQz2n+jsM5eadCpQqQ5K507TnaNejmCbG7kfKTGLeGvDWocn9
-         hG/joX1VEaiIU72/sKk80qp1HPv8Xwh34gljPzlz54k7l31bPrk4+GB7g6Zr5y19W+K4
-         LVzg==
-X-Gm-Message-State: AOAM532aQg8/4hLbnW33m5KxrsJoQ6nP8X1oh0G0Ppohzuc8DnoPO/Ja
-        Ir1KvfZtaBIiABrDnKkU106OSA==
-X-Google-Smtp-Source: ABdhPJyw3+fT/a7gefxPigqVMegk1UxofIMMCBv+uVydXXF56pofuEw+FLJtbXuk0WLtOds7Jal1xQ==
-X-Received: by 2002:a05:6638:389a:: with SMTP id b26mr9781380jav.197.1639670744180;
-        Thu, 16 Dec 2021 08:05:44 -0800 (PST)
-Received: from x1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s9sm3237155ild.14.2021.12.16.08.05.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Dec 2021 08:05:43 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Pf9fb3BzOHZeasMBnE2TZjTYGuhuTLpt0IzZchAOoCI=;
+        b=G2F3QjQjqA/Sn36c/jF4dThFAlF3G6B3oLrUbo6n3CQ7DiT4pO3Y+MQDYyzXbBbvLT
+         ailGfbS0ZB72OEwa12y21712tRQPtBCFwUvpaO1qhjFKA/xFPpD30JPZwmtGxQRQpqQm
+         ujZ7grCOZSw1V0IrSUQ/ajZWHRtaZqe5AqP2TbTHuIEGnPnlQ/TrGwunoWwzQpcblvwp
+         xfRTdzV5UIpAAcUggUGpf4eak15RE2G90IjyJhix2dbqO9EAY4894RN7jDH/yF41VSqV
+         odO53mNOh4fdbrMeVt343u3TmiuEqvsAm7Kpd7p1lKQVfdh6ygVWvW9H3RcZx43G5LIY
+         i69Q==
+X-Gm-Message-State: AOAM533F28z/5YL0m8tw6ecAcfhoeV9xHG+9dQaFFaHjtkOr5IQ4Ynso
+        j8EwiKn5qGFDjYkwcMU8fTc+Lg==
+X-Google-Smtp-Source: ABdhPJxrCl8DAdI5vuBFBvDjOLDjTPwNTli9HWjp3v8EKYMdhUi4Z8uByjZ/rJmfHoPwXonA3F8HOg==
+X-Received: by 2002:a5e:8a41:: with SMTP id o1mr9801431iom.131.1639671061064;
+        Thu, 16 Dec 2021 08:11:01 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id q8sm3228064iow.47.2021.12.16.08.11.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Dec 2021 08:11:00 -0800 (PST)
+Subject: [PATCH v2 4/4] nvme: add support for mq_ops->queue_rqs()
 To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 4/4] nvme: add support for mq_ops->queue_rqs()
-Date:   Thu, 16 Dec 2021 09:05:37 -0700
-Message-Id: <20211216160537.73236-5-axboe@kernel.dk>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20211216160537.73236-1-axboe@kernel.dk>
+Cc:     Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
 References: <20211216160537.73236-1-axboe@kernel.dk>
+ <20211216160537.73236-5-axboe@kernel.dk>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <37e91ddf-6658-e587-7895-edc1c9b2e83b@kernel.dk>
+Date:   Thu, 16 Dec 2021 09:11:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211216160537.73236-5-axboe@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -79,15 +83,16 @@ from 9.6M to 10M IOPS/core.
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- drivers/nvme/host/pci.c | 58 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+
+Added the prev check suggested by Max.
 
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6be6b1ab4285..e34ad67c4c41 100644
+index 6be6b1ab4285..58d97660374a 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -981,6 +981,63 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
+@@ -981,6 +981,64 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
  	return BLK_STS_OK;
  }
  
@@ -139,7 +144,8 @@ index 6be6b1ab4285..e34ad67c4c41 100644
 +		req = rq_list_next(req);
 +		if (!req || (prev && req->mq_hctx != prev->mq_hctx)) {
 +			/* detach rest of list, and submit */
-+			prev->rq_next = NULL;
++			if (prev)
++				prev->rq_next = NULL;
 +			nvme_submit_cmds(nvmeq, rqlist);
 +			*rqlist = req;
 +		}
@@ -151,7 +157,7 @@ index 6be6b1ab4285..e34ad67c4c41 100644
  static __always_inline void nvme_pci_unmap_rq(struct request *req)
  {
  	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-@@ -1678,6 +1735,7 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
+@@ -1678,6 +1736,7 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
  
  static const struct blk_mq_ops nvme_mq_ops = {
  	.queue_rq	= nvme_queue_rq,
@@ -159,6 +165,7 @@ index 6be6b1ab4285..e34ad67c4c41 100644
  	.complete	= nvme_pci_complete_rq,
  	.commit_rqs	= nvme_commit_rqs,
  	.init_hctx	= nvme_init_hctx,
+
 -- 
-2.34.1
+Jens Axboe
 
