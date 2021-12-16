@@ -2,84 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD56C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC52C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238784AbhLPQFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:05:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38150 "EHLO
+        id S232897AbhLPQFm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:05:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233135AbhLPQFl (ORCPT
+        with ESMTP id S238786AbhLPQFm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:05:41 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0035AC061574
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:40 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id b187so35767760iof.11
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:40 -0800 (PST)
+        Thu, 16 Dec 2021 11:05:42 -0500
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADD2C061574
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:41 -0800 (PST)
+Received: by mail-io1-xd2f.google.com with SMTP id p23so35810218iod.7
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tL3o525SSbhSebgjQfZMQ7uigsMTO2fDpoEDGUF4HUE=;
-        b=0LEQNGb1bTHq9e+hYsc3l+U2okJ0k4nHCnm1dhpKeonjqY5/ZM5neoakgeOcnU8rMt
-         pqd/Xs3gl8OfNB5zpWbbHRemeoSAhzx4OjzZC9/nUuQ5hNpz9f5iBm0955pOnS1isizS
-         JAip0m3naR8v4h1fESL4IKpKKycnMHxyPGjlktYqX9o1oKPQgvGE6+BklJ58NVHSreeu
-         pIxhC+CTNkzBhAgy0G4S4qMsOTW6SLnoF3binn+Y5vangPa3tr2JNByLyvb6RJlZUOSc
-         Q6M4wLWZjHPSPDI/FLUA7mI2SPGwGpULFNf82V7VdpjkSXl9392Ow7vVukUVOmKvpL0U
-         /eNw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=/pPKkXtT6Xrl9aqdgr4UGNl+ZJEtLSBkw/CIGk0Ps8Y=;
+        b=hrAibA8VCiRbTVdDg+0x+InGlOJ+7hx7X3m+HVrRE6NeGaojnjD2KfBEJAt57Bx4kM
+         ACupiwLU2vUmauKIDN301FUJJ6n1BgnD02odN8w3JnW7LCGe5nmxQDPO273GM4btJjUX
+         V1FopdaIX6h0oB3RIpJX+b7FoyBH4NuoiYCF5pdu9KIJKIsQAk4iCep/Q66gGjd76o2a
+         UIihO0OWoyCB2n2zPJ1YKWbBZhvMd420Jj3btrYZtg9ZwebXjibml4Gj9S3+5e4tpSBT
+         wpX/Q6ij0l9dTKlSmI1nrvWocgsVnUXDiKwRHT32LoOmXssog1YLnFfkefG6El7MMS0Q
+         RzXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tL3o525SSbhSebgjQfZMQ7uigsMTO2fDpoEDGUF4HUE=;
-        b=WDMGuZxaSMdI4zQvXvWyh8eZ3TJeAfokl65hqZdIwz/Na3A3ncjqThKbJJ09ZI8X5y
-         DvAY2p10GrG8XuWlaofQY8zVUqFGDzP+g/EZiCnZeBA6Nci0DnKICeqcbnlf02Roh8kF
-         RHV2Bta9dYu9AQTrgdaHamtNBNuMijfCv0NL3l3ZJCVWqcOLtR6VXQacNBv0LVg8jjeG
-         PT0t5jn6eu5DUO54tpulRehlikE4bG9QCbk+e0ODKmD6c3H0cSUuS5tpwFELNNXplgcO
-         C3DlE7oaYFTPsmPg5dTiRPoDQeoQL5wO3AaU6cA7iY2lI0ymcPh3YO8vN4fG1AyNYxeZ
-         3ATw==
-X-Gm-Message-State: AOAM531PJNhUrBAWDnwReq2o7EL1RlCIzn0khx0OmUsOE2b4DPWOYw7E
-        nonO2PODhwRQe4S/SE4tIjKQzRwvFK2cBQ==
-X-Google-Smtp-Source: ABdhPJyX8QJ18MhgVKKInSNZnCJnXEn3TufvHX3LuCasO/H2/ZZH4vXTozIHee1wM/MvTcWLkJaRoA==
-X-Received: by 2002:a05:6638:3381:: with SMTP id h1mr10264337jav.176.1639670740358;
-        Thu, 16 Dec 2021 08:05:40 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=/pPKkXtT6Xrl9aqdgr4UGNl+ZJEtLSBkw/CIGk0Ps8Y=;
+        b=gdlb5CG1cT0Z52+RPu43PxcG0X8D971Bi789nhPwm3zsQyA6q7i0FUqm661q3fiNwU
+         /o4HjNuOH5hdERHBJzIL1HG9xOJTw8fbIB/l4xwv8/FxuqnDaPdNsVL8zlKrAu/ADCx7
+         C4w3Zhwikhjukxi1uBFXq0POqIAMQGHKvJjyc7IXlkUxpmsYbpTM/au7oZLuapVd9GXv
+         YkioKq7ha9kVjc1fX4aYVxKuWCMs3H0JKhV51DOfjhZWL8sWd3n7komJm+SQFVNIouHb
+         IMywbk+LDHd1deQrUMlutah94J4eAvswGDwbG9ia5NqTSdK+fqnVuEWobTnHUxFubTSu
+         RcNQ==
+X-Gm-Message-State: AOAM533icke6isVXA/J/c4dKFiKyRAKLVQ5K7ONOL9PynDq7+zhnmsqy
+        CuM0Cwi+LYSgtIbRY0JiT1BiutrztFgtUQ==
+X-Google-Smtp-Source: ABdhPJyZvGZ7Csc3Ozp6Tn4H9lRpoYb6zejMLBe6rUw9wqFXCf+CxyyNi5MRqbS6MX2EEwjVvOZdiQ==
+X-Received: by 2002:a05:6638:2055:: with SMTP id t21mr10015876jaj.90.1639670741326;
+        Thu, 16 Dec 2021 08:05:41 -0800 (PST)
 Received: from x1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s9sm3237155ild.14.2021.12.16.08.05.39
+        by smtp.gmail.com with ESMTPSA id s9sm3237155ild.14.2021.12.16.08.05.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Dec 2021 08:05:39 -0800 (PST)
+        Thu, 16 Dec 2021 08:05:40 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org
-Subject: [PATCHSET v4 0/4] Add support for list issue
-Date:   Thu, 16 Dec 2021 09:05:33 -0700
-Message-Id: <20211216160537.73236-1-axboe@kernel.dk>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 1/4] block: add mq_ops->queue_rqs hook
+Date:   Thu, 16 Dec 2021 09:05:34 -0700
+Message-Id: <20211216160537.73236-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20211216160537.73236-1-axboe@kernel.dk>
+References: <20211216160537.73236-1-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the support in 5.16-rc1 for allocating and completing batches of
-IO, the one missing piece is passing down a list of requests for issue.
-Drivers can take advantage of this by defining an mq_ops->queue_rqs()
-hook.
+If we have a list of requests in our plug list, send it to the driver in
+one go, if possible. The driver must set mq_ops->queue_rqs() to support
+this, if not the usual one-by-one path is used.
 
-This implements it for NVMe, allowing copy of multiple commands in one
-swoop.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/blk-mq.c         | 26 +++++++++++++++++++++++---
+ include/linux/blk-mq.h |  8 ++++++++
+ 2 files changed, 31 insertions(+), 3 deletions(-)
 
-This is good for around a 500K IOPS/core improvement in my testing,
-which is around a 5-6% improvement in efficiency.
-
-Note to Christoph - I kept the copy helper, since it's used in 3
-spots and I _think_ you ended up being fine with that...
-
-Changes since v3:
-- Use nvme_sq_copy_cmd() in nvme_submit_cmds()
-- Add reviewed-by's
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 75154cc788db..51991232824a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2553,6 +2553,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ {
+ 	struct blk_mq_hw_ctx *this_hctx;
+ 	struct blk_mq_ctx *this_ctx;
++	struct request *rq;
+ 	unsigned int depth;
+ 	LIST_HEAD(list);
+ 
+@@ -2561,7 +2562,28 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	plug->rq_count = 0;
+ 
+ 	if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
+-		struct request_queue *q = rq_list_peek(&plug->mq_list)->q;
++		struct request_queue *q;
++
++		rq = rq_list_peek(&plug->mq_list);
++		q = rq->q;
++
++		/*
++		 * Peek first request and see if we have a ->queue_rqs() hook.
++		 * If we do, we can dispatch the whole plug list in one go. We
++		 * already know at this point that all requests belong to the
++		 * same queue, caller must ensure that's the case.
++		 *
++		 * Since we pass off the full list to the driver at this point,
++		 * we do not increment the active request count for the queue.
++		 * Bypass shared tags for now because of that.
++		 */
++		if (q->mq_ops->queue_rqs &&
++		    !(rq->mq_hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
++			blk_mq_run_dispatch_ops(q,
++				q->mq_ops->queue_rqs(&plug->mq_list));
++			if (rq_list_empty(plug->mq_list))
++				return;
++		}
+ 
+ 		blk_mq_run_dispatch_ops(q,
+ 				blk_mq_plug_issue_direct(plug, false));
+@@ -2573,8 +2595,6 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	this_ctx = NULL;
+ 	depth = 0;
+ 	do {
+-		struct request *rq;
+-
+ 		rq = rq_list_pop(&plug->mq_list);
+ 
+ 		if (!this_hctx) {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 772f8f921526..550996cf419c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -492,6 +492,14 @@ struct blk_mq_ops {
+ 	 */
+ 	void (*commit_rqs)(struct blk_mq_hw_ctx *);
+ 
++	/**
++	 * @queue_rqs: Queue a list of new requests. Driver is guaranteed
++	 * that each request belongs to the same queue. If the driver doesn't
++	 * empty the @rqlist completely, then the rest will be queued
++	 * individually by the block layer upon return.
++	 */
++	void (*queue_rqs)(struct request **rqlist);
++
+ 	/**
+ 	 * @get_budget: Reserve budget before queue request, once .queue_rq is
+ 	 * run, it is driver's responsibility to release the
 -- 
-Jens Axboe
-
+2.34.1
 
