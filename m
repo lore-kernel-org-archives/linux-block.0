@@ -2,180 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 043A4C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 15 Dec 2021 19:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18C8C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 07:22:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231913AbhLOTiw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Dec 2021 14:38:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230009AbhLOTiv (ORCPT
+        id S231903AbhLPHWn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 02:22:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27371 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229452AbhLPHWn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Dec 2021 14:38:51 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F97DC061574;
-        Wed, 15 Dec 2021 11:38:51 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id b22so592836lfb.9;
-        Wed, 15 Dec 2021 11:38:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fOcjE2pXavuKbJCrwB9ewcw0SQq3JyvpjoJ4QyUms+k=;
-        b=o5dMU0DcaUlE+/2CiW05vzfTnr1Z77oVBKfCUQNAWnB/OsBNdI4o54ecYJjM75u9vg
-         rumPl1ANlnY1sGQ5A8QVq5e3qtaAm8tQdpLkLl6uwWVNO1qOYYy6subpsVjKQTyVYwaF
-         03H1MXlzz7LF7VHLRfMSOkuPwwpEwN2pV2cy+59gHDAcZluJ4dV2vm3VfCKKzjP4D1CO
-         dVef13FjgFkkTF+9AKC/EoeP86pYpw3adJVaB3Tb4Oh/qNDgjSA3rT63sUTaCPG2OuPy
-         BKEnXMGA8P0cCLGpbAjuV2s0vSeIsxQblkAns4Dko7VUXD3bBpkBCVsAGh0oAizWbzcL
-         2j/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fOcjE2pXavuKbJCrwB9ewcw0SQq3JyvpjoJ4QyUms+k=;
-        b=q0aPhhld57jN5bfvvCD5mnnI2AiUm+fEw9JU8wMvH42kQ8gLKTSi/NBwhwaNHCFzHn
-         qEpWJpPDnOVbqfUumSGgemsinVmWGUJkcofigR6pgTHuWCGf+Wimj2m7Z+PHuDbT1AUB
-         3u+R5vXuEqI/f321iHWx+qy+X9fvBDe6q/gcjpKmKN1mJ4WsFdNJnJx66hOlJwOBk4dT
-         2zahbCCdVWrgDZiu+mK9Uw6dmjrEaJMcYG9BglIYu6HWFJFBxD3BrA2sNKflM498KA+e
-         S8/iAFzE1kiC+APkbc8QLMnaUNiYqVZosP6XFU3g+F/oR1bfZiAKRnMKtt8Iz+VOOr6j
-         5LIQ==
-X-Gm-Message-State: AOAM530M6wNt+10VZ7Z5DeUPjut91e8i4DTyzjSa6lFFrhenz/1xELli
-        jjoz6Gc3ImNbq7iwaGtRjw4=
-X-Google-Smtp-Source: ABdhPJxHpQcpecZHC7OldNt5DYzoOYI16J+5esNrAprCo/D3ilVrZV5uhXycQ2Cd340qZ/0p+0tZhA==
-X-Received: by 2002:a05:6512:2347:: with SMTP id p7mr11387141lfu.304.1639597129414;
-        Wed, 15 Dec 2021 11:38:49 -0800 (PST)
-Received: from pc638.lan (h5ef52e3d.seluork.dyn.perspektivbredband.net. [94.245.46.61])
-        by smtp.gmail.com with ESMTPSA id u22sm463719lff.118.2021.12.15.11.38.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Dec 2021 11:38:48 -0800 (PST)
-From:   Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc638.lan>
-Date:   Wed, 15 Dec 2021 20:38:46 +0100
-To:     Jens Axboe <axboe@kernel.dk>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org
-Cc:     LKML <linux-kernel@vger.kernel.org>, RCU <rcu@vger.kernel.org>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Michal Hocko <mhocko@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Daniel Axtens <dja@axtens.net>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Neeraj Upadhyay <neeraju@codeaurora.org>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Oleksiy Avramchenko <oleksiy.avramchenko@sonymobile.com>
-Subject: Re: [PATCH] drdb: Switch to kvfree_rcu() API
-Message-ID: <YbpERiPKO4ufe1hf@pc638.lan>
-References: <20211215111845.2514-1-urezki@gmail.com>
+        Thu, 16 Dec 2021 02:22:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639639362;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Gh7OfxB6gHNNIY1MGf+TNdGG2hD+gXIjCaTRnCEV9Xc=;
+        b=V9xwvNexcBz+0Oh/gHpjxLwpu+FXFsQEG5zAlIKaKjD3jtiA/8OELCGtmyReQzRqsIMZ3c
+        o3SG7th+zkLLHZtERdrEBKfyFa245nzn2a7TSc6gldd0+nD0oYEAE/ZfDNsI9mT/5Cjcgx
+        MKC2rkQUhaPpNKBnR3uru9/vOA1J8Kw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-622-f-ujoBuZPmif9U0Fx45zQA-1; Thu, 16 Dec 2021 02:22:39 -0500
+X-MC-Unique: f-ujoBuZPmif9U0Fx45zQA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 643618042F6;
+        Thu, 16 Dec 2021 07:22:38 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A8CF47EBDD;
+        Thu, 16 Dec 2021 07:22:15 +0000 (UTC)
+Date:   Thu, 16 Dec 2021 15:22:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Dexuan Cui <decui@microsoft.com>, linux-scsi@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH] block: reduce kblockd_mod_delayed_work_on() CPU
+ consumption
+Message-ID: <YbrpIQUs4WOhyiIX@T590>
+References: <bc529a3e-31d5-c266-8633-91095b346b19@kernel.dk>
+ <YbiyhcbZmnNbed3O@infradead.org>
+ <53b6fac0-10cb-80ab-16e7-ee851b720d5e@kernel.dk>
+ <883ad44e-8421-1cb5-f3f4-4a8d193e2d5a@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211215111845.2514-1-urezki@gmail.com>
+In-Reply-To: <883ad44e-8421-1cb5-f3f4-4a8d193e2d5a@acm.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 15, 2021 at 12:18:37PM +0100, Uladzislau Rezki (Sony) wrote:
-> Instead of invoking a synchronize_rcu() to free a pointer
-> after a grace period we can directly make use of new API
-> that does the same but in more efficient way.
+On Wed, Dec 15, 2021 at 09:40:38AM -0800, Bart Van Assche wrote:
+> On 12/14/21 7:59 AM, Jens Axboe wrote:
+> > On 12/14/21 8:04 AM, Christoph Hellwig wrote:
+> > > So why not do a non-delayed queue_work for that case?  Might be good
+> > > to get the scsi and workqueue maintaines involved to understand the
+> > > issue a bit better first.
+> > 
+> > We can probably get by with doing just that, and just ignore if a delayed
+> > work timer is already running.
+> > 
+> > Dexuan, can you try this one?
+> > 
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index 1378d084c770..c1833f95cb97 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -1484,6 +1484,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
+> >   int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
+> >   				unsigned long delay)
+> >   {
+> > +	if (!delay)
+> > +		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
+> >   	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
+> >   }
+> >   EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
 > 
-> TO: Jens Axboe <axboe@kernel.dk>
-> TO: Philipp Reisner <philipp.reisner@linbit.com>
-> TO: Jason Gunthorpe <jgg@nvidia.com>
-> TO: drbd-dev@lists.linbit.com
-> TO: linux-block@vger.kernel.org
-> Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
-> ---
->  drivers/block/drbd/drbd_nl.c       | 9 +++------
->  drivers/block/drbd/drbd_receiver.c | 6 ++----
->  drivers/block/drbd/drbd_state.c    | 3 +--
->  3 files changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> index 44ccf8b4f4b2..28f4d84945fd 100644
-> --- a/drivers/block/drbd/drbd_nl.c
-> +++ b/drivers/block/drbd/drbd_nl.c
-> @@ -1679,8 +1679,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
->  			drbd_send_sync_param(peer_device);
->  	}
->  
-> -	synchronize_rcu();
-> -	kfree(old_disk_conf);
-> +	kvfree_rcu(old_disk_conf);
->  	kfree(old_plan);
->  	mod_timer(&device->request_timer, jiffies + HZ);
->  	goto success;
-> @@ -2511,8 +2510,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
->  
->  	mutex_unlock(&connection->resource->conf_update);
->  	mutex_unlock(&connection->data.mutex);
-> -	synchronize_rcu();
-> -	kfree(old_net_conf);
-> +	kvfree_rcu(old_net_conf);
->  
->  	if (connection->cstate >= C_WF_REPORT_PARAMS) {
->  		struct drbd_peer_device *peer_device;
-> @@ -2925,8 +2923,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct genl_info *info)
->  		new_disk_conf->disk_size = (sector_t)rs.resize_size;
->  		rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
->  		mutex_unlock(&device->resource->conf_update);
-> -		synchronize_rcu();
-> -		kfree(old_disk_conf);
-> +		kvfree_rcu(old_disk_conf);
->  		new_disk_conf = NULL;
->  	}
->  
-> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> index 1f740e42e457..d73a53242a75 100644
-> --- a/drivers/block/drbd/drbd_receiver.c
-> +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -3799,8 +3799,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
->  		drbd_info(connection, "peer data-integrity-alg: %s\n",
->  			  integrity_alg[0] ? integrity_alg : "(none)");
->  
-> -	synchronize_rcu();
-> -	kfree(old_net_conf);
-> +	kvfree_rcu(old_net_conf);
->  	return 0;
->  
->  disconnect_rcu_unlock:
-> @@ -4168,8 +4167,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
->  
->  			rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
->  			mutex_unlock(&connection->resource->conf_update);
-> -			synchronize_rcu();
-> -			kfree(old_disk_conf);
-> +			kvfree_rcu(old_disk_conf);
->  
->  			drbd_info(device, "Peer sets u_size to %lu sectors (old: %lu)\n",
->  				 (unsigned long)p_usize, (unsigned long)my_usize);
-> diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
-> index b8a27818ab3f..826e496821c7 100644
-> --- a/drivers/block/drbd/drbd_state.c
-> +++ b/drivers/block/drbd/drbd_state.c
-> @@ -2071,8 +2071,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
->  		conn_free_crypto(connection);
->  		mutex_unlock(&connection->resource->conf_update);
->  
-> -		synchronize_rcu();
-> -		kfree(old_conf);
-> +		kvfree_rcu(old_conf);
->  	}
->  
->  	if (ns_max.susp_fen) {
-> -- 
-> 2.30.2
-> 
-+ Jens Axboe <axboe@kernel.dk>
-+ Philipp Reisner <philipp.reisner@linbit.com>
-+ Jason Gunthorpe <jgg@nvidia.com>
-+ drbd-dev@lists.linbit.com
-+ linux-block@vger.kernel.org
+> As Christoph already mentioned, it would be great to receive feedback from the
+> workqueue maintainer about this patch since I'm not aware of other kernel code
+> that queues delayed_work in a similar way.
+> Regarding the feedback from the view of the SCSI subsystem: I'd like to see the
+> block layer core track whether or not a queue needs to be run such that the
+> scsi_run_queue_async() call can be removed from scsi_end_request(). No such call
 
---
-Vlad Rezki
+scsi_run_queue_async() is just for handling restart from running out of
+scsi's device queue limit, which shouldn't be hot now, and it is for
+handling scsi's own queue limit.
+
+> was present in the original conversion of the SCSI core from the legacy block
+> layer to blk-mq. See also commit d285203cf647 ("scsi: add support for a blk-mq
+> based I/O path.").
+
+That isn't true, see scsi_next_command()->scsi_run_queue().
+
+
+Thanks,
+Ming
+
