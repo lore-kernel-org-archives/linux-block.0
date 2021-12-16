@@ -2,81 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C440C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 15:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0B4C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 15:41:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237994AbhLPPAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 10:00:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50798 "EHLO
+        id S238484AbhLPPla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 10:41:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238029AbhLPPAc (ORCPT
+        with ESMTP id S238592AbhLPPl3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 10:00:32 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE5BC061574;
-        Thu, 16 Dec 2021 07:00:32 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id y12so87067029eda.12;
-        Thu, 16 Dec 2021 07:00:32 -0800 (PST)
+        Thu, 16 Dec 2021 10:41:29 -0500
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5DAC06173E
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 07:41:29 -0800 (PST)
+Received: by mail-io1-xd30.google.com with SMTP id y16so35725068ioc.8
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 07:41:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=L049ONQywJ6H/KZx9A7zcZi3+9QPQbN67lLTXpZqhJg=;
-        b=Y0CCyIX577ItMuVjdK7JK8S3erVUlwtSe05Y/0yfQu00Xox2RQ34Mft3N3Tvv+HHf2
-         Tg9+wMomgiknz17BgjyK9WQKsfa48pSUcZmkf1FL8h9JQHUlPqYlC+HvM4Q7UixtljTV
-         U3Mh5WLIFcM6YMuP8Y8ZxqwLEKhRvrOAWL/VuUDsnRFLV9fIw5vFpOws/UPwE24VbR18
-         MlaWMbitpIIpuBtTIY9/Bn9PKJo0teb7IdnF4KVYCQyI83FSHHW2KTAZywmFIkfTuMxK
-         0amWx/yCFeJSIkRZl3A1qGZBNggfeUqJ6x3zHy3augRwPGfIY1eGo/GqKI11YlqXhPqO
-         7Zow==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MP+T3S95w7/Wr3GB0++QH4Oo4hV/4bl0WcXKRoTLGQ0=;
+        b=evOjiqfRtE8boAoAd9ey6rKsowHC91NdzVLe8IIOQ4b1W0oxAcbWN3qES/e+bG37eA
+         /7MKrSEsOKK4Al6LohurfbKIb9PibRrx8erXp7J2zuW7REqCqup9f/AHDovHpy/Pj/JH
+         QfxEefXcv/c+EZ/kJZjaUVq4BuMIta3R+f90Xq0/rAgAFsV87UTxjDdJJ+bU/exZbtVB
+         NC9JKYMftiJoN4nqAYENi14C+DXAU3Gfq+1MSH5B9RL8DKDtKdcUQX5ZtZBvXJdYCNtv
+         F3GdDGq7kPcv575Net9cOdZBH1FU5RhLteC33ibOwpzaH/ASwr+OhcoTiOrkW7Q9ltm7
+         uLZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=L049ONQywJ6H/KZx9A7zcZi3+9QPQbN67lLTXpZqhJg=;
-        b=KdYhrtfozbtsAoWY2m0FHJq5eD9uNSvJtPJ7G0O7/yFtbA8hXfI76Mg6Vvvg8eBqSD
-         LLEgPvkfQgDIiS6Ipm6TXfefLdTBcVz4fBUIQgdbBAMznhoH2Q1QsxMh3ACahlMLRtyf
-         0SXsJ6JRTN7w0JH1zTVCQpivvzh2iZ5U23eNDMl9COrpNutKs8s/7DTt1N18+WL5BMRx
-         rLlnFhJXzmONrk2jP4+PgX7d+DvT66OPYlRwl9f3p/nwPMM3NfDcs17O13UDEcSD3/7S
-         wvoja2AdpEtyd6QOrxvvGSfWVahk7Pk7w2WzTAbBNdkHC467FuTRQy2otW0nUaGndQQe
-         KEEQ==
-X-Gm-Message-State: AOAM532NPmR9g9wQEGl0wSeL2lLsymduxoSBtxBbW5FNKI0TmhanwRRX
-        kRh5mrqt4xCNOWfCt+aQowM=
-X-Google-Smtp-Source: ABdhPJwM22q+zKYOW3oqdNbMsAG8SeJf3yN12RL90IIq1gsRVgdIJQLHi/OKiuYN6ZUGrAXAyTlQ6Q==
-X-Received: by 2002:a17:907:7211:: with SMTP id dr17mr14718856ejc.204.1639666826368;
-        Thu, 16 Dec 2021 07:00:26 -0800 (PST)
-Received: from zenorus.myxoz.lan (81-224-108-56-no2390.tbcn.telia.com. [81.224.108.56])
-        by smtp.gmail.com with ESMTPSA id n3sm2473969edw.58.2021.12.16.07.00.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Dec 2021 07:00:26 -0800 (PST)
-Date:   Thu, 16 Dec 2021 16:00:21 +0100
-From:   Miko Larsson <mikoxyzzz@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MP+T3S95w7/Wr3GB0++QH4Oo4hV/4bl0WcXKRoTLGQ0=;
+        b=iiJQMA3tHeBD3NtSwHWa+5iPC/OKdy4YlsatiDu99yYq1H3hj+Ao9p/MTm3V2wL1D3
+         1px4jHzZchGjzswxkg0qIp92eno3QtV912hlZrVwpCdoGro+Evqu3iY7Cu5YeoNrKoaq
+         NdjtztEekFWTFmMLB7OhF/mQCpsGGuUnnSg8PK82fW8NnUajTdhTwQ0qgtNeap2tz57G
+         0DDOJu5RoN/k5gMkiJqcPmzS9t6MtCYy28RUTrEwqNdywStBb6nQXHBunoXFp88RT9Xn
+         9VadXIZFmmWY/IpAz9z6krH9oLOJVbXnkzXly2cESs4PxXKse50W3oEmarmRVcWv4Vqm
+         1yZQ==
+X-Gm-Message-State: AOAM532TI5nm5WzGJ8CX1BWbhAUlw/ODf6BaT/1hYaDBhVAUZTFWpZfu
+        Dt4Ej3UMZl70Z5n3YKD4VwXpifCAk/aoqA==
+X-Google-Smtp-Source: ABdhPJzdm4qSTLH4VkMPxlI2m6ERABTsKKJ4m7mPGBKBPzteAcbMkw4q+kYTqt0WuqpL8lTMFOmCCQ==
+X-Received: by 2002:a05:6638:24c3:: with SMTP id y3mr9504683jat.305.1639669288784;
+        Thu, 16 Dec 2021 07:41:28 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id z17sm2788790ior.22.2021.12.16.07.41.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Dec 2021 07:41:28 -0800 (PST)
+Subject: Re: [PATCH 3/3] block: enable bio allocation cache for IRQ driven IO
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] zram: zram_drv: replace strlcpy with strscpy
-Message-ID: <20211216160021.1b9e6d87@zenorus.myxoz.lan>
-In-Reply-To: <YbsRlDYT2BfgrXRX@infradead.org>
-References: <20211215192128.108967-1-mikoxyzzz@gmail.com>
-        <20211215192128.108967-3-mikoxyzzz@gmail.com>
-        <YbsRlDYT2BfgrXRX@infradead.org>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.30; x86_64-pc-linux-gnu)
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
+References: <20211215163009.15269-1-axboe@kernel.dk>
+ <20211215163009.15269-4-axboe@kernel.dk> <YbtOIA7eI0nyh8rb@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <25bd6311-0360-a88e-001c-29c309c8e658@kernel.dk>
+Date:   Thu, 16 Dec 2021 08:41:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <YbtOIA7eI0nyh8rb@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 16 Dec 2021 02:14:44 -0800
-Christoph Hellwig <hch@infradead.org> wrote:
-
-> On Wed, Dec 15, 2021 at 08:21:28PM +0100, Miko Larsson wrote:
-> > strlcpy shouldn't be used; strscpy should be used instead.
+On 12/16/21 7:33 AM, Christoph Hellwig wrote:
+> On Wed, Dec 15, 2021 at 09:30:09AM -0700, Jens Axboe wrote:
+>> We currently cannot use the bio recycling allocation cache for IRQ driven
+>> IO, as the cache isn't IRQ safe (by design).
+>>
+>> Add a way for the completion side to pass back a bio that needs freeing,
+>> so we can do it from the io_uring side. io_uring completions always
+>> run in task context.
+>>
+>> This is good for about a 13% improvement in IRQ driven IO, taking us from
+>> around 6.3M/core to 7.1M/core IOPS.
 > 
-> I think the proper API to use here would be kmemdup_nul.
+> The numbers looks great, but I really hate how it ties the caller into
+> using a bio.  I'll have to think hard about a better structure.
 
-Thanks for the heads-up! That only seems to apply to the assignment of
-'file_name'. The usage of strscpy seems to be correct in the other two
-cases, though (since they're char arrays.) I suspect I might be wrong
-though, since my knowledge of C is shabby at best.
+Yeah it's definitely not the prettiest, but I haven't been able to come
+up with a better approach so far. I don't think the bio association is
+the worst, can't imagine we'd want to tie it to something else. I might
+be wrong...
+
+Ideally we'd flip the completion model upside down here, instead of
+having ->bi_end_io() call ->ki_complete.
+
+> Just curious:  are the numbers with retpolines or without?  Do you care
+> about the cost of indirect calls with retpolines for these benchmarks?
+
+No mitigations enabled for these tests, so no retpoline. I definitely do
+care about indirect call performance. The peak testing so far has been
+mostly focused on best case - various features disabled that are common
+but costly, and no mitigations enabled. Mostly because it's necessary to
+break down the issues one-by-one, and the intent has always been to move
+towards making common options less expensive too. Most of the patches
+cover both bases, but there are also cases where we want to fix just
+items that are costly when features/mitigations are enabled.
+
+
+-- 
+Jens Axboe
+
