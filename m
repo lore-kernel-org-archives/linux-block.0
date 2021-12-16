@@ -2,135 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C00C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EFBC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:39:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239519AbhLPQeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:34:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46374 "EHLO
+        id S233274AbhLPQjE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:39:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239473AbhLPQeJ (ORCPT
+        with ESMTP id S229480AbhLPQjE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:34:09 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FAF0C06173E
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:34:09 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id t5so88905003edd.0
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:34:09 -0800 (PST)
+        Thu, 16 Dec 2021 11:39:04 -0500
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD812C061574
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:39:03 -0800 (PST)
+Received: by mail-il1-x12c.google.com with SMTP id d17so4620486ils.8
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:39:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=YIxQQ6KDBZhBgpCjwTDT7xZgLL24q7Pq/WYlBcp43Wc=;
-        b=P4zJ4MdxI3Nrq2mTejPtTAUCz2UTy2xuQFXkgZ51A3KEZY3c8BbN2FMPLzvgbMKG/q
-         2CS3yZFEyqHxMzPI6X1GpdoEf7/MOX2c3YmQETBCmfW78pISipn2xqcOZbdiJgvCNJiw
-         3VJ2atCKDqhYMLBfQPRzc95ji4OpWuWcZG6iYnojd5q6N19g6zvgS20ZcXYBq+xz3uM+
-         Ror14fJKf1hGgsQL8KDApaQr3lj8beuTP3xEei2gF56D1gL6W7lmSjr0NrbQP3GXVzpm
-         FAY4tBJcjTbSjdm3thtN8R96q5Qt/7rsyyynLkRfFW7fF8ZlcPnfDkvN3Y1lE37hmhOW
-         Zkzw==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WuiksDPLX46rGvth8ZoLiIY5pKEIITYAcJQliALs1ec=;
+        b=4kV/CAF4VTowFvtMxlL6qG65R7GTZCDJGnm57mJgsFe2IxB8sjZV4ldX32hYm+sutJ
+         ucztWjponY482RE/7JFN9AFRkvMCKrbTQBjmmmfo1NMXX9S9YNdPU+CHcwGfQQUEoK2y
+         W5bBpg2mcTEHGWaFOM2ES0EXhlrl95fUuwxsBEFoF4DvK3iP2gVzj3ho5eiy79YnfA2+
+         +cBkEY26aWtKl7wG9lvddzHhQiClvUjIzl1MIYODSvVSchKeXNmLZeuZE71Gd5P/NRyt
+         LeTY6kB4GSzQnzW72FYH5tFp/kSUKMoOpfnPjuLM6O8OxaePESKHpUF7djO+Q3dci1p/
+         yvRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=YIxQQ6KDBZhBgpCjwTDT7xZgLL24q7Pq/WYlBcp43Wc=;
-        b=GLiuEVXiKbyT1zVuMCDeK4hPcYHguYwTXrxPsodGd7gT8AyOMi1mdt7zlM0cNs1pnS
-         rgOERU7K4AtAxvzvrkcYkIaLSaIobUFtEAZyUVwSovtsVxyI1EPMwDYOrRxheHRWluVY
-         HDXHV4utWSP9f+nQYvQQPoH2ENYivn2ggnsjYUbKd/01FZatb/clM59Njt50hlimwwQE
-         ys1VIhsmoX3mf51WuC2fA3RS+P+Ws9ubJflqDNVaKelYTZ+wRPib3DprTAYX8kXbDerr
-         sHerMihOyc1buHEzlZU3clLC7dh0AVSVYBBfQ/pue9xXIucHn3ZlN3j1G3DZl0Gm4yP5
-         wbAw==
-X-Gm-Message-State: AOAM533wj6bK3XNADL4lryWcGIOz7+tC9BQlGYptabrDcBjBE06LqzS9
-        QGEyRXtkyVmC0aGq3EDj9/L3Xw==
-X-Google-Smtp-Source: ABdhPJzF8h8sUsqhmrPvbnHY0/fmYX/iET/VxwEtCPRcQ1Dc0xW/7REFzhZEkkq+0vwLjwhjjvUEIA==
-X-Received: by 2002:a17:906:c7c9:: with SMTP id dc9mr6960432ejb.559.1639672448083;
-        Thu, 16 Dec 2021 08:34:08 -0800 (PST)
-Received: from [192.168.1.5] (net-93-70-85-238.cust.vodafonedsl.it. [93.70.85.238])
-        by smtp.gmail.com with ESMTPSA id 8sm1956208ejb.9.2021.12.16.08.34.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 16 Dec 2021 08:34:07 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH RFC 9/9] block, bfq: decrease
- 'num_groups_with_pending_reqs' earlier
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <4765e7f8-48b7-3bc6-5eb6-1dc0a569233d@huawei.com>
-Date:   Thu, 16 Dec 2021 17:34:06 +0100
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B5C2B1F6-4DF9-4657-AFF4-D53DD04A65DC@linaro.org>
-References: <20211127101132.486806-1-yukuai3@huawei.com>
- <20211127101132.486806-10-yukuai3@huawei.com>
- <AA66019E-FD14-4821-B53D-0C56EEC38828@linaro.org>
- <4765e7f8-48b7-3bc6-5eb6-1dc0a569233d@huawei.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WuiksDPLX46rGvth8ZoLiIY5pKEIITYAcJQliALs1ec=;
+        b=ZuqPd2Pf717MLJXLSMn/Y9H3/6UPSyKwSbwdeQ1zKMMLgxwv4MXYrk/wqJx9LchAc8
+         BwCevYHho5HC2mQ3wG7Q2759Lvu3pfAsPiPP+nmbeQpV2cdWIaRX6zrNzgAs8xm+mJ7W
+         TTTUQje88A42rRkILQNHKRBlpkQmblXbq6Dju6FWZx3b15Zo15HYCztwWYJc/cOH4icd
+         ch2KKab95OWgiTKZw/yvczpvGftSFRv47AhD4zCev1jUTigZLgO7X4UOuu4JM4+iWym+
+         orJ80Oi9+6D8oJ47dhk7xKstQtDlVUqCVZSBBuaxoBGCEHIp/0LlFo843jQrMqjlw+qY
+         WVrQ==
+X-Gm-Message-State: AOAM533eyLM6ytnWyk3mwxQMh/dR2wz3TW/JkkqXHXibNZQRxOppeWGp
+        Ohm7k3CEMSjQxFXnyuRwsr8ivZTMsXiyXQ==
+X-Google-Smtp-Source: ABdhPJye2SGmV1G1NKox7Eax5N3l1SrMAtCAMBAWdWiCRRAjLXyT7evL1MC0E1nB77hJVO4q9ObJ9g==
+X-Received: by 2002:a92:cdaa:: with SMTP id g10mr9703007ild.142.1639672743161;
+        Thu, 16 Dec 2021 08:39:03 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id t17sm71816ilm.46.2021.12.16.08.39.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 08:39:02 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: [PATCHSET v5 0/4] Add support for list issue
+Date:   Thu, 16 Dec 2021 09:38:57 -0700
+Message-Id: <20211216163901.81845-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
+With the support in 5.16-rc1 for allocating and completing batches of
+IO, the one missing piece is passing down a list of requests for issue.
+Drivers can take advantage of this by defining an mq_ops->queue_rqs()
+hook.
 
-> Il giorno 11 dic 2021, alle ore 03:10, yukuai (C) <yukuai3@huawei.com> =
-ha scritto:
->=20
-> =E5=9C=A8 2021/12/10 18:21, Paolo Valente =E5=86=99=E9=81=93:
->>> Il giorno 27 nov 2021, alle ore 11:11, Yu Kuai<yukuai3@huawei.com>  =
-ha scritto:
->>>=20
->>> Currently 'num_groups_with_pending_reqs' won't be decreased when
->>> the group doesn't have any pending requests, while any child group
->>> have any pending requests. The decrement is delayed to when all the
->>> child groups doesn't have any pending requests.
->>>=20
->>> For example:
->>> 1) t1 issue sync io on root group, t2 and t3 issue sync io on the =
-same
->>> child group. num_groups_with_pending_reqs is 2 now.
->>> 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 =
-and
->>> t3 still can't be handled concurrently.
->>>=20
->>> Fix the problem by decreasing 'num_groups_with_pending_reqs'
->>> immediately upon the deactivation of last entity of the group.
->>>=20
->> I don't understand this patch clearly.
->> I understand your proposal not to count a group as with pending =
-requests, in case no child process of the group has IO, but only its =
-child groups have pending requests.
->> So, entities here are only queues for this patch?
->> If they are only queues, I think it is still incorrect to remove the =
-group from the count of groups with pending IO when all its child queues =
-are deactivated, because there may still be unfinished IO for those =
-queues.
->=20
-> Hi, Paolo
->=20
-> bfq_weights_tree_remove() will be called when all requests are =
-completed
-> in bfq_queue, thus I recored how many queues have pending requests
-> through weights tree insertion and removal.(Details in patch 7)
->=20
-> Thus when calling bfq_weights_tree_remove() for bfqq, I can check if
-> there are no queues have pending requests for parent bfqg:
->=20
-> if (!bfqg->num_entities_with_pending_reqs && -> no queues with pending =
-reqs
->    entity->in_groups_with_pending_reqs) {   -> the group is counted
->=20
+This implements it for NVMe, allowing copy of multiple commands in one
+swoop.
 
-Ok, I got confused because you use the term deactivation.  Yet you
-seem to decrement the counter at the right time.  Maybe fix that term,
-in commit messages and comments.
+This is good for around a 500K IOPS/core improvement in my testing,
+which is around a 5-6% improvement in efficiency.
 
-Thanks,
-Paolo
+Note to Christoph - I kept the copy helper, since it's used in 3
+spots and I _think_ you ended up being fine with that...
 
-> Thanks,
-> Kuai
->> Am I missing something?
->> Thanks,
->> Paolo
+Changes since v4:
+- Get rid of nvme_submit_cmd()
+- Check for prev == NULL for batched issue
+
 
