@@ -2,108 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0B4C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 15:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28985C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:00:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238484AbhLPPla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 10:41:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60564 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238592AbhLPPl3 (ORCPT
+        id S238644AbhLPQAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:00:13 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:54981 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232642AbhLPQAL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 10:41:29 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5DAC06173E
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 07:41:29 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id y16so35725068ioc.8
-        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 07:41:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=MP+T3S95w7/Wr3GB0++QH4Oo4hV/4bl0WcXKRoTLGQ0=;
-        b=evOjiqfRtE8boAoAd9ey6rKsowHC91NdzVLe8IIOQ4b1W0oxAcbWN3qES/e+bG37eA
-         /7MKrSEsOKK4Al6LohurfbKIb9PibRrx8erXp7J2zuW7REqCqup9f/AHDovHpy/Pj/JH
-         QfxEefXcv/c+EZ/kJZjaUVq4BuMIta3R+f90Xq0/rAgAFsV87UTxjDdJJ+bU/exZbtVB
-         NC9JKYMftiJoN4nqAYENi14C+DXAU3Gfq+1MSH5B9RL8DKDtKdcUQX5ZtZBvXJdYCNtv
-         F3GdDGq7kPcv575Net9cOdZBH1FU5RhLteC33ibOwpzaH/ASwr+OhcoTiOrkW7Q9ltm7
-         uLZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MP+T3S95w7/Wr3GB0++QH4Oo4hV/4bl0WcXKRoTLGQ0=;
-        b=iiJQMA3tHeBD3NtSwHWa+5iPC/OKdy4YlsatiDu99yYq1H3hj+Ao9p/MTm3V2wL1D3
-         1px4jHzZchGjzswxkg0qIp92eno3QtV912hlZrVwpCdoGro+Evqu3iY7Cu5YeoNrKoaq
-         NdjtztEekFWTFmMLB7OhF/mQCpsGGuUnnSg8PK82fW8NnUajTdhTwQ0qgtNeap2tz57G
-         0DDOJu5RoN/k5gMkiJqcPmzS9t6MtCYy28RUTrEwqNdywStBb6nQXHBunoXFp88RT9Xn
-         9VadXIZFmmWY/IpAz9z6krH9oLOJVbXnkzXly2cESs4PxXKse50W3oEmarmRVcWv4Vqm
-         1yZQ==
-X-Gm-Message-State: AOAM532TI5nm5WzGJ8CX1BWbhAUlw/ODf6BaT/1hYaDBhVAUZTFWpZfu
-        Dt4Ej3UMZl70Z5n3YKD4VwXpifCAk/aoqA==
-X-Google-Smtp-Source: ABdhPJzdm4qSTLH4VkMPxlI2m6ERABTsKKJ4m7mPGBKBPzteAcbMkw4q+kYTqt0WuqpL8lTMFOmCCQ==
-X-Received: by 2002:a05:6638:24c3:: with SMTP id y3mr9504683jat.305.1639669288784;
-        Thu, 16 Dec 2021 07:41:28 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id z17sm2788790ior.22.2021.12.16.07.41.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Dec 2021 07:41:28 -0800 (PST)
-Subject: Re: [PATCH 3/3] block: enable bio allocation cache for IRQ driven IO
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20211215163009.15269-1-axboe@kernel.dk>
- <20211215163009.15269-4-axboe@kernel.dk> <YbtOIA7eI0nyh8rb@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <25bd6311-0360-a88e-001c-29c309c8e658@kernel.dk>
-Date:   Thu, 16 Dec 2021 08:41:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 16 Dec 2021 11:00:11 -0500
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BGG01Va003055;
+        Fri, 17 Dec 2021 01:00:01 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Fri, 17 Dec 2021 01:00:01 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BGG01EE003052
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 17 Dec 2021 01:00:01 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp>
+Date:   Fri, 17 Dec 2021 01:00:00 +0900
 MIME-Version: 1.0
-In-Reply-To: <YbtOIA7eI0nyh8rb@infradead.org>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
 Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     linux-block <linux-block@vger.kernel.org>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: [PATCH] block: fix error handling for device_add_disk
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/16/21 7:33 AM, Christoph Hellwig wrote:
-> On Wed, Dec 15, 2021 at 09:30:09AM -0700, Jens Axboe wrote:
->> We currently cannot use the bio recycling allocation cache for IRQ driven
->> IO, as the cache isn't IRQ safe (by design).
->>
->> Add a way for the completion side to pass back a bio that needs freeing,
->> so we can do it from the io_uring side. io_uring completions always
->> run in task context.
->>
->> This is good for about a 13% improvement in IRQ driven IO, taking us from
->> around 6.3M/core to 7.1M/core IOPS.
-> 
-> The numbers looks great, but I really hate how it ties the caller into
-> using a bio.  I'll have to think hard about a better structure.
+syzbot is reporting double kfree() bug in disk_release_events() [1], for
+commit 9be68dd7ac0e13be ("md: add error handling support for add_disk()")
+is calling blk_cleanup_disk() which will call disk_release_events() from
+regular kobject_release() path when device_add_disk() from add_disk()
+failed.
 
-Yeah it's definitely not the prettiest, but I haven't been able to come
-up with a better approach so far. I don't think the bio association is
-the worst, can't imagine we'd want to tie it to something else. I might
-be wrong...
+Since kobject_release() will be always called regardless of whether
+device_add_disk() from add_disk() succeeds, we should leave
+disk_release_events() to regular kobject_release() path.
 
-Ideally we'd flip the completion model upside down here, instead of
-having ->bi_end_io() call ->ki_complete.
+Link: https://syzkaller.appspot.com/bug?extid=28a66a9fbc621c939000 [1]
+Reported-by: syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
+Tested-by: syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
+Fixes: 83cbce9574462c6b ("block: add error handling for device_add_disk / add_disk")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ block/genhd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Just curious:  are the numbers with retpolines or without?  Do you care
-> about the cost of indirect calls with retpolines for these benchmarks?
-
-No mitigations enabled for these tests, so no retpoline. I definitely do
-care about indirect call performance. The peak testing so far has been
-mostly focused on best case - various features disabled that are common
-but costly, and no mitigations enabled. Mostly because it's necessary to
-break down the issues one-by-one, and the intent has always been to move
-towards making common options less expensive too. Most of the patches
-cover both bases, but there are also cases where we want to fix just
-items that are costly when features/mitigations are enabled.
-
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 30362aeacac4..47bb34ab967b 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -540,7 +540,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ out_device_del:
+ 	device_del(ddev);
+ out_disk_release_events:
+-	disk_release_events(disk);
++	/* disk_release() will call disk_release_events(). */
+ out_free_ext_minor:
+ 	if (disk->major == BLOCK_EXT_MAJOR)
+ 		blk_free_ext_minor(disk->first_minor);
 -- 
-Jens Axboe
-
+2.32.0
