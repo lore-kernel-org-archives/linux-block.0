@@ -2,78 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28985C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD56C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 16 Dec 2021 16:05:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238644AbhLPQAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:00:13 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:54981 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232642AbhLPQAL (ORCPT
+        id S238784AbhLPQFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:05:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38150 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233135AbhLPQFl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:00:11 -0500
-Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BGG01Va003055;
-        Fri, 17 Dec 2021 01:00:01 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
- Fri, 17 Dec 2021 01:00:01 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BGG01EE003052
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 17 Dec 2021 01:00:01 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp>
-Date:   Fri, 17 Dec 2021 01:00:00 +0900
+        Thu, 16 Dec 2021 11:05:41 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0035AC061574
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:40 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id b187so35767760iof.11
+        for <linux-block@vger.kernel.org>; Thu, 16 Dec 2021 08:05:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tL3o525SSbhSebgjQfZMQ7uigsMTO2fDpoEDGUF4HUE=;
+        b=0LEQNGb1bTHq9e+hYsc3l+U2okJ0k4nHCnm1dhpKeonjqY5/ZM5neoakgeOcnU8rMt
+         pqd/Xs3gl8OfNB5zpWbbHRemeoSAhzx4OjzZC9/nUuQ5hNpz9f5iBm0955pOnS1isizS
+         JAip0m3naR8v4h1fESL4IKpKKycnMHxyPGjlktYqX9o1oKPQgvGE6+BklJ58NVHSreeu
+         pIxhC+CTNkzBhAgy0G4S4qMsOTW6SLnoF3binn+Y5vangPa3tr2JNByLyvb6RJlZUOSc
+         Q6M4wLWZjHPSPDI/FLUA7mI2SPGwGpULFNf82V7VdpjkSXl9392Ow7vVukUVOmKvpL0U
+         /eNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tL3o525SSbhSebgjQfZMQ7uigsMTO2fDpoEDGUF4HUE=;
+        b=WDMGuZxaSMdI4zQvXvWyh8eZ3TJeAfokl65hqZdIwz/Na3A3ncjqThKbJJ09ZI8X5y
+         DvAY2p10GrG8XuWlaofQY8zVUqFGDzP+g/EZiCnZeBA6Nci0DnKICeqcbnlf02Roh8kF
+         RHV2Bta9dYu9AQTrgdaHamtNBNuMijfCv0NL3l3ZJCVWqcOLtR6VXQacNBv0LVg8jjeG
+         PT0t5jn6eu5DUO54tpulRehlikE4bG9QCbk+e0ODKmD6c3H0cSUuS5tpwFELNNXplgcO
+         C3DlE7oaYFTPsmPg5dTiRPoDQeoQL5wO3AaU6cA7iY2lI0ymcPh3YO8vN4fG1AyNYxeZ
+         3ATw==
+X-Gm-Message-State: AOAM531PJNhUrBAWDnwReq2o7EL1RlCIzn0khx0OmUsOE2b4DPWOYw7E
+        nonO2PODhwRQe4S/SE4tIjKQzRwvFK2cBQ==
+X-Google-Smtp-Source: ABdhPJyX8QJ18MhgVKKInSNZnCJnXEn3TufvHX3LuCasO/H2/ZZH4vXTozIHee1wM/MvTcWLkJaRoA==
+X-Received: by 2002:a05:6638:3381:: with SMTP id h1mr10264337jav.176.1639670740358;
+        Thu, 16 Dec 2021 08:05:40 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id s9sm3237155ild.14.2021.12.16.08.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 08:05:39 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: [PATCHSET v4 0/4] Add support for list issue
+Date:   Thu, 16 Dec 2021 09:05:33 -0700
+Message-Id: <20211216160537.73236-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-block <linux-block@vger.kernel.org>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: [PATCH] block: fix error handling for device_add_disk
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting double kfree() bug in disk_release_events() [1], for
-commit 9be68dd7ac0e13be ("md: add error handling support for add_disk()")
-is calling blk_cleanup_disk() which will call disk_release_events() from
-regular kobject_release() path when device_add_disk() from add_disk()
-failed.
+With the support in 5.16-rc1 for allocating and completing batches of
+IO, the one missing piece is passing down a list of requests for issue.
+Drivers can take advantage of this by defining an mq_ops->queue_rqs()
+hook.
 
-Since kobject_release() will be always called regardless of whether
-device_add_disk() from add_disk() succeeds, we should leave
-disk_release_events() to regular kobject_release() path.
+This implements it for NVMe, allowing copy of multiple commands in one
+swoop.
 
-Link: https://syzkaller.appspot.com/bug?extid=28a66a9fbc621c939000 [1]
-Reported-by: syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
-Tested-by: syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
-Fixes: 83cbce9574462c6b ("block: add error handling for device_add_disk / add_disk")
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is good for around a 500K IOPS/core improvement in my testing,
+which is around a 5-6% improvement in efficiency.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 30362aeacac4..47bb34ab967b 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -540,7 +540,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- out_device_del:
- 	device_del(ddev);
- out_disk_release_events:
--	disk_release_events(disk);
-+	/* disk_release() will call disk_release_events(). */
- out_free_ext_minor:
- 	if (disk->major == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(disk->first_minor);
+Note to Christoph - I kept the copy helper, since it's used in 3
+spots and I _think_ you ended up being fine with that...
+
+Changes since v3:
+- Use nvme_sq_copy_cmd() in nvme_submit_cmds()
+- Add reviewed-by's
+
 -- 
-2.32.0
+Jens Axboe
+
+
