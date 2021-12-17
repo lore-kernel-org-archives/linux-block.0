@@ -2,64 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B236EC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 16:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1695C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 17:00:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239090AbhLQQZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Dec 2021 11:25:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42836 "EHLO
+        id S236105AbhLQRA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Dec 2021 12:00:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238005AbhLQQZM (ORCPT
+        with ESMTP id S239553AbhLQRA0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Dec 2021 11:25:12 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CF85C061574
-        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 08:25:12 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id co15so2727666pjb.2
-        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 08:25:12 -0800 (PST)
+        Fri, 17 Dec 2021 12:00:26 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40781C061574
+        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 09:00:26 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id k14so2105179ils.12
+        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 09:00:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=i5b9PXwhAv6r3gLGUQSE4NSFBShDvIEQt7qaKbqdtRU=;
-        b=oUkhRhxL7JjguwmmNEIfWI77z+V+UN9VccwOVfxMjGgLpOYWokci2tfIxVqsGczmST
-         QMxe3fcL/DphTCa09VQqbosf4tTlsF0XqoP63h1S66W47QyQ+/igaI5OBfIzrmoKzzZe
-         3rigQueqD7rezcc5qugBXfwmqrFlKxNi/kkC/JbX+1OAlWk9Q61yzo7j1HGoE0aiE6jw
-         Xu926yr+rLhSReYBvO4eo/NAZCRhPCevqQwOEr1CfukbfA8KVAWKEUmpA9SdGrHxNLno
-         0Ce8mhLfTrvVkgPVQRpxQnzMpq/vhaNNc5Y3vcJGeRHL16jD/J/GrzFJeflJ2nUkyDvG
-         dFRQ==
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=GZBwY2NbRuxbFYYDc91qDyWl8E5i42R8FRX/H+or41M=;
+        b=nRz5zY7y0u6WGvjkaVgD4pI26dmMUJEzn95gHmiPdPq6PMMyC4nYmovoE+AX7rebRY
+         9TBfyI0BtjNtG5Yr+DzPJqyl9KIW8GBOzBPQScS17wTl6OFnTT7Fp3g5xgAglOi9VAjh
+         N8sTnqRFGa4q9TJF3fEo2LMQILSqioRvGWBpgiidOY10hOwD4TmVMB9v7m4GEQv3xqXZ
+         cVLcCtPwAaAiNV50aRRxWT+K2Ge0M2H/bVTIFPZeHGU0Fz6ssLnlOa4kU4WdxrhaBmXp
+         IzoQsxWazcUvTNex7e6M0zhuB7bi+PxGCvDjY5Weh+LPoq4g91eWGZmdZrnUMqC6vtoN
+         2rOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i5b9PXwhAv6r3gLGUQSE4NSFBShDvIEQt7qaKbqdtRU=;
-        b=wgAxEMLQhReivevRHOANk90xU9rNZgG/c4CMlLnPJu+GVPsFCrLkCfyfIb2vTpR/+L
-         m6BCDYI6d7zxizMcxMnSBdcoyCfqWnE326Q703eQt9yhbFI7jG4NED/Qg0g7ZtizgjCI
-         7srlDzbbj0LSMG/9F4RolnMRZCoZPrEczFZjzoQsg5B5zzDZqqbEPpms/rse4Am2se6D
-         RnNBW3zXYZMssnCCBaFI+7GcQkMLennw1mOFn6/qctvvym0qFskDWiUK9XAEobhxAV4C
-         22zhdlF1nDNIGPRjOy1gzBY1jMkh8U7++vBMbnIc1k71gVxoLAml1XDL4f6f+4OFU3UN
-         t/XA==
-X-Gm-Message-State: AOAM532iQ45J5MEO3VuznFGJq839meov/7Y8z6OgBTOeOgRbx3Gxw1/v
-        gKbUmHFVbD8umrVrRxWDj8t7iUS3MO/oAw==
-X-Google-Smtp-Source: ABdhPJx3bmYolgmWDig8iyqAYOvSIoFRuQg5Rl3cmZdn7QGY7iyfQpRgeaMheRIczzz2i3SXX8XRsQ==
-X-Received: by 2002:a17:90a:950b:: with SMTP id t11mr13029826pjo.80.1639758311355;
-        Fri, 17 Dec 2021 08:25:11 -0800 (PST)
-Received: from ?IPv6:2620:10d:c085:21c8::1321? ([2620:10d:c090:400::5:4398])
-        by smtp.gmail.com with ESMTPSA id nl16sm12921115pjb.13.2021.12.17.08.25.09
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=GZBwY2NbRuxbFYYDc91qDyWl8E5i42R8FRX/H+or41M=;
+        b=NCwDHI5mJ8QJT+SxY3W4YX8pAI+o3OeXns34LKH8AkqtAlKvb/4i72M+NBifzF99pE
+         nS/TPTFBhli2fM78eWW60vnoqpmETDIpgHqjHBzNikmt3m4cfZgtRONhuY4koZhQGQS6
+         0ONYaq7+smrsjxUwVljtlSISYPnRlNa3wwmsK6/HFzs70GkAggfB2UQq4l2cc2F4EOCF
+         T2UzT7uJ7/JWskHsOSJrsgnW90pzEAlmikD4LxeHHCPCY0eJ7NeMBRnisPgKRq7/Xs5c
+         b7qHoVKjS85Vt6UQ8+kFTVYSStKiXKiWwdD9yemFEn9IMuvjDGcdlrWKISGGS1yqOnKD
+         UceQ==
+X-Gm-Message-State: AOAM530y8J7rvgVYoTqqnsWPkA2Woy3jkMc1nKPJWk5dgfNhLQl5v6sa
+        siTAWq2yD0OHUZ2qQhxVAOro4KXYFUBtjg==
+X-Google-Smtp-Source: ABdhPJzIBpmYa4UYCpKJ2/6Z67PDw9L3suZ9psFEOHzSGPI9GQNvpiJXkC5rVbkB3LB7EEEPBeHEvg==
+X-Received: by 2002:a05:6e02:18cc:: with SMTP id s12mr2085057ilu.171.1639760425350;
+        Fri, 17 Dec 2021 09:00:25 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id w11sm4874084ilv.18.2021.12.17.09.00.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 08:25:10 -0800 (PST)
-Subject: Re: [PATCH] block: use "unsigned long" for blk_validate_block_size()
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block <linux-block@vger.kernel.org>
-References: <f81aaa2b-16c4-6e20-8a13-33f0a7d319d1@i-love.sakura.ne.jp>
+        Fri, 17 Dec 2021 09:00:25 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b114e2c8-d5c2-c2e8-9aeb-c18eaba52de0@kernel.dk>
-Date:   Fri, 17 Dec 2021 09:25:08 -0700
+Subject: [GIT PULL] Block fixes for 5.16-rc6
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <2a664593-191b-db70-7dde-0b02ef2b6e6a@kernel.dk>
+Date:   Fri, 17 Dec 2021 10:00:24 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <f81aaa2b-16c4-6e20-8a13-33f0a7d319d1@i-love.sakura.ne.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -67,18 +64,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/21 4:38 AM, Tetsuo Handa wrote:
-> Use of "unsigned short" for loop_validate_block_size() is wrong [1], and
-> commit af3c570fb0df422b ("loop: Use blk_validate_block_size() to validate
-> block size") changed to use "unsigned int".
-> 
-> However, since lo_simple_ioctl(LOOP_SET_BLOCK_SIZE) passes "unsigned long
-> arg" to loop_set_block_size(), blk_validate_block_size() can't validate
-> the upper 32bits on 64bits environment. A block size like 0x100000200
-> should be rejected.
+Hi Linus,
 
-Wouldn't it make more sense to validate that part on the loop side? A
-block size > 32-bit doesn't make any sense.
+A few fixes that should go into 5.16-rc6:
+
+- Fix for hammering on the delayed run queue timer (me)
+
+- bcache regression fix for this merge window (Lin)
+
+- Fix a divide-by-zero in the blk-iocost code (Tejun)
+
+Please pull!
+
+
+The following changes since commit 5eff363838654790f67f4bd564c5782967f67bcc:
+
+  Revert "mtd_blkdevs: don't scan partitions for plain mtdblock" (2021-12-10 11:52:34 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-17
+
+for you to fetch changes up to aa97f6cdb7e92909e17c8ca63e622fcb81d57a57:
+
+  bcache: fix NULL pointer reference in cached_dev_detach_finish (2021-12-14 20:32:54 -0700)
+
+----------------------------------------------------------------
+block-5.16-2021-12-17
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      block: reduce kblockd_mod_delayed_work_on() CPU consumption
+
+Lin Feng (1):
+      bcache: fix NULL pointer reference in cached_dev_detach_finish
+
+Tejun Heo (1):
+      iocost: Fix divide-by-zero on donation from low hweight cgroup
+
+ block/blk-core.c          | 2 ++
+ block/blk-iocost.c        | 9 ++++++++-
+ drivers/md/bcache/super.c | 3 ++-
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
 -- 
 Jens Axboe
