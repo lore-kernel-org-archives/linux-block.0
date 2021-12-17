@@ -2,111 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1695C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 17:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E42FC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 18:09:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236105AbhLQRA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Dec 2021 12:00:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239553AbhLQRA0 (ORCPT
+        id S235880AbhLQSJo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Dec 2021 13:09:44 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:60342 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234093AbhLQSJn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Dec 2021 12:00:26 -0500
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40781C061574
-        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 09:00:26 -0800 (PST)
-Received: by mail-il1-x136.google.com with SMTP id k14so2105179ils.12
-        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 09:00:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=GZBwY2NbRuxbFYYDc91qDyWl8E5i42R8FRX/H+or41M=;
-        b=nRz5zY7y0u6WGvjkaVgD4pI26dmMUJEzn95gHmiPdPq6PMMyC4nYmovoE+AX7rebRY
-         9TBfyI0BtjNtG5Yr+DzPJqyl9KIW8GBOzBPQScS17wTl6OFnTT7Fp3g5xgAglOi9VAjh
-         N8sTnqRFGa4q9TJF3fEo2LMQILSqioRvGWBpgiidOY10hOwD4TmVMB9v7m4GEQv3xqXZ
-         cVLcCtPwAaAiNV50aRRxWT+K2Ge0M2H/bVTIFPZeHGU0Fz6ssLnlOa4kU4WdxrhaBmXp
-         IzoQsxWazcUvTNex7e6M0zhuB7bi+PxGCvDjY5Weh+LPoq4g91eWGZmdZrnUMqC6vtoN
-         2rOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=GZBwY2NbRuxbFYYDc91qDyWl8E5i42R8FRX/H+or41M=;
-        b=NCwDHI5mJ8QJT+SxY3W4YX8pAI+o3OeXns34LKH8AkqtAlKvb/4i72M+NBifzF99pE
-         nS/TPTFBhli2fM78eWW60vnoqpmETDIpgHqjHBzNikmt3m4cfZgtRONhuY4koZhQGQS6
-         0ONYaq7+smrsjxUwVljtlSISYPnRlNa3wwmsK6/HFzs70GkAggfB2UQq4l2cc2F4EOCF
-         T2UzT7uJ7/JWskHsOSJrsgnW90pzEAlmikD4LxeHHCPCY0eJ7NeMBRnisPgKRq7/Xs5c
-         b7qHoVKjS85Vt6UQ8+kFTVYSStKiXKiWwdD9yemFEn9IMuvjDGcdlrWKISGGS1yqOnKD
-         UceQ==
-X-Gm-Message-State: AOAM530y8J7rvgVYoTqqnsWPkA2Woy3jkMc1nKPJWk5dgfNhLQl5v6sa
-        siTAWq2yD0OHUZ2qQhxVAOro4KXYFUBtjg==
-X-Google-Smtp-Source: ABdhPJzIBpmYa4UYCpKJ2/6Z67PDw9L3suZ9psFEOHzSGPI9GQNvpiJXkC5rVbkB3LB7EEEPBeHEvg==
-X-Received: by 2002:a05:6e02:18cc:: with SMTP id s12mr2085057ilu.171.1639760425350;
-        Fri, 17 Dec 2021 09:00:25 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id w11sm4874084ilv.18.2021.12.17.09.00.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 09:00:25 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.16-rc6
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <2a664593-191b-db70-7dde-0b02ef2b6e6a@kernel.dk>
-Date:   Fri, 17 Dec 2021 10:00:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 17 Dec 2021 13:09:43 -0500
+Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BHI9eXY008807;
+        Sat, 18 Dec 2021 03:09:40 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
+ Sat, 18 Dec 2021 03:09:40 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BHI9dCD008804
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 18 Dec 2021 03:09:40 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <7943926f-4365-f741-a353-4820b8707d87@i-love.sakura.ne.jp>
+Date:   Sat, 18 Dec 2021 03:09:36 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] block: use "unsigned long" for blk_validate_block_size()
 Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+References: <f81aaa2b-16c4-6e20-8a13-33f0a7d319d1@i-love.sakura.ne.jp>
+ <b114e2c8-d5c2-c2e8-9aeb-c18eaba52de0@kernel.dk>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+In-Reply-To: <b114e2c8-d5c2-c2e8-9aeb-c18eaba52de0@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 2021/12/18 1:25, Jens Axboe wrote:
+> On 12/17/21 4:38 AM, Tetsuo Handa wrote:
+>> Use of "unsigned short" for loop_validate_block_size() is wrong [1], and
+>> commit af3c570fb0df422b ("loop: Use blk_validate_block_size() to validate
+>> block size") changed to use "unsigned int".
+>>
+>> However, since lo_simple_ioctl(LOOP_SET_BLOCK_SIZE) passes "unsigned long
+>> arg" to loop_set_block_size(), blk_validate_block_size() can't validate
+>> the upper 32bits on 64bits environment. A block size like 0x100000200
+>> should be rejected.
+> 
+> Wouldn't it make more sense to validate that part on the loop side? A
+> block size > 32-bit doesn't make any sense.
+> 
 
-A few fixes that should go into 5.16-rc6:
+I think doing below is embarrassing, for there is blk_validate_block_size() which is
+meant for validating the arg. Although use of "unsigned long" for blk_validate_block_size()
+might cause small bloating on 64 bits kernels, I think 64 bits kernels would not care.
 
-- Fix for hammering on the delayed run queue timer (me)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c3a36cfaa855..98871d7b601d 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1474,6 +1474,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	err = blk_validate_block_size(arg);
+ 	if (err)
+ 		return err;
++#if BITS_PER_LONG == 64
++	if (arg > UINT_MAX)
++		return -EINVAL;
++#endif
+ 
+ 	if (lo->lo_queue->limits.logical_block_size == arg)
+ 		return 0;
 
-- bcache regression fix for this merge window (Lin)
-
-- Fix a divide-by-zero in the blk-iocost code (Tejun)
-
-Please pull!
-
-
-The following changes since commit 5eff363838654790f67f4bd564c5782967f67bcc:
-
-  Revert "mtd_blkdevs: don't scan partitions for plain mtdblock" (2021-12-10 11:52:34 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-17
-
-for you to fetch changes up to aa97f6cdb7e92909e17c8ca63e622fcb81d57a57:
-
-  bcache: fix NULL pointer reference in cached_dev_detach_finish (2021-12-14 20:32:54 -0700)
-
-----------------------------------------------------------------
-block-5.16-2021-12-17
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      block: reduce kblockd_mod_delayed_work_on() CPU consumption
-
-Lin Feng (1):
-      bcache: fix NULL pointer reference in cached_dev_detach_finish
-
-Tejun Heo (1):
-      iocost: Fix divide-by-zero on donation from low hweight cgroup
-
- block/blk-core.c          | 2 ++
- block/blk-iocost.c        | 9 ++++++++-
- drivers/md/bcache/super.c | 3 ++-
- 3 files changed, 12 insertions(+), 2 deletions(-)
-
--- 
-Jens Axboe
-
+And reviving loop_validate_block_size() in order to use "unsigned long" does not make sense
+for 32bits kernels.
