@@ -2,126 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B05C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 06:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5F4C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 06:33:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233247AbhLQGcz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Dec 2021 01:32:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45822 "EHLO
+        id S232073AbhLQGdA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Dec 2021 01:33:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232191AbhLQGcy (ORCPT
+        with ESMTP id S233260AbhLQGc7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Dec 2021 01:32:54 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3DEC06173E;
-        Thu, 16 Dec 2021 22:32:54 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id g14so3956786edb.8;
-        Thu, 16 Dec 2021 22:32:54 -0800 (PST)
+        Fri, 17 Dec 2021 01:32:59 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2CEC061574;
+        Thu, 16 Dec 2021 22:32:53 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id r11so3941797edd.9;
+        Thu, 16 Dec 2021 22:32:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jVz5gmWkvfHnwl1AICB+LrD0LvfkSYpF7pSTjzPszEs=;
-        b=Z/NKcsvrzrquLzVkgn3SArWeTGGKsArSdqDxuzHRyxgYJdTUMmZFGqNx218o4KZ3bi
-         Ji9rMNoA0YP/dXmNbAgN3HetOR14Jbs+vqKfeqU3vrqfhOx/nw3kLxusOR2ZsTUs5j9G
-         5ZHf/W6RXEyoIDe5ljmek6lYSUPZ07YMnDh/nWuTXXU3PhfI5lB0Sb4G71pt4S5I1LIV
-         RfSHP/p9sRZVfOejmRl9lmsb7cwBky5ZGvH1d8BJAECVAV1v2IwuM417movY/kn71kwT
-         ZiWFLvQ4jOROFx0f4l1j3/dzfDDS9PB1NRa31vuxbPabUeqlobZ0Os+oMSlulozH7lIu
-         pwRg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CWaK4nuZq/Gptqq/StNfBOqK2pmw94eOOpm80CCHM+k=;
+        b=iE2K+o+6yAVWBImSh9JPzbjoWp3pwFjLq1krhSQA4kN0RLevetGuJwsFzcLvVfYRqe
+         DuIdzunsX9k5DnVjsBNaEFoFpNmEU4yVUETLYOeUct9bZe0gaeMeENk2KoDV1uk7yMQ5
+         Hm9i5Tj78s1YfNkJBpAbKky67QV0hSqVdyyGZP4u2mu5L/rzzwpHi17XIrruAY39m2qf
+         h7aR20/k5eop5sC1NMOJfq0cCFEtT37iqJNdkUHEhn4hOBP7tijp++8YUWv5r0LkiLk2
+         pW3AWBPZLl14r90H7YPCd0336hZnxLzozoAuWid8F2vYCQCnOme2KhSrW9/hpr3PozBl
+         ubWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jVz5gmWkvfHnwl1AICB+LrD0LvfkSYpF7pSTjzPszEs=;
-        b=I5rp13Lpec+9+aHGuU8Cov6CRPzgS/mSEXfIY9m/ddseGvi5omxqakBme+RNSWL8qL
-         UzIrSV6saeNcI/UCXzqGaIta0QD5BJXFxuABVQDcMm/LTGW1zNpDlCPpC1Q2OYRZmO+c
-         D6Q+iVAi6eUgQRTB+oM004hgOcn/fWQcR2RhE+wMDSYWwY9zHNai2O3WwRorgRAL9ghi
-         ouuu/B9gGlYoF9eAz/vcV2tehA7MS7EY3xhWRhyRiNhMglT6e/NAo0OtBUGMKJ1eA2tH
-         3B65M1KouWgo/1dqjfrv6bb756jtyfePog53wkXAPSVXyGHOvytpzsnLUS8iIZw9SbNd
-         YYXA==
-X-Gm-Message-State: AOAM531jdXxf9r+4hIEBsKEI55/wxwT5/TxzIj4xVbh/hxNCr913dAkq
-        uX1cbPqjHPuaFaQrAFqJaCA=
-X-Google-Smtp-Source: ABdhPJzel5vzdE3ikJ2oPZCrG4tkSHvvw24nnRQFJNtnW88H0qM7WrEzXjsy8HG1Ycdrc7rQBhxJPA==
-X-Received: by 2002:aa7:d495:: with SMTP id b21mr1486049edr.363.1639722773000;
-        Thu, 16 Dec 2021 22:32:53 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CWaK4nuZq/Gptqq/StNfBOqK2pmw94eOOpm80CCHM+k=;
+        b=QbZT1SL4clNlajxSX80nqKiJcIysM9PQADJfHMdnIc6AQq28kEdQMBn1BVhV7YR2Ig
+         p+19hqCu4l/ibdhYKMrRYx2ntfjCPS4RsrU75xEtwzW8WiXC/yTsUQluhvCAS1uY7j2E
+         DlKF6qLw1jOQ+NbnycEcyTZADp3xMuleL4oawgj5DSo6weg2hJB8VRehGhgO/C5FaLMi
+         ILxw7DZTlWv5kisvSoRafIQ+uHhxzIQqWCSvZUzTMAPuZWTxN+5krvrZ7vGuf+QIL8GU
+         a0+yIHqAHQ3hhJtE0xGGAOPC2x8vtnH2I7Ea+iBKkGWSulBbZJJ6SGqnldgwVZ7wrRqI
+         /6fQ==
+X-Gm-Message-State: AOAM5310SKR2CnB7ZPjAfyuu6fVeBM8qdRv3WKlpEIVNKCYKw7pWOrHC
+        5BZYHjM/3sFMgEpX2YULsEM=
+X-Google-Smtp-Source: ABdhPJysFoJi3jwEJHIV/Ibe7ZZ+j3RrTJD0TV88nz5g/njfLBn2mXqpuMDROgi/LnY2ldSkNEbPaw==
+X-Received: by 2002:a05:6402:84f:: with SMTP id b15mr1491076edz.342.1639722771938;
+        Thu, 16 Dec 2021 22:32:51 -0800 (PST)
 Received: from zenorus.myxoz.lan (81-224-108-56-no2390.tbcn.telia.com. [81.224.108.56])
-        by smtp.gmail.com with ESMTPSA id e20sm2490148ejl.189.2021.12.16.22.32.52
+        by smtp.gmail.com with ESMTPSA id e20sm2490148ejl.189.2021.12.16.22.32.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Dec 2021 22:32:52 -0800 (PST)
+        Thu, 16 Dec 2021 22:32:51 -0800 (PST)
 From:   Miko Larsson <mikoxyzzz@gmail.com>
 To:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
         axboe@kernel.dk, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc:     Miko Larsson <mikoxyzzz@gmail.com>, hch@infradead.org
-Subject: [PATCH v2 2/2] zram: zram_drv: replace 'strlcpy()'
-Date:   Fri, 17 Dec 2021 07:32:24 +0100
-Message-Id: <20211217063224.3474-3-mikoxyzzz@gmail.com>
+Subject: [PATCH v2 0/2] Fix some formatting problems
+Date:   Fri, 17 Dec 2021 07:32:22 +0100
+Message-Id: <20211217063224.3474-1-mikoxyzzz@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20211217063224.3474-1-mikoxyzzz@gmail.com>
-References: <20211217063224.3474-1-mikoxyzzz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-'strlcpy()' shouldn't be used, and should be replaced with safer
-alternatives. Cristoph Hellwig suggested [1] that 'kmemdup_nul()' should
-be used in two cases instead of 'strscpy()', and that a regular
-'strcpy()' should be used in the third case. [2][3]
+Hi,
 
-[1] https://lore.kernel.org/all/YbsRlDYT2BfgrXRX@infradead.org/
-[2] https://lore.kernel.org/all/Ybt8wY3U2ETjQijH@infradead.org/
-[3] https://lore.kernel.org/all/Ybt8554NZpscKx2K@infradead.org/
+This is v2 of the patch set I sent in two days ago. The subject is
+arguably misleading, since we're doing a bit more than fixing some
+"superficial formatting problems", but I wanted to keep the original
+subject since this is a followup to the previous patch set.
 
-Signed-off-by: Miko Larsson <mikoxyzzz@gmail.com>
----
- drivers/block/zram/zram_drv.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+This patch set adds SPDX license identifiers to zram_drv, and replaces
+all uses of 'strlcpy()' with 'kmemdup_nul()' and 'strcpy()'.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 4de6fe13edaf..c7c751e6ca2e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -482,7 +482,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 	int err;
- 	struct zram *zram = dev_to_zram(dev);
- 
--	file_name = kmalloc(PATH_MAX, GFP_KERNEL);
-+	file_name = kmemdup_nul(buf, PATH_MAX, GFP_KERNEL);
- 	if (!file_name)
- 		return -ENOMEM;
- 
-@@ -493,7 +493,6 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
- 	}
- 
--	strlcpy(file_name, buf, PATH_MAX);
- 	/* ignore trailing newline */
- 	sz = strlen(file_name);
- 	if (sz > 0 && file_name[sz - 1] == '\n')
-@@ -1024,10 +1023,10 @@ static ssize_t comp_algorithm_store(struct device *dev,
- 		struct device_attribute *attr, const char *buf, size_t len)
- {
- 	struct zram *zram = dev_to_zram(dev);
--	char compressor[ARRAY_SIZE(zram->compressor)];
-+	char *compressor;
- 	size_t sz;
- 
--	strlcpy(compressor, buf, sizeof(compressor));
-+	compressor = kmemdup_nul(buf, sizeof(zram->compressor), GFP_KERNEL);
- 	/* ignore trailing newline */
- 	sz = strlen(compressor);
- 	if (sz > 0 && compressor[sz - 1] == '\n')
-@@ -1981,7 +1980,7 @@ static int zram_add(void)
- 	if (ret)
- 		goto out_cleanup_disk;
- 
--	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
-+	strcpy(zram->compressor, default_compressor);
- 
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
+Miko Larsson (2):
+  zram: zram_drv: add SPDX license identifiers
+  zram: zram_drv: replace 'strlcpy()'
+
+ drivers/block/zram/zram_drv.c | 18 ++++++------------
+ drivers/block/zram/zram_drv.h |  9 ++-------
+ 2 files changed, 8 insertions(+), 19 deletions(-)
+
 -- 
 2.34.1
 
