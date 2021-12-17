@@ -2,110 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDD3C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 02:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B5AC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 06:32:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbhLQCxS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Dec 2021 21:53:18 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:33862 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbhLQCxR (ORCPT
+        id S232151AbhLQGcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Dec 2021 01:32:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45818 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232073AbhLQGcy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Dec 2021 21:53:17 -0500
-Received: from kwepemi100007.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JFYSS3L7Qzcbyw;
-        Fri, 17 Dec 2021 10:52:56 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100007.china.huawei.com (7.221.188.115) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 17 Dec 2021 10:53:14 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 17 Dec 2021 10:53:14 +0800
-Subject: Re: [PATCH RFC 9/9] block, bfq: decrease
- 'num_groups_with_pending_reqs' earlier
-To:     Paolo Valente <paolo.valente@linaro.org>
-CC:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20211127101132.486806-1-yukuai3@huawei.com>
- <20211127101132.486806-10-yukuai3@huawei.com>
- <AA66019E-FD14-4821-B53D-0C56EEC38828@linaro.org>
- <4765e7f8-48b7-3bc6-5eb6-1dc0a569233d@huawei.com>
- <B5C2B1F6-4DF9-4657-AFF4-D53DD04A65DC@linaro.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <97642e8d-b93c-c229-d13e-76517d5e654f@huawei.com>
-Date:   Fri, 17 Dec 2021 10:53:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 17 Dec 2021 01:32:54 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5DD9C06173E;
+        Thu, 16 Dec 2021 22:32:53 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id z29so3954206edl.7;
+        Thu, 16 Dec 2021 22:32:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=AsAjCk9qQhY+pBaGcqz3KvnxpttrERJajnH3RPfyHpM=;
+        b=OGrRb2gStGK/8I6F49ek+EI08w23eVGZIVGEkDIc88k5jSnWDFkpLKjwhQG6/sZhuk
+         wBVkfxgAplb15wtDWFCcvHLZJOFYIC3oLZw6tgANwOgcxggEPOdOtT2WJ7/lj2PW9V0a
+         fWS3gDJzi8rE8XCtvUWQGzj71fS1ZHP6vNBZ8nFNhvDpNqMSeBMAGQmimpz4MQQH9abI
+         AhnpalwQ+p0qlqzmaosR/Or2U30qRG1MW2ZIQmGbjq1qSpwiTRG5WcRCIWE3ETvujsYO
+         onDTZ6Ze7TYxBtACwxw3C61awM6EmmFZoyPBaoX6jMQdKMpNr+iJJs7JKpTcZlHrghU7
+         ewwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=AsAjCk9qQhY+pBaGcqz3KvnxpttrERJajnH3RPfyHpM=;
+        b=elY3P+QXY8l7SkxeoO2LPWMIn3ui3J+gxoYeCbnVYeih78x379C/GmXXI5S4xX/3qa
+         MULPoLl+oit/hqcjtIlMMABac7KWSCIJRTMsX3HCKbglllkuH8+lqQJdrPNcLRLnxECD
+         XtwgYLEsZaqpPbdYfKUAu+JQB6Gvy7J6v1y95OTdz2B5anowGbDQmJBZgzqqMfrz5nVv
+         17F5gOfOy17uzH5d4HoLClP0JVJLBUuT5OfxIWCLp8GFKcKueRW9FCAX5vYFrKBvP0sk
+         F3UquSzi1tp79j6mqWd1TimzgwZoABcxD0ShFNk881xV1Qr7Zi8+4v5OoJ/dEm5CGxzd
+         Kn5Q==
+X-Gm-Message-State: AOAM531g4JjS6x1yPvFkNhh/Cw3PH05VhDBW9m21jvceLzbpVLpAByi/
+        zglKzajluoildEdFHX4Z35o=
+X-Google-Smtp-Source: ABdhPJw7fgsg/IktzkoDmmBR2UV8LnmiKRCN1WduIQHlg0zi3BS9phz3xj+ApCyZ/L/M/EegqIpC+Q==
+X-Received: by 2002:a17:907:1117:: with SMTP id qu23mr1401185ejb.404.1639722772450;
+        Thu, 16 Dec 2021 22:32:52 -0800 (PST)
+Received: from zenorus.myxoz.lan (81-224-108-56-no2390.tbcn.telia.com. [81.224.108.56])
+        by smtp.gmail.com with ESMTPSA id e20sm2490148ejl.189.2021.12.16.22.32.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 22:32:52 -0800 (PST)
+From:   Miko Larsson <mikoxyzzz@gmail.com>
+To:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Miko Larsson <mikoxyzzz@gmail.com>, hch@infradead.org
+Subject: [PATCH v2 1/2] zram: zram_drv: add SPDX license identifiers
+Date:   Fri, 17 Dec 2021 07:32:23 +0100
+Message-Id: <20211217063224.3474-2-mikoxyzzz@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20211217063224.3474-1-mikoxyzzz@gmail.com>
+References: <20211217063224.3474-1-mikoxyzzz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <B5C2B1F6-4DF9-4657-AFF4-D53DD04A65DC@linaro.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2021/12/17 0:34, Paolo Valente 写道:
-> 
-> 
->> Il giorno 11 dic 2021, alle ore 03:10, yukuai (C) <yukuai3@huawei.com> ha scritto:
->>
->> 在 2021/12/10 18:21, Paolo Valente 写道:
->>>> Il giorno 27 nov 2021, alle ore 11:11, Yu Kuai<yukuai3@huawei.com>  ha scritto:
->>>>
->>>> Currently 'num_groups_with_pending_reqs' won't be decreased when
->>>> the group doesn't have any pending requests, while any child group
->>>> have any pending requests. The decrement is delayed to when all the
->>>> child groups doesn't have any pending requests.
->>>>
->>>> For example:
->>>> 1) t1 issue sync io on root group, t2 and t3 issue sync io on the same
->>>> child group. num_groups_with_pending_reqs is 2 now.
->>>> 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 and
->>>> t3 still can't be handled concurrently.
->>>>
->>>> Fix the problem by decreasing 'num_groups_with_pending_reqs'
->>>> immediately upon the deactivation of last entity of the group.
->>>>
->>> I don't understand this patch clearly.
->>> I understand your proposal not to count a group as with pending requests, in case no child process of the group has IO, but only its child groups have pending requests.
->>> So, entities here are only queues for this patch?
->>> If they are only queues, I think it is still incorrect to remove the group from the count of groups with pending IO when all its child queues are deactivated, because there may still be unfinished IO for those queues.
->>
->> Hi, Paolo
->>
->> bfq_weights_tree_remove() will be called when all requests are completed
->> in bfq_queue, thus I recored how many queues have pending requests
->> through weights tree insertion and removal.(Details in patch 7)
->>
->> Thus when calling bfq_weights_tree_remove() for bfqq, I can check if
->> there are no queues have pending requests for parent bfqg:
->>
->> if (!bfqg->num_entities_with_pending_reqs && -> no queues with pending reqs
->>     entity->in_groups_with_pending_reqs) {   -> the group is counted
->>
-> 
-> Ok, I got confused because you use the term deactivation.  Yet you
-> seem to decrement the counter at the right time.  Maybe fix that term,
-> in commit messages and comments.
+zram_drv lacks an SPDX license identifier in both its source and in its
+header, so we should add license identifiers based on the copyright info
+provided by the initial comment block.
 
-Ok, I'll fix that term, and thanks for taking time reviewing these
-patches,
-> 
-> Thanks,
-> Paolo
-> 
->> Thanks,
->> Kuai
->>> Am I missing something?
->>> Thanks,
->>> Paolo
-> 
-> .
-> 
+Signed-off-by: Miko Larsson <mikoxyzzz@gmail.com>
+---
+ drivers/block/zram/zram_drv.c | 9 ++-------
+ drivers/block/zram/zram_drv.h | 9 ++-------
+ 2 files changed, 4 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 25071126995b..4de6fe13edaf 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1,15 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
++
+ /*
+  * Compressed RAM block device
+  *
+  * Copyright (C) 2008, 2009, 2010  Nitin Gupta
+  *               2012, 2013 Minchan Kim
+- *
+- * This code is released using a dual license strategy: BSD/GPL
+- * You can choose the licence that better fits your requirements.
+- *
+- * Released under the terms of 3-clause BSD License
+- * Released under the terms of GNU General Public License Version 2.0
+- *
+  */
+ 
+ #define KMSG_COMPONENT "zram"
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index 80c3b43b4828..29e75e094a9d 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -1,15 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
++
+ /*
+  * Compressed RAM block device
+  *
+  * Copyright (C) 2008, 2009, 2010  Nitin Gupta
+  *               2012, 2013 Minchan Kim
+- *
+- * This code is released using a dual license strategy: BSD/GPL
+- * You can choose the licence that better fits your requirements.
+- *
+- * Released under the terms of 3-clause BSD License
+- * Released under the terms of GNU General Public License Version 2.0
+- *
+  */
+ 
+ #ifndef _ZRAM_DRV_H_
+-- 
+2.34.1
+
