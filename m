@@ -2,106 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97300C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 18 Dec 2021 09:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70C28C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 18 Dec 2021 09:42:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232506AbhLRJJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Dec 2021 04:09:26 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:33864 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232481AbhLRJJZ (ORCPT
+        id S231365AbhLRJmD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Dec 2021 04:42:03 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:56650 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232538AbhLRJmD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Dec 2021 04:09:25 -0500
-Received: from kwepemi500006.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JGKlz6h89zcbh0;
-        Sat, 18 Dec 2021 17:09:03 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500006.china.huawei.com (7.221.188.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 18 Dec 2021 17:09:23 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 18 Dec 2021 17:09:23 +0800
-Subject: Re: [PATCH RFC] block, bfq: update pos_root for idle bfq_queue in
- bfq_bfqq_move()
-To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>, <tj@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20211210081641.3025060-1-yukuai3@huawei.com>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <680073dc-cdaf-8634-e536-7f07997c5d93@huawei.com>
-Date:   Sat, 18 Dec 2021 17:09:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sat, 18 Dec 2021 04:42:03 -0500
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BI9fxv6032222;
+        Sat, 18 Dec 2021 18:41:59 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Sat, 18 Dec 2021 18:41:59 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BI9fxUM032219
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 18 Dec 2021 18:41:59 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <9ecbf057-4375-c2db-ab53-e4cc0dff953d@i-love.sakura.ne.jp>
+Date:   Sat, 18 Dec 2021 18:41:56 +0900
 MIME-Version: 1.0
-In-Reply-To: <20211210081641.3025060-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: [PATCH v2] block: use "unsigned long" for blk_validate_block_size().
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+References: <f81aaa2b-16c4-6e20-8a13-33f0a7d319d1@i-love.sakura.ne.jp>
+ <b114e2c8-d5c2-c2e8-9aeb-c18eaba52de0@kernel.dk>
+ <7943926f-4365-f741-a353-4820b8707d87@i-love.sakura.ne.jp>
+ <6e9e3cf6-5cb6-cde6-c8ef-aafd685d6d97@i-love.sakura.ne.jp>
+In-Reply-To: <6e9e3cf6-5cb6-cde6-c8ef-aafd685d6d97@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2021/12/10 16:16, Yu Kuai Ð´µÀ:
-> During code review, we found that if bfqq is not busy in
-> bfq_bfqq_move(), bfq_pos_tree_add_move() won't be called for the bfqq,
-> thus bfqq->pos_root still points to the old bfqg. However, the ref
-> that bfqq hold for the old bfqg will be released, so it's possible
-> that the old bfqg can be freed. This is problematic because the freed
-> bfqg can still be accessed by bfqq->pos_root.
-> 
-> Fix the problem by calling bfq_pos_tree_add_move() for idle bfqq
-> as well.
-> 
-Friendly ping ...
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   block/bfq-cgroup.c | 15 ++++++++++-----
->   1 file changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 24a5c5329bcd..85f34c29b909 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -645,6 +645,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   		   struct bfq_group *bfqg)
->   {
->   	struct bfq_entity *entity = &bfqq->entity;
-> +	struct bfq_group *old_parent = bfqq_group(bfqq);
->   
->   	/*
->   	 * Get extra reference to prevent bfqq from being freed in
-> @@ -666,7 +667,6 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
->   	else if (entity->on_st_or_in_serv)
->   		bfq_put_idle_entity(bfq_entity_service_tree(entity), entity);
-> -	bfqg_and_blkg_put(bfqq_group(bfqq));
->   
->   	if (entity->parent &&
->   	    entity->parent->last_bfqq_created == bfqq)
-> @@ -679,11 +679,16 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   	/* pin down bfqg and its associated blkg  */
->   	bfqg_and_blkg_get(bfqg);
->   
-> -	if (bfq_bfqq_busy(bfqq)) {
-> -		if (unlikely(!bfqd->nonrot_with_queueing))
-> -			bfq_pos_tree_add_move(bfqd, bfqq);
-> +	/*
-> +	 * Don't leave the pos_root to old bfqg, since the ref to old bfqg will
-> +	 * be released and the bfqg might be freed.
-> +	 */
-> +	if (unlikely(!bfqd->nonrot_with_queueing))
-> +		bfq_pos_tree_add_move(bfqd, bfqq);
-> +	bfqg_and_blkg_put(old_parent);
-> +
-> +	if (bfq_bfqq_busy(bfqq))
->   		bfq_activate_bfqq(bfqd, bfqq);
-> -	}
->   
->   	if (!bfqd->in_service_queue && !bfqd->rq_in_driver)
->   		bfq_schedule_dispatch(bfqd);
-> 
+Since lo_simple_ioctl(LOOP_SET_BLOCK_SIZE) and ioctl(NBD_SET_BLKSIZE) pass
+user-controlled "unsigned long arg" to blk_validate_block_size(),
+"unsigned long" should be used for validation.
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+Changes in v2:
+  Rewrite description.
+
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bd4370baccca..e13e41f7fad2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -44,7 +44,7 @@ struct blk_crypto_profile;
+  */
+ #define BLKCG_MAX_POLS		6
+ 
+-static inline int blk_validate_block_size(unsigned int bsize)
++static inline int blk_validate_block_size(unsigned long bsize)
+ {
+ 	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
+ 		return -EINVAL;
+-- 
+2.32.0
+
