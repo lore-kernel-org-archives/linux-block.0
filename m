@@ -2,68 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9D1C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Dec 2021 21:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A2AC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 18 Dec 2021 01:32:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbhLQVnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Dec 2021 16:43:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59804 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbhLQVnS (ORCPT
+        id S229995AbhLRBcq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Dec 2021 20:32:46 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:55309 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229480AbhLRBcq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Dec 2021 16:43:18 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96735C061574
-        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 13:43:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 35E35623C1
-        for <linux-block@vger.kernel.org>; Fri, 17 Dec 2021 21:43:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9ABEDC36AE2;
-        Fri, 17 Dec 2021 21:43:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639777397;
-        bh=jTtbKcQo/of0S5X6A++eWcoIKcf1Qf/bZt1ypjv+1IA=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=fGIEHkOX5p7hdsvslfzPOwpBhOfOCoL9x7QdYamyssffmgXzfVyS+4F2d+CP3PmoO
-         ntruUCK9uGwev0bVVEbUuLqYvg1zOqjDQ/oHhJj/aYwqdv3/81+inFun8+0eM2gATT
-         4ahhKlEbynkulThW7QyPDdrcsNmGBgUy4smPXMcP4qq274j68cFp+klkRXKO8xseWn
-         U0x/tpsLPQUJXKzD5x9oMRGHFAqJ5S9PJIsoEuhimGPL2MTXkeGxMCuxAUhTsFnulO
-         JCpBMAkjjn34a6JDcQkSfwOIjukFsqz6mBC687VWEznOK7igqXOa4YhIy45xRDFEot
-         r4o+b1KY1otjA==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 725A260A39;
-        Fri, 17 Dec 2021 21:43:17 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 5.16-rc6
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <2a664593-191b-db70-7dde-0b02ef2b6e6a@kernel.dk>
-References: <2a664593-191b-db70-7dde-0b02ef2b6e6a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <2a664593-191b-db70-7dde-0b02ef2b6e6a@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-17
-X-PR-Tracked-Commit-Id: aa97f6cdb7e92909e17c8ca63e622fcb81d57a57
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: fa09ca5ebce5b293ddba9b042d8fa9ed690bd91d
-Message-Id: <163977739740.30898.9095122798228211603.pr-tracker-bot@kernel.org>
-Date:   Fri, 17 Dec 2021 21:43:17 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Fri, 17 Dec 2021 20:32:46 -0500
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BI1WhIu037090;
+        Sat, 18 Dec 2021 10:32:43 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Sat, 18 Dec 2021 10:32:43 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BI1Wgmw037085
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 18 Dec 2021 10:32:43 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <6e9e3cf6-5cb6-cde6-c8ef-aafd685d6d97@i-love.sakura.ne.jp>
+Date:   Sat, 18 Dec 2021 10:32:39 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] block: use "unsigned long" for blk_validate_block_size()
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+References: <f81aaa2b-16c4-6e20-8a13-33f0a7d319d1@i-love.sakura.ne.jp>
+ <b114e2c8-d5c2-c2e8-9aeb-c18eaba52de0@kernel.dk>
+ <7943926f-4365-f741-a353-4820b8707d87@i-love.sakura.ne.jp>
+In-Reply-To: <7943926f-4365-f741-a353-4820b8707d87@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 17 Dec 2021 10:00:24 -0700:
+On 2021/12/18 3:09, Tetsuo Handa wrote:
+> On 2021/12/18 1:25, Jens Axboe wrote:
+>> On 12/17/21 4:38 AM, Tetsuo Handa wrote:
+>>> Use of "unsigned short" for loop_validate_block_size() is wrong [1], and
+>>> commit af3c570fb0df422b ("loop: Use blk_validate_block_size() to validate
+>>> block size") changed to use "unsigned int".
+>>>
+>>> However, since lo_simple_ioctl(LOOP_SET_BLOCK_SIZE) passes "unsigned long
+>>> arg" to loop_set_block_size(), blk_validate_block_size() can't validate
+>>> the upper 32bits on 64bits environment. A block size like 0x100000200
+>>> should be rejected.
+>>
+>> Wouldn't it make more sense to validate that part on the loop side? A
+>> block size > 32-bit doesn't make any sense.
+>>
+> 
+> I think doing below is embarrassing, for there is blk_validate_block_size() which is
+> meant for validating the arg. Although use of "unsigned long" for blk_validate_block_size()
+> might cause small bloating on 64 bits kernels, I think 64 bits kernels would not care.
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index c3a36cfaa855..98871d7b601d 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1474,6 +1474,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+>  	err = blk_validate_block_size(arg);
+>  	if (err)
+>  		return err;
+> +#if BITS_PER_LONG == 64
+> +	if (arg > UINT_MAX)
+> +		return -EINVAL;
+> +#endif
+>  
+>  	if (lo->lo_queue->limits.logical_block_size == arg)
+>  		return 0;
+> 
+> And reviving loop_validate_block_size() in order to use "unsigned long" does not make sense
+> for 32bits kernels.
 
-> git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-17
+Well, this problem is not specific to the loop module.
+nbd_set_size(struct nbd_device *nbd, loff_t bytesize, loff_t blksize) calls
+blk_validate_block_size(blksize), and blksize can be > UINT_MAX, for
+ioctl(NBD_SET_BLKSIZE) passes "unsigned long arg" to nbd_set_size().
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/fa09ca5ebce5b293ddba9b042d8fa9ed690bd91d
+But size bloating cannot be a problem because there are only 4 callers.
 
-Thank you!
+    drivers/block/loop.c
+        line 996
+        line 1474 
+    drivers/block/nbd.c, line 325
+    drivers/block/virtio_blk.c, line 878 
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I think we can (and should) use "unsigned long" for blk_validate_block_size().
