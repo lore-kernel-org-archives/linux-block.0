@@ -2,71 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0695EC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 19 Dec 2021 15:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342A0C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 19 Dec 2021 17:14:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235990AbhLSP2V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Dec 2021 10:28:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35844 "EHLO
+        id S233280AbhLSROB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Dec 2021 12:14:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233286AbhLSP2V (ORCPT
+        with ESMTP id S229742AbhLSROB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Dec 2021 10:28:21 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24756C061574
-        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 07:28:21 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id j6so4340412ila.4
-        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 07:28:21 -0800 (PST)
+        Sun, 19 Dec 2021 12:14:01 -0500
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2FE5C061574
+        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 09:14:00 -0800 (PST)
+Received: by mail-il1-x131.google.com with SMTP id j6so4480662ila.4
+        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 09:14:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=ABMuECWKR/9ZUZvCXNqRtaxyxdUxxfmB5wAUrCcXRWw=;
-        b=ZRo7631AKE/juZY8w/sQQndQSFwT/lkIs3DvUn/kJvyAjNo9+7VVS67vobF6d3+pzh
-         c+30H5wsRa4yVMCEP8tnsV++9FChvSJQZH93H3Tel+5c+9qC9dsf2osCOeQ1zcmPpVf1
-         Pmnt7ddXiOmZtmGekjC8tzFGFLCyNTW+1KR9R30ICUJExq+EkpoXr9YJ0X+kVjnEX5yY
-         1fpnYNQKJ4RuHUdMxDiVzpiQZUoii2NNsjdsaapXeHzAzPUiuvhqXF2rCcSSeUCQiL0x
-         ATflXHfuNpMx9zLJkhkgaRH4b01xrJny+uERu6Nap8nxLhjk0saUfOlgPIt31jg2QCir
-         3D6g==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=ga2Wl9f/1foFY62Wlc8VODha7nmRjQPysvMA2RCkocM=;
+        b=2Qp6pqD6m6dPARzaOXalwvpiRtMsVik1XnYyY4b8Ub7kpUlC3+KlI+TfzjY9J2fuE4
+         p2I5C797usRQngtl28XciRlFmXMuizg5AKxPsQLPDqahoTrvcJwndSDdnHCJrQjppzI1
+         MOU7dOKc2Nu51bEKYexpo1czOIhlM/ECZHBriyKCx/w8ZiV85fvuj+NKyoaDu0rNB1nf
+         hL1N86aUW+qoBrMsdawSXyV7DY7jIjvyAHIbu+azFxEbGzXNQBBzvV058kflljml6tR5
+         mg5uod9mbeuPrKnp9LXkx6rvQaZgbJRDYvqgTOfDyBo5YpFj7UIswX2G/hpTNDGrn9/1
+         ZaQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ABMuECWKR/9ZUZvCXNqRtaxyxdUxxfmB5wAUrCcXRWw=;
-        b=ZeAtqlXlaBx11ofejr3dM6Uxzsd+Hl9FwZuQHTNrAlm5Nq6WVYoJuK55SdzfZYG5Wf
-         KSLA2lp6BBSnLjRXKU7sXkk0i8SkOR+2ODsKp0pSKjeKA5fVYrgyzjtB4sX542aQLVgE
-         lWgRjknVfsfG2NCOxSSBIvw77IMPu6uoxyjSgR7xBxM+NjmKaeQzEigPRJ+X7CXnzszC
-         lMyOBCSNNEQL4CNJ5wtS3wluyngFjbk9gQTl2ZKmcyDh8qcVy8xwTMZ5ha003qkCARKq
-         iMs2NMvjVjIGHHZPOuBw4Yse+BXd+60yuRZgtaja7HYrm8plSCBbKJMuTL5zGW2ozqg2
-         OQnQ==
-X-Gm-Message-State: AOAM532c9orS+J3ivRP7ohi2wK/ppS7EsHN0YRr5CxSSvhG36mfHTGPn
-        fQwZjn7HETNTNb+QgAb8EEfn/A==
-X-Google-Smtp-Source: ABdhPJylI8VcD9R91zkPQvZPJ5f1ryW8XU+RSLBFP3FzwvxqMY9/eKN5aVoIdEuHHpfakj5yNjLhxw==
-X-Received: by 2002:a05:6e02:160d:: with SMTP id t13mr6584467ilu.0.1639927699881;
-        Sun, 19 Dec 2021 07:28:19 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=ga2Wl9f/1foFY62Wlc8VODha7nmRjQPysvMA2RCkocM=;
+        b=kZUESUaHwvznSVl6B7ai4bp2v4rYrdnYL8KEGsJqv58R5cNP1yDFmDjL78FFZbuERb
+         BFsyF8pcKwhag0jBkbYA2tYSwGJbCcvlzQRt2bVthAxZbW71wGTvmc6LvDVU6IB7W9ZM
+         237aVqB/jUs27dzKnpjzlV8QvoVPVpc+T2LQHXY+eXQh+i9lb2Xb6yj4QtCbLiUTA68C
+         htfmsMOrGzgc1ivpplxqNGaLCff29tft4/wJjVrp0kLqA35WxxhYCwnG5i3xYnDe508Z
+         TVNsNmI/SEvIDTtSqKHMlqnGWufZIHtYTE8/zz2seuDsAEksCEKUDzpwr/E+R6bdlV6g
+         wjWg==
+X-Gm-Message-State: AOAM5321LX70/cc05sLy+k+nWHMd4jA95DeQMZJCSPukdN26MSrn9kzT
+        JLwKSUgYxMRX5/+UGNtNANYCc5Tgvge0NA==
+X-Google-Smtp-Source: ABdhPJzkPxSGzoqUGcIODGwd78pNDON4lC8H6WYRboQnICjB8Ux+JL5CIIq0y01VyQqrHF+H5No80Q==
+X-Received: by 2002:a92:c54c:: with SMTP id a12mr2621913ilj.256.1639934039848;
+        Sun, 19 Dec 2021 09:13:59 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id 18sm7097114iln.83.2021.12.19.07.28.19
+        by smtp.gmail.com with ESMTPSA id w11sm8287880ilv.18.2021.12.19.09.13.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Dec 2021 07:28:19 -0800 (PST)
-Subject: Re: very low IOPS due to "block: reduce kblockd_mod_delayed_work_on()
- CPU consumption"
+        Sun, 19 Dec 2021 09:13:59 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
-        linux-block@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-        ming.lei@redhat.com, hch@lst.de, Long Li <longli@microsoft.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        linux-kernel@vger.kernel.org
-References: <1639853092.524jxfaem2.none.ref@localhost>
- <1639853092.524jxfaem2.none@localhost>
- <7d1e4bb8-1a73-9529-3191-66df4ff2d5fe@kernel.dk>
- <12f43a71-713b-a74f-a169-b6ac3d804e50@kernel.dk>
-Message-ID: <237bd7d8-9e75-01b5-ebe7-8b1eb747474b@kernel.dk>
-Date:   Sun, 19 Dec 2021 08:28:18 -0700
+Subject: [GIT PULL] Block revert for -rc6
+Message-ID: <b49f11c8-11b3-6d81-288a-9ca545763a1d@kernel.dk>
+Date:   Sun, 19 Dec 2021 10:13:58 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <12f43a71-713b-a74f-a169-b6ac3d804e50@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,95 +64,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/19/21 7:58 AM, Jens Axboe wrote:
-> On 12/18/21 12:02 PM, Jens Axboe wrote:
->> On 12/18/21 11:57 AM, Alex Xu (Hello71) wrote:
->>> Hi,
->>>
->>> I recently noticed that between 6441998e2e and 9eaa88c703, I/O became 
->>> much slower on my machine using ext4 on dm-crypt on NVMe with bfq 
->>> scheduler. Checking iostat during heavy usage (find / -xdev and fstrim 
->>> -v /), maximum IOPS had fallen from ~10000 to ~100. Reverting cb2ac2912a 
->>> ("block: reduce kblockd_mod_delayed_work_on() CPU consumption") resolves 
->>> the issue.
->>
->> Hmm interesting. I'll try and see if I can reproduce this and come up
->> with a fix.
-> 
-> I can reproduce this. Alex, can you see if this one helps? Trying to see
-> if we can hit a happy medium here that avoids hammering on that timer,
-> but it really depends on what the mix is here of delay with pending,
-> or no delay with no pending.
-> 
-> Dexuan, can you test this for your test case too? I'm going to queue
-> up a revert for -rc6 just in case.
+Hi Linus,
 
-This one should be better...
+Turns out that the fix for not hammering on the delayed work timer too
+much caused a performance regression for BFQ, so let's revert the change
+for now. I've got some ideas on how to fix it appropriately, but they
+should wait for 5.17.
+
+Please pull!
 
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c1833f95cb97..5e9e3c2b7a94 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1481,12 +1481,17 @@ int kblockd_schedule_work(struct work_struct *work)
- }
- EXPORT_SYMBOL(kblockd_schedule_work);
- 
--int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
--				unsigned long delay)
-+void kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
-+				 unsigned long msecs)
- {
--	if (!delay)
--		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
--	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
-+	if (!msecs) {
-+		cancel_delayed_work(dwork);
-+		queue_work_on(cpu, kblockd_workqueue, &dwork->work);
-+	} else {
-+		unsigned long delay = msecs_to_jiffies(msecs);
-+
-+		mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
-+	}
- }
- EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8874a63ae952..95288a98dae1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1155,8 +1155,7 @@ EXPORT_SYMBOL(blk_mq_kick_requeue_list);
- void blk_mq_delay_kick_requeue_list(struct request_queue *q,
- 				    unsigned long msecs)
- {
--	kblockd_mod_delayed_work_on(WORK_CPU_UNBOUND, &q->requeue_work,
--				    msecs_to_jiffies(msecs));
-+	kblockd_mod_delayed_work_on(WORK_CPU_UNBOUND, &q->requeue_work, msecs);
- }
- EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
- 
-@@ -1868,7 +1867,7 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 	}
- 
- 	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
--				    msecs_to_jiffies(msecs));
-+					msecs);
- }
- 
- /**
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bd4370baccca..40748eedddbb 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1159,7 +1159,7 @@ static inline unsigned int block_size(struct block_device *bdev)
- }
- 
- int kblockd_schedule_work(struct work_struct *work);
--int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long delay);
-+void kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork, unsigned long msecs);
- 
- #define MODULE_ALIAS_BLOCKDEV(major,minor) \
- 	MODULE_ALIAS("block-major-" __stringify(major) "-" __stringify(minor))
+The following changes since commit aa97f6cdb7e92909e17c8ca63e622fcb81d57a57:
+
+  bcache: fix NULL pointer reference in cached_dev_detach_finish (2021-12-14 20:32:54 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-19
+
+for you to fetch changes up to 87959fa16cfbcf76245c11559db1940069621274:
+
+  Revert "block: reduce kblockd_mod_delayed_work_on() CPU consumption" (2021-12-19 07:58:44 -0700)
+
+----------------------------------------------------------------
+block-5.16-2021-12-19
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      Revert "block: reduce kblockd_mod_delayed_work_on() CPU consumption"
+
+ block/blk-core.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 -- 
 Jens Axboe
