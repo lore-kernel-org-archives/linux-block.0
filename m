@@ -2,104 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 957CDC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 19 Dec 2021 20:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FA3C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 19 Dec 2021 20:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236378AbhLSUAx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Dec 2021 15:00:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38116 "EHLO
+        id S233463AbhLSUza (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Dec 2021 15:55:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbhLSUAw (ORCPT
+        with ESMTP id S231646AbhLSUz3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Dec 2021 15:00:52 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B39ADC061574
-        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 12:00:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=WKnfsdrA27hz3Lg5En9wRqt9H4h1j7CXJCH/bJYdq58=; b=Qw2kiXDnsyynz5pSeIv6j9midA
-        mPZiuGk9duDa4s+HsxJ1oQYPcU10wZOO+YxijhzRba0GSxfPAyctPARHoGzREjvxSjN6B6j4IwbLc
-        RGQA+kosw2iT3VzPfvVMoLRui+WtyOOmlHJsr2xHukbGDRZThV0rumzQDU2QxnKSHr/EWeAyFUstP
-        WhVx5M/Wv48bEXj8O9nn5LenfP2QcRw4zcmBHSxVOTAdI7Lhy2VgmtqV2FFbHTZvMboPzEMgciyGc
-        /pNAz/8nm7NdZx/ijU35jyp+2NtpTQN3b/UvvcXiMtbJpqmJDMPDQyndEppmWLdxj9NvIM/sK6DF2
-        2Ch+15xw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mz2MR-00GtUZ-JG; Sun, 19 Dec 2021 20:00:47 +0000
-Date:   Sun, 19 Dec 2021 12:00:47 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>, mcgrof@kernel.org
-Subject: Re: [PATCH] block: fix error handling for device_add_disk
-Message-ID: <Yb+Pbz1pCNEs4xw3@bombadil.infradead.org>
-References: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp>
- <20211216161806.GA31879@lst.de>
- <20211216161928.GB31879@lst.de>
- <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+        Sun, 19 Dec 2021 15:55:29 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E8FC061574
+        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 12:55:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 34121B80DC4
+        for <linux-block@vger.kernel.org>; Sun, 19 Dec 2021 20:55:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DBA4FC36AE7;
+        Sun, 19 Dec 2021 20:55:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639947326;
+        bh=7GjIFkH/3NKk7x0kxI0JjkVRX3q+wH3JqtAS1VTYe6Q=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=RloAHAvTN6IT+i04kRGpxb7JwJboQCtcOH24YvwTb4PKy7UBUzEI6dUYIuvfqiQtz
+         CZtP/Xq7qge4486D0U6d5S6AxKec7CoRdB9n5G1+Neuaa359U6rSrFSbV01t09J0jE
+         8zAzRFMCop8YCN1PBwQWkKZYbIimq5G5/nH1onEoErRTy0XpXXppMBFnq9OvAep1c6
+         dBsrg3TKm6ot/GFU16uwC6B4C8Fuoiytum+fWFV2noEbf7CeMIyulBdZwRSxttKr1A
+         UGIUNAtnXF4Pqr0nMO1ElzZbmMXNWVlJEE6OqWC3SR8yeQZJXXWCUcexHMSMnF+CDo
+         0qELxCZfNhBCg==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id BA57160A27;
+        Sun, 19 Dec 2021 20:55:26 +0000 (UTC)
+Subject: Re: [GIT PULL] Block revert for -rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <b49f11c8-11b3-6d81-288a-9ca545763a1d@kernel.dk>
+References: <b49f11c8-11b3-6d81-288a-9ca545763a1d@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <b49f11c8-11b3-6d81-288a-9ca545763a1d@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-19
+X-PR-Tracked-Commit-Id: 87959fa16cfbcf76245c11559db1940069621274
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2da09da4ae5e1714606668bdb145806b0afe9c90
+Message-Id: <163994732670.21051.9819140458539627584.pr-tracker-bot@kernel.org>
+Date:   Sun, 19 Dec 2021 20:55:26 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 17, 2021 at 07:37:43PM +0900, Tetsuo Handa wrote:
-> I think we can apply this patch as-is...
+The pull request you sent on Sun, 19 Dec 2021 10:13:58 -0700:
 
-Unfortunately I don't think so, don't we end up still with a race
-in between the first part of device_add() and the kobject_add()
-which adds the kobject to generic layer and in return enables the
-disk_release() call for the disk? I count 5 error paths in between
-including kobject_add() which can fail as well.
+> git://git.kernel.dk/linux-block.git tags/block-5.16-2021-12-19
 
-If correct then something like the following may be needed:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2da09da4ae5e1714606668bdb145806b0afe9c90
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 3c139a1b6f04..08ab7ce63e57 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -539,9 +539,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- out_device_del:
- 	device_del(ddev);
- out_disk_release_events:
--	disk_release_events(disk);
-+	if (!kobject_alive(&ddev->kobj))
-+		disk_release_events(disk);
- out_free_ext_minor:
--	if (disk->major == BLOCK_EXT_MAJOR)
-+	if (!kobject_alive(&ddev->kobj) && disk->major == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(disk->first_minor);
- 	return ret;
- }
-diff --git a/include/linux/kobject.h b/include/linux/kobject.h
-index c740062b4b1a..4884aedbd4e0 100644
---- a/include/linux/kobject.h
-+++ b/include/linux/kobject.h
-@@ -117,6 +117,23 @@ extern void kobject_get_ownership(struct kobject *kobj,
- 				  kuid_t *uid, kgid_t *gid);
- extern char *kobject_get_path(struct kobject *kobj, gfp_t flag);
- 
-+/**
-+ * kobject_alive - Returns whether a kobject_add() has succeeded
-+ * @kobj: the object to test
-+ *
-+ * This will return whether a kobject has been successfully added already with
-+ * kobject_add(). It is useful for subsystems which have a kobj_type with its
-+ * own kobj_type release() routine and want to verify that it will be called
-+ * as otherwise if kobject_add() failed the subsystem is in charge of doing that
-+ * cleanup.
-+ */
-+static inline bool kobject_alive(struct kobject *kobj)
-+{
-+	if (!kobj || kref_read(&kobj->kref) == 0)
-+		return false;
-+	return true;
-+}
-+
- /**
-  * kobject_has_children - Returns whether a kobject has children.
-  * @kobj: the object to test
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
