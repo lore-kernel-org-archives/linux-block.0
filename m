@@ -2,126 +2,238 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 047C4C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 20 Dec 2021 13:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97291C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 20 Dec 2021 15:35:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232533AbhLTNEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Dec 2021 08:04:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:56139 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232584AbhLTNEg (ORCPT
+        id S232266AbhLTPfA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Dec 2021 10:35:00 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:58621 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231589AbhLTPfA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Dec 2021 08:04:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640005476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SpZhFrz9dx36NbUHnalLW+M3fvlORbcPnr3fBhmIpok=;
-        b=LmboVOYwXcW2I0RJR5TrLXSmDPcv5rIJfgahs6Ek6l9xIvx09QTAfALaZgKsIctcpz6lj+
-        +Gdp2o9r2nC6qwS/vhZlqyGcycVwM0HtMQcKI88nGXfTvKyeouHq9AlniLLx2ndzdYnK1E
-        iQ57cu2yE5I+1sP5Nt/E8OeqOrvjMk0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-19-JicLN36zNUG7DorTzUIkfQ-1; Mon, 20 Dec 2021 08:04:32 -0500
-X-MC-Unique: JicLN36zNUG7DorTzUIkfQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B668981CCCE;
-        Mon, 20 Dec 2021 13:04:30 +0000 (UTC)
-Received: from wcosta.com (ovpn-116-93.gru2.redhat.com [10.97.116.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 66DD05F4F5;
-        Mon, 20 Dec 2021 13:04:26 +0000 (UTC)
-From:   Wander Lairson Costa <wander@redhat.com>
-To:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Wander Lairson Costa <wander@redhat.com>
-Subject: [PATCH v4 1/1] blktrace: switch trace spinlock to a raw spinlock
-Date:   Mon, 20 Dec 2021 10:03:57 -0300
-Message-Id: <20211220130357.8790-2-wander@redhat.com>
-In-Reply-To: <20211220130357.8790-1-wander@redhat.com>
-References: <20211220130357.8790-1-wander@redhat.com>
+        Mon, 20 Dec 2021 10:35:00 -0500
+Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BKEvjuT081035;
+        Mon, 20 Dec 2021 23:57:45 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
+ Mon, 20 Dec 2021 23:57:45 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BKEviZT081032
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 20 Dec 2021 23:57:44 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <ee718d4e-7681-d09a-5d2a-4f9ac2172038@i-love.sakura.ne.jp>
+Date:   Mon, 20 Dec 2021 23:57:40 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [loop] 322c4293ec: xfstests.xfs.049.fail
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     kernel test robot <oliver.sang@intel.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        syzbot <syzbot+643e4ce4b6ad1347d372@syzkaller.appspotmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
+        lkp@intel.com, linux-block <linux-block@vger.kernel.org>
+References: <20211219150933.GJ14057@xsang-OptiPlex-9020>
+ <dd707dfd-6421-b1df-4820-e30787b84181@i-love.sakura.ne.jp>
+ <20211220115823.GB20005@quack2.suse.cz>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+In-Reply-To: <20211220115823.GB20005@quack2.suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The running_trace_lock protects running_trace_list and is acquired
-within the tracepoint which implies disabled preemption. The spinlock_t
-typed lock can not be acquired with disabled preemption on PREEMPT_RT
-because it becomes a sleeping lock.
-The runtime of the tracepoint depends on the number of entries in
-running_trace_list and has no limit. The blk-tracer is considered debug
-code and higher latencies here are okay.
+On 2021/12/20 20:58, Jan Kara wrote:
+> On Mon 20-12-21 00:45:46, Tetsuo Handa wrote:
+>> On 2021/12/20 0:09, kernel test robot wrote:
+>>>     @@ -13,3 +13,5 @@
+>>>      --- clean
+>>>      --- umount ext2 on xfs
+>>>      --- umount xfs
+>>>     +!!! umount xfs failed
+>>>     +(see /lkp/benchmarks/xfstests/results//xfs/049.full for details)
+>>>     ...
+>>>     (Run 'diff -u /lkp/benchmarks/xfstests/tests/xfs/049.out /lkp/benchmarks/xfstests/results//xfs/049.out.bad'  to see the entire diff)
+>>
+>> Yes, we know this race condition can happen.
+>>
+>> https://lkml.kernel.org/r/16c7d304-60ef-103f-1b2c-8592b48f47c6@i-love.sakura.ne.jp
+>> https://lkml.kernel.org/r/YaYfu0H2k0PSQL6W@infradead.org
+>>
+>> Should we try to wait for autoclear operation to complete?
+> 
+> So I think we should try to fix this because as Dave writes in the
+> changelog for a1ecac3b0656 ("loop: Make explicit loop device destruction
+> lazy") which started all this, having random EBUSY failures (either from
+> losetup or umount) is annoying and you need to work it around it lots of
+> unexpected places.
 
-Make running_trace_lock a raw_spinlock_t.
+OK. Let's wait for autoclear operation to complete.
 
-Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+> 
+> We cannot easily wait for work completion in the loop device code without
+> reintroducing the deadlock - whole lo_release() is called under
+> disk->open_mutex which you also need to grab in __loop_clr_fd(). So to
+> avoid holding backing file busy longer than expected, we could use
+> task_work instead of ordinary work as I suggested - but you were right that
+> we need to be somewhat careful and in case we are running in a kthread, we
+> would still need to offload to a normal work (but in that case we don't
+> care about delaying file release anyway).
+
+Like fput_many() shows, it is not easy to implement fallback correctly.
+I worry that exporting task_work_add() to loadable kernel modules results in
+random abuse of task_work which does not implement fallback.
+
+Instead of exporting task_work_add(), I think we can apply below diff.
+I chose not to rely on WQ context, for there is fput(filp) in __loop_clr_fd()
+which we should make sure that __fput(filp) is processed by a thread which
+triggered autoclear operation. If this __fput(filp) is scheduled by other thread
+because fput(filp) is called by a thread which did not trigger autoclear operation,
+I think it is possible that a thread which triggered autoclear operation fails to
+wait for completion of __fput(filp), and results in the same problem.
+
 ---
- kernel/trace/blktrace.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/bdev.c           |  2 ++
+ drivers/block/loop.c   | 42 ++++++++++++------------------------------
+ drivers/block/loop.h   |  2 +-
+ include/linux/blkdev.h |  5 +++++
+ 4 files changed, 20 insertions(+), 31 deletions(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index c221e4c3f625..0ce1fadce078 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -34,7 +34,7 @@ static struct trace_array *blk_tr;
- static bool blk_tracer_enabled __read_mostly;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c80cfaefc0a8..b252b1d87471 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1227,6 +1227,11 @@ struct block_device_operations {
+ 	 * driver.
+ 	 */
+ 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
++	/*
++	 * Special callback for doing post-release callback without
++	 * disk->open_mutex held. Used by loop driver.
++	 */
++	void (*post_release)(struct gendisk *disk);
+ };
  
- static LIST_HEAD(running_trace_list);
--static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
-+static __cacheline_aligned_in_smp DEFINE_RAW_SPINLOCK(running_trace_lock);
+ #ifdef CONFIG_COMPAT
+diff --git a/block/bdev.c b/block/bdev.c
+index 8bf93a19041b..0cb638d81a27 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -948,6 +948,8 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
+ 	else
+ 		blkdev_put_whole(bdev, mode);
+ 	mutex_unlock(&disk->open_mutex);
++	if (bdev->bd_disk->fops->post_release)
++		bdev->bd_disk->fops->post_release(bdev->bd_disk);
  
- /* Select an alternative, minimalistic output than the original one */
- #define TRACE_BLK_OPT_CLASSIC	0x1
-@@ -121,12 +121,12 @@ static void trace_note_tsk(struct task_struct *tsk)
- 	struct blk_trace *bt;
+ 	module_put(disk->fops->owner);
+ 	blkdev_put_no_open(bdev);
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 918a7a2dc025..f2e9f38694dc 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -56,7 +56,7 @@ struct loop_device {
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
+ 	bool			idr_visible;
+-	struct work_struct      rundown_work;
++	struct task_struct	*rundown_owner; /* current or NULL */
+ };
  
- 	tsk->btrace_seq = blktrace_seq;
--	spin_lock_irqsave(&running_trace_lock, flags);
-+	raw_spin_lock_irqsave(&running_trace_lock, flags);
- 	list_for_each_entry(bt, &running_trace_list, running_list) {
- 		trace_note(bt, tsk->pid, BLK_TN_PROCESS, tsk->comm,
- 			   sizeof(tsk->comm), 0);
- 	}
--	spin_unlock_irqrestore(&running_trace_lock, flags);
-+	raw_spin_unlock_irqrestore(&running_trace_lock, flags);
+ struct loop_cmd {
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b1b05c45c07c..faa3a3097b22 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1165,40 +1165,12 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
+ 
+ 	fput(filp);
+-}
+-
+-static void loop_rundown_completed(struct loop_device *lo)
+-{
+ 	mutex_lock(&lo->lo_mutex);
+ 	lo->lo_state = Lo_unbound;
+ 	mutex_unlock(&lo->lo_mutex);
+ 	module_put(THIS_MODULE);
  }
  
- static void trace_note_time(struct blk_trace *bt)
-@@ -666,9 +666,9 @@ static int __blk_trace_startstop(struct request_queue *q, int start)
- 			blktrace_seq++;
- 			smp_mb();
- 			bt->trace_state = Blktrace_running;
--			spin_lock_irq(&running_trace_lock);
-+			raw_spin_lock_irq(&running_trace_lock);
- 			list_add(&bt->running_list, &running_trace_list);
--			spin_unlock_irq(&running_trace_lock);
-+			raw_spin_unlock_irq(&running_trace_lock);
+-static void loop_rundown_workfn(struct work_struct *work)
+-{
+-	struct loop_device *lo = container_of(work, struct loop_device,
+-					      rundown_work);
+-	struct block_device *bdev = lo->lo_device;
+-	struct gendisk *disk = lo->lo_disk;
+-
+-	__loop_clr_fd(lo);
+-	kobject_put(&bdev->bd_device.kobj);
+-	module_put(disk->fops->owner);
+-	loop_rundown_completed(lo);
+-}
+-
+-static void loop_schedule_rundown(struct loop_device *lo)
+-{
+-	struct block_device *bdev = lo->lo_device;
+-	struct gendisk *disk = lo->lo_disk;
+-
+-	__module_get(disk->fops->owner);
+-	kobject_get(&bdev->bd_device.kobj);
+-	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
+-	queue_work(system_long_wq, &lo->rundown_work);
+-}
+-
+ static int loop_clr_fd(struct loop_device *lo)
+ {
+ 	int err;
+@@ -1229,7 +1201,6 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	mutex_unlock(&lo->lo_mutex);
  
- 			trace_note_time(bt);
- 			ret = 0;
-@@ -676,9 +676,9 @@ static int __blk_trace_startstop(struct request_queue *q, int start)
- 	} else {
- 		if (bt->trace_state == Blktrace_running) {
- 			bt->trace_state = Blktrace_stopped;
--			spin_lock_irq(&running_trace_lock);
-+			raw_spin_lock_irq(&running_trace_lock);
- 			list_del_init(&bt->running_list);
--			spin_unlock_irq(&running_trace_lock);
-+			raw_spin_unlock_irq(&running_trace_lock);
- 			relay_flush(bt->rchan);
- 			ret = 0;
- 		}
+ 	__loop_clr_fd(lo);
+-	loop_rundown_completed(lo);
+ 	return 0;
+ }
+ 
+@@ -1754,7 +1725,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		loop_schedule_rundown(lo);
++		lo->rundown_owner = current;
+ 		return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+@@ -1769,10 +1740,21 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 	mutex_unlock(&lo->lo_mutex);
+ }
+ 
++static void lo_post_release(struct gendisk *disk)
++{
++	struct loop_device *lo = disk->private_data;
++
++	if (lo->rundown_owner != current)
++		return;
++	lo->rundown_owner = NULL;
++	__loop_clr_fd(lo);
++}
++
+ static const struct block_device_operations lo_fops = {
+ 	.owner =	THIS_MODULE,
+ 	.open =		lo_open,
+ 	.release =	lo_release,
++	.post_release = lo_post_release,
+ 	.ioctl =	lo_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl =	lo_compat_ioctl,
 -- 
-2.27.0
+2.32.0
 
