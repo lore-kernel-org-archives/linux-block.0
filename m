@@ -2,119 +2,321 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3045CC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Dec 2021 10:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDF16C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 20 Dec 2021 12:23:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230380AbhLTKFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Dec 2021 05:05:39 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:46984 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230251AbhLTKFj (ORCPT
+        id S232512AbhLTMXM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Dec 2021 07:23:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56454 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232484AbhLTMXL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Dec 2021 05:05:39 -0500
-Date:   Mon, 20 Dec 2021 11:05:36 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639994737;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Eb4FlXy5iNBTsYxMb6HKNk2awrPzuqjLQBf44LyIGYI=;
-        b=KCVR/kX4O48pNJ9g5bDGGNvupM9+voewbhLhngVZOMgyj6XbtGV+BN0PdhEXBl3kiRsrRo
-        wfhu8k+WZUQ6U4qugn9I2zxjpIKsro8XSphbroBTPY30LzQRBN11Q4JHOYSyG9C2jVSP9e
-        txPAo2ExiyYCHkTKxINyGQt5TYvKCKgkb02Zyq2kiB0ZI8vAOcPeImeZsLh7t8HHpbfBM4
-        JhSs8pHlFTVIvsti6n2bBUxW1M3lWBQDjoa1jcji1JWE+6iQh+1aFjaN4/QRK3C24BjQdg
-        Up0KOkEazoSPmyyhXMXh7uH3Lj+eKAZCZ6pFWL9BbRGvTOpean1QRzuOAEUCXg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639994737;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Eb4FlXy5iNBTsYxMb6HKNk2awrPzuqjLQBf44LyIGYI=;
-        b=Pq6d57tihbT1nHZysmj5FVz84TEDFd6zd+iFGDcbzWcMtgrJpSNmmiXTOEQD1C5mAdCHZ9
-        SO/eSs9jy2hkwjAQ==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Wander Lairson Costa <wander@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v3] blktrace: switch trace spinlock to a raw spinlock
-Message-ID: <YcBVcOkWumdpjtvI@linutronix.de>
-References: <20211217141656.8720-1-wander@redhat.com>
+        Mon, 20 Dec 2021 07:23:11 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A805C061574
+        for <linux-block@vger.kernel.org>; Mon, 20 Dec 2021 04:23:11 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id n15-20020a17090a394f00b001b0f6d6468eso12696432pjf.3
+        for <linux-block@vger.kernel.org>; Mon, 20 Dec 2021 04:23:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lsgIL1tDtOBFrpOspcS2K2I6OHy7UCaW1Rph+orChAs=;
+        b=GXO6ig5L1U27xWqp0VUQcsmGEsk1G6nBK9/KrDH8zpUWvR3CW7T0qExr2heJCnrv1t
+         jScBMnJKJJ2/C6tYDb8SGcwXPvpsSGJw8gxyr7+3dQhQsbcq+p7Xzs4lpxbSH4sijvjS
+         R/PFxmtcMKd+wWEo2Abytjo5M+aSqSHLE8zuwshbmsMyzyWLS7veie4rECCRN6ghCS6K
+         V5o8ogAULtggJ451Y+vTfVj9MsraxHGhQj0DQzNPHva2kJ9Q85g6ISvo+IosDkciaNJr
+         KEuc6Jv1lIOHHo0XJ9sRYkyhjLDdBn88p1e5nXBrfOKWX8hjdcX8f6GF2ygSSwMHj53P
+         YP4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lsgIL1tDtOBFrpOspcS2K2I6OHy7UCaW1Rph+orChAs=;
+        b=8AuGoZ2jH43oJCOXgAClglVJ1hA7ArjNER2k1+beqSzdShW6D6MSJagM18xK0zl964
+         IsP9PgLDLrDrlfazpf7YOyf9u3DnqWs6iuofsh8HDpi9Syj2l+4uZV0ABEz4UMCfiJPl
+         SMxfZjPpUNu76BehA8Pya/NOcaOc4qCSokVcEw8Ji7/5ArlaPtfodNDu/vo3cCluev3H
+         AahvYR91gdGhRAsZun86zMd6dSmrJ1jzCY4kZBRcnYZEsd7hhmZKbSpR4vXIRoCHL0Nh
+         mmQrJs69AiD6W4sDZOjhDDH9lsyfR/h8UrmbzTmYuqLTUoKLHR9RmKTjAx/95+ufRlzj
+         c1kQ==
+X-Gm-Message-State: AOAM532DMkjH+Uvg/5ee+rZNeBybiJTdRpKTs0zGIbQlECI2vul4J2s6
+        Q3I4GgB966O0GBg2htejumMs
+X-Google-Smtp-Source: ABdhPJzHl5RE3y85EcZXnrvWRI5P8OiaYQAkte8wCBy6l7L9SzAGXn28+KrNbDnNbqw7JaJIOr7zSw==
+X-Received: by 2002:a17:902:c60b:b0:149:2afe:489f with SMTP id r11-20020a170902c60b00b001492afe489fmr109271plr.104.1640002991024;
+        Mon, 20 Dec 2021 04:23:11 -0800 (PST)
+Received: from localhost ([139.177.225.237])
+        by smtp.gmail.com with ESMTPSA id s4sm12994731pjg.54.2021.12.20.04.23.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Dec 2021 04:23:10 -0800 (PST)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     josef@toxicpanda.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] nbd: Don't use workqueue to handle recv work
+Date:   Mon, 20 Dec 2021 20:22:41 +0800
+Message-Id: <20211220122241.150-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211217141656.8720-1-wander@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-12-17 11:16:56 [-0300], Wander Lairson Costa wrote:
+The rescuer thread might take over the works queued on
+the workqueue when the worker thread creation timed out.
+If this happens, we have no chance to create multiple
+recv threads which causes I/O hung on this nbd device.
 
-Assuming neither Steven nor Jens object,
+To fix it, this tries to create kthreads directly to
+handle the recv work instead of using workqueue.
 
-> TRACE_EVENT disables preemption before calling the callback. Because of
-> that blktrace triggers the following bug under PREEMPT_RT:
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/block/nbd.c | 95 +++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 56 insertions(+), 39 deletions(-)
 
-The tracepoint is invoked with disabled preemption.
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 5a1f98494ddd..e572d1dc20b4 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -63,7 +63,6 @@ struct nbd_sock {
+ };
+ 
+ struct recv_thread_args {
+-	struct work_struct work;
+ 	struct nbd_device *nbd;
+ 	int index;
+ };
+@@ -97,6 +96,7 @@ struct nbd_config {
+ 
+ 	atomic_t recv_threads;
+ 	wait_queue_head_t recv_wq;
++	spinlock_t recv_lock;
+ 	unsigned int blksize_bits;
+ 	loff_t bytesize;
+ #if IS_ENABLED(CONFIG_DEBUG_FS)
+@@ -118,7 +118,6 @@ struct nbd_device {
+ 	struct nbd_config *config;
+ 	struct mutex config_lock;
+ 	struct gendisk *disk;
+-	struct workqueue_struct *recv_workq;
+ 	struct work_struct remove_work;
+ 
+ 	struct list_head list;
+@@ -260,7 +259,6 @@ static void nbd_dev_remove(struct nbd_device *nbd)
+ 	mutex_lock(&nbd_index_mutex);
+ 	idr_remove(&nbd_index_idr, nbd->index);
+ 	mutex_unlock(&nbd_index_mutex);
+-	destroy_workqueue(nbd->recv_workq);
+ 	kfree(nbd);
+ }
+ 
+@@ -818,11 +816,19 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
+ 	return ret ? ERR_PTR(ret) : cmd;
+ }
+ 
+-static void recv_work(struct work_struct *work)
++static void flush_recv_works(struct nbd_device *nbd)
+ {
+-	struct recv_thread_args *args = container_of(work,
+-						     struct recv_thread_args,
+-						     work);
++	wait_event(nbd->config->recv_wq,
++		   atomic_read(&nbd->config->recv_threads) == 0);
++
++	/* Make sure recv threads have no reference to nbd->config */
++	spin_lock(&nbd->config->recv_lock);
++	spin_unlock(&nbd->config->recv_lock);
++}
++
++static int recv_work(void *data)
++{
++	struct recv_thread_args *args = (struct recv_thread_args *)data;
+ 	struct nbd_device *nbd = args->nbd;
+ 	struct nbd_config *config = nbd->config;
+ 	struct request_queue *q = nbd->disk->queue;
+@@ -866,9 +872,14 @@ static void recv_work(struct work_struct *work)
+ 	mutex_unlock(&nsock->tx_lock);
+ 
+ 	nbd_config_put(nbd);
++
++	spin_lock(&config->recv_lock);
+ 	atomic_dec(&config->recv_threads);
+ 	wake_up(&config->recv_wq);
++	spin_unlock(&config->recv_lock);
+ 	kfree(args);
++
++	return 0;
+ }
+ 
+ static bool nbd_clear_req(struct request *req, void *data, bool reserved)
+@@ -1176,6 +1187,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 
+ 	for (i = 0; i < config->num_connections; i++) {
+ 		struct nbd_sock *nsock = config->socks[i];
++		struct task_struct *worker;
+ 
+ 		if (!nsock->dead)
+ 			continue;
+@@ -1185,6 +1197,14 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 			mutex_unlock(&nsock->tx_lock);
+ 			continue;
+ 		}
++		worker = kthread_create(recv_work, args, "knbd%d.%d-recv",
++					nbd->index, i);
++		if (!worker) {
++			sockfd_put(sock);
++			kfree(args);
++			return -ENOMEM;
++		}
++
+ 		sk_set_memalloc(sock->sk);
+ 		if (nbd->tag_set.timeout)
+ 			sock->sk->sk_sndtimeo = nbd->tag_set.timeout;
+@@ -1194,7 +1214,6 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 		nsock->fallback_index = -1;
+ 		nsock->sock = sock;
+ 		nsock->dead = false;
+-		INIT_WORK(&args->work, recv_work);
+ 		args->index = i;
+ 		args->nbd = nbd;
+ 		nsock->cookie++;
+@@ -1206,7 +1225,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 		/* We take the tx_mutex in an error path in the recv_work, so we
+ 		 * need to queue_work outside of the tx_mutex.
+ 		 */
+-		queue_work(nbd->recv_workq, &args->work);
++		wake_up_process(worker);
+ 
+ 		atomic_inc(&config->live_connections);
+ 		wake_up(&config->conn_wait);
+@@ -1359,34 +1378,42 @@ static int nbd_start_device(struct nbd_device *nbd)
+ 	nbd_dev_dbg_init(nbd);
+ 	for (i = 0; i < num_connections; i++) {
+ 		struct recv_thread_args *args;
++		struct task_struct *worker;
+ 
+ 		args = kzalloc(sizeof(*args), GFP_KERNEL);
+-		if (!args) {
+-			sock_shutdown(nbd);
+-			/*
+-			 * If num_connections is m (2 < m),
+-			 * and NO.1 ~ NO.n(1 < n < m) kzallocs are successful.
+-			 * But NO.(n + 1) failed. We still have n recv threads.
+-			 * So, add flush_workqueue here to prevent recv threads
+-			 * dropping the last config_refs and trying to destroy
+-			 * the workqueue from inside the workqueue.
+-			 */
+-			if (i)
+-				flush_workqueue(nbd->recv_workq);
+-			return -ENOMEM;
++		if (!args)
++			goto err;
++
++		worker = kthread_create(recv_work, args, "knbd%d.%d-recv",
++					nbd->index, i);
++		if (!worker) {
++			kfree(args);
++			goto err;
+ 		}
++
+ 		sk_set_memalloc(config->socks[i]->sock->sk);
+ 		if (nbd->tag_set.timeout)
+ 			config->socks[i]->sock->sk->sk_sndtimeo =
+ 				nbd->tag_set.timeout;
+ 		atomic_inc(&config->recv_threads);
+ 		refcount_inc(&nbd->config_refs);
+-		INIT_WORK(&args->work, recv_work);
+ 		args->nbd = nbd;
+ 		args->index = i;
+-		queue_work(nbd->recv_workq, &args->work);
++		wake_up_process(worker);
+ 	}
+ 	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
++err:
++	sock_shutdown(nbd);
++	/*
++	 * If num_connections is m (2 < m),
++	 * and NO.1 ~ NO.n(1 < n < m) connections are successful.
++	 * But NO.(n + 1) failed. We still have n recv threads.
++	 * So, add flush_recv_works here to prevent recv threads
++	 * dropping the last config_refs.
++	 */
++	flush_recv_works(nbd);
++
++	return -ENOMEM;
+ }
+ 
+ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
+@@ -1405,7 +1432,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+ 					 atomic_read(&config->recv_threads) == 0);
+ 	if (ret)
+ 		sock_shutdown(nbd);
+-	flush_workqueue(nbd->recv_workq);
++	flush_recv_works(nbd);
+ 
+ 	mutex_lock(&nbd->config_lock);
+ 	nbd_bdev_reset(bdev);
+@@ -1525,6 +1552,7 @@ static struct nbd_config *nbd_alloc_config(void)
+ 	atomic_set(&config->recv_threads, 0);
+ 	init_waitqueue_head(&config->recv_wq);
+ 	init_waitqueue_head(&config->conn_wait);
++	spin_lock_init(&config->recv_lock);
+ 	config->blksize_bits = NBD_DEF_BLKSIZE_BITS;
+ 	atomic_set(&config->live_connections, 0);
+ 	try_module_get(THIS_MODULE);
+@@ -1769,15 +1797,6 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 	}
+ 	nbd->disk = disk;
+ 
+-	nbd->recv_workq = alloc_workqueue("nbd%d-recv",
+-					  WQ_MEM_RECLAIM | WQ_HIGHPRI |
+-					  WQ_UNBOUND, 0, nbd->index);
+-	if (!nbd->recv_workq) {
+-		dev_err(disk_to_dev(nbd->disk), "Could not allocate knbd recv work queue.\n");
+-		err = -ENOMEM;
+-		goto out_err_disk;
+-	}
+-
+ 	/*
+ 	 * Tell the block layer that we are not a rotational device
+ 	 */
+@@ -1808,7 +1827,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 	disk->first_minor = index << part_shift;
+ 	if (disk->first_minor < index || disk->first_minor > MINORMASK) {
+ 		err = -EINVAL;
+-		goto out_free_work;
++		goto out_err_disk;
+ 	}
+ 
+ 	disk->minors = 1 << part_shift;
+@@ -1817,7 +1836,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 	sprintf(disk->disk_name, "nbd%d", index);
+ 	err = add_disk(disk);
+ 	if (err)
+-		goto out_free_work;
++		goto out_err_disk;
+ 
+ 	/*
+ 	 * Now publish the device.
+@@ -1826,8 +1845,6 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 	nbd_total_devices++;
+ 	return nbd;
+ 
+-out_free_work:
+-	destroy_workqueue(nbd->recv_workq);
+ out_err_disk:
+ 	blk_cleanup_disk(disk);
+ out_free_idr:
+@@ -2086,7 +2103,7 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
+ 	 * Make sure recv thread has finished, we can safely call nbd_clear_que()
+ 	 * to cancel the inflight I/Os.
+ 	 */
+-	flush_workqueue(nbd->recv_workq);
++	flush_recv_works(nbd);
+ 	nbd_clear_que(nbd);
+ 	nbd->task_setup = NULL;
+ 	mutex_unlock(&nbd->config_lock);
+-- 
+2.11.0
 
->  BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:35
->  in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 119, name: kworker/u2:2
->  5 locks held by kworker/u2:2/119:
->   #0: ffff8c2e4a88f538 ((wq_completion)xfs-cil/dm-0){+.+.}-{0:0}, at: process_one_work+0x200/0x450
->   #1: ffffab3840ac7e68 ((work_completion)(&cil->xc_push_work)){+.+.}-{0:0}, at: process_one_work+0x200/0x450
->   #2: ffff8c2e4a887128 (&cil->xc_ctx_lock){++++}-{3:3}, at: xlog_cil_push_work+0xb7/0x670 [xfs]
->   #3: ffffffffa6a63780 (rcu_read_lock){....}-{1:2}, at: blk_add_trace_bio+0x0/0x1f0
->   #4: ffffffffa6610620 (running_trace_lock){+.+.}-{2:2}, at: __blk_add_trace+0x3ef/0x480
->  Preemption disabled at:
->  [<ffffffffa4d35c05>] migrate_enable+0x45/0x140
->  CPU: 0 PID: 119 Comm: kworker/u2:2 Kdump: loaded Not tainted 5.14.0-25.rt21.25.light.el9.x86_64+debug #1
->  Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
->  Workqueue: xfs-cil/dm-0 xlog_cil_push_work [xfs]
->  Call Trace:
->   ? migrate_enable+0x45/0x140
->   dump_stack_lvl+0x57/0x7d
->   ___might_sleep.cold+0xe3/0xf7
->   rt_spin_lock+0x3a/0xd0
->   ? __blk_add_trace+0x3ef/0x480
->   __blk_add_trace+0x3ef/0x480
->   blk_add_trace_bio+0x18d/0x1f0
->   trace_block_bio_queue+0xb5/0x150
->   submit_bio_checks+0x1f0/0x520
->   ? sched_clock_cpu+0xb/0x100
->   submit_bio_noacct+0x30/0x1d0
->   ? bio_associate_blkg+0x66/0x190
->   xlog_cil_push_work+0x1b6/0x670 [xfs]
->   ? register_lock_class+0x43/0x4f0
->   ? xfs_swap_extents+0x5f0/0x5f0 [xfs]
->   process_one_work+0x275/0x450
->   ? process_one_work+0x200/0x450
->   worker_thread+0x55/0x3c0
->   ? process_one_work+0x450/0x450
->   kthread+0x188/0x1a0
->   ? set_kthread_struct+0x40/0x40
->   ret_from_fork+0x22/0x30
-
-The above fills 90% of my screen with _no_ additional information. What
-about:
-
-   The running_trace_lock protects running_trace_list and is acquired
-   within the tracepoint which implies disabled preemption. The spinlock_t
-   typed lock can not be acquired with disabled preemption on PREEMPT_RT
-   because it becomes a sleeping lock.
-   The runtime of the tracepoint depends on the number of entries in
-   running_trace_list and has no limit. The blk-tracer is considered debug
-   code and higher latencies here are okay.
-   
-   Make running_trace_lock a raw_spinlock_t
-
-> To avoid this bug, we switch the trace lock to a raw spinlock.
-
-Basically I want to give rationale _why_ changing a lock to
-raw_spinlock_t _here_ is okay. I want to avoid that people slap a
-s/spinlock_t/raw_spinlock_t/ each time they see warning of this kind.
-
-> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-
-Sebastian
