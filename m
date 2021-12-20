@@ -2,72 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B951CC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 20 Dec 2021 17:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D11C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Dec 2021 18:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235154AbhLTRKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Dec 2021 12:10:17 -0500
-Received: from mail-pg1-f173.google.com ([209.85.215.173]:36554 "EHLO
-        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235057AbhLTRKR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Dec 2021 12:10:17 -0500
-Received: by mail-pg1-f173.google.com with SMTP id 200so9950471pgg.3;
-        Mon, 20 Dec 2021 09:10:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=tJqbUHV90MYT7sauKSyrvUY9zVpGUS3+UEyHIr2dLnY=;
-        b=UEasx0lBZEwvrRTO2FI4Z9/fnVWR1s3QCrGrlUITfopN6LpLLwNxOgOX6lUKm7ULtQ
-         7zyipi1a289sY2K2+nHpSxTgfGnZcRGT9W56E7YXLuHaoZzFEF+iHJYUJcT8ycJa2DfG
-         mYWI1TBJzs0jmZDXHIYK/7ylyCnjBT14U8NG0cwyYrT87TIg1zLzvqKiXV6yzVsxqZFI
-         pdlGbRpUfy+DoXQOn2DvCBCNcToA0B9RaDp/HTVPCi1usbqEDYCngX9DYZ9c0KurDSz4
-         PeMOXQq1ho/nawpGXY9TkILY7kIP55HEkHkL755+/vA+fPWzCCKuHwHUr+XS3Z0Dg16k
-         +Ttw==
-X-Gm-Message-State: AOAM530HMVuOXiOAS/ZHHzVWnRB1JMhgVtj2GHuC6yUajW6vPcvr7IzC
-        OZTnABaWsyRHrb1VMU7l958=
-X-Google-Smtp-Source: ABdhPJxwOSjE1jdX7wbjjGBxvw5S+FLJAIe83DDBI6cya2hxJp0wNz/zciDp+jHSlP+7qyAUAlUVLw==
-X-Received: by 2002:a63:8ac2:: with SMTP id y185mr15868960pgd.205.1640020216814;
-        Mon, 20 Dec 2021 09:10:16 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id x33sm9549361pfh.212.2021.12.20.09.10.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Dec 2021 09:10:16 -0800 (PST)
-Message-ID: <a4ba2441-83eb-dde2-09ae-7c5f42ff6ad3@acm.org>
-Date:   Mon, 20 Dec 2021 09:10:14 -0800
+        id S235305AbhLTSPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Dec 2021 13:15:19 -0500
+Received: from mga07.intel.com ([134.134.136.100]:35096 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232777AbhLTSPT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Dec 2021 13:15:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1640024119; x=1671560119;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xn3SfHAVBBxgPNY/hfMHHIDWLipvyx6cHeleLt7x/qI=;
+  b=ZLT1fuI6bUi4rFwLyKh5YnsUM6IOACWTQ69QIfG8TFS0H1XJOw8TwkoD
+   DafifOtphkympgkgdGi7lOliDHxt68MyPDF6sQ1PbtPWypZvXE1+Z4JGz
+   ByK+krBV42NymwnUnqGx1lAzRZL8kVib6wdXY4mBzNc1LYoZmyPhkpJUD
+   q9Gd8mmQCPYWvmQJfOYaeHJ4oXb3pAhCj29FKly4enhE0fsuz/csXLwDO
+   LSY4I3kLioneB039ezT9flMZs3iQmGIb5bPmif5fShyrSYVC8P0+RPRKw
+   k2M8rMWE5uZsb4HJ+rADVhynNyxkMm39/80TsOdBEWcy368yAiG5Avf2G
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10203"; a="303615285"
+X-IronPort-AV: E=Sophos;i="5.88,221,1635231600"; 
+   d="scan'208";a="303615285"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2021 10:15:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,221,1635231600"; 
+   d="scan'208";a="684370606"
+Received: from lkp-server02.sh.intel.com (HELO 9f38c0981d9f) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 20 Dec 2021 10:15:15 -0800
+Received: from kbuild by 9f38c0981d9f with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mzNBr-00085W-6H; Mon, 20 Dec 2021 18:15:15 +0000
+Date:   Tue, 21 Dec 2021 02:14:14 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Wander Lairson Costa <wander@redhat.com>,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Wander Lairson Costa <wander@redhat.com>
+Subject: Re: [PATCH v4 1/1] blktrace: switch trace spinlock to a raw spinlock
+Message-ID: <202112210258.y6u1AZpZ-lkp@intel.com>
+References: <20211220130357.8790-2-wander@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] nbd: Don't use workqueue to handle recv work
-Content-Language: en-US
-To:     Xie Yongji <xieyongji@bytedance.com>, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org
-References: <20211220122241.150-1-xieyongji@bytedance.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20211220122241.150-1-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211220130357.8790-2-wander@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/20/21 04:22, Xie Yongji wrote:
-> The rescuer thread might take over the works queued on
-> the workqueue when the worker thread creation timed out.
-> If this happens, we have no chance to create multiple
-> recv threads which causes I/O hung on this nbd device.
-> 
-> To fix it, this tries to create kthreads directly to
-> handle the recv work instead of using workqueue.
+Hi Wander,
 
-Why a kthread instead of only removing the WQ_MEM_RECLAIM flag from the 
-alloc_workqueue() call? This should have been explained in the patch 
-description. Additionally, a Fixes: tag is missing.
+Thank you for the patch! Yet something to improve:
 
-Thanks,
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linux/master linus/master v5.16-rc6 next-20211220]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Bart.
+url:    https://github.com/0day-ci/linux/commits/Wander-Lairson-Costa/blktrace-switch-trace-spinlock-to-a-raw-spinlock/20211220-210538
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: hexagon-randconfig-r045-20211220 (https://download.01.org/0day-ci/archive/20211221/202112210258.y6u1AZpZ-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 555eacf75f21cd1dfc6363d73ad187b730349543)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/b270731108ecba0d77a6db93d057290406c51a20
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Wander-Lairson-Costa/blktrace-switch-trace-spinlock-to-a-raw-spinlock/20211220-210538
+        git checkout b270731108ecba0d77a6db93d057290406c51a20
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash drivers/gpu/drm/ kernel/trace/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   kernel/trace/blktrace.c:148:63: warning: parameter 'blkcg' set but not used [-Wunused-but-set-parameter]
+   void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
+                                                                 ^
+>> kernel/trace/blktrace.c:1611:17: error: incompatible pointer types passing 'raw_spinlock_t *' (aka 'struct raw_spinlock *') to parameter of type 'spinlock_t *' (aka 'struct spinlock *') [-Werror,-Wincompatible-pointer-types]
+                   spin_lock_irq(&running_trace_lock);
+                                 ^~~~~~~~~~~~~~~~~~~
+   include/linux/spinlock.h:372:55: note: passing argument to parameter 'lock' here
+   static __always_inline void spin_lock_irq(spinlock_t *lock)
+                                                         ^
+   kernel/trace/blktrace.c:1613:19: error: incompatible pointer types passing 'raw_spinlock_t *' (aka 'struct raw_spinlock *') to parameter of type 'spinlock_t *' (aka 'struct spinlock *') [-Werror,-Wincompatible-pointer-types]
+                   spin_unlock_irq(&running_trace_lock);
+                                   ^~~~~~~~~~~~~~~~~~~
+   include/linux/spinlock.h:397:57: note: passing argument to parameter 'lock' here
+   static __always_inline void spin_unlock_irq(spinlock_t *lock)
+                                                           ^
+   1 warning and 2 errors generated.
+
+
+vim +1611 kernel/trace/blktrace.c
+
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1599  
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1600  static int blk_trace_remove_queue(struct request_queue *q)
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1601  {
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1602  	struct blk_trace *bt;
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1603  
+c3dbe541ef7775 kernel/trace/blktrace.c Jan Kara                 2020-06-05  1604  	bt = rcu_replace_pointer(q->blk_trace, NULL,
+85e0cbbb8a7953 kernel/trace/blktrace.c Luis Chamberlain         2020-06-19  1605  				 lockdep_is_held(&q->debugfs_mutex));
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1606  	if (bt == NULL)
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1607  		return -EINVAL;
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1608  
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1609  	if (bt->trace_state == Blktrace_running) {
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1610  		bt->trace_state = Blktrace_stopped;
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23 @1611  		spin_lock_irq(&running_trace_lock);
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1612  		list_del_init(&bt->running_list);
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1613  		spin_unlock_irq(&running_trace_lock);
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1614  		relay_flush(bt->rchan);
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1615  	}
+5afedf670caf30 kernel/trace/blktrace.c Zhihao Cheng             2021-09-23  1616  
+a6da0024ffc19e kernel/trace/blktrace.c Jens Axboe               2017-11-05  1617  	put_probe_ref();
+c780e86dd48ef6 kernel/trace/blktrace.c Jan Kara                 2020-02-06  1618  	synchronize_rcu();
+ad5dd5493a55e4 kernel/trace/blktrace.c Li Zefan                 2009-03-27  1619  	blk_trace_free(bt);
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1620  	return 0;
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1621  }
+c71a896154119f block/blktrace.c        Arnaldo Carvalho de Melo 2009-01-23  1622  
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
