@@ -2,106 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F3CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 15:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39920C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 15:25:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239194AbhLUPTs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 10:19:48 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4314 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239157AbhLUPTr (ORCPT
+        id S239305AbhLUPZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 10:25:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59202 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239283AbhLUPZH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 10:19:47 -0500
-Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JJKl45Wzpz6H8S1;
-        Tue, 21 Dec 2021 23:15:12 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 16:19:44 +0100
-Received: from [10.195.32.222] (10.195.32.222) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 15:19:44 +0000
-Subject: Re: [PATCH RFT] blk-mq: optimize queue tag busy iter for shared_tags
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ming.lei@redhat.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-References: <20211221123157.14052-1-kashyap.desai@broadcom.com>
- <e9174a89-b3a4-d737-c5a9-ff3969053479@huawei.com>
- <7028630054e9cd0e8c84670a27c2b164@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <e7288bcd-cc4d-8f57-a0c8-eadd53732177@huawei.com>
-Date:   Tue, 21 Dec 2021 15:19:43 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Tue, 21 Dec 2021 10:25:07 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE8A1C061574
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 07:25:06 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id z26so18062539iod.10
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 07:25:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1nswmIXvkrgdGsozU3iZx920lgYKsqE2KdHTmx1sEkY=;
+        b=tlEICRYnaczk+jXexMQbyT6UB86cUJhvbNq6yjDPnzv8/uG1ta2zkMxPBmL5I6ildh
+         /t8JmErPIszZfzjnxhOgktmM9nnSaLgUbHk5KmKEdQkc6KDfLBma4yBZpNwt0Hfvhtvc
+         smp2HPUxWngwO/s5rMo5kWXNMBcQCqWkZa2z6vH3VtdCrZbB17YdeZxrQdf9cdcLNSQ+
+         P+cQBs7uCSzQHKNNT3nwFl01CEN4Qlm6cq/rYnZ1Vprhd0daXmj0huImLelXjBVKE3Bj
+         1wBFKAE51b/Hpu5+LUs6vFASW3WJwgvhq3naazQLVNTQd9vFC2su+MiDs4SnOL+uZBpH
+         m6Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1nswmIXvkrgdGsozU3iZx920lgYKsqE2KdHTmx1sEkY=;
+        b=7Y+4B7Rsh/YbP2OAHCkNx9T1syxqfyQP0c9kHOgiSiiyUb3LkiYlAfwKlY9W5tUhuh
+         FV1fk1hryH5e19I0154eZYAa7nZepsTRoI9yHMCTHC3lC8U4Z72k4G+dojtSYWcxpJah
+         +I7hHHwT7Cp98M/f5TxHT5TRvaZHtOK3nZazT47tf3sirAz6lr5EQR9CqQHevBTSQzoW
+         YfblSLkWAZet+JeI1npiZGuO7qZHk05B8Ctp5wwS+OLSI5/WmUYU5HCMTvTNa0r7ro4A
+         rGZtlHA1r7CFBG7pdHS18Ed6TO2sRCAOZz+G/PN03Svz8NwGWt1mIF8pgFc2ixnCRjTR
+         J1GA==
+X-Gm-Message-State: AOAM530OCOW4gh80MIkHtHkhcWPTw+NZ9dYjQwBTPfElVkLW0hcHiMr0
+        7sAlyEpd2fXXOCbo5sqCmDtDm8ZfnOey4Q==
+X-Google-Smtp-Source: ABdhPJxK104GzhXJnT+gHzCxZmWtbC6T7ciYqYcYMTLp6Mxau8YEuA532kQe83FSc/UZ+crXL0wcPg==
+X-Received: by 2002:a05:6638:4129:: with SMTP id ay41mr2154729jab.23.1640100306190;
+        Tue, 21 Dec 2021 07:25:06 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id c22sm10425970ioz.15.2021.12.21.07.25.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Dec 2021 07:25:05 -0800 (PST)
+Subject: Re: [syzbot] general protection fault in set_task_ioprio
+To:     Eric Dumazet <edumazet@google.com>,
+        syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     changbin.du@intel.com,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        David Miller <davem@davemloft.net>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Yajun Deng <yajun.deng@linux.dev>
+References: <000000000000c70eef05d39f42a5@google.com>
+ <00000000000066073805d3a4f598@google.com>
+ <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
+Date:   Tue, 21 Dec 2021 08:25:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <7028630054e9cd0e8c84670a27c2b164@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.32.222]
-X-ClientProxiedBy: lhreml750-chm.china.huawei.com (10.201.108.200) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Kashyap,
-
-> This is for current/5.17. This patch is meaningfully only on top of [1].
+On 12/21/21 3:44 AM, Eric Dumazet wrote:
+> On Tue, Dec 21, 2021 at 1:52 AM syzbot
+> <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
+>>
+>> syzbot has bisected this issue to:
+>>
+>> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
+>> Author: Eric Dumazet <edumazet@google.com>
+>> Date:   Tue Dec 7 01:30:37 2021 +0000
+>>
+>>     netlink: add net device refcount tracker to struct ethnl_req_info
+>>
 > 
-> [1] " blk-mq: Use shared tags for shared sbitmap support" Commit -
-> e155b0c238b20f0a866f4334d292656665836c8a
+> Unfortunately this commit will be in the way of many bisections.
 > 
-
-But your change seems effectively the same as in 
-https://lore.kernel.org/all/1638794990-137490-4-git-send-email-john.garry@huawei.com/, 
-which is now merged in Jens' 5.17 queue:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.17/block&id=fea9f92f1748083cb82049ed503be30c3d3a9b69
-
-> While doing additional testing for [1], I noticed some performance issue.
-> Along with the performance issue, I noticed CPU lockup as well. Lockup
-> trace -
+> Real bug was added in
 > 
-> _raw_spin_lock_irqsave+0x42/0x50
->   blk_mq_find_and_get_req+0x20/0xa0
->   bt_iter+0x2d/0x80
->   blk_mq_queue_tag_busy_iter+0x1aa/0x2f0
->   ? blk_mq_complete_request+0x30/0x30
->   ? blk_mq_complete_request+0x30/0x30
->   ? __schedule+0x360/0x850
->   blk_mq_timeout_work+0x5e/0x120
->   process_one_work+0x1a8/0x380
->   worker_thread+0x30/0x380
->   ? wq_calc_node_cpumask.isra.30+0x100/0x100
->   kthread+0x167/0x190
->   ? set_kthread_struct+0x40/0x40
->   ret_from_fork+0x22/0x30
+> commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Thu Dec 9 07:31:29 2021 +0100
 > 
-> It is a generic performance issue if driver use " shost->host_tagset = 1".
-> In fact, I found that [1] is useful to fix performance issue and provided
-> this additional patch.
+>     block: open code create_task_io_context in set_task_ioprio
 > 
-> I changed my setup to have 64 scsi_devices (earlier I just kept 16 or 24
-> drives, so did not noticed this issue). Performance/cpu lockup issue is not
-> due to [1].
-> More number of scsi device, hardware context per host and high queue depth
-> will increase the chances of lockup and performance drop.
+>     The flow in set_task_ioprio can be simplified by simply open coding
+>     create_task_io_context, which removes a refcount roundtrip on the I/O
+>     context.
 > 
-> Do you think, it is good to have changes in 5.16 + stable ?
-> I don't know if this  patch will create any side effect. Can you review and
-> let me know your feedback. ?
-> 
+>     Signed-off-by: Christoph Hellwig <hch@lst.de>
+>     Reviewed-by: Jan Kara <jack@suse.cz>
+>     Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Can you test my merged change again for this scenario?
+There are only really 5 patches in between the broken commit and the one
+that fixes it, and it only affects things trying to set the ioprio with
+a dead task. Is this a huge issue? I don't see why this would cause a
+lot of bisection headaches.
 
-I will also note that I mentioned previously that 
-blk_mq_queue_tag_busy_iter() was not optimum for shared sbitmap, i.e. 
-before shared tags, but no one said performance was bad for shared sbitmap.
+-- 
+Jens Axboe
 
-Thanks,
-John
