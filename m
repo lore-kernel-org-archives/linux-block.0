@@ -2,61 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03795C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 05:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BA8C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 08:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbhLUFVI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 00:21:08 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:52071 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232517AbhLUFVH (ORCPT
+        id S235414AbhLUIL1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 03:11:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43030 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234701AbhLUIL1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 00:21:07 -0500
-Received: by mail-io1-f72.google.com with SMTP id s199-20020a6b2cd0000000b005ed3e776ad0so8477468ios.18
-        for <linux-block@vger.kernel.org>; Mon, 20 Dec 2021 21:21:07 -0800 (PST)
+        Tue, 21 Dec 2021 03:11:27 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71DEC061574;
+        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id y9so11680020pgj.5;
+        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CNQ27S31DQKVMGNaa41vJ0MWzIDdPEbu6tohUmL45Xc=;
+        b=pWK7rOOe6EgoIgreqR5MDZpNyU04GgACI0jFEnyQ7jExs/7udsljcJrTRwZEPfYbwd
+         YkVlyFt10PL4riFiWcVbhu8LmpmmK2H0ZQVtO/z68Gyrsdhqd7Fnf5dneJzJ+LI6GzAL
+         9oCUXjCyX+2x+mrhIiSi1ZE/oyDDgMWJ4ihXNqpLPvF752E50HoZQDFsmvJl1jujPur7
+         +oR2aKa7zgfO1CFOFyJ55EYKbJqR4LZOWhVfPUx9BpozHtEnpoQ2fUA0U1BXMdos+56s
+         Mi+wCnO9sOOaWnXXwVOuDesraAB8rkTU6lpx+r9R7Q3I2BDYwJnouyEcaOvJaxArG7KY
+         i18Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=pAkGYvpJnzLica1LfFPS5fVVW20iI4ebrlJU4TBRC1w=;
-        b=SDJy0+rVPL8zgzeERJo23VUgF0zslWktnxTHL5KAZtDXdNrHpn/leBUMMNYsVvtMe2
-         Zr6swjKZ0q6dG3XH6keetEsJ7lKmdFRxW/QoleHsqI3S0HtGXuiZqMegYjM0iY6RzF7K
-         pu70gNbiT8R7u58swu4e+QPA/gpzYHvtDTtDrIozCZy7czfinzGkQ/WXlIaJ86uKu0oR
-         0TZVXHSvv4WJ9F5DZWF5dg6ErEALrQE74MjzJUdPczRn2Kk00PrfCF/Dnj6YSDEoEPVV
-         HFKyFrBJHzQThwYzFl9/PKCB9TKPV9b6zNq2W9VBPmWG6lkm+6A3sOIX4EIl/nC2Up3c
-         pLug==
-X-Gm-Message-State: AOAM530p55YtTM9mu0Q2c+pM6qZO/vkjo853K0YeOWSdlVGQpbfMe2by
-        1KxiP2R+DJtVUTaAzI25zLE47KmXSWc8ApfUh2a+X8ltbUaR
-X-Google-Smtp-Source: ABdhPJzS3GVIK0iN6UAGQUIYIE7VHAjysuGY/+j4c2ZHySOCtT0bggn2d6ZgGUznxMwY4oZx0iqBl07uUkLjNeNC4zm/b04G1ZFQ
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CNQ27S31DQKVMGNaa41vJ0MWzIDdPEbu6tohUmL45Xc=;
+        b=7zSa4bwpPwUv4ZB8LnXvLK2cfZzal3TLTcukTKbefafGC5so4o2Pg4Z1viYjCAuyhU
+         DkgD0KQGi8dFyi/WbTRiE1bx5Rq8DQOeQRg4hsuuqXZg3zl+Ao8OI56GFvLBHZqjPyej
+         hi6N2RYM1M46tv6h0LYCK+h0CLRT/cQqQQsnLoQsAizC9tSLdqXvG8bmo11OaLjFi2IY
+         KoKj7unNfX8VK2upB32/jmCDpkz6Qm9FZgx3lgHNdgGKSlChNacI34HMprAzo4X8120y
+         Jw/0/bJHD+Nzq+nsL2R0x3sObTW6Wu7gGU+dRsAsyJPJnT9ffw9ZsGp+NwvKAIZbUVil
+         8fgA==
+X-Gm-Message-State: AOAM530WXUtvlBz8lLwSPuL8LbRHvwon0NkBO/QU2+5bnwn3k825ncRT
+        K8B1InUPPS+C2NWhfHtdWjgoEnw/pqM=
+X-Google-Smtp-Source: ABdhPJzivj4IPkq9WcmMOBNQPCbJy7iEXusOZPE0zZnBwVmWYQio52v+igjnlqR4d8Jn8/gjmKRBYA==
+X-Received: by 2002:a62:8042:0:b0:4a8:15eb:db10 with SMTP id j63-20020a628042000000b004a815ebdb10mr2128313pfd.28.1640074286391;
+        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
+Received: from FLYINGPENG-MB0.tencent.com ([103.7.29.30])
+        by smtp.gmail.com with ESMTPSA id t8sm21024635pfj.26.2021.12.21.00.11.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
+From:   Peng Hao <flyingpenghao@gmail.com>
+X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH]  block/elevator: handle possible null pointer
+Date:   Tue, 21 Dec 2021 16:10:42 +0800
+Message-Id: <20211221081042.78799-1-flyingpeng@tencent.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:190e:: with SMTP id w14mr694808ilu.191.1640064067391;
- Mon, 20 Dec 2021 21:21:07 -0800 (PST)
-Date:   Mon, 20 Dec 2021 21:21:07 -0800
-In-Reply-To: <7ded6b2a-1f95-73a2-c074-2841dd5aaf96@kernel.dk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000025571305d3a12cdd@google.com>
-Subject: Re: [syzbot] general protection fault in set_task_ioprio
-From:   syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+There is a check for q->tag_set in the front of elevator_get_default,
+and there should be a check here too.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+---
+ block/elevator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reported-and-tested-by: syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com
+diff --git a/block/elevator.c b/block/elevator.c
+index 1f39f6e8ebb9..b7d0bead680c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -636,7 +636,7 @@ static struct elevator_type *elevator_get_default(struct request_queue *q)
+ 	if (q->tag_set && q->tag_set->flags & BLK_MQ_F_NO_SCHED_BY_DEFAULT)
+ 		return NULL;
+ 
+-	if (q->nr_hw_queues != 1 &&
++	if (q->nr_hw_queues != 1 && q->tag_set &&
+ 	    !blk_mq_is_shared_tags(q->tag_set->flags))
+ 		return NULL;
+ 
+-- 
+2.27.0
 
-Tested on:
-
-commit:         e1ad6d38 Merge branch 'for-5.17/block' into for-next
-git tree:       git://git.kernel.dk/linux-block for-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f22078a087d573ce
-dashboard link: https://syzkaller.appspot.com/bug?extid=8836466a79f4175961b0
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Note: testing is done by a robot and is best-effort only.
