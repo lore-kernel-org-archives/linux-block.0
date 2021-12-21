@@ -2,96 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2994C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 17:27:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FCFC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 17:58:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231187AbhLUR1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 12:27:34 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:53664 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbhLUR1d (ORCPT
+        id S240787AbhLUR6D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 12:58:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38786 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240786AbhLUR6C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 12:27:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=tHUZjlzEP3lopTOQQN8mNVWiWWJwS29dSxMFB9HD+A8=; b=BGAK1lUDvyuZ48bEqcCgg4po+X
-        NmanPhpAS6+UNAz03pYcDzNhaFu6mxvVL+qqnx53zeLQX6h1PxLDsBp8IULQlncbyQRvfjX79PRX9
-        gvGf08CiKgzW2Sj7hkGZNGAo4+HMl1MGmxNHvizb/NiE6kQd8yfGXJ/3dXLgtk53IKoxY4ZDedsfU
-        DPyaBVJpdtBflN4LZlAsXbgLCmRJRoBDGMAfmDRTKiT01PhljpgcRRK1n7m1/kODICqJNT8gQZlWb
-        9hO76EMgdAOZiU3xTp4NH/AWvbL4YKf/4o7K7oRm5tr5TSQHxlKuC+ozusnGeek8c5BYNcduFKMx3
-        t6BHI/9w==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1mziuv-00AX3M-08; Tue, 21 Dec 2021 10:27:14 -0700
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-References: <20211117215410.3695-1-logang@deltatee.com>
- <20211117215410.3695-22-logang@deltatee.com> <20211221090648.GE7949@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <369770be-c2d1-fcbf-f317-279981707cb9@deltatee.com>
-Date:   Tue, 21 Dec 2021 10:27:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Tue, 21 Dec 2021 12:58:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD95C061574;
+        Tue, 21 Dec 2021 09:58:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5B22161560;
+        Tue, 21 Dec 2021 17:58:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 843AFC36AE8;
+        Tue, 21 Dec 2021 17:58:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640109481;
+        bh=3qgi7m2U5AM2AOiPN4zIxugcdCksddJqx+Ux44PyM1Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qAo8OY8u5TEnvSJXZTiZPWyAFXoQ498I07KyY1TYKZm7G6Q8/kCLLQ7dhohQ3ANj2
+         4iL+bFix8HrBp5vSbuDu6qaN7g3Q+7TVrHR+0HMN6xYmwYmgzytDnN6u2ttbRB3bT6
+         GZVH0aIXC7jY4Z4U7miqtQgUscHNZQa1urs8sQBEzpLyIAKDiIx5AAYn2ztZ7SqO4L
+         rL8i0riLSvD54/OWExGZg0jvHJAXhyVPf3KYe3STaWLh16pAczqyW7Obw+Dyr+fLuO
+         VocalQNktwbs6YMxyTE4njNwdbNToIenMfRfR6ia1m7qhFKRaWz4bt7Ew6DkwMNwgw
+         IDxVE7i7sqW+w==
+Date:   Tue, 21 Dec 2021 12:58:00 -0500
+From:   Sasha Levin <sashal@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH AUTOSEL 5.15 20/29] block: reduce
+ kblockd_mod_delayed_work_on() CPU consumption
+Message-ID: <YcIVqFOrxbG8sqXK@sashalap>
+References: <20211221015751.116328-1-sashal@kernel.org>
+ <20211221015751.116328-20-sashal@kernel.org>
+ <MWHPR21MB1593141494C76CF5A0BDDB11D77C9@MWHPR21MB1593.namprd21.prod.outlook.com>
+ <ad76826e-73b2-b2f0-3cd4-8481645a6568@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20211221090648.GE7949@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v4 21/23] mm: use custom page_free for P2PDMA pages
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ad76826e-73b2-b2f0-3cd4-8481645a6568@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2021-12-21 2:06 a.m., Christoph Hellwig wrote:
-> On Wed, Nov 17, 2021 at 02:54:08PM -0700, Logan Gunthorpe wrote:
->> When P2PDMA pages are passed to userspace, they will need to be
->> reference counted properly and returned to their genalloc after their
->> reference count returns to 1. This is accomplished with the existing
->> DEV_PAGEMAP_OPS and the .page_free() operation.
+On Tue, Dec 21, 2021 at 08:36:33AM -0700, Jens Axboe wrote:
+>On 12/21/21 8:35 AM, Michael Kelley (LINUX) wrote:
+>> From: Sasha Levin <sashal@kernel.org> Sent: Monday, December 20, 2021 5:58 PM
+>>>
+>>> From: Jens Axboe <axboe@kernel.dk>
+>>>
+>>> [ Upstream commit cb2ac2912a9ca7d3d26291c511939a41361d2d83 ]
+>>>
+>>> Dexuan reports that he's seeing spikes of very heavy CPU utilization when
+>>> running 24 disks and using the 'none' scheduler. This happens off the
+>>> sched restart path, because SCSI requires the queue to be restarted async,
+>>> and hence we're hammering on mod_delayed_work_on() to ensure that the work
+>>> item gets run appropriately.
+>>>
+>>> Avoid hammering on the timer and just use queue_work_on() if no delay
+>>> has been specified.
+>>>
+>>> Reported-and-tested-by: Dexuan Cui <decui@microsoft.com>
+>>> Link: https://lore.kernel.org/linux-block/BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com/
+>>> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>>> ---
+>>>  block/blk-core.c | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>> index c2d912d0c976c..a728434fcff87 100644
+>>> --- a/block/blk-core.c
+>>> +++ b/block/blk-core.c
+>>> @@ -1625,6 +1625,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
+>>>  int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
+>>>  				unsigned long delay)
+>>>  {
+>>> +	if (!delay)
+>>> +		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
+>>>  	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
+>>>  }
+>>>  EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+>>> --
+>>> 2.34.1
 >>
->> Change CONFIG_P2PDMA to select CONFIG_DEV_PAGEMAP_OPS and add
->> MEMORY_DEVICE_PCI_P2PDMA to page_is_devmap_managed(),
->> devmap_managed_enable_[put|get]() and free_devmap_managed_page().
-> 
-> Uuuh.  We are trying hard to kill off this magic free at refcount 1
-> behavior in the amdgpu device coherent series.  We really should not
-> add more of this.
+>> Sasha -- there are reports of this patch causing performance problems.
+>> See
+>> https://lore.kernel.org/lkml/1639853092.524jxfaem2.none@localhost/. I
+>> would suggest *not* backporting it to any of the stable branches until
+>> the issues are fully sorted out.
+>
+>Both this and the revert were backported. Which arguably doesn't make a
+>lot of sense, but at least it's consistent and won't cause any issues...
 
-Ah, ok. I found Ralph's patch that cleans this up and I can try to
-rebase this onto it for future postings until it gets merged.
+The logic behind it is that it makes it easy for both us as well as
+everyone else to annotate why a certain patch might be "missing" from
+the trees - in this case because it was reverted.
 
-Your other comments I can address for the next time I post this series.
+It looks dumb now, but it saves a lot of time as well as mitigates the
+risk of it being picked up again at some point in the future.
 
-Thanks for the review!
-
-Logan
+-- 
+Thanks,
+Sasha
