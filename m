@@ -2,155 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7D1C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 12:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13550C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 13:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237900AbhLUMzt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 07:55:49 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4313 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237896AbhLUMzt (ORCPT
+        id S238268AbhLUNrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 08:47:00 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:54201 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232876AbhLUNrA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 07:55:49 -0500
-Received: from fraeml739-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JJGbM2jPCz67Vss;
-        Tue, 21 Dec 2021 20:53:19 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml739-chm.china.huawei.com (10.206.15.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 13:55:46 +0100
-Received: from [10.195.32.222] (10.195.32.222) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 21 Dec 2021 12:55:45 +0000
-Subject: Re: [PATCH RFT] blk-mq: optimize queue tag busy iter for shared_tags
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ming.lei@redhat.com>, <sathya.prakash@broadcom.com>
-References: <20211221123157.14052-1-kashyap.desai@broadcom.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <e9174a89-b3a4-d737-c5a9-ff3969053479@huawei.com>
-Date:   Tue, 21 Dec 2021 12:55:44 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Tue, 21 Dec 2021 08:47:00 -0500
+Received: from fsav312.sakura.ne.jp (fsav312.sakura.ne.jp [153.120.85.143])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BLDknfx026573;
+        Tue, 21 Dec 2021 22:46:49 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav312.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav312.sakura.ne.jp);
+ Tue, 21 Dec 2021 22:46:49 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav312.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BLDknb2026560
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 21 Dec 2021 22:46:49 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <6562c672-e6e4-2f85-c5ce-dafc8b528cbf@i-love.sakura.ne.jp>
+Date:   Tue, 21 Dec 2021 22:46:48 +0900
 MIME-Version: 1.0
-In-Reply-To: <20211221123157.14052-1-kashyap.desai@broadcom.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] block: fix error handling for device_add_disk
 Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp>
+ <20211216161806.GA31879@lst.de> <20211216161928.GB31879@lst.de>
+ <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
+ <20211221100811.GA10674@lst.de> <20211221101517.GA13416@lst.de>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+In-Reply-To: <20211221101517.GA13416@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.32.222]
-X-ClientProxiedBy: lhreml750-chm.china.huawei.com (10.201.108.200) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/12/2021 12:31, Kashyap Desai wrote:
-
-Hi Kashyap,
-
-What kernel is this for? 5.17 or 5.16 + stable? Your intention is not 
-clear to me.
-
-
-> In [0], CPU usage for blk_mq_queue_tag_busy_iter() was optimized, but
-> there are still periodic call of blk_mq_queue_tag_busy_iter() from
-> below context. Below context is used for block layer timer to find out
-> potential expired command (per request queue) which requires tag iteration
-> almost every 5 seconds(defined BLK_MAX_TIMEOUT) for each request queue.
+On 2021/12/21 19:15, Christoph Hellwig wrote:
+>>> I think we can apply this patch as-is...
+>>
+>> With the patch as-is we'll still leak disk->ev if device_add fails.
+>> Something like the patch below should solve that by moving the disk->ev
+>> allocation later and always cleaning it up through disk->release:
 > 
-> kthread
->          worker_thread
->          process_one_work
->          blk_mq_timeout_work
->          blk_mq_queue_tag_busy_iter
->          bt_iter
->          blk_mq_find_and_get_req
->          _raw_spin_lock_irqsave
->          native_queued_spin_lock_slowpath
-> 
-> Changes in this patch optimize extra iterations of tags in case of
-> shared_tags. One iteration of shared_tags can give expected results for
-> iterate function.
-> 
-> Setup -  AMD64 Gen-4.0 Server.
-> 64 Virtual Drive created using 16 Nvme drives + mpi3mr driver (in
-> shared_tags mode)
-> 
-> Test command -
-> fio 64.fio --rw=randread --bs=4K --iodepth=32 --numjobs=2 --ioscheduler=mq-deadline --disk_util=0
-> 
-> Without this patch on 5.16.0-rc5, mpi3mr driver in shared_tags mode can
-> give 4.0M IOPs vs expected to get ~6.0M.
-> Snippet of perf top
-> 
->    25.42%  [kernel]                               [k] native_queued_spin_lock_slowpath
->     3.95%  [kernel]                               [k] cpupri_set
->     2.05%  [kernel]                               [k] __blk_mq_get_driver_tag
->     1.67%  [kernel]                               [k] __rcu_read_unlock
->     1.63%  [kernel]                               [k] check_preemption_disabled
-> 
-> After applying this patch on 5.16.0-rc5, mpi3mr driver in shared_tags
-> mode reach up to 5.8M IOPs.
-> 
-> Snippet of perf top
-> 
->     7.95%  [kernel]                               [k] native_queued_spin_lock_slowpath
->     5.61%  [kernel]                               [k] cpupri_set
->     2.98%  [kernel]                               [k] acpi_processor_ffh_cstate_enter
->     2.49%  [kernel]                               [k] read_tsc
->     2.15%  [kernel]                               [k] check_preemption_disabled
-> 
-> 
-> [0] https://lore.kernel.org/all/9b092ca49e9b5415772cd950a3c12584@mail.gmail.com/
-> 
-> 
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: john.garry@huawei.com
-> Cc: ming.lei@redhat.com
-> Cc: sathya.prakash@broadcom.com
-> Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-> ---
->   block/blk-mq-tag.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 995336abee33..3e0a8e79f966 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -253,7 +253,8 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->   	if (!rq)
->   		return true;
->   
-> -	if (rq->q == hctx->queue && rq->mq_hctx == hctx)
-> +	if (rq->q == hctx->queue && (rq->mq_hctx == hctx ||
-> +				blk_mq_is_shared_tags(hctx->flags)))
->   		ret = iter_data->fn(hctx, rq, iter_data->data, reserved);
->   	blk_mq_put_rq_ref(rq);
->   	return ret;
-> @@ -484,6 +485,14 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
->   		if (tags->nr_reserved_tags)
->   			bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
->   		bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
-> +		
-> +		/* In case of shared bitmap if shared_tags is allocated, it is not required
-> +		 * to iterate all the hctx. Looping one hctx is good enough.
-> +		 */
-> +		if (blk_mq_is_shared_tags(hctx->flags)) {
-> +			blk_queue_exit(q);
-> +			return;
-
-this looks like v5.16-rc6 code
-
-> +		}
->   	}
->   	blk_queue_exit(q);
->   }
+> Sorry, this still had the extra return.
 > 
 
+OK. Since blkdev_get_no_open() from blkdev_get_by_dev() returns NULL until
+disk_alloc_events() after device_add() completes, there is no race window for
+unbalanced disk_block_events(disk)/disk_unblock_events(disk) pair.
 
-
-Thanks,
-John
+Your patch seems to work. Please propose as a patch.
