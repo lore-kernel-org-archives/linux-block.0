@@ -2,60 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 065C3C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:21:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33637C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:30:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239591AbhLUQVs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 11:21:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44444 "EHLO
+        id S236428AbhLUQaI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 11:30:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236213AbhLUQVr (ORCPT
+        with ESMTP id S232746AbhLUQaI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 11:21:47 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC50C061574
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:21:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=QMre7yUdiStof2atRavqSpTRCc6/AnhtGt+tSsPd3MY=; b=e6utLqY6kTAViu0kjZBWn9FCY8
-        CO3PbjwYjfVjEqZzalVtljhrMW7lUfROG5LF7f0fhLqLbx5m14XQVmYDW2s+KSNi1+bfKxJ8fvhS5
-        pzKdTDajTaahR55SZbdVO58PIH3rbm1Cy6kIViPaVpZXLjofQWmW+E1bJILNkGl6tbQhwCzRND5KM
-        UbYNdq/3lDqvEfjHIyLETIPUHOe/m7f3hvdIDSBwMub0K45Ux3t9zliwM9F3nZ47HGQJUew1rqzAL
-        5TeoQUa9N25SuKeAYfvV/lJxhCvXsr9GgEk5yS0J16nPXxvATyWba8IO8YQ7U1IMl8B1Lc8eYIay2
-        e1amTxMA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mzhtT-007Xsf-Lh; Tue, 21 Dec 2021 16:21:39 +0000
-Date:   Tue, 21 Dec 2021 08:21:39 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 0/3] blk-mq/dm-rq: support BLK_MQ_F_BLOCKING for dm-rq
-Message-ID: <YcH/E4JNag0QYYAa@infradead.org>
-References: <20211221141459.1368176-1-ming.lei@redhat.com>
+        Tue, 21 Dec 2021 11:30:08 -0500
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32D2C061574
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:30:07 -0800 (PST)
+Received: by mail-io1-xd2b.google.com with SMTP id c3so18452517iob.6
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:30:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7sxBQCeGbgjg8hdOqmzJbuJh118tuNeNWeBKOPnBuj4=;
+        b=rM9txxh7bVyOpYeNcdnZq54+VIKIAdv3C2Uk5i2GQHXci67nad8NG1VDX7GftZ34a4
+         9kTd49eJXYwM5buP3S28M0gwynJO8BYyHxGt1eIXuyD/4LmYYqSevnocjs+dLT47gIH8
+         CpC7lfe+pjRjxTzjbUP4BtWNJ8lPsB3tr/qMaSjF93hrNPMbRptcp/6dp+hHHHDxDGfj
+         7pOrkIN9UQzA3G21lFS4Fh6ItJK8ytCftF0jhRoceLXU8Wj71bbhlcpORzudbjBebTL1
+         uRM+u3ZJgB8Y86UOz4M1XPPodXoJ9x7L+ayWis/6168qL30F5ZLuWdZlQzaxpbGXRYC7
+         ynQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7sxBQCeGbgjg8hdOqmzJbuJh118tuNeNWeBKOPnBuj4=;
+        b=1M7hiSx8+MVgrXwWvRkIB/rH5KTxsz4huEbdLVXXm/QmbG0AhwebTgCqpJz8HrBrrM
+         gsOs0Smrmrlwy5S4V2cQhbPXqp66lvxwwjtFkZ4BRMLtbU5FNh80TGazzHZx1Umrq8R0
+         5EiNOa523rrOHfyqg9mWwKa5NZZs/yd5WRagttbfrT+b8j71AUY+UVp64dnmllE/S+18
+         kjWAtMGeO3CSooiKXdEE4zgHxLXE8814JILSAhCTyh474JySKIUyrhDEiP+7ea5ZZRVh
+         /Fh+j9/DIW/9/5qo+qBU/xB6o3l4K9fq2yCW2bgZqF+M5kFI8k5toC3XKlB5/YVC65wd
+         voCQ==
+X-Gm-Message-State: AOAM530lzRC++uB3cUnmLiRVDeKMDLyGcJl9yGN2RjLutU4Bn4rg9tyY
+        rb/xvPJohLmQk/t7UyjGcPaWCg==
+X-Google-Smtp-Source: ABdhPJw2g4+qQmGEDfi6OpYTcH6TRPryOo0x8DjOmFSCt7NLQFDpv0qCcviUcJbXAr1pzpmSKSc4zQ==
+X-Received: by 2002:a6b:f018:: with SMTP id w24mr2073095ioc.124.1640104207248;
+        Tue, 21 Dec 2021 08:30:07 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id f10sm4326211ilu.88.2021.12.21.08.30.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Dec 2021 08:30:06 -0800 (PST)
+Subject: Re: [syzbot] general protection fault in set_task_ioprio
+To:     Eric Dumazet <edumazet@google.com>
+Cc:     syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
+        Christoph Hellwig <hch@lst.de>, changbin.du@intel.com,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        David Miller <davem@davemloft.net>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Yajun Deng <yajun.deng@linux.dev>
+References: <000000000000c70eef05d39f42a5@google.com>
+ <00000000000066073805d3a4f598@google.com>
+ <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com>
+ <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
+ <CANn89iJfEgkJCBqO9d7t9BHHMEh-6DQ1BJkqkiOQ59dxSHB2EQ@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4019677f-7225-c359-a411-e4290cc717b0@kernel.dk>
+Date:   Tue, 21 Dec 2021 09:30:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211221141459.1368176-1-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CANn89iJfEgkJCBqO9d7t9BHHMEh-6DQ1BJkqkiOQ59dxSHB2EQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 10:14:56PM +0800, Ming Lei wrote:
-> Hello,
+On 12/21/21 9:03 AM, Eric Dumazet wrote:
+> On Tue, Dec 21, 2021 at 7:25 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 12/21/21 3:44 AM, Eric Dumazet wrote:
+>>> On Tue, Dec 21, 2021 at 1:52 AM syzbot
+>>> <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
+>>>>
+>>>> syzbot has bisected this issue to:
+>>>>
+>>>> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
+>>>> Author: Eric Dumazet <edumazet@google.com>
+>>>> Date:   Tue Dec 7 01:30:37 2021 +0000
+>>>>
+>>>>     netlink: add net device refcount tracker to struct ethnl_req_info
+>>>>
+>>>
+>>> Unfortunately this commit will be in the way of many bisections.
+>>>
+>>> Real bug was added in
+>>>
+>>> commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
+>>> Author: Christoph Hellwig <hch@lst.de>
+>>> Date:   Thu Dec 9 07:31:29 2021 +0100
+>>>
+>>>     block: open code create_task_io_context in set_task_ioprio
+>>>
+>>>     The flow in set_task_ioprio can be simplified by simply open coding
+>>>     create_task_io_context, which removes a refcount roundtrip on the I/O
+>>>     context.
+>>>
+>>>     Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>>     Reviewed-by: Jan Kara <jack@suse.cz>
+>>>     Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
+>>>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>
+>> There are only really 5 patches in between the broken commit and the one
+>> that fixes it, and it only affects things trying to set the ioprio with
+>> a dead task. Is this a huge issue? I don't see why this would cause a
+>> lot of bisection headaches.
+>>
 > 
-> dm-rq may be built on blk-mq device which marks BLK_MQ_F_BLOCKING, so
-> dm_mq_queue_rq() may become to sleep current context.
-> 
-> Fixes the issue by allowing dm-rq to set BLK_MQ_F_BLOCKING in case that
-> any underlying queue is marked as BLK_MQ_F_BLOCKING.
-> 
-> DM request queue is allocated before allocating tagset, this way is a
-> bit special, so we need to pre-allocate srcu payload, then use the queue
-> flag of QUEUE_FLAG_BLOCKING for locking dispatch.
+> I was saying that my commit was polluting syzbot bisection, this is a
+> distraction in this report.
+> (Or if you prefer, please ignore syzbot bisection)
 
-What is the benefit over just forcing bio-based dm-mpath for these
-devices?
+Ah got it, yes makes sense.
+
+> linux-next has still this bug in set_task_ioprio()
+
+linux-next often trails by a few days, once it catches up hopefully
+this will be behind us.
+
+-- 
+Jens Axboe
+
