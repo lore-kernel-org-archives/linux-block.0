@@ -2,47 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F971C4321E
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 02:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF869C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 02:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233948AbhLUCAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Dec 2021 21:00:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44924 "EHLO
+        id S234518AbhLUCAl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Dec 2021 21:00:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234075AbhLUB7W (ORCPT
+        with ESMTP id S233670AbhLUB7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Dec 2021 20:59:22 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4743C06139C;
-        Mon, 20 Dec 2021 17:59:15 -0800 (PST)
+        Mon, 20 Dec 2021 20:59:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFDFC06173F;
+        Mon, 20 Dec 2021 17:59:47 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 704A9B8110F;
-        Tue, 21 Dec 2021 01:59:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BF3AC36AE8;
-        Tue, 21 Dec 2021 01:59:12 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EA8096134A;
+        Tue, 21 Dec 2021 01:59:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BDFBC36AE9;
+        Tue, 21 Dec 2021 01:59:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640051953;
-        bh=6UIh52Tcej7Ot3P7T4ivehxOUWTSUwK+Qf3CRz0eW20=;
+        s=k20201202; t=1640051986;
+        bh=yDmdNC0HoR1IwjTR1JRCbmCO+bCirtEJeqJxF7ONdbk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dUQ82qiuRwuUGZWskSy9zr+JrmEzjOVDGC0qOx+wYEAfmz6LB/2m95htc6kgNoPn+
-         m3WA17B7jxisMX411jbgYq/EyHHJb5dtseBNGGNX/SB+qpY4H1NTvRDdaiDkjWqgLA
-         4LleoGKY3dZcQT5E2jDwsuRaE4ICYgrpUx4vyjkfK1N6hi1jX8NRK7xc1cox7LcmJk
-         SxEEQC/xU4vHUQlm9d5c8xErXosSiLIPINuZn5PU1ig93cB38n4zw1tXiGkMvXrT6U
-         zyz2Y5vlc12uZxhay87u5pwazbrcvB+dcQMmeHX0H10Gd3HS1N2EzSEVft3LJ+MjKy
-         dICWP9dYtvQ2g==
+        b=ZfF0RjYV/Ixo30kfo559Fm2kAa5yxZ0VKTgVSYYO4up9bOKBrZcGIV62RtKdN/Cyk
+         QqL1jADPsB6WWYjAACiDUD4+WwQ9MYS9iPD+F25knnkp1vrCod6ZZT8/IV8oX2VAla
+         hpJDOFLA823ixUedMFzMnr/692R1RrJbK2LFNv54ZXznNydtctm0kDGcu75H+J751Q
+         2luAG926g4Y5i6gINzX/lPiUF7sZXCUXM9yiSA/mUZT01QgjpFTvsQoGqrdLPSRy61
+         cpMVn/f9SmqleQesYjZmzlu7XrS12kLqeCTMLM2GzidzeP/R3GFbVr86F7ZSGvSu8k
+         oqtKRDBz9cP0A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Alex Xu <alex_y_xu@yahoo.ca>,
-        kernel test robot <oliver.sang@intel.com>,
+Cc:     Jens Axboe <axboe@kernel.dk>, Dexuan Cui <decui@microsoft.com>,
+        Ming Lei <ming.lei@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 29/29] Revert "block: reduce kblockd_mod_delayed_work_on() CPU consumption"
-Date:   Mon, 20 Dec 2021 20:57:50 -0500
-Message-Id: <20211221015751.116328-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 15/19] block: reduce kblockd_mod_delayed_work_on() CPU consumption
+Date:   Mon, 20 Dec 2021 20:59:10 -0500
+Message-Id: <20211221015914.116767-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20211221015751.116328-1-sashal@kernel.org>
-References: <20211221015751.116328-1-sashal@kernel.org>
+In-Reply-To: <20211221015914.116767-1-sashal@kernel.org>
+References: <20211221015914.116767-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,35 +53,36 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jens Axboe <axboe@kernel.dk>
 
-[ Upstream commit 87959fa16cfbcf76245c11559db1940069621274 ]
+[ Upstream commit cb2ac2912a9ca7d3d26291c511939a41361d2d83 ]
 
-This reverts commit cb2ac2912a9ca7d3d26291c511939a41361d2d83.
+Dexuan reports that he's seeing spikes of very heavy CPU utilization when
+running 24 disks and using the 'none' scheduler. This happens off the
+sched restart path, because SCSI requires the queue to be restarted async,
+and hence we're hammering on mod_delayed_work_on() to ensure that the work
+item gets run appropriately.
 
-Alex and the kernel test robot report that this causes a significant
-performance regression with BFQ. I can reproduce that result, so let's
-revert this one as we're close to -rc6 and we there's no point in trying
-to rush a fix.
+Avoid hammering on the timer and just use queue_work_on() if no delay
+has been specified.
 
-Link: https://lore.kernel.org/linux-block/1639853092.524jxfaem2.none@localhost/
-Link: https://lore.kernel.org/lkml/20211219141852.GH14057@xsang-OptiPlex-9020/
-Reported-by: Alex Xu (Hello71) <alex_y_xu@yahoo.ca>
-Reported-by: kernel test robot <oliver.sang@intel.com>
+Reported-and-tested-by: Dexuan Cui <decui@microsoft.com>
+Link: https://lore.kernel.org/linux-block/BYAPR21MB1270C598ED214C0490F47400BF719@BYAPR21MB1270.namprd21.prod.outlook.com/
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-core.c | 2 --
- 1 file changed, 2 deletions(-)
+ block/blk-core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index a728434fcff87..c2d912d0c976c 100644
+index 26664f2a139eb..4f4e286198660 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1625,8 +1625,6 @@ EXPORT_SYMBOL(kblockd_schedule_work);
+@@ -1657,6 +1657,8 @@ EXPORT_SYMBOL(kblockd_schedule_work);
  int kblockd_mod_delayed_work_on(int cpu, struct delayed_work *dwork,
  				unsigned long delay)
  {
--	if (!delay)
--		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
++	if (!delay)
++		return queue_work_on(cpu, kblockd_workqueue, &dwork->work);
  	return mod_delayed_work_on(cpu, kblockd_workqueue, dwork, delay);
  }
  EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
