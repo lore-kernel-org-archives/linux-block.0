@@ -2,91 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A57D2C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 10:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D48C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 10:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231767AbhLUKIP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 05:08:15 -0500
-Received: from verein.lst.de ([213.95.11.211]:46299 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231764AbhLUKIO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 05:08:14 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9A0EA68AFE; Tue, 21 Dec 2021 11:08:11 +0100 (CET)
-Date:   Tue, 21 Dec 2021 11:08:11 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: fix error handling for device_add_disk
-Message-ID: <20211221100811.GA10674@lst.de>
-References: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp> <20211216161806.GA31879@lst.de> <20211216161928.GB31879@lst.de> <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
+        id S231904AbhLUKPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 05:15:19 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:37362 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231745AbhLUKPS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Dec 2021 05:15:18 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 684282114D;
+        Tue, 21 Dec 2021 10:15:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1640081717; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tw4XdfqKEnDXFIq4KJAkTaIZVJn1UjG86AxtNcsugP8=;
+        b=Hjyte8ENHdsPrBGaVKpNFn1mwcPxGe7gGmzQMk577eS/xg7Pz8BF7k5gk9VW2Sck6Eq61M
+        A6fT0Z6/hDxsTH4hAJdSSOKKZez+Hyn+fY03LdgZdjsuEArzOZYvCTAGFiwCzVGI68RGuw
+        aNqrAysr/+N8GWNpt7852Prl0Wd4DSA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1640081717;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tw4XdfqKEnDXFIq4KJAkTaIZVJn1UjG86AxtNcsugP8=;
+        b=/iFnvAG4RtesCazLS7MFQDjGh3UnSiR0emxt3HUEhp0xgT6K6zgWlDSxErALSjimAWHqOo
+        WfH9FJNrpG9+C8BA==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id 5309AA3B89;
+        Tue, 21 Dec 2021 10:15:17 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 2A3E41E14A1; Tue, 21 Dec 2021 11:15:17 +0100 (CET)
+Date:   Tue, 21 Dec 2021 11:15:17 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     tj@kernel.org, axboe@kernel.dk, paolo.valente@linaro.org,
+        jack@suse.cz, fchecconi@gmail.com, avanzini.arianna@gmail.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH 1/4] block, bfq: cleanup bfq_bfqq_to_bfqg()
+Message-ID: <20211221101517.GA24748@quack2.suse.cz>
+References: <20211221032135.878550-1-yukuai3@huawei.com>
+ <20211221032135.878550-2-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20211221032135.878550-2-yukuai3@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 17, 2021 at 07:37:43PM +0900, Tetsuo Handa wrote:
-> Well, I don't think that we can remove this blk_free_ext_minor() call, for
-> this call is releasing disk->first_minor rather than MINOR(bdev->bd_dev).
+On Tue 21-12-21 11:21:32, Yu Kuai wrote:
+> Use bfq_group() instead, which do the same thing.
 > 
-> Since bdev_add(disk->part0, MKDEV(disk->major, disk->first_minor)) is not
-> called when reaching the out_free_ext_minor label,
-> 
-> 	if (MAJOR(bdev->bd_dev) == BLOCK_EXT_MAJOR)
-> 		blk_free_ext_minor(MINOR(bdev->bd_dev));
-> 
-> in bdev_free_inode() will not be called because MAJOR(bdev->bd_dev) == 0
-> because bdev->bd_dev == 0.
-> 
-> I think we can apply this patch as-is...
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-With the patch as-is we'll still leak disk->ev if device_add fails.
-Something like the patch below should solve that by moving the disk->ev
-allocation later and always cleaning it up through disk->release:
+Nice. Feel free to add:
 
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 3c139a1b6f049..3e4bbfa3e1c24 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -442,10 +442,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 		disk->first_minor = ret;
- 	}
- 
--	ret = disk_alloc_events(disk);
--	if (ret)
--		goto out_free_ext_minor;
--
- 	/* delay uevents, until we scanned partition table */
- 	dev_set_uevent_suppress(ddev, 1);
- 
-@@ -456,7 +452,12 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 		ddev->devt = MKDEV(disk->major, disk->first_minor);
- 	ret = device_add(ddev);
- 	if (ret)
--		goto out_disk_release_events;
-+		goto out_free_ext_minor;
-+
-+	ret = disk_alloc_events(disk);
-+	if (ret)
-+		goto out_device_del;
-+
- 	if (!sysfs_deprecated) {
- 		ret = sysfs_create_link(block_depr, &ddev->kobj,
- 					kobject_name(&ddev->kobj));
-@@ -538,8 +539,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 		sysfs_remove_link(block_depr, dev_name(ddev));
- out_device_del:
- 	device_del(ddev);
--out_disk_release_events:
--	disk_release_events(disk);
-+	return ret;
- out_free_ext_minor:
- 	if (disk->major == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(disk->first_minor);
+								Honza
+
+> ---
+>  block/bfq-iosched.c |  4 ++--
+>  block/bfq-iosched.h |  1 -
+>  block/bfq-wf2q.c    | 15 ---------------
+>  3 files changed, 2 insertions(+), 18 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0c612a911696..2f2b97cad980 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -774,7 +774,7 @@ bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>  	if (!bfqq->next_rq)
+>  		return;
+>  
+> -	bfqq->pos_root = &bfq_bfqq_to_bfqg(bfqq)->rq_pos_tree;
+> +	bfqq->pos_root = &bfqq_group(bfqq)->rq_pos_tree;
+>  	__bfqq = bfq_rq_pos_tree_lookup(bfqd, bfqq->pos_root,
+>  			blk_rq_pos(bfqq->next_rq), &parent, &p);
+>  	if (!__bfqq) {
+> @@ -2669,7 +2669,7 @@ static struct bfq_queue *bfqq_find_close(struct bfq_data *bfqd,
+>  					 struct bfq_queue *bfqq,
+>  					 sector_t sector)
+>  {
+> -	struct rb_root *root = &bfq_bfqq_to_bfqg(bfqq)->rq_pos_tree;
+> +	struct rb_root *root = &bfqq_group(bfqq)->rq_pos_tree;
+>  	struct rb_node *parent, *node;
+>  	struct bfq_queue *__bfqq;
+>  
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 07288b9da389..99949548896e 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -1051,7 +1051,6 @@ extern struct blkcg_policy blkcg_policy_bfq;
+>  	for (parent = NULL; entity ; entity = parent)
+>  #endif /* CONFIG_BFQ_GROUP_IOSCHED */
+>  
+> -struct bfq_group *bfq_bfqq_to_bfqg(struct bfq_queue *bfqq);
+>  struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity);
+>  unsigned int bfq_tot_busy_queues(struct bfq_data *bfqd);
+>  struct bfq_service_tree *bfq_entity_service_tree(struct bfq_entity *entity);
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index b74cc0da118e..e1f5ca5c1fdb 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -142,16 +142,6 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+>  
+>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
+>  
+> -struct bfq_group *bfq_bfqq_to_bfqg(struct bfq_queue *bfqq)
+> -{
+> -	struct bfq_entity *group_entity = bfqq->entity.parent;
+> -
+> -	if (!group_entity)
+> -		group_entity = &bfqq->bfqd->root_group->entity;
+> -
+> -	return container_of(group_entity, struct bfq_group, entity);
+> -}
+> -
+>  /*
+>   * Returns true if this budget changes may let next_in_service->parent
+>   * become the next_in_service entity for its parent entity.
+> @@ -230,11 +220,6 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+>  
+>  #else /* CONFIG_BFQ_GROUP_IOSCHED */
+>  
+> -struct bfq_group *bfq_bfqq_to_bfqg(struct bfq_queue *bfqq)
+> -{
+> -	return bfqq->bfqd->root_group;
+> -}
+> -
+>  static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
+>  {
+>  	return false;
+> -- 
+> 2.31.1
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
