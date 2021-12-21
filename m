@@ -2,87 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BA8C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 08:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01102C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 08:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235414AbhLUIL1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 03:11:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43030 "EHLO
+        id S235911AbhLUI6a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 03:58:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234701AbhLUIL1 (ORCPT
+        with ESMTP id S235910AbhLUI63 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 03:11:27 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71DEC061574;
-        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id y9so11680020pgj.5;
-        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CNQ27S31DQKVMGNaa41vJ0MWzIDdPEbu6tohUmL45Xc=;
-        b=pWK7rOOe6EgoIgreqR5MDZpNyU04GgACI0jFEnyQ7jExs/7udsljcJrTRwZEPfYbwd
-         YkVlyFt10PL4riFiWcVbhu8LmpmmK2H0ZQVtO/z68Gyrsdhqd7Fnf5dneJzJ+LI6GzAL
-         9oCUXjCyX+2x+mrhIiSi1ZE/oyDDgMWJ4ihXNqpLPvF752E50HoZQDFsmvJl1jujPur7
-         +oR2aKa7zgfO1CFOFyJ55EYKbJqR4LZOWhVfPUx9BpozHtEnpoQ2fUA0U1BXMdos+56s
-         Mi+wCnO9sOOaWnXXwVOuDesraAB8rkTU6lpx+r9R7Q3I2BDYwJnouyEcaOvJaxArG7KY
-         i18Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CNQ27S31DQKVMGNaa41vJ0MWzIDdPEbu6tohUmL45Xc=;
-        b=7zSa4bwpPwUv4ZB8LnXvLK2cfZzal3TLTcukTKbefafGC5so4o2Pg4Z1viYjCAuyhU
-         DkgD0KQGi8dFyi/WbTRiE1bx5Rq8DQOeQRg4hsuuqXZg3zl+Ao8OI56GFvLBHZqjPyej
-         hi6N2RYM1M46tv6h0LYCK+h0CLRT/cQqQQsnLoQsAizC9tSLdqXvG8bmo11OaLjFi2IY
-         KoKj7unNfX8VK2upB32/jmCDpkz6Qm9FZgx3lgHNdgGKSlChNacI34HMprAzo4X8120y
-         Jw/0/bJHD+Nzq+nsL2R0x3sObTW6Wu7gGU+dRsAsyJPJnT9ffw9ZsGp+NwvKAIZbUVil
-         8fgA==
-X-Gm-Message-State: AOAM530WXUtvlBz8lLwSPuL8LbRHvwon0NkBO/QU2+5bnwn3k825ncRT
-        K8B1InUPPS+C2NWhfHtdWjgoEnw/pqM=
-X-Google-Smtp-Source: ABdhPJzivj4IPkq9WcmMOBNQPCbJy7iEXusOZPE0zZnBwVmWYQio52v+igjnlqR4d8Jn8/gjmKRBYA==
-X-Received: by 2002:a62:8042:0:b0:4a8:15eb:db10 with SMTP id j63-20020a628042000000b004a815ebdb10mr2128313pfd.28.1640074286391;
-        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
-Received: from FLYINGPENG-MB0.tencent.com ([103.7.29.30])
-        by smtp.gmail.com with ESMTPSA id t8sm21024635pfj.26.2021.12.21.00.11.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 Dec 2021 00:11:26 -0800 (PST)
-From:   Peng Hao <flyingpenghao@gmail.com>
-X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH]  block/elevator: handle possible null pointer
-Date:   Tue, 21 Dec 2021 16:10:42 +0800
-Message-Id: <20211221081042.78799-1-flyingpeng@tencent.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+        Tue, 21 Dec 2021 03:58:29 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6180C061574;
+        Tue, 21 Dec 2021 00:58:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Mj42r7OdlZgUxm6RYk+ouMVGEzoTqWz8z3niMiIDoo8=; b=Qz3NIVR0QqoJvr56nSAlKRPp8H
+        OhrFMEP02wF4IUt6OAZiLa6Je+2eOOr9nio4AXgCj7XNZ73sia0WTGytTvpEEtLOew4PjLsa8XEkH
+        f1hhGzxeolPyl58LM+Rz/5b58lnHwaf71CFn/yXoV+dFs/BvWY9jAsAJDkwN3/Duoi5QmymH223Lw
+        HFz3MAQaWZWAoJQHKM9nMGfPAFB9A8nEB5C7FYMQOKE8rcs+Bb9PJhxgQzsn7znngkB3M02L97XXD
+        qqGrx1S4DYR7Dp8AY0TC2PAyK3EZVGbKMnTJwHTQutBCxxNPi2l5zfaV0iqxipXD/KY6SF0BkoBVk
+        LccgiqDw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mzayY-006040-T6; Tue, 21 Dec 2021 08:58:26 +0000
+Date:   Tue, 21 Dec 2021 00:58:26 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Miko Larsson <mikoxyzzz@gmail.com>
+Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@infradead.org
+Subject: Re: [PATCH v2 1/2] zram: zram_drv: add SPDX license identifiers
+Message-ID: <YcGXMkttiOq4IpJg@infradead.org>
+References: <20211217063224.3474-1-mikoxyzzz@gmail.com>
+ <20211217063224.3474-2-mikoxyzzz@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211217063224.3474-2-mikoxyzzz@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is a check for q->tag_set in the front of elevator_get_default,
-and there should be a check here too.
+On Fri, Dec 17, 2021 at 07:32:23AM +0100, Miko Larsson wrote:
+> zram_drv lacks an SPDX license identifier in both its source and in its
+> header, so we should add license identifiers based on the copyright info
+> provided by the initial comment block.
+> 
+> Signed-off-by: Miko Larsson <mikoxyzzz@gmail.com>
 
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
----
- block/elevator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Looks good,
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 1f39f6e8ebb9..b7d0bead680c 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -636,7 +636,7 @@ static struct elevator_type *elevator_get_default(struct request_queue *q)
- 	if (q->tag_set && q->tag_set->flags & BLK_MQ_F_NO_SCHED_BY_DEFAULT)
- 		return NULL;
- 
--	if (q->nr_hw_queues != 1 &&
-+	if (q->nr_hw_queues != 1 && q->tag_set &&
- 	    !blk_mq_is_shared_tags(q->tag_set->flags))
- 		return NULL;
- 
--- 
-2.27.0
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
