@@ -2,85 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543AEC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FFFC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 17:24:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239401AbhLUQeg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 11:34:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47334 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239833AbhLUQee (ORCPT
+        id S232738AbhLURYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 12:24:05 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:53604 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232694AbhLURYF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 11:34:34 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C957C061574
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:34:34 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id q5so1883247ioj.7
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:34:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
-         :content-transfer-encoding;
-        bh=vLP4eiroe55V6lUMRm6orfW7+CR+Oeoc1rOve2nNZ1A=;
-        b=tNYo3RdkE+4sQL2+DmrX2sHPr2YFc7lHg5RasUtAfG8airdALSBeV+dW8sEQ0kYVjM
-         n7JAhYsOD2nuqKnWIBHdA1KPM8QgGI1sxxFuX7i6eHBwNolS2FgKDIDiFSUNP65NK88b
-         20T4OhXizHMvOfgUqh+m8JNpbTtWIiLAFCyTtbRb+kbhlybj8rFi3uMa/yrMliYJgSA2
-         NyhoP5qFQd8BqVw2aBt3dFOQLlSH+iZmIfZ8U6KC3Kwc/uoAhLYWwU9koYNRcY3+rDRn
-         TKkiCtU+snGcT0Hz8GMC0vwXJSJ/l6qrSOPZfFxisW5GF7igz2NnuogfPtO6C81RJ6Bi
-         UKuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=vLP4eiroe55V6lUMRm6orfW7+CR+Oeoc1rOve2nNZ1A=;
-        b=sqBvbyfvWeXZvC24KXN63SkIkrttMbE3zL8duQEpFQwL4rJThi8rIwoeHVScrvHVnC
-         T96lgtW8S6RUMffoZHN/kzccB86AMHptpcme5/2zoCl4mDR8eAlx61BMSou3GsESAL3y
-         YHNg17R/RrCwEfJZrybB41xr9cs64t08tmIFJU4CsDzmO6hMLwAy0W+ZnKRo5YS5hGOz
-         bv7FXWOhlpbd+w/XvuyO3HguiJNJlYsiJU1w7HPwzNBZTvSYC986sjGlUO+Ez16wkMly
-         nZDxC6vLu1ROBvHI1+KcO8UPUgeL1flSbOStNvP9FlnvLBUmLEOVjHYO/FzHXNjfcopy
-         IMRg==
-X-Gm-Message-State: AOAM533cxrz9ItpOJ+jv7KH8hxwDopxixEw9AG6v+DYj8d0qKvSiH0jK
-        R8EdBvNwCLv1GkmUDZobuvyrwg==
-X-Google-Smtp-Source: ABdhPJwqbSVKPEFE7DDgb9nqb0RrZnTl6cdeDKrHhd7/Zy5cnub3TPsQYBohxTj3kxKtIgGbxf7pMg==
-X-Received: by 2002:a05:6602:42:: with SMTP id z2mr2058449ioz.208.1640104474045;
-        Tue, 21 Dec 2021 08:34:34 -0800 (PST)
-Received: from x1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id i20sm13598872iow.9.2021.12.21.08.34.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Dec 2021 08:34:33 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <b1b19379-23ee-5379-0eb5-94bf5f79f1b4@i-love.sakura.ne.jp>
-References: <b1b19379-23ee-5379-0eb5-94bf5f79f1b4@i-love.sakura.ne.jp>
-Subject: Re: [PATCH] block: check minor range in device_add_disk()
-Message-Id: <164010447356.608284.16828138439159731604.b4-ty@kernel.dk>
-Date:   Tue, 21 Dec 2021 09:34:33 -0700
+        Tue, 21 Dec 2021 12:24:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=6RE2t3Nrh37PIF515dZ3u+BHHExtd6YU1HsGcK2dnu4=; b=eXXVACeUXdlIB1/KjWu9GhcS1t
+        xrekSWq8RR2HCh+ekHLaiG+FIMaBYGfJYe5FGYP48P0GSRb0k+4RcTErCcOt9jBFo1Ig9Sjj3Kmoe
+        tYncC6lDUuP1bBmukDNNGvuJU7dzQGVanoWl4myv8s/QCXLVm72hdiY9G793ucRM2CiViDyHuRKK1
+        7i04q7Rmc1PbF/nOuxVTO3/I4ww8EecYfZPpNo9Hs1p8QOcgmTzxATUwvQhora8iHePLymjF6XC09
+        IIUeWkGtVQTpxCWH7uDR7kLmDT2i93+1oUQMtFpv4hoHCiA3m8EbXPaWgvrA4OrO2Fuj1hJ76ySdm
+        ndk5VOCg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1mzirJ-00AX1V-OI; Tue, 21 Dec 2021 10:23:31 -0700
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+References: <20211117215410.3695-1-logang@deltatee.com>
+ <20211117215410.3695-2-logang@deltatee.com> <20211221090003.GA7949@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <05095125-464e-4e85-f609-c7bc93d2f479@deltatee.com>
+Date:   Tue, 21 Dec 2021 10:23:24 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211221090003.GA7949@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, ckulkarnilinux@gmail.com, martin.oliveira@eideticom.com, robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v4 01/23] lib/scatterlist: cleanup macros into static
+ inline functions
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 17 Dec 2021 23:51:25 +0900, Tetsuo Handa wrote:
-> ioctl(fd, LOOP_CTL_ADD, 1048576) causes
+
+
+On 2021-12-21 2:00 a.m., Christoph Hellwig wrote:
+> On Wed, Nov 17, 2021 at 02:53:48PM -0700, Logan Gunthorpe wrote:
+>> Convert the sg_is_chain(), sg_is_last() and sg_chain_ptr() macros
+>> into static inline functions. There's no reason for these to be macros
+>> and static inline are generally preferred these days.
+>>
+>> Also introduce the SG_PAGE_LINK_MASK define so the P2PDMA work, which is
+>> adding another bit to this mask, can do so more easily.
+>>
+>> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 > 
->   sysfs: cannot create duplicate filename '/dev/block/7:0'
+> Looks fine:
 > 
-> message because such request is treated as if ioctl(fd, LOOP_CTL_ADD, 0)
-> due to MINORMASK == 1048575. Verify that all minor numbers for that device
-> fit in the minor range.
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
-> [...]
+> scatterlist.h doesn't have a real maintainer, do you want me to pick
+> this up through the DMA tree?
 
-Applied, thanks!
+Sure, that would be great!
 
-[1/1] block: check minor range in device_add_disk()
-      commit: e338924bd05d6e71574bc13e310c89e10e49a8a5
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
+Logan
