@@ -2,137 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33637C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C6FC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236428AbhLUQaI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 11:30:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46346 "EHLO
+        id S236400AbhLUQcZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 11:32:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232746AbhLUQaI (ORCPT
+        with ESMTP id S236379AbhLUQcZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 11:30:08 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32D2C061574
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:30:07 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id c3so18452517iob.6
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:30:07 -0800 (PST)
+        Tue, 21 Dec 2021 11:32:25 -0500
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB84EC061574
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:32:24 -0800 (PST)
+Received: by mail-io1-xd2d.google.com with SMTP id q5so1874506ioj.7
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:32:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=7sxBQCeGbgjg8hdOqmzJbuJh118tuNeNWeBKOPnBuj4=;
-        b=rM9txxh7bVyOpYeNcdnZq54+VIKIAdv3C2Uk5i2GQHXci67nad8NG1VDX7GftZ34a4
-         9kTd49eJXYwM5buP3S28M0gwynJO8BYyHxGt1eIXuyD/4LmYYqSevnocjs+dLT47gIH8
-         CpC7lfe+pjRjxTzjbUP4BtWNJ8lPsB3tr/qMaSjF93hrNPMbRptcp/6dp+hHHHDxDGfj
-         7pOrkIN9UQzA3G21lFS4Fh6ItJK8ytCftF0jhRoceLXU8Wj71bbhlcpORzudbjBebTL1
-         uRM+u3ZJgB8Y86UOz4M1XPPodXoJ9x7L+ayWis/6168qL30F5ZLuWdZlQzaxpbGXRYC7
-         ynQA==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=OSYGbDYLABic1AwwbvsvU2yksM9gIU3mk5OiGF/FAM0=;
+        b=dXA8WgvqYCLjtEq7bYxfJI70dPFik0m2LvpnvbmcmXs4FoOQZGQMqwCnuQxz1aaxzc
+         oLqc1drt4Glzu+y/PWnGV6zGwGSFrP5iQy4kCW6VonXXeZZUogR7Ar6gkYD4NFtiBg8r
+         89TAI9tE/jCA21qWcZxyYDCZOiwv2iG08QUQz3/KbTSPQsf57jfiY5PDDYzvePiOy3kL
+         cVwKtijHHfxd73QvO4ZsRCkadA0mP+VPKFNIYen242b0hztoCwoGk4KFdUrJFlvwO2HY
+         yaISMCHCvFipQwjZhtMGs+wAbq6zxtjv42GM47Ovro+15VCfSbUolbLtj8uUddT2GbXC
+         wvWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7sxBQCeGbgjg8hdOqmzJbuJh118tuNeNWeBKOPnBuj4=;
-        b=1M7hiSx8+MVgrXwWvRkIB/rH5KTxsz4huEbdLVXXm/QmbG0AhwebTgCqpJz8HrBrrM
-         gsOs0Smrmrlwy5S4V2cQhbPXqp66lvxwwjtFkZ4BRMLtbU5FNh80TGazzHZx1Umrq8R0
-         5EiNOa523rrOHfyqg9mWwKa5NZZs/yd5WRagttbfrT+b8j71AUY+UVp64dnmllE/S+18
-         kjWAtMGeO3CSooiKXdEE4zgHxLXE8814JILSAhCTyh474JySKIUyrhDEiP+7ea5ZZRVh
-         /Fh+j9/DIW/9/5qo+qBU/xB6o3l4K9fq2yCW2bgZqF+M5kFI8k5toC3XKlB5/YVC65wd
-         voCQ==
-X-Gm-Message-State: AOAM530lzRC++uB3cUnmLiRVDeKMDLyGcJl9yGN2RjLutU4Bn4rg9tyY
-        rb/xvPJohLmQk/t7UyjGcPaWCg==
-X-Google-Smtp-Source: ABdhPJw2g4+qQmGEDfi6OpYTcH6TRPryOo0x8DjOmFSCt7NLQFDpv0qCcviUcJbXAr1pzpmSKSc4zQ==
-X-Received: by 2002:a6b:f018:: with SMTP id w24mr2073095ioc.124.1640104207248;
-        Tue, 21 Dec 2021 08:30:07 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id f10sm4326211ilu.88.2021.12.21.08.30.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Dec 2021 08:30:06 -0800 (PST)
-Subject: Re: [syzbot] general protection fault in set_task_ioprio
-To:     Eric Dumazet <edumazet@google.com>
-Cc:     syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
-        Christoph Hellwig <hch@lst.de>, changbin.du@intel.com,
-        Christian Brauner <christian.brauner@ubuntu.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        David Miller <davem@davemloft.net>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Yajun Deng <yajun.deng@linux.dev>
-References: <000000000000c70eef05d39f42a5@google.com>
- <00000000000066073805d3a4f598@google.com>
- <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com>
- <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
- <CANn89iJfEgkJCBqO9d7t9BHHMEh-6DQ1BJkqkiOQ59dxSHB2EQ@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=OSYGbDYLABic1AwwbvsvU2yksM9gIU3mk5OiGF/FAM0=;
+        b=tEN039SWa7kCMcUODeXAk3Ud0jcYeW3E7Z7nFyMzyHG95ZusNcG2nAK/L2u235Vo5X
+         JKH1Ve2MQTlWtl2EcGW21pZaZqBljZT83/Fc2kyco0c26a5LgVVS+fTHuiO2veXjBk+W
+         fyp9v4OFPnn5Lm0p47JR5SbhW6s0TYHs3MRdCYF66SK7c7DpQZM9elP+HHv4Vj0ng6dw
+         c6gSfdyG1PqB5a5SyWSlGu24DpO3Av2WNUraoO4DWezp3DOJhQ8No9cj0PbrsVqsw2X8
+         uaslXISDXDOMuv5Zx5QvNFeZTZUyPQvXRUEj6lgBvHzenwA1YYM0rP3Br/DjEG1uIU7P
+         ucmw==
+X-Gm-Message-State: AOAM532Cfl8THIEpWrBpkFpZi7zuMmhcmAbtF8Fy1jrZes2qhh8LcVzw
+        cFvdsflnV7oGurJjH44LC2Fd1QxbbMsf6Q==
+X-Google-Smtp-Source: ABdhPJw70w25fqXrv8T183SyRDOr7UNdKhDxiBXG8kgE9Y5JAXhiQ2oFpn9y7ZCFd30U/FqrnwcEBA==
+X-Received: by 2002:a02:c90c:: with SMTP id t12mr2410629jao.247.1640104344400;
+        Tue, 21 Dec 2021 08:32:24 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id a5sm10826120ilb.76.2021.12.21.08.32.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Dec 2021 08:32:23 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4019677f-7225-c359-a411-e4290cc717b0@kernel.dk>
-Date:   Tue, 21 Dec 2021 09:30:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     penguin-kernel@i-love.sakura.ne.jp,
+        syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>,
+        linux-block@vger.kernel.org
+In-Reply-To: <20211221161851.788424-1-hch@lst.de>
+References: <20211221161851.788424-1-hch@lst.de>
+Subject: Re: [PATCH] block: fix error unwinding in device_add_disk
+Message-Id: <164010434373.606970.3230458552695453398.b4-ty@kernel.dk>
+Date:   Tue, 21 Dec 2021 09:32:23 -0700
 MIME-Version: 1.0
-In-Reply-To: <CANn89iJfEgkJCBqO9d7t9BHHMEh-6DQ1BJkqkiOQ59dxSHB2EQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/21/21 9:03 AM, Eric Dumazet wrote:
-> On Tue, Dec 21, 2021 at 7:25 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 12/21/21 3:44 AM, Eric Dumazet wrote:
->>> On Tue, Dec 21, 2021 at 1:52 AM syzbot
->>> <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
->>>>
->>>> syzbot has bisected this issue to:
->>>>
->>>> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
->>>> Author: Eric Dumazet <edumazet@google.com>
->>>> Date:   Tue Dec 7 01:30:37 2021 +0000
->>>>
->>>>     netlink: add net device refcount tracker to struct ethnl_req_info
->>>>
->>>
->>> Unfortunately this commit will be in the way of many bisections.
->>>
->>> Real bug was added in
->>>
->>> commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
->>> Author: Christoph Hellwig <hch@lst.de>
->>> Date:   Thu Dec 9 07:31:29 2021 +0100
->>>
->>>     block: open code create_task_io_context in set_task_ioprio
->>>
->>>     The flow in set_task_ioprio can be simplified by simply open coding
->>>     create_task_io_context, which removes a refcount roundtrip on the I/O
->>>     context.
->>>
->>>     Signed-off-by: Christoph Hellwig <hch@lst.de>
->>>     Reviewed-by: Jan Kara <jack@suse.cz>
->>>     Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
->>>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>
->> There are only really 5 patches in between the broken commit and the one
->> that fixes it, and it only affects things trying to set the ioprio with
->> a dead task. Is this a huge issue? I don't see why this would cause a
->> lot of bisection headaches.
->>
+On Tue, 21 Dec 2021 17:18:51 +0100, Christoph Hellwig wrote:
+> One device_add is called disk->ev will be freed by disk_release, so we
+> should free it twice.  Fix this by allocating disk->ev after device_add
+> so that the extra local unwinding can be removed entirely.
 > 
-> I was saying that my commit was polluting syzbot bisection, this is a
-> distraction in this report.
-> (Or if you prefer, please ignore syzbot bisection)
+> Based on an earlier patch from Tetsuo Handa.
+> 
+> 
+> [...]
 
-Ah got it, yes makes sense.
+Applied, thanks!
 
-> linux-next has still this bug in set_task_ioprio()
+[1/1] block: fix error unwinding in device_add_disk
+      commit: 99d8690aae4b2f0d1d90075de355ac087f820a66
 
-linux-next often trails by a few days, once it catches up hopefully
-this will be behind us.
-
+Best regards,
 -- 
 Jens Axboe
+
 
