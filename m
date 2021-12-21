@@ -2,72 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF347C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 09:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A57D2C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 10:08:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbhLUJwJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 04:52:09 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:50929 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbhLUJwJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 04:52:09 -0500
-Received: by mail-il1-f197.google.com with SMTP id 9-20020a056e0216c900b002acc1b44b91so6668652ilx.17
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 01:52:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=gtMOeWgOjqpxf3UJsdLLfE47QPkTrgfO0H8YEz5DRG8=;
-        b=vE8BGDKQwKof0LP5ySGY8r3fCtO2+06wTVbYCwdAy+OnsdsKqLNiULkHimwAIgDvqP
-         kzqo2L6Hu63/rHnkCqjk4NVG44RdWMbj5llCaP92frRZrUex6JWbSVG7TvlJpYAhpyaw
-         flkRC5E8BurrTi3Xly/pRx4j1lRKp/qtPLdgS9sqvZJiaM/Q+MunpLuJ0SRIvAuqqApB
-         1sh+B5sUtBY97FEuUS47090I8tBjEOW3mCx0y0m1m2RYg/22N5ojA8LH0PqklsKlDrxU
-         Ap24vMbbfu0xfaN24kw3WGYkFqjiiuyvcH+9W+5Ysbarxjo/m8KmsQ9AU5J1XIolK4Sb
-         6A7g==
-X-Gm-Message-State: AOAM533NG1psChidxT8mUyWcDdRWKC89UB4ViS9+Ob88LJxk1tx1Upo2
-        XSHdWSECdfGcLZytfgdRCFfWdUWab6i2L/MjB69kW/DmEKp6
-X-Google-Smtp-Source: ABdhPJx6QiXqNu7Hfc+O/DrzAKwtgSlzMWab3H3rNwlyXnrdxwZcfwS7rfCEn4d1tGHD0uzTYSEiyrI+miyx42y9AEkxASphiUL7
+        id S231767AbhLUKIP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 05:08:15 -0500
+Received: from verein.lst.de ([213.95.11.211]:46299 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231764AbhLUKIO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Dec 2021 05:08:14 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 9A0EA68AFE; Tue, 21 Dec 2021 11:08:11 +0100 (CET)
+Date:   Tue, 21 Dec 2021 11:08:11 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: fix error handling for device_add_disk
+Message-ID: <20211221100811.GA10674@lst.de>
+References: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp> <20211216161806.GA31879@lst.de> <20211216161928.GB31879@lst.de> <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:a10:: with SMTP id z16mr1105244ioi.204.1640080328753;
- Tue, 21 Dec 2021 01:52:08 -0800 (PST)
-Date:   Tue, 21 Dec 2021 01:52:08 -0800
-In-Reply-To: <000000000000c70eef05d39f42a5@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000066073805d3a4f598@google.com>
-Subject: Re: [syzbot] general protection fault in set_task_ioprio
-From:   syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, changbin.du@intel.com,
-        christian.brauner@ubuntu.com, daniel@iogearbox.net,
-        davem@davemloft.net, edumazet@google.com, hkallweit1@gmail.com,
-        kuba@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, yajun.deng@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+On Fri, Dec 17, 2021 at 07:37:43PM +0900, Tetsuo Handa wrote:
+> Well, I don't think that we can remove this blk_free_ext_minor() call, for
+> this call is releasing disk->first_minor rather than MINOR(bdev->bd_dev).
+> 
+> Since bdev_add(disk->part0, MKDEV(disk->major, disk->first_minor)) is not
+> called when reaching the out_free_ext_minor label,
+> 
+> 	if (MAJOR(bdev->bd_dev) == BLOCK_EXT_MAJOR)
+> 		blk_free_ext_minor(MINOR(bdev->bd_dev));
+> 
+> in bdev_free_inode() will not be called because MAJOR(bdev->bd_dev) == 0
+> because bdev->bd_dev == 0.
+> 
+> I think we can apply this patch as-is...
 
-commit e4b8954074f6d0db01c8c97d338a67f9389c042f
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Tue Dec 7 01:30:37 2021 +0000
+With the patch as-is we'll still leak disk->ev if device_add fails.
+Something like the patch below should solve that by moving the disk->ev
+allocation later and always cleaning it up through disk->release:
 
-    netlink: add net device refcount tracker to struct ethnl_req_info
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10620fcdb00000
-start commit:   07f8c60fe60f Add linux-next specific files for 20211220
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12620fcdb00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14620fcdb00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2060504830b9124a
-dashboard link: https://syzkaller.appspot.com/bug?extid=8836466a79f4175961b0
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12058fcbb00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17141adbb00000
-
-Reported-by: syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com
-Fixes: e4b8954074f6 ("netlink: add net device refcount tracker to struct ethnl_req_info")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/block/genhd.c b/block/genhd.c
+index 3c139a1b6f049..3e4bbfa3e1c24 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -442,10 +442,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		disk->first_minor = ret;
+ 	}
+ 
+-	ret = disk_alloc_events(disk);
+-	if (ret)
+-		goto out_free_ext_minor;
+-
+ 	/* delay uevents, until we scanned partition table */
+ 	dev_set_uevent_suppress(ddev, 1);
+ 
+@@ -456,7 +452,12 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		ddev->devt = MKDEV(disk->major, disk->first_minor);
+ 	ret = device_add(ddev);
+ 	if (ret)
+-		goto out_disk_release_events;
++		goto out_free_ext_minor;
++
++	ret = disk_alloc_events(disk);
++	if (ret)
++		goto out_device_del;
++
+ 	if (!sysfs_deprecated) {
+ 		ret = sysfs_create_link(block_depr, &ddev->kobj,
+ 					kobject_name(&ddev->kobj));
+@@ -538,8 +539,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		sysfs_remove_link(block_depr, dev_name(ddev));
+ out_device_del:
+ 	device_del(ddev);
+-out_disk_release_events:
+-	disk_release_events(disk);
++	return ret;
+ out_free_ext_minor:
+ 	if (disk->major == BLOCK_EXT_MAJOR)
+ 		blk_free_ext_minor(disk->first_minor);
