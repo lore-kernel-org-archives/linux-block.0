@@ -2,72 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEA6C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 15:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DCDC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:04:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236154AbhLUPly (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 10:41:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
+        id S236964AbhLUQEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 11:04:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234903AbhLUPlx (ORCPT
+        with ESMTP id S236929AbhLUQEJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 10:41:53 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD68DC061574;
-        Tue, 21 Dec 2021 07:41:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 675C66165B;
-        Tue, 21 Dec 2021 15:41:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 774B7C36AE9;
-        Tue, 21 Dec 2021 15:41:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640101311;
-        bh=2yY7BcdUJNA534m7FVOTXVI6m2bGZl/R7BXTgcDlCkk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VS1LzvCAS641eFn9AmbzbuYM8ST03U8Z5bPYDcFGrrhzWrZehYLMEw4n0Mv8PVgsv
-         6NYEnY4gIhSqKi1lH6/aQ+AurOVt4UTg0Qg0T2R6PkaB6MmgBgl0CeaVYteWwsGPrl
-         oxiNY+tfAfqY1uh3I3xGpmKcJt9pJd0nnQRuirGDd0nu+Cme30muYRQIfmc9vSROBS
-         EvgdlGUkcIsG6x0eCOrzxEMxHfeEJYIRYlrti9DSFxx5ma8ZQTn2VQj5CEbtwji6xB
-         ZfudwEGxc2I3HFfWGX7kPrdIKMi94/aukgQrPBwiJPUZHiBnvmYXGc43qqzW/nBnmq
-         9RNp9EsuoJgcQ==
-Date:   Tue, 21 Dec 2021 09:41:47 -0600
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-doc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/8] docs: consolidate sysfs-block into
- Documentation/ABI/
-Message-ID: <YcH1uxfdTRHIwl7Y@quark>
-References: <20211209003833.6396-1-ebiggers@kernel.org>
+        Tue, 21 Dec 2021 11:04:09 -0500
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58F3C06173F
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:04:08 -0800 (PST)
+Received: by mail-yb1-xb31.google.com with SMTP id 131so40099553ybc.7
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:04:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0roCqRwBVDlG3ZY65wGgF0zPM6igK5cwoWbgit1/YI4=;
+        b=ivqIGI/KEh3aqvtfjIDOc/Es6avHmhJ8sdvnEc9Ai/lVNTM6sXIhd7yyVJkd0zJfVc
+         Gj7NjooTymJGQ++gTM7x7xQxtsN+uvQD1TfM9U2SaNJozKgKseF+z4aC3zPe/Hiyo1lA
+         xo0oYvohryFUtbZJh61O2widNyobZBGA1oAQVnjMM7imhIOoUpP/Er2U0o5jv2M9zyMH
+         OuM0PviL4m8wy30aSqh0E31abJOKeh2RH71+HAV/ZujEV9zwL6QcT7x4I15HgAiCQjyi
+         lbWZpWxs2LVQj4rLzZznhPun9nh+JqmejVgHODL/amc2mt6HqijdOs8eQJAEZrSY0SiS
+         T6DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0roCqRwBVDlG3ZY65wGgF0zPM6igK5cwoWbgit1/YI4=;
+        b=sAPVeNx70FZJXZsYS/30RxdA25foVcna9nPEr0U2mhJdo8ctsTCM35etVvTwkCbuOK
+         Y4VviE6LruZz5tVCSHllA4c7+I9DhPThS7Vw+GrMvomCjwYny45PUSZQAn7wOVkr5LRo
+         9Mx87peVyQeYkwlYErD3BP8Ge2jk9MM0xU1d3TMkQQBMTDW2WcvKT5wylLNRtRqANjIh
+         Gfaz5F740kutbVnPzG9NbYsRw38ypyHz3fmaUOOkdlFHEWQNHwDdGGZ04KqyldKoixhg
+         vw69mGOeCeiiY5Qa2hAU4zguDs2+mkcV3XXxRJR9zOIxOJD8m3tN3Q7Ondtm2mJfkbex
+         dedQ==
+X-Gm-Message-State: AOAM531DcE3G6yCGdbW7fKcCpWrxcBrz3rLm+O7NBaRGoNjMwYct2v0o
+        o/Yjss55+M9rLAHL3Sr7A3CI3ajv4Tij1qQ9VcsGwg==
+X-Google-Smtp-Source: ABdhPJzzns+hChUDZbOHQEm/E9TmmuZM8sZ7oacian8uS0tNDMDu1xMFR62ZsNiEzzke81Jc3knotpgxEeZ8ttZAfl4=
+X-Received: by 2002:a05:6902:1025:: with SMTP id x5mr5545758ybt.156.1640102647638;
+ Tue, 21 Dec 2021 08:04:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211209003833.6396-1-ebiggers@kernel.org>
+References: <000000000000c70eef05d39f42a5@google.com> <00000000000066073805d3a4f598@google.com>
+ <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com> <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
+In-Reply-To: <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Tue, 21 Dec 2021 08:03:56 -0800
+Message-ID: <CANn89iJfEgkJCBqO9d7t9BHHMEh-6DQ1BJkqkiOQ59dxSHB2EQ@mail.gmail.com>
+Subject: Re: [syzbot] general protection fault in set_task_ioprio
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
+        Christoph Hellwig <hch@lst.de>, changbin.du@intel.com,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        David Miller <davem@davemloft.net>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Yajun Deng <yajun.deng@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 08, 2021 at 04:38:25PM -0800, Eric Biggers wrote:
-> This series consolidates the documentation for /sys/block/<disk>/queue/
-> into Documentation/ABI/, where it is supposed to go (as per Greg KH:
-> https://lore.kernel.org/r/YaXXpEAwVGTLjp1e@kroah.com).
-> 
-> This series also updates MAINTAINERS to associate the block
-> documentation with the block layer.
-> 
-> This series applies to linux-block/for-next.
-> 
-> Changed v2 => v3:
->    - Improved documentation for stable_writes and virt_boundary_mask.
->    - Added more Reviewed-by tags.
-> 
-> Changed v1 => v2:
->    - Added patch which moves the documentation to the stable directory.
->    - Added Reviewed-by tags.
+On Tue, Dec 21, 2021 at 7:25 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 12/21/21 3:44 AM, Eric Dumazet wrote:
+> > On Tue, Dec 21, 2021 at 1:52 AM syzbot
+> > <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
+> >>
+> >> syzbot has bisected this issue to:
+> >>
+> >> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
+> >> Author: Eric Dumazet <edumazet@google.com>
+> >> Date:   Tue Dec 7 01:30:37 2021 +0000
+> >>
+> >>     netlink: add net device refcount tracker to struct ethnl_req_info
+> >>
+> >
+> > Unfortunately this commit will be in the way of many bisections.
+> >
+> > Real bug was added in
+> >
+> > commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
+> > Author: Christoph Hellwig <hch@lst.de>
+> > Date:   Thu Dec 9 07:31:29 2021 +0100
+> >
+> >     block: open code create_task_io_context in set_task_ioprio
+> >
+> >     The flow in set_task_ioprio can be simplified by simply open coding
+> >     create_task_io_context, which removes a refcount roundtrip on the I/O
+> >     context.
+> >
+> >     Signed-off-by: Christoph Hellwig <hch@lst.de>
+> >     Reviewed-by: Jan Kara <jack@suse.cz>
+> >     Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
+> >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>
+> There are only really 5 patches in between the broken commit and the one
+> that fixes it, and it only affects things trying to set the ioprio with
+> a dead task. Is this a huge issue? I don't see why this would cause a
+> lot of bisection headaches.
+>
 
-Jens, any interest in applying this series?
+I was saying that my commit was polluting syzbot bisection, this is a
+distraction in this report.
+(Or if you prefer, please ignore syzbot bisection)
 
-- Eric
+linux-next has still this bug in set_task_ioprio()
+
+
+> --
+> Jens Axboe
+>
