@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01102C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 08:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB2DAC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 08:59:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235911AbhLUI6a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 03:58:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53864 "EHLO
+        id S234029AbhLUI7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 03:59:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235910AbhLUI63 (ORCPT
+        with ESMTP id S233983AbhLUI7M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 03:58:29 -0500
+        Tue, 21 Dec 2021 03:59:12 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6180C061574;
-        Tue, 21 Dec 2021 00:58:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E7BBC061574;
+        Tue, 21 Dec 2021 00:59:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Mj42r7OdlZgUxm6RYk+ouMVGEzoTqWz8z3niMiIDoo8=; b=Qz3NIVR0QqoJvr56nSAlKRPp8H
-        OhrFMEP02wF4IUt6OAZiLa6Je+2eOOr9nio4AXgCj7XNZ73sia0WTGytTvpEEtLOew4PjLsa8XEkH
-        f1hhGzxeolPyl58LM+Rz/5b58lnHwaf71CFn/yXoV+dFs/BvWY9jAsAJDkwN3/Duoi5QmymH223Lw
-        HFz3MAQaWZWAoJQHKM9nMGfPAFB9A8nEB5C7FYMQOKE8rcs+Bb9PJhxgQzsn7znngkB3M02L97XXD
-        qqGrx1S4DYR7Dp8AY0TC2PAyK3EZVGbKMnTJwHTQutBCxxNPi2l5zfaV0iqxipXD/KY6SF0BkoBVk
-        LccgiqDw==;
+        bh=wHV6GRR4eealQww1iJ3X6PIJAgvUqP6QFcBO/7H/dwA=; b=aHBb50Wa5isXtAMsqxF6OqcRS5
+        Hmpz+X/6tFqcv5yPwUdnV67lcPCIHy6ZUAL4qO9GPiknrWSLdymdHViVIMvq965OMQoUvx4kF1FP7
+        JN4AdLf7oxczerBipw7sjE5qOGAzOH1TkI0RZoDlAKGUlxGX1fojXlxHSw3Gl8OPTUYSODKG9gsAN
+        m9pkcXigBpB1QNUYLahgPlN6XDovrC4kSTUZghc/6ZXbZWo3DBMiIEZQdXiBZE3O/J4kgfpAsKwEj
+        W3ovp8tMzAW4z2q3yCrn0I17fOPNABRZ8nvhWE5sU3HFUFJ21lMh5FlaV5IBO7/mRwlsB7X6PXG0H
+        DiM1rSdA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mzayY-006040-T6; Tue, 21 Dec 2021 08:58:26 +0000
-Date:   Tue, 21 Dec 2021 00:58:26 -0800
+        id 1mzazF-0060Dn-PJ; Tue, 21 Dec 2021 08:59:09 +0000
+Date:   Tue, 21 Dec 2021 00:59:09 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Miko Larsson <mikoxyzzz@gmail.com>
 Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
         axboe@kernel.dk, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, hch@infradead.org
-Subject: Re: [PATCH v2 1/2] zram: zram_drv: add SPDX license identifiers
-Message-ID: <YcGXMkttiOq4IpJg@infradead.org>
+Subject: Re: [PATCH v2 2/2] zram: zram_drv: replace 'strlcpy()'
+Message-ID: <YcGXXQhB8YUMXI3O@infradead.org>
 References: <20211217063224.3474-1-mikoxyzzz@gmail.com>
- <20211217063224.3474-2-mikoxyzzz@gmail.com>
+ <20211217063224.3474-3-mikoxyzzz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211217063224.3474-2-mikoxyzzz@gmail.com>
+In-Reply-To: <20211217063224.3474-3-mikoxyzzz@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 17, 2021 at 07:32:23AM +0100, Miko Larsson wrote:
-> zram_drv lacks an SPDX license identifier in both its source and in its
-> header, so we should add license identifiers based on the copyright info
-> provided by the initial comment block.
-> 
-> Signed-off-by: Miko Larsson <mikoxyzzz@gmail.com>
+On Fri, Dec 17, 2021 at 07:32:24AM +0100, Miko Larsson wrote:
+> 'strlcpy()' shouldn't be used, and should be replaced with safer
+> alternatives. Cristoph Hellwig suggested [1] that 'kmemdup_nul()' should
+> be used in two cases instead of 'strscpy()', and that a regular
+> 'strcpy()' should be used in the third case. [2][3]
 
-Looks good,
+Not that strcpy isn't really safer, but if your plan is to get rid
+of strlcpy I think it makes more sense there.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
