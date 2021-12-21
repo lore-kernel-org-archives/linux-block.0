@@ -2,115 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 451ABC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 10:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE89C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 11:08:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbhLUKot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 05:44:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230132AbhLUKot (ORCPT
+        id S236910AbhLULIt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 06:08:49 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:29273 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236868AbhLULIs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 05:44:49 -0500
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17280C06173F
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 02:44:49 -0800 (PST)
-Received: by mail-yb1-xb2d.google.com with SMTP id d10so37674883ybn.0
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 02:44:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NDtQgb9AA9xFpWuXkc+E4u23J1dpI6q3KUw8LtmkUY4=;
-        b=ovRbDOO2X6hqPfiK/gjWv7YQ+244WflmjY3yZq9cJQOSgTPJydu/nbHdDw9lr8vmi/
-         zxib8m2jR5z2FSANVQNHDy6k764HSw9nvKTW+XzIhN0dLh6V9zr6W/YpJMzTbXVRN6F5
-         9UBFUHMLjkb7XnubVZj2qxqokO5PxSptXvirtG2wePW937F8auR/q7zq/hvxCrsx7lvo
-         MpcQZVVAbABQzJ9KvzbyNev8aasfruRE9vgz9YoDUNKMlHjZPD8LwmeJSw3Kq40rx8E6
-         YOiPQ/xJLQDlkTkBcdV9aL4TV33kDoXalpchSkU8OeUL6oGQl/kbT98bYCU9kG9mhAbX
-         WhFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NDtQgb9AA9xFpWuXkc+E4u23J1dpI6q3KUw8LtmkUY4=;
-        b=vWdOJBcMXK5crnR+1fX6lT7bY4Tj1u3dqC7SvMsa+upvC43LWr2+9aWRl+Jhe1WjI0
-         aR3+xiqxAex064LDomI1SosR3CRuV8o/CAGxwMTkSyAA5OHm7Uv3YerYT63FgPWhy7PN
-         z/TT/lxOoa3kKiSLkjGq7h27dX9zBSbiNUuztfmr2giAf52xZ/0jfkdPXj5B3Tbog4yi
-         +JyaglEX0RZV8/os0IiDxmQ8Bsjnprc1J1K1lfMnaEKIzMcl0M2QegdHFbRuzbpIcicG
-         x9uwZ2vIcfdkblWKHPMo+egc7sheuC4Nli/3y2csGaaPeSYfrS4yWoR19xhx2p8Pkmvn
-         drng==
-X-Gm-Message-State: AOAM532CHAKicTRTwkhlbx13LRkjTzgSOcCu3rxr6FuLvvJ+mP9W4X6L
-        Dp1GyEMsvdCWGgq8MKYMMMm1plP+7yh9xUx6CIVHAA==
-X-Google-Smtp-Source: ABdhPJxdMBSrVlyjappl/8A1n64cSvK0pWT+wsIIG/Rr1u/SqTZbJCLSpE7r7ssu9rf/kxNEj1CabHdgFByo5q4RJOE=
-X-Received: by 2002:a25:af14:: with SMTP id a20mr3799875ybh.753.1640083487564;
- Tue, 21 Dec 2021 02:44:47 -0800 (PST)
+        Tue, 21 Dec 2021 06:08:48 -0500
+Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JJDGH3hx4zbjY2;
+        Tue, 21 Dec 2021 19:08:23 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 21 Dec 2021 19:08:46 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 21 Dec 2021 19:08:45 +0800
+Subject: Re: [PATCH 2/4] block, bfq: avoid moving bfqq to it's parent bfqg
+To:     Jan Kara <jack@suse.cz>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <fchecconi@gmail.com>, <avanzini.arianna@gmail.com>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211221032135.878550-1-yukuai3@huawei.com>
+ <20211221032135.878550-3-yukuai3@huawei.com>
+ <20211221101659.GB24748@quack2.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <d1c91a5f-33f3-ffad-e1ad-fb91482eb864@huawei.com>
+Date:   Tue, 21 Dec 2021 19:08:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <000000000000c70eef05d39f42a5@google.com> <00000000000066073805d3a4f598@google.com>
-In-Reply-To: <00000000000066073805d3a4f598@google.com>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Tue, 21 Dec 2021 02:44:36 -0800
-Message-ID: <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com>
-Subject: Re: [syzbot] general protection fault in set_task_ioprio
-To:     syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, changbin.du@intel.com,
-        Christian Brauner <christian.brauner@ubuntu.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        David Miller <davem@davemloft.net>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Yajun Deng <yajun.deng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20211221101659.GB24748@quack2.suse.cz>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 1:52 AM syzbot
-<syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
->
-> syzbot has bisected this issue to:
->
-> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Tue Dec 7 01:30:37 2021 +0000
->
->     netlink: add net device refcount tracker to struct ethnl_req_info
->
+ÔÚ 2021/12/21 18:16, Jan Kara Ð´µÀ:
+> On Tue 21-12-21 11:21:33, Yu Kuai wrote:
+>> Moving bfqq to it's parent bfqg is pointless.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> 
+> Did you notice that this is happening often enough that the check is worth
+> it? Where do we do this?
+> 
 
-Unfortunately this commit will be in the way of many bisections.
+I noticed that this will happend when root group is offlined:
 
-Real bug was added in
+bfq_pd_offline
+  bfq_put_async_queues
+   __bfq_put_async_bfqq
+    bfq_bfqq_move
 
-commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Thu Dec 9 07:31:29 2021 +0100
+I'm not sure if there are other situations. I think bfq_bfqq_move()
+is not happening often itself, thus the checking won't affect
+performance.
 
-    block: open code create_task_io_context in set_task_ioprio
-
-    The flow in set_task_ioprio can be simplified by simply open coding
-    create_task_io_context, which removes a refcount roundtrip on the I/O
-    context.
-
-    Signed-off-by: Christoph Hellwig <hch@lst.de>
-    Reviewed-by: Jan Kara <jack@suse.cz>
-    Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10620fcdb00000
-> start commit:   07f8c60fe60f Add linux-next specific files for 20211220
-> git tree:       linux-next
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=12620fcdb00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=14620fcdb00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=2060504830b9124a
-> dashboard link: https://syzkaller.appspot.com/bug?extid=8836466a79f4175961b0
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12058fcbb00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17141adbb00000
->
-> Reported-by: syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com
-> Fixes: e4b8954074f6 ("netlink: add net device refcount tracker to struct ethnl_req_info")
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Thanks,
+Kuai
+> 								Honza
+> 
+>> ---
+>>   block/bfq-cgroup.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+>> index 24a5c5329bcd..0f62546a72d4 100644
+>> --- a/block/bfq-cgroup.c
+>> +++ b/block/bfq-cgroup.c
+>> @@ -645,6 +645,11 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>>   		   struct bfq_group *bfqg)
+>>   {
+>>   	struct bfq_entity *entity = &bfqq->entity;
+>> +	struct bfq_group *old_parent = bfq_group(bfqq);
+>> +
+>> +	/* No point to move bfqq to the same group */
+>> +	if (old_parent == bfqg)
+>> +		return;
+>>   
+>>   	/*
+>>   	 * Get extra reference to prevent bfqq from being freed in
+>> @@ -666,7 +671,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>>   		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
+>>   	else if (entity->on_st_or_in_serv)
+>>   		bfq_put_idle_entity(bfq_entity_service_tree(entity), entity);
+>> -	bfqg_and_blkg_put(bfqq_group(bfqq));
+>> +	bfqg_and_blkg_put(old_parent);
+>>   
+>>   	if (entity->parent &&
+>>   	    entity->parent->last_bfqq_created == bfqq)
+>> -- 
+>> 2.31.1
+>>
