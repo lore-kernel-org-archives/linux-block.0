@@ -2,90 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B46C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 09:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA50C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 09:34:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236299AbhLUJX1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 04:23:27 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:44302 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232251AbhLUJX1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 04:23:27 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F079EB8124B;
-        Tue, 21 Dec 2021 09:23:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A0FBC36AE2;
-        Tue, 21 Dec 2021 09:23:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1640078604;
-        bh=vs6i4+czViyI3niT0XaIdGWKKRNE64KCSW1Ge0iJUMQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YFyHD1mTWBetPy/IaSAHNt0jtVC558rU2odGeu0CUBv7mrg/gEEPDUJ3dI5/k+gNs
-         S/RmsgwAx/8pU6/vOHLbVQTP0gIHnDwKBjw8jGNtz9QCbGBFoMkd+KjIb7DZzy8+Dg
-         7jIC2+VjTX3zVG0LBA9+tnzVxTdT9qhclPLrtRgY=
-Date:   Tue, 21 Dec 2021 10:23:22 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     tim@cyberelk.net, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] paride: fix up build warning on mips platforms
-Message-ID: <YcGdCp1lgG2x89y/@kroah.com>
-References: <20211130084626.3215987-1-gregkh@linuxfoundation.org>
- <YcCo8+jTG3b+5GTA@kroah.com>
- <4915ba81-28b1-6008-62f2-50316177fd46@kernel.dk>
+        id S236408AbhLUJeU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 04:34:20 -0500
+Received: from verein.lst.de ([213.95.11.211]:46194 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236409AbhLUJeU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Dec 2021 04:34:20 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id E7E3968AFE; Tue, 21 Dec 2021 10:34:16 +0100 (CET)
+Date:   Tue, 21 Dec 2021 10:34:16 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH (resend)] brd: remove brd_devices_mutex mutex
+Message-ID: <20211221093416.GA10573@lst.de>
+References: <01fb7a16-fb97-b0e4-1c1f-aa42e7f68766@i-love.sakura.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4915ba81-28b1-6008-62f2-50316177fd46@kernel.dk>
+In-Reply-To: <01fb7a16-fb97-b0e4-1c1f-aa42e7f68766@i-love.sakura.ne.jp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 20, 2021 at 09:33:12AM -0700, Jens Axboe wrote:
-> On 12/20/21 9:01 AM, Greg Kroah-Hartman wrote:
-> > On Tue, Nov 30, 2021 at 09:46:26AM +0100, Greg Kroah-Hartman wrote:
-> >> MIPS include files define "PC" so when building the paride driver the
-> >> following build warning shows up:
-> >>
-> >> 	rivers/block/paride/bpck.c:32: warning: "PC" redefined
-> >>
-> >> Fix this by undefining PC before redefining it as is done for other
-> >> defines in this driver.
-> >>
-> >> Cc: Tim Waugh <tim@cyberelk.net>
-> >> Cc: Jens Axboe <axboe@kernel.dk>
-> >> Cc: linux-block@vger.kernel.org
-> >> Cc: linux-kernel@vger.kernel.org
-> >> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> >> ---
-> >>  drivers/block/paride/bpck.c | 1 +
-> >>  1 file changed, 1 insertion(+)
-> >>
-> >> diff --git a/drivers/block/paride/bpck.c b/drivers/block/paride/bpck.c
-> >> index f5f63ca2889d..d880a9465e9b 100644
-> >> --- a/drivers/block/paride/bpck.c
-> >> +++ b/drivers/block/paride/bpck.c
-> >> @@ -28,6 +28,7 @@
-> >>  
-> >>  #undef r2
-> >>  #undef w2
-> >> +#undef PC
-> >>  
-> >>  #define PC			pi->private
-> >>  #define r2()			(PC=(in_p(2) & 0xff))
-> >> -- 
-> >> 2.34.1
-> >>
-> > 
-> > Given the lack of objections to this, I'll just take it through one of
-> > my trees for 5.17-rc1.
-> 
-> Sorry about that, got lost. I can queue it  up too, or you can add my
-> acked-by, either is fine.
+Looks good,
 
-Easy enough for me to take it, now done, thanks!
-
-greg k-h
+Reviewed-by: Christoph Hellwig <hch@lst.de>
