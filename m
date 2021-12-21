@@ -2,83 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 366FDC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 10:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 451ABC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 10:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231187AbhLUKV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 05:21:57 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:56246 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbhLUKV5 (ORCPT
+        id S233901AbhLUKot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 05:44:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230132AbhLUKot (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 05:21:57 -0500
-Received: from fsav117.sakura.ne.jp (fsav117.sakura.ne.jp [27.133.134.244])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BLALdbo046079;
-        Tue, 21 Dec 2021 19:21:39 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav117.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp);
- Tue, 21 Dec 2021 19:21:39 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BLALdst046076
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 21 Dec 2021 19:21:39 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <9946ace6-7a00-fd15-3cfa-886eb3b63c6f@i-love.sakura.ne.jp>
-Date:   Tue, 21 Dec 2021 19:21:39 +0900
+        Tue, 21 Dec 2021 05:44:49 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17280C06173F
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 02:44:49 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id d10so37674883ybn.0
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 02:44:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NDtQgb9AA9xFpWuXkc+E4u23J1dpI6q3KUw8LtmkUY4=;
+        b=ovRbDOO2X6hqPfiK/gjWv7YQ+244WflmjY3yZq9cJQOSgTPJydu/nbHdDw9lr8vmi/
+         zxib8m2jR5z2FSANVQNHDy6k764HSw9nvKTW+XzIhN0dLh6V9zr6W/YpJMzTbXVRN6F5
+         9UBFUHMLjkb7XnubVZj2qxqokO5PxSptXvirtG2wePW937F8auR/q7zq/hvxCrsx7lvo
+         MpcQZVVAbABQzJ9KvzbyNev8aasfruRE9vgz9YoDUNKMlHjZPD8LwmeJSw3Kq40rx8E6
+         YOiPQ/xJLQDlkTkBcdV9aL4TV33kDoXalpchSkU8OeUL6oGQl/kbT98bYCU9kG9mhAbX
+         WhFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NDtQgb9AA9xFpWuXkc+E4u23J1dpI6q3KUw8LtmkUY4=;
+        b=vWdOJBcMXK5crnR+1fX6lT7bY4Tj1u3dqC7SvMsa+upvC43LWr2+9aWRl+Jhe1WjI0
+         aR3+xiqxAex064LDomI1SosR3CRuV8o/CAGxwMTkSyAA5OHm7Uv3YerYT63FgPWhy7PN
+         z/TT/lxOoa3kKiSLkjGq7h27dX9zBSbiNUuztfmr2giAf52xZ/0jfkdPXj5B3Tbog4yi
+         +JyaglEX0RZV8/os0IiDxmQ8Bsjnprc1J1K1lfMnaEKIzMcl0M2QegdHFbRuzbpIcicG
+         x9uwZ2vIcfdkblWKHPMo+egc7sheuC4Nli/3y2csGaaPeSYfrS4yWoR19xhx2p8Pkmvn
+         drng==
+X-Gm-Message-State: AOAM532CHAKicTRTwkhlbx13LRkjTzgSOcCu3rxr6FuLvvJ+mP9W4X6L
+        Dp1GyEMsvdCWGgq8MKYMMMm1plP+7yh9xUx6CIVHAA==
+X-Google-Smtp-Source: ABdhPJxdMBSrVlyjappl/8A1n64cSvK0pWT+wsIIG/Rr1u/SqTZbJCLSpE7r7ssu9rf/kxNEj1CabHdgFByo5q4RJOE=
+X-Received: by 2002:a25:af14:: with SMTP id a20mr3799875ybh.753.1640083487564;
+ Tue, 21 Dec 2021 02:44:47 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] block: fix error handling for device_add_disk
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Luis Chamberlain <mcgrof@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp>
- <20211216161806.GA31879@lst.de> <20211216161928.GB31879@lst.de>
- <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
- <20211221100811.GA10674@lst.de> <20211221101517.GA13416@lst.de>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <20211221101517.GA13416@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <000000000000c70eef05d39f42a5@google.com> <00000000000066073805d3a4f598@google.com>
+In-Reply-To: <00000000000066073805d3a4f598@google.com>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Tue, 21 Dec 2021 02:44:36 -0800
+Message-ID: <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com>
+Subject: Re: [syzbot] general protection fault in set_task_ioprio
+To:     syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, changbin.du@intel.com,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        David Miller <davem@davemloft.net>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Yajun Deng <yajun.deng@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/12/21 19:15, Christoph Hellwig wrote:
-> On Tue, Dec 21, 2021 at 11:08:11AM +0100, Christoph Hellwig wrote:
->> On Fri, Dec 17, 2021 at 07:37:43PM +0900, Tetsuo Handa wrote:
->>> Well, I don't think that we can remove this blk_free_ext_minor() call, for
->>> this call is releasing disk->first_minor rather than MINOR(bdev->bd_dev).
->>>
->>> Since bdev_add(disk->part0, MKDEV(disk->major, disk->first_minor)) is not
->>> called when reaching the out_free_ext_minor label,
->>>
->>> 	if (MAJOR(bdev->bd_dev) == BLOCK_EXT_MAJOR)
->>> 		blk_free_ext_minor(MINOR(bdev->bd_dev));
->>>
->>> in bdev_free_inode() will not be called because MAJOR(bdev->bd_dev) == 0
->>> because bdev->bd_dev == 0.
->>>
->>> I think we can apply this patch as-is...
->>
->> With the patch as-is we'll still leak disk->ev if device_add fails.
->> Something like the patch below should solve that by moving the disk->ev
->> allocation later and always cleaning it up through disk->release:
+On Tue, Dec 21, 2021 at 1:52 AM syzbot
+<syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has bisected this issue to:
+>
+> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Tue Dec 7 01:30:37 2021 +0000
+>
+>     netlink: add net device refcount tracker to struct ethnl_req_info
+>
 
-Then what about this simple fix?
+Unfortunately this commit will be in the way of many bisections.
 
-diff --git a/block/disk-events.c b/block/disk-events.c
-index 8d5496e7592a..05b1249650ab 100644
---- a/block/disk-events.c
-+++ b/block/disk-events.c
-@@ -501,4 +501,5 @@ void disk_release_events(struct gendisk *disk)
- 	/* the block count should be 1 from disk_del_events() */
- 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
- 	kfree(disk->ev);
-+	disk->ev = NULL;
- }
+Real bug was added in
 
+commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Thu Dec 9 07:31:29 2021 +0100
+
+    block: open code create_task_io_context in set_task_ioprio
+
+    The flow in set_task_ioprio can be simplified by simply open coding
+    create_task_io_context, which removes a refcount roundtrip on the I/O
+    context.
+
+    Signed-off-by: Christoph Hellwig <hch@lst.de>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10620fcdb00000
+> start commit:   07f8c60fe60f Add linux-next specific files for 20211220
+> git tree:       linux-next
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=12620fcdb00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14620fcdb00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=2060504830b9124a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=8836466a79f4175961b0
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12058fcbb00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17141adbb00000
+>
+> Reported-by: syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com
+> Fixes: e4b8954074f6 ("netlink: add net device refcount tracker to struct ethnl_req_info")
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
