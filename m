@@ -2,120 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DCDC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 157FDC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 16:18:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236964AbhLUQEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 11:04:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
+        id S239636AbhLUQS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 11:18:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236929AbhLUQEJ (ORCPT
+        with ESMTP id S239635AbhLUQS5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 11:04:09 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58F3C06173F
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:04:08 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id 131so40099553ybc.7
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:04:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0roCqRwBVDlG3ZY65wGgF0zPM6igK5cwoWbgit1/YI4=;
-        b=ivqIGI/KEh3aqvtfjIDOc/Es6avHmhJ8sdvnEc9Ai/lVNTM6sXIhd7yyVJkd0zJfVc
-         Gj7NjooTymJGQ++gTM7x7xQxtsN+uvQD1TfM9U2SaNJozKgKseF+z4aC3zPe/Hiyo1lA
-         xo0oYvohryFUtbZJh61O2widNyobZBGA1oAQVnjMM7imhIOoUpP/Er2U0o5jv2M9zyMH
-         OuM0PviL4m8wy30aSqh0E31abJOKeh2RH71+HAV/ZujEV9zwL6QcT7x4I15HgAiCQjyi
-         lbWZpWxs2LVQj4rLzZznhPun9nh+JqmejVgHODL/amc2mt6HqijdOs8eQJAEZrSY0SiS
-         T6DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0roCqRwBVDlG3ZY65wGgF0zPM6igK5cwoWbgit1/YI4=;
-        b=sAPVeNx70FZJXZsYS/30RxdA25foVcna9nPEr0U2mhJdo8ctsTCM35etVvTwkCbuOK
-         Y4VviE6LruZz5tVCSHllA4c7+I9DhPThS7Vw+GrMvomCjwYny45PUSZQAn7wOVkr5LRo
-         9Mx87peVyQeYkwlYErD3BP8Ge2jk9MM0xU1d3TMkQQBMTDW2WcvKT5wylLNRtRqANjIh
-         Gfaz5F740kutbVnPzG9NbYsRw38ypyHz3fmaUOOkdlFHEWQNHwDdGGZ04KqyldKoixhg
-         vw69mGOeCeiiY5Qa2hAU4zguDs2+mkcV3XXxRJR9zOIxOJD8m3tN3Q7Ondtm2mJfkbex
-         dedQ==
-X-Gm-Message-State: AOAM531DcE3G6yCGdbW7fKcCpWrxcBrz3rLm+O7NBaRGoNjMwYct2v0o
-        o/Yjss55+M9rLAHL3Sr7A3CI3ajv4Tij1qQ9VcsGwg==
-X-Google-Smtp-Source: ABdhPJzzns+hChUDZbOHQEm/E9TmmuZM8sZ7oacian8uS0tNDMDu1xMFR62ZsNiEzzke81Jc3knotpgxEeZ8ttZAfl4=
-X-Received: by 2002:a05:6902:1025:: with SMTP id x5mr5545758ybt.156.1640102647638;
- Tue, 21 Dec 2021 08:04:07 -0800 (PST)
+        Tue, 21 Dec 2021 11:18:57 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF72DC061574
+        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 08:18:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=yll7nt3nRnHgj0EuNAl5ZlNUl1Z5RGGx2f/PYKT7y28=; b=lT12ktL00QzNJYgpKQBB42eA8d
+        VDoVAkvtR/S7JY+8its3K43fXbt1GoqxxFPqP2zueU/HR4zQ5lxXfHBRM3bWlDp3zviKfpNdOf8eo
+        Q2uqNkvLOUbznGD88YvySm2DEEC7Ey28oad8Mtw6peGoN0P3CMh392V1lXscKdWN4/ikTNnvQ8sYM
+        rgjPNIsw/EbD8WyeMuA7CF3/1GsQv6oopogFLRnz5nb2oonUxcmYoP/iP5W+xzWkfLgxGs9IwPl3B
+        vC86a7anhAAniZp/rQivYcmcFbf+PM9kKh2bwl32Tgl/gTH8ggXbYabCObTZdJFhKMKWuebxJEmfY
+        fZ/xqzzg==;
+Received: from [2001:4bb8:188:3825:7066:8068:a6be:a483] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mzhqn-002cbi-7J; Tue, 21 Dec 2021 16:18:53 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp,
+        syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
+Subject: [PATCH] block: fix error unwinding in device_add_disk
+Date:   Tue, 21 Dec 2021 17:18:51 +0100
+Message-Id: <20211221161851.788424-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <000000000000c70eef05d39f42a5@google.com> <00000000000066073805d3a4f598@google.com>
- <CANn89i++5O_4_j3KO0wAiJHkEj=1zAeAHv=s9Lub_B6=cguwXQ@mail.gmail.com> <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
-In-Reply-To: <e3a30c8c-3f1a-47b5-57e7-1b456bbc8719@kernel.dk>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Tue, 21 Dec 2021 08:03:56 -0800
-Message-ID: <CANn89iJfEgkJCBqO9d7t9BHHMEh-6DQ1BJkqkiOQ59dxSHB2EQ@mail.gmail.com>
-Subject: Re: [syzbot] general protection fault in set_task_ioprio
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     syzbot <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com>,
-        Christoph Hellwig <hch@lst.de>, changbin.du@intel.com,
-        Christian Brauner <christian.brauner@ubuntu.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        David Miller <davem@davemloft.net>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Yajun Deng <yajun.deng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 7:25 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 12/21/21 3:44 AM, Eric Dumazet wrote:
-> > On Tue, Dec 21, 2021 at 1:52 AM syzbot
-> > <syzbot+8836466a79f4175961b0@syzkaller.appspotmail.com> wrote:
-> >>
-> >> syzbot has bisected this issue to:
-> >>
-> >> commit e4b8954074f6d0db01c8c97d338a67f9389c042f
-> >> Author: Eric Dumazet <edumazet@google.com>
-> >> Date:   Tue Dec 7 01:30:37 2021 +0000
-> >>
-> >>     netlink: add net device refcount tracker to struct ethnl_req_info
-> >>
-> >
-> > Unfortunately this commit will be in the way of many bisections.
-> >
-> > Real bug was added in
-> >
-> > commit 5fc11eebb4a98df5324a4de369bb5ab7f0007ff7
-> > Author: Christoph Hellwig <hch@lst.de>
-> > Date:   Thu Dec 9 07:31:29 2021 +0100
-> >
-> >     block: open code create_task_io_context in set_task_ioprio
-> >
-> >     The flow in set_task_ioprio can be simplified by simply open coding
-> >     create_task_io_context, which removes a refcount roundtrip on the I/O
-> >     context.
-> >
-> >     Signed-off-by: Christoph Hellwig <hch@lst.de>
-> >     Reviewed-by: Jan Kara <jack@suse.cz>
-> >     Link: https://lore.kernel.org/r/20211209063131.18537-10-hch@lst.de
-> >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
->
-> There are only really 5 patches in between the broken commit and the one
-> that fixes it, and it only affects things trying to set the ioprio with
-> a dead task. Is this a huge issue? I don't see why this would cause a
-> lot of bisection headaches.
->
+One device_add is called disk->ev will be freed by disk_release, so we
+should free it twice.  Fix this by allocating disk->ev after device_add
+so that the extra local unwinding can be removed entirely.
 
-I was saying that my commit was polluting syzbot bisection, this is a
-distraction in this report.
-(Or if you prefer, please ignore syzbot bisection)
+Based on an earlier patch from Tetsuo Handa.
 
-linux-next has still this bug in set_task_ioprio()
+Reported-by: syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
+Tested-by: syzbot <syzbot+28a66a9fbc621c939000@syzkaller.appspotmail.com>
+Fixes: 83cbce9574462c6b ("block: add error handling for device_add_disk / add_disk")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
+diff --git a/block/genhd.c b/block/genhd.c
+index 3c139a1b6f049..603db5d6f10c0 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -442,10 +442,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		disk->first_minor = ret;
+ 	}
+ 
+-	ret = disk_alloc_events(disk);
+-	if (ret)
+-		goto out_free_ext_minor;
+-
+ 	/* delay uevents, until we scanned partition table */
+ 	dev_set_uevent_suppress(ddev, 1);
+ 
+@@ -456,7 +452,12 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		ddev->devt = MKDEV(disk->major, disk->first_minor);
+ 	ret = device_add(ddev);
+ 	if (ret)
+-		goto out_disk_release_events;
++		goto out_free_ext_minor;
++
++	ret = disk_alloc_events(disk);
++	if (ret)
++		goto out_device_del;
++
+ 	if (!sysfs_deprecated) {
+ 		ret = sysfs_create_link(block_depr, &ddev->kobj,
+ 					kobject_name(&ddev->kobj));
+@@ -538,8 +539,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		sysfs_remove_link(block_depr, dev_name(ddev));
+ out_device_del:
+ 	device_del(ddev);
+-out_disk_release_events:
+-	disk_release_events(disk);
+ out_free_ext_minor:
+ 	if (disk->major == BLOCK_EXT_MAJOR)
+ 		blk_free_ext_minor(disk->first_minor);
+-- 
+2.30.2
 
-> --
-> Jens Axboe
->
