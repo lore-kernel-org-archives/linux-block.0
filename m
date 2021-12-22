@@ -2,125 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 184C7C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 13:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90684C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 14:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236698AbhLVNrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 08:47:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52806 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234159AbhLVNrD (ORCPT
+        id S245621AbhLVORa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 09:17:30 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:50460 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245622AbhLVOR3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 08:47:03 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE814C061574;
-        Wed, 22 Dec 2021 05:47:02 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id i12so1626094wmq.4;
-        Wed, 22 Dec 2021 05:47:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wxvMlF+l51oDklf4EWdV5hXzMGWV02iTMeiu5UDuE14=;
-        b=EqwnjVMY7HMk9vmwXPlECKQbKBxQ1TmHzuOg9dZYm38j3qn958X3+M1Lsm73knrJN8
-         gPqRxOj/t/X0hnbQrQzvxwDlOtOIzRn0NsHQF2cOMikt6I1aybrCWrJRNUc91wW/Ruer
-         R0q17uz4oBfLyWR3W9I95XBcT0sHWigqYiMC+GPmCVawoSUXJdA7OxboIlEeR1eDkxkt
-         AuXbjq8h3m4jsheXsDmFu5j5B0Hf1WGZl5L5R5e9xRQ4SFAWKgHTKw+eq29tyN+31iqK
-         BjpSCDJoTc5rCPfgMtSAe9oOfiokMXuNKCCxINdNM1QAYxFepXoZogVo7koypWnJNx0D
-         jykQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wxvMlF+l51oDklf4EWdV5hXzMGWV02iTMeiu5UDuE14=;
-        b=mZ7BbpdSngvs++yy0UM6bA0DxBeiSAod1SL6uqe7KZZxyd9NK7acggYj+rVHpi6l0M
-         vt2o48vzPN4tm4jLEOq55mX+Syy3RHQKjJnCHS+isdTaUjOZhKvqqeVHf377z8E8kH1r
-         uKwS1rrXEmQNNtX2IZayCj7ec8qCHJxvnpgGDNcaXaz5bm6tYpYuvtq2Oyf5mHTfsi2h
-         MjxkWlH3tTbZdWiweYAvDKh87Mb4Bn8HsybjX43oCZgtd3varbFWpGVcbXXG0dRFop9T
-         eafk1JFIC2+BexbqVD5ODlZaRJWDVy8udEkLL4us51hOihy8d2FSXPAl5Rxi53sqj6OH
-         fjyA==
-X-Gm-Message-State: AOAM531PoJqjtM4kNmRQGo2HijbgauWqbmn2YzpZ4l+6v3QsA27DA4c2
-        i5P9n/H1utMxNgrkH/5UkOAPc0BgHSB6C31MqBg=
-X-Google-Smtp-Source: ABdhPJxkxIwRoqvckjEUCYcJLdJLYPj3QuiYAWIBmMn64kvOBURss2n9lxMGdsbdDXeake/d5KlX0U843vkNazgqp0c=
-X-Received: by 2002:a1c:f213:: with SMTP id s19mr1042698wmc.0.1640180821187;
- Wed, 22 Dec 2021 05:47:01 -0800 (PST)
+        Wed, 22 Dec 2021 09:17:29 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 82D76212B7;
+        Wed, 22 Dec 2021 14:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1640182648; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=idiSby8trVHShWK13Y0N9hJM/pCoT2M/uIPXzb4ZYSA=;
+        b=XDsNO3+6DoHh9p+11+8PK6Gn9zpjZeUbct6b6ph3OmJRYuyc9lSQprir/4vmItc06j8BtB
+        XOEVxllFEWsgILJ8W7Nr+s/AAWK/QhZCWFoz7vYeG3K0SuXxsuHodfbKv1NpYkQ55dlK48
+        CrCYotIwo+k+loQFNJJz2LZNfYBOBWo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1640182648;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=idiSby8trVHShWK13Y0N9hJM/pCoT2M/uIPXzb4ZYSA=;
+        b=gqT1jGNfT+HgU3YyxXQ1XixhKQerBZcrY72CDNrrn+PaBGBW7lhNdsvIge7o/1p7kZMKkL
+        1Q1dAFAsOMJg56Aw==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id E3334A3B85;
+        Wed, 22 Dec 2021 14:17:27 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 5787C1F2CEF; Wed, 22 Dec 2021 15:17:22 +0100 (CET)
+Date:   Wed, 22 Dec 2021 15:17:22 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, tj@kernel.org, axboe@kernel.dk,
+        paolo.valente@linaro.org, fchecconi@gmail.com,
+        avanzini.arianna@gmail.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH 4/4] block, bfq: update pos_root for idle bfq_queue in
+ bfq_bfqq_move()
+Message-ID: <20211222141722.GC685@quack2.suse.cz>
+References: <20211221032135.878550-1-yukuai3@huawei.com>
+ <20211221032135.878550-5-yukuai3@huawei.com>
+ <20211221115001.GD24748@quack2.suse.cz>
+ <6ca1e924-47fa-b94e-598c-69a9549eb68e@huawei.com>
 MIME-Version: 1.0
-References: <2da62822fd56414d9893b89e160ed05c@kioxia.com>
-In-Reply-To: <2da62822fd56414d9893b89e160ed05c@kioxia.com>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Wed, 22 Dec 2021 19:16:35 +0530
-Message-ID: <CA+1E3r+kmGcAsN-1F4W02+qrF7MJ1fqbRWnOfNAqNAapg=E4qw@mail.gmail.com>
-Subject: Re: [RFC 02/13] nvme: wire-up support for async-passthru on
-To:     Clay Mayers <Clay.Mayers@kioxia.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "anuj20.g@samsung.com" <anuj20.g@samsung.com>,
-        "pankydev8@gmail.com" <pankydev8@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6ca1e924-47fa-b94e-598c-69a9549eb68e@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 22, 2021 at 2:46 AM Clay Mayers <Clay.Mayers@kioxia.com> wrote:
->
-> Message-ID: <20211220141734.12206-3-joshi.k@samsung.com>
->
-> On 12/20/21 19:47:23 +0530, Kanchan Joshi wrote:
-> > Introduce handlers for fops->async_cmd(), implementing async passthru on
-> > char device (including the multipath one).
-> > The handlers supports NVME_IOCTL_IO64_CMD.
-> >
-> I commented on these two issues below in more detail at
-> https://github.com/joshkan/nvme-uring-pt/issues
+On Wed 22-12-21 11:12:45, yukuai (C) wrote:
+> 在 2021/12/21 19:50, Jan Kara 写道:
+> > On Tue 21-12-21 11:21:35, Yu Kuai wrote:
+> > > During code review, we found that if bfqq is not busy in
+> > > bfq_bfqq_move(), bfq_pos_tree_add_move() won't be called for the bfqq,
+> > > thus bfqq->pos_root still points to the old bfqg. However, the ref
+> > > that bfqq hold for the old bfqg will be released, so it's possible
+> > > that the old bfqg can be freed. This is problematic because the freed
+> > > bfqg can still be accessed by bfqq->pos_root.
+> > > 
+> > > Fix the problem by calling bfq_pos_tree_add_move() for idle bfqq
+> > > as well.
+> > > 
+> > > Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
+> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > 
+> > I'm just wondering, how can it happen that !bfq_bfqq_busy() queue is in
+> > pos_tree? Because bfq_remove_request() takes care to remove bfqq from the
+> > pos_tree...
+> 
+> Hi,
+> 
+> It's right this is not a problem in common case. The problem seems to
+> relate to queue merging and task migration. Because I once reporduced
+> it with the same reporducer for the problem that offlined bfqg can be
+> inserted into service tree. The uaf is exactly in
+> bfq_remove_request->rb_rease(). However I didn't save the stack...
+> 
+> I guess this is because bfq_del_bfqq_busy() is called from
+> bfq_release_process_ref(), and queue merging prevert sunch bfqq to be
+> freed, thus such bfqq is not in service tree, and it's pos_root can
+> point to the old bfqg after bfq_bic_update_cgroup->bfq_bfqq_move.
+> 
+> I haven't confirmed this, however, this patch itself only cleared
+> bfqq->pos_root for idle bfqq, there should be no harm.
 
-That is on general/existing nvme ioctl (and not specific to this
-series). You might want to open up a discussion in the nvme mailing
-list.
+Well, I agree this patch does no harm but in my opinion it is just papering
+over the real problem which is that we leave bfqq without any request in
+the pos_tree which can have also other unexpected consequences. I don't
+think your scenario with bfq_release_process_ref() calling
+bfq_del_bfqq_busy() really answers my question because we call
+bfq_del_bfqq_busy() only if RB_EMPTY_ROOT(&bfqq->sort_list) (i.e., bfqq has
+no requests) and when sort_list was becoming empty, bfq_remove_request()
+should have removed bfqq from the pos_tree. So I think proper fix lies
+elsewhere and I would not merge this patch until we better understand what
+is happening in this case.
 
-> > +static void nvme_setup_uring_cmd_data(struct request *rq,
-> > +             struct io_uring_cmd *ioucmd, void *meta,
-> > +             void __user *meta_buffer, u32 meta_len, bool write) {
-> > +     struct nvme_uring_cmd *cmd = nvme_uring_cmd(ioucmd);
-> > +
-> > +     /* to free bio on completion, as req->bio will be null at that time */
-> > +     cmd->bio = rq->bio;
-> > +     /* meta update is required only for read requests */
-> > +     if (meta && !write) {
-> > +             cmd->meta = meta;
-> > +             cmd->meta_buffer = meta_buffer;
-> > +             cmd->meta_len = meta_len;
-> > +     } else {
-> > +             cmd->meta = NULL;
-> I believe that not saving meta in cmd->meta will leak it when it's a write.
-
-Indeed. Will fix that up.
-
-> But nvme_pt_task_cb also needs to change to copy to user when
-> cmd->meta_buffer is set instead of cmd->meta.
->
-> > +
-> > +int nvme_ns_chr_async_cmd(struct io_uring_cmd *ioucmd,
-> > +             enum io_uring_cmd_flags flags)
-> > +{
-> > +     struct nvme_ns *ns = container_of(file_inode(ioucmd->file)->i_cdev,
-> > +                     struct nvme_ns, cdev);
-> > +
-> > +     return nvme_ns_async_ioctl(ns, ioucmd); }
-> > +
-> The uring cmd flags are not being passed to nvme_ns_async_ioctl - what if
-> IO_URING_F_NONBLOCK Is set?  When it is, I think the nvme_alloc_request()
-> call in nvme_submit_user_cmd() needs to pass in BLK_MQ_REQ_NOWAIT as
-> the flags parameter or move to another thread.  Our proto-type does the former
-> requiring user mode to retry on -EWOULDBLOCK and -EBUSY.
-
-Right, this part is not handled. Need to get that sorted in the next
-version. Thanks.
-
-
-
+								Honza
 -- 
-Joshi
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
