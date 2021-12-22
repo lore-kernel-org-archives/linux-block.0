@@ -2,92 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B1DC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 15:56:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A6C7C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 21:15:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241570AbhLVP4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 10:56:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
+        id S233473AbhLVVPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 16:15:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241565AbhLVP4x (ORCPT
+        with ESMTP id S233208AbhLVVPg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 10:56:53 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61615C061574
-        for <linux-block@vger.kernel.org>; Wed, 22 Dec 2021 07:56:53 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id v10so2141770ilj.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Dec 2021 07:56:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=AGUbv8FQKdejZqiK/AphGsZArcqOnzS9+M0oJenzGdE=;
-        b=HPm5xSQmnUPzu4QXQssDXgC0m16sxG4xHWJhxR0nmtU2nRwMsy073pbH/F81hiB4Iy
-         x/dSG+sc7rJNdBPrn4ORI5L5zUkkjv46UdmeMWNJqHXbb/qQZP4bu3JQUUIeEcLapbZd
-         8eifD/oQF3KZiVumew4cLPKwXhPQS6fd4AE9bDtO7WGO7AVLkm0EKJ1dvKHkiQvB620l
-         o2sWZ9FUMpG74ienXzEej0P//5tEObtericeqq0m3J6cjLTxWh0nxnpJpNc7i/yovIY0
-         hSmeenCDHnnbDJxqnINjl6BGD1CrK3/OsGuMIDYa50FTbk/w8vbAh7iN8cG3d2h3a7mN
-         XgfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AGUbv8FQKdejZqiK/AphGsZArcqOnzS9+M0oJenzGdE=;
-        b=a/Dg+jhN8neaetPes2yRisKdRlXQDnnSB9+N1u6nGeYV3t+NSJhDcppuyq223gwd6C
-         LuQkymHVk0fvk4+swoyGMuv2D+62Cd0O+bx6X2ax3q/qtVD964oFlI+21CxBaqdZxWAJ
-         as4Sca5W8lcxbLFhFtR/hHOpbw0xw3/ThLaUj8nekKUwk4tuddTGzVCz/YxIzNSJVZ9H
-         GKnJprfGqWTn5dfap8S0HnzkrakwrU86ZuFat5g0kfhPnIw+fpfwW92nM4HOYE4VRcoY
-         WZgoPagc3jeLhUE+CJsvaV9cttbjJJUQRJWbcEuzbtxwXq6ewkl93MrkctJph7Jh6CT5
-         YsrQ==
-X-Gm-Message-State: AOAM530Xum9mKEB3Hdj8PMx3k3NEUVTidGDv6SWq6Fg9tj38YfizkIMl
-        iW4V/FEAq4YplwIZWfmkQ8VYur2pZrxLXw==
-X-Google-Smtp-Source: ABdhPJzQckiUKSuYnTpfMWij+o0lAZ8p6bGjj83S4wEO3Y/aGuUjrffl9cll30uJoifcvnnHY0nw+w==
-X-Received: by 2002:a05:6e02:1bc6:: with SMTP id x6mr1630136ilv.31.1640188611969;
-        Wed, 22 Dec 2021 07:56:51 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h13sm1386886ilj.59.2021.12.22.07.56.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Dec 2021 07:56:51 -0800 (PST)
-Subject: Re: [PATCH 2/2] loop: use task_work for autoclear operation
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        linux-block <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-References: <e9f59c70-5dc9-45ce-be93-9f149028f922@i-love.sakura.ne.jp>
- <9eff2034-2f32-54a3-e476-d0f609ab49c0@i-love.sakura.ne.jp>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <da951c17-8a2f-4731-c34d-e08921824414@kernel.dk>
-Date:   Wed, 22 Dec 2021 08:56:50 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 22 Dec 2021 16:15:36 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3824C061574;
+        Wed, 22 Dec 2021 13:15:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=JinkcA8eBr/TSVBGiLUkMKqrNJ00IO7KthEpRw1rJs4=; b=iC/OtRboDlGIGXRTlOPBjWUOTl
+        L5DTSvB6FwYv1lMy2d6/jFwImHClHRa4lUXSW3zIMUy9YrjVFUOtZnCc7fYmQN9zxuB3aEqLU2DG4
+        QybynduIvuCQn25iSTmNBkjM/4qL3qsN5DXTgmrZ1Tc7AjxtTJ2vZmRQcd9MPvB+a/8Ww9Y1nWjW2
+        wrJ66ddP9YPaiz3tLtyPrIWCZrlFN2c7TTLRazW8d7Rxz7SsWIMcp969GeMOSnHFYGoTIoTmi2pjC
+        EnCG0LaI3nKZciUdpbyTX803BugB9Gq02ZUDRNXst3biyeMBznC4zFhkxh2PRXdzjhlvSPLlOYvSI
+        hdE9CxWQ==;
+Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n08xR-00BKzB-3x; Wed, 22 Dec 2021 21:15:33 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH -next] bio.h: fix kernel-doc warnings
+Date:   Wed, 22 Dec 2021 13:15:32 -0800
+Message-Id: <20211222211532.24060-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <9eff2034-2f32-54a3-e476-d0f609ab49c0@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/22/21 8:27 AM, Tetsuo Handa wrote:
-> The kernel test robot is reporting that xfstest can fail at
-> 
->   umount ext2 on xfs
->   umount xfs
-> 
-> sequence, for commit 322c4293ecc58110 ("loop: make autoclear operation
-> asynchronous") broke what commit ("loop: Make explicit loop device
-> destruction lazy") wanted to achieve.
-> 
-> Although we cannot guarantee that nobody is holding a reference when
-> "umount xfs" is called, we should try to close a race window opened
-> by asynchronous autoclear operation.
-> 
-> Try to make the autoclear operation upon close() synchronous, by calling
-> __loop_clr_fd() from current thread's task work rather than a WQ thread.
+Fix all kernel-doc warnings in <linux/bio.h>:
 
-Doesn't this potentially race with fput?
+include/linux/bio.h:136: warning: Function parameter or member 'nbytes' not described in 'bio_advance'
+include/linux/bio.h:136: warning: Excess function parameter 'bytes' description in 'bio_advance'
+include/linux/bio.h:391: warning: No description found for return value of 'bio_next_split'
 
--- 
-Jens Axboe
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+---
+ include/linux/bio.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+--- linux-next-20211222.orig/include/linux/bio.h
++++ linux-next-20211222/include/linux/bio.h
+@@ -124,7 +124,7 @@ void __bio_advance(struct bio *, unsigne
+ /**
+  * bio_advance - increment/complete a bio by some number of bytes
+  * @bio:	bio to advance
+- * @bytes:	number of bytes to complete
++ * @nbytes:	number of bytes to complete
+  *
+  * This updates bi_sector, bi_size and bi_idx; if the number of bytes to
+  * complete doesn't align with a bvec boundary, then bv_len and bv_offset will
+@@ -383,7 +383,7 @@ extern struct bio *bio_split(struct bio
+  * @gfp:	gfp mask
+  * @bs:		bio set to allocate from
+  *
+- * Returns a bio representing the next @sectors of @bio - if the bio is smaller
++ * Return: a bio representing the next @sectors of @bio - if the bio is smaller
+  * than @sectors, returns the original bio unchanged.
+  */
+ static inline struct bio *bio_next_split(struct bio *bio, int sectors,
