@@ -2,78 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A6C7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 21:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7293AC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 21:52:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233473AbhLVVPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 16:15:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41022 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233208AbhLVVPg (ORCPT
+        id S240570AbhLVVwo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 16:52:44 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:35972 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240768AbhLVVwo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 16:15:36 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3824C061574;
-        Wed, 22 Dec 2021 13:15:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=JinkcA8eBr/TSVBGiLUkMKqrNJ00IO7KthEpRw1rJs4=; b=iC/OtRboDlGIGXRTlOPBjWUOTl
-        L5DTSvB6FwYv1lMy2d6/jFwImHClHRa4lUXSW3zIMUy9YrjVFUOtZnCc7fYmQN9zxuB3aEqLU2DG4
-        QybynduIvuCQn25iSTmNBkjM/4qL3qsN5DXTgmrZ1Tc7AjxtTJ2vZmRQcd9MPvB+a/8Ww9Y1nWjW2
-        wrJ66ddP9YPaiz3tLtyPrIWCZrlFN2c7TTLRazW8d7Rxz7SsWIMcp969GeMOSnHFYGoTIoTmi2pjC
-        EnCG0LaI3nKZciUdpbyTX803BugB9Gq02ZUDRNXst3biyeMBznC4zFhkxh2PRXdzjhlvSPLlOYvSI
-        hdE9CxWQ==;
-Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n08xR-00BKzB-3x; Wed, 22 Dec 2021 21:15:33 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH -next] bio.h: fix kernel-doc warnings
-Date:   Wed, 22 Dec 2021 13:15:32 -0800
-Message-Id: <20211222211532.24060-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.31.1
+        Wed, 22 Dec 2021 16:52:44 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 212D5B81D17
+        for <linux-block@vger.kernel.org>; Wed, 22 Dec 2021 21:52:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EB39C36AE8;
+        Wed, 22 Dec 2021 21:52:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640209961;
+        bh=TRPaF3ET+3tv7R9DSMssYX7C0fD3j7Op/HrutG9nIsg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=F8fdMqBpehMmP47elRPWEEhEDBZqO68Dyehk2gFttzsKFae4wQJghD/sPoYI2po8w
+         /TMeqT6Ve78ecEZhe4LqvW0B4yxJ28hv0qYUgd6JonirCImORsyQc2iF7GO60Q1alE
+         ur0rbFVfOaXIjwsWDlkjaReO1eNXhCtjktQ5usSnHLeWNGAiqHGZBVZfpwq9xZrF9d
+         aRwj5DOvo4yOpjWMdB7Pt50wEXTpX7ys7OediXfNK3DTXw8nSzWwrKM2JCYJljEVx1
+         Zzxv33vt4ih4pXvRm/XLZ92a4fkIqtHkaxWeNTaYkTkBjhqTtN5qg5ctoUzveOu20g
+         9ApYMV37hY51Q==
+From:   Keith Busch <kbusch@kernel.org>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] block: remove unnecessary trailing '\'
+Date:   Wed, 22 Dec 2021 13:52:39 -0800
+Message-Id: <20211222215239.1768164-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix all kernel-doc warnings in <linux/bio.h>:
+While harmless, the blank line is certainly not intended to be part of
+the rq_list_for_each() macro. Remove it.
 
-include/linux/bio.h:136: warning: Function parameter or member 'nbytes' not described in 'bio_advance'
-include/linux/bio.h:136: warning: Excess function parameter 'bytes' description in 'bio_advance'
-include/linux/bio.h:391: warning: No description found for return value of 'bio_next_split'
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/linux/bio.h |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- linux-next-20211222.orig/include/linux/bio.h
-+++ linux-next-20211222/include/linux/bio.h
-@@ -124,7 +124,7 @@ void __bio_advance(struct bio *, unsigne
- /**
-  * bio_advance - increment/complete a bio by some number of bytes
-  * @bio:	bio to advance
-- * @bytes:	number of bytes to complete
-+ * @nbytes:	number of bytes to complete
-  *
-  * This updates bi_sector, bi_size and bi_idx; if the number of bytes to
-  * complete doesn't align with a bvec boundary, then bv_len and bv_offset will
-@@ -383,7 +383,7 @@ extern struct bio *bio_split(struct bio
-  * @gfp:	gfp mask
-  * @bs:		bio set to allocate from
-  *
-- * Returns a bio representing the next @sectors of @bio - if the bio is smaller
-+ * Return: a bio representing the next @sectors of @bio - if the bio is smaller
-  * than @sectors, returns the original bio unchanged.
-  */
- static inline struct bio *bio_next_split(struct bio *bio, int sectors,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5fb7282e6e..22746b2d6825 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1363,7 +1363,7 @@ struct io_comp_batch {
+ })
+ 
+ #define rq_list_for_each(listptr, pos)			\
+-	for (pos = rq_list_peek((listptr)); pos; pos = rq_list_next(pos)) \
++	for (pos = rq_list_peek((listptr)); pos; pos = rq_list_next(pos))
+ 
+ #define rq_list_next(rq)	(rq)->rq_next
+ #define rq_list_empty(list)	((list) == (struct request *) NULL)
+-- 
+2.25.4
+
