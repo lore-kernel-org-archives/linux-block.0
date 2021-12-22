@@ -2,86 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6707FC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 21 Dec 2021 21:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B927C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 01:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237202AbhLUVuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Dec 2021 16:50:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35460 "EHLO
+        id S238381AbhLVBNL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Dec 2021 20:13:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230251AbhLUVuG (ORCPT
+        with ESMTP id S230433AbhLVBNK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Dec 2021 16:50:06 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57EDC061574
-        for <linux-block@vger.kernel.org>; Tue, 21 Dec 2021 13:50:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4uUB7OvEP777x5aSTb3bjGyRvtnNEoJahrUKQnkYzZA=; b=d8f278I0epkwa0u4oUG6Y09EGi
-        5F+Lyh1Ynf353smMbI+czmvNsEe5VvGifCMQiQzj/VJXmdq2Roh9h+8rBP6kM8a20JKglW/NCzCh4
-        LgptBC2NMjh0aeObnKZgLF/CBmYdy7yJnslCJZqisSBjh/K/UjXZ5EaDhsaj98El+vwVl4mqKTH33
-        V1JFiDrZbCu3415wnxYLT0shGYhYT1UH/66DIoF/PbSqH9QQhLLJ/wzzWuqebBjiNuKMwvQmtcc86
-        4dh5w89HzwrbG63Bn0XHO83BObgjKD7PWm5hDYtw4ZxiInqwzN45w/g8V0Ur5K0v1uGojwra217nz
-        pl0ukqMA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mzn1E-008ZbH-Pq; Tue, 21 Dec 2021 21:50:00 +0000
-Date:   Tue, 21 Dec 2021 13:50:00 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: fix error handling for device_add_disk
-Message-ID: <YcJMCPvyWZgolXdy@bombadil.infradead.org>
-References: <c614deb3-ce75-635e-a311-4f4fc7aa26e3@i-love.sakura.ne.jp>
- <20211216161806.GA31879@lst.de>
- <20211216161928.GB31879@lst.de>
- <c3e48497-480b-79e8-b483-b50667eb9bbf@i-love.sakura.ne.jp>
- <Yb+Pbz1pCNEs4xw3@bombadil.infradead.org>
- <11adfb69-9ce6-c1f6-7b0d-c435e1856412@i-love.sakura.ne.jp>
- <YcDWjrTgNG8/vkmJ@bombadil.infradead.org>
- <e5a62dee-a420-f9c4-f33d-e154cf4b0d9e@i-love.sakura.ne.jp>
+        Tue, 21 Dec 2021 20:13:10 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA76C061574;
+        Tue, 21 Dec 2021 17:13:10 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id t123so794329pfc.13;
+        Tue, 21 Dec 2021 17:13:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3tuVnOiMraCwH10Uv8N7IHwNP9xedfBBpuE0UrBCKDE=;
+        b=h/WakJ+6ykw780HcE+D18jLdSMBGs+iwIV8UIO16Fn5/S/P0gPx6DbBlgEpmm8YNDg
+         IWtCFPEheqU/z5I2Cpm2dM+O3s3qfzdORm5xX9PHRQQOKdMKZyJw+vuvI7DJ4eTFRrSs
+         NIr4TRqlbnu426cCSrrWy3n/0z9ue8vDADrmOww+ouU74vlOjhv6bErPoVceeRxXlm7Y
+         xDw2VWS+frEA32pom/LAykXe/kDs/nfillUNTtIHmjH4UyFgH3cbeX7zwaDQzjYRSLoZ
+         rOsF5E3l30xxp97/eMvoKrqfMlvNQ3727uKKHFh8UcuGlW2ajT+N8GR4kp0BOlXNzF74
+         nJyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3tuVnOiMraCwH10Uv8N7IHwNP9xedfBBpuE0UrBCKDE=;
+        b=LsbH3Vn/KFHA0ZAMM1Pz49c/q8hW21z5OUqCIuL/6aDIDNYlMPtPA9w14axNMgxAv6
+         IXQuAuRJETc+tTrCvX6LbTqZgmfNaA+5FIGhIILMinK2HAIEeLTBmEtuYao2EdIwGKlX
+         Poo12m3Xij5jCJX3ydZic+vrzgsZiipDkayckL5y3+0OWz0w2HThwuthvCtozHNZaRqx
+         y/WsLEyKV90a9+bnUYMkJuCGKx4KMV9DBDyRmvFZICGKv70AQyljU9ELCyUX0WRN+2P7
+         yVRcIB99KBej5QqeiPpbqgEJZJPf8V3NEyv5EHh2qPFwVajhEDdpeMOwk4eBvatwbeVw
+         dm6g==
+X-Gm-Message-State: AOAM530AptH4HBU7SKYmxYIqFeW9UZXTA00+nqbkpGJoPs/27bevD71T
+        sPyPXDnjl5zdEVhHUJnXtiA=
+X-Google-Smtp-Source: ABdhPJyzsmoQ/NTUp3e/vm0A72wJblWVESub0GoYMNPwEVywO0vEzAKA43tppPZZ2Y5yZR2hRIh2nQ==
+X-Received: by 2002:aa7:8153:0:b0:4a8:2c13:dab7 with SMTP id d19-20020aa78153000000b004a82c13dab7mr645957pfn.51.1640135590127;
+        Tue, 21 Dec 2021 17:13:10 -0800 (PST)
+Received: from FLYINGPENG-MB0.tencent.com ([103.7.29.30])
+        by smtp.gmail.com with ESMTPSA id np1sm4015315pjb.22.2021.12.21.17.13.07
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 21 Dec 2021 17:13:09 -0800 (PST)
+From:   Peng Hao <flyingpenghao@gmail.com>
+X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
+To:     david@redhat.com, mst@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH]  virtio/virtio_mem: handle a possible NULL as a memcpy parameter
+Date:   Wed, 22 Dec 2021 09:12:25 +0800
+Message-Id: <20211222011225.40573-1-flyingpeng@tencent.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5a62dee-a420-f9c4-f33d-e154cf4b0d9e@i-love.sakura.ne.jp>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 08:41:18PM +0900, Tetsuo Handa wrote:
-> On 2021/12/21 4:16, Luis Chamberlain wrote:
-> > The kobject_alive() tells us if at least the device_add() had the
-> > kobject_add() complete.
-> 
-> 
-> Testing with error injection
-> 
-> @@ -3284,6 +3284,9 @@ int device_add(struct device *dev)
->         if (!dev)
->                 goto done;
-> 
-> +       if (!strcmp(current->comm, "a.out"))
-> +               goto done;
-> +
->         if (!dev->p) {
->                 error = device_private_init(dev);
->                 if (error)
-> 
-> told me that kref count is 1 when reaching the out_disk_release_events label.
-> Thus,
-> 
-> 	if (!kobject_alive(&ddev->kobj))
-> 
-> seems wrong.
+There is a check for vm->sbm.sb_states before, and it should check
+it here as well.
 
-Hrm.... quite unexpected.
+Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+---
+ drivers/virtio/virtio_mem.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Christoph proposed deferring disk_alloc_events(). If it is safe to defer
-> disk_alloc_events(), that can be a fix. 
+diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
+index 96e5a8782769..b6b7c489c8b6 100644
+--- a/drivers/virtio/virtio_mem.c
++++ b/drivers/virtio/virtio_mem.c
+@@ -592,7 +592,7 @@ static int virtio_mem_sbm_sb_states_prepare_next_mb(struct virtio_mem *vm)
+ 		return -ENOMEM;
+ 
+ 	mutex_lock(&vm->hotplug_mutex);
+-	if (new_bitmap)
++	if (vm->sbm.sb_states)
+ 		memcpy(new_bitmap, vm->sbm.sb_states, old_pages * PAGE_SIZE);
+ 
+ 	old_bitmap = vm->sbm.sb_states;
+-- 
+2.27.0
 
-*If safe*, yes, agreed.
-
-  Luis
