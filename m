@@ -2,72 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A0D5C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 15:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B849DC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 15:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343670AbhLVPLf convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 10:11:35 -0500
-Received: from usmailhost21.kioxia.com ([12.0.68.226]:30302 "EHLO
-        SJSMAIL01.us.kioxia.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S234907AbhLVPLf (ORCPT
+        id S1343698AbhLVPVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 10:21:06 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:58204 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237912AbhLVPVF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 10:11:35 -0500
-Received: from SJSMAIL01.us.kioxia.com (10.90.133.90) by
- SJSMAIL01.us.kioxia.com (10.90.133.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.14; Wed, 22 Dec 2021 07:11:33 -0800
-Received: from SJSMAIL01.us.kioxia.com ([fe80::4822:8b9:76de:8b6]) by
- SJSMAIL01.us.kioxia.com ([fe80::4822:8b9:76de:8b6%3]) with mapi id
- 15.01.2176.014; Wed, 22 Dec 2021 07:11:33 -0800
-From:   Clay Mayers <Clay.Mayers@kioxia.com>
-To:     "hch@lst.de" <hch@lst.de>
-CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "anuj20.g@samsung.com" <anuj20.g@samsung.com>,
-        "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
-        "pankydev8@gmail.com" <pankydev8@gmail.com>
-Subject: RE: [RFC 02/13] nvme: wire-up support for async-passthru on
-Thread-Topic: [RFC 02/13] nvme: wire-up support for async-passthru on
-Thread-Index: Adf2q4Y1jNlE3svCRZSHuwnlq+XxWAAocZcAAAIa2KA=
-Date:   Wed, 22 Dec 2021 15:11:33 +0000
-Message-ID: <1ef1f30f1b52498ba10c727a69f7612b@kioxia.com>
-References: <2da62822fd56414d9893b89e160ed05c@kioxia.com>
- <20211222080220.GA21346@lst.de>
-In-Reply-To: <20211222080220.GA21346@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.90.53.183]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 22 Dec 2021 10:21:05 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 7C6AD210FC;
+        Wed, 22 Dec 2021 15:21:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1640186464; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R2sITC9btmJiDozWSszdfDjZ963CmDEzfUkTeAu2sDA=;
+        b=lSydeBHpVZNddXzbAHVcSnrorz4RUGeFU9TcqTystRoY8fF+TifMIFhPIbsaOAgxucV4jH
+        zByyb3oanWZ2gfcPt92euWMf29KSEzeuCqXI6nDgizZMzcW4ceOYs5GsEQ0DzspIlFnyqf
+        n4sZ65IcXVyMyQKC/vMKEDCme6BoN5I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1640186464;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R2sITC9btmJiDozWSszdfDjZ963CmDEzfUkTeAu2sDA=;
+        b=xhFZ8ktwWymeyjzUUyYj7R5bM5dB3ZApam1ek0CcfrhdfzMc9J977sTd3qNZWCMtqfvUsi
+        irLLy6oQ51UHRECQ==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id 6D581A3B88;
+        Wed, 22 Dec 2021 15:21:04 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 03C951F2CEF; Wed, 22 Dec 2021 16:21:03 +0100 (CET)
+Date:   Wed, 22 Dec 2021 16:21:03 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org, fvogt@suse.de, cgroups@vger.kernel.org
+Subject: Re: Use after free with BFQ and cgroups
+Message-ID: <20211222152103.GF685@quack2.suse.cz>
+References: <20211125172809.GC19572@quack2.suse.cz>
+ <20211126144724.GA31093@blackbody.suse.cz>
+ <20211129171115.GC29512@quack2.suse.cz>
+ <f03b2b1c-808a-c657-327d-03165b988e7d@huawei.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f03b2b1c-808a-c657-327d-03165b988e7d@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> From: hch@lst.de <hch@lst.de>
-> Sent: Wednesday, December 22, 2021 12:02 AM
-> 
-> On Tue, Dec 21, 2021 at 09:16:27PM +0000, Clay Mayers wrote:
-> > Message-ID: <20211220141734.12206-3-joshi.k@samsung.com>
-> >
-> > On 12/20/21 19:47:23 +0530, Kanchan Joshi wrote:
-> > > Introduce handlers for fops->async_cmd(), implementing async
-> > > passthru on char device (including the multipath one).
-> > > The handlers supports NVME_IOCTL_IO64_CMD.
-> > >
-> > I commented on these two issues below in more detail at
-> > https://github.com/joshkan/nvme-uring-pt/issues
-> 
-> If you want people to read your comments send them here and not on some
-> random website no one is reading.
+On Thu 09-12-21 10:23:33, yukuai (C) wrote:
+> We confirmed this by our reproducer through a simple patch:
+> stop merging bfq_queues if their parents are different.
 
-Of course.  That's the site this patch was staged on before being submitted
-here.  The comments there precede the posting here.
+Can you please share your reproducer? I have prepared some patches which
+I'd like to verify before posting... Thanks!
 
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
