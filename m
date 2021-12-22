@@ -2,72 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEA0C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 11:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E786DC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 12:02:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240268AbhLVLf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 06:35:27 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4318 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236667AbhLVLf0 (ORCPT
+        id S244765AbhLVMCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 07:02:45 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:53541 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235474AbhLVMCm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 06:35:26 -0500
-Received: from fraeml702-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JJrjl1Wg8z67b01;
-        Wed, 22 Dec 2021 19:30:51 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml702-chm.china.huawei.com (10.206.15.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Wed, 22 Dec 2021 12:35:24 +0100
-Received: from [10.195.32.222] (10.195.32.222) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 22 Dec 2021 11:35:23 +0000
-Subject: Re: [PATCH RFT] blk-mq: optimize queue tag busy iter for shared_tags
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ming.lei@redhat.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-References: <20211221123157.14052-1-kashyap.desai@broadcom.com>
- <e9174a89-b3a4-d737-c5a9-ff3969053479@huawei.com>
- <7028630054e9cd0e8c84670a27c2b164@mail.gmail.com>
- <e7288bcd-cc4d-8f57-a0c8-eadd53732177@huawei.com>
- <c26b40bac76ec1bfbab2419aece544ca@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <e50cfdcd-110b-d778-6e3f-edfed9b1c5a4@huawei.com>
-Date:   Wed, 22 Dec 2021 11:35:22 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Wed, 22 Dec 2021 07:02:42 -0500
+Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BMC2UaM013651;
+        Wed, 22 Dec 2021 21:02:30 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
+ Wed, 22 Dec 2021 21:02:30 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BMC2T7A013446
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 22 Dec 2021 21:02:30 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <08d703d1-8b32-ec9b-2b50-54b8376d3d40@i-love.sakura.ne.jp>
+Date:   Wed, 22 Dec 2021 21:02:29 +0900
 MIME-Version: 1.0
-In-Reply-To: <c26b40bac76ec1bfbab2419aece544ca@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
 Content-Language: en-US
+To:     linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: [PATCH 1/2] block: Add post_release() operation
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.32.222]
-X-ClientProxiedBy: lhreml750-chm.china.huawei.com (10.201.108.200) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 22/12/2021 11:20, Kashyap Desai wrote:
-> Yes, above is the same changes I was looking for. I did very basic mistake.
-> I applied your above commit while doing megaraid_sas testing.
->   While I move to mpi3mr testing, I did not apply your patch set. 
+Add post_release() block device callback which allows release() block
+device callback to schedule an extra cleanup operation while holding
+disk->open_mutex and let post_release() callback synchronously perform
+that operation without holding disk->open_mutex.
 
-But I did not think that my patch would help mpi3mr since it does not 
-use host_tagset.
+The loop driver needs this callback for synchronously performing autoclear
+operation, for some userspace programs (e.g. xfstest) depend on that the
+autoclear operation already completes by the moment lo_release() from
+close() returns to userspace and immediately call umount() of a partition
+containing a backing file which the autoclear operation will close(), but
+temporarily dropping disk->open_mutex inside lo_release() in order to avoid
+circular locking dependency is considered as a bad approach.
 
-> We can drop
-> request of this RFT since I tested above series and it serve the same
-> purpose.
+Note that unlike release() callback, post_release() callback is called
+every time blkdev_put() is called. That is, the release() callback is
+responsible for making it possible for post_release() callback to tell
+whether post_release() callback has something to do.
 
-ok, fine.
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Fixes: 322c4293ecc58110 ("loop: make autoclear operation asynchronous")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ block/bdev.c           | 2 ++
+ include/linux/blkdev.h | 5 +++++
+ 2 files changed, 7 insertions(+)
 
-And just to confirm, do you now think that we need to fix any older 
-kernel with some backport of my changes? I think that we would just need 
-to consider 5.16 (when it becomes stable), 5.15, and and 5.10
+diff --git a/block/bdev.c b/block/bdev.c
+index 8bf93a19041b..0cb638d81a27 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -948,6 +948,8 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
+ 	else
+ 		blkdev_put_whole(bdev, mode);
+ 	mutex_unlock(&disk->open_mutex);
++	if (bdev->bd_disk->fops->post_release)
++		bdev->bd_disk->fops->post_release(bdev->bd_disk);
+ 
+ 	module_put(disk->fops->owner);
+ 	blkdev_put_no_open(bdev);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c80cfaefc0a8..b252b1d87471 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1227,6 +1227,11 @@ struct block_device_operations {
+ 	 * driver.
+ 	 */
+ 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
++	/*
++	 * Special callback for doing post-release callback without
++	 * disk->open_mutex held. Used by loop driver.
++	 */
++	void (*post_release)(struct gendisk *disk);
+ };
+ 
+ #ifdef CONFIG_COMPAT
+-- 
+2.32.0
 
-Thanks,
-John
