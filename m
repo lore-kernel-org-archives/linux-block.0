@@ -2,99 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFE2C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 12:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 184C7C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 13:47:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240517AbhLVMeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 07:34:17 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4320 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240438AbhLVMeR (ORCPT
+        id S236698AbhLVNrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 08:47:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234159AbhLVNrD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 07:34:17 -0500
-Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JJt4n5wLhz67p89;
-        Wed, 22 Dec 2021 20:32:25 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 22 Dec 2021 13:34:14 +0100
-Received: from [10.195.32.222] (10.195.32.222) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 22 Dec 2021 12:34:14 +0000
-Subject: Re: [PATCH RFT] blk-mq: optimize queue tag busy iter for shared_tags
-To:     Kashyap Desai <kashyap.desai@broadcom.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ming.lei@redhat.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-References: <20211221123157.14052-1-kashyap.desai@broadcom.com>
- <e9174a89-b3a4-d737-c5a9-ff3969053479@huawei.com>
- <7028630054e9cd0e8c84670a27c2b164@mail.gmail.com>
- <e7288bcd-cc4d-8f57-a0c8-eadd53732177@huawei.com>
- <c26b40bac76ec1bfbab2419aece544ca@mail.gmail.com>
- <e50cfdcd-110b-d778-6e3f-edfed9b1c5a4@huawei.com>
- <c3bfc0c83a3a4727b364505e4a4f1332@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <40a72c28-dd49-b1d6-59aa-79399a3d66c9@huawei.com>
-Date:   Wed, 22 Dec 2021 12:34:13 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Wed, 22 Dec 2021 08:47:03 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE814C061574;
+        Wed, 22 Dec 2021 05:47:02 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id i12so1626094wmq.4;
+        Wed, 22 Dec 2021 05:47:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wxvMlF+l51oDklf4EWdV5hXzMGWV02iTMeiu5UDuE14=;
+        b=EqwnjVMY7HMk9vmwXPlECKQbKBxQ1TmHzuOg9dZYm38j3qn958X3+M1Lsm73knrJN8
+         gPqRxOj/t/X0hnbQrQzvxwDlOtOIzRn0NsHQF2cOMikt6I1aybrCWrJRNUc91wW/Ruer
+         R0q17uz4oBfLyWR3W9I95XBcT0sHWigqYiMC+GPmCVawoSUXJdA7OxboIlEeR1eDkxkt
+         AuXbjq8h3m4jsheXsDmFu5j5B0Hf1WGZl5L5R5e9xRQ4SFAWKgHTKw+eq29tyN+31iqK
+         BjpSCDJoTc5rCPfgMtSAe9oOfiokMXuNKCCxINdNM1QAYxFepXoZogVo7koypWnJNx0D
+         jykQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wxvMlF+l51oDklf4EWdV5hXzMGWV02iTMeiu5UDuE14=;
+        b=mZ7BbpdSngvs++yy0UM6bA0DxBeiSAod1SL6uqe7KZZxyd9NK7acggYj+rVHpi6l0M
+         vt2o48vzPN4tm4jLEOq55mX+Syy3RHQKjJnCHS+isdTaUjOZhKvqqeVHf377z8E8kH1r
+         uKwS1rrXEmQNNtX2IZayCj7ec8qCHJxvnpgGDNcaXaz5bm6tYpYuvtq2Oyf5mHTfsi2h
+         MjxkWlH3tTbZdWiweYAvDKh87Mb4Bn8HsybjX43oCZgtd3varbFWpGVcbXXG0dRFop9T
+         eafk1JFIC2+BexbqVD5ODlZaRJWDVy8udEkLL4us51hOihy8d2FSXPAl5Rxi53sqj6OH
+         fjyA==
+X-Gm-Message-State: AOAM531PoJqjtM4kNmRQGo2HijbgauWqbmn2YzpZ4l+6v3QsA27DA4c2
+        i5P9n/H1utMxNgrkH/5UkOAPc0BgHSB6C31MqBg=
+X-Google-Smtp-Source: ABdhPJxkxIwRoqvckjEUCYcJLdJLYPj3QuiYAWIBmMn64kvOBURss2n9lxMGdsbdDXeake/d5KlX0U843vkNazgqp0c=
+X-Received: by 2002:a1c:f213:: with SMTP id s19mr1042698wmc.0.1640180821187;
+ Wed, 22 Dec 2021 05:47:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c3bfc0c83a3a4727b364505e4a4f1332@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.195.32.222]
-X-ClientProxiedBy: lhreml750-chm.china.huawei.com (10.201.108.200) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <2da62822fd56414d9893b89e160ed05c@kioxia.com>
+In-Reply-To: <2da62822fd56414d9893b89e160ed05c@kioxia.com>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Wed, 22 Dec 2021 19:16:35 +0530
+Message-ID: <CA+1E3r+kmGcAsN-1F4W02+qrF7MJ1fqbRWnOfNAqNAapg=E4qw@mail.gmail.com>
+Subject: Re: [RFC 02/13] nvme: wire-up support for async-passthru on
+To:     Clay Mayers <Clay.Mayers@kioxia.com>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "anuj20.g@samsung.com" <anuj20.g@samsung.com>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 22/12/2021 12:06, Kashyap Desai wrote:
->> But I did not think that my patch would help mpi3mr since it does not use
->> host_tagset.
-> Internally we are testing performance check for mpi3mr. We want to make sure
-> performance is not impacted due to shared host_tagset before we apply the
-> feature.
+On Wed, Dec 22, 2021 at 2:46 AM Clay Mayers <Clay.Mayers@kioxia.com> wrote:
+>
+> Message-ID: <20211220141734.12206-3-joshi.k@samsung.com>
+>
+> On 12/20/21 19:47:23 +0530, Kanchan Joshi wrote:
+> > Introduce handlers for fops->async_cmd(), implementing async passthru on
+> > char device (including the multipath one).
+> > The handlers supports NVME_IOCTL_IO64_CMD.
+> >
+> I commented on these two issues below in more detail at
+> https://github.com/joshkan/nvme-uring-pt/issues
 
-Hmmm... I thought that you said previously that it was not necessary for 
-this HW. But I am not familiar with the driver or HW.
+That is on general/existing nvme ioctl (and not specific to this
+series). You might want to open up a discussion in the nvme mailing
+list.
 
-As an aside, I assume that this driver uses none IO sched by default, 
-but drivers using host_tagset use mq-deadline – I’m not sure if that is 
-what you want.
+> > +static void nvme_setup_uring_cmd_data(struct request *rq,
+> > +             struct io_uring_cmd *ioucmd, void *meta,
+> > +             void __user *meta_buffer, u32 meta_len, bool write) {
+> > +     struct nvme_uring_cmd *cmd = nvme_uring_cmd(ioucmd);
+> > +
+> > +     /* to free bio on completion, as req->bio will be null at that time */
+> > +     cmd->bio = rq->bio;
+> > +     /* meta update is required only for read requests */
+> > +     if (meta && !write) {
+> > +             cmd->meta = meta;
+> > +             cmd->meta_buffer = meta_buffer;
+> > +             cmd->meta_len = meta_len;
+> > +     } else {
+> > +             cmd->meta = NULL;
+> I believe that not saving meta in cmd->meta will leak it when it's a write.
 
-> 
->>> We can drop
->>> request of this RFT since I tested above series and it serve the same
->>> purpose.
->> ok, fine.
->>
->> And just to confirm, do you now think that we need to fix any older kernel
->> with some backport of my changes? I think that we would just need to
->> consider 5.16 (when it becomes stable), 5.15, and and 5.10
-> It need full patch set (below) + associated fixes.
-> [1] " blk-mq: Use shared tags for shared sbitmap support" Commit -
-> e155b0c238b20f0a866f4334d292656665836c8a
-> 
-> Below commit cannot go to stable without [1].
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.17/block&id=fea9f92f1748083cb82049ed503be30c3d3a9b69
-> 
-> I am not sure if stable requirement fits in this case. I mean large
-> patch-set is OK ?
+Indeed. Will fix that up.
 
-The two other patches in the series wouldn't need to be backported, so 
-it should be possible. You would just need a very good reason, though. 
-And we would need to know whether 5.10 and 5.15 are required - they use 
-shared sbitmap. As I mentioned a few times, contention in 
-blk_mq_queue_tag_busy_iter() and callees would not be so high as 
-blk_mq_tags.lock and blk_mq_tags.rqs are not shared there.
+> But nvme_pt_task_cb also needs to change to copy to user when
+> cmd->meta_buffer is set instead of cmd->meta.
+>
+> > +
+> > +int nvme_ns_chr_async_cmd(struct io_uring_cmd *ioucmd,
+> > +             enum io_uring_cmd_flags flags)
+> > +{
+> > +     struct nvme_ns *ns = container_of(file_inode(ioucmd->file)->i_cdev,
+> > +                     struct nvme_ns, cdev);
+> > +
+> > +     return nvme_ns_async_ioctl(ns, ioucmd); }
+> > +
+> The uring cmd flags are not being passed to nvme_ns_async_ioctl - what if
+> IO_URING_F_NONBLOCK Is set?  When it is, I think the nvme_alloc_request()
+> call in nvme_submit_user_cmd() needs to pass in BLK_MQ_REQ_NOWAIT as
+> the flags parameter or move to another thread.  Our proto-type does the former
+> requiring user mode to retry on -EWOULDBLOCK and -EBUSY.
 
-Thanks,
-John
+Right, this part is not handled. Need to get that sorted in the next
+version. Thanks.
 
 
 
+-- 
+Joshi
