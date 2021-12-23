@@ -2,83 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02361C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 13:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3D7C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 14:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243683AbhLWNkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Dec 2021 08:40:52 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:39632 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238660AbhLWNkw (ORCPT
+        id S1348748AbhLWOKW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Dec 2021 09:10:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41908 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243803AbhLWOKV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Dec 2021 08:40:52 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 16A79210FE;
-        Thu, 23 Dec 2021 13:40:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1640266851; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1z7OZ0rR0P0RKIxtTpXCekGGavovOZJ7xmNdBmMBHWs=;
-        b=jB3zfhm3Qdta9/CrojrUHeWpz3PclVivNnqkNEzCjCpcKxVGvEKxEz/6AyfWnHLlKmu0uC
-        zp5zQsFuoq5fDwS/1CIw7KEZlkQQygBXxRIXtA98jlgXpSRZ37XLJ5pQz2yT0XeWKjWrp2
-        1a5X2gNWmGIstfPd4XgXGhkSmme8aW4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1640266851;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1z7OZ0rR0P0RKIxtTpXCekGGavovOZJ7xmNdBmMBHWs=;
-        b=U7mBhKscVssGu0NynAL/yRJix2XjbbIV7rSANWAGQw7uQWzYNK8hlJwLMev/4L1W/RQQcR
-        +JSfzrEDtBur/gAA==
-Received: from quack2.suse.cz (unknown [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id C071AA3B84;
-        Thu, 23 Dec 2021 13:40:50 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 7FDAE1E1328; Thu, 23 Dec 2021 14:40:50 +0100 (CET)
-Date:   Thu, 23 Dec 2021 14:40:50 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Jan Kara <jack@suse.cz>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        linux-block@vger.kernel.org
-Subject: Re: fix loop autoclear for xfstets xfs/049
-Message-ID: <20211223134050.GD19129@quack2.suse.cz>
-References: <20211223112509.1116461-1-hch@lst.de>
+        Thu, 23 Dec 2021 09:10:21 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7D7C061756
+        for <linux-block@vger.kernel.org>; Thu, 23 Dec 2021 06:10:21 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id l3so4998945iol.10
+        for <linux-block@vger.kernel.org>; Thu, 23 Dec 2021 06:10:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=gMMkG6ShZ8Fp8sfGbq2eA4arzE/ALNfZG3xl3bXJNac=;
+        b=zJGqbUATsUbBv6aa3sXgvVdq8FU+nNsnuNULbWOe0Aq65kN627RrJBdYAnXPEOU573
+         57oO5OnVaYU37dWODlrEEKJxu79VLTm7VDq8++2Xf4HnqRqI/dI13K6+B5bgFE7GJPmr
+         guGqNeGmHAXcM3tB1dRoG1i9eNhAlm9LzYfYlwaepBgd8HNjB4Vnc2MJQmADlG63OqK7
+         zJUuK9teis2aL3R6Lj5EJCYhMV3NVEXzXlnp83F1fJ1DyziTsvU5mxOopnk24a5kG6nL
+         teLIYhVOw9/0RNEza/SfcUotZISuE2BFRFDUUCcLXTtod4BfdYdRqQ6FkopKNaEyoQxd
+         8aCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=gMMkG6ShZ8Fp8sfGbq2eA4arzE/ALNfZG3xl3bXJNac=;
+        b=2tLqWnF+Mc9/RekAr6cX8rtQtYZa3OHOVFM9zgxf3dYqWkLx4X0+UPdD+t8UQv3wfr
+         aqa8v/dvuBW7KHDuMmX0KHc8q8lR7GBWN3PWvWV8plt06FyStuAj7dHFfXzRHXFSXN8d
+         zhpMqc1kRWRB04VhA2by0mKt4leVQJkCAn4Exl0yEcPQVt+DFDfJUHi//cFmiZHvxP2M
+         nyz4ggr9nTKSvkVSOUQgT5G3OPspsHEKi8YTlRO5Gl/H2SpefujjfErqLTUfAshQM9P5
+         wS33wKVRio82pTs1EsF5isIXClSQIw0NhHT8kxf4bA5N2fBcYp+//G/XAX3Yb4DcdxEQ
+         B6gg==
+X-Gm-Message-State: AOAM531LHb3yVXp68uvxzARInEvUlj/kwACZr0jG5wQx9uQojA8vbp/u
+        a2sSnmIeMw+FDcefUizoWMqsgVrHveBmtQ==
+X-Google-Smtp-Source: ABdhPJwe/yp49IOX3sR4spMvhOeNOgkGUATD0XvuuA62Fz9OMMcM+zMLkz/p2WC4YR3YMJG1IZdJkA==
+X-Received: by 2002:a05:6638:2495:: with SMTP id x21mr104131jat.258.1640268620593;
+        Thu, 23 Dec 2021 06:10:20 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id k1sm1549005ilu.80.2021.12.23.06.10.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Dec 2021 06:10:20 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc:     llvm@lists.linux.dev, Nathan Chancellor <nathan@kernel.org>,
+        linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        kernel-janitors@vger.kernel.org
+In-Reply-To: <20211223125300.20691-1-lukas.bulwahn@gmail.com>
+References: <20211223125300.20691-1-lukas.bulwahn@gmail.com>
+Subject: Re: [PATCH v2] block: drop needless assignment in set_task_ioprio()
+Message-Id: <164026861975.771757.2667766405282712502.b4-ty@kernel.dk>
+Date:   Thu, 23 Dec 2021 07:10:19 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211223112509.1116461-1-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+On Thu, 23 Dec 2021 13:53:00 +0100, Lukas Bulwahn wrote:
+> Commit 5fc11eebb4a9 ("block: open code create_task_io_context in
+> set_task_ioprio") introduces a needless assignment
+> 'ioc = task->io_context', as the local variable ioc is not further
+> used before returning.
+> 
+> Even after the further fix, commit a957b61254a7 ("block: fix error in
+> handling dead task for ioprio setting"), the assignment still remains
+> needless.
+> 
+> [...]
 
-On Thu 23-12-21 12:25:07, Christoph Hellwig wrote:
-> this is a 3rd approach to fix the loop autoclean delay.  Instead of
-> working around the workqueue lockdep issues this switches the loop
-> driver to use a global workqueue and thus avoids the destroy_workqueue
-> call under disk->open_mutex entirely.
+Applied, thanks!
 
-Hum, I have nothing against this but I'm somewhat wondering: Lockdep was
-originally complaining because it somehow managed to find a write whose
-completion was indirectly dependent on disk->open_mutex and
-destroy_workqueue() could wait for such write to complete under
-disk->open_mutex. Now your patch will fix this lockdep complaint but we
-still would wait for the write to complete through blk_mq_freeze_queue()
-(just lockdep is not clever enough to detect this). So IHMO if there was a
-deadlock before, it will be still there with your changes. Now I'm not 100%
-sure the deadlock lockdep was complaining about is real in the first place
-because it involved some writes to proc files (taking some locks) and
-hibernation mutex and whatnot.  But it is true that writing to a backing
-file will grab fs freeze protection and that can bring with it all sorts of
-interesting dependencies.
+[1/1] block: drop needless assignment in set_task_ioprio()
+      commit: 669a064625fa3a06ddf8a4ac1f35b7436b99f133
 
-								Honza
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
