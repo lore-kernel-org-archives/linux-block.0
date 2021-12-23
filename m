@@ -2,81 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F07C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 21:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B360C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 22:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbhLWVzo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Dec 2021 16:55:44 -0500
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:54110 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230281AbhLWVzl (ORCPT
+        id S240842AbhLWWfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Dec 2021 17:35:07 -0500
+Received: from hosting.gsystem.sk ([212.5.213.30]:58286 "EHLO
+        hosting.gsystem.sk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245211AbhLWWeu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Dec 2021 16:55:41 -0500
-Received: from pop-os.home ([86.243.171.122])
-        by smtp.orange.fr with ESMTPA
-        id 0W3lnGyoSbyf90W3lnnXk1; Thu, 23 Dec 2021 22:55:40 +0100
-X-ME-Helo: pop-os.home
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Thu, 23 Dec 2021 22:55:40 +0100
-X-ME-IP: 86.243.171.122
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     axboe@kernel.dk, chaitanya.kulkarni@wdc.com, damien.lemoal@wdc.com,
-        ming.lei@redhat.com, Johannes.Thumshirn@wdc.com,
-        shinichiro.kawasaki@wdc.com, jiangguoqing@kylinos.cn
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] null_blk: Use bitmap_zalloc() when applicable
-Date:   Thu, 23 Dec 2021 22:55:36 +0100
-Message-Id: <3e68598defed010efb864ea55887d88ed0da02cc.1640296433.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.32.0
+        Thu, 23 Dec 2021 17:34:50 -0500
+Received: from [192.168.0.2] (chello089173232159.chello.sk [89.173.232.159])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 678997A0089;
+        Thu, 23 Dec 2021 23:34:49 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Jens Axboe <axboe@kernel.dk>
+Subject: Re: [RFC] remove the paride driver
+Date:   Thu, 23 Dec 2021 23:34:46 +0100
+User-Agent: KMail/1.9.10
+Cc:     Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org
+References: <20211223113504.1117836-1-hch@lst.de> <202112231829.25658.linux@zary.sk> <4f88a1e4-1bbb-1c32-79dd-389f18cb3fa4@kernel.dk>
+In-Reply-To: <4f88a1e4-1bbb-1c32-79dd-389f18cb3fa4@kernel.dk>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <202112232334.46631.linux@zary.sk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-'nq->tag_map' is a bitmap. So use bitmap_zalloc() to simplify code and
-improve the semantic.
+On Thursday 23 December 2021 19:33:21 Jens Axboe wrote:
+> On 12/23/21 10:29 AM, Ondrej Zary wrote:
+> > On Thursday 23 December 2021 12:35:03 Christoph Hellwig wrote:
+> >> Hi Jens,
+> >>
+> >> the paride driver has been unmaintained for a while and is a significant
+> >> maintainance burden, including the fact that it is one of the last
+> >> users of the block layer bounce buffering code.  This patch suggest
+> >> to remove it assuming no users complain loduly.
+> >>
+> >> Ondrej: you're the last known users, so please speak up if you still
+> >> have a use case!
+> > 
+> > Looks like I really need to do the libata conversion.
+> 
+> That would indeed be great! As mentioned in my reply, I don't want to
+> remove drivers that are actively being used. Is the libata conversion
+> something you are going to do, or is it more of a dream at this point?
+> Ideally we get that done first, and then remove paride.
 
-Also change the corresponding kfree() into bitmap_free() to keep
-consistency.
+Haven't started yet. But I'm increasing its priority in my todo list.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/block/null_blk/main.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 6be6ccd4a28f..9e058e0aa668 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1661,7 +1661,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- static void cleanup_queue(struct nullb_queue *nq)
- {
--	kfree(nq->tag_map);
-+	bitmap_free(nq->tag_map);
- 	kfree(nq->cmds);
- }
- 
-@@ -1790,14 +1790,13 @@ static const struct block_device_operations null_rq_ops = {
- static int setup_commands(struct nullb_queue *nq)
- {
- 	struct nullb_cmd *cmd;
--	int i, tag_size;
-+	int i;
- 
- 	nq->cmds = kcalloc(nq->queue_depth, sizeof(*cmd), GFP_KERNEL);
- 	if (!nq->cmds)
- 		return -ENOMEM;
- 
--	tag_size = ALIGN(nq->queue_depth, BITS_PER_LONG) / BITS_PER_LONG;
--	nq->tag_map = kcalloc(tag_size, sizeof(unsigned long), GFP_KERNEL);
-+	nq->tag_map = bitmap_zalloc(nq->queue_depth, GFP_KERNEL);
- 	if (!nq->tag_map) {
- 		kfree(nq->cmds);
- 		return -ENOMEM;
 -- 
-2.32.0
-
+Ondrej Zary
