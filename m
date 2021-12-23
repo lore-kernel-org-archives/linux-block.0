@@ -2,79 +2,233 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 674FCC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 22 Dec 2021 23:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A41D1C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 01:03:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344129AbhLVX5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Dec 2021 18:57:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231232AbhLVX5M (ORCPT
+        id S233743AbhLWBC7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Dec 2021 20:02:59 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:30093 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230041AbhLWBC7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Dec 2021 18:57:12 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9D2C061574
-        for <linux-block@vger.kernel.org>; Wed, 22 Dec 2021 15:57:12 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id f17so2961707ilj.11
-        for <linux-block@vger.kernel.org>; Wed, 22 Dec 2021 15:57:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
-         :content-transfer-encoding;
-        bh=ksIioGq7KyW4HwAMxNm7/fq+qcCFuMQvcVGncdn/2s4=;
-        b=pcsJu2vYmhbnYQcIVbVfzEw6sWQdnId6qYrCPHKBGR5ZqJ44YKThy4HgESlQA/Nb02
-         Do1mYpQspKLRarLrNJDKpiwGDNlPEMkjryuce9u7Nyhoj9tQr5/1b6cLPBvklqYEfiKv
-         1t8kxLRMK95T+1Qb3BiFtrL3lE4raWdit7recWvbfnnFnopI4T50bPcEbThcccpRhTRO
-         rokweafVy1ifc3xfcVYxDUG2BO6tSLzhb4TKaftQkLS/CxBxA+CT9CN0PZZ+gOj8TziN
-         Y0SOE9jQSmlQwhSU58NWSywB9HbxUWzMvsgQwzwGNNmMpwmSHY5ICkv8MXr7Ly3ciFCu
-         Ud4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=ksIioGq7KyW4HwAMxNm7/fq+qcCFuMQvcVGncdn/2s4=;
-        b=M0NgmJ0x5womLC6AnQv8E4Qrmyajuq5QTnDe7805b1aJ5ueXSz49klsjzXxoCW0jQ0
-         VFdyf6+f3Ws85zuxozMG8pyQ5KUfVTAgU+YfRrXcm7IIb1LzWsIXvOzIAIvAcXDyQBO4
-         93dS0G+uWF7ZVNxUk1zLfZra4MMqd2sdpUYyFGiPjIl5ZJ89ORSBxe0XOR7Vf9TKMMOJ
-         b6msU/5mAaaiSebPY0USXK0WukfdXlotW+DybeFPor9yoPMe/i4xOhPrAaAiX6iEfkNu
-         p1ziMdUPIoBSGOlwP63YSMiuAKwby8GdZKyExUY/QWKPzAIQ5YJ2IxQhKJUpLiCDtu33
-         QhFQ==
-X-Gm-Message-State: AOAM530qWz3zBr7D6Yz+fvYJG4unK4o2G+9drmPeBfUSkhlAp1jJG4lj
-        HZkYqISTartaCETWnaNO0+acf2+7YNrgGQ==
-X-Google-Smtp-Source: ABdhPJx5A7b6m3lJSbydW+/MUSx8fNdHy3qw+3Nkgy3uYTNjkyjH9fdWWejd1MzEUcJuRXp8i2tMeA==
-X-Received: by 2002:a05:6e02:1b8b:: with SMTP id h11mr2561419ili.14.1640217431816;
-        Wed, 22 Dec 2021 15:57:11 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id f11sm2151764ila.17.2021.12.22.15.57.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Dec 2021 15:57:11 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org
-In-Reply-To: <20211222215239.1768164-1-kbusch@kernel.org>
-References: <20211222215239.1768164-1-kbusch@kernel.org>
-Subject: Re: [PATCH] block: remove unnecessary trailing '\'
-Message-Id: <164021743111.720001.8149569508323760461.b4-ty@kernel.dk>
-Date:   Wed, 22 Dec 2021 16:57:11 -0700
+        Wed, 22 Dec 2021 20:02:59 -0500
+Received: from kwepemi500003.china.huawei.com (unknown [172.30.72.54])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JKBg76Gc4z1DJqk;
+        Thu, 23 Dec 2021 08:59:47 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500003.china.huawei.com (7.221.188.51) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 23 Dec 2021 09:02:57 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 23 Dec 2021 09:02:56 +0800
+Subject: Re: Use after free with BFQ and cgroups
+To:     Jan Kara <jack@suse.cz>
+CC:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        <linux-block@vger.kernel.org>, <fvogt@suse.de>,
+        <cgroups@vger.kernel.org>
+References: <20211125172809.GC19572@quack2.suse.cz>
+ <20211126144724.GA31093@blackbody.suse.cz>
+ <20211129171115.GC29512@quack2.suse.cz>
+ <f03b2b1c-808a-c657-327d-03165b988e7d@huawei.com>
+ <20211222152103.GF685@quack2.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <d770663a-911c-c9c1-1185-558634f4c738@huawei.com>
+Date:   Thu, 23 Dec 2021 09:02:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211222152103.GF685@quack2.suse.cz>
+Content-Type: multipart/mixed;
+        boundary="------------DBDA67AA3D957847EA8B3933"
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 22 Dec 2021 13:52:39 -0800, Keith Busch wrote:
-> While harmless, the blank line is certainly not intended to be part of
-> the rq_list_for_each() macro. Remove it.
+--------------DBDA67AA3D957847EA8B3933
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+
+ÔÚ 2021/12/22 23:21, Jan Kara Ð´µÀ:
+> On Thu 09-12-21 10:23:33, yukuai (C) wrote:
+>> We confirmed this by our reproducer through a simple patch:
+>> stop merging bfq_queues if their parents are different.
 > 
+> Can you please share your reproducer? I have prepared some patches which
+> I'd like to verify before posting... Thanks!
+
+Hi,
+
+Here is the reproducer, usually the problem will come up within an
+hour.
+
+Thanks,
+Kuai
+> 
+> 								Honza
 > 
 
-Applied, thanks!
+--------------DBDA67AA3D957847EA8B3933
+Content-Type: text/plain; charset="UTF-8"; name="null_bad.sh"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="null_bad.sh"
 
-[1/1] block: remove unnecessary trailing '\'
-      commit: a16c7246368db8935652c805bc446928d0e1c0aa
+#!/bin/bash
+NR=1
+basedir=/sys/fs/cgroup/blkio/null
+CG_PREFIX=/sys/fs/cgroup/blkio/null/nullb
 
-Best regards,
--- 
-Jens Axboe
+function set_cgroup()
+{
+	testdir=$1
+	dev_id=$2
+	let weight=RANDOM%900+100
+	let iops=RANDOM%1000+100
+	let bps=RANDOM%10485760+10485760
+	echo "$weight" > $testdir/blkio.bfq.weight
+	echo "$dev_id $iops" > $testdir/blkio.throttle.read_iops_device
+	echo "$dev_id $iops" > $testdir/blkio.throttle.write_iops_device
+	echo "$dev_id $bps" > $testdir/blkio.throttle.read_bps_device
+	echo "$dev_id $bps" > $testdir/blkio.throttle.write_bps_device
+}
+
+function set_sys()
+{
+	local queue_dir=/sys/block/$1/queue
+
+	let rq_affinity=RANDOM%3
+	echo $rq_affinity > $queue_dir/rq_affinity
+
+	let add_random=RANDOM%2
+	echo $add_random > $queue_dir/add_random
+
+	let rotational=RANDOM%2
+	echo $rotational > $queue_dir/rotational
+
+	let nomerges=RANDOM%2
+	echo $nomerges > $queue_dir/nomerges
+
+	let s_num=RANDOM%5
+	case $s_num in
+		0)
+		scheduler=none
+		;;
+		1)
+		scheduler=bfq
+		;;
+		2)
+		scheduler=bfq
+		;;
+		3)
+		scheduler=none
+		;;
+	esac
+	echo bfq > $queue_dir/scheduler
+}
+
+create_cg()
+{
+	local i
+	local path
+
+	for i in $(seq 0 $NR)
+	do
+		path=${CG_PREFIX}${i}
+		mkdir -p $path
+	done
+}
+
+switch_cg()
+{
+	local path=${CG_PREFIX}$1
+	local t
+
+	for t in $(cat $path/tasks)
+	do
+		echo $t > /sys/fs/cgroup/blkio/tasks
+	done
+
+	echo "tasks in $path"
+	cat $path/tasks
+}
+
+rm_cg()
+{
+	local path=${CG_PREFIX}$1
+
+	rmdir $path
+	return $?
+}
+
+mkdir $basedir
+cgdir1=/sys/fs/cgroup/blkio/null/nullb0
+cgdir2=/sys/fs/cgroup/blkio/null/nullb1
+
+ADD_MOD="modprobe null_blk"
+while true
+do
+	let flag=RANDOM%2
+	if [ $flag -eq 1 ];then
+		$ADD_MOD queue_mode=2 blocking=1 nr_devices=2
+	else
+		$ADD_MOD queue_mode=2 nr_devices=2
+	fi
+		
+	create_cg
+
+	dev_id=`lsblk | grep nullb0 | awk '{print $2}'`
+	set_cgroup $basedir $dev_id 
+	set_sys nullb0
+
+	dev_id=`lsblk | grep nullb1 | awk '{print $2}'`
+	set_cgroup $basedir $dev_id 
+	set_sys nullb1
+
+	let flag=RANDOM%20
+	if [ $flag -eq 5 ];then
+		echo 1 > /sys/block/nullb0/make-it-fail
+		echo 1 > /sys/block/nullb1/make-it-fail
+	else
+		echo 0 > /sys/block/nullb0/make-it-fail
+		echo 0 > /sys/block/nullb1/make-it-fail
+	fi
+
+	i=0
+	while [ $i -le 3 ]
+	do
+		cgexec -g "blkio:null/nullb0" fio -filename=/dev/nullb0 -ioengine=libaio -time_based=1 -rw=rw -thread -size=100g -bs=512 -numjobs=4 -iodepth=8 -runtime=5 -group_reporting -name=brd-IOwrite -rwmixread=50 &>/dev/null &
+		cgexec -g "blkio:null/nullb0" fio -filename=/dev/nullb0 -ioengine=psync -direct=1 -time_based=1 -rw=rw -thread -size=100g -bs=512 -numjobs=4 -iodepth=8 -runtime=5 -group_reporting -name=brd-IOwrite -rwmixread=50 &>/dev/null &
+		cgexec -g "blkio:null/nullb1" fio -filename=/dev/nullb1 -ioengine=libaio -time_based=1 -rw=rw -thread -size=100g -bs=1024k -numjobs=4 -iodepth=8 -runtime=5 -group_reporting -name=brd-IOwrite -rwmixread=50 &>/dev/null &
+		cgexec -g "blkio:null/nullb1" fio -filename=/dev/nullb1 -ioengine=psync -direct=1 -time_based=1 -rw=rw -thread -size=100g -bs=1024k -numjobs=4 -iodepth=8 -runtime=5 -group_reporting -name=brd-IOwrite -rwmixread=50 &>/dev/null &
+		((i=i+1))
+	done
+
+	sleep 3
+
+	until rm_cg 0
+	do
+		switch_cg 0
+		sleep 0.1
+	done
+
+	until rm_cg 1
+	do
+		switch_cg 1
+		sleep 0.1
+	done
+
+	while true
+	do
+		rmmod null_blk &>/dev/null && break
+		sleep 0.1
+	done
+done
 
 
+--------------DBDA67AA3D957847EA8B3933--
