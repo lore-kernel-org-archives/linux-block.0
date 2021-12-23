@@ -2,92 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED67C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 18:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F07C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 21:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238882AbhLWSdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Dec 2021 13:33:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235579AbhLWSdY (ORCPT
+        id S231565AbhLWVzo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Dec 2021 16:55:44 -0500
+Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:54110 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230281AbhLWVzl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Dec 2021 13:33:24 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA91C061401
-        for <linux-block@vger.kernel.org>; Thu, 23 Dec 2021 10:33:24 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id y70so8249231iof.2
-        for <linux-block@vger.kernel.org>; Thu, 23 Dec 2021 10:33:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3TtGTsDOS1sv5VjAapnrKvw759mjru/5vHNygb4N0eQ=;
-        b=JdTfLfrrGmDFScx/OQtMg7HYOPFuDdER34j5YkQsfD8NbSnAoJ1auYNe74thKI8HBQ
-         ixj/9ym6KBf9zWCPoJpdIrjJXHgoNLqR3YpOacJNUxkGWkbUITQwybiRXtKaBfaoK3dn
-         NVQMirY+aGB/9jMjOoxYati/9ByK7hxJm+NXHIunrT8yEz0vvGNZklxJWFdyj9FuAP3G
-         hpn+pJu/VLfAoFePe4Ssyq8QHshR04SYAJmiz6FcYRUzD4kgsc3EZoVuJRNCLInH0DZz
-         1WDYaA40WPxL2iNUKQWTNLetZY8u3r13e5CqC//HrRX6+yo97z/FOQmvUb/Va0GFby59
-         ykRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3TtGTsDOS1sv5VjAapnrKvw759mjru/5vHNygb4N0eQ=;
-        b=bC4mQycr1abeF6T992wFQbASq34ow2z4OaQxknBXSi4VFXS5B/88ke8K37K/k/+6y6
-         BWP3GDEB7v224UK13/GZGYF38/BGKvcccOtiP567xYXcU5BUcWKg/OngJtjmRnD4vQYo
-         kyHHDMooz1As9IJc0J3Ag0kx+/ZgAN5+xU/hnpHJOk8M4jdDllQ2Ke0ikWgMIeUZ/OeI
-         n5mcirT45/2z2bhaYvfZ3qp68UlvRttXDiYa0K/ao7sNWMjfJVn2zyjI/fRsNIKrPUZg
-         wHAr2mKUmXSoo6dlyaT9WtS+KM9CetgLaSMd68aQ8iXpjQGx+gHed1rvLYm2PPcQqJPG
-         Jk2g==
-X-Gm-Message-State: AOAM533JNJKAzr0U/uh+p+bNEEIjIR+1HexHJ5Jb3Y+gL4Tm+D5bYt7q
-        a3cdWbIwwvVjKjHWzpqRNnJ0wA==
-X-Google-Smtp-Source: ABdhPJydAZ45WTRPq5+RzQwSrvcrY4VGXEmM5jOIltHvqumauXgrJtdp1sDGKNOJCQQ5WH5IkXgfzw==
-X-Received: by 2002:a5d:81d3:: with SMTP id t19mr1829959iol.199.1640284403854;
-        Thu, 23 Dec 2021 10:33:23 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id a12sm2953694ilv.69.2021.12.23.10.33.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Dec 2021 10:33:23 -0800 (PST)
-Subject: Re: [RFC] remove the paride driver
-To:     Ondrej Zary <linux@zary.sk>, Christoph Hellwig <hch@lst.de>
-Cc:     Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
-        linux-parport@lists.infradead.org
-References: <20211223113504.1117836-1-hch@lst.de>
- <202112231829.25658.linux@zary.sk>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4f88a1e4-1bbb-1c32-79dd-389f18cb3fa4@kernel.dk>
-Date:   Thu, 23 Dec 2021 11:33:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 23 Dec 2021 16:55:41 -0500
+Received: from pop-os.home ([86.243.171.122])
+        by smtp.orange.fr with ESMTPA
+        id 0W3lnGyoSbyf90W3lnnXk1; Thu, 23 Dec 2021 22:55:40 +0100
+X-ME-Helo: pop-os.home
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Thu, 23 Dec 2021 22:55:40 +0100
+X-ME-IP: 86.243.171.122
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     axboe@kernel.dk, chaitanya.kulkarni@wdc.com, damien.lemoal@wdc.com,
+        ming.lei@redhat.com, Johannes.Thumshirn@wdc.com,
+        shinichiro.kawasaki@wdc.com, jiangguoqing@kylinos.cn
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] null_blk: Use bitmap_zalloc() when applicable
+Date:   Thu, 23 Dec 2021 22:55:36 +0100
+Message-Id: <3e68598defed010efb864ea55887d88ed0da02cc.1640296433.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <202112231829.25658.linux@zary.sk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/23/21 10:29 AM, Ondrej Zary wrote:
-> On Thursday 23 December 2021 12:35:03 Christoph Hellwig wrote:
->> Hi Jens,
->>
->> the paride driver has been unmaintained for a while and is a significant
->> maintainance burden, including the fact that it is one of the last
->> users of the block layer bounce buffering code.  This patch suggest
->> to remove it assuming no users complain loduly.
->>
->> Ondrej: you're the last known users, so please speak up if you still
->> have a use case!
-> 
-> Looks like I really need to do the libata conversion.
+'nq->tag_map' is a bitmap. So use bitmap_zalloc() to simplify code and
+improve the semantic.
 
-That would indeed be great! As mentioned in my reply, I don't want to
-remove drivers that are actively being used. Is the libata conversion
-something you are going to do, or is it more of a dream at this point?
-Ideally we get that done first, and then remove paride.
+Also change the corresponding kfree() into bitmap_free() to keep
+consistency.
 
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ drivers/block/null_blk/main.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 6be6ccd4a28f..9e058e0aa668 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1661,7 +1661,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ static void cleanup_queue(struct nullb_queue *nq)
+ {
+-	kfree(nq->tag_map);
++	bitmap_free(nq->tag_map);
+ 	kfree(nq->cmds);
+ }
+ 
+@@ -1790,14 +1790,13 @@ static const struct block_device_operations null_rq_ops = {
+ static int setup_commands(struct nullb_queue *nq)
+ {
+ 	struct nullb_cmd *cmd;
+-	int i, tag_size;
++	int i;
+ 
+ 	nq->cmds = kcalloc(nq->queue_depth, sizeof(*cmd), GFP_KERNEL);
+ 	if (!nq->cmds)
+ 		return -ENOMEM;
+ 
+-	tag_size = ALIGN(nq->queue_depth, BITS_PER_LONG) / BITS_PER_LONG;
+-	nq->tag_map = kcalloc(tag_size, sizeof(unsigned long), GFP_KERNEL);
++	nq->tag_map = bitmap_zalloc(nq->queue_depth, GFP_KERNEL);
+ 	if (!nq->tag_map) {
+ 		kfree(nq->cmds);
+ 		return -ENOMEM;
 -- 
-Jens Axboe
+2.32.0
 
