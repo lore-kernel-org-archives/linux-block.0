@@ -2,87 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DE9C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 17:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D51AC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 17:32:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244356AbhLWRNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Dec 2021 12:13:50 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:53342 "EHLO
+        id S244489AbhLWRcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Dec 2021 12:32:42 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:54104 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244347AbhLWRNu (ORCPT
+        with ESMTP id S244516AbhLWRcL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Dec 2021 12:13:50 -0500
+        Thu, 23 Dec 2021 12:32:11 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id F15A8210FE;
-        Thu, 23 Dec 2021 17:13:48 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTP id 6209121128;
+        Thu, 23 Dec 2021 17:32:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1640279628; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TK8w/l2QmkKbweJf4VP5hkqJcVEfLR6+7DArEF8svg0=;
-        b=N3/Mg4U+xanWLS7bAaYDZP3g6btzRSuYvsvFl8fzz3i/KoD0mzhP2WkozLnYEXg7pAYEcL
-        7aZqzXk5T/hOrNJpK83n2KFLjdJYNcdM6OyxH6/i40b0Rrmcwyo8mJ1Sed6xjKpip4/MmU
-        30TjoOc1SpPAloZxkLpf6Q8a8FnMLa8=
+        t=1640280730; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=L8kagnBOo/gOySUuvYmjg4HfRSNqdxnk/fAqew7vElI=;
+        b=HPx55yZzqw9bHDQOAN0yrdvTrh6z78aIpnRe3wiIM6O7OL8qrLTZYy/ExmiNFg+03a8syN
+        eCH0jxbN9tGFXu83Tz4M3MFNIVnJ0AMfOS1qiFGGRi/79CJBCgXt987zKg4mAJpPO0jxCH
+        7GmCDWfp5IO7ujgTvoI159pTnnx0YCg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1640279628;
+        s=susede2_ed25519; t=1640280730;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TK8w/l2QmkKbweJf4VP5hkqJcVEfLR6+7DArEF8svg0=;
-        b=fZsVIT/8nYiFKohB3PYI+Tz1zhjd13tVgKSwUm+zfPngwa8hyJelVLscYzOYaxhslRz9Z4
-        HQOjiTluRe2hvyAQ==
-Received: from quack2.suse.cz (jack.udp.ovpn1.nue.suse.de [10.163.28.18])
-        by relay2.suse.de (Postfix) with ESMTP id DC225A3B81;
-        Thu, 23 Dec 2021 17:13:48 +0000 (UTC)
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=L8kagnBOo/gOySUuvYmjg4HfRSNqdxnk/fAqew7vElI=;
+        b=y6LM5oL9zK87MpqAGbAYEDPSKhFepGTP7cDJDS/MqOm32Sr7MtKlkOqcY2mNDgtBxYoj0W
+        KCS9l4zlLBLUtmBQ==
+Received: from quack2.suse.cz (unknown [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id 4AD74A3B85;
+        Thu, 23 Dec 2021 17:32:10 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id CA0051E1328; Thu, 23 Dec 2021 18:13:45 +0100 (CET)
-Date:   Thu, 23 Dec 2021 18:13:45 +0100
+        id 1AB921E1328; Thu, 23 Dec 2021 18:32:07 +0100 (CET)
 From:   Jan Kara <jack@suse.cz>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Jan Kara <jack@suse.cz>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+To:     <linux-block@vger.kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
         Paolo Valente <paolo.valente@linaro.org>,
-        linux-block@vger.kernel.org, fvogt@suse.de, cgroups@vger.kernel.org
-Subject: Re: Use after free with BFQ and cgroups
-Message-ID: <20211223171345.GE19129@quack2.suse.cz>
-References: <20211125172809.GC19572@quack2.suse.cz>
- <20211126144724.GA31093@blackbody.suse.cz>
- <20211129171115.GC29512@quack2.suse.cz>
- <f03b2b1c-808a-c657-327d-03165b988e7d@huawei.com>
- <20211222152103.GF685@quack2.suse.cz>
- <d770663a-911c-c9c1-1185-558634f4c738@huawei.com>
+        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/3] bfq: Avoid use-after-free when moving processes between cgroups
+Date:   Thu, 23 Dec 2021 18:31:56 +0100
+Message-Id: <20211223171425.3551-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=332; h=from:subject:message-id; bh=vs1Yyl+jjo2YoeXrke5B9pRz4cZBGIlt/W4J35idkrI=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBhxLJvAkrJljfG3ckpfTB+EUPJhWIRi1BHBbwIssao mLv8Ws2JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYcSybwAKCRCcnaoHP2RA2aL/B/ 0Qwl0hLeiS4L71MKuAdPgButRR1AiTv22v/77les8FoM1wjsuFRtrMZOBnTalLE4YJ7TaJu45IdU7n ufYzrBgUED38Ms8grJw+U4S/6IesMGs57yGCu9Whj8VhE1fd0QAGU1ot3k0uDjPnouLBuvp9IQHleb 4yew1aZc+dAjnuAUxWELIMprdML5yuqAE4V59/GA+pIFAb5ShNltVl6Z2lDWf0gCqwkXevg4yftd+J ow0pT9/eX43TjnvR7bdtJt+LBOIWzla06ybRMaZtsoW2uh1RYyTO2Xm0SFXv6alEsqmek1Chk/DD4M Qlc6XrHRgeQmiy4javcXXwRwzss3kz
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d770663a-911c-c9c1-1185-558634f4c738@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 23-12-21 09:02:55, yukuai (C) wrote:
-> 在 2021/12/22 23:21, Jan Kara 写道:
-> > On Thu 09-12-21 10:23:33, yukuai (C) wrote:
-> > > We confirmed this by our reproducer through a simple patch:
-> > > stop merging bfq_queues if their parents are different.
-> > 
-> > Can you please share your reproducer? I have prepared some patches which
-> > I'd like to verify before posting... Thanks!
-> 
-> Hi,
-> 
-> Here is the reproducer, usually the problem will come up within an
-> hour.
+Hello,
 
-Thanks! For some reason the reproducer does not trigger the KASAN warning
-for me (with or without my patches). But anyway, I'll post my fixes and
-we'll see what do people think, also I'd be grateful if you can test them
-in your environment. Thanks.
+these three patches fix use-after-free issues in BFQ when processes with merged
+queues get moved to different cgroups. The patches have survived some beating
+in my test VM but so far I fail to reproduce the original KASAN reports so
+testing from people who can reproduce them is most welcome. Thanks!
 
 								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
