@@ -2,83 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F716C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 15:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DE9C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 23 Dec 2021 17:13:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348982AbhLWP2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Dec 2021 10:28:51 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:58791 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232660AbhLWP2v (ORCPT
+        id S244356AbhLWRNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Dec 2021 12:13:50 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:53342 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244347AbhLWRNu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Dec 2021 10:28:51 -0500
-Received: from fsav314.sakura.ne.jp (fsav314.sakura.ne.jp [153.120.85.145])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BNFScbO010560;
-        Fri, 24 Dec 2021 00:28:38 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav314.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp);
- Fri, 24 Dec 2021 00:28:38 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BNFScd0010556
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 24 Dec 2021 00:28:38 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <c205dcd2-db55-a35c-e2ef-20193b5ac0da@i-love.sakura.ne.jp>
-Date:   Fri, 24 Dec 2021 00:28:37 +0900
+        Thu, 23 Dec 2021 12:13:50 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id F15A8210FE;
+        Thu, 23 Dec 2021 17:13:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1640279628; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TK8w/l2QmkKbweJf4VP5hkqJcVEfLR6+7DArEF8svg0=;
+        b=N3/Mg4U+xanWLS7bAaYDZP3g6btzRSuYvsvFl8fzz3i/KoD0mzhP2WkozLnYEXg7pAYEcL
+        7aZqzXk5T/hOrNJpK83n2KFLjdJYNcdM6OyxH6/i40b0Rrmcwyo8mJ1Sed6xjKpip4/MmU
+        30TjoOc1SpPAloZxkLpf6Q8a8FnMLa8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1640279628;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TK8w/l2QmkKbweJf4VP5hkqJcVEfLR6+7DArEF8svg0=;
+        b=fZsVIT/8nYiFKohB3PYI+Tz1zhjd13tVgKSwUm+zfPngwa8hyJelVLscYzOYaxhslRz9Z4
+        HQOjiTluRe2hvyAQ==
+Received: from quack2.suse.cz (jack.udp.ovpn1.nue.suse.de [10.163.28.18])
+        by relay2.suse.de (Postfix) with ESMTP id DC225A3B81;
+        Thu, 23 Dec 2021 17:13:48 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id CA0051E1328; Thu, 23 Dec 2021 18:13:45 +0100 (CET)
+Date:   Thu, 23 Dec 2021 18:13:45 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        linux-block@vger.kernel.org, fvogt@suse.de, cgroups@vger.kernel.org
+Subject: Re: Use after free with BFQ and cgroups
+Message-ID: <20211223171345.GE19129@quack2.suse.cz>
+References: <20211125172809.GC19572@quack2.suse.cz>
+ <20211126144724.GA31093@blackbody.suse.cz>
+ <20211129171115.GC29512@quack2.suse.cz>
+ <f03b2b1c-808a-c657-327d-03165b988e7d@huawei.com>
+ <20211222152103.GF685@quack2.suse.cz>
+ <d770663a-911c-c9c1-1185-558634f4c738@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH 2/2] loop: use task_work for autoclear operation
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-References: <e9f59c70-5dc9-45ce-be93-9f149028f922@i-love.sakura.ne.jp>
- <9eff2034-2f32-54a3-e476-d0f609ab49c0@i-love.sakura.ne.jp>
- <da951c17-8a2f-4731-c34d-e08921824414@kernel.dk>
- <ae5848e6-aaeb-4f5a-ade7-f09d0f5d4d0b@i-love.sakura.ne.jp>
- <2b6db3cb-a942-6fd6-fdbf-8f355103cb55@kernel.dk>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <2b6db3cb-a942-6fd6-fdbf-8f355103cb55@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d770663a-911c-c9c1-1185-558634f4c738@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/12/23 23:13, Jens Axboe wrote:
-> Race is the wrong word, I mean ordering issues. If the fput happens
-> before you queue your task_work, then it'll be run before that.
+On Thu 23-12-21 09:02:55, yukuai (C) wrote:
+> 在 2021/12/22 23:21, Jan Kara 写道:
+> > On Thu 09-12-21 10:23:33, yukuai (C) wrote:
+> > > We confirmed this by our reproducer through a simple patch:
+> > > stop merging bfq_queues if their parents are different.
+> > 
+> > Can you please share your reproducer? I have prepared some patches which
+> > I'd like to verify before posting... Thanks!
+> 
+> Hi,
+> 
+> Here is the reproducer, usually the problem will come up within an
+> hour.
 
-There are two fput() related to this patch.
-fput(file_of_loop_device) or fput(file_of_backing_file), which one?
+Thanks! For some reason the reproducer does not trigger the KASAN warning
+for me (with or without my patches). But anyway, I'll post my fixes and
+we'll see what do people think, also I'd be grateful if you can test them
+in your environment. Thanks.
 
-loop_schedule_rundown() is called from lo_release() from blkdev_put() from
-blkdev_close() from __fput() from task_work_run(), after fput(file_of_loop_device)
-called task_work_add(TWA_RESUME) for scheduling __fput().
-
-__loop_clr_fd() is called from loop_rundown_callbackfn() from task_work_run(),
-after loop_schedule_rundown() called task_work_add(TWA_RESUME) for scheduling
-loop_rundown_callbackfn().
-
-fput(file_of_backing_file) is called from __loop_clr_fd(), and
-fput(file_of_backing_file) calls task_work_add(TWA_RESUME) for scheduling
-__fput().
-
-And __fput() from task_work_run() calls release callback for file_of_backing_file.
-
-fput(file_of_loop_device) happens before loop_schedule_rundown() calls
-task_work_add(TWA_RESUME).
-
-fput(file_of_backing_file) happens after loop_schedule_rundown() called
-task_work_add(TWA_RESUME).
-
-The release callback for file_of_backing_file will be completed before
-close() syscall which triggered fput(file_of_loop_device) returns to
-userspace, for these are chain of add_task_work().
-
-As a total sequence, I think there is no ordering issues.
-Or, am I missing limitation of task work usage?
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
