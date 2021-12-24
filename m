@@ -2,96 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E9EC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 24 Dec 2021 00:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEAEC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 24 Dec 2021 01:08:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350461AbhLXAzf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Dec 2021 19:55:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350445AbhLXAze (ORCPT
+        id S231915AbhLXBIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Dec 2021 20:08:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26500 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230130AbhLXBIs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Dec 2021 19:55:34 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB6FC061401
-        for <linux-block@vger.kernel.org>; Thu, 23 Dec 2021 16:55:34 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id b187so9158360iof.11
-        for <linux-block@vger.kernel.org>; Thu, 23 Dec 2021 16:55:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=S/bUBMGyS87hIhz1yDVLMVnif3yIPsXTuqHAs6Zb//Q=;
-        b=CHbYhHYgqmVNp3xuJVyaeCyoFlIfB6sHY+uNaIDoB6zgzf18jiee3Lf/Uo5VQWwJtq
-         BYvCXVDXJUfO2S+JLyoo8Rw3Vce3AuQs/1Vk0AmpIbF8nlbYZo8j0c7DtRlUUExjDu/+
-         g0rota+I5TBL0Vgy3NKUt0kUBUXS2ZDmzkQig3WKIcp5f3N3V+Gey9TLQ2ufehzFTgDd
-         R2CjBPSfNe+jD6lzJaEI0ROgTD0wK9VdR2QrC+/RxpHwH0jekUhRv+QsHrePy3Mdyyjs
-         /mp/Tvd7lsy5fNP6EUnRnHxCnFidPBrn3vSd+1T+NO+lD5tvbZ6pF3Rqgm67X8Z9Sqgi
-         XQ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=S/bUBMGyS87hIhz1yDVLMVnif3yIPsXTuqHAs6Zb//Q=;
-        b=Vd/CxdLIlGDPfoWm+qg4QAEO8Qm6VtM6WtR8IJpQuUHf1Y3Vr8XYiWqWX6ZdFSMUnD
-         VPpJJV8LkOKMI21PDoS27hmXuU8L7BaEukghgXL9D5Cse/Ih7AAc0kfsR6xR6lVix1vE
-         OexTOESAIEFFxKupFWN8S7xqior7ZNLhOWgBU6GCflSxzsCiI1+bIShKcmo313FoVXLQ
-         s+qQ115JNOwtkEO16OPlmu3+pPkog7dRTLGGvpNoVc584AR59wp0XZ2lb6BqgZY4Y4ZH
-         1etYbceV5rxr0VSa8qy8wJ+0QN/Qt4Pkpho7K+26aAqt1MCVTbcxAfKdDyXjYQFA3P6D
-         WqYA==
-X-Gm-Message-State: AOAM531XtPgh1kp8+ixZSUXNgEFk8PfOEVrlPLCftlZYzYm+cRYNPNOJ
-        MGVV+DanysxdtJagSwCnAbmubYffBPFJAg==
-X-Google-Smtp-Source: ABdhPJxvF4iQ6fb0XhN880yhLwq1lkxo57Qu/phG8pLb4thwTg+xAc51NhDyGkf3/ITI3A0UOTKwWg==
-X-Received: by 2002:a05:6602:1495:: with SMTP id a21mr2303954iow.79.1640307333417;
-        Thu, 23 Dec 2021 16:55:33 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id g20sm5006412iov.35.2021.12.23.16.55.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Dec 2021 16:55:33 -0800 (PST)
-Subject: Re: [PATCH V2] null_blk: allow zero poll queues
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20211203130907.3667775-1-ming.lei@redhat.com>
- <20211224005237.ryuyjrrn63t7y7sa@shindev>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8b1f05d7-c741-24e3-be67-bf3616ff1931@kernel.dk>
-Date:   Thu, 23 Dec 2021 17:55:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 23 Dec 2021 20:08:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640308127;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=L2HweA5yx0JUV8R/ix9WuhIsEqwY2v1CXamoZnqo6CE=;
+        b=Ka7XlUd2+GcroI8KYHLcns9dOqKgc2gxSme/e2viray73vgOLg6sMnCAPnneBcQIfAruWv
+        CVqBjcJZA8LLQV6dSTxDC8B5/1QH4j0tBSZlL1YUW9zelNzUtWP35B25wVNK2oXYILF8N8
+        v8Z5AAQXngKTrywgxLBuXWIgvGHGELI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-248-DKCTurLENu6rDS5AL8XrBw-1; Thu, 23 Dec 2021 20:08:46 -0500
+X-MC-Unique: DKCTurLENu6rDS5AL8XrBw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E449102CB76;
+        Fri, 24 Dec 2021 01:08:45 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD47F5E4AE;
+        Fri, 24 Dec 2021 01:08:40 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH] block: null_blk: only set set->nr_maps as 3 if active poll_queues is > 0
+Date:   Fri, 24 Dec 2021 09:08:31 +0800
+Message-Id: <20211224010831.1521805-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20211224005237.ryuyjrrn63t7y7sa@shindev>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/23/21 5:52 PM, Shinichiro Kawasaki wrote:
-> On Dec 03, 2021 / 21:09, Ming Lei wrote:
->> There isn't any reason to not allow zero poll queues from user
->> viewpoint.
->>
->> Also sometimes we need to compare io poll between poll mode and irq
->> mode, so not allowing poll queues is bad.
->>
->> Fixes: 15dfc662ef31 ("null_blk: Fix handling of submit_queues and poll_queues attributes")
->> Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->> ---
->> V2:
->> 	- fix divide zero fault as reported by Shin'ichiro
-> 
-> Jens, Ming,
-> 
-> I find the V1 was applied to the for/5.17-drivers branch, and the additional fix
-> in the V2 does not look applied to the branch. Do we need another small patch to
-> cover the delta between V1 and V2?
+It isn't correct to set set->nr_maps as 3 if g_poll_queues is > 0 since
+we can change it via configfs for null_blk device created there, so only
+set it as 3 if active poll_queues is > 0.
 
-Yes, please send an incremental, thanks.
+Fixes divide zero exception reported by Shinichiro.
 
+Fixes: 2bfdbe8b7ebd ("null_blk: allow zero poll queues")
+Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/null_blk/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 6be6ccd4a28f..13004beb48ca 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1892,7 +1892,7 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+ 	if (g_shared_tag_bitmap)
+ 		set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
+ 	set->driver_data = nullb;
+-	if (g_poll_queues)
++	if (poll_queues)
+ 		set->nr_maps = 3;
+ 	else
+ 		set->nr_maps = 1;
 -- 
-Jens Axboe
+2.31.1
 
