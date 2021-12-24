@@ -2,125 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D9CC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 24 Dec 2021 12:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48815C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 24 Dec 2021 13:13:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352635AbhLXMGR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Dec 2021 07:06:17 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:61976 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352634AbhLXMGR (ORCPT
+        id S1352768AbhLXNNa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Dec 2021 08:13:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35194 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1352766AbhLXNNU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Dec 2021 07:06:17 -0500
-Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1BOC626X005352;
-        Fri, 24 Dec 2021 21:06:02 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
- Fri, 24 Dec 2021 21:06:01 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1BOC5uea005336
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 24 Dec 2021 21:06:01 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Message-ID: <f839a895-bb91-02f8-33fb-5994dd725d24@i-love.sakura.ne.jp>
-Date:   Fri, 24 Dec 2021 21:05:53 +0900
+        Fri, 24 Dec 2021 08:13:20 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD311C061761;
+        Fri, 24 Dec 2021 05:13:19 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id y22so33403368edq.2;
+        Fri, 24 Dec 2021 05:13:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=1HOHy0keKQpVOdFGSD3b7czxWNidYu54FMob3Fejw/c=;
+        b=ESSrB2GK3yeEN6DHbA1RPADMjQWU8OnZYs2QJnd5CjEooRgJgU7fGtziObh5mCUp5y
+         DDdfiKXLQGFXZbAF7vo2yjbVKaSW0xhw/IJyojow7d7AuMMqnNuaedAClFO4BWF0d5SP
+         u3aIt1Ovs8LI3SDhcrxejnkvCcaie0Yxp1uLpC0y9PNF+v4FgZpzveHvzsLgk0QGtmEc
+         Krg9d9oWleQ4+/UmXfwznmThSAU6ZC2vkXMKGDOWKbnLnoYqFoRUMXq7kidRrJ5lclw5
+         nS2X2izt9cjrIrI+DPKCnx09X6zK0KndiNWoKLRmfdHeFSr82o1yL6QfkLhDm0/1muSm
+         TIZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=1HOHy0keKQpVOdFGSD3b7czxWNidYu54FMob3Fejw/c=;
+        b=vVUzMo5zAtnyjZzvwUbDOyjY4Sxh3/Wyc5d8kugOCMH06ymRU+YNR5BoxxZdZ98yH2
+         faGZ021hTjFe3HuSFUW58oi1Ri23C41gWVbDk6gFDNfZL+SGppg4GKEtIuRt2pATXl4b
+         tLirv0Q3VxO6bGSNjU4mgr/6qGp7bDE9QRdOug45YDKf3inKZmZbohgX1D5qPYCYnRto
+         XkY/GKFQWlXkrl5UoAYO0MdCsXGMiUgd96njo/QrSbBZA5El4PGVHo114R33YmrULkY/
+         kXfeQiejbRT9E4cddfJHG5Wy36vWSu6nJ8LGt6R/5G2YTJhaM2bNUeoo/FcPm/6R0eN8
+         Et+g==
+X-Gm-Message-State: AOAM531BEOg4jmoozsYVKBpcycK+gxV+DdZwqa6BAvoW9NxipSTNKA5e
+        iyHT9oLs9EGRaC+d7hazM2s=
+X-Google-Smtp-Source: ABdhPJz6jKKfbHIAecMUs3UMcUpV1ym7wAu3gVdxWZgZvS1hCKJzH4op9tszz6o5Nkpl9fLTWal0TA==
+X-Received: by 2002:a17:906:4796:: with SMTP id cw22mr5557920ejc.594.1640351598286;
+        Fri, 24 Dec 2021 05:13:18 -0800 (PST)
+Received: from zenorus.myxoz.lan (2-248-181-218-no2390.tbcn.telia.com. [2.248.181.218])
+        by smtp.gmail.com with ESMTPSA id 5sm2636998ejm.132.2021.12.24.05.13.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Dec 2021 05:13:18 -0800 (PST)
+Message-ID: <985cf51402ff6ea2c199869c3501a43a6588ae4f.camel@gmail.com>
+Subject: Re: [PATCH v2 1/2] zram: zram_drv: add SPDX license identifiers
+From:   Miko Larsson <mikoxyzzz@gmail.com>
+To:     Joe Perches <joe@perches.com>, minchan@kernel.org,
+        ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     hch@infradead.org
+Date:   Fri, 24 Dec 2021 14:13:17 +0100
+In-Reply-To: <b71570d5bc14181c656f8dd7ba69a397fd775495.camel@perches.com>
+References: <20211217063224.3474-1-mikoxyzzz@gmail.com>
+         <20211217063224.3474-2-mikoxyzzz@gmail.com>
+         <b71570d5bc14181c656f8dd7ba69a397fd775495.camel@perches.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.2 (3.42.2-1.fc35) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH 1/2] loop: use a global workqueue
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        linux-block@vger.kernel.org
-References: <20211223112509.1116461-1-hch@lst.de>
- <20211223112509.1116461-2-hch@lst.de>
- <bb151d84-8a56-f6da-a5dd-b2d8d1fb6cdb@i-love.sakura.ne.jp>
- <20211224060311.GC12234@lst.de>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-In-Reply-To: <20211224060311.GC12234@lst.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/12/24 15:03, Christoph Hellwig wrote:
-> On Thu, Dec 23, 2021 at 11:37:21PM +0900, Tetsuo Handa wrote:
->>> @@ -1115,7 +1107,6 @@ static void __loop_clr_fd(struct loop_device *lo)
->>>  	/* freeze request queue during the transition */
->>>  	blk_mq_freeze_queue(lo->lo_queue);
->>>  
->>> -	destroy_workqueue(lo->workqueue);
->>
->> is it safe to remove destroy_workqueue() call here?
->>
->>>  	spin_lock_irq(&lo->lo_work_lock);
->>>  	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
->>>  				idle_list) {
->>
->> destroy_workqueue() implies flush_workqueue() which is creating the lock
->> ordering problem. And I think that flush_workqueue() is required for making
->> sure that there is no more work to process (i.e. loop_process_work() is
->> no longer running) before start deleting idle workers.
->>
->> My understanding is that the problem is not the use of a per-device workqueue
->> but the need to call flush_workqueue() in order to make sure that all pending
->> works are completed.
+On Tue, 2021-12-21 at 01:33 -0800, Joe Perches wrote:
+> GPL v2 is a permissive license and this SPDX tag should probably be
 > 
-> All the work items are for requests, and the blk_mq_freeze_queue should
-> take care of flushing them all out.
+> // SPDX-License-Identifier: GPL-2.0-or-later or BSD-3-Clause
 
-Hmm, OK.
-
-(1) loop_queue_rq() calls blk_mq_start_request() and then calls loop_queue_work().
-
-(2) loop_queue_work() allocates "struct work_struct" and calls queue_work().
-
-(3) loop_handle_cmd() from loop_process_work() from loop_workfn() is called by a WQ thread.
-
-(4) do_req_filebacked() from loop_handle_cmd() performs read/write on lo->lo_backing_file.
-
-(5) Either completion function or loop_handle_cmd() calls blk_mq_complete_request().
-
-Therefore, as long as blk_mq_freeze_queue(lo->lo_queue) waits for completion of (5) and
-blocks new events for (2), there should be no work to process by loop_process_work().
-
-Then, we can defer
-
-	destroy_workqueue(lo->workqueue);
-	spin_lock_irq(&lo->lo_work_lock);
-	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-				idle_list) {
-		list_del(&worker->idle_list);
-		rb_erase(&worker->rb_node, &lo->worker_tree);
-		css_put(worker->blkcg_css);
-		kfree(worker);
-	}
-	spin_unlock_irq(&lo->lo_work_lock);
-	del_timer_sync(&lo->timer);
-
-block in __loop_clr_fd() till loop_remove() if we want. Assuming that
-loop devices are likely created only when there is no free one, a loop
-device is likely reused once created. Then, we don't need to care idle
-workers on every loop_configure()/__loop_clr_fd() pairs?
-
-By the way, is it safe to use single global WQ if (4) is a synchronous I/O request?
-Since there can be up to 1048576 loop devices, and one loop device can use another
-loop device as lo->lo_backing_file (unless loop_validate_file() finds a circular
-usage), one synchronous I/O request in (4) might recursively involve up to 1048576
-works (which would be too many concurrency to be handled by a WQ) ?
-
-Also, is
-
-	blk_mq_start_request(rq);
-
-	if (lo->lo_state != Lo_bound)
-		return BLK_STS_IOERR;
-
-in loop_queue_rq() correct? (Not only lo->lo_state test is racy, but wants
-blk_mq_end_request() like lo_complete_rq() does?
+It shouldn't be GPL-2.0-or-later, because the original copyright notice
+doesn't have an "or later" clause.
