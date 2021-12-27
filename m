@@ -2,324 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCDDC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 27 Dec 2021 09:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84933C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Dec 2021 09:32:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233991AbhL0JNc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Dec 2021 04:13:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36146 "EHLO
+        id S231689AbhL0JcM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Dec 2021 04:32:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232620AbhL0JNb (ORCPT
+        with ESMTP id S229652AbhL0JcM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Dec 2021 04:13:31 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C408C061401
-        for <linux-block@vger.kernel.org>; Mon, 27 Dec 2021 01:13:31 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id l10so13124299pgm.7
-        for <linux-block@vger.kernel.org>; Mon, 27 Dec 2021 01:13:31 -0800 (PST)
+        Mon, 27 Dec 2021 04:32:12 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D62C06173E;
+        Mon, 27 Dec 2021 01:32:12 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id mj19so12992402pjb.3;
+        Mon, 27 Dec 2021 01:32:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RCiFLv0kUNDa03tFrYQemsW+z+Tyz2IxoYAt9DnOKgo=;
-        b=JZz2X2wCV6kr4cbfiC68gk4fPdQuaT3HieyBTfs9Nezr1ZOF97TjqtH86WbA/F9eSZ
-         VfsxK6RxCNgXl9kphiwr55ZLoh+B/PeeuxdIo6ROwbTI1Pcqk0xKEFUIeXtOfw+Uv+N2
-         tUZbWL4AkFn2UQmhLBgI7lrXKRWE0eorrL92wqxkpurAECCAbciKuwIoc/mTT8I5qTAo
-         QmsiAZVazVlBrU96MUp7sPY8YjjTQaTMnHYLf0+L7nM+FXBpjx6bg+OcglLp0Ta7ZINS
-         p6YtbIQymKvk7xA6sK+hLTfvoHyHbj6OJY7D/k/tATfULDpSM5LGrjhtQdZgs88h1HE4
-         pW8w==
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=blLyqMGVfs0AXFge5rZvCvR55Jlo7Ci/Oo9BAO3yZv0=;
+        b=LS2dAyf37rcZFYM7ikwO9zifbPnqt4N8M4ZsoQw+qaZPpHQMM/iZnE0MTLLaavjS/p
+         KGphPKq6ivNOGsGnAl/AMNCBujp726HGWUFiQClxO2jxe7W1zE/mlag5ylf047HWsoTm
+         T1+EJbXZpkOivcgKd9HLbXQwxmuMEQams/EPgoL9XAwdSLm4MNTMMARld1gSD2VDDhJU
+         gWJFv3mSQ45D/os5sfwPjlSU7WrGenIHzl6HJ0GpZJIhFQCrZwkbeTQSx7frbiKtRbW+
+         1CWU3O3fBg28/iYt5gVbqqo8xfQwVH+WeCjD5S0VJA9zxbnCrU2QTma94fktXB/QO9k+
+         VIKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RCiFLv0kUNDa03tFrYQemsW+z+Tyz2IxoYAt9DnOKgo=;
-        b=NUJ2024R7oNPF0+WuVAJkGWwY+EgDlOPa7dNNr6Trg1X2KZDrFwYWhaDlbtI6B5GWx
-         mZUNrjqs/RxhPRRvRYEO0bIhslvrY1e5UaAtnzdsFFyETx5XXOL+K4HNJ4e/z/IkymXR
-         0gTogCaVc52H4tRdD34WYpbTbmWBbbkqwYbgIibLn6Fho5tSjVd+0hDeoDIbcuAAWnfO
-         tXe76JI16p8eN5uZ+e3Nzuc+yPGBEkSWZc7i6T9/M3JGFUEm8Imo9H84hJmioJg3SaMJ
-         UapHTTpFKar1AvQX+iFzrjNVGrGuMMJjWOdM/iMmv7YMr4q9beenaZTOvWKoAX5Q5etE
-         dzeA==
-X-Gm-Message-State: AOAM530uB2gNMZXIcM2IsQuy7ecwAVgJCCOFtek4WZHje/cT7+aHs6yH
-        nDnR2B/eHuMeyqBAZj3S1ziz
-X-Google-Smtp-Source: ABdhPJzBwOKIBG/9l+UwCTnBnGxcV3N9ZcRK/acsoyWt6GozuvwQm7E9wV96lDiNs2KsPmJKetXZqw==
-X-Received: by 2002:a63:8b4c:: with SMTP id j73mr14696480pge.81.1640596410606;
-        Mon, 27 Dec 2021 01:13:30 -0800 (PST)
-Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id t4sm16377314pfj.168.2021.12.27.01.13.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Dec 2021 01:13:29 -0800 (PST)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     bvanassche@acm.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] nbd: Don't use workqueue to handle recv work
-Date:   Mon, 27 Dec 2021 17:12:41 +0800
-Message-Id: <20211227091241.103-1-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=blLyqMGVfs0AXFge5rZvCvR55Jlo7Ci/Oo9BAO3yZv0=;
+        b=5Dgq4G7htanNGnFVmma8u4opUWjBkqFqBUcu08GWeNuxk1tp4ueSymVqGqGQJ9RdML
+         S3KX1jclrhYTLffDCXabNITddmuMDcUOU9/ycZ7Z1/hwTLdd5vhQyOxgXSjEFBqsITF9
+         1E0igjBrmrPbTpkzqduVXYRz2OGQLQYouOLcH65e7Ehvb6sfl9sySa9eBUrYKUnEwBJP
+         J8JyCp3znjsyqgmsaTvyPyHTggSChBXpOmwm6dWK4Do+wZHRHqcRo9zkaaAvA3wlFRR2
+         PukaYrvgsLQCgYWUAbXEdElIZZgqpCH9KLyD6Dl/8eV2QW34bGub1yQlIWjo9zBA0xd9
+         jNbg==
+X-Gm-Message-State: AOAM531jAsmlVU/B3T2RI7JgJRWd9ksu8uN22xa8E3YcC5d63+RgohtP
+        ccEpkUVYRkAnZTv+0WLAihh9Mo2w29Y=
+X-Google-Smtp-Source: ABdhPJyCdzlaIZDM422nqqDeSBxQwuHBA5PLmDAniPnAPJtDFJS+UdHChOtIYWdDm3/fqNU/u3/fSQ==
+X-Received: by 2002:a17:902:f543:b0:148:a2e8:2793 with SMTP id h3-20020a170902f54300b00148a2e82793mr16886367plf.154.1640597531253;
+        Mon, 27 Dec 2021 01:32:11 -0800 (PST)
+Received: from [192.168.1.100] ([166.111.139.127])
+        by smtp.gmail.com with ESMTPSA id oa9sm16238648pjb.31.2021.12.27.01.32.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Dec 2021 01:32:10 -0800 (PST)
+Subject: Re: [BUG] fs: super: possible ABBA deadlocks in
+ do_thaw_all_callback() and freeze_bdev()
+To:     Theodore Ts'o <tytso@mit.edu>, Matthew Wilcox <willy@infradead.org>
+Cc:     viro@zeniv.linux.org.uk, Jens Axboe <axboe@kernel.dk>,
+        hch@infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <e3de0d83-1170-05c8-672c-4428e781b988@gmail.com>
+ <YckgOocIWOrOoRvf@casper.infradead.org> <YclDafAwrN0TkhCi@mit.edu>
+From:   Jia-Ju Bai <baijiaju1990@gmail.com>
+Message-ID: <a9dde5cc-b919-9c82-a185-851c2eab5442@gmail.com>
+Date:   Mon, 27 Dec 2021 17:32:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <YclDafAwrN0TkhCi@mit.edu>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The rescuer thread might take over the works queued on
-the workqueue when the worker thread creation timed out.
-If this happens, we have no chance to create multiple
-recv threads which causes I/O hung on this nbd device.
 
-To fix it, we can not simply remove the WQ_MEM_RECLAIM
-flag since the recv work is in the memory reclaim path.
-So this patch tries to create kthreads directly to
-handle the recv work instead of using workqueue.
 
-Fixes: 124d6db07c3b ("nbd: use our own workqueue for recv threads")
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- drivers/block/nbd.c | 95 +++++++++++++++++++++++++++++++----------------------
- 1 file changed, 56 insertions(+), 39 deletions(-)
+On 2021/12/27 12:39, Theodore Ts'o wrote:
+> On Mon, Dec 27, 2021 at 02:08:58AM +0000, Matthew Wilcox wrote:
+>> On Mon, Dec 27, 2021 at 10:03:35AM +0800, Jia-Ju Bai wrote:
+>>> My static analysis tool reports several possible ABBA deadlocks in Linux
+>>> 5.10:
+>>>
+>>> do_thaw_all_callback()
+>>>    down_write(&sb->s_umount); --> Line 1028 (Lock A)
+>>>    emergency_thaw_bdev()
+>>>      thaw_bdev()
+>>>        mutex_lock(&bdev->bd_fsfreeze_mutex); --> Line 602 (Lock B)
+>>>
+>>> freeze_bdev()
+>>>    mutex_lock(&bdev->bd_fsfreeze_mutex); --> Line 556 (Lock B)
+>>>    freeze_super()
+>>>      down_write(&sb->s_umount); --> Line 1716 (Lock A)
+>>>      down_write(&sb->s_umount); --> Line 1738 (Lock A)
+>>>    deactivate_super()
+>>>      down_write(&s->s_umount); --> Line 365 (Lock A)
+>>>
+>>> When do_thaw_all_callback() and freeze_bdev() are concurrently executed, the
+>>> deadlocks can occur.
+>>>
+>>> I am not quite sure whether these possible deadlocks are real and how to fix
+>>> them if them are real.
+>>> Any feedback would be appreciated, thanks :)
+>> As a rule, ABBA deadlocks that can actually occur are already found by
+>> lockdep.    Tools that think they've found something are generally wrong.
+>> I'm not inclined to look in detail to find out why this tool is wrong
+>> because lockdep is so effective.
+> Well, to be fair, lockdep will only find problems if both code paths
+> are actually executed during a boot session where lockdep is active.
+>
+> In this particular case, "do_thaw_all_callback()" is called only from
+> emergency_thaw_all(), which is executed via a magic-sysrq.  (Sysrq-j).
+> In practice, this sysrq is almost never used except to work around
+> userspace bugs where a particular block device is frozen via the
+> FIFREEZE ioctl, and never thawed via the FITHAW ioctl.
+>
+> So unless we had, say, an xfstest which tried to simulate triggering
+> sysrq-j (e.g., via "echo j > /proc/sysrq-trigger"), lockdep would
+> never find it.  Of course, how likely is it that a user would try to
+> trigger sysrq-j, because the user was trying to debug a buggy program
+> that froze a block device and then, say, crashed before it had a
+> chance to thaw it?  It's probably pretty darned unlikely.
+>
+> So as to whether or not it's real, I'm sure we could probably trigger
+> the deadlock using an artificial workload if you had one process
+> constantly calling FIFREEZE and FITHAW on a block device, and other
+> process constantly triggering "echo j > /proc/sysrq-trigger".  So it
+> *technically* could happen.  Is it *likely* to happen under any kind
+> of normal workload?  Not hardly....
+>
+> This makes it fall in the category of, "patch to fix something that
+> never happens in real life, and would require root privs to trigger,
+> and root can screw over the system in enough other ways anyway so it's
+> kind of pointless", versus "let's try to shut up the static checker so
+> we can find real bugs".
+>
+> And there I'd agree with Willy; I run xfstests with lockdep enabled,
+> and given that the code coverage of xfstests is pretty good, I'm
+> confident that any ABBA deadlocks that are *likely* to happen in real
+> life tend to be found quickly, and fixed.
+>
+> If someone wanted to rewrite the emergency_thaw codepath to fix the
+> locking order, in my opinion it's *technically* a bug fix.  But it's
+> the sort of thing which gets categorized as a P2 bug, and after a
+> year, gets dropped down to P3, and a year after that, dropped down to
+> P4 and ignored, since for most engineering organizations, resources
+> are finite, and while this is a real bug, for most companies it's not
+> worth fixing.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5a1f98494ddd..e572d1dc20b4 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -63,7 +63,6 @@ struct nbd_sock {
- };
- 
- struct recv_thread_args {
--	struct work_struct work;
- 	struct nbd_device *nbd;
- 	int index;
- };
-@@ -97,6 +96,7 @@ struct nbd_config {
- 
- 	atomic_t recv_threads;
- 	wait_queue_head_t recv_wq;
-+	spinlock_t recv_lock;
- 	unsigned int blksize_bits;
- 	loff_t bytesize;
- #if IS_ENABLED(CONFIG_DEBUG_FS)
-@@ -118,7 +118,6 @@ struct nbd_device {
- 	struct nbd_config *config;
- 	struct mutex config_lock;
- 	struct gendisk *disk;
--	struct workqueue_struct *recv_workq;
- 	struct work_struct remove_work;
- 
- 	struct list_head list;
-@@ -260,7 +259,6 @@ static void nbd_dev_remove(struct nbd_device *nbd)
- 	mutex_lock(&nbd_index_mutex);
- 	idr_remove(&nbd_index_idr, nbd->index);
- 	mutex_unlock(&nbd_index_mutex);
--	destroy_workqueue(nbd->recv_workq);
- 	kfree(nbd);
- }
- 
-@@ -818,11 +816,19 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
- 	return ret ? ERR_PTR(ret) : cmd;
- }
- 
--static void recv_work(struct work_struct *work)
-+static void flush_recv_works(struct nbd_device *nbd)
- {
--	struct recv_thread_args *args = container_of(work,
--						     struct recv_thread_args,
--						     work);
-+	wait_event(nbd->config->recv_wq,
-+		   atomic_read(&nbd->config->recv_threads) == 0);
-+
-+	/* Make sure recv threads have no reference to nbd->config */
-+	spin_lock(&nbd->config->recv_lock);
-+	spin_unlock(&nbd->config->recv_lock);
-+}
-+
-+static int recv_work(void *data)
-+{
-+	struct recv_thread_args *args = (struct recv_thread_args *)data;
- 	struct nbd_device *nbd = args->nbd;
- 	struct nbd_config *config = nbd->config;
- 	struct request_queue *q = nbd->disk->queue;
-@@ -866,9 +872,14 @@ static void recv_work(struct work_struct *work)
- 	mutex_unlock(&nsock->tx_lock);
- 
- 	nbd_config_put(nbd);
-+
-+	spin_lock(&config->recv_lock);
- 	atomic_dec(&config->recv_threads);
- 	wake_up(&config->recv_wq);
-+	spin_unlock(&config->recv_lock);
- 	kfree(args);
-+
-+	return 0;
- }
- 
- static bool nbd_clear_req(struct request *req, void *data, bool reserved)
-@@ -1176,6 +1187,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- 
- 	for (i = 0; i < config->num_connections; i++) {
- 		struct nbd_sock *nsock = config->socks[i];
-+		struct task_struct *worker;
- 
- 		if (!nsock->dead)
- 			continue;
-@@ -1185,6 +1197,14 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- 			mutex_unlock(&nsock->tx_lock);
- 			continue;
- 		}
-+		worker = kthread_create(recv_work, args, "knbd%d.%d-recv",
-+					nbd->index, i);
-+		if (!worker) {
-+			sockfd_put(sock);
-+			kfree(args);
-+			return -ENOMEM;
-+		}
-+
- 		sk_set_memalloc(sock->sk);
- 		if (nbd->tag_set.timeout)
- 			sock->sk->sk_sndtimeo = nbd->tag_set.timeout;
-@@ -1194,7 +1214,6 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- 		nsock->fallback_index = -1;
- 		nsock->sock = sock;
- 		nsock->dead = false;
--		INIT_WORK(&args->work, recv_work);
- 		args->index = i;
- 		args->nbd = nbd;
- 		nsock->cookie++;
-@@ -1206,7 +1225,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- 		/* We take the tx_mutex in an error path in the recv_work, so we
- 		 * need to queue_work outside of the tx_mutex.
- 		 */
--		queue_work(nbd->recv_workq, &args->work);
-+		wake_up_process(worker);
- 
- 		atomic_inc(&config->live_connections);
- 		wake_up(&config->conn_wait);
-@@ -1359,34 +1378,42 @@ static int nbd_start_device(struct nbd_device *nbd)
- 	nbd_dev_dbg_init(nbd);
- 	for (i = 0; i < num_connections; i++) {
- 		struct recv_thread_args *args;
-+		struct task_struct *worker;
- 
- 		args = kzalloc(sizeof(*args), GFP_KERNEL);
--		if (!args) {
--			sock_shutdown(nbd);
--			/*
--			 * If num_connections is m (2 < m),
--			 * and NO.1 ~ NO.n(1 < n < m) kzallocs are successful.
--			 * But NO.(n + 1) failed. We still have n recv threads.
--			 * So, add flush_workqueue here to prevent recv threads
--			 * dropping the last config_refs and trying to destroy
--			 * the workqueue from inside the workqueue.
--			 */
--			if (i)
--				flush_workqueue(nbd->recv_workq);
--			return -ENOMEM;
-+		if (!args)
-+			goto err;
-+
-+		worker = kthread_create(recv_work, args, "knbd%d.%d-recv",
-+					nbd->index, i);
-+		if (!worker) {
-+			kfree(args);
-+			goto err;
- 		}
-+
- 		sk_set_memalloc(config->socks[i]->sock->sk);
- 		if (nbd->tag_set.timeout)
- 			config->socks[i]->sock->sk->sk_sndtimeo =
- 				nbd->tag_set.timeout;
- 		atomic_inc(&config->recv_threads);
- 		refcount_inc(&nbd->config_refs);
--		INIT_WORK(&args->work, recv_work);
- 		args->nbd = nbd;
- 		args->index = i;
--		queue_work(nbd->recv_workq, &args->work);
-+		wake_up_process(worker);
- 	}
- 	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
-+err:
-+	sock_shutdown(nbd);
-+	/*
-+	 * If num_connections is m (2 < m),
-+	 * and NO.1 ~ NO.n(1 < n < m) connections are successful.
-+	 * But NO.(n + 1) failed. We still have n recv threads.
-+	 * So, add flush_recv_works here to prevent recv threads
-+	 * dropping the last config_refs.
-+	 */
-+	flush_recv_works(nbd);
-+
-+	return -ENOMEM;
- }
- 
- static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
-@@ -1405,7 +1432,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 					 atomic_read(&config->recv_threads) == 0);
- 	if (ret)
- 		sock_shutdown(nbd);
--	flush_workqueue(nbd->recv_workq);
-+	flush_recv_works(nbd);
- 
- 	mutex_lock(&nbd->config_lock);
- 	nbd_bdev_reset(bdev);
-@@ -1525,6 +1552,7 @@ static struct nbd_config *nbd_alloc_config(void)
- 	atomic_set(&config->recv_threads, 0);
- 	init_waitqueue_head(&config->recv_wq);
- 	init_waitqueue_head(&config->conn_wait);
-+	spin_lock_init(&config->recv_lock);
- 	config->blksize_bits = NBD_DEF_BLKSIZE_BITS;
- 	atomic_set(&config->live_connections, 0);
- 	try_module_get(THIS_MODULE);
-@@ -1769,15 +1797,6 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	}
- 	nbd->disk = disk;
- 
--	nbd->recv_workq = alloc_workqueue("nbd%d-recv",
--					  WQ_MEM_RECLAIM | WQ_HIGHPRI |
--					  WQ_UNBOUND, 0, nbd->index);
--	if (!nbd->recv_workq) {
--		dev_err(disk_to_dev(nbd->disk), "Could not allocate knbd recv work queue.\n");
--		err = -ENOMEM;
--		goto out_err_disk;
--	}
--
- 	/*
- 	 * Tell the block layer that we are not a rotational device
- 	 */
-@@ -1808,7 +1827,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	disk->first_minor = index << part_shift;
- 	if (disk->first_minor < index || disk->first_minor > MINORMASK) {
- 		err = -EINVAL;
--		goto out_free_work;
-+		goto out_err_disk;
- 	}
- 
- 	disk->minors = 1 << part_shift;
-@@ -1817,7 +1836,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	sprintf(disk->disk_name, "nbd%d", index);
- 	err = add_disk(disk);
- 	if (err)
--		goto out_free_work;
-+		goto out_err_disk;
- 
- 	/*
- 	 * Now publish the device.
-@@ -1826,8 +1845,6 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
- 	nbd_total_devices++;
- 	return nbd;
- 
--out_free_work:
--	destroy_workqueue(nbd->recv_workq);
- out_err_disk:
- 	blk_cleanup_disk(disk);
- out_free_idr:
-@@ -2086,7 +2103,7 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
- 	 * Make sure recv thread has finished, we can safely call nbd_clear_que()
- 	 * to cancel the inflight I/Os.
- 	 */
--	flush_workqueue(nbd->recv_workq);
-+	flush_recv_works(nbd);
- 	nbd_clear_que(nbd);
- 	nbd->task_setup = NULL;
- 	mutex_unlock(&nbd->config_lock);
--- 
-2.11.0
+Thanks for your reply and suggestions.
+I will try to trigger this possible deadlock by enabling lockdep and 
+using the workloads that you suggested.
+In my opinion, static analysis can conveniently cover some code that is 
+hard to be covered at runtime, and thus it is useful to detecting some 
+infrequently-triggered bugs.
+However, it is true that static analysis sometimes has many false 
+positives, which is unsatisfactory :(
+I am trying some works to relieve this problem in kernel-code analysis.
+I can understand that the related code is not frequently executed, but I 
+think that finding and fixing bugs should be always useful in practice :)
 
+
+Best wishes,
+Jia-Ju Bai
