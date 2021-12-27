@@ -2,91 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A825C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 27 Dec 2021 13:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4556FC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Dec 2021 16:41:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232373AbhL0Nn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Dec 2021 08:43:29 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:53268 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229644AbhL0Nn3 (ORCPT
+        id S229832AbhL0Qlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Dec 2021 11:41:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229831AbhL0Qlr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Dec 2021 08:43:29 -0500
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 1BRDhFk8024251
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Dec 2021 08:43:16 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 9C46A15C33A3; Mon, 27 Dec 2021 08:43:15 -0500 (EST)
-Date:   Mon, 27 Dec 2021 08:43:15 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Jia-Ju Bai <baijiaju1990@gmail.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, hch@infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [BUG] fs: super: possible ABBA deadlocks in
- do_thaw_all_callback() and freeze_bdev()
-Message-ID: <YcnC85Vc95OTBJSV@mit.edu>
-References: <e3de0d83-1170-05c8-672c-4428e781b988@gmail.com>
- <YckgOocIWOrOoRvf@casper.infradead.org>
- <YclDafAwrN0TkhCi@mit.edu>
- <a9dde5cc-b919-9c82-a185-851c2eab5442@gmail.com>
+        Mon, 27 Dec 2021 11:41:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A79C06173E
+        for <linux-block@vger.kernel.org>; Mon, 27 Dec 2021 08:41:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 87CF361126
+        for <linux-block@vger.kernel.org>; Mon, 27 Dec 2021 16:41:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F53AC36AEB;
+        Mon, 27 Dec 2021 16:41:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640623306;
+        bh=WoHtcBMvvFU7VPovTMB/F8HHt+DyWm856xyUX8Ln0wA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=AIRnfL6mDeOA4tAONDJCoSC8mHOEzPxUyyVL0+qruj8sWa6lp9Rn+DN+1kBj9jJIz
+         wBO1kLM/FLY9QhQOGBlH7418g9AJETuAXIXkAEmOff+GhYj5cr3YyMBZe75EUP0bpK
+         Mm4WhcaxIIL2rt4ua/l/tYYMG/37MwiL570Ny6KJ69m/ecXKwwlIOOa00D0RLqekyU
+         IQeta4R/CDFTgV4fsGi2lnBHojPj60r003xoT9iZcpEOgzwqy1J1CX4c8L15padtfo
+         ydmSHEqsBs7amTcQINXxC/nUFMF50mxwU6H/HLjI5IN0ANQoDK7qsJ0656OEUN+Zl4
+         o8B+yoSaRi1Sg==
+From:   Keith Busch <kbusch@kernel.org>
+To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Cc:     hch@lst.de, sagi@grimberg.me, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 2/3] block: introduce rq_list_move
+Date:   Mon, 27 Dec 2021 08:41:37 -0800
+Message-Id: <20211227164138.2488066-2-kbusch@kernel.org>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20211227164138.2488066-1-kbusch@kernel.org>
+References: <20211227164138.2488066-1-kbusch@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a9dde5cc-b919-9c82-a185-851c2eab5442@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 27, 2021 at 05:32:09PM +0800, Jia-Ju Bai wrote:
-> Thanks for your reply and suggestions.
-> I will try to trigger this possible deadlock by enabling lockdep and using
-> the workloads that you suggested.
-> In my opinion, static analysis can conveniently cover some code that is hard
-> to be covered at runtime, and thus it is useful to detecting some
-> infrequently-triggered bugs.
-> However, it is true that static analysis sometimes has many false positives,
-> which is unsatisfactory :(
-> I am trying some works to relieve this problem in kernel-code analysis.
-> I can understand that the related code is not frequently executed, but I
-> think that finding and fixing bugs should be always useful in practice :)
+When iterating a list, a particular request may need to be moved for
+special handling. Provide a helper function to achieve that so drivers
+don't need to reimplement rqlist manipulation.
 
-The thing about the sysrq commands is that they are almost always used
-in emergency situations when the system administrator with physical
-access to the console sends a sysrq command (e.g., by sending a BREAK
-to the serial console).  This is usually done when the system has
-*already* locked up for some reason, such as getting livelocked due to
-an out of memory condition, or maybe even a deadlock.  So if sysrq-j
-could potentially cause a deadlock, so what?  Sysrq-j would only be
-used when the system was in a really bad state due to a bug in any
-case.  In over 10 years of kernel development, I can't remember a
-single time when I've needed to use sysrq-j.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ include/linux/blk-mq.h | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-So it might be that the better way to handle this would be to make
-sure all of the emergency sysrq code in fs/super.c is under the
-CONFIG_MAGIC_SYSRQ #ifdef --- and then do the static analysis without
-CONFIG_MAGIC_SYSRQ defined.
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 550996cf419c..0efa25abcc1c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -216,6 +216,25 @@ static inline unsigned short req_get_ioprio(struct request *req)
+ #define rq_dma_dir(rq) \
+ 	(op_is_write(req_op(rq)) ? DMA_TO_DEVICE : DMA_FROM_DEVICE)
+ 
++/**
++ * rq_list_move() - move a struct request from one list to another
++ * @src: The source list @rq is currently in
++ * @dst: The destination list that @rq will be appended to
++ * @rq: The request to move
++ * @prv: The request preceding @rq in @src (NULL if @rq is the head)
++ * @nxt: The request following @rq in @src (NULL if @rq is the tail)
++ */
++static void inline rq_list_move(struct request **src, struct request **dst,
++				struct request *rq, struct request *prv,
++				struct request *nxt)
++{
++	if (prv)
++		prv->rq_next = nxt;
++	else
++		*src = nxt;
++	rq_list_add(dst, rq);
++}
++
+ enum blk_eh_timer_return {
+ 	BLK_EH_DONE,		/* drivers has completed the command */
+ 	BLK_EH_RESET_TIMER,	/* reset timer and try again */
+-- 
+2.25.4
 
-As I said, I agree it's a bug, and if I had infinite resources, I'd
-certainly ask an engineer to completely rework the emergency sysrq-j
-code path to address the potential ABBA deadlock.  The problem is I do
-*not* have infinite resources, which means I have to prioritize which
-bugs get attention, and how much time engineers on my team spend
-working on new features or performance enhacements that can justify
-their salaries and ensure that they get good performance ratings ---
-since leadership, technical difficulty and business impact is how
-engineers get judged at my company.
-
-Unfortunately, judging business impact is one of those things that is
-unfair to expect a static analyzer to do.  And after all, if we have
-infinite resources, why should an OS bother with a VM?  We can just
-pin all process text/data segments in memory, if money (and DRAM
-availability in the supply chain) is no object.  :-)
-
-Cheers,
-
-						- Ted
