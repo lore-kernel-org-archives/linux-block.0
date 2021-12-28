@@ -2,144 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56632C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 28 Dec 2021 02:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E268C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 28 Dec 2021 05:12:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234565AbhL1Cbc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Dec 2021 21:31:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40920 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230372AbhL1Cbb (ORCPT
+        id S230369AbhL1FM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Dec 2021 00:12:58 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:56006 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229484AbhL1FM4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Dec 2021 21:31:31 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47895C06173E;
-        Mon, 27 Dec 2021 18:31:31 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id w20so26506585wra.9;
-        Mon, 27 Dec 2021 18:31:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=Wz8zeI20HalqtebnxY/VQRKKWH6al7/r6x+JqAjZOIQ=;
-        b=ltGaoEU7RlUuoNcgFbFyC0ca+4UlT0ZzN1mgLyNTk5sFT654E5beEaP0rSeaHIXdA9
-         5PXoeqSUENPjrbxIyDmIT7jwhCF56sOHLehaqCsbgAReCCpCUw0XkeHOs9sJ2MEMr6pR
-         AiodT1flUpJxQpsIsSnv4TfOyq+wgkqrIYUgTx60OZFsAIvvofJ6tZAMqqZmUKM+wC7r
-         Y4jtaEmj8KSq/OADSRE1ufT6nZ0AzBYTUAViHg+caKf8R53gOwPgk0w4Uv+JcuBllEpy
-         cpmmvMYAvUqgBd7DAz9TrlF/tTGdcJDHk5ouAI1q0tYCAFCybNUP14JreL1zFEWD5BIJ
-         8hBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Wz8zeI20HalqtebnxY/VQRKKWH6al7/r6x+JqAjZOIQ=;
-        b=UPkNfHBfcoMKg+si1puJEpTrwX8Z+yhWOISEtCNIfaQ2LKcgni0W58fXEgXaVx8hDa
-         XYY4DHN4uYLTSVX55wnXQegJc/Dph9h/egQwGoHmu4euP0KpZv5fMMZ9abDyxFqKgEVE
-         CxnBr57JNsjWaypqqcvqEeKdOPznLlwALdULGdg/y+23qxRUM4qVokWWM3mGn84Gm2Up
-         RQkG4yuo8Zhpj7mqDFa74iyIdlcgO0WEbYfN4LrUKURzQDvWcfrgmxG6b3U1dcsOeaXj
-         m3B5Xup4es4A/LPvFXiKmec8Y3gHROcF7ihE+pHpGiC8oloHOb2Bn3QqcWJn8Xg5LczR
-         32eg==
-X-Gm-Message-State: AOAM530bUZGmyUekQlT3DBydmxJqkHT2+Vow6cmOUCLDVhm5DtevwSbF
-        Qa4S2IXA8F1VvAY0KuySRMD11w9iCrw=
-X-Google-Smtp-Source: ABdhPJxOEtL3danJ29EvFL9hT/KByy7zQsSmh3yq5taCtscXFQY0ZTEiEyrT7TiLrIAt8ZrUPe/g4w==
-X-Received: by 2002:a5d:4486:: with SMTP id j6mr13857030wrq.160.1640658689674;
-        Mon, 27 Dec 2021 18:31:29 -0800 (PST)
-Received: from [10.101.0.6] ([85.203.46.195])
-        by smtp.gmail.com with ESMTPSA id h14sm12912601wmq.16.2021.12.27.18.31.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Dec 2021 18:31:29 -0800 (PST)
-Subject: Re: [BUG] fs: super: possible ABBA deadlocks in
- do_thaw_all_callback() and freeze_bdev()
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, hch@infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <e3de0d83-1170-05c8-672c-4428e781b988@gmail.com>
- <YckgOocIWOrOoRvf@casper.infradead.org> <YclDafAwrN0TkhCi@mit.edu>
- <a9dde5cc-b919-9c82-a185-851c2eab5442@gmail.com> <YcnC85Vc95OTBJSV@mit.edu>
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-Message-ID: <c6d8e729-6537-1a6a-43ff-255e8fbcec7d@gmail.com>
-Date:   Tue, 28 Dec 2021 10:31:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Tue, 28 Dec 2021 00:12:56 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 969612113D;
+        Tue, 28 Dec 2021 05:12:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1640668374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2KFwh8yhnhjlUIUNd3TLB0tvFqrNdzPEOF14AoxMgt4=;
+        b=kgwUllaeSuDMOEHeY3obDskXM61Dr5e7m3tWMmq7rfhm9JvZA00CKbDP1uPDu32hBmIGIf
+        C6zpB6Avch5qZfLtNredl80v1OxESTn5O5y1eXlcGG4CvR+XEl7+7rltaBEbiITlY6r5jv
+        Wyl0+V9VongMNkcWkyF8iY9PPXThdks=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1640668374;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2KFwh8yhnhjlUIUNd3TLB0tvFqrNdzPEOF14AoxMgt4=;
+        b=4N90ophzg+7DM3pdFuuJtAt8mCGSciycD8j+tb8XjntIsR4mfQvCpVRRQKO5Tgn4+V8KON
+        J0YXBfBuUJRuXLCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BF45F13343;
+        Tue, 28 Dec 2021 05:12:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id P9YrH9OcymHdEwAAMHmgww
+        (envelope-from <colyli@suse.de>); Tue, 28 Dec 2021 05:12:51 +0000
+Message-ID: <f713d122-07af-435f-5716-36351936695c@suse.de>
+Date:   Tue, 28 Dec 2021 13:12:48 +0800
 MIME-Version: 1.0
-In-Reply-To: <YcnC85Vc95OTBJSV@mit.edu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH v13 03/12] bcache: initialization of the buddy
 Content-Language: en-US
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, Jianpeng Ma <jianpeng.ma@intel.com>,
+        kernel test robot <lkp@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>
+References: <20211212170552.2812-1-colyli@suse.de>
+ <20211212170552.2812-4-colyli@suse.de> <20211215162005.GA1978@kadam>
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <20211215162005.GA1978@kadam>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2021/12/27 21:43, Theodore Ts'o wrote:
-> On Mon, Dec 27, 2021 at 05:32:09PM +0800, Jia-Ju Bai wrote:
->> Thanks for your reply and suggestions.
->> I will try to trigger this possible deadlock by enabling lockdep and using
->> the workloads that you suggested.
->> In my opinion, static analysis can conveniently cover some code that is hard
->> to be covered at runtime, and thus it is useful to detecting some
->> infrequently-triggered bugs.
->> However, it is true that static analysis sometimes has many false positives,
->> which is unsatisfactory :(
->> I am trying some works to relieve this problem in kernel-code analysis.
->> I can understand that the related code is not frequently executed, but I
->> think that finding and fixing bugs should be always useful in practice :)
-> The thing about the sysrq commands is that they are almost always used
-> in emergency situations when the system administrator with physical
-> access to the console sends a sysrq command (e.g., by sending a BREAK
-> to the serial console).  This is usually done when the system has
-> *already* locked up for some reason, such as getting livelocked due to
-> an out of memory condition, or maybe even a deadlock.  So if sysrq-j
-> could potentially cause a deadlock, so what?  Sysrq-j would only be
-> used when the system was in a really bad state due to a bug in any
-> case.  In over 10 years of kernel development, I can't remember a
-> single time when I've needed to use sysrq-j.
+On 12/16/21 12:20 AM, Dan Carpenter wrote:
+> On Mon, Dec 13, 2021 at 01:05:43AM +0800, Coly Li wrote:
+>> +	/*
+>> +	 * parameters of bitmap_set/clear are unsigned int.
+>> +	 * Given currently size of nvm is far from exceeding this limit,
+>> +	 * so only add a WARN_ON message.
+>> +	 */
+>> +	WARN_ON(BITS_TO_LONGS(ns->pages_total) > UINT_MAX);
+>> +	ns->pages_bitmap = kvcalloc(BITS_TO_LONGS(ns->pages_total),
+>> +				    sizeof(unsigned long), GFP_KERNEL);
+> BITS_TO_LONGS() has a potential integer overflow if we're talking about
+> truly giant numbers.  It will return zero if ns->pages_total is more
+> than U64_MAX - 64.  In that case kvcalloc() will return ZERO_SIZE_PTR.
 >
-> So it might be that the better way to handle this would be to make
-> sure all of the emergency sysrq code in fs/super.c is under the
-> CONFIG_MAGIC_SYSRQ #ifdef --- and then do the static analysis without
-> CONFIG_MAGIC_SYSRQ defined.
-
-Thanks for the explanation.
-In fact, I did not know the sysrq commands, before finding this bug and 
-seeing your explanation.
-
+> Btw, kvcalloc() will never let you allocate more than INT_MAX.  It will
+> trigger a WARN_ONCE().  If people want to allocate more than 2GB of RAM
+> then they have to plan ahead of time and use vmalloc().
 >
-> As I said, I agree it's a bug, and if I had infinite resources, I'd
-> certainly ask an engineer to completely rework the emergency sysrq-j
-> code path to address the potential ABBA deadlock.  The problem is I do
-> *not* have infinite resources, which means I have to prioritize which
-> bugs get attention, and how much time engineers on my team spend
-> working on new features or performance enhacements that can justify
-> their salaries and ensure that they get good performance ratings ---
-> since leadership, technical difficulty and business impact is how
-> engineers get judged at my company.
 
-I can understand the priority of bug fixing, with the consideration of 
-resources and time.
-My static analysis tool just provides a small message that there is a 
-possible bug :)
+Hi Dan,
 
->
-> Unfortunately, judging business impact is one of those things that is
-> unfair to expect a static analyzer to do.
+Thanks for the informative hint. I discussed with Qiaowen and Jianpeng, 
+we plan to use an extent tree to replace current bitmap to record the 
+free and allocated areas on the NVDIMM namespace. Which may have more 
+efficient memory usage and avoid such size limitation.
 
-Thanks for your understanding :)
-Before seeing your explanation, I have no idea of business impact.
-But it is indeed practical to consider business impact and resource 
-assignment in kernel development.
+Sorry for replying late, I was in travel and followed a sick for whole 
+week. Again, thank you for taking time to look into this, and please 
+continue next time :-)
 
->   And after all, if we have
-> infinite resources, why should an OS bother with a VM?  We can just
-> pin all process text/data segments in memory, if money (and DRAM
-> availability in the supply chain) is no object.  :-)
-
-Haha, interesting idea :)
-
-
-Thanks a lot,
-Jia-Ju Bai
+Coly Li
