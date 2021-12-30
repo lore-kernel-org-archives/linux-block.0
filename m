@@ -2,112 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D715CC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 30 Dec 2021 02:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6F9C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Dec 2021 03:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234842AbhL3Cec (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Dec 2021 21:34:32 -0500
-Received: from rap-us.hgst.com ([199.255.44.250]:59780 "EHLO
-        usg-ed-osssrv.wdc.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S234683AbhL3Ceb (ORCPT
+        id S235406AbhL3Dpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Dec 2021 22:45:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34871 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235449AbhL3Dpr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Dec 2021 21:34:31 -0500
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4JPXJJ6XzXz1Rwnv
-        for <linux-block@vger.kernel.org>; Wed, 29 Dec 2021 18:28:32 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1640831312; x=1643423313; bh=Kr7L88VPkC+kLwXhuVnFqsMu3F4AU4CQPbs
-        zTpzNGxM=; b=CtGXYfwCe2nVF0poLJ9LgREcsKqsQAHoHt2NBYCYfKblE7aoKNi
-        bJIivQzvgN6piZU3EBkvRmlzj1gqqRuBhY2N06cgz3RhdEzEa8DoH8NTIug6pD2C
-        PpsfOgpCEjXYCLXmwGzA3JnJzL/pCDlzKhAB3GIaFqLlK6nYS210XRGtdCqUpNaw
-        g9WFhWmraYzYw9UC50JUEhAm0JEm/T9enO/cSpmPfuLmqCoSgBNNcoEXLiOYkitk
-        U74CobODbSmBbPxoqsqTR+b4nRnHq7iXrTXIY7loDNWtmG3NWs0B6P3Slpc0I1dv
-        rsWzvUVaMnFVjiz33hXBBBkUVUvGFqdS63Q==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id eZqfShpLu26j for <linux-block@vger.kernel.org>;
-        Wed, 29 Dec 2021 18:28:32 -0800 (PST)
-Received: from [10.225.163.41] (unknown [10.225.163.41])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4JPXJG2kp0z1RtVG;
-        Wed, 29 Dec 2021 18:28:30 -0800 (PST)
-Message-ID: <c60a1750-ccbb-1f7a-12be-ac331393be80@opensource.wdc.com>
-Date:   Thu, 30 Dec 2021 11:28:28 +0900
+        Wed, 29 Dec 2021 22:45:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640835946;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ZgceoptduseXpkhN3aGAd6Y1g+mAU3eLFSwrtgQNRug=;
+        b=KlMcyGwCpjcCkNiANvESYc2S/RZ/mN/IrZFeipd39C6aZnlwfpFhRNuezDBpyDcs4Se7iw
+        NkmnjFBrKFxQwtxoD7Ak4VvB8GOnN8EPfSfY57LPqZD1UqeMIYsKtqWSF9tlbhgD+IP4Ag
+        AqlBp5FkH9aWkZXj9bdZqffFALtZgGk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-332-SnYPLp_jMmuxBlSmyrQ8bg-1; Wed, 29 Dec 2021 22:45:43 -0500
+X-MC-Unique: SnYPLp_jMmuxBlSmyrQ8bg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B05561006AA5;
+        Thu, 30 Dec 2021 03:45:41 +0000 (UTC)
+Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 55AE5E71C;
+        Thu, 30 Dec 2021 03:45:22 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        lining2020x@163.com, Tejun Heo <tj@kernel.org>,
+        Chunguang Xu <brookxu@tencent.com>
+Subject: [PATCH] block: throttle: charge io re-submission for iops limit
+Date:   Thu, 30 Dec 2021 11:45:13 +0800
+Message-Id: <20211230034513.131619-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] null_blk: Use bitmap_zalloc() when applicable
-Content-Language: en-US
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        axboe@kernel.dk, chaitanya.kulkarni@wdc.com, damien.lemoal@wdc.com,
-        ming.lei@redhat.com, Johannes.Thumshirn@wdc.com,
-        shinichiro.kawasaki@wdc.com, jiangguoqing@kylinos.cn
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <3e68598defed010efb864ea55887d88ed0da02cc.1640296433.git.christophe.jaillet@wanadoo.fr>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <3e68598defed010efb864ea55887d88ed0da02cc.1640296433.git.christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/24/21 06:55, Christophe JAILLET wrote:
-> 'nq->tag_map' is a bitmap. So use bitmap_zalloc() to simplify code and
-> improve the semantic.
-> 
-> Also change the corresponding kfree() into bitmap_free() to keep
-> consistency.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  drivers/block/null_blk/main.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 6be6ccd4a28f..9e058e0aa668 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1661,7 +1661,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
->  
->  static void cleanup_queue(struct nullb_queue *nq)
->  {
-> -	kfree(nq->tag_map);
-> +	bitmap_free(nq->tag_map);
->  	kfree(nq->cmds);
->  }
->  
-> @@ -1790,14 +1790,13 @@ static const struct block_device_operations null_rq_ops = {
->  static int setup_commands(struct nullb_queue *nq)
->  {
->  	struct nullb_cmd *cmd;
-> -	int i, tag_size;
-> +	int i;
->  
->  	nq->cmds = kcalloc(nq->queue_depth, sizeof(*cmd), GFP_KERNEL);
->  	if (!nq->cmds)
->  		return -ENOMEM;
->  
-> -	tag_size = ALIGN(nq->queue_depth, BITS_PER_LONG) / BITS_PER_LONG;
-> -	nq->tag_map = kcalloc(tag_size, sizeof(unsigned long), GFP_KERNEL);
-> +	nq->tag_map = bitmap_zalloc(nq->queue_depth, GFP_KERNEL);
->  	if (!nq->tag_map) {
->  		kfree(nq->cmds);
->  		return -ENOMEM;
+Commit 111be8839817 ("block-throttle: avoid double charge") marks bio as
+BIO_THROTTLED unconditionally if __blk_throtl_bio() is called on this bio,
+then this bio won't be called into __blk_throtl_bio() any more. This way
+is to avoid double charge in case of bio splitting. It is reasonable for
+read/write throughput limit, but not reasonable for IOPS limit because
+block layer provides io accounting against split bio.
 
-Before this patch, tag_size would always be a multiple of BITS_PER_LONG.
-Using bitmap_zalloc(), that alignment goes away, but I think this is OK.
+Chunguang Xu has already observed this issue and fixed it in commit
+4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios").
+However, that patch only covers bio splitting in __blk_queue_split(), and
+we have other kind of bio splitting, such as bio_split() & submit_bio_noacct()
+and other ways.
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+This patch tries to fix the issue in one generic way, by always charge
+the bio for iops limit in blk_throtl_bio() in case that BIO_THROTTLED
+is set. This way is reasonable: re-submission & fast-cloned bio is charged
+if it is submitted to same disk/queue, and BIO_THROTTLED will be cleared
+if bio->bi_bdev is changed.
 
+Reported-by: lining2020x@163.com
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Chunguang Xu <brookxu@tencent.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-merge.c    | 2 --
+ block/blk-throttle.c | 2 +-
+ block/blk-throttle.h | 8 +++++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 4de34a332c9f..f5255991b773 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -368,8 +368,6 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+ 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+ 		submit_bio_noacct(*bio);
+ 		*bio = split;
+-
+-		blk_throtl_charge_bio_split(*bio);
+ 	}
+ }
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 7c462c006b26..ea532c178385 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2043,7 +2043,7 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+ }
+ #endif
+ 
+-void blk_throtl_charge_bio_split(struct bio *bio)
++void blk_throtl_charge_for_iops_limit(struct bio *bio)
+ {
+ 	struct blkcg_gq *blkg = bio->bi_blkg;
+ 	struct throtl_grp *parent = blkg_to_tg(blkg);
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index 175f03abd9e4..954b9cac19b7 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -158,20 +158,22 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
+ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+ static inline void blk_throtl_exit(struct request_queue *q) { }
+ static inline void blk_throtl_register_queue(struct request_queue *q) { }
+-static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
++static inline void blk_throtl_charge_for_iops_limit(struct bio *bio) { }
+ static inline bool blk_throtl_bio(struct bio *bio) { return false; }
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ int blk_throtl_init(struct request_queue *q);
+ void blk_throtl_exit(struct request_queue *q);
+ void blk_throtl_register_queue(struct request_queue *q);
+-void blk_throtl_charge_bio_split(struct bio *bio);
++void blk_throtl_charge_for_iops_limit(struct bio *bio);
+ bool __blk_throtl_bio(struct bio *bio);
+ static inline bool blk_throtl_bio(struct bio *bio)
+ {
+ 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
+ 
+-	if (bio_flagged(bio, BIO_THROTTLED))
++	if (bio_flagged(bio, BIO_THROTTLED)) {
++		blk_throtl_charge_for_iops_limit(bio);
+ 		return false;
++	}
+ 	if (!tg->has_rules[bio_data_dir(bio)])
+ 		return false;
+ 
 -- 
-Damien Le Moal
-Western Digital Research
+2.31.1
+
