@@ -2,138 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6F9C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Dec 2021 03:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D50C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Dec 2021 04:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235406AbhL3Dpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Dec 2021 22:45:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34871 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235449AbhL3Dpr (ORCPT
+        id S235316AbhL3EBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Dec 2021 23:01:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235271AbhL3EBf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Dec 2021 22:45:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640835946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ZgceoptduseXpkhN3aGAd6Y1g+mAU3eLFSwrtgQNRug=;
-        b=KlMcyGwCpjcCkNiANvESYc2S/RZ/mN/IrZFeipd39C6aZnlwfpFhRNuezDBpyDcs4Se7iw
-        NkmnjFBrKFxQwtxoD7Ak4VvB8GOnN8EPfSfY57LPqZD1UqeMIYsKtqWSF9tlbhgD+IP4Ag
-        AqlBp5FkH9aWkZXj9bdZqffFALtZgGk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-332-SnYPLp_jMmuxBlSmyrQ8bg-1; Wed, 29 Dec 2021 22:45:43 -0500
-X-MC-Unique: SnYPLp_jMmuxBlSmyrQ8bg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B05561006AA5;
-        Thu, 30 Dec 2021 03:45:41 +0000 (UTC)
-Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 55AE5E71C;
-        Thu, 30 Dec 2021 03:45:22 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        lining2020x@163.com, Tejun Heo <tj@kernel.org>,
-        Chunguang Xu <brookxu@tencent.com>
-Subject: [PATCH] block: throttle: charge io re-submission for iops limit
-Date:   Thu, 30 Dec 2021 11:45:13 +0800
-Message-Id: <20211230034513.131619-1-ming.lei@redhat.com>
+        Wed, 29 Dec 2021 23:01:35 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AA54C061574
+        for <linux-block@vger.kernel.org>; Wed, 29 Dec 2021 20:01:35 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id y22so93379828edq.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Dec 2021 20:01:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+5onrs9lSEaHmvYpP7Y+ZzwiLXT0++XAWXsdC8ftsfM=;
+        b=eW8aWt+e/Eht2JXn+QcRsIlGQtn13L3SfDZa2aeBH8mDWXtdnt2EgOaMcRpNeTwfGM
+         yCUCa+G1GvDUVT4PVoj1pGmKAVJoo5l90f6aXco45+KpucB0PH+REvGR2xN1Sv8/Ea3R
+         qQ09TbK7wJZlfB1OZiVe3hgujFPHps6dHCuK1JGj6lwffiLoUmk76/jC8cpWrRyq5Xdq
+         wsju7O1itCrafDBBgLymyovaQhoHmuIja931eeS0Mz9431kFwhXpUefcP37ekmp5rIRy
+         7q2+7/BRfLJCseYWogIM9zKab3izoKfvSUlFTPKo4xXgdZWboqOR56J+zabEc51fXwuO
+         +YoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+5onrs9lSEaHmvYpP7Y+ZzwiLXT0++XAWXsdC8ftsfM=;
+        b=q02rfsJe43xtukCZ9ye8xmNEdVw6iABZan2Mlfwvmf13DxHAg/+0c++0fQRl7bYrgw
+         vBn0kljIk5Sr0j2yUi7W0LqbSqzWonQtlOl7DMmRZ0EFh6y+pS7MkI7FeuIYaq5EvCXk
+         7sdbAlI5R1xW1wotR/nni6zKbUOqvkNNhfbXOJ40VNbn0tsBCK0ibCummveoYtddrPYA
+         0HIxNS5WX05jYW0CHUNwoxFgnBvfDljMvgZw+6xgW/dFAF5MxJOwNgp7vD9+D/c+W7LQ
+         8VhbmMW9kD12t0Gme4H3CQaVWUowbRpnxwz3mV85IeSfyQ4LNmxhONcqK1/iS6x32VrK
+         wZfA==
+X-Gm-Message-State: AOAM532MPjLuio5ljQTK9a+IlqRiemH9p6Pxct2VttZuHd6bPaDBfT9U
+        4JggPCoD3Glg39um3kTCzNtT+hmsHNmW3SWkLHoa
+X-Google-Smtp-Source: ABdhPJwwN4Iso2fFaoeNHAASddkpjxDEcW4ydhjnGSeZ7ramQSBfNRtaYA2Ye43/a6HNM5+6L9P2K7DemHTdE1iYWZo=
+X-Received: by 2002:a17:907:1c9c:: with SMTP id nb28mr25007879ejc.452.1640836893881;
+ Wed, 29 Dec 2021 20:01:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20211227091241.103-1-xieyongji@bytedance.com> <Ycycda8w/zHWGw9c@infradead.org>
+In-Reply-To: <Ycycda8w/zHWGw9c@infradead.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 30 Dec 2021 12:01:23 +0800
+Message-ID: <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
+Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 111be8839817 ("block-throttle: avoid double charge") marks bio as
-BIO_THROTTLED unconditionally if __blk_throtl_bio() is called on this bio,
-then this bio won't be called into __blk_throtl_bio() any more. This way
-is to avoid double charge in case of bio splitting. It is reasonable for
-read/write throughput limit, but not reasonable for IOPS limit because
-block layer provides io accounting against split bio.
+On Thu, Dec 30, 2021 at 1:35 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
+> > The rescuer thread might take over the works queued on
+> > the workqueue when the worker thread creation timed out.
+> > If this happens, we have no chance to create multiple
+> > recv threads which causes I/O hung on this nbd device.
+>
+> If a workqueue is used there aren't really 'receive threads'.
+> What is the deadlock here?
 
-Chunguang Xu has already observed this issue and fixed it in commit
-4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios").
-However, that patch only covers bio splitting in __blk_queue_split(), and
-we have other kind of bio splitting, such as bio_split() & submit_bio_noacct()
-and other ways.
+We might have multiple recv works, and those recv works won't quit
+unless the socket is closed. If the rescuer thread takes over those
+works, only the first recv work can run. The I/O needed to be handled
+in other recv works would be hung since no thread can handle them.
 
-This patch tries to fix the issue in one generic way, by always charge
-the bio for iops limit in blk_throtl_bio() in case that BIO_THROTTLED
-is set. This way is reasonable: re-submission & fast-cloned bio is charged
-if it is submitted to same disk/queue, and BIO_THROTTLED will be cleared
-if bio->bi_bdev is changed.
+In that case, we can see below stacks in rescuer thread:
 
-Reported-by: lining2020x@163.com
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Chunguang Xu <brookxu@tencent.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c    | 2 --
- block/blk-throttle.c | 2 +-
- block/blk-throttle.h | 8 +++++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+__schedule
+  schedule
+    scheule_timeout
+      unix_stream_read_generic
+        unix_stream_recvmsg
+          sock_xmit
+            nbd_read_stat
+              recv_work
+                process_one_work
+                  rescuer_thread
+                    kthread
+                      ret_from_fork
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 4de34a332c9f..f5255991b773 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -368,8 +368,6 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
- 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
- 		submit_bio_noacct(*bio);
- 		*bio = split;
--
--		blk_throtl_charge_bio_split(*bio);
- 	}
- }
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 7c462c006b26..ea532c178385 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2043,7 +2043,7 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
--void blk_throtl_charge_bio_split(struct bio *bio)
-+void blk_throtl_charge_for_iops_limit(struct bio *bio)
- {
- 	struct blkcg_gq *blkg = bio->bi_blkg;
- 	struct throtl_grp *parent = blkg_to_tg(blkg);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 175f03abd9e4..954b9cac19b7 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -158,20 +158,22 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
--static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
-+static inline void blk_throtl_charge_for_iops_limit(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
- #else /* CONFIG_BLK_DEV_THROTTLING */
- int blk_throtl_init(struct request_queue *q);
- void blk_throtl_exit(struct request_queue *q);
- void blk_throtl_register_queue(struct request_queue *q);
--void blk_throtl_charge_bio_split(struct bio *bio);
-+void blk_throtl_charge_for_iops_limit(struct bio *bio);
- bool __blk_throtl_bio(struct bio *bio);
- static inline bool blk_throtl_bio(struct bio *bio)
- {
- 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
- 
--	if (bio_flagged(bio, BIO_THROTTLED))
-+	if (bio_flagged(bio, BIO_THROTTLED)) {
-+		blk_throtl_charge_for_iops_limit(bio);
- 		return false;
-+	}
- 	if (!tg->has_rules[bio_data_dir(bio)])
- 		return false;
- 
--- 
-2.31.1
-
+Thanks,
+Yongji
