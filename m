@@ -2,176 +2,361 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E39C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 31 Dec 2021 03:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B33BCC433FE
+	for <linux-block@archiver.kernel.org>; Sun,  2 Jan 2022 07:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237453AbhLaDMg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Dec 2021 22:12:36 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:30126 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242569AbhLaDMe (ORCPT
+        id S232850AbiABHEi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Jan 2022 02:04:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54685 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229520AbiABHEi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Dec 2021 22:12:34 -0500
-Received: from kwepemi500002.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JQ98l45Vyz1DKKp;
-        Fri, 31 Dec 2021 11:09:11 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500002.china.huawei.com (7.221.188.171) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 31 Dec 2021 11:12:31 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Fri, 31 Dec
- 2021 11:12:30 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <jack@suse.cz>, <tj@kernel.org>, <axboe@kernel.dk>,
-        <paolo.valente@linaro.org>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH v2 3/3] block, bfq: don't move oom_bfqq
-Date:   Fri, 31 Dec 2021 11:23:54 +0800
-Message-ID: <20211231032354.793092-4-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211231032354.793092-1-yukuai3@huawei.com>
-References: <20211231032354.793092-1-yukuai3@huawei.com>
+        Sun, 2 Jan 2022 02:04:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641107077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rNvgKa7RBKZAN1BbsQtt2iLEjXM+iSNPhCbUMTDF2yU=;
+        b=JnyZpjm4z58EM+GregvUUe07O0h0UzXqtPPH1zHa8o/3GX3/BPq8PvXi3SV3rvTMEOKWbn
+        tMxT9IpQX7qnHGqOcTUP0R626+3BdTBLV9mDLQOGexw+VseHgVlvnprgm6sjJ86xZFumtp
+        72RuSF+E49wYtZgwDVii/aayO2EdI2c=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-638-aOL61EMUMZih1Ae7YTHZDQ-1; Sun, 02 Jan 2022 02:04:36 -0500
+X-MC-Unique: aOL61EMUMZih1Ae7YTHZDQ-1
+Received: by mail-ed1-f69.google.com with SMTP id z3-20020a05640240c300b003f9154816ffso11879266edb.9
+        for <linux-block@vger.kernel.org>; Sat, 01 Jan 2022 23:04:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rNvgKa7RBKZAN1BbsQtt2iLEjXM+iSNPhCbUMTDF2yU=;
+        b=1Mvs7H9co0BFspCENSd0fp9vvyzzlJPmrMHvJltX552UeJBhuXRLRpo0s9ANq51vsf
+         PWTMxo4q64o6BWGG8q5++LaBsK9p/ydwoTQjUgHydEO25THzeDMJAd95AWi8ySjpMvm/
+         ju1A7P19L6G/kXrUBi5YA2YO4J7ce37QD5nLLzAE0j2iqaCQGsGMQlGHC3CJiYq71U+k
+         3FrhvSTWzR6qUphrl1VLOJt5ymsaOYTMLAKb5drtdhw4RZSpP8HKBlvQR/ErforHr83l
+         vExW4kqx3uxgmLY/wKaE/MMum9iQ3JSricTKNDydk7IEbBJRfe2GMww1nlDqAVbAZM8F
+         n0Dg==
+X-Gm-Message-State: AOAM5302vW1fqmDDKDkvWZ65HxvNfkBEv6En2sKoN7yjdvnMo5NTn9fc
+        SF4mIMnQ9ZP6qUlfxRGoKUBjKpNPxShsuWqKhJKRGwqE7ngOLMLEVma6cExggsR/10j2ol5X7lJ
+        UoUzEE62AdcRbQrbziGO+xC3v0QrPmn9DGDJtRZo=
+X-Received: by 2002:a17:907:8a0d:: with SMTP id sc13mr33324324ejc.498.1641107075673;
+        Sat, 01 Jan 2022 23:04:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxUIhr76bnjGItvqFPRFYIE+XdU78Fz4DGy60kqLhZt8/cvA7FCuOih75BkLEpO9m5Bs6UNO7PzGBT09Wbkddk=
+X-Received: by 2002:a17:907:8a0d:: with SMTP id sc13mr33324314ejc.498.1641107075471;
+ Sat, 01 Jan 2022 23:04:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+References: <20211210160456.56816-1-colyli@suse.de> <20211210160456.56816-3-colyli@suse.de>
+In-Reply-To: <20211210160456.56816-3-colyli@suse.de>
+From:   Xiao Ni <xni@redhat.com>
+Date:   Sun, 2 Jan 2022 15:04:24 +0800
+Message-ID: <CALTww28HF2SPrrQAaLd+H_De5F8aOemBHfU03zMVAYatb7k19Q@mail.gmail.com>
+Subject: Re: [PATCH v5 2/6] badblocks: add helper routines for badblock ranges handling
+To:     Coly Li <colyli@suse.de>
+Cc:     nvdimm@lists.linux.dev, linux-raid <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Geliang Tang <geliang.tang@suse.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.de>,
+        Vishal L Verma <vishal.l.verma@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Our test report a UAF:
+On Sat, Dec 11, 2021 at 12:05 AM Coly Li <colyli@suse.de> wrote:
+>
+> This patch adds several helper routines to improve badblock ranges
+> handling. These helper routines will be used later in the improved
+> version of badblocks_set()/badblocks_clear()/badblocks_check().
+>
+> - Helpers prev_by_hint() and prev_badblocks() are used to find the bad
+>   range from bad table which the searching range starts at or after.
+>
+> - The following helpers are to decide the relative layout between the
+>   manipulating range and existing bad block range from bad table.
+>   - can_merge_behind()
+>     Return 'true' if the manipulating range can backward merge with the
+>     bad block range.
+>   - can_merge_front()
+>     Return 'true' if the manipulating range can forward merge with the
+>     bad block range.
+>   - can_combine_front()
+>     Return 'true' if two adjacent bad block ranges before the
+>     manipulating range can be merged.
+>   - overlap_front()
+>     Return 'true' if the manipulating range exactly overlaps with the
+>     bad block range in front of its range.
+>   - overlap_behind()
+>     Return 'true' if the manipulating range exactly overlaps with the
+>     bad block range behind its range.
+>   - can_front_overwrite()
+>     Return 'true' if the manipulating range can forward overwrite the
+>     bad block range in front of its range.
+>
+> - The following helpers are to add the manipulating range into the bad
+>   block table. Different routine is called with the specific relative
+>   layout between the manipulating range and other bad block range in the
+>   bad block table.
+>   - behind_merge()
+>     Merge the manipulating range with the bad block range behind its
+>     range, and return the number of merged length in unit of sector.
+>   - front_merge()
+>     Merge the manipulating range with the bad block range in front of
+>     its range, and return the number of merged length in unit of sector.
+>   - front_combine()
+>     Combine the two adjacent bad block ranges before the manipulating
+>     range into a larger one.
+>   - front_overwrite()
+>     Overwrite partial of whole bad block range which is in front of the
+>     manipulating range. The overwrite may split existing bad block range
+>     and generate more bad block ranges into the bad block table.
+>   - insert_at()
+>     Insert the manipulating range at a specific location in the bad
+>     block table.
+>
+> All the above helpers are used in later patches to improve the bad block
+> ranges handling for badblocks_set()/badblocks_clear()/badblocks_check().
+>
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Geliang Tang <geliang.tang@suse.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: NeilBrown <neilb@suse.de>
+> Cc: Vishal L Verma <vishal.l.verma@intel.com>
+> ---
+>  block/badblocks.c | 376 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 376 insertions(+)
+>
+> diff --git a/block/badblocks.c b/block/badblocks.c
+> index d39056630d9c..30958cc4469f 100644
+> --- a/block/badblocks.c
+> +++ b/block/badblocks.c
+> @@ -16,6 +16,382 @@
+>  #include <linux/types.h>
+>  #include <linux/slab.h>
+>
+> +/*
+> + * Find the range starts at-or-before 's' from bad table. The search
+> + * starts from index 'hint' and stops at index 'hint_end' from the bad
+> + * table.
+> + */
+> +static int prev_by_hint(struct badblocks *bb, sector_t s, int hint)
+> +{
+> +       int hint_end = hint + 2;
+> +       u64 *p = bb->page;
+> +       int ret = -1;
+> +
+> +       while ((hint < hint_end) && ((hint + 1) <= bb->count) &&
+> +              (BB_OFFSET(p[hint]) <= s)) {
+> +               if ((hint + 1) == bb->count || BB_OFFSET(p[hint + 1]) > s) {
+> +                       ret = hint;
+> +                       break;
+> +               }
+> +               hint++;
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +/*
+> + * Find the range starts at-or-before bad->start. If 'hint' is provided
+> + * (hint >= 0) then search in the bad table from hint firstly. It is
+> + * very probably the wanted bad range can be found from the hint index,
+> + * then the unnecessary while-loop iteration can be avoided.
+> + */
+> +static int prev_badblocks(struct badblocks *bb, struct badblocks_context *bad,
+> +                         int hint)
+> +{
+> +       sector_t s = bad->start;
+> +       int ret = -1;
+> +       int lo, hi;
+> +       u64 *p;
+> +
+> +       if (!bb->count)
+> +               goto out;
+> +
+> +       if (hint >= 0) {
+> +               ret = prev_by_hint(bb, s, hint);
+> +               if (ret >= 0)
+> +                       goto out;
+> +       }
+> +
+> +       lo = 0;
+> +       hi = bb->count;
+> +       p = bb->page;
+> +
+> +       while (hi - lo > 1) {
+> +               int mid = (lo + hi)/2;
+> +               sector_t a = BB_OFFSET(p[mid]);
+> +
+> +               if (a <= s)
+> +                       lo = mid;
+> +               else
+> +                       hi = mid;
+> +       }
 
-[ 2073.019181] ==================================================================
-[ 2073.019188] BUG: KASAN: use-after-free in __bfq_put_async_bfqq+0xa0/0x168
-[ 2073.019191] Write of size 8 at addr ffff8000ccf64128 by task rmmod/72584
-[ 2073.019192]
-[ 2073.019196] CPU: 0 PID: 72584 Comm: rmmod Kdump: loaded Not tainted 4.19.90-yk #5
-[ 2073.019198] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
-[ 2073.019200] Call trace:
-[ 2073.019203]  dump_backtrace+0x0/0x310
-[ 2073.019206]  show_stack+0x28/0x38
-[ 2073.019210]  dump_stack+0xec/0x15c
-[ 2073.019216]  print_address_description+0x68/0x2d0
-[ 2073.019220]  kasan_report+0x238/0x2f0
-[ 2073.019224]  __asan_store8+0x88/0xb0
-[ 2073.019229]  __bfq_put_async_bfqq+0xa0/0x168
-[ 2073.019233]  bfq_put_async_queues+0xbc/0x208
-[ 2073.019236]  bfq_pd_offline+0x178/0x238
-[ 2073.019240]  blkcg_deactivate_policy+0x1f0/0x420
-[ 2073.019244]  bfq_exit_queue+0x128/0x178
-[ 2073.019249]  blk_mq_exit_sched+0x12c/0x160
-[ 2073.019252]  elevator_exit+0xc8/0xd0
-[ 2073.019256]  blk_exit_queue+0x50/0x88
-[ 2073.019259]  blk_cleanup_queue+0x228/0x3d8
-[ 2073.019267]  null_del_dev+0xfc/0x1e0 [null_blk]
-[ 2073.019274]  null_exit+0x90/0x114 [null_blk]
-[ 2073.019278]  __arm64_sys_delete_module+0x358/0x5a0
-[ 2073.019282]  el0_svc_common+0xc8/0x320
-[ 2073.019287]  el0_svc_handler+0xf8/0x160
-[ 2073.019290]  el0_svc+0x10/0x218
-[ 2073.019291]
-[ 2073.019294] Allocated by task 14163:
-[ 2073.019301]  kasan_kmalloc+0xe0/0x190
-[ 2073.019305]  kmem_cache_alloc_node_trace+0x1cc/0x418
-[ 2073.019308]  bfq_pd_alloc+0x54/0x118
-[ 2073.019313]  blkcg_activate_policy+0x250/0x460
-[ 2073.019317]  bfq_create_group_hierarchy+0x38/0x110
-[ 2073.019321]  bfq_init_queue+0x6d0/0x948
-[ 2073.019325]  blk_mq_init_sched+0x1d8/0x390
-[ 2073.019330]  elevator_switch_mq+0x88/0x170
-[ 2073.019334]  elevator_switch+0x140/0x270
-[ 2073.019338]  elv_iosched_store+0x1a4/0x2a0
-[ 2073.019342]  queue_attr_store+0x90/0xe0
-[ 2073.019348]  sysfs_kf_write+0xa8/0xe8
-[ 2073.019351]  kernfs_fop_write+0x1f8/0x378
-[ 2073.019359]  __vfs_write+0xe0/0x360
-[ 2073.019363]  vfs_write+0xf0/0x270
-[ 2073.019367]  ksys_write+0xdc/0x1b8
-[ 2073.019371]  __arm64_sys_write+0x50/0x60
-[ 2073.019375]  el0_svc_common+0xc8/0x320
-[ 2073.019380]  el0_svc_handler+0xf8/0x160
-[ 2073.019383]  el0_svc+0x10/0x218
-[ 2073.019385]
-[ 2073.019387] Freed by task 72584:
-[ 2073.019391]  __kasan_slab_free+0x120/0x228
-[ 2073.019394]  kasan_slab_free+0x10/0x18
-[ 2073.019397]  kfree+0x94/0x368
-[ 2073.019400]  bfqg_put+0x64/0xb0
-[ 2073.019404]  bfqg_and_blkg_put+0x90/0xb0
-[ 2073.019408]  bfq_put_queue+0x220/0x228
-[ 2073.019413]  __bfq_put_async_bfqq+0x98/0x168
-[ 2073.019416]  bfq_put_async_queues+0xbc/0x208
-[ 2073.019420]  bfq_pd_offline+0x178/0x238
-[ 2073.019424]  blkcg_deactivate_policy+0x1f0/0x420
-[ 2073.019429]  bfq_exit_queue+0x128/0x178
-[ 2073.019433]  blk_mq_exit_sched+0x12c/0x160
-[ 2073.019437]  elevator_exit+0xc8/0xd0
-[ 2073.019440]  blk_exit_queue+0x50/0x88
-[ 2073.019443]  blk_cleanup_queue+0x228/0x3d8
-[ 2073.019451]  null_del_dev+0xfc/0x1e0 [null_blk]
-[ 2073.019459]  null_exit+0x90/0x114 [null_blk]
-[ 2073.019462]  __arm64_sys_delete_module+0x358/0x5a0
-[ 2073.019467]  el0_svc_common+0xc8/0x320
-[ 2073.019471]  el0_svc_handler+0xf8/0x160
-[ 2073.019474]  el0_svc+0x10/0x218
-[ 2073.019475]
-[ 2073.019479] The buggy address belongs to the object at ffff8000ccf63f00
- which belongs to the cache kmalloc-1024 of size 1024
-[ 2073.019484] The buggy address is located 552 bytes inside of
- 1024-byte region [ffff8000ccf63f00, ffff8000ccf64300)
-[ 2073.019486] The buggy address belongs to the page:
-[ 2073.019492] page:ffff7e000333d800 count:1 mapcount:0 mapping:ffff8000c0003a00 index:0x0 compound_mapcount: 0
-[ 2073.020123] flags: 0x7ffff0000008100(slab|head)
-[ 2073.020403] raw: 07ffff0000008100 ffff7e0003334c08 ffff7e00001f5a08 ffff8000c0003a00
-[ 2073.020409] raw: 0000000000000000 00000000001c001c 00000001ffffffff 0000000000000000
-[ 2073.020411] page dumped because: kasan: bad access detected
-[ 2073.020412]
-[ 2073.020414] Memory state around the buggy address:
-[ 2073.020420]  ffff8000ccf64000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2073.020424]  ffff8000ccf64080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2073.020428] >ffff8000ccf64100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2073.020430]                                   ^
-[ 2073.020434]  ffff8000ccf64180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2073.020438]  ffff8000ccf64200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2073.020439] ==================================================================
+Hi Coly
 
-The same problem exist in mainline as well.
+Does it need to stop the loop when "a == s". For example, there are
+100 bad blocks.
+The new bad starts equals offset(50). In the first loop, it can find
+the result. It doesn't
+need to go on running in the loop. If it still runs the loop, only the
+hi can be handled.
+It has no meaning.
 
-This is because oom_bfqq is moved to a non-root group, thus root_group
-is freed earlier.
+> +
+> +       if (BB_OFFSET(p[lo]) <= s)
+> +               ret = lo;
+> +out:
+> +       return ret;
+> +}
+> +
+> +/*
+> + * Return 'true' if the range indicated by 'bad' can be backward merged
+> + * with the bad range (from the bad table) index by 'behind'.
+> + */
+> +static bool can_merge_behind(struct badblocks *bb, struct badblocks_context *bad,
+> +                            int behind)
+> +{
+> +       sector_t sectors = bad->len;
+> +       sector_t s = bad->start;
+> +       u64 *p = bb->page;
+> +
+> +       if ((s <= BB_OFFSET(p[behind])) &&
 
-Thus fix the problem by don't move oom_bfqq.
+In fact, it can never trigger s == BB_OFFSET here. By the design, if s
+== offset(pos), prev_badblocks
+can find it. Then front_merge/front_overwrite can handle it.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- block/bfq-cgroup.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> +           ((s + sectors) >= BB_OFFSET(p[behind])) &&
+> +           ((BB_END(p[behind]) - s) <= BB_MAX_LEN) &&
+> +           BB_ACK(p[behind]) == bad->ack)
+> +               return true;
+> +       return false;
+> +}
+> +
+> +/*
+> + * Do backward merge for range indicated by 'bad' and the bad range
+> + * (from the bad table) indexed by 'behind'. The return value is merged
+> + * sectors from bad->len.
+> + */
+> +static int behind_merge(struct badblocks *bb, struct badblocks_context *bad,
+> +                       int behind)
+> +{
+> +       sector_t sectors = bad->len;
+> +       sector_t s = bad->start;
+> +       u64 *p = bb->page;
+> +       int merged = 0;
+> +
+> +       WARN_ON(s > BB_OFFSET(p[behind]));
+> +       WARN_ON((s + sectors) < BB_OFFSET(p[behind]));
+> +
+> +       if (s < BB_OFFSET(p[behind])) {
+> +               WARN_ON((BB_LEN(p[behind]) + merged) >= BB_MAX_LEN);
+> +
+> +               merged = min_t(sector_t, sectors, BB_OFFSET(p[behind]) - s);
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 5e65b0407e85..22dd5b7229ae 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -654,6 +654,12 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	if (old_parent == bfqg)
- 		return;
- 
-+	/*
-+	 * oom_bfqq is not allowed to move, oom_bfqq will hold ref to root_group
-+	 * until elevator exit.
-+	 */
-+	if (bfqq == &bfqd->oom_bfqq)
-+		return;
- 	/*
- 	 * Get extra reference to prevent bfqq from being freed in
- 	 * next possible expire or deactivate.
--- 
-2.31.1
+sectors must be >= BB_OFFSET(p[behind] - s) here? It's behind_merge, so the end
+of bad should be >= BB_OFFSET(p[behind])
+
+If we need to check merged value. The WARN_ON should be checked after merged
+
+> +               p[behind] =  BB_MAKE(s, BB_LEN(p[behind]) + merged, bad->ack);
+> +       } else {
+> +               merged = min_t(sector_t, sectors, BB_LEN(p[behind]));
+> +       }
+
+If we don't need to consider s == offset(pos) situation, it only needs
+to consider s < offset(pos) here
+> +
+> +       WARN_ON(merged == 0);
+> +
+> +       return merged;
+> +}
+> +
+> +/*
+> + * Return 'true' if the range indicated by 'bad' can be forward
+> + * merged with the bad range (from the bad table) indexed by 'prev'.
+> + */
+> +static bool can_merge_front(struct badblocks *bb, int prev,
+> +                           struct badblocks_context *bad)
+> +{
+> +       sector_t s = bad->start;
+> +       u64 *p = bb->page;
+> +
+> +       if (BB_ACK(p[prev]) == bad->ack &&
+> +           (s < BB_END(p[prev]) ||
+> +            (s == BB_END(p[prev]) && (BB_LEN(p[prev]) < BB_MAX_LEN))))
+> +               return true;
+> +       return false;
+> +}
+> +
+> +/*
+> + * Do forward merge for range indicated by 'bad' and the bad range
+> + * (from bad table) indexed by 'prev'. The return value is sectors
+> + * merged from bad->len.
+> + */
+> +static int front_merge(struct badblocks *bb, int prev, struct badblocks_context *bad)
+> +{
+> +       sector_t sectors = bad->len;
+> +       sector_t s = bad->start;
+> +       u64 *p = bb->page;
+> +       int merged = 0;
+> +
+> +       WARN_ON(s > BB_END(p[prev]));
+> +
+> +       if (s < BB_END(p[prev])) {
+> +               merged = min_t(sector_t, sectors, BB_END(p[prev]) - s);
+> +       } else {
+> +               merged = min_t(sector_t, sectors, BB_MAX_LEN - BB_LEN(p[prev]));
+> +               if ((prev + 1) < bb->count &&
+> +                   merged > (BB_OFFSET(p[prev + 1]) - BB_END(p[prev]))) {
+> +                       merged = BB_OFFSET(p[prev + 1]) - BB_END(p[prev]);
+> +               }
+> +
+> +               p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
+> +                                 BB_LEN(p[prev]) + merged, bad->ack);
+> +       }
+> +
+> +       return merged;
+> +}
+> +
+> +/*
+> + * 'Combine' is a special case which can_merge_front() is not able to
+> + * handle: If a bad range (indexed by 'prev' from bad table) exactly
+> + * starts as bad->start, and the bad range ahead of 'prev' (indexed by
+> + * 'prev - 1' from bad table) exactly ends at where 'prev' starts, and
+> + * the sum of their lengths does not exceed BB_MAX_LEN limitation, then
+> + * these two bad range (from bad table) can be combined.
+> + *
+> + * Return 'true' if bad ranges indexed by 'prev' and 'prev - 1' from bad
+> + * table can be combined.
+> + */
+> +static bool can_combine_front(struct badblocks *bb, int prev,
+> +                             struct badblocks_context *bad)
+> +{
+> +       u64 *p = bb->page;
+> +
+> +       if ((prev > 0) &&
+> +           (BB_OFFSET(p[prev]) == bad->start) &&
+> +           (BB_END(p[prev - 1]) == BB_OFFSET(p[prev])) &&
+> +           (BB_LEN(p[prev - 1]) + BB_LEN(p[prev]) <= BB_MAX_LEN) &&
+> +           (BB_ACK(p[prev - 1]) == BB_ACK(p[prev])))
+> +               return true;
+> +       return false;
+> +}
+
+could you explain why BB_OFFSET(p[prev]) should == bad->start. If
+bad(prev-1) and
+bad(prev) are adjacent, can they be combine directly without
+considering bad->start
+
+Best Regards
+Xiao
 
