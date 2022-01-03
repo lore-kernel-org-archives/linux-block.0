@@ -2,110 +2,435 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF39C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  3 Jan 2022 16:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 146FAC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Jan 2022 16:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233708AbiACQKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Jan 2022 11:10:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231648AbiACQKw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jan 2022 11:10:52 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5AA3C061784
-        for <linux-block@vger.kernel.org>; Mon,  3 Jan 2022 08:10:51 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id 131so31733838qkk.2
-        for <linux-block@vger.kernel.org>; Mon, 03 Jan 2022 08:10:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=D1Q3J6juiePL27oWBkNOxTw2Gj9XV99OOInUYuxJbFA=;
-        b=K83wNLSqiOi8vkX/rso4uTib9WyUzG+hZKEYcqDcieuwvx8rSQoSi+KaIrxQ1OzQog
-         TDzNbj//gaIPz6hc/czb1VUjZFifljsuefa5lRfEZSS2joeL3jairu9nvrFTo7aLcA8+
-         chTKfTi35f+mA3a4VvuMf9g6B9+OXAwwU5B4BKT2GDtkgDlWySSFk97KAhhz5ZaV52YD
-         OthaIbhPUP2OpIqopyIvOlDeaGPXNXl73+sYrfKfLQ/TGkBxSKmKr/waFZQAdAX956Hr
-         Rxi/QHTYWUp1YAzfrxuuEFUez1Ljxin7TlA6P99aKoLlRTig2ys9lKYRIsgrj3BdCmun
-         NmMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=D1Q3J6juiePL27oWBkNOxTw2Gj9XV99OOInUYuxJbFA=;
-        b=IjPg26bxSk6x0oisT1x0HzBcjKtZFoT4mmaixmhXnTUnkltCniqQbQVFsNPKhmVIpQ
-         5+kpxEws2BZhufXNf7J8Zx+m24mDqCU0vGLrid/XOopIICnA5VnVRns3P++24TI4kH8y
-         YkpQ2KgJzJyJw0v46cx4ERURz+or/a87ApeQqmxMpaxVHWWyy6XTHSzqek0G0MsXKT7F
-         E01FPV4jV7bacZzwqUAooq+0blWW+qnoF4vy6s0z2kktccindlUEJKG5cjYF6JDPRRzE
-         7uueOXli0782+mu/QgsTXzdjvNQTx/HDX3eOEQANH+bdPPkznAJ8zeYHzngglfmnxvXV
-         7QIw==
-X-Gm-Message-State: AOAM5311LpBw/3nm9iLwGc1VcRQPQVH+PgfdOYdaZC5klnClbO75DpAZ
-        WjAHnjQ3XuHDfU9HsaG0eC2yxg==
-X-Google-Smtp-Source: ABdhPJyNV5rHobiq6J8ocNRs9MB2USBw2xmYNfVt1+XhSMp1T2zlbT9BAc0HnGfPjpPYBlHq18KNyg==
-X-Received: by 2002:a05:620a:85e:: with SMTP id u30mr32185499qku.765.1641226250755;
-        Mon, 03 Jan 2022 08:10:50 -0800 (PST)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id o10sm30540976qtx.33.2022.01.03.08.10.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jan 2022 08:10:50 -0800 (PST)
-Date:   Mon, 3 Jan 2022 11:10:49 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
-Message-ID: <YdMgCS1RMcb5V2RJ@localhost.localdomain>
-References: <20211227091241.103-1-xieyongji@bytedance.com>
- <Ycycda8w/zHWGw9c@infradead.org>
- <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
+        id S234293AbiACQYO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Jan 2022 11:24:14 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:59238 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231534AbiACQYO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Jan 2022 11:24:14 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 346886114A;
+        Mon,  3 Jan 2022 16:24:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B453C36AEB;
+        Mon,  3 Jan 2022 16:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1641227053;
+        bh=ZpPAlBJcc3DZqp5X0mPY52nCNgGaZNTEWY4IM4UoSLE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=rodw9dbRmhNY8eCt1HQnqyGzCtkqqhvemZ/Ddjj19bZ6ny1aPCyu/qmCYtspuXSW6
+         X7IuIW2SCZ7Bc80A0FtL8KLxlRHFEwDGWZgArW4RpQ0pMh7aSHT7c6xryO3YP5BZmB
+         7saorrapxcuvnUkHf5n60HFuZYvmcO8C2P34rGlA=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] pktcdvd: convert to use attribute groups
+Date:   Mon,  3 Jan 2022 17:24:08 +0100
+Message-Id: <20220103162408.742003-1-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11936; h=from:subject; bh=ZpPAlBJcc3DZqp5X0mPY52nCNgGaZNTEWY4IM4UoSLE=; b=owGbwMvMwCRo6H6F97bub03G02pJDImXlVUzVp87KBNm5JzrtU1vZ9TSBRxmE0wr/hte4l5ZLqsW NyulI5aFQZCJQVZMkeXLNp6j+ysOKXoZ2p6GmcPKBDKEgYtTACZy/wPDgh1yjGw6Ac4SD6q+Fp2wNs vfcj3alGHBmhmLNQr5N2z6tHHWtY4/arJmE4/rAQA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 30, 2021 at 12:01:23PM +0800, Yongji Xie wrote:
-> On Thu, Dec 30, 2021 at 1:35 AM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
-> > > The rescuer thread might take over the works queued on
-> > > the workqueue when the worker thread creation timed out.
-> > > If this happens, we have no chance to create multiple
-> > > recv threads which causes I/O hung on this nbd device.
-> >
-> > If a workqueue is used there aren't really 'receive threads'.
-> > What is the deadlock here?
-> 
-> We might have multiple recv works, and those recv works won't quit
-> unless the socket is closed. If the rescuer thread takes over those
-> works, only the first recv work can run. The I/O needed to be handled
-> in other recv works would be hung since no thread can handle them.
-> 
+There is no need to create kobject children of the pktcdvd device just
+to display a subdirectory name.  Instead, use a named attribute group
+which removes the extra kobjects and also fixes the userspace race where
+the device is created yet tools like libudev can not see the attributes
+as they think the subdirectories are some other sort of device.
 
-I'm not following this explanation.  What is the rescuer thread you're talking
-about?  If there's an error we close the socket which will error out the recvmsg
-which will make the recv workqueue close down.
+Cc: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/block/pktcdvd.c | 275 ++++++++++++++++++++--------------------
+ include/linux/pktcdvd.h |  10 --
+ 2 files changed, 134 insertions(+), 151 deletions(-)
 
-> In that case, we can see below stacks in rescuer thread:
-> 
-> __schedule
->   schedule
->     scheule_timeout
->       unix_stream_read_generic
->         unix_stream_recvmsg
->           sock_xmit
->             nbd_read_stat
->               recv_work
->                 process_one_work
->                   rescuer_thread
->                     kthread
->                       ret_from_fork
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index b53f648302c1..435e20f892f1 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -113,57 +113,10 @@ static sector_t get_zone(sector_t sector, struct pktcdvd_device *pd)
+ 	return (sector + pd->offset) & ~(sector_t)(pd->settings.size - 1);
+ }
+ 
+-/*
+- * create and register a pktcdvd kernel object.
+- */
+-static struct pktcdvd_kobj* pkt_kobj_create(struct pktcdvd_device *pd,
+-					const char* name,
+-					struct kobject* parent,
+-					struct kobj_type* ktype)
+-{
+-	struct pktcdvd_kobj *p;
+-	int error;
+-
+-	p = kzalloc(sizeof(*p), GFP_KERNEL);
+-	if (!p)
+-		return NULL;
+-	p->pd = pd;
+-	error = kobject_init_and_add(&p->kobj, ktype, parent, "%s", name);
+-	if (error) {
+-		kobject_put(&p->kobj);
+-		return NULL;
+-	}
+-	kobject_uevent(&p->kobj, KOBJ_ADD);
+-	return p;
+-}
+-/*
+- * remove a pktcdvd kernel object.
+- */
+-static void pkt_kobj_remove(struct pktcdvd_kobj *p)
+-{
+-	if (p)
+-		kobject_put(&p->kobj);
+-}
+-/*
+- * default release function for pktcdvd kernel objects.
+- */
+-static void pkt_kobj_release(struct kobject *kobj)
+-{
+-	kfree(to_pktcdvdkobj(kobj));
+-}
+-
+-
+ /**********************************************************
+- *
+  * sysfs interface for pktcdvd
+  * by (C) 2006  Thomas Maier <balagi@justmail.de>
+- *
+- **********************************************************/
+-
+-#define DEF_ATTR(_obj,_name,_mode) \
+-	static struct attribute _obj = { .name = _name, .mode = _mode }
+-
+-/**********************************************************
++ 
+   /sys/class/pktcdvd/pktcdvd[0-7]/
+                      stat/reset
+                      stat/packets_started
+@@ -176,75 +129,94 @@ static void pkt_kobj_release(struct kobject *kobj)
+                      write_queue/congestion_on
+  **********************************************************/
+ 
+-DEF_ATTR(kobj_pkt_attr_st1, "reset", 0200);
+-DEF_ATTR(kobj_pkt_attr_st2, "packets_started", 0444);
+-DEF_ATTR(kobj_pkt_attr_st3, "packets_finished", 0444);
+-DEF_ATTR(kobj_pkt_attr_st4, "kb_written", 0444);
+-DEF_ATTR(kobj_pkt_attr_st5, "kb_read", 0444);
+-DEF_ATTR(kobj_pkt_attr_st6, "kb_read_gather", 0444);
+-
+-static struct attribute *kobj_pkt_attrs_stat[] = {
+-	&kobj_pkt_attr_st1,
+-	&kobj_pkt_attr_st2,
+-	&kobj_pkt_attr_st3,
+-	&kobj_pkt_attr_st4,
+-	&kobj_pkt_attr_st5,
+-	&kobj_pkt_attr_st6,
+-	NULL
+-};
++static ssize_t packets_started_show(struct device *dev,
++				    struct device_attribute *attr, char *buf)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+ 
+-DEF_ATTR(kobj_pkt_attr_wq1, "size", 0444);
+-DEF_ATTR(kobj_pkt_attr_wq2, "congestion_off", 0644);
+-DEF_ATTR(kobj_pkt_attr_wq3, "congestion_on",  0644);
++	return sysfs_emit(buf, "%lu\n", pd->stats.pkt_started);
++}
++static DEVICE_ATTR_RO(packets_started);
+ 
+-static struct attribute *kobj_pkt_attrs_wqueue[] = {
+-	&kobj_pkt_attr_wq1,
+-	&kobj_pkt_attr_wq2,
+-	&kobj_pkt_attr_wq3,
+-	NULL
+-};
++static ssize_t packets_finished_show(struct device *dev,
++				     struct device_attribute *attr, char *buf)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+ 
+-static ssize_t kobj_pkt_show(struct kobject *kobj,
+-			struct attribute *attr, char *data)
++	return sysfs_emit(buf, "%lu\n", pd->stats.pkt_ended);
++}
++static DEVICE_ATTR_RO(packets_finished);
++
++static ssize_t kb_written_show(struct device *dev,
++			       struct device_attribute *attr, char *buf)
+ {
+-	struct pktcdvd_device *pd = to_pktcdvdkobj(kobj)->pd;
+-	int n = 0;
+-	int v;
+-	if (strcmp(attr->name, "packets_started") == 0) {
+-		n = sprintf(data, "%lu\n", pd->stats.pkt_started);
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+ 
+-	} else if (strcmp(attr->name, "packets_finished") == 0) {
+-		n = sprintf(data, "%lu\n", pd->stats.pkt_ended);
++	return sysfs_emit(buf, "%lu\n", pd->stats.secs_w >> 1);
++}
++static DEVICE_ATTR_RO(kb_written);
+ 
+-	} else if (strcmp(attr->name, "kb_written") == 0) {
+-		n = sprintf(data, "%lu\n", pd->stats.secs_w >> 1);
++static ssize_t kb_read_show(struct device *dev,
++			    struct device_attribute *attr, char *buf)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+ 
+-	} else if (strcmp(attr->name, "kb_read") == 0) {
+-		n = sprintf(data, "%lu\n", pd->stats.secs_r >> 1);
++	return sysfs_emit(buf, "%lu\n", pd->stats.secs_r >> 1);
++}
++static DEVICE_ATTR_RO(kb_read);
+ 
+-	} else if (strcmp(attr->name, "kb_read_gather") == 0) {
+-		n = sprintf(data, "%lu\n", pd->stats.secs_rg >> 1);
++static ssize_t kb_read_gather_show(struct device *dev,
++				   struct device_attribute *attr, char *buf)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+ 
+-	} else if (strcmp(attr->name, "size") == 0) {
+-		spin_lock(&pd->lock);
+-		v = pd->bio_queue_size;
+-		spin_unlock(&pd->lock);
+-		n = sprintf(data, "%d\n", v);
++	return sysfs_emit(buf, "%lu\n", pd->stats.secs_rg >> 1);
++}
++static DEVICE_ATTR_RO(kb_read_gather);
+ 
+-	} else if (strcmp(attr->name, "congestion_off") == 0) {
+-		spin_lock(&pd->lock);
+-		v = pd->write_congestion_off;
+-		spin_unlock(&pd->lock);
+-		n = sprintf(data, "%d\n", v);
++static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
++			   const char *buf, size_t len)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
+ 
+-	} else if (strcmp(attr->name, "congestion_on") == 0) {
+-		spin_lock(&pd->lock);
+-		v = pd->write_congestion_on;
+-		spin_unlock(&pd->lock);
+-		n = sprintf(data, "%d\n", v);
++	if (len > 0) {
++		pd->stats.pkt_started = 0;
++		pd->stats.pkt_ended = 0;
++		pd->stats.secs_w = 0;
++		pd->stats.secs_rg = 0;
++		pd->stats.secs_r = 0;
+ 	}
++	return len;
++}
++static DEVICE_ATTR_WO(reset);
++
++static struct attribute *pkt_stat_attrs[] = {
++	&dev_attr_packets_finished.attr,
++	&dev_attr_packets_started.attr,
++	&dev_attr_kb_read.attr,
++	&dev_attr_kb_written.attr,
++	&dev_attr_kb_read_gather.attr,
++	&dev_attr_reset.attr,
++	NULL,
++};
++
++static const struct attribute_group pkt_stat_group = {
++	.name = "stat",
++	.attrs = pkt_stat_attrs,
++};
++
++static ssize_t size_show(struct device *dev,
++			 struct device_attribute *attr, char *buf)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
++	int n;
++
++	spin_lock(&pd->lock);
++	n = sysfs_emit(buf, "%d\n", pd->bio_queue_size);
++	spin_unlock(&pd->lock);
+ 	return n;
+ }
++static DEVICE_ATTR_RO(size);
+ 
+ static void init_write_congestion_marks(int* lo, int* hi)
+ {
+@@ -263,30 +235,56 @@ static void init_write_congestion_marks(int* lo, int* hi)
+ 	}
+ }
+ 
+-static ssize_t kobj_pkt_store(struct kobject *kobj,
+-			struct attribute *attr,
+-			const char *data, size_t len)
++static ssize_t congestion_off_show(struct device *dev,
++				   struct device_attribute *attr, char *buf)
+ {
+-	struct pktcdvd_device *pd = to_pktcdvdkobj(kobj)->pd;
+-	int val;
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
++	int n;
+ 
+-	if (strcmp(attr->name, "reset") == 0 && len > 0) {
+-		pd->stats.pkt_started = 0;
+-		pd->stats.pkt_ended = 0;
+-		pd->stats.secs_w = 0;
+-		pd->stats.secs_rg = 0;
+-		pd->stats.secs_r = 0;
++	spin_lock(&pd->lock);
++	n = sysfs_emit(buf, "%d\n", pd->write_congestion_off);
++	spin_unlock(&pd->lock);
++	return n;
++}
++
++static ssize_t congestion_off_store(struct device *dev,
++				    struct device_attribute *attr,
++				    const char *buf, size_t len)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
++	int val;
+ 
+-	} else if (strcmp(attr->name, "congestion_off") == 0
+-		   && sscanf(data, "%d", &val) == 1) {
++	if (sscanf(buf, "%d", &val) == 1) {
+ 		spin_lock(&pd->lock);
+ 		pd->write_congestion_off = val;
+ 		init_write_congestion_marks(&pd->write_congestion_off,
+ 					&pd->write_congestion_on);
+ 		spin_unlock(&pd->lock);
++	}
++	return len;
++}
++static DEVICE_ATTR_RW(congestion_off);
++
++static ssize_t congestion_on_show(struct device *dev,
++				  struct device_attribute *attr, char *buf)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
++	int n;
+ 
+-	} else if (strcmp(attr->name, "congestion_on") == 0
+-		   && sscanf(data, "%d", &val) == 1) {
++	spin_lock(&pd->lock);
++	n = sysfs_emit(buf, "%d\n", pd->write_congestion_on);
++	spin_unlock(&pd->lock);
++	return n;
++}
++
++static ssize_t congestion_on_store(struct device *dev,
++				   struct device_attribute *attr,
++				   const char *buf, size_t len)
++{
++	struct pktcdvd_device *pd = dev_get_drvdata(dev);
++	int val;
++
++	if (sscanf(buf, "%d", &val) == 1) {
+ 		spin_lock(&pd->lock);
+ 		pd->write_congestion_on = val;
+ 		init_write_congestion_marks(&pd->write_congestion_off,
+@@ -295,44 +293,39 @@ static ssize_t kobj_pkt_store(struct kobject *kobj,
+ 	}
+ 	return len;
+ }
++static DEVICE_ATTR_RW(congestion_on);
+ 
+-static const struct sysfs_ops kobj_pkt_ops = {
+-	.show = kobj_pkt_show,
+-	.store = kobj_pkt_store
++static struct attribute *pkt_wq_attrs[] = {
++	&dev_attr_congestion_on.attr,
++	&dev_attr_congestion_off.attr,
++	&dev_attr_size.attr,
++	NULL,
+ };
+-static struct kobj_type kobj_pkt_type_stat = {
+-	.release = pkt_kobj_release,
+-	.sysfs_ops = &kobj_pkt_ops,
+-	.default_attrs = kobj_pkt_attrs_stat
++
++static const struct attribute_group pkt_wq_group = {
++	.name = "write_queue",
++	.attrs = pkt_wq_attrs,
+ };
+-static struct kobj_type kobj_pkt_type_wqueue = {
+-	.release = pkt_kobj_release,
+-	.sysfs_ops = &kobj_pkt_ops,
+-	.default_attrs = kobj_pkt_attrs_wqueue
++
++static const struct attribute_group *pkt_groups[] = {
++	&pkt_stat_group,
++	&pkt_wq_group,
++	NULL,
+ };
+ 
+ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
+ {
+ 	if (class_pktcdvd) {
+-		pd->dev = device_create(class_pktcdvd, NULL, MKDEV(0, 0), NULL,
+-					"%s", pd->name);
++		pd->dev = device_create_with_groups(class_pktcdvd, NULL,
++						    MKDEV(0, 0), pd, pkt_groups,
++						    "%s", pd->name);
+ 		if (IS_ERR(pd->dev))
+ 			pd->dev = NULL;
+ 	}
+-	if (pd->dev) {
+-		pd->kobj_stat = pkt_kobj_create(pd, "stat",
+-					&pd->dev->kobj,
+-					&kobj_pkt_type_stat);
+-		pd->kobj_wqueue = pkt_kobj_create(pd, "write_queue",
+-					&pd->dev->kobj,
+-					&kobj_pkt_type_wqueue);
+-	}
+ }
+ 
+ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
+ {
+-	pkt_kobj_remove(pd->kobj_stat);
+-	pkt_kobj_remove(pd->kobj_wqueue);
+ 	if (class_pktcdvd)
+ 		device_unregister(pd->dev);
+ }
+diff --git a/include/linux/pktcdvd.h b/include/linux/pktcdvd.h
+index 174601554b06..fc2ed629be72 100644
+--- a/include/linux/pktcdvd.h
++++ b/include/linux/pktcdvd.h
+@@ -152,14 +152,6 @@ struct packet_stacked_data
+ };
+ #define PSD_POOL_SIZE		64
+ 
+-struct pktcdvd_kobj
+-{
+-	struct kobject		kobj;
+-	struct pktcdvd_device	*pd;
+-};
+-#define to_pktcdvdkobj(_k) \
+-  ((struct pktcdvd_kobj*)container_of(_k,struct pktcdvd_kobj,kobj))
+-
+ struct pktcdvd_device
+ {
+ 	struct block_device	*bdev;		/* dev attached */
+@@ -195,8 +187,6 @@ struct pktcdvd_device
+ 	int			write_congestion_on;
+ 
+ 	struct device		*dev;		/* sysfs pktcdvd[0-7] dev */
+-	struct pktcdvd_kobj	*kobj_stat;	/* sysfs pktcdvd[0-7]/stat/     */
+-	struct pktcdvd_kobj	*kobj_wqueue;	/* sysfs pktcdvd[0-7]/write_queue/ */
+ 
+ 	struct dentry		*dfs_d_root;	/* debugfs: devname directory */
+ 	struct dentry		*dfs_f_info;	/* debugfs: info file */
+-- 
+2.34.1
 
-This is just the thing hanging waiting for an incoming request, so this doesn't
-tell me anything.  Thanks,
-
-Josef
