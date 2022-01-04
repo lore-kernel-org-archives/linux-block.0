@@ -2,282 +2,298 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFBFC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 08:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B58BC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 10:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbiADI62 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jan 2022 03:58:28 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:29322 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbiADI62 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jan 2022 03:58:28 -0500
-Received: from dggeme706-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JSmjD3bZHzbjpZ;
-        Tue,  4 Jan 2022 16:57:52 +0800 (CST)
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme706-chm.china.huawei.com (10.1.199.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.20; Tue, 4 Jan 2022 16:58:25 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.2308.020;
- Tue, 4 Jan 2022 16:58:25 +0800
-From:   "zhangwensheng (E)" <zhangwensheng5@huawei.com>
-To:     Paolo Valente <paolo.valente@linaro.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIIC1uZXh0IHYzXSBiZnE6IGZpeCB1c2UtYWZ0ZXItZnJl?=
- =?gb2312?B?ZSBpbiBiZnFfZGlzcGF0Y2hfcmVxdWVzdA==?=
-Thread-Topic: [PATCH -next v3] bfq: fix use-after-free in bfq_dispatch_request
-Thread-Index: AQHX8pnSNnUYyqRnlESsN7jEp4m3R6w6palQgAS4csCAE08QwA==
-Date:   Tue, 4 Jan 2022 08:58:25 +0000
-Message-ID: <6a7f4813cbd14353930974960d5a719d@huawei.com>
-References: <20211216122157.672159-1-zhangwensheng5@huawei.com>
- <42FD69CD-16CF-447D-AA69-621EE97CE3DC@linaro.org>  
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.176.103]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        id S231390AbiADK0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jan 2022 05:26:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229604AbiADK0Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jan 2022 05:26:16 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040D0C061761;
+        Tue,  4 Jan 2022 02:26:16 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id e202so63984379ybf.4;
+        Tue, 04 Jan 2022 02:26:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=+9T/07leZYL+u6jeCf+ODELS7jGXLy0BCeiUyoOyR1c=;
+        b=cT0GAxJrjzD92ynzS4sf/JBBRHe2rAL6bQZSUTOwCUslvJ/pQXBHoEk1RpirF17P8h
+         CkI4sTAWwe3/IPXum4b58EiAZVBORC88BReAh9Wv+GHZYYt/tzau+FstS03mt4Aa9bhz
+         eicoWjMGD5noFGW6PgPvo7US97ZISsyGYbWU3IbkuV7vuD7SW/tDDTqPQPyJULD9p0QJ
+         y9tVkiYXpBjSvSYRT8LiBBHDS3mITrkh1L5TaFTdo/rc9jMPXuE7gq4Th/j99Ss8aIAx
+         1JnSN/NV07Ur1lXKL/gINlJhgpily5DLFifFhhcN2S9VbJaYKXLMckD7Mqo1ZLrdSXnG
+         qkEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=+9T/07leZYL+u6jeCf+ODELS7jGXLy0BCeiUyoOyR1c=;
+        b=Zic7GMsZRpS2dYfNakRTG5DOeQ7xGxtNjlTlexSlnBECmvLcG2tKAjZxI6ycEcPx3P
+         WVcglsieDkdY+Evsz48QO6cj1z1uTqAelqlrY4wxcxL85XH/KxmyHgNdS/XrVuIHf7LK
+         9QBJ+Yr4+sKme26bjoiKSp5EpFxdytuMMdJPteu2VC8pyssDrU1OJrVBIcLkqKnqKA/U
+         cv95KMQu9HywwpxeIjPruuluHr2t8TuHHEPfWtEEMR+o1aUgNN9yY1EuVtMwsN18rNZu
+         tuj0z/2f7p6uIYG9BLMb9wOX/DtaNzU0YPRCQKkRaSFOokwL9bl2rU7TnZLKGlG830dT
+         aJYA==
+X-Gm-Message-State: AOAM530aK8fagYPHVDabFav8XLEwiqPyDoI/nQU9uc79vsxLT9Cwm6OA
+        1i3y+MfivN1M+FWYs5jT8v9FDkRrml+pHNcj0/k=
+X-Google-Smtp-Source: ABdhPJzJWVZsFcDUbxHMqKQdXnh4Xx3kfG4A23r/I8INgKKCTE4phhTXKO9KlZ5iltZVrJ+vxPspLIzKzI4bBCmqdQo=
+X-Received: by 2002:a25:b293:: with SMTP id k19mr55021388ybj.627.1641291975222;
+ Tue, 04 Jan 2022 02:26:15 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+From:   kvartet <xyru1999@gmail.com>
+Date:   Tue, 4 Jan 2022 18:26:04 +0800
+Message-ID: <CAFkrUshANwa2iLNdjZypUUam7-tarKNp-EAhJMDbJciHKCXe7Q@mail.gmail.com>
+Subject: INFO: task hung in blk_mq_get_tag
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Cc:     sunhao.th@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-UGluZy4uLg0KDQotLS0tLdPKvP7Urbz+LS0tLS0NCreivP7Iyzogemhhbmd3ZW5zaGVuZyAoRSkg
-DQq3osvNyrG85DogMjAyMcTqMTLUwjIzyNUgMTA6MDYNCsrVvP7IyzogJ1Bhb2xvIFZhbGVudGUn
-IDxwYW9sby52YWxlbnRlQGxpbmFyby5vcmc+DQqzrcvNOiAnSmVucyBBeGJvZScgPGF4Ym9lQGtl
-cm5lbC5kaz47ICdsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmcnIDxsaW51eC1ibG9ja0B2Z2Vy
-Lmtlcm5lbC5vcmc+OyAnbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZycgPGxpbnV4LWtlcm5l
-bEB2Z2VyLmtlcm5lbC5vcmc+DQrW98ziOiC08Li0OiBbUEFUQ0ggLW5leHQgdjNdIGJmcTogZml4
-IHVzZS1hZnRlci1mcmVlIGluIGJmcV9kaXNwYXRjaF9yZXF1ZXN0DQoNCnBpbmcuLi4NCg0KLS0t
-LS3Tyrz+1K28/i0tLS0tDQq3orz+yMs6IHpoYW5nd2Vuc2hlbmcgKEUpDQq3osvNyrG85DogMjAy
-McTqMTLUwjIwyNUgMTA6MzUNCsrVvP7IyzogJ1Bhb2xvIFZhbGVudGUnIDxwYW9sby52YWxlbnRl
-QGxpbmFyby5vcmc+DQqzrcvNOiBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+OyBsaW51eC1i
-bG9ja0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNCtb3zOI6
-ILTwuLQ6IFtQQVRDSCAtbmV4dCB2M10gYmZxOiBmaXggdXNlLWFmdGVyLWZyZWUgaW4gYmZxX2Rp
-c3BhdGNoX3JlcXVlc3QNCg0KSGkgcGFvbG+jug0KCVRoYW5rcyBmb3IgeW91ciBxdWVzdGlvbiwg
-aXQgaXMgbXkgbmVnbGlnZW5jZS4NCglJIGhhdmUgdHdvIGlkZWFzIGZvciByZXBhaXJpbmcgdGhl
-IHByb2JsZW06DQoNCjEuIHVzZSByZWYrKyB0byBhdm9pZCB0aGUgaW5fc2Vydl9xdWV1ZSBiZWlu
-ZyByZWxlYXNlZC4gUGF0Y2ggYXMgZm9sbG93Og0KDQpibG9jay9iZnEtaW9zY2hlZC5jIHwgNSAr
-KysrKw0KIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKykNCg0KZGlmZiAtLWdpdCBhL2Js
-b2NrL2JmcS1pb3NjaGVkLmMgYi9ibG9jay9iZnEtaW9zY2hlZC5jIGluZGV4IGZlYzE4MTE4ZGMz
-MC4uNzBiZDI4MDE3MGY5IDEwMDY0NA0KLS0tIGEvYmxvY2svYmZxLWlvc2NoZWQuYw0KKysrIGIv
-YmxvY2svYmZxLWlvc2NoZWQuYw0KQEAgLTUwNjYsNiArNTA2Niw3IEBAIHN0YXRpYyBzdHJ1Y3Qg
-cmVxdWVzdCAqYmZxX2Rpc3BhdGNoX3JlcXVlc3Qoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgp
-DQogICAgICAgIHNwaW5fbG9ja19pcnEoJmJmcWQtPmxvY2spOw0KDQogICAgICAgIGluX3NlcnZf
-cXVldWUgPSBiZnFkLT5pbl9zZXJ2aWNlX3F1ZXVlOw0KKyAgICAgICBpbl9zZXJ2X3F1ZXVlLT5y
-ZWYrKzsgLyogYXZpb2QgaW5fc2Vydl9xdWV1ZSByZWxlYXNlICovDQogICAgICAgIHdhaXRpbmdf
-cnEgPSBpbl9zZXJ2X3F1ZXVlICYmIGJmcV9iZnFxX3dhaXRfcmVxdWVzdChpbl9zZXJ2X3F1ZXVl
-KTsNCg0KICAgICAgICBycSA9IF9fYmZxX2Rpc3BhdGNoX3JlcXVlc3QoaGN0eCk7IEBAIC01MDc3
-LDYgKzUwNzgsMTAgQEAgc3RhdGljIHN0cnVjdCByZXF1ZXN0ICpiZnFfZGlzcGF0Y2hfcmVxdWVz
-dChzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCkNCg0KICAgICAgICBiZnFfdXBkYXRlX2Rpc3Bh
-dGNoX3N0YXRzKGhjdHgtPnF1ZXVlLCBycSwgaW5fc2Vydl9xdWV1ZSwNCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBpZGxlX3RpbWVyX2Rpc2FibGVkKTsNCisgICAgICAgLyogcmVz
-dW1lIGluX3NlcnZfcXVldWUgKi8NCisgICAgICAgc3Bpbl9sb2NrX2lycSgmYmZxZC0+bG9jayk7
-DQorICAgICAgIGJmcV9wdXRfcXVldWUoaW5fc2Vydl9xdWV1ZSk7DQorICAgICAgIHNwaW5fdW5s
-b2NrX2lycSgmYmZxZC0+bG9jayk7DQoNCiAgICAgICAgcmV0dXJuIHJxOw0KIH0NCg0KMi4gYWRk
-IG5ldyBjaGFuZ2VzIHRvIHByZXZpb3VzLCB0YWtpbmcgb3V0IGJmcXFfZ3JvdXAoaW5fc2Vydl9x
-dWV1ZSkgZnJvbSBiZnFfdXBkYXRlX2Rpc3BhdGNoX3N0YXRzLiBQYXRjaCBhcyBmb2xsb3c6DQoN
-CmRpZmYgLS1naXQgYS9ibG9jay9iZnEtaW9zY2hlZC5jIGIvYmxvY2svYmZxLWlvc2NoZWQuYw0K
-LS0tIGEvYmxvY2svYmZxLWlvc2NoZWQuYw0KKysrIGIvYmxvY2svYmZxLWlvc2NoZWQuYw0KQEAg
-LTUwMDcsNyArNTAwNyw3IEBAIHN0YXRpYyBzdHJ1Y3QgcmVxdWVzdCAqX19iZnFfZGlzcGF0Y2hf
-cmVxdWVzdChzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCkgICNpZmRlZiBDT05GSUdfQkZRX0NH
-Uk9VUF9ERUJVRyAgc3RhdGljIHZvaWQgYmZxX3VwZGF0ZV9kaXNwYXRjaF9zdGF0cyhzdHJ1Y3Qg
-cmVxdWVzdF9xdWV1ZSAqcSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-c3RydWN0IHJlcXVlc3QgKnJxLA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBzdHJ1Y3QgYmZxX3F1ZXVlICppbl9zZXJ2X3F1ZXVlLA0KKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBzdHJ1Y3QgYmZxX2dyb3VwICpiZnFnX2luX3NlcnYsDQogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgaWRsZV90aW1lcl9kaXNhYmxlZCkg
-IHsNCiAgICAgICAgc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSA9IHJxID8gUlFfQkZRUShycSkgOiBO
-VUxMOyBAQCAtNTAzOSw3ICs1MDM5LDcgQEAgc3RhdGljIHZvaWQgYmZxX3VwZGF0ZV9kaXNwYXRj
-aF9zdGF0cyhzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwNCiAgICAgICAgICAgICAgICAgKiB0aGVy
-ZWZvcmUgZ3VhcmFudGVlZCB0byBleGlzdCBiZWNhdXNlIG9mIHRoZSBhYm92ZQ0KICAgICAgICAg
-ICAgICAgICAqIGFyZ3VtZW50cy4NCiAgICAgICAgICAgICAgICAgKi8NCi0gICAgICAgICAgICAg
-ICBiZnFnX3N0YXRzX3VwZGF0ZV9pZGxlX3RpbWUoYmZxcV9ncm91cChpbl9zZXJ2X3F1ZXVlKSk7
-DQorICAgICAgICAgICAgICAgYmZxZ19zdGF0c191cGRhdGVfaWRsZV90aW1lKGJmcWdfaW5fc2Vy
-dik7DQogICAgICAgIGlmIChiZnFxKSB7DQogICAgICAgICAgICAgICAgc3RydWN0IGJmcV9ncm91
-cCAqYmZxZyA9IGJmcXFfZ3JvdXAoYmZxcSk7DQogDQpAQCAtNTA1Miw3ICs1MDUyLDcgQEAgc3Rh
-dGljIHZvaWQgYmZxX3VwZGF0ZV9kaXNwYXRjaF9zdGF0cyhzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAq
-cSwgICNlbHNlICBzdGF0aWMgaW5saW5lIHZvaWQgYmZxX3VwZGF0ZV9kaXNwYXRjaF9zdGF0cyhz
-dHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHN0cnVjdCByZXF1ZXN0ICpycSwNCi0gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBiZnFfcXVldWUgKmluX3NlcnZfcXVldWUsDQor
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgYmZxX2dy
-b3VwIA0KKyAqYmZxZ19pbl9zZXJ2LA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgYm9vbCBpZGxlX3RpbWVyX2Rpc2FibGVkKSB7fSAgI2VuZGlmIC8qIENPTkZJ
-R19CRlFfQ0dST1VQX0RFQlVHICovDQogDQpAQCAtNTA2MiwyMCArNTA2MiwyMyBAQCBzdGF0aWMg
-c3RydWN0IHJlcXVlc3QgKmJmcV9kaXNwYXRjaF9yZXF1ZXN0KHN0cnVjdCBibGtfbXFfaHdfY3R4
-ICpoY3R4KQ0KICAgICAgICBzdHJ1Y3QgcmVxdWVzdCAqcnE7DQogICAgICAgIHN0cnVjdCBiZnFf
-cXVldWUgKmluX3NlcnZfcXVldWU7DQogICAgICAgIGJvb2wgd2FpdGluZ19ycSwgaWRsZV90aW1l
-cl9kaXNhYmxlZDsNCisgICAgICAgc3RydWN0IGJmcV9ncm91cCAqYmZxZ19pbl9zZXJ2Ow0KIA0K
-ICAgICAgICBzcGluX2xvY2tfaXJxKCZiZnFkLT5sb2NrKTsNCiANCiAgICAgICAgaW5fc2Vydl9x
-dWV1ZSA9IGJmcWQtPmluX3NlcnZpY2VfcXVldWU7DQogICAgICAgIHdhaXRpbmdfcnEgPSBpbl9z
-ZXJ2X3F1ZXVlICYmIGJmcV9iZnFxX3dhaXRfcmVxdWVzdChpbl9zZXJ2X3F1ZXVlKTsNCisgICAg
-ICAgYmZxZ19pbl9zZXJ2ID0gYmZxcV9ncm91cChpbl9zZXJ2X3F1ZXVlKTsNCiANCiAgICAgICAg
-cnEgPSBfX2JmcV9kaXNwYXRjaF9yZXF1ZXN0KGhjdHgpOw0KIA0KLSAgICAgICBpZGxlX3RpbWVy
-X2Rpc2FibGVkID0NCi0gICAgICAgICAgICAgICB3YWl0aW5nX3JxICYmICFiZnFfYmZxcV93YWl0
-X3JlcXVlc3QoaW5fc2Vydl9xdWV1ZSk7DQotDQorICAgICAgIGlmIChpbl9zZXJ2X3F1ZXVlID09
-IGJmcWQtPmluX3NlcnZpY2VfcXVldWUpIHsNCisgICAgICAgICAgICAgICBpZGxlX3RpbWVyX2Rp
-c2FibGVkID0NCisgICAgICAgICAgICAgICAgICAgICAgIHdhaXRpbmdfcnEgJiYgIWJmcV9iZnFx
-X3dhaXRfcmVxdWVzdChpbl9zZXJ2X3F1ZXVlKTsNCisgICAgICAgfQ0KICAgICAgICBzcGluX3Vu
-bG9ja19pcnEoJmJmcWQtPmxvY2spOw0KIA0KLSAgICAgICBiZnFfdXBkYXRlX2Rpc3BhdGNoX3N0
-YXRzKGhjdHgtPnF1ZXVlLCBycSwgaW5fc2Vydl9xdWV1ZSwNCisgICAgICAgYmZxX3VwZGF0ZV9k
-aXNwYXRjaF9zdGF0cyhoY3R4LT5xdWV1ZSwgcnEsIGJmcWdfaW5fc2VydiwNCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBpZGxlX3RpbWVyX2Rpc2FibGVkKTsNCiANCiAgICAgICAg
-cmV0dXJuIHJxOw0KDQoJd2hhdCBkbyB5b3UgdGhpbms/DQoJDQoJVGhhbmtzDQoJWmhhbmcgV2Vu
-c2hlbmcNCi0tLS0t08q8/tStvP4tLS0tLQ0Kt6K8/sjLOiBQYW9sbyBWYWxlbnRlIFttYWlsdG86
-cGFvbG8udmFsZW50ZUBsaW5hcm8ub3JnXQ0Kt6LLzcqxvOQ6IDIwMjHE6jEy1MIxN8jVIDA6MjgN
-CsrVvP7Iyzogemhhbmd3ZW5zaGVuZyAoRSkgPHpoYW5nd2Vuc2hlbmc1QGh1YXdlaS5jb20+DQqz
-rcvNOiBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+OyBsaW51eC1ibG9ja0B2Z2VyLmtlcm5l
-bC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNCtb3zOI6IFJlOiBbUEFUQ0ggLW5l
-eHQgdjNdIGJmcTogZml4IHVzZS1hZnRlci1mcmVlIGluIGJmcV9kaXNwYXRjaF9yZXF1ZXN0DQoN
-Cg0KDQo+IElsIGdpb3JubyAxNiBkaWMgMjAyMSwgYWxsZSBvcmUgMTM6MjEsIFpoYW5nIFdlbnNo
-ZW5nIDx6aGFuZ3dlbnNoZW5nNUBodWF3ZWkuY29tPiBoYSBzY3JpdHRvOg0KPiANCj4gS0FTQU4g
-cmVwb3J0cyBhIHVzZS1hZnRlci1mcmVlIHJlcG9ydCB3aGVuIGRvaW5nIG5vcm1hbCBzY3NpLW1x
-IHRlc3QNCj4gDQo+IFs2OTgzMi4yMzkwMzJdDQo+ID09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiBbNjk4MzIuMjQxODEw
-XSBCVUc6IEtBU0FOOiB1c2UtYWZ0ZXItZnJlZSBpbg0KPiBiZnFfZGlzcGF0Y2hfcmVxdWVzdCsw
-eDEwNDUvMHg0NGIwDQo+IFs2OTgzMi4yNDMyNjddIFJlYWQgb2Ygc2l6ZSA4IGF0IGFkZHIgZmZm
-Zjg4ODAyNjIyYmE4OCBieSB0YXNrDQo+IGt3b3JrZXIvMzoxSC8xNTUgWzY5ODMyLjI0NDY1Nl0g
-WzY5ODMyLjI0NTAwN10gQ1BVOiAzIFBJRDogMTU1IENvbW06IA0KPiBrd29ya2VyLzM6MUggTm90
-IHRhaW50ZWQgNS4xMC4wLTEwMjk1LWc1NzZjNjM4MjUyOWUgIzggWzY5ODMyLjI0NjYyNl0gDQo+
-IEhhcmR3YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBC
-SU9TIA0KPiByZWwtMS4xNC4wLTAtZzE1NTgyMWExOTkwYi1wcmVidWlsdC5xZW11Lm9yZyAwNC8w
-MS8yMDE0IFs2OTgzMi4yNDkwNjldDQo+IFdvcmtxdWV1ZToga2Jsb2NrZCBibGtfbXFfcnVuX3dv
-cmtfZm4gWzY5ODMyLjI1MDAyMl0gQ2FsbCBUcmFjZToNCj4gWzY5ODMyLjI1MDU0MV0gIGR1bXBf
-c3RhY2srMHg5Yi8weGNlDQo+IFs2OTgzMi4yNTEyMzJdICA/IGJmcV9kaXNwYXRjaF9yZXF1ZXN0
-KzB4MTA0NS8weDQ0YjANCj4gWzY5ODMyLjI1MjI0M10gIHByaW50X2FkZHJlc3NfZGVzY3JpcHRp
-b24uY29uc3Rwcm9wLjYrMHgzZS8weDYwDQo+IFs2OTgzMi4yNTMzODFdICA/IF9fY3B1aWRsZV90
-ZXh0X2VuZCsweDUvMHg1IFs2OTgzMi4yNTQyMTFdICA/IA0KPiB2cHJpbnRrX2Z1bmMrMHg2Yi8w
-eDEyMCBbNjk4MzIuMjU0OTk0XSAgPyANCj4gYmZxX2Rpc3BhdGNoX3JlcXVlc3QrMHgxMDQ1LzB4
-NDRiMA0KPiBbNjk4MzIuMjU1OTUyXSAgPyBiZnFfZGlzcGF0Y2hfcmVxdWVzdCsweDEwNDUvMHg0
-NGIwDQo+IFs2OTgzMi4yNTY5MTRdICBrYXNhbl9yZXBvcnQuY29sZC45KzB4MjIvMHgzYSBbNjk4
-MzIuMjU3NzUzXSAgPyANCj4gYmZxX2Rpc3BhdGNoX3JlcXVlc3QrMHgxMDQ1LzB4NDRiMA0KPiBb
-Njk4MzIuMjU4NzU1XSAgY2hlY2tfbWVtb3J5X3JlZ2lvbisweDFjMS8weDFlMCBbNjk4MzIuMjYw
-MjQ4XQ0KPiBiZnFfZGlzcGF0Y2hfcmVxdWVzdCsweDEwNDUvMHg0NGIwDQo+IFs2OTgzMi4yNjEx
-ODFdICA/IGJmcV9iZnFxX2V4cGlyZSsweDI0NDAvMHgyNDQwIFs2OTgzMi4yNjIwMzJdICA/IA0K
-PiBibGtfbXFfZGVsYXlfcnVuX2h3X3F1ZXVlcysweGY5LzB4MTcwDQo+IFs2OTgzMi4yNjMwMjJd
-ICBfX2Jsa19tcV9kb19kaXNwYXRjaF9zY2hlZCsweDUyZi8weDgzMA0KPiBbNjk4MzIuMjY0MDEx
-XSAgPyBibGtfbXFfc2NoZWRfcmVxdWVzdF9pbnNlcnRlZCsweDEwMC8weDEwMA0KPiBbNjk4MzIu
-MjY1MTAxXSAgX19ibGtfbXFfc2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMrMHgzOTgvMHg0ZjANCj4g
-WzY5ODMyLjI2NjIwNl0gID8gYmxrX21xX2RvX2Rpc3BhdGNoX2N0eCsweDU3MC8weDU3MA0KPiBb
-Njk4MzIuMjY3MTQ3XSAgPyBfX3N3aXRjaF90bysweDVmNC8weGVlMCBbNjk4MzIuMjY3ODk4XQ0K
-PiBibGtfbXFfc2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMrMHhkZi8weDE0MA0KPiBbNjk4MzIuMjY4
-OTQ2XSAgX19ibGtfbXFfcnVuX2h3X3F1ZXVlKzB4YzAvMHgyNzAgWzY5ODMyLjI2OTg0MF0NCj4g
-YmxrX21xX3J1bl93b3JrX2ZuKzB4NTEvMHg2MCBbNjk4MzIuMjc4MTcwXQ0KPiBwcm9jZXNzX29u
-ZV93b3JrKzB4NmQ0LzB4ZmUwIFs2OTgzMi4yNzg5ODRdICB3b3JrZXJfdGhyZWFkKzB4OTEvMHhj
-ODAgDQo+IFs2OTgzMi4yNzk3MjZdICA/IF9fa3RocmVhZF9wYXJrbWUrMHhiMC8weDExMCBbNjk4
-MzIuMjgwNTU0XSAgPw0KPiBwcm9jZXNzX29uZV93b3JrKzB4ZmUwLzB4ZmUwIFs2OTgzMi4yODE0
-MTRdICBrdGhyZWFkKzB4MzJkLzB4M2YwIA0KPiBbNjk4MzIuMjgyMDgyXSAgPyBrdGhyZWFkX3Bh
-cmsrMHgxNzAvMHgxNzAgWzY5ODMyLjI4Mjg0OV0NCj4gcmV0X2Zyb21fZm9yaysweDFmLzB4MzAg
-WzY5ODMyLjI4MzU3M10gWzY5ODMyLjI4Mzg4Nl0gQWxsb2NhdGVkIGJ5IA0KPiB0YXNrIDc3MjU6
-DQo+IFs2OTgzMi4yODQ1OTldICBrYXNhbl9zYXZlX3N0YWNrKzB4MTkvMHg0MCBbNjk4MzIuMjg1
-Mzg1XQ0KPiBfX2thc2FuX2ttYWxsb2MuY29uc3Rwcm9wLjIrMHhjMS8weGQwDQo+IFs2OTgzMi4y
-ODYzNTBdICBrbWVtX2NhY2hlX2FsbG9jX25vZGUrMHgxM2YvMHg0NjAgWzY5ODMyLjI4NzIzN10N
-Cj4gYmZxX2dldF9xdWV1ZSsweDNkNC8weDExNDAgWzY5ODMyLjI4Nzk5M10NCj4gYmZxX2dldF9i
-ZnFxX2hhbmRsZV9zcGxpdCsweDEwMy8weDUxMA0KPiBbNjk4MzIuMjg5MDE1XSAgYmZxX2luaXRf
-cnErMHgzMzcvMHgyZDUwIFs2OTgzMi4yODk3NDldDQo+IGJmcV9pbnNlcnRfcmVxdWVzdHMrMHgz
-MDQvMHg0ZTEwIFs2OTgzMi4yOTA2MzRdDQo+IGJsa19tcV9zY2hlZF9pbnNlcnRfcmVxdWVzdHMr
-MHgxM2UvMHgzOTANCj4gWzY5ODMyLjI5MTYyOV0gIGJsa19tcV9mbHVzaF9wbHVnX2xpc3QrMHg0
-YjQvMHg3NjANCj4gWzY5ODMyLjI5MjUzOF0gIGJsa19mbHVzaF9wbHVnX2xpc3QrMHgyYzUvMHg0
-ODAgWzY5ODMyLjI5MzM5Ml0NCj4gaW9fc2NoZWR1bGVfcHJlcGFyZSsweGIyLzB4ZDAgWzY5ODMy
-LjI5NDIwOV0NCj4gaW9fc2NoZWR1bGVfdGltZW91dCsweDEzLzB4ODAgWzY5ODMyLjI5NTAxNF0N
-Cj4gd2FpdF9mb3JfY29tbW9uX2lvLmNvbnN0cHJvcC4xKzB4MTNjLzB4MjcwDQo+IFs2OTgzMi4y
-OTYxMzddICBzdWJtaXRfYmlvX3dhaXQrMHgxMDMvMHgxYTAgWzY5ODMyLjI5NjkzMl0NCj4gYmxr
-ZGV2X2lzc3VlX2Rpc2NhcmQrMHhlNi8weDE2MCBbNjk4MzIuMjk3Nzk0XQ0KPiBibGtfaW9jdGxf
-ZGlzY2FyZCsweDIxOS8weDI5MCBbNjk4MzIuMjk4NjE0XQ0KPiBibGtkZXZfY29tbW9uX2lvY3Rs
-KzB4NTBhLzB4MTc1MCBbNjk4MzIuMzA0NzE1XQ0KPiBibGtkZXZfaW9jdGwrMHg0NzAvMHg2MDAg
-WzY5ODMyLjMwNTQ3NF0gIGJsb2NrX2lvY3RsKzB4ZGUvMHgxMjAgDQo+IFs2OTgzMi4zMDYyMzJd
-ICB2ZnNfaW9jdGwrMHg2Yy8weGMwIFs2OTgzMi4zMDY4NzddDQo+IF9fc2Vfc3lzX2lvY3RsKzB4
-OTAvMHhhMCBbNjk4MzIuMzA3NjI5XSAgZG9fc3lzY2FsbF82NCsweDJkLzB4NDAgDQo+IFs2OTgz
-Mi4zMDgzNjJdICBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUrMHg0NC8weGE5DQo+IFs2
-OTgzMi4zMDkzODJdDQo+IFs2OTgzMi4zMDk3MDFdIEZyZWVkIGJ5IHRhc2sgMTU1Og0KPiBbNjk4
-MzIuMzEwMzI4XSAga2FzYW5fc2F2ZV9zdGFjaysweDE5LzB4NDAgWzY5ODMyLjMxMTEyMV0NCj4g
-a2FzYW5fc2V0X3RyYWNrKzB4MWMvMHgzMCBbNjk4MzIuMzExODY4XQ0KPiBrYXNhbl9zZXRfZnJl
-ZV9pbmZvKzB4MWIvMHgzMCBbNjk4MzIuMzEyNjk5XQ0KPiBfX2thc2FuX3NsYWJfZnJlZSsweDEx
-MS8weDE2MCBbNjk4MzIuMzEzNTI0XQ0KPiBrbWVtX2NhY2hlX2ZyZWUrMHg5NC8weDQ2MCBbNjk4
-MzIuMzE0MzY3XSAgYmZxX3B1dF9xdWV1ZSsweDU4Mi8weDk0MCANCj4gWzY5ODMyLjMxNTExMl0g
-IF9fYmZxX2JmcWRfcmVzZXRfaW5fc2VydmljZSsweDE2Ni8weDFkMA0KPiBbNjk4MzIuMzE3Mjc1
-XSAgYmZxX2JmcXFfZXhwaXJlKzB4YjI3LzB4MjQ0MCBbNjk4MzIuMzE4MDg0XQ0KPiBiZnFfZGlz
-cGF0Y2hfcmVxdWVzdCsweDY5Ny8weDQ0YjAgWzY5ODMyLjMxODk5MV0NCj4gX19ibGtfbXFfZG9f
-ZGlzcGF0Y2hfc2NoZWQrMHg1MmYvMHg4MzANCj4gWzY5ODMyLjMxOTk4NF0gIF9fYmxrX21xX3Nj
-aGVkX2Rpc3BhdGNoX3JlcXVlc3RzKzB4Mzk4LzB4NGYwDQo+IFs2OTgzMi4zMjEwODddICBibGtf
-bXFfc2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMrMHhkZi8weDE0MA0KPiBbNjk4MzIuMzIyMjI1XSAg
-X19ibGtfbXFfcnVuX2h3X3F1ZXVlKzB4YzAvMHgyNzAgWzY5ODMyLjMyMzExNF0NCj4gYmxrX21x
-X3J1bl93b3JrX2ZuKzB4NTEvMHg2MCBbNjk4MzIuMzIzOTQyXQ0KPiBwcm9jZXNzX29uZV93b3Jr
-KzB4NmQ0LzB4ZmUwIFs2OTgzMi4zMjQ3NzJdICB3b3JrZXJfdGhyZWFkKzB4OTEvMHhjODAgDQo+
-IFs2OTgzMi4zMjU1MThdICBrdGhyZWFkKzB4MzJkLzB4M2YwIFs2OTgzMi4zMjYyMDVdDQo+IHJl
-dF9mcm9tX2ZvcmsrMHgxZi8weDMwIFs2OTgzMi4zMjY5MzJdIFs2OTgzMi4zMzgyOTddIFRoZSBi
-dWdneSANCj4gYWRkcmVzcyBiZWxvbmdzIHRvIHRoZSBvYmplY3QgYXQgZmZmZjg4ODAyNjIyYjk2
-OCBbNjk4MzIuMzM4Mjk3XSB3aGljaCANCj4gYmVsb25ncyB0byB0aGUgY2FjaGUgYmZxX3F1ZXVl
-IG9mIHNpemUgNTEyIFs2OTgzMi4zNDA3NjZdIFRoZSBidWdneSANCj4gYWRkcmVzcyBpcyBsb2Nh
-dGVkIDI4OCBieXRlcyBpbnNpZGUgb2YgWzY5ODMyLjM0MDc2Nl0gIDUxMi1ieXRlIHJlZ2lvbiAN
-Cj4gW2ZmZmY4ODgwMjYyMmI5NjgsIGZmZmY4ODgwMjYyMmJiNjgpIFs2OTgzMi4zNDMwOTFdIFRo
-ZSBidWdneSBhZGRyZXNzIA0KPiBiZWxvbmdzIHRvIHRoZSBwYWdlOg0KPiBbNjk4MzIuMzQ0MDk3
-XSBwYWdlOmZmZmZlYTAwMDA5ODhhMDAgcmVmY291bnQ6MSBtYXBjb3VudDowDQo+IG1hcHBpbmc6
-MDAwMDAwMDAwMDAwMDAwMCBpbmRleDoweGZmZmY4ODgwMjYyMmE1MjggcGZuOjB4MjYyMjggDQo+
-IFs2OTgzMi4zNDYyMTRdIGhlYWQ6ZmZmZmVhMDAwMDk4OGEwMCBvcmRlcjoyIGNvbXBvdW5kX21h
-cGNvdW50OjANCj4gY29tcG91bmRfcGluY291bnQ6MCBbNjk4MzIuMzQ3NzE5XSBmbGFnczogMHgx
-ZmZmZmY4MDAxMDIwMChzbGFifGhlYWQpIA0KPiBbNjk4MzIuMzQ4NjI1XSByYXc6IDAwMWZmZmZm
-ODAwMTAyMDAgZmZmZmVhMDAwMGRiYWMwOCBmZmZmODg4MDE3YTU3NjUwDQo+IGZmZmY4ODgwMTc5
-ZmU4NDAgWzY5ODMyLjM1NDk3Ml0gcmF3OiBmZmZmODg4MDI2MjJhNTI4IDAwMDAwMDAwMDAxMjAw
-MDggDQo+IDAwMDAwMDAxZmZmZmZmZmYgMDAwMDAwMDAwMDAwMDAwMCBbNjk4MzIuMzU2NTQ3XSBw
-YWdlIGR1bXBlZCBiZWNhdXNlOg0KPiBrYXNhbjogYmFkIGFjY2VzcyBkZXRlY3RlZCBbNjk4MzIu
-MzU3NjUyXSBbNjk4MzIuMzU3OTcwXSBNZW1vcnkgc3RhdGUgYXJvdW5kIHRoZSBidWdneSBhZGRy
-ZXNzOg0KPiBbNjk4MzIuMzU4OTI2XSAgZmZmZjg4ODAyNjIyYjk4MDogZmIgZmIgZmIgZmIgZmIg
-ZmIgZmIgZmIgZmIgZmIgZmIgZmIgDQo+IGZiIGZiIGZiIGZiIFs2OTgzMi4zNjAzNThdICBmZmZm
-ODg4MDI2MjJiYTAwOiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiANCj4gZmIgZmIgZmIgZmIgZmIg
-ZmIgZmIgZmIgWzY5ODMyLjM2MTgxMF0gPmZmZmY4ODgwMjYyMmJhODA6IGZiIGZiIGZiIGZiIGZi
-IGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiIGZiDQo+IFs2OTgzMi4zNjMyNzNdICAgICAg
-ICAgICAgICAgICAgICAgICBeDQo+IFs2OTgzMi4zNjM5NzVdICBmZmZmODg4MDI2MjJiYjAwOiBm
-YiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiBmYiANCj4gZmIgZmMgZmMgZmMgWzY5ODMy
-LjM3NTk2MF0gIGZmZmY4ODgwMjYyMmJiODA6IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIA0KPiBm
-YyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBbNjk4MzIuMzc3NDA1XSANCj4gPT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+IA0K
-PiBJbiBiZnFfZGlzcGF0Y2hfcmVxdWVzdGZ1bmN0aW9uLCBpdCBtYXkgaGF2ZSBmdW5jdGlvbiBj
-YWxsOg0KPiANCj4gYmZxX2Rpc3BhdGNoX3JlcXVlc3QNCj4gCV9fYmZxX2Rpc3BhdGNoX3JlcXVl
-c3QNCj4gCQliZnFfc2VsZWN0X3F1ZXVlDQo+IAkJCWJmcV9iZnFxX2V4cGlyZQ0KPiAJCQkJX19i
-ZnFfYmZxZF9yZXNldF9pbl9zZXJ2aWNlDQo+IAkJCQkJYmZxX3B1dF9xdWV1ZQ0KPiAJCQkJCQlr
-bWVtX2NhY2hlX2ZyZWUNCj4gSW4gdGhpcyBmdW5jdGlvbiBjYWxsLCBpbl9zZXJ2X3F1ZXVlIGhh
-cyBiZWVkIGV4cGlyZWQgYW5kIG1lZXQgdGhlIA0KPiBjb25kaXRpb25zIHRvIGZyZWUuIEluIHRo
-ZSBmdW5jdGlvbiBiZnFfZGlzcGF0Y2hfcmVxdWVzdCwgdGhlIGFkZHJlc3MgDQo+IG9mIGluX3Nl
-cnZfcXVldWUgcG9pbnRpbmcgdG8gaGFzIGJlZW4gcmVsZWFzZWQuIEZvciBnZXR0aW5nIHRoZSB2
-YWx1ZSANCj4gb2YgaWRsZV90aW1lcl9kaXNhYmxlZCwgaXQgd2lsbCBnZXQgZmxhZ3MgdmFsdWUg
-ZnJvbSB0aGUgYWRkcmVzcyB3aGljaCANCj4gaW5fc2Vydl9xdWV1ZSBwb2ludGluZyB0bywgdGhl
-biB0aGUgcHJvYmxlbSBvZiB1c2UtYWZ0ZXItZnJlZSBoYXBwZW5zOw0KPiANCj4gRml4IHRoZSBw
-cm9ibGVtIGJ5IGNoZWNrIGluX3NlcnZfcXVldWUgPT0gYmZxZC0+aW5fc2VydmljZV9xdWV1ZSwg
-dG8gDQo+IGdldCB0aGUgdmFsdWUgb2YgaWRsZV90aW1lcl9kaXNhYmxlZCBpZiBpbl9zZXJ2ZV9x
-dWV1ZSBpcyBlcXVlbCB0bw0KPiBiZnFkLT5pbl9zZXJ2aWNlX3F1ZXVlLiBJZiB0aGUgc3BhY2Ug
-b2YgaW5fc2Vydl9xdWV1ZSBwb2ludGluZyBoYXMNCj4gYmVlbiByZWxlYXNlZCwgdGhpcyBqdWRn
-ZSB3aWxsIGF2aW9kIHVzZS1hZnRlci1mcmVlIHByb2JsZW0uDQo+IEFuZCBpZiBpbl9zZXJ2X3F1
-ZXVlIG1heSBiZSBleHBpcmVkIGJ1dCBpdCBzdGlsbCBleGlzdHMsIHRoaXMganVkZ2UgDQo+IG1h
-eSBoYXZlIGxpdHRsZSBlZmZlY3RzIG9uIHRoZSBmdW5jdGlvbiBiZnFnX3N0YXRzX3VwZGF0ZV9p
-ZGxlX3RpbWUgaW4gDQo+IGJmcV91cGRhdGVfZGlzcGF0Y2hfc3RhdHMuDQo+IA0KPiBSZXBvcnRl
-ZC1ieTogSHVsayBSb2JvdCA8aHVsa2NpQGh1YXdlaS5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IFpo
-YW5nIFdlbnNoZW5nIDx6aGFuZ3dlbnNoZW5nNUBodWF3ZWkuY29tPg0KPiAtLS0NCj4gYmxvY2sv
-YmZxLWlvc2NoZWQuYyB8IDkgKysrKystLS0tDQo+IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlv
-bnMoKyksIDQgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmZxLWlvc2No
-ZWQuYyBiL2Jsb2NrL2JmcS1pb3NjaGVkLmMgaW5kZXggDQo+IGZlYzE4MTE4ZGMzMC4uOTc1MzM2
-MzRiOTllIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9iZnEtaW9zY2hlZC5jDQo+ICsrKyBiL2Jsb2Nr
-L2JmcS1pb3NjaGVkLmMNCj4gQEAgLTUwNjEsNyArNTA2MSw3IEBAIHN0YXRpYyBzdHJ1Y3QgcmVx
-dWVzdCAqYmZxX2Rpc3BhdGNoX3JlcXVlc3Qoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgpDQo+
-IAlzdHJ1Y3QgYmZxX2RhdGEgKmJmcWQgPSBoY3R4LT5xdWV1ZS0+ZWxldmF0b3ItPmVsZXZhdG9y
-X2RhdGE7DQo+IAlzdHJ1Y3QgcmVxdWVzdCAqcnE7DQo+IAlzdHJ1Y3QgYmZxX3F1ZXVlICppbl9z
-ZXJ2X3F1ZXVlOw0KPiAtCWJvb2wgd2FpdGluZ19ycSwgaWRsZV90aW1lcl9kaXNhYmxlZDsNCj4g
-Kwlib29sIHdhaXRpbmdfcnEsIGlkbGVfdGltZXJfZGlzYWJsZWQgPSBmYWxzZTsNCj4gDQo+IAlz
-cGluX2xvY2tfaXJxKCZiZnFkLT5sb2NrKTsNCj4gDQo+IEBAIC01MDcwLDkgKzUwNzAsMTAgQEAg
-c3RhdGljIHN0cnVjdCByZXF1ZXN0IA0KPiAqYmZxX2Rpc3BhdGNoX3JlcXVlc3Qoc3RydWN0IGJs
-a19tcV9od19jdHggKmhjdHgpDQo+IA0KPiAJcnEgPSBfX2JmcV9kaXNwYXRjaF9yZXF1ZXN0KGhj
-dHgpOw0KPiANCj4gLQlpZGxlX3RpbWVyX2Rpc2FibGVkID0NCj4gLQkJd2FpdGluZ19ycSAmJiAh
-YmZxX2JmcXFfd2FpdF9yZXF1ZXN0KGluX3NlcnZfcXVldWUpOw0KPiAtDQo+ICsJaWYgKGluX3Nl
-cnZfcXVldWUgPT0gYmZxZC0+aW5fc2VydmljZV9xdWV1ZSkgew0KPiArCQlpZGxlX3RpbWVyX2Rp
-c2FibGVkID0NCj4gKwkJCXdhaXRpbmdfcnEgJiYgIWJmcV9iZnFxX3dhaXRfcmVxdWVzdChpbl9z
-ZXJ2X3F1ZXVlKTsNCj4gKwl9DQoNCkdvb2QgY2F0Y2ghDQoNCj4gCXNwaW5fdW5sb2NrX2lycSgm
-YmZxZC0+bG9jayk7DQo+IA0KPiAJYmZxX3VwZGF0ZV9kaXNwYXRjaF9zdGF0cyhoY3R4LT5xdWV1
-ZSwgcnEsIGluX3NlcnZfcXVldWUsDQoNCllldCwgd2hhdCBhYm91dCB0aGUgYWJvdmUgdXNlIG9m
-IGluX3NlcnZfcXVldWUgdGhlbj8NCg0KVGhhbmtzLA0KUGFvbG8NCg0KPiAtLQ0KPiAyLjMxLjEN
-Cj4gDQoNCg==
+Hello,
+
+When using Syzkaller to fuzz the latest Linux kernel, the following
+crash was triggered.
+
+HEAD commit: a7904a538933 Linux 5.16-rc6
+git tree: upstream
+console output: https://paste.ubuntu.com/p/sBNS3rSWFq/plain/
+kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/plain/
+
+Sorry, I don't have a reproducer for this crash, hope the symbolized
+report can help.
+
+If you fix this issue, please add the following tag to the commit:
+Reported-by: Yiru Xu <xyru1999@gmail.com>
+
+
+INFO: task syz-executor.7:13121 blocked for more than 143 seconds.
+      Not tainted 5.16.0-rc6 #9
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.7  state:D stack:27760 pid:13121 ppid: 12530 flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:4972 [inline]
+ __schedule+0xcd9/0x2530 kernel/sched/core.c:6253
+ schedule+0xd2/0x260 kernel/sched/core.c:6326
+ io_schedule+0xb3/0x120 kernel/sched/core.c:8371
+ blk_mq_get_tag+0x58d/0xac0 block/blk-mq-tag.c:158
+ __blk_mq_alloc_requests+0x674/0xe00 block/blk-mq.c:486
+ blk_mq_alloc_request+0x116/0x210 block/blk-mq.c:520
+ scsi_alloc_request+0x1f/0x60 drivers/scsi/scsi_lib.c:1103
+ sg_start_req drivers/scsi/sg.c:1727 [inline]
+ sg_common_write.isra.0+0x50e/0x1f30 drivers/scsi/sg.c:807
+ sg_write+0x7c9/0xda0 drivers/scsi/sg.c:711
+ vfs_write+0x22a/0xae0 fs/read_write.c:588
+ ksys_write+0x12d/0x250 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f90924fe89d
+RSP: 002b:00007f9090e6fc28 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f909261df60 RCX: 00007f90924fe89d
+RDX: 0000000000000030 RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 00007f909256b00d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fff4495088f R14: 00007f909261df60 R15: 00007f9090e6fdc0
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/39:
+ #0: ffffffff8bb80e20 (rcu_read_lock){....}-{1:2}, at:
+debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6458
+1 lock held by in:imklog/6764:
+ #0: ffff888018636b70 (&f->f_pos_lock){+.+.}-{3:3}, at:
+__fdget_pos+0xe9/0x100 fs/file.c:1034
+3 locks held by syz-fuzzer/6689:
+ #0: ffff888102adc460 (sb_writers#5){.+.+}-{0:0}, at:
+do_rmdir+0x1d0/0x390 fs/namei.c:4013
+ #1: ffff88802af421d8 (&type->i_mutex_dir_key#4/1){+.+.}-{3:3}, at:
+inode_lock_nested include/linux/fs.h:818 [inline]
+ #1: ffff88802af421d8 (&type->i_mutex_dir_key#4/1){+.+.}-{3:3}, at:
+do_rmdir+0x21b/0x390 fs/namei.c:4017
+ #2: ffff888113c5b5c8 (&type->i_mutex_dir_key#4){++++}-{3:3}, at:
+inode_lock include/linux/fs.h:783 [inline]
+ #2: ffff888113c5b5c8 (&type->i_mutex_dir_key#4){++++}-{3:3}, at:
+vfs_rmdir fs/namei.c:3958 [inline]
+ #2: ffff888113c5b5c8 (&type->i_mutex_dir_key#4){++++}-{3:3}, at:
+vfs_rmdir+0xe3/0x570 fs/namei.c:3946
+3 locks held by kworker/u9:21/13658:
+ #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
+arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
+ #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
+arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
+ #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
+atomic_long_set include/linux/atomic/atomic-instrumented.h:1198
+[inline]
+ #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
+set_work_data kernel/workqueue.c:635 [inline]
+ #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
+set_work_pool_and_clear_pending kernel/workqueue.c:662 [inline]
+ #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
+process_one_work+0x8c3/0x16d0 kernel/workqueue.c:2269
+ #1: ffffc9000f8bfdc8
+((work_completion)(&(&wb->dwork)->work)){+.+.}-{0:0}, at:
+process_one_work+0x8f7/0x16d0 kernel/workqueue.c:2273
+ #2: ffff8881000940e0 (&type->s_umount_key#47){.+.+}-{3:3}, at:
+trylock_super+0x1d/0x100 fs/super.c:418
+4 locks held by kworker/2:10/30001:
+ #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
+arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
+ #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
+arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
+ #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
+atomic_long_set include/linux/atomic/atomic-instrumented.h:1198
+[inline]
+ #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
+set_work_data kernel/workqueue.c:635 [inline]
+ #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
+set_work_pool_and_clear_pending kernel/workqueue.c:662 [inline]
+ #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
+process_one_work+0x8c3/0x16d0 kernel/workqueue.c:2269
+ #1: ffffc9001352fdc8
+((work_completion)(&ap->scsi_rescan_task)){+.+.}-{0:0}, at:
+process_one_work+0x8f7/0x16d0 kernel/workqueue.c:2273
+ #2: ffff8881075ac2a0 (&ap->scsi_scan_mutex){+.+.}-{3:3}, at:
+ata_scsi_dev_rescan+0x38/0x230 drivers/ata/libata-scsi.c:4646
+ #3: ffff888107c9a3e0 (&dev->mutex){....}-{3:3}, at: device_lock
+include/linux/device.h:760 [inline]
+ #3: ffff888107c9a3e0 (&dev->mutex){....}-{3:3}, at:
+scsi_rescan_device+0x28/0x210 drivers/scsi/scsi_scan.c:1555
+
+=============================================
+
+NMI backtrace for cpu 2
+CPU: 2 PID: 39 Comm: khungtaskd Not tainted 5.16.0-rc6 #9
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
+ nmi_trigger_cpumask_backtrace+0x1a1/0x1e0 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:210 [inline]
+ watchdog+0xcc8/0x1010 kernel/hung_task.c:295
+ kthread+0x405/0x4f0 kernel/kthread.c:327
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
+Sending NMI from CPU 2 to CPUs 0-1,3:
+NMI backtrace for cpu 0
+CPU: 0 PID: 11470 Comm: kworker/u8:5 Not tainted 5.16.0-rc6 #9
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Workqueue: bat_events batadv_nc_worker
+RIP: 0010:lockdep_enabled kernel/locking/lockdep.c:91 [inline]
+RIP: 0010:lock_acquire kernel/locking/lockdep.c:5613 [inline]
+RIP: 0010:lock_acquire+0x13b/0x520 kernel/locking/lockdep.c:5602
+Code: 85 c5 01 00 00 65 48 8b 14 25 40 70 02 00 48 8d ba 1c 0a 00 00
+48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 0f b6 0c 01 <48> 89
+f8 83 e0 07 83 c0 03 38 c8 7c 08 84 c9 0f 85 80 03 00 00 8b
+RSP: 0018:ffffc9000fc7fbf0 EFLAGS: 00000213
+RAX: dffffc0000000000 RBX: 1ffff92001f8ff80 RCX: 0000000000000000
+RDX: ffff888054573980 RSI: 0000000000000001 RDI: ffff88805457439c
+RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1b20a2b
+R10: ffffffff8d905157 R11: fffffbfff1b20a2a R12: 0000000000000002
+R13: ffffffff8bb80e20 R14: 0000000000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888063e00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000563740b0c900 CR3: 000000000b88e000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ rcu_lock_acquire include/linux/rcupdate.h:268 [inline]
+ rcu_read_lock include/linux/rcupdate.h:688 [inline]
+ batadv_nc_purge_orig_hash net/batman-adv/network-coding.c:412 [inline]
+ batadv_nc_worker+0x114/0x770 net/batman-adv/network-coding.c:723
+ process_one_work+0x9df/0x16d0 kernel/workqueue.c:2298
+ worker_thread+0x90/0xed0 kernel/workqueue.c:2445
+ kthread+0x405/0x4f0 kernel/kthread.c:327
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
+NMI backtrace for cpu 1 skipped: idling at native_safe_halt
+arch/x86/include/asm/irqflags.h:51 [inline]
+NMI backtrace for cpu 1 skipped: idling at arch_safe_halt
+arch/x86/include/asm/irqflags.h:89 [inline]
+NMI backtrace for cpu 1 skipped: idling at default_idle+0xb/0x10
+arch/x86/kernel/process.c:733
+NMI backtrace for cpu 3
+CPU: 3 PID: 3047 Comm: systemd-journal Not tainted 5.16.0-rc6 #9
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+RIP: 0010:get_reg+0xef/0x170 arch/x86/kernel/unwind_orc.c:405
+Code: 11 00 0f 85 8d 00 00 00 49 89 45 00 41 bc 01 00 00 00 48 83 c4
+08 5b 44 89 e0 5d 41 5c 41 5d c3 48 8d 7c f5 00 e8 01 fc ff ff <4c> 89
+e9 48 ba 00 00 00 00 00 fc ff df 48 c1 e9 03 80 3c 11 00 75
+RSP: 0018:ffffc9000128f928 EFLAGS: 00000202
+RAX: 00007ffd54a44fe0 RBX: ffffc9000128fa50 RCX: 1ffff92000251f54
+RDX: 0000000000000006 RSI: 0000000000000004 RDI: ffffc9000128ff78
+RBP: ffffc9000128ff58 R08: ffffffff8ea3f366 R09: ffffffff8ea3f360
+R10: ffffc9000128faaf R11: 0000000000088089 R12: 0000000000000001
+R13: ffffc9000128f9d8 R14: ffffc9000128fa50 R15: ffffc9000128ff58
+FS:  00007fbeac5ba8c0(0000) GS:ffff888135d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fbea9dca000 CR3: 000000001b63f000 CR4: 0000000000350ee0
+Call Trace:
+ <TASK>
+ unwind_next_frame+0xfe8/0x1780 arch/x86/kernel/unwind_orc.c:595
+ arch_stack_walk+0x7d/0xe0 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x8c/0xc0 kernel/stacktrace.c:122
+ kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:513 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:472 [inline]
+ __kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:522
+ kasan_kmalloc include/linux/kasan.h:269 [inline]
+ __kmalloc+0x1d2/0x3d0 mm/slub.c:4423
+ kmalloc include/linux/slab.h:595 [inline]
+ kzalloc include/linux/slab.h:724 [inline]
+ lsm_cred_alloc security/security.c:537 [inline]
+ security_prepare_creds+0x10e/0x190 security/security.c:1692
+ prepare_creds+0x56e/0x7b0 kernel/cred.c:291
+ access_override_creds fs/open.c:351 [inline]
+ do_faccessat+0x3f4/0x850 fs/open.c:415
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fbeab8769c7
+Code: 83 c4 08 48 3d 01 f0 ff ff 73 01 c3 48 8b 0d c8 d4 2b 00 f7 d8
+64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 b8 15 00 00 00 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 8b 0d a1 d4 2b 00 f7 d8 64 89 01 48
+RSP: 002b:00007ffd54a44fa8 EFLAGS: 00000246 ORIG_RAX: 0000000000000015
+RAX: ffffffffffffffda RBX: 00007ffd54a47ec0 RCX: 00007fbeab8769c7
+RDX: 00007fbeac2e7a00 RSI: 0000000000000000 RDI: 000055b9fe0f89a3
+RBP: 00007ffd54a44fe0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000069 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007ffd54a47ec0 R15: 00007ffd54a454d0
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0: 85 c5                test   %eax,%ebp
+   2: 01 00                add    %eax,(%rax)
+   4: 00 65 48              add    %ah,0x48(%rbp)
+   7: 8b 14 25 40 70 02 00 mov    0x27040,%edx
+   e: 48 8d ba 1c 0a 00 00 lea    0xa1c(%rdx),%rdi
+  15: 48 b8 00 00 00 00 00 movabs $0xdffffc0000000000,%rax
+  1c: fc ff df
+  1f: 48 89 f9              mov    %rdi,%rcx
+  22: 48 c1 e9 03          shr    $0x3,%rcx
+  26: 0f b6 0c 01          movzbl (%rcx,%rax,1),%ecx
+* 2a: 48 89 f8              mov    %rdi,%rax <-- trapping instruction
+  2d: 83 e0 07              and    $0x7,%eax
+  30: 83 c0 03              add    $0x3,%eax
+  33: 38 c8                cmp    %cl,%al
+  35: 7c 08                jl     0x3f
+  37: 84 c9                test   %cl,%cl
+  39: 0f 85 80 03 00 00    jne    0x3bf
+  3f: 8b                    .byte 0x8b
+
+
+
+Best Regards,
+Yiru
