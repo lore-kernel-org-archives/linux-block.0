@@ -2,128 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CB5C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 12:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D614C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 12:05:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbiADMCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jan 2022 07:02:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48246 "EHLO
+        id S231725AbiADMFC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jan 2022 07:05:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiADMCO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jan 2022 07:02:14 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A175C061761;
-        Tue,  4 Jan 2022 04:02:14 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id i22so75677922wrb.13;
-        Tue, 04 Jan 2022 04:02:13 -0800 (PST)
+        with ESMTP id S231270AbiADMFC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jan 2022 07:05:02 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27057C061761;
+        Tue,  4 Jan 2022 04:05:02 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id k69so91682097ybf.1;
+        Tue, 04 Jan 2022 04:05:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id;
-        bh=iJCchn2X34ne9iX0z8o1f3UymboTeZK5qbmX+dn9QQI=;
-        b=JfiVlhnMPzA+jvSKV4ITc/KrSQp97QQgaA1FBiNnZBb/UhPU8YPlvD0Wi4KnX7GFNh
-         KsIZ62/drSwobPTlpHyv9+p64BkxYbnzdGN7gYnuE+kKw2XLeSR9Pziq3CVBlThgJ1VR
-         rh/plbAUSzyuFtQ6b04EAig8a6N2JSNHaZqdHdk3eoajmQt/jWcYhGZArGs33OUzMp9E
-         vozF9lM2hCwD0fkpRK+GlhNKrbcQRjO6I3JPxiJocAU6ZDxJZI+bkjiURUTceENPU1Gh
-         5kfTWHNSu+3lWCmRowMi2FsfAObcCH2Ix6SzwkLTOBLl7sRm74iyCoKn0K7CCOPHrhL4
-         Mp7w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C/I5Ah1No+IpmF4Eci4a1wynvY0dF++LDExr+NlwhiM=;
+        b=UVPDdtLwGsnHz/K20jufX5JZ/9azR61+VQ5FvbmkOzjCWST3oGp1ZurAEZfg1GtoUh
+         tH8ryqv64HzXkgrlAcYN3qFVJzk/sdnoffVu3ekKrMU3Cq0D6C/9uXJ3YUsFXTPQAoe2
+         6znMtVZwjHRr3aGrCecz6kqr9yal0Zw+Fv2ufDO6YRv8yPm12P09XxtvMzgHvoFTO9PW
+         jU4+uHRzHM+1d2YcjNARSCPVYh+53vlkcz3ViTSuiUSN0OId1fhXOPRX4o5h/VL3pkDQ
+         ahGvgbl0ysoT7UoGil7JlIcPgzQFk2MNKhkmnHicC/M+naiKdZ31cD7TstZ1aOjY62mI
+         aVvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=iJCchn2X34ne9iX0z8o1f3UymboTeZK5qbmX+dn9QQI=;
-        b=Ziwp5k0p4Jo4lW3n+XxtmfG6SqBLKt5QUFJQBPuNYTieqh/e4Q2Zy8zo/jbkQ0u9Fm
-         GGbE4I9VoyoIOSpS/X97u098bbY+UuvJsBguBK2iDAxkCtymxMLCgn5O8djrGJW/4r8O
-         ETPQ4RFeGArv0goF6oliqp4MNsswV0znOSEwEzZR5BWbc91rAMY9QTOGSuzJ545ygaXj
-         1juotqpI1dr94IGPcy9XPYma45xEXtZdBqUxN6jnOaRaa83N6zectUXW5455S9bYw5vS
-         zDxt9x2IHpf6m6FB22gAPHfy1CcMRL3Kuk41poHVB3RBZF8z0PGpetpJ5D3yKPRaA5EK
-         HtZg==
-X-Gm-Message-State: AOAM532kCIawGRP5PQw7+Yo/Bq2WGfY2K2vFTX5of1LCfW7XDDfZu/g4
-        Km27r+1OAUqE2v6OvElUbpM=
-X-Google-Smtp-Source: ABdhPJwnvPlI2K3oopQjvmwG366MYxq9KF8B8OhI6kbksvbCi5nwHkvDJATS7pFQNkB5wh1PL+emoQ==
-X-Received: by 2002:adf:de84:: with SMTP id w4mr41123010wrl.67.1641297732567;
-        Tue, 04 Jan 2022 04:02:12 -0800 (PST)
-Received: from felia.fritz.box ([2001:16b8:2647:5a00:918:9389:3260:d714])
-        by smtp.gmail.com with ESMTPSA id d5sm15640703wrs.61.2022.01.04.04.02.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 04:02:12 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C/I5Ah1No+IpmF4Eci4a1wynvY0dF++LDExr+NlwhiM=;
+        b=zqZAhokuU5nrrodEBaXj9D8lbXGqtxp3r+I3vAVYNpFibaegXLhpSqTrklypPwbv5U
+         zxKVPufRI3JG/4vFa0dRroUqn2Wk5l8fk5zUpOKy9ysmHY5/Hu/bGOqsEZxtDOP6t/KP
+         pkw3gPQTDTdRw2MuGsNrYmrY0unnlieyuq3JZrv2KEXcZlpdDPpBiNwfHiETGC0dC46R
+         4TFlMTpI2X6aN4y1P7I+jEds3IEPpzVCTf7SLlSnAtRNW1B32m3+i9big4JeUYhT+6vl
+         fCum0Q6jWubTy46M10lcaZYdAC0XSOZU3djZU8a/YLgHaPlM3bhp9fyqayGL3fP2IvAP
+         Tswg==
+X-Gm-Message-State: AOAM531pI19u9W5Qpo7ES3LeoAZSQnKvnqHEdOE6mqp/QjlSN0yHdXAX
+        1kHUxUzn1Q7ky/easurZWtHa2cIhvZ2VgwtYMen87XiOkhI=
+X-Google-Smtp-Source: ABdhPJx9Fc4XaNuqUUxkXvESNiwDEQ+10mI662MFgb2vVAgeLo6yDNKvk9sAHSSpRRXiQO18TexgNp6ER7/P4VH6W5M=
+X-Received: by 2002:a25:2cd0:: with SMTP id s199mr48746235ybs.234.1641297901311;
+ Tue, 04 Jan 2022 04:05:01 -0800 (PST)
+MIME-Version: 1.0
+References: <CAKXUXMy=M42hapfG1S4ZT1v5WEdH2KYiF8Cgukmf48=FKFCyJg@mail.gmail.com>
+ <20220103163532.GB3151@lst.de>
+In-Reply-To: <20220103163532.GB3151@lst.de>
 From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] block: remove dead queue_dma_alignment branch from bio_map_user_iov()
-Date:   Tue,  4 Jan 2022 13:01:58 +0100
-Message-Id: <20220104120158.20177-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
+Date:   Tue, 4 Jan 2022 13:04:50 +0100
+Message-ID: <CAKXUXMxxNBYhb37PQRnRaVAwd98ASKKeWDYDE11SzvyTQ9Lv9g@mail.gmail.com>
+Subject: Re: Potentially broken error path in bio_map_user_iov()
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kernel-janitors <kernel-janitors@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If queue_dma_alignment(rq->q), then blk_rq_map_user_iov() will call
-bio_copy_user_iov() and not bio_map_user_iov(). So, bio_map_user_iov() does
-not need to handle the queue_dma_alignment(rq->q) case in any special way.
+On Mon, Jan 3, 2022 at 5:35 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Hi Lukas,
+>
+> we can just remove the queue_dma_alignment check entirely, the caller
+> already ensures bio_copy_user_iov is called instead of this case.
 
-Remove this dead branch from bio_map_user_iov().
+Okay, I have sent you a patch to do so:
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
- block/blk-map.c | 41 ++++++++++++++++++-----------------------
- 1 file changed, 18 insertions(+), 23 deletions(-)
+https://lore.kernel.org/all/20220104120158.20177-1-lukas.bulwahn@gmail.com/
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 4526adde0156..1cccdb776905 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -260,31 +260,26 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 
- 		npages = DIV_ROUND_UP(offs + bytes, PAGE_SIZE);
- 
--		if (unlikely(offs & queue_dma_alignment(rq->q))) {
--			ret = -EINVAL;
--			j = 0;
--		} else {
--			for (j = 0; j < npages; j++) {
--				struct page *page = pages[j];
--				unsigned int n = PAGE_SIZE - offs;
--				bool same_page = false;
--
--				if (n > bytes)
--					n = bytes;
--
--				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
--						     max_sectors, &same_page)) {
--					if (same_page)
--						put_page(page);
--					break;
--				}
--
--				added += n;
--				bytes -= n;
--				offs = 0;
-+		for (j = 0; j < npages; j++) {
-+			struct page *page = pages[j];
-+			unsigned int n = PAGE_SIZE - offs;
-+			bool same_page = false;
-+
-+			if (n > bytes)
-+				n = bytes;
-+
-+			if (!bio_add_hw_page(rq->q, bio, page, n, offs,
-+					     max_sectors, &same_page)) {
-+				if (same_page)
-+					put_page(page);
-+				break;
- 			}
--			iov_iter_advance(iter, added);
-+
-+			added += n;
-+			bytes -= n;
-+			offs = 0;
- 		}
-+		iov_iter_advance(iter, added);
- 		/*
- 		 * release the pages we didn't map into the bio, if any
- 		 */
--- 
-2.17.1
+Feel free to pick it, reword it, rework it or ignore it.
 
+Lukas
