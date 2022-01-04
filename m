@@ -2,136 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4782CC433FE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 11:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB31AC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 11:49:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231209AbiADLqi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jan 2022 06:46:38 -0500
-Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:58184
-        "EHLO smtp-relay-internal-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230183AbiADLqi (ORCPT
+        id S232634AbiADLtr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jan 2022 06:49:47 -0500
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:33744
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231659AbiADLtq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Jan 2022 06:46:38 -0500
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+        Tue, 4 Jan 2022 06:49:46 -0500
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 7C36F3F1AF
-        for <linux-block@vger.kernel.org>; Tue,  4 Jan 2022 11:46:30 +0000 (UTC)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 2741E3F175
+        for <linux-block@vger.kernel.org>; Tue,  4 Jan 2022 11:49:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1641296790;
-        bh=JY7Ra2cchiTcCQg+DROtjoU0ny4nqnEUeEw1mO9P5Dc=;
+        s=20210705; t=1641296985;
+        bh=vguJt1qBunnTzzYbonX6ium+NdHf9qExcNc7nkL9r5E=;
         h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
          To:Cc:Content-Type;
-        b=nnVjdUZBDa3jJ5rlpt4oyTizF+akpiMJjgEsTDr+lZxhZhGae9BhsfTAVvYQhzCGM
-         YnEUoSsk5yqXvIWT04fkgDkaZS9GM/MwVfSYmDj8ZUY5D9aX42V/2hKY9CNniN8v2f
-         eV4k8AinkHbizoVnoWGZZBW0dzsK793ssVzUiFcTLP2W2+UcpjFKDfax+lMTcdxQry
-         PpuGlDvbaOjw78kawOQncfZ+cSf5gMVM2Y+ADguVNfe5vCgTIpOMMJB3pp8ZwhvZ3t
-         cJ0r/N1Ew4+pqvC4U77jq2kSBogBjmM3OQNPGx/UKEBzm1tPo/hUOmRw/v06vxPsSw
-         k66N8fgXd3a2Q==
-Received: by mail-pj1-f70.google.com with SMTP id y2-20020a17090a1f4200b001b103d6b6d0so29116862pjy.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Jan 2022 03:46:30 -0800 (PST)
+        b=LZ8iaik6Pt5sah160yZ5UtIiXDZaxjwStLmFjgetXA3OFyJsRvs6cqN44/+Tgscps
+         Al6xwuimMxadZ0k2VLj4u105C0iII1ZUUvZx0qldtZ+Qs5T8Z0ySdTPxO3VCxCDyrA
+         1Y0zpbwSEicJZSiNhccOqhm6Xjo/HC2nESx4z952sSQcIUTgGZm74Q8HAnF8AWuZQV
+         IEyw1+G3dypxpe2e7/vdYyBEye/STr0L1no7kKB9I+s33mj8cSPSZylQ3Q/JX6xO0D
+         bDjOS3feCr5zJvRfFvCEjF/eKivbFU16fRqTYGip7d4Dt1zswr51YeJt632F5gT5J6
+         K2jrfvCT3ntaA==
+Received: by mail-pg1-f200.google.com with SMTP id k1-20020a63d841000000b003417384b156so13414648pgj.13
+        for <linux-block@vger.kernel.org>; Tue, 04 Jan 2022 03:49:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=JY7Ra2cchiTcCQg+DROtjoU0ny4nqnEUeEw1mO9P5Dc=;
-        b=qmh7J96Yzz7lME9KE0znZQ6xfcyqRCuchAdeSN5jX4MAlG0jz+fGgpP7dRo5ScnkkJ
-         GspBTNuPSMNYrkbf6yCBOoS2nkCyElnLL9MXk5kEU1s0r/3Ns0jRCqR+C80yKc/wEDrS
-         6+ut0wQ1PKDfOUOhOjsEWqjysTrhGZ/zRVBs/5LYWtdUhGsAsYCen9PkB/vbABL72cVY
-         +d9im6/PdY8yX+LsDgL2EAlNclaQxQuHIKWDEwoT5Kr4k9nPw/X4DFKmKElvc+d0UlZP
-         bMGaqPutVn+IE2x3vA+R30uzxb0lsinR3xJeRybrDCJPPwtZTJyTrve7cQosDpjZoQez
-         +q4Q==
-X-Gm-Message-State: AOAM532+ay0tLG3du3GvkZipE5IAEvPtO1SyX3cMnmbNMsyoUCtErMqg
-        VAD6ZV5v9Tzoeh70wyC5Q+yYtehunfGE1goNDRu1KrXAJQhG5YX2fgkl9EZXxtPWH99yUn8IfGM
-        fLbX2Bj8PGGWipmf+mFwocemVDM/B1nz1PZV5rjbHmM/O4EVDv7CRVdSo
-X-Received: by 2002:a17:902:dac7:b0:148:ea85:af4d with SMTP id q7-20020a170902dac700b00148ea85af4dmr48734215plx.131.1641296789042;
-        Tue, 04 Jan 2022 03:46:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwMafOx3J2N+vnirg/RUlbh9VxvnjrvO/7mYaSFQHtIuDWATbA8Hi1oXl+pthEwcCKllJGQrdkzLfD/NlRm1gg=
-X-Received: by 2002:a17:902:dac7:b0:148:ea85:af4d with SMTP id
- q7-20020a170902dac700b00148ea85af4dmr48734197plx.131.1641296788754; Tue, 04
- Jan 2022 03:46:28 -0800 (PST)
+        bh=vguJt1qBunnTzzYbonX6ium+NdHf9qExcNc7nkL9r5E=;
+        b=0m7j3nGQ32M9ffCYsj/0UEZziV88S2DNP7/OCKrru91afzYObcV3+60s4DKEKXeJtl
+         UHhDp70YRt7PlQFjgLZX0NjZ2hNuARp0Z9hDuM/x1qPJhyJR4Mmd9rYslpxyOLi84s+g
+         R/4/z8Ej4z3txCI2Tx38UCaMsd8rWPW8YJF3S42gmHgA3Qncw4CtekYu0rhbbzQXp9Fc
+         vKjmP8H11fNUkNKvZg35k6rdZnwpOykXQFMUGW1w5IjEvkzGUTK3Lx8dGd+nYdC8kbxS
+         rBhM1y1VwEyPJfQQqLGftkd/JCgM6xTPEW+GfSnagmqBQT+4YOlY7rCJ/VV2IxRbXmJd
+         +Veg==
+X-Gm-Message-State: AOAM532D5qDPAZVUj4uu7uMsn6jaXHuG02FFer37US6vXgss+7X8/e+B
+        Rbq6qks6KCqE8brmdTlxw12JkE+6dQYjPLjsdOVJD28cjWPDDkNJI++wL4jHDVILNv9+mNR+poW
+        PpZ/MEo1NPQPu6+ea6nvSORSu+a5/lZn30EhxsKeadecVcO1cfwBpn+jw
+X-Received: by 2002:a05:6a00:2189:b0:4bc:3def:b662 with SMTP id h9-20020a056a00218900b004bc3defb662mr25965576pfi.5.1641296983724;
+        Tue, 04 Jan 2022 03:49:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwHUG523/8tbQoU+FdbL4mua7c1pE+3BKOgbfFl3NT4qiEjvq8tQ1RLFRaslHzAFK3UvUGlAtwKxmumPCxbgVk=
+X-Received: by 2002:a05:6a00:2189:b0:4bc:3def:b662 with SMTP id
+ h9-20020a056a00218900b004bc3defb662mr25965561pfi.5.1641296983477; Tue, 04 Jan
+ 2022 03:49:43 -0800 (PST)
 MIME-Version: 1.0
 References: <20211211022115.1547617-1-mfo@canonical.com> <YbuCvo12yVHiZgRE@google.com>
-In-Reply-To: <YbuCvo12yVHiZgRE@google.com>
+ <871r2ct207.fsf@yhuang6-desk2.ccr.corp.intel.com>
+In-Reply-To: <871r2ct207.fsf@yhuang6-desk2.ccr.corp.intel.com>
 From:   Mauricio Faria de Oliveira <mfo@canonical.com>
-Date:   Tue, 4 Jan 2022 08:46:17 -0300
-Message-ID: <CAO9xwp32+izoL54iCWRMGttL_T9yJKcyDyqwqxoDBx8Z7d_ZKg@mail.gmail.com>
+Date:   Tue, 4 Jan 2022 08:49:32 -0300
+Message-ID: <CAO9xwp0buKKqEU=CLe0tjDhSM_NWx6aafXiNX3zPghNdtcPQyA@mail.gmail.com>
 Subject: Re: [PATCH] mm: fix race between MADV_FREE reclaim and blkdev direct
  IO read
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, Huang Ying <ying.huang@intel.com>,
-        Miaohe Lin <linmiaohe@huawei.com>
+To:     "Huang, Ying" <ying.huang@intel.com>
+Cc:     Minchan Kim <minchan@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, Miaohe Lin <linmiaohe@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 16, 2021 at 3:17 PM Minchan Kim <minchan@kernel.org> wrote:
+On Thu, Dec 16, 2021 at 11:10 PM Huang, Ying <ying.huang@intel.com> wrote:
+>
+> Minchan Kim <minchan@kernel.org> writes:
 ...
-> Hi Mauricio,
->
-> Thanks for catching the bug. There is some comment before I would
-> look the problem in more detail. Please see below.
->
-
-Hey! Thanks for looking into this. Sorry for the delay; I've been out
-a few weeks.
-
-> > diff --git a/mm/rmap.c b/mm/rmap.c
-> > index 163ac4e6bcee..f04151aae03b 100644
-> > --- a/mm/rmap.c
-> > +++ b/mm/rmap.c
-> > @@ -1570,7 +1570,18 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
 > >
-> >                       /* MADV_FREE page check */
-> >                       if (!PageSwapBacked(page)) {
-> > -                             if (!PageDirty(page)) {
-> > +                             int refcount = page_ref_count(page);
-> > +
-> > +                             /*
-> > +                              * The only page refs must be from the isolation
-> > +                              * (checked by the caller shrink_page_list() too)
-> > +                              * and the (single) rmap (dropped by discard:).
-> > +                              *
-> > +                              * Check the reference count before dirty flag
-> > +                              * with memory barrier; see __remove_mapping().
-> > +                              */
-> > +                             smp_rmb();
-> > +                             if (refcount == 2 && !PageDirty(page)) {
+> > A madv_free marked page could be mapped at several processes so
+> > it wouldn't be refcount two all the time, I think.
+> > Shouldn't we check it with page_mapcount with page_refcount?
+> >
+> >     page_ref_count(page) - 1  > page_mapcount(page)
+> >
 >
-> A madv_free marked page could be mapped at several processes so
-> it wouldn't be refcount two all the time, I think.
-> Shouldn't we check it with page_mapcount with page_refcount?
->
->     page_ref_count(page) - 1  > page_mapcount(page)
->
+> And should we consider page_count() too in madvise_free_pte_range()?
+> That is, if the page has been used by GUP, we needn't to make its PTE
+> clean?
 
-It's the other way around, isn't it? The madvise(MADV_FREE) call only clears
-the page dirty flag if page_mapcount() == 1 (ie not mapped by more processes).
+Hey, thanks for reviewing!
 
-@ madvise_free_pte_range()
+That might not be sufficient time-wise, I guess, because the page can
+be used by GUP after the madvise() call (e.g., this case), thus
+checking for it during the call wouldn't catch it -- this may apply to
+other cases too, where there's no guarantee/ordering between both
+operations.
 
-                        /*
-                         * If page is shared with others, we couldn't clear
-                         * PG_dirty of the page.
-                         */
-                        if (page_mapcount(page) != 1) {
-                                unlock_page(page);
-                                continue;
-                        }
-...
-                        ClearPageDirty(page);
-                        unlock_page(page);
-
-
-If that's right, the refcount of 2 should be OK (one from the isolation,
-another one from the single map/one process.)
-
-Does that make sense?  I might be missing something.
-
-Thanks!
+cheers,
 
 -- 
 Mauricio Faria de Oliveira
