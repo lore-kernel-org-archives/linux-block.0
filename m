@@ -2,51 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B58BC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 10:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A88DEC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  4 Jan 2022 11:40:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231390AbiADK0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Jan 2022 05:26:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54384 "EHLO
+        id S232422AbiADLkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Jan 2022 06:40:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiADK0Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jan 2022 05:26:16 -0500
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040D0C061761;
-        Tue,  4 Jan 2022 02:26:16 -0800 (PST)
-Received: by mail-yb1-xb2d.google.com with SMTP id e202so63984379ybf.4;
-        Tue, 04 Jan 2022 02:26:15 -0800 (PST)
+        with ESMTP id S232419AbiADLkN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Jan 2022 06:40:13 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9FFEC061761;
+        Tue,  4 Jan 2022 03:40:12 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id 139so75695019ybd.3;
+        Tue, 04 Jan 2022 03:40:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:from:date:message-id:subject:to:cc;
-        bh=+9T/07leZYL+u6jeCf+ODELS7jGXLy0BCeiUyoOyR1c=;
-        b=cT0GAxJrjzD92ynzS4sf/JBBRHe2rAL6bQZSUTOwCUslvJ/pQXBHoEk1RpirF17P8h
-         CkI4sTAWwe3/IPXum4b58EiAZVBORC88BReAh9Wv+GHZYYt/tzau+FstS03mt4Aa9bhz
-         eicoWjMGD5noFGW6PgPvo7US97ZISsyGYbWU3IbkuV7vuD7SW/tDDTqPQPyJULD9p0QJ
-         y9tVkiYXpBjSvSYRT8LiBBHDS3mITrkh1L5TaFTdo/rc9jMPXuE7gq4Th/j99Ss8aIAx
-         1JnSN/NV07Ur1lXKL/gINlJhgpily5DLFifFhhcN2S9VbJaYKXLMckD7Mqo1ZLrdSXnG
-         qkEQ==
+        bh=7C3FpU/yuL9QU2o/yrunzaCR75pcnIXMC+mxGFaMH9k=;
+        b=o8iExUzolcdqu0q75Y9bgohWZwmhltmhssWqwRLRwTTyLPep3IUFF/oZoCjae6Ht0o
+         yoNJLK0++o2DF27IHPydLn41RAJHZ9XCgt30Ydeeo5L83ytF6h1J6RIS7qDQ3BF5PPwp
+         Bg4ni1gDRcMD5wZE/pfUj8eRvB5K19/cVk0wVfRbOSRDUKt07SMN4eoAXHZZAe1COKe1
+         zc/i3yvASpuEc0CdX+qtdBXauvtZsFjrboOelFoPF/ccV5Dteae3HvITfIGOQOJlEbgK
+         UggCRFDGV0mFYOUrOo5zdz+4uLajkyAhk6qT7Od9k2MRRImlkN9auJWm6BdHS7XcU9h0
+         bevw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=+9T/07leZYL+u6jeCf+ODELS7jGXLy0BCeiUyoOyR1c=;
-        b=Zic7GMsZRpS2dYfNakRTG5DOeQ7xGxtNjlTlexSlnBECmvLcG2tKAjZxI6ycEcPx3P
-         WVcglsieDkdY+Evsz48QO6cj1z1uTqAelqlrY4wxcxL85XH/KxmyHgNdS/XrVuIHf7LK
-         9QBJ+Yr4+sKme26bjoiKSp5EpFxdytuMMdJPteu2VC8pyssDrU1OJrVBIcLkqKnqKA/U
-         cv95KMQu9HywwpxeIjPruuluHr2t8TuHHEPfWtEEMR+o1aUgNN9yY1EuVtMwsN18rNZu
-         tuj0z/2f7p6uIYG9BLMb9wOX/DtaNzU0YPRCQKkRaSFOokwL9bl2rU7TnZLKGlG830dT
-         aJYA==
-X-Gm-Message-State: AOAM530aK8fagYPHVDabFav8XLEwiqPyDoI/nQU9uc79vsxLT9Cwm6OA
-        1i3y+MfivN1M+FWYs5jT8v9FDkRrml+pHNcj0/k=
-X-Google-Smtp-Source: ABdhPJzJWVZsFcDUbxHMqKQdXnh4Xx3kfG4A23r/I8INgKKCTE4phhTXKO9KlZ5iltZVrJ+vxPspLIzKzI4bBCmqdQo=
-X-Received: by 2002:a25:b293:: with SMTP id k19mr55021388ybj.627.1641291975222;
- Tue, 04 Jan 2022 02:26:15 -0800 (PST)
+        bh=7C3FpU/yuL9QU2o/yrunzaCR75pcnIXMC+mxGFaMH9k=;
+        b=mRS792/8Q+/0x/772Lsbb7kviZW+gsAN72PPw2oI1RInaMRIIZa15w2uyg+m4b4BzV
+         PVO3mglHZWgy8QaxmmgK9niCsYLKz2xu7dgWYWgEHnejGG4NJwGY9VQ1Rf4asg+RsvZ7
+         i2FyXjdEhy8+q9xI/7fHklXoOqWRpYmGQDjAnQKbjT/22xwomKEbLhwSUVh1XsWsHelE
+         rBdPHrFbiwdt2UGnE0UdYSGE8/zfZgmIHOsQwsNPX3jx9atoLWsdPmCE1KWkUH+zPXw2
+         lgOmGUV+BdS4dVW0qe2vrIG9iI3YTOYCXxpb7kl7yM6RNgJIeuLs5UhCgVvfvkClcvN1
+         NLYA==
+X-Gm-Message-State: AOAM532Y2KP3DonkWsIOUMdrK7PJ6e1detikn6UCKPOnAt9DKUvnbfkh
+        ZN1AOiQ9+PnJOZwiq1A0/kfupJcvqMGme5R3hy2u+IJW61NccA==
+X-Google-Smtp-Source: ABdhPJxFWwabLwek5/CKneKT/E6/G7cN2Ee9cXqjfQkB3D0otnVKE4beORmfrYU4hMS9htg5XPjU8T7yYe3/TcfhBl8=
+X-Received: by 2002:a25:b293:: with SMTP id k19mr55341624ybj.627.1641296412030;
+ Tue, 04 Jan 2022 03:40:12 -0800 (PST)
 MIME-Version: 1.0
 From:   kvartet <xyru1999@gmail.com>
-Date:   Tue, 4 Jan 2022 18:26:04 +0800
-Message-ID: <CAFkrUshANwa2iLNdjZypUUam7-tarKNp-EAhJMDbJciHKCXe7Q@mail.gmail.com>
-Subject: INFO: task hung in blk_mq_get_tag
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Date:   Tue, 4 Jan 2022 19:40:01 +0800
+Message-ID: <CAFkrUsjwz_aJusruvm23_HmQOrxuMtOzokjGYqPZngW87v=Lbw@mail.gmail.com>
+Subject: INFO: task hung in blk_trace_ioctl
+To:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Cc:     sunhao.th@gmail.com
 Content-Type: text/plain; charset="UTF-8"
@@ -61,7 +62,7 @@ crash was triggered.
 
 HEAD commit: a7904a538933 Linux 5.16-rc6
 git tree: upstream
-console output: https://paste.ubuntu.com/p/sBNS3rSWFq/plain/
+console output: https://paste.ubuntu.com/p/c57Y7mpvMj/plain/
 kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/plain/
 
 Sorry, I don't have a reproducer for this crash, hope the symbolized
@@ -70,100 +71,186 @@ report can help.
 If you fix this issue, please add the following tag to the commit:
 Reported-by: Yiru Xu <xyru1999@gmail.com>
 
-
-INFO: task syz-executor.7:13121 blocked for more than 143 seconds.
+INFO: task syz-executor.4:8184 blocked for more than 143 seconds.
       Not tainted 5.16.0-rc6 #9
 "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.7  state:D stack:27760 pid:13121 ppid: 12530 flags:0x00000004
+task:syz-executor.4  state:D stack:29536 pid: 8184 ppid: 28604 flags:0x00000004
 Call Trace:
  <TASK>
  context_switch kernel/sched/core.c:4972 [inline]
  __schedule+0xcd9/0x2530 kernel/sched/core.c:6253
  schedule+0xd2/0x260 kernel/sched/core.c:6326
- io_schedule+0xb3/0x120 kernel/sched/core.c:8371
- blk_mq_get_tag+0x58d/0xac0 block/blk-mq-tag.c:158
- __blk_mq_alloc_requests+0x674/0xe00 block/blk-mq.c:486
- blk_mq_alloc_request+0x116/0x210 block/blk-mq.c:520
- scsi_alloc_request+0x1f/0x60 drivers/scsi/scsi_lib.c:1103
- sg_start_req drivers/scsi/sg.c:1727 [inline]
- sg_common_write.isra.0+0x50e/0x1f30 drivers/scsi/sg.c:807
- sg_write+0x7c9/0xda0 drivers/scsi/sg.c:711
- vfs_write+0x22a/0xae0 fs/read_write.c:588
- ksys_write+0x12d/0x250 fs/read_write.c:643
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6385
+ __mutex_lock_common kernel/locking/mutex.c:680 [inline]
+ __mutex_lock+0xc48/0x1610 kernel/locking/mutex.c:740
+ blk_trace_ioctl+0xab/0x270 kernel/trace/blktrace.c:725
+ blkdev_common_ioctl+0x66c/0x1930 block/ioctl.c:529
+ blkdev_ioctl+0x2ca/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
  do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
  entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f90924fe89d
-RSP: 002b:00007f9090e6fc28 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f909261df60 RCX: 00007f90924fe89d
-RDX: 0000000000000030 RSI: 0000000020000040 RDI: 0000000000000004
-RBP: 00007f909256b00d R08: 0000000000000000 R09: 0000000000000000
+RIP: 0033:0x7fc154d6689d
+RSP: 002b:00007fc153695c28 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fc154e86100 RCX: 00007fc154d6689d
+RDX: 0000000000000000 RSI: 0000000000001276 RDI: 0000000000000004
+RBP: 00007fc154dd300d R08: 0000000000000000 R09: 0000000000000000
 R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fff4495088f R14: 00007f909261df60 R15: 00007f9090e6fdc0
+R13: 00007ffd12e481ef R14: 00007fc154e86100 R15: 00007fc153695dc0
  </TASK>
 
 Showing all locks held in the system:
 1 lock held by khungtaskd/39:
  #0: ffffffff8bb80e20 (rcu_read_lock){....}-{1:2}, at:
 debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6458
-1 lock held by in:imklog/6764:
- #0: ffff888018636b70 (&f->f_pos_lock){+.+.}-{3:3}, at:
-__fdget_pos+0xe9/0x100 fs/file.c:1034
-3 locks held by syz-fuzzer/6689:
- #0: ffff888102adc460 (sb_writers#5){.+.+}-{0:0}, at:
-do_rmdir+0x1d0/0x390 fs/namei.c:4013
- #1: ffff88802af421d8 (&type->i_mutex_dir_key#4/1){+.+.}-{3:3}, at:
+3 locks held by jbd2/sda-8/3025:
+2 locks held by systemd-journal/3047:
+ #0: ffff888104518f88 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff888104518f88 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by systemd-udevd/3063:
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by systemd-timesyn/3122:
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by sd-resolve/3125:
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by in:imklog/6788:
+ #0: ffff888019825550 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff888019825550 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by cron/6320:
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff88810451a378 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by agetty/6353:
+ #0: ffff88810bb0b098 (&tty->ldisc_sem){++++}-{0:0}, at:
+tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:252
+ #1: ffffc900026232e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at:
+n_tty_read+0x8db/0x1250 drivers/tty/n_tty.c:2113
+2 locks held by syz-fuzzer/6713:
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by syz-fuzzer/6714:
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by syz-fuzzer/6715:
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by syz-fuzzer/6716:
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_invalidate_lock_shared include/linux/fs.h:838 [inline]
+ #0: ffff888026de2d70 (mapping.invalidate_lock){++++}-{3:3}, at:
+filemap_fault+0x1537/0x2400 mm/filemap.c:3096
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #1: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+2 locks held by kworker/u8:4/9919:
+3 locks held by kworker/1:14/11580:
+5 locks held by kworker/u9:7/28673:
+2 locks held by syz-executor.1/4457:
+ #0: ffff8880202da460 (sb_writers#5){.+.+}-{0:0}, at:
+do_unlinkat+0x17f/0x660 fs/namei.c:4146
+ #1: ffff88811b4c0de8 (&type->i_mutex_dir_key#4/1){+.+.}-{3:3}, at:
 inode_lock_nested include/linux/fs.h:818 [inline]
- #1: ffff88802af421d8 (&type->i_mutex_dir_key#4/1){+.+.}-{3:3}, at:
-do_rmdir+0x21b/0x390 fs/namei.c:4017
- #2: ffff888113c5b5c8 (&type->i_mutex_dir_key#4){++++}-{3:3}, at:
-inode_lock include/linux/fs.h:783 [inline]
- #2: ffff888113c5b5c8 (&type->i_mutex_dir_key#4){++++}-{3:3}, at:
-vfs_rmdir fs/namei.c:3958 [inline]
- #2: ffff888113c5b5c8 (&type->i_mutex_dir_key#4){++++}-{3:3}, at:
-vfs_rmdir+0xe3/0x570 fs/namei.c:3946
-3 locks held by kworker/u9:21/13658:
- #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
-arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
-arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
-atomic_long_set include/linux/atomic/atomic-instrumented.h:1198
-[inline]
- #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
-set_work_data kernel/workqueue.c:635 [inline]
- #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
-set_work_pool_and_clear_pending kernel/workqueue.c:662 [inline]
- #0: ffff888100ff0138 ((wq_completion)writeback){+.+.}-{0:0}, at:
-process_one_work+0x8c3/0x16d0 kernel/workqueue.c:2269
- #1: ffffc9000f8bfdc8
-((work_completion)(&(&wb->dwork)->work)){+.+.}-{0:0}, at:
-process_one_work+0x8f7/0x16d0 kernel/workqueue.c:2273
- #2: ffff8881000940e0 (&type->s_umount_key#47){.+.+}-{3:3}, at:
-trylock_super+0x1d/0x100 fs/super.c:418
-4 locks held by kworker/2:10/30001:
- #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
-arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
-arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
-atomic_long_set include/linux/atomic/atomic-instrumented.h:1198
-[inline]
- #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
-set_work_data kernel/workqueue.c:635 [inline]
- #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
-set_work_pool_and_clear_pending kernel/workqueue.c:662 [inline]
- #0: ffff888010c64d38 ((wq_completion)events){+.+.}-{0:0}, at:
-process_one_work+0x8c3/0x16d0 kernel/workqueue.c:2269
- #1: ffffc9001352fdc8
-((work_completion)(&ap->scsi_rescan_task)){+.+.}-{0:0}, at:
-process_one_work+0x8f7/0x16d0 kernel/workqueue.c:2273
- #2: ffff8881075ac2a0 (&ap->scsi_scan_mutex){+.+.}-{3:3}, at:
-ata_scsi_dev_rescan+0x38/0x230 drivers/ata/libata-scsi.c:4646
- #3: ffff888107c9a3e0 (&dev->mutex){....}-{3:3}, at: device_lock
-include/linux/device.h:760 [inline]
- #3: ffff888107c9a3e0 (&dev->mutex){....}-{3:3}, at:
-scsi_rescan_device+0x28/0x210 drivers/scsi/scsi_scan.c:1555
+ #1: ffff88811b4c0de8 (&type->i_mutex_dir_key#4/1){+.+.}-{3:3}, at:
+do_unlinkat+0x269/0x660 fs/namei.c:4150
+1 lock held by syz-executor.5/5778:
+ #0: ffffffff8c353758 (tomoyo_ss){....}-{0:0}, at:
+tomoyo_check_open_permission+0xe8/0x370 security/tomoyo/file.c:761
+3 locks held by syz-executor.4/8180:
+ #0: ffff88810720bd20 (&q->debugfs_mutex){+.+.}-{3:3}, at:
+blk_trace_ioctl+0xab/0x270 kernel/trace/blktrace.c:725
+ #1: ffffffff8bbe0f08 (relay_channels_mutex){+.+.}-{3:3}, at:
+relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bbe0f08 (relay_channels_mutex){+.+.}-{3:3}, at:
+relay_open+0x389/0x9d0 kernel/relay.c:477
+ #2: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim
+mm/page_alloc.c:4585 [inline]
+ #2: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ #2: ffffffff8bca5140 (fs_reclaim){+.+.}-{0:0}, at:
+__alloc_pages_slowpath.constprop.0+0x760/0x21b0 mm/page_alloc.c:5007
+1 lock held by syz-executor.4/8184:
+ #0: ffff88810720bd20 (&q->debugfs_mutex){+.+.}-{3:3}, at:
+blk_trace_ioctl+0xab/0x270 kernel/trace/blktrace.c:725
 
 =============================================
 
@@ -185,113 +272,158 @@ Call Trace:
  </TASK>
 Sending NMI from CPU 2 to CPUs 0-1,3:
 NMI backtrace for cpu 0
-CPU: 0 PID: 11470 Comm: kworker/u8:5 Not tainted 5.16.0-rc6 #9
+CPU: 0 PID: 28673 Comm: kworker/u9:7 Not tainted 5.16.0-rc6 #9
 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
 1.13.0-1ubuntu1.1 04/01/2014
-Workqueue: bat_events batadv_nc_worker
-RIP: 0010:lockdep_enabled kernel/locking/lockdep.c:91 [inline]
-RIP: 0010:lock_acquire kernel/locking/lockdep.c:5613 [inline]
-RIP: 0010:lock_acquire+0x13b/0x520 kernel/locking/lockdep.c:5602
-Code: 85 c5 01 00 00 65 48 8b 14 25 40 70 02 00 48 8d ba 1c 0a 00 00
-48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 0f b6 0c 01 <48> 89
-f8 83 e0 07 83 c0 03 38 c8 7c 08 84 c9 0f 85 80 03 00 00 8b
-RSP: 0018:ffffc9000fc7fbf0 EFLAGS: 00000213
-RAX: dffffc0000000000 RBX: 1ffff92001f8ff80 RCX: 0000000000000000
-RDX: ffff888054573980 RSI: 0000000000000001 RDI: ffff88805457439c
-RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1b20a2b
-R10: ffffffff8d905157 R11: fffffbfff1b20a2a R12: 0000000000000002
-R13: ffffffff8bb80e20 R14: 0000000000000000 R15: 0000000000000000
+Workqueue: events_unbound toggle_allocation_gate
+RIP: 0010:csd_lock_wait kernel/smp.c:440 [inline]
+RIP: 0010:smp_call_function_many_cond+0x3db/0xc20 kernel/smp.c:969
+Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89
+f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 17 6f 0b 00 f3 90 <41> 0f
+b6 04 24 40 38 c5 7c 08 84 c0 0f 85 a2 06 00 00 8b 43 08 31
+RSP: 0018:ffffc90002b47a10 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: ffff888063f3fca0 RCX: ffff888040a58000
+RDX: 0000000000000000 RSI: ffff888040a58000 RDI: 0000000000000002
+RBP: 0000000000000003 R08: ffffffff816bfe59 R09: 0000000000000000
+R10: 0000000000000005 R11: fffffbfff1fee128 R12: ffffed100c7e7f95
+R13: 0000000000000002 R14: ffff888063f3fca8 R15: 0000000000000001
 FS:  0000000000000000(0000) GS:ffff888063e00000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000563740b0c900 CR3: 000000000b88e000 CR4: 0000000000350ef0
+CR2: 000000000043cfec CR3: 000000000b88e000 CR4: 0000000000350ef0
 Call Trace:
  <TASK>
- rcu_lock_acquire include/linux/rcupdate.h:268 [inline]
- rcu_read_lock include/linux/rcupdate.h:688 [inline]
- batadv_nc_purge_orig_hash net/batman-adv/network-coding.c:412 [inline]
- batadv_nc_worker+0x114/0x770 net/batman-adv/network-coding.c:723
+ on_each_cpu_cond_mask+0x56/0xa0 kernel/smp.c:1135
+ on_each_cpu include/linux/smp.h:71 [inline]
+ text_poke_sync arch/x86/kernel/alternative.c:1112 [inline]
+ text_poke_bp_batch+0x355/0x560 arch/x86/kernel/alternative.c:1350
+ text_poke_flush arch/x86/kernel/alternative.c:1451 [inline]
+ text_poke_finish+0x16/0x30 arch/x86/kernel/alternative.c:1458
+ arch_jump_label_transform_apply+0x13/0x20 arch/x86/kernel/jump_label.c:146
+ jump_label_update+0x32d/0x440 kernel/jump_label.c:830
+ static_key_disable_cpuslocked+0x156/0x1c0 kernel/jump_label.c:207
+ static_key_disable+0x16/0x20 kernel/jump_label.c:215
+ toggle_allocation_gate mm/kfence/core.c:746 [inline]
+ toggle_allocation_gate+0x183/0x390 mm/kfence/core.c:724
  process_one_work+0x9df/0x16d0 kernel/workqueue.c:2298
  worker_thread+0x90/0xed0 kernel/workqueue.c:2445
  kthread+0x405/0x4f0 kernel/kthread.c:327
  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
  </TASK>
-NMI backtrace for cpu 1 skipped: idling at native_safe_halt
-arch/x86/include/asm/irqflags.h:51 [inline]
-NMI backtrace for cpu 1 skipped: idling at arch_safe_halt
-arch/x86/include/asm/irqflags.h:89 [inline]
-NMI backtrace for cpu 1 skipped: idling at default_idle+0xb/0x10
-arch/x86/kernel/process.c:733
 NMI backtrace for cpu 3
-CPU: 3 PID: 3047 Comm: systemd-journal Not tainted 5.16.0-rc6 #9
+CPU: 3 PID: 9919 Comm: kworker/u8:4 Not tainted 5.16.0-rc6 #9
 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
 1.13.0-1ubuntu1.1 04/01/2014
-RIP: 0010:get_reg+0xef/0x170 arch/x86/kernel/unwind_orc.c:405
-Code: 11 00 0f 85 8d 00 00 00 49 89 45 00 41 bc 01 00 00 00 48 83 c4
-08 5b 44 89 e0 5d 41 5c 41 5d c3 48 8d 7c f5 00 e8 01 fc ff ff <4c> 89
-e9 48 ba 00 00 00 00 00 fc ff df 48 c1 e9 03 80 3c 11 00 75
-RSP: 0018:ffffc9000128f928 EFLAGS: 00000202
-RAX: 00007ffd54a44fe0 RBX: ffffc9000128fa50 RCX: 1ffff92000251f54
-RDX: 0000000000000006 RSI: 0000000000000004 RDI: ffffc9000128ff78
-RBP: ffffc9000128ff58 R08: ffffffff8ea3f366 R09: ffffffff8ea3f360
-R10: ffffc9000128faaf R11: 0000000000088089 R12: 0000000000000001
-R13: ffffc9000128f9d8 R14: ffffc9000128fa50 R15: ffffc9000128ff58
-FS:  00007fbeac5ba8c0(0000) GS:ffff888135d00000(0000) knlGS:0000000000000000
+Workqueue: bat_events batadv_nc_worker
+RIP: 0010:__sanitizer_cov_trace_pc+0x15/0x40 kernel/kcov.c:200
+Code: 8b 80 58 15 00 00 c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00
+65 48 8b 0c 25 40 70 02 00 bf 02 00 00 00 48 89 ce 4c 8b 04 24 <e8> 76
+ff ff ff 84 c0 74 20 48 8b 91 48 15 00 00 8b 89 44 15 00 00
+RSP: 0018:ffffc90018eefc28 EFLAGS: 00000046
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88802dd50000
+RDX: 0000000000000000 RSI: ffff88802dd50000 RDI: 0000000000000002
+RBP: ffffffff88df98b1 R08: ffffffff817d7f4c R09: 0000000000000000
+R10: 0000000000000005 R11: ffffed1006758a98 R12: ffff888017e456d8
+R13: ffff888017e44c80 R14: dffffc0000000000 R15: ffffffff88df99e0
+FS:  0000000000000000(0000) GS:ffff888135d00000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fbea9dca000 CR3: 000000001b63f000 CR4: 0000000000350ee0
+CR2: 00007f6177701270 CR3: 000000003157d000 CR4: 0000000000350ee0
 Call Trace:
  <TASK>
- unwind_next_frame+0xfe8/0x1780 arch/x86/kernel/unwind_orc.c:595
- arch_stack_walk+0x7d/0xe0 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x8c/0xc0 kernel/stacktrace.c:122
- kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:434 [inline]
- ____kasan_kmalloc mm/kasan/common.c:513 [inline]
- ____kasan_kmalloc mm/kasan/common.c:472 [inline]
- __kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:522
- kasan_kmalloc include/linux/kasan.h:269 [inline]
- __kmalloc+0x1d2/0x3d0 mm/slub.c:4423
- kmalloc include/linux/slab.h:595 [inline]
- kzalloc include/linux/slab.h:724 [inline]
- lsm_cred_alloc security/security.c:537 [inline]
- security_prepare_creds+0x10e/0x190 security/security.c:1692
- prepare_creds+0x56e/0x7b0 kernel/cred.c:291
- access_override_creds fs/open.c:351 [inline]
- do_faccessat+0x3f4/0x850 fs/open.c:415
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fbeab8769c7
-Code: 83 c4 08 48 3d 01 f0 ff ff 73 01 c3 48 8b 0d c8 d4 2b 00 f7 d8
-64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 b8 15 00 00 00 0f 05 <48> 3d
-01 f0 ff ff 73 01 c3 48 8b 0d a1 d4 2b 00 f7 d8 64 89 01 48
-RSP: 002b:00007ffd54a44fa8 EFLAGS: 00000246 ORIG_RAX: 0000000000000015
-RAX: ffffffffffffffda RBX: 00007ffd54a47ec0 RCX: 00007fbeab8769c7
-RDX: 00007fbeac2e7a00 RSI: 0000000000000000 RDI: 000055b9fe0f89a3
-RBP: 00007ffd54a44fe0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000069 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007ffd54a47ec0 R15: 00007ffd54a454d0
+ trace_hardirqs_off+0x2c/0x1b0 kernel/trace/trace_preemptirq.c:79
+ __local_bh_enable_ip+0xc3/0x110 kernel/softirq.c:365
+ spin_unlock_bh include/linux/spinlock.h:394 [inline]
+ batadv_nc_purge_paths+0x2d1/0x400 net/batman-adv/network-coding.c:475
+ batadv_nc_worker+0x287/0x770 net/batman-adv/network-coding.c:726
+ process_one_work+0x9df/0x16d0 kernel/workqueue.c:2298
+ worker_thread+0x90/0xed0 kernel/workqueue.c:2445
+ kthread+0x405/0x4f0 kernel/kthread.c:327
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
+NMI backtrace for cpu 1
+CPU: 1 PID: 3025 Comm: jbd2/sda-8 Not tainted 5.16.0-rc6 #9
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+RIP: 0010:__sanitizer_cov_trace_pc+0x1c/0x40 kernel/kcov.c:200
+Code: 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 65 48 8b 0c 25 40 70
+02 00 bf 02 00 00 00 48 89 ce 4c 8b 04 24 e8 76 ff ff ff 84 c0 <74> 20
+48 8b 91 48 15 00 00 8b 89 44 15 00 00 48 8b 02 48 83 c0 01
+RSP: 0018:ffffc9000cba68b8 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: fffffffffffffffe RCX: ffff88801ed9d640
+RDX: 0000000000000000 RSI: ffff88801ed9d640 RDI: 0000000000000002
+RBP: ffff888013f46788 R08: ffffffff81a24171 R09: fffffffffffffffe
+R10: 0000000000000007 R11: fffffbfff1b20a2a R12: 0000000000000004
+R13: 0000000000000000 R14: ffffc9000cba6930 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff888135c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000477f80 CR3: 00000000218ee000 CR4: 0000000000350ee0
+Call Trace:
+ <TASK>
+ list_empty include/linux/list.h:284 [inline]
+ rwsem_is_contended include/linux/rwsem.h:121 [inline]
+ shrink_slab mm/vmscan.c:942 [inline]
+ shrink_slab+0x1a1/0x6f0 mm/vmscan.c:906
+ shrink_node_memcgs mm/vmscan.c:3131 [inline]
+ shrink_node+0x883/0x1df0 mm/vmscan.c:3252
+ shrink_zones mm/vmscan.c:3485 [inline]
+ do_try_to_free_pages+0x4f6/0x1440 mm/vmscan.c:3541
+ try_to_free_pages+0x2a6/0x760 mm/vmscan.c:3776
+ __perform_reclaim mm/page_alloc.c:4588 [inline]
+ __alloc_pages_direct_reclaim mm/page_alloc.c:4609 [inline]
+ __alloc_pages_slowpath.constprop.0+0x807/0x21b0 mm/page_alloc.c:5007
+ __alloc_pages+0x5ab/0x6e0 mm/page_alloc.c:5382
+ alloc_pages+0x115/0x240 mm/mempolicy.c:2191
+ __stack_depot_save+0x3db/0x520 lib/stackdepot.c:359
+ save_stack+0x15e/0x1e0 mm/page_owner.c:120
+ __set_page_owner+0x45/0x300 mm/page_owner.c:181
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook mm/page_alloc.c:2412 [inline]
+ prep_new_page+0x1a6/0x240 mm/page_alloc.c:2418
+ get_page_from_freelist+0x1eed/0x3b50 mm/page_alloc.c:4149
+ __alloc_pages_cpuset_fallback mm/page_alloc.c:4231 [inline]
+ __alloc_pages_may_oom mm/page_alloc.c:4322 [inline]
+ __alloc_pages_slowpath.constprop.0+0x1d34/0x21b0 mm/page_alloc.c:5051
+ __alloc_pages+0x5ab/0x6e0 mm/page_alloc.c:5382
+ alloc_pages+0x115/0x240 mm/mempolicy.c:2191
+ folio_alloc+0x1c/0x70 mm/mempolicy.c:2201
+ filemap_alloc_folio+0x282/0x3d0 mm/filemap.c:1036
+ __filemap_get_folio+0x3d7/0x1080 mm/filemap.c:1951
+ pagecache_get_page+0x2c/0x1a0 mm/folio-compat.c:125
+ find_or_create_page include/linux/pagemap.h:489 [inline]
+ grow_dev_page fs/buffer.c:949 [inline]
+ grow_buffers fs/buffer.c:1014 [inline]
+ __getblk_slow fs/buffer.c:1041 [inline]
+ __getblk_gfp+0x240/0xb80 fs/buffer.c:1334
+ __getblk include/linux/buffer_head.h:382 [inline]
+ jbd2_journal_get_descriptor_buffer+0x10a/0x410 fs/jbd2/journal.c:1014
+ journal_submit_commit_record.part.0+0x89/0xa20 fs/jbd2/commit.c:131
+ journal_submit_commit_record fs/jbd2/commit.c:128 [inline]
+ jbd2_journal_commit_transaction+0x3ffd/0x6c90 fs/jbd2/commit.c:925
+ kjournald2+0x1d0/0x930 fs/jbd2/journal.c:213
+ kthread+0x405/0x4f0 kernel/kthread.c:327
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
  </TASK>
 ----------------
 Code disassembly (best guess):
-   0: 85 c5                test   %eax,%ebp
-   2: 01 00                add    %eax,(%rax)
-   4: 00 65 48              add    %ah,0x48(%rbp)
-   7: 8b 14 25 40 70 02 00 mov    0x27040,%edx
-   e: 48 8d ba 1c 0a 00 00 lea    0xa1c(%rdx),%rdi
-  15: 48 b8 00 00 00 00 00 movabs $0xdffffc0000000000,%rax
-  1c: fc ff df
-  1f: 48 89 f9              mov    %rdi,%rcx
-  22: 48 c1 e9 03          shr    $0x3,%rcx
-  26: 0f b6 0c 01          movzbl (%rcx,%rax,1),%ecx
-* 2a: 48 89 f8              mov    %rdi,%rax <-- trapping instruction
-  2d: 83 e0 07              and    $0x7,%eax
-  30: 83 c0 03              add    $0x3,%eax
-  33: 38 c8                cmp    %cl,%al
-  35: 7c 08                jl     0x3f
-  37: 84 c9                test   %cl,%cl
-  39: 0f 85 80 03 00 00    jne    0x3bf
-  3f: 8b                    .byte 0x8b
+   0: 0b 00                or     (%rax),%eax
+   2: 85 ed                test   %ebp,%ebp
+   4: 74 4d                je     0x53
+   6: 48 b8 00 00 00 00 00 movabs $0xdffffc0000000000,%rax
+   d: fc ff df
+  10: 4d 89 f4              mov    %r14,%r12
+  13: 4c 89 f5              mov    %r14,%rbp
+  16: 49 c1 ec 03          shr    $0x3,%r12
+  1a: 83 e5 07              and    $0x7,%ebp
+  1d: 49 01 c4              add    %rax,%r12
+  20: 83 c5 03              add    $0x3,%ebp
+  23: e8 17 6f 0b 00        callq  0xb6f3f
+  28: f3 90                pause
+* 2a: 41 0f b6 04 24        movzbl (%r12),%eax <-- trapping instruction
+  2f: 40 38 c5              cmp    %al,%bpl
+  32: 7c 08                jl     0x3c
+  34: 84 c0                test   %al,%al
+  36: 0f 85 a2 06 00 00    jne    0x6de
+  3c: 8b 43 08              mov    0x8(%rbx),%eax
+  3f: 31                    .byte 0x31
 
 
 
