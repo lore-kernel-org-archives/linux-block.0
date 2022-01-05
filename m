@@ -2,74 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ACF6C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Jan 2022 10:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1528C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Jan 2022 17:05:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239552AbiAEK4k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jan 2022 05:56:40 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4347 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232847AbiAEK4j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jan 2022 05:56:39 -0500
-Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JTRD40y1Cz67bNC;
-        Wed,  5 Jan 2022 18:53:24 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 5 Jan 2022 11:56:37 +0100
-Received: from [10.47.27.56] (10.47.27.56) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Wed, 5 Jan
- 2022 10:56:37 +0000
-Subject: Re: [PATCH -next V2] blk-mq: fix tag_get wait task can't be awakened
-To:     Laibin Qiu <qiulaibin@huawei.com>, <axboe@kernel.dk>,
-        <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20220105035644.3311480-1-qiulaibin@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <ddb3c319-65f3-6045-d0ac-764c7dcc84c2@huawei.com>
-Date:   Wed, 5 Jan 2022 10:56:25 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S242123AbiAERF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jan 2022 12:05:27 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:40256 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242089AbiAERF0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Jan 2022 12:05:26 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A949D617C9
+        for <linux-block@vger.kernel.org>; Wed,  5 Jan 2022 17:05:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CAD1C36AE9;
+        Wed,  5 Jan 2022 17:05:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641402325;
+        bh=WC9QR45b9hMLbj6d6HxZ8ypkwBnGddX9RlV4N19YuXs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=X5zo9rSHRZkW+2OBJ/lxCHzmmzG8R21+rDn96plb9ETPb2CJS0KDyknFy7vDWwNce
+         D0bhNXtZi/nZFSR499r6OwZpLBoV9oIu7bG0gZnBr+P1gtPZ8Vum8RQ8tGJvvixPpa
+         IUMMtJLLH/8vLIzNTcT3i0SR51AHsE7vgQXIebk3ARLcLtyFk+YjSHgjaamWgDeiar
+         jwwHPGQxllzvK6TdyYzv1ctFYZqzYbnyBvBxIHb2n3ggSL0wqMMsdnu3IXprG3O7H1
+         R5vhgFGVSDM/jzkOC89KPyV9umH7KKompzwuq/WydwMr3JWw/F4HvL22Iy/viQA9Ef
+         PsGNzRw/ZKlMA==
+From:   Keith Busch <kbusch@kernel.org>
+To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Cc:     hch@lst.de, sagi@grimberg.me, mgurtovoy@nvidia.com,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv3 0/4] queue_rqs error handling
+Date:   Wed,  5 Jan 2022 09:05:14 -0800
+Message-Id: <20220105170518.3181469-1-kbusch@kernel.org>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-In-Reply-To: <20220105035644.3311480-1-qiulaibin@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.27.56]
-X-ClientProxiedBy: lhreml736-chm.china.huawei.com (10.201.108.87) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/01/2022 03:56, Laibin Qiu wrote:
-> +
->   /*
->    * If a previously inactive queue goes active, bump the active user count.
->    * We need to do this before try to allocate driver tag, then even if fail
-> @@ -23,10 +38,16 @@
->    */
->   bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
->   {
-> +	unsigned int users;
-> +
->   	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-> -	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-> +	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
->   		atomic_inc(&hctx->tags->active_queues);
->   
-> +		users = atomic_read(&hctx->tags->active_queues);
-> +		blk_mq_update_wake_batch(hctx->tags, users);
-> +	}
-> +
->   	return true;
->   }
->   
+The only real change since v2 is a prep patch that relocates the rq list
+macros to blk-mq.h since that's where 'struct request' is defined.
 
-This code looks old to me. Which baseline is used here?
+Patch 3 removes the 'next' parameter since it is trivially obtainable
+via 'rq->rq_next' anyway.
 
-Thanks,
-John
+Otherwise, the series is the same as v2 and tested with lots of random
+error injection in the prep path. The same errors would have lost
+requests in the current driver, but is successful with this series.
+
+Keith Busch (4):
+  block: move rq_list macros to blk-mq.h
+  block: introduce rq_list_for_each_safe macro
+  block: introduce rq_list_move
+  nvme-pci: fix queue_rqs list splitting
+
+ drivers/nvme/host/pci.c | 28 +++++++++++------------
+ fs/io_uring.c           |  2 +-
+ include/linux/blk-mq.h  | 50 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h  | 29 ------------------------
+ 4 files changed, 65 insertions(+), 44 deletions(-)
+
+-- 
+2.25.4
+
