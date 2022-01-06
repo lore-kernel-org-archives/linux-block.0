@@ -2,206 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04621C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 15:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E9CC4332F
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 16:17:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233007AbiAFPwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jan 2022 10:52:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53179 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230138AbiAFPwK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Jan 2022 10:52:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641484327;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4t/c2e5dlVL4C0onl5AB0P4i94Iv3cIbHbEUlUanZ+k=;
-        b=ZQnpulol/gORZ0uQ0MgVnbzb0nhJ9PDSR3I7nhniHL+G6j205JudX36v/8NOAbzEkfH0AG
-        fyTDJGV/eehLkfpvpBegaMiCCAwdjz6U/yjpPMpKPVS8ahIh8mBj+Oz9gUYami29PSyIH0
-        1w08CANC2MisAByFYBZ9b3vNYSR8P/8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-209-eSz1Cuy_NqGuF6pL0zM5gg-1; Thu, 06 Jan 2022 10:52:04 -0500
-X-MC-Unique: eSz1Cuy_NqGuF6pL0zM5gg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S241104AbiAFQRn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jan 2022 11:17:43 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:48812 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241052AbiAFQRm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jan 2022 11:17:42 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF14D1023F4D;
-        Thu,  6 Jan 2022 15:52:02 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D64685EFE;
-        Thu,  6 Jan 2022 15:51:30 +0000 (UTC)
-Date:   Thu, 6 Jan 2022 23:51:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [PATCH 3/3] dm: mark dm queue as blocking if any underlying is
- blocking
-Message-ID: <YdcP/fnF5xrBnq+Y@T590>
-References: <20211221141459.1368176-1-ming.lei@redhat.com>
- <20211221141459.1368176-4-ming.lei@redhat.com>
- <YdcNgw14kSg+ENVL@redhat.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 6FED71F37F;
+        Thu,  6 Jan 2022 16:17:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1641485861; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jiujcEw1K7Aihwam1nGHQCL1WPhq/6cKdLiFVo++R3c=;
+        b=ufwsRGd/FAFSnNurr1idklThXc8LwBLYgJV1EMzyI+FcwXo4765ZgS1rrPr2SeIcuIzAnr
+        Qz4oPL+EShKMJyF/TCs94cyS3cFUxMuOwWgiXtUwbuPcHE6tPcT5sfgFyaEmSqXyyPurGp
+        WTGPEzwD6r+hPpBJqRPJK6LRMaR/z5k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1641485861;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jiujcEw1K7Aihwam1nGHQCL1WPhq/6cKdLiFVo++R3c=;
+        b=226XJuqQmhTHAxGxJccyOlu2FmeDoOd5e59bAFWXy3zITmcJmXbjP4qXgwZ7rlGZs25eRZ
+        SylzAKQ0qBaZkMBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2A6C113C5E;
+        Thu,  6 Jan 2022 16:17:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id rt3wOCIW12FhCgAAMHmgww
+        (envelope-from <colyli@suse.de>); Thu, 06 Jan 2022 16:17:38 +0000
+Message-ID: <bd98488b-dbb8-0510-3ccc-f80cbfe5e3ff@suse.de>
+Date:   Fri, 7 Jan 2022 00:17:36 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YdcNgw14kSg+ENVL@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent for
+ hardware raid5/6
+Content-Language: en-US
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     linux-block@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de>
+ <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net>
+ <200638b0-7cba-38b4-20c4-b325f3cfe862@suse.de>
+ <alpine.LRH.2.11.1906241800350.1114@mx.ewheeler.net>
+ <8a9131dc-9bf7-a24a-f7b8-35e0c019e905@suse.de>
+ <fdb85dc1-eee6-e55e-8e9c-fa1f36b4a37@ewheeler.net>
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <fdb85dc1-eee6-e55e-8e9c-fa1f36b4a37@ewheeler.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 06, 2022 at 10:40:51AM -0500, Mike Snitzer wrote:
-> On Tue, Dec 21 2021 at  9:14P -0500,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > dm request based driver doesn't set BLK_MQ_F_BLOCKING, so dm_queue_rq()
-> > is supposed to not sleep.
-> > 
-> > However, blk_insert_cloned_request() is used by dm_queue_rq() for
-> > queuing underlying request, but the underlying queue may be marked as
-> > BLK_MQ_F_BLOCKING, so blk_insert_cloned_request() may become to block
-> > current context, then rcu warning is triggered.
-> > 
-> > Fixes the issue by marking dm request based queue as BLK_MQ_F_BLOCKING
-> > if any underlying queue is marked as BLK_MQ_F_BLOCKING, meantime we
-> > need to allocate srcu beforehand.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/md/dm-rq.c    |  5 ++++-
-> >  drivers/md/dm-rq.h    |  3 ++-
-> >  drivers/md/dm-table.c | 14 ++++++++++++++
-> >  drivers/md/dm.c       |  5 +++--
-> >  drivers/md/dm.h       |  1 +
-> >  5 files changed, 24 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> > index 579ab6183d4d..2297d37c62a9 100644
-> > --- a/drivers/md/dm-rq.c
-> > +++ b/drivers/md/dm-rq.c
-> > @@ -535,7 +535,8 @@ static const struct blk_mq_ops dm_mq_ops = {
-> >  	.init_request = dm_mq_init_request,
-> >  };
-> >  
-> > -int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
-> > +int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t,
-> > +			     bool blocking)
-> >  {
-> >  	struct dm_target *immutable_tgt;
-> >  	int err;
-> > @@ -550,6 +551,8 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
-> >  	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING;
-> >  	md->tag_set->nr_hw_queues = dm_get_blk_mq_nr_hw_queues();
-> >  	md->tag_set->driver_data = md;
-> > +	if (blocking)
-> > +		md->tag_set->flags |= BLK_MQ_F_BLOCKING;
-> >  
-> >  	md->tag_set->cmd_size = sizeof(struct dm_rq_target_io);
-> >  	immutable_tgt = dm_table_get_immutable_target(t);
-> 
-> As you can see, dm_table_get_immutable_target(t) is called here ^
-> 
-> Rather than pass 'blocking' in, please just call dm_table_has_blocking_dev(t);
-> 
-> But not a big deal, I can clean that up once this gets committed...
-> 
-> > diff --git a/drivers/md/dm-rq.h b/drivers/md/dm-rq.h
-> > index 1eea0da641db..5f3729f277d7 100644
-> > --- a/drivers/md/dm-rq.h
-> > +++ b/drivers/md/dm-rq.h
-> > @@ -30,7 +30,8 @@ struct dm_rq_clone_bio_info {
-> >  	struct bio clone;
-> >  };
-> >  
-> > -int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t);
-> > +int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t,
-> > +			     bool blocking);
-> >  void dm_mq_cleanup_mapped_device(struct mapped_device *md);
-> >  
-> >  void dm_start_queue(struct request_queue *q);
-> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> > index aa173f5bdc3d..e4bdd4f757a3 100644
-> > --- a/drivers/md/dm-table.c
-> > +++ b/drivers/md/dm-table.c
-> > @@ -1875,6 +1875,20 @@ static bool dm_table_supports_write_zeroes(struct dm_table *t)
-> >  	return true;
-> >  }
-> >  
-> > +/* If the device can block inside ->queue_rq */
-> > +static int device_is_io_blocking(struct dm_target *ti, struct dm_dev *dev,
-> > +			      sector_t start, sector_t len, void *data)
-> > +{
-> > +	struct request_queue *q = bdev_get_queue(dev->bdev);
-> > +
-> > +	return blk_queue_blocking(q);
-> > +}
-> > +
-> > +bool dm_table_has_blocking_dev(struct dm_table *t)
-> > +{
-> > +	return dm_table_any_dev_attr(t, device_is_io_blocking, NULL);
-> > +}
-> > +
-> >  static int device_not_nowait_capable(struct dm_target *ti, struct dm_dev *dev,
-> >  				     sector_t start, sector_t len, void *data)
-> >  {
-> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > index 280918cdcabd..2f72877752dd 100644
-> > --- a/drivers/md/dm.c
-> > +++ b/drivers/md/dm.c
-> > @@ -1761,7 +1761,7 @@ static struct mapped_device *alloc_dev(int minor)
-> >  	 * established. If request-based table is loaded: blk-mq will
-> >  	 * override accordingly.
-> >  	 */
-> > -	md->disk = blk_alloc_disk(md->numa_node_id);
-> > +	md->disk = blk_alloc_disk_srcu(md->numa_node_id);
-> >  	if (!md->disk)
-> >  		goto bad;
-> >  	md->queue = md->disk->queue;
-> > @@ -2046,7 +2046,8 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
-> >  	switch (type) {
-> >  	case DM_TYPE_REQUEST_BASED:
-> >  		md->disk->fops = &dm_rq_blk_dops;
-> > -		r = dm_mq_init_request_queue(md, t);
-> > +		r = dm_mq_init_request_queue(md, t,
-> > +				dm_table_has_blocking_dev(t));
-> >  		if (r) {
-> >  			DMERR("Cannot initialize queue for request-based dm mapped device");
-> >  			return r;
-> > diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-> > index 742d9c80efe1..f7f92b272cce 100644
-> > --- a/drivers/md/dm.h
-> > +++ b/drivers/md/dm.h
-> > @@ -60,6 +60,7 @@ int dm_calculate_queue_limits(struct dm_table *table,
-> >  			      struct queue_limits *limits);
-> >  int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-> >  			      struct queue_limits *limits);
-> > +bool dm_table_has_blocking_dev(struct dm_table *t);
-> >  struct list_head *dm_table_get_devices(struct dm_table *t);
-> >  void dm_table_presuspend_targets(struct dm_table *t);
-> >  void dm_table_presuspend_undo_targets(struct dm_table *t);
-> > -- 
-> > 2.31.1
-> > 
-> 
-> Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+On 1/6/22 11:29 AM, Eric Wheeler wrote:
+> On Tue, 25 Jun 2019, Coly Li wrote:
+>> On 2019/6/25 2:14 上午, Eric Wheeler wrote:
+>>> On Mon, 24 Jun 2019, Coly Li wrote:
+>>>
+>>>> On 2019/6/23 7:16 上午, Eric Wheeler wrote:
+>>>>> From: Eric Wheeler <git@linux.ewheeler.net>
+>>>>>
+>>>>> While some drivers set queue_limits.io_opt (e.g., md raid5), there are
+>>>>> currently no SCSI/RAID controller drivers that do.  Previously stripe_size
+>>>>> and partial_stripes_expensive were read-only values and could not be
+>>>>> tuned by users (eg, for hardware RAID5/6).
+>>>>>
+>>>>> This patch enables users to save the optimal IO size via sysfs through
+>>>>> the backing device attributes stripe_size and partial_stripes_expensive
+>>>>> into the bcache superblock.
+>>>>>
+>>>>> Superblock changes are backwards-compatable:
+>>>>>
+>>>>> *  partial_stripes_expensive: One bit was used in the superblock flags field
+>>>>>
+>>>>> *  stripe_size: There are eight 64-bit "pad" fields for future use in
+>>>>>     the superblock which default to 0; from those, 32-bits are now used
+>>>>>     to save the stripe_size and load at device registration time.
+>>>>>
+>>>>> Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
+>>>> Hi Eric,
+>>>>
+>>>> In general I am OK with this patch. Since Peter comments lots of SCSI
+>>>> RAID devices reports a stripe width, could you please list the hardware
+>>>> raid devices which don't list stripe size ? Then we can make decision
+>>>> whether it is necessary to have such option enabled.
+>>> Perhaps they do not set stripe_width using io_opt? I did a grep to see if
+>>> any of them did, but I didn't see them. How is stripe_width indicated by
+>>> RAID controllers?
+>>>
+>>> If they do set io_opt, then at least my Areca 1883 does not set io_opt as
+>>> of 4.19.x. I also have a LSI MegaRAID 3108 which does not report io_opt as
+>>> of 4.1.x, but that is an older kernel so maybe support has been added
+>>> since then.
+>>>
+>>> Martin,
+>>>
+>>> Where would stripe_width be configured in the SCSI drivers? Is it visible
+>>> through sysfs or debugfs so I can check my hardware support without
+>>> hacking debugging the kernel?
+>>>
+>>>> Another point is, this patch changes struct cache_sb, it is no problem
+>>>> to change on-disk format. I plan to update the super block version soon,
+>>>> to store more configuration persistently into super block. stripe_size
+>>>> can be added to cache_sb with other on-disk changes.
+>> Hi Eric,
+>>
+>>> Maybe bumping version makes sense, but even if you do not, this is safe to
+>>> use on systems without bumping the version because the values are unused
+>>> and default to 0.
+>> Yes, I understand you, it works as you suggested. I need to think how to
+>> organize all options in struct cache_sb, stripe_size will be arranged
+>> then. And I will ask help to you for reviewing the changes of on-disk
+>> format.
+> Hi Coli,
+>
+> Just checking in, its been a while and I didn't see any more discussion on
+> the topic:
 
-Thanks!
+Hi Eric,
 
-> 
-> Late, given holidays we know why, but this patchset is needed for 5.17
-> (maybe with added: 'Fixes: 704b914f15fb7 "blk-mq: move srcu from
-> blk_mq_hw_ctx to request_queue"' to this 3rd patch?)
+Thank you for reminding me. The persistent on-disk options were that 
+much as I thought, so using a reserved space from the on-disk super 
+block is fine.
 
-It is one long-term issue, not related with commit 704b914f15fb7. The
-problem is that rcu read lock is held by blk-mq when running dm_queue_rq()
-which calls underlying blocking queue's ->queue_rq() which may sleep
-somewhere.
+> This would benefit users with older RAID controllers using RAID-5/6 that
+> don't set io_opt.
+>
+> Even new new RAID controlers that _do_ provide `io_opt` still do _not_
+> indicate partial_stripes_expensive (which is an mdraid feature, but Martin
+> please correct me if I'm wrong here).  Thus, all hardware RAID-5/6 users
+> could benefit by manually flagging partial_stripes_expensive to get burst
+> writes out of bcache that fit their stride width.
 
+Yeah, I agree with you.
 
-Thanks,
-Ming
+> This patch probably needs rebased and documentation updated about io_opt,
+> but here is the original patch with documentation for your reference:
+> 	https://lkml.org/lkml/2019/6/22/298
+>
+> What do you think?
 
+Yes please rebase the patch with latest mainline kernel and let's start 
+the review.
+
+Thank you.
+
+Coly Li
