@@ -2,154 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F72C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 09:10:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9120BC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 09:53:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237202AbiAFJKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jan 2022 04:10:39 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:60269 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237228AbiAFJKb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jan 2022 04:10:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1641460231; x=1672996231;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8EjfkMBxgq9OGB9tI0dnsy+jf3uRZb0u3PYnJ6+biAQ=;
-  b=IjQBtvSlaxUJwwOl4zNkWgAipOGb9LoDfyz3J/AQv/5ZcSDZ8/Hx1iv/
-   ZyTlZInVnZbGC0ueOQma2NB40QaxKSvHkBCF7BDPmfsdjXCDEaPTOGfoJ
-   lMlaVV2gAtUAhOQFCdos/msEmRoDAkLH0VdI2ctEE3YDSKatHEobcC1AK
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.88,266,1635206400"; 
-   d="scan'208";a="168173182"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-31df91b1.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 06 Jan 2022 09:10:20 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-31df91b1.us-west-2.amazon.com (Postfix) with ESMTPS id 8E3B243128;
-        Thu,  6 Jan 2022 09:10:19 +0000 (UTC)
-Received: from EX13d09UWA001.ant.amazon.com (10.43.160.247) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1497.26; Thu, 6 Jan 2022 09:10:19 +0000
-Received: from EX13MTAUWA001.ant.amazon.com (10.43.160.58) by
- EX13d09UWA001.ant.amazon.com (10.43.160.247) with Microsoft SMTP Server (TLS)
- id 15.0.1497.26; Thu, 6 Jan 2022 09:10:18 +0000
-Received: from dev-dsk-mheyne-1b-c1524648.eu-west-1.amazon.com (10.15.60.66)
- by mail-relay.amazon.com (10.43.160.118) with Microsoft SMTP Server id
- 15.0.1497.26 via Frontend Transport; Thu, 6 Jan 2022 09:10:19 +0000
-Received: by dev-dsk-mheyne-1b-c1524648.eu-west-1.amazon.com (Postfix, from userid 5466572)
-        id 838C241148; Thu,  6 Jan 2022 09:10:17 +0000 (UTC)
-From:   Maximilian Heyne <mheyne@amazon.de>
-CC:     Maximilian Heyne <mheyne@amazon.de>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Anthony Liguori <aliguori@amazon.com>,
-        "SeongJae Park" <sjpark@amazon.de>,
-        Juergen Gross <jgross@suse.com>,
-        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] xen, blkback: fix persistent grants negotiation
-Date:   Thu, 6 Jan 2022 09:10:13 +0000
-Message-ID: <20220106091013.126076-1-mheyne@amazon.de>
-X-Mailer: git-send-email 2.32.0
+        id S235664AbiAFJxW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jan 2022 04:53:22 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:62620 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236542AbiAFJxW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jan 2022 04:53:22 -0500
+Received: from fsav314.sakura.ne.jp (fsav314.sakura.ne.jp [153.120.85.145])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 2069rInE064374;
+        Thu, 6 Jan 2022 18:53:18 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav314.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp);
+ Thu, 06 Jan 2022 18:53:18 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 2069rIGB064358
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Thu, 6 Jan 2022 18:53:18 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-ID: <6b074af7-c165-4fab-b7da-8270a4f6f6cd@i-love.sakura.ne.jp>
+Date:   Thu, 6 Jan 2022 18:53:16 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: [PATCH] brd: remove brd_devices_mutex mutex
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Given dom0 supports persistent grants but the guest does not.
-Then, when attaching a block device during runtime of the guest, dom0
-will enable persistent grants for this newly attached block device:
+If brd_alloc() from brd_probe() is called before brd_alloc() from
+brd_init() is called, module loading will fail with -EEXIST error.
+To close this race, call __register_blkdev() just before leaving
+brd_init().
 
-  $ xenstore-ls -f | grep 20674 | grep persistent
-  /local/domain/0/backend/vbd/20674/768/feature-persistent = "0"
-  /local/domain/0/backend/vbd/20674/51792/feature-persistent = "1"
+Then, we can remove brd_devices_mutex mutex, for brd_device list
+will no longer be accessed concurrently.
 
-Here disk 768 was attached during guest creation while 51792 was
-attached at runtime. If the guest would have advertised the persistent
-grant feature, there would be a xenstore entry like:
-
-  /local/domain/20674/device/vbd/51792/feature-persistent = "1"
-
-Persistent grants are also used when the guest tries to access the disk
-which can be seen when enabling log stats:
-
-  $ echo 1 > /sys/module/xen_blkback/parameters/log_stats
-  $ dmesg
-  xen-blkback: (20674.xvdf-0): oo   0  |  rd    0  |  wr    0  |  f    0 |  ds    0 | pg:    1/1056
-
-The "pg: 1/1056" shows that one persistent grant is used.
-
-Before commit aac8a70db24b ("xen-blkback: add a parameter for disabling
-of persistent grants") vbd->feature_gnt_persistent was set in
-connect_ring. After the commit it was intended to be initialized in
-xen_vbd_create and then set according to the guest feature availability
-in connect_ring. However, with a running guest, connect_ring might be
-called before xen_vbd_create and vbd->feature_gnt_persistent will be
-incorrectly initialized. xen_vbd_create will overwrite it with the value
-of feature_persistent regardless whether the guest actually supports
-persistent grants.
-
-With this commit, vbd->feature_gnt_persistent is set only in
-connect_ring and this is the only use of the module parameter
-feature_persistent. This avoids races when the module parameter changes
-during the block attachment process.
-
-Note that vbd->feature_gnt_persistent doesn't need to be initialized in
-xen_vbd_create. It's next use is in connect which can only be called
-once connect_ring has initialized the rings. xen_update_blkif_status is
-checking for this.
-
-Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
-Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- drivers/block/xen-blkback/xenbus.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ drivers/block/brd.c | 73 +++++++++++++++++++--------------------------
+ 1 file changed, 30 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 914587aabca0c..51b6ec0380ca4 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -522,8 +522,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 	if (q && blk_queue_secure_erase(q))
- 		vbd->discard_secure = true;
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 8fe2e4289dae..6e3f2f0d2352 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -362,7 +362,6 @@ __setup("ramdisk_size=", ramdisk_size);
+  * (should share code eventually).
+  */
+ static LIST_HEAD(brd_devices);
+-static DEFINE_MUTEX(brd_devices_mutex);
+ static struct dentry *brd_debugfs_dir;
  
--	vbd->feature_gnt_persistent = feature_persistent;
--
- 	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
- 		handle, blkif->domid);
- 	return 0;
-@@ -1090,10 +1088,9 @@ static int connect_ring(struct backend_info *be)
- 		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
- 		return -ENOSYS;
- 	}
--	if (blkif->vbd.feature_gnt_persistent)
--		blkif->vbd.feature_gnt_persistent =
--			xenbus_read_unsigned(dev->otherend,
--					"feature-persistent", 0);
+ static int brd_alloc(int i)
+@@ -372,21 +371,14 @@ static int brd_alloc(int i)
+ 	char buf[DISK_NAME_LEN];
+ 	int err = -ENOMEM;
+ 
+-	mutex_lock(&brd_devices_mutex);
+-	list_for_each_entry(brd, &brd_devices, brd_list) {
+-		if (brd->brd_number == i) {
+-			mutex_unlock(&brd_devices_mutex);
++	list_for_each_entry(brd, &brd_devices, brd_list)
++		if (brd->brd_number == i)
+ 			return -EEXIST;
+-		}
+-	}
+ 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
+-	if (!brd) {
+-		mutex_unlock(&brd_devices_mutex);
++	if (!brd)
+ 		return -ENOMEM;
+-	}
+ 	brd->brd_number		= i;
+ 	list_add_tail(&brd->brd_list, &brd_devices);
+-	mutex_unlock(&brd_devices_mutex);
+ 
+ 	spin_lock_init(&brd->brd_lock);
+ 	INIT_RADIX_TREE(&brd->brd_pages, GFP_ATOMIC);
+@@ -429,9 +421,7 @@ static int brd_alloc(int i)
+ out_cleanup_disk:
+ 	blk_cleanup_disk(disk);
+ out_free_dev:
+-	mutex_lock(&brd_devices_mutex);
+ 	list_del(&brd->brd_list);
+-	mutex_unlock(&brd_devices_mutex);
+ 	kfree(brd);
+ 	return err;
+ }
+@@ -441,15 +431,19 @@ static void brd_probe(dev_t dev)
+ 	brd_alloc(MINOR(dev) / max_part);
+ }
+ 
+-static void brd_del_one(struct brd_device *brd)
++static void brd_cleanup(void)
+ {
+-	del_gendisk(brd->brd_disk);
+-	blk_cleanup_disk(brd->brd_disk);
+-	brd_free_pages(brd);
+-	mutex_lock(&brd_devices_mutex);
+-	list_del(&brd->brd_list);
+-	mutex_unlock(&brd_devices_mutex);
+-	kfree(brd);
++	struct brd_device *brd, *next;
 +
-+	blkif->vbd.feature_gnt_persistent = feature_persistent &&
-+		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
++	debugfs_remove_recursive(brd_debugfs_dir);
++
++	list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
++		del_gendisk(brd->brd_disk);
++		blk_cleanup_disk(brd->brd_disk);
++		brd_free_pages(brd);
++		list_del(&brd->brd_list);
++		kfree(brd);
++	}
+ }
  
- 	blkif->vbd.overflow_max_grants = 0;
+ static inline void brd_check_and_reset_par(void)
+@@ -473,9 +467,18 @@ static inline void brd_check_and_reset_par(void)
  
+ static int __init brd_init(void)
+ {
+-	struct brd_device *brd, *next;
+ 	int err, i;
+ 
++	brd_check_and_reset_par();
++
++	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
++
++	for (i = 0; i < rd_nr; i++) {
++		err = brd_alloc(i);
++		if (err)
++			goto out_free;
++	}
++
+ 	/*
+ 	 * brd module now has a feature to instantiate underlying device
+ 	 * structure on-demand, provided that there is an access dev node.
+@@ -491,28 +494,16 @@ static int __init brd_init(void)
+ 	 *	dynamically.
+ 	 */
+ 
+-	if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe))
+-		return -EIO;
+-
+-	brd_check_and_reset_par();
+-
+-	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
+-
+-	for (i = 0; i < rd_nr; i++) {
+-		err = brd_alloc(i);
+-		if (err)
+-			goto out_free;
++	if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe)) {
++		err = -EIO;
++		goto out_free;
+ 	}
+ 
+ 	pr_info("brd: module loaded\n");
+ 	return 0;
+ 
+ out_free:
+-	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+-	debugfs_remove_recursive(brd_debugfs_dir);
+-
+-	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
+-		brd_del_one(brd);
++	brd_cleanup();
+ 
+ 	pr_info("brd: module NOT loaded !!!\n");
+ 	return err;
+@@ -520,13 +511,9 @@ static int __init brd_init(void)
+ 
+ static void __exit brd_exit(void)
+ {
+-	struct brd_device *brd, *next;
+ 
+ 	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
+-	debugfs_remove_recursive(brd_debugfs_dir);
+-
+-	list_for_each_entry_safe(brd, next, &brd_devices, brd_list)
+-		brd_del_one(brd);
++	brd_cleanup();
+ 
+ 	pr_info("brd: module unloaded\n");
+ }
 -- 
 2.32.0
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
 
