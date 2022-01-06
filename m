@@ -2,142 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B1CC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 02:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D51C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 03:34:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231969AbiAFClg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Jan 2022 21:41:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45113 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231967AbiAFClg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Jan 2022 21:41:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641436895;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=27mfixNH5Fceen+RQ8Te4w1ftnjUijse05g0jdU93XM=;
-        b=YzZawW/K0c1G9R3eATT91Z9FwUBD1qa0DULfgjhyP3ygcZwu8fgOwhORAY4TdudQvAMQ5m
-        H14YpAOwvRAoDQ+twnZJ4HW1XXR29yHIVbsu6FS+4ocku01FS2K0K3D+zsFWvOa/XdXTlR
-        l19cMWi+L9ERz9h0DN6RVGEQaOoAtjs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-277-Z1vb-L1ZNgKqq4txlptiIw-1; Wed, 05 Jan 2022 21:41:34 -0500
-X-MC-Unique: Z1vb-L1ZNgKqq4txlptiIw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S229821AbiAFDei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Jan 2022 22:34:38 -0500
+Received: from mx.ewheeler.net ([173.205.220.69]:33318 "EHLO mx.ewheeler.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229593AbiAFDei (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Jan 2022 22:34:38 -0500
+X-Greylist: delayed 325 seconds by postgrey-1.27 at vger.kernel.org; Wed, 05 Jan 2022 22:34:38 EST
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 1D16141;
+        Wed,  5 Jan 2022 19:29:13 -0800 (PST)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id EF3nXm4EoBAl; Wed,  5 Jan 2022 19:29:08 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E052B81CCB7;
-        Thu,  6 Jan 2022 02:41:32 +0000 (UTC)
-Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 565C01037F3E;
-        Thu,  6 Jan 2022 02:41:18 +0000 (UTC)
-Date:   Thu, 6 Jan 2022 10:41:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, lining2020x@163.com,
-        Tejun Heo <tj@kernel.org>, Chunguang Xu <brookxu@tencent.com>
-Subject: Re: [PATCH] block: throttle: charge io re-submission for iops limit
-Message-ID: <YdZWyRpbi4HdHAZa@T590>
-References: <20211230034513.131619-1-ming.lei@redhat.com>
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 32F2439;
+        Wed,  5 Jan 2022 19:29:08 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 32F2439
+Date:   Wed, 5 Jan 2022 19:29:05 -0800 (PST)
+From:   Eric Wheeler <bcache@lists.ewheeler.net>
+To:     Coly Li <colyli@suse.de>
+cc:     linux-block@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent
+ for hardware raid5/6
+In-Reply-To: <8a9131dc-9bf7-a24a-f7b8-35e0c019e905@suse.de>
+Message-ID: <fdb85dc1-eee6-e55e-8e9c-fa1f36b4a37@ewheeler.net>
+References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de> <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net> <200638b0-7cba-38b4-20c4-b325f3cfe862@suse.de> <alpine.LRH.2.11.1906241800350.1114@mx.ewheeler.net>
+ <8a9131dc-9bf7-a24a-f7b8-35e0c019e905@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211230034513.131619-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: multipart/mixed; boundary="8323328-1944457719-1641439748=:4450"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 30, 2021 at 11:45:13AM +0800, Ming Lei wrote:
-> Commit 111be8839817 ("block-throttle: avoid double charge") marks bio as
-> BIO_THROTTLED unconditionally if __blk_throtl_bio() is called on this bio,
-> then this bio won't be called into __blk_throtl_bio() any more. This way
-> is to avoid double charge in case of bio splitting. It is reasonable for
-> read/write throughput limit, but not reasonable for IOPS limit because
-> block layer provides io accounting against split bio.
-> 
-> Chunguang Xu has already observed this issue and fixed it in commit
-> 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios").
-> However, that patch only covers bio splitting in __blk_queue_split(), and
-> we have other kind of bio splitting, such as bio_split() & submit_bio_noacct()
-> and other ways.
-> 
-> This patch tries to fix the issue in one generic way, by always charge
-> the bio for iops limit in blk_throtl_bio() in case that BIO_THROTTLED
-> is set. This way is reasonable: re-submission & fast-cloned bio is charged
-> if it is submitted to same disk/queue, and BIO_THROTTLED will be cleared
-> if bio->bi_bdev is changed.
-> 
-> Reported-by: lining2020x@163.com
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: Chunguang Xu <brookxu@tencent.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-merge.c    | 2 --
->  block/blk-throttle.c | 2 +-
->  block/blk-throttle.h | 8 +++++---
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 4de34a332c9f..f5255991b773 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -368,8 +368,6 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
->  		trace_block_split(split, (*bio)->bi_iter.bi_sector);
->  		submit_bio_noacct(*bio);
->  		*bio = split;
-> -
-> -		blk_throtl_charge_bio_split(*bio);
->  	}
->  }
->  
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 7c462c006b26..ea532c178385 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -2043,7 +2043,7 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
->  }
->  #endif
->  
-> -void blk_throtl_charge_bio_split(struct bio *bio)
-> +void blk_throtl_charge_for_iops_limit(struct bio *bio)
->  {
->  	struct blkcg_gq *blkg = bio->bi_blkg;
->  	struct throtl_grp *parent = blkg_to_tg(blkg);
-> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-> index 175f03abd9e4..954b9cac19b7 100644
-> --- a/block/blk-throttle.h
-> +++ b/block/blk-throttle.h
-> @@ -158,20 +158,22 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
->  static inline int blk_throtl_init(struct request_queue *q) { return 0; }
->  static inline void blk_throtl_exit(struct request_queue *q) { }
->  static inline void blk_throtl_register_queue(struct request_queue *q) { }
-> -static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
-> +static inline void blk_throtl_charge_for_iops_limit(struct bio *bio) { }
->  static inline bool blk_throtl_bio(struct bio *bio) { return false; }
->  #else /* CONFIG_BLK_DEV_THROTTLING */
->  int blk_throtl_init(struct request_queue *q);
->  void blk_throtl_exit(struct request_queue *q);
->  void blk_throtl_register_queue(struct request_queue *q);
-> -void blk_throtl_charge_bio_split(struct bio *bio);
-> +void blk_throtl_charge_for_iops_limit(struct bio *bio);
->  bool __blk_throtl_bio(struct bio *bio);
->  static inline bool blk_throtl_bio(struct bio *bio)
->  {
->  	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
->  
-> -	if (bio_flagged(bio, BIO_THROTTLED))
-> +	if (bio_flagged(bio, BIO_THROTTLED)) {
-> +		blk_throtl_charge_for_iops_limit(bio);
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-This way may cause double charge since the bio's iops limit
-charge can be done via blk_throtl_dispatch_work_fn() too.
+--8323328-1944457719-1641439748=:4450
+Content-Type: text/plain; charset=iso-2022-jp
 
-Will post another version for fix this issue.
+On Tue, 25 Jun 2019, Coly Li wrote:
+> On 2019/6/25 2:14 上午, Eric Wheeler wrote:
+> > On Mon, 24 Jun 2019, Coly Li wrote:
+> > 
+> >> On 2019/6/23 7:16 上午, Eric Wheeler wrote:
+> >>> From: Eric Wheeler <git@linux.ewheeler.net>
+> >>>
+> >>> While some drivers set queue_limits.io_opt (e.g., md raid5), there are
+> >>> currently no SCSI/RAID controller drivers that do.  Previously stripe_size
+> >>> and partial_stripes_expensive were read-only values and could not be
+> >>> tuned by users (eg, for hardware RAID5/6).
+> >>>
+> >>> This patch enables users to save the optimal IO size via sysfs through
+> >>> the backing device attributes stripe_size and partial_stripes_expensive
+> >>> into the bcache superblock.
+> >>>
+> >>> Superblock changes are backwards-compatable:
+> >>>
+> >>> *  partial_stripes_expensive: One bit was used in the superblock flags field
+> >>>
+> >>> *  stripe_size: There are eight 64-bit "pad" fields for future use in
+> >>>    the superblock which default to 0; from those, 32-bits are now used
+> >>>    to save the stripe_size and load at device registration time.
+> >>>
+> >>> Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
+> >>
+> >> Hi Eric,
+> >>
+> >> In general I am OK with this patch. Since Peter comments lots of SCSI
+> >> RAID devices reports a stripe width, could you please list the hardware
+> >> raid devices which don't list stripe size ? Then we can make decision
+> >> whether it is necessary to have such option enabled.
+> > 
+> > Perhaps they do not set stripe_width using io_opt? I did a grep to see if 
+> > any of them did, but I didn't see them. How is stripe_width indicated by 
+> > RAID controllers? 
+> > 
+> > If they do set io_opt, then at least my Areca 1883 does not set io_opt as 
+> > of 4.19.x. I also have a LSI MegaRAID 3108 which does not report io_opt as 
+> > of 4.1.x, but that is an older kernel so maybe support has been added 
+> > since then.
+> > 
+> > Martin,
+> > 
+> > Where would stripe_width be configured in the SCSI drivers? Is it visible 
+> > through sysfs or debugfs so I can check my hardware support without 
+> > hacking debugging the kernel?
+> > 
+> >>
+> >> Another point is, this patch changes struct cache_sb, it is no problem
+> >> to change on-disk format. I plan to update the super block version soon,
+> >> to store more configuration persistently into super block. stripe_size
+> >> can be added to cache_sb with other on-disk changes.
+> > 
+> 
+> Hi Eric,
+> 
+> > Maybe bumping version makes sense, but even if you do not, this is safe to 
+> > use on systems without bumping the version because the values are unused 
+> > and default to 0.
+> 
+> Yes, I understand you, it works as you suggested. I need to think how to
+> organize all options in struct cache_sb, stripe_size will be arranged
+> then. And I will ask help to you for reviewing the changes of on-disk
+> format.
 
-Thanks,
-Ming
+Hi Coli,
 
+Just checking in, its been a while and I didn't see any more discussion on 
+the topic:
+
+This would benefit users with older RAID controllers using RAID-5/6 that 
+don't set io_opt.
+
+Even new new RAID controlers that _do_ provide `io_opt` still do _not_ 
+indicate partial_stripes_expensive (which is an mdraid feature, but Martin 
+please correct me if I'm wrong here).  Thus, all hardware RAID-5/6 users 
+could benefit by manually flagging partial_stripes_expensive to get burst 
+writes out of bcache that fit their stride width.
+
+This patch probably needs rebased and documentation updated about io_opt, 
+but here is the original patch with documentation for your reference:
+	https://lkml.org/lkml/2019/6/22/298
+
+What do you think?
+
+-Eric
+
+> 
+> Thanks.
+> 
+> [snipped]
+> 
+> -- 
+> 
+> Coly Li
+> 
+--8323328-1944457719-1641439748=:4450--
