@@ -2,125 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50CFFC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 07:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F72C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Jan 2022 09:10:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236198AbiAFHtn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jan 2022 02:49:43 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:5604 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiAFHtn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jan 2022 02:49:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1641455382; x=1672991382;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2WDD+HaOLgup4B5fEQYLo+csY4qLmPnygvxXzcy18iQ=;
-  b=OUficGyyNATVvETZflqH1X83WHSQPeDlyVeKFoutl94OC4VkqLtdvckN
-   wrcaD/5hH/1J5j8C0ifRpRRAusha1TeW50QLahtNOJoZ2bjcgrqjBl8Do
-   Fv+5m/cuTA/I4RfVqB6moEYtaszx0S3JHun/XWsmgSbXzlP9w6IPZ9nrZ
-   TObxq/svfhUSuKfgfPbMbtLqHJjaIKjUrAtrsBD4lFZKE00KrMlnTIaos
-   NCsUfMcilsNqRUNXqraTJ77RUTDW2yboF1tM/jBBhLrV+4ydI/U7JMxsS
-   QvKLDld6Uqzkv6L4iwIPYk6V78ch4Vrc/ibGXbh2MEN/BYNYikjp8LQxx
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.88,266,1635177600"; 
-   d="scan'208";a="188782113"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jan 2022 15:49:36 +0800
-IronPort-SDR: MDwjVY7UKeayY3n7UrRv6cf4FO67YHGi7S7K57jfttuJXpKeDdyju7eWTaMUqAUEp8OJp7lFrw
- npPaBzUtDlmnfBB0wGhbXrw/uLXfBVrx0HF1RIGZIPCU4FX+70o2TZAqYpdMXQC3ThD96TO0oS
- YjEbeWhRoC50Dp821DtPw1gr1uW/IPFEqrc/4sTD7puK/aGHMQ3+dije1rZJANDl6te/YNQ3j9
- i4w0aoq+NkM3lov6j/tjkZUYJS+zM1Ltf2GogXZAl03RxhAZTSEk8RMXaC9BoyBx8pjP2UMou+
- D7WrPGsGjGD7l+VW6H5ITM+u
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 23:22:06 -0800
-IronPort-SDR: jb4aYdIbpdi9YKrt6BxRourrsGQm43HK1XOztwuqedXiTaHCDIc+ZXzIhspLnbgyeaGwhTNIKX
- HJbyc0jdbqjQJSTyDx3PwETQdiI0UJYBJ8RAzaoiO4oboNzEoUo2CQBn5g3varRsFUr1x4NiT4
- TFO1/HEigP9RcYj+zEwi1DAarMVzaTMhX/zWycpWAbk+neycCKZfcgGJY/3jjRS7+YZC70riMH
- AUH26dT6w16m4i5k/mRAOrjt4jCVSNMiI/m9xVqBVb0O/pS4gtyvLCl3sQier3XDxrKRy+tCSU
- 5rU=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2022 23:49:38 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4JTz5X4xbvz1P3j6
-        for <linux-block@vger.kernel.org>; Wed,  5 Jan 2022 23:49:36 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1641455376; x=1644047377; bh=2WDD+HaOLgup4B5fEQYLo+csY4qLmPnygvx
-        Xzcy18iQ=; b=uP4J5GAOC/i/fac34YK8PszLfeqTSzbT7NmYCFPHcJlXaqA2ro5
-        xSWcvbMKn07EMVQFud+vxIR7gIiggdcg6x5Z5wM+zMV9LjIzRuSni+F7hcgJ+HM7
-        h74Ws9HNuQQKlTld1chy3alkvaGYvvNQ1x0WJD77EOcz64TAgFcemtAuzTURrGgP
-        ljCfBERpRsDYbTcC6kwvSfiTU/R5EnaBixBQUTjaWLPrpVbynujP52rpun+FgYWa
-        6JsIOoViOVX1cyRbTWK3iJOO7DBe32qzojFz/pTFMfvSfUKeU4rcXpCgGijlPcjr
-        dqXT0spSpjVeoMQxbTwfiat2/+jtzoLiSJQ==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id NJJwOXQfsK97 for <linux-block@vger.kernel.org>;
-        Wed,  5 Jan 2022 23:49:36 -0800 (PST)
-Received: from [10.225.163.43] (unknown [10.225.163.43])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4JTz5V0scwz1VSkV;
-        Wed,  5 Jan 2022 23:49:33 -0800 (PST)
-Message-ID: <974640be-a87e-5a46-3dcc-ba8dbf79c9cf@opensource.wdc.com>
-Date:   Thu, 6 Jan 2022 16:49:32 +0900
+        id S237202AbiAFJKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jan 2022 04:10:39 -0500
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:60269 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237228AbiAFJKb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jan 2022 04:10:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1641460231; x=1672996231;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8EjfkMBxgq9OGB9tI0dnsy+jf3uRZb0u3PYnJ6+biAQ=;
+  b=IjQBtvSlaxUJwwOl4zNkWgAipOGb9LoDfyz3J/AQv/5ZcSDZ8/Hx1iv/
+   ZyTlZInVnZbGC0ueOQma2NB40QaxKSvHkBCF7BDPmfsdjXCDEaPTOGfoJ
+   lMlaVV2gAtUAhOQFCdos/msEmRoDAkLH0VdI2ctEE3YDSKatHEobcC1AK
+   Y=;
+X-IronPort-AV: E=Sophos;i="5.88,266,1635206400"; 
+   d="scan'208";a="168173182"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-31df91b1.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 06 Jan 2022 09:10:20 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2b-31df91b1.us-west-2.amazon.com (Postfix) with ESMTPS id 8E3B243128;
+        Thu,  6 Jan 2022 09:10:19 +0000 (UTC)
+Received: from EX13d09UWA001.ant.amazon.com (10.43.160.247) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.26; Thu, 6 Jan 2022 09:10:19 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (10.43.160.58) by
+ EX13d09UWA001.ant.amazon.com (10.43.160.247) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.26; Thu, 6 Jan 2022 09:10:18 +0000
+Received: from dev-dsk-mheyne-1b-c1524648.eu-west-1.amazon.com (10.15.60.66)
+ by mail-relay.amazon.com (10.43.160.118) with Microsoft SMTP Server id
+ 15.0.1497.26 via Frontend Transport; Thu, 6 Jan 2022 09:10:19 +0000
+Received: by dev-dsk-mheyne-1b-c1524648.eu-west-1.amazon.com (Postfix, from userid 5466572)
+        id 838C241148; Thu,  6 Jan 2022 09:10:17 +0000 (UTC)
+From:   Maximilian Heyne <mheyne@amazon.de>
+CC:     Maximilian Heyne <mheyne@amazon.de>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Anthony Liguori <aliguori@amazon.com>,
+        "SeongJae Park" <sjpark@amazon.de>,
+        Juergen Gross <jgross@suse.com>,
+        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] xen, blkback: fix persistent grants negotiation
+Date:   Thu, 6 Jan 2022 09:10:13 +0000
+Message-ID: <20220106091013.126076-1-mheyne@amazon.de>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] null_blk: Use bitmap_zalloc() when applicable
-Content-Language: en-US
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        axboe@kernel.dk, chaitanya.kulkarni@wdc.com, damien.lemoal@wdc.com,
-        ming.lei@redhat.com, Johannes.Thumshirn@wdc.com,
-        shinichiro.kawasaki@wdc.com, jiangguoqing@kylinos.cn,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <3e68598defed010efb864ea55887d88ed0da02cc.1640296433.git.christophe.jaillet@wanadoo.fr>
- <c60a1750-ccbb-1f7a-12be-ac331393be80@opensource.wdc.com>
- <20220106074423.GG7674@kadam>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220106074423.GG7674@kadam>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/6/22 16:44, Dan Carpenter wrote:
-> On Thu, Dec 30, 2021 at 11:28:28AM +0900, Damien Le Moal wrote:
->>>  
->>> -	tag_size = ALIGN(nq->queue_depth, BITS_PER_LONG) / BITS_PER_LONG;
->>> -	nq->tag_map = kcalloc(tag_size, sizeof(unsigned long), GFP_KERNEL);
->>> +	nq->tag_map = bitmap_zalloc(nq->queue_depth, GFP_KERNEL);
->>>  	if (!nq->tag_map) {
->>>  		kfree(nq->cmds);
->>>  		return -ENOMEM;
->>
->> Before this patch, tag_size would always be a multiple of BITS_PER_LONG.
->> Using bitmap_zalloc(), that alignment goes away, but I think this is OK.
->>
-> 
-> It's still going to be a multiple of long.  Bitmaps are always stored
-> in longs.
+Given dom0 supports persistent grants but the guest does not.
+Then, when attaching a block device during runtime of the guest, dom0
+will enable persistent grants for this newly attached block device:
 
-Yes, I understand that. I was referring to tag_size, which was rounded
-before. But tag_size is only a local variable and not the actual queue
-depth, which is not rounded. I got confused :)
+  $ xenstore-ls -f | grep 20674 | grep persistent
+  /local/domain/0/backend/vbd/20674/768/feature-persistent = "0"
+  /local/domain/0/backend/vbd/20674/51792/feature-persistent = "1"
 
-> 
-> regards,
-> dan carpenter
-> 
+Here disk 768 was attached during guest creation while 51792 was
+attached at runtime. If the guest would have advertised the persistent
+grant feature, there would be a xenstore entry like:
 
+  /local/domain/20674/device/vbd/51792/feature-persistent = "1"
 
+Persistent grants are also used when the guest tries to access the disk
+which can be seen when enabling log stats:
+
+  $ echo 1 > /sys/module/xen_blkback/parameters/log_stats
+  $ dmesg
+  xen-blkback: (20674.xvdf-0): oo   0  |  rd    0  |  wr    0  |  f    0 |  ds    0 | pg:    1/1056
+
+The "pg: 1/1056" shows that one persistent grant is used.
+
+Before commit aac8a70db24b ("xen-blkback: add a parameter for disabling
+of persistent grants") vbd->feature_gnt_persistent was set in
+connect_ring. After the commit it was intended to be initialized in
+xen_vbd_create and then set according to the guest feature availability
+in connect_ring. However, with a running guest, connect_ring might be
+called before xen_vbd_create and vbd->feature_gnt_persistent will be
+incorrectly initialized. xen_vbd_create will overwrite it with the value
+of feature_persistent regardless whether the guest actually supports
+persistent grants.
+
+With this commit, vbd->feature_gnt_persistent is set only in
+connect_ring and this is the only use of the module parameter
+feature_persistent. This avoids races when the module parameter changes
+during the block attachment process.
+
+Note that vbd->feature_gnt_persistent doesn't need to be initialized in
+xen_vbd_create. It's next use is in connect which can only be called
+once connect_ring has initialized the rings. xen_update_blkif_status is
+checking for this.
+
+Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
+Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+---
+ drivers/block/xen-blkback/xenbus.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index 914587aabca0c..51b6ec0380ca4 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -522,8 +522,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 	if (q && blk_queue_secure_erase(q))
+ 		vbd->discard_secure = true;
+ 
+-	vbd->feature_gnt_persistent = feature_persistent;
+-
+ 	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
+ 		handle, blkif->domid);
+ 	return 0;
+@@ -1090,10 +1088,9 @@ static int connect_ring(struct backend_info *be)
+ 		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+ 		return -ENOSYS;
+ 	}
+-	if (blkif->vbd.feature_gnt_persistent)
+-		blkif->vbd.feature_gnt_persistent =
+-			xenbus_read_unsigned(dev->otherend,
+-					"feature-persistent", 0);
++
++	blkif->vbd.feature_gnt_persistent = feature_persistent &&
++		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
+ 
+ 	blkif->vbd.overflow_max_grants = 0;
+ 
 -- 
-Damien Le Moal
-Western Digital Research
+2.32.0
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
