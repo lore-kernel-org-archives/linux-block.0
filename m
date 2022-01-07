@@ -2,199 +2,314 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62C6C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 09:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C05AC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 09:28:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346405AbiAGJPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jan 2022 04:15:48 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:30261 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346393AbiAGJPq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 04:15:46 -0500
-Received: from kwepemi100010.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JVcxn0rHpzbjtb;
-        Fri,  7 Jan 2022 17:15:09 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100010.china.huawei.com (7.221.188.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 7 Jan 2022 17:15:44 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 7 Jan 2022 17:15:44 +0800
-Subject: Re: [PATCH 0/5 v2] bfq: Avoid use-after-free when moving processes
- between cgroups
-To:     Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>
-CC:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20220105143037.20542-1-jack@suse.cz>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
-Date:   Fri, 7 Jan 2022 17:15:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S236608AbiAGJ2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jan 2022 04:28:51 -0500
+Received: from proxmox-new.maurer-it.com ([94.136.29.106]:35294 "EHLO
+        proxmox-new.maurer-it.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231910AbiAGJ2v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 04:28:51 -0500
+X-Greylist: delayed 504 seconds by postgrey-1.27 at vger.kernel.org; Fri, 07 Jan 2022 04:28:51 EST
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+        by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 7707146BF2;
+        Fri,  7 Jan 2022 10:20:25 +0100 (CET)
+Date:   Fri, 7 Jan 2022 10:20:23 +0100
+From:   Wolfgang Bumiller <w.bumiller@proxmox.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, tj@kernel.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] blk-cgroup: stop using seq_get_buf
+Message-ID: <20220107092023.iaz57fai5kj47fqf@olga.proxmox.com>
+References: <20210810152623.1796144-1-hch@lst.de>
+ <20210810152623.1796144-2-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20220105143037.20542-1-jack@suse.cz>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210810152623.1796144-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/01/05 22:36, Jan Kara Ð´µÀ:
-> Hello,
+Sorry for the late noise, but now when there are no stats, the name has
+still been printed out without adding a new line, which doesn't seem to
+be inline with the documented 'nested keyed' file format.
+
+in particular, I'm now seeing this line with 2 keys:
+
+    253:10 253:5 rbytes=0 wbytes=0 rios=0 wios=1 dbytes=0 dios=0
+    ^~~~~~ ^~~~~
+
+I'm not sure if a separate temporary buffer would make more sense or
+switching back to seq_get_buf?
+Figuring out `has_stats` first doesn't seem to be trivial due to the
+`pd_stat_fn` calls.
+
+Or of course, just include the newlines unconditionally?
+
+Unless seq_file has/gets another way to roll back the buffer?
+
+On Tue, Aug 10, 2021 at 05:26:23PM +0200, Christoph Hellwig wrote:
+> seq_get_buf is a crutch that undoes all the memory safety of the
+> seq_file interface.  Use the normal seq_printf interfaces instead.
 > 
-> here is the second version of my patches to fix use-after-free issues in BFQ
-> when processes with merged queues get moved to different cgroups. The patches
-> have survived some beating in my test VM but so far I fail to reproduce the
-> original KASAN reports so testing from people who can reproduce them is most
-> welcome. Thanks!
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-cgroup.c         | 30 ++++++------------------------
+>  block/blk-iocost.c         | 23 +++++++++--------------
+>  block/blk-iolatency.c      | 38 +++++++++++++++++++-------------------
+>  block/mq-deadline-cgroup.c |  8 +++-----
+>  include/linux/blk-cgroup.h |  4 ++--
+>  5 files changed, 39 insertions(+), 64 deletions(-)
 > 
-> Changes since v1:
-> * Added fix for bfq_put_cooperator()
-> * Added fix to handle move between cgroups in bfq_merge_bio()
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 52aa0540ccaf..b8ec47dcce42 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -877,8 +877,6 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+>  	bool has_stats = false;
+>  	const char *dname;
+>  	unsigned seq;
+> -	char *buf;
+> -	size_t size = seq_get_buf(s, &buf), off = 0;
+>  	int i;
+>  
+>  	if (!blkg->online)
+> @@ -888,13 +886,7 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+>  	if (!dname)
+>  		return;
+>  
+> -	/*
+> -	 * Hooray string manipulation, count is the size written NOT
+> -	 * INCLUDING THE \0, so size is now count+1 less than what we
+> -	 * had before, but we want to start writing the next bit from
+> -	 * the \0 so we only add count to buf.
+> -	 */
+> -	off += scnprintf(buf+off, size-off, "%s ", dname);
+> +	seq_printf(s, "%s ", dname);
+>  
+>  	do {
+>  		seq = u64_stats_fetch_begin(&bis->sync);
+> @@ -909,40 +901,30 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+>  
+>  	if (rbytes || wbytes || rios || wios) {
+>  		has_stats = true;
+> -		off += scnprintf(buf+off, size-off,
+> -			"rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
+> +		seq_printf(s, "rbytes=%llu wbytes=%llu rios=%llu wios=%llu dbytes=%llu dios=%llu",
+>  			rbytes, wbytes, rios, wios,
+>  			dbytes, dios);
+>  	}
+>  
+>  	if (blkcg_debug_stats && atomic_read(&blkg->use_delay)) {
+>  		has_stats = true;
+> -		off += scnprintf(buf+off, size-off, " use_delay=%d delay_nsec=%llu",
+> +		seq_printf(s, " use_delay=%d delay_nsec=%llu",
+>  			atomic_read(&blkg->use_delay),
+>  			atomic64_read(&blkg->delay_nsec));
+>  	}
+>  
+>  	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+>  		struct blkcg_policy *pol = blkcg_policy[i];
+> -		size_t written;
+>  
+>  		if (!blkg->pd[i] || !pol->pd_stat_fn)
+>  			continue;
+>  
+> -		written = pol->pd_stat_fn(blkg->pd[i], buf+off, size-off);
+> -		if (written)
+> +		if (pol->pd_stat_fn(blkg->pd[i], s))
+>  			has_stats = true;
+> -		off += written;
+>  	}
+>  
+> -	if (has_stats) {
+> -		if (off < size - 1) {
+> -			off += scnprintf(buf+off, size-off, "\n");
+> -			seq_commit(s, off);
+> -		} else {
+> -			seq_commit(s, -1);
+> -		}
+> -	}
+> +	if (has_stats)
+> +		seq_printf(s, "\n");
+>  }
+>  
+>  static int blkcg_print_stat(struct seq_file *sf, void *v)
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 5fac3757e6e0..89b21a360b2c 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2988,34 +2988,29 @@ static void ioc_pd_free(struct blkg_policy_data *pd)
+>  	kfree(iocg);
+>  }
+>  
+> -static size_t ioc_pd_stat(struct blkg_policy_data *pd, char *buf, size_t size)
+> +static bool ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
+>  {
+>  	struct ioc_gq *iocg = pd_to_iocg(pd);
+>  	struct ioc *ioc = iocg->ioc;
+> -	size_t pos = 0;
+>  
+>  	if (!ioc->enabled)
+> -		return 0;
+> +		return false;
+>  
+>  	if (iocg->level == 0) {
+>  		unsigned vp10k = DIV64_U64_ROUND_CLOSEST(
+>  			ioc->vtime_base_rate * 10000,
+>  			VTIME_PER_USEC);
+> -		pos += scnprintf(buf + pos, size - pos, " cost.vrate=%u.%02u",
+> -				  vp10k / 100, vp10k % 100);
+> +		seq_printf(s, " cost.vrate=%u.%02u", vp10k / 100, vp10k % 100);
+>  	}
+>  
+> -	pos += scnprintf(buf + pos, size - pos, " cost.usage=%llu",
+> -			 iocg->last_stat.usage_us);
+> +	seq_printf(s, " cost.usage=%llu", iocg->last_stat.usage_us);
+>  
+>  	if (blkcg_debug_stats)
+> -		pos += scnprintf(buf + pos, size - pos,
+> -				 " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
+> -				 iocg->last_stat.wait_us,
+> -				 iocg->last_stat.indebt_us,
+> -				 iocg->last_stat.indelay_us);
+> -
+> -	return pos;
+> +		seq_printf(s, " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
+> +			iocg->last_stat.wait_us,
+> +			iocg->last_stat.indebt_us,
+> +			iocg->last_stat.indelay_us);
+> +	return true;
+>  }
+>  
+>  static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index d8b0d8bd132b..c0545f9da549 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -890,8 +890,7 @@ static int iolatency_print_limit(struct seq_file *sf, void *v)
+>  	return 0;
+>  }
+>  
+> -static size_t iolatency_ssd_stat(struct iolatency_grp *iolat, char *buf,
+> -				 size_t size)
+> +static bool iolatency_ssd_stat(struct iolatency_grp *iolat, struct seq_file *s)
+>  {
+>  	struct latency_stat stat;
+>  	int cpu;
+> @@ -906,39 +905,40 @@ static size_t iolatency_ssd_stat(struct iolatency_grp *iolat, char *buf,
+>  	preempt_enable();
+>  
+>  	if (iolat->rq_depth.max_depth == UINT_MAX)
+> -		return scnprintf(buf, size, " missed=%llu total=%llu depth=max",
+> -				 (unsigned long long)stat.ps.missed,
+> -				 (unsigned long long)stat.ps.total);
+> -	return scnprintf(buf, size, " missed=%llu total=%llu depth=%u",
+> -			 (unsigned long long)stat.ps.missed,
+> -			 (unsigned long long)stat.ps.total,
+> -			 iolat->rq_depth.max_depth);
+> +		seq_printf(s, " missed=%llu total=%llu depth=max",
+> +			(unsigned long long)stat.ps.missed,
+> +			(unsigned long long)stat.ps.total);
+> +	else
+> +		seq_printf(s, " missed=%llu total=%llu depth=%u",
+> +			(unsigned long long)stat.ps.missed,
+> +			(unsigned long long)stat.ps.total,
+> +			iolat->rq_depth.max_depth);
+> +	return true;
+>  }
+>  
+> -static size_t iolatency_pd_stat(struct blkg_policy_data *pd, char *buf,
+> -				size_t size)
+> +static bool iolatency_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
+>  {
+>  	struct iolatency_grp *iolat = pd_to_lat(pd);
+>  	unsigned long long avg_lat;
+>  	unsigned long long cur_win;
+>  
+>  	if (!blkcg_debug_stats)
+> -		return 0;
+> +		return false;
+>  
+>  	if (iolat->ssd)
+> -		return iolatency_ssd_stat(iolat, buf, size);
+> +		return iolatency_ssd_stat(iolat, s);
+>  
+>  	avg_lat = div64_u64(iolat->lat_avg, NSEC_PER_USEC);
+>  	cur_win = div64_u64(iolat->cur_win_nsec, NSEC_PER_MSEC);
+>  	if (iolat->rq_depth.max_depth == UINT_MAX)
+> -		return scnprintf(buf, size, " depth=max avg_lat=%llu win=%llu",
+> -				 avg_lat, cur_win);
+> -
+> -	return scnprintf(buf, size, " depth=%u avg_lat=%llu win=%llu",
+> -			 iolat->rq_depth.max_depth, avg_lat, cur_win);
+> +		seq_printf(s, " depth=max avg_lat=%llu win=%llu",
+> +			avg_lat, cur_win);
+> +	else
+> +		seq_printf(s, " depth=%u avg_lat=%llu win=%llu",
+> +			iolat->rq_depth.max_depth, avg_lat, cur_win);
+> +	return true;
+>  }
+>  
+> -
+>  static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
+>  						   struct request_queue *q,
+>  						   struct blkcg *blkcg)
+> diff --git a/block/mq-deadline-cgroup.c b/block/mq-deadline-cgroup.c
+> index 3b4bfddec39f..b48a4b962f90 100644
+> --- a/block/mq-deadline-cgroup.c
+> +++ b/block/mq-deadline-cgroup.c
+> @@ -52,7 +52,7 @@ struct dd_blkcg *dd_blkcg_from_bio(struct bio *bio)
+>  	return dd_blkcg_from_pd(pd);
+>  }
+>  
+> -static size_t dd_pd_stat(struct blkg_policy_data *pd, char *buf, size_t size)
+> +static bool dd_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
+>  {
+>  	static const char *const prio_class_name[] = {
+>  		[IOPRIO_CLASS_NONE]	= "NONE",
+> @@ -61,12 +61,10 @@ static size_t dd_pd_stat(struct blkg_policy_data *pd, char *buf, size_t size)
+>  		[IOPRIO_CLASS_IDLE]	= "IDLE",
+>  	};
+>  	struct dd_blkcg *blkcg = dd_blkcg_from_pd(pd);
+> -	int res = 0;
+>  	u8 prio;
+>  
+>  	for (prio = 0; prio < ARRAY_SIZE(blkcg->stats->stats); prio++)
+> -		res += scnprintf(buf + res, size - res,
+> -			" [%s] dispatched=%u inserted=%u merged=%u",
+> +		seq_printf(s, " [%s] dispatched=%u inserted=%u merged=%u",
+>  			prio_class_name[prio],
+>  			ddcg_sum(blkcg, dispatched, prio) +
+>  			ddcg_sum(blkcg, merged, prio) -
+> @@ -75,7 +73,7 @@ static size_t dd_pd_stat(struct blkg_policy_data *pd, char *buf, size_t size)
+>  			ddcg_sum(blkcg, completed, prio),
+>  			ddcg_sum(blkcg, merged, prio));
+>  
+> -	return res;
+> +	return true;
+>  }
+>  
+>  static struct blkg_policy_data *dd_pd_alloc(gfp_t gfp, struct request_queue *q,
+> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+> index 37048438872c..b4de2010fba5 100644
+> --- a/include/linux/blk-cgroup.h
+> +++ b/include/linux/blk-cgroup.h
+> @@ -152,8 +152,8 @@ typedef void (blkcg_pol_online_pd_fn)(struct blkg_policy_data *pd);
+>  typedef void (blkcg_pol_offline_pd_fn)(struct blkg_policy_data *pd);
+>  typedef void (blkcg_pol_free_pd_fn)(struct blkg_policy_data *pd);
+>  typedef void (blkcg_pol_reset_pd_stats_fn)(struct blkg_policy_data *pd);
+> -typedef size_t (blkcg_pol_stat_pd_fn)(struct blkg_policy_data *pd, char *buf,
+> -				      size_t size);
+> +typedef bool (blkcg_pol_stat_pd_fn)(struct blkg_policy_data *pd,
+> +				struct seq_file *s);
+>  
+>  struct blkcg_policy {
+>  	int				plid;
+> -- 
+> 2.30.2
 > 
-> 								Honza
-> Previous versions:
-> Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
-> .
 > 
 
-Hi,
-
-I repoduced the problem again with this patchset...
-
-[   71.004788] BUG: KASAN: use-after-free in 
-__bfq_deactivate_entity+0x21/0x290
-[   71.006328] Read of size 1 at addr ffff88817a3dc0b0 by task rmmod/801
-[   71.007723]
-[   71.008068] CPU: 7 PID: 801 Comm: rmmod Tainted: G        W 
-5.16.0-rc5-next-2021127
-[   71.009995] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
-BIOS ?-20190727_073836-4
-[   71.012274] Call Trace:
-[   71.012603]  <TASK>
-[   71.012886]  dump_stack_lvl+0x34/0x44
-[   71.013379]  print_address_description.constprop.0.cold+0xab/0x36b
-[   71.014182]  ? __bfq_deactivate_entity+0x21/0x290
-[   71.014795]  ? __bfq_deactivate_entity+0x21/0x290
-[   71.015398]  kasan_report.cold+0x83/0xdf
-[   71.015904]  ? _raw_read_lock_bh+0x20/0x40
-[   71.016433]  ? __bfq_deactivate_entity+0x21/0x290
-[   71.017033]  __bfq_deactivate_entity+0x21/0x290
-[   71.017617]  bfq_pd_offline+0xc1/0x110
-[   71.018105]  blkcg_deactivate_policy+0x14b/0x210
-[   71.018699]  bfq_exit_queue+0xe5/0x100
-[   71.019189]  blk_mq_exit_sched+0x113/0x140
-[   71.019720]  elevator_exit+0x30/0x50
-[   71.020186]  blk_release_queue+0xa8/0x160
-[   71.020702]  kobject_put+0xd4/0x270
-[   71.021158]  disk_release+0xc5/0xf0
-[   71.021609]  device_release+0x56/0xe0
-[   71.022086]  kobject_put+0xd4/0x270
-[   71.022546]  null_del_dev.part.0+0xe6/0x220 [null_blk]
-[   71.023228]  null_exit+0x62/0xa6 [null_blk]
-[   71.023792]  __x64_sys_delete_module+0x20a/0x2f0
-[   71.024387]  ? __ia32_sys_delete_module+0x2f0/0x2f0
-[   71.025008]  ? fpregs_assert_state_consistent+0x55/0x60
-[   71.025674]  ? exit_to_user_mode_prepare+0x39/0x1e0
-[   71.026304]  do_syscall_64+0x35/0x80
-[   71.026763]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[   71.027410] RIP: 0033:0x7fddec6bdfc7
-[   71.027869] Code: 73 01 c3 48 8b 0d c1 de 2b 00 f7 d8 64 89 01 48 83 
-c8 ff c3 66 2e 0f 1f 8
-[   71.030206] RSP: 002b:00007fff9486bc08 EFLAGS: 00000206 ORIG_RAX: 
-00000000000000b0
-[   71.031160] RAX: ffffffffffffffda RBX: 00007fff9486bc68 RCX: 
-00007fddec6bdfc7
-[   71.032058] RDX: 000000000000000a RSI: 0000000000000800 RDI: 
-000055fc863ac258
-[   71.032962] RBP: 000055fc863ac1f0 R08: 00007fff9486ab81 R09: 
-0000000000000000
-[   71.033861] R10: 00007fddec730260 R11: 0000000000000206 R12: 
-00007fff9486be30
-[   71.034758] R13: 00007fff9486c45b R14: 000055fc863ab010 R15: 
-000055fc863ac1f0
-[   71.035659]  </TASK>
-[   71.035946]
-[   71.036149] Allocated by task 620:
-[   71.036585]  kasan_save_stack+0x1e/0x40
-[   71.037076]  __kasan_kmalloc+0x81/0xa0
-[   71.037558]  bfq_pd_alloc+0x72/0x110
-[   71.038015]  blkg_alloc+0x252/0x2c0
-[   71.038467]  blkg_create+0x38e/0x560
-[   71.038927]  bio_associate_blkg_from_css+0x3bc/0x490
-[   71.039563]  bio_associate_blkg+0x3b/0x90
-[   71.040076]  mpage_alloc+0x7c/0xe0
-[   71.040516]  do_mpage_readpage+0xb42/0xff0
-[   71.041040]  mpage_readahead+0x1fd/0x3f0
-[   71.041544]  read_pages+0x144/0x770
-[   71.041994]  page_cache_ra_unbounded+0x2d2/0x380
-[   71.042586]  filemap_get_pages+0x1bc/0xaf0
-[   71.043115]  filemap_read+0x1bf/0x5a0
-[   71.043585]  aio_read+0x1ca/0x2f0
-[   71.044014]  io_submit_one+0x874/0x11c0
-[   71.044511]  __x64_sys_io_submit+0xfa/0x250
-[   71.045048]  do_syscall_64+0x35/0x80
-[   71.045513]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[   71.046161]
-[   71.046361] Freed by task 0:
-[   71.046735]  kasan_save_stack+0x1e/0x40
-[   71.047230]  kasan_set_track+0x21/0x30
-[   71.047709]  kasan_set_free_info+0x20/0x30
-[   71.048235]  __kasan_slab_free+0x103/0x180
-[   71.048757]  kfree+0x9a/0x4b0
-[   71.049144]  blkg_free.part.0+0x4a/0x90
-[   71.049635]  rcu_do_batch+0x2e1/0x760
-[   71.050111]  rcu_core+0x367/0x530
-[   71.050536]  __do_softirq+0x119/0x3ba
-[   71.051007]
-[   71.051210] The buggy address belongs to the object at ffff88817a3dc000
-[   71.051210]  which belongs to the cache kmalloc-2k of size 2048
-[   71.052766] The buggy address is located 176 bytes inside of
-[   71.052766]  2048-byte region [ffff88817a3dc000, ffff88817a3dc800)
-[   71.054240] The buggy address belongs to the page:
-[   71.054843] page:00000000ce62c7c2 refcount:1 mapcount:0 
-mapping:0000000000000000 index:0x08
-[   71.056021] head:00000000ce62c7c2 order:3 compound_mapcount:0 
-compound_pincount:0
-[   71.056961] flags: 
-0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
-[   71.057894] raw: 0017ffffc0010200 dead000000000100 dead000000000122 
-ffff888100042f00
-[   71.058866] raw: 0000000000000000 0000000080080008 00000001ffffffff 
-0000000000000000
-[   71.059840] page dumped because: kasan: bad access detected
-[   71.060543]
-[   71.060742] Memory state around the buggy address:
-[   71.061349]  ffff88817a3dbf80: fc fc fc fc fc fc fc fc fc fc fc fc fc 
-fc fc fc
-[   71.062256]  ffff88817a3dc000: fa fb fb fb fb fb fb fb fb fb fb fb fb 
-fb fb fb
-[   71.063163] >ffff88817a3dc080: fb fb fb fb fb fb fb fb fb fb fb fb fb 
-fb fb fb
-[   71.064129]                                      ^
-[   71.064734]  ffff88817a3dc100: fb fb fb fb fb fb fb fb fb fb fb fb fb 
-fb fb fb
-[   71.065639]  ffff88817a3dc180: fb fb fb fb fb fb fb fb fb fb fb fb fb 
-fb fb fb
-[   71.066544] 
-==================================================================
-
-Here is the caller of  __bfq_deactivate_entity:
-(gdb) list *(bfq_pd_offline+0xc1)
-0xffffffff81c504f1 is in bfq_pd_offline (block/bfq-cgroup.c:942).
-937                      * entities to the idle tree. It happens if, in some
-938                      * of the calls to bfq_bfqq_move() performed by
-939                      * bfq_reparent_active_queues(), the queue to 
-move is
-940                      * empty and gets expired.
-941                      */
-942                     bfq_flush_idle_tree(st);
-943             }
-944
-945             __bfq_deactivate_entity(entity, false);
