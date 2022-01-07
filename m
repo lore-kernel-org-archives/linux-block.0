@@ -2,61 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B869C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 00:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD1CC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 01:04:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343978AbiAGAwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Jan 2022 19:52:34 -0500
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:44653 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344587AbiAGAwd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Jan 2022 19:52:33 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0V17mLiK_1641516750;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0V17mLiK_1641516750)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 07 Jan 2022 08:52:31 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] block: fix old-style declaration
-Date:   Fri,  7 Jan 2022 08:52:28 +0800
-Message-Id: <20220107005228.103927-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        id S1344151AbiAGBEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Jan 2022 20:04:49 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:17330 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236544AbiAGBEt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Jan 2022 20:04:49 -0500
+Received: from kwepemi100007.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JVQ2l2KF4z920b;
+        Fri,  7 Jan 2022 09:03:43 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100007.china.huawei.com (7.221.188.115) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 7 Jan 2022 09:04:46 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 7 Jan 2022 09:04:45 +0800
+Subject: Re: [PATCH 4/4] block, bfq: update pos_root for idle bfq_queue in
+ bfq_bfqq_move()
+To:     Jan Kara <jack@suse.cz>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <fchecconi@gmail.com>, <avanzini.arianna@gmail.com>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211221032135.878550-1-yukuai3@huawei.com>
+ <20211221032135.878550-5-yukuai3@huawei.com>
+ <20211221115001.GD24748@quack2.suse.cz>
+ <6ca1e924-47fa-b94e-598c-69a9549eb68e@huawei.com>
+ <20211222141722.GC685@quack2.suse.cz>
+ <9743fc5a-f3f0-a23a-5d21-0c04c90e90e1@huawei.com>
+ <5b42943f-4a8e-c4ec-05da-57e36cc14113@huawei.com>
+ <20220103153732.pcfsmadzlqqroxcj@quack3>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <44c41001-c072-8e13-77e3-c19b8c12ab41@huawei.com>
+Date:   Fri, 7 Jan 2022 09:04:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
+In-Reply-To: <20220103153732.pcfsmadzlqqroxcj@quack3>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the 'inline' keyword to the front of 'void'.
+在 2022/01/03 23:37, Jan Kara 写道:
+> OK, thanks for following up on this. So do I understand you correctly that
+> the problem with empty bfqq being in pos_tree does not exist in current
+> upstream kernel?
 
-Remove a warning found by clang(make W=1 LLVM=1)
-./include/linux/blk-mq.h:259:1: warning: ‘inline’ is not at beginning of
-declaration
+Yes, I had this patch removed in v2 patchset.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- include/linux/blk-mq.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index f40a05ecca4a..d319ffa59354 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -256,7 +256,7 @@ static inline unsigned short req_get_ioprio(struct request *req)
-  * @rq: The request to move
-  * @prev: The request preceding @rq in @src (NULL if @rq is the head)
-  */
--static void inline rq_list_move(struct request **src, struct request **dst,
-+static inline void rq_list_move(struct request **src, struct request **dst,
- 				struct request *rq, struct request *prev)
- {
- 	if (prev)
--- 
-2.20.1.7.g153144c
-
+Thanks,
+Kuai
