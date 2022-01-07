@@ -2,245 +2,237 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA6AC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 11:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1596BC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 12:06:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346962AbiAGLE6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jan 2022 06:04:58 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:59855 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346886AbiAGLEz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 06:04:55 -0500
-Received: from fsav315.sakura.ne.jp (fsav315.sakura.ne.jp [153.120.85.146])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 207B4ao0064077;
-        Fri, 7 Jan 2022 20:04:36 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav315.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav315.sakura.ne.jp);
- Fri, 07 Jan 2022 20:04:36 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav315.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 207B4aqg064074
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 7 Jan 2022 20:04:36 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
-Date:   Fri, 7 Jan 2022 20:04:31 +0900
+        id S237590AbiAGMGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jan 2022 07:06:04 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4370 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238153AbiAGMGC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 07:06:02 -0500
+Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JVhdD29r4z67k2V;
+        Fri,  7 Jan 2022 20:01:04 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 7 Jan 2022 13:05:46 +0100
+Received: from [10.47.89.210] (10.47.89.210) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Fri, 7 Jan
+ 2022 12:05:46 +0000
+Subject: Re: [PATCH -next v3] blk-mq: fix tag_get wait task can't be awakened
+To:     qiulaibin <qiulaibin@huawei.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC:     "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20220106133432.989177-1-qiulaibin@huawei.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <1430d56b-ed99-6c30-85e2-11d0a8a40a12@huawei.com>
+Date:   Fri, 7 Jan 2022 12:05:33 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: [PATCH v2 2/2] loop: use task_work for autoclear operation
+In-Reply-To: <20220106133432.989177-1-qiulaibin@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Language: en-US
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Jan Kara <jack@suse.cz>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        Jan Stancek <jstancek@redhat.com>
-Cc:     linux-block <linux-block@vger.kernel.org>
-References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
-In-Reply-To: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.89.210]
+X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jan Stancek is reporting that commit 322c4293ecc58110 ("loop: make
-autoclear operation asynchronous") broke LTP tests which run /bin/mount
-and /bin/umount in close succession like
+On 06/01/2022 13:34, qiulaibin wrote:
+> In case of shared tags, there might be more than one hctx which
+> allocates tag from single tags,
 
-  while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+how about "allocates from the same tags"?
 
-. This is because since /usr/lib/systemd/systemd-udevd asynchronously
-opens the loop device which /bin/mount and /bin/umount are operating,
-autoclear from lo_release() is likely triggered by systemd-udevd than
-mount or umount. And unfortunately, /bin/mount fails if read of superblock
-(for examining filesystem type) returned an error due to the backing file
-being cleared by __loop_clr_fd(). It turned out that disk->open_mutex was
-by chance serving as a barrier for serializing "__loop_clr_fd() from
-lo_release()" and "vfs_read() after lo_open()", and we need to restore
-this barrier (without reintroducing circular locking dependency).
+> and each hctx is limited to allocate at
+> most:
+>          hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
+> 
+> tag idle detection is lazy, and may be delayed for 30sec, so there
+> could be just one real active hctx(queue) but all others are actually
+> idle and still accounted as active because of the lazy idle detection.
+> Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
+> forever on this real active hctx.
+> 
+> Fix this by recalculating wake_batch when inc or dec active_queues.
+> 
+> Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+> ---
+>   block/blk-mq-tag.c      | 32 ++++++++++++++++++++++++++++++--
+>   include/linux/sbitmap.h | 11 +++++++++++
+>   lib/sbitmap.c           | 22 +++++++++++++++++++---
+>   3 files changed, 60 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index e55a6834c9a6..e59ebf89c1bf 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -16,6 +16,21 @@
+>   #include "blk-mq-sched.h"
+>   #include "blk-mq-tag.h"
+>   
+> +/*
+> + * Recalculate wakeup batch when tag is shared by hctx.
+> + */
+> +static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+> +		unsigned int users)
+> +{
+> +	if (!users)
+> +		return;
+> +
+> +	sbitmap_queue_recalculate_wake_batch(&tags->bitmap_tags,
+> +			users);
+> +	sbitmap_queue_recalculate_wake_batch(&tags->breserved_tags,
+> +			users);
+> +}
+> +
+>   /*
+>    * If a previously inactive queue goes active, bump the active user count.
+>    * We need to do this before try to allocate driver tag, then even if fail
+> @@ -24,16 +39,25 @@
+>    */
+>   bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>   {
+> +	unsigned int users;
+>   	if (blk_mq_is_shared_tags(hctx->flags)) {
+>   		struct request_queue *q = hctx->queue;
+>   
+>   		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
+> -		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+> +		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
+>   			atomic_inc(&hctx->tags->active_queues);
+> +
+> +			users = atomic_read(&hctx->tags->active_queues);
+> +			blk_mq_update_wake_batch(hctx->tags, users);
+> +		}
+>   	} else {
+>   		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+> -		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> +		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
+>   			atomic_inc(&hctx->tags->active_queues);
+> +
+> +			users = atomic_read(&hctx->tags->active_queues);
 
-Also, the kernel test robot is reporting that that commit broke xfstest
-which does
+atomic_inc_return() can do inc and read together
 
-  umount ext2 on xfs
-  umount xfs
+> +			blk_mq_update_wake_batch(hctx->tags, users);
+> +		}
 
-sequence.
+there seems to be more duplicated code here now, as we do the same in 
+both legs of the if-else statement.
 
-One of approaches for fixing these problems is to revert that commit and
-instead remove destroy_workqueue() from __loop_clr_fd(), for it turned out
-that we did not need to call flush_workqueue() from __loop_clr_fd() since
-blk_mq_freeze_queue() blocks until all pending "struct work_struct" are
-processed by loop_process_work(). But we are not sure whether it is safe
-to wait blk_mq_freeze_queue() etc. with disk->open_mutex held; it could
-be simply because dependency is not clear enough for fuzzers to cover and
-lockdep to detect.
+>   	}
+>   
+>   	return true;
+> @@ -56,6 +80,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
+>   void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>   {
+>   	struct blk_mq_tags *tags = hctx->tags;
+> +	unsigned int users;
+>   
+>   	if (blk_mq_is_shared_tags(hctx->flags)) {
+>   		struct request_queue *q = hctx->queue;
+> @@ -70,6 +95,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>   
+>   	atomic_dec(&tags->active_queues);
+>   
+> +	users = atomic_read(&hctx->tags->active_queues);
 
-Therefore, before taking revert approach, let's try if we can use task
-work approach which is called without locks held while the caller can
-wait for completion of that task work before returning to user mode.
+as above, atomic_dec_return()
 
-This patch tries to make lo_open()/lo_release() to locklessly wait for
-__loop_clr_fd() by inserting a task work into lo_open()/lo_release() if
-possible.
+> +	blk_mq_update_wake_batch(hctx->tags, users);
+> +
+>   	blk_mq_tag_wakeup_all(tags, false);
+>   }
+>   
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index fc0357a6e19b..e1fced98dfca 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -415,6 +415,17 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
+>   	sbitmap_free(&sbq->sb);
+>   }
+>   
+> +/**
+> + * sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch
+> + * @sbq: Bitmap queue to Recalculate wake batch.
 
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Reported-by: Jan Stancek <jstancek@redhat.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-Changes in v2:
-  Need to also wait on lo_open(), per Jan's testcase.
+/s/Recalculate /recalculate/
 
- drivers/block/loop.c | 70 ++++++++++++++++++++++++++++++++++++++++----
- drivers/block/loop.h |  5 +++-
- 2 files changed, 68 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index b1b05c45c07c..8ef6da186c5c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -89,6 +89,7 @@
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
- static DEFINE_MUTEX(loop_validate_mutex);
-+static DECLARE_WAIT_QUEUE_HEAD(loop_rundown_wait);
- 
- /**
-  * loop_global_lock_killable() - take locks for safe loop_validate_file() test
-@@ -1172,13 +1173,12 @@ static void loop_rundown_completed(struct loop_device *lo)
- 	mutex_lock(&lo->lo_mutex);
- 	lo->lo_state = Lo_unbound;
- 	mutex_unlock(&lo->lo_mutex);
-+	wake_up_all(&loop_rundown_wait);
- 	module_put(THIS_MODULE);
- }
- 
--static void loop_rundown_workfn(struct work_struct *work)
-+static void loop_rundown_start(struct loop_device *lo)
- {
--	struct loop_device *lo = container_of(work, struct loop_device,
--					      rundown_work);
- 	struct block_device *bdev = lo->lo_device;
- 	struct gendisk *disk = lo->lo_disk;
- 
-@@ -1188,6 +1188,18 @@ static void loop_rundown_workfn(struct work_struct *work)
- 	loop_rundown_completed(lo);
- }
- 
-+static void loop_rundown_callbackfn(struct callback_head *callback)
-+{
-+	loop_rundown_start(container_of(callback, struct loop_device,
-+					rundown.callback));
-+}
-+
-+static void loop_rundown_workfn(struct work_struct *work)
-+{
-+	loop_rundown_start(container_of(work, struct loop_device,
-+					rundown.work));
-+}
-+
- static void loop_schedule_rundown(struct loop_device *lo)
- {
- 	struct block_device *bdev = lo->lo_device;
-@@ -1195,8 +1207,13 @@ static void loop_schedule_rundown(struct loop_device *lo)
- 
- 	__module_get(disk->fops->owner);
- 	kobject_get(&bdev->bd_device.kobj);
--	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
--	queue_work(system_long_wq, &lo->rundown_work);
-+	if (!(current->flags & PF_KTHREAD)) {
-+		init_task_work(&lo->rundown.callback, loop_rundown_callbackfn);
-+		if (!task_work_add(current, &lo->rundown.callback, TWA_RESUME))
-+			return;
-+	}
-+	INIT_WORK(&lo->rundown.work, loop_rundown_workfn);
-+	queue_work(system_long_wq, &lo->rundown.work);
- }
- 
- static int loop_clr_fd(struct loop_device *lo)
-@@ -1721,19 +1738,60 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- }
- #endif
- 
-+struct loop_rundown_waiter {
-+	struct callback_head callback;
-+	struct loop_device *lo;
-+};
-+
-+static void loop_rundown_waiter_callbackfn(struct callback_head *callback)
-+{
-+	struct loop_rundown_waiter *lrw =
-+		container_of(callback, struct loop_rundown_waiter, callback);
-+
-+	/*
-+	 * Locklessly wait for completion of __loop_clr_fd().
-+	 * This should be safe because of the following rules.
-+	 *
-+	 *  (a) From locking dependency perspective, this function is called
-+	 *      without any locks held.
-+	 *  (b) From execution ordering perspective, this function is called
-+	 *      by the moment lo_open() from open() syscall returns to user
-+	 *      mode.
-+	 *  (c) From use-after-free protection perspective, this function is
-+	 *      called before loop_remove() is called, for lo->lo_refcnt taken
-+	 *      by lo_open() prevents loop_control_remove() and loop_exit().
-+	 */
-+	wait_event_killable(loop_rundown_wait, data_race(lrw->lo->lo_state) != Lo_rundown);
-+	kfree(lrw);
-+}
-+
- static int lo_open(struct block_device *bdev, fmode_t mode)
- {
- 	struct loop_device *lo = bdev->bd_disk->private_data;
-+	struct loop_rundown_waiter *lrw =
-+		kmalloc(sizeof(*lrw), GFP_KERNEL | __GFP_NOWARN);
- 	int err;
- 
-+	if (!lrw)
-+		return -ENOMEM;
- 	err = mutex_lock_killable(&lo->lo_mutex);
--	if (err)
-+	if (err) {
-+		kfree(lrw);
- 		return err;
-+	}
- 	if (lo->lo_state == Lo_deleting)
- 		err = -ENXIO;
- 	else
- 		atomic_inc(&lo->lo_refcnt);
- 	mutex_unlock(&lo->lo_mutex);
-+	if (!err && !(current->flags & PF_KTHREAD)) {
-+		init_task_work(&lrw->callback, loop_rundown_waiter_callbackfn);
-+		lrw->lo = lo;
-+		if (task_work_add(current, &lrw->callback, TWA_RESUME))
-+			kfree(lrw);
-+	} else {
-+		kfree(lrw);
-+	}
- 	return err;
- }
- 
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 918a7a2dc025..596472f9cde3 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -56,7 +56,10 @@ struct loop_device {
- 	struct gendisk		*lo_disk;
- 	struct mutex		lo_mutex;
- 	bool			idr_visible;
--	struct work_struct      rundown_work;
-+	union {
-+		struct work_struct   work;
-+		struct callback_head callback;
-+	} rundown;
- };
- 
- struct loop_cmd {
--- 
-2.32.0
 
+> + * @users: Number of shares.
+> + *
+> + * Like sbitmap_queue_update_wake_batch(), this will calculate wake batch
+> + * by depth. This interface is for sharing tags.
+
+we have concept of shared tags (flag BLK_MQ_F_TAG_HCTX_SHARED) and queue 
+shared tags (flag BLK_MQ_F_TAG_QUEUE_SHARED) - please be careful in the 
+terminology
+
+> + */
+> +void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int users);
+> +
+>   /**
+>    * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
+>    * @sbq: Bitmap queue to resize.
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 2709ab825499..94b3272effd8 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -457,10 +457,9 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+>   }
+>   EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
+>   
+> -static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> -					    unsigned int depth)
+> +static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int wake_batch)
+>   {
+> -	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
+>   	int i;
+>   
+>   	if (sbq->wake_batch != wake_batch) {
+> @@ -476,6 +475,23 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+>   	}
+>   }
+>   
+> +static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int depth)
+> +{
+> +	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
+> +
+> +	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
+> +}
+> +
+> +void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int users)
+> +{
+> +	unsigned int wake_batch = clamp_t(unsigned int,
+> +			(sbq->sb.depth + users - 1) / users, 4U, SBQ_WAKE_BATCH);
+> +	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
+> +}
+> +EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
+> +
+>   void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
+>   {
+>   	sbitmap_queue_update_wake_batch(sbq, depth);
+> 
 
