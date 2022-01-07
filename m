@@ -2,237 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1596BC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 12:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A411C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 14:58:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237590AbiAGMGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jan 2022 07:06:04 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4370 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238153AbiAGMGC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 07:06:02 -0500
-Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JVhdD29r4z67k2V;
-        Fri,  7 Jan 2022 20:01:04 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 7 Jan 2022 13:05:46 +0100
-Received: from [10.47.89.210] (10.47.89.210) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Fri, 7 Jan
- 2022 12:05:46 +0000
-Subject: Re: [PATCH -next v3] blk-mq: fix tag_get wait task can't be awakened
-To:     qiulaibin <qiulaibin@huawei.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC:     "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20220106133432.989177-1-qiulaibin@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <1430d56b-ed99-6c30-85e2-11d0a8a40a12@huawei.com>
-Date:   Fri, 7 Jan 2022 12:05:33 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S1347934AbiAGO6z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jan 2022 09:58:55 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:58664 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239433AbiAGO6z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 09:58:55 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 41582212C6;
+        Fri,  7 Jan 2022 14:58:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1641567534; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q+M3OTlcNIhKbjyMggTY5uMxWt3ZZp8965loljHciE0=;
+        b=SeGpPiRRR6vTyNLaOomxMq6iudO2Fo4nMmpGkuvPuycFbakKjI179WnXG3tq6SxxSBmD8W
+        4Vl8FRkPUZ+hdXMX5qNWbL6Uvia/bQzFJ8Lw8i9GLRla8kXxqs4YLGLUb9W/wgGug+abbP
+        dwzzXIE8NZIL9vIp4F3Gly5jdyuIK2c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1641567534;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q+M3OTlcNIhKbjyMggTY5uMxWt3ZZp8965loljHciE0=;
+        b=gSI3f/cmp9WUxUxMP1EuF5U5BQvmB7Rb81zJ2qGJAKUGTAa91d4oCuAdGFJ98O5emyYFOA
+        pT0WoXntuVyHz7Ag==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 36972A3B8E;
+        Fri,  7 Jan 2022 14:58:54 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id EDE03A05D7; Fri,  7 Jan 2022 15:58:53 +0100 (CET)
+Date:   Fri, 7 Jan 2022 15:58:53 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5 v2] bfq: Avoid use-after-free when moving processes
+ between cgroups
+Message-ID: <20220107145853.jvgupijrq2ejnhdt@quack3.lan>
+References: <20220105143037.20542-1-jack@suse.cz>
+ <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20220106133432.989177-1-qiulaibin@huawei.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.89.210]
-X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/01/2022 13:34, qiulaibin wrote:
-> In case of shared tags, there might be more than one hctx which
-> allocates tag from single tags,
-
-how about "allocates from the same tags"?
-
-> and each hctx is limited to allocate at
-> most:
->          hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
+On Fri 07-01-22 17:15:43, yukuai (C) wrote:
+> 在 2022/01/05 22:36, Jan Kara 写道:
+> > Hello,
+> > 
+> > here is the second version of my patches to fix use-after-free issues in BFQ
+> > when processes with merged queues get moved to different cgroups. The patches
+> > have survived some beating in my test VM but so far I fail to reproduce the
+> > original KASAN reports so testing from people who can reproduce them is most
+> > welcome. Thanks!
+> > 
+> > Changes since v1:
+> > * Added fix for bfq_put_cooperator()
+> > * Added fix to handle move between cgroups in bfq_merge_bio()
+> > 
+> > 								Honza
+> > Previous versions:
+> > Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
+> > .
+> > 
 > 
-> tag idle detection is lazy, and may be delayed for 30sec, so there
-> could be just one real active hctx(queue) but all others are actually
-> idle and still accounted as active because of the lazy idle detection.
-> Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
-> forever on this real active hctx.
+> Hi,
 > 
-> Fix this by recalculating wake_batch when inc or dec active_queues.
-> 
-> Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
-> Suggested-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
-> ---
->   block/blk-mq-tag.c      | 32 ++++++++++++++++++++++++++++++--
->   include/linux/sbitmap.h | 11 +++++++++++
->   lib/sbitmap.c           | 22 +++++++++++++++++++---
->   3 files changed, 60 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index e55a6834c9a6..e59ebf89c1bf 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -16,6 +16,21 @@
->   #include "blk-mq-sched.h"
->   #include "blk-mq-tag.h"
->   
-> +/*
-> + * Recalculate wakeup batch when tag is shared by hctx.
-> + */
-> +static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
-> +		unsigned int users)
-> +{
-> +	if (!users)
-> +		return;
-> +
-> +	sbitmap_queue_recalculate_wake_batch(&tags->bitmap_tags,
-> +			users);
-> +	sbitmap_queue_recalculate_wake_batch(&tags->breserved_tags,
-> +			users);
-> +}
-> +
->   /*
->    * If a previously inactive queue goes active, bump the active user count.
->    * We need to do this before try to allocate driver tag, then even if fail
-> @@ -24,16 +39,25 @@
->    */
->   bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
->   {
-> +	unsigned int users;
->   	if (blk_mq_is_shared_tags(hctx->flags)) {
->   		struct request_queue *q = hctx->queue;
->   
->   		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
-> -		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
-> +		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
->   			atomic_inc(&hctx->tags->active_queues);
-> +
-> +			users = atomic_read(&hctx->tags->active_queues);
-> +			blk_mq_update_wake_batch(hctx->tags, users);
-> +		}
->   	} else {
->   		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-> -		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-> +		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
->   			atomic_inc(&hctx->tags->active_queues);
-> +
-> +			users = atomic_read(&hctx->tags->active_queues);
+> I repoduced the problem again with this patchset...
 
-atomic_inc_return() can do inc and read together
+Thanks for testing! 
 
-> +			blk_mq_update_wake_batch(hctx->tags, users);
-> +		}
+> [   71.004788] BUG: KASAN: use-after-free in
+> __bfq_deactivate_entity+0x21/0x290
+> [   71.006328] Read of size 1 at addr ffff88817a3dc0b0 by task rmmod/801
+> [   71.007723]
+> [   71.008068] CPU: 7 PID: 801 Comm: rmmod Tainted: G        W
+> 5.16.0-rc5-next-2021127
+> [   71.009995] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> ?-20190727_073836-4
+> [   71.012274] Call Trace:
+> [   71.012603]  <TASK>
+> [   71.012886]  dump_stack_lvl+0x34/0x44
+> [   71.013379]  print_address_description.constprop.0.cold+0xab/0x36b
+> [   71.014182]  ? __bfq_deactivate_entity+0x21/0x290
+> [   71.014795]  ? __bfq_deactivate_entity+0x21/0x290
+> [   71.015398]  kasan_report.cold+0x83/0xdf
+> [   71.015904]  ? _raw_read_lock_bh+0x20/0x40
+> [   71.016433]  ? __bfq_deactivate_entity+0x21/0x290
+> [   71.017033]  __bfq_deactivate_entity+0x21/0x290
+> [   71.017617]  bfq_pd_offline+0xc1/0x110
+> [   71.018105]  blkcg_deactivate_policy+0x14b/0x210
+...
 
-there seems to be more duplicated code here now, as we do the same in 
-both legs of the if-else statement.
+> Here is the caller of  __bfq_deactivate_entity:
+> (gdb) list *(bfq_pd_offline+0xc1)
+> 0xffffffff81c504f1 is in bfq_pd_offline (block/bfq-cgroup.c:942).
+> 937                      * entities to the idle tree. It happens if, in some
+> 938                      * of the calls to bfq_bfqq_move() performed by
+> 939                      * bfq_reparent_active_queues(), the queue to move
+> is
+> 940                      * empty and gets expired.
+> 941                      */
+> 942                     bfq_flush_idle_tree(st);
+> 943             }
+> 944
+> 945             __bfq_deactivate_entity(entity, false);
 
->   	}
->   
->   	return true;
-> @@ -56,6 +80,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
->   void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
->   {
->   	struct blk_mq_tags *tags = hctx->tags;
-> +	unsigned int users;
->   
->   	if (blk_mq_is_shared_tags(hctx->flags)) {
->   		struct request_queue *q = hctx->queue;
-> @@ -70,6 +95,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
->   
->   	atomic_dec(&tags->active_queues);
->   
-> +	users = atomic_read(&hctx->tags->active_queues);
+So this is indeed strange. The group has in some of its idle service trees
+an entity whose entity->sched_data points to already freed cgroup. In
+particular it means the bfqq_entity_service_tree() leads to somewhere else
+than the 'st' we called bfq_flush_idle_tree() with. This looks like a
+different kind of problem AFAICT but still it needs fixing :). Can you
+please run your reproducer with my patches + the attached debug patch on
+top? Hopefully it should tell us more about the problematic entity and how
+it got there... Thanks!
 
-as above, atomic_dec_return()
+								Honza
 
-> +	blk_mq_update_wake_batch(hctx->tags, users);
-> +
->   	blk_mq_tag_wakeup_all(tags, false);
->   }
->   
-> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-> index fc0357a6e19b..e1fced98dfca 100644
-> --- a/include/linux/sbitmap.h
-> +++ b/include/linux/sbitmap.h
-> @@ -415,6 +415,17 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
->   	sbitmap_free(&sbq->sb);
->   }
->   
-> +/**
-> + * sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch
-> + * @sbq: Bitmap queue to Recalculate wake batch.
-
-/s/Recalculate /recalculate/
-
-
-
-> + * @users: Number of shares.
-> + *
-> + * Like sbitmap_queue_update_wake_batch(), this will calculate wake batch
-> + * by depth. This interface is for sharing tags.
-
-we have concept of shared tags (flag BLK_MQ_F_TAG_HCTX_SHARED) and queue 
-shared tags (flag BLK_MQ_F_TAG_QUEUE_SHARED) - please be careful in the 
-terminology
-
-> + */
-> +void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-> +					    unsigned int users);
-> +
->   /**
->    * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
->    * @sbq: Bitmap queue to resize.
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 2709ab825499..94b3272effd8 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -457,10 +457,9 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
->   }
->   EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
->   
-> -static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-> -					    unsigned int depth)
-> +static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-> +					    unsigned int wake_batch)
->   {
-> -	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
->   	int i;
->   
->   	if (sbq->wake_batch != wake_batch) {
-> @@ -476,6 +475,23 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
->   	}
->   }
->   
-> +static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-> +					    unsigned int depth)
-> +{
-> +	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
-> +
-> +	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-> +}
-> +
-> +void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-> +					    unsigned int users)
-> +{
-> +	unsigned int wake_batch = clamp_t(unsigned int,
-> +			(sbq->sb.depth + users - 1) / users, 4U, SBQ_WAKE_BATCH);
-> +	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-> +}
-> +EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
-> +
->   void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
->   {
->   	sbitmap_queue_update_wake_batch(sbq, depth);
-> 
-
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
