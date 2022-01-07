@@ -2,72 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F079DC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 20:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33039C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  7 Jan 2022 21:18:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbiAGU6O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jan 2022 15:58:14 -0500
-Received: from mail-pl1-f174.google.com ([209.85.214.174]:45000 "EHLO
-        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiAGU6O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 15:58:14 -0500
-Received: by mail-pl1-f174.google.com with SMTP id h1so5744729pls.11;
-        Fri, 07 Jan 2022 12:58:14 -0800 (PST)
+        id S229823AbiAGVSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Jan 2022 16:18:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52480 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229504AbiAGVSt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Jan 2022 16:18:49 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA177C061574;
+        Fri,  7 Jan 2022 13:18:49 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id gp5so6142947pjb.0;
+        Fri, 07 Jan 2022 13:18:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=+mr+pZW4rtkqx4SLZE7ugT/NQ4UbxX8mOU3Dn6TRB6E=;
+        b=ZuF6bOWd6HtMcHA/bmJB1Shy2xxq6HYD6KqDZeTxu750fya3OiGetfqbVr2CUYNqbA
+         AnEyOYmA4HDVuAXKWGU4om1OHTDuf9bVVL9ZJd23rN4X/C2DjSEZg3SgRmMK0g5mBXg1
+         c5an3csi7XL+F6f1NicQH8YOUasfa2gWNBpW1XXIgYMDvOAwrE8koHzN1h02gbtMe0lw
+         I9ZJB59fM4queKy4VeG0J2GhXboceIkj0Zbyr7WfYTBtHRxmRdf19WKeHoAXo/Axy5iU
+         cFWUrrYcwe//r7iVsP9TWzOfqxpHZCg1N5yQn36Gnd1hMP5SClcAtkj7v9ID8c3XyhVo
+         BRPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=oGg6eEoyVeP3AsWSET5vQXpARWWBJj2efG9QJ7/Rr00=;
-        b=YLVgqrl7Y3kn2OILpy1lQy7qFiX5L2mXexV+eUyY4cW3XCmpkxmkmcXZEgSHc9ceYS
-         tdG/zb2pJ65H6pM/ddwqqVU7gMPA6zjTFt4obrremJF+s2cENKomhbXZGBRnknylmm1n
-         5zdJfZ0HvaUymBiqfNZNFA4uTkee+JFVrS0OD/Lxh7yhuLTalX8AWTloZ9dIt3rtLoRs
-         JKDPICgv9+wR41RJ6EKty/lTb4KuM3atiR2Gr6E/kaiHN51uJr2dh4F678b+XmXTNFyf
-         dM92yrbf5WuwJiiH4nCETPsEPdwtmsczWxtCcdOaLOZQ5zbz2L71FX7PkzogVHlQ8AOk
-         Bfgg==
-X-Gm-Message-State: AOAM533xe9Lrf14O04w7D0baIx4ADRu8iAz8Pj3TlNvZkDh6rTcmZBL2
-        17GQJ1BnFoHJx+spuSTBYmk5Pn3Dlkk=
-X-Google-Smtp-Source: ABdhPJyZMDQwYg25LmbxhXmRoavew5HZXicqdbehbXyIjNxXyVMTLPDIQSJ5/cpns4UpDcSoMLYYYQ==
-X-Received: by 2002:a17:903:1c4:b0:149:45fb:d6f0 with SMTP id e4-20020a17090301c400b0014945fbd6f0mr63257885plh.143.1641589093673;
-        Fri, 07 Jan 2022 12:58:13 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:d201:bcd0:fc75:8697? ([2620:15c:211:201:d201:bcd0:fc75:8697])
-        by smtp.gmail.com with ESMTPSA id l6sm6840272pfu.63.2022.01.07.12.58.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jan 2022 12:58:12 -0800 (PST)
-Message-ID: <65376e36-579b-76c4-0642-4582d6679914@acm.org>
-Date:   Fri, 7 Jan 2022 12:58:11 -0800
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to;
+        bh=+mr+pZW4rtkqx4SLZE7ugT/NQ4UbxX8mOU3Dn6TRB6E=;
+        b=u1dlZqpXpecSkKp0wGWHvNsjKP/aaHif/bD3zsvBdXnVmlL97IgOLO5+8Ne83WxAPP
+         GLD3RkWpWWOVGOopXelaSbaOEmRJOHRvU3Yo951CdIyQmTFMzJfpVlCJjK82Zrd30MP1
+         BgKGVCSp1Lh2mtX+hfys0PXBkjpHhj2arTEQ8mSMcaEk/8ksSmIOAMUXhaMMbCcJow0K
+         M6Gfv5TpuBT4sJa6WKWN/aCoOqHMepgSPtYofPnZZ5js5eRHj0foKTExKYQJYoQ9oPKJ
+         u+ul1Te3mn/fdrGlemV7GqtzBOSc3B8ZrA01E4PiQBd3z2eFeUI4jX9tYC8DYjohJwI0
+         uVNw==
+X-Gm-Message-State: AOAM532mnPr8JbGLI95a+WXSaJmlCmPsgcCEinh/DuDdqQ5Lp4tc0nOB
+        PZxtDZv0uIiQTDYpnsNcqVg=
+X-Google-Smtp-Source: ABdhPJzDfFuAfm7wc/zg1mWwwVSzhzcBr0JCM31bdg44rNqROMTxCopNrCHTQZZFgnfF1N01spu6mg==
+X-Received: by 2002:a17:902:c215:b0:148:af14:6e96 with SMTP id 21-20020a170902c21500b00148af146e96mr64413333pll.80.1641590329057;
+        Fri, 07 Jan 2022 13:18:49 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id n26sm1610483pgb.91.2022.01.07.13.18.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jan 2022 13:18:48 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 7 Jan 2022 11:18:47 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     Yu Kuai <yukuai3@huawei.com>, hch@infradead.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH v5 2/2] block: cancel all throttled bios in del_gendisk()
+Message-ID: <YdiuN9kv5OvE/Rtf@slm.duckdns.org>
+References: <20211210083143.3181535-1-yukuai3@huawei.com>
+ <20211210083143.3181535-3-yukuai3@huawei.com>
+ <20220107150519.GA26824@blackbody.suse.cz>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH v3 0/8] docs: consolidate sysfs-block into
- Documentation/ABI/
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-References: <20211209003833.6396-1-ebiggers@kernel.org>
- <YcH1uxfdTRHIwl7Y@quark> <YdMQ6rfSZWSOLptA@quark>
- <YddiJFr+ba7Veh82@sol.localdomain>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <YddiJFr+ba7Veh82@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220107150519.GA26824@blackbody.suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/6/22 13:41, Eric Biggers wrote:
-> Jens, any reason you haven't applied this series yet?  It looks like you've been
-> applying other patches.  To be clear, I've been expecting that this would go in
-> through the block tree, rather than the docs tree.
+Hello,
 
-We are close to the v5.17 merge window so this is not a good time for a maintainer to
-apply a large patch series. If Jens does not reply I propose to repost this patch
-series after the v5.17 merge window has closed (three weeks from now?).
+On Fri, Jan 07, 2022 at 04:05:19PM +0100, Michal Koutný wrote:
+> On Fri, Dec 10, 2021 at 04:31:43PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+> > +	 * queue_lock is held, rcu lock is not needed here.
+> > +	 */
+> > +	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
+> > +		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
+> 
+> FTR, I acknowledge this can work due to RCU peculiarities, however, I
+> don't understand why is it preferred against more robust explict
+> rcu_read_lock().
+> 
+> (All in all, this isn't a deal breaker and I'm not confident evaluating
+> the rest of the patch.)
 
-See also https://lore.kernel.org/lkml/CAHk-=wg=3dEpPGhz8YvJUDWhFW_GUeASBGmqyw3aPQRfB3ki9w@mail.gmail.com/
+Cc'ing Paul for RCU. Paul, this nit is around whether or not to use
+rcu_read_lock() in an irq disabled section. I can see both sides of the
+arguments - it's weird to put in an extra rcu_read_lock() when technically
+unnecessary but it's also nice to have something explicit and structured to
+mark parts which require RCU protection. Putting in a comment is okay but
+consistency is difficult to achieve that way.
 
-Thanks,
+Maybe all these are unnecessary as lockdep would be able to catch them
+anyway, or maybe we'd want something to explicitly mark RCU protected
+sections. I don't know but whichever way, I think we need to establish a
+convention.
 
-Bart.
+Thanks.
+
+-- 
+tejun
