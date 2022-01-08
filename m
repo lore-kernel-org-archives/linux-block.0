@@ -2,104 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FC2C4332F
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jan 2022 04:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FCB9C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  8 Jan 2022 19:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229953AbiAHEyZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Jan 2022 23:54:25 -0500
-Received: from mx.ewheeler.net ([173.205.220.69]:53842 "EHLO mx.ewheeler.net"
+        id S232473AbiAHTxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Jan 2022 14:53:05 -0500
+Received: from mout.web.de ([217.72.192.78]:46135 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229527AbiAHEyY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Jan 2022 23:54:24 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 52E7581;
-        Fri,  7 Jan 2022 20:54:24 -0800 (PST)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id wLW4KuNBqH4k; Fri,  7 Jan 2022 20:54:19 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id 1A62840;
-        Fri,  7 Jan 2022 20:54:18 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 1A62840
-Date:   Fri, 7 Jan 2022 20:54:16 -0800 (PST)
-From:   Eric Wheeler <bcache@lists.ewheeler.net>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-cc:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>
-Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent
- for hardware raid5/6
-In-Reply-To: <yq15yqvw1f0.fsf@ca-mkp.ca.oracle.com>
-Message-ID: <c9abd220-6b7f-9299-48a1-a16d64981734@ewheeler.net>
-References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de> <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net> <200638b0-7cba-38b4-20c4-b325f3cfe862@suse.de> <alpine.LRH.2.11.1906241800350.1114@mx.ewheeler.net> <8a9131dc-9bf7-a24a-f7b8-35e0c019e905@suse.de>
- <fdb85dc1-eee6-e55e-8e9c-fa1f36b4a37@ewheeler.net> <yq15yqvw1f0.fsf@ca-mkp.ca.oracle.com>
+        id S230057AbiAHTxE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 8 Jan 2022 14:53:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1641671581;
+        bh=1WVD8sonhTLURoKUip2kjYjg4FF2hd+FCM0q+/QbYDM=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+        b=HI+LsoJjrpJarY5PC2jnWthra6+hzz1n/twlgNAR+jRHaKvlsvEf7D22sld9bYOse
+         xeC+jRGo34sbkwQR0+iUnuG07XBH8rc8EZ5HLembkdVjteEhxro9OsYumFVQB+Kukc
+         og9z8r9D9ccYTK9+Xu9JSo7v/Ge9eL99Ldjj07cw=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from gecko ([46.223.151.24]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MvKbj-1mF0Si1UDh-00r490; Sat, 08
+ Jan 2022 20:53:01 +0100
+Date:   Sat, 8 Jan 2022 19:52:59 +0000
+From:   Lukas Straub <lukasstraub2@web.de>
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        linux-raid@vger.kernel.org
+Subject: Re: [dm-devel] Proper way to test RAID456?
+Message-ID: <20220108195259.33e9bdf0@gecko>
+In-Reply-To: <0535d6c3-dec3-fb49-3707-709e8d26b538@gmx.com>
+References: <0535d6c3-dec3-fb49-3707-709e8d26b538@gmx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:AGazrWY5rmVs3KLflW/ztv0A9Mbn86f0R+FugVm+ZYTHp7FWmhP
+ UvJZ7Mc6s9oUNuBwc+domY47DVsmzp1hcddFyhihrJZm94jzAM/cdMUybsVRXFVs1ix97Gr
+ yUM0jx4iKxPulgBfO3FqcjTf+8YUYTlwb+qhzXu6GDGY4VsOiMiFlnsMswKbB4rsGTkCp3i
+ U3YHoiSxmX6OtjPgyUEKw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ef3i2KUnSBY=:4g/W591zD1UlL8Yb2WX+B8
+ r1UoDoaKzksXCE4os1w3nACPuh/ySwzvZGc413W+WlWuW2T/NfQruF4er6nRFvayFLnKt2eOL
+ qOmeHqQdoaJ0sfRWyhmsv2GT9ggBKpW4K6qlhaJ3ygAxSOGQs0UeSU+yDuS1MrJCclUAkDo4B
+ rrnPk2g/7656zG+1Qm40Vqk7f657JeIcG/HNLtHSLz7I1102SltZHV+tUGj+l4BwRFX1sWvl9
+ RbnFGBXr/44y3bLF7rN4FH1IlPFja6M4nKK2nXy6znDC+d9V/iXd8tjyR9JIZBuDks3H0coWX
+ 5kugKKRpwzONWZaqD//w01j7qrD/CRoC08845Y+lJZ6CtB/enhSnWY30ReDzQXJVAvsTY+Agg
+ nz2LhQ4aEq98sXKFpqZIV5YnKVdrfwTo+yGBRT43GGcjhqrtbj4DwF9K4FPxQ4W82CUUya+lk
+ AUn3V1imD1vSz8DzhLhsEAES3RF3vRAsvUg/0nlmKGJ4VashcP3TdmarvRAfd+2SMB81r5ni+
+ tVHW1TmYdzq4IvdWnUAko06M8a7fLZqYdKgTItuti8YBiE5XjeHN+CZjXDAUIdHqAhilU0pTM
+ dvAXUsgEs2mddPocJuVGy39SD/kxiLp2XWPW2TaUuXhBoMuWSLctr6mYYNl/b7Bxvy+ExJQq9
+ cowacETdAxgBsXiRiyUWV6Ui8OrYG6gK7cuFWEQrPr+V8/ZQgMB3TCErUoDfjLi7uz3jT1oF7
+ lbvObD046YkIHxZg8b7qNOcLTJaZ5o+aJ4bhG7CrXMISbqBIhGu++jd79q1FFeswdF41qC1Yg
+ ppSNtBX98EFoX2I5ox7zGvaoqo0HWVeaPpuL8XKaVNv0XfRyg8OOu4WdBF7C77FPDKjNU34Za
+ Ze4ePujn1Mo0uMdJNM3gOqBr1APf4u8wUp68Jr8xogp/7st9gpHbf3bUETu/xkOsauZXSDLIP
+ tdT512V6gxLGtQaunF2jDLB2h1btyWjTKm+00aD2kH3pX9olpgIfvulpoRJKz6gJk+XN30iRq
+ AF49TnIRQfiaQsN51E0+pDGwJVQXmWg1gqjFs0QQfg3E3N9Wj4enPK4qBPKKm6Ql436D5KW1w
+ UlmJoRr99Y61bc=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 7 Jan 2022, Martin K. Petersen wrote:
-> Eric,
-> 
-> > Even new new RAID controlers that _do_ provide `io_opt` still do _not_ 
-> > indicate partial_stripes_expensive (which is an mdraid feature, but Martin 
-> > please correct me if I'm wrong here).
-> 
-> partial_stripes_expensive is a bcache thing, I am not sure why it needs
-> a separate flag. It is implied, although I guess one could argue that
-> RAID0 is a special case since partial writes are not as painful as with
-> parity RAID.
+CC'ing linux-raid mailing list, where md raid development happens.
+dm-raid is just a different interface to md raid.
 
-I'm guessing bcache used did some optimization for 
-queue->limits.raid_partial_stripes_expensive because md raid5 code sets 
-this flag.  At least when using Linux md as the RAID5 implementation it 
-gets configured automatically:
-   raid5.c:       mddev->queue->limits.raid_partial_stripes_expensive = 1;
+On Fri, 7 Jan 2022 10:30:56 +0800
+Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
 
-https://elixir.bootlin.com/linux/latest/source/drivers/md/raid5.c#L7729
-
-Interestingly only bcache uses it, but md does set it.
-
-> The SCSI spec states that submitting an I/O that is smaller than io_min
-> "may incur delays in processing the command". And similarly, submitting
-> a command larger than io_opt "may incur delays in processing the
-> command".
-> 
-> IOW, the spec says "don't write less than an aligned multiple of the
-> stripe chunk size" and "don't write more than an aligned full
-> stripe". That leaves "aligned multiples of the stripe chunk size but
-> less than the full stripe width" unaccounted for. And I guess that's
-> what the bcache flag is trying to capture.
-
-Maybe any time io_opt is provided then partial_stripes_expensive should be 
-flagged too and any code to the contrary should be removed?
-
-Question: Does anyone have a reason to keep partial_stripes_expensive in 
-the kernel at all?
-
-> SCSI doesn't go into details about RAID levels and other implementation
-> details which is why the wording is deliberately vague. But obviously
-> the expectation is that partial stripe writes are slower than full.
-> 
-> In my book any component in the stack that sees either io_min or io_opt
-> should try very hard to send I/Os that are aligned multiples of those
-> values. I am not opposed to letting users manually twiddle the
-> settings. But I do think that we should aim for the stack doing the
-> right thing when it sees io_opt reported on a device.
-
-Agreed, thanks for the feedback!
-
--Eric
+> Hi,
+>
+> Recently I'm working on refactor btrfs raid56 (with long term objective
+> to add proper journal to solve write-hole), and the coverage of current
+> fstests for btrfs RAID56 is not that ideal.
+>
+> Is there any project testing dm/md RAID456 for things like
+> re-silvering/write-hole problems?
+>
+> And how you dm guys do the tests for stacked RAID456?
+>
+> I really hope to learn some tricks from the existing, tried-and-true
+> RAID456 implementations, and hopefully to solve the known write-hole
+> bugs in btrfs.
+>
+> Thanks,
+> Qu
+>
+>
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://listman.redhat.com/mailman/listinfo/dm-devel
+>
 
 
-> 
-> -- 
-> Martin K. Petersen	Oracle Linux Engineering
-> 
+
+=2D-
+
