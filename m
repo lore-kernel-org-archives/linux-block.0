@@ -2,141 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2528C4332F
-	for <linux-block@archiver.kernel.org>; Sat,  8 Jan 2022 23:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12468C433EF
+	for <linux-block@archiver.kernel.org>; Sun,  9 Jan 2022 09:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230191AbiAHXzb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Jan 2022 18:55:31 -0500
-Received: from mout.gmx.net ([212.227.15.19]:50579 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229974AbiAHXzb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 8 Jan 2022 18:55:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1641686128;
-        bh=tLEqv6MN/iJ9BJHmdTUiojJfm2Ierwu//B8gxWLz8Gs=;
-        h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=A+Nqieb36kpnfdNrD9Z24NfM8/o9IIn4fIbqfHttqEPcDP+z7qEZYqOxb/vtqr2KX
-         A1BcYblkKK/nFBSgy657X/BK7W5ntEjfpkbqyFE/FF+RsP4oWj6LuVATLSxTrFxdzF
-         VqbBlmYntw6x1GI9PHTh7DjKHivMYiPcKT6p45e4=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MVvPD-1myx8k1kJR-00Ro3e; Sun, 09
- Jan 2022 00:55:28 +0100
-Message-ID: <5ffc44f1-7e82-bc85-fbb1-a4f89711ae8f@gmx.com>
-Date:   Sun, 9 Jan 2022 07:55:23 +0800
+        id S233882AbiAIJgr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jan 2022 04:36:47 -0500
+Received: from mail.parknet.co.jp ([210.171.160.6]:57434 "EHLO
+        mail.parknet.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229523AbiAIJgq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jan 2022 04:36:46 -0500
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+        by mail.parknet.co.jp (Postfix) with ESMTPSA id A33DE15F93A;
+        Sun,  9 Jan 2022 18:36:45 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+        by ibmpc.myhome.or.jp (8.16.1/8.16.1/Debian-2) with ESMTPS id 2099ahk9096048
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Sun, 9 Jan 2022 18:36:44 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+        by devron.myhome.or.jp (8.16.1/8.16.1/Debian-2) with ESMTPS id 2099ahfd817108
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Sun, 9 Jan 2022 18:36:43 +0900
+Received: (from hirofumi@localhost)
+        by devron.myhome.or.jp (8.16.1/8.16.1/Submit) id 2099ah09817107;
+        Sun, 9 Jan 2022 18:36:43 +0900
+From:   OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, glider@google.com,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com>
+Subject: [PATCH] block: Fix wrong offset in bio_truncate()
+References: <000000000000880fca05d4fc73b0@google.com>
+Date:   Sun, 09 Jan 2022 18:36:43 +0900
+In-Reply-To: <000000000000880fca05d4fc73b0@google.com> (syzbot's message of
+        "Fri, 07 Jan 2022 03:40:18 -0800")
+Message-ID: <875yqt1c9g.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/29.0.50 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [dm-devel] Proper way to test RAID456?
-Content-Language: en-US
-To:     Lukas Straub <lukasstraub2@web.de>
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        linux-raid@vger.kernel.org
-References: <0535d6c3-dec3-fb49-3707-709e8d26b538@gmx.com>
- <20220108195259.33e9bdf0@gecko> <20220108202922.6b00de19@gecko>
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-In-Reply-To: <20220108202922.6b00de19@gecko>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:BVRGUUZIO9w0zpfZKPOWTlrdRKy2XP9MQupgHUM5oIewSBjhOs4
- svXluN/0+v3ESSi3sLWhSM0N0A9E2ysoTIY7HPb4OAT2PHYDcmuvIFAadI8HBL5jnLwetek
- LJC9VWzhP+VjyYCTQ/GDykKGquQwn8P3/UEftFjJ4zpTU2In8Gu+7lOk+BoC0vqHs3Hus75
- Pri2/mZl15MwyxoTis1Ag==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:t4ygZ1xfhRY=:aszCUv/cnRDUnUZaClUDKI
- C+B41B4hagqjTYzoIK/rB4p0hQHKl/Tsj2kG82o/qzDsCsUj2p9JvuFx5O83zvJtsE9GXUkbX
- 6I6HdKEYqErfrFIJZS0ii3MPZt/cKJ5gGNIj2J2RiYmHmZLandyJogh5yRCQOip1dxsVgrxx5
- DyzkhBSuERhOzoVcMfuaQ+Q65jfoJDudpIO4mwS4aqtIUAtFJgL7yYLcLhrcSaX1wpeynX4Ya
- IomnefyPCUcu+otEiDPBG+Z0b59jKl8r/BfLzPLGuj1maP9LUkK5oPzmfPgUEZ+385/Fle72J
- A6mazlkmcKRt/Zj7eq8wwT8LeRt76JTDF4T19fUdkBirRikPxU51q8va55DlQdNO/RujgYXOx
- p7z/Bm99PuHHdX7tW4GWtyWE7mD/LLtdlSp5Ak+oLB7QH+8korUct+4jN8XfPYJ/E1bkDt52w
- 0TbmqMFjo4R8+RaJj2IAKhDIIAjNzQQwdlvxJ+HxZdbwT6PXJ/w9g2oXWtkpup17/2pVmx1qA
- I2kFa+Q4PNaBr2rxJfUaJmsgQbwN7abbzSViHNahInEyw+8b/1FmJbOBQ2MbHitWWXtAdPDZ3
- cZKMrFefbJxmcxSJrSyPSJXQV6aB5AcNup4bq58pg8Pou0LCjQU+m3mG/MW7KmRDrI7OkPtNr
- hql7N+tqXVVtlYFXwangNq4XV+Fm29Ps1FDkBW6OeugGsVO9yIzGXmGUSppfbt2tAttf8zdwS
- FuLmjPL8Jzr9FozHceo/HZn4JxuF/Lh0eGkyYpNOWVH80F656Y8j7S2Q/hIbBr1CFrTgvejX2
- lo6DxNIG10nY1S7Kq2rJiV2twurjxc23tyWDM12NUEH0/7wVT45ZhKB5c6SYXSg2tj8Y+bHjP
- /fpIvtyuXMK/8JGTYwa/o+RWjDrWCzzlFUeoS7EPPPjR8phZ7yQ6tUOkIgWjaCalsCLXlihGM
- os9KHW6/WByumMkZlTzckWhtrFixMHFErUMRWn/ExYPALWTeQAMVQA4ZY2n/DJPSxkIxwbhNB
- M5SWbwViMizZYFgL8pLb30LSxDPvKs93FPjzlqxPNmzX0j2HJSo1ZDwomPR9gI5IKl0BaR7yN
- acBLXwFmCxbelI=
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+bio_truncate() clears the buffer outside of last block of bdev, however
+current bio_truncate() is using the wrong offset of page. So it can
+return the uninitialized data.
 
+This happened when both of truncated/corrupted FS and userspace (via
+bdev) are trying to read the last of bdev.
 
-On 2022/1/9 04:29, Lukas Straub wrote:
-> On Sat, 8 Jan 2022 19:52:59 +0000
-> Lukas Straub <lukasstraub2@web.de> wrote:
->
->> CC'ing linux-raid mailing list, where md raid development happens.
->> dm-raid is just a different interface to md raid.
->>
->> On Fri, 7 Jan 2022 10:30:56 +0800
->> Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
->>
->>> Hi,
->>>
->>> Recently I'm working on refactor btrfs raid56 (with long term objectiv=
-e
->>> to add proper journal to solve write-hole), and the coverage of curren=
-t
->>> fstests for btrfs RAID56 is not that ideal.
->>>
->>> Is there any project testing dm/md RAID456 for things like
->>> re-silvering/write-hole problems?
->>>
->>> And how you dm guys do the tests for stacked RAID456?
->>>
->>> I really hope to learn some tricks from the existing, tried-and-true
->>> RAID456 implementations, and hopefully to solve the known write-hole
->>> bugs in btrfs.
->
-> Just some thoughts:
-> Besides the journal to mitigate the write-hole, md raid has another
-> trick:
-> The Partial Parity Log
-> https://www.kernel.org/doc/html/latest/driver-api/md/raid5-ppl.html
->
-> When a stripe is partially updated with new data, PPL ensures that the
-> old data in the stripe will not be corrupted by the write-hole. The new
-> data on the other hand is still affected by the write hole, but for
-> btrfs that is no problem.
->
-> But there is a even simpler solution for btrfs: It could just not touch
-> stripes that already contain data.
+Reported-by: syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com
+Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+---
+ block/bio.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-That would waste a lot of space, if the fs is fragemented.
+diff --git a/block/bio.c b/block/bio.c
+index a6fb6a0..25f1ed2 100644
+--- a/block/bio.c	2021-11-01 09:19:05.999472589 +0900
++++ b/block/bio.c	2022-01-09 17:40:09.010438012 +0900
+@@ -567,7 +567,8 @@ void bio_truncate(struct bio *bio, unsig
+ 				offset = new_size - done;
+ 			else
+ 				offset = 0;
+-			zero_user(bv.bv_page, offset, bv.bv_len - offset);
++			zero_user(bv.bv_page, bv.bv_offset + offset,
++				  bv.bv_len - offset);
+ 			truncated = true;
+ 		}
+ 		done += bv.bv_len;
+_
 
-Or we have to write into data stripes when free space is low.
-
-That's why I'm trying to implement a PPL-like journal for btrfs RAID56.
-
-Thanks,
-Qu
-
->
-> The big problem will be NOCOW files, since a write to an already
-> allocated extent will necessarily touch a stripe with old data in it
-> and the new data also needs to be protected from the write-hole.
->
-> Regards,
-> Lukas Straub
->
->>> Thanks,
->>> Qu
->>>
->>>
->>> --
->>> dm-devel mailing list
->>> dm-devel@redhat.com
->>> https://listman.redhat.com/mailman/listinfo/dm-devel
->>>
->>
->>
->>
->
->
->
+-- 
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
