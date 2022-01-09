@@ -2,84 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92273C433F5
-	for <linux-block@archiver.kernel.org>; Sun,  9 Jan 2022 17:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A21C433EF
+	for <linux-block@archiver.kernel.org>; Sun,  9 Jan 2022 21:25:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbiAIRhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Jan 2022 12:37:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36420 "EHLO
+        id S231936AbiAIVZz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jan 2022 16:25:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiAIRhS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jan 2022 12:37:18 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8324C06173F
-        for <linux-block@vger.kernel.org>; Sun,  9 Jan 2022 09:37:18 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id v18so9370031ilm.11
-        for <linux-block@vger.kernel.org>; Sun, 09 Jan 2022 09:37:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=bODOj2iY3281uNiwPt+MJVU4a89V+UJ+UJjJJrO9Fss=;
-        b=2jUIhvux0YeD6RwsfY9TYfiTTCrZC/XkWBXPY6d4SSwtcWoudBsnmtW77Zo8j81Byv
-         M8XhUvHBQ7mEe4C1J8+ZKq2ow/tSXRsPgmfb0WHkksx8+YMZv4kbgmE/WreyNqdwf9W3
-         EzYpWN+PCl1usIO0RX5fwDQvohttuTUKY+9yq0t/D5s2zpzPtuW5sjnxiVS7SGkJR+5x
-         RqPS7AjuNrbPc+U0kMY6YmLxfNRoiFD/0CSFoU6wE9JBOFgemm9JAUwJa0m5bUgocD98
-         Nr6iwQs1GxG2+Bc0U3Yb0iycZ7stWNSSNHcTZfZ7XF4wal6YY29N2gQkIVKGyMCMiqhV
-         q8Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=bODOj2iY3281uNiwPt+MJVU4a89V+UJ+UJjJJrO9Fss=;
-        b=h9oCwOsSpzDr1K8GWwlRda6lXUOQd/DXdJMt0GF17pT61MdPV2TpSV1SEVLIehDovl
-         CiaTtzuzoJOqgxltAVldXMIPvu6EqU7kxAXo0iTw40wUE3kAqHlyGtj53/YZrWTpiqF9
-         vpBhGIWdW6xE5bWxr01CvwQKXwk6hFww9cp9bS7IKDTrSmZxW5VO03LYQX8qZ1cLxOp+
-         W79HxvGBZY36cwMfhL2FYWSvuaXB/cC/0U2VpMqmdgZTSFK/L7Ur9QN2KmHD6P6H08yt
-         rN7/ni9M6cdoM9ggFAOxgWlBeFAF9+LjMErkXBrwChsSMyrNw4FJP9Ez4fBD/JVeNyB1
-         QAsg==
-X-Gm-Message-State: AOAM530/uFNZZlMak0d9ky4Q/Z5RcVDZTS+s5O6b6midKm1V5E5DuoQS
-        BRwZOf2lcO47HJMdsyKF7mfzJQ==
-X-Google-Smtp-Source: ABdhPJzhgT9GoDuxD82LpzWq8JlymoPqHojM6SncquisHWWAsIZsqGdPvlwlCE6um9UeCQbTaZ44VA==
-X-Received: by 2002:a92:de0a:: with SMTP id x10mr3078309ilm.309.1641749837966;
-        Sun, 09 Jan 2022 09:37:17 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id g5sm2991212iok.52.2022.01.09.09.37.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jan 2022 09:37:17 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Yang Li <yang.lee@linux.alibaba.com>
-Cc:     Abaci Robot <abaci@linux.alibaba.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20220107005228.103927-1-yang.lee@linux.alibaba.com>
-References: <20220107005228.103927-1-yang.lee@linux.alibaba.com>
-Subject: Re: [PATCH -next] block: fix old-style declaration
-Message-Id: <164174983619.77550.9171818584702975669.b4-ty@kernel.dk>
-Date:   Sun, 09 Jan 2022 10:37:16 -0700
+        with ESMTP id S232039AbiAIVZy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jan 2022 16:25:54 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7D4C06173F;
+        Sun,  9 Jan 2022 13:25:54 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CEA3A60DBF;
+        Sun,  9 Jan 2022 21:25:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2889C36AE3;
+        Sun,  9 Jan 2022 21:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641763553;
+        bh=L/paTrcUsrXaeUe0V0GPEPrSSn2bsBSIX9D3COqKh2Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dFQnUDMBv9ya2R9Lnp2kK3kp1OUjhyyBPE5n4LorweT7FgaUNta/9YBteBE2iRXGP
+         tJv9CNMJu+pDhdG27sab2KqJbdoAWPd4PzFxajnIR/pRscps/Im6vEWNlirIN2WJJn
+         e9+ntVAwwNDMFrAESH65beReVM9k9Q01WQ3hKmDbHxTzqI6CZMQM6MDmV4sd4PlYCb
+         mfn8Ye5wn3LwJ3xU6Y1oBySQr+7fAGgQboQcEfHT75cYHe01BNsvAdnVRRtnrbMjSM
+         VuDLfUfYMp2t/1qIK6AVjgbvR//XQ2kyXt4SxOPl6FKDYhG9pO8zW62meFYB4b1diU
+         OdP+4D4CSYqEQ==
+Date:   Sun, 9 Jan 2022 13:25:51 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/8] docs: consolidate sysfs-block into
+ Documentation/ABI/
+Message-ID: <YdtS3x0M1qFcN3R1@sol.localdomain>
+References: <20211209003833.6396-1-ebiggers@kernel.org>
+ <YcH1uxfdTRHIwl7Y@quark>
+ <YdMQ6rfSZWSOLptA@quark>
+ <YddiJFr+ba7Veh82@sol.localdomain>
+ <65376e36-579b-76c4-0642-4582d6679914@acm.org>
+ <ef487b83-a1cc-d8a5-8a45-d0fec5eed94b@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef487b83-a1cc-d8a5-8a45-d0fec5eed94b@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 7 Jan 2022 08:52:28 +0800, Yang Li wrote:
-> Move the 'inline' keyword to the front of 'void'.
+On Sun, Jan 09, 2022 at 10:01:11AM -0700, Jens Axboe wrote:
+> On 1/7/22 1:58 PM, Bart Van Assche wrote:
+> > On 1/6/22 13:41, Eric Biggers wrote:
+> >> Jens, any reason you haven't applied this series yet?  It looks like you've been
+> >> applying other patches.  To be clear, I've been expecting that this would go in
+> >> through the block tree, rather than the docs tree.
+> > 
+> > We are close to the v5.17 merge window so this is not a good time for a maintainer to
+> > apply a large patch series. If Jens does not reply I propose to repost this patch
+> > series after the v5.17 merge window has closed (three weeks from now?).
 > 
-> Remove a warning found by clang(make W=1 LLVM=1)
-> ./include/linux/blk-mq.h:259:1: warning: ‘inline’ is not at beginning of
-> declaration
-> 
-> 
-> [...]
+> I'm fine with it, but it should probably just go through the doc tree.
 
-Applied, thanks!
+I think it makes much more sense for subsystems to be responsible for their own
+documentation; that's why patch 8 in this series adds the block layer
+documentation to the block layer MAINTAINERS entry.  Do you disagree with that?
 
-[1/1] block: fix old-style declaration
-      commit: 292c33c95defd0b814fec1fc8cd60d16556cf7b8
-
-Best regards,
--- 
-Jens Axboe
-
-
+- Eric
