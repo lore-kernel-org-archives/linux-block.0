@@ -2,84 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FF5C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 00:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C06C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 01:28:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237526AbiAJAFX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Jan 2022 19:05:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53337 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237534AbiAJAFX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 9 Jan 2022 19:05:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641773121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m8SAvP6dAzHrjKhMg+5R+766TBWSrJAna+O4hSrTC58=;
-        b=i3xW1a+ItJx9nL6JcmeSQ4PoEFuqCSOvSzADMlnzr1Voip3Eqx87tfYvEoM6jO8SHaZvoe
-        VuPkd4TnDvUpYWtuzCn/rWyuVAp7iTArrvvMbvTG8M4BF9b2vsVGy+YG1BRVoLanvR9rEn
-        WBthlAAo8qbgecGlzXPyj3pvb4p5wlM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-627-EpnrowMdMyKBB6ZaQ9MdXQ-1; Sun, 09 Jan 2022 19:05:20 -0500
-X-MC-Unique: EpnrowMdMyKBB6ZaQ9MdXQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AEAA18C89C4;
-        Mon, 10 Jan 2022 00:05:19 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F30656F9B;
-        Mon, 10 Jan 2022 00:05:13 +0000 (UTC)
-Date:   Mon, 10 Jan 2022 08:05:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: don't protect submit_bio_checks by q_usage_counter
-Message-ID: <Ydt4NK82C3rx2EuW@T590>
-References: <20220104134223.590803-1-ming.lei@redhat.com>
+        id S233053AbiAJB2e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jan 2022 20:28:34 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:30263 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232997AbiAJB2d (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jan 2022 20:28:33 -0500
+Received: from kwepemi500007.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JXGRF3Bj3zbjhR;
+        Mon, 10 Jan 2022 09:27:53 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500007.china.huawei.com (7.221.188.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 10 Jan 2022 09:28:31 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Mon, 10 Jan 2022 09:28:30 +0800
+Subject: Re: [PATCH v5 2/2] block: cancel all throttled bios in del_gendisk()
+To:     <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>
+CC:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        <hch@infradead.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20211210083143.3181535-1-yukuai3@huawei.com>
+ <20211210083143.3181535-3-yukuai3@huawei.com>
+ <20220107150519.GA26824@blackbody.suse.cz> <YdiuN9kv5OvE/Rtf@slm.duckdns.org>
+ <20220107213612.GQ4202@paulmck-ThinkPad-P17-Gen-1>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <9e318511-b33c-37c6-8ffd-75302280246d@huawei.com>
+Date:   Mon, 10 Jan 2022 09:28:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220104134223.590803-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20220107213612.GQ4202@paulmck-ThinkPad-P17-Gen-1>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 04, 2022 at 09:42:23PM +0800, Ming Lei wrote:
-> Commit cc9c884dd7f4 ("block: call submit_bio_checks under q_usage_counter")
-> uses q_usage_counter to protect submit_bio_checks for avoiding IO after
-> disk is deleted by del_gendisk().
+在 2022/01/08 5:36, Paul E. McKenney 写道:
+> On Fri, Jan 07, 2022 at 11:18:47AM -1000, Tejun Heo wrote:
+>> Hello,
+>>
+>> On Fri, Jan 07, 2022 at 04:05:19PM +0100, Michal Koutný wrote:
+>>> On Fri, Dec 10, 2021 at 04:31:43PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>>>> +	 * queue_lock is held, rcu lock is not needed here.
+>>>> +	 */
+>>>> +	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
+>>>> +		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
+>>>
+>>> FTR, I acknowledge this can work due to RCU peculiarities, however, I
+>>> don't understand why is it preferred against more robust explict
+>>> rcu_read_lock().
+>>>
+>>> (All in all, this isn't a deal breaker and I'm not confident evaluating
+>>> the rest of the patch.)
+>>
+>> Cc'ing Paul for RCU. Paul, this nit is around whether or not to use
+>> rcu_read_lock() in an irq disabled section. I can see both sides of the
+>> arguments - it's weird to put in an extra rcu_read_lock() when technically
+>> unnecessary but it's also nice to have something explicit and structured to
+>> mark parts which require RCU protection. Putting in a comment is okay but
+>> consistency is difficult to achieve that way.
+>>
+>> Maybe all these are unnecessary as lockdep would be able to catch them
+>> anyway, or maybe we'd want something to explicitly mark RCU protected
+>> sections. I don't know but whichever way, I think we need to establish a
+>> convention.
 > 
-> Turns out the protection isn't necessary, because once
-> blk_mq_freeze_queue_wait() in del_gendisk() returns:
+> The easiest thing to do is to use rcu_dereference_sched() instead of
+> rcu_dereference().  This will cause lockdep to insist on preemption
+> (for example, interrupts) being disabled.
 > 
-> 1) all in-flight IO has been done
-> 
-> 2) all new IO will be failed in __bio_queue_enter() because
->    q_usage_counter is dead, and GD_DEAD is set
-> 
-> 3) both disk and request queue instance are safe since caller of
-> submit_bio() guarantees that the disk can't be closed.
-> 
-> Once submit_bio_checks() needn't the protection of q_usage_counter, we can
-> move submit_bio_checks before calling blk_mq_submit_bio() and
-> ->submit_bio(). With this change, we needn't to throttle queue with
-> holding one allocated request, then precise driver tag or request won't be
-> wasted in throttling. Meantime we can unify the bio check for both bio
-> based and request based driver.
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Or is this a case where a function containing rcu_dereference() is invoked
+> with interrupts disabled from some call sites and under rcu_read_lock()
+> protection from other call sites?  In this case, it is usually best to
+> include that redundant rcu_read_lock() [1].
 
-Hello,
+Hi,
 
-Any comments on this fix?
+This is the later case, so I guess I'll include that redundant
+rcu_read_lock().
 
--- 
-Ming
-
+Thanks,
+Kuai
+> 
+> 							Thanx, Paul
+> 
+> [1]	If you are a glutton for punishment, or if you would otherwise
+> 	have to add a cubic goatskin of rcu_read_lock() calls, you
+> 	could instead write this priceless gem in place of the calls to
+> 	rcu_dereference() in that common function:
+> 
+> 	p = rcu_dereference_check(ptr, rcu_read_lock_sched_held());
+> 
+> 	This would cause lockdep to be happy with either rcu_read_lock()
+> 	or preemption being disabled.
+> 
+> 	This is more precise, and would be preferable in some cases,
+> 	for example, if there were lots of hotpath callsites with
+> 	interrupts disabled.  "Do we add 25 pairs of rcu_read_lock()
+> 	and rcu_read_unlock()?	Or do we add just the one ugly
+> 	rcu_dereference_check()?"
+> .
+> 
