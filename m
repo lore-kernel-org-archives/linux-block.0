@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14757C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 09:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDBFC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 09:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242675AbiAJJMf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 04:12:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
+        id S242763AbiAJJMj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 04:12:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242653AbiAJJMO (ORCPT
+        with ESMTP id S242630AbiAJJMe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 04:12:14 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 055C9C061212;
-        Mon, 10 Jan 2022 01:12:08 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id t19so10070964pfg.9;
-        Mon, 10 Jan 2022 01:12:08 -0800 (PST)
+        Mon, 10 Jan 2022 04:12:34 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F525C034003;
+        Mon, 10 Jan 2022 01:12:26 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id r16-20020a17090a0ad000b001b276aa3aabso21772344pje.0;
+        Mon, 10 Jan 2022 01:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=0AjmjFBGavsvtxiPwAj3xUkJ0oQuucx2gbTAmMmtGEI=;
-        b=qBB4XiRmOUg7Fhsgm27ytLlait1aSQJ55NYbveAGQ8KlfJ43zppL6+ZU10iiwoZtQN
-         rnOcN9ZJrl5qfh21UySN0zRBFka/magri+itMAODk4yi6TMZ8NybMM7nyKxlinAIZZk6
-         lAtDDaEX8q69XigGoD+W8gXOWpa6/qFxP+esDz+fpP33zTmWVJH2Iuba8k+FYHwE59ta
-         zi+XSul789Bx/DPrhC5N7+4CYbajAEsQihag4sVutDSWnQFMqbUScZk/hLB3R+FJX7/b
-         W3L72imBZYo3zbGkYTCxqCVB47Xyz9RvxUqZQ1bB6nJr7G8ejAdgIH77c4wC+v//kKHw
-         KTIg==
+        bh=QjwJsbeo9uruskPn1+c6wYleKO50y4VIL3hXZvxsfXw=;
+        b=pDEp4cMPc15aOxBiVGfQ2kYpyXV6sApSCvQAi/bjfVt9RR3uLDYSYYlC/7oQAKXkPR
+         nJ/aXZXEtNncN/QuW9J1PG4g/BilOgBqAkfPNxKDKG+oYkpsUKrrka57SEjvKk9+h3PG
+         8oMG6CSirJW+sfC8a4V6OEeTcT04bKq6jm/9CoF77mqhtaZW+UqBzhYuTZ7rJ6xbvYjv
+         U7C8AnQmm//Qs41GGwjdpYARTkn7uWda7bFphipUQKedULWkrJOXyLCNapyQSbr3WAj6
+         XnvqACxcdjtQLrBNDBOPztnTjBS63qVWqSugAD7joAPTYZZBV4J8T8RJvQypIUkFf0bs
+         H3+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=0AjmjFBGavsvtxiPwAj3xUkJ0oQuucx2gbTAmMmtGEI=;
-        b=s5GxH0z6nGQAKhniAgNICTi1hdve9VKSxqgeSaDXz6DXk1yCeOM0mpq8xlYACq8ZGG
-         6uTjNjcp+K68gIcNvn5zOr9aS1ZmdyFDQpsxkEWQUYDsKH2eqmOyV8PJ7JviF4qtu9kx
-         +TvtwVqVaF64IyDX/q+AwNvcvggaYST0Kze3xDe8MHntu/ZYQPWsUO30pxKiRp33h81t
-         WqAmLh7lyJMffE69O/wXsYa3RXDO4MjZkhpQvpK7EFWXyHlqyamXwJ226BNbQ5icvw/i
-         k8QdWNi6g+BvSRZ9uli5R25MnEUPNgwNfS+OX5TF6K/TqMYnLINfIJJ/6wgUHetuXN3t
-         Yqcw==
-X-Gm-Message-State: AOAM533tldmgN8meMO1kfvofACRJF0aLbw3KoQvLU4ucXw+PU3RMQih1
-        HvQU49wnpyKP+gzRJFYMM74=
-X-Google-Smtp-Source: ABdhPJzOD1APLre3OAuDoVPSCNs0ASHxcx0YcINNGcOHqWAZlwSn+cFQ4S7ZO/t2peezlzvk7yVJuA==
-X-Received: by 2002:a63:455f:: with SMTP id u31mr65643828pgk.537.1641805928378;
-        Mon, 10 Jan 2022 01:12:08 -0800 (PST)
+        bh=QjwJsbeo9uruskPn1+c6wYleKO50y4VIL3hXZvxsfXw=;
+        b=B4fM7kDiEKj7SCevx/M9oawwaHO5xdDbDoxFGbOh0ZOAFhl8QPmv5FL5r9Qg90PQB4
+         +6CDAtRe8q6uVd6e7NDiIGPHR60pWj9pJ8mdrQ8nRzqob9lvghE/mEL/q2sqegNh4Soo
+         2EaBqPaJo8fInbzKElSUzqe6I1OpswcGgCpELycXYwp2I2pLvtUO7ywj/Q1uLqRV6iVj
+         UEll+mZyyYKutOZNNvikEPvp4drhRe6S/lb079VCuh0Pdze5OXLshb56QXOo/mJRo2Mh
+         e4NQidrBxKnfAMqXUXoYVkLKOQFchCknIQCUqZa6HF+yol/5zZ1U3P5dQ5k324vo1dX/
+         KXlQ==
+X-Gm-Message-State: AOAM530jLzugSXn5viF96tsl9HlXiOpZsRO71/gT5dC7kHcBFej0humi
+        aNdNY0HAy5o2kjg4LyXpxcA=
+X-Google-Smtp-Source: ABdhPJzsX9cn3Gn+g4gyD5G4S35HOBCNDc3n08Ncy9yx+YyV808IIIbCHLq6OizQJbZ/8SJTD9K4Eg==
+X-Received: by 2002:a17:902:e74e:b0:149:7c20:c69b with SMTP id p14-20020a170902e74e00b001497c20c69bmr64501735plf.82.1641805946151;
+        Mon, 10 Jan 2022 01:12:26 -0800 (PST)
 Received: from localhost.localdomain ([162.219.34.250])
-        by smtp.gmail.com with ESMTPSA id j22sm6293910pfj.29.2022.01.10.01.12.06
+        by smtp.gmail.com with ESMTPSA id j22sm6293910pfj.29.2022.01.10.01.12.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 01:12:08 -0800 (PST)
+        Mon, 10 Jan 2022 01:12:25 -0800 (PST)
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
 To:     axboe@kernel.dk
 Cc:     jbacik@fb.com, tj@kernel.org, bvanassche@acm.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/13] blk: make blk-rq-qos support pluggable and modular policy
-Date:   Mon, 10 Jan 2022 17:10:34 +0800
-Message-Id: <20220110091046.17010-2-jianchao.wan9@gmail.com>
+Subject: [PATCH 08/13] blk-iocost: make iocost pluggable and modular
+Date:   Mon, 10 Jan 2022 17:10:41 +0800
+Message-Id: <20220110091046.17010-9-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220110091046.17010-1-jianchao.wan9@gmail.com>
 References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
@@ -63,711 +63,213 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Wang Jianchao <wangjianchao@kuaishou.com>
 
-blk-rq-qos is a standalone framework out of io-sched and can be
-used to control or observe the IO progress in block-layer with
-hooks. blk-rq-qos is a great design but right now, it is totally
-fixed and built-in and shut out peoples who want to use it with
-external module.
-
-This patch make blk-rq-qos policies pluggable and modular.
-(1) Add code to maintain the rq_qos_ops. A rq-qos module need to
-    register itself with rq_qos_register(). The original enum
-    rq_qos_id will be removed in following patch. They will use
-    a dynamic id maintained by rq_qos_ida.
-(2) Add .init callback into rq_qos_ops. We use it to initialize the
-    resource.
-(3) Add /sys/block/x/queue/qos
-    We can use '+name' or "-name" to open or close the blk-rq-qos
-    policy.
-
-Because the rq-qos list can be modified at anytime, rq_qos_id()
-which has been renamed to rq_qos_by_id() has to iterate the list
-under sysfs_lock or queue_lock. This patch adapts the code for this.
-More details, please refer to the comment above rq_qos_get(), And
-the rq_qos_exit() is moved to blk_cleanup_queue. Except for these
-modification, there is no other functional change here. Following
-patches will adpat the code of wbt, iolatency, iocost and ioprio
-to make them pluggable and modular one by one.
+Make blk-iocost pluggable and modular. Then we can close or open
+it through /sys/block/xxx/queue/qos and rmmod the module if we don't
+need it which can release one blkcg policy slot.
 
 Signed-off-by: Wang Jianchao <wangjianchao@kuaishou.com>
 ---
- block/blk-core.c       |   2 +
- block/blk-iocost.c     |  20 ++-
- block/blk-mq-debugfs.c |   4 +-
- block/blk-rq-qos.c     | 312 ++++++++++++++++++++++++++++++++++++++++-
- block/blk-rq-qos.h     |  55 +++++++-
- block/blk-sysfs.c      |   2 +
- block/blk-wbt.c        |   6 +-
- block/elevator.c       |   3 +
- block/genhd.c          |   3 -
- include/linux/blkdev.h |   4 +
- 10 files changed, 394 insertions(+), 17 deletions(-)
+ block/Kconfig          |  2 +-
+ block/Makefile         |  4 ++--
+ block/blk-iocost.c     | 53 ++++++++++++++++++++++++++----------------
+ block/blk-mq-debugfs.c |  2 --
+ block/blk-rq-qos.h     |  1 -
+ 5 files changed, 36 insertions(+), 26 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1378d084c770..2847ab514c1f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -51,6 +51,7 @@
- #include "blk-mq-sched.h"
- #include "blk-pm.h"
- #include "blk-throttle.h"
-+#include "blk-rq-qos.h"
+diff --git a/block/Kconfig b/block/Kconfig
+index e1b1bff5c1e9..3e1a3487b55a 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -134,7 +134,7 @@ config BLK_CGROUP_FC_APPID
+ 	  application specific identification into the FC frame.
  
- struct dentry *blk_debugfs_root;
- 
-@@ -377,6 +378,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * it is safe to free requests now.
- 	 */
- 	mutex_lock(&q->sysfs_lock);
-+	rq_qos_exit(q);
- 	if (q->elevator)
- 		blk_mq_sched_free_rqs(q);
- 	mutex_unlock(&q->sysfs_lock);
+ config BLK_CGROUP_IOCOST
+-	bool "Enable support for cost model based cgroup IO controller"
++	tristate "Enable support for cost model based cgroup IO controller"
+ 	depends on BLK_CGROUP
+ 	select BLK_RQ_ALLOC_TIME
+ 	select BLK_BIO_IOCOST
+diff --git a/block/Makefile b/block/Makefile
+index ccf61c57e1d4..8950913cbcc9 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -20,8 +20,8 @@ obj-$(CONFIG_BLK_DEV_THROTTLING)	+= blk-throttle.o
+ obj-$(CONFIG_BLK_CGROUP_IOPRIO)	+= blk-ioprio.o
+ iolat-y 				:= blk-iolatency.o
+ obj-$(CONFIG_BLK_CGROUP_IOLATENCY)	+= iolat.o
+-
+-obj-$(CONFIG_BLK_CGROUP_IOCOST)	+= blk-iocost.o
++iocost-y 			:= blk-iocost.o
++obj-$(CONFIG_BLK_CGROUP_IOCOST)	+= iocost.o
+ obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
+ obj-$(CONFIG_MQ_IOSCHED_KYBER)	+= kyber-iosched.o
+ bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 769b64394298..cfc0e305c32e 100644
+index cfc0e305c32e..afa52354d42b 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -662,7 +662,7 @@ static struct ioc *rqos_to_ioc(struct rq_qos *rqos)
+@@ -660,9 +660,10 @@ static struct ioc *rqos_to_ioc(struct rq_qos *rqos)
+ 	return container_of(rqos, struct ioc, rqos);
+ }
  
++static struct rq_qos_ops ioc_rqos_ops;
  static struct ioc *q_to_ioc(struct request_queue *q)
  {
--	return rqos_to_ioc(rq_qos_id(q, RQ_QOS_COST));
-+	return rqos_to_ioc(rq_qos_by_id(q, RQ_QOS_COST));
+-	return rqos_to_ioc(rq_qos_by_id(q, RQ_QOS_COST));
++	return rqos_to_ioc(rq_qos_by_id(q, ioc_rqos_ops.id));
  }
  
  static const char *q_name(struct request_queue *q)
-@@ -3162,6 +3162,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 			     size_t nbytes, loff_t off)
- {
- 	struct block_device *bdev;
-+	struct rq_qos *rqos;
- 	struct ioc *ioc;
- 	u32 qos[NR_QOS_PARAMS];
- 	bool enable, user;
-@@ -3172,14 +3173,15 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	if (IS_ERR(bdev))
- 		return PTR_ERR(bdev);
+@@ -2810,6 +2811,7 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+ 	struct ioc *ioc = rqos_to_ioc(rqos);
  
--	ioc = q_to_ioc(bdev_get_queue(bdev));
--	if (!ioc) {
-+	rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
-+	if (!rqos) {
- 		ret = blk_iocost_init(bdev_get_queue(bdev));
- 		if (ret)
- 			goto err;
--		ioc = q_to_ioc(bdev_get_queue(bdev));
-+		rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
+ 	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iocost);
++	rq_qos_deactivate(rqos);
+ 
+ 	spin_lock_irq(&ioc->lock);
+ 	ioc->running = IOC_STOP;
+@@ -2820,13 +2822,20 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+ 	kfree(ioc);
+ }
+ 
++static int blk_iocost_init(struct request_queue *q);
+ static struct rq_qos_ops ioc_rqos_ops = {
++#if IS_MODULE(CONFIG_BLK_CGROUP_IOCOST)
++	.owner = THIS_MODULE,
++#endif
++	.name = "iocost",
++	.flags = RQOS_FLAG_CGRP_POL | RQOS_FLAG_RQ_ALLOC_TIME,
+ 	.throttle = ioc_rqos_throttle,
+ 	.merge = ioc_rqos_merge,
+ 	.done_bio = ioc_rqos_done_bio,
+ 	.done = ioc_rqos_done,
+ 	.queue_depth_changed = ioc_rqos_queue_depth_changed,
+ 	.exit = ioc_rqos_exit,
++	.init = blk_iocost_init,
+ };
+ 
+ static int blk_iocost_init(struct request_queue *q)
+@@ -2856,10 +2865,7 @@ static int blk_iocost_init(struct request_queue *q)
  	}
  
-+	ioc = rqos_to_ioc(rqos);
- 	spin_lock_irq(&ioc->lock);
- 	memcpy(qos, ioc->params.qos, sizeof(qos));
- 	enable = ioc->enabled;
-@@ -3272,10 +3274,12 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	ioc_refresh_params(ioc, true);
- 	spin_unlock_irq(&ioc->lock);
- 
-+	rq_qos_put(rqos);
- 	blkdev_put_no_open(bdev);
- 	return nbytes;
- einval:
- 	ret = -EINVAL;
-+	rq_qos_put(rqos);
- err:
- 	blkdev_put_no_open(bdev);
- 	return ret;
-@@ -3329,6 +3333,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 				    size_t nbytes, loff_t off)
- {
- 	struct block_device *bdev;
-+	struct rq_qos *rqos;
- 	struct ioc *ioc;
- 	u64 u[NR_I_LCOEFS];
- 	bool user;
-@@ -3339,14 +3344,15 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	rqos = &ioc->rqos;
+-	rqos->id = RQ_QOS_COST;
+-	rqos->ops = &ioc_rqos_ops;
+-	rqos->q = q;
+-
++	rq_qos_activate(q, rqos, &ioc_rqos_ops);
+ 	spin_lock_init(&ioc->lock);
+ 	timer_setup(&ioc->timer, ioc_timer_fn, 0);
+ 	INIT_LIST_HEAD(&ioc->active_iocgs);
+@@ -2883,10 +2889,9 @@ static int blk_iocost_init(struct request_queue *q)
+ 	 * called before policy activation completion, can't assume that the
+ 	 * target bio has an iocg associated and need to test for NULL iocg.
+ 	 */
+-	rq_qos_add(q, rqos);
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
+ 	if (ret) {
+-		rq_qos_del(q, rqos);
++		rq_qos_deactivate(rqos);
+ 		free_percpu(ioc->pcpu_stat);
+ 		kfree(ioc);
+ 		return ret;
+@@ -3173,12 +3178,10 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
  	if (IS_ERR(bdev))
  		return PTR_ERR(bdev);
  
--	ioc = q_to_ioc(bdev_get_queue(bdev));
-+	rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
+-	rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
++	rqos = rq_qos_get(bdev_get_queue(bdev), ioc_rqos_ops.id);
+ 	if (!rqos) {
+-		ret = blk_iocost_init(bdev_get_queue(bdev));
+-		if (ret)
+-			goto err;
+-		rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
++		ret = -EOPNOTSUPP;
++		goto err;
+ 	}
+ 
+ 	ioc = rqos_to_ioc(rqos);
+@@ -3257,10 +3260,8 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 
+ 	if (enable) {
+ 		blk_stat_enable_accounting(ioc->rqos.q);
+-		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, ioc->rqos.q);
+ 		ioc->enabled = true;
+ 	} else {
+-		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, ioc->rqos.q);
+ 		ioc->enabled = false;
+ 	}
+ 
+@@ -3344,12 +3345,10 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	if (IS_ERR(bdev))
+ 		return PTR_ERR(bdev);
+ 
+-	rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
++	rqos = rq_qos_get(bdev_get_queue(bdev), ioc_rqos_ops.id);
  	if (!ioc) {
- 		ret = blk_iocost_init(bdev_get_queue(bdev));
- 		if (ret)
- 			goto err;
--		ioc = q_to_ioc(bdev_get_queue(bdev));
-+		rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
+-		ret = blk_iocost_init(bdev_get_queue(bdev));
+-		if (ret)
+-			goto err;
+-		rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
++		ret = -EOPNOTSUPP;
++		goto err;
  	}
  
-+	ioc = rqos_to_ioc(rqos);
- 	spin_lock_irq(&ioc->lock);
- 	memcpy(u, ioc->params.i_lcoefs, sizeof(u));
- 	user = ioc->user_cost_model;
-@@ -3397,11 +3403,13 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	ioc_refresh_params(ioc, true);
- 	spin_unlock_irq(&ioc->lock);
+ 	ioc = rqos_to_ioc(rqos);
+@@ -3449,13 +3448,27 @@ static struct blkcg_policy blkcg_policy_iocost = {
  
-+	rq_qos_put(rqos);
- 	blkdev_put_no_open(bdev);
- 	return nbytes;
+ static int __init ioc_init(void)
+ {
+-	return blkcg_policy_register(&blkcg_policy_iocost);
++	int ret;
++
++	ret = rq_qos_register(&ioc_rqos_ops);
++	if (ret)
++		return ret;
++
++	ret = blkcg_policy_register(&blkcg_policy_iocost);
++	if (ret)
++		rq_qos_unregister(&ioc_rqos_ops);
++
++	return ret;
+ }
  
- einval:
- 	ret = -EINVAL;
-+	rq_qos_put(rqos);
- err:
- 	blkdev_put_no_open(bdev);
- 	return ret;
+ static void __exit ioc_exit(void)
+ {
+ 	blkcg_policy_unregister(&blkcg_policy_iocost);
++	rq_qos_unregister(&ioc_rqos_ops);
+ }
+ 
+ module_init(ioc_init);
+ module_exit(ioc_exit);
++MODULE_AUTHOR("Tejun Heo");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Cost model based cgroup IO controller");
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 4f2cf8399f3d..e3e8d54c836f 100644
+index 57c33f4730f2..14fda9a5e552 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -841,7 +841,9 @@ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
- void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
+@@ -820,8 +820,6 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
+ static const char *rq_qos_id_to_name(enum rq_qos_id id)
  {
- 	struct request_queue *q = rqos->q;
--	const char *dir_name = rq_qos_id_to_name(rqos->id);
-+	const char *dir_name;
-+
-+	dir_name = rqos->ops->name ? rqos->ops->name : rq_qos_id_to_name(rqos->id);
- 
- 	if (rqos->debugfs_dir || !rqos->ops->debugfs_attrs)
- 		return;
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index e83af7bc7591..a94ff872722b 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -2,6 +2,11 @@
- 
- #include "blk-rq-qos.h"
- 
-+static DEFINE_IDA(rq_qos_ida);
-+static int nr_rqos_blkcg_pols;
-+static DEFINE_MUTEX(rq_qos_mutex);
-+static LIST_HEAD(rq_qos_list);
-+
- /*
-  * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
-  * false if 'v' + 1 would be bigger than 'below'.
-@@ -294,11 +299,316 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 
- void rq_qos_exit(struct request_queue *q)
- {
--	blk_mq_debugfs_unregister_queue_rqos(q);
-+	WARN_ON(!mutex_is_locked(&q->sysfs_lock));
- 
- 	while (q->rq_qos) {
- 		struct rq_qos *rqos = q->rq_qos;
- 		q->rq_qos = rqos->next;
-+		if (rqos->ops->owner)
-+			module_put(rqos->ops->owner);
- 		rqos->ops->exit(rqos);
+ 	switch (id) {
+-	case RQ_QOS_COST:
+-		return "cost";
+ 	case RQ_QOS_IOPRIO:
+ 		return "ioprio";
  	}
-+	blk_mq_debugfs_unregister_queue_rqos(q);
-+}
-+
-+/*
-+ * After the pluggable blk-qos, rqos's life cycle become complicated,
-+ * qos switching path can add/delete rqos to/from request_queue
-+ * under sysfs_lock and queue_lock. There are following places
-+ * may access rqos through rq_qos_by_id() concurrently:
-+ * (1) normal IO path, under q_usage_counter,
-+ * (2) queue sysfs interfaces, under sysfs_lock,
-+ * (3) blkg_create, the .pd_init_fn() may access rqos, under queue_lock,
-+ * (4) cgroup file, such as ioc_cost_model_write,
-+ *
-+ * (1)(2)(3) are definitely safe. case (4) is tricky. rq_qos_get() is
-+ * for the case.
-+ */
-+struct rq_qos *rq_qos_get(struct request_queue *q, int id)
-+{
-+	struct rq_qos *rqos;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	rqos = rq_qos_by_id(q, id);
-+	if (rqos && rqos->dying)
-+		rqos = NULL;
-+	if (rqos)
-+		refcount_inc(&rqos->ref);
-+	spin_unlock_irq(&q->queue_lock);
-+	return rqos;
-+}
-+EXPORT_SYMBOL_GPL(rq_qos_get);
-+
-+void rq_qos_put(struct rq_qos *rqos)
-+{
-+	struct request_queue *q = rqos->q;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	refcount_dec(&rqos->ref);
-+	if (rqos->dying)
-+		wake_up(&rqos->waitq);
-+	spin_unlock_irq(&q->queue_lock);
-+}
-+EXPORT_SYMBOL_GPL(rq_qos_put);
-+
-+void rq_qos_activate(struct request_queue *q,
-+		struct rq_qos *rqos, const struct rq_qos_ops *ops)
-+{
-+	struct rq_qos *pos;
-+	bool rq_alloc_time = false;
-+
-+	WARN_ON(!mutex_is_locked(&q->sysfs_lock));
-+
-+	rqos->dying = false;
-+	refcount_set(&rqos->ref, 1);
-+	init_waitqueue_head(&rqos->waitq);
-+	rqos->id = ops->id;
-+	rqos->ops = ops;
-+	rqos->q = q;
-+	rqos->next = NULL;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	pos = q->rq_qos;
-+	if (pos) {
-+		while (pos->next) {
-+			if (pos->ops->flags & RQOS_FLAG_RQ_ALLOC_TIME)
-+				rq_alloc_time = true;
-+			pos = pos->next;
-+		}
-+		pos->next = rqos;
-+	} else {
-+		q->rq_qos = rqos;
-+	}
-+	if (ops->flags & RQOS_FLAG_RQ_ALLOC_TIME &&
-+	    !rq_alloc_time)
-+		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, q);
-+
-+	spin_unlock_irq(&q->queue_lock);
-+
-+	if (rqos->ops->debugfs_attrs)
-+		blk_mq_debugfs_register_rqos(rqos);
-+}
-+EXPORT_SYMBOL_GPL(rq_qos_activate);
-+
-+void rq_qos_deactivate(struct rq_qos *rqos)
-+{
-+	struct request_queue *q = rqos->q;
-+	struct rq_qos **cur, *pos;
-+	bool rq_alloc_time = false;
-+
-+	WARN_ON(!mutex_is_locked(&q->sysfs_lock));
-+
-+	spin_lock_irq(&q->queue_lock);
-+	rqos->dying = true;
-+	/*
-+	 * Drain all of the usage of get/put_rqos()
-+	 */
-+	wait_event_lock_irq(rqos->waitq,
-+		refcount_read(&rqos->ref) == 1, q->queue_lock);
-+	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
-+		if (*cur == rqos) {
-+			*cur = rqos->next;
-+			break;
-+		}
-+	}
-+
-+	pos = q->rq_qos;
-+	while (pos && pos->next) {
-+		if (pos->ops->flags & RQOS_FLAG_RQ_ALLOC_TIME)
-+			rq_alloc_time = true;
-+		pos = pos->next;
-+	}
-+
-+	if (rqos->ops->flags & RQOS_FLAG_RQ_ALLOC_TIME &&
-+	    !rq_alloc_time)
-+		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, q);
-+
-+	spin_unlock_irq(&q->queue_lock);
-+	blk_mq_debugfs_unregister_rqos(rqos);
-+}
-+EXPORT_SYMBOL_GPL(rq_qos_deactivate);
-+
-+static struct rq_qos_ops *rq_qos_find_by_name(const char *name)
-+{
-+	struct rq_qos_ops *pos;
-+
-+	list_for_each_entry(pos, &rq_qos_list, node) {
-+		if (!strncmp(pos->name, name, strlen(pos->name)))
-+			return pos;
-+	}
-+
-+	return NULL;
-+}
-+
-+int rq_qos_register(struct rq_qos_ops *ops)
-+{
-+	int ret, start;
-+
-+	mutex_lock(&rq_qos_mutex);
-+
-+	if (rq_qos_find_by_name(ops->name)) {
-+		ret = -EEXIST;
-+		goto out;
-+	}
-+
-+	if (ops->flags & RQOS_FLAG_CGRP_POL &&
-+	    nr_rqos_blkcg_pols >= (BLKCG_MAX_POLS - BLKCG_NON_RQOS_POLS)) {
-+		ret = -ENOSPC;
-+		goto out;
-+	}
-+
-+	start = RQ_QOS_IOPRIO + 1;
-+	ret = ida_simple_get(&rq_qos_ida, start, INT_MAX, GFP_KERNEL);
-+	if (ret < 0)
-+		goto out;
-+
-+	if (ops->flags & RQOS_FLAG_CGRP_POL)
-+		nr_rqos_blkcg_pols++;
-+
-+	ops->id = ret;
-+	ret = 0;
-+	INIT_LIST_HEAD(&ops->node);
-+	list_add_tail(&ops->node, &rq_qos_list);
-+out:
-+	mutex_unlock(&rq_qos_mutex);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(rq_qos_register);
-+
-+void rq_qos_unregister(struct rq_qos_ops *ops)
-+{
-+	mutex_lock(&rq_qos_mutex);
-+
-+	if (ops->flags & RQOS_FLAG_CGRP_POL)
-+		nr_rqos_blkcg_pols--;
-+	list_del_init(&ops->node);
-+	ida_simple_remove(&rq_qos_ida, ops->id);
-+	mutex_unlock(&rq_qos_mutex);
-+}
-+EXPORT_SYMBOL_GPL(rq_qos_unregister);
-+
-+ssize_t queue_qos_show(struct request_queue *q, char *buf)
-+{
-+	struct rq_qos_ops *ops;
-+	struct rq_qos *rqos;
-+	int ret = 0;
-+
-+	mutex_lock(&rq_qos_mutex);
-+	/*
-+	 * Show the policies in the order of being invoked
-+	 */
-+	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+		if (!rqos->ops->name)
-+			continue;
-+		ret += sprintf(buf + ret, "[%s] ", rqos->ops->name);
-+	}
-+	list_for_each_entry(ops, &rq_qos_list, node) {
-+		if (!rq_qos_by_name(q, ops->name))
-+			ret += sprintf(buf + ret, "%s ", ops->name);
-+	}
-+
-+	ret--; /* overwrite the last space */
-+	ret += sprintf(buf + ret, "\n");
-+	mutex_unlock(&rq_qos_mutex);
-+
-+	return ret;
-+}
-+
-+int rq_qos_switch(struct request_queue *q,
-+		const struct rq_qos_ops *ops,
-+		struct rq_qos *rqos)
-+{
-+	int ret;
-+
-+	WARN_ON(!mutex_is_locked(&q->sysfs_lock));
-+
-+	blk_mq_freeze_queue(q);
-+	if (!rqos) {
-+		ret = ops->init(q);
-+	} else {
-+		ops->exit(rqos);
-+		ret = 0;
-+	}
-+	blk_mq_unfreeze_queue(q);
-+
-+	return ret;
-+}
-+
-+ssize_t queue_qos_store(struct request_queue *q, const char *page,
-+			  size_t count)
-+{
-+	const struct rq_qos_ops *ops;
-+	struct rq_qos *rqos;
-+	const char *qosname;
-+	char *buf;
-+	bool add;
-+	int ret;
-+
-+	buf = kstrdup(page, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	buf = strim(buf);
-+	if (buf[0] != '+' && buf[0] != '-') {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	add = buf[0] == '+';
-+	qosname = buf + 1;
-+
-+	rqos = rq_qos_by_name(q, qosname);
-+	if ((buf[0] == '+' && rqos)) {
-+		ret = -EEXIST;
-+		goto out;
-+	}
-+
-+	if ((buf[0] == '-' && !rqos)) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	mutex_lock(&rq_qos_mutex);
-+	if (add) {
-+		ops = rq_qos_find_by_name(qosname);
-+		if (!ops) {
-+			/*
-+			 * module_init callback may request this mutex
-+			 */
-+			mutex_unlock(&rq_qos_mutex);
-+			request_module("%s", qosname);
-+			mutex_lock(&rq_qos_mutex);
-+			ops = rq_qos_find_by_name(qosname);
-+		}
-+	} else {
-+		ops = rqos->ops;
-+	}
-+
-+	if (!ops) {
-+		ret = -EINVAL;
-+	} else if (ops->owner && !try_module_get(ops->owner)) {
-+		ops = NULL;
-+		ret = -EAGAIN;
-+	}
-+	mutex_unlock(&rq_qos_mutex);
-+
-+	if (!ops)
-+		goto out;
-+
-+	if (add) {
-+		ret = rq_qos_switch(q, ops, NULL);
-+		if (!ret && ops->owner)
-+			__module_get(ops->owner);
-+	} else {
-+		rq_qos_switch(q, ops, rqos);
-+		ret = 0;
-+		if (ops->owner)
-+			module_put(ops->owner);
-+	}
-+
-+	if (ops->owner)
-+		module_put(ops->owner);
-+out:
-+	kfree(buf);
-+	return ret ? ret : count;
- }
 diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 3cfbc8668cba..c2b9b41f8fd4 100644
+index 6ca46c69e325..4eef53f2c290 100644
 --- a/block/blk-rq-qos.h
 +++ b/block/blk-rq-qos.h
-@@ -26,7 +26,10 @@ struct rq_wait {
+@@ -14,7 +14,6 @@
+ struct blk_mq_debugfs_attr;
+ 
+ enum rq_qos_id {
+-	RQ_QOS_COST,
+ 	RQ_QOS_IOPRIO,
  };
  
- struct rq_qos {
--	struct rq_qos_ops *ops;
-+	refcount_t ref;
-+	wait_queue_head_t waitq;
-+	bool dying;
-+	const struct rq_qos_ops *ops;
- 	struct request_queue *q;
- 	enum rq_qos_id id;
- 	struct rq_qos *next;
-@@ -35,7 +38,17 @@ struct rq_qos {
- #endif
- };
- 
-+enum {
-+	RQOS_FLAG_CGRP_POL = 1 << 0,
-+	RQOS_FLAG_RQ_ALLOC_TIME = 1 << 1
-+};
-+
- struct rq_qos_ops {
-+	struct list_head node;
-+	struct module *owner;
-+	const char *name;
-+	int flags;
-+	int id;
- 	void (*throttle)(struct rq_qos *, struct bio *);
- 	void (*track)(struct rq_qos *, struct request *, struct bio *);
- 	void (*merge)(struct rq_qos *, struct request *, struct bio *);
-@@ -46,6 +59,7 @@ struct rq_qos_ops {
- 	void (*cleanup)(struct rq_qos *, struct bio *);
- 	void (*queue_depth_changed)(struct rq_qos *);
- 	void (*exit)(struct rq_qos *);
-+	int (*init)(struct request_queue *);
- 	const struct blk_mq_debugfs_attr *debugfs_attrs;
- };
- 
-@@ -59,10 +73,12 @@ struct rq_depth {
- 	unsigned int default_depth;
- };
- 
--static inline struct rq_qos *rq_qos_id(struct request_queue *q,
--				       enum rq_qos_id id)
-+static inline struct rq_qos *rq_qos_by_id(struct request_queue *q, int id)
- {
- 	struct rq_qos *rqos;
-+
-+	WARN_ON(!mutex_is_locked(&q->sysfs_lock) && !spin_is_locked(&q->queue_lock));
-+
- 	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
- 		if (rqos->id == id)
- 			break;
-@@ -72,12 +88,12 @@ static inline struct rq_qos *rq_qos_id(struct request_queue *q,
- 
- static inline struct rq_qos *wbt_rq_qos(struct request_queue *q)
- {
--	return rq_qos_id(q, RQ_QOS_WBT);
-+	return rq_qos_by_id(q, RQ_QOS_WBT);
- }
- 
- static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
- {
--	return rq_qos_id(q, RQ_QOS_LATENCY);
-+	return rq_qos_by_id(q, RQ_QOS_LATENCY);
- }
- 
- static inline void rq_wait_init(struct rq_wait *rq_wait)
-@@ -132,6 +148,35 @@ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
- 	blk_mq_debugfs_unregister_rqos(rqos);
- }
- 
-+int rq_qos_register(struct rq_qos_ops *ops);
-+void rq_qos_unregister(struct rq_qos_ops *ops);
-+void rq_qos_activate(struct request_queue *q,
-+		struct rq_qos *rqos, const struct rq_qos_ops *ops);
-+void rq_qos_deactivate(struct rq_qos *rqos);
-+ssize_t queue_qos_show(struct request_queue *q, char *buf);
-+ssize_t queue_qos_store(struct request_queue *q, const char *page,
-+			  size_t count);
-+struct rq_qos *rq_qos_get(struct request_queue *q, int id);
-+void rq_qos_put(struct rq_qos *rqos);
-+
-+static inline struct rq_qos *rq_qos_by_name(struct request_queue *q,
-+		const char *name)
-+{
-+	struct rq_qos *rqos;
-+
-+	WARN_ON(!mutex_is_locked(&q->sysfs_lock));
-+
-+	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+		if (!rqos->ops->name)
-+			continue;
-+
-+		if (!strncmp(rqos->ops->name, name,
-+					strlen(rqos->ops->name)))
-+			return rqos;
-+	}
-+	return NULL;
-+}
-+
- typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
- typedef void (cleanup_cb_t)(struct rq_wait *rqw, void *private_data);
- 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index cd75b0f73dc6..91f980985b1b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -573,6 +573,7 @@ QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
- QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
- QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
- QUEUE_RW_ENTRY(elv_iosched, "scheduler");
-+QUEUE_RW_ENTRY(queue_qos, "qos");
- 
- QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
- QUEUE_RO_ENTRY(queue_physical_block_size, "physical_block_size");
-@@ -632,6 +633,7 @@ static struct attribute *queue_attrs[] = {
- 	&queue_max_integrity_segments_entry.attr,
- 	&queue_max_segment_size_entry.attr,
- 	&elv_iosched_entry.attr,
-+	&queue_qos_entry.attr,
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0c119be0e813..88265ae4fa41 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -628,9 +628,13 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
- 
- void wbt_set_write_cache(struct request_queue *q, bool write_cache_on)
- {
--	struct rq_qos *rqos = wbt_rq_qos(q);
-+	struct rq_qos *rqos;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	rqos = wbt_rq_qos(q);
- 	if (rqos)
- 		RQWB(rqos)->wc = write_cache_on;
-+	spin_unlock_irq(&q->queue_lock);
- }
- 
- /*
-diff --git a/block/elevator.c b/block/elevator.c
-index 19a78d5516ba..fe664674c14d 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -701,12 +701,15 @@ void elevator_init_mq(struct request_queue *q)
- 	 * requests, then no need to quiesce queue which may add long boot
- 	 * latency, especially when lots of disks are involved.
- 	 */
-+
-+	mutex_lock(&q->sysfs_lock);
- 	blk_mq_freeze_queue(q);
- 	blk_mq_cancel_work_sync(q);
- 
- 	err = blk_mq_init_sched(q, e);
- 
- 	blk_mq_unfreeze_queue(q);
-+	mutex_unlock(&q->sysfs_lock);
- 
- 	if (err) {
- 		pr_warn("\"%s\" elevator initialization failed, "
-diff --git a/block/genhd.c b/block/genhd.c
-index 30362aeacac4..af2e8ebce46e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -27,7 +27,6 @@
- #include <linux/badblocks.h>
- 
- #include "blk.h"
--#include "blk-rq-qos.h"
- 
- static struct kobject *block_depr;
- 
-@@ -621,8 +620,6 @@ void del_gendisk(struct gendisk *disk)
- 	device_del(disk_to_dev(disk));
- 
- 	blk_mq_freeze_queue_wait(q);
--
--	rq_qos_exit(q);
- 	blk_sync_queue(q);
- 	blk_flush_integrity();
- 	/*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bd4370baccca..e7dce2232814 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -43,6 +43,10 @@ struct blk_crypto_profile;
-  * Defined here to simplify include dependency.
-  */
- #define BLKCG_MAX_POLS		6
-+/*
-+ * Non blk-rq-qos blkcg policies include blk-throttle and bfq
-+ */
-+#define BLKCG_NON_RQOS_POLS		2
- 
- static inline int blk_validate_block_size(unsigned int bsize)
- {
 -- 
 2.17.1
 
