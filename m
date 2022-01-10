@@ -2,44 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C06C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 01:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9ADC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 01:49:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233053AbiAJB2e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Jan 2022 20:28:34 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:30263 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232997AbiAJB2d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jan 2022 20:28:33 -0500
-Received: from kwepemi500007.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JXGRF3Bj3zbjhR;
-        Mon, 10 Jan 2022 09:27:53 +0800 (CST)
+        id S237969AbiAJBtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Jan 2022 20:49:39 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:34890 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237943AbiAJBti (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Jan 2022 20:49:38 -0500
+Received: from kwepemi500002.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JXGvZ5xZRzXtLt;
+        Mon, 10 Jan 2022 09:48:58 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500007.china.huawei.com (7.221.188.207) with Microsoft SMTP Server
+ kwepemi500002.china.huawei.com (7.221.188.171) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 10 Jan 2022 09:28:31 +0800
+ 15.1.2308.20; Mon, 10 Jan 2022 09:49:36 +0800
 Received: from [10.174.176.73] (10.174.176.73) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 10 Jan 2022 09:28:30 +0800
-Subject: Re: [PATCH v5 2/2] block: cancel all throttled bios in del_gendisk()
-To:     <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>
-CC:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        <hch@infradead.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20211210083143.3181535-1-yukuai3@huawei.com>
- <20211210083143.3181535-3-yukuai3@huawei.com>
- <20220107150519.GA26824@blackbody.suse.cz> <YdiuN9kv5OvE/Rtf@slm.duckdns.org>
- <20220107213612.GQ4202@paulmck-ThinkPad-P17-Gen-1>
+ 15.1.2308.20; Mon, 10 Jan 2022 09:49:35 +0800
+Subject: Re: [PATCH 0/5 v2] bfq: Avoid use-after-free when moving processes
+ between cgroups
+To:     Jan Kara <jack@suse.cz>
+CC:     <linux-block@vger.kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20220105143037.20542-1-jack@suse.cz>
+ <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
+ <20220107145853.jvgupijrq2ejnhdt@quack3.lan>
 From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <9e318511-b33c-37c6-8ffd-75302280246d@huawei.com>
-Date:   Mon, 10 Jan 2022 09:28:29 +0800
+Message-ID: <db449ed5-85db-37e5-deb6-62fdeb124c90@huawei.com>
+Date:   Mon, 10 Jan 2022 09:49:34 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20220107213612.GQ4202@paulmck-ThinkPad-P17-Gen-1>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+In-Reply-To: <20220107145853.jvgupijrq2ejnhdt@quack3.lan>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.176.73]
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
@@ -49,69 +48,101 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/01/08 5:36, Paul E. McKenney 写道:
-> On Fri, Jan 07, 2022 at 11:18:47AM -1000, Tejun Heo wrote:
->> Hello,
->>
->> On Fri, Jan 07, 2022 at 04:05:19PM +0100, Michal Koutný wrote:
->>> On Fri, Dec 10, 2021 at 04:31:43PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
->>>> +	 * queue_lock is held, rcu lock is not needed here.
->>>> +	 */
->>>> +	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
->>>> +		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
+在 2022/01/07 22:58, Jan Kara 写道:
+> On Fri 07-01-22 17:15:43, yukuai (C) wrote:
+>> 在 2022/01/05 22:36, Jan Kara 写道:
+>>> Hello,
 >>>
->>> FTR, I acknowledge this can work due to RCU peculiarities, however, I
->>> don't understand why is it preferred against more robust explict
->>> rcu_read_lock().
+>>> here is the second version of my patches to fix use-after-free issues in BFQ
+>>> when processes with merged queues get moved to different cgroups. The patches
+>>> have survived some beating in my test VM but so far I fail to reproduce the
+>>> original KASAN reports so testing from people who can reproduce them is most
+>>> welcome. Thanks!
 >>>
->>> (All in all, this isn't a deal breaker and I'm not confident evaluating
->>> the rest of the patch.)
+>>> Changes since v1:
+>>> * Added fix for bfq_put_cooperator()
+>>> * Added fix to handle move between cgroups in bfq_merge_bio()
+>>>
+>>> 								Honza
+>>> Previous versions:
+>>> Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
+>>> .
+>>>
 >>
->> Cc'ing Paul for RCU. Paul, this nit is around whether or not to use
->> rcu_read_lock() in an irq disabled section. I can see both sides of the
->> arguments - it's weird to put in an extra rcu_read_lock() when technically
->> unnecessary but it's also nice to have something explicit and structured to
->> mark parts which require RCU protection. Putting in a comment is okay but
->> consistency is difficult to achieve that way.
+>> Hi,
 >>
->> Maybe all these are unnecessary as lockdep would be able to catch them
->> anyway, or maybe we'd want something to explicitly mark RCU protected
->> sections. I don't know but whichever way, I think we need to establish a
->> convention.
+>> I repoduced the problem again with this patchset...
 > 
-> The easiest thing to do is to use rcu_dereference_sched() instead of
-> rcu_dereference().  This will cause lockdep to insist on preemption
-> (for example, interrupts) being disabled.
+> Thanks for testing!
 > 
-> Or is this a case where a function containing rcu_dereference() is invoked
-> with interrupts disabled from some call sites and under rcu_read_lock()
-> protection from other call sites?  In this case, it is usually best to
-> include that redundant rcu_read_lock() [1].
+>> [   71.004788] BUG: KASAN: use-after-free in
+>> __bfq_deactivate_entity+0x21/0x290
+>> [   71.006328] Read of size 1 at addr ffff88817a3dc0b0 by task rmmod/801
+>> [   71.007723]
+>> [   71.008068] CPU: 7 PID: 801 Comm: rmmod Tainted: G        W
+>> 5.16.0-rc5-next-2021127
+>> [   71.009995] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+>> ?-20190727_073836-4
+>> [   71.012274] Call Trace:
+>> [   71.012603]  <TASK>
+>> [   71.012886]  dump_stack_lvl+0x34/0x44
+>> [   71.013379]  print_address_description.constprop.0.cold+0xab/0x36b
+>> [   71.014182]  ? __bfq_deactivate_entity+0x21/0x290
+>> [   71.014795]  ? __bfq_deactivate_entity+0x21/0x290
+>> [   71.015398]  kasan_report.cold+0x83/0xdf
+>> [   71.015904]  ? _raw_read_lock_bh+0x20/0x40
+>> [   71.016433]  ? __bfq_deactivate_entity+0x21/0x290
+>> [   71.017033]  __bfq_deactivate_entity+0x21/0x290
+>> [   71.017617]  bfq_pd_offline+0xc1/0x110
+>> [   71.018105]  blkcg_deactivate_policy+0x14b/0x210
+> ...
+> 
+>> Here is the caller of  __bfq_deactivate_entity:
+>> (gdb) list *(bfq_pd_offline+0xc1)
+>> 0xffffffff81c504f1 is in bfq_pd_offline (block/bfq-cgroup.c:942).
+>> 937                      * entities to the idle tree. It happens if, in some
+>> 938                      * of the calls to bfq_bfqq_move() performed by
+>> 939                      * bfq_reparent_active_queues(), the queue to move
+>> is
+>> 940                      * empty and gets expired.
+>> 941                      */
+>> 942                     bfq_flush_idle_tree(st);
+>> 943             }
+>> 944
+>> 945             __bfq_deactivate_entity(entity, false);
+> 
+> So this is indeed strange. The group has in some of its idle service trees
+> an entity whose entity->sched_data points to already freed cgroup. In
+> particular it means the bfqq_entity_service_tree() leads to somewhere else
+> than the 'st' we called bfq_flush_idle_tree() with. This looks like a
+> different kind of problem AFAICT but still it needs fixing :). Can you
+> please run your reproducer with my patches + the attached debug patch on
+> top? Hopefully it should tell us more about the problematic entity and how
+> it got there... Thanks!
 
 Hi,
 
-This is the later case, so I guess I'll include that redundant
-rcu_read_lock().
+I'm not sure I understand what you mean... I reporduced again with your
+debug patch applied, however, no extra messages are printed.
+
+I think this is exactly the same problem we discussed before:
+
+1) bfqq->new_bfqq is set, they are under g1
+2) bfqq is moved to another group, and user thread of new_bfqq exit
+3) g1 is offlied
+3) io issued from bfqq will end up in new_bfqq, and the offlined
+g1 will be inserted to st of g1's parent.
+
+Currently such entity should be in active tree, however, I think it's
+prossible that it can end up in idle tree throuph deactivation of
+entity?
+
+4) io is done, new_bfqq is deactivated
+5) new_bfqq is freed, and then g1 is freed
+6) the problem is triggered when g1's parent is offlined.
 
 Thanks,
 Kuai
 > 
-> 							Thanx, Paul
-> 
-> [1]	If you are a glutton for punishment, or if you would otherwise
-> 	have to add a cubic goatskin of rcu_read_lock() calls, you
-> 	could instead write this priceless gem in place of the calls to
-> 	rcu_dereference() in that common function:
-> 
-> 	p = rcu_dereference_check(ptr, rcu_read_lock_sched_held());
-> 
-> 	This would cause lockdep to be happy with either rcu_read_lock()
-> 	or preemption being disabled.
-> 
-> 	This is more precise, and would be preferable in some cases,
-> 	for example, if there were lots of hotpath callsites with
-> 	interrupts disabled.  "Do we add 25 pairs of rcu_read_lock()
-> 	and rcu_read_unlock()?	Or do we add just the one ugly
-> 	rcu_dereference_check()?"
-> .
+> 								Honza
 > 
