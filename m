@@ -2,116 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46298C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 19:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D32C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 19:35:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243186AbiAJT0g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 14:26:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35023 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243038AbiAJT0e (ORCPT
+        id S240075AbiAJTfA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 14:35:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231986AbiAJTe7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 14:26:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641842793;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yZ08XZ8idEJY7dNL/CjmIYmeW6lP9L5GGjs6T10cj9s=;
-        b=K9ExXwrZtIhLRb0PGg4uVChsHUwconXfBhnWKXmkMvIioFg66Dch2VVv772u47a+g75rmt
-        oYEIEAmEPPIZHeNx4BMNnN9m7EOnLq16E7hvjAV8/HtLPtNzuQqW9Sgm1/79wlRx7OWd5U
-        b6hmSM1vn0xQvzVba4jYyXAc7c3pEbk=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-116-Ygy16UhGPwaMYrs51C8O9Q-1; Mon, 10 Jan 2022 14:26:32 -0500
-X-MC-Unique: Ygy16UhGPwaMYrs51C8O9Q-1
-Received: by mail-qt1-f200.google.com with SMTP id cp8-20020a05622a420800b002c617119aafso2509516qtb.4
-        for <linux-block@vger.kernel.org>; Mon, 10 Jan 2022 11:26:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yZ08XZ8idEJY7dNL/CjmIYmeW6lP9L5GGjs6T10cj9s=;
-        b=tE817WvQmp7enG6EhsaSadCRGfd03cxGgRV3d4jQa3NRZtseoMy/GMNisOypFp7jHD
-         tr+KQEJKzP/RHjBnGPm3go/czr9FSnU+v6JEgP9+Z6UixMoN87YPvN1h3x4GVrvDYTd6
-         AqNMBDc8j63lXRBfDstmbaUG2GbqnM6dHYBgRgnH4+bC33zBGCI+6pkCztNQ1rDvCXR8
-         Dbws5Y/WGJOBC7l/KPHYWd6gzC+z4pWyI5ozw0jFnf03Ps+ck6jfhPUyXLbJYzFupF+e
-         tcTz3G3qicCwyBFkK2L4uHm/fV726Plpy9g8T9xi8UbdNlqDa9cOOoZzoYsXlSdtjhjg
-         hiQA==
-X-Gm-Message-State: AOAM532qR9073Hdw4n8nBitat1i0sZ+rGIXC32b7yXfQ/KlZvWkITXrx
-        W2H8lWQVxThK5bd4e5ao/fMQm8Z0ACg8Muam4P1fGR4xd9jRr+hAvjHT32fneJIKlLdKp2GEZ9G
-        1R0CWHj/qNZsUX4WI2GZ1Qw==
-X-Received: by 2002:a05:620a:2015:: with SMTP id c21mr883060qka.383.1641842791595;
-        Mon, 10 Jan 2022 11:26:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwwHjM+t1bgDCUU60h+0opXhwpp98ZNY2fG6MTGB7kRs/0equHHPiJppDI0OZXqDMqD3jRW+w==
-X-Received: by 2002:a05:620a:2015:: with SMTP id c21mr883046qka.383.1641842791400;
-        Mon, 10 Jan 2022 11:26:31 -0800 (PST)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id o21sm5295158qta.89.2022.01.10.11.26.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 11:26:30 -0800 (PST)
-Date:   Mon, 10 Jan 2022 14:26:29 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [PATCH 0/3] blk-mq/dm-rq: support BLK_MQ_F_BLOCKING for dm-rq
-Message-ID: <YdyIZR4LkQTVjhWf@redhat.com>
-References: <20211221141459.1368176-1-ming.lei@redhat.com>
- <YcH/E4JNag0QYYAa@infradead.org>
- <YcP4FMG9an5ReIiV@T590>
- <YcuB4K8P2d9WFb83@redhat.com>
+        Mon, 10 Jan 2022 14:34:59 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC9CC06173F;
+        Mon, 10 Jan 2022 11:34:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=ZFZ4QOFgcoyMCECZ3PkgL8BM+HFxPBx0EV0hU5cheCk=; b=kwTBNQ14Ajm4bb+p+yD8k57QkP
+        ag8IoWMx+ZceNrBHQIAX1qjPtJFmAq9bB3a4JnH2JpRIvuJYBtpHdys8Jq/5cenklNvLq/gPB+1Sg
+        2qgeP1b1J6H2Tv69ZZ1Dchmb2ZJjZjBKqVxc/SH3eNnBFhJ4iqYqyoAG6HKgY9R7CIH30swf1tj0Z
+        Gu8uqqBGWzCL6jiU7/viwFyhvJ/itxVSedkUZDGnUhNOWzn5QaeMXBfrtSKRCMeY14yLf8X1p6aFJ
+        T2ZJbBdfedchNNamYhhW0wNJ5GgzCiU5esGaF1uPdBB8x01ZyuwW4BYXYZcWtRvjnGo36PQEJY1Up
+        7sxipnQg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n70RN-002fyD-DM; Mon, 10 Jan 2022 19:34:49 +0000
+Date:   Mon, 10 Jan 2022 19:34:49 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        nvdimm@lists.linux.dev
+Subject: Phyr Starter
+Message-ID: <YdyKWeU0HTv8m7wD@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YcuB4K8P2d9WFb83@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 28 2021 at  4:30P -0500,
-Mike Snitzer <snitzer@redhat.com> wrote:
+TLDR: I want to introduce a new data type:
 
-> On Wed, Dec 22 2021 at 11:16P -0500,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > On Tue, Dec 21, 2021 at 08:21:39AM -0800, Christoph Hellwig wrote:
-> > > On Tue, Dec 21, 2021 at 10:14:56PM +0800, Ming Lei wrote:
-> > > > Hello,
-> > > > 
-> > > > dm-rq may be built on blk-mq device which marks BLK_MQ_F_BLOCKING, so
-> > > > dm_mq_queue_rq() may become to sleep current context.
-> > > > 
-> > > > Fixes the issue by allowing dm-rq to set BLK_MQ_F_BLOCKING in case that
-> > > > any underlying queue is marked as BLK_MQ_F_BLOCKING.
-> > > > 
-> > > > DM request queue is allocated before allocating tagset, this way is a
-> > > > bit special, so we need to pre-allocate srcu payload, then use the queue
-> > > > flag of QUEUE_FLAG_BLOCKING for locking dispatch.
-> > > 
-> > > What is the benefit over just forcing bio-based dm-mpath for these
-> > > devices?
-> > 
-> > At least IO scheduler can't be used for bio based dm-mpath, also there should
-> > be other drawbacks for bio based mpath and request mpath is often the default
-> > option, maybe Mike has more input about bio vs request dm-mpath.
-> 
-> Yeah, people use request-based for IO scheduling and more capable path
-> selectors. Imposing bio-based would be a pretty jarring workaround for 
-> BLK_MQ_F_BLOCKING. request-based DM should properly support it.
-> 
-> I'm on vacation for the next week but will have a look at this
-> patchset once I'm back.
+struct phyr {
+        phys_addr_t addr;
+        size_t len;
+};
 
-I replied last week and hoped Jens would pick this patchset up after
-my Reviewed-by of patch 3/3.
+and use it to replace bio_vec as well as using it to replace the array
+of struct pages used by get_user_pages() and friends.
 
-Christoph wasn't back though, so best to kick this thread again.
+---
 
-Thoughts on this patchset?
+There are two distinct problems I want to address: doing I/O to memory
+which does not have a struct page and efficiently doing I/O to large
+blobs of physically contiguous memory, regardless of whether it has a
+struct page.  There are some other improvements which I regard as minor.
 
-Thanks,
-Mike
+There are many types of memory that one might want to do I/O to that do
+not have a struct page, some examples:
+ - Memory on a graphics card (or other PCI card, but gfx seems to be
+   the primary provider of DRAM on the PCI bus today)
+ - DAX, or other pmem (there are some fake pages today, but this is
+   mostly a workaround for the IO problem today)
+ - Guest memory being accessed from the hypervisor (KVM needs to
+   create structpages to make this happen.  Xen doesn't ...)
+All of these kinds of memories can be addressed by the CPU and so also
+by a bus master.  That is, there is a physical address that the CPU
+can use which will address this memory, and there is a way to convert
+that to a DMA address which can be programmed into another device.
+There's no intent here to support memory which can be accessed by a
+complex scheme like writing an address to a control register and then
+accessing the memory through a FIFO; this is for memory which can be
+accessed by DMA and CPU loads and stores.
 
+For get_user_pages() and friends, we currently fill an array of struct
+pages, each one representing PAGE_SIZE bytes.  For an application that
+is using 1GB hugepages, writing 2^18 entries is a significant overhead.
+It also makes drivers hard to write as they have to recoalesce the
+struct pages, even though the VM can tell it whether those 2^18 pages
+are contiguous.
+
+On the minor side, struct phyr can represent any mappable chunk of memory.
+A bio_vec is limited to 2^32 bytes, while on 64-bit machines a phyr
+can represent larger than 4GB.  A phyr is the same size as a bio_vec
+on 64 bit (16 bytes), and the same size for 32-bit with PAE (12 bytes).
+It is smaller for 32-bit machines without PAE (8 bytes instead of 12).
+
+Finally, it may be possible to stop using scatterlist to describe the
+input to the DMA-mapping operation.  We may be able to get struct
+scatterlist down to just dma_address and dma_length, with chaining
+handled through an enclosing struct.
+
+I would like to see phyr replace bio_vec everywhere it's currently used.
+I don't have time to do that work now because I'm busy with folios.
+If someone else wants to take that on, I shall cheer from the sidelines.
+What I do intend to do is:
+
+ - Add an interface to gup.c to pin/unpin N phyrs
+ - Add a sg_map_phyrs()
+   This will take an array of phyrs and allocate an sg for them
+ - Whatever else I need to do to make one RDMA driver happy with
+   this scheme
+
+At that point, I intend to stop and let others more familiar with this
+area of the kernel continue the conversion of drivers.
+
+P.S. If you've had the Prodigy song running through your head the whole
+time you've been reading this email ... I'm sorry / You're welcome.
+If people insist, we can rename this to phys_range or something boring,
+but I quite like the spelling of phyr with the pronunciation of "fire".
