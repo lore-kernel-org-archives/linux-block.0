@@ -2,88 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CD9C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 08:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DE6C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 08:30:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240556AbiAJICc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 03:02:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52230 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242079AbiAJIAr (ORCPT
+        id S240510AbiAJIah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 03:30:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35104 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240674AbiAJI31 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 03:00:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641801646;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a8uXDg0+yQDdSb7ulPXiELnZGHaVMyBnuD++p+AMB1M=;
-        b=EDCFDcyKymGhdjXVMe0VKvz8N4MGdnswG6Gw5PmH2d89UlAflWEJwskjPh3aYOXdQWoXkF
-        Jz5C1pRZvYHaR7pXUG/8dOtUZ0BTFGbr2xg2EFR8Bwp9f6f7lCDmOX+nhKAgDDqBHMOK5x
-        2ZnrVwOvIN4bcO5oScgLelVSSozKtmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-671-xrlnaNm0PIyI_mpyPYD6fQ-1; Mon, 10 Jan 2022 03:00:42 -0500
-X-MC-Unique: xrlnaNm0PIyI_mpyPYD6fQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C92498042F6;
-        Mon, 10 Jan 2022 08:00:39 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3484C5F939;
-        Mon, 10 Jan 2022 08:00:06 +0000 (UTC)
-Date:   Mon, 10 Jan 2022 16:00:00 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        glider@google.com, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com>
-Subject: Re: [PATCH] block: Fix wrong offset in bio_truncate()
-Message-ID: <YdvngICmbNXOFIIj@T590>
-References: <000000000000880fca05d4fc73b0@google.com>
- <875yqt1c9g.fsf@mail.parknet.co.jp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875yqt1c9g.fsf@mail.parknet.co.jp>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        Mon, 10 Jan 2022 03:29:27 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96ECDC06173F;
+        Mon, 10 Jan 2022 00:29:26 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id e19so4505494plc.10;
+        Mon, 10 Jan 2022 00:29:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=ZbHmoJTvhu1ZJHvYjVegih6S2199NdYzTfdyg0if26A=;
+        b=HYBLvzRW8JYt51HdI/oGR7NhCjlv3HKUo+3R8MK/A2QmXDOpfeXDrE4OjEKm9hyr/f
+         z5hX0nD3/ELjvCIWF3aW7LoLRpbBM3CKM9oC0yCAspprbuIglE0aPyjqcHkod9waOtca
+         jACUuUUMU78auMMafwnfGwvnN7p3AZGIQrnJFXjhJgW9a6cjPA5f4TfMTLNcrk6/lSrj
+         dBnOaXvOggkJTMyvlJqd2KtzgMZ/4mtVYVoAjFAQ2Bkc0sZySQB6oQ8/btLK5dPWlvZ/
+         2ywGopmL+wwuf31otpzF9BsUiYay3Gy7Ib/XhmoOHpMu6jaer01guxfqSmTd4wrbNiol
+         Fb3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=ZbHmoJTvhu1ZJHvYjVegih6S2199NdYzTfdyg0if26A=;
+        b=XJYzNoY+Hll/kDUaiu0k5hpRe02wTjkuHY31ds8cAxjyS1o7xpySXLT7tziRdnPn35
+         8AQAD+je3MyrEWUboKu4hiA7BU8irG5tQ+2ljJYdaCC2cE0p7tM66jQE3YGSMwhKqbSs
+         jd95kCOzVNgLAzTieXoJLCBW26QhhBG9RYsiX5IH2NkuDRF2L0QmFulU4BdOqKUFGNnJ
+         40Dla8b0yTKLSBMboGsYPFcybk7UfCMI9l1EJhE5wuk0v4vC5xt8gF/JwBUi9L7/oCdz
+         PHn/qtierI72qPvTIH+RDtgZOWccANnKxsBwiopM1JcQo7JvBvg3A04EkhzUWVnWq9km
+         2rpw==
+X-Gm-Message-State: AOAM532qaP3BsPLOsiJbPs/eEvpok8iZmEQokB+KNJYhWHU93jnJ8Grw
+        0w0CH5Ri+TlUMNkXvsXYq0c=
+X-Google-Smtp-Source: ABdhPJyU5uW0w9xPoxodl96z0xjfHCXHzkuF3m3FvUNE58KKuxPvBJMw0Qwd4L1dVj5i44JThwNdrw==
+X-Received: by 2002:a17:902:a601:b0:148:adf2:9725 with SMTP id u1-20020a170902a60100b00148adf29725mr74531784plq.136.1641803366161;
+        Mon, 10 Jan 2022 00:29:26 -0800 (PST)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id h2sm6223356pfh.55.2022.01.10.00.29.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jan 2022 00:29:25 -0800 (PST)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     ming.lei@redhat.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-throtl: avoid double charge of bio IOPS due to split
+Date:   Mon, 10 Jan 2022 16:29:23 +0800
+Message-Id: <1641803363-27550-1-git-send-email-brookxu.cn@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jan 09, 2022 at 06:36:43PM +0900, OGAWA Hirofumi wrote:
-> bio_truncate() clears the buffer outside of last block of bdev, however
-> current bio_truncate() is using the wrong offset of page. So it can
-> return the uninitialized data.
-> 
-> This happened when both of truncated/corrupted FS and userspace (via
-> bdev) are trying to read the last of bdev.
-> 
-> Reported-by: syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com
-> Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-> ---
->  block/bio.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index a6fb6a0..25f1ed2 100644
-> --- a/block/bio.c	2021-11-01 09:19:05.999472589 +0900
-> +++ b/block/bio.c	2022-01-09 17:40:09.010438012 +0900
-> @@ -567,7 +567,8 @@ void bio_truncate(struct bio *bio, unsig
->  				offset = new_size - done;
->  			else
->  				offset = 0;
-> -			zero_user(bv.bv_page, offset, bv.bv_len - offset);
-> +			zero_user(bv.bv_page, bv.bv_offset + offset,
-> +				  bv.bv_len - offset);
+From: Chunguang Xu <brookxu@tencent.com>
 
-Looks correct:
+After commit 900e08075202("block: move queue enter logic into
+blk_mq_submit_bio()"), submit_bio_checks() moved to __submit_bio_fops()
+and blk_mq_submit_bio(). The IOs go through blk_mq_submit_bio()
+may be splited before entering blk-throtl, so we need to check
+whether the BIO is throttled, and only update the io_split_cnt
+for the THROTTLED bio to avoid double charge.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/blk-throttle.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 39bb6e6..2b12fc7 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2049,6 +2049,9 @@ void blk_throtl_charge_bio_split(struct bio *bio)
+ 	struct throtl_service_queue *parent_sq;
+ 	bool rw = bio_data_dir(bio);
+ 
++	if (!bio_flagged(bio, BIO_THROTTLED))
++		return;
++
+ 	do {
+ 		if (!parent->has_rules[rw])
+ 			break;
 -- 
-Ming
+1.8.3.1
 
