@@ -2,127 +2,194 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5FCC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 06:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F03C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 07:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233393AbiAJGU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 01:20:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33577 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233169AbiAJGUy (ORCPT
+        id S235123AbiAJHBh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 02:01:37 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:16697 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235119AbiAJHBh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 01:20:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641795653;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4UJGQxN4llUmBgJPrZBfXyF/mKlQ560GlFfyJVtdhC4=;
-        b=ZH3951dQMs9qeqAyFk1nUM60kQsJAEQif6hUdDgqIgRa6KIqkrY682MC4Xhn8J7V8XHRUN
-        aIBp2S+9yRysEsMFzriEStWpPyTOsdJF40OI5oZ5t2mhfD+HEtRW7rW9SPaZp1uc7zCJI7
-        9ck8NXk1L+xUjDbUO39/PEnrXitPP+o=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-ti7AUWZnN6G56gCUHtf8aw-1; Mon, 10 Jan 2022 01:20:51 -0500
-X-MC-Unique: ti7AUWZnN6G56gCUHtf8aw-1
-Received: by mail-ed1-f72.google.com with SMTP id h11-20020a05640250cb00b003fa024f87c2so9273925edb.4
-        for <linux-block@vger.kernel.org>; Sun, 09 Jan 2022 22:20:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4UJGQxN4llUmBgJPrZBfXyF/mKlQ560GlFfyJVtdhC4=;
-        b=GBPP+hBE9YFB+5M471zwh5o7/+lAWqI/MyhU7+tHYclL6mBoCzVOSjcBx77esDpDPJ
-         1503h89j9yno6kocxd+g5/MdTg9iEVzIIkUlO0P5cM/3vAs9EJfWV+D8Aj28Citomfw2
-         uLVZxNt4iZfg8nRZEeiamp1QxbrF7OtN17kkk8O9C10xjSLh/tISwpMbj4f7XoRbRFxM
-         qO7dY48lUN90P0GLYno+1WNyFn5N+fmg8PcTN0bDzU1hlllSC+L0ol3l00QbNE8uQjzv
-         oXYmYSM+JckylKSd9yXpHpckJs1QJbYidB1w1XBL1ccB9WBLPPGuuYiM/smY52KQ2FYm
-         UPyw==
-X-Gm-Message-State: AOAM532Qgkd00oGrSKcc7nMJ2NKTCwYWixrdtgjRjT11MaIgcbCMWvAl
-        FmiBONpKREKHnRAYy3uYQUqDa4h0flevD2mMsiJhUiw2/y6jcfHDk14Y+0SZlByPHj7lcpPvhw4
-        NMWwKcPPV4gLhf1eNZRxmrjuoexYx12JA8aY+sOU=
-X-Received: by 2002:a17:906:5d01:: with SMTP id g1mr57520301ejt.219.1641795650530;
-        Sun, 09 Jan 2022 22:20:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwHKP8/xjNW4WyuXNqZMO1X/n21owYLDUnRvikz9y+BzXAsQLDT5sBIwn6BHfp1ZA2MwAaVLBo+tXxytMNG0Cg=
-X-Received: by 2002:a17:906:5d01:: with SMTP id g1mr57520292ejt.219.1641795650302;
- Sun, 09 Jan 2022 22:20:50 -0800 (PST)
+        Mon, 10 Jan 2022 02:01:37 -0500
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JXPm92XPfzZf56;
+        Mon, 10 Jan 2022 14:58:01 +0800 (CST)
+Received: from localhost.localdomain (10.175.127.227) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.20; Mon, 10 Jan 2022 15:01:34 +0800
+From:   Zhang Wensheng <zhangwensheng5@huawei.com>
+To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next v4] bfq: fix use-after-free in bfq_dispatch_request
+Date:   Mon, 10 Jan 2022 15:12:31 +0800
+Message-ID: <20220110071231.1819009-1-zhangwensheng5@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp> <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
-In-Reply-To: <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
-From:   Jan Stancek <jstancek@redhat.com>
-Date:   Mon, 10 Jan 2022 07:20:32 +0100
-Message-ID: <CAASaF6wVsX=tkrTr6fst=7VoC1Bkr7rUQHUEr5oneyik4XLS+Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Jan Kara <jack@suse.cz>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggeme756-chm.china.huawei.com (10.3.19.102)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 7, 2022 at 12:04 PM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> Jan Stancek is reporting that commit 322c4293ecc58110 ("loop: make
-> autoclear operation asynchronous") broke LTP tests which run /bin/mount
-> and /bin/umount in close succession like
->
->   while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
->
-> . This is because since /usr/lib/systemd/systemd-udevd asynchronously
-> opens the loop device which /bin/mount and /bin/umount are operating,
-> autoclear from lo_release() is likely triggered by systemd-udevd than
-> mount or umount. And unfortunately, /bin/mount fails if read of superblock
-> (for examining filesystem type) returned an error due to the backing file
-> being cleared by __loop_clr_fd(). It turned out that disk->open_mutex was
-> by chance serving as a barrier for serializing "__loop_clr_fd() from
-> lo_release()" and "vfs_read() after lo_open()", and we need to restore
-> this barrier (without reintroducing circular locking dependency).
->
-> Also, the kernel test robot is reporting that that commit broke xfstest
-> which does
->
->   umount ext2 on xfs
->   umount xfs
->
-> sequence.
->
-> One of approaches for fixing these problems is to revert that commit and
-> instead remove destroy_workqueue() from __loop_clr_fd(), for it turned out
-> that we did not need to call flush_workqueue() from __loop_clr_fd() since
-> blk_mq_freeze_queue() blocks until all pending "struct work_struct" are
-> processed by loop_process_work(). But we are not sure whether it is safe
-> to wait blk_mq_freeze_queue() etc. with disk->open_mutex held; it could
-> be simply because dependency is not clear enough for fuzzers to cover and
-> lockdep to detect.
->
-> Therefore, before taking revert approach, let's try if we can use task
-> work approach which is called without locks held while the caller can
-> wait for completion of that task work before returning to user mode.
->
-> This patch tries to make lo_open()/lo_release() to locklessly wait for
-> __loop_clr_fd() by inserting a task work into lo_open()/lo_release() if
-> possible.
->
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Reported-by: Jan Stancek <jstancek@redhat.com>
+KASAN reports a use-after-free report when doing normal scsi-mq test
 
-v2 looked OK in my tests, thanks.
+[69832.239032] ==================================================================
+[69832.241810] BUG: KASAN: use-after-free in bfq_dispatch_request+0x1045/0x44b0
+[69832.243267] Read of size 8 at addr ffff88802622ba88 by task kworker/3:1H/155
+[69832.244656]
+[69832.245007] CPU: 3 PID: 155 Comm: kworker/3:1H Not tainted 5.10.0-10295-g576c6382529e #8
+[69832.246626] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[69832.249069] Workqueue: kblockd blk_mq_run_work_fn
+[69832.250022] Call Trace:
+[69832.250541]  dump_stack+0x9b/0xce
+[69832.251232]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.252243]  print_address_description.constprop.6+0x3e/0x60
+[69832.253381]  ? __cpuidle_text_end+0x5/0x5
+[69832.254211]  ? vprintk_func+0x6b/0x120
+[69832.254994]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.255952]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.256914]  kasan_report.cold.9+0x22/0x3a
+[69832.257753]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.258755]  check_memory_region+0x1c1/0x1e0
+[69832.260248]  bfq_dispatch_request+0x1045/0x44b0
+[69832.261181]  ? bfq_bfqq_expire+0x2440/0x2440
+[69832.262032]  ? blk_mq_delay_run_hw_queues+0xf9/0x170
+[69832.263022]  __blk_mq_do_dispatch_sched+0x52f/0x830
+[69832.264011]  ? blk_mq_sched_request_inserted+0x100/0x100
+[69832.265101]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
+[69832.266206]  ? blk_mq_do_dispatch_ctx+0x570/0x570
+[69832.267147]  ? __switch_to+0x5f4/0xee0
+[69832.267898]  blk_mq_sched_dispatch_requests+0xdf/0x140
+[69832.268946]  __blk_mq_run_hw_queue+0xc0/0x270
+[69832.269840]  blk_mq_run_work_fn+0x51/0x60
+[69832.278170]  process_one_work+0x6d4/0xfe0
+[69832.278984]  worker_thread+0x91/0xc80
+[69832.279726]  ? __kthread_parkme+0xb0/0x110
+[69832.280554]  ? process_one_work+0xfe0/0xfe0
+[69832.281414]  kthread+0x32d/0x3f0
+[69832.282082]  ? kthread_park+0x170/0x170
+[69832.282849]  ret_from_fork+0x1f/0x30
+[69832.283573]
+[69832.283886] Allocated by task 7725:
+[69832.284599]  kasan_save_stack+0x19/0x40
+[69832.285385]  __kasan_kmalloc.constprop.2+0xc1/0xd0
+[69832.286350]  kmem_cache_alloc_node+0x13f/0x460
+[69832.287237]  bfq_get_queue+0x3d4/0x1140
+[69832.287993]  bfq_get_bfqq_handle_split+0x103/0x510
+[69832.289015]  bfq_init_rq+0x337/0x2d50
+[69832.289749]  bfq_insert_requests+0x304/0x4e10
+[69832.290634]  blk_mq_sched_insert_requests+0x13e/0x390
+[69832.291629]  blk_mq_flush_plug_list+0x4b4/0x760
+[69832.292538]  blk_flush_plug_list+0x2c5/0x480
+[69832.293392]  io_schedule_prepare+0xb2/0xd0
+[69832.294209]  io_schedule_timeout+0x13/0x80
+[69832.295014]  wait_for_common_io.constprop.1+0x13c/0x270
+[69832.296137]  submit_bio_wait+0x103/0x1a0
+[69832.296932]  blkdev_issue_discard+0xe6/0x160
+[69832.297794]  blk_ioctl_discard+0x219/0x290
+[69832.298614]  blkdev_common_ioctl+0x50a/0x1750
+[69832.304715]  blkdev_ioctl+0x470/0x600
+[69832.305474]  block_ioctl+0xde/0x120
+[69832.306232]  vfs_ioctl+0x6c/0xc0
+[69832.306877]  __se_sys_ioctl+0x90/0xa0
+[69832.307629]  do_syscall_64+0x2d/0x40
+[69832.308362]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[69832.309382]
+[69832.309701] Freed by task 155:
+[69832.310328]  kasan_save_stack+0x19/0x40
+[69832.311121]  kasan_set_track+0x1c/0x30
+[69832.311868]  kasan_set_free_info+0x1b/0x30
+[69832.312699]  __kasan_slab_free+0x111/0x160
+[69832.313524]  kmem_cache_free+0x94/0x460
+[69832.314367]  bfq_put_queue+0x582/0x940
+[69832.315112]  __bfq_bfqd_reset_in_service+0x166/0x1d0
+[69832.317275]  bfq_bfqq_expire+0xb27/0x2440
+[69832.318084]  bfq_dispatch_request+0x697/0x44b0
+[69832.318991]  __blk_mq_do_dispatch_sched+0x52f/0x830
+[69832.319984]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
+[69832.321087]  blk_mq_sched_dispatch_requests+0xdf/0x140
+[69832.322225]  __blk_mq_run_hw_queue+0xc0/0x270
+[69832.323114]  blk_mq_run_work_fn+0x51/0x60
+[69832.323942]  process_one_work+0x6d4/0xfe0
+[69832.324772]  worker_thread+0x91/0xc80
+[69832.325518]  kthread+0x32d/0x3f0
+[69832.326205]  ret_from_fork+0x1f/0x30
+[69832.326932]
+[69832.338297] The buggy address belongs to the object at ffff88802622b968
+[69832.338297]  which belongs to the cache bfq_queue of size 512
+[69832.340766] The buggy address is located 288 bytes inside of
+[69832.340766]  512-byte region [ffff88802622b968, ffff88802622bb68)
+[69832.343091] The buggy address belongs to the page:
+[69832.344097] page:ffffea0000988a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802622a528 pfn:0x26228
+[69832.346214] head:ffffea0000988a00 order:2 compound_mapcount:0 compound_pincount:0
+[69832.347719] flags: 0x1fffff80010200(slab|head)
+[69832.348625] raw: 001fffff80010200 ffffea0000dbac08 ffff888017a57650 ffff8880179fe840
+[69832.354972] raw: ffff88802622a528 0000000000120008 00000001ffffffff 0000000000000000
+[69832.356547] page dumped because: kasan: bad access detected
+[69832.357652]
+[69832.357970] Memory state around the buggy address:
+[69832.358926]  ffff88802622b980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.360358]  ffff88802622ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.361810] >ffff88802622ba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.363273]                       ^
+[69832.363975]  ffff88802622bb00: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
+[69832.375960]  ffff88802622bb80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[69832.377405] ==================================================================
 
-Tested-by: Jan Stancek <jstancek@redhat.com>
+In bfq_dispatch_requestfunction, it may have function call:
 
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> ---
-> Changes in v2:
->   Need to also wait on lo_open(), per Jan's testcase.
->
->  drivers/block/loop.c | 70 ++++++++++++++++++++++++++++++++++++++++----
->  drivers/block/loop.h |  5 +++-
->  2 files changed, 68 insertions(+), 7 deletions(-)
->
+bfq_dispatch_request
+	__bfq_dispatch_request
+		bfq_select_queue
+			bfq_bfqq_expire
+				__bfq_bfqd_reset_in_service
+					bfq_put_queue
+						kmem_cache_free
+In this function call, in_serv_queue has beed expired and meet
+the conditions to free. In the function bfq_dispatch_request,
+the address of in_serv_queue pointing to has been released. For
+getting the value of idle_timer_disabled, it will get flags
+value from the address which in_serv_queue pointing to, then
+the problem of use-after-free happens;
+
+Fix the problem by adding ref of the in_serv_queue, and at the end
+of function(bfq_dispatch_request), resuming it by put it.
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+---
+ block/bfq-iosched.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index fec18118dc30..70bd280170f9 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5066,6 +5066,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	spin_lock_irq(&bfqd->lock);
+ 
+ 	in_serv_queue = bfqd->in_service_queue;
++	in_serv_queue->ref++; /* aviod in_serv_queue release */
+ 	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
+ 
+ 	rq = __bfq_dispatch_request(hctx);
+@@ -5077,6 +5078,10 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 
+ 	bfq_update_dispatch_stats(hctx->queue, rq, in_serv_queue,
+ 				  idle_timer_disabled);
++	/* resume in_serv_queue */
++	spin_lock_irq(&bfqd->lock);
++	bfq_put_queue(in_serv_queue);
++	spin_unlock_irq(&bfqd->lock);
+ 
+ 	return rq;
+ }
+-- 
+2.31.1
 
