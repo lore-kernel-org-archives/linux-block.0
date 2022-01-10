@@ -2,165 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C130C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 13:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706EBC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 14:59:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbiAJNmh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 08:42:37 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:35694 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232695AbiAJNmh (ORCPT
+        id S235800AbiAJO7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 09:59:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40990 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235009AbiAJO7B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 08:42:37 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 2664C2112B;
-        Mon, 10 Jan 2022 13:42:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1641822156; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LEZG69IvMHeeEqQTSKmf1op1UvQ9cRWEUSHsYHoYGHU=;
-        b=AO4zcq0F06C8iGjRb8P37mvnuQLi9gGlzP8blp9GkCL2K0c28dbJNaT2iAmGyavGSnAUzU
-        a4fYH2xs9VoLfzPy+57uSJDKNBf8iixr9gvKok2/hbt17Tbq2stIJlln3LJr/n8szEniky
-        1Jo80dVjCek5WiMoWxP3btXDN1Q1rko=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1641822156;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LEZG69IvMHeeEqQTSKmf1op1UvQ9cRWEUSHsYHoYGHU=;
-        b=80sG7O/LVlh/yXRU2ABrXMXBQGKYmsMXOQnsjocuXqbCMfB7Dw23fI4nnEZKsE72D6ePfz
-        g11zhH0muNJj+hCQ==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id C797BA3B89;
-        Mon, 10 Jan 2022 13:42:34 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 47711A05B4; Mon, 10 Jan 2022 14:42:34 +0100 (CET)
-Date:   Mon, 10 Jan 2022 14:42:34 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        Jan Stancek <jstancek@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
-Message-ID: <20220110134234.qebxn5gghqupsc7t@quack3.lan>
-References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
- <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
- <20220110103057.h775jv2br2xr2l5k@quack3.lan>
- <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+        Mon, 10 Jan 2022 09:59:01 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10413C06173F;
+        Mon, 10 Jan 2022 06:59:01 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id m4so13160789edb.10;
+        Mon, 10 Jan 2022 06:59:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=/v7/SBL7OndFJiOowJ8cyCY2ULEGJWIlLTFRcsV3eoY=;
+        b=ojBH/IpEl26sk0FqVmOU8piF0nbkO2/qIbD+27fgV+JOX4V4M8Qd8ElpX+nBVjvx7W
+         fwVdlGli3YOmFuUfJuElLj5sNrIP1vjcl3u8yNiqG6CyR206ADhgpZoDPHxrYI2RJz5+
+         siRKZLUq8CGLwGE/Rmzr12XiQvqpE3sCB8SRQK/odGPjvaEm7BGG4atnIaCfBoUBXBee
+         IyDnOtD2bj+W546ML//YlV7Eqm/28QcL5KFjIKAX1TdtlTn3Sj9qGp3Hch4QVq0JLmuo
+         p1DiX4sWourhOZLuFt0cjUI8UfwnLrs2033IoSMGvF+DnGzDf4tYFxd2/mpBBUgqu3Pe
+         USBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=/v7/SBL7OndFJiOowJ8cyCY2ULEGJWIlLTFRcsV3eoY=;
+        b=R49Hpf+b1xCU92z3JB9lkSal7FV/uajKDaJ8QnyD/EO5dVFXLLVXVS9h8RWSEaBtmI
+         M+GhdGiPArsjdl3lTtCTanni6iMQKrYA7R+IIy9QbAmI1TAhmWxuxBMw9Ta2XbHxs1OM
+         ZVUJOrQCxMODSb/YkDhgE84m+fglIJDt6JRKuNLZOXQG0c2L3YNv9FNVU2d34fu6wtZp
+         twFbu3PM/ev8s62usEy1fI9XRetomHNhUTIZwECkXk/NxBH+P+dvu/CUENTCrhBVyBAU
+         gmV+Ica5L189uehP1WiZMC/1ytjPORdNIUzILLBRHtuMA7kLdnmxAqKk84AvHimmQTu+
+         fh+g==
+X-Gm-Message-State: AOAM5302042F8PuIkFdCbNfAiJD+rf84CHZSVQO0x+XS2w3oZcnRzxEl
+        L+D8KUjUrbdyEYV9+bnblxUJwTtG9Fsy2EXKkgI=
+X-Google-Smtp-Source: ABdhPJxF9UAGt8Tq09N699eWVjizOf4v4o23jdSnv6YzvXvALNEA9D9gBwjqnDxEXL7+8Dlzx+ZSRIL/TpcGgL/N2QM=
+X-Received: by 2002:a17:906:713:: with SMTP id y19mr81185ejb.723.1641826739634;
+ Mon, 10 Jan 2022 06:58:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+From:   cruise k <cruise4k@gmail.com>
+Date:   Mon, 10 Jan 2022 22:58:48 +0800
+Message-ID: <CAKcFiNC=MfYVW-Jt9A3=FPJpTwCD2PL_ULNCpsCVE5s8ZeBQgQ@mail.gmail.com>
+Subject: KASAN: use-after-free Read in start_motor
+To:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     sunhao.th@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 10-01-22 20:28:28, Tetsuo Handa wrote:
-> On 2022/01/10 19:30, Jan Kara wrote:
-> > Eek, I agree that the patch may improve the situation but is the complexity
-> > and ugliness really worth it?
-> 
-> If we are clear about
-> 
->   Now your patch will fix this lockdep complaint but we
->   still would wait for the write to complete through blk_mq_freeze_queue()
->   (just lockdep is not clever enough to detect this). So IHMO if there was a
->   deadlock before, it will be still there with your changes.
-> 
-> in https://lkml.kernel.org/r/20211223134050.GD19129@quack2.suse.cz ,
-> we can go with the revert approach.
-> 
-> I want to call blk_mq_freeze_queue() without disk->open_mutex held.
-> But currently lo_release() is calling blk_mq_freeze_queue() with
-> disk->open_mutex held. My patch is going towards doing locklessly
-> where possible.
+Hi,
 
-I see. But:
-a) We didn't fully establish a real deadlock scenario from the lockdep
-report, did we? The lockdep report involved suspend locks, some locks on
-accessing files in /proc etc. and it was not clear whether it all reflects
-a real deadlock possibility or just a fact that lockdep tracking is rather
-coarse-grained at times. Now lockdep report is unpleasant and loop device
-locking was ugly anyway so your async change made sense but once lockdep is
-silenced we should really establish whether there is real deadlock and more
-work is needed or not.
+Syzkaller found the following issue:
 
-b) Unless we have a realistic plan of moving *all* blk_mq_freeze_queue()
-calls from under open_mutex in loop driver, moving stuff "where possible"
-from under open_mutex is IMO just muddying water.
+HEAD commit: 75acfdb Linux 5.16-rc8
+git tree: upstream
+console output: https://pastebin.com/raw/yHnKW716
+kernel config: https://pastebin.com/raw/XsnKfdRt
 
-> >                               I mean using task work in
-> > loop_schedule_rundown() makes a lot of sense because the loop
-> > 
-> > while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
-> > 
-> > will not fail because of dangling work in the workqueue after umount ->
-> > __loop_clr_fd().
-> 
-> Using task work from lo_release() is for handling close() => umount() sequence.
-> Using task work in lo_open() is for handling close() => open() sequence.
-> The mount in
-> 
->   while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
-> 
-> fails unless lo_open() waits for __loop_clr_fd() to complete.
-
-Why? If we use task work, we are guaranteed the loop device is cleaned up
-before umount returns unless some other process also has the loop device
-open.
-
-> >                  But when other processes like systemd-udevd start to mess
-> > with the loop device, then you have no control whether the following mount
-> > will see isofs.iso busy or not - it depends on when systemd-udevd decides
-> > to close the loop device.
-> 
-> Right. But regarding that part the main problem is that the script is not
-> checking for errors. What we are expected to do is to restore barrier
-> which existed before commit 322c4293ecc58110 ("loop: make autoclear
-> operation asynchronous").
-
-OK, can you explain what you exactly mean by the barrier? Because it my
-understanding your patch only makes one race somewhat less likely.
-
-> 
-> >                           What your waiting in lo_open() achieves is only
-> > that if __loop_clr_fd() from systemd-udevd happens to run at the same time
-> > as lo_open() from mount, then we won't see EBUSY.
-> 
-> My waiting in lo_open() is to fix a regression that
-> 
->   while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
-> 
-> started to fail.
-
-OK, so you claim this loop fails even with using task work in __loop_clr_fd(),
-correct? And does it fail even without systemd-udev?
-
-> >                                                   But IMO that is not worth
-> > the complexity in lo_open() because if systemd-udevd happens to close the
-> > loop device a millisecond later, you will get EBUSY anyway (and you would
-> > get it even in the past) Or am I missing something?
-> 
-> Excuse me, but lo_open() does not return EBUSY?
-> What operation are you talking about?
-
-I didn't mean EBUSY from lo_open() but EBUSY from LOOP_SET_FD ioctl(2). But
-maybe I misunderstood the failure. Where exactly does mount(1) fail? Because
-with the options you mention it should do something like:
-  ioctl(LOOP_CTL_GET_FREE) -> get free loop dev
-  ioctl(LOOP_SET_FD) -> bind isofs.iso to free loop dev
-  mount(loop_dev, isofs/)
-
-and I though it is the second syscall that fails.
+And hope the report log can help you.
 
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+==================================================================
+BUG: KASAN: use-after-free in start_motor+0x31b/0x3f0
+Read of size 4 at addr ffff88801961c800 by task kworker/u16:1/10
+
+CPU: 0 PID: 10 Comm: kworker/u16:1 Not tainted 5.16.0-rc8+ #10
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Workqueue: floppy fd_timer_workfn
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xcd/0x134
+ print_address_description.constprop.0.cold+0x93/0x347
+ kasan_report.cold+0x83/0xdf
+ start_motor+0x31b/0x3f0
+ floppy_ready+0x7f/0x19b0
+ process_one_work+0x9df/0x16a0
+ worker_thread+0x90/0xe20
+ kthread+0x405/0x4f0
+ ret_from_fork+0x1f/0x30
+ </TASK>
+
+Allocated by task 17012:
+ kasan_save_stack+0x1e/0x50
+ __kasan_kmalloc+0xa9/0xd0
+ kmem_cache_alloc_trace+0x198/0x390
+ fd_locked_ioctl+0xa33/0x23d0
+ fd_ioctl+0x35/0x50
+ blkdev_ioctl+0x37a/0x800
+ __x64_sys_ioctl+0x193/0x200
+ do_syscall_64+0x35/0xb0
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Freed by task 17012:
+ kasan_save_stack+0x1e/0x50
+ kasan_set_track+0x21/0x30
+ kasan_set_free_info+0x20/0x30
+ __kasan_slab_free+0x100/0x140
+ kfree+0x107/0x4c0
+ raw_cmd_free+0x72/0x140
+ fd_locked_ioctl+0x19b4/0x23d0
+ fd_ioctl+0x35/0x50
+ blkdev_ioctl+0x37a/0x800
+ __x64_sys_ioctl+0x193/0x200
+ do_syscall_64+0x35/0xb0
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff88801961c800
+ which belongs to the cache kmalloc-128 of size 128
+The buggy address is located 0 bytes inside of
+ 128-byte region [ffff88801961c800, ffff88801961c880)
+The buggy address belongs to the page:
+page:ffffea0000658700 refcount:1 mapcount:0 mapping:0000000000000000
+index:0x0 pfn:0x1961c
+head:ffffea0000658700 order:1 compound_mapcount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000010200 dead000000000100 dead000000000122 ffff888010c428c0
+raw: 0000000000000000 0000000080200020 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 1, migratetype Unmovable, gfp_mask
+0xd2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC),
+pid 16049, ts 140600618188, free_ts 140590103353
+ prep_new_page+0x1a6/0x240
+ get_page_from_freelist+0x1eec/0x3b50
+ __alloc_pages+0x30c/0x6e0
+ alloc_pages+0x115/0x240
+ new_slab+0x35e/0x4b0
+ ___slab_alloc+0xae6/0x1120
+ __slab_alloc.isra.0+0x4d/0xa0
+ __kmalloc+0x345/0x3d0
+ tomoyo_supervisor+0xca7/0xe30
+ tomoyo_path_permission+0x270/0x3a0
+ tomoyo_path_perm+0x352/0x420
+ tomoyo_path_symlink+0x94/0xe0
+ security_path_symlink+0xdf/0x150
+ do_symlinkat+0x107/0x2a0
+ __x64_sys_symlink+0x75/0x90
+ do_syscall_64+0x35/0xb0
+page last free stack trace:
+ free_pcp_prepare+0x474/0x9f0
+ free_unref_page+0x19/0x5b0
+ __unfreeze_partials+0x343/0x360
+ qlist_free_all+0x5a/0xc0
+ kasan_quarantine_reduce+0x13d/0x180
+ __kasan_slab_alloc+0xa2/0xc0
+ slab_post_alloc_hook+0x4d/0x4a0
+ __kmalloc+0x190/0x3d0
+ tomoyo_supervisor+0xca7/0xe30
+ tomoyo_path_permission+0x270/0x3a0
+ tomoyo_path_perm+0x2fc/0x420
+ tomoyo_path_unlink+0x8e/0xd0
+ security_path_unlink+0xd7/0x150
+ do_unlinkat+0x369/0x660
+ __x64_sys_unlink+0x3e/0x50
+ do_syscall_64+0x35/0xb0
+
+Memory state around the buggy address:
+ ffff88801961c700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88801961c780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88801961c800: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff88801961c880: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88801961c900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
