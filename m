@@ -2,51 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62364C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 17:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE4FC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 19:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238229AbiAJRge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 12:36:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49266 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238197AbiAJRgd (ORCPT
+        id S242976AbiAJTDV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 14:03:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45445 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242133AbiAJTDV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 12:36:33 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A13FC06173F;
-        Mon, 10 Jan 2022 09:36:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Cg6PTGtJDlAWiPThvj1wyyJNeW5hKDAPzKITicALVW8=; b=C4oP80EqKgM2rhrX+cvp+y2fgY
-        kqbIl79WkupMAOt9fAfN3aSo4HzcvzfRWHXZWd3TVvkycbbSuusQtl859H0/oE8lbtb9dNHL8vFrd
-        Rt4Pehqpr7z52juZub+IcTkKsf98o3yVcEkVsGAziu5ZgDvDnp9sQ3lfnqdw+BSKUtq9rT7sTw3VR
-        wS5bmujkO+3YgANbsijQvDlRZGUF1R3M2nqsY6JW1v/96RHbZrhANLF37HhQxE/bWH/2HLE/8QjP2
-        7si4nX2wnlP+YM6BHEmE6VE6GAovGdc4ghTdaJ6lnyC0WOpGxMnLGFouEtgN2KmpCS5xPz5CTNqlM
-        Xzc+Y+pg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n6yap-00CapK-PY; Mon, 10 Jan 2022 17:36:27 +0000
-Date:   Mon, 10 Jan 2022 09:36:27 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Wang Jianchao <jianchao.wan9@gmail.com>
-Cc:     axboe@kernel.dk, jbacik@fb.com, tj@kernel.org, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/13] blk: make blk-rq-qos policies pluggable and modular
-Message-ID: <Ydxum/2iwp6hDw68@infradead.org>
-References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
+        Mon, 10 Jan 2022 14:03:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641841400;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wJVpXmFJvi99AqmLB99IJstD9nuMHAk3xaEQkzCNADQ=;
+        b=hpvrBBftAYSRRGr1Jt2+WEQrFrsA38/szY7A0pDRaLskvn+xWdbzBz0Dz18zyXDNItQlq3
+        xuhE8UneLIja/PfGFxM9sn+YAVLbbo+7gQ62aIO8wnUwrfGAcqnjjcAmGybLAgWhTEYkyU
+        q+M7L1bFkYvkzgZOTn4VUQs3dx3yZsU=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-8-HyAqCWztOJWHnsiP-wExaA-1; Mon, 10 Jan 2022 14:03:19 -0500
+X-MC-Unique: HyAqCWztOJWHnsiP-wExaA-1
+Received: by mail-qv1-f72.google.com with SMTP id kk20-20020a056214509400b004110a8ba7beso13986785qvb.20
+        for <linux-block@vger.kernel.org>; Mon, 10 Jan 2022 11:03:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wJVpXmFJvi99AqmLB99IJstD9nuMHAk3xaEQkzCNADQ=;
+        b=Nwk6qQlRTso5r4t/jSBQ4Bt4NYQwZot8XfZrhWHD2b7ljREqs+MDmg5gH01FfQthEP
+         MhIs7yGaRO26HTmncwUOrpTsZrPcK3dc7GOcG8jO54wIog4ocw0g9oy6VFClXfZZL5JT
+         8JiX/wwL1P52davE8wVliO7gPn4M0L/nH5/q/1Hw3IomkzUqWYU/92/wBe1EbNzfnTPu
+         DNpYKDSvmoB5sR+jwjVyhIBSDof1jjUV1FZKh1WhVtqgw0V743jLVv5XgBeGjat1yuDF
+         cOY02O6HQe1WxRKpzVxQNUqciQl1oa1BaO2CHbbHOYv/zFndF8rYm4iUEJj0+Q3glngA
+         h20g==
+X-Gm-Message-State: AOAM532TelugPfvRBBdilS0LOe8NXmTYjzryi8K/xqDuGXugYxA8qDda
+        MS3d2hQmHpeNXULsilAYyJyd7gx/2emjbNMD55YNytYYFKVovzOkfnwJfBywF6aq4tDwhBlBjQH
+        33141z3tkCtpp4fFb2nBnAw==
+X-Received: by 2002:a37:dc45:: with SMTP id v66mr833130qki.516.1641841398614;
+        Mon, 10 Jan 2022 11:03:18 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzDZRef9V/QtQImBhNEfUIX1j4IHs5Ip3sUthhzJGhtWzXF2cDrhAoBRB1f9r3zeMNRnQHO0A==
+X-Received: by 2002:a37:dc45:: with SMTP id v66mr833116qki.516.1641841398397;
+        Mon, 10 Jan 2022 11:03:18 -0800 (PST)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id j22sm2687451qko.117.2022.01.10.11.03.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 11:03:18 -0800 (PST)
+Date:   Mon, 10 Jan 2022 14:03:16 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        lining <lining2020x@163.com>, Tejun Heo <tj@kernel.org>,
+        Chunguang Xu <brookxu@tencent.com>
+Subject: Re: [PATCH 1/2] block: add resubmit_bio_noacct()
+Message-ID: <YdyC9KpQ7yC3l7RZ@redhat.com>
+References: <20220110075141.389532-1-ming.lei@redhat.com>
+ <20220110075141.389532-2-ming.lei@redhat.com>
+ <YdxuWlZAPJkPyr3h@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220110091046.17010-1-jianchao.wan9@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YdxuWlZAPJkPyr3h@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 05:10:33PM +0800, Wang Jianchao wrote:
-> This patchset attempts to make blk-rq-qos framework pluggable and modular.
+On Mon, Jan 10 2022 at 12:35P -0500,
+Christoph Hellwig <hch@infradead.org> wrote:
 
-I really don't think making them policies modular is a good thing, and
-your new exports/APIs are a very good sign for why it is not a good
-idea.
+> On Mon, Jan 10, 2022 at 03:51:40PM +0800, Ming Lei wrote:
+> > Add block layer API of resubmit_bio_noacct() for handling blk-throttle
+> > iops limit correctly. Typical use case is that bio split, and it isn't
+> > good to export blk_throtl_charge_bio_split() for drivers, so add new API
+> > for serving such purpose.
+> 
+> Umm, submit_bio_noacct is meant exactly for this case of resubmitting
+> a bio.  We should not need another API for that.
+> 
+
+Ming is lifting code out of __blk_queue_split() for reuse (by DM in
+this instance, because it has its own bio_split+bio_chain).
+
+Are you saying submit_bio_noacct() should be made to call
+blk_throtl_charge_bio_split() and blk_throtl_charge_bio_split() simply
+return if not a split bio? (not sure bio has enough context to know,
+other than looking at some side-effect change from bio_chain)
+
+But Ming: your __blk_queue_split() change seems wrong.
+Prior to your patch __blk_queue_split() did:
+
+bio_chain(split, *bio);
+submit_bio_noacct(*bio);
+*bio = split;
+blk_throtl_charge_bio_split(*bio);
+
+After your patch (effectively):
+
+bio_chain(split, *bio);
+submit_bio_noacct(*bio);
+blk_throtl_charge_bio_split(bio);
+*bio = split;
+
+Maybe that was intended? (or maybe it doesn't matter because bio_split
+copies fields with bio_clone_fast())?  Regardless, it is subtle.
+
+Should blk_throtl_charge_bio_split() just be pushed down to
+bio_split()?
+
+In general, such narrow hacks for how to properly resubmit split bios
+are asking for further trouble.  As is, I'm having to triage new
+reports of bio-based accounting issues (which has called into question
+my hack/fix commit a1e1cb72d9649 ("dm: fix redundant IO accounting for
+bios that need splitting") that papered over this bigger issue of
+needing proper split IO accounting, so likely needs to be revisited).
+
+We also have the much bigger issue of IO poll support (or
+lack-there-of) for split bios.
+
+Mike
+
