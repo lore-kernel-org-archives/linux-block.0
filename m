@@ -2,196 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5CD8C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 13:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C130C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 13:42:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232919AbiAJNhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 08:37:25 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:31084 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232939AbiAJNgu (ORCPT
+        id S233008AbiAJNmh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 08:42:37 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:35694 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232695AbiAJNmh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 08:36:50 -0500
-Received: from kwepemi100004.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JXZXB6hr3z1FCfV;
-        Mon, 10 Jan 2022 21:33:14 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100004.china.huawei.com (7.221.188.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 10 Jan 2022 21:36:48 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Mon, 10 Jan
- 2022 21:36:47 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <mkoutny@suse.com>, <paulmck@kernel.org>, <tj@kernel.org>,
-        <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH v6 2/2] block: cancel all throttled bios in del_gendisk()
-Date:   Mon, 10 Jan 2022 21:47:58 +0800
-Message-ID: <20220110134758.2233758-3-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220110134758.2233758-1-yukuai3@huawei.com>
-References: <20220110134758.2233758-1-yukuai3@huawei.com>
+        Mon, 10 Jan 2022 08:42:37 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 2664C2112B;
+        Mon, 10 Jan 2022 13:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1641822156; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LEZG69IvMHeeEqQTSKmf1op1UvQ9cRWEUSHsYHoYGHU=;
+        b=AO4zcq0F06C8iGjRb8P37mvnuQLi9gGlzP8blp9GkCL2K0c28dbJNaT2iAmGyavGSnAUzU
+        a4fYH2xs9VoLfzPy+57uSJDKNBf8iixr9gvKok2/hbt17Tbq2stIJlln3LJr/n8szEniky
+        1Jo80dVjCek5WiMoWxP3btXDN1Q1rko=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1641822156;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LEZG69IvMHeeEqQTSKmf1op1UvQ9cRWEUSHsYHoYGHU=;
+        b=80sG7O/LVlh/yXRU2ABrXMXBQGKYmsMXOQnsjocuXqbCMfB7Dw23fI4nnEZKsE72D6ePfz
+        g11zhH0muNJj+hCQ==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id C797BA3B89;
+        Mon, 10 Jan 2022 13:42:34 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 47711A05B4; Mon, 10 Jan 2022 14:42:34 +0100 (CET)
+Date:   Mon, 10 Jan 2022 14:42:34 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Message-ID: <20220110134234.qebxn5gghqupsc7t@quack3.lan>
+References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
+ <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+ <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Throttled bios can't be issued after del_gendisk() is done, thus
-it's better to cancel them immediately rather than waiting for
-throttle is done.
+On Mon 10-01-22 20:28:28, Tetsuo Handa wrote:
+> On 2022/01/10 19:30, Jan Kara wrote:
+> > Eek, I agree that the patch may improve the situation but is the complexity
+> > and ugliness really worth it?
+> 
+> If we are clear about
+> 
+>   Now your patch will fix this lockdep complaint but we
+>   still would wait for the write to complete through blk_mq_freeze_queue()
+>   (just lockdep is not clever enough to detect this). So IHMO if there was a
+>   deadlock before, it will be still there with your changes.
+> 
+> in https://lkml.kernel.org/r/20211223134050.GD19129@quack2.suse.cz ,
+> we can go with the revert approach.
+> 
+> I want to call blk_mq_freeze_queue() without disk->open_mutex held.
+> But currently lo_release() is calling blk_mq_freeze_queue() with
+> disk->open_mutex held. My patch is going towards doing locklessly
+> where possible.
 
-For example, if user thread is throttled with low bps while it's
-issuing large io, and the device is deleted. The user thread will
-wait for a long time for io to return.
+I see. But:
+a) We didn't fully establish a real deadlock scenario from the lockdep
+report, did we? The lockdep report involved suspend locks, some locks on
+accessing files in /proc etc. and it was not clear whether it all reflects
+a real deadlock possibility or just a fact that lockdep tracking is rather
+coarse-grained at times. Now lockdep report is unpleasant and loop device
+locking was ugly anyway so your async change made sense but once lockdep is
+silenced we should really establish whether there is real deadlock and more
+work is needed or not.
 
-Noted this patch is mainly from revertion of commit 32e3374304c7
-("blk-throttle: remove tg_drain_bios") and commit b77412372b68
-("blk-throttle: remove blk_throtl_drain").
+b) Unless we have a realistic plan of moving *all* blk_mq_freeze_queue()
+calls from under open_mutex in loop driver, moving stuff "where possible"
+from under open_mutex is IMO just muddying water.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
- block/blk-throttle.h |  2 ++
- block/genhd.c        |  2 ++
- 3 files changed, 81 insertions(+)
+> >                               I mean using task work in
+> > loop_schedule_rundown() makes a lot of sense because the loop
+> > 
+> > while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+> > 
+> > will not fail because of dangling work in the workqueue after umount ->
+> > __loop_clr_fd().
+> 
+> Using task work from lo_release() is for handling close() => umount() sequence.
+> Using task work in lo_open() is for handling close() => open() sequence.
+> The mount in
+> 
+>   while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+> 
+> fails unless lo_open() waits for __loop_clr_fd() to complete.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index fdd57878e862..49e783d6b0d4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2256,6 +2256,83 @@ void blk_throtl_bio_endio(struct bio *bio)
- }
- #endif
- 
-+/*
-+ * Dispatch all bios from all children tg's queued on @parent_sq.  On
-+ * return, @parent_sq is guaranteed to not have any active children tg's
-+ * and all bios from previously active tg's are on @parent_sq->bio_lists[].
-+ */
-+static void tg_drain_bios(struct throtl_service_queue *parent_sq)
-+{
-+	struct throtl_grp *tg;
-+
-+	while ((tg = throtl_rb_first(parent_sq))) {
-+		struct throtl_service_queue *sq = &tg->service_queue;
-+		struct bio *bio;
-+
-+		throtl_dequeue_tg(tg);
-+
-+		while ((bio = throtl_peek_queued(&sq->queued[READ])))
-+			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+		while ((bio = throtl_peek_queued(&sq->queued[WRITE])))
-+			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+	}
-+}
-+
-+/**
-+ * blk_throtl_cancel_bios - cancel throttled bios
-+ * @q: request_queue to cancel throttled bios for
-+ *
-+ * This function is called to error all currently throttled bios on @q.
-+ */
-+void blk_throtl_cancel_bios(struct request_queue *q)
-+{
-+	struct throtl_data *td = q->td;
-+	struct bio_list bio_list_on_stack;
-+	struct blkcg_gq *blkg;
-+	struct cgroup_subsys_state *pos_css;
-+	struct bio *bio;
-+	int rw;
-+
-+	bio_list_init(&bio_list_on_stack);
-+
-+	/*
-+	 * hold queue_lock to prevent concurrent with dispatching
-+	 * throttled bios by timer.
-+	 */
-+	spin_lock_irq(&q->queue_lock);
-+
-+	/*
-+	 * queue_lock is held, rcu lock is not needed here technically.
-+	 * However, rcu lock is still held to emphasize that following
-+	 * path need RCU protection and to prevent warning from lockdep.
-+	 */
-+	rcu_read_lock();
-+
-+	/*
-+	 * Drain each tg while doing post-order walk on the blkg tree, so
-+	 * that all bios are propagated to td->service_queue.  It'd be
-+	 * better to walk service_queue tree directly but blkg walk is
-+	 * easier.
-+	 */
-+	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg)
-+		tg_drain_bios(&blkg_to_tg(blkg)->service_queue);
-+
-+	/* finally, transfer bios from top-level tg's into the td */
-+	tg_drain_bios(&td->service_queue);
-+
-+	/* all bios now should be in td->service_queue, cancel them */
-+	for (rw = READ; rw <= WRITE; rw++)
-+		while ((bio = throtl_pop_queued(&td->service_queue.queued[rw],
-+						NULL)))
-+			bio_list_add(&bio_list_on_stack, bio);
-+
-+	rcu_read_unlock();
-+	spin_unlock_irq(&q->queue_lock);
-+	if (!bio_list_empty(&bio_list_on_stack))
-+		while ((bio = bio_list_pop(&bio_list_on_stack)))
-+			bio_io_error(bio);
-+}
-+
- int blk_throtl_init(struct request_queue *q)
- {
- 	struct throtl_data *td;
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 175f03abd9e4..9d67d5139954 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -160,12 +160,14 @@ static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
- static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
-+#define blk_throtl_cancel_bios(q)  do { } while (0)
- #else /* CONFIG_BLK_DEV_THROTTLING */
- int blk_throtl_init(struct request_queue *q);
- void blk_throtl_exit(struct request_queue *q);
- void blk_throtl_register_queue(struct request_queue *q);
- void blk_throtl_charge_bio_split(struct bio *bio);
- bool __blk_throtl_bio(struct bio *bio);
-+void blk_throtl_cancel_bios(struct request_queue *q);
- static inline bool blk_throtl_bio(struct bio *bio)
- {
- 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
-diff --git a/block/genhd.c b/block/genhd.c
-index c5392cc24d37..1d138f0ae26a 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -28,6 +28,7 @@
- 
- #include "blk.h"
- #include "blk-rq-qos.h"
-+#include "blk-throttle.h"
- 
- static struct kobject *block_depr;
- 
-@@ -622,6 +623,7 @@ void del_gendisk(struct gendisk *disk)
- 
- 	blk_mq_freeze_queue_wait(q);
- 
-+	blk_throtl_cancel_bios(q);
- 	rq_qos_exit(q);
- 	blk_sync_queue(q);
- 	blk_flush_integrity();
+Why? If we use task work, we are guaranteed the loop device is cleaned up
+before umount returns unless some other process also has the loop device
+open.
+
+> >                  But when other processes like systemd-udevd start to mess
+> > with the loop device, then you have no control whether the following mount
+> > will see isofs.iso busy or not - it depends on when systemd-udevd decides
+> > to close the loop device.
+> 
+> Right. But regarding that part the main problem is that the script is not
+> checking for errors. What we are expected to do is to restore barrier
+> which existed before commit 322c4293ecc58110 ("loop: make autoclear
+> operation asynchronous").
+
+OK, can you explain what you exactly mean by the barrier? Because it my
+understanding your patch only makes one race somewhat less likely.
+
+> 
+> >                           What your waiting in lo_open() achieves is only
+> > that if __loop_clr_fd() from systemd-udevd happens to run at the same time
+> > as lo_open() from mount, then we won't see EBUSY.
+> 
+> My waiting in lo_open() is to fix a regression that
+> 
+>   while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+> 
+> started to fail.
+
+OK, so you claim this loop fails even with using task work in __loop_clr_fd(),
+correct? And does it fail even without systemd-udev?
+
+> >                                                   But IMO that is not worth
+> > the complexity in lo_open() because if systemd-udevd happens to close the
+> > loop device a millisecond later, you will get EBUSY anyway (and you would
+> > get it even in the past) Or am I missing something?
+> 
+> Excuse me, but lo_open() does not return EBUSY?
+> What operation are you talking about?
+
+I didn't mean EBUSY from lo_open() but EBUSY from LOOP_SET_FD ioctl(2). But
+maybe I misunderstood the failure. Where exactly does mount(1) fail? Because
+with the options you mention it should do something like:
+  ioctl(LOOP_CTL_GET_FREE) -> get free loop dev
+  ioctl(LOOP_SET_FD) -> bind isofs.iso to free loop dev
+  mount(loop_dev, isofs/)
+
+and I though it is the second syscall that fails.
+
+
+								Honza
 -- 
-2.31.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
