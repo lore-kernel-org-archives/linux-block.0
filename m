@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D11CC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 09:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B49C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 09:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242772AbiAJJNI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 04:13:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45510 "EHLO
+        id S242786AbiAJJNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 04:13:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242771AbiAJJMj (ORCPT
+        with ESMTP id S242563AbiAJJMb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 04:12:39 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F448C061751;
-        Mon, 10 Jan 2022 01:12:39 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id x27so1437935pfu.3;
-        Mon, 10 Jan 2022 01:12:39 -0800 (PST)
+        Mon, 10 Jan 2022 04:12:31 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16189C061757;
+        Mon, 10 Jan 2022 01:12:19 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id m13so12667588pji.3;
+        Mon, 10 Jan 2022 01:12:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pUKMXuo3xVxEWKXjp7ogKF7zeSoPw2PTqo2WG9e7EOA=;
-        b=Di3cCvIIY239IGt/c0tGqMqgvAASPuPHbHmpXojKoUTCVBMW1LRI5K5Roe/rkjJJF5
-         J9zueerHJSCCjyTJL7jLXgEl3GnSNljmqfAhm5b86Un2Lhyu1CZI+IoZI+cLDaREx7ri
-         7DOjA8EMIZ9c4wsmiRsBmKHm1YQC05orPwzfSvK4qdSEeaHiZqm0Yb7LfuRfcqAXiQoQ
-         YoNBwOAsaXc8AfJLJ/mhZlZJeGB/6uev3KQXCfIt95hf8/gYJGcNrIWmWKncgMK6cTrD
-         9d/3iH2t7PymWGE2CFZkWszqlDUNpTYE9FX/H1+UVFS+ZMOLoKzrJzdjGjxEpJ/L0WSF
-         mHRw==
+        bh=4lE5PHQYmUvEqvSpisgi3VasZwT8tgz/FJ17TpKqMMY=;
+        b=hYISV7/FT/xXa9WAfxYaQavkfEd79VcEhIpJzFbQZnLGItS+7h2qG0tmAQA3UQA+Gg
+         4jnPoex++S4yCyOKFmUUBPRN0aRobJkhbW4cNfI4Q3xwMrfj2yqyvlb9wc4gIv5wmDFf
+         bibZN2gN0UwJd8GErMrdxAdj8iDWHyeSX9tK8Ka3TEnUor7HUapIMwO94pvA91DFfoQc
+         iT736brWPhy4FeQEESZpjBXNkMmbh1QH8sKNtJUIQX2GIp9mOLYRKuBLA6gvvfKsbNkP
+         76vmevuyPLHkVxjo/1NsLDRZSDMFJ/3DBVe5SDNaS/gpBKzTfRlfIiyNA47sULI94NRl
+         wVuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=pUKMXuo3xVxEWKXjp7ogKF7zeSoPw2PTqo2WG9e7EOA=;
-        b=sYKBh/sQBKE65L7dT9XjRuXBUOE5JVe9FKCkaDDZgRXG8n6eovY9iVPzH5ggXyLD8d
-         ZWEpXW2ZmkT1umkg1cUFlZ3E9hN9RLeJFrnOY7IJUR0xnHEpZUbW0RUVIWXYykTqDikw
-         w6P3CR2nZHNtkvDeyNlUwmelQ34LiXwxtCP3x1+wP2QymBa4rEzFvXFePMgEvL5nqQw6
-         6c23goeFyqhoeMuQ+uEfNOPFUDqQ84zQ031+2C2h+A70cpDcnSgtildcxQDYZzff4MRA
-         c+9UJxrI4CKohFOkjC4P2uJdi04ISYTQDOTQeSaLoMnphEqdyVtKQblFGxUqeyauO1s5
-         s6fw==
-X-Gm-Message-State: AOAM5327DVwdJJSAKID+/bOH/Q9WGE1XI3hUekDKRJHd3Ctx6saRv3/R
-        FcEoq8Wdb9+C0OawNbGtNCQ=
-X-Google-Smtp-Source: ABdhPJzcUoj3Y6lu927itTNWfKF9jZHJw6//ZclzBXChG2+gGlTakfZDxB2artybUeJ0b5BbTvueRw==
-X-Received: by 2002:a05:6a00:1351:b0:4bc:edbf:7acd with SMTP id k17-20020a056a00135100b004bcedbf7acdmr18006227pfu.41.1641805958867;
-        Mon, 10 Jan 2022 01:12:38 -0800 (PST)
+        bh=4lE5PHQYmUvEqvSpisgi3VasZwT8tgz/FJ17TpKqMMY=;
+        b=HM765KrvcBM97pKC0VQ5G7F93i2yFW1T9FwSPxyGcBm46hOgUv1nQwd8P+LL5+dYnr
+         kqJp5q/L+2SpJFvBbS5qkyTBiqBRwkClOZKH/xZ1Q33oY5kjORXdoXBVpaIuqOcOPuCj
+         I7UTG5rnsWPw6m/Qlb8ni/i2xoKe6WyFThLm2Tmn8MvVoT/DMeePeeAjDIUWYNhe9lYm
+         A7OcMJstT/wv6V9DTOirxYMSIkZqtYo98WaSZerUia4KR/1hUql/c4sVcjEIb0ig6dxN
+         eVSUGOnLEKjByH4lX4Q1W8opbvdv3RZQ29foGyCE/HDm5xVEGSWYjgM47PfzIhqX5IjT
+         S+jg==
+X-Gm-Message-State: AOAM532g24gQ2Sk6TB2y0+SCuP5nq6gzVqZbJR6vXqSVpP9t8UQDsUGe
+        rMsD9S4R1HCu2PCLDVzltZQ=
+X-Google-Smtp-Source: ABdhPJzVCbbXY+GPZ285lAOvjIJJgS49A7vVnkOb4wPTmUy8WPlrMcdMWKhLvEPuP5tAW107PE7tOg==
+X-Received: by 2002:a17:903:3015:b0:14a:2206:8cdc with SMTP id o21-20020a170903301500b0014a22068cdcmr7666910pla.55.1641805938642;
+        Mon, 10 Jan 2022 01:12:18 -0800 (PST)
 Received: from localhost.localdomain ([162.219.34.250])
-        by smtp.gmail.com with ESMTPSA id j22sm6293910pfj.29.2022.01.10.01.12.36
+        by smtp.gmail.com with ESMTPSA id j22sm6293910pfj.29.2022.01.10.01.12.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 01:12:38 -0800 (PST)
+        Mon, 10 Jan 2022 01:12:18 -0800 (PST)
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
 To:     axboe@kernel.dk
 Cc:     jbacik@fb.com, tj@kernel.org, bvanassche@acm.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 13/13] blk: introduce iostat per cgroup module
-Date:   Mon, 10 Jan 2022 17:10:46 +0800
-Message-Id: <20220110091046.17010-14-jianchao.wan9@gmail.com>
+Subject: [PATCH 05/13] blk-iolatency: make iolatency pluggable and modular
+Date:   Mon, 10 Jan 2022 17:10:38 +0800
+Message-Id: <20220110091046.17010-6-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220110091046.17010-1-jianchao.wan9@gmail.com>
 References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
@@ -63,437 +63,206 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Wang Jianchao <wangjianchao@kuaishou.com>
 
-iostat can only track the whole device's io statistics. This patch
-introduces iostat per cgroup based on blk-rq-qos framework which
-can track bw, iops, queue latency and device latency and distinguish
-regular or meta data. The blkio.iostat per cgroup output in following
-format,
-vda-data bytes iops queue_lat dev_lat [ditto]  [ditto]
-    meta   \___________ ______________/    |        |
-	               v                   v        v
-	             read               write   discard
-In particular, the blkio.iostat of root only output the statistics
-of IOs from root cgroup. However, the non-root blkio.iostat outputs
-all of the children cgroups. With meta stats in root cgroup, hope
-to observe the performace of fs metadata.
+Make blk-iolatency pluggable and modular. Then we can close or open
+it through /sys/block/xxx/queue/qos and rmmod the module if we don't
+need it which can release one blkcg policy slot.
 
 Signed-off-by: Wang Jianchao <wangjianchao@kuaishou.com>
 ---
- block/Kconfig          |   9 ++
- block/Makefile         |   2 +
- block/blk-iostat.c     | 356 +++++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h |   2 +-
- 4 files changed, 368 insertions(+), 1 deletion(-)
- create mode 100644 block/blk-iostat.c
+ block/Kconfig          |  2 +-
+ block/Makefile         |  4 +++-
+ block/blk-cgroup.c     |  6 ------
+ block/blk-iolatency.c  | 39 +++++++++++++++++++++++++++++++--------
+ block/blk-mq-debugfs.c |  2 --
+ block/blk-rq-qos.h     |  6 ------
+ block/blk.h            |  6 ------
+ 7 files changed, 35 insertions(+), 30 deletions(-)
 
 diff --git a/block/Kconfig b/block/Kconfig
-index ea612cb5c8ee..35f24db3ec92 100644
+index c6ce41a5e5b2..1c0d05df2aec 100644
 --- a/block/Kconfig
 +++ b/block/Kconfig
-@@ -156,6 +156,15 @@ config BLK_CGROUP_IOPRIO
- 	scheduler and block devices process requests. Only some I/O schedulers
- 	and some block devices support I/O priorities.
+@@ -111,7 +111,7 @@ config BLK_WBT_MQ
+ 	Enable writeback throttling by default for request-based block devices.
  
-+config BLK_CGROUP_IOSTAT
-+	tristate "IO statistics monitor per cgroup"
-+	select BLK_RQ_BLKCG_GQ
-+	select BLK_RQ_ALLOC_TIME
-+	depends on BLK_CGROUP
-+	help
-+	Monitor IO statistics, including bw, iops, queue latency and device
-+	latency, in per-cgroup level.
-+
- config BLK_DEBUG_FS
- 	bool "Block layer debugging information in debugfs"
- 	default y
+ config BLK_CGROUP_IOLATENCY
+-	bool "Enable support for latency based cgroup IO protection"
++	tristate "Enable support for latency based cgroup IO protection"
+ 	depends on BLK_CGROUP
+ 	help
+ 	Enabling this option enables the .latency interface for IO throttling.
 diff --git a/block/Makefile b/block/Makefile
-index 3f76836076b2..ad89015e37ce 100644
+index 44df57e562bf..ccf61c57e1d4 100644
 --- a/block/Makefile
 +++ b/block/Makefile
-@@ -23,6 +23,8 @@ iolat-y 				:= blk-iolatency.o
- obj-$(CONFIG_BLK_CGROUP_IOLATENCY)	+= iolat.o
- iocost-y 			:= blk-iocost.o
- obj-$(CONFIG_BLK_CGROUP_IOCOST)	+= iocost.o
-+iostat-y 			:= blk-iostat.o
-+obj-$(CONFIG_BLK_CGROUP_IOSTAT)	+= iostat.o
+@@ -18,7 +18,9 @@ obj-$(CONFIG_BLK_CGROUP)	+= blk-cgroup.o
+ obj-$(CONFIG_BLK_CGROUP_RWSTAT)	+= blk-cgroup-rwstat.o
+ obj-$(CONFIG_BLK_DEV_THROTTLING)	+= blk-throttle.o
+ obj-$(CONFIG_BLK_CGROUP_IOPRIO)	+= blk-ioprio.o
+-obj-$(CONFIG_BLK_CGROUP_IOLATENCY)	+= blk-iolatency.o
++iolat-y 				:= blk-iolatency.o
++obj-$(CONFIG_BLK_CGROUP_IOLATENCY)	+= iolat.o
++
+ obj-$(CONFIG_BLK_CGROUP_IOCOST)	+= blk-iocost.o
  obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
  obj-$(CONFIG_MQ_IOSCHED_KYBER)	+= kyber-iosched.o
- bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
-diff --git a/block/blk-iostat.c b/block/blk-iostat.c
-new file mode 100644
-index 000000000000..3c6bcb6ab055
---- /dev/null
-+++ b/block/blk-iostat.c
-@@ -0,0 +1,356 @@
-+#include <linux/kernel.h>
-+#include <linux/blk_types.h>
-+#include <linux/module.h>
-+#include <linux/blk-cgroup.h>
-+#include <linux/bio.h>
-+#include <linux/spinlock.h>
-+
-+#include "blk.h"
-+#include "blk-rq-qos.h"
-+
-+enum {
-+	IOSTAT_READ = 0,
-+	IOSTAT_WRITE,
-+	IOSTAT_DISCARD,
-+	IOSTAT_MAX,
-+};
-+
-+struct iostat_data {
-+	u64 bytes[IOSTAT_MAX];
-+	u64 ios[IOSTAT_MAX];
-+	u64 queue_lat[IOSTAT_MAX];
-+	u64 dev_lat[IOSTAT_MAX];
-+};
-+
-+struct iostat_queue {
-+	struct rq_qos rqos;
-+};
-+
-+struct iostat_gq {
-+	struct blkg_policy_data pd;
-+	char disk_name[DISK_NAME_LEN];
-+	struct {
-+		struct iostat_data __percpu *data;
-+		struct iostat_data __percpu *meta;
-+	} stat;
-+};
-+
-+struct iostat_cgrp {
-+	struct blkcg_policy_data cpd;
-+};
-+
-+DEFINE_MUTEX(iostat_mutex);
-+
-+static struct blkcg_policy blkcg_policy_iostat;
-+
-+static inline struct iostat_gq *pd_to_ist(struct blkg_policy_data *pd)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index fb56d74f1c8e..fd874dfd38ed 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1212,12 +1212,6 @@ int blkcg_init_queue(struct request_queue *q)
+ 	if (ret)
+ 		goto err_destroy_all;
+ 
+-	ret = blk_iolatency_init(q);
+-	if (ret) {
+-		blk_throtl_exit(q);
+-		goto err_destroy_all;
+-	}
+-
+ 	return 0;
+ 
+ err_destroy_all:
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 6593c7123b97..6aaf0775e484 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -90,6 +90,12 @@ struct blk_iolatency {
+ 	atomic_t enabled;
+ };
+ 
++static struct rq_qos_ops blkcg_iolatency_ops;
++static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
 +{
-+	return pd ? container_of(pd, struct iostat_gq, pd) : NULL;
++	return rq_qos_by_id(q, blkcg_iolatency_ops.id);
 +}
 +
-+static inline struct iostat_gq *blkg_to_ist(struct blkcg_gq *blkg)
-+{
-+	return pd_to_ist(blkg_to_pd(blkg, &blkcg_policy_iostat));
-+}
-+
-+static inline bool req_is_meta(struct request *req)
-+{
-+	return req->cmd_flags & REQ_META;
-+}
-+
-+static inline int iostat_op(struct request *req)
-+{
-+	int op;
-+
-+	if (unlikely(op_is_discard(req_op(req))))
-+		op = IOSTAT_DISCARD;
-+	else if (op_is_write(req_op(req)))
-+		op = IOSTAT_WRITE;
-+	else
-+		op = IOSTAT_READ;
-+
-+	return op;
-+}
-+
-+static void __iostat_issue(struct rq_qos *rqos,
-+		struct iostat_gq *is, struct request *req)
-+{
-+	struct iostat_data *stat;
-+	int op = iostat_op(req);
-+
-+	/*
-+	 * blk_mq_start_request() inherents bio_issue_time() when BLK_CGROUP
-+	 * to avoid overhead of readtsc.
-+	 */
-+	req->io_start_time_ns = ktime_get_ns();
-+	if (req_is_meta(req))
-+		stat = get_cpu_ptr(is->stat.meta);
-+	else
-+		stat = get_cpu_ptr(is->stat.data);
-+	/*
-+	 * alloc_time_ns is get before get tag, we use it monitor depth,
-+	 * tag waits and in queue time.
-+	 */
-+	stat->queue_lat[op] += req->io_start_time_ns - req->alloc_time_ns;
-+	stat->ios[op]++;
-+	stat->bytes[op] += blk_rq_bytes(req);
-+	put_cpu_ptr(stat);
-+}
-+
-+static void iostat_issue(struct rq_qos *rqos, struct request *req)
-+{
-+	struct iostat_gq *is;
-+
-+	if (unlikely(!req->bio))
-+		return;
-+
-+	is = blkg_to_ist(req->blkg);
-+	/*
-+	 * Most of time, bios from submit_bio would have the valid bi_blkg,
-+	 * however, blk_execute_rq case is an exception.
-+	 */
-+	if (is)
-+		__iostat_issue(rqos, is, req);
-+}
-+
-+static void __iostat_done(struct rq_qos *rq_qos,
-+		struct iostat_gq *is, struct request *req)
-+{
-+	struct iostat_data *stat;
-+	int op = iostat_op(req);
-+
-+	if (req_is_meta(req))
-+		stat = get_cpu_ptr(is->stat.meta);
-+	else
-+		stat = get_cpu_ptr(is->stat.data);
-+	if (req->io_start_time_ns)
-+		stat->dev_lat[op] += ktime_get_ns() - req->io_start_time_ns;
-+	put_cpu_ptr(stat);
-+}
-+
-+static void iostat_done(struct rq_qos *rqos, struct request *req)
-+{
-+	struct iostat_gq *is = blkg_to_ist(req->blkg);
-+
-+	if (is)
-+		__iostat_done(rqos, is, req);
-+}
-+
-+static void iostat_exit(struct rq_qos *rqos)
-+{
-+	struct iostat_queue *isq = container_of(rqos, struct iostat_queue, rqos);
-+
-+	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iostat);
+ static inline struct blk_iolatency *BLKIOLATENCY(struct rq_qos *rqos)
+ {
+ 	return container_of(rqos, struct blk_iolatency, rqos);
+@@ -646,13 +652,21 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ 
+ 	del_timer_sync(&blkiolat->timer);
+ 	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iolatency);
 +	rq_qos_deactivate(rqos);
-+	kfree(isq);
-+}
-+
-+static int iostat_init(struct request_queue *q);
-+
-+struct rq_qos_ops iostat_rq_ops = {
+ 	kfree(blkiolat);
+ }
+ 
++static int blk_iolatency_init(struct request_queue *q);
+ static struct rq_qos_ops blkcg_iolatency_ops = {
 +#if IS_MODULE(CONFIG_BLK_CGROUP_IOLATENCY)
 +	.owner = THIS_MODULE,
 +#endif
-+	.name = "iostat",
-+	.flags = RQOS_FLAG_CGRP_POL | RQOS_FLAG_RQ_ALLOC_TIME,
-+	.issue = iostat_issue,
-+	.done = iostat_done,
-+	.exit = iostat_exit,
-+	.init = iostat_init,
-+};
-+
-+static int iostat_init(struct request_queue *q)
-+{
-+	struct iostat_queue *isq;
-+	struct rq_qos *rqos;
-+	int ret;
-+
-+	isq = kzalloc_node(sizeof(*isq), GFP_KERNEL, q->node);
-+	if (!isq) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, q);
-+	rqos = &isq->rqos;
-+	rq_qos_activate(q, rqos, &iostat_rq_ops);
-+
-+	ret = blkcg_activate_policy(q, &blkcg_policy_iostat);
-+	if (ret) {
++	.name = "iolat",
++	.flags = RQOS_FLAG_CGRP_POL,
+ 	.throttle = blkcg_iolatency_throttle,
+ 	.done_bio = blkcg_iolatency_done_bio,
+ 	.exit = blkcg_iolatency_exit,
++	.init = blk_iolatency_init,
+ };
+ 
+ static void blkiolatency_timer_fn(struct timer_list *t)
+@@ -727,15 +741,10 @@ int blk_iolatency_init(struct request_queue *q)
+ 		return -ENOMEM;
+ 
+ 	rqos = &blkiolat->rqos;
+-	rqos->id = RQ_QOS_LATENCY;
+-	rqos->ops = &blkcg_iolatency_ops;
+-	rqos->q = q;
+-
+-	rq_qos_add(q, rqos);
+-
++	rq_qos_activate(q, rqos, &blkcg_iolatency_ops);
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iolatency);
+ 	if (ret) {
+-		rq_qos_del(q, rqos);
 +		rq_qos_deactivate(rqos);
-+		kfree(isq);
-+	}
-+out:
-+	return ret;
-+}
-+
-+static void iostat_sum(struct blkcg_gq *blkg,
-+		struct iostat_data *sum, bool meta)
-+{
-+	struct iostat_gq *is = blkg_to_ist(blkg);
-+	struct iostat_data *stat;
-+	int cpu, i;
-+
-+	for_each_possible_cpu(cpu) {
-+		if (meta)
-+			stat = per_cpu_ptr(is->stat.meta, cpu);
-+		else
-+			stat = per_cpu_ptr(is->stat.data, cpu);
-+		for (i = 0; i < IOSTAT_MAX; i++) {
-+			sum->bytes[i] += stat->bytes[i];
-+			sum->ios[i] += stat->ios[i];
-+			sum->dev_lat[i] += stat->dev_lat[i];
-+			sum->queue_lat[i] += stat->queue_lat[i];
-+		}
-+	}
-+}
-+
-+static int iostat_show(struct seq_file *sf, void *v)
-+{
-+	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
-+	struct cgroup_subsys_state *pos_css;
-+	struct iostat_gq *is;
-+	struct blkcg_gq *blkg, *pos_blkg;
-+	struct iostat_data data_sum, meta_sum;
-+	int i;
-+
-+	rcu_read_lock();
-+	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-+		is = blkg_to_ist(blkg);
-+		/*
-+		 * The is activated on demand so iostat may be NULL
-+		 */
-+		if (!is)
-+			continue;
-+
-+		memset(&data_sum, 0, sizeof(data_sum));
-+		memset(&meta_sum, 0, sizeof(meta_sum));
-+		if (blkg == blkg->q->root_blkg) {
-+			iostat_sum(blkg, &data_sum, false);
-+			iostat_sum(blkg, &meta_sum, true);
-+		} else {
-+			/*
-+			 * Iterate every children blkg to agregate statistics
-+			 */
-+			blkg_for_each_descendant_pre(pos_blkg, pos_css, blkg) {
-+				if (!pos_blkg->online)
-+					continue;
-+				iostat_sum(pos_blkg, &data_sum, false);
-+				iostat_sum(pos_blkg, &meta_sum, true);
-+			}
-+		}
-+
-+		seq_printf(sf, "%s-data ", is->disk_name);
-+		for (i = 0; i < IOSTAT_MAX; i++)
-+			seq_printf(sf, "%llu %llu %llu %llu ",
-+				data_sum.bytes[i], data_sum.ios[i],
-+				data_sum.queue_lat[i], data_sum.dev_lat[i]);
-+		seq_printf(sf, "\n");
-+		seq_printf(sf, "%s-meta ", is->disk_name);
-+		for (i = 0; i < IOSTAT_MAX; i++)
-+			seq_printf(sf, "%llu %llu %llu %llu ",
-+				meta_sum.bytes[i], meta_sum.ios[i],
-+				meta_sum.queue_lat[i], meta_sum.dev_lat[i]);
-+		seq_printf(sf, "\n");
-+	}
-+	rcu_read_unlock();
-+
-+	return 0;
-+}
-+
-+static struct cftype iostat_files[] = {
-+	{
-+		.name = "iostat",
-+		.seq_show = iostat_show,
-+	},
-+	{}
-+};
-+
-+static struct cftype iostat_legacy_files[] = {
-+	{
-+		.name = "iostat",
-+		.seq_show = iostat_show,
-+	},
-+	{}
-+};
-+
-+static void iostat_pd_free(struct blkg_policy_data *pd)
-+{
-+	struct iostat_gq *is = pd_to_ist(pd);
-+
-+	if (is->stat.data)
-+		free_percpu(is->stat.data);
-+
-+	if (is->stat.meta)
-+		free_percpu(is->stat.meta);
-+
-+	kfree(is);
-+}
-+
-+static struct blkg_policy_data *iostat_pd_alloc(gfp_t gfp,
-+		struct request_queue *q, struct blkcg *blkcg)
-+{
-+	struct iostat_gq *is;
-+
-+	is = kzalloc_node(sizeof(*is), gfp, q->node);
-+	if (!is)
-+		return NULL;
-+
-+	is->stat.data = __alloc_percpu_gfp(sizeof(struct iostat_data),
-+			__alignof__(struct iostat_data), gfp);
-+	if (!is->stat.data)
-+		goto out_free;
-+
-+	is->stat.meta = __alloc_percpu_gfp(sizeof(struct iostat_data),
-+			__alignof__(struct iostat_data), gfp);
-+	if (!is->stat.meta)
-+		goto out_free;
-+	/*
-+	 * request_queue.kobj's parent is gendisk
-+	 */
-+	strlcpy(is->disk_name,
-+		kobject_name(q->kobj.parent),
-+		DISK_NAME_LEN);
-+	return &is->pd;
-+out_free:
-+	if (is->stat.data)
-+		free_percpu(is->stat.data);
-+	iostat_pd_free(&is->pd);
-+	return NULL;
-+}
-+
-+static struct blkcg_policy blkcg_policy_iostat = {
-+	.dfl_cftypes	= iostat_files,
-+	.legacy_cftypes	= iostat_legacy_files,
-+	.pd_alloc_fn	= iostat_pd_alloc,
-+	.pd_free_fn	= iostat_pd_free,
-+};
-+
-+static int __init iostat_mod_init(void)
-+{
+ 		kfree(blkiolat);
+ 		return ret;
+ 	}
+@@ -1046,13 +1055,27 @@ static struct blkcg_policy blkcg_policy_iolatency = {
+ 
+ static int __init iolatency_init(void)
+ {
+-	return blkcg_policy_register(&blkcg_policy_iolatency);
 +	int ret;
 +
-+	ret = rq_qos_register(&iostat_rq_ops);
++	ret = rq_qos_register(&blkcg_iolatency_ops);
 +	if (ret)
 +		return ret;
 +
-+	ret = blkcg_policy_register(&blkcg_policy_iostat);
-+	if (ret) {
-+		rq_qos_unregister(&iostat_rq_ops);
-+		return ret;
-+	}
++	ret = blkcg_policy_register(&blkcg_policy_iolatency);
++	if (ret)
++		rq_qos_unregister(&blkcg_iolatency_ops);
 +
-+	return 0;
-+}
-+
-+static void __exit iostat_mod_exit(void)
-+{
-+	rq_qos_unregister(&iostat_rq_ops);
-+	blkcg_policy_unregister(&blkcg_policy_iostat);
-+}
-+
-+module_init(iostat_mod_init);
-+module_exit(iostat_mod_exit);
-+MODULE_AUTHOR("Wang Jianchao");
++	return ret;
+ }
+ 
+ static void __exit iolatency_exit(void)
+ {
+ 	blkcg_policy_unregister(&blkcg_policy_iolatency);
++	rq_qos_unregister(&blkcg_iolatency_ops);
+ }
+ 
+ module_init(iolatency_init);
+ module_exit(iolatency_exit);
++MODULE_AUTHOR("Josef Bacik");
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Block Statistics per Cgroup");
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ed30b3c3fee7..75026cf54384 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -42,7 +42,7 @@ struct blk_crypto_profile;
-  * Maximum number of blkcg policies allowed to be registered concurrently.
-  * Defined here to simplify include dependency.
-  */
--#define BLKCG_MAX_POLS		6
-+#define BLKCG_MAX_POLS		7
- /*
-  * Non blk-rq-qos blkcg policies include blk-throttle and bfq
-  */
++MODULE_DESCRIPTION("Latency based cgroup IO protection");
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 9c786b63c847..57c33f4730f2 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -820,8 +820,6 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
+ static const char *rq_qos_id_to_name(enum rq_qos_id id)
+ {
+ 	switch (id) {
+-	case RQ_QOS_LATENCY:
+-		return "latency";
+ 	case RQ_QOS_COST:
+ 		return "cost";
+ 	case RQ_QOS_IOPRIO:
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index de82eb951bdd..6ca46c69e325 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -14,7 +14,6 @@
+ struct blk_mq_debugfs_attr;
+ 
+ enum rq_qos_id {
+-	RQ_QOS_LATENCY,
+ 	RQ_QOS_COST,
+ 	RQ_QOS_IOPRIO,
+ };
+@@ -85,11 +84,6 @@ static inline struct rq_qos *rq_qos_by_id(struct request_queue *q, int id)
+ 	return rqos;
+ }
+ 
+-static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
+-{
+-	return rq_qos_by_id(q, RQ_QOS_LATENCY);
+-}
+-
+ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ {
+ 	atomic_set(&rq_wait->inflight, 0);
+diff --git a/block/blk.h b/block/blk.h
+index ccde6e6f1736..e2e4fbb9a58d 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -436,12 +436,6 @@ static inline void blk_queue_bounce(struct request_queue *q, struct bio **bio)
+ 		__blk_queue_bounce(q, bio);	
+ }
+ 
+-#ifdef CONFIG_BLK_CGROUP_IOLATENCY
+-extern int blk_iolatency_init(struct request_queue *q);
+-#else
+-static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+-#endif
+-
+ struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
+ 
+ #ifdef CONFIG_BLK_DEV_ZONED
 -- 
 2.17.1
 
