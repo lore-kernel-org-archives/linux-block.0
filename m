@@ -2,77 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D29C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 10:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5818C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 11:29:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244274AbiAJKvu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 05:51:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50081 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244323AbiAJKvn (ORCPT
+        id S244708AbiAJL3a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 06:29:30 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:58200 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244737AbiAJL3D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 05:51:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641811903;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Uep8m/hs5XUyZjO6T2O4qnfO84NUY7Xj8s7kTpYwtJo=;
-        b=N5jr7Y/zN7v8oHzu0eiy+1rv/70+duVtx/j625g43a2DHdx+/gIaOMYY27IYYr2ATlbvnf
-        k6qhNRcM4hZmTHWfnlaLDyUcB2C/Hlx25h1PX11ssVACfqQGhbQqvzCIGQHMqBNlWxJZAX
-        epi+TRE0SeRjnG41CkXyGnW/wyk1JRQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-395-aM6BJwXvNJ-5aNcEJ64cIQ-1; Mon, 10 Jan 2022 05:51:36 -0500
-X-MC-Unique: aM6BJwXvNJ-5aNcEJ64cIQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59B6783DD20;
-        Mon, 10 Jan 2022 10:51:34 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 340EF4E2A2;
-        Mon, 10 Jan 2022 10:51:30 +0000 (UTC)
-Date:   Mon, 10 Jan 2022 18:51:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     brookxu <brookxu.cn@gmail.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-throtl: avoid double charge of bio IOPS due to split
-Message-ID: <YdwPrsdhwX39IlDG@T590>
-References: <1641803363-27550-1-git-send-email-brookxu.cn@gmail.com>
+        Mon, 10 Jan 2022 06:29:03 -0500
+Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20ABScsk029261;
+        Mon, 10 Jan 2022 20:28:38 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
+ Mon, 10 Jan 2022 20:28:38 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20ABSX0X028931
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 10 Jan 2022 20:28:38 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+Date:   Mon, 10 Jan 2022 20:28:28 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1641803363-27550-1-git-send-email-brookxu.cn@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
+ <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Chunguang,
+On 2022/01/10 19:30, Jan Kara wrote:
+> Eek, I agree that the patch may improve the situation but is the complexity
+> and ugliness really worth it?
 
-On Mon, Jan 10, 2022 at 04:29:23PM +0800, brookxu wrote:
-> From: Chunguang Xu <brookxu@tencent.com>
+If we are clear about
+
+  Now your patch will fix this lockdep complaint but we
+  still would wait for the write to complete through blk_mq_freeze_queue()
+  (just lockdep is not clever enough to detect this). So IHMO if there was a
+  deadlock before, it will be still there with your changes.
+
+in https://lkml.kernel.org/r/20211223134050.GD19129@quack2.suse.cz ,
+we can go with the revert approach.
+
+I want to call blk_mq_freeze_queue() without disk->open_mutex held.
+But currently lo_release() is calling blk_mq_freeze_queue() with
+disk->open_mutex held. My patch is going towards doing locklessly
+where possible.
+
+>                               I mean using task work in
+> loop_schedule_rundown() makes a lot of sense because the loop
 > 
-> After commit 900e08075202("block: move queue enter logic into
-> blk_mq_submit_bio()"), submit_bio_checks() moved to __submit_bio_fops()
-> and blk_mq_submit_bio(). The IOs go through blk_mq_submit_bio()
-> may be splited before entering blk-throtl, so we need to check
-> whether the BIO is throttled, and only update the io_split_cnt
-> for the THROTTLED bio to avoid double charge.
+> while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+> 
+> will not fail because of dangling work in the workqueue after umount ->
+> __loop_clr_fd().
 
-Today Jens has merged the patch[1] of "block: don't protect
-submit_bio_checks by q_usage_counter", so the behavior is switched
-back to previous behavior: running bio check before calling
-blk_mq_submit_bio() or ->submit_bio().
+Using task work from lo_release() is for handling close() => umount() sequence.
+Using task work in lo_open() is for handling close() => open() sequence.
+The mount in
 
-Then looks your patch isn't needn't any more.
+  while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.17/block&id=9d497e2941c30a060ba62d5485b3bc9d91ffb09e
+fails unless lo_open() waits for __loop_clr_fd() to complete.
 
+>                  But when other processes like systemd-udevd start to mess
+> with the loop device, then you have no control whether the following mount
+> will see isofs.iso busy or not - it depends on when systemd-udevd decides
+> to close the loop device.
 
-Thanks,
-Ming
+Right. But regarding that part the main problem is that the script is not checking
+for errors. What we are expected to do is to restore barrier which existed before
+commit 322c4293ecc58110 ("loop: make autoclear operation asynchronous").
+
+>                           What your waiting in lo_open() achieves is only
+> that if __loop_clr_fd() from systemd-udevd happens to run at the same time
+> as lo_open() from mount, then we won't see EBUSY.
+
+My waiting in lo_open() is to fix a regression that
+
+  while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+
+started to fail.
+
+>                                                   But IMO that is not worth
+> the complexity in lo_open() because if systemd-udevd happens to close the
+> loop device a millisecond later, you will get EBUSY anyway (and you would
+> get it even in the past) Or am I missing something?
+
+Excuse me, but lo_open() does not return EBUSY?
+What operation are you talking about?
+
+If lo_open() from /bin/mount happened earlier than close() from systemd-udevd
+happens, __loop_clr_fd() from systemd-udevd does not happen because lo_open()
+incremented lo->lo_refcnt, and autoclear will not happen until /bin/mount
+calls close().
+
+If you are talking about close() => umount() sequence, do_umount() can fail
+with EBUSY if /bin/umount happened earlier than close() from systemd-udevd
+happens. But that is out of scope for use of task work in lo_open().
 
