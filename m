@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E699DC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 09:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 531E0C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 09:13:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242722AbiAJJM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 04:12:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45502 "EHLO
+        id S242726AbiAJJNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 04:13:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242619AbiAJJMe (ORCPT
+        with ESMTP id S242685AbiAJJMe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 10 Jan 2022 04:12:34 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEAEC034000;
-        Mon, 10 Jan 2022 01:12:21 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id q14so11283658plx.4;
-        Mon, 10 Jan 2022 01:12:21 -0800 (PST)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19625C06175A;
+        Mon, 10 Jan 2022 01:12:29 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id v25so10608824pge.2;
+        Mon, 10 Jan 2022 01:12:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=l3XXcURerpYJD7VuNrikwmg4jwTKIhd5e7FpXq8T7WM=;
-        b=fHcMn2z/pwtFurWbFk+PvvXhhsECkSUJRSeDouKx2K3qSyHOeQCx0ODMAbPN8El0QP
-         telhh3eIadEfgXcfabxrMoHxBWtwQEDxUFPnHSUoMYuQjl7Q/wKbKzg/vr3frL4TnMCK
-         1F9bYuidAwClzGUOBSFhx48y84eJB2JCeH3ykYA9nnFa4i1cqitYiY5aV7j0FvaHbI/W
-         ymVmZM5lJT1KN0Yzwazb/8vV/3HpufljjxhuMgjMHnC9PKYGKkExWuZUjl27XukI79gK
-         04kHEA5/0klFJaYbrotzHyc2S+sMq/B8Q2u6qA7ngHmvghmRfFHsU9qkkkEec+Km4ERj
-         KY/A==
+        bh=5uGAFhwG1PalEv/hF+X/ZtSoGm0z/W3W27BE5YAO4Hk=;
+        b=HclcVXbL/P/hD+zMRRRq3PMc7Z0zkztb27qGLwdXrpjH168r+dmIDTe1bvQzBM6PN0
+         CoqL+m6dM+vhPWm1ofsZfpwHjIhJu4EgZCJKZS2HCMxZ3SeEybPC/w+FNXugUmVkFzu4
+         uEPnw2eXhxngyTVqLfNGMhCPTQBA+VFk3zdl/5nSQIJEWuDoDd7NDmiiBa/1nus/Z3QB
+         B3Ta5CL/HOyXNOMI+RBvPgEjRm5JYJrRFNJrG3NI7f5MQB+C8bW6OZ23oJL5WdJyqPBT
+         D3oeHOOlCOeJdj13Qv7kx9cRdNG4Kshbif/lq0n2m3qQC5B3nIq0a1MenIaK0r89IbnR
+         0JZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=l3XXcURerpYJD7VuNrikwmg4jwTKIhd5e7FpXq8T7WM=;
-        b=3vKVTuv8qYCyY0nzVkGe1Z0clwKDN92burt3D/3Z3uwwmgh0fy8oF47DsvrIfBT/NE
-         T3c5t+mnCoeBSC8SubLak9QqNojAceQRvXNwVhcZ4Oow/nXvpQmSKO0re0h+pJALwDWn
-         bnXLqTlwnZ3ATk9xfaAqTRpoQd56EajWe9DQiA3H0hc4702QiS/DiQFxLI661GWlc6sf
-         +2sp8RkZBI5MO1hb5I1hvdL8cBhYJTt6esOB8cRuEGqOqNHsQ4v37uT1+aUOyXc2k0B2
-         tq1V8tdCXTEW4+6QzIob9xUM0q4jHbKHyp6LtaK6t2t8InKB5+GcQufC8a3AFmU30RkL
-         4CEA==
-X-Gm-Message-State: AOAM530GSTjZ2hYBxSPB+0vUICGMTfkgx5LQv3J3QJ7Y5QfVShTVmijc
-        TnJRXY6dlWFxRxUa67Db3fpdPLVqNPRM7AH7
-X-Google-Smtp-Source: ABdhPJyvtR5CwApsfmKKBwNyqfQ/icTdLXB/W5BcF2uOaQo9PRlbBZ3mJELp6oUzlr39glr+NV+RKg==
-X-Received: by 2002:a17:90a:bb91:: with SMTP id v17mr28008022pjr.238.1641805941140;
-        Mon, 10 Jan 2022 01:12:21 -0800 (PST)
+        bh=5uGAFhwG1PalEv/hF+X/ZtSoGm0z/W3W27BE5YAO4Hk=;
+        b=UTdC1MQIIgTH/O62JqGiJT4UmRmKau7Bq1r/tKTjTrUlo7LD1X5ENtBEoF0cp/BdRs
+         O1aYK6P7UpAWA1bDw2Zzz3twbKs9wvZZOSvGNkfjVTcBTeowxzyuO1Si9p2F0Yoly2F6
+         5ssEuaCgQUqcYgWjY0Rh0dElwHjJHb2R/NQlCV0CVGBCctePpfhPLQDSnCk0x1B2S7fn
+         dytuXTfII3RUrxY+XCxmYgx/t53dFH5pKkWAjq3qrYvFSFFV2EUfkVe4j//w+wwKDt8x
+         g+6kpus9RWdf/ujOMqUHWwca8ORuhMUTH4SX8SKMXLYCav3zzBGN7hJDK+oJEDFtv21w
+         /QSQ==
+X-Gm-Message-State: AOAM530VOoHr4T5VjHCYtU95rYsBrAEZbsDDLEy0Im8gYLHrBdvBE4OD
+        x3610CldFUoGaVvRPWgnO9Q=
+X-Google-Smtp-Source: ABdhPJxvOYj/fwaErfsO6GCO2pBBDv3M4enh4tzXVYxkLKfbV68E2GHA1K7sLhRddzhPPP1seAlZaQ==
+X-Received: by 2002:a63:7014:: with SMTP id l20mr1684639pgc.384.1641805948672;
+        Mon, 10 Jan 2022 01:12:28 -0800 (PST)
 Received: from localhost.localdomain ([162.219.34.250])
-        by smtp.gmail.com with ESMTPSA id j22sm6293910pfj.29.2022.01.10.01.12.18
+        by smtp.gmail.com with ESMTPSA id j22sm6293910pfj.29.2022.01.10.01.12.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 01:12:20 -0800 (PST)
+        Mon, 10 Jan 2022 01:12:28 -0800 (PST)
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
 To:     axboe@kernel.dk
 Cc:     jbacik@fb.com, tj@kernel.org, bvanassche@acm.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 06/13] blk: remove unused BLK_RQ_IO_DATA_LEN
-Date:   Mon, 10 Jan 2022 17:10:39 +0800
-Message-Id: <20220110091046.17010-7-jianchao.wan9@gmail.com>
+Subject: [PATCH 09/13] blk: rename ioprio.c to ioprio-common.c
+Date:   Mon, 10 Jan 2022 17:10:42 +0800
+Message-Id: <20220110091046.17010-10-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220110091046.17010-1-jianchao.wan9@gmail.com>
 References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
@@ -63,25 +63,33 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Wang Jianchao <wangjianchao@kuaishou.com>
 
-Remove it as nobody use it any more.
+In next patch, blk-ioprio.c is changed to a module named ioprio.ko.
+Rename ioprio.c to ioprio-common.c to avoid same ioprio.o in Makefile
 
 Signed-off-by: Wang Jianchao <wangjianchao@kuaishou.com>
 ---
- block/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+ block/Makefile                      | 2 +-
+ block/{ioprio.c => ioprio-common.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename block/{ioprio.c => ioprio-common.c} (100%)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 1c0d05df2aec..50cc1b56852c 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -133,7 +133,6 @@ config BLK_CGROUP_FC_APPID
- config BLK_CGROUP_IOCOST
- 	bool "Enable support for cost model based cgroup IO controller"
- 	depends on BLK_CGROUP
--	select BLK_RQ_IO_DATA_LEN
- 	select BLK_RQ_ALLOC_TIME
- 	help
- 	Enabling this option enables the .weight interface for cost
+diff --git a/block/Makefile b/block/Makefile
+index 8950913cbcc9..beacc3a03c8b 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -8,7 +8,7 @@ obj-y		:= bdev.o fops.o bio.o elevator.o blk-core.o blk-sysfs.o \
+ 			blk-exec.o blk-merge.o blk-timeout.o \
+ 			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+ 			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
+-			genhd.o ioprio.o badblocks.o partitions/ blk-rq-qos.o \
++			genhd.o ioprio-common.o badblocks.o partitions/ blk-rq-qos.o \
+ 			disk-events.o blk-ia-ranges.o
+ 
+ obj-$(CONFIG_BOUNCE)		+= bounce.o
+diff --git a/block/ioprio.c b/block/ioprio-common.c
+similarity index 100%
+rename from block/ioprio.c
+rename to block/ioprio-common.c
 -- 
 2.17.1
 
