@@ -2,211 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB8AC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 13:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C81FC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 13:47:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239294AbiAKNN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 08:13:57 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:31153 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239222AbiAKNN4 (ORCPT
+        id S240973AbiAKNrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 08:47:04 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:17339 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240678AbiAKNrD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 08:13:56 -0500
-Received: from kwepemi500003.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JYB0K1Tqkz8wCw;
-        Tue, 11 Jan 2022 21:11:13 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500003.china.huawei.com (7.221.188.51) with Microsoft SMTP Server
+        Tue, 11 Jan 2022 08:47:03 -0500
+Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JYBmL2H7Tz9ryK;
+        Tue, 11 Jan 2022 21:45:54 +0800 (CST)
+Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 11 Jan 2022 21:13:54 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 11 Jan 2022 21:13:54 +0800
-Subject: Re: [PATCH 0/5 v2] bfq: Avoid use-after-free when moving processes
- between cgroups
-To:     Jan Kara <jack@suse.cz>
-CC:     <linux-block@vger.kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20220105143037.20542-1-jack@suse.cz>
- <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
- <20220107145853.jvgupijrq2ejnhdt@quack3.lan>
- <db449ed5-85db-37e5-deb6-62fdeb124c90@huawei.com>
- <8d799a42-062b-491b-af7d-58ade50e1d2f@huawei.com>
- <20220111123603.rxzzuqdtdk57tlav@quack3.lan>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <6fef4448-8100-0651-2089-57f2c80e6297@huawei.com>
-Date:   Tue, 11 Jan 2022 21:13:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ 15.1.2308.20; Tue, 11 Jan 2022 21:47:01 +0800
+Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
+ (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Tue, 11 Jan
+ 2022 21:47:00 +0800
+From:   Laibin Qiu <qiulaibin@huawei.com>
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <john.garry@huawei.com>
+CC:     <martin.petersen@oracle.com>, <hare@suse.de>,
+        <johannes.thumshirn@wdc.com>, <andriy.shevchenko@linux.intel.com>,
+        <bvanassche@acm.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next v4] blk-mq: fix tag_get wait task can't be awakened
+Date:   Tue, 11 Jan 2022 22:02:16 +0800
+Message-ID: <20220111140216.1858823-1-qiulaibin@huawei.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-In-Reply-To: <20220111123603.rxzzuqdtdk57tlav@quack3.lan>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500004.china.huawei.com (7.185.36.219)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/01/11 20:36, Jan Kara 写道:
-> On Tue 11-01-22 16:28:35, yukuai (C) wrote:
->> 在 2022/01/10 9:49, yukuai (C) 写道:
->>> 在 2022/01/07 22:58, Jan Kara 写道:
->>>> On Fri 07-01-22 17:15:43, yukuai (C) wrote:
->>>>> 在 2022/01/05 22:36, Jan Kara 写道:
->>>>>> Hello,
->>>>>>
->>>>>> here is the second version of my patches to fix
->>>>>> use-after-free issues in BFQ
->>>>>> when processes with merged queues get moved to different
->>>>>> cgroups. The patches
->>>>>> have survived some beating in my test VM but so far I fail
->>>>>> to reproduce the
->>>>>> original KASAN reports so testing from people who can
->>>>>> reproduce them is most
->>>>>> welcome. Thanks!
->>>>>>
->>>>>> Changes since v1:
->>>>>> * Added fix for bfq_put_cooperator()
->>>>>> * Added fix to handle move between cgroups in bfq_merge_bio()
->>>>>>
->>>>>>                                  Honza
->>>>>> Previous versions:
->>>>>> Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
->>>>>> .
->>>>>>
->>>>>
->>>>> Hi,
->>>>>
->>>>> I repoduced the problem again with this patchset...
->>>>
->>>> Thanks for testing!
->>>>
->>>>> [   71.004788] BUG: KASAN: use-after-free in
->>>>> __bfq_deactivate_entity+0x21/0x290
->>>>> [   71.006328] Read of size 1 at addr ffff88817a3dc0b0 by task rmmod/801
->>>>> [   71.007723]
->>>>> [   71.008068] CPU: 7 PID: 801 Comm: rmmod Tainted: G        W
->>>>> 5.16.0-rc5-next-2021127
->>>>> [   71.009995] Hardware name: QEMU Standard PC (i440FX + PIIX,
->>>>> 1996), BIOS
->>>>> ?-20190727_073836-4
->>>>> [   71.012274] Call Trace:
->>>>> [   71.012603]  <TASK>
->>>>> [   71.012886]  dump_stack_lvl+0x34/0x44
->>>>> [   71.013379]  print_address_description.constprop.0.cold+0xab/0x36b
->>>>> [   71.014182]  ? __bfq_deactivate_entity+0x21/0x290
->>>>> [   71.014795]  ? __bfq_deactivate_entity+0x21/0x290
->>>>> [   71.015398]  kasan_report.cold+0x83/0xdf
->>>>> [   71.015904]  ? _raw_read_lock_bh+0x20/0x40
->>>>> [   71.016433]  ? __bfq_deactivate_entity+0x21/0x290
->>>>> [   71.017033]  __bfq_deactivate_entity+0x21/0x290
->>>>> [   71.017617]  bfq_pd_offline+0xc1/0x110
->>>>> [   71.018105]  blkcg_deactivate_policy+0x14b/0x210
->>>> ...
->>>>
->>>>> Here is the caller of  __bfq_deactivate_entity:
->>>>> (gdb) list *(bfq_pd_offline+0xc1)
->>>>> 0xffffffff81c504f1 is in bfq_pd_offline (block/bfq-cgroup.c:942).
->>>>> 937                      * entities to the idle tree. It happens
->>>>> if, in some
->>>>> 938                      * of the calls to bfq_bfqq_move() performed by
->>>>> 939                      * bfq_reparent_active_queues(), the
->>>>> queue to move
->>>>> is
->>>>> 940                      * empty and gets expired.
->>>>> 941                      */
->>>>> 942                     bfq_flush_idle_tree(st);
->>>>> 943             }
->>>>> 944
->>>>> 945             __bfq_deactivate_entity(entity, false);
->>>>
->>>> So this is indeed strange. The group has in some of its idle service
->>>> trees
->>>> an entity whose entity->sched_data points to already freed cgroup. In
->>>> particular it means the bfqq_entity_service_tree() leads to
->>>> somewhere else
->>>> than the 'st' we called bfq_flush_idle_tree() with. This looks like a
->>>> different kind of problem AFAICT but still it needs fixing :). Can you
->>>> please run your reproducer with my patches + the attached debug patch on
->>>> top? Hopefully it should tell us more about the problematic entity
->>>> and how
->>>> it got there... Thanks!
->>>
->>> Hi,
->>>
->>> I'm not sure I understand what you mean... I reporduced again with your
->>> debug patch applied, however, no extra messages are printed.
->>>
->>> I think this is exactly the same problem we discussed before:
->>>
->>> 1) bfqq->new_bfqq is set, they are under g1
->>> 2) bfqq is moved to another group, and user thread of new_bfqq exit
->>> 3) g1 is offlied
->>> 3) io issued from bfqq will end up in new_bfqq, and the offlined
->>> g1 will be inserted to st of g1's parent.
->>>
->>> Currently such entity should be in active tree, however, I think it's
->>> prossible that it can end up in idle tree throuph deactivation of
->>> entity?
->>>
->>> 4) io is done, new_bfqq is deactivated
->>> 5) new_bfqq is freed, and then g1 is freed
->>> 6) the problem is triggered when g1's parent is offlined.
->>
->> Hi,
->>
->> I applied the following modification and the problem can't be
->> repoduced anymore.
->>
->> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
->> index 24a5c5329bcd..9b29af66635f 100644
->> --- a/block/bfq-cgroup.c
->> +++ b/block/bfq-cgroup.c
->> @@ -730,8 +730,19 @@ static struct bfq_group *__bfq_bic_change_cgroup(struct
->> bfq_data *bfqd,
->>
->>          if (sync_bfqq) {
->>                  entity = &sync_bfqq->entity;
->> -               if (entity->sched_data != &bfqg->sched_data)
->> +               if (entity->sched_data != &bfqg->sched_data) {
->> +                       if (sync_bfqq->new_bfqq) {
->> +                               bfq_put_queue(sync_bfqq->new_bfqq);
->> +                               sync_bfqq->new_bfqq = NULL;
->> +                       }
->> +
->> +                       if (bfq_bfqq_coop(sync_bfqq)) {
->> +                               bic->stably_merged = false;
->> +                               bfq_mark_bfqq_split_coop(sync_bfqq);
->> +                       }
->> +
->>                          bfq_bfqq_move(bfqd, sync_bfqq, bfqg);
->> +               }
->>
->> I'm not sure if we can set sync_bfqq->new_bfqq = NULL here, however,
->> this can make sure the problem here really is what we discussed
->> before...
-> 
-> OK, if this fixed the problem for you then I'm wondering why
-> 
->    WARN_ON_ONCE(sync_bfqq->new_bfqq);
-> 
-> in my patch "bfq: Split shared queues on move between cgroups" didn't
-> trigger? Now I see how sync_bfqq->new_bfqq can indeed be != NULL here so I
-> agree with the change in principle (it has to use bfq_put_cooperator()
-> though) but I'm wondering why the WARN_ON didn't trigger. Or you just
-> didn't notice?
-Hi,
+In case of shared tags, there might be more than one hctx which
+allocates from the same tags, and each hctx is limited to allocate at
+most:
+        hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
 
-When the repoducer start running, the WARN_ON() will be triggered
-immediately, sorry that the missing log lead to misunderstanding.
+tag idle detection is lazy, and may be delayed for 30sec, so there
+could be just one real active hctx(queue) but all others are actually
+idle and still accounted as active because of the lazy idle detection.
+Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
+forever on this real active hctx.
 
-Thanks,
-Kuai
-> 
-> 								Honza
-> 
+Fix this by recalculating wake_batch when inc or dec active_queues.
+
+Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
+Suggested-by: Ming Lei <ming.lei@redhat.com>
+Suggested-by: John Garry <john.garry@huawei.com>
+Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+---
+ block/blk-mq-tag.c      | 39 ++++++++++++++++++++++++++++++++-------
+ include/linux/sbitmap.h | 11 +++++++++++
+ lib/sbitmap.c           | 22 +++++++++++++++++++---
+ 3 files changed, 62 insertions(+), 10 deletions(-)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index e55a6834c9a6..48b00d56141a 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -16,6 +16,21 @@
+ #include "blk-mq-sched.h"
+ #include "blk-mq-tag.h"
+ 
++/*
++ * Recalculate wakeup batch when tag is shared by hctx.
++ */
++static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
++		unsigned int users)
++{
++	if (!users)
++		return;
++
++	sbitmap_queue_recalculate_wake_batch(&tags->bitmap_tags,
++			users);
++	sbitmap_queue_recalculate_wake_batch(&tags->breserved_tags,
++			users);
++}
++
+ /*
+  * If a previously inactive queue goes active, bump the active user count.
+  * We need to do this before try to allocate driver tag, then even if fail
+@@ -24,18 +39,25 @@
+  */
+ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
++	unsigned int users;
+ 	if (blk_mq_is_shared_tags(hctx->flags)) {
+ 		struct request_queue *q = hctx->queue;
+ 
+-		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
+-		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+-			atomic_inc(&hctx->tags->active_queues);
++		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
++		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
++			return true;
++		}
+ 	} else {
+-		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+-		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-			atomic_inc(&hctx->tags->active_queues);
++		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
++		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
++			return true;
++		}
+ 	}
+ 
++	users = atomic_inc_return(&hctx->tags->active_queues);
++
++	blk_mq_update_wake_batch(hctx->tags, users);
++
+ 	return true;
+ }
+ 
+@@ -56,6 +78,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
+ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct blk_mq_tags *tags = hctx->tags;
++	unsigned int users;
+ 
+ 	if (blk_mq_is_shared_tags(hctx->flags)) {
+ 		struct request_queue *q = hctx->queue;
+@@ -68,7 +91,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 			return;
+ 	}
+ 
+-	atomic_dec(&tags->active_queues);
++	users = atomic_dec_return(&tags->active_queues);
++
++	blk_mq_update_wake_batch(tags, users);
+ 
+ 	blk_mq_tag_wakeup_all(tags, false);
+ }
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index fc0357a6e19b..95df357ec009 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -415,6 +415,17 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
+ 	sbitmap_free(&sbq->sb);
+ }
+ 
++/**
++ * sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch
++ * @sbq: Bitmap queue to recalculate wake batch.
++ * @users: Number of shares.
++ *
++ * Like sbitmap_queue_update_wake_batch(), this will calculate wake batch
++ * by depth. This interface is for HCTX shared tags or queue shared tags.
++ */
++void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
++					    unsigned int users);
++
+ /**
+  * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
+  * @sbq: Bitmap queue to resize.
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 2709ab825499..94b3272effd8 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -457,10 +457,9 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+ }
+ EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
+ 
+-static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+-					    unsigned int depth)
++static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
++					    unsigned int wake_batch)
+ {
+-	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
+ 	int i;
+ 
+ 	if (sbq->wake_batch != wake_batch) {
+@@ -476,6 +475,23 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+ 	}
+ }
+ 
++static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
++					    unsigned int depth)
++{
++	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
++
++	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
++}
++
++void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
++					    unsigned int users)
++{
++	unsigned int wake_batch = clamp_t(unsigned int,
++			(sbq->sb.depth + users - 1) / users, 4U, SBQ_WAKE_BATCH);
++	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
++}
++EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
++
+ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
+ {
+ 	sbitmap_queue_update_wake_batch(sbq, depth);
+-- 
+2.22.0
+
