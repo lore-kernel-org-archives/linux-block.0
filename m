@@ -2,185 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECCBC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 04:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5970C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 06:48:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233909AbiAKEdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 23:33:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33970 "EHLO
+        id S234182AbiAKGsU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 01:48:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbiAKEdB (ORCPT
+        with ESMTP id S1348284AbiAKGsS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 23:33:01 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA24C06173F;
-        Mon, 10 Jan 2022 20:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Weh6b9gFW7u95WZ3fLgbX0xHy9YQw+y8aATtGfb9KPk=; b=QbEVmLb7c71g917OtGsCpYozqz
-        NahoDOK/ASMcUKOsu8udIeCBf7rigwUpe17iM9vaZsxms0gwiYv74P/RUIZesqYIcv4/bgM7D92cE
-        OUo+2dK5IqhimAh4KvP9MBSgIpQmy9oD3lk+R6zzZDsIC5EvPaI/sR6nZNo3ENDOrWrH5uExLX/qQ
-        9sRGHC2d2IuVaNdNwZKYoKblFN1JOIhANzNpXPKbEXQ5zRayxoS7X9I3HoxbjQfqdilVLIV4FjmVx
-        65MinbN8fCC2biLDFMYV54SUO1f1oKjno5s+fAzi26w/3BM3QTvBzkmUp3v1iLy5hJW17b5I6UeXS
-        xV4oTKag==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n78q8-002y1G-Cq; Tue, 11 Jan 2022 04:32:56 +0000
-Date:   Tue, 11 Jan 2022 04:32:56 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        nvdimm@lists.linux.dev
-Subject: Re: Phyr Starter
-Message-ID: <Yd0IeK5s/E0fuWqn@casper.infradead.org>
-References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
- <20220111004126.GJ2328285@nvidia.com>
+        Tue, 11 Jan 2022 01:48:18 -0500
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95222C061751
+        for <linux-block@vger.kernel.org>; Mon, 10 Jan 2022 22:48:18 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id o1so13453172ilo.6
+        for <linux-block@vger.kernel.org>; Mon, 10 Jan 2022 22:48:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4ITfgoI/hkOmitkObr0MHrURTFUggwhsmZdLLG4Gu2M=;
+        b=GABoh6pTU+pkl9fJ9X9wQyh8l3BAM0EjSTJ8UZIw0e63NG2i+GA0fm1hYaysk5wJN/
+         H6rs77qHpwEimHUe1jN16hBsJvebs6S6fU8PUu1jDtpC9JDJcieelEGDirjE0k1vGY/6
+         evh2E5j4Td1nsfFrfbq6WvpWZo/Ivt2UBOK5ModiZ8TiC6NvdCFgUAXQEhe/94cZ8avk
+         7WH8xDyE0nNWwbHlSFq8P0vDA0Fs56hR7Y0O7DjoXqVO5TfLrnMVeGRrZwhJKPL5e7R7
+         vYs3TXmDX0vytbI8UQyI4rdkpOTLj0bu+BSlUn7jhUsKuQolqvkehX/TepcNEfU6lMt8
+         58nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4ITfgoI/hkOmitkObr0MHrURTFUggwhsmZdLLG4Gu2M=;
+        b=lxPgbXaqBjVqPkq4RNa7Anw6GkmIqhrDNQE7tVhjOPl4A1lR8zSpDHW+HfFhjQUCfj
+         amDjMlevoJGY24WE7GVG07kx4qm7UWLwWAlA8/3ML3Wj+PI6vE0JcZlu6i+JjSuODOYk
+         9INbnb2OP1Cyj/lLWiXKu/GxjA9cWuiuqz6IXLsXct7QiGG0pFac1xRRTESmXFr0OiP3
+         ZLY54XQ8CKoK1JkyYK/eW2ewb/UvpLRnoWK7IhEBoKwCJenGNH4S7u8H4jcVIKGFxl+u
+         6ywafm+DU3k9Ox7xYprCELy22VxWbfUb1cA4uD9eNfcqpcWpC2yXIII8+oQml6IQiIP5
+         W1tg==
+X-Gm-Message-State: AOAM533UYHQBgzeGDUWqNxROV3uZiqo0nFtq7+93S9yz0MFRs67DJ0m9
+        +BSXBVHOYTTsXOs6xbFsGIKuOQ==
+X-Google-Smtp-Source: ABdhPJxkBBT+vJl/fMTZBYKd1S3+ewDILh1A0DcwFOkufVI7CJv0nZmtTj3GQxdMLl6jqhJ6R/uVQw==
+X-Received: by 2002:a05:6e02:12ee:: with SMTP id l14mr1645211iln.313.1641883697841;
+        Mon, 10 Jan 2022 22:48:17 -0800 (PST)
+Received: from google.com ([2620:15c:183:200:bdd9:6181:19a:9d62])
+        by smtp.gmail.com with ESMTPSA id n6sm4481201ili.60.2022.01.10.22.48.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 22:48:17 -0800 (PST)
+Date:   Mon, 10 Jan 2022 23:48:13 -0700
+From:   Yu Zhao <yuzhao@google.com>
+To:     Mauricio Faria de Oliveira <mfo@canonical.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, Huang Ying <ying.huang@intel.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Yang Shi <shy828301@gmail.com>
+Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
+ direct IO read
+Message-ID: <Yd0oLWtVAyAexyQc@google.com>
+References: <20220105233440.63361-1-mfo@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220111004126.GJ2328285@nvidia.com>
+In-Reply-To: <20220105233440.63361-1-mfo@canonical.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 08:41:26PM -0400, Jason Gunthorpe wrote:
-> On Mon, Jan 10, 2022 at 07:34:49PM +0000, Matthew Wilcox wrote:
-> 
-> > Finally, it may be possible to stop using scatterlist to describe the
-> > input to the DMA-mapping operation.  We may be able to get struct
-> > scatterlist down to just dma_address and dma_length, with chaining
-> > handled through an enclosing struct.
-> 
-> Can you talk about this some more? IMHO one of the key properties of
-> the scatterlist is that it can hold huge amounts of pages without
-> having to do any kind of special allocation due to the chaining.
-> 
-> The same will be true of the phyr idea right?
+On Wed, Jan 05, 2022 at 08:34:40PM -0300, Mauricio Faria de Oliveira wrote:
+> diff --git a/mm/rmap.c b/mm/rmap.c
+> index 163ac4e6bcee..8671de473c25 100644
+> --- a/mm/rmap.c
+> +++ b/mm/rmap.c
+> @@ -1570,7 +1570,20 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
+>  
+>  			/* MADV_FREE page check */
+>  			if (!PageSwapBacked(page)) {
+> -				if (!PageDirty(page)) {
+> +				int ref_count = page_ref_count(page);
+> +				int map_count = page_mapcount(page);
+> +
+> +				/*
+> +				 * The only page refs must be from the isolation
+> +				 * (checked by the caller shrink_page_list() too)
+> +				 * and one or more rmap's (dropped by discard:).
+> +				 *
+> +				 * Check the reference count before dirty flag
+> +				 * with memory barrier; see __remove_mapping().
+> +				 */
+> +				smp_rmb();
+> +				if ((ref_count - 1 == map_count) &&
+> +				    !PageDirty(page)) {
+>  					/* Invalidate as we cleared the pte */
+>  					mmu_notifier_invalidate_range(mm,
+>  						address, address + PAGE_SIZE);
 
-My thinking is that we'd pass a relatively small array of phyr (maybe 16
-entries) to get_user_phyr().  If that turned out not to be big enough,
-then we have two options; one is to map those 16 ranges with sg and use
-the sg chaining functionality before throwing away the phyr and calling
-get_user_phyr() again.  The other is to stash those 16 ranges somewhere
-(eg a resizing array of some kind) and keep calling get_user_phyr()
-to get the next batch of 16; once we've got the entire range, call
-sg_map_phyr() passing all of the phyrs.
-
-> > I would like to see phyr replace bio_vec everywhere it's currently used.
-> > I don't have time to do that work now because I'm busy with folios.
-> > If someone else wants to take that on, I shall cheer from the sidelines.
-> > What I do intend to do is:
-> 
-> I wonder if we mixed things though..
-> 
-> IMHO there is a lot of optimization to be had by having a
-> datastructure that is expressly 'the physical pages underlying a
-> contiguous chunk of va'
-> 
-> If you limit to that scenario then we can be more optimal because
-> things like byte granular offsets and size in the interior pages don't
-> need to exist. Every interior chunk is always aligned to its order and
-> we only need to record the order.
-> 
-> An overall starting offset and total length allow computing the slice
-> of the first/last entry.
-> 
-> If the physical address is always aligned then we get 12 free bits
-> from the min 4k alignment and also only need to store order, not an
-> arbitary byte granular length.
-> 
-> The win is I think we can meaningfully cover most common cases using
-> only 8 bytes per physical chunk. The 12 bits can be used to encode the
-> common orders (4k, 2M, 1G, etc) and some smart mechanism to get
-> another 16 bits to cover 'everything'.
-> 
-> IMHO storage density here is quite important, we end up having to keep
-> this stuff around for a long time.
-> 
-> I say this here, because I've always though bio_vec/etc are more
-> general than we actually need, being byte granular at every chunk.
-
-Oh, I can do you one better on the bit-packing scheme.  There's a
-representation of every power-of-two that is naturally aligned, using
-just one extra bit.  Let's say we have 3 bits of address space and
-4 bits to represent any power of two allocation within that address
-space:
-
-0000 index-0, order-0
-0010 index-1, order-0
-...
-1110 index-7, order-0
-0001 index-0, order-1
-0101 index-2, order-1
-1001 index-4, order-1
-1101 index-6, order-1
-0011 index-0, order-2
-1011 index-4, order-2
-0111 index-0, order-3
-
-1111 has no meaning and can be used to represent an invalid range, if
-that's useful.  The lowest clear bit decodes to the order, and
-(x & (x+1))/2 gets you the index.
-
-That leaves you with another 11 bits to represent something smart about
-partial pages.
-
-The question is whether this is the right kind of optimisation to be
-doing.  I hear you that we want a dense format, but it's questionable
-whether the kind of thing you're suggesting is actually denser than this
-scheme.  For example, if we have 1GB pages and userspace happens to have
-allocated pages (3, 4, 5, 6, 7, 8, 9, 10) then this can be represented
-as a single phyr.  A power-of-two scheme would have us use four entries
-(3, 4-7, 8-9, 10).
-
-Using a (dma_addr, size_t) tuple makes coalescing adjacent pages very
-cheap.  If I have to walk PTEs looking for pages which can be combined
-together, I end up with interesting behaviour where the length of the
-list shrinks and expands.  Using the example above, as I walk successive
-PUDs, the data struct looks like this:
-
-(3)
-(3, 4)
-(3, 4-5)
-(3, 4-5, 6)
-(3, 4-7)
-(3, 4-7, 8)
-(3, 4-7, 8-9)
-(3, 4-7, 8-9, 10)
-
-We could end up with a situation where we stop because the array is
-full, even though if we kept going, it'd shrink back down below the
-length of the array (in this example, an array of length 2 would stop
-when it saw page 6, even though page 7 shrinks it back down again).
-
-> What is needed is a full scatterlist replacement, including the IOMMU
-> part.
-> 
-> For the IOMMU I would expect the datastructure to be re-used, we start
-> with a list of physical pages and then 'dma map' gives us a list of
-> IOVA physical pages, in another allocation, but exactly the same
-> datastructure.
-> 
-> This 'dma map' could return a pointer to the first datastructure if
-> there is no iommu, allocate a single entry list if the whole thing can
-> be linearly mapped with the iommu, and other baroque cases (like pci
-> offset/etc) will need to allocate full array. ie good HW runs fast and
-> is memory efficient.
-> 
-> It would be nice to see a patch sketching showing what this
-> datastructure could look like.
-> 
-> VFIO would like this structure as well as it currently is a very
-> inefficient page at a time loop when it iommu maps things.
-
-I agree that you need these things.  I think I'll run into trouble
-if I try to do them for you ... so I'm going to stop after doing the
-top end (pinning pages and getting them into an sg list) and let
-people who know that area better than I do work on that.
+Out of curiosity, how does it work with COW in terms of reordering?
+Specifically, it seems to me get_page() and page_dup_rmap() in
+copy_present_pte() can happen in any order, and if page_dup_rmap()
+is seen first, and direct io is holding a refcnt, this check can still
+pass?
