@@ -2,251 +2,262 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9BCC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 11:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9B3C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 11:18:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238186AbiAKLDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 06:03:18 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:47854 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238145AbiAKLDS (ORCPT
+        id S238292AbiAKLSg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 06:18:36 -0500
+Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:13148 "EHLO
+        esa3.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238137AbiAKLSf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 06:03:18 -0500
-Received: by mail-il1-f199.google.com with SMTP id g14-20020a056e021e0e00b002a26cb56bd4so7751952ila.14
-        for <linux-block@vger.kernel.org>; Tue, 11 Jan 2022 03:03:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=SvKZTa68HXu7QD4i2AGs0+tntAMij4q7jyYjSzoxnBw=;
-        b=12fRkwYbQmGOqpNs+nAu43hDrluwKeIymnqJlhLxVqcjGV21fOotzGrP7TdSms1Os8
-         //w6OPFRTFrRdCHS4Njx2tnSqA/+uh+HnOPvXUI1zQneO7eSh6r6VLrThEEIz6dO5KNa
-         1mfem1/qTx17fCMbgOGp4+cJIGXaYTtS12QjQAbKlrVDnEys9d3aI0yP8BnyZDAec35F
-         3DlvUZfjpwH8OcWvIHyhL1GVMVMf3h55n2t1GABXvm4VxkEoRnb4POKD+nTCgOEr81T7
-         iLWEmj1N6mc0y1OHRcaw3MK/67l8k7vhMZE1A0LpvjvdSR4UodvFIYnzrc7JIErgU65h
-         IXzQ==
-X-Gm-Message-State: AOAM533Xz60T2w7UMElsCGPlo2ySRpOLT/9KKUqobdCiH8gShpkDKK+c
-        a+67gY5FsLgrTG7epJzM2COF0dsvTVXq/rf97Q9zVrve3bnn
-X-Google-Smtp-Source: ABdhPJxuCvuULKufbJcbdPC16proZAKGjsigW5n3Atjpy5M6rvajnc/51odPS1pvc5hso1aQu1y5ER1CFGINgJvGVU6J6Vo/a5KN
+        Tue, 11 Jan 2022 06:18:35 -0500
+X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Jan 2022 06:18:35 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1641899915;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=+FoSMuDBKeH6aEXUH+JLFA1KOxwJzJTpMqM/2dl5nIE=;
+  b=dBWYRoX1nxvPUpI7e949THW0k4kuE0el6T6LEVYqc5ZFUkp6qG1XZvvU
+   ntAwwiZPCvRf1pH8IXGQ6b7vYhO4n2x5TtcHqLgv9vclzzX4yOkw+dNcC
+   4s7Sl2gQdThonbzY4Ph59Pr5+iOxMEgEzSPHmKW7iQ5smvSZLihyInVfz
+   g=;
+Authentication-Results: esa3.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
+IronPort-SDR: +LNhzxgyQIwGFZ5VV6qDOzBvNMLcq5gBJ6Qly+qzJynxF/aJZ8v2GSXyhhTU1Qe/XUzsCWs9ZG
+ zndvA2sFmWxFp/cdUOnSlAFe8dTD/Mf3c0uz/HvLaImKGJhuSGarQm6IjfZcBJ+gmA3j2jcOzG
+ b4t3pmzFrSBoNCZwA4RVbkukkIWutLJw+BoYXWH/QZr40gryeOjqieLlAuzPt8hJ83lIF7nNCY
+ 2FpP3TLXoE7KuPoI+dWwD3xmKs7PlgCOkJADSAkw17s7DrPgaM3dgpITfAoA/cijtipM9Lh/vJ
+ MbcsE9njnUW6KClRkHINz1jF
+X-SBRS: 5.2
+X-MesageID: 61727851
+X-Ironport-Server: esa3.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.156.83
+X-Policy: $RELAYED
+IronPort-Data: A9a23:zlVqz6p1B8lhTSNjk34AyjEBx0peBmJrYxIvgKrLsJaIsI4StFCzt
+ garIBnQOvmJNGL3c90lPd7goBwDvpCHyNFjQQdo/iA9Hy0b9puZCYyVIHmrMnLJJKUvbq7GA
+ +byyDXkBJppJpMJjk71atANlZT4vE2xbuKU5NTsY0idfic5Dndx4f5fs7Rh2NQw2IHgW1rlV
+ e7a+KUzBnf0g1aYDUpMg06zgEsHUCPa4W5wUvQWPJinjXeG/5UnJMt3yZKZdhMUdrJ8DO+iL
+ 9sv+Znilo/vE7XBPfv++lrzWhVirrc/pmFigFIOM0SpqkAqSiDfTs/XnRfTAKtao2zhojx/9
+ DlCnbHuViVuGYv2ouYyUCRJIxNDI6JsoZaSdBBTseTLp6HHW37lwvEoB0AqJ4wIvO1wBAmi9
+ 9RBdmpLNErawbvrnvTrEYGAhex6RCXvFJkYtXx6iynQEN4tQIzZQrWM7thdtNs1rp4XQqyBN
+ 5dAAdZpRFfdbzoSE1YqNL8Vob2q1l/CfSxW913A8MLb5ECMlVcsgdABKuH9atGMAMlYgEucj
+ mbH5HjiRAEXMsSFzjiI+W7qgfXA9Qv5V5gVD6aQ7eNxjRuYwWl7IBkXU0ar5Pq0kEizX/pBJ
+ EEOvCkjt64/8AqsVNaVdxm5pmOU+xQYXNFTO/M15RvLyafO5QudQG8eQVZpc94+vdU1bTUv3
+ 02OmZXlCFRHua2fTn+19bqOqz62fyQWRUcHZSIVSwYt6tzqsoY1yB7CJv5qFK+6k9rvGBn5x
+ jmYqy54jLIW5eYB0L+65hbAmC62oYbSTR8d4R/eVWaoqAh+YeaYi5eAsAaBq6wadcDAEwfH7
+ CNsd9WiAP4mIM+StmuqZt83Hp6q2ue1AgDCjnQ2Nsx0n9iywEKLcYdV6TB4AU5mNMcYZDPkC
+ HPuVRNtCIx7ZyXzM/IuC26lI4FzlPW7S4y5PhzBRocWOvBMmBm7EDaCjKJ690TkiwASnK42I
+ v93mu78XC9BWcyLINdbLtrxMIPHJAhjnQs/prihlnxLNIZyglbPEt/p13PUP4gEAFus+lm9z
+ jqmH5LiJ+9jeOP/eDLL1oUYMEoHK3M2bbiv9ZAOJrLbe1s+Qzx5YxM0/V/HU9Y+90iyvr2Zl
+ kxRp2cCkAav7ZE5AVjiho9fhEPHAs8k8CNT0d0ENle0wXkzCbtDH49EH6bbiYIPrbQ5pdYtF
+ qFtU5zZXpxnF2qbkxxAM8iVhNEyJXyD2FPVVwL4MWdXQnKVb1GTkjMSVlGxpHBm4+venZZWn
+ oBMISuAEMVTHFozXZ+GAB9tpnvo1UUgdCtJdxKgCvFYeVn28ZgsLCr0j/QtJNoLJwmFzTyfv
+ zt6yz9BzQUUi4NqotTPm46eqIKlT7l3EkZARjGJ5reqLyjKuGGkxNYYAuqPeDncUkLy+bmjO
+ roJn62tbqVfkQYYqZd4HpZq0bk6u4nlqYhFw1k2B37MdVmqVO9teyHUwclVu6RR7bZFog/qC
+ FmX89xXNOzRasPoGVIcPiQ/aeGH2a1GkzXe961tck77+DV27PyMVkALZ0uAjylULb1UNoI5w
+ Lh+5J5KulLn0hdza4SIlCFZ8WiIP0csaaR/u8FIGpLvhyoq1kpGPc7WBBjp7czdcN5LKEQrf
+ GOZ3fKQm7RGy0PeWHMvDnyRj/FFjJEDtR0Wnl8PI1OFxojMivMthUAD9D02SkJezwld0vI1M
+ W9ubhUnKaKL9jZupc5CQ2HzRF0RWEzHohT8mwkTiWnUb0i0TWicfmQyNNGE8F0d728BLCNQ+
+ 6uVyTq9XDvnFC0rMvDehaKxRyTfcOFM
+IronPort-HdrOrdr: A9a23:ankYLaziIgMQgF2FMda3KrPwIr1zdoMgy1knxilNoH1uHvBw8v
+ rEoB1173DJYVoqNk3I++rhBEDwexLhHPdOiOF6UItKNzOW21dAQrsSiLfK8nnNHDD/6/4Y9Y
+ oISdkbNDQoNykZsfrH
+X-IronPort-AV: E=Sophos;i="5.88,279,1635220800"; 
+   d="scan'208";a="61727851"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MtZlmloa5NjDpfBJQTxhye7c7JuLPtDAkvx1Q6hQ7VOdvm+PpSU2xvfbuYYAZIdIyo+hb+zndZOd/iMLaNHHdwBj09WhOIYQrsYXWux/d+n7E/sNhrKn1M8Rg3hfLOrGrDc4NrYfuNP0yHJFrJ/ctJNXgg9L/fPyasCT+1PYDfkaV28QVRzNlWMnWHdqljyeeB+8oxtkklauJT4ygpxvFOb13mXCAcoap/mEeLn5oUrxXsqynyj80tdYZ7dTt3MdfqVDT1OtFQua9cIt0EulN9rJj5CSeAO2WLRt6lGf9jIUp2DtgsPvqkrLwzd/VnPwr+XoSXIrv4rheQtf/DdAzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4vbVjBIbKzztlAe9vCcCRtVaFrKaWxxjBst7/u1OVq4=;
+ b=FijY9vWbTiWmmKqfl5e/6IYr+Hl5trJs/tCkF7he/+aqmDTJSD68SwBxUEarjmgZRSVSw2R6k4YXAgugCDF9Yp/+JGqF46M8wzTET9u8VIyl8HKI6oky2jrsyUV/cPLe1dIV/Mbx6qqWXGxCmOzQUYvg72I6Y9R4icjzbuwdFzGwkbeOYYEY32toPRLAkuSIzyirEklzM7nrkRyj/e9tQvUc36l3/kHaVad3a/HBGbiftinbhDbOufIx3HJHC1S8fH6rxgA7e+5Nxh8kh7/cEBw2jRrRUlX+2unVUlFymuL+MVcRIwx+o1stdH5BuNuu4pvbw6BMtYDoenCOXwlgew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4vbVjBIbKzztlAe9vCcCRtVaFrKaWxxjBst7/u1OVq4=;
+ b=V2h5QEMyn+h1fHP6YxkjXyUF1ZToXayYCZ98Dv0F9OshjQb48GHzr8OH7rUFU5AOi+jh6MpxDp9VXK+g6qicChyA21YpW//UoxWAlAXlc1BEOOYHydiYigIPGVz1v1OUb0RPp2vpxfOScC2TVx/xWHcRpCHMhMy2Pn9AKnMhrs8=
+Date:   Tue, 11 Jan 2022 12:11:15 +0100
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Maximilian Heyne <mheyne@amazon.de>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Anthony Liguori <aliguori@amazon.com>,
+        SeongJae Park <sjpark@amazon.de>,
+        Juergen Gross <jgross@suse.com>,
+        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] xen, blkback: fix persistent grants negotiation
+Message-ID: <Yd1l01jTPwx5oBuo@Air-de-Roger>
+References: <20220106091013.126076-1-mheyne@amazon.de>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220106091013.126076-1-mheyne@amazon.de>
+X-ClientProxiedBy: MRXP264CA0014.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:500:15::26) To DS7PR03MB5608.namprd03.prod.outlook.com
+ (2603:10b6:5:2c9::18)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2615:: with SMTP id m21mr2019712jat.271.1641898997559;
- Tue, 11 Jan 2022 03:03:17 -0800 (PST)
-Date:   Tue, 11 Jan 2022 03:03:17 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000081b56205d54c6667@google.com>
-Subject: [syzbot] KASAN: use-after-free Read in srcu_invoke_callbacks
-From:   syzbot <syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com>
-To:     andrii@kernel.org, ast@kernel.org, axboe@kernel.dk,
-        bpf@vger.kernel.org, daniel@iogearbox.net,
-        john.fastabend@gmail.com, kafai@fb.com, kpsingh@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bc51d806-8853-454a-0c36-08d9d4f3182d
+X-MS-TrafficTypeDiagnostic: DM6PR03MB3579:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR03MB3579241225EF1DF9195BDD188F519@DM6PR03MB3579.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bG9W7xQbLt+Fz/Bw5ozsPnIiTsbvl1uiENCeEeeyeXzjsNnypH5eSBvhnN8XwnJ6T0U7kHsT56bxhuBUy+0/0OcYIvUxIjH+SX8k4DqpkW5fKO+ceLMQm9FlxOI3oWBJK3tou+J/dgEIJzF+43g9r13idBA8gCqmZt58rjtqfw8iO26p6IHjneKk1VSKnYA4JMNPNwRLn6Atmlv/dJHb3xnUnFLPWGOSIIuxsALnoZS8BTH910UtgpR0+xQnAzEdGNd3JTba6SBYseEBAsegJDarpOmGv99eQAR6d8qAVoC3EC29QecUaxdXRbGDGI6Mi7+0csh3hi6P60r6hu4leKYFo6Sl7rRvDOwk69dtHywofaXRVUimzzGjLWka/FWM3UivEAVuP/7VRneH7MFv/Wjei/WVhv7M6d2hhy/ZHLdIQ4PLTxUSlL98bYqxqXp1nrqxLTtqlyjDY/uVfsa871dYP1g6jCr5m6C7hYR6NGA6FuPnu/Kr60yCzRLv0Nfh/lzXgsB1Y+UvnidQOJwBUetXC39XUNYQ9Ju7TIgztx57WN3PN7jyOjxcJnWC1OJBhBu/aP+zekaIBvtQtTu7KpiGJEcz6nBaj/26Vj1Xp/ZH3/VAHxVuM2x8IYt1AiNVtPkbZzdmwTJFNE34ha22+w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(4636009)(366004)(82960400001)(4326008)(9686003)(38100700002)(83380400001)(6486002)(6512007)(5660300002)(6916009)(66946007)(54906003)(66476007)(66556008)(508600001)(85182001)(8676002)(2906002)(186003)(316002)(26005)(6506007)(6666004)(8936002)(33716001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MjRBUVYzcmVyWnZtYUlkZS83ckQ0T2hvemxFUXNvQSsrRVY1aGdPM1NsWklY?=
+ =?utf-8?B?U1BrQUk5bXArbElrc3g0c294SEJ6OEZtRnhQdjVxU3Uva0N6OWs4d05NZ2VT?=
+ =?utf-8?B?RVZFSjQvZVhTZmJOdWttdXpzT1ZkdVR6ZWRaZjNMTmRNb2NuaXR2cUlOVFBo?=
+ =?utf-8?B?U3ZydWZPMjQyeU5PWG1hMXAwOUJUeEZPdjVCOGpDNjFxQnYxQ3RacTNTNS9n?=
+ =?utf-8?B?bFpQdmJQbVhzeS9ZTW8wVUpza2VIYVNRZGxBZThiVFNjSnU2VHVjNUhJMkpR?=
+ =?utf-8?B?V2R6TXVmVThiWUl1WGJ3Z1dnNlozT2pqWDFsNmJSVFhQVkMrL2ZRY0JLUVdB?=
+ =?utf-8?B?NmxHVjQrRUpGbVVqOE5vVXdqTlZFZGllaDJBN1dHUEVYUEtBMU5zL0U2NXRT?=
+ =?utf-8?B?YUdjdnNhN0k5RTg0SGtobFNXelN0aUJtQkNUeGpWTGdiYkFwSTNSYkVTN2NX?=
+ =?utf-8?B?OGJ0aU1wUUNPUmpqOEw2dWxuWTFzZDFScWdwZUVGdG43L3JkWDVVYmp5d0JS?=
+ =?utf-8?B?bGl6Z0JiM2xtQUs2dGtMZnFGREZWZzZzd1NRVVpkbFdDd0hkOGE4R0xQbmFo?=
+ =?utf-8?B?U04xZWlPQjdCRmsvVXhKWGhSZ3hQVmpXak9XNHdGaGpTRUQzV2J3eUNMM3dQ?=
+ =?utf-8?B?ZThQd3paa3BVNE4wMzRkUE5OS1A3Z2JlbU1LcXZzS1haZEFtZ29nb0xpRWhi?=
+ =?utf-8?B?OFNYV0ZmdStTdUx4QVo1azVXNFFXOGk1ZjdtZnFIOVNsN1VlSFBaS2R6TnEz?=
+ =?utf-8?B?WFZzZngvYkRLRVo1YURqcjJ1b0JOVUJ4czBrVGVQYXd1TnlNekdCSDk4cmU2?=
+ =?utf-8?B?NndmRElkay9JSWJMRWZRUlFmVy9uZllnbllRTG9nalpidnNsYWJxTnRxY2pO?=
+ =?utf-8?B?YTdsaExITXZnZmZOVmNjN0tsd0N0b2lFZzhWWmNmanZIdCt5WUFqcmVUWDQx?=
+ =?utf-8?B?KzIvTVdmb2VhZ01VRFo3R3RtdGE1YzA1MUhHYXJvUUFPMk9VenFPdFJkbXJy?=
+ =?utf-8?B?S1paSVRzQWpaMytnc1R4VHM2eXQxcEZZbncyREhJYjNUUVdsVTk2QzF2OFJL?=
+ =?utf-8?B?UFpTLytxenJsVHk3alo2cHVKRXlUZkh0T09JQlgrRGZXZ2Q3VjVkL1k0WlpU?=
+ =?utf-8?B?N3dWU2NXY2pZSitvMkpoaUhvZ0lzNDBUQTdLU0VsTnpkdC95MHp1K3UzS0Vt?=
+ =?utf-8?B?TWIreXFnajVwdjJvNDFES2hhQnVpRDl4L1lRVTlaQUpscnJydHpINUVubGVw?=
+ =?utf-8?B?ZDlXeUhJM01ZNVdOMEFMN0crVWZvQ3UzUSt5Nnk3VEcxRGVEVEcvZXVweFNN?=
+ =?utf-8?B?VXU3Uy9RRG9ZVlhHcXN4M25sZFc0dkVpczlrR0pjdU1uWEcrRHFsdGlWcUVS?=
+ =?utf-8?B?QnVETENrUytsNmJSbHRydHVVS1BkTTdhTEo5dHllVWttZFJKS0FsZ0Y5TTho?=
+ =?utf-8?B?ZVY3bThDZ1hwNC96NUJlSjdSRnhjdXZzR1ZpL2RudnIyVXBCbUVkNXBQTmhZ?=
+ =?utf-8?B?RjJDeVVTdnpUM0p0Zy9YNWRyZHdjWTQyMjFYdUp0dHV2TmJPMExOanEzektx?=
+ =?utf-8?B?elRkUjIzOHQrYmk5eFpyMDAycTV2eUl6cU51WTRpM1M5Z3lKdTgyUEkxL0lF?=
+ =?utf-8?B?TkxMRnltcjhMT1l0NzZZd0hRK2pDc3Q0YUQyRDA2SWhsOFJrN1JrT3NWSHox?=
+ =?utf-8?B?N1l5TEpwRlR2T0pjMkdZeVpSbG5GU2J5KzJpa3ZyMXltUXVlN2xiM1FCRmpQ?=
+ =?utf-8?B?VDlJbmF4RlVldmpTeWxQaUkvUkw2VDlHeHFHb3JtRWRZdnROQTg1cld5QlZ6?=
+ =?utf-8?B?aHcwSyszTVBYL2hYYTRPNWo2QzYrcVhLUndkOHhFZWo1UmRKcUsrTmc3VUhZ?=
+ =?utf-8?B?dWhHWlhuVmlBaGVpQ3ZIWXduUHQwSHFjZG1SaEkzbkx4TzZrU29kLzhXN1c4?=
+ =?utf-8?B?QXlpUmcxcUw5S3Y2U0RXam55VllLK3VYU1JhdmdGYkg2ekxUMThzd1NhUWZZ?=
+ =?utf-8?B?UTVwUTZXNS9pYXRud3phZTZvVll5SXN5cE90Sk9HY3pyLzhkbC9NbzdWeHdu?=
+ =?utf-8?B?WklEL1o5bFZWY1JWMThEN2hIek5rNDFZc1VBVE55WlhjWXpaREFMU2l4ZkVH?=
+ =?utf-8?B?VmZydUFMd2pqVXpUbTk0bDc3QklQY0FOUkdqZWJwUVYyRHliVkFZd1lHb0sx?=
+ =?utf-8?Q?n+PpDa+MF45QWgnnhYfCo2k=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc51d806-8853-454a-0c36-08d9d4f3182d
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 11:11:19.9101
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vIumD4dZ8uZG4TnqleOgL4NRm58z8s/Ng23DGrTQdpgU8RWIXqlO+dsEp589sTzYXNFRX/Xr6QcsIXGtBxH5YA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR03MB3579
+X-OriginatorOrg: citrix.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Jan 06, 2022 at 09:10:13AM +0000, Maximilian Heyne wrote:
+> Given dom0 supports persistent grants but the guest does not.
+> Then, when attaching a block device during runtime of the guest, dom0
+> will enable persistent grants for this newly attached block device:
+> 
+>   $ xenstore-ls -f | grep 20674 | grep persistent
+>   /local/domain/0/backend/vbd/20674/768/feature-persistent = "0"
+>   /local/domain/0/backend/vbd/20674/51792/feature-persistent = "1"
 
-syzbot found the following issue on:
+The mechanism that we use to advertise persistent grants support is
+wrong. 'feature-persistent' should always be set if the backend
+supports persistent grant (like it's done for other features in
+xen_blkbk_probe). The usage of the feature depends on whether both
+parties support persistent grants, and the xenstore entry printed by
+blkback shouldn't reflect whether persistent grants are in use, but
+rather whether blkback supports the feature.
 
-HEAD commit:    3770333b3f8c Add linux-next specific files for 20220106
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=171aa4e3b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f9eb40d9f910b474
-dashboard link: https://syzkaller.appspot.com/bug?extid=4f789823c1abc5accf13
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b08f53b00000
+> 
+> Here disk 768 was attached during guest creation while 51792 was
+> attached at runtime. If the guest would have advertised the persistent
+> grant feature, there would be a xenstore entry like:
+> 
+>   /local/domain/20674/device/vbd/51792/feature-persistent = "1"
+> 
+> Persistent grants are also used when the guest tries to access the disk
+> which can be seen when enabling log stats:
+> 
+>   $ echo 1 > /sys/module/xen_blkback/parameters/log_stats
+>   $ dmesg
+>   xen-blkback: (20674.xvdf-0): oo   0  |  rd    0  |  wr    0  |  f    0 |  ds    0 | pg:    1/1056
+> 
+> The "pg: 1/1056" shows that one persistent grant is used.
+> 
+> Before commit aac8a70db24b ("xen-blkback: add a parameter for disabling
+> of persistent grants") vbd->feature_gnt_persistent was set in
+> connect_ring. After the commit it was intended to be initialized in
+> xen_vbd_create and then set according to the guest feature availability
+> in connect_ring. However, with a running guest, connect_ring might be
+> called before xen_vbd_create and vbd->feature_gnt_persistent will be
+> incorrectly initialized. xen_vbd_create will overwrite it with the value
+> of feature_persistent regardless whether the guest actually supports
+> persistent grants.
+> 
+> With this commit, vbd->feature_gnt_persistent is set only in
+> connect_ring and this is the only use of the module parameter
+> feature_persistent. This avoids races when the module parameter changes
+> during the block attachment process.
+> 
+> Note that vbd->feature_gnt_persistent doesn't need to be initialized in
+> xen_vbd_create. It's next use is in connect which can only be called
+> once connect_ring has initialized the rings. xen_update_blkif_status is
+> checking for this.
+> 
+> Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
+> Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+> ---
+>  drivers/block/xen-blkback/xenbus.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index 914587aabca0c..51b6ec0380ca4 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -522,8 +522,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+>  	if (q && blk_queue_secure_erase(q))
+>  		vbd->discard_secure = true;
+>  
+> -	vbd->feature_gnt_persistent = feature_persistent;
+> -
+>  	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
+>  		handle, blkif->domid);
+>  	return 0;
+> @@ -1090,10 +1088,9 @@ static int connect_ring(struct backend_info *be)
+>  		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+>  		return -ENOSYS;
+>  	}
+> -	if (blkif->vbd.feature_gnt_persistent)
+> -		blkif->vbd.feature_gnt_persistent =
+> -			xenbus_read_unsigned(dev->otherend,
+> -					"feature-persistent", 0);
+> +
+> +	blkif->vbd.feature_gnt_persistent = feature_persistent &&
+> +		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com
+I'm not sure it's correct to potentially read feature_persistent
+multiple times like it's done here.
 
-==================================================================
-BUG: KASAN: use-after-free in rcu_seq_snap kernel/rcu/rcu.h:91 [inline]
-BUG: KASAN: use-after-free in srcu_invoke_callbacks+0x391/0x3c0 kernel/rcu/srcutree.c:1283
-Read of size 8 at addr ffff8880189b6968 by task kworker/0:1/7
+A device can be disconnected and re-attached multiple times, and that
+implies multiple calls to connect_ring which could make the state of
+feature_gnt_persistent change across reconnections if the value of
+feature_persistent is changed. I think that would be unexpected.
 
-CPU: 0 PID: 7 Comm: kworker/0:1 Not tainted 5.16.0-rc8-next-20220106-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: rcu_gp srcu_invoke_callbacks
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- print_address_description.constprop.0.cold+0xa5/0x3ed mm/kasan/report.c:255
- __kasan_report mm/kasan/report.c:442 [inline]
- kasan_report.cold+0x83/0xdf mm/kasan/report.c:459
- rcu_seq_snap kernel/rcu/rcu.h:91 [inline]
- srcu_invoke_callbacks+0x391/0x3c0 kernel/rcu/srcutree.c:1283
- process_one_work+0x9ac/0x1650 kernel/workqueue.c:2307
- worker_thread+0x657/0x1110 kernel/workqueue.c:2454
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
+There are also similar issues with
+xenblk_max_queues/xen_blkif_max_ring_order changing after
+xen_blkbk_probe has been executed. We likely need to stash all those
+parameters so what's on xenbus is consistent with the limits enforced
+in blkback.
 
-Allocated by task 19830:
- kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:45 [inline]
- set_alloc_info mm/kasan/common.c:436 [inline]
- __kasan_slab_alloc+0x90/0xc0 mm/kasan/common.c:469
- kasan_slab_alloc include/linux/kasan.h:260 [inline]
- slab_post_alloc_hook mm/slab.h:738 [inline]
- slab_alloc_node mm/slub.c:3230 [inline]
- kmem_cache_alloc_node+0x255/0x3e0 mm/slub.c:3266
- blk_alloc_queue+0x5ad/0x870 block/blk-core.c:446
- blk_mq_init_queue_data block/blk-mq.c:3878 [inline]
- __blk_mq_alloc_disk+0x8c/0x1c0 block/blk-mq.c:3902
- nbd_dev_add+0x3b2/0xcd0 drivers/block/nbd.c:1765
- nbd_genl_connect+0x11f3/0x1930 drivers/block/nbd.c:1948
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
- genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2494
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
- netlink_unicast_kernel net/netlink/af_netlink.c:1317 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1343
- netlink_sendmsg+0x904/0xdf0 net/netlink/af_netlink.c:1919
- sock_sendmsg_nosec net/socket.c:705 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:725
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2410
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2464
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2493
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Freed by task 13:
- kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
- kasan_set_track+0x21/0x30 mm/kasan/common.c:45
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:370
- ____kasan_slab_free mm/kasan/common.c:366 [inline]
- ____kasan_slab_free+0x166/0x1a0 mm/kasan/common.c:328
- kasan_slab_free include/linux/kasan.h:236 [inline]
- slab_free_hook mm/slub.c:1728 [inline]
- slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1754
- slab_free mm/slub.c:3509 [inline]
- kmem_cache_free+0xdb/0x3b0 mm/slub.c:3526
- rcu_do_batch kernel/rcu/tree.c:2536 [inline]
- rcu_core+0x7b8/0x1540 kernel/rcu/tree.c:2787
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
-
-Last potentially related work creation:
- kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
- __kasan_record_aux_stack+0xbe/0xd0 mm/kasan/generic.c:348
- call_rcu+0x99/0x730 kernel/rcu/tree.c:3072
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- disk_release+0x19a/0x260 block/genhd.c:1116
- device_release+0x9f/0x240 drivers/base/core.c:2229
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- put_device+0x1b/0x30 drivers/base/core.c:3512
- put_disk block/genhd.c:1368 [inline]
- blk_cleanup_disk+0x6b/0x80 block/genhd.c:1384
- nbd_dev_remove+0x44/0xf0 drivers/block/nbd.c:253
- process_one_work+0x9ac/0x1650 kernel/workqueue.c:2307
- worker_thread+0x657/0x1110 kernel/workqueue.c:2454
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
-Second to last potentially related work creation:
- kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
- __kasan_record_aux_stack+0xbe/0xd0 mm/kasan/generic.c:348
- insert_work+0x48/0x370 kernel/workqueue.c:1368
- __queue_work+0x5ca/0xf30 kernel/workqueue.c:1534
- __queue_delayed_work+0x1c8/0x270 kernel/workqueue.c:1682
- queue_delayed_work_on+0x105/0x120 kernel/workqueue.c:1718
- process_one_work+0x9ac/0x1650 kernel/workqueue.c:2307
- worker_thread+0x657/0x1110 kernel/workqueue.c:2454
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
-The buggy address belongs to the object at ffff8880189b5c70
- which belongs to the cache request_queue_srcu of size 3816
-The buggy address is located 3320 bytes inside of
- 3816-byte region [ffff8880189b5c70, ffff8880189b6b58)
-The buggy address belongs to the page:
-page:ffffea0000626c00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x189b0
-head:ffffea0000626c00 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000010200 0000000000000000 dead000000000001 ffff888012787140
-raw: 0000000000000000 0000000080080008 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 14963, ts 196854875504, free_ts 196839673140
- prep_new_page mm/page_alloc.c:2434 [inline]
- get_page_from_freelist+0xa72/0x2f40 mm/page_alloc.c:4165
- __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5381
- alloc_pages+0x1aa/0x310 mm/mempolicy.c:2271
- alloc_slab_page mm/slub.c:1799 [inline]
- allocate_slab mm/slub.c:1944 [inline]
- new_slab+0x28d/0x380 mm/slub.c:2004
- ___slab_alloc+0x6be/0xd60 mm/slub.c:3018
- __slab_alloc.constprop.0+0x4d/0xa0 mm/slub.c:3105
- slab_alloc_node mm/slub.c:3196 [inline]
- kmem_cache_alloc_node+0x122/0x3e0 mm/slub.c:3266
- blk_alloc_queue+0x5ad/0x870 block/blk-core.c:446
- blk_mq_init_queue_data block/blk-mq.c:3878 [inline]
- __blk_mq_alloc_disk+0x8c/0x1c0 block/blk-mq.c:3902
- nbd_dev_add+0x3b2/0xcd0 drivers/block/nbd.c:1765
- nbd_genl_connect+0x11f3/0x1930 drivers/block/nbd.c:1948
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
- genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2494
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
- netlink_unicast_kernel net/netlink/af_netlink.c:1317 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1343
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1352 [inline]
- free_pcp_prepare+0x414/0xb60 mm/page_alloc.c:1404
- free_unref_page_prepare mm/page_alloc.c:3325 [inline]
- free_unref_page+0x19/0x690 mm/page_alloc.c:3404
- __unfreeze_partials+0x17c/0x1a0 mm/slub.c:2536
- qlink_free mm/kasan/quarantine.c:157 [inline]
- qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:176
- kasan_quarantine_reduce+0x180/0x200 mm/kasan/quarantine.c:283
- __kasan_slab_alloc+0xa2/0xc0 mm/kasan/common.c:446
- kasan_slab_alloc include/linux/kasan.h:260 [inline]
- slab_post_alloc_hook mm/slab.h:738 [inline]
- slab_alloc_node mm/slub.c:3230 [inline]
- slab_alloc mm/slub.c:3238 [inline]
- __kmalloc+0x1e7/0x340 mm/slub.c:4420
- kmalloc include/linux/slab.h:586 [inline]
- tomoyo_realpath_from_path+0xc3/0x620 security/tomoyo/realpath.c:254
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_path_perm+0x21b/0x400 security/tomoyo/file.c:822
- security_inode_getattr+0xcf/0x140 security/security.c:1326
- vfs_getattr fs/stat.c:157 [inline]
- vfs_statx+0x164/0x390 fs/stat.c:225
- vfs_fstatat fs/stat.c:243 [inline]
- __do_sys_newfstatat+0x96/0x120 fs/stat.c:412
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Memory state around the buggy address:
- ffff8880189b6800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880189b6880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff8880189b6900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                          ^
- ffff8880189b6980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880189b6a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Thanks, Roger.
