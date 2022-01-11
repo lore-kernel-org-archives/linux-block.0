@@ -2,227 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C8CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 14:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC1BC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 14:16:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239746AbiAKOMd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 09:12:33 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:45330 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230295AbiAKOMc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 09:12:32 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id BBE141F37D;
-        Tue, 11 Jan 2022 14:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1641910351; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P9lRhOlKm9dnxzXyqY8lcIf6WomYbHt92EMiBkXux2k=;
-        b=Gj4ClZvoEM5fSzU9xF6tst/twW/13Xn5w/zat7lwwsHqqZJ/gse4Y6pighmnOdi6VexDvk
-        IN73xOILaNE4mTeo08Pk8gpt0Qkp0kQQGmFTX7s9sal/pTCNfBsw5SJMKWXu9k40v4r5m5
-        7o7SciYiLTnSAhiFfgBwf5L4vUDzXak=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1641910351;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P9lRhOlKm9dnxzXyqY8lcIf6WomYbHt92EMiBkXux2k=;
-        b=P0Pjk3DeMFYYAWNKiu7A2O7Zk/pWZLGvVGpz7QdJ2QN5P4yd7GDTa1deNh30s4NLFYNS/R
-        NPhXq2oAZuAafPCg==
-Received: from quack3.suse.cz (unknown [10.100.200.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 9C1C9A3B81;
-        Tue, 11 Jan 2022 14:12:31 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 514FBA0597; Tue, 11 Jan 2022 15:12:28 +0100 (CET)
-Date:   Tue, 11 Jan 2022 15:12:28 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/5 v2] bfq: Avoid use-after-free when moving processes
- between cgroups
-Message-ID: <20220111141228.xxr6wiq5x6b34uo3@quack3.lan>
-References: <20220105143037.20542-1-jack@suse.cz>
- <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
- <20220107145853.jvgupijrq2ejnhdt@quack3.lan>
- <db449ed5-85db-37e5-deb6-62fdeb124c90@huawei.com>
+        id S241377AbiAKOQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 09:16:23 -0500
+Received: from mga07.intel.com ([134.134.136.100]:45852 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241371AbiAKOQW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jan 2022 09:16:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641910582; x=1673446582;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CtkRIdIcSFtO4roDqVbqnO0SVGudoxuXWeAfwaPV4dQ=;
+  b=m1IbHCJ8020CdF8tQLDjqHXNJ2FpjhqlJOvTCbA1r0QHy1pXUlxvIGw6
+   qAZMAQBqMImBaxAR3odD/oycIEMr9nMEhc68/rkTpq0pVRtda1rqdrVds
+   iAyq7fDyXkyRyZcHxir0nSeljX6WeKjQsXF8pwwG4wKH+T+ZJi5nIdLw7
+   MS3lbbPhyC9palTisoVTKsmom0LfgULm+MCgyWaI+8aLAXhrcTJFQqYrU
+   XHXp/845GXTLNUDJXlPy/eLF0VSNeaEh8Kz9zRyXeD5EM6bY7YfFqOWrg
+   o3UoEMTqaPZf8iejh7R2yimec0RuKIhzgDmHEWOZql1RYTtlBCry9b3ih
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="306843209"
+X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
+   d="scan'208";a="306843209"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 06:16:22 -0800
+X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
+   d="scan'208";a="613228878"
+Received: from smile.fi.intel.com ([10.237.72.61])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 06:16:19 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1n7HvV-009FzU-7q;
+        Tue, 11 Jan 2022 16:15:05 +0200
+Date:   Tue, 11 Jan 2022 16:15:04 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Laibin Qiu <qiulaibin@huawei.com>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, john.garry@huawei.com,
+        martin.petersen@oracle.com, hare@suse.de,
+        johannes.thumshirn@wdc.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next v4] blk-mq: fix tag_get wait task can't be awakened
+Message-ID: <Yd2Q6LyJUDAU54Dt@smile.fi.intel.com>
+References: <20220111140216.1858823-1-qiulaibin@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <db449ed5-85db-37e5-deb6-62fdeb124c90@huawei.com>
+In-Reply-To: <20220111140216.1858823-1-qiulaibin@huawei.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 10-01-22 09:49:34, yukuai (C) wrote:
-> 在 2022/01/07 22:58, Jan Kara 写道:
-> > On Fri 07-01-22 17:15:43, yukuai (C) wrote:
-> > > 在 2022/01/05 22:36, Jan Kara 写道:
-> > > > Hello,
-> > > > 
-> > > > here is the second version of my patches to fix use-after-free issues in BFQ
-> > > > when processes with merged queues get moved to different cgroups. The patches
-> > > > have survived some beating in my test VM but so far I fail to reproduce the
-> > > > original KASAN reports so testing from people who can reproduce them is most
-> > > > welcome. Thanks!
-> > > > 
-> > > > Changes since v1:
-> > > > * Added fix for bfq_put_cooperator()
-> > > > * Added fix to handle move between cgroups in bfq_merge_bio()
-> > > > 
-> > > > 								Honza
-> > > > Previous versions:
-> > > > Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
-> > > > .
-> > > > 
-> > > 
-> > > Hi,
-> > > 
-> > > I repoduced the problem again with this patchset...
-> > 
-> > Thanks for testing!
-> > 
-> > > [   71.004788] BUG: KASAN: use-after-free in
-> > > __bfq_deactivate_entity+0x21/0x290
-> > > [   71.006328] Read of size 1 at addr ffff88817a3dc0b0 by task rmmod/801
-> > > [   71.007723]
-> > > [   71.008068] CPU: 7 PID: 801 Comm: rmmod Tainted: G        W
-> > > 5.16.0-rc5-next-2021127
-> > > [   71.009995] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> > > ?-20190727_073836-4
-> > > [   71.012274] Call Trace:
-> > > [   71.012603]  <TASK>
-> > > [   71.012886]  dump_stack_lvl+0x34/0x44
-> > > [   71.013379]  print_address_description.constprop.0.cold+0xab/0x36b
-> > > [   71.014182]  ? __bfq_deactivate_entity+0x21/0x290
-> > > [   71.014795]  ? __bfq_deactivate_entity+0x21/0x290
-> > > [   71.015398]  kasan_report.cold+0x83/0xdf
-> > > [   71.015904]  ? _raw_read_lock_bh+0x20/0x40
-> > > [   71.016433]  ? __bfq_deactivate_entity+0x21/0x290
-> > > [   71.017033]  __bfq_deactivate_entity+0x21/0x290
-> > > [   71.017617]  bfq_pd_offline+0xc1/0x110
-> > > [   71.018105]  blkcg_deactivate_policy+0x14b/0x210
-> > ...
-> > 
-> > > Here is the caller of  __bfq_deactivate_entity:
-> > > (gdb) list *(bfq_pd_offline+0xc1)
-> > > 0xffffffff81c504f1 is in bfq_pd_offline (block/bfq-cgroup.c:942).
-> > > 937                      * entities to the idle tree. It happens if, in some
-> > > 938                      * of the calls to bfq_bfqq_move() performed by
-> > > 939                      * bfq_reparent_active_queues(), the queue to move
-> > > is
-> > > 940                      * empty and gets expired.
-> > > 941                      */
-> > > 942                     bfq_flush_idle_tree(st);
-> > > 943             }
-> > > 944
-> > > 945             __bfq_deactivate_entity(entity, false);
-> > 
-> > So this is indeed strange. The group has in some of its idle service trees
-> > an entity whose entity->sched_data points to already freed cgroup. In
-> > particular it means the bfqq_entity_service_tree() leads to somewhere else
-> > than the 'st' we called bfq_flush_idle_tree() with. This looks like a
-> > different kind of problem AFAICT but still it needs fixing :). Can you
-> > please run your reproducer with my patches + the attached debug patch on
-> > top? Hopefully it should tell us more about the problematic entity and how
-> > it got there... Thanks!
+On Tue, Jan 11, 2022 at 10:02:16PM +0800, Laibin Qiu wrote:
+> In case of shared tags, there might be more than one hctx which
+> allocates from the same tags, and each hctx is limited to allocate at
+> most:
+>         hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
 > 
-> Hi,
+> tag idle detection is lazy, and may be delayed for 30sec, so there
+> could be just one real active hctx(queue) but all others are actually
+> idle and still accounted as active because of the lazy idle detection.
+> Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
+> forever on this real active hctx.
 > 
-> I'm not sure I understand what you mean... I reporduced again with your
-> debug patch applied, however, no extra messages are printed.
-> 
-> I think this is exactly the same problem we discussed before:
-> 
-> 1) bfqq->new_bfqq is set, they are under g1
-> 2) bfqq is moved to another group, and user thread of new_bfqq exit
-> 3) g1 is offlied
-> 3) io issued from bfqq will end up in new_bfqq, and the offlined
-> g1 will be inserted to st of g1's parent.
+> Fix this by recalculating wake_batch when inc or dec active_queues.
 
-Hmm, you are right. I was confused by the fact that bfq_setup_merge() is
-always immediately (under big bfq lock) followed by bfq_merge_bfqqs() but
-that redirects BIC of just one process pointing to the new bfqq. So the
-following is a bit more detailed and graphical version of your scenario for
-future reference :):
+...
 
-Initial state, bfqq2 is shared by Process 2 & Process 3:
+>  {
+> +	unsigned int users;
 
-Process 1 (blkcg1)	Process 2 (blkcg1)	Process 3 (blkcg1)
- (BIC)			 (BIC)			 (BIC)
-   |			   |			   |
-   |			   |			  /
-   v			   v			 /
- bfqq1			bfqq2<-------------------
-   \			  /
-    \			 /
-     \			/
-      ----> BFQ group1<-
+Missed blank line here.
 
-Now while processing request for Process 2 we decide to merge bfqq2 to
-bfqq1. Situation after the merge:
+>  	if (blk_mq_is_shared_tags(hctx->flags)) {
+>  		struct request_queue *q = hctx->queue;
+>  
+> +		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
+> +		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
 
-Process 1 (blkcg1)	Process 2 (blkcg1)	Process 3 (blkcg1)
- (BIC)			 (BIC)			 (BIC)
-   |			   /			   |
-   |/---------------------/   			  /
-   vv		new_bfqq   			 /
- bfqq1<-----------------bfqq2<-------------------
-   \			  /
-    \			 /
-     \			/
-      ----> BFQ group1<-
+Whoever wrote this code did too much defensive programming, because the first
+conditional doesn't make much sense here. Am I right?
 
-Processes 1 and 2 exit:
-					Process 3 (blkcg1)
-					 (BIC)
-					   |
-					  /
-		new_bfqq		 /
- bfqq1<-----------------bfqq2<-----------
-   \			  /
-    \			 /
-     \			/
-      ----> BFQ group1<-
+> +			return true;
+> +		}
+>  	} else {
 
-Process 3 is moved to blkcg2 and submits IO, blkcg1 is offlined.
-bfq_bic_update_cgroup() will change the picture to:
+> +		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
+> +		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
 
-					Process 3 (blkcg2)
-					 (BIC)
-					   |
-					  /
-		new_bfqq		 /
- bfqq1<-----------------bfqq2<-----------
-   |			  |
-   |			  |
-   v 			  v
-BFQ group1		BFQ group2
+Ditto.
 
-and following bfq_merge_bfqqs() when submitting the request will further
-modify the picture to:
-					Process 3 (blkcg2)
-					 (BIC)
-					   |
-     /-------------------------------------/
-     v		new_bfqq
- bfqq1<-----------------bfqq2
-   |			  |
-   |			  |
-   v 			  v
-BFQ group1		BFQ group2
+> +			return true;
+> +		}
+>  	}
 
-and boom, we queue again offlined BFQ group1.
+...
 
-								Honza
+> +	unsigned int wake_batch = clamp_t(unsigned int,
+> +			(sbq->sb.depth + users - 1) / users, 4U, SBQ_WAKE_BATCH);
+
+
+	unsigned int wake_batch;
+
+	wake_batch = clamp_val((sbq->sb.depth + users - 1) / users, 4, SBQ_WAKE_BATCH);
+	...
+
+is easier to read, no?
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+With Best Regards,
+Andy Shevchenko
+
+
