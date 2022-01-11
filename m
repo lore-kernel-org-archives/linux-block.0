@@ -2,262 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9B3C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 11:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C30C9C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 11:40:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238292AbiAKLSg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 06:18:36 -0500
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:13148 "EHLO
-        esa3.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238137AbiAKLSf (ORCPT
+        id S238856AbiAKLkM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 06:40:12 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:33904 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238840AbiAKLkM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 06:18:35 -0500
-X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Jan 2022 06:18:35 EST
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1641899915;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=+FoSMuDBKeH6aEXUH+JLFA1KOxwJzJTpMqM/2dl5nIE=;
-  b=dBWYRoX1nxvPUpI7e949THW0k4kuE0el6T6LEVYqc5ZFUkp6qG1XZvvU
-   ntAwwiZPCvRf1pH8IXGQ6b7vYhO4n2x5TtcHqLgv9vclzzX4yOkw+dNcC
-   4s7Sl2gQdThonbzY4Ph59Pr5+iOxMEgEzSPHmKW7iQ5smvSZLihyInVfz
-   g=;
-Authentication-Results: esa3.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
-IronPort-SDR: +LNhzxgyQIwGFZ5VV6qDOzBvNMLcq5gBJ6Qly+qzJynxF/aJZ8v2GSXyhhTU1Qe/XUzsCWs9ZG
- zndvA2sFmWxFp/cdUOnSlAFe8dTD/Mf3c0uz/HvLaImKGJhuSGarQm6IjfZcBJ+gmA3j2jcOzG
- b4t3pmzFrSBoNCZwA4RVbkukkIWutLJw+BoYXWH/QZr40gryeOjqieLlAuzPt8hJ83lIF7nNCY
- 2FpP3TLXoE7KuPoI+dWwD3xmKs7PlgCOkJADSAkw17s7DrPgaM3dgpITfAoA/cijtipM9Lh/vJ
- MbcsE9njnUW6KClRkHINz1jF
-X-SBRS: 5.2
-X-MesageID: 61727851
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.156.83
-X-Policy: $RELAYED
-IronPort-Data: A9a23:zlVqz6p1B8lhTSNjk34AyjEBx0peBmJrYxIvgKrLsJaIsI4StFCzt
- garIBnQOvmJNGL3c90lPd7goBwDvpCHyNFjQQdo/iA9Hy0b9puZCYyVIHmrMnLJJKUvbq7GA
- +byyDXkBJppJpMJjk71atANlZT4vE2xbuKU5NTsY0idfic5Dndx4f5fs7Rh2NQw2IHgW1rlV
- e7a+KUzBnf0g1aYDUpMg06zgEsHUCPa4W5wUvQWPJinjXeG/5UnJMt3yZKZdhMUdrJ8DO+iL
- 9sv+Znilo/vE7XBPfv++lrzWhVirrc/pmFigFIOM0SpqkAqSiDfTs/XnRfTAKtao2zhojx/9
- DlCnbHuViVuGYv2ouYyUCRJIxNDI6JsoZaSdBBTseTLp6HHW37lwvEoB0AqJ4wIvO1wBAmi9
- 9RBdmpLNErawbvrnvTrEYGAhex6RCXvFJkYtXx6iynQEN4tQIzZQrWM7thdtNs1rp4XQqyBN
- 5dAAdZpRFfdbzoSE1YqNL8Vob2q1l/CfSxW913A8MLb5ECMlVcsgdABKuH9atGMAMlYgEucj
- mbH5HjiRAEXMsSFzjiI+W7qgfXA9Qv5V5gVD6aQ7eNxjRuYwWl7IBkXU0ar5Pq0kEizX/pBJ
- EEOvCkjt64/8AqsVNaVdxm5pmOU+xQYXNFTO/M15RvLyafO5QudQG8eQVZpc94+vdU1bTUv3
- 02OmZXlCFRHua2fTn+19bqOqz62fyQWRUcHZSIVSwYt6tzqsoY1yB7CJv5qFK+6k9rvGBn5x
- jmYqy54jLIW5eYB0L+65hbAmC62oYbSTR8d4R/eVWaoqAh+YeaYi5eAsAaBq6wadcDAEwfH7
- CNsd9WiAP4mIM+StmuqZt83Hp6q2ue1AgDCjnQ2Nsx0n9iywEKLcYdV6TB4AU5mNMcYZDPkC
- HPuVRNtCIx7ZyXzM/IuC26lI4FzlPW7S4y5PhzBRocWOvBMmBm7EDaCjKJ690TkiwASnK42I
- v93mu78XC9BWcyLINdbLtrxMIPHJAhjnQs/prihlnxLNIZyglbPEt/p13PUP4gEAFus+lm9z
- jqmH5LiJ+9jeOP/eDLL1oUYMEoHK3M2bbiv9ZAOJrLbe1s+Qzx5YxM0/V/HU9Y+90iyvr2Zl
- kxRp2cCkAav7ZE5AVjiho9fhEPHAs8k8CNT0d0ENle0wXkzCbtDH49EH6bbiYIPrbQ5pdYtF
- qFtU5zZXpxnF2qbkxxAM8iVhNEyJXyD2FPVVwL4MWdXQnKVb1GTkjMSVlGxpHBm4+venZZWn
- oBMISuAEMVTHFozXZ+GAB9tpnvo1UUgdCtJdxKgCvFYeVn28ZgsLCr0j/QtJNoLJwmFzTyfv
- zt6yz9BzQUUi4NqotTPm46eqIKlT7l3EkZARjGJ5reqLyjKuGGkxNYYAuqPeDncUkLy+bmjO
- roJn62tbqVfkQYYqZd4HpZq0bk6u4nlqYhFw1k2B37MdVmqVO9teyHUwclVu6RR7bZFog/qC
- FmX89xXNOzRasPoGVIcPiQ/aeGH2a1GkzXe961tck77+DV27PyMVkALZ0uAjylULb1UNoI5w
- Lh+5J5KulLn0hdza4SIlCFZ8WiIP0csaaR/u8FIGpLvhyoq1kpGPc7WBBjp7czdcN5LKEQrf
- GOZ3fKQm7RGy0PeWHMvDnyRj/FFjJEDtR0Wnl8PI1OFxojMivMthUAD9D02SkJezwld0vI1M
- W9ubhUnKaKL9jZupc5CQ2HzRF0RWEzHohT8mwkTiWnUb0i0TWicfmQyNNGE8F0d728BLCNQ+
- 6uVyTq9XDvnFC0rMvDehaKxRyTfcOFM
-IronPort-HdrOrdr: A9a23:ankYLaziIgMQgF2FMda3KrPwIr1zdoMgy1knxilNoH1uHvBw8v
- rEoB1173DJYVoqNk3I++rhBEDwexLhHPdOiOF6UItKNzOW21dAQrsSiLfK8nnNHDD/6/4Y9Y
- oISdkbNDQoNykZsfrH
-X-IronPort-AV: E=Sophos;i="5.88,279,1635220800"; 
-   d="scan'208";a="61727851"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MtZlmloa5NjDpfBJQTxhye7c7JuLPtDAkvx1Q6hQ7VOdvm+PpSU2xvfbuYYAZIdIyo+hb+zndZOd/iMLaNHHdwBj09WhOIYQrsYXWux/d+n7E/sNhrKn1M8Rg3hfLOrGrDc4NrYfuNP0yHJFrJ/ctJNXgg9L/fPyasCT+1PYDfkaV28QVRzNlWMnWHdqljyeeB+8oxtkklauJT4ygpxvFOb13mXCAcoap/mEeLn5oUrxXsqynyj80tdYZ7dTt3MdfqVDT1OtFQua9cIt0EulN9rJj5CSeAO2WLRt6lGf9jIUp2DtgsPvqkrLwzd/VnPwr+XoSXIrv4rheQtf/DdAzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4vbVjBIbKzztlAe9vCcCRtVaFrKaWxxjBst7/u1OVq4=;
- b=FijY9vWbTiWmmKqfl5e/6IYr+Hl5trJs/tCkF7he/+aqmDTJSD68SwBxUEarjmgZRSVSw2R6k4YXAgugCDF9Yp/+JGqF46M8wzTET9u8VIyl8HKI6oky2jrsyUV/cPLe1dIV/Mbx6qqWXGxCmOzQUYvg72I6Y9R4icjzbuwdFzGwkbeOYYEY32toPRLAkuSIzyirEklzM7nrkRyj/e9tQvUc36l3/kHaVad3a/HBGbiftinbhDbOufIx3HJHC1S8fH6rxgA7e+5Nxh8kh7/cEBw2jRrRUlX+2unVUlFymuL+MVcRIwx+o1stdH5BuNuu4pvbw6BMtYDoenCOXwlgew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
- dkim=pass header.d=citrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4vbVjBIbKzztlAe9vCcCRtVaFrKaWxxjBst7/u1OVq4=;
- b=V2h5QEMyn+h1fHP6YxkjXyUF1ZToXayYCZ98Dv0F9OshjQb48GHzr8OH7rUFU5AOi+jh6MpxDp9VXK+g6qicChyA21YpW//UoxWAlAXlc1BEOOYHydiYigIPGVz1v1OUb0RPp2vpxfOScC2TVx/xWHcRpCHMhMy2Pn9AKnMhrs8=
-Date:   Tue, 11 Jan 2022 12:11:15 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Maximilian Heyne <mheyne@amazon.de>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Anthony Liguori <aliguori@amazon.com>,
-        SeongJae Park <sjpark@amazon.de>,
-        Juergen Gross <jgross@suse.com>,
-        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] xen, blkback: fix persistent grants negotiation
-Message-ID: <Yd1l01jTPwx5oBuo@Air-de-Roger>
-References: <20220106091013.126076-1-mheyne@amazon.de>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220106091013.126076-1-mheyne@amazon.de>
-X-ClientProxiedBy: MRXP264CA0014.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:500:15::26) To DS7PR03MB5608.namprd03.prod.outlook.com
- (2603:10b6:5:2c9::18)
+        Tue, 11 Jan 2022 06:40:12 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 007211F3BA;
+        Tue, 11 Jan 2022 11:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1641901211; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hu9yh0NTZIrOTv2yobLAEgOChSVCw5ux5AM6GsPbBCM=;
+        b=eFLSf/b0jLI14BDLXTV7umL8kh2VbVXgqWz9Zteh+o/1g4MW1s7FAmnA4q2r41zBiYruNR
+        SQCRGEo5FjtA6kctsS+ap7+TI9SW5EwEKqmRoZOHXscRoV2wlhsS7AoZHzKvzxfyV3wGl0
+        /EQw01HZmPSsoG4t4SSq46mQHYxY+qA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1641901211;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hu9yh0NTZIrOTv2yobLAEgOChSVCw5ux5AM6GsPbBCM=;
+        b=+SwoFrKjyHsSsz11+UflDNr3OyN4U/3YvFLIDgxo93qHySymgtrdvVCCFGrm9J8Et0F7qg
+        ZHgp+Nxlfky5ObDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AB81E13DD6;
+        Tue, 11 Jan 2022 11:40:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id AqTGKJps3WFBCQAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Tue, 11 Jan 2022 11:40:10 +0000
+Message-ID: <f7bd672f-dfa8-93fa-e101-e57b90faeb1e@suse.de>
+Date:   Tue, 11 Jan 2022 12:40:10 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bc51d806-8853-454a-0c36-08d9d4f3182d
-X-MS-TrafficTypeDiagnostic: DM6PR03MB3579:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR03MB3579241225EF1DF9195BDD188F519@DM6PR03MB3579.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bG9W7xQbLt+Fz/Bw5ozsPnIiTsbvl1uiENCeEeeyeXzjsNnypH5eSBvhnN8XwnJ6T0U7kHsT56bxhuBUy+0/0OcYIvUxIjH+SX8k4DqpkW5fKO+ceLMQm9FlxOI3oWBJK3tou+J/dgEIJzF+43g9r13idBA8gCqmZt58rjtqfw8iO26p6IHjneKk1VSKnYA4JMNPNwRLn6Atmlv/dJHb3xnUnFLPWGOSIIuxsALnoZS8BTH910UtgpR0+xQnAzEdGNd3JTba6SBYseEBAsegJDarpOmGv99eQAR6d8qAVoC3EC29QecUaxdXRbGDGI6Mi7+0csh3hi6P60r6hu4leKYFo6Sl7rRvDOwk69dtHywofaXRVUimzzGjLWka/FWM3UivEAVuP/7VRneH7MFv/Wjei/WVhv7M6d2hhy/ZHLdIQ4PLTxUSlL98bYqxqXp1nrqxLTtqlyjDY/uVfsa871dYP1g6jCr5m6C7hYR6NGA6FuPnu/Kr60yCzRLv0Nfh/lzXgsB1Y+UvnidQOJwBUetXC39XUNYQ9Ju7TIgztx57WN3PN7jyOjxcJnWC1OJBhBu/aP+zekaIBvtQtTu7KpiGJEcz6nBaj/26Vj1Xp/ZH3/VAHxVuM2x8IYt1AiNVtPkbZzdmwTJFNE34ha22+w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(4636009)(366004)(82960400001)(4326008)(9686003)(38100700002)(83380400001)(6486002)(6512007)(5660300002)(6916009)(66946007)(54906003)(66476007)(66556008)(508600001)(85182001)(8676002)(2906002)(186003)(316002)(26005)(6506007)(6666004)(8936002)(33716001)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MjRBUVYzcmVyWnZtYUlkZS83ckQ0T2hvemxFUXNvQSsrRVY1aGdPM1NsWklY?=
- =?utf-8?B?U1BrQUk5bXArbElrc3g0c294SEJ6OEZtRnhQdjVxU3Uva0N6OWs4d05NZ2VT?=
- =?utf-8?B?RVZFSjQvZVhTZmJOdWttdXpzT1ZkdVR6ZWRaZjNMTmRNb2NuaXR2cUlOVFBo?=
- =?utf-8?B?U3ZydWZPMjQyeU5PWG1hMXAwOUJUeEZPdjVCOGpDNjFxQnYxQ3RacTNTNS9n?=
- =?utf-8?B?bFpQdmJQbVhzeS9ZTW8wVUpza2VIYVNRZGxBZThiVFNjSnU2VHVjNUhJMkpR?=
- =?utf-8?B?V2R6TXVmVThiWUl1WGJ3Z1dnNlozT2pqWDFsNmJSVFhQVkMrL2ZRY0JLUVdB?=
- =?utf-8?B?NmxHVjQrRUpGbVVqOE5vVXdqTlZFZGllaDJBN1dHUEVYUEtBMU5zL0U2NXRT?=
- =?utf-8?B?YUdjdnNhN0k5RTg0SGtobFNXelN0aUJtQkNUeGpWTGdiYkFwSTNSYkVTN2NX?=
- =?utf-8?B?OGJ0aU1wUUNPUmpqOEw2dWxuWTFzZDFScWdwZUVGdG43L3JkWDVVYmp5d0JS?=
- =?utf-8?B?bGl6Z0JiM2xtQUs2dGtMZnFGREZWZzZzd1NRVVpkbFdDd0hkOGE4R0xQbmFo?=
- =?utf-8?B?U04xZWlPQjdCRmsvVXhKWGhSZ3hQVmpXak9XNHdGaGpTRUQzV2J3eUNMM3dQ?=
- =?utf-8?B?ZThQd3paa3BVNE4wMzRkUE5OS1A3Z2JlbU1LcXZzS1haZEFtZ29nb0xpRWhi?=
- =?utf-8?B?OFNYV0ZmdStTdUx4QVo1azVXNFFXOGk1ZjdtZnFIOVNsN1VlSFBaS2R6TnEz?=
- =?utf-8?B?WFZzZngvYkRLRVo1YURqcjJ1b0JOVUJ4czBrVGVQYXd1TnlNekdCSDk4cmU2?=
- =?utf-8?B?NndmRElkay9JSWJMRWZRUlFmVy9uZllnbllRTG9nalpidnNsYWJxTnRxY2pO?=
- =?utf-8?B?YTdsaExITXZnZmZOVmNjN0tsd0N0b2lFZzhWWmNmanZIdCt5WUFqcmVUWDQx?=
- =?utf-8?B?KzIvTVdmb2VhZ01VRFo3R3RtdGE1YzA1MUhHYXJvUUFPMk9VenFPdFJkbXJy?=
- =?utf-8?B?S1paSVRzQWpaMytnc1R4VHM2eXQxcEZZbncyREhJYjNUUVdsVTk2QzF2OFJL?=
- =?utf-8?B?UFpTLytxenJsVHk3alo2cHVKRXlUZkh0T09JQlgrRGZXZ2Q3VjVkL1k0WlpU?=
- =?utf-8?B?N3dWU2NXY2pZSitvMkpoaUhvZ0lzNDBUQTdLU0VsTnpkdC95MHp1K3UzS0Vt?=
- =?utf-8?B?TWIreXFnajVwdjJvNDFES2hhQnVpRDl4L1lRVTlaQUpscnJydHpINUVubGVw?=
- =?utf-8?B?ZDlXeUhJM01ZNVdOMEFMN0crVWZvQ3UzUSt5Nnk3VEcxRGVEVEcvZXVweFNN?=
- =?utf-8?B?VXU3Uy9RRG9ZVlhHcXN4M25sZFc0dkVpczlrR0pjdU1uWEcrRHFsdGlWcUVS?=
- =?utf-8?B?QnVETENrUytsNmJSbHRydHVVS1BkTTdhTEo5dHllVWttZFJKS0FsZ0Y5TTho?=
- =?utf-8?B?ZVY3bThDZ1hwNC96NUJlSjdSRnhjdXZzR1ZpL2RudnIyVXBCbUVkNXBQTmhZ?=
- =?utf-8?B?RjJDeVVTdnpUM0p0Zy9YNWRyZHdjWTQyMjFYdUp0dHV2TmJPMExOanEzektx?=
- =?utf-8?B?elRkUjIzOHQrYmk5eFpyMDAycTV2eUl6cU51WTRpM1M5Z3lKdTgyUEkxL0lF?=
- =?utf-8?B?TkxMRnltcjhMT1l0NzZZd0hRK2pDc3Q0YUQyRDA2SWhsOFJrN1JrT3NWSHox?=
- =?utf-8?B?N1l5TEpwRlR2T0pjMkdZeVpSbG5GU2J5KzJpa3ZyMXltUXVlN2xiM1FCRmpQ?=
- =?utf-8?B?VDlJbmF4RlVldmpTeWxQaUkvUkw2VDlHeHFHb3JtRWRZdnROQTg1cld5QlZ6?=
- =?utf-8?B?aHcwSyszTVBYL2hYYTRPNWo2QzYrcVhLUndkOHhFZWo1UmRKcUsrTmc3VUhZ?=
- =?utf-8?B?dWhHWlhuVmlBaGVpQ3ZIWXduUHQwSHFjZG1SaEkzbkx4TzZrU29kLzhXN1c4?=
- =?utf-8?B?QXlpUmcxcUw5S3Y2U0RXam55VllLK3VYU1JhdmdGYkg2ekxUMThzd1NhUWZZ?=
- =?utf-8?B?UTVwUTZXNS9pYXRud3phZTZvVll5SXN5cE90Sk9HY3pyLzhkbC9NbzdWeHdu?=
- =?utf-8?B?WklEL1o5bFZWY1JWMThEN2hIek5rNDFZc1VBVE55WlhjWXpaREFMU2l4ZkVH?=
- =?utf-8?B?VmZydUFMd2pqVXpUbTk0bDc3QklQY0FOUkdqZWJwUVYyRHliVkFZd1lHb0sx?=
- =?utf-8?Q?n+PpDa+MF45QWgnnhYfCo2k=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc51d806-8853-454a-0c36-08d9d4f3182d
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 11:11:19.9101
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vIumD4dZ8uZG4TnqleOgL4NRm58z8s/Ng23DGrTQdpgU8RWIXqlO+dsEp589sTzYXNFRX/Xr6QcsIXGtBxH5YA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR03MB3579
-X-OriginatorOrg: citrix.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: Phyr Starter
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org
+Cc:     nvdimm@lists.linux.dev, linux-rdma@vger.kernel.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        dri-devel@lists.freedesktop.org, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+In-Reply-To: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------TUMr3QAK8x0Ry03YInQSssDP"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 06, 2022 at 09:10:13AM +0000, Maximilian Heyne wrote:
-> Given dom0 supports persistent grants but the guest does not.
-> Then, when attaching a block device during runtime of the guest, dom0
-> will enable persistent grants for this newly attached block device:
-> 
->   $ xenstore-ls -f | grep 20674 | grep persistent
->   /local/domain/0/backend/vbd/20674/768/feature-persistent = "0"
->   /local/domain/0/backend/vbd/20674/51792/feature-persistent = "1"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------TUMr3QAK8x0Ry03YInQSssDP
+Content-Type: multipart/mixed; boundary="------------FSfCP6lzbOH6mRnDQRWz0fCp";
+ protected-headers="v1"
+From: Thomas Zimmermann <tzimmermann@suse.de>
+To: Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org
+Cc: nvdimm@lists.linux.dev, linux-rdma@vger.kernel.org,
+ John Hubbard <jhubbard@nvidia.com>, dri-devel@lists.freedesktop.org,
+ Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, Jason Gunthorpe <jgg@nvidia.com>,
+ netdev@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Christoph Hellwig <hch@lst.de>
+Message-ID: <f7bd672f-dfa8-93fa-e101-e57b90faeb1e@suse.de>
+Subject: Re: Phyr Starter
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+In-Reply-To: <YdyKWeU0HTv8m7wD@casper.infradead.org>
 
-The mechanism that we use to advertise persistent grants support is
-wrong. 'feature-persistent' should always be set if the backend
-supports persistent grant (like it's done for other features in
-xen_blkbk_probe). The usage of the feature depends on whether both
-parties support persistent grants, and the xenstore entry printed by
-blkback shouldn't reflect whether persistent grants are in use, but
-rather whether blkback supports the feature.
+--------------FSfCP6lzbOH6mRnDQRWz0fCp
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> 
-> Here disk 768 was attached during guest creation while 51792 was
-> attached at runtime. If the guest would have advertised the persistent
-> grant feature, there would be a xenstore entry like:
-> 
->   /local/domain/20674/device/vbd/51792/feature-persistent = "1"
-> 
-> Persistent grants are also used when the guest tries to access the disk
-> which can be seen when enabling log stats:
-> 
->   $ echo 1 > /sys/module/xen_blkback/parameters/log_stats
->   $ dmesg
->   xen-blkback: (20674.xvdf-0): oo   0  |  rd    0  |  wr    0  |  f    0 |  ds    0 | pg:    1/1056
-> 
-> The "pg: 1/1056" shows that one persistent grant is used.
-> 
-> Before commit aac8a70db24b ("xen-blkback: add a parameter for disabling
-> of persistent grants") vbd->feature_gnt_persistent was set in
-> connect_ring. After the commit it was intended to be initialized in
-> xen_vbd_create and then set according to the guest feature availability
-> in connect_ring. However, with a running guest, connect_ring might be
-> called before xen_vbd_create and vbd->feature_gnt_persistent will be
-> incorrectly initialized. xen_vbd_create will overwrite it with the value
-> of feature_persistent regardless whether the guest actually supports
-> persistent grants.
-> 
-> With this commit, vbd->feature_gnt_persistent is set only in
-> connect_ring and this is the only use of the module parameter
-> feature_persistent. This avoids races when the module parameter changes
-> during the block attachment process.
-> 
-> Note that vbd->feature_gnt_persistent doesn't need to be initialized in
-> xen_vbd_create. It's next use is in connect which can only be called
-> once connect_ring has initialized the rings. xen_update_blkif_status is
-> checking for this.
-> 
-> Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
-> Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
-> ---
->  drivers/block/xen-blkback/xenbus.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index 914587aabca0c..51b6ec0380ca4 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -522,8 +522,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
->  	if (q && blk_queue_secure_erase(q))
->  		vbd->discard_secure = true;
->  
-> -	vbd->feature_gnt_persistent = feature_persistent;
-> -
->  	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
->  		handle, blkif->domid);
->  	return 0;
-> @@ -1090,10 +1088,9 @@ static int connect_ring(struct backend_info *be)
->  		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
->  		return -ENOSYS;
->  	}
-> -	if (blkif->vbd.feature_gnt_persistent)
-> -		blkif->vbd.feature_gnt_persistent =
-> -			xenbus_read_unsigned(dev->otherend,
-> -					"feature-persistent", 0);
-> +
-> +	blkif->vbd.feature_gnt_persistent = feature_persistent &&
-> +		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
+SGkNCg0KQW0gMTAuMDEuMjIgdW0gMjA6MzQgc2NocmllYiBNYXR0aGV3IFdpbGNveDoNCj4g
+VExEUjogSSB3YW50IHRvIGludHJvZHVjZSBhIG5ldyBkYXRhIHR5cGU6DQo+IA0KPiBzdHJ1
+Y3QgcGh5ciB7DQo+ICAgICAgICAgIHBoeXNfYWRkcl90IGFkZHI7DQo+ICAgICAgICAgIHNp
+emVfdCBsZW47DQo+IH07DQoNCkRpZCB5b3UgbG9vayBhdCBzdHJ1Y3QgZG1hX2J1Zl9tYXA/
+IFsxXQ0KDQpGb3IgZ3JhcGhpY3MgZnJhbWVidWZmZXJzLCB3ZSBoYXZlIHRoZSBwcm9ibGVt
+IHRoYXQgdGhlc2UgYnVmZmVycyBjYW4gYmUgDQppbiBJL08gb3Igc3lzdGVtIG1lbW9yeSAo
+YW5kIHBvc3NpYmx5IG1vdmUgYmV0d2VlbiB0aGVtKS4gTGludXgnIA0KdHJhZGl0aW9uYWwg
+aW50ZXJmYWNlcyAobWVtY3B5X3RvaW8oKSwgZXRjKSBkb24ndCBkZWFsIHdpdGggdGhlIA0K
+ZGlmZmVyZW5jZXMgd2VsbC4NCg0KU28gd2UgYWRkZWQgc3RydWN0IGRtYV9idWZfbWFwIGFz
+IGFuIGFic3RyYWN0aW9uIHRvIHRoZSBidWZmZXIgYWRkcmVzcy4gDQpUaGVyZSBhcmUgaW50
+ZXJmYWNlcyBmb3IgYWNjZXNzaW5nIGFuZCBjb3B5aW5nIHRoZSBkYXRhLiBJIGFsc28gaGF2
+ZSBhIA0KcGF0Y2hzZXQgc29tZXdoZXJlIHRoYXQgYWRkcyBjYWNoaW5nIGluZm9ybWF0aW9u
+IHRvIHRoZSBzdHJ1Y3R1cmUuIA0Kc3RydWN0IGRtYV9idWZfbWFwIGlzIGZvciBncmFwaGlj
+cywgYnV0IHJlYWxseSBqdXN0IGFub3RoZXIgbWVtb3J5IEFQSS4NCg0KV2hlbiB3ZSBpbnRy
+b2R1Y2VkIHN0cnVjdCBkbWFfYnVmX21hcCB3ZSB0aG91Z2h0IG9mIGFkZGl0aW9uYWwgdXNl
+IA0KY2FzZXMsIGJ1dCBjb3VsZG4ndCByZWFsbHkgZmluZCBhbnkgYXQgdGhlIHRpbWUuIE1h
+eWJlIHdoYXQgeW91J3JlIA0KZGVzY3JpYmluZyBpcyB0aGF0IHVzZSBjYXNlIGFuZCBzdHJ1
+Y3QgZG1hX2J1Zl9tYXAgY291bGQgYmUgZXh0ZW5kZWQgZm9yIA0KdGhpcyBwdXJwb3NlLg0K
+DQpCZXN0IHJlZ2FyZHMNClRob21hcw0KDQpbMV0gDQpodHRwczovL2VsaXhpci5ib290bGlu
+LmNvbS9saW51eC92NS4xNi9zb3VyY2UvaW5jbHVkZS9saW51eC9kbWEtYnVmLW1hcC5oI0wx
+MTUNCg0KPiANCj4gYW5kIHVzZSBpdCB0byByZXBsYWNlIGJpb192ZWMgYXMgd2VsbCBhcyB1
+c2luZyBpdCB0byByZXBsYWNlIHRoZSBhcnJheQ0KPiBvZiBzdHJ1Y3QgcGFnZXMgdXNlZCBi
+eSBnZXRfdXNlcl9wYWdlcygpIGFuZCBmcmllbmRzLg0KPiANCj4gLS0tDQo+IA0KPiBUaGVy
+ZSBhcmUgdHdvIGRpc3RpbmN0IHByb2JsZW1zIEkgd2FudCB0byBhZGRyZXNzOiBkb2luZyBJ
+L08gdG8gbWVtb3J5DQo+IHdoaWNoIGRvZXMgbm90IGhhdmUgYSBzdHJ1Y3QgcGFnZSBhbmQg
+ZWZmaWNpZW50bHkgZG9pbmcgSS9PIHRvIGxhcmdlDQo+IGJsb2JzIG9mIHBoeXNpY2FsbHkg
+Y29udGlndW91cyBtZW1vcnksIHJlZ2FyZGxlc3Mgb2Ygd2hldGhlciBpdCBoYXMgYQ0KPiBz
+dHJ1Y3QgcGFnZS4gIFRoZXJlIGFyZSBzb21lIG90aGVyIGltcHJvdmVtZW50cyB3aGljaCBJ
+IHJlZ2FyZCBhcyBtaW5vci4NCj4gDQo+IFRoZXJlIGFyZSBtYW55IHR5cGVzIG9mIG1lbW9y
+eSB0aGF0IG9uZSBtaWdodCB3YW50IHRvIGRvIEkvTyB0byB0aGF0IGRvDQo+IG5vdCBoYXZl
+IGEgc3RydWN0IHBhZ2UsIHNvbWUgZXhhbXBsZXM6DQo+ICAgLSBNZW1vcnkgb24gYSBncmFw
+aGljcyBjYXJkIChvciBvdGhlciBQQ0kgY2FyZCwgYnV0IGdmeCBzZWVtcyB0byBiZQ0KPiAg
+ICAgdGhlIHByaW1hcnkgcHJvdmlkZXIgb2YgRFJBTSBvbiB0aGUgUENJIGJ1cyB0b2RheSkN
+Cj4gICAtIERBWCwgb3Igb3RoZXIgcG1lbSAodGhlcmUgYXJlIHNvbWUgZmFrZSBwYWdlcyB0
+b2RheSwgYnV0IHRoaXMgaXMNCj4gICAgIG1vc3RseSBhIHdvcmthcm91bmQgZm9yIHRoZSBJ
+TyBwcm9ibGVtIHRvZGF5KQ0KPiAgIC0gR3Vlc3QgbWVtb3J5IGJlaW5nIGFjY2Vzc2VkIGZy
+b20gdGhlIGh5cGVydmlzb3IgKEtWTSBuZWVkcyB0bw0KPiAgICAgY3JlYXRlIHN0cnVjdHBh
+Z2VzIHRvIG1ha2UgdGhpcyBoYXBwZW4uICBYZW4gZG9lc24ndCAuLi4pDQo+IEFsbCBvZiB0
+aGVzZSBraW5kcyBvZiBtZW1vcmllcyBjYW4gYmUgYWRkcmVzc2VkIGJ5IHRoZSBDUFUgYW5k
+IHNvIGFsc28NCj4gYnkgYSBidXMgbWFzdGVyLiAgVGhhdCBpcywgdGhlcmUgaXMgYSBwaHlz
+aWNhbCBhZGRyZXNzIHRoYXQgdGhlIENQVQ0KPiBjYW4gdXNlIHdoaWNoIHdpbGwgYWRkcmVz
+cyB0aGlzIG1lbW9yeSwgYW5kIHRoZXJlIGlzIGEgd2F5IHRvIGNvbnZlcnQNCj4gdGhhdCB0
+byBhIERNQSBhZGRyZXNzIHdoaWNoIGNhbiBiZSBwcm9ncmFtbWVkIGludG8gYW5vdGhlciBk
+ZXZpY2UuDQo+IFRoZXJlJ3Mgbm8gaW50ZW50IGhlcmUgdG8gc3VwcG9ydCBtZW1vcnkgd2hp
+Y2ggY2FuIGJlIGFjY2Vzc2VkIGJ5IGENCj4gY29tcGxleCBzY2hlbWUgbGlrZSB3cml0aW5n
+IGFuIGFkZHJlc3MgdG8gYSBjb250cm9sIHJlZ2lzdGVyIGFuZCB0aGVuDQo+IGFjY2Vzc2lu
+ZyB0aGUgbWVtb3J5IHRocm91Z2ggYSBGSUZPOyB0aGlzIGlzIGZvciBtZW1vcnkgd2hpY2gg
+Y2FuIGJlDQo+IGFjY2Vzc2VkIGJ5IERNQSBhbmQgQ1BVIGxvYWRzIGFuZCBzdG9yZXMuDQo+
+IA0KPiBGb3IgZ2V0X3VzZXJfcGFnZXMoKSBhbmQgZnJpZW5kcywgd2UgY3VycmVudGx5IGZp
+bGwgYW4gYXJyYXkgb2Ygc3RydWN0DQo+IHBhZ2VzLCBlYWNoIG9uZSByZXByZXNlbnRpbmcg
+UEFHRV9TSVpFIGJ5dGVzLiAgRm9yIGFuIGFwcGxpY2F0aW9uIHRoYXQNCj4gaXMgdXNpbmcg
+MUdCIGh1Z2VwYWdlcywgd3JpdGluZyAyXjE4IGVudHJpZXMgaXMgYSBzaWduaWZpY2FudCBv
+dmVyaGVhZC4NCj4gSXQgYWxzbyBtYWtlcyBkcml2ZXJzIGhhcmQgdG8gd3JpdGUgYXMgdGhl
+eSBoYXZlIHRvIHJlY29hbGVzY2UgdGhlDQo+IHN0cnVjdCBwYWdlcywgZXZlbiB0aG91Z2gg
+dGhlIFZNIGNhbiB0ZWxsIGl0IHdoZXRoZXIgdGhvc2UgMl4xOCBwYWdlcw0KPiBhcmUgY29u
+dGlndW91cy4NCj4gDQo+IE9uIHRoZSBtaW5vciBzaWRlLCBzdHJ1Y3QgcGh5ciBjYW4gcmVw
+cmVzZW50IGFueSBtYXBwYWJsZSBjaHVuayBvZiBtZW1vcnkuDQo+IEEgYmlvX3ZlYyBpcyBs
+aW1pdGVkIHRvIDJeMzIgYnl0ZXMsIHdoaWxlIG9uIDY0LWJpdCBtYWNoaW5lcyBhIHBoeXIN
+Cj4gY2FuIHJlcHJlc2VudCBsYXJnZXIgdGhhbiA0R0IuICBBIHBoeXIgaXMgdGhlIHNhbWUg
+c2l6ZSBhcyBhIGJpb192ZWMNCj4gb24gNjQgYml0ICgxNiBieXRlcyksIGFuZCB0aGUgc2Ft
+ZSBzaXplIGZvciAzMi1iaXQgd2l0aCBQQUUgKDEyIGJ5dGVzKS4NCj4gSXQgaXMgc21hbGxl
+ciBmb3IgMzItYml0IG1hY2hpbmVzIHdpdGhvdXQgUEFFICg4IGJ5dGVzIGluc3RlYWQgb2Yg
+MTIpLg0KPiANCj4gRmluYWxseSwgaXQgbWF5IGJlIHBvc3NpYmxlIHRvIHN0b3AgdXNpbmcg
+c2NhdHRlcmxpc3QgdG8gZGVzY3JpYmUgdGhlDQo+IGlucHV0IHRvIHRoZSBETUEtbWFwcGlu
+ZyBvcGVyYXRpb24uICBXZSBtYXkgYmUgYWJsZSB0byBnZXQgc3RydWN0DQo+IHNjYXR0ZXJs
+aXN0IGRvd24gdG8ganVzdCBkbWFfYWRkcmVzcyBhbmQgZG1hX2xlbmd0aCwgd2l0aCBjaGFp
+bmluZw0KPiBoYW5kbGVkIHRocm91Z2ggYW4gZW5jbG9zaW5nIHN0cnVjdC4NCj4gDQo+IEkg
+d291bGQgbGlrZSB0byBzZWUgcGh5ciByZXBsYWNlIGJpb192ZWMgZXZlcnl3aGVyZSBpdCdz
+IGN1cnJlbnRseSB1c2VkLg0KPiBJIGRvbid0IGhhdmUgdGltZSB0byBkbyB0aGF0IHdvcmsg
+bm93IGJlY2F1c2UgSSdtIGJ1c3kgd2l0aCBmb2xpb3MuDQo+IElmIHNvbWVvbmUgZWxzZSB3
+YW50cyB0byB0YWtlIHRoYXQgb24sIEkgc2hhbGwgY2hlZXIgZnJvbSB0aGUgc2lkZWxpbmVz
+Lg0KPiBXaGF0IEkgZG8gaW50ZW5kIHRvIGRvIGlzOg0KPiANCj4gICAtIEFkZCBhbiBpbnRl
+cmZhY2UgdG8gZ3VwLmMgdG8gcGluL3VucGluIE4gcGh5cnMNCj4gICAtIEFkZCBhIHNnX21h
+cF9waHlycygpDQo+ICAgICBUaGlzIHdpbGwgdGFrZSBhbiBhcnJheSBvZiBwaHlycyBhbmQg
+YWxsb2NhdGUgYW4gc2cgZm9yIHRoZW0NCj4gICAtIFdoYXRldmVyIGVsc2UgSSBuZWVkIHRv
+IGRvIHRvIG1ha2Ugb25lIFJETUEgZHJpdmVyIGhhcHB5IHdpdGgNCj4gICAgIHRoaXMgc2No
+ZW1lDQo+IA0KPiBBdCB0aGF0IHBvaW50LCBJIGludGVuZCB0byBzdG9wIGFuZCBsZXQgb3Ro
+ZXJzIG1vcmUgZmFtaWxpYXIgd2l0aCB0aGlzDQo+IGFyZWEgb2YgdGhlIGtlcm5lbCBjb250
+aW51ZSB0aGUgY29udmVyc2lvbiBvZiBkcml2ZXJzLg0KPiANCj4gUC5TLiBJZiB5b3UndmUg
+aGFkIHRoZSBQcm9kaWd5IHNvbmcgcnVubmluZyB0aHJvdWdoIHlvdXIgaGVhZCB0aGUgd2hv
+bGUNCj4gdGltZSB5b3UndmUgYmVlbiByZWFkaW5nIHRoaXMgZW1haWwgLi4uIEknbSBzb3Jy
+eSAvIFlvdSdyZSB3ZWxjb21lLg0KPiBJZiBwZW9wbGUgaW5zaXN0LCB3ZSBjYW4gcmVuYW1l
+IHRoaXMgdG8gcGh5c19yYW5nZSBvciBzb21ldGhpbmcgYm9yaW5nLA0KPiBidXQgSSBxdWl0
+ZSBsaWtlIHRoZSBzcGVsbGluZyBvZiBwaHlyIHdpdGggdGhlIHByb251bmNpYXRpb24gb2Yg
+ImZpcmUiLg0KDQotLSANClRob21hcyBaaW1tZXJtYW5uDQpHcmFwaGljcyBEcml2ZXIgRGV2
+ZWxvcGVyDQpTVVNFIFNvZnR3YXJlIFNvbHV0aW9ucyBHZXJtYW55IEdtYkgNCk1heGZlbGRz
+dHIuIDUsIDkwNDA5IE7DvHJuYmVyZywgR2VybWFueQ0KKEhSQiAzNjgwOSwgQUcgTsO8cm5i
+ZXJnKQ0KR2VzY2jDpGZ0c2bDvGhyZXI6IEl2byBUb3Rldg0K
 
-I'm not sure it's correct to potentially read feature_persistent
-multiple times like it's done here.
+--------------FSfCP6lzbOH6mRnDQRWz0fCp--
 
-A device can be disconnected and re-attached multiple times, and that
-implies multiple calls to connect_ring which could make the state of
-feature_gnt_persistent change across reconnections if the value of
-feature_persistent is changed. I think that would be unexpected.
+--------------TUMr3QAK8x0Ry03YInQSssDP
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
-There are also similar issues with
-xenblk_max_queues/xen_blkif_max_ring_order changing after
-xen_blkbk_probe has been executed. We likely need to stash all those
-parameters so what's on xenbus is consistent with the limits enforced
-in blkback.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks, Roger.
+wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmHdbJoFAwAAAAAACgkQlh/E3EQov+Ab
+pA//eKdztUrkpafjDVZN2ROygr3b8QCA5GvPP8rrhIDvxNRVIT0RoC1H1JN16SyfXJVuPq+wIQ4s
+iMN5Gr/FxyWZOKcn5QXxyUceQTIVIIFI8wooOzIueOqUmtf/P/LdPoyZDrDxVfhTbT3u3ZlpDSiV
+bNuV6HZhz224KNfBduGcj5kY2MNwFYoDJFrBCv5AYFsfVayRR0K0AAG1+41+e/B5tWNO1tr8pZyD
+wJfAntFrq/3vz/vmRt3vzMM8bisUaZfFfgEdWRlBgjduvhwvTUuiid85JF7YmLC4MCvewBiOkwN3
+2Ov+XSv01Y3SXoeKUDd6/S8UVJdXg2dyCRJftbaf+WJ5XPSXJ9r4pPb3tPTvIUWFFX7iY3Q3ap50
+qS/7bUoQ9Vyl1Krv1QMo5wmg7Jf4ie2yn9TN/Z4HSCpIxuDSs33cGH5vQfrVa33b1K+VHFSOnuh5
+wxqguP/iNDWs/9ryASOrg6jFLe/D3nX+RH4OOibqR10sNrU/UrFo5roqRHoKF6EevW/KVXitHZZT
+NR+pBzDiX8scl/Akzm1wrxre4RvTBOFpppI+ayaEbjMSEQ8OSOQEm7njmYp6ue699rNcqi2UWT8s
+M56FvFE4IbvlfmOGVvyJWA0G61Y2tDkAtJW3MDvyPZcvBSb1gHo7G8sJc9rRp/4fDisa5AHDF7/q
+ekc=
+=yG12
+-----END PGP SIGNATURE-----
+
+--------------TUMr3QAK8x0Ry03YInQSssDP--
