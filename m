@@ -2,126 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C86C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 16:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48682C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 17:32:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349828AbiAKQPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 11:15:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50893 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349852AbiAKQPR (ORCPT
+        id S1344751AbiAKRc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 12:32:57 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:43930 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344767AbiAKRcC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 11:15:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641917715;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CC1i5tpLMiW1d6bdv7f77XtvYY1n5qxfZPIldyU34eI=;
-        b=XIReghv8xVgycXV9Qno6O5jm+U2gsnwabtHDxf7WRmRcL6IFWioFNdS51qhbiu/8qq0QRb
-        71/yfdhFjVlSzTpw3NKtyk+Xz5pwsXSUiCS9hELGHdAbrwtkOkHbdeZYjzfAoFD5sie1f0
-        9lF3KaG4pGd22RqAjUkqHktV9TBYjqs=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-573-kNNscN0xOBeJrPuVjgjEEA-1; Tue, 11 Jan 2022 11:15:14 -0500
-X-MC-Unique: kNNscN0xOBeJrPuVjgjEEA-1
-Received: by mail-qv1-f71.google.com with SMTP id o14-20020ad45c8e000000b004112b52fc2cso16587328qvh.6
-        for <linux-block@vger.kernel.org>; Tue, 11 Jan 2022 08:15:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CC1i5tpLMiW1d6bdv7f77XtvYY1n5qxfZPIldyU34eI=;
-        b=tMP/HWu+FymPihuKsUx8t49NK0KbLj0sjZAzZ4zWsRqFJUDUZwalIwG9baDbWnP1Nh
-         idTnOLEy8RQ7SgfmmCGm3hGxkQqenMAOpg0BUpA1P3V9Lb9pGiXH+NMF2SXQn0m7Brcl
-         +TjW28ibyrvkzThxtdXl/tsJIb4deFknDrJ7Dlr/ipp55LeplJY5LNntLZtYCS+M+FeY
-         Ri7JC88gRXLjkFI1syot+qedK91wJx0ml+nfGtT8NuIX+0SZK0gy6MF/Bj7bXse1mduX
-         3DfT2O7w3UTa/pm852zJgWgTAtx/qI1wMmRnfJPOM+rSrWBTt4HzBH67x6Q7afzlTzHF
-         AlIw==
-X-Gm-Message-State: AOAM5335XJPKKucjOztSni5nx2VjiZJZcHUBxHZr3R90riFsfRoQK5rW
-        FkqPKUXjGcLCNBQ4bKFd4RHtVjLszZptgsnCMXMTA/pbXrANVe8ciaQOT32tsnO+H9iWoGnB2p/
-        9Cc1fu4RH/qGoMwjpg8zqXA==
-X-Received: by 2002:a05:622a:13ce:: with SMTP id p14mr4232674qtk.562.1641917712074;
-        Tue, 11 Jan 2022 08:15:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz9rn8Dc2sri+sXStNgRwr2Ijq9qi5yvFpyULm8k4zkoftteb5wEjtKYGDbnDA0U+OKT8LYwQ==
-X-Received: by 2002:a05:622a:13ce:: with SMTP id p14mr4232630qtk.562.1641917711671;
-        Tue, 11 Jan 2022 08:15:11 -0800 (PST)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id j13sm7195820qta.76.2022.01.11.08.15.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 08:15:11 -0800 (PST)
-Date:   Tue, 11 Jan 2022 11:15:09 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/3] blk-mq/dm-rq: support BLK_MQ_F_BLOCKING for dm-rq
-Message-ID: <Yd2tDWuP+aT3Hxbj@redhat.com>
-References: <20211221141459.1368176-1-ming.lei@redhat.com>
- <YcH/E4JNag0QYYAa@infradead.org>
- <YcP4FMG9an5ReIiV@T590>
- <YcuB4K8P2d9WFb83@redhat.com>
- <Yd1BFpYTBlQSPReW@infradead.org>
+        Tue, 11 Jan 2022 12:32:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=oBrXEHfI6xABrUDZXcl3Ilv2Mnj53ZcLvhEcAszQLhw=; b=YeL6mnl38ypaS0PyULw3luqlUK
+        XeOI6Vhp947TOTlkyofoaX8wJ8Yg8h3TI1VDxJKcJ9GY5xcvig0mIQbG1QAzJj7OFJGoGht0Yb0/K
+        tCS0dg0IMDzl/EH2fKYSqUf/gOewi+o5KmBNzaa7MfqcqWht6q8GI3xD9GYemVOCBS6mmJTuSF8wp
+        PWzBOz3P0o1s2U3pEYwYMqlbrob3xzb0MD0zndcqZ4+3aWrBorD50RGouaf0fv20oDTgMxWvUpoMU
+        2sXHLWkZGVSk79v0DlRL8om4AbtqKRlS5Om4EuhSURfLs+YKil2RSAe8S2cXFLA5uF5y1ZXO38jnC
+        TupA0NOA==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1n7Kzp-009ip7-HL; Tue, 11 Jan 2022 10:31:46 -0700
+To:     John Hubbard <jhubbard@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-kernel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        nvdimm@lists.linux.dev
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+ <82989486-3780-f0aa-c13d-994e97d4ac89@nvidia.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <305b0b3b-e5d1-3dc2-a4a3-01c05dda6748@deltatee.com>
+Date:   Tue, 11 Jan 2022 10:31:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yd1BFpYTBlQSPReW@infradead.org>
+In-Reply-To: <82989486-3780-f0aa-c13d-994e97d4ac89@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: nvdimm@lists.linux.dev, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-block@vger.kernel.org, ming.lei@redhat.com, joao.m.martins@oracle.com, jgg@nvidia.com, hch@lst.de, linux-kernel@vger.kernel.org, willy@infradead.org, jhubbard@nvidia.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: Phyr Starter
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 11 2022 at  3:34P -0500,
-Christoph Hellwig <hch@infradead.org> wrote:
 
-> On Tue, Dec 28, 2021 at 04:30:08PM -0500, Mike Snitzer wrote:
-> > Yeah, people use request-based for IO scheduling and more capable path
-> > selectors. Imposing bio-based would be a pretty jarring workaround for 
-> > BLK_MQ_F_BLOCKING. request-based DM should properly support it.
+
+On 2022-01-11 1:17 a.m., John Hubbard wrote:
+> On 1/10/22 11:34, Matthew Wilcox wrote:
+>> TLDR: I want to introduce a new data type:
+>>
+>> struct phyr {
+>>          phys_addr_t addr;
+>>          size_t len;
+>> };
+>>
+>> and use it to replace bio_vec as well as using it to replace the array
+>> of struct pages used by get_user_pages() and friends.
+>>
+>> ---
 > 
-> Given that nvme-tcp is the only blocking driver that has multipath
-> driver that driver explicitly does not intend to support dm-multipath
-> I'm absolutely against adding block layer cruft for this particular
-> use case.
+> This would certainly solve quite a few problems at once. Very compelling.
 
-this diffstat amounts to what you call "cruft":
+I agree.
 
- block/blk-core.c       |  2 +-
- block/blk-mq.c         |  6 +++---
- block/blk-mq.h         |  2 +-
- block/blk-sysfs.c      |  2 +-
- block/genhd.c          |  5 +++--
- drivers/md/dm-rq.c     |  5 ++++-
- drivers/md/dm-rq.h     |  3 ++-
- drivers/md/dm-table.c  | 14 ++++++++++++++
- drivers/md/dm.c        |  5 +++--
- drivers/md/dm.h        |  1 +
- include/linux/blkdev.h |  5 +++--
- include/linux/genhd.h  | 12 ++++++++----
- 12 files changed, 44 insertions(+), 18 deletions(-)
-
-> SCSI even has this:
+> Zooming in on the pinning aspect for a moment: last time I attempted to
+> convert O_DIRECT callers from gup to pup, I recall wanting very much to
+> record, in each bio_vec, whether these pages were acquired via FOLL_PIN,
+> or some non-FOLL_PIN method. Because at the end of the IO, it is not
+> easy to disentangle which pages require put_page() and which require
+> unpin_user_page*().
 > 
-> 	        /*
-> 		 * SCSI never enables blk-mq's BLK_MQ_F_BLOCKING flag so
-> 		 * calling synchronize_rcu() once is enough.
-> 		 */
-> 		WARN_ON_ONCE(shost->tag_set.flags & BLK_MQ_F_BLOCKING);
+> And changing the bio_vec for *that* purpose was not really acceptable.
 > 
+> But now that you're looking to change it in a big way (and with some
+> spare bits avaiable...oohh!), maybe I can go that direction after all.
+> 
+> Or, are you looking at a design in which any phyr is implicitly FOLL_PIN'd
+> if it exists at all?
 
-Round and round we go.. Pretty tired of this.
+I'd also second being able to store a handful of flags in each phyr. My
+userspace P2PDMA patchset needs to add a flag to each sgl to indicate
+whether it was mapped as a bus address or not (which would be necessary
+for the DMA mapped side dma_map_phyr).
 
-You are perfectly fine with incrementally compromising request-based
-DM's ability to evolve as block core does.
+Though, it's not immediately obvious where to put the flags without
+increasing the size of the structure :(
 
-Seriously, this patchset shouldn't warrant bickering:
-https://patchwork.kernel.org/project/dm-devel/list/?series=598823
-
-Jens, this incremental weakening of what it is that DM is allowed to
-do is not something I can continue to work with (nor should Ming's or
-others' contributions be rejected for such reasons).
-
-This tribal war needs to stop.
-
-Mike
-
+Logan
