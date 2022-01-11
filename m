@@ -2,122 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 931EBC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 21:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7513C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 22:09:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244337AbiAKV7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 16:59:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbiAKV7u (ORCPT
+        id S1345776AbiAKWJZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 17:09:25 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:49446 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237002AbiAKWJZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 16:59:50 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BC2C06173F
-        for <linux-block@vger.kernel.org>; Tue, 11 Jan 2022 13:59:49 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id c14-20020a17090a674e00b001b31e16749cso7868901pjm.4
-        for <linux-block@vger.kernel.org>; Tue, 11 Jan 2022 13:59:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=4d36RkzytXf0AgHZAiUJdXMpTmlRY0RoMET8pPsPvK0=;
-        b=LGd1jH+zfdPsEcPidDrJ0DVRR4MjhIWo1GWAUUtBAd8WFzU0bN8xR3cY8Q1y5rCn0G
-         Tel+J2RbldSK6/GMpRPS9ML+zYKLZRPTzH8mpKFRyIGiFqNeFVRTtTcar5GEpLsTja+/
-         3plP//t/Zlpq3FpZcan8Vq6n5gUvpDA9QXrFHGu2cLUWIwfVtT5pJP+hlOXwmyVxSDfS
-         LXkYUTm20TeDHTd83XcU1urJ5U3WnMJmXMlC5B3Hma+aJicIBsqtz+NSsz9OwKgNgNJf
-         8/UbFu4of/WHopTxp+n6wH1uOV5oAwdKrSiF5agsVRZ55cRjmfYBFeQBZIdD32P8Przw
-         8qAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to;
-        bh=4d36RkzytXf0AgHZAiUJdXMpTmlRY0RoMET8pPsPvK0=;
-        b=zdbtKiFJXpr48+MrpmMwIMrqggGuaOtr/xalCkihaEIFwJWRy3rv62v7+iKOiRB9mg
-         +UqJNjfLOromSNw57xJvq68S6JmSo42kbbjofmqIdBHCXeiU7LqgN8Nn0BSOsfw3knKP
-         QsFgqDj/wxxo2A90aVt0U2wiNiG8y0U7c7riFkrRbKQ1mvVP3ja7h4rKJIrXGTtCeX4N
-         gxs1sT2C/C2mGB6knhMy7iiKyIJCwda2AYlqyRo6aludyTLdS+7FuOvdpx02NixZgvFb
-         uehZJpAsoyHjFWw7/npouXj67XkVAaZsvNFjvj7FJd7feUQbfdwB8bvmRKspZiXMRAis
-         /Nvw==
-X-Gm-Message-State: AOAM532whmRzQzzr5W/Agc//N0Fzoai0HD/8uXpDm6efHCVr6K1bQPTQ
-        WX92lJrLppQ8t8jstIMdtUg=
-X-Google-Smtp-Source: ABdhPJyeC53hc0Mjhmw1IVlh6Gi1bTzao6f/P9GnEVnDagcJ383FsXEMOfHhKiCIPRTYPatWVsXgHg==
-X-Received: by 2002:a17:902:d485:b0:14a:4ba5:6e64 with SMTP id c5-20020a170902d48500b0014a4ba56e64mr6535979plg.152.1641938389214;
-        Tue, 11 Jan 2022 13:59:49 -0800 (PST)
-Received: from google.com ([2620:15c:211:201:4f0e:ffc8:3f7b:ac89])
-        by smtp.gmail.com with ESMTPSA id l12sm11764682pfc.181.2022.01.11.13.59.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 13:59:48 -0800 (PST)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Tue, 11 Jan 2022 13:59:47 -0800
-From:   Minchan Kim <minchan@kernel.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Yu Zhao <yuzhao@google.com>,
-        Mauricio Faria de Oliveira <mfo@canonical.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, Huang Ying <ying.huang@intel.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Yang Shi <shy828301@gmail.com>
-Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-Message-ID: <Yd39019io71DHbVq@google.com>
-References: <20220105233440.63361-1-mfo@canonical.com>
- <Yd0oLWtVAyAexyQc@google.com>
- <Yd3SUXVy7MbyBzFw@google.com>
- <e75c8f37-782f-f4d4-b197-8fda18090b42@nvidia.com>
- <Yd3mfROPwP72QPt3@google.com>
- <Yd3m55+d2edO2I4p@google.com>
+        Tue, 11 Jan 2022 17:09:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=Ea3/TfTxnBizgPzQyGep0ghYBk0hbGQaIDnneO+IVxM=; b=n28l4tU4hMcGmq66NzaaHE2bgM
+        DLtZM1k0CMmcynt95oE9h0HRhweiVxNXojoxFWf2yRWNJS9ZBjOqlWoQ2pd5h6x2Dja/MDMQxce4h
+        oC4wWWh7fyC2fM+VSsghTwbh9vsQKdiXBQ1gn4feOPPSodQaYZq+Qjf9nVlB6xdH7gUCyyIyA5SDB
+        kd+Jw0ZcrPVZTrek2/BUeREf/XC9z/tYBcWTs9Ss6gvRjyZX6HCf8rrhXu6Q3C/XPn/EfIrLxjRE3
+        AFLxscv0jUHFqxFFUr+MNIjLV+z4FrJWWTnywtnmhaO9c987fXwNpO2H8Afye56wVIxz2W0+ce2Ej
+        t7wlui9A==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1n7PKO-009nQW-1A; Tue, 11 Jan 2022 15:09:17 -0700
+To:     Matthew Wilcox <willy@infradead.org>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        nvdimm@lists.linux.dev
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+ <20220111004126.GJ2328285@nvidia.com> <Yd0IeK5s/E0fuWqn@casper.infradead.org>
+ <20220111150142.GL2328285@nvidia.com> <Yd3Nle3YN063ZFVY@casper.infradead.org>
+ <20220111202159.GO2328285@nvidia.com> <Yd311C45gpQ3LqaW@casper.infradead.org>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <ef01ce7d-f1d3-0bbb-38ba-2de4d3f7e31a@deltatee.com>
+Date:   Tue, 11 Jan 2022 15:09:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
+In-Reply-To: <Yd311C45gpQ3LqaW@casper.infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yd3m55+d2edO2I4p@google.com>
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: nvdimm@lists.linux.dev, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-block@vger.kernel.org, ming.lei@redhat.com, jhubbard@nvidia.com, joao.m.martins@oracle.com, hch@lst.de, linux-kernel@vger.kernel.org, jgg@nvidia.com, willy@infradead.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: Phyr Starter
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 12:21:59PM -0800, Minchan Kim wrote:
-> On Tue, Jan 11, 2022 at 12:20:13PM -0800, Minchan Kim wrote:
-> < snip >
-> > > > slow path with __gup_longterm_unlocked and set_dirty_pages
-> > > > for them).
-> > > > 
-> > > > This approach would solve other cases where map userspace
-> > > > pages into kernel space and then write. Since the write
-> > > > didn't go through with the process's page table, we will
-> > > > lose the dirty bit in the page table of the process and
-> > > > it turns out same problem. That's why I'd like to approach
-> > > > this.
-> > > > 
-> > > > If it doesn't work, the other option to fix this specific
-> > > > case is can't we make pages dirty in advance in DIO read-case?
-> > > > 
-> > > > When I look at DIO code, it's already doing in async case.
-> > > > Could't we do the same thing for the other cases?
-> > > > I guess the worst case we will see would be more page
-> > > > writeback since the page becomes dirty unnecessary.
-> > > 
-> > > Marking pages dirty after pinning them is a pre-existing area of
-> > > problems. See the long-running LWN articles about get_user_pages() [1].
-> > 
-> > Oh, Do you mean marking page dirty in DIO path is already problems?
+
+
+On 2022-01-11 2:25 p.m., Matthew Wilcox wrote:
+> That's reproducing the bad decision of the scatterlist, only with
+> a different encoding.  You end up with something like:
 > 
->                   ^ marking page dirty too late in DIO path
+> struct neoscat {
+> 	dma_addr_t dma_addr;
+> 	phys_addr_t phys_addr;
+> 	size_t dma_len;
+> 	size_t phys_len;
+> };
 > 
-> Typo fix.
+> and the dma_addr and dma_len are unused by all-but-the-first entry when
+> you have a competent IOMMU.  We want a different data structure in and
+> out, and we may as well keep using the scatterlist for the dma-map-out.
 
-I looked though the articles but couldn't find dots to connetct
-issues with this MADV_FREE issue. However, man page shows a clue
-why it's fine.
+With my P2PDMA patchset, even with a competent IOMMU, we need to support
+multiple dma_addr/dma_len pairs (plus the flag bit). This is required to
+program IOVAs and multiple bus addresses into a single DMA transactions.
 
-```
-       O_DIRECT  I/Os should never be run concurrently with the fork(2) system call, if the memory buffer is a private map‐
-       ping (i.e., any mapping created with the mmap(2) MAP_PRIVATE flag; this includes memory allocated on  the  heap  and
-       statically  allocated  buffers).  Any such I/Os, whether submitted via an asynchronous I/O interface or from another
-       thread in the process, should be completed before fork(2) is called.  Failure to do so can result in data corruption
-       and  undefined  behavior  in parent and child processes.
+I think using the scatter list for the DMA-out side is not ideal seeing
+we don't need the page pointers or multiple length fields and we won't
+be able to change the sgl substantially given the massive amount of
+existing use cases that won't go away over night.
 
-```
+My hope would be along these lines:
 
-I think it would make the copy_present_pte's page_dup_rmap safe.
+struct phy_range {
+    phys_addr_t phyr_addr;
+    u32 phyr_len;
+    u32 phyr_flags;
+};
+
+struct dma_range {
+    dma_addr_t dmar_addr;
+    u32 dmar_len;
+    u32 dmar_flags;
+};
+
+A new GUP helper would somehow return a list of phy_range structs and
+the new dma_map function would take that list and return a list of
+dma_range structs. Each element in the list could represent a segment up
+to 4GB, so any range longer than that would need multiple items in the
+list. (Alternatively, perhaps the length could be a 64bit value and we
+steal some of the top bits for flags or some such). The flags would not
+only be needed by some of the use cases mentioned (FOLL_PIN or
+DMA_BUS_ADDRESS) but could also support chaining these lists like SGLs
+so continuous vmallocs would not be necessary for longer lists.
+
+If there's an [phy|dma]_range_list struct (or some such) which contains
+these range structs (per some details of Jason's suggestions) that'd be
+fine by me too and would just depend on implementation details.
+
+However, the main problem I see is a chicken and egg problem. The new
+dma_map function would need to be implemented by every dma_map provider
+or any driver trying to use it would need a messy fallback. Either that,
+or we need a wrapper that allocates an appropriately sized SGL to pass
+to any dma_map implementation that doesn't support the new structures.
+
+Logan
