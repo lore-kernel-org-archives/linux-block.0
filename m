@@ -2,80 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CACCC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Jan 2022 23:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3E0C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 00:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241586AbiAJXa2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 18:30:28 -0500
-Received: from mx.ewheeler.net ([173.205.220.69]:47288 "EHLO mx.ewheeler.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241114AbiAJXa2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 18:30:28 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 26AC54A;
-        Mon, 10 Jan 2022 15:30:27 -0800 (PST)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id 7WW_Nc2i1HIQ; Mon, 10 Jan 2022 15:30:26 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
+        id S243194AbiAKAhK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 19:37:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343618AbiAKAhJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Jan 2022 19:37:09 -0500
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF37C06173F
+        for <linux-block@vger.kernel.org>; Mon, 10 Jan 2022 16:37:09 -0800 (PST)
+Received: from localhost (unknown [IPv6:2601:281:8300:104d::5f6])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id 3F41E39;
-        Mon, 10 Jan 2022 15:30:26 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 3F41E39
-Date:   Mon, 10 Jan 2022 15:30:24 -0800 (PST)
-From:   Eric Wheeler <bcache@lists.ewheeler.net>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-cc:     Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>
-Subject: Re: [PATCH] bcache: make stripe_size configurable and persistent
- for hardware raid5/6
-In-Reply-To: <yq1fspvshbw.fsf@ca-mkp.ca.oracle.com>
-Message-ID: <611f98fc-222-8dd2-6b81-d570fb91fc@ewheeler.net>
-References: <d3f7fd44-9287-c7fa-ee95-c3b8a4d56c93@suse.de> <1561245371-10235-1-git-send-email-bcache@lists.ewheeler.net> <200638b0-7cba-38b4-20c4-b325f3cfe862@suse.de> <alpine.LRH.2.11.1906241800350.1114@mx.ewheeler.net> <8a9131dc-9bf7-a24a-f7b8-35e0c019e905@suse.de>
- <fdb85dc1-eee6-e55e-8e9c-fa1f36b4a37@ewheeler.net> <yq15yqvw1f0.fsf@ca-mkp.ca.oracle.com> <c9abd220-6b7f-9299-48a1-a16d64981734@ewheeler.net> <98aa1886-859-abb9-164f-c9eb9be38a91@ewheeler.net> <yq1fspvshbw.fsf@ca-mkp.ca.oracle.com>
+        by ms.lwn.net (Postfix) with ESMTPSA id AEEBC378;
+        Tue, 11 Jan 2022 00:37:07 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net AEEBC378
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1641861427; bh=061YdezqR5dKI/s7KvDyFuJ0KmD4Akd4qE617b2KoiA=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=AnWixQy2UwGOWY3tLumAeQQ9tG6hGqHXUUGsDECy2YnZnPPoEA6XlBCYywS3TQif/
+         NKqJ+1JMdqu9exJllhs+j1iJksUKr+uKs0nmuH+nt74FkTOwcu8wgJ8goxFZu/tynm
+         BPFUMYu0+aC0wzDvB+wzlydiZH4WqClekNuWgHILIdh71/Vfb36vcEwhuu1xYZ7ZqL
+         3mD3OBUdML/LCTwMVZv9ChhAtevF6xxH9SBiZyPj9Zbx+4nZnNfEyiEPHDkGhPCtvO
+         WEeZWtarx1iKsPKfxaBEnPSOiQd/Q/Tp52WQynAaMVlHFWXfs19msAVa68zUVHbhio
+         PUchTDGb0GSQA==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/8] docs: consolidate sysfs-block into
+ Documentation/ABI/
+In-Reply-To: <fff11146-f759-2887-5c80-6449dbc16717@kernel.dk>
+References: <20211209003833.6396-1-ebiggers@kernel.org>
+ <YcH1uxfdTRHIwl7Y@quark> <YdMQ6rfSZWSOLptA@quark>
+ <YddiJFr+ba7Veh82@sol.localdomain>
+ <65376e36-579b-76c4-0642-4582d6679914@acm.org>
+ <ef487b83-a1cc-d8a5-8a45-d0fec5eed94b@kernel.dk>
+ <YdtS3x0M1qFcN3R1@sol.localdomain>
+ <fff11146-f759-2887-5c80-6449dbc16717@kernel.dk>
+Date:   Mon, 10 Jan 2022 17:37:19 -0700
+Message-ID: <87k0f7hzuo.fsf@meer.lwn.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 10 Jan 2022, Martin K. Petersen wrote:
-> > Ok so `git blame` shows that Kent added this to md/raid5.c in 
-> > c78afc6261b (Kent Overstreet 2013-07-11 22:39:53 -0700 7526)
-> 
-> Yep.
-> 
-> > Do you think we should leave the md-specific
-> > raid_partial_stripes_expensive setting and require users of RAID
-> > controllers to set the bit themselves in bcache---or---remove all
-> > raid_partial_stripes_expensive code and always treat writes as
-> > "expensive" when `opt_io` is defined?
-> 
-> I'd prefer the latter since that was the very intent of exporting the
-> device topology in an abstract and protocol-independent fashion.
-> However, I don't know enough about bcache internals to know whether it
-> is always the right choice, what the trade-offs are, etc.
+Jens Axboe <axboe@kernel.dk> writes:
 
-I've not looked in detail, but I don't think its too difficult.
+> On 1/9/22 2:25 PM, Eric Biggers wrote:
+>> I think it makes much more sense for subsystems to be responsible for
+>> their own documentation; that's why patch 8 in this series adds the
+>> block layer documentation to the block layer MAINTAINERS entry.  Do
+>> you disagree with that?
+>
+> I agree, but then we often end up with merge conflicts between the doc
+> tree and others. That's why it's usually punted there. As a maintainer,
+> any conflicts is a pain in the butt to deal with, something the
+> contributor doesn't necessarily see or understand.
+>
+> If there are no conflicts this time around, I can queue them up.
 
-Do you know if io_opt can be configured on scsi devices that do not have 
-io_opt provided by the controller?  If so, or if it would be easy to add, 
-then configuring io_opt at the scsi layer is probably a better option so 
-subsystems besides bcache would benefit.
+[Docs maintainer not copied on any of this, but you can't escape :)]
 
-What do you think?
+Maintaining docs is a bit of a challenge for the reason Jens mentions:
+everybody puts their fingers into it, and the result is lots of merge
+conflicts.  For that reason, I'd prefer that big changes go through the
+docs tree.  Changes to directories like Documentation/ABI can be
+especially prone to conflicts, FWIW.
 
---
-Eric Wheeler
+I also tend to be a bit more attentive to things like the addition of
+docs-build warnings than maintainers from other subsystems.
 
+That said, the real goal is to get more and better documentation merged,
+and it often does make the most sense for docs changes to go through
+other trees.  Forcing the separation of documentation changes from the
+code changes they reflect would be kind of silly at best, for example.
+So if the block tree is the best path for these changes, then all I can
+say is:
 
-> 
-> -- 
-> Martin K. Petersen	Oracle Linux Engineering
-> 
+  Acked-by: Jonathan Corbet <corbet@lwn.net>
+
+Thanks,
+
+jon
