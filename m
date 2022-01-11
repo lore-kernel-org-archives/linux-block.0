@@ -2,142 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10669C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 14:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C8CC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 14:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241065AbiAKOKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 09:10:03 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:45176 "EHLO
+        id S239746AbiAKOMd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 09:12:33 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:45330 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241015AbiAKOKC (ORCPT
+        with ESMTP id S230295AbiAKOMc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 09:10:02 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 31FC51F37C;
-        Tue, 11 Jan 2022 14:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1641910201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        Tue, 11 Jan 2022 09:12:32 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id BBE141F37D;
+        Tue, 11 Jan 2022 14:12:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1641910351; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pEheax8cHUq+PpKPjpFMPLC2jVHfLP6R8ECbdm/214w=;
-        b=UusrhdrMkYLh5FAMpnWON1J/QUQoekCssXJOgQ1pmfsgXGaERozSRaR79VcuR3ZzgRcSRt
-        L9W4G4K4xRaJ07MmCPUhdtXFYQzt9drKAqXbeAK4XxLI/3VjiqDbGsf5mknLg3/38HtZpe
-        Xx0/8fk8uGRmu1Hn726DyKbvybNWoLY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1641910201;
+        bh=P9lRhOlKm9dnxzXyqY8lcIf6WomYbHt92EMiBkXux2k=;
+        b=Gj4ClZvoEM5fSzU9xF6tst/twW/13Xn5w/zat7lwwsHqqZJ/gse4Y6pighmnOdi6VexDvk
+        IN73xOILaNE4mTeo08Pk8gpt0Qkp0kQQGmFTX7s9sal/pTCNfBsw5SJMKWXu9k40v4r5m5
+        7o7SciYiLTnSAhiFfgBwf5L4vUDzXak=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1641910351;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pEheax8cHUq+PpKPjpFMPLC2jVHfLP6R8ECbdm/214w=;
-        b=/p5XzLUxq7TMaydSPAajIcMkJU1LSeopPXWpqtFQEb0vPananL6OSrSLYQAavBlPrcCbkA
-        f+w5BNrVySfbanCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=P9lRhOlKm9dnxzXyqY8lcIf6WomYbHt92EMiBkXux2k=;
+        b=P0Pjk3DeMFYYAWNKiu7A2O7Zk/pWZLGvVGpz7QdJ2QN5P4yd7GDTa1deNh30s4NLFYNS/R
+        NPhXq2oAZuAafPCg==
+Received: from quack3.suse.cz (unknown [10.100.200.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DD8D713AB2;
-        Tue, 11 Jan 2022 14:10:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id I3reNLiP3WH9XgAAMHmgww
-        (envelope-from <tzimmermann@suse.de>); Tue, 11 Jan 2022 14:10:00 +0000
-Message-ID: <9486843d-bbef-f7e0-354c-2522ea3f896f@suse.de>
-Date:   Tue, 11 Jan 2022 15:10:00 +0100
+        by relay2.suse.de (Postfix) with ESMTPS id 9C1C9A3B81;
+        Tue, 11 Jan 2022 14:12:31 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 514FBA0597; Tue, 11 Jan 2022 15:12:28 +0100 (CET)
+Date:   Tue, 11 Jan 2022 15:12:28 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5 v2] bfq: Avoid use-after-free when moving processes
+ between cgroups
+Message-ID: <20220111141228.xxr6wiq5x6b34uo3@quack3.lan>
+References: <20220105143037.20542-1-jack@suse.cz>
+ <527c2294-9a53-872a-330a-f337506cd08b@huawei.com>
+ <20220107145853.jvgupijrq2ejnhdt@quack3.lan>
+ <db449ed5-85db-37e5-deb6-62fdeb124c90@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: Phyr Starter
-Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     nvdimm@lists.linux.dev, linux-rdma@vger.kernel.org,
-        John Hubbard <jhubbard@nvidia.com>,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, Jason Gunthorpe <jgg@nvidia.com>,
-        netdev@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
- <f7bd672f-dfa8-93fa-e101-e57b90faeb1e@suse.de>
- <Yd2MeMT6LXWxJIDd@casper.infradead.org>
-From:   Thomas Zimmermann <tzimmermann@suse.de>
-In-Reply-To: <Yd2MeMT6LXWxJIDd@casper.infradead.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------q4YJa809K6MbWZkHsDkLnQxU"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <db449ed5-85db-37e5-deb6-62fdeb124c90@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------q4YJa809K6MbWZkHsDkLnQxU
-Content-Type: multipart/mixed; boundary="------------JQ28srt10RofHn0a758GsGXI";
- protected-headers="v1"
-From: Thomas Zimmermann <tzimmermann@suse.de>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: nvdimm@lists.linux.dev, linux-rdma@vger.kernel.org,
- John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Ming Lei <ming.lei@redhat.com>,
- linux-block@vger.kernel.org, linux-mm@kvack.org,
- Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org,
- Joao Martins <joao.m.martins@oracle.com>,
- Logan Gunthorpe <logang@deltatee.com>, Christoph Hellwig <hch@lst.de>
-Message-ID: <9486843d-bbef-f7e0-354c-2522ea3f896f@suse.de>
-Subject: Re: Phyr Starter
-References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
- <f7bd672f-dfa8-93fa-e101-e57b90faeb1e@suse.de>
- <Yd2MeMT6LXWxJIDd@casper.infradead.org>
-In-Reply-To: <Yd2MeMT6LXWxJIDd@casper.infradead.org>
+On Mon 10-01-22 09:49:34, yukuai (C) wrote:
+> 在 2022/01/07 22:58, Jan Kara 写道:
+> > On Fri 07-01-22 17:15:43, yukuai (C) wrote:
+> > > 在 2022/01/05 22:36, Jan Kara 写道:
+> > > > Hello,
+> > > > 
+> > > > here is the second version of my patches to fix use-after-free issues in BFQ
+> > > > when processes with merged queues get moved to different cgroups. The patches
+> > > > have survived some beating in my test VM but so far I fail to reproduce the
+> > > > original KASAN reports so testing from people who can reproduce them is most
+> > > > welcome. Thanks!
+> > > > 
+> > > > Changes since v1:
+> > > > * Added fix for bfq_put_cooperator()
+> > > > * Added fix to handle move between cgroups in bfq_merge_bio()
+> > > > 
+> > > > 								Honza
+> > > > Previous versions:
+> > > > Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
+> > > > .
+> > > > 
+> > > 
+> > > Hi,
+> > > 
+> > > I repoduced the problem again with this patchset...
+> > 
+> > Thanks for testing!
+> > 
+> > > [   71.004788] BUG: KASAN: use-after-free in
+> > > __bfq_deactivate_entity+0x21/0x290
+> > > [   71.006328] Read of size 1 at addr ffff88817a3dc0b0 by task rmmod/801
+> > > [   71.007723]
+> > > [   71.008068] CPU: 7 PID: 801 Comm: rmmod Tainted: G        W
+> > > 5.16.0-rc5-next-2021127
+> > > [   71.009995] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> > > ?-20190727_073836-4
+> > > [   71.012274] Call Trace:
+> > > [   71.012603]  <TASK>
+> > > [   71.012886]  dump_stack_lvl+0x34/0x44
+> > > [   71.013379]  print_address_description.constprop.0.cold+0xab/0x36b
+> > > [   71.014182]  ? __bfq_deactivate_entity+0x21/0x290
+> > > [   71.014795]  ? __bfq_deactivate_entity+0x21/0x290
+> > > [   71.015398]  kasan_report.cold+0x83/0xdf
+> > > [   71.015904]  ? _raw_read_lock_bh+0x20/0x40
+> > > [   71.016433]  ? __bfq_deactivate_entity+0x21/0x290
+> > > [   71.017033]  __bfq_deactivate_entity+0x21/0x290
+> > > [   71.017617]  bfq_pd_offline+0xc1/0x110
+> > > [   71.018105]  blkcg_deactivate_policy+0x14b/0x210
+> > ...
+> > 
+> > > Here is the caller of  __bfq_deactivate_entity:
+> > > (gdb) list *(bfq_pd_offline+0xc1)
+> > > 0xffffffff81c504f1 is in bfq_pd_offline (block/bfq-cgroup.c:942).
+> > > 937                      * entities to the idle tree. It happens if, in some
+> > > 938                      * of the calls to bfq_bfqq_move() performed by
+> > > 939                      * bfq_reparent_active_queues(), the queue to move
+> > > is
+> > > 940                      * empty and gets expired.
+> > > 941                      */
+> > > 942                     bfq_flush_idle_tree(st);
+> > > 943             }
+> > > 944
+> > > 945             __bfq_deactivate_entity(entity, false);
+> > 
+> > So this is indeed strange. The group has in some of its idle service trees
+> > an entity whose entity->sched_data points to already freed cgroup. In
+> > particular it means the bfqq_entity_service_tree() leads to somewhere else
+> > than the 'st' we called bfq_flush_idle_tree() with. This looks like a
+> > different kind of problem AFAICT but still it needs fixing :). Can you
+> > please run your reproducer with my patches + the attached debug patch on
+> > top? Hopefully it should tell us more about the problematic entity and how
+> > it got there... Thanks!
+> 
+> Hi,
+> 
+> I'm not sure I understand what you mean... I reporduced again with your
+> debug patch applied, however, no extra messages are printed.
+> 
+> I think this is exactly the same problem we discussed before:
+> 
+> 1) bfqq->new_bfqq is set, they are under g1
+> 2) bfqq is moved to another group, and user thread of new_bfqq exit
+> 3) g1 is offlied
+> 3) io issued from bfqq will end up in new_bfqq, and the offlined
+> g1 will be inserted to st of g1's parent.
 
---------------JQ28srt10RofHn0a758GsGXI
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Hmm, you are right. I was confused by the fact that bfq_setup_merge() is
+always immediately (under big bfq lock) followed by bfq_merge_bfqqs() but
+that redirects BIC of just one process pointing to the new bfqq. So the
+following is a bit more detailed and graphical version of your scenario for
+future reference :):
 
-SGkNCg0KQW0gMTEuMDEuMjIgdW0gMTQ6NTYgc2NocmllYiBNYXR0aGV3IFdpbGNveDoNCj4g
-T24gVHVlLCBKYW4gMTEsIDIwMjIgYXQgMTI6NDA6MTBQTSArMDEwMCwgVGhvbWFzIFppbW1l
-cm1hbm4gd3JvdGU6DQo+PiBIaQ0KPj4NCj4+IEFtIDEwLjAxLjIyIHVtIDIwOjM0IHNjaHJp
-ZWIgTWF0dGhldyBXaWxjb3g6DQo+Pj4gVExEUjogSSB3YW50IHRvIGludHJvZHVjZSBhIG5l
-dyBkYXRhIHR5cGU6DQo+Pj4NCj4+PiBzdHJ1Y3QgcGh5ciB7DQo+Pj4gICAgICAgICAgIHBo
-eXNfYWRkcl90IGFkZHI7DQo+Pj4gICAgICAgICAgIHNpemVfdCBsZW47DQo+Pj4gfTsNCj4+
-DQo+PiBEaWQgeW91IGxvb2sgYXQgc3RydWN0IGRtYV9idWZfbWFwPyBbMV0NCj4gDQo+IFRo
-YW5rcy4gIEkgd2Fzbid0IGF3YXJlIG9mIHRoYXQuICBJdCBkb2Vzbid0IHNlZW0gdG8gYWN0
-dWFsbHkgc29sdmUgdGhlDQo+IHByb2JsZW0sIGluIHRoYXQgaXQgZG9lc24ndCBjYXJyeSBh
-bnkgbGVuZ3RoIGluZm9ybWF0aW9uLiAgRGlkIHlvdSBtZWFuDQo+IHRvIHBvaW50IG1lIGF0
-IGEgZGlmZmVyZW50IHN0cnVjdHVyZT8NCj4gDQoNCkl0J3MgdGhlIHN0cnVjdHVyZSBJIG1l
-YW50LiBJdCByZWZlcnMgdG8gYSBidWZmZXIsIHNvIHRoZSBsZW5ndGggY291bGQgDQpiZSBh
-ZGRlZC4gRm9yIHNvbWV0aGluZyBtb3JlIHNvcGhpc3RpY2F0ZWQsIGRtYV9idWZfbWFwIGNv
-dWxkIGJlIGNoYW5nZWQgDQp0byBkaXN0aW5ndWlzaCBiZXR3ZWVuIHRoZSBidWZmZXIgYW5k
-IGFuIGl0ZXJhdG9yIHBvaW50aW5nIGludG8gdGhlIGJ1ZmZlci4NCg0KQnV0IGlmIGl0J3Mg
-cmVhbGx5IGRpZmZlcmVudCwgdGhlbiBzbyBiZSBpdC4NCg0KQmVzdCByZWdhcmRzDQpUaG9t
-YXMNCg0KLS0gDQpUaG9tYXMgWmltbWVybWFubg0KR3JhcGhpY3MgRHJpdmVyIERldmVsb3Bl
-cg0KU1VTRSBTb2Z0d2FyZSBTb2x1dGlvbnMgR2VybWFueSBHbWJIDQpNYXhmZWxkc3RyLiA1
-LCA5MDQwOSBOw7xybmJlcmcsIEdlcm1hbnkNCihIUkIgMzY4MDksIEFHIE7DvHJuYmVyZykN
-Ckdlc2Now6RmdHNmw7xocmVyOiBJdm8gVG90ZXYNCg==
+Initial state, bfqq2 is shared by Process 2 & Process 3:
 
---------------JQ28srt10RofHn0a758GsGXI--
+Process 1 (blkcg1)	Process 2 (blkcg1)	Process 3 (blkcg1)
+ (BIC)			 (BIC)			 (BIC)
+   |			   |			   |
+   |			   |			  /
+   v			   v			 /
+ bfqq1			bfqq2<-------------------
+   \			  /
+    \			 /
+     \			/
+      ----> BFQ group1<-
 
---------------q4YJa809K6MbWZkHsDkLnQxU
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+Now while processing request for Process 2 we decide to merge bfqq2 to
+bfqq1. Situation after the merge:
 
------BEGIN PGP SIGNATURE-----
+Process 1 (blkcg1)	Process 2 (blkcg1)	Process 3 (blkcg1)
+ (BIC)			 (BIC)			 (BIC)
+   |			   /			   |
+   |/---------------------/   			  /
+   vv		new_bfqq   			 /
+ bfqq1<-----------------bfqq2<-------------------
+   \			  /
+    \			 /
+     \			/
+      ----> BFQ group1<-
 
-wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmHdj7gFAwAAAAAACgkQlh/E3EQov+BS
-lRAAz+DTGAOsJc2UgiW04AClMKGGbLV3LKjkDNZAa+Hc0xHE/ZEHF83nn9E+5pRFGz+Cfo+CI9Q3
-tQc0EWE5IAMeyE+L/LsllOmSyhtSIyaAfYdrW2zTAuDRoSBZ8pCpO4lQwzmkXZ74LEUya5qbBPs/
-Py7h077aQI470Yz4IMEpoq+dISWarWoo9XdD7VniouUdWs60YdfGG4Bd9w0AiV1kUC+DMkIZzj1o
-qUjZ2R2KvvtSt0a/e52re1sTDbNTYTXYdcIiE3i2komeCBz6uH/pBxbOXdKlThAz2MOcC9PvyN9n
-hqNAcSk0m0RPmNI1cm/EiDsb+YJeGBZ/zschwco30nJZ2pE66Ri/b//qf1zCg4l1e8Tx+Py7j3fR
-a0opO6MHLSdxa1kodAEwrEhIrzEAyJPqN0tfBFA2h58Kq+vA0l0NwUGTy+tLPt1Po72XINe8Ohxj
-OOfFwE1vJbyshQ+YeUtxiJLHvOkyAb3hqjSC8o8rV/CgzheVg9tGHrGfodzOcItHoJ3iyc2zot4E
-Qi+zISV4nx2wPLPSjKlpMcbUx0BUeH0rLiOVdruQgLH/Ap63tmx/Ce3XXf+2qpH//vPvCZb22asY
-u2S5nzcMTO3X82nqaGF4PMhh5JYvpA9eQ1zoMHZv0l9PPxxC11431rRgJOwuKb0fgoKPuooRmj4r
-eoQ=
-=vOo8
------END PGP SIGNATURE-----
+Processes 1 and 2 exit:
+					Process 3 (blkcg1)
+					 (BIC)
+					   |
+					  /
+		new_bfqq		 /
+ bfqq1<-----------------bfqq2<-----------
+   \			  /
+    \			 /
+     \			/
+      ----> BFQ group1<-
 
---------------q4YJa809K6MbWZkHsDkLnQxU--
+Process 3 is moved to blkcg2 and submits IO, blkcg1 is offlined.
+bfq_bic_update_cgroup() will change the picture to:
+
+					Process 3 (blkcg2)
+					 (BIC)
+					   |
+					  /
+		new_bfqq		 /
+ bfqq1<-----------------bfqq2<-----------
+   |			  |
+   |			  |
+   v 			  v
+BFQ group1		BFQ group2
+
+and following bfq_merge_bfqqs() when submitting the request will further
+modify the picture to:
+					Process 3 (blkcg2)
+					 (BIC)
+					   |
+     /-------------------------------------/
+     v		new_bfqq
+ bfqq1<-----------------bfqq2
+   |			  |
+   |			  |
+   v 			  v
+BFQ group1		BFQ group2
+
+and boom, we queue again offlined BFQ group1.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
