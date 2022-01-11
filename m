@@ -2,211 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C81FC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 13:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CA7C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 13:56:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240973AbiAKNrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 08:47:04 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:17339 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240678AbiAKNrD (ORCPT
+        id S240830AbiAKN4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 08:56:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239487AbiAKN4N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 08:47:03 -0500
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JYBmL2H7Tz9ryK;
-        Tue, 11 Jan 2022 21:45:54 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 11 Jan 2022 21:47:01 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Tue, 11 Jan
- 2022 21:47:00 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <john.garry@huawei.com>
-CC:     <martin.petersen@oracle.com>, <hare@suse.de>,
-        <johannes.thumshirn@wdc.com>, <andriy.shevchenko@linux.intel.com>,
-        <bvanassche@acm.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next v4] blk-mq: fix tag_get wait task can't be awakened
-Date:   Tue, 11 Jan 2022 22:02:16 +0800
-Message-ID: <20220111140216.1858823-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        Tue, 11 Jan 2022 08:56:13 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5CEC06173F;
+        Tue, 11 Jan 2022 05:56:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9x3T+OG12IkfXXX5SdbrD0z40LWuqe0Q6mgSeNzWLM8=; b=TaT6fy8pCvO5SdKMnaN7SpBmY9
+        /ZLyF3tWCXHLpuit9luOiZ+ndBhQ7LL/wNEHrb38QTJZ6YpADTaPY1r1YOSR00c9Kbj2WgXFKfoye
+        AWqf5FCJoK95CUarLnHHHQ+mltrKuJLW/m7eN2QQhyn7ZyRMaP6Z5ZdVjN6nHIgPoWECjHIV9dkCB
+        +ZfRtOv6Aex8dBEReg0SGmxUnklwwvLlMM42PR8Xw3SOfokz55fFhdgE9ORE7rzOEVfdu079sxZ6X
+        tK+DFC4Njr3sRPVXX9X+tuYJmqg8+Ur/DcvJQhMYgoFj0Bmnsfpi5Rk6ot0HbCwGDYQSQnGAGX52y
+        Zz45MQfg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n7HdA-003Id6-MO; Tue, 11 Jan 2022 13:56:08 +0000
+Date:   Tue, 11 Jan 2022 13:56:08 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Thomas Zimmermann <tzimmermann@suse.de>
+Cc:     linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-rdma@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
+        dri-devel@lists.freedesktop.org, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: Phyr Starter
+Message-ID: <Yd2MeMT6LXWxJIDd@casper.infradead.org>
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+ <f7bd672f-dfa8-93fa-e101-e57b90faeb1e@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7bd672f-dfa8-93fa-e101-e57b90faeb1e@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case of shared tags, there might be more than one hctx which
-allocates from the same tags, and each hctx is limited to allocate at
-most:
-        hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
+On Tue, Jan 11, 2022 at 12:40:10PM +0100, Thomas Zimmermann wrote:
+> Hi
+> 
+> Am 10.01.22 um 20:34 schrieb Matthew Wilcox:
+> > TLDR: I want to introduce a new data type:
+> > 
+> > struct phyr {
+> >          phys_addr_t addr;
+> >          size_t len;
+> > };
+> 
+> Did you look at struct dma_buf_map? [1]
 
-tag idle detection is lazy, and may be delayed for 30sec, so there
-could be just one real active hctx(queue) but all others are actually
-idle and still accounted as active because of the lazy idle detection.
-Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
-forever on this real active hctx.
-
-Fix this by recalculating wake_batch when inc or dec active_queues.
-
-Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Suggested-by: John Garry <john.garry@huawei.com>
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
----
- block/blk-mq-tag.c      | 39 ++++++++++++++++++++++++++++++++-------
- include/linux/sbitmap.h | 11 +++++++++++
- lib/sbitmap.c           | 22 +++++++++++++++++++---
- 3 files changed, 62 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e55a6834c9a6..48b00d56141a 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -16,6 +16,21 @@
- #include "blk-mq-sched.h"
- #include "blk-mq-tag.h"
- 
-+/*
-+ * Recalculate wakeup batch when tag is shared by hctx.
-+ */
-+static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
-+		unsigned int users)
-+{
-+	if (!users)
-+		return;
-+
-+	sbitmap_queue_recalculate_wake_batch(&tags->bitmap_tags,
-+			users);
-+	sbitmap_queue_recalculate_wake_batch(&tags->breserved_tags,
-+			users);
-+}
-+
- /*
-  * If a previously inactive queue goes active, bump the active user count.
-  * We need to do this before try to allocate driver tag, then even if fail
-@@ -24,18 +39,25 @@
-  */
- bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
-+	unsigned int users;
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
- 
--		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
--		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
--			atomic_inc(&hctx->tags->active_queues);
-+		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
-+		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
-+			return true;
-+		}
- 	} else {
--		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
--		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--			atomic_inc(&hctx->tags->active_queues);
-+		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
-+		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
-+			return true;
-+		}
- 	}
- 
-+	users = atomic_inc_return(&hctx->tags->active_queues);
-+
-+	blk_mq_update_wake_batch(hctx->tags, users);
-+
- 	return true;
- }
- 
-@@ -56,6 +78,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
- void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- {
- 	struct blk_mq_tags *tags = hctx->tags;
-+	unsigned int users;
- 
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
-@@ -68,7 +91,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 			return;
- 	}
- 
--	atomic_dec(&tags->active_queues);
-+	users = atomic_dec_return(&tags->active_queues);
-+
-+	blk_mq_update_wake_batch(tags, users);
- 
- 	blk_mq_tag_wakeup_all(tags, false);
- }
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index fc0357a6e19b..95df357ec009 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -415,6 +415,17 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
- 	sbitmap_free(&sbq->sb);
- }
- 
-+/**
-+ * sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch
-+ * @sbq: Bitmap queue to recalculate wake batch.
-+ * @users: Number of shares.
-+ *
-+ * Like sbitmap_queue_update_wake_batch(), this will calculate wake batch
-+ * by depth. This interface is for HCTX shared tags or queue shared tags.
-+ */
-+void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int users);
-+
- /**
-  * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
-  * @sbq: Bitmap queue to resize.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 2709ab825499..94b3272effd8 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -457,10 +457,9 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
- 
--static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
--					    unsigned int depth)
-+static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int wake_batch)
- {
--	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
- 	int i;
- 
- 	if (sbq->wake_batch != wake_batch) {
-@@ -476,6 +475,23 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
- 	}
- }
- 
-+static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int depth)
-+{
-+	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
-+
-+	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-+}
-+
-+void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int users)
-+{
-+	unsigned int wake_batch = clamp_t(unsigned int,
-+			(sbq->sb.depth + users - 1) / users, 4U, SBQ_WAKE_BATCH);
-+	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
-+
- void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- {
- 	sbitmap_queue_update_wake_batch(sbq, depth);
--- 
-2.22.0
+Thanks.  I wasn't aware of that.  It doesn't seem to actually solve the
+problem, in that it doesn't carry any length information.  Did you mean
+to point me at a different structure?
 
