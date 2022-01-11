@@ -2,102 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48682C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 17:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF086C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 18:11:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344751AbiAKRc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 12:32:57 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:43930 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344767AbiAKRcC (ORCPT
+        id S1344178AbiAKSLP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 13:11:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45255 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1344600AbiAKSLM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 12:32:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=oBrXEHfI6xABrUDZXcl3Ilv2Mnj53ZcLvhEcAszQLhw=; b=YeL6mnl38ypaS0PyULw3luqlUK
-        XeOI6Vhp947TOTlkyofoaX8wJ8Yg8h3TI1VDxJKcJ9GY5xcvig0mIQbG1QAzJj7OFJGoGht0Yb0/K
-        tCS0dg0IMDzl/EH2fKYSqUf/gOewi+o5KmBNzaa7MfqcqWht6q8GI3xD9GYemVOCBS6mmJTuSF8wp
-        PWzBOz3P0o1s2U3pEYwYMqlbrob3xzb0MD0zndcqZ4+3aWrBorD50RGouaf0fv20oDTgMxWvUpoMU
-        2sXHLWkZGVSk79v0DlRL8om4AbtqKRlS5Om4EuhSURfLs+YKil2RSAe8S2cXFLA5uF5y1ZXO38jnC
-        TupA0NOA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1n7Kzp-009ip7-HL; Tue, 11 Jan 2022 10:31:46 -0700
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-kernel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        nvdimm@lists.linux.dev
-References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
- <82989486-3780-f0aa-c13d-994e97d4ac89@nvidia.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <305b0b3b-e5d1-3dc2-a4a3-01c05dda6748@deltatee.com>
-Date:   Tue, 11 Jan 2022 10:31:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Tue, 11 Jan 2022 13:11:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641924671;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nk+q8m9ky5pTPX+6o8N1V5u5NI0/FPXtRIjpZUtn01E=;
+        b=CUWynFGv1KPwM2/76MFx5GqxPtajhsUOH3O4gmhCueCEUks+maEJyzcP4Hzs5M5qQdVTvw
+        GB+AIASkyfDJdfl+xzofyyNpnmeE6m/S9kQnWFrE9wDCjgx+uWhqcpAnMIIDNUj+8JIDTE
+        7q2hw1RzQq+USfFj1/Kyeq24DQcLz/0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-155-d4c82tFCM92e531xU6LGhQ-1; Tue, 11 Jan 2022 13:11:09 -0500
+X-MC-Unique: d4c82tFCM92e531xU6LGhQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8A37190D34B;
+        Tue, 11 Jan 2022 18:11:08 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CCD8A7FCCB;
+        Tue, 11 Jan 2022 18:10:50 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [dm-devel] [PATCH 1/3] block: split having srcu from queue blocking
+References: <20211221141459.1368176-1-ming.lei@redhat.com>
+        <20211221141459.1368176-2-ming.lei@redhat.com>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Tue, 11 Jan 2022 13:13:21 -0500
+In-Reply-To: <20211221141459.1368176-2-ming.lei@redhat.com> (Ming Lei's
+        message of "Tue, 21 Dec 2021 22:14:57 +0800")
+Message-ID: <x49r19ejg3i.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <82989486-3780-f0aa-c13d-994e97d4ac89@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: nvdimm@lists.linux.dev, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-block@vger.kernel.org, ming.lei@redhat.com, joao.m.martins@oracle.com, jgg@nvidia.com, hch@lst.de, linux-kernel@vger.kernel.org, willy@infradead.org, jhubbard@nvidia.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: Phyr Starter
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Ming Lei <ming.lei@redhat.com> writes:
 
+> Now we reuse queue flag of QUEUE_FLAG_HAS_SRCU for both having srcu and
+> BLK_MQ_F_BLOCKING. Actually they are two things: one is that srcu is
+> allocated inside queue, another is that we need to handle blocking
+> ->queue_rq. So far this way works as expected.
+>
+> dm-rq needs to set BLK_MQ_F_BLOCKING if any underlying queue is
+> marked as BLK_MQ_F_BLOCKING. But dm queue is allocated before tagset
+> is allocated, one doable way is to always allocate SRCU for dm
+> queue, then set BLK_MQ_F_BLOCKING for the tagset if it is required,
+> meantime we can mark the request queue as supporting blocking
+> ->queue_rq.
+>
+> So add one new flag of QUEUE_FLAG_BLOCKING for supporting blocking
+> ->queue_rq only, and use one private field to describe if request
+> queue has allocated srcu instance.
 
-On 2022-01-11 1:17 a.m., John Hubbard wrote:
-> On 1/10/22 11:34, Matthew Wilcox wrote:
->> TLDR: I want to introduce a new data type:
->>
->> struct phyr {
->>          phys_addr_t addr;
->>          size_t len;
->> };
->>
->> and use it to replace bio_vec as well as using it to replace the array
->> of struct pages used by get_user_pages() and friends.
->>
->> ---
-> 
-> This would certainly solve quite a few problems at once. Very compelling.
+OK, so you switched to has_srcu because it's an internaly only detail,
+that makes sense.  I think testing for blocking makes more sense than
+testing for the existence of srcu, so this actually makes the code a bit
+more readable in my opinion.
 
-I agree.
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
-> Zooming in on the pinning aspect for a moment: last time I attempted to
-> convert O_DIRECT callers from gup to pup, I recall wanting very much to
-> record, in each bio_vec, whether these pages were acquired via FOLL_PIN,
-> or some non-FOLL_PIN method. Because at the end of the IO, it is not
-> easy to disentangle which pages require put_page() and which require
-> unpin_user_page*().
-> 
-> And changing the bio_vec for *that* purpose was not really acceptable.
-> 
-> But now that you're looking to change it in a big way (and with some
-> spare bits avaiable...oohh!), maybe I can go that direction after all.
-> 
-> Or, are you looking at a design in which any phyr is implicitly FOLL_PIN'd
-> if it exists at all?
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c       | 2 +-
+>  block/blk-mq.c         | 6 +++---
+>  block/blk-mq.h         | 2 +-
+>  block/blk-sysfs.c      | 2 +-
+>  include/linux/blkdev.h | 5 +++--
+>  5 files changed, 9 insertions(+), 8 deletions(-)
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 10619fd83c1b..7ba806a4e779 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -449,7 +449,7 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
+>  		return NULL;
+>  
+>  	if (alloc_srcu) {
+> -		blk_queue_flag_set(QUEUE_FLAG_HAS_SRCU, q);
+> +		q->has_srcu = true;
+>  		if (init_srcu_struct(q->srcu) != 0)
+>  			goto fail_q;
+>  	}
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 0d7c9d3e0329..1408a6b8ccdc 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -259,7 +259,7 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+>   */
+>  void blk_mq_wait_quiesce_done(struct request_queue *q)
+>  {
+> -	if (blk_queue_has_srcu(q))
+> +	if (blk_queue_blocking(q))
+>  		synchronize_srcu(q->srcu);
+>  	else
+>  		synchronize_rcu();
+> @@ -4024,8 +4024,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+>  		struct request_queue *q)
+>  {
+> -	WARN_ON_ONCE(blk_queue_has_srcu(q) !=
+> -			!!(set->flags & BLK_MQ_F_BLOCKING));
+> +	if (set->flags & BLK_MQ_F_BLOCKING)
+> +		blk_queue_flag_set(QUEUE_FLAG_BLOCKING, q);
+>  
+>  	/* mark the queue as mq asap */
+>  	q->mq_ops = set->ops;
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 948791ea2a3e..9601918e2034 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -377,7 +377,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+>  /* run the code block in @dispatch_ops with rcu/srcu read lock held */
+>  #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
+>  do {								\
+> -	if (!blk_queue_has_srcu(q)) {				\
+> +	if (!blk_queue_blocking(q)) {				\
+>  		rcu_read_lock();				\
+>  		(dispatch_ops);					\
+>  		rcu_read_unlock();				\
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index e20eadfcf5c8..af89fabb58e3 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -736,7 +736,7 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_head)
+>  	struct request_queue *q = container_of(rcu_head, struct request_queue,
+>  					       rcu_head);
+>  
+> -	kmem_cache_free(blk_get_queue_kmem_cache(blk_queue_has_srcu(q)), q);
+> +	kmem_cache_free(blk_get_queue_kmem_cache(q->has_srcu), q);
+>  }
+>  
+>  /* Unconfigure the I/O scheduler and dissociate from the cgroup controller. */
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index c80cfaefc0a8..d84abdb294c4 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -365,6 +365,7 @@ struct request_queue {
+>  #endif
+>  
+>  	bool			mq_sysfs_init_done;
+> +	bool			has_srcu;
+>  
+>  #define BLK_MAX_WRITE_HINTS	5
+>  	u64			write_hints[BLK_MAX_WRITE_HINTS];
+> @@ -385,7 +386,7 @@ struct request_queue {
+>  /* Keep blk_queue_flag_name[] in sync with the definitions below */
+>  #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
+>  #define QUEUE_FLAG_DYING	1	/* queue being torn down */
+> -#define QUEUE_FLAG_HAS_SRCU	2	/* SRCU is allocated */
+> +#define QUEUE_FLAG_BLOCKING	2	/* ->queue_rq may block */
+>  #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
+>  #define QUEUE_FLAG_SAME_COMP	4	/* complete on same CPU-group */
+>  #define QUEUE_FLAG_FAIL_IO	5	/* fake timeout */
+> @@ -423,7 +424,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+>  
+>  #define blk_queue_stopped(q)	test_bit(QUEUE_FLAG_STOPPED, &(q)->queue_flags)
+>  #define blk_queue_dying(q)	test_bit(QUEUE_FLAG_DYING, &(q)->queue_flags)
+> -#define blk_queue_has_srcu(q)	test_bit(QUEUE_FLAG_HAS_SRCU, &(q)->queue_flags)
+> +#define blk_queue_blocking(q)	test_bit(QUEUE_FLAG_BLOCKING, &(q)->queue_flags)
+>  #define blk_queue_dead(q)	test_bit(QUEUE_FLAG_DEAD, &(q)->queue_flags)
+>  #define blk_queue_init_done(q)	test_bit(QUEUE_FLAG_INIT_DONE, &(q)->queue_flags)
+>  #define blk_queue_nomerges(q)	test_bit(QUEUE_FLAG_NOMERGES, &(q)->queue_flags)
 
-I'd also second being able to store a handful of flags in each phyr. My
-userspace P2PDMA patchset needs to add a flag to each sgl to indicate
-whether it was mapped as a bus address or not (which would be necessary
-for the DMA mapped side dma_map_phyr).
-
-Though, it's not immediately obvious where to put the flags without
-increasing the size of the structure :(
-
-Logan
