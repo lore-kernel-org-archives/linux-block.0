@@ -2,211 +2,419 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF66CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 21:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4218C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 21:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbiAKVZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 16:25:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42118 "EHLO
+        id S232974AbiAKVrJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 16:47:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiAKVZs (ORCPT
+        with ESMTP id S244652AbiAKVrH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 16:25:48 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB6BC06173F;
-        Tue, 11 Jan 2022 13:25:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7YIdvCOYX163JNG4239+4esl2HeeXcNsGWrdL0xg2YA=; b=u1Qxt2awbRu7BIYKpqKoP6QqrJ
-        PAoK0pYJO0npqFgnmoat3cPH4r/kKiEj/005I94Nhesk0TWmuGwwtHKDdKblHmH52LCLZQdaxUMhg
-        nxbzZtO9+DkzQ4KBBEJzHDNDG5VicIQZquwaVeHSY7GnkkTF16Iv6JgNgwf+gtzXgjJy8iZUNQYhx
-        se88avHiAVIvEv/82vRLQKEVEVe3QWXF7+mt20TqrOdWZFxxKXzvTsG72adiSJpSTcNxEh/Ua3kJI
-        CqVLwQ2k7pZRiVBWybULM4rcp8s5j2cHarbzzPROawS1/fyPQSFQObt7qXiJFeyLBMlol8Gm/WwOs
-        kk7cp+ZA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n7OeC-003ab4-K5; Tue, 11 Jan 2022 21:25:40 +0000
-Date:   Tue, 11 Jan 2022 21:25:40 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        nvdimm@lists.linux.dev
-Subject: Re: Phyr Starter
-Message-ID: <Yd311C45gpQ3LqaW@casper.infradead.org>
-References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
- <20220111004126.GJ2328285@nvidia.com>
- <Yd0IeK5s/E0fuWqn@casper.infradead.org>
- <20220111150142.GL2328285@nvidia.com>
- <Yd3Nle3YN063ZFVY@casper.infradead.org>
- <20220111202159.GO2328285@nvidia.com>
+        Tue, 11 Jan 2022 16:47:07 -0500
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF34C061748
+        for <linux-block@vger.kernel.org>; Tue, 11 Jan 2022 13:47:07 -0800 (PST)
+Received: by mail-io1-xd2b.google.com with SMTP id w9so738928iol.13
+        for <linux-block@vger.kernel.org>; Tue, 11 Jan 2022 13:47:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=/XOOphy/Re6PQQyuWxFUm3dRimPvMQu/VHe5XKL5tPs=;
+        b=RE5Bn8e8hLDKfXn0opCoFDjRY4orv+NhqtRBx8Y3Sj4He1wszdijm+I625kjx6WbLN
+         g8OlEZKRlnDht+CRZ2+K5XLIp3bPNQmLbZXaMrjRMEjZ+jawF9Pi3mGBR1icCX6Y1i30
+         l/GidG8LGhAVgUnf1UgyFJdeIuMsulC97iCDXS9oEgQJ1WYeukVcbFkXD1f30R3OJU4y
+         uDsGZZiBw6KFE1YmE6OCAyhgyrgdelc8J71jyFRzSh82owWSqBUr3gUXhkq31vRcPjJk
+         1uzvSIpuh6QSEsJYjnJD7Zvcx3oxOQtZPnID9SdMDcwmj7m1873VeJ8+bj0H3J4jvb4N
+         +DAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=/XOOphy/Re6PQQyuWxFUm3dRimPvMQu/VHe5XKL5tPs=;
+        b=UqqOfojM6xbFSTtkbZy5+YAb15uItuXJxRIJRjb8Q9OIRWnrrYJTvIwyWPjtY/0ntS
+         /1MeM5VVZsOGZhoeEiuvugHQy0C1L+VERm4b7hwBZ12nDh40yHttP0qKLEBCTj2T034b
+         r+63A13kwqmJFFBlgSn50JSFlXhsH6DvfYaUFtb9SNdiEzPnDBLrCAEMDeg8ePPbVsq8
+         n5q2gXPD4bu1tPnCGAxeaplffcqXN3xFfMvTUyoUW6fQnrR9GpucncbgEHdLyuZJTPhx
+         nVr57RusmY6ekcMJ2EIJQR8MDtoK6IKggD0vEINCdElNKd/SUZs0yYUIi1v9VGzmffxm
+         5q4w==
+X-Gm-Message-State: AOAM531249lodiibwuHWpoQqSNqEsSs9Sogtww4apL6qew7pwLNowm8g
+        xEwleifp4aV+qKp4YyUn8jqMnRyF+pPUeA==
+X-Google-Smtp-Source: ABdhPJxFbOMqo6P6sIs/vQ7ri6KODxXFB4F3RjAh85O3Dqqw1vjJFdZz5a4cTNQRy6L14XEtwNs/zQ==
+X-Received: by 2002:a02:6d15:: with SMTP id m21mr3237125jac.83.1641937626829;
+        Tue, 11 Jan 2022 13:47:06 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id a14sm6560980ilm.48.2022.01.11.13.47.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jan 2022 13:47:06 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block updates for 5.17-rc
+Message-ID: <c4086937-5e74-b8e8-d8a1-5e203c926c71@kernel.dk>
+Date:   Tue, 11 Jan 2022 14:47:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220111202159.GO2328285@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 04:21:59PM -0400, Jason Gunthorpe wrote:
-> On Tue, Jan 11, 2022 at 06:33:57PM +0000, Matthew Wilcox wrote:
-> 
-> > > Then we are we using get_user_phyr() at all if we are just storing it
-> > > in a sg?
-> > 
-> > I did consider just implementing get_user_sg() (actually 4 years ago),
-> > but that cements the use of sg as both an input and output data structure
-> > for DMA mapping, which I am under the impression we're trying to get
-> > away from.
-> 
-> I know every time I talked about a get_user_sg() Christoph is against
-> it and we need to stop using scatter list...
-> 
-> > > Also 16 entries is way to small, it should be at least a whole PMD
-> > > worth so we don't have to relock the PMD level each iteration.
-> > > 
-> > > I would like to see a flow more like:
-> > > 
-> > >   cpu_phyr_list = get_user_phyr(uptr, 1G);
-> > >   dma_phyr_list = dma_map_phyr(device, cpu_phyr_list);
-> > >   [..]
-> > >   dma_unmap_phyr(device, dma_phyr_list);
-> > >   unpin_drity_free(cpu_phy_list);
-> > > 
-> > > Where dma_map_phyr() can build a temporary SGL for old iommu drivers
-> > > compatability. iommu drivers would want to implement natively, of
-> > > course.
-> > > 
-> > > ie no loops in drivers.
-> > 
-> > Let me just rewrite that for you ...
-> > 
-> > 	umem->phyrs = get_user_phyrs(addr, size, &umem->phyr_len);
-> > 	umem->sgt = dma_map_phyrs(device, umem->phyrs, umem->phyr_len,
-> > 			DMA_BIDIRECTIONAL, dma_attr);
-> > 	...
-> > 	dma_unmap_phyr(device, umem->phyrs, umem->phyr_len, umem->sgt->sgl,
-> > 			umem->sgt->nents, DMA_BIDIRECTIONAL, dma_attr);
-> > 	sg_free_table(umem->sgt);
-> > 	free_user_phyrs(umem->phyrs, umem->phyr_len);
-> 
-> Why? As above we want to get rid of the sgl, so you are telling me to
-> adopt phyrs I need to increase the memory consumption by a hefty
-> amount to store the phyrs and still keep the sgt now? Why?
-> 
-> I don't need the sgt at all. I just need another list of physical
-> addresses for DMA. I see no issue with a phsr_list storing either CPU
-> Physical Address or DMA Physical Addresses, same data structure.
+Hi Linus,
 
-There's a difference between a phys_addr_t and a dma_addr_t.  They
-can even be different sizes; some architectures use a 32-bit dma_addr_t
-and a 64-bit phys_addr_t or vice-versa.  phyr cannot store DMA addresses.
+Here are the core block changes for the 5.17-rc1 merge window. This pull
+request contains:
 
-> In the fairly important passthrough DMA case the CPU list and DMA list
-> are identical, so we don't even need to do anything.
-> 
-> In the typical iommu case my dma map's phyrs is only one entry.
+- Unify where the struct request handling code is located in the blk-mq
+  code (Christoph)
 
-That becomes a very simple sg table then.
+- Header cleanups (Christoph)
 
-> As an example coding - Use the first 8 bytes to encode this:
-> 
->  51:0 - Physical address / 4k (ie pfn)
->  56:52 - Order (simple, your order encoding can do better)
->  61:57 - Unused
->  63:62 - Mode, one of:
->          00 = natural order pfn (8 bytes)
->          01 = order aligned with length (12 bytes)
->          10 = arbitary (12 bytes)
-> 
-> Then the optional 4 bytes are used as:
-> 
-> Mode 01 (Up to 2^48 bytes of memory on a 4k alignment)
->   31:0 - # of order pages
-> 
-> Mode 10 (Up to 2^25 bytes of memory on a 1 byte alignment)
->   11:0 - starting byte offset in the 4k
->   31:12 - 20 bits, plus the 5 bit order from the first 8 bytes:
->           length in bytes
+- Clean up the io_context handling code (Christoph, me)
 
-Honestly, this looks awful to operate on.  Mandatory 8-bytes per entry
-with an optional 4 byte extension?
+- Get rid of ->rq_disk in struct request (Christoph)
 
-> > > The last case is, perhaps, a possible route to completely replace
-> > > scatterlist. Few places need true byte granularity for interior pages,
-> > > so we can invent some coding to say 'this is 8 byte aligned, and n
-> > > bytes long' that only fits < 4k or something. Exceptional cases can
-> > > then still work. I'm not sure what block needs here - is it just 512?
-> > 
-> > Replacing scatterlist is not my goal.  That seems like a lot more work
-> > for little gain.  
-> 
-> Well, I'm not comfortable with the idea above where RDMA would have to
-> take a memory penalty to use the new interface. To avoid that memory
-> penalty we need to get rid of scatterlist entirely.
-> 
-> If we do the 16 byte struct from the first email then a umem for MRs
-> will increase in memory consumption by 160% compared today's 24
-> bytes/page. I think the HPC workloads will veto this.
+- Error handling fix for add_disk() (Christoph)
 
-Huh?  We do 16 bytes per physically contiguous range.  Then, if your HPC
-workloads use an IOMMU that can map a virtually contiguous range
-into a single sg entry, it uses 24 bytes for the entire mapping.
-It should shrink.
+- request allocation cleanusp (Christoph)
 
-> > I just want to delete page_link, offset and length from struct
-> > scatterlist.  Given the above sequence of calls, we're going to get
-> > sg lists that aren't chained.  They may have to be vmalloced, but
-> > they should be contiguous.
-> 
-> I don't understand that? Why would the SGL out of the iommu suddenly
-> not be chained?
+- Documentation updates (Eric, Matthew)
 
-Because it's being given a single set of ranges to map, instead of
-being given 512 pages at a time.
+- Remove trivial crypto unregister helper (Eric)
 
-> >From what I've heard I'm also not keen on a physr list using vmalloc
-> either, that is said to be quite slow?
+- Reduce shared tag overhead (John)
 
-It would only be slow for degenerate cases where the pinned memory
-is fragmented and not contiguous.
+- Reduce poll_stats memory overhead (me)
 
-> > > I would imagine a few steps to this process:
-> > >  1) 'phyr_list' datastructure, with chaining, pre-allocation, etc
-> > >  2) Wrapper around existing gup to get a phyr_list for user VA
-> > >  3) Compat 'dma_map_phyr()' that coverts a phyr_list to a sgl and back
-> > >     (However, with full performance for iommu passthrough)
-> > >  4) Patches changing RDMA/VFIO/DRM to this API
-> > >  5) Patches optimizing get_user_phyr()
-> > >  6) Patches implementing dma_map_phyr in the AMD or Intel IOMMU driver
-> > 
-> > I was thinking ...
-> > 
-> > 1. get_user_phyrs() & free_user_phyrs()
-> > 2. dma_map_phyrs() and dma_unmap_phyrs() wrappers that create a
-> >    scatterlist from phyrs and call dma_map_sg() / dma_unmap_sg() to work
-> >    with current IOMMU drivers
-> 
-> IMHO, the scatterlist has to go away. The interface should be physr
-> list in, physr list out.
+- Known indirect function call for dio (me)
 
-That's reproducing the bad decision of the scatterlist, only with
-a different encoding.  You end up with something like:
+- Use atomic references for struct request (me)
 
-struct neoscat {
-	dma_addr_t dma_addr;
-	phys_addr_t phys_addr;
-	size_t dma_len;
-	size_t phys_len;
-};
+- Support request list issue for block and NVMe (me)
 
-and the dma_addr and dma_len are unused by all-but-the-first entry when
-you have a competent IOMMU.  We want a different data structure in and
-out, and we may as well keep using the scatterlist for the dma-map-out.
+- Improve queue dispatch pinning (Ming)
+
+- Improve the direct list issue code (Keith)
+
+- BFQ improvements (Jan)
+
+- Direct completion helper and use it in mmc block (Sebastian)
+
+- Use raw spinlock for the blktrace code (Wander)
+
+- fsync error handling fix (Ye)
+
+- Various fixes and cleanups (Lukas, Randy, Yang, Tetsuo, Ming, me)
+
+Please pull!
+
+
+The following changes since commit d58071a8a76d779eedab38033ae4c821c30295a5:
+
+  Linux 5.16-rc3 (2021-11-28 14:09:19 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/for-5.17/block-2022-01-11
+
+for you to fetch changes up to f029cedb9bb5bab7f1bb3042be348f2dac0ee66e:
+
+  MAINTAINERS: add entries for block layer documentation (2022-01-09 18:59:10 -0700)
+
+----------------------------------------------------------------
+for-5.17/block-2022-01-11
+
+----------------------------------------------------------------
+Christoph Hellwig (68):
+      block: move blk_rq_err_bytes to scsi
+      block: remove rq_flush_dcache_pages
+      block: remove blk-exec.c
+      blk-mq: move blk_mq_flush_plug_list
+      block: move request based cloning helpers to blk-mq.c
+      block: move blk_rq_init to blk-mq.c
+      block: move blk_steal_bios to blk-mq.c
+      block: move blk_account_io_{start,done} to blk-mq.c
+      block: move blk_dump_rq_flags to blk-mq.c
+      block: move blk_print_req_error to blk-mq.c
+      block: don't include blk-mq headers in blk-core.c
+      block: move GENHD_FL_NATIVE_CAPACITY to disk->state
+      block: move GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE to disk->event_flags
+      block: remove GENHD_FL_CD
+      block: remove a dead check in show_partition
+      block: merge disk_scan_partitions and blkdev_reread_part
+      block: rename GENHD_FL_NO_PART_SCAN to GENHD_FL_NO_PART
+      block: remove the GENHD_FL_HIDDEN check in blkdev_get_no_open
+      null_blk: don't suppress partitioning information
+      mmc: don't set GENHD_FL_SUPPRESS_PARTITION_INFO
+      block: remove GENHD_FL_SUPPRESS_PARTITION_INFO
+      block: remove GENHD_FL_EXT_DEVT
+      block: don't set GENHD_FL_NO_PART for hidden gendisks
+      block: cleanup the GENHD_FL_* definitions
+      sr: set GENHD_FL_REMOVABLE earlier
+      blk-mq: simplify the plug handling in blk_mq_submit_bio
+      blk-mq: move more plug handling from blk_mq_submit_bio into blk_add_rq_to_plug
+      block: move blk_get_flush_queue to blk-flush.c
+      block: remove elevator_exit
+      block: remove the e argument to elevator_exit
+      block: don't include blk-mq-sched.h in blk.h
+      block: don't include blk-mq.h in blk.h
+      block: don't include <linux/blk-mq.h> in blk.h
+      block: don't include <linux/idr.h> in blk.h
+      block: don't include <linux/part_stat.h> in blk.h
+      blk-mq: cleanup request allocation
+      RDMA/qib: rename copy_io to qib_copy_io
+      fork: move copy_io to block/blk-ioc.c
+      bfq: simplify bfq_bic_lookup
+      bfq: use bfq_bic_lookup in bfq_limit_depth
+      Revert "block: Provide blk_mq_sched_get_icq()"
+      block: mark put_io_context_active static
+      block: move blk_mq_sched_assign_ioc to blk-ioc.c
+      block: move the remaining elv.icq handling to the I/O scheduler
+      block: remove get_io_context_active
+      block: factor out a alloc_io_context helper
+      block: use alloc_io_context in __copy_io
+      block: return the io_context from create_task_io_context
+      block: simplify ioc_create_icq
+      block: simplify ioc_lookup_icq
+      mtd_blkdevs: remove the sector out of range check in do_blktrans_request
+      block: don't check ->rq_disk in merges
+      block: remove the ->rq_disk field in struct request
+      block: remove the gendisk argument to blk_execute_rq
+      scsi: remove the gendisk argument to scsi_ioctl
+      mtd_blkdevs: don't scan partitions for plain mtdblock
+      block: remove the nr_task field from struct io_context
+      block: simplify struct io_context refcounting
+      block: refactor put_iocontext_active
+      block: remove the NULL ioc check in put_io_context
+      block: refactor put_io_context
+      block: cleanup ioc_clear_queue
+      block: move set_task_ioprio to blk-ioc.c
+      block: fold get_task_io_context into set_task_ioprio
+      block: open code create_task_io_context in set_task_ioprio
+      block: fold create_task_io_context into ioc_find_get_icq
+      block: only build the icq tracking code when needed
+      block: fix error unwinding in device_add_disk
+
+Colin Ian King (1):
+      block: Remove redundant initialization of variable ret
+
+Eric Biggers (9):
+      blk-crypto: remove blk_crypto_unregister()
+      docs: sysfs-block: move to stable directory
+      docs: sysfs-block: sort alphabetically
+      docs: sysfs-block: add contact for nomerges
+      docs: sysfs-block: fill in missing documentation from queue-sysfs.rst
+      docs: sysfs-block: document stable_writes
+      docs: sysfs-block: document virt_boundary_mask
+      docs: block: remove queue-sysfs.rst
+      MAINTAINERS: add entries for block layer documentation
+
+Guo Zhengkui (1):
+      blk_mq: remove repeated includes
+
+Jan Kara (8):
+      block: Provide blk_mq_sched_get_icq()
+      bfq: Track number of allocated requests in bfq_entity
+      bfq: Store full bitmap depth in bfq_data
+      bfq: Limit number of requests consumed by each cgroup
+      bfq: Limit waker detection in time
+      bfq: Provide helper to generate bfqq name
+      bfq: Log waker detections
+      bfq: Do not let waker requests skip proper accounting
+
+Jens Axboe (16):
+      blk-ioprio: don't set bio priority if not needed
+      block: only allocate poll_stats if there's a user of them
+      block: move io_context creation into where it's needed
+      block: get rid of useless goto and label in blk_mq_get_new_requests()
+      block: fix double bio queue when merging in cached request path
+      mm: move filemap_range_needs_writeback() into header
+      block: move direct_IO into our own read_iter handler
+      block: switch to atomic_t for request references
+      block: make queue stat accounting a reference
+      block: add completion handler for fast path
+      block: use singly linked list for bio cache
+      block: add mq_ops->queue_rqs hook
+      nvme: split command copy into a helper
+      nvme: separate command prep and issue
+      nvme: add support for mq_ops->queue_rqs()
+      block: fix error in handling dead task for ioprio setting
+
+John Garry (3):
+      blk-mq: Drop busy_iter_fn blk_mq_hw_ctx argument
+      blk-mq: Delete busy_iter_fn
+      blk-mq: Optimise blk_mq_queue_tag_busy_iter() for shared tags
+
+Keith Busch (6):
+      blk-mq: blk-mq: check quiesce state before queue_rqs
+      block: remove unnecessary trailing '\'
+      block: move rq_list macros to blk-mq.h
+      block: introduce rq_list_for_each_safe macro
+      block: introduce rq_list_move
+      nvme-pci: fix queue_rqs list splitting
+
+Lukas Bulwahn (1):
+      block: drop needless assignment in set_task_ioprio()
+
+Matthew Wilcox (Oracle) (1):
+      bdev: Improve lookup_bdev documentation
+
+Ming Lei (10):
+      blk-mq: use bio->bi_opf after bio is checked
+      blk-mq: check q->poll_stat in queue_poll_stat_show
+      blk-mq: remove hctx_lock and hctx_unlock
+      blk-mq: move srcu from blk_mq_hw_ctx to request_queue
+      blk-mq: pass request queue to blk_mq_run_dispatch_ops
+      blk-mq: run dispatch lock once in case of issuing from list
+      blk-mq: don't run might_sleep() if the operation needn't blocking
+      blk-mq: don't use plug->mq_list->q directly in blk_mq_run_dispatch_ops()
+      block: call blk_exit_queue() before freeing q->stats
+      block: don't protect submit_bio_checks by q_usage_counter
+
+Randy Dunlap (1):
+      bio.h: fix kernel-doc warnings
+
+Sebastian Andrzej Siewior (2):
+      blk-mq: Add blk_mq_complete_request_direct()
+      mmc: core: Use blk_mq_complete_request_direct().
+
+Tetsuo Handa (2):
+      block: use "unsigned long" for blk_validate_block_size().
+      block: check minor range in device_add_disk()
+
+Wander Lairson Costa (1):
+      blktrace: switch trace spinlock to a raw spinlock
+
+Yang Li (1):
+      block: fix old-style declaration
+
+Ye Bin (1):
+      block: Fix fsync always failed if once failed
+
+ Documentation/ABI/stable/sysfs-block               | 676 ++++++++++++++
+ Documentation/ABI/testing/sysfs-block              | 346 --------
+ Documentation/block/index.rst                      |   1 -
+ Documentation/block/queue-sysfs.rst                | 321 -------
+ Documentation/core-api/kernel-api.rst              |   3 -
+ .../translations/zh_CN/core-api/kernel-api.rst     |   2 -
+ MAINTAINERS                                        |   2 +
+ block/Kconfig                                      |   3 +
+ block/Kconfig.iosched                              |   1 +
+ block/Makefile                                     |   2 +-
+ block/bdev.c                                       |  24 +-
+ block/bfq-iosched.c                                | 304 ++++---
+ block/bfq-iosched.h                                |  35 +-
+ block/bio.c                                        |  13 +-
+ block/blk-cgroup.c                                 |   1 +
+ block/blk-core.c                                   | 391 +--------
+ block/blk-crypto-profile.c                         |   5 -
+ block/blk-exec.c                                   | 116 ---
+ block/blk-flush.c                                  |  18 +-
+ block/blk-integrity.c                              |   2 +-
+ block/blk-ioc.c                                    | 318 ++++---
+ block/blk-ioprio.c                                 |  13 +-
+ block/blk-merge.c                                  |  18 +-
+ block/blk-mq-debugfs.c                             |   5 +-
+ block/blk-mq-sched.c                               |  29 +-
+ block/blk-mq-sched.h                               |   2 -
+ block/blk-mq-sysfs.c                               |   2 -
+ block/blk-mq-tag.c                                 |  67 +-
+ block/blk-mq-tag.h                                 |   2 +-
+ block/blk-mq.c                                     | 974 ++++++++++++++-------
+ block/blk-mq.h                                     |  22 +-
+ block/blk-stat.c                                   |  39 +-
+ block/blk-stat.h                                   |   2 +
+ block/blk-sysfs.c                                  |  13 +-
+ block/blk-throttle.c                               |   1 +
+ block/blk.h                                        | 115 +--
+ block/bsg-lib.c                                    |   2 +-
+ block/elevator.c                                   |  10 +-
+ block/fops.c                                       |  37 +-
+ block/genhd.c                                      |  60 +-
+ block/ioctl.c                                      |  31 +-
+ block/ioprio.c                                     |  32 -
+ block/kyber-iosched.c                              |   1 +
+ block/partitions/core.c                            |  24 +-
+ drivers/block/amiflop.c                            |   3 +-
+ drivers/block/ataflop.c                            |   7 +-
+ drivers/block/brd.c                                |   1 -
+ drivers/block/drbd/drbd_main.c                     |   1 +
+ drivers/block/floppy.c                             |   7 +-
+ drivers/block/loop.c                               |   9 +-
+ drivers/block/mtip32xx/mtip32xx.c                  |   2 +-
+ drivers/block/n64cart.c                            |   2 +-
+ drivers/block/null_blk/main.c                      |   1 -
+ drivers/block/null_blk/trace.h                     |   2 +-
+ drivers/block/paride/pcd.c                         |   5 +-
+ drivers/block/paride/pd.c                          |   6 +-
+ drivers/block/paride/pf.c                          |   5 +-
+ drivers/block/pktcdvd.c                            |   4 +-
+ drivers/block/ps3vram.c                            |   1 +
+ drivers/block/rbd.c                                |   6 +-
+ drivers/block/rnbd/rnbd-clt.c                      |   4 +-
+ drivers/block/sunvdc.c                             |  19 +-
+ drivers/block/swim.c                               |   1 +
+ drivers/block/swim3.c                              |   2 +-
+ drivers/block/sx8.c                                |   4 +-
+ drivers/block/virtio_blk.c                         |   3 +-
+ drivers/block/xen-blkback/xenbus.c                 |   2 +-
+ drivers/block/xen-blkfront.c                       |  26 +-
+ drivers/block/z2ram.c                              |   1 +
+ drivers/block/zram/zram_drv.c                      |   1 +
+ drivers/cdrom/gdrom.c                              |   1 +
+ drivers/infiniband/hw/qib/qib_verbs.c              |   4 +-
+ drivers/md/dm-mpath.c                              |   1 -
+ drivers/md/dm.c                                    |   1 +
+ drivers/md/md.c                                    |   5 -
+ drivers/mmc/core/block.c                           |  38 +-
+ drivers/mtd/mtd_blkdevs.c                          |  26 +-
+ drivers/mtd/ubi/block.c                            |   7 +-
+ drivers/nvme/host/core.c                           |   4 +-
+ drivers/nvme/host/fault_inject.c                   |   2 +-
+ drivers/nvme/host/pci.c                            | 147 +++-
+ drivers/nvme/host/trace.h                          |   6 +-
+ drivers/nvme/target/passthru.c                     |   3 +-
+ drivers/scsi/ch.c                                  |   2 +-
+ drivers/scsi/scsi_bsg.c                            |   2 +-
+ drivers/scsi/scsi_error.c                          |   2 +-
+ drivers/scsi/scsi_ioctl.c                          |  43 +-
+ drivers/scsi/scsi_lib.c                            |  47 +-
+ drivers/scsi/scsi_logging.c                        |   4 +-
+ drivers/scsi/sd.c                                  |  27 +-
+ drivers/scsi/sd_zbc.c                              |   8 +-
+ drivers/scsi/sg.c                                  |   6 +-
+ drivers/scsi/sr.c                                  |  17 +-
+ drivers/scsi/st.c                                  |   4 +-
+ drivers/scsi/ufs/ufshpb.c                          |   4 +-
+ drivers/scsi/virtio_scsi.c                         |   2 +-
+ drivers/target/target_core_pscsi.c                 |   2 +-
+ drivers/usb/storage/transport.c                    |   2 +-
+ fs/io_uring.c                                      |   2 +-
+ fs/iomap/direct-io.c                               |   1 +
+ include/linux/bio.h                                |   4 +-
+ include/linux/blk-mq.h                             | 105 ++-
+ include/linux/blkdev.h                             |  47 +-
+ include/linux/fs.h                                 |   2 -
+ include/linux/genhd.h                              |  85 +-
+ include/linux/iocontext.h                          |  49 +-
+ include/linux/pagemap.h                            |  29 +
+ include/scsi/scsi_cmnd.h                           |   2 +-
+ include/scsi/scsi_device.h                         |   4 +-
+ include/scsi/scsi_ioctl.h                          |   4 +-
+ include/trace/events/block.h                       |   8 +-
+ kernel/fork.c                                      |  26 -
+ kernel/trace/blktrace.c                            |  20 +-
+ mm/filemap.c                                       |  32 +-
+ 114 files changed, 2563 insertions(+), 2484 deletions(-)
+ create mode 100644 Documentation/ABI/stable/sysfs-block
+ delete mode 100644 Documentation/ABI/testing/sysfs-block
+ delete mode 100644 Documentation/block/queue-sysfs.rst
+ delete mode 100644 block/blk-exec.c
+
+-- 
+Jens Axboe
 
