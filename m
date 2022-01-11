@@ -2,83 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F22C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 03:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECCBC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 11 Jan 2022 04:33:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244602AbiAKD0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Jan 2022 22:26:00 -0500
-Received: from mail-pj1-f52.google.com ([209.85.216.52]:37398 "EHLO
-        mail-pj1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235643AbiAKDZ6 (ORCPT
+        id S233909AbiAKEdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Jan 2022 23:33:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230245AbiAKEdB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Jan 2022 22:25:58 -0500
-Received: by mail-pj1-f52.google.com with SMTP id y16-20020a17090a6c9000b001b13ffaa625so2525054pjj.2;
-        Mon, 10 Jan 2022 19:25:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=+IrioJ14vRZe46/0NWAy9KztWiI2hvMJP8opnttVIEU=;
-        b=E2LUMbKztkTD+R4dRyd3OEW/L8sjhTao2v+QXr7+SQeNLFCD9SZlA/H3C3s9Kq0YHv
-         BRSs7iSigT1gvDeZUbwQg50CFR+14FteQvCfaZzXn0ebQOKSlOlZlx4X49wJvf0pmkfs
-         jKy9I1/7I4G5NBWUq4GxivHlqF3CF6YjHas1T54jkSFN4h7Nbakr907qZ+GEztZV5QyR
-         svRH5oBwKfKyV78SKExxpSnspzG+MfCzU+CfiRb836yP5CSaBJnLu/ioy4D6YbSizp7b
-         Zyh/W0drw/FLGMWhrlKyAPMktDrsRP5yV7drXsO+a+IEv2ir27klqqn1YHbqTotJgtT1
-         9Ndg==
-X-Gm-Message-State: AOAM531iH+ID6W/a5nMVT8vdX2uqsSI7Cz0kf5mhCUVn3rqgsYUl1noJ
-        6MBuuIh8DaJAkb3RrWSDl4C8fW6NGv0=
-X-Google-Smtp-Source: ABdhPJxc5akiiLV56FHBQGpILjN/2inSGNxegSXkNU4UvRu5tiBs00Inrw8SHdk82j9XqkA3gUO5Xg==
-X-Received: by 2002:a17:902:c946:b0:149:94d:c049 with SMTP id i6-20020a170902c94600b00149094dc049mr2652243pla.75.1641871557731;
-        Mon, 10 Jan 2022 19:25:57 -0800 (PST)
-Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id b22sm8847399pfv.107.2022.01.10.19.25.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jan 2022 19:25:57 -0800 (PST)
-Message-ID: <bb83d65e-bcd8-9da8-e54b-0dde6f23434e@acm.org>
-Date:   Mon, 10 Jan 2022 19:25:54 -0800
+        Mon, 10 Jan 2022 23:33:01 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA24C06173F;
+        Mon, 10 Jan 2022 20:33:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Weh6b9gFW7u95WZ3fLgbX0xHy9YQw+y8aATtGfb9KPk=; b=QbEVmLb7c71g917OtGsCpYozqz
+        NahoDOK/ASMcUKOsu8udIeCBf7rigwUpe17iM9vaZsxms0gwiYv74P/RUIZesqYIcv4/bgM7D92cE
+        OUo+2dK5IqhimAh4KvP9MBSgIpQmy9oD3lk+R6zzZDsIC5EvPaI/sR6nZNo3ENDOrWrH5uExLX/qQ
+        9sRGHC2d2IuVaNdNwZKYoKblFN1JOIhANzNpXPKbEXQ5zRayxoS7X9I3HoxbjQfqdilVLIV4FjmVx
+        65MinbN8fCC2biLDFMYV54SUO1f1oKjno5s+fAzi26w/3BM3QTvBzkmUp3v1iLy5hJW17b5I6UeXS
+        xV4oTKag==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n78q8-002y1G-Cq; Tue, 11 Jan 2022 04:32:56 +0000
+Date:   Tue, 11 Jan 2022 04:32:56 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        nvdimm@lists.linux.dev
+Subject: Re: Phyr Starter
+Message-ID: <Yd0IeK5s/E0fuWqn@casper.infradead.org>
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+ <20220111004126.GJ2328285@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH 0/13] blk: make blk-rq-qos policies pluggable and modular
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        Wang Jianchao <jianchao.wan9@gmail.com>
-Cc:     axboe@kernel.dk, jbacik@fb.com, tj@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
- <Ydxum/2iwp6hDw68@infradead.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Ydxum/2iwp6hDw68@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220111004126.GJ2328285@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/10/22 09:36, Christoph Hellwig wrote:
-> On Mon, Jan 10, 2022 at 05:10:33PM +0800, Wang Jianchao wrote:
->> This patchset attempts to make blk-rq-qos framework pluggable and modular.
+On Mon, Jan 10, 2022 at 08:41:26PM -0400, Jason Gunthorpe wrote:
+> On Mon, Jan 10, 2022 at 07:34:49PM +0000, Matthew Wilcox wrote:
 > 
-> I really don't think making them policies modular is a good thing, and
-> your new exports/APIs are a very good sign for why it is not a good
-> idea.
+> > Finally, it may be possible to stop using scatterlist to describe the
+> > input to the DMA-mapping operation.  We may be able to get struct
+> > scatterlist down to just dma_address and dma_length, with chaining
+> > handled through an enclosing struct.
+> 
+> Can you talk about this some more? IMHO one of the key properties of
+> the scatterlist is that it can hold huge amounts of pages without
+> having to do any kind of special allocation due to the chaining.
+> 
+> The same will be true of the phyr idea right?
 
-Hi Christoph,
+My thinking is that we'd pass a relatively small array of phyr (maybe 16
+entries) to get_user_phyr().  If that turned out not to be big enough,
+then we have two options; one is to map those 16 ranges with sg and use
+the sg chaining functionality before throwing away the phyr and calling
+get_user_phyr() again.  The other is to stash those 16 ranges somewhere
+(eg a resizing array of some kind) and keep calling get_user_phyr()
+to get the next batch of 16; once we've got the entire range, call
+sg_map_phyr() passing all of the phyrs.
 
-Personally I don't need the ability to implement blk-rq-qos 
-functionality as a loadable kernel module.
+> > I would like to see phyr replace bio_vec everywhere it's currently used.
+> > I don't have time to do that work now because I'm busy with folios.
+> > If someone else wants to take that on, I shall cheer from the sidelines.
+> > What I do intend to do is:
+> 
+> I wonder if we mixed things though..
+> 
+> IMHO there is a lot of optimization to be had by having a
+> datastructure that is expressly 'the physical pages underlying a
+> contiguous chunk of va'
+> 
+> If you limit to that scenario then we can be more optimal because
+> things like byte granular offsets and size in the interior pages don't
+> need to exist. Every interior chunk is always aligned to its order and
+> we only need to record the order.
+> 
+> An overall starting offset and total length allow computing the slice
+> of the first/last entry.
+> 
+> If the physical address is always aligned then we get 12 free bits
+> from the min 4k alignment and also only need to store order, not an
+> arbitary byte granular length.
+> 
+> The win is I think we can meaningfully cover most common cases using
+> only 8 bytes per physical chunk. The 12 bits can be used to encode the
+> common orders (4k, 2M, 1G, etc) and some smart mechanism to get
+> another 16 bits to cover 'everything'.
+> 
+> IMHO storage density here is quite important, we end up having to keep
+> this stuff around for a long time.
+> 
+> I say this here, because I've always though bio_vec/etc are more
+> general than we actually need, being byte granular at every chunk.
 
-When I implemented the ioprio rq-qos policy (see also blk-ioprio.c) I 
-noticed that I had to make changes in the block layer core 
-(blkcg_init_queue(), rq_qos_id_to_name(), blk-rq-qos.h) instead of 
-having all code related to the new rq-pos policy contained in a single 
-file. I think it would be an improvement if new rq-qos policies could be 
-implemented in a single source file and no block layer core changes 
-would be necessary.
+Oh, I can do you one better on the bit-packing scheme.  There's a
+representation of every power-of-two that is naturally aligned, using
+just one extra bit.  Let's say we have 3 bits of address space and
+4 bits to represent any power of two allocation within that address
+space:
 
-Thanks,
+0000 index-0, order-0
+0010 index-1, order-0
+...
+1110 index-7, order-0
+0001 index-0, order-1
+0101 index-2, order-1
+1001 index-4, order-1
+1101 index-6, order-1
+0011 index-0, order-2
+1011 index-4, order-2
+0111 index-0, order-3
 
-Bart.
+1111 has no meaning and can be used to represent an invalid range, if
+that's useful.  The lowest clear bit decodes to the order, and
+(x & (x+1))/2 gets you the index.
 
+That leaves you with another 11 bits to represent something smart about
+partial pages.
 
+The question is whether this is the right kind of optimisation to be
+doing.  I hear you that we want a dense format, but it's questionable
+whether the kind of thing you're suggesting is actually denser than this
+scheme.  For example, if we have 1GB pages and userspace happens to have
+allocated pages (3, 4, 5, 6, 7, 8, 9, 10) then this can be represented
+as a single phyr.  A power-of-two scheme would have us use four entries
+(3, 4-7, 8-9, 10).
+
+Using a (dma_addr, size_t) tuple makes coalescing adjacent pages very
+cheap.  If I have to walk PTEs looking for pages which can be combined
+together, I end up with interesting behaviour where the length of the
+list shrinks and expands.  Using the example above, as I walk successive
+PUDs, the data struct looks like this:
+
+(3)
+(3, 4)
+(3, 4-5)
+(3, 4-5, 6)
+(3, 4-7)
+(3, 4-7, 8)
+(3, 4-7, 8-9)
+(3, 4-7, 8-9, 10)
+
+We could end up with a situation where we stop because the array is
+full, even though if we kept going, it'd shrink back down below the
+length of the array (in this example, an array of length 2 would stop
+when it saw page 6, even though page 7 shrinks it back down again).
+
+> What is needed is a full scatterlist replacement, including the IOMMU
+> part.
+> 
+> For the IOMMU I would expect the datastructure to be re-used, we start
+> with a list of physical pages and then 'dma map' gives us a list of
+> IOVA physical pages, in another allocation, but exactly the same
+> datastructure.
+> 
+> This 'dma map' could return a pointer to the first datastructure if
+> there is no iommu, allocate a single entry list if the whole thing can
+> be linearly mapped with the iommu, and other baroque cases (like pci
+> offset/etc) will need to allocate full array. ie good HW runs fast and
+> is memory efficient.
+> 
+> It would be nice to see a patch sketching showing what this
+> datastructure could look like.
+> 
+> VFIO would like this structure as well as it currently is a very
+> inefficient page at a time loop when it iommu maps things.
+
+I agree that you need these things.  I think I'll run into trouble
+if I try to do them for you ... so I'm going to stop after doing the
+top end (pinning pages and getting them into an sg list) and let
+people who know that area better than I do work on that.
