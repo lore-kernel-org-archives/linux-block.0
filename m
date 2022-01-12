@@ -2,214 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF12C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 17:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D847FC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 17:33:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355406AbiALRBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 12:01:46 -0500
-Received: from mout.web.de ([212.227.15.3]:46721 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349807AbiALRBp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 12:01:45 -0500
-X-Greylist: delayed 313 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Jan 2022 12:01:44 EST
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1642006904;
-        bh=VpwX7tXhTbrLuzi1YF8Uzmb4A2oBhdUT14fAMPWrFis=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=PeskKWovL/ACSiPTBh401vUzji0my+TACRDRioT7OKxnbJRg38vK9L8VFKIJbqPcI
-         KXjyohg8wbSuXw6mRJ/2iQZJDVi6V7V1HeWGMM4MpinLd1V/Nl02zr+lUveXqI73dF
-         dKp91ZyAl1wVDk5yZVzUixu1s0L2gub2JgC+352M=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from gecko ([46.223.151.70]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M91Pe-1n1fJI3tgc-006XPY; Wed, 12
- Jan 2022 17:56:15 +0100
-Date:   Wed, 12 Jan 2022 16:56:12 +0000
-From:   Lukas Straub <lukasstraub2@web.de>
-To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        linux-raid@vger.kernel.org
-Subject: Re: [dm-devel] Proper way to test RAID456?
-Message-ID: <20220112155351.5b670d81@gecko>
-In-Reply-To: <24998019-960c-0808-78df-72e0d08c904e@gmx.com>
-References: <0535d6c3-dec3-fb49-3707-709e8d26b538@gmx.com>
-        <20220108195259.33e9bdf0@gecko>
-        <20220108202922.6b00de19@gecko>
-        <5ffc44f1-7e82-bc85-fbb1-a4f89711ae8f@gmx.com>
-        <e209bfe191442846f66d790321f2db672edfb8ca.camel@infradead.org>
-        <24998019-960c-0808-78df-72e0d08c904e@gmx.com>
+        id S1355735AbiALRdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 12:33:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33774 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1355680AbiALRdf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jan 2022 12:33:35 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3663DC06173F
+        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 09:33:35 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id n30-20020a17090a5aa100b001b2b6509685so6159739pji.3
+        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 09:33:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QTT6XNlZaHloaWKh9RlDBcbi7e/Mx29t7wQ9qiCr9Wk=;
+        b=McJ9rx6ho4q7bQA5UEc5Hl+SPzzXrSF17SbhpQ9arHbQBNEEZqy5jlQaRdedoCU+fb
+         VU0nKy9XA71b2jesQEk9fGOzp7AddLJC4uxRqwulc2+EHQbNX8r3QdRtMnI4HuAk30HK
+         NNsPKgd0VY9SEUP3yZnIy1nyo6rH9Vz0cfGe/nxlPBqipEB2RkFd5twZ5+QDnS6VTGO0
+         p6wIEer4taQvMZJEbEsB26Z0OZiztq97Isph2FaOsF5lptQ3GnDlkv1dsDpCRYB3S98J
+         kentlDg19ZSanmjpfQQsOIUnAINkHq4ylwi0oygiwnouXEzZJSo0jOHS88LVV5iBjTs8
+         NUfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=QTT6XNlZaHloaWKh9RlDBcbi7e/Mx29t7wQ9qiCr9Wk=;
+        b=iHsSN3omsz/J26Vvvx/W0BhbfPKwXgRxwETgUvKn4sz06RbDCFBTlKrPjE/TLXZvCW
+         9m+Atff/MSoxBBb3RFi8/L4o5xwlNQGyn7DFKsQNzFogQppIbyI/UMbFjRbxABO8tU5Q
+         UDqKhYwjES/zsrAX98aNhVXtje51vViwjk0kRONgUcakWHau+Du++1qiP2sSPo+m5fcx
+         M5I+hjTRVRPv17p+T3ZbCuuLcRZj9tvoHGQx0HxqNoG9eZs/FTGvnjcWnYb294CkHJ+6
+         M8w8Jdxvxttr8A4Ha1te39BTsQ30iZjpWGHt1y9VdarHjWDMYTMtpOl0ZyLLpzzhn87f
+         ktmw==
+X-Gm-Message-State: AOAM530iozIhvZP58PDLy/oH/G4CREYUwO9b6079dpT2ou0Bf88lH8dX
+        W8ebyv66pUp2t6j6WC8FSj8=
+X-Google-Smtp-Source: ABdhPJwKijslZUpfhxrNVx/g1iCkKFSqKCsY14+CZzSIGCrvJV9N8a5p2muRe42uf+WJol2H6N8G3g==
+X-Received: by 2002:a17:90b:4a47:: with SMTP id lb7mr662190pjb.126.1642008814586;
+        Wed, 12 Jan 2022 09:33:34 -0800 (PST)
+Received: from google.com ([2620:15c:211:201:b6c7:c163:623d:56bc])
+        by smtp.gmail.com with ESMTPSA id y31sm243277pfa.67.2022.01.12.09.33.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jan 2022 09:33:34 -0800 (PST)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Wed, 12 Jan 2022 09:33:32 -0800
+From:   Minchan Kim <minchan@kernel.org>
+To:     "Huang, Ying" <ying.huang@intel.com>
+Cc:     Yu Zhao <yuzhao@google.com>,
+        Mauricio Faria de Oliveira <mfo@canonical.com>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, Miaohe Lin <linmiaohe@huawei.com>,
+        Yang Shi <shy828301@gmail.com>
+Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
+ direct IO read
+Message-ID: <Yd8Q7Cplp5xLTYlV@google.com>
+References: <20220105233440.63361-1-mfo@canonical.com>
+ <Yd0oLWtVAyAexyQc@google.com>
+ <87v8ypybdc.fsf@yhuang6-desk2.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/trK2B+bQZg4U+J+J8zLUK/8";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Provags-ID: V03:K1:heywFokXSb224cpwvQrsi2v/LXbEHOE0r74vVZ0tAW61GPjbn6c
- eDdc9ppwND/oggCfxDn5DN/mNAEMOVaVO4sSRcD5N3Lu0QPeZ0mcwnxvixwiuMB9gADj3xX
- dVwYWnfBfnpweGh1YlYWJL76eTBrK6kgl6tA9RTyCdIlzfqKoVwEtzccIk2kpvTVW8uMHiR
- nbXSeKAdNKk+mM7NioWjQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:HoFGdC2jWiw=:IO49La0OrTdQ2Ah/QSu86R
- PInkEFYz0f7sLMKmILByyxEbjUOcCQgktOoaHafjY777p5GLH7bbCdB8Jz7611+wkdnpBRu7r
- uOsURFWjr4Uv/Va3/HJqSR2CzbbVn/T4mQUwGUfZe+gJF9uOHT1FEj2hL8swfEpA2hKBagFFG
- ahOztmFrt5u5vJ+7cSOi66FDfXwg9xr7L+ocsKIuXF/gA0XBzD4/9jsCrEtjlIhgfw4L/JcVT
- E6XNq63820FwJ/iQvuDpBIH7/1f5WVZBonMyexMx7FEDeE98Q1hfz+DbMiFXMUDMajCB3yAgX
- aRhDNXsrCu0seOZLJYeQNzhjJ7q3MmVx/71Ur8SzphSEKAm/Yp1bCE4Nqcyx19SZxUSSgJfso
- MeWdPL9FHR+oRO8iNFcc6YA9p52dilbL6s7ycJbAr7RwVpXs/EZaD/3CZMIuKKFcwtkb8w+gA
- DfKTiGgkSf7PndQWkSk260pTzE9gj6L9HpgoS74v5hXd27wuXTQxjM6UiAjcl0ujB3+TUni3e
- cTO0EOcBYgpy85HayzEQMcnWDbP7A+Wia9gkjREnmEwhjLeBkWENf83z1uOo2AiX7V+pwgwv1
- qMOLIOomVl+0Tr+FpBW+X4pFXqkvS+TEpeRgKny27cY00YaWBhLoiNXnIKAEidd/qA5WQbIJ5
- alM8JfrfHK4cmMBtX+E/zwqH/HYaOtP58bwh8pjyNfJOjgqe0ym3ej6CcfCMHP3ci1YhzhmbL
- sIMjcCUlLCD5ILBna9NQElbEAfcSACWI/bkz+g4kAehupxO6RM+2C6Msg7t0l/uclPPw6+wS+
- d7OHze5YbfgRLNDHLyxYbl3cwM6zLgWj0i4pdXXSiinBcnh+JNndgXR4TR/Mcg6BqEcQJDJ+U
- O3x24kK3e9PlhPSxSuHspAc1qoSqghi86xAX8NCS2y95PAceQbjOv01dZDBQCijS/L3xo8aTt
- sdhGSC2NrB4ibyEf6PEKhxNZINhJX4JlFi9/VgOcnhsbyNjXw99oAo5wq99zxF50iolzY2bzw
- U4/2Xn2bc4Sb9HdUEj8iOqHOx0g8+IWNXuvX7S3ZnfQbINbYU8F07rFS+GO+YZOtVaEBSZg1W
- 4GFIFl2Xg7/rdQ=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87v8ypybdc.fsf@yhuang6-desk2.ccr.corp.intel.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---Sig_/trK2B+bQZg4U+J+J8zLUK/8
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, 9 Jan 2022 20:13:36 +0800
-Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
-
-> On 2022/1/9 18:04, David Woodhouse wrote:
-> > On Sun, 2022-01-09 at 07:55 +0800, Qu Wenruo wrote: =20
-> >> On 2022/1/9 04:29, Lukas Straub wrote: =20
-> >>> But there is a even simpler solution for btrfs: It could just not tou=
-ch
-> >>> stripes that already contain data. =20
-> >>
-> >> That would waste a lot of space, if the fs is fragemented.
-> >>
-> >> Or we have to write into data stripes when free space is low.
-> >>
-> >> That's why I'm trying to implement a PPL-like journal for btrfs RAID56=
-. =20
+On Wed, Jan 12, 2022 at 09:46:23AM +0800, Huang, Ying wrote:
+> Yu Zhao <yuzhao@google.com> writes:
+> 
+> > On Wed, Jan 05, 2022 at 08:34:40PM -0300, Mauricio Faria de Oliveira wrote:
+> >> diff --git a/mm/rmap.c b/mm/rmap.c
+> >> index 163ac4e6bcee..8671de473c25 100644
+> >> --- a/mm/rmap.c
+> >> +++ b/mm/rmap.c
+> >> @@ -1570,7 +1570,20 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
+> >>  
+> >>  			/* MADV_FREE page check */
+> >>  			if (!PageSwapBacked(page)) {
+> >> -				if (!PageDirty(page)) {
+> >> +				int ref_count = page_ref_count(page);
+> >> +				int map_count = page_mapcount(page);
+> >> +
+> >> +				/*
+> >> +				 * The only page refs must be from the isolation
+> >> +				 * (checked by the caller shrink_page_list() too)
+> >> +				 * and one or more rmap's (dropped by discard:).
+> >> +				 *
+> >> +				 * Check the reference count before dirty flag
+> >> +				 * with memory barrier; see __remove_mapping().
+> >> +				 */
+> >> +				smp_rmb();
+> >> +				if ((ref_count - 1 == map_count) &&
+> >> +				    !PageDirty(page)) {
+> >>  					/* Invalidate as we cleared the pte */
+> >>  					mmu_notifier_invalidate_range(mm,
+> >>  						address, address + PAGE_SIZE);
 > >
-> > PPL writes the P/Q of the unmodified chunks from the stripe, doesn't
-> > it? =20
->=20
-> Did I miss something or the PPL isn't what I thought?
->=20
-> I thought PPL either:
->=20
-> a) Just write a metadata entry into the journal to indicate a full
->     stripe (along with its location) is going to be written.
->=20
-> b) Write a metadata entry into the journal about a non-full stripe
->     write, then write the new data and new P/Q into the journal
->=20
-> And this is before we start any data/P/Q write.
->=20
-> And after related data/P/Q write is finished, remove corresponding
-> metadata and data entry from the journal.
->=20
-> Or PPL have even better solution?
+> > Out of curiosity, how does it work with COW in terms of reordering?
+> > Specifically, it seems to me get_page() and page_dup_rmap() in
+> > copy_present_pte() can happen in any order, and if page_dup_rmap()
+> > is seen first, and direct io is holding a refcnt, this check can still
+> > pass?
+> 
+> I think that you are correct.
+> 
+> After more thoughts, it appears very tricky to compare page count and
+> map count.  Even if we have added smp_rmb() between page_ref_count() and
+> page_mapcount(), an interrupt may happen between them.  During the
+> interrupt, the page count and map count may be changed, for example,
+> unmapped, or do_swap_page().
 
-Yes, PPL is a bit better than a journal as you described it (md
-supports both). Because a journal would need to be replicated to
-multiple devices (raid1) in the array while the PPL is only written to
-the drive containing the parity for the particular stripe. And since the
-parity is distributed across all drives, the PPL overhead is also
-distributed across all drives. However, PPL only works for raid5 as
-you'll see.
+Yeah, it happens but what specific problem are you concerning from the
+count change under race? The fork case Yu pointed out was already known
+for breaking DIO so user should take care not to fork under DIO(Please
+look at O_DIRECT section in man 2 open). If you could give a specific
+example, it would be great to think over the issue.
 
-PPL works like this:
+I agree it's little tricky but it seems to be way other place has used
+for a long time(Please look at write_protect_page in ksm.c).
+So, here what we missing is tlb flush before the checking.
 
-Before any data/parity write either:
+Something like this.
 
- a) Just write a metadata entry into the PPL on the parity drive to
-    indicate a full stripe (along with its location) is going to be
-    written.
+diff --git a/mm/rmap.c b/mm/rmap.c
+index b0fd9dc19eba..b4ad9faa17b2 100644
+--- a/mm/rmap.c
++++ b/mm/rmap.c
+@@ -1599,18 +1599,8 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
 
- b) Write a metadata entry into the PPL on the parity drive about a
-    non-full stripe write, including which data chunks are going to be
-    modified, then write the XOR of chunks not modified by this write in
-    to the PPL.
+                        /* MADV_FREE page check */
+                        if (!PageSwapBacked(page)) {
+-                               int refcount = page_ref_count(page);
+-
+-                               /*
+-                                * The only page refs must be from the isolation
+-                                * (checked by the caller shrink_page_list() too)
+-                                * and the (single) rmap (dropped by discard:).
+-                                *
+-                                * Check the reference count before dirty flag
+-                                * with memory barrier; see __remove_mapping().
+-                                */
+-                               smp_rmb();
+-                               if (refcount == 2 && !PageDirty(page)) {
++                               if (!PageDirty(page) &&
++                                       page_mapcount(page) + 1 == page_count(page)) {
+                                        /* Invalidate as we cleared the pte */
+                                        mmu_notifier_invalidate_range(mm,
+                                                address, address + PAGE_SIZE);
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index f3162a5724de..6454ff5c576f 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -1754,6 +1754,9 @@ static unsigned int shrink_page_list(struct list_head *page_list,
+                        enum ttu_flags flags = TTU_BATCH_FLUSH;
+                        bool was_swapbacked = PageSwapBacked(page);
 
-To recover a inconsistent array with a lost drive:
-
-In case a), the stripe consists only of newly written data, so it will
-be affected by the write-hole (this is the trade-off that PPL makes) so
-just standard parity recovery.
-
-In case b), XOR what we wrote to the PPL (the XOR of chunks not
-modified) with the modified data chunks to get our new (consistent)
-parity. Then do standard parity recovery. This just works if we lost a
-unmodified data chunk.
-If we lost a modified data chunk this is not possible and just do
-standard parity recovery from the beginning. Again, the newly written
-data is affected by the write-hole but existing data is not.
-If we lost the parity drive (containing the PPL) there is no need to
-recover since all the data chunks are present.
-
-Of course, this was a simplified explanation, see drivers/md/raid5-ppl.c
-for details (it has good comments with examples). This also covers the
-case where a data chunk is only partially modified and the unmodified
-part of the chunk also needs to be protected (by working on a per-block
-basis instead of per-chunk).
-
-The PPL is not possible for raid6 AFAIK, because there it could happen
-that you loose both a modified data chunk and a unmodified data chunk.
-
-Regards,
-Lukas Straub
-
-> >
-> > An alternative in a true file system which can do its own block
-> > allocation is to just calculate the P/Q of the final stripe after it's
-> > been modified, and write those (and) the updated data out to newly-
-> > allocated blocks instead of overwriting the original. =20
->=20
-> This is what Johannes is considering, but for a different purpose.
-> Johannes' idea is to support zoned device. As the physical location a
-> zoned append write will only be known after it's written.
->=20
-> So his idea is to maintain another mapping tree for zoned write, so that
-> full stripe update will also happen in that tree.
->=20
-> But that idea is still in the future, on the other hand I still prefer
-> some tried-and-true method, as I'm 100% sure there will be new
-> difficulties waiting us for the new mapping tree method.
->=20
-> Thanks,
-> Qu
->=20
-> >
-> > Then the final step is to free the original data blocks and P/Q.
-> >
-> > This means that your RAID stripes no longer have a fixed topology; you
-> > need metadata to be able to *find* the component data and P/Q chunks...
-> > it ends up being non-trivial, but it has attractive properties if we
-> > can work it out. =20
++                       if (!was_swapbacked && PageAnon(page))
++                               flags &= ~TTU_BATCH_FLUSH;
++
+                        if (unlikely(PageTransHuge(page)))
+                                flags |= TTU_SPLIT_HUGE_PMD;
 
 
 
---=20
 
 
---Sig_/trK2B+bQZg4U+J+J8zLUK/8
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAmHfCCwACgkQNasLKJxd
-slj5YRAAriTi+zPKCzdoJ0d2cj8ZkHXtVoQMa5qr3R5f20aEyu/oTPkMFvmtsOKj
-ViMcFhTaV5Ceardq7Td7G3N2QzBJjEQsrg0FIl6aD9Jp8XWW49VwXRTyHihXi7xy
-HRCziWCxp8HWc6qy3IpOCm/XD3i0i37IDrm8dmA7r62swOALFX5g5zIpDo/CkfNU
-Tln3wA97KMEd93dWLzvWZsXFhETQ2lX9l5EMYzTjUqR0PAtbVJlHfeVYTnF1eAnw
-S5+TyiwfXa0lqOKUABYR8Ygnelu98VROpNWXUJi25CaY8l2T5jigskFdNvm+Ihy+
-era4R8dAsXCBhTEmO4JXNLmE42IU+m+6DnZlGHxn+v3wuh7Tz46sAAC9JX73R6Fk
-e925eXQ2e2df7Ej964r3f4u/yiVO+/MaoiLUacz+U3VbZu9LOGYJ+xmnmycjhV3X
-NmfBV1nnWIeYU6fHvRigLCMJXnVd9dPlYlqW0alRq/OtLW2rKlUkXf+RWLOpT8By
-+ZMyloNz0/84MFLN+XhgdbwpEJ/NStbaJXJtD7T2nUf2l3+kWV6rFrmPIgxdPYyb
-7yJMWxj9rGaU+2XmAkqoyC5ahj30apruZbQLyCXqc1EeHlGY8/Wrq5h2ZBAJcDbr
-CH22cVV2JzDT77MvzC+9nPWT/rkm8MNna4TRLZgtTauio9bPGHg=
-=Jly6
------END PGP SIGNATURE-----
-
---Sig_/trK2B+bQZg4U+J+J8zLUK/8--
