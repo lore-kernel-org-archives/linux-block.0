@@ -2,114 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC42EC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 12:32:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E516EC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 12:51:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240474AbiALMb7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 07:31:59 -0500
-Received: from mga14.intel.com ([192.55.52.115]:52245 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240219AbiALMb5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 07:31:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641990717; x=1673526717;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pBoOKXSUj7v7gJ89NZFrmu1XUSGgJkxV+aXq1SqTpog=;
-  b=QIzgEbrt+srN7jM/E+ZWGv1wXNfpVtD9v1XrcArM8xOYNypkisPLY45+
-   6n1F+Sx3Brh2j7/QzTDMRqRVzI95B6D2KOeISDp/1xXlo8YcCgVXHQOJ4
-   mGQYfg9GQDb7Fz/qsCSiAmHZY7BFv0YKJF8ymZJ5fqa3yuvfXysgz9YuO
-   Q/pRnhuER3KJ6L8t0vG2gRmJCpqDpJK7esd2ME93aEmN3cE4D62wzFdAw
-   sCFITnB1QRy08BikP+RzdIt+1i3+rch2IchTauKsF9zyvS+aFovfWmMGW
-   Og4nfXtrizzWUAr9yEmztpm+WwxAmTPaBeRuazFVxRU82kOmqbI3wUeFg
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10224"; a="243923292"
-X-IronPort-AV: E=Sophos;i="5.88,282,1635231600"; 
-   d="scan'208";a="243923292"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 04:31:42 -0800
-X-IronPort-AV: E=Sophos;i="5.88,282,1635231600"; 
-   d="scan'208";a="691367878"
-Received: from smile.fi.intel.com ([10.237.72.61])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 04:31:39 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.95)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1n7clm-009gGJ-2T;
-        Wed, 12 Jan 2022 14:30:26 +0200
-Date:   Wed, 12 Jan 2022 14:30:25 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     QiuLaibin <qiulaibin@huawei.com>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, john.garry@huawei.com,
-        martin.petersen@oracle.com, hare@suse.de,
-        johannes.thumshirn@wdc.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+        id S1353273AbiALMvi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 07:51:38 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4405 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232738AbiALMvh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jan 2022 07:51:37 -0500
+Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JYnRy4gY2z67vyB;
+        Wed, 12 Jan 2022 20:48:46 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 12 Jan 2022 13:51:35 +0100
+Received: from [10.47.88.157] (10.47.88.157) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Wed, 12 Jan
+ 2022 12:51:33 +0000
+From:   John Garry <john.garry@huawei.com>
 Subject: Re: [PATCH -next v4] blk-mq: fix tag_get wait task can't be awakened
-Message-ID: <Yd7J4XbkdIm52bVw@smile.fi.intel.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        QiuLaibin <qiulaibin@huawei.com>
+CC:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <martin.petersen@oracle.com>, <hare@suse.de>,
+        <johannes.thumshirn@wdc.com>, <bvanassche@acm.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 References: <20220111140216.1858823-1-qiulaibin@huawei.com>
  <Yd2Q6LyJUDAU54Dt@smile.fi.intel.com>
  <d7f51067-f5a8-e78c-5ece-c1ef132b9b9a@huawei.com>
+ <Yd7J4XbkdIm52bVw@smile.fi.intel.com>
+Message-ID: <3d386998-d810-5036-a87e-50aba9f56639@huawei.com>
+Date:   Wed, 12 Jan 2022 12:51:13 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7f51067-f5a8-e78c-5ece-c1ef132b9b9a@huawei.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <Yd7J4XbkdIm52bVw@smile.fi.intel.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.88.157]
+X-ClientProxiedBy: lhreml714-chm.china.huawei.com (10.201.108.65) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 12:18:53PM +0800, QiuLaibin wrote:
-> On 2022/1/11 22:15, Andy Shevchenko wrote:
-> > On Tue, Jan 11, 2022 at 10:02:16PM +0800, Laibin Qiu wrote:
-
-...
-
-> > > +		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
-> > > +		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
-> > 
-> > Whoever wrote this code did too much defensive programming, because the first
-> > conditional doesn't make much sense here. Am I right?
-> > 
-> I think because this judgement is in the general IO process, there are also
-> some performance considerations here.
-
-I didn't buy this. Is there any better argument why you need redundant
-test_bit() call?
-
-> > > +			return true;
-
-> > >   	} else {
-> > 
-> > > +		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
-> > > +		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
-> > 
-> > Ditto.
-> > 
-> > > +			return true;
-
-> > >   	}
-
-...
-
-> > > +	unsigned int wake_batch = clamp_t(unsigned int,
-> > > +			(sbq->sb.depth + users - 1) / users, 4U, SBQ_WAKE_BATCH);
-> > 
-> > 
-> > 	unsigned int wake_batch;
-> > 
-> > 	wake_batch = clamp_val((sbq->sb.depth + users - 1) / users, 4, SBQ_WAKE_BATCH);
-> > 	...
-> > 
-> > is easier to read, no?
+On 12/01/2022 12:30, Andy Shevchenko wrote:
+>>>> +		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
+>>>> +		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
+>>> Whoever wrote this code did too much defensive programming, because the first
+>>> conditional doesn't make much sense here. Am I right?
+>>>
+>> I think because this judgement is in the general IO process, there are also
+>> some performance considerations here.
+> I didn't buy this. Is there any better argument why you need redundant
+> test_bit() call?
 > 
-> Here I refer to the calculation method in sbq_calc_wake_batch(). And I will
-> separate the definition from the calculation in V5.
 
-I'm not sure I understand how it's related to the style changes I proposed.
-I haven't changed any logic behind.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+I think that the idea is that test_bit() is fast and test_and_set_bit() 
+is slow; as such, if we generally expect the bit to be set, then there 
+is no need to do the slower test_and_set_bit() always.
