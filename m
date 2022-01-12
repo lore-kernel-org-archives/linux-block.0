@@ -2,91 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 322E0C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 20:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A6CC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 20:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357165AbiALUOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 15:14:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43512 "EHLO
+        id S234050AbiALUPN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 15:15:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357325AbiALUNn (ORCPT
+        with ESMTP id S1357397AbiALUOj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 15:13:43 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0498C061751;
-        Wed, 12 Jan 2022 12:13:42 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id oa15so7297303pjb.4;
-        Wed, 12 Jan 2022 12:13:42 -0800 (PST)
+        Wed, 12 Jan 2022 15:14:39 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 405EDC061756;
+        Wed, 12 Jan 2022 12:14:39 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id hv15so7299870pjb.5;
+        Wed, 12 Jan 2022 12:14:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=XMI3dbv7S6q2jB5/NVdmh3pFl60FzTgbFc2uAC8p4kQ=;
-        b=WNdGX4sWq7OTOq6tvGxIIKvH3UBlRIANC2Pv4V6m0hc0ZZLdjqFY8Jtl6Q23Qq5e2G
-         jHU+I5ciqJ8LhYAJBYBZuT6b5/cWT6ZC9iGb/q37U7Jm1bfZmKdOCueEdeUfZTqxLFVi
-         rOEmnW3bKlifhvohIlJ7VTKFccteIR9AUKP4ya1gVpsyQdE8S0EWkzp82S86jZnNSIsx
-         LtkyBbCL702Bh6BO/GgYdaEYZ9C0pvMefrKGrnGhy2SJ+Odk6MGjWfabSPV9rkGvO5RJ
-         t04P/EXDhXVjBMC+VOKTjiVetCpaDxS3nrBJQOAc6apK322tGTdZFhlhWYF+XUUhoFTJ
-         hK1Q==
+        bh=rmc9nZh5Lq0NuEYLrcILVtw0HQa1oGMKkH5BAZ9bgf0=;
+        b=HVXOgy3P/tNrTaSec1EwDq6ftH01QJGPUkpDBvb/XQxYHgT2/zL/fmJCQahK0JFQDQ
+         20A2ZBj9n2jTrv7KuepLM9ZCuXF0UcxiLIVkuMey1CPpYK+vJNjTKSmhhb5hwEWI4XRZ
+         nn8zAh/Iea/Bw/+9isy3jE3PVZsq+Naj8r1OMI0dKcaYIkPv1eKzGXL+JYGaPTcTzM3P
+         qexr5+fySbDPqSQuqaoxCsXdsRig+QXmamZtpeNLhHTKqOKdiquiWstCUaagrZLlqM1o
+         d7MTfA8y6mqu+yRx6Yp6y8QFcDT3jq83sTsNVHNg2h/yD+3s6c0vUjpe0wKZZA1pWTRD
+         uWpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to;
-        bh=XMI3dbv7S6q2jB5/NVdmh3pFl60FzTgbFc2uAC8p4kQ=;
-        b=Vlj8Q8zylUHyno1H/A4iruh0NyLzTRFtSoIE2jKCRwtiYIcsuHNuX+Bwf4xSZfao2I
-         g8mKFeM1DLKvPF8svAPWbZrOA2bHYzG9skHvZsoR9Bm844bzWOG350Bido4sI8WY1svi
-         9GNW7d7GVcPV3tRWRjQSMdzj9978A84p1fYjODjxW80kxRL1KyVtJf8NMmon82glI270
-         lEr8LBwAITRgtxuMUHmug1qE+KrhLqGqlhQjKEaVE/VhfhK0ZSnRcqW34l6BuWwvks7R
-         bQ8zPqNltCGOf3GcK5ZBxmLhPZ7t5dyNRx/qzDdZnku4f0fMMXmljkv3Lhc5e6REGNpT
-         pZhA==
-X-Gm-Message-State: AOAM532R7QIyuqeFtgZDYrlfaUFI06FiB/uM5uctZnuB8Va7CIKPmVds
-        csga8atBHmp5bVXAx7mgZn4=
-X-Google-Smtp-Source: ABdhPJxq26drZEE9wV2Y1XH1ljH7HvENl4m541tSkiSwjR162ek5D4RLLMtTTVviKpZ4wLCDDi12mA==
-X-Received: by 2002:a17:902:c942:b0:14a:604d:2c35 with SMTP id i2-20020a170902c94200b0014a604d2c35mr986692pla.153.1642018422294;
-        Wed, 12 Jan 2022 12:13:42 -0800 (PST)
+        bh=rmc9nZh5Lq0NuEYLrcILVtw0HQa1oGMKkH5BAZ9bgf0=;
+        b=8NF1W3C0VX4esqNUhTFD+qcnAnL2LGt0gUsk7WwFhiM0RF0s+h08wgulHPRUDfxX9A
+         C9qNnwBLaBzUxZ91byjOStw7kkuPcePzL9PpelvbLl2PLW9DPqmisiL6OwuXElPalWKO
+         wnodo6jtJV/k360r0lQY928BegPKXXP1mpMA1a6LHQmMliyg7z13Jri7W71OB7mIlIMQ
+         q82KrLwwX4t2Oj9iifukB2Mbgjk+aL0sbMT6mERZpB4nw0x30tGIs5GZFqxsnN05Vvrs
+         dPlapCmjrt4CPsE2278Ml5Xk41oTwLrI7TQFBS2C8HW5ZYj4q90IHeDsmRCko8OB7KRu
+         vMoQ==
+X-Gm-Message-State: AOAM531TVbSUGjsFS3iKHEDolqrpGV51nvaL9K4ASuTXqQ4OHDg+VS+N
+        i2Lkw2y8DgRFcF6UUanjVlY=
+X-Google-Smtp-Source: ABdhPJynA6+huSbdIZ0m2kRdfbFhlbDmj/q7j3NwR6spgOTiAMFKUmZeY0OGovCUJKT1J+WKWae3qA==
+X-Received: by 2002:a17:902:7202:b0:14a:6b9:ce33 with SMTP id ba2-20020a170902720200b0014a06b9ce33mr1378616plb.124.1642018478672;
+        Wed, 12 Jan 2022 12:14:38 -0800 (PST)
 Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id s8sm397048pfu.190.2022.01.12.12.13.41
+        by smtp.gmail.com with ESMTPSA id b6sm419574pfm.170.2022.01.12.12.14.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 12:13:41 -0800 (PST)
+        Wed, 12 Jan 2022 12:14:38 -0800 (PST)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 12 Jan 2022 10:13:40 -1000
+Date:   Wed, 12 Jan 2022 10:14:36 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Wang Jianchao <jianchao.wan9@gmail.com>
-Cc:     axboe@kernel.dk, jbacik@fb.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/13] blk: introduce iostat per cgroup module
-Message-ID: <Yd82dJMxdQkssu4k@slm.duckdns.org>
-References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
- <20220110091046.17010-14-jianchao.wan9@gmail.com>
+To:     Wolfgang Bumiller <w.bumiller@proxmox.com>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Thomas Lamprecht <t.lamprecht@proxmox.com>
+Subject: Re: [PATCH v3] blk-cgroup: always terminate io.stat lines
+Message-ID: <Yd82rHFwf9XQ9Gwu@slm.duckdns.org>
+References: <20220111083159.42340-1-w.bumiller@proxmox.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220110091046.17010-14-jianchao.wan9@gmail.com>
+In-Reply-To: <20220111083159.42340-1-w.bumiller@proxmox.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 05:10:46PM +0800, Wang Jianchao wrote:
-> From: Wang Jianchao <wangjianchao@kuaishou.com>
+On Tue, Jan 11, 2022 at 09:31:59AM +0100, Wolfgang Bumiller wrote:
+> With the removal of seq_get_buf in blkcg_print_one_stat, we
+> cannot make adding the newline conditional on there being
+> relevant stats because the name was already written out
+> unconditionally.
+> Otherwise we may end up with multiple device names in one
+> line which is confusing and doesn't follow the nested-keyed
+> file format.
 > 
-> iostat can only track the whole device's io statistics. This patch
-> introduces iostat per cgroup based on blk-rq-qos framework which
-> can track bw, iops, queue latency and device latency and distinguish
-> regular or meta data. The blkio.iostat per cgroup output in following
-> format,
-> vda-data bytes iops queue_lat dev_lat [ditto]  [ditto]
->     meta   \___________ ______________/    |        |
-> 	               v                   v        v
-> 	             read               write   discard
-> In particular, the blkio.iostat of root only output the statistics
-> of IOs from root cgroup. However, the non-root blkio.iostat outputs
-> all of the children cgroups. With meta stats in root cgroup, hope
-> to observe the performace of fs metadata.
+> Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+> Fixes: 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
 
-I think using bpf is a way better solution for this kind of detailed
-statistics. What if I want to know what portions are random, or the
-distribution of IO sizes? Do I add another rq-qos policy or add another
-interface file with interface versioning?
+Acked-by: Tejun Heo <tj@kernel.org>
 
 Thanks.
 
