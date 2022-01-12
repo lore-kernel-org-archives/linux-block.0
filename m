@@ -2,72 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F87C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 19:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322E0C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 20:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344661AbiALTPc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 14:15:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56660 "EHLO
+        id S1357165AbiALUOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 15:14:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357043AbiALTOm (ORCPT
+        with ESMTP id S1357325AbiALUNn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 14:14:42 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56FBC0254B0
-        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 11:12:11 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 65FD5619FE
-        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 19:12:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CCF57C36AEA;
-        Wed, 12 Jan 2022 19:12:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642014730;
-        bh=kqYP7tVhIUBxPZyHPkL2WEiXOpWIFn/NPQXNzncSSh8=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=T9h22OSQGJgtbBPnbaPFwPiCbienA4sG01H2VGARi/kWInk/MsvgrX2VAf/3DoBj5
-         bqlJhryVpPn2tgF29Y4XRXENp0I9MFLX3z1w1MwTIQmV89ZQxiAU6QeesftGqzzCWF
-         phkrMbU0lctnufPCe3ZTlFJgPfG6ayxZb+YU1tlSVQ3xje77EiRKtUhLsQpUl7F5uA
-         hTB5UK5AHPLiN2yID/5FnTSDNAdjTNiLE0gBI1l1ozotzeIFpAYM6zAeMljvaPRIcg
-         jfuvsMVxKa/elkL3rc4L9I3SatXcCClKF4fcc/hPWuLojBc6kGyJG00YdPv3TxNGKN
-         8caDF3nRLAqUw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BB5D8F6078C;
-        Wed, 12 Jan 2022 19:12:10 +0000 (UTC)
-Subject: Re: [git pull] device mapper changes for 5.17
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Yd8AveH8D+Nk2ILp@redhat.com>
-References: <Yd8AveH8D+Nk2ILp@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Yd8AveH8D+Nk2ILp@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.17/dm-changes
-X-PR-Tracked-Commit-Id: eaac0b590a47c717ef36cbfd1c528cd154c965a1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 49008f0cc1ef0b86ccfa0d1d99e67741d46bd35b
-Message-Id: <164201473075.2601.9666209549315511909.pr-tracker-bot@kernel.org>
-Date:   Wed, 12 Jan 2022 19:12:10 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joe Thornber <ejt@redhat.com>,
-        Kees Cook <keescook@chromium.org>
+        Wed, 12 Jan 2022 15:13:43 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0498C061751;
+        Wed, 12 Jan 2022 12:13:42 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id oa15so7297303pjb.4;
+        Wed, 12 Jan 2022 12:13:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XMI3dbv7S6q2jB5/NVdmh3pFl60FzTgbFc2uAC8p4kQ=;
+        b=WNdGX4sWq7OTOq6tvGxIIKvH3UBlRIANC2Pv4V6m0hc0ZZLdjqFY8Jtl6Q23Qq5e2G
+         jHU+I5ciqJ8LhYAJBYBZuT6b5/cWT6ZC9iGb/q37U7Jm1bfZmKdOCueEdeUfZTqxLFVi
+         rOEmnW3bKlifhvohIlJ7VTKFccteIR9AUKP4ya1gVpsyQdE8S0EWkzp82S86jZnNSIsx
+         LtkyBbCL702Bh6BO/GgYdaEYZ9C0pvMefrKGrnGhy2SJ+Odk6MGjWfabSPV9rkGvO5RJ
+         t04P/EXDhXVjBMC+VOKTjiVetCpaDxS3nrBJQOAc6apK322tGTdZFhlhWYF+XUUhoFTJ
+         hK1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=XMI3dbv7S6q2jB5/NVdmh3pFl60FzTgbFc2uAC8p4kQ=;
+        b=Vlj8Q8zylUHyno1H/A4iruh0NyLzTRFtSoIE2jKCRwtiYIcsuHNuX+Bwf4xSZfao2I
+         g8mKFeM1DLKvPF8svAPWbZrOA2bHYzG9skHvZsoR9Bm844bzWOG350Bido4sI8WY1svi
+         9GNW7d7GVcPV3tRWRjQSMdzj9978A84p1fYjODjxW80kxRL1KyVtJf8NMmon82glI270
+         lEr8LBwAITRgtxuMUHmug1qE+KrhLqGqlhQjKEaVE/VhfhK0ZSnRcqW34l6BuWwvks7R
+         bQ8zPqNltCGOf3GcK5ZBxmLhPZ7t5dyNRx/qzDdZnku4f0fMMXmljkv3Lhc5e6REGNpT
+         pZhA==
+X-Gm-Message-State: AOAM532R7QIyuqeFtgZDYrlfaUFI06FiB/uM5uctZnuB8Va7CIKPmVds
+        csga8atBHmp5bVXAx7mgZn4=
+X-Google-Smtp-Source: ABdhPJxq26drZEE9wV2Y1XH1ljH7HvENl4m541tSkiSwjR162ek5D4RLLMtTTVviKpZ4wLCDDi12mA==
+X-Received: by 2002:a17:902:c942:b0:14a:604d:2c35 with SMTP id i2-20020a170902c94200b0014a604d2c35mr986692pla.153.1642018422294;
+        Wed, 12 Jan 2022 12:13:42 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id s8sm397048pfu.190.2022.01.12.12.13.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jan 2022 12:13:41 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 12 Jan 2022 10:13:40 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Wang Jianchao <jianchao.wan9@gmail.com>
+Cc:     axboe@kernel.dk, jbacik@fb.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 13/13] blk: introduce iostat per cgroup module
+Message-ID: <Yd82dJMxdQkssu4k@slm.duckdns.org>
+References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
+ <20220110091046.17010-14-jianchao.wan9@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220110091046.17010-14-jianchao.wan9@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Wed, 12 Jan 2022 11:24:29 -0500:
+On Mon, Jan 10, 2022 at 05:10:46PM +0800, Wang Jianchao wrote:
+> From: Wang Jianchao <wangjianchao@kuaishou.com>
+> 
+> iostat can only track the whole device's io statistics. This patch
+> introduces iostat per cgroup based on blk-rq-qos framework which
+> can track bw, iops, queue latency and device latency and distinguish
+> regular or meta data. The blkio.iostat per cgroup output in following
+> format,
+> vda-data bytes iops queue_lat dev_lat [ditto]  [ditto]
+>     meta   \___________ ______________/    |        |
+> 	               v                   v        v
+> 	             read               write   discard
+> In particular, the blkio.iostat of root only output the statistics
+> of IOs from root cgroup. However, the non-root blkio.iostat outputs
+> all of the children cgroups. With meta stats in root cgroup, hope
+> to observe the performace of fs metadata.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.17/dm-changes
+I think using bpf is a way better solution for this kind of detailed
+statistics. What if I want to know what portions are random, or the
+distribution of IO sizes? Do I add another rq-qos policy or add another
+interface file with interface versioning?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/49008f0cc1ef0b86ccfa0d1d99e67741d46bd35b
-
-Thank you!
+Thanks.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+tejun
