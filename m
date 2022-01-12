@@ -2,102 +2,194 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF93BC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 01:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7191FC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 03:06:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235918AbiALBqs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Jan 2022 20:46:48 -0500
-Received: from mga05.intel.com ([192.55.52.43]:11704 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234009AbiALBqr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Jan 2022 20:46:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641952007; x=1673488007;
-  h=from:to:cc:subject:references:date:in-reply-to:
-   message-id:mime-version;
-  bh=ja5XEXe3L9WwTnPzS4XAGuR/jxoyzbCGm01nJS455Pw=;
-  b=VkbtDtvVDu1xR1zhhQ71mDskxeoCu+gEWcNcpuMG5bcOiExWAj6lOwnF
-   MRjGPSFhlMjgghW9GC4xNyuAT9TS34t8IJUCL3nSMjon1b/ekNhpHenkv
-   n4Tq6bhaRGISt0QkY8G5vK1IgAh+EQMqnEyscg5OPeNMjHbMSUW3p8w+C
-   BZxcq1JwhJnxj8YDkQWIvtHl5Fn8avZsGwqEeq80T4wiUXiajqJKhThzJ
-   rSgJWGPZ3R+PDr03akNiIKWjZj1BMU2Vd7zSXVAIWkWbVXML8sR/NXKwZ
-   CSHhhXyHEf6Dss6tPV1FAi1t/baMCiWezSeuoLmIkX29RwmL+fEUDtSHT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10224"; a="329984941"
-X-IronPort-AV: E=Sophos;i="5.88,281,1635231600"; 
-   d="scan'208";a="329984941"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 17:46:27 -0800
-X-IronPort-AV: E=Sophos;i="5.88,281,1635231600"; 
-   d="scan'208";a="528982378"
-Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.239.13.11])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 17:46:24 -0800
-From:   "Huang, Ying" <ying.huang@intel.com>
-To:     Yu Zhao <yuzhao@google.com>
-Cc:     Mauricio Faria de Oliveira <mfo@canonical.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Minchan Kim <minchan@kernel.org>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, Miaohe Lin <linmiaohe@huawei.com>,
-        Yang Shi <shy828301@gmail.com>
-Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-References: <20220105233440.63361-1-mfo@canonical.com>
-        <Yd0oLWtVAyAexyQc@google.com>
-Date:   Wed, 12 Jan 2022 09:46:23 +0800
-In-Reply-To: <Yd0oLWtVAyAexyQc@google.com> (Yu Zhao's message of "Mon, 10 Jan
-        2022 23:48:13 -0700")
-Message-ID: <87v8ypybdc.fsf@yhuang6-desk2.ccr.corp.intel.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+        id S1349060AbiALDGf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Jan 2022 22:06:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47076 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1349046AbiALDGe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Jan 2022 22:06:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641956794;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hLUxMC+s0pjFSC8kaV/VAZ/OjH+3iQwtRfE6QrexVRQ=;
+        b=CbTvkKSwsGdKG6kpTLJugZ4XuOeJRudt5m7p30PWh49X2QCCdY1VplQLLGURauvcEkTCDv
+        RZ+Ooy8AfZl9Hrst5UzgFmJFDdMJGSLVp0pJY2VZrpsFwwrYjd8tVWnQECWUE6O0ptjm7k
+        HhWt2f9IjShz8JcRf8EBoRDkaIiawEA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-88-BVlO2JIgPpuRso4p7ARE6A-1; Tue, 11 Jan 2022 22:06:31 -0500
+X-MC-Unique: BVlO2JIgPpuRso4p7ARE6A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97F321853028;
+        Wed, 12 Jan 2022 03:06:29 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C73E5E24E;
+        Wed, 12 Jan 2022 03:05:58 +0000 (UTC)
+Date:   Wed, 12 Jan 2022 11:05:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     mkoutny@suse.com, paulmck@kernel.org, tj@kernel.org,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v6 2/2] block: cancel all throttled bios in del_gendisk()
+Message-ID: <Yd5FkuhYX9YcgQkZ@T590>
+References: <20220110134758.2233758-1-yukuai3@huawei.com>
+ <20220110134758.2233758-3-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ascii
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220110134758.2233758-3-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Yu Zhao <yuzhao@google.com> writes:
+Hello Yu Kuai,
 
-> On Wed, Jan 05, 2022 at 08:34:40PM -0300, Mauricio Faria de Oliveira wrote:
->> diff --git a/mm/rmap.c b/mm/rmap.c
->> index 163ac4e6bcee..8671de473c25 100644
->> --- a/mm/rmap.c
->> +++ b/mm/rmap.c
->> @@ -1570,7 +1570,20 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
->>  
->>  			/* MADV_FREE page check */
->>  			if (!PageSwapBacked(page)) {
->> -				if (!PageDirty(page)) {
->> +				int ref_count = page_ref_count(page);
->> +				int map_count = page_mapcount(page);
->> +
->> +				/*
->> +				 * The only page refs must be from the isolation
->> +				 * (checked by the caller shrink_page_list() too)
->> +				 * and one or more rmap's (dropped by discard:).
->> +				 *
->> +				 * Check the reference count before dirty flag
->> +				 * with memory barrier; see __remove_mapping().
->> +				 */
->> +				smp_rmb();
->> +				if ((ref_count - 1 == map_count) &&
->> +				    !PageDirty(page)) {
->>  					/* Invalidate as we cleared the pte */
->>  					mmu_notifier_invalidate_range(mm,
->>  						address, address + PAGE_SIZE);
->
-> Out of curiosity, how does it work with COW in terms of reordering?
-> Specifically, it seems to me get_page() and page_dup_rmap() in
-> copy_present_pte() can happen in any order, and if page_dup_rmap()
-> is seen first, and direct io is holding a refcnt, this check can still
-> pass?
+On Mon, Jan 10, 2022 at 09:47:58PM +0800, Yu Kuai wrote:
+> Throttled bios can't be issued after del_gendisk() is done, thus
+> it's better to cancel them immediately rather than waiting for
+> throttle is done.
+> 
+> For example, if user thread is throttled with low bps while it's
+> issuing large io, and the device is deleted. The user thread will
+> wait for a long time for io to return.
+> 
+> Noted this patch is mainly from revertion of commit 32e3374304c7
+> ("blk-throttle: remove tg_drain_bios") and commit b77412372b68
+> ("blk-throttle: remove blk_throtl_drain").
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-throttle.c | 77 ++++++++++++++++++++++++++++++++++++++++++++
+>  block/blk-throttle.h |  2 ++
+>  block/genhd.c        |  2 ++
+>  3 files changed, 81 insertions(+)
 
-I think that you are correct.
+Just wondering why not take the built-in way in throtl_upgrade_state() for
+canceling throttled bios? Something like the following, then we can avoid
+to re-invent the wheel.
 
-After more thoughts, it appears very tricky to compare page count and
-map count.  Even if we have added smp_rmb() between page_ref_count() and
-page_mapcount(), an interrupt may happen between them.  During the
-interrupt, the page count and map count may be changed, for example,
-unmapped, or do_swap_page().
+ block/blk-throttle.c | 38 +++++++++++++++++++++++++++++++-------
+ block/blk-throttle.h |  2 ++
+ block/genhd.c        |  3 +++
+ 3 files changed, 36 insertions(+), 7 deletions(-)
 
-Best Regards,
-Huang, Ying
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index cf7e20804f1b..17e56b2e44c4 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1816,16 +1816,11 @@ static void throtl_upgrade_check(struct throtl_grp *tg)
+ 		throtl_upgrade_state(tg->td);
+ }
+ 
+-static void throtl_upgrade_state(struct throtl_data *td)
++static void __throtl_cancel_bios(struct throtl_data *td)
+ {
+ 	struct cgroup_subsys_state *pos_css;
+ 	struct blkcg_gq *blkg;
+ 
+-	throtl_log(&td->service_queue, "upgrade to max");
+-	td->limit_index = LIMIT_MAX;
+-	td->low_upgrade_time = jiffies;
+-	td->scale = 0;
+-	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+ 		struct throtl_service_queue *sq = &tg->service_queue;
+@@ -1834,12 +1829,41 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 		throtl_select_dispatch(sq);
+ 		throtl_schedule_next_dispatch(sq, true);
+ 	}
+-	rcu_read_unlock();
+ 	throtl_select_dispatch(&td->service_queue);
+ 	throtl_schedule_next_dispatch(&td->service_queue, true);
+ 	queue_work(kthrotld_workqueue, &td->dispatch_work);
+ }
+ 
++void blk_throtl_cancel_bios(struct request_queue *q)
++{
++	struct cgroup_subsys_state *pos_css;
++	struct blkcg_gq *blkg;
++
++	rcu_read_lock();
++	spin_lock_irq(&q->queue_lock);
++	__throtl_cancel_bios(q->td);
++	spin_unlock_irq(&q->queue_lock);
++	rcu_read_unlock();
++
++	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg)
++		del_timer_sync(&blkg_to_tg(blkg)->service_queue.pending_timer);
++	del_timer_sync(&q->td->service_queue.pending_timer);
++
++	throtl_shutdown_wq(q);
++}
++
++static void throtl_upgrade_state(struct throtl_data *td)
++{
++	throtl_log(&td->service_queue, "upgrade to max");
++	td->limit_index = LIMIT_MAX;
++	td->low_upgrade_time = jiffies;
++	td->scale = 0;
++
++	rcu_read_lock();
++	__throtl_cancel_bios(td);
++	rcu_read_unlock();
++}
++
+ static void throtl_downgrade_state(struct throtl_data *td)
+ {
+ 	td->scale /= 2;
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index b23a9f3abb82..525ac607c518 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -162,11 +162,13 @@ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+ static inline void blk_throtl_exit(struct request_queue *q) { }
+ static inline void blk_throtl_register_queue(struct request_queue *q) { }
+ static inline bool blk_throtl_bio(struct bio *bio) { return false; }
++static inline void blk_throtl_cancel_bios(struct request_queue *q) {}
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ int blk_throtl_init(struct request_queue *q);
+ void blk_throtl_exit(struct request_queue *q);
+ void blk_throtl_register_queue(struct request_queue *q);
+ bool __blk_throtl_bio(struct bio *bio);
++void blk_throtl_cancel_bios(struct request_queue *q);
+ static inline bool blk_throtl_bio(struct bio *bio)
+ {
+ 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
+diff --git a/block/genhd.c b/block/genhd.c
+index 626c8406f21a..1395cbd8eacf 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -30,6 +30,7 @@
+ #include "blk.h"
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
++#include "blk-throttle.h"
+ 
+ static struct kobject *block_depr;
+ 
+@@ -622,6 +623,8 @@ void del_gendisk(struct gendisk *disk)
+ 
+ 	blk_mq_freeze_queue_wait(q);
+ 
++	blk_throtl_cancel_bios(q);
++
+ 	rq_qos_exit(q);
+ 	blk_sync_queue(q);
+ 	blk_flush_integrity();
+
+Thanks,
+Ming
+
