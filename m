@@ -2,131 +2,214 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08577C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 16:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF12C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 12 Jan 2022 17:01:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349883AbiALQiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 11:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49366 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349928AbiALQiM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 11:38:12 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0CFC061748
-        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 08:38:11 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id k14so472407ion.7
-        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 08:38:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=y+e/Abjluh2qjRwXoFE5SuEjr/IJUMHa4m2SRSbbLfw=;
-        b=yQXlUaU5PjJ3upop3OQQrfIPE66U+P7AdW2r2E8KWDXkCVoNmaLXah5I47DQmRdnxt
-         QoHW4Srchizm4cIZcGbuReX47iXxEXcIgVDflYNInJEnKTaSg5ex5RMXpcknbM6SXIcB
-         jKv4/CVpZGUzrgT+MU1AwIOlt608U4NOUNKkRTMQMTP1LMvuZcYRduih7aZM1I2ursME
-         vAkpN3YzakKnN1VtcHdb974JxZePFYFLomcoi2iIai1KztBXVlxs4rrphCGvYcAzNDf/
-         wVztaNNMDlhn52m0GK2RkG1wWlVjBapJOGdLlYReQiDLuV/K8zKqSxmdXqA7D39dOay/
-         lcJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=y+e/Abjluh2qjRwXoFE5SuEjr/IJUMHa4m2SRSbbLfw=;
-        b=U7eXktRWhCPYEE1B/Tf59t5pb3LBiAj8HWN9DqNBZDeZDV3FnS8bj11/DI+J+ndE29
-         eYxvZN27dbfZU9JbIfNZmQJRRnMsoqVIRLrpsXpgluaKQhxZXuAplXC34FWuz2Gdk4C8
-         koFIOobMjSXIIMcOUDnzI+yrHfcRuzlwzGSEKon9gX7i3YwYaXi/ospTOuuCMzZ5tvm7
-         i12knElVWkQ78ih6uym9b1oRiVAPWMy9j7sOrygqV3iOZ/bxWsZIpN8mXxh8hZAG6J/+
-         rJ3NAau35PLfvFxmIhe6Nujx7bZHqA1W6TJAMhI6w8xPzFclewh+Dnr7FKUUNKIC+MPI
-         EKGw==
-X-Gm-Message-State: AOAM532lydTSmudTi+EfuMVBzMu1ooI4HoAuuVdbyDMdVUynJs7CjQc+
-        yzhCOqONSXZgItIhfwcUZTFtkw==
-X-Google-Smtp-Source: ABdhPJzYpvaOJB0ObtsV0unjGXy+MdZ/MElQVoxlvGyY+OnkoRdm6x0nD0Wz3u1/4rtc+6Xi44CeUg==
-X-Received: by 2002:a05:6602:168e:: with SMTP id s14mr283215iow.202.1642005491161;
-        Wed, 12 Jan 2022 08:38:11 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id t6sm201750iov.39.2022.01.12.08.38.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jan 2022 08:38:10 -0800 (PST)
-Subject: Re: [PATCH -next v4] blk-mq: fix tag_get wait task can't be awakened
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     John Garry <john.garry@huawei.com>,
-        QiuLaibin <qiulaibin@huawei.com>, ming.lei@redhat.com,
-        martin.petersen@oracle.com, hare@suse.de,
-        johannes.thumshirn@wdc.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220111140216.1858823-1-qiulaibin@huawei.com>
- <Yd2Q6LyJUDAU54Dt@smile.fi.intel.com>
- <d7f51067-f5a8-e78c-5ece-c1ef132b9b9a@huawei.com>
- <Yd7J4XbkdIm52bVw@smile.fi.intel.com>
- <3d386998-d810-5036-a87e-50aba9f56639@huawei.com>
- <Yd7n7xA9ecF1/0DK@smile.fi.intel.com>
- <03a3bece-12d7-6732-9b80-a008a86320ba@kernel.dk>
- <Yd8B6F/6fW5DqxOl@smile.fi.intel.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <579f4be1-889a-3740-fa85-ca652ed3b2ae@kernel.dk>
-Date:   Wed, 12 Jan 2022 09:38:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1355406AbiALRBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 12:01:46 -0500
+Received: from mout.web.de ([212.227.15.3]:46721 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1349807AbiALRBp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jan 2022 12:01:45 -0500
+X-Greylist: delayed 313 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Jan 2022 12:01:44 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1642006904;
+        bh=VpwX7tXhTbrLuzi1YF8Uzmb4A2oBhdUT14fAMPWrFis=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+        b=PeskKWovL/ACSiPTBh401vUzji0my+TACRDRioT7OKxnbJRg38vK9L8VFKIJbqPcI
+         KXjyohg8wbSuXw6mRJ/2iQZJDVi6V7V1HeWGMM4MpinLd1V/Nl02zr+lUveXqI73dF
+         dKp91ZyAl1wVDk5yZVzUixu1s0L2gub2JgC+352M=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from gecko ([46.223.151.70]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M91Pe-1n1fJI3tgc-006XPY; Wed, 12
+ Jan 2022 17:56:15 +0100
+Date:   Wed, 12 Jan 2022 16:56:12 +0000
+From:   Lukas Straub <lukasstraub2@web.de>
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        linux-raid@vger.kernel.org
+Subject: Re: [dm-devel] Proper way to test RAID456?
+Message-ID: <20220112155351.5b670d81@gecko>
+In-Reply-To: <24998019-960c-0808-78df-72e0d08c904e@gmx.com>
+References: <0535d6c3-dec3-fb49-3707-709e8d26b538@gmx.com>
+        <20220108195259.33e9bdf0@gecko>
+        <20220108202922.6b00de19@gecko>
+        <5ffc44f1-7e82-bc85-fbb1-a4f89711ae8f@gmx.com>
+        <e209bfe191442846f66d790321f2db672edfb8ca.camel@infradead.org>
+        <24998019-960c-0808-78df-72e0d08c904e@gmx.com>
 MIME-Version: 1.0
-In-Reply-To: <Yd8B6F/6fW5DqxOl@smile.fi.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/trK2B+bQZg4U+J+J8zLUK/8";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Provags-ID: V03:K1:heywFokXSb224cpwvQrsi2v/LXbEHOE0r74vVZ0tAW61GPjbn6c
+ eDdc9ppwND/oggCfxDn5DN/mNAEMOVaVO4sSRcD5N3Lu0QPeZ0mcwnxvixwiuMB9gADj3xX
+ dVwYWnfBfnpweGh1YlYWJL76eTBrK6kgl6tA9RTyCdIlzfqKoVwEtzccIk2kpvTVW8uMHiR
+ nbXSeKAdNKk+mM7NioWjQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:HoFGdC2jWiw=:IO49La0OrTdQ2Ah/QSu86R
+ PInkEFYz0f7sLMKmILByyxEbjUOcCQgktOoaHafjY777p5GLH7bbCdB8Jz7611+wkdnpBRu7r
+ uOsURFWjr4Uv/Va3/HJqSR2CzbbVn/T4mQUwGUfZe+gJF9uOHT1FEj2hL8swfEpA2hKBagFFG
+ ahOztmFrt5u5vJ+7cSOi66FDfXwg9xr7L+ocsKIuXF/gA0XBzD4/9jsCrEtjlIhgfw4L/JcVT
+ E6XNq63820FwJ/iQvuDpBIH7/1f5WVZBonMyexMx7FEDeE98Q1hfz+DbMiFXMUDMajCB3yAgX
+ aRhDNXsrCu0seOZLJYeQNzhjJ7q3MmVx/71Ur8SzphSEKAm/Yp1bCE4Nqcyx19SZxUSSgJfso
+ MeWdPL9FHR+oRO8iNFcc6YA9p52dilbL6s7ycJbAr7RwVpXs/EZaD/3CZMIuKKFcwtkb8w+gA
+ DfKTiGgkSf7PndQWkSk260pTzE9gj6L9HpgoS74v5hXd27wuXTQxjM6UiAjcl0ujB3+TUni3e
+ cTO0EOcBYgpy85HayzEQMcnWDbP7A+Wia9gkjREnmEwhjLeBkWENf83z1uOo2AiX7V+pwgwv1
+ qMOLIOomVl+0Tr+FpBW+X4pFXqkvS+TEpeRgKny27cY00YaWBhLoiNXnIKAEidd/qA5WQbIJ5
+ alM8JfrfHK4cmMBtX+E/zwqH/HYaOtP58bwh8pjyNfJOjgqe0ym3ej6CcfCMHP3ci1YhzhmbL
+ sIMjcCUlLCD5ILBna9NQElbEAfcSACWI/bkz+g4kAehupxO6RM+2C6Msg7t0l/uclPPw6+wS+
+ d7OHze5YbfgRLNDHLyxYbl3cwM6zLgWj0i4pdXXSiinBcnh+JNndgXR4TR/Mcg6BqEcQJDJ+U
+ O3x24kK3e9PlhPSxSuHspAc1qoSqghi86xAX8NCS2y95PAceQbjOv01dZDBQCijS/L3xo8aTt
+ sdhGSC2NrB4ibyEf6PEKhxNZINhJX4JlFi9/VgOcnhsbyNjXw99oAo5wq99zxF50iolzY2bzw
+ U4/2Xn2bc4Sb9HdUEj8iOqHOx0g8+IWNXuvX7S3ZnfQbINbYU8F07rFS+GO+YZOtVaEBSZg1W
+ 4GFIFl2Xg7/rdQ=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/12/22 9:29 AM, Andy Shevchenko wrote:
-> On Wed, Jan 12, 2022 at 08:37:34AM -0700, Jens Axboe wrote:
->> On 1/12/22 7:38 AM, Andy Shevchenko wrote:
->>> On Wed, Jan 12, 2022 at 12:51:13PM +0000, John Garry wrote:
->>>> On 12/01/2022 12:30, Andy Shevchenko wrote:
->>>>>>>> +		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
->>>>>>>> +		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
->>>>>>> Whoever wrote this code did too much defensive programming, because the first
->>>>>>> conditional doesn't make much sense here. Am I right?
->>>>>>>
->>>>>> I think because this judgement is in the general IO process, there are also
->>>>>> some performance considerations here.
->>>>> I didn't buy this. Is there any better argument why you need redundant
->>>>> test_bit() call?
->>>>
->>>> I think that the idea is that test_bit() is fast and test_and_set_bit() is
->>>> slow; as such, if we generally expect the bit to be set, then there is no
->>>> need to do the slower test_and_set_bit() always.
->>>
->>> It doesn't sound thought through solution, the bit can be flipped in
->>> between, so what is this all about? Maybe missing proper serialization
->>> somewhere else?
->>
->> You need to work on your communication a bit - if there's a piece of
->> code you don't understand, maybe try being a bit less aggressive about
->> it? Otherwise people tend to just ignore you rather than explain it.
-> 
-> Sure. Thanks for below explanations, btw.
-> 
->> test_bit() is a lot faster than a test_and_set_bit(), and there's no
->> need to run the latter if the former returns true. This is a pretty
->> common optimization, particularly if the majority of the calls end up
->> having the bit set already.
-> 
-> I don't see how it may give optimization here generally speaking.
-> If we know that bit is _often_ is set, than of course it sounds
-> like opportunistic win. Otherwise, it may have the opposite effect.
-> 
-> I.o.w. without knowing the statistics of the bit being set/clear it's
-> hard to say if it's optimization or waste of the (CPU) resources.
+--Sig_/trK2B+bQZg4U+J+J8zLUK/8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-It doesn't really matter that much, the test_bit() is essentially free
-compared to the test and set. Which means that in practice there's
-little downside, and the upsides on when the bit is set is pretty big.
+On Sun, 9 Jan 2022 20:13:36 +0800
+Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
 
-This technique has proven very useful in other spots, only downside is
-really that there's no general helper to do this. That would also help
-the readability.
+> On 2022/1/9 18:04, David Woodhouse wrote:
+> > On Sun, 2022-01-09 at 07:55 +0800, Qu Wenruo wrote: =20
+> >> On 2022/1/9 04:29, Lukas Straub wrote: =20
+> >>> But there is a even simpler solution for btrfs: It could just not tou=
+ch
+> >>> stripes that already contain data. =20
+> >>
+> >> That would waste a lot of space, if the fs is fragemented.
+> >>
+> >> Or we have to write into data stripes when free space is low.
+> >>
+> >> That's why I'm trying to implement a PPL-like journal for btrfs RAID56=
+. =20
+> >
+> > PPL writes the P/Q of the unmodified chunks from the stripe, doesn't
+> > it? =20
+>=20
+> Did I miss something or the PPL isn't what I thought?
+>=20
+> I thought PPL either:
+>=20
+> a) Just write a metadata entry into the journal to indicate a full
+>     stripe (along with its location) is going to be written.
+>=20
+> b) Write a metadata entry into the journal about a non-full stripe
+>     write, then write the new data and new P/Q into the journal
+>=20
+> And this is before we start any data/P/Q write.
+>=20
+> And after related data/P/Q write is finished, remove corresponding
+> metadata and data entry from the journal.
+>=20
+> Or PPL have even better solution?
 
--- 
-Jens Axboe
+Yes, PPL is a bit better than a journal as you described it (md
+supports both). Because a journal would need to be replicated to
+multiple devices (raid1) in the array while the PPL is only written to
+the drive containing the parity for the particular stripe. And since the
+parity is distributed across all drives, the PPL overhead is also
+distributed across all drives. However, PPL only works for raid5 as
+you'll see.
 
+PPL works like this:
+
+Before any data/parity write either:
+
+ a) Just write a metadata entry into the PPL on the parity drive to
+    indicate a full stripe (along with its location) is going to be
+    written.
+
+ b) Write a metadata entry into the PPL on the parity drive about a
+    non-full stripe write, including which data chunks are going to be
+    modified, then write the XOR of chunks not modified by this write in
+    to the PPL.
+
+To recover a inconsistent array with a lost drive:
+
+In case a), the stripe consists only of newly written data, so it will
+be affected by the write-hole (this is the trade-off that PPL makes) so
+just standard parity recovery.
+
+In case b), XOR what we wrote to the PPL (the XOR of chunks not
+modified) with the modified data chunks to get our new (consistent)
+parity. Then do standard parity recovery. This just works if we lost a
+unmodified data chunk.
+If we lost a modified data chunk this is not possible and just do
+standard parity recovery from the beginning. Again, the newly written
+data is affected by the write-hole but existing data is not.
+If we lost the parity drive (containing the PPL) there is no need to
+recover since all the data chunks are present.
+
+Of course, this was a simplified explanation, see drivers/md/raid5-ppl.c
+for details (it has good comments with examples). This also covers the
+case where a data chunk is only partially modified and the unmodified
+part of the chunk also needs to be protected (by working on a per-block
+basis instead of per-chunk).
+
+The PPL is not possible for raid6 AFAIK, because there it could happen
+that you loose both a modified data chunk and a unmodified data chunk.
+
+Regards,
+Lukas Straub
+
+> >
+> > An alternative in a true file system which can do its own block
+> > allocation is to just calculate the P/Q of the final stripe after it's
+> > been modified, and write those (and) the updated data out to newly-
+> > allocated blocks instead of overwriting the original. =20
+>=20
+> This is what Johannes is considering, but for a different purpose.
+> Johannes' idea is to support zoned device. As the physical location a
+> zoned append write will only be known after it's written.
+>=20
+> So his idea is to maintain another mapping tree for zoned write, so that
+> full stripe update will also happen in that tree.
+>=20
+> But that idea is still in the future, on the other hand I still prefer
+> some tried-and-true method, as I'm 100% sure there will be new
+> difficulties waiting us for the new mapping tree method.
+>=20
+> Thanks,
+> Qu
+>=20
+> >
+> > Then the final step is to free the original data blocks and P/Q.
+> >
+> > This means that your RAID stripes no longer have a fixed topology; you
+> > need metadata to be able to *find* the component data and P/Q chunks...
+> > it ends up being non-trivial, but it has attractive properties if we
+> > can work it out. =20
+
+
+
+--=20
+
+
+--Sig_/trK2B+bQZg4U+J+J8zLUK/8
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAmHfCCwACgkQNasLKJxd
+slj5YRAAriTi+zPKCzdoJ0d2cj8ZkHXtVoQMa5qr3R5f20aEyu/oTPkMFvmtsOKj
+ViMcFhTaV5Ceardq7Td7G3N2QzBJjEQsrg0FIl6aD9Jp8XWW49VwXRTyHihXi7xy
+HRCziWCxp8HWc6qy3IpOCm/XD3i0i37IDrm8dmA7r62swOALFX5g5zIpDo/CkfNU
+Tln3wA97KMEd93dWLzvWZsXFhETQ2lX9l5EMYzTjUqR0PAtbVJlHfeVYTnF1eAnw
+S5+TyiwfXa0lqOKUABYR8Ygnelu98VROpNWXUJi25CaY8l2T5jigskFdNvm+Ihy+
+era4R8dAsXCBhTEmO4JXNLmE42IU+m+6DnZlGHxn+v3wuh7Tz46sAAC9JX73R6Fk
+e925eXQ2e2df7Ej964r3f4u/yiVO+/MaoiLUacz+U3VbZu9LOGYJ+xmnmycjhV3X
+NmfBV1nnWIeYU6fHvRigLCMJXnVd9dPlYlqW0alRq/OtLW2rKlUkXf+RWLOpT8By
++ZMyloNz0/84MFLN+XhgdbwpEJ/NStbaJXJtD7T2nUf2l3+kWV6rFrmPIgxdPYyb
+7yJMWxj9rGaU+2XmAkqoyC5ahj30apruZbQLyCXqc1EeHlGY8/Wrq5h2ZBAJcDbr
+CH22cVV2JzDT77MvzC+9nPWT/rkm8MNna4TRLZgtTauio9bPGHg=
+=Jly6
+-----END PGP SIGNATURE-----
+
+--Sig_/trK2B+bQZg4U+J+J8zLUK/8--
