@@ -2,215 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6315C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 02:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2902C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 02:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231761AbiAMCkZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 21:40:25 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:17343 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231758AbiAMCkY (ORCPT
+        id S231782AbiAMCkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 21:40:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45014 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231775AbiAMCkc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 21:40:24 -0500
-Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JZ7t84RZDz9sBn;
-        Thu, 13 Jan 2022 10:39:12 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 13 Jan 2022 10:40:21 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Thu, 13 Jan
- 2022 10:40:20 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <john.garry@huawei.com>
-CC:     <martin.petersen@oracle.com>, <hare@suse.de>,
-        <akpm@linux-foundation.org>, <bvanassche@acm.org>,
-        <andriy.shevchenko@linux.intel.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next V5] blk-mq: fix tag_get wait task can't be awakened
-Date:   Thu, 13 Jan 2022 10:55:36 +0800
-Message-ID: <20220113025536.1479653-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        Wed, 12 Jan 2022 21:40:32 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007CDC061748;
+        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id u11so2270144plh.13;
+        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=JoKRBnT1aSEAFNkcPF+/qny7tM7I8hSefs8ekQNOZv4=;
+        b=njycsCtXyUBVACORzb6K3ZlGuXAhESVTJ/F6syqGCjZ1FAFBAMfUDtnwgyGShnfVTW
+         /JmTQPG/X1zXegbpzluQ03zUSjG9q4Sqo3q4ogTzMi9v7lX7EJGVp3yRjqLudEOqMVt3
+         SGosPPiY1T8PtzE4kTiWt5R1ILnnc4UP7wGaPVcXyCfoz71sobo2RtLM0vh3s5A905Bq
+         vHGIcR06L27EJnpn8J1ffam9fP+CnUqhzjX015Q/YjUmUwy1qH3wEjYNLovlNO3IMhEu
+         A+/8wlnAT4pyeH1dboOolHue93OcDWa1c06tHMNddSSgeF7sLkO/Oyi1WNWI+E17Buy2
+         XNJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=JoKRBnT1aSEAFNkcPF+/qny7tM7I8hSefs8ekQNOZv4=;
+        b=bFgGoTAz8jF27Oe5nAR7Gv9FZZCG+c9zTMe8ogY3InAVUTYL40HVXfXigQb2aD7bWn
+         2apjjONV+ctDza5enSrmhASu8nwx5PoJuglfK8G+eqBoSENR2qH9jWSMHpxE+0MZoN0u
+         ukBbNDivMuzLJFAt4iUM1vAPUAvU5UGLtm+kWnInvGM8Nv7cM2OIX+W2PDxDnpNXryGN
+         L4UBMgt25O0IqcfuXPeISumOjLJ46ovdk5n0CRF/eSvZ3SHUoSkcERUOqIYzlKx5lWiB
+         SsIbqkqdb4nuHh2CcL/qnW4JbKVk5DjZiP+CK46uVZcJhBpni7sbiq4txgbKSYQNS1Cp
+         iETw==
+X-Gm-Message-State: AOAM533EkVcbe55RK9bBHb20UI6SG4NKNMh5jvJMQ3xqgpb81OXNzpnv
+        PBcRX/XqvcAuTTQuNrEH/ks=
+X-Google-Smtp-Source: ABdhPJzSMmK82zqEL6l6FJRtP4b2XtGIQwoQI7SYCZSyS9jfjIAODTqmOKKjgFr1SnmWRVh2QINIRQ==
+X-Received: by 2002:a17:902:6544:b0:149:8222:4b62 with SMTP id d4-20020a170902654400b0014982224b62mr2610422pln.114.1642041631524;
+        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
+Received: from [172.20.120.1] ([61.16.102.72])
+        by smtp.gmail.com with ESMTPSA id b12sm903557pfv.148.2022.01.12.18.40.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
+Message-ID: <faafdf29-6d8b-82a8-c69d-4ab3e623b489@gmail.com>
+Date:   Thu, 13 Jan 2022 10:40:27 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH 13/13] blk: introduce iostat per cgroup module
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, jbacik@fb.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
+ <20220110091046.17010-14-jianchao.wan9@gmail.com>
+ <Yd82dJMxdQkssu4k@slm.duckdns.org>
+From:   Wang Jianchao <jianchao.wan9@gmail.com>
+In-Reply-To: <Yd82dJMxdQkssu4k@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case of shared tags, there might be more than one hctx which
-allocates from the same tags, and each hctx is limited to allocate at
-most:
-        hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
 
-tag idle detection is lazy, and may be delayed for 30sec, so there
-could be just one real active hctx(queue) but all others are actually
-idle and still accounted as active because of the lazy idle detection.
-Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
-forever on this real active hctx.
 
-Fix this by recalculating wake_batch when inc or dec active_queues.
+On 2022/1/13 4:13 上午, Tejun Heo wrote:
+> On Mon, Jan 10, 2022 at 05:10:46PM +0800, Wang Jianchao wrote:
+>> From: Wang Jianchao <wangjianchao@kuaishou.com>
+>>
+>> iostat can only track the whole device's io statistics. This patch
+>> introduces iostat per cgroup based on blk-rq-qos framework which
+>> can track bw, iops, queue latency and device latency and distinguish
+>> regular or meta data. The blkio.iostat per cgroup output in following
+>> format,
+>> vda-data bytes iops queue_lat dev_lat [ditto]  [ditto]
+>>     meta   \___________ ______________/    |        |
+>> 	               v                   v        v
+>> 	             read               write   discard
+>> In particular, the blkio.iostat of root only output the statistics
+>> of IOs from root cgroup. However, the non-root blkio.iostat outputs
+>> all of the children cgroups. With meta stats in root cgroup, hope
+>> to observe the performace of fs metadata.
+> > I think using bpf is a way better solution for this kind of detailed
+> statistics. 
+bw/iops/lat of data or metadata of one cgroup is very basic statistics
+which kernel could provide especially when cgroup is employed everywhere.
+And we love to collect them all the time during the instance in cgroup is
+running.
+> What if I want to know what portions are random, or the
+> distribution of IO sizes? 
+This looks really detailed statistics :)
+> Do I add another rq-qos policy or add another
+> interface file with interface versioning?
+This iostat module can not provide all the kinds of statistics we want
+but just some very basic things. And maybe it can provide better hooks
+to install the ebpf program to collect detailed statistics.
 
-Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Suggested-by: John Garry <john.garry@huawei.com>
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
----
- block/blk-mq-tag.c      | 40 +++++++++++++++++++++++++++++++++-------
- include/linux/sbitmap.h | 11 +++++++++++
- lib/sbitmap.c           | 25 ++++++++++++++++++++++---
- 3 files changed, 66 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e55a6834c9a6..845f74e8dd7b 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -16,6 +16,21 @@
- #include "blk-mq-sched.h"
- #include "blk-mq-tag.h"
- 
-+/*
-+ * Recalculate wakeup batch when tag is shared by hctx.
-+ */
-+static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
-+		unsigned int users)
-+{
-+	if (!users)
-+		return;
-+
-+	sbitmap_queue_recalculate_wake_batch(&tags->bitmap_tags,
-+			users);
-+	sbitmap_queue_recalculate_wake_batch(&tags->breserved_tags,
-+			users);
-+}
-+
- /*
-  * If a previously inactive queue goes active, bump the active user count.
-  * We need to do this before try to allocate driver tag, then even if fail
-@@ -24,18 +39,26 @@
-  */
- bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
-+	unsigned int users;
-+
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
- 
--		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
--		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
--			atomic_inc(&hctx->tags->active_queues);
-+		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
-+		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
-+			return true;
-+		}
- 	} else {
--		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
--		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
--			atomic_inc(&hctx->tags->active_queues);
-+		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
-+		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
-+			return true;
-+		}
- 	}
- 
-+	users = atomic_inc_return(&hctx->tags->active_queues);
-+
-+	blk_mq_update_wake_batch(hctx->tags, users);
-+
- 	return true;
- }
- 
-@@ -56,6 +79,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
- void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- {
- 	struct blk_mq_tags *tags = hctx->tags;
-+	unsigned int users;
- 
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
-@@ -68,7 +92,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 			return;
- 	}
- 
--	atomic_dec(&tags->active_queues);
-+	users = atomic_dec_return(&tags->active_queues);
-+
-+	blk_mq_update_wake_batch(tags, users);
- 
- 	blk_mq_tag_wakeup_all(tags, false);
- }
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index fc0357a6e19b..95df357ec009 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -415,6 +415,17 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
- 	sbitmap_free(&sbq->sb);
- }
- 
-+/**
-+ * sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch
-+ * @sbq: Bitmap queue to recalculate wake batch.
-+ * @users: Number of shares.
-+ *
-+ * Like sbitmap_queue_update_wake_batch(), this will calculate wake batch
-+ * by depth. This interface is for HCTX shared tags or queue shared tags.
-+ */
-+void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int users);
-+
- /**
-  * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
-  * @sbq: Bitmap queue to resize.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 2709ab825499..6220fa67fb7e 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -457,10 +457,9 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
- 
--static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
--					    unsigned int depth)
-+static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int wake_batch)
- {
--	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
- 	int i;
- 
- 	if (sbq->wake_batch != wake_batch) {
-@@ -476,6 +475,26 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
- 	}
- }
- 
-+static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int depth)
-+{
-+	unsigned int wake_batch;
-+
-+	wake_batch = sbq_calc_wake_batch(sbq, depth);
-+	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-+}
-+
-+void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
-+					    unsigned int users)
-+{
-+	unsigned int wake_batch;
-+
-+	wake_batch = clamp_val((sbq->sb.depth + users - 1) /
-+			users, 4, SBQ_WAKE_BATCH);
-+	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
-+
- void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- {
- 	sbitmap_queue_update_wake_batch(sbq, depth);
--- 
-2.22.0
-
+Best regards
+Jianchao
