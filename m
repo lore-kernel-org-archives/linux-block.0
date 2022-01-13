@@ -2,139 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEF1C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 03:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3668EC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 05:47:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232386AbiAMD5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 22:57:51 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:30272 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbiAMD5u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 22:57:50 -0500
-Received: from kwepemi500010.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JZ9c32W1lzbjvj;
-        Thu, 13 Jan 2022 11:57:07 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500010.china.huawei.com (7.221.188.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 13 Jan 2022 11:57:47 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Thu, 13 Jan 2022 11:57:46 +0800
-Subject: Re: [PATCH 3/4] bfq: Split shared queues on move between cgroups
-To:     Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        <stable@vger.kernel.org>
-References: <20220112113529.6355-1-jack@suse.cz>
- <20220112113928.32349-3-jack@suse.cz>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <3d831e07-61d5-b28b-9886-05f01ede7745@huawei.com>
-Date:   Thu, 13 Jan 2022 11:57:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S229798AbiAMFrp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jan 2022 00:47:45 -0500
+Received: from mga17.intel.com ([192.55.52.151]:19865 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229764AbiAMFrp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jan 2022 00:47:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642052864; x=1673588864;
+  h=from:to:cc:subject:references:date:in-reply-to:
+   message-id:mime-version;
+  bh=AzTsk6++VNpW9AnxKpfUAG5E06dkEV0XznLYERQRvQs=;
+  b=BdtwXPMKyUxddcBY3nDUuGcdRulWhQRS7Rtrr5iTfzrfRzttk8H8dX7o
+   1zSC5XQzKquLS4+vtcDV4u36pWTpY4K6bzeB8RVxP5ugys/z9GkQFGZhr
+   thP9XGCu6r9174wRi//uJuEBxT2s9YIcHuvFeb6c5D7po8i3v4OjUaDIl
+   DORpnO3+0GOw2SsBCtlmBRA9gcz9Sf0BykCkiDMxh8xhAosEEiF5hf22H
+   uv2C9DfxK/D3seTaKPEEhlVA9fyArK5J66x+5j0xrhpUvOuBNCZvCXtcx
+   qx7nJoXYNkCTjrWfe7p12rnsZtenSZYycJ9xjawoz0d/2g8oIWO/T5WLN
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="224628449"
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="224628449"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 21:47:44 -0800
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="529527197"
+Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.239.13.11])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 21:47:42 -0800
+From:   "Huang, Ying" <ying.huang@intel.com>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Yu Zhao <yuzhao@google.com>,
+        Mauricio Faria de Oliveira <mfo@canonical.com>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, Miaohe Lin <linmiaohe@huawei.com>,
+        Yang Shi <shy828301@gmail.com>
+Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
+ direct IO read
+References: <20220105233440.63361-1-mfo@canonical.com>
+        <Yd0oLWtVAyAexyQc@google.com>
+        <87v8ypybdc.fsf@yhuang6-desk2.ccr.corp.intel.com>
+        <Yd8Q7Cplp5xLTYlV@google.com>
+Date:   Thu, 13 Jan 2022 13:47:40 +0800
+In-Reply-To: <Yd8Q7Cplp5xLTYlV@google.com> (Minchan Kim's message of "Wed, 12
+        Jan 2022 09:33:32 -0800")
+Message-ID: <87zgo0uqyr.fsf@yhuang6-desk2.ccr.corp.intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20220112113928.32349-3-jack@suse.cz>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=ascii
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/01/12 19:39, Jan Kara Ð´µÀ:
-> When bfqq is shared by multiple processes it can happen that one of the
-> processes gets moved to a different cgroup (or just starts submitting IO
-> for different cgroup). In case that happens we need to split the merged
-> bfqq as otherwise we will have IO for multiple cgroups in one bfqq and
-> we will just account IO time to wrong entities etc.
-> 
-> Similarly if the bfqq is scheduled to merge with another bfqq but the
-> merge didn't happen yet, cancel the merge as it need not be valid
-> anymore.
-> 
-> CC: stable@vger.kernel.org
-> Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->   block/bfq-cgroup.c  | 25 ++++++++++++++++++++++++-
->   block/bfq-iosched.c |  2 +-
->   block/bfq-iosched.h |  1 +
->   3 files changed, 26 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 24a5c5329bcd..dbc117e00783 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -730,8 +730,31 @@ static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
->   
->   	if (sync_bfqq) {
->   		entity = &sync_bfqq->entity;
-> -		if (entity->sched_data != &bfqg->sched_data)
-> +		if (entity->sched_data != &bfqg->sched_data) {
-> +			/*
-> +			 * Was the queue we use merged to a different queue?
-> +			 * Detach process from the queue as merge need not be
-> +			 * valid anymore. We cannot easily cancel the merge as
-> +			 * there may be other processes scheduled to this
-> +			 * queue.
-> +			 */
-> +			if (sync_bfqq->new_bfqq) {
-> +				bfq_put_cooperator(sync_bfqq);
-Hi,
+Minchan Kim <minchan@kernel.org> writes:
 
-The patch " bfq: Simplify bfq_put_cooperator()" in last version is not
-in this patch set, thus bfq_put_cooperator() won't set
-sync_bfqq->new_bfqq to NULL. So I guess the problem still exist?
+> On Wed, Jan 12, 2022 at 09:46:23AM +0800, Huang, Ying wrote:
+>> Yu Zhao <yuzhao@google.com> writes:
+>> 
+>> > On Wed, Jan 05, 2022 at 08:34:40PM -0300, Mauricio Faria de Oliveira wrote:
+>> >> diff --git a/mm/rmap.c b/mm/rmap.c
+>> >> index 163ac4e6bcee..8671de473c25 100644
+>> >> --- a/mm/rmap.c
+>> >> +++ b/mm/rmap.c
+>> >> @@ -1570,7 +1570,20 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
+>> >>  
+>> >>  			/* MADV_FREE page check */
+>> >>  			if (!PageSwapBacked(page)) {
+>> >> -				if (!PageDirty(page)) {
+>> >> +				int ref_count = page_ref_count(page);
+>> >> +				int map_count = page_mapcount(page);
+>> >> +
+>> >> +				/*
+>> >> +				 * The only page refs must be from the isolation
+>> >> +				 * (checked by the caller shrink_page_list() too)
+>> >> +				 * and one or more rmap's (dropped by discard:).
+>> >> +				 *
+>> >> +				 * Check the reference count before dirty flag
+>> >> +				 * with memory barrier; see __remove_mapping().
+>> >> +				 */
+>> >> +				smp_rmb();
+>> >> +				if ((ref_count - 1 == map_count) &&
+>> >> +				    !PageDirty(page)) {
+>> >>  					/* Invalidate as we cleared the pte */
+>> >>  					mmu_notifier_invalidate_range(mm,
+>> >>  						address, address + PAGE_SIZE);
+>> >
+>> > Out of curiosity, how does it work with COW in terms of reordering?
+>> > Specifically, it seems to me get_page() and page_dup_rmap() in
+>> > copy_present_pte() can happen in any order, and if page_dup_rmap()
+>> > is seen first, and direct io is holding a refcnt, this check can still
+>> > pass?
+>> 
+>> I think that you are correct.
+>> 
+>> After more thoughts, it appears very tricky to compare page count and
+>> map count.  Even if we have added smp_rmb() between page_ref_count() and
+>> page_mapcount(), an interrupt may happen between them.  During the
+>> interrupt, the page count and map count may be changed, for example,
+>> unmapped, or do_swap_page().
+>
+> Yeah, it happens but what specific problem are you concerning from the
+> count change under race? The fork case Yu pointed out was already known
+> for breaking DIO so user should take care not to fork under DIO(Please
+> look at O_DIRECT section in man 2 open). If you could give a specific
+> example, it would be great to think over the issue.
 
-Thanks,
-Kuai
-> +				bfq_release_process_ref(bfqd, sync_bfqq);
-> +				bic_set_bfqq(bic, NULL, 1);
-> +				return bfqg;
-> +			}
-> +			/*
-> +			 * Moving bfqq that is shared with another process?
-> +			 * Split the queues at the nearest occasion as the
-> +			 * processes can be in different cgroups now.
-> +			 */
-> +			if (bfq_bfqq_coop(sync_bfqq)) {
-> +				bic->stably_merged = false;
-> +				bfq_mark_bfqq_split_coop(sync_bfqq);
-> +			}
->   			bfq_bfqq_move(bfqd, sync_bfqq, bfqg);
-> +		}
->   	}
->   
->   	return bfqg;
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 0da47f2ca781..361d321b012a 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -5184,7 +5184,7 @@ static void bfq_put_stable_ref(struct bfq_queue *bfqq)
->   	bfq_put_queue(bfqq);
->   }
->   
-> -static void bfq_put_cooperator(struct bfq_queue *bfqq)
-> +void bfq_put_cooperator(struct bfq_queue *bfqq)
->   {
->   	struct bfq_queue *__bfqq, *next;
->   
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index a73488eec8a4..6e250db2138e 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -976,6 +976,7 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd,
->   void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   		     bool compensate, enum bfqq_expiration reason);
->   void bfq_put_queue(struct bfq_queue *bfqq);
-> +void bfq_put_cooperator(struct bfq_queue *bfqq);
->   void bfq_end_wr_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg);
->   void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq);
->   void bfq_schedule_dispatch(struct bfq_data *bfqd);
-> 
+Whether is the following race possible?
+
+CPU0/Process A                  CPU1/Process B
+--------------                  --------------
+try_to_unmap_one
+  page_mapcount()
+                                zap_pte_range()
+                                  page_remove_rmap()
+                                    atomic_add_negative(-1, &page->_mapcount)
+                                  tlb_flush_mmu()
+                                    ...
+                                      put_page_testzero()
+  page_count()
+
+Previously I thought that there's similar race in do_swap_page().  But
+after more thoughts, I found that the page is locked in do_swap_page().
+So do_swap_page() is safe.  Per my understanding, except during fork()
+as Yu pointed out, the anonymous page must be locked before increasing
+its mapcount.
+
+So, if the above race is possible, we need to guarantee to read
+page_count() before page_mapcount().  That is, something as follows,
+
+        count = page_count();
+        smp_rmb();
+        mapcount = page_mapcount();
+        if (!PageDirty(page) && mapcount + 1 == count) {
+                ...
+        }
+
+Best Regards,
+Huang, Ying
+
+> I agree it's little tricky but it seems to be way other place has used
+> for a long time(Please look at write_protect_page in ksm.c).
+> So, here what we missing is tlb flush before the checking.
+>
+> Something like this.
+>
+> diff --git a/mm/rmap.c b/mm/rmap.c
+> index b0fd9dc19eba..b4ad9faa17b2 100644
+> --- a/mm/rmap.c
+> +++ b/mm/rmap.c
+> @@ -1599,18 +1599,8 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
+>
+>                         /* MADV_FREE page check */
+>                         if (!PageSwapBacked(page)) {
+> -                               int refcount = page_ref_count(page);
+> -
+> -                               /*
+> -                                * The only page refs must be from the isolation
+> -                                * (checked by the caller shrink_page_list() too)
+> -                                * and the (single) rmap (dropped by discard:).
+> -                                *
+> -                                * Check the reference count before dirty flag
+> -                                * with memory barrier; see __remove_mapping().
+> -                                */
+> -                               smp_rmb();
+> -                               if (refcount == 2 && !PageDirty(page)) {
+> +                               if (!PageDirty(page) &&
+> +                                       page_mapcount(page) + 1 == page_count(page)) {
+>                                         /* Invalidate as we cleared the pte */
+>                                         mmu_notifier_invalidate_range(mm,
+>                                                 address, address + PAGE_SIZE);
+> diff --git a/mm/vmscan.c b/mm/vmscan.c
+> index f3162a5724de..6454ff5c576f 100644
+> --- a/mm/vmscan.c
+> +++ b/mm/vmscan.c
+> @@ -1754,6 +1754,9 @@ static unsigned int shrink_page_list(struct list_head *page_list,
+>                         enum ttu_flags flags = TTU_BATCH_FLUSH;
+>                         bool was_swapbacked = PageSwapBacked(page);
+>
+> +                       if (!was_swapbacked && PageAnon(page))
+> +                               flags &= ~TTU_BATCH_FLUSH;
+> +
+>                         if (unlikely(PageTransHuge(page)))
+>                                 flags |= TTU_SPLIT_HUGE_PMD;
