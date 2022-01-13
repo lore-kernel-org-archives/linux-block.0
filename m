@@ -2,180 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2D3C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 08:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DC7C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 10:44:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbiAMIyd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jan 2022 03:54:33 -0500
-Received: from mga11.intel.com ([192.55.52.93]:31965 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231250AbiAMIyc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jan 2022 03:54:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642064072; x=1673600072;
-  h=from:to:cc:subject:references:date:in-reply-to:
-   message-id:mime-version;
-  bh=8Xlh4Hbvt79v2c/TU/hbl+S7X88tZU2xfJYXHN/OQXM=;
-  b=P4zOyCaynLGZ58wZGOnNX3890684pFQWGQ54DFSjshOJfA5fgqhZXlHw
-   kLKc5He+SVRRVYwnYUKvAU2rnhDJEN/Vyb3XM8weVB3LmTPjlbKiIOGYD
-   s1GtuzMrPh6mg1vX9eq44Y25lEvuRZCLaxMotAhGbOefXqVSQf4rfAdvV
-   E8olZmsKmjuUA35+iDlIRVVa7Y5mtIr/WIrvfrC6luEI7G5uD7juKOZ8Y
-   Su+4W2NJHSfSeoMidTpZ6KnZ+pyQWUSCryEz5wHRf12u5qsWTMHsrB67g
-   EQjcv+1ElTSpot/BRaOtj+QJ96me7WeX5hn1eAT0wMuyCH9Rl6OK8jQZ3
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="241525136"
-X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
-   d="scan'208";a="241525136"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 00:54:32 -0800
-X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
-   d="scan'208";a="473153575"
-Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.239.13.11])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 00:54:29 -0800
-From:   "Huang, Ying" <ying.huang@intel.com>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Mauricio Faria de Oliveira <mfo@canonical.com>,
-        Yu Zhao <yuzhao@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, Miaohe Lin <linmiaohe@huawei.com>,
-        Yang Shi <shy828301@gmail.com>
-Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-References: <20220105233440.63361-1-mfo@canonical.com>
-        <Yd0oLWtVAyAexyQc@google.com>
-        <87v8ypybdc.fsf@yhuang6-desk2.ccr.corp.intel.com>
-        <Yd8Q7Cplp5xLTYlV@google.com>
-        <CAO9xwp3cgdXRmogRReJW+_AKktWhYL74kzphKpz_8wh12BVzGA@mail.gmail.com>
-        <Yd9YIGLWEeYBkTge@google.com>
-Date:   Thu, 13 Jan 2022 16:54:28 +0800
-In-Reply-To: <Yd9YIGLWEeYBkTge@google.com> (Minchan Kim's message of "Wed, 12
-        Jan 2022 14:37:20 -0800")
-Message-ID: <87zgo0t3qz.fsf@yhuang6-desk2.ccr.corp.intel.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+        id S231667AbiAMKoa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jan 2022 05:44:30 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:42296 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233028AbiAMKoa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jan 2022 05:44:30 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id D70311F3A5;
+        Thu, 13 Jan 2022 10:44:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1642070668; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TCgATi/m4azEbIHlxBaCRn3iRlbVFUXL15I0kom16+g=;
+        b=z8sf9i8fwcwZImaKwCMLCsv1IqIJaeZafUMTvtQDkQH7gRZimzofw+6iDOhlbJIRgj24D0
+        FjM0/OsIH8tYQy/AQOfllRO+9wwSyrfiGlA52l3PDfr//hVOUGjJSHV4WAoU1r2i1MqUj0
+        TJnc41ONxHrhsTQUTrHnnxzWLvVZ4vQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1642070668;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TCgATi/m4azEbIHlxBaCRn3iRlbVFUXL15I0kom16+g=;
+        b=roJq0srrCtTPqbbZass+jK44DQPJTSK9D0/ZkHJlQspVw8AOg94iumFgeV4fHO90EZnCu1
+        xBtkjrEF6T3oDgAQ==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 56398A3B98;
+        Thu, 13 Jan 2022 10:44:28 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id EC9D7A05E2; Thu, 13 Jan 2022 11:44:24 +0100 (CET)
+Date:   Thu, 13 Jan 2022 11:44:24 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Message-ID: <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
+References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
+ <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+ <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+ <20220110134234.qebxn5gghqupsc7t@quack3.lan>
+ <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
+ <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ascii
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Minchan Kim <minchan@kernel.org> writes:
+On Wed 12-01-22 14:16:15, Jan Kara wrote:
+> On Tue 11-01-22 00:08:56, Tetsuo Handa wrote:
+> > On 2022/01/10 22:42, Jan Kara wrote:
+> > > a) We didn't fully establish a real deadlock scenario from the lockdep
+> > > report, did we? The lockdep report involved suspend locks, some locks on
+> > > accessing files in /proc etc. and it was not clear whether it all reflects
+> > > a real deadlock possibility or just a fact that lockdep tracking is rather
+> > > coarse-grained at times. Now lockdep report is unpleasant and loop device
+> > > locking was ugly anyway so your async change made sense but once lockdep is
+> > > silenced we should really establish whether there is real deadlock and more
+> > > work is needed or not.
+> > 
+> > Not /proc files but /sys/power/resume file.
+> > Here is a reproducer but I can't test whether we can trigger a real deadlock.
+> > 
+> > ----------------------------------------
+> > #include <stdio.h>
+> > #include <sys/types.h>
+> > #include <sys/stat.h>
+> > #include <fcntl.h>
+> > #include <unistd.h>
+> > #include <sys/ioctl.h>
+> > #include <linux/loop.h>
+> > #include <sys/sendfile.h>
+> > 
+> > int main(int argc, char *argv[])
+> > {
+> > 	const int file_fd = open("testfile", O_RDWR | O_CREAT, 0600);
+> > 	ftruncate(file_fd, 1048576);
+> > 	char filename[128] = { };
+> > 	const int loop_num = ioctl(open("/dev/loop-control", 3), LOOP_CTL_GET_FREE, 0);
+> > 	snprintf(filename, sizeof(filename) - 1, "/dev/loop%d", loop_num);
+> > 	const int loop_fd_1 = open(filename, O_RDWR);
+> > 	ioctl(loop_fd_1, LOOP_SET_FD, file_fd);
+> > 	const int loop_fd_2 = open(filename, O_RDWR);
+> > 	ioctl(loop_fd_1, LOOP_CLR_FD, 0);
+> > 	const int sysfs_fd = open("/sys/power/resume", O_RDWR);
+> > 	sendfile(file_fd, sysfs_fd, 0, 1048576);
+> > 	sendfile(loop_fd_2, file_fd, 0, 1048576);
+> > 	write(sysfs_fd, "700", 3);
+> > 	close(loop_fd_2);
+> > 	close(loop_fd_1); // Lockdep complains.
+> > 	close(file_fd);
+> > 	return 0;
+> > }
+> > ----------------------------------------
+> 
+> Thanks for the reproducer. I will try to simplify it even more and figure
+> out whether there is a real deadlock potential in the lockdep complaint or
+> not...
 
-> On Wed, Jan 12, 2022 at 06:53:07PM -0300, Mauricio Faria de Oliveira wrote:
->> Hi Minchan Kim,
->> 
->> Thanks for handling the hard questions! :)
->> 
->> On Wed, Jan 12, 2022 at 2:33 PM Minchan Kim <minchan@kernel.org> wrote:
->> >
->> > On Wed, Jan 12, 2022 at 09:46:23AM +0800, Huang, Ying wrote:
->> > > Yu Zhao <yuzhao@google.com> writes:
->> > >
->> > > > On Wed, Jan 05, 2022 at 08:34:40PM -0300, Mauricio Faria de Oliveira wrote:
->> > > >> diff --git a/mm/rmap.c b/mm/rmap.c
->> > > >> index 163ac4e6bcee..8671de473c25 100644
->> > > >> --- a/mm/rmap.c
->> > > >> +++ b/mm/rmap.c
->> > > >> @@ -1570,7 +1570,20 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
->> > > >>
->> > > >>                    /* MADV_FREE page check */
->> > > >>                    if (!PageSwapBacked(page)) {
->> > > >> -                          if (!PageDirty(page)) {
->> > > >> +                          int ref_count = page_ref_count(page);
->> > > >> +                          int map_count = page_mapcount(page);
->> > > >> +
->> > > >> +                          /*
->> > > >> +                           * The only page refs must be from the isolation
->> > > >> +                           * (checked by the caller shrink_page_list() too)
->> > > >> +                           * and one or more rmap's (dropped by discard:).
->> > > >> +                           *
->> > > >> +                           * Check the reference count before dirty flag
->> > > >> +                           * with memory barrier; see __remove_mapping().
->> > > >> +                           */
->> > > >> +                          smp_rmb();
->> > > >> +                          if ((ref_count - 1 == map_count) &&
->> > > >> +                              !PageDirty(page)) {
->> > > >>                                    /* Invalidate as we cleared the pte */
->> > > >>                                    mmu_notifier_invalidate_range(mm,
->> > > >>                                            address, address + PAGE_SIZE);
->> > > >
->> > > > Out of curiosity, how does it work with COW in terms of reordering?
->> > > > Specifically, it seems to me get_page() and page_dup_rmap() in
->> > > > copy_present_pte() can happen in any order, and if page_dup_rmap()
->> > > > is seen first, and direct io is holding a refcnt, this check can still
->> > > > pass?
->> > >
->> > > I think that you are correct.
->> > >
->> > > After more thoughts, it appears very tricky to compare page count and
->> > > map count.  Even if we have added smp_rmb() between page_ref_count() and
->> > > page_mapcount(), an interrupt may happen between them.  During the
->> > > interrupt, the page count and map count may be changed, for example,
->> > > unmapped, or do_swap_page().
->> >
->> > Yeah, it happens but what specific problem are you concerning from the
->> > count change under race? The fork case Yu pointed out was already known
->> > for breaking DIO so user should take care not to fork under DIO(Please
->> > look at O_DIRECT section in man 2 open). If you could give a specific
->> > example, it would be great to think over the issue.
->> >
->> > I agree it's little tricky but it seems to be way other place has used
->> > for a long time(Please look at write_protect_page in ksm.c).
->> 
->> Ah, that's great to see it's being used elsewhere, for DIO particularly!
->> 
->> > So, here what we missing is tlb flush before the checking.
->> 
->> That shouldn't be required for this particular issue/case, IIUIC.
->> One of the things we checked early on was disabling deferred TLB flush
->> (similarly to what you've done), and it didn't help with the issue; also, the
->> issue happens on uniprocessor mode too (thus no remote CPU involved.)
->
-> I guess you didn't try it with page_mapcount + 1 == page_count at tha
-> time?  Anyway, I agree we don't need TLB flush here like KSM.
-> I think the reason KSM is doing TLB flush before the check it to
-> make sure trap trigger on the write from userprocess in other core.
-> However, this MADV_FREE case, HW already gaurantees the trap.
-> Please see below.
->
->> 
->> 
->> >
->> > Something like this.
->> >
->> > diff --git a/mm/rmap.c b/mm/rmap.c
->> > index b0fd9dc19eba..b4ad9faa17b2 100644
->> > --- a/mm/rmap.c
->> > +++ b/mm/rmap.c
->> > @@ -1599,18 +1599,8 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
->> >
->> >                         /* MADV_FREE page check */
->> >                         if (!PageSwapBacked(page)) {
->> > -                               int refcount = page_ref_count(page);
->> > -
->> > -                               /*
->> > -                                * The only page refs must be from the isolation
->> > -                                * (checked by the caller shrink_page_list() too)
->> > -                                * and the (single) rmap (dropped by discard:).
->> > -                                *
->> > -                                * Check the reference count before dirty flag
->> > -                                * with memory barrier; see __remove_mapping().
->> > -                                */
->> > -                               smp_rmb();
->> > -                               if (refcount == 2 && !PageDirty(page)) {
->> > +                               if (!PageDirty(page) &&
->> > +                                       page_mapcount(page) + 1 == page_count(page)) {
->> 
->> In the interest of avoiding a different race/bug, it seemed worth following the
->> suggestion outlined in __remove_mapping(), i.e., checking PageDirty()
->> after the page's reference count, with a memory barrier in between.
->
-> True so it means your patch as-is is good for me.
+OK, so I think I understand the lockdep complaint better. Lockdep
+essentially complains about the following scenario:
 
-If my understanding were correct, a shared anonymous page will be mapped
-read-only.  If so, will a private anonymous page be called
-SetPageDirty() concurrently after direct IO case has been dealt with
-via comparing page_count()/page_mapcount()?
+blkdev_put()
+  lock disk->open_mutex
+  lo_release
+    __loop_clr_fd()
+        |
+        | wait for IO to complete
+        v
+loop worker
+  write to backing file
+    sb_start_write(file)
+        |
+        | wait for fs with backing file to unfreeze
+        v
+process holding fs frozen
+  freeze_super()
+        |
+        | wait for remaining writers on the fs so that fs can be frozen
+        v
+sendfile()
+  sb_start_write()
+  do_splice_direct()
+        |
+        | blocked on read from /sys/power/resume, waiting for kernfs file
+	| lock
+        v
+write() "/dev/loop0" (in whatever form) to /sys/power/resume
+  calls blkdev_get_by_dev("/dev/loop0")
+    lock disk->open_mutex => deadlock
 
-Best Regards,
-Huang, Ying
+So there are three other ingredients to this locking loop besides loop device
+behavior:
+1) sysfs files which serialize reads & writes
+2) sendfile which holds freeze protection while reading data to write
+3) "resume" file behavior opening bdev from write to sysfs file
+
+We cannot sensibly do anything about 1) AFAICT. You cannot get a coherent
+view of a sysfs file while it is changing.
+
+We could actually change 2) (to only hold freeze protection while splicing
+from pipe) but that will fix the problem only for sendfile(2). E.g.
+splice(2) may also block waiting for data to become available in the pipe
+while holding freeze protection. Changing that would require some surgery
+in our splice infrastructure and at this point I'm not sure whether we
+would not introduce other locking problems due to pipe_lock lock ordering.
+
+For 3), we could consider stuff like not resuming from a loop device or
+postponing resume to a workqueue but it all looks ugly.
+
+Maybe the most disputable thing in this locking chain seems to be splicing
+from sysfs files. That does not seem terribly useful and due to special
+locking and behavior of sysfs files it allows for creating interesting lock
+dependencies. OTOH maybe there is someone out there who (possibly
+inadvertedly through some library) ends up using splice on sysfs files so
+chances for userspace breakage, if we disable splice for sysfs, would be
+non-negligible. Hum, tough.
+
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
