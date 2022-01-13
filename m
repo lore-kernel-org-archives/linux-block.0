@@ -2,180 +2,239 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DC7C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 10:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F08C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 10:52:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231667AbiAMKoa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jan 2022 05:44:30 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:42296 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233028AbiAMKoa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jan 2022 05:44:30 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id D70311F3A5;
-        Thu, 13 Jan 2022 10:44:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1642070668; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TCgATi/m4azEbIHlxBaCRn3iRlbVFUXL15I0kom16+g=;
-        b=z8sf9i8fwcwZImaKwCMLCsv1IqIJaeZafUMTvtQDkQH7gRZimzofw+6iDOhlbJIRgj24D0
-        FjM0/OsIH8tYQy/AQOfllRO+9wwSyrfiGlA52l3PDfr//hVOUGjJSHV4WAoU1r2i1MqUj0
-        TJnc41ONxHrhsTQUTrHnnxzWLvVZ4vQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1642070668;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TCgATi/m4azEbIHlxBaCRn3iRlbVFUXL15I0kom16+g=;
-        b=roJq0srrCtTPqbbZass+jK44DQPJTSK9D0/ZkHJlQspVw8AOg94iumFgeV4fHO90EZnCu1
-        xBtkjrEF6T3oDgAQ==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 56398A3B98;
-        Thu, 13 Jan 2022 10:44:28 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id EC9D7A05E2; Thu, 13 Jan 2022 11:44:24 +0100 (CET)
-Date:   Thu, 13 Jan 2022 11:44:24 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        Jan Stancek <jstancek@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
-Message-ID: <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
-References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
- <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
- <20220110103057.h775jv2br2xr2l5k@quack3.lan>
- <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
- <20220110134234.qebxn5gghqupsc7t@quack3.lan>
- <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
- <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
+        id S233250AbiAMKws (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jan 2022 05:52:48 -0500
+Received: from mga04.intel.com ([192.55.52.120]:18428 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229780AbiAMKwr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Jan 2022 05:52:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642071167; x=1673607167;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=f+3DK8tcDzxN/KnQ4WDFNfYsiYO589Q11iMRonfrLto=;
+  b=fCxYUKdHVX4ERE17edP0Jf5HV1qt/HEXQdoI4uOSA1U3Ba9IYE6HTeZH
+   N9CJPYxu49Z9Ssfjob1hFAEFkoKuh6WZnhD6IbmKvd6lEBqJN2v8Fvbbr
+   K1TzFMt7YIbNNuQASTihcuneW6Gj3cyXV4b9N8U3ipSGMO4paruevoe+E
+   G62d6pTyUcf+OyGK71FZcWtsZigungDi/YJLH8VHqNnmqSSJqzIzDpcD3
+   Sy7sAVa3JHXM1iFsIs3wVWXFsv8so3ZLlHLzqqV+mlpZ7lfObRN8s17T7
+   CTsp2RNUNGLvpXjJERK8+ru/Hnt9emjAv0AMC4c7dNJ3T04a56oi/feS/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="242800979"
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="242800979"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 02:52:47 -0800
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="473181819"
+Received: from smile.fi.intel.com ([10.237.72.61])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 02:52:44 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1n7xhb-00AA2N-C2;
+        Thu, 13 Jan 2022 12:51:31 +0200
+Date:   Thu, 13 Jan 2022 12:51:31 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Laibin Qiu <qiulaibin@huawei.com>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, john.garry@huawei.com,
+        martin.petersen@oracle.com, hare@suse.de,
+        akpm@linux-foundation.org, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next V5] blk-mq: fix tag_get wait task can't be awakened
+Message-ID: <YeAEM5k+KjqTj0iN@smile.fi.intel.com>
+References: <20220113025536.1479653-1-qiulaibin@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
+In-Reply-To: <20220113025536.1479653-1-qiulaibin@huawei.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 12-01-22 14:16:15, Jan Kara wrote:
-> On Tue 11-01-22 00:08:56, Tetsuo Handa wrote:
-> > On 2022/01/10 22:42, Jan Kara wrote:
-> > > a) We didn't fully establish a real deadlock scenario from the lockdep
-> > > report, did we? The lockdep report involved suspend locks, some locks on
-> > > accessing files in /proc etc. and it was not clear whether it all reflects
-> > > a real deadlock possibility or just a fact that lockdep tracking is rather
-> > > coarse-grained at times. Now lockdep report is unpleasant and loop device
-> > > locking was ugly anyway so your async change made sense but once lockdep is
-> > > silenced we should really establish whether there is real deadlock and more
-> > > work is needed or not.
-> > 
-> > Not /proc files but /sys/power/resume file.
-> > Here is a reproducer but I can't test whether we can trigger a real deadlock.
-> > 
-> > ----------------------------------------
-> > #include <stdio.h>
-> > #include <sys/types.h>
-> > #include <sys/stat.h>
-> > #include <fcntl.h>
-> > #include <unistd.h>
-> > #include <sys/ioctl.h>
-> > #include <linux/loop.h>
-> > #include <sys/sendfile.h>
-> > 
-> > int main(int argc, char *argv[])
-> > {
-> > 	const int file_fd = open("testfile", O_RDWR | O_CREAT, 0600);
-> > 	ftruncate(file_fd, 1048576);
-> > 	char filename[128] = { };
-> > 	const int loop_num = ioctl(open("/dev/loop-control", 3), LOOP_CTL_GET_FREE, 0);
-> > 	snprintf(filename, sizeof(filename) - 1, "/dev/loop%d", loop_num);
-> > 	const int loop_fd_1 = open(filename, O_RDWR);
-> > 	ioctl(loop_fd_1, LOOP_SET_FD, file_fd);
-> > 	const int loop_fd_2 = open(filename, O_RDWR);
-> > 	ioctl(loop_fd_1, LOOP_CLR_FD, 0);
-> > 	const int sysfs_fd = open("/sys/power/resume", O_RDWR);
-> > 	sendfile(file_fd, sysfs_fd, 0, 1048576);
-> > 	sendfile(loop_fd_2, file_fd, 0, 1048576);
-> > 	write(sysfs_fd, "700", 3);
-> > 	close(loop_fd_2);
-> > 	close(loop_fd_1); // Lockdep complains.
-> > 	close(file_fd);
-> > 	return 0;
-> > }
-> > ----------------------------------------
+On Thu, Jan 13, 2022 at 10:55:36AM +0800, Laibin Qiu wrote:
+> In case of shared tags, there might be more than one hctx which
+> allocates from the same tags, and each hctx is limited to allocate at
+> most:
+>         hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
 > 
-> Thanks for the reproducer. I will try to simplify it even more and figure
-> out whether there is a real deadlock potential in the lockdep complaint or
-> not...
+> tag idle detection is lazy, and may be delayed for 30sec, so there
+> could be just one real active hctx(queue) but all others are actually
+> idle and still accounted as active because of the lazy idle detection.
+> Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
+> forever on this real active hctx.
+> 
+> Fix this by recalculating wake_batch when inc or dec active_queues.
 
-OK, so I think I understand the lockdep complaint better. Lockdep
-essentially complains about the following scenario:
+FWIW,
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-blkdev_put()
-  lock disk->open_mutex
-  lo_release
-    __loop_clr_fd()
-        |
-        | wait for IO to complete
-        v
-loop worker
-  write to backing file
-    sb_start_write(file)
-        |
-        | wait for fs with backing file to unfreeze
-        v
-process holding fs frozen
-  freeze_super()
-        |
-        | wait for remaining writers on the fs so that fs can be frozen
-        v
-sendfile()
-  sb_start_write()
-  do_splice_direct()
-        |
-        | blocked on read from /sys/power/resume, waiting for kernfs file
-	| lock
-        v
-write() "/dev/loop0" (in whatever form) to /sys/power/resume
-  calls blkdev_get_by_dev("/dev/loop0")
-    lock disk->open_mutex => deadlock
+Thanks!
 
-So there are three other ingredients to this locking loop besides loop device
-behavior:
-1) sysfs files which serialize reads & writes
-2) sendfile which holds freeze protection while reading data to write
-3) "resume" file behavior opening bdev from write to sysfs file
-
-We cannot sensibly do anything about 1) AFAICT. You cannot get a coherent
-view of a sysfs file while it is changing.
-
-We could actually change 2) (to only hold freeze protection while splicing
-from pipe) but that will fix the problem only for sendfile(2). E.g.
-splice(2) may also block waiting for data to become available in the pipe
-while holding freeze protection. Changing that would require some surgery
-in our splice infrastructure and at this point I'm not sure whether we
-would not introduce other locking problems due to pipe_lock lock ordering.
-
-For 3), we could consider stuff like not resuming from a loop device or
-postponing resume to a workqueue but it all looks ugly.
-
-Maybe the most disputable thing in this locking chain seems to be splicing
-from sysfs files. That does not seem terribly useful and due to special
-locking and behavior of sysfs files it allows for creating interesting lock
-dependencies. OTOH maybe there is someone out there who (possibly
-inadvertedly through some library) ends up using splice on sysfs files so
-chances for userspace breakage, if we disable splice for sysfs, would be
-non-negligible. Hum, tough.
-
-								Honza
+> Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Suggested-by: John Garry <john.garry@huawei.com>
+> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+> ---
+>  block/blk-mq-tag.c      | 40 +++++++++++++++++++++++++++++++++-------
+>  include/linux/sbitmap.h | 11 +++++++++++
+>  lib/sbitmap.c           | 25 ++++++++++++++++++++++---
+>  3 files changed, 66 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index e55a6834c9a6..845f74e8dd7b 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -16,6 +16,21 @@
+>  #include "blk-mq-sched.h"
+>  #include "blk-mq-tag.h"
+>  
+> +/*
+> + * Recalculate wakeup batch when tag is shared by hctx.
+> + */
+> +static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+> +		unsigned int users)
+> +{
+> +	if (!users)
+> +		return;
+> +
+> +	sbitmap_queue_recalculate_wake_batch(&tags->bitmap_tags,
+> +			users);
+> +	sbitmap_queue_recalculate_wake_batch(&tags->breserved_tags,
+> +			users);
+> +}
+> +
+>  /*
+>   * If a previously inactive queue goes active, bump the active user count.
+>   * We need to do this before try to allocate driver tag, then even if fail
+> @@ -24,18 +39,26 @@
+>   */
+>  bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>  {
+> +	unsigned int users;
+> +
+>  	if (blk_mq_is_shared_tags(hctx->flags)) {
+>  		struct request_queue *q = hctx->queue;
+>  
+> -		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) &&
+> -		    !test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+> -			atomic_inc(&hctx->tags->active_queues);
+> +		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
+> +		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
+> +			return true;
+> +		}
+>  	} else {
+> -		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+> -		    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+> -			atomic_inc(&hctx->tags->active_queues);
+> +		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
+> +		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state)) {
+> +			return true;
+> +		}
+>  	}
+>  
+> +	users = atomic_inc_return(&hctx->tags->active_queues);
+> +
+> +	blk_mq_update_wake_batch(hctx->tags, users);
+> +
+>  	return true;
+>  }
+>  
+> @@ -56,6 +79,7 @@ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool include_reserve)
+>  void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	struct blk_mq_tags *tags = hctx->tags;
+> +	unsigned int users;
+>  
+>  	if (blk_mq_is_shared_tags(hctx->flags)) {
+>  		struct request_queue *q = hctx->queue;
+> @@ -68,7 +92,9 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>  			return;
+>  	}
+>  
+> -	atomic_dec(&tags->active_queues);
+> +	users = atomic_dec_return(&tags->active_queues);
+> +
+> +	blk_mq_update_wake_batch(tags, users);
+>  
+>  	blk_mq_tag_wakeup_all(tags, false);
+>  }
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index fc0357a6e19b..95df357ec009 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -415,6 +415,17 @@ static inline void sbitmap_queue_free(struct sbitmap_queue *sbq)
+>  	sbitmap_free(&sbq->sb);
+>  }
+>  
+> +/**
+> + * sbitmap_queue_recalculate_wake_batch() - Recalculate wake batch
+> + * @sbq: Bitmap queue to recalculate wake batch.
+> + * @users: Number of shares.
+> + *
+> + * Like sbitmap_queue_update_wake_batch(), this will calculate wake batch
+> + * by depth. This interface is for HCTX shared tags or queue shared tags.
+> + */
+> +void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int users);
+> +
+>  /**
+>   * sbitmap_queue_resize() - Resize a &struct sbitmap_queue.
+>   * @sbq: Bitmap queue to resize.
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 2709ab825499..6220fa67fb7e 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -457,10 +457,9 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+>  }
+>  EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
+>  
+> -static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> -					    unsigned int depth)
+> +static inline void __sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int wake_batch)
+>  {
+> -	unsigned int wake_batch = sbq_calc_wake_batch(sbq, depth);
+>  	int i;
+>  
+>  	if (sbq->wake_batch != wake_batch) {
+> @@ -476,6 +475,26 @@ static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+>  	}
+>  }
+>  
+> +static void sbitmap_queue_update_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int depth)
+> +{
+> +	unsigned int wake_batch;
+> +
+> +	wake_batch = sbq_calc_wake_batch(sbq, depth);
+> +	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
+> +}
+> +
+> +void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
+> +					    unsigned int users)
+> +{
+> +	unsigned int wake_batch;
+> +
+> +	wake_batch = clamp_val((sbq->sb.depth + users - 1) /
+> +			users, 4, SBQ_WAKE_BATCH);
+> +	__sbitmap_queue_update_wake_batch(sbq, wake_batch);
+> +}
+> +EXPORT_SYMBOL_GPL(sbitmap_queue_recalculate_wake_batch);
+> +
+>  void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
+>  {
+>  	sbitmap_queue_update_wake_batch(sbq, depth);
+> -- 
+> 2.22.0
+> 
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+With Best Regards,
+Andy Shevchenko
+
+
