@@ -2,228 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB452C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 01:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D80C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 01:49:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbiAMBag (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 20:30:36 -0500
-Received: from mout.gmx.net ([212.227.15.15]:40435 "EHLO mout.gmx.net"
+        id S231422AbiAMBtb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 20:49:31 -0500
+Received: from mga05.intel.com ([192.55.52.43]:9581 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231324AbiAMBag (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 20:30:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1642037424;
-        bh=mq9bW3p6NpBcihXHvI0LYCV+TPIOfIHX8cNLcfu07Qc=;
-        h=X-UI-Sender-Class:Date:To:Cc:References:From:Subject:In-Reply-To;
-        b=XnaWLR2GBxueKieX89caOldRXQ9f9tflldJoi7Sh1VzxTqFv9msiLoSX3TgX9sfbV
-         hv57TGWAIZAVXCtcPQplKt6t0lxGzMn3iNAnsff3gv0Z+yvUQuGkuaChgOMya2c7/t
-         G4QoEt9qnNmcyVBxCWUfTtlddB0UwfQZr1ecaXlw=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1Mel7v-1mX7DG1drR-00algE; Thu, 13
- Jan 2022 02:30:24 +0100
-Message-ID: <d8a4ab1f-f6eb-06a3-cdf4-6122a6b3cbf6@gmx.com>
-Date:   Thu, 13 Jan 2022 09:30:17 +0800
+        id S231452AbiAMBta (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Jan 2022 20:49:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642038570; x=1673574570;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IGcBXmDavEDF4tJbBG6LgESiku0mGLX28XESGtQ8168=;
+  b=kPmWbtH1ZfcXoJd+djTF5pjXFdiFdhmmvVtqWCO3SKu+C1w+HqyZaS2G
+   fDp4cBdDldE7sYQWscyEfZQeGk+2/XVnNNErxLYeYxLdSa6HXpUk6KMfi
+   83n6/nihZeihjKMILP+BniCaJqppD3/UajDy+XCksgQzWEJkUfSAbjNQD
+   UuW2LzQEpjAsEZ+Inu4caG3Y849M9PEPPJkewbwyCCghO6tc4M5lcX3AW
+   PvonNNHKTukepmqnNNELBkLwy3f6YgbQuE4t0QcjnYlxeiXe4hGoxXiUs
+   F3KAQ+6sAv1C9ta+LHcDYdmF/XWPfZa5Hj74MYJ2HJMosXdPr7dqMYY9t
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="330253500"
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="330253500"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 17:49:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="593201335"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 12 Jan 2022 17:49:28 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1n7pF1-0006hE-Be; Thu, 13 Jan 2022 01:49:27 +0000
+Date:   Thu, 13 Jan 2022 09:49:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Wang Jianchao <jianchao.wan9@gmail.com>, axboe@kernel.dk
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, jbacik@fb.com,
+        tj@kernel.org, bvanassche@acm.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/13] blk: make blk-rq-qos support pluggable and modular
+ policy
+Message-ID: <202201130903.7ZvBIOs4-lkp@intel.com>
+References: <20220110091046.17010-2-jianchao.wan9@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Content-Language: en-US
-To:     Lukas Straub <lukasstraub2@web.de>
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-raid@vger.kernel.org
-References: <0535d6c3-dec3-fb49-3707-709e8d26b538@gmx.com>
- <20220108195259.33e9bdf0@gecko> <20220108202922.6b00de19@gecko>
- <5ffc44f1-7e82-bc85-fbb1-a4f89711ae8f@gmx.com>
- <e209bfe191442846f66d790321f2db672edfb8ca.camel@infradead.org>
- <24998019-960c-0808-78df-72e0d08c904e@gmx.com>
- <20220112155351.5b670d81@gecko>
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-Subject: Re: [dm-devel] Proper way to test RAID456?
-In-Reply-To: <20220112155351.5b670d81@gecko>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:UerDNmPKLlus2Pxmptpvr2B2Iop8EYbu1P0Fdu1O8neE5S59DYe
- xT6zzMRJR78JmWf1AmmWm9wYMi69yHPHtxpC73LPZ48//FarAODtB0yNZXkqFE9m0LjfdKy
- nywJDLgHAjmA1H9E6f8wi87Mt1hYOa9s5ibZP3Gx3VMlenhrhYbziZo1LhTg4fEYN1zCuiZ
- k4Wx9Vy423RxIH9tI9a2Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+n/mTaIWfEM=:RhhlemtXcANIxJfX7X6c26
- TZ5ZnwlVkKYxGafYznTogLzddIm9XwfAaZRc+ecS04UfvDGLLL8X6C2usQZ4ZHX1YB+mqsn2t
- UvLkN/v2TwTn7OeS6CK2b0FST5lqWWowJ0htmrZBxcpuo+GumBAJTvwBL6wQXDjrQesjReuM4
- C8EYUwDxyNqPcX3iFRT1alWdFGxKRxOqrRClFxya/PguqpIOsY4WX/DVbdLLyJ2xAzEMf08AN
- 0wde98XxP22gzx5bi+ySQiasy6I+QG2RN549G74XAYQY1J1wXeO2iRZ7Y78+6o+FqxW/zZj9X
- 1cRlds8fnISxX2ONVxMyAEdP6s5vm1gEGE0dcCMZG57F4ONf7432VsNVbNtGj/s1goHnG9BjD
- xuWhXf12tcYwx5F7blz/A4kdFhWFhN2oXN7ZW0uYZaPirk5TgNMemF78tqZd4K5hCPbHLFMh/
- vA4ij/mCGOmFCgRVsOOpsr9KeXBJo9rzx/0+JinDC88+3qXT/746SVv+Jv7JpdI1CPdUPK7pt
- fUspPLGw3kakqnp841LPxBUB5UZYNlRyPfhkhINbkUYT8LYvVXqpmxPUlkOb789e1YmCE7RBq
- z7iYfOfb0d+SXRa7owIdlghwfub4i5vyYnljMoR9ojSfqaOhXtRG2212DUzKWf0ZGrFRLzGS0
- cRbNq76LNw7G73T1A7icIuifxEI4jXuRw9UQuXuQdfWQ1gawCU8Zp32DUION2vA4/AQR/XWfF
- DXzbAS+p1ohdjh7OmaZKnxn5XsI1bFXVdwPB9W44ZmObNl2dbGWj11LBt6nQRLw2fNVRXG+us
- Bnx7pJH5GLstX9gI96+XEARquP6d4b0VYoz1F7DNfY7a8blAnuEiRlO8VlHWzAntp9n/RLjxe
- UpbCxktkfL5enSrkrgE6ZU7LT5SDzCVivCLOPnsXiXjTzLJBrelgMq10c6PeH23FylbjuAiSI
- Y/nfVfUZpcOYiPhHL8YBObWuz1Tj+/5qQtBQekzRC89OlEB+SkmLECZGvtYLt1Sb5oIlQOJXB
- ePcA7uOy9iZIM8BUhb3AAYGoqEUbks1WPxL9NZ4YcPXqKsqRrIKa1rJe5OJpoTHobmlE6LEhP
- KcCUr5mJn94XWc=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220110091046.17010-2-jianchao.wan9@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Wang,
+
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on tj-cgroup/for-next]
+[also build test WARNING on v5.16]
+[cannot apply to axboe-block/for-next next-20220112]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Wang-Jianchao/blk-make-blk-rq-qos-policies-pluggable-and-modular/20220110-171347
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup.git for-next
+config: arm-randconfig-r006-20220112 (https://download.01.org/0day-ci/archive/20220113/202201130903.7ZvBIOs4-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 244dd2913a43a200f5a6544d424cdc37b771028b)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm cross compiling tool for clang build
+        # apt-get install binutils-arm-linux-gnueabi
+        # https://github.com/0day-ci/linux/commit/8bef9fba59d8d47ecaebbeff3e62ee550d89b017
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Wang-Jianchao/blk-make-blk-rq-qos-policies-pluggable-and-modular/20220110-171347
+        git checkout 8bef9fba59d8d47ecaebbeff3e62ee550d89b017
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   block/blk-iocost.c:1244:6: warning: variable 'last_period' set but not used [-Wunused-but-set-variable]
+           u64 last_period, cur_period;
+               ^
+>> block/blk-iocost.c:3348:7: warning: variable 'ioc' is uninitialized when used here [-Wuninitialized]
+           if (!ioc) {
+                ^~~
+   block/blk-iocost.c:3337:17: note: initialize the variable 'ioc' to silence this warning
+           struct ioc *ioc;
+                          ^
+                           = NULL
+   2 warnings generated.
 
 
-On 2022/1/13 00:56, Lukas Straub wrote:
-> On Sun, 9 Jan 2022 20:13:36 +0800
-> Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
->
->> On 2022/1/9 18:04, David Woodhouse wrote:
->>> On Sun, 2022-01-09 at 07:55 +0800, Qu Wenruo wrote:
->>>> On 2022/1/9 04:29, Lukas Straub wrote:
->>>>> But there is a even simpler solution for btrfs: It could just not to=
-uch
->>>>> stripes that already contain data.
->>>>
->>>> That would waste a lot of space, if the fs is fragemented.
->>>>
->>>> Or we have to write into data stripes when free space is low.
->>>>
->>>> That's why I'm trying to implement a PPL-like journal for btrfs RAID5=
-6.
->>>
->>> PPL writes the P/Q of the unmodified chunks from the stripe, doesn't
->>> it?
->>
->> Did I miss something or the PPL isn't what I thought?
->>
->> I thought PPL either:
->>
->> a) Just write a metadata entry into the journal to indicate a full
->>      stripe (along with its location) is going to be written.
->>
->> b) Write a metadata entry into the journal about a non-full stripe
->>      write, then write the new data and new P/Q into the journal
->>
->> And this is before we start any data/P/Q write.
->>
->> And after related data/P/Q write is finished, remove corresponding
->> metadata and data entry from the journal.
->>
->> Or PPL have even better solution?
->
-> Yes, PPL is a bit better than a journal as you described it (md
-> supports both). Because a journal would need to be replicated to
-> multiple devices (raid1) in the array while the PPL is only written to
-> the drive containing the parity for the particular stripe. And since the
-> parity is distributed across all drives, the PPL overhead is also
-> distributed across all drives. However, PPL only works for raid5 as
-> you'll see.
->
-> PPL works like this:
->
-> Before any data/parity write either:
->
->   a) Just write a metadata entry into the PPL on the parity drive to
->      indicate a full stripe (along with its location) is going to be
->      written.
->
->   b) Write a metadata entry into the PPL on the parity drive about a
->      non-full stripe write, including which data chunks are going to be
->      modified, then write the XOR of chunks not modified by this write i=
-n
->      to the PPL.
+vim +/ioc +3348 block/blk-iocost.c
 
-This is a little different than I thought, and I guess that's why RAID6
-is not supported.
+7caa47151ab2e64 Tejun Heo         2019-08-28  3331  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3332  static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+7caa47151ab2e64 Tejun Heo         2019-08-28  3333  				    size_t nbytes, loff_t off)
+7caa47151ab2e64 Tejun Heo         2019-08-28  3334  {
+22ae8ce8b89241c Christoph Hellwig 2020-11-26  3335  	struct block_device *bdev;
+8bef9fba59d8d47 Wang Jianchao     2022-01-10  3336  	struct rq_qos *rqos;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3337  	struct ioc *ioc;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3338  	u64 u[NR_I_LCOEFS];
+7caa47151ab2e64 Tejun Heo         2019-08-28  3339  	bool user;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3340  	char *p;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3341  	int ret;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3342  
+22ae8ce8b89241c Christoph Hellwig 2020-11-26  3343  	bdev = blkcg_conf_open_bdev(&input);
+22ae8ce8b89241c Christoph Hellwig 2020-11-26  3344  	if (IS_ERR(bdev))
+22ae8ce8b89241c Christoph Hellwig 2020-11-26  3345  		return PTR_ERR(bdev);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3346  
+8bef9fba59d8d47 Wang Jianchao     2022-01-10  3347  	rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
+7caa47151ab2e64 Tejun Heo         2019-08-28 @3348  	if (!ioc) {
+ed6cddefdfd361a Pavel Begunkov    2021-10-14  3349  		ret = blk_iocost_init(bdev_get_queue(bdev));
+7caa47151ab2e64 Tejun Heo         2019-08-28  3350  		if (ret)
+7caa47151ab2e64 Tejun Heo         2019-08-28  3351  			goto err;
+8bef9fba59d8d47 Wang Jianchao     2022-01-10  3352  		rqos = rq_qos_get(bdev_get_queue(bdev), RQ_QOS_COST);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3353  	}
+7caa47151ab2e64 Tejun Heo         2019-08-28  3354  
+8bef9fba59d8d47 Wang Jianchao     2022-01-10  3355  	ioc = rqos_to_ioc(rqos);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3356  	spin_lock_irq(&ioc->lock);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3357  	memcpy(u, ioc->params.i_lcoefs, sizeof(u));
+7caa47151ab2e64 Tejun Heo         2019-08-28  3358  	user = ioc->user_cost_model;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3359  	spin_unlock_irq(&ioc->lock);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3360  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3361  	while ((p = strsep(&input, " \t\n"))) {
+7caa47151ab2e64 Tejun Heo         2019-08-28  3362  		substring_t args[MAX_OPT_ARGS];
+7caa47151ab2e64 Tejun Heo         2019-08-28  3363  		char buf[32];
+7caa47151ab2e64 Tejun Heo         2019-08-28  3364  		int tok;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3365  		u64 v;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3366  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3367  		if (!*p)
+7caa47151ab2e64 Tejun Heo         2019-08-28  3368  			continue;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3369  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3370  		switch (match_token(p, cost_ctrl_tokens, args)) {
+7caa47151ab2e64 Tejun Heo         2019-08-28  3371  		case COST_CTRL:
+7caa47151ab2e64 Tejun Heo         2019-08-28  3372  			match_strlcpy(buf, &args[0], sizeof(buf));
+7caa47151ab2e64 Tejun Heo         2019-08-28  3373  			if (!strcmp(buf, "auto"))
+7caa47151ab2e64 Tejun Heo         2019-08-28  3374  				user = false;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3375  			else if (!strcmp(buf, "user"))
+7caa47151ab2e64 Tejun Heo         2019-08-28  3376  				user = true;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3377  			else
+7caa47151ab2e64 Tejun Heo         2019-08-28  3378  				goto einval;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3379  			continue;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3380  		case COST_MODEL:
+7caa47151ab2e64 Tejun Heo         2019-08-28  3381  			match_strlcpy(buf, &args[0], sizeof(buf));
+7caa47151ab2e64 Tejun Heo         2019-08-28  3382  			if (strcmp(buf, "linear"))
+7caa47151ab2e64 Tejun Heo         2019-08-28  3383  				goto einval;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3384  			continue;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3385  		}
+7caa47151ab2e64 Tejun Heo         2019-08-28  3386  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3387  		tok = match_token(p, i_lcoef_tokens, args);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3388  		if (tok == NR_I_LCOEFS)
+7caa47151ab2e64 Tejun Heo         2019-08-28  3389  			goto einval;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3390  		if (match_u64(&args[0], &v))
+7caa47151ab2e64 Tejun Heo         2019-08-28  3391  			goto einval;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3392  		u[tok] = v;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3393  		user = true;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3394  	}
+7caa47151ab2e64 Tejun Heo         2019-08-28  3395  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3396  	spin_lock_irq(&ioc->lock);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3397  	if (user) {
+7caa47151ab2e64 Tejun Heo         2019-08-28  3398  		memcpy(ioc->params.i_lcoefs, u, sizeof(u));
+7caa47151ab2e64 Tejun Heo         2019-08-28  3399  		ioc->user_cost_model = true;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3400  	} else {
+7caa47151ab2e64 Tejun Heo         2019-08-28  3401  		ioc->user_cost_model = false;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3402  	}
+7caa47151ab2e64 Tejun Heo         2019-08-28  3403  	ioc_refresh_params(ioc, true);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3404  	spin_unlock_irq(&ioc->lock);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3405  
+8bef9fba59d8d47 Wang Jianchao     2022-01-10  3406  	rq_qos_put(rqos);
+22ae8ce8b89241c Christoph Hellwig 2020-11-26  3407  	blkdev_put_no_open(bdev);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3408  	return nbytes;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3409  
+7caa47151ab2e64 Tejun Heo         2019-08-28  3410  einval:
+7caa47151ab2e64 Tejun Heo         2019-08-28  3411  	ret = -EINVAL;
+8bef9fba59d8d47 Wang Jianchao     2022-01-10  3412  	rq_qos_put(rqos);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3413  err:
+22ae8ce8b89241c Christoph Hellwig 2020-11-26  3414  	blkdev_put_no_open(bdev);
+7caa47151ab2e64 Tejun Heo         2019-08-28  3415  	return ret;
+7caa47151ab2e64 Tejun Heo         2019-08-28  3416  }
+7caa47151ab2e64 Tejun Heo         2019-08-28  3417  
 
-My original assumption would be something like this for one RMW
-(X =3D modified data, | | =3D unmodified data)
-
-Data 1:    |XXXXXXXXX|   |        |
-Data 2:    |         |   |XXXXXXXX|
-P(1+2):    |XXXXXXXXX|   |XXXXXXXX|
-
-In that case, modified Data 1 and 2 will go logged into PPL for the
-corresponding disks.
-Then for P(1+2), only the modified two parts will be logged into the devic=
-e.
-
-I'm wondering if we go this solution, wouldn't it be able to handle
-RAID6 too?
-Even we lost two disks, the remaining part in the PPL should still be
-enough to recover whatever is lost, as long as the unmodified sectors
-are really unmodified on-disk.
-
-Although this would greatly make the PPL management much harder, as
-different devices will have different PPL data usage.
-
-
->
-> To recover a inconsistent array with a lost drive:
->
-> In case a), the stripe consists only of newly written data, so it will
-> be affected by the write-hole (this is the trade-off that PPL makes) so
-> just standard parity recovery.
->
-> In case b), XOR what we wrote to the PPL (the XOR of chunks not
-> modified) with the modified data chunks to get our new (consistent)
-> parity. Then do standard parity recovery. This just works if we lost a
-> unmodified data chunk.
-> If we lost a modified data chunk this is not possible and just do
-> standard parity recovery from the beginning. Again, the newly written
-> data is affected by the write-hole but existing data is not.
-> If we lost the parity drive (containing the PPL) there is no need to
-> recover since all the data chunks are present.
->
-> Of course, this was a simplified explanation, see drivers/md/raid5-ppl.c
-> for details (it has good comments with examples). This also covers the
-> case where a data chunk is only partially modified and the unmodified
-> part of the chunk also needs to be protected (by working on a per-block
-> basis instead of per-chunk).
-
-Thanks for the detailed explanation.
-Qu
-
->
-> The PPL is not possible for raid6 AFAIK, because there it could happen
-> that you loose both a modified data chunk and a unmodified data chunk.
->
-> Regards,
-> Lukas Straub
->
->>>
->>> An alternative in a true file system which can do its own block
->>> allocation is to just calculate the P/Q of the final stripe after it's
->>> been modified, and write those (and) the updated data out to newly-
->>> allocated blocks instead of overwriting the original.
->>
->> This is what Johannes is considering, but for a different purpose.
->> Johannes' idea is to support zoned device. As the physical location a
->> zoned append write will only be known after it's written.
->>
->> So his idea is to maintain another mapping tree for zoned write, so tha=
-t
->> full stripe update will also happen in that tree.
->>
->> But that idea is still in the future, on the other hand I still prefer
->> some tried-and-true method, as I'm 100% sure there will be new
->> difficulties waiting us for the new mapping tree method.
->>
->> Thanks,
->> Qu
->>
->>>
->>> Then the final step is to free the original data blocks and P/Q.
->>>
->>> This means that your RAID stripes no longer have a fixed topology; you
->>> need metadata to be able to *find* the component data and P/Q chunks..=
-.
->>> it ends up being non-trivial, but it has attractive properties if we
->>> can work it out.
->
->
->
->
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://listman.redhat.com/mailman/listinfo/dm-devel
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
