@@ -2,107 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2902C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 02:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EBD9C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 03:20:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231782AbiAMCkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 21:40:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbiAMCkc (ORCPT
+        id S232031AbiAMDUC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 22:20:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:42225 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232025AbiAMDT7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 21:40:32 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007CDC061748;
-        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id u11so2270144plh.13;
-        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=JoKRBnT1aSEAFNkcPF+/qny7tM7I8hSefs8ekQNOZv4=;
-        b=njycsCtXyUBVACORzb6K3ZlGuXAhESVTJ/F6syqGCjZ1FAFBAMfUDtnwgyGShnfVTW
-         /JmTQPG/X1zXegbpzluQ03zUSjG9q4Sqo3q4ogTzMi9v7lX7EJGVp3yRjqLudEOqMVt3
-         SGosPPiY1T8PtzE4kTiWt5R1ILnnc4UP7wGaPVcXyCfoz71sobo2RtLM0vh3s5A905Bq
-         vHGIcR06L27EJnpn8J1ffam9fP+CnUqhzjX015Q/YjUmUwy1qH3wEjYNLovlNO3IMhEu
-         A+/8wlnAT4pyeH1dboOolHue93OcDWa1c06tHMNddSSgeF7sLkO/Oyi1WNWI+E17Buy2
-         XNJg==
+        Wed, 12 Jan 2022 22:19:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642043998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jm5clb8xIHCpD5vaQkgGsXDJRBF8humGdGQtxPy4P88=;
+        b=W0eKP+y9m2GdIMWAdG0B8hUIAwN4IedRtDidcUte/1NA4s4mqY6QrwuJDigLhXphaRePAS
+        +BzYi9Q0b00u4jn2rSqB3gZK3/ZRstK8kSsNFlf+xKGutODPE9WAZworATYA/URBH4GZcl
+        gYcnUY7RUrFlmJp8mHYE+QNrhCRM90A=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-k5ZRzDjSOxuvH2jEk0jxPw-1; Wed, 12 Jan 2022 22:19:56 -0500
+X-MC-Unique: k5ZRzDjSOxuvH2jEk0jxPw-1
+Received: by mail-lf1-f71.google.com with SMTP id n7-20020a056512388700b0042a063bb38cso2987188lft.14
+        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 19:19:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=JoKRBnT1aSEAFNkcPF+/qny7tM7I8hSefs8ekQNOZv4=;
-        b=bFgGoTAz8jF27Oe5nAR7Gv9FZZCG+c9zTMe8ogY3InAVUTYL40HVXfXigQb2aD7bWn
-         2apjjONV+ctDza5enSrmhASu8nwx5PoJuglfK8G+eqBoSENR2qH9jWSMHpxE+0MZoN0u
-         ukBbNDivMuzLJFAt4iUM1vAPUAvU5UGLtm+kWnInvGM8Nv7cM2OIX+W2PDxDnpNXryGN
-         L4UBMgt25O0IqcfuXPeISumOjLJ46ovdk5n0CRF/eSvZ3SHUoSkcERUOqIYzlKx5lWiB
-         SsIbqkqdb4nuHh2CcL/qnW4JbKVk5DjZiP+CK46uVZcJhBpni7sbiq4txgbKSYQNS1Cp
-         iETw==
-X-Gm-Message-State: AOAM533EkVcbe55RK9bBHb20UI6SG4NKNMh5jvJMQ3xqgpb81OXNzpnv
-        PBcRX/XqvcAuTTQuNrEH/ks=
-X-Google-Smtp-Source: ABdhPJzSMmK82zqEL6l6FJRtP4b2XtGIQwoQI7SYCZSyS9jfjIAODTqmOKKjgFr1SnmWRVh2QINIRQ==
-X-Received: by 2002:a17:902:6544:b0:149:8222:4b62 with SMTP id d4-20020a170902654400b0014982224b62mr2610422pln.114.1642041631524;
-        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
-Received: from [172.20.120.1] ([61.16.102.72])
-        by smtp.gmail.com with ESMTPSA id b12sm903557pfv.148.2022.01.12.18.40.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jan 2022 18:40:31 -0800 (PST)
-Message-ID: <faafdf29-6d8b-82a8-c69d-4ab3e623b489@gmail.com>
-Date:   Thu, 13 Jan 2022 10:40:27 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jm5clb8xIHCpD5vaQkgGsXDJRBF8humGdGQtxPy4P88=;
+        b=vYjh+geMtQE1UmaAgcwyy1h2mbedbhBZGugU5ctYjITuGqeEqCVtI5minItPPExf3R
+         X1nRO09DSolGvLFTB7NIkj+Gx1kvK/0DtXtaecQg2TDHOIXNaT1MVZKO/3+JLmIHkSSz
+         TkgQSmOpDoLZnPemUQV+Pbu7eIFLNKmC4Okh49UkKYjceXmRxGH5LTxbei7apCBwc1lf
+         UIi+ufTMsBxazoJVMoHsghYwvaPjk5ze76kv5IRKTgS600zpaLD28UHnuo3NwNcS/wXK
+         9CM4xhzXG08UANZyhHmuqlL67PA7iw36GVsmLOCeFIIg6gEO81ytt5R8c0MUbDLVEu/g
+         h1Bg==
+X-Gm-Message-State: AOAM533+o1gw9yvJ/AYd9P3Hy+HI+QksMPT28Lb2B8MVYgIt6d0d86gw
+        d7MJ1pcsrmvPMu/3uZaaOIUlHGMf33ZcC6Tet8KhAtHhsuZCCT07cznWCTCDq53AjL7T74HHjid
+        3+pFy0s3zuqjojU+ik/5maJE3VqvdAfpCr3dNS+E=
+X-Received: by 2002:a2e:947:: with SMTP id 68mr1793928ljj.300.1642043995220;
+        Wed, 12 Jan 2022 19:19:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw5cHa/DU7QyIA+QmQtXpznmnfrd2+vdQCDxWpWS7tHq+wUGhwbB0Mc8Mc7keQjtAIC037LniGxAkqy5XbXWaM=
+X-Received: by 2002:a2e:947:: with SMTP id 68mr1793905ljj.300.1642043994973;
+ Wed, 12 Jan 2022 19:19:54 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.1
-Subject: Re: [PATCH 13/13] blk: introduce iostat per cgroup module
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, jbacik@fb.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
- <20220110091046.17010-14-jianchao.wan9@gmail.com>
- <Yd82dJMxdQkssu4k@slm.duckdns.org>
-From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <Yd82dJMxdQkssu4k@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <00000000000081b56205d54c6667@google.com>
+In-Reply-To: <00000000000081b56205d54c6667@google.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Thu, 13 Jan 2022 11:19:44 +0800
+Message-ID: <CAFj5m9LujfHUMv+DuCLUfrevPHuF1NxtMiu_-N-C0VTiY-KNbw@mail.gmail.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in srcu_invoke_callbacks
+To:     syzbot <syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com>
+Cc:     andrii@kernel.org, ast@kernel.org, Jens Axboe <axboe@kernel.dk>,
+        bpf@vger.kernel.org, daniel@iogearbox.net,
+        john.fastabend@gmail.com, kafai@fb.com, kpsingh@kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        songliubraving@fb.com, syzkaller-bugs@googlegroups.com, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jan 11, 2022 at 7:03 PM syzbot
+<syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    3770333b3f8c Add linux-next specific files for 20220106
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=171aa4e3b00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=f9eb40d9f910b474
+> dashboard link: https://syzkaller.appspot.com/bug?extid=4f789823c1abc5accf13
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b08f53b00000
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com
 
+BTW, the report should be addressed by the patch:
 
-On 2022/1/13 4:13 上午, Tejun Heo wrote:
-> On Mon, Jan 10, 2022 at 05:10:46PM +0800, Wang Jianchao wrote:
->> From: Wang Jianchao <wangjianchao@kuaishou.com>
->>
->> iostat can only track the whole device's io statistics. This patch
->> introduces iostat per cgroup based on blk-rq-qos framework which
->> can track bw, iops, queue latency and device latency and distinguish
->> regular or meta data. The blkio.iostat per cgroup output in following
->> format,
->> vda-data bytes iops queue_lat dev_lat [ditto]  [ditto]
->>     meta   \___________ ______________/    |        |
->> 	               v                   v        v
->> 	             read               write   discard
->> In particular, the blkio.iostat of root only output the statistics
->> of IOs from root cgroup. However, the non-root blkio.iostat outputs
->> all of the children cgroups. With meta stats in root cgroup, hope
->> to observe the performace of fs metadata.
-> > I think using bpf is a way better solution for this kind of detailed
-> statistics. 
-bw/iops/lat of data or metadata of one cgroup is very basic statistics
-which kernel could provide especially when cgroup is employed everywhere.
-And we love to collect them all the time during the instance in cgroup is
-running.
-> What if I want to know what portions are random, or the
-> distribution of IO sizes? 
-This looks really detailed statistics :)
-> Do I add another rq-qos policy or add another
-> interface file with interface versioning?
-This iostat module can not provide all the kinds of statistics we want
-but just some very basic things. And maybe it can provide better hooks
-to install the ebpf program to collect detailed statistics.
+https://lore.kernel.org/linux-block/20220111123401.520192-1-ming.lei@redhat.com/T/#u
 
-Best regards
-Jianchao
+Thanks,
+Ming
+
