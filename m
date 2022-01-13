@@ -2,92 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A56C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 00:14:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2870FC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 00:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236522AbiAMAOg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 19:14:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236356AbiAMAOe (ORCPT
+        id S229878AbiAMA65 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 19:58:57 -0500
+Received: from mail-wr1-f47.google.com ([209.85.221.47]:36549 "EHLO
+        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229792AbiAMA64 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 19:14:34 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A308C06173F;
-        Wed, 12 Jan 2022 16:14:34 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id f141-20020a1c1f93000000b003497aec3f86so2625308wmf.3;
-        Wed, 12 Jan 2022 16:14:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nrycIVytOAWKwlTZ8w/ilWkQGwSx5+f1dHu/8y6N/pg=;
-        b=a5njH7Cztbo3QbtdGcyKyoTMyUtlQJsxqlzKkWKEIfbWXIsN71da5Z/xrNnGXkCf02
-         g1Em62HCYMugKat3UKDt/LZu3XMEaqlybt+gLzPfyFBHJhdrrnmgDrTRzlMSxekNtaZf
-         YtFe+WRGbXF/EO7hGdJ1/gQuwtdMhG8Lj3sVOIomo8rQa+cLHlgPHQz5eVgLp70/jnoj
-         6Hhy85tZnyfANAw1RyglEUob4q+sl79VTXnwMQ2KpYknTZv/Tgd4GsMPbJQqyQOA4WpV
-         i5qcHpHpQVP+d0Xvmxtc/ORerQIP7N5lx6j7E0mFDwMK2FYoLTbGRXi8kFt+4KVm0T+4
-         /Nyg==
+        Wed, 12 Jan 2022 19:58:56 -0500
+Received: by mail-wr1-f47.google.com with SMTP id r28so7295387wrc.3
+        for <linux-block@vger.kernel.org>; Wed, 12 Jan 2022 16:58:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nrycIVytOAWKwlTZ8w/ilWkQGwSx5+f1dHu/8y6N/pg=;
-        b=j8ix3Ld2AhABhXUH0ZObs0w7pm5lg8tKRcHP8TjTFBOczpxTqN61FABaGweFErvz2c
-         ur+qsRaZVRU3KI7djDbSCJLnNiC3CoYDFHHm7f/xBARU/2+c94uiM10J2ZTQGLxlcXzA
-         CQfq6oMqWfGQRjSAU59Q7Y2ExqpRPgUyCKKOYygc3IE7o1QEN9+INrAdZqSZ1WtmmX7f
-         CGfe0JgUWRu+H3bAKUbyDs0H+BXji1eul2spvuw23o11tWZZyEPMZCPq3EGjxs9NAsyh
-         ImL2C/Q2yvqX8Wjfq1poLqMN7e9lQdO7Phr07TDUqXRTJypi9bA5oNXONXwuZr4PVUnl
-         gplw==
-X-Gm-Message-State: AOAM533IpkKNzBP2hgyeuJqbpRyf8ZG6uslACOKrIk/kCOSmrddzrysC
-        6EXKJ+95pBgKd1yd2BBow8GHfdmDJND1vQqc
-X-Google-Smtp-Source: ABdhPJzFRXF9OXm4/EgGBsukO61paY1VNAwGvoqc5gvww2Qjl1zPJXbwmOs2F+J66qK1yHYXQaSWcQ==
-X-Received: by 2002:a05:600c:4f93:: with SMTP id n19mr1573262wmq.64.1642032873277;
-        Wed, 12 Jan 2022 16:14:33 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id bh26sm6581197wmb.3.2022.01.12.16.14.32
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version;
+        bh=odbVD9g7tAIK8dQGcnu4Ggb+BPkjbdrd+1ieep80GTY=;
+        b=paXKofIOwI28qG+rRj2s4v1ot9QDaSxuhlCJaC7Ho+FyQEZMeFutmTgrKLNLd3bF+l
+         HHgE3CgmpaegEQPgm1vYCau7XPU5+zTNVVjLGoxuM4XUsqwn/28YRaOd/igzqae7X+Fe
+         tpSdASjxAnFAH17xq713CFQEmCAVIdxTbaAnB0VH3M3BTJXxJJxqLms4Y+tu28tUOsJ9
+         egehnufP9qt3acsQ08a67q2s0zRJS3+tVJiZ7fEGPx4J8t0kny+3Cx+ZlQa0qjJXMQhs
+         8VCUS56++O80wdlX1uHKXysIuNb70dVdWr1y0SDm7xjwdtHuf9JS5W/Z4+bmynadbNm/
+         a+Dg==
+X-Gm-Message-State: AOAM531uDALBFESA49giR8KJoKerO6c8hNwtncm82NoGTWbMm6QaUmM9
+        7sS9ma0lZoszXJTvH4RYTpa4lcuXk3w=
+X-Google-Smtp-Source: ABdhPJxDUXYXBd3HFI/Y5s/Q3YdzzwPl3vIioEi9WC9yhgMMKXoQptPQKhaI4uekVURrvr8gfvh7+A==
+X-Received: by 2002:a5d:64ee:: with SMTP id g14mr1818527wri.52.1642035535693;
+        Wed, 12 Jan 2022 16:58:55 -0800 (PST)
+Received: from localhost ([2a01:4b00:f41a:3600:df86:cebc:8870:2184])
+        by smtp.gmail.com with ESMTPSA id t5sm1121921wrw.12.2022.01.12.16.58.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 16:14:32 -0800 (PST)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, llvm@lists.linux.dev
-Subject: [PATCH] loop: remove redundant initialization of pointer node
-Date:   Thu, 13 Jan 2022 00:14:32 +0000
-Message-Id: <20220113001432.1331871-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        Wed, 12 Jan 2022 16:58:55 -0800 (PST)
+Message-ID: <93f6c52690fb84fc79cc634f451a5c5d52df6c5f.camel@debian.org>
+Subject: Re: [PATCH V2] block: sed-opal: Add ioctl to return device status
+From:   Luca Boccassi <bluca@debian.org>
+To:     dougmill@linux.vnet.ibm.com
+Cc:     jonathan.derrick@intel.com, revanth.rajashekar@intel.com,
+        linux-block@vger.kernel.org, hch@infradead.org,
+        sbauer@plzdonthack.me
+Date:   Thu, 13 Jan 2022 00:58:50 +0000
+In-Reply-To: <612795b5.tj7FMS9wzchsMzrK%dougmill@linux.vnet.ibm.com>
+References: <612795b5.tj7FMS9wzchsMzrK%dougmill@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-iu9Vq1xeG/SJnZ0bhA1R"
+User-Agent: Evolution 3.42.2-1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pointer node is being initialized with a value that is never
-read, it is being re-assigned the same value a little futher on.
-Remove the redundant initialization. Cleans up clang scan warning:
 
-drivers/block/loop.c:823:19: warning: Value stored to 'node' during
-its initialization is never read [deadcode.DeadStores]
+--=-iu9Vq1xeG/SJnZ0bhA1R
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, 2021-08-26 at 08:23 -0500, dougmill@linux.vnet.ibm.com wrote:
+> Provide a mechanism to retrieve basic status information about
+> the device, including the "supported" flag indicating whether
+> SED-OPAL is supported. The information returned is from the various
+> feature descriptors received during the discovery0 step, and so
+> this ioctl does nothing more than perform the discovery0 step
+> and then save the information received. See "struct opal_status"
+> and OPAL_FL_* bits for the status information currently returned.
+>=20
+> Signed-off-by: Douglas Miller <dougmill@linux.vnet.ibm.com>
+> ---
+> =C2=A0kernel/block/opal_proto.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 5 ++
+> =C2=A0kernel/block/sed-opal.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 90 ++++++++++++++++++++++++--
+> --
+> =C2=A0kernel/include/linux/sed-opal.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0 1 +
+> =C2=A0kernel/include/uapi/linux/sed-opal.h | 12 ++++
+> =C2=A04 files changed, 96 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index b1b05c45c07c..01cbbfc4e9e2 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -820,7 +820,7 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
- 
- static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- {
--	struct rb_node **node = &(lo->worker_tree.rb_node), *parent = NULL;
-+	struct rb_node **node, *parent = NULL;
- 	struct loop_worker *cur_worker, *worker = NULL;
- 	struct work_struct *work;
- 	struct list_head *cmd_list;
--- 
-2.33.1
+Hi,
 
+Any update on this patch? It would be very useful, right now it's quite
+difficult to check the status of a sed-opal device. Christoph's review
+comments from v1 were addressed as far as I can see.
+
+https://patchwork.kernel.org/project/linux-block/patch/612795b5.tj7FMS9wzch=
+sMzrK%25dougmill@linux.vnet.ibm.com/
+
+Thanks!
+
+--=20
+Kind regards,
+Luca Boccassi
+
+--=-iu9Vq1xeG/SJnZ0bhA1R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCSqx93EIPGOymuRKGv37813JB4FAmHfeUsACgkQKGv37813
+JB5Osg/+Of8hawEFQYPn77lsDWZUkRQnPnyTFAdBNGsT5OTHitHTJl8majiVldvM
+8OZRcFukcrutXy5v65NBS4EWVpvj6uVYXds62TaTC4SuitSvo+dY5S6kSExRuLdY
+6kdIVXKKtCWBh5dKfhNYkHqBp6ti3ka4Rlx5oDJ+eB5dqkj/J0oIu8OyMRaejjyO
+u8Ka7HBhHW69eM0slhffLbnO5uLVSBzGCpd4aFAH5ekGPHPFvhm87xmRvTPLSJeO
+kLKyJ1+agWYHrEBqVv4CPin8fkoo34kaYZxJkVU0kn4MZvywiC5tr4WjDxuTDvbt
+uMG6EKylOH6SoLmUHwAcUs1QPX1via1L4pnFPRzO/hV++0V6oL/LSqXjTxGwtnOf
+2u12/AgAmR5OIv6NXmi/lEEGuLAd2bYHPg22RljtakEw/N74ZeA19p4I1BDMVh3n
+PeMQtZStqrzYiqGQrT4Ts2msXSODknfsPLv58w4Z0JViZ/kf7NsGl869weJNSKNE
+O/MEKQ0MeSYPBaz9Fmblj1Dt6MBhDzd5QfQtkb7Fc9tBvzxewT9YhQmSNJr+Hc/R
+go9JTfH8bn37Dv1Aj+//kc5r8abmLp1oQuojXbR62ugivELOidS6VQSkAYWWLLCS
+Qme1gk67f51B8ewUhX/p3xvC4La6CXdvuySt5DvxMQ6/LfKXIWA=
+=+FFs
+-----END PGP SIGNATURE-----
+
+--=-iu9Vq1xeG/SJnZ0bhA1R--
