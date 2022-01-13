@@ -2,60 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02641C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 00:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A56C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 13 Jan 2022 00:14:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236423AbiAMAFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Jan 2022 19:05:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38924 "EHLO
+        id S236522AbiAMAOg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Jan 2022 19:14:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236356AbiAMAFr (ORCPT
+        with ESMTP id S236356AbiAMAOe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Jan 2022 19:05:47 -0500
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818EDC06173F;
-        Wed, 12 Jan 2022 16:05:47 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id k30so7080877wrd.9;
-        Wed, 12 Jan 2022 16:05:47 -0800 (PST)
+        Wed, 12 Jan 2022 19:14:34 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A308C06173F;
+        Wed, 12 Jan 2022 16:14:34 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id f141-20020a1c1f93000000b003497aec3f86so2625308wmf.3;
+        Wed, 12 Jan 2022 16:14:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=B96Zf7JbGiWB8a0l9E4LUmhTdYONZVGjIpO5gBzcQpU=;
-        b=nUWTJxjyqxw239n79lbq8UFam5zo7paOS3rJ/H9NI5WUpZefKsbDGUhKk57qXhppfS
-         xr4A6cULiA7qoedsyMMi2l4KQyZjMfNdzpk7393cxz0J3ioIyLuuLNs9FDhFUTnpl0f5
-         QI01BHdZBB8UyGS2+toen3wH0F2RKXI87F4CkycCJksHjOrgwhu/MQfUMZ1/IaXh9+JQ
-         Icd6uhfCb7V5k+eVsPFgq7LF52QRRSKDwwg8Hj0mYGzBiKBRWrW89k82JmlUJVTYx2aG
-         WCrkmmdiysKfChK2MV9ydbaxCf6ujZoXRT5Eyo+7GerKEG6fN5RyCUqYIyR5WLhbKyXV
-         6SWA==
+        bh=nrycIVytOAWKwlTZ8w/ilWkQGwSx5+f1dHu/8y6N/pg=;
+        b=a5njH7Cztbo3QbtdGcyKyoTMyUtlQJsxqlzKkWKEIfbWXIsN71da5Z/xrNnGXkCf02
+         g1Em62HCYMugKat3UKDt/LZu3XMEaqlybt+gLzPfyFBHJhdrrnmgDrTRzlMSxekNtaZf
+         YtFe+WRGbXF/EO7hGdJ1/gQuwtdMhG8Lj3sVOIomo8rQa+cLHlgPHQz5eVgLp70/jnoj
+         6Hhy85tZnyfANAw1RyglEUob4q+sl79VTXnwMQ2KpYknTZv/Tgd4GsMPbJQqyQOA4WpV
+         i5qcHpHpQVP+d0Xvmxtc/ORerQIP7N5lx6j7E0mFDwMK2FYoLTbGRXi8kFt+4KVm0T+4
+         /Nyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=B96Zf7JbGiWB8a0l9E4LUmhTdYONZVGjIpO5gBzcQpU=;
-        b=e89h8bM45AraQr1W66is+qNm/4K81UcbPgiS+N/afAvwoEFHCNf6eyO1T55ETVG5Ge
-         GTAxW8tSksQtCxBXK9zxWiMoacVjxXYbaX8JYGf13Z+5J8lzfMjVv41UGOPauxCf1Fpp
-         V1B9uGdD0RE9ryCq6Hu3/VxCTEuvg4/0UAZZOmbLNJt3c6aFyb3AgaBmerTaJwLtggEh
-         +UgnRXAp2biOD1YrquIXg8s+PkYGJLxBSlGqiwSjBkVgOw/+raTM60z3ZPvagIUibDly
-         3lLxoOtlUeBlHgRclI572u2Ilyjy5iQ1pdbxDdFualtanl+/0bqNoudTbVjlwI4UY7Yp
-         VYcQ==
-X-Gm-Message-State: AOAM531dfqu/B32ghPWVVbH2m8LgCfIf96n7t4Z7b+5SiktXpGwkhP3f
-        RYYf2lTJLNKjCey5VeZP9EI=
-X-Google-Smtp-Source: ABdhPJwpRmxNptr0kCGBzfBMdeVGo5gGW6lImhDWjH6nq9cG/U50U1+eHHcQHwb59H/2QHvslDyRfw==
-X-Received: by 2002:a5d:6d8c:: with SMTP id l12mr1713767wrs.365.1642032346183;
-        Wed, 12 Jan 2022 16:05:46 -0800 (PST)
+        bh=nrycIVytOAWKwlTZ8w/ilWkQGwSx5+f1dHu/8y6N/pg=;
+        b=j8ix3Ld2AhABhXUH0ZObs0w7pm5lg8tKRcHP8TjTFBOczpxTqN61FABaGweFErvz2c
+         ur+qsRaZVRU3KI7djDbSCJLnNiC3CoYDFHHm7f/xBARU/2+c94uiM10J2ZTQGLxlcXzA
+         CQfq6oMqWfGQRjSAU59Q7Y2ExqpRPgUyCKKOYygc3IE7o1QEN9+INrAdZqSZ1WtmmX7f
+         CGfe0JgUWRu+H3bAKUbyDs0H+BXji1eul2spvuw23o11tWZZyEPMZCPq3EGjxs9NAsyh
+         ImL2C/Q2yvqX8Wjfq1poLqMN7e9lQdO7Phr07TDUqXRTJypi9bA5oNXONXwuZr4PVUnl
+         gplw==
+X-Gm-Message-State: AOAM533IpkKNzBP2hgyeuJqbpRyf8ZG6uslACOKrIk/kCOSmrddzrysC
+        6EXKJ+95pBgKd1yd2BBow8GHfdmDJND1vQqc
+X-Google-Smtp-Source: ABdhPJzFRXF9OXm4/EgGBsukO61paY1VNAwGvoqc5gvww2Qjl1zPJXbwmOs2F+J66qK1yHYXQaSWcQ==
+X-Received: by 2002:a05:600c:4f93:: with SMTP id n19mr1573262wmq.64.1642032873277;
+        Wed, 12 Jan 2022 16:14:33 -0800 (PST)
 Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id a3sm1255693wri.89.2022.01.12.16.05.45
+        by smtp.gmail.com with ESMTPSA id bh26sm6581197wmb.3.2022.01.12.16.14.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 16:05:45 -0800 (PST)
+        Wed, 12 Jan 2022 16:14:32 -0800 (PST)
 From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: [PATCH] aoe: remove redundant assignment on variable n
-Date:   Thu, 13 Jan 2022 00:05:45 +0000
-Message-Id: <20220113000545.1307091-1-colin.i.king@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, llvm@lists.linux.dev
+Subject: [PATCH] loop: remove redundant initialization of pointer node
+Date:   Thu, 13 Jan 2022 00:14:32 +0000
+Message-Id: <20220113001432.1331871-1-colin.i.king@gmail.com>
 X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -64,32 +63,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The variable n is being bit-wise or'd with a value and reassigned
-before being returned. The update of n is redundant, replace
-the |= operator with | instead. Cleans up clang scan warning:
+The pointer node is being initialized with a value that is never
+read, it is being re-assigned the same value a little futher on.
+Remove the redundant initialization. Cleans up clang scan warning:
 
-drivers/block/aoe/aoecmd.c:125:9: warning: Although the value stored
-to 'n' is used in the enclosing expression, the value is never
-actually read from 'n' [deadcode.DeadStores]
+drivers/block/loop.c:823:19: warning: Value stored to 'node' during
+its initialization is never read [deadcode.DeadStores]
 
 Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- drivers/block/aoe/aoecmd.c | 2 +-
+ drivers/block/loop.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index 588889bea7c3..6af111f568e4 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -122,7 +122,7 @@ newtag(struct aoedev *d)
- 	register ulong n;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b1b05c45c07c..01cbbfc4e9e2 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -820,7 +820,7 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
  
- 	n = jiffies & 0xffff;
--	return n |= (++d->lasttag & 0x7fff) << 16;
-+	return n | (++d->lasttag & 0x7fff) << 16;
- }
- 
- static u32
+ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ {
+-	struct rb_node **node = &(lo->worker_tree.rb_node), *parent = NULL;
++	struct rb_node **node, *parent = NULL;
+ 	struct loop_worker *cur_worker, *worker = NULL;
+ 	struct work_struct *work;
+ 	struct list_head *cmd_list;
 -- 
 2.33.1
 
