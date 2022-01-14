@@ -2,183 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0035AC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 00:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEC0C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 02:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238427AbiANAff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Jan 2022 19:35:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60274 "EHLO
+        id S238733AbiANCBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Jan 2022 21:01:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238400AbiANAfe (ORCPT
+        with ESMTP id S233796AbiANCBf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Jan 2022 19:35:34 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9006C061574
-        for <linux-block@vger.kernel.org>; Thu, 13 Jan 2022 16:35:34 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id x83so1368994pgx.4
-        for <linux-block@vger.kernel.org>; Thu, 13 Jan 2022 16:35:34 -0800 (PST)
+        Thu, 13 Jan 2022 21:01:35 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC5BC061574;
+        Thu, 13 Jan 2022 18:01:35 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id n11so10056442plf.4;
+        Thu, 13 Jan 2022 18:01:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AjzOkDchvf02gYZZoxvXFJNLTblhB7iQVr4M395uCo0=;
-        b=O6128YMBPVSio52qugA5q2UpiJ471XvdTyOF5goIce06TcQioUwOs0jhLo2jqYBYqi
-         eAOyiyU+3u0EL95DGHtYyYDvnwZAYCc//Ru50LiLIK/3i6jTALCh7IckEfaMIx/Cr/Ry
-         DfYBLszSgT/3c38P3gsV+3b6QXUbvaMWahCEQnPMTOkdxI5okARgLit6Hj+EPmKet9ok
-         UEYa3+4KrI1qjLKGuhHwJW764a+GWnScfkmURH1+jDOjfGh913nosoZbcboDxAl+ofzz
-         9pzoM13hQzGCZTIH6GoKlFyWxr8mbRwQv/HUhwXm5ZWasooj8YNdiw7jXx7z3RLPXmHR
-         w0/A==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=Cd4/SGiXPD6hEhCacRdicixZc/0NYh6bUXzOA7/GX3o=;
+        b=JWu8c3lStqL+MQo7BbsBXfiPLFpR4NkzcMrGEdxAfVT2ZHfzjTh8sdaHXU51JKCAtk
+         jElJ+Ih5DWYPyePdga7pvdh4rZ2ffC0VHRVFUfgCojOY7sZvDjpB2iMTw/pnmfhTyArf
+         I2Xp4MI5/mmLbjLfM4/fiDQSeNqdnfGhf3FyxdVW87p6Mgr024CJm5GphHmd6UFqfTuM
+         SNve8z5aLwbMWtEQ7Ezqm0/XWSwpsuoHBdBSg7EbAaV6L92zcdGGuWIul3rEyP6aDO/V
+         gk1BaAB4ZIs1tmcIgMb5jNgTg09BSBvY6BbsAtSKd3aWNQ9bESAJndGaRG426YQzM0+o
+         woLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=AjzOkDchvf02gYZZoxvXFJNLTblhB7iQVr4M395uCo0=;
-        b=SW1MyaPLcvFXhcg5mdxQ0LhICIza4IelWM7arGTFBKWav1hgN2cMmjbBRYhvNPvFp9
-         OZvoPXIL2EZT8zvPQVWesV6mDbbzXfxJzVik1lYULZUUjiVYQBrY6kgYWp+RIAAmxEuD
-         VE43qzxHU8KdaKR/RlbOLBxfUGDWIjyRMXOQKcFeiwhQO8MU4+PeXMwk7lAW0VAwpRyp
-         xORDjZOYZ1TmpIo3a+imcciTXRWztzZiCd1Te3+btCoeJF/h/38dTNRQkugUJpxDrfv1
-         pTKZC7vsRuOCOKl2L5PCq29WviW0okpLWzI9VOTS7nxGmCJBkoKGfLgJ3hcgNu7Tn48t
-         Ad4g==
-X-Gm-Message-State: AOAM530sH1r6jJXX/vIdJfJjnBNG0LZIy3F37GXuV9h67DY5Mj1vciRs
-        uvm6lln07gMSUJ8slGcfMJI=
-X-Google-Smtp-Source: ABdhPJw9pKgsSa2xUfDa80qoAdxljjrQ8kMlcCFpiTeCp2GFmMigIP9oPnboN/8m22embZXJC2rGzw==
-X-Received: by 2002:a05:6a00:2286:b0:4bb:3358:7ea0 with SMTP id f6-20020a056a00228600b004bb33587ea0mr6581122pfe.35.1642120534036;
-        Thu, 13 Jan 2022 16:35:34 -0800 (PST)
-Received: from google.com ([2620:15c:211:201:5a69:b957:d6be:ccb0])
-        by smtp.gmail.com with ESMTPSA id s5sm3750513pfe.117.2022.01.13.16.35.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jan 2022 16:35:33 -0800 (PST)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 13 Jan 2022 16:35:31 -0800
-From:   Minchan Kim <minchan@kernel.org>
-To:     Yu Zhao <yuzhao@google.com>
-Cc:     Mauricio Faria de Oliveira <mfo@canonical.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linux-MM <linux-mm@kvack.org>, linux-block@vger.kernel.org,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Yang Shi <shy828301@gmail.com>
-Subject: Re: [PATCH v2] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-Message-ID: <YeDFU3k7pkMpTl6T@google.com>
-References: <20220105233440.63361-1-mfo@canonical.com>
- <Yd0oLWtVAyAexyQc@google.com>
- <87v8ypybdc.fsf@yhuang6-desk2.ccr.corp.intel.com>
- <Yd8Q7Cplp5xLTYlV@google.com>
- <CAO9xwp3cgdXRmogRReJW+_AKktWhYL74kzphKpz_8wh12BVzGA@mail.gmail.com>
- <CAOUHufZk1YF5g4b33Sz8WHaKooCcF-KoiHO+sw3XjiHEGhkPEQ@mail.gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Cd4/SGiXPD6hEhCacRdicixZc/0NYh6bUXzOA7/GX3o=;
+        b=BEEN9Yf1qsc/x6ORsQqeexfLFQk+zYhI8/N19iUOoMrEWSuYJOfh8TQ13npft36kVi
+         PY6d3nCH/d4SpE7ISh4O5CjrR5j5wqjewkxMN0BgGk8kXOuIyhpxktCFjipdq4nGFAMH
+         JpowKmHIOwLVAv7yo+PlAW6vNsmtS34vSkLkzE/KH5tGzKxhge1y+c3lGrPhn7hAB3lg
+         GidyjcDigVOaDDzmdmdXBI1cMGMY9SCktp/tMhw3/QORx4oUC9BNLsKkMJelK9/cBiiO
+         ltwGsiKuUzoKTexYHYzh4IUf7QMSprB2msKygGzs1I/9Uns1TFwhmgTKtF8OLaW30M3v
+         ioIA==
+X-Gm-Message-State: AOAM531eSaHg9HGXWZngKEGeWhLLhOVu7V5cw7QfkM9x9Owm4esuCkLr
+        7yjxq6ofNC7kwPQUt8oRVt4=
+X-Google-Smtp-Source: ABdhPJwX2Hcolwy/XdrrGkyuZlufjRaG8CKEZxeLKgO81YwIyWXPmST1AU/6HWTQzh09lgsoLeI9qg==
+X-Received: by 2002:a17:902:a404:b0:148:bdd6:d752 with SMTP id p4-20020a170902a40400b00148bdd6d752mr7274060plq.20.1642125694784;
+        Thu, 13 Jan 2022 18:01:34 -0800 (PST)
+Received: from [172.20.120.1] ([162.219.34.250])
+        by smtp.gmail.com with ESMTPSA id m3sm3711300pfa.183.2022.01.13.18.01.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jan 2022 18:01:34 -0800 (PST)
+Message-ID: <13cad320-db43-99db-ed0c-61b27a9a3447@gmail.com>
+Date:   Fri, 14 Jan 2022 10:01:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOUHufZk1YF5g4b33Sz8WHaKooCcF-KoiHO+sw3XjiHEGhkPEQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.1
+Subject: Re: [PATCH 13/13] blk: introduce iostat per cgroup module
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, jbacik@fb.com, bvanassche@acm.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220110091046.17010-1-jianchao.wan9@gmail.com>
+ <20220110091046.17010-14-jianchao.wan9@gmail.com>
+ <Yd82dJMxdQkssu4k@slm.duckdns.org>
+ <faafdf29-6d8b-82a8-c69d-4ab3e623b489@gmail.com>
+ <YeBa68w4nQQvBM9Z@slm.duckdns.org>
+From:   Wang Jianchao <jianchao.wan9@gmail.com>
+In-Reply-To: <YeBa68w4nQQvBM9Z@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 12:29:51AM -0700, Yu Zhao wrote:
-> On Wed, Jan 12, 2022 at 2:53 PM Mauricio Faria de Oliveira
-> <mfo@canonical.com> wrote:
-> >
-> > Hi Minchan Kim,
-> >
-> > Thanks for handling the hard questions! :)
-> >
-> > On Wed, Jan 12, 2022 at 2:33 PM Minchan Kim <minchan@kernel.org> wrote:
-> > >
-> > > On Wed, Jan 12, 2022 at 09:46:23AM +0800, Huang, Ying wrote:
-> > > > Yu Zhao <yuzhao@google.com> writes:
-> > > >
-> > > > > On Wed, Jan 05, 2022 at 08:34:40PM -0300, Mauricio Faria de Oliveira wrote:
-> > > > >> diff --git a/mm/rmap.c b/mm/rmap.c
-> > > > >> index 163ac4e6bcee..8671de473c25 100644
-> > > > >> --- a/mm/rmap.c
-> > > > >> +++ b/mm/rmap.c
-> > > > >> @@ -1570,7 +1570,20 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
-> > > > >>
-> > > > >>                    /* MADV_FREE page check */
-> > > > >>                    if (!PageSwapBacked(page)) {
-> > > > >> -                          if (!PageDirty(page)) {
-> > > > >> +                          int ref_count = page_ref_count(page);
-> > > > >> +                          int map_count = page_mapcount(page);
-> > > > >> +
-> > > > >> +                          /*
-> > > > >> +                           * The only page refs must be from the isolation
-> > > > >> +                           * (checked by the caller shrink_page_list() too)
-> > > > >> +                           * and one or more rmap's (dropped by discard:).
-> > > > >> +                           *
-> > > > >> +                           * Check the reference count before dirty flag
-> > > > >> +                           * with memory barrier; see __remove_mapping().
-> > > > >> +                           */
-> > > > >> +                          smp_rmb();
-> > > > >> +                          if ((ref_count - 1 == map_count) &&
-> > > > >> +                              !PageDirty(page)) {
-> > > > >>                                    /* Invalidate as we cleared the pte */
-> > > > >>                                    mmu_notifier_invalidate_range(mm,
-> > > > >>                                            address, address + PAGE_SIZE);
-> > > > >
-> > > > > Out of curiosity, how does it work with COW in terms of reordering?
-> > > > > Specifically, it seems to me get_page() and page_dup_rmap() in
-> > > > > copy_present_pte() can happen in any order, and if page_dup_rmap()
-> > > > > is seen first, and direct io is holding a refcnt, this check can still
-> > > > > pass?
-> > > >
-> > > > I think that you are correct.
-> > > >
-> > > > After more thoughts, it appears very tricky to compare page count and
-> > > > map count.  Even if we have added smp_rmb() between page_ref_count() and
-> > > > page_mapcount(), an interrupt may happen between them.  During the
-> > > > interrupt, the page count and map count may be changed, for example,
-> > > > unmapped, or do_swap_page().
-> > >
-> > > Yeah, it happens but what specific problem are you concerning from the
-> > > count change under race? The fork case Yu pointed out was already known
-> > > for breaking DIO so user should take care not to fork under DIO(Please
-> > > look at O_DIRECT section in man 2 open). If you could give a specific
-> > > example, it would be great to think over the issue.
-> > >
-> > > I agree it's little tricky but it seems to be way other place has used
-> > > for a long time(Please look at write_protect_page in ksm.c).
-> >
-> > Ah, that's great to see it's being used elsewhere, for DIO particularly!
-> >
-> > > So, here what we missing is tlb flush before the checking.
-> >
-> > That shouldn't be required for this particular issue/case, IIUIC.
-> > One of the things we checked early on was disabling deferred TLB flush
-> > (similarly to what you've done), and it didn't help with the issue; also, the
-> > issue happens on uniprocessor mode too (thus no remote CPU involved.)
-> 
-> Fast gup doesn't block tlb flush; it only blocks IPI used when freeing
-> page tables. So it's expected that forcing a tlb flush doesn't fix the
-> problem.
-> 
-> But it still seems to me the fix is missing smp_mb(). IIUC, a proper
-> fix would require, on the dio side
-> inc page refcnt
-> smp_mb()
-> read pte
-> 
-> and on the rmap side
-> clear pte
-> smp_mb()
-> read page refcnt
-> 
-> try_grab_compound_head() implies smp_mb, but i don't think
-> ptep_get_and_clear() does.
-> 
-> mapcount, as Minchan said, probably is irrelevant given dio is already
-> known to be broken with fork.
-> 
-> I glanced at the thread and thought it might be worth menthing.
+Hi Tejun
 
-If the madv_freed page is shared among processes, it means the ptes
-pointing the page are CoW state. If DIO is about to work with the
-page, gup_fast will fallback to slow path and then break the CoW
-using faultin_page before the submit bio. Thus, the page is not
-shared any longer and the pte was alrady marked as dirty on fault
-handling. Thus, I think there is no race.
+Thanks so much your comment :)
+I really appreciate it.
 
-Only, problem is race between DIO and reclaim on exclusive private
-madv_free page. In the case, page_count would be only racy.
-If ptep_get_and_clear is unordered, yeah, we need barrier there.
-(Looks like unorder since ARM uses xchg_relaxed).
+On 2022/1/14 1:01 上午, Tejun Heo wrote:
+> Hello,
+> 
+> On Thu, Jan 13, 2022 at 10:40:27AM +0800, Wang Jianchao wrote:
+>> bw/iops/lat of data or metadata of one cgroup is very basic statistics
+> 
+> bw and iops can already be derived from the cumulative counters in io.stat.
+> Latencies without distribution are often what we tradtionally exposed not
+> because they're great but because exposing distributions is so cumbersome
+> from kernel. Also, latency numbers at cgroup level isn't *that* useful
+> anyway. There isn't a lot you can deduce for the particular cgroup from that
+> number.
+I agree with this. But my customer would yell at me because they really want to
+see that....
+> 
+>> which kernel could provide especially when cgroup is employed everywhere.
+>> And we love to collect them all the time during the instance in cgroup is
+>> running.
+> 
+> It's really not that difficult to collect these numbers from bpf with pretty
+> low overhead. There's the problem of deployment for which there isn't "the"
+> right and convenient way but it'd be more worthwhile to put efforts towards
+> that.
+> 
+>>> What if I want to know what portions are random, or the
+>>> distribution of IO sizes? 
+>> This looks really detailed statistics :)
+>>> Do I add another rq-qos policy or add another
+>>> interface file with interface versioning?
+>> This iostat module can not provide all the kinds of statistics we want
+>> but just some very basic things. And maybe it can provide better hooks
+>> to install the ebpf program to collect detailed statistics.
+> 
+> I mean, "really basic" means different things for different folks. Bytes /
+> ios, we all seem to agree. Beyond that, who knows? There already are enough
+> hooks to collect stats that you're trying to collect. The examples in py-bcc
+> might be a good place to start.
+Thanks for your suggestion. I will read it and try with bpf
+
+Best Regards
+Jianchao
+
