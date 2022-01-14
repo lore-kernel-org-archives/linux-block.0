@@ -2,135 +2,245 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A95C4167B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 17:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 929B7C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 19:58:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243697AbiANRCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jan 2022 12:02:31 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:35216 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243695AbiANRCa (ORCPT
+        id S244181AbiANT6p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jan 2022 14:58:45 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:36810 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229471AbiANT6p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jan 2022 12:02:30 -0500
+        Fri, 14 Jan 2022 14:58:45 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 35EC6219B1;
-        Fri, 14 Jan 2022 17:02:29 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id 3DBCD1F386;
+        Fri, 14 Jan 2022 19:58:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1642179749; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        t=1642190324; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oeshiqmmWZD73GkSK4+N+GqKNPAYETIzxJpuE6/zef0=;
-        b=fEP19GZFNu7CiMzyrNWes3nEi1AFHt/7bVN2BDWD/uTgZSVkvi6E0SUuGqBkN/HXMb8SqS
-        kYKe+wIEJFBONj/AInoyP97JxkN9X6P/PrWiADoT+dOu6K5WDUfqh/oUUUfTik0b1yevA5
-        tT2P+IapWYkgguyJJld/QRmQcGkkrQw=
+        bh=E5i+R3XEiZAqOGm9b/PbA1/tHE/Gec75YDhTldr90Pk=;
+        b=Gyaa0corR49SKK/z82ayItWfurTMrwvs8asemV0gb0dMWnUzniWkBEjIRUIxzDn2Seicrq
+        ROjtPvC1K+fTRdzn6L4p6H/CZ4TMfmg5rXVrSGFDPPQfN1RScYfBriSfjO9LLQGGkhbR74
+        9a4U5UFl4/YT7vMSTl6r3NiYU+BFlpc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1642179749;
+        s=susede2_ed25519; t=1642190324;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oeshiqmmWZD73GkSK4+N+GqKNPAYETIzxJpuE6/zef0=;
-        b=GBefCU+JD81UaHLuTumy18++m6stUD1pT0FPJ3THkONY8aATUBb+2qqQcxf0wD5E2bJ7Yl
-        pZvYefRyVi2wUfCw==
+        bh=E5i+R3XEiZAqOGm9b/PbA1/tHE/Gec75YDhTldr90Pk=;
+        b=mXG2JN7W+HHaKcXoqxv04VbniL/pIGBZm9pbDFnB8yWvucFBLrnmEF4qbf0B/+EwTeMURl
+        TurxjOieZ2wWvgBQ==
 Received: from quack3.suse.cz (unknown [10.100.224.230])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id A96EEA3B84;
-        Fri, 14 Jan 2022 17:02:26 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTPS id C59E4A3B83;
+        Fri, 14 Jan 2022 19:58:43 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 5D016A05E2; Fri, 14 Jan 2022 18:02:09 +0100 (CET)
+        id D5435A05DB; Fri, 14 Jan 2022 20:58:40 +0100 (CET)
+Date:   Fri, 14 Jan 2022 20:58:40 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     <linux-block@vger.kernel.org>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: [PATCH 2/4] bfq: Avoid merging queues with different parents
-Date:   Fri, 14 Jan 2022 18:01:54 +0100
-Message-Id: <20220114170209.8606-2-jack@suse.cz>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220114164215.28972-1-jack@suse.cz>
-References: <20220114164215.28972-1-jack@suse.cz>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Message-ID: <20220114195840.kdzegicjx7uyscoq@quack3.lan>
+References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
+ <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+ <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+ <20220110134234.qebxn5gghqupsc7t@quack3.lan>
+ <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
+ <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
+ <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
+ <f893638a-2109-c197-9783-c5e6dced23e5@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2888; h=from:subject; bh=Wo1FkmvrgLnsLoxUN8FFedXWnRxiaMVst9kwBuKTVTg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBh4ayCCr2kJ3pthS1i4guH+kNkcoxQDTHDYlhq+Qn6 JBmDeFCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYeGsggAKCRCcnaoHP2RA2fc+CA Dndw74mFYFk1iVQeGLoVZh7PofJJRP/Jnt4PETNUFUoqdQIenKaSudVxAGs7yOIETtrXdwjZjXZF97 Ogd7YaYibrFHvHyekvH5tM1p9kRjJHIb7SzQhTjavAAhJY8uawj3sOB6yj4Rxf94MwAPDQXi9bcVQe +4ILdKK10w2mh0mUDKWax5QorLDdCh/bOKc9Lvlg8SnoP6ywXXjfs0C1YM02+JIt5BaM5w7Ou83SnF fGkhOI90xBvSMf3XvK15/sK8g2ZRU4dKxFrhnOvKvqXKw4M1gjYddpI3b8Oq14OMlwigbGu93eWSPF T0Br2OCvgtra/u7+s+rds5j4jQ4H1H
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="wizfrpswfn5c5lmo"
+Content-Disposition: inline
+In-Reply-To: <f893638a-2109-c197-9783-c5e6dced23e5@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It can happen that the parent of a bfqq changes between the moment we
-decide two queues are worth to merge (and set bic->stable_merge_bfqq)
-and the moment bfq_setup_merge() is called. This can happen e.g. because
-the process submitted IO for a different cgroup and thus bfqq got
-reparented. It can even happen that the bfqq we are merging with has
-parent cgroup that is already offline and going to be destroyed in which
-case the merge can lead to use-after-free issues such as:
 
-BUG: KASAN: use-after-free in __bfq_deactivate_entity+0x9cb/0xa50
-Read of size 8 at addr ffff88800693c0c0 by task runc:[2:INIT]/10544
+--wizfrpswfn5c5lmo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-CPU: 0 PID: 10544 Comm: runc:[2:INIT] Tainted: G            E     5.15.2-0.g5fb85fd-default #1 openSUSE Tumbleweed (unreleased) f1f3b891c72369aebecd2e43e4641a6358867c70
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a-rebuilt.opensuse.org 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x46/0x5a
- print_address_description.constprop.0+0x1f/0x140
- ? __bfq_deactivate_entity+0x9cb/0xa50
- kasan_report.cold+0x7f/0x11b
- ? __bfq_deactivate_entity+0x9cb/0xa50
- __bfq_deactivate_entity+0x9cb/0xa50
- ? update_curr+0x32f/0x5d0
- bfq_deactivate_entity+0xa0/0x1d0
- bfq_del_bfqq_busy+0x28a/0x420
- ? resched_curr+0x116/0x1d0
- ? bfq_requeue_bfqq+0x70/0x70
- ? check_preempt_wakeup+0x52b/0xbc0
- __bfq_bfqq_expire+0x1a2/0x270
- bfq_bfqq_expire+0xd16/0x2160
- ? try_to_wake_up+0x4ee/0x1260
- ? bfq_end_wr_async_queues+0xe0/0xe0
- ? _raw_write_unlock_bh+0x60/0x60
- ? _raw_spin_lock_irq+0x81/0xe0
- bfq_idle_slice_timer+0x109/0x280
- ? bfq_dispatch_request+0x4870/0x4870
- __hrtimer_run_queues+0x37d/0x700
- ? enqueue_hrtimer+0x1b0/0x1b0
- ? kvm_clock_get_cycles+0xd/0x10
- ? ktime_get_update_offsets_now+0x6f/0x280
- hrtimer_interrupt+0x2c8/0x740
+On Sat 15-01-22 00:50:32, Tetsuo Handa wrote:
+> On 2022/01/13 19:44, Jan Kara wrote:
+> > OK, so I think I understand the lockdep complaint better. Lockdep
+> > essentially complains about the following scenario:
+> > 
+> > blkdev_put()
+> >   lock disk->open_mutex
+> >   lo_release
+> >     __loop_clr_fd()
+> >         |
+> >         | wait for IO to complete
+> >         v
+> > loop worker
+> >   write to backing file
+> >     sb_start_write(file)
+> >         |
+> >         | wait for fs with backing file to unfreeze
+> >         v
+> > process holding fs frozen
+> >   freeze_super()
+> >         |
+> >         | wait for remaining writers on the fs so that fs can be frozen
+> >         v
+> > sendfile()
+> >   sb_start_write()
+> >   do_splice_direct()
+> >         |
+> >         | blocked on read from /sys/power/resume, waiting for kernfs file
+> >         | lock
+> >         v
+> > write() "/dev/loop0" (in whatever form) to /sys/power/resume
+> >   calls blkdev_get_by_dev("/dev/loop0")
+> >     lock disk->open_mutex => deadlock
+> > 
+> 
+> Then, not calling flush_workqueue() from destroy_workqueue() from
+> __loop_clr_fd() will not help because the reason we did not need to call
+> flush_workqueue() is that blk_mq_freeze_queue() waits until all "struct
+> work_struct" which flush_workqueue() would have waited completes?
 
-Fix the problem by checking that the parent of the two bfqqs we are
-merging in bfq_setup_merge() is the same.
+Yes.
 
-Link: https://lore.kernel.org/linux-block/20211125172809.GC19572@quack2.suse.cz/
-CC: stable@vger.kernel.org
-Fixes: 430a67f9d616 ("block, bfq: merge bursts of newly-created queues")
+> If flush_workqueue() cannot complete because an I/O request cannot
+> complete, blk_mq_freeze_queue() as well cannot complete because it waits
+> for I/O requests which flush_workqueue() would have waited?
+> 
+> Then, any attempt to revert commit 322c4293ecc58110 ("loop: make
+> autoclear operation asynchronous")
+> (e.g.
+> https://lkml.kernel.org/r/4e7b711f-744b-3a78-39be-c9432a3cecd2@i-love.sakura.ne.jp
+> ) cannot be used?
+
+Well, it could be used but the deadlock would be reintroduced. There are
+still possibilities to fix it in some other way. But for now I think that
+async loop cleanup is probably the least painful solution.
+
+> Now that commit 322c4293ecc58110 already arrived at linux.git, we need to
+> quickly send a fixup patch for these reported regressions. This "[PATCH
+> v2 2/2] loop: use task_work for autoclear operation" did not address "if
+> (lo->lo_state == Lo_bound) { }" part. If we address this part, something
+> like below diff?
+
+Please no. That is too ugly to live. I'd go just with attached version of
+your solution. That should fix the xfstests regression. The LTP regression
+needs to be fixed in mount.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--wizfrpswfn5c5lmo
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-loop-use-task_work-for-autoclear-operation.patch"
+
+From e36d7507bd65a880b1bb032a498a74e101c5368e Mon Sep 17 00:00:00 2001
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Date: Fri, 7 Jan 2022 20:04:31 +0900
+Subject: [PATCH] loop: use task_work for autoclear operation
+
+The kernel test robot is reporting that commit 322c4293ecc58110 ("loop:
+make autoclear operation asynchronous") broke xfstest which does
+
+  umount ext2 image file on xfs
+  umount xfs
+
+sequence. Let's use task work for calling __loop_clr_fd() so that by the
+time umount returns to userspace the loop device is cleaned up (unless
+there are other device users but in that case the problem lies in
+userspace).
+
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Reported-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/block/loop.c | 25 ++++++++++++++++++++-----
+ drivers/block/loop.h |  5 ++++-
+ 2 files changed, 24 insertions(+), 6 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 056399185c2f..0da47f2ca781 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2638,6 +2638,14 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 	if (process_refs == 0 || new_process_refs == 0)
- 		return NULL;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b1b05c45c07c..814605e2cbef 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1175,10 +1175,8 @@ static void loop_rundown_completed(struct loop_device *lo)
+ 	module_put(THIS_MODULE);
+ }
  
-+	/*
-+	 * Make sure merged queues belong to the same parent. Parents could
-+	 * have changed since the time we decided the two queues are suitable
-+	 * for merging.
-+	 */
-+	if (new_bfqq->entity.parent != bfqq->entity.parent)
-+		return NULL;
+-static void loop_rundown_workfn(struct work_struct *work)
++static void loop_rundown_start(struct loop_device *lo)
+ {
+-	struct loop_device *lo = container_of(work, struct loop_device,
+-					      rundown_work);
+ 	struct block_device *bdev = lo->lo_device;
+ 	struct gendisk *disk = lo->lo_disk;
+ 
+@@ -1188,6 +1186,18 @@ static void loop_rundown_workfn(struct work_struct *work)
+ 	loop_rundown_completed(lo);
+ }
+ 
++static void loop_rundown_callbackfn(struct callback_head *callback)
++{
++	loop_rundown_start(container_of(callback, struct loop_device,
++					rundown.callback));
++}
 +
- 	bfq_log_bfqq(bfqq->bfqd, bfqq, "scheduling merge with queue %d",
- 		new_bfqq->pid);
++static void loop_rundown_workfn(struct work_struct *work)
++{
++	loop_rundown_start(container_of(work, struct loop_device,
++					rundown.work));
++}
++
+ static void loop_schedule_rundown(struct loop_device *lo)
+ {
+ 	struct block_device *bdev = lo->lo_device;
+@@ -1195,8 +1205,13 @@ static void loop_schedule_rundown(struct loop_device *lo)
  
+ 	__module_get(disk->fops->owner);
+ 	kobject_get(&bdev->bd_device.kobj);
+-	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
+-	queue_work(system_long_wq, &lo->rundown_work);
++	if (!(current->flags & PF_KTHREAD)) {
++		init_task_work(&lo->rundown.callback, loop_rundown_callbackfn);
++		if (!task_work_add(current, &lo->rundown.callback, TWA_RESUME))
++			return;
++	}
++	INIT_WORK(&lo->rundown.work, loop_rundown_workfn);
++	queue_work(system_long_wq, &lo->rundown.work);
+ }
+ 
+ static int loop_clr_fd(struct loop_device *lo)
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 918a7a2dc025..596472f9cde3 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -56,7 +56,10 @@ struct loop_device {
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
+ 	bool			idr_visible;
+-	struct work_struct      rundown_work;
++	union {
++		struct work_struct   work;
++		struct callback_head callback;
++	} rundown;
+ };
+ 
+ struct loop_cmd {
 -- 
 2.31.1
 
+
+--wizfrpswfn5c5lmo--
