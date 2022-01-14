@@ -2,171 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DD8C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 15:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D00C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 16:21:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235921AbiANP7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jan 2022 10:59:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43660 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243051AbiANP7A (ORCPT
+        id S243266AbiANQVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jan 2022 11:21:16 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:58788 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233473AbiANQVQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jan 2022 10:59:00 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37525C06161C
-        for <linux-block@vger.kernel.org>; Fri, 14 Jan 2022 07:59:00 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id w26so7075310wmi.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Jan 2022 07:59:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=szw02yiK6W7tpFgSfwd3kajTRZIxL193SsZX0/IZf0Y=;
-        b=awoHZAzqy0dI0bh2d9Neqnja9z5Yjg90dsUbQypA6oSb4jwdywDqVpzoNCi1ZGNqVe
-         GHaezCl5X2uh2V1kX5g5AvnN25Mkfp2pIN6TUb0qBPXUSlBQKw3JG3UePEsROPQ7li7O
-         dwc+UhZo8EdA1BXzUGekW5EqcvAlyddlmI504vxeX0AFuDpwkNhB8HcRisap7fAdovV1
-         s9dYjrba1vaYop58d9ZTsHPIgtuGbBTz4gNKUW6LHZLTHUidoO0yHl2Wgb7jRwvdmGCE
-         NLljQHhs1OD327MX3l4uZSm2dqN0dnJ6kd2kbniSSSC7RkGy/ShTTkh5sgPT1QHeKDIO
-         0M0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=szw02yiK6W7tpFgSfwd3kajTRZIxL193SsZX0/IZf0Y=;
-        b=S4ynzFt3+4r2zZdFr71u7WBO2rYKkGIRqu5JV84cjkUHzWPpD77EOB4FfAyN81oFk9
-         qx7a5FVl0MQXNZv8udAsqVOZW3W3LvqCm7rW62oJ6F1wt5CNyakUjdcglyk6zKGZ9uc6
-         mWCeXuvh78exTFkV+l1XRC0eCu0blLV1mPMD0wRCRaqgshyHZgxJcTAmDArVjDtIvVIO
-         cyDIGJKfMgk2ZQANNzdwnWtkKo2MQ/U9dU4W/P8RbokpXnZx4GD3EfQ/mJytHPBewRuw
-         Cnn9uPEXEtroRr849F8IhWG+NpG825MepFvQF3c4jWBlEve88tGQKdkSGItCS/og+tpr
-         IkIg==
-X-Gm-Message-State: AOAM532WRV7NcqEIV280GO7zn8jz1QnKoheZRpmKWp1Adk+oxdlCINMO
-        xIHUl23ZvEr84i1AcieFYG0xfH33v/Du9A==
-X-Google-Smtp-Source: ABdhPJwDKOR+cpkeEIVRE84nu9Mg0ZWUiH5CyKQTVpjBcr5pGNDnchY/mcUHuzC8JI8qj8LnVb72/w==
-X-Received: by 2002:aa7:dc15:: with SMTP id b21mr9295760edu.237.1642175938816;
-        Fri, 14 Jan 2022 07:58:58 -0800 (PST)
-Received: from lb01533.fkb.profitbricks.net ([85.214.13.132])
-        by smtp.gmail.com with ESMTPSA id j5sm1930246ejo.171.2022.01.14.07.58.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 07:58:58 -0800 (PST)
-From:   Md Haris Iqbal <haris.iqbal@ionos.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCH for-next 2/2] block/rnbd: client device does not care queue/rotational
-Date:   Fri, 14 Jan 2022 16:58:55 +0100
-Message-Id: <20220114155855.984144-3-haris.iqbal@ionos.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220114155855.984144-1-haris.iqbal@ionos.com>
-References: <20220114155855.984144-1-haris.iqbal@ionos.com>
+        Fri, 14 Jan 2022 11:21:16 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 44D1921129;
+        Fri, 14 Jan 2022 16:21:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1642177275; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6Kk5LXJ2ri231HYkIxeoUDJk+06B5IheewsWprd9rno=;
+        b=mq3fVL2XmUaWAOMPTkrppBjpmK8MHo2AdZArQxHUG/Efb+lMyi3MuH1nmGLwH4YbJYkhde
+        DsENc8sTt8+TcMQRETq4PmdoeNNEG1JTxVYvAU1E8wLwVjRAk0UZP/V9CN1tsIcmnjiGkv
+        qt4kjDOntvSaBZnUvZ3IzspGzpsfyk4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1642177275;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6Kk5LXJ2ri231HYkIxeoUDJk+06B5IheewsWprd9rno=;
+        b=6WAtT3SBS8yCbf4SwqX9FhJUOhy3P4gaK4Neg8ID1ZAUccRv/bf5+x1eZ01kXlfSkeH36e
+        yVcqueaYiUvUi6Cw==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 359E1A3B83;
+        Fri, 14 Jan 2022 16:21:15 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 17BB1A05B3; Fri, 14 Jan 2022 17:05:45 +0100 (CET)
+Date:   Fri, 14 Jan 2022 17:05:45 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Message-ID: <20220114160545.lsgge7aom7rdttmo@quack3.lan>
+References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
+ <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+ <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+ <20220110134234.qebxn5gghqupsc7t@quack3.lan>
+ <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
+ <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
+ <a614bffa-d2a8-60c0-a2d9-e0ad1be17939@I-love.SAKURA.ne.jp>
+ <20220113152306.n4awebeougcamvny@quack3.lan>
+ <37878b0a-da3b-1285-4f42-27871bfaddee@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37878b0a-da3b-1285-4f42-27871bfaddee@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gioh Kim <gi-oh.kim@ionos.com>
+On Fri 14-01-22 20:05:31, Tetsuo Handa wrote:
+> On 2022/01/14 0:23, Jan Kara wrote:
+> > Well, we cannot guarantee what will be state of the loop device when you
+> > open it but I think we should guarantee that once you have loop device
+> > open, it will not be torn down under your hands. And now that I have
+> > realized there are those lo_state checks, I think everything is fine in
+> > that regard. I wanted to make sure that sequence such as:
+> 
+> Well, we could abort __loop_clr_fd() if somebody called "open()", something
+> like below. But
+> 
+> ----------------------------------------
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index b1b05c45c07c..960db2c484ab 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1082,7 +1082,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+>  	return error;
+>  }
+>  
+> -static void __loop_clr_fd(struct loop_device *lo)
+> +static bool __loop_clr_fd(struct loop_device *lo, int expected_refcnt)
+>  {
+>  	struct file *filp;
+>  	gfp_t gfp = lo->old_gfp_mask;
+> @@ -1104,9 +1104,19 @@ static void __loop_clr_fd(struct loop_device *lo)
+>  	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
+>  	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
+>  	 * lo->lo_state has changed while waiting for lo->lo_mutex.
+> +	 *
+> +	 * However, if somebody called "open()" after lo->lo_state became
+> +	 * Lo_rundown, we should abort rundown in order to avoid unexpected
+> +	 * I/O error.
+>  	 */
+>  	mutex_lock(&lo->lo_mutex);
+>  	BUG_ON(lo->lo_state != Lo_rundown);
+> +	if (atomic_read(&lo->lo_refcnt) != expected_refcnt) {
+> +		lo->lo_state = Lo_bound;
+> +		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+> +		mutex_unlock(&lo->lo_mutex);
+> +		return false;
+> +	}
+>  	mutex_unlock(&lo->lo_mutex);
 
-On client side, the device is a network device. There is no reason
-to set rotational even-if the target device on server is rotational.
+Yeah, but as I wrote in my email, I don't think this is needed anymore (and
+I even think it would be counterproductive). There can be new opens
+happening before __loop_clr_fd() but any ioctl querying loop device state
+will return error due to lo->lo_state == Lo_rundown. So from userspace POV
+the loop device is already invalidated.
 
-Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
----
- drivers/block/rnbd/rnbd-clt.c   | 11 ++++++-----
- drivers/block/rnbd/rnbd-clt.h   |  1 -
- drivers/block/rnbd/rnbd-proto.h |  4 ++--
- drivers/block/rnbd/rnbd-srv.c   |  1 -
- 4 files changed, 8 insertions(+), 9 deletions(-)
+> > Currently, we may hold both. With your async patch we hold only lo_mutex.
+> > Now that I better understand the nature of the deadlock, I agree that
+> > holding either still creates the deadlock possibility because both are
+> > acquired on loop device open. But now that I reminded myself the lo_state
+> > handling, I think the following should be safe in __loop_clr_fd:
+> > 
+> > 	/* Just a safety check... */
+> > 	if (WARN_ON_ONCE(data_race(lo->lo_state) != Lo_rundown))
+> > 		return -ENXIO;
+> > 
+> 
+> this is still racy, for somebody can reach lo_open() right after this check.
 
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 8c24d3dfe35f..6ace401baf8a 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -87,7 +87,6 @@ static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
- 	dev->discard_granularity    = le32_to_cpu(rsp->discard_granularity);
- 	dev->discard_alignment	    = le32_to_cpu(rsp->discard_alignment);
- 	dev->secure_discard	    = le16_to_cpu(rsp->secure_discard);
--	dev->rotational		    = rsp->rotational;
- 	dev->wc			    = !!(rsp->cache_policy & RNBD_WRITEBACK);
- 	dev->fua		    = !!(rsp->cache_policy & RNBD_FUA);
- 
-@@ -1410,8 +1409,10 @@ static int rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
- 		dev->read_only = false;
- 	}
- 
--	if (!dev->rotational)
--		blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->queue);
-+	/*
-+	 * Network device does not need rotational
-+	 */
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->queue);
- 	err = add_disk(dev->gd);
- 	if (err)
- 		blk_cleanup_disk(dev->gd);
-@@ -1610,13 +1611,13 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
- 	}
- 
- 	rnbd_clt_info(dev,
--		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d, wc: %d, fua: %d)\n",
-+		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, wc: %d, fua: %d)\n",
- 		       dev->gd->disk_name, dev->nsectors,
- 		       dev->logical_block_size, dev->physical_block_size,
- 		       dev->max_write_same_sectors, dev->max_discard_sectors,
- 		       dev->discard_granularity, dev->discard_alignment,
- 		       dev->secure_discard, dev->max_segments,
--		       dev->max_hw_sectors, dev->rotational, dev->wc, dev->fua);
-+		       dev->max_hw_sectors, dev->wc, dev->fua);
- 
- 	mutex_unlock(&dev->lock);
- 	rnbd_clt_put_sess(sess);
-diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-index 9ef8c4f306f2..715e616b8a91 100644
---- a/drivers/block/rnbd/rnbd-clt.h
-+++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -118,7 +118,6 @@ struct rnbd_clt_dev {
- 	enum rnbd_access_mode	access_mode;
- 	u32			nr_poll_queues;
- 	bool			read_only;
--	bool			rotational;
- 	bool			wc;
- 	bool			fua;
- 	u32			max_hw_sectors;
-diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
-index de5d5a8df81d..c4a68b3a1cbe 100644
---- a/drivers/block/rnbd/rnbd-proto.h
-+++ b/drivers/block/rnbd/rnbd-proto.h
-@@ -128,7 +128,7 @@ enum rnbd_cache_policy {
-  * @logical_block_size: logical block size device supports in bytes
-  * @max_segments:	max segments hardware support in one transfer
-  * @secure_discard:	supports secure discard
-- * @rotation:		is a rotational disc?
-+ * @obsolete_rotational: obsolete, not in used.
-  * @cache_policy: 	support write-back caching or FUA?
-  */
- struct rnbd_msg_open_rsp {
-@@ -144,7 +144,7 @@ struct rnbd_msg_open_rsp {
- 	__le16			logical_block_size;
- 	__le16			max_segments;
- 	__le16			secure_discard;
--	u8			rotational;
-+	u8			obsolete_rotational;
- 	u8			cache_policy;
- 	u8			reserved[10];
- };
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index aafecfe97055..4f5d919f3760 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -568,7 +568,6 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
- 		cpu_to_le32(rnbd_dev_get_discard_alignment(rnbd_dev));
- 	rsp->secure_discard =
- 		cpu_to_le16(rnbd_dev_get_secure_discard(rnbd_dev));
--	rsp->rotational = !blk_queue_nonrot(q);
- 	rsp->cache_policy = 0;
- 	if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))
- 		rsp->cache_policy |= RNBD_WRITEBACK;
+Yes, somebody can open but he cannot change lo->lo_state. Also this should
+be just a safety check. We should never reach __loop_clr_fd() with
+different lo_state.
+
+> Anyway, since the problem that umount() immediately after close() (reported by
+> kernel test robot) remains, we need to make sure that __loop_clr_fd() completes
+> before close() returns to user mode.
+
+I agree with this. But using task_work for __loop_clr_fd() is enough for
+that. I was just arguing that we don't need extra waiting in lo_open().
+
+								Honza
 -- 
-2.25.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
