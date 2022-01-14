@@ -2,180 +2,443 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0381C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 12:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4533FC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 14 Jan 2022 15:50:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241025AbiANMZf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Jan 2022 07:25:35 -0500
-Received: from mx0a-002e3701.pphosted.com ([148.163.147.86]:50222 "EHLO
-        mx0a-002e3701.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241006AbiANMZe (ORCPT
+        id S242928AbiANPu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Jan 2022 10:50:58 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:62575 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235921AbiANPu5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Jan 2022 07:25:34 -0500
-Received: from pps.filterd (m0150242.ppops.net [127.0.0.1])
-        by mx0a-002e3701.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20EB225C030603;
-        Fri, 14 Jan 2022 12:25:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=pps0720;
- bh=5Ok6r7sWEPHUSgc0E2ZQY3UE23UHLMe4GOzvathj0J4=;
- b=Uo1adbEMWk1TIR7/sNW+yQl5aTbSh7exAsriq5n0H7eDY0nKliaNxoQ8H5Q2e8Jf2irB
- sFfJvI4i84jQKKhgMFdJ9q2xKza/IBzuCJw7ECFbNBe/6zLPdUETLvYB2wSI659xTExh
- HDvPmeASrcIWE5Ev8QHX58QmJtIQkzqA0e00rs2LcO3Ns5xPqULkh8r2M4aaHLpj6DFQ
- TU9cC/qF7cKG78t500JVoHl+6wyIksj9okTqPm5PJmmrNQQhZ3hU7GEt64bAcfQQqu0P
- iMApfd3LWafOE60aqTrcknIYg5xLE3tEy5BQ/BfNRDmNkPrwjYZhBCM1Hg1VlIqKWJBB mA== 
-Received: from g4t3426.houston.hpe.com (g4t3426.houston.hpe.com [15.241.140.75])
-        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3dk25uaw7v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Jan 2022 12:25:20 +0000
-Received: from G9W8454.americas.hpqcorp.net (exchangepmrr1.us.hpecorp.net [16.216.161.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by g4t3426.houston.hpe.com (Postfix) with ESMTPS id B7B6959;
-        Fri, 14 Jan 2022 12:25:19 +0000 (UTC)
-Received: from G4W9121.americas.hpqcorp.net (2002:10d2:1510::10d2:1510) by
- G9W8454.americas.hpqcorp.net (2002:10d8:a104::10d8:a104) with Microsoft SMTP
- Server (TLS) id 15.0.1497.23; Fri, 14 Jan 2022 12:25:19 +0000
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (15.241.52.13) by
- G4W9121.americas.hpqcorp.net (16.210.21.16) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23 via Frontend Transport; Fri, 14 Jan 2022 12:25:19 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cgELr2JHr3r/lwC4EdhD3+3hlwMHgtpL9Ya+xh8cxb+sbJsGuQEHSdCpoM+IAPckhP/9ssSIelQkJ0+VLGnFzAlTKbjufsfjpjdMcRi5egizM3xJYYX2pPJ3oafdssBsf4KTOPEvox7C0uJBJlqUnoDZg2/oCh3Urz1ZSFM2jxD75c2RImgvoo/pq1lfusicU2NN5COzAC51NL2qxcTymnMQFzYOPK6RaoYuTN5pq5ilE3kZXxXVVXlL/MO3UsKZLgJ7H2Yl/TDkk4c6KZWsJetHSJYJV7Ntv4pY/bpBu7YB6qzdacZbKyTMhcilFliyTU071bjyq2xWoWUUISeBjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5Ok6r7sWEPHUSgc0E2ZQY3UE23UHLMe4GOzvathj0J4=;
- b=XsCegXRde2ZlqIXFw9qRKnw7GUtn8O4V/30pUYMK53VqGI1vqQsNkD+sR+JEiykihcl/qRYwsPi2+xgQSGyOPlWe2WGAL6QucLqB5FK079eIWkr79oZpYNJhoi2x7wiIeTSvDIzqztyJ6vWy0n2iJFFaQKxUhBCjLjDsYgy2XOsBdinGYqdCESurgoekR/DM+iorPVZuVtt1dPGcVwCmihVRKWK36dtfEhIreJdulck1/KAvkOAGNDTHdvIFu2JdDDC3ePbMe+ppfBYYGpekxLnsGal1zibliUEH83gJlkSc2PLF3zAmgkv5yz1ZFrZOkPbX6oOgILCb93sOffdmIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from PH7PR84MB1910.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:155::13)
- by DM4PR84MB1687.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:4a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.9; Fri, 14 Jan
- 2022 12:25:18 +0000
-Received: from PH7PR84MB1910.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::1115:5407:b4fb:9e10]) by PH7PR84MB1910.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::1115:5407:b4fb:9e10%5]) with mapi id 15.20.4888.012; Fri, 14 Jan 2022
- 12:25:18 +0000
-From:   "Lyashkov, Alexey" <alexey.lyashkov@hpe.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-CC:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH 0/1] t10-pi bio split fix
-Thread-Topic: [PATCH 0/1] t10-pi bio split fix
-Thread-Index: AQHX9ae9F1LvItF/X0quij8FY4R836w7kj8egAY1AgCACJX2AIAWxvkAgABgx9yAAUWXgA==
-Date:   Fri, 14 Jan 2022 12:25:17 +0000
-Message-ID: <1B10E639-BD16-4B3B-B6BA-9F5F8DE73982@hpe.com>
-References: <20211220134422.1045336-1-alexey.lyashkov@hpe.com>
- <yq1wnjzi6oc.fsf@ca-mkp.ca.oracle.com>
- <82F812AE-BEFA-4F57-A134-C1EED7F1928E@hpe.com>
- <b16b20d3-fd5e-ce5c-f744-be5022b4156f@opensource.wdc.com>
- <71B870D7-16B9-4299-ACB0-F4B6D5188C70@hpe.com>
- <yq1k0f3pg4y.fsf@ca-mkp.ca.oracle.com>
-In-Reply-To: <yq1k0f3pg4y.fsf@ca-mkp.ca.oracle.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e40e6edb-d393-4465-d59b-08d9d758ece6
-x-ms-traffictypediagnostic: DM4PR84MB1687:EE_
-x-microsoft-antispam-prvs: <DM4PR84MB1687953D8DCE842EA80F8BBEF7549@DM4PR84MB1687.NAMPRD84.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: K/lNyIpgqJW9YdRRjV9cXxAqMokeIn15p0OgGRfK2ARjS5voKIqTpejxbzlSPFLHA9Tat7gFj5HcSF0QZPzltqInKEkk6oaduhOb9BPOXypxFjZZdsMcoL7zNMrn4xhlcQBbrJiDVpnZ7ZYnsJE7YKsJ+tpQNil9Kv8gLJinqcrbh2tS6onc5ht/jFU6F5LY7+Qvv4T4kKZPIME5t8u0I8PZxzev9TGmodHsUHot6x/zV1obekvgawCrQBgP+c+DofpRi6fdcyQkfG29kwAGT+smOAHYO8WH6S114JjoO7xamINU4FZUtI+9ZiiF9eVms3nv35CrENw7eb5j/4DWhA7OwLHf/WZCZqDtjijH4zU9xuaoKpLDerMHSoAaX5sRrJxV3YBgu7EJ0LTuk5ErKAXQURgSP4AapbAqQRJyTKH/I6YvCRsNtunN55sHdCX+8F1MfNSKs+FOGo+HxdYmkLd4aB1cHUyZLSu+6HVyktwuetoSVatW7t9hK89ZAU6qxVjIkhm+mQNIEcwblM4ZS263DzQ3KjM6Z4gYimx8+tg+DemUKlupy52EEfj/2COy8Qc4wvWy6mmgTx56uRasaRv47DtBUx5uKfs98m41DYzquJfQnipLbL3owmcW5XWU0izU0DMk58SnGbnYxHwmovS+v3DG1K2kI6SnLs1VIIeYN9sNVHibkJuzxsX2446Kd42/HWtsYXe3um1DKYklgfaMOUXE2qhaxCYtrVRm8s8LHwavQVZ9UlhbYbR1JhRd
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR84MB1910.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(366004)(26005)(71200400001)(82960400001)(8676002)(2906002)(6512007)(186003)(122000001)(83380400001)(8936002)(6506007)(33656002)(38100700002)(66946007)(5660300002)(54906003)(6486002)(316002)(2616005)(86362001)(66556008)(66446008)(64756008)(38070700005)(91956017)(76116006)(4326008)(66476007)(6916009)(4744005)(36756003)(508600001)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VjdyRXRETHJMZUV1ZlcvUitiMnpuR3dxZEJ6amN4R3dINnNXakU0T2FaRkw5?=
- =?utf-8?B?SDJRNjAzL1Z5cnh6OFBKOC9KbXF1UllwZkg5d0kzMFd6UGNZeHBhQms5ZlhD?=
- =?utf-8?B?RlhUMHc0SE9zWTBPTlVxNEJDa2p3SXUrbHkvM2tpazZQcG0vT0dydFBBSkV0?=
- =?utf-8?B?OHpGQUJwNG5WeFR3RTZWSWtkM3l6SnRES1RiUk9vaFQyVys0V01xWjNhTDNW?=
- =?utf-8?B?Szc5bFBHaS9SeVhRb29RT3RjNFdSWk5mb2NLSWFpVGUvTGVvZTAyemhKYXdw?=
- =?utf-8?B?TUJuWnJGUWVVNS9ndnU5WFRmM1gxbUNYazdkYWl2c0MrNU14QXN3SnBJa2ZJ?=
- =?utf-8?B?R0hSbDVNcUZVaDdzQXRnTTlCZjJhV3FIYzdRNnZPTi9mZmd0QTRRL3FDMGJQ?=
- =?utf-8?B?aXpsTnN0RlZ2WXB3WWFjc1d6emJkMzBnd0lBY0psaXU4OGhtZlJ1b0l3eGg3?=
- =?utf-8?B?SG5iOHBCdyt0bjZaeUh4RStqMFUyMzhuY3F3TjhHSjQ3UHFBeEozSDZnbHcy?=
- =?utf-8?B?RGJlRGdpTkh4Vk1mMUdGVGNvdGsrT1oySkM0bW5uSkI2MkVhTmNhbFAydXZH?=
- =?utf-8?B?YVFiT3VxVmUyTE83cU9jSW5aOGpCTlJMK1p3WkYwOVRFb2pQQTZ5dk55eWtx?=
- =?utf-8?B?dWNHWGtNbkZNbHFZclVOYUMxVFJEUWtlY0FUT3YzcHpQdDRZRmxrd1Q1VGJl?=
- =?utf-8?B?UGs2MHpXL2dnRXdXcDQvQWI5eEw0SjZPYmIraFJYWFk5WmQvc3dyVkJ6ZWxE?=
- =?utf-8?B?YXhCTHNwL0htdVp6OFZPUkwySitUdHVLcUI0T2xnOVplT0FnMDF6Q1VvNE5Z?=
- =?utf-8?B?bEg4SVB1V1RNZ0lTQklQWm1oZVNDblh5WnU5cC9Qc1NyRS9UZTV4VmtRL2Vh?=
- =?utf-8?B?K0Q2R2N6MURZVTBtUWdXeHgzZnMyNEUrY0hBV1owUjdJaUV5YWVVb2VKR2FP?=
- =?utf-8?B?RDJmb1pVYlhvUll4TnRMNHJKdEZQN2Y3Y0xGK0tzSkR2V1JwbENReTBQdS84?=
- =?utf-8?B?UzA3VHRXYU51bzBNb2NHcVo1ajUvQ2duNjRqbWhVZDQ5SXpUVEI1NFkreEg5?=
- =?utf-8?B?VWtVYVl6b1VxOG5ZVWRmNFFEVjh4TUZBUUQzVW5xRUxOMmVtYkhjT2lyd2hy?=
- =?utf-8?B?cTVyaUlHMXp1bmRnWURnNFU0Q2c5N0hFMGZrSFo2YkgrMzZRcFVTcHlHeGk0?=
- =?utf-8?B?ODExY0gweUZiZGtsYUVoNllXSC8zQ0EzUmtZbEhGV01ueWlMaGJEVHlWSEx1?=
- =?utf-8?B?N1dmVzRiK0lUS1ZOd1FKd2pDdnV1dmNZWnllUnFWQWNtS0tSMW1rNWtrWDd6?=
- =?utf-8?B?WGdFVngrTkRqRGJTQXMyN2JsVGRiM0VjTkRUNTkydjlkL2tLOTVveVRVUWhD?=
- =?utf-8?B?UzhINGNKWWVTSnFUYThSV3BsU3NxV0gzTGwvTURRUitkUVRiVkdnSkVkWDQ0?=
- =?utf-8?B?UkV2SC93UGZ3ZVZJdUgwMVJXb1htelRrN3pRd2UwY0VsWWFzaVZJczlDYUox?=
- =?utf-8?B?QTFuWEhjWGxPenp6OUFNYklPcDNuVjM3Q3VpUHF5cXRVOVY4M1l1bEZRVEph?=
- =?utf-8?B?Nk9Cclp2YlZ0SkF0V2NMdkZyNFA4Wkx5eGF4bVVKVysxZG13V2UwTEE3emJx?=
- =?utf-8?B?Rno3L2xiOUdFQjVWdXVxOU1Kb1p3NWFmVUE3djNuc0FMOHB3YlN6UEtvOXZJ?=
- =?utf-8?B?bytwVk96b09SU3ZZRk9DSjZiNndteWw5dzhPRHcxSzM1U1MrcE02SDA5cEVR?=
- =?utf-8?B?RHlHWDI2NEhjMEpHbGdlNFFTRm04dVJwd3VWTUNWUUNEZ1dsOVpFdloxMWMr?=
- =?utf-8?B?TlZ2T0ZNb2gvczRPVWJaL2JRVHAxOFloRzBLM2lyMm5wTUxTSlMvTzI2ZUc5?=
- =?utf-8?B?QVpWWFAwbjgwSnJjY2xWQTNFMU9Ka20vSkg1MVY0YTI3cHQzNnA2MDhjY0dJ?=
- =?utf-8?B?YW1QVFV0RkhlUjhVT01jT0lpMTRrUHdtamVjZWxzQXBNajJIcUxYRWJhOTdT?=
- =?utf-8?B?N3Rma29NYldGdlBjb1BSS2R4WExWSHR4RW1vZGh1QVVJU093NmJVNEVhT3ho?=
- =?utf-8?B?N00xSlZSbnRDVUhld1cxMHIxUEtrbWRhNGdhdlNlQVB6S0hLV0NUWnY3M3JK?=
- =?utf-8?B?cGszblIxdElNcTBaQWFCWk5HRXF2UnRjSGtMVlErc2JSZDdQTEJ1L1BwdENk?=
- =?utf-8?Q?26HcqvYFd2NbyEjrXMxO67Y=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <95C6740F75218E4FB28CF3A1302F6883@NAMPRD84.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+        Fri, 14 Jan 2022 10:50:57 -0500
+Received: from fsav414.sakura.ne.jp (fsav414.sakura.ne.jp [133.242.250.113])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20EFoaXM052784;
+        Sat, 15 Jan 2022 00:50:36 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav414.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp);
+ Sat, 15 Jan 2022 00:50:36 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20EFoYnL052776
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 15 Jan 2022 00:50:35 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <f893638a-2109-c197-9783-c5e6dced23e5@I-love.SAKURA.ne.jp>
+Date:   Sat, 15 Jan 2022 00:50:32 +0900
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR84MB1910.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: e40e6edb-d393-4465-d59b-08d9d758ece6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jan 2022 12:25:17.9562
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zVsGysCZkSf3hZdJIFUtzbYmDI+daPQ6sXUAJwVgQ1jh4L1wg3kJteHPmuCIiJtyyg9HB2b0UhbPLUBKifmhVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR84MB1687
-X-OriginatorOrg: hpe.com
-X-Proofpoint-GUID: 2aCC_xika5GPj-pQ05iGp297fPPUkkEQ
-X-Proofpoint-ORIG-GUID: 2aCC_xika5GPj-pQ05iGp297fPPUkkEQ
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-14_04,2022-01-14_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- spamscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 phishscore=0
- bulkscore=0 impostorscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2201140082
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
+ <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+ <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+ <20220110134234.qebxn5gghqupsc7t@quack3.lan>
+ <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
+ <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
+ <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TWFydGluLA0KDQpJIHdpbGwgdGVzdCBzaG9ydGx5LiBCdXQgaXQgbWVhbiBiaV9zZWN0b3Igd2ls
-bCBiZSBpbiB0aGUgaW50ZWdyaXR5IGludGVydmFsIHVuaXRzIHdoaWxlIA0KYW55IHNlY3RvcnMg
-ZXhwZWN0ZWQgdG8gYmUgaW4gdGhlIFNFQ1RPUl9TSVpFIHVuaXRzIGFuZCBpdCBjb25mdXNlIHdo
-aWxlIGRlYnVnLg0KDQpBbGV4DQoNCu+7v09uIDEzLzAxLzIwMjIsIDIyOjU5LCAiTWFydGluIEsu
-IFBldGVyc2VuIiA8bWFydGluLnBldGVyc2VuQG9yYWNsZS5jb20+IHdyb3RlOg0KDQoNCiAgICBB
-bGV4ZXksDQoNCiAgICA+IFBpbmcgZm9yIHJldmlldy4NCg0KICAgIENhbiB5b3UgcGxlYXNlIHRy
-eSB0aGUgZm9sbG93aW5nIHBhdGNoPw0KDQogICAgLS0gDQogICAgTWFydGluIEsuIFBldGVyc2Vu
-CU9yYWNsZSBMaW51eCBFbmdpbmVlcmluZw0KDQogICAgZGlmZiAtLWdpdCBhL2Jsb2NrL2Jpby1p
-bnRlZ3JpdHkuYyBiL2Jsb2NrL2Jpby1pbnRlZ3JpdHkuYw0KICAgIGluZGV4IGMwZWI5MDEzMTVm
-OS4uZmE1YmM1YjEzYzZhIDEwMDY0NA0KICAgIC0tLSBhL2Jsb2NrL2Jpby1pbnRlZ3JpdHkuYw0K
-ICAgICsrKyBiL2Jsb2NrL2Jpby1pbnRlZ3JpdHkuYw0KICAgIEBAIC0zODcsNyArMzg3LDcgQEAg
-dm9pZCBiaW9faW50ZWdyaXR5X2FkdmFuY2Uoc3RydWN0IGJpbyAqYmlvLCB1bnNpZ25lZCBpbnQg
-Ynl0ZXNfZG9uZSkNCiAgICAgCXN0cnVjdCBibGtfaW50ZWdyaXR5ICpiaSA9IGJsa19nZXRfaW50
-ZWdyaXR5KGJpby0+YmlfZGlzayk7DQogICAgIAl1bnNpZ25lZCBieXRlcyA9IGJpb19pbnRlZ3Jp
-dHlfYnl0ZXMoYmksIGJ5dGVzX2RvbmUgPj4gOSk7DQoNCiAgICAtCWJpcC0+YmlwX2l0ZXIuYmlf
-c2VjdG9yICs9IGJ5dGVzX2RvbmUgPj4gOTsNCiAgICArCWJpcC0+YmlwX2l0ZXIuYmlfc2VjdG9y
-ICs9IGJpb19pbnRlZ3JpdHlfaW50ZXJ2YWxzKGJpLCBieXRlc19kb25lID4+IDkpOw0KICAgICAJ
-YnZlY19pdGVyX2FkdmFuY2UoYmlwLT5iaXBfdmVjLCAmYmlwLT5iaXBfaXRlciwgYnl0ZXMpOw0K
-ICAgICB9DQoNCg0K
+On 2022/01/13 19:44, Jan Kara wrote:
+> OK, so I think I understand the lockdep complaint better. Lockdep
+> essentially complains about the following scenario:
+> 
+> blkdev_put()
+>   lock disk->open_mutex
+>   lo_release
+>     __loop_clr_fd()
+>         |
+>         | wait for IO to complete
+>         v
+> loop worker
+>   write to backing file
+>     sb_start_write(file)
+>         |
+>         | wait for fs with backing file to unfreeze
+>         v
+> process holding fs frozen
+>   freeze_super()
+>         |
+>         | wait for remaining writers on the fs so that fs can be frozen
+>         v
+> sendfile()
+>   sb_start_write()
+>   do_splice_direct()
+>         |
+>         | blocked on read from /sys/power/resume, waiting for kernfs file
+>         | lock
+>         v
+> write() "/dev/loop0" (in whatever form) to /sys/power/resume
+>   calls blkdev_get_by_dev("/dev/loop0")
+>     lock disk->open_mutex => deadlock
+> 
+
+Then, not calling flush_workqueue() from destroy_workqueue() from __loop_clr_fd() will not help
+because the reason we did not need to call flush_workqueue() is that blk_mq_freeze_queue() waits
+until all "struct work_struct" which flush_workqueue() would have waited completes?
+
+If flush_workqueue() cannot complete because an I/O request cannot complete, blk_mq_freeze_queue()
+as well cannot complete because it waits for I/O requests which flush_workqueue() would have waited?
+
+Then, any attempt to revert commit 322c4293ecc58110 ("loop: make autoclear operation asynchronous")
+(e.g. https://lkml.kernel.org/r/4e7b711f-744b-3a78-39be-c9432a3cecd2@i-love.sakura.ne.jp ) cannot be
+used?
+
+Now that commit 322c4293ecc58110 already arrived at linux.git, we need to quickly send a fixup patch
+for these reported regressions. This "[PATCH v2 2/2] loop: use task_work for autoclear operation" did
+not address "if (lo->lo_state == Lo_bound) { }" part. If we address this part, something like below diff?
+
+----------------------------------------
+ drivers/block/loop.c |  158 ++++++++++++++++++++++++++++++++++++++-------------
+ drivers/block/loop.h |    1 
+ 2 files changed, 120 insertions(+), 39 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b1b05c45c07c..eb750602c94d 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -89,6 +89,8 @@
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_ctl_mutex);
+ static DEFINE_MUTEX(loop_validate_mutex);
++static DECLARE_WAIT_QUEUE_HEAD(loop_rundown_wait);
++static DEFINE_SPINLOCK(loop_open_spinlock);
+ 
+ /**
+  * loop_global_lock_killable() - take locks for safe loop_validate_file() test
+@@ -1172,33 +1174,10 @@ static void loop_rundown_completed(struct loop_device *lo)
+ 	mutex_lock(&lo->lo_mutex);
+ 	lo->lo_state = Lo_unbound;
+ 	mutex_unlock(&lo->lo_mutex);
++	wake_up_all(&loop_rundown_wait);
+ 	module_put(THIS_MODULE);
+ }
+ 
+-static void loop_rundown_workfn(struct work_struct *work)
+-{
+-	struct loop_device *lo = container_of(work, struct loop_device,
+-					      rundown_work);
+-	struct block_device *bdev = lo->lo_device;
+-	struct gendisk *disk = lo->lo_disk;
+-
+-	__loop_clr_fd(lo);
+-	kobject_put(&bdev->bd_device.kobj);
+-	module_put(disk->fops->owner);
+-	loop_rundown_completed(lo);
+-}
+-
+-static void loop_schedule_rundown(struct loop_device *lo)
+-{
+-	struct block_device *bdev = lo->lo_device;
+-	struct gendisk *disk = lo->lo_disk;
+-
+-	__module_get(disk->fops->owner);
+-	kobject_get(&bdev->bd_device.kobj);
+-	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
+-	queue_work(system_long_wq, &lo->rundown_work);
+-}
+-
+ static int loop_clr_fd(struct loop_device *lo)
+ {
+ 	int err;
+@@ -1721,30 +1700,91 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ }
+ #endif
+ 
++struct loop_rundown_waiter {
++	struct callback_head callback;
++	struct loop_device *lo;
++};
++
++static void loop_rundown_waiter_callbackfn(struct callback_head *callback)
++{
++	struct loop_rundown_waiter *lrw =
++		container_of(callback, struct loop_rundown_waiter, callback);
++
++	/*
++	 * Locklessly wait for completion of __loop_clr_fd().
++	 * This should be safe because of the following rules.
++	 *
++	 *  (a) From locking dependency perspective, this function is called
++	 *      without any locks held.
++	 *  (b) From execution ordering perspective, this function is called
++	 *      by the moment lo_open() from open() syscall returns to user
++	 *      mode.
++	 *  (c) From use-after-free protection perspective, this function is
++	 *      called before loop_remove() is called, for lo->lo_refcnt taken
++	 *      by lo_open() prevents loop_control_remove() and loop_exit().
++	 */
++	wait_event_killable(loop_rundown_wait, data_race(lrw->lo->lo_state) != Lo_rundown);
++	kfree(lrw);
++}
++
+ static int lo_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct loop_device *lo = bdev->bd_disk->private_data;
+-	int err;
++	int err = 0;
+ 
+-	err = mutex_lock_killable(&lo->lo_mutex);
+-	if (err)
+-		return err;
+-	if (lo->lo_state == Lo_deleting)
++	/*
++	 * Avoid creating disk->open_mutex => lo->lo_mutex locking chain, for
++	 * calling blk_mq_freeze_queue() with lo->lo_mutex held will form a
++	 * circular locking dependency chain due to waiting for I/O requests
++	 * to complete.
++	 */
++	spin_lock(&loop_open_spinlock);
++	/*
++	 * Since the purpose of lo_open() is to protect this loop device from
++	 * entering Lo_rundown or Lo_deleting state, only serialization against
++	 * loop_control_remove() is sufficient.
++	 */
++	if (data_race(lo->lo_state) == Lo_deleting)
+ 		err = -ENXIO;
+ 	else
+ 		atomic_inc(&lo->lo_refcnt);
+-	mutex_unlock(&lo->lo_mutex);
++	spin_unlock(&loop_open_spinlock);
++	/*
++	 * But loop_clr_fd() or __lo_release() might have already set this loop
++	 * device to Lo_rundown state. Since accessing Lo_rundown loop device
++	 * confuses userspace programs, try to wait for __loop_clr_fd() to
++	 * complete without disk->open_mutex held.
++	 */
++	if (!err && !(current->flags & PF_KTHREAD)) {
++		struct loop_rundown_waiter *lrw =
++			kmalloc(sizeof(*lrw), GFP_KERNEL | __GFP_NOFAIL);
++
++		init_task_work(&lrw->callback, loop_rundown_waiter_callbackfn);
++		lrw->lo = lo;
++		if (task_work_add(current, &lrw->callback, TWA_RESUME))
++			kfree(lrw);
++	}
+ 	return err;
+ }
+ 
+-static void lo_release(struct gendisk *disk, fmode_t mode)
++struct loop_release_trigger {
++	union {
++		struct work_struct   work;
++		struct callback_head callback;
++	};
++	struct loop_device *lo;
++};
++
++/* Perform actual creanup if nobody is using this loop device. */
++static void __lo_release(struct loop_release_trigger *lrt)
+ {
+-	struct loop_device *lo = disk->private_data;
++	struct loop_device *lo = lrt->lo;
++	struct gendisk *disk = lo->lo_disk;
++	bool cleared = false;
+ 
+ 	mutex_lock(&lo->lo_mutex);
+-	if (atomic_dec_return(&lo->lo_refcnt))
++	if (atomic_read(&lo->lo_refcnt))
+ 		goto out_unlock;
+-
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+ 		if (lo->lo_state != Lo_bound)
+ 			goto out_unlock;
+@@ -1754,8 +1794,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		loop_schedule_rundown(lo);
+-		return;
++		__loop_clr_fd(lo);
++		cleared = true;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
+ 		 * Otherwise keep thread (if running) and config,
+@@ -1764,9 +1804,48 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		blk_mq_freeze_queue(lo->lo_queue);
+ 		blk_mq_unfreeze_queue(lo->lo_queue);
+ 	}
++ out_unlock:
++	if (!cleared)
++		mutex_unlock(&lo->lo_mutex);
++	module_put(disk->fops->owner);
++	if (cleared)
++		loop_rundown_completed(lo);
++}
+ 
+-out_unlock:
+-	mutex_unlock(&lo->lo_mutex);
++static void loop_release_callbackfn(struct callback_head *callback)
++{
++	__lo_release(container_of(callback, struct loop_release_trigger,
++				  callback));
++}
++
++static void loop_release_workfn(struct work_struct *work)
++{
++	__lo_release(container_of(work, struct loop_release_trigger, work));
++}
++
++static void lo_release(struct gendisk *disk, fmode_t mode)
++{
++	struct loop_device *lo = disk->private_data;
++	struct loop_release_trigger *lrt;
++
++	if (atomic_dec_return(&lo->lo_refcnt))
++		return;
++	/*
++	 * In order to avoid waiting for I/O requests to complete under
++	 * disk->open_mutex held, defer actual clreanup to __lo_release().
++	 * Prefer task work context if possible in order to make sure that
++	 * __lo_release() completes before close() returns to user mode,
++	 */
++	lrt = kmalloc(sizeof(*lrt), GFP_KERNEL | __GFP_NOFAIL);
++	lrt->lo = lo;
++	__module_get(disk->fops->owner);
++	if (!(current->flags & PF_KTHREAD)) {
++		init_task_work(&lrt->callback, loop_release_callbackfn);
++		if (!task_work_add(current, &lrt->callback, TWA_RESUME))
++			return;
++	}
++	INIT_WORK(&lrt->work, loop_release_workfn);
++	queue_work(system_long_wq, &lrt->work);
+ }
+ 
+ static const struct block_device_operations lo_fops = {
+@@ -2119,14 +2198,17 @@ static int loop_control_remove(int idx)
+ 	ret = mutex_lock_killable(&lo->lo_mutex);
+ 	if (ret)
+ 		goto mark_visible;
++	spin_lock(&loop_open_spinlock);
+ 	if (lo->lo_state != Lo_unbound ||
+ 	    atomic_read(&lo->lo_refcnt) > 0) {
++		spin_unlock(&loop_open_spinlock);
+ 		mutex_unlock(&lo->lo_mutex);
+ 		ret = -EBUSY;
+ 		goto mark_visible;
+ 	}
+ 	/* Mark this loop device no longer open()-able. */
+ 	lo->lo_state = Lo_deleting;
++	spin_unlock(&loop_open_spinlock);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+ 	loop_remove(lo);
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index 918a7a2dc025..082d4b6bfc6a 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -56,7 +56,6 @@ struct loop_device {
+ 	struct gendisk		*lo_disk;
+ 	struct mutex		lo_mutex;
+ 	bool			idr_visible;
+-	struct work_struct      rundown_work;
+ };
+ 
+ struct loop_cmd {
+----------------------------------------
+
+This diff avoids disk->open_mutex => lo->lo_mutex chain.
+
+ffffffff84a06140 OPS:    7944 FD:  305 BD:    4 +.+.: &disk->open_mutex
+ -> [ffffffffa0158a48] sd_ref_mutex
+ -> [ffffffff831be200] fs_reclaim
+ -> [ffffffff849d7ee0] &n->list_lock
+ -> [ffffffff8332ce18] depot_lock
+ -> [ffffffff8312d508] tk_core.seq.seqcount
+ -> [ffffffff84a06940] &obj_hash[i].lock
+ -> [ffffffff84a05680] &hctx->lock
+ -> [ffffffff84a05620] &x->wait#20
+ -> [ffffffff849c10e0] &base->lock
+ -> [ffffffff83d93000] &rq->__lock
+ -> [ffffffff849c1060] (&timer.timer)
+ -> [ffff88811ac44b48] lock#2
+ -> [ffffffff849cebe0] &____s->seqcount
+ -> [ffffffff84a05420] &q->sysfs_dir_lock
+ -> [ffffffff84a04980] &bdev->bd_size_lock
+ -> [ffffffff831bcdd8] free_vmap_area_lock
+ -> [ffffffff831bcd78] vmap_area_lock
+ -> [ffffffff849e5900] &xa->xa_lock#3
+ -> [ffff88811ac44390] lock#6
+ -> [ffffffff849e58f0] &mapping->private_lock
+ -> [ffffffff84a06740] &dd->lock
+ -> [ffffffff82ef8d78] (console_sem).lock
+ -> [ffffffff83307c28] &sb->s_type->i_lock_key#3
+ -> [ffffffff849e2420] &s->s_inode_list_lock
+ -> [ffffffff831a9f68] pcpu_alloc_mutex
+ -> [ffffffff84b8dd60] &x->wait#9
+ -> [ffffffff84b77980] &k->list_lock
+ -> [ffff88811ac45780] lock#3
+ -> [ffffffff849ea3e0] &root->kernfs_rwsem
+ -> [ffffffff8335b830] bus_type_sem
+ -> [ffffffff8321b1b8] sysfs_symlink_target_lock
+ -> [ffffffff84b8d7c0] &dev->power.lock
+ -> [ffffffff833e2e28] dpm_list_mtx
+ -> [ffffffff833e03b8] req_lock
+ -> [ffffffff83d8e820] &p->pi_lock
+ -> [ffffffff84b8dbc0] &x->wait#10
+ -> [ffffffff84b77960] &k->k_lock
+ -> [ffffffff84a06180] subsys mutex#48
+ -> [ffffffff84a061a0] &xa->xa_lock#5
+ -> [ffffffff82e14698] inode_hash_lock
+ -> [ffffffff831bcf98] purge_vmap_area_lock
+ -> [ffffffff849cd420] &lruvec->lru_lock
+ -> [ffffffff849ccec0] &folio_wait_table[i]
+ -> [ffffffff83410a68] sr_ref_mutex
+ -> [ffffffff84a06240] &ev->block_mutex
+ -> [ffffffff84a06220] &ev->lock
+ -> [ffffffff831e7398] sb_lock
+ -> [ffffffff84b8f280] &cd->lock
+ -> [ffffffff82ea6878] pgd_lock
+ -> [ffffffff82e14758] bdev_lock
+ -> [ffffffff849ce0e0] &wb->list_lock
+ -> [ffffffffa04b9378] loop_open_spinlock
+ -> [ffffffff83d8e800] &____s->seqcount#2
+ -> [ffffffff849c0b00] rcu_node_0
+ -> [ffffffff83d94320] &lock->wait_lock
+
+ffffffffa04b90c0 OPS:    3257 FD:  280 BD:    1 +.+.: &lo->lo_mutex
+ -> [ffffffff831be200] fs_reclaim
+ -> [ffffffff849d7ee0] &n->list_lock
+ -> [ffffffff8332ce18] depot_lock
+ -> [ffffffff82ec1450] cpu_hotplug_lock
+ -> [ffffffff82ed3848] wq_pool_mutex
+ -> [ffffffff83330448] uevent_sock_mutex
+ -> [ffffffff84a06940] &obj_hash[i].lock
+ -> [ffffffff831e7398] sb_lock
+ -> [ffffffff83d8e800] &____s->seqcount#2
+ -> [ffff88811ac44b48] lock#2
+ -> [ffffffff849cebe0] &____s->seqcount
+ -> [ffff88811ac45780] lock#3
+ -> [ffffffff849ea3e0] &root->kernfs_rwsem
+ -> [ffffffff83d94330] &sem->wait_lock
+ -> [ffffffff83d8e820] &p->pi_lock
+ -> [ffffffff84a04980] &bdev->bd_size_lock
+ -> [ffffffff82ef8d78] (console_sem).lock
+ -> [ffffffff84a05480] &q->mq_freeze_lock
+ -> [ffffffff83322e18] percpu_ref_switch_lock
+ -> [ffffffff84a05460] &q->mq_freeze_wq
+ -> [ffffffff83d93000] &rq->__lock
+ -> [ffffffff831cf1a0] quarantine_lock
+ -> [ffffffff849e57a0] &dentry->d_lock
+ -> [ffffffff83d94320] &lock->wait_lock
+ -> [ffffffff83110f98] console_owner_lock
+
+I think lo_open() and lo_release() are doing too much things. I wish "struct block_device_operations"
+provides open() and release() callbacks without disk->open_mutex held...
+
