@@ -2,84 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97E8C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jan 2022 03:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF39FC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jan 2022 07:55:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236946AbiAQDdF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Jan 2022 22:33:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25951 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236944AbiAQDdF (ORCPT
+        id S237741AbiAQHzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jan 2022 02:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60556 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237740AbiAQHzj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Jan 2022 22:33:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642390384;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ccZ+oKNF9ScPDegB7MEDqYsfYM+gZw4I1frllwTtQlg=;
-        b=BbEzYp5N9wg/BkFE3jKS1/HPVpYoFnr3PUKZHpqk1sVhgqgZCKucHCZi5iXmDUz0CbXycH
-        A1T5w+OvB8s8sOEZO3seqapOLD0t2x3Sije+sL/74rYRZfdG/zr9u4stJ7ZGvpL9hnCLhk
-        57VeiBReXJmw/sZvKwMqnwO2Ri85Ciw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-494-CI-xJHTIODe8jFVZ-UQhiA-1; Sun, 16 Jan 2022 22:33:03 -0500
-X-MC-Unique: CI-xJHTIODe8jFVZ-UQhiA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2D51853026;
-        Mon, 17 Jan 2022 03:33:02 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44FED4BC57;
-        Mon, 17 Jan 2022 03:32:54 +0000 (UTC)
-Date:   Mon, 17 Jan 2022 11:32:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com
-Subject: Re: [PATCH] block: cleanup q->srcu
-Message-ID: <YeTjYU3KVeU1sstH@T590>
-References: <20220111123401.520192-1-ming.lei@redhat.com>
+        Mon, 17 Jan 2022 02:55:39 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD45C061574
+        for <linux-block@vger.kernel.org>; Sun, 16 Jan 2022 23:55:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=QJoKabHCJyjMHl+asLl43wZb7zsct5+NVbZkfh+AIdg=; b=CLTLapTtvfn+zeSUyRi67dv8eR
+        GAAr3QPmjQotElvNBw2fm87EZcnXjncqaNzNsJ4VdCzeucRpJAiyJ5MSYU02qBnKeA3TVCfi+igqV
+        bTSsCNu0dxzlwJw94z53paZrM+msCBtBaDkWVpEwSYc20q2nYXnGv2jaVl/yfO5mM//DFPjw+ndCE
+        VI1lNuVdN6mVI333ctG9/GWmtfxgVmNWBtNpVoEyYO8bJwuYSC7N1dFz66MmYO5NEEIfx4Eeh1bem
+        qV5mLkaAbdodMhzLey7ZwYfw6h3l1033STaYxMUq57Tvo2OzfVmyC0OALONnL6XRVZKTpEbqX7Toj
+        YlNwcgfw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n9MrV-00Dzst-1f; Mon, 17 Jan 2022 07:55:33 +0000
+Date:   Sun, 16 Jan 2022 23:55:33 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Luca Boccassi <bluca@debian.org>
+Cc:     dougmill@linux.vnet.ibm.com, jonathan.derrick@intel.com,
+        revanth.rajashekar@intel.com, linux-block@vger.kernel.org,
+        hch@infradead.org, sbauer@plzdonthack.me
+Subject: Re: [PATCH V2] block: sed-opal: Add ioctl to return device status
+Message-ID: <YeUg9QmITYUTqia3@infradead.org>
+References: <612795b5.tj7FMS9wzchsMzrK%dougmill@linux.vnet.ibm.com>
+ <93f6c52690fb84fc79cc634f451a5c5d52df6c5f.camel@debian.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220111123401.520192-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <93f6c52690fb84fc79cc634f451a5c5d52df6c5f.camel@debian.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 08:34:01PM +0800, Ming Lei wrote:
-> srcu structure has to be cleanup via cleanup_srcu_struct(), so fix it.
-> 
-> Reported-by: syzbot+4f789823c1abc5accf13@syzkaller.appspotmail.com
-> Fixes: 704b914f15fb ("blk-mq: move srcu from blk_mq_hw_ctx to request_queue")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-sysfs.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index e20eadfcf5c8..8d8549f71311 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -811,6 +811,9 @@ static void blk_release_queue(struct kobject *kobj)
->  
->  	bioset_exit(&q->bio_split);
->  
-> +	if (blk_queue_has_srcu(q))
-> +		cleanup_srcu_struct(q->srcu);
-> +
->  	ida_simple_remove(&blk_queue_ida, q->id);
->  	call_rcu(&q->rcu_head, blk_free_queue_rcu);
-
-Hello Jens,
-
-Can we make it into mainline to fix the recent syzbot report?
-
-
-Thanks,
-Ming
-
+Please resend the patch.
