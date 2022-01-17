@@ -2,157 +2,391 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 412B1C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jan 2022 11:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFA1C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jan 2022 14:10:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239177AbiAQLpR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:45:17 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:57358 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239176AbiAQLpR (ORCPT
+        id S233058AbiAQOKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jan 2022 09:10:39 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:49923 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230445AbiAQOKj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jan 2022 06:45:17 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id EE6F121136;
-        Mon, 17 Jan 2022 11:45:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1642419915; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yEDOB1b5QMEk+p74vrb6XllKv30Ay5OutaTSP81qrCo=;
-        b=K1uWdnIUz2AE1WRDiXx8eZpgHjU9aZavdJnyULEIaVCwhC764Lhvk7ATn6wNt2eO9SbIYo
-        eD5Sh+jS+Wtukw6lwuxlJO7y72Evosi2Hv6aB7fMSaz87Zbupuk9ipdl6VK+5+gykEuiW7
-        ObcPCQOBpoTS6VqA2ltDOfd3eqF5oZc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1642419915;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yEDOB1b5QMEk+p74vrb6XllKv30Ay5OutaTSP81qrCo=;
-        b=O7RrYlEPHfwJFtOq4t0gcMDjvp+tbyE28WUM9Rze0PbCtTrV5OATDHfqd6pEqz8KXLgoQq
-        rn+ykkpfbLUl90Bg==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id D172AA3B81;
-        Mon, 17 Jan 2022 11:45:15 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 15421A05E4; Mon, 17 Jan 2022 12:45:10 +0100 (CET)
-Date:   Mon, 17 Jan 2022 12:45:10 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/4 v4] bfq: Avoid use-after-free when moving processes
- between cgroups
-Message-ID: <20220117114510.x6yrhx4nlncso3vd@quack3.lan>
-References: <20220114164215.28972-1-jack@suse.cz>
- <9ee09c05-13c4-ec9d-5859-ed91dea39e13@huawei.com>
+        Mon, 17 Jan 2022 09:10:39 -0500
+Received: from fsav112.sakura.ne.jp (fsav112.sakura.ne.jp [27.133.134.239])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20HEADGG051216;
+        Mon, 17 Jan 2022 23:10:13 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav112.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp);
+ Mon, 17 Jan 2022 23:10:13 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20HEACQ7051210
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 17 Jan 2022 23:10:13 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <1c400c45-1427-6c8c-8053-a4e1e7e92b81@I-love.SAKURA.ne.jp>
+Date:   Mon, 17 Jan 2022 23:10:08 +0900
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="byygjjdi76ebnkrh"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9ee09c05-13c4-ec9d-5859-ed91dea39e13@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Jan Stancek <jstancek@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>
+References: <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
+ <20220110103057.h775jv2br2xr2l5k@quack3.lan>
+ <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
+ <20220110134234.qebxn5gghqupsc7t@quack3.lan>
+ <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
+ <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
+ <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
+ <f893638a-2109-c197-9783-c5e6dced23e5@I-love.SAKURA.ne.jp>
+ <20220114195840.kdzegicjx7uyscoq@quack3.lan>
+ <33f360ca-d3e1-7070-654e-26ef22109a61@I-love.SAKURA.ne.jp>
+ <20220117081554.GA22708@lst.de>
+ <cdaf1346-2885-f0da-8878-12264bd48348@I-love.SAKURA.ne.jp>
+In-Reply-To: <cdaf1346-2885-f0da-8878-12264bd48348@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---byygjjdi76ebnkrh
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-
-On Mon 17-01-22 16:13:09, yukuai (C) wrote:
-> 在 2022/01/15 1:01, Jan Kara 写道:
-> > Hello,
-> > 
-> > here is the third version of my patches to fix use-after-free issues in BFQ
-> > when processes with merged queues get moved to different cgroups. The patches
-> > have survived some beating in my test VM, but so far I fail to reproduce the
-> > original KASAN reports so testing from people who can reproduce them is most
-> > welcome. Kuai, can you please give these patches a run in your setup? Thanks
-> > a lot for your help with fixing this!
-> > 
-> > Changes since v3:
-> > * Changed handling of bfq group move to handle the case when target of the
-> >    merge has moved.
-> Hi, Jan
+On 2022/01/17 18:34, Tetsuo Handa wrote:
+> On 2022/01/17 17:15, Christoph Hellwig wrote:
+>> On Sat, Jan 15, 2022 at 09:34:10AM +0900, Tetsuo Handa wrote:
+>>> Christoph is not a fan of proliferating the use of task_work_add(). Can we go with exporting task_work_add()
+>>
+>> Not a fan != NAK.  If we can't think of anything better we'll have to do
+>> that.  Note that I also have a task_work_add API cleanup pending that makes
+>> it a lot less ugly.
+>>
+>>> for this release cycle? Or instead can we go with providing release() callback without disk->open_mutex held
+>>> ( https://lkml.kernel.org/r/08d703d1-8b32-ec9b-2b50-54b8376d3d40@i-love.sakura.ne.jp ) ?
+>>
+>> This one OTOH is a hard NAK as this is an API that will just cause a lot
+>> of problems.
 > 
-> The problem can still be reporduced...
-
-Drat. Thanks for testing.
-
-> Do you implement this in patch 4? If so, I don't understand how you
-> chieve this.
-
-Yes, patch 4 should be handling this.
-
-> For example: 3 bfqqs were merged:
-> q1->q2->q3
+> What problems can you think of with [PATCH 1/4] below?
 > 
-> If __bfq_bic_change_cgroup() is called with q2, the problem can be
-> fixed. However, if __bfq_bic_change_cgroup() is called with q3, can
-> the problem be fixed?
+> I found that patches below are robuster than task_work_add() approach because
+> the loop module does not need to know about refcounts which the core block layer
+> manipulates. If we go with task_work_add() approach, the loop module needs to be
+> updated in sync with refcount manipulations in the core block layer.
+> 
 
-Maybe I'm missing something so let's walk through your example where the
-bio is submitted for a task attached to q3. Bio is submitted,
-__bfq_bic_change_cgroup() is called with sync_bfqq == q3, the loop
+For your information, below is how task_work_add() approach would look like.
+Despite full of refcount management, cannot provide synchronous autoclear
+operation if closed by kernel threads, cannot provide synchronous waiting if
+opened by kernel threads, possibility to fail to run autoclear operation when
+open by user threads failed... What a mess!
 
-               while (sync_bfqq->new_bfqq)
-                       sync_bfqq = sync_bfqq->new_bfqq;
+---
+ block/bdev.c           |  30 +++-------
+ drivers/block/loop.c   | 125 ++++++++++++++++++++++++++++++++++++-----
+ include/linux/blkdev.h |   6 --
+ kernel/task_work.c     |   1 +
+ 4 files changed, 121 insertions(+), 41 deletions(-)
 
-won't do anything. Then we check:
-
-               if (sync_bfqq->entity.sched_data != &bfqg->sched_data) {
-
-This should be true because the task got moved and the bio is thus now
-submitted for a different cgroup. Then we get to the condition:
-
-                       if (orig_bfqq != sync_bfqq || bfq_bfqq_coop(sync_bfqq))
-
-orig_bfqq == sync_bfqq so that won't help but the idea was that
-bfq_bfqq_coop() would trigger in this case so we detach the process from q3
-(through bic_set_bfqq(bic, NULL, 1)) and create new queue in the right
-cgroup. Eventually, all the processes would detach from q3 and it would get
-destroyed. So why do you think this scheme will not work?
-
-And even if q3 is not marked as coop (which should not happen when there
-are other queues merged to it), we would move q3 to a cgroup for which IO
-is submitted - i.e., a one which is alive.
-
-Hum, but maybe with the above merge setup (q1->q2->q3) if
-__bfq_bic_change_cgroup() gets called for q1, q3 is already moved to the root
-cgroup by bfq_pd_offline() and bio is for the root cgroup, then we decide
-to keep everything as is. But bfq_setup_cooperator() will return q2 and
-we queue IO there and q2 may still be pointing to a dead cgroup (but q2
-didn't get reparented because it was not in any of the service trees). So
-perhaps attached fixup will help?
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
-
---byygjjdi76ebnkrh
-Content-Type: text/x-patch; charset=us-ascii
-Content-Disposition: attachment; filename="bfq-cgroup-fixup.patch"
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index f6f5f156b9f2..3e8f0564ff0b 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -732,7 +732,7 @@ static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
- 		struct bfq_queue *orig_bfqq = sync_bfqq;
+diff --git a/block/bdev.c b/block/bdev.c
+index efde8ffd0df6..8bf93a19041b 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -683,16 +683,15 @@ static int blkdev_get_whole(struct block_device *bdev, fmode_t mode)
+ 	if (test_bit(GD_NEED_PART_SCAN, &disk->state))
+ 		bdev_disk_changed(disk, false);
+ 	bdev->bd_openers++;
+-	return 0;
++	return 0;;
+ }
  
- 		/* Traverse the merge chain to bfqq we will be using */
--		while (sync_bfqq->new_bfqq)
-+		if (sync_bfqq->new_bfqq)
- 			sync_bfqq = sync_bfqq->new_bfqq;
- 		/*
- 		 * Target bfqq got moved to a different cgroup or this process
+-static bool blkdev_put_whole(struct block_device *bdev, fmode_t mode)
++static void blkdev_put_whole(struct block_device *bdev, fmode_t mode)
+ {
+ 	if (!--bdev->bd_openers)
+ 		blkdev_flush_mapping(bdev);
+ 	if (bdev->bd_disk->fops->release)
+ 		bdev->bd_disk->fops->release(bdev->bd_disk, mode);
+-	return true;
+ }
+ 
+ static int blkdev_get_part(struct block_device *part, fmode_t mode)
+@@ -722,15 +721,15 @@ static int blkdev_get_part(struct block_device *part, fmode_t mode)
+ 	return ret;
+ }
+ 
+-static bool blkdev_put_part(struct block_device *part, fmode_t mode)
++static void blkdev_put_part(struct block_device *part, fmode_t mode)
+ {
+ 	struct block_device *whole = bdev_whole(part);
+ 
+ 	if (--part->bd_openers)
+-		return false;
++		return;
+ 	blkdev_flush_mapping(part);
+ 	whole->bd_disk->open_partitions--;
+-	return blkdev_put_whole(whole, mode);
++	blkdev_put_whole(whole, mode);
+ }
+ 
+ struct block_device *blkdev_get_no_open(dev_t dev)
+@@ -785,7 +784,6 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 	bool unblock_events = true;
+ 	struct block_device *bdev;
+ 	struct gendisk *disk;
+-	bool release_called = false;
+ 	int ret;
+ 
+ 	ret = devcgroup_check_permission(DEVCG_DEV_BLOCK,
+@@ -814,13 +812,10 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 		goto abort_claiming;
+ 	if (!try_module_get(disk->fops->owner))
+ 		goto abort_claiming;
+-	if (bdev_is_partition(bdev)) {
++	if (bdev_is_partition(bdev))
+ 		ret = blkdev_get_part(bdev, mode);
+-		if (ret)
+-			release_called = true;
+-	} else {
++	else
+ 		ret = blkdev_get_whole(bdev, mode);
+-	}
+ 	if (ret)
+ 		goto put_module;
+ 	if (mode & FMODE_EXCL) {
+@@ -840,8 +835,6 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 		}
+ 	}
+ 	mutex_unlock(&disk->open_mutex);
+-	if (bdev->bd_disk->fops->post_open)
+-		bdev->bd_disk->fops->post_open(bdev->bd_disk);
+ 
+ 	if (unblock_events)
+ 		disk_unblock_events(disk);
+@@ -852,8 +845,6 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 	if (mode & FMODE_EXCL)
+ 		bd_abort_claiming(bdev, holder);
+ 	mutex_unlock(&disk->open_mutex);
+-	if (release_called && bdev->bd_disk->fops->post_release)
+-		bdev->bd_disk->fops->post_release(bdev->bd_disk);
+ 	disk_unblock_events(disk);
+ put_blkdev:
+ 	blkdev_put_no_open(bdev);
+@@ -902,7 +893,6 @@ EXPORT_SYMBOL(blkdev_get_by_path);
+ void blkdev_put(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct gendisk *disk = bdev->bd_disk;
+-	bool release_called;
+ 
+ 	/*
+ 	 * Sync early if it looks like we're the last one.  If someone else
+@@ -954,12 +944,10 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
+ 	disk_flush_events(disk, DISK_EVENT_MEDIA_CHANGE);
+ 
+ 	if (bdev_is_partition(bdev))
+-		release_called = blkdev_put_part(bdev, mode);
++		blkdev_put_part(bdev, mode);
+ 	else
+-		release_called = blkdev_put_whole(bdev, mode);
++		blkdev_put_whole(bdev, mode);
+ 	mutex_unlock(&disk->open_mutex);
+-	if (release_called && bdev->bd_disk->fops->post_release)
+-		bdev->bd_disk->fops->post_release(bdev->bd_disk);
+ 
+ 	module_put(disk->fops->owner);
+ 	blkdev_put_no_open(bdev);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cd19af969209..cfa6ab7c315a 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1695,6 +1695,38 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ }
+ #endif
+ 
++static void lo_post_open(struct gendisk *disk)
++{
++	struct loop_device *lo = disk->private_data;
++
++	/* Wait for lo_post_release() to leave lo->lo_mutex section. */
++	if (mutex_lock_killable(&lo->lo_mutex))
++		return;
++	mutex_unlock(&lo->lo_mutex);
++	/* Also wait for __loop_clr_fd() to complete if Lo_rundown was set. */
++	wait_event_killable(loop_rundown_wait, data_race(lo->lo_state) != Lo_rundown);
++}
++
++struct loop_open_task {
++	struct callback_head cb;
++	struct loop_device *lo;
++};
++
++static void loop_open_callbackfn(struct callback_head *callback)
++{
++	struct loop_open_task *lot =
++		container_of(callback, struct loop_open_task, cb);
++	struct gendisk *disk = lot->lo->lo_disk;
++
++	lo_post_open(disk);
++	/*
++	 * Since I didn't hold references, I can't call lo_post_release().
++	 * That is, I won't handle __loop_clr_fd() if I was the last user.
++	 */
++	atomic_dec(&lot->lo->lo_refcnt);
++	kfree(lot);
++}
++
+ static int lo_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	struct loop_device *lo = bdev->bd_disk->private_data;
+@@ -1707,21 +1739,29 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ 	else
+ 		atomic_inc(&lo->lo_refcnt);
+ 	spin_unlock(&loop_delete_spinlock);
++	/* Try to avoid accessing Lo_rundown loop device. */
++	if (!(current->flags & PF_KTHREAD)) {
++		struct loop_open_task *lot =
++			kmalloc(sizeof(*lot), GFP_KERNEL | __GFP_NOWARN);
++
++		if (lot) {
++			lot->lo = lo;
++			init_task_work(&lot->cb, loop_open_callbackfn);
++			if (task_work_add(current, &lot->cb, TWA_RESUME))
++				kfree(lot);
++			/*
++			 * Needs an extra reference for avoiding use-after-free
++			 * when an error occurred before returning to user mode
++			 * because the task work list is LIFO. But that in turn
++			 * bothers me with dropping this extra reference.
++			 */
++			else
++				atomic_inc(&lo->lo_refcnt);
++		}
++	}
+ 	return err;
+ }
+ 
+-static void lo_post_open(struct gendisk *disk)
+-{
+-	struct loop_device *lo = disk->private_data;
+-
+-	/* Wait for lo_post_release() to leave lo->lo_mutex section. */
+-	if (mutex_lock_killable(&lo->lo_mutex))
+-		return;
+-	mutex_unlock(&lo->lo_mutex);
+-	/* Also wait for __loop_clr_fd() to complete if Lo_rundown was set. */
+-	wait_event_killable(loop_rundown_wait, data_race(lo->lo_state) != Lo_rundown);
+-}
+-
+ static void lo_post_release(struct gendisk *disk)
+ {
+ 	struct loop_device *lo = disk->private_data;
+@@ -1753,11 +1793,68 @@ static void lo_post_release(struct gendisk *disk)
+ 	mutex_unlock(&lo->lo_mutex);
+ }
+ 
++struct loop_release_task {
++	union {
++		struct callback_head cb;
++		struct work_struct ws;
++	};
++	struct loop_device *lo;
++};
++
++static void loop_release_workfn(struct work_struct *work)
++{
++	struct loop_release_task *lrt =
++		container_of(work, struct loop_release_task, ws);
++	struct loop_device *lo = lrt->lo;
++	struct gendisk *disk = lo->lo_disk;
++
++	lo_post_release(disk);
++	/* Drop references which will be dropped after lo_release(). */
++	kobject_put(&disk_to_dev(disk)->kobj);
++	module_put(disk->fops->owner);
++	kfree(lrt);
++	/* Drop a reference to allow loop_exit(). */
++	module_put(THIS_MODULE);
++}
++
++static void loop_release_callbackfn(struct callback_head *callback)
++{
++	struct loop_release_task *lrt =
++		container_of(callback, struct loop_release_task, cb);
++
++	loop_release_workfn(&lrt->ws);
++}
++
++static void lo_release(struct gendisk *disk, fmode_t mode)
++{
++	struct loop_device *lo = disk->private_data;
++	struct loop_release_task *lrt = kmalloc(sizeof(*lrt),
++						GFP_KERNEL | __GFP_NOFAIL);
++
++	/* Hold a reference to disallow loop_exit(). */
++	__module_get(THIS_MODULE);
++	/* Hold references which will be dropped after lo_release(). */
++	__module_get(disk->fops->owner);
++	kobject_get(&disk_to_dev(disk)->kobj);
++	/* Clear this loop device. */
++	lrt->lo = lo;
++	if (!(current->flags & PF_KTHREAD)) {
++		/*
++		 * Prefer task work so that clear operation completes
++		 * before close() returns to user mode.
++		 */
++		init_task_work(&lrt->cb, loop_release_callbackfn);
++		if (!task_work_add(current, &lrt->cb, TWA_RESUME))
++			return;
++	}
++	INIT_WORK(&lrt->ws, loop_release_workfn);
++	queue_work(system_long_wq, &lrt->ws);
++}
++
+ static const struct block_device_operations lo_fops = {
+ 	.owner =	THIS_MODULE,
+ 	.open =		lo_open,
+-	.post_open =	lo_post_open,
+-	.post_release = lo_post_release,
++	.release =	lo_release,
+ 	.ioctl =	lo_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl =	lo_compat_ioctl,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f35e92fd72d0..9c95df26fc26 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1227,12 +1227,6 @@ struct block_device_operations {
+ 	 * driver.
+ 	 */
+ 	int (*alternative_gpt_sector)(struct gendisk *disk, sector_t *sector);
+-	/*
+-	 * Special callback for doing extra operations without
+-	 * disk->open_mutex held. Used by loop driver.
+-	 */
+-	void (*post_open)(struct gendisk *disk);
+-	void (*post_release)(struct gendisk *disk);
+ };
+ 
+ #ifdef CONFIG_COMPAT
+diff --git a/kernel/task_work.c b/kernel/task_work.c
+index 1698fbe6f0e1..2a1644189182 100644
+--- a/kernel/task_work.c
++++ b/kernel/task_work.c
+@@ -60,6 +60,7 @@ int task_work_add(struct task_struct *task, struct callback_head *work,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(task_work_add);
+ 
+ /**
+  * task_work_cancel_match - cancel a pending work added by task_work_add()
+-- 
+2.32.0
 
---byygjjdi76ebnkrh--
