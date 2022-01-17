@@ -2,82 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD608C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 17 Jan 2022 08:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FC5C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Jan 2022 09:08:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238362AbiAQIn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jan 2022 03:43:59 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:31163 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238330AbiAQIn5 (ORCPT
+        id S233504AbiAQJIz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jan 2022 04:08:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48424 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232619AbiAQJIy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jan 2022 03:43:57 -0500
-Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Jcljv0xfNz8wNn;
-        Mon, 17 Jan 2022 16:41:07 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 17 Jan 2022 16:43:54 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Mon, 17 Jan
- 2022 16:43:54 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH RESEND 3/3] blk-mq: allow hardware queue to get more tag while sharing a tag set
-Date:   Mon, 17 Jan 2022 16:54:55 +0800
-Message-ID: <20220117085455.2269760-4-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220117085455.2269760-1-yukuai3@huawei.com>
-References: <20220117085455.2269760-1-yukuai3@huawei.com>
+        Mon, 17 Jan 2022 04:08:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642410534;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jW5D2ERgawesUqlNSwP7hlu0lpi3I08Xd1+MoofN+wE=;
+        b=JN6j3OB3rQMeHyc2ydVs1D2jVLnFrcINUcNHZF0cnOa1xhgFazlvOwWnVrfeud2eNW0kY2
+        +opPyU7YrWt1VnxLz3jB5R0MNFlXPvESM9u2bc9yFw8dWI1NeBWoUKWjLc7QS4Z5+f1aNY
+        CGM1eRms3al8X0qZhpYwJ1TxygBgm8M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-356-kvJE8VEkOYOa9RRx2a41yA-1; Mon, 17 Jan 2022 04:08:50 -0500
+X-MC-Unique: kvJE8VEkOYOa9RRx2a41yA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73BC92F24;
+        Mon, 17 Jan 2022 09:08:49 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EA0796A023;
+        Mon, 17 Jan 2022 09:08:28 +0000 (UTC)
+Date:   Mon, 17 Jan 2022 17:08:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3] block: don't drain file system I/O on del_gendisk
+Message-ID: <YeUyB/5YtA1AGyt8@T590>
+References: <20220116041815.1218170-1-ming.lei@redhat.com>
+ <20220117081321.GA22627@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220117081321.GA22627@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If there are multiple active queues while sharing a tag set, the
-avaliable driver tag for each queue is fair share currently. However,
-we found this way cause performance degradation in our environment:
+On Mon, Jan 17, 2022 at 09:13:21AM +0100, Christoph Hellwig wrote:
+> On Sun, Jan 16, 2022 at 12:18:12PM +0800, Ming Lei wrote:
+> > Hello,
+> > 
+> > Draining FS I/O on del_gendisk() is added for just avoiding to refer to
+> > recently added q->disk in IO path, and it isn't actually needed.
+> 
+> We need it to have proper life times in the block layer.  Everything only
+> needed for file system I/O and not blk-mq specific should slowly move
+> from the request_queue to the gendisk and I have patches going in
+> that direction.  In the end only the SCSI discovery code and the case
+> of /dev/sg without SCSI ULP will ever do passthrough I/O purely on the
+> gendisk.
+> 
+> So I think this series is moving in the wrong direction.  If you care
+> about no doing two freeze cycles the right thing to do is to record
 
-A virtual machine which has 12 scsi disks on the same scsi host, each
-disk represents a network disk on host machine. In virtual machine, each
-disk will issue a sg io about every 15s, which will cause active queues
-to be 12 before the disk is idle(blk_mq_tag_idle() is called), and io
-performance is bad due to short of driver tag during that time.
+I just think that the extra draining point in del_gendisk() isn't useful,
+can you share any use case with this change?
 
-Thus if there are no hctx ever failed to get driver tag, don't limit the
-available driver tags as fair share. And if someone do failed to get
-driver tag, fall back to fair share.
+> if we ever did non-disk based passthrough I/O on a requeue_queue and
+> if not simplify the request_queue cleanup.  Doing this is on my TODO
+> list but I haven't look into the details yet.
+> 
+> > 1) queue freezing can't drain FS I/O for bio based driver
+> 
+> This is something I've started looking into it.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq.h | 4 ++++
- 1 file changed, 4 insertions(+)
+But that is one big problem, not sure you can solve it in short time,
+also not sure if it is useful, cause FS already guaranteed that every
+IO is drained before releasing disk, or IOs in the submission task are
+drained when exiting the task.
 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 948791ea2a3e..4b059221b265 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -352,6 +352,10 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 	if (bt->sb.depth == 1)
- 		return true;
- 
-+	/* Don't use fair share untill some hctx failed to get driver tag */
-+	if (!atomic_read(&hctx->tags->pending_queues))
-+		return true;
-+
- 	if (blk_mq_is_shared_tags(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
- 
--- 
-2.31.1
+> 
+> > 2) it isn't easy to move elevator/cgroup/throttle shutdown during
+> > del_gendisk, and q->disk can still be referred in these code paths
+> 
+> I've also done some prep work to land this cycle here, as all that
+> code is only used for FS I/O.
+
+IMO,
+
+Firstly, FS layer has already guaranteed that every FS IO is done before
+releasing disk, so no need to take so much effort and make code more
+fragile to add one extra FS IO draining point in del_gendisk().
+
+Also the above two things aren't trivial enough to solve in short time, so
+can we delay the FS draining in del_gendisk() until the two are done?
+
+Thanks,
+Ming
 
