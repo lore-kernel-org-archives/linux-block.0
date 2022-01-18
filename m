@@ -2,131 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C28C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 03:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF29BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 07:04:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345859AbiARDge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jan 2022 22:36:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45794 "EHLO
+        id S244541AbiARHEr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jan 2022 02:04:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376598AbiARDcl (ORCPT
+        with ESMTP id S230196AbiARHEr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jan 2022 22:32:41 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11DBEC06127F;
-        Mon, 17 Jan 2022 19:08:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C933BB80932;
-        Tue, 18 Jan 2022 03:08:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7711C36AF3;
-        Tue, 18 Jan 2022 03:08:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642475329;
-        bh=+Qy6CnoK+aL3Wg8FhMKndjvPPXNLgLTjEimjmDFscDI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=V4dcayjBZcO39jYjGlGWXTExZkpvpCpU0UPkHaFp+X7HziJeMnZ6fs0HKYh5dCObR
-         nBBUYABLq2OymFRsI4X2u8bNVGr8BJE7VS9EdeO75Thc/AwTYjs6638U6O/qo26zj+
-         wk097kUNNDqpgrna/sIAX2YxKh4WDL40TffYD01XW6OcTUDUWbmiWdeJ9SP7UpmltJ
-         63Ksk8qFUZ+xjkb9FDHzMzAfm27tb+fOODeMcDllSJFUoioU/WYlQK2mSPLUOgdMsY
-         L9W6Ko/SpuuppmK+IzX2E0yo3Qww8NpzIajVY7Iz00il4ultvOa4WJQEfSnFheW8pI
-         f0vuABOD/kRcQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Xiongwei Song <sxwjean@gmail.com>,
-        syzbot+23a02c7df2cf2bc93fa2@syzkaller.appspotmail.com,
-        Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 09/29] floppy: Add max size check for user space request
-Date:   Mon, 17 Jan 2022 22:08:02 -0500
-Message-Id: <20220118030822.1955469-9-sashal@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220118030822.1955469-1-sashal@kernel.org>
-References: <20220118030822.1955469-1-sashal@kernel.org>
+        Tue, 18 Jan 2022 02:04:47 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED94C061574
+        for <linux-block@vger.kernel.org>; Mon, 17 Jan 2022 23:04:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=ORSN9e15JyRxg79JiBN0SJHsITvQpXLhCCj7osd2HYw=; b=z5RxoCTm3tdVF4zOf2MXnfgck4
+        h7GOI8Kjmfsd8QGo8NHtQffy7wIm5rVh/MGGuTphf349XD244ANGGaWdtW4s7b/a7zHY011acGYEP
+        2jnj6+D9+LK1aj3e1q56mTKjq8WvpB+rlnC/dL+CqWdc0zuUv0FAGSf1GPTBYBON1gCgDyC/U1JEz
+        +SYr+htypwfgyxx8d5SLBfGhksNKRgNJUGWpM7jwfw5ZQHwlH428YMjuTy1JVegsQqtBahAhiGKZ1
+        GDjX1IhRhPRihAEV/5YbzUrUrg4d+F3OagtYXdJ9TVorlDiexNfPkFbrVuaV8TUTMeaqEpx/vLZkR
+        /wxOTSIQ==;
+Received: from [2001:4bb8:184:72a4:a4a9:19c0:5242:7768] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n9iXt-000Vyu-U3; Tue, 18 Jan 2022 07:04:46 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org,
+        Benjamin Marzinski <bmarzins@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: assign bi_bdev for cloned bios in blk_rq_prep_clone
+Date:   Tue, 18 Jan 2022 08:04:44 +0100
+Message-Id: <20220118070444.1241739-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Xiongwei Song <sxwjean@gmail.com>
+bio_clone_fast() sets the cloned bio to have the same ->bi_bdev as the
+source bio. This means that when request-based dm called setup_clone(),
+the cloned bio had its ->bi_bdev pointing to the dm device. After Commit
+0b6e522cdc4a ("blk-mq: use ->bi_bdev for I/O accounting")
+__blk_account_io_start() started using the request's ->bio->bi_bdev for
+I/O accounting, if it was set. This caused IO going to the underlying
+devices to use the dm device for their I/O accounting.
 
-[ Upstream commit 545a32498c536ee152331cd2e7d2416aa0f20e01 ]
+Set up the proper ->bi_bdev in blk_rq_prep_clone based on the whole
+device bdev for the queue the request is cloned onto.
 
-We need to check the max request size that is from user space before
-allocating pages. If the request size exceeds the limit, return -EINVAL.
-This check can avoid the warning below from page allocator.
-
-WARNING: CPU: 3 PID: 16525 at mm/page_alloc.c:5344 current_gfp_context include/linux/sched/mm.h:195 [inline]
-WARNING: CPU: 3 PID: 16525 at mm/page_alloc.c:5344 __alloc_pages+0x45d/0x500 mm/page_alloc.c:5356
-Modules linked in:
-CPU: 3 PID: 16525 Comm: syz-executor.3 Not tainted 5.15.0-syzkaller #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:__alloc_pages+0x45d/0x500 mm/page_alloc.c:5344
-Code: be c9 00 00 00 48 c7 c7 20 4a 97 89 c6 05 62 32 a7 0b 01 e8 74 9a 42 07 e9 6a ff ff ff 0f 0b e9 a0 fd ff ff 40 80 e5 3f eb 88 <0f> 0b e9 18 ff ff ff 4c 89 ef 44 89 e6 45 31 ed e8 1e 76 ff ff e9
-RSP: 0018:ffffc90023b87850 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 1ffff92004770f0b RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 0000000000000033 RDI: 0000000000010cc1
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff81bb4686 R11: 0000000000000001 R12: ffffffff902c1960
-R13: 0000000000000033 R14: 0000000000000000 R15: ffff88804cf64a30
-FS:  0000000000000000(0000) GS:ffff88802cd00000(0063) knlGS:00000000f44b4b40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 000000002c921000 CR3: 000000004f507000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- alloc_pages+0x1a7/0x300 mm/mempolicy.c:2191
- __get_free_pages+0x8/0x40 mm/page_alloc.c:5418
- raw_cmd_copyin drivers/block/floppy.c:3113 [inline]
- raw_cmd_ioctl drivers/block/floppy.c:3160 [inline]
- fd_locked_ioctl+0x12e5/0x2820 drivers/block/floppy.c:3528
- fd_ioctl drivers/block/floppy.c:3555 [inline]
- fd_compat_ioctl+0x891/0x1b60 drivers/block/floppy.c:3869
- compat_blkdev_ioctl+0x3b8/0x810 block/ioctl.c:662
- __do_compat_sys_ioctl+0x1c7/0x290 fs/ioctl.c:972
- do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
- __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
- do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:203
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-
-Reported-by: syzbot+23a02c7df2cf2bc93fa2@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/20211116131033.27685-1-sxwjean@me.com
-Signed-off-by: Xiongwei Song <sxwjean@gmail.com>
-Signed-off-by: Denis Efremov <efremov@linux.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 0b6e522cdc4a ("blk-mq: use ->bi_bdev for I/O accounting")
+Reported-by: Benjamin Marzinski <bmarzins@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+[hch: the commit message is mostly from a different patch from Benjamin]
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Benjamin Marzinski <bmarzins@redhat.com>
 ---
- drivers/block/floppy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/blk-mq.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 40c251ef175db..e1834d7409781 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -3116,6 +3116,8 @@ static void raw_cmd_free(struct floppy_raw_cmd **ptr)
- 	}
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a6d4780580fcd..b5e35e63adad4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2976,6 +2976,7 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ 		bio = bio_clone_fast(bio_src, gfp_mask, bs);
+ 		if (!bio)
+ 			goto free_and_out;
++		bio->bi_bdev = rq->q->disk->part0;
  
-+#define MAX_LEN (1UL << MAX_ORDER << PAGE_SHIFT)
-+
- static int raw_cmd_copyin(int cmd, void __user *param,
- 				 struct floppy_raw_cmd **rcmd)
- {
-@@ -3153,7 +3155,7 @@ static int raw_cmd_copyin(int cmd, void __user *param,
- 	ptr->resultcode = 0;
- 
- 	if (ptr->flags & (FD_RAW_READ | FD_RAW_WRITE)) {
--		if (ptr->length <= 0)
-+		if (ptr->length <= 0 || ptr->length >= MAX_LEN)
- 			return -EINVAL;
- 		ptr->kernel_data = (char *)fd_dma_mem_alloc(ptr->length);
- 		fallback_on_nodma_alloc(&ptr->kernel_data, ptr->length);
+ 		if (bio_ctr && bio_ctr(bio, bio_src, data))
+ 			goto free_and_out;
 -- 
-2.34.1
+2.30.2
 
