@@ -2,87 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EB7C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 13:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE5DC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 15:52:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242607AbiARNeX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jan 2022 08:34:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242872AbiARNeS (ORCPT
+        id S233324AbiARPwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jan 2022 10:52:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52125 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232516AbiARPwo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jan 2022 08:34:18 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E98C06173E
-        for <linux-block@vger.kernel.org>; Tue, 18 Jan 2022 05:34:17 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id e8so17517502ilm.13
-        for <linux-block@vger.kernel.org>; Tue, 18 Jan 2022 05:34:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=VJ0Go1iexNePR+XLN+Sy+sq0m+3ItOh9+zlr4BQ8Lws=;
-        b=UsR/i7J7BaZX5LJDrgKD7c6zf1TiFV3VpSCl58D7RP1fn+RqCVm/OrxWsT7TFtOZxX
-         /NppTeYizfwPz6CpxsTPy2098yT04kAmN45IuOinrKwDyhVFIbHNjuWpxdItliD2a8wg
-         vBWI0JaXZVGjX/RCLFaXIR5C6xfeJs6EgbrP3tM6GlYpiytU7rls4siDlbvARhqIhXfa
-         fpNonbwGoDt/1lR3LoT40wGsQW9sfwx/cDyuFzTHCY172vaxlkGm1nWqD9ps1CV4Mg9M
-         wINfiriUTHVixRyGU6YD6fbBhLuXdB6EWFob2kJGr/Dwj/cH6iwE7Qtk6iRdhyWGmfpY
-         vp7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=VJ0Go1iexNePR+XLN+Sy+sq0m+3ItOh9+zlr4BQ8Lws=;
-        b=r7B65YMDRYaxIfx6+Mlca226VHyv/onqsm8IOWtFLe0LaErBtF2sufXFkfEO2o6+T6
-         K926ZZkbj0NHBcNhVwNx/os6hiyMcxnA151bhx1cWTo728B9GYE2PNE2y6tjNMx/aWXb
-         AsDSnlkLJT6fwUopzNQfAtdfFwyjNfPLA9bpSh8665pY01yTGiJ4AEgRrBbiCinmbHa/
-         ZveLRl41A6ocmMLSZAmte/qK1A9YM4oS3qqMK4qRDpI/vOsgN+J/aJ0n3SCMS9zsamPr
-         kpkEqxzOtcJXcYuZaffzICLKnnXBiepRR9YsHrKxQjKcq3CM/HmX2JWlXXcsR1QRlWbv
-         R9QQ==
-X-Gm-Message-State: AOAM531wiI3/2Up1zTOU2NgTlo81Y5soHbghrVFARxvFXxNjmDFS1HFs
-        TJ4rzc5Lufe3O694wdIDSQEuBg==
-X-Google-Smtp-Source: ABdhPJymb5wi3Q+xSrBvaiy7jITtrQ6swp90zYj7ZkKzJFntjsuFXkeuGj96uvVA3PHbZce40t++jw==
-X-Received: by 2002:a92:2805:: with SMTP id l5mr10852693ilf.18.1642512856966;
-        Tue, 18 Jan 2022 05:34:16 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id t9sm5956540ilu.50.2022.01.18.05.34.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jan 2022 05:34:16 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
+        Tue, 18 Jan 2022 10:52:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642521163;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3gquFfOR0xiFNLfrS0pvE5c5azb/hNWp0sLy8/kX3zI=;
+        b=FQ3qCeWAWxCh9JgxZ1p5/01AXa8Tdm8K9BfIgtkYFn2PB2T+iroqjzgAVgX1x3zjWY+SBg
+        cHa71RbW2ZKh391S1ZAoqOWRTY+QVSIJDLFTw5T2gsFt9oZ+WUHcNc8edagWbt+JJ/lbYe
+        xj4QXgPbaGSjTQcMJdQT8SBgwR1MOGU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-110-omh4R_mxOSmzlAcMq-9alg-1; Tue, 18 Jan 2022 10:52:42 -0500
+X-MC-Unique: omh4R_mxOSmzlAcMq-9alg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4761310B4344;
+        Tue, 18 Jan 2022 15:47:42 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 65FA13468A;
+        Tue, 18 Jan 2022 15:47:38 +0000 (UTC)
+Date:   Tue, 18 Jan 2022 23:47:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <20220118070444.1241739-1-hch@lst.de>
-References: <20220118070444.1241739-1-hch@lst.de>
-Subject: Re: [PATCH] block: assign bi_bdev for cloned bios in blk_rq_prep_clone
-Message-Id: <164251285630.363604.2974408716787328487.b4-ty@kernel.dk>
-Date:   Tue, 18 Jan 2022 06:34:16 -0700
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: move freeing disk into queue's release handler
+Message-ID: <YebhFeJb/0Fux5Ei@T590>
+References: <20220116041815.1218170-1-ming.lei@redhat.com>
+ <20220116041815.1218170-2-ming.lei@redhat.com>
+ <20220118082259.GA21847@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220118082259.GA21847@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 18 Jan 2022 08:04:44 +0100, Christoph Hellwig wrote:
-> bio_clone_fast() sets the cloned bio to have the same ->bi_bdev as the
-> source bio. This means that when request-based dm called setup_clone(),
-> the cloned bio had its ->bi_bdev pointing to the dm device. After Commit
-> 0b6e522cdc4a ("blk-mq: use ->bi_bdev for I/O accounting")
-> __blk_account_io_start() started using the request's ->bio->bi_bdev for
-> I/O accounting, if it was set. This caused IO going to the underlying
-> devices to use the dm device for their I/O accounting.
-> 
-> [...]
+On Tue, Jan 18, 2022 at 09:22:59AM +0100, Christoph Hellwig wrote:
+> How does this work for SCSI where we can detach the disk from the
+> request queue, reattach it and then maybe later free them both?
 
-Applied, thanks!
+Commit 8e141f9eb803 ("block: drain file system I/O on del_gendisk") has
+marked queue as dying, so how can the above case work given no any code
+clears the queue's dying flag?
 
-[1/1] block: assign bi_bdev for cloned bios in blk_rq_prep_clone
-      commit: fd9f4e62a39f09a7c014d7415c2b9d1390aa0504
+Can you share steps for this test case? And it shouldn't hard to extend this
+patch for supporting it.
 
-Best regards,
--- 
-Jens Axboe
-
+Thanks, 
+Ming
 
