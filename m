@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42000C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 07:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA95C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 07:20:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244673AbiARHUI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jan 2022 02:20:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41916 "EHLO
+        id S244840AbiARHUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jan 2022 02:20:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbiARHUH (ORCPT
+        with ESMTP id S244726AbiARHUM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jan 2022 02:20:07 -0500
+        Tue, 18 Jan 2022 02:20:12 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D882C061574;
-        Mon, 17 Jan 2022 23:20:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD77C061574;
+        Mon, 17 Jan 2022 23:20:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=7QPyuzOR2N2LqXuXA08GkKhJ7fsHc2fxZXqTeovi8aQ=; b=mwLo7/0/BOPnfEnPa3xkh1wtp3
-        15wY0VF1l5wgNEmlmFx9qahgWnFhyJl6myyHdYnnzRUVdOqVBkw7UQ2s8GiXprR+T/gsvB/2g/F5v
-        UCaXHspI+nVqVsB58mvQw0HRJkvSn89DW90IDAfE05lkscu3Lf/H7fIN1bqOWBihdD4Tp5Ut6juFU
-        WNJ1skjZ7Xkx6wUi1wozYtRk77Q0Gy2FFrBE57k2vN/cSiZKuWEEa/FwDkaLAeAptVbMHq6BGRtqX
-        s60rfzBqA3qtv2QplYalZU7PGOtQaONd/6YhcyxH1JxZ9Vqhkoc/TOJtrX45PcQTGjUSplXja4jev
-        6N8KX46Q==;
+        bh=EcXfe+QJLbyEaBSYcI8IdLx+VpwVU+Twsx7L0heUO1Q=; b=Crht+UUgONjGH1v8HmgHBuR0Pw
+        3+FhXNSZnyjRNWPG58Wm2G5KNvvpy1aGmBMUIrUK1u4m17TdekCh3eo0S2wKQYJJCbvDqXQsRo2wK
+        voVwIithhKd6AwW1XgXVCGDM2qY6luEVdRs+f8pN0VmiQubGiTFrLb9HST+OMYWI2ooLOR0H3H2W4
+        vveuXxxHUHwA+40YbvmOhhsxe1wU4IgQ9dJEnKgPFvwGnegPrJbbGgCJPHOwX/k9PMvLPupdzEJoQ
+        dshYui2V9dLVx8Ag4GNgYySKuflXOClHoN9+HnAX1vSgCn5EnBRDfedOUMh6tHzNLJ5kJKsxDwFUO
+        XkKnK+AQ==;
 Received: from [2001:4bb8:184:72a4:a4a9:19c0:5242:7768] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n9ime-000ZNW-EE; Tue, 18 Jan 2022 07:20:01 +0000
+        id 1n9imk-000ZPF-0i; Tue, 18 Jan 2022 07:20:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Pavel Begunkov <asml.silence@gmail.com>,
@@ -44,9 +44,9 @@ Cc:     Pavel Begunkov <asml.silence@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
         xen-devel@lists.xenproject.org, drbd-dev@lists.linbit.com
-Subject: [PATCH 02/19] nilfs2: remove nilfs_alloc_seg_bio
-Date:   Tue, 18 Jan 2022 08:19:35 +0100
-Message-Id: <20220118071952.1243143-3-hch@lst.de>
+Subject: [PATCH 04/19] ntfs3: remove ntfs_alloc_bio
+Date:   Tue, 18 Jan 2022 08:19:37 +0100
+Message-Id: <20220118071952.1243143-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220118071952.1243143-1-hch@lst.de>
 References: <20220118071952.1243143-1-hch@lst.de>
@@ -57,63 +57,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_alloc will never fail when it can sleep.  Remove the now simple
-nilfs_alloc_seg_bio helper and open code it in the only caller.
+bio_alloc will never fail if it is allowed to sleep, so there is no
+need for this loop.  Also remove the __GFP_HIGH specifier as it doesn't
+make sense here given that we'll always fall back to the mempool anyway.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/nilfs2/segbuf.c | 31 ++++---------------------------
- 1 file changed, 4 insertions(+), 27 deletions(-)
+ fs/ntfs3/fsntfs.c | 23 ++---------------------
+ 1 file changed, 2 insertions(+), 21 deletions(-)
 
-diff --git a/fs/nilfs2/segbuf.c b/fs/nilfs2/segbuf.c
-index 43287b0d3e9b6..53b7c6d21cdd8 100644
---- a/fs/nilfs2/segbuf.c
-+++ b/fs/nilfs2/segbuf.c
-@@ -371,29 +371,6 @@ static int nilfs_segbuf_submit_bio(struct nilfs_segment_buffer *segbuf,
+diff --git a/fs/ntfs3/fsntfs.c b/fs/ntfs3/fsntfs.c
+index 4de9acb169689..4a255e21ecf5f 100644
+--- a/fs/ntfs3/fsntfs.c
++++ b/fs/ntfs3/fsntfs.c
+@@ -1443,17 +1443,6 @@ int ntfs_write_bh(struct ntfs_sb_info *sbi, struct NTFS_RECORD_HEADER *rhdr,
  	return err;
  }
  
--/**
-- * nilfs_alloc_seg_bio - allocate a new bio for writing log
-- * @nilfs: nilfs object
-- * @start: start block number of the bio
-- * @nr_vecs: request size of page vector.
-- *
-- * Return Value: On success, pointer to the struct bio is returned.
-- * On error, NULL is returned.
-- */
--static struct bio *nilfs_alloc_seg_bio(struct the_nilfs *nilfs, sector_t start,
--				       int nr_vecs)
+-static inline struct bio *ntfs_alloc_bio(u32 nr_vecs)
 -{
--	struct bio *bio;
+-	struct bio *bio = bio_alloc(GFP_NOFS | __GFP_HIGH, nr_vecs);
 -
--	bio = bio_alloc(GFP_NOIO, nr_vecs);
--	if (likely(bio)) {
--		bio_set_dev(bio, nilfs->ns_bdev);
--		bio->bi_iter.bi_sector =
--			start << (nilfs->ns_blocksize_bits - 9);
+-	if (!bio && (current->flags & PF_MEMALLOC)) {
+-		while (!bio && (nr_vecs /= 2))
+-			bio = bio_alloc(GFP_NOFS | __GFP_HIGH, nr_vecs);
 -	}
 -	return bio;
 -}
 -
- static void nilfs_segbuf_prepare_write(struct nilfs_segment_buffer *segbuf,
- 				       struct nilfs_write_info *wi)
- {
-@@ -414,10 +391,10 @@ static int nilfs_segbuf_submit_bh(struct nilfs_segment_buffer *segbuf,
- 	BUG_ON(wi->nr_vecs <= 0);
-  repeat:
- 	if (!wi->bio) {
--		wi->bio = nilfs_alloc_seg_bio(wi->nilfs, wi->blocknr + wi->end,
--					      wi->nr_vecs);
--		if (unlikely(!wi->bio))
--			return -ENOMEM;
-+		wi->bio = bio_alloc(GFP_NOIO, wi->nr_vecs);
-+		bio_set_dev(wi->bio, wi->nilfs->ns_bdev);
-+		wi->bio->bi_iter.bi_sector = (wi->blocknr + wi->end) <<
-+			(wi->nilfs->ns_blocksize_bits - 9);
- 	}
- 
- 	len = bio_add_page(wi->bio, bh->b_page, bh->b_size, bh_offset(bh));
+ /*
+  * ntfs_bio_pages - Read/write pages from/to disk.
+  */
+@@ -1496,11 +1485,7 @@ int ntfs_bio_pages(struct ntfs_sb_info *sbi, const struct runs_tree *run,
+ 		lbo = ((u64)lcn << cluster_bits) + off;
+ 		len = ((u64)clen << cluster_bits) - off;
+ new_bio:
+-		new = ntfs_alloc_bio(nr_pages - page_idx);
+-		if (!new) {
+-			err = -ENOMEM;
+-			goto out;
+-		}
++		new = bio_alloc(GFP_NOFS, nr_pages - page_idx);
+ 		if (bio) {
+ 			bio_chain(bio, new);
+ 			submit_bio(bio);
+@@ -1599,11 +1584,7 @@ int ntfs_bio_fill_1(struct ntfs_sb_info *sbi, const struct runs_tree *run)
+ 		lbo = (u64)lcn << cluster_bits;
+ 		len = (u64)clen << cluster_bits;
+ new_bio:
+-		new = ntfs_alloc_bio(BIO_MAX_VECS);
+-		if (!new) {
+-			err = -ENOMEM;
+-			break;
+-		}
++		new = bio_alloc(GFP_NOFS, BIO_MAX_VECS);
+ 		if (bio) {
+ 			bio_chain(bio, new);
+ 			submit_bio(bio);
 -- 
 2.30.2
 
