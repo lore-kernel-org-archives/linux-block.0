@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE14C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 03:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C28C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 03:36:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347166AbiARDNK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Jan 2022 22:13:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39644 "EHLO
+        id S1345859AbiARDge (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Jan 2022 22:36:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348252AbiARDJY (ORCPT
+        with ESMTP id S1376598AbiARDcl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Jan 2022 22:09:24 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CAFC061763;
-        Mon, 17 Jan 2022 18:51:41 -0800 (PST)
+        Mon, 17 Jan 2022 22:32:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11DBEC06127F;
+        Mon, 17 Jan 2022 19:08:52 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B8E2261359;
-        Tue, 18 Jan 2022 02:51:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C8DC36AE3;
-        Tue, 18 Jan 2022 02:51:39 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C933BB80932;
+        Tue, 18 Jan 2022 03:08:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7711C36AF3;
+        Tue, 18 Jan 2022 03:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642474300;
-        bh=JZ7z9uj03AYMOh3XucqqrW+DG6zPcpcLLEJB4WDjveQ=;
+        s=k20201202; t=1642475329;
+        bh=+Qy6CnoK+aL3Wg8FhMKndjvPPXNLgLTjEimjmDFscDI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lm6G/Jiz5Xj/ZwEi7oCvLIXO6x7A1DUCQxEJMTSMT8UNocX9DbVCV6czNGrzKAmTm
-         3lNwC5VEWTep8nvJgcpysoNPKtgvhwBJymC7OriP6nf7LPMPWlnJcR1+Yscy3tz9gg
-         iKAOXet6hAFll+Gj98l1Mep0YueUST95twdGvXEHUkbgGPr64SsGdj8Pr+iiHdlYcO
-         JgO9OU8FZQHONFt24F5CT9JeSqe/2rU3oraDUIwYHyyfevZcF8g9XMZ5mxABl9VrR1
-         hAcYwEElxzWRsQRb7PYCIN6UhJeqX20qb7OVx/Ucwx5pIiXNDYHftUNSPdYOYoeook
-         hVqvt+untqajA==
+        b=V4dcayjBZcO39jYjGlGWXTExZkpvpCpU0UPkHaFp+X7HziJeMnZ6fs0HKYh5dCObR
+         nBBUYABLq2OymFRsI4X2u8bNVGr8BJE7VS9EdeO75Thc/AwTYjs6638U6O/qo26zj+
+         wk097kUNNDqpgrna/sIAX2YxKh4WDL40TffYD01XW6OcTUDUWbmiWdeJ9SP7UpmltJ
+         63Ksk8qFUZ+xjkb9FDHzMzAfm27tb+fOODeMcDllSJFUoioU/WYlQK2mSPLUOgdMsY
+         L9W6Ko/SpuuppmK+IzX2E0yo3Qww8NpzIajVY7Iz00il4ultvOa4WJQEfSnFheW8pI
+         f0vuABOD/kRcQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xiongwei Song <sxwjean@gmail.com>,
@@ -39,12 +39,12 @@ Cc:     Xiongwei Song <sxwjean@gmail.com>,
         Denis Efremov <efremov@linux.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 11/33] floppy: Add max size check for user space request
-Date:   Mon, 17 Jan 2022 21:50:53 -0500
-Message-Id: <20220118025116.1954375-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 09/29] floppy: Add max size check for user space request
+Date:   Mon, 17 Jan 2022 22:08:02 -0500
+Message-Id: <20220118030822.1955469-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220118025116.1954375-1-sashal@kernel.org>
-References: <20220118025116.1954375-1-sashal@kernel.org>
+In-Reply-To: <20220118030822.1955469-1-sashal@kernel.org>
+References: <20220118030822.1955469-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -106,7 +106,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 4496e7a492352..8832cd0d03e79 100644
+index 40c251ef175db..e1834d7409781 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
 @@ -3116,6 +3116,8 @@ static void raw_cmd_free(struct floppy_raw_cmd **ptr)
