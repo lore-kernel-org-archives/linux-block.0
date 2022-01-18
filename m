@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18288C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 07:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7B0C43219
+	for <linux-block@archiver.kernel.org>; Tue, 18 Jan 2022 07:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244646AbiARHUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jan 2022 02:20:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41914 "EHLO
+        id S244691AbiARHUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jan 2022 02:20:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244621AbiARHUG (ORCPT
+        with ESMTP id S244684AbiARHUK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jan 2022 02:20:06 -0500
+        Tue, 18 Jan 2022 02:20:10 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7990C06161C;
-        Mon, 17 Jan 2022 23:20:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08579C061574;
+        Mon, 17 Jan 2022 23:20:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=YxQPbVqFWlutwQ2g8QVoc6P1c2MdSC28Qzk+anwg+hU=; b=Aj57TSt044wK2CCPLfgXb0ZAwk
-        9mWJT/5UNCkKd3f1yXIMAN9xyDLJUu3QU7reZqN8AlrNxLUkACdZGVqWAyrPW2DXx4b56mN360ajs
-        tnrM1tSyMJMrxuGoWL7slxfWQQoTCNIGc+Rce+QIvDGRGudY75/w9mNMqH7INE3qjcSL6PPIQSpar
-        izSBzVi51KHPBDpVwknJRkLmOKFNYTbqx6opFFMC7PlZQEtbU/zkFVQ4suZAA2E9o65JtfCHUoPjI
-        mvtq0z4UUf/AABSsCrJejqHjARkD7w5ZiIc7BbCbrPrVs9JefbbyVyP6CMS+regjgEJQy9onPqeWH
-        P5XYqC+Q==;
+        bh=pMAOIxwEWgivE8T/8jAutxBqi67ojpc7aSJ9Dfvp1Nk=; b=kFKC1f6LHbffT6qzEiLaEuNO4Z
+        y5Wa6DZ64ihxEa532MbgjcReTwtC60BjPLQEj05bs6YuEeVI3sM977SdQzX4xmobJdlgPZVs2xWyC
+        EMJ38PRJqUFy7XNiizvMrGIgprvIHQUp93bgTey3sz0jg7eZMOPncNFBYMmaEZWsV/sf41kUB2N71
+        F5CwruEap8s8xzf4gj6k+YJ16+23/Z0Hl+DOqrPk1VXeoCpYu2IIRMb8Gs68ph2j0gtiX2+uWw4CJ
+        twPIBYTRWRfw9YLbtir6ZkrrfCdWs9qy8EIvSFTnNOFAOKv/ZGihXdRGCZZictQuPhGrpOtQoXsyI
+        Sb9DHpsQ==;
 Received: from [2001:4bb8:184:72a4:a4a9:19c0:5242:7768] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n9imb-000ZN9-IU; Tue, 18 Jan 2022 07:19:58 +0000
+        id 1n9imh-000ZOH-7s; Tue, 18 Jan 2022 07:20:03 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Pavel Begunkov <asml.silence@gmail.com>,
@@ -44,9 +44,9 @@ Cc:     Pavel Begunkov <asml.silence@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
         xen-devel@lists.xenproject.org, drbd-dev@lists.linbit.com
-Subject: [PATCH 01/19] fs: remove mpage_alloc
-Date:   Tue, 18 Jan 2022 08:19:34 +0100
-Message-Id: <20220118071952.1243143-2-hch@lst.de>
+Subject: [PATCH 03/19] nfs/blocklayout: remove bl_alloc_init_bio
+Date:   Tue, 18 Jan 2022 08:19:36 +0100
+Message-Id: <20220118071952.1243143-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220118071952.1243143-1-hch@lst.de>
 References: <20220118071952.1243143-1-hch@lst.de>
@@ -57,84 +57,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-open code mpage_alloc in it's two callers and simplify the results
-because of the context:
-
- - __mpage_writepage always passes GFP_NOFS and can thus always sleep and
-    will never get a NULL return from bio_alloc at all.
- - do_mpage_readpage can only get a non-sleeping context for readahead
-   which never sets PF_MEMALLOC and thus doesn't need the retry loop
-   either.
-
-Both cases will never have __GFP_HIGH set.
+bio_alloc will never fail when it can sleep.  Remove the now simple
+bl_alloc_init_bio helper and open code it in the only caller.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/mpage.c | 35 ++++++-----------------------------
- 1 file changed, 6 insertions(+), 29 deletions(-)
+ fs/nfs/blocklayout/blocklayout.c | 26 +++++---------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index 334e7d09aa652..c5817699b369b 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -67,29 +67,6 @@ static struct bio *mpage_bio_submit(int op, int op_flags, struct bio *bio)
+diff --git a/fs/nfs/blocklayout/blocklayout.c b/fs/nfs/blocklayout/blocklayout.c
+index fe860c5387476..38e063af7e98a 100644
+--- a/fs/nfs/blocklayout/blocklayout.c
++++ b/fs/nfs/blocklayout/blocklayout.c
+@@ -115,23 +115,6 @@ bl_submit_bio(struct bio *bio)
  	return NULL;
  }
  
--static struct bio *
--mpage_alloc(struct block_device *bdev,
--		sector_t first_sector, int nr_vecs,
--		gfp_t gfp_flags)
+-static struct bio *bl_alloc_init_bio(unsigned int npg,
+-		struct block_device *bdev, sector_t disk_sector,
+-		bio_end_io_t end_io, struct parallel_io *par)
 -{
 -	struct bio *bio;
 -
--	/* Restrict the given (page cache) mask for slab allocations */
--	gfp_flags &= GFP_KERNEL;
--	bio = bio_alloc(gfp_flags, nr_vecs);
--
--	if (bio == NULL && (current->flags & PF_MEMALLOC)) {
--		while (!bio && (nr_vecs /= 2))
--			bio = bio_alloc(gfp_flags, nr_vecs);
--	}
--
+-	npg = bio_max_segs(npg);
+-	bio = bio_alloc(GFP_NOIO, npg);
 -	if (bio) {
+-		bio->bi_iter.bi_sector = disk_sector;
 -		bio_set_dev(bio, bdev);
--		bio->bi_iter.bi_sector = first_sector;
+-		bio->bi_end_io = end_io;
+-		bio->bi_private = par;
 -	}
 -	return bio;
 -}
 -
- /*
-  * support function for mpage_readahead.  The fs supplied get_block might
-  * return an up to date buffer.  This is used to map that buffer into
-@@ -303,10 +280,11 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 								page))
- 				goto out;
- 		}
--		args->bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
--					bio_max_segs(args->nr_pages), gfp);
-+		args->bio = bio_alloc(gfp, bio_max_segs(args->nr_pages));
- 		if (args->bio == NULL)
- 			goto confused;
-+		bio_set_dev(args->bio, bdev);
-+		args->bio->bi_iter.bi_sector = blocks[0] << (blkbits - 9);
+ static bool offset_in_map(u64 offset, struct pnfs_block_dev_map *map)
+ {
+ 	return offset >= map->start && offset < map->start + map->len;
+@@ -171,10 +154,11 @@ do_add_page_to_bio(struct bio *bio, int npg, int rw, sector_t isect,
+ 
+ retry:
+ 	if (!bio) {
+-		bio = bl_alloc_init_bio(npg, map->bdev,
+-				disk_addr >> SECTOR_SHIFT, end_io, par);
+-		if (!bio)
+-			return ERR_PTR(-ENOMEM);
++		bio = bio_alloc(GFP_NOIO, bio_max_segs(npg));
++		bio->bi_iter.bi_sector = disk_addr >> SECTOR_SHIFT;
++		bio_set_dev(bio, map->bdev);
++		bio->bi_end_io = end_io;
++		bio->bi_private = par;
+ 		bio_set_op_attrs(bio, rw, 0);
  	}
- 
- 	length = first_hole << blkbits;
-@@ -615,10 +593,9 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
- 								page, wbc))
- 				goto out;
- 		}
--		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
--				BIO_MAX_VECS, GFP_NOFS|__GFP_HIGH);
--		if (bio == NULL)
--			goto confused;
-+		bio = bio_alloc(GFP_NOFS, BIO_MAX_VECS);
-+		bio_set_dev(bio, bdev);
-+		bio->bi_iter.bi_sector = blocks[0] << (blkbits - 9);
- 
- 		wbc_init_bio(wbc, bio);
- 		bio->bi_write_hint = inode->i_write_hint;
+ 	if (bio_add_page(bio, page, *len, offset) < *len) {
 -- 
 2.30.2
 
