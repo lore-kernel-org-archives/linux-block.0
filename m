@@ -2,54 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5835DC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jan 2022 00:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49228C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jan 2022 00:48:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350409AbiASAVI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Jan 2022 19:21:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51380 "EHLO
+        id S1350492AbiASAs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Jan 2022 19:48:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244782AbiASAVH (ORCPT
+        with ESMTP id S235175AbiASAsZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Jan 2022 19:21:07 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD80C06161C
-        for <linux-block@vger.kernel.org>; Tue, 18 Jan 2022 16:21:07 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 30so3008466edv.3
-        for <linux-block@vger.kernel.org>; Tue, 18 Jan 2022 16:21:06 -0800 (PST)
+        Tue, 18 Jan 2022 19:48:25 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37F2C061574
+        for <linux-block@vger.kernel.org>; Tue, 18 Jan 2022 16:48:24 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id c71so3205662edf.6
+        for <linux-block@vger.kernel.org>; Tue, 18 Jan 2022 16:48:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=bmeqfE1RuOXde41Zr3CQ/9tcb+03J/6w+lG9hJ7A4Ho=;
-        b=Ybqt4L8XARDalF5U3jxiomW7vn0XAjkMf9MRDY2CLKnxrl9ZFVPOy45252iZ/ahaBE
-         Uul8Do3DwK3+IhjDQEsQqZ25qhbKav+CsP+D/VRz8S/JP1MCrWjpPNAT2T6HpwQO2Kaj
-         U+mXSh1wrYynaFmrl3R954SKWovO2KgQQwMuFgk3bN6254exjP5wW45dCjMVUb5YwN8a
-         VxuJ4073q87irF35SwVs1OSriqyn3iO2/rrlt98SROIN6upeJLmrkKzh1HvDiSu1wNK0
-         Osy4+7YgQ8hN9QPHR4VjTrEWqZipRE0LQfv8aN/2JjfC3ryAYgT+7fuyuH/QIVRL+JSD
-         L94g==
+        bh=PAK4mW8hYoqrJ21zjz/l0DR61Bn1u+hWmA/ygwKpR6A=;
+        b=SQ3H6Qc9RZNxAmcSFllQOOFG3yg91OTSmj2gmpE3fpQkDrrsoBOB6ydcmoJOu9UA57
+         +j/ZzPkXrgRAlZ6C2fF+2yfdVbMPE3/xMK6g3CVDAQjj9HbIl7kDv0ep3bml8wS6pYpc
+         ja8hXr1DNG/LV35KH+Bn9KFuQyCPtK51Klo04YrgE44CMJHpm5Awv1SO0dH+tqBFOoZF
+         PAEqQjfzUXpqTAd9zrTAudxarFP+UTahdMIlCt2SxSqvwYGPoZOr4o/frkIPgqjbxFsd
+         WyjmmrY9xl/B1aq+lfouAaj1zJovUnyR0fBjUAyQOGkMBYIMDba7MB/bWami13YQl70t
+         QfCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=bmeqfE1RuOXde41Zr3CQ/9tcb+03J/6w+lG9hJ7A4Ho=;
-        b=Dk7c248nurl+pVZhGVlagqt59Wwy5ax47H9Ho3PZO2Y9qLBfb8RMdzVJPL/SItuDZS
-         xn0+W6nJPCGDnSelw97VuKV33dQCBtVgS0WvsEzkaYuD2OeOA5brpcc3m0ziqEfYUUCY
-         vb8SlbUtPqoat4Wlx2btJg02MPnjIbmCFKC3UKZM8P1iaB464OxyeteVFmxxHkmnOzfy
-         oWVRqMpBvPGBZ3SJ9VWIZ1ijTE09zSnvaZ2SY7bJir1lO3nCjWTrjciVxUnB5i1ATzlE
-         YkJ1yDja/yWn8OiPsXQICz3Mss/80gFqeMKUa0sgBrScb/+NLysyynjutnF46f9qfoJP
-         dNLg==
-X-Gm-Message-State: AOAM530WVrhUIQ4bYRgkofIUQE9H2rRZSLn4Mq0T5aUeNIBuV2EWqpcD
-        i2GDypznBFsy3zjBWpSV0pEXx+xGAAoESmNNkdKaug==
-X-Google-Smtp-Source: ABdhPJzX/FVgzC0EPKMvsUUn84DEffG26tohBKCZtOfTfxVCmLokcVuYpKW6O9EGM43LUqr04D+DAH09ngv7yEmd1xc=
-X-Received: by 2002:a05:6402:14f:: with SMTP id s15mr27553335edu.118.1642551665549;
- Tue, 18 Jan 2022 16:21:05 -0800 (PST)
+        bh=PAK4mW8hYoqrJ21zjz/l0DR61Bn1u+hWmA/ygwKpR6A=;
+        b=lwhQ01tTniz5AauctZDV/M9HatuNhTMn0Qb11cWO4RXzrV5UgqcyMIN+TR0vnrbwB5
+         CMlpcWTBdsWiV0dcS/5N0BdeDG4CP/xtbDr79AUwwGHsAMPEmv2vckayEJnozTcNjlB7
+         Z5FaZLzMEBvACmGhoOKiEHSxTBPC16NfCe9LDyPP/AZ7nmPGUPRP1uA7pmsCbVQ0Om2J
+         H68iCYseOvpRLJn9yn7MSZUTRxf1U6ykZojTivbtLCmjR3Zvx79IyZNgQ/f1lzAtA+EI
+         D9ZzloiLUEgj6n3SP+RjuS3+9AxrIsPcWF5z49mcCF9U9dyL3r++EmeKJHsuyzjHCe6i
+         dsVw==
+X-Gm-Message-State: AOAM531yJ/M6NNRReomAHt/WKPnPn4as285+/glH3+IgXUlaI1U3N+qg
+        8jn8Tw9SMouZ5oNpXu99zw+0jfz72kuUUIkJFfHyvA==
+X-Google-Smtp-Source: ABdhPJwQjghAznMK411R8b9/ZDbYdnQBr2j4+YDtGVUTaFkxr/2dQA+aeV/q08/V3OevBldMGzoi+KYmS0TVluHMgAk=
+X-Received: by 2002:a17:906:1f15:: with SMTP id w21mr18364838ejj.205.1642553303188;
+ Tue, 18 Jan 2022 16:48:23 -0800 (PST)
 MIME-Version: 1.0
 References: <20220118071952.1243143-1-hch@lst.de> <20220118071952.1243143-11-hch@lst.de>
-In-Reply-To: <20220118071952.1243143-11-hch@lst.de>
+ <CAMGffEmFZB1PPE09bfxQjKw-tJhdprEkF-OWrVF4Kjsf1OwQ_g@mail.gmail.com>
+In-Reply-To: <CAMGffEmFZB1PPE09bfxQjKw-tJhdprEkF-OWrVF4Kjsf1OwQ_g@mail.gmail.com>
 From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Wed, 19 Jan 2022 01:20:54 +0100
-Message-ID: <CAMGffEmFZB1PPE09bfxQjKw-tJhdprEkF-OWrVF4Kjsf1OwQ_g@mail.gmail.com>
+Date:   Wed, 19 Jan 2022 01:48:12 +0100
+Message-ID: <CAMGffEnZT_uU-CdACiW7cPQ_fRtUasMOHzr0VUrG4QmkJHF76g@mail.gmail.com>
 Subject: Re: [PATCH 10/19] rnbd-srv: simplify bio mapping in process_rdma
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>,
@@ -71,154 +72,158 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
-
-Thanks for the patch.
-
-On Tue, Jan 18, 2022 at 8:20 AM Christoph Hellwig <hch@lst.de> wrote:
+On Wed, Jan 19, 2022 at 1:20 AM Jinpu Wang <jinpu.wang@ionos.com> wrote:
 >
-> The memory mapped in process_rdma is contiguous, so there is no need
-> to loop over bio_add_page.  Remove rnbd_bio_map_kern and just open code
-> the bio allocation and mapping in the caller.
+> Hi Christoph,
 >
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/rnbd/rnbd-srv-dev.c | 57 -------------------------------
->  drivers/block/rnbd/rnbd-srv-dev.h |  5 ---
->  drivers/block/rnbd/rnbd-srv.c     | 20 ++++++++---
->  3 files changed, 15 insertions(+), 67 deletions(-)
+> Thanks for the patch.
 >
-> diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
-> index b241a099aeae2..98d3e591a0885 100644
-> --- a/drivers/block/rnbd/rnbd-srv-dev.c
-> +++ b/drivers/block/rnbd/rnbd-srv-dev.c
-> @@ -44,60 +44,3 @@ void rnbd_dev_close(struct rnbd_dev *dev)
->         blkdev_put(dev->bdev, dev->blk_open_flags);
->         kfree(dev);
->  }
-> -
-> -void rnbd_dev_bi_end_io(struct bio *bio)
-> -{
-> -       struct rnbd_dev_blk_io *io = bio->bi_private;
-> -
-> -       rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
-> -       bio_put(bio);
-> -}
-> -
-> -/**
-> - *     rnbd_bio_map_kern       -       map kernel address into bio
-> - *     @data: pointer to buffer to map
-> - *     @bs: bio_set to use.
-> - *     @len: length in bytes
-> - *     @gfp_mask: allocation flags for bio allocation
-> - *
-> - *     Map the kernel address into a bio suitable for io to a block
-> - *     device. Returns an error pointer in case of error.
-> - */
-> -struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
-> -                             unsigned int len, gfp_t gfp_mask)
-> -{
-> -       unsigned long kaddr = (unsigned long)data;
-> -       unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-> -       unsigned long start = kaddr >> PAGE_SHIFT;
-> -       const int nr_pages = end - start;
-> -       int offset, i;
-> -       struct bio *bio;
-> -
-> -       bio = bio_alloc_bioset(gfp_mask, nr_pages, bs);
-> -       if (!bio)
-> -               return ERR_PTR(-ENOMEM);
-> -
-> -       offset = offset_in_page(kaddr);
-> -       for (i = 0; i < nr_pages; i++) {
-> -               unsigned int bytes = PAGE_SIZE - offset;
-> -
-> -               if (len <= 0)
-> -                       break;
-> -
-> -               if (bytes > len)
-> -                       bytes = len;
-> -
-> -               if (bio_add_page(bio, virt_to_page(data), bytes,
-> -                                   offset) < bytes) {
-> -                       /* we don't support partial mappings */
-> -                       bio_put(bio);
-> -                       return ERR_PTR(-EINVAL);
-> -               }
-> -
-> -               data += bytes;
-> -               len -= bytes;
-> -               offset = 0;
-> -       }
-> -
-> -       return bio;
-> -}
-> diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
-> index 0eb23850afb95..1a14ece0be726 100644
-> --- a/drivers/block/rnbd/rnbd-srv-dev.h
-> +++ b/drivers/block/rnbd/rnbd-srv-dev.h
-> @@ -41,11 +41,6 @@ void rnbd_dev_close(struct rnbd_dev *dev);
+> On Tue, Jan 18, 2022 at 8:20 AM Christoph Hellwig <hch@lst.de> wrote:
+> >
+> > The memory mapped in process_rdma is contiguous, so there is no need
+> > to loop over bio_add_page.  Remove rnbd_bio_map_kern and just open code
+> > the bio allocation and mapping in the caller.
+> >
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  drivers/block/rnbd/rnbd-srv-dev.c | 57 -------------------------------
+> >  drivers/block/rnbd/rnbd-srv-dev.h |  5 ---
+> >  drivers/block/rnbd/rnbd-srv.c     | 20 ++++++++---
+> >  3 files changed, 15 insertions(+), 67 deletions(-)
+> >
+> > diff --git a/drivers/block/rnbd/rnbd-srv-dev.c b/drivers/block/rnbd/rnbd-srv-dev.c
+> > index b241a099aeae2..98d3e591a0885 100644
+> > --- a/drivers/block/rnbd/rnbd-srv-dev.c
+> > +++ b/drivers/block/rnbd/rnbd-srv-dev.c
+> > @@ -44,60 +44,3 @@ void rnbd_dev_close(struct rnbd_dev *dev)
+> >         blkdev_put(dev->bdev, dev->blk_open_flags);
+> >         kfree(dev);
+> >  }
+> > -
+> > -void rnbd_dev_bi_end_io(struct bio *bio)
+> > -{
+> > -       struct rnbd_dev_blk_io *io = bio->bi_private;
+> > -
+> > -       rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
+> > -       bio_put(bio);
+> > -}
+> > -
+> > -/**
+> > - *     rnbd_bio_map_kern       -       map kernel address into bio
+> > - *     @data: pointer to buffer to map
+> > - *     @bs: bio_set to use.
+> > - *     @len: length in bytes
+> > - *     @gfp_mask: allocation flags for bio allocation
+> > - *
+> > - *     Map the kernel address into a bio suitable for io to a block
+> > - *     device. Returns an error pointer in case of error.
+> > - */
+> > -struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> > -                             unsigned int len, gfp_t gfp_mask)
+> > -{
+> > -       unsigned long kaddr = (unsigned long)data;
+> > -       unsigned long end = (kaddr + len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+> > -       unsigned long start = kaddr >> PAGE_SHIFT;
+> > -       const int nr_pages = end - start;
+> > -       int offset, i;
+> > -       struct bio *bio;
+> > -
+> > -       bio = bio_alloc_bioset(gfp_mask, nr_pages, bs);
+> > -       if (!bio)
+> > -               return ERR_PTR(-ENOMEM);
+> > -
+> > -       offset = offset_in_page(kaddr);
+> > -       for (i = 0; i < nr_pages; i++) {
+> > -               unsigned int bytes = PAGE_SIZE - offset;
+> > -
+> > -               if (len <= 0)
+> > -                       break;
+> > -
+> > -               if (bytes > len)
+> > -                       bytes = len;
+> > -
+> > -               if (bio_add_page(bio, virt_to_page(data), bytes,
+> > -                                   offset) < bytes) {
+> > -                       /* we don't support partial mappings */
+> > -                       bio_put(bio);
+> > -                       return ERR_PTR(-EINVAL);
+> > -               }
+> > -
+> > -               data += bytes;
+> > -               len -= bytes;
+> > -               offset = 0;
+> > -       }
+> > -
+> > -       return bio;
+> > -}
+> > diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
+> > index 0eb23850afb95..1a14ece0be726 100644
+> > --- a/drivers/block/rnbd/rnbd-srv-dev.h
+> > +++ b/drivers/block/rnbd/rnbd-srv-dev.h
+> > @@ -41,11 +41,6 @@ void rnbd_dev_close(struct rnbd_dev *dev);
+> >
+> >  void rnbd_endio(void *priv, int error);
+> >
+> > -void rnbd_dev_bi_end_io(struct bio *bio);
+> > -
+> > -struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
+> > -                             unsigned int len, gfp_t gfp_mask);
+> > -
+> >  static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
+> >  {
+> >         return queue_max_segments(bdev_get_queue(dev->bdev));
+> > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+> > index 1ee808fc600cf..65c670e96075b 100644
+> > --- a/drivers/block/rnbd/rnbd-srv.c
+> > +++ b/drivers/block/rnbd/rnbd-srv.c
+> > @@ -114,6 +114,14 @@ rnbd_get_sess_dev(int dev_id, struct rnbd_srv_session *srv_sess)
+> >         return sess_dev;
+> >  }
+> >
+> > +static void rnbd_dev_bi_end_io(struct bio *bio)
+> > +{
+> > +       struct rnbd_dev_blk_io *io = bio->bi_private;
+> > +
+> > +       rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
+> > +       bio_put(bio);
+> > +}
+> > +
+> >  static int process_rdma(struct rnbd_srv_session *srv_sess,
+> >                         struct rtrs_srv_op *id, void *data, u32 datalen,
+> >                         const void *usr, size_t usrlen)
+> > @@ -144,11 +152,11 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
+> >         priv->sess_dev = sess_dev;
+> >         priv->id = id;
+> >
+> > -       /* Generate bio with pages pointing to the rdma buffer */
+> > -       bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
+> > -       if (IS_ERR(bio)) {
+> > -               err = PTR_ERR(bio);
+> > -               rnbd_srv_err(sess_dev, "Failed to generate bio, err: %d\n", err);
+> > +       bio = bio_alloc_bioset(GFP_KERNEL, 1, sess_dev->rnbd_dev->ibd_bio_set);
+> > +       if (bio_add_page(bio, virt_to_page(data), datalen,
+> > +                       offset_in_page(data))) {
+> this changes lead to IO error all the time, because bio_add_page return len.
+> We need  if (bio_add_page(bio, virt_to_page(data), datalen,
+>                      offset_in_page(data)) < datalen)
 >
->  void rnbd_endio(void *priv, int error);
->
-> -void rnbd_dev_bi_end_io(struct bio *bio);
-> -
-> -struct bio *rnbd_bio_map_kern(void *data, struct bio_set *bs,
-> -                             unsigned int len, gfp_t gfp_mask);
-> -
->  static inline int rnbd_dev_get_max_segs(const struct rnbd_dev *dev)
->  {
->         return queue_max_segments(bdev_get_queue(dev->bdev));
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-> index 1ee808fc600cf..65c670e96075b 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -114,6 +114,14 @@ rnbd_get_sess_dev(int dev_id, struct rnbd_srv_session *srv_sess)
->         return sess_dev;
->  }
->
-> +static void rnbd_dev_bi_end_io(struct bio *bio)
-> +{
-> +       struct rnbd_dev_blk_io *io = bio->bi_private;
-> +
-> +       rnbd_endio(io->priv, blk_status_to_errno(bio->bi_status));
-> +       bio_put(bio);
-> +}
-> +
->  static int process_rdma(struct rnbd_srv_session *srv_sess,
->                         struct rtrs_srv_op *id, void *data, u32 datalen,
->                         const void *usr, size_t usrlen)
-> @@ -144,11 +152,11 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
->         priv->sess_dev = sess_dev;
->         priv->id = id;
->
-> -       /* Generate bio with pages pointing to the rdma buffer */
-> -       bio = rnbd_bio_map_kern(data, sess_dev->rnbd_dev->ibd_bio_set, datalen, GFP_KERNEL);
-> -       if (IS_ERR(bio)) {
-> -               err = PTR_ERR(bio);
-> -               rnbd_srv_err(sess_dev, "Failed to generate bio, err: %d\n", err);
-> +       bio = bio_alloc_bioset(GFP_KERNEL, 1, sess_dev->rnbd_dev->ibd_bio_set);
-> +       if (bio_add_page(bio, virt_to_page(data), datalen,
-> +                       offset_in_page(data))) {
-this changes lead to IO error all the time, because bio_add_page return len.
-We need  if (bio_add_page(bio, virt_to_page(data), datalen,
-                     offset_in_page(data)) < datalen)
-
-Thanks!
-> +               rnbd_srv_err(sess_dev, "Failed to map data to bio\n");
-> +               err = -EINVAL;
->                 goto sess_dev_put;
->         }
->
-> @@ -170,6 +178,8 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
->
->         return 0;
->
-> +bio_put:
-> +       bio_put(bio);
->  sess_dev_put:
->         rnbd_put_sess_dev(sess_dev);
->  err:
-> --
-> 2.30.2
->
+> Thanks!
+> > +               rnbd_srv_err(sess_dev, "Failed to map data to bio\n");
+> > +               err = -EINVAL;
+> >                 goto sess_dev_put;
+> >         }
+> >
+> > @@ -170,6 +178,8 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
+> >
+> >         return 0;
+> >
+> > +bio_put:
+> > +       bio_put(bio);
+and bio_put is not used, should move bio_put(bio); below, no need for
+bio_put: label.
+> >  sess_dev_put:
+> >         rnbd_put_sess_dev(sess_dev);
+> >  err:
+> > --
+> > 2.30.2
+> >
