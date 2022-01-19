@@ -2,73 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C284C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jan 2022 11:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F128BC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 19 Jan 2022 11:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354134AbiASLbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jan 2022 06:31:05 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:58765 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354064AbiASLbF (ORCPT
+        id S1354240AbiASLjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jan 2022 06:39:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40306 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1354244AbiASLjK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jan 2022 06:31:05 -0500
-Received: from fsav119.sakura.ne.jp (fsav119.sakura.ne.jp [27.133.134.246])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20JBUsKI084480;
-        Wed, 19 Jan 2022 20:30:54 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav119.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav119.sakura.ne.jp);
- Wed, 19 Jan 2022 20:30:54 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav119.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20JBUsEj084462
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 19 Jan 2022 20:30:54 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <28a360a3-b559-24ec-6c3d-3fe6e8302393@I-love.SAKURA.ne.jp>
-Date:   Wed, 19 Jan 2022 20:30:52 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: Racy loop device reuse logic
-Content-Language: en-US
+        Wed, 19 Jan 2022 06:39:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642592348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z23E4Um11BOkgt39lK2OE7q1T4sdztW+qOUuVlme2a4=;
+        b=N02AlMBYRJkUftXEvAnr05qcgnUtZ0RbOyixeaF/1NakSdGX7S2gSZYmtUpNFcVFjom/T+
+        lhfDttyQwEyWcw9kyfEBkVax8Qk+gwDyRyn9CuL//OMzPcX/xyB2A4nLkX+ujnayCxWkIo
+        DhMphfkEDiIy0zroXwlS+wyZ+fRVjJ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-111-ydGGwi7GOLyv-AR0jtGzIw-1; Wed, 19 Jan 2022 06:39:05 -0500
+X-MC-Unique: ydGGwi7GOLyv-AR0jtGzIw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 505291083F61;
+        Wed, 19 Jan 2022 11:39:04 +0000 (UTC)
+Received: from ws.net.home (ovpn-112-8.ams2.redhat.com [10.36.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 308A97D475;
+        Wed, 19 Jan 2022 11:39:03 +0000 (UTC)
+Date:   Wed, 19 Jan 2022 12:39:00 +0100
+From:   Karel Zak <kzak@redhat.com>
 To:     Jan Kara <jack@suse.cz>
 Cc:     util-linux@vger.kernel.org, linux-block@vger.kernel.org,
-        Karel Zak <kzak@redhat.com>
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: Re: Racy loop device reuse logic
+Message-ID: <20220119113900.tm5j65wzxglggsig@ws.net.home>
 References: <20220113154735.hdzi4cqsz5jt6asp@quack3.lan>
  <20220119085247.duhblxzp6joukarw@quack3.lan>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20220119085247.duhblxzp6joukarw@quack3.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I found a way to avoid this race by splitting lo_open() into two phases using task_work_add().
-Christoph Hellwig is trying to take a look at https://lkml.kernel.org/r/f6b947d0-1047-66b3-0243-af5017c9ab55@I-love.SAKURA.ne.jp .
+On Wed, Jan 19, 2022 at 09:52:47AM +0100, Jan Kara wrote:
+> Ping? Any opinion?
 
-On 2022/01/12 22:16, Jan Kara wrote:
-> I don't think we can fully solve this race in the kernel and IMO it is
-> futile to try that - depending on when exactly systemd-udev decides to
+ Sorry for the delay.
 
-s/systemd-udev/systemd-udevd/g
+> On Thu 13-01-22 16:47:35, Jan Kara wrote:
+> > Hello,
+> > 
+> > Tetsuo has been doing some changes to the loop device shutdown in the
+> > kernel and that broke LTP that is doing essentially the following loop:
+> > 
+> > while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
+> > 
+> > And this loop is broken because of a subtle interaction with systemd-udev
+> > that also opens the loop device. The race seems to be in mount(8) handling
+> > itself and the altered kernel timing makes it happen. It look like:
+> > 
+> > bash					systemd-udev
+> >   mount -o loop,ro isofs.iso isofs/
+> >     /dev/loop0 is created and bound to isofs.iso, autoclear is set for
+> >     loop0
+> >   					opens /dev/loop0
+> >   umount isofs/
+> >   loop0 still lives because systemd-udev still has device open
+> >   mount -o loop,ro isofs.iso isofs/
+> >     gets to mnt_context_setup_loopdev()
+> >       loopcxt_find_overlap()
+> >       sees loop0 is still valid and with proper parameters
+> >       reuse = true;
+> > 					close /dev/loop0
+> > 					  last fd closed => loop0 is
+> > 					    cleaned up
+> >       loopcxt_get_fd()
+> >         opens loop0 but it is no longer the device we wanted!
+> >     calls mount(2) which fails because we cannot read from the loop device
+> > 
+> > It seems to me that mnt_context_setup_loopdev() should actually recheck
+> > that loop device parameters still match what we need after opening
+> > /dev/loop0 (if LOOP_GET_STATUS ioctl succeeds on the fd, you are guaranteed
+> > the loop device is in that state and will not be torn down under your
+> > hands). What do you think?
 
-> close /dev/loop0 and how exactly mount decides to implement its loop device
-> reuse, different strategies will / will not work.
+Seems like elegant solution. Please, send a patch.
 
-Assuming memory leak
+(It would be possible to be care about autoclear in
+loopcxt_find_overlap(), but it sounds complicated and probably still
+racy.
 
- +	spin_unlock(&loop_delete_spinlock);
--+	if (err)
--+		return err;
-++	if (err) {
-++		kfree(lot);
-++		kfree(lrt);
-++		return err;
-++	}
- +	/* Add to spool, for -ENOMEM upon release() cannot be handled. */
+> > 
+> > 								Honza
+> > -- 
+> > Jan Kara <jack@suse.com>
+> > SUSE Labs, CR
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+> 
 
-in that patch is fixed, trying to solve this race on the kernel side looks not such bad.
+-- 
+ Karel Zak  <kzak@redhat.com>
+ http://karelzak.blogspot.com
 
