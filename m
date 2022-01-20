@@ -2,62 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C06C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 11:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB72C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 11:18:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbiATLCv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jan 2022 06:02:51 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:57686 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230145AbiATLCu (ORCPT
+        id S230404AbiATLS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jan 2022 06:18:26 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:39116 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229891AbiATLSZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jan 2022 06:02:50 -0500
+        Thu, 20 Jan 2022 06:18:25 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8A89C1F766;
-        Thu, 20 Jan 2022 11:02:49 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 92BE3218A9;
+        Thu, 20 Jan 2022 11:18:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1642676569; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1642677504; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p3BqDV1ig3o00bV+/31wlTcHkbP1cECkqVf9yFw8L1Q=;
-        b=01SrN6rMZ1shkMT4kYWA9HnqBDMzl6gT93XmfiFF1n1HO3dqQqp8mNa6fp9MKHCSLH9vkF
-        UgVRXuuNIBCvWIXM3WamVb9ywMHjkDdKazvvnpHEhhph+MjqxSn6VJPaRGHCpijdcWUFZF
-        XPI5BGPgzjJDtAOR6zaoDbJ5sHNuRx0=
+        bh=d8VO0ro5++eVxYPby3+L4F01fUksoPWmYpmpbS50Btk=;
+        b=nuvuzlBVkYDxr2xgcBnJJiv47ULnPtdRTDJScmiMOA8+bNYz8tWoANqYonVXzt4soCYFrK
+        +/jLJxWE56mdhnq1q+62Zw/5zOjz7ksITJrIeLbJdbhfzzK8wn4/sBB/6KUEnTOf5cj7G4
+        b1X1qXujMdoGKFuHdMhXOwJAVF1wau4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1642676569;
+        s=susede2_ed25519; t=1642677504;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p3BqDV1ig3o00bV+/31wlTcHkbP1cECkqVf9yFw8L1Q=;
-        b=QlcXv1R6f60jWk/EAYeSynTum2DIWp37sF0SfSTV7ST/H3UwA5k6aepXluNoR9Cv7i3lKk
-        vfcQc75N5T2YqfCw==
+        bh=d8VO0ro5++eVxYPby3+L4F01fUksoPWmYpmpbS50Btk=;
+        b=o/YDxOoqxKLCyAgRaLIyLdzQLNJAPwzZkHyjn/gD5o0DZnCJU+JSia1+osg7H6mZ385V6a
+        BmCE59UmpQyevtBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 72B2B13E46;
-        Thu, 20 Jan 2022 11:02:49 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 857CD13E46;
+        Thu, 20 Jan 2022 11:18:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id pfYIG1lB6WH8NwAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 20 Jan 2022 11:02:49 +0000
-Subject: Re: [PATCH 1/2] block: remove commented out code from diskstats_show
+        id dewfIABF6WFKPwAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 20 Jan 2022 11:18:24 +0000
+Subject: Re: [PATCH 2/2] block: hold queue lock while iterating in
+ diskstats_show
 To:     Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 References: <20220120105248.117025-1-dwagner@suse.de>
- <20220120105248.117025-2-dwagner@suse.de>
+ <20220120105248.117025-3-dwagner@suse.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <83b281e5-16c2-d659-172d-3a2c911c7ff0@suse.de>
-Date:   Thu, 20 Jan 2022 12:02:49 +0100
+Message-ID: <bcd9ee08-d751-84f4-7334-b107ee3ca294@suse.de>
+Date:   Thu, 20 Jan 2022 12:18:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20220120105248.117025-2-dwagner@suse.de>
+In-Reply-To: <20220120105248.117025-3-dwagner@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -66,36 +67,50 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 1/20/22 11:52 AM, Daniel Wagner wrote:
-> The diskstats format is ABI, so we just can't add a new header. The
-> code snippet has been commented out since at least v2.6.12-rc2.
-> Remove it.
+> The request queues can be freed while we operate on them. Make sure we
+> hold a reference when using blk_mq_queue_tag_busy_iter.
+> 
+> RIP: blk_mq_queue_tag_busy_iter
+> Call Trace:
+>  ? blk_mq_hctx_mark_pending
+>  ? diskstats_show
+>  ? blk_mq_hctx_mark_pending
+>  blk_mq_in_flight
+>  diskstats_show
+>  ? klist_next
+>  seq_read
+>  proc_reg_read
+>  vfs_read
+>  ksys_read
+>  do_syscall_64
+>  entry_SYSCALL_64_after_hwframe
 > 
 > Signed-off-by: Daniel Wagner <dwagner@suse.de>
 > ---
->  block/genhd.c | 8 --------
->  1 file changed, 8 deletions(-)
+>  block/genhd.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
 > diff --git a/block/genhd.c b/block/genhd.c
-> index 626c8406f21a..c9d4386dd177 100644
+> index c9d4386dd177..0e163055a4e6 100644
 > --- a/block/genhd.c
 > +++ b/block/genhd.c
-> @@ -1162,14 +1162,6 @@ static int diskstats_show(struct seq_file *seqf, void *v)
->  	struct disk_stats stat;
->  	unsigned long idx;
->  
-> -	/*
-> -	if (&disk_to_dev(gp)->kobj.entry == block_class.devices.next)
-> -		seq_puts(seqf,	"major minor name"
-> -				"     rio rmerge rsect ruse wio wmerge "
-> -				"wsect wuse running use aveq"
-> -				"\n\n");
-> -	*/
-> -
->  	rcu_read_lock();
->  	xa_for_each(&gp->part_tbl, idx, hd) {
+> @@ -1167,10 +1167,13 @@ static int diskstats_show(struct seq_file *seqf, void *v)
 >  		if (bdev_is_partition(hd) && !bdev_nr_sectors(hd))
+>  			continue;
+>  		part_stat_read_all(hd, &stat);
+> +		if (blk_queue_enter(gp->queue, BLK_MQ_REQ_NOWAIT))
+> +			continue;
+>  		if (queue_is_mq(gp->queue))
+>  			inflight = blk_mq_in_flight(gp->queue, hd);
+>  		else
+>  			inflight = part_in_flight(hd);
+> +		blk_queue_exit(gp->queue);
+>  
+>  		seq_printf(seqf, "%4d %7d %pg "
+>  			   "%lu %lu %lu %u "
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+While this looks good, it seems to have been cut against an earlier
+branch; the code in question looks different in my copy.
 
 Cheers,
 
