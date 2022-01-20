@@ -2,63 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 822DBC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 17:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D070C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 17:54:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232494AbiATRxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jan 2022 12:53:49 -0500
-Received: from mail-pj1-f54.google.com ([209.85.216.54]:46929 "EHLO
-        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230477AbiATRxt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jan 2022 12:53:49 -0500
-Received: by mail-pj1-f54.google.com with SMTP id n16-20020a17090a091000b001b46196d572so6455823pjn.5
-        for <linux-block@vger.kernel.org>; Thu, 20 Jan 2022 09:53:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=bW21sZp1EbNoTXfTox1CrDTu68JnEQ/L0AiwmQmbAXQ=;
-        b=Wfu/Lxq42rLp1Kwz9dy6L8VfaUI+AGgC5DifliaOgMmdj1WAIutDXS2SKcDWc5c1X5
-         jCYZE5nbLba4p+9ald7+OLUgFkM7IAxAE/fzO2gCzp0lE8mPgpt1r12DDzdvgygGqABc
-         YE+KHINc+/DYV23NMezXjEE26QBeMXuWZFWnBm+RHYgb+ThpRuYHoOTwsDFRcjFSaFBD
-         G0Exii7JJb+yLeSD1nkLEX+I2JP9Qhmu/rDlE5ud5XFfroarfOATJDw2pSO31vxfj+6M
-         Q5GppyP9ka2GYei5zkEKdr5WJP7fpQWIkOz38A4XO9UHa0yQeUL2M72WPx+gGGPueOEi
-         Rqvg==
-X-Gm-Message-State: AOAM530Dy/xV3awG6STOFQN/gkPFPeEzkCwCt8+leA+7YuKlm4YzLg1y
-        fP1N+O5H4nlP+TAIdmJZ57pJWlPK+Iw=
-X-Google-Smtp-Source: ABdhPJxMaosQECmVSCgqXGBizhs1zzqZT+XqdfYk0Ma7fHFigYQuG++NRXg4xrxW1Yg1wkKxunc5dQ==
-X-Received: by 2002:a17:90b:2252:: with SMTP id hk18mr97035pjb.53.1642701229041;
-        Thu, 20 Jan 2022 09:53:49 -0800 (PST)
-Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id 14sm9484132pjh.45.2022.01.20.09.53.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jan 2022 09:53:48 -0800 (PST)
-Message-ID: <cb8e7e51-d4f1-0109-83b2-6b686305043f@acm.org>
-Date:   Thu, 20 Jan 2022 09:53:47 -0800
+        id S233051AbiATRym (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jan 2022 12:54:42 -0500
+Received: from foss.arm.com ([217.140.110.172]:47074 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232979AbiATRyi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Jan 2022 12:54:38 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3F09FED1;
+        Thu, 20 Jan 2022 09:54:37 -0800 (PST)
+Received: from [10.57.68.26] (unknown [10.57.68.26])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0213C3F774;
+        Thu, 20 Jan 2022 09:54:34 -0800 (PST)
+Message-ID: <744d247c-bbb5-80aa-f774-c65791cb0766@arm.com>
+Date:   Thu, 20 Jan 2022 17:54:30 +0000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH] block: fix async_depth sysfs interface for mq-deadline
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <f8b01f4c-f8d5-8fcb-dba4-6d37f0db5622@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <f8b01f4c-f8d5-8fcb-dba4-6d37f0db5622@kernel.dk>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: Phyr Starter
+Content-Language: en-GB
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     nvdimm@lists.linux.dev, linux-rdma@vger.kernel.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, dri-devel@lists.freedesktop.org,
+        Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
+ <20220111004126.GJ2328285@nvidia.com> <20220120135602.GA11223@lst.de>
+ <20220120152736.GB383746@dhcp-10-100-145-180.wdc.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20220120152736.GB383746@dhcp-10-100-145-180.wdc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/20/22 09:30, Jens Axboe wrote:
-> A previous commit added this feature, but it inadvertently used the wrong
-> variable to show/store the setting from/to, victimized by copy/paste. Fix
-> it up so that the async_depth sysfs interface reads and writes from the
-> right setting.
+On 2022-01-20 15:27, Keith Busch wrote:
+> On Thu, Jan 20, 2022 at 02:56:02PM +0100, Christoph Hellwig wrote:
+>>   - on the input side to dma mapping the bio_vecs (or phyrs) are chained
+>>     as bios or whatever the containing structure is.  These already exist
+>>     and have infrastructure at least in the block layer
+>>   - on the output side I plan for two options:
+>>
+>> 	1) we have a sane IOMMU and everyting will be coalesced into a
+>> 	   single dma_range.  This requires setting the block layer
+>> 	   merge boundary to match the IOMMU page size, but that is
+>> 	   a very good thing to do anyway.
+> 
+> It doesn't look like IOMMU page sizes are exported, or even necessarily
+> consistently sized on at least one arch (power).
 
-Thank you for having fixed this.
+FWIW POWER does its own thing separate from the IOMMU API. For all the 
+regular IOMMU API players, page sizes are published in the iommu_domain 
+that the common iommu-dma layer operates on. In fact it already uses 
+them to pick chunk sizes for composing large buffer allocations.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Robin.
