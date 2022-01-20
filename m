@@ -2,109 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA45C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 19 Jan 2022 21:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14514C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 04:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357426AbiASVew (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Jan 2022 16:34:52 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:59894 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243932AbiASVeu (ORCPT
+        id S232488AbiATEnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Jan 2022 23:43:10 -0500
+Received: from mail.parknet.co.jp ([210.171.160.6]:59148 "EHLO
+        mail.parknet.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229952AbiATEnJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Jan 2022 16:34:50 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 5C84E212C2;
-        Wed, 19 Jan 2022 21:34:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1642628089; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aun6ij2QvF3u9NGjQoC9Mv9VjaXAyj0RX96zTEIVNxg=;
-        b=joEyvuS9fXcfXCF5bw55cOZG6q15KFDVFKMt8XVzDsh5sc9RS5XVteIux1nOb8E+Yl6dbR
-        cqHqwWozC/x7uYwF2a3hd0zYVEkdwUQ51ek6m3fKJypSIlc5snxr8ZXyXJPYYgs+gneFyB
-        RYSwa6JTVlRrfB9sQPWE8IoKd0/Rt58=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1642628089;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aun6ij2QvF3u9NGjQoC9Mv9VjaXAyj0RX96zTEIVNxg=;
-        b=MatgSzeDOdCZNjAee9KM0XsPevwPmwYuVkWFAxBwc0fjA0R7LLabb0/bfg6qBtL6OlyNEW
-        CAEXPXmTDOgBQ2BA==
-Received: from quack3.suse.cz (jack.udp.ovpn1.prg.suse.de [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 4CC11A3B83;
-        Wed, 19 Jan 2022 21:34:49 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 1E180A05E7; Wed, 19 Jan 2022 22:34:49 +0100 (CET)
-Date:   Wed, 19 Jan 2022 22:34:49 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Karel Zak <kzak@redhat.com>
-Cc:     Jan Kara <jack@suse.cz>, util-linux@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: Re: Racy loop device reuse logic
-Message-ID: <20220119213449.jydoqbyzjudqmikk@quack3.lan>
-References: <20220113154735.hdzi4cqsz5jt6asp@quack3.lan>
- <20220119085247.duhblxzp6joukarw@quack3.lan>
- <20220119113900.tm5j65wzxglggsig@ws.net.home>
+        Wed, 19 Jan 2022 23:43:09 -0500
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+        by mail.parknet.co.jp (Postfix) with ESMTPSA id A3E6F15F939;
+        Thu, 20 Jan 2022 13:43:08 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+        by ibmpc.myhome.or.jp (8.16.1/8.16.1/Debian-2) with ESMTPS id 20K4h7uu116242
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 13:43:08 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+        by devron.myhome.or.jp (8.16.1/8.16.1/Debian-2) with ESMTPS id 20K4h7jJ493217
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 13:43:07 +0900
+Received: (from hirofumi@localhost)
+        by devron.myhome.or.jp (8.16.1/8.16.1/Submit) id 20K4h6L8493216;
+        Thu, 20 Jan 2022 13:43:06 +0900
+From:   OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        glider@google.com, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] block: Fix wrong offset in bio_truncate()
+References: <000000000000880fca05d4fc73b0@google.com>
+        <875yqt1c9g.fsf@mail.parknet.co.jp> <YdvngICmbNXOFIIj@T590>
+Date:   Thu, 20 Jan 2022 13:43:05 +0900
+In-Reply-To: <YdvngICmbNXOFIIj@T590> (Ming Lei's message of "Mon, 10 Jan 2022
+        16:00:00 +0800")
+Message-ID: <87pmonqap2.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/29.0.50 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220119113900.tm5j65wzxglggsig@ws.net.home>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 19-01-22 12:39:00, Karel Zak wrote:
-> On Wed, Jan 19, 2022 at 09:52:47AM +0100, Jan Kara wrote:
-> > Ping? Any opinion?
-> 
->  Sorry for the delay.
-> 
-> > On Thu 13-01-22 16:47:35, Jan Kara wrote:
-> > > Hello,
-> > > 
-> > > Tetsuo has been doing some changes to the loop device shutdown in the
-> > > kernel and that broke LTP that is doing essentially the following loop:
-> > > 
-> > > while :; do mount -o loop,ro isofs.iso isofs/; umount isofs/; done
-> > > 
-> > > And this loop is broken because of a subtle interaction with systemd-udev
-> > > that also opens the loop device. The race seems to be in mount(8) handling
-> > > itself and the altered kernel timing makes it happen. It look like:
-> > > 
-> > > bash					systemd-udev
-> > >   mount -o loop,ro isofs.iso isofs/
-> > >     /dev/loop0 is created and bound to isofs.iso, autoclear is set for
-> > >     loop0
-> > >   					opens /dev/loop0
-> > >   umount isofs/
-> > >   loop0 still lives because systemd-udev still has device open
-> > >   mount -o loop,ro isofs.iso isofs/
-> > >     gets to mnt_context_setup_loopdev()
-> > >       loopcxt_find_overlap()
-> > >       sees loop0 is still valid and with proper parameters
-> > >       reuse = true;
-> > > 					close /dev/loop0
-> > > 					  last fd closed => loop0 is
-> > > 					    cleaned up
-> > >       loopcxt_get_fd()
-> > >         opens loop0 but it is no longer the device we wanted!
-> > >     calls mount(2) which fails because we cannot read from the loop device
-> > > 
-> > > It seems to me that mnt_context_setup_loopdev() should actually recheck
-> > > that loop device parameters still match what we need after opening
-> > > /dev/loop0 (if LOOP_GET_STATUS ioctl succeeds on the fd, you are guaranteed
-> > > the loop device is in that state and will not be torn down under your
-> > > hands). What do you think?
-> 
-> Seems like elegant solution. Please, send a patch.
+Ming Lei <ming.lei@redhat.com> writes:
 
-OK, will do.
+> On Sun, Jan 09, 2022 at 06:36:43PM +0900, OGAWA Hirofumi wrote:
+>> bio_truncate() clears the buffer outside of last block of bdev, however
+>> current bio_truncate() is using the wrong offset of page. So it can
+>> return the uninitialized data.
+>> 
+>> This happened when both of truncated/corrupted FS and userspace (via
+>> bdev) are trying to read the last of bdev.
+>> 
+>> Reported-by: syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com
+>> Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+>> ---
+>>  block/bio.c |    3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/block/bio.c b/block/bio.c
+>> index a6fb6a0..25f1ed2 100644
+>> --- a/block/bio.c	2021-11-01 09:19:05.999472589 +0900
+>> +++ b/block/bio.c	2022-01-09 17:40:09.010438012 +0900
+>> @@ -567,7 +567,8 @@ void bio_truncate(struct bio *bio, unsig
+>>  				offset = new_size - done;
+>>  			else
+>>  				offset = 0;
+>> -			zero_user(bv.bv_page, offset, bv.bv_len - offset);
+>> +			zero_user(bv.bv_page, bv.bv_offset + offset,
+>> +				  bv.bv_len - offset);
+>
+> Looks correct:
+>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-								Honza
+ping?
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
