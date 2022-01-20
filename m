@@ -2,94 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2093C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 15:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AB5C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 16:29:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376650AbiATPm4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jan 2022 10:42:56 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:58566 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231997AbiATPmz (ORCPT
+        id S1377011AbiATQ3x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jan 2022 11:29:53 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:43354 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1376939AbiATQ3w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jan 2022 10:42:55 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id CA18A1F394;
-        Thu, 20 Jan 2022 15:42:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1642693374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        Thu, 20 Jan 2022 11:29:52 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 260A62195A;
+        Thu, 20 Jan 2022 16:29:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1642696190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=PWUKBq0/dMYv0MqWyaiHtHc2XPqegj3c/pp1sj1xy6Y=;
-        b=avRUtaaUJzkOEmekqVhwYbR7NvCbSlDyy1gpTunxDZstw/owjNIpNY7uKqfwowSRL/4+W4
-        iCrTlcDrao0TYBPiVpQkJrTXoz0kJyxAxlrk5WSkvKZiXR42cG75oQyk6J1Gvlp63mcNVf
-        7bwbodT/qDRc5g/U9cpoD1pERhm2qUs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1642693374;
+        bh=sW8ehN6Hzkq3F2pX0JmHoCxEG6Zo3yhNg1meJqbd2PA=;
+        b=isXCpz4dYPVHoDVI0GsoO/Nq1d+UW3BiSThtZwybrbNVLvZJnaUvJJlQ6I+SwqX4si6Fwl
+        SMRpQVOlS6rOREOyXqe4LvyJhVH0nEeNrO3Ym+RKkN5pKtzv9b9BFg1WVgGCytH6yi87wL
+        YafFTQLJYKETzCDjQufMV1ODcvfNP78=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1642696190;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=PWUKBq0/dMYv0MqWyaiHtHc2XPqegj3c/pp1sj1xy6Y=;
-        b=XGHfpNNeHZ9eCK+0MjWPqBfxghpt16JLxjqy7SlyiDS9CWz1BsA5WFAInoELySXGb4IfYy
-        L4pff9GxMuqzWaDg==
-Received: from quack3.suse.cz (unknown [10.100.200.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        bh=sW8ehN6Hzkq3F2pX0JmHoCxEG6Zo3yhNg1meJqbd2PA=;
+        b=opIu8da2LLuYNR0aDKPyth4dVWw5d8fT2gQC/jytzOM5xJ1Ii1Y51sTAtNsRka2XXrbOyV
+        vNUhpkP/Bmt8wBCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 92399A3B85;
-        Thu, 20 Jan 2022 15:42:54 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id B32D5A05D3; Thu, 20 Jan 2022 16:42:52 +0100 (CET)
-Date:   Thu, 20 Jan 2022 16:42:52 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        Jan Stancek <jstancek@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] loop: use task_work for autoclear operation
-Message-ID: <20220120154252.cmh57rrhyy22t6de@quack3.lan>
-References: <969f764d-0e0f-6c64-de72-ecfee30bdcf7@I-love.SAKURA.ne.jp>
- <bcaf38e6-055e-0d83-fd1d-cb7c0c649372@I-love.SAKURA.ne.jp>
- <20220110103057.h775jv2br2xr2l5k@quack3.lan>
- <fc15d4a1-a9d2-1a26-71dc-827b0445d957@I-love.SAKURA.ne.jp>
- <20220110134234.qebxn5gghqupsc7t@quack3.lan>
- <d1ca4fa4-ac3e-1354-3d94-1bf55f2000a9@I-love.SAKURA.ne.jp>
- <20220112131615.qsdxx6r7xvnvlwgx@quack3.lan>
- <20220113104424.u6fj3z2zd34ohthc@quack3.lan>
- <20220120142014.GA11879@lst.de>
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1336113BE3;
+        Thu, 20 Jan 2022 16:29:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id oy6pBP6N6WHyWwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 20 Jan 2022 16:29:50 +0000
+Date:   Thu, 20 Jan 2022 17:29:49 +0100
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 2/2] block: hold queue lock while iterating in
+ diskstats_show
+Message-ID: <20220120162949.5y6t5u6dbtxw2w5y@carbon.lan>
+References: <20220120105248.117025-1-dwagner@suse.de>
+ <20220120105248.117025-3-dwagner@suse.de>
+ <Yelb4+r5KuV67tO0@T590>
+ <20220120131936.mlug7nhnoe73abx5@carbon.lan>
+ <Yelo1gx5cp1l4npK@T590>
+ <20220120140126.ntzvrcmczd7pph75@carbon.lan>
+ <YemBnAvtNkIjVc7t@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220120142014.GA11879@lst.de>
+In-Reply-To: <YemBnAvtNkIjVc7t@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 20-01-22 15:20:14, Christoph Hellwig wrote:
-> On Thu, Jan 13, 2022 at 11:44:24AM +0100, Jan Kara wrote:
-> > Maybe the most disputable thing in this locking chain seems to be splicing
-> > from sysfs files. That does not seem terribly useful and due to special
-> > locking and behavior of sysfs files it allows for creating interesting lock
-> > dependencies. OTOH maybe there is someone out there who (possibly
-> > inadvertedly through some library) ends up using splice on sysfs files so
-> > chances for userspace breakage, if we disable splice for sysfs, would be
-> > non-negligible. Hum, tough.
+On Thu, Jan 20, 2022 at 11:37:00PM +0800, Ming Lei wrote:
+> Seems more likely nvme recovery issue, tags is changed even though
+> ->q_usage_counter is grabbed in blk_mq_queue_tag_busy_iter(), which is
+> added in v4.19.
 > 
-> People were using sendfile on sysfs files, that is why support for this
-> got added back after it was removed for a while as part of the set_fs()
-> removal.
-> 
-> The real question for me is why do we need freeing and writer counts on
-> sysfs or any other pure in-memory file system to start with?
+> You may check dmesg log and see if there is any nvme error recovery info.
 
-We don't. But freezing of sysfs is not part of the locking chain. Only
-freezing of the filesystem holding loopback backing file is (let's call
-that fs F). And splice from sysfs to some file in F is what ties freezing of
-F with a file lock in sysfs...
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks for the tip. It's likely that a recovery is running although
+there is no entry in the logs. At least I have an idea what could be the
+problem here.
