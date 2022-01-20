@@ -2,87 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5C9C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 08:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1159EC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 08:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359360AbiATIqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jan 2022 03:46:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37542 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359358AbiATIqg (ORCPT
+        id S1359423AbiATIuU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jan 2022 03:50:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30207 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1359384AbiATIuT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jan 2022 03:46:36 -0500
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F999C061746
-        for <linux-block@vger.kernel.org>; Thu, 20 Jan 2022 00:46:36 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id z22so25368377edd.12
-        for <linux-block@vger.kernel.org>; Thu, 20 Jan 2022 00:46:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cgwK+h4TcKTuzoMVgpyjaT6hqJgZPgeFi9/82jcEytw=;
-        b=bSaFa+URfbmU/MszEXVOlamjch2d/bVKLmiJuU4jZJRaWnRGqGHrY9tAQfmQRbRXiV
-         uc/9kTk3/S5l1jHMLdTRmVU57otES44XeerqdTVprmM6I9EDUZQLX+yH0h63YbxWR9mE
-         9nbGRPoufn7nse+dFWj62siY9k2GshoKLCrxbi33+uXmG5HvTOiNXAwJCNJOjjOHmaSp
-         XOP01luyWgvqHzNdBA4wIYoRQp0k9Ft6zqCX+Ra/R90oY2R7/AxbMlg/sS1PwZuWZg03
-         Z3JDZLtjXW1ZdUyTLOQOdSV8iGdn5zWa6hPXzsGCHlb9LWK1Z0CByscOqozFwyTfAd7X
-         /t3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cgwK+h4TcKTuzoMVgpyjaT6hqJgZPgeFi9/82jcEytw=;
-        b=D9C7z42XaQwYDmEgdGyBGqZYW7hNJ/AJ97e/YiB/Dm/ZrQoBrxQX/+NgTxKgqolnXt
-         NTfRneInz98ay60l1Pj6WDhBtVroGrnl0d1rgWYLGJTRF7Hq9t4W8/Ws49xHalmZUgzH
-         3QL0v4BMJ4OwW6j9bGtH3BbM90xDHmHE0gJTZ8qJ1F6qT+GaqwVB9+TfDvCZ5+7YqTnQ
-         xdXHuhjPOzkK25goS/6xfo+ypLjyaGnkGJKosvQSo8dZZn9Zha3rvwVx0HJWGvRSD5An
-         tmS1yPcD4RUWUEL+h2ouFKItg95pB3bYQwrPqLiluUggKV3D+22bF+S9Sb8FaFhNSGkO
-         z75Q==
-X-Gm-Message-State: AOAM530CjgqQcCYZx4TRwr0elKu6hdb8EQ+fG7l17X+ubnc+YUr3uhYL
-        CfHGeC8A6klVr8AyGbjXy7RyNGuGeNatwWwK/7owaQ==
-X-Google-Smtp-Source: ABdhPJxuyj+5hYqiz1QG79H/zXO6tZsV+Dq+Pw3BW6UC4M2lhhCbPthTcTo8B1M9EwB4FqJ6g90lXSpEfvPIb7w08Cw=
-X-Received: by 2002:a05:6402:195:: with SMTP id r21mr34247351edv.174.1642668394471;
- Thu, 20 Jan 2022 00:46:34 -0800 (PST)
+        Thu, 20 Jan 2022 03:50:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642668618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WbdpZBG+JAPEFt3/QPKFPH7gsIvhnHQK8HUTdERmVKU=;
+        b=XODHqTplEx1vhQRwz74qzYRMWo5KFBSivI2AbuKDQs+00mr6slazgWTgP3f46tn7hAFR4i
+        nWrO4JDZ+lspUsUJaGjC1OgOg0zQhOE512DlqzfdurB2ANkEXpkT5SSRtemkeXZPwlecP/
+        pA6dQ4tAA69i7D7HLeYGXU8eiuIX7zQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-493-vBbuS2HkN8qqc0vyWI0Jkw-1; Thu, 20 Jan 2022 03:50:15 -0500
+X-MC-Unique: vBbuS2HkN8qqc0vyWI0Jkw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A972C1083F70;
+        Thu, 20 Jan 2022 08:50:13 +0000 (UTC)
+Received: from ws.net.home (ovpn-112-8.ams2.redhat.com [10.36.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 816957B9E1;
+        Thu, 20 Jan 2022 08:50:12 +0000 (UTC)
+Date:   Thu, 20 Jan 2022 09:50:09 +0100
+From:   Karel Zak <kzak@redhat.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        util-linux@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: Racy loop device reuse logic
+Message-ID: <20220120085009.xecitkc7f2digut6@ws.net.home>
+References: <20220113154735.hdzi4cqsz5jt6asp@quack3.lan>
+ <20220119085247.duhblxzp6joukarw@quack3.lan>
+ <28a360a3-b559-24ec-6c3d-3fe6e8302393@I-love.SAKURA.ne.jp>
+ <20220119213415.csieaktdqmshemiy@quack3.lan>
 MIME-Version: 1.0
-References: <20220118071952.1243143-1-hch@lst.de> <20220118071952.1243143-11-hch@lst.de>
- <CAMGffEmFZB1PPE09bfxQjKw-tJhdprEkF-OWrVF4Kjsf1OwQ_g@mail.gmail.com> <20220120083746.GA5622@lst.de>
-In-Reply-To: <20220120083746.GA5622@lst.de>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Thu, 20 Jan 2022 09:46:23 +0100
-Message-ID: <CAMGffE=+ENBdRfugG4k3yB_ca3rqwnaKFXC4+8=CZ=LGvggA6w@mail.gmail.com>
-Subject: Re: [PATCH 10/19] rnbd-srv: simplify bio mapping in process_rdma
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Md . Haris Iqbal" <haris.iqbal@ionos.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.co>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
-        xen-devel@lists.xenproject.org, drbd-dev@lists.linbit.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220119213415.csieaktdqmshemiy@quack3.lan>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 20, 2022 at 9:37 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Wed, Jan 19, 2022 at 01:20:54AM +0100, Jinpu Wang wrote:
-> > this changes lead to IO error all the time, because bio_add_page return len.
-> > We need  if (bio_add_page(bio, virt_to_page(data), datalen,
-> >                      offset_in_page(data)) < datalen)
->
-> Does this version look good to you?
->
-> http://git.infradead.org/users/hch/block.git/commitdiff/62adb08e765b889dd8db4227cad33a710e36d631
+On Wed, Jan 19, 2022 at 10:34:15PM +0100, Jan Kara wrote:
+> On Wed 19-01-22 20:30:52, Tetsuo Handa wrote:
+> > I found a way to avoid this race by splitting lo_open() into two phases
+> > using task_work_add().  Christoph Hellwig is trying to take a look at
+> > https://lkml.kernel.org/r/f6b947d0-1047-66b3-0243-af5017c9ab55@I-love.SAKURA.ne.jp
+> > .
+> 
+> No, you have found a way to make the race window for mount(8) smaller. And
+> I still disagree with that kernel change because it is making kernel more
+> complex only to make the race window smaller. On another machine or with
+> different scheduling decisions, you can still hit this race. This problem
+> must be fixed in mount...
 
-Yes, lgtm, thank you!
-Reviewed-by: Jack Wang <jinpu.wang@ionons.com>
-Tested-by: Jack Wang <jinpu.wang@ionos.com>
++1
+
+I think Jan is right. In this case mount(8) is not robust enough. It
+reads info about the device from /sys and then it opens the device.
+Unfortunately, whatever can happen before the open() call.
+
+    Karel
+
+-- 
+ Karel Zak  <kzak@redhat.com>
+ http://karelzak.blogspot.com
+
