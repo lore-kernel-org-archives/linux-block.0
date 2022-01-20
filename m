@@ -2,80 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E038C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 10:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD46C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 10:10:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241450AbiATKJm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jan 2022 05:09:42 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:55629 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236681AbiATKJm (ORCPT
+        id S1359664AbiATKKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Jan 2022 05:10:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56974 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234793AbiATKKc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jan 2022 05:09:42 -0500
-Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20KA9W74058705;
-        Thu, 20 Jan 2022 19:09:32 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
- Thu, 20 Jan 2022 19:09:32 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20KA9VoH058702
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 20 Jan 2022 19:09:32 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <1ae05b2c-1ccf-2e31-4cc9-f89c54486bff@I-love.SAKURA.ne.jp>
-Date:   Thu, 20 Jan 2022 19:09:28 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: Racy loop device reuse logic
-Content-Language: en-US
-To:     Karel Zak <kzak@redhat.com>, Jan Kara <jack@suse.cz>
-Cc:     util-linux@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220113154735.hdzi4cqsz5jt6asp@quack3.lan>
- <20220119085247.duhblxzp6joukarw@quack3.lan>
- <28a360a3-b559-24ec-6c3d-3fe6e8302393@I-love.SAKURA.ne.jp>
- <20220119213415.csieaktdqmshemiy@quack3.lan>
- <20220120085009.xecitkc7f2digut6@ws.net.home>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220120085009.xecitkc7f2digut6@ws.net.home>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Thu, 20 Jan 2022 05:10:32 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F87EC061574;
+        Thu, 20 Jan 2022 02:10:32 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id d12-20020a17090a628c00b001b4f47e2f51so6427260pjj.3;
+        Thu, 20 Jan 2022 02:10:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=IHoRYXmsI6hCwlePGthADoqqx8EGqrGxFXJW5zS+sQ0=;
+        b=YvqpLTSOHM9Pz6U4id3HfU1MmCRrcgTcmZmMu7/AyGjpEZsiMKlXASida8OEvzGXFY
+         PCcpga6trrt0kerBrrNxJCQMUXEr6uNh3xjzFIiZ7eqDL27zLSCDayK9lnp3+ir8M3ud
+         l7l7JmSX7E1rL6Hd1Rkiv0PvJ5WWfVfC5RGxT9D+o4qFcRrKkkJ8DpNyTXMxj6GL5dIg
+         cIvzv6l4HkdnbG9LsBIfP4rbzA8VWZnfTtlWHEqIZLWE2/gCRDkudtdwcXdBBJZ5rCmi
+         1AcSSwicf50fhecPaZoQrydMVET5WUJv8wkbAX/Y5ZjsAqcEggFLmh5kdtS4dbuoyqWe
+         DVRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=IHoRYXmsI6hCwlePGthADoqqx8EGqrGxFXJW5zS+sQ0=;
+        b=Q+ng7fZ5PTut7BfxQyy2EpJNVxeD/2+yaHDGuANlfYnmprE+UsBF3E3pS3ORzwwdxM
+         nxMcPaLPkRxHES3v3FKMZUfG8xakVf2LLde34KJaG6jHcJuLcwdc6qXaqgyFG2lulG8P
+         YnSY4IbNh7oLO0AbwW8meaj/kWaGgJgeVlgdanSnKLEtSsBuXFLT7ST7fjoFrG3kzZhd
+         PieELFsUCURX4WbbKrTf60/9TV24f4/7HTfOtN/C7LWwtvutvuqPWMAzbORY0WIOUm1O
+         fnyF9KKQHOIzLhoYiT4URorMmFz37xz8OTQox9CBozEHFbLIuUi+I/Zmueg+10pHT9BZ
+         Vm5g==
+X-Gm-Message-State: AOAM533deGX1r6Q3mEbRh7V2y857kZ75lp8sUyaQHOxyG+JeGBuRxMgp
+        Hbr0AUQGgOTwqst+BxOz/c0=
+X-Google-Smtp-Source: ABdhPJz/6lhApOItRjC9jAHbqU8MScNTsw4oqQ+fYOBEGjosaF0Bth4k4RFBB6qZHb/wDOjm1Oi7ow==
+X-Received: by 2002:a17:90b:1bc9:: with SMTP id oa9mr9912048pjb.47.1642673431696;
+        Thu, 20 Jan 2022 02:10:31 -0800 (PST)
+Received: from localhost.localdomain ([159.226.95.43])
+        by smtp.googlemail.com with ESMTPSA id x7sm2862788pfh.178.2022.01.20.02.10.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jan 2022 02:10:31 -0800 (PST)
+From:   Miaoqian Lin <linmq006@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+        Keith Busch <kbusch@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     linmq006@gmail.com
+Subject: [PATCH] block: fix memory leak in disk_register_independent_access_ranges
+Date:   Thu, 20 Jan 2022 10:10:25 +0000
+Message-Id: <20220120101025.22411-1-linmq006@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/01/20 17:50, Karel Zak wrote:
-> On Wed, Jan 19, 2022 at 10:34:15PM +0100, Jan Kara wrote:
->> On Wed 19-01-22 20:30:52, Tetsuo Handa wrote:
->>> I found a way to avoid this race by splitting lo_open() into two phases
->>> using task_work_add().  Christoph Hellwig is trying to take a look at
->>> https://lkml.kernel.org/r/f6b947d0-1047-66b3-0243-af5017c9ab55@I-love.SAKURA.ne.jp
->>> .
->>
->> No, you have found a way to make the race window for mount(8) smaller. And
->> I still disagree with that kernel change because it is making kernel more
->> complex only to make the race window smaller. On another machine or with
->> different scheduling decisions, you can still hit this race. This problem
->> must be fixed in mount...
-> 
-> +1
-> 
-> I think Jan is right. In this case mount(8) is not robust enough. It
-> reads info about the device from /sys and then it opens the device.
-> Unfortunately, whatever can happen before the open() call.
-> 
+kobject_init_and_add() takes reference even when it fails.
+According to the doc of kobject_init_and_add()
 
-I'm not objecting to fix /bin/mount itself. Please check
-[PATCH 4/4] loop: wait for __loop_clr_fd() to complete upon lo_open()
-in https://lkml.kernel.org/r/cdaf1346-2885-f0da-8878-12264bd48348@I-love.SAKURA.ne.jp .
+   If this function returns an error, kobject_put() must be called to
+   properly clean up the memory associated with the object.
 
-  /bin/mount needs to be updated to check ioctl(LOOP_GET_STATUS) after open()
-  in order to confirm that lo->lo_state remains Lo_bound. But we need some
-  migration period for allowing users to update their util-linux package.
-  Thus, meantime emulate serialization between lo_open() and lo_release()
-  without using disk->open_mutex.
+Fix this issue by adding kobject_put().
+Callback function blk_ia_ranges_sysfs_release() in kobject_put()
+can handle the pointer "iars" properly.
+
+Fixes: a2247f19ee1c ("block: Add independent access ranges support")
+Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+---
+ block/blk-ia-ranges.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
+index b925f3db3ab7..18c68d8b9138 100644
+--- a/block/blk-ia-ranges.c
++++ b/block/blk-ia-ranges.c
+@@ -144,7 +144,7 @@ int disk_register_independent_access_ranges(struct gendisk *disk,
+ 				   &q->kobj, "%s", "independent_access_ranges");
+ 	if (ret) {
+ 		q->ia_ranges = NULL;
+-		kfree(iars);
++		kobject_put(&iars->kobj);
+ 		return ret;
+ 	}
+ 
+-- 
+2.17.1
 
