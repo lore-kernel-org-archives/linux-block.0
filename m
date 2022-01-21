@@ -2,129 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4BCFC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 08:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE95C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 09:47:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbiAUIfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jan 2022 03:35:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48798 "EHLO
+        id S1379627AbiAUJrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jan 2022 04:47:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349378AbiAUIeZ (ORCPT
+        with ESMTP id S231417AbiAUJrl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jan 2022 03:34:25 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8974DC06173F
-        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 00:34:24 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id a18so39882657edj.7
-        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 00:34:24 -0800 (PST)
+        Fri, 21 Jan 2022 04:47:41 -0500
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52723C061574;
+        Fri, 21 Jan 2022 01:47:41 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id o135so9304784qke.8;
+        Fri, 21 Jan 2022 01:47:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MaJVMg+g5DUUOUdBu9/Df9/RFBs/TIbTQZzIsKw2iKg=;
-        b=P7QTTv7hHfbbe2OClT1Kjb3kRatE9n4kVuBrYAX+TSocdmc/pPPmPArC+eBY8j45O3
-         /SqBaFXkywgPJ+2rC3PruZ4LR45txQGneJk3zC45MIi26yOLkRREZX8IsvAT7tkdrxP5
-         uoblK4HfmWm0avFOSwpzGyoUMzGHyvAP1s3g/3zm9BRNVjxt9WiYwhbKz5KuLrqOuYh7
-         tHag4GlgjUnKmV+cBLPaJ+enEnDmJxHSDFo+1/0HV+VCGvlilYuI/RlY22HlbJhKLVdC
-         p4cbHOrTY4GL975OpWwwVb/paJISTARLDu193tj/pGhcRcg0khuHika8wQ2RFnrWcS6S
-         f4+w==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4alRYNA0bZSUpUO0RvXdY6tMCVcCPN7Mpy2jJJWzikQ=;
+        b=YaQKORsMB2bdN1W4/mkTZKwGRaWhrXkJgweMN8CATucj7B1cciRG8rekkt1b2xDg9t
+         OR1nB307gTVwzXqlANGyg69IAd0VlVH0rlTuwJpiPftztRO4wBKaRE8uwXpORtGswc0I
+         +UXoFLN0sgWTItAvwTNYmQv3ktrsows6ugjMzl0GYxmFQZJWph4XKwIJYiZo/DQEDW0c
+         HwL+EV9JTiHIgenYsVZya3r9Kh8uN+ihjvL0Wl5scRy/FHgM8KUsHQ4+O6DKdjqo5h9r
+         uqvn9lvnrkhsJRG/Ks+eanMv1gsfEtCNTlWdc35zYnUW3i/rjAcsvXFYU1xoKcJ7IllY
+         Q5iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MaJVMg+g5DUUOUdBu9/Df9/RFBs/TIbTQZzIsKw2iKg=;
-        b=th8R/RiQK1GQggni1Rr/3kZ9TTjPkyzA5I2kvTV3BL7UHEAocAq8LYvNhCX6Pi7OZx
-         GLkLiyrfHDlGzk0uuKrekMT/CUoTmD66buQoy+gMwXWUSYn0T++Xgz9dpLYoXotSOM/h
-         wOg18ks8p+N80zwpO256RXw3Tgms2Ww4ClSKpmQZ7Ovjvocj3Yth/PsjT3Rr0ahJ63gw
-         LTyVTfnD24VVPgqpvgrnuF4PnG/mnBMxjtr5fM4cDkJVwkc/eDvb7P0lo6jmFXm0S8Vd
-         q/Zi0mPcti/KC6aedXoT1pP6b0k7VrBSDKT/r+bDyxVtfOv4x7bqflDG1GpI+Ssv0OWU
-         /sdA==
-X-Gm-Message-State: AOAM532AbjD/00AK64IYfqKXDsT7OyAIQxam5WPf6DhG7q7I6NS5HxfL
-        OSR3t3JTfCsQagVwTqQBj4LJ9tP/rwGqmxpQGwGV
-X-Google-Smtp-Source: ABdhPJyiX2tettfsCx6cHZABS+yVxwDmnEePfNEcWEOW8c+9z8wtNNeaipYQcpTYt5p4LaunCbPSBLMmhR3jLYdlnO0=
-X-Received: by 2002:a05:6402:4495:: with SMTP id er21mr3388511edb.298.1642754063092;
- Fri, 21 Jan 2022 00:34:23 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4alRYNA0bZSUpUO0RvXdY6tMCVcCPN7Mpy2jJJWzikQ=;
+        b=oN7uwx1ZPZgZP1ffZ5d0fIXMmf2PGoT5RllLqiKAJV4VDZXQ49FWwjwMuj70pmP/fJ
+         c9WsfQxJ1WLwJsmo4Bk/KVHsVSUiKXDtjTcP8OOj4W5Wpcy//hKORc8BUzCp0IpkfkLZ
+         9GFNJbB58X+kX36DEi6EAM1uz8CZLIKAUD8FGFyMivJlJu4D4L9afnhIITHV4IZtaQzG
+         km6O3Tb+taJw90UVZuNpRW3ER/tg0rbQR2e3JcixSaS9wgvXef6hiontgEN/ZSzZqZSp
+         aK6t1MgRQtUGuraq1on54L2rvfwcN4PmMrrbZ4BN8bqxl8uaqDbwuQ0NxPB5uVUrjeTt
+         t57g==
+X-Gm-Message-State: AOAM5323iAtXTiq+0N0PQ0paWkUumdbZx41PN0l2qYe4e8esDgZ8y5lj
+        cP7iH9sxa4oMC7tmGtyygMg=
+X-Google-Smtp-Source: ABdhPJx1gI5f8FBHlXxXyrC9Ba766FCQ1GJNTMXVKJGTEMUCTEJMioQKkaqdjQTjXF1cBIYyZAGQjA==
+X-Received: by 2002:a05:620a:1991:: with SMTP id bm17mr2090145qkb.132.1642758460482;
+        Fri, 21 Jan 2022 01:47:40 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id l22sm2941282qkp.92.2022.01.21.01.47.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jan 2022 01:47:40 -0800 (PST)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: deng.changcheng@zte.com.cn
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Changcheng Deng <deng.changcheng@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] block: fix boolreturn.cocci warning
+Date:   Fri, 21 Jan 2022 09:47:32 +0000
+Message-Id: <20220121094732.1002257-1-deng.changcheng@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20211227091241.103-1-xieyongji@bytedance.com> <Ycycda8w/zHWGw9c@infradead.org>
- <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
- <YdMgCS1RMcb5V2RJ@localhost.localdomain> <CACycT3vYt0XNV2GdjKjDS1iyWieY_OV4h=W1qqk_AAAahRZowA@mail.gmail.com>
- <YdSMqKXv0PUkAwfl@localhost.localdomain> <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
-In-Reply-To: <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Fri, 21 Jan 2022 16:34:11 +0800
-Message-ID: <CACycT3tTKBpS_B5vVJ8MZ1iuaF2bf-01=9+tAdxUddziF2DQ-g@mail.gmail.com>
-Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ping.
+From: Changcheng Deng <deng.changcheng@zte.com.cn>
 
-On Wed, Jan 5, 2022 at 1:36 PM Yongji Xie <xieyongji@bytedance.com> wrote:
->
-> On Wed, Jan 5, 2022 at 2:06 AM Josef Bacik <josef@toxicpanda.com> wrote:
-> >
-> > On Tue, Jan 04, 2022 at 01:31:47PM +0800, Yongji Xie wrote:
-> > > On Tue, Jan 4, 2022 at 12:10 AM Josef Bacik <josef@toxicpanda.com> wrote:
-> > > >
-> > > > On Thu, Dec 30, 2021 at 12:01:23PM +0800, Yongji Xie wrote:
-> > > > > On Thu, Dec 30, 2021 at 1:35 AM Christoph Hellwig <hch@infradead.org> wrote:
-> > > > > >
-> > > > > > On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
-> > > > > > > The rescuer thread might take over the works queued on
-> > > > > > > the workqueue when the worker thread creation timed out.
-> > > > > > > If this happens, we have no chance to create multiple
-> > > > > > > recv threads which causes I/O hung on this nbd device.
-> > > > > >
-> > > > > > If a workqueue is used there aren't really 'receive threads'.
-> > > > > > What is the deadlock here?
-> > > > >
-> > > > > We might have multiple recv works, and those recv works won't quit
-> > > > > unless the socket is closed. If the rescuer thread takes over those
-> > > > > works, only the first recv work can run. The I/O needed to be handled
-> > > > > in other recv works would be hung since no thread can handle them.
-> > > > >
-> > > >
-> > > > I'm not following this explanation.  What is the rescuer thread you're talking
-> > >
-> > > https://www.kernel.org/doc/html/latest/core-api/workqueue.html#c.rescuer_thread
-> > >
-> >
-> > Ahhh ok now I see, thanks, I didn't know this is how this worked.
-> >
-> > So what happens is we do the queue_work(), this needs to do a GFP_KERNEL
-> > allocation internally, we are unable to satisfy this, and thus the work gets
-> > pushed onto the rescuer thread.
-> >
-> > Then the rescuer thread can't be used in the future because it's doing this long
-> > running thing.
-> >
->
-> Yes.
->
-> > I think the correct thing to do here is simply drop the WQ_MEM_RECLAIM bit.  It
-> > makes sense for workqueue's that are handling the work of short lived works that
-> > are in the memory reclaim path.  That's not what these workers are doing, yes
-> > they are in the reclaim path, but they run the entire time the device is up.
-> > The actual work happens as they process incoming requests.  AFAICT
-> > WQ_MEM_RECLAIM doesn't affect the actual allocations that the worker thread
-> > needs to do, which is what I think the intention was in using WQ_MEM_RECLAIM,
-> > which isn't really what it's used for.
-> >
-> > tl;dr, just remove thee WQ_MEM_RECLAIM flag completely and I think that's good
-> > enough?  Thanks,
-> >
->
-> In the reconnect case, we still need to call queue_work() while the
-> device is running. So it looks like we can't simply remove the
-> WQ_MEM_RECLAIM flag.
->
-> Thanks,
-> Yongji
+./block/bio.c: 1057: 9-10: WARNING:
+return of 0/1 in function 'bio_add_folio' with return type bool
+
+Return statements in functions returning bool should use true/false
+instead of 1/0.
+
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
+---
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 4312a8085396..108b11106c8d 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1054,7 +1054,7 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+ 		   size_t off)
+ {
+ 	if (len > UINT_MAX || off > UINT_MAX)
+-		return 0;
++		return false;
+ 	return bio_add_page(bio, &folio->page, len, off) > 0;
+ }
+ 
+-- 
+2.25.1
+
