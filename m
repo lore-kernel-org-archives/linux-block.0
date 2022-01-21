@@ -2,158 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69095C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 20 Jan 2022 21:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4BCFC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 08:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242070AbiATVfb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Jan 2022 16:35:31 -0500
-Received: from mail-sn1anam02on2060.outbound.protection.outlook.com ([40.107.96.60]:35790
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231373AbiATVfa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Jan 2022 16:35:30 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TRRdVsWi1viDb9dGhauGBlGKbHdv7vRAku44SaynoUoop+s6JuFWm0vMN4OZY0VMms2oRPcvTwYiW9LMVg0fryQeW8mUzqSw0xgu8b+pxgHlN0xRNBp+cowyhLEAOErk6I+1ApUPSFz1xc8R5zy6GhmLk4TNceVV48cp6T61YI6rUijG/SaQ6EF9zDfn+k9G1oqSQMFa59uLGZJ6yJCdHDP2MriSchBgdIHwsNeS9JqhdOdA6akZMRUVB1o238A9gyBhyk2gS62qex39WKoFzj0Sl4byg1dxlAGxVARMa8LzRkm56rQS9GQ52mJ7BvYPT6na/HqFjg2dyTRkSbdO8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u1Xb8IL40GuR8ynWkDCwxn9jEe9qVYYaX11bVtBYBxs=;
- b=lVLWQIaUcCSFpV5bryc4Gt14SQ+/HJPt+M5HD2eeaL/kaK+/W7rWDd6dN0APwIA5fDP2R4dH5b0rERR7K7Rm/9+zl5yO9xHCAawuIWAYwRUtHuo8x+rC0xdhyH2GUQsOrdnDV+GBFJbBjeOM/1vvMlVDbpOah6zoGyLUQ4x9ERlZ0IIuA5Ptq5NkSuA9OSnMJONvfLxBjeL1Eq5FF6IJ8dmzcUTQMcefu7h/2Rpy0gDr4gRjrVDzfLET5faHscoaXc5G3eC1XKtv68eJD2ru1cd3jPBfTNeK7DupyhpXKAa4Yz0ktZs+WkTXWra0H7MgQVABrtabtxLEPiX8mDTNgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u1Xb8IL40GuR8ynWkDCwxn9jEe9qVYYaX11bVtBYBxs=;
- b=p/4YsRfy2x/fHOWXGFc3nDolGVqr/20sLL0q4cOcNB4F9rz3KlV7dQYgdiIZ1Pnn0dXjqUMA9GOguAIThCcZYruuBg88M613+ABDQ+zbaUuG1VPILFQx4oGa8nBtDX11p3/Slicf2tI/gO3cZRX1x4xt7YDkCw922E0jkW9Se8ibIGclGtCN+PblwZdL/mqhMMQcZu1m0esqVNzYoX5YX1qzXw0zPnSqPLjvsR5fLe2nYwGJLSzKELoKW1p3SjYlwu+KhUnFAWqdHY6u2NBK9bGYxNUpgFxuId7/r+Nx8KqqfmQL5UwCw6v+8SOGllS5pH2kveX2Z8GFUlBlHNxW4g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13)
- by MWHPR1201MB2559.namprd12.prod.outlook.com (2603:10b6:300:e0::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.8; Thu, 20 Jan
- 2022 21:35:26 +0000
-Received: from DM6PR12MB4140.namprd12.prod.outlook.com
- ([fe80::ede5:7f12:c1:b25]) by DM6PR12MB4140.namprd12.prod.outlook.com
- ([fe80::ede5:7f12:c1:b25%7]) with mapi id 15.20.4888.014; Thu, 20 Jan 2022
- 21:35:26 +0000
-Message-ID: <a6b65260-669b-65d8-c20f-0d75e0393200@nvidia.com>
-Date:   Thu, 20 Jan 2022 13:35:23 -0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.0
-Subject: Re: Phyr Starter
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matthew Wilcox <willy@infradead.org>, linux-kernel@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        linux-rdma@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        nvdimm@lists.linux.dev
-References: <YdyKWeU0HTv8m7wD@casper.infradead.org>
- <82989486-3780-f0aa-c13d-994e97d4ac89@nvidia.com>
- <20220120141219.GB11707@lst.de>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20220120141219.GB11707@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0040.namprd13.prod.outlook.com
- (2603:10b6:a03:2c2::15) To DM6PR12MB4140.namprd12.prod.outlook.com
- (2603:10b6:5:221::13)
+        id S231392AbiAUIfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jan 2022 03:35:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48798 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349378AbiAUIeZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Jan 2022 03:34:25 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8974DC06173F
+        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 00:34:24 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id a18so39882657edj.7
+        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 00:34:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MaJVMg+g5DUUOUdBu9/Df9/RFBs/TIbTQZzIsKw2iKg=;
+        b=P7QTTv7hHfbbe2OClT1Kjb3kRatE9n4kVuBrYAX+TSocdmc/pPPmPArC+eBY8j45O3
+         /SqBaFXkywgPJ+2rC3PruZ4LR45txQGneJk3zC45MIi26yOLkRREZX8IsvAT7tkdrxP5
+         uoblK4HfmWm0avFOSwpzGyoUMzGHyvAP1s3g/3zm9BRNVjxt9WiYwhbKz5KuLrqOuYh7
+         tHag4GlgjUnKmV+cBLPaJ+enEnDmJxHSDFo+1/0HV+VCGvlilYuI/RlY22HlbJhKLVdC
+         p4cbHOrTY4GL975OpWwwVb/paJISTARLDu193tj/pGhcRcg0khuHika8wQ2RFnrWcS6S
+         f4+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MaJVMg+g5DUUOUdBu9/Df9/RFBs/TIbTQZzIsKw2iKg=;
+        b=th8R/RiQK1GQggni1Rr/3kZ9TTjPkyzA5I2kvTV3BL7UHEAocAq8LYvNhCX6Pi7OZx
+         GLkLiyrfHDlGzk0uuKrekMT/CUoTmD66buQoy+gMwXWUSYn0T++Xgz9dpLYoXotSOM/h
+         wOg18ks8p+N80zwpO256RXw3Tgms2Ww4ClSKpmQZ7Ovjvocj3Yth/PsjT3Rr0ahJ63gw
+         LTyVTfnD24VVPgqpvgrnuF4PnG/mnBMxjtr5fM4cDkJVwkc/eDvb7P0lo6jmFXm0S8Vd
+         q/Zi0mPcti/KC6aedXoT1pP6b0k7VrBSDKT/r+bDyxVtfOv4x7bqflDG1GpI+Ssv0OWU
+         /sdA==
+X-Gm-Message-State: AOAM532AbjD/00AK64IYfqKXDsT7OyAIQxam5WPf6DhG7q7I6NS5HxfL
+        OSR3t3JTfCsQagVwTqQBj4LJ9tP/rwGqmxpQGwGV
+X-Google-Smtp-Source: ABdhPJyiX2tettfsCx6cHZABS+yVxwDmnEePfNEcWEOW8c+9z8wtNNeaipYQcpTYt5p4LaunCbPSBLMmhR3jLYdlnO0=
+X-Received: by 2002:a05:6402:4495:: with SMTP id er21mr3388511edb.298.1642754063092;
+ Fri, 21 Jan 2022 00:34:23 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a3a12c13-c6f5-4614-8d4b-08d9dc5cc5b6
-X-MS-TrafficTypeDiagnostic: MWHPR1201MB2559:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR1201MB25595B65CE828B58F598DEF8A85A9@MWHPR1201MB2559.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5kf2HCFNx9Ji15uRIOnMmA/sbh8+Z25GzNBzuEyMA+lJ2JfZbHaBn3otlVrhYmnjnxnRYywLi+I0jUju7b3a2JvX15RTGj8XipzDeoCCoy1WKBTs19ShB8uorLzL1wac1zPduJr8sIYvIfToAynFfzG/g+CBAGtJZsuhkTjfZ1b82tmzN/7M786UvGLlyde3k60CfYO6h3YUfa/E2V6BQc7I53vnAIsTxjnLbQRnkqiS4oLxj2TYYeAN8Di2lQxv5Bo+uV4g4EOUqAl7soM39OSdGJ5SLxnH6YSW1mkiPxvBW32Hy0IBq0+zWbjeDbSaqVVQHDRqNe0Rqw+hICRlPyAOe8a9itrGfFZqcINWhLI6vsRM5bJ8NwxKCvMIgADvmzskFtCgWm3iX9ClDOdtMjq8NfqntvUCsAm0IZtv6hsWMpQY6zEXdB2Zh2wlwW/qr06oOXZwRtgN86mq6kB2EIbIonlRCv+zOabDMyA95qSqHNgwmdw0aXEFCWYarSKJWp3qcFHVW3KLNk7D2O108hngacPpiOVfUMEKpgfPjQoHc0/mZcBoJ1SCt2ho+Ch+i43jg/IPgDpYanlTr5TQuCVOy+77uwW5eLJLII2hvjS57puWRzOEi6PQt8GgGapsoa5r8H0oo5vJxawlJRRviFN8gDBomsQOQuuyjIB5ukb8JqzWQuJ3huiBrfxHey8dDnaGpWOSkrjquEISJLc7r+kvgxSkqn8bAA6KU6TpvBcsy1ncAxaOBZG53sb9GnJr
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4140.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(7116003)(8676002)(316002)(66476007)(4326008)(186003)(6916009)(3480700007)(508600001)(66556008)(53546011)(31696002)(54906003)(31686004)(26005)(8936002)(6486002)(66946007)(2616005)(83380400001)(6506007)(86362001)(6512007)(2906002)(38100700002)(5660300002)(6666004)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eXpyTWRxRGNwdTRrbVRPRkMzakhZNDM1WkhxTllEd21YVEFZSUpVMkhvQnRY?=
- =?utf-8?B?bzdFK2dKNW4rTUhvZUJFMHkwNnl5K0FaNHlpVzNqTVpXL1dicVE4NWpEMm5u?=
- =?utf-8?B?UXYveUZlKy83RWZJb29oUGw1SENuM2E0Sk8vR0hBVnFmQSsxWHNGVFh2VHVQ?=
- =?utf-8?B?WHZZU0xiODE5QjEvQzNralZ4UUtaRDR0SWxDd2dUcHpCRXNBMWU2K1IwejRz?=
- =?utf-8?B?VVB2M2VUR2tXYm1ZbjF6bXY1RzlvWVBQRFhLNWhickNma3NLNTVQUXlGNERp?=
- =?utf-8?B?aFJrNHRYdmJRYkFuWlZaTVk5anBmUEE1TnNTZHdHN0ZSQ1FtNnpKQjhyN3dO?=
- =?utf-8?B?RWxGUlhJZFFsTGRNQ1gwVzNSVER4TkJBOVRISzdZazFFc1E5VGhIMGdIdi9l?=
- =?utf-8?B?ckxUQ2ZBWXJUSmUrMTBXNlhBeFBxVTlWeVZGZkpnUWo3WWQ3VGoyeEhmK1N5?=
- =?utf-8?B?UHV4VHN2QmFVOFFEK1RwcG5mTkxYTW9tMnc5SFhxbnRQQVdZU2RMSCtMSlRQ?=
- =?utf-8?B?SE9GU2JoL3dCV0JEUmVsZllVVVBlWjZCNmNzZ3JNQTdlcTJwSy9tMVZBN0Zm?=
- =?utf-8?B?MnFNb3JuaEp5MHlDUDIyVUMwbnY3ZDlOK0tZbHA4TVBsZnhoWC9VZWFmQjMr?=
- =?utf-8?B?ZTl1c2xvdnBiN3hFR29KMDczUVN2d01oa3F4ZzVOVEczblJJUjUzbHl3Ykp0?=
- =?utf-8?B?V2FaSFRoQ0JNdjN6ajRLVmNGMUpKdFRmWERvRklSVEYyaVBzK0cxQkJEdnR2?=
- =?utf-8?B?TFFyaC9Ebysyc1N4Q2V1ZHJhSHAzZ1hZVnNSeWdqUzl4WE10aVVUQWdvTFdK?=
- =?utf-8?B?K0hqMkx3R1E5UmZXMzcyWlZhYytxK2N3dGF4QTl1MnRFVHhGK0pRM2JKYWFO?=
- =?utf-8?B?L2FZQWRyblpKV2wzSHVDNFkrVW52UEp5NEc1WnVqK1Y1V1RvMGN5U0tXU3BO?=
- =?utf-8?B?Z0RDVHgyNFMwOFVpWVRUbmlPbW1pOEQwZUZtVlVDSFo0UFNEVHhha2h2N3Mr?=
- =?utf-8?B?OTBLVkQvMHpDMi9kQ1ZpOWpYQlhNdFZBMmwyYWk0NVdta1V1OGJ5U1ZEVThR?=
- =?utf-8?B?eEMrWmlZL3hFcVVvK0hOK2lqbmZ0d29nRkJuRXNRdDUxdDRXTGJKc2xHdTdp?=
- =?utf-8?B?OUd2Ukx6MmJrZ2lpVEVENzBjL2NoY1VYb01RWUMwbkxFRkwydzl2cU5wLzVS?=
- =?utf-8?B?d0J6QkhnSWtNZjNSTElmU05NenVNZ3k3WUFMZVVLR3FoWFR1MWxrOUhvZkUw?=
- =?utf-8?B?a0RiRGlTenRjK1RrYU5SKzVEbXR5alIxS25Jcm94amF6SUJYZ3JoS2hvTHNs?=
- =?utf-8?B?YVVDcVEzdUtwUHF6dnArSlhxN1g3d0xHVHRCV1I1RVYvZWlmeWpseXlPSGhy?=
- =?utf-8?B?ckp0akc0QnZucEFGQlVpa2VRYnVoUjdZMGF2WnJrTDJ4MzdpdVZ6ZUdlc2hZ?=
- =?utf-8?B?YmZsVVVwYXBUSERlMUZrM2xYNUVIOXRBR3F3LzdGSHYrNHVBTFVKQTIrME1X?=
- =?utf-8?B?Sk1NZ2YybWpqSVBuU1h0aG9qd2dRVWExUjlQdTJRM1RJcG56aTk0bW9qQ3oy?=
- =?utf-8?B?eC9RSERFeVJqcFdubUY1Z2M5c29xNzFabUpUd2Ixa0dBcUJUbzhZdGRqVEpt?=
- =?utf-8?B?aUlmOU40cngvS2RUZ3RYckpGb1EzbUQ2dVZhdndrRnVJYkJnM2sxcllrRmt4?=
- =?utf-8?B?bFJQVE0xWmZZNXYwd3lMNjkvcnJ5V3NCS2h6MVYyeXcraDNvam5QRmphbVVa?=
- =?utf-8?B?RGIzU2pqMm5iWEcvRWZNM3BNeEUraTVodjJKRTFpN2VSZEtaSld5Y09Zemp6?=
- =?utf-8?B?Q0txejBvSWQvMC9EVkg2Z2w2cTFsN1JnZXZ4aXZZaGFOOFdVNm55dTlEdVht?=
- =?utf-8?B?R2dPOXR6Z1MxQ3RqbGc4S01EK2JiblhIeEVWdVd4OGpDUm9HejFNUWY3bWxQ?=
- =?utf-8?B?UVBLNmREa3psaVI4NUhPanh3ZVV3VzArM2hKMmsyQkJvRFYwKy93R1IraGxu?=
- =?utf-8?B?bWZEYVc2ajdBdFRtU1V2OTlzQ0xxWHEyaDcrL3pUSkkxRG42dzRscVBBS1R6?=
- =?utf-8?B?eDU5RjV2NEM5ckd4Wnc2Rk0vNzJxUElZT1UwNFVOUExoSm8yTWxjZUtmV3Zv?=
- =?utf-8?B?MkJ2aDhrclVnbGRtMS9tQ1lGTEhOb3JIM0ttTkdmaDdVQTdmby9oTDdCczJF?=
- =?utf-8?Q?vrHX+Tr7yOc6e5MYPqF8+KM=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3a12c13-c6f5-4614-8d4b-08d9dc5cc5b6
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4140.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2022 21:35:26.4325
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4WjzFTIwbIds3SUEgIVBXKvy0ozCxfD+csRsUdXbj2XoYyOHEUVAaEHzQSWS5DV3Z3Aa/APuSxbzmLMhaQIpAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB2559
+References: <20211227091241.103-1-xieyongji@bytedance.com> <Ycycda8w/zHWGw9c@infradead.org>
+ <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
+ <YdMgCS1RMcb5V2RJ@localhost.localdomain> <CACycT3vYt0XNV2GdjKjDS1iyWieY_OV4h=W1qqk_AAAahRZowA@mail.gmail.com>
+ <YdSMqKXv0PUkAwfl@localhost.localdomain> <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
+In-Reply-To: <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Fri, 21 Jan 2022 16:34:11 +0800
+Message-ID: <CACycT3tTKBpS_B5vVJ8MZ1iuaF2bf-01=9+tAdxUddziF2DQ-g@mail.gmail.com>
+Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/20/22 6:12 AM, Christoph Hellwig wrote:
-> On Tue, Jan 11, 2022 at 12:17:18AM -0800, John Hubbard wrote:
->> Zooming in on the pinning aspect for a moment: last time I attempted to
->> convert O_DIRECT callers from gup to pup, I recall wanting very much to
->> record, in each bio_vec, whether these pages were acquired via FOLL_PIN,
->> or some non-FOLL_PIN method. Because at the end of the IO, it is not
->> easy to disentangle which pages require put_page() and which require
->> unpin_user_page*().
-> 
-> I don't think that is a problem.  Pinning only need to happen for
-> ITER_IOVEC, and the only non-user pages there is the ZERO_PAGE added
-> for padding that can be special cased.
+Ping.
 
-I am really glad to hear you say that. Because I just worked through it
-again in detail yesterday (including your and others' old emails about
-this), and tentatively reached the same conclusion from seeing the call 
-paths. But I wanted to confirm with someone who actually knows this code 
-well, and that's not me. :)
-
-Things like dio_refill_pages() are mixing in the zero page, but like you 
-say, that can be handled. I have a few ideas for that.
-
-Now that the goal is a considerably narrower as compared to in 2019 
-("convert DIO callers to pup", instead of "convert the world to pup", 
-ha), this looks quite feasible after all.
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
+On Wed, Jan 5, 2022 at 1:36 PM Yongji Xie <xieyongji@bytedance.com> wrote:
+>
+> On Wed, Jan 5, 2022 at 2:06 AM Josef Bacik <josef@toxicpanda.com> wrote:
+> >
+> > On Tue, Jan 04, 2022 at 01:31:47PM +0800, Yongji Xie wrote:
+> > > On Tue, Jan 4, 2022 at 12:10 AM Josef Bacik <josef@toxicpanda.com> wrote:
+> > > >
+> > > > On Thu, Dec 30, 2021 at 12:01:23PM +0800, Yongji Xie wrote:
+> > > > > On Thu, Dec 30, 2021 at 1:35 AM Christoph Hellwig <hch@infradead.org> wrote:
+> > > > > >
+> > > > > > On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
+> > > > > > > The rescuer thread might take over the works queued on
+> > > > > > > the workqueue when the worker thread creation timed out.
+> > > > > > > If this happens, we have no chance to create multiple
+> > > > > > > recv threads which causes I/O hung on this nbd device.
+> > > > > >
+> > > > > > If a workqueue is used there aren't really 'receive threads'.
+> > > > > > What is the deadlock here?
+> > > > >
+> > > > > We might have multiple recv works, and those recv works won't quit
+> > > > > unless the socket is closed. If the rescuer thread takes over those
+> > > > > works, only the first recv work can run. The I/O needed to be handled
+> > > > > in other recv works would be hung since no thread can handle them.
+> > > > >
+> > > >
+> > > > I'm not following this explanation.  What is the rescuer thread you're talking
+> > >
+> > > https://www.kernel.org/doc/html/latest/core-api/workqueue.html#c.rescuer_thread
+> > >
+> >
+> > Ahhh ok now I see, thanks, I didn't know this is how this worked.
+> >
+> > So what happens is we do the queue_work(), this needs to do a GFP_KERNEL
+> > allocation internally, we are unable to satisfy this, and thus the work gets
+> > pushed onto the rescuer thread.
+> >
+> > Then the rescuer thread can't be used in the future because it's doing this long
+> > running thing.
+> >
+>
+> Yes.
+>
+> > I think the correct thing to do here is simply drop the WQ_MEM_RECLAIM bit.  It
+> > makes sense for workqueue's that are handling the work of short lived works that
+> > are in the memory reclaim path.  That's not what these workers are doing, yes
+> > they are in the reclaim path, but they run the entire time the device is up.
+> > The actual work happens as they process incoming requests.  AFAICT
+> > WQ_MEM_RECLAIM doesn't affect the actual allocations that the worker thread
+> > needs to do, which is what I think the intention was in using WQ_MEM_RECLAIM,
+> > which isn't really what it's used for.
+> >
+> > tl;dr, just remove thee WQ_MEM_RECLAIM flag completely and I think that's good
+> > enough?  Thanks,
+> >
+>
+> In the reconnect case, we still need to call queue_work() while the
+> device is running. So it looks like we can't simply remove the
+> WQ_MEM_RECLAIM flag.
+>
+> Thanks,
+> Yongji
