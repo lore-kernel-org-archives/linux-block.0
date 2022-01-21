@@ -2,65 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 404B1C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 14:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D23BCC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 17:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381032AbiAUO1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jan 2022 09:27:25 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:60112 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381061AbiAUO1I (ORCPT
+        id S1382024AbiAURss (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jan 2022 12:48:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33796 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1381866AbiAURsH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jan 2022 09:27:08 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1AA85617C4
-        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 14:27:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 81D6FC340E3;
-        Fri, 21 Jan 2022 14:27:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642775227;
-        bh=ZGxRIaAiZIkNAgdBGNhAvuRt47w1gyKYhYaLnE4uayU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=dm7RuRTFwoEHCsjjju+QhyjCPMDEHCBKcSCcdC+WUOBg69ZZwFro91IGnSTt7vIDv
-         tMfbfJCL5YIOwOEmBl4eVSbkuHkBwy1TsJSb08dYQz/6EQoWRh7hQ8EJ0M/oHQHSug
-         iB5nQMdappjGWNE4Avd22OYHLaiDzHvrB+Pk5EETIsJte5t1LgLQ/N8SGpKSnRPmJO
-         tWl3XcuNcWCG4W/2IZhRb09U2DHx1WioCKEkSCXCOPNzGUMtIOz6xtyX9KaFXdHm8Z
-         bb0RCYjXOmgS+PdvRXKrLFbM78fOMGxlKu1UnI+1favJkbcYKSyV/V6iILjM3K2MwB
-         hlh4dzmuUsgFA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 713CEF60798;
-        Fri, 21 Jan 2022 14:27:07 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 5.17-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <bc78bf16-3c07-66a3-fa1b-a07cbc95ac84@kernel.dk>
-References: <bc78bf16-3c07-66a3-fa1b-a07cbc95ac84@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <bc78bf16-3c07-66a3-fa1b-a07cbc95ac84@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.17-2022-01-21
-X-PR-Tracked-Commit-Id: 46cdc45acb089c811d9a54fd50af33b96e5fae9d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3c7c25038b6c7d66a6816028219914379be6a5cc
-Message-Id: <164277522745.13796.13493167825211771643.pr-tracker-bot@kernel.org>
-Date:   Fri, 21 Jan 2022 14:27:07 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Fri, 21 Jan 2022 12:48:07 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 712ECC061756
+        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 09:48:06 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id p7so11687707iod.2
+        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 09:48:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
+         :content-transfer-encoding;
+        bh=BvgJ1KhQ09zgjMCeIf9WRh/NdcZGH1G7T7wldmYjdSE=;
+        b=cNENdJj9VCARwTzDZtisAhMuzRAldSqAvbGoQbnJu32rHz0Q1fS52L8cwBPwk6voZU
+         dMUT7Gpa3TD8uvgwbpI5R5rHhp0CQspe1jE4mdX9yocZtgmKiKpdZC5U9/9EkgW3HOc/
+         w+ACPfBlyX+zmaNQnqLEedOWd+iA6Dpgdlqcncu4Pk6EM7VKuZTaS2OKWdnaC/Aqvdih
+         cGZZc/y2zEQr1hC9BX5DfDPBk9ULLQWsDB70O5+iM1iUvdf0S+eX/Cy1Tv0pkoL976dX
+         W77cuSpyDlMW2gpriOkOEVtNUqoc0fly/P3AcRB0QS2FqZk/VHVOwu8++g1u/WVC/N6u
+         CqPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=BvgJ1KhQ09zgjMCeIf9WRh/NdcZGH1G7T7wldmYjdSE=;
+        b=fyQYLTaFcv9CuJ0tpTjHg7SiFhr+wPvf5sYPRvj/FRuWPjEH8hiIkOCu0+JN/8e4tZ
+         5qAeofExRBigZe6Ai3ndCQ9buB7Es2CQeQ/7TvbZYYHSeU0AFy5PSx9JFJdFLlMdionI
+         rrKrfvFeLIxIu4GIfmp99+FqZ9lDkf/+zFBbb+Yu+KlrZs0tt323ZRqyggVkQ7bWkPnb
+         SzHy8tTOZUhiRW2aALIEL35V2iOBIFYXIminaTqT6kBzVFbvX/W+d8796w/QDmUBS/4f
+         CYgC5RgE3CvX/m4pkMxSk/msF+po+lZ8t5632j+/hHSfpxcizS/R06tgoM8at2BkR3X8
+         fxQQ==
+X-Gm-Message-State: AOAM530Ct1APTGaJhqXc1/mGNkP7SOVAbh0PXYgsc2wK8sqvxpRU5lLi
+        ZoWYVr4E9V7nKBid1a67hVsT/w==
+X-Google-Smtp-Source: ABdhPJwb1HnQ9ro85HHm7p9EGFys4Nphpx6yExOfHsGC6ziznix/qKRunIQxVlDaDPiFTugQ23IK7w==
+X-Received: by 2002:a05:6638:a3c:: with SMTP id 28mr2396405jao.281.1642787285706;
+        Fri, 21 Jan 2022 09:48:05 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id h12sm1549324iok.25.2022.01.21.09.48.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jan 2022 09:48:05 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org,
+        Miaoqian Lin <linmq006@gmail.com>, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20220120101025.22411-1-linmq006@gmail.com>
+References: <20220120101025.22411-1-linmq006@gmail.com>
+Subject: Re: [PATCH] block: fix memory leak in disk_register_independent_access_ranges
+Message-Id: <164278728249.232198.7158002983506256334.b4-ty@kernel.dk>
+Date:   Fri, 21 Jan 2022 10:48:02 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 21 Jan 2022 06:41:01 -0700:
+On Thu, 20 Jan 2022 10:10:25 +0000, Miaoqian Lin wrote:
+> kobject_init_and_add() takes reference even when it fails.
+> According to the doc of kobject_init_and_add()
+> 
+>    If this function returns an error, kobject_put() must be called to
+>    properly clean up the memory associated with the object.
+> 
+> Fix this issue by adding kobject_put().
+> Callback function blk_ia_ranges_sysfs_release() in kobject_put()
+> can handle the pointer "iars" properly.
+> 
+> [...]
 
-> git://git.kernel.dk/linux-block.git tags/block-5.17-2022-01-21
+Applied, thanks!
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3c7c25038b6c7d66a6816028219914379be6a5cc
+[1/1] block: fix memory leak in disk_register_independent_access_ranges
+      commit: c321e650a45c4228cce1107680ac74e06f014906
 
-Thank you!
-
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jens Axboe
+
+
