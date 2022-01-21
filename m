@@ -2,230 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DB7C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 12:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D89C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 21 Jan 2022 13:41:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380371AbiAUM2S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Jan 2022 07:28:18 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:31110 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380360AbiAUM2Q (ORCPT
+        id S1350636AbiAUNlF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Jan 2022 08:41:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33060 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235175AbiAUNlF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Jan 2022 07:28:16 -0500
-Received: from kwepemi500021.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JgJTj5zN5z1FCX3;
-        Fri, 21 Jan 2022 20:24:25 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500021.china.huawei.com (7.221.188.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 21 Jan 2022 20:28:13 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 21 Jan 2022 20:28:13 +0800
-Subject: Re: [PATCH 0/4 v5] bfq: Avoid use-after-free when moving processes
- between cgroups
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>
-CC:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20220121105503.14069-1-jack@suse.cz>
- <4b44e8db-771f-fc08-85f1-52c326f3db18@huawei.com>
-Message-ID: <9e9206d6-d806-459f-49f0-710606c0ab3f@huawei.com>
-Date:   Fri, 21 Jan 2022 20:28:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 21 Jan 2022 08:41:05 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B6E6C061574
+        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 05:41:05 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id r15so7642713ilj.7
+        for <linux-block@vger.kernel.org>; Fri, 21 Jan 2022 05:41:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=cDr3vNomNDCKFdF35ALOQFuIyi3whzLCi+09XJGyqjY=;
+        b=n0esj85hKlwZauXumWyd9Od5Bsomq/9rbEdxLVp5ZKHIZuaxDDbMSttnRgdD/n77J2
+         GUdV6nAzL90uldVsKs5XeqFJBI21KSi5LH/3mSgTg9c5Fmnu2Co+4EUHtqchzA9pUzPi
+         rr3Lxq7tLK6eJniEA/zONuCCynQKgQUvu8/9lKS/tmuat2RfrogHfY+5wzU3IJLR+/u1
+         6bwWjzASt63V6IhA6N7aY7PJNPsa4I8ipQPPZ43V+5aAwmG3pUilveY5QDA22h9xYYJa
+         M/aMODwwCIGxEibnyaLaQoe2yXbS/tYA3yiB6AF1xL+gLZOMTIeVRgOCqJkOrvyKbpSE
+         AISA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=cDr3vNomNDCKFdF35ALOQFuIyi3whzLCi+09XJGyqjY=;
+        b=drvgxyACrKUqIR4SRAyppVixALaNVNh6FV9OAkIuIKIQqoOaqDnvYhj1aXb/BpI52t
+         nAObRpldZjgjG47Wr0yfO9HMIY4diblPBJwMMePAleQQixxJV/Ci7x5+HiNhugtgNYwW
+         ybmh3x2ByD7K5FQS1Sg4GwEp4nsTi8cBuSB6e6gGocECvJCeFymubnTSdbKRsSo0KU3i
+         6LeL5i5A0zVFjSp3Zkkr/2Xcur4X+ECkBffspT5tzCHnFLGMu8tNB3t8CiqD1bk7VcIu
+         Xjc1cfkVZwqP/6MivyHzLKWfkCQBMzVrbpl3tEI+F0+EzrXZM3Qvl7dxg6eHFQHfRiFs
+         LYfg==
+X-Gm-Message-State: AOAM533kwCNv7djOFwYSKJdOz9cwRomiDg6DNKRWECuH8XWD4R0GDNYv
+        H8AAKhgFlSOTu5cB9wvuTxgnERZRjDugog==
+X-Google-Smtp-Source: ABdhPJy5ih13FXzK7UJUVn8KvUOxrBsNimxHCJUKwtOO2YYxbkGKK1qa/0Z9ppqH7ZOTeBBYGKSYFA==
+X-Received: by 2002:a05:6e02:170d:: with SMTP id u13mr1892858ill.321.1642772464314;
+        Fri, 21 Jan 2022 05:41:04 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id g6sm1518302iow.4.2022.01.21.05.41.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jan 2022 05:41:03 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.17-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <bc78bf16-3c07-66a3-fa1b-a07cbc95ac84@kernel.dk>
+Date:   Fri, 21 Jan 2022 06:41:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <4b44e8db-771f-fc08-85f1-52c326f3db18@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/01/21 19:42, yukuai (C) 写道:
-> 在 2022/01/21 18:56, Jan Kara 写道:
->> Hello,
->>
->> here is the fifth version of my patches to fix use-after-free issues 
->> in BFQ
->> when processes with merged queues get moved to different cgroups. The 
->> patches
->> have survived some beating in my test VM, but so far I fail to 
->> reproduce the
->> original KASAN reports so testing from people who can reproduce them 
->> is most
->> welcome. Kuai, can you please give these patches a run in your setup? 
->> Thanks
->> a lot for your help with fixing this!
->>
->> Changes since v4:
->> * Even more aggressive splitting of merged bfq queues to avoid 
->> problems with
->>    long merge chains.
->>
->> Changes since v3:
->> * Changed handling of bfq group move to handle the case when target of 
->> the
->>    merge has moved.
->>
->> Changes since v2:
->> * Improved handling of bfq queue splitting on move between cgroups
->> * Removed broken change to bfq_put_cooperator()
->>
->> Changes since v1:
->> * Added fix for bfq_put_cooperator()
->> * Added fix to handle move between cgroups in bfq_merge_bio()
->>
->>                                 Honza
->> Previous versions:
->> Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
->> Link: http://lore.kernel.org/r/20220105143037.20542-1-jack@suse.cz # v2
->> Link: http://lore.kernel.org/r/20220112113529.6355-1-jack@suse.cz # v3
->> Link: http://lore.kernel.org/r/20220114164215.28972-1-jack@suse.cz # v4
->> .
->>
-> Hi, Jan
-> 
-> I add a new BUG_ON() in bfq_setup_merge() while iterating new_bfqq, and
-> this time this BUG_ON() is triggered:
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 00184530c644..4b17eb4a29bc 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -731,8 +731,12 @@ static struct bfq_group 
-> *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
->          if (sync_bfqq) {
->                  if (!sync_bfqq->new_bfqq && !bfq_bfqq_coop(sync_bfqq)) {
->                          /* We are the only user of this bfqq, just move 
-> it */
-> -                       if (sync_bfqq->entity.sched_data != 
-> &bfqg->sched_data)
-> +                       if (sync_bfqq->entity.sched_data != 
-> &bfqg->sched_data) {
-> +                               printk("%s: bfqq %px move from %px to 
-> %px\n",
-> +                                      __func__, sync_bfqq,
-> +                                      bfqq_group(sync_bfqq), bfqg);
->                                  bfq_bfqq_move(bfqd, sync_bfqq, bfqg);
-> +                       }
->                  } else {
->                          struct bfq_queue *bfqq;
-> 
-> @@ -741,10 +745,13 @@ static struct bfq_group 
-> *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
->                           * that the merge chain still belongs to the same
->                           * cgroup.
->                           */
-> -                       for (bfqq = sync_bfqq; bfqq; bfqq = bfqq->new_bfqq)
-> +                       for (bfqq = sync_bfqq; bfqq; bfqq = 
-> bfqq->new_bfqq) {
-> +                               printk("%s: bfqq %px(%px) bfqg %px\n", 
-> __func__,
-> +                                       bfqq, bfqq_group(bfqq), bfqg);
->                                  if (bfqq->entity.sched_data !=
->                                      &bfqg->sched_data)
->                                          break;
-> +                       }
->                          if (bfqq) {
->                                  /*
->                                   * Some queue changed cgroup so the 
-> merge is
-> @@ -878,6 +885,8 @@ static void bfq_reparent_leaf_entity(struct bfq_data 
-> *bfqd,
->          }
-> 
->          bfqq = bfq_entity_to_bfqq(child_entity);
-> +       printk("%s: bfqq %px move from %px to %px\n",  __func__, bfqq,
-> +               bfqq_group(bfqq), bfqd->root_group);
->          bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
->   }
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 07be51bc229b..6d4e243c9a1e 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -2753,6 +2753,14 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct 
-> bfq_queue *new_bfqq)
->          while ((__bfqq = new_bfqq->new_bfqq)) {
->                  if (__bfqq == bfqq)
->                          return NULL;
-> +               if (new_bfqq->entity.parent != __bfqq->entity.parent &&
-> +                   bfqq_group(__bfqq) != __bfqq->bfqd->root_group) {
-> +                       printk("%s: bfqq %px(%px) new_bfqq %px(%px)\n", 
-> __func__,
-> +                               new_bfqq, bfqq_group(new_bfqq), __bfqq,
-> +                               bfqq_group(__bfqq));
-> +                       BUG_ON(1);
-> +               }
-> +
->                  new_bfqq = __bfqq;
->          }
-> 
-> @@ -2797,6 +2805,8 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct 
-> bfq_queue *new_bfqq)
->           * are likely to increase the throughput.
->           */
->          bfqq->new_bfqq = new_bfqq;
-> +        printk("%s: set bfqq %px(%px) new_bfqq %px(%px)\n", __func__, 
-> bfqq,
-> +               bfqq_group(bfqq), new_bfqq, bfqq_group(new_bfqq));
->          new_bfqq->ref += process_refs;
->          return new_bfqq;
->   }
-> @@ -2963,8 +2973,16 @@ bfq_setup_cooperator(struct bfq_data *bfqd, 
-> struct bfq_queue *bfqq,
->          if (bfq_too_late_for_merging(bfqq))
->                  return NULL;
-> 
-> -       if (bfqq->new_bfqq)
-> +       if (bfqq->new_bfqq) {
-> +               if (bfqq->entity.parent != bfqq->new_bfqq->entity.parent &&
-> +                   bfqq_group(bfqq->new_bfqq) != bfqd->root_group) {
-> +                       printk("%s: bfqq %px(%px) new_bfqq %px(%px)\n", 
-> __func__,
-> +                               bfqq, bfqq_group(bfqq), bfqq->new_bfqq,
-> +                               bfqq_group(bfqq->new_bfqq));
-> +                       BUG_ON(1);
-> +               }
->                  return bfqq->new_bfqq;
-> +       }
-> 
->          if (!io_struct || unlikely(bfqq == &bfqd->oom_bfqq))
->                  return NULL;
-> @@ -6928,6 +6946,9 @@ static void __bfq_put_async_bfqq(struct bfq_data 
-> *bfqd,
-> 
->          bfq_log(bfqd, "put_async_bfqq: %p", bfqq);
->          if (bfqq) {
-> +               printk("%s: bfqq %px move from %px to %px\n",  __func__, 
-> bfqq,
-> +                       bfqq_group(bfqq), bfqd->root_group);
-> +
->                  bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
-> 
->                  bfq_log_bfqq(bfqd, bfqq, "put_async_bfqq: putting %p, %d",
-> 
-Hi, Jan
+Hi Linus,
 
-It seems to me this problem is related to your orignal patch to move all
-bfqqs to root during bfqg offline:
+Various little minor fixes that should go into this release:
 
-bfqg ffff8881721ee000  offline:
-[   51.083018] bfq_reparent_leaf_entity: bfqq ffff8881130898c0 move from 
-ffff8881721ee000 to ffff88817cb0f000
-[   51.093889] bfq_reparent_leaf_entity: bfqq ffff8881222e2940 move from 
-ffff8881721ee000 to ffff88817cb0f000
-[   51.094756] bfq_reparent_leaf_entity: bfqq ffff88810e6a58c0 move from 
-ffff8881721ee000 to ffff88817cb0f000
-[   51.095626] bfq_reparent_leaf_entity: bfqq ffff888136b95600 move from 
-ffff8881721ee000 to ffff88817cb0f000
+- Fix issue with cloned bios and IO accounting (Christoph)
 
-however parent of ffff88817f8d0dc0 is still ffff8881721ee000 :
-[   51.224771] bfq_setup_merge: bfqq ffff8881130898c0(ffff88817cb0f000) 
-new_bfqq ffff88817f8d0dc0(ffff8881721ee000)
+- Remove redundant assignments (Colin, GuoYong)
+
+- Fix an issue with the mq-deadline async_depth sysfs interface (me)
+
+- Fix brd module loading race (Tetsuo)
+
+- Shared tag map wakeup fix (Laibin)
+
+- End of bdev read fix (OGAWA)
+
+- srcu leak fix (Ming)
+
+Please pull!
+
+
+The following changes since commit fb3b0673b7d5b477ed104949450cd511337ba3c6:
+
+  Merge tag 'mailbox-v5.17' of git://git.linaro.org/landing-teams/working/fujitsu/integration (2022-01-13 11:19:07 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-01-21
+
+for you to fetch changes up to 46cdc45acb089c811d9a54fd50af33b96e5fae9d:
+
+  block: fix async_depth sysfs interface for mq-deadline (2022-01-20 10:54:02 -0700)
+
+----------------------------------------------------------------
+block-5.17-2022-01-21
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      block: assign bi_bdev for cloned bios in blk_rq_prep_clone
+
+Colin Ian King (2):
+      loop: remove redundant initialization of pointer node
+      aoe: remove redundant assignment on variable n
+
+GuoYong Zheng (1):
+      block: Remove unnecessary variable assignment
+
+Jens Axboe (1):
+      block: fix async_depth sysfs interface for mq-deadline
+
+Laibin Qiu (1):
+      blk-mq: fix tag_get wait task can't be awakened
+
+Ming Lei (1):
+      block: cleanup q->srcu
+
+OGAWA Hirofumi (1):
+      block: Fix wrong offset in bio_truncate()
+
+Tetsuo Handa (1):
+      brd: remove brd_devices_mutex mutex
+
+ block/bio.c                |  3 +-
+ block/blk-mq-tag.c         | 40 ++++++++++++++++++++-----
+ block/blk-mq.c             |  1 +
+ block/blk-sysfs.c          |  4 ++-
+ block/mq-deadline.c        |  4 +--
+ drivers/block/aoe/aoecmd.c |  2 +-
+ drivers/block/brd.c        | 73 +++++++++++++++++++---------------------------
+ drivers/block/loop.c       |  2 +-
+ include/linux/sbitmap.h    | 11 +++++++
+ lib/sbitmap.c              | 25 ++++++++++++++--
+ 10 files changed, 106 insertions(+), 59 deletions(-)
+
+-- 
+Jens Axboe
+
