@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0D9C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 23 Jan 2022 00:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5637C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 23 Jan 2022 00:16:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235347AbiAWAQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Jan 2022 19:16:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37074 "EHLO
+        id S235576AbiAWAQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Jan 2022 19:16:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235649AbiAWAOe (ORCPT
+        with ESMTP id S231836AbiAWAPi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Jan 2022 19:14:34 -0500
+        Sat, 22 Jan 2022 19:15:38 -0500
 Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0FEAC0617BF;
-        Sat, 22 Jan 2022 16:13:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B40EC061768;
+        Sat, 22 Jan 2022 16:13:53 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id B750ACE0025;
-        Sun, 23 Jan 2022 00:13:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E59C340E2;
-        Sun, 23 Jan 2022 00:13:22 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id F0ECECE0AD1;
+        Sun, 23 Jan 2022 00:13:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90FD7C004E1;
+        Sun, 23 Jan 2022 00:13:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642896803;
-        bh=sRFbfziYn/GXziu1+HwHd/arn8ZkRrexYZMBH0GRhpY=;
+        s=k20201202; t=1642896831;
+        bh=izXuRLTqqf53tu6dekzU+DqbvdILLQrv0sYd8FrFK8o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dCVHQs8Ve+cSPdqfTU9rACArpCOC1lwB9DSj/HHEtO7TYr89fYsuRquUq9Hr7tEmN
-         DV5VLXim2cMnLUjr7RD7oYSrXFeSZHdbX27eNefB85TIOK1vtL3li+xOXhNlY1bqUs
-         sf/uU8oBsoFN4NJpICQSgBWhugtAXLxRU0HmV5BcNt1LGKorylbmkXhn00t+YKmPqg
-         JIsFkgIJ/KiSvW8eonC+xS48AgYeOhfkm5rvtYhmsLsxp3T5ykuHuhBV0k5Zuh/C9f
-         i4XViBx64v3nByTsQyEtgqFFH2d1EURp0gFS19tSMpOc17Mg8Js4gPhus6nA2ekPXo
-         X/WBCJJ2vjdcg==
+        b=XoEEIsCEaSl854DrQLPfdYTinF5Qxo1n5AzmB2Z8alEmuygXb6PgwcSHknADe1wif
+         vJsBJ5tf2dCH+t4PbjU52p+dIxj/9WxjkQaOk3wsIBV/Rol6Yxyz8MKnW8sHVXWfcK
+         d9uefpz1LqCh9GH5JsmbpwI1pHs0YCaGaUB4s9IQHmDNASAGUSAhB0A6qRmnedGGd4
+         fr79SC+cmBz5DaZDz8/kuK8mAnTFtTmANKuOqnfwxpTjoDC1ovyVgoQmCTsLELxYNc
+         MiKqxj2XoXgBFpTJ4flj0ibAtQqY8EOrGAi+AQZzM8GdYl+2Vg4WYycRpqMQN1fbiO
+         TmBtHh5G57JWQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
         syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com,
         Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 9/9] block: Fix wrong offset in bio_truncate()
-Date:   Sat, 22 Jan 2022 19:12:58 -0500
-Message-Id: <20220123001258.2460594-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 8/8] block: Fix wrong offset in bio_truncate()
+Date:   Sat, 22 Jan 2022 19:13:23 -0500
+Message-Id: <20220123001323.2460719-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220123001258.2460594-1-sashal@kernel.org>
-References: <20220123001258.2460594-1-sashal@kernel.org>
+In-Reply-To: <20220123001323.2460719-1-sashal@kernel.org>
+References: <20220123001323.2460719-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -74,10 +74,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 0703a208ca248..f8d26ce7b61b0 100644
+index cb38d6f3acceb..1c52d0196e15c 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -575,7 +575,8 @@ void bio_truncate(struct bio *bio, unsigned new_size)
+@@ -569,7 +569,8 @@ void bio_truncate(struct bio *bio, unsigned new_size)
  				offset = new_size - done;
  			else
  				offset = 0;
