@@ -2,92 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3244C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 16:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FEFC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 16:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236081AbiAXQBO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jan 2022 11:01:14 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:54440 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240889AbiAXQBM (ORCPT
+        id S240911AbiAXQBQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jan 2022 11:01:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58458 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243283AbiAXQBP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jan 2022 11:01:12 -0500
+        Mon, 24 Jan 2022 11:01:15 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA9AC06173B;
+        Mon, 24 Jan 2022 08:01:14 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AFECBB810FD;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6B323B810FD;
+        Mon, 24 Jan 2022 16:01:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F3DEC340EB;
         Mon, 24 Jan 2022 16:01:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2EDAC340E5;
-        Mon, 24 Jan 2022 16:01:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643040070;
-        bh=D3cFc/NBIAKXRfJhPp6StLK8ULApGVcFR4ulS3YCWUQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=LpXp9TSxT9DE4dWhl8kwwb+u+FDuQ6R5RNmldAa79eAXhv+4zjfK/cR2DNrCGh66T
-         4GpN1b6bmLoZ3osKkobMbihcZgC+XOBs451dIO7hfTvNeqXlw9qRDfXjEk4sviVPHc
-         cvRMBnCN4y/EUq+pWRRADhslAEllBDQX2BqUCkalrTprazEQRlwmrmzrEr2l8vWcm4
-         RrUwYu2gfY4aKJF5udNbRjCkctX8RqIAr4Oo2iSZYmf/1/EVFU/E/hfsIE/7OIiZch
-         46pUfq3eQl+7JFul6fXguYURidLaO7ywGE/iaMyVn7V8Oc0v8/QrOD7DEZaJStBNC4
-         S25nsPZR42T1w==
+        s=k20201202; t=1643040072;
+        bh=5NXbiPmUVyXNpYVOqSPCaEFkm6W60TiQ0PNNsqOWJcc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=uGHnnHYXoWm8KwuCR/gfWP1n6W0Aja74gXs7JM2Q2n4qe2YnYQH/2UdZ+artUKnx1
+         QSgWEp9sX4O0vTXTW7UiQYJocPTik0Ub/TM1BPp28tkLtOHe6aKj8KHU/YhVs0Cxiw
+         1NieNy1dH1Ygy1uz+QFDlnQVKjh4B09sOPX0QoqIauorgMEOgTOmOmxwGW5uFP0I5l
+         jHhdUjjOnPmYMAyK4x+tRTZDLjhn3buUGd34TJmQ8y4JIvK0vYZFSygNWwcCjB6p/0
+         9YDvKY9MmjX4b4vitMwoh5ilocbK0PCAGnPbescNW8+zx548bXFyD0niZUU9F6L6XD
+         +4kfNBC/0OaPA==
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
         colyli@suse.de, arnd@arndb.de, Keith Busch <kbusch@kernel.org>
-Subject: [RFC 0/7] 64-bit data integrity field support
-Date:   Mon, 24 Jan 2022 08:01:00 -0800
-Message-Id: <20220124160107.1683901-1-kbusch@kernel.org>
+Subject: [RFC 2/7] nvme: allow integrity on extended metadata formats
+Date:   Mon, 24 Jan 2022 08:01:02 -0800
+Message-Id: <20220124160107.1683901-3-kbusch@kernel.org>
 X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20220124160107.1683901-1-kbusch@kernel.org>
+References: <20220124160107.1683901-1-kbusch@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The NVM Express protocol added enhancements to the data integrity field
-formats beyond the T10 defined protection information. A detailed
-description of the new formats can be found in the NVMe's NVM Command
-Set Specification, section 5.2, available at:
+The block integrity subsystem knows how to construct protection
+information buffers with metadata beyond the protection information
+fields. Remove the driver restriction.
 
-  https://nvmexpress.org/wp-content/uploads/NVM-Command-Set-Specification-1.0b-2021.12.18-Ratified.pdf
+Note, this can only work if the PI field appears first in the metadata,
+as the integrity subsystem doesn't update guard tags on preceding
+metadata.
 
-This series implements one possible new format: the CRC64 guard with
-48-bit reference tags. This does not add support for the variable
-"storage tag" field.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/nvme/host/core.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-The NVMe CRC64 parameters (from Rocksoft) were not implemented in the
-kernel, so a software implementation is included in this series based on
-the generated table. This series does not include any possible hardware
-excelleration (ex: x86's pclmulqdq), so it's not very high performant
-right now.
-
-Keith Busch (7):
-  block: support pi with extended metadata
-  nvme: allow integrity on extended metadata formats
-  lib: add rocksoft model crc64
-  lib: add crc64 tests
-  asm-generic: introduce be48 unaligned accessors
-  block: add pi for nvme enhanced integrity
-  nvme: add support for enhanced metadata
-
- block/Kconfig                   |   1 +
- block/bio-integrity.c           |   1 +
- block/t10-pi.c                  | 198 +++++++++++++++++++++++++++++++-
- drivers/nvme/host/core.c        | 167 ++++++++++++++++++++++-----
- drivers/nvme/host/nvme.h        |   1 +
- include/asm-generic/unaligned.h |  26 +++++
- include/linux/blk-integrity.h   |   1 +
- include/linux/crc64.h           |   2 +
- include/linux/nvme.h            |  53 ++++++++-
- include/linux/t10-pi.h          |  20 ++++
- lib/Kconfig.debug               |   3 +
- lib/Makefile                    |   1 +
- lib/crc64.c                     |  79 +++++++++++++
- lib/gen_crc64table.c            |  33 ++++--
- lib/test_crc64.c                |  68 +++++++++++
- 15 files changed, 608 insertions(+), 46 deletions(-)
- create mode 100644 lib/test_crc64.c
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 5e0bfda04bd7..b3eabf6a08b9 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1726,12 +1726,9 @@ static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
+ {
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
+ 
+-	/*
+-	 * The PI implementation requires the metadata size to be equal to the
+-	 * t10 pi tuple size.
+-	 */
+ 	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
+-	if (ns->ms == sizeof(struct t10_pi_tuple))
++	if (id->dps & NVME_NS_DPS_PI_FIRST ||
++	    ns->ms == sizeof(struct t10_pi_tuple))
+ 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
+ 	else
+ 		ns->pi_type = 0;
 -- 
 2.25.4
 
