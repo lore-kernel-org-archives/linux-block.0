@@ -2,67 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C58DC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 13:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 681C0C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 13:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242738AbiAXNSZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jan 2022 08:18:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48496 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbiAXNSY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jan 2022 08:18:24 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86571C06173B;
-        Mon, 24 Jan 2022 05:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=eVF/Mv3zSzI2Qv9R17ZtBQ7iXQHeN6j3EvpwEFzhP+A=; b=MtKNoAUtESHAtwBDb3vz7cd1iq
-        UZOXon3J+Q3yBBjJ54bWFLp+IXJLgFgUjRKdXSW2AHl4dSQAmoQtijlx2xZVIDVN5Reg2pxKhGsNh
-        Tj1kjCJ6AXAEIAs7n74mOFweE1jgA85vQlvIytqfUW90QyrMRqYiFXP3XbgPp+6ztCpD2lsw71NQ+
-        6RMnE9W9bjnvj9Vy3JS9NG3G1keJAcVEgmVRst3yMJHwLMIoXMg8LDIosetR3WhVECuDdL/Popbyt
-        lmi/+J/eqPGXQK4AgT5cgKhQrG0DONsxkeo8B7KWrQp7CUaT65FpFZXvWMqhjWDRksulTY1LcCU/H
-        Xvhx4khw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nBzEh-000fvO-7w; Mon, 24 Jan 2022 13:18:19 +0000
-Date:   Mon, 24 Jan 2022 13:18:19 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: RFA (Request for Advice): block/bio: get_user_pages() -->
- pin_user_pages()
-Message-ID: <Ye6nG6xvVG2xTQkZ@casper.infradead.org>
-References: <e83cd4fe-8606-f4de-41ad-33a40f251648@nvidia.com>
+        id S239654AbiAXNWZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jan 2022 08:22:25 -0500
+Received: from verein.lst.de ([213.95.11.211]:55797 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229791AbiAXNWZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Jan 2022 08:22:25 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1D85868BEB; Mon, 24 Jan 2022 14:22:22 +0100 (CET)
+Date:   Mon, 24 Jan 2022 14:22:21 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH V2 11/13] block: move blk_exit_queue into disk_release
+Message-ID: <20220124132221.GJ27269@lst.de>
+References: <20220122111054.1126146-1-ming.lei@redhat.com> <20220122111054.1126146-12-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e83cd4fe-8606-f4de-41ad-33a40f251648@nvidia.com>
+In-Reply-To: <20220122111054.1126146-12-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jan 23, 2022 at 11:52:07PM -0800, John Hubbard wrote:
-> To ground this in reality, one of the partial call stacks is:
+On Sat, Jan 22, 2022 at 07:10:52PM +0800, Ming Lei wrote:
+>  3 files changed, 41 insertions(+), 17 deletions(-)
 > 
-> do_direct_IO()
->     dio_zero_block()
->         page = ZERO_PAGE(0); <-- This is a problem
-> 
-> I'm not sure what to use, instead of that zero page! The zero page
-> doesn't need to be allocated nor tracked, and so any replacement
-> approaches would need either other storage, or some horrid scheme that I
-> won't go so far as to write on the screen. :)
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d51b0aa2e4e4..72ae9955cf27 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3101,6 +3101,9 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>  	struct blk_mq_tags *drv_tags;
+>  	struct page *page;
+>  
+> +	if (list_empty(&tags->page_list))
+> +		return;
 
-I'm not really sure what the problem is.
+Please split this out and document why it is needed.
 
-include/linux/mm.h:             is_zero_pfn(page_to_pfn(page));
+> +/* Unconfigure the I/O scheduler and dissociate from the cgroup controller. */
+> +static void blk_exit_queue(struct request_queue *q)
+> +{
+> +	/*
+> +	 * Since the I/O scheduler exit code may access cgroup information,
+> +	 * perform I/O scheduler exit before disassociating from the block
+> +	 * cgroup controller.
+> +	 */
+> +	if (q->elevator) {
+> +		ioc_clear_queue(q);
+> +
+> +		mutex_lock(&q->sysfs_lock);
+> +		blk_mq_sched_free_rqs(q);
+> +		elevator_exit(q);
+> +		mutex_unlock(&q->sysfs_lock);
+> +	}
+> +}
 
-and release_pages() already contains:
-                if (is_huge_zero_page(page))
-                        continue;
+Given that this all deals with the I/O scheduler the naming seems
+wrong.  It almost seems like we'd want to move ioc_clear_queue and
+blk_mq_sched_free_rqs into elevator_exit to have somewhat sensible
+helpers.  That would add extra locking of q->sysfs_lock for
+ioc_clear_queue, but given that elevator_switch_mq already does
+that, this seems harmless.
 
-Why can't the BIO release function contain an is_zero_pfn() check?
