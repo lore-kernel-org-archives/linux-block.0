@@ -2,91 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5637C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 23 Jan 2022 00:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E5CC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 03:46:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235576AbiAWAQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Jan 2022 19:16:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231836AbiAWAPi (ORCPT
+        id S241096AbiAXDqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Jan 2022 22:46:07 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:31115 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241090AbiAXDqH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Jan 2022 19:15:38 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B40EC061768;
-        Sat, 22 Jan 2022 16:13:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id F0ECECE0AD1;
-        Sun, 23 Jan 2022 00:13:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90FD7C004E1;
-        Sun, 23 Jan 2022 00:13:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642896831;
-        bh=izXuRLTqqf53tu6dekzU+DqbvdILLQrv0sYd8FrFK8o=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XoEEIsCEaSl854DrQLPfdYTinF5Qxo1n5AzmB2Z8alEmuygXb6PgwcSHknADe1wif
-         vJsBJ5tf2dCH+t4PbjU52p+dIxj/9WxjkQaOk3wsIBV/Rol6Yxyz8MKnW8sHVXWfcK
-         d9uefpz1LqCh9GH5JsmbpwI1pHs0YCaGaUB4s9IQHmDNASAGUSAhB0A6qRmnedGGd4
-         fr79SC+cmBz5DaZDz8/kuK8mAnTFtTmANKuOqnfwxpTjoDC1ovyVgoQmCTsLELxYNc
-         MiKqxj2XoXgBFpTJ4flj0ibAtQqY8EOrGAi+AQZzM8GdYl+2Vg4WYycRpqMQN1fbiO
-         TmBtHh5G57JWQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 8/8] block: Fix wrong offset in bio_truncate()
-Date:   Sat, 22 Jan 2022 19:13:23 -0500
-Message-Id: <20220123001323.2460719-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220123001323.2460719-1-sashal@kernel.org>
-References: <20220123001323.2460719-1-sashal@kernel.org>
+        Sun, 23 Jan 2022 22:46:07 -0500
+Received: from kwepemi100020.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Jhwln2Xl3z1FClV;
+        Mon, 24 Jan 2022 11:42:13 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100020.china.huawei.com (7.221.188.48) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 24 Jan 2022 11:46:04 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 24 Jan 2022 11:46:03 +0800
+Subject: Re: [PATCH v2 0/3] block, bfq: minor cleanup and fix
+To:     <jack@suse.cz>, <tj@kernel.org>, <axboe@kernel.dk>,
+        <paolo.valente@linaro.org>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20211231032354.793092-1-yukuai3@huawei.com>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <a461cdbd-e1f3-0083-cd96-b69837334b19@huawei.com>
+Date:   Mon, 24 Jan 2022 11:46:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <20211231032354.793092-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+ÔÚ 2021/12/31 11:23, Yu Kuai Ð´µÀ:
+> Chagnes in v2:
+>   - add comment in patch 2
+>   - remove patch 4, since the problem do not exist.
+> 
+> Yu Kuai (3):
+>    block, bfq: cleanup bfq_bfqq_to_bfqg()
+>    block, bfq: avoid moving bfqq to it's parent bfqg
+>    block, bfq: don't move oom_bfqq
+> 
+>   block/bfq-cgroup.c  | 16 +++++++++++++++-
+>   block/bfq-iosched.c |  4 ++--
+>   block/bfq-iosched.h |  1 -
+>   block/bfq-wf2q.c    | 15 ---------------
+>   4 files changed, 17 insertions(+), 19 deletions(-)
+> 
+Hi, jens
 
-[ Upstream commit 3ee859e384d453d6ac68bfd5971f630d9fa46ad3 ]
+Now that with acked-by Paolo, can you please applied this pathset?
 
-bio_truncate() clears the buffer outside of last block of bdev, however
-current bio_truncate() is using the wrong offset of page. So it can
-return the uninitialized data.
-
-This happened when both of truncated/corrupted FS and userspace (via
-bdev) are trying to read the last of bdev.
-
-Reported-by: syzbot+ac94ae5f68b84197f41c@syzkaller.appspotmail.com
-Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/875yqt1c9g.fsf@mail.parknet.co.jp
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index cb38d6f3acceb..1c52d0196e15c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -569,7 +569,8 @@ void bio_truncate(struct bio *bio, unsigned new_size)
- 				offset = new_size - done;
- 			else
- 				offset = 0;
--			zero_user(bv.bv_page, offset, bv.bv_len - offset);
-+			zero_user(bv.bv_page, bv.bv_offset + offset,
-+				  bv.bv_len - offset);
- 			truncated = true;
- 		}
- 		done += bv.bv_len;
--- 
-2.34.1
-
+Thanks,
+Kuai
