@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0912DC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 09:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67273C43219
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 09:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242651AbiAXJLe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jan 2022 04:11:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47284 "EHLO
+        id S242636AbiAXJLh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jan 2022 04:11:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242637AbiAXJLb (ORCPT
+        with ESMTP id S242600AbiAXJLf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jan 2022 04:11:31 -0500
+        Mon, 24 Jan 2022 04:11:35 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1447C06173B;
-        Mon, 24 Jan 2022 01:11:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59082C06173D;
+        Mon, 24 Jan 2022 01:11:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=3LrK4aJmaFdogyqU1iGTwXaIOJsn5a0nWoXb/YpJask=; b=dOpJ6VWs7GeKGh/hw/8P4SP7FK
-        RXz/peApW9FKh8sSsu7uUo+QtvkbnDZDwTOcd5J5Pq5W3XgHqglOKXW799+pUl2WvrjLJprVkTHCA
-        p3/3aoG7Mwr53C5WGPXIK6Qqp+gEU7yP0fW+guIJKj3SHE0tRoCgRPkLGqnIJP2biH8/WVSZA7oAH
-        pzi1ZQ3awROYglH+FkL+uPSH3p22Q32npWjBeWaOyja3i/9lrLRMlYivos3JfT31vW+hBRer+0qmA
-        npqDdh0oZ4yylM4qRHIr/2/DipAO6d3JmwA4VavBQsVevlc2tlTIP6TRjz194kx3o7cOVaSIfO4Io
-        RbUoCZzg==;
+        bh=cyA51tgTzJ0oURPYTTRoUDyOePKkV9xxN4Hqcjy0whE=; b=24POPMuL96/As8aG9GXRe4flkw
+        PU2voX+TtVVlvvdQoBbajVZWFUX5Dxw0G62WsA11q+Z8rRjH+LEx651hKp3XtfjI7gXtHN4ZzkX/+
+        zbZ+tlG5Y0PtCwK4dK1YvN9MT7GYMmhUZbx6oA7tclLFQqB/Hk6HGXGms/H0HPQsHLOdwunOcJ2He
+        Z/XTdU7e0f03aHpCO6hyntFD+lSqUwmcuScLWrUHjNVwxSomsOA9gkK7UTP2pkv+Rq271Q+ptnz5u
+        RQQj2WoPvjf4xtnwoz0FDtxL394f4gkw9/czqcZnSk+qNyA0Xz4vOPLIi9B+cPZ8PvyvkOOGVnRjM
+        +yBS+85g==;
 Received: from [2001:4bb8:184:72a4:a337:a75f:a24e:7e39] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nBvNj-002k3M-8B; Mon, 24 Jan 2022 09:11:23 +0000
+        id 1nBvNo-002k7w-Qx; Mon, 24 Jan 2022 09:11:29 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Pavel Begunkov <asml.silence@gmail.com>,
@@ -44,9 +44,9 @@ Cc:     Pavel Begunkov <asml.silence@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
         xen-devel@lists.xenproject.org, drbd-dev@lists.linbit.com
-Subject: [PATCH 05/19] dm: bio_alloc can't fail if it is allowed to sleep
-Date:   Mon, 24 Jan 2022 10:10:53 +0100
-Message-Id: <20220124091107.642561-6-hch@lst.de>
+Subject: [PATCH 07/19] dm-snap: use blkdev_issue_flush instead of open coding it
+Date:   Mon, 24 Jan 2022 10:10:55 +0100
+Message-Id: <20220124091107.642561-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220124091107.642561-1-hch@lst.de>
 References: <20220124091107.642561-1-hch@lst.de>
@@ -57,185 +57,74 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove handling of NULL returns from sleeping bio_alloc calls given that
-those can't fail.
+Use blkdev_issue_flush, which uses an on-stack bio instead of an
+opencoded version with a bio embedded into struct dm_snapshot.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/dm-crypt.c          |  5 +----
- drivers/md/dm-log-writes.c     | 18 ------------------
- drivers/md/dm-thin.c           | 25 +++++++++----------------
- drivers/md/dm-zoned-metadata.c | 11 -----------
- drivers/md/dm.c                |  2 --
- 5 files changed, 10 insertions(+), 51 deletions(-)
+ drivers/md/dm-snap.c | 21 +--------------------
+ 1 file changed, 1 insertion(+), 20 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index d4ae31558826a..20abe3486aba1 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1673,9 +1673,6 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
- 		mutex_lock(&cc->bio_alloc_lock);
- 
- 	clone = bio_alloc_bioset(GFP_NOIO, nr_iovecs, &cc->bs);
--	if (!clone)
--		goto out;
+diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
+index dcf34c6b05ad3..0d336b5ec5714 100644
+--- a/drivers/md/dm-snap.c
++++ b/drivers/md/dm-snap.c
+@@ -141,11 +141,6 @@ struct dm_snapshot {
+ 	 * for them to be committed.
+ 	 */
+ 	struct bio_list bios_queued_during_merge;
 -
- 	clone_init(io, clone);
+-	/*
+-	 * Flush data after merge.
+-	 */
+-	struct bio flush_bio;
+ };
  
- 	remaining_size = size;
-@@ -1702,7 +1699,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
- 		bio_put(clone);
- 		clone = NULL;
- 	}
--out:
-+
- 	if (unlikely(gfp_mask & __GFP_DIRECT_RECLAIM))
- 		mutex_unlock(&cc->bio_alloc_lock);
+ /*
+@@ -1127,17 +1122,6 @@ static void snapshot_merge_next_chunks(struct dm_snapshot *s)
  
-diff --git a/drivers/md/dm-log-writes.c b/drivers/md/dm-log-writes.c
-index 139b09b06eda9..25f5e8d2d417b 100644
---- a/drivers/md/dm-log-writes.c
-+++ b/drivers/md/dm-log-writes.c
-@@ -218,10 +218,6 @@ static int write_metadata(struct log_writes_c *lc, void *entry,
- 	size_t ret;
+ static void error_bios(struct bio *bio);
  
- 	bio = bio_alloc(GFP_KERNEL, 1);
--	if (!bio) {
--		DMERR("Couldn't alloc log bio");
--		goto error;
--	}
- 	bio->bi_iter.bi_size = 0;
- 	bio->bi_iter.bi_sector = sector;
- 	bio_set_dev(bio, lc->logdev->bdev);
-@@ -276,11 +272,6 @@ static int write_inline_data(struct log_writes_c *lc, void *entry,
- 		atomic_inc(&lc->io_blocks);
- 
- 		bio = bio_alloc(GFP_KERNEL, bio_pages);
--		if (!bio) {
--			DMERR("Couldn't alloc inline data bio");
--			goto error;
--		}
+-static int flush_data(struct dm_snapshot *s)
+-{
+-	struct bio *flush_bio = &s->flush_bio;
 -
- 		bio->bi_iter.bi_size = 0;
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, lc->logdev->bdev);
-@@ -322,7 +313,6 @@ static int write_inline_data(struct log_writes_c *lc, void *entry,
- error_bio:
- 	bio_free_pages(bio);
- 	bio_put(bio);
--error:
- 	put_io_block(lc);
- 	return -1;
- }
-@@ -364,10 +354,6 @@ static int log_one_block(struct log_writes_c *lc,
- 
- 	atomic_inc(&lc->io_blocks);
- 	bio = bio_alloc(GFP_KERNEL, bio_max_segs(block->vec_cnt));
--	if (!bio) {
--		DMERR("Couldn't alloc log bio");
--		goto error;
--	}
- 	bio->bi_iter.bi_size = 0;
- 	bio->bi_iter.bi_sector = sector;
- 	bio_set_dev(bio, lc->logdev->bdev);
-@@ -387,10 +373,6 @@ static int log_one_block(struct log_writes_c *lc,
- 			submit_bio(bio);
- 			bio = bio_alloc(GFP_KERNEL,
- 					bio_max_segs(block->vec_cnt - i));
--			if (!bio) {
--				DMERR("Couldn't alloc log bio");
--				goto error;
--			}
- 			bio->bi_iter.bi_size = 0;
- 			bio->bi_iter.bi_sector = sector;
- 			bio_set_dev(bio, lc->logdev->bdev);
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index ec119d2422d5d..76a9c2e9aeeea 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -1180,24 +1180,17 @@ static void process_prepared_discard_passdown_pt1(struct dm_thin_new_mapping *m)
+-	bio_reset(flush_bio);
+-	bio_set_dev(flush_bio, s->origin->bdev);
+-	flush_bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
+-
+-	return submit_bio_wait(flush_bio);
+-}
+-
+ static void merge_callback(int read_err, unsigned long write_err, void *context)
+ {
+ 	struct dm_snapshot *s = context;
+@@ -1151,7 +1135,7 @@ static void merge_callback(int read_err, unsigned long write_err, void *context)
+ 		goto shut;
  	}
  
- 	discard_parent = bio_alloc(GFP_NOIO, 1);
--	if (!discard_parent) {
--		DMWARN("%s: unable to allocate top level discard bio for passdown. Skipping passdown.",
--		       dm_device_name(tc->pool->pool_md));
--		queue_passdown_pt2(m);
-+	discard_parent->bi_end_io = passdown_endio;
-+	discard_parent->bi_private = m;
- 
--	} else {
--		discard_parent->bi_end_io = passdown_endio;
--		discard_parent->bi_private = m;
--
--		if (m->maybe_shared)
--			passdown_double_checking_shared_status(m, discard_parent);
--		else {
--			struct discard_op op;
-+	if (m->maybe_shared)
-+		passdown_double_checking_shared_status(m, discard_parent);
-+	else {
-+		struct discard_op op;
- 
--			begin_discard(&op, tc, discard_parent);
--			r = issue_discard(&op, m->data_block, data_end);
--			end_discard(&op, r);
--		}
-+		begin_discard(&op, tc, discard_parent);
-+		r = issue_discard(&op, m->data_block, data_end);
-+		end_discard(&op, r);
+-	if (flush_data(s) < 0) {
++	if (blkdev_issue_flush(s->origin->bdev) < 0) {
+ 		DMERR("Flush after merge failed: shutting down merge");
+ 		goto shut;
  	}
- }
+@@ -1340,7 +1324,6 @@ static int snapshot_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	s->first_merging_chunk = 0;
+ 	s->num_merging_chunks = 0;
+ 	bio_list_init(&s->bios_queued_during_merge);
+-	bio_init(&s->flush_bio, NULL, 0);
  
-diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
-index ee4626d085574..5718b83cc7182 100644
---- a/drivers/md/dm-zoned-metadata.c
-+++ b/drivers/md/dm-zoned-metadata.c
-@@ -551,10 +551,6 @@ static struct dmz_mblock *dmz_get_mblock_slow(struct dmz_metadata *zmd,
- 		return ERR_PTR(-ENOMEM);
+ 	/* Allocate hash table for COW data */
+ 	if (init_hash_tables(s)) {
+@@ -1528,8 +1511,6 @@ static void snapshot_dtr(struct dm_target *ti)
  
- 	bio = bio_alloc(GFP_NOIO, 1);
--	if (!bio) {
--		dmz_free_mblock(zmd, mblk);
--		return ERR_PTR(-ENOMEM);
--	}
+ 	dm_exception_store_destroy(s->store);
  
- 	spin_lock(&zmd->mblk_lock);
- 
-@@ -726,10 +722,6 @@ static int dmz_write_mblock(struct dmz_metadata *zmd, struct dmz_mblock *mblk,
- 		return -EIO;
- 
- 	bio = bio_alloc(GFP_NOIO, 1);
--	if (!bio) {
--		set_bit(DMZ_META_ERROR, &mblk->state);
--		return -ENOMEM;
--	}
- 
- 	set_bit(DMZ_META_WRITING, &mblk->state);
- 
-@@ -760,9 +752,6 @@ static int dmz_rdwr_block(struct dmz_dev *dev, int op,
- 		return -EIO;
- 
- 	bio = bio_alloc(GFP_NOIO, 1);
--	if (!bio)
--		return -ENOMEM;
+-	bio_uninit(&s->flush_bio);
 -
- 	bio->bi_iter.bi_sector = dmz_blk2sect(block);
- 	bio_set_dev(bio, dev->bdev);
- 	bio_set_op_attrs(bio, op, REQ_SYNC | REQ_META | REQ_PRIO);
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index c0ae8087c6027..81449cbdafa81 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -520,8 +520,6 @@ static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
- 	struct bio *clone;
+ 	dm_put_device(ti, s->cow);
  
- 	clone = bio_alloc_bioset(GFP_NOIO, 0, &md->io_bs);
--	if (!clone)
--		return NULL;
- 
- 	tio = container_of(clone, struct dm_target_io, clone);
- 	tio->inside_dm_io = true;
+ 	dm_put_device(ti, s->origin);
 -- 
 2.30.2
 
