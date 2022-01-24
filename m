@@ -2,70 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC2FC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 17:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0106EC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 24 Jan 2022 18:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241602AbiAXRi0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jan 2022 12:38:26 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:33033 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241578AbiAXRi0 (ORCPT
+        id S244997AbiAXScY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jan 2022 13:32:24 -0500
+Received: from mail-pf1-f170.google.com ([209.85.210.170]:46719 "EHLO
+        mail-pf1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235727AbiAXScX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jan 2022 12:38:26 -0500
-Received: from mail-wr1-f50.google.com ([209.85.221.50]) by
- mrelayeu.kundenserver.de (mreue106 [213.165.67.113]) with ESMTPSA (Nemesis)
- id 1MI4gb-1n6G8t1YJT-00F9bj; Mon, 24 Jan 2022 18:38:24 +0100
-Received: by mail-wr1-f50.google.com with SMTP id s18so15008492wrv.7;
-        Mon, 24 Jan 2022 09:38:24 -0800 (PST)
-X-Gm-Message-State: AOAM532wZ/7hDIwWVwGqKyTMpN/7w/SxsY5tVPI64gOAxf9MNq7pya2C
-        kq2rztD30Mt58FtjPiiZAl3EMC2rz0rqlNTm6Sc=
-X-Google-Smtp-Source: ABdhPJyXZF2Mj32FjIcX5YcSsfFjBiMAv8HzCU2khH2F5s44N81S3irwIWHPo6ztRa/zA18kUOwyvr7pqZEPgvvDxxk=
-X-Received: by 2002:adf:fd05:: with SMTP id e5mr15019518wrr.192.1643045904049;
- Mon, 24 Jan 2022 09:38:24 -0800 (PST)
+        Mon, 24 Jan 2022 13:32:23 -0500
+Received: by mail-pf1-f170.google.com with SMTP id h5so8425186pfv.13;
+        Mon, 24 Jan 2022 10:32:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=GLaZfB9I2LW9NeKFD2WW2Oku6S9Lctym5AUPyw4r0EY=;
+        b=fajSdkh/uKwUew1ftRiCsi8O3SO0Mmcm29q7zxCoBpfQ7JwdIOHbbOp7EKb0qxUh9G
+         X2K5iU7a8dJWo5z59hWFglTUtRcU9SN1IzxFuhys+KVxHpwtsSGtkVooR+ZyuYAZmaxZ
+         x+GBq85tyQn3YD/H9YxP5kAu0IoJ+c7hDfyYGuCXECgU7sCdiI9zmlU7HSkT0D+CJrYg
+         1OVIemcO9OffQSFY2HB4Knd3W4uduEmQ4+ZsUJXQfVOJP8Xm+IS1mumZvbI0sX6WwnU3
+         5ooi50C1OnMu4TfodV8sdECLPmreY7EB4/uQDRF8aVDbdHrtCW9Q0jXCV1SqQyBpv6Sz
+         1odg==
+X-Gm-Message-State: AOAM5308gs+bRi3Q8lc9pEev/rMlgt1TnkWtovGy+RkTQo6LB5mq3pyi
+        6B/yy6fOXgcGVV5SNGdMa4U=
+X-Google-Smtp-Source: ABdhPJzA51riiYOrypw+qulVvPjMNxUCWtPJGWOxpGCXrMtb9yuuv88+rFUnia/iPBRRB6INTPErIQ==
+X-Received: by 2002:a63:205:: with SMTP id 5mr12627815pgc.379.1643049142834;
+        Mon, 24 Jan 2022 10:32:22 -0800 (PST)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id l21sm16939528pfu.120.2022.01.24.10.32.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jan 2022 10:32:21 -0800 (PST)
+Message-ID: <db0d9760-9cff-e85b-ca2a-003c297322d1@acm.org>
+Date:   Mon, 24 Jan 2022 10:32:19 -0800
 MIME-Version: 1.0
-References: <20220124160107.1683901-1-kbusch@kernel.org> <20220124160107.1683901-6-kbusch@kernel.org>
-In-Reply-To: <20220124160107.1683901-6-kbusch@kernel.org>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Mon, 24 Jan 2022 18:38:07 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a0i87SHhAvG2GuruGgnTzqAuHaEQ0iq9udaMwX56aaw+Q@mail.gmail.com>
-Message-ID: <CAK8P3a0i87SHhAvG2GuruGgnTzqAuHaEQ0iq9udaMwX56aaw+Q@mail.gmail.com>
-Subject: Re: [RFC 5/7] asm-generic: introduce be48 unaligned accessors
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Coly Li <colyli@suse.de>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:I8h1ypcpQkRVWYDmhHD/7ZNBaRfwZbx4+VRS54tR3JyXNphMEfB
- z54KvBcDDtEa/MBE7dN53mI5dqkOoFGWp8lMih5OXZw5ukhwwAtDsoP+pUVO6CJJR91Adfd
- AoIKE/3yKOX87arMjSdbWDaB7IRqVKP3EIwThbxqSiWGa5BJ7MYyIE/Q8n85ZzHuOryD2UO
- jU9pRnU0chK/aawyX36Zg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:yYbU92YJgN0=:zF7fXxd/lCqCcUbPx/Uwbz
- J9nARFuQXexhVj1/CFuxAHbI7oxDLqJS8MbsQ+LLqcMpwlLS3qR7ZLT2SaBtWPYqz6EaC6wLN
- QDE6VN4ZzgU+4xktwPmLgFJaDlz16xMWUa6aZ2qgb+vvq4iPd1OnKqOh4CvXYQ6Y8d5p+Ex+5
- W2nIf31TfHS7nGw5lkM/SOPIQK0OBQadNwIq+legAJy6B+BMF85J8LMiVr+14jLHgfxzEndYb
- Qo8bRhwquW18Nqrb4sA4tHAdepSs8pxhXkS0dGDVeoje6foumgG9l5U4442cCfDlkFdMrzRqI
- AlaWmpGuxueyFjkV7pmNnqzcMhsv0YfJizf8OIX7fVUSjYWpvFwUGWcWUaRezG8zFpDutcEsR
- Zrg1IFKGpAr33QNgxKggTpyOaytjm2oL+3U82uEq5HwJ2xlf+H1JYR01uvdVdIhEgnwQpuCxy
- rORfoynedSd5Aca0CBxmDal33N1bs9HLPLifZoTyqL1BwAAHekZKu0jhHBRILgkwQh5FX5dIJ
- w6GF1TLsGdlB2uXcrgWVPtsRWX+ScrqpqQF+MTtktqvdogq42Xvxq0BvNIiRMRQes08Y3MWyM
- HDHa5oU6tHkqcZk6JsaXmfhJtb4cDYst8FHkKVhmJ+fpFzjnPrwmlr9tqlmXp9NyKM4miUPHU
- s5Y8VYf870Kp7bMB+EdOXqQvMvdF0GU1gmQe9nUxwnWA+lKqDH2VlrtPzutP7g+faeVY=
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH V2 02/13] block: move initialization of q->blkg_list into
+ blkcg_init_queue
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+References: <20220122111054.1126146-1-ming.lei@redhat.com>
+ <20220122111054.1126146-3-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220122111054.1126146-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 24, 2022 at 5:01 PM Keith Busch <kbusch@kernel.org> wrote:
->
-> The NVMe protocol extended data integrity fields with unaligned 48-bit
-> reference tags. Provide some helper accessors in preparation for these.
->
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+On 1/22/22 03:10, Ming Lei wrote:
+> q->blkg_list is only used by blkcg code, so move it into
+> blkcg_init_queue.
 
-For asm-generic:
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+Should Tejun be Cc-ed for this patch?
 
-I assume you are keeping this together with the rest of the series.
+Anyway:
+
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
