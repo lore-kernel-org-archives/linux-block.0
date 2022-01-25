@@ -2,149 +2,330 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7E7C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 21:37:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58122C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 21:53:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233188AbiAYVhN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jan 2022 16:37:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52098 "EHLO
+        id S233416AbiAYVxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jan 2022 16:53:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231860AbiAYVhM (ORCPT
+        with ESMTP id S233383AbiAYVxj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jan 2022 16:37:12 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB55EC06173B;
-        Tue, 25 Jan 2022 13:37:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3694A617B7;
-        Tue, 25 Jan 2022 21:37:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BBAEC340E0;
-        Tue, 25 Jan 2022 21:37:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643146630;
-        bh=h81BZXvPIOlmJJsgYNlhiu/ww3iwFWXAH+fepaPHzx0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XDNv0B/BAm+p6XCB3ULkVvDn2Bo5l/TBuw0gfOc5YwfbJwrX09VDKtJGCJnQwyZTX
-         nJTV5XbRBubiILxIbjPKDbw1rbpogHChKAlfw9E9QJs48jJhkf1aNWe39by8GWAbw9
-         Yj2R7xw7pyitv4KubiGDTPCxrPoNXAleKZNnUzO+PluHFc/LOgQMtSbKk2ZIa+unmm
-         XU1MdZIjtvMe50CBdNc1Cc7050uc+/fRwjAt4gCFI/x0wJLw6qPw+bv7SDOPwPwiPN
-         1nRSJofaypJgjC+VM7eEhcyHlM+Jbb91EBnH4OQXvyKzp5UFIIHOLqcJgHkWGU8Tdw
-         dd/hj1ihIvxzQ==
-Date:   Tue, 25 Jan 2022 13:37:09 -0800
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        xfs <linux-xfs@vger.kernel.org>
-Subject: Re: [PATCH v3 1/5] task_work: export task_work_add()
-Message-ID: <20220125213709.GA2404843@magnolia>
-References: <20220121114006.3633-1-penguin-kernel@I-love.SAKURA.ne.jp>
+        Tue, 25 Jan 2022 16:53:39 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37148C06173B
+        for <linux-block@vger.kernel.org>; Tue, 25 Jan 2022 13:53:39 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id q9-20020a7bce89000000b00349e697f2fbso2579795wmj.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Jan 2022 13:53:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BdpZSIkZiiSZsugPXBVYh45nFBoaMHN+Ogs7ToUw++I=;
+        b=Z6gTaOBDWzF7neGF3L5lou9KqaVrNcyUnFmZDBbUY23OlMdTe0I9P3OuhQkxsDUYY3
+         VZAZ4l4Dg8H/CpVs7oIoMnnen8hRNnZaawY9Lwl1KwymURnhe9Q0dswV+Hulw+tFSoSv
+         s7X1Go/o/hTZoLy0qn/QIwboEKdtN1uO+tgDEAkU3acTcO1EE0AD0JFs01/OUDd1gKxD
+         eS73mL6xga+r+rWKP04gHl4exsgEFFZwmtLdITAhYi7xrbs3eNQrLzME6ZdI5goS8jPx
+         WXOiwGKo5Bt/+WtpPNNQ0sNgZ/6eAv7OiqEOBXJoBFLrhWgK/c5T4U5b1BzgFj0eGP8l
+         eD0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BdpZSIkZiiSZsugPXBVYh45nFBoaMHN+Ogs7ToUw++I=;
+        b=R9mlF+o/CMBfc1VANEpKO4Njch/TTow6zq6HD62RjgNEr/+Sg247kcKEDCnbmFIne7
+         xizQgr0yaVxoKa8Zv9GkMRusr7RqNhAiOkMNTtu44Phhud0mQjxGlec3ARDFwmQjZhGv
+         6W4xlYwKRnUwJpCLZWgdZ+xBbU3rcTv3VCC5dBvDiYZ8EXg19zcR7x2pNnwTr+b0fipU
+         dKIJnkDxOgnSXmEzOdvln4j5yTQ2theB4JtFrJZFIKyBXaRkbfN98lMvlWWy7JAdGPfC
+         qFtMz+c77R2qZu16SWCq7XEZedh4MHNFgcG4xVyu4zXm7w2M2R4KFev4kXRbmzaykl+b
+         NbMQ==
+X-Gm-Message-State: AOAM531kW/Wbeg8mNW6nQl5ju25rxi5VuVqz8W5SjQSHXGqEdwoRgnWi
+        YIRQpKw03mCSbV6ElYUOrs67kHJpms3Opw==
+X-Google-Smtp-Source: ABdhPJwEwrCKDBMpHYSJpUBpqJPq4vLhfI3NXo0IZ8UMgbOd7DW+SzJ6OAaCG3f2u3ctxhh8ofr7mQ==
+X-Received: by 2002:a05:600c:1d8b:: with SMTP id p11mr4671066wms.115.1643147617489;
+        Tue, 25 Jan 2022 13:53:37 -0800 (PST)
+Received: from localhost ([2a01:4b00:f41a:3600:df86:cebc:8870:2184])
+        by smtp.gmail.com with ESMTPSA id j19sm1743140wmq.17.2022.01.25.13.53.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jan 2022 13:53:36 -0800 (PST)
+From:   luca.boccassi@gmail.com
+To:     linux-block@vger.kernel.org
+Cc:     dougmill@linux.vnet.ibm.com, hch@infradead.org,
+        sbauer@plzdonthack.me, Jonathan.Derrick@solidigmtechnology.com
+Subject: [PATCH v3] block: sed-opal: Add ioctl to return device status
+Date:   Tue, 25 Jan 2022 21:52:48 +0000
+Message-Id: <20220125215248.6489-1-luca.boccassi@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220121114006.3633-1-penguin-kernel@I-love.SAKURA.ne.jp>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 21, 2022 at 08:40:02PM +0900, Tetsuo Handa wrote:
-> Commit 322c4293ecc58110 ("loop: make autoclear operation asynchronous")
-> silenced a circular locking dependency warning by moving autoclear
-> operation to WQ context.
-> 
-> Then, it was reported that WQ context is too late to run autoclear
-> operation; some userspace programs (e.g. xfstest) assume that the autoclear
-> operation already completed by the moment close() returns to user mode
-> so that they can immediately call umount() of a partition containing a
-> backing file which the autoclear operation should have closed.
-> 
-> Then, Jan Kara found that fundamental problem is that waiting for I/O
-> completion (from blk_mq_freeze_queue() or flush_workqueue()) with
-> disk->open_mutex held has possibility of deadlock.
-> 
-> Then, I found that since disk->open_mutex => lo->lo_mutex dependency is
-> recorded by lo_open() and lo_release(), and blk_mq_freeze_queue() by e.g.
-> loop_set_status() waits for I/O completion with lo->lo_mutex held, from
-> locking dependency chain perspective we need to avoid holding lo->lo_mutex
->  from lo_open() and lo_release(). And we can avoid holding lo->lo_mutex
->  from lo_open(), for we can instead use a spinlock dedicated for
-> Lo_deleting check.
-> 
-> But we cannot avoid holding lo->lo_mutex from lo_release(), for WQ context
-> was too late to run autoclear operation. We need to make whole lo_release()
-> operation start without disk->open_mutex and complete before returning to
-> user mode. One of approaches that can meet such requirement is to use the
-> task_work context. Thus, export task_work_add() for the loop driver.
-> 
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+From: "dougmill@linux.vnet.ibm.com" <dougmill@linux.vnet.ibm.com>
 
-5.17-rc1 came out and I saw regressions across the board when xfs/049
-and xfs/073 ran.
+Provide a mechanism to retrieve basic status information about
+the device, including the "supported" flag indicating whether
+SED-OPAL is supported. The information returned is from the various
+feature descriptors received during the discovery0 step, and so
+this ioctl does nothing more than perform the discovery0 step
+and then save the information received. See "struct opal_status"
+and OPAL_FL_* bits for the status information currently returned.
 
-xfs/049 formats XFS on a block device, mounts it, creates a sparse file
-inside the XFS fs, formats the sparse file, mounts that (via automatic
-loop device), does some work, and then unmounts both the sparse file
-filesystem and the outer XFS filesystem.
+Signed-off-by: Douglas Miller <dougmill@linux.vnet.ibm.com>
+Tested-by: Luca Boccassi <bluca@debian.org>
+---
+v2: https://patchwork.kernel.org/project/linux-block/patch/612795b5.tj7FMS9wzchsMzrK%25dougmill@linux.vnet.ibm.com/
+v3: resend on request, after rebasing and testing on my machine
 
-The first unmount no longer waited for the loop device to release
-asynchronously so the unmount of the outer fs fails because it's still
-in use.
+ block/opal_proto.h            |  5 ++
+ block/sed-opal.c              | 90 ++++++++++++++++++++++++++++++-----
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h | 12 +++++
+ 4 files changed, 96 insertions(+), 12 deletions(-)
 
-So this series fixes xfs/049, but xfs/073 is still broken.  xfs/073
-creates a sparse file containing an XFS filesystem and then does this in
-rapid succession:
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index b486b3ec7dc4..7152aa1f1a49 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -39,7 +39,12 @@ enum opal_response_token {
+ #define FIRST_TPER_SESSION_NUM	4096
+ 
+ #define TPER_SYNC_SUPPORTED 0x01
++/* FC_LOCKING features */
++#define LOCKING_SUPPORTED_MASK 0x01
++#define LOCKING_ENABLED_MASK 0x02
++#define LOCKED_MASK 0x04
+ #define MBR_ENABLED_MASK 0x10
++#define MBR_DONE_MASK 0x20
+ 
+ #define TINY_ATOM_DATA_MASK 0x3F
+ #define TINY_ATOM_SIGNED 0x40
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index daafadbb88ca..3a9c235be323 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -74,8 +74,7 @@ struct parsed_resp {
+ };
+ 
+ struct opal_dev {
+-	bool supported;
+-	bool mbr_enabled;
++	u32 flags;
+ 
+ 	void *data;
+ 	sec_send_recv *send_recv;
+@@ -280,6 +279,30 @@ static bool check_tper(const void *data)
+ 	return true;
+ }
+ 
++static bool check_lcksuppt(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKING_SUPPORTED_MASK);
++}
++
++static bool check_lckenabled(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKING_ENABLED_MASK);
++}
++
++static bool check_locked(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKED_MASK);
++}
++
+ static bool check_mbrenabled(const void *data)
+ {
+ 	const struct d0_locking_features *lfeat = data;
+@@ -288,6 +311,14 @@ static bool check_mbrenabled(const void *data)
+ 	return !!(sup_feat & MBR_ENABLED_MASK);
+ }
+ 
++static bool check_mbrdone(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & MBR_DONE_MASK);
++}
++
+ static bool check_sum(const void *data)
+ {
+ 	const struct d0_single_user_mode *sum = data;
+@@ -435,7 +466,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 	u32 hlen = be32_to_cpu(hdr->length);
+ 
+ 	print_buffer(dev->resp, hlen);
+-	dev->mbr_enabled = false;
++	dev->flags &= OPAL_FL_SUPPORTED;
+ 
+ 	if (hlen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
+ 		pr_debug("Discovery length overflows buffer (%zu+%u)/%u\n",
+@@ -461,7 +492,16 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 			check_geometry(dev, body);
+ 			break;
+ 		case FC_LOCKING:
+-			dev->mbr_enabled = check_mbrenabled(body->features);
++			if (check_lcksuppt(body->features))
++				dev->flags |= OPAL_FL_LOCKING_SUPPORTED;
++			if (check_lckenabled(body->features))
++				dev->flags |= OPAL_FL_LOCKING_ENABLED;
++			if (check_locked(body->features))
++				dev->flags |= OPAL_FL_LOCKED;
++			if (check_mbrenabled(body->features))
++				dev->flags |= OPAL_FL_MBR_ENABLED;
++			if (check_mbrdone(body->features))
++				dev->flags |= OPAL_FL_MBR_DONE;
+ 			break;
+ 		case FC_ENTERPRISE:
+ 		case FC_DATASTORE:
+@@ -2109,7 +2149,8 @@ static int check_opal_support(struct opal_dev *dev)
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+ 	ret = opal_discovery0_step(dev);
+-	dev->supported = !ret;
++	if (!ret)
++		dev->flags |= OPAL_FL_SUPPORTED;
+ 	mutex_unlock(&dev->dev_lock);
+ 
+ 	return ret;
+@@ -2148,6 +2189,7 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
+ 
+ 	INIT_LIST_HEAD(&dev->unlk_lst);
+ 	mutex_init(&dev->dev_lock);
++	dev->flags = 0;
+ 	dev->data = data;
+ 	dev->send_recv = send_recv;
+ 	if (check_opal_support(dev) != 0) {
+@@ -2528,7 +2570,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ 	if (!dev)
+ 		return false;
+ 
+-	if (!dev->supported)
++	if (!(dev->flags & OPAL_FL_SUPPORTED))
+ 		return false;
+ 
+ 	mutex_lock(&dev->dev_lock);
+@@ -2546,7 +2588,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ 			was_failure = true;
+ 		}
+ 
+-		if (dev->mbr_enabled) {
++		if (dev->flags & OPAL_FL_MBR_ENABLED) {
+ 			ret = __opal_set_mbr_done(dev, &suspend->unlk.session.opal_key);
+ 			if (ret)
+ 				pr_debug("Failed to set MBR Done in S3 resume\n");
+@@ -2620,6 +2662,24 @@ static int opal_generic_read_write_table(struct opal_dev *dev,
+ 	return ret;
+ }
+ 
++static int opal_get_status(struct opal_dev *dev, void __user *data)
++{
++	struct opal_status sts = {0};
++
++	/*
++	 * check_opal_support() error is not fatal,
++	 * !dev->supported is a valid condition
++	 */
++	if (!check_opal_support(dev)) {
++		sts.flags = dev->flags;
++	}
++	if (copy_to_user(data, &sts, sizeof(sts))) {
++		pr_debug("Error copying status to userspace\n");
++		return -EFAULT;
++	}
++	return 0;
++}
++
+ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ {
+ 	void *p;
+@@ -2629,12 +2689,14 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 		return -EACCES;
+ 	if (!dev)
+ 		return -ENOTSUPP;
+-	if (!dev->supported)
++	if (!(dev->flags & OPAL_FL_SUPPORTED))
+ 		return -ENOTSUPP;
+ 
+-	p = memdup_user(arg, _IOC_SIZE(cmd));
+-	if (IS_ERR(p))
+-		return PTR_ERR(p);
++	if (cmd & IOC_IN) {
++		p = memdup_user(arg, _IOC_SIZE(cmd));
++		if (IS_ERR(p))
++			return PTR_ERR(p);
++	}
+ 
+ 	switch (cmd) {
+ 	case IOC_OPAL_SAVE:
+@@ -2685,11 +2747,15 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_GENERIC_TABLE_RW:
+ 		ret = opal_generic_read_write_table(dev, p);
+ 		break;
++	case IOC_OPAL_GET_STATUS:
++		ret = opal_get_status(dev, arg);
++		break;
+ 	default:
+ 		break;
+ 	}
+ 
+-	kfree(p);
++	if (cmd & IOC_IN)
++		kfree(p);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(sed_ioctl);
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index 1ac0d712a9c3..6f837bb6c715 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -43,6 +43,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_MBR_DONE:
+ 	case IOC_OPAL_WRITE_SHADOW_MBR:
+ 	case IOC_OPAL_GENERIC_TABLE_RW:
++	case IOC_OPAL_GET_STATUS:
+ 		return true;
+ 	}
+ 	return false;
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index 6f5af1a84213..c55bc79e3128 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -132,6 +132,17 @@ struct opal_read_write_table {
+ 	__u64 priv;
+ };
+ 
++#define OPAL_FL_SUPPORTED		0x00000001
++#define OPAL_FL_LOCKING_SUPPORTED	0x00000002
++#define OPAL_FL_LOCKING_ENABLED		0x00000004
++#define OPAL_FL_LOCKED			0x00000008
++#define OPAL_FL_MBR_ENABLED		0x00000010
++#define OPAL_FL_MBR_DONE		0x00000020
++
++struct opal_status {
++	__u32 flags;
++};
++
+ #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
+ #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
+ #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
+@@ -148,5 +159,6 @@ struct opal_read_write_table {
+ #define IOC_OPAL_MBR_DONE           _IOW('p', 233, struct opal_mbr_done)
+ #define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 234, struct opal_shadow_mbr)
+ #define IOC_OPAL_GENERIC_TABLE_RW   _IOW('p', 235, struct opal_read_write_table)
++#define IOC_OPAL_GET_STATUS         _IOR('p', 236, struct opal_status)
+ 
+ #endif /* _UAPI_SED_OPAL_H */
+-- 
+2.34.1
 
-mount -o loop <mount options that guarantee mount failure>
-mount -o loop <mount options that should work>
-
-Whereas with 5.16 this worked fine,
-
- [U] try mount 1
- loop0: detected capacity change from 0 to 83968
- XFS (loop0): Filesystem has duplicate UUID 924e8033-a130-4f9c-a11f-52f892c268e9 - can't mount
- [U] try mount 2
- loop0: detected capacity change from 0 to 83968
- XFS (loop0): Mounting V5 Filesystem
- XFS (loop0): resetting quota flags
- XFS (loop0): Ending clean mount
-
-in 5.17-rc1 it fails like this:
-
- [U] try mount 1
- loop0: detected capacity change from 0 to 83968
- XFS (loop0): Filesystem has duplicate UUID 0b0afdac-5c9c-4d94-9b8d-fe85a2eb1143 - can't mount
- [U] try mount 2
- I/O error, dev loop0, sector 0 op 0x0:(READ) flags 0x1000 phys_seg 1 prio class 0
- XFS (loop0): SB validate failed with error -5.
- [U] fail mount 2
-
-I guess this means that mount can grab the loop device after the backing
-file has been released but before a new one has been plumbed in?  Or,
-seeing the lack of "detected capacity change" for mount 2, maybe the
-backing file never gets added?
-
---D
-
-> ---
->  kernel/task_work.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/kernel/task_work.c b/kernel/task_work.c
-> index 1698fbe6f0e1..2a1644189182 100644
-> --- a/kernel/task_work.c
-> +++ b/kernel/task_work.c
-> @@ -60,6 +60,7 @@ int task_work_add(struct task_struct *task, struct callback_head *work,
->  
->  	return 0;
->  }
-> +EXPORT_SYMBOL_GPL(task_work_add);
->  
->  /**
->   * task_work_cancel_match - cancel a pending work added by task_work_add()
-> -- 
-> 2.32.0
-> 
