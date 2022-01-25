@@ -2,92 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F11C4321E
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 09:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BA1C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 09:12:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1453784AbiAYJLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jan 2022 04:11:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38970 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1452592AbiAYIzi (ORCPT
+        id S1452592AbiAYJL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jan 2022 04:11:56 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:35864 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1449145AbiAYJJD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jan 2022 03:55:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643100934;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qbUXbdIpxR2xFT2q0NmyKpU21hdp1+TV9GE31xW0gGk=;
-        b=RBu875JpBhGTzd7T+5MW9QkYmrcRhEPb/gEQGpuxRovPqUbY74aVrhUNaD9TC+qVgS6hXv
-        LF4mhaV9tAgdYesM2VCl3PwDS4Z3btk0xafgKcIbjtZy8pIbdQ8pL4Y9WBAGpYLdT4J8d9
-        Af37lF7OIXk7WFHOaoJvnuBcf88zc3c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-597-sZYhBf1lO---MmiEipssQg-1; Tue, 25 Jan 2022 03:55:31 -0500
-X-MC-Unique: sZYhBf1lO---MmiEipssQg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEB19190A7A4;
-        Tue, 25 Jan 2022 08:55:29 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 098C01F30C;
-        Tue, 25 Jan 2022 08:54:48 +0000 (UTC)
-Date:   Tue, 25 Jan 2022 16:54:43 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH V2 09/13] scsi: force unfreezing queue into atomic mode
-Message-ID: <Ye+605vZEyx3ofi2@T590>
-References: <20220122111054.1126146-1-ming.lei@redhat.com>
- <20220122111054.1126146-10-ming.lei@redhat.com>
- <20220124131516.GH27269@lst.de>
- <Ye80kxTBojm6GN8k@T590>
- <20220125072739.GA27777@lst.de>
+        Tue, 25 Jan 2022 04:09:03 -0500
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JjgxM0YnMzccdv;
+        Tue, 25 Jan 2022 17:08:07 +0800 (CST)
+Received: from localhost.localdomain (10.175.127.227) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Tue, 25 Jan 2022 17:08:55 +0800
+From:   Zhang Wensheng <zhangwensheng5@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] block: update io_ticks when io hang
+Date:   Tue, 25 Jan 2022 17:19:38 +0800
+Message-ID: <20220125091938.1799001-1-zhangwensheng5@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220125072739.GA27777@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggeme756-chm.china.huawei.com (10.3.19.102)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 25, 2022 at 08:27:39AM +0100, Christoph Hellwig wrote:
-> On Tue, Jan 25, 2022 at 07:21:55AM +0800, Ming Lei wrote:
-> > > > @@ -3670,7 +3670,7 @@ static void scsi_disk_release(struct device *dev)
-> > > >  	 * in case multiple processes open a /dev/sd... node concurrently.
-> > > >  	 */
-> > > >  	blk_mq_freeze_queue(q);
-> > > > -	blk_mq_unfreeze_queue(q);
-> > > > +	__blk_mq_unfreeze_queue(q, true);
-> > > 
-> > > I think the right thing here is to drop the freeze/unfreeze pair.
-> > > Now that del_gendisk properly freezes the queue, we don't need this
-> > > protection as the issue that Bart fixed with it can't happen any more.
-> > 
-> > As you see, the last patch removes freeze/unfreeze pair in del_gendisk(),
-> > which looks not very useful: it can't drain IO on bio based driver, and
-> > del_gendisk() is supposed to provide consistent behavior for both request
-> > and bio based driver.
-> 
-> So what is the advantage of trying to remove the freeze from where
-> it belongs (common unregister code) while keeping it where it is a bandaid
-> (driver specific unregister code)?
+When the inflight IOs are slow and no new IOs are issued, we expect
+iostat could manifest the IO hang problem. However after
+commit 5b18b5a73760 ("block: delete part_round_stats and switch to less
+precise counting"), io_tick and time_in_queue will not be updated until
+the end of IO, and the avgqu-sz and %util columns of iostat will be zero.
 
-freeze in common unregister code is actually not good, because it provide
-nothing for bio based driver, so we can't move blk-cgroup shutdown into
-del_gendisk. Also we can't move elevator shutdown to del_gendisk for
-similar reason.
+Because it has using stat.nsecs accumulation to express time_in_queue
+which is not suitable to change, and may %util will express the status
+better when io hang occur. To fix io_ticks, we use update_io_ticks and
+inflight to update io_ticks when diskstats_show and part_stat_show
+been called.
 
-Secondly freeze is pretty slow in percpu mode, so why slow down removing every
-disk just for scsi's bandaid?
+Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
+Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+---
+ block/genhd.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-
-Thanks,
-Ming
+diff --git a/block/genhd.c b/block/genhd.c
+index 626c8406f21a..df0656ffb4ad 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -913,12 +913,14 @@ ssize_t part_stat_show(struct device *dev,
+ 	struct disk_stats stat;
+ 	unsigned int inflight;
+ 
+-	part_stat_read_all(bdev, &stat);
+ 	if (queue_is_mq(q))
+ 		inflight = blk_mq_in_flight(q, bdev);
+ 	else
+ 		inflight = part_in_flight(bdev);
+ 
++	if (inflight)
++		update_io_ticks(bdev, jiffies, true);
++	part_stat_read_all(bdev, &stat);
+ 	return sprintf(buf,
+ 		"%8lu %8lu %8llu %8u "
+ 		"%8lu %8lu %8llu %8u "
+@@ -1174,12 +1176,14 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 	xa_for_each(&gp->part_tbl, idx, hd) {
+ 		if (bdev_is_partition(hd) && !bdev_nr_sectors(hd))
+ 			continue;
+-		part_stat_read_all(hd, &stat);
+ 		if (queue_is_mq(gp->queue))
+ 			inflight = blk_mq_in_flight(gp->queue, hd);
+ 		else
+ 			inflight = part_in_flight(hd);
+ 
++		if (inflight)
++			update_io_ticks(hd, jiffies, true);
++		part_stat_read_all(hd, &stat);
+ 		seq_printf(seqf, "%4d %7d %pg "
+ 			   "%lu %lu %lu %u "
+ 			   "%lu %lu %lu %u "
+-- 
+2.31.1
 
