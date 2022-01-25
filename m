@@ -2,183 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33669C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 08:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 377F5C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 08:50:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1450276AbiAYIiK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jan 2022 03:38:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60599 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1451169AbiAYIfh (ORCPT
+        id S1452754AbiAYIuj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jan 2022 03:50:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1451896AbiAYIsO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jan 2022 03:35:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643099736;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jmdE/FyqqZW/h993WVIcmcL0hdVF9fjW8merVZKPk2A=;
-        b=ftBjBuvUvTjm5FBcg3RBjBcdTfpXw4+6SGm/8V9KUadIweVNUJI0Cw0NRyB/lIeXN3N5wF
-        yMuB0tSWgJylM7hRE+IUpqG078F1cORFeFMh17DFuWoET8mXrwx7NMx87uBWPB+akt4MqG
-        jAIDcR+SQNJGTXEY3QgEa2uLzjK55ek=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-582-OMpK3gLvO4-6Wz2gTuw3GA-1; Tue, 25 Jan 2022 03:35:32 -0500
-X-MC-Unique: OMpK3gLvO4-6Wz2gTuw3GA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE4E539392;
-        Tue, 25 Jan 2022 08:35:31 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 122D462D6C;
-        Tue, 25 Jan 2022 08:35:13 +0000 (UTC)
-Date:   Tue, 25 Jan 2022 16:35:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH V2 05/13] block: only account passthrough IO from
- userspace
-Message-ID: <Ye+2PHFyY/xNmMzB@T590>
-References: <20220122111054.1126146-1-ming.lei@redhat.com>
- <20220122111054.1126146-6-ming.lei@redhat.com>
- <20220124130555.GD27269@lst.de>
- <Ye8xleeYZfmwA3D7@T590>
- <20220125061634.GA26495@lst.de>
- <20220125071906.GA27674@lst.de>
+        Tue, 25 Jan 2022 03:48:14 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E73C06E013;
+        Mon, 24 Jan 2022 23:25:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=75fjvxkpcCo4jL8p3FdjfOk5GEVHgIS93fZ4qZc8bNA=; b=b/iOn8Hoyg1wUS7Qh2nzBKg7np
+        6I3neoUO8FFrYnLwuI7F5FFB6D/zq/RE9H+RYoI5cJXZ9EoEJSEF5ZeNr2ZGqb46CIrAiOtQQ+sfZ
+        zhUdDlgEsHqyrNffazit08rwIRlViWqKuGaZZ2iwEtkCpVWyed/VByG0wf8bVjwrk4RA51O3XmsY3
+        dNdUp5UEgwEK2uirQ49eGBy71/067s9j1j5cn1SguthPSwQcSibgj3JLW3zEmVuTdguSjZ2/jK6Zx
+        CyU8VxYpajC6sQIEu7evljbtW6LL5Y0FDh6lNbKAWu7fxeKXlHHkFi90ANg13efiK5ZjqQeh5xmDl
+        /CfAUpeQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nCGCq-006iFh-V8; Tue, 25 Jan 2022 07:25:32 +0000
+Date:   Mon, 24 Jan 2022 23:25:32 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-mmc@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v4 1/3] block: simplify calling convention of
+ elv_unregister_queue()
+Message-ID: <Ye+l7K4peViBTOkX@infradead.org>
+References: <20220124215938.2769-1-ebiggers@kernel.org>
+ <20220124215938.2769-2-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220125071906.GA27674@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20220124215938.2769-2-ebiggers@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 25, 2022 at 08:19:06AM +0100, Christoph Hellwig wrote:
-> On Tue, Jan 25, 2022 at 07:16:34AM +0100, Christoph Hellwig wrote:
-> > So why not key off accouning off "rq->bio && rq->bio->bi_bdev"
-> > and remove the need for the flag and the second half of the assignment
-> > above?  That is much less error probe and removes code size.
+On Mon, Jan 24, 2022 at 01:59:36PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Something like this, lightly tested:
+> Make elv_unregister_queue() a no-op if q->elevator is NULL or is not
+> registered.
 > 
-> ---
-> From 5499d013341b492899d1fecde7680ff8ebd232e9 Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Tue, 25 Jan 2022 07:29:06 +0100
-> Subject: block: remove the part field from struct request
+> This simplifies the existing callers, as well as the future caller in
+> the error path of blk_register_queue().
 > 
-> All file system I/O and most userspace passthrough bios have bi_bdev set.
-> Switch I/O accounting to directly use the bio and stop copying it into a
-> separate struct request field.
+> Also don't bother checking whether q is NULL, since it never is.
 > 
-> This changes behavior in that e.g. /dev/sgX requests are not accounted
-> to the gendisk for the SCSI disk any more, which is the correct thing to
-> do as they never went through that gendisk, and fixes a potential race
-> when the disk driver is unbound while /dev/sgX I/O is in progress.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-merge.c      | 12 ++++++------
->  block/blk-mq.c         | 32 +++++++++++++-------------------
->  block/blk.h            |  6 +++---
->  include/linux/blk-mq.h |  1 -
->  4 files changed, 22 insertions(+), 29 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 4de34a332c9fd..43e46ea2f0152 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -739,11 +739,11 @@ void blk_rq_set_mixed_merge(struct request *rq)
->  
->  static void blk_account_io_merge_request(struct request *req)
->  {
-> -	if (blk_do_io_stat(req)) {
-> -		part_stat_lock();
-> -		part_stat_inc(req->part, merges[op_stat_group(req_op(req))]);
-> -		part_stat_unlock();
-> -	}
-> +	if (!blk_do_io_stat(req))
-> +		return;
-> +	part_stat_lock();
-> +	part_stat_inc(req->bio->bi_bdev, merges[op_stat_group(req_op(req))]);
-> +	part_stat_unlock();
->  }
->  
->  static enum elv_merge blk_try_req_merge(struct request *req,
-> @@ -947,7 +947,7 @@ static void blk_account_io_merge_bio(struct request *req)
->  		return;
->  
->  	part_stat_lock();
-> -	part_stat_inc(req->part, merges[op_stat_group(req_op(req))]);
-> +	part_stat_inc(req->bio->bi_bdev, merges[op_stat_group(req_op(req))]);
->  	part_stat_unlock();
->  }
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index f3bf3358a3bb2..01b3862347965 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -132,10 +132,12 @@ static bool blk_mq_check_inflight(struct request *rq, void *priv,
->  {
->  	struct mq_inflight *mi = priv;
->  
-> -	if ((!mi->part->bd_partno || rq->part == mi->part) &&
-> -	    blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
-> -		mi->inflight[rq_data_dir(rq)]++;
-> +	if (blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
-> +		return true;
-> +	if (mi->part->bd_partno && rq->bio && rq->bio->bi_bdev != mi->part)
-> +		return true;
->  
-> +	mi->inflight[rq_data_dir(rq)]++;
->  	return true;
->  }
->  
-> @@ -331,7 +333,6 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
->  	rq->tag = BLK_MQ_NO_TAG;
->  	rq->internal_tag = BLK_MQ_NO_TAG;
->  	rq->start_time_ns = ktime_get_ns();
-> -	rq->part = NULL;
->  	blk_crypto_rq_set_defaults(rq);
->  }
->  EXPORT_SYMBOL(blk_rq_init);
-> @@ -368,7 +369,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->  		rq->start_time_ns = ktime_get_ns();
->  	else
->  		rq->start_time_ns = 0;
-> -	rq->part = NULL;
->  #ifdef CONFIG_BLK_RQ_ALLOC_TIME
->  	rq->alloc_time_ns = alloc_time_ns;
->  #endif
-> @@ -687,11 +687,11 @@ static void req_bio_endio(struct request *rq, struct bio *bio,
->  
->  static void blk_account_io_completion(struct request *req, unsigned int bytes)
->  {
-> -	if (req->part && blk_do_io_stat(req)) {
-> +	if (blk_do_io_stat(req)) {
->  		const int sgrp = op_stat_group(req_op(req));
->  
->  		part_stat_lock();
-> -		part_stat_add(req->part, sectors[sgrp], bytes >> 9);
-> +		part_stat_add(req->bio->bi_bdev, sectors[sgrp], bytes >> 9);
->  		part_stat_unlock();
->  	}
->  }
-> @@ -859,11 +859,12 @@ EXPORT_SYMBOL_GPL(blk_update_request);
->  static void __blk_account_io_done(struct request *req, u64 now)
->  {
->  	const int sgrp = op_stat_group(req_op(req));
-> +	struct block_device *bdev = req->bio->bi_bdev;
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Then you need to move account_io_done before calling blk_update_request().
+Looks good,
 
-
-thanks,
-Ming
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
