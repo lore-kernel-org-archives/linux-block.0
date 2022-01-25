@@ -2,115 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 044E7C35274
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 03:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC08C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 04:56:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233672AbiAYDX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Jan 2022 22:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35868 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2374421AbiAYARC (ORCPT
+        id S1390908AbiAYE4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Jan 2022 23:56:13 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:31185 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S249456AbiAYEIz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jan 2022 19:17:02 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A198AC02B8D4;
-        Mon, 24 Jan 2022 14:03:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 67163B80CCF;
-        Mon, 24 Jan 2022 22:03:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D571FC340E4;
-        Mon, 24 Jan 2022 22:03:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643061829;
-        bh=xrwemF3DoaZJ3THX4M5sDEyymgR1OJsmnN+8J59590A=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ISJiKyxxFowPXIBWWiPDolNLtJNFOguGCeoc7oUL5TCgnV4fJO+brTfSXz7JFTeDX
-         HtCvbWJ6PHsp6/6UMOJAOnVD9+kxn3mnLceBX6kTuorlJwT23mbldhnua5m53/nhGA
-         tOfk7uG+SIVGyGrO9diUepvGo47ymC6jjeTNm9ZDgnBZNpVYR8I8li2ZX1DbsZKzWb
-         aTYx96+KhUmG0rtTf2EiczL/gKnZNqV4t2FIqsyCZLTfff3a2VDygyKRPL7vBfIylY
-         tlMMSeX8xC4B7VkVN2TPZXzpzoFKfK9lRYcWE53uo/+fUH5jMl0qqTJIMNlF1fI9Ai
-         VQ5ik8h7M8LCA==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-mmc@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v4 1/3] block: simplify calling convention of elv_unregister_queue()
-Date:   Mon, 24 Jan 2022 13:59:36 -0800
-Message-Id: <20220124215938.2769-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220124215938.2769-1-ebiggers@kernel.org>
-References: <20220124215938.2769-1-ebiggers@kernel.org>
+        Mon, 24 Jan 2022 23:08:55 -0500
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JjYDh5yLsz8wX5;
+        Tue, 25 Jan 2022 12:05:56 +0800 (CST)
+Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 25 Jan 2022 12:08:52 +0800
+Received: from [10.174.177.69] (10.174.177.69) by
+ dggpemm500004.china.huawei.com (7.185.36.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 25 Jan 2022 12:08:51 +0800
+Content-Type: multipart/mixed;
+        boundary="------------F0Ms0Bgpgimwe3x0FCyWuKwt"
+Message-ID: <78cafe94-a787-e006-8851-69906f0c2128@huawei.com>
+Date:   Tue, 25 Jan 2022 12:08:51 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: "blk-mq: fix tag_get wait task can't be awakened" causes hangs
+Content-Language: en-US
+To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>, <axboe@kernel.dk>,
+        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+        <linux-block@vger.kernel.org>
+CC:     <john.garry@huawei.com>, <ming.lei@redhat.com>,
+        <martin.petersen@oracle.com>, <hare@suse.de>,
+        <akpm@linux-foundation.org>, <bvanassche@acm.org>,
+        <linux-kernel@vger.kernel.org>
+References: <1643040870.3bwvk3sis4.none.ref@localhost>
+ <1643040870.3bwvk3sis4.none@localhost>
+From:   QiuLaibin <qiulaibin@huawei.com>
+In-Reply-To: <1643040870.3bwvk3sis4.none@localhost>
+X-Originating-IP: [10.174.177.69]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500004.china.huawei.com (7.185.36.219)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+--------------F0Ms0Bgpgimwe3x0FCyWuKwt
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Make elv_unregister_queue() a no-op if q->elevator is NULL or is not
-registered.
+Hi Alex
 
-This simplifies the existing callers, as well as the future caller in
-the error path of blk_register_queue().
+1、Please help to import this structure:
 
-Also don't bother checking whether q is NULL, since it never is.
+blk_mq_tags <= request_queue->blk_mq_hw_ctx->blk_mq_tags
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- block/blk-sysfs.c | 3 +--
- block/elevator.c  | 8 ++++----
- 2 files changed, 5 insertions(+), 6 deletions(-)
+If there is no kernel dump, help to see the value of
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9f32882ceb2f6..a02b42ad9a6e0 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -960,8 +960,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	blk_trace_remove_sysfs(disk_to_dev(disk));
- 
- 	mutex_lock(&q->sysfs_lock);
--	if (q->elevator)
--		elv_unregister_queue(q);
-+	elv_unregister_queue(q);
- 	disk_unregister_independent_access_ranges(disk);
- 	mutex_unlock(&q->sysfs_lock);
- 	mutex_unlock(&q->sysfs_dir_lock);
-diff --git a/block/elevator.c b/block/elevator.c
-index ec98aed39c4f5..b062c5bc10b9a 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -516,9 +516,11 @@ int elv_register_queue(struct request_queue *q, bool uevent)
- 
- void elv_unregister_queue(struct request_queue *q)
- {
-+	struct elevator_queue *e = q->elevator;
-+
- 	lockdep_assert_held(&q->sysfs_lock);
- 
--	if (q) {
-+	if (e && e->registered) {
- 		struct elevator_queue *e = q->elevator;
- 
- 		kobject_uevent(&e->kobj, KOBJ_REMOVE);
-@@ -593,9 +595,7 @@ int elevator_switch_mq(struct request_queue *q,
- 	lockdep_assert_held(&q->sysfs_lock);
- 
- 	if (q->elevator) {
--		if (q->elevator->registered)
--			elv_unregister_queue(q);
--
-+		elv_unregister_queue(q);
- 		ioc_clear_queue(q);
- 		blk_mq_sched_free_rqs(q);
- 		elevator_exit(q);
--- 
-2.34.1
+cat /sys/block/sda/mq/0/nr_tags
+                __ <= Change it to the problem device
 
+And how many block devices in total by lsblk.
+
+2、Please describe in detail how to reproduce the issue,
+
+And what type of USB device?
+
+3、Please help to try the attachment patch and see if it can be reproduced.
+
+Thanks.
+
+On 2022/1/25 0:24, Alex Xu (Hello71) wrote:
+> Hi,
+> 
+> Recently on torvalds master, I/O on USB flash drives started hanging
+> here:
+> 
+> task:systemd-udevd   state:D stack:    0 pid:  374 ppid:   347 flags:0x00004000
+> Call Trace:
+>   <TASK>
+>   ? __schedule+0x319/0x4a0
+>   ? schedule+0x77/0xa0
+>   ? io_schedule+0x43/0x60
+>   ? blk_mq_get_tag+0x175/0x2b0
+>   ? mempool_alloc+0x33/0x170
+>   ? init_wait_entry+0x30/0x30
+>   ? __blk_mq_alloc_requests+0x1b4/0x220
+>   ? blk_mq_submit_bio+0x213/0x490
+>   ? submit_bio_noacct+0x22c/0x270
+>   ? xa_load+0x48/0x80
+>   ? mpage_readahead+0x114/0x130
+>   ? blkdev_fallocate+0x170/0x170
+>   ? read_pages+0x48/0x1d0
+>   ? page_cache_ra_unbounded+0xee/0x1f0
+>   ? force_page_cache_ra+0x68/0xc0
+>   ? filemap_read+0x18c/0x9a0
+>   ? blkdev_read_iter+0x4e/0x120
+>   ? vfs_read+0x265/0x2d0
+>   ? ksys_read+0x50/0xa0
+>   ? do_syscall_64+0x62/0x90
+>   ? do_user_addr_fault+0x271/0x3c0
+>   ? asm_exc_page_fault+0x8/0x30
+>   ? exc_page_fault+0x58/0x80
+>   ? entry_SYSCALL_64_after_hwframe+0x44/0xae
+>   </TASK>
+> 
+> mount(8) hangs with a similar backtrace, making the device effectively
+> unusable. It does not seem to affect NVMe or SATA attached drives. The
+> affected drive does not support UAS. I don't currently have UAS drives
+> to test with. The default I/O scheduler is set to noop.
+> 
+> I found that reverting 180dccb0dba4 ("blk-mq: fix tag_get wait
+> task can't be awakened") appears to resolve the issue.
+> 
+> Let me know what other information is needed.
+> 
+> Cheers,
+> Alex.
+> .
+> 
+
+BR
+Laibin
+
+--------------F0Ms0Bgpgimwe3x0FCyWuKwt
+Content-Type: text/plain; charset="UTF-8"; name="fix_hang.patch"
+Content-Disposition: attachment; filename="fix_hang.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL2xpYi9zYml0bWFwLmMgYi9saWIvc2JpdG1hcC5jCmluZGV4IDYyMjBm
+YTY3ZmI3ZS4uMDlkMjkzYzMwZmQyIDEwMDY0NAotLS0gYS9saWIvc2JpdG1hcC5jCisrKyBi
+L2xpYi9zYml0bWFwLmMKQEAgLTQ4OCw5ICs0ODgsMTMgQEAgdm9pZCBzYml0bWFwX3F1ZXVl
+X3JlY2FsY3VsYXRlX3dha2VfYmF0Y2goc3RydWN0IHNiaXRtYXBfcXVldWUgKnNicSwKIAkJ
+CQkJICAgIHVuc2lnbmVkIGludCB1c2VycykKIHsKIAl1bnNpZ25lZCBpbnQgd2FrZV9iYXRj
+aDsKKwl1bnNpZ25lZCBpbnQgbWluX2JhdGNoOworCXVuc2lnbmVkIGludCBkZXB0aCA9IChz
+YnEtPnNiLmRlcHRoICsgdXNlcnMgLSAxKSAvIHVzZXJzOwogCi0Jd2FrZV9iYXRjaCA9IGNs
+YW1wX3ZhbCgoc2JxLT5zYi5kZXB0aCArIHVzZXJzIC0gMSkgLwotCQkJdXNlcnMsIDQsIFNC
+UV9XQUtFX0JBVENIKTsKKwltaW5fYmF0Y2ggPSBzYnEtPnNiLmRlcHRoID49ICg0ICogU0JR
+X1dBSVRfUVVFVUVTKSA/IDQgOiAxOworCisJd2FrZV9iYXRjaCA9IGNsYW1wX3ZhbChkZXB0
+aCAvIFNCUV9XQUlUX1FVRVVFUywKKwkJCW1pbl9iYXRjaCwgU0JRX1dBS0VfQkFUQ0gpOwog
+CV9fc2JpdG1hcF9xdWV1ZV91cGRhdGVfd2FrZV9iYXRjaChzYnEsIHdha2VfYmF0Y2gpOwog
+fQogRVhQT1JUX1NZTUJPTF9HUEwoc2JpdG1hcF9xdWV1ZV9yZWNhbGN1bGF0ZV93YWtlX2Jh
+dGNoKTsK
+--------------F0Ms0Bgpgimwe3x0FCyWuKwt--
