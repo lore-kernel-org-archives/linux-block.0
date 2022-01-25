@@ -2,95 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BA1C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 09:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE30C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 09:20:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1452592AbiAYJL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jan 2022 04:11:56 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:35864 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1449145AbiAYJJD (ORCPT
+        id S1456220AbiAYJT6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jan 2022 04:19:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22200 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1456222AbiAYJKD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jan 2022 04:09:03 -0500
-Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JjgxM0YnMzccdv;
-        Tue, 25 Jan 2022 17:08:07 +0800 (CST)
-Received: from localhost.localdomain (10.175.127.227) by
- dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.21; Tue, 25 Jan 2022 17:08:55 +0800
-From:   Zhang Wensheng <zhangwensheng5@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next] block: update io_ticks when io hang
-Date:   Tue, 25 Jan 2022 17:19:38 +0800
-Message-ID: <20220125091938.1799001-1-zhangwensheng5@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 25 Jan 2022 04:10:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643101800;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xIYDHT/wi2RbZuBVptrIISb//TVLfsExKGTY/EiU5iA=;
+        b=f3ujSgXHvQXKMS0tjr+UorXcm+VIAnMCRustvfrmat3jbrkI0aC8h9lTXR3YQvwOyZkmv2
+        owOcBb5addlUv4WSZQhrl6wcyL/Ji0vU30CccBj1pjaneSRWU7V20bCxTv4WkeodzKDHNE
+        /sY39Zo5t9iWOdflwO76vDkXlFGRSZo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-382-_N3xcEKzNiyevSWK1dOi3g-1; Tue, 25 Jan 2022 04:09:57 -0500
+X-MC-Unique: _N3xcEKzNiyevSWK1dOi3g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 494E52F25;
+        Tue, 25 Jan 2022 09:09:56 +0000 (UTC)
+Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 01EEE1F2E7;
+        Tue, 25 Jan 2022 09:09:47 +0000 (UTC)
+Date:   Tue, 25 Jan 2022 17:09:42 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH V2 05/13] block: only account passthrough IO from
+ userspace
+Message-ID: <Ye++VmBkg0I8Lq8+@T590>
+References: <20220122111054.1126146-1-ming.lei@redhat.com>
+ <20220122111054.1126146-6-ming.lei@redhat.com>
+ <20220124130555.GD27269@lst.de>
+ <Ye8xleeYZfmwA3D7@T590>
+ <20220125061634.GA26495@lst.de>
+ <20220125071906.GA27674@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggeme756-chm.china.huawei.com (10.3.19.102)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220125071906.GA27674@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the inflight IOs are slow and no new IOs are issued, we expect
-iostat could manifest the IO hang problem. However after
-commit 5b18b5a73760 ("block: delete part_round_stats and switch to less
-precise counting"), io_tick and time_in_queue will not be updated until
-the end of IO, and the avgqu-sz and %util columns of iostat will be zero.
+On Tue, Jan 25, 2022 at 08:19:06AM +0100, Christoph Hellwig wrote:
+> On Tue, Jan 25, 2022 at 07:16:34AM +0100, Christoph Hellwig wrote:
+> > So why not key off accouning off "rq->bio && rq->bio->bi_bdev"
+> > and remove the need for the flag and the second half of the assignment
+> > above?  That is much less error probe and removes code size.
+> 
+> Something like this, lightly tested:
+> 
 
-Because it has using stat.nsecs accumulation to express time_in_queue
-which is not suitable to change, and may %util will express the status
-better when io hang occur. To fix io_ticks, we use update_io_ticks and
-inflight to update io_ticks when diskstats_show and part_stat_show
-been called.
+Follows another simple way by accounting all request with bio attached,
+except for requests with kernel buffer.
 
-Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to less precise counting")
-Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
----
- block/genhd.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 626c8406f21a..df0656ffb4ad 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -913,12 +913,14 @@ ssize_t part_stat_show(struct device *dev,
- 	struct disk_stats stat;
- 	unsigned int inflight;
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 4526adde0156..1210b51c62ae 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -630,6 +630,8 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
+ 	struct bio *bio;
+ 	int ret;
  
--	part_stat_read_all(bdev, &stat);
- 	if (queue_is_mq(q))
- 		inflight = blk_mq_in_flight(q, bdev);
- 	else
- 		inflight = part_in_flight(bdev);
++	rq->rq_flags &= ~RQF_IO_STAT;
++
+ 	if (len > (queue_max_hw_sectors(q) << 9))
+ 		return -EINVAL;
+ 	if (!len || !kbuf)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 72ae9955cf27..eac589d2c340 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -903,7 +903,7 @@ static void __blk_account_io_start(struct request *rq)
+ 	/* passthrough requests can hold bios that do not have ->bi_bdev set */
+ 	if (rq->bio && rq->bio->bi_bdev)
+ 		rq->part = rq->bio->bi_bdev;
+-	else if (rq->q->disk)
++	else if (rq->q->disk && rq->bio)
+ 		rq->part = rq->q->disk->part0;
  
-+	if (inflight)
-+		update_io_ticks(bdev, jiffies, true);
-+	part_stat_read_all(bdev, &stat);
- 	return sprintf(buf,
- 		"%8lu %8lu %8llu %8u "
- 		"%8lu %8lu %8llu %8u "
-@@ -1174,12 +1176,14 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 	xa_for_each(&gp->part_tbl, idx, hd) {
- 		if (bdev_is_partition(hd) && !bdev_nr_sectors(hd))
- 			continue;
--		part_stat_read_all(hd, &stat);
- 		if (queue_is_mq(gp->queue))
- 			inflight = blk_mq_in_flight(gp->queue, hd);
- 		else
- 			inflight = part_in_flight(hd);
- 
-+		if (inflight)
-+			update_io_ticks(hd, jiffies, true);
-+		part_stat_read_all(hd, &stat);
- 		seq_printf(seqf, "%4d %7d %pg "
- 			   "%lu %lu %lu %u "
- 			   "%lu %lu %lu %u "
--- 
-2.31.1
+ 	part_stat_lock();
+
+
+Thanks,
+Ming
 
