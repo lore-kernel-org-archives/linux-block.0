@@ -2,74 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 971ACC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 12:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F091C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 14:40:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350127AbiAYMTG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jan 2022 07:19:06 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:35865 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354553AbiAYMQI (ORCPT
+        id S1388564AbiAYOkG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jan 2022 09:40:06 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:32802 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232614AbiAYOhR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jan 2022 07:16:08 -0500
-Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Jjm5G3JmwzccbZ;
-        Tue, 25 Jan 2022 20:15:14 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 25 Jan 2022 20:16:03 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 25 Jan
- 2022 20:16:03 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <snitzer@redhat.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH] dm mpath: fix missing blk_account_io_done() in error path
-Date:   Tue, 25 Jan 2022 20:26:54 +0800
-Message-ID: <20220125122654.2236172-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 25 Jan 2022 09:37:17 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 25D99B8180E;
+        Tue, 25 Jan 2022 14:37:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B83CC340E0;
+        Tue, 25 Jan 2022 14:37:04 +0000 (UTC)
+Date:   Tue, 25 Jan 2022 09:37:02 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Yang Shi <shy828301@gmail.com>
+Cc:     Cong Wang <xiyou.wangcong@gmail.com>, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [Patch v3] block: introduce block_rq_error tracepoint
+Message-ID: <20220125093702.3ffdb721@gandalf.local.home>
+In-Reply-To: <CAHbLzkoUmhPbnt=yMfBSFs2G6r2S5ggD6AkYQvg0zxBAqQK2fA@mail.gmail.com>
+References: <20200203053650.8923-1-xiyou.wangcong@gmail.com>
+        <CAHbLzkoUmhPbnt=yMfBSFs2G6r2S5ggD6AkYQvg0zxBAqQK2fA@mail.gmail.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If blk_mq_request_issue_directly() failed from
-blk_insert_cloned_request(), the request will be accounted start.
-Currently, blk_insert_cloned_request() is only called by dm, and such
-request won't be accounted done by dm.
+On Mon, 24 Jan 2022 12:54:01 -0800
+Yang Shi <shy828301@gmail.com> wrote:
 
-In normal path, io will be accounted start from blk_mq_bio_to_request(),
-when the request is allocated, and such io will be accounted done from
-__blk_mq_end_request_acct() whether it succeeded or failed. Thus add
-blk_account_io_done() to fix the problem.
+> Hi folks,
+> 
+> I think the problems fixed by this patch still exist and we do need
+> this patch to make disk error handling in rasdaemon easier. I saw
+> Steven already gave his reviewed-by, I'm wondering why this patch was
+> not merged to upstream? I didn't see any unsolved comments.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq.c | 2 ++
- 1 file changed, 2 insertions(+)
+Maybe I did that prematurely, as I think I found a mistake in the tracing
+below.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d73bc219a7fa..d73490fe200d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2922,6 +2922,8 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
- 	 */
- 	blk_mq_run_dispatch_ops(rq->q,
- 			ret = blk_mq_request_issue_directly(rq, true));
-+	if (ret)
-+		blk_account_io_done(rq, ktime_get_ns());
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
--- 
-2.31.1
+> 
+> If it looks fine, would Jens (I guess it should go with block tree)
+> please merge this patch upstream? The latest kernel moved
+> blk_update_request() to blk-mq.c, if it is ok to move forward, I could
+> prepare a new version.
+> 
+> Thanks,
+> Yang
+> 
+> On Sun, Feb 2, 2020 at 11:15 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> >
+> > Currently, rasdaemon uses the existing tracepoint block_rq_complete
+> > and filters out non-error cases in order to capture block disk errors.
+> >
+> > But there are a few problems with this approach:
+> >
+> > 1. Even kernel trace filter could do the filtering work, there is
+> >    still some overhead after we enable this tracepoint.
+> >
+> > 2. The filter is merely based on errno, which does not align with kernel
+> >    logic to check the errors for print_req_error().
+> >
+> > 3. block_rq_complete only provides dev major and minor to identify
+> >    the block device, it is not convenient to use in user-space.
+> >
+> > So introduce a new tracepoint block_rq_error just for the error case
+> > and provides the device name for convenience too. With this patch,
+> > rasdaemon could switch to block_rq_error.
+> >
+> > Cc: Jens Axboe <axboe@kernel.dk>
+> > Cc: Steven Rostedt <rostedt@goodmis.org>
+> > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> > ---
+> >  block/blk-core.c             |  4 +++-
+> >  include/trace/events/block.h | 41 ++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 44 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index 089e890ab208..0c7ad70d06be 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -1450,8 +1450,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
+> >  #endif
+> >
+> >         if (unlikely(error && !blk_rq_is_passthrough(req) &&
+> > -                    !(req->rq_flags & RQF_QUIET)))
+> > +                    !(req->rq_flags & RQF_QUIET))) {
+> > +               trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
+> >                 print_req_error(req, error, __func__);
+> > +       }
+> >
+> >         blk_account_io_completion(req, nr_bytes);
+> >
+> > diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> > index 81b43f5bdf23..575054e7cfa0 100644
+> > --- a/include/trace/events/block.h
+> > +++ b/include/trace/events/block.h
+> > @@ -145,6 +145,47 @@ TRACE_EVENT(block_rq_complete,
+> >                   __entry->nr_sector, __entry->error)
+> >  );
+> >
+> > +/**
+> > + * block_rq_error - block IO operation error reported by device driver
+> > + * @rq: block operations request
+> > + * @error: status code
+> > + * @nr_bytes: number of completed bytes
+> > + *
+> > + * The block_rq_error tracepoint event indicates that some portion
+> > + * of operation request has failed as reported by the device driver.
+> > + */
+> > +TRACE_EVENT(block_rq_error,
+> > +
+> > +       TP_PROTO(struct request *rq, int error, unsigned int nr_bytes),
+> > +
+> > +       TP_ARGS(rq, error, nr_bytes),
+> > +
+> > +       TP_STRUCT__entry(
+> > +               __field(  dev_t,        dev                     )
+> > +               __string( name,         rq->rq_disk ? rq->rq_disk->disk_name : "?")
+> > +               __field(  sector_t,     sector                  )
+> > +               __field(  unsigned int, nr_sector               )
+> > +               __field(  int,          error                   )
+> > +               __array(  char,         rwbs,   RWBS_LEN        )
+
+Why is the above not "__string" ?
+
+> > +       ),
+> > +
+> > +       TP_fast_assign(
+> > +               __entry->dev       = rq->rq_disk ? disk_devt(rq->rq_disk) : 0;
+> > +               __assign_str(name,   rq->rq_disk ? rq->rq_disk->disk_name : "?");
+
+__assign_str() will not work on an __array() type. It only works here
+because you added it at the end, but it's just shear luck that it didn't
+crash.
+
+-- Steve
+
+
+> > +               __entry->sector    = blk_rq_pos(rq);
+> > +               __entry->nr_sector = nr_bytes >> 9;
+> > +               __entry->error     = error;
+> > +
+> > +               blk_fill_rwbs(__entry->rwbs, rq->cmd_flags, nr_bytes);
+> > +       ),
+> > +
+> > +       TP_printk("%d,%d %s %s %llu + %u [%d]",
+> > +                 MAJOR(__entry->dev), MINOR(__entry->dev),
+> > +                 __get_str(name), __entry->rwbs,
+> > +                 (unsigned long long)__entry->sector,
+> > +                 __entry->nr_sector, __entry->error)
+> > +);
+> > +
+> >  DECLARE_EVENT_CLASS(block_rq,
+> >
+> >         TP_PROTO(struct request_queue *q, struct request *rq),
+> > --
+> > 2.21.1
+> >  
 
