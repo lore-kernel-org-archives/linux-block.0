@@ -2,63 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99260C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 15:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F52EC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 15:43:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1582264AbiAYPmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Jan 2022 10:42:09 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:59578 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385965AbiAYPkB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Jan 2022 10:40:01 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9892FB81814;
-        Tue, 25 Jan 2022 15:39:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBE3FC340E0;
-        Tue, 25 Jan 2022 15:39:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643125193;
-        bh=uNyjZOcU2IAryn5EV8J/+fRYJaBYG5sJZ9cOcNYSXKM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=C1r3iAOnInePO7W2vzlG/JCu7lpHJTZx4DYsvuA7G/wWHlrehhV+RLui7rytxsvKO
-         5469WoSZY7zhTDHqhHTWbF5x6iJsdWNZxJNwCNfmchq7orWCL0dn53zMGOqmP6YIHs
-         7EsnU1SHCe5Kg1vmj4Sl1BW3cha5XoK4AW8/kFOSJEAcVdundY/CLjUw1g1ues6qqg
-         7yKk1nRlhXRJnxTVLMKfbj2BCfZHB+3sRUhriuY1rmTSJEmspj7qRqaai5lTr3Zkis
-         /OLzRAPmaeqonHrRZ9p+F7HuS35/vfC0K337VHjKa+TIyZ2YqTzounznnT76g5ODss
-         KbX0i1RJ4mhjw==
-Date:   Tue, 25 Jan 2022 07:39:50 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com, colyli@suse.de, arnd@arndb.de
-Subject: Re: [RFC 3/7] lib: add rocksoft model crc64
-Message-ID: <20220125153950.GB1683949@dhcp-10-100-145-180.wdc.com>
-References: <20220124160107.1683901-1-kbusch@kernel.org>
- <20220124160107.1683901-4-kbusch@kernel.org>
- <Ye+GTkrZ5YMe5qGt@sol.localdomain>
+        id S233920AbiAYPnD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Jan 2022 10:43:03 -0500
+Received: from verein.lst.de ([213.95.11.211]:36096 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1582101AbiAYPk2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Jan 2022 10:40:28 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 61B1467373; Tue, 25 Jan 2022 16:40:19 +0100 (CET)
+Date:   Tue, 25 Jan 2022 16:40:19 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Vivek Goyal <vgoyal@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>
+Subject: Re: [PATCH V2] block: loop:use kstatfs.f_bsize of backing file to
+ set discard granularity
+Message-ID: <20220125154019.GA4536@lst.de>
+References: <20220125044005.211943-1-ming.lei@redhat.com> <20220125061057.GA26444@lst.de> <Ye/CiFZSHmHQ3Pfu@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ye+GTkrZ5YMe5qGt@sol.localdomain>
+In-Reply-To: <Ye/CiFZSHmHQ3Pfu@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 24, 2022 at 09:10:38PM -0800, Eric Biggers wrote:
-> On Mon, Jan 24, 2022 at 08:01:03AM -0800, Keith Busch wrote:
-> > Since this model reflects inputs and outputs, a helper table and
-> > function are added to reverse bits of 8 and 64 bit values.
+On Tue, Jan 25, 2022 at 05:27:36PM +0800, Ming Lei wrote:
 > 
-> That's a silly way to do a bit-reflected CRC.  The proper way to do it is to
-> reflect the bytes too, so that the bits and bytes are ordered consistently, so
-> explicitly reflecting the bits isn't needed.  Most CRC-32's are bit-reflected,
-> and they are usually implemented this way.  E.g., see crc32_le() in lib/crc32.c.
+> But it is configure code path, even though vfs_statfs() fails,
+> loop_config_discard() still need to keep discard setting consistent.
 > 
-> Here's a Python script that shows that the Rocksoft CRC-64 can be computed
-> without explicitly reversing the bits.  It passes the tests from your patch 4:
+> Setting granularity as PAGE_SIZE is just for making discard granularity
+> matched with max_discard_sectors. Or you have better/simpler handling?
 
-Thanks for the tip! I'll use that for the next version.
+I'd fail the entire configuration preferably. Or at least not support
+discard at all.
