@@ -2,150 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC08C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 04:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A82C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 25 Jan 2022 04:56:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390908AbiAYE4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S245455AbiAYE4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 24 Jan 2022 23:56:13 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:31185 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S249456AbiAYEIz (ORCPT
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60883 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240932AbiAYEkq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Jan 2022 23:08:55 -0500
-Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JjYDh5yLsz8wX5;
-        Tue, 25 Jan 2022 12:05:56 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 25 Jan 2022 12:08:52 +0800
-Received: from [10.174.177.69] (10.174.177.69) by
- dggpemm500004.china.huawei.com (7.185.36.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 25 Jan 2022 12:08:51 +0800
-Content-Type: multipart/mixed;
-        boundary="------------F0Ms0Bgpgimwe3x0FCyWuKwt"
-Message-ID: <78cafe94-a787-e006-8851-69906f0c2128@huawei.com>
-Date:   Tue, 25 Jan 2022 12:08:51 +0800
+        Mon, 24 Jan 2022 23:40:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643085638;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=//gd3MlJOe9KhwhDkvV5hXClhf54wEmDqKiRtLDICzw=;
+        b=M2dm6WuJCOyoJbWkZcUJuIxtQRGXmskxTeCv4nj6OROJ9Q7CI6I+JlIhJ8y1nBfHh7eH+f
+        beEZDulkpkp8yxaewBHElzEAVO/Id9C/WYRXKrU4uOTvk2XO1HOIiQ38aKuLs2r7paArR2
+        /+KJsHoAGYJJzgGoAg1WpgngxncioCk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-140-FMIA0xT7MdqVCPq07K3rBQ-1; Mon, 24 Jan 2022 23:40:35 -0500
+X-MC-Unique: FMIA0xT7MdqVCPq07K3rBQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 511E9802926;
+        Tue, 25 Jan 2022 04:40:34 +0000 (UTC)
+Received: from localhost (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E713655F4A;
+        Tue, 25 Jan 2022 04:40:09 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Vivek Goyal <vgoyal@redhat.com>, Pei Zhang <pezhang@redhat.com>
+Subject: [PATCH V2] block: loop:use kstatfs.f_bsize of backing file to set discard granularity
+Date:   Tue, 25 Jan 2022 12:40:05 +0800
+Message-Id: <20220125044005.211943-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: "blk-mq: fix tag_get wait task can't be awakened" causes hangs
-Content-Language: en-US
-To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>, <axboe@kernel.dk>,
-        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
-        <linux-block@vger.kernel.org>
-CC:     <john.garry@huawei.com>, <ming.lei@redhat.com>,
-        <martin.petersen@oracle.com>, <hare@suse.de>,
-        <akpm@linux-foundation.org>, <bvanassche@acm.org>,
-        <linux-kernel@vger.kernel.org>
-References: <1643040870.3bwvk3sis4.none.ref@localhost>
- <1643040870.3bwvk3sis4.none@localhost>
-From:   QiuLaibin <qiulaibin@huawei.com>
-In-Reply-To: <1643040870.3bwvk3sis4.none@localhost>
-X-Originating-IP: [10.174.177.69]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---------------F0Ms0Bgpgimwe3x0FCyWuKwt
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+If backing file's filesystem has implemented ->fallocate(), we think the
+loop device can support discard, then pass sb->s_blocksize as
+discard_granularity. However, some underlying FS, such as overlayfs,
+doesn't set sb->s_blocksize, and causes discard_granularity to be set as
+zero, then the warning in __blkdev_issue_discard() is triggered.
 
-Hi Alex
+Christoph suggested to pass kstatfs.f_bsize as discard granularity, and
+this way is fine because kstatfs.f_bsize means 'Optimal transfer block
+size', which still matches with definition of discard granularity.
 
-1、Please help to import this structure:
+So fix the issue by setting discard_granularity as kstatfs.f_bsize if it
+is available, otherwise fackback to PAGE_SIZE.
 
-blk_mq_tags <= request_queue->blk_mq_hw_ctx->blk_mq_tags
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Vivek Goyal <vgoyal@redhat.com>
+Reported-by: Pei Zhang <pezhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- take Christoph's suggestion to use kstatfs.f_bsize
 
-If there is no kernel dump, help to see the value of
+ drivers/block/loop.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-cat /sys/block/sda/mq/0/nr_tags
-                __ <= Change it to the problem device
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b1b05c45c07c..0991f08f79d7 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -79,6 +79,7 @@
+ #include <linux/ioprio.h>
+ #include <linux/blk-cgroup.h>
+ #include <linux/sched/mm.h>
++#include <linux/statfs.h>
+ 
+ #include "loop.h"
+ 
+@@ -774,8 +775,13 @@ static void loop_config_discard(struct loop_device *lo)
+ 		granularity = 0;
+ 
+ 	} else {
++		struct kstatfs sbuf;
++
+ 		max_discard_sectors = UINT_MAX >> 9;
+-		granularity = inode->i_sb->s_blocksize;
++		if (!vfs_statfs(&file->f_path, &sbuf))
++			granularity = sbuf.f_bsize;
++		else
++			granularity = PAGE_SIZE;
+ 	}
+ 
+ 	if (max_discard_sectors) {
+-- 
+2.31.1
 
-And how many block devices in total by lsblk.
-
-2、Please describe in detail how to reproduce the issue,
-
-And what type of USB device?
-
-3、Please help to try the attachment patch and see if it can be reproduced.
-
-Thanks.
-
-On 2022/1/25 0:24, Alex Xu (Hello71) wrote:
-> Hi,
-> 
-> Recently on torvalds master, I/O on USB flash drives started hanging
-> here:
-> 
-> task:systemd-udevd   state:D stack:    0 pid:  374 ppid:   347 flags:0x00004000
-> Call Trace:
->   <TASK>
->   ? __schedule+0x319/0x4a0
->   ? schedule+0x77/0xa0
->   ? io_schedule+0x43/0x60
->   ? blk_mq_get_tag+0x175/0x2b0
->   ? mempool_alloc+0x33/0x170
->   ? init_wait_entry+0x30/0x30
->   ? __blk_mq_alloc_requests+0x1b4/0x220
->   ? blk_mq_submit_bio+0x213/0x490
->   ? submit_bio_noacct+0x22c/0x270
->   ? xa_load+0x48/0x80
->   ? mpage_readahead+0x114/0x130
->   ? blkdev_fallocate+0x170/0x170
->   ? read_pages+0x48/0x1d0
->   ? page_cache_ra_unbounded+0xee/0x1f0
->   ? force_page_cache_ra+0x68/0xc0
->   ? filemap_read+0x18c/0x9a0
->   ? blkdev_read_iter+0x4e/0x120
->   ? vfs_read+0x265/0x2d0
->   ? ksys_read+0x50/0xa0
->   ? do_syscall_64+0x62/0x90
->   ? do_user_addr_fault+0x271/0x3c0
->   ? asm_exc_page_fault+0x8/0x30
->   ? exc_page_fault+0x58/0x80
->   ? entry_SYSCALL_64_after_hwframe+0x44/0xae
->   </TASK>
-> 
-> mount(8) hangs with a similar backtrace, making the device effectively
-> unusable. It does not seem to affect NVMe or SATA attached drives. The
-> affected drive does not support UAS. I don't currently have UAS drives
-> to test with. The default I/O scheduler is set to noop.
-> 
-> I found that reverting 180dccb0dba4 ("blk-mq: fix tag_get wait
-> task can't be awakened") appears to resolve the issue.
-> 
-> Let me know what other information is needed.
-> 
-> Cheers,
-> Alex.
-> .
-> 
-
-BR
-Laibin
-
---------------F0Ms0Bgpgimwe3x0FCyWuKwt
-Content-Type: text/plain; charset="UTF-8"; name="fix_hang.patch"
-Content-Disposition: attachment; filename="fix_hang.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2xpYi9zYml0bWFwLmMgYi9saWIvc2JpdG1hcC5jCmluZGV4IDYyMjBm
-YTY3ZmI3ZS4uMDlkMjkzYzMwZmQyIDEwMDY0NAotLS0gYS9saWIvc2JpdG1hcC5jCisrKyBi
-L2xpYi9zYml0bWFwLmMKQEAgLTQ4OCw5ICs0ODgsMTMgQEAgdm9pZCBzYml0bWFwX3F1ZXVl
-X3JlY2FsY3VsYXRlX3dha2VfYmF0Y2goc3RydWN0IHNiaXRtYXBfcXVldWUgKnNicSwKIAkJ
-CQkJICAgIHVuc2lnbmVkIGludCB1c2VycykKIHsKIAl1bnNpZ25lZCBpbnQgd2FrZV9iYXRj
-aDsKKwl1bnNpZ25lZCBpbnQgbWluX2JhdGNoOworCXVuc2lnbmVkIGludCBkZXB0aCA9IChz
-YnEtPnNiLmRlcHRoICsgdXNlcnMgLSAxKSAvIHVzZXJzOwogCi0Jd2FrZV9iYXRjaCA9IGNs
-YW1wX3ZhbCgoc2JxLT5zYi5kZXB0aCArIHVzZXJzIC0gMSkgLwotCQkJdXNlcnMsIDQsIFNC
-UV9XQUtFX0JBVENIKTsKKwltaW5fYmF0Y2ggPSBzYnEtPnNiLmRlcHRoID49ICg0ICogU0JR
-X1dBSVRfUVVFVUVTKSA/IDQgOiAxOworCisJd2FrZV9iYXRjaCA9IGNsYW1wX3ZhbChkZXB0
-aCAvIFNCUV9XQUlUX1FVRVVFUywKKwkJCW1pbl9iYXRjaCwgU0JRX1dBS0VfQkFUQ0gpOwog
-CV9fc2JpdG1hcF9xdWV1ZV91cGRhdGVfd2FrZV9iYXRjaChzYnEsIHdha2VfYmF0Y2gpOwog
-fQogRVhQT1JUX1NZTUJPTF9HUEwoc2JpdG1hcF9xdWV1ZV9yZWNhbGN1bGF0ZV93YWtlX2Jh
-dGNoKTsK
---------------F0Ms0Bgpgimwe3x0FCyWuKwt--
