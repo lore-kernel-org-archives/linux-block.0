@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6340DC2BA4C
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 13:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DDFCC28CF5
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 13:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240479AbiAZNs7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 08:48:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49064 "EHLO
+        id S240555AbiAZNtf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 08:49:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235498AbiAZNs7 (ORCPT
+        with ESMTP id S235498AbiAZNte (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 08:48:59 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3651C06161C
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:48:58 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id d3so19903924ilr.10
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:48:58 -0800 (PST)
+        Wed, 26 Jan 2022 08:49:34 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C51FC06161C
+        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:49:34 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id h23so27272489iol.11
+        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:49:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=CyqmzxPGCoANQA0kOVDAK6ju2RW+nvX6I43oXbMXgUw=;
-        b=lun5tjg2WIq7PC3FBHi1dBQyxh16BBDdlifzhnh+6rwcdQVtgmhkqlyKc3SPHlMeXn
-         qAaMvzXf+ItRubd2XwpJ0CLV2Rckyph4reP4Jh0BpPGIaheVphnQpXiOZSCmOU3HeyqO
-         bw4bg4EwxtLkf3n5US90A47tptrQE2CEHQFolnNoGJKevehA6feUrRjJSsEH0ez0ceFB
-         ldN0H0ZDSpUFCvKy76gjhAnb3HXtp2yeq4/QLAtpk8oM0ueJFSkt4oo8fmZlBbD4++Op
-         WZSqe3tD7iyRG6LokGyVIxTdZcm1ciFU9pKLMYkaF0sWog0UgGcdk3rpnUmJkSDT8vWF
-         nB6Q==
+        bh=ybwGmxgwKjmKGBzbrpNwzZ2K79xNGpQw+SzUzbPkAfs=;
+        b=U9yQwD5hvrqlntYpFepmK0fNluiGtNkAfJwxa/Ys5sUNsY3X4B95sS/6HyKEOFQQ6+
+         OH56Bz7LywZcxuSYdgohuohgoAMmLmle66pD9VlUm/murzrnPDlr5+SJ7CdtmixjPNvE
+         RTsX9tgGHvaqgbtecSxwbP0cyFUoTknSflTY72QywXtTa8H9M+hKvmWYEGenBvm/53XR
+         nxBGtaA30nKlKAx7IKr1qWPr28rKBcfng6IMCxZj8UV6DSgz10onb/sTtkH/90lXoBkZ
+         BkgsGi/yVvE1Przu2r4UXM1WfhkQOJbyyW3IkQozJsehnkxJDxpfV0mI90+xMhYE3z9/
+         /tdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=CyqmzxPGCoANQA0kOVDAK6ju2RW+nvX6I43oXbMXgUw=;
-        b=o9Re3FI3o5P1SyRDrjAlFPuVr6psfGttOQinFryplbOnMnlN5euHucrBbZHV3ws96e
-         xFs7jbttMbgU4+kmCrDIWVqSfnUPhfDWu6z3utIDdjrIAuPSfCUXgkRcakkWwbxnSQgZ
-         QucbhosXt1CClbwSZWd98ZOptykta0TY44dg4XQ6bxZjXmGFukTftcFkMtz+/RTjaauA
-         CxKbMF5M6WlKwE+0O4kcGnlOAD+axFt6kM0jhV4aa6yKgualWuWyAkmN/qsyxkTzQKBQ
-         /679MGqW2o/D9sJJ2g0g8eT660MJXBQCfanwkdO+c/vHMlHDtshRS4Is65v4c4nHr/lW
-         9YjA==
-X-Gm-Message-State: AOAM530iZOK6XY2jRPRbF8AZzie84vrNzyd0TJjedi8g2T+ZOVhbgd1r
-        15Yxq1+DBye2w8Ev+YHh0ZDtIeu5UDH9Jw==
-X-Google-Smtp-Source: ABdhPJxKpLQrRSGVLtg08ymaTRbs6gKlvK+FtDXdrgFfXgfiKV0UOKpU8QBqVNolIQomCukOatmwYQ==
-X-Received: by 2002:a05:6e02:1c48:: with SMTP id d8mr14066465ilg.297.1643204937905;
-        Wed, 26 Jan 2022 05:48:57 -0800 (PST)
+        bh=ybwGmxgwKjmKGBzbrpNwzZ2K79xNGpQw+SzUzbPkAfs=;
+        b=FVx/3JnwZPi+1iYxqkoUQSoYhTTvLDj8iodU5aPKTzAEmHpZ7sl6UN5cJQUqM5lhci
+         wraBSxhRADykUwN9bsaGatERicNWppDNZqktr+B2yrQelBwRr+yq8kryDmU/9YF5K0aB
+         58c4WdXjn1YkX/mJmvvxZJ1rtlWIzxIIHJsdpATfhUcM3uT3t2dC6BJFJaB8RaZQWYo+
+         A6QArnjhYIQA7VsLNvG0x42ZZsxE+vyM7eXixVXP/ux5UAvc7HRAp6lsSbBpbKIjpyyf
+         OAWC+cQBnh7I3F4WP9hIjW2SH9bFd2zU9mD2tliETFEnf0/srAADops1ZI4Wt/aATd+5
+         d0Cg==
+X-Gm-Message-State: AOAM533aq+vqJ68OT7114Rh9gD3RM+mPNhukQO90b2XXH8p4cO+BJQrJ
+        CkyJrn++ml8+Fkgq2Ghzx+E02h9pmDsHfQ==
+X-Google-Smtp-Source: ABdhPJztbrAQgID/9caJo8uomH/o7bxx2XtrRpx6ifFCoAIUI8gY+dAte+/Oj66nhikjX8YY88k5Fg==
+X-Received: by 2002:a05:6638:345f:: with SMTP id q31mr6537702jav.253.1643204973555;
+        Wed, 26 Jan 2022 05:49:33 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id f22sm10041108iob.34.2022.01.26.05.48.57
+        by smtp.gmail.com with ESMTPSA id n12sm10833857ili.58.2022.01.26.05.49.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 05:48:57 -0800 (PST)
+        Wed, 26 Jan 2022 05:49:33 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20220124093913.742411-2-hch@lst.de>
-References: <20220124093913.742411-1-hch@lst.de> <20220124093913.742411-2-hch@lst.de>
-Subject: Re: [PATCH 1/3] block: move disk_{block,unblock,flush}_events to blk.h
-Message-Id: <164320493537.125747.12080346441619848293.b4-ty@kernel.dk>
-Date:   Wed, 26 Jan 2022 06:48:55 -0700
+Cc:     linux-block@vger.kernel.org, penguin-kernel@I-love.SAKURA.ne.jp
+In-Reply-To: <20220104071647.164918-1-hch@lst.de>
+References: <20220104071647.164918-1-hch@lst.de>
+Subject: Re: [PATCH v2] block: deprecate autoloading based on dev_t
+Message-Id: <164320497084.125866.8866965243014223261.b4-ty@kernel.dk>
+Date:   Wed, 26 Jan 2022 06:49:30 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -63,19 +63,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 24 Jan 2022 10:39:11 +0100, Christoph Hellwig wrote:
-> No need to have these declarations in a public header.
+On Tue, 4 Jan 2022 08:16:47 +0100, Christoph Hellwig wrote:
+> Make the legacy dev_t based autoloading optional and add a deprecation
+> warning.  This kind of autoloading has ceased to be useful about 20 years
+> ago.
 > 
 > 
 
 Applied, thanks!
 
-[1/3] block: move disk_{block,unblock,flush}_events to blk.h
-      commit: cb42c8ab3115f70501cf4657fa09c465f1d13284
-[2/3] block: move blk_drop_partitions to blk.h
-      commit: a3498e7ccf139ba19bacaded7cdc8ed098f5f907
-[3/3] block: remove genhd.h
-      commit: eac3b89477ca8274e27ddefe9a1f9da4d0c5dd4a
+[1/1] block: deprecate autoloading based on dev_t
+      commit: cee57556d6b7521f584f6dd989546ea17d170346
 
 Best regards,
 -- 
