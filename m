@@ -2,102 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6E0C2BA4C
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 13:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6340DC2BA4C
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 13:49:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240435AbiAZNii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 08:38:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46504 "EHLO
+        id S240479AbiAZNs7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 08:48:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240371AbiAZNig (ORCPT
+        with ESMTP id S235498AbiAZNs7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 08:38:36 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E14CCC06161C
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:38:35 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id y84so10957505iof.0
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:38:35 -0800 (PST)
+        Wed, 26 Jan 2022 08:48:59 -0500
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3651C06161C
+        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:48:58 -0800 (PST)
+Received: by mail-il1-x132.google.com with SMTP id d3so19903924ilr.10
+        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:48:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=KbzpRph0Mirr8SYyjxp9jggX64pxfscjypFnc+VjXUI=;
-        b=2h86gEPsZt0ZRZ84D/69gIx+ZrLslbkplVGbsOAbusBnHkfr0lUNoC7Op19I3YhizF
-         S467/e+ilOOHR+jtKiozvpymRc9p6hhXvZpCuinpElvwJLplcrKwvhMGzWqvexKMs/xM
-         3FbMgA7Byz4TsskTLPdfL/sJesykdpOBUoX//Wyu8XTLVIekd2rtbA/q06qofTbnt01D
-         qgR9bocOBcl/HhIFPWGz4OSq+LcgR96HpAYWfgWOylfvfi7lmN9JjrN+LPdOZQFwAjY2
-         X6Bz71oxNHWGIwtDxlyBSjgdRo0/oSjVhBOv2KchvGM1GDwxl9eXK+21vkF6OUw+vaHC
-         4eSA==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=CyqmzxPGCoANQA0kOVDAK6ju2RW+nvX6I43oXbMXgUw=;
+        b=lun5tjg2WIq7PC3FBHi1dBQyxh16BBDdlifzhnh+6rwcdQVtgmhkqlyKc3SPHlMeXn
+         qAaMvzXf+ItRubd2XwpJ0CLV2Rckyph4reP4Jh0BpPGIaheVphnQpXiOZSCmOU3HeyqO
+         bw4bg4EwxtLkf3n5US90A47tptrQE2CEHQFolnNoGJKevehA6feUrRjJSsEH0ez0ceFB
+         ldN0H0ZDSpUFCvKy76gjhAnb3HXtp2yeq4/QLAtpk8oM0ueJFSkt4oo8fmZlBbD4++Op
+         WZSqe3tD7iyRG6LokGyVIxTdZcm1ciFU9pKLMYkaF0sWog0UgGcdk3rpnUmJkSDT8vWF
+         nB6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KbzpRph0Mirr8SYyjxp9jggX64pxfscjypFnc+VjXUI=;
-        b=3cFUDadx9AcdeZTY1Zrr6wULbGhZUzHBUHj1J84dr6yJM8kCy2lq7pH0YZJcSUOdrT
-         QNC3a+MPrwLTeZwFalsuusiQtLkqPfBNle7z+vJJ7+gRdA4OmL6nrGTuYT4LosxAEJn9
-         xtbBHUNK1ZGOaLIflUMH2Te4ntvbtjmro5qkPQTw4uqaKIbxQHwv8OvyYVKQvOKuhoiU
-         F08eunDjM0ucGw3eBNbG31kBH9ZPTMq0Uou8xs5HmDpWJTmg22O27qDpK1ceAFcSVh4E
-         3MrJyvWdehRDjaKEPnkPwiSNZsPJrCTnDFZUk55HXHsPwQkE4d//PbK2kbU+pHGRLgMT
-         rMTg==
-X-Gm-Message-State: AOAM533jjTIMZEwJ+i4ERqDX17zwI4FaZSdiDSG3RNnqMlzieWojpEzf
-        cv2wctKtVo2h48aOps+YUPF4Fg==
-X-Google-Smtp-Source: ABdhPJygyTf213ZJMtCcew39K4MPmynzYhqQ6Sj1LmJZF3M+EudaxH8+lUH1KPDZguuIJpox9Wt7ZA==
-X-Received: by 2002:a05:6602:1688:: with SMTP id s8mr13649548iow.206.1643204315186;
-        Wed, 26 Jan 2022 05:38:35 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=CyqmzxPGCoANQA0kOVDAK6ju2RW+nvX6I43oXbMXgUw=;
+        b=o9Re3FI3o5P1SyRDrjAlFPuVr6psfGttOQinFryplbOnMnlN5euHucrBbZHV3ws96e
+         xFs7jbttMbgU4+kmCrDIWVqSfnUPhfDWu6z3utIDdjrIAuPSfCUXgkRcakkWwbxnSQgZ
+         QucbhosXt1CClbwSZWd98ZOptykta0TY44dg4XQ6bxZjXmGFukTftcFkMtz+/RTjaauA
+         CxKbMF5M6WlKwE+0O4kcGnlOAD+axFt6kM0jhV4aa6yKgualWuWyAkmN/qsyxkTzQKBQ
+         /679MGqW2o/D9sJJ2g0g8eT660MJXBQCfanwkdO+c/vHMlHDtshRS4Is65v4c4nHr/lW
+         9YjA==
+X-Gm-Message-State: AOAM530iZOK6XY2jRPRbF8AZzie84vrNzyd0TJjedi8g2T+ZOVhbgd1r
+        15Yxq1+DBye2w8Ev+YHh0ZDtIeu5UDH9Jw==
+X-Google-Smtp-Source: ABdhPJxKpLQrRSGVLtg08ymaTRbs6gKlvK+FtDXdrgFfXgfiKV0UOKpU8QBqVNolIQomCukOatmwYQ==
+X-Received: by 2002:a05:6e02:1c48:: with SMTP id d8mr14066465ilg.297.1643204937905;
+        Wed, 26 Jan 2022 05:48:57 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id g10sm836114iov.22.2022.01.26.05.38.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jan 2022 05:38:34 -0800 (PST)
-Subject: Re: "blk-mq: fix tag_get wait task can't be awakened" causes hangs
-To:     QiuLaibin <qiulaibin@huawei.com>,
-        "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-block@vger.kernel.org
-Cc:     john.garry@huawei.com, ming.lei@redhat.com,
-        martin.petersen@oracle.com, hare@suse.de,
-        akpm@linux-foundation.org, bvanassche@acm.org,
-        linux-kernel@vger.kernel.org
-References: <1643040870.3bwvk3sis4.none.ref@localhost>
- <1643040870.3bwvk3sis4.none@localhost>
- <78cafe94-a787-e006-8851-69906f0c2128@huawei.com>
+        by smtp.gmail.com with ESMTPSA id f22sm10041108iob.34.2022.01.26.05.48.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jan 2022 05:48:57 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <723815a5-f716-499a-acce-15028a629f3a@kernel.dk>
-Date:   Wed, 26 Jan 2022 06:38:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20220124093913.742411-2-hch@lst.de>
+References: <20220124093913.742411-1-hch@lst.de> <20220124093913.742411-2-hch@lst.de>
+Subject: Re: [PATCH 1/3] block: move disk_{block,unblock,flush}_events to blk.h
+Message-Id: <164320493537.125747.12080346441619848293.b4-ty@kernel.dk>
+Date:   Wed, 26 Jan 2022 06:48:55 -0700
 MIME-Version: 1.0
-In-Reply-To: <78cafe94-a787-e006-8851-69906f0c2128@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/22 9:08 PM, QiuLaibin wrote:
-> Hi Alex
+On Mon, 24 Jan 2022 10:39:11 +0100, Christoph Hellwig wrote:
+> No need to have these declarations in a public header.
 > 
-> 1、Please help to import this structure:
 > 
-> blk_mq_tags <= request_queue->blk_mq_hw_ctx->blk_mq_tags
-> 
-> If there is no kernel dump, help to see the value of
-> 
-> cat /sys/block/sda/mq/0/nr_tags
->                 __ <= Change it to the problem device
-> 
-> And how many block devices in total by lsblk.
-> 
-> 2、Please describe in detail how to reproduce the issue,
-> 
-> And what type of USB device?
-> 
-> 3、Please help to try the attachment patch and see if it can be reproduced.
 
-Any progress on this? I strongly suspect that any QD=1 setup would
-trivially show the issue, based on the reports.
+Applied, thanks!
 
+[1/3] block: move disk_{block,unblock,flush}_events to blk.h
+      commit: cb42c8ab3115f70501cf4657fa09c465f1d13284
+[2/3] block: move blk_drop_partitions to blk.h
+      commit: a3498e7ccf139ba19bacaded7cdc8ed098f5f907
+[3/3] block: remove genhd.h
+      commit: eac3b89477ca8274e27ddefe9a1f9da4d0c5dd4a
+
+Best regards,
 -- 
 Jens Axboe
+
 
