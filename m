@@ -2,49 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DE1C2BA4C
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 08:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684BBC28CF5
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 08:21:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238308AbiAZIUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 03:20:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
+        id S238316AbiAZIVy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 03:21:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238304AbiAZIUH (ORCPT
+        with ESMTP id S230268AbiAZIVx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 03:20:07 -0500
+        Wed, 26 Jan 2022 03:21:53 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC427C06161C;
-        Wed, 26 Jan 2022 00:20:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756C7C06161C;
+        Wed, 26 Jan 2022 00:21:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=RDB5+xtWfozAnAatM5/ug6QmjY
-        wBsLp5pzqWQ04h7g7wpI9Njma8N8Lm5+hfaJAMdnhp5eAqvgciiMF6i3clZ4o3+1XpiB0RH4U8IXL
-        L3T1XLAKl7yzuYr1UiqT8gC816bhLis9NOYm0RXL2ZkomGjCgaqeytmasuDEcF8iHopelxZ3Q/CkI
-        0UKUmbVyhAsUgy4p6CQBOwfm46r8C0hCJx85Osid8dBDs9JBKkBgdc6FbRgQUa+mRXTXv8FaldHOV
-        Li5FXx+c0jxldnujKmt1VFumdjZNOJf4nrarEVN+ADuCyjB7zTahT+bgiLJotdvItvZ/41V9lbRrP
-        LFfWD9zA==;
+        bh=MAdtxuXSV1VHX1OFKJGAFQr/nTMY6TEYJtcKj8HipZ4=; b=0POYNJcO0+eSkFys4Qwl3AROeN
+        dGi1PTZ4XEWAKnRRQfWQXWF75hKV4dSuj1Ou/jx9MX/Gs3hxEMkTfcK4zTxw+0+dN7ujRtneqmEU6
+        x+DHlIboN4OCSJWii/FLQNHLJhUrkAsNw7JwU+yymdVfX86lqFY2qBWlfp1bzdmRFYG7jt1gltdDZ
+        IPNCFBnH8GWWohetE3f2gEbJNNqPm6AX4IpD/Z9oZ/YzOA+t4tAoaX0nrGImEGY8VJXherqNSdcib
+        mtVSrWI3nIIANYiICvxLB9CfFAvjQEzN+3oeVO4ZImQe0gijVnrh+nffM4aGMTTLRXkIXCuRg2A/y
+        8sXk3ykw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nCdXA-00AgiH-7y; Wed, 26 Jan 2022 08:20:04 +0000
-Date:   Wed, 26 Jan 2022 00:20:04 -0800
+        id 1nCdYt-00AhVp-Q9; Wed, 26 Jan 2022 08:21:51 +0000
+Date:   Wed, 26 Jan 2022 00:21:51 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH v2] blk-mq: fix missing blk_account_io_done() in error
- path
-Message-ID: <YfEENNG2VMT+aZWc@infradead.org>
-References: <20220126012132.3111551-1-yukuai3@huawei.com>
+To:     Yang Shi <shy828301@gmail.com>
+Cc:     axboe@kernel.dk, rostedt@goodmis.org, xiyou.wangcong@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [v4 PATCH] block: introduce block_rq_error tracepoint
+Message-ID: <YfEEn06IEPjdGzHc@infradead.org>
+References: <20220125203548.352278-1-shy828301@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220126012132.3111551-1-yukuai3@huawei.com>
+In-Reply-To: <20220125203548.352278-1-shy828301@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On Tue, Jan 25, 2022 at 12:35:48PM -0800, Yang Shi wrote:
+> Currently, rasdaemon uses the existing tracepoint block_rq_complete
+> and filters out non-error cases in order to capture block disk errors.
+> 
+> But there are a few problems with this approach:
+> 
+> 1. Even kernel trace filter could do the filtering work, there is
+>    still some overhead after we enable this tracepoint.
+> 
+> 2. The filter is merely based on errno, which does not align with kernel
+>    logic to check the errors for print_req_error().
+> 
+> 3. block_rq_complete only provides dev major and minor to identify
+>    the block device, it is not convenient to use in user-space.
+> 
+> So introduce a new tracepoint block_rq_error just for the error case
+> and provides the device name for convenience too. With this patch,
+> rasdaemon could switch to block_rq_error.
+> 
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Reviewed-by: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> Signed-off-by: Yang Shi <shy828301@gmail.com>
+> ---
+> The v3 patch was submitted in Feb 2020, and Steven reviewed the patch, but
+> it was not merged to upstream. See
+> https://lore.kernel.org/lkml/20200203053650.8923-1-xiyou.wangcong@gmail.com/.
+> 
+> The problems fixed by that patch still exist and we do need it to make
+> disk error handling in rasdaemon easier. So this resurrected it and
+> continued the version number.
+> 
+> v3 --> v4:
+>  * Rebased to v5.17-rc1.
+>  * Collected reviewed-by tag from Steven.
+> 
+>  block/blk-mq.c               |  4 +++-
+>  include/trace/events/block.h | 41 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f3bf3358a3bb..bb0593f93675 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -789,8 +789,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
+>  #endif
+>  
+>  	if (unlikely(error && !blk_rq_is_passthrough(req) &&
+> -		     !(req->rq_flags & RQF_QUIET)))
+> +		     !(req->rq_flags & RQF_QUIET))) {
+> +		trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Please report the atual block layer status code instead of the errno
+mapping here.
