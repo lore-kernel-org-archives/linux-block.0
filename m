@@ -2,86 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E8CC28CF5
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 09:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD0FC63697
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 10:27:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233122AbiAZJ7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 04:59:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27023 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239488AbiAZJ7i (ORCPT
+        id S239935AbiAZK1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 05:27:48 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:56918 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232579AbiAZK1l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 04:59:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643191178;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zMHF6f0MT3+XJF4o6Gm2OrzeZ0dXQYMGKwzgfSSU6fw=;
-        b=gjNu0ZfV71A4G6C7kBHqWgJilzaDTNmss0rLKp113odbCx8y1yNRLeExxtgQ2vXfPoEgwb
-        aS3jATvRLvrgdmKj4faxji96cbRV+1wYv/xs/kS8+xkeGlDLx0zSoYIj+qujTAphMO+Wfs
-        HEDzZYvjTEEnGUmExMyUbVXL0xULkFc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-263-6Qau-70pOiqE3W5BYG2Naw-1; Wed, 26 Jan 2022 04:59:34 -0500
-X-MC-Unique: 6Qau-70pOiqE3W5BYG2Naw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9978B51082;
-        Wed, 26 Jan 2022 09:59:33 +0000 (UTC)
-Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C96E6128B;
-        Wed, 26 Jan 2022 09:59:13 +0000 (UTC)
-Date:   Wed, 26 Jan 2022 17:59:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH V2 05/13] block: only account passthrough IO from
- userspace
-Message-ID: <YfEbbPr1Q5Ci48cg@T590>
-References: <20220124130555.GD27269@lst.de>
- <Ye8xleeYZfmwA3D7@T590>
- <20220125061634.GA26495@lst.de>
- <20220125071906.GA27674@lst.de>
- <Ye++VmBkg0I8Lq8+@T590>
- <20220126055003.GA21089@lst.de>
- <YfD2YNRf+lhe5BcU@T590>
- <20220126081052.GA23154@lst.de>
- <YfEHcs6psrBqFu3l@T590>
- <20220126084950.GA23957@lst.de>
+        Wed, 26 Jan 2022 05:27:41 -0500
+Received: from fsav413.sakura.ne.jp (fsav413.sakura.ne.jp [133.242.250.112])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20QARLdB038284;
+        Wed, 26 Jan 2022 19:27:21 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav413.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp);
+ Wed, 26 Jan 2022 19:27:21 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav413.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20QARLQm038281
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 26 Jan 2022 19:27:21 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <bdb74587-c688-c326-332a-be0b3f2db844@I-love.SAKURA.ne.jp>
+Date:   Wed, 26 Jan 2022 19:27:17 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220126084950.GA23957@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 1/5] task_work: export task_work_add()
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org
+References: <20220121114006.3633-1-penguin-kernel@I-love.SAKURA.ne.jp>
+ <20220125154730.GA4611@lst.de>
+ <ec15d9ef-a659-e4f0-fc3f-c75acaa0be2a@I-love.SAKURA.ne.jp>
+ <20220126052159.GA20838@lst.de> <YfD1xo/bepV17ggx@T590>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <YfD1xo/bepV17ggx@T590>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 09:49:50AM +0100, Christoph Hellwig wrote:
-> On Wed, Jan 26, 2022 at 04:33:54PM +0800, Ming Lei wrote:
-> > > I guess you are worried about the latter conditionin that we stop
-> > > accounting for no data transfer passthrough commands?
-> > 
-> > No, I meant that bio->bi_bdev isn't setup yet for passthrough request,
-> > and not sure that can be done easily.
+On 2022/01/26 16:18, Ming Lei wrote:
+>>> Isn't that the reason of
+>>>
+>>> 	} else if (lo->lo_state == Lo_bound) {
+>>> 		/*
+>>> 		 * Otherwise keep thread (if running) and config,
+>>> 		 * but flush possible ongoing bios in thread.
+>>> 		 */
+>>> 		blk_mq_freeze_queue(lo->lo_queue);
+>>> 		blk_mq_unfreeze_queue(lo->lo_queue);
+>>> 	}
+>>>
+>>> path in lo_release() being there?
+>>
+>> This looks completely spurious to me.  Adding Ming who added it.
 > 
-> Take a look at e.g. nvme_submit_user_cmd and iblock_get_bio.
+> It was added when converting to blk-mq.
 
-nvme just sets part0 to rq->bio, which is fine since nvme doesn't
-support partial completion.
+Well, commit b5dd2f6047ca1080 ("block: loop: improve performance via blk-mq") in v4.0-rc1.
+That's where "thread" in the block comment above became outdated, and a global WQ_MEM_RECLAIM
+workqueue was used. We need to update both.
 
-The simplest way could be to assign bio->bi_bdev with q->disk->part0 in both
-bio_copy_user_iov() and bio_map_user_iov(), which should cover most of cases.
-Given user io is always on device instead of partition even though the
-command is sent via partition bdev.
+> 
+> I remember it was to replace original loop_flush() which uses
+> wait_for_completion() for draining all inflight bios, but seems
+> the flush isn't needed in lo_release().
 
+Even if we can remove blk_mq_freeze_queue()/blk_mq_unfreeze_queue() from lo_release(), we
+cannot remove blk_mq_freeze_queue()/blk_mq_unfreeze_queue() from e.g. loop_set_status(), right?
 
-Thanks,
-Ming
+Then, lo_release() which is called with disk->open_mutex held can be still blocked at
+mutex_lock(&lo->lo_mutex) waiting for e.g. loop_set_status() to call mutex_unlock(&lo->lo_mutex).
+That is, lo_open() from e.g. /sys/power/resume can still wait for I/O completion with disk->open_mutex held.
+
+How to kill this dependency? Don't we need to make sure that lo_open()/lo_release() are not
+blocked on lo->lo_mutex (like [PATCH v3 3/5] and [PATCH v3 4/5] does) ?
 
