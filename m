@@ -2,88 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9325C2BA4C
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 13:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F20C28CF5
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 13:35:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240027AbiAZNe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 08:34:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45602 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230472AbiAZNe4 (ORCPT
+        id S235094AbiAZNfi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 08:35:38 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:61606 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235061AbiAZNfh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 08:34:56 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25736C06161C
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:34:56 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id i1so13892736ils.5
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 05:34:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=/ycwdxXl7xzlVcgZpMTQusl4xKyijfRRHTUAN+QxTEE=;
-        b=FKQPqYyQV4gUD8tCmpE3qC9ZiTKhLgDxer8fEHHPqZTpYefsVvvGFNefA/FnssIM63
-         EaLiJfNVUOfBHVOrxkmfzQL49q/d/5pN1ZUU+LKQBzI598d2wwNERrpeh1Ex6kPzyiFb
-         JZTWeKXf8b70jcKMwDZy9/YO8nTDW0APYt+yJvhJiwzryilyz/ZZVHAUhzZdnK1sWg4k
-         ywmCT668+bdItqD8CNFdJOjUeMrxDk5wGGgh4+hv+1F7whIXtq4hGqU/JcaP+ZrYoU3c
-         8lsuSBN0dz2w2QuiV3kN+YZgs90jZh2Pb41G51L41stEtx9VN3x/tJGdLtkp0T497OU4
-         xY0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=/ycwdxXl7xzlVcgZpMTQusl4xKyijfRRHTUAN+QxTEE=;
-        b=K3Pby+ml25qAD6pf/K70f83HPVSuvhLlPk14feMiC5tH5M4ZAHuLG2HQ+3DCL/7Oop
-         swBbPir/xW9k35ApsZBmVHc3YbzPxuEGlNyxCOPeKNykJycJxNDsb6vNlfZsVa09SG8W
-         c5GOQP5uBGLj2e4o4L2I8vvANLEwp6JsVSe5TizoZKomn/+JjwULOlyxowSxsT6LO5Tg
-         DyVb8HWch62II/R7iYqLznVjPbK/MaZYUXVjSOkRCXgZfdd62AYtDV0GPSFrCpTib50R
-         5TjOPgGRE9wVtAoG77Zqa2ajtja2ZZ8FzsExrhr1/NYazvuTdDbtk56Zgfsm/sJ4gWAm
-         Wn6A==
-X-Gm-Message-State: AOAM5300jBviPeQALS95gUX8yNSsQ2Do+CXxkrv7j9LvneT4KWc6XfnU
-        3h+Ijc++/2wXhK6961Z/JR5HJNnHL0k0ww==
-X-Google-Smtp-Source: ABdhPJxzuTGcfsYFU99TT4WD+eEaJROO/7MGhikZS0SWzpSAI4623/dh2z8rsy9wTzniruCxAOGyLQ==
-X-Received: by 2002:a92:d2d1:: with SMTP id w17mr14293198ilg.170.1643204095401;
-        Wed, 26 Jan 2022 05:34:55 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id q16sm9375312ion.27.2022.01.26.05.34.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 05:34:54 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        yi.zhang@huawei.com
-In-Reply-To: <20220126012132.3111551-1-yukuai3@huawei.com>
-References: <20220126012132.3111551-1-yukuai3@huawei.com>
-Subject: Re: [PATCH v2] blk-mq: fix missing blk_account_io_done() in error path
-Message-Id: <164320409207.123597.5205274330613779469.b4-ty@kernel.dk>
-Date:   Wed, 26 Jan 2022 06:34:52 -0700
+        Wed, 26 Jan 2022 08:35:37 -0500
+Received: from fsav315.sakura.ne.jp (fsav315.sakura.ne.jp [153.120.85.146])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20QDZBfJ096607;
+        Wed, 26 Jan 2022 22:35:11 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav315.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav315.sakura.ne.jp);
+ Wed, 26 Jan 2022 22:35:11 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav315.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20QDZAOj096599
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 26 Jan 2022 22:35:10 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <65d206c6-3361-5cbc-d25d-07faec3dda96@I-love.SAKURA.ne.jp>
+Date:   Wed, 26 Jan 2022 22:35:09 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3 1/5] task_work: export task_work_add()
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20220121114006.3633-1-penguin-kernel@I-love.SAKURA.ne.jp>
+ <20220125154730.GA4611@lst.de>
+ <ec15d9ef-a659-e4f0-fc3f-c75acaa0be2a@I-love.SAKURA.ne.jp>
+ <20220126052159.GA20838@lst.de> <YfD1xo/bepV17ggx@T590>
+ <bdb74587-c688-c326-332a-be0b3f2db844@I-love.SAKURA.ne.jp>
+ <20220126131148.k5byj6p7fmgsmebw@quack3.lan>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20220126131148.k5byj6p7fmgsmebw@quack3.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 26 Jan 2022 09:21:32 +0800, Yu Kuai wrote:
-> If blk_mq_request_issue_directly() failed from
-> blk_insert_cloned_request(), the request will be accounted start.
-> Currently, blk_insert_cloned_request() is only called by dm, and such
-> request won't be accounted done by dm.
+On 2022/01/26 22:11, Jan Kara wrote:
+> On Wed 26-01-22 19:27:17, Tetsuo Handa wrote:
+>> Even if we can remove blk_mq_freeze_queue()/blk_mq_unfreeze_queue() from
+>> lo_release(), we cannot remove
+>> blk_mq_freeze_queue()/blk_mq_unfreeze_queue() from e.g.
+>> loop_set_status(), right?
 > 
-> In normal path, io will be accounted start from blk_mq_bio_to_request(),
-> when the request is allocated, and such io will be accounted done from
-> __blk_mq_end_request_acct() whether it succeeded or failed. Thus add
-> blk_account_io_done() to fix the problem.
+> Correct AFAICT.
+
+OK.
+
 > 
-> [...]
+>> Then, lo_release() which is called with disk->open_mutex held can be
+>> still blocked at mutex_lock(&lo->lo_mutex) waiting for e.g.
+>> loop_set_status() to call mutex_unlock(&lo->lo_mutex).  That is,
+>> lo_open() from e.g. /sys/power/resume can still wait for I/O completion
+>> with disk->open_mutex held.
+> 
+> I don't think this is a real problem. If someone is calling
+> loop_set_status() it means the loop device is open and thus lo_release()
+> cannot be running in parallel, can it?
 
-Applied, thanks!
+lo_release() is called when a file descriptor is close()d.
+That is, loop_set_status() and lo_release() can run in parallel, can't it?
 
-[1/1] blk-mq: fix missing blk_account_io_done() in error path
-      commit: 592ee1197f78b30bd60c87db9b6c8c045c8d8314
+  Process-A                               Process-B
 
-Best regards,
--- 
-Jens Axboe
+  int fd1 = open("/dev/loop0", O_RDWR);   int fd2 = open("/dev/loop0", O_RDWR);
+  ioctl(fd1, LOOP_SET_STATUS64, ...);     close(fd2);
 
+If lo_release() (which is called with disk->open_mutex held) waits for ioctl()
+(which waits for I/O completion with lo->lo_mutex held), there is
+disk->open_mutex => lo->lo_mutex => I/O completion dependency.
 
+And the possibility of deadlock problem (when mixed with sysfs and fsfreeze)
+happens at lo_open(). If lo_open() (which is called with disk->open_mutex held)
+waits for ioctl() (which waits for I/O completion with lo->lo_mutex held), there
+as well is disk->open_mutex => lo->lo_mutex => I/O completion dependency.
