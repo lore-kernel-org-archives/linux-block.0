@@ -2,88 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C08EC28CF5
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 14:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B6FC28CF5
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 14:38:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241877AbiAZOBL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 09:01:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241869AbiAZOBL (ORCPT
+        id S235594AbiAZOiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 09:38:19 -0500
+Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:46619 "EHLO
+        wout5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235584AbiAZOiS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 09:01:11 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E29A2C06161C
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 06:01:10 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id r144so5411414iod.9
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 06:01:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=Y53qxsCo4solTvnTSnoGZXGVlBGrMeQOvLhWcI4XWD0=;
-        b=jBCF92XeVH6rkyRbsGbY9To9SPPG9HrF8Y5/yA86sJpVJ9U+xqnGFMpcZ5SfKas9a2
-         bgTWXQThucrJ9bqSB7KYs0rOIWSNTH6J38iWdZTtiILu3PHBFNjwbnw/7GSJ98p+0xyW
-         f1bvzY/AF+Am2r01Tt8zU0VPa0KVUTLqbVNMZScWCjDKHKWaMN/4ZWN9mofclgP9XyYh
-         bgv/y+v0LDpCDLxY0re5BGxRkuKLtvt26Uqe9tqWvNLL3qjwehnDltISqnoj9O0OzBMf
-         mmkDw3+KBfEsqyXBua4UrmlufsC198HNrKQV0OWR13qUJixgsAxJmIl4nIaczJ6Yft4V
-         mr8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=Y53qxsCo4solTvnTSnoGZXGVlBGrMeQOvLhWcI4XWD0=;
-        b=ZAs1+AjkgCLFMhW0idziexXZ7XvbiyXkgY9EnbWxhNExa7tEGSg4cMfadQe8AqvQl8
-         e+o+06uZqa7HTl/TJRdWC/OCWnE1bpEByr1ogMK0IDsk4D6SWcjxkPzYMfQDrJWWCHph
-         yLG9z2I03vMuKvJ8qQdNAQV7T9Oxu437dk2y3hGdEXVAV4fsyaM/JEQLJuZrHsi29qp8
-         5fjy4o3dyUJ0ldI95RI59aMhAFfP1mIKENa1MEj64ml0hJYS4rHNgIooDHH+K966AFJt
-         mKpNRU6R2HlRocWjby1L1EV9/isnegpLyuTGWi3w5pXwBsAVYN+bqU47ofxZu8kxEowu
-         O3tg==
-X-Gm-Message-State: AOAM530d+8RVEgcc7ZIbwPvObUBeP7awbloXMm82byEwkRuqjCcR6rxE
-        bUTgM/95ByxBJnA4aNkxZAmknQ==
-X-Google-Smtp-Source: ABdhPJzpPngofjYwlp5BhheLcijW9HHnwzPeB+KKxvodSfIKWxWzF4HqLxMKgvbAmIdsM9c2TPM8pQ==
-X-Received: by 2002:a02:5b44:: with SMTP id g65mr12436624jab.214.1643205670323;
-        Wed, 26 Jan 2022 06:01:10 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id j14sm10457498ilc.62.2022.01.26.06.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 06:01:09 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Md Haris Iqbal <haris.iqbal@ionos.com>, linux-block@vger.kernel.org
-Cc:     hch@infradead.org, jinpu.wang@ionos.com, bvanassche@acm.org,
-        sagi@grimberg.me
-In-Reply-To: <20220114155855.984144-1-haris.iqbal@ionos.com>
-References: <20220114155855.984144-1-haris.iqbal@ionos.com>
-Subject: Re: [PATCH for-next 0/2] Misc RNBD update
-Message-Id: <164320566734.128521.6880129358020047420.b4-ty@kernel.dk>
-Date:   Wed, 26 Jan 2022 07:01:07 -0700
+        Wed, 26 Jan 2022 09:38:18 -0500
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id 6DD8B3200D98;
+        Wed, 26 Jan 2022 09:38:17 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Wed, 26 Jan 2022 09:38:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; bh=vntiIBiB94gPAqm1i6BqXy0anQqXEM
+        zvI40bvzT6DfY=; b=HhTIEmEm3mcJ5PQ5UMHHm4E9F0atCEWgal/p1BJJH6kAtu
+        2ia9h5ustybJAsgX1W5Ot4OqNiD2L1+Aq9bOGSdwp4aKiWrw1cz8i8df2GaSJTyg
+        KSFG+m7HtZobgRS3feHY94Jh5f8cuwM8bmAW+CnS3C2hFRX/2+GBYSx3PK4MNRu3
+        x5dxdXYWLZUOppwqPxk1IdRigiY3s//bHEVy3held5JBKAx2Q0T3gtXC2mInE2oH
+        1Nao5wstvaczk1FtcDjYzowFCzDxz1CTCBdUjiL/y3h880pUQI8BVuWoWWFkxY9Y
+        NRxClbFhxmgn4Z8QNI4GNlag0q1T9CtEKNdFENLA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=vntiIBiB94gPAqm1i
+        6BqXy0anQqXEMzvI40bvzT6DfY=; b=LS1qPngBvH9CDi9zK8epOAKF3M6clk7v+
+        LmzSpxKk4/XD0FpHldJvgezapzkaiyE92glhzf1tRKbRoh0imv1QWop7SYG2QTZ+
+        OC0UeeXKHIfB9ucuaas9kjtTZnzmEcpIliajM3WluHEYXIzhbhx3JNLzXiRPIcwY
+        rnIcGBMdNfyvhYyQry4bSvxxD/MFzWSVmMRBVWb8++FA3a3nom9MEXROmzlui1gq
+        bL45b9O7n5t1Ph1tQvvc/KbHc/Q/sBQWRSRbv+AZLTGEHWefIeDQQ8mqXdm2Sto7
+        7Ao75yz2tG0NURPKCb6YH5XUmoa14nJFbS7PvpOzldrGzf4KUVZZw==
+X-ME-Sender: <xms:2FzxYXYOYicuXKhMUx8Bx7tid_g2Z47DHP1nhRWwq90hOQ_23LCc0w>
+    <xme:2FzxYWZIfM5glrWe75x9oPhtFJHvnrWKfdlftewhnkgFoIB6Pkm1ZBdQJp4gPd2uw
+    3jnZekpnzfYIh11YDA>
+X-ME-Received: <xmr:2FzxYZ_PXr37MynCXqjoMDxQdKkItBuuZfnKZNgtl4yN-qLkfI7b_k3ae3FevNgLl8OivZ6LSqC1nQB7b_s>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrfedugdeiiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+    lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+    hrnheptdetieekjeffvefgjeekueehjedtlefhffefudfgiedvfeelkeetiefgudejheet
+    necuffhomhgrihhnpehnvhhmvgigphhrvghsshdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdr
+    ughk
+X-ME-Proxy: <xmx:2FzxYdqsXl0JkrBluIeU_aZN45VYSNS8j3XjRuksX9uIHqMXsK-pgQ>
+    <xmx:2FzxYSo513Hi-7k9ffCA2wo-Y69l5rfvHNgVdfUYzKl700UjUVhXxw>
+    <xmx:2FzxYTSvnXXuyGfoDHrhUxprLsKcc5RasepS6UkU2RqaC4ePxsomVg>
+    <xmx:2VzxYefdbL43SUJ5_SrRutAYMyf6e-8uHc5Fq-VsOUeyVcopbj9F8Q>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 26 Jan 2022 09:38:15 -0500 (EST)
+Date:   Wed, 26 Jan 2022 15:38:13 +0100
+From:   Klaus Jensen <its@irrelevant.dk>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        martin.petersen@oracle.com, colyli@suse.de, arnd@arndb.de
+Subject: Re: [RFC 0/7] 64-bit data integrity field support
+Message-ID: <YfFc1f2MoSQzyxZ4@apples>
+References: <20220124160107.1683901-1-kbusch@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="vd57dnmutxBObqid"
+Content-Disposition: inline
+In-Reply-To: <20220124160107.1683901-1-kbusch@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 14 Jan 2022 16:58:53 +0100, Md Haris Iqbal wrote:
-> Please consider to include following change for next merge window.
->  - fixes warning generated from checkpatch
->  - removes rotational param from RNBD device
-> 
-> Gioh Kim (2):
->   block/rnbd-clt: fix CHECK:BRACES warning
->   block/rnbd: client device does not care queue/rotational
-> 
-> [...]
 
-Applied, thanks!
+--vd57dnmutxBObqid
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[1/2] block/rnbd-clt: fix CHECK:BRACES warning
-      commit: 7cb0c32efbae2a7000f74243d8b4cab35d669cbd
-[2/2] block/rnbd: client device does not care queue/rotational
-      commit: de53a6a82aad3010d7e9c3151cba5e4e46b6ec32
+On Jan 24 08:01, Keith Busch wrote:
+> The NVM Express protocol added enhancements to the data integrity field
+> formats beyond the T10 defined protection information. A detailed
+> description of the new formats can be found in the NVMe's NVM Command
+> Set Specification, section 5.2, available at:
+>=20
+>   https://nvmexpress.org/wp-content/uploads/NVM-Command-Set-Specification=
+-1.0b-2021.12.18-Ratified.pdf
+>=20
+> This series implements one possible new format: the CRC64 guard with
+> 48-bit reference tags. This does not add support for the variable
+> "storage tag" field.
+>=20
+> The NVMe CRC64 parameters (from Rocksoft) were not implemented in the
+> kernel, so a software implementation is included in this series based on
+> the generated table. This series does not include any possible hardware
+> excelleration (ex: x86's pclmulqdq), so it's not very high performant
+> right now.
+>=20
 
-Best regards,
--- 
-Jens Axboe
+Hi Keith,
 
+Tested this on QEMU and (assuming we didnt implement the same bugs) it
+looks good functionally for separate metadata. However, it should also
+be able to support PRACT (i.e. pi strip/insert device-side) if
+nvme_ns_has_pi() is updated to also match on the 16 byte pi tuple. I
+made it work by just hitting it with a hammer and changing the
+comparison to hard-coded 16 bytes, but it should of course handle both
+cases.
 
+Naveen and I will post the emulated implementation (that certainly isnt
+very high performant either) on qemu-block ASAP if others are interested
+in giving this a spin without having hardware available.
+
+--vd57dnmutxBObqid
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAmHxXNIACgkQTeGvMW1P
+DentcAf/W/roVVj60nLr0claSmtY5JLuq/07TsbgeykeS04Yr9AWpPp79Yvwnus/
+sEZAxGWyDdn+J5CdJJ3YYG0xt6J1ET+i6JWTw7jG8Mx4dzKU+MjhT7IosuavGieg
+L5xs02jpT3+l+aBNOlSspom8WaN8EcxPOKRKzF4Ew0kwtta10XoMfU4W9ceuSp62
+GbNWKqnpyoCyQeVW5/AOZQ9/58V84So0roA0Vj4joICOVyofj7VDYSespsI8+y4y
+CtYSypgpp/3GdJ8YaKcuNN7Z1k18GUb6sYBSbRNeCknh9FHsAMVkcoC6yKUXA8tD
+p0sG5s5m+F1HeG0lKi6Y+0/T6q8nzw==
+=DnBV
+-----END PGP SIGNATURE-----
+
+--vd57dnmutxBObqid--
