@@ -2,108 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD6DC63682
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 17:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C7CC2BA4C
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 18:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237093AbiAZR32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 12:29:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44986 "EHLO
+        id S229636AbiAZSgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 13:36:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236899AbiAZR31 (ORCPT
+        with ESMTP id S230424AbiAZSgM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 12:29:27 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE90C06161C;
-        Wed, 26 Jan 2022 09:29:27 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id d15-20020a17090a110f00b001b4e7d27474so335196pja.2;
-        Wed, 26 Jan 2022 09:29:27 -0800 (PST)
+        Wed, 26 Jan 2022 13:36:12 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDDBC06161C;
+        Wed, 26 Jan 2022 10:36:12 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id a18so415861edj.7;
+        Wed, 26 Jan 2022 10:36:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=o7yVQ6gsvTTab9fYp8q+lCU+rLwohNUxOjiCLgJGdGM=;
-        b=O6zfBzmd+BywBFqXzIfiy3ycqMOwjnMfDYKV8Xlu61A5NUaAdxjhLjXRk91Zxmp379
-         0Zfjblp8ROfH7rGfRhEtsP/JWG6yw+G/qBGkEN722dXIW53FMFuWEu01agN9bdHb9we0
-         XOfCUvJMOBV/VWzq7SmjsTPdvjJ7m8E7DPaqPCR2KdqEhdKUcN20ZgDnwHGrUrZ6+I3h
-         8R/tO/SPoduJvlIslRZbhDKzQDuMNWYkbGxVq/ggvEDK6IeFnDzjVzrDuCHhUptS6yE3
-         zTZNooS0kFSqw6KKe8jJQpHWqMqYs1PMrHkCKAl3tpRiDJB4Eimn0LqYUPgEWvGJZSkJ
-         kK4w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yIv2lBySDQKuLdPHpVEfN5DTmOKpNIBBtz27Np5pjBs=;
+        b=YEIlpKJ98MWEUJYL4CbgZhaiOFeTWJ3MJeooSJ4MIVj4L7eOFGHB2ukyAiGsaz47FX
+         z7UvaoDQgwl0jkr/w9d+Lj5TNCHiAovaQWvH5hs0t4iYxygwLdbhT4vuug94xEvdsldk
+         y+gJzkGt9Fz6yN1e1wkgNc9ZSbwkYuafvifedVVjwOSpK5fczlexTSrQjDSGWVC20gGM
+         RmWk/2DXB+1Q3ygO+YoO2U/MuBiLG9bIBMfcmiv91702xVr4q9oI2rFZB4eTB6ZsWN7L
+         0O5EEBiqYqnqdIc4N94/I+uoo32WKwicF9xKG5xxxwmwpTuhqwiwGE7paSAeFy2oOpxG
+         JJeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=o7yVQ6gsvTTab9fYp8q+lCU+rLwohNUxOjiCLgJGdGM=;
-        b=l2cEOGO1p2/3I7N4HQz0BC9A0nojRP7a/1rdpe1Hx1e2CjpOr8TGNa0HLg6xByehIM
-         sG15LnT3sLLOideTEXk0rx8m5JS8uTT+XXy43uzLaE6azSMH2/IedWJthyDgGlCvHvNm
-         yD9dV/B07Q16NcSz4fTllrqn4KQ5f0fhQFxXV7gQpUJq9Fi8OPB33CMeXnjy4KVTVVUb
-         zVKvopY+PWUj0yxLotUJgodtB9dDGs5vbKG5PQ1RFkAIicx5asFwo9Erv0c7t/Kpgs9v
-         KEnHS640zBcZXmoyuJ1t7zWaMk7GEyIWapf8p/eZRFrsLlOYXiKOxkjPOetnOqzKr+QD
-         /C2Q==
-X-Gm-Message-State: AOAM532k/FQrp4pi9uHL10HPwqMUuUWrsqUnvggE/14umfFIAAdCklF8
-        FcOpQUs4uICAqK9VNr/qJoEjouEWLRZ3mw==
-X-Google-Smtp-Source: ABdhPJxyUHtO42sVayvKd1TwY8fWw8c2ZGvly5R/fAkkk2S/qM6qTyEIqTSco7v2TNmyUpldFs4JGQ==
-X-Received: by 2002:a17:903:1212:: with SMTP id l18mr10132plh.45.1643218166669;
-        Wed, 26 Jan 2022 09:29:26 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id h18sm2699799pfv.216.2022.01.26.09.29.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 09:29:26 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 26 Jan 2022 07:29:24 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next] blk-throttle: enable io throttle for root in
- cgroup v2
-Message-ID: <YfGE9L4i7DtNTo08@slm.duckdns.org>
-References: <20220114093000.3323470-1-yukuai3@huawei.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yIv2lBySDQKuLdPHpVEfN5DTmOKpNIBBtz27Np5pjBs=;
+        b=NyqOefL8DN1kCbs/y75sY+SYql0FT0tkwDOip9rgaHxOD08gqq9mVpG+HFMCe8nibL
+         VfJ3noNdICuPKuPg4ga0kPX37PVkYKe4rPKPr4zemxbQgrjp5z+41O/x2nw0B06AwffV
+         SS137cTayFsNSby9FUnOtv5x3kI9778gXslmubjsX/CI3I1egNrf0GfTi1tiLI7JsbKJ
+         cJuGVmGRoP+B8y1GfuXy+Q2ZJfVZQQEj29wPjXDvdLEmpMetSQFn2p/GlBcOivWaGpF7
+         0+KEv0Hp1BQI7A+Ehzq7zIz6meLqHKbFSFYa8S38YbBv9dgTnhkT+TF9silh/YTlNhBg
+         wS+g==
+X-Gm-Message-State: AOAM533tY67ED7OkBaO29CN6HpTuUQWalNOIbbYe0zc/EpBbUqeyzosL
+        OeUkmZ6qbbJTKmWlvRHV/qvHzIJr6vqQWqJjowVpsHg2
+X-Google-Smtp-Source: ABdhPJxcPb3yuO2kg71BJe3/VCzS/xRUBoWsgeZAKM8JtpENt1sJrIw1A34rRk5qSmiuJ5u4b4YHY0ycl1/bpMbRM44=
+X-Received: by 2002:a05:6402:12cf:: with SMTP id k15mr260420edx.299.1643222170905;
+ Wed, 26 Jan 2022 10:36:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220114093000.3323470-1-yukuai3@huawei.com>
+References: <20220125203548.352278-1-shy828301@gmail.com> <YfEEn06IEPjdGzHc@infradead.org>
+In-Reply-To: <YfEEn06IEPjdGzHc@infradead.org>
+From:   Yang Shi <shy828301@gmail.com>
+Date:   Wed, 26 Jan 2022 10:35:59 -0800
+Message-ID: <CAHbLzkoaM=e7EXpKQkxP+BRi-1gSjfJ=9GHM+s=5Lyh2ksZ+Kw@mail.gmail.com>
+Subject: Re: [v4 PATCH] block: introduce block_rq_error tracepoint
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 14, 2022 at 05:30:00PM +0800, Yu Kuai wrote:
-> RFC patch: https://lkml.org/lkml/2021/9/9/1432
-> 
-> There is a proformance problem in our environment:
-> 
-> A host can provide a remote device to difierent client. If one client is
-> under high io pressure, other clients might be affected.
-> 
-> Limit the overall iops/bps(io.max) from the client can fix the problem,
-> however, config files do not exist in root cgroup currently, which makes
-> it impossible.
-> 
-> This patch enables io throttle for root cgroup:
->  - enable "io.max" and "io.low" in root
->  - don't skip root group in tg_iops_limit() and tg_bps_limit()
->  - don't skip root group in tg_conf_updated()
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+On Wed, Jan 26, 2022 at 12:21 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Tue, Jan 25, 2022 at 12:35:48PM -0800, Yang Shi wrote:
+> > Currently, rasdaemon uses the existing tracepoint block_rq_complete
+> > and filters out non-error cases in order to capture block disk errors.
+> >
+> > But there are a few problems with this approach:
+> >
+> > 1. Even kernel trace filter could do the filtering work, there is
+> >    still some overhead after we enable this tracepoint.
+> >
+> > 2. The filter is merely based on errno, which does not align with kernel
+> >    logic to check the errors for print_req_error().
+> >
+> > 3. block_rq_complete only provides dev major and minor to identify
+> >    the block device, it is not convenient to use in user-space.
+> >
+> > So introduce a new tracepoint block_rq_error just for the error case
+> > and provides the device name for convenience too. With this patch,
+> > rasdaemon could switch to block_rq_error.
+> >
+> > Cc: Jens Axboe <axboe@kernel.dk>
+> > Reviewed-by: Steven Rostedt <rostedt@goodmis.org>
+> > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> > Signed-off-by: Yang Shi <shy828301@gmail.com>
+> > ---
+> > The v3 patch was submitted in Feb 2020, and Steven reviewed the patch, but
+> > it was not merged to upstream. See
+> > https://lore.kernel.org/lkml/20200203053650.8923-1-xiyou.wangcong@gmail.com/.
+> >
+> > The problems fixed by that patch still exist and we do need it to make
+> > disk error handling in rasdaemon easier. So this resurrected it and
+> > continued the version number.
+> >
+> > v3 --> v4:
+> >  * Rebased to v5.17-rc1.
+> >  * Collected reviewed-by tag from Steven.
+> >
+> >  block/blk-mq.c               |  4 +++-
+> >  include/trace/events/block.h | 41 ++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 44 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index f3bf3358a3bb..bb0593f93675 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -789,8 +789,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
+> >  #endif
+> >
+> >       if (unlikely(error && !blk_rq_is_passthrough(req) &&
+> > -                  !(req->rq_flags & RQF_QUIET)))
+> > +                  !(req->rq_flags & RQF_QUIET))) {
+> > +             trace_block_rq_error(req, blk_status_to_errno(error), nr_bytes);
+>
+> Please report the atual block layer status code instead of the errno
+> mapping here.
 
-Yeah, I'm kinda split. It's a simple change with some utility, but it's also
-something which doesn't fit with the cgroup feature or interface. It's
-regulating the whole system behavior. There's no reason for any of the
-control "groups" to be involved here and semantically the interface would
-fit a lot better under /proc, /sys or some other system-wide location. Here
-are some points to consider:
-
-* As a comparison, it'd be rather absurd to enable memory.max at system root
-  in terms of interface and most likely break whole lot of mm operations.
-
-* Resource control knobs of a cgroup belong to the parent as the parent is
-  responsible for divvying up the available resources to its children. Here
-  too, the knobs are making sense because there's a higher level parent
-  (whether that's hypervisor or some network server).
-
-Is your use case VMs or network attached storage?
-
-Thanks.
-
--- 
-tejun
+Sure, thanks.
