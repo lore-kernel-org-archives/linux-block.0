@@ -2,47 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 928A3C2BA4C
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 16:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02170C2BA4C
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 16:52:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243167AbiAZQhe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 11:37:34 -0500
-Received: from verein.lst.de ([213.95.11.211]:40700 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243168AbiAZQhb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 11:37:31 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 500F768AFE; Wed, 26 Jan 2022 17:37:28 +0100 (CET)
-Date:   Wed, 26 Jan 2022 17:37:28 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH V2 05/13] block: only account passthrough IO from
- userspace
-Message-ID: <20220126163728.GA31935@lst.de>
-References: <Ye8xleeYZfmwA3D7@T590> <20220125061634.GA26495@lst.de> <20220125071906.GA27674@lst.de> <Ye++VmBkg0I8Lq8+@T590> <20220126055003.GA21089@lst.de> <YfD2YNRf+lhe5BcU@T590> <20220126081052.GA23154@lst.de> <YfEHcs6psrBqFu3l@T590> <20220126084950.GA23957@lst.de> <YfEbbPr1Q5Ci48cg@T590>
+        id S241985AbiAZQwS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 11:52:18 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:37556 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236507AbiAZQwS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jan 2022 11:52:18 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A19EC6193B;
+        Wed, 26 Jan 2022 16:52:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E20C340E3;
+        Wed, 26 Jan 2022 16:52:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643215937;
+        bh=NX4Hlz3e3ASOAcsOzjd8Irwr9rnJ14JnxiTx/r4AofM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mNrcBhHhPbrxWEvOmXY+ZOy1754JLA/j+krUWiDKJEyt0GlUtdKUqT2IHEWzUt8ic
+         UTUy/4GOz4QQT9eeMY5s5wDYi5mCddNWpV2DraqitYfX1TKsI4jpTX6mHDI+kTf15l
+         z797R1DCSshahywdXqa4wKxatf6ji+IQTzWsHppnt7VbmlUJUwEA3eYaaeroU85dsL
+         GfTbETtIygJL0Ez9B3lX/ordSuHCPotbHCh2DMqGxoUSVnzTnDHA+C7QDcmd6Pq2Me
+         LgpxyhslMdpa7FdxrXVU3tubSMTDrUNITUVZRc1RYcJryzkagjLIHmaF8I1VZAS4QN
+         5SlQqlM/rwHLQ==
+Date:   Wed, 26 Jan 2022 08:52:14 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Klaus Jensen <its@irrelevant.dk>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        martin.petersen@oracle.com, colyli@suse.de, arnd@arndb.de
+Subject: Re: [RFC 0/7] 64-bit data integrity field support
+Message-ID: <20220126165214.GA1782352@dhcp-10-100-145-180.wdc.com>
+References: <20220124160107.1683901-1-kbusch@kernel.org>
+ <YfFc1f2MoSQzyxZ4@apples>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YfEbbPr1Q5Ci48cg@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <YfFc1f2MoSQzyxZ4@apples>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 05:59:08PM +0800, Ming Lei wrote:
-> nvme just sets part0 to rq->bio, which is fine since nvme doesn't
-> support partial completion.
+On Wed, Jan 26, 2022 at 03:38:13PM +0100, Klaus Jensen wrote:
+> On Jan 24 08:01, Keith Busch wrote:
+> > The NVM Express protocol added enhancements to the data integrity field
+> > formats beyond the T10 defined protection information. A detailed
+> > description of the new formats can be found in the NVMe's NVM Command
+> > Set Specification, section 5.2, available at:
+> > 
+> >   https://nvmexpress.org/wp-content/uploads/NVM-Command-Set-Specification-1.0b-2021.12.18-Ratified.pdf
+> > 
+> > This series implements one possible new format: the CRC64 guard with
+> > 48-bit reference tags. This does not add support for the variable
+> > "storage tag" field.
+> > 
+> > The NVMe CRC64 parameters (from Rocksoft) were not implemented in the
+> > kernel, so a software implementation is included in this series based on
+> > the generated table. This series does not include any possible hardware
+> > excelleration (ex: x86's pclmulqdq), so it's not very high performant
+> > right now.
+> > 
 > 
-> The simplest way could be to assign bio->bi_bdev with q->disk->part0 in both
-> bio_copy_user_iov() and bio_map_user_iov(), which should cover most of cases.
-> Given user io is always on device instead of partition even though the
-> command is sent via partition bdev.
+> Hi Keith,
+> 
+> Tested this on QEMU and (assuming we didnt implement the same bugs) it
+> looks good functionally for separate metadata. However, it should also
+> be able to support PRACT (i.e. pi strip/insert device-side) if
+> nvme_ns_has_pi() is updated to also match on the 16 byte pi tuple. I
+> made it work by just hitting it with a hammer and changing the
+> comparison to hard-coded 16 bytes, but it should of course handle both
+> cases.
 
-This would be easiest, but it would also assign them when called from
-the SG driver.  And that means these I/Os could be in flight when
-detaching a SCSI ULP.  At least without the freeze in del_gendisk
-(or the local one in case of the sd driver).
+Thanks for checking with the qemu device!
+
+I'll add the PRACT support for the next version, but will wait till next
+week to post it in case there's more feedback to consider.
+
+> Naveen and I will post the emulated implementation (that certainly isnt
+> very high performant either) on qemu-block ASAP if others are interested
+> in giving this a spin without having hardware available.
+
+There are more features with this TP than are implemented here. I'm just
+enabling a product that only supports the 64-bit CRC with 0 STS, but I'm
+assuming your QEMU implementation may be more feature complete. If
+anyone is interested in 32-bit CRC or >0 STS, there's more work to
+follow on from here, but I currently don't have such a target to test
+against.
