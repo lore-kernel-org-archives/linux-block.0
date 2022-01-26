@@ -2,63 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912CEC63682
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 08:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DE1C2BA4C
+	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 08:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238255AbiAZIPK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 03:15:10 -0500
-Received: from verein.lst.de ([213.95.11.211]:38863 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238246AbiAZIPJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 03:15:09 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2D9C368AFE; Wed, 26 Jan 2022 09:15:05 +0100 (CET)
-Date:   Wed, 26 Jan 2022 09:15:04 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH V2 09/13] scsi: force unfreezing queue into atomic mode
-Message-ID: <20220126081504.GB23154@lst.de>
-References: <20220122111054.1126146-1-ming.lei@redhat.com> <20220122111054.1126146-10-ming.lei@redhat.com> <20220124131516.GH27269@lst.de> <Ye80kxTBojm6GN8k@T590> <20220125072739.GA27777@lst.de> <Ye+605vZEyx3ofi2@T590>
+        id S238308AbiAZIUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 03:20:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238304AbiAZIUH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Jan 2022 03:20:07 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC427C06161C;
+        Wed, 26 Jan 2022 00:20:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=RDB5+xtWfozAnAatM5/ug6QmjY
+        wBsLp5pzqWQ04h7g7wpI9Njma8N8Lm5+hfaJAMdnhp5eAqvgciiMF6i3clZ4o3+1XpiB0RH4U8IXL
+        L3T1XLAKl7yzuYr1UiqT8gC816bhLis9NOYm0RXL2ZkomGjCgaqeytmasuDEcF8iHopelxZ3Q/CkI
+        0UKUmbVyhAsUgy4p6CQBOwfm46r8C0hCJx85Osid8dBDs9JBKkBgdc6FbRgQUa+mRXTXv8FaldHOV
+        Li5FXx+c0jxldnujKmt1VFumdjZNOJf4nrarEVN+ADuCyjB7zTahT+bgiLJotdvItvZ/41V9lbRrP
+        LFfWD9zA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nCdXA-00AgiH-7y; Wed, 26 Jan 2022 08:20:04 +0000
+Date:   Wed, 26 Jan 2022 00:20:04 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v2] blk-mq: fix missing blk_account_io_done() in error
+ path
+Message-ID: <YfEENNG2VMT+aZWc@infradead.org>
+References: <20220126012132.3111551-1-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ye+605vZEyx3ofi2@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220126012132.3111551-1-yukuai3@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 25, 2022 at 04:54:43PM +0800, Ming Lei wrote:
-> > So what is the advantage of trying to remove the freeze from where
-> > it belongs (common unregister code) while keeping it where it is a bandaid
-> > (driver specific unregister code)?
-> 
-> freeze in common unregister code is actually not good, because it provide
-> nothing for bio based driver, so we can't move blk-cgroup shutdown into
-> del_gendisk. Also we can't move elevator shutdown to del_gendisk for
-> similar reason.
-> 
-> Secondly freeze is pretty slow in percpu mode, so why slow down removing every
-> disk just for scsi's bandaid?
+Looks good,
 
-I'd frame this differently:
-
- - del_gendisk is the right place to freeze the queue, as that is where the
-   gendisk is unregistered and all fs I/O needs to stop.  If we don't get
-   all aspects right we need to fix.  As mentioned I'm already looking into
-   keeping a reference for the bio life time for bio based drivers.
- - SCSI is the only driver that ever submits passthrough I/O without the
-   gendisk.  So doing an additional freeze during request_queue teardown
-   is only needed for SCSI and we can eventually remove that for everyone
-   else.  And most of your series already does really good work towards that
-   goal!
-
-> 
-> 
-> Thanks,
-> Ming
----end quoted text---
+Reviewed-by: Christoph Hellwig <hch@lst.de>
