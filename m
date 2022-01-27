@@ -2,186 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A511FC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 11:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DE7C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 12:23:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239856AbiA0LMW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 06:12:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59310 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiA0LMW (ORCPT
+        id S232773AbiA0MXa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 07:23:30 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:52392 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235811AbiA0MX3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 06:12:22 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01ECBC061714;
-        Thu, 27 Jan 2022 03:12:21 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Thu, 27 Jan 2022 07:23:29 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id CDD111F37F;
+        Thu, 27 Jan 2022 12:23:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1643286207; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2/zhGPBBKnmOu2pFSFHXFOJN2o1An1lof2yyfsoLaQ0=;
+        b=ra6AOq1GWUa3pZmL30eaT8Ju3HxPIHJcRcZ2y7nV/61n6w+R4dpUdDxw//EplYjqqGwMOR
+        VlrYfdJsERqDgK/+BhFSrDUOGbkIjAM3wqumB3aSX2ZjyOE/G3OX3vjoK0mO50t7pnWKlM
+        EJA4RGTjG2XNZYKQ5wACgNLfLc6FUvg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1643286207;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2/zhGPBBKnmOu2pFSFHXFOJN2o1An1lof2yyfsoLaQ0=;
+        b=4avwth8FJ6B6XxCNA43O3sh26m7+V3ada4fC2uu74hOb/fZJu6ZQRt6v66dRarHMmzCLHB
+        9jmUyronTc3G/kAg==
+Received: from quack3.suse.cz (unknown [10.163.43.118])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 55F3DB821EE;
-        Thu, 27 Jan 2022 11:12:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A0ECC340E4;
-        Thu, 27 Jan 2022 11:12:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643281939;
-        bh=V5HYgTWJFQ5JJsKuBtDbntq5jM8gqYnHqlB+WwVQUg0=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=qs+oygNUvOkZojCS4tbIHBbHNnN2c83jSwVTtC+PXReiKpUgTryV/Jn9i4kA11TCx
-         wQIA8T/xXWysKr5FVnBsdp7s6T57gZuXoA8b+6AKW4GBWhPcMDiC878wFDfjGOUfSX
-         5ddnmsg5pr+FfS6jpyfRuWWfH+qIetrTGJZM1PAYwXCjUJyQB7D1Wcs5o++QKht+ze
-         N6Qaj6XKvoxOKPWxiTmKIzgNkaDO61bAS7aaPRXf+qfG+7pz/a1932PlgtYdjIokd4
-         zXshthMZgvLd9Pe0iKyNgu1FzP9P91fWoKA6y5OydLOCZNYRF9sJ2Iz0TLFNBDx5FN
-         vYRqTrnWEMhKw==
-Message-ID: <2e66ef3e8f5df0529d3c289f8ed0be6a051d95ea.camel@kernel.org>
-Subject: Re: [PATCH 5/9] cephfs: don't set/clear bdi_congestion
-From:   Jeff Layton <jlayton@kernel.org>
-To:     NeilBrown <neilb@suse.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Date:   Thu, 27 Jan 2022 06:12:15 -0500
-In-Reply-To: <164325158958.29787.8840004338500709466.stgit@noble.brown>
-References: <164325106958.29787.4865219843242892726.stgit@noble.brown>
-         <164325158958.29787.8840004338500709466.stgit@noble.brown>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+        by relay2.suse.de (Postfix) with ESMTPS id B7E98A3B8B;
+        Thu, 27 Jan 2022 12:23:27 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 1EA0FA05E6; Thu, 27 Jan 2022 13:23:27 +0100 (CET)
+Date:   Thu, 27 Jan 2022 13:23:27 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 3/8] block: remove the racy bd_inode->i_mapping->nrpages
+ asserts
+Message-ID: <20220127122327.ivzofycd6g7umox6@quack3.lan>
+References: <20220126155040.1190842-1-hch@lst.de>
+ <20220126155040.1190842-4-hch@lst.de>
+ <20220127094737.dosrg7xbnwuw3ttx@quack3.lan>
+ <20220127094942.GA14727@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="37mr5yq4wgm3vwh3"
+Content-Disposition: inline
+In-Reply-To: <20220127094942.GA14727@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2022-01-27 at 13:46 +1100, NeilBrown wrote:
-> The bdi congestion framework is no-longer used - writeback uses other
-> mechanisms to manage throughput.
-> 
-> So remove calls to set_bdi_congested() and clear_bdi_congested(), and
-> remove the writeback_count which is used only to guide the setting and
-> clearing.
-> 
-> The congestion_kb mount option is no longer meaningful, but as it is
-> visible to user-space, removing it needs more consideration.
-> 
-> Signed-off-by: NeilBrown <neilb@suse.de>
-> ---
->  fs/ceph/addr.c  |   27 ---------------------------
->  fs/ceph/super.c |    2 --
->  fs/ceph/super.h |    2 --
->  3 files changed, 31 deletions(-)
-> 
-> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-> index c98e5238a1b6..9147667f8cd5 100644
-> --- a/fs/ceph/addr.c
-> +++ b/fs/ceph/addr.c
-> @@ -57,11 +57,6 @@
->   * accounting is preserved.
->   */
->  
-> -#define CONGESTION_ON_THRESH(congestion_kb) (congestion_kb >> (PAGE_SHIFT-10))
-> -#define CONGESTION_OFF_THRESH(congestion_kb)				\
-> -	(CONGESTION_ON_THRESH(congestion_kb) -				\
-> -	 (CONGESTION_ON_THRESH(congestion_kb) >> 2))
-> -
->  static int ceph_netfs_check_write_begin(struct file *file, loff_t pos, unsigned int len,
->  					struct folio *folio, void **_fsdata);
->  
-> @@ -561,10 +556,6 @@ static int writepage_nounlock(struct page *page, struct writeback_control *wbc)
->  	dout("writepage %p page %p index %lu on %llu~%llu snapc %p seq %lld\n",
->  	     inode, page, page->index, page_off, len, snapc, snapc->seq);
->  
-> -	if (atomic_long_inc_return(&fsc->writeback_count) >
-> -	    CONGESTION_ON_THRESH(fsc->mount_options->congestion_kb))
-> -		set_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
-> -
->  	req = ceph_osdc_new_request(osdc, &ci->i_layout, ceph_vino(inode), page_off, &len, 0, 1,
->  				    CEPH_OSD_OP_WRITE, CEPH_OSD_FLAG_WRITE, snapc,
->  				    ceph_wbc.truncate_seq, ceph_wbc.truncate_size,
-> @@ -621,10 +612,6 @@ static int writepage_nounlock(struct page *page, struct writeback_control *wbc)
->  	ceph_put_wrbuffer_cap_refs(ci, 1, snapc);
->  	ceph_put_snap_context(snapc);  /* page's reference */
->  
-> -	if (atomic_long_dec_return(&fsc->writeback_count) <
-> -	    CONGESTION_OFF_THRESH(fsc->mount_options->congestion_kb))
-> -		clear_bdi_congested(inode_to_bdi(inode), BLK_RW_ASYNC);
-> -
->  	return err;
->  }
->  
-> @@ -704,12 +691,6 @@ static void writepages_finish(struct ceph_osd_request *req)
->  			BUG_ON(!page);
->  			WARN_ON(!PageUptodate(page));
->  
-> -			if (atomic_long_dec_return(&fsc->writeback_count) <
-> -			     CONGESTION_OFF_THRESH(
-> -					fsc->mount_options->congestion_kb))
-> -				clear_bdi_congested(inode_to_bdi(inode),
-> -						    BLK_RW_ASYNC);
-> -
->  			ceph_put_snap_context(detach_page_private(page));
->  			end_page_writeback(page);
->  			dout("unlocking %p\n", page);
-> @@ -952,14 +933,6 @@ static int ceph_writepages_start(struct address_space *mapping,
->  			dout("%p will write page %p idx %lu\n",
->  			     inode, page, page->index);
->  
-> -			if (atomic_long_inc_return(&fsc->writeback_count) >
-> -			    CONGESTION_ON_THRESH(
-> -				    fsc->mount_options->congestion_kb)) {
-> -				set_bdi_congested(inode_to_bdi(inode),
-> -						  BLK_RW_ASYNC);
-> -			}
-> -
-> -
->  			pages[locked_pages++] = page;
->  			pvec.pages[i] = NULL;
->  
-> diff --git a/fs/ceph/super.c b/fs/ceph/super.c
-> index bf79f369aec6..b2f38af9fca8 100644
-> --- a/fs/ceph/super.c
-> +++ b/fs/ceph/super.c
-> @@ -801,8 +801,6 @@ static struct ceph_fs_client *create_fs_client(struct ceph_mount_options *fsopt,
->  	fsc->filp_gen = 1;
->  	fsc->have_copy_from2 = true;
->  
-> -	atomic_long_set(&fsc->writeback_count, 0);
-> -
->  	err = -ENOMEM;
->  	/*
->  	 * The number of concurrent works can be high but they don't need
-> diff --git a/fs/ceph/super.h b/fs/ceph/super.h
-> index 67f145e1ae7a..fc58adf1d36a 100644
-> --- a/fs/ceph/super.h
-> +++ b/fs/ceph/super.h
-> @@ -120,8 +120,6 @@ struct ceph_fs_client {
->  
->  	struct ceph_mds_client *mdsc;
->  
-> -	atomic_long_t writeback_count;
-> -
->  	struct workqueue_struct *inode_wq;
->  	struct workqueue_struct *cap_wq;
->  
-> 
-> 
 
-Thanks Neil.
+--37mr5yq4wgm3vwh3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I'll plan to pull this into the ceph testing branch and do some testing
-with it, but at a quick glance I don't forsee any issues. This should
-make v5.18, but we may be able to get it in sooner.
+On Thu 27-01-22 10:49:42, Christoph Hellwig wrote:
+> On Thu, Jan 27, 2022 at 10:47:37AM +0100, Jan Kara wrote:
+> > On Wed 26-01-22 16:50:35, Christoph Hellwig wrote:
+> > > Nothing prevents a file system or userspace opener of the block device
+> > > from redirtying the page right afte sync_blockdev returned.  Fortunately
+> > > data in the page cache during a block device change is mostly harmless
+> > > anyway.
+> > > 
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > My understanding was these warnings are there to tell userspace it is doing
+> > something wrong. Something like the warning we issue when DIO races with
+> > buffered IO... I'm not sure how useful they are but I don't see strong
+> > reason to remove them either...
+> 
+> Well, it is not just a warning, but also fails the command.  With some of
+> the reduced synchronization blktests loop/002 can hit them pretty reliably.
+
+I see. I guess another place where using mapping->invalidate_lock would be
+good to avoid these races... So maybe something like attached patch?
+
+								Honza
 -- 
-Jeff Layton <jlayton@kernel.org>
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--37mr5yq4wgm3vwh3
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-loop-Protect-loop-device-invalidation-from-racing-pa.patch"
+
+From 3914760aa538f55012f41859857cfe75bdcfc6a2 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Thu, 27 Jan 2022 12:43:26 +0100
+Subject: [PATCH] loop: Protect loop device invalidation from racing page cache
+ operations
+
+Grab bdev->i_mutex and bdev->i_mapping->invalidate_lock to protect
+operations invalidating loop device page cache from racing operations on
+the page cache. As a result we can drop some warnings.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 29 ++++++++---------------------
+ 1 file changed, 8 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 01cbbfc4e9e2..170e3dc0d8a9 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1252,6 +1252,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	if (lo->lo_offset != info->lo_offset ||
+ 	    lo->lo_sizelimit != info->lo_sizelimit) {
+ 		size_changed = true;
++		inode_lock(lo->lo_device->bd_inode);
++		filemap_invalidate_lock(lo->lo_device->bd_inode->i_mapping);
+ 		sync_blockdev(lo->lo_device);
+ 		invalidate_bdev(lo->lo_device);
+ 	}
+@@ -1259,15 +1261,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	/* I/O need to be drained during transfer transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+-	if (size_changed && lo->lo_device->bd_inode->i_mapping->nrpages) {
+-		/* If any pages were dirtied after invalidate_bdev(), try again */
+-		err = -EAGAIN;
+-		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+-			__func__, lo->lo_number, lo->lo_file_name,
+-			lo->lo_device->bd_inode->i_mapping->nrpages);
+-		goto out_unfreeze;
+-	}
+-
+ 	prev_lo_flags = lo->lo_flags;
+ 
+ 	err = loop_set_status_from_info(lo, info);
+@@ -1285,6 +1278,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
+ 					   lo->lo_backing_file);
+ 		loop_set_size(lo, new_size);
++		filemap_invalidate_unlock(lo->lo_device->bd_inode->i_mapping);
++		inode_unlock(lo->lo_device->bd_inode);
+ 	}
+ 
+ 	loop_config_discard(lo);
+@@ -1474,26 +1469,18 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	if (lo->lo_queue->limits.logical_block_size == arg)
+ 		return 0;
+ 
++	inode_lock(lo->lo_device->bd_inode);
++	filemap_invalidate_lock(lo->lo_device->bd_inode->i_mapping);
+ 	sync_blockdev(lo->lo_device);
+ 	invalidate_bdev(lo->lo_device);
+-
+ 	blk_mq_freeze_queue(lo->lo_queue);
+-
+-	/* invalidate_bdev should have truncated all the pages */
+-	if (lo->lo_device->bd_inode->i_mapping->nrpages) {
+-		err = -EAGAIN;
+-		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
+-			__func__, lo->lo_number, lo->lo_file_name,
+-			lo->lo_device->bd_inode->i_mapping->nrpages);
+-		goto out_unfreeze;
+-	}
+-
+ 	blk_queue_logical_block_size(lo->lo_queue, arg);
+ 	blk_queue_physical_block_size(lo->lo_queue, arg);
+ 	blk_queue_io_min(lo->lo_queue, arg);
+ 	loop_update_dio(lo);
+-out_unfreeze:
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
++	filemap_invalidate_unlock(lo->lo_device->bd_inode->i_mapping);
++	inode_unlock(lo->lo_device->bd_inode);
+ 
+ 	return err;
+ }
+-- 
+2.31.1
+
+
+--37mr5yq4wgm3vwh3--
