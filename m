@@ -2,67 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4F9C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 10:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9AC6C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 10:42:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239502AbiA0Kbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 05:31:46 -0500
-Received: from www262.sakura.ne.jp ([202.181.97.72]:55763 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239505AbiA0Kbq (ORCPT
+        id S232955AbiA0Km6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 05:42:58 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:36982 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232785AbiA0Km6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 05:31:46 -0500
-Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20RAVR9S002426;
-        Thu, 27 Jan 2022 19:31:27 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
- Thu, 27 Jan 2022 19:31:27 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20RAVRsj002421
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 27 Jan 2022 19:31:27 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <60b17284-8baf-a0a4-c27c-3f8f1e21b93c@I-love.SAKURA.ne.jp>
-Date:   Thu, 27 Jan 2022 19:31:26 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 5/8] loop: only take lo_mutex for the first reference in
- lo_open
-Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Thu, 27 Jan 2022 05:42:58 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 476021F37E;
+        Thu, 27 Jan 2022 10:42:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1643280177; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tv+eUJRhWEEVj7lSMaQdKVvjEwjVSfmaWuxJPecm1fA=;
+        b=zrAM2NYrjjeVFPpXbp1bzWerG2wiMCXSLvNOBARXZhHfoJ58PQHpn3hM4SOrpMWSNr7w8G
+        OVDXXpN8YLNCPJs7/kDdBzbYFm3R6fSbxRGaHv4M/nEQqGYUWrcQtyQ0P5TaAKTR7HxNoW
+        sDen++nEgrFfh70ATLg8t1qHCUOk82I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1643280177;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tv+eUJRhWEEVj7lSMaQdKVvjEwjVSfmaWuxJPecm1fA=;
+        b=kSSnwJaBReS2SO7qx5/7hKHSV9qgmdFLjXM2Of0QxzWNnSgpRDm6eacp4ecpGtNVPCQSY4
+        pmxjd2Kbn32EMyDQ==
+Received: from quack3.suse.cz (unknown [10.163.43.118])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 36AB8A3B89;
+        Thu, 27 Jan 2022 10:42:56 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 92F2AA05E6; Thu, 27 Jan 2022 11:42:56 +0100 (CET)
+Date:   Thu, 27 Jan 2022 11:42:56 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
         Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 6/8] loop: don't freeze the queue in lo_release
+Message-ID: <20220127104256.5tmkxo4m4uvcbqai@quack3.lan>
 References: <20220126155040.1190842-1-hch@lst.de>
- <20220126155040.1190842-6-hch@lst.de>
- <20220127102848.eyzf5wwbssbvgkim@quack3.lan>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220127102848.eyzf5wwbssbvgkim@quack3.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20220126155040.1190842-7-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220126155040.1190842-7-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/01/27 19:28, Jan Kara wrote:
-> So this also relies on disk->open_mutex for correctness. Otherwise a race
-> like:
+On Wed 26-01-22 16:50:38, Christoph Hellwig wrote:
+> By the time the final ->release is called there can't be outstanding I/O.
+> For non-final ->release there is no need for driver action at all.
 > 
-> Thread1			Thread2
-> lo_open()
->   if (atomic_inc_return(&lo->lo_refcnt) > 1)
->   mutex_lock_killable(&lo->lo_mutex);
-> 			lo_open()
-> 			if (atomic_inc_return(&lo->lo_refcnt) > 1)
-> 			  return 0;
->   ..
+> Thus remove the useless queue freeze.
 > 
-> can result in Thread2 using the loop device before Thread1 actually did the
-> "first open" checks. So perhaps one common comment for lo_open + lo_release
-> explaining the locking?
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Please see https://lkml.kernel.org/r/7bebf860-2415-7eb6-55a1-47dc4439d9e9@I-love.SAKURA.ne.jp .
+Looks good, just one nit below. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 4b0058a67c48e..d9a0e2205762f 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1758,13 +1758,6 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+>  		 */
+>  		loop_schedule_rundown(lo);
+>  		return;
+> -	} else if (lo->lo_state == Lo_bound) {
+> -		/*
+> -		 * Otherwise keep thread (if running) and config,
+> -		 * but flush possible ongoing bios in thread.
+> -		 */
+> -		blk_mq_freeze_queue(lo->lo_queue);
+> -		blk_mq_unfreeze_queue(lo->lo_queue);
+>  	}
+
+Maybe worth a comment like:
+
+	/*
+	 * No IO can be running at this point since there are no openers
+	 * (covers filesystems, stacked devices, AIO) and the page cache is
+	 * evicted.
+	 */
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
