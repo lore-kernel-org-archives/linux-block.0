@@ -2,92 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE5BC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 17:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA9DC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 17:17:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244378AbiA0RLo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 12:11:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55801 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244387AbiA0RLo (ORCPT
+        id S237863AbiA0RRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 12:17:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244422AbiA0RRL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 12:11:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643303503;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xtKZnu3m4MJ1lsPgVyhgN06mFCH9uLK+At7c0q3e4j8=;
-        b=LN8FAamK45sm6noJKUN6tg+JuKEjFXTHjCz0Gz3hQXd7xEnG8vCRHb6CYG8/0sito9KieR
-        EoA3uFroRZoPvlL+SDdS4cbDbrpWlWUd6YK5HZdf/U3wzh4GlyqcSS/9tB/oQEndPVNawx
-        37imUkamyk+Z/2GOH1G55UuYiAToeOc=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-hhpWFCY6N1yUI622JjDnpw-1; Thu, 27 Jan 2022 12:11:42 -0500
-X-MC-Unique: hhpWFCY6N1yUI622JjDnpw-1
-Received: by mail-qk1-f198.google.com with SMTP id a134-20020ae9e88c000000b0047ebe47102dso2810989qkg.18
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:11:42 -0800 (PST)
+        Thu, 27 Jan 2022 12:17:11 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3132C061714
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:17:11 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id e79so4345981iof.13
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:17:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=xT5bmm2ZQXkv90xnzpvjPoRX55jk4swWNegsJQidaMk=;
+        b=lmmuvr1mDR2lpp75UuTV/YmRZ/vruMXzovUf0ufPZXQSub/rdkvpFRZ6oq6ojgC6qG
+         haWfw36+0F6OBHA+fg1roo1ACTNUuWBztjpenR9yAhaRSUmTKH7AcUk2HIokYLwxTrId
+         AQX/P8gG+k0rBzIbyv62WVfJI2puED+0/wVaY+hyNl56xIh6Siv/I4I3cWRdcb+gODGn
+         MAMMW3FWHforNa05ny6rYXkwF6CVkdEFuwhCURKMrQ63VhBdc73lgrUlJnojKPB8G3w4
+         5SjB8ZCtTIP73PJ/GMbcMx4lR3Vl911uJjRmVthc540OAyjY6Ih/c0N5zqK9jdCWP7ej
+         sG2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xtKZnu3m4MJ1lsPgVyhgN06mFCH9uLK+At7c0q3e4j8=;
-        b=idt49ogcV0zxSTvKOWTaXxgrHvcEqJnQgJboLfixs8s/0aW23clqXdZqt7pPc50UPA
-         p1QaL6TxZWc4gZE3Lg1GZOhwG4Ua2sHAip/LNqmy2BIXZDC4wDRRK/z9dKNjlr1k24+T
-         PqpdJFXljBFaHK2uSCgAMFkE3ZjQ8iz4q42N11JIyOpjgWWpUMPAA+emMbDheRsLWQQZ
-         SZ9AGf/jv/EuBqFNq/LqoUSwIlrDfXgnYQgXQBW9vxjIqE63RkQ9BqbwjpfjFJOAeGW1
-         0Pvp2cFeThx8Pw22vePIRcG/c8Ws3b62xeqbkYi4nY72vxoBsjquiRMhpaFJoao6PQh8
-         uUoA==
-X-Gm-Message-State: AOAM532MO9fmyehYYIlHqiOOAuR3yypPmvaUwVsW3zwkAXx2ZWr4DEJF
-        Y9zCIko3FTnHMNPOwL1DgSd750u07GC+ZyxL46XBhaEZsRrnS97P0+Xi1toTyRVVxK9lqg7GSdf
-        SdsaYHFTqGymns41+wL/9kg==
-X-Received: by 2002:ad4:5968:: with SMTP id eq8mr3808170qvb.80.1643303501889;
-        Thu, 27 Jan 2022 09:11:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJztPCW/ls/HGsD9xe/WMaahh4UjrJsfEVpwqwRI5tHMnXcgyiZLuuvrhgvmY/MRUsNQeYYfvQ==
-X-Received: by 2002:ad4:5968:: with SMTP id eq8mr3808154qvb.80.1643303501730;
-        Thu, 27 Jan 2022 09:11:41 -0800 (PST)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id w8sm119796qti.21.2022.01.27.09.11.41
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=xT5bmm2ZQXkv90xnzpvjPoRX55jk4swWNegsJQidaMk=;
+        b=uWRNdaS98M+nJ0b1wWxMN9Y7IvhzQ1bNqHHrYI7VKBQGzRDkiuc1rYhX3Bja4n/zBS
+         NJUgPr0b/2ThpBlIOd5QSHyaLOKos2vucWMIS8hdBer6ve2IUhNBRE1E3Z4Ko0Yi6ilV
+         ZJf5yW+hlfLfg553nxsG7+J8VMpCStjcm1ZtMYrPRmm/7r30AaSMd9iW0uVv7PhN7MqO
+         XDixn4RQb2nZBrBZCyp4GEIdJCd5yMEtHiT8EkH0hNe8Knb+/JAnux23YMR6i31b9imv
+         Y8BuqDZvyPsBJPPTYEB91AewaGnYohIzcgZ2m/7JP6HHQK9LY9+efrKDLckEbSRDPpxk
+         Wopw==
+X-Gm-Message-State: AOAM532BmjBTi3znCSBz82+s+zt1LpldCPix+EC3bgxonON2NepozoFF
+        XqFMd3ne0QXdqhoEQ03FVNlHiA==
+X-Google-Smtp-Source: ABdhPJwbgWzbI7aMMuKcrQvqQ4HkGfjRykM9p+OlU2Z5sQrKZs5ocBKAg3laeC7po/s7XuxJ4QTbXQ==
+X-Received: by 2002:a05:6638:4193:: with SMTP id az19mr664890jab.138.1643303831002;
+        Thu, 27 Jan 2022 09:17:11 -0800 (PST)
+Received: from x1.localdomain ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id a2sm5166896ilj.35.2022.01.27.09.17.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jan 2022 09:11:41 -0800 (PST)
-Date:   Thu, 27 Jan 2022 12:11:40 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Md . Haris Iqbal " <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.co>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
-        xen-devel@lists.xenproject.org, drbd-dev@lists.linbit.com
-Subject: Re: [PATCH 08/19] dm-thin: use blkdev_issue_flush instead of open
- coding it
-Message-ID: <YfLSTPB7UUZKqQKL@redhat.com>
-References: <20220124091107.642561-1-hch@lst.de>
- <20220124091107.642561-9-hch@lst.de>
+        Thu, 27 Jan 2022 09:17:10 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Laibin Qiu <qiulaibin@huawei.com>,
+        andriy.shevchenko@linux.intel.com
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        alex_y_xu@yahoo.ca
+In-Reply-To: <20220127100047.1763746-1-qiulaibin@huawei.com>
+References: <20220127100047.1763746-1-qiulaibin@huawei.com>
+Subject: Re: [PATCH -next] blk-mq: Fix wrong wakeup batch configuration which will cause hang
+Message-Id: <164330383030.210260.14632628670635722739.b4-ty@kernel.dk>
+Date:   Thu, 27 Jan 2022 10:17:10 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220124091107.642561-9-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 24 2022 at  4:10P -0500,
-Christoph Hellwig <hch@lst.de> wrote:
-
-> Use blkdev_issue_flush, which uses an on-stack bio instead of an
-> opencoded version with a bio embedded into struct pool.
+On Thu, 27 Jan 2022 18:00:47 +0800, Laibin Qiu wrote:
+> Commit 180dccb0dba4f ("blk-mq: fix tag_get wait task can't be
+> awakened") will recalculating wake_batch when inc or dec active_queues
+> to avoid wake_batch is > hctx_max_depth. At the same time, in order to
+> not affect performance as much as possible, the minimum wakeup batch is
+> set to 4. But when the QD is small (such as QD=1), if inc or dec
+> active_queues will increase wakeup batch, which will lead to hang.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> [...]
 
-Acked-by: Mike Snitzer <snitzer@redhat.com>
+Applied, thanks!
+
+[1/1] blk-mq: Fix wrong wakeup batch configuration which will cause hang
+      commit: 10825410b956dc1ed8c5fbc8bbedaffdadde7f20
+
+Best regards,
+-- 
+Jens Axboe
+
 
