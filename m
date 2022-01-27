@@ -2,83 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C97C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 17:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC394C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 17:28:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238793AbiA0RTm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 12:19:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33258 "EHLO
+        id S233995AbiA0R20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 12:28:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238739AbiA0RTm (ORCPT
+        with ESMTP id S240928AbiA0R2Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 12:19:42 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE83C061714
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:19:41 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id i62so4443629ioa.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:19:41 -0800 (PST)
+        Thu, 27 Jan 2022 12:28:25 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06A1C061747
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:28:24 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id h7so4450315iof.3
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 09:28:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=SeXRjVY9Q4YMFH/0nT9DEyoUFf/9IS91BdFB/cZlSJA=;
-        b=P5qbJwDNwltmD9CyLlTzaoOs4EcO4GWAu5aJKZGaFFp7qMYKNsqNU68qxxN/hPGsFD
-         BmBF0+FL13a2Zs7K2DmIz16Qa71CCcLIiDEglAC4/Cyb/p3yGqa3qRrfVdkjmC+2IBm4
-         B1lXRXw69o9K6Xf+pstdoEpC+GSDG5OOOp7NdOydhNRaZAS2Zmyip6Cn9UC5s6eTGvJC
-         +aeU6vI0FFujmGign6ArfDxcsGP2tV7q6XLcW6Xb9p205TFG9OxK1YFBusZFElvK0Uay
-         /HNt1JwPTfazzN+0TIXshOOXuAOi8YV6YLZQWyDNn75rh4RAfTXALReDBKuK23ZcHjo5
-         3gbQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=NiHrTM8m6eB81b1pCE7srDrvMUba4g0skB5zfMI0lrw=;
+        b=JTdiPiRz3TEJdVVOZBIwh6J2HR7uxIGsNCLo2suPO+UCntkps90II56CuW9TwsGDY9
+         WPsAw+JgVZwEP7zBRT2VMZhYzfR34HDwCcZQkO+owhgbvI9DnzwPZ7Uvb6CHr8zfFtaS
+         V46vw8MIXsxuuRTOKMJsAyA9nHhQ6h3gnghE68EAhdlJY4kghFzVgK+w+1hAojsjV+9x
+         NwBLaSKcFoHk3GacoxvDpRGWuuuGFwJzXV4IeOamgTZEfz6cTkR7AkMa2E4f0t/lQnvM
+         fnL3TAlx7vnr81fecbLHb1YYLyPw6lJJDxAk7hSw8mAdHPV0MVfGNXHO3YM2fwgWk8bR
+         PiFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=SeXRjVY9Q4YMFH/0nT9DEyoUFf/9IS91BdFB/cZlSJA=;
-        b=bQk7o0TOP6QqaY+oq67T/Sl16Fd1mx4TQSlccLvw0QEoxSCuCRCUrRuKJp0KcO8vDr
-         l+3S7e9H3DY0Bm845UOIJrJCutzCjdWm0MLZ/Ms7Mng4hHGwOrH5is96OddcYltR1W3n
-         ZJIPDKnXVeOw9XD7US6vJOd1v+plGTIEVags5oSTSmhXQn87O0EujCdcOImtxljAxVMx
-         5G1A513dzB+OMHj1TFO0/6MlOX4cKOQ7P109a0GJ2YefpiFR58pd5lkjmy+BZnpqg9Eb
-         dZTx7OaLypBvKCjRLRpd+OaAJ1GvKNDoYa9k6Uy/VwuHJoRIAx4t4wpOmC6dFgjHgCh/
-         vz3A==
-X-Gm-Message-State: AOAM531GP3P6scma6L4lJ2Lg82viBORSVJy03bQDPFQUEQ4Siua3RVhM
-        T9wMlEFYH5WWKveuzUZeQQvYZzf6ZGpP1g==
-X-Google-Smtp-Source: ABdhPJwuqe8N1RbR24xkG+UMr2VmXEmUjtK7I8UPHnfnYWcJQEe+Qt1lFaocPxlKztU7Swx3f7MxYg==
-X-Received: by 2002:a05:6602:2ac2:: with SMTP id m2mr2565606iov.103.1643303981279;
-        Thu, 27 Jan 2022 09:19:41 -0800 (PST)
-Received: from x1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id f2sm12839063ilu.79.2022.01.27.09.19.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jan 2022 09:19:40 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NiHrTM8m6eB81b1pCE7srDrvMUba4g0skB5zfMI0lrw=;
+        b=ejYI17UTJ7V6uxlo3dRIHT3lY4iXva5BODk6XH7twF5FyrwloL2H00zHYOCzdIh3mr
+         ooLVfmBJCPFzRGtHA0btllFia3U1K9n5kfUzw33nUG9LWVKZ0y88q6cE6qfnyCrsZ6PK
+         v5wEunuW8wsIwPNED6hrNfug74tqP3nrz1FzQDCxVkl1BmDkktlfyRDsGArqM/ueAnDp
+         IkPvu9Qqg+dVWcZzNf21hlBQW5SZF8IWjiq2/D1tGwBEfWB8+2ebefVqFaIqgmT+dshh
+         Cek/K7A1XOvLgAbcuAADzyxERAoUCFBRk/rCQaN8jRTVi3L7mB75Az5ZTw4i/KEihnU0
+         GJ6Q==
+X-Gm-Message-State: AOAM5334yE+LvAEtkj6TtYFFQchXnOmO0eHi5VioyrchQRFZ+q7t5l0w
+        cD+B37CjJvwmy+zqlFH2ff6srA==
+X-Google-Smtp-Source: ABdhPJwBcX5RQUdOi1bACPk4RQbIXtNWPZgPMzjdQ6FuG+c3n9alVtT2kKIy9lzWbmeLrFJeWk5I4g==
+X-Received: by 2002:a5e:dd41:: with SMTP id u1mr2594293iop.217.1643304504096;
+        Thu, 27 Jan 2022 09:28:24 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m14sm11636401iov.0.2022.01.27.09.28.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jan 2022 09:28:23 -0800 (PST)
+Subject: Re: [PATCH -next V5] blk-mq: fix tag_get wait task can't be awakened
+To:     Guenter Roeck <linux@roeck-us.net>,
+        Laibin Qiu <qiulaibin@huawei.com>
+Cc:     ming.lei@redhat.com, john.garry@huawei.com,
+        martin.petersen@oracle.com, hare@suse.de,
+        akpm@linux-foundation.org, bvanassche@acm.org,
+        andriy.shevchenko@linux.intel.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220113025536.1479653-1-qiulaibin@huawei.com>
+ <20220127013238.GA1478141@roeck-us.net>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20220127070549.1377856-1-hch@lst.de>
-References: <20220127070549.1377856-1-hch@lst.de>
-Subject: Re: [PATCH 1/2] block: remove blk_needs_flush_plug
-Message-Id: <164330398052.211167.14801879231624002504.b4-ty@kernel.dk>
-Date:   Thu, 27 Jan 2022 10:19:40 -0700
+Message-ID: <bb1c7c15-ef4e-8c2f-4c01-758bf186e010@kernel.dk>
+Date:   Thu, 27 Jan 2022 10:28:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220127013238.GA1478141@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 27 Jan 2022 08:05:48 +0100, Christoph Hellwig wrote:
-> blk_needs_flush_plug fails to account for the cb_list, which needs
-> flushing as well.  Remove it and just check if there is a plug instead
-> of poking into the internals of the plug structure.
+On 1/26/22 6:32 PM, Guenter Roeck wrote:
+> Hi,
 > 
+> On Thu, Jan 13, 2022 at 10:55:36AM +0800, Laibin Qiu wrote:
+>> In case of shared tags, there might be more than one hctx which
+>> allocates from the same tags, and each hctx is limited to allocate at
+>> most:
+>>         hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
+>>
+>> tag idle detection is lazy, and may be delayed for 30sec, so there
+>> could be just one real active hctx(queue) but all others are actually
+>> idle and still accounted as active because of the lazy idle detection.
+>> Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
+>> forever on this real active hctx.
+>>
+>> Fix this by recalculating wake_batch when inc or dec active_queues.
+>>
+>> Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
+>> Suggested-by: Ming Lei <ming.lei@redhat.com>
+>> Suggested-by: John Garry <john.garry@huawei.com>
+>> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
 > 
+> I understand this problem has been reported already, but still:
+> 
+> This patch causes a hang in several of my qemu emulations when
+> trying to boot from usb. Reverting it fixes the problem. Bisect log
+> is attached.
+> 
+> Boot logs are available at
+> https://kerneltests.org/builders/qemu-arm-aspeed-master/builds/230/steps/qemubuildcommand/logs/stdio
+> but don't really show much: the affected tests simply hang until they
+> are aborted.
 
-Applied, thanks!
+This one got reported a few days ago, can you check if applying:
 
-[1/2] block: remove blk_needs_flush_plug
-      commit: 1642097f8e40bf81c9c5976879a561eb098fc6d8
-[2/2] block: check that there is a plug in blk_flush_plug
-      commit: 1741f0be918539f186e8262d4bd020629c60b400
+https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.17&id=10825410b956dc1ed8c5fbc8bbedaffdadde7f20
 
-Best regards,
+fixes it for you?
+
 -- 
 Jens Axboe
-
 
