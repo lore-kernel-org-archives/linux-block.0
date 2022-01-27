@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C931FC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 19:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D253DC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 19:07:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245400AbiA0THt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 14:07:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59818 "EHLO
+        id S245420AbiA0THw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 14:07:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27650 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239096AbiA0THt (ORCPT
+        by vger.kernel.org with ESMTP id S239096AbiA0THu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 14:07:49 -0500
+        Thu, 27 Jan 2022 14:07:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643310468;
+        s=mimecast20190719; t=1643310470;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=Mcb+ktGUGJ4HlzXNV8rq6rWy920OMZnuBuYL0YqXQLQ=;
-        b=hm0cCKumtMsDn3dCl/Q1XAajJm+aqGDhYrJYvl9HfVCx5gDfn3wm8ds1wZush6DvDxWaZi
-        0Rkqr6p6py0UJuWXsOWqCZEpyaWIxJuEgVDTXZGbdb01Os5xXcy+u1tzkfLxY5PTPwGnBd
-        135FSdzQKH9+zD2fPlTnPAHjGyJPtRA=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tQTNouHLD2pqrJUsY0rGuooqQ0qZGduHNcta+zU07XE=;
+        b=FRFFPXXe6tbwdCYNEGkqUSyHvZfPRhUiOp2RVRFK9U24xm/dIWU65kfcnJghAntL476i7H
+        2ZPORn4YP7ONm3/UujipAfSb5bI1EJr8+2x48rUankIb7dBpVgyAZyyYfR7SfVEqMx2iVA
+        75HbP6GRG12OT4X42loDgtL//WER3ZM=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-10-_nVZmE3vNLOUMQmLQe7S7A-1; Thu, 27 Jan 2022 14:07:47 -0500
-X-MC-Unique: _nVZmE3vNLOUMQmLQe7S7A-1
-Received: by mail-qk1-f199.google.com with SMTP id d11-20020a37680b000000b0047d87e46f4aso3108918qkc.11
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 11:07:47 -0800 (PST)
+ us-mta-458-8tguTwWvN9Wi41PORefwrQ-1; Thu, 27 Jan 2022 14:07:48 -0500
+X-MC-Unique: 8tguTwWvN9Wi41PORefwrQ-1
+Received: by mail-qt1-f197.google.com with SMTP id d25-20020ac84e39000000b002d1cf849207so2910250qtw.19
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 11:07:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=Mcb+ktGUGJ4HlzXNV8rq6rWy920OMZnuBuYL0YqXQLQ=;
-        b=5r4/1PjzhtY6bE8YcJr3FOXa2shqODDw7Y7+nu/RhOjt+m9DrakL1Un2kuGC7elYBX
-         2m8UzgTka9cM0Qep5aJ28bfYpa7LN/fksFRpztDcSdmUqSbEb+cQohY6yKK3+KL2F2Kt
-         BBzcZNINXo1RwoXqNwsrFdvfmqBWQNQqhDhIWyvnmv5bjRtiVJfva69QXoMYZJP23K1N
-         9IwgWMH6ARxyg4VGyp62vMkbBIvqBeyhS5+gR8f//dXLQJqMmyN5YbFitUIr8Aec305y
-         +IpSl+nU+ankgDmGXCAmLNUAEiOSN8qUHwKPVTzfM8jCmsTv3+1fMrarOccuLY/CicMS
-         eHXA==
-X-Gm-Message-State: AOAM530+MOjGPc0OL2DJ/YEj2SrFdsa79evHKjs/V5DbIDXGlmy0gI5z
-        z3x7XQQamHzsc3p+SG4Ksv6D8HwNG43Jp5TXREb4ziemWVfC54u+RRONAZSAXP1SEX1tJg0aCwr
-        7kYcXU6TI6DmPnbh53qNAIw==
-X-Received: by 2002:a05:6214:c66:: with SMTP id t6mr4716133qvj.19.1643310466551;
-        Thu, 27 Jan 2022 11:07:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxXHG1MTwpN3KTgGPH5X5OglQEa0u195K9rFWI52LePU9Dx+L87Vn0bG74FauJJTD6KSNMkRg==
-X-Received: by 2002:a05:6214:c66:: with SMTP id t6mr4716108qvj.19.1643310466185;
-        Thu, 27 Jan 2022 11:07:46 -0800 (PST)
+        bh=tQTNouHLD2pqrJUsY0rGuooqQ0qZGduHNcta+zU07XE=;
+        b=deCymPRBOyCv7+cWEQGoY3X6XfES4Yb7bzsWflRoeLz5BGHsxM3w+dfedLqYFfRMVF
+         BzMjEdvDpCm1NRRtruXjHQpV1yrNvJDX0kXNlWuSHjebL9uFxy0It4R58ODfQ7hRAA2V
+         lUnREHfT5JIqetl/qyPbHqK6JxNykZMuO1hvGCz7Ap/y3D82KVOdxv9e/VpVR4bVIiYz
+         xehAd628P9wsnusTA2M3Do3wtl/vLkEuNokq5SvEWjyUXtxGgQesKb4fTC26T9nLsIi1
+         Ik1dlZfZCRtQjoeOOO0MyVyJkmNOQl6/kwU8EN4spmTls0/QQvqZ5lDkEjGONbQW/syn
+         foKA==
+X-Gm-Message-State: AOAM531BIPfbQw3tpe9mThoCxdNalwiTb/y/iWP+jwxOd9T5iWmHrUIp
+        TV9SgTvhR5IG++ZXf3g0rNGdm1Vg1fjlM5EmgLIfu76r27Hq7paZDMxt59h/dp1tmN2kPgz6hj5
+        AEGN37fICeVxG2Ktj4fdn4g==
+X-Received: by 2002:a05:6214:5283:: with SMTP id kj3mr4186782qvb.44.1643310467909;
+        Thu, 27 Jan 2022 11:07:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxLXfr5ejiKHZx1ikK0AjZiulBItlwcYvACwkbT0h4rgqFSKIcHUzV6pNWRSgRjrkRpIubxgg==
+X-Received: by 2002:a05:6214:5283:: with SMTP id kj3mr4186766qvb.44.1643310467651;
+        Thu, 27 Jan 2022 11:07:47 -0800 (PST)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id d13sm1891974qte.77.2022.01.27.11.07.45
+        by smtp.gmail.com with ESMTPSA id r3sm1816610qkm.56.2022.01.27.11.07.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jan 2022 11:07:45 -0800 (PST)
+        Thu, 27 Jan 2022 11:07:47 -0800 (PST)
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     axboe@kernel.dk
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 1/3] block: add __bio_start_io_acct() to control start_time
-Date:   Thu, 27 Jan 2022 14:07:40 -0500
-Message-Id: <20220127190742.12776-2-snitzer@redhat.com>
+Subject: [PATCH 2/3] dm: revert partial fix for redundant bio-based IO accounting
+Date:   Thu, 27 Jan 2022 14:07:41 -0500
+Message-Id: <20220127190742.12776-3-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20220127190742.12776-1-snitzer@redhat.com>
 References: <20220127190742.12776-1-snitzer@redhat.com>
@@ -63,90 +63,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__bio_start_io_acct() interface is like bio_start_io_acct() that
-allows start_time to be passed in. This gives drivers the ability to
-defer starting accounting until after IO is issued (but possibily not
-entirely due to bio splitting).
+Reverts a1e1cb72d9649 ("dm: fix redundant IO accounting for bios that
+need splitting") because it was too narrow in scope (only addressed
+redundant 'sectors[]' accounting and not ios, nsecs[], etc).
 
+Cc: stable@vger.kernel.org
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- block/blk-core.c       | 27 ++++++++++++++++++++-------
- include/linux/blkdev.h |  1 +
- 2 files changed, 21 insertions(+), 7 deletions(-)
+ drivers/md/dm.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 97f8bc8d3a79..18cd12fee67d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1060,21 +1060,30 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
- 	}
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index c0ae8087c602..9849114b3c08 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1442,9 +1442,6 @@ static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
+ 	ci->sector = bio->bi_iter.bi_sector;
  }
  
--static unsigned long __part_start_io_acct(struct block_device *part,
--					  unsigned int sectors, unsigned int op)
-+static void __part_start_io_acct(struct block_device *part, unsigned int sectors,
-+				 unsigned int op, unsigned long start_time)
- {
- 	const int sgrp = op_stat_group(op);
--	unsigned long now = READ_ONCE(jiffies);
- 
- 	part_stat_lock();
--	update_io_ticks(part, now, false);
-+	update_io_ticks(part, start_time, false);
- 	part_stat_inc(part, ios[sgrp]);
- 	part_stat_add(part, sectors[sgrp], sectors);
- 	part_stat_local_inc(part, in_flight[op_is_write(op)]);
- 	part_stat_unlock();
-+}
- 
--	return now;
-+/**
-+ * __bio_start_io_acct - start I/O accounting for bio based drivers
-+ * @bio:	bio to start account for
-+ * @start_time:	start time that should be passed back to bio_end_io_acct().
-+ */
-+void __bio_start_io_acct(struct bio *bio, unsigned long start_time)
-+{
-+	__part_start_io_acct(bio->bi_bdev, bio_sectors(bio),
-+			     bio_op(bio), start_time);
- }
-+EXPORT_SYMBOL_GPL(__bio_start_io_acct);
- 
- /**
-  * bio_start_io_acct - start I/O accounting for bio based drivers
-@@ -1084,14 +1093,18 @@ static unsigned long __part_start_io_acct(struct block_device *part,
+-#define __dm_part_stat_sub(part, field, subnd)	\
+-	(part_stat_get(part, field) -= (subnd))
+-
+ /*
+  * Entry point to split a bio into clones and submit them to the targets.
   */
- unsigned long bio_start_io_acct(struct bio *bio)
- {
--	return __part_start_io_acct(bio->bi_bdev, bio_sectors(bio), bio_op(bio));
-+	unsigned long now = READ_ONCE(jiffies);
-+	__bio_start_io_acct(bio, now);
-+	return now;
- }
- EXPORT_SYMBOL_GPL(bio_start_io_acct);
+@@ -1480,18 +1477,6 @@ static void __split_and_process_bio(struct mapped_device *md,
+ 						  GFP_NOIO, &md->queue->bio_split);
+ 			ci.io->orig_bio = b;
  
- unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
- 				 unsigned int op)
- {
--	return __part_start_io_acct(disk->part0, sectors, op);
-+	unsigned long now = READ_ONCE(jiffies);
-+	__part_start_io_acct(disk->part0, sectors, op, now);
-+	return now;
- }
- EXPORT_SYMBOL(disk_start_io_acct);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9c95df26fc26..ed3cd5f7f984 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1258,6 +1258,7 @@ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
- void disk_end_io_acct(struct gendisk *disk, unsigned int op,
- 		unsigned long start_time);
- 
-+void __bio_start_io_acct(struct bio *bio, unsigned long start_time);
- unsigned long bio_start_io_acct(struct bio *bio);
- void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
- 		struct block_device *orig_bdev);
+-			/*
+-			 * Adjust IO stats for each split, otherwise upon queue
+-			 * reentry there will be redundant IO accounting.
+-			 * NOTE: this is a stop-gap fix, a proper fix involves
+-			 * significant refactoring of DM core's bio splitting
+-			 * (by eliminating DM's splitting and just using bio_split)
+-			 */
+-			part_stat_lock();
+-			__dm_part_stat_sub(dm_disk(md)->part0,
+-					   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
+-			part_stat_unlock();
+-
+ 			bio_chain(b, bio);
+ 			trace_block_split(b, bio->bi_iter.bi_sector);
+ 			submit_bio_noacct(bio);
 -- 
 2.15.0
 
