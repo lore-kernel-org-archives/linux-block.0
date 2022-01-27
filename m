@@ -2,63 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DCDC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 02:45:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7377CC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 02:47:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232954AbiA0Cpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 21:45:38 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:32064 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbiA0Cph (ORCPT
+        id S235133AbiA0CrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 21:47:08 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:55046 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230049AbiA0CrI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 21:45:37 -0500
-Received: from kwepemi500019.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JklGX36yRz1FCpq;
-        Thu, 27 Jan 2022 10:41:40 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500019.china.huawei.com (7.221.188.117) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 27 Jan 2022 10:45:35 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 27 Jan 2022 10:45:34 +0800
-Subject: Re: [PATCH v6 2/2] block: cancel all throttled bios in del_gendisk()
-To:     Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
-CC:     <mkoutny@suse.com>, <paulmck@kernel.org>, <axboe@kernel.dk>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220110134758.2233758-1-yukuai3@huawei.com>
- <20220110134758.2233758-3-yukuai3@huawei.com> <Yd5FkuhYX9YcgQkZ@T590>
- <b416e6a6-f2c9-caf3-dacd-f937746207da@huawei.com>
- <YfF+yukISfkuc9IK@slm.duckdns.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <630c162b-8bdd-d87e-0d80-c7a78ea267a5@huawei.com>
-Date:   Thu, 27 Jan 2022 10:45:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 26 Jan 2022 21:47:08 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id AB2D621905;
+        Thu, 27 Jan 2022 02:47:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643251625; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yDPdolIqP1BqbqmgH35S+RrYDCrJz/kAXtj6i96pLsQ=;
+        b=hAN5Dg0REL/K5jKsVHYqM3X+M7oL7DolmPiPn5nkKXAbr4U3cj5oAi65hMwxiSWo27QmOB
+        cLQTty8i2cI986CYr180STDwieVyetu7kQ3qHdYo7SeahuPrc14qirLFBA73zPbrr4po2f
+        zGgWZWBXgqAPi8k0xRaMTCQlkN1djpM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643251625;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yDPdolIqP1BqbqmgH35S+RrYDCrJz/kAXtj6i96pLsQ=;
+        b=x6ydMXUFPK4DvzDKO6csSNrS9nejdxdCvtHG4Sf6wjFPHRmP2fhorasjEjQ6+4R4FunEK1
+        J47b6RQj8pZ6MXBg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E280813E46;
+        Thu, 27 Jan 2022 02:46:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id d+tYJ6IH8mGjKwAAMHmgww
+        (envelope-from <neilb@suse.de>); Thu, 27 Jan 2022 02:46:58 +0000
+Subject: [PATCH 0/9] Remove remaining parts of congestions tracking code.
+From:   NeilBrown <neilb@suse.de>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Date:   Thu, 27 Jan 2022 13:46:29 +1100
+Message-ID: <164325106958.29787.4865219843242892726.stgit@noble.brown>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-In-Reply-To: <YfF+yukISfkuc9IK@slm.duckdns.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/01/27 1:03, Tejun Heo Ð´µÀ:
-> On Mon, Jan 24, 2022 at 11:50:11AM +0800, yukuai (C) wrote:
->> Both ways can fix the problem, which way do you prefer?
-> 
-> Ming's suggested change seems simpler, no?
+Congestion hasn't been reliably tracked for quite some time.
+Most MM uses of it for guiding writeback decisions were removed in 5.16.
+Some other uses were removed in 17-rc1.
 
-Hi,
+This series removes the remaining places that test for congestion, and
+the few places which still set it.
 
-Yes, if Ming don't mind, I can send a new version after Ming's
-pathset "block: don't drain file system I/O on del_gendisk".
+The second patch touches a few filesystems.  I didn't think there was
+much value in splitting this out by filesystems, but if maintainers
+would rather I did that, I will.
+
+The f2fs, cephfs, fuse, NFS, and block patches can go through the
+respective trees proving the final patch doesn't land until after they
+all do - so maybe it should be held for 5.18-rc2 if all the rest lands
+by 5.18-rc1.
 
 Thanks,
-Kuai
+NeilBrown
+
+---
+
+NeilBrown (9):
+      Remove inode_congested()
+      Remove bdi_congested() and wb_congested() and related functions
+      f2fs: change retry waiting for f2fs_write_single_data_page()
+      f2f2: replace some congestion_wait() calls with io_schedule_timeout()
+      cephfs: don't set/clear bdi_congestion
+      fuse: don't set/clear bdi_congested
+      NFS: remove congestion control.
+      block/bfq-iosched.c: use "false" rather than "BLK_RW_ASYNC"
+      Remove congestion tracking framework.
+
+
+ block/bfq-iosched.c              |  2 +-
+ drivers/block/drbd/drbd_int.h    |  3 --
+ drivers/block/drbd/drbd_req.c    |  3 +-
+ fs/ceph/addr.c                   | 27 ---------------
+ fs/ceph/super.c                  |  2 --
+ fs/ceph/super.h                  |  2 --
+ fs/ext2/ialloc.c                 |  2 --
+ fs/f2fs/compress.c               |  6 ++--
+ fs/f2fs/data.c                   |  9 +++--
+ fs/f2fs/segment.c                | 14 ++++----
+ fs/f2fs/super.c                  |  8 ++---
+ fs/fuse/control.c                | 17 ----------
+ fs/fuse/dev.c                    |  8 -----
+ fs/nfs/sysctl.c                  |  7 ----
+ fs/nfs/write.c                   | 53 +----------------------------
+ fs/nilfs2/segbuf.c               | 11 ------
+ fs/xfs/xfs_buf.c                 |  3 --
+ include/linux/backing-dev-defs.h |  8 -----
+ include/linux/backing-dev.h      | 28 ----------------
+ include/linux/nfs_fs.h           |  1 -
+ include/linux/nfs_fs_sb.h        |  1 -
+ include/trace/events/writeback.h | 28 ----------------
+ mm/backing-dev.c                 | 57 --------------------------------
+ mm/vmscan.c                      |  4 +--
+ 24 files changed, 25 insertions(+), 279 deletions(-)
+
+--
+Signature
+
