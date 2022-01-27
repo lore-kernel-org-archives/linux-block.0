@@ -2,82 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAD1C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 20:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7E0C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 21:38:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239817AbiA0UBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 15:01:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
+        id S1344435AbiA0ViU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 16:38:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234736AbiA0UBc (ORCPT
+        with ESMTP id S1344424AbiA0ViU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 15:01:32 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E31EC061714
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 12:01:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YfYqh5AXegFPSYmmpGCNINSsy5Jd2eg32j3jvkQd3As=; b=csFk+qUpLHubPzNbGwN1Gol4Rx
-        e2B3p5i0RvKmyUIyrLJyNypMGMNDO1iq1L2NG8SZXHsfdAER60M62//P+cOoxyy7e1EODx+/oa8XC
-        caVxdHKeU2kVXf76dSqi7bfNjJ+QsaSyJcw7QD7wVvm1dpCU3HwlwJ525G2IO0koNw9PYxSZam+6y
-        TJleGZFS7H8NrQWL3V1vOK8ChwZ5o5W/UdVp6pUNiig4HEi/mjZVKv7Rj0pOvARc3xe3hLbHRp1nQ
-        xcbqPBk/A9O6WrfYmBvToei1UlI8OXb5Z3r2HxJzvZbLR17DHDAzBLUGXpXgzrMw8sjjH0dqjulyl
-        0I6rY0EA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nDAxW-00H0Y1-CQ; Thu, 27 Jan 2022 20:01:30 +0000
-Date:   Thu, 27 Jan 2022 12:01:30 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [dm-devel] [PATCH 1/3] block: add __bio_start_io_acct() to
- control start_time
-Message-ID: <YfL6GgqQPqj7jxbF@infradead.org>
-References: <20220127190742.12776-1-snitzer@redhat.com>
- <20220127190742.12776-2-snitzer@redhat.com>
+        Thu, 27 Jan 2022 16:38:20 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB875C061753;
+        Thu, 27 Jan 2022 13:38:19 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id y15so7872257lfa.9;
+        Thu, 27 Jan 2022 13:38:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=z+U+izVFukrEKq10kL5qCCsiT3qJmeLAo+mnNrOVCPU=;
+        b=DwtRea8LCCOg/PGJHjd1bTltmn0bHa2clILkAwGYtZppoAY25qIBMTxyD6B5uMLit6
+         7wk+d+sZiWX35l8wQaAoyrJ9H5CizW30SYci3NU1ojzD14qB67btK2MGpyfbQ3U8Fswu
+         zxqpCDGkYCIAg/NDZ5r6/eIuacbMkuvBlqu9ammCZDYbuScyx0/VXZFI/czsoS4aCdCY
+         RzPo3aqhubsJoGDCZLj5SmdkiGyLla36RWFVNiU5MVGZ7MrbcY5xEOS4+eUv/n2M8qYN
+         MVuY5Y428ZMyJxOjYYJ1BtbtHPjLQ+HBbJ/bfmBPwl0UHF3vKl1N9F7XDbteSxFshMZ6
+         OfIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=z+U+izVFukrEKq10kL5qCCsiT3qJmeLAo+mnNrOVCPU=;
+        b=Nz0EAoWz0IU/5WY3XHQMld9RLIE6u7H0aYgobmmD8kamzGg4mtcs2vPs82+vygFZBt
+         wetvkYu+4j9dTaJ+VCqIfs5TCKyUN4YPJhhpFIH4rkOsDCTQh7BDs7XqOYs50TyyyVFm
+         nC+2yi1kUgxt+ZfZV/8/FqNnFNnAsHoHevE+n702XoJS7fGe0IrVPUkPN0lus3Q4qxdr
+         PX3/2VPJswkQk2VdBHhf6k+P/rPrT1KL0RlchBhA90Jz7wCUp0RRHY8kkO+0NBL5zldr
+         lkh6ZRtsqBJuYMN5eJHnWQKpXysNyQ7MNgZ8/GjmNUq2NRaHwAYPlQKy5K58rmQ7BpyR
+         A2LQ==
+X-Gm-Message-State: AOAM531sNM8rAlW1WGBQD6c5OKhWmvFn7lvHDDkZeQpPog30lN0stT46
+        OZ2Sn9M3UNT1e1PT386yBetUxlKU3IzyQDGjJf4=
+X-Google-Smtp-Source: ABdhPJxaVoQ4SfBVmSOjFCGrgluhZGplrFWaRNqk5pMVob8JHRQWRWEKNtxwMeMPmpBWjy5SR70YaIdo0zrC/X/8wRA=
+X-Received: by 2002:ac2:58f7:: with SMTP id v23mr4043478lfo.390.1643319497799;
+ Thu, 27 Jan 2022 13:38:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220127190742.12776-2-snitzer@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20220124091107.642561-1-hch@lst.de> <20220124091107.642561-3-hch@lst.de>
+In-Reply-To: <20220124091107.642561-3-hch@lst.de>
+From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date:   Fri, 28 Jan 2022 06:38:05 +0900
+Message-ID: <CAKFNMomoLqbbOwg5d6aBHCyGT5v+NF=N2Rm3QwYk8NDXsoJHtA@mail.gmail.com>
+Subject: Re: [PATCH 02/19] nilfs2: remove nilfs_alloc_seg_bio
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Md . Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.co>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        linux-block@vger.kernel.org,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-nilfs <linux-nilfs@vger.kernel.org>, ntfs3@lists.linux.dev,
+        xen-devel@lists.xenproject.org, drbd-dev@lists.linbit.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -static unsigned long __part_start_io_acct(struct block_device *part,
-> -					  unsigned int sectors, unsigned int op)
-> +static void __part_start_io_acct(struct block_device *part, unsigned int sectors,
-> +				 unsigned int op, unsigned long start_time)
+On Mon, Jan 24, 2022 at 6:11 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> bio_alloc will never fail when it can sleep.  Remove the now simple
+> nilfs_alloc_seg_bio helper and open code it in the only caller.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/nilfs2/segbuf.c | 31 ++++---------------------------
+>  1 file changed, 4 insertions(+), 27 deletions(-)
 
-Please avoid the overly long line.
+Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
 
-> +/**
-> + * __bio_start_io_acct - start I/O accounting for bio based drivers
-> + * @bio:	bio to start account for
-> + * @start_time:	start time that should be passed back to bio_end_io_acct().
-> + */
-> +void __bio_start_io_acct(struct bio *bio, unsigned long start_time)
+Thanks!
 
-I'd name this something like bio_start_io_acct_time to be a little more
-descriptive
-
-> +	unsigned long now = READ_ONCE(jiffies);
-> +	__bio_start_io_acct(bio, now);
-> +	return now;
-
-Plase add an empty line after the variable declaration.
-
->  }
->  EXPORT_SYMBOL_GPL(bio_start_io_acct);
->  
->  unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
->  				 unsigned int op)
->  {
-> -	return __part_start_io_acct(disk->part0, sectors, op);
-> +	unsigned long now = READ_ONCE(jiffies);
-> +	__part_start_io_acct(disk->part0, sectors, op, now);
-> +	return now;
-
-I wonder if just returning the passed in time from __part_start_io_acct
-wouldn't be a bit cleaner to avoid all the extra local variables.
+Ryusuke Konishi
