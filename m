@@ -2,77 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99EAC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 16:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AD3C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 16:52:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238560AbiA0QuJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 11:50:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234585AbiA0QuJ (ORCPT
+        id S244023AbiA0Qw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 11:52:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45149 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234331AbiA0Qw4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 11:50:09 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E09C061714;
-        Thu, 27 Jan 2022 08:50:09 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0D867B80D70;
-        Thu, 27 Jan 2022 16:50:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A626DC340E4;
-        Thu, 27 Jan 2022 16:50:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643302206;
-        bh=+LfawAXH2gQ2TbaBe0JzcDv1nk+wJZIKhVlzd3yjN3o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WEV6/ULnIBTF21Cu/tQMvjDCUQvSt/tw/O27j3yer9tnQjcjP/u5OzHLSSJnbuCes
-         YqlW+6zNxyKvo26d1zZ/18437Q9hxS+beXnufa1GqQXxwJGioO7RUb0KB35zjo/47p
-         CcpzxJO/nx2gd+8m+eUYjiV7qeO79jvXL4tzWGHbxaKrqu3a7tQqlstrBVe87voS7o
-         6/+USzNCzdhIzH5gv7ueMRUenPGE/r9QF0A6mVRCDFJvgZ5jbVvaA2CJZQUIfozLit
-         ZWmTVUWpNND9inSy4ZyCPtRymKLyURfc12/MWq8/RIRALhF4KcDwvfVA23tThglYDS
-         cMyd3tpKt9KXQ==
-Date:   Thu, 27 Jan 2022 08:50:05 -0800
-From:   "Darrick J. Wong" <djwong@kernel.org>
+        Thu, 27 Jan 2022 11:52:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643302375;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AGOKQqcuQhkDwTPU+rhG3/lUwVIbdjyWIj81munfXW0=;
+        b=VmRpdIyd0xvMY5AG/PvMJ/LgB5XpiN9VoyU1eK07v8Qcv2mLjq3PAYKzlXy6rbI9lRes52
+        pb5Kv/kv8KZycePenDYmxBNn6NWaDK7E9Rjb1TA2izv/3Nw3mRD+8B/GFzCzGMmToFhhNC
+        rab+AKj8XSjkSmDJEFmSWfZkGTRLP5M=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-208-xW7JUHUMNIGcQq2PtTfKMg-1; Thu, 27 Jan 2022 11:52:53 -0500
+X-MC-Unique: xW7JUHUMNIGcQq2PtTfKMg-1
+Received: by mail-qk1-f197.google.com with SMTP id g3-20020a05620a108300b0047e16fc0d6cso2813111qkk.3
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 08:52:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AGOKQqcuQhkDwTPU+rhG3/lUwVIbdjyWIj81munfXW0=;
+        b=TMgZbhpvKaIbJpHk3uV5P1QYDkhf8Pekm5qo8En5qbhxNsXj6fH4f4ctbX+PXVLWmM
+         /OSMcjDojzrbFnHt9EUT9pBfjgMEAz5nyXkfkR7UvAHEP+6hS1hwoj87LG1eYKjw3hzZ
+         x+SdRqi/7Xnd2LK1J5wDeQ7m4Mq0AehABTOht/bd7rImRcUwceNlpIRPZWoeJQWZBFmT
+         6auZiJbLNKLx8Wy5Z4XkU+bz89Gut20hcBp3UPDsgC9Hdz6dmHrFMBwkNMQUL4hdhLXv
+         FLT/sK6ERcmETZlXEemWaqb4B7g6P/NFiv0ijl21ENl8/r8bH9ASLg7DR4Cnf4SgkYx7
+         Fp9g==
+X-Gm-Message-State: AOAM5334WUAMc8Y7bjmf4H6VrjnJWNN6pq/VFoln2mHTs/2LiAqINo/2
+        5hUtdi41kqelWTLl1V14cJ1KaC8vKbBOe+2y+RGSvTIraEWrbYoDtA15ooVu7qXOFadJNjLV1kz
+        HqTyk3Be/Ybjgi0GAAUD2qA==
+X-Received: by 2002:a0c:fa09:: with SMTP id q9mr4322350qvn.21.1643302373426;
+        Thu, 27 Jan 2022 08:52:53 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw2rtqqWw8vSSkq/pAGCHoYHXJ1BiURlAQlul/eODmSBNf8OGMbqxmxG8mMS7PpEMI9YH9jUw==
+X-Received: by 2002:a0c:fa09:: with SMTP id q9mr4322338qvn.21.1643302373224;
+        Thu, 27 Jan 2022 08:52:53 -0800 (PST)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id y15sm826432qtx.28.2022.01.27.08.52.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jan 2022 08:52:52 -0800 (PST)
+Date:   Thu, 27 Jan 2022 11:52:51 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, xfs <linux-xfs@vger.kernel.org>
-Subject: Re: yet another approach to fix loop autoclear for xfstets xfs/049
-Message-ID: <20220127165005.GE13540@magnolia>
-References: <20220126155040.1190842-1-hch@lst.de>
- <20220126193840.GA2761985@magnolia>
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com
+Subject: Re: improve the bio cloning interface
+Message-ID: <YfLN4/2bYe4hebCy@redhat.com>
+References: <20220127063546.1314111-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220126193840.GA2761985@magnolia>
+In-Reply-To: <20220127063546.1314111-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 11:38:40AM -0800, Darrick J. Wong wrote:
-> On Wed, Jan 26, 2022 at 04:50:32PM +0100, Christoph Hellwig wrote:
-> > Hi Jens, hi Tetsuo,
-> > 
-> > this series uses the approach from Tetsuo to delay the destroy_workueue
-> > cll, extended by a delayed teardown of the workers to fix a potential
-> > racewindow then the workqueue can be still round after finishing the
-> > commands.  It then also removed the queue freeing in release that is
-> > not needed to fix the dependency chain for that (which can't be
-> > reported by lockdep) as well.
+On Thu, Jan 27 2022 at  1:35P -0500,
+Christoph Hellwig <hch@lst.de> wrote:
+
+> Hi Jens,
 > 
-> [add xfs to cc list]
+> this series changes the bio cloning interface to match the rest changes
+> to the bio allocation interface and passes the block_device and operation
+> to the cloning helpers.  In addition it renames the cloning helpers to
+> be more descriptive.
 > 
-> This fixes all the regressions I've been seeing in xfs/049 and xfs/073,
-> thank you.  I'll give this a spin with the rest of fstests overnight.
+> To get there it requires a bit of refactoring in the device mapper code.
 
-After an overnight run with 5.17-rc1 + {xfs,iomap}-for-next + this patchset,
-fstests is back to normal.
+I'd like to take a closer look, do you happen to have this series
+available in a git branch?
 
-Tested-by: Darrick J. Wong <djwong@kernel.org>
+The changes generally look fine.  Any chance you could forecast what
+you're planning for follow-on changes?
 
---D
+Or is it best to just wait for you to produce those follow-on changes?
 
-> 
-> --D
+Thanks,
+Mike
+
