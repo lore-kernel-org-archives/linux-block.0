@@ -2,171 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2BCC28CF5
-	for <linux-block@archiver.kernel.org>; Wed, 26 Jan 2022 19:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD09C43217
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 00:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244559AbiAZTy4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 14:54:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234640AbiAZTy4 (ORCPT
+        id S231587AbiA0AvZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 19:51:25 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:53086 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231533AbiA0AvZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 14:54:56 -0500
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E4CC061747
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 11:54:55 -0800 (PST)
-Received: by mail-qv1-xf36.google.com with SMTP id i19so797900qvx.12
-        for <linux-block@vger.kernel.org>; Wed, 26 Jan 2022 11:54:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :content-transfer-encoding;
-        bh=/b9yrYylsR3IXw2MBkgKmnslMTaks1EUQq+pWFo3vMU=;
-        b=jIM+Tc+JfN7AxN6yCV944hevmEwbziOmVrsSDKFKhxcK5czEdfwuGa1+JKEm5p153D
-         slLmda6m/yCZO8ZIHlLZl6IqweIwHdlxDpwmS9sacFA2fhuXmFY8LEFoX+85O/+Bx4OE
-         iGciw+hNYyVKtUVlJOaV2lZ+sKD0MAsMcI/LQl+lQZdZ70jf6CnR8vIw7OtQFvUwfrZJ
-         lhlzFUgt9mOyvy8aEn4Oyx65EgV/2T/N1fYGTTkn2R2iHkCpwr0QXQR7i6xi6krzpt4Q
-         B7QgV0Cbl2yPbyxMuyZmyWX6EsCRk/5btemPGasR9kB/RKqdVkmYF45VVp+Q7EiGvBjs
-         T3MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:content-transfer-encoding;
-        bh=/b9yrYylsR3IXw2MBkgKmnslMTaks1EUQq+pWFo3vMU=;
-        b=Vi8r0rGN5fs+3sXwp7S/yS2L2sx4YdYMX232rwblO0kfvylHxasHgUXZHsrduzNeLW
-         M95LIdLu10YA+7ORIUS+kk35dxS3l7mzpg43b72VUMzzmj2Vav6rpYVOoDekcOAQQZK7
-         wfFyRpej64ygfgAYzdnLfj/aKQOM5b/Dfpcz402l018d1n/Motkdo4AUb7aYENq785K4
-         J9t6n4AIWmbbFdIlSxkMLgZgVW4rBDJ3sW0drIjnb3XcvSQnOl1FYly5vMT9KaozGR9i
-         SD6IJi1tFJSIdRpb2KghyFu/xQI5b639UPUS+R5Ab4d42ihgGepdo4jqNfXhnexgrG3y
-         P0RA==
-X-Gm-Message-State: AOAM532L2GvaKPBPCIfEs+9Hsqmuxf4doU19Ok7LI2810mYP8R8bVbZT
-        a4iFyMyG5Rpun7uV4c7JlkmH6g==
-X-Google-Smtp-Source: ABdhPJzDiy8lWJPalTqmHodK4vLPsn5OI+iOGQeHou4Hn9uAp27KEpv7ql8yuu4Af0KUxh9Hg0NE3g==
-X-Received: by 2002:a05:6214:e45:: with SMTP id o5mr364368qvc.10.1643226894754;
-        Wed, 26 Jan 2022 11:54:54 -0800 (PST)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id bs33sm148633qkb.103.2022.01.26.11.54.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jan 2022 11:54:54 -0800 (PST)
-Date:   Wed, 26 Jan 2022 14:54:53 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     lsf-pc@lists.linuxfoundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, bpf@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: LSF/MM/BPF: 2022: Call for Proposals
-Message-ID: <YfGnDRM/Pe4jzbSr@localhost.localdomain>
+        Wed, 26 Jan 2022 19:51:25 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7E2EA61B60;
+        Thu, 27 Jan 2022 00:51:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92875C340E3;
+        Thu, 27 Jan 2022 00:51:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643244683;
+        bh=4Mfk12KQfEEtPKhz5q6wmn/51AroOcN3gjCZnA6JALI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tJ2g3KAU1gh48p97de8DlKNDKULc0D7dZ+zKnvFrJVx5VzYeuPpKZ3f/emBbFQQyb
+         7Q9QUN6h2yerWnY4PPDdviQJT4AOXTGYtCHg0fxukUux66gfKxHq4hZCVmB+yRBocL
+         TuWNvNGnCsUcJrQPda9IRFJq+7zf1LOYCSLrG4H/4AchxSDkFEyk1x6wWzYwqrgKHF
+         wv9g7wVHD8WkFd3VD0jgGQdb/ADZ/ppxdvKx/xOnVjrQv+2GwQ/GTNJyI4sRQINki1
+         +QKi3pozZw4Ow3PfCNr8MWU6X37xwqz3JaY5et9pIaTvCqnwb7RXGY206z04pFk+fY
+         yhTPXC8Y/XD2Q==
+Date:   Wed, 26 Jan 2022 16:51:22 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gaurav Kashyap <gaurkash@qti.qualcomm.com>
+Cc:     "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "thara.gopinath@linaro.org" <thara.gopinath@linaro.org>,
+        "Neeraj Soni (QUIC)" <quic_neersoni@quicinc.com>,
+        Dinesh Garg <dineshg@quicinc.com>
+Subject: Re: [PATCH 00/10] Add wrapped key support for Qualcomm ICE
+Message-ID: <YfHsimSOxedhRBdI@sol.localdomain>
+References: <20211206225725.77512-1-quic_gaurkash@quicinc.com>
+ <YddHbRx2UGeAOhji@sol.localdomain>
+ <BYAPR02MB4071D51F6DFB371E46E424ACE24C9@BYAPR02MB4071.namprd02.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <BYAPR02MB4071D51F6DFB371E46E424ACE24C9@BYAPR02MB4071.namprd02.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The annual Linux Storage, Filesystem, Memory Management, and BPF
-(LSF/MM/BPF) Summit for 2022 will be held from May 2 to May 4 at The
-Margaritaville Resort Palm Springs in Palm Springs, California.
-LSF/MM/BPF is an invitation-only technical workshop to map out
-improvements to the Linux storage, filesystem, BPF, and memory
-management subsystems that will make their way into the mainline kernel
-within the coming years.
+Hi Gaurav,
 
-COVID is at the front of our minds as we attempt to put together the
-best and safest conference we can arrange.  The logistics of how to hold
-an in person event will change and evolve as we get closer to the actual
-date, but rest assured we will do everything recommended by public
-health officials.
+On Thu, Jan 06, 2022 at 09:14:22PM +0000, Gaurav Kashyap wrote:
+> Hey Eric
+> 
+> > Have you tested that QCOM_SCM_ES_DERIVE_SW_SECRET is working properly?
+> 
+> - You will need updated trustzone build for that (as I was missing a minor detail in the original one pertaining to SW secret) , please request again on the same ticket for the updated build.
+> - I have reminded the people in Qualcomm too to provide you the build.
+> - Note that with the new build you should be using the correct directions, i.e QCOM_SCM_RO where intended
+> 
+> Warm Regards
+> Gaurav Kashyap
+> 
 
-LSF/MM/BPF 2022 will be a three day, stand-alone conference with four
-subsystem-specific tracks, cross-track discussions, as well as BoF and
-hacking sessions.
+I verified that the latest TrustZone build is working; thanks for the help!
 
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
+Note, these are the branches I'm using for now:
 
-If advance notice is required for visa applications then please point
-that out in your proposal or request to attend, and submit the topic as
-soon as possible.
+  * Kernel patches: https://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git/log/?h=wip-wrapped-keys
+  * fscryptctl tool and test scripts: https://github.com/ebiggers/fscryptctl/tree/wip-wrapped-keys
 
-This years instructions are similar to our previous attempts.  We're
-asking that you please let us know you want to be invited by March 1,
-2022.  We realize that travel is an ever changing target, but it helps
-us get an idea of possible attendance numbers.  Clearly things can and
-will change, so consider the request to attend deadline more about
-planning and less about concrete plans.
+The kernel branch is based on v5.17-rc1.  I haven't changed your patches from
+your latest series other than rebasing them and adding a fix
+"qcom_scm: fix return values" on top.
 
-1) Fill out the following Google form to request attendance and
-suggest any topics
+Note that v5.16-rc5 and later have a bug where the UFS controller on SM8350
+isn't recognized.  Therefore, my branch contains a fix from Bjorn Andersson for
+that bug, which I applied from the mailing list.
 
-	https://forms.gle/uD5tbZYGpaRXPnE19
+One oddity I noticed is that if I import the same raw key twice, the long-term
+wrapped key blob is the same.  This implies that the key encryption algorithm
+used by the Qualcomm hardware is deterministic, which is unexpected.  I would
+expect the wrapped key to contain a random nonce.  Do you know why deterministic
+encryption is used?  This probably isn't much of a problem, but it's unexpected.
 
-In previous years we have accidentally missed people's attendance
-requests because they either didn't cc lsf-pc@ or we simply missed them
-in the flurry of emails we get.  Our community is large and our
-volunteers are busy, filling this out will help us make sure we don't
-miss anybody.
+Besides that, I think the next steps are for you to address the comments I've
+left on this series, and for me to get started on adding ciphertext verification
+tests for this to xfstests (alongside the other fscrypt ciphertext verification
+tests that are already there) so that we can prove this feature is actually
+encrypting the data as intended.
 
-2) Proposals for agenda topics should still be sent to the following
-lists to allow for discussion among your peers.  This will help us
-figure out which topics are important for the agenda.
-
-        lsf-pc@lists.linux-foundation.org
-
-and CC the mailing lists that are relevant for the topic in question:
-
-        FS:     linux-fsdevel@vger.kernel.org
-        MM:     linux-mm@kvack.org
-        Block:  linux-block@vger.kernel.org
-        ATA:    linux-ide@vger.kernel.org
-        SCSI:   linux-scsi@vger.kernel.org
-        NVMe:   linux-nvme@lists.infradead.org
-        BPF:    bpf@vger.kernel.org
-
-Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier to
-track. In addition, please make sure to start a new thread for each
-topic rather than following up to an existing one. Agenda topics and
-attendees will be selected by the program committee, but the final
-agenda will be formed by consensus of the attendees on the day.
-
-We will try to cap attendance at around 25-30 per track to facilitate
-discussions although the final numbers will depend on the room sizes
-at the venue.
-
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks; the sessions are supposed to be
-interactive, inclusive discussions.
-
-There will be no recording or audio bridge. However, we expect that
-written minutes will be published as we did in previous years:
-
-2019: https://lwn.net/Articles/lsfmm2019/
-
-2018: https://lwn.net/Articles/lsfmm2018/
-
-2017: https://lwn.net/Articles/lsfmm2017/
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-3) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-        lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-        Josef Bacik (Filesystems)
-        Amir Goldstein (Filesystems)
-        Martin K. Petersen (Storage)
-        Omar Sandoval (Storage)
-        Michal Hocko (MM)
-        Dan Williams (MM)
-        Alexei Starovoitov (BPF)
-        Daniel Borkmann (BPF)
+- Eric
