@@ -2,203 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8756FC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 01:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB22BC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 01:32:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234480AbiA0Ba7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Jan 2022 20:30:59 -0500
-Received: from lgeamrelo13.lge.com ([156.147.23.53]:48317 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S231889AbiA0Ba7 (ORCPT
+        id S231940AbiA0Bcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Jan 2022 20:32:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43128 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231771AbiA0Bcl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Jan 2022 20:30:59 -0500
-Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
-        by 156.147.23.53 with ESMTP; 27 Jan 2022 10:00:57 +0900
-X-Original-SENDERIP: 156.147.1.126
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.126 with ESMTP; 27 Jan 2022 10:00:57 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     torvalds@linux-foundation.org, mingo@redhat.com,
+        Wed, 26 Jan 2022 20:32:41 -0500
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E45C06161C;
+        Wed, 26 Jan 2022 17:32:41 -0800 (PST)
+Received: by mail-oi1-x22e.google.com with SMTP id e81so3087453oia.6;
+        Wed, 26 Jan 2022 17:32:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qCtH/ypAXmYDr6RjK5BruZCO9IbiFs41tnc4Av1HVRU=;
+        b=nb2+zVVoP5FgZ/oje4rt8CeGz1R/DGOSEfXupo/v7APMgjJhEFbgciWKE46gkTGUVe
+         0EwyHsWhcGnf4PIjplvT98i/TND9CELEcBMomOE1JBXMTk4E0Q5M64QWjnEsEdK1BCsH
+         FaqyQFxgWSKgPFijB94WEgDiXNKFzThnVl2B7TEH6U//Ue1EPOa+hR6laCvypxKX8e2x
+         sFwwnaLWN2j0BW+P8wFRbdxBiOATFGh7c5YZEAOJLZIW8yqFrno2iTAlxcULdcv/mQQT
+         vhUhYAU+e438SMuZ9ud4l8AV5XjMrYPxBHfNxwliJMT/CZEaXnlhlP/Dvn1hGeGF2unb
+         WGuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=qCtH/ypAXmYDr6RjK5BruZCO9IbiFs41tnc4Av1HVRU=;
+        b=PNILo2tVLslHazVj+bW0i859BCbG2FgmQKgSPirgePrXE6l7zhr0aAGJa1ctdX6rRL
+         MIBIst16qpx9JwuZ4Og8+uvEaqudXp2a7GIoPmIeQRpijldonmt40K8USBbXBKMShsQX
+         qFXcddKtFSXaGzIYjcF/hGMkoMVixkAoM2auxsehXhcf/VKzX4cy6IYZmt/tBVU2V/Uy
+         g/Gt+1fzLvvJ1D2cwp7JFv6elPyc7wIDxtGYu/59IjYwq8EDE5ROltW/rNxoRkq5amLe
+         ByRqi7mQG86sKGVwnVCIWhnZCWNasT8G5n+E/5OqpkoAZT+SAYIYwS9WCtGUP3+FLhNP
+         HOrw==
+X-Gm-Message-State: AOAM530xX7u93I5bHDOsu5eLibMxDMVA6gc4zeY9SXtTCMGPnmmzEdTJ
+        evZalCwqc0kShcm6K/Eo6iA=
+X-Google-Smtp-Source: ABdhPJx6/0rs2bzhh4CVU1hxj+vuEjMK50dLStrQMPv/HowItDMJ7Ii7kF0yqliE6QiTiZe5UAaRmA==
+X-Received: by 2002:a05:6808:1a12:: with SMTP id bk18mr5435394oib.44.1643247160872;
+        Wed, 26 Jan 2022 17:32:40 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id n22sm8245730ooq.27.2022.01.26.17.32.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jan 2022 17:32:40 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Wed, 26 Jan 2022 17:32:38 -0800
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Laibin Qiu <qiulaibin@huawei.com>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, john.garry@huawei.com,
+        martin.petersen@oracle.com, hare@suse.de,
+        akpm@linux-foundation.org, bvanassche@acm.org,
+        andriy.shevchenko@linux.intel.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-        amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: [RFC 00/14] DEPT(DEPendency Tracker)
-Date:   Thu, 27 Jan 2022 10:00:53 +0900
-Message-Id: <1643245254-11122-1-git-send-email-byungchul.park@lge.com>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1643078204-12663-1-git-send-email-byungchul.park@lge.com>
-References: <1643078204-12663-1-git-send-email-byungchul.park@lge.com>
+Subject: Re: [PATCH -next V5] blk-mq: fix tag_get wait task can't be awakened
+Message-ID: <20220127013238.GA1478141@roeck-us.net>
+References: <20220113025536.1479653-1-qiulaibin@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220113025536.1479653-1-qiulaibin@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+cc
+Hi,
 
-linux-mm@kvack.org
-akpm@linux-foundation.org
-mhocko@kernel.org
-minchan@kernel.org
-hannes@cmpxchg.org
-vdavydov.dev@gmail.com
-sj@kernel.org
-jglisse@redhat.com
-dennis@kernel.org
-cl@linux.com
-penberg@kernel.org
-rientjes@google.com
-vbabka@suse.cz
-ngupta@vflare.org
-linux-block@vger.kernel.org
-axboe@kernel.dk
-paolo.valente@linaro.org
-josef@toxicpanda.com
-linux-fsdevel@vger.kernel.org
-viro@zeniv.linux.org.uk
-jack@suse.cz
-jlayton@kernel.org
-dan.j.williams@intel.com
-hch@infradead.org
-djwong@kernel.org
-dri-devel@lists.freedesktop.org
-airlied@linux.ie
-rodrigosiqueiramelo@gmail.com
-melissa.srw@gmail.com
-hamohammed.sa@gmail.com
+On Thu, Jan 13, 2022 at 10:55:36AM +0800, Laibin Qiu wrote:
+> In case of shared tags, there might be more than one hctx which
+> allocates from the same tags, and each hctx is limited to allocate at
+> most:
+>         hctx_max_depth = max((bt->sb.depth + users - 1) / users, 4U);
+> 
+> tag idle detection is lazy, and may be delayed for 30sec, so there
+> could be just one real active hctx(queue) but all others are actually
+> idle and still accounted as active because of the lazy idle detection.
+> Then if wake_batch is > hctx_max_depth, driver tag allocation may wait
+> forever on this real active hctx.
+> 
+> Fix this by recalculating wake_batch when inc or dec active_queues.
+> 
+> Fixes: 0d2602ca30e41 ("blk-mq: improve support for shared tags maps")
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Suggested-by: John Garry <john.garry@huawei.com>
+> Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
 
---->8---
-From 68ee7ab996fc7d67b6b506f48da106493ca2546a Mon Sep 17 00:00:00 2001
-From: Byungchul Park <byungchul.park@lge.com>
-Date: Tue, 25 Jan 2022 10:12:54 +0900
-Subject: [RFC 00/14] DEPT(DEPendency Tracker)
+I understand this problem has been reported already, but still:
 
-Hi forks,
+This patch causes a hang in several of my qemu emulations when
+trying to boot from usb. Reverting it fixes the problem. Bisect log
+is attached.
 
-I've been developing a tool for detecting deadlock possibilities by
-tracking wait/event rather than lock(?) acquisition order to try to
-cover all synchonization machanisms. It's done on v5.10 tag. I bet
-it would work great! Try it and see what's gonna happen.
+Boot logs are available at
+https://kerneltests.org/builders/qemu-arm-aspeed-master/builds/230/steps/qemubuildcommand/logs/stdio
+but don't really show much: the affected tests simply hang until they
+are aborted.
 
-Now that there's a porting issue, I made Dept rely on Lockdep. But it
-should be separated from Lockdep once it's considered worth having.
+Guenter
 
-Benifit:
+---
+bisect log:
 
-	0. Works with all lock primitives.
-	1. Works with wait_for_completion()/complete().
-	2. Works with 'wait' on PG_locked.
-	3. Works with 'wait' on PG_writeback.
-	4. Works with swait/wakeup.
-	5. Multiple reports are allowed.
-	6. Deduplication control on multiple reports.
-	7. Withstand false positives thanks to 5.
-	8. Easy to tag any wait/event.
-
-Future work:
-
-	0. To make it more stable.
-	1. To separates Dept from Lockdep.
-	2. To improves performance in terms of time and space.
-	3. To use Dept as a dependency engine for Lockdep.
-	4. To add any missing tags of wait/event in the kernel.
-	5. To deduplicate stack trace.
-
-I hope you guys are gonna be satisfied with Dept. Don't hesitate to
-give any feedback. I will adopt any feedbacks if reasonable.
-
-Thanks,
-Byungchul
-
-Byungchul Park (14):
-  llist: Move llist_{head,node} definition to types.h
-  dept: Implement Dept(Dependency Tracker)
-  dept: Embed Dept data in Lockdep
-  dept: Apply Dept to spinlock
-  dept: Apply Dept to mutex families
-  dept: Apply Dept to rwlock
-  dept: Apply Dept to wait_for_completion()/complete()
-  dept: Apply Dept to seqlock
-  dept: Apply Dept to rwsem
-  dept: Add proc knobs to show stats and dependency graph
-  dept: Introduce split map concept and new APIs for them
-  dept: Apply Dept to wait/event of PG_{locked,writeback}
-  dept: Separate out SDT(Single-event Dependency Tracker) header
-  dept: Apply SDT to swait
-
- include/linux/completion.h        |   48 +-
- include/linux/dept.h              |  541 ++++++++
- include/linux/dept_page.h         |   71 +
- include/linux/dept_sdt.h          |   53 +
- include/linux/hardirq.h           |    3 +
- include/linux/irqflags.h          |   33 +-
- include/linux/llist.h             |    9 +-
- include/linux/lockdep.h           |  156 ++-
- include/linux/lockdep_types.h     |    3 +
- include/linux/mutex.h             |   31 +
- include/linux/page-flags.h        |   26 +-
- include/linux/pagemap.h           |    7 +-
- include/linux/percpu-rwsem.h      |   10 +-
- include/linux/rtmutex.h           |   11 +-
- include/linux/rwlock.h            |   48 +
- include/linux/rwlock_api_smp.h    |    8 +-
- include/linux/rwlock_types.h      |    7 +
- include/linux/rwsem.h             |   31 +
- include/linux/sched.h             |    3 +
- include/linux/seqlock.h           |   19 +-
- include/linux/spinlock.h          |   24 +
- include/linux/spinlock_types.h    |   10 +
- include/linux/swait.h             |    4 +
- include/linux/types.h             |    8 +
- init/init_task.c                  |    2 +
- init/main.c                       |    4 +
- kernel/Makefile                   |    1 +
- kernel/dependency/Makefile        |    5 +
- kernel/dependency/dept.c          | 2593 +++++++++++++++++++++++++++++++++++++
- kernel/dependency/dept_hash.h     |   11 +
- kernel/dependency/dept_internal.h |   26 +
- kernel/dependency/dept_object.h   |   14 +
- kernel/dependency/dept_proc.c     |   97 ++
- kernel/exit.c                     |    1 +
- kernel/fork.c                     |    2 +
- kernel/locking/lockdep.c          |   12 +-
- kernel/module.c                   |    2 +
- kernel/sched/completion.c         |   12 +-
- kernel/sched/swait.c              |    8 +
- kernel/softirq.c                  |    6 +-
- kernel/trace/trace_preemptirq.c   |   19 +-
- lib/Kconfig.debug                 |   21 +
- mm/filemap.c                      |   62 +
- mm/page_ext.c                     |    5 +
- 44 files changed, 4009 insertions(+), 58 deletions(-)
- create mode 100644 include/linux/dept.h
- create mode 100644 include/linux/dept_page.h
- create mode 100644 include/linux/dept_sdt.h
- create mode 100644 kernel/dependency/Makefile
- create mode 100644 kernel/dependency/dept.c
- create mode 100644 kernel/dependency/dept_hash.h
- create mode 100644 kernel/dependency/dept_internal.h
- create mode 100644 kernel/dependency/dept_object.h
- create mode 100644 kernel/dependency/dept_proc.c
-
--- 
-1.9.1
-
+# bad: [0280e3c58f92b2fe0e8fbbdf8d386449168de4a8] Merge tag 'nfs-for-5.17-1' of git://git.linux-nfs.org/projects/anna/linux-nfs
+# good: [64f29d8856a9e0d1fcdc5344f76e70c364b941cb] Merge tag 'ceph-for-5.17-rc1' of git://github.com/ceph/ceph-client
+git bisect start 'HEAD' '64f29d8856a9'
+# bad: [b087788c20aa959f83df989b31fdcc4182b2d067] Merge tag 'ata-5.17-rc1-part2' of git://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/libata
+git bisect bad b087788c20aa959f83df989b31fdcc4182b2d067
+# bad: [0854dc81e108c90cccda6d1fc54bc270f16a3cc9] Merge tag 'docs-5.17-2' of git://git.lwn.net/linux
+git bisect bad 0854dc81e108c90cccda6d1fc54bc270f16a3cc9
+# good: [75242f31db6cabf602a5eb84c13b579099d72a65] Merge tag 'rtc-5.17' of git://git.kernel.org/pub/scm/linux/kernel/git/abelloni/linux
+git bisect good 75242f31db6cabf602a5eb84c13b579099d72a65
+# good: [f3a78227eef20c0ba13bbf9401f0a340bca3ad16] Merge tag 'io_uring-5.17-2022-01-21' of git://git.kernel.dk/linux-block
+git bisect good f3a78227eef20c0ba13bbf9401f0a340bca3ad16
+# bad: [3c7c25038b6c7d66a6816028219914379be6a5cc] Merge tag 'block-5.17-2022-01-21' of git://git.kernel.dk/linux-block
+git bisect bad 3c7c25038b6c7d66a6816028219914379be6a5cc
+# bad: [e6a2e5116e07ce5acc8698785c29e9e47f010fd5] block: Remove unnecessary variable assignment
+git bisect bad e6a2e5116e07ce5acc8698785c29e9e47f010fd5
+# bad: [413ec8057bc3d368574abd05dd27e747063b2f59] loop: remove redundant initialization of pointer node
+git bisect bad 413ec8057bc3d368574abd05dd27e747063b2f59
+# bad: [180dccb0dba4f5e84a4a70c1be1d34cbb6528b32] blk-mq: fix tag_get wait task can't be awakened
+git bisect bad 180dccb0dba4f5e84a4a70c1be1d34cbb6528b32
+# first bad commit: [180dccb0dba4f5e84a4a70c1be1d34cbb6528b32] blk-mq: fix tag_get wait task can't be awakened
