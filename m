@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 838A8C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 14:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 872DFC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 14:44:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242480AbiA0Oif (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 09:38:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51610 "EHLO
+        id S231443AbiA0OoO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 09:44:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234071AbiA0Oif (ORCPT
+        with ESMTP id S242538AbiA0OoN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 09:38:35 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173FEC061714
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 06:38:35 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id s2-20020a17090ad48200b001b501977b23so7724501pju.2
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 06:38:35 -0800 (PST)
+        Thu, 27 Jan 2022 09:44:13 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BACC061714
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 06:44:12 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id p37so2819849pfh.4
+        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 06:44:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=5OC6d3lGaiCactmd/xMDmrnP0MikjxAmGKwgY6B8rNA=;
-        b=BRy4W+xYso6FWfmNoAQig2ZnwCU+Pqrczm0lNLitMBWjXPxZzaT25dQCnSvtDuPWEW
-         mSXC4yFdQrnzSuc0QlaVDDXjXbc3IU7QzaBPs5iVma0PKtjWWmfSGisU+r5fRLK33NKF
-         aIrfYxdqQlN6eJ0rNPsqEJwtmi4JkPHFo6T8orNS23sn0lGKJMcxu00urRsT4Xuh7vLU
-         lTvuA/At8LN3g1iHHKv7avFwjgtkdjQoHfhSgpktyzfI4AhotBsqEuCMsdKhcqrhyTSK
-         r74gA21UDb45f5+ZppsGpR9AGK/lQjmDfhQmZXP/1heUU1aIixqhe3t1uqAhJiWH6Qn7
-         qeAw==
+        bh=XXUUPQa1aUv+YBHhpXUraTxpOw9EvSTI8Y9qQN6SCis=;
+        b=Nz6tExmq7RyTSsHC/6qD1f1o4nViCCtTuKQFK27QzpkOPANQB2MqT1LUhILQue8adp
+         llmNpcEWpwrYNxj01XYateYIsqVJNInOoL3JDYxMARIp5Td8Rw9WvCWcyDk70MBOcjCZ
+         NRNm8+N06Au3lu3VSoBrqtXivtPkMVES0CthJG5ZIwvNrhhBjZcEnC/9L8EtlC4RSQTG
+         PriUaFABeUrtG1OFH+mFEqNzErkzw29Jf79HrLJ0r43UyDz7LNkgx2ux13yi5MNn/bCU
+         XcyTB1N8n2dMfCaxeyghUvDjzdFhqZ4fM2NkUd3cZlccJ6bATJHIJ/+NjrO0gwif6r9s
+         gfTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=5OC6d3lGaiCactmd/xMDmrnP0MikjxAmGKwgY6B8rNA=;
-        b=fvPikKDnfEzsKEdkLcs9wIwT1dyLnGE5Olu0rLekLYNJSvWD2BYHZC1ii5rJi44xwN
-         U4QeEnUTtCOUh3mWxytunM6xDdw4MMpKY/NErazJ8ZSAXDMd6yNiHQ30mG1JyY7NnBO/
-         QZ9sT0VvpBTUHj3P8sKXtJD+Lpc4lWHVGlNOUpxA8E5KLvojBUUG4Zye7sXZB83JszVC
-         LSYN16ONF0kDX/pzPN20ITaQTNQ4QpubsZxsStc/0dKLXtRhd99D7qLU+m+oqW2J/k9O
-         8Gyo6waGgYEOX1hVz5OE2PZB4SnEuTX+plHL09g+drym5YxD0cDgkD9rEUfbe6e5M9Oj
-         SEzQ==
-X-Gm-Message-State: AOAM530jplv9TxWN6W7QFeyhNlBCgZo+HJHNgckpCr+cfySZFDl1lfWi
-        QhJ5Dk6ixGlO34OYrpwCuTDVZlJDD2/moNJYOZ8=
-X-Google-Smtp-Source: ABdhPJybFXXY9mmFQkfuJzQBLrraeIouIJJp9xPpVJ/3yElzmYBK/hQYvnyadQ53YF4fstj50Vni0rIpjiDgMzuCKI8=
-X-Received: by 2002:a17:902:c652:: with SMTP id s18mr3688054pls.1.1643294314524;
- Thu, 27 Jan 2022 06:38:34 -0800 (PST)
+        bh=XXUUPQa1aUv+YBHhpXUraTxpOw9EvSTI8Y9qQN6SCis=;
+        b=vSHQUaud8QQ2g3EiLwKyrZ5XKznLx9XadU7o6OjDbSJKm8VCefjrP5atstHtM6jYZe
+         GGhRHx6pPHXVPYmZ3WB/wCy9r6/v4rxqgXbUllvYNWXz1qtt9k6KilqMuXMR8B9vgJzy
+         kNIqDgWpPErUVwApYz8SZAjEN03UGD8uKP0yJ2qrHf6MfDcxKafMIreIpyKItw7h7cGa
+         iB47VCPDMULh/5IZX0aG1mYoWq+gnFaB1q3ZSzaGBCSAlqE4px+C3gA/j42TD0LUtBBG
+         JM2nAaE/+ifdlrnDU0gtxFdGy4onZFF9tw9E7ujpCw8LLDD/kVqnHJP8eS/iriNT2OZT
+         HT0Q==
+X-Gm-Message-State: AOAM531ad7L/WcncukfmmG1GDCUPPAj1mi/n2S4H/ieQyLawrL+U7pth
+        0Uj4QIiouskJwg6zUjomQKma1yFDHq2kTTQNpbQ=
+X-Google-Smtp-Source: ABdhPJxWzybUYiMCznLtPeYdZtDVjf2rDOfAX9Rrw9FX8v6dAynvxlT2Ud9pJ95Cf5o1uUp3soNb7gIcInF0CGbVFCw=
+X-Received: by 2002:a63:6cc9:: with SMTP id h192mr2920360pgc.486.1643294652441;
+ Thu, 27 Jan 2022 06:44:12 -0800 (PST)
 MIME-Version: 1.0
-References: <20220127082536.7243-1-joshi.k@samsung.com> <CGME20220127083034epcas5p4aaafaf1f40c21a383e985d6f6568cbef@epcas5p4.samsung.com>
- <20220127082536.7243-2-joshi.k@samsung.com> <20220127092746.GA14431@lst.de>
-In-Reply-To: <20220127092746.GA14431@lst.de>
+References: <20220127082536.7243-1-joshi.k@samsung.com> <CGME20220127083035epcas5p3e3760849513fb7939757f4e6678405a0@epcas5p3.samsung.com>
+ <20220127082536.7243-3-joshi.k@samsung.com> <20220127092921.GB14431@lst.de>
+In-Reply-To: <20220127092921.GB14431@lst.de>
 From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Thu, 27 Jan 2022 20:08:08 +0530
-Message-ID: <CA+1E3r+ohVCy4dTPwYLmPCsH6y6R2zg0GGv_-NQybP83Y1yfLA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] block: introduce and export blk_rq_map_user_vec
+Date:   Thu, 27 Jan 2022 20:13:46 +0530
+Message-ID: <CA+1E3r+tZH4AtnHduTTZenbJTzn1pC9HuDcYNaZUVX4+umyk5w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] nvme: add vectored-io support for user passthru
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Kanchan Joshi <joshi.k@samsung.com>,
         Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
@@ -61,48 +61,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 2:57 PM Christoph Hellwig <hch@lst.de> wrote:
+On Thu, Jan 27, 2022 at 2:59 PM Christoph Hellwig <hch@lst.de> wrote:
 >
-> On Thu, Jan 27, 2022 at 01:55:35PM +0530, Kanchan Joshi wrote:
-> > Similiar to blk_rq_map_user except that it operates on iovec.
-> > This is a prep patch.
-> >
-> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> > Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> > ---
-> >  block/blk-map.c        | 19 +++++++++++++++++++
-> >  include/linux/blk-mq.h |  2 ++
-> >  2 files changed, 21 insertions(+)
-> >
-> > diff --git a/block/blk-map.c b/block/blk-map.c
-> > index 4526adde0156..7fe45df3e580 100644
-> > --- a/block/blk-map.c
-> > +++ b/block/blk-map.c
-> > @@ -577,6 +577,25 @@ int blk_rq_map_user(struct request_queue *q, struct request *rq,
-> >  }
-> >  EXPORT_SYMBOL(blk_rq_map_user);
-> >
-> > +int blk_rq_map_user_vec(struct request_queue *q, struct request *rq,
-> > +                 struct rq_map_data *map_data, void __user *uvec,
-> > +                 unsigned long nr_vecs, gfp_t gfp_mask)
-> > +{
-> > +     struct iovec fast_iov[UIO_FASTIOV];
-> > +     struct iovec *iov = fast_iov;
-> > +     struct iov_iter iter;
-> > +     int ret;
-> > +
-> > +     ret = import_iovec(rq_data_dir(rq), uvec, nr_vecs, UIO_FASTIOV, &iov, &iter);
-> > +     if (unlikely(ret < 0))
-> > +             return ret;
-> > +     ret = blk_rq_map_user_iov(q, rq, NULL, &iter, gfp_mask);
-> > +     kfree(iov);
-> > +
-> > +     return ret;
+> On Thu, Jan 27, 2022 at 01:55:36PM +0530, Kanchan Joshi wrote:
+> > wire up support for passthru that takes an array of buffers (using
+> > iovec). Enable it for NVME_IOCTL_IO64_CMD; same ioctl code to be used
+> > with following differences -
 >
-> I see very little point in adding this function vs just open coding it.
+> Flags overloading for a completely different ABI is a bad idea.
+> Please add a separate ioctl instead.
 
-Fine, I will kill this and open-code in nvme instead.
-
+Hope "NVME_IOCTL_IO64_VEC_CMD" sounds fine for the new one?
 
 -- 
 Kanchan
