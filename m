@@ -2,114 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76119C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 13:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8167C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 13:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245235AbiA1NiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jan 2022 08:38:01 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:41502 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348829AbiA1NiB (ORCPT
+        id S1349051AbiA1Nik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jan 2022 08:38:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59600 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349024AbiA1Nid (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jan 2022 08:38:01 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 7389F212B6;
-        Fri, 28 Jan 2022 13:38:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1643377080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p14uLMbcqMcWjcLH5TQCeRME7n0cE2dEr7vOnIFxtB4=;
-        b=OL6pKLGQ84EojgIXLYIgUOh6c+SRzrNnwJwtYqmsitxKGpCOgeJEcRqjqecsJRk/17U/jL
-        mqECq8lGlQFnjWpdWs7lV3F0EirQwmvSFgrXotKXJN2AggEK5Lo3djzsUyvpx0ESaqwgAn
-        WbLzbb5+Y78galkMZlSU1pgPhEelZ0Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1643377080;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=p14uLMbcqMcWjcLH5TQCeRME7n0cE2dEr7vOnIFxtB4=;
-        b=RKgk+eSOi4tgMx8w6VLFwTJZFWwB6B71hge/T1s+uf9XnR0pkeipl9HOBQUnkrKCh9ZOR6
-        rNwFdWlhJwOGbcCA==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 64AB9A3B81;
-        Fri, 28 Jan 2022 13:38:00 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 32695A05A4; Fri, 28 Jan 2022 14:38:00 +0100 (CET)
-Date:   Fri, 28 Jan 2022 14:38:00 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>,
-        "Darrick J . Wong" <djwong@kernel.org>
-Subject: Re: [PATCH 5/8] loop: only take lo_mutex for the first reference in
- lo_open
-Message-ID: <20220128133800.ylms4h4j4n4wawrq@quack3.lan>
-References: <20220128130022.1750906-1-hch@lst.de>
- <20220128130022.1750906-6-hch@lst.de>
+        Fri, 28 Jan 2022 08:38:33 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 349A8C061714
+        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 05:38:33 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id d5so6489792pjk.5
+        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 05:38:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=is6S4jElVQxIZHKKeJ+uOPT+PZ499bwGOBOByve3Wqc=;
+        b=pgdwWCc9Z8paSvapjeT876SWKb54JtsvY5vIptMdL1evVDEFpDSj5UWqDPJs6jKeAa
+         G/NfGlgRl3Z6en35n4+FjhpHbD8hXjz8LNDX1ut2YFYjCK2Qsp1VjrVOmnBH+lnBsys0
+         8Z1EGtkCBKxKwUS+OdtknAAj+sHFz5NvsFCmPPuakhSdsyYumm2c1O4U8RM+ZQPZ7l6r
+         FbgN1AjTCEjDmzvg9PMBXoIX4JULIGsnjIl2UyoGYDCi8LT9YJDIUyhQmYJUwXGAWvUy
+         5I947V+twaWqFmR5FOnYfxV8kqVMYA52EOOvRkeJckK5M9sMPleOQ1fm27nTWarRfxTW
+         lmUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=is6S4jElVQxIZHKKeJ+uOPT+PZ499bwGOBOByve3Wqc=;
+        b=miSBKFpGGcNGxzkxgekN0c5dy6ZAhGzrWUdahVZPQeRPnYy9iXsqdZgWMizRXspjsx
+         M1DgdzEDrap6SnHzljlK68bABdIAnFtc65n5Q9O5t6bqpMb9KMcwYWEXHEqw8B+DytxW
+         p5M8QO1Ti2fH1H5lRsGVVkLpmwRvht+vbztNVfuQXJPV2ppVe8pEl04HkJVUUidX/h0G
+         d8RJBXGAKKl3aJrJ15WQrSWrBHFuzT395MNw7QYaaeziQXBvYefmDhc9vbZzUbG/9ov6
+         ZT3L2kjnqqCy4JvZfCe4ce35aofcFVNJBkKFApEn6jstue5bpBGTZsSec4Fle06VBXDq
+         rIPg==
+X-Gm-Message-State: AOAM530v4g4Jopg0SBmAVFWj5KLzXwaOdaqwmtodB5TmUwmDz5gkonSQ
+        NERWE/AU7Wzj2ycliKYlj1RQJg==
+X-Google-Smtp-Source: ABdhPJxJrzuPfUKSSu+77kxCEcP4C5CMCDjHXJgujfWUfsNG4a9hKWqGRmbMvVVK6rcQonP73yOFFA==
+X-Received: by 2002:a17:90a:4811:: with SMTP id a17mr9839741pjh.159.1643377112676;
+        Fri, 28 Jan 2022 05:38:32 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id b14sm10009771pfm.17.2022.01.28.05.38.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jan 2022 05:38:32 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Abaci Robot <abaci@linux.alibaba.com>,
+        linux-block@vger.kernel.org
+In-Reply-To: <20220128043454.68927-1-jiapeng.chong@linux.alibaba.com>
+References: <20220128043454.68927-1-jiapeng.chong@linux.alibaba.com>
+Subject: Re: [PATCH] block: fix boolreturn.cocci warning
+Message-Id: <164337711017.260343.398701118435973656.b4-ty@kernel.dk>
+Date:   Fri, 28 Jan 2022 06:38:30 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220128130022.1750906-6-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 28-01-22 14:00:19, Christoph Hellwig wrote:
-> lo_refcnt is only incremented in lo_open and decremented in lo_release,
-> and thus protected by open_mutex.  Only take lo_mutex when lo_open is
-> called the first time, as only for the first open there is any affect
-> on the driver state (incremental opens on partitions don't end up in
-> lo_open at all already).
+On Fri, 28 Jan 2022 12:34:54 +0800, Jiapeng Chong wrote:
+> Return statements in functions returning bool should use true/false
+> instead of 1/0.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Tested-by: Darrick J. Wong <djwong@kernel.org>
-
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  drivers/block/loop.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+> ./block/bio.c:1081:9-10: WARNING: return of 0/1 in function
+> 'bio_add_folio' with return type bool.
 > 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index b58dc95f80d96..f349ddfc0e84a 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1725,13 +1725,20 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
->  	struct loop_device *lo = bdev->bd_disk->private_data;
->  	int err;
->  
-> +	/*
-> +	 * Note: this requires disk->open_mutex to protect against races
-> +	 * with lo_release.
-> +	 */
-> +	if (atomic_inc_return(&lo->lo_refcnt) > 1)
-> +		return 0;
-> +
->  	err = mutex_lock_killable(&lo->lo_mutex);
->  	if (err)
->  		return err;
-> -	if (lo->lo_state == Lo_deleting)
-> +	if (lo->lo_state == Lo_deleting) {
-> +		atomic_dec(&lo->lo_refcnt);
->  		err = -ENXIO;
-> -	else
-> -		atomic_inc(&lo->lo_refcnt);
-> +	}
->  	mutex_unlock(&lo->lo_mutex);
->  	return err;
->  }
-> -- 
-> 2.30.2
 > 
+> [...]
+
+Applied, thanks!
+
+[1/1] block: fix boolreturn.cocci warning
+      commit: 7fc6fce0c96ff6db540a974b9b9dc38e241543a5
+
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
