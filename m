@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A5FC35271
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 00:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE048C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 00:26:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344567AbiA1A0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1344575AbiA1A0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 27 Jan 2022 19:26:31 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:46938 "EHLO
+Received: from ale.deltatee.com ([204.191.154.188]:46998 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236048AbiA1A00 (ORCPT
+        with ESMTP id S1344485AbiA1A00 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 27 Jan 2022 19:26:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=HHTYT5k3QiiDV6LMv4vKtzyhJ9FCFmq5gXJCns7NBlU=; b=nH+QGcWcTfLDJqbFBTkackrqrG
-        IP6cWyAeLl9RuOzP5vD7BPyQU58XFn47tuDx4R7Thwosc+4soLlQVecHvAgk4qyxAjLmiqxSW3I5g
-        SqIvy9WWdkwSYLgfzKnqG+dBpmOVLy4K6320JbcNr95+oWJo7UZV/NITfylMgQ8/RTfCcifnSfZBX
-        r41I8tSoanWnwJpvJUpUw/NlhzAT4jhPRHUIZoBCgMZi//CDOJpWdTYlF2dkrkYW2sa/+iJk+Oy+2
-        a2caIhrPLspGcwjE+BtlAnMEszIzOsYbKM+4zKJzw5grV9y8OoAAbzhfGXuxs5Cs9EpHAAqLDRLRB
-        NXs+TrNA==;
+        bh=UO35KE8YVx2v+yNTFMhmKCQE8ptUbM1lG6ODy8MFD4U=; b=sBbcFg82SAk1otTpMskAScMiG7
+        RyAKAQkLTz1xmy8xTlaHSy36dHLKBWxmZ36QoMwA4kkP1Jl1psr1WnOOxIkWmE9XtLADFmwdP9Al8
+        ICSCs2cktw8nLKLELqHswQ/9zbp0P2ctwkft2z7KTrR3Sn8uIMRmhiPnKpbppo9L3h5AIBakUCRp6
+        ACGKOFIT2MqbGv8JvJsn9xNK3WT0DFPSr3AFe/PofI/wklbT7AxT8jWUom0daiNDBGZ6rcIONs0MR
+        Hx6YbD9XhVp29jfmuXGV9Ri0UA0Ly2AAO8I6iJbJsPYwK+DBu9x+77HhVcbEqqwc0x0ilK1AB7U1m
+        XP4zUiFw==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1nDF5p-005Oca-Lc; Thu, 27 Jan 2022 17:26:22 -0700
+        id 1nDF5r-005OcV-Sd; Thu, 27 Jan 2022 17:26:25 -0700
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1nDF5m-0001cL-MP; Thu, 27 Jan 2022 17:26:18 -0700
+        id 1nDF5p-0001dH-Dg; Thu, 27 Jan 2022 17:26:21 -0700
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -53,76 +53,111 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Date:   Thu, 27 Jan 2022 17:25:54 -0700
-Message-Id: <20220128002614.6136-5-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 27 Jan 2022 17:26:09 -0700
+Message-Id: <20220128002614.6136-20-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128002614.6136-1-logang@deltatee.com>
 References: <20220128002614.6136-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, bhelgaas@google.com, jhubbard@nvidia.com, rcampbell@nvidia.com, kch@nvidia.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v5 04/24] PCI/P2PDMA: Attempt to set map_type if it has not been set
+Subject: [PATCH v5 19/24] lib/scatterlist: add check when merging zone device pages
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Attempt to find the mapping type for P2PDMA pages on the first
-DMA map attempt if it has not been done ahead of time.
+Consecutive zone device pages should not be merged into the same sgl
+or bvec segment with other types of pages or if they belong to different
+pgmaps. Otherwise getting the pgmap of a given segment is not possible
+without scanning the entire segment. This helper returns true either if
+both pages are not zone device pages or both pages are zone device
+pages with the same pgmap.
 
-Previously, the mapping type was expected to be calculated ahead of
-time, but if pages are to come from userspace then there's no
-way to ensure the path was checked ahead of time.
-
-This change will calculate the mapping type if it hasn't pre-calculated
-so it is no longer invalid to call pci_p2pdma_map_sg() before the mapping
-type is calculated, so drop the WARN_ON when that is he case.
+Factor out the check for page mergability into a pages_are_mergable()
+helper and add a check with zone_device_pages_are_mergeable().
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- drivers/pci/p2pdma.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ lib/scatterlist.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index 1015274bd2fe..bb8900ce073a 100644
---- a/drivers/pci/p2pdma.c
-+++ b/drivers/pci/p2pdma.c
-@@ -848,6 +848,7 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
- 	struct pci_dev *provider = to_p2p_pgmap(pgmap)->provider;
- 	struct pci_dev *client;
- 	struct pci_p2pdma *p2pdma;
-+	int dist;
- 
- 	if (!provider->p2pdma)
- 		return PCI_P2PDMA_MAP_NOT_SUPPORTED;
-@@ -864,6 +865,10 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
- 		type = xa_to_value(xa_load(&p2pdma->map_types,
- 					   map_types_idx(client)));
- 	rcu_read_unlock();
-+
-+	if (type == PCI_P2PDMA_MAP_UNKNOWN)
-+		return calc_map_type_and_dist(provider, client, &dist, true);
-+
- 	return type;
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index d5e82e4a57ad..af53a0984f76 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -410,6 +410,15 @@ static struct scatterlist *get_next_sg(struct sg_append_table *table,
+ 	return new_sg;
  }
  
-@@ -906,7 +911,7 @@ int pci_p2pdma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
- 	case PCI_P2PDMA_MAP_BUS_ADDR:
- 		return __pci_p2pdma_map_sg(p2p_pgmap, dev, sg, nents);
- 	default:
--		WARN_ON_ONCE(1);
-+		/* Mapping is not Supported */
- 		return 0;
- 	}
- }
++static bool pages_are_mergeable(struct page *a, struct page *b)
++{
++	if (page_to_pfn(a) != page_to_pfn(b) + 1)
++		return false;
++	if (!zone_device_pages_have_same_pgmap(a, b))
++		return false;
++	return true;
++}
++
+ /**
+  * sg_alloc_append_table_from_pages - Allocate and initialize an append sg
+  *                                    table from an array of pages
+@@ -447,6 +456,7 @@ int sg_alloc_append_table_from_pages(struct sg_append_table *sgt_append,
+ 	unsigned int chunks, cur_page, seg_len, i, prv_len = 0;
+ 	unsigned int added_nents = 0;
+ 	struct scatterlist *s = sgt_append->prv;
++	struct page *last_pg;
+ 
+ 	/*
+ 	 * The algorithm below requires max_segment to be aligned to PAGE_SIZE
+@@ -460,21 +470,17 @@ int sg_alloc_append_table_from_pages(struct sg_append_table *sgt_append,
+ 		return -EOPNOTSUPP;
+ 
+ 	if (sgt_append->prv) {
+-		unsigned long paddr =
+-			(page_to_pfn(sg_page(sgt_append->prv)) * PAGE_SIZE +
+-			 sgt_append->prv->offset + sgt_append->prv->length) /
+-			PAGE_SIZE;
+-
+ 		if (WARN_ON(offset))
+ 			return -EINVAL;
+ 
+ 		/* Merge contiguous pages into the last SG */
+ 		prv_len = sgt_append->prv->length;
+-		while (n_pages && page_to_pfn(pages[0]) == paddr) {
++		last_pg = sg_page(sgt_append->prv);
++		while (n_pages && pages_are_mergeable(last_pg, pages[0])) {
+ 			if (sgt_append->prv->length + PAGE_SIZE > max_segment)
+ 				break;
+ 			sgt_append->prv->length += PAGE_SIZE;
+-			paddr++;
++			last_pg = pages[0];
+ 			pages++;
+ 			n_pages--;
+ 		}
+@@ -488,7 +494,7 @@ int sg_alloc_append_table_from_pages(struct sg_append_table *sgt_append,
+ 	for (i = 1; i < n_pages; i++) {
+ 		seg_len += PAGE_SIZE;
+ 		if (seg_len >= max_segment ||
+-		    page_to_pfn(pages[i]) != page_to_pfn(pages[i - 1]) + 1) {
++		    !pages_are_mergeable(pages[i], pages[i - 1])) {
+ 			chunks++;
+ 			seg_len = 0;
+ 		}
+@@ -504,8 +510,7 @@ int sg_alloc_append_table_from_pages(struct sg_append_table *sgt_append,
+ 		for (j = cur_page + 1; j < n_pages; j++) {
+ 			seg_len += PAGE_SIZE;
+ 			if (seg_len >= max_segment ||
+-			    page_to_pfn(pages[j]) !=
+-			    page_to_pfn(pages[j - 1]) + 1)
++			    !pages_are_mergeable(pages[j], pages[j - 1]))
+ 				break;
+ 		}
+ 
 -- 
 2.30.2
 
