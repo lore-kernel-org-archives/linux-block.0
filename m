@@ -2,60 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED87C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 04:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66170C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 06:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346054AbiA1EfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 23:35:13 -0500
-Received: from out199-3.us.a.mail.aliyun.com ([47.90.199.3]:25193 "EHLO
-        out199-3.us.a.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237463AbiA1EfM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 23:35:12 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0V310Omk_1643344504;
-Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0V310Omk_1643344504)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 28 Jan 2022 12:35:08 +0800
-From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH] block: fix boolreturn.cocci warning
-Date:   Fri, 28 Jan 2022 12:34:54 +0800
-Message-Id: <20220128043454.68927-1-jiapeng.chong@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        id S234289AbiA1GNM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jan 2022 01:13:12 -0500
+Received: from verein.lst.de ([213.95.11.211]:46930 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242326AbiA1GNM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Jan 2022 01:13:12 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C703668AA6; Fri, 28 Jan 2022 07:13:08 +0100 (CET)
+Date:   Fri, 28 Jan 2022 07:13:08 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     axboe@kernel.dk, hch@lst.de, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] block: add bio_start_io_acct_time() to control
+ start_time
+Message-ID: <20220128061308.GA1477@lst.de>
+References: <20220128041753.32195-1-snitzer@redhat.com> <20220128041753.32195-2-snitzer@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220128041753.32195-2-snitzer@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Return statements in functions returning bool should use true/false
-instead of 1/0.
+On Thu, Jan 27, 2022 at 11:17:51PM -0500, Mike Snitzer wrote:
+> +	__part_start_io_acct(bio->bi_bdev, bio_sectors(bio),
+> +			     bio_op(bio), start_time);
+>  }
+> +EXPORT_SYMBOL_GPL(bio_start_io_acct_time);
+>  
+>  /**
+>   * bio_start_io_acct - start I/O accounting for bio based drivers
+> @@ -1084,14 +1096,15 @@ static unsigned long __part_start_io_acct(struct block_device *part,
+>   */
+>  unsigned long bio_start_io_acct(struct bio *bio)
+>  {
+> -	return __part_start_io_acct(bio->bi_bdev, bio_sectors(bio), bio_op(bio));
+> +	return __part_start_io_acct(bio->bi_bdev, bio_sectors(bio),
+> +				    bio_op(bio), jiffies);
 
-./block/bio.c:1081:9-10: WARNING: return of 0/1 in function
-'bio_add_folio' with return type bool.
+Is droppingthe READ_ONCE safe here?  This is a honest question as these
+helpers still confuse me.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The rest looks good:
 
-diff --git a/block/bio.c b/block/bio.c
-index 03cefe81950f..2e19ca600fcd 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1078,7 +1078,7 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
- 		   size_t off)
- {
- 	if (len > UINT_MAX || off > UINT_MAX)
--		return 0;
-+		return false;
- 	return bio_add_page(bio, &folio->page, len, off) > 0;
- }
- 
--- 
-2.20.1.7.g153144c
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
