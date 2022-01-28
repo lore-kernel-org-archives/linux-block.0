@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A318C4167B
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 00:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E20EC4707E
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 00:26:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344648AbiA1A0x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 19:26:53 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:47140 "EHLO
+        id S1344659AbiA1A0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 19:26:54 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:47184 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344598AbiA1A0e (ORCPT
+        with ESMTP id S1344611AbiA1A0e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 27 Jan 2022 19:26:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=f6Gceh5S5jL/nBaUJCDzdn+tmuAbFKWfwLoFX7deOH8=; b=titcmnMGmGT6rJBuUoaxsU3FRv
-        fhU9hatq+5bu8PuY1JxWWSy0DyHNJoJfbNg5UKzxTAf1nXRCVaZyimOoF9Lgvce1Z5kjdXoNEGpx+
-        RAiD7KwkuPazykuSDNcM7rEyD2ZAh4kEjpFz2jgXtnYe0j+N+E4l15cY1wMHugqfUAjEho91h6xXE
-        dI8ctOdivU2niYrip3XS8jwbsdQBKak2n/A9z/YC32RWvd+CIOKsJJIjon/alW1KThIecaZH5VHGp
-        Xf2+ddYB0UF82Dst8XOw73KuEaG31MOSgyzEeKV9XSNlGKM3l9I3qIulrLze8U1X6oENJe0l/yr4N
-        hTwcqvVw==;
+        bh=bX2MPLdONywt9Jg2kBZ4+U7MTlH6jUj7zAM9CGcnTno=; b=niKQOBObQMpHq2+bvomGg6XFgp
+        e1uacA/QTmWjbufbUaQHCaMQmWbnjcZWnSLHUq9QeghzBCGHaPx51JjPpjwQi2gEklYFI7GgCyw7D
+        CNTSkJaGcq3FrfD8eWZC0hG8DPiRZcD756F/qbelT7Bc7Em5rX/s1g1pxSLMW+CG3ACNgvR2otysh
+        F77hKp129+rLZEG054Gymw8ud2/4rdBTZ+Df4k6e3BoqJJsvNquMm7fZqXD1kgwn3dlcYGF44MSu2
+        CftfO2vzYEunYEwZP5js2Dgy6yn2OaLmG3u/saGDENWjr2+DYN6dHFVEwVmIUmAzYzaPXBBo8q/A0
+        wXF9HkkA==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1nDF5u-005OcY-3f; Thu, 27 Jan 2022 17:26:27 -0700
+        id 1nDF5v-005OcZ-0x; Thu, 27 Jan 2022 17:26:28 -0700
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1nDF5n-0001cl-QN; Thu, 27 Jan 2022 17:26:19 -0700
+        id 1nDF5n-0001cX-6K; Thu, 27 Jan 2022 17:26:19 -0700
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -53,102 +53,148 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Date:   Thu, 27 Jan 2022 17:26:01 -0700
-Message-Id: <20220128002614.6136-12-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 27 Jan 2022 17:25:58 -0700
+Message-Id: <20220128002614.6136-9-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128002614.6136-1-logang@deltatee.com>
 References: <20220128002614.6136-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, jhubbard@nvidia.com, rcampbell@nvidia.com, kch@nvidia.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v5 11/24] nvme-pci: check DMA ops when indicating support for PCI P2PDMA
+Subject: [PATCH v5 08/24] dma-direct: support PCI P2PDMA pages in dma-direct map_sg
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce a supports_pci_p2pdma() operation in nvme_ctrl_ops to
-replace the fixed NVME_F_PCI_P2PDMA flag such that the dma_map_ops
-flags can be checked for PCI P2PDMA support.
+Add PCI P2PDMA support for dma_direct_map_sg() so that it can map
+PCI P2PDMA pages directly without a hack in the callers. This allows
+for heterogeneous SGLs that contain both P2PDMA and regular pages.
+
+A P2PDMA page may have three possible outcomes when being mapped:
+  1) If the data path between the two devices doesn't go through the
+     root port, then it should be mapped with a PCI bus address
+  2) If the data path goes through the host bridge, it should be mapped
+     normally, as though it were a CPU physical address
+  3) It is not possible for the two devices to communicate and thus
+     the mapping operation should fail (and it will return -EREMOTEIO).
+
+SGL segments that contain PCI bus addresses are marked with
+sg_dma_mark_pci_p2pdma() and are ignored when unmapped.
+
+P2PDMA mappings are also failed if swiotlb needs to be used on the
+mapping.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- drivers/nvme/host/core.c |  3 ++-
- drivers/nvme/host/nvme.h |  2 +-
- drivers/nvme/host/pci.c  | 11 +++++++++--
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ kernel/dma/direct.c | 43 +++++++++++++++++++++++++++++++++++++------
+ kernel/dma/direct.h |  7 ++++++-
+ 2 files changed, 43 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 5e0bfda04bd7..ecb01984b55d 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3850,7 +3850,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
- 		blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, ns->queue);
- 
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
--	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
-+	if (ctrl->ops->supports_pci_p2pdma &&
-+	    ctrl->ops->supports_pci_p2pdma(ctrl))
- 		blk_queue_flag_set(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
- 
- 	ns->ctrl = ctrl;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index a162f6c6da6e..97efc6d0b146 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -486,7 +486,6 @@ struct nvme_ctrl_ops {
- 	unsigned int flags;
- #define NVME_F_FABRICS			(1 << 0)
- #define NVME_F_METADATA_SUPPORTED	(1 << 1)
--#define NVME_F_PCI_P2PDMA		(1 << 2)
- 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
- 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
- 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
-@@ -494,6 +493,7 @@ struct nvme_ctrl_ops {
- 	void (*submit_async_event)(struct nvme_ctrl *ctrl);
- 	void (*delete_ctrl)(struct nvme_ctrl *ctrl);
- 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
-+	bool (*supports_pci_p2pdma)(struct nvme_ctrl *ctrl);
- };
- 
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index d8585df2c2fd..35e9b1e13d9f 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2965,17 +2965,24 @@ static int nvme_pci_get_address(struct nvme_ctrl *ctrl, char *buf, int size)
- 	return snprintf(buf, size, "%s\n", dev_name(&pdev->dev));
+diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
+index 50f48e9e4598..975df5f3aaf9 100644
+--- a/kernel/dma/direct.c
++++ b/kernel/dma/direct.c
+@@ -461,29 +461,60 @@ void dma_direct_sync_sg_for_cpu(struct device *dev,
+ 		arch_sync_dma_for_cpu_all();
  }
  
-+static bool nvme_pci_supports_pci_p2pdma(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_dev *dev = to_nvme_dev(ctrl);
-+
-+	return dma_pci_p2pdma_supported(dev->dev);
-+}
-+
- static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.name			= "pcie",
- 	.module			= THIS_MODULE,
--	.flags			= NVME_F_METADATA_SUPPORTED |
--				  NVME_F_PCI_P2PDMA,
-+	.flags			= NVME_F_METADATA_SUPPORTED,
- 	.reg_read32		= nvme_pci_reg_read32,
- 	.reg_write32		= nvme_pci_reg_write32,
- 	.reg_read64		= nvme_pci_reg_read64,
- 	.free_ctrl		= nvme_pci_free_ctrl,
- 	.submit_async_event	= nvme_pci_submit_async_event,
- 	.get_address		= nvme_pci_get_address,
-+	.supports_pci_p2pdma	= nvme_pci_supports_pci_p2pdma,
- };
++/*
++ * Unmaps segments, except for ones marked as pci_p2pdma which do not
++ * require any further action as they contain a bus address.
++ */
+ void dma_direct_unmap_sg(struct device *dev, struct scatterlist *sgl,
+ 		int nents, enum dma_data_direction dir, unsigned long attrs)
+ {
+ 	struct scatterlist *sg;
+ 	int i;
  
- static int nvme_dev_map(struct nvme_dev *dev)
+-	for_each_sg(sgl, sg, nents, i)
+-		dma_direct_unmap_page(dev, sg->dma_address, sg_dma_len(sg), dir,
+-			     attrs);
++	for_each_sg(sgl,  sg, nents, i) {
++		if (sg_is_dma_bus_address(sg))
++			sg_dma_unmark_bus_address(sg);
++		else
++			dma_direct_unmap_page(dev, sg->dma_address,
++					      sg_dma_len(sg), dir, attrs);
++	}
+ }
+ #endif
+ 
+ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
+ 		enum dma_data_direction dir, unsigned long attrs)
+ {
+-	int i;
++	struct pci_p2pdma_map_state p2pdma_state = {};
++	enum pci_p2pdma_map_type map;
+ 	struct scatterlist *sg;
++	int i, ret;
+ 
+ 	for_each_sg(sgl, sg, nents, i) {
++		if (is_pci_p2pdma_page(sg_page(sg))) {
++			map = pci_p2pdma_map_segment(&p2pdma_state, dev, sg);
++			switch (map) {
++			case PCI_P2PDMA_MAP_BUS_ADDR:
++				continue;
++			case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
++				/*
++				 * Any P2P mapping that traverses the PCI
++				 * host bridge must be mapped with CPU physical
++				 * address and not PCI bus addresses. This is
++				 * done with dma_direct_map_page() below.
++				 */
++				break;
++			default:
++				ret = -EREMOTEIO;
++				goto out_unmap;
++			}
++		}
++
+ 		sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
+ 				sg->offset, sg->length, dir, attrs);
+-		if (sg->dma_address == DMA_MAPPING_ERROR)
++		if (sg->dma_address == DMA_MAPPING_ERROR) {
++			ret = -EIO;
+ 			goto out_unmap;
++		}
+ 		sg_dma_len(sg) = sg->length;
+ 	}
+ 
+@@ -491,7 +522,7 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
+ 
+ out_unmap:
+ 	dma_direct_unmap_sg(dev, sgl, i, dir, attrs | DMA_ATTR_SKIP_CPU_SYNC);
+-	return -EIO;
++	return ret;
+ }
+ 
+ dma_addr_t dma_direct_map_resource(struct device *dev, phys_addr_t paddr,
+diff --git a/kernel/dma/direct.h b/kernel/dma/direct.h
+index 4632b0f4f72e..a33152d79069 100644
+--- a/kernel/dma/direct.h
++++ b/kernel/dma/direct.h
+@@ -87,10 +87,15 @@ static inline dma_addr_t dma_direct_map_page(struct device *dev,
+ 	phys_addr_t phys = page_to_phys(page) + offset;
+ 	dma_addr_t dma_addr = phys_to_dma(dev, phys);
+ 
+-	if (is_swiotlb_force_bounce(dev))
++	if (is_swiotlb_force_bounce(dev)) {
++		if (is_pci_p2pdma_page(page))
++			return DMA_MAPPING_ERROR;
+ 		return swiotlb_map(dev, phys, size, dir, attrs);
++	}
+ 
+ 	if (unlikely(!dma_capable(dev, dma_addr, size, true))) {
++		if (is_pci_p2pdma_page(page))
++			return DMA_MAPPING_ERROR;
+ 		if (swiotlb_force != SWIOTLB_NO_FORCE)
+ 			return swiotlb_map(dev, phys, size, dir, attrs);
+ 
 -- 
 2.30.2
 
