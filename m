@@ -2,112 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CCDC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 27 Jan 2022 22:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C4CFC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 00:26:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235304AbiA0W45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Jan 2022 17:56:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21565 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229801AbiA0W44 (ORCPT
+        id S1344493AbiA1A00 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Jan 2022 19:26:26 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:46980 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235714AbiA1A00 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Jan 2022 17:56:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643324216;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=vJ6TnJPKd3jnAAKSRYmEdyBJB9c5u4F9myAf76vl6jE=;
-        b=J33ymQjexydbPNM+4OytE1i7B+RyBTbZCFi54KA18Nh1d/eIN3syCoBk8sYpelZTPmXTfD
-        tclDovBggLdaSRfQyCDZ1l3VKBcV7PSZbJjxxnu3lEhyOvoCeipJHzdUUHzDhKImJJhPvW
-        eRTQkciFwSEy7gY+W7YM/VzhBQFs+Bw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-196-2x-7KD3sOnOFI60Zk27uSw-1; Thu, 27 Jan 2022 17:56:55 -0500
-X-MC-Unique: 2x-7KD3sOnOFI60Zk27uSw-1
-Received: by mail-qv1-f70.google.com with SMTP id e14-20020a0cf34e000000b0042623ad325aso91198qvm.16
-        for <linux-block@vger.kernel.org>; Thu, 27 Jan 2022 14:56:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=vJ6TnJPKd3jnAAKSRYmEdyBJB9c5u4F9myAf76vl6jE=;
-        b=Oufe10Z/SRzc5vOca1WlnvbvFZ1cwZsKza0+ANPlRe5UsQxF/qQUE43X31bjcmxS2U
-         9dZ2szcK5neLdQbi5CxqtYj0T6j3800BXWqDYkd9J6z8sdR2wTlF7WfwTay6AC/QC/UQ
-         Nu31ZSob8IbNuq7/GyOnriSwEX+nUJX3fESz+rCiyEdwFREil2Ju+cGsE0KdywSnpBk8
-         w+8SzvgaUUGpyWbt8gdiokd6UCGTdONFv1JwLaIrrobJqle9cGN3syX8bLywKWv7DIk2
-         HY0dTE/dkmNiQTrKw86f+4jDASx1Cqw6i99Z0cs5q4mcm3c5WnCEQuYimNTMqAifEjU4
-         H4rQ==
-X-Gm-Message-State: AOAM5301jyRPsRe6DWjrOJFUZAIgAFpHYHPglWFVao7AxPrsAvkp+duG
-        M90XqEjJ90lBEiwcBHMU/0f0D3XmELJV7S+JwkXwpN9fVpzyvmnn2aiT4IggkfSyqLZ9YLneNl7
-        BpQVpNlTUVK4N5XoPt4oVPw==
-X-Received: by 2002:a05:620a:450c:: with SMTP id t12mr4251281qkp.343.1643324214621;
-        Thu, 27 Jan 2022 14:56:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx0nJBNt2XNTVFChnIRxj7wnHOd+t1Jl5N/kzJqu73nkFplu02EOEvuNXsrUdyeMf2Ql9ud7g==
-X-Received: by 2002:a05:620a:450c:: with SMTP id t12mr4251277qkp.343.1643324214446;
-        Thu, 27 Jan 2022 14:56:54 -0800 (PST)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id n17sm1149219qkp.89.2022.01.27.14.56.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jan 2022 14:56:54 -0800 (PST)
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     axboe@kernel.dk
-Cc:     hch@lst.de, dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH v2 3/3] dm: properly fix redundant bio-based IO accounting
-Date:   Thu, 27 Jan 2022 17:56:48 -0500
-Message-Id: <20220127225648.28729-4-snitzer@redhat.com>
-X-Mailer: git-send-email 2.15.0
-In-Reply-To: <20220127225648.28729-1-snitzer@redhat.com>
-References: <20220127225648.28729-1-snitzer@redhat.com>
+        Thu, 27 Jan 2022 19:26:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=bRKwNbLS7GTorTVqHwjsOSnom3kuz6wsSSmUEePGzuc=; b=bbCGCv2EfpiJjjFaP9abLvC1cM
+        Sm++joV+vIhFDE3ycOTZUG498KzRrSdEDKEN9SQIIZUdbhc/YoQ0DfjQMkERarIVbrRXVK6w2CSPZ
+        AwcM72rvP+JqOvBa+3q4iZDXBxHGKa5KJVDotidYB/zfXPJtcPv9FjbpNJc4lVVYY36VJ1bW1BEBo
+        CRlyTYkBXN6VJFG77/h9nzmY6aSthXmwEKGNBwhM4NSTdBkAVdpPgcp8zZPZDr4HFIa4YC4KZX4Yf
+        6V9SzQVNljq015M1B9bdjnNhtFDKymD2AgeAianLjdGqdqYecjHiGk8E1Tz1MtYAaWItofLbzhgHj
+        e6SlzPQA==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1nDF5r-005OcX-Pi; Thu, 27 Jan 2022 17:26:24 -0700
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1nDF5p-0001dT-Uz; Thu, 27 Jan 2022 17:26:22 -0700
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 27 Jan 2022 17:26:12 -0700
+Message-Id: <20220128002614.6136-23-logang@deltatee.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220128002614.6136-1-logang@deltatee.com>
+References: <20220128002614.6136-1-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH v5 22/24] mm: use custom page_free for P2PDMA pages
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Record the start_time for a bio but defer the starting block core's IO
-accounting until after IO is submitted using bio_start_io_acct_time().
+When P2PDMA pages are passed to userspace, they will need to be
+reference counted properly and returned to their genalloc after their
+reference count returns to 1. This is accomplished with the existing
+DEV_PAGEMAP_OPS and the .page_free() operation.
 
-This approach avoids the need to mess around with any of the
-individual IO stats in response to a bio_split() that follows bio
-submission.
+Change CONFIG_P2PDMA to select CONFIG_DEV_PAGEMAP_OPS and add
+MEMORY_DEVICE_PCI_P2PDMA to page_is_devmap_managed(),
+devmap_managed_enable_[put|get]() and free_devmap_managed_page().
 
-Reported-by: Bud Brown <bubrown@redhat.com>
-Cc: stable@vger.kernel.org
-Depends-on: f9893e1da2e3 ("block: add bio_start_io_acct_time() to control start_time")
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/md/dm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/pci/p2pdma.c | 13 +++++++++++++
+ mm/memremap.c        |  5 +++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 9849114b3c08..144436301a57 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -489,7 +489,7 @@ static void start_io_acct(struct dm_io *io)
- 	struct mapped_device *md = io->md;
- 	struct bio *bio = io->orig_bio;
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index e66694cc9e14..3a24bf5099cf 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -101,6 +101,18 @@ static const struct attribute_group p2pmem_group = {
+ 	.name = "p2pmem",
+ };
  
--	io->start_time = bio_start_io_acct(bio);
-+	__bio_start_io_acct(bio, io->start_time);
- 	if (unlikely(dm_stats_used(&md->stats)))
- 		dm_stats_account_io(&md->stats, bio_data_dir(bio),
- 				    bio->bi_iter.bi_sector, bio_sectors(bio),
-@@ -535,7 +535,7 @@ static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
- 	io->md = md;
- 	spin_lock_init(&io->endio_lock);
++static void p2pdma_page_free(struct page *page)
++{
++	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page->pgmap);
++
++	gen_pool_free(pgmap->provider->p2pdma->pool,
++		      (uintptr_t)page_to_virt(page), PAGE_SIZE);
++}
++
++static const struct dev_pagemap_ops p2pdma_pgmap_ops = {
++	.page_free = p2pdma_page_free,
++};
++
+ static void pci_p2pdma_release(void *data)
+ {
+ 	struct pci_dev *pdev = data;
+@@ -198,6 +210,7 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 	pgmap->range.end = pgmap->range.start + size - 1;
+ 	pgmap->nr_range = 1;
+ 	pgmap->type = MEMORY_DEVICE_PCI_P2PDMA;
++	pgmap->ops = &p2pdma_pgmap_ops;
  
--	start_io_acct(io);
-+	io->start_time = READ_ONCE(jiffies);
- 
- 	return io;
- }
-@@ -1482,6 +1482,7 @@ static void __split_and_process_bio(struct mapped_device *md,
- 			submit_bio_noacct(bio);
- 		}
- 	}
-+	start_io_acct(ci.io);
- 
- 	/* drop the extra reference count */
- 	dm_io_dec_pending(ci.io, errno_to_blk_status(error));
+ 	p2p_pgmap->provider = pdev;
+ 	p2p_pgmap->bus_offset = pci_bus_address(pdev, bar) -
+diff --git a/mm/memremap.c b/mm/memremap.c
+index 0fc8b85d792e..ced9448ddcb4 100644
+--- a/mm/memremap.c
++++ b/mm/memremap.c
+@@ -299,6 +299,10 @@ void *memremap_pages(struct dev_pagemap *pgmap, int nid)
+ 	case MEMORY_DEVICE_GENERIC:
+ 		break;
+ 	case MEMORY_DEVICE_PCI_P2PDMA:
++		if (!pgmap->ops->page_free) {
++			WARN(1, "Missing page_free method\n");
++			return ERR_PTR(-EINVAL);
++		}
+ 		params.pgprot = pgprot_noncached(params.pgprot);
+ 		break;
+ 	default:
+@@ -460,6 +464,7 @@ void free_zone_device_page(struct page *page)
+ {
+ 	switch (page->pgmap->type) {
+ 	case MEMORY_DEVICE_PRIVATE:
++	case MEMORY_DEVICE_PCI_P2PDMA:
+ 		free_device_page(page);
+ 		return;
+ 	case MEMORY_DEVICE_FS_DAX:
 -- 
-2.15.0
+2.30.2
 
