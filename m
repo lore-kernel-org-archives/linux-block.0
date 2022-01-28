@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95999C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 13:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92436C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 13:00:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237652AbiA1NAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jan 2022 08:00:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        id S236635AbiA1NAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jan 2022 08:00:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232557AbiA1NAb (ORCPT
+        with ESMTP id S237628AbiA1NAd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jan 2022 08:00:31 -0500
+        Fri, 28 Jan 2022 08:00:33 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EEE2C061749
-        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 05:00:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0970DC061714
+        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 05:00:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=M7+p/Wcaf4mI3B2OWg65g74qcIfYAzurE0KZl84PMfE=; b=B+f4Oypjm6C7Bzk86CPcM4gQhY
-        o2zWp/ECDeLyl+ieMEkm9UbBC30mAd0D+UW1Dcx1QbWziQX/Kj3Y9Gnlj8kk1rsm4qZoOKflUtLtN
-        NNHYiH+IbGGTWKwd0xmfrJpxFLYc2UimU5UsHr7E1DVzpEU5xL+lxn4Fcdfr663A6k6zeRjHHk5lB
-        xvBVSjVl9whvC037pIDrVmgPqH5VBjQn6zQoULr8jAOK+jaHcuM4eVQouNuDuR7XbJAU5JNy2JcCq
-        0UP70wiKq9VlZ8WWe5iSBdfquANwxJ/e7rdyYMEnd6ULLfKVAjbzUS/Wd85eFLb178Q6tqiOZeRcZ
-        KN/x8nUQ==;
+        bh=L+JJfK2NHPJv5MHoM3InDvOXTWR2sZz0iNRY4R8iog4=; b=w/L14eTsQz63k3T+GS7vz2uC3M
+        O/d67FY2rgTgiEYLEs/9uaCIzdjzGpEW2G+JriZvLTgmJpQE90nrOL0wSkHwFY6erKd6iTq06H2bU
+        FkCmya3KMEkM6BRqQbUP+KT1qLjQRyAIoQ4PbBA/GZTJ/j1O4Wl4Geui5HqI0gCKz3pZmOLJS/4fn
+        V6+GIjbeDohBNpyi5egn4sV+0Mw/YpSkvezofnvfjnMPM2tmACvWiVKC3cX8UfAgweoX+0LudbulH
+        Rr+ksxhxTnD72n94kEyFyct3XALawvHbrVlGwTMbXkfhMYW7XpzmjdOivpct8iAy4x/NZ7H/AFZ1a
+        2K+6p5VA==;
 Received: from [2001:4bb8:180:4c4c:73e:e8c7:4199:32d7] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nDQrb-0028qG-BP; Fri, 28 Jan 2022 13:00:27 +0000
+        id 1nDQre-0028rb-7p; Fri, 28 Jan 2022 13:00:30 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
         Ming Lei <ming.lei@redhat.com>,
         "Darrick J . Wong" <djwong@kernel.org>
-Subject: [PATCH 1/8] loop: de-duplicate the idle worker freeing code
-Date:   Fri, 28 Jan 2022 14:00:15 +0100
-Message-Id: <20220128130022.1750906-2-hch@lst.de>
+Subject: [PATCH 2/8] loop: initialize the worker tracking fields once
+Date:   Fri, 28 Jan 2022 14:00:16 +0100
+Message-Id: <20220128130022.1750906-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128130022.1750906-1-hch@lst.de>
 References: <20220128130022.1750906-1-hch@lst.de>
@@ -47,142 +47,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use a common helper for both timer based and uncoditional freeing of idle
-workers.
+There is no need to reinitialize idle_worker_list, worker_tree and timer
+every time a loop device is configured.  Just initialize them once at
+allocation time.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
 Tested-by: Darrick J. Wong <djwong@kernel.org>
 ---
- drivers/block/loop.c | 73 +++++++++++++++++++++-----------------------
- 1 file changed, 35 insertions(+), 38 deletions(-)
+ drivers/block/loop.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 01cbbfc4e9e24..b268bca6e4fb7 100644
+index b268bca6e4fb7..6ec55a5d9dfc4 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -804,7 +804,6 @@ struct loop_worker {
+@@ -1052,10 +1052,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
  
- static void loop_workfn(struct work_struct *work);
- static void loop_rootcg_workfn(struct work_struct *work);
--static void loop_free_idle_workers(struct timer_list *timer);
- 
- #ifdef CONFIG_BLK_CGROUP
- static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
-@@ -888,6 +887,39 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 	spin_unlock_irq(&lo->lo_work_lock);
- }
- 
-+static void loop_set_timer(struct loop_device *lo)
-+{
-+	timer_reduce(&lo->timer, jiffies + LOOP_IDLE_WORKER_TIMEOUT);
-+}
-+
-+static void loop_free_idle_workers(struct loop_device *lo, bool delete_all)
-+{
-+	struct loop_worker *pos, *worker;
-+
-+	spin_lock_irq(&lo->lo_work_lock);
-+	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-+				idle_list) {
-+		if (!delete_all &&
-+		    time_is_after_jiffies(worker->last_ran_at +
-+					  LOOP_IDLE_WORKER_TIMEOUT))
-+			break;
-+		list_del(&worker->idle_list);
-+		rb_erase(&worker->rb_node, &lo->worker_tree);
-+		css_put(worker->blkcg_css);
-+		kfree(worker);
-+	}
-+	if (!list_empty(&lo->idle_worker_list))
-+		loop_set_timer(lo);
-+	spin_unlock_irq(&lo->lo_work_lock);
-+}
-+
-+static void loop_free_idle_workers_timer(struct timer_list *timer)
-+{
-+	struct loop_device *lo = container_of(timer, struct loop_device, timer);
-+
-+	return loop_free_idle_workers(lo, false);
-+}
-+
- static void loop_update_rotational(struct loop_device *lo)
- {
- 	struct file *file = lo->lo_backing_file;
-@@ -1022,7 +1054,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
  	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
- 	INIT_LIST_HEAD(&lo->idle_worker_list);
- 	lo->worker_tree = RB_ROOT;
--	timer_setup(&lo->timer, loop_free_idle_workers,
-+	timer_setup(&lo->timer, loop_free_idle_workers_timer,
- 		TIMER_DEFERRABLE);
+-	INIT_LIST_HEAD(&lo->idle_worker_list);
+-	lo->worker_tree = RB_ROOT;
+-	timer_setup(&lo->timer, loop_free_idle_workers_timer,
+-		TIMER_DEFERRABLE);
  	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
  	lo->lo_device = bdev;
-@@ -1086,7 +1118,6 @@ static void __loop_clr_fd(struct loop_device *lo)
- {
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
--	struct loop_worker *pos, *worker;
+ 	lo->lo_backing_file = file;
+@@ -1957,6 +1953,9 @@ static int loop_add(int i)
+ 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
+ 	if (!lo)
+ 		goto out;
++	lo->worker_tree = RB_ROOT;
++	INIT_LIST_HEAD(&lo->idle_worker_list);
++	timer_setup(&lo->timer, loop_free_idle_workers_timer, TIMER_DEFERRABLE);
+ 	lo->lo_state = Lo_unbound;
  
- 	/*
- 	 * Flush loop_configure() and loop_change_fd(). It is acceptable for
-@@ -1116,15 +1147,7 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
- 	destroy_workqueue(lo->workqueue);
--	spin_lock_irq(&lo->lo_work_lock);
--	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
--				idle_list) {
--		list_del(&worker->idle_list);
--		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->blkcg_css);
--		kfree(worker);
--	}
--	spin_unlock_irq(&lo->lo_work_lock);
-+	loop_free_idle_workers(lo, true);
- 	del_timer_sync(&lo->timer);
- 
- 	spin_lock_irq(&lo->lo_lock);
-@@ -1871,11 +1894,6 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 	}
- }
- 
--static void loop_set_timer(struct loop_device *lo)
--{
--	timer_reduce(&lo->timer, jiffies + LOOP_IDLE_WORKER_TIMEOUT);
--}
--
- static void loop_process_work(struct loop_worker *worker,
- 			struct list_head *cmd_list, struct loop_device *lo)
- {
-@@ -1924,27 +1942,6 @@ static void loop_rootcg_workfn(struct work_struct *work)
- 	loop_process_work(NULL, &lo->rootcg_cmd_list, lo);
- }
- 
--static void loop_free_idle_workers(struct timer_list *timer)
--{
--	struct loop_device *lo = container_of(timer, struct loop_device, timer);
--	struct loop_worker *pos, *worker;
--
--	spin_lock_irq(&lo->lo_work_lock);
--	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
--				idle_list) {
--		if (time_is_after_jiffies(worker->last_ran_at +
--						LOOP_IDLE_WORKER_TIMEOUT))
--			break;
--		list_del(&worker->idle_list);
--		rb_erase(&worker->rb_node, &lo->worker_tree);
--		css_put(worker->blkcg_css);
--		kfree(worker);
--	}
--	if (!list_empty(&lo->idle_worker_list))
--		loop_set_timer(lo);
--	spin_unlock_irq(&lo->lo_work_lock);
--}
--
- static const struct blk_mq_ops loop_mq_ops = {
- 	.queue_rq       = loop_queue_rq,
- 	.complete	= lo_complete_rq,
+ 	err = mutex_lock_killable(&loop_ctl_mutex);
 -- 
 2.30.2
 
