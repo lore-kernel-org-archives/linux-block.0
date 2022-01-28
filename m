@@ -2,72 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC797C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 09:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B20C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 09:38:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234997AbiA1Jfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jan 2022 04:35:46 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:35882 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233524AbiA1Jfp (ORCPT
+        id S229836AbiA1JiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jan 2022 04:38:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347685AbiA1JiN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jan 2022 04:35:45 -0500
-Received: from kwepemi100012.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JlXNp4gCdzcck2;
-        Fri, 28 Jan 2022 17:34:50 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100012.china.huawei.com (7.221.188.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 28 Jan 2022 17:35:42 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 28 Jan 2022 17:35:41 +0800
-Subject: Re: [PATCH v2 0/3] block, bfq: minor cleanup and fix
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     <jack@suse.cz>, <tj@kernel.org>, <axboe@kernel.dk>,
-        <paolo.valente@linaro.org>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20211231032354.793092-1-yukuai3@huawei.com>
- <a461cdbd-e1f3-0083-cd96-b69837334b19@huawei.com>
-Message-ID: <a6c3696b-467c-0ea7-141c-714a9a1b7ba4@huawei.com>
-Date:   Fri, 28 Jan 2022 17:35:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 28 Jan 2022 04:38:13 -0500
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B471C061753
+        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 01:38:08 -0800 (PST)
+Received: by mail-vs1-xe30.google.com with SMTP id v62so2281245vsv.4
+        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 01:38:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E/VIyc5JpK2Sy5loT9a2HcHWg2TrorJJxRaogeKP25w=;
+        b=EibPllimp8WZIwxJdUGUIFAlIuZdyznPvrXJ7caP5EDkiBNUVM4ihiUoIfNxC6TVSx
+         YE207qfvpl7N/VHWz1SefuMcAFD5mqGieRSegzXNyYGWfyIdkPkwWByrIvqWimbKQ8Un
+         /lbUGxvPlDX06Jf/32nPUu5Q90vZSrQ0/ovfo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E/VIyc5JpK2Sy5loT9a2HcHWg2TrorJJxRaogeKP25w=;
+        b=2lqyyHONhyBYvm+6hB88VYG3UEW46bGepLcEQXFnC/4kZcx/w4yhIoVJ1WlAuUx1e8
+         JaBNxtdEHZsR0oeyBTE2kqUF12BSg2vfMCrmepKtK/D4854ut8mGHb06QoFk1dUI+U0V
+         fTsbVfdq7bW5pZYb1apMK1zwhNiXTy1pv5ud8o3WDZ5MDOKGrR01re52ULN3nEYtPf/g
+         Dybb9FyUAS9wsVOw7KbRzyLLO1clACbB1vbqfBG2o/eVjMJkt8XK+uLN5uReqDlqbDjF
+         7aVuB71qdDfCcmTTNuv848+825GnCfoYiGwgp6z855x9AjtPUglpRXV4wwSsHsax9ALp
+         qCnQ==
+X-Gm-Message-State: AOAM533dtkbSEXBnBIGlOSoBoqb8JE/ggp+fyZlV5+dHGV23kRp8Gggh
+        bMMzy7P+L6t4BIoZdBeJXvrVs3KD4Rex3E+uqY1RXcIvN1LNoQ==
+X-Google-Smtp-Source: ABdhPJwGf3F8vVWMx/hAPOM/tzuC6mlnTkkNvV3zFtYKADK7sTRpnxjvKNE9DMzHauL+NEVwnl4j38I6/K9jRDhQk7E=
+X-Received: by 2002:a67:c390:: with SMTP id s16mr3769368vsj.61.1643362687362;
+ Fri, 28 Jan 2022 01:38:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a461cdbd-e1f3-0083-cd96-b69837334b19@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+References: <164325106958.29787.4865219843242892726.stgit@noble.brown> <164325158954.29787.7856652136298668100.stgit@noble.brown>
+In-Reply-To: <164325158954.29787.7856652136298668100.stgit@noble.brown>
+From:   Miklos Szeredi <miklos@szeredi.hu>
+Date:   Fri, 28 Jan 2022 10:37:56 +0100
+Message-ID: <CAJfpegt-igF8HqsDUcMzfU0jYv8WpofLy0Uv0YnXLzsfx=tkGg@mail.gmail.com>
+Subject: Re: [PATCH 1/9] Remove inode_congested()
+To:     NeilBrown <neilb@suse.de>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm <linux-mm@kvack.org>,
+        linux-nilfs@vger.kernel.org,
+        Linux NFS list <linux-nfs@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Ext4 <linux-ext4@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/01/24 11:46, yukuai (C) 写道:
-> 在 2021/12/31 11:23, Yu Kuai 写道:
->> Chagnes in v2:
->>   - add comment in patch 2
->>   - remove patch 4, since the problem do not exist.
->>
->> Yu Kuai (3):
->>    block, bfq: cleanup bfq_bfqq_to_bfqg()
->>    block, bfq: avoid moving bfqq to it's parent bfqg
->>    block, bfq: don't move oom_bfqq
->>
->>   block/bfq-cgroup.c  | 16 +++++++++++++++-
->>   block/bfq-iosched.c |  4 ++--
->>   block/bfq-iosched.h |  1 -
->>   block/bfq-wf2q.c    | 15 ---------------
->>   4 files changed, 17 insertions(+), 19 deletions(-)
->>
-> Hi, jens
-> 
-> Now that with acked-by Paolo, can you please applied this pathset?
-friendly ping ...
-> 
-> Thanks,
-> Kuai
+On Thu, 27 Jan 2022 at 03:47, NeilBrown <neilb@suse.de> wrote:
+>
+> inode_congested() reports if the backing-device for the inode is
+> congested.  Few bdi report congestion any more, only ceph, fuse, and
+> nfs.  Having support just for those is unlikely to be useful.
+>
+> The places which test inode_congested() or it variants like
+> inode_write_congested(), avoid initiating IO if congestion is present.
+> We now have to rely on other places in the stack to back off, or abort
+> requests - we already do for everything except these 3 filesystems.
+>
+> So remove inode_congested() and related functions, and remove the call
+> sites, assuming that inode_congested() always returns 'false'.
+
+Looks to me this is going to "break" fuse; e.g. readahead path will go
+ahead and try to submit more requests, even if the queue is getting
+congested.   In this case the readahead submission will eventually
+block, which is counterproductive.
+
+I think we should *first* make sure all call sites are substituted
+with appropriate mechanisms in the affected filesystems and as a last
+step remove the superfluous bdi congestion mechanism.
+
+You are saying that all fs except these three already have such
+mechanisms in place, right?  Can you elaborate on that?
+
+Thanks,
+Miklos
