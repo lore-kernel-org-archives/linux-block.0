@@ -2,96 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D54C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 29 Jan 2022 01:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7C0C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 29 Jan 2022 01:47:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352036AbiA2Bmr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jan 2022 20:42:47 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:31251 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344761AbiA2Bmr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jan 2022 20:42:47 -0500
-Received: from kwepemi100008.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Jlxrc3gk2zbk3y;
-        Sat, 29 Jan 2022 09:41:52 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100008.china.huawei.com (7.221.188.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 29 Jan 2022 09:42:44 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 29 Jan 2022 09:42:44 +0800
-Subject: Re: [PATCH v2 0/3] block, bfq: minor cleanup and fix
-To:     Jens Axboe <axboe@kernel.dk>, <paolo.valente@linaro.org>,
-        <jack@suse.cz>, <tj@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
-        <yi.zhang@huawei.com>, <linux-kernel@vger.kernel.org>
-References: <20211231032354.793092-1-yukuai3@huawei.com>
- <164338111974.263985.3933987922467783334.b4-ty@kernel.dk>
- <2579c500-549f-ff04-d1e1-6cf3db10b428@kernel.dk>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <8f0d2f92-96c5-f2c4-daa4-f2a59bd885a2@huawei.com>
-Date:   Sat, 29 Jan 2022 09:42:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1344761AbiA2Bry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jan 2022 20:47:54 -0500
+Received: from mail-bn8nam08on2089.outbound.protection.outlook.com ([40.107.100.89]:41345
+        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1344830AbiA2Brw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Jan 2022 20:47:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FaQvDY41ZkJOErtocNz5WvWSF1CRu+QB6AmYr3CGAGG+igd7eY9bNkIWQIVmRAda7yyHnBRG7/kV54u2azjFgDcL4asAFl+Jq6XxDZJaP/XPoaMBizgpbeY1qcPYjSwZm5HllyDFpxZP7pjrxLBpvB1HegVLVm6EJ+Q3P2B9zZT7HDEshHGXdmmQtUH0eSmdp2WkQnrZFObeN+yRYbHlBntNBfHKfktPArn7+ECvpasaU21CZjfx3ZwziTp0cV/+8A/7Hsy8SaYVFYYORLkOcf5+LCruGNutwEjbgX4FEXFReee5yRP66xNRP7+wbSocQYbj0Iavn5xHcLsN4b65dg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hbqSoTeYxV7jPqlFn6ijrE9aPAUzRh9uKQKHfXBPpWg=;
+ b=O6CRnPPRl+4zfhv9ALHfD8A8KjZx3TRMy6XQgon9NTmQlIIvDpFw6Gzlevk+4yV+38le/HvtVIOc4HTfHSdiHBRBv0PbfgFcekiz2ZTEOegMOJFbMlsyCLAB2oSR5oPPmeW7WVAIgmXXTT1OBRXvj3EjJlZD2xVmO2NfvoFP7PSRwzo5kzLODwbEVuHj/DSg92l7XHarEIw1zuBF+k5zGEmXQ8b7RUqQxX9fefigkFqxePAvJHYBrwjrIgWRyO6mlPY+iYv82HRbC/LYYkdQm/xtwSayXeRBxuDZ+ZqBK5Irm1iDY61ShyXcqG6RzCdUwH/+fghiaZCRfMx9hj3X8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hbqSoTeYxV7jPqlFn6ijrE9aPAUzRh9uKQKHfXBPpWg=;
+ b=Bj7/SxBvONbUBmORZxBHVDreTLyxut6UoyPLjgBvP6K8X6kr0zJkPH3tfE7GsYvMYvONX4F/z/CGGwH+WC9mpdkmywmVgG8SrRJ6nftUhHlMniN9I77i3RTWtLbPbcmbkvPKDVqTup+sAVqrLbTvHaMW5lFGs77wMcKRD80wEMzhTzbB0/m0L57z6ekBXbQ2lAiUOvfhbsf+mrv3m+AGz5i2eJZVnhAfWa1aPB/wepcZrICUWCpUSNzAiVeXm0HNiD7XH5h1Ev/BXgddfYue1esQld4b28G6uLH4p4rLTg2CpnFjlKZSgKAlXJMkLqTwZBrK+1ELih024AEmGz6j8Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13)
+ by MN2PR12MB3488.namprd12.prod.outlook.com (2603:10b6:208:ca::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.15; Sat, 29 Jan
+ 2022 01:47:50 +0000
+Received: from DM6PR12MB4140.namprd12.prod.outlook.com
+ ([fe80::ede5:7f12:c1:b25]) by DM6PR12MB4140.namprd12.prod.outlook.com
+ ([fe80::ede5:7f12:c1:b25%6]) with mapi id 15.20.4930.019; Sat, 29 Jan 2022
+ 01:47:50 +0000
+Message-ID: <c6e152ad-2b31-48cd-3d5e-c109d24a0e79@nvidia.com>
+Date:   Fri, 28 Jan 2022 17:47:47 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Content-Language: en-US
+To:     lsf-pc@lists.linux-foundation.org,
+        Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gary Gunthorpe <jgg@nvidia.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   John Hubbard <jhubbard@nvidia.com>
+Subject: [LSF/MM/BPF TOPIC] FOLL_PIN + file systems
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR04CA0004.namprd04.prod.outlook.com
+ (2603:10b6:a03:217::9) To DM6PR12MB4140.namprd12.prod.outlook.com
+ (2603:10b6:5:221::13)
 MIME-Version: 1.0
-In-Reply-To: <2579c500-549f-ff04-d1e1-6cf3db10b428@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e59b7e1b-62bd-4b38-860f-08d9e2c95ba6
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3488:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB3488542EED410FFACE516891A8239@MN2PR12MB3488.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: k0BnBFBmB604Do3reug4VWSQPtmp+hf0b+IaQpeXXJLkvGnYTmd4EYo/5nnkDAKUqvPCGednXasiS9VzeG+ofaos9WDZAQSZjHS3tf0Ui9Nd6Z85HFrHpIqri6IhZxhLfJtOXxnm6Tw328zdG0Llk7q40pybGOFDQFLL/xeXzjLZhh1pFCexCFLoFez8MJ723WBf/k7Zk1PTPBU3R3bVNvFOEINpuTT0ug+2wj/kwkCiX0VipNNTsgqolnQwZCvH9mXPDFwlMN110B97h4Eblo39syPl1NOGBaayn/ZYbaWLxDZSg69EjD2XAnPMCTU9XAlIQ2WyP6qh/tUbGTZp9504z3rxeeYOM0aej2TAlW17WPdxww177JP9Obf13mfEwkyUqCS4Qur7sQRvo3nbX0D9RZlS+ukyC9c3eO8v4xvI193VcsMI/5ake0Q7dlugzkZRe1/SQlLTL8Q02qgC7pbceauJS9H2f6DedznzbiE2gqcDZ93F2xANQgxHm6ApQ8GQPhiHUmMdq2FG1aO7MOXnkcC49F41o/6mOan6r3mSD+ENooVNrkKUZ7EMShqsjTGN4TGLxm60a8b6oxtpAPIYFwzu/hmaSh+vWqpucnTgmRLJyoA6reKXGJCbkdGrPw/4zkcDCBOKuckyUfy+VIFCY9IjJvWYUnP0suKweQ8mUER2KxDtrKgVsfftOiGjueZEGOpYTqAm8g+cVu2qSO/zfsSktcPjMUNR+NDG40egpfc1H6+4VjaESZ5x9baB9GC5DDznw3ikG1t8SzEOv0++eHczSQr981Anq+dwvW1MaNIlxrkqLmHHZjF3C/4xYjmN9dfGumattFaAT4CX/eGDjp7UU1TtfitBtcyhBbw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4140.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(36756003)(38100700002)(66476007)(66556008)(31686004)(2906002)(66946007)(26005)(186003)(2616005)(83380400001)(110136005)(6486002)(966005)(5660300002)(54906003)(316002)(6666004)(6506007)(31696002)(4326008)(86362001)(508600001)(8936002)(8676002)(6512007)(45980500001)(43740500002)(20210929001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q3loK24wb29kZlVROFViRkVwR2pja2laZ0VjNi9ad3l5L1V3MlR2WnpMNjhx?=
+ =?utf-8?B?cndMT2V6NG8rZzFTa2RTNGN4WWhyMW9LbmxTeGd2aDRadnhQeDZ3K01NZU1G?=
+ =?utf-8?B?SzlxbVJwKzkxblZJaEJKM2dNZExsWS9TTUNnazZKK0c1UU1WR0VpQzRDU0xl?=
+ =?utf-8?B?S0krOEFyTnVvVDRReHQ3RGNxVG9vc2RLYmVIN01oMFpFMno5N014ZEVGQXMv?=
+ =?utf-8?B?ZXFxZUNwclB5R2ZRRUExMUxzQ1hScXRMU2gxR0tCL21FMmZacTVhWGZBRExK?=
+ =?utf-8?B?MXRNU0NiM3lWMDBXbnAxT25NN2FMNXVZeENoRGJFTmFlYzBkNk90OHh5WitC?=
+ =?utf-8?B?cGNKdVBab1ByREpxZ0o0dnFObC9FYXR0b0tpaGxRdXp0SDR2ZUprSUx0bm5T?=
+ =?utf-8?B?cHNldGRlenFTNWlCa25NRHNXTWQrQVd2MERKazhjZWlKdTZNZS9nTDZvckxB?=
+ =?utf-8?B?VDdYLzhjSDBSNkc0Qk9JeGh0VkJiOHV3aTFsWUFmc2ZFZXpkVTd2am9HVWJP?=
+ =?utf-8?B?VC9YNlBTTzIwUXhPa0g2UXBBZzNic2dOSUR3OWpNWUxvOXJwaktXZmgxWmxN?=
+ =?utf-8?B?MUNGMWs5K2U1ZW9yTlFtcSszQ0o3QVRSQlJBYlZEWGluUFNwSGV3d1FsK2Y1?=
+ =?utf-8?B?MG9QM2Z2RlhWSHY1bmJURytzZUJHbit6SHZuZ1pJa0Mrdko2WkNpT253QjR0?=
+ =?utf-8?B?V3dsOFY0T0FYQTc0c3dPSTIyeHEyOXZQVUY0R2xUTnFXYVBDTzN2RFMrUHBr?=
+ =?utf-8?B?RXplR0VlY1Z0UkpITXdkb0xTdzZkR25oRWNWQ0tEYTFERjY5d2NFMWpPUVY0?=
+ =?utf-8?B?YWhyM2I0Y1JGdTIrbUUwRTArbjNsS3ZubVIyRytQbEViOE1NcGZLNGRORGRs?=
+ =?utf-8?B?R1lXNzAvbFVmZHJqN2tac0puT3ZUY3dJb2FXMEdqc3ZzMnVheFd1b0RQREpx?=
+ =?utf-8?B?SlFpdXhoMWVFUEVldDZXK2N5Z0lVKzBXOC82VS9FbGFUbUdCVlI1clNTMmF4?=
+ =?utf-8?B?RjdPellGWklMTXl1dzJGd3hyUHVQMlZjQTlpNXoxQXc2RkpmSitacHc4eTRm?=
+ =?utf-8?B?ZXdDV0M4dnc3N0dyZXBraDdrbzJYcGlwN25lTy9UY2drSzJjc3pmU3NqU2Jq?=
+ =?utf-8?B?NTRxN2hERWlPMEhyRWZqaDdhYTR1Y2xsekZEcGNkdkhIVVhrSDlMbEJXbi9L?=
+ =?utf-8?B?RDVmZFkwNWhMS1Z5RWoyUGdXVWs0MCt0L3JLZC9xckJjQ3NGbG9aNGlxc0NW?=
+ =?utf-8?B?cG1wa0ZRY2p4TEhRbWFsa1FXbDk0M3U4N2dOVzRkZUF2N0ppY2NTQ1VFYjRT?=
+ =?utf-8?B?R2VPMTY4TzdmWmZ1RElzWmNyMmVFM3lKNzZORC9Jd3J6U2d3UXlPdjZvYitl?=
+ =?utf-8?B?bWc3ZUc3S2FVdkNWY21wWndwNEEvS1lMY2ZYZ0NjL1c0SG9rSWZTL1ZMdTcw?=
+ =?utf-8?B?VGExOEdhLzMrNTQramx5U1E4c0tTb0Q1OG5qWEoxODh5cjdWNHVlWTlKb0hV?=
+ =?utf-8?B?RCtZSXBjQVg1WUtTcXRIVVJ4bkJZSkRESGpBS3ZEc3JoSDF2MUNMNlcyQkJl?=
+ =?utf-8?B?VkhZUzFIOStkd1VoVlczQWRMczFsbS8rRm1HRTlVWnNpT0pxdHpXa2RVZGt1?=
+ =?utf-8?B?Zld0T1RUYUE4bGFZbFEwYXc5SmMrKzBPRElDT3cyOVVmY1E0d2VrekxVS1ow?=
+ =?utf-8?B?Z2tRN1p3WFNEaENqdVljZTJKTnV6eWVLV0Q5L1hUZWJTTG1lWEpFcnBUakRZ?=
+ =?utf-8?B?TjlnWU0zMXlVVTg3T1pKdEp1NHczYnh6N0JmVjFQZUVCNjZ1NVN2Y1RGQ0tv?=
+ =?utf-8?B?N2NodFBlVmFtUittcktPNXlpVC9WTXpZSlBzbGFQQzU0ekZqR2wyL0FNcG9B?=
+ =?utf-8?B?b0E3QUZyV2N2SEZNMnhJd0VGNnhaZUlRUnAzamVqLzZreitLeG9Pc2xQbld0?=
+ =?utf-8?B?MlI3THphNmJXTDJodzRNMzcvR2xuSDQ5TmxnR1FaYUEvVHFPU08vZ2dLMFhV?=
+ =?utf-8?B?b3k2ZE5POEQ1UTBaM1p3RFd3LzJmZGZ1TzVXZE0xU0dxYnd2cUwvcThyR050?=
+ =?utf-8?B?aUI4N1ZLOVY0TUxoa0NVcjF2UytMRDgxSEVwcDlqWnZ2d2tyQ3ZCTUxKZjNa?=
+ =?utf-8?B?OVNrYVdmcngwZnZQU001bnphZzl3c0FSeWZBU2h6a0I5dmlKTXFpakZUZ3Mz?=
+ =?utf-8?Q?IqFgZYZ56yBTwo9+KT17Mok=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e59b7e1b-62bd-4b38-860f-08d9e2c95ba6
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4140.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2022 01:47:50.5454
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6I/3AP9gTKZ9V9UMOCQByfRh/xbneuxMgUiqc/UdEmT0eCE3qfq8Bbq05F2ag/n7ok2prRh5+9jsec6jdHFdBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3488
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/01/29 3:27, Jens Axboe 写道:
-> On 1/28/22 7:45 AM, Jens Axboe wrote:
->> On Fri, 31 Dec 2021 11:23:51 +0800, Yu Kuai wrote:
->>> Chagnes in v2:
->>>   - add comment in patch 2
->>>   - remove patch 4, since the problem do not exist.
->>>
->>> Yu Kuai (3):
->>>    block, bfq: cleanup bfq_bfqq_to_bfqg()
->>>    block, bfq: avoid moving bfqq to it's parent bfqg
->>>    block, bfq: don't move oom_bfqq
->>>
->>> [...]
->>
->> Applied, thanks!
->>
->> [1/3] block, bfq: cleanup bfq_bfqq_to_bfqg()
->>        commit: a9c77f6ec0b566439182a10b64dd3e60a0408849
->> [2/3] block, bfq: avoid moving bfqq to it's parent bfqg
->>        commit: 36ad7fe0ec7485ee435f7a40452c7a58598779d4
->> [3/3] block, bfq: don't move oom_bfqq
->>        commit: a0b98e6fba18a40aa9672cc3e0abf980456f3ae6
-> 
-> For all those pings, this patchset sure didn't see a lot of compiles:
-> 
-> block/bfq-cgroup.c: In function ‘bfq_bfqq_move’:
-> block/bfq-cgroup.c:648:40: error: implicit declaration of function ‘bfq_group’; did you mean ‘bfqq_group’? [-Werror=implicit-function-declaration]
->    648 |         struct bfq_group *old_parent = bfq_group(bfqq);
->        |                                        ^~~~~~~~~
->        |                                        bfqq_group
-> block/bfq-cgroup.c:648:40: error: initialization of ‘struct bfq_group *’ from ‘int’ makes pointer from integer without a cast [-Werror=int-conversion]
-> cc1: all warnings being treated as errors
-> make[1]: *** [scripts/Makefile.build:288: block/bfq-cgroup.o] Error 1
-> make: *** [Makefile:1831: block] Error 2
-> 
-> Dropped.
-> 
-
 Hi,
 
-I'm sincerely sorry for this, I do forget to compiles this patchset,
-and let this stupid clerical error exposure to you...
+By the time we meet for LSF/MM/BPF in May, the Direct IO layer will
+likely be converted to use FOLL_PIN page pinning (that is, changed from
+using get_user_pages_fast(), to pin_user_pages_fast()).
 
-I'll send anothor version of patch 2.
+Direct IO conversion to FOLL_PIN was the last missing piece, and so the
+time is right to discuss how to use the output of all of this work
+(which is: the ability to call page_maybe_dma_pinned()), in order to fix
+one of the original problems that prompted FOLL_PIN's creation.
 
-Thanks,
-Kuai
+That problem is: file systems do not currently tolerate having their
+pages pinned and DMA'd to/from. See [1] for an extensive background of
+some 11 LWN articles since 2018.
+
+In order to fix that problem, now that FOLL_PIN is available and wired
+up, we should revisit some of the leading proposals. For example, using
+file leases to mark out areas that are safe for FOLL_PIN page pins, is
+probably about right--with enough caveats to avoid breaking things for
+existing users...this is worth discussing at the conference. This topic
+has been contentious in past sessions, but with the recent progress, it
+should be a little easier to make progress, because there are fewer
+"variables".
+
+I'll volunteer to present a few slides to provide the background and get
+the discussion started. It's critical to have filesystem people in
+attendance for this, such as Jan Kara, Dave Chinner, Christoph Hellwig,
+and many more that I won't try to list explicitly here. RDMA
+representation (Jason Gunthorpe, Leon Romanovsky, Chaitanya Kulkarni,
+and others) will help keep the file system folks from creating rules
+that break them "too much". And of course -mm folks. There are many
+people who have contributed to this project, so again, apologies for not
+listing everyone explicitly.
+
+Worth mentioning: in addition to the Direct IO work, FOLL_PIN has been
+used to help improve the accuracy of copy-on-write (COW) behavior [2].
+And that eventually led to some speculation on Linus' part [3], that
+"legacy gup" (wow, someone already said those words!) might eventually
+be rare, and that most callers of the mm/gup.c functions would actually
+want access to the pages' contents for DMA or Direct IO. Those cases
+require calling the FOLL_PIN (pin_user_pages*) variants.
+
+
+[1] https://lwn.net/Kernel/Index/#Memory_management-get_user_pages
+
+[2] https://lwn.net/Articles/849876/ Patching until the COWs come home
+     (part 2)
+
+[3] https://lore.kernel.org/r/CAHk-=whUEZC2skXPUWy93DpNmC0VF=t2EwmEgWGx8aPstTmWYA@mail.gmail.com
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
