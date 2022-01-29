@@ -2,139 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57300C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 28 Jan 2022 22:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D54C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 29 Jan 2022 01:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344588AbiA1WHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jan 2022 17:07:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiA1WHb (ORCPT
+        id S1352036AbiA2Bmr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Jan 2022 20:42:47 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:31251 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344761AbiA2Bmr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jan 2022 17:07:31 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5386EC061714
-        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 14:07:31 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id my12-20020a17090b4c8c00b001b528ba1cd7so7702216pjb.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Jan 2022 14:07:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=qCR/XxEGxCdJDcAyJtLZMVgzHT8JKX0szIHntTFx8xQ=;
-        b=H9UXkkz/uFLOmMN5y+CgCAJss1h0lB2o8IPznO1xDY2D04MTPVUspa7Puriq8yQ0Me
-         AtXbmopblJZsA6kYD4Udh00aUxcSQS0FbibefsA+2sK016MApkZ9LYihTCbNVXpdzcgQ
-         k3J8Arpcjd4xrMDB+wBGaFAfSfj6nPpb1lCac22kD3cZxoqsKs4vsVCN4pO5Ai6wP6yt
-         xrGVNNN7VXWDVwN2ONSwA7z0yl6tWQok7uCW9ekWGYp/0Nc19lI9YE4UY7/EYAnMtb11
-         oF6C+CYApHxtO6j2r5PJLjRUtSX4A7gERyFbHg7mprGLEJ85ePcy1IkxHCrpahcEtcPb
-         Cj1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=qCR/XxEGxCdJDcAyJtLZMVgzHT8JKX0szIHntTFx8xQ=;
-        b=Hg7PBZEs32ROgT6caa7NUHTqiv7Fq5KNrJ/tFzJnpiHEvpC3vEeJw1J/sbjuGYxVvc
-         y3ztVHdHkRy78l9Hy2Cvwhp6ZwvIm1u1iv64LEYzZaxp8ImXnMVyYJeMzsXvkDmxfMm4
-         xd8QF7O7Wf7y3J3psXnOerg92ptEzTzLCfZF5KALAFG0XlParjz5kdIT86pmSpnrYLqw
-         rMJ7r6WoRHBcTOdgF3R017RpTjD461HqaJYsDvrxUEZ33Mjx1c+2YkBl7Y/klWwIQhyT
-         9PUdSverJKsHVw10otcCM79MvyYfCaXV6YLZq3Ky6D+ez6t694h2lZPjq4e9xp90/CA/
-         brRw==
-X-Gm-Message-State: AOAM531/J9ywJrgUle7GyE7zIdLjJCbI/CtB7j9rPemeyfBr+Oy+o17A
-        mtRFrIhB4+984RaiSK7KeTwWwuVO91FTFg==
-X-Google-Smtp-Source: ABdhPJznuyFbBWa4i61mzp+dL0JSpFzHTW2yB23TNxxPMfwHBPwEoWzalRFn7HPcQiApe3hPqntZhA==
-X-Received: by 2002:a17:90a:5503:: with SMTP id b3mr21889980pji.187.1643407650552;
-        Fri, 28 Jan 2022 14:07:30 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id x23sm7412408pfh.216.2022.01.28.14.07.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jan 2022 14:07:30 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.17-rc2
-Message-ID: <a6c3f018-4235-3707-75b1-3c79adfbd15c@kernel.dk>
-Date:   Fri, 28 Jan 2022 15:07:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 28 Jan 2022 20:42:47 -0500
+Received: from kwepemi100008.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Jlxrc3gk2zbk3y;
+        Sat, 29 Jan 2022 09:41:52 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100008.china.huawei.com (7.221.188.57) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 29 Jan 2022 09:42:44 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 29 Jan 2022 09:42:44 +0800
+Subject: Re: [PATCH v2 0/3] block, bfq: minor cleanup and fix
+To:     Jens Axboe <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <jack@suse.cz>, <tj@kernel.org>
+CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <yi.zhang@huawei.com>, <linux-kernel@vger.kernel.org>
+References: <20211231032354.793092-1-yukuai3@huawei.com>
+ <164338111974.263985.3933987922467783334.b4-ty@kernel.dk>
+ <2579c500-549f-ff04-d1e1-6cf3db10b428@kernel.dk>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <8f0d2f92-96c5-f2c4-daa4-f2a59bd885a2@huawei.com>
+Date:   Sat, 29 Jan 2022 09:42:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <2579c500-549f-ff04-d1e1-6cf3db10b428@kernel.dk>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+在 2022/01/29 3:27, Jens Axboe 写道:
+> On 1/28/22 7:45 AM, Jens Axboe wrote:
+>> On Fri, 31 Dec 2021 11:23:51 +0800, Yu Kuai wrote:
+>>> Chagnes in v2:
+>>>   - add comment in patch 2
+>>>   - remove patch 4, since the problem do not exist.
+>>>
+>>> Yu Kuai (3):
+>>>    block, bfq: cleanup bfq_bfqq_to_bfqg()
+>>>    block, bfq: avoid moving bfqq to it's parent bfqg
+>>>    block, bfq: don't move oom_bfqq
+>>>
+>>> [...]
+>>
+>> Applied, thanks!
+>>
+>> [1/3] block, bfq: cleanup bfq_bfqq_to_bfqg()
+>>        commit: a9c77f6ec0b566439182a10b64dd3e60a0408849
+>> [2/3] block, bfq: avoid moving bfqq to it's parent bfqg
+>>        commit: 36ad7fe0ec7485ee435f7a40452c7a58598779d4
+>> [3/3] block, bfq: don't move oom_bfqq
+>>        commit: a0b98e6fba18a40aa9672cc3e0abf980456f3ae6
+> 
+> For all those pings, this patchset sure didn't see a lot of compiles:
+> 
+> block/bfq-cgroup.c: In function ‘bfq_bfqq_move’:
+> block/bfq-cgroup.c:648:40: error: implicit declaration of function ‘bfq_group’; did you mean ‘bfqq_group’? [-Werror=implicit-function-declaration]
+>    648 |         struct bfq_group *old_parent = bfq_group(bfqq);
+>        |                                        ^~~~~~~~~
+>        |                                        bfqq_group
+> block/bfq-cgroup.c:648:40: error: initialization of ‘struct bfq_group *’ from ‘int’ makes pointer from integer without a cast [-Werror=int-conversion]
+> cc1: all warnings being treated as errors
+> make[1]: *** [scripts/Makefile.build:288: block/bfq-cgroup.o] Error 1
+> make: *** [Makefile:1831: block] Error 2
+> 
+> Dropped.
+> 
 
-Set of fixes for 5.17-rc2:
+Hi,
 
-- NVMe pull request
-	- add the IGNORE_DEV_SUBNQN quirk for Intel P4500/P4600 SSDs
-	  (Wu Zheng)
-	- remove the unneeded ret variable in nvmf_dev_show
-	  (Changcheng Deng)
+I'm sincerely sorry for this, I do forget to compiles this patchset,
+and let this stupid clerical error exposure to you...
 
-- Fix for a hang regression introduced with a patch in the merge window,
-  where low queue depth devices would not always get woken correctly
-  (Laibin)
+I'll send anothor version of patch 2.
 
-- Small series fixing an IO accounting issue with bio backed dm devices
-  (Mike, Yu)
-
-- Fix an error handling memory leak (Miaoqian)
-
-Please pull!
-
-
-The following changes since commit dd81e1c7d5fb126e5fbc5c9e334d7b3ec29a16a0:
-
-  Merge tag 'powerpc-5.17-2' of git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux (2022-01-23 17:52:42 +0200)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-01-28
-
-for you to fetch changes up to b879f915bc48a18d4f4462729192435bb0f17052:
-
-  dm: properly fix redundant bio-based IO accounting (2022-01-28 12:28:15 -0700)
-
-----------------------------------------------------------------
-block-5.17-2022-01-28
-
-----------------------------------------------------------------
-Changcheng Deng (1):
-      nvme-fabrics: remove the unneeded ret variable in nvmf_dev_show
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.17-2022-01-27' of git://git.infradead.org/nvme into block-5.17
-
-Laibin Qiu (1):
-      blk-mq: Fix wrong wakeup batch configuration which will cause hang
-
-Miaoqian Lin (1):
-      block: fix memory leak in disk_register_independent_access_ranges
-
-Mike Snitzer (3):
-      block: add bio_start_io_acct_time() to control start_time
-      dm: revert partial fix for redundant bio-based IO accounting
-      dm: properly fix redundant bio-based IO accounting
-
-Wu Zheng (1):
-      nvme-pci: add the IGNORE_DEV_SUBNQN quirk for Intel P4500/P4600 SSDs
-
-Yu Kuai (1):
-      blk-mq: fix missing blk_account_io_done() in error path
-
- block/blk-core.c            | 25 +++++++++++++++++++------
- block/blk-ia-ranges.c       |  2 +-
- block/blk-mq.c              |  2 ++
- drivers/md/dm.c             | 20 +++-----------------
- drivers/nvme/host/fabrics.c |  3 +--
- drivers/nvme/host/pci.c     |  3 ++-
- include/linux/blkdev.h      |  1 +
- lib/sbitmap.c               |  8 ++++++--
- 8 files changed, 35 insertions(+), 29 deletions(-)
-
--- 
-Jens Axboe
-
+Thanks,
+Kuai
