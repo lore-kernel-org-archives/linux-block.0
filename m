@@ -2,84 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A442C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 29 Jan 2022 02:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDC6C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 29 Jan 2022 07:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352154AbiA2CFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Jan 2022 21:05:39 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:31254 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352147AbiA2CF3 (ORCPT
+        id S1349502AbiA2HQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Jan 2022 02:16:03 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:56748 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349216AbiA2HQD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Jan 2022 21:05:29 -0500
-Received: from kwepemi100020.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JlyLq1kfLzbk83;
-        Sat, 29 Jan 2022 10:04:35 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100020.china.huawei.com (7.221.188.48) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 29 Jan 2022 10:05:27 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 29 Jan 2022 10:05:26 +0800
-Subject: Re: [PATCH v3 0/3] block, bfq: minor cleanup and fix
-To:     Jens Axboe <axboe@kernel.dk>, <paolo.valente@linaro.org>,
-        <jack@suse.cz>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220129015924.3958918-1-yukuai3@huawei.com>
- <7cb40388-02e9-712a-6a40-ccabd5605880@kernel.dk>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <9ed6bf05-4c31-eef1-1736-65915e55eb8e@huawei.com>
-Date:   Sat, 29 Jan 2022 10:05:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <7cb40388-02e9-712a-6a40-ccabd5605880@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+        Sat, 29 Jan 2022 02:16:03 -0500
+Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 20T7FXxe082101;
+        Sat, 29 Jan 2022 16:15:33 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
+ Sat, 29 Jan 2022 16:15:33 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
+Received: from localhost.localdomain (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 20T7FSNn082068
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 29 Jan 2022 16:15:32 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Jan Kara <jack@suse.cz>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH 2/7] loop: clarify __module_get()/module_put() usage
+Date:   Sat, 29 Jan 2022 16:14:55 +0900
+Message-Id: <20220129071500.3566-3-penguin-kernel@I-love.SAKURA.ne.jp>
+X-Mailer: git-send-email 2.18.4
+In-Reply-To: <20220129071500.3566-1-penguin-kernel@I-love.SAKURA.ne.jp>
+References: <20220129071500.3566-1-penguin-kernel@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/01/29 9:51, Jens Axboe 写道:
-> On 1/28/22 6:59 PM, Yu Kuai wrote:
->> Changes in v3:
->>   - fix a clerical error in patch 2
->>
->> Chagnes in v2:
->>   - add comment in patch 2
->>   - remove patch 4, since the problem do not exist.
->>
->> Yu Kuai (3):
->>    block, bfq: cleanup bfq_bfqq_to_bfqg()
->>    block, bfq: avoid moving bfqq to it's parent bfqg
->>    block, bfq: don't move oom_bfqq
->>
->>   block/bfq-cgroup.c  | 16 +++++++++++++++-
->>   block/bfq-iosched.c |  4 ++--
->>   block/bfq-iosched.h |  1 -
->>   block/bfq-wf2q.c    | 15 ---------------
->>   4 files changed, 17 insertions(+), 19 deletions(-)
-> 
-> I'm not even looking at this until you tell me that:
-> 
-> a) you've actually compiled this one. which, btw, I can't believe
->     needs mentioning, particularly when you had enough time to keep
->     pinging about this patchset.
-> 
-> b) it's actually be run. last one was clearly not.
-> 
-Hi,
+These are used in order to block loop_exit() while holding backing files.
 
-I compiled and tested the patchset locally in a different version,
-v4.19 specifically. However, after I decide to send them to mainline,
-I made such clerical mistake and forgot to check the patches.
+Cc: Jan Kara <jack@suse.cz>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/block/loop.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-My sincerely apologize again...
-Kuai
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 150012ffb387..3a87c33df2ec 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -959,9 +959,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		return -EBADF;
+ 	is_loop = is_loop_device(file);
+ 
+-	/* This is safe, since we have a reference from open(). */
+-	__module_get(THIS_MODULE);
+-
+ 	/*
+ 	 * If we don't hold exclusive handle for the device, upgrade to it
+ 	 * here to avoid changing device under exclusive owner.
+@@ -1027,6 +1024,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
+ 	lo->lo_device = bdev;
+ 	lo->lo_backing_file = file;
++	/* Block loop_exit() while holding backing file. */
++	__module_get(THIS_MODULE);
+ 	lo->old_gfp_mask = mapping_gfp_mask(mapping);
+ 	mapping_set_gfp_mask(mapping, lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+ 
+@@ -1077,8 +1076,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		bd_abort_claiming(bdev, loop_configure);
+ out_putf:
+ 	fput(file);
+-	/* This is safe: open() is still holding a reference. */
+-	module_put(THIS_MODULE);
+ 	return error;
+ }
+ 
+@@ -1144,8 +1141,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	/* let user-space know about this change */
+ 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+ 	mapping_set_gfp_mask(filp->f_mapping, gfp);
+-	/* This is safe: open() is still holding a reference. */
+-	module_put(THIS_MODULE);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
+ 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+@@ -1185,12 +1180,9 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	lo->lo_state = Lo_unbound;
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	/*
+-	 * Need not hold lo_mutex to fput backing file. Calling fput holding
+-	 * lo_mutex triggers a circular lock dependency possibility warning as
+-	 * fput can take open_mutex which is usually taken before lo_mutex.
+-	 */
++	/* Release backing file and unblock loop_exit(). */
+ 	fput(filp);
++	module_put(THIS_MODULE);
+ }
+ 
+ static int loop_clr_fd(struct loop_device *lo)
+-- 
+2.32.0
+
