@@ -2,90 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0069FC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 30 Jan 2022 16:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330DEC433FE
+	for <linux-block@archiver.kernel.org>; Sun, 30 Jan 2022 20:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240484AbiA3QT7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Jan 2022 11:19:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51570 "EHLO
+        id S1356094AbiA3UOK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Jan 2022 15:14:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242648AbiA3QT6 (ORCPT
+        with ESMTP id S1356090AbiA3UOJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Jan 2022 11:19:58 -0500
-Received: from mail-ua1-x92b.google.com (mail-ua1-x92b.google.com [IPv6:2607:f8b0:4864:20::92b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C3DC061714
-        for <linux-block@vger.kernel.org>; Sun, 30 Jan 2022 08:19:58 -0800 (PST)
-Received: by mail-ua1-x92b.google.com with SMTP id b16so10502493uaq.4
-        for <linux-block@vger.kernel.org>; Sun, 30 Jan 2022 08:19:58 -0800 (PST)
+        Sun, 30 Jan 2022 15:14:09 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44A71C06173B
+        for <linux-block@vger.kernel.org>; Sun, 30 Jan 2022 12:14:09 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id p5so34300042ybd.13
+        for <linux-block@vger.kernel.org>; Sun, 30 Jan 2022 12:14:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HPkNoKQ4Pd+AHckOSmZ38ryny5w+vsqu07xNizGyqTY=;
-        b=kg3+JjiXad8tw+GIisyMJbE2xUu4NenS+YohXz+XGdFNW+Hyo/OKmsvwR0sxd10qW3
-         XX/03mD4ye8FfvqRA2TvNeCUtIewVQpYSUiy/YDN6uV+mPgSJiL+2kVKm6rllRrMnDYh
-         iXhZkkjm/YKT1c2nRYllIR5IaRZuT9jBgxeuNYL7PADRGo1BSp7VnPnrkM2iVJq1wVF2
-         PCmxw4iVd5QkaUWDZRvwTtb1IePxdWbx9jxv1RwG2MQWfs2lCdHTqKULRy14r/X8TXkT
-         pWiV0SZta1yNz9TlpYzFL/zHrrtHNYQvcusbSPi4NKlhsTLLte3JpnEVDmT4yZiUuehd
-         yxwA==
+        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=B5RDFYVH+TmmOH5uylQQBjq9xZgwfPdMXnc3AvG2YZc=;
+        b=VTtCVZ53zZ6UsWVL2KQxOBVSzglYrpVXQ04tWD/kYESSCJ5u8t2oifPVCjUt1+i1Bw
+         zb9BrzM1DYsPnDKHMGywMivERJi44+JvyRamX0zj3vi34VYpV+51ZF59s2PDRB5ANrhy
+         jkr8I9ezKGAq2A6bapDgIGGn/fExiHVUpGBifjFpV3Bk0kG9cysY8rFzwosUNML5uGKY
+         5hn5ddmN28D3rQkmVpO+Y1uMK2LwMTp/z/+5/mAb4m3bu/nTdjASyHTLNC8zxNtZ1UWd
+         D9sRZDsvu6oc2SRxtS8hV2cgE5Ltk64rMppMKv22Btb7tf9osiVKsLY+64riCgYbaKdK
+         81MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HPkNoKQ4Pd+AHckOSmZ38ryny5w+vsqu07xNizGyqTY=;
-        b=0ntr9i9cf9yp69Z/OJ40d6388Hq3SWxMvIjGmj+DLapRXBn4qI54XtNVlFqiUxAqxG
-         FPTleWcE+ZVqrkfRyM/tNu0OezYhkcf9C06xcYvArPNbb5lF9boQSmkUTR7rf89BIjO9
-         AR63XW0tz6FkdpfthGL1TPzXMp5RD9TVkhKf1aTI5YmmhJ2qlDAwndQaRx0+j1MZxoNz
-         5vAqKrzftX7s6BogP3c/ZJOhL57Hrmiu1hN+PFlxR6oCBYflXaMUjKOC3tG5LvrDE7ZN
-         JmV9aPTMa0CSg/hAiKIcJZYo7qBoF8JTsBMSzGy9ii8F32kddk0VByCoFpoKUq87t35E
-         x3ZA==
-X-Gm-Message-State: AOAM530agoZcYap2F7wtbK0oLEViEy8CAggdUp6kDjS4a4ozcPv0GxpB
-        FPYSaQ8dVp8qDSiQkQOL/xoln7WzIOu/l0xQmS7+RHmn
-X-Google-Smtp-Source: ABdhPJysG7oWQL32REKtB4OlNKprhg0z6kmtqUnf53trMGZAwj49WnslkkGALJoUwRNx/p/sEXFUq9NJePNLQT4Sn3s=
-X-Received: by 2002:ab0:372a:: with SMTP id s10mr6636778uag.86.1643559597396;
- Sun, 30 Jan 2022 08:19:57 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=B5RDFYVH+TmmOH5uylQQBjq9xZgwfPdMXnc3AvG2YZc=;
+        b=kQD7y82A+n5JQFY9PuBpIjhbT6i53mEEQMvnTbsDSQaKG6fn4Ve8CFlAaKtBud/MkO
+         hsbPtu2omWQDFGdZMrFxWhQbExeRtxNJiIlWs0aypvVw/9zTl8ajBYWA6lB74w3JAQCT
+         rk6N1/76s/MCLHngdVMzwaO0rxsQzAMetqv3jr3OT01HrUnldXMxi1tioHd/ehUcMt1d
+         dZbzK3cC3rIK4/BZ/raWuXJLrxyfz9sXRdnr+i71co+RIkqsCG9qR865ZqdufQl/ugMI
+         6xhFdflpQanEaKRmWBOnf6UHekIuBf5ntXMylU8/ga5weumDzcssVz5OhVKuiZ3brCY1
+         w7vg==
+X-Gm-Message-State: AOAM530YEVr8AEyYk+clgH5c/4MRMLJCasJ9yNoQZAn75w+vXtBhfdH0
+        7SgyjR7P4fMAL9bESYV+/TMNqczWU8j3lhTxGUb+CruMPR9wt4xd
+X-Google-Smtp-Source: ABdhPJxhVBgnY32VOHkWK5MbxCF59xVBdXpCSbyl5wQ2u7qGZBnMbxHOmvwZyfuSP9FpLqI56f0ZZWKrSaHBHmJjTXw=
+X-Received: by 2002:a25:8e0a:: with SMTP id p10mr23665629ybl.239.1643573648348;
+ Sun, 30 Jan 2022 12:14:08 -0800 (PST)
 MIME-Version: 1.0
-References: <20220125215248.6489-1-luca.boccassi@gmail.com> <10a8fbc8-c242-af90-2a3f-d55cd27497a8@linux.vnet.ibm.com>
-In-Reply-To: <10a8fbc8-c242-af90-2a3f-d55cd27497a8@linux.vnet.ibm.com>
-From:   Luca Boccassi <luca.boccassi@gmail.com>
-Date:   Sun, 30 Jan 2022 16:19:46 +0000
-Message-ID: <CAMw=ZnTJxFhcVgApcj6YNtU2Djcybrf9gN_6dmfr7QM+jxXmww@mail.gmail.com>
-Subject: Re: [PATCH v3] block: sed-opal: Add ioctl to return device status
-To:     Douglas Miller <dougmill@linux.vnet.ibm.com>
-Cc:     linux-block@vger.kernel.org
+From:   Chris Murphy <lists@colorremedies.com>
+Date:   Sun, 30 Jan 2022 13:13:52 -0700
+Message-ID: <CAJCQCtRM4Gn_EY_A0Da7qz=MFfmw08+oD=syQEQt=9DrE8_gFw@mail.gmail.com>
+Subject: FITRIM minimum block size for weekly usage
+To:     linux-block@vger.kernel.org
+Cc:     kzak@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 25 Jan 2022 at 22:03, Douglas Miller
-<dougmill@linux.vnet.ibm.com> wrote:
->
-> On 1/25/22 15:52, luca.boccassi@gmail.com wrote:
-> > From: "dougmill@linux.vnet.ibm.com" <dougmill@linux.vnet.ibm.com>
-> >
-> > Provide a mechanism to retrieve basic status information about
-> > the device, including the "supported" flag indicating whether
-> > SED-OPAL is supported. The information returned is from the various
-> > feature descriptors received during the discovery0 step, and so
-> > this ioctl does nothing more than perform the discovery0 step
-> > and then save the information received. See "struct opal_status"
-> > and OPAL_FL_* bits for the status information currently returned.
-> >
-> > Signed-off-by: Douglas Miller <dougmill@linux.vnet.ibm.com>
-> > Tested-by: Luca Boccassi <bluca@debian.org>
-> > ---
-> > v2: https://patchwork.kernel.org/project/linux-block/patch/612795b5.tj7FMS9wzchsMzrK%25dougmill@linux.vnet.ibm.com/
-> > v3: resend on request, after rebasing and testing on my machine
->
-> I would like to withdraw this patch. We are going a different direction
-> for our SED-OPAL support and will be submitting a new set of patches
-> soon, which includes a different method of obtaining the discovery0 data.
-
 Hi,
 
-Do you have a rough ETA on the new series? Also would you mind CC'ing
-me when you send it, please? Thanks!
+util-linux includes /usr/lib/systemd/system/fstrim.service, which has
+an fstrim.timer set to run the service once per week. It's commonly
+enabled by default in linux distributions these days.
 
-Kind Regards,
-Luca Boccassi
+By default, fstrim uses the file system block size as the minimum
+contiguous free block range for discards. On heavily fragmented file
+systems, this can take a while. Whether fragmented or not, such
+granularity probably provides no meaningful improvement in wear
+leveling performance. I'm wondering if something in the range of 1-4
+MiB would be sufficient for most cases, and unlikely to be harmful for
+any? Or if block devs have any other ideas for the minimum size?
+
+The tentative proposal is to modify /usr/lib/systemd/system/fstrim.service
+
+- ExecStart=/usr/sbin/fstrim --listed-in
+/etc/fstab:/proc/self/mountinfo --verbose --quiet-unsupported
++ ExecStart=/usr/sbin/fstrim --listed-in
+/etc/fstab:/proc/self/mountinfo --minimum 4M --verbose
+--quiet-unsupported
+
+That results in, e.g.
+
+ioctl(3, FITRIM, {start=0, len=18446744073709551615, minlen=4194304}) = 0
+
+instead of
+
+ioctl(3, FITRIM, {start=0, len=18446744073709551615, minlen=0}) = 0
+
+
+That this will do much less trimming for particularly heavy use file
+systems, so much the better, as drives have been getting quite a bit
+smarter about managing wear leveling even without the trim hinting.
+But I think it's useful for common consumer devices still out there,
+but doesn't need to be so thorough at trimming every free block. Fair?
+
+Best,
+
+-- 
+Chris Murphy
