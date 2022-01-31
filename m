@@ -2,183 +2,241 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0A0C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 31 Jan 2022 11:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1BFC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 31 Jan 2022 18:56:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377391AbiAaLvf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jan 2022 06:51:35 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:24437 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377151AbiAaLtc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jan 2022 06:49:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1643629771; x=1675165771;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ZqRDfmeC7gSqlp2AvRocSOZwLJK1Ix8VOc+4HY0faIQ=;
-  b=BzvkPJr6SkTnmaMYkPifyAnlg0Hsf+aMs4zd5Q2Rhq1KpLHIcS+mJDLC
-   aEpyBMyQFlxxx/EmAllM4LTGW1SDCXpKDp2Hd/syB+JxF8Xpj9J8rMtmI
-   e6o8cb0YB5anFuW7LR3DjvfdugGRe0BpNGXjoEWvJ2mGexovkQ7IWDU9J
-   VAbEEpsOhAK7WmncYvZsTpehEtUGfZ8yPRNUQNcKVzAZlmieFd2qGuo5A
-   jsdeXKlOP5TeK4np03hkSlax8wktp165U8SO2ZI3XPmpdxDEmhkKlVzZA
-   Qg9uqT6UpbCkINjwaaofUT3eFu4h669HJ3V2ts3ysL+t8/HGj0U+w5SXA
-   g==;
-X-IronPort-AV: E=Sophos;i="5.88,330,1635177600"; 
-   d="scan'208";a="191798219"
-Received: from mail-co1nam11lp2170.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.170])
-  by ob1.hgst.iphmx.com with ESMTP; 31 Jan 2022 19:49:28 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TiqTBnJJ2rtjBnVwcR357iV7NU4/lP8Klhqt4iAzC1KID03Jrm/lhryw3j2hFv+tSFjRn9qt0ynmCXC69td9TwOg4LB1mqO+Jc0ZYrop7sn235hwmrFi2Yt1D/cqoZXm4EMdhFFm45aX0REjoizSnBTV5zMImUBMbbBkHQN7oMra1YxRv6WVMoVNsFpkm1OOLeX+KIdOs3Lh+/Jg97cXqxkZovKyWbfLBtPyDHsPuN4m26fb5XVor3KAL3Wlm0/l50qTX8yYAH4z37KreX2k5KMyt4E5jjXzE3BiTVyye+j1azfTq6/hhDiTm8sGoLzZqUjmf6De6QqjmH13elaJkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZqRDfmeC7gSqlp2AvRocSOZwLJK1Ix8VOc+4HY0faIQ=;
- b=dMguEMtBclVQrQlIjVstp3egpI8V9ZJffvk65MVSyO9FJXhfjdgyZ8zQ7UIHC38EYa23Iznx18DqokDvacR2pVSQ2gHQY4nKRhFzkqMx3RODfvl8oQSFa9li2k07shgGqy6NAHmJjwLLGQa5jw7sDl8hgSLxy8tPBM42qQTIBxXCNh3D7gdSiEfcbFLls65NPEZLpoSaDSNlvcLS2sdEHpH3y25mKzBL0no1ydgf2QK/R7qfrPDtZOG+GAV8VSkjSzEGBAdaa3tbqLfeGoKeDnTzajZZzm3xZdpXo9nxLmUY6KPRc1FBu8BAfpzd/GWwSxGUrjyS74s2Mf+rYDDFaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZqRDfmeC7gSqlp2AvRocSOZwLJK1Ix8VOc+4HY0faIQ=;
- b=FXT6Yjm0bmzGnmbHG4Sdcy/uJ0f2kb/XUE3K7zqx9YA5lbDlrA/KnvRs0JLXZ2d4pRAr4nIJClU+nFtRQpY0ck/dFCYlVP2BqgEQI7KCbqk6REfM6AbQb8BJYxbgZ8tXmlaYju3wNIYUuLhi2bAUNuNQ01LTLMOvmenxe5gpbzQ=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by MN2PR04MB5504.namprd04.prod.outlook.com (2603:10b6:208:df::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.15; Mon, 31 Jan
- 2022 11:49:28 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::8d9e:d733:bca6:bc0f]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::8d9e:d733:bca6:bc0f%5]) with mapi id 15.20.4930.022; Mon, 31 Jan 2022
- 11:49:28 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
-        "a.manzanares@samsung.com" <a.manzanares@samsung.com>
-CC:     "clm@fb.com" <clm@fb.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "dsterba@suse.com" <dsterba@suse.com>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "hch@lst.de" <hch@lst.de>, "hare@suse.de" <hare@suse.de>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "jack@suse.com" <jack@suse.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Thread-Topic: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Thread-Index: AQHYE018isCsN3oz40OdcqzMcXhV7qx5YsQAgAOn04A=
-Date:   Mon, 31 Jan 2022 11:49:28 +0000
-Message-ID: <69241add19fddd4168c9f2ae15fd08e8e701f8ec.camel@wdc.com>
-References: <CGME20220127071544uscas1p2f70f4d2509f3ebd574b7ed746d3fa551@uscas1p2.samsung.com>
-         <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
-         <20220128195956.GA287797@bgt-140510-bm01>
-In-Reply-To: <20220128195956.GA287797@bgt-140510-bm01>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.42.3 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e0ff18da-5e0f-4426-bea0-08d9e4afbc83
-x-ms-traffictypediagnostic: MN2PR04MB5504:EE_
-x-microsoft-antispam-prvs: <MN2PR04MB5504CDC48A827E32C76F7C279B259@MN2PR04MB5504.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: LIHDYYF+rdDLpnzdS3fsShR8EgtehxgMmccET5xwjGkfXw10zRKpHKcG7/PB6BTG2EJOOQhDyopvZtkpSZhYDprldCjAk2/T0WS1oJ6+3nnEcao5O/J8OR2eLP7oiAe3G85LMq1fh7tBE5/790Q5pz/zOOKyKZLWniBwK0U+suTtbbimXoKwSnT7TiVfSDIk81xgiJUhitV7peqIh9+NdSHvmFeMSnu4AEBUxJ12vijRId8uebu7LcucwjSKXNhk8VHugUnbHflKZtF5WECXt246UTQZS10S8pJf7qmmVkZk2lT5oHDmC7xHTpdSLOX+0L14ndiZk1Mh87E9dKGoO1xwqrNhn/fA+0GF+nmDOKVPjbpuEJkzxTYy8sYMwN059Deu3HDYIWsHQMMiCFfz46Dkf+eaSMo3G6tN6DUUmJc8CXHIxyVKWPLtbr17TjZuIRKsbbk+7BvQFyz4Bo2KyYxni0yapwvJ0nKZ4MNscRcKzBq0GuuBeHCsiNrh229ABPBW4UmfA9EBE4HpXJiLYdPLlz82b4J+60o9WuJvaXRswouhm4t/CMwRCWEjptJgfbMNF38NlHssC6RctwqAUvQwB0VMIe6vPu6Hd2QuyE5r76YGYiR7Bbi9y4QiWBpSAN6EaHlE++EFtou+mLZSNrSrmqYL+DZFyofZtdSInsTcQiYxalJ0SG1/9RVqu70u2ex8TKc8see22WduPRs1CQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(38100700002)(82960400001)(38070700005)(2906002)(4744005)(122000001)(6506007)(6512007)(7416002)(316002)(71200400001)(6486002)(54906003)(508600001)(26005)(8676002)(4326008)(8936002)(64756008)(110136005)(186003)(2616005)(66946007)(66556008)(66446008)(66476007)(91956017)(76116006)(86362001)(36756003)(20210929001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ck9DL1Q4WHpGbjNGSnAyVG1qWmJtU0MwQzdZbWY1VWtYS2hQcVh3R0pGRkNn?=
- =?utf-8?B?eFFaQjRQZDhidGtMb0lHK0h0Y0ZWMmxoK3g0cTQyRCtjNnk3cCtCL1RIRFBh?=
- =?utf-8?B?N3BLaE1zWVp1TnFkS0QwZUVPMjVVRkw1OFBqSkZTZm1SWjROaSsrNGRYdWE5?=
- =?utf-8?B?Yy9XT2tLL1VIakJYWW5NeUp6WTVSVVJuRm9RbU0yQXV5endUMGhveXVQVEVn?=
- =?utf-8?B?dkxIWVBLdzQzTDh4MzBLSDV4Skp4MmVuZ2tTQTkrUnBFdzdOeEYzSkpQYysx?=
- =?utf-8?B?RWRxdlY2NFhQeGw0TGVlcit5SUtORWtIUTc4NXNhVWsvNW5ySlpxUFQ2ZWE2?=
- =?utf-8?B?RytzTmVFWklsVjE0dnl4OFF1SjJPQ3dZN0diMVNsOEQ2dGx0RjJ4Z3RaUW00?=
- =?utf-8?B?SGEwd0lxSEdFdTNob0RhN2ZJeEdRZWpaUTVOV055ZmJaaHJRUjNnVVJHdkZO?=
- =?utf-8?B?YVJEYndSRzcvdDJIL2dtejV4L0hReG45aUJUS3hFZENNb05iMVFMMlJxS1pq?=
- =?utf-8?B?OXZVTllRZCtpMlpxcEFjUkZydmxkU3dyb1czSUE2MFM0SmViRkNvcXgwU3BT?=
- =?utf-8?B?OUZZOVgvRlFrR3VDQS9ienlwbnJOY3grcFFpOWE4a0wwUEkyNTFlaWtRMlJZ?=
- =?utf-8?B?TEtCVFpnUDJkeWM5VGxYQm92VzBGRktKZTVraVhyTmdSa2lYeUcvMnl5M3Ri?=
- =?utf-8?B?NVNOM1JvZGh6cVpUQkhNT0JUYmtjSkRPNU5XdzZjckZEaWRhV1R6NlJWN083?=
- =?utf-8?B?aGZJeDQyMXpPbFhLRXgvUE1mRUFhQUNBMzVOZXNIcWpETGgrOVZ2dEwwSUw3?=
- =?utf-8?B?VFpKL0VVblFmb29sTWRzcWhCd2owYVlzSWFQeDk0eUFTbEJ4bGxZTVRQR2J1?=
- =?utf-8?B?bFZqTGdOMkZ4dVYxdE9GTHNCUktNMTllS3YzK2kwQkgzZVY0U1N0TEYyWVo4?=
- =?utf-8?B?Mll4R3hKM1dQbHJkRFRISHNXNW96WFlhTkNYclIxKzVKYjJkaHdwY3l1bldh?=
- =?utf-8?B?SnhiMjlHU3BIVnBQZ2tqVVJKUVpMSWFweUVaQVcwTkZLRFd6MU5EV1RVeVRQ?=
- =?utf-8?B?SXZ3a3FyVGJsWTk0NXM2am54enorUXllZlg4ZWZ5L01FYS9Ra2N6SFBwRU1F?=
- =?utf-8?B?V3AzTHYyTHVPZFFpa2JLSkF5TEpDV3JiYnJVUm0zNU1nYkRYN2NPazhqTTZu?=
- =?utf-8?B?NGZ0WmtBMHRCQVhJek9NSjAxZlRZNHJ2UUZUdFBPbDNQNlQ4N1dnTjBsWHly?=
- =?utf-8?B?ODM0UnZYRHhMeE04Mk1GdkhtYThOL002dU1WbHVzRklNNjYzbnh6cmZIOUZk?=
- =?utf-8?B?eTZ6L0xRcWVnTEFYY3VvblFqUkZ6ZEkvcE5yNDA4cG1aS0lKb21VdTREV0Fk?=
- =?utf-8?B?alFMdnlVQ1dVanM0RFAreXR3RHJjSkgwcGJRTlluYm1Od2R0WWo0OFVOVkNO?=
- =?utf-8?B?eG1LZnkrbkw1eTVSSlh1b3RaYnpkNi9CNkQ4TVRncFFjK1JwOXF5K2hDeWVO?=
- =?utf-8?B?bUd0QVF0ZzY2VHRUTi9ickpjRElLVGl3eUtydnJnb2wrcXZqSkpkaGFVaHR1?=
- =?utf-8?B?RTV6NmxjL2owc243aVB3RnBWSUpIaHRLdmNkUnk2dlVvWjFMK2ZEMFVrYVFr?=
- =?utf-8?B?VTU1UDhGYmQ0S09TeU9OM3NybDBnMkk5QmZzSmpQaGtvZVE3TTB2Q2JpcGY4?=
- =?utf-8?B?TFVXenlQWEdVQ29NYTMweDhUa0R0YnVvUnRXZm9XT2oyUkYrTk11d3VUZ28z?=
- =?utf-8?B?K2piZkJ2d2trTmRlSWlJZWRKZWl5THNXYm1Na1pWOUxQRzQ2K0IvTDNkWW94?=
- =?utf-8?B?WlV2RDRRMjZkRDVUV25oYTE3bHRyTkZIZ2pjTnZXVWgxWEZzNzZxTVlPUFhO?=
- =?utf-8?B?OWtwcjNabmh4aTA2VjYrQUxCeGVmUUZORTVTbmVGUFNLNmlON0c0cXE5eVVO?=
- =?utf-8?B?MGg3MVVORDF2dXFSNFJNTTNSUytxeGtjbkhrT0RTNDlJaGppRWozT1JvbDdr?=
- =?utf-8?B?V3BvbWM0WGtpcHEwRGhYb1dwNkNWTmhWRE5sajNUaDUrM2JrbzlnSmV0ZGxk?=
- =?utf-8?B?cEdrbUdpeitueGhOMHZOOCtSNDhMUGNmOE54aS9Cd3BkRzdkT2hOVm9aanpK?=
- =?utf-8?B?MVVBWmhrL3loS2RvbWhZU1dmTWF0MXhKTUlGVVlOSy9Xdkw0Vkk4SkZMNnh6?=
- =?utf-8?B?ZjVIRXBza05aNTRXY0p6VDU5ck1SUVZ1aDFyaUdiLzNrZVo2TWdWWVowQnVm?=
- =?utf-8?Q?BNkE+4TTJlJrTLcYn3CpgRGlhf+kfX5XldD+DuTuyU=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CD1311B6D0A3A44CB966E8F883FADF5F@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S244299AbiAaS4p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jan 2022 13:56:45 -0500
+Received: from out2.migadu.com ([188.165.223.204]:24197 "EHLO out2.migadu.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232915AbiAaS4p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jan 2022 13:56:45 -0500
+Message-ID: <c725798d-48da-2993-cc48-0ec0b314455f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1643655403;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=c/Ch63bJctNf9QVTZKCEvsLX1+etquC6AF86UHoNYQM=;
+        b=kWyls4uSwgafhck97EAH48F82wrfX1sG7bf2UiJGBsZ6E7Ik/quiWKTHipoo8vkphexbQV
+        myDA12KzydncCp/wpMhcNWf9nJrkJDZKOviEN3jh728f3TNzuxKgFqSQdpfSMtFNotH6Lz
+        jMcWyPgRMq1uWDXOiPLTxcYaTsLE3zE=
+Date:   Mon, 31 Jan 2022 11:56:36 -0700
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0ff18da-5e0f-4426-bea0-08d9e4afbc83
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2022 11:49:28.0609
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Eg0MHbXRUbhC34ECSqEe+qbDjTEN2Kb4i+M/iL9UFSUdsctihkRTWzOqS8rYLdrCNSIjGilxGTYji48QtMnffMWmD9T5IOugqEKmUKn/PVo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5504
+Subject: Re: [PATCH v5 00/24] Userspace P2PDMA with O_DIRECT NVMe devices
+Content-Language: en-US
+To:     Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>
+References: <20220128002614.6136-1-logang@deltatee.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Jonathan Derrick <jonathan.derrick@linux.dev>
+In-Reply-To: <20220128002614.6136-1-logang@deltatee.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDIyLTAxLTI4IGF0IDE5OjU5ICswMDAwLCBBZGFtIE1hbnphbmFyZXMgd3JvdGU6
-DQo+IE9uIFRodSwgSmFuIDI3LCAyMDIyIGF0IDA3OjE0OjEzQU0gKzAwMDAsIENoYWl0YW55YSBL
-dWxrYXJuaSB3cm90ZToNCj4gPiANCj4gPiAqIEN1cnJlbnQgc3RhdGUgb2YgdGhlIHdvcmsgOi0N
-Cj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tDQo+ID4gLS0tLQ0KPiA+IA0KPiA+IFdpdGggWzNdIGJlaW5nIGhhcmQg
-dG8gaGFuZGxlIGFyYml0cmFyeSBETS9NRCBzdGFja2luZyB3aXRob3V0DQo+ID4gc3BsaXR0aW5n
-IHRoZSBjb21tYW5kIGluIHR3bywgb25lIGZvciBjb3B5aW5nIElOIGFuZCBvbmUgZm9yDQo+ID4g
-Y29weWluZw0KPiA+IE9VVC4gV2hpY2ggaXMgdGhlbiBkZW1vbnN0cmF0ZWQgYnkgdGhlIFs0XSB3
-aHkgWzNdIGl0IGlzIG5vdCBhDQo+ID4gc3VpdGFibGUNCj4gPiBjYW5kaWRhdGUuIEFsc28sIHdp
-dGggWzRdIHRoZXJlIGlzIGFuIHVucmVzb2x2ZWQgcHJvYmxlbSB3aXRoIHRoZQ0KPiA+IHR3by1j
-b21tYW5kIGFwcHJvYWNoIGFib3V0IGhvdyB0byBoYW5kbGUgY2hhbmdlcyB0byB0aGUgRE0gbGF5
-b3V0DQo+ID4gYmV0d2VlbiBhbiBJTiBhbmQgT1VUIG9wZXJhdGlvbnMuDQo+ID4gDQo+ID4gV2Ug
-aGF2ZSBjb25kdWN0ZWQgYSBjYWxsIHdpdGggaW50ZXJlc3RlZCBwZW9wbGUgbGF0ZSBsYXN0IHll
-YXINCj4gPiBzaW5jZSANCj4gPiBsYWNrIG9mIExTRk1NTSBhbmQgd2Ugd291bGQgbGlrZSB0byBz
-aGFyZSB0aGUgZGV0YWlscyB3aXRoIGJyb2FkZXINCj4gPiBjb21tdW5pdHkgbWVtYmVycy4NCj4g
-DQo+IFdhcyBvbiB0aGF0IGNhbGwgYW5kIEkgYW0gaW50ZXJlc3RlZCBpbiBqb2luaW5nIHRoaXMg
-ZGlzY3Vzc2lvbi4NCg0KU2FtZSBmb3IgbWUgOikNCg0KDQoNCg==
+Hi Logan,
+
+On 1/27/2022 5:25 PM, Logan Gunthorpe wrote:
+> Hi,
+> 
+> This patchset continues my work to add userspace P2PDMA access using
+> O_DIRECT NVMe devices. This posting fixes a lot of issues that were
+> addresed in the last posting, which is here[1].
+> 
+> The patchset is rebased onto v5.17-rc1 as well as a rebased version of
+> Ralph Campbell's patches to drop the ZONE_DEVICE page ref count offset.
+> My understanding is this patch has some problems that are yet to be
+> resolved but this will be the direction taken going forward and is
+> included here to show that it is compatible with this patchset.
+> 
+> The patchset enables userspace P2PDMA by allowing userspace to mmap()
+> allocated chunks of the CMB. The resulting VMA can be passed only
+> to O_DIRECT IO on NVMe backed files or block devices. A flag is added
+> to GUP() in Patch 16, then Patches 17 through 21 wire this flag up based
+> on whether the block queue indicates P2PDMA support. Patches 22
+> through 24 enable the CMB to be mapped into userspace by mmaping
+> the nvme char device.
+> 
+> This is relatively straightforward, however the one significant
+> problem is that, presently, pci_p2pdma_map_sg() requires a homogeneous
+> SGL with all P2PDMA pages or all regular pages. Enhancing GUP to
+> support enforcing this rule would require a huge hack that I don't
+> expect would be all that pallatable. So patches 3 to 16 add
+> support for P2PDMA pages to dma_map_sg[table]() to the dma-direct
+> and dma-iommu implementations. Thus systems without an IOMMU plus
+> Intel and AMD IOMMUs are supported. (Other IOMMU implementations would
+> then be unsupported, notably ARM and PowerPC but support would be added
+> when they convert to dma-iommu).
+Am I understanding that an IO may use a mix of p2pdma and system pages?
+Would that cause inconsistent latencies?
+
+> 
+> dma_map_sgtable() is preferred when dealing with P2PDMA memory as it
+> will return -EREMOTEIO when the DMA device cannot map specific P2PDMA
+> pages based on the existing rules in calc_map_type_and_dist().
+> 
+> The other issue is dma_unmap_sg() needs a flag to determine whether a
+> given dma_addr_t was mapped regularly or as a PCI bus address. To allow
+> this, a third flag is added to the page_link field in struct
+> scatterlist. This effectively means support for P2PDMA will now depend
+> on CONFIG_64BIT.
+> 
+> Feedback welcome.
+> 
+> This series is based on v5.17-rc1. A git branch is available here:
+> 
+>    https://github.com/sbates130272/linux-p2pmem/  p2pdma_user_cmb_v5
+> 
+> Thanks,
+> 
+> Logan
+> 
+> [1] https://lore.kernel.org/all/20211117215410.3695-1-logang@deltatee.com/T/#u
+> 
+> --
+> 
+> Changes since v4:
+>    - Rebase onto v5.17-rc1.
+>    - Included Ralph Cambell's patches which removes the ZONE_DEVICE page
+>      reference count offset. This is just to demonstrate that this
+>      series is compatible with that direction.
+>    - Added a comment in pci_p2pdma_map_sg_attrs(), per Chaitanya and
+>      included his Reviewed-by tags.
+>    - Patch 1 in the last series which cleaned up scatterlist.h
+>      has been upstreamed.
+>    - Dropped NEED_SG_DMA_BUS_ADDR_FLAG seeing depends on doesn't
+>      work with selected symbols, per Christoph.
+>    - Switched iov_iter_get_pages_[alloc_]flags to be exported with
+>      EXPORT_SYMBOL_GPL, per Christoph.
+>    - Renamed zone_device_pages_are_mergeable() to
+>      zone_device_pages_have_same_pgmap(), per Christoph.
+>    - Renamed .mmap_file_open operation in nvme_ctrl_ops to
+>      cdev_file_open(), per Christoph.
+> 
+> Changes since v3:
+>    - Add some comment and commit message cleanups I had missed for v3,
+>      also moved the prototypes for some of the p2pdma helpers to
+>      dma-map-ops.h (which I missed in v3 and was suggested in v2).
+>    - Add separate cleanup patch for scatterlist.h and change the macros
+>      to functions. (Suggested by Chaitanya and Jason, respectively)
+>    - Rename sg_dma_mark_pci_p2pdma() and sg_is_dma_pci_p2pdma() to
+>      sg_dma_mark_bus_address() and sg_is_dma_bus_address() which
+>      is a more generic name (As requested by Jason)
+>    - Fixes to some comments and commit messages as suggested by Bjorn
+>      and Jason.
+>    - Ensure swiotlb is not used with P2PDMA pages. (Per Jason)
+>    - The sgtable coversion in RDMA was split out and sent upstream
+>      separately, the new patch is only the removal. (Per Jason)
+>    - Moved the FOLL_PCI_P2PDMA check outside of get_dev_pagemap() as
+>      Jason suggested this will be removed in the near term.
+>    - Add two patches to ensure that zone device pages with different
+>      pgmaps are never merged in the block layer or
+>      sg_alloc_append_table_from_pages() (Per Jason)
+>    - Ensure synchronize_rcu() or call_rcu() is used before returning
+>      pages to the genalloc. (Jason pointed out that pages are not
+>      gauranteed to be unused in all architectures until at least
+>      after an RCU grace period, and that synchronize_rcu() was likely
+>      too slow to use in the vma close operation.
+>    - Collected Acks and Reviews by Bjorn, Jason and Max.
+> 
+> Logan Gunthorpe (22):
+>    lib/scatterlist: add flag for indicating P2PDMA segments in an SGL
+>    PCI/P2PDMA: Attempt to set map_type if it has not been set
+>    PCI/P2PDMA: Expose pci_p2pdma_map_type()
+>    PCI/P2PDMA: Introduce helpers for dma_map_sg implementations
+>    dma-mapping: allow EREMOTEIO return code for P2PDMA transfers
+>    dma-direct: support PCI P2PDMA pages in dma-direct map_sg
+>    dma-mapping: add flags to dma_map_ops to indicate PCI P2PDMA support
+>    iommu/dma: support PCI P2PDMA pages in dma-iommu map_sg
+>    nvme-pci: check DMA ops when indicating support for PCI P2PDMA
+>    nvme-pci: convert to using dma_map_sgtable()
+>    RDMA/core: introduce ib_dma_pci_p2p_dma_supported()
+>    RDMA/rw: drop pci_p2pdma_[un]map_sg()
+>    PCI/P2PDMA: Remove pci_p2pdma_[un]map_sg()
+>    mm: introduce FOLL_PCI_P2PDMA to gate getting PCI P2PDMA pages
+>    iov_iter: introduce iov_iter_get_pages_[alloc_]flags()
+>    block: add check when merging zone device pages
+>    lib/scatterlist: add check when merging zone device pages
+>    block: set FOLL_PCI_P2PDMA in __bio_iov_iter_get_pages()
+>    block: set FOLL_PCI_P2PDMA in bio_map_user_iov()
+>    mm: use custom page_free for P2PDMA pages
+>    PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+>    nvme-pci: allow mmaping the CMB in userspace
+> 
+> Ralph Campbell (2):
+>    ext4/xfs: add page refcount helper
+>    mm: remove extra ZONE_DEVICE struct page refcount
+> 
+>   arch/powerpc/kvm/book3s_hv_uvmem.c     |   2 +-
+>   block/bio.c                            |  10 +-
+>   block/blk-map.c                        |   7 +-
+>   drivers/gpu/drm/nouveau/nouveau_dmem.c |   2 +-
+>   drivers/infiniband/core/rw.c           |  45 +--
+>   drivers/iommu/dma-iommu.c              |  67 +++-
+>   drivers/nvme/host/core.c               |  18 +-
+>   drivers/nvme/host/nvme.h               |   4 +-
+>   drivers/nvme/host/pci.c                |  97 +++---
+>   drivers/nvme/target/rdma.c             |   2 +-
+>   drivers/pci/Kconfig                    |   5 +
+>   drivers/pci/p2pdma.c                   | 441 +++++++++++++++++++++----
+>   fs/dax.c                               |   8 +-
+>   fs/ext4/inode.c                        |   5 +-
+>   fs/fuse/dax.c                          |   4 +-
+>   fs/xfs/xfs_file.c                      |   4 +-
+>   include/linux/dax.h                    |  10 +
+>   include/linux/dma-map-ops.h            |  76 +++++
+>   include/linux/dma-mapping.h            |   5 +
+>   include/linux/memremap.h               |   7 +-
+>   include/linux/mm.h                     |  68 ++--
+>   include/linux/pci-p2pdma.h             |  38 +--
+>   include/linux/scatterlist.h            |  44 ++-
+>   include/linux/uio.h                    |   6 +
+>   include/rdma/ib_verbs.h                |  11 +
+>   include/uapi/linux/magic.h             |   1 +
+>   kernel/dma/direct.c                    |  43 ++-
+>   kernel/dma/direct.h                    |   7 +-
+>   kernel/dma/mapping.c                   |  22 +-
+>   lib/iov_iter.c                         |  25 +-
+>   lib/scatterlist.c                      |  25 +-
+>   lib/test_hmm.c                         |   2 +-
+>   mm/gup.c                               |  22 +-
+>   mm/internal.h                          |   8 +
+>   mm/memcontrol.c                        |   6 +-
+>   mm/memremap.c                          |  75 ++---
+>   mm/migrate.c                           |   5 -
+>   mm/page_alloc.c                        |   3 +
+>   mm/swap.c                              |  45 +--
+>   39 files changed, 904 insertions(+), 371 deletions(-)
+> 
+> 
+> base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
+> --
+> 2.30.2
