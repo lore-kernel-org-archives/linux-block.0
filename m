@@ -2,43 +2,41 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63345C4332F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 19:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B6BC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 19:01:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242233AbiBATBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Feb 2022 14:01:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60900 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242227AbiBATBg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Feb 2022 14:01:36 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B57C061714;
-        Tue,  1 Feb 2022 11:01:36 -0800 (PST)
+        id S237209AbiBATBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Feb 2022 14:01:38 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:52062 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242227AbiBATBi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Feb 2022 14:01:38 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DCD0EB82F6E;
-        Tue,  1 Feb 2022 19:01:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C45A5C340F2;
-        Tue,  1 Feb 2022 19:01:32 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EDDEF61615;
+        Tue,  1 Feb 2022 19:01:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 683C7C340F1;
+        Tue,  1 Feb 2022 19:01:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643742093;
-        bh=VRyH49oabNK9tq5d8ITbMCbDVSNwxXXmYIC92KD8pAk=;
+        s=k20201202; t=1643742097;
+        bh=I5Ksu7TSv5OlmgMa0WaJLxD3mrYm2dJm/MON3Czbzb4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fi+UTk5gKsIOw6y/x5rzHWQN/dnuO/rcJ2Xny2s+2Q88W0N8SybiTPxqM2DK7/24v
-         oc/3jbMdTQsoMiKdWMxWYVug5ow3HaLAUjFRczq7DhXBMLgmVYgqlGG7GzGug2KnPL
-         QMIK3GC9JD7b2hkx+iWsEuDTTJ9VWjJkHm/KlN90BXsGZMzDLbHaTGTXnwICBQFsAp
-         3ntQ6T9fgHXAf9+1oLBj6GojrZacR5vN2aX5zv91rESdRcNN7/ch++E5T2Ny111EC6
-         yzKSfynwDKOzwRKqAn8Zn/scTeWnqa39hGJMBEGczewg6o3A2HNtN83ohpkyX0pDCm
-         JWJht0H1Jfp6Q==
+        b=jQ82qm84m11Nng41jofXckgW27OfA/w2Hm4edQErKgZLb4z6UpZyBy+n5cVpzibpp
+         Abi8XyCVEp2+PtlRd+6iNXAh9Yvs9mQjFJcnANc9zg/XJVm7BcFu60Ga68e0YiZ/Xi
+         ngxXYR5CsuKYtPtG0lr+hvr5D+s5ZbFCe6/STaqkdtEnqyzdxPP5A3tk1sFZOuUdXv
+         Cke9uxy8QG9Fm8Tkeyw+HUQdaPc+DoZvrdE0oQN/K5jfvjdm/3kWUQwA99uaUJqL5E
+         6hczOpd6kOuAYY5gmz0QKjT1Wx5Vu0pixs4oHmuqrDS6Gzg49FiAJ4uNa03yKrfgMx
+         bCm5frnH6HIgQ==
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 2/7] nvme: allow integrity on extended metadata formats
-Date:   Tue,  1 Feb 2022 11:01:23 -0800
-Message-Id: <20220201190128.3075065-3-kbusch@kernel.org>
+        colyli@suse.de, Keith Busch <kbusch@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCHv2 5/7] asm-generic: introduce be48 unaligned accessors
+Date:   Tue,  1 Feb 2022 11:01:26 -0800
+Message-Id: <20220201190128.3075065-6-kbusch@kernel.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20220201190128.3075065-1-kbusch@kernel.org>
 References: <20220201190128.3075065-1-kbusch@kernel.org>
@@ -48,38 +46,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The block integrity subsystem knows how to construct protection
-information buffers with metadata beyond the protection information
-fields. Remove the driver restriction.
+The NVMe protocol extended the data integrity fields with unaligned
+48-bit reference tags. Provide some helper accessors in
+preparation for these.
 
-Note, this can only work if the PI field appears first in the metadata,
-as the integrity subsystem doesn't calculate guard tags on preceding
-metadata.
-
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/nvme/host/core.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ include/asm-generic/unaligned.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 5e0bfda04bd7..b3eabf6a08b9 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1726,12 +1726,9 @@ static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
- 	struct nvme_ctrl *ctrl = ns->ctrl;
+diff --git a/include/asm-generic/unaligned.h b/include/asm-generic/unaligned.h
+index 1c4242416c9f..8fc637379899 100644
+--- a/include/asm-generic/unaligned.h
++++ b/include/asm-generic/unaligned.h
+@@ -126,4 +126,30 @@ static inline void put_unaligned_le24(const u32 val, void *p)
+ 	__put_unaligned_le24(val, p);
+ }
  
--	/*
--	 * The PI implementation requires the metadata size to be equal to the
--	 * t10 pi tuple size.
--	 */
- 	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
--	if (ns->ms == sizeof(struct t10_pi_tuple))
-+	if (id->dps & NVME_NS_DPS_PI_FIRST ||
-+	    ns->ms == sizeof(struct t10_pi_tuple))
- 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
- 	else
- 		ns->pi_type = 0;
++static inline void __put_unaligned_be48(const u64 val, __u8 *p)
++{
++	*p++ = val >> 40;
++	*p++ = val >> 32;
++	*p++ = val >> 24;
++	*p++ = val >> 16;
++	*p++ = val >> 8;
++	*p++ = val;
++}
++
++static inline void put_unaligned_be48(const u64 val, void *p)
++{
++	__put_unaligned_be48(val, p);
++}
++
++static inline u64 __get_unaligned_be48(const u8 *p)
++{
++	return (u64)p[0] << 40 | (u64)p[1] << 32 | p[2] << 24 |
++		p[3] << 16 | p[4] << 8 | p[5];
++}
++
++static inline u64 get_unaligned_be48(const void *p)
++{
++	return __get_unaligned_be48(p);
++}
++
+ #endif /* __ASM_GENERIC_UNALIGNED_H */
 -- 
 2.25.4
 
