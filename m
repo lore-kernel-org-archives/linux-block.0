@@ -2,69 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A17C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 14:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD29AC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 17:20:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239071AbiBAONV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Feb 2022 09:13:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32717 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238761AbiBAONV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Feb 2022 09:13:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643724800;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nrT/5L5qYMHdiH1OYbxOA/3ZZSuEj0xzzYPB+L6+4q8=;
-        b=TbGoTYkXfEBP3ktG2YrM56VdiDIAOjRiGyjak4zZFlWnQUEzvFR9CbBHt3rJfvzW992bim
-        h35nkEpB+iijzZhZRCtNVZmdb7Yr2bcbzq9z/iqjJEs6RsxpX2A7RKxCPGB4W2GX1hgWYC
-        XezYeaZvayk7wOlcInTG4jaERJteQIU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-79-wAukSB2EMM-ZNA2E0nQePQ-1; Tue, 01 Feb 2022 09:13:18 -0500
-X-MC-Unique: wAukSB2EMM-ZNA2E0nQePQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EDB784DA41;
-        Tue,  1 Feb 2022 14:13:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CCA9277D52;
-        Tue,  1 Feb 2022 14:13:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <2ee1eb2b46a3bbdbde4244634586655247f5c676.camel@HansenPartnership.com>
-References: <2ee1eb2b46a3bbdbde4244634586655247f5c676.camel@HansenPartnership.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     dhowells@redhat.com, lsf-pc@lists.linux-foundation.org,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [LSF/MM/BPF TOPIC] configfd as a replacement for both ioctls and fsconfig
+        id S241441AbiBARUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Feb 2022 12:20:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229836AbiBARUg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Feb 2022 12:20:36 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CB1C061714;
+        Tue,  1 Feb 2022 09:20:35 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id j16so15924431plx.4;
+        Tue, 01 Feb 2022 09:20:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=P/OM7TjxmbJXWO65CCc5u6gW1j1hf5TT48SuvRQUGM4=;
+        b=Th2pE7IdvVAvL27K0Qf/WfMwKXepCYHz0caGuE/hHj2a/Cnls+2LvQk4pd0hPSsVmc
+         /P6uhuhZiLl+17CpwiopYhBR/qCtJBVssgTbQdYnIISNQERS2GZ14qq/Hg7eUUCaN674
+         VCwtBPI4DwClaYXcyxJN+XKveP7T7CfMg5ljyW3+GK7dyKLOmA8hFBXrPEcKThr76/Z1
+         McM98ys2DJwA4II8akyGsTpeN9bHmMtE68PaVABB+oTwu+4yN2ONkyGt3QHviGejnNXf
+         7GgXGq04oayAGMEjV9a1B4yP0UFh2KbtUdz2IDGrTo7ZtGrKniUuXyFMvj/ITBpXNTId
+         pHiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=P/OM7TjxmbJXWO65CCc5u6gW1j1hf5TT48SuvRQUGM4=;
+        b=nuphlPTDXdkwSDnUWH6Ss4nCdRdRM01kQ/PnJVhFMY2drww3RLAKnddClVatJzm4ju
+         G+AB6hS2MZulCp70yX3pqVTkVScVvjBg8fDV0DJ26PJYkZD4eu0EAmMjbaWxiP1RB49A
+         +JMPrhUwcXVUFYgEyE+Ip3tLosSnBbwqddRu03TW0yLJkx+10lHPm3afWK3cDdSr76lk
+         YIQgQlIBbENFCkt5wP6KKbbGFaYlm/UPtclylwqpuhJvQ3bnMIvZJTajVd6VErs2qPOj
+         FlvfytpnS7AW+hgBrSGK8qymxDykqjyutbBblDGgSt/e/yyWm8RbygMx4WZjFRvu+Oax
+         Cmbg==
+X-Gm-Message-State: AOAM530FgnFIe+8gwqdIiSh7X5EdtGuXGy9n309ybF87mfrXei6StaOc
+        s1oZSYfjysQvzR0DjwUgsjQ=
+X-Google-Smtp-Source: ABdhPJyk13e7IHTfwNVZ5H4BVDaKYyNxLipIUGhMx2bZAPAdIiubCpR1ZgCsi1FvSg/sKK/5ZB7m1A==
+X-Received: by 2002:a17:90b:3144:: with SMTP id ip4mr3488407pjb.23.1643736035151;
+        Tue, 01 Feb 2022 09:20:35 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id a1sm31598385pgg.18.2022.02.01.09.20.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Feb 2022 09:20:34 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 1 Feb 2022 07:20:32 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next] blk-throttle: enable io throttle for root in
+ cgroup v2
+Message-ID: <Yflr4FzUTWsiLTC/@slm.duckdns.org>
+References: <20220114093000.3323470-1-yukuai3@huawei.com>
+ <YfGE9L4i7DtNTo08@slm.duckdns.org>
+ <235b0757-d322-2b6e-3ab6-ecc8c82f8f1e@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1476916.1643724793.1@warthog.procyon.org.uk>
-Date:   Tue, 01 Feb 2022 14:13:13 +0000
-Message-ID: <1476917.1643724793@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <235b0757-d322-2b6e-3ab6-ecc8c82f8f1e@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
+Hello,
 
+On Thu, Jan 27, 2022 at 10:36:38AM +0800, yukuai (C) wrote:
+> In our case, the disk is provided by server, and such disk can be shared
+> by multipul clients. Thus for the client side, the server is a higher
+> level parent.
 > 
-> If the ioctl debate goes against ioctls, I think configfd would present
-> a more palatable alternative to netlink everywhere.
+> Theoretically, limit the io from server for each client is feasible,
+> however, the main reason we don't want to do this is the following
+> shortcoming:
+> 
+> client can still send io to server unlimited, we can just limit the
+> amount of io that can complete from server, which might cause too much
+> pressure on the server side.
 
-It'd be nice to be able to set up a 'configuration transaction' and then do a
-commit to apply it all in one go.
+I don't quite follow the "send io to server unlimited" part. Doesn't that
+get limited by available number of requests? ie. if the server throttles,
+the in-flight requests will take longer to complete which exhausts the
+available requests and thus slows down the client. That's how it's supposed
+to work on the local machine too.
 
-David
+Thanks.
 
+-- 
+tejun
