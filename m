@@ -2,96 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86431C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 13:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D76C4332F
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 13:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238015AbiBANnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Feb 2022 08:43:50 -0500
-Received: from bedivere.hansenpartnership.com ([96.44.175.130]:43718 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230213AbiBANnu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Feb 2022 08:43:50 -0500
+        id S238856AbiBANrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Feb 2022 08:47:04 -0500
+Received: from mga14.intel.com ([192.55.52.115]:22012 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230213AbiBANrD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Feb 2022 08:47:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1643723029;
-        bh=uDxFPxbUo1MGB82BrefKPM3fJAGFfZccgORo64UPMRc=;
-        h=Message-ID:Subject:From:To:Date:From;
-        b=Hf2rxqKEVSX4jxK5SJEx3GK0ItD2CuaL1uvIaDfjqf0qDvPbxbZOug+2kR8E+cOJ7
-         IMP8/OoVXoXCGjWfKV9REMzq6IzmCEZeMNsXWoTLlD8UPMXXHyf1Cqtq+4XFEtzH44
-         5qP7QgLQkVvAlrCgk+2rHIFJyuK2OYC4OSz1COj8=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id C33541280C67;
-        Tue,  1 Feb 2022 08:43:49 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id iq5iSiTKdxO8; Tue,  1 Feb 2022 08:43:49 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1643723029;
-        bh=uDxFPxbUo1MGB82BrefKPM3fJAGFfZccgORo64UPMRc=;
-        h=Message-ID:Subject:From:To:Date:From;
-        b=Hf2rxqKEVSX4jxK5SJEx3GK0ItD2CuaL1uvIaDfjqf0qDvPbxbZOug+2kR8E+cOJ7
-         IMP8/OoVXoXCGjWfKV9REMzq6IzmCEZeMNsXWoTLlD8UPMXXHyf1Cqtq+4XFEtzH44
-         5qP7QgLQkVvAlrCgk+2rHIFJyuK2OYC4OSz1COj8=
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::c447])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 151651280C13;
-        Tue,  1 Feb 2022 08:43:49 -0500 (EST)
-Message-ID: <2ee1eb2b46a3bbdbde4244634586655247f5c676.camel@HansenPartnership.com>
-Subject: [LSF/MM/BPF TOPIC] configfd as a replacement for both ioctls and
- fsconfig
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Brauner <brauner@kernel.org>
-Date:   Tue, 01 Feb 2022 08:43:47 -0500
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643723223; x=1675259223;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zhANCAVRPMJKtTyZJ596l8+I84NvbmfarsdAm14y2lU=;
+  b=UYGenkS6sE45CvZW4dpddxiZlDGOHQ1XPVp6LK05NiASG3aEJy8IstpS
+   l62F/cSDVGKmMqHn8w8qwCW3QhaJNr3eVh5/J2Tb6PmrCZanpTQdMcwgH
+   m4CwgSCogmQSZGuumLVViPzaFao8mBnUpbelyApL0kVzDMNaXXXDp7WgB
+   QnE3Tiiy0kUSdJdnKtDwBVastuMUvRnMXmBk5s7GmVU6GL7zyG2lSKkyD
+   P1ckrLl1BfYA8c11nQkIDBybfebAekwtaqlVbzgzKbmsORx+iMTmS1x4F
+   Eem9/9nvmICboJkaVd6sdlb5K7VVi8Di4Vx5I+Etn0izXr0ZbxdVI5W7V
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10244"; a="247908769"
+X-IronPort-AV: E=Sophos;i="5.88,334,1635231600"; 
+   d="scan'208";a="247908769"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2022 05:46:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,334,1635231600"; 
+   d="scan'208";a="768931254"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Feb 2022 05:46:44 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nEtUZ-000TKI-Ta; Tue, 01 Feb 2022 13:46:43 +0000
+Date:   Tue, 1 Feb 2022 21:46:18 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Douglas Gilbert <dgilbert@interlog.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, martin.petersen@oracle.com,
+        jejb@linux.vnet.ibm.com, hare@suse.de, bvanassche@acm.org,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Bodo Stroesser <bostroesser@gmail.com>
+Subject: Re: [PATCH v7 1/4] sgl_alloc_order: remove 4 GiB limit
+Message-ID: <202202012125.JGVcLupw-lkp@intel.com>
+References: <20220201034915.183117-2-dgilbert@interlog.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220201034915.183117-2-dgilbert@interlog.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A shortened version of this topic was originally sent for LSF/MM 2020
-which didn't happen due to the pandemic:
+Hi Douglas,
 
-https://lore.kernel.org/all/1581781497.3847.5.camel@HansenPartnership.com/
+Thank you for the patch! Yet something to improve:
 
-However, now replacing ioctls is on the table:
+[auto build test ERROR on linus/master]
+[also build test ERROR on v5.17-rc2 next-20220131]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-https://lore.kernel.org/all/20220201013329.ofxhm4qingvddqhu@garbanzo/
+url:    https://github.com/0day-ci/linux/commits/Douglas-Gilbert/scatterlist-add-new-capabilities/20220201-115047
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 26291c54e111ff6ba87a164d85d4a4e134b7315c
+config: i386-randconfig-a003-20220131 (https://download.01.org/0day-ci/archive/20220201/202202012125.JGVcLupw-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/0day-ci/linux/commit/be1e80a043970c400c00709be739ab26f931331a
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Douglas-Gilbert/scatterlist-add-new-capabilities/20220201-115047
+        git checkout be1e80a043970c400c00709be739ab26f931331a
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-as I've already stated in that thread, I think, used sparingly, ioctls
-are fit for purpose and shouldn't be replaced and I'd definitely like
-to argue for that position.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-However, assuming that people would like to consider alternatives, I'd
-like to propose configfd.  It was originally proposed as a
-configuration mechanism for bind mounts that was a more general
-replacement for fsconfig (which can only configure filesystems with
-superblocks) and was going to be used by shiftfs.  However, since
-shiftfs functionality was done a different way, configfd has
-languished, although the patches are here:
+All errors (new ones prefixed by >>):
 
-https://lore.kernel.org/all/20200215153609.23797-1-James.Bottomley@HansenPartnership.com/
-
-The point, though, is that configfd can configure pretty much anything;
-it wouldn't just be limited to filesystem objects.  It takes the
-fsconfig idea of using a file descriptor to carry configuration
-information, which could be built up over many config calls and makes
-it general enough to apply to anything.  One of the ideas of configfd
-is that the data could be made fully introspectable ... as in not just
-per item description, but the ability to get from the receiver what it
-is expecting in terms of configuration options (this part was an idea
-not present in the above patch series).
-
-If the ioctl debate goes against ioctls, I think configfd would present
-a more palatable alternative to netlink everywhere.
-
-James
+   ld: lib/scatterlist.o: in function `sgl_alloc_order':
+>> lib/scatterlist.c:612: undefined reference to `__udivdi3'
 
 
+vim +612 lib/scatterlist.c
+
+   586	
+   587	/**
+   588	 * sgl_alloc_order - allocate a scatterlist with equally sized elements each
+   589	 *		     of which has 2^@order continuous pages
+   590	 * @length: Length in bytes of the scatterlist. Must be at least one
+   591	 * @order:  Second argument for alloc_pages(). Each sgl element size will
+   592	 *	    be (PAGE_SIZE*2^@order) bytes. @order must not exceed 16.
+   593	 * @chainable: Whether or not to allocate an extra element in the scatterlist
+   594	 *	       for scatterlist chaining purposes
+   595	 * @gfp: Memory allocation flags
+   596	 * @nent_p: [out] Number of entries in the scatterlist that have pages.
+   597	 *		  Ignored if @nent_p is NULL.
+   598	 *
+   599	 * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
+   600	 */
+   601	struct scatterlist *sgl_alloc_order(unsigned long long length,
+   602					    unsigned int order, bool chainable,
+   603					    gfp_t gfp, unsigned int *nent_p)
+   604	{
+   605		struct scatterlist *sgl, *sg;
+   606		struct page *page;
+   607		unsigned int nent, nalloc;
+   608		u32 elem_len;
+   609	
+   610		if (length >> (PAGE_SHIFT + order) >= UINT_MAX)
+   611			return NULL;
+ > 612		nent = DIV_ROUND_UP(length, PAGE_SIZE << order);
+   613	
+   614		if (chainable) {
+   615			if (check_add_overflow(nent, 1U, &nalloc))
+   616				return NULL;
+   617		} else {
+   618			nalloc = nent;
+   619		}
+   620		sgl = kmalloc_array(nalloc, sizeof(struct scatterlist),
+   621				    gfp & ~GFP_DMA);
+   622		if (!sgl)
+   623			return NULL;
+   624	
+   625		sg_init_table(sgl, nalloc);
+   626		sg = sgl;
+   627		while (length) {
+   628			elem_len = min_t(u64, length, PAGE_SIZE << order);
+   629			page = alloc_pages(gfp, order);
+   630			if (!page) {
+   631				sgl_free_order(sgl, order);
+   632				return NULL;
+   633			}
+   634	
+   635			sg_set_page(sg, page, elem_len, 0);
+   636			length -= elem_len;
+   637			sg = sg_next(sg);
+   638		}
+   639		WARN_ONCE(length, "length = %lld\n", length);
+   640		if (nent_p)
+   641			*nent_p = nent;
+   642		return sgl;
+   643	}
+   644	EXPORT_SYMBOL(sgl_alloc_order);
+   645	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
