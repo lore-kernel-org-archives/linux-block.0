@@ -2,155 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCBBDC433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 12:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3354AC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 12:56:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235459AbiBAMg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Feb 2022 07:36:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55854 "EHLO
+        id S238257AbiBAM4W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Feb 2022 07:56:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237956AbiBAMgz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Feb 2022 07:36:55 -0500
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04EA3C061714
-        for <linux-block@vger.kernel.org>; Tue,  1 Feb 2022 04:36:55 -0800 (PST)
-Received: by mail-qk1-x72d.google.com with SMTP id g145so14893530qke.3
-        for <linux-block@vger.kernel.org>; Tue, 01 Feb 2022 04:36:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nskeSRiBDGoJdBUOhSRpII4ymRQB/RCZW6MS1+0kpvM=;
-        b=mDPlLjNErpVCtqtsADancFzkLBmw2S+bXBPoILSGxKLUJz63L0rtVX0E+uIJ1BQJPm
-         DIW4sRvonVCFjMNv7tIo0KxFmA4JIWX+ABxVtU7ZqLLWFK//4u162OThrMYofKmZmy9l
-         V2Nebp/Km4rhU1Db/RMAmSdEx77JIzmUH66hvegpy6x/gVRKcfFJG/z8FfLCvmKVLAhu
-         KNEA8/5zU06Vfj9WX4R7G7s9Gz6+WBE/QQp3VKlyjg0qHv54Y0mdPqSOg9VNeUxY3YxO
-         E+DbwtOd7I004ecGyetRUm2jOLjIkMRTL9SxchLuW1/3XM+Xl6r/FN63oYZqis3jpxNx
-         q4AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nskeSRiBDGoJdBUOhSRpII4ymRQB/RCZW6MS1+0kpvM=;
-        b=4e/z/8OpQGtvrPw++6DQXXxaOxdbRaTpH/5FRDtJXnLFKbhQ8T9USs19yjATEx7gHH
-         /dwbbNViJK8pi5nYPuqIoum7p3zi7qaVKLQc0stlp1Och/WmmlEn9fpNNUTDfGYH9U3F
-         netyOns4Xg/Ke0m2eRBxjfrxbFS/lZ/FfIdSgiaMpJI4vKy00v6FCmUcK1MeQlIsr18K
-         rAznQOwh7Wv6yAgkRlypIQ3DpIt5YnsNWoUTPB4GDUpcikDxjk29FMM378WJqm0o2qS7
-         rzlh0JT6k2Q+m9pGQTG5dO++dnKTQINC4RbyxRbtMWql2R/Wab2CGW2W3FOx9DKdoHuw
-         R3eQ==
-X-Gm-Message-State: AOAM5306opFBh7rbn9cBosRaQJNROG41G3cirkp+lmwbNVBeOIJfIAif
-        zAvqsQ6mRcpLKnHj3TqddHwi8w==
-X-Google-Smtp-Source: ABdhPJy8a1by7jIsBADUNDKiXTVedVbFSBvgzztZ25yKMzc7Lw3UMCCBlQ3EYyDDmoD2PL87m7SIzg==
-X-Received: by 2002:a05:620a:40c5:: with SMTP id g5mr16227786qko.139.1643719014182;
-        Tue, 01 Feb 2022 04:36:54 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id 16sm3216564qty.86.2022.02.01.04.36.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 04:36:53 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nEsOy-00A73m-Vh; Tue, 01 Feb 2022 08:36:52 -0400
-Date:   Tue, 1 Feb 2022 08:36:52 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Douglas Gilbert <dgilbert@interlog.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com, jejb@linux.vnet.ibm.com, hare@suse.de,
-        bvanassche@acm.org, Bodo Stroesser <bostroesser@gmail.com>
-Subject: Re: [PATCH v7 1/4] sgl_alloc_order: remove 4 GiB limit
-Message-ID: <20220201123652.GA8034@ziepe.ca>
-References: <20220201034915.183117-1-dgilbert@interlog.com>
- <20220201034915.183117-2-dgilbert@interlog.com>
+        with ESMTP id S229725AbiBAM4W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Feb 2022 07:56:22 -0500
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89456C061714;
+        Tue,  1 Feb 2022 04:56:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1643720181;
+        bh=0lhXHBUl87DlcDjTUNO3sOfNdzeACry/BwIu5h5Ckbo=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=aWrhN73VoUu6+6bMgo4G3g7xhazdOBdC3OeJs3fu5EirieSShkxrjG3eNX0ygh+1d
+         xMcURv9c47WMfQ+bS4vIZxNVRFvwtEJMziT+t6Maf9Ke6CRneJGrU38glV6E92leRt
+         o7jzPPG6vf1z7Zr6UdvgtsfsB3I9ZwYjoHEBOm5A=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 96EDC1280BF8;
+        Tue,  1 Feb 2022 07:56:21 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 3TOI1er4DDo2; Tue,  1 Feb 2022 07:56:21 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1643720181;
+        bh=0lhXHBUl87DlcDjTUNO3sOfNdzeACry/BwIu5h5Ckbo=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=aWrhN73VoUu6+6bMgo4G3g7xhazdOBdC3OeJs3fu5EirieSShkxrjG3eNX0ygh+1d
+         xMcURv9c47WMfQ+bS4vIZxNVRFvwtEJMziT+t6Maf9Ke6CRneJGrU38glV6E92leRt
+         o7jzPPG6vf1z7Zr6UdvgtsfsB3I9ZwYjoHEBOm5A=
+Received: from [IPv6:2601:5c4:4300:c551::c447] (unknown [IPv6:2601:5c4:4300:c551::c447])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 80C2A1280BD1;
+        Tue,  1 Feb 2022 07:56:20 -0500 (EST)
+Message-ID: <f4f86a3e1ab20a1d7d32c7f5ae74419c8d780e82.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] are we going to use ioctls forever?
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        lsf-pc@lists.linux-foundation.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        Samuel Cabrero <scabrero@suse.de>,
+        David Teigland <teigland@redhat.com>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Date:   Tue, 01 Feb 2022 07:56:19 -0500
+In-Reply-To: <20220201013329.ofxhm4qingvddqhu@garbanzo>
+References: <20220201013329.ofxhm4qingvddqhu@garbanzo>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220201034915.183117-2-dgilbert@interlog.com>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 31, 2022 at 10:49:12PM -0500, Douglas Gilbert wrote:
-> This patch fixes a check done by sgl_alloc_order() before it starts
-> any allocations. The comment in the original said: "Check for integer
-> overflow" but the right hand side of the expression in the condition
-> is resolved as u32 so it can not exceed UINT32_MAX (4 GiB) which
-> means 'length' can not exceed that value.
-> 
-> This function may be used to replace vmalloc(unsigned long) for a
-> large allocation (e.g. a ramdisk). vmalloc has no limit at 4 GiB so
-> it seems unreasonable that sgl_alloc_order() whose length type is
-> unsigned long long should be limited to 4 GB.
-> 
-> In early 2021 there was discussion between Jason Gunthorpe
-> <jgg@ziepe.ca> and Bodo Stroesser <bostroesser@gmail.com> about the
-> way to check for overflow caused by order (an exponent) being
-> too large. Take the solution proposed by Bodo in post dated
-> 20210118 to the linux-scsi and linux-block lists.
-> 
-> An earlier patch fixed a memory leak in sg_alloc_order() due to the
-> misuse of sgl_free(). Take the opportunity to put a one line comment
-> above sgl_free()'s declaration warning that it is not suitable when
-> order > 0 .
-> 
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
-> Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
-> ---
->  include/linux/scatterlist.h |  1 +
->  lib/scatterlist.c           | 24 +++++++++++++-----------
->  2 files changed, 14 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-> index 7ff9d6386c12..03130be581bb 100644
-> --- a/include/linux/scatterlist.h
-> +++ b/include/linux/scatterlist.h
-> @@ -357,6 +357,7 @@ struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
->  			      unsigned int *nent_p);
->  void sgl_free_n_order(struct scatterlist *sgl, int nents, int order);
->  void sgl_free_order(struct scatterlist *sgl, int order);
-> +/* Only use sgl_free() when order is 0 */
->  void sgl_free(struct scatterlist *sgl);
->  #endif /* CONFIG_SGL_ALLOC */
->  
-> diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-> index d5e82e4a57ad..ed6d0465c78e 100644
-> --- a/lib/scatterlist.c
-> +++ b/lib/scatterlist.c
-> @@ -585,13 +585,16 @@ EXPORT_SYMBOL(sg_alloc_table_from_pages_segment);
->  #ifdef CONFIG_SGL_ALLOC
->  
->  /**
-> - * sgl_alloc_order - allocate a scatterlist and its pages
-> + * sgl_alloc_order - allocate a scatterlist with equally sized elements each
-> + *		     of which has 2^@order continuous pages
->   * @length: Length in bytes of the scatterlist. Must be at least one
-> - * @order: Second argument for alloc_pages()
-> + * @order:  Second argument for alloc_pages(). Each sgl element size will
-> + *	    be (PAGE_SIZE*2^@order) bytes. @order must not exceed 16.
->   * @chainable: Whether or not to allocate an extra element in the scatterlist
-> - *	for scatterlist chaining purposes
-> + *	       for scatterlist chaining purposes
->   * @gfp: Memory allocation flags
-> - * @nent_p: [out] Number of entries in the scatterlist that have pages
-> + * @nent_p: [out] Number of entries in the scatterlist that have pages.
-> + *		  Ignored if @nent_p is NULL.
->   *
->   * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
->   */
-> @@ -604,16 +607,15 @@ struct scatterlist *sgl_alloc_order(unsigned long long length,
->  	unsigned int nent, nalloc;
->  	u32 elem_len;
->  
-> -	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
-> -	/* Check for integer overflow */
-> -	if (length > (nent << (PAGE_SHIFT + order)))
-> +	if (length >> (PAGE_SHIFT + order) >= UINT_MAX)
->  		return NULL;
-> -	nalloc = nent;
-> +	nent = DIV_ROUND_UP(length, PAGE_SIZE << order);
-> +
+On Mon, 2022-01-31 at 17:33 -0800, Luis Chamberlain wrote:
+> It would seem we keep tacking on things with ioctls for the block
+> layer and filesystems. Even for new trendy things like io_uring [0].
 
-This would be clearer to make nent/etc an unsigned long long. Then
-check if nalloc is > SIZE_MAX before casting it to size_t for the
-allocation. Avoids the wonky if statement.
+And many systems besides ... we're also adding new ioctls for things
+like containers.
 
-Kaspm
+However, could I just ask why you object to ioctls?  I agree, like any
+drug, overuse leads to huge problems.  However, there are medicinal use
+cases where they actually save a huge amount of pain.  So I think as
+long as we're careful we can still continue using them.
+
+What is the issue?  Just the non-introspectability of the data from the
+perspective of tools like seccomp?
+
+> For a few years I have found this odd, and have slowly started
+> asking folks why we don't consider alternatives like a generic
+> netlink family. I've at least been told that this is desirable
+> but no one has worked on it. *If* we do want this I think we just
+> not only need to commit to do this, but also provide a target. LSFMM
+> seems like a good place to do this.
+
+It's not just netlink.  We have a huge plethora of interfaces claiming
+to replace the need for ioctl as a means for exchanging information
+between a multiplexor and an in-kernel set of receivers.  The latest
+one I noticed would be fsconfig, although that is filesystem specific
+(but could be made more generic).  And, of course, configfs was
+supposed to be another generic but introspectable configuration
+exchange system.  We're quite good at coming up with ioctl replacement,
+however when we do they don't seem to be as durable.  I think we should
+really examine what we think the problem is in detail before even
+starting to propose a solution.
+
+James
+
+
