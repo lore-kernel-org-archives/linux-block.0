@@ -2,95 +2,202 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A07FDC433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 02:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F15C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 03:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231890AbiBACYG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jan 2022 21:24:06 -0500
-Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:43652
-        "EHLO smtp-relay-internal-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229816AbiBACYG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jan 2022 21:24:06 -0500
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id DF0B33F1A3
-        for <linux-block@vger.kernel.org>; Tue,  1 Feb 2022 02:24:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1643682244;
-        bh=HNbqgIyTl4U/xKe4xsBZV50k1Yf+Ba7ETVwZMbT4bZs=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=Grz7+EIkDYowm3GbDM09KUFHdqInhvOGV5yeddvIwhgoA3+HtZnTj9bJNEsjkB2aq
-         0dMLRZEKiL4/vTaT+9UjWFIB2rm5Wqnd4Q8TwkvyUCJd6NYoSM+C4VGYq80qmwDI7B
-         cvlyaAWhP/95SUDshWOXuFJhUsuWzwZ13/XcNe/ujvcjTcb1Nj/0Fqt6E3iYzp0heh
-         zGvGwM1EV0jse/fakd4+lkxCrwndiZUYcfQbEBoJnqAOPcM71mRkiCHJ6f1PMFAReK
-         SM5pn85ZlUJ8eYoIB6U+0MgZFMikeJPhjO6j0nIv7fkYCIMR4BqAmLFmR+RwcgrmJa
-         m/u/Rs4793gzQ==
-Received: by mail-pj1-f69.google.com with SMTP id mn21-20020a17090b189500b001b4fa60efcbso797767pjb.2
-        for <linux-block@vger.kernel.org>; Mon, 31 Jan 2022 18:24:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HNbqgIyTl4U/xKe4xsBZV50k1Yf+Ba7ETVwZMbT4bZs=;
-        b=ya2BEdODNvwaqFxlWRPHekDJKtis8xT0oM6MW2huaeiBvx/jJjS9Bd64aOdfhFP6LW
-         hUHQlkjTRseEqj3kiY+ICt1tHg7rrg5hNJ1vS4GiLE5gKRuqkJH2lfS2TjoJmsl1f51J
-         sJyZVofsEFXUxsDVmAaRVhzWHF4FgqsLrb1BatDogNap4JcvbP0A2sj0L14nkn3AMVbT
-         k4ayqm0WqlN0BdTcbS6yB0tk1NzA+xD7N+bW2F9Xc+b7Bq3CbGAVJiK0qLOJSSNJ5P32
-         jv24NiBpOifcp742/iTMeAXVzkDc96ECOKzgxFJAvwla6lpwMpmbt4rlNqhogzikwHGq
-         jHCA==
-X-Gm-Message-State: AOAM532uJJq914PTbiwx2sWoJri1i2OUpV8liiJ35AA6aMQjP5OhJuVI
-        aced/pRtWjuf2cbDrCYgW+pI+u46ixDzAbg2MMQ3NjMQ1HsJMQ4dgnKyBxb7HWwDZ7ftfvhxZ89
-        KC24cr0qnDH6beAxEOF44JzoO8MWQpHDuBq+wlVqU61+lW0EEu/v2erH7
-X-Received: by 2002:a17:902:c412:: with SMTP id k18mr23673511plk.142.1643682243186;
-        Mon, 31 Jan 2022 18:24:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUpLi1Kj9iW2239Gl4OCQo7sqjVsLCdg+wb37W63kLcV8MTz5K+4G0SF2M2xMZ1pGQgsrwVqJZb6NZCuH2H+M=
-X-Received: by 2002:a17:902:c412:: with SMTP id k18mr23673491plk.142.1643682242961;
- Mon, 31 Jan 2022 18:24:02 -0800 (PST)
+        id S232796AbiBAD5i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jan 2022 22:57:38 -0500
+Received: from smtp.infotech.no ([82.134.31.41]:32861 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232719AbiBAD5h (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jan 2022 22:57:37 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 25AB32041AF;
+        Tue,  1 Feb 2022 04:49:27 +0100 (CET)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id UQU7f0mfQ1O7; Tue,  1 Feb 2022 04:49:25 +0100 (CET)
+Received: from xtwo70.bingwo.ca (host-45-78-195-155.dyn.295.ca [45.78.195.155])
+        by smtp.infotech.no (Postfix) with ESMTPA id 7D2942041BB;
+        Tue,  1 Feb 2022 04:49:21 +0100 (CET)
+From:   Douglas Gilbert <dgilbert@interlog.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com, hare@suse.de,
+        bvanassche@acm.org, Bodo Stroesser <bostroesser@gmail.com>,
+        David Disseldorp <ddiss@suse.de>
+Subject: [PATCH v7 3/4] scatterlist: add sgl_equal_sgl() function
+Date:   Mon, 31 Jan 2022 22:49:14 -0500
+Message-Id: <20220201034915.183117-4-dgilbert@interlog.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220201034915.183117-1-dgilbert@interlog.com>
+References: <20220201034915.183117-1-dgilbert@interlog.com>
 MIME-Version: 1.0
-References: <20220131230255.789059-1-mfo@canonical.com> <20220131154340.e65ebe932d8933bc68c4ddf4@linux-foundation.org>
-In-Reply-To: <20220131154340.e65ebe932d8933bc68c4ddf4@linux-foundation.org>
-From:   Mauricio Faria de Oliveira <mfo@canonical.com>
-Date:   Mon, 31 Jan 2022 23:23:50 -0300
-Message-ID: <CAO9xwp16-q-Ow29VVmTY-wRUtK4wZ+o_pfm+MmNhX4tP1-1=eg@mail.gmail.com>
-Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        "Huang, Ying" <ying.huang@intel.com>, Yu Zhao <yuzhao@google.com>,
-        Yang Shi <shy828301@gmail.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 31, 2022 at 8:43 PM Andrew Morton <akpm@linux-foundation.org> wrote:
->
-> On Mon, 31 Jan 2022 20:02:55 -0300 Mauricio Faria de Oliveira <mfo@canonical.com> wrote:
->
-> > Problem:
-> > =======
-> >
-> > Userspace might read the zero-page instead of actual data from a
-> > direct IO read on a block device if the buffers have been called
-> > madvise(MADV_FREE) on earlier (this is discussed below) due to a
-> > race between page reclaim on MADV_FREE and blkdev direct IO read.
-> >
-> > ...
-> >
-> > Fixes: 802a3a92ad7a ("mm: reclaim MADV_FREE pages")
->
-> Five years ago.  As it doesn't seem urgent I targeted 5.18-rc1 for
-> this, and added a cc:stable so it will trickle back into earlier trees.
->
-> How does this plan sound?
+After enabling copies between scatter gather lists (sgl_s), another
+storage related operation is to compare two sgl_s for equality. This
+new function is designed to partially implement NVMe's Compare
+command and the SCSI VERIFY(BYTCHK=1) command. Like memcmp() this
+function begins scanning at the start (of each sgl) and returns
+false on the first miscompare and stops comparing.
 
-That sounds good; it's not urgent, indeed. Thanks!
+The sgl_equal_sgl_idx() function additionally yields the index (i.e.
+byte position) of the first miscompare. The additional parameter,
+miscompare_idx, is a pointer. If it is non-NULL and a miscompare is
+detected (i.e. the function returns false) then the byte index of
+the first miscompare is written to *miscompare_idx. Knowing the
+location of the first miscompare is needed to implement properly
+the SCSI COMPARE AND WRITE command.
 
+Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
+Reviewed-by: David Disseldorp <ddiss@suse.de>
+Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
+---
+ include/linux/scatterlist.h |   8 +++
+ lib/scatterlist.c           | 110 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 118 insertions(+)
+
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 1291ff63fe83..a96874a8b791 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -380,6 +380,14 @@ size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_ski
+ 		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
+ 		    size_t n_bytes);
+ 
++bool sgl_equal_sgl(struct scatterlist *x_sgl, unsigned int x_nents, off_t x_skip,
++		   struct scatterlist *y_sgl, unsigned int y_nents, off_t y_skip,
++		   size_t n_bytes);
++
++bool sgl_equal_sgl_idx(struct scatterlist *x_sgl, unsigned int x_nents, off_t x_skip,
++		       struct scatterlist *y_sgl, unsigned int y_nents, off_t y_skip,
++		       size_t n_bytes, size_t *miscompare_idx);
++
+ /*
+  * Maximum number of entries that will be allocated in one piece, if
+  * a list larger than this is required then chaining will be utilized.
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index d4d56eece250..1fb14b2e320a 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -1161,3 +1161,113 @@ size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_ski
+ 	return offset;
+ }
+ EXPORT_SYMBOL(sgl_copy_sgl);
++
++/**
++ * sgl_equal_sgl_idx - check if x and y (both sgl_s) compare equal, report
++ *		       index for first unequal bytes
++ * @x_sgl:		 x (left) sgl
++ * @x_nents:		 Number of SG entries in x (left) sgl
++ * @x_skip:		 Number of bytes to skip in x (left) before starting
++ * @y_sgl:		 y (right) sgl
++ * @y_nents:		 Number of SG entries in y (right) sgl
++ * @y_skip:		 Number of bytes to skip in y (right) before starting
++ * @n_bytes:		 The (maximum) number of bytes to compare
++ * @miscompare_idx:	 if return is false, index of first miscompare written
++ *			 to this pointer (if non-NULL). Value will be < n_bytes
++ *
++ * Returns:
++ *   true if x and y compare equal before x, y or n_bytes is exhausted.
++ *   Otherwise on a miscompare, returns false (and stops comparing). If return
++ *   is false and miscompare_idx is non-NULL, then index of first miscompared
++ *   byte written to *miscompare_idx.
++ *
++ * Notes:
++ *   x and y are symmetrical: they can be swapped and the result is the same.
++ *
++ *   Implementation is based on memcmp(). x and y segments may overlap.
++ *
++ *   The notes in sgl_copy_sgl() about large sgl_s _applies here as well.
++ *
++ **/
++bool sgl_equal_sgl_idx(struct scatterlist *x_sgl, unsigned int x_nents, off_t x_skip,
++		       struct scatterlist *y_sgl, unsigned int y_nents, off_t y_skip,
++		       size_t n_bytes, size_t *miscompare_idx)
++{
++	bool equ = true;
++	size_t len;
++	size_t offset = 0;
++	struct sg_mapping_iter x_iter, y_iter;
++
++	if (n_bytes == 0)
++		return true;
++	sg_miter_start(&x_iter, x_sgl, x_nents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
++	sg_miter_start(&y_iter, y_sgl, y_nents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
++	if (!sg_miter_skip(&x_iter, x_skip))
++		goto fini;
++	if (!sg_miter_skip(&y_iter, y_skip))
++		goto fini;
++
++	while (offset < n_bytes) {
++		if (!sg_miter_next(&x_iter))
++			break;
++		if (!sg_miter_next(&y_iter))
++			break;
++		len = min3(x_iter.length, y_iter.length, n_bytes - offset);
++
++		equ = !memcmp(x_iter.addr, y_iter.addr, len);
++		if (!equ)
++			goto fini;
++		offset += len;
++		/* LIFO order is important when SG_MITER_ATOMIC is used */
++		y_iter.consumed = len;
++		sg_miter_stop(&y_iter);
++		x_iter.consumed = len;
++		sg_miter_stop(&x_iter);
++	}
++fini:
++	if (miscompare_idx && !equ) {
++		u8 *xp = x_iter.addr;
++		u8 *yp = y_iter.addr;
++		u8 *x_endp;
++
++		for (x_endp = xp + len ; xp < x_endp; ++xp, ++yp) {
++			if (*xp != *yp)
++				break;
++		}
++		*miscompare_idx = offset + len - (x_endp - xp);
++	}
++	sg_miter_stop(&y_iter);
++	sg_miter_stop(&x_iter);
++	return equ;
++}
++EXPORT_SYMBOL(sgl_equal_sgl_idx);
++
++/**
++ * sgl_equal_sgl - check if x and y (both sgl_s) compare equal
++ * @x_sgl:		 x (left) sgl
++ * @x_nents:		 Number of SG entries in x (left) sgl
++ * @x_skip:		 Number of bytes to skip in x (left) before starting
++ * @y_sgl:		 y (right) sgl
++ * @y_nents:		 Number of SG entries in y (right) sgl
++ * @y_skip:		 Number of bytes to skip in y (right) before starting
++ * @n_bytes:		 The (maximum) number of bytes to compare
++ *
++ * Returns:
++ *   true if x and y compare equal before x, y or n_bytes is exhausted.
++ *   Otherwise on a miscompare, returns false (and stops comparing).
++ *
++ * Notes:
++ *   x and y are symmetrical: they can be swapped and the result is the same.
++ *
++ *   Implementation is based on memcmp(). x and y segments may overlap.
++ *
++ *   The notes in sgl_copy_sgl() about large sgl_s _applies here as well.
++ *
++ **/
++bool sgl_equal_sgl(struct scatterlist *x_sgl, unsigned int x_nents, off_t x_skip,
++		   struct scatterlist *y_sgl, unsigned int y_nents, off_t y_skip,
++		   size_t n_bytes)
++{
++	return sgl_equal_sgl_idx(x_sgl, x_nents, x_skip, y_sgl, y_nents, y_skip, n_bytes, NULL);
++}
++EXPORT_SYMBOL(sgl_equal_sgl);
 -- 
-Mauricio Faria de Oliveira
+2.25.1
+
