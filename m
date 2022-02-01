@@ -2,82 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBED9C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 01:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D99C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 01:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231901AbiBABdf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jan 2022 20:33:35 -0500
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:40730 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231891AbiBABdd (ORCPT
+        id S231309AbiBAByk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jan 2022 20:54:40 -0500
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:44915 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229897AbiBAByk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jan 2022 20:33:33 -0500
-Received: by mail-pl1-f181.google.com with SMTP id y17so14090064plg.7;
-        Mon, 31 Jan 2022 17:33:33 -0800 (PST)
+        Mon, 31 Jan 2022 20:54:40 -0500
+Received: by mail-pg1-f171.google.com with SMTP id h23so13915116pgk.11;
+        Mon, 31 Jan 2022 17:54:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=kZzz0ZYedVF3geNCITujBz9Zssyga+6PVvZeF/gIoDU=;
-        b=I1/ehDaucbNojiD5ORkRdw1ZJaPq6xwG2Qyl2sQQ3mUeoDPkuYab5ejWvARjV2tbjZ
-         y6/6P0ajvhneYoxCsQFj7ip2EBZVIwiAhbQr3z3ssBlVdMWMhWKS1W88J3xQndrTGG8Q
-         GTyJu3RVtt4tPlQMi3+VmkLwfF8+VFzbH9P4tVkjw5K/oXNFMqDOVB6ye1H59OtEl9hU
-         ZDZ9/DG5JUT0plIlReW4oKuc3FYzowpUhluA9iBBSJv/4YXqBDnN1ziIdrZ2Yxe/SLB9
-         dkcSMTRsaGIei7Mc31HReonRLKNgTO3v/QOG5k3WY0zASXIi03LYo0vSls2hKytw3kDm
-         ejLQ==
-X-Gm-Message-State: AOAM531tE5550oiAyf1Cf1d6GCxWROqb46h0XNzZW2KOXfFXWRIirdr5
-        7N/Pl+0Sdnud3ZmOB1D521A=
-X-Google-Smtp-Source: ABdhPJwyNJSCImOrvU/mdIW6gh3qj/6cZSSMKVuaeGq/vVBBGhmfv/RsFnQmUhjEcL/u5ZN1P+cl5w==
-X-Received: by 2002:a17:90b:388d:: with SMTP id mu13mr36859368pjb.239.1643679212988;
-        Mon, 31 Jan 2022 17:33:32 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DEQ16urBvP0UlaY7sL7xRV/9fsqy0EWylw9ub26/KfQ=;
+        b=jZOseM6jjNg3lZ0YYrNyZ2+8s8BScZLdB0mlpaSO4OvbBtMk947soQ42qZ0lcimllk
+         T1k2xcVXI58EDUJt0VhsJeLCIp2I2tdAUndW+pjvJDl1R7mXQ1N1B1vi0K9wrC+30BQ7
+         JZiy5sMLEq25k8ZHNTYLhiHg9k/PnwH5Wgl/CXVi3288LOIe1zwaWPeV3NwfrF2te+aA
+         g9sKJurQM8vcxRGbwCETV6HGnEpNUJWSON89GhkWDBG1E5juD6JwDv2eKjkAzPsnpUdL
+         KmDSXBewPA2X8jOjvK1JcE29teubWThGaoRHEfEfQ8aA3+gKdQEi8vL4d+1Z46/CMujV
+         y7Mg==
+X-Gm-Message-State: AOAM533AD1cIK8TVj1jxKZ2NPGy4445vyUTS6IYqIJvD4IFobquHIpRt
+        qsDjluphBiqYKDf2H9zyx0k=
+X-Google-Smtp-Source: ABdhPJxwurPLwookDKYfdK759aK7v43l+AjycUMO4NhyGq1GqximIDE/k24pt0ls+ZyULuBGbLpUaw==
+X-Received: by 2002:a63:1ca:: with SMTP id 193mr16567674pgb.20.1643680479518;
+        Mon, 31 Jan 2022 17:54:39 -0800 (PST)
 Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
-        by smtp.gmail.com with ESMTPSA id v9sm20344629pfu.60.2022.01.31.17.33.31
+        by smtp.gmail.com with ESMTPSA id k9sm446369pfi.134.2022.01.31.17.54.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jan 2022 17:33:32 -0800 (PST)
-Date:   Mon, 31 Jan 2022 17:33:29 -0800
+        Mon, 31 Jan 2022 17:54:38 -0800 (PST)
+Date:   Mon, 31 Jan 2022 17:54:35 -0800
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Samuel Cabrero <scabrero@suse.de>,
-        David Teigland <teigland@redhat.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Josef Bacik <josef@toxicpanda.com>, mcgrof@kernel.org
-Subject: [LSF/MM/BPF TOPIC] are we going to use ioctls forever?
-Message-ID: <20220201013329.ofxhm4qingvddqhu@garbanzo>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "kbus >> Keith Busch" <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+Message-ID: <20220201015435.okpgudxfrrtxwcd4@garbanzo>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It would seem we keep tacking on things with ioctls for the block
-layer and filesystems. Even for new trendy things like io_uring [0].
-For a few years I have found this odd, and have slowly started
-asking folks why we don't consider alternatives like a generic
-netlink family. I've at least been told that this is desirable
-but no one has worked on it. *If* we do want this I think we just
-not only need to commit to do this, but also provide a target. LSFMM
-seems like a good place to do this.
+> * What we will discuss in the proposed session ?
+> -----------------------------------------------------------------------
+> 
+> I'd like to propose a session to go over this topic to understand :-
+> 
+> 1. What are the blockers for Copy Offload implementation ?
+> 2. Discussion about having a file system interface.
+> 3. Discussion about having right system call for user-space.
+> 4. What is the right way to move this work forward ?
+> 5. How can we help to contribute and move this work forward ?
+> 
+> * Required Participants :-
+> -----------------------------------------------------------------------
+> 
+> I'd like to invite file system, block layer, and device drivers
+> developers to:-
+> 
+> 1. Share their opinion on the topic.
+> 2. Share their experience and any other issues with [4].
+> 3. Uncover additional details that are missing from this proposal.
 
-Possible issues? Kernels without CONFIG_NET. Is that a deal breaker?
-We already have a few filesystems with their own generic netlink
-families, so not sure if this is a good argument against this.
-
-mcgrof@fulton ~/linux-next (git::master)$ git grep genl_register_family fs
-fs/cifs/netlink.c:      ret = genl_register_family(&cifs_genl_family);
-fs/dlm/netlink.c:       return genl_register_family(&family);
-fs/ksmbd/transport_ipc.c:       ret = genl_register_family(&ksmbd_genl_family);
-fs/quota/netlink.c:     if (genl_register_family(&quota_genl_family) != 0)
-mcgrof@fulton ~/linux-next (git::master)$ git grep genl_register_family drivers/block
-drivers/block/nbd.c:    if (genl_register_family(&nbd_genl_family)) {
-
-Are there other reasons to *not* use generic netlink for new features?
-For folks with experience using generic netlink on the block layer and
-their own fs, any issues or pain points observed so far?
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=nvme-passthru-wip.2&id=d11e20acbd93fbbcdaf87e73615cdac53b814eca
+Consider me intersted in this topic.
 
   Luis
