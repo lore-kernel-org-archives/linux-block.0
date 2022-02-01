@@ -2,94 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD29AC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 17:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EC6C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 18:32:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241441AbiBARUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Feb 2022 12:20:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36726 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229836AbiBARUg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Feb 2022 12:20:36 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CB1C061714;
-        Tue,  1 Feb 2022 09:20:35 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id j16so15924431plx.4;
-        Tue, 01 Feb 2022 09:20:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=P/OM7TjxmbJXWO65CCc5u6gW1j1hf5TT48SuvRQUGM4=;
-        b=Th2pE7IdvVAvL27K0Qf/WfMwKXepCYHz0caGuE/hHj2a/Cnls+2LvQk4pd0hPSsVmc
-         /P6uhuhZiLl+17CpwiopYhBR/qCtJBVssgTbQdYnIISNQERS2GZ14qq/Hg7eUUCaN674
-         VCwtBPI4DwClaYXcyxJN+XKveP7T7CfMg5ljyW3+GK7dyKLOmA8hFBXrPEcKThr76/Z1
-         McM98ys2DJwA4II8akyGsTpeN9bHmMtE68PaVABB+oTwu+4yN2ONkyGt3QHviGejnNXf
-         7GgXGq04oayAGMEjV9a1B4yP0UFh2KbtUdz2IDGrTo7ZtGrKniUuXyFMvj/ITBpXNTId
-         pHiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=P/OM7TjxmbJXWO65CCc5u6gW1j1hf5TT48SuvRQUGM4=;
-        b=nuphlPTDXdkwSDnUWH6Ss4nCdRdRM01kQ/PnJVhFMY2drww3RLAKnddClVatJzm4ju
-         G+AB6hS2MZulCp70yX3pqVTkVScVvjBg8fDV0DJ26PJYkZD4eu0EAmMjbaWxiP1RB49A
-         +JMPrhUwcXVUFYgEyE+Ip3tLosSnBbwqddRu03TW0yLJkx+10lHPm3afWK3cDdSr76lk
-         YIQgQlIBbENFCkt5wP6KKbbGFaYlm/UPtclylwqpuhJvQ3bnMIvZJTajVd6VErs2qPOj
-         FlvfytpnS7AW+hgBrSGK8qymxDykqjyutbBblDGgSt/e/yyWm8RbygMx4WZjFRvu+Oax
-         Cmbg==
-X-Gm-Message-State: AOAM530FgnFIe+8gwqdIiSh7X5EdtGuXGy9n309ybF87mfrXei6StaOc
-        s1oZSYfjysQvzR0DjwUgsjQ=
-X-Google-Smtp-Source: ABdhPJyk13e7IHTfwNVZ5H4BVDaKYyNxLipIUGhMx2bZAPAdIiubCpR1ZgCsi1FvSg/sKK/5ZB7m1A==
-X-Received: by 2002:a17:90b:3144:: with SMTP id ip4mr3488407pjb.23.1643736035151;
-        Tue, 01 Feb 2022 09:20:35 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id a1sm31598385pgg.18.2022.02.01.09.20.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 09:20:34 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 1 Feb 2022 07:20:32 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next] blk-throttle: enable io throttle for root in
- cgroup v2
-Message-ID: <Yflr4FzUTWsiLTC/@slm.duckdns.org>
-References: <20220114093000.3323470-1-yukuai3@huawei.com>
- <YfGE9L4i7DtNTo08@slm.duckdns.org>
- <235b0757-d322-2b6e-3ab6-ecc8c82f8f1e@huawei.com>
+        id S237968AbiBAScQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Feb 2022 13:32:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23902 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231693AbiBAScP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Feb 2022 13:32:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643740335;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TZGPu0c4d8zM+GPEdhVnS2gfnUOmYVJ4nIlDhy1/n6A=;
+        b=i9qm8iN/taRdnfPDsgjB54DeUy5lJnjIAlg5rCJ1WwXEJeCkMeprLHc4Mfh469SoMLj3vs
+        3yFBVbvFQyTIs55g0EVJkgnVxNIoTFJxtEpGlTP13lu11HMnelwtXFLwd0M+VDzv3VUntM
+        cbmDpkS+zPL82PMT0GCJReDDrlg4a24=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-451-_BYmkupWO1qxJJWnnqHHaw-1; Tue, 01 Feb 2022 13:32:12 -0500
+X-MC-Unique: _BYmkupWO1qxJJWnnqHHaw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A8E82F7DF;
+        Tue,  1 Feb 2022 18:32:07 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A93EA798D8;
+        Tue,  1 Feb 2022 18:31:52 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 211IVqOM019366;
+        Tue, 1 Feb 2022 13:31:52 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 211IVpQx019362;
+        Tue, 1 Feb 2022 13:31:51 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Tue, 1 Feb 2022 13:31:51 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     =?ISO-8859-15?Q?Javier_Gonz=E1lez?= <javier@javigon.com>
+cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "kbus @imap.gmail.com>> Keith Busch" <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [RFC PATCH 0/3] NVMe copy offload patches
+In-Reply-To: <20220201102122.4okwj2gipjbvuyux@mpHalley-2>
+Message-ID: <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com> <20220201102122.4okwj2gipjbvuyux@mpHalley-2>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <235b0757-d322-2b6e-3ab6-ecc8c82f8f1e@huawei.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi
 
-On Thu, Jan 27, 2022 at 10:36:38AM +0800, yukuai (C) wrote:
-> In our case, the disk is provided by server, and such disk can be shared
-> by multipul clients. Thus for the client side, the server is a higher
-> level parent.
-> 
-> Theoretically, limit the io from server for each client is feasible,
-> however, the main reason we don't want to do this is the following
-> shortcoming:
-> 
-> client can still send io to server unlimited, we can just limit the
-> amount of io that can complete from server, which might cause too much
-> pressure on the server side.
+Here I'm submitting the first version of NVMe copy offload patches as a
+request for comment. They use the token-based approach as we discussed on
+the phone call.
 
-I don't quite follow the "send io to server unlimited" part. Doesn't that
-get limited by available number of requests? ie. if the server throttles,
-the in-flight requests will take longer to complete which exhausts the
-available requests and thus slows down the client. That's how it's supposed
-to work on the local machine too.
+The first patch adds generic copy offload support to the block layer - it
+adds two new bio types (REQ_OP_COPY_READ_TOKEN and
+REQ_OP_COPY_WRITE_TOKEN) and a new ioctl BLKCOPY and a kernel function
+blkdev_issue_copy.
 
-Thanks.
+The second patch adds copy offload support to the NVMe subsystem.
 
--- 
-tejun
+The third patch implements a "nvme-debug" driver - it is similar to
+"scsi-debug", it simulates a nvme host controller, it keeps data in memory
+and it supports copy offload according to NVMe Command Set Specification
+1.0a. (there are no hardware or software implementations supporting copy
+offload so far, so I implemented it in nvme-debug)
+
+TODO:
+* implement copy offload in device mapper linear target
+* implement copy offload in software NVMe target driver
+* make it possible to complete REQ_OP_COPY_WRITE_TOKEN bios asynchronously
+* should we use copy_file_range instead of a new ioctl?
+
+How to test this:
+* apply the three patches
+* select CONFIG_NVME_DEBUG
+* compile the kernel
+* modprobe nvme-debug; nvme connect -t debug -a 123 -n 456
+* issue the BLKCOPY ioctl on /dev/nvme0n1, for example, you can use this
+  program:
+  http://people.redhat.com/~mpatocka/patches/kernel/xcopy/example/blkcopy.c
+
+Mikulas
+
