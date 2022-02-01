@@ -2,66 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC32EC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 31 Jan 2022 23:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D61BAC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 01:11:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbiAaXno (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Jan 2022 18:43:44 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:39856 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbiAaXnn (ORCPT
+        id S231633AbiBABLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Jan 2022 20:11:03 -0500
+Received: from mail-pf1-f180.google.com ([209.85.210.180]:36742 "EHLO
+        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231628AbiBABLD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jan 2022 18:43:43 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BE210B82CC5
-        for <linux-block@vger.kernel.org>; Mon, 31 Jan 2022 23:43:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42617C340EC;
-        Mon, 31 Jan 2022 23:43:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1643672621;
-        bh=7F7rGKin8kFBYulVUr3maZBnBl+p1ysUFkm3zq518Yw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MpkeaLQThVMk9vfPEzYRm/b8NRdBh0k8KXiVDsoGl55i8Fno7JreuLashX0g3BiT8
-         16BteH0eL9Cf0ibNod1n9oxCLFPYLIX7y+6JqTIN9vOZylB+9cwUpYvaQB+0xVA0yC
-         ZCYLbqvvY8nBKRA6PhqnHJkgXU8NTH/2QtS/y8CY=
-Date:   Mon, 31 Jan 2022 15:43:40 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Mauricio Faria de Oliveira <mfo@canonical.com>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        "Huang, Ying" <ying.huang@intel.com>, Yu Zhao <yuzhao@google.com>,
-        Yang Shi <shy828301@gmail.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-Message-Id: <20220131154340.e65ebe932d8933bc68c4ddf4@linux-foundation.org>
-In-Reply-To: <20220131230255.789059-1-mfo@canonical.com>
-References: <20220131230255.789059-1-mfo@canonical.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Mon, 31 Jan 2022 20:11:03 -0500
+Received: by mail-pf1-f180.google.com with SMTP id 192so14417382pfz.3;
+        Mon, 31 Jan 2022 17:11:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=jOdu8BK0aHwVRtofXibmBugDwe7ABt+3hwddEIBt+RU=;
+        b=dBOs7jFJx3Rv3vqGZCOQOqDkF0RdddT0EbHgguPeUpdUbTeQ8n59IhxKJ2b9jzAP+g
+         1CarPeJGsZmqahOlyhWKc8gRCVKVmNxuA3LnVgZaM7W0E1O8gqGUVFVgs9uWI7oa56yq
+         JD79J5pjTyuK1FUuwlTfSYEnp0kIeOnoR6u1goxrqv4e+Nz4OnYxnCjDzThdmlcqqN/5
+         dtjrP9uGt1Jw2vJAIlquEilu6Cfx93y8dab7JR2lz5nTTTQpoNUH6PfeAJvOENRk5MX1
+         Zdeu5VEgGqmdvgxgOaznmHttodJN/xkEKFMuRWuOTHp5wmxGeasXpSzjw77/MhhKZR+E
+         +Wxw==
+X-Gm-Message-State: AOAM533XS70SMJ6B2blm31tTje+1V66+Ow4tpewRWPhlwKiWw05EDZEh
+        fvIIBrjTMpNNjgYvNOmi9BU=
+X-Google-Smtp-Source: ABdhPJzSvSQJaT10CRpVEE50uSgPZwPQaff/3Q20sHiKgbPqQE7HP8Wb3nAjllSdyEPxhP3qt26IHw==
+X-Received: by 2002:a05:6a00:b42:: with SMTP id p2mr22813636pfo.50.1643677863000;
+        Mon, 31 Jan 2022 17:11:03 -0800 (PST)
+Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
+        by smtp.gmail.com with ESMTPSA id lb7sm503889pjb.56.2022.01.31.17.11.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jan 2022 17:11:02 -0800 (PST)
+Date:   Mon, 31 Jan 2022 17:10:59 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     lsf-pc@lists.linux-foundation.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Josef Bacik <josef@toxicpanda.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Eryu Guan <guaneryu@gmail.com>, Omar Sandoval <osandov@fb.com>,
+        mcgrof@kernel.org
+Subject: [LSF/MM/BPF TOPIC] scaling error injection for block / fs
+Message-ID: <20220201011059.kqyrftg2hpgtjtpp@garbanzo>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 31 Jan 2022 20:02:55 -0300 Mauricio Faria de Oliveira <mfo@canonical.com> wrote:
+We *used* to not any error handling as part of the block layer's
+*add_disk() paths since the code's inception. Fortunately that's now
+history, but the only piece of code changes that were dropped from
+that effort was error injection [0], this was since Hannes noted that
+we may want to discuss if the approach is the best we can do.
 
-> Problem:
-> =======
-> 
-> Userspace might read the zero-page instead of actual data from a
-> direct IO read on a block device if the buffers have been called
-> madvise(MADV_FREE) on earlier (this is discussed below) due to a
-> race between page reclaim on MADV_FREE and blkdev direct IO read.
-> 
-> ...
->
-> Fixes: 802a3a92ad7a ("mm: reclaim MADV_FREE pages")
+I looked into this and indeed the BFP method to do error injection
+is a viable alternative [1]. However this was even further generalized
+from kprobes and all one now needs is to sprinkle ALLOW_ERROR_INJECTION()
+on calls we went to enable error injection for. This makes things much
+easier, instead of having to have a kernel bpf program to load
+load_bpf_file() and then to run that and specify the comands you want
+on the shell you can now just use something as simple as just shell:
 
-Five years ago.  As it doesn't seem urgent I targeted 5.18-rc1 for
-this, and added a cc:stable so it will trickle back into earlier trees.
+-------------------------------------------------------------------
+#!/bin/bash
 
-How does this plan sound?
+rm -f testfile.img
+dd if=/dev/zero of=testfile.img bs=1M seek=1000 count=1
+DEVICE=$(losetup --show -f testfile.img)
+mkfs.btrfs -f $DEVICE
+mkdir -p tmpmnt
+
+FAILTYPE=fail_function
+FAILFUNC=open_ctree
+echo $FAILFUNC > /sys/kernel/debug/$FAILTYPE/inject
+echo -12 > /sys/kernel/debug/$FAILTYPE/$FAILFUNC/retval
+echo N > /sys/kernel/debug/$FAILTYPE/task-filter
+echo 100 > /sys/kernel/debug/$FAILTYPE/probability
+echo 0 > /sys/kernel/debug/$FAILTYPE/interval
+echo -1 > /sys/kernel/debug/$FAILTYPE/times
+echo 0 > /sys/kernel/debug/$FAILTYPE/space
+echo 1 > /sys/kernel/debug/$FAILTYPE/verbose
+
+mount -t btrfs $DEVICE tmpmnt
+if [ $? -ne 0 ]
+then
+       echo "SUCCESS!"
+else
+       echo "FAILED!"
+       umount tmpmnt
+fi
+
+echo > /sys/kernel/debug/$FAILTYPE/inject
+
+rmdir tmpmnt
+losetup -d $DEVICE
+rm testfile.img
+-------------------------------------------------------------------
+
+This seems to be much more adaptable to what we do in blktests and
+fstests. So before I go forward with adding error injection for the
+block layer (only one user) or fs (only btrfs uses this so far), I think
+it would be prudent for us to socialize if this *is* the scalable
+strategy we'd like to see moving forward. If not then LSFMM seems like a
+good place to iron out any possible kinks or concerns folks might have.
+
+If we already have consensus and this is *the* way to go then I'll just
+go forward and start adding some knobs / tests for this.
+
+Perhaps the only issue I can think of is that you need a kernel
+which enables error injection, and so production kernels would not
+cut it.
+
+Thoughts?
+
+[0] https://lkml.kernel.org/r/20210512064629.13899-9-mcgrof@kernel.org
+[1] https://lwn.net/Articles/740146/
+[2] https://patchwork.ozlabs.org/project/netdev/patch/151563182380.628.2420967932180154822.stgit@devbox/
+
+  Luis
