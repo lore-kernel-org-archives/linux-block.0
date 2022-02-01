@@ -2,33 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E60F9C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91052C433EF
 	for <linux-block@archiver.kernel.org>; Tue,  1 Feb 2022 03:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233295AbiBAD5i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232719AbiBAD5i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 31 Jan 2022 22:57:38 -0500
-Received: from smtp.infotech.no ([82.134.31.41]:32862 "EHLO smtp.infotech.no"
+Received: from smtp.infotech.no ([82.134.31.41]:32864 "EHLO smtp.infotech.no"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233245AbiBAD5i (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Jan 2022 22:57:38 -0500
+        id S233295AbiBAD5h (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Jan 2022 22:57:37 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id BAF4C2041BD;
-        Tue,  1 Feb 2022 04:49:22 +0100 (CET)
+        by smtp.infotech.no (Postfix) with ESMTP id 8C0D6204169;
+        Tue,  1 Feb 2022 04:49:25 +0100 (CET)
 X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
 Received: from smtp.infotech.no ([127.0.0.1])
         by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ZC7obR1We4LR; Tue,  1 Feb 2022 04:49:19 +0100 (CET)
+        with ESMTP id asknqynLJmk4; Tue,  1 Feb 2022 04:49:22 +0100 (CET)
 Received: from xtwo70.bingwo.ca (host-45-78-195-155.dyn.295.ca [45.78.195.155])
-        by smtp.infotech.no (Postfix) with ESMTPA id 6A29D2041AC;
-        Tue,  1 Feb 2022 04:49:18 +0100 (CET)
+        by smtp.infotech.no (Postfix) with ESMTPA id 0D9822041AF;
+        Tue,  1 Feb 2022 04:49:19 +0100 (CET)
 From:   Douglas Gilbert <dgilbert@interlog.com>
 To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com, hare@suse.de,
-        bvanassche@acm.org, Jason Gunthorpe <jgg@ziepe.ca>,
-        Bodo Stroesser <bostroesser@gmail.com>
-Subject: [PATCH v7 1/4] sgl_alloc_order: remove 4 GiB limit
-Date:   Mon, 31 Jan 2022 22:49:12 -0500
-Message-Id: <20220201034915.183117-2-dgilbert@interlog.com>
+        bvanassche@acm.org, Bodo Stroesser <bostroesser@gmail.com>
+Subject: [PATCH v7 2/4] scatterlist: add sgl_copy_sgl() function
+Date:   Mon, 31 Jan 2022 22:49:13 -0500
+Message-Id: <20220201034915.183117-3-dgilbert@interlog.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220201034915.183117-1-dgilbert@interlog.com>
 References: <20220201034915.183117-1-dgilbert@interlog.com>
@@ -38,96 +37,120 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch fixes a check done by sgl_alloc_order() before it starts
-any allocations. The comment in the original said: "Check for integer
-overflow" but the right hand side of the expression in the condition
-is resolved as u32 so it can not exceed UINT32_MAX (4 GiB) which
-means 'length' can not exceed that value.
+Both the SCSI and NVMe subsystems receive user data from the block
+layer in scatterlist_s (aka scatter gather lists (sgl) which are
+often arrays). If drivers in those subsystems represent storage
+(e.g. a ramdisk) or cache "hot" user data then they may also
+choose to use scatterlist_s. Currently there are no sgl to sgl
+operations in the kernel. Start with a sgl to sgl copy. Stops
+when the first of the number of requested bytes to copy, or the
+source sgl, or the destination sgl is exhausted. So the
+destination sgl will _not_ grow.
 
-This function may be used to replace vmalloc(unsigned long) for a
-large allocation (e.g. a ramdisk). vmalloc has no limit at 4 GiB so
-it seems unreasonable that sgl_alloc_order() whose length type is
-unsigned long long should be limited to 4 GB.
-
-In early 2021 there was discussion between Jason Gunthorpe
-<jgg@ziepe.ca> and Bodo Stroesser <bostroesser@gmail.com> about the
-way to check for overflow caused by order (an exponent) being
-too large. Take the solution proposed by Bodo in post dated
-20210118 to the linux-scsi and linux-block lists.
-
-An earlier patch fixed a memory leak in sg_alloc_order() due to the
-misuse of sgl_free(). Take the opportunity to put a one line comment
-above sgl_free()'s declaration warning that it is not suitable when
-order > 0 .
-
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
 Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
 Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
 ---
- include/linux/scatterlist.h |  1 +
- lib/scatterlist.c           | 24 +++++++++++++-----------
- 2 files changed, 14 insertions(+), 11 deletions(-)
+ include/linux/scatterlist.h |  4 ++
+ lib/scatterlist.c           | 74 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
 
 diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 7ff9d6386c12..03130be581bb 100644
+index 03130be581bb..1291ff63fe83 100644
 --- a/include/linux/scatterlist.h
 +++ b/include/linux/scatterlist.h
-@@ -357,6 +357,7 @@ struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
- 			      unsigned int *nent_p);
- void sgl_free_n_order(struct scatterlist *sgl, int nents, int order);
- void sgl_free_order(struct scatterlist *sgl, int order);
-+/* Only use sgl_free() when order is 0 */
- void sgl_free(struct scatterlist *sgl);
- #endif /* CONFIG_SGL_ALLOC */
+@@ -376,6 +376,10 @@ size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
+ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
+ 		       size_t buflen, off_t skip);
  
++size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
++		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
++		    size_t n_bytes);
++
+ /*
+  * Maximum number of entries that will be allocated in one piece, if
+  * a list larger than this is required then chaining will be utilized.
 diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index d5e82e4a57ad..ed6d0465c78e 100644
+index ed6d0465c78e..d4d56eece250 100644
 --- a/lib/scatterlist.c
 +++ b/lib/scatterlist.c
-@@ -585,13 +585,16 @@ EXPORT_SYMBOL(sg_alloc_table_from_pages_segment);
- #ifdef CONFIG_SGL_ALLOC
- 
- /**
-- * sgl_alloc_order - allocate a scatterlist and its pages
-+ * sgl_alloc_order - allocate a scatterlist with equally sized elements each
-+ *		     of which has 2^@order continuous pages
-  * @length: Length in bytes of the scatterlist. Must be at least one
-- * @order: Second argument for alloc_pages()
-+ * @order:  Second argument for alloc_pages(). Each sgl element size will
-+ *	    be (PAGE_SIZE*2^@order) bytes. @order must not exceed 16.
-  * @chainable: Whether or not to allocate an extra element in the scatterlist
-- *	for scatterlist chaining purposes
-+ *	       for scatterlist chaining purposes
-  * @gfp: Memory allocation flags
-- * @nent_p: [out] Number of entries in the scatterlist that have pages
-+ * @nent_p: [out] Number of entries in the scatterlist that have pages.
-+ *		  Ignored if @nent_p is NULL.
-  *
-  * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
-  */
-@@ -604,16 +607,15 @@ struct scatterlist *sgl_alloc_order(unsigned long long length,
- 	unsigned int nent, nalloc;
- 	u32 elem_len;
- 
--	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
--	/* Check for integer overflow */
--	if (length > (nent << (PAGE_SHIFT + order)))
-+	if (length >> (PAGE_SHIFT + order) >= UINT_MAX)
- 		return NULL;
--	nalloc = nent;
-+	nent = DIV_ROUND_UP(length, PAGE_SIZE << order);
+@@ -1087,3 +1087,77 @@ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
+ 	return offset;
+ }
+ EXPORT_SYMBOL(sg_zero_buffer);
 +
- 	if (chainable) {
--		/* Check for integer overflow */
--		if (nalloc + 1 < nalloc)
-+		if (check_add_overflow(nent, 1U, &nalloc))
- 			return NULL;
--		nalloc++;
-+	} else {
-+		nalloc = nent;
- 	}
- 	sgl = kmalloc_array(nalloc, sizeof(struct scatterlist),
- 			    gfp & ~GFP_DMA);
++/**
++ * sgl_copy_sgl - Copy over a destination sgl from a source sgl
++ * @d_sgl:		 Destination sgl
++ * @d_nents:		 Number of SG entries in destination sgl
++ * @d_skip:		 Number of bytes to skip in destination before starting
++ * @s_sgl:		 Source sgl
++ * @s_nents:		 Number of SG entries in source sgl
++ * @s_skip:		 Number of bytes to skip in source before starting
++ * @n_bytes:		 The (maximum) number of bytes to copy
++ *
++ * Returns:
++ *   The number of copied bytes.
++ *
++ * Notes:
++ *   Destination arguments appear before the source arguments, as with memcpy().
++ *
++ *   Stops copying if either d_sgl, s_sgl or n_bytes is exhausted.
++ *
++ *   Since memcpy() is used, overlapping copies (where d_sgl and s_sgl belong
++ *   to the same sgl and the copy regions overlap) are not supported.
++ *
++ *   Large copies are broken into copy segments whose sizes may vary. Those
++ *   copy segment sizes are chosen by the min3() statement in the code below.
++ *   Since SG_MITER_ATOMIC is used for both sides, each copy segment is started
++ *   with kmap_atomic() [in sg_miter_next()] and completed with kunmap_atomic()
++ *   [in sg_miter_stop()]. This means pre-emption is inhibited for relatively
++ *   short periods even in very large copies.
++ *
++ *   If d_skip is large, potentially spanning multiple d_nents then some
++ *   integer arithmetic to adjust d_sgl may improve performance. For example
++ *   if d_sgl is built using sgl_alloc_order(chainable=false) then the sgl
++ *   will be an array with equally sized segments facilitating that
++ *   arithmetic. The suggestion applies to s_skip, s_sgl and s_nents as well.
++ *
++ **/
++size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
++		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
++		    size_t n_bytes)
++{
++	size_t len;
++	size_t offset = 0;
++	struct sg_mapping_iter d_iter, s_iter;
++
++	if (n_bytes == 0)
++		return 0;
++	sg_miter_start(&s_iter, s_sgl, s_nents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
++	sg_miter_start(&d_iter, d_sgl, d_nents, SG_MITER_ATOMIC | SG_MITER_TO_SG);
++	if (!sg_miter_skip(&s_iter, s_skip))
++		goto fini;
++	if (!sg_miter_skip(&d_iter, d_skip))
++		goto fini;
++
++	while (offset < n_bytes) {
++		if (!sg_miter_next(&s_iter))
++			break;
++		if (!sg_miter_next(&d_iter))
++			break;
++		len = min3(d_iter.length, s_iter.length, n_bytes - offset);
++
++		memcpy(d_iter.addr, s_iter.addr, len);
++		offset += len;
++		/* LIFO order (stop d_iter before s_iter) needed with SG_MITER_ATOMIC */
++		d_iter.consumed = len;
++		sg_miter_stop(&d_iter);
++		s_iter.consumed = len;
++		sg_miter_stop(&s_iter);
++	}
++fini:
++	sg_miter_stop(&d_iter);
++	sg_miter_stop(&s_iter);
++	return offset;
++}
++EXPORT_SYMBOL(sgl_copy_sgl);
 -- 
 2.25.1
 
