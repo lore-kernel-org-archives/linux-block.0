@@ -2,98 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04355C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 18:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F35C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 18:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239994AbiBBSNx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 13:13:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37764 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346553AbiBBSNu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 13:13:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84043C061714
-        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 10:13:50 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S238370AbiBBSaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 13:30:22 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:36340 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233050AbiBBSaW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 13:30:22 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 22C4C61899
-        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 18:13:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B7BFC340ED
-        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 18:13:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643825629;
-        bh=I9cUeG+o8ociheUF47gyxFEtCVrjUoyuy0FBaKgZn78=;
-        h=From:Date:Subject:To:From;
-        b=sVms2loOrDRXQVzMvGmXTqKRz26u2C8O8H5G3YOnmaXYUNEl4CFwoV6DizJrHBGU1
-         5nNwygSomAYFfozCdFtcMNsy9wPjMbJMmzH662iBYojpXCmIXC5tbV3tA6b3E2ALEh
-         MrZX+JPPQeXFAq7Jb/C65pOTAKsr0RcNPbnJ4jtzUgCRap/Q3AL3TruaEvHdFTSh5w
-         Ux96uWOFRGV/ZPcu63apKzDPZIuMFkSEEsBjRqXGvZR6hQZf3O3sGOpOUsXNcDGtY/
-         OpPjx51J5kixQjYB/XWydfSHcp11iezvG+p4wk0howhGPugc+EOojDePBH5zAYpBgl
-         niseBD4yo32KQ==
-Received: by mail-yb1-f170.google.com with SMTP id i62so1160270ybg.5
-        for <linux-block@vger.kernel.org>; Wed, 02 Feb 2022 10:13:49 -0800 (PST)
-X-Gm-Message-State: AOAM5315nGMeQgLxjS7p9h9lbvmqw4NtFqDHjxGSx2lOdKWqYnhcgefQ
-        X5tneWAVBYJrgXxqd0fQv+l73WTaQAhO2LfEb4g=
-X-Google-Smtp-Source: ABdhPJzQyOuK7Gtw+hbadorktGBU4AKxChQzBWOHJXLcg9FLxp6Mn0T3uTQauP2d+WLGTwEQzsQszDZ4TB+Pv4XI4OU=
-X-Received: by 2002:a25:8543:: with SMTP id f3mr25451798ybn.47.1643825628566;
- Wed, 02 Feb 2022 10:13:48 -0800 (PST)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id DAA3B1F37C;
+        Wed,  2 Feb 2022 18:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643826620; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ofv7V/MQVvyAB2zyifMmag7SP5keFFOIeiBWbFRtzaU=;
+        b=JNMlzSCbec767vPRfVpOmFvG5C2r21R69LEV1Qn56i6rTVQ3Lwth4L9j7j0MV/VkVj8srM
+        5MskiOlqBcuDF6khSSZt32NSIcnX+jKC4Mkav605vBUWT7M4YwbHu9GRqTJzO3nc5H9Gkt
+        uZSpqMnA6eOZMJ7PzgqTzom0CvVqYXY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643826620;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ofv7V/MQVvyAB2zyifMmag7SP5keFFOIeiBWbFRtzaU=;
+        b=7+W85VwULlaftlUvRleNHXP3k2CPXLAWirjTWTR285341BYHOdCH9dRQqyfdO3p5IuWxO/
+        o45sC6oCwTlXfOBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5419C13E25;
+        Wed,  2 Feb 2022 18:30:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 2dCVBrzN+mG6awAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 02 Feb 2022 18:30:20 +0000
+Date:   Wed, 2 Feb 2022 15:30:17 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Chuck Lever III <chuck.lever@oracle.com>
+Cc:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [LSF/MM/BPF TOPIC][LSF/MM/BPF ATTEND] TLS handshake for
+ in-kernel consumers
+Message-ID: <20220202183017.ryv43nebh4ane42u@cyberdelia>
+References: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de>
+ <C4E94EAA-7452-4D69-9C06-E5AD5B7A1F14@oracle.com>
 MIME-Version: 1.0
-From:   Song Liu <song@kernel.org>
-Date:   Wed, 2 Feb 2022 10:13:37 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW6UxfwrD0qhqfCg7UFcxUnRqNpL9kscy=kMV+3P1teQ9Q@mail.gmail.com>
-Message-ID: <CAPhsuW6UxfwrD0qhqfCg7UFcxUnRqNpL9kscy=kMV+3P1teQ9Q@mail.gmail.com>
-Subject: What shall read() return on deleted block device?
-To:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Kernel Team <kernel-team@fb.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <C4E94EAA-7452-4D69-9C06-E5AD5B7A1F14@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph and folks,
+On 02/02, Chuck Lever III wrote:
+>[ ... adding NFS and CIFS ... ]
+>
+>> Required attendees:
+>>
+>> Chuck Lever
+>> James Bottomley
+>> Sagi Grimberg
+>> Keith Busch
+>> Christoph Hellwig
+>> David Howells
+>
+>Anyone from the CIFS team? Enzo? How about Dave Miller?
 
-While debugging something else, we noticed a behavior change for the following
-program:
+I'll be attending representing the CIFS side. I hope to have my
+prototype more solid and public by then.
 
-    main()
-    {
-        fd = open("/dev/sdXX", O_RDWR | O_CLOEXEC);
 
-        /* delete sdXX by echo 1 > /sys/block/sdXX/device/delete */
-        sleep(10); /* to make sure delete finishes */
+Cheers,
 
-        ret = read(fd, buf, 4096);
-        fprintf(stderr, "ret = %d errno = %d\n", ret, errno)
-    }
-
-On older kernel, we got
-   ret = -1 errno = EIO;
-while on newer kernel, we get
-   ret = 0;
-
-git-bisect points to [1]. However, I would not call it a bug caused by [1]. What
-actually happens is:
-
-In blkdev_read_iter(),we check
-     size = bdev_nr_bytes(bdev);
-     if (pos >= size)
-          return 0;
-     /* do the read, which may return -EIO */
-
-Before [1], size is not set to 0 when the device is deleted.
-Therefore, blkdev_read_iter
-will not hit pos >= size, and return -EIO. After [1], size is set to
-zero on device delete,
-so blkdev_read_iter returns 0 after the delete.
-
-I think this is not a bug, but a clear behavior change. However, no
-one seems to care
-after a year. So the question is, which behavior shall we keep for the
-future. And, if we
-want to go back to ret = -1, what's the proper fix?
-
-Thanks,
-Song
-
-[1] commit a782483cc1f8 ("block: remove the nr_sects field in struct hd_struct")
+Enzo
