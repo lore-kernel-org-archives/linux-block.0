@@ -2,87 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A23C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 14:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC808C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 14:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235892AbiBBOD0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 09:03:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35848 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235377AbiBBODZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 09:03:25 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BADC061714
-        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 06:03:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=WQ2L5/ObHkXFJ17v3gfX3wo3y3s1Mn9urNO+NaAYYgU=; b=BOj7m3fkiBcwXXbRlvjHKjiLV7
-        Fm1wMRar2jk1XY9BCQR2VxBY7luUA2DeguyTP/WLglcqIjtWYTVyXaIzMUqSpT9xZkp/dAGqf4ANb
-        gPhZBRe9nmrrSg1xdRqz4VbGJMUS0NcqXh/FX880zL5HU+l7Kn/y61t7E4jzJmwIxdrTyqyEC4Vje
-        HqgbABtLs5jOuPI4QJva11o91d7kV1YPIeSlTE3VD5+QWBWviRp5Ee0EdNq+HHeaG7xbFuJSTV8vI
-        wobK+cLGrUEgYwtlbwruVoOz4A0ienf7XwGlCZly/EJZYGBwxjQhd/1Wm40vlqc4VaHd2yCHx1yRL
-        JrUTAcqw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nFGE8-00FW8R-QQ; Wed, 02 Feb 2022 14:03:16 +0000
-Date:   Wed, 2 Feb 2022 06:03:16 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mauricio Faria de Oliveira <mfo@canonical.com>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        "Huang, Ying" <ying.huang@intel.com>, Yu Zhao <yuzhao@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Shi <shy828301@gmail.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-Message-ID: <YfqPJLTIx18DCGii@infradead.org>
-References: <20220131230255.789059-1-mfo@canonical.com>
+        id S238563AbiBBOMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 09:12:05 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:33554 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237388AbiBBOMF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 09:12:05 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 392351F397;
+        Wed,  2 Feb 2022 14:12:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643811124; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+RcZpPqtnfLAwgIFAjYhXtgjx/0Wde9g5JtAXXXQ3Hk=;
+        b=IoEmeC7b6SCa2pEE4x4Dcr5x3ja8fY7Iqi+JIo1sSpTPS9vz1jOYEZfrgpFXp6/Q2PP9bG
+        EPo2LhvuC2c+jfaRIFc10W1Xuk2tVMkfXQEqszO9RIQ8vdszRnsmWfVKgfthMuG51OAxdv
+        kXNtBvBnJ8Ky7zs95rRLzHyvl7UZ+w4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643811124;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+RcZpPqtnfLAwgIFAjYhXtgjx/0Wde9g5JtAXXXQ3Hk=;
+        b=Ji9+WRMhtXbsUd8Nw/4DI0m71QiyLu0cugknNcqTwZpD2vPhslTP08V1vm03RHgLG0L6Ni
+        TX9Morl3HlHdH3Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2C5F613BBC;
+        Wed,  2 Feb 2022 14:12:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id +glHCjSR+mGGYgAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 02 Feb 2022 14:12:04 +0000
+Message-ID: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de>
+Date:   Wed, 2 Feb 2022 15:12:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220131230255.789059-1-mfo@canonical.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Content-Language: en-US
+To:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+From:   Hannes Reinecke <hare@suse.de>
+Cc:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Chuck Lever III <chuck.lever@oracle.com>
+Subject: [LSF/MM/BPF TOPIC][LSF/MM/BPF ATTEND] TLS handshake for in-kernel
+ consumers
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 31, 2022 at 08:02:55PM -0300, Mauricio Faria de Oliveira wrote:
-> Well, blkdev_direct_IO() gets references for all pages, and on READ
-> operations it only sets them dirty _later_.
-> 
-> So, if MADV_FREE'd pages (i.e., not dirty) are used as buffers for
-> direct IO read from block devices, and page reclaim happens during
-> __blkdev_direct_IO[_simple]() exactly AFTER bio_iov_iter_get_pages()
-> returns, but BEFORE the pages are set dirty, the situation happens.
-> 
-> The direct IO read eventually completes. Now, when userspace reads
-> the buffers, the PTE is no longer there and the page fault handler
-> do_anonymous_page() services that with the zero-page, NOT the data!
+Hi all,
 
-So why not just set the pages dirty early like the other direct I/O
-implementations?  Or if this is fine with the patch should we remove
-the early dirtying elsewhere?
+nvme-over-tcp has the option to utilize TLS for encrypted traffic, but 
+due to the internal design of the nvme-over-fabrics stack we cannot 
+initiate the TLS connection from userspace (as the current in-kernel TLS 
+implementation is designed).
 
-> Reproducer:
-> ==========
-> 
-> @ test.c (simplified, but works)
+This leaves us with two options:
+1) Put TLS handshake into the kernel (which will be quite some
+   discussion as it's arguably a userspace configuration)
+2) Pass an in-kernel socket to userspace and have a userspace
+   application to run the TLS handshake.
 
-Can you add this to blktests or some other regularly run regression
-test suite?
+None of these options are quiet clear cut, as we will be have to put
+quite some complexity into the kernel to do full TLS handshake (if we
+were to go with option 1) or will have to design a mechanism to pass
+an in-kernel socket to userspace as we don't do that currently (if we 
+were going with option 2).
 
-> +				smp_rmb();
-> +
-> +				/*
-> +				 * The only page refs must be from the isolation
-> +				 * plus one or more rmap's (dropped by discard:).
+We have been discussing some ideas on how to implement option 2 
+(together with Chuck Lever and the NFS crowd), but so far haven't been 
+able to come up with a decent design.
 
-Overly long line.
+So I would like to discuss with interested parties on how TLS handshake 
+could be facilitated, and what would be the best design options here.
 
-> +				 */
-> +				if ((ref_count == 1 + map_count) &&
+The proposed configd would be an option, but then we don't have that, 
+either :-)
 
-No need for the inner braces.
+Required attendees:
 
+Chuck Lever
+James Bottomley
+Sagi Grimberg
+Keith Busch
+Christoph Hellwig
+David Howells
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
