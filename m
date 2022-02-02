@@ -2,101 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D859C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 16:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C06DC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 16:40:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243322AbiBBQia (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 11:38:30 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:53302 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231801AbiBBQi3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 11:38:29 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5BD071F387;
-        Wed,  2 Feb 2022 16:38:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643819908; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        id S1345912AbiBBQks (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 11:40:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38094 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345992AbiBBQkm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 2 Feb 2022 11:40:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643820041;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=F1UflJiT/C+aLCGaPFrCtnXw6syIU85V9VqllgoyNsQ=;
-        b=puI/AdpQ/jspQcK3mXAqRUwhDRtHt1MSPBzzy8N1Mifk+8scPd3zOn7xXDLF0P4jalWpeb
-        3zwY+UlTQjuUbb+X5lykpgnY7ikIqin5+iKBeSeAhsHoiLtY6dwohtEa+d1kt2pdGnoc9k
-        d+VpKvXPETRjviF2CwXpqYJ7fdzdStE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643819908;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=F1UflJiT/C+aLCGaPFrCtnXw6syIU85V9VqllgoyNsQ=;
-        b=4grxMtf5PsW9idScRI3PE3js7l6vQVXkZjy99aCei5I5HHh9Wy0iCDyXXx0hHR6VbI79sQ
-        fHfUdD3zucB26NAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=RkPWSrbUhue/IGuXAsyfEqPciSlbxQ314sYBlz/Oexs=;
+        b=ShcBOlXtDC9c5WWO3PTJdgJ21DnoU/xtL0oFglF6gy3hzWyHqb6pVlgB+JYSBodvjDtdj1
+        2hTn86iz2onBGChqbtqCGfuYvKUu/nQQRlNhuaA79gzSggD2uwltDgOJ24ycy/t17+/6qH
+        LAYr4apV5apmmmDS4JuFMSq7sSIKUcQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-224-35Gc2b91Oea_SG3sjsQYzA-1; Wed, 02 Feb 2022 11:40:38 -0500
+X-MC-Unique: 35Gc2b91Oea_SG3sjsQYzA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2A4913E99;
-        Wed,  2 Feb 2022 16:38:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id +AUgL4Oz+mHsNwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 02 Feb 2022 16:38:27 +0000
-Message-ID: <c2294974-38a5-1900-2af7-10d317493b63@suse.de>
-Date:   Wed, 2 Feb 2022 17:38:27 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCHv2 7/7] nvme: add support for enhanced metadata
-Content-Language: en-US
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C1F21853022;
+        Wed,  2 Feb 2022 16:40:33 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 914772B4C9;
+        Wed,  2 Feb 2022 16:40:32 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 212GeW3G000735;
+        Wed, 2 Feb 2022 11:40:32 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 212GeUkY000731;
+        Wed, 2 Feb 2022 11:40:30 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 2 Feb 2022 11:40:30 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
 To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com, colyli@suse.de
-References: <20220201190128.3075065-1-kbusch@kernel.org>
- <20220201190128.3075065-8-kbusch@kernel.org>
- <aaf56d4b-8554-e677-119e-9d23c921fe0a@suse.de>
- <20220202154131.GA3077632@dhcp-10-100-145-180.wdc.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220202154131.GA3077632@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+cc:     =?ISO-8859-15?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [RFC PATCH 1/3] block: add copy offload support
+In-Reply-To: <20220202162147.GC3077632@dhcp-10-100-145-180.wdc.com>
+Message-ID: <alpine.LRH.2.02.2202021134400.31294@file01.intranet.prod.int.rdu2.redhat.com>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com> <20220201102122.4okwj2gipjbvuyux@mpHalley-2> <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2202011331570.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <20220202162147.GC3077632@dhcp-10-100-145-180.wdc.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/2/22 16:41, Keith Busch wrote:
-> On Wed, Feb 02, 2022 at 02:28:53PM +0100, Hannes Reinecke wrote:
->> On 2/1/22 20:01, Keith Busch wrote:
-[ .. ]
->>> @@ -3104,7 +3218,7 @@ int nvme_init_ctrl_finish(struct nvme_ctrl *ctrl)
->>>    	if (ret < 0)
->>>    		return ret;
->>> -	ret = nvme_configure_acre(ctrl);
->>> +	ret = nvme_configure_host_options(ctrl);
->>>    	if (ret < 0)
->>>    		return ret;
->>
->> This could be made into a separate patch, is it's not directly related to PI
->> support. >
-> Well, the driver can't read the new PI formats without enabling host
-> supported features for it. Enabling the feature tells the controller
-> we're going to check for it, so I don't think we could reasonably split
-> this part into a prep patch from the part that sets up the PI formats.
 
-Actually I was thinking about a patch renaming 'nvme_configure_acre' 
-into 'nvme_configure_host_options', as _this_ really is independent.
-When mixed together with the PI stuff it's hard to track down from the 
-commit message when it got changed.
 
-Cheers,
+On Wed, 2 Feb 2022, Keith Busch wrote:
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+> On Tue, Feb 01, 2022 at 01:32:29PM -0500, Mikulas Patocka wrote:
+> > +int blkdev_issue_copy(struct block_device *bdev1, sector_t sector1,
+> > +		      struct block_device *bdev2, sector_t sector2,
+> > +		      sector_t nr_sects, sector_t *copied, gfp_t gfp_mask)
+> > +{
+> > +	struct page *token;
+> > +	sector_t m;
+> > +	int r = 0;
+> > +	struct completion comp;
+> > +
+> > +	*copied = 0;
+> > +
+> > +	m = min(bdev_max_copy_sectors(bdev1), bdev_max_copy_sectors(bdev2));
+> > +	if (!m)
+> > +		return -EOPNOTSUPP;
+> > +	m = min(m, (sector_t)round_down(UINT_MAX, PAGE_SIZE) >> 9);
+> > +
+> > +	if (unlikely(bdev_read_only(bdev2)))
+> > +		return -EPERM;
+> > +
+> > +	token = alloc_page(gfp_mask);
+> > +	if (unlikely(!token))
+> > +		return -ENOMEM;
+> > +
+> > +	while (nr_sects) {
+> > +		struct bio *read_bio, *write_bio;
+> > +		sector_t this_step = min(nr_sects, m);
+> > +
+> > +		read_bio = bio_alloc(gfp_mask, 1);
+> > +		if (unlikely(!read_bio)) {
+> > +			r = -ENOMEM;
+> > +			break;
+> > +		}
+> > +		bio_set_op_attrs(read_bio, REQ_OP_COPY_READ_TOKEN, REQ_NOMERGE);
+> > +		bio_set_dev(read_bio, bdev1);
+> > +		__bio_add_page(read_bio, token, PAGE_SIZE, 0);
+> 
+> You have this "token" payload as driver specific data, but there's no
+> check that bdev1 and bdev2 subscribe to the same driver specific format.
+> 
+> I thought we discussed defining something like a "copy domain" that
+> establishes which block devices can offload copy operations to/from each
+> other, and that should be checked before proceeding with the copy
+> operation.
+
+There is nvme_setup_read_token that fills in the token:
+	memcpy(token->subsys, "nvme", 4);
+	token->ns = ns;
+	token->src_sector = bio->bi_iter.bi_sector;
+	token->sectors = bio->bi_iter.bi_size >> 9;
+
+There is nvme_setup_write_token that checks these values:
+	if (unlikely(memcmp(token->subsys, "nvme", 4)))
+		return BLK_STS_NOTSUPP;
+	if (unlikely(token->ns != ns))
+		return BLK_STS_NOTSUPP;
+
+So, if we attempt to copy data between the nvme subsystem and the scsi 
+subsystem, the "subsys" check will fail. If we attempt to copy data 
+between different nvme namespaces, the "ns" check will fail.
+
+If the nvme standard gets extended with cross-namespace copies, we can 
+check in nvme_setup_write_token if we can copy between the source and 
+destination namespace.
+
+Mikulas
+
