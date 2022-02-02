@@ -2,64 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FA4C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 13:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCFBC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 13:15:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231834AbiBBNOY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 08:14:24 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:57702 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbiBBNOX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 08:14:23 -0500
+        id S240338AbiBBNPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 08:15:09 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:52134 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235676AbiBBNPI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 08:15:08 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id BE3032113D;
-        Wed,  2 Feb 2022 13:14:22 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 69C191F3A8;
+        Wed,  2 Feb 2022 13:15:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643807662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1643807707; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Bcp04e1xn7q0Nbal9eCkQGo3QVCsVp3wNyotn26SUZc=;
-        b=LZs0ZRhvdcYR4fHgsCej3MaQSN3G4oIpS/kCbCgOmUTVhOlkBQQhuDRxMjPwUMsMrI3SaT
-        E6g7iLhxHav8I7ggM5n+2vqmangAHogtTcA2Orv4zkgue4a4HwosZZrYNwbvylYiromKcf
-        p0+RbuqnABB705j7wYl/55XGBj4RebE=
+        bh=pepWXB5DvgjMJGEOiNQEx9XrtwsT7XquutmoNVWSlU4=;
+        b=rLvqpqtnCiYNIil5Go7svLeylAIK/EEsiClAPmvdv4ttCXiLfYnicBjtG/cnDOlDfOoRyq
+        qhB995y++QwMg5Li89skyZD/Yc2RDkshYC/Mkjct8LGK/0zXRTjCGw53IpouRZamrWXK8J
+        uhezZb3ePVwOWaoJG4Eg6l7DCwWeogo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643807662;
+        s=susede2_ed25519; t=1643807707;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Bcp04e1xn7q0Nbal9eCkQGo3QVCsVp3wNyotn26SUZc=;
-        b=r9xPJKaqrE/bIIJMhdvUrixtqOxNNTZ1cWRhDYeQhs7tG4PzA68uodopZ7ROBkL6z5kp+c
-        S2gBwkyJ2d9Ct6Cw==
+        bh=pepWXB5DvgjMJGEOiNQEx9XrtwsT7XquutmoNVWSlU4=;
+        b=VDrw+YadqVUsdwACF7urbi3ndmOhUBvTEabGX1G+gvq1l75Q+bA8vCqac7k+0k+NMTefJ8
+        2C0zZB7ce9NEF1BQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B0E5313E48;
-        Wed,  2 Feb 2022 13:14:22 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 55DC213E48;
+        Wed,  2 Feb 2022 13:15:07 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id InP9Kq6D+mFFQAAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 02 Feb 2022 13:14:22 +0000
-Message-ID: <b46c5a9a-670a-2989-2429-f28b2bafdfc2@suse.de>
-Date:   Wed, 2 Feb 2022 14:14:22 +0100
+        id h92FFNuD+mHuQAAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 02 Feb 2022 13:15:07 +0000
+Message-ID: <5bc42a39-9c6a-bf63-9470-ab9e44fa1c68@suse.de>
+Date:   Wed, 2 Feb 2022 14:15:06 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [PATCHv2 4/7] lib: add crc64 tests
+Subject: Re: [PATCHv2 5/7] asm-generic: introduce be48 unaligned accessors
 Content-Language: en-US
 To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de
+        colyli@suse.de, Arnd Bergmann <arnd@arndb.de>
 References: <20220201190128.3075065-1-kbusch@kernel.org>
- <20220201190128.3075065-5-kbusch@kernel.org>
+ <20220201190128.3075065-6-kbusch@kernel.org>
 From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220201190128.3075065-5-kbusch@kernel.org>
+In-Reply-To: <20220201190128.3075065-6-kbusch@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,21 +67,18 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/1/22 20:01, Keith Busch wrote:
-> Provide a module to test the rocksoft crc64 calculations with well known
-> inputs and exepected values.
+> The NVMe protocol extended the data integrity fields with unaligned
+> 48-bit reference tags. Provide some helper accessors in
+> preparation for these.
 > 
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
 > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
-> v1->v2:
+>   include/asm-generic/unaligned.h | 26 ++++++++++++++++++++++++++
+>   1 file changed, 26 insertions(+)
 > 
->    Fixed Kconfig dependency
-> 
->   lib/Kconfig.debug |  4 +++
->   lib/Makefile      |  1 +
->   lib/test_crc64.c  | 68 +++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 73 insertions(+)
->   create mode 100644 lib/test_crc64.c
-> 
+Hehe.
+
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
