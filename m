@@ -2,124 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA99C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 14:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 625FDC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 14:48:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240458AbiBBOrk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 09:47:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40159 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345076AbiBBOrh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Feb 2022 09:47:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643813257;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VGlmPh+lpFCFUzwkF/NTnSbC4pQ69+yQaOHVbCiVAdo=;
-        b=ekHgjkWljgDliqFPWR6ZkuUzBz9wp3airPiTfjnF1LjSH5+N3UFJCrMOmyMVGdYXoQT+uZ
-        0o5HqG8jlrbSAkB4spf/DQL+Gc6fo3i9Ac3UxMLNcbVQB7SY/2vqgfZLDYMXA0M1PJBvUP
-        b25gYUnUFOKA6ie6x/5zmnIa6ryBySU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-w-xX1KEaMoiBIYAFgBKfgA-1; Wed, 02 Feb 2022 09:47:36 -0500
-X-MC-Unique: w-xX1KEaMoiBIYAFgBKfgA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C363318B9ECC;
-        Wed,  2 Feb 2022 14:47:34 +0000 (UTC)
-Received: from [172.16.176.1] (ovpn-64-2.rdu2.redhat.com [10.10.64.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10C83747B3;
-        Wed,  2 Feb 2022 14:47:33 +0000 (UTC)
-From:   "Benjamin Coddington" <bcodding@redhat.com>
-To:     "Hannes Reinecke" <hare@suse.de>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        "Chuck Lever III" <chuck.lever@oracle.com>
-Subject: Re: [LSF/MM/BPF TOPIC] [LSF/MM/BPF ATTEND] TLS handshake for
- in-kernel consumers
-Date:   Wed, 02 Feb 2022 09:47:32 -0500
-Message-ID: <1AF72276-E808-48E5-9824-6355129E58BE@redhat.com>
-In-Reply-To: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de>
-References: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de>
+        id S239717AbiBBOsv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 09:48:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231812AbiBBOsv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 09:48:51 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6943BC061714
+        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 06:48:51 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id y5-20020a17090aca8500b001b8127e3d3aso6223115pjt.3
+        for <linux-block@vger.kernel.org>; Wed, 02 Feb 2022 06:48:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=o2YwdDrmz2Gi+LFty9hPLez4dJYG3tDKGBRIQIFGHlY=;
+        b=ciZHZivMW32BQJwTSSyu4AB2jCIoRiAX8bxIKaDdGtzINzzZgrdiKZw5zykAnQ4vZw
+         8mfUdwK9lubVZmQfz6z7P46pGEB7Dp4bHYnH1sA/JtpfgTt/jAW8RRHpuZHpA37QKd3C
+         xH+kOJTpMbz6rVp1cHfqrSODVZADLwTWo8+NPRBlJSGYqNcMjdXlXcvGyHdKUn2WrVCy
+         h0hnn0s5Rj2AUPktZQpp7nK0T7a8ETlcncT+yJH824T3VTVT4s+1jZ8v8noPpzjww+EW
+         T1M6lzjgFFrG9FMcZJyExW1VaGPio8vuN4IBw256E2Obx8Qark2Jnk47nJ7Wk443892r
+         kdXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=o2YwdDrmz2Gi+LFty9hPLez4dJYG3tDKGBRIQIFGHlY=;
+        b=DKuPp2XaoTMY11OEtwRWA+dLDs8w3zcfqcTpHCAXlQ38F7cEyBp3AH/0luPIlKZBiW
+         Rro/q/Jl/dg0qQaOxFO4aDMCP6n6cpJJYIaKhd+hhMZIDIwaDP+eq3lkb2YUXfOaOg+c
+         GQUHRM1zltlx5CtOzDAfgPyjPUTgK5bIyyYBbRBQjX7u/WAtESzoEwiV52LhS7ONUDck
+         uoRmRFg+gJGnYrI3uX1o4mm/rvCRgiGGPPPoU+w3i+l3KVizykjgDIYv493OC1RziCGa
+         3mQW/LN6IVua4boGQwLVtCbWFPGC9nwjPf+zC0flNWnLIbzUwFLEAJihc1Ew1fynSYVH
+         552Q==
+X-Gm-Message-State: AOAM531u7K7nLDO8yn+dJuvNbqn0Ly/f6LbCS3RHyhRi7VlXiLhE9OBK
+        ZtcqucFuq2Cnpvuo841Trl7HgQ==
+X-Google-Smtp-Source: ABdhPJyHwRBbaqcSa4if9zeZtcm8WmzfudtV8ZQYfEsw1AH8kXbPkrt8FuHP8dN8OBUVsn/SQZOepw==
+X-Received: by 2002:a17:90b:2385:: with SMTP id mr5mr8384586pjb.186.1643813330845;
+        Wed, 02 Feb 2022 06:48:50 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id y42sm27096277pfa.5.2022.02.02.06.48.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Feb 2022 06:48:50 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ilya Dryomov <idryomov@gmail.com>, linux-block@vger.kernel.org
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20220201100420.25875-1-idryomov@gmail.com>
+References: <20220201100420.25875-1-idryomov@gmail.com>
+Subject: Re: [PATCH] block: fix DIO handling regressions in blkdev_read_iter()
+Message-Id: <164381332963.169219.170063515987307185.b4-ty@kernel.dk>
+Date:   Wed, 02 Feb 2022 07:48:49 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2 Feb 2022, at 9:12, Hannes Reinecke wrote:
+On Tue, 1 Feb 2022 11:04:20 +0100, Ilya Dryomov wrote:
+> Commit ceaa762527f4 ("block: move direct_IO into our own read_iter
+> handler") introduced several regressions for bdev DIO:
+> 
+> 1. read spanning EOF always returns 0 instead of the number of bytes
+>    read.  This is because "count" is assigned early and isn't updated
+>    when the iterator is truncated:
+> 
+> [...]
 
-> Hi all,
->
-> nvme-over-tcp has the option to utilize TLS for encrypted traffic, but 
-> due to the internal design of the nvme-over-fabrics stack we cannot 
-> initiate the TLS connection from userspace (as the current in-kernel 
-> TLS implementation is designed).
->
-> This leaves us with two options:
-> 1) Put TLS handshake into the kernel (which will be quite some
->   discussion as it's arguably a userspace configuration)
-> 2) Pass an in-kernel socket to userspace and have a userspace
->   application to run the TLS handshake.
->
-> None of these options are quiet clear cut, as we will be have to put
-> quite some complexity into the kernel to do full TLS handshake (if we
-> were to go with option 1) or will have to design a mechanism to pass
-> an in-kernel socket to userspace as we don't do that currently (if we 
-> were going with option 2).
->
-> We have been discussing some ideas on how to implement option 2 
-> (together with Chuck Lever and the NFS crowd), but so far haven't been 
-> able to come up with a decent design.
->
-> So I would like to discuss with interested parties on how TLS 
-> handshake could be facilitated, and what would be the best design 
-> options here.
->
-> The proposed configd would be an option, but then we don't have that, 
-> either :-)
->
-> Required attendees:
->
-> Chuck Lever
-> James Bottomley
-> Sagi Grimberg
-> Keith Busch
-> Christoph Hellwig
-> David Howells
+Applied, thanks!
 
-I'm interested in this as well, and have gone down quite a rabbit-hole 
-of
-experimental implementation for NFS.  I've found the keys API to be 
-useful
-to implement a tls_session keytype that allows kernel subsystems to 
-request
-that userspace do the heavy lifting of establishing a TLS session and
-installing the kTLS bits on the socket by passing an existing socket fd 
-to
-userspace.
+[1/1] block: fix DIO handling regressions in blkdev_read_iter()
+      commit: 3e1f941dd9f33776b3df4e30f741fe445ff773f3
 
-However, something more persistent than call_usermode_helper is needed,
-since userspace helpers may not be able to be looked up from a 
-filesystem
-when establishing or re-keying (or doing a number of other things) on a 
-TLS
-session for NFS or NVMe-over-tcp.
+Best regards,
+-- 
+Jens Axboe
 
-I've got a rough idea to create a thing called a "keyagent" which would 
-be
-an alternative to using call_usermode_helper to service request-key.
-Keyagents would be persistent processes in userspace themselves 
-represented
-by keys, and if a keyagent key is linked into a process' keyrings and
-matches the requested type it is consulted to service request-key and 
-update
-for those keys.
-
-Ben
 
