@@ -2,131 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4B6EC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 17:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04355C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 18:13:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbiBBRr4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 12:47:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
+        id S239994AbiBBSNx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 13:13:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245487AbiBBRr4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 12:47:56 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE51C061714;
-        Wed,  2 Feb 2022 09:47:55 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id k25so23563ejp.5;
-        Wed, 02 Feb 2022 09:47:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+AamInyOOTBBGovz85dTdC8owJuF7NBk/tyX7bBLgOk=;
-        b=H0g9b2FKQCmM+dXDcg/CEux+iY077CMc6zivamSyyAtG2GiCirq4qWNTJkuDuOcljp
-         snvP7E39bJXkpJAGRnbLSQlB1wgijC1Hhi0Vr6QVCGPHfq5bqLJgiHKwMLkTGVE9UAKu
-         cLc/U07SDXBBOPypX+8KUO6eH1VksG3UU12/lwDsT5BaEpkzLbEIi0q3ldVmGXVpng5r
-         +8G2vlgcuwksg4Y/SCvCHqhwK9Mz/z+nKJ17+tH8Hr2qLOYV76Jeff+sEvG0FlXTDeQ5
-         vq2Gu1ENHU2G0+WfGfdyQazkNQHN2Ji8Gt0Gd646y2w5aY8z91v3rheIYzxPOQAMQtZr
-         GdLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+AamInyOOTBBGovz85dTdC8owJuF7NBk/tyX7bBLgOk=;
-        b=Ijcn/5DJfu8yIUelx85dI9GDGcAofF4CWgp8W1RMeq5+4fsxDcv8s2N+1r031Qey1w
-         nFpiR4koYjcGqLqLuCUTzqmP7h1IMX1Ez2msy5CkvGeVew8AxGDWIRRW/VO1uY337Okz
-         A835Z+kk9Jem2SaNDYxEqZqj6JIBhZZGvlHRU5fxcN3e/Asjc0PMiokSPQL1d85Eo39u
-         kqSzhP33xi1A2pXciDf0U0oHZPFf2ubVDTM0Z/VB2SEdyro1BAWFN2GyheF98tFNEQYN
-         +d9vYtNZfOvkUq5mcWV3PsIIxivy7pXd+YbgF1o9GBKcLJF366cZofPwoabeLFZKqB/T
-         G9zA==
-X-Gm-Message-State: AOAM533xnXGSM929/5yTGYjRS9zX2H0KfJiHsLysJjhUwGIdME+2Wyo7
-        Vav+EAOrpPOzn7HnCEddn+OOwD1TbQiOEFLNTRc=
-X-Google-Smtp-Source: ABdhPJzh73CAbM/4RbWI3z4AVB0icVBLQfjZCZt5gRHnqXOGTYiCaVfj4lhsZa9kP73TUMBSfPzDNc2e4G1cqg3/rK8=
-X-Received: by 2002:a17:907:6e1a:: with SMTP id sd26mr25152915ejc.270.1643824074319;
- Wed, 02 Feb 2022 09:47:54 -0800 (PST)
+        with ESMTP id S1346553AbiBBSNu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 13:13:50 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84043C061714
+        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 10:13:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 22C4C61899
+        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 18:13:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B7BFC340ED
+        for <linux-block@vger.kernel.org>; Wed,  2 Feb 2022 18:13:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643825629;
+        bh=I9cUeG+o8ociheUF47gyxFEtCVrjUoyuy0FBaKgZn78=;
+        h=From:Date:Subject:To:From;
+        b=sVms2loOrDRXQVzMvGmXTqKRz26u2C8O8H5G3YOnmaXYUNEl4CFwoV6DizJrHBGU1
+         5nNwygSomAYFfozCdFtcMNsy9wPjMbJMmzH662iBYojpXCmIXC5tbV3tA6b3E2ALEh
+         MrZX+JPPQeXFAq7Jb/C65pOTAKsr0RcNPbnJ4jtzUgCRap/Q3AL3TruaEvHdFTSh5w
+         Ux96uWOFRGV/ZPcu63apKzDPZIuMFkSEEsBjRqXGvZR6hQZf3O3sGOpOUsXNcDGtY/
+         OpPjx51J5kixQjYB/XWydfSHcp11iezvG+p4wk0howhGPugc+EOojDePBH5zAYpBgl
+         niseBD4yo32KQ==
+Received: by mail-yb1-f170.google.com with SMTP id i62so1160270ybg.5
+        for <linux-block@vger.kernel.org>; Wed, 02 Feb 2022 10:13:49 -0800 (PST)
+X-Gm-Message-State: AOAM5315nGMeQgLxjS7p9h9lbvmqw4NtFqDHjxGSx2lOdKWqYnhcgefQ
+        X5tneWAVBYJrgXxqd0fQv+l73WTaQAhO2LfEb4g=
+X-Google-Smtp-Source: ABdhPJzQyOuK7Gtw+hbadorktGBU4AKxChQzBWOHJXLcg9FLxp6Mn0T3uTQauP2d+WLGTwEQzsQszDZ4TB+Pv4XI4OU=
+X-Received: by 2002:a25:8543:: with SMTP id f3mr25451798ybn.47.1643825628566;
+ Wed, 02 Feb 2022 10:13:48 -0800 (PST)
 MIME-Version: 1.0
-References: <20220126185153.417948-1-shy828301@gmail.com> <YfJrsid0OJQykXYz@infradead.org>
- <CAHbLzkqNdnECNHGn0=kfUOfaxq6LLrwPSVvJKRHNvnuFtPve2w@mail.gmail.com>
-In-Reply-To: <CAHbLzkqNdnECNHGn0=kfUOfaxq6LLrwPSVvJKRHNvnuFtPve2w@mail.gmail.com>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Wed, 2 Feb 2022 09:47:42 -0800
-Message-ID: <CAHbLzkqAEmwjC-A=kuS1DY676jiDWD+cohO486djdmPDvgOF3A@mail.gmail.com>
-Subject: Re: [v5 PATCH] block: introduce block_rq_error tracepoint
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
-        Cong Wang <xiyou.wangcong@gmail.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+From:   Song Liu <song@kernel.org>
+Date:   Wed, 2 Feb 2022 10:13:37 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW6UxfwrD0qhqfCg7UFcxUnRqNpL9kscy=kMV+3P1teQ9Q@mail.gmail.com>
+Message-ID: <CAPhsuW6UxfwrD0qhqfCg7UFcxUnRqNpL9kscy=kMV+3P1teQ9Q@mail.gmail.com>
+Subject: What shall read() return on deleted block device?
+To:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Kernel Team <kernel-team@fb.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 10:18 AM Yang Shi <shy828301@gmail.com> wrote:
->
-> On Thu, Jan 27, 2022 at 1:53 AM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Wed, Jan 26, 2022 at 10:51:53AM -0800, Yang Shi wrote:
-> > > +             __entry->dev       = rq->q->disk ? disk_devt(rq->q->disk) : 0;
-> > > +             __assign_str(name,   rq->q->disk ? rq->q->disk->disk_name : "?");
-> >
-> > None f the other tracepoints has the disk name, why does this one need
-> > it?  And if you add it please avoid the overly long line.
->
-> I guess the disk name was added to ease some handling in userspace
-> tools. But if all other tracepoints don't have disk name shown, I
-> think I'd better follow the convention. I did overlook this when I
-> ported this patch. Will remove it.
->
-> >
-> > > +             __entry->sector    = blk_rq_pos(rq);
-> > > +             __entry->nr_sector = nr_bytes >> 9;
-> > > +             __entry->error     = blk_status_to_errno(error);
-> >
-> > This still converts the block status to an errno.
->
-> I may misunderstand your comments. I just followed what
-> block_rq_complete tracepoint does. Or the linux-block community is
-> converting all tracepoints to show blk status code instead of
-> conventional errno?
->
-> And the userspace tool doesn't know blk status code and still expects
-> the conventional errno. For example, rasdaemon reads block_rq_complete
-> events now and have the below:
->
-> static const struct {
->         int             error;
->         const char      *name;
-> } blk_errors[] = {
->         { -EOPNOTSUPP, "operation not supported error" },
->         { -ETIMEDOUT, "timeout error" },
->         { -ENOSPC,    "critical space allocation error" },
->         { -ENOLINK,   "recoverable transport error" },
->         { -EREMOTEIO, "critical target error" },
->         { -EBADE,     "critical nexus error" },
->         { -ENODATA,   "critical medium error" },
->         { -EILSEQ,    "protection error" },
->         { -ENOMEM,    "kernel resource error" },
->         { -EBUSY,     "device resource error" },
->         { -EAGAIN,    "nonblocking retry error" },
->         { -EREMCHG, "dm internal retry error" },
->         { -EIO,       "I/O error" },
-> };
+Hi Christoph and folks,
 
-Gently ping. Should I print blk status code instead of errno for this
-trace point? But I really don't get why. And block_rq_complete
-tracepoint does:
+While debugging something else, we noticed a behavior change for the following
+program:
 
-        TP_fast_assign(
-                __entry->dev       = rq->q->disk ? disk_devt(rq->q->disk) : 0;
-                __entry->sector    = blk_rq_pos(rq);
-                __entry->nr_sector = nr_bytes >> 9;
-                __entry->error     = blk_status_to_errno(error); <===
-convert blk status code to errno
+    main()
+    {
+        fd = open("/dev/sdXX", O_RDWR | O_CLOEXEC);
 
-                blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
-                __get_str(cmd)[0] = '\0';
-        ),
+        /* delete sdXX by echo 1 > /sys/block/sdXX/device/delete */
+        sleep(10); /* to make sure delete finishes */
 
->
-> This patch aims to add block_rq_err tracepoint to replace
-> block_rq_complete in rasdaemon.
+        ret = read(fd, buf, 4096);
+        fprintf(stderr, "ret = %d errno = %d\n", ret, errno)
+    }
+
+On older kernel, we got
+   ret = -1 errno = EIO;
+while on newer kernel, we get
+   ret = 0;
+
+git-bisect points to [1]. However, I would not call it a bug caused by [1]. What
+actually happens is:
+
+In blkdev_read_iter(),we check
+     size = bdev_nr_bytes(bdev);
+     if (pos >= size)
+          return 0;
+     /* do the read, which may return -EIO */
+
+Before [1], size is not set to 0 when the device is deleted.
+Therefore, blkdev_read_iter
+will not hit pos >= size, and return -EIO. After [1], size is set to
+zero on device delete,
+so blkdev_read_iter returns 0 after the delete.
+
+I think this is not a bug, but a clear behavior change. However, no
+one seems to care
+after a year. So the question is, which behavior shall we keep for the
+future. And, if we
+want to go back to ret = -1, what's the proper fix?
+
+Thanks,
+Song
+
+[1] commit a782483cc1f8 ("block: remove the nr_sects field in struct hd_struct")
