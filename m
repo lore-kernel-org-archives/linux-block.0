@@ -2,64 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCFBC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 13:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E72C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 13:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240338AbiBBNPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 08:15:09 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:52134 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiBBNPI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 08:15:08 -0500
+        id S232705AbiBBNT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 08:19:28 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:58186 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233464AbiBBNT1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 08:19:27 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 69C191F3A8;
-        Wed,  2 Feb 2022 13:15:07 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 34DEB212B5;
+        Wed,  2 Feb 2022 13:19:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643807707; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1643807966; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pepWXB5DvgjMJGEOiNQEx9XrtwsT7XquutmoNVWSlU4=;
-        b=rLvqpqtnCiYNIil5Go7svLeylAIK/EEsiClAPmvdv4ttCXiLfYnicBjtG/cnDOlDfOoRyq
-        qhB995y++QwMg5Li89skyZD/Yc2RDkshYC/Mkjct8LGK/0zXRTjCGw53IpouRZamrWXK8J
-        uhezZb3ePVwOWaoJG4Eg6l7DCwWeogo=
+        bh=ulFfKXoRq8QJukyKpX0WjkN9+vmh3h2i2KxS5J3haRQ=;
+        b=DGEwghLPcWpzoCyyuOkZszuDl1Q8nqded/8dPqG8Q4YU7UWvuMuws+oda0lX7DvFwZ+65W
+        XLmqjEpMg3A4TrGv93zlxgQ+Qy09zlx1ClX33wXVIJnWV+LhMQb61MKYsIUi4IlLy2c44/
+        lsHCp3gnEtoVC69tYvIoR77t/2E1jZw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643807707;
+        s=susede2_ed25519; t=1643807966;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pepWXB5DvgjMJGEOiNQEx9XrtwsT7XquutmoNVWSlU4=;
-        b=VDrw+YadqVUsdwACF7urbi3ndmOhUBvTEabGX1G+gvq1l75Q+bA8vCqac7k+0k+NMTefJ8
-        2C0zZB7ce9NEF1BQ==
+        bh=ulFfKXoRq8QJukyKpX0WjkN9+vmh3h2i2KxS5J3haRQ=;
+        b=MK6+KnaE5ttkGnMgjHwh7+EWvFddHB6ebwBy9l80HtxfBniDhBKSGdFapKAUgiUVemN/AT
+        0MJWjC+AmEHj1gCQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 55DC213E48;
-        Wed,  2 Feb 2022 13:15:07 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 23CC913E48;
+        Wed,  2 Feb 2022 13:19:26 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id h92FFNuD+mHuQAAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 02 Feb 2022 13:15:07 +0000
-Message-ID: <5bc42a39-9c6a-bf63-9470-ab9e44fa1c68@suse.de>
-Date:   Wed, 2 Feb 2022 14:15:06 +0100
+        id GJBXCN6E+mFeQwAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 02 Feb 2022 13:19:26 +0000
+Message-ID: <7a8e472b-8534-957e-6c32-49d3b919f382@suse.de>
+Date:   Wed, 2 Feb 2022 14:19:25 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [PATCHv2 5/7] asm-generic: introduce be48 unaligned accessors
+Subject: Re: [PATCHv2 6/7] block: add pi for nvme enhanced integrity
 Content-Language: en-US
 To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de, Arnd Bergmann <arnd@arndb.de>
+        colyli@suse.de
 References: <20220201190128.3075065-1-kbusch@kernel.org>
- <20220201190128.3075065-6-kbusch@kernel.org>
+ <20220201190128.3075065-7-kbusch@kernel.org>
 From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220201190128.3075065-6-kbusch@kernel.org>
+In-Reply-To: <20220201190128.3075065-7-kbusch@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,18 +67,19 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/1/22 20:01, Keith Busch wrote:
-> The NVMe protocol extended the data integrity fields with unaligned
-> 48-bit reference tags. Provide some helper accessors in
-> preparation for these.
+> The NVMe specification defines larger data integrity formats beyond the
+> t10 tuple. Add support for the specification defined CRC64 formats,
+> assuming the reference tag does not need to be split with the "storage
+> tag".
 > 
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
 > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
->   include/asm-generic/unaligned.h | 26 ++++++++++++++++++++++++++
->   1 file changed, 26 insertions(+)
+>   block/Kconfig          |   1 +
+>   block/t10-pi.c         | 194 +++++++++++++++++++++++++++++++++++++++++
+>   include/linux/t10-pi.h |  20 +++++
+>   3 files changed, 215 insertions(+)
 > 
-Hehe.
-
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
