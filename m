@@ -2,80 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE84C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 20:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 469D1C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Feb 2022 20:57:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231196AbiBBUgP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 15:36:15 -0500
-Received: from mail-pj1-f51.google.com ([209.85.216.51]:41770 "EHLO
-        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbiBBUgP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 15:36:15 -0500
-Received: by mail-pj1-f51.google.com with SMTP id p12-20020a17090a2d8c00b001b833dec394so752096pjd.0;
-        Wed, 02 Feb 2022 12:36:15 -0800 (PST)
+        id S232941AbiBBU5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Feb 2022 15:57:46 -0500
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:43740 "EHLO
+        mail-wm1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230399AbiBBU5p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 15:57:45 -0500
+Received: by mail-wm1-f41.google.com with SMTP id k6-20020a05600c1c8600b003524656034cso422530wms.2;
+        Wed, 02 Feb 2022 12:57:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=YapDcpTnt0pNDjwnCsaJppc8fMq8nOcDVHLmni897fw=;
-        b=g9lYHjxQBVB7bnaMaVlekVDr0pcIYnEQh3OGRhtJi8dDg0g8eDsbB4y50X6/6tAXCJ
-         kslRVHYhvcasAapZvICVKRIim7lhwB305sdvqY4Q1QoqcssKhUhx8Z2pH3Z+0MVhCd3r
-         VkdEhwLRMrmMgWlAouXB9rUX4kJDLrSwn1l1vZadKo0KBNdojqGz9C7Hy8ss2GrzJVdz
-         ur2ULMTjJpLWCPAYNrxfWdrAk46e5735SOQXFdxH7BjqMiMJl0j+misTRPSA78z3sDOp
-         aDbj3rMQsdaA7vSX8IpME1ddjnheypM+PiBQ/8cDMy6spI4qVjX2ktNIVgCWRgPwHM69
-         ORLg==
-X-Gm-Message-State: AOAM533RUZR1+y323ePw8KvSdRyLDnASSDZJKKuxHrqzHqqfk8ET8474
-        JyOsC30MjXzvkvrFAve0t1M=
-X-Google-Smtp-Source: ABdhPJztFTw+1Ka+LWZeLE261k/YPdwwB0CS/Ml4N47khvlZQwg7VL3liHHIL4Gj83KwOOgizn59Kg==
-X-Received: by 2002:a17:90b:4c8b:: with SMTP id my11mr10008445pjb.33.1643834174683;
-        Wed, 02 Feb 2022 12:36:14 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id f9sm34311732pgf.94.2022.02.02.12.36.13
+        bh=oIyPxiDfzVDRtE7UMRXVR4ajUxUuMcTHsY89cmsysY0=;
+        b=BpwShtm8hs4A7Hi8JEeIFE4yYRbnr+Z6KCeRqwB5AutsLZNBKbEnyYscj2eDNiFvn2
+         GnHgPEMZr2pQk9PH0QEjC5R8waOvGQxU4knwKu0oNsmrshgRH4Ec/NNKU++tr0cs9dvR
+         Pxe/01tXespX94bMHaFKjU2KU4QQvM9Uu9Vhyy2cX0WeANYnvl9H+MGt5rzuA7TnrOnQ
+         +vWiL0a51Yfl8KEBvNmcCLBD1XcsFaKDJ2bOXb4PtWW8U57ztsxsbrmO/4mUxlKZ4b7t
+         zz/gILoEj1DAio1TEVT0/+yUDy1xGH5hdXzzImYCT8I31GdQ4HKaP+v6fYt3Xp+9rPop
+         o4RQ==
+X-Gm-Message-State: AOAM5307LAbfwTZuiDnqtRmhZc5lgpzNtknKkujYw6vEd+nU3JHKmMoL
+        RgbcKPySwsyrl1ldYofQY/FkBv1OLR8=
+X-Google-Smtp-Source: ABdhPJy1hTjgBquVbH7T+1Pchv+xCOouM5FJq4sGB5simcA3jH1shtiSVCxikRUxKMCs36j8SgHk+A==
+X-Received: by 2002:a05:600c:4e4a:: with SMTP id e10mr7762089wmq.113.1643835464462;
+        Wed, 02 Feb 2022 12:57:44 -0800 (PST)
+Received: from [10.100.102.14] (46-117-116-119.bb.netvision.net.il. [46.117.116.119])
+        by smtp.gmail.com with ESMTPSA id h4sm21701817wre.0.2022.02.02.12.57.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Feb 2022 12:36:14 -0800 (PST)
-Message-ID: <4de2c701-6a83-cf7f-69ba-36a921997180@acm.org>
-Date:   Wed, 2 Feb 2022 12:36:12 -0800
+        Wed, 02 Feb 2022 12:57:43 -0800 (PST)
+Message-ID: <2640b631-f8ac-ab4b-5ff1-884972f25334@grimberg.me>
+Date:   Wed, 2 Feb 2022 22:57:42 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [LSF/MM/BPF TOPIC] are we going to use ioctls forever?
+Subject: Re: [LSF/MM/BPF TOPIC][LSF/MM/BPF ATTEND] TLS handshake for in-kernel
+ consumers
 Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        lsf-pc@lists.linux-foundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Samuel Cabrero <scabrero@suse.de>,
-        David Teigland <teigland@redhat.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Josef Bacik <josef@toxicpanda.com>
-References: <20220201013329.ofxhm4qingvddqhu@garbanzo>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220201013329.ofxhm4qingvddqhu@garbanzo>
+To:     Hannes Reinecke <hare@suse.de>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+Cc:     "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Chuck Lever III <chuck.lever@oracle.com>
+References: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/31/22 17:33, Luis Chamberlain wrote:
-> It would seem we keep tacking on things with ioctls for the block
-> layer and filesystems. Even for new trendy things like io_uring [0].
-> For a few years I have found this odd, and have slowly started
-> asking folks why we don't consider alternatives like a generic
-> netlink family. I've at least been told that this is desirable
-> but no one has worked on it. *If* we do want this I think we just
-> not only need to commit to do this, but also provide a target. LSFMM
-> seems like a good place to do this.
 
-Do we need a new netlink family for this purpose? The RDMA subsystem 
-uses netlink since considerable time for configuration purposes instead 
-of ioctls, sysfs or configfs. The user space tool 'rdma' supports that 
-interface. That tool is used by e.g. blktests to configure the soft-RoCE 
-and soft-iWARP interfaces.
+> Hi all,
+> 
+> nvme-over-tcp has the option to utilize TLS for encrypted traffic, but 
+> due to the internal design of the nvme-over-fabrics stack we cannot 
+> initiate the TLS connection from userspace (as the current in-kernel TLS 
+> implementation is designed).
+> 
+> This leaves us with two options:
+> 1) Put TLS handshake into the kernel (which will be quite some
+>    discussion as it's arguably a userspace configuration)
+> 2) Pass an in-kernel socket to userspace and have a userspace
+>    application to run the TLS handshake.
+> 
+> None of these options are quiet clear cut, as we will be have to put
+> quite some complexity into the kernel to do full TLS handshake (if we
+> were to go with option 1) or will have to design a mechanism to pass
+> an in-kernel socket to userspace as we don't do that currently (if we 
+> were going with option 2).
+> 
+> We have been discussing some ideas on how to implement option 2 
+> (together with Chuck Lever and the NFS crowd), but so far haven't been 
+> able to come up with a decent design.
+> 
+> So I would like to discuss with interested parties on how TLS handshake 
+> could be facilitated, and what would be the best design options here.
+> 
+> The proposed configd would be an option, but then we don't have that, 
+> either :-)
+> 
+> Required attendees:
+> 
+> Chuck Lever
+> James Bottomley
+> Sagi Grimberg
 
-See also rdma(8), available at e.g. 
-https://man7.org/linux/man-pages/man8/rdma.8.html.
+I'd be interested to discuss this.
 
-Bart.
+One other item with TLS besides the handshake part is that
+nfs/cifs/nvme-tcp are all tcp ulps like tls itself, which at
+the currently cannot be stacked IIRC (all use sk callbacks,
+including tls).
+
+Is anyone looking into enabling stacking tcp ulps on top of tls?
