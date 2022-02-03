@@ -2,114 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F42C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 07:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3076FC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 09:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345220AbiBCHYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 02:24:42 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:51898 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234191AbiBCHYk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 02:24:40 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 9DFE61F3A5;
-        Thu,  3 Feb 2022 07:24:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643873079; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        id S232009AbiBCJQK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 04:16:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58880 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230259AbiBCJQJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Feb 2022 04:16:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643879768;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=JD8B5j8oQIXRjUzj5jBBRCBqywjDhdE1cYhu2C2Cvd0=;
-        b=ygLG+YQf3EF4Uxq+IXFmFbjnofBR0aPmdw5iNB2eyC1a2y5dnZsTIXo0v2knoz9HJt/PsF
-        T9QcYv69QTbmTCl/yMscKOuDAna49LekksZMKtlGNDi4f9BPsj83LiNRKZB8oSoREO3WpT
-        wcVjhb1NyzqlBkvlgrxXupvL/chGdv0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643873079;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JD8B5j8oQIXRjUzj5jBBRCBqywjDhdE1cYhu2C2Cvd0=;
-        b=fY+nyVrLJKTYTDzPB3YgSTAicSss8xxv/r/Hlan/Kuoz8wBhJlXRE4wrVH3iAbnDk7DujD
-        P01uHEzc/VkNhKDQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=upgByqr3JPm/pcAvrDmZYGayUFSi5IEqwps1GZG/nc0=;
+        b=B6MUaGnJiZC2VFi6N9sluyeiqAKecziiB07LxbfOIPvT6vKmXwdQ5s9aHqkSXsp1+YWXeC
+        252gCyqZ96ZbTQDWrqnWD7LnSBeiZ3AIlZ1sXG8qmgpmIeafWZtFjRVdqMRLLRF77csqcI
+        VPBFOdK58KyUDiGDOY8DoJmGes5gRuA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-568-EoxAI1sUPIO6LAQoAIe3XA-1; Thu, 03 Feb 2022 04:16:03 -0500
+X-MC-Unique: EoxAI1sUPIO6LAQoAIe3XA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7DE431344A;
-        Thu,  3 Feb 2022 07:24:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id CbNAGzeD+2GpcwAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 03 Feb 2022 07:24:39 +0000
-Message-ID: <a393bff0-f2f4-9749-df90-d961a6406659@suse.de>
-Date:   Thu, 3 Feb 2022 08:24:38 +0100
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 306AA814245;
+        Thu,  3 Feb 2022 09:16:02 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.146])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 09D181062227;
+        Thu,  3 Feb 2022 09:15:54 +0000 (UTC)
+Date:   Thu, 3 Feb 2022 09:15:53 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 2/5] virtio_blk: simplify refcounting
+Message-ID: <YfudSXcT2rNh/Jhl@stefanha-x1.localdomain>
+References: <20220202155659.107895-1-hch@lst.de>
+ <20220202155659.107895-3-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 2/2] scsi: use BLK_STS_OFFLINE for not fully online
- devices
-Content-Language: en-US
-To:     Song Liu <song@kernel.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Kernel Team <kernel-team@fb.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20220203064009.1795344-1-song@kernel.org>
- <20220203064009.1795344-3-song@kernel.org>
- <CAPhsuW5DitVaUG-z35Si0bMERQdGAF60Tj3nD7DwmKhZVxs9AA@mail.gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <CAPhsuW5DitVaUG-z35Si0bMERQdGAF60Tj3nD7DwmKhZVxs9AA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="PeAgK0yhrSE0EZQO"
+Content-Disposition: inline
+In-Reply-To: <20220202155659.107895-3-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/3/22 07:53, Song Liu wrote:
-> CC linux-block (it was a typo in the original email)
-> 
-> On Wed, Feb 2, 2022 at 10:40 PM Song Liu <song@kernel.org> wrote:
->>
->> The new error message for such case looks like
->>
->> [  172.809565] device offline error, dev sda, sector 3138208 ...
->>
->> which will not be confused with regular I/O error (BLK_STS_IOERR).
->>
->> Signed-off-by: Song Liu <song@kernel.org>
->> ---
->>   drivers/scsi/scsi_lib.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
->> index 0a70aa763a96..e30bc51578e9 100644
->> --- a/drivers/scsi/scsi_lib.c
->> +++ b/drivers/scsi/scsi_lib.c
->> @@ -1276,7 +1276,7 @@ scsi_device_state_check(struct scsi_device *sdev, struct request *req)
->>                   * power management commands.
->>                   */
->>                  if (req && !(req->rq_flags & RQF_PM))
->> -                       return BLK_STS_IOERR;
->> +                       return BLK_STS_OFFLINE;
->>                  return BLK_STS_OK;
->>          }
->>   }
->> --
->> 2.30.2
->>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Cheers,
+--PeAgK0yhrSE0EZQO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hannes
+On Wed, Feb 02, 2022 at 04:56:56PM +0100, Christoph Hellwig wrote:
+> @@ -985,8 +947,6 @@ static void virtblk_remove(struct virtio_device *vdev)
+>  	kfree(vblk->vqs);
+> =20
+>  	mutex_unlock(&vblk->vdev_mutex);
+> -
+> -	virtblk_put(vblk);
+>  }
 
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Thank you, this is a nice cleanup! One question:
+
+File systems are unmounted and block devices are not open. PCI hot
+unplug calls virtblk_remove(). It looks vblk is used after being freed
+by virtblk_free_disk() halfway through virtblk_remove()?
+
+  static void virtblk_remove(struct virtio_device *vdev)
+  {
+          struct virtio_blk *vblk =3D vdev->priv;
+ =20
+          /* Make sure no work handler is accessing the device. */
+          flush_work(&vblk->config_work);
+ =20
+          del_gendisk(vblk->disk);
+          blk_cleanup_disk(vblk->disk);
+	          ^--- is virtblk_free_disk() called here?
+          blk_mq_free_tag_set(&vblk->tag_set);
+	                         ^--- use after free
+ =20
+          mutex_lock(&vblk->vdev_mutex);
+ =20
+          /* Stop all the virtqueues. */
+          virtio_reset_device(vdev);
+ =20
+          /* Virtqueues are stopped, nothing can use vblk->vdev anymore. */
+          vblk->vdev =3D NULL;
+ =20
+          vdev->config->del_vqs(vdev);
+          kfree(vblk->vqs);
+ =20
+          mutex_unlock(&vblk->vdev_mutex);
+  }
+
+Stefan
+
+--PeAgK0yhrSE0EZQO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmH7nUkACgkQnKSrs4Gr
+c8jN5Af4iefIKAa+WFTDInuj0dl0GqxL+bsDsqNBDCW3K7iOiQgIseKP/QpFl3n6
+4mtnQAzuafGzOc9g2LlaL1R3tTbz3hK5Vo2MeNSwI60VfMkOGmxh2G9ORRqVBfG6
+K884fdqqhR5QDBaJq9cysUjqUtCw6adOa2LR0jqbwX4SbwJhpab1W/zBy2jq7XWD
+WP+2D/1S5nmR8VwAYqpI5xFzoxtTmkN2mVR7niF2nQxutTzeorYHwMF9ZEPkoAcB
+nDUDhWU5rREG2a26dOemMRcitNHjT85xZxWYGB+SvdZCgT9kwJP69gJTkeJ+smC6
+2uOsaWdcWDALmkpFn1IdRd5uX5r3
+=0b+G
+-----END PGP SIGNATURE-----
+
+--PeAgK0yhrSE0EZQO--
+
