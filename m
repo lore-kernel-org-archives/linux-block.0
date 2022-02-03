@@ -2,179 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D12C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 20:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2F7C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 20:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353955AbiBCUMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 15:12:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
+        id S1354512AbiBCUdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 15:33:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350957AbiBCUMM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 15:12:12 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70D1C061714;
-        Thu,  3 Feb 2022 12:12:12 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id h23so3169173pgk.11;
-        Thu, 03 Feb 2022 12:12:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+W+KjPt40snWKlcOiz5y4VMLU8RQSblS+FRo+YklbYo=;
-        b=arM4wXQPQIqbNWzf3MS/S5hCXTZ94hUMEZQXR6L1SLSmdVpz+75kk+ZCtb3v4LxFdZ
-         UiSohRLVcAdA1PjlhICP6pI+GgLwFfkCxbPEAOCZtqBLeVW0gpUnBJhMicjwtXoGG06e
-         rOXtcGsvJzMA16ZhhFDccLMDJZdvJXqueBEOdupvpU48ExrLOqNWYYWWEhaah8V4qJt3
-         xAFx++Cq3mauE8mVV7y03mZBlvp0HLCUOIFEUbNsKADNpTiKPk4lJZpoWvPcAwJfibD9
-         EY/9zgItTo/d0qpoh3QeR7RuRmrD/ydRJe1D6y8X43bLoRNplh9XCEGKx2mXNLKpSDty
-         qQyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+W+KjPt40snWKlcOiz5y4VMLU8RQSblS+FRo+YklbYo=;
-        b=Vn9Hky3hVd7K6RFRLPV9jL70dqfaezAQiZf/qSYg4+lNTBujdGzgPkvhovX3vPwIrk
-         41cF5pE+BCnZcOrb7hf1PLRVxHNw6tfqWHMw7+tWgMDWui8Z1I5Q98etg25oni/Qdi0k
-         g2gLE+LkBBuzNDODmd9sBtl8/ft0lC1LQpWg44EvWk1DancQEk8SyRQJ7DkkPJCpo3dN
-         y0V8z1L1Gb6OL0MKRaF7faToEDuh/Um3+H6/DGoAq9dFNxQe0zrBRi37bV8edGvCm8uu
-         GWNCjoT0+c4EmBdfGwTc6trAb6M/OVfIzvU5/jwd+ESuNboUY521Oh/QblXYGhmF0F8c
-         9KjQ==
-X-Gm-Message-State: AOAM533P/9fALbbi4/tEby2adka8crOa8gGZ1Jhsvdp884n/RkVR4Vjn
-        BpCBMEU/xGPgDGjVC3nO5ys=
-X-Google-Smtp-Source: ABdhPJywdOnD4uSlYBz32VRAwgXrN+9+mf99fmcszDbGJqPcxZdavp8IH+fWAcKgOh+Hrk7WwPqE6w==
-X-Received: by 2002:a05:6a00:158c:: with SMTP id u12mr35425442pfk.18.1643919132308;
-        Thu, 03 Feb 2022 12:12:12 -0800 (PST)
-Received: from localhost.localdomain (c-67-174-241-145.hsd1.ca.comcast.net. [67.174.241.145])
-        by smtp.gmail.com with ESMTPSA id nh18sm10727293pjb.18.2022.02.03.12.12.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Feb 2022 12:12:10 -0800 (PST)
-From:   Yang Shi <shy828301@gmail.com>
-To:     axboe@kernel.dk, hch@infradead.org, chaitanyak@nvidia.com,
-        rostedt@goodmis.org, xiyou.wangcong@gmail.com
-Cc:     shy828301@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [v6 PATCH] block: introduce block_rq_error tracepoint
-Date:   Thu,  3 Feb 2022 12:12:07 -0800
-Message-Id: <20220203201207.1075933-1-shy828301@gmail.com>
-X-Mailer: git-send-email 2.26.3
+        with ESMTP id S1354492AbiBCUcn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 15:32:43 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2105AC061714;
+        Thu,  3 Feb 2022 12:32:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D6602B835AE;
+        Thu,  3 Feb 2022 20:32:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB50C340F1;
+        Thu,  3 Feb 2022 20:32:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643920360;
+        bh=ifE1v8Glm0+46fo4SD9U2xsciJHsM1QktgWn5k6e/Yo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XJQPHt4mH+lBJOvpMviGDu2qe+aQiBZajoj+70NFkrhA246TInvWGo+8cJLQ2UIe/
+         Ps7uJzMduyHdiQFjBFMzM/DNxusjGXuBGEbvWnpsgwX6SOsBd5CQO9TrUO2cq0tE1i
+         nZd01TINUNAuLhfhLhGbYoGCxwejjIUtVPBgpHVgKgWhgowUk6eQslaxZAEYqivIfX
+         EXGhnvGhAaDacSlAextTUBQym1HErat95yTK5i3H0KWsvqMWSGSYyE24zQBs/jy/M2
+         D4CG16edG+qvr5rRGs2VbRKKDPzJ6uP4LIVPLotO9774FsODQvQjrbkGjoacE9pJBn
+         +JT1chWWuePpQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 51/52] block: add bio_start_io_acct_time() to control start_time
+Date:   Thu,  3 Feb 2022 15:29:45 -0500
+Message-Id: <20220203202947.2304-51-sashal@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220203202947.2304-1-sashal@kernel.org>
+References: <20220203202947.2304-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, rasdaemon uses the existing tracepoint block_rq_complete
-and filters out non-error cases in order to capture block disk errors.
+From: Mike Snitzer <snitzer@redhat.com>
 
-But there are a few problems with this approach:
+[ Upstream commit e45c47d1f94e0cc7b6b079fdb4bcce2995e2adc4 ]
 
-1. Even kernel trace filter could do the filtering work, there is
-   still some overhead after we enable this tracepoint.
+bio_start_io_acct_time() interface is like bio_start_io_acct() that
+allows start_time to be passed in. This gives drivers the ability to
+defer starting accounting until after IO is issued (but possibily not
+entirely due to bio splitting).
 
-2. The filter is merely based on errno, which does not align with kernel
-   logic to check the errors for print_req_error().
-
-3. block_rq_complete only provides dev major and minor to identify
-   the block device, it is not convenient to use in user-space.
-
-So introduce a new tracepoint block_rq_error just for the error case.
-With this patch, rasdaemon could switch to block_rq_error.
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Reviewed-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
-Signed-off-by: Yang Shi <shy828301@gmail.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Link: https://lore.kernel.org/r/20220128155841.39644-2-snitzer@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-The v3 patch was submitted in Feb 2020, and Steven reviewed the patch, but
-it was not merged to upstream. See
-https://lore.kernel.org/lkml/20200203053650.8923-1-xiyou.wangcong@gmail.com/.
+ block/blk-core.c       | 25 +++++++++++++++++++------
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 20 insertions(+), 6 deletions(-)
 
-The problems fixed by that patch still exist and we do need it to make
-disk error handling in rasdaemon easier. So this resurrected it and
-continued the version number.
-
-v5 --> v6:
- * Removed disk name per Christoph and Chaitanya
- * Kept errno since I didn't find any other block tracepoints print blk
-   status code and userspace (i.e. rasdaemon) does expect errno.
-v4 --> v5:
- * Report the actual block layer status code instead of the errno per
-   Christoph Hellwig.
-v3 --> v4:
- * Rebased to v5.17-rc1.
- * Collected reviewed-by tag from Steven.
-
- block/blk-mq.c               |  4 +++-
- include/trace/events/block.h | 39 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f3bf3358a3bb..4ca72ea917d4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -789,8 +789,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
- #endif
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 1378d084c770f..9ebeb9bdf5832 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1258,20 +1258,32 @@ void __blk_account_io_start(struct request *rq)
+ }
  
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
--		     !(req->rq_flags & RQF_QUIET)))
-+		     !(req->rq_flags & RQF_QUIET))) {
-+		trace_block_rq_error(req, error, nr_bytes);
- 		blk_print_req_error(req, error);
-+	}
+ static unsigned long __part_start_io_acct(struct block_device *part,
+-					  unsigned int sectors, unsigned int op)
++					  unsigned int sectors, unsigned int op,
++					  unsigned long start_time)
+ {
+ 	const int sgrp = op_stat_group(op);
+-	unsigned long now = READ_ONCE(jiffies);
  
- 	blk_account_io_completion(req, nr_bytes);
+ 	part_stat_lock();
+-	update_io_ticks(part, now, false);
++	update_io_ticks(part, start_time, false);
+ 	part_stat_inc(part, ios[sgrp]);
+ 	part_stat_add(part, sectors[sgrp], sectors);
+ 	part_stat_local_inc(part, in_flight[op_is_write(op)]);
+ 	part_stat_unlock();
  
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 27170e40e8c9..8c0bb06e16b8 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -144,6 +144,45 @@ TRACE_EVENT(block_rq_complete,
- 		  __entry->nr_sector, __entry->error)
- );
- 
+-	return now;
++	return start_time;
++}
++
 +/**
-+ * block_rq_error - block IO operation error reported by device driver
-+ * @rq: block operations request
-+ * @error: status code
-+ * @nr_bytes: number of completed bytes
-+ *
-+ * The block_rq_error tracepoint event indicates that some portion
-+ * of operation request has failed as reported by the device driver.
++ * bio_start_io_acct_time - start I/O accounting for bio based drivers
++ * @bio:	bio to start account for
++ * @start_time:	start time that should be passed back to bio_end_io_acct().
 + */
-+TRACE_EVENT(block_rq_error,
-+
-+	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
-+
-+	TP_ARGS(rq, error, nr_bytes),
-+
-+	TP_STRUCT__entry(
-+		__field(  dev_t,	dev			)
-+		__field(  sector_t,	sector			)
-+		__field(  unsigned int,	nr_sector		)
-+		__field(  int,		error			)
-+		__array(  char,		rwbs,	RWBS_LEN	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev	   = rq->q->disk ? disk_devt(rq->q->disk) : 0;
-+		__entry->sector    = blk_rq_pos(rq);
-+		__entry->nr_sector = nr_bytes >> 9;
-+		__entry->error     = blk_status_to_errno(error);
-+
-+		blk_fill_rwbs(__entry->rwbs, rq->cmd_flags);
-+	),
-+
-+	TP_printk("%d,%d %s %llu + %u [%d]",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev),
-+		  __entry->rwbs,
-+		  (unsigned long long)__entry->sector,
-+		  __entry->nr_sector, __entry->error)
-+);
-+
- DECLARE_EVENT_CLASS(block_rq,
++void bio_start_io_acct_time(struct bio *bio, unsigned long start_time)
++{
++	__part_start_io_acct(bio->bi_bdev, bio_sectors(bio),
++			     bio_op(bio), start_time);
+ }
++EXPORT_SYMBOL_GPL(bio_start_io_acct_time);
  
- 	TP_PROTO(struct request *rq),
+ /**
+  * bio_start_io_acct - start I/O accounting for bio based drivers
+@@ -1281,14 +1293,15 @@ static unsigned long __part_start_io_acct(struct block_device *part,
+  */
+ unsigned long bio_start_io_acct(struct bio *bio)
+ {
+-	return __part_start_io_acct(bio->bi_bdev, bio_sectors(bio), bio_op(bio));
++	return __part_start_io_acct(bio->bi_bdev, bio_sectors(bio),
++				    bio_op(bio), jiffies);
+ }
+ EXPORT_SYMBOL_GPL(bio_start_io_acct);
+ 
+ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
+ 				 unsigned int op)
+ {
+-	return __part_start_io_acct(disk->part0, sectors, op);
++	return __part_start_io_acct(disk->part0, sectors, op, jiffies);
+ }
+ EXPORT_SYMBOL(disk_start_io_acct);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bd4370baccca3..d73887c805e05 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1254,6 +1254,7 @@ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
+ void disk_end_io_acct(struct gendisk *disk, unsigned int op,
+ 		unsigned long start_time);
+ 
++void bio_start_io_acct_time(struct bio *bio, unsigned long start_time);
+ unsigned long bio_start_io_acct(struct bio *bio);
+ void bio_end_io_acct_remapped(struct bio *bio, unsigned long start_time,
+ 		struct block_device *orig_bdev);
 -- 
-2.26.3
+2.34.1
 
