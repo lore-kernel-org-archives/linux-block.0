@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2F7C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 20:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 192D7C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 20:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354512AbiBCUdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 15:33:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
+        id S1354807AbiBCUif (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 15:38:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354492AbiBCUcn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 15:32:43 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2105AC061714;
-        Thu,  3 Feb 2022 12:32:43 -0800 (PST)
+        with ESMTP id S1355442AbiBCUfw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 15:35:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE939C0613BB;
+        Thu,  3 Feb 2022 12:34:45 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D6602B835AE;
-        Thu,  3 Feb 2022 20:32:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB50C340F1;
-        Thu,  3 Feb 2022 20:32:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ABFD561A73;
+        Thu,  3 Feb 2022 20:34:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D8A3C36AE7;
+        Thu,  3 Feb 2022 20:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643920360;
-        bh=ifE1v8Glm0+46fo4SD9U2xsciJHsM1QktgWn5k6e/Yo=;
+        s=k20201202; t=1643920485;
+        bh=VxEQX6Dno7ifn5D1jOKQHelxxxyFWN1e7zDI/DHZSJs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XJQPHt4mH+lBJOvpMviGDu2qe+aQiBZajoj+70NFkrhA246TInvWGo+8cJLQ2UIe/
-         Ps7uJzMduyHdiQFjBFMzM/DNxusjGXuBGEbvWnpsgwX6SOsBd5CQO9TrUO2cq0tE1i
-         nZd01TINUNAuLhfhLhGbYoGCxwejjIUtVPBgpHVgKgWhgowUk6eQslaxZAEYqivIfX
-         EXGhnvGhAaDacSlAextTUBQym1HErat95yTK5i3H0KWsvqMWSGSYyE24zQBs/jy/M2
-         D4CG16edG+qvr5rRGs2VbRKKDPzJ6uP4LIVPLotO9774FsODQvQjrbkGjoacE9pJBn
-         +JT1chWWuePpQ==
+        b=Jos3s3uLYW3xdlYmDAhx36DlnRU2ogmYBvIr61sJjMzxMMTR7eYOmTNkfigZZ/bdm
+         6Y5nNjFt/pIY9UULMajsVhV50dEIMilNI5TzK7cZn+Ha9YCr2wZdQTpK9X9QnhaX8s
+         WKbuNJ9GKMYa2aKfoXvhF/p+ylnXYF9tjbxA7IIpgWvi3VuBvnwSXkQZnzNC789mf9
+         npYiIwarU5q6WhM7JQazrcAYYaN3Y5Glh498Ns4ZVDP4ghxl8f4GgcrB0jWFGLOpCl
+         Fu24iuhDr3UTp9vezfTLsAz7JvyLZEUEa4lCMTG06MmAER0J/monuq64ARalRbmZfl
+         ha58cfGXe9J+w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 51/52] block: add bio_start_io_acct_time() to control start_time
-Date:   Thu,  3 Feb 2022 15:29:45 -0500
-Message-Id: <20220203202947.2304-51-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 41/41] block: add bio_start_io_acct_time() to control start_time
+Date:   Thu,  3 Feb 2022 15:32:45 -0500
+Message-Id: <20220203203245.3007-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220203202947.2304-1-sashal@kernel.org>
-References: <20220203202947.2304-1-sashal@kernel.org>
+In-Reply-To: <20220203203245.3007-1-sashal@kernel.org>
+References: <20220203203245.3007-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 1378d084c770f..9ebeb9bdf5832 100644
+index c2d912d0c976c..d42a0f3ff7361 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -1258,20 +1258,32 @@ void __blk_account_io_start(struct request *rq)
+@@ -1293,20 +1293,32 @@ void blk_account_io_start(struct request *rq)
  }
  
  static unsigned long __part_start_io_acct(struct block_device *part,
@@ -110,7 +110,7 @@ index 1378d084c770f..9ebeb9bdf5832 100644
  
  /**
   * bio_start_io_acct - start I/O accounting for bio based drivers
-@@ -1281,14 +1293,15 @@ static unsigned long __part_start_io_acct(struct block_device *part,
+@@ -1316,14 +1328,15 @@ static unsigned long __part_start_io_acct(struct block_device *part,
   */
  unsigned long bio_start_io_acct(struct bio *bio)
  {
@@ -129,10 +129,10 @@ index 1378d084c770f..9ebeb9bdf5832 100644
  EXPORT_SYMBOL(disk_start_io_acct);
  
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bd4370baccca3..d73887c805e05 100644
+index 0a9fdcbbab83d..be8e7a55d803c 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1254,6 +1254,7 @@ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
+@@ -1947,6 +1947,7 @@ unsigned long disk_start_io_acct(struct gendisk *disk, unsigned int sectors,
  void disk_end_io_acct(struct gendisk *disk, unsigned int op,
  		unsigned long start_time);
  
