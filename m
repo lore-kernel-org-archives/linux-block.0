@@ -2,184 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63ADC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 03:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FB3C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 06:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238138AbiBCDkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Feb 2022 22:40:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231564AbiBCDkv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Feb 2022 22:40:51 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68EBC061714;
-        Wed,  2 Feb 2022 19:40:51 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id z4so3221308lft.3;
-        Wed, 02 Feb 2022 19:40:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uyEDTT7UWcx0aQYR+EyAeRErzTRFuEJTWicokIyg/X8=;
-        b=Cp35ItJkrFPCC1+ZfrNG4XN0hg6G4Yoy2CzfSRy2FWJCu4ia08qfUbOlOIeGcSjDK5
-         yVYxu3JN/E8ii1sk5h/UmG3QBO085GTVOSo6/DdsGFUwfV0KpwW4Gz8jTQsDVfSIRP7A
-         ClHkgzujvx8Gsi9gIufTJA9oaCJJafzXlHOkWX8L8PE2dwpNi6WRoO9fNiJRKoMssL35
-         pJqvekbdwqSOkUfPGsu07XLlvEDoeNyuLMZTexRwkfUHKX64IVjLsu/BWWQG4bDHnjhP
-         QLxwOaDWplkfF1MbfLZAxJlfeYWictcUCYDrgmug8bjBMXQNSHp6gVQKiX6eqoaCx8Xh
-         Z3Zg==
+        id S234224AbiBCG1r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 01:27:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53462 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231539AbiBCG1r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Feb 2022 01:27:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643869666;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4Q3hJgKl1GZvpzGFs1izzlrbs0UNXcazvIKGrrx7xHU=;
+        b=NDTle27wgLWvp93MGSCYusCBmWiI2+gy/xD+GZDQqSq/lNkiWDrD8erMpT56RR+PMstD7Y
+        +6eXTtBZT6vsfybCocVISW3Wk+QcbvqILLZRLz/xdrkwAvfJutpYP7oiv7ogu14DxD7W6d
+        tPNL1h3K69kYXLErcwmg3s34A1YHp+Y=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-w5O8NsURMpGzrxAByWRO4g-1; Thu, 03 Feb 2022 01:27:09 -0500
+X-MC-Unique: w5O8NsURMpGzrxAByWRO4g-1
+Received: by mail-wr1-f71.google.com with SMTP id s25-20020adfa299000000b001d8d032255fso273206wra.14
+        for <linux-block@vger.kernel.org>; Wed, 02 Feb 2022 22:27:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uyEDTT7UWcx0aQYR+EyAeRErzTRFuEJTWicokIyg/X8=;
-        b=0aYJfSvMTbex6Q1bTvlJB+cHGbr8ijNltl1y8zIRl9bX42Tub7mIhaoSd4hW7z0O+/
-         WMJKgtShGhdLH1RIByh8WGJPtsgQiCxFeME0LewQkZeGpBkeKXIOiz2/1F5mdsXRZ++1
-         rUF7amC65kWivFtiy1wmIGTddCkCAG9NVLnqKEJomMeIsdWyvFiV5D6QuebGvhkZl0il
-         r7ujmZaGNyxhFrAn6Zi3D8ONZL6vW/wLpWeWO689f1O8VHibt3HcqasXsSKk/h53fae1
-         B+ZRSc+UbQcTO+sE9g+c6M0DH2xZJJRF+WF60+z/wVRLcpJqvHcELuDGOqvU3n+Rdz36
-         J7Cg==
-X-Gm-Message-State: AOAM531g+xBcA6ZwhuhD7bJSptxgctDfV29m9hH5B6eygp0e/ETeO+ky
-        Z3ztbeuyEf+8mXuqIxzJYR+y/3CMTpQbdawJUFgcUa2R
-X-Google-Smtp-Source: ABdhPJzPg+zSnT0SKrtipmoLp2+mt0UbTrXwpd0OYsdp8nW2Rksld9GezBee71wcQB0o2Ra72WaOst/UsAeYF0J+Cn8=
-X-Received: by 2002:a19:ae04:: with SMTP id f4mr24353648lfc.667.1643859649878;
- Wed, 02 Feb 2022 19:40:49 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4Q3hJgKl1GZvpzGFs1izzlrbs0UNXcazvIKGrrx7xHU=;
+        b=dx/Vk3GBgS0BVK+MUP8KK+7ZsaYNJsUA3M4PaxK8GPGoafTO1yFut94PvpGYbhswuN
+         eFYW66X1l9ZabSaJDkuN40Cr5+CgiI/GZbLP0+xA908jhu6wtmObhrO84L8xvu4gaq7L
+         +caFTp6kO6yRscXoIqidcBQlvfs2wyYIqqSY0M8XeF/bRd9V7ugkZ/3HjySIdfjduYMe
+         Dfh6ZvOPqurx2Lwosazmk0AqVtVn1QyYTREWe6Ik4i9QRhB4Z7ZZtwhVMqUwMzADltlP
+         VYZuJcxrMOY/lqPykjEnwdAKNamY06T/z7MceZ66EIi0UoWPfuXNq4WXqFbY9UwjA5ou
+         n0Fg==
+X-Gm-Message-State: AOAM531P4JvR1pX98ec6vXo86mryhQB05l6+v76XprIFsVENLUTSzMjl
+        uaDqJMx0O72oXDYDx0bvRoe4DVPyS9iydVQIAPB67jlEMUPkFZ1ol3zNROLfm7XhZEY+tUbX6M4
+        LOoVHWeiSpOkws1624EkMxEE=
+X-Received: by 2002:a05:600c:19d2:: with SMTP id u18mr8762757wmq.101.1643869628587;
+        Wed, 02 Feb 2022 22:27:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzzwiRrXNiT1PFeEaEWqx53rsILaHA53YSG2uTc3uPWU3z3/gKj5cRHza8XX+2eY8cuzPj6uA==
+X-Received: by 2002:a05:600c:19d2:: with SMTP id u18mr8762735wmq.101.1643869628366;
+        Wed, 02 Feb 2022 22:27:08 -0800 (PST)
+Received: from redhat.com ([2.55.131.61])
+        by smtp.gmail.com with ESMTPSA id v3sm18549520wru.15.2022.02.02.22.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Feb 2022 22:27:07 -0800 (PST)
+Date:   Thu, 3 Feb 2022 01:27:04 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 2/5] virtio_blk: simplify refcounting
+Message-ID: <20220203012654-mutt-send-email-mst@kernel.org>
+References: <20220202155659.107895-1-hch@lst.de>
+ <20220202155659.107895-3-hch@lst.de>
 MIME-Version: 1.0
-References: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de> <C4E94EAA-7452-4D69-9C06-E5AD5B7A1F14@oracle.com>
-In-Reply-To: <C4E94EAA-7452-4D69-9C06-E5AD5B7A1F14@oracle.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 2 Feb 2022 21:40:39 -0600
-Message-ID: <CAH2r5msVxenATfo+7iu7kjsQXXXT0dq2jp2JSxrY5Qm2PEde5w@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC][LSF/MM/BPF ATTEND] TLS handshake for in-kernel consumers
-To:     Chuck Lever III <chuck.lever@oracle.com>
-Cc:     "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220202155659.107895-3-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an interesting question - and got me thinking about whether
-also could be helpful to the critical question we have been asked
-about multiple times for SMB, about how to get QUIC in the kernel (see
-the various Storage Developer Conference presentations etc), while
-putting as much as possible of the session establishment in userspace
-accessed via upcalls.
+On Wed, Feb 02, 2022 at 04:56:56PM +0100, Christoph Hellwig wrote:
+> Implement the ->free_disk method to free the virtio_blk structure only
+> once the last gendisk reference goes away instead of keeping a local
+> refcount.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I don't mind discussing this in detail at LSF (or at SambaXP a few
-weeks after LSF), and since there are some SMB servers that support
-QUIC already we could probably do at least some prototyping if there
-is overlap between these two efforts.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-On Wed, Feb 2, 2022 at 10:04 AM Chuck Lever III <chuck.lever@oracle.com> wrote:
->
-> [ ... adding NFS and CIFS ... ]
->
-> > On Feb 2, 2022, at 9:12 AM, Hannes Reinecke <hare@suse.de> wrote:
-> >
-> > Hi all,
-> >
-> > nvme-over-tcp has the option to utilize TLS for encrypted traffic, but due to the internal design of the nvme-over-fabrics stack we cannot initiate the TLS connection from userspace (as the current in-kernel TLS implementation is designed).
-> >
-> > This leaves us with two options:
-> > 1) Put TLS handshake into the kernel (which will be quite some
-> >  discussion as it's arguably a userspace configuration)
-> > 2) Pass an in-kernel socket to userspace and have a userspace
-> >  application to run the TLS handshake.
-> >
-> > None of these options are quiet clear cut, as we will be have to put
-> > quite some complexity into the kernel to do full TLS handshake (if we
-> > were to go with option 1) or will have to design a mechanism to pass
-> > an in-kernel socket to userspace as we don't do that currently (if we were going with option 2).
-> >
-> > We have been discussing some ideas on how to implement option 2 (together with Chuck Lever and the NFS crowd), but so far haven't been able to come up with a decent design.
-> >
-> > So I would like to discuss with interested parties on how TLS handshake could be facilitated, and what would be the best design options here.
->
-> IMO we are a bit farther along than Hannes suggests, and I had
-> the impression that we have already agreed on a "decent design"
-> (see Ben Coddington's earlier post).
->
-> We currently have several prototypes we can discuss, and there
-> are some important issues on the table.
->
-> First, from the start we have recognized that we have a range
-> of potential in-kernel TLS consumers. To name a few: NVMe/TLS,
-> RPC-with-TLS (for in-transit NFS encryption), CIFS/SMB, and,
-> when it arrives, the QUICv1 transport. We don't intend to
-> build something that works for only one of these, thus it
-> will not be based on existing security infrastructure like
-> rpc.gssd.
->
-> Second, we believe in-kernel consumers will hitch onto the
-> existing kTLS infrastructure to handle payload encryption and
-> decryption. This transparently enables both software-based
-> and offload, and in the latter case, we hope for quite
-> reasonable performance.
->
-> As Hannes said, the missing piece is support for the TLS
-> handshake protocol to boot strap each TLS session.
->
-> The security community has demanded that we stick with user
-> space handshake implementations because they view the TLS
-> handshake as complex and a broad attack surface. I question
-> those assumptions, but even so...
->
-> We will need to have in-kernel handshake to support NFSROOT
-> and NVMe/TLS with a root filesystem, which are requirements
-> for the storage community.
->
-> We have an in-kernel prototype based on Tempesta's TLSv1.2
-> offload in the works. See the "topic-rpc-with-tls" branch:
->
->  https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git
->
-> We also have three promising user space upcall implementations
-> that are helping us with architectural choices. The main issue
-> here is how to set the correct peer authentication parameters
-> for each handshake. As Ben said, key rings can play a critical
-> part (as might netlink, but perhaps that can be avoided). We
-> are sensitive to containerization requirements as well.
->
-> One (not-yet-working) user space prototype is published in
-> the "topic-rpc-with-tls-upcall" branch in the repo above.
->
->
-> > The proposed configd would be an option, but then we don't have that, either :-)
-> >
-> > Required attendees:
-> >
-> > Chuck Lever
-> > James Bottomley
-> > Sagi Grimberg
-> > Keith Busch
-> > Christoph Hellwig
-> > David Howells
->
-> Anyone from the CIFS team? Enzo? How about Dave Miller?
->
-> Actually I think we need to have security and network folks
-> at the table. LSF/MM might not be the right venue for a
-> full-scale discussion of alternatives. We have been waiting
-> for an opportunity to bring this to a broad community event
-> such as Plumbers but the pandemic has interfered.
->
-> However, I am happy to discuss alternative upcall mechanisms,
-> new requirements, and anything related to securing an
-> in-kernel handshake against remote attack.
->
-> --
-> Chuck Lever
->
->
->
+> ---
+>  drivers/block/virtio_blk.c | 64 +++++++-------------------------------
+>  1 file changed, 12 insertions(+), 52 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index c443cd64fc9b4..2d939ac1508c1 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -69,13 +69,6 @@ struct virtio_blk {
+>  	/* Process context for config space updates */
+>  	struct work_struct config_work;
+>  
+> -	/*
+> -	 * Tracks references from block_device_operations open/release and
+> -	 * virtio_driver probe/remove so this object can be freed once no
+> -	 * longer in use.
+> -	 */
+> -	refcount_t refs;
+> -
+>  	/* What host tells us, plus 2 for header & tailer. */
+>  	unsigned int sg_elems;
+>  
+> @@ -391,43 +384,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+>  	return err;
+>  }
+>  
+> -static void virtblk_get(struct virtio_blk *vblk)
+> -{
+> -	refcount_inc(&vblk->refs);
+> -}
+> -
+> -static void virtblk_put(struct virtio_blk *vblk)
+> -{
+> -	if (refcount_dec_and_test(&vblk->refs)) {
+> -		ida_simple_remove(&vd_index_ida, vblk->index);
+> -		mutex_destroy(&vblk->vdev_mutex);
+> -		kfree(vblk);
+> -	}
+> -}
+> -
+> -static int virtblk_open(struct block_device *bd, fmode_t mode)
+> -{
+> -	struct virtio_blk *vblk = bd->bd_disk->private_data;
+> -	int ret = 0;
+> -
+> -	mutex_lock(&vblk->vdev_mutex);
+> -
+> -	if (vblk->vdev)
+> -		virtblk_get(vblk);
+> -	else
+> -		ret = -ENXIO;
+> -
+> -	mutex_unlock(&vblk->vdev_mutex);
+> -	return ret;
+> -}
+> -
+> -static void virtblk_release(struct gendisk *disk, fmode_t mode)
+> -{
+> -	struct virtio_blk *vblk = disk->private_data;
+> -
+> -	virtblk_put(vblk);
+> -}
+> -
+>  /* We provide getgeo only to please some old bootloader/partitioning tools */
+>  static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+>  {
+> @@ -460,11 +416,19 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+>  	return ret;
+>  }
+>  
+> +static void virtblk_free_disk(struct gendisk *disk)
+> +{
+> +	struct virtio_blk *vblk = disk->private_data;
+> +
+> +	ida_simple_remove(&vd_index_ida, vblk->index);
+> +	mutex_destroy(&vblk->vdev_mutex);
+> +	kfree(vblk);
+> +}
+> +
+>  static const struct block_device_operations virtblk_fops = {
+> -	.owner  = THIS_MODULE,
+> -	.open = virtblk_open,
+> -	.release = virtblk_release,
+> -	.getgeo = virtblk_getgeo,
+> +	.owner  	= THIS_MODULE,
+> +	.getgeo		= virtblk_getgeo,
+> +	.free_disk	= virtblk_free_disk,
+>  };
+>  
+>  static int index_to_minor(int index)
+> @@ -791,8 +755,6 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  		goto out_free_index;
+>  	}
+>  
+> -	/* This reference is dropped in virtblk_remove(). */
+> -	refcount_set(&vblk->refs, 1);
+>  	mutex_init(&vblk->vdev_mutex);
+>  
+>  	vblk->vdev = vdev;
+> @@ -985,8 +947,6 @@ static void virtblk_remove(struct virtio_device *vdev)
+>  	kfree(vblk->vqs);
+>  
+>  	mutex_unlock(&vblk->vdev_mutex);
+> -
+> -	virtblk_put(vblk);
+>  }
+>  
+>  #ifdef CONFIG_PM_SLEEP
+> -- 
+> 2.30.2
 
-
--- 
-Thanks,
-
-Steve
