@@ -2,136 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B2CC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 13:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4CDAC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 15:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbiBCNrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 08:47:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbiBCNrH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 08:47:07 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACF3C061714
-        for <linux-block@vger.kernel.org>; Thu,  3 Feb 2022 05:47:07 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id p12-20020a17090a2d8c00b001b833dec394so3086449pjd.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Feb 2022 05:47:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4lH2VgPBXYRbIhRugnUOELNcQmdFJ96oasF65A9Co/Q=;
-        b=4PvRoUTgpElxfl/Go44GA2aaNrScwzjhcWR99CInOd7e1l5EZj2NAPZZIURjbYZWzq
-         JtR4InT15njGIPaeLn+76hBlX6Oj7FO5myCTILI5SEAI3/gIokoEiWOHaoJT6RNGDm96
-         s2bh9qgnzvypbzsa9RP63SfDS1nnQubTIGSEnGf1vodzaMwigBHzudA4gjkp3N9XWzvy
-         P8UQ5jLKH/idWYjzg8PayenbtEK3naZXT1nDMuqUMFNg5U1/LOK+E3dXKDGio2da+mkF
-         INbaGB56lah1TXPk3PpUQB2mts4P/srDseppvn0Ndo9Y024IUTCmG2/xlEabHKBXz4ou
-         fF7g==
+        id S1351924AbiBCPit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 10:38:49 -0500
+Received: from mail-pf1-f179.google.com ([209.85.210.179]:37476 "EHLO
+        mail-pf1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351905AbiBCPis (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 10:38:48 -0500
+Received: by mail-pf1-f179.google.com with SMTP id y5so1603301pfe.4;
+        Thu, 03 Feb 2022 07:38:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4lH2VgPBXYRbIhRugnUOELNcQmdFJ96oasF65A9Co/Q=;
-        b=FRTLVqKEmdzaI3eGDwoi+ODD+bI2J86+IP0OTunOuPGSmCClYYNPJvviSnBfpSysX5
-         vxaniOlnTJ3UiFq4NIfq9tEGbWbwlHnqEV4VrplVuj07NcgLoyYXdE5zvCLS9VK2YQt6
-         VC5R+ZRgEBKlyPHuXVKI6MB4xHdpSCPzlG2kw3cjZ5vDYqKoVOiWnBEORqIUGO/3CTSV
-         JVRAqVE7yiPiY+i/KSDwOy1qOI1MJiXKvr7Y3g+YjxevXYuByn29hBPP+JTCUanA4T3j
-         wBLFN1wGCVulEWptI2n4DbsZRERsiQsh6ZtVAtf5qHVadWofYo/SCfcxEkb2gHdtLD7e
-         F1RA==
-X-Gm-Message-State: AOAM533LUi7nyOdfTK/WcwjkuRxq8An7y6Ri9kdvDGmUyLymyLyTOeYf
-        XBLUxw6UDEwJTNyM8CnGamm1BLueRSHfeg==
-X-Google-Smtp-Source: ABdhPJy4n/BftDa7LWNvKG9wfAOMBEYieimwvOR+N8ucNn6mXZkLOo/h1yGZrveoUe6eZYLz9PpZEQ==
-X-Received: by 2002:a17:902:d50f:: with SMTP id b15mr1634677plg.54.1643896026771;
-        Thu, 03 Feb 2022 05:47:06 -0800 (PST)
-Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id e3sm22669698pgc.41.2022.02.03.05.47.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Feb 2022 05:47:06 -0800 (PST)
-Subject: Re: [PATCH 1/2] block: introduce BLK_STS_OFFLINE
-To:     Hannes Reinecke <hare@suse.de>, Song Liu <song@kernel.org>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     Kernel Team <kernel-team@fb.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20220203064009.1795344-1-song@kernel.org>
- <20220203064009.1795344-2-song@kernel.org>
- <CAPhsuW6PNaYUb5xDxPX_gX=2fZdiRURRos5sT_Tsbngon1+eKw@mail.gmail.com>
- <f7489746-b8fb-bc9a-a706-e5926fa9e325@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <27583256-dc7d-74bd-115c-b0c835cd5c1b@kernel.dk>
-Date:   Thu, 3 Feb 2022 06:47:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hJc80QrxeNpdYK/bKJzdbQZVP7dPgDgH6+/SL6BaJLA=;
+        b=doU45sIK+CSec063wF0MiToitTNSaakQmJ9w4k/ShF5SmY6NH+n3Q/9rT59IZLyXK2
+         5lf1kZqpIVnQgIRFH5twfJTXc9IgB4rHHCq8ilKrW3kb8HOAnSoZ3025pcLHO3f2EsrN
+         /1uNBpV4FHgqnsgbTs6v/TZcDq7Ixtbc1or142TmMy+9d/RExvWvsMvZQbLvMfQNAUXf
+         R6bCdJ9Q4MckZJAJ8z0DKE9ad0wlwQg0rDbDtLeGOf3y7w4IFK2SSedS7o+VaksAIMnT
+         6e6RfVtt3FfRERL8pKeO+vjPuLqZzpfESeRgnMzW1S7bfJuaxOuzOfYNl9ZdG6H+wjvK
+         ysdA==
+X-Gm-Message-State: AOAM530AglalReux9/ieAPVUL++rJI1U7w6m78ZSWiTy7sGV5RegGGJV
+        CqaMWRHTQQHu8FoHCqXx+0A=
+X-Google-Smtp-Source: ABdhPJyK53iWqvFX2Vqq2e4bGH4TKRnnEI6Nef430vI4MXHRwAQ64yyEJcJ63nBPtWhhnkJ6Y3aDlw==
+X-Received: by 2002:a63:68c4:: with SMTP id d187mr15183399pgc.603.1643902727819;
+        Thu, 03 Feb 2022 07:38:47 -0800 (PST)
+Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
+        by smtp.gmail.com with ESMTPSA id b12sm12465462pfm.154.2022.02.03.07.38.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Feb 2022 07:38:46 -0800 (PST)
+Date:   Thu, 3 Feb 2022 07:38:43 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "kbus @imap.gmail.com>> Keith Busch" <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [RFC PATCH 3/3] nvme: add the "debug" host driver
+Message-ID: <20220203153843.szbd4n65ru4fx5hx@garbanzo>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
+ <20220201102122.4okwj2gipjbvuyux@mpHalley-2>
+ <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2202011333160.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <270f30df-f14c-b9e4-253f-bff047d32ff0@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <f7489746-b8fb-bc9a-a706-e5926fa9e325@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <270f30df-f14c-b9e4-253f-bff047d32ff0@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/3/22 12:24 AM, Hannes Reinecke wrote:
-> On 2/3/22 07:52, Song Liu wrote:
->> CC linux-block (it was a typo in the original email)
->>
->> On Wed, Feb 2, 2022 at 10:40 PM Song Liu <song@kernel.org> wrote:
->>>
->>> Currently, drivers reports BLK_STS_IOERR for devices that are not full
->>> online or being removed. This behavior could cause confusion for users,
->>> as they are not really I/O errors from the device.
->>>
->>> Solve this issue with a new state BLK_STS_OFFLINE, which reports "device
->>> offline error" in dmesg instead of "I/O error".
->>>
->>> Signed-off-by: Song Liu <song@kernel.org>
->>> ---
->>>   block/blk-core.c          | 1 +
->>>   include/linux/blk_types.h | 7 +++++++
->>>   2 files changed, 8 insertions(+)
->>>
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index 61f6a0dc4511..24035dd2eef1 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -164,6 +164,7 @@ static const struct {
->>>          [BLK_STS_RESOURCE]      = { -ENOMEM,    "kernel resource" },
->>>          [BLK_STS_DEV_RESOURCE]  = { -EBUSY,     "device resource" },
->>>          [BLK_STS_AGAIN]         = { -EAGAIN,    "nonblocking retry" },
->>> +       [BLK_STS_OFFLINE]       = { -EIO,       "device offline" },
->>>
->>>          /* device mapper special case, should not leak out: */
->>>          [BLK_STS_DM_REQUEUE]    = { -EREMCHG, "dm internal retry" },
->>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->>> index fe065c394fff..5561e58d158a 100644
->>> --- a/include/linux/blk_types.h
->>> +++ b/include/linux/blk_types.h
->>> @@ -153,6 +153,13 @@ typedef u8 __bitwise blk_status_t;
->>>    */
->>>   #define BLK_STS_ZONE_ACTIVE_RESOURCE   ((__force blk_status_t)16)
->>>
->>> +/*
->>> + * BLK_STS_OFFLINE is returned from the driver when the target device is offline
->>> + * or is being taken offline. This could help differentiate the case where a
->>> + * device is intentionally being shut down from a real I/O error.
->>> + */
->>> +#define BLK_STS_OFFLINE                ((__force blk_status_t)17)
->>> +
->>>   /**
->>>    * blk_path_error - returns true if error may be path related
->>>    * @error: status the request was completed with
->>> --
->>> 2.30.2
->>>
-> Please do not overload EIO here.
-> EIO already is a catch-all error if we don't know any better, but for 
-> the 'device offline' case we do (or rather should).
-> Please map it onto 'ENODEV' or 'ENXIO'.
+On Wed, Feb 02, 2022 at 08:00:12AM +0000, Chaitanya Kulkarni wrote:
+> Mikulas,
+> 
+> On 2/1/22 10:33 AM, Mikulas Patocka wrote:
+> > External email: Use caution opening links or attachments
+> > 
+> > 
+> > This patch adds a new driver "nvme-debug". It uses memory as a backing
+> > store and it is used to test the copy offload functionality.
+> > 
+> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> > 
+> 
+> 
+> NVMe Controller specific memory backed features needs to go into
+> QEMU which are targeted for testing and debugging, just like what
+> we have done for NVMe ZNS QEMU support and not in kernel.
+> 
+> I don't see any special reason to make copy offload an exception.
 
-It's deliberately EIO as not to force a change in behavior. I don't mind
-using something else, but that should be a separate change then.
+One can instantiate scsi devices with qemu by using fake scsi devices,
+but one can also just use scsi_debug to do the same. I see both efforts
+as desirable, so long as someone mantains this.
 
--- 
-Jens Axboe
+For instance, blktests uses scsi_debug for simplicity.
 
+In the end you decide what you want to use.
+
+  Luis
