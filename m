@@ -2,213 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C34FC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 17:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67412C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 18:21:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242852AbiBCRXP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 12:23:15 -0500
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:30682 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231389AbiBCRXP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Feb 2022 12:23:15 -0500
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 213HKtNW020585;
-        Thu, 3 Feb 2022 09:23:14 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : mime-version; s=facebook;
- bh=yvUWJqMfsSwPQKo18bJhoegbjawAt5Y2tF6mdrauLNg=;
- b=j3K16vhf0LHIm2XmuAl0Ep+dVbrWeN+xqU1TraaFfh7u0Ua+yv0SMo149ZNP4UzpOAh/
- PG1+6BCOC8t1jFK2FsmqAIiTvdfm6AGn1Qk1WDsL42LHy4+0hBcABGxJg+UXJyIvx/YU
- 5qo1/s3MONIGwWgzIbyjZ9xC6fnjoi8HCkk= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3e05sncne4-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Thu, 03 Feb 2022 09:23:14 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.35.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 3 Feb 2022 09:23:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h1qBRnKkmlbAOfK4LFYMiqxZsvoff8wHA0NKOkUXMJEtejELsZeUC0Y/7OpbHWNO9mC4z47lp747luYWjgE1CmfWi5UHvkiLOhOpjwSXt7KlE9GeXpsiN2nVluahvLpfuTgb0OBxuSF6yU4x7VgyIE98Btgg6hZ0psxDwZnPAigvNKVy3r3rhS/LhLZCtsPn1wKCllM/IWBft59jZ2ZZAYMHcA/Oh6E6oOaBMsMERK/X0M6Rnmd+9IvYFEHMLzj3jBd1qTMvN6188TUf5iWMabtdCQTlSZbbJ3kX+PDJYYoYuJeixPAYF7Ckcda1cTsZKf1YfKD/NcBfCaOQsU6VjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yvUWJqMfsSwPQKo18bJhoegbjawAt5Y2tF6mdrauLNg=;
- b=av/Ewd32YqH5TnAyam/FshU06gU/WKvJKftHx/O7h5p3Q2b6c7nSeuQ0nZZi7Fb+uyNyWIdhXPr1eiHsbUXJbu03q892Qo87VSwaScFcjbQ5BraB0a4ts9zViDS7oOoneENGZkorWi621odlQ5sYa1Cl6LGHASlM48VPNFKeX2MGtYn6gUyYdmcXugi4NIjQIhSThM4iddlk18V1DjUbbT4M//EHLI7BLZWx0qgh4fRpjv67iOxAT80VXJ6BIWE8+/PvrD1+XxoUifVuCwqvpmY0jdOxZ74Z1IK5paSKRk61RY30QD34OHSpL5csEO7JTkVlBPZIebUXggRZpEqh+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from SA1PR15MB5109.namprd15.prod.outlook.com (2603:10b6:806:1dc::10)
- by CY4PR15MB1622.namprd15.prod.outlook.com (2603:10b6:903:134::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Thu, 3 Feb
- 2022 17:23:09 +0000
-Received: from SA1PR15MB5109.namprd15.prod.outlook.com
- ([fe80::cd7f:351f:8939:596e]) by SA1PR15MB5109.namprd15.prod.outlook.com
- ([fe80::cd7f:351f:8939:596e%4]) with mapi id 15.20.4951.012; Thu, 3 Feb 2022
- 17:23:09 +0000
-From:   Song Liu <songliubraving@fb.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     Hannes Reinecke <hare@suse.de>, Song Liu <song@kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 1/2] block: introduce BLK_STS_OFFLINE
-Thread-Topic: [PATCH 1/2] block: introduce BLK_STS_OFFLINE
-Thread-Index: AQHYGMjwyuZSzyBrcUKDpa/SuWPXVqyBY7UAgAAIyICAAGr/gIAAPF4A
-Date:   Thu, 3 Feb 2022 17:23:09 +0000
-Message-ID: <C3D342B9-C4D0-4C3A-9582-EB15A5F5D7FF@fb.com>
-References: <20220203064009.1795344-1-song@kernel.org>
- <20220203064009.1795344-2-song@kernel.org>
- <CAPhsuW6PNaYUb5xDxPX_gX=2fZdiRURRos5sT_Tsbngon1+eKw@mail.gmail.com>
- <f7489746-b8fb-bc9a-a706-e5926fa9e325@suse.de>
- <27583256-dc7d-74bd-115c-b0c835cd5c1b@kernel.dk>
-In-Reply-To: <27583256-dc7d-74bd-115c-b0c835cd5c1b@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3693.40.0.1.81)
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c5361531-37ac-44c6-242c-08d9e739d982
-x-ms-traffictypediagnostic: CY4PR15MB1622:EE_
-x-microsoft-antispam-prvs: <CY4PR15MB1622F137B47894D74FE4701BB3289@CY4PR15MB1622.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jABASh8CkDp+iiot1USThRfKiN+tQ+HJuoLp1eRNmJCOrWQuIdbQYbLL9pSZZWogSDfWfW39ed++Qzzl+xP5DGodeY/cMQoBmDF/3VLFlStZZqn7Oq9hX9ksZ5OcBsC2IM90W2iaQ3asbZ1tpWMGV6QcyI9lTgAXVFIu2yAb9ZcJthi4BjJdRFOQUq4u+TXsiRx1AW+P4/6Feq854+loiyiZCgsimjeFCwIg9esgpoknxgycng73e7K1OJTGRjpu2tTE6908el0M9614sLY1WRVlbfKOL59CR8qBBTo3W5G86SSL6IKlZS7Fzv9bpjfGS+MtKwvht2NqOuuUA/PF/FEsJde5S/VbDhDDQtARbMQbORvAdWCv++ENQxx0ny4onOWf1huEYAdBwejMXuZlz7LCTSn/f+AuepbHJ9hxon8DVfdrigFDFj6V7d8XG1FFsXp6rh4V1jGsbsC+nRHY/56wYV5k2aF6NtOBJGNVcpbt82fTUwViSgysfoYkvM3O198EnyYS9yl9TcN5ONS7ceRIZ0hOvdjMpkXvkUQatTjsaFkFzHf4kikVuEyMUb3wJvAvFTX3NzoBtf2mDQKacforoBf7Du2eYvh7Ugb23kTC5WYWGykGr4Nr5jc9UMPgkI17/lt7YH6u5hErDycgTciqjoWrctR2QjGuH0ZAtGgg/Ha8SjSycc47vDuf2Na/QgnDyORYKZaEVu3hR4J9MBGRyw3WH+ZTSmTxCs6OfYESzuxk8h6/Y8roDFXb1lhk
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR15MB5109.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(54906003)(6916009)(38100700002)(508600001)(6512007)(316002)(86362001)(36756003)(38070700005)(6486002)(33656002)(8936002)(8676002)(66476007)(66556008)(71200400001)(66946007)(91956017)(76116006)(83380400001)(6506007)(186003)(122000001)(2616005)(2906002)(4326008)(66446008)(53546011)(64756008)(5660300002)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?t0FbustmxuO9cR6w9tRzdYnUm0FD0/X0a8s/OogNA1FlsA5Kpi0icaelMoEm?=
- =?us-ascii?Q?+V320/ETQZwwfcc/Abt6HmXE0BBoqp6/Fcbou/JVKkdPG6sNv6G1YCSmdnV4?=
- =?us-ascii?Q?MmWsrnyqWN/OuzewcWXBCfm4UBJr9fMZltgplqQixTCL8H3jFBIadx8KlPFQ?=
- =?us-ascii?Q?lB0jWpIuq47SuoC+kpUlAQNOLC+enWvcFs42hvQzECqq+hBK66ZTpjLJ6IpO?=
- =?us-ascii?Q?Gfs/XR1ANsewUP2YEO7wykXbkoJR3fs5WbES8YJOLpCEna2AqttaH3nEQwjK?=
- =?us-ascii?Q?oWg3x/Coazov2ouhVB7OlX1/HPpJVJ4ppxdu3NU6A3Yfd3jCwNa/juPTxdtY?=
- =?us-ascii?Q?XyPEsYYDohKm/h150XjfITSV28ViBvVvoGXUxTkhpzh8k7ukm9CPwN9hnc3M?=
- =?us-ascii?Q?OSVD06rEU20cDy9L4H3efWa9hqYHNb6e2MUu9jJPBTy3x4BO77Fg3vTGl21t?=
- =?us-ascii?Q?2jKwvwFJlkMua7oXhdU/MTlbk1nCEuMdPuhCsxoSq7lhKjY8HdcIBZE4FtKm?=
- =?us-ascii?Q?cvCsOJFiUOf2L3o8jU9EwswxbmaPQKEfsryNjA8qfejmP7tPXZ2QHEMke04U?=
- =?us-ascii?Q?K3u42spotH842H/+0AXDlEW2PXLqUwXhO1BszKt4ZvDZTi0jo7tMOGEQmjfA?=
- =?us-ascii?Q?lUpzI4Abc4cYhZybWz89MYqkBmcIaQxWN0oyd00fUZZGdOjt+pXd9KlWKhZ7?=
- =?us-ascii?Q?HhjHZLrwrMn0HHRmtVO+ZAx9uOxhhVc4cdaAdp/pOVcAJAljC5C+QV/2T6J3?=
- =?us-ascii?Q?86drTnFNbLUv81VREtU8CcOfIpY+6kVcIlsOeUuITOc7ylbvvCLq3Nk+jam4?=
- =?us-ascii?Q?bz/ncHPe1I4Qx31gUzBkBKdSvwpZiM3axXl/4UdKYjSPGWM6AQ4NBF+lsMZ3?=
- =?us-ascii?Q?e9zu/NVYtwPCSliHMXwA016lu68aoKVbJf25P0cvpjZ+uKt/mrJI30vUERCn?=
- =?us-ascii?Q?tG4B/qg4g30qPNgl4Ggc1zTLawrzbq6Ojn9fj+ovXecwQxkOQUFmTUWlr+sB?=
- =?us-ascii?Q?lREOBSbenI4xSjqNbdZgXUWQZTdB5fKMZuN8xrtVCI6UEYkGbf+8YArx1ZFx?=
- =?us-ascii?Q?GghLglAQQTKFU0kMPZfYF3DFQE5vdi8e5dhzagtlDckrbqlkQbph9InQ1DQw?=
- =?us-ascii?Q?C6P5nVNtQP7bpWPBM/wGrUXjQDEMRsNs2cVqfO3cuJ7s6p0koxYCgXN6bRXU?=
- =?us-ascii?Q?Ddtn8cLOsX+dMw8AcIwfSxPeepcED7lcuvMsBcdvwylpih/Cic9gOnKFa/vw?=
- =?us-ascii?Q?5hKqbBX9sj0LQ14YYMtkTeeL9wHaRlwipQUcwFknhXiFW0m4y7pnsus8Mg8b?=
- =?us-ascii?Q?+IUuQnLqqcULMkpez9SEPLuxabTPTs6DnFF2fI8OQCLcyAm7X44RnKPm1iiw?=
- =?us-ascii?Q?hYxVpX3btBmi+lRhY8B4G9QGXsHhOZLXAXhhPWdW6eAOg/UNUBpB8EzV2i2p?=
- =?us-ascii?Q?+hFhdCvG+BnGldN1NI9QNfXmyvsMF/tzeAp7CSgNkm3L/Yj/3OTEdDgz5oc+?=
- =?us-ascii?Q?Ct7MbuIGCLssAvbj7nPoFDy2+bc3xI5jwSvG6UhBkXRCIhmzx2ZyG4k2F+yE?=
- =?us-ascii?Q?ZexggSj1/003X2O9gmVz4bGM/vg1HfJiysI/3qRSe4mnjDgHIILHigRD//Kw?=
- =?us-ascii?Q?4v7rsVOe656AzPhacgKc1Fwcd2OJF4ncR7eJ5kxnen0uvzAPIGbGHR5WEfx9?=
- =?us-ascii?Q?5REQ7A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <B31EEF27F1AC97419DA69F1812ADE441@namprd15.prod.outlook.com>
+        id S1353384AbiBCSVV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 13:21:21 -0500
+Received: from mail-il1-f199.google.com ([209.85.166.199]:42653 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353359AbiBCSVU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 13:21:20 -0500
+Received: by mail-il1-f199.google.com with SMTP id l10-20020a056e020dca00b002badca9390eso2240616ilj.9
+        for <linux-block@vger.kernel.org>; Thu, 03 Feb 2022 10:21:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=YJwkvjDZtoFvou/XeL//kDGHxyur+FvYXZqDkXgxerQ=;
+        b=Wb5oWzKWvh2lIUhzVhKxrVjllCGe5gx+vpWUFqyZXygFPLQXiQoIGqAonJDiKaYIT7
+         MC7p3EYQobGp788Oz8B8LYGGQFYanb5mN8kZLMgQCvzahg91sxvQoWwFLsNp80vXWTIv
+         Y97V8F6KCASkmA8Cd9qYAr/BaeUipN6/bM+eTG6TnCzu7ssKeRCR/rlueFLZSGYnGKBN
+         QpAlWhbNH0sXmuKu5SGGVQrhrAoJAXugMelAgcA0Lqv4n5iZ9Hc6sBfYwhHkYceqi55H
+         ARIw+v06oatSLvFAma0qNQGxl/ZxdBRx8b81NbTlXZzXtz9eQZ/51kQ7MAh8IDydsAzZ
+         XzNg==
+X-Gm-Message-State: AOAM531r2rMdFW5eJxBssaowveYi6ZZqmUizRYDa60obXWCAU6vH2Ww/
+        5vjA/ecO4R29VwrJOuKlpU5Ke+ndJ2fd9fLWD1Y8uCAy/wq5
+X-Google-Smtp-Source: ABdhPJyX2fKmFCd+QpNNJ3kd0vnZJd34rXvJtqwsbLa0MTjeKF92b4+SnnvvoY3CvoJUKH+z26sehsf+A1AwCasi5Sew25ZGEGeZ
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR15MB5109.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5361531-37ac-44c6-242c-08d9e739d982
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Feb 2022 17:23:09.7191
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mNI2/YaUBSpEmQCJvA6RT3w5RICnmZoZJkwOvfvLXrf7XsEogbkU6NML1/LWZRDcGy8gxIxMEr+QTJKMO3OC/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR15MB1622
-X-OriginatorOrg: fb.com
-X-Proofpoint-ORIG-GUID: 9mBVDmm3jni78MlNBDxaWRRhhqaym1WP
-X-Proofpoint-GUID: 9mBVDmm3jni78MlNBDxaWRRhhqaym1WP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-03_06,2022-02-03_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 clxscore=1011
- impostorscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
- mlxlogscore=999 priorityscore=1501 suspectscore=0 mlxscore=0 spamscore=0
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202030105
-X-FB-Internal: deliver
+X-Received: by 2002:a92:d387:: with SMTP id o7mr21518039ilo.26.1643912480285;
+ Thu, 03 Feb 2022 10:21:20 -0800 (PST)
+Date:   Thu, 03 Feb 2022 10:21:20 -0800
+In-Reply-To: <0000000000008c32e305d6d8e802@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006de93f05d721334b@google.com>
+Subject: Re: [syzbot] general protection fault in submit_bio_checks
+From:   syzbot <syzbot+2b3f18414c37b42dcc94@syzkaller.appspotmail.com>
+To:     andrii@kernel.org, ast@kernel.org, axboe@kernel.dk,
+        bpf@vger.kernel.org, daniel@iogearbox.net,
+        john.fastabend@gmail.com, kafai@fb.com, kpsingh@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, songliubraving@fb.com,
+        syzkaller-bugs@googlegroups.com, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Hannes and Jens,
+syzbot has found a reproducer for the following issue on:
 
-> On Feb 3, 2022, at 5:47 AM, Jens Axboe <axboe@kernel.dk> wrote:
-> 
-> On 2/3/22 12:24 AM, Hannes Reinecke wrote:
->> On 2/3/22 07:52, Song Liu wrote:
->>> CC linux-block (it was a typo in the original email)
->>> 
->>> On Wed, Feb 2, 2022 at 10:40 PM Song Liu <song@kernel.org> wrote:
->>>> 
->>>> Currently, drivers reports BLK_STS_IOERR for devices that are not full
->>>> online or being removed. This behavior could cause confusion for users,
->>>> as they are not really I/O errors from the device.
->>>> 
->>>> Solve this issue with a new state BLK_STS_OFFLINE, which reports "device
->>>> offline error" in dmesg instead of "I/O error".
->>>> 
->>>> Signed-off-by: Song Liu <song@kernel.org>
->>>> ---
->>>>  block/blk-core.c          | 1 +
->>>>  include/linux/blk_types.h | 7 +++++++
->>>>  2 files changed, 8 insertions(+)
->>>> 
->>>> diff --git a/block/blk-core.c b/block/blk-core.c
->>>> index 61f6a0dc4511..24035dd2eef1 100644
->>>> --- a/block/blk-core.c
->>>> +++ b/block/blk-core.c
->>>> @@ -164,6 +164,7 @@ static const struct {
->>>>         [BLK_STS_RESOURCE]      = { -ENOMEM,    "kernel resource" },
->>>>         [BLK_STS_DEV_RESOURCE]  = { -EBUSY,     "device resource" },
->>>>         [BLK_STS_AGAIN]         = { -EAGAIN,    "nonblocking retry" },
->>>> +       [BLK_STS_OFFLINE]       = { -EIO,       "device offline" },
->>>> 
->>>>         /* device mapper special case, should not leak out: */
->>>>         [BLK_STS_DM_REQUEUE]    = { -EREMCHG, "dm internal retry" },
->>>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->>>> index fe065c394fff..5561e58d158a 100644
->>>> --- a/include/linux/blk_types.h
->>>> +++ b/include/linux/blk_types.h
->>>> @@ -153,6 +153,13 @@ typedef u8 __bitwise blk_status_t;
->>>>   */
->>>>  #define BLK_STS_ZONE_ACTIVE_RESOURCE   ((__force blk_status_t)16)
->>>> 
->>>> +/*
->>>> + * BLK_STS_OFFLINE is returned from the driver when the target device is offline
->>>> + * or is being taken offline. This could help differentiate the case where a
->>>> + * device is intentionally being shut down from a real I/O error.
->>>> + */
->>>> +#define BLK_STS_OFFLINE                ((__force blk_status_t)17)
->>>> +
->>>>  /**
->>>>   * blk_path_error - returns true if error may be path related
->>>>   * @error: status the request was completed with
->>>> --
->>>> 2.30.2
->>>> 
->> Please do not overload EIO here.
->> EIO already is a catch-all error if we don't know any better, but for 
->> the 'device offline' case we do (or rather should).
->> Please map it onto 'ENODEV' or 'ENXIO'.
-> 
-> It's deliberately EIO as not to force a change in behavior. I don't mind
-> using something else, but that should be a separate change then.
+HEAD commit:    2d3d8c7643a5 Add linux-next specific files for 20220203
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14c0c8dc700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=27a9abf2c11167c7
+dashboard link: https://syzkaller.appspot.com/bug?extid=2b3f18414c37b42dcc94
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14635480700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10eb2d14700000
 
-Thanks for these feedbacks. Shall I send v2 with an extra patch that 
-changes EIO to ENODEV/ENXIO? Or shall we do that in a follow up patch? 
-Also, any preference between ENODEV and ENXIO? 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2b3f18414c37b42dcc94@syzkaller.appspotmail.com
 
-Thanks,
-Song
+BTRFS info (device loop0): disk space caching is enabled
+BTRFS info (device loop0): has skinny extents
+BTRFS info (device loop0): enabling ssd optimizations
+general protection fault, probably for non-canonical address 0xdffffc000000002f: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000178-0x000000000000017f]
+CPU: 0 PID: 3586 Comm: syz-executor095 Not tainted 5.17.0-rc2-next-20220203-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:blk_throtl_bio block/blk-throttle.h:175 [inline]
+RIP: 0010:submit_bio_checks+0x7c0/0x1bf0 block/blk-core.c:765
+Code: 08 3c 03 0f 8e 4a 11 00 00 48 b8 00 00 00 00 00 fc ff df 44 8b 6d 10 41 83 e5 01 4a 8d bc 2b 7c 01 00 00 48 89 fa 48 c1 ea 03 <0f> b6 04 02 48 89 fa 83 e2 07 38 d0 7f 08 84 c0 0f 85 09 11 00 00
+RSP: 0018:ffffc9000293f278 EFLAGS: 00010203
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 000000000000002f RSI: ffffffff83d5d9de RDI: 000000000000017d
+RBP: ffff888014fbd300 R08: ffffffff8a044f00 R09: 0000000000000000
+R10: ffffffff83d5d9d0 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000001 R14: 00000000fffffffe R15: ffff88801a2be93c
+FS:  0000555555975300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9789f79668 CR3: 00000000145d1000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __submit_bio+0xaf/0x360 block/blk-core.c:802
+ __submit_bio_noacct_mq block/blk-core.c:881 [inline]
+ submit_bio_noacct block/blk-core.c:907 [inline]
+ submit_bio_noacct+0x6c9/0x8a0 block/blk-core.c:896
+ submit_bio block/blk-core.c:968 [inline]
+ submit_bio+0x1ea/0x430 block/blk-core.c:926
+ write_dev_flush fs/btrfs/disk-io.c:4243 [inline]
+ barrier_all_devices fs/btrfs/disk-io.c:4293 [inline]
+ write_all_supers+0x3038/0x4440 fs/btrfs/disk-io.c:4388
+ btrfs_commit_transaction+0x1be3/0x3180 fs/btrfs/transaction.c:2362
+ btrfs_commit_super+0xc1/0x100 fs/btrfs/disk-io.c:4562
+ close_ctree+0x314/0xccc fs/btrfs/disk-io.c:4671
+ btrfs_fill_super fs/btrfs/super.c:1400 [inline]
+ btrfs_mount_root.cold+0xb1/0x162 fs/btrfs/super.c:1744
+ legacy_get_tree+0x105/0x220 fs/fs_context.c:610
+ vfs_get_tree+0x89/0x2f0 fs/super.c:1497
+ fc_mount fs/namespace.c:1016 [inline]
+ vfs_kern_mount.part.0+0xd3/0x170 fs/namespace.c:1046
+ vfs_kern_mount+0x3c/0x60 fs/namespace.c:1033
+ btrfs_mount+0x234/0xa60 fs/btrfs/super.c:1804
+ legacy_get_tree+0x105/0x220 fs/fs_context.c:610
+ vfs_get_tree+0x89/0x2f0 fs/super.c:1497
+ do_new_mount fs/namespace.c:3012 [inline]
+ path_mount+0x1320/0x1fa0 fs/namespace.c:3342
+ do_mount fs/namespace.c:3355 [inline]
+ __do_sys_mount fs/namespace.c:3563 [inline]
+ __se_sys_mount fs/namespace.c:3540 [inline]
+ __x64_sys_mount+0x27f/0x300 fs/namespace.c:3540
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7ff53f71fd8a
+Code: 83 c4 08 5b 5d c3 66 2e 0f 1f 84 00 00 00 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffeaf8661f8 EFLAGS: 00000282 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007ffeaf866250 RCX: 00007ff53f71fd8a
+RDX: 0000000020000000 RSI: 0000000020000100 RDI: 00007ffeaf866210
+RBP: 00007ffeaf866210 R08: 00007ffeaf866250 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000282 R12: 0000000020000f50
+R13: 0000000000000003 R14: 0000000000000004 R15: 000000000000008e
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:blk_throtl_bio block/blk-throttle.h:175 [inline]
+RIP: 0010:submit_bio_checks+0x7c0/0x1bf0 block/blk-core.c:765
+Code: 08 3c 03 0f 8e 4a 11 00 00 48 b8 00 00 00 00 00 fc ff df 44 8b 6d 10 41 83 e5 01 4a 8d bc 2b 7c 01 00 00 48 89 fa 48 c1 ea 03 <0f> b6 04 02 48 89 fa 83 e2 07 38 d0 7f 08 84 c0 0f 85 09 11 00 00
+RSP: 0018:ffffc9000293f278 EFLAGS: 00010203
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 000000000000002f RSI: ffffffff83d5d9de RDI: 000000000000017d
+RBP: ffff888014fbd300 R08: ffffffff8a044f00 R09: 0000000000000000
+R10: ffffffff83d5d9d0 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000001 R14: 00000000fffffffe R15: ffff88801a2be93c
+FS:  0000555555975300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fab1d1bfe28 CR3: 00000000145d1000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	08 3c 03             	or     %bh,(%rbx,%rax,1)
+   3:	0f 8e 4a 11 00 00    	jle    0x1153
+   9:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  10:	fc ff df
+  13:	44 8b 6d 10          	mov    0x10(%rbp),%r13d
+  17:	41 83 e5 01          	and    $0x1,%r13d
+  1b:	4a 8d bc 2b 7c 01 00 	lea    0x17c(%rbx,%r13,1),%rdi
+  22:	00
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+  2e:	48 89 fa             	mov    %rdi,%rdx
+  31:	83 e2 07             	and    $0x7,%edx
+  34:	38 d0                	cmp    %dl,%al
+  36:	7f 08                	jg     0x40
+  38:	84 c0                	test   %al,%al
+  3a:	0f 85 09 11 00 00    	jne    0x1149
+
