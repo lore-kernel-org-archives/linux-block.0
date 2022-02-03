@@ -2,196 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FB3C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 06:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 827A7C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 06:52:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234224AbiBCG1r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 01:27:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53462 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231539AbiBCG1r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Feb 2022 01:27:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643869666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4Q3hJgKl1GZvpzGFs1izzlrbs0UNXcazvIKGrrx7xHU=;
-        b=NDTle27wgLWvp93MGSCYusCBmWiI2+gy/xD+GZDQqSq/lNkiWDrD8erMpT56RR+PMstD7Y
-        +6eXTtBZT6vsfybCocVISW3Wk+QcbvqILLZRLz/xdrkwAvfJutpYP7oiv7ogu14DxD7W6d
-        tPNL1h3K69kYXLErcwmg3s34A1YHp+Y=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-350-w5O8NsURMpGzrxAByWRO4g-1; Thu, 03 Feb 2022 01:27:09 -0500
-X-MC-Unique: w5O8NsURMpGzrxAByWRO4g-1
-Received: by mail-wr1-f71.google.com with SMTP id s25-20020adfa299000000b001d8d032255fso273206wra.14
-        for <linux-block@vger.kernel.org>; Wed, 02 Feb 2022 22:27:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4Q3hJgKl1GZvpzGFs1izzlrbs0UNXcazvIKGrrx7xHU=;
-        b=dx/Vk3GBgS0BVK+MUP8KK+7ZsaYNJsUA3M4PaxK8GPGoafTO1yFut94PvpGYbhswuN
-         eFYW66X1l9ZabSaJDkuN40Cr5+CgiI/GZbLP0+xA908jhu6wtmObhrO84L8xvu4gaq7L
-         +caFTp6kO6yRscXoIqidcBQlvfs2wyYIqqSY0M8XeF/bRd9V7ugkZ/3HjySIdfjduYMe
-         Dfh6ZvOPqurx2Lwosazmk0AqVtVn1QyYTREWe6Ik4i9QRhB4Z7ZZtwhVMqUwMzADltlP
-         VYZuJcxrMOY/lqPykjEnwdAKNamY06T/z7MceZ66EIi0UoWPfuXNq4WXqFbY9UwjA5ou
-         n0Fg==
-X-Gm-Message-State: AOAM531P4JvR1pX98ec6vXo86mryhQB05l6+v76XprIFsVENLUTSzMjl
-        uaDqJMx0O72oXDYDx0bvRoe4DVPyS9iydVQIAPB67jlEMUPkFZ1ol3zNROLfm7XhZEY+tUbX6M4
-        LOoVHWeiSpOkws1624EkMxEE=
-X-Received: by 2002:a05:600c:19d2:: with SMTP id u18mr8762757wmq.101.1643869628587;
-        Wed, 02 Feb 2022 22:27:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzzwiRrXNiT1PFeEaEWqx53rsILaHA53YSG2uTc3uPWU3z3/gKj5cRHza8XX+2eY8cuzPj6uA==
-X-Received: by 2002:a05:600c:19d2:: with SMTP id u18mr8762735wmq.101.1643869628366;
-        Wed, 02 Feb 2022 22:27:08 -0800 (PST)
-Received: from redhat.com ([2.55.131.61])
-        by smtp.gmail.com with ESMTPSA id v3sm18549520wru.15.2022.02.02.22.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Feb 2022 22:27:07 -0800 (PST)
-Date:   Thu, 3 Feb 2022 01:27:04 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 2/5] virtio_blk: simplify refcounting
-Message-ID: <20220203012654-mutt-send-email-mst@kernel.org>
-References: <20220202155659.107895-1-hch@lst.de>
- <20220202155659.107895-3-hch@lst.de>
+        id S237987AbiBCGwk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 01:52:40 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:46430 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235985AbiBCGwj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 01:52:39 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 758E7B82FE9;
+        Thu,  3 Feb 2022 06:52:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AC48C340ED;
+        Thu,  3 Feb 2022 06:52:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643871157;
+        bh=fz5MvNfRWNYgfn/SaRRyX+Dv+C+hsMQ9E+HgMk2p0Yo=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=XgTi4QIXP0nrNgiS3l/vbZEy9QNLACnlFB/LCCsgxHAuJ8AulBbrha57RqCwYJZKk
+         bPYERgwxVoNQJi9IwUBTbO/kYZdRZb5vZmnztsBp23fkHo6nukPMaqRmzwB1va9w6n
+         LkrHjUD3NB984RAcG8DsCJqJzd2ZOWvmqZ0YgB4cd6lXV+QAnhGQQkc5JXocLUaUdd
+         bPjHowyOO+/4xmx7uNH4TXJwiRVAF7MbCEqy+IhmlDS1eVSSw24P7A6kLBxriwIKXO
+         MkZYZGK2PJCQpoiEFUA43/Xsx/QiZ+yEQ6XXrgPfvm8bbRq/FMMVLi8tFRFfmHh8ZW
+         wEOt895Ow3jxg==
+Received: by mail-yb1-f172.google.com with SMTP id j2so6179795ybu.0;
+        Wed, 02 Feb 2022 22:52:36 -0800 (PST)
+X-Gm-Message-State: AOAM530Y459QjODSuwhn9cJzllYM1Bfqozg4w76djRde8lRkpb3LeMb5
+        DNwO4uBj1ss5Ziic7NL+/Wvu+LPCoh3CkiKBQU0=
+X-Google-Smtp-Source: ABdhPJwT3phjdGsczSBHcxGP9Ar1RLKOeEqejDhaQbncDZ931IS4vJZUSzbOC00341TfRRuL6JGmVXaIJjqZtSTMx0Q=
+X-Received: by 2002:a0d:f742:: with SMTP id h63mr3233782ywf.410.1643871156127;
+ Wed, 02 Feb 2022 22:52:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220202155659.107895-3-hch@lst.de>
+References: <20220203064009.1795344-1-song@kernel.org>
+In-Reply-To: <20220203064009.1795344-1-song@kernel.org>
+From:   Song Liu <song@kernel.org>
+Date:   Wed, 2 Feb 2022 22:52:25 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW4j+Y-EQvBo6qRHwNu4eupycxDr7Qy3yBe4L5ug0atAHw@mail.gmail.com>
+Message-ID: <CAPhsuW4j+Y-EQvBo6qRHwNu4eupycxDr7Qy3yBe4L5ug0atAHw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] block: scsi: introduce and use BLK_STS_OFFLINE
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     Kernel Team <kernel-team@fb.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 02, 2022 at 04:56:56PM +0100, Christoph Hellwig wrote:
-> Implement the ->free_disk method to free the virtio_blk structure only
-> once the last gendisk reference goes away instead of keeping a local
-> refcount.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+CC linux-block (it was a typo in the original email)
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  drivers/block/virtio_blk.c | 64 +++++++-------------------------------
->  1 file changed, 12 insertions(+), 52 deletions(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index c443cd64fc9b4..2d939ac1508c1 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -69,13 +69,6 @@ struct virtio_blk {
->  	/* Process context for config space updates */
->  	struct work_struct config_work;
->  
-> -	/*
-> -	 * Tracks references from block_device_operations open/release and
-> -	 * virtio_driver probe/remove so this object can be freed once no
-> -	 * longer in use.
-> -	 */
-> -	refcount_t refs;
-> -
->  	/* What host tells us, plus 2 for header & tailer. */
->  	unsigned int sg_elems;
->  
-> @@ -391,43 +384,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
->  	return err;
->  }
->  
-> -static void virtblk_get(struct virtio_blk *vblk)
-> -{
-> -	refcount_inc(&vblk->refs);
-> -}
-> -
-> -static void virtblk_put(struct virtio_blk *vblk)
-> -{
-> -	if (refcount_dec_and_test(&vblk->refs)) {
-> -		ida_simple_remove(&vd_index_ida, vblk->index);
-> -		mutex_destroy(&vblk->vdev_mutex);
-> -		kfree(vblk);
-> -	}
-> -}
-> -
-> -static int virtblk_open(struct block_device *bd, fmode_t mode)
-> -{
-> -	struct virtio_blk *vblk = bd->bd_disk->private_data;
-> -	int ret = 0;
-> -
-> -	mutex_lock(&vblk->vdev_mutex);
-> -
-> -	if (vblk->vdev)
-> -		virtblk_get(vblk);
-> -	else
-> -		ret = -ENXIO;
-> -
-> -	mutex_unlock(&vblk->vdev_mutex);
-> -	return ret;
-> -}
-> -
-> -static void virtblk_release(struct gendisk *disk, fmode_t mode)
-> -{
-> -	struct virtio_blk *vblk = disk->private_data;
-> -
-> -	virtblk_put(vblk);
-> -}
-> -
->  /* We provide getgeo only to please some old bootloader/partitioning tools */
->  static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  {
-> @@ -460,11 +416,19 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
->  	return ret;
->  }
->  
-> +static void virtblk_free_disk(struct gendisk *disk)
-> +{
-> +	struct virtio_blk *vblk = disk->private_data;
-> +
-> +	ida_simple_remove(&vd_index_ida, vblk->index);
-> +	mutex_destroy(&vblk->vdev_mutex);
-> +	kfree(vblk);
-> +}
-> +
->  static const struct block_device_operations virtblk_fops = {
-> -	.owner  = THIS_MODULE,
-> -	.open = virtblk_open,
-> -	.release = virtblk_release,
-> -	.getgeo = virtblk_getgeo,
-> +	.owner  	= THIS_MODULE,
-> +	.getgeo		= virtblk_getgeo,
-> +	.free_disk	= virtblk_free_disk,
->  };
->  
->  static int index_to_minor(int index)
-> @@ -791,8 +755,6 @@ static int virtblk_probe(struct virtio_device *vdev)
->  		goto out_free_index;
->  	}
->  
-> -	/* This reference is dropped in virtblk_remove(). */
-> -	refcount_set(&vblk->refs, 1);
->  	mutex_init(&vblk->vdev_mutex);
->  
->  	vblk->vdev = vdev;
-> @@ -985,8 +947,6 @@ static void virtblk_remove(struct virtio_device *vdev)
->  	kfree(vblk->vqs);
->  
->  	mutex_unlock(&vblk->vdev_mutex);
-> -
-> -	virtblk_put(vblk);
->  }
->  
->  #ifdef CONFIG_PM_SLEEP
-> -- 
+On Wed, Feb 2, 2022 at 10:40 PM Song Liu <song@kernel.org> wrote:
+>
+> We have a use case where HDDs are regularly power on/off to perserve power.
+> When a drive is being removed, we often see errors like
+>
+>    [  172.803279] I/O error, dev sda, sector 3137184
+>
+> These messages are confusing for automations that grep dmesg, as they look
+> very similar to real HDD error.
+>
+> Solve this issue with a new block state BLK_STS_OFFLINE. After the change,
+> the error message looks like
+>
+>    [  172.803279] device offline error, dev sda, sector 3137184
+>
+> so that the automations won't confuse them with real I/O error.
+>
+> Song Liu (2):
+>   block: introduce BLK_STS_OFFLINE
+>   scsi: use BLK_STS_OFFLINE for not fully online devices
+>
+>  block/blk-core.c          | 1 +
+>  drivers/scsi/scsi_lib.c   | 2 +-
+>  include/linux/blk_types.h | 7 +++++++
+>  3 files changed, 9 insertions(+), 1 deletion(-)
+>
+> --
 > 2.30.2
-
