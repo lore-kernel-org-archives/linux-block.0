@@ -2,94 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B48C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 12:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 687FDC4332F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Feb 2022 13:06:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236515AbiBCM0B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Feb 2022 07:26:01 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:49486 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbiBCM0B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Feb 2022 07:26:01 -0500
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 1AA4D1F440;
-        Thu,  3 Feb 2022 12:26:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1643891160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=juIxieDbjH1PYuli4PdRWdOgnr2+ISrjEig2JKm3Nhw=;
-        b=XRutn9JxZG1/CR+daZ9dX6VBrpfujr27BvSJHISIc7aQIUoY/1OVCAkrjIIMfKuO5nzrNl
-        v6MKFX670X7rQ9eH7i+f7O3L6/xqZvzztaDSGeyMKpJse/4gQCQBTjxMzIrPMqTzQOXpsr
-        JJ8Om10d4JOgfmJXTOJqvWv6ya6qiWU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1643891160;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=juIxieDbjH1PYuli4PdRWdOgnr2+ISrjEig2JKm3Nhw=;
-        b=69IWpUmIPWALn+S9hK/GM+swpuSPnZJOkt9BkL3zKdSeoFgO41EWh6rJei/aajbtPLMkZH
-        0zagUBsl5Ly2u2CA==
-Received: from quack3.suse.cz (unknown [10.100.200.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 90C1DA3B84;
-        Thu,  3 Feb 2022 12:25:59 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id DCEA8A05B6; Thu,  3 Feb 2022 13:25:55 +0100 (CET)
-Date:   Thu, 3 Feb 2022 13:25:55 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        id S1350702AbiBCNG1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Feb 2022 08:06:27 -0500
+Received: from verein.lst.de ([213.95.11.211]:37546 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1350696AbiBCNG0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Feb 2022 08:06:26 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7E93768AFE; Thu,  3 Feb 2022 14:06:22 +0100 (CET)
+Date:   Thu, 3 Feb 2022 14:06:22 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
         linux-block@vger.kernel.org,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Samuel Cabrero <scabrero@suse.de>,
-        David Teigland <teigland@redhat.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [LSF/MM/BPF TOPIC] are we going to use ioctls forever?
-Message-ID: <20220203122555.cqnvnbur43zrfqfa@quack3.lan>
-References: <20220201013329.ofxhm4qingvddqhu@garbanzo>
- <YfiXkk9HJpatFxnd@casper.infradead.org>
+        virtualization@lists.linux-foundation.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 2/5] virtio_blk: simplify refcounting
+Message-ID: <20220203130622.GA12361@lst.de>
+References: <20220202155659.107895-1-hch@lst.de> <20220202155659.107895-3-hch@lst.de> <YfudSXcT2rNh/Jhl@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YfiXkk9HJpatFxnd@casper.infradead.org>
+In-Reply-To: <YfudSXcT2rNh/Jhl@stefanha-x1.localdomain>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 01-02-22 02:14:42, Matthew Wilcox wrote:
-> On Mon, Jan 31, 2022 at 05:33:29PM -0800, Luis Chamberlain wrote:
-> > Possible issues? Kernels without CONFIG_NET. Is that a deal breaker?
-> > We already have a few filesystems with their own generic netlink
-> > families, so not sure if this is a good argument against this.
-> > 
-> > mcgrof@fulton ~/linux-next (git::master)$ git grep genl_register_family fs
-> > fs/cifs/netlink.c:      ret = genl_register_family(&cifs_genl_family);
-> > fs/dlm/netlink.c:       return genl_register_family(&family);
-> > fs/ksmbd/transport_ipc.c:       ret = genl_register_family(&ksmbd_genl_family);
-> > fs/quota/netlink.c:     if (genl_register_family(&quota_genl_family) != 0)
-> 
-> I'm not sure these are good arguments in favour ... other than quota,
-> these are all network filesystems, which aren't much use without
-> CONFIG_NET.
-> 
-> > mcgrof@fulton ~/linux-next (git::master)$ git grep genl_register_family drivers/block
-> > drivers/block/nbd.c:    if (genl_register_family(&nbd_genl_family)) {
-> 
-> The, er, _network_ block device, right?
+On Thu, Feb 03, 2022 at 09:15:53AM +0000, Stefan Hajnoczi wrote:
+>           /* Make sure no work handler is accessing the device. */
+>           flush_work(&vblk->config_work);
+>   
+>           del_gendisk(vblk->disk);
+>           blk_cleanup_disk(vblk->disk);
+> 	          ^--- is virtblk_free_disk() called here?
+>           blk_mq_free_tag_set(&vblk->tag_set);
+> 	                         ^--- use after free
 
-Yep, and even for the quota what you'll lose with the netlink family are
-the fancy out-of-band notifications about users going over their quotas.
-Not a big loss. So I don't by this argument.
-
-OTOH these days when even a lightbulb is connected to a network, I don't
-personally think CONFIG_NET dependency is a real problem...
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Yeah.  We need to split up blk_cleanup_disk again for this into
+separate calls to blk_cleanup_queue and put_disk..
