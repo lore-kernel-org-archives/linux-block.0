@@ -2,80 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC6DC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 16:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619FCC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:09:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234036AbiBDQBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 11:01:47 -0500
-Received: from verein.lst.de ([213.95.11.211]:41815 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231664AbiBDQBq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 4 Feb 2022 11:01:46 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9C75E68AA6; Fri,  4 Feb 2022 17:01:40 +0100 (CET)
-Date:   Fri, 4 Feb 2022 17:01:40 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "martin.petersen@oracle.com >> Martin K. Petersen" 
-        <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
-        Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [RFC PATCH 3/3] nvme: add the "debug" host driver
-Message-ID: <20220204160140.GA6817@lst.de>
-References: <20220203153843.szbd4n65ru4fx5hx@garbanzo> <CGME20220203165248uscas1p1f0459e548743e6be26d13d3ed8aa4902@uscas1p1.samsung.com> <20220203165238.GA142129@dhcp-10-100-145-180.wdc.com> <20220203195155.GB249665@bgt-140510-bm01> <863d85e3-9a93-4d8c-cf04-88090eb4cc02@nvidia.com> <2bbed027-b9a1-e5db-3a3d-90c40af49e09@opensource.wdc.com> <9d5d0b50-2936-eac3-12d3-a309389e03bf@nvidia.com> <20220204082445.hczdiy2uhxfi3x2g@ArmHalley.local> <4d5410a5-93c3-d73c-6aeb-2c1c7f940963@nvidia.com> <befa49b3-7606-a3ce-24f7-e184e3df41a3@suse.de>
+        id S1355839AbiBDSJL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 13:09:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41600 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231759AbiBDSJL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 13:09:11 -0500
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F1CC061714;
+        Fri,  4 Feb 2022 10:09:11 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id o12so21653764eju.13;
+        Fri, 04 Feb 2022 10:09:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZOk1AjwIVX9pqDuRbELOCa6z4G8rYwIr5B63rOLPi6w=;
+        b=WzlYqpQ9SFXr3PX0uYzI1THJe1HOJjHnQYjFosTkecnxX56r1yjc/1jr7dEL2onX98
+         ojbxDzjeA15k37t+POMIoGbnCdw0F0/Q945oDIATQCU3YuHJMrym9OBMUy7ED58xFS2f
+         OvDj3LeIFKuByu9wtCVJj9zR/KCHwgCzcufanpT3Rj+fiCD8TpGIYoPiv8uZEfXPGKVL
+         ivQUAqE+Wt1bWyxBLkf41RjEpx0xgnyW8E3SrjnhEJsr0lkM46GugLbkvvtIrsm+GP7o
+         N8n6JUrCA37Izve+pGlgY9XFG28XEHH0TdJHSPy9bF4Zz2O0Q+PYpnYPHoW5yB/8LVVC
+         dVTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZOk1AjwIVX9pqDuRbELOCa6z4G8rYwIr5B63rOLPi6w=;
+        b=QA04E4k73ZJtj92axiBOk+KYqgXqWgFZ6IzjlP6IeDHmvZ/P/osYFnjJr8jkEbTfDI
+         Th6D3+SB4ll19e6lvbvVz1Fr9znIzK7F4h6EZoitB+1iD18ZNu7d41L4JGWT4TpCKqui
+         yTm6v0C2SkQ/QxKoV5GlJ1dYVU8cd6JislHxxxgj1A0AHc1amiPQTkoGhg1VyKyiEc0l
+         SWG8pDYMRHmyyjQcncD4femhweIa+Tsh9bmzHxAhnbdJsZGD0UtjsB2SKbmZBw5VUE7p
+         qhSz2ynhWNWNd7wDBQh2Q7Vykzsd7904Fcs7A4kCiQqgL9NGNyu50Ij15P4+H4ltoOPz
+         1tUQ==
+X-Gm-Message-State: AOAM532lr89lYjqIIZICbYIxEIlbAkcO1TkRimM+OMn5tAROetg2uNUx
+        AYpT5+1M3mNpplIyO7YSj9pI1CBw9GOIJa0xn2APOf2p
+X-Google-Smtp-Source: ABdhPJwafFKJN7/nW/YfpdDz6GBq+Lu04Yh1LmAOb61IjhGfURB/qgcTa/AMBwlAWsDw2vk5++ZSGS4R2gxsK5B101s=
+X-Received: by 2002:a17:906:30c9:: with SMTP id b9mr61442ejb.377.1643998149504;
+ Fri, 04 Feb 2022 10:09:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <befa49b3-7606-a3ce-24f7-e184e3df41a3@suse.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20220203201207.1075933-1-shy828301@gmail.com> <302fa562-612b-0853-31de-a11399e5aa08@nvidia.com>
+In-Reply-To: <302fa562-612b-0853-31de-a11399e5aa08@nvidia.com>
+From:   Yang Shi <shy828301@gmail.com>
+Date:   Fri, 4 Feb 2022 10:08:57 -0800
+Message-ID: <CAHbLzko1izwBERS6auEna+eAGzQVA7zkDihMjT=tt_EBdhfmaA@mail.gmail.com>
+Subject: Re: [v6 PATCH] block: introduce block_rq_error tracepoint
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hch@infradead.org" <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 04, 2022 at 03:15:02PM +0100, Hannes Reinecke wrote:
->> ZNS kernel code testing is also done on QEMU, I've also fixed
->> bugs in the ZNS kernel code which are discovered on QEMU and I've not
->> seen any issues with that. Given that simple copy feature is way smaller
->> than ZNS it will less likely to suffer from slowness and etc (listed
->> above) in QEMU.
->>
->> my point is if we allow one, we will be opening floodgates and we need
->> to be careful not to bloat the code unless it is _absolutely
->> necessary_ which I don't think it is based on the simple copy
->> specification.
->>
+On Thu, Feb 3, 2022 at 6:46 PM Chaitanya Kulkarni <chaitanyak@nvidia.com> wrote:
 >
-> I do have a slightly different view on the nvme target code; it should 
-> provide the necessary means to test the nvme host code.
-> And simple copy is on of these features, especially as it will operate as 
-> an exploiter of the new functionality.
+> Yang,
+>
+> On 2/3/22 12:12, Yang Shi wrote:
+> > Currently, rasdaemon uses the existing tracepoint block_rq_complete
+> > and filters out non-error cases in order to capture block disk errors.
+> >
+> > But there are a few problems with this approach:
+> >
+> > 1. Even kernel trace filter could do the filtering work, there is
+> >     still some overhead after we enable this tracepoint.
+> >
+> > 2. The filter is merely based on errno, which does not align with kernel
+> >     logic to check the errors for print_req_error().
+> >
+> > 3. block_rq_complete only provides dev major and minor to identify
+> >     the block device, it is not convenient to use in user-space.
+> >
+> > So introduce a new tracepoint block_rq_error just for the error case.
+> > With this patch, rasdaemon could switch to block_rq_error.
+> >
+>
+> This patch looks good, but I've a question for you.
+>
+> We already have a tracepoint for the request completion
+> block_rq_complete(). We are adding a new tracepoint blk_rq_error()
+> that is also similar to what blk_rq_complete() reports.
+> Similar call sites  :-
+> trace_block_rq_complete(req, error, nr_bytes);
+> trace_block_rq_error(req, error, nr_bytes);
+>
+> The only delta between blk_rq_complete() and blk_rq_error() is
+> cmd field for blk_rq_complete() in the TP_STRUCT_ENTRY() and
+> __get_str(cmd) field in TP_printk() which I don't think will
+> have any issue if we use that for blk_rq_error().
 
-Well, in general I'd like to have every useful feature supported in
-nvmet, because it serves both testing and production.  If a feature
-isn't all that useful (and there are lots of those in nvme these days)
-we don't need to support in nvmet, but probably neither in the host code.
+Yes, I agree. Just no user needs it for our usecase.
+
+>
+> Question 1 :- What prevents us from using the same format for
+> both blk_rq_complete() and blk_rq_error() ?
+
+Actually nothing if we ignore cmd.
+
+>
+> Question 2 :- assuming that blk_rq_complete() and blk_rq_error()
+> are using same format why can't we :-
+>
+> declare DECLARE_EVENT_CLASS(blk_rq_completion....)
+> and use that class for blk_rq_complete() and blk_rq_error() ?
+>
+> since if I remember correctly we need to define a event class
+> instead of duplicating a tracepoint with similar reporting.
+
+Very good point. I did overlook it. The original post did have disk
+name and didn't have cmd, now the two tracepoints look much more
+similar than the original post, so I agree the duplicate could be
+combined into an event class.
+
+>
+> -ck
+>
+>
