@@ -2,136 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4972C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 08:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC70DC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 08:24:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344557AbiBDINz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 03:13:55 -0500
-Received: from mail-dm6nam12on2056.outbound.protection.outlook.com ([40.107.243.56]:6377
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1344149AbiBDINy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 4 Feb 2022 03:13:54 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HUDa7Z4Py0d6B7Cw6kIHV1kYsbpIt0pG/18nVBwTML12MMO+8oyQ67A9fTlhnDsgqfLX4YPLuNFsbsks1SKidyifecny/155O26lIBFbHnC8sFe1+WSOnMDAlW3brJrk8XfxUHAh2/sQQkvHRRkdv8CyTZbT0C/JGCVip+9j+oYjWj8AJYGbwMViNR3F0F8taDvIZbMJfcvG44jQ5HK3FGPhrUGa3Yu/Jp6XkSUFwXmaBOr62xyWx5q4fee/kwE1njgLNCC+XnjwMLXolbwGDbhD8PN1Eqv9QwqpRvW/EloxfbZDtZDCHCxfdedmE9DBta2+JXnwd+vOfHFmby9d+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5pjjRIA/Ys4Ha/buEdRmR7ttTNjOaW9AoUvI2q0oEh4=;
- b=aBoGBXkvRv6mWpCgVvY1Jkd7EPV6b1vEE8ZyogVuI+bMyiuUfWHOv0ju/6pXHx2RmceA6fRKZGp9KBpXC1GFH7LYx3F61JAZWbR/SBaToMb7dfijckowmuLa/yf0HKQu9kbVnh7tDpecmEQ4i7ypi71+Z0PhJzMe7QrCA91V6igCEjcTpM6LFl2fvfblnD805x0DhvlhI3yoKLqGyOBWp8nlIrhOW6Sh6Ccvv5RuD9t5WrrQykdPb9Zh0jcsmBL/EAMCimi4riWCDp7ct2beVYjaQYP+59KaJY210jZe1i51Y/ghKmKaRYFWSxKu/PEpJUqmY06t06mWdhu0Dh/X8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5pjjRIA/Ys4Ha/buEdRmR7ttTNjOaW9AoUvI2q0oEh4=;
- b=SF/YOfCBn6QZtkxERQ9Ixfu+wCcOgupvKDPSWZx9z5hLy8cehOdMfy7dHLnIGz2Gu77dTlJ90Epj6SCOYTGEzT5eRZcv6L0kg43wPdh6+hLo18boLFIZQudOaBSJ961bBcoavuumKq+2whLLxSjAaUWHEZ6mRcPYMh35Bl6DYSnl3PSRDH/LFPL8aRjBZGU+I6Zjx0N1/hiBc25ujQt7J2TEbT5aN9haPH9R/3zAduZ/rOY18YYDgzP6AVxU+7Xa0rwjf9jKpO5VCNf1Tw5SxJD+w9RqPH6lBzXzHq3A5zjDCEgmSvztDva2p4vVcbITMr1a5ffkpyTkVlBH6pBRhg==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by MWHPR12MB1326.namprd12.prod.outlook.com (2603:10b6:300:10::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Fri, 4 Feb
- 2022 08:13:52 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::846c:d3cd:5a30:c35]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::846c:d3cd:5a30:c35%5]) with mapi id 15.20.4951.014; Fri, 4 Feb 2022
- 08:13:52 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "syzbot+2b3f18414c37b42dcc94@syzkaller.appspotmail.com" 
-        <syzbot+2b3f18414c37b42dcc94@syzkaller.appspotmail.com>
-Subject: Re: [PATCH] block: call bio_associate_blkg from bio_reset
-Thread-Topic: [PATCH] block: call bio_associate_blkg from bio_reset
-Thread-Index: AQHYGZeUytTRR2ku7EOkgGIuxe8Pa6yDCxmA
-Date:   Fri, 4 Feb 2022 08:13:52 +0000
-Message-ID: <fadfe7ca-f4f2-6d01-0be3-07406549fff9@nvidia.com>
-References: <20220204071934.168469-1-hch@lst.de>
-In-Reply-To: <20220204071934.168469-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e19fb08d-b0a8-4939-3c7c-08d9e7b647c9
-x-ms-traffictypediagnostic: MWHPR12MB1326:EE_
-x-microsoft-antispam-prvs: <MWHPR12MB13268DC99062BB0B0AEE4B5CA3299@MWHPR12MB1326.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: BEys1Nq9LM2FVATUxu9Zjmr7P7PoWKifnuK1s1MzcGNas4VUIf7Cwp+0Nk5Bgn/VNTkEF/DjrbjxLm2bJWwGOR9pxvq6MQ+RN7R1wwvfuPqeOgikW2izhXpFkl1u7SYBXifaznutMONrqn7cPBAfYLmIlhRApLoUWfwlCeD6jzV1mw/e5w2UqZ6HF/pgYt0t6rm9eeh3GQDL8VFa8XMLQQoAMrZyaR7HuDpkbGS83Ulcp+UkZVJAUus60UB1B3Bc6EockKba4CINlKZ5Ju24F3Z/UZfQckQKLHIhB1CyfoXgBszCvkWzmceLPaq3EwXXYXNfNf4XHp3cDkVuCqCjLcQAQta9sxrsb4IOVUCnt/A1PAmxN7ItnroJ3lEH1uxdZIVbDmQba3zx8lUPqgQk8VNgJQ2K5mTnapzZHK1edSjJR8JI8nkAza70T1Cc5rFfdpZJfrHlPC5wXQU4PGdDa8ElNno7jnPbo1Wja23P77FV61oVE0zio3UBKwIJmvMsS/crM42jw64BTTCOMtSxQt/hb9+l7z8iLh4hqvVhRsxBx6b+xZCBk944W+zQba7uIcAGMyFuUUnHwHs4MMBLfq6UKQxyvnwQQvl+nKbuAy8gPqEw64VtW0Di5ieoQHYYrttnKPT/R2Rp0QxGHiuPJGfOp60Di3VAB7KjRkxuH7dXZAgs3nNWOVyy2ONqi2mdFdGWsxIDEyJtvc399pErAQ+n5vpnOQHfn7X89wrzm4r5Jxiny4+iSWgBrI2QTaqaBU6/pP6f1V+MWpj7TN6sPg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(53546011)(122000001)(5660300002)(83380400001)(6506007)(71200400001)(38070700005)(186003)(36756003)(38100700002)(4744005)(31686004)(2616005)(66946007)(66556008)(76116006)(66476007)(4326008)(66446008)(54906003)(64756008)(8936002)(8676002)(110136005)(91956017)(6512007)(2906002)(508600001)(86362001)(6486002)(31696002)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cTlBQWk1VEg2bWtnTno4T3RnUmVkZC9tbmJYUXpxT1RIRDRxYTF0bGxLMDlH?=
- =?utf-8?B?SnR4ZnVLdmxYU3M1QTJ6aDI4ZmtwbzNzQkJEakRSanpOZFJiUFBXdjNlWXEx?=
- =?utf-8?B?S0tWRGorV3c0bXE5M0o5VG1aYnFsUlBhYzczSDU5S1UzSng5K3dZbVdIZkRY?=
- =?utf-8?B?UEh4KzZtSUpJckxMU0duWjQ5T3NUUVlWejBlYmhPejJPRWl2ekhhR2xhaWR0?=
- =?utf-8?B?TjFxZjZSYXk3OGJFL0tQWVNIOGpwOGhPQVczQnVHRGJadXJaTllOcjM5V2Fk?=
- =?utf-8?B?RStFZy90TDhVM2E1WVFIWllVZTJubytWRmJjU012cjc3MnVxQUtLS0hvR3Y4?=
- =?utf-8?B?TWRTaGIyQXZGdzJQbXVXK0V4enUwNXFFOWNlRFg3Z0sxdy9mMHg5Vm94V05F?=
- =?utf-8?B?YU8xd3dKZHpTbHJzRjlKTUZlTGJ0d21nZEk2LzMzUlNJdit5L1czalFQWWVU?=
- =?utf-8?B?elV3SlA0UzAybkU1MTNpV2FRNzdqYklOMWNrbVJBRWIyalZrbHIwTHZVZDR3?=
- =?utf-8?B?OGxyZ3NUaFVYaDVvZDZ2R3ExamxuWXFzZXFlOEZtbVBuWE9ZWXYxaW1KT1Ew?=
- =?utf-8?B?ajlxai8rMGthOG9rK3l3TFU0V28zQktuZlY5VThsaDNET1o2QW9NOUxXcVBF?=
- =?utf-8?B?cW9xajEvYU5lQkFnbkZiUHRQdzJWSGJqbEdVU3Z5RU9mMVZCbXY4RVNZNXNO?=
- =?utf-8?B?NDBZcmhNTG5LRk5TQW9YRSt0UGdoeU5tdWI2Z2hTQldlMU94dEhMbWdxZCsz?=
- =?utf-8?B?eUJGNVYwSm1HWkNNTXpqVUpoTXhRUVdFL1dET2tRNmo0MEhEcGhIVVJJMm94?=
- =?utf-8?B?WmxGckl5VS9yZDhoZDE3WTlFcmdSbk1kNThiQndRazJGMWtQOHpBU3BCVlB2?=
- =?utf-8?B?dVRCTG5PZEpTTHEvdGNJV0J6SllDOXJVZnJ1UWtqQ1pQdFNyU2g3OEMxdXBp?=
- =?utf-8?B?bEhjNDRBZWxOb05mQlFOTkRPbkFOcUU3Tkd6aUkyT0xpNWNOWmZpUEVQOWhj?=
- =?utf-8?B?OVJqbE10TnVVTXppbURjQUFCMktkZG9HaEd2U1BVNkRPa2YvVjVDdEFHME9t?=
- =?utf-8?B?QVFhanBQUWw4NTI4aDRMenBVM01ELzQyVGpmVmE5RkpBZFovbURxZWxlOWc5?=
- =?utf-8?B?MVdMQ2NFM2RocXhoRW15ZGNzQTVWY0lhdHVLY1hSVnZPVUdkTTJCS3dTblhy?=
- =?utf-8?B?aXhMRjByY2F6Q0NsT0ROcm5ZenF5ZFdmODMzUzM5dFU4TzRBTGIwYVpYZUEw?=
- =?utf-8?B?TXI5K1I5bGR2aDhEN1lub0R3TERGalkweGFnYjE1UlZDb3R1RXRreTJlV2V3?=
- =?utf-8?B?WTBKL2ZBNUt3UXErZmxzM2xJZHFFakdKbmZ4TTRQV2tWdmRxTm4xRW9MQUFx?=
- =?utf-8?B?SFk3THg2bCtGUzlGYVhGVnVLMjZzRk4zMmkzSG1BMTdJTElINm1VNk5vNEVi?=
- =?utf-8?B?VFNmMmRmNjRqZFR2M2l4N1orL3FHbHg3OVdwMnVBRHBrRDZoWkp4bi95ZDFm?=
- =?utf-8?B?NUtvTlhVcGRhVWVrR1hvYkZtRUVxZDk3VjdRd3FNVzd5Mmd6ZWJ0b2lxcjlt?=
- =?utf-8?B?NCtYL2VCL25kWTNKZ3hocXAxTitkVXRGTDFjcHdqc1VnRWhRTDdMd1dZOEFV?=
- =?utf-8?B?cXZvTEJOWVo2bW9JNTJaVkJtZUJ2eXJCWHRUNGZyV1lmSTZrVFpOY2lSc1po?=
- =?utf-8?B?dCs4WCtZNHpCZDR5dzY0Z2E5OWlXUlFUamtlK0JMK0ZqQkpWdGdxZVI5WER0?=
- =?utf-8?B?NmlFK0wwT0w0emIwQlVvYklmcXZIVXF2SFdHQlA2SkRraFUramRLNlZ4WitM?=
- =?utf-8?B?THBGbHBTZEt5VGJWcUszMWJZb0RtbEVaYzd2V1hTc2tJNitva0lCSnY5dEJU?=
- =?utf-8?B?YVU2TDQwOWVEcGZoWk03TXJzaGFGWWRjZGx4akJ0ZHVnTi9zRjBGSDZTUFk2?=
- =?utf-8?B?WjJDdzNYaGNkTWo5RDQvZjJ5NmhNVFBLdmZkcllBWTF0Njd6cGx6ODR3YmE4?=
- =?utf-8?B?S0lrbFJWY0RIRmhoUUY2SjVaSGsvcWYwSUxqRUQ3OEpvYUN3ZHh1TDJrT01j?=
- =?utf-8?B?SHowOSt1K2gwcHpxbjVXQklNaktFWHg3djdQMGc3Uk5tSEJLa3dReHowdVF5?=
- =?utf-8?B?U1VaNkhCbit1aXRoZkFHTXBuUGJDSEtRQ3oyMFBZZEpZL0trcWoycEUxMzZN?=
- =?utf-8?Q?1OlYINybUI9HZzauJQ6xLyeccRZyBCmVhJBPEutu6AXs?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8B81589CD9B46B4895120807EC2B41F3@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S230020AbiBDIYt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 03:24:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47444 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238387AbiBDIYs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 03:24:48 -0500
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 682ABC06173E
+        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 00:24:48 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id j2so16805922ejk.6
+        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 00:24:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+AJzw4pLVP6piQQ8DJ6FcW2rv83/BHBjZGX/F+I/5C4=;
+        b=Be5ov5gRTokjg21xyNf+ohGtnsQqDmD5CpogVJAXrnVz7pcHBReU3EKuZVtKt4Tw/w
+         RDcn4+ueTA4m3ociZUooQ/VSUz3b9a58vjo7nJ/Hli8DSbbZtEPUvDVwZH40LA/ByK1h
+         mkWQHDVpTChQTI+dNdwTriPMcFCGtP4xz0vuE6s8JoGHah/8CmMO+m7uOrLICrWvo7I0
+         G0FCSCS1JRJJr87Ow3i8npF6I4zG3xBdyz0bittGNIKmc8CnFGCEP83qtpr4iUUrGgFK
+         skH8Hp0XEyEDf/nOhXwfNesNPqOB1Pp2msfiVJJq4EnftBMldbpnYneRb8cxXlSx8a/P
+         UWKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+AJzw4pLVP6piQQ8DJ6FcW2rv83/BHBjZGX/F+I/5C4=;
+        b=d6j9K6y3GQBebQwDhBU2oJFN+X1OqdW1fFQalE/Nun9dnteHsxmm3svN8eFp4hE6JR
+         TMCBN7qHIDPor5vr3RwDOH6mfGBK5S5YAG+AeMDXLWDfx/wcEJGO9Eq/4A1u6UI3c9Nc
+         iyrsYXWw95ZD1zmVu7csr+QIv/M+xrGrssQ1h1Zg2MPoI39kmCRrPuhyxgeKyjRTeCzl
+         vf4ldgEo0xnfVuyr6iQZKWBeNDmcrNua3B2Hl/7LX65K/BRF+8VYdilVrMGkRV6ysFaQ
+         yv0ddudJf684ry9DmTz6clKX/QpUg/z85hZteTqMGTQQm1xW/LqIHqmWxIhkrCN0yx2/
+         EhcA==
+X-Gm-Message-State: AOAM531yFkxlz2PECNOXquse4oWwb2NsVn5WOvoLCgHkHkNKEkIjRDQG
+        AoPEXaPlof4Sexqy30nzAonxQA==
+X-Google-Smtp-Source: ABdhPJyAfQjC4kR5eZYldFqWF50m/eUAUll5gwN5OdXOAvaJGO24XxVigDE5qacG6WGLefG1r9JSCg==
+X-Received: by 2002:a17:906:9b8e:: with SMTP id dd14mr1449134ejc.6.1643963086917;
+        Fri, 04 Feb 2022 00:24:46 -0800 (PST)
+Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
+        by smtp.gmail.com with ESMTPSA id u3sm409447ejz.99.2022.02.04.00.24.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Feb 2022 00:24:46 -0800 (PST)
+Date:   Fri, 4 Feb 2022 09:24:45 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [RFC PATCH 3/3] nvme: add the "debug" host driver
+Message-ID: <20220204082445.hczdiy2uhxfi3x2g@ArmHalley.local>
+References: <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2202011333160.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <270f30df-f14c-b9e4-253f-bff047d32ff0@nvidia.com>
+ <20220203153843.szbd4n65ru4fx5hx@garbanzo>
+ <CGME20220203165248uscas1p1f0459e548743e6be26d13d3ed8aa4902@uscas1p1.samsung.com>
+ <20220203165238.GA142129@dhcp-10-100-145-180.wdc.com>
+ <20220203195155.GB249665@bgt-140510-bm01>
+ <863d85e3-9a93-4d8c-cf04-88090eb4cc02@nvidia.com>
+ <2bbed027-b9a1-e5db-3a3d-90c40af49e09@opensource.wdc.com>
+ <9d5d0b50-2936-eac3-12d3-a309389e03bf@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e19fb08d-b0a8-4939-3c7c-08d9e7b647c9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2022 08:13:52.3133
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MTZxr2IckLQhmPEGqWE2HDzNntzI8LP0T4/B27f7B2rdWSb6HSxTmqYxekebWxcFCLmhsAohoKDoZm45SZKbYA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1326
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <9d5d0b50-2936-eac3-12d3-a309389e03bf@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMi8zLzIyIDIzOjE5LCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToNCj4gQ2FsbCBiaW9fYXNz
-b2NpYXRlX2Jsa2cganVzdCBsaWtlIGJpb19zZXRfZGV2IGRpZCBpbiB0aGUgY2FsbGVycyBiZWZv
-cmUNCj4gdGhlIGNvbnZlcnNpb24gdG8gc2V0IHRoZSBibG9jayBkZXZpY2UgaW4gYmlvX3Jlc2V0
-Lg0KPiANCj4gRml4ZXM6IGE3YzUwYzk0MDQ3NyAoImJsb2NrOiBwYXNzIGEgYmxvY2tfZGV2aWNl
-IGFuZCBvcGYgdG8gYmlvX3Jlc2V0IikNCj4gUmVwb3J0ZWQtYnk6IHN5emJvdCsyYjNmMTg0MTRj
-MzdiNDJkY2M5NEBzeXprYWxsZXIuYXBwc3BvdG1haWwuY29tDQo+IFRlc3RlZC1ieTogc3l6Ym90
-KzJiM2YxODQxNGMzN2I0MmRjYzk0QHN5emthbGxlci5hcHBzcG90bWFpbC5jb20NCj4gU2lnbmVk
-LW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+IC0tLQ0KDQpUaGlzIGZp
-eGVzIHRoZSBpc3N1ZSBtZW50aW9uZWQgYnkgSmVucyBvbiB0aGUgcmVwb3J0LA0Kbm90IHN1cmUg
-aWYgSSBjYW4gYWRkIHJldmlld2VkLWJ5IGFmdGVyIHRlc3RlZCBieSB0YWcsDQppZiBub3QsIHBs
-ZWFzZSBkcm9wIHJldmlld2VkLWJ5IHRhZy4uDQoNClRlc3RlZC1ieTogQ2hhaXRhbnlhIEt1bGth
-cm5pIDxrY2hAbnZpZGlhLmNvbT4NClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGtj
-aEBudmlkaWEuY29tPg0KDQoNCi1jaw0KDQo=
+On 04.02.2022 07:58, Chaitanya Kulkarni wrote:
+>On 2/3/22 22:28, Damien Le Moal wrote:
+>> On 2/4/22 12:12, Chaitanya Kulkarni wrote:
+>>>
+>>>>>> One can instantiate scsi devices with qemu by using fake scsi devices,
+>>>>>> but one can also just use scsi_debug to do the same. I see both efforts
+>>>>>> as desirable, so long as someone mantains this.
+>>>>>>
+>>>
+>>> Why do you think both efforts are desirable ?
+>>
+>> When testing code using the functionality, it is far easier to get said
+>> functionality doing a simple "modprobe" rather than having to setup a
+>> VM. C.f. running blktests or fstests.
+>>
+>
+>agree on simplicity but then why do we have QEMU implementations for
+>the NVMe features (e.g. ZNS, NVMe Simple Copy) ? we can just build
+>memoery backed NVMeOF test target for NVMe controller features.
+>
+>Also, recognizing the simplicity I proposed initially NVMe ZNS
+>fabrics based emulation over QEMU (I think I still have initial state
+>machine implementation code for ZNS somewhere), those were "nacked" for
+>the right reason, since we've decided go with QEMU and use that as a
+>primary platform for testing, so I failed to understand what has
+>changed.. since given that QEMU already supports NVMe simple copy ...
+
+I was not part of this conversation, but as I see it each approach give
+a benefit. QEMU is fantastic for compliance testing and I am not sure
+you get the same level of command analysis anywhere else; at least not
+without writing dedicated code for this in a target.
+
+This said, when we want to test for race conditions, QEMU is very slow.
+For a software-only solution, we have experimented with something
+similar to the nvme-debug code tha Mikulas is proposing. Adam pointed to
+the nvme-loop target as an alternative and this seems to work pretty
+nicely. I do not believe there should be many changes to support copy
+offload using this.
+
+So in my view having both is not replication and it gives more
+flexibility for validation, which I believe it is always good.
+
+>
+>> So personally, I also think it would be great to have a kernel-based
+>> emulation of copy offload. And that should be very easy to implement
+>> with the fabric code. Then loopback onto a nullblk device and you get a
+>> quick and easy to setup copy-offload device that can even be of the ZNS
+>> variant if you want since nullblk supports zones.
+>>
+>
+>One can do that with creating null_blk based NVMeOF target namespace,
+>no need to emulate simple copy memory backed code in the fabrics
+>with nvme-loop.. it is as simple as inserting module and configuring
+>ns with nvmetcli once we have finalized the solution for copy offload.
+>If you remember, I already have patches for that...
+>
+>>>
+>>> NVMe ZNS QEMU implementation proved to be perfect and works just
+>>> fine for testing, copy offload is not an exception.
+>>>
+>>>>>> For instance, blktests uses scsi_debug for simplicity.
+>>>>>>
+>>>>>> In the end you decide what you want to use.
+>>>>>
+>>>>> Can we use the nvme-loop target instead?
+>>>>
+>>>> I am advocating for this approach as well. It presentas a virtual nvme
+>>>> controller already.
+>>>>
+>>>
+>>> It does that assuming underlying block device such as null_blk or
+>>> QEMU implementation supports required features not to bloat the the
+>>> NVMeOF target.
+>>>
+>>> -ck
+>>>
+>
+>-ck
+>
