@@ -2,164 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89343C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9746C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377374AbiBDSLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 13:11:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
+        id S239198AbiBDS2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 13:28:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377368AbiBDSLJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 13:11:09 -0500
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C69B0C061714;
-        Fri,  4 Feb 2022 10:11:08 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id w25so14711864edt.7;
-        Fri, 04 Feb 2022 10:11:08 -0800 (PST)
+        with ESMTP id S232631AbiBDS2t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 13:28:49 -0500
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FDAC061714
+        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 10:28:49 -0800 (PST)
+Received: by mail-ot1-x332.google.com with SMTP id n6-20020a9d6f06000000b005a0750019a7so5770799otq.5
+        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 10:28:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6s9CxsBC8cchiiPxKjwG6ONmmaSZUcKlcytb21KkuK4=;
-        b=mMwobpRUXA9Il4+uCKlHw6uyqMvTiH9Co4xQriHvk+7cQWLGfV4ISuvLZjoEIYz2YL
-         spSlxMCfXEqOlVgcBgRfvr7pMEccBcsjdEJHVaT+9IGq1T4x45Wh/IY0kFLObZgjyEi6
-         qBKsaymIjp4oJsFJiFD1K8E1Cg0Cd2guzmTHMmlzvSuMbBVmk+i8SZSOiiaPlv4yvlz6
-         rOsdvp0VNA5dRowLx6zMu5Av5Jz3WZLFQJTgvJknSwvoVcGuB9D3oLpqChe5IFVYxnzz
-         oztZ8x+bOOEFXJH4M77HfNGxKRMNJh4UWDTgYw42Z8YdBcIHdA86Z8Nrowue70SLFobL
-         4/Rg==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=pgW3FfHX4y6xVFGvas96PvsLzR4RAaCwfL3uj8TdYA0=;
+        b=tlzi4xa31KiHXSY0gBAc4dR9HNT5QuRcpkkdtimaaezHwLg3sco69w7Fu/tYRfODvG
+         3eM4ssFBvDC9coPfnksw88WySbbNsbIE78N/swg79+XyQy34mXriqHFiIqU5YDNIxji3
+         IG9d7rBlnzUzosU/Kg456nApyftZfDf9SICqEHTnIljUzH8fHeSMRF8BTRALMsFOHs42
+         HPqwlET7Av/FeTBkeMOJxXeIE0XmqpXlOSOYM8WaTK7N7RSfsbfkCoMCZ21fr05IeEvZ
+         SjrTZ9gErnmf8j4yovwN4Foa/P1cpFsD0j6SsOgop3KTha2Df5hGsMaf994YviXNaDST
+         gN9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6s9CxsBC8cchiiPxKjwG6ONmmaSZUcKlcytb21KkuK4=;
-        b=mm+ZNuoY1AyZvJCUfW7Y3XjWcpUkLtxrOcWAgfGUBo9wf06oA4TdM4cIqIZx24qakk
-         rkojaC/1fpvfukWsDJImV7UjWHyaM7OqA+l3sCoC/oJg3u35PG9kWC3xoZ68tR3cP0hQ
-         hpOVRSZzqLo58/C3Gme25J+9ICVg74cC5x0WJ63PnUn2g/TP6Ks+eTdpvJYqR8XaT805
-         Eg6wSqUMeWpEBslQ7R7pRdQXf3G7RDwt865//h0sACTmCL9G5Jx0fIa+AWF1zyd4/n6i
-         dTNXPfUq+O+fLv07YlDAvsDxGOCmNltXyuGnM7H/oZ/0RkMwK3DKo2DApg+xElNuhpHa
-         fZYg==
-X-Gm-Message-State: AOAM5308MbIol/L4N82FbluMumUaUD8spwQGEyxxy1ADEEz7AlFKD1Nr
-        Ir4P8SQq9bGQEwdSCbEKo0h5+f+lmotfY/k4smc=
-X-Google-Smtp-Source: ABdhPJxIigxgUUaumtaROQOhEriR+Qg/btM9GhyxFDVYRkUss89SOw+32KatpfY67ve6G/Onyk2M09eet+4uxIblNBQ=
-X-Received: by 2002:a50:ee01:: with SMTP id g1mr316060eds.415.1643998267355;
- Fri, 04 Feb 2022 10:11:07 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=pgW3FfHX4y6xVFGvas96PvsLzR4RAaCwfL3uj8TdYA0=;
+        b=rK6NQRBm5Uq/pp6HA6Lob9ur/jQW9fZTtmHlufvzye2ziaT1ZKE/uu8oyhZhAVIPMH
+         7vweSk4XrYIS+yej8sCiBpSMyyDkIrH70aYWrgLj5/SIXd8l7mKLt+xERo0mC7F3IhxK
+         yKkXOUy+lnzGwgFTCfMNJ1bWeFafZkZ8TuTMowPU2MHLsA/+Bar5+wKa5kziYUb/m7Cm
+         w6N6ljQmnndMb0Y72icv73EL/M4HuA9brPSrYWqcvIh3Kw5577Z1Vlgg0Z6meSlH3irY
+         xGvV8UsL9/62gPwjC/0SK5SBqb2oAZkPheLyP7sbizvlXKjX8cVHJSrPIfwuj13XQIzd
+         4XWQ==
+X-Gm-Message-State: AOAM532i4ww6oeFfDP3RncYt0LrzdlhlRh8RfWR+wRAxhMCt3cVk2pMq
+        4ue+SeUOLWAkKNsDM9wl3x4WfzKUOjVRfQ==
+X-Google-Smtp-Source: ABdhPJwjE8SKscmFCx6A/Ew4FpULeOfDYVvbnmaYm97XNcVfgL29a0n8ihQuCwiA/8EH0vfjRnI2Xg==
+X-Received: by 2002:a9d:341:: with SMTP id 59mr128399otv.286.1643999328759;
+        Fri, 04 Feb 2022 10:28:48 -0800 (PST)
+Received: from [192.168.1.30] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id t20sm986942oov.35.2022.02.04.10.28.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Feb 2022 10:28:48 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.17-rc3
+Message-ID: <4c26c740-abde-87a1-3cf0-5f97fad85d4e@kernel.dk>
+Date:   Fri, 4 Feb 2022 11:28:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20220203201207.1075933-1-shy828301@gmail.com> <302fa562-612b-0853-31de-a11399e5aa08@nvidia.com>
- <ff0d4285-471b-7a33-15a5-3ce89443b41a@nvidia.com>
-In-Reply-To: <ff0d4285-471b-7a33-15a5-3ce89443b41a@nvidia.com>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Fri, 4 Feb 2022 10:10:55 -0800
-Message-ID: <CAHbLzkpSD8C2qTytUejrjuNG_o7r=UuHyqpJasiN_r9MD7AeMg@mail.gmail.com>
-Subject: Re: [v6 PATCH] block: introduce block_rq_error tracepoint
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "hch@infradead.org" <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 4, 2022 at 12:35 AM Chaitanya Kulkarni
-<chaitanyak@nvidia.com> wrote:
->
-> Yang,
->
-> > Question 1 :- What prevents us from using the same format for
-> > both blk_rq_complete() and blk_rq_error() ?
-> >
-> > Question 2 :- assuming that blk_rq_complete() and blk_rq_error()
-> > are using same format why can't we :-
-> >
-> > declare DECLARE_EVENT_CLASS(blk_rq_completion....)
-> > and use that class for blk_rq_complete() and blk_rq_error() ?
-> >
-> > since if I remember correctly we need to define a event class
-> > instead of duplicating a tracepoint with similar reporting.
->
-> What I meant is following compile tested patch (although it will
-> need to split into a prep patch in order to post it) :-
+Hi Linus,
 
-Thank you so much. I will prepare the new patches. I assume you prefer
-a prep patch which converts trace event to event class, then add
-block_rq_err event.
+A set of fixes that should go into this release:
 
->
-> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-> index 27170e40e8c9..7f4dfbdf12a6 100644
-> --- a/include/trace/events/block.h
-> +++ b/include/trace/events/block.h
-> @@ -100,19 +100,7 @@ TRACE_EVENT(block_rq_requeue,
->                    __entry->nr_sector, 0)
->   );
->
-> -/**
-> - * block_rq_complete - block IO operation completed by device driver
-> - * @rq: block operations request
-> - * @error: status code
-> - * @nr_bytes: number of completed bytes
-> - *
-> - * The block_rq_complete tracepoint event indicates that some portion
-> - * of operation request has been completed by the device driver.  If
-> - * the @rq->bio is %NULL, then there is absolutely no additional work to
-> - * do for the request. If @rq->bio is non-NULL then there is
-> - * additional work required to complete the request.
-> - */
-> -TRACE_EVENT(block_rq_complete,
-> +DECLARE_EVENT_CLASS(block_rq_completion,
->
->          TP_PROTO(struct request *rq, blk_status_t error, unsigned int
-> nr_bytes),
->
-> @@ -144,6 +132,41 @@ TRACE_EVENT(block_rq_complete,
->                    __entry->nr_sector, __entry->error)
->   );
->
-> +/**
-> + * block_rq_complete - block IO operation completed by device driver
-> + * @rq: block operations request
-> + * @error: status code
-> + * @nr_bytes: number of completed bytes
-> + *
-> + * The block_rq_complete tracepoint event indicates that some portion
-> + * of operation request has been completed by the device driver.  If
-> + * the @rq->bio is %NULL, then there is absolutely no additional work to
-> + * do for the request. If @rq->bio is non-NULL then there is
-> + * additional work required to complete the request.
-> + */
-> +DEFINE_EVENT(block_rq_completion, block_rq_complete,
-> +
-> +       TP_PROTO(struct request *rq, blk_status_t error, unsigned int
-> nr_bytes),
-> +
-> +       TP_ARGS(rq, error, nr_bytes)
-> +);
-> +
-> +/**
-> + * block_rq_error - block IO operation error reported by device driver
-> + * @rq: block operations request
-> + * @error: status code
-> + * @nr_bytes: number of completed bytes
-> + *
-> + * The block_rq_error tracepoint event indicates that some portion
-> + * of operation request has failed as reported by the device driver.
-> + */
-> +DEFINE_EVENT(block_rq_completion, block_rq_error,
-> +
-> +       TP_PROTO(struct request *rq, blk_status_t error, unsigned int
-> nr_bytes),
-> +
-> +       TP_ARGS(rq, error, nr_bytes)
-> +);
-> +
->   DECLARE_EVENT_CLASS(block_rq,
->
->          TP_PROTO(struct request *rq),
-> >
-> > -ck
-> >
-> >
->
+- NVMe pull request
+	- fix a use-after-free in rdm and tcp controller reset
+	  (Sagi Grimberg)
+	- fix the state check in nvmf_ctlr_matches_baseopts
+	  (Uday Shankar)
+
+- MD nowait null pointer fix (Song)
+
+- blk-integrity seed advance fix (Martin)
+
+- Fix a dio regression in this merge window (Ilya)
+
+Please pull!
+
+
+The following changes since commit b879f915bc48a18d4f4462729192435bb0f17052:
+
+  dm: properly fix redundant bio-based IO accounting (2022-01-28 12:28:15 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-04
+
+for you to fetch changes up to b13e0c71856817fca67159b11abac350e41289f5:
+
+  block: bio-integrity: Advance seed correctly for larger interval sizes (2022-02-03 21:09:24 -0700)
+
+----------------------------------------------------------------
+block-5.17-2022-02-04
+
+----------------------------------------------------------------
+Ilya Dryomov (1):
+      block: fix DIO handling regressions in blkdev_read_iter()
+
+Jens Axboe (2):
+      Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.17
+      Merge tag 'nvme-5.17-2022-02-03' of git://git.infradead.org/nvme into block-5.17
+
+Martin K. Petersen (1):
+      block: bio-integrity: Advance seed correctly for larger interval sizes
+
+Sagi Grimberg (3):
+      nvme: fix a possible use-after-free in controller reset during load
+      nvme-tcp: fix possible use-after-free in transport error_recovery work
+      nvme-rdma: fix possible use-after-free in transport error_recovery work
+
+Song Liu (1):
+      md: fix NULL pointer deref with nowait but no mddev->queue
+
+Uday Shankar (1):
+      nvme-fabrics: fix state check in nvmf_ctlr_matches_baseopts()
+
+ block/bio-integrity.c       |  2 +-
+ block/fops.c                | 33 +++++++++++++++++++--------------
+ drivers/md/md.c             |  8 ++++----
+ drivers/nvme/host/core.c    |  9 ++++++++-
+ drivers/nvme/host/fabrics.h |  1 +
+ drivers/nvme/host/rdma.c    |  1 +
+ drivers/nvme/host/tcp.c     |  1 +
+ 7 files changed, 35 insertions(+), 20 deletions(-)
+
+-- 
+Jens Axboe
+
