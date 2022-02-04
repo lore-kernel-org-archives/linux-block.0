@@ -2,132 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9746C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8DDC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239198AbiBDS2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 13:28:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46146 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232631AbiBDS2t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 13:28:49 -0500
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FDAC061714
-        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 10:28:49 -0800 (PST)
-Received: by mail-ot1-x332.google.com with SMTP id n6-20020a9d6f06000000b005a0750019a7so5770799otq.5
-        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 10:28:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=pgW3FfHX4y6xVFGvas96PvsLzR4RAaCwfL3uj8TdYA0=;
-        b=tlzi4xa31KiHXSY0gBAc4dR9HNT5QuRcpkkdtimaaezHwLg3sco69w7Fu/tYRfODvG
-         3eM4ssFBvDC9coPfnksw88WySbbNsbIE78N/swg79+XyQy34mXriqHFiIqU5YDNIxji3
-         IG9d7rBlnzUzosU/Kg456nApyftZfDf9SICqEHTnIljUzH8fHeSMRF8BTRALMsFOHs42
-         HPqwlET7Av/FeTBkeMOJxXeIE0XmqpXlOSOYM8WaTK7N7RSfsbfkCoMCZ21fr05IeEvZ
-         SjrTZ9gErnmf8j4yovwN4Foa/P1cpFsD0j6SsOgop3KTha2Df5hGsMaf994YviXNaDST
-         gN9g==
+        id S229567AbiBDS7D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 13:59:03 -0500
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:33800
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235038AbiBDS6s (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Feb 2022 13:58:48 -0500
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 521034019A
+        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 18:58:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1644001119;
+        bh=QC1X2RM71Awb1moshBsuaGTei8lAkzyYiOUHcrb832I=;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+         To:Cc:Content-Type;
+        b=ZaBwsSX7fq638ZMo1N6DblQeDXcbAPMG80ahuqF41ADiUdyT8vs2HNq+iY4oRtb92
+         cB2xH+jpK/iBGb40LXatgkRXRy/QG3/WHB7tGs1xjqygBZZA4S4LusJtf39naFcljx
+         KWYz9qzRvQknoGiL2WXipw9htoPkP1VqfA7NGvPHVcv3Nms7cYerFHOyJbNwAOru9h
+         /QKImHk09SQ2ZzBlOIgEwo1zs5ET7SG7koTMOQrXnS5qHXWcrEiU8knfJ/KeAoKzcE
+         9WQuy1QFHQfLb3/4g8eUubhlkMX6SItHJkEcGPvtbzCxweMsZGh6+3ddS4T/3FyHe0
+         x/G1FcwTvsYxw==
+Received: by mail-pj1-f71.google.com with SMTP id q12-20020a17090a2e0c00b001b874772fecso602052pjd.2
+        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 10:58:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=pgW3FfHX4y6xVFGvas96PvsLzR4RAaCwfL3uj8TdYA0=;
-        b=rK6NQRBm5Uq/pp6HA6Lob9ur/jQW9fZTtmHlufvzye2ziaT1ZKE/uu8oyhZhAVIPMH
-         7vweSk4XrYIS+yej8sCiBpSMyyDkIrH70aYWrgLj5/SIXd8l7mKLt+xERo0mC7F3IhxK
-         yKkXOUy+lnzGwgFTCfMNJ1bWeFafZkZ8TuTMowPU2MHLsA/+Bar5+wKa5kziYUb/m7Cm
-         w6N6ljQmnndMb0Y72icv73EL/M4HuA9brPSrYWqcvIh3Kw5577Z1Vlgg0Z6meSlH3irY
-         xGvV8UsL9/62gPwjC/0SK5SBqb2oAZkPheLyP7sbizvlXKjX8cVHJSrPIfwuj13XQIzd
-         4XWQ==
-X-Gm-Message-State: AOAM532i4ww6oeFfDP3RncYt0LrzdlhlRh8RfWR+wRAxhMCt3cVk2pMq
-        4ue+SeUOLWAkKNsDM9wl3x4WfzKUOjVRfQ==
-X-Google-Smtp-Source: ABdhPJwjE8SKscmFCx6A/Ew4FpULeOfDYVvbnmaYm97XNcVfgL29a0n8ihQuCwiA/8EH0vfjRnI2Xg==
-X-Received: by 2002:a9d:341:: with SMTP id 59mr128399otv.286.1643999328759;
-        Fri, 04 Feb 2022 10:28:48 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id t20sm986942oov.35.2022.02.04.10.28.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Feb 2022 10:28:48 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.17-rc3
-Message-ID: <4c26c740-abde-87a1-3cf0-5f97fad85d4e@kernel.dk>
-Date:   Fri, 4 Feb 2022 11:28:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QC1X2RM71Awb1moshBsuaGTei8lAkzyYiOUHcrb832I=;
+        b=N1sVzO6zN521gJTCD2bZ7k0gijOFckdfb5bbfPzO21s4+NFppx9hrzxPS0PPAPySFl
+         tocPOy6n8JqvURy422uavkA8rQVJg8Wq6wFDT3i+oIUTCk5XtcNgxXkkhBQQc1QLwuPa
+         HSGqC68jXCMUATKQKHx5+dP3ENTR3XBI+duLYII5RSPk7jFdO305HRZ9E6c4VZrCWe5E
+         SXCV6r15kgvXXFqnMkOTintKK5NdOBN6CrwbQCQOkdbboMFTYe90wlzq8eWx/DR+Gwtg
+         Dl2OMRlYwH17iYIOoBr5SWm2Axie5KXwS3BYJtV6v64mBfEgTZU8ApPqZdcJj0D/Ldu3
+         s+9g==
+X-Gm-Message-State: AOAM53372HcwPSnfRgUyc+51Bq6zPFioV/77A2b4b4LzDc8tpIg/oS6x
+        qoF70hsh50f4+uD7j/Bq0MTUCVcm2By3k/XbQjnYEGoDHYYF1W4/CYMQUTaKoU4XFpOpTkYlqJ/
+        yYs/IUsHabS742a6bcltSIggUV3T8tJ0+9n3kKj/oJTVg74cKcCcvruqs
+X-Received: by 2002:a17:902:b189:: with SMTP id s9mr4485538plr.112.1644001116753;
+        Fri, 04 Feb 2022 10:58:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzuk7oKvRr5g5rTmO/g4zY0rk6mbprl0xb/vtL7A7Epg/efssaXqnqWVn9eorBVMSJVXU29JHGqszbnckbLPqY=
+X-Received: by 2002:a17:902:b189:: with SMTP id s9mr4485508plr.112.1644001116472;
+ Fri, 04 Feb 2022 10:58:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20220131230255.789059-1-mfo@canonical.com> <Yfrh9F67ligMDUB7@google.com>
+ <CAO9xwp3DNioiVPJNH9w-eXLxfVmTx9jBpOgq9eatpTFJTTg50Q@mail.gmail.com>
+ <Yfr9UkEtLSHL2qhZ@google.com> <CAO9xwp0U4u_XST3WARND0eQ5nyHFrKx+sLWVJLQpjYrkZJOBaw@mail.gmail.com>
+ <CAOUHufbrQZQ=ZCmVFRGOFk6+Snuy4Z6YSDUb3qMsHwROXatz_w@mail.gmail.com>
+In-Reply-To: <CAOUHufbrQZQ=ZCmVFRGOFk6+Snuy4Z6YSDUb3qMsHwROXatz_w@mail.gmail.com>
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+Date:   Fri, 4 Feb 2022 15:58:24 -0300
+Message-ID: <CAO9xwp0z3Gi4NmNsgGfNPQvmp=4e5-NfQ0Wu_m-9XoRR_eegXw@mail.gmail.com>
+Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
+ direct IO read
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Minchan Kim <minchan@kernel.org>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Shi <shy828301@gmail.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Linux-MM <linux-mm@kvack.org>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, Feb 4, 2022 at 2:57 AM Yu Zhao <yuzhao@google.com> wrote:
+>
+> On Thu, Feb 3, 2022 at 3:17 PM Mauricio Faria de Oliveira
+> <mfo@canonical.com> wrote:
+> >
+> > On Wed, Feb 2, 2022 at 6:53 PM Yu Zhao <yuzhao@google.com> wrote:
+[...]
+> > > Got it. IIRC, get_user_pages() doesn't imply a write barrier. If so,
+> > > there should be a smp_wmb() on the other side:
+> >
+> > If I understand it correctly, it actually implies a full memory
+> > barrier, doesn't it?
+> >
+> > Because... gup_pte_range() (fast path) calls try_grab_compound_head(),
+> > which eventually calls* atomic_add_unless(), an atomic conditional RMW
+> > operation with return value, thus fully ordered on success (atomic_t.rst);
+> > (on failure gup_pte_range() falls back to the slow path, below.)
+> >
+> > And follow_page_pte() (slow path) calls try_grab_page(), which also calls
+> > into try_grab_compound_head(), as the above.
+> >
+> > (* on CONFIG_TINY_RCU, it calls just atomic_add(), which isn't ordered,
+> > but that option is targeted for UP/!SMP, thus not a problem for this race.)
+> >
+> > Looking at the implementation of arch_atomic_fetch_add_unless() on
+> > more relaxed/weakly ordered archs (arm, powerpc, if I got that right),
+> > there are barriers like 'smp_mb()' and 'sync' instruction if 'old != unless',
+> > so that seems to be OK.
+> >
+> > And the set_page_dirty() calls occur after get_user_pages() / that point.
+> >
+> > Does that make sense?
+>
+> Yes, it does, thanks. I was thinking along the lines of whether there
+> is an actual contract. [...]
 
-A set of fixes that should go into this release:
+Ok, got you.
 
-- NVMe pull request
-	- fix a use-after-free in rdm and tcp controller reset
-	  (Sagi Grimberg)
-	- fix the state check in nvmf_ctlr_matches_baseopts
-	  (Uday Shankar)
+> [...] The reason get_user_pages() currently works as
+> a full barrier is not intentional but a side effect of this recent
+> cleanup patch:
+> commit 54d516b1d6 ("mm/gup: small refactoring: simplify try_grab_page()")
+> But I agree your fix works as is.
 
-- MD nowait null pointer fix (Song)
+Thanks for bringing it up!
 
-- blk-integrity seed advance fix (Martin)
+That commit and its revert [1] (that John mentioned in his reply)
+change only try_grab_page() / not try_grab_compound_head(),
+thus should affect only the slow path / not the fast path.
 
-- Fix a dio regression in this merge window (Ilya)
+So, with either change or revert, the slow path should still be okay,
+as it takes the page table lock, and try_to_unmap_one() too, thus
+they shouldn't race. And the spinlock barriers get values through.
 
-Please pull!
+Thanks,
 
-
-The following changes since commit b879f915bc48a18d4f4462729192435bb0f17052:
-
-  dm: properly fix redundant bio-based IO accounting (2022-01-28 12:28:15 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-04
-
-for you to fetch changes up to b13e0c71856817fca67159b11abac350e41289f5:
-
-  block: bio-integrity: Advance seed correctly for larger interval sizes (2022-02-03 21:09:24 -0700)
-
-----------------------------------------------------------------
-block-5.17-2022-02-04
-
-----------------------------------------------------------------
-Ilya Dryomov (1):
-      block: fix DIO handling regressions in blkdev_read_iter()
-
-Jens Axboe (2):
-      Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.17
-      Merge tag 'nvme-5.17-2022-02-03' of git://git.infradead.org/nvme into block-5.17
-
-Martin K. Petersen (1):
-      block: bio-integrity: Advance seed correctly for larger interval sizes
-
-Sagi Grimberg (3):
-      nvme: fix a possible use-after-free in controller reset during load
-      nvme-tcp: fix possible use-after-free in transport error_recovery work
-      nvme-rdma: fix possible use-after-free in transport error_recovery work
-
-Song Liu (1):
-      md: fix NULL pointer deref with nowait but no mddev->queue
-
-Uday Shankar (1):
-      nvme-fabrics: fix state check in nvmf_ctlr_matches_baseopts()
-
- block/bio-integrity.c       |  2 +-
- block/fops.c                | 33 +++++++++++++++++++--------------
- drivers/md/md.c             |  8 ++++----
- drivers/nvme/host/core.c    |  9 ++++++++-
- drivers/nvme/host/fabrics.h |  1 +
- drivers/nvme/host/rdma.c    |  1 +
- drivers/nvme/host/tcp.c     |  1 +
- 7 files changed, 35 insertions(+), 20 deletions(-)
+[1] commit c36c04c2e132 ("Revert "mm/gup: small refactoring: simplify
+try_grab_page()"")
 
 -- 
-Jens Axboe
-
+Mauricio Faria de Oliveira
