@@ -2,211 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B6FC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 11:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74564C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 12:09:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358420AbiBDLe1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 06:34:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358414AbiBDLe1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 06:34:27 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4A66C06173D
-        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 03:34:26 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id p7so12414773edc.12
-        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 03:34:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=TQF1/AEnbtmUHa3FAuw6nQDJrxJFCv8yYCIQAgYMNR0=;
-        b=0ajy+8v/jsBfgGk6bMpBUIYinieWtgCd8llUbf5/SfFTr0L10wjL33Esd6+WVS2q2E
-         xqEgoNZe7p3DDKol3CMhwf6WG1KmRbyJSWkBOeMknNl1IAqw9zmfsPqxwZTokejNvsaj
-         zdGTtDXMNUShvYojokoJIIsbJr7NlUheT5MdHDTN78S9Ni0fp/PrLAyDtP4PDwuqrShn
-         5EhDoOXXJRrQzt9eDOHS8+XTN9x+8QFTmbmumY1rXqKeQxIRyNW3KKZbTdh2twSt76Kw
-         X+vs/lT5ri3RBBbCqns98AWJt8C/8UJqJgAsRxcw8Y2AxPDbi7jLb7/51n6gXs8g6W8N
-         8K1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=TQF1/AEnbtmUHa3FAuw6nQDJrxJFCv8yYCIQAgYMNR0=;
-        b=LAUZqs60cMb5Z7I/kt9Xh6WhL2U2EkIWF2IV3hT0aPcbQvEQUPSqpNx+JW5e5qRAJW
-         q7FK6jlotXWxshE59Xvm8CaiDUBwE5E2DvtjOMuqECj1nhjIsg93yJxZhCKdgi1xzh+c
-         v42XY4HWzfZhpDQLbzJIJXb9Dj9PM3DjSefMlbz6PRGAekMReS4xzYmicopRM+yqAud5
-         kr9XNKvkz8s1tzjLpIEtcZDgnYQhkeJMwQkgvCW0zX0HjI+B/q4eouGmKzKcgaPWllZ7
-         vga1S6oOR6CPnw2/nsZa/2rvFOPitEUtKIucIX8PnaFzLN0StsnLYDu3CZO5WdzQtijk
-         4ZSg==
-X-Gm-Message-State: AOAM533qYsJKzjtxkbE4jbKYkaybgZeAi/1zB6LiZa/OamUlCUOoldj3
-        jNI/l0NhqpHg4vTgT1e6B/Wi0g==
-X-Google-Smtp-Source: ABdhPJyHnNd9ApX9T3hNeWQ8SqCfGSdnwH7VDzen0VyUwGIsxdXYZM95bCYkUb7xHMbslFw5zjsfww==
-X-Received: by 2002:a05:6402:2691:: with SMTP id w17mr2622163edd.126.1643974464821;
-        Fri, 04 Feb 2022 03:34:24 -0800 (PST)
-Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
-        by smtp.gmail.com with ESMTPSA id z8sm556366ejc.151.2022.02.04.03.34.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Feb 2022 03:34:24 -0800 (PST)
-Date:   Fri, 4 Feb 2022 12:34:23 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
+        id S229682AbiBDMJX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 07:09:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50265 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1348709AbiBDMJW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Feb 2022 07:09:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643976562;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ug0j2D3hPaBD8ARb0/WmIlQ1wD9LKsRfGtTL8Fytta4=;
+        b=Zv3nSStOBy40Sf8K1haWbl3jgElR6ZrUyx9koXzovBKxIVyOvUszVI3/6AJ28s2yhF9Mks
+        1sZiogyul/PHxVCnDJeDj1dYE80WXYPmS2wLX1yajVg5RZHtGeL0k0zxmigaiHtnaCr/2f
+        gQSTudL6F/z0UY7qY+VgGgZ8D6zQJDI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-548-F7yHxsWwMP2s-ecdrp4ehg-1; Fri, 04 Feb 2022 07:09:19 -0500
+X-MC-Unique: F7yHxsWwMP2s-ecdrp4ehg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B182B8145E0;
+        Fri,  4 Feb 2022 12:09:17 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 914F178A9E;
+        Fri,  4 Feb 2022 12:09:09 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 214C99wH019986;
+        Fri, 4 Feb 2022 07:09:09 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 214C97pr019978;
+        Fri, 4 Feb 2022 07:09:07 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 4 Feb 2022 07:09:07 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "martin.petersen@oracle.com >> Martin K. Petersen" 
-        <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
-        Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [RFC PATCH 3/3] nvme: add the "debug" host driver
-Message-ID: <20220204113423.jmynvz4w5u6wdban@ArmHalley.local>
-References: <270f30df-f14c-b9e4-253f-bff047d32ff0@nvidia.com>
- <20220203153843.szbd4n65ru4fx5hx@garbanzo>
- <CGME20220203165248uscas1p1f0459e548743e6be26d13d3ed8aa4902@uscas1p1.samsung.com>
- <20220203165238.GA142129@dhcp-10-100-145-180.wdc.com>
- <20220203195155.GB249665@bgt-140510-bm01>
- <863d85e3-9a93-4d8c-cf04-88090eb4cc02@nvidia.com>
- <2bbed027-b9a1-e5db-3a3d-90c40af49e09@opensource.wdc.com>
- <9d5d0b50-2936-eac3-12d3-a309389e03bf@nvidia.com>
- <20220204082445.hczdiy2uhxfi3x2g@ArmHalley.local>
- <4d5410a5-93c3-d73c-6aeb-2c1c7f940963@nvidia.com>
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: [RFC PATCH 1/3] block: add copy offload support
+In-Reply-To: <a2ec9086-72d2-4a4e-c4fa-fe53bf5ba092@acm.org>
+Message-ID: <alpine.LRH.2.02.2202040657060.19134@file01.intranet.prod.int.rdu2.redhat.com>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com> <20220201102122.4okwj2gipjbvuyux@mpHalley-2> <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2202011331570.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <efd2e976-4d2d-178e-890d-9bde1a89c47f@acm.org> <alpine.LRH.2.02.2202031310530.28604@file01.intranet.prod.int.rdu2.redhat.com> <a2ec9086-72d2-4a4e-c4fa-fe53bf5ba092@acm.org>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4d5410a5-93c3-d73c-6aeb-2c1c7f940963@nvidia.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04.02.2022 09:58, Chaitanya Kulkarni wrote:
->On 2/4/22 12:24 AM, Javier González wrote:
->> On 04.02.2022 07:58, Chaitanya Kulkarni wrote:
->>> On 2/3/22 22:28, Damien Le Moal wrote:
->>>> On 2/4/22 12:12, Chaitanya Kulkarni wrote:
->>>>>
->>>>>>>> One can instantiate scsi devices with qemu by using fake scsi
->>>>>>>> devices,
->>>>>>>> but one can also just use scsi_debug to do the same. I see both
->>>>>>>> efforts
->>>>>>>> as desirable, so long as someone mantains this.
->>>>>>>>
->>>>>
->>>>> Why do you think both efforts are desirable ?
->>>>
->>>> When testing code using the functionality, it is far easier to get said
->>>> functionality doing a simple "modprobe" rather than having to setup a
->>>> VM. C.f. running blktests or fstests.
->>>>
->>>
->>> agree on simplicity but then why do we have QEMU implementations for
->>> the NVMe features (e.g. ZNS, NVMe Simple Copy) ? we can just build
->>> memoery backed NVMeOF test target for NVMe controller features.
->>>
->>> Also, recognizing the simplicity I proposed initially NVMe ZNS
->>> fabrics based emulation over QEMU (I think I still have initial state
->>> machine implementation code for ZNS somewhere), those were "nacked" for
->>> the right reason, since we've decided go with QEMU and use that as a
->>> primary platform for testing, so I failed to understand what has
->>> changed.. since given that QEMU already supports NVMe simple copy ...
->>
->> I was not part of this conversation, but as I see it each approach give
->> a benefit. QEMU is fantastic for compliance testing and I am not sure
->> you get the same level of command analysis anywhere else; at least not
->> without writing dedicated code for this in a target.
->>
->> This said, when we want to test for race conditions, QEMU is very slow.
->
->Can you please elaborate the scenario and numbers for slowness of QEMU?
-
-QEMU is an emulator, not a simulator. So we will not be able to stress
-the host stack in the same way the null_blk device does. If we want to
-test code in the NVMe driver then we need a way to have the equivalent
-to the null_blk in NVMe. It seems like the nvme-loop target can achieve
-this.
-
-Does this answer your concern?
-
->
->For race conditions testing we can build error injection framework
->around the code implementation which present in kernel everywhere.
-
-True. This is also a good way to do this.
 
 
->
->> For a software-only solution, we have experimented with something
->> similar to the nvme-debug code tha Mikulas is proposing. Adam pointed to
->> the nvme-loop target as an alternative and this seems to work pretty
->> nicely. I do not believe there should be many changes to support copy
->> offload using this.
->>
->
->If QEMU is so incompetent then we need to add every big feature into
->the NVMeOF test target so that we can test it better ? is that what
->you are proposing ? since if we implement one feature, it will be
->hard to nack any new features that ppl will come up with
->same rationale "with QEMU being slow and hard to test race
->conditions etc .."
+On Thu, 3 Feb 2022, Bart Van Assche wrote:
 
-In my opinion, if people want this and is willing to maintain it, there
-is a case for it.
+> On 2/3/22 10:50, Mikulas Patocka wrote:
+> > On Tue, 1 Feb 2022, Bart Van Assche wrote:
+> > > On 2/1/22 10:32, Mikulas Patocka wrote:
+> > > >    /**
+> > > > + * blk_queue_max_copy_sectors - set maximum copy offload sectors for
+> > > > the
+> > > > queue
+> > > > + * @q:  the request queue for the device
+> > > > + * @size:  the maximum copy offload sectors
+> > > > + */
+> > > > +void blk_queue_max_copy_sectors(struct request_queue *q, unsigned int
+> > > > size)
+> > > > +{
+> > > > +	q->limits.max_copy_sectors = size;
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(blk_queue_max_copy_sectors);
+> > > 
+> > > Please either change the unit of 'size' into bytes or change its type into
+> > > sector_t.
+> > 
+> > blk_queue_chunk_sectors, blk_queue_max_discard_sectors,
+> > blk_queue_max_write_same_sectors, blk_queue_max_write_zeroes_sectors,
+> > blk_queue_max_zone_append_sectors also have the unit of sectors and the
+> > argument is "unsigned int". Should blk_queue_max_copy_sectors be
+> > different?
+> 
+> As far as I know using the type sector_t for variables that represent a number
+> of sectors is a widely followed convention:
+> 
+> $ git grep -w sector_t | wc -l
+> 2575
+> 
+> I would appreciate it if that convention would be used consistently, even if
+> that means modifying existing code.
+> 
+> Thanks,
+> 
+> Bart.
 
->
->and if that is the case why we don't have ZNS NVMeOF target
->memory backed emulation ? Isn't that a bigger and more
->complicated feature than Simple Copy where controller states
->are involved with AENs ?
+Changing the sector limit variables in struct queue_limits from unsigned 
+int to sector_t would increase the size of the structure and its cache 
+footprint.
 
-I think this is a good idea.
+And we can't send bios larger than 4GiB anyway because bi_size is 32-bit.
 
->
->ZNS kernel code testing is also done on QEMU, I've also fixed
->bugs in the ZNS kernel code which are discovered on QEMU and I've not
->seen any issues with that. Given that simple copy feature is way smaller
->than ZNS it will less likely to suffer from slowness and etc (listed
->above) in QEMU.
+Jens, what do you think about it? Should the sectors limits be sector_t?
 
-QEMU is super useful: it is easy and it help identifying many issues.
-But it is for compliance, not for performance. There was an effort to
-make FEMU, but this seems to be an abandoned project.
+Mikulas
 
->
->my point is if we allow one, we will be opening floodgates and we need
->to be careful not to bloat the code unless it is _absolutely
->necessary_ which I don't think it is based on the simple copy
->specification.
-
-I understand, and this is a very valid point. It seems like the
-nvme-loop device can give a lot of what we need; all the necessary extra
-logic can go into the null_blk and then we do not need NVMe specific
-code.
-
-Do you see any inconvenient with this approach?
-
-
->
->> So in my view having both is not replication and it gives more
->> flexibility for validation, which I believe it is always good.
->>
->
