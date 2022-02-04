@@ -2,102 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F240AC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 13:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B4AC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 13:33:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358699AbiBDNc3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 08:32:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
+        id S1358850AbiBDNdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 08:33:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231856AbiBDNc3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 08:32:29 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D22C061714
-        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 05:32:29 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id h125so5053917pgc.3
-        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 05:32:29 -0800 (PST)
+        with ESMTP id S1358843AbiBDNdK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 08:33:10 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFA3C061714
+        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 05:33:10 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id x15-20020a17090a6b4f00b001b8778c9183so145100pjl.4
+        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 05:33:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UbGuJT+82u/r5OVFIMOVDfayUzP0EGS/g4aR/lRMEDU=;
-        b=tb319ZxJaT2G2jEsLg001lXCi1v5OjI0tcX3tYb96s6yhPSV74Av/Fmqv0P0FhrD7G
-         s2KWFILCJ5Oe0/99QkM+8m8DWTGV1SDpUTKkSEDRGLnXb7mFRWlTwa9OyG+pZVFThbUg
-         rYfdGtniBA03bJjxGVdaQl6ucJZuNbaP7KhiG9fD1L61EpDe3plJ3LfLi9tciIE5Iv7a
-         mVRSxtjXq27G3q1MSzQc7EMJ3TBmmwQDnV0PsyF6L/Pih5jw/Bz24fS+cxAnAe5pbEeD
-         2zG+kzzIf0gF2GH7cIe7EgjqwptmQB9eylyoXBg9MZBZ+fmNMejHy8r7jHrrx4IhOgwi
-         HcKA==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=jo/bvJQ+bbTHRoPqzABHC5ghz3NHgQ20n2D3ghkleSk=;
+        b=iHyvceh0OaodJw4edYRlN1IK4MdVQwthNvykjiqGcUuqHKxy9eaL5Y24MnKr71hoK/
+         mXp8W9C6lvQQGAGYjSE2E17SbLBYl+9pxRL+XpIW813Xj2rt2BY9YGqrhNiwqURVooyd
+         nM9AwuHNtrT3OjBSMcN3VhiaB4/DTIP10qc3qbJ3hndkIvDjyo+njx2yBTWXL4TWACKo
+         kwciynBVHAVZGTa5zybPRpolNuWHibYy0dFKBEHOq1g6s2dYve9hGh6MmBaVmRAIhSRK
+         qEJEmStLqmUNH4gf3j/jh/qVXwA6hEWmNMVHZbu6dUhLYHmwNXGe2kLCuYZhuFgbvx7j
+         1e2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UbGuJT+82u/r5OVFIMOVDfayUzP0EGS/g4aR/lRMEDU=;
-        b=20mNAPQs6NthuA/ILLK+STgcVv/rAx5zvgPW50Z76JdnPuNrCq3wE9xybwKmkchDvC
-         E3BY0BjwtUZgcgR1E4qpi1KeN4Ik6SX5jmuYcTmIph+h7NfULn2kzuWvfHSM740QdEil
-         2ncr0R8yNbQnKDWCY+cLK7KbAta80lYKPw1JEsmL65F+0QMVQIUcsYrRgwOgpYN6wKNP
-         IG39Kfnkm9XqJVIYHB/A2EKHPGzYX3ELJmRG9aij+lhCTRvX4Sev3Q0z5t6IJUmkCrP6
-         A4sn+Ft1ebH0uj49WXqLlsM9B8qKADZTn2TZoy+uDyhnx3BTFUHKoH8vIyCmhK6OAOA0
-         mRZw==
-X-Gm-Message-State: AOAM531EYOJVWCQ7de2dDWu5pyPi3FZXFklFXUCpKtgZwVEilW6g/qjD
-        7Du3P2PPDvlMyPGxa4SN2wocDw==
-X-Google-Smtp-Source: ABdhPJwqTE9JG+YJdZ4CiM388CYHQbBhyS5L72K7Y633EUO/ynw8J+ru2L9V+JSjCIgU1JgykhkwhQ==
-X-Received: by 2002:a63:f711:: with SMTP id x17mr2395738pgh.274.1643981548461;
-        Fri, 04 Feb 2022 05:32:28 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=jo/bvJQ+bbTHRoPqzABHC5ghz3NHgQ20n2D3ghkleSk=;
+        b=btSS/DpXpgE9vhtwNV5+97nkFDGAW1wrfzHyoe4HTOZ9ztbjM+4CmraM3cUTUC9eJ5
+         zHXVsilm260/x0li6TLgX/LbRYvHP/a3mfPZB/Gwoscom4njG1wY2pc16Pdl1yJpcbDa
+         tTWvcvITILy5nJefHDuc50pF3vGnkOUvsCA55Zt9Gb+uiF04pEWQpnkyscGoBy8TdDOH
+         9albNrw67H7+42iFZqs8b1/s4equkuxc4RP8ZhR3IO2G73JWZf920Dj3g92gHwCFfyXe
+         0sxorCzrjSnk3EZyXg6K95rueCzbfqjX2cfSMlW5O0qOuIMfDhxekYUEQQUyFDwiZiIl
+         DYnQ==
+X-Gm-Message-State: AOAM532nkyVBSg1Zq28m1mbCzixCXZ4njnLF8T2EtbwD37LldOpD6rYA
+        Ldf41nKctMUy+aF2keO5F56ayZR5eJEnpw==
+X-Google-Smtp-Source: ABdhPJxvkiQLuQb7jRyLi/86KiVqYUedYolrW2j5d4wg9tBOU2oaXzkfGfrwbpN3xIoYki7KLzHELA==
+X-Received: by 2002:a17:90a:4b8b:: with SMTP id i11mr3165659pjh.148.1643981589831;
+        Fri, 04 Feb 2022 05:33:09 -0800 (PST)
 Received: from [192.168.1.116] ([66.219.217.159])
-        by smtp.gmail.com with ESMTPSA id o5sm2727140pfk.172.2022.02.04.05.32.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Feb 2022 05:32:28 -0800 (PST)
-Subject: Re: Partial direct-io loop regression in 5.17-rc
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ondrej Kozina <okozina@redhat.com>
-References: <feb7e4b4-1a6f-71a7-0cdd-fda547408bea@gmail.com>
+        by smtp.gmail.com with ESMTPSA id s17sm2528575pfk.156.2022.02.04.05.33.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Feb 2022 05:33:09 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <08e1dbde-b27c-fd99-294c-8e4715b92576@kernel.dk>
-Date:   Fri, 4 Feb 2022 06:32:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     syzbot+2b3f18414c37b42dcc94@syzkaller.appspotmail.com,
+        linux-block@vger.kernel.org
+In-Reply-To: <20220204071934.168469-1-hch@lst.de>
+References: <20220204071934.168469-1-hch@lst.de>
+Subject: Re: [PATCH] block: call bio_associate_blkg from bio_reset
+Message-Id: <164398158883.441900.2159539572105486844.b4-ty@kernel.dk>
+Date:   Fri, 04 Feb 2022 06:33:08 -0700
 MIME-Version: 1.0
-In-Reply-To: <feb7e4b4-1a6f-71a7-0cdd-fda547408bea@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/4/22 2:22 AM, Milan Broz wrote:
-> Hi Jens,
-> 
-> It seems that there is a regression in direct-io over loop for partial
-> direct-io reads (or perhaps even for other situations).
-> 
-> If I run this code (loop over 6M file, dd direct-io read with 4M blocks)
-> 
-> IMG=tst.img
-> LOOP=/dev/loop66
-> 
-> truncate -s 6M $IMG
-> losetup $LOOP $IMG
-> dd if=$LOOP of=/dev/null bs=4M iflag=direct
-> losetup -d $LOOP
+On Fri, 4 Feb 2022 08:19:34 +0100, Christoph Hellwig wrote:
+> Call bio_associate_blkg just like bio_set_dev did in the callers before
+> the conversion to set the block device in bio_reset.
 > 
 > 
-> on older kernel (<=5.16) it reads the whole file
->    6291456 bytes (6.3 MB, 6.0 MiB) copied, 0.201591 s, 31.2 MB/s
-> 
-> 
-> while on 5.17-rc (tested on today/s Linus' git) it reads only the full blocks:
->    4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.201904 s, 20.8 MB/s
-> 
-> No error reported, exit code is 0.
 
-Can you try:
+Applied, thanks!
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.17&id=3e1f941dd9f33776b3df4e30f741fe445ff773f3
+[1/1] block: call bio_associate_blkg from bio_reset
+      commit: 78e3437450be5236c4949e377c9b848bbcd4fcb0
 
+Best regards,
 -- 
 Jens Axboe
+
 
