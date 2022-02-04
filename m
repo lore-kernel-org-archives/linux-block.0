@@ -2,117 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74564C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 12:09:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F240AC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 13:32:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbiBDMJX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 07:09:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50265 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348709AbiBDMJW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 4 Feb 2022 07:09:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643976562;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ug0j2D3hPaBD8ARb0/WmIlQ1wD9LKsRfGtTL8Fytta4=;
-        b=Zv3nSStOBy40Sf8K1haWbl3jgElR6ZrUyx9koXzovBKxIVyOvUszVI3/6AJ28s2yhF9Mks
-        1sZiogyul/PHxVCnDJeDj1dYE80WXYPmS2wLX1yajVg5RZHtGeL0k0zxmigaiHtnaCr/2f
-        gQSTudL6F/z0UY7qY+VgGgZ8D6zQJDI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-548-F7yHxsWwMP2s-ecdrp4ehg-1; Fri, 04 Feb 2022 07:09:19 -0500
-X-MC-Unique: F7yHxsWwMP2s-ecdrp4ehg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B182B8145E0;
-        Fri,  4 Feb 2022 12:09:17 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 914F178A9E;
-        Fri,  4 Feb 2022 12:09:09 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 214C99wH019986;
-        Fri, 4 Feb 2022 07:09:09 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 214C97pr019978;
-        Fri, 4 Feb 2022 07:09:07 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Fri, 4 Feb 2022 07:09:07 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [RFC PATCH 1/3] block: add copy offload support
-In-Reply-To: <a2ec9086-72d2-4a4e-c4fa-fe53bf5ba092@acm.org>
-Message-ID: <alpine.LRH.2.02.2202040657060.19134@file01.intranet.prod.int.rdu2.redhat.com>
-References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com> <20220201102122.4okwj2gipjbvuyux@mpHalley-2> <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2202011331570.22481@file01.intranet.prod.int.rdu2.redhat.com>
- <efd2e976-4d2d-178e-890d-9bde1a89c47f@acm.org> <alpine.LRH.2.02.2202031310530.28604@file01.intranet.prod.int.rdu2.redhat.com> <a2ec9086-72d2-4a4e-c4fa-fe53bf5ba092@acm.org>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S1358699AbiBDNc3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 08:32:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231856AbiBDNc3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 08:32:29 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D22C061714
+        for <linux-block@vger.kernel.org>; Fri,  4 Feb 2022 05:32:29 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id h125so5053917pgc.3
+        for <linux-block@vger.kernel.org>; Fri, 04 Feb 2022 05:32:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UbGuJT+82u/r5OVFIMOVDfayUzP0EGS/g4aR/lRMEDU=;
+        b=tb319ZxJaT2G2jEsLg001lXCi1v5OjI0tcX3tYb96s6yhPSV74Av/Fmqv0P0FhrD7G
+         s2KWFILCJ5Oe0/99QkM+8m8DWTGV1SDpUTKkSEDRGLnXb7mFRWlTwa9OyG+pZVFThbUg
+         rYfdGtniBA03bJjxGVdaQl6ucJZuNbaP7KhiG9fD1L61EpDe3plJ3LfLi9tciIE5Iv7a
+         mVRSxtjXq27G3q1MSzQc7EMJ3TBmmwQDnV0PsyF6L/Pih5jw/Bz24fS+cxAnAe5pbEeD
+         2zG+kzzIf0gF2GH7cIe7EgjqwptmQB9eylyoXBg9MZBZ+fmNMejHy8r7jHrrx4IhOgwi
+         HcKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UbGuJT+82u/r5OVFIMOVDfayUzP0EGS/g4aR/lRMEDU=;
+        b=20mNAPQs6NthuA/ILLK+STgcVv/rAx5zvgPW50Z76JdnPuNrCq3wE9xybwKmkchDvC
+         E3BY0BjwtUZgcgR1E4qpi1KeN4Ik6SX5jmuYcTmIph+h7NfULn2kzuWvfHSM740QdEil
+         2ncr0R8yNbQnKDWCY+cLK7KbAta80lYKPw1JEsmL65F+0QMVQIUcsYrRgwOgpYN6wKNP
+         IG39Kfnkm9XqJVIYHB/A2EKHPGzYX3ELJmRG9aij+lhCTRvX4Sev3Q0z5t6IJUmkCrP6
+         A4sn+Ft1ebH0uj49WXqLlsM9B8qKADZTn2TZoy+uDyhnx3BTFUHKoH8vIyCmhK6OAOA0
+         mRZw==
+X-Gm-Message-State: AOAM531EYOJVWCQ7de2dDWu5pyPi3FZXFklFXUCpKtgZwVEilW6g/qjD
+        7Du3P2PPDvlMyPGxa4SN2wocDw==
+X-Google-Smtp-Source: ABdhPJwqTE9JG+YJdZ4CiM388CYHQbBhyS5L72K7Y633EUO/ynw8J+ru2L9V+JSjCIgU1JgykhkwhQ==
+X-Received: by 2002:a63:f711:: with SMTP id x17mr2395738pgh.274.1643981548461;
+        Fri, 04 Feb 2022 05:32:28 -0800 (PST)
+Received: from [192.168.1.116] ([66.219.217.159])
+        by smtp.gmail.com with ESMTPSA id o5sm2727140pfk.172.2022.02.04.05.32.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Feb 2022 05:32:28 -0800 (PST)
+Subject: Re: Partial direct-io loop regression in 5.17-rc
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Ondrej Kozina <okozina@redhat.com>
+References: <feb7e4b4-1a6f-71a7-0cdd-fda547408bea@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <08e1dbde-b27c-fd99-294c-8e4715b92576@kernel.dk>
+Date:   Fri, 4 Feb 2022 06:32:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <feb7e4b4-1a6f-71a7-0cdd-fda547408bea@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On Thu, 3 Feb 2022, Bart Van Assche wrote:
-
-> On 2/3/22 10:50, Mikulas Patocka wrote:
-> > On Tue, 1 Feb 2022, Bart Van Assche wrote:
-> > > On 2/1/22 10:32, Mikulas Patocka wrote:
-> > > >    /**
-> > > > + * blk_queue_max_copy_sectors - set maximum copy offload sectors for
-> > > > the
-> > > > queue
-> > > > + * @q:  the request queue for the device
-> > > > + * @size:  the maximum copy offload sectors
-> > > > + */
-> > > > +void blk_queue_max_copy_sectors(struct request_queue *q, unsigned int
-> > > > size)
-> > > > +{
-> > > > +	q->limits.max_copy_sectors = size;
-> > > > +}
-> > > > +EXPORT_SYMBOL_GPL(blk_queue_max_copy_sectors);
-> > > 
-> > > Please either change the unit of 'size' into bytes or change its type into
-> > > sector_t.
-> > 
-> > blk_queue_chunk_sectors, blk_queue_max_discard_sectors,
-> > blk_queue_max_write_same_sectors, blk_queue_max_write_zeroes_sectors,
-> > blk_queue_max_zone_append_sectors also have the unit of sectors and the
-> > argument is "unsigned int". Should blk_queue_max_copy_sectors be
-> > different?
+On 2/4/22 2:22 AM, Milan Broz wrote:
+> Hi Jens,
 > 
-> As far as I know using the type sector_t for variables that represent a number
-> of sectors is a widely followed convention:
+> It seems that there is a regression in direct-io over loop for partial
+> direct-io reads (or perhaps even for other situations).
 > 
-> $ git grep -w sector_t | wc -l
-> 2575
+> If I run this code (loop over 6M file, dd direct-io read with 4M blocks)
 > 
-> I would appreciate it if that convention would be used consistently, even if
-> that means modifying existing code.
+> IMG=tst.img
+> LOOP=/dev/loop66
 > 
-> Thanks,
+> truncate -s 6M $IMG
+> losetup $LOOP $IMG
+> dd if=$LOOP of=/dev/null bs=4M iflag=direct
+> losetup -d $LOOP
 > 
-> Bart.
+> 
+> on older kernel (<=5.16) it reads the whole file
+>    6291456 bytes (6.3 MB, 6.0 MiB) copied, 0.201591 s, 31.2 MB/s
+> 
+> 
+> while on 5.17-rc (tested on today/s Linus' git) it reads only the full blocks:
+>    4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.201904 s, 20.8 MB/s
+> 
+> No error reported, exit code is 0.
 
-Changing the sector limit variables in struct queue_limits from unsigned 
-int to sector_t would increase the size of the structure and its cache 
-footprint.
+Can you try:
 
-And we can't send bios larger than 4GiB anyway because bi_size is 32-bit.
+https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.17&id=3e1f941dd9f33776b3df4e30f741fe445ff773f3
 
-Jens, what do you think about it? Should the sectors limits be sector_t?
-
-Mikulas
+-- 
+Jens Axboe
 
