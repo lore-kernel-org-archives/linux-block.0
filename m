@@ -2,53 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 619FCC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89343C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 18:11:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355839AbiBDSJL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 13:09:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41600 "EHLO
+        id S1377374AbiBDSLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 13:11:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbiBDSJL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 13:09:11 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F1CC061714;
-        Fri,  4 Feb 2022 10:09:11 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id o12so21653764eju.13;
-        Fri, 04 Feb 2022 10:09:10 -0800 (PST)
+        with ESMTP id S1377368AbiBDSLJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 13:11:09 -0500
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C69B0C061714;
+        Fri,  4 Feb 2022 10:11:08 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id w25so14711864edt.7;
+        Fri, 04 Feb 2022 10:11:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ZOk1AjwIVX9pqDuRbELOCa6z4G8rYwIr5B63rOLPi6w=;
-        b=WzlYqpQ9SFXr3PX0uYzI1THJe1HOJjHnQYjFosTkecnxX56r1yjc/1jr7dEL2onX98
-         ojbxDzjeA15k37t+POMIoGbnCdw0F0/Q945oDIATQCU3YuHJMrym9OBMUy7ED58xFS2f
-         OvDj3LeIFKuByu9wtCVJj9zR/KCHwgCzcufanpT3Rj+fiCD8TpGIYoPiv8uZEfXPGKVL
-         ivQUAqE+Wt1bWyxBLkf41RjEpx0xgnyW8E3SrjnhEJsr0lkM46GugLbkvvtIrsm+GP7o
-         N8n6JUrCA37Izve+pGlgY9XFG28XEHH0TdJHSPy9bF4Zz2O0Q+PYpnYPHoW5yB/8LVVC
-         dVTw==
+        bh=6s9CxsBC8cchiiPxKjwG6ONmmaSZUcKlcytb21KkuK4=;
+        b=mMwobpRUXA9Il4+uCKlHw6uyqMvTiH9Co4xQriHvk+7cQWLGfV4ISuvLZjoEIYz2YL
+         spSlxMCfXEqOlVgcBgRfvr7pMEccBcsjdEJHVaT+9IGq1T4x45Wh/IY0kFLObZgjyEi6
+         qBKsaymIjp4oJsFJiFD1K8E1Cg0Cd2guzmTHMmlzvSuMbBVmk+i8SZSOiiaPlv4yvlz6
+         rOsdvp0VNA5dRowLx6zMu5Av5Jz3WZLFQJTgvJknSwvoVcGuB9D3oLpqChe5IFVYxnzz
+         oztZ8x+bOOEFXJH4M77HfNGxKRMNJh4UWDTgYw42Z8YdBcIHdA86Z8Nrowue70SLFobL
+         4/Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ZOk1AjwIVX9pqDuRbELOCa6z4G8rYwIr5B63rOLPi6w=;
-        b=QA04E4k73ZJtj92axiBOk+KYqgXqWgFZ6IzjlP6IeDHmvZ/P/osYFnjJr8jkEbTfDI
-         Th6D3+SB4ll19e6lvbvVz1Fr9znIzK7F4h6EZoitB+1iD18ZNu7d41L4JGWT4TpCKqui
-         yTm6v0C2SkQ/QxKoV5GlJ1dYVU8cd6JislHxxxgj1A0AHc1amiPQTkoGhg1VyKyiEc0l
-         SWG8pDYMRHmyyjQcncD4femhweIa+Tsh9bmzHxAhnbdJsZGD0UtjsB2SKbmZBw5VUE7p
-         qhSz2ynhWNWNd7wDBQh2Q7Vykzsd7904Fcs7A4kCiQqgL9NGNyu50Ij15P4+H4ltoOPz
-         1tUQ==
-X-Gm-Message-State: AOAM532lr89lYjqIIZICbYIxEIlbAkcO1TkRimM+OMn5tAROetg2uNUx
-        AYpT5+1M3mNpplIyO7YSj9pI1CBw9GOIJa0xn2APOf2p
-X-Google-Smtp-Source: ABdhPJwafFKJN7/nW/YfpdDz6GBq+Lu04Yh1LmAOb61IjhGfURB/qgcTa/AMBwlAWsDw2vk5++ZSGS4R2gxsK5B101s=
-X-Received: by 2002:a17:906:30c9:: with SMTP id b9mr61442ejb.377.1643998149504;
- Fri, 04 Feb 2022 10:09:09 -0800 (PST)
+        bh=6s9CxsBC8cchiiPxKjwG6ONmmaSZUcKlcytb21KkuK4=;
+        b=mm+ZNuoY1AyZvJCUfW7Y3XjWcpUkLtxrOcWAgfGUBo9wf06oA4TdM4cIqIZx24qakk
+         rkojaC/1fpvfukWsDJImV7UjWHyaM7OqA+l3sCoC/oJg3u35PG9kWC3xoZ68tR3cP0hQ
+         hpOVRSZzqLo58/C3Gme25J+9ICVg74cC5x0WJ63PnUn2g/TP6Ks+eTdpvJYqR8XaT805
+         Eg6wSqUMeWpEBslQ7R7pRdQXf3G7RDwt865//h0sACTmCL9G5Jx0fIa+AWF1zyd4/n6i
+         dTNXPfUq+O+fLv07YlDAvsDxGOCmNltXyuGnM7H/oZ/0RkMwK3DKo2DApg+xElNuhpHa
+         fZYg==
+X-Gm-Message-State: AOAM5308MbIol/L4N82FbluMumUaUD8spwQGEyxxy1ADEEz7AlFKD1Nr
+        Ir4P8SQq9bGQEwdSCbEKo0h5+f+lmotfY/k4smc=
+X-Google-Smtp-Source: ABdhPJxIigxgUUaumtaROQOhEriR+Qg/btM9GhyxFDVYRkUss89SOw+32KatpfY67ve6G/Onyk2M09eet+4uxIblNBQ=
+X-Received: by 2002:a50:ee01:: with SMTP id g1mr316060eds.415.1643998267355;
+ Fri, 04 Feb 2022 10:11:07 -0800 (PST)
 MIME-Version: 1.0
 References: <20220203201207.1075933-1-shy828301@gmail.com> <302fa562-612b-0853-31de-a11399e5aa08@nvidia.com>
-In-Reply-To: <302fa562-612b-0853-31de-a11399e5aa08@nvidia.com>
+ <ff0d4285-471b-7a33-15a5-3ce89443b41a@nvidia.com>
+In-Reply-To: <ff0d4285-471b-7a33-15a5-3ce89443b41a@nvidia.com>
 From:   Yang Shi <shy828301@gmail.com>
-Date:   Fri, 4 Feb 2022 10:08:57 -0800
-Message-ID: <CAHbLzko1izwBERS6auEna+eAGzQVA7zkDihMjT=tt_EBdhfmaA@mail.gmail.com>
+Date:   Fri, 4 Feb 2022 10:10:55 -0800
+Message-ID: <CAHbLzkpSD8C2qTytUejrjuNG_o7r=UuHyqpJasiN_r9MD7AeMg@mail.gmail.com>
 Subject: Re: [v6 PATCH] block: introduce block_rq_error tracepoint
 To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -62,67 +63,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 3, 2022 at 6:46 PM Chaitanya Kulkarni <chaitanyak@nvidia.com> wrote:
+On Fri, Feb 4, 2022 at 12:35 AM Chaitanya Kulkarni
+<chaitanyak@nvidia.com> wrote:
 >
 > Yang,
 >
-> On 2/3/22 12:12, Yang Shi wrote:
-> > Currently, rasdaemon uses the existing tracepoint block_rq_complete
-> > and filters out non-error cases in order to capture block disk errors.
+> > Question 1 :- What prevents us from using the same format for
+> > both blk_rq_complete() and blk_rq_error() ?
 > >
-> > But there are a few problems with this approach:
+> > Question 2 :- assuming that blk_rq_complete() and blk_rq_error()
+> > are using same format why can't we :-
 > >
-> > 1. Even kernel trace filter could do the filtering work, there is
-> >     still some overhead after we enable this tracepoint.
+> > declare DECLARE_EVENT_CLASS(blk_rq_completion....)
+> > and use that class for blk_rq_complete() and blk_rq_error() ?
 > >
-> > 2. The filter is merely based on errno, which does not align with kernel
-> >     logic to check the errors for print_req_error().
-> >
-> > 3. block_rq_complete only provides dev major and minor to identify
-> >     the block device, it is not convenient to use in user-space.
-> >
-> > So introduce a new tracepoint block_rq_error just for the error case.
-> > With this patch, rasdaemon could switch to block_rq_error.
-> >
+> > since if I remember correctly we need to define a event class
+> > instead of duplicating a tracepoint with similar reporting.
 >
-> This patch looks good, but I've a question for you.
->
-> We already have a tracepoint for the request completion
-> block_rq_complete(). We are adding a new tracepoint blk_rq_error()
-> that is also similar to what blk_rq_complete() reports.
-> Similar call sites  :-
-> trace_block_rq_complete(req, error, nr_bytes);
-> trace_block_rq_error(req, error, nr_bytes);
->
-> The only delta between blk_rq_complete() and blk_rq_error() is
-> cmd field for blk_rq_complete() in the TP_STRUCT_ENTRY() and
-> __get_str(cmd) field in TP_printk() which I don't think will
-> have any issue if we use that for blk_rq_error().
+> What I meant is following compile tested patch (although it will
+> need to split into a prep patch in order to post it) :-
 
-Yes, I agree. Just no user needs it for our usecase.
+Thank you so much. I will prepare the new patches. I assume you prefer
+a prep patch which converts trace event to event class, then add
+block_rq_err event.
 
 >
-> Question 1 :- What prevents us from using the same format for
-> both blk_rq_complete() and blk_rq_error() ?
-
-Actually nothing if we ignore cmd.
-
+> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> index 27170e40e8c9..7f4dfbdf12a6 100644
+> --- a/include/trace/events/block.h
+> +++ b/include/trace/events/block.h
+> @@ -100,19 +100,7 @@ TRACE_EVENT(block_rq_requeue,
+>                    __entry->nr_sector, 0)
+>   );
 >
-> Question 2 :- assuming that blk_rq_complete() and blk_rq_error()
-> are using same format why can't we :-
+> -/**
+> - * block_rq_complete - block IO operation completed by device driver
+> - * @rq: block operations request
+> - * @error: status code
+> - * @nr_bytes: number of completed bytes
+> - *
+> - * The block_rq_complete tracepoint event indicates that some portion
+> - * of operation request has been completed by the device driver.  If
+> - * the @rq->bio is %NULL, then there is absolutely no additional work to
+> - * do for the request. If @rq->bio is non-NULL then there is
+> - * additional work required to complete the request.
+> - */
+> -TRACE_EVENT(block_rq_complete,
+> +DECLARE_EVENT_CLASS(block_rq_completion,
 >
-> declare DECLARE_EVENT_CLASS(blk_rq_completion....)
-> and use that class for blk_rq_complete() and blk_rq_error() ?
+>          TP_PROTO(struct request *rq, blk_status_t error, unsigned int
+> nr_bytes),
 >
-> since if I remember correctly we need to define a event class
-> instead of duplicating a tracepoint with similar reporting.
-
-Very good point. I did overlook it. The original post did have disk
-name and didn't have cmd, now the two tracepoints look much more
-similar than the original post, so I agree the duplicate could be
-combined into an event class.
-
+> @@ -144,6 +132,41 @@ TRACE_EVENT(block_rq_complete,
+>                    __entry->nr_sector, __entry->error)
+>   );
 >
-> -ck
+> +/**
+> + * block_rq_complete - block IO operation completed by device driver
+> + * @rq: block operations request
+> + * @error: status code
+> + * @nr_bytes: number of completed bytes
+> + *
+> + * The block_rq_complete tracepoint event indicates that some portion
+> + * of operation request has been completed by the device driver.  If
+> + * the @rq->bio is %NULL, then there is absolutely no additional work to
+> + * do for the request. If @rq->bio is non-NULL then there is
+> + * additional work required to complete the request.
+> + */
+> +DEFINE_EVENT(block_rq_completion, block_rq_complete,
+> +
+> +       TP_PROTO(struct request *rq, blk_status_t error, unsigned int
+> nr_bytes),
+> +
+> +       TP_ARGS(rq, error, nr_bytes)
+> +);
+> +
+> +/**
+> + * block_rq_error - block IO operation error reported by device driver
+> + * @rq: block operations request
+> + * @error: status code
+> + * @nr_bytes: number of completed bytes
+> + *
+> + * The block_rq_error tracepoint event indicates that some portion
+> + * of operation request has failed as reported by the device driver.
+> + */
+> +DEFINE_EVENT(block_rq_completion, block_rq_error,
+> +
+> +       TP_PROTO(struct request *rq, blk_status_t error, unsigned int
+> nr_bytes),
+> +
+> +       TP_ARGS(rq, error, nr_bytes)
+> +);
+> +
+>   DECLARE_EVENT_CLASS(block_rq,
 >
+>          TP_PROTO(struct request *rq),
+> >
+> > -ck
+> >
+> >
 >
