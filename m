@@ -2,170 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE95C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 05:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E99ACC433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Feb 2022 06:28:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243548AbiBDF5M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Feb 2022 00:57:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243547AbiBDF5M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 00:57:12 -0500
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECD0C061714
-        for <linux-block@vger.kernel.org>; Thu,  3 Feb 2022 21:57:11 -0800 (PST)
-Received: by mail-ua1-x934.google.com with SMTP id b37so9107875uad.12
-        for <linux-block@vger.kernel.org>; Thu, 03 Feb 2022 21:57:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LhDcUu3Ah3HZ65FQSPghcO3kyhkxVY9J9SeqjAvd2Fw=;
-        b=K1pF2m5RKywvhxtdwrfFT98zAoy7v14CJrP/cEUKbZ3nzk5SacG7CKL+pvEBPuLHZk
-         dDIfQoUdrgwxzxH+UzPPdbY/FIG3gxQaKssFF7dMyxmT2eifYq+bAorIbCrB+uuS/hqt
-         92R+lq/qRyM+H3Qvvd4lHjRbtYu5LKx5Wdoec3XzFLSrW9kYAG8fUDS/OzbOLS89ybML
-         in7YrcHGhtYyar+8MTuFkXAseuXMceN8BzGkX2Dt/6mBmW396ajO0Y1Il/Hauzgcp61r
-         B8cfi6DXXcFM99PcxexHi/NbH5PLhg3TsHWfhljoE6senApyrQihD7BXQFDX/QGB7Ww8
-         spOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LhDcUu3Ah3HZ65FQSPghcO3kyhkxVY9J9SeqjAvd2Fw=;
-        b=A5LmIVnDxoz41gCw/QpNG1VtTGynug/VuwBQHBNiPalOXudnLyMDG2DPfFic+Lsv2U
-         GPb1KSpvNsB2VRayPDp9QySuVgllqTXV99BmXr7LGjkwx2XBe7itmmSXTylsvbKDXdok
-         mIshi0itdoL9FZTOYFwY8J1l3ovREQoh3a7jzgKD/ShtiEixM7HIS1V3DGixV4hD6nOz
-         bU/cgkKGQb7AODUPxk3lZakvi2j/mni/3LOb8A9KQ2gu0ZMmTebOQmtffwAQvl699rXK
-         XtqEjrEqe34r1Kes7JN/5ea2xkGFobUbWm7yyzfeIqByAguZXUl+6cz9wUHMMf4gwj72
-         3N/A==
-X-Gm-Message-State: AOAM532GBwRsDHQEsOk/aAJcpot/RdskxWpjMI+1vZJJiZdPpZwaft4U
-        bOgwbWDuZbJjJhzNYtskm1UQlQaHqlrJPgCwbZbVew==
-X-Google-Smtp-Source: ABdhPJy7o0D9msmWzU/lM04nhhBo9zAihX2iB3mo/hUoczBILrE6VlbDQ25BjYSLtAkQfjDs0kSkALwgG/UsPC4eKi0=
-X-Received: by 2002:ab0:4d6d:: with SMTP id k45mr423355uag.55.1643954230355;
- Thu, 03 Feb 2022 21:57:10 -0800 (PST)
+        id S244028AbiBDG2m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Feb 2022 01:28:42 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:8271 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235669AbiBDG2l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Feb 2022 01:28:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1643956121; x=1675492121;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=XY7HM1Ns7hm2Ldhsemh6j5ncCcWBc54JkxLeU7W/o3w=;
+  b=WjueqhXlfDDgoL6+iANgkOVfKYC5DJbA9mwI3+/d+o3tJE2LsDTUL+F+
+   MbrWrSJiHZBZIZEl8umussbDbeinTJvtclGzsk64IiFDoz+nJ4Ki3/6Ql
+   bDFKLJ/Iy0jZ8x3wy2pj+2ngnoqBdT5Hatb92NFDsh44MwAuwV/dqPkmg
+   umxhtw5o6ZdxlN/5MwRIi7fSrYEZDOoggd+2WS+oJRdyilk4i5Eb3UQeJ
+   2iuOPmxYgfdde2+6NHmMxVwovHnY9n4w7dRMlBAsPT6NwDTpemN4afTaV
+   SwMwYyoLrhGhQG3ky72Pd2YBWbMSP0/JCzUamM+r8fsDjDVlkl87OPm2C
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.88,341,1635177600"; 
+   d="scan'208";a="196957610"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Feb 2022 14:28:40 +0800
+IronPort-SDR: 1XmJVdKKrROtUtG5JMHLvzHZ9gXt6AUlYqCvG90qmrBthKq0LfW9bnyTlNQAu3ZYNiikrL0RuU
+ wPulu+oIE77Tbl32QkCU5sbTM3YKRIDUK5Hg6CJ/eT6hh239vW80fqWJSRhmHpOFdcU5h345jo
+ Wu9JVs1pUuhrpfZ/t7dT0NCiaiz2UpFJqk57rJfbBT9dPZmr0RQLe4fsetzzmpCoCxaI0pq2Wl
+ M+BwB/U5XsUhlEvxRlqQ7nUOhNDOcwZCyPC8s35NKrN3jImRR5EDj/+kCv9gzv6YQxCIq/bmti
+ EZN3a+GdTS36s6bgPawMhsw5
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2022 22:01:48 -0800
+IronPort-SDR: vbfZwuM4+5bcbVvdnYA9X6xngDe1RdV9OLue/4aqEi+IVnMBJxLL+hZgkQ13Jn8rb9JXdMzx49
+ XfsiD7KWXv1BAFermAWTy46FfG4v2EGhL3yvyPQhFig0frPVyOodNC860UORuTdV0S8/WxRrSR
+ /Z3XhbYw0t/9wKyKPj4m5g8cvWMN6rm6n0ib3/mYILAImQ9qgF2hzcBAc7zHpTm1WDrSVOlHXX
+ ockcrnEncfSriC3vkOBzNlZqMEt/nqetmdupat+MIxSLOLTrbgQ64H2X7ZjafLeckBhYnUmca2
+ akg=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2022 22:28:41 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Jqlwn09bgz1SVnx
+        for <linux-block@vger.kernel.org>; Thu,  3 Feb 2022 22:28:40 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1643956119; x=1646548120; bh=XY7HM1Ns7hm2Ldhsemh6j5ncCcWBc54JkxL
+        eU7W/o3w=; b=Vy1JQI4M/p1RM6pYjkGTdHayEVDerzZzeQKwGTfze/XnWDZgKtC
+        452KAtRCJmmt2/PoJYUSFE5uhvagAB3Aq1Fktw/41WmPj8t5pXf1u0eCtiVdkYqj
+        101uSyKbmZmftoezDdZsx8NMUv2/vmFsInUBB/0WSQbmeVoYYQ5A4gIGMf0IckqC
+        4kAcyV9l8+HvrKY/u5XCSrb2iOQhmd++vpkqueu5mnX/ad80yJuRsm3HZ3dA9vXV
+        aH3mjv/PXZ2R3eiDFD/wY6bfvhEKTK1baWpKRVPShwdOOm725/z3JLVgHG4+2+Qw
+        VDs6oFM1RR6Yb3d/5JyVazRxgVSzUUtx8QQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 81dlzMJYnqaJ for <linux-block@vger.kernel.org>;
+        Thu,  3 Feb 2022 22:28:39 -0800 (PST)
+Received: from [10.225.163.63] (unknown [10.225.163.63])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Jqlwf4v8pz1Rwrw;
+        Thu,  3 Feb 2022 22:28:34 -0800 (PST)
+Message-ID: <2bbed027-b9a1-e5db-3a3d-90c40af49e09@opensource.wdc.com>
+Date:   Fri, 4 Feb 2022 15:28:33 +0900
 MIME-Version: 1.0
-References: <20220131230255.789059-1-mfo@canonical.com> <Yfrh9F67ligMDUB7@google.com>
- <CAO9xwp3DNioiVPJNH9w-eXLxfVmTx9jBpOgq9eatpTFJTTg50Q@mail.gmail.com>
- <Yfr9UkEtLSHL2qhZ@google.com> <CAO9xwp0U4u_XST3WARND0eQ5nyHFrKx+sLWVJLQpjYrkZJOBaw@mail.gmail.com>
-In-Reply-To: <CAO9xwp0U4u_XST3WARND0eQ5nyHFrKx+sLWVJLQpjYrkZJOBaw@mail.gmail.com>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Thu, 3 Feb 2022 22:56:58 -0700
-Message-ID: <CAOUHufbrQZQ=ZCmVFRGOFk6+Snuy4Z6YSDUb3qMsHwROXatz_w@mail.gmail.com>
-Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
- direct IO read
-To:     Mauricio Faria de Oliveira <mfo@canonical.com>,
-        John Hubbard <jhubbard@nvidia.com>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Shi <shy828301@gmail.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Linux-MM <linux-mm@kvack.org>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [RFC PATCH 3/3] nvme: add the "debug" host driver
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Adam Manzanares <a.manzanares@samsung.com>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>,
+        Kanchan Joshi <joshi.k@samsung.com>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
+ <20220201102122.4okwj2gipjbvuyux@mpHalley-2>
+ <alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2202011333160.22481@file01.intranet.prod.int.rdu2.redhat.com>
+ <270f30df-f14c-b9e4-253f-bff047d32ff0@nvidia.com>
+ <20220203153843.szbd4n65ru4fx5hx@garbanzo>
+ <CGME20220203165248uscas1p1f0459e548743e6be26d13d3ed8aa4902@uscas1p1.samsung.com>
+ <20220203165238.GA142129@dhcp-10-100-145-180.wdc.com>
+ <20220203195155.GB249665@bgt-140510-bm01>
+ <863d85e3-9a93-4d8c-cf04-88090eb4cc02@nvidia.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <863d85e3-9a93-4d8c-cf04-88090eb4cc02@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 3, 2022 at 3:17 PM Mauricio Faria de Oliveira
-<mfo@canonical.com> wrote:
->
-> On Wed, Feb 2, 2022 at 6:53 PM Yu Zhao <yuzhao@google.com> wrote:
-> >
-> > On Wed, Feb 02, 2022 at 06:27:47PM -0300, Mauricio Faria de Oliveira wrote:
-> > > On Wed, Feb 2, 2022 at 4:56 PM Yu Zhao <yuzhao@google.com> wrote:
-> > > >
-> > > > On Mon, Jan 31, 2022 at 08:02:55PM -0300, Mauricio Faria de Oliveira wrote:
-> > > > > Problem:
-> > > > > =======
-> > > >
-> > > > Thanks for the update. A couple of quick questions:
-> > > >
-> > > > > Userspace might read the zero-page instead of actual data from a
-> > > > > direct IO read on a block device if the buffers have been called
-> > > > > madvise(MADV_FREE) on earlier (this is discussed below) due to a
-> > > > > race between page reclaim on MADV_FREE and blkdev direct IO read.
-> > > >
-> > > > 1) would page migration be affected as well?
-> > >
-> > > Could you please elaborate on the potential problem you considered?
-> > >
-> > > I checked migrate_pages() -> try_to_migrate() holds the page lock,
-> > > thus shouldn't race with shrink_page_list() -> with try_to_unmap()
-> > > (where the issue with MADV_FREE is), but maybe I didn't get you
-> > > correctly.
-> >
-> > Could the race exist between DIO and migration? While DIO is writing
-> > to a page, could migration unmap it and copy the data from this page
-> > to a new page?
-> >
->
-> Thanks for clarifying. I started looking into this, but since it's unrelated
-> to MADV_FREE (which doesn't apply to page migration), I guess this
-> shouldn't block this patch, if at all possible.  Is that OK with you?
->
->
-> > > > > @@ -1599,7 +1599,30 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
-> > > > >
-> > > > >                       /* MADV_FREE page check */
-> > > > >                       if (!PageSwapBacked(page)) {
-> > > > > -                             if (!PageDirty(page)) {
-> > > > > +                             int ref_count, map_count;
-> > > > > +
-> > > > > +                             /*
-> > > > > +                              * Synchronize with gup_pte_range():
-> > > > > +                              * - clear PTE; barrier; read refcount
-> > > > > +                              * - inc refcount; barrier; read PTE
-> > > > > +                              */
-> > > > > +                             smp_mb();
-> > > > > +
-> > > > > +                             ref_count = page_count(page);
-> > > > > +                             map_count = page_mapcount(page);
-> > > > > +
-> > > > > +                             /*
-> > > > > +                              * Order reads for page refcount and dirty flag;
-> > > > > +                              * see __remove_mapping().
-> > > > > +                              */
-> > > > > +                             smp_rmb();
-> > > >
-> > > > 2) why does it need to order against __remove_mapping()? It seems to
-> > > >    me that here (called from the reclaim path) it can't race with
-> > > >    __remove_mapping() because both lock the page.
-> > >
-> > > I'll improve that comment in v4.  The ordering isn't against __remove_mapping(),
-> > > but actually because of an issue described in __remove_mapping()'s comments
-> > > (something else that doesn't hold the page lock, just has a page reference, that
-> > > may clear the page dirty flag then drop the reference; thus check ref,
-> > > then dirty).
-> >
-> > Got it. IIRC, get_user_pages() doesn't imply a write barrier. If so,
-> > there should be a smp_wmb() on the other side:
->
-> If I understand it correctly, it actually implies a full memory
-> barrier, doesn't it?
->
-> Because... gup_pte_range() (fast path) calls try_grab_compound_head(),
-> which eventually calls* atomic_add_unless(), an atomic conditional RMW
-> operation with return value, thus fully ordered on success (atomic_t.rst);
-> (on failure gup_pte_range() falls back to the slow path, below.)
->
-> And follow_page_pte() (slow path) calls try_grab_page(), which also calls
-> into try_grab_compound_head(), as the above.
->
-> (* on CONFIG_TINY_RCU, it calls just atomic_add(), which isn't ordered,
-> but that option is targeted for UP/!SMP, thus not a problem for this race.)
->
-> Looking at the implementation of arch_atomic_fetch_add_unless() on
-> more relaxed/weakly ordered archs (arm, powerpc, if I got that right),
-> there are barriers like 'smp_mb()' and 'sync' instruction if 'old != unless',
-> so that seems to be OK.
->
-> And the set_page_dirty() calls occur after get_user_pages() / that point.
->
-> Does that make sense?
+On 2/4/22 12:12, Chaitanya Kulkarni wrote:
+> 
+>>>> One can instantiate scsi devices with qemu by using fake scsi devices,
+>>>> but one can also just use scsi_debug to do the same. I see both efforts
+>>>> as desirable, so long as someone mantains this.
+>>>>
+> 
+> Why do you think both efforts are desirable ?
 
-Yes, it does, thanks. I was thinking along the lines of whether there
-is an actual contract. The reason get_user_pages() currently works as
-a full barrier is not intentional but a side effect of this recent
-cleanup patch:
-commit 54d516b1d6 ("mm/gup: small refactoring: simplify try_grab_page()")
-But I agree your fix works as is.
+When testing code using the functionality, it is far easier to get said
+functionality doing a simple "modprobe" rather than having to setup a
+VM. C.f. running blktests or fstests.
+
+So personally, I also think it would be great to have a kernel-based
+emulation of copy offload. And that should be very easy to implement
+with the fabric code. Then loopback onto a nullblk device and you get a
+quick and easy to setup copy-offload device that can even be of the ZNS
+variant if you want since nullblk supports zones.
+
+> 
+> NVMe ZNS QEMU implementation proved to be perfect and works just
+> fine for testing, copy offload is not an exception.
+> 
+>>>> For instance, blktests uses scsi_debug for simplicity.
+>>>>
+>>>> In the end you decide what you want to use.
+>>>
+>>> Can we use the nvme-loop target instead?
+>>
+>> I am advocating for this approach as well. It presentas a virtual nvme
+>> controller already.
+>>
+> 
+> It does that assuming underlying block device such as null_blk or
+> QEMU implementation supports required features not to bloat the the
+> NVMeOF target.
+> 
+> -ck
+> 
+> 
+
+
+-- 
+Damien Le Moal
+Western Digital Research
