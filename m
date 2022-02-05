@@ -2,67 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CC1C433F5
-	for <linux-block@archiver.kernel.org>; Sat,  5 Feb 2022 17:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D120DC433F5
+	for <linux-block@archiver.kernel.org>; Sat,  5 Feb 2022 21:59:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237091AbiBERub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Feb 2022 12:50:31 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:47979 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S235159AbiBERub (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Feb 2022 12:50:31 -0500
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 215HoHV8005452
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 5 Feb 2022 12:50:18 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 419F015C401D; Sat,  5 Feb 2022 12:50:17 -0500 (EST)
-Date:   Sat, 5 Feb 2022 12:50:17 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     dwagner@suse.de, osandov@fb.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blktests: replace module removal with patient module
- removal
-Message-ID: <Yf642Rr4mDsZ7HnS@mit.edu>
-References: <20211116172926.587062-1-mcgrof@kernel.org>
+        id S1351155AbiBEV7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Feb 2022 16:59:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33074 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240342AbiBEV7Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Feb 2022 16:59:16 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B00C061353;
+        Sat,  5 Feb 2022 13:59:15 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id p22-20020a17090adf9600b001b8783b2647so3310157pjv.5;
+        Sat, 05 Feb 2022 13:59:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:references:cc:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding;
+        bh=PWXw56wMSVUiQo+0Y/X1ZEc8HwPwp/sCbKGTlf6LMjs=;
+        b=akjLYJsZTcN5ZzBMtnld1Izt5WF6Pacjnxu649A2A34JBhKdoWD0qdk0G2DxkdH930
+         sWwEuVv7ldvooEhDVXBqvE/hPzyAsIorqDfQf9Y9Whdi/w+RTKvj5PD+BKVOH9/moJc9
+         Os3dgxRTGCSzVc/4SsVQGgMtZsCUXUY1TSV5Zr5YjWEoasYoYdpepnGCAPzxU+GtpldA
+         +QPrQ9nVvE//sBu/vf4BaRAE7iLhi38L/WNUwHA60Ag/kAhNqRvkl7cbEgZj9CV2nrkU
+         2IuUTRiTsT+JMaToV/giN+oFjjmwBXNekLrsqHJEuOAPZc0MdYCI/Bbd/Gn0uBnT1r44
+         W2Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
+        bh=PWXw56wMSVUiQo+0Y/X1ZEc8HwPwp/sCbKGTlf6LMjs=;
+        b=J3d1r2OpRnvt3NX2lJmWa9Xpcfsgt9fjueLWupQdQIMnjxlAQGqO/mdDqP0Be5JdEe
+         FVSqCKTzbdfkDKuoL3kdB1Y49Il8expDdXFbIFqA/EffQi/NbUzd4w7P4+xuXefFDoSV
+         T+M8nCjfD6caJ5n1kNyzE69w4HwNhkWbTP7/tg+C4uqIv8Jx65n+8onhJ0rIrCCYvOOn
+         t3y1aK11OjIuONI2eL664UcRvpqpyLWF6KYWCrIT2fdkl2AG2NQL8tj7x22ofL51cvOR
+         KgKh1eH9WqxgxCPwUewopSVQYKgEtUSxjJAvFUOIJFXr7uwHcfjHmsiJBc9zSKliULbQ
+         QVcA==
+X-Gm-Message-State: AOAM530EJqjMilZwEgxITV/tQ5dcmWzgniK16LJ4VVRuwl8TzBcWy+eS
+        WINphj4NtlyMgUDuCGMtMoKl3ZCITQk=
+X-Google-Smtp-Source: ABdhPJzX5yjwAdDFdotVdtPaI3Ecrj5KkR50/7owTP98UVyuhWA/p5XLhclwXNQNWdHJIve3p5BDUw==
+X-Received: by 2002:a17:902:e88b:: with SMTP id w11mr9531591plg.153.1644098354413;
+        Sat, 05 Feb 2022 13:59:14 -0800 (PST)
+Received: from [10.1.1.24] (222-155-5-102-adsl.sparkbb.co.nz. [222.155.5.102])
+        by smtp.gmail.com with ESMTPSA id lp17sm17664003pjb.25.2022.02.05.13.59.09
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 05 Feb 2022 13:59:13 -0800 (PST)
+Subject: Re: Regression in 5.17-rc1 on pata-falcon
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+References: <20220128173006.1713210-1-geert@linux-m68k.org>
+ <63c80eba-7c55-2a92-8078-c63cec3c9efb@gmail.com>
+ <8913a0a2-9496-143c-18c2-f3023fd37ba0@gmail.com>
+ <8d215dab-cd0f-452b-281b-f67c9324b53b@gmail.com>
+ <CAMuHMdVnkvSCHKt5ouZP7HrMBg7nPg7fjiio-KVJ7dehA=FwyQ@mail.gmail.com>
+Cc:     linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Laibin Qiu <qiulaibin@huawei.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <eb5fc9ae-45a7-44d3-0238-5cdaa1ae3558@gmail.com>
+Date:   Sun, 6 Feb 2022 10:59:07 +1300
+User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
+ Icedove/45.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211116172926.587062-1-mcgrof@kernel.org>
+In-Reply-To: <CAMuHMdVnkvSCHKt5ouZP7HrMBg7nPg7fjiio-KVJ7dehA=FwyQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 09:29:26AM -0800, Luis Chamberlain wrote:
-> diff --git a/common/rc b/common/rc
-> index 85e6314..2b551bf 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -321,15 +321,143 @@ _uptime_s() {
->  	awk '{ print int($1) }' /proc/uptime
->  }
->  
-> -# Arguments: module to unload ($1) and retry count ($2).
-> -unload_module() {
-> -	local i m=$1 rc=${2:-1}
-> -
-> -	[ ! -e "/sys/module/$m" ] && return 0
-> -	for ((i=rc;i>0;i--)); do
-> -		modprobe -r "$m"
-> -		[ ! -e "/sys/module/$m" ] && return 0
-> -		sleep .1
-> +# Set MODPROBE_PATIENT_RM_TIMEOUT_SECONDS to "forever" if you want the patient
-> +# modprobe removal to run forever trying to remove a module.
-> +MODPROBE_REMOVE_PATIENT=""
-> +modprobe --help | grep -q -1 "remove-patiently"
+Hi Geert, Jens,
 
-Could you add the same guard I suggested for fstests for ancient
-versions of modprobe?  e.g.,:
+thanks for the hint - applying 10825410b956dc1e on top of 5.17-rc1 does 
+indeed fix the issue.
 
-modprobe --help >& /dev/null && modprobe --help | grep -q -1 "remove-patiently"
+nr_tags == 1 on the Falcon may explain why I ran into this. Oddly 
+enough, I have the same on ARAnyM. Adding a second 'disk' there does 
+reproduce the issue on ARAnyM though. nr_tags == 1 && nr_disks > 1 
+appears to be sufficient to reproduce this.
 
-Thanks!
+I surmised I couldn't be the only one to run into this, but hadn't seen 
+any other reports yet.
 
-						- Ted
+Cheers,
+
+	Michael
+
+
+Am 05.02.2022 um 21:31 schrieb Geert Uytterhoeven:
+> Hi Michael,
+>
+> On Sat, Feb 5, 2022 at 1:04 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
+>> commit 180dccb0dba4f5e84a4a70c1be1d34cbb6528b32 (blk-mq: fix tag_get
+>> wait task can't be awakened) does cause a regression on my m68k hardware
+>> test rig (m68k Falcon030, IDE disk attached through pata-falcon driver
+>> which does use polled IO instead of interrupts, so may be a little on
+>> the slow side).
+>
+>> Bisection between v5.16 and v5.17-rc1 points to
+>> 180dccb0dba4f5e84a4a70c1be1d34cbb6528b32 as the culprit, which is
+>> corroborated by reverting that commit in v5.17-rc1 and booting as
+>> rapidly as before.
+>
+> Now you know the culprit, it looks like several other people ran into this.
+> Does this fix help?
+> https://lore.kernel.org/all/1643040870.3bwvk3sis4.none@localhost/
+>
+> It is commit 10825410b956dc1e ("blk-mq: Fix wrong wakeup
+> batch configuration which will cause hang") in v5.17-rc2.
+>
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+>
+> In personal conversations with technical people, I call myself a hacker. But
+> when I'm talking to journalists I just say "programmer" or something like that.
+>                                 -- Linus Torvalds
+>
