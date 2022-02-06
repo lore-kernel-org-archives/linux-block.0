@@ -2,112 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD38C433FE
-	for <linux-block@archiver.kernel.org>; Sun,  6 Feb 2022 02:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1340EC433F5
+	for <linux-block@archiver.kernel.org>; Sun,  6 Feb 2022 03:57:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348364AbiBFCXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Feb 2022 21:23:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44412 "EHLO
+        id S233147AbiBFD5T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Feb 2022 22:57:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244398AbiBFCXn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Feb 2022 21:23:43 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE3BC043186;
-        Sat,  5 Feb 2022 18:23:42 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id z20so14457492ljo.6;
-        Sat, 05 Feb 2022 18:23:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=B1E6bVK8AHUmw4iabxx8MHLpQ1jAgmwOt/Bl6uj/XOE=;
-        b=Hva+uqwHSlQvGLAnTK95lIoVWsYCCaIXmeP9M9F/K6qkI/GjxxCiFYiZoDxmvbhjSt
-         wFrNcyfBjJyNKSanRTr6V4v0jxDKjHMJe/+wcwcqQRxaHmi4lHtHEG34Na/k//Wucb5S
-         Y2/H/xUGghO5Wa7c9sj1i26ApDYQU+wPv1HtS76dLsi3Da4nNQfL9hkt7O0dB21C5QEx
-         nH62yeCYLHEVzy0twChXimUzTI+kobVTUABoiBRXvSQViIg1cUDVGZcdGqXUSaeDFQyU
-         IdnnWA406aBuORLi3DimswmAeIlt6HRqDlMsZl3/uc3xZJkags2uXB7M5jUlcF2L3Igz
-         Ku2A==
+        with ESMTP id S233139AbiBFD5S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Feb 2022 22:57:18 -0500
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1BF4C06173B
+        for <linux-block@vger.kernel.org>; Sat,  5 Feb 2022 19:57:17 -0800 (PST)
+Received: by mail-pj1-f48.google.com with SMTP id oa14-20020a17090b1bce00b001b61aed4a03so10008189pjb.5
+        for <linux-block@vger.kernel.org>; Sat, 05 Feb 2022 19:57:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=B1E6bVK8AHUmw4iabxx8MHLpQ1jAgmwOt/Bl6uj/XOE=;
-        b=F8T2X2K+TpCRUxR+cdnun08lTkoau7ksawCqaIiTJVYLP6j8cw3SbTFoknFEQ6H4B7
-         1VISGT0Q9cWGZCAHr1xexHvreZbQQGNo7EUnlGKG/qWUVzzB/YY8otnxj63N0gJMm1hR
-         4TojK2TPjXiKLWtFYf9ERw61T+2eXUIzbFwuunfAhFQA2CZZXfDPLCZoWjv2tQlJxmNK
-         39R6JiIM5YRG70nCIw5lFTiETCXFMF1bYCY1/k18yU1m0/Zfq5X+TDWbbrwkKc1cOU17
-         g+yqBPRVQKtt3QxJrmCk9Cx3XyH5ey0m3j1QH9s/SAfo+7QPbgRiTHCIX6jjHPmGpgq/
-         pmAw==
-X-Gm-Message-State: AOAM530j4I3X0XoLItIjGBpZ4dwIJ4GIz/6HOSnY8BSLgFHY1F8E65mH
-        CurXRyAATTvnLsnzVaynm4mdrg3+mh1WwhvVHKAUn494
-X-Google-Smtp-Source: ABdhPJzUVRwpCGA1/qPUbSEMKThqgsdM9cosL6EJ5qtQdJ84l8myWVlTLU3OlpeWT/nkXdqqIAZEphddm+AlO6EprwI=
-X-Received: by 2002:a2e:9c04:: with SMTP id s4mr4399755lji.229.1644114220293;
- Sat, 05 Feb 2022 18:23:40 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=aRbUM2OkSJNzRmkAZ1wcN1ygc+lBSjgrwnIa5Qi6I/c=;
+        b=pM8oYk8XBVqIlkzOiMITmkzX7l6EHdTiOQejlBIlHtPZS+PlQ1/f1M3JmxnYkltmGJ
+         bAIxCI/L4yvSPMcOoQk1Hn29XAZ+aUCwt3/beVILtna1VMG22Ay42Rsotpfr2fRE+aRI
+         zjE1UhsPTTpr8nHQxUzqV1gkex7ci6seGzE79xvDUqDibhShAErGc8ROIYYeRG6G/eLd
+         a0lHf1MaKJE9wbzb8VVIyvQ7Abe6jPXVBWmwlmsT5XqYIGTQpOiOHQ7OtX1vClIhJm+d
+         4E2nPzJBRGqS3JsTJMiec69oX5murMhxRP52qY0VKrvvU+a4TIVTYap0NH08xEzkVoCl
+         xbdQ==
+X-Gm-Message-State: AOAM530BQJm/4WQyZWqbgLemK+0Ps5OeFSpzpFxpxrb7YqqLIz46QRAV
+        zBm5fU2brkFSWiIxcDnXkCs=
+X-Google-Smtp-Source: ABdhPJzEWXrzA3Ymlxvd661PlinGyorNqwJHS7/8W+00fdSuYu+PPQme2mtebhBN8jvlu0UIoBS/jg==
+X-Received: by 2002:a17:902:b941:: with SMTP id h1mr10459220pls.73.1644119837018;
+        Sat, 05 Feb 2022 19:57:17 -0800 (PST)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id a3sm7145949pfk.73.2022.02.05.19.57.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Feb 2022 19:57:16 -0800 (PST)
+Message-ID: <11565c22-33b2-dbf9-0409-b9926ff78997@acm.org>
+Date:   Sat, 5 Feb 2022 19:57:15 -0800
 MIME-Version: 1.0
-References: <2ee1eb2b46a3bbdbde4244634586655247f5c676.camel@HansenPartnership.com>
-In-Reply-To: <2ee1eb2b46a3bbdbde4244634586655247f5c676.camel@HansenPartnership.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 5 Feb 2022 20:23:29 -0600
-Message-ID: <CAH2r5mvgm30Dr8P=Ah8Hq0dZ6w=++amLg98TJgtfdOL+Tdjdzg@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] configfd as a replacement for both ioctls and fsconfig
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     lsf-pc@lists.linux-foundation.org,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH] blktests: replace module removal with patient module
+ removal
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "dwagner@suse.de" <dwagner@suse.de>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20211116172926.587062-1-mcgrof@kernel.org>
+ <48b1d742-888c-ee14-297e-c63ae3bf37ed@nvidia.com>
+ <Yf3iA/dDXOBJMXqU@bombadil.infradead.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <Yf3iA/dDXOBJMXqU@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a good discussion to have
+On 2/4/22 18:33, Luis Chamberlain wrote:
+> Bart, *poke*
 
-On Sat, Feb 5, 2022 at 6:02 AM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
->
-> A shortened version of this topic was originally sent for LSF/MM 2020
-> which didn't happen due to the pandemic:
->
-> https://lore.kernel.org/all/1581781497.3847.5.camel@HansenPartnership.com/
->
-> However, now replacing ioctls is on the table:
->
-> https://lore.kernel.org/all/20220201013329.ofxhm4qingvddqhu@garbanzo/
->
-> as I've already stated in that thread, I think, used sparingly, ioctls
-> are fit for purpose and shouldn't be replaced and I'd definitely like
-> to argue for that position.
->
-> However, assuming that people would like to consider alternatives, I'd
-> like to propose configfd.  It was originally proposed as a
-> configuration mechanism for bind mounts that was a more general
-> replacement for fsconfig (which can only configure filesystems with
-> superblocks) and was going to be used by shiftfs.  However, since
-> shiftfs functionality was done a different way, configfd has
-> languished, although the patches are here:
->
-> https://lore.kernel.org/all/20200215153609.23797-1-James.Bottomley@HansenPartnership.com/
->
-> The point, though, is that configfd can configure pretty much anything;
-> it wouldn't just be limited to filesystem objects.  It takes the
-> fsconfig idea of using a file descriptor to carry configuration
-> information, which could be built up over many config calls and makes
-> it general enough to apply to anything.  One of the ideas of configfd
-> is that the data could be made fully introspectable ... as in not just
-> per item description, but the ability to get from the receiver what it
-> is expecting in terms of configuration options (this part was an idea
-> not present in the above patch series).
->
-> If the ioctl debate goes against ioctls, I think configfd would present
-> a more palatable alternative to netlink everywhere.
->
-> James
->
->
+My 2y old son is really good at taking up most of my spare time. Anyway, 
+I will try to find some time to review this patch.
 
-
--- 
-Thanks,
-
-Steve
+Bart.
