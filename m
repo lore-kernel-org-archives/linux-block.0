@@ -2,284 +2,290 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F39DAC41535
-	for <linux-block@archiver.kernel.org>; Mon,  7 Feb 2022 14:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 594E7C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  7 Feb 2022 17:26:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382719AbiBGOxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Feb 2022 09:53:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44762 "EHLO
+        id S239316AbiBGR0B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Feb 2022 12:26:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390977AbiBGOcK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 09:32:10 -0500
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E223C0401C5
-        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 06:32:09 -0800 (PST)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220207142301epoutp03177554dd2fa7cd390c807f55d882ed10~RhwICIrvS0886008860epoutp03t
-        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 14:23:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220207142301epoutp03177554dd2fa7cd390c807f55d882ed10~RhwICIrvS0886008860epoutp03t
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1644243781;
-        bh=ZToRjRwJn34ZzyDg3GTI5a5frORbDpzvx2HVQIjtABY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kEVBNja8g2Gsq0NRGnigEkZ/bb60s9RB3315Lau2+9XNb9OZbKKhmvvJsFjFE8rG7
-         N1I7Twwr6KhFUUPYpv+JHT8JyT9ifEkWV9mue9UooWQ+kjYpOWWX021sw1BGjHydYH
-         ZBgPZ+i0h3YC1oCAL5CLy5DWIbCqtnv3NN0P/WAw=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20220207142300epcas5p12234e1ca79163589c3076cd92d89717c~RhwHTuydG0954809548epcas5p1y;
-        Mon,  7 Feb 2022 14:23:00 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4JspJc28mZz4x9Px; Mon,  7 Feb
-        2022 14:22:56 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C8.C5.05590.5FA21026; Mon,  7 Feb 2022 23:21:41 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220207141930epcas5p2bcbff65f78ad1dede64648d73ddb3770~RhtDWlMgg1158611586epcas5p2M;
-        Mon,  7 Feb 2022 14:19:30 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220207141930epsmtrp21b9db411c3a7e6b4f999cb91f5d68f68~RhtDVVysP0696106961epsmtrp2U;
-        Mon,  7 Feb 2022 14:19:30 +0000 (GMT)
-X-AuditID: b6c32a4b-739ff700000015d6-76-62012af5077e
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        98.43.08738.27A21026; Mon,  7 Feb 2022 23:19:30 +0900 (KST)
-Received: from test-zns.sa.corp.samsungelectronics.net (unknown
-        [107.110.206.5]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220207141926epsmtip102d2e45931c03e67130238beb97316d9~Rhs-lY_vs0283802838epsmtip1d;
-        Mon,  7 Feb 2022 14:19:26 +0000 (GMT)
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     mpatocka@redhat.com
-Cc:     javier@javigon.com, chaitanyak@nvidia.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        msnitzer@redhat.com, bvanassche@acm.org,
-        martin.petersen@oracle.com, roland@purestorage.com, hare@suse.de,
-        kbusch@kernel.org, hch@lst.de, Frederick.Knight@netapp.com,
-        zach.brown@ni.com, osandov@fb.com,
-        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
-        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
-        jack@suse.com, joshi.k@samsung.com, arnav.dawn@samsung.com,
-        nj.shetty@samsung.com
-Subject: [PATCH v2 05/10] block: add emulation for copy
-Date:   Mon,  7 Feb 2022 19:43:43 +0530
-Message-Id: <20220207141348.4235-6-nj.shetty@samsung.com>
-X-Mailer: git-send-email 2.30.0-rc0
-In-Reply-To: <20220207141348.4235-1-nj.shetty@samsung.com>
+        with ESMTP id S1384175AbiBGRSB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 12:18:01 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0835C0401E9
+        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 09:17:55 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id s21so15927307ejx.12
+        for <linux-block@vger.kernel.org>; Mon, 07 Feb 2022 09:17:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+x0yu+l5gRNEA0QtHe7jspCvvoGDqhGxc2x1qQ+kRw8=;
+        b=nhjAqvfsGZyoSHJ/ghPwnVbcNlCD5MwcUpxIHy5iYH9yt42hlKEsyEPAHQOnywyXTj
+         Z5/HrzP2LEEwruYd+/KaY0qh44TkHSkdDTuaKd/5RTK+tLRi2j+ZYopKQ79G6cBjAiW+
+         rJcmrfXjKGWydMkaW6XRG1yBtgR6KFZHekFPd0+QZUC+sQuVvpmw9ql2Pkoa2WQ26B+J
+         v8P0UybSnWQKd7bRs1tDz6cxOegh/LPzz3uHCjZz2avbkZTzPVO/2QiJR2b4Mbwgtk21
+         QZLtRzcFNAYWKqS/xYrVM26A5LXSx/VoXNBxQJlLVnL7WU2CBrfgkN3yqWOhY0tmwGiH
+         t1yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+x0yu+l5gRNEA0QtHe7jspCvvoGDqhGxc2x1qQ+kRw8=;
+        b=cFiA3Ac6YjeHK3CY+j7Bf72D5jU5uPUEzQVB95nZWQbRQlvTujmHDb7ZvbdCdhGS1F
+         601R528kE2MSP4/7fTBJzGZH7g6qVmeU5cel127ESZ8W9qexn2IIJtrrdpbVrYAuxXtp
+         tP1CylEGZ4KqLQebg+fk6ttyHRHleA+neW3COU1U71l3VKgEihHQ4zuAIiymHcbRUFiO
+         eY7dTaAYtAE8BJ23+KEdOPw4lW6OifWZ7ECUoXJwIXyusfHC58mK+ZqcjdU6RlBidVYH
+         0zNFDuSop6vsZdcmo1e7zzbuq94JbOy1RhAEcAhu33UdEfHHnoI6fE0nTkLZJB5uSU3H
+         UYBQ==
+X-Gm-Message-State: AOAM531ltuLKyWVxtv0NiMPyIRLYMTr/wjCdqZzCUvb2theP9DIU7p6B
+        axl7AEZVsEAiYEG8rENtPdMz5ixQNCBuvs+z47M=
+X-Google-Smtp-Source: ABdhPJxhlhjoVSVHyqYa16k7/eubuxcbb613lOtvzRolBySylZw3wwseFqKRudnHxquWRIPuMVP8r9u8RMau0KBuFpc=
+X-Received: by 2002:a17:907:3e1c:: with SMTP id hp28mr101272ejc.377.1644254274268;
+ Mon, 07 Feb 2022 09:17:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTZxTfd2+5LSTAHY/0k2kk100jhELH64MILoh6N+YkcZpFJ1jgCgxo
-        m5ai6JaBnVFggLDgsGxaBMczQoAVxjOUMQKUBcZLmMwhOB1gQWCjPAYrvZ3zv9853+93fuec
-        L4eH21VxnXix4kRGJhbFU4QVR9Oxf5/bXy4gwqOjhUDNY0sWqGIim0A3F1ZxNN8+ZYFys/O5
-        aHDaBrXoCyxQvyEVQ1M1WxhqvpuLobKKTgw9LSkCKK23H0Mbk0LUufWcQLnaEYBaxl1Rc0s3
-        B9357gkXZYw2EKh1tgVHJV2bGMq5Poyhn1UbBNKs38FRx2/DHFSxgdDVL1e5aKYt7J1d9OBQ
-        CJ2j1HNppfohhx7sU9A15WkEXVv8Of3VgxJAN42lEPQVXSdO5y8uE/Sorh6jM5V6gn7xZJxD
-        ayYzufR86zBBZ9WVg1CH03EHYhhRFCNzZsSRkqhYcXQAFXIi/FC4t4+H0E3oh3wpZ7EogQmg
-        gt8PdTsSG29cEuWcJIpXGFOhIrmccg88IJMoEhnnGIk8MYBipFHxUi+pQC5KkCvE0QIxk+gv
-        9PB429tIPBcXU9dzXKqmLpYOfANSQMkb6cCSB0kvONWfR6QDK54d2QTgr6szgA0WAUx7vsZl
-        gyUA5364a5EOeCZJaXckm28EcFM1gbPBVQz+VNCHbZMI0hX2bvG2LRxIPtzo15iq4uQSB46M
-        qrjbD/akLyxqHTNhDvkWXOju5Wxja9IPDui7Mba/PbBwst1iG1uS/vDvjZtmzuuw+9a0CePk
-        bqj8vsDUBCTHLeEXhU1mcTD8c7rSjO3hTFcdl8VOcEnfQrCCDAANukcYG+QDqLyhJFjWQTjQ
-        /I9pHJzcD6sa3dn0LpjXcx9jnW1g5vq02cAaNtyeftl1ZZXaXGYHHFlJNWMaZn3bxmHXNWTc
-        9sRTzg3grHplItUrE6n+t1YDvBzsYKTyhGhG7i31FDMXXn5zpCShBpguxyWkATz+fUGgBRgP
-        aAHk4ZSD9c6MLZGddZQo+RIjk4TLFPGMXAu8jSvPwZ0cIyXG0xMnhgu9/Dy8fHx8vPw8fYQU
-        37onulpkR0aLEpk4hpEysv90GM/SKQU7qsuyr68endN6NH7mdqx2ZRN/YTi1Nz/nXnbcwQ8W
-        bR88qqF+3Dor0SaUVrcmh5R38nuG6pK4XJtPu/gnl08f1swarvvWHgry5tD2r0lLYorVmbub
-        jzTlwSESZZY9DLKNSHL/xL908dnX89SxwLV2R9c3e2eBwCpK88dy4AKa+viocH1dnXL58tyl
-        gYiMD/uqYt7VD0ZHPLMpCP7IxxCmWOnx25N6IVVxsidsn9Ps5rWiRV1Rh8PY4aCL1mPUL15t
-        J9pCiqnhMJWbgHveYi//Mb978egZ22vvXQleZc4OClIjz6m154/fu6XrTe5fK6w8M3NKbRDw
-        lz1vx9XvdBy7j5VRHHmMSOiCy+SifwG2PN8jwgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMIsWRmVeSWpSXmKPExsWy7bCSnG6RFmOSwe7zohZ7bn5mtVh9t5/N
-        YtqHn8wW7w8+ZrWY1D+D3eLyEz6Lve9ms1pc+NHIZPF4038miz2LJjFZrFx9lMni+fLFjBad
-        py8wWfx5aGhx9P9bNotJh64xWuy9pW2xZ+9JFov5y56yW3Rf38Fmse/1XmaL5cf/MVlM7LjK
-        ZHFu1h82i22/5zNbHL53lcVi9R8Li9aen+wWr/bHOch6XL7i7TGx+R27R/OCOywel8+Wemxa
-        1cnmsXlJvcfkG8sZPXbfbGDzaDpzlNljxqcvbB7Xz2xn8uhtfsfm8fHpLRaPbQ972T3e77vK
-        5tG3ZRVjgEgUl01Kak5mWWqRvl0CV8aWU/4FC5QqVlycw9jAuFy6i5GDQ0LARGLFyeQuRi4O
-        IYEdjBI7vu5n7WLkBIpLSiz7e4QZwhaWWPnvOTuILSTQzCSx9ZI5SC+bgLbE6f8cIGERAXGJ
-        Pxe2MYLMYRaYzirRcOoyE0hCWMBcYvG+m2C9LAKqEh9OnmYBsXkFLCUuvjvJBDFfWWLhw4Ng
-        ezkFrCS+/ZnGAnFQA6NEw7kVrBANghInZz4Ba2YWkJdo3jqbeQKjwCwkqVlIUgsYmVYxSqYW
-        FOem5xYbFhjlpZbrFSfmFpfmpesl5+duYgSnAy2tHYx7Vn3QO8TIxMF4iFGCg1lJhFem+3+i
-        EG9KYmVValF+fFFpTmrxIUZpDhYlcd4LXSfjhQTSE0tSs1NTC1KLYLJMHJxSDUx5crHi3+8+
-        fhthHJAWGPz/3eUVmi128RHH63sV5x7/VeS2eEeU98HWZWwf71ye99HmhU2Or9W/4qB7R5rv
-        L2Y9OnvZpfbJ7uf/H3e9uJWx9+hE7bMC6ffKz347dLFk9e21kQ3TFqU/1mF7l5V7bcvGefcW
-        3PHZ16xmxxEV8KfN2M5SSXull2f2GoYCa5HX0zS9v1w0sn6S7sTO+zpLL31r+DHt4+zRtecv
-        Tg+oj56terVF6uP36zNYn2fZ/w2fXce1aell/ZkfS24/yfvIHG85eea67yybGhMP/vD6q5DY
-        //NLwp/TTvskXwhV7G6urbzR07dcumx57L6eVv6ycMPVPuI1dw57am/Pn1V8+26DEktxRqKh
-        FnNRcSIANdWiInYDAAA=
-X-CMS-MailID: 20220207141930epcas5p2bcbff65f78ad1dede64648d73ddb3770
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220207141930epcas5p2bcbff65f78ad1dede64648d73ddb3770
-References: <CAOSviJ0HmT9iwdHdNtuZ8vHETCosRMpR33NcYGVWOV0ki3EYgw@mail.gmail.com>
-        <20220207141348.4235-1-nj.shetty@samsung.com>
-        <CGME20220207141930epcas5p2bcbff65f78ad1dede64648d73ddb3770@epcas5p2.samsung.com>
+References: <20220205091150.6105-1-chaitanyak@nvidia.com>
+In-Reply-To: <20220205091150.6105-1-chaitanyak@nvidia.com>
+From:   Yang Shi <shy828301@gmail.com>
+Date:   Mon, 7 Feb 2022 09:17:42 -0800
+Message-ID: <CAHbLzkp6P_1F2oCPvzT7BP830S6YcyVd46gEJdgvpKSJmwvQ7Q@mail.gmail.com>
+Subject: Re: [PATCH V7 0/2] block: introduce block_rq_error tracepoint
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For the devices which does not support copy, copy emulation is
-added. Copy-emulation is implemented by reading from source ranges
-into memory and writing to the corresponding destination synchronously.
+On Sat, Feb 5, 2022 at 1:12 AM Chaitanya Kulkarni <chaitanyak@nvidia.com> wrote:
+>
+> From: Chaitanya Kulkarni <kch@nvidia.com>
+>
+> Hi Yang,
+>
+> I spent sometime generating V7 and testing the same. I kept your
+> original authorship for the 2nd patch and added a prep patch.
+> Let me know if you find anything wrong with this series.
 
-TODO: Optimise emulation.
+Hi Chaitanya,
 
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
----
- block/blk-lib.c | 119 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+Thank you so much for preparing the patches. They look good to me. But
+it seems you forgot cc Steven Rostedt. Looped him in.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 3ae2c27b566e..05c8cd02fffc 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -272,6 +272,65 @@ int blk_copy_offload(struct block_device *src_bdev, int nr_srcs,
- 	return cio_await_completion(cio);
- }
- 
-+int blk_submit_rw_buf(struct block_device *bdev, void *buf, sector_t buf_len,
-+				sector_t sector, unsigned int op, gfp_t gfp_mask)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	struct bio *bio, *parent = NULL;
-+	sector_t max_hw_len = min_t(unsigned int, queue_max_hw_sectors(q),
-+			queue_max_segments(q) << (PAGE_SHIFT - SECTOR_SHIFT)) << SECTOR_SHIFT;
-+	sector_t len, remaining;
-+	int ret;
-+
-+	for (remaining = buf_len; remaining > 0; remaining -= len) {
-+		len = min_t(int, max_hw_len, remaining);
-+retry:
-+		bio = bio_map_kern(q, buf, len, gfp_mask);
-+		if (IS_ERR(bio)) {
-+			len >>= 1;
-+			if (len)
-+				goto retry;
-+			return PTR_ERR(bio);
-+		}
-+
-+		bio->bi_iter.bi_sector = sector >> SECTOR_SHIFT;
-+		bio->bi_opf = op;
-+		bio_set_dev(bio, bdev);
-+		bio->bi_end_io = NULL;
-+		bio->bi_private = NULL;
-+
-+		if (parent) {
-+			bio_chain(parent, bio);
-+			submit_bio(parent);
-+		}
-+		parent = bio;
-+		sector += len;
-+		buf = (char *) buf + len;
-+	}
-+	ret = submit_bio_wait(bio);
-+	bio_put(bio);
-+
-+	return ret;
-+}
-+
-+static void *blk_alloc_buf(sector_t req_size, sector_t *alloc_size, gfp_t gfp_mask)
-+{
-+	int min_size = PAGE_SIZE;
-+	void *buf;
-+
-+	while (req_size >= min_size) {
-+		buf = kvmalloc(req_size, gfp_mask);
-+		if (buf) {
-+			*alloc_size = req_size;
-+			return buf;
-+		}
-+		/* retry half the requested size */
-+		req_size >>= 1;
-+	}
-+
-+	return NULL;
-+}
-+
- static inline int blk_copy_sanity_check(struct block_device *src_bdev,
- 		struct block_device *dst_bdev, struct range_entry *rlist, int nr)
- {
-@@ -297,6 +356,64 @@ static inline int blk_copy_sanity_check(struct block_device *src_bdev,
- 	return 0;
- }
- 
-+static inline sector_t blk_copy_max_range(struct range_entry *rlist, int nr, sector_t *max_len)
-+{
-+	int i;
-+	sector_t len = 0;
-+
-+	*max_len = 0;
-+	for (i = 0; i < nr; i++) {
-+		*max_len = max(*max_len, rlist[i].len);
-+		len += rlist[i].len;
-+	}
-+
-+	return len;
-+}
-+
-+/*
-+ * If native copy offload feature is absent, this function tries to emulate,
-+ * by copying data from source to a temporary buffer and from buffer to
-+ * destination device.
-+ */
-+static int blk_copy_emulate(struct block_device *src_bdev, int nr,
-+		struct range_entry *rlist, struct block_device *dest_bdev, gfp_t gfp_mask)
-+{
-+	void *buf = NULL;
-+	int ret, nr_i = 0;
-+	sector_t src, dst, copy_len, buf_len, read_len, copied_len, max_len = 0, remaining = 0;
-+
-+	copy_len = blk_copy_max_range(rlist, nr, &max_len);
-+	buf = blk_alloc_buf(max_len, &buf_len, gfp_mask);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	for (copied_len = 0; copied_len < copy_len; copied_len += read_len) {
-+		if (!remaining) {
-+			rlist[nr_i].comp_len = 0;
-+			src = rlist[nr_i].src;
-+			dst = rlist[nr_i].dst;
-+			remaining = rlist[nr_i++].len;
-+		}
-+
-+		read_len = min_t(sector_t, remaining, buf_len);
-+		ret = blk_submit_rw_buf(src_bdev, buf, read_len, src, REQ_OP_READ, gfp_mask);
-+		if (ret)
-+			goto out;
-+		src += read_len;
-+		remaining -= read_len;
-+		ret = blk_submit_rw_buf(dest_bdev, buf, read_len, dst, REQ_OP_WRITE,
-+				gfp_mask);
-+		if (ret)
-+			goto out;
-+		else
-+			rlist[nr_i - 1].comp_len += read_len;
-+		dst += read_len;
-+	}
-+out:
-+	kvfree(buf);
-+	return ret;
-+}
-+
- static inline bool blk_check_copy_offload(struct request_queue *src_q,
- 		struct request_queue *dest_q)
- {
-@@ -346,6 +463,8 @@ int blkdev_issue_copy(struct block_device *src_bdev, int nr,
- 
- 	if (blk_check_copy_offload(src_q, dest_q))
- 		ret = blk_copy_offload(src_bdev, nr, rlist, dest_bdev, gfp_mask);
-+	else
-+		ret = blk_copy_emulate(src_bdev, nr, rlist, dest_bdev, gfp_mask);
- 
- 	return ret;
- }
--- 
-2.30.0-rc0
-
+>
+> Following is the cover-letter for everyone else:-
+>
+> Currently, rasdaemon uses existing tracepoint block_rq_complete
+> and filters out non-error cases in order to capture block disk errors.
+> The generic tracepoint brings overhead see below and requires filtering
+> for the requests which are failed due to error :-
+>
+> block_rq_complete() tracepint enabled fio randread :-
+>
+>   read: IOPS=107k, BW=418MiB/s (439MB/s)(24.5GiB/60001msec)
+>   read: IOPS=107k, BW=419MiB/s (439MB/s)(24.5GiB/60001msec)
+>   read: IOPS=106k, BW=416MiB/s (436MB/s)(24.4GiB/60001msec)
+>   read: IOPS=107k, BW=417MiB/s (437MB/s)(24.4GiB/60001msec)
+>   read: IOPS=107k, BW=418MiB/s (438MB/s)(24.5GiB/60001msec)
+>   read: IOPS=106k, BW=414MiB/s (434MB/s)(24.3GiB/60001msec)
+>   read: IOPS=107k, BW=418MiB/s (438MB/s)(24.5GiB/60001msec)
+>   read: IOPS=106k, BW=413MiB/s (434MB/s)(24.2GiB/60001msec)
+>   read: IOPS=106k, BW=414MiB/s (434MB/s)(24.2GiB/60001msec)
+>   read: IOPS=109k, BW=425MiB/s (445MB/s)(24.9GiB/60001msec)
+>   AVG = 417 MiB/s
+>
+> block_rq_complete() tracepint disabled fio randread :-
+>   read: IOPS=110k, BW=428MiB/s (449MB/s)(25.1GiB/60001msec)
+>   read: IOPS=107k, BW=418MiB/s (438MB/s)(24.5GiB/60001msec)
+>   read: IOPS=108k, BW=421MiB/s (442MB/s)(24.7GiB/60001msec)
+>   read: IOPS=107k, BW=419MiB/s (439MB/s)(24.5GiB/60001msec)
+>   read: IOPS=108k, BW=422MiB/s (442MB/s)(24.7GiB/60001msec)
+>   read: IOPS=108k, BW=422MiB/s (443MB/s)(24.7GiB/60001msec)
+>   read: IOPS=108k, BW=422MiB/s (442MB/s)(24.7GiB/60001msec)
+>   read: IOPS=108k, BW=422MiB/s (443MB/s)(24.8GiB/60001msec)
+>   read: IOPS=108k, BW=421MiB/s (442MB/s)(24.7GiB/60001msec)
+>   read: IOPS=108k, BW=423MiB/s (443MB/s)(24.8GiB/60001msec)
+>   AVG = 421 MiB/s
+>
+> Introduce a new tracepoint block_rq_error() just for the error case to
+> reduce the overhead of generic block_rq_complete() tracepoint to only
+> trace requests with errors.
+>
+> Below is the detailed log of testing block_rq_complete() and
+> block_rq_error() tracepoints.
+>
+> -ck
+>
+> The v3 patch was submitted in Feb 2020, and Steven reviewed the patch, but
+> it was not merged to upstream. See
+> https://lore.kernel.org/lkml/20200203053650.8923-1-xiyou.wangcong@gmail.com/.
+>
+> The problems fixed by that patch still exist and we do need it to make
+> disk error handling in rasdaemon easier. So this resurrected it and
+> continued the version number.
+>
+> V6 --> V7:
+>  * Declare new trace event block_rq_completion and use it with
+>    bio_rq_complete and bio_rq_error() to avoid code repetation.
+>  * Add cover letter and document details.
+>  * Add performance numbers.
+>
+> v5 --> v6:
+>  * Removed disk name per Christoph and Chaitanya
+>  * Kept errno since I didn't find any other block tracepoints print blk
+>    status code and userspace (i.e. rasdaemon) does expect errno.
+> v4 --> v5:
+>  * Report the actual block layer status code instead of the errno per
+>    Christoph Hellwig.
+> v3 --> v4:
+>  * Rebased to v5.17-rc1.
+>  * Collected reviewed-by tag from Steven.
+>
+>
+> Chaitanya Kulkarni (1):
+>   block: create event class for rq completion
+>
+> Yang Shi (1):
+>   block: introduce block_rq_error tracepoint
+>
+>  block/blk-mq.c               |  4 ++-
+>  include/trace/events/block.h | 49 ++++++++++++++++++++++++++----------
+>  2 files changed, 39 insertions(+), 14 deletions(-)
+>
+>
+>
+> * Detailed test log for two tracepoints block_rq_complete() and
+>   block_rq_error():
+>
+> * Modified null_blk to fail any incoming REQ_OP_WRITE for
+>    testing :-
+>
+> root@dev linux-block (for-next) # git diff drivers/block/null_blk/main.c
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> index 13004beb48ca..0376d0f46fdf 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -1414,6 +1414,9 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
+>                         return sts;
+>         }
+>
+> +       if (op == REQ_OP_WRITE)
+> +               return BLK_STS_IOERR;
+> +
+>         if (op == REQ_OP_FLUSH) {
+>                 cmd->error = errno_to_blk_status(null_handle_flush(nullb));
+>                 goto out;
+> root@dev tracing # modprobe null_blk
+> root@dev tracing # ls -l /dev/nullb0
+> brw-rw----. 1 root disk 251, 0 Feb  4 02:45 /dev/nullb0
+> root@dev tracing # # note the above major number
+>
+> * Test both block_rq_complete() and block_rq_error() tracepoints :-
+>
+> + cd tracing
+> + modprobe -r null_blk
+> + rm -fr /dev/nullb0
+> + modprobe null_blk
+> + sleep 1
+> + set +x
+> ###############################################################
+> # Disable block_rq_[complete|error] tracepoints
+> #
+> + echo 0
+> + echo 0
+> + cat events/block/block_rq_complete/enable
+> 0
+> + cat events/block/block_rq_error/enable
+> 0
+> + set +x
+> ###############################################################
+> # Enable block_rq_complete() tracepoint and generate write error
+> #
+> + echo 1
+> + cat events/block/block_rq_complete/enable
+> 1
+> + dd if=/dev/zero of=/dev/nullb0 bs=64k count=10 oflag=direct seek=1024
+> dd: error writing '/dev/nullb0': Input/output error
+> 1+0 records in
+> 0+0 records out
+> 0 bytes copied, 0.00268675 s, 0.0 kB/s
+> + cat trace
+> # tracer: nop
+> #
+> # entries-in-buffer/entries-written: 1/1   #P:48
+> #
+> #                                _-----=> irqs-off/BH-disabled
+> #                               / _----=> need-resched
+> #                              | / _---=> hardirq/softirq
+> #                              || / _--=> preempt-depth
+> #                              ||| / _-=> migrate-disable
+> #                              |||| /     delay
+> #           TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
+> #              | |         |   |||||     |         |
+>     kworker/0:1H-1090    [000] .....   586.020342: block_rq_complete: 251,0 WS () 131072 + 128 [-5]
+> + echo ''
+> + set +x
+> ###############################################################
+> # Enable block_rq_[complete|error]() tracepoint and
+> # generate write error
+> #
+> + echo 1
+> + cat events/block/block_rq_error/enable
+> 1
+> + dd if=/dev/zero of=/dev/nullb0 bs=64k count=10 oflag=direct seek=10240
+> dd: error writing '/dev/nullb0': Input/output error
+> 1+0 records in
+> 0+0 records out
+> 0 bytes copied, 0.0022944 s, 0.0 kB/s
+> + cat trace
+> # tracer: nop
+> #
+> # entries-in-buffer/entries-written: 2/2   #P:48
+> #
+> #                                _-----=> irqs-off/BH-disabled
+> #                               / _----=> need-resched
+> #                              | / _---=> hardirq/softirq
+> #                              || / _--=> preempt-depth
+> #                              ||| / _-=> migrate-disable
+> #                              |||| /     delay
+> #           TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
+> #              | |         |   |||||     |         |
+>     kworker/0:1H-1090    [000] .....   586.064527: block_rq_complete: 251,0 WS () 1310720 + 128 [-5]
+>     kworker/0:1H-1090    [000] .....   586.066135: block_rq_error: 251,0 WS () 1310720 + 128 [-5]
+> + echo ''
+> + set +x
+> ###############################################################
+> # Disable block_rq_complete() and keep block_rq_error()
+> # tracepoint enabled and generate write error
+> #
+> + echo 0
+> + cat events/block/block_rq_complete/enable
+> 0
+> + dd if=/dev/zero of=/dev/nullb0 bs=64k count=10 oflag=direct seek=10240
+> dd: error writing '/dev/nullb0': Input/output error
+> 1+0 records in
+> 0+0 records out
+> 0 bytes copied, 0.00235022 s, 0.0 kB/s
+> + cat trace
+> # tracer: nop
+> #
+> # entries-in-buffer/entries-written: 1/1   #P:48
+> #
+> #                                _-----=> irqs-off/BH-disabled
+> #                               / _----=> need-resched
+> #                              | / _---=> hardirq/softirq
+> #                              || / _--=> preempt-depth
+> #                              ||| / _-=> migrate-disable
+> #                              |||| /     delay
+> #           TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
+> #              | |         |   |||||     |         |
+>     kworker/0:1H-1090    [000] .....   586.110419: block_rq_error: 251,0 WS () 1310720 + 128 [-5]
+> + echo ''
+> + modprobe -r null_blk
+> + set +x
+>
+> --
+> 2.29.0
+>
