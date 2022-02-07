@@ -2,112 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AE1C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Feb 2022 08:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A061C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Feb 2022 09:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239363AbiBGI0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Feb 2022 03:26:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53268 "EHLO
+        id S235154AbiBGJOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Feb 2022 04:14:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244004AbiBGIPt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 03:15:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 127E1C043181
-        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 00:15:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644221748;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fZCtKdGV/PdaGul2Xel2hTCDnJYx95E5j/0H+d54vhM=;
-        b=fJptsK01acVwFMlBSTrTPSO8bajQfTkX1EwxxGI4jYwom92NsQ6MyCy0avnbg0vh7VA2Cq
-        KJRjPxzVNSgXsUh8ggriYsbpYEni7SLhnfC1rcaHbs0MG1opyJEBwYruVV3JOR9hChFTuV
-        OgcbQZ83gwx+NwWq/oTW9+VtBjCUVmY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-38-UW0UGwDRPQ-RJVmE6brk5w-1; Mon, 07 Feb 2022 03:15:47 -0500
-X-MC-Unique: UW0UGwDRPQ-RJVmE6brk5w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FE2F801B0E;
-        Mon,  7 Feb 2022 08:15:45 +0000 (UTC)
-Received: from T590 (ovpn-8-33.pek2.redhat.com [10.72.8.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B56D127CD2;
-        Mon,  7 Feb 2022 08:15:11 +0000 (UTC)
-Date:   Mon, 7 Feb 2022 16:15:06 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v7 1/2] blk-throtl: introduce a new flag
- THROTL_TG_CANCELING
-Message-ID: <YgDVCjkjJe1CSVxv@T590>
-References: <20220128084522.3169961-1-yukuai3@huawei.com>
- <20220128084522.3169961-2-yukuai3@huawei.com>
+        with ESMTP id S240758AbiBGJGk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 04:06:40 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C73FC043181;
+        Mon,  7 Feb 2022 01:06:39 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id on2so3767383pjb.4;
+        Mon, 07 Feb 2022 01:06:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=z4u5w4bPw3yV/b+kwX1aHYBXd+5cdgt0I+HhlG81Y0w=;
+        b=I3SC8O7pbbNxbedv2qwjaMe3RpBRr2dLh4gTQ4+8YLG66sdQWzfhcz+A7XLsoifHPp
+         O/KBe+DuQl1gJ4RtlJHPJvHYZtdeThla2pgyR0eQvCbcW/winam4GAAAQXIJaqzKLrt4
+         ir6Pko95eMhn/toNdLOg9FSWIEoULuDqVRy8sDWVi2SpaGip5tn+fzVwLa/QIdETuW7S
+         VV0Ys4OL4BFHJV2TCch65duVYYr7bOxIhI0E8fAHQH87B3Hfic3XTmmPzqgAPPMctlYX
+         eAFOGNdpAsuvm9qNFGR6y+j997pRPszL2VnlqyV8uzMKJAH1NnBdZeypw5QTwsYBeAbq
+         GJbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=z4u5w4bPw3yV/b+kwX1aHYBXd+5cdgt0I+HhlG81Y0w=;
+        b=dA3dejW1qANkxKfpfov00Rx70XgOqKi6sZ1Th03JDX0hAC1nl99VrSZxGOHqleO2/j
+         n7RRhf/DTdFFoSU/G/EyyL51/xcEnDc/LAiePT4SXI07mRTE2VrNBeso+sysNS8aDrFk
+         dYB2fiONBH5z+b0pU34C9sgubPN5Mwwj9+jXBUNjT9igMZYiXJmrGxW+2Bvbo/QvPlJP
+         JlGkYX6NZnaZ+kslbMurs4y+6LCl9wf9VFdOxL+DsvawvDpwC84dsooxKoF2Ox4sfOvw
+         08QOsgGHDUxWI7/PIRr+pZ0ehoaY4Ivnse8W5XVnoL2LEcopRDTBhsUL1zg2s3QR4PUJ
+         xlXw==
+X-Gm-Message-State: AOAM5304gy2SKWnXTi2DFMovICTmTjGxxo7YnJ/M3fkPOgjPXYoH+lO0
+        tygmvRIb8blRZIijWRsTTdFrkC/SdB0=
+X-Google-Smtp-Source: ABdhPJx4GR2wsbDJLP7wI3RIxadSj0ipCMY9VI0P/l4mi9o0gHOe/FMyPrBofsFJ5cLht8dSGeBJGw==
+X-Received: by 2002:a17:90b:4c06:: with SMTP id na6mr13168872pjb.37.1644224798980;
+        Mon, 07 Feb 2022 01:06:38 -0800 (PST)
+Received: from baohua-VirtualBox.localdomain (47-72-151-34.dsl.dyn.ihug.co.nz. [47.72.151.34])
+        by smtp.gmail.com with ESMTPSA id s17sm10660126pfk.156.2022.02.07.01.06.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Feb 2022 01:06:38 -0800 (PST)
+From:   Barry Song <21cnbao@gmail.com>
+X-Google-Original-From: Barry Song <song.bao.hua@hisilicon.com>
+To:     agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linuxarm@huawei.com,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] dm io: Drop the obsolete and incorrect doc for dm_io()
+Date:   Mon,  7 Feb 2022 17:06:20 +0800
+Message-Id: <20220207090620.21207-1-song.bao.hua@hisilicon.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220128084522.3169961-2-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 28, 2022 at 04:45:21PM +0800, Yu Kuai wrote:
-> If the new flag is set, then the throtl_grp will stop throttling bios.
-> Prepare to canceling all throttled bios if the disk is gone.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/blk-throttle.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 7c462c006b26..abc5e506c72d 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -43,8 +43,12 @@
->  static struct workqueue_struct *kthrotld_workqueue;
->  
->  enum tg_state_flags {
-> -	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
-> -	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
-> +	/* on parent's pending tree */
-> +	THROTL_TG_PENDING	= 1 << 0,
-> +	/* bio_lists[] became non-empty */
-> +	THROTL_TG_WAS_EMPTY	= 1 << 1,
-> +	/* starts to cancel all bios, will be set if the disk is deleted */
-> +	THROTL_TG_CANCELING	= 1 << 2,
->  };
->  
->  #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
-> @@ -871,7 +875,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
->  	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
->  
->  	/* If tg->bps = -1, then BW is unlimited */
-> -	if (bps_limit == U64_MAX && iops_limit == UINT_MAX) {
-> +	if ((bps_limit == U64_MAX && iops_limit == UINT_MAX) ||
-> +	    tg->flags & THROTL_TG_CANCELING) {
->  		if (wait)
->  			*wait = 0;
->  		return true;
-> @@ -974,6 +979,9 @@ static void tg_update_disptime(struct throtl_grp *tg)
->  	unsigned long read_wait = -1, write_wait = -1, min_wait = -1, disptime;
->  	struct bio *bio;
->  
-> +	if (tg->flags & THROTL_TG_CANCELING)
-> +		goto update;
-> +
+Commit 7eaceaccab5f ("block: remove per-queue plugging") dropped
+unplug_delay() and blk_unplug(). And the current code has no
+fundamental difference between sync_io() and async_io() except
+sync_io() uses sync_io_complete() as the notify.fn and explicitly
+calls wait_for_completion_io() to sync. The comment isn't valid
+any more.
 
-The above change and the following one in tg_update_disptime() isn't
-needed actually.
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
+---
+ drivers/md/dm-io.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Also I'd suggest to fold the two into one patch.
-
-
-Thanks,
-Ming
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 2d3cda0acacb..7dba193de28b 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -528,11 +528,6 @@ static int dp_init(struct dm_io_request *io_req, struct dpages *dp,
+ 
+ /*
+  * New collapsed (a)synchronous interface.
+- *
+- * If the IO is asynchronous (i.e. it has notify.fn), you must either unplug
+- * the queue with blk_unplug() some time later or set REQ_SYNC in
+- * io_req->bi_opf. If you fail to do one of these, the IO will be submitted to
+- * the disk after q->unplug_delay, which defaults to 3ms in blk-settings.c.
+  */
+ int dm_io(struct dm_io_request *io_req, unsigned num_regions,
+ 	  struct dm_io_region *where, unsigned long *sync_error_bits)
+-- 
+2.25.1
 
