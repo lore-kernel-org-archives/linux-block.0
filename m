@@ -2,137 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC86C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  7 Feb 2022 17:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 427BDC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Feb 2022 18:19:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236752AbiBGR02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Feb 2022 12:26:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43412 "EHLO
+        id S231587AbiBGSTO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Feb 2022 13:19:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242444AbiBGRTS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 12:19:18 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE25C0401D6
-        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 09:19:17 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id w14so31628367edd.10
-        for <linux-block@vger.kernel.org>; Mon, 07 Feb 2022 09:19:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0Bpm5xCm6lbMEjb6E6FobgdnJVJasrPPGpl6KCiYRgM=;
-        b=a3tojpRh9LyG1HB9vOiafOasa72XcjiwjX10yLoRyEC7dQcnzKXfNJyiElGB4x6efl
-         Z6hkasrLGqkc8jsc5j0c0z1EI8mfP551kYSjK2lCvGnoCP3m4n5knLo3Aa8o8T6MBFSN
-         FlVrsf7Yd/j0gc08gfY+FEvcHpJkpdF+RqysWyfYA3jiN4og7PgeiOb3Ot/A/NBAanFL
-         Ftenw7Fg5w3L8S5WednZqylHpFxQrPXJlGY/3mJkdaouzi0O/Yl9ZOYGtutb28JeOuHs
-         KsUw7X9H/lXD1Afmvqff79/cmxqIlJW3OqqwJTwotnBh90xT7Jm62hFgeJJ784TKEOYL
-         ObLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0Bpm5xCm6lbMEjb6E6FobgdnJVJasrPPGpl6KCiYRgM=;
-        b=7aU/airhJ+n0wBe0r+Mf7+Ai3YSYGfmFYlJDmxj1Q3fREDPJPNJz8IJXXcUMD0Pihp
-         VC2Qdvi1uxBqOJSWLHQfn5MC/zqfD3/X8C0KRDLKAFxrPj+hlg3Zl/wn48Yg7sFywhEG
-         XAO+zY4lOVaJFnW4sMH5wDU4SuhYOtkT3/RaUObq7iRoRlTEzkzBXLnOaIor963O6sNQ
-         nUJfR1ewVb3GeW49hr0ESv0KcEss9V/qaxOdrtExWJlTpSUrj7ZsHFI6kfht0HwgKRxR
-         PbJX4WOWvGeRwGSJnaIiVJ/0RjcEsKVIWSppXFzpy/O0yWCiTrge4cNPwolkN5ABm73e
-         451w==
-X-Gm-Message-State: AOAM531pT/+7kHLv+IqEhGVSDxzpemlv7z7dENtV/2SVucF4bQV6+s7G
-        18/qitDCHUQZ7F9uKEUhybHuIKx1C5t9sBT4CTIe59IA
-X-Google-Smtp-Source: ABdhPJwAKRYJdNf+uA69YYkosJfUQE71jIk/ytcGZb2Pu0pClNz6GfjhhbbM4rCGVqY/JCqZlcslqJoD0z2fKZ4js/M=
-X-Received: by 2002:a50:da87:: with SMTP id q7mr336881edj.64.1644254356577;
- Mon, 07 Feb 2022 09:19:16 -0800 (PST)
+        with ESMTP id S1344353AbiBGSMy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 13:12:54 -0500
+X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Feb 2022 10:12:53 PST
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDC2C0401D9;
+        Mon,  7 Feb 2022 10:12:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644257573; x=1675793573;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9jtlciL9JDhXsZpBNGevebG0Pcet92BqXyuEzYTIPU8=;
+  b=ML8cvVpRs8VbVgMGfU63I3TOLbvIr8lzXHWAhbHSoYtT8InWInmrvzuy
+   ktzJsbvE9okzMhc9wuO8IK/UyhCkmzkDhKL9Ry4S58GBiGzuwM0yqJGV2
+   JXziBwJt4T/fBv7HZ1G4N5Bj4UIxDJaj/TZ3wH/oM6B/zyhIr5deiJo0s
+   m1UA5pOlgQfqxIlyeevJfaFMcoLDMJiDpQ342U6paKdWgdduCbAcLqkE8
+   3wzEIzZDDAmZ9zv7uC8uku77+PYW+14JwTWuAsP4K4UjOot48GX7cYNN6
+   LivZbhcyBW+assdP6tOGs78FZlYuDCigWf01x6Xf+dHgHOvrC6ygBhpLk
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10250"; a="248725038"
+X-IronPort-AV: E=Sophos;i="5.88,350,1635231600"; 
+   d="scan'208";a="248725038"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2022 10:11:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,350,1635231600"; 
+   d="scan'208";a="481665736"
+Received: from lkp-server01.sh.intel.com (HELO 9dd77a123018) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 07 Feb 2022 10:11:47 -0800
+Received: from kbuild by 9dd77a123018 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nH8UN-0000qN-4m; Mon, 07 Feb 2022 18:11:47 +0000
+Date:   Tue, 8 Feb 2022 02:10:49 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>, mpatocka@redhat.com
+Cc:     kbuild-all@lists.01.org, javier@javigon.com, chaitanyak@nvidia.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk, msnitzer@redhat.com
+Subject: Re: [PATCH v2 07/10] nvmet: add copy command support for bdev and
+ file ns
+Message-ID: <202202080206.J6kilCeY-lkp@intel.com>
+References: <20220207141348.4235-8-nj.shetty@samsung.com>
 MIME-Version: 1.0
-References: <20220205091150.6105-1-chaitanyak@nvidia.com> <20220205091150.6105-2-chaitanyak@nvidia.com>
-In-Reply-To: <20220205091150.6105-2-chaitanyak@nvidia.com>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Mon, 7 Feb 2022 09:19:04 -0800
-Message-ID: <CAHbLzkosqBwCV8wFkfHtqvsrie8nb4CNBm9Hfw4xUpUjX5-s4Q@mail.gmail.com>
-Subject: Re: [PATCH V7 1/2] block: create event class for rq completion
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Steven Rostedt <rostedt@goodmis.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220207141348.4235-8-nj.shetty@samsung.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 5, 2022 at 1:12 AM Chaitanya Kulkarni <chaitanyak@nvidia.com> wrote:
->
-> From: Chaitanya Kulkarni <kch@nvidia.com>
->
-> Move the existing code from TRACE_EVENT block_rq_complete() into new
-> event class block_rq_completion(). Add a new event block_rq_complete()
-> from newly created event class block_rq_completion().
->
-> This prep patch is needed to resue the code into new tracepoint
+Hi Nitesh,
 
-Just a minor nit:
-s/resue/reuse
+Thank you for the patch! Perhaps something to improve:
 
-> block_rq_error() in the next patch.
->
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v5.17-rc3 next-20220207]
+[cannot apply to device-mapper-dm/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Reviewed-by: Yang Shi <shy828301@gmail.com>
+url:    https://github.com/0day-ci/linux/commits/Nitesh-Shetty/block-make-bio_map_kern-non-static/20220207-231407
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: microblaze-buildonly-randconfig-r003-20220207 (https://download.01.org/0day-ci/archive/20220208/202202080206.J6kilCeY-lkp@intel.com/config)
+compiler: microblaze-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/6bb6ea64499e1ac27975e79bb2eee89f07861893
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Nitesh-Shetty/block-make-bio_map_kern-non-static/20220207-231407
+        git checkout 6bb6ea64499e1ac27975e79bb2eee89f07861893
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=microblaze SHELL=/bin/bash drivers/nvme/target/
 
-> ---
->  include/trace/events/block.h | 33 ++++++++++++++++++++-------------
->  1 file changed, 20 insertions(+), 13 deletions(-)
->
-> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-> index 27170e40e8c9..1519068bd1ab 100644
-> --- a/include/trace/events/block.h
-> +++ b/include/trace/events/block.h
-> @@ -100,19 +100,7 @@ TRACE_EVENT(block_rq_requeue,
->                   __entry->nr_sector, 0)
->  );
->
-> -/**
-> - * block_rq_complete - block IO operation completed by device driver
-> - * @rq: block operations request
-> - * @error: status code
-> - * @nr_bytes: number of completed bytes
-> - *
-> - * The block_rq_complete tracepoint event indicates that some portion
-> - * of operation request has been completed by the device driver.  If
-> - * the @rq->bio is %NULL, then there is absolutely no additional work to
-> - * do for the request. If @rq->bio is non-NULL then there is
-> - * additional work required to complete the request.
-> - */
-> -TRACE_EVENT(block_rq_complete,
-> +DECLARE_EVENT_CLASS(block_rq_completion,
->
->         TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
->
-> @@ -144,6 +132,25 @@ TRACE_EVENT(block_rq_complete,
->                   __entry->nr_sector, __entry->error)
->  );
->
-> +/**
-> + * block_rq_complete - block IO operation completed by device driver
-> + * @rq: block operations request
-> + * @error: status code
-> + * @nr_bytes: number of completed bytes
-> + *
-> + * The block_rq_complete tracepoint event indicates that some portion
-> + * of operation request has been completed by the device driver.  If
-> + * the @rq->bio is %NULL, then there is absolutely no additional work to
-> + * do for the request. If @rq->bio is non-NULL then there is
-> + * additional work required to complete the request.
-> + */
-> +DEFINE_EVENT(block_rq_completion, block_rq_complete,
-> +
-> +       TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
-> +
-> +       TP_ARGS(rq, error, nr_bytes)
-> +);
-> +
->  DECLARE_EVENT_CLASS(block_rq,
->
->         TP_PROTO(struct request *rq),
-> --
-> 2.29.0
->
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/linux/byteorder/big_endian.h:5,
+                    from arch/microblaze/include/uapi/asm/byteorder.h:8,
+                    from include/asm-generic/bitops/le.h:6,
+                    from include/asm-generic/bitops.h:35,
+                    from ./arch/microblaze/include/generated/asm/bitops.h:1,
+                    from include/linux/bitops.h:33,
+                    from include/linux/log2.h:12,
+                    from include/asm-generic/div64.h:55,
+                    from ./arch/microblaze/include/generated/asm/div64.h:1,
+                    from include/linux/math.h:5,
+                    from include/linux/math64.h:6,
+                    from include/linux/time.h:6,
+                    from include/linux/stat.h:19,
+                    from include/linux/module.h:13,
+                    from drivers/nvme/target/admin-cmd.c:7:
+   drivers/nvme/target/admin-cmd.c: In function 'nvmet_execute_identify_ns':
+>> include/uapi/linux/byteorder/big_endian.h:34:26: warning: conversion from 'unsigned int' to '__le16' {aka 'short unsigned int'} changes value from '524288' to '0' [-Woverflow]
+      34 | #define __cpu_to_le32(x) ((__force __le32)__swab32((x)))
+         |                          ^
+   include/linux/byteorder/generic.h:88:21: note: in expansion of macro '__cpu_to_le32'
+      88 | #define cpu_to_le32 __cpu_to_le32
+         |                     ^~~~~~~~~~~~~
+   drivers/nvme/target/admin-cmd.c:534:29: note: in expansion of macro 'cpu_to_le32'
+     534 |                 id->mssrl = cpu_to_le32(BIO_MAX_VECS << (PAGE_SHIFT - SECTOR_SHIFT));
+         |                             ^~~~~~~~~~~
+
+
+vim +34 include/uapi/linux/byteorder/big_endian.h
+
+5921e6f8809b161 David Howells 2012-10-13  15  
+5921e6f8809b161 David Howells 2012-10-13  16  #define __constant_htonl(x) ((__force __be32)(__u32)(x))
+5921e6f8809b161 David Howells 2012-10-13  17  #define __constant_ntohl(x) ((__force __u32)(__be32)(x))
+5921e6f8809b161 David Howells 2012-10-13  18  #define __constant_htons(x) ((__force __be16)(__u16)(x))
+5921e6f8809b161 David Howells 2012-10-13  19  #define __constant_ntohs(x) ((__force __u16)(__be16)(x))
+5921e6f8809b161 David Howells 2012-10-13  20  #define __constant_cpu_to_le64(x) ((__force __le64)___constant_swab64((x)))
+5921e6f8809b161 David Howells 2012-10-13  21  #define __constant_le64_to_cpu(x) ___constant_swab64((__force __u64)(__le64)(x))
+5921e6f8809b161 David Howells 2012-10-13  22  #define __constant_cpu_to_le32(x) ((__force __le32)___constant_swab32((x)))
+5921e6f8809b161 David Howells 2012-10-13  23  #define __constant_le32_to_cpu(x) ___constant_swab32((__force __u32)(__le32)(x))
+5921e6f8809b161 David Howells 2012-10-13  24  #define __constant_cpu_to_le16(x) ((__force __le16)___constant_swab16((x)))
+5921e6f8809b161 David Howells 2012-10-13  25  #define __constant_le16_to_cpu(x) ___constant_swab16((__force __u16)(__le16)(x))
+5921e6f8809b161 David Howells 2012-10-13  26  #define __constant_cpu_to_be64(x) ((__force __be64)(__u64)(x))
+5921e6f8809b161 David Howells 2012-10-13  27  #define __constant_be64_to_cpu(x) ((__force __u64)(__be64)(x))
+5921e6f8809b161 David Howells 2012-10-13  28  #define __constant_cpu_to_be32(x) ((__force __be32)(__u32)(x))
+5921e6f8809b161 David Howells 2012-10-13  29  #define __constant_be32_to_cpu(x) ((__force __u32)(__be32)(x))
+5921e6f8809b161 David Howells 2012-10-13  30  #define __constant_cpu_to_be16(x) ((__force __be16)(__u16)(x))
+5921e6f8809b161 David Howells 2012-10-13  31  #define __constant_be16_to_cpu(x) ((__force __u16)(__be16)(x))
+5921e6f8809b161 David Howells 2012-10-13  32  #define __cpu_to_le64(x) ((__force __le64)__swab64((x)))
+5921e6f8809b161 David Howells 2012-10-13  33  #define __le64_to_cpu(x) __swab64((__force __u64)(__le64)(x))
+5921e6f8809b161 David Howells 2012-10-13 @34  #define __cpu_to_le32(x) ((__force __le32)__swab32((x)))
+5921e6f8809b161 David Howells 2012-10-13  35  #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+5921e6f8809b161 David Howells 2012-10-13  36  #define __cpu_to_le16(x) ((__force __le16)__swab16((x)))
+5921e6f8809b161 David Howells 2012-10-13  37  #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
+5921e6f8809b161 David Howells 2012-10-13  38  #define __cpu_to_be64(x) ((__force __be64)(__u64)(x))
+5921e6f8809b161 David Howells 2012-10-13  39  #define __be64_to_cpu(x) ((__force __u64)(__be64)(x))
+5921e6f8809b161 David Howells 2012-10-13  40  #define __cpu_to_be32(x) ((__force __be32)(__u32)(x))
+5921e6f8809b161 David Howells 2012-10-13  41  #define __be32_to_cpu(x) ((__force __u32)(__be32)(x))
+5921e6f8809b161 David Howells 2012-10-13  42  #define __cpu_to_be16(x) ((__force __be16)(__u16)(x))
+5921e6f8809b161 David Howells 2012-10-13  43  #define __be16_to_cpu(x) ((__force __u16)(__be16)(x))
+5921e6f8809b161 David Howells 2012-10-13  44  
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
