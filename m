@@ -2,125 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8421BC433EF
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 05:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9E8C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 06:24:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231868AbiBHFkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 00:40:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45482 "EHLO
+        id S1347237AbiBHGY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 01:24:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231855AbiBHFkc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 00:40:32 -0500
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA77C0401EF
-        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 21:40:30 -0800 (PST)
-Received: by mail-io1-f70.google.com with SMTP id q5-20020a0566022f0500b00638278a161fso5114077iow.11
-        for <linux-block@vger.kernel.org>; Mon, 07 Feb 2022 21:40:30 -0800 (PST)
+        with ESMTP id S1347225AbiBHGY4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 01:24:56 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8384C0401EF
+        for <linux-block@vger.kernel.org>; Mon,  7 Feb 2022 22:24:55 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id k25so48751046ejp.5
+        for <linux-block@vger.kernel.org>; Mon, 07 Feb 2022 22:24:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=F05KrrJ5nwRnJTzF4EHFCUub/SMru0BF05WRRy/F6Pk=;
+        b=bHQDT+JW+B0bT2CR3YOv/YW+mOdd+RZtX5FkePRJjdUsBXnKBDk6mgNM+23oTbmdrd
+         nrdPoqa/CLBSQWuGpmofiyJt9ss8A8yWrHjEgoIa8Xv7OiBtEtQEf6c392Oa0gdT4guo
+         kkKwUGcKP/XhVXaF1w77SLwYUxK+lFZt1iQP4SBwIeaqvc0jgpogqAhVH7Ee2xD+5r9f
+         CQXsGQRxOgipfmH5UbxTLv/XDTNk1MfKMv8QM7IwhzIxQ1M5sCVmu2u/1/6gTCNlQdt/
+         xvBIoUQifcbWMgHTJOtJsL3oxZCAwbsP8/qJUbtgRzDShxFg3rWUEpkxGbuivR50PT+2
+         NaHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=NVEYrJM0C3B0DWqVYowPI6bzh3KUToVqmgGzHv+vXCQ=;
-        b=hVWg8EhUuUhpa4Q6GpL+T5IpOjk7yB6tnYOXesAPIWDCqNf5g77O4Xg90xvq/wF3K3
-         OUsHuBXA3alicsmFpKmy8ODdArlEjNio2Hxzgh2EG8yhcxA7r1xyu2QWM45jMmOEn77/
-         p3lFeof/Gk/JR0wPcgJDT+qJaN76hfCe08S4e0ZeOl/zsG78U7AzuhdFP8yiRyxb23Xc
-         vhr8XFhEf0VEsKG0q9JWUrymo+lwmbbqrO3TR+cGdWMY6YzZkikRboo3HeWrw8bXMkwE
-         4eqfzppxd6ahTpx5eB4kAgWINwYSuAlLVItAuBFw442ESVkHEs9C6IxXTQVU0l9k7cDn
-         pBEg==
-X-Gm-Message-State: AOAM533E9tM0CRNGFW6UXY7wCjKLtkzn/TDQP6/yrvLC0l7gdAo/BCkD
-        bFMMkzqa6toY365iZb5p/TTo/moM9BozVkTNTJu1rWm1RGE8
-X-Google-Smtp-Source: ABdhPJwLZLDaZfItvI/FjsAH813l0hh7diG5+FTlYeAhKB9UntHVkhqPOESjyLXH9GxA56pxarOniC87xi34KrKsGbjRmS+msCyo
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=F05KrrJ5nwRnJTzF4EHFCUub/SMru0BF05WRRy/F6Pk=;
+        b=LVCTGXIvN+h4wXnGWjBxmkCbqEZlv+4HumjiAYSb1Ut2wC0xV298+bW9257rDIJYXy
+         fUJG2YxuiiLLG9GiV+FwN6FhapXGj8gbNkq5G8JZGJDoPnnV5m274i0dq4TYDcrAPQz3
+         NeQSDWdSGbT1+Q1ZOMAkhAvcsRxDNIX8Aq+vJIe419+cKVEc1ricEGqkFYQ06w9SJKBI
+         a27tJ1UbUKa1UCgLu9dBDxY1EbLK60BX3bDX1R6bi+PsYwLwQtoC6u7Ebn2sY/6xD/xs
+         WdMm+Y832vKBq19L+w5O09iGjuEALsnCzV2orV7SUoMFm0uo0IXc//ekrasX7kGJN+NB
+         g1QA==
+X-Gm-Message-State: AOAM532M1HhalBHsQKH4ec3Wr/ZHQDDW/fQM0c7gwOGUm+BsGkYOiAGg
+        AEL6MoECvVXTxm5ta0RzSfkYaZ4+2/eVfn1VFGmviQ==
+X-Google-Smtp-Source: ABdhPJw0mV3W8x4mwmjY7Wbc8YNoyW9j3jncLmuwo0IXP3n3B7HZBKW9o3xDHJtoZCmgbTznPN2ywGhGB920b7ymYx8=
+X-Received: by 2002:a17:907:1b1c:: with SMTP id mp28mr2441762ejc.624.1644301494293;
+ Mon, 07 Feb 2022 22:24:54 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1348:: with SMTP id u8mr1445462jad.204.1644298830219;
- Mon, 07 Feb 2022 21:40:30 -0800 (PST)
-Date:   Mon, 07 Feb 2022 21:40:30 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ae0f7b05d77b27b5@google.com>
-Subject: [syzbot] WARNING in blk_register_tracepoints
-From:   syzbot <syzbot+c54ded83396afee31eb1@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
+References: <7f9eccd8b1fce1bac45ac9b01a78cf72f54c0a61.1644266862.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <7f9eccd8b1fce1bac45ac9b01a78cf72f54c0a61.1644266862.git.christophe.jaillet@wanadoo.fr>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Tue, 8 Feb 2022 07:24:43 +0100
+Message-ID: <CAMGffE=xiO1tgAeZ9QJr0GyrE2EnYkj3hASJSMsGFHwRCTZ5Cg@mail.gmail.com>
+Subject: Re: [PATCH v2] block/rnbd: Remove a useless mutex
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    d8ad2ce873ab Merge tag 'ext4_for_linus_stable' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15665db2700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ee3797346aa03884
-dashboard link: https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11e00d84700000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=119fd0c2700000
-
-Bisection is inconclusive: the issue happens on the oldest tested release.
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=171a984fb00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=149a984fb00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=109a984fb00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c54ded83396afee31eb1@syzkaller.appspotmail.com
-
-RBP: 00007ffc2d88d100 R08: 0000000000000002 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-R13: 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 3595 at kernel/trace/blktrace.c:1090 blk_register_tracepoints+0x2dc/0x3a0 kernel/trace/blktrace.c:1090
-Modules linked in:
-CPU: 0 PID: 3595 Comm: syz-executor147 Not tainted 5.17.0-rc2-syzkaller-00398-gd8ad2ce873ab #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:blk_register_tracepoints+0x2dc/0x3a0 kernel/trace/blktrace.c:1090
-Code: 48 c7 c7 00 3d 82 8d e8 f2 69 fb ff 31 ff 89 c3 89 c6 e8 e7 a8 f9 ff 85 db 0f 85 ba 00 00 00 5b e9 b9 a6 f9 ff e8 b4 a6 f9 ff <0f> 0b e9 4b fd ff ff e8 a8 a6 f9 ff 0f 0b e9 6c fd ff ff e8 9c a6
-RSP: 0018:ffffc9000279fbc0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 00000000fffffff4 RCX: 0000000000000000
-RDX: ffff888023011d00 RSI: ffffffff817ed1dc RDI: 0000000000000003
-RBP: ffff8881469d4300 R08: 0000000000000000 R09: ffffc9000279fa67
-R10: ffffffff817ecf26 R11: 0000000000000000 R12: ffffc9000279fc70
-R13: ffff8881469d4328 R14: ffff8881470196d0 R15: ffff8881469d4330
-FS:  0000555556142300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffc2d88d0c8 CR3: 00000000715ef000 CR4: 0000000000350ee0
-Call Trace:
- <TASK>
- get_probe_ref kernel/trace/blktrace.c:326 [inline]
- do_blk_trace_setup+0x9c3/0xc80 kernel/trace/blktrace.c:570
- __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:589
- blk_trace_setup+0x43/0x60 kernel/trace/blktrace.c:607
- sg_ioctl_common drivers/scsi/sg.c:1123 [inline]
- sg_ioctl+0x257/0x2780 drivers/scsi/sg.c:1165
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f7e080026d9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 b1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc2d88d0e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f7e080026d9
-RDX: 0000000020000140 RSI: 00000000c0481273 RDI: 0000000000000003
-RBP: 00007ffc2d88d100 R08: 0000000000000002 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-R13: 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+On Mon, Feb 7, 2022 at 9:48 PM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> According to lib/idr.c,
+>    The IDA handles its own locking.  It is safe to call any of the IDA
+>    functions without synchronisation in your code.
+>
+> so the 'ida_lock' mutex can just be removed.
+> It is here only to protect some ida_simple_get()/ida_simple_remove() calls.
+>
+> While at it, switch to ida_alloc_XXX()/ida_free() instead to
+> ida_simple_get()/ida_simple_remove().
+> The latter is deprecated and more verbose.
+>
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+Thanks!
+> ---
+>  drivers/block/rnbd/rnbd-clt.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> index 9a880d559ab8..1f63f308eb39 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -23,7 +23,6 @@ MODULE_LICENSE("GPL");
+>
+>  static int rnbd_client_major;
+>  static DEFINE_IDA(index_ida);
+> -static DEFINE_MUTEX(ida_lock);
+>  static DEFINE_MUTEX(sess_lock);
+>  static LIST_HEAD(sess_list);
+>
+> @@ -55,9 +54,7 @@ static void rnbd_clt_put_dev(struct rnbd_clt_dev *dev)
+>         if (!refcount_dec_and_test(&dev->refcount))
+>                 return;
+>
+> -       mutex_lock(&ida_lock);
+> -       ida_simple_remove(&index_ida, dev->clt_device_id);
+> -       mutex_unlock(&ida_lock);
+> +       ida_free(&index_ida, dev->clt_device_id);
+>         kfree(dev->hw_queues);
+>         kfree(dev->pathname);
+>         rnbd_clt_put_sess(dev->sess);
+> @@ -1460,10 +1457,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+>                 goto out_alloc;
+>         }
+>
+> -       mutex_lock(&ida_lock);
+> -       ret = ida_simple_get(&index_ida, 0, 1 << (MINORBITS - RNBD_PART_BITS),
+> -                            GFP_KERNEL);
+> -       mutex_unlock(&ida_lock);
+> +       ret = ida_alloc_max(&index_ida, 1 << (MINORBITS - RNBD_PART_BITS),
+> +                           GFP_KERNEL);
+>         if (ret < 0) {
+>                 pr_err("Failed to initialize device '%s' from session %s, allocating idr failed, err: %d\n",
+>                        pathname, sess->sessname, ret);
+> --
+> 2.32.0
+>
