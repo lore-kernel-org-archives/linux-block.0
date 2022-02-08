@@ -2,104 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A47C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 01:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6C6C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 02:13:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237747AbiBHBzd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Feb 2022 20:55:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43870 "EHLO
+        id S230198AbiBHCM7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Feb 2022 21:12:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235279AbiBHBzc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 20:55:32 -0500
-X-Greylist: delayed 1014 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Feb 2022 17:55:31 PST
+        with ESMTP id S230123AbiBHCM7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Feb 2022 21:12:59 -0500
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C934C061355;
-        Mon,  7 Feb 2022 17:55:30 -0800 (PST)
-Received: from kwepemi100021.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Jt5CM6X25zZdZp;
-        Tue,  8 Feb 2022 09:34:23 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100021.china.huawei.com (7.221.188.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 09:38:34 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 09:38:34 +0800
-Subject: Re: [PATCH -next] blk-throttle: enable io throttle for root in cgroup
- v2
-To:     Tejun Heo <tj@kernel.org>
-CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220114093000.3323470-1-yukuai3@huawei.com>
- <YfGE9L4i7DtNTo08@slm.duckdns.org>
- <235b0757-d322-2b6e-3ab6-ecc8c82f8f1e@huawei.com>
- <Yflr4FzUTWsiLTC/@slm.duckdns.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <32b6949d-60b1-82ce-ae44-1cf089a78276@huawei.com>
-Date:   Tue, 8 Feb 2022 09:38:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8819C061355;
+        Mon,  7 Feb 2022 18:12:58 -0800 (PST)
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Jt62j1PC2zccRR;
+        Tue,  8 Feb 2022 10:11:57 +0800 (CST)
+Received: from [10.174.176.103] (10.174.176.103) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Tue, 8 Feb 2022 10:12:56 +0800
+Message-ID: <6e7fe188-a258-8d10-2f86-027c6b6f434c@huawei.com>
+Date:   Tue, 8 Feb 2022 10:12:56 +0800
 MIME-Version: 1.0
-In-Reply-To: <Yflr4FzUTWsiLTC/@slm.duckdns.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH -next] block: update io_ticks when io hang
+From:   "zhangwensheng (E)" <zhangwensheng5@huawei.com>
+To:     <axboe@kernel.dk>
+References: <20220125091938.1799001-1-zhangwensheng5@huawei.com>
+ <45c2ae11-c44e-f27d-f029-66efe96b0804@huawei.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+In-Reply-To: <45c2ae11-c44e-f27d-f029-66efe96b0804@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
+X-Originating-IP: [10.174.176.103]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggeme756-chm.china.huawei.com (10.3.19.102)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-�� 2022/02/02 1:20, Tejun Heo д��:
-> Hello,
-> 
-> On Thu, Jan 27, 2022 at 10:36:38AM +0800, yukuai (C) wrote:
->> In our case, the disk is provided by server, and such disk can be shared
->> by multipul clients. Thus for the client side, the server is a higher
->> level parent.
+friendly ping...
+
+在 2022/1/28 14:22, zhangwensheng (E) 写道:
+> friendly ping...
+>
+> 在 2022/1/25 17:19, Zhang Wensheng 写道:
+>> When the inflight IOs are slow and no new IOs are issued, we expect
+>> iostat could manifest the IO hang problem. However after
+>> commit 5b18b5a73760 ("block: delete part_round_stats and switch to less
+>> precise counting"), io_tick and time_in_queue will not be updated until
+>> the end of IO, and the avgqu-sz and %util columns of iostat will be 
+>> zero.
 >>
->> Theoretically, limit the io from server for each client is feasible,
->> however, the main reason we don't want to do this is the following
->> shortcoming:
+>> Because it has using stat.nsecs accumulation to express time_in_queue
+>> which is not suitable to change, and may %util will express the status
+>> better when io hang occur. To fix io_ticks, we use update_io_ticks and
+>> inflight to update io_ticks when diskstats_show and part_stat_show
+>> been called.
 >>
->> client can still send io to server unlimited, we can just limit the
->> amount of io that can complete from server, which might cause too much
->> pressure on the server side.
-> 
-> I don't quite follow the "send io to server unlimited" part. Doesn't that
-> get limited by available number of requests? 
-
-Hi, Tejun
-
-Here I mean that io is not limited through io throttle from client. Of
-course io must be limited by avaliable number of requests.
-
-> ie. if the server throttles,
-> the in-flight requests will take longer to complete which exhausts the
-> available requests and thus slows down the client.
-
-For example, if we have 8 clients, and available requests is 64.
-
-1) If we don't limit iops, and each client send 64 io to server, some
-client might have performance issue.
-
-2) If we limit iops to 8 from clients, then server can receive 64 io at
-most at the same time, both client and server should work fine.
-
-3) If we limit iops to 8 for each client from server, client should work
-fine, however, server can receive 64 x 8 = 512 io at most at the same
-time, which might cause too much pressure on the server.(maybe bps is
-more appropriate to explain the high pressure).
-
-Thus I prefer to limit io from client.
-
-Thanks,
-Kuai
-> That's how it's supposed
-> to work on the local machine too.
-> 
-> Thanks.
-> 
+>> Fixes: 5b18b5a73760 ("block: delete part_round_stats and switch to 
+>> less precise counting")
+>> Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+>> ---
+>>   block/genhd.c | 8 ++++++--
+>>   1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/genhd.c b/block/genhd.c
+>> index 626c8406f21a..df0656ffb4ad 100644
+>> --- a/block/genhd.c
+>> +++ b/block/genhd.c
+>> @@ -913,12 +913,14 @@ ssize_t part_stat_show(struct device *dev,
+>>       struct disk_stats stat;
+>>       unsigned int inflight;
+>>   -    part_stat_read_all(bdev, &stat);
+>>       if (queue_is_mq(q))
+>>           inflight = blk_mq_in_flight(q, bdev);
+>>       else
+>>           inflight = part_in_flight(bdev);
+>>   +    if (inflight)
+>> +        update_io_ticks(bdev, jiffies, true);
+>> +    part_stat_read_all(bdev, &stat);
+>>       return sprintf(buf,
+>>           "%8lu %8lu %8llu %8u "
+>>           "%8lu %8lu %8llu %8u "
+>> @@ -1174,12 +1176,14 @@ static int diskstats_show(struct seq_file 
+>> *seqf, void *v)
+>>       xa_for_each(&gp->part_tbl, idx, hd) {
+>>           if (bdev_is_partition(hd) && !bdev_nr_sectors(hd))
+>>               continue;
+>> -        part_stat_read_all(hd, &stat);
+>>           if (queue_is_mq(gp->queue))
+>>               inflight = blk_mq_in_flight(gp->queue, hd);
+>>           else
+>>               inflight = part_in_flight(hd);
+>>   +        if (inflight)
+>> +            update_io_ticks(hd, jiffies, true);
+>> +        part_stat_read_all(hd, &stat);
+>>           seq_printf(seqf, "%4d %7d %pg "
+>>                  "%lu %lu %lu %u "
+>>                  "%lu %lu %lu %u "
