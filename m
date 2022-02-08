@@ -2,94 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CEBC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 11:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F26C4167B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 13:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357482AbiBHLun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 06:50:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41356 "EHLO
+        id S231351AbiBHNPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 08:15:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359750AbiBHLuc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 06:50:32 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 223E9C07D6C3;
-        Tue,  8 Feb 2022 03:46:59 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id k1so13686114wrd.8;
-        Tue, 08 Feb 2022 03:46:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TmKAUjm7Amkz4S/+pPvWtraWrpa9Qq6Jt7Fq2nrePGY=;
-        b=EgeeHN4vzoL9zkyQQVYX1Lnc+cX0DZo1vKQPHeupYiXrhuhX3nBJAOCYY4IBoqxlyh
-         aaElxz/kT4CVD5ywumrG53+6Lbl4dCv1lTwUVOfJWALhBAlRFVmBcKRjmO7El/TbWlHH
-         w5ygQguZlGzTZrItZ5bMdJq3b1YNzmrxI49/7yG06HqexxLtBzh7VpV09oxNY+gHDMoz
-         voXJCeuN6gY4tomhUKUOhcOlL1StV4b+hBtrXzmQDg70ZZh8nFUZQlbqlwoPWR0LN8hr
-         mncBTWERBiafqsGg1V8Iv4MxqcrFjtvswXqQQfYWa2zSigAQPJYdhiOckoTYf+Zy82pb
-         55tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TmKAUjm7Amkz4S/+pPvWtraWrpa9Qq6Jt7Fq2nrePGY=;
-        b=3rq9OAzRUzxvX7OvV1yrNCUtWxU0n239jAt6dPU14zTlXfxJwYoo6IsEKy1uCNIjgp
-         G9rkyaZ/sJRIZA0x6FYEv8cPAwZibr+p1URf78A14Z8viOQWicKyWp3e7TXGBJcF7Hz5
-         uSI7dkx7Ru/TZmM/RtgWiDeC9+PTUEBuwQ46+rFW2HQ3la3kgE/ddaYgn74vHvvlIIaR
-         QoDu4UkHREAQnKk7HigTl7/WmLbhRxZbMQGNPikYSFGxnDe4sWZ/3eVfYgShHdTZDJBY
-         Nz26PtU7G1WYAoAE2z4/5PNrr3FNmp1JxrkpKwiCH961Nfq28KymLbgiA2pkH0ycYBkA
-         ZZLA==
-X-Gm-Message-State: AOAM5339NysVO6QAgbP66cfOt1NnNSIT2QU1ix3PR0d48xFrqlid5KZA
-        hsBux1wNYnK4nK6x8EJs7hU=
-X-Google-Smtp-Source: ABdhPJydTeiXL4oQvRW9uwlGPuG9NdNqDOm+HT9vlgGdbCLc5ktplVB4jWosm30UjoJiuT+AoLlU0w==
-X-Received: by 2002:a05:6000:4:: with SMTP id h4mr3150446wrx.336.1644320817649;
-        Tue, 08 Feb 2022 03:46:57 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id c13sm12650329wrv.24.2022.02.08.03.46.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Feb 2022 03:46:57 -0800 (PST)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] loop: clean up grammar in warning message
-Date:   Tue,  8 Feb 2022 11:46:56 +0000
-Message-Id: <20220208114656.61629-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S1349825AbiBHMMb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 07:12:31 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F7BC03FEC0;
+        Tue,  8 Feb 2022 04:12:28 -0800 (PST)
+Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JtMLm3sGSz67xNM;
+        Tue,  8 Feb 2022 20:11:44 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Feb 2022 13:12:26 +0100
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Feb 2022 12:12:24 +0000
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <ming.lei@redhat.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, John Garry <john.garry@huawei.com>
+Subject: [PATCH] sbitmap: Delete old sbitmap_queue_get_shallow()
+Date:   Tue, 8 Feb 2022 20:07:04 +0800
+Message-ID: <1644322024-105340-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The phrase "has still" should be "still has" to clean up the grammar.
+Since __sbitmap_queue_get_shallow() was introduced in commit c05e66733788
+("sbitmap: add sbitmap_get_shallow() operation"), it has not been used.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/block/loop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Delete __sbitmap_queue_get_shallow() and rename public
+__sbitmap_queue_get_shallow() -> sbitmap_queue_get_shallow() as it is odd
+to have public __foo but no foo at all.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 01cbbfc4e9e2..bdea448d2419 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1262,7 +1262,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if (size_changed && lo->lo_device->bd_inode->i_mapping->nrpages) {
- 		/* If any pages were dirtied after invalidate_bdev(), try again */
- 		err = -EAGAIN;
--		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-+		pr_warn("%s: loop%d (%s) still has dirty pages (nrpages=%lu)\n",
- 			__func__, lo->lo_number, lo->lo_file_name,
- 			lo->lo_device->bd_inode->i_mapping->nrpages);
- 		goto out_unfreeze;
-@@ -1482,7 +1482,7 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- 	/* invalidate_bdev should have truncated all the pages */
- 	if (lo->lo_device->bd_inode->i_mapping->nrpages) {
- 		err = -EAGAIN;
--		pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
-+		pr_warn("%s: loop%d (%s) still has dirty pages (nrpages=%lu)\n",
- 			__func__, lo->lo_number, lo->lo_file_name,
- 			lo->lo_device->bd_inode->i_mapping->nrpages);
- 		goto out_unfreeze;
+Signed-off-by: John Garry <john.garry@huawei.com>
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 845f74e8dd7b..0fd409b8e86e 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -107,7 +107,7 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
+ 		return BLK_MQ_NO_TAG;
+ 
+ 	if (data->shallow_depth)
+-		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
++		return sbitmap_queue_get_shallow(bt, data->shallow_depth);
+ 	else
+ 		return __sbitmap_queue_get(bt);
+ }
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index df3b584b0f0c..dffeb8281c2d 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -135,7 +135,7 @@ struct sbitmap_queue {
+ 
+ 	/**
+ 	 * @min_shallow_depth: The minimum shallow depth which may be passed to
+-	 * sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().
++	 * sbitmap_queue_get_shallow()
+ 	 */
+ 	unsigned int min_shallow_depth;
+ };
+@@ -463,7 +463,7 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+ 					unsigned int *offset);
+ 
+ /**
+- * __sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
++ * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
+  * sbitmap_queue, limiting the depth used from each word, with preemption
+  * already disabled.
+  * @sbq: Bitmap queue to allocate from.
+@@ -475,8 +475,8 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+  *
+  * Return: Non-negative allocated bit number if successful, -1 otherwise.
+  */
+-int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
+-				unsigned int shallow_depth);
++int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
++			      unsigned int shallow_depth);
+ 
+ /**
+  * sbitmap_queue_get() - Try to allocate a free bit from a &struct
+@@ -498,32 +498,6 @@ static inline int sbitmap_queue_get(struct sbitmap_queue *sbq,
+ 	return nr;
+ }
+ 
+-/**
+- * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
+- * sbitmap_queue, limiting the depth used from each word.
+- * @sbq: Bitmap queue to allocate from.
+- * @cpu: Output parameter; will contain the CPU we ran on (e.g., to be passed to
+- *       sbitmap_queue_clear()).
+- * @shallow_depth: The maximum number of bits to allocate from a single word.
+- * See sbitmap_get_shallow().
+- *
+- * If you call this, make sure to call sbitmap_queue_min_shallow_depth() after
+- * initializing @sbq.
+- *
+- * Return: Non-negative allocated bit number if successful, -1 otherwise.
+- */
+-static inline int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
+-					    unsigned int *cpu,
+-					    unsigned int shallow_depth)
+-{
+-	int nr;
+-
+-	*cpu = get_cpu();
+-	nr = __sbitmap_queue_get_shallow(sbq, shallow_depth);
+-	put_cpu();
+-	return nr;
+-}
+-
+ /**
+  * sbitmap_queue_min_shallow_depth() - Inform a &struct sbitmap_queue of the
+  * minimum shallow depth that will be used.
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index b7cb96ae4701..2eb3de18ded3 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -557,14 +557,14 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+ 	return 0;
+ }
+ 
+-int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
+-				unsigned int shallow_depth)
++int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
++			      unsigned int shallow_depth)
+ {
+ 	WARN_ON_ONCE(shallow_depth < sbq->min_shallow_depth);
+ 
+ 	return sbitmap_get_shallow(&sbq->sb, shallow_depth);
+ }
+-EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
++EXPORT_SYMBOL_GPL(sbitmap_queue_get_shallow);
+ 
+ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
+ 				     unsigned int min_shallow_depth)
 -- 
-2.34.1
+2.26.2
 
