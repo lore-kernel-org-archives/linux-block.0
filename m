@@ -2,201 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFD7C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 14:47:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A70C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 16:07:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378387AbiBHOrh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 09:47:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44034 "EHLO
+        id S1382382AbiBHQH6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 11:07:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378390AbiBHOrh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 09:47:37 -0500
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AECC061578
-        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 06:47:35 -0800 (PST)
-Received: from fsav311.sakura.ne.jp (fsav311.sakura.ne.jp [153.120.85.142])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 218ElLHJ080554;
-        Tue, 8 Feb 2022 23:47:21 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav311.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav311.sakura.ne.jp);
- Tue, 08 Feb 2022 23:47:21 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav311.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 218ElLHw080551
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 8 Feb 2022 23:47:21 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <28d54cac-f235-d041-5171-4efa8a954926@I-love.SAKURA.ne.jp>
-Date:   Tue, 8 Feb 2022 23:47:19 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: [PATCH for 5.17] loop: revert "make autoclear operation asynchronous"
-References: <20220129071500.3566-2-penguin-kernel@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@lst.de>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220129071500.3566-2-penguin-kernel@I-love.SAKURA.ne.jp>
-X-Forwarded-Message-Id: <20220129071500.3566-2-penguin-kernel@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S1381969AbiBHQHx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 11:07:53 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADEB0C061579
+        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 08:07:52 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id d10so53727705eje.10
+        for <linux-block@vger.kernel.org>; Tue, 08 Feb 2022 08:07:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=pxjwicyhltOLuF32btZSo9eR1Q86Q6QmMx6SaA/q3DI=;
+        b=OB5f9v0kZYyeHeXgReydEaPOiq979JGQ7lVGZlZ6oerO1iBCCY1iWxu20iUkDgyoNe
+         c1t/aUQ01QC+znccPD/jcIC+wwAm6hnUmmiy2z7kDF3cLJUMMmMFFRmeet/e3nBKQyEt
+         Xk/CRe2LQ/RZ49l0q1BZsmQYAq4gFiek0EEZ+Z1ABV2rNhdhkyA1+kns7YAk3M7b+Lk8
+         RLcZE0Sb0VvlEU2SZHdq0wbgunrryPSxZFiTgUDpR/sQS4gmOfV+oPD8RzV7YCzjALNT
+         VMwocI/yT5E0Q0Vus3FHvHbYZ/1eK/o29ut25C0BmXinqyLPrMuZIx3hvWhJCDKkhxn2
+         MAmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=pxjwicyhltOLuF32btZSo9eR1Q86Q6QmMx6SaA/q3DI=;
+        b=B2CorBnSANVN8nnmCpeyqGWpJFla8hvtkfEdYJrng5DQ7z6Vpx855AaoFq849y8gGj
+         TF9kOmhUNBQbcOwYUsRrhv3F0aevshYFDMHPnIVFl93jv+8WCk6yyWFimeRYdikVbQJ5
+         dCt+LCzJ0GVrUsI8Hn3Lxegvye7VfNZL7Jcx8rhE+yFBlFhFLZNahpMMG11WxFiFLhoM
+         9B9WkgbOCFaJFzEUgtHjvNpPMCJ7oNn41/925smKjuqPVNL3gyDXLcRmIVshmWrAhfNA
+         5MSZFSF9UiNe8LWKC/3i1SPuZLu56FnJWpN0x7inohpmST85T8Fex11VaXoGjMakMWGW
+         2d3w==
+X-Gm-Message-State: AOAM530QsTCIyRltq7aKkXDuYczn2ZNpWoTos8QSrbeWx828cD3mjUFP
+        OzCahciXgiuL25iN2Ql4ds/5Uw==
+X-Google-Smtp-Source: ABdhPJz4RnNuj5YY8xlIrK2+luOydjfdY6530XHJpbvHISffDI7nftfnB9s3FoY7gS9qnJyGCpXHFw==
+X-Received: by 2002:a17:906:dc90:: with SMTP id cs16mr2272590ejc.295.1644336471256;
+        Tue, 08 Feb 2022 08:07:51 -0800 (PST)
+Received: from mbp-di-paolo.station (net-2-37-165-88.cust.vodafonedsl.it. [2.37.165.88])
+        by smtp.gmail.com with ESMTPSA id a21sm4794976eds.5.2022.02.08.08.07.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Feb 2022 08:07:50 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v3 2/3] block, bfq: avoid moving bfqq to it's parent bfqg
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <c85b10ce-fb41-9e0a-772a-63c226227207@huawei.com>
+Date:   Tue, 8 Feb 2022 17:07:49 +0100
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <36E597B3-AC41-48CC-BF3D-C35FAA7CCDD6@linaro.org>
+References: <20220129015924.3958918-1-yukuai3@huawei.com>
+ <20220129015924.3958918-3-yukuai3@huawei.com>
+ <c85b10ce-fb41-9e0a-772a-63c226227207@huawei.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The kernel test robot is reporting that xfstest which does
 
-  umount ext2 on xfs
-  umount xfs
 
-sequence started failing, for commit 322c4293ecc58110 ("loop: make
-autoclear operation asynchronous") removed a guarantee that fput() of
-backing file is processed before lo_release() from close() returns to
-user mode. Revert that commit.
+> Il giorno 8 feb 2022, alle ore 04:53, yukuai (C) <yukuai3@huawei.com> =
+ha scritto:
+>=20
+> =E5=9C=A8 2022/01/29 9:59, Yu Kuai =E5=86=99=E9=81=93:
+>> Moving bfqq to it's parent bfqg is pointless.
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>  block/bfq-cgroup.c | 10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>=20
+> Hi, Paolo
+>=20
+> I make a clerical error in last version of this patch:
+>=20
+> bfq_group should be bfqq_group
+>=20
+> Can you please take a look of this patch? I do compile and
+> test the patch this time...
+>=20
 
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Acked-by: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- drivers/block/loop.c | 65 ++++++++++++++++++++------------------------
- drivers/block/loop.h |  1 -
- 2 files changed, 29 insertions(+), 37 deletions(-)
+Haven't I acked this patch series already?
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 01cbbfc4e9e2..150012ffb387 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1082,7 +1082,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return error;
- }
- 
--static void __loop_clr_fd(struct loop_device *lo)
-+static void __loop_clr_fd(struct loop_device *lo, bool release)
- {
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
-@@ -1144,6 +1144,8 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	/* let user-space know about this change */
- 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- 	mapping_set_gfp_mask(filp->f_mapping, gfp);
-+	/* This is safe: open() is still holding a reference. */
-+	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
-@@ -1151,52 +1153,44 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
- 		int err;
- 
--		mutex_lock(&lo->lo_disk->open_mutex);
-+		/*
-+		 * open_mutex has been held already in release path, so don't
-+		 * acquire it if this function is called in such case.
-+		 *
-+		 * If the reread partition isn't from release path, lo_refcnt
-+		 * must be at least one and it can only become zero when the
-+		 * current holder is released.
-+		 */
-+		if (!release)
-+			mutex_lock(&lo->lo_disk->open_mutex);
- 		err = bdev_disk_changed(lo->lo_disk, false);
--		mutex_unlock(&lo->lo_disk->open_mutex);
-+		if (!release)
-+			mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo->lo_number, err);
- 		/* Device is gone, no point in returning error */
- 	}
- 
-+	/*
-+	 * lo->lo_state is set to Lo_unbound here after above partscan has
-+	 * finished. There cannot be anybody else entering __loop_clr_fd() as
-+	 * Lo_rundown state protects us from all the other places trying to
-+	 * change the 'lo' device.
-+	 */
- 	lo->lo_flags = 0;
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
--
--	fput(filp);
--}
--
--static void loop_rundown_completed(struct loop_device *lo)
--{
- 	mutex_lock(&lo->lo_mutex);
- 	lo->lo_state = Lo_unbound;
- 	mutex_unlock(&lo->lo_mutex);
--	module_put(THIS_MODULE);
--}
--
--static void loop_rundown_workfn(struct work_struct *work)
--{
--	struct loop_device *lo = container_of(work, struct loop_device,
--					      rundown_work);
--	struct block_device *bdev = lo->lo_device;
--	struct gendisk *disk = lo->lo_disk;
--
--	__loop_clr_fd(lo);
--	kobject_put(&bdev->bd_device.kobj);
--	module_put(disk->fops->owner);
--	loop_rundown_completed(lo);
--}
- 
--static void loop_schedule_rundown(struct loop_device *lo)
--{
--	struct block_device *bdev = lo->lo_device;
--	struct gendisk *disk = lo->lo_disk;
--
--	__module_get(disk->fops->owner);
--	kobject_get(&bdev->bd_device.kobj);
--	INIT_WORK(&lo->rundown_work, loop_rundown_workfn);
--	queue_work(system_long_wq, &lo->rundown_work);
-+	/*
-+	 * Need not hold lo_mutex to fput backing file. Calling fput holding
-+	 * lo_mutex triggers a circular lock dependency possibility warning as
-+	 * fput can take open_mutex which is usually taken before lo_mutex.
-+	 */
-+	fput(filp);
- }
- 
- static int loop_clr_fd(struct loop_device *lo)
-@@ -1228,8 +1222,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	lo->lo_state = Lo_rundown;
- 	mutex_unlock(&lo->lo_mutex);
- 
--	__loop_clr_fd(lo);
--	loop_rundown_completed(lo);
-+	__loop_clr_fd(lo, false);
- 	return 0;
- }
- 
-@@ -1754,7 +1747,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		loop_schedule_rundown(lo);
-+		__loop_clr_fd(lo, true);
- 		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 918a7a2dc025..082d4b6bfc6a 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -56,7 +56,6 @@ struct loop_device {
- 	struct gendisk		*lo_disk;
- 	struct mutex		lo_mutex;
- 	bool			idr_visible;
--	struct work_struct      rundown_work;
- };
- 
- struct loop_cmd {
--- 
-2.32.0
+Thanks,
+Paolo
+
+> Thanks,
+> Kuai
 
