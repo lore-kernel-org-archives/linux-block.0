@@ -2,198 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10700C43217
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 11:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E346C4332F
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 11:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376397AbiBHLcW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 06:32:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40670 "EHLO
+        id S1356640AbiBHLcY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 06:32:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236625AbiBHLWQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 06:22:16 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769A0C03FEC0;
-        Tue,  8 Feb 2022 03:22:12 -0800 (PST)
-Received: from kwepemi100023.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JtL8k2YPDzZfSH;
-        Tue,  8 Feb 2022 19:17:58 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100023.china.huawei.com (7.221.188.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 19:22:09 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 8 Feb
- 2022 19:22:08 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <ming.lei@redhat.com>, <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH v8] block: cancel all throttled bios in del_gendisk()
-Date:   Tue, 8 Feb 2022 19:38:08 +0800
-Message-ID: <20220208113808.1401601-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S232060AbiBHKzm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 05:55:42 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0813EC03FEC0;
+        Tue,  8 Feb 2022 02:55:42 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id i30so18189068pfk.8;
+        Tue, 08 Feb 2022 02:55:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=sWE38xa95W+xhxHgrq7WzsZ2vv/Ie+VkpJNorAGjDbg=;
+        b=pl2KrerUPO7MVE2mHCZefx2Cu4UZm40ckE4roweTe44c4Ba20GwJgU1rTKso9u6o2M
+         Kj3sbpYEtJt4vQQewuqFXCPntHNfgIjnnjOGwmasAEudNDqcpfQ+kkfBlpHs2u5eVDM9
+         2o7krHmcBdbWj5VIOdLbo+N8O+Oo4bslLwDmrHVgLP76c1DSwPNr60Q4iLlxUqaMVl8x
+         sYhks3hdQEVr0uo7ZQW+08cLx9omr0tfW1W3mxhZZlix82+kKoKxjYaiylZKwt5u6BZm
+         nv70sxkFlTdmMcEC8Ds+KF9wMOruXjUJ/onhU0oV7Bx6J7F7/3x1pPT41IFJwRO2m8WC
+         bKwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=sWE38xa95W+xhxHgrq7WzsZ2vv/Ie+VkpJNorAGjDbg=;
+        b=3xtatWAKpkg85YtREj0I9cHFYNIP3TqahqugDrVLthe5i1QrLQTGqZivQ4Nnq+uLHZ
+         fiP3P14qidGGUuNHV25ianpeh0zXC9QHe5bxFXCrjHahl5Eol8BcyP0yOxbSQPXG6tUB
+         /qzImL4d/njhex/QkTih6HZNsHMDJvZSX7mjldLDKI/viY5li9d73yvt6aP2Wqe+NP6t
+         DDKhXBlLn0NQ8+nqj7vqpsgQOVE/hXAKe9VJf947R4426l/qnesQYdKYqkbJvioIqw+9
+         Gaq7W3raaX75XrJqBYlaySZ0hZsK4OGVaXhEW1VaJp+p8M24Nx4ZXxWx592NAqMvodxR
+         A+rA==
+X-Gm-Message-State: AOAM532zwAVUlMz3Ca3ZdcxbINOdDYUoZBxWgPIw0N+hZsm+rZ32Kblr
+        hfxZ64+WbcnbT6xPJpjJPnzx0+aSHjA=
+X-Google-Smtp-Source: ABdhPJzDfm/XaP31aWpiNpsnafHmrMc0SBrpe7htyOBDrSByBdrMOLx1+2RuXa1fzkZlUAECj3XIAw==
+X-Received: by 2002:a05:6a00:c94:: with SMTP id a20mr3833402pfv.41.1644317741126;
+        Tue, 08 Feb 2022 02:55:41 -0800 (PST)
+Received: from [192.168.1.100] ([166.111.139.99])
+        by smtp.gmail.com with ESMTPSA id lk8sm2489742pjb.40.2022.02.08.02.55.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Feb 2022 02:55:40 -0800 (PST)
+From:   Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [BUG] block: drbd: possible deadlocks involving waiting and locking
+ operations
+To:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        axboe@kernel.dk
+Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Message-ID: <3b992e3b-bf1a-426a-5e76-a822f5bf6e6a@gmail.com>
+Date:   Tue, 8 Feb 2022 18:55:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Throttled bios can't be issued after del_gendisk() is done, thus
-it's better to cancel them immediately rather than waiting for
-throttle is done.
+Hello,
 
-For example, if user thread is throttled with low bps while it's
-issuing large io, and the device is deleted. The user thread will
-wait for a long time for io to return.
+My static analysis tool reports three possible deadlocks in the drbd 
+driver in Linux 5.16:
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
-Changes in v8:
- - fold two patches into one
-Changes in v7:
- - use the new solution as suggested by Ming.
+#BUG 1
+drbd_adm_attach()
+   mutex_lock(&adm_ctx.resource->adm_mutex); --> Line 1810 (Lock A)
+   wait_event(device->misc_wait, ...); --> Line 1824 (Wait X)
 
- block/blk-throttle.c | 49 ++++++++++++++++++++++++++++++++++++++++----
- block/blk-throttle.h |  2 ++
- block/genhd.c        |  2 ++
- 3 files changed, 49 insertions(+), 4 deletions(-)
+drbd_adm_disk_opts()
+   mutex_lock(&adm_ctx.resource->adm_mutex); --> Line 1582 (Lock A)
+   get_ldev()
+     get_ldev_if_state()
+       _get_ldev_if_state()
+         put_ldev()
+           wake_up(&device->misc_wait); --> Line 2108 (Wake X)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 7c462c006b26..557d20796157 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -43,8 +43,12 @@
- static struct workqueue_struct *kthrotld_workqueue;
- 
- enum tg_state_flags {
--	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
--	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
-+	/* on parent's pending tree */
-+	THROTL_TG_PENDING	= 1 << 0,
-+	/* bio_lists[] became non-empty */
-+	THROTL_TG_WAS_EMPTY	= 1 << 1,
-+	/* starts to cancel all bios, will be set if the disk is deleted */
-+	THROTL_TG_CANCELING	= 1 << 2,
- };
- 
- #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
-@@ -871,7 +875,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
- 
- 	/* If tg->bps = -1, then BW is unlimited */
--	if (bps_limit == U64_MAX && iops_limit == UINT_MAX) {
-+	if ((bps_limit == U64_MAX && iops_limit == UINT_MAX) ||
-+	    tg->flags & THROTL_TG_CANCELING) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
-@@ -974,6 +979,9 @@ static void tg_update_disptime(struct throtl_grp *tg)
- 	unsigned long read_wait = -1, write_wait = -1, min_wait = -1, disptime;
- 	struct bio *bio;
- 
-+	if (tg->flags & THROTL_TG_CANCELING)
-+		goto update;
-+
- 	bio = throtl_peek_queued(&sq->queued[READ]);
- 	if (bio)
- 		tg_may_dispatch(tg, bio, &read_wait);
-@@ -983,9 +991,10 @@ static void tg_update_disptime(struct throtl_grp *tg)
- 		tg_may_dispatch(tg, bio, &write_wait);
- 
- 	min_wait = min(read_wait, write_wait);
--	disptime = jiffies + min_wait;
- 
-+update:
- 	/* Update dispatch time */
-+	disptime = jiffies + min_wait;
- 	throtl_dequeue_tg(tg);
- 	tg->disptime = disptime;
- 	throtl_enqueue_tg(tg);
-@@ -1763,6 +1772,38 @@ static bool throtl_hierarchy_can_upgrade(struct throtl_grp *tg)
- 	return false;
- }
- 
-+void blk_throtl_cancel_bios(struct request_queue *q)
-+{
-+	struct cgroup_subsys_state *pos_css;
-+	struct blkcg_gq *blkg;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	/*
-+	 * queue_lock is held, rcu lock is not needed here technically.
-+	 * However, rcu lock is still held to emphasize that following
-+	 * path need RCU protection and to prevent warning from lockdep.
-+	 */
-+	rcu_read_lock();
-+	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
-+		struct throtl_grp *tg = blkg_to_tg(blkg);
-+		struct throtl_service_queue *sq = &tg->service_queue;
-+
-+		/*
-+		 * Set disptime in the past to make sure
-+		 * throtl_select_dispatch() won't exit without dispatching.
-+		 */
-+		tg->disptime = jiffies - 1;
-+		/*
-+		 * Set the flag to make sure throtl_pending_timer_fn() won't
-+		 * stop until all throttled bios are dispatched.
-+		 */
-+		blkg_to_tg(blkg)->flags |= THROTL_TG_CANCELING;
-+		throtl_schedule_pending_timer(sq, jiffies + 1);
-+	}
-+	rcu_read_unlock();
-+	spin_unlock_irq(&q->queue_lock);
-+}
-+
- static bool throtl_can_upgrade(struct throtl_data *td,
- 	struct throtl_grp *this_tg)
- {
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 175f03abd9e4..2ae467ac17ea 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -160,12 +160,14 @@ static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
- static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
-+static inline void blk_throtl_cancel_bios(struct request_queue *q) { }
- #else /* CONFIG_BLK_DEV_THROTTLING */
- int blk_throtl_init(struct request_queue *q);
- void blk_throtl_exit(struct request_queue *q);
- void blk_throtl_register_queue(struct request_queue *q);
- void blk_throtl_charge_bio_split(struct bio *bio);
- bool __blk_throtl_bio(struct bio *bio);
-+void blk_throtl_cancel_bios(struct request_queue *q);
- static inline bool blk_throtl_bio(struct bio *bio)
- {
- 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
-diff --git a/block/genhd.c b/block/genhd.c
-index 9589d1d59afa..6acc98cd0365 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -29,6 +29,7 @@
- #include "blk.h"
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-+#include "blk-throttle.h"
- 
- static struct kobject *block_depr;
- 
-@@ -625,6 +626,7 @@ void del_gendisk(struct gendisk *disk)
- 
- 	blk_mq_freeze_queue_wait(q);
- 
-+	blk_throtl_cancel_bios(disk->queue);
- 	rq_qos_exit(q);
- 	blk_sync_queue(q);
- 	blk_flush_integrity();
--- 
-2.31.1
+#BUG 2
+drbd_adm_invalidate()
+   mutex_lock(&adm_ctx.resource->adm_mutex); --> Line 3024 (Lock A)
+   wait_event(device->misc_wait, ...); --> Line 3030 (Wait X)
+
+drbd_adm_disk_opts()
+   mutex_lock(&adm_ctx.resource->adm_mutex); --> Line 1582 (Lock A)
+   get_ldev()
+     get_ldev_if_state()
+       _get_ldev_if_state()
+         put_ldev()
+           wake_up(&device->misc_wait); --> Line 2108 (Wake X)
+
+#BUG 3
+drbd_adm_invalidate_peer()
+   mutex_lock(&adm_ctx.resource->adm_mutex); --> Line 3101 (Lock A)
+   wait_event(device->misc_wait, ...); --> Line 3107 (Wait X)
+
+drbd_adm_disk_opts()
+   mutex_lock(&adm_ctx.resource->adm_mutex); --> Line 1582 (Lock A)
+   get_ldev()
+     get_ldev_if_state()
+       _get_ldev_if_state()
+         put_ldev()
+           wake_up(&device->misc_wait); --> Line 2108 (Wake X)
+
+When drbd_adm_attach()/drbd_adm_invalidate()/drbd_adm_invalidate_peer() 
+is executed, "Wait X" is performed by holding "Lock A". If 
+drbd_adm_disk_opts() is executed at this time, because "Lock A" has been 
+already held, "Wake X" cannot be performed to wake up "Wait X", causing 
+possible deadlocks.
+
+I am not quite sure whether these possible problems are real.
+Any feedback would be appreciated, thanks :)
+
+Best wishes,
+Jia-Ju Bai
 
