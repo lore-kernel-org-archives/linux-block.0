@@ -2,157 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F26C4167B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 13:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 764BFC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 13:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231351AbiBHNPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 08:15:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51432 "EHLO
+        id S235437AbiBHNqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 08:46:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349825AbiBHMMb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 07:12:31 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F7BC03FEC0;
-        Tue,  8 Feb 2022 04:12:28 -0800 (PST)
-Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JtMLm3sGSz67xNM;
-        Tue,  8 Feb 2022 20:11:44 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 13:12:26 +0100
-Received: from localhost.localdomain (10.69.192.58) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Feb 2022 12:12:24 +0000
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <ming.lei@redhat.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, John Garry <john.garry@huawei.com>
-Subject: [PATCH] sbitmap: Delete old sbitmap_queue_get_shallow()
-Date:   Tue, 8 Feb 2022 20:07:04 +0800
-Message-ID: <1644322024-105340-1-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
+        with ESMTP id S233183AbiBHNqJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 08:46:09 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F600C03FED0
+        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 05:46:04 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id EA9AC210F9;
+        Tue,  8 Feb 2022 13:46:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1644327962; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H9mTDHRn4rDCTFNm9LKmE5lKyDRh9x5V5ssHBvtyW2U=;
+        b=RtfLojFkrxrhMGCt/qb2RhzN5DCywcfZX7wAs8sOn9CMTIP88bE1kW5qyYPmd2tWL7oAw6
+        PXpGxqmoNbqdlx7LQvjyACKBfBynQHVhlMDwLOpHkMcyuW9clCbYDEXDYiwj8jC1nNpxR+
+        Dfy8ePgizai6PgH4eRPwMXzqLe/XRuc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1644327962;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H9mTDHRn4rDCTFNm9LKmE5lKyDRh9x5V5ssHBvtyW2U=;
+        b=YdZaR9JKL09/8SN+SvEc9M/fgWZZocEe3SipDQBMMkLtAfNpm6Iu+G73z+ZrGcbeGcbF+O
+        VduXr+bJ/5n9ovAQ==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id D86D2A3B88;
+        Tue,  8 Feb 2022 13:46:02 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 5128BA05C7; Tue,  8 Feb 2022 14:45:59 +0100 (CET)
+Date:   Tue, 8 Feb 2022 14:45:59 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>,
+        "Darrick J . Wong" <djwong@kernel.org>
+Subject: Re: [PATCH 5/8] loop: only take lo_mutex for the first reference in
+ lo_open
+Message-ID: <20220208134559.qfs4pkukdzkuh2rg@quack3.lan>
+References: <20220128130022.1750906-1-hch@lst.de>
+ <20220128130022.1750906-6-hch@lst.de>
+ <397e50c7-ae46-8834-1632-7bac1ad7df99@I-love.SAKURA.ne.jp>
+ <10d156e7-4347-4ccd-51f4-ea5febd1b1ee@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <10d156e7-4347-4ccd-51f4-ea5febd1b1ee@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since __sbitmap_queue_get_shallow() was introduced in commit c05e66733788
-("sbitmap: add sbitmap_get_shallow() operation"), it has not been used.
+On Sat 05-02-22 09:28:33, Tetsuo Handa wrote:
+> Ping?
+> 
+> I sent https://lkml.kernel.org/r/20220129071500.3566-1-penguin-kernel@I-love.SAKURA.ne.jp
+> based on ideas from your series.
+> 
+> Since automated kernel tests are failing, can't we apply
+> [PATCH 1/7] loop: revert "make autoclear operation asynchronous"
+> for now if we can't come to a conclusion?
 
-Delete __sbitmap_queue_get_shallow() and rename public
-__sbitmap_queue_get_shallow() -> sbitmap_queue_get_shallow() as it is odd
-to have public __foo but no foo at all.
+That's certainly a good start so feel free to add my Acked-by to the
+revert. I agree it should be merged quickly as I think it is better to have
+a theoretical deadlock in the code than userspace breakage hit in the wild.
+I'll find some more time to look into this but it will take a while.
 
-Signed-off-by: John Garry <john.garry@huawei.com>
+								Honza
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 845f74e8dd7b..0fd409b8e86e 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -107,7 +107,7 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 		return BLK_MQ_NO_TAG;
- 
- 	if (data->shallow_depth)
--		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
-+		return sbitmap_queue_get_shallow(bt, data->shallow_depth);
- 	else
- 		return __sbitmap_queue_get(bt);
- }
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index df3b584b0f0c..dffeb8281c2d 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -135,7 +135,7 @@ struct sbitmap_queue {
- 
- 	/**
- 	 * @min_shallow_depth: The minimum shallow depth which may be passed to
--	 * sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().
-+	 * sbitmap_queue_get_shallow()
- 	 */
- 	unsigned int min_shallow_depth;
- };
-@@ -463,7 +463,7 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
- 					unsigned int *offset);
- 
- /**
-- * __sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-+ * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-  * sbitmap_queue, limiting the depth used from each word, with preemption
-  * already disabled.
-  * @sbq: Bitmap queue to allocate from.
-@@ -475,8 +475,8 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
-  *
-  * Return: Non-negative allocated bit number if successful, -1 otherwise.
-  */
--int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
--				unsigned int shallow_depth);
-+int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+			      unsigned int shallow_depth);
- 
- /**
-  * sbitmap_queue_get() - Try to allocate a free bit from a &struct
-@@ -498,32 +498,6 @@ static inline int sbitmap_queue_get(struct sbitmap_queue *sbq,
- 	return nr;
- }
- 
--/**
-- * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
-- * sbitmap_queue, limiting the depth used from each word.
-- * @sbq: Bitmap queue to allocate from.
-- * @cpu: Output parameter; will contain the CPU we ran on (e.g., to be passed to
-- *       sbitmap_queue_clear()).
-- * @shallow_depth: The maximum number of bits to allocate from a single word.
-- * See sbitmap_get_shallow().
-- *
-- * If you call this, make sure to call sbitmap_queue_min_shallow_depth() after
-- * initializing @sbq.
-- *
-- * Return: Non-negative allocated bit number if successful, -1 otherwise.
-- */
--static inline int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
--					    unsigned int *cpu,
--					    unsigned int shallow_depth)
--{
--	int nr;
--
--	*cpu = get_cpu();
--	nr = __sbitmap_queue_get_shallow(sbq, shallow_depth);
--	put_cpu();
--	return nr;
--}
--
- /**
-  * sbitmap_queue_min_shallow_depth() - Inform a &struct sbitmap_queue of the
-  * minimum shallow depth that will be used.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index b7cb96ae4701..2eb3de18ded3 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -557,14 +557,14 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
- 	return 0;
- }
- 
--int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
--				unsigned int shallow_depth)
-+int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
-+			      unsigned int shallow_depth)
- {
- 	WARN_ON_ONCE(shallow_depth < sbq->min_shallow_depth);
- 
- 	return sbitmap_get_shallow(&sbq->sb, shallow_depth);
- }
--EXPORT_SYMBOL_GPL(__sbitmap_queue_get_shallow);
-+EXPORT_SYMBOL_GPL(sbitmap_queue_get_shallow);
- 
- void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
- 				     unsigned int min_shallow_depth)
+> 
+> On 2022/01/28 22:13, Tetsuo Handa wrote:
+> > On 2022/01/28 22:00, Christoph Hellwig wrote:
+> >> +	if (atomic_inc_return(&lo->lo_refcnt) > 1)
+> >> +		return 0;
+> >> +
+> >>  	err = mutex_lock_killable(&lo->lo_mutex);
+> >>  	if (err)
+> > 
+> > You did not notice my diff here...
+> 
+> You need to drop lo->lo_refcnt before return.
+> 
+> But my latest series no longer uses task work context and no longer
+> holds lo->lo_mutex from lo_open()/lo_release().
+> 
+> > 
+> >>  		return err;
+> >> -	if (lo->lo_state == Lo_deleting)
+> >> +	if (lo->lo_state == Lo_deleting) {
+> >> +		atomic_dec(&lo->lo_refcnt);
+> >>  		err = -ENXIO;
+> >> -	else
+> >> -		atomic_inc(&lo->lo_refcnt);
+> >> +	}
+> > 
+> > Why do we need [PATCH 1/8] [PATCH 2/8] [PATCH 3/8] in this series?
+> > Shouldn't we first make a clean revert, and keep the changes for
+> > this release cycle as small as possible?
 -- 
-2.26.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
