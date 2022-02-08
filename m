@@ -2,136 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3082C352B6
-	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 22:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A90EC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  8 Feb 2022 22:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386579AbiBHW0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 17:26:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38758 "EHLO
+        id S1354944AbiBHWnq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 17:43:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386922AbiBHVVf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 16:21:35 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CD0FC0612B8
-        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 13:21:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MEcfNAJvaE7mW6qFLMfAKdyTamVFCzaZ2UMAPksa7eQ=; b=gxYD89ofKC7H/dZAQV3hGIcGd6
-        i+QAQ8ERqzX1SiiOWe9YT4bZyn62qiiVgpEvN/CgKXf7+pnnYb4upqz+QcmgZAkQnzbA28OGV+bNz
-        LZu7Huttrjb5ECFthwEF9ON43Ix472FN2o1RTA+OX8e7zvrRx6ZCmjohdeipZZWBnaB8Oe73c7z42
-        yti3oZ3KU8HrP7uC1yLoT0BeKOIVxo40Bj5mHWZ2WTlOd1M9pz3Okyb7jPKH0bfHve4jnsxSoZtWc
-        3uYRuNkfoKDCAcFsWCXXyKAAKLOFG70ioWDIb2XKfelqnCwNedcAQ/vjqEu0U3YxPFThm3ULxnECs
-        4TWLbC8A==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nHXvU-00FbZ1-GA; Tue, 08 Feb 2022 21:21:28 +0000
-Date:   Tue, 8 Feb 2022 13:21:28 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     dwagner@suse.de, osandov@fb.com, linux-block@vger.kernel.org
+        with ESMTP id S1355496AbiBHWnl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 17:43:41 -0500
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D28C03E920
+        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 14:26:41 -0800 (PST)
+Received: by mail-pj1-f43.google.com with SMTP id y9so486683pjf.1
+        for <linux-block@vger.kernel.org>; Tue, 08 Feb 2022 14:26:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=6fPfiGd24JzmlajWvkJlznSEszSJCJjAYwLhn5BSKcE=;
+        b=znI6IeBQSbRD/pbDdB1vSxfZpA5lKSC6dcI1QiInzq3KA5G9wRS9euJ+1PKIbCFZXG
+         oy3q2KgcU7o+VMcMTJiCDKZquiyXh6RpYsghjOoQCdvKr9ry0Rr9ye+fJpAt/KcA2mJc
+         TLfpe2BO4URM2OfzTNbVVAtDqHb9Ip8L+HRrif0eXXH0vS6D2C4DAUEOEFnAou7DA2BU
+         0rhu4ENVyZexi0YzNAdV3L4XDZgW20UjHmgzuFDLoI1pL76qD+BJI+Jd44jKCKKOwVkm
+         CES9i7URRrvhMiM6ASs6uuRPT+dqydmEmOfjHGfkhyAHcIbuBDBD7EAa4j8z2gdslY1l
+         hD7w==
+X-Gm-Message-State: AOAM530xKCrZzrZpoBRLsX/iL+gd6gdezjMammy7AyrDGfyBkcvt2HvL
+        dxoMkj6MIxv6ToAOUoNi3Ko=
+X-Google-Smtp-Source: ABdhPJyZntv91nr4i3SneFqdn2f5Z+mdFKG1SKEZoUaaJWjprCYFIr/SqpeZZZLRA9Mg7vo0qN05Mw==
+X-Received: by 2002:a17:90b:3ec8:: with SMTP id rm8mr106046pjb.207.1644359201079;
+        Tue, 08 Feb 2022 14:26:41 -0800 (PST)
+Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id y12sm17626548pfa.132.2022.02.08.14.26.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Feb 2022 14:26:40 -0800 (PST)
+Message-ID: <d32088fb-2423-b7c7-9184-ebb184ec95e8@acm.org>
+Date:   Tue, 8 Feb 2022 14:26:38 -0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
 Subject: Re: [PATCH] blktests: replace module removal with patient module
  removal
-Message-ID: <YgLe2GXJW2vqFZc5@bombadil.infradead.org>
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     dwagner@suse.de, osandov@fb.com, linux-block@vger.kernel.org
 References: <20211116172926.587062-1-mcgrof@kernel.org>
  <caa2ba82-b3e8-6d5a-d411-241eb147f697@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <caa2ba82-b3e8-6d5a-d411-241eb147f697@acm.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+ <YgLe2GXJW2vqFZc5@bombadil.infradead.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <YgLe2GXJW2vqFZc5@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 07, 2022 at 05:10:24PM -0800, Bart Van Assche wrote:
-> On 11/16/21 09:29, Luis Chamberlain wrote:
-> > for a while now. More wider testig is welcomed.
->                               ^^^^^^
->                               testing?
+On 2/8/22 13:21, Luis Chamberlain wrote:
+> On Mon, Feb 07, 2022 at 05:10:24PM -0800, Bart Van Assche wrote:
+>> On 11/16/21 09:29, Luis Chamberlain wrote:
+>>> +	if [[ -f /sys/module/$module/refcnt ]]; then
+>>
+>> Has this patch been analyzed with 'make check'? I expect checkpatch to
+>> complain about missing double quotes for the above statement.
 > 
-> > @@ -427,14 +428,8 @@ stop_soft_rdma() {
-> >   		      echo "$i ..."
-> >   		      rdma link del "${i}" || echo "Failed to remove ${i}"
-> >   		done
-> > -	if ! unload_module rdma_rxe 10; then
-> > -		echo "Unloading rdma_rxe failed"
-> > -		return 1
-> > -	fi
-> > -	if ! unload_module siw 10; then
-> > -		echo "Unloading siw failed"
-> > -		return 1
-> > -	fi
-> > +	_patient_rmmod rdma_rxe || return 1
-> > +	_patient_rmmod 1siw  || return 1
+> No, I was not aware this was a thing. I fixed all the stupid complaints
+> however I should note at least tests/srp/rc has existing complaints
+> before my changes. I won't address those.
+
+Please consider opening a pull request for the 
+https://github.com/osandov/blktests repository. That will cause the 
+blktests presubmit tests to be run. See also .github/workflows/ci.yml in 
+the blktests source code.
+
+> I can't say I agree with the changes to remove checks for $?, but
+> whatever. Consinstancy is better than not having one. Perhaps we should
+> embrace this on fstests as well.
+
++1
+
+> No, I'll clarify to this:
 > 
-> The above clearly has not been tested. There is an easy to spot typo in the
-> above change. Please test your changes before publishing these.
+> # Tries to wait patiently to remove a module by ensuring first
+> # the refcnt is 0 and then trying to remove the module over and over
+> # again within the time allowed
 
-Thanks, fixed. Please I stated:
+Looks better to me :-)
 
-	I've tested blktests with this for things which I can run virtually
-	for a while now. More wider testig is welcomed.
-
-> > +	if [[ ! -z "$MODPROBE_PATIENT_RM_TIMEOUT_SECONDS" ]]; then
+>>>    	for m in ib_srpt iscsi_target_mod target_core_pscsi target_core_iblock \
+>>>    			 target_core_file target_core_stgt target_core_user \
+>>>    			 target_core_mod
+>>> -	do
+>>> -		unload_module $m 10 || return $?
+>>> -	done
+>>> +	_patient_rmmod $m || return $1
+>>
+>> Please proofread your changes and test your changes before posting these. I
+>> think that both "do" and "done" should have been preserved above.
 > 
-> Please use -n instead of ! -z.
+> And the return value shoudl be $? not $1. I couldn't test srp so wanted
+> someone who would to help review, but sure, I should have caught this.
 
-Sure...
+Hmm ... the SRP tests can be run inside a virtual machine so it is not 
+clear to me what prevents to run these tests?
 
-> > +	if [[ -f /sys/module/$module/refcnt ]]; then
-> 
-> Has this patch been analyzed with 'make check'? I expect checkpatch to
-> complain about missing double quotes for the above statement.
+Thanks,
 
-No, I was not aware this was a thing. I fixed all the stupid complaints
-however I should note at least tests/srp/rc has existing complaints
-before my changes. I won't address those.
-
-I can't say I agree with the changes to remove checks for $?, but
-whatever. Consinstancy is better than not having one. Perhaps we should
-embrace this on fstests as well. Who knows how many crufty bugs lie
-there.
-
-> > +# Patiently tries to wait to remove a module by ensuring first
->      ^^^^^^^^^^^^^^^^^^^^^^^
-> Tries to wait patiently?
-
-Sure..
-
-> > +	if [[ ! -z $MODPROBE_REMOVE_PATIENT ]]; then
-> 
-> Please use -n instead of ! -z and surround the variable expansion with
-> double quotes.
-
-Sure..
-
-> > +	# If we have extra time left. Use the time left to now try to
-> > +	# persistently remove the module. We do this because although through
-> 
-> What is persistent module removal? Is that perhaps removing a module such
-> that it cannot be loaded again?
-
-No, I'll clarify to this:
-
-# Tries to wait patiently to remove a module by ensuring first                  
-# the refcnt is 0 and then trying to remove the module over and over            
-# again within the time allowed
-
-> >   	for m in ib_srpt iscsi_target_mod target_core_pscsi target_core_iblock \
-> >   			 target_core_file target_core_stgt target_core_user \
-> >   			 target_core_mod
-> > -	do
-> > -		unload_module $m 10 || return $?
-> > -	done
-> > +	_patient_rmmod $m || return $1
-> 
-> Please proofread your changes and test your changes before posting these. I
-> think that both "do" and "done" should have been preserved above.
-
-And the return value shoudl be $? not $1. I couldn't test srp so wanted
-someone who would to help review, but sure, I should have caught this.
-
-Thanks for the review, I'll post a v2.
-
-  Luis
+Bart.
