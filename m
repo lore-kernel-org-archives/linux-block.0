@@ -2,101 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D99C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 10:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD7FC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 10:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230475AbiBIKCZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Feb 2022 05:02:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38546 "EHLO
+        id S232910AbiBIKWT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Feb 2022 05:22:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232489AbiBIKCG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Feb 2022 05:02:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3DCB6E0EA452
-        for <linux-block@vger.kernel.org>; Wed,  9 Feb 2022 02:02:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644400560;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nrZaO1QLhXCKNSnMpSxxsA2uM/u3n5wse6OBdbYb6VM=;
-        b=ITXSoXJjUvc9js5aeqSHXiyA8y5QtZpY1Z9SfeT535b2PQPHg3jaiqvdp1pIz2uUUDau5A
-        +Sjkyk82Tvw6Cu+YeossRW72KXouI2kJyQnSdsFb0i9fLCQRBbhkvt3rLRbEXizeMajQG+
-        OtsNOjIw6cM47TlmXgJGMpf19aj6uGg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-576-IBZ2QZvUPNi116_lJZriTA-1; Wed, 09 Feb 2022 04:39:53 -0500
-X-MC-Unique: IBZ2QZvUPNi116_lJZriTA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D82985B6C8;
-        Wed,  9 Feb 2022 09:39:50 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 90BBE6C196;
-        Wed,  9 Feb 2022 09:39:34 +0000 (UTC)
-Date:   Wed, 9 Feb 2022 09:38:32 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 5/5] virtio_blk: simplify refcounting
-Message-ID: <YgOLmLOCNZQS3EYG@stefanha-x1.localdomain>
-References: <20220209082121.2628452-1-hch@lst.de>
- <20220209082121.2628452-6-hch@lst.de>
+        with ESMTP id S231827AbiBIKWS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Feb 2022 05:22:18 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB610E08F62E
+        for <linux-block@vger.kernel.org>; Wed,  9 Feb 2022 02:16:32 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id cn6so4007896edb.5
+        for <linux-block@vger.kernel.org>; Wed, 09 Feb 2022 02:16:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rAKZIFdP28Fau+cOOS9z/0N05/8YiKE8+fxfg8uPyQs=;
+        b=YWFqKgZ5ycvsDpd3Js/maaKkL2iEOs7pq1F8qJxkGIxo554G77WEA3/MnBXGdZJ6cn
+         S2zOBOKx2p0k6E6nCOGXvUgDHDjckUkdsO4MClCKJRSd3vUEvBl9BHCq4d2KVMB0z23Z
+         IYoRQl6Lk58wTLjKRX4ZrVQDstZv2FRuv/uE8mIqPKq99yhwX2LqDrlnQeID6q2GFd1t
+         ZgeDSV93cGgQ7/h+xJiGltXLWpkmouQSRZbU1/qqhYmJtIgsKdWYhOA3i7ZoJHPWk4xD
+         2xq5lbDdRmAT1Sll/JVr7RWWPBhG/RiI1a3mymQOP2l96/ar+llCZ8IUt2uMw5fBIecl
+         b0Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rAKZIFdP28Fau+cOOS9z/0N05/8YiKE8+fxfg8uPyQs=;
+        b=7t0VEdR6riiwySHnpWJ8uwCS8Sn45LUwu9JlrMkt1DZQjphzYZ+7YzVeLDEeiekw5L
+         H27w3IzQRF2+VRbK3N1L1anQwYbUk7YtttZGJ1t7mqBqHXrZh1GxC86eFwqCpjMEEL/B
+         j/fHZT7HzGTXPua+e3TcjRQ4tPWbcaoxj/Z90FVDXx3tC6h0QVl/wikSBIudn/NsNHND
+         7YMRTCSZDosX3Y1H7AOU8qArRaXSC6C6NsRnTBI+kCPiOnNRTK/kd9X5K8fHMBsLTmR8
+         QXGFx2GOT3jLqMBYVJGMT76Jq4OMJSyvwtLLtu3nS6bixwXi0g9Cs7Fv9+/tdUV/3Tnr
+         ALqA==
+X-Gm-Message-State: AOAM533jJht0Vk6RwKYul1y2n9k3GHmsiZ4du6VsMI42i1laXGkp1DZj
+        sCvvAGMYPDtNNzKXO/n2WWaLSaDsuJfZhnLxXT3qNA==
+X-Google-Smtp-Source: ABdhPJyJl1H6BhQtX6vwv0TWGp6atpb+7BMBNRgisc9vY7m9y/rdk2zMRqBceAy/KYQ8UAkhYC65Cf47LU0RO5V0mS4=
+X-Received: by 2002:a05:6402:2916:: with SMTP id ee22mr1661883edb.3.1644401784309;
+ Wed, 09 Feb 2022 02:16:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="cXxZwQ9bZyPfG1Md"
-Content-Disposition: inline
-In-Reply-To: <20220209082121.2628452-6-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20220209082828.2629273-1-hch@lst.de> <20220209082828.2629273-4-hch@lst.de>
+In-Reply-To: <20220209082828.2629273-4-hch@lst.de>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Wed, 9 Feb 2022 11:16:13 +0100
+Message-ID: <CAMGffE=GMYNsw+mDt1h-BDh3JXkdrP9v2AUF7z0xE7jkumM+RQ@mail.gmail.com>
+Subject: Re: [PATCH 3/7] rnbd: drop WRITE_SAME support
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        target-devel@vger.kernel.org, haris.iqbal@ionos.com,
+        manoj@linux.ibm.com, mrochs@linux.ibm.com, ukrishn@linux.ibm.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dm-devel@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Christoph,
 
---cXxZwQ9bZyPfG1Md
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 09, 2022 at 09:21:20AM +0100, Christoph Hellwig wrote:
-> Implement the ->free_disk method to free the virtio_blk structure only
-> once the last gendisk reference goes away instead of keeping a local
-> refcount.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/virtio_blk.c | 74 +++++++++++---------------------------
->  1 file changed, 21 insertions(+), 53 deletions(-)
+On Wed, Feb 9, 2022 at 9:28 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> REQ_OP_WRITE_SAME was only ever submitted by the legacy Linux zeroing
+> code, which has switched to use REQ_OP_WRITE_ZEROES long before rnbd was
+> even merged.
+
+Do you think if it makes sense to instead of removing
+REQ_OP_WRITE_SAME, simply convert it to REQ_OP_WRITE_ZEROES?
 
 Thanks!
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---cXxZwQ9bZyPfG1Md
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIDi5cACgkQnKSrs4Gr
-c8g2sAgAp/NAAO/juuKgvBUzwYfw+VgLihgtcRdyhBUc5WnO+Aev/sb2TqEGOP5c
-UzY4CDswetq1vNZ9WitzwDaseUPVipRQtooSPmJwRFfLj2PQPeB/6MdLQljq4F67
-CIjaudo4PEP1jXUkX8dmaTpx8R0pfF7MGRHI759J5/6hWntvd0P7GQaiGU8EzHJh
-P5CA2pJvoXn5czUsigfT7DXqOEmRExrrNk2CnhATs/LQ49xLiDwEi5ysXMhNxKeR
-4VTbRo6WiONe1hpT71b0g199I0/4o2o9rLy1kCaqMjUKZetL2q7UeqCBFuBWpFgp
-X5DGkOtiZp8xt56ZheqqWQjrE8uuBA==
-=7zac
------END PGP SIGNATURE-----
-
---cXxZwQ9bZyPfG1Md--
-
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/rnbd/rnbd-clt.c   | 7 ++-----
+>  drivers/block/rnbd/rnbd-clt.h   | 1 -
+>  drivers/block/rnbd/rnbd-proto.h | 6 ------
+>  drivers/block/rnbd/rnbd-srv.c   | 3 +--
+>  4 files changed, 3 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.=
+c
+> index c08971de369fc..dc192d2738854 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -82,7 +82,6 @@ static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *d=
+ev,
+>         dev->nsectors               =3D le64_to_cpu(rsp->nsectors);
+>         dev->logical_block_size     =3D le16_to_cpu(rsp->logical_block_si=
+ze);
+>         dev->physical_block_size    =3D le16_to_cpu(rsp->physical_block_s=
+ize);
+> -       dev->max_write_same_sectors =3D le32_to_cpu(rsp->max_write_same_s=
+ectors);
+>         dev->max_discard_sectors    =3D le32_to_cpu(rsp->max_discard_sect=
+ors);
+>         dev->discard_granularity    =3D le32_to_cpu(rsp->discard_granular=
+ity);
+>         dev->discard_alignment      =3D le32_to_cpu(rsp->discard_alignmen=
+t);
+> @@ -1359,8 +1358,6 @@ static void setup_request_queue(struct rnbd_clt_dev=
+ *dev)
+>         blk_queue_logical_block_size(dev->queue, dev->logical_block_size)=
+;
+>         blk_queue_physical_block_size(dev->queue, dev->physical_block_siz=
+e);
+>         blk_queue_max_hw_sectors(dev->queue, dev->max_hw_sectors);
+> -       blk_queue_max_write_same_sectors(dev->queue,
+> -                                        dev->max_write_same_sectors);
+>
+>         /*
+>          * we don't support discards to "discontiguous" segments
+> @@ -1610,10 +1607,10 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const ch=
+ar *sessname,
+>         }
+>
+>         rnbd_clt_info(dev,
+> -                      "map_device: Device mapped as %s (nsectors: %zu, l=
+ogical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d,=
+ max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, s=
+ecure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d, wc=
+: %d, fua: %d)\n",
+> +                      "map_device: Device mapped as %s (nsectors: %zu, l=
+ogical_block_size: %d, physical_block_size: %d, max_discard_sectors: %d, di=
+scard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segme=
+nts: %d, max_hw_sectors: %d, rotational: %d, wc: %d, fua: %d)\n",
+>                        dev->gd->disk_name, dev->nsectors,
+>                        dev->logical_block_size, dev->physical_block_size,
+> -                      dev->max_write_same_sectors, dev->max_discard_sect=
+ors,
+> +                      dev->max_discard_sectors,
+>                        dev->discard_granularity, dev->discard_alignment,
+>                        dev->secure_discard, dev->max_segments,
+>                        dev->max_hw_sectors, dev->rotational, dev->wc, dev=
+->fua);
+> diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.=
+h
+> index 0c2cae7f39b9f..6946ba23d62e5 100644
+> --- a/drivers/block/rnbd/rnbd-clt.h
+> +++ b/drivers/block/rnbd/rnbd-clt.h
+> @@ -122,7 +122,6 @@ struct rnbd_clt_dev {
+>         bool                    wc;
+>         bool                    fua;
+>         u32                     max_hw_sectors;
+> -       u32                     max_write_same_sectors;
+>         u32                     max_discard_sectors;
+>         u32                     discard_granularity;
+>         u32                     discard_alignment;
+> diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-pr=
+oto.h
+> index de5d5a8df81d7..3eb8b34bd1886 100644
+> --- a/drivers/block/rnbd/rnbd-proto.h
+> +++ b/drivers/block/rnbd/rnbd-proto.h
+> @@ -249,9 +249,6 @@ static inline u32 rnbd_to_bio_flags(u32 rnbd_opf)
+>         case RNBD_OP_SECURE_ERASE:
+>                 bio_opf =3D REQ_OP_SECURE_ERASE;
+>                 break;
+> -       case RNBD_OP_WRITE_SAME:
+> -               bio_opf =3D REQ_OP_WRITE_SAME;
+> -               break;
+>         default:
+>                 WARN(1, "Unknown RNBD type: %d (flags %d)\n",
+>                      rnbd_op(rnbd_opf), rnbd_opf);
+> @@ -284,9 +281,6 @@ static inline u32 rq_to_rnbd_flags(struct request *rq=
+)
+>         case REQ_OP_SECURE_ERASE:
+>                 rnbd_opf =3D RNBD_OP_SECURE_ERASE;
+>                 break;
+> -       case REQ_OP_WRITE_SAME:
+> -               rnbd_opf =3D RNBD_OP_WRITE_SAME;
+> -               break;
+>         case REQ_OP_FLUSH:
+>                 rnbd_opf =3D RNBD_OP_FLUSH;
+>                 break;
+> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.=
+c
+> index 132e950685d59..0e6b5687f8321 100644
+> --- a/drivers/block/rnbd/rnbd-srv.c
+> +++ b/drivers/block/rnbd/rnbd-srv.c
+> @@ -548,8 +548,7 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_ms=
+g_open_rsp *rsp,
+>                 cpu_to_le16(rnbd_dev_get_max_segs(rnbd_dev));
+>         rsp->max_hw_sectors =3D
+>                 cpu_to_le32(rnbd_dev_get_max_hw_sects(rnbd_dev));
+> -       rsp->max_write_same_sectors =3D
+> -               cpu_to_le32(bdev_write_same(rnbd_dev->bdev));
+> +       rsp->max_write_same_sectors =3D 0;
+>         rsp->max_discard_sectors =3D
+>                 cpu_to_le32(rnbd_dev_get_max_discard_sects(rnbd_dev));
+>         rsp->discard_granularity =3D
+> --
+> 2.30.2
+>
