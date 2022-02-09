@@ -2,117 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F63C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 21:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3885C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 01:25:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234030AbiBIVwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Feb 2022 16:52:01 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:41992 "EHLO
+        id S231932AbiBJBZP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Feb 2022 20:25:15 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:50562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234052AbiBIVwA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Feb 2022 16:52:00 -0500
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F1EDF49885
-        for <linux-block@vger.kernel.org>; Wed,  9 Feb 2022 13:52:01 -0800 (PST)
-Received: by mail-qv1-xf2b.google.com with SMTP id n6so2997918qvk.13
-        for <linux-block@vger.kernel.org>; Wed, 09 Feb 2022 13:52:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:content-transfer-encoding:mime-version:subject:message-id:date
-         :cc:to;
-        bh=+KQV3KMSnnUOCfI2fkELTlqbV6pIH87B8EpZ9AiDcXo=;
-        b=qy+icEr6KJhCohC425kW8gmaTjZ0ATgSiQzfjVUzvB+4E92YSb7gqUYEuvdO0gtGYU
-         nW19DPlzilGzji2/wTnVu65KrVpJ2euZHOAjp9Nxt1SaF14HrYA9C+juWI9q24b58osU
-         MFBGthlpfbNIHYx7T6j3DW14SR4CB70E+1KGNU7bvpxA4jU+aI6M2HWRmqO96YQ7f49P
-         KadBoUIFca7+RRqrEZnKkYS3WXNaPpLHyDSO2/dKNa+j+pGOnx8BcxEknDdaj5sWFvGx
-         dh02QQiJ9+vWbCgA4YBwucly5EAlArMQbLy4t+xybnSNC/PF8dGukX0WuR8WGvQL0ZfB
-         aoWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:content-transfer-encoding:mime-version
-         :subject:message-id:date:cc:to;
-        bh=+KQV3KMSnnUOCfI2fkELTlqbV6pIH87B8EpZ9AiDcXo=;
-        b=35GQiQQKmEy6Xp02/5xYJPz5NaepndqcbgEh/BSEphPyLMMIeCarXasXtLLHRVCsAE
-         D9Ds7ZSLeqO/k0Bch/PuAoCJdabGPbaVFhwtnlEL01oIbwAexDLcWn5hdurbaYJ+EOyF
-         z3BshruTcbPDoHbFQyFmFiAA+sZLA0B5mQ8sJsXB0arKqgR1TXIpiVa0sO6QZXSWJ1Uh
-         pFkHlmsrh1E9O1+GF5yB/qkckqhbjrBCgucSJrV8rbid/Eybpwac/xD+TjbY4lAARmpk
-         O3btp4YVoNog84EWtbSZAZJsNppJAlqtidg8W3vFpnUeJBgC97eBJ31tMnxSaMlm3v7n
-         CFyw==
-X-Gm-Message-State: AOAM533uFJAmB288CfH8r2WR0wnpI5DGCbtQly96VtRXVCb9Ovf8Nnmr
-        YcUlrbsxgI6t1E/69nEG17bq1g==
-X-Google-Smtp-Source: ABdhPJyoMbI85IYVAWwegUJeGiQZ8AcYZmQuxyLdjq00t9sKA24p2TopQ232ctEQFtAHwVPwXJRPeg==
-X-Received: by 2002:a05:6214:2306:: with SMTP id gc6mr3009292qvb.131.1644443520168;
-        Wed, 09 Feb 2022 13:52:00 -0800 (PST)
-Received: from smtpclient.apple ([2600:1700:42f0:6600:cd8a:8634:7b18:da1e])
-        by smtp.gmail.com with ESMTPSA id bl1sm8887446qkb.16.2022.02.09.13.51.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Feb 2022 13:51:59 -0800 (PST)
-From:   "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: [LSF/MM/BPF TOPIC] File system techniques for computational storage
- and heterogeneous memory pool
-Message-Id: <E0E49215-1C61-48ED-8A89-889C2E65A53B@bytedance.com>
-Date:   Wed, 9 Feb 2022 13:51:57 -0800
-Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-To:     lsf-pc@lists.linux-foundation.org
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        with ESMTP id S231706AbiBJBZO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Feb 2022 20:25:14 -0500
+X-Greylist: delayed 7188 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Feb 2022 17:25:15 PST
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA453261F;
+        Wed,  9 Feb 2022 17:25:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Cc:To:From:Date:Message-ID;
+        bh=vPnlkbWR5HgIGL04GSDBl0UvRCFHTEXuwzUZuwp1LfE=; b=zblNw58dqdSJhAuts7LK/1qI+H
+        QUA188YjLPPeroeIMzrvUK9e3jE4A3JrXlIpHfhGCNgv7T8DQ4jqFZtBp4p8oXI8NqrS4YSpk7QNW
+        auVgKOp5dz8vArulC+uigNr/hpoFsqfusVAEOVA5H8Xxws/K96v+o9h7mb265vDOe2naQ35exOUSS
+        caW7DPOrZIwXk0LLgx9hEc5EXaJVG2M6ZDZ7cAnJDN3sWx57DPMKxs54vws7TSHLDzbWZ0jXHpxY6
+        uJp1lcAM7UvDFnQ3YMcCC/vWRbzSF6ViF/7jd5rvuJbRGrWC9rkOxj7XXbzqVPYsKVNHX2Imyxsh+
+        i13kAd3iJs/E6eSk2lYbXMGXMw0TdDLwyVRf0CnCzhInEhIviqp2CcaaX4q7n1FVy4TkfatEmRhJj
+        T8YzJ3JC1VEkQUWqJeVKATswx6fnl45C4f2eTnDWSTh497Qd+1z1DUl/WdKgTTQBLKPt5dXUAlr/Y
+        xuGTcoH2Mn0C1MPlb8LkKOUd;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nHvy7-002zPp-Tj; Wed, 09 Feb 2022 23:01:48 +0000
+Message-ID: <e5171c3d-4df7-1e70-ce3e-badcd6ea855d@samba.org>
+Date:   Thu, 10 Feb 2022 00:01:47 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+From:   Stefan Metzmacher <metze@samba.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Daniel Black <daniel@mariadb.org>,
+        Salvatore Bonaccorso <carnil@debian.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        stable@vger.kernel.org
+References: <c6d6bffe-1770-c51d-11c6-c5483bde1766@kernel.dk>
+ <bd7289c8-0b01-4fcf-e584-273d372f8343@kernel.dk>
+ <6d0ca779-3111-bc5e-88c0-22a98a6974b8@kernel.dk>
+ <281147cc-7da4-8e45-2d6f-3f7c2a2ca229@kernel.dk>
+ <c92f97e5-1a38-e23f-f371-c00261cacb6d@kernel.dk>
+ <CABVffEN0LzLyrHifysGNJKpc_Szn7qPO4xy7aKvg7LTNc-Fpng@mail.gmail.com>
+ <00d6e7ad-5430-4fca-7e26-0774c302be57@kernel.dk>
+ <CABVffEM79CZ+4SW0+yP0+NioMX=sHhooBCEfbhqs6G6hex2YwQ@mail.gmail.com>
+ <3aaac8b2-e2f6-6a84-1321-67409b2a3dce@kernel.dk>
+ <98f8a00f-c634-4a1a-4eba-f97be5b2e801@kernel.dk> <YZ5lvtfqsZEllUJq@kroah.com>
+ <c0a7ac89-2a8c-b1e3-00c2-96ee259582b4@kernel.dk>
+ <96d6241f-7bf0-cefe-947e-ee03d83fb828@samba.org>
+ <6d6fc76f-880a-938d-64dd-527e6be3009e@kernel.dk>
+ <5217de38-d166-de32-c115-fd34399eb234@samba.org>
+Subject: Re: uring regression - lost write request
+In-Reply-To: <5217de38-d166-de32-c115-fd34399eb234@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
 
-I would like to discuss potential file system techniques that could =
-employ the computational storage=E2=80=99s capabilities and how =
-computational storage would collaborate with the file system. File =
-system plays the role of mediator between application and storage device =
-by means of creating the file/folder abstraction. So, the file system =
-still is capable of creating a good abstraction for the case of a =
-computational storage device. What could such an abstraction look like? =
-The responsibility of the file system would be to offload (send an =
-algorithm on storage device side) or to initiate the existing algorithm =
-execution on storage device side.
+Hi Jens,
 
-If we consider any algorithm then, usually, an algorithm is a sequence =
-of actions that needs to be applied to some set of items or objects of =
-some type. So, it is possible to see the necessity to consider: (1) data =
-object, (2) algorithm object, (3) object type. Data and algorithm =
-objects can still be represented by files. However, there is a tricky =
-point of sharing file system knowledge about file=E2=80=99s content =
-placement with computational storage. So, finally, what could be a basic =
-item to represent an object inside of computational storage? Would it =
-be: (1) logical block (LBA), (2) LBA range, (3) stream managed by =
-storage device, (4) file system=E2=80=99s allocation group, (5) =
-segment/zone? Technically, a folder could still be a namespace that =
-groups a set of objects. And algorithm object can be applied by =
-computational storage on a folder (set of objects) or file (one object). =
-Or, maybe, a file/stream needs to be considered like a set of items?
+>>>>>> Looks good to me - Greg, would you mind queueing this up for
+>>>>>> 5.14-stable?
+>>>>>
+>>>>> 5.14 is end-of-life and not getting any more releases (the front page of
+>>>>> kernel.org should show that.)
+>>>>
+>>>> Oh, well I guess that settles that...
+>>>>
+>>>>> If this needs to go anywhere else, please let me know.
+>>>>
+>>>> Should be fine, previous 5.10 isn't affected and 5.15 is fine too as it
+>>>> already has the patch.
+>>>
+>>> Are 5.11 and 5.13 are affected, these are hwe kernels for ubuntu,
+>>> I may need to open a bug for them...
+>>
+>> Please do, then we can help get the appropriate patches lined up for
+>> 5.11/13. They should need the same set, basically what ended up in 5.14
+>> plus the one I posted today.
+> 
+> Ok, I've created https://bugs.launchpad.net/bugs/1952222
 
-The next question is when an algorithm execution can be initiated? One =
-of the possible way is to execute such an algorithm at the moment of =
-delivering the code from the host on the storage device side (eBPF =
-way?). However, if the code is already inside of computational storage =
-then a trigger model can be used (when some event could initiate the =
-code execution). So, the file system could play the role of algorithm =
-execution initiator and to define objects that should be processed. The =
-trigger model implies that computational storage could register an =
-action (algorithm) needed to apply on some object or data type in the =
-case of an event. What potential events can be considered: (1) read =
-operation, (2) write operation, (3) update operation, (4) GC operation, =
-(5) copy operation, (6) metadata operation, and so on?
+At least for 5.14 the patch is included in
 
-What potential mechanisms of function/algorithm delivering in =
-computational storage? It is possible to consider: (1) SCSI/NVMe packet, =
-(2) file/folder extended attribute, (3) DMA exchange, (4) special =
-partition.
+https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-oem/+git/focal/log/?h=Ubuntu-oem-5.14-5.14.0-1023.25
 
-Any opinions, ideas?
+https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-oem/+git/focal/commit/?h=Ubuntu-oem-5.14-5.14.0-1023.25&id=9e2b95e7c9dd103297e6a3ccd98a7bf11ef66921
 
-Thanks,
-Slava.
+apt-get install -V -t focal-proposed linux-oem-20.04d linux-tools-oem-20.04d
+installs linux-image-5.14.0-1023-oem (5.14.0-1023.25)
 
+Do we have any reproducer I can use to reproduce the problem
+and demonstrate the bug if fixed?
+
+Thanks!
+metze
