@@ -2,346 +2,260 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4CDC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 05:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4715C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 07:50:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243414AbiBIFKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Feb 2022 00:10:04 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:41282 "EHLO
+        id S239669AbiBIHug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Feb 2022 02:50:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377784AbiBIEiq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 23:38:46 -0500
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204F1C061579
-        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 20:38:43 -0800 (PST)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220209043836epoutp030852f8f066e45c56eef12118a9eb0039~SBEbmPqtt1883618836epoutp03D
-        for <linux-block@vger.kernel.org>; Wed,  9 Feb 2022 04:38:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220209043836epoutp030852f8f066e45c56eef12118a9eb0039~SBEbmPqtt1883618836epoutp03D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1644381516;
-        bh=T21Leag532jQo/m2bHBtfeMAgbWmo7GbX2bNWcGrWyQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=gcHYW4rkNyOR4E3UVLwWv/nondq+H01olj20Gcn5qMiTr9HjuZabecI01K75zG3hb
-         YM2gzDaWnSxLve6FdRj2BHgGtYg1mDbZdPEupGCh/XgUBDsXJSN1tLsDtC50BF2tmT
-         dXP6G/I0i13KWw0ZQnlRT5XI+mVftLhRrr20cDZY=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20220209043835epcas5p1ee6c56b765d238a016403d90930d732f~SBEae6L5f0268902689epcas5p1A;
-        Wed,  9 Feb 2022 04:38:35 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.177]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4JtnFK477qz4x9Qb; Wed,  9 Feb
-        2022 04:38:29 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        34.EC.06423.54543026; Wed,  9 Feb 2022 13:38:29 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220208184834epcas5p3a3396d81aeedc6075c2746dba6e5478c~R5BQyfGa20152701527epcas5p3q;
-        Tue,  8 Feb 2022 18:48:34 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220208184834epsmtrp19d1025712f2309762feb9b4e5764c603~R5BQxAddT1266912669epsmtrp1P;
-        Tue,  8 Feb 2022 18:48:34 +0000 (GMT)
-X-AuditID: b6c32a49-b13ff70000001917-d5-6203454590b2
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        6D.C5.29871.20BB2026; Wed,  9 Feb 2022 03:48:34 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220208184829epsmtip27e4be18b4c9e849a698142fcd717cafc~R5BMi6Xwc2722127221epsmtip2F;
-        Tue,  8 Feb 2022 18:48:29 +0000 (GMT)
-Date:   Wed, 9 Feb 2022 00:13:35 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     mpatocka@redhat.com, javier@javigon.com, chaitanyak@nvidia.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        msnitzer@redhat.com, bvanassche@acm.org,
+        with ESMTP id S237614AbiBIHue (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Feb 2022 02:50:34 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07255C0613CA;
+        Tue,  8 Feb 2022 23:50:38 -0800 (PST)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2193kZ2C007536;
+        Wed, 9 Feb 2022 07:50:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : content-type : in-reply-to : mime-version;
+ s=corp-2021-07-09; bh=Rwx8LwUj2Mxz60sfougznBi9CSFwxPMOP1KNO+TNfKg=;
+ b=wjyMuq2omCYZjzNcitokLtVydLxJmGdtua5aA1ImdxQXo0zD6mTVl6IM8twy8IJld96W
+ KVioN2hlk3ghkV5XIlMJ9E21kB9YctNogVscPQAj4mLYRhiQeAJEADfcK5HAbrP7W2/E
+ gUzyVYXLYBfl0iPo/4ES3ZIuc+LYEJ8adhnMEySxu/8HdIMaGXfYu6jFUXGeztAywfZT
+ 8ajRTE6cna/I7kaRli24MfCtTv1uUr22ZeGLnWkYuHJr4+Z2iE1+vMLYLBvxAYaRLAUV
+ swTZ3kI/kGDverX29fYIiauFwrK7jupVLgqVIYJgnvPqNvmTbvkmlDc3YR5F3b18qGJr SA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3e368tw4bm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Feb 2022 07:50:03 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 2197l5Q7058601;
+        Wed, 9 Feb 2022 07:50:01 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2104.outbound.protection.outlook.com [104.47.58.104])
+        by userp3020.oracle.com with ESMTP id 3e1jpsaytu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Feb 2022 07:50:01 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mxgnrNY9jYwWkTKzGxn7m3v0pWKDAA1UMkRT9RaJ0xqPPO2AmfpUgyIUJYtWn3bng23HXdMCBy4IHJZGzxfQU+nybm6pPlUJ7xjZjB640eMfrR1hxKsKK9SmwwPA9hKy8JP4LLeY4GpmO9+BrLyksw39QWlawExtDi6LNOKjKZeANF5QWYdbT5OmT6GUegBtdSp4ewsQZrn4IHulTSXAsxVQFWUUIAlLeSXQUw60VGUz2GKfXLS0LyGRNWTw3JuHbXjlj3npQqRJdJhb+2vbKRnAzlyhIJtHbjcvHQ157j4PZSmApSAQZVyo11otG3m1Rq620XW63oB1cOF96XfdBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Rwx8LwUj2Mxz60sfougznBi9CSFwxPMOP1KNO+TNfKg=;
+ b=TYnRevOZ1RZLWOdnesT+SDCaMb8AJ2rSMqeBqnH8KcJAH+DGIdGL7j8CN/Z7DlBc/NHQnqwL3hiGik51WxGrc6tHbEwmgCmNMv+NssOyTp/njl3j8dcTRVTyPHjdBjEWnSD+BWPoXcQ/X1jWFvEFT9DgKhsR4bEHfPnLav16oPI+D7JkW+x5AXv6vGJe8Zn36r7s7d4/wR+NrdrDlXvVMCNkbuVmLHb+M9f4C0V2OMVf4pFyyagbRJzJbGjlSRglyCLP+AmwjjeLn521Gw2b2aGBNIwZ3lQXeDmOIU41I1kF6Qd2OnVUdo3LErVQU5KX+Nat6iN9HwK6d3XDzmohcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Rwx8LwUj2Mxz60sfougznBi9CSFwxPMOP1KNO+TNfKg=;
+ b=AXIELfS+3scS3I0NBrwc3KDnNHMBwXKXVbQ/dmtmkcAmPxyHQ6E48nWKpR5JPU5xI7tQfTDM3Dj4aSdftXw1MG0ysDBQZimx2x5s48xLvv8x0iHnCrdxqSJDr6tXMEOUZ5FhONpKAHq26VzJb2JqNGAmU/bIxw+xya5gqGccwLg=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by DS7PR10MB5149.namprd10.prod.outlook.com
+ (2603:10b6:5:3a7::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.11; Wed, 9 Feb
+ 2022 07:49:58 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::e5a5:8f49:7ec4:b7b8]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::e5a5:8f49:7ec4:b7b8%5]) with mapi id 15.20.4951.018; Wed, 9 Feb 2022
+ 07:49:58 +0000
+Date:   Wed, 9 Feb 2022 10:48:44 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     kbuild@lists.01.org, Nitesh Shetty <nj.shetty@samsung.com>,
+        mpatocka@redhat.com
+Cc:     lkp@intel.com, kbuild-all@lists.01.org, javier@javigon.com,
+        chaitanyak@nvidia.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, msnitzer@redhat.com, bvanassche@acm.org,
         martin.petersen@oracle.com, roland@purestorage.com, hare@suse.de,
         kbusch@kernel.org, hch@lst.de, Frederick.Knight@netapp.com,
-        osandov@fb.com, lsf-pc@lists.linux-foundation.org,
-        djwong@kernel.org, josef@toxicpanda.com, clm@fb.com,
-        dsterba@suse.com, tytso@mit.edu, jack@suse.com,
-        joshi.k@samsung.com, arnav.dawn@samsung.com,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        nitheshshetty@gmail.com
-Subject: Re: [PATCH v2 02/10] block: Introduce queue limits for copy-offload
- support
-Message-ID: <20220208184335.GA7698@test-zns>
-MIME-Version: 1.0
-In-Reply-To: <af214223-8bb9-a1ca-6394-9c403c9becef@opensource.wdc.com>
+        zach.brown@ni.com, osandov@fb.com,
+        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
+        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
+        jack@suse.com, joshi.k@samsung.com, arnav.dawn@samsung.com,
+        nj.shetty@samsung.com, SelvaKumar S <selvakuma.s1@samsung.com>
+Subject: Re: [PATCH v2 03/10] block: Add copy offload support infrastructure
+Message-ID: <202202090703.U5riBMIn-lkp@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220207141348.4235-4-nj.shetty@samsung.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te1BUVRzH59x79+5CgjeU6UgaO4ulKOCu7OLBRJpCuoIkptOUldsV7iwE
-        7G776CGTgAuNCMhLHdhmZH0B8YiHDfEWcIB4JhEGynNYTOIhIgYMIAG7VP99f9/z+5zf7/x+
-        c3i4TS3Xjhcs17AqORMqIC2JkruOjs6HDuGnhYtNW1FlzzMOyu1LJNGVqXkcPakd5qCUxDQu
-        Wmj7FUedRmtUNfk9B92bi8LQcPEyhiqvp2Doh9x6DP2ZdQOg2JZ7GFocEqH65QkSpdTdB6jq
-        wW5UWdVEoIzMES6K+6OURNVjVTjKanyBoeTzXRhq1y+SqNQYBdDd/i4C5S4iNDbXRKKY+Hnu
-        W6/Rnb/70sm6SS5dpu/j0jpDL0F3tmnp4pxYkr59M4JO7c4CdEVPJEmfa63H6bTpGZJO0E2S
-        dFnMAId+OvKAoEuGErj0k+ou0t/2ZMiBIJYJZFV8Vh6gCAyWyzwEvsel70glbkKRs8gd7RPw
-        5UwY6yHwOuLv7B0cujIqAf9LJlS7YvkzarVgz8EDKoVWw/KDFGqNh4BVBoYqxUoXNROm1spl
-        LnJWs18kFO6VrCR+FhJkPJ9BKHs8v57JWgKRoM31ArDgQUoMb10cBBeAJc+GqgBw6WoyZgqm
-        AXyYnmoO/gZwObkNrCPZUYVmpArAJN06/wjAZ2Nl+GoWQW2HuQbdCs7jkdRu2LLMW7U3UxI4
-        ER9DrObjlIED05svc1cPNlEfwLqOxbUKVpQTzEyt55j0y7Ap3UisagvKG07MF6/db0s5wJqS
-        xrX2IDVtATPybnJN7XnBuO4m0qQ3wb8afzL7dnA08TuuCYgDcK51wEynAahL0pkJT9hRubTW
-        Nk4FwYGc9032Nni5+UdsVeOUNUxYMGIm3wqWXl3XDjCvwGC+Zgu8Pxtl1jTM1ceYR1SDweLy
-        fpAE7PX/e53+v3L6tRJO0FAxTZrsV2HWC55JOsKC8j0GwMkBW1ilOkzGqiVKkZz96t+VByjC
-        isHaX9p1uBT0DU651AGMB+oA5OGCzVZb45YZG6tA5pszrEohVWlDWXUdkKwsKxm3sw1QrHxG
-        uUYqErsLxW5ubmJ3VzeR4BWrFlkhY0PJGA0bwrJKVrXOYTwLu0js05c22MfOtxMHzyhSksaH
-        hMLn1fXjtyN6R6McfLTkrCf3i5RrhoifUe23d2QanXQ4aXFYG/y2xcbPH75etCOms09yYlIY
-        GXK8x1KUH/1ImR0OY/OPfIgx6We121p87pxokEW/mx99eHt76fAxa/7QRM2lmZmywLNeRrL8
-        sVOEULK/sLpoA8BG7Ccb3Burla46nyvZC9dnRzVhRwe740szw+r794WLAw3Rvd41RU+n2uL1
-        4QVzfRuFUsN7vnrd40i/tOZzF4998gt/rHVHx97TR4fFO/NEp4iP23I+AuO/2ftdKzo1NP0G
-        0vkpBPNZcsicvOQefaur7obqzZ0tRiLgeYOAUAcxol24Ss38AyemZ0TUBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpileLIzCtJLcpLzFFi42LZdlhJXpdpN1OSweMDXBZ7bn5mtVh9t5/N
-        YtqHn8wW7w8+ZrWY1D+D3eL32fPMFpef8FnsfTeb1eLCj0Ymi8eb/jNZ7Fk0icli5eqjTBbP
-        ly9mtOg8fYHJ4s9DQ4uj/9+yWUw6dI3RYu8tbYs9e0+yWMxf9pTdovv6DjaLfa/3MlssP/6P
-        yWJix1Umi3Oz/rBZ7HjSyGhx+N5VFovVfywsXv84yWbR2vOT3UHO4/IVb4+Jze/YPXbOusvu
-        0bzgDovH5bOlHptWdbJ5bF5S7zH5xnJGj903G9g8ms4cZfaY8ekLm0dv8zs2j52t91k9Pj69
-        xeKx7WEvu8f7fVfZAkSjuGxSUnMyy1KL9O0SuDI+3r/AUjDTtuL+4bdsDYzLDLsYOTkkBEwk
-        VjRuYOxi5OIQEtjNKHHr7CE2iISkxLK/R5ghbGGJlf+es0MUPWGUaLy3DqyIRUBFYvWCZqYu
-        Rg4ONgFtidP/OUDCIgKmEm97WllA6pkFFrFKTLi1ixEkISwQJnHo4h8wm1dAR2LZ5KOsEEMP
-        MEnMf3iADSIhKHFy5hMWEJtZQEvixr+XYAuYBaQllv8DW8Ap4Cbx9ucmsONEBZQlDmw7zjSB
-        UXAWku5ZSLpnIXQvYGRexSiZWlCcm55bbFhgmJdarlecmFtcmpeul5yfu4kRnEy0NHcwbl/1
-        Qe8QIxMH4yFGCQ5mJRFeme7/iUK8KYmVValF+fFFpTmpxYcYpTlYlMR5L3SdjBcSSE8sSc1O
-        TS1ILYLJMnFwSjUwLZzdE/fK6uqV/XN+Gskv+6bQEvv2rSafsM8xxf42sXy/dLHHl7/fmq4p
-        P/lxcPbrBycPnI9fdNKzJ6GpeH10zZEKdYvVl79J7P/QY/WFM65yXsbeUhtdu9cVnPk1D592
-        7JDNORPZ3r/qNXfotrV2p3WN0mdYLugX2tm1NC0k53Bvdq3qO86E10IWVRtPXzz6J3GiT0D1
-        Qj0haysRFcVS9tXBxn8PWskY7b34en6i7PyAAw+lZGa9UMzWf/79cF/amYnNqhMirf1uKUe9
-        LZPm9/u6wGZP85bl69Wsw47Hxr+sZphydXrBf5MTU2VdGz4xqsev3isX5JR+e8tR1lTLO/x1
-        r655Jkhd2u1+/eZLJZbijERDLeai4kQAsolVpJUDAAA=
-X-CMS-MailID: 20220208184834epcas5p3a3396d81aeedc6075c2746dba6e5478c
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_5a767_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220207141913epcas5p4d41cb549b7cca1ede5c7a66bbd110da0
-References: <CAOSviJ0HmT9iwdHdNtuZ8vHETCosRMpR33NcYGVWOV0ki3EYgw@mail.gmail.com>
-        <20220207141348.4235-1-nj.shetty@samsung.com>
-        <CGME20220207141913epcas5p4d41cb549b7cca1ede5c7a66bbd110da0@epcas5p4.samsung.com>
-        <20220207141348.4235-3-nj.shetty@samsung.com>
-        <af214223-8bb9-a1ca-6394-9c403c9becef@opensource.wdc.com>
+X-ClientProxiedBy: JNXP275CA0038.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:18::26)
+ To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 108b7a0f-6174-44ad-11f6-08d9eba0c46b
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5149:EE_
+X-Microsoft-Antispam-PRVS: <DS7PR10MB5149A424EFD26ACFACEED7798E2E9@DS7PR10MB5149.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ofe8/xT3ve24a8k+HC/PuVOqTV6P4AcepG3RXjMnjwMQNGvKkOba4nhwUrlMteeheigFD33DbhJ7hQYhftaBZhWOgv4pj1iJEbHEG9d8STAUBpda1NEw2nE4Wqp2rHPyGkqnHDDOLVCgEno2yOXjcpnIhUXnUIPwe+rJQVp9SoWFSRmiH7W2Cwb+w9ODpybs5DYpBrkOdmsY8Z2NYcHHsoTW7Q8cDPqEz35/SZ9d8XT1qFgh0pCGRRo3lbAAxWOqoevadSAQUd6/q8TnFpDqSOEicw/lMkajhCCnSm57LLmW/Tt87nF01l/xEMshs7blxme1nmF72CM5fEK3icZD4FXUmldXcRknDSPvztopJ9J6rEamgEd790t0AeYOn7R4QqCn3Rl0nabjvprtGy1J2EU7bl+h2j7PI+uzUlNSA4SREXpGKFEo+AE0rjGCoIwh4pf3Vb6uXQ3i1U9BYz2VAcT6r4J8gjyDnXuGIM78/SHIerQsCPVegqvUylFRm41Wrbw9pVBK5qYGi4EQ33qyR62MccmfnLnC3tkLr5tPxLyHkTJYFWYYG00dx3uAJfC0ODdD9noK9iwo71+aJbJm1V2Pw2/CjvPmBv5FPDI7KOomBV6MD4SPBoDVXngzJBe52HxCTiYJ318PMZcc+tRAw4H7My6CwWRopVpSwwGQB8ci0AvwkQkhaCmch4nVrEHBXBlDv2ihYUHjt+kSYtkm9/bw8Pmnki7Rj0yw4s3QWUVxkAARLnMsbFRN3P0Wtr0u3sa/SQ1COQWUjRaiQBFm8cpvf5y+DHThQ9KsoONYnaeuh4FBZ18o2DiZp0Qc2zLmKsBo6Vup5KTY9g2EV7lLlA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(8936002)(8676002)(66946007)(4326008)(2906002)(66556008)(66476007)(6666004)(6512007)(6506007)(1076003)(52116002)(186003)(38350700002)(36756003)(9686003)(38100700002)(7416002)(316002)(508600001)(7406005)(44832011)(6486002)(966005)(86362001)(83380400001)(26005)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qn2SKiX4ff8/ryIyyGsAmU8btwVNyfzYOoUm3CVEYURCiHvpx4sjiFybfn4+?=
+ =?us-ascii?Q?XPXEO6kvlOwztShStFE+lAQRR5Yo24yEX6Y/B/d7EbcMPfuKfZYfWxCWhwSU?=
+ =?us-ascii?Q?7Uku5h/vIbX+diJO+RlqFzxBVizPGLwMwUmP1uuGKgFlU2K5GboMLBUM0+3Z?=
+ =?us-ascii?Q?GLe+Iad51yMGYPAz46neKstPVRXppIiqg4D/AhkUdnTXnBLgJt1qrWxAUTAA?=
+ =?us-ascii?Q?PwoT47Hx+2SLib80xS7W3azovFM9aCBHdC17d+6kyrnGceeNBCRTOg/gWaaX?=
+ =?us-ascii?Q?Qzqbk2DwqzFquwwhzCMWotuwqXvVhkbQT4WrzQ0IrFkkel1+i9oobRbQn2Fk?=
+ =?us-ascii?Q?uWl93Z3upTvUO/8eRsMZNYKT5EIDffHolWyHWi/Mv8CRg1gOC59KhUGyp03l?=
+ =?us-ascii?Q?xZ/uL6tJ7kAx+L9SLW0sPoMyQaTI80/RMssBI+Kw3jAGykiH3f/Xbrp7f7/k?=
+ =?us-ascii?Q?TpS3v/qHfnLtlyaxbwGBde4zE9YAVAOnci4JuyjJm3sR/rve44l7EE6NrUTP?=
+ =?us-ascii?Q?wfy7aKr6x33Akgb095jTBg/XYNFQHNhvAJOSScKw3pzZPjbR3/baZEo78NlS?=
+ =?us-ascii?Q?N6h2b9AcRz5Z4EyUDn1qYwzFwt0jN//ktFdjoCQCgmHrxx1M3F5uGEFCkOWG?=
+ =?us-ascii?Q?3Lhpq9VClPnjaWmfUkZ1MA7cB+1WhjX+vMoka3yP+/IdHtBIRjk9SJWzI2xZ?=
+ =?us-ascii?Q?XeqVGQu/6S/tSfGg6y/TAAt31ADf6aX+SDG9hIXVytdgIQot6AwGiabd+X4h?=
+ =?us-ascii?Q?dKHKXvzxM/CPh3Ko/u1AuO7LgzjBIL6hc5ZloBqkO+8fqRsGMuGMGds65tJP?=
+ =?us-ascii?Q?ITOOZdM40hB0+8wi80ML/c6RCkztC5L7KJ+eCVNntMMbkO1jJ9ZpO4hraVm3?=
+ =?us-ascii?Q?mzuAe9xjv1BEO55IpRWZeqYFhA8y4+bK7Bb/CQAtJJ/83ecOtWf5W4EkSHAS?=
+ =?us-ascii?Q?ZJ3oYOf4SiVdo76GDUxj6KNbT6N3uYI6+lhlFcbxd2u1XtZiBVHg7OSpEc2w?=
+ =?us-ascii?Q?erqc8SzPwoOo9yA3zYr606jCx9I7pDcxdufrm2NRiOCkEPzPkAfFchsHsY49?=
+ =?us-ascii?Q?WEzlZF67lHKNf6HJEiGmtcgRV3257C8XeN9+bH9Jk6B4n7xLPZag8rndGJuG?=
+ =?us-ascii?Q?ybajJVwcLVfDr5+2G6KqtFAX6Lv1oB4Nk5qCbQudZZ+ddEbmkX1/8+NrlOoB?=
+ =?us-ascii?Q?B91I80/bnHCIvrgGzmEzfOIPWtktlAk8jwETTgW8idCB33KJsVe0GlLfmso2?=
+ =?us-ascii?Q?m3mXBp+yEpVhIt1Kobh/QgymBqK4j27iMqYBYiaonHUemTW2lzcLi6GHNmHw?=
+ =?us-ascii?Q?x+LauMWRRucr7bJZPhTdA6GjFMKiOlRe605eSvqrrCFExsu+7DDg05O/BkP9?=
+ =?us-ascii?Q?I0muVc3qe7abfr0cO1r+kIS87PEgh+WhdhcUn9lJW74+JKU5GK7issNfT1LQ?=
+ =?us-ascii?Q?ySljYYYipkx9JeEnpRhJHXYR7BN6Ub/QlfA4F3jiFXu8kD22YauQMCnKzmyZ?=
+ =?us-ascii?Q?1J7imkNJSSfo3kssW4qQjYaMmQGxxx4tFFklY0MDNuxdxobE4nv7sDyN33ZE?=
+ =?us-ascii?Q?2eAl22PIRT8G44B3J23EXR/saG+7yN8mhT3/C8OgzaZGAcZUdGpQ3wWSSNjk?=
+ =?us-ascii?Q?FxYDZUHcPFUCTL2BQisMlC7VJReVmijXky+L3Czaa2V8EMWmCA3x/OmtFwBo?=
+ =?us-ascii?Q?x2R7RA=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 108b7a0f-6174-44ad-11f6-08d9eba0c46b
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2022 07:49:58.4780
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hXLUeWCrH40a8GyJAC0B8sJmDvvKyOzQ/e/q7jrkxZ88wDNC6Z0jWnnVqHxAIu8SIM4s9EdiglR+bkt+e9yTVQTfr+8jZQ7uZQcSwEWEFe4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5149
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10252 signatures=673431
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202090052
+X-Proofpoint-ORIG-GUID: XYOaZ5K02SYUt3ZMxeLa-jELX3i6JA9E
+X-Proofpoint-GUID: XYOaZ5K02SYUt3ZMxeLa-jELX3i6JA9E
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_5a767_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+Hi Nitesh,
 
-On Tue, Feb 08, 2022 at 04:01:23PM +0900, Damien Le Moal wrote:
-> On 2/7/22 23:13, Nitesh Shetty wrote:
-> > Add device limits as sysfs entries,
-> >         - copy_offload (READ_WRITE)
-> >         - max_copy_sectors (READ_ONLY)
->
-> Why read-only ? With the name as you have it, it seems to be the soft
-> control for the max size of copy operations rather than the actual
-> device limit. So it would be better to align to other limits like max
-> sectors/max_hw_sectors and have:
-> 
-> 	max_copy_sectors (RW)
-> 	max_hw_copy_sectors (RO)
->
+url:    https://github.com/0day-ci/linux/commits/Nitesh-Shetty/block-make-bio_map_kern-non-static/20220207-231407
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: i386-randconfig-m021-20220207 (https://download.01.org/0day-ci/archive/20220209/202202090703.U5riBMIn-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
 
-Idea was to have minimal number of sysfs.
-We will add R/W limits in next series.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-> >         - max_copy_ranges_sectors (READ_ONLY)
-> >         - max_copy_nr_ranges (READ_ONLY)
-> 
-> Same for these.
-> 
-> > 
-> > copy_offload(= 0), is disabled by default. This needs to be enabled if
-> > copy-offload needs to be used.
-> 
-> How does this work ? This limit will be present for a DM device AND the
-> underlying devices of the DM target. But "offload" applies only to the
-> underlying devices, not the DM device...
-> 
-> Also, since this is not an underlying device limitation but an on/off
-> switch, this should probably be moved to a request_queue boolean field
-> or flag bit, controlled with sysfs.
+smatch warnings:
+block/blk-lib.c:272 blk_copy_offload() warn: possible memory leak of 'ctx'
 
-copy_offload was used as a flag to switch between emulation/offload in
-block layer.
-Yeah, it makes sense to use request_queue flag for the same, also will
-make dm limit calculations simple. Will add in next series.
+vim +/ctx +272 block/blk-lib.c
 
-> > max_copy_sectors = 0, indicates the device doesn't support native copy.
-> > 
-> > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> > Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
-> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> > ---
-> >  block/blk-settings.c   |  4 ++++
-> >  block/blk-sysfs.c      | 51 ++++++++++++++++++++++++++++++++++++++++++
-> >  include/linux/blkdev.h | 12 ++++++++++
-> >  3 files changed, 67 insertions(+)
-> > 
-> > diff --git a/block/blk-settings.c b/block/blk-settings.c
-> > index b880c70e22e4..818454552cf8 100644
-> > --- a/block/blk-settings.c
-> > +++ b/block/blk-settings.c
-> > @@ -57,6 +57,10 @@ void blk_set_default_limits(struct queue_limits *lim)
-> >  	lim->misaligned = 0;
-> >  	lim->zoned = BLK_ZONED_NONE;
-> >  	lim->zone_write_granularity = 0;
-> > +	lim->copy_offload = 0;
-> > +	lim->max_copy_sectors = 0;
-> > +	lim->max_copy_nr_ranges = 0;
-> > +	lim->max_copy_range_sectors = 0;
-> >  }
-> >  EXPORT_SYMBOL(blk_set_default_limits);
-> >  
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index 9f32882ceb2f..dc68ae6b55c9 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -171,6 +171,48 @@ static ssize_t queue_discard_granularity_show(struct request_queue *q, char *pag
-> >  	return queue_var_show(q->limits.discard_granularity, page);
-> >  }
-> >  
-> > +static ssize_t queue_copy_offload_show(struct request_queue *q, char *page)
-> > +{
-> > +	return queue_var_show(q->limits.copy_offload, page);
-> > +}
-> > +
-> > +static ssize_t queue_copy_offload_store(struct request_queue *q,
-> > +				       const char *page, size_t count)
-> > +{
-> > +	unsigned long copy_offload;
-> > +	ssize_t ret = queue_var_store(&copy_offload, page, count);
-> > +
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	if (copy_offload && q->limits.max_copy_sectors == 0)
-> > +		return -EINVAL;
-> > +
-> > +	if (copy_offload)
-> > +		q->limits.copy_offload = BLK_COPY_OFFLOAD;
-> > +	else
-> > +		q->limits.copy_offload = 0;
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static ssize_t queue_max_copy_sectors_show(struct request_queue *q, char *page)
-> > +{
-> > +	return queue_var_show(q->limits.max_copy_sectors, page);
-> > +}
-> > +
-> > +static ssize_t queue_max_copy_range_sectors_show(struct request_queue *q,
-> > +		char *page)
-> > +{
-> > +	return queue_var_show(q->limits.max_copy_range_sectors, page);
-> > +}
-> > +
-> > +static ssize_t queue_max_copy_nr_ranges_show(struct request_queue *q,
-> > +		char *page)
-> > +{
-> > +	return queue_var_show(q->limits.max_copy_nr_ranges, page);
-> > +}
-> > +
-> >  static ssize_t queue_discard_max_hw_show(struct request_queue *q, char *page)
-> >  {
-> >  
-> > @@ -597,6 +639,11 @@ QUEUE_RO_ENTRY(queue_nr_zones, "nr_zones");
-> >  QUEUE_RO_ENTRY(queue_max_open_zones, "max_open_zones");
-> >  QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zones");
-> >  
-> > +QUEUE_RW_ENTRY(queue_copy_offload, "copy_offload");
-> > +QUEUE_RO_ENTRY(queue_max_copy_sectors, "max_copy_sectors");
-> > +QUEUE_RO_ENTRY(queue_max_copy_range_sectors, "max_copy_range_sectors");
-> > +QUEUE_RO_ENTRY(queue_max_copy_nr_ranges, "max_copy_nr_ranges");
-> > +
-> >  QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
-> >  QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
-> >  QUEUE_RW_ENTRY(queue_poll, "io_poll");
-> > @@ -643,6 +690,10 @@ static struct attribute *queue_attrs[] = {
-> >  	&queue_discard_max_entry.attr,
-> >  	&queue_discard_max_hw_entry.attr,
-> >  	&queue_discard_zeroes_data_entry.attr,
-> > +	&queue_copy_offload_entry.attr,
-> > +	&queue_max_copy_sectors_entry.attr,
-> > +	&queue_max_copy_range_sectors_entry.attr,
-> > +	&queue_max_copy_nr_ranges_entry.attr,
-> >  	&queue_write_same_max_entry.attr,
-> >  	&queue_write_zeroes_max_entry.attr,
-> >  	&queue_zone_append_max_entry.attr,
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index efed3820cbf7..f63ae50f1de3 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -51,6 +51,12 @@ extern struct class block_class;
-> >  /* Doing classic polling */
-> >  #define BLK_MQ_POLL_CLASSIC -1
-> >  
-> > +/* Define copy offload options */
-> > +enum blk_copy {
-> > +	BLK_COPY_EMULATE = 0,
-> > +	BLK_COPY_OFFLOAD,
-> > +};
-> > +
-> >  /*
-> >   * Maximum number of blkcg policies allowed to be registered concurrently.
-> >   * Defined here to simplify include dependency.
-> > @@ -253,6 +259,10 @@ struct queue_limits {
-> >  	unsigned int		discard_granularity;
-> >  	unsigned int		discard_alignment;
-> >  	unsigned int		zone_write_granularity;
-> > +	unsigned int            copy_offload;
-> > +	unsigned int            max_copy_sectors;
-> > +	unsigned short          max_copy_range_sectors;
-> > +	unsigned short          max_copy_nr_ranges;
-> >  
-> >  	unsigned short		max_segments;
-> >  	unsigned short		max_integrity_segments;
-> > @@ -562,6 +572,7 @@ struct request_queue {
-> >  #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
-> >  #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
-> >  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
-> > +#define QUEUE_FLAG_COPY		30	/* supports copy offload */
-> 
-> Then what is the point of max_copy_sectors limit ? You can test support
-> by the device by looking at max_copy_sectors != 0, no ? This flag is
-> duplicated information.
-> I would rather use it for the on/off switch for the copy offload,
-> removing the copy_offload limit.
-> 
+12a9801a7301f1 Nitesh Shetty 2022-02-07  185  int blk_copy_offload(struct block_device *src_bdev, int nr_srcs,
+12a9801a7301f1 Nitesh Shetty 2022-02-07  186  		struct range_entry *rlist, struct block_device *dst_bdev, gfp_t gfp_mask)
+12a9801a7301f1 Nitesh Shetty 2022-02-07  187  {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  188  	struct request_queue *sq = bdev_get_queue(src_bdev);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  189  	struct request_queue *dq = bdev_get_queue(dst_bdev);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  190  	struct bio *read_bio, *write_bio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  191  	struct copy_ctx *ctx;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  192  	struct cio *cio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  193  	struct page *token;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  194  	sector_t src_blk, copy_len, dst_blk;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  195  	sector_t remaining, max_copy_len = LONG_MAX;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  196  	int ri = 0, ret = 0;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  197  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  198  	cio = kzalloc(sizeof(struct cio), GFP_KERNEL);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  199  	if (!cio)
+12a9801a7301f1 Nitesh Shetty 2022-02-07  200  		return -ENOMEM;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  201  	atomic_set(&cio->refcount, 0);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  202  	cio->rlist = rlist;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  203  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  204  	max_copy_len = min3(max_copy_len, (sector_t)sq->limits.max_copy_sectors,
+12a9801a7301f1 Nitesh Shetty 2022-02-07  205  			(sector_t)dq->limits.max_copy_sectors);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  206  	max_copy_len = min3(max_copy_len, (sector_t)sq->limits.max_copy_range_sectors,
+12a9801a7301f1 Nitesh Shetty 2022-02-07  207  			(sector_t)dq->limits.max_copy_range_sectors) << SECTOR_SHIFT;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  208  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  209  	for (ri = 0; ri < nr_srcs; ri++) {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  210  		cio->rlist[ri].comp_len = rlist[ri].len;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  211  		for (remaining = rlist[ri].len, src_blk = rlist[ri].src, dst_blk = rlist[ri].dst;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  212  			remaining > 0;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  213  			remaining -= copy_len, src_blk += copy_len, dst_blk += copy_len) {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  214  			copy_len = min(remaining, max_copy_len);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  215  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  216  			token = alloc_page(gfp_mask);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  217  			if (unlikely(!token)) {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  218  				ret = -ENOMEM;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  219  				goto err_token;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  220  			}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  221  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  222  			read_bio = bio_alloc(src_bdev, 1, REQ_OP_READ | REQ_COPY | REQ_NOMERGE,
+12a9801a7301f1 Nitesh Shetty 2022-02-07  223  					gfp_mask);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  224  			if (!read_bio) {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  225  				ret = -ENOMEM;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  226  				goto err_read_bio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  227  			}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  228  			read_bio->bi_iter.bi_sector = src_blk >> SECTOR_SHIFT;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  229  			read_bio->bi_iter.bi_size = copy_len;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  230  			__bio_add_page(read_bio, token, PAGE_SIZE, 0);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  231  			ret = submit_bio_wait(read_bio);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  232  			if (ret) {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  233  				bio_put(read_bio);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  234  				goto err_read_bio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  235  			}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  236  			bio_put(read_bio);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  237  			ctx = kzalloc(sizeof(struct copy_ctx), gfp_mask);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  238  			if (!ctx) {
+12a9801a7301f1 Nitesh Shetty 2022-02-07  239  				ret = -ENOMEM;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  240  				goto err_read_bio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  241  			}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  242  			ctx->cio = cio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  243  			ctx->range_idx = ri;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  244  			ctx->start_sec = rlist[ri].src;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  245  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  246  			write_bio = bio_alloc(dst_bdev, 1, REQ_OP_WRITE | REQ_COPY | REQ_NOMERGE,
+12a9801a7301f1 Nitesh Shetty 2022-02-07  247  					gfp_mask);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  248  			if (!write_bio) {
 
-Same as above
+Please call kfree(ctx) before the goto.
 
-> >  
-> >  #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
-> >  				 (1 << QUEUE_FLAG_SAME_COMP) |		\
-> > @@ -585,6 +596,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
-> >  #define blk_queue_io_stat(q)	test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_flags)
-> >  #define blk_queue_add_random(q)	test_bit(QUEUE_FLAG_ADD_RANDOM, &(q)->queue_flags)
-> >  #define blk_queue_discard(q)	test_bit(QUEUE_FLAG_DISCARD, &(q)->queue_flags)
-> > +#define blk_queue_copy(q)	test_bit(QUEUE_FLAG_COPY, &(q)->queue_flags)
-> >  #define blk_queue_zone_resetall(q)	\
-> >  	test_bit(QUEUE_FLAG_ZONE_RESETALL, &(q)->queue_flags)
-> >  #define blk_queue_secure_erase(q) \
-> 
-> 
-> -- 
-> Damien Le Moal
-> Western Digital Research
-> 
+12a9801a7301f1 Nitesh Shetty 2022-02-07  249  				ret = -ENOMEM;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  250  				goto err_read_bio;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  251  			}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  252  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  253  			write_bio->bi_iter.bi_sector = dst_blk >> SECTOR_SHIFT;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  254  			write_bio->bi_iter.bi_size = copy_len;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  255  			__bio_add_page(write_bio, token, PAGE_SIZE, 0);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  256  			write_bio->bi_end_io = bio_copy_end_io;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  257  			write_bio->bi_private = ctx;
+12a9801a7301f1 Nitesh Shetty 2022-02-07  258  			atomic_inc(&cio->refcount);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  259  			submit_bio(write_bio);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  260  		}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  261  	}
+12a9801a7301f1 Nitesh Shetty 2022-02-07  262  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  263  	/* Wait for completion of all IO's*/
+12a9801a7301f1 Nitesh Shetty 2022-02-07  264  	return cio_await_completion(cio);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  265  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  266  err_read_bio:
+12a9801a7301f1 Nitesh Shetty 2022-02-07  267  	__free_page(token);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  268  err_token:
+12a9801a7301f1 Nitesh Shetty 2022-02-07  269  	rlist[ri].comp_len = min_t(sector_t, rlist[ri].comp_len, (rlist[ri].len - remaining));
+12a9801a7301f1 Nitesh Shetty 2022-02-07  270  
+12a9801a7301f1 Nitesh Shetty 2022-02-07  271  	cio->io_err = ret;
+12a9801a7301f1 Nitesh Shetty 2022-02-07 @272  	return cio_await_completion(cio);
+12a9801a7301f1 Nitesh Shetty 2022-02-07  273  }
 
---
-Thank you
-Nitesh
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
-------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_5a767_
-Content-Type: text/plain; charset="utf-8"
-
-
-------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_5a767_--
