@@ -2,91 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E9CC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 03:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58047C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Feb 2022 04:08:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232387AbiBIDPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Feb 2022 22:15:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39620 "EHLO
+        id S1345997AbiBIEH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Feb 2022 23:07:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243635AbiBIDOy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 22:14:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A3042C0612C1
-        for <linux-block@vger.kernel.org>; Tue,  8 Feb 2022 19:14:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644376492;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=X9DHk6APJIsHE1UI+ceCyZijDLQACCuReEtHVHktgAg=;
-        b=AmXW1nf8BYebvD8R3j31GEa5KmvmSbdZ8Ns7MmDTx3dX+hx4r17ufHkODYgbgPe3yqzioj
-        QSZpLeJk+gmj5QQ5epZUGFtwOWvSMqub2zv5GImnSo8eoLfUvFt72+H/vivHS9EuaE4jtv
-        G9GwL4oE4Wf3T6hPL57IPLgxWoHcTI0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-533-TMv76d40NiuumRdfoHQ9zA-1; Tue, 08 Feb 2022 22:14:49 -0500
-X-MC-Unique: TMv76d40NiuumRdfoHQ9zA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E426E1091DA0;
-        Wed,  9 Feb 2022 03:14:47 +0000 (UTC)
-Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A6EBD4D729;
-        Wed,  9 Feb 2022 03:14:31 +0000 (UTC)
-Date:   Wed, 9 Feb 2022 11:14:23 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next] blk-throttle: enable io throttle for root in
- cgroup v2
-Message-ID: <YgMxjyVjMjmkMQU5@T590>
-References: <20220114093000.3323470-1-yukuai3@huawei.com>
+        with ESMTP id S1347094AbiBIDjb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Feb 2022 22:39:31 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2058DC06174F;
+        Tue,  8 Feb 2022 19:39:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644377970; x=1675913970;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UUr2oeyzfQDDRtI6hlTLxPqoP/+EpMIGE8+TwWUBk0o=;
+  b=ez4stKHhDDVl6yT1xk5D8g+3iUmg6vrCg8TAcWNDTtW/xjyZoVHkRtZ5
+   AkML9UxVY1ZAhD/aTHvD0/3HXMB2dpsSCRydZH82ctlxsBCTB2U96Xgky
+   6CE1Ffq0Udon1BOWvX0OHPNOF3GER6T7MJTggDfsPXGg+ZBoP1ivFgiWr
+   9Lnn0vGK9LR2fXDionZhp+FoMQGhojvuhSQgfNXqQzgFyAM2aPkT8ECtb
+   6PukQzvp23a5vkpBXcCI7xCABAid6MlSUqkj0wlwHZfUEVnV2FJnnBTCw
+   xpNL6Zk1jhro343tWtHiX6vAKur/bWm7Bstd/yrOxlOjFHfvU46ZNM2g1
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="335513823"
+X-IronPort-AV: E=Sophos;i="5.88,354,1635231600"; 
+   d="scan'208";a="335513823"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2022 19:39:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,354,1635231600"; 
+   d="scan'208";a="771204809"
+Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 08 Feb 2022 19:39:23 -0800
+Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nHdpD-0001Al-6Z; Wed, 09 Feb 2022 03:39:23 +0000
+Date:   Wed, 9 Feb 2022 11:39:03 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>, mpatocka@redhat.com
+Cc:     kbuild-all@lists.01.org, javier@javigon.com, chaitanyak@nvidia.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+        msnitzer@redhat.com, bvanassche@acm.org,
+        martin.petersen@oracle.com, roland@purestorage.com, hare@suse.de,
+        kbusch@kernel.org, hch@lst.de, Frederick.Knight@netapp.com,
+        zach.brown@ni.com, osandov@fb.com,
+        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
+        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
+        jack@suse.com, joshi.k@samsung.com, arnav.dawn@samsung.com,
+        nj.shetty@samsung.com
+Subject: Re: [PATCH v2 04/10] block: Introduce a new ioctl for copy
+Message-ID: <202202091048.qDQvi6ab-lkp@intel.com>
+References: <20220207141348.4235-5-nj.shetty@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220114093000.3323470-1-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20220207141348.4235-5-nj.shetty@samsung.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Yu Kuai,
+Hi Nitesh,
 
-On Fri, Jan 14, 2022 at 05:30:00PM +0800, Yu Kuai wrote:
-> RFC patch: https://lkml.org/lkml/2021/9/9/1432
-> 
-> There is a proformance problem in our environment:
-> 
-> A host can provide a remote device to difierent client. If one client is
-> under high io pressure, other clients might be affected.
+Thank you for the patch! Perhaps something to improve:
 
-Can you use the linux kernel storage term to describe the issue?
-Such as, I guess here host means target server(iscsi, nvme target?),
-client should be scsi initiator, or nvme host. If not, can you provide
-one actual example for your storage use case?
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on next-20220208]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-With common term used, it becomes pretty easy for people to understand &
-solve the issue, and avoid any misunderstanding.
+url:    https://github.com/0day-ci/linux/commits/Nitesh-Shetty/block-make-bio_map_kern-non-static/20220207-231407
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: i386-randconfig-c001 (https://download.01.org/0day-ci/archive/20220209/202202091048.qDQvi6ab-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
 
-> 
-> Limit the overall iops/bps(io.max) from the client can fix the problem,
-
-Just be curious how each client can figure out perfect iops/bps limit?
-Given one client doesn't know how many clients are connected to the
-target server.
-
-It sounds like the throttle shouldn't be done in client side cgroup,
-given the throttle is nothing to do with tasks. 
-
-Maybe it should be done in server side, since server has enough
-information to provide fair iops/bps allocation for each clients.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
 
-Thanks, 
-Ming
+cocci warnings: (new ones prefixed by >>)
+>> block/ioctl.c:145:10-17: WARNING opportunity for memdup_user
 
+vim +145 block/ioctl.c
+
+   126	
+   127	static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,
+   128			unsigned long arg)
+   129	{
+   130		struct copy_range crange, *ranges;
+   131		size_t payload_size = 0;
+   132		int ret;
+   133	
+   134		if (!(mode & FMODE_WRITE))
+   135			return -EBADF;
+   136	
+   137		if (copy_from_user(&crange, (void __user *)arg, sizeof(crange)))
+   138			return -EFAULT;
+   139	
+   140		if (unlikely(!crange.nr_range || crange.reserved || crange.nr_range >= MAX_COPY_NR_RANGE))
+   141			return -EINVAL;
+   142	
+   143		payload_size = (crange.nr_range * sizeof(struct range_entry)) + sizeof(crange);
+   144	
+ > 145		ranges = kmalloc(payload_size, GFP_KERNEL);
+   146		if (!ranges)
+   147			return -ENOMEM;
+   148	
+   149		if (copy_from_user(ranges, (void __user *)arg, payload_size)) {
+   150			ret = -EFAULT;
+   151			goto out;
+   152		}
+   153	
+   154		ret = blkdev_issue_copy(bdev, ranges->nr_range, ranges->range_list, bdev, GFP_KERNEL, 0);
+   155		if (copy_to_user((void __user *)arg, ranges, payload_size))
+   156			ret = -EFAULT;
+   157	out:
+   158		kfree(ranges);
+   159		return ret;
+   160	}
+   161	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
