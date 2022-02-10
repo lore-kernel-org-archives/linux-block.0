@@ -2,210 +2,210 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38773C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 22:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A8CC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 23:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345271AbiBJWw0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 17:52:26 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39344 "EHLO
+        id S1345708AbiBJXfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 18:35:30 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242333AbiBJWwZ (ORCPT
+        with ESMTP id S231627AbiBJXfa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 17:52:25 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9348B7D;
-        Thu, 10 Feb 2022 14:52:25 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id m7so6533736pjk.0;
-        Thu, 10 Feb 2022 14:52:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=I+G4ImXqp+YpMfGeGYS+9Bq40aQsZnhUC626GwYdKvE=;
-        b=jRjyEU3R4uemNWY/qUKFenrVhNKeIRQQgJQSjLwWDYkm3k+ajMOQmWGRJUFOUAbMGI
-         JeIY1Qp+Xjv95rv7BnlpEjJ9BUO+wW005jxc9qhsCwhMBRhMBeJonVCSIrhgtG3bR7A5
-         RbBvwl5EqA1Snj+FzmxTF+NKlYtNySD3GBveYDIMArClsb3349mLYd+dbzPQ1QAEdGAn
-         t87Hfn5dANzEfUds5SpNlZ/gSWI96WeItS2rlmom5oiqM2DQNc7JeLjdHz3dKFgyHlGe
-         BRTStPnk4QON0Flb68BwRrgHC+AX9tIVL2fXPinY9TwFWNMAnRkrGFOZeZ5EQ51ia6Rs
-         EHBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=I+G4ImXqp+YpMfGeGYS+9Bq40aQsZnhUC626GwYdKvE=;
-        b=aHLgxLNhpeNyzgMqEXM2YufGNdmxgcBMCvY8Z2L1pAXtY5IuoZ1HeJ8PWnZKrGuKhz
-         3beSI9hPXpN9XKX1dHtCQOJtWQX+zGHYT+qewO5MIupsv59YefMzzuRTcI4/RSX2op0F
-         g4gGPbLHINYdn5OJXV40V3Ty29FElIGjrD9MH3yzKfSDgRrTknJUHbmvu3rNdloywLQB
-         m03irc5dZYfhIKkADUcjIdXgUSCOj+o/HxW4magkjyj/q7Kt1ut6zNesnAGMuyq+bUSb
-         wtRTTHoD6zulNCs2b6mfrCcupWyh9rIcClkuyHOd37+GxOYSKgWoerxrSwvIsNc89u/4
-         VE9Q==
-X-Gm-Message-State: AOAM533J4uN+Mgqw6vMRMRPMeIaZpXcF3tM+pT/Atz4TKBcnCbIdYv0w
-        WrCwxUCvN2gDfPHgNXGdn+U=
-X-Google-Smtp-Source: ABdhPJwQ2J1fWIOUF1+0+pC4v7lYv7ERiZvxzsDAUbW70rk1etY82hcz+XyErcUx8/OKwz8H4J9L1w==
-X-Received: by 2002:a17:902:7049:: with SMTP id h9mr9947785plt.121.1644533545134;
-        Thu, 10 Feb 2022 14:52:25 -0800 (PST)
-Received: from localhost.localdomain (c-67-174-241-145.hsd1.ca.comcast.net. [67.174.241.145])
-        by smtp.gmail.com with ESMTPSA id d9sm11033569pfl.69.2022.02.10.14.52.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 14:52:23 -0800 (PST)
-From:   Yang Shi <shy828301@gmail.com>
-To:     axboe@kernel.dk, hch@infradead.org, rostedt@goodmis.org,
-        kch@nvidia.com, xiyou.wangcong@gmail.com
-Cc:     shy828301@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [v8 PATCH] block: introduce block_rq_error tracepoint
-Date:   Thu, 10 Feb 2022 14:52:22 -0800
-Message-Id: <20220210225222.260069-1-shy828301@gmail.com>
-X-Mailer: git-send-email 2.26.3
+        Thu, 10 Feb 2022 18:35:30 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADAF5F64;
+        Thu, 10 Feb 2022 15:35:30 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CEFCF21126;
+        Thu, 10 Feb 2022 23:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1644536128; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o2Yicem2YyHeYev4jh35sFR/3S6yxP16YJIZJw/2u2E=;
+        b=IRejTp/lbCDisc33iEc4E7PVz/okwunBODuHyI/b85cHeu50KxfVz4Lm1ulBn16HHIvtlA
+        ybEwfsOogFOgpBDauYwGb+Akw4qrm8puoflgsBEzORq8jfHdN6f4ykyJ3bj8AO7gbIdRoY
+        JxHa2lsbMPUq7RCvp7L2aTnG70bRko0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1644536128;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o2Yicem2YyHeYev4jh35sFR/3S6yxP16YJIZJw/2u2E=;
+        b=akwWvp114tx/QzY8BBRxePKACalrKHFoVw/bZPcO2rBeEBJtdQRh+pMHD3FVXfuxr+1IuH
+        CB/Fb6z1JJ/iymCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4AE5C13C55;
+        Thu, 10 Feb 2022 23:35:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id eHQaAjihBWKSUAAAMHmgww
+        (envelope-from <neilb@suse.de>); Thu, 10 Feb 2022 23:35:20 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   "NeilBrown" <neilb@suse.de>
+To:     "Jan Kara" <jack@suse.cz>
+Cc:     "Andrew Morton" <akpm@linux-foundation.org>,
+        "Jan Kara" <jack@suse.cz>, "Wu Fengguang" <fengguang.wu@intel.com>,
+        "Jaegeuk Kim" <jaegeuk@kernel.org>, "Chao Yu" <chao@kernel.org>,
+        "Jeff Layton" <jlayton@kernel.org>,
+        "Ilya Dryomov" <idryomov@gmail.com>,
+        "Miklos Szeredi" <miklos@szeredi.hu>,
+        "Trond Myklebust" <trond.myklebust@hammerspace.com>,
+        "Anna Schumaker" <anna.schumaker@netapp.com>,
+        "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "Philipp Reisner" <philipp.reisner@linbit.com>,
+        "Lars Ellenberg" <lars.ellenberg@linbit.com>,
+        "Paolo Valente" <paolo.valente@linaro.org>,
+        "Jens Axboe" <axboe@kernel.dk>, linux-doc@vger.kernel.org,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 02/11] MM: document and polish read-ahead code.
+In-reply-to: <20220210122440.vqth5mwsqtv6vjpq@quack3.lan>
+References: <164447124918.23354.17858831070003318849.stgit@noble.brown>,
+ <164447147257.23354.2801426518649016278.stgit@noble.brown>,
+ <20220210122440.vqth5mwsqtv6vjpq@quack3.lan>
+Date:   Fri, 11 Feb 2022 10:35:17 +1100
+Message-id: <164453611721.27779.1299851963795418722@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, rasdaemon uses the existing tracepoint block_rq_complete
-and filters out non-error cases in order to capture block disk errors.
+On Thu, 10 Feb 2022, Jan Kara wrote:
+> Hi Neil!
+> 
+> On Thu 10-02-22 16:37:52, NeilBrown wrote:
+> > Add some "big-picture" documentation for read-ahead and polish the code
+> > to make it fit this documentation.
+> > 
+> > The meaning of ->async_size is clarified to match its name.
+> > i.e. Any request to ->readahead() has a sync part and an async part.
+> > The caller will wait for the sync pages to complete, but will not wait
+> > for the async pages.  The first async page is still marked PG_readahead
 
-But there are a few problems with this approach:
+Thanks for the review!
 
-1. Even kernel trace filter could do the filtering work, there is
-   still some overhead after we enable this tracepoint.
+> 
+> So I don't think this is how the code was meant. My understanding of
+> readahead comes from a comment:
 
-2. The filter is merely based on errno, which does not align with kernel
-   logic to check the errors for print_req_error().
+I can't be sure what was "meant" but what I described is very close to
+what the code actually does.
 
-3. block_rq_complete only provides dev major and minor to identify
-   the block device, it is not convenient to use in user-space.
+> 
+> /*
+>  * On-demand readahead design.
+>  *
+> ....
+> 
+> in mm/readahead.c. The ra->size is how many pages should be read.
+> ra->async_size is the "lookahead size" meaning that we should place a
+> marker (PageReadahead) at "ra->size - ra->async_size" to trigger next
+> readahead.
 
-So introduce a new tracepoint block_rq_error just for the error case.
-With this patch, rasdaemon could switch to block_rq_error.
+This description of PageReadahead and ->async_size focuses on *what*
+happens, not *why*.  Importantly it doesn't help answer the question "What
+should I set ->async_size to?"
 
-Since the new tracepoint has the similar implementation with
-block_rq_complete, so move the existing code from TRACE_EVENT
-block_rq_complete() into new event class block_rq_completion(). Then add
-event for block_rq_complete and block_rq_err respectively from the newly
-created event class per the suggestion from Chaitanya Kulkarni.
+The implication in the code is that when we sequentially access a page
+that was read-ahead (read before it was explicitly requested), we trigger
+more read ahead.  So ->async_size should refer to that part of the
+readahead request which was not explicitly requested.  With that
+understanding, it becomes possible to audit all the places that
+->async_size are set and to see if they make sense.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>
-Reviewed-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Yang Shi <shy828301@gmail.com>
----
-The v3 patch was submitted in Feb 2020, and Steven reviewed the patch, but
-it was not merged to upstream. See
-https://lore.kernel.org/lkml/20200203053650.8923-1-xiyou.wangcong@gmail.com/.
+> 
+> > 
+> > - in try_context_readahead(), the async_sync is set correctly rather
+> >   than being set to 1.  Prior to Commit 2cad40180197 ("readahead: make
+> >   context readahead more conservative") it was set to ra->size which
+> >   is not correct (that implies no sync component).  As this was too
+> >   high and caused problems it was reduced to 1, again incorrect but less
+> >   problematic.  The setting provided with this patch does not restore
+> >   those problems, and is now not arbitrary.
+> 
+> I agree the 1 there looks strange as it effectively discards all the logic
+> handling the lookahead size. I agree with the tweak there but I would do
+> this behavioral change as a separate commit since it can have performance
+> implications.
+> 
+> > - The calculation of ->async_size in the initial_readahead section of
+> >   ondemand_readahead() now makes sense - it is zero if the chosen
+> >   size does not exceed the requested size.  This means that we will not
+> >   set the PG_readahead flag in this case, but as the requested size
+> >   has not been satisfied we can expect a subsequent read ahead request
+> >   any way.
+> 
+> So I agree that setting of ->async_size to ->size in initial_readahead
+> section does not make great sence but if you look a bit below into readit
+> section, you will notice the ->async_size is overwritten there to something
+> meaninful. So I think the code actually does something sensible, maybe it
+> could be written in a more readable way.
 
-The problems fixed by that patch still exist and we do need it to make
-disk error handling in rasdaemon easier. So this resurrected it and
-continued the version number.
+I'm certainly focusing on making the code look sensible and be
+consistent with the documentation, rather than fixing actual faults in
+behaviour.  Code that makes sense is easier to maintain.
 
-v7 --> v8:
- * Combined two patches into one per Christoph Hellwig.
- * Kept Steven's reviewed-by since there is no significant change for
-   tracepoint other than creating event class.
-v6 --> v7:
- * Prepared (two patches) by Chaitanya Kulkarni
- * Created event class
-v5 --> v6:
- * Removed disk name per Christoph and Chaitanya
- * Kept errno since I didn't find any other block tracepoints print blk
-   status code and userspace (i.e. rasdaemon) does expect errno.
-v4 --> v5:
- * Report the actual block layer status code instead of the errno per
-   Christoph Hellwig.
-v3 --> v4:
- * Rebased to v5.17-rc1.
- * Collected reviewed-by tag from Steven.
+I came very close to removing that code after readit: but I agree it
+needs a separate patch and needs more thought.  It looks like a bandaid
+that addressed some specific problem which was probably caused by one of
+the size fields being set "wrongly" earlier.
 
- block/blk-mq.c               |  4 ++-
- include/trace/events/block.h | 49 ++++++++++++++++++++++++++----------
- 2 files changed, 39 insertions(+), 14 deletions(-)
+>  
+> > Note that the current function names page_cache_sync_ra() and
+> > page_cache_async_ra() are misleading.  All ra request are partly sync
+> > and partly async, so either part can be empty.
+> 
+> The meaning of these names IMO is:
+> page_cache_sync_ra() - tell readahead that we currently need a page
+> ractl->_index and would prefer req_count pages fetched ahead.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1adfe4824ef5..b79a9b500105 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -789,8 +789,10 @@ bool blk_update_request(struct request *req, blk_status_t error,
- #endif
- 
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
--		     !(req->rq_flags & RQF_QUIET)))
-+		     !(req->rq_flags & RQF_QUIET))) {
- 		blk_print_req_error(req, error);
-+		trace_block_rq_error(req, error, nr_bytes);
-+	}
- 
- 	blk_account_io_completion(req, nr_bytes);
- 
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 27170e40e8c9..7f4dfbdf12a6 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -100,19 +100,7 @@ TRACE_EVENT(block_rq_requeue,
- 		  __entry->nr_sector, 0)
- );
- 
--/**
-- * block_rq_complete - block IO operation completed by device driver
-- * @rq: block operations request
-- * @error: status code
-- * @nr_bytes: number of completed bytes
-- *
-- * The block_rq_complete tracepoint event indicates that some portion
-- * of operation request has been completed by the device driver.  If
-- * the @rq->bio is %NULL, then there is absolutely no additional work to
-- * do for the request. If @rq->bio is non-NULL then there is
-- * additional work required to complete the request.
-- */
--TRACE_EVENT(block_rq_complete,
-+DECLARE_EVENT_CLASS(block_rq_completion,
- 
- 	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
- 
-@@ -144,6 +132,41 @@ TRACE_EVENT(block_rq_complete,
- 		  __entry->nr_sector, __entry->error)
- );
- 
-+/**
-+ * block_rq_complete - block IO operation completed by device driver
-+ * @rq: block operations request
-+ * @error: status code
-+ * @nr_bytes: number of completed bytes
-+ *
-+ * The block_rq_complete tracepoint event indicates that some portion
-+ * of operation request has been completed by the device driver.  If
-+ * the @rq->bio is %NULL, then there is absolutely no additional work to
-+ * do for the request. If @rq->bio is non-NULL then there is
-+ * additional work required to complete the request.
-+ */
-+DEFINE_EVENT(block_rq_completion, block_rq_complete,
-+
-+	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
-+
-+	TP_ARGS(rq, error, nr_bytes)
-+);
-+
-+/**
-+ * block_rq_error - block IO operation error reported by device driver
-+ * @rq: block operations request
-+ * @error: status code
-+ * @nr_bytes: number of completed bytes
-+ *
-+ * The block_rq_error tracepoint event indicates that some portion
-+ * of operation request has failed as reported by the device driver.
-+ */
-+DEFINE_EVENT(block_rq_completion, block_rq_error,
-+
-+	TP_PROTO(struct request *rq, blk_status_t error, unsigned int nr_bytes),
-+
-+	TP_ARGS(rq, error, nr_bytes)
-+);
-+
- DECLARE_EVENT_CLASS(block_rq,
- 
- 	TP_PROTO(struct request *rq),
--- 
-2.26.3
+I don't think that is what req_count means.  req_count is the number of
+pages that are needed *now* to satisfy the current read request.
+page_cache_sync_ra() has the job of determining how many more pages (if
+any) to read-ahead to satisfy future requests.  Sometimes it reads
+another req_count - sometimes not.
 
+> 
+> page_cache_async_ra() - called when we hit the lookahead marker to give
+> opportunity to readahead code to prefetch more pages.
+
+Yes, but page_cache_async_ra() is given a req_count which, as above, is
+the number of pages needed to satisfy *this* request.  That wouldn't
+make sense if it was a pure future-readahead request.
+
+In practice, the word "sync" is used to mean "page was missing" and
+"async" here means "PG_readahead was found".  But that isn't what those
+words usually mean.
+
+They both call ondemand_readahead() passing False or True respectively
+to hit_readahead_marker - which makes that meaning clear in the code...
+but it still isn't clear in the name.
+
+> 
+> > A page_cache_sync_ra() request will usually set ->async_size non-zero,
+> > implying it is not all synchronous.
+> > When a non-zero req_count is passed to page_cache_async_ra(), the
+> > implication is that some prefix of the request is synchronous, though
+> > the calculation made there is incorrect - I haven't tried to fix it.
+> > 
+> > Signed-off-by: NeilBrown <neilb@suse.de>
+> 
+> 								Honza
+
+
+Thanks,
+NeilBrown
