@@ -2,160 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 861B2C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 19:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30185C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 19:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343845AbiBJTRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 14:17:19 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51794 "EHLO
+        id S235577AbiBJTel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 14:34:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343849AbiBJTRS (ORCPT
+        with ESMTP id S245360AbiBJTel (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 14:17:18 -0500
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305CF10BA
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:17:19 -0800 (PST)
-Received: by mail-io1-f69.google.com with SMTP id q7-20020a6bf207000000b006129589cb60so4758508ioh.4
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:17:19 -0800 (PST)
+        Thu, 10 Feb 2022 14:34:41 -0500
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 681A4E61
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:34:41 -0800 (PST)
+Received: by mail-qt1-x835.google.com with SMTP id g4so5864137qto.1
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:34:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:content-transfer-encoding:mime-version:subject:message-id:date
+         :cc:to;
+        bh=Nkl51yYf/EKhGstFPpzBrtWqnV5GN775dSpin1RK3UE=;
+        b=WNY5d5ME1mlUXyTWD6sK18mEZKD+vsTIMpBeQSFlhk8Fvo+Am7EqNZpVWhkd/Pu4pc
+         tRK3y66AjiVZSit/4HAFgM5IDZZVLnxngOJHbYxygMNYSXmhsbI5LEts+LrrY1E0Lp1K
+         93vshHkvHYlnogalgr2VymZvuIAINY0APwV2lL98gLjSjPgQdUQKmSNg3uRXwwTu0j8R
+         rHBt88/5vQyyanJwD4fKUwGPk9J3kaHQUobuUtyXouqCOjb1vlb4qiqZiahZmYIFEvnM
+         OdaA7cPKxgmgYLCdGjNaN2ZJlsBkUqZ2T8gOnn3vRuDFbQVidACAN5Xb93uOKeS4gu/W
+         Ad7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=dhTqdS5BhFkXmeRR/16Vvef9lka+5JexgN00dZ10W4A=;
-        b=I+XrhM3wV6mSpYcmsN61MdbpjZ26TPrxbdhaEv+T67cJ813FOG/lvI5qIaL7uKMI39
-         X8VCOiYRdtcyRZbU9rpEd34MOnLPxhUZ+Rj3Nc2yLn3gH8lqCr3BvoMI2n5aVW7Issfw
-         cufJLatQHaZr0L3oS99uA9V5a9XQRnbJNZByhC4fhhLPxSwCowNdBMyH7SGK3RMvsfKY
-         CHf7wDh48Eq5a1Nlg0o3uOOSzOc2iU+W5qp7w290kwb92kmlT1aHsecjCKdCxeKJ01HZ
-         D8Q9OLjal1JgNI0eFyjXnz7wLbNbR9NFp1nh9E03mygfmEaNW4DuTtqYlZFLiowcC7Vw
-         QSSg==
-X-Gm-Message-State: AOAM530V9OKQF85AMbkBl6ET0U1Ugq1gF86YDKshSg4rqgMtvhuNTRKr
-        kojTGN/TT6uJdpl9iaBNQTlKVsjaF1V3dwQxoWXhxhJs1BOG
-X-Google-Smtp-Source: ABdhPJyBLvgOembLjlTMGygnb+NRkBqPrV4hZGpY8vwXOKFzRYp15MkEXO5VJ1WTtgeZRcU3bBjqxSDDaE+3jSaIe2VrDXyLosRY
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:a26:: with SMTP id 6mr5028413jao.34.1644520638577;
- Thu, 10 Feb 2022 11:17:18 -0800 (PST)
-Date:   Thu, 10 Feb 2022 11:17:18 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007d025d05d7aecc00@google.com>
-Subject: [syzbot] general protection fault in blk_mq_free_rqs
-From:   syzbot <syzbot+7295389ef2000630244b@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:content-transfer-encoding:mime-version
+         :subject:message-id:date:cc:to;
+        bh=Nkl51yYf/EKhGstFPpzBrtWqnV5GN775dSpin1RK3UE=;
+        b=dSNZ+jA279iIMnQ1j2e3U9eeRsbURuZbbO2Mbq19V/krltK3mxaNCC1l+fBMWdK2HY
+         NCqVjRM79w9XSs++WnaDk2+in3Md9cp7Gd/70iALRRIa18Yo9uSDEXwGBz+6g/Tjg4IW
+         Jksb7e1smJSYj4OljntUNbwjQWbTHpg5cW/quWwb6Lzy8NdBbfMHGEoCtH/vd2oui9D1
+         jjibk0RU9CZ55tXZPrcHTAGwsGOmszEaCbR1PMbKzL0b0BITouBO9STGjuFSKgxoJICJ
+         oV3yjAlBUKqcdJpGBO8Jm9nVEge83BgsJEECNxTtamBkii/p1lEN/4x2whqoy34BT+FE
+         V5Bg==
+X-Gm-Message-State: AOAM533GgumKRVsqa2svzv0Ucfchl+q7lfOAMYWlBfcOn3gRcqfhTo0Q
+        38FNO3IT6Uw1j5KGXpx4oZnyZWTxygGeofn5
+X-Google-Smtp-Source: ABdhPJxCaQNdrxnnNrnO3nmn9K0NNHI1oDAUnu+Zc0f4BAcJ0cTVFx+DqI3jPR33HCdZlO4WMvqsyw==
+X-Received: by 2002:ac8:5896:: with SMTP id t22mr6043234qta.613.1644521680580;
+        Thu, 10 Feb 2022 11:34:40 -0800 (PST)
+Received: from smtpclient.apple ([2600:1700:42f0:6600:cd8a:8634:7b18:da1e])
+        by smtp.gmail.com with ESMTPSA id n19sm1503518qtk.66.2022.02.10.11.34.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Feb 2022 11:34:40 -0800 (PST)
+From:   "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: [LSF/MM/BPF TOPIC] File system synthesis inside of computational
+ storage
+Message-Id: <A7928480-2F5C-4BCD-B8E8-62E2AA5FCD8A@bytedance.com>
+Date:   Thu, 10 Feb 2022 11:34:38 -0800
+Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+To:     lsf-pc@lists.linux-foundation.org
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hello,
 
-syzbot found the following issue on:
+Computational storage creates the way to offload as user data as =
+metadata processing into storage space. So, I would like to discuss the =
+feasibility of building a storage device that is capable of synthesizing =
+a file system by itself.
 
-HEAD commit:    90c9e950c0de Merge tag 'for-linus-5.17a-rc3-tag' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=137905dc700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ee3797346aa03884
-dashboard link: https://syzkaller.appspot.com/bug?extid=7295389ef2000630244b
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10801462700000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135d7524700000
+First of all, it is well known that designing and implementing a file =
+system architecture is a very time-consuming and difficult process. Also =
+this process includes a significant amount of debugging and bug fix =
+efforts. But real life and evolving technologies require much faster =
+data processing. So, file system technologies cannot satisfy the =
+challenges of real life very frequently. Generally speaking, if =
+computational storage is capable of designing and evolving file system =
+architecture under I/O load then it could be a very interesting =
+solution.
 
-Bisection is inconclusive: the issue happens on the oldest tested release.
+Any machine learning approach is based on training by input data. So, =
+I/O requests can be such training data. It is possible to imagine a ML =
+engine inside of computational storage that can analyze the requests to =
+store and to retrieve the data and to build the file system=E2=80=99s =
+metadata structures on the fly. Generally speaking, computational =
+storage can implement a file system architecture inside of a storage =
+device without any preliminary development of a file system driver.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14b09d42700000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16b09d42700000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b09d42700000
+Initially, the ML engine inside of computational storage could be =
+equipped with the initial set of metadata structure primitives (array, =
+queue, bitmap, tree). By receiving I/O requests, ML engine can use at =
+first the simplest metadata structures and to gather the =
+modification/access statistics. For example, initially, it is possible =
+to use a simple array of extents to account file=E2=80=99s content =
+location. Then, with a growing amount of statistics, ML engine can =
+synthesize more sophisticated and efficient metadata structures and =
+start to use, for example, a tree that consumes existing arrays as =
+tree=E2=80=99s nodes. As a result, a file system can be constructed by =
+an ML engine taking into account the peculiarities of files=E2=80=99 =
+lifetime and workload.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7295389ef2000630244b@syzkaller.appspotmail.com
+Any opinions related to this crazy idea?
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 PID: 3605 Comm: syz-executor139 Not tainted 5.17.0-rc2-syzkaller-00353-g90c9e950c0de #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:blk_mq_clear_rq_mapping block/blk-mq.c:3061 [inline]
-RIP: 0010:blk_mq_free_rqs+0x399/0x910 block/blk-mq.c:3106
-Code: de e8 8b 83 ac fd 83 fb 3f 0f 87 04 c3 49 05 e8 5d 81 ac fd b8 00 10 00 00 89 d9 48 d3 e0 4c 01 e8 48 89 44 24 08 48 8b 04 24 <0f> b6 00 84 c0 74 08 3c 03 0f 8e bb 03 00 00 41 8b 1f 31 ff 31 ed
-RSP: 0018:ffffc900027afaf8 EFLAGS: 00010286
-RAX: dffffc0000000000 RBX: 0000000000000004 RCX: 0000000000000004
-RDX: ffff888074ef3a00 RSI: ffffffff83cbf733 RDI: 0000000000000003
-RBP: ffff888071ce6000 R08: 000000000000003f R09: ffffffff8ffbf99f
-R10: ffffffff83cbf725 R11: 0000000000000246 R12: dffffc0000000000
-R13: ffff88801a380000 R14: ffff88801a23f000 R15: 0000000000000000
-FS:  00007f894cb64700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f894cc20aa3 CR3: 0000000021f45000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- blk_mq_sched_free_rqs block/blk-mq-sched.c:629 [inline]
- blk_mq_sched_free_rqs+0x16c/0x270 block/blk-mq-sched.c:618
- elevator_switch_mq+0xed/0x720 block/elevator.c:600
- blk_mq_elv_switch_none block/blk-mq.c:4445 [inline]
- __blk_mq_update_nr_hw_queues block/blk-mq.c:4498 [inline]
- blk_mq_update_nr_hw_queues+0x3f1/0xd30 block/blk-mq.c:4548
- nbd_start_device+0x157/0xd10 drivers/block/nbd.c:1347
- nbd_start_device_ioctl drivers/block/nbd.c:1397 [inline]
- __nbd_ioctl drivers/block/nbd.c:1471 [inline]
- nbd_ioctl+0x5f3/0xb10 drivers/block/nbd.c:1511
- blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f894cbb7349
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 11 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f894cb642e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f894cc3c4e0 RCX: 00007f894cbb7349
-RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000007
-RBP: 00007f894cc091ac R08: 0000000000000002 R09: 0000000000003331
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f894cc3c4ec
-R13: 00007f894cb642f0 R14: 00007f894cc3c4e8 R15: 0000000000000002
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:blk_mq_clear_rq_mapping block/blk-mq.c:3061 [inline]
-RIP: 0010:blk_mq_free_rqs+0x399/0x910 block/blk-mq.c:3106
-Code: de e8 8b 83 ac fd 83 fb 3f 0f 87 04 c3 49 05 e8 5d 81 ac fd b8 00 10 00 00 89 d9 48 d3 e0 4c 01 e8 48 89 44 24 08 48 8b 04 24 <0f> b6 00 84 c0 74 08 3c 03 0f 8e bb 03 00 00 41 8b 1f 31 ff 31 ed
-RSP: 0018:ffffc900027afaf8 EFLAGS: 00010286
-RAX: dffffc0000000000 RBX: 0000000000000004 RCX: 0000000000000004
-RDX: ffff888074ef3a00 RSI: ffffffff83cbf733 RDI: 0000000000000003
-RBP: ffff888071ce6000 R08: 000000000000003f R09: ffffffff8ffbf99f
-R10: ffffffff83cbf725 R11: 0000000000000246 R12: dffffc0000000000
-R13: ffff88801a380000 R14: ffff88801a23f000 R15: 0000000000000000
-FS:  00007f894cb64700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f894cc20aa3 CR3: 0000000021f45000 CR4: 0000000000350ef0
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	e8 8b 83 ac fd       	callq  0xfdac8390
-   5:	83 fb 3f             	cmp    $0x3f,%ebx
-   8:	0f 87 04 c3 49 05    	ja     0x549c312
-   e:	e8 5d 81 ac fd       	callq  0xfdac8170
-  13:	b8 00 10 00 00       	mov    $0x1000,%eax
-  18:	89 d9                	mov    %ebx,%ecx
-  1a:	48 d3 e0             	shl    %cl,%rax
-  1d:	4c 01 e8             	add    %r13,%rax
-  20:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
-  25:	48 8b 04 24          	mov    (%rsp),%rax
-* 29:	0f b6 00             	movzbl (%rax),%eax <-- trapping instruction
-  2c:	84 c0                	test   %al,%al
-  2e:	74 08                	je     0x38
-  30:	3c 03                	cmp    $0x3,%al
-  32:	0f 8e bb 03 00 00    	jle    0x3f3
-  38:	41 8b 1f             	mov    (%r15),%ebx
-  3b:	31 ff                	xor    %edi,%edi
-  3d:	31 ed                	xor    %ebp,%ebp
+Thanks,
+Slava.
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
