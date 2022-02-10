@@ -2,227 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145A6C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 08:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FF4C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 09:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237460AbiBJIbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 03:31:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60914 "EHLO
+        id S235240AbiBJJTl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 04:19:41 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234948AbiBJIbk (ORCPT
+        with ESMTP id S238391AbiBJJTl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 03:31:40 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCDF1128;
-        Thu, 10 Feb 2022 00:31:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644481901; x=1676017901;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8c00mtbRrdA18FyTX012jqJDs1wrgVfFCJpPUSIXoOg=;
-  b=kIaWDprOJ97uL3HXho1jQnTXl9egIlImJKQv4Q4EYGozZgcs8CUF2hYJ
-   HMBCjXQyTDiOts33c7LCStVk+P51p3WbcsWo4vUUgyFDqFPtyis3pbK9H
-   pRss22b87SaV4BtqFPyHzOmyHiEaWvR9rR0KFlFzA1tfDd2+oKyiVJr5+
-   GIoiMBXPsasDZUztzRUVjzPyhKDQ2ZaW+Q/izG3uZEznlpA3mJMMDEm7m
-   s4OYh4P6SksnbDglqdT6Parlr07NKxKwbvbo6T/2vW0gC0hDJXnX9tIea
-   Vm2oFc88E9t6vr8ZhzkVsLZby0wvcPCxG7VKvVlMAuKHxLf9zDM0opful
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="248273487"
-X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
-   d="scan'208";a="248273487"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 00:31:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
-   d="scan'208";a="629615271"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 10 Feb 2022 00:31:34 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nI4rW-0002yF-8m; Thu, 10 Feb 2022 08:31:34 +0000
-Date:   Thu, 10 Feb 2022 16:31:10 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Nitesh Shetty <nj.shetty@samsung.com>, mpatocka@redhat.com
-Cc:     kbuild-all@lists.01.org, javier@javigon.com, chaitanyak@nvidia.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        msnitzer@redhat.com, bvanassche@acm.org,
-        martin.petersen@oracle.com, roland@purestorage.com, hare@suse.de,
-        kbusch@kernel.org, hch@lst.de, Frederick.Knight@netapp.com,
-        zach.brown@ni.com, osandov@fb.com,
-        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
-        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
-        jack@suse.com, joshi.k@samsung.com, arnav.dawn@samsung.com,
-        nj.shetty@samsung.com
-Subject: Re: [PATCH v2 07/10] nvmet: add copy command support for bdev and
- file ns
-Message-ID: <202202101647.VtWTgalm-lkp@intel.com>
-References: <20220207141348.4235-8-nj.shetty@samsung.com>
+        Thu, 10 Feb 2022 04:19:41 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D496F10B3;
+        Thu, 10 Feb 2022 01:19:41 -0800 (PST)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JvWPV1Sttz9sXd;
+        Thu, 10 Feb 2022 17:18:06 +0800 (CST)
+Received: from dggpemm500002.china.huawei.com (7.185.36.229) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 10 Feb 2022 17:19:24 +0800
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 10 Feb 2022 17:19:24 +0800
+From:   Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To:     <axboe@kernel.dk>, <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yuyufen@huawei.com>, <guohanjun@huawei.com>,
+        <wangxiongfeng2@huawei.com>
+Subject: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker on a non-housekeeping CPU
+Date:   Thu, 10 Feb 2022 17:35:32 +0800
+Message-ID: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220207141348.4235-8-nj.shetty@samsung.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.25]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500002.china.huawei.com (7.185.36.229)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Nitesh,
+When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
+into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
+are NOHZ_FULL CPUs and are often monopolized by the userspace process,
+such HPC application process. Any sort of interruption is not expected.
 
-Thank you for the patch! Perhaps something to improve:
+blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
+to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
+contains housekeeping CPU and non-housekeeping CPU at the same time, a
+housekeeping CPU, which want to request a IO, may schedule a worker on a
+non-housekeeping CPU. This may affect the performance of the userspace
+application running on non-housekeeping CPUs.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v5.17-rc3 next-20220209]
-[cannot apply to device-mapper-dm/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+So let's just schedule the worker thread on the current CPU when the
+current CPU is housekeeping CPU.
 
-url:    https://github.com/0day-ci/linux/commits/Nitesh-Shetty/block-make-bio_map_kern-non-static/20220207-231407
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: arm64-randconfig-s032-20220207 (https://download.01.org/0day-ci/archive/20220210/202202101647.VtWTgalm-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 11.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/6bb6ea64499e1ac27975e79bb2eee89f07861893
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Nitesh-Shetty/block-make-bio_map_kern-non-static/20220207-231407
-        git checkout 6bb6ea64499e1ac27975e79bb2eee89f07861893
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 SHELL=/bin/bash drivers/nvme/target/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/nvme/target/io-cmd-bdev.c:52:25: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le32 [usertype] mcl @@     got restricted __le64 [usertype] @@
-   drivers/nvme/target/io-cmd-bdev.c:52:25: sparse:     expected restricted __le32 [usertype] mcl
-   drivers/nvme/target/io-cmd-bdev.c:52:25: sparse:     got restricted __le64 [usertype]
->> drivers/nvme/target/io-cmd-bdev.c:53:27: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le16 [usertype] mssrl @@     got restricted __le32 [usertype] @@
-   drivers/nvme/target/io-cmd-bdev.c:53:27: sparse:     expected restricted __le16 [usertype] mssrl
-   drivers/nvme/target/io-cmd-bdev.c:53:27: sparse:     got restricted __le32 [usertype]
->> drivers/nvme/target/io-cmd-bdev.c:55:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned char [usertype] msrc @@     got restricted __le16 @@
-   drivers/nvme/target/io-cmd-bdev.c:55:26: sparse:     expected unsigned char [usertype] msrc
-   drivers/nvme/target/io-cmd-bdev.c:55:26: sparse:     got restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:58:34: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned char [usertype] msrc @@     got restricted __le16 @@
-   drivers/nvme/target/io-cmd-bdev.c:58:34: sparse:     expected unsigned char [usertype] msrc
-   drivers/nvme/target/io-cmd-bdev.c:58:34: sparse:     got restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:59:35: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le16 [usertype] mssrl @@     got restricted __le32 [usertype] @@
-   drivers/nvme/target/io-cmd-bdev.c:59:35: sparse:     expected restricted __le16 [usertype] mssrl
-   drivers/nvme/target/io-cmd-bdev.c:59:35: sparse:     got restricted __le32 [usertype]
->> drivers/nvme/target/io-cmd-bdev.c:61:35: sparse: sparse: cast to restricted __le32
->> drivers/nvme/target/io-cmd-bdev.c:61:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:61:33: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le32 [usertype] mcl @@     got restricted __le64 [usertype] @@
-   drivers/nvme/target/io-cmd-bdev.c:61:33: sparse:     expected restricted __le32 [usertype] mcl
-   drivers/nvme/target/io-cmd-bdev.c:61:33: sparse:     got restricted __le64 [usertype]
-   drivers/nvme/target/io-cmd-bdev.c:65:34: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned char [usertype] msrc @@     got restricted __le16 @@
-   drivers/nvme/target/io-cmd-bdev.c:65:34: sparse:     expected unsigned char [usertype] msrc
-   drivers/nvme/target/io-cmd-bdev.c:65:34: sparse:     got restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:66:35: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le16 [usertype] mssrl @@     got restricted __le32 [usertype] @@
-   drivers/nvme/target/io-cmd-bdev.c:66:35: sparse:     expected restricted __le16 [usertype] mssrl
-   drivers/nvme/target/io-cmd-bdev.c:66:35: sparse:     got restricted __le32 [usertype]
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast to restricted __le32
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast to restricted __le32
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast to restricted __le32
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast to restricted __le32
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast to restricted __le32
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast to restricted __le32
-   drivers/nvme/target/io-cmd-bdev.c:68:35: sparse: sparse: cast from restricted __le16
-   drivers/nvme/target/io-cmd-bdev.c:68:33: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le32 [usertype] mcl @@     got restricted __le64 [usertype] @@
-   drivers/nvme/target/io-cmd-bdev.c:68:33: sparse:     expected restricted __le32 [usertype] mcl
-   drivers/nvme/target/io-cmd-bdev.c:68:33: sparse:     got restricted __le64 [usertype]
---
->> drivers/nvme/target/admin-cmd.c:533:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned char [usertype] msrc @@     got restricted __le16 @@
-   drivers/nvme/target/admin-cmd.c:533:26: sparse:     expected unsigned char [usertype] msrc
-   drivers/nvme/target/admin-cmd.c:533:26: sparse:     got restricted __le16
->> drivers/nvme/target/admin-cmd.c:534:27: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le16 [usertype] mssrl @@     got restricted __le32 [usertype] @@
-   drivers/nvme/target/admin-cmd.c:534:27: sparse:     expected restricted __le16 [usertype] mssrl
-   drivers/nvme/target/admin-cmd.c:534:27: sparse:     got restricted __le32 [usertype]
->> drivers/nvme/target/admin-cmd.c:535:27: sparse: sparse: cast to restricted __le32
->> drivers/nvme/target/admin-cmd.c:535:27: sparse: sparse: cast from restricted __le16
->> drivers/nvme/target/admin-cmd.c:535:25: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le32 [usertype] mcl @@     got restricted __le64 [usertype] @@
-   drivers/nvme/target/admin-cmd.c:535:25: sparse:     expected restricted __le32 [usertype] mcl
-   drivers/nvme/target/admin-cmd.c:535:25: sparse:     got restricted __le64 [usertype]
-
-vim +52 drivers/nvme/target/io-cmd-bdev.c
-
-    11	
-    12	void nvmet_bdev_set_limits(struct block_device *bdev, struct nvme_id_ns *id)
-    13	{
-    14		const struct queue_limits *ql = &bdev_get_queue(bdev)->limits;
-    15		/* Number of logical blocks per physical block. */
-    16		const u32 lpp = ql->physical_block_size / ql->logical_block_size;
-    17		/* Logical blocks per physical block, 0's based. */
-    18		const __le16 lpp0b = to0based(lpp);
-    19	
-    20		/*
-    21		 * For NVMe 1.2 and later, bit 1 indicates that the fields NAWUN,
-    22		 * NAWUPF, and NACWU are defined for this namespace and should be
-    23		 * used by the host for this namespace instead of the AWUN, AWUPF,
-    24		 * and ACWU fields in the Identify Controller data structure. If
-    25		 * any of these fields are zero that means that the corresponding
-    26		 * field from the identify controller data structure should be used.
-    27		 */
-    28		id->nsfeat |= 1 << 1;
-    29		id->nawun = lpp0b;
-    30		id->nawupf = lpp0b;
-    31		id->nacwu = lpp0b;
-    32	
-    33		/*
-    34		 * Bit 4 indicates that the fields NPWG, NPWA, NPDG, NPDA, and
-    35		 * NOWS are defined for this namespace and should be used by
-    36		 * the host for I/O optimization.
-    37		 */
-    38		id->nsfeat |= 1 << 4;
-    39		/* NPWG = Namespace Preferred Write Granularity. 0's based */
-    40		id->npwg = lpp0b;
-    41		/* NPWA = Namespace Preferred Write Alignment. 0's based */
-    42		id->npwa = id->npwg;
-    43		/* NPDG = Namespace Preferred Deallocate Granularity. 0's based */
-    44		id->npdg = to0based(ql->discard_granularity / ql->logical_block_size);
-    45		/* NPDG = Namespace Preferred Deallocate Alignment */
-    46		id->npda = id->npdg;
-    47		/* NOWS = Namespace Optimal Write Size */
-    48		id->nows = to0based(ql->io_opt / ql->logical_block_size);
-    49	
-    50		/*Copy limits*/
-    51		if (ql->max_copy_sectors) {
-  > 52			id->mcl = cpu_to_le64((ql->max_copy_sectors << 9) / ql->logical_block_size);
-  > 53			id->mssrl = cpu_to_le32((ql->max_copy_range_sectors << 9) /
-    54					ql->logical_block_size);
-  > 55			id->msrc = to0based(ql->max_copy_nr_ranges);
-    56		} else {
-    57			if (ql->zoned == BLK_ZONED_NONE) {
-    58				id->msrc = to0based(BIO_MAX_VECS);
-    59				id->mssrl = cpu_to_le32(
-    60						(BIO_MAX_VECS << PAGE_SHIFT) / ql->logical_block_size);
-  > 61				id->mcl = cpu_to_le64(le32_to_cpu(id->mssrl) * BIO_MAX_VECS);
-    62	#ifdef CONFIG_BLK_DEV_ZONED
-    63			} else {
-    64				/* TODO: get right values for zoned device */
-    65				id->msrc = to0based(BIO_MAX_VECS);
-    66				id->mssrl = cpu_to_le32(min((BIO_MAX_VECS << PAGE_SHIFT),
-    67						ql->chunk_sectors) / ql->logical_block_size);
-    68				id->mcl = cpu_to_le64(min(le32_to_cpu(id->mssrl) * BIO_MAX_VECS,
-    69							ql->chunk_sectors));
-    70	#endif
-    71			}
-    72		}
-    73	}
-    74	
-
+Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ block/blk-mq.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1adfe4824ef5..ff9a4bf16858 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -24,6 +24,7 @@
+ #include <linux/sched/sysctl.h>
+ #include <linux/sched/topology.h>
+ #include <linux/sched/signal.h>
++#include <linux/sched/isolation.h>
+ #include <linux/delay.h>
+ #include <linux/crash_dump.h>
+ #include <linux/prefetch.h>
+@@ -2036,6 +2037,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
++	int work_cpu;
++
+ 	if (unlikely(blk_mq_hctx_stopped(hctx)))
+ 		return;
+ 
+@@ -2050,7 +2053,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		put_cpu();
+ 	}
+ 
+-	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
++	/*
++	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
++	 * CPU
++	 */
++	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
++							 HK_FLAG_WQ))
++		work_cpu = smp_processor_id();
++	else
++		work_cpu = blk_mq_hctx_next_cpu(hctx);
++
++	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
+ 				    msecs_to_jiffies(msecs));
+ }
+ 
+-- 
+2.20.1
+
