@@ -2,131 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 341CAC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 19:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 861B2C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 19:17:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241500AbiBJTHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 14:07:15 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46384 "EHLO
+        id S1343845AbiBJTRT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 14:17:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237528AbiBJTHP (ORCPT
+        with ESMTP id S1343849AbiBJTRS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 14:07:15 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C35D10BA
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:07:15 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id c188so8571855iof.6
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:07:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=hG/KdDDxIcyXsyw/RMafLBe/uq6M82xYSQCLZJnYCEQ=;
-        b=MhT9yp2Wge+NFj3sIIssuJKA1EFvLYafov3ukdfpfxkJjrAyJ1X6589ADOHOdM6Mig
-         lWCvxNbvFzre/oFjaU9WOhIo/uduK4gomEJDVb34A7s5M3dGQrAZdmOdFbxJXx/f/JkN
-         bZvr07+qfO2B7VnwJ7JS1t3MhBuwbPznM/VwRVW6fuk9kXhe+QR1izIygJqsaP63QXpI
-         /6Aj5q/0fNCvycYCK20DCIwhgU++rozy43uBwMYMHn7lOZwZ9BCuzAnVg5qIcIDQU3Ko
-         +F8s0+yHbCHq+FZIO6GEbHCc7syIkjhMgNdoXM5RuAWRgMz85gHGEk0T1dtxdOcoDpXw
-         vGlQ==
+        Thu, 10 Feb 2022 14:17:18 -0500
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305CF10BA
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:17:19 -0800 (PST)
+Received: by mail-io1-f69.google.com with SMTP id q7-20020a6bf207000000b006129589cb60so4758508ioh.4
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:17:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hG/KdDDxIcyXsyw/RMafLBe/uq6M82xYSQCLZJnYCEQ=;
-        b=N5nYfs1NowoHeXZK8lnMcNgs0E2R+UO+BatGUDHXHVadRDd/9NJzH5KU8LS+LZy/rS
-         U/FFO8RNhxBgonOvwbmNEePeaT/BARCWxfy73Qz+nKGdeNyrswOGsTaa8sQywDFfX1wv
-         7XHncLrkG1LFhyEPBR+C/oyV3P31a8Ktaj2Wm1LGFBToeHAS7tltmN/WJPiBwYSUwVsq
-         i0c/ox7+gK6/lAxRxenHvkZzvq1IbH5jaMYEEnxAVVMou4+bY7z+zvn4NCnwjje+UsZX
-         qfbJfxKWagA8GNHmmDvjZpaip0knE0+oLB9TmSRayNSkwLorRLGkxBeHNeq7Hnq9Hos6
-         5pBA==
-X-Gm-Message-State: AOAM533A7R5+VHxmGVx5EtaxcC2e/5ULHINDCzUb/Ljifo5ICa9QJAen
-        DCgmn3TDq33W4/J9nimK/2WDAg==
-X-Google-Smtp-Source: ABdhPJwGOIWKCswLNq3dImk+idWkmGGgawR3gp26wwxBe9YeZ5EJ7znDKL+IkSxmrLR0nh/ZL2oLAg==
-X-Received: by 2002:a6b:d80c:: with SMTP id y12mr4395981iob.31.1644520034625;
-        Thu, 10 Feb 2022 11:07:14 -0800 (PST)
-Received: from [192.168.1.30] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h8sm5789399ile.22.2022.02.10.11.07.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 11:07:14 -0800 (PST)
-Subject: Re: [PATCH v2 2/3] block: io_uring: add READV_PI/WRITEV_PI operations
-To:     "Alexander V. Buev" <a.buev@yadro.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
-References: <20220210130825.657520-1-a.buev@yadro.com>
- <20220210130825.657520-3-a.buev@yadro.com>
- <6d505bdc-d687-a9e7-54a1-9a2e662e9707@kernel.dk>
- <20220210190311.driobrtfavnb7ha3@yadro.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b8082a03-ab50-8a28-b6fd-1bf6985713ec@kernel.dk>
-Date:   Thu, 10 Feb 2022 12:07:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=dhTqdS5BhFkXmeRR/16Vvef9lka+5JexgN00dZ10W4A=;
+        b=I+XrhM3wV6mSpYcmsN61MdbpjZ26TPrxbdhaEv+T67cJ813FOG/lvI5qIaL7uKMI39
+         X8VCOiYRdtcyRZbU9rpEd34MOnLPxhUZ+Rj3Nc2yLn3gH8lqCr3BvoMI2n5aVW7Issfw
+         cufJLatQHaZr0L3oS99uA9V5a9XQRnbJNZByhC4fhhLPxSwCowNdBMyH7SGK3RMvsfKY
+         CHf7wDh48Eq5a1Nlg0o3uOOSzOc2iU+W5qp7w290kwb92kmlT1aHsecjCKdCxeKJ01HZ
+         D8Q9OLjal1JgNI0eFyjXnz7wLbNbR9NFp1nh9E03mygfmEaNW4DuTtqYlZFLiowcC7Vw
+         QSSg==
+X-Gm-Message-State: AOAM530V9OKQF85AMbkBl6ET0U1Ugq1gF86YDKshSg4rqgMtvhuNTRKr
+        kojTGN/TT6uJdpl9iaBNQTlKVsjaF1V3dwQxoWXhxhJs1BOG
+X-Google-Smtp-Source: ABdhPJyBLvgOembLjlTMGygnb+NRkBqPrV4hZGpY8vwXOKFzRYp15MkEXO5VJ1WTtgeZRcU3bBjqxSDDaE+3jSaIe2VrDXyLosRY
 MIME-Version: 1.0
-In-Reply-To: <20220210190311.driobrtfavnb7ha3@yadro.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:a26:: with SMTP id 6mr5028413jao.34.1644520638577;
+ Thu, 10 Feb 2022 11:17:18 -0800 (PST)
+Date:   Thu, 10 Feb 2022 11:17:18 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007d025d05d7aecc00@google.com>
+Subject: [syzbot] general protection fault in blk_mq_free_rqs
+From:   syzbot <syzbot+7295389ef2000630244b@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/10/22 12:03 PM, Alexander V. Buev wrote:
->> On 2/10/22 6:08 AM, Alexander V. Buev wrote:
->>> Added new READV_PI/WRITEV_PI operations to io_uring.
->>> Added new pi_addr & pi_len fields to SQE struct.
->>> Added new pi_iter field and IOCB_USE_PI flag to kiocb struct.
->>> Make corresponding corrections to io uring trace event.
->>>
->>> +struct io_rw_pi_state {
->>> +	struct iov_iter			iter;
->>> +	struct iov_iter_state		iter_state;
->>> +	struct iovec			fast_iov[UIO_FASTIOV_PI];
->>> +};
->>> +
->>> +struct io_rw_pi {
->>> +	struct io_rw			rw;
->>> +	struct iovec			*pi_iov;
->>> +	u32				nr_pi_segs;
->>> +	struct io_rw_pi_state		*s;
->>> +};
->>
->> One immediate issue I see here is that io_rw_pi is big, and we try very
->> hard to keep the per-command payload to 64-bytes. This would be 88 bytes
->> by my count :-/
->>
->> Do you need everything from io_rw? If not, I'd just make io_rw_pi
->> contain the bits you need and see if you can squeeze it into the
->> existing cacheline.
-> 
-> In short - Yes. Current patch code call existing io_read/io_write functions.
-> This functions use io_rw struct information and process this data.
-> I wanted to use existing functions but may be this is wrong way in this 
-> case.
->                                                                                 
-> The second problem with request size is that the patch adds pi_iter   
-> pointer to kiocb struct. This also increase whole request union
-> length.
-> 
-> So I can see some (may be possible) solution for this: 
-> 
->  1) do not store whole kiocb struct in request
->     and write fully separated io_read/write_pi functions
-> 
->  2) make special CONFIG_XXX variable and simplify hide this code
->     as default
+Hello,
 
-Option 2 really sucks, because then obviously everyone wants their
-feature enabled, and then we are back to square one. So never rely on a
-config option, if it can be avoided.
+syzbot found the following issue on:
 
-I'd like to see what option 1 looks like, that sounds like a far better
-solution.
+HEAD commit:    90c9e950c0de Merge tag 'for-linus-5.17a-rc3-tag' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=137905dc700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ee3797346aa03884
+dashboard link: https://syzkaller.appspot.com/bug?extid=7295389ef2000630244b
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10801462700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135d7524700000
 
--- 
-Jens Axboe
+Bisection is inconclusive: the issue happens on the oldest tested release.
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14b09d42700000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16b09d42700000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12b09d42700000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7295389ef2000630244b@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 3605 Comm: syz-executor139 Not tainted 5.17.0-rc2-syzkaller-00353-g90c9e950c0de #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:blk_mq_clear_rq_mapping block/blk-mq.c:3061 [inline]
+RIP: 0010:blk_mq_free_rqs+0x399/0x910 block/blk-mq.c:3106
+Code: de e8 8b 83 ac fd 83 fb 3f 0f 87 04 c3 49 05 e8 5d 81 ac fd b8 00 10 00 00 89 d9 48 d3 e0 4c 01 e8 48 89 44 24 08 48 8b 04 24 <0f> b6 00 84 c0 74 08 3c 03 0f 8e bb 03 00 00 41 8b 1f 31 ff 31 ed
+RSP: 0018:ffffc900027afaf8 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: 0000000000000004 RCX: 0000000000000004
+RDX: ffff888074ef3a00 RSI: ffffffff83cbf733 RDI: 0000000000000003
+RBP: ffff888071ce6000 R08: 000000000000003f R09: ffffffff8ffbf99f
+R10: ffffffff83cbf725 R11: 0000000000000246 R12: dffffc0000000000
+R13: ffff88801a380000 R14: ffff88801a23f000 R15: 0000000000000000
+FS:  00007f894cb64700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f894cc20aa3 CR3: 0000000021f45000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ blk_mq_sched_free_rqs block/blk-mq-sched.c:629 [inline]
+ blk_mq_sched_free_rqs+0x16c/0x270 block/blk-mq-sched.c:618
+ elevator_switch_mq+0xed/0x720 block/elevator.c:600
+ blk_mq_elv_switch_none block/blk-mq.c:4445 [inline]
+ __blk_mq_update_nr_hw_queues block/blk-mq.c:4498 [inline]
+ blk_mq_update_nr_hw_queues+0x3f1/0xd30 block/blk-mq.c:4548
+ nbd_start_device+0x157/0xd10 drivers/block/nbd.c:1347
+ nbd_start_device_ioctl drivers/block/nbd.c:1397 [inline]
+ __nbd_ioctl drivers/block/nbd.c:1471 [inline]
+ nbd_ioctl+0x5f3/0xb10 drivers/block/nbd.c:1511
+ blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f894cbb7349
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 11 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f894cb642e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f894cc3c4e0 RCX: 00007f894cbb7349
+RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000007
+RBP: 00007f894cc091ac R08: 0000000000000002 R09: 0000000000003331
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f894cc3c4ec
+R13: 00007f894cb642f0 R14: 00007f894cc3c4e8 R15: 0000000000000002
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:blk_mq_clear_rq_mapping block/blk-mq.c:3061 [inline]
+RIP: 0010:blk_mq_free_rqs+0x399/0x910 block/blk-mq.c:3106
+Code: de e8 8b 83 ac fd 83 fb 3f 0f 87 04 c3 49 05 e8 5d 81 ac fd b8 00 10 00 00 89 d9 48 d3 e0 4c 01 e8 48 89 44 24 08 48 8b 04 24 <0f> b6 00 84 c0 74 08 3c 03 0f 8e bb 03 00 00 41 8b 1f 31 ff 31 ed
+RSP: 0018:ffffc900027afaf8 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: 0000000000000004 RCX: 0000000000000004
+RDX: ffff888074ef3a00 RSI: ffffffff83cbf733 RDI: 0000000000000003
+RBP: ffff888071ce6000 R08: 000000000000003f R09: ffffffff8ffbf99f
+R10: ffffffff83cbf725 R11: 0000000000000246 R12: dffffc0000000000
+R13: ffff88801a380000 R14: ffff88801a23f000 R15: 0000000000000000
+FS:  00007f894cb64700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f894cc20aa3 CR3: 0000000021f45000 CR4: 0000000000350ef0
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	e8 8b 83 ac fd       	callq  0xfdac8390
+   5:	83 fb 3f             	cmp    $0x3f,%ebx
+   8:	0f 87 04 c3 49 05    	ja     0x549c312
+   e:	e8 5d 81 ac fd       	callq  0xfdac8170
+  13:	b8 00 10 00 00       	mov    $0x1000,%eax
+  18:	89 d9                	mov    %ebx,%ecx
+  1a:	48 d3 e0             	shl    %cl,%rax
+  1d:	4c 01 e8             	add    %r13,%rax
+  20:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+  25:	48 8b 04 24          	mov    (%rsp),%rax
+* 29:	0f b6 00             	movzbl (%rax),%eax <-- trapping instruction
+  2c:	84 c0                	test   %al,%al
+  2e:	74 08                	je     0x38
+  30:	3c 03                	cmp    $0x3,%al
+  32:	0f 8e bb 03 00 00    	jle    0x3f3
+  38:	41 8b 1f             	mov    (%r15),%ebx
+  3b:	31 ff                	xor    %edi,%edi
+  3d:	31 ed                	xor    %ebp,%ebp
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
