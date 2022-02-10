@@ -2,293 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCFDC4321E
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 13:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A72BC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 13:57:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242072AbiBJNSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 08:18:00 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48944 "EHLO
+        id S242520AbiBJN5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 08:57:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242071AbiBJNR5 (ORCPT
+        with ESMTP id S242522AbiBJN5M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 08:17:57 -0500
-Received: from mta-01.yadro.com (mta-02.yadro.com [89.207.88.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC881F7;
-        Thu, 10 Feb 2022 05:17:56 -0800 (PST)
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id E9CA04755B;
-        Thu, 10 Feb 2022 13:09:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        content-type:content-type:content-transfer-encoding:mime-version
-        :references:in-reply-to:x-mailer:message-id:date:date:subject
-        :subject:from:from:received:received:received; s=mta-01; t=
-        1644498547; x=1646312948; bh=9kSU/I5H2WBh0fkpjBAEh3bUyaugKITtigP
-        hDtO9uV0=; b=Ttqqi1I2XyE72hhU9obSMU1w4EbvG+AKHVioG0b8NVDTekSFX52
-        Kk11Hpe7PLsQ/rdudLqj9xI5qAsLYeKlxOMDFP7ewtxz05bxNGVWFewLJ5kDlrMo
-        Vq4Dfi8X4XBMW6gZkXgORG5Lr1aUfc0+g+X1mucvqtdY3B3QFf/KW+HI=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ONqGzW73ilEK; Thu, 10 Feb 2022 16:09:07 +0300 (MSK)
-Received: from T-EXCH-04.corp.yadro.com (t-exch-04.corp.yadro.com [172.17.100.104])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 6E34341846;
-        Thu, 10 Feb 2022 16:09:07 +0300 (MSK)
-Received: from localhost.localdomain (10.178.114.63) by
- T-EXCH-04.corp.yadro.com (172.17.100.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
- 15.1.669.32; Thu, 10 Feb 2022 16:09:04 +0300
-From:   "Alexander V. Buev" <a.buev@yadro.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <io-uring@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>,
-        "Alexander V. Buev" <a.buev@yadro.com>
-Subject: [PATCH v2 1/3] block: bio-integrity: add PI iovec to bio
-Date:   Thu, 10 Feb 2022 16:08:23 +0300
-Message-ID: <20220210130825.657520-2-a.buev@yadro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220210130825.657520-1-a.buev@yadro.com>
-References: <20220210130825.657520-1-a.buev@yadro.com>
+        Thu, 10 Feb 2022 08:57:12 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95201CEA
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 05:57:13 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id d187so10339430pfa.10
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 05:57:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=qVzYl3RlPID/1J9EWvCP0Ca8Qcit/GaDc2G90eYSD+Y=;
+        b=LKl4z5JRyaO+PUQiRs9JHd7OdFbbp52Lv8apqasXRv4aStNfB+l4IFQQVUlXc28apu
+         uh9mhThuVQTf3LXVfbdwp3kjdP2leon4kcPp1St8klcjimLjOwz14ITEGliL/dygvA+v
+         KrhDCsvRuDYMHL765CS/jHpsU/FCvpZiRQidxahdxxqdY4sWTSLUzB0RvTRcLTjkEJqD
+         TGs4vUkfS8JHQwp1/wNIR0enaaLEKxTSUmqYYAUJmQrl3AU6bC6wZjdcxDYW7+r2FC6A
+         66e9wgUCfNaHEYIXOyXBuV0oj8SpS3CZzh7iUyIFPaK7uA2zVr9iYVnRzqnjvkk+l1tw
+         nY8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qVzYl3RlPID/1J9EWvCP0Ca8Qcit/GaDc2G90eYSD+Y=;
+        b=5oAM2gdo2z2q/49P/FUzfGZd7CDyYECWqJiZxj7sAf8Mvf+XS6c3kB93+8qUEdzDEH
+         dWyYiYOwyvNkXrU1msF9BS+Z268PEP8lr2zvLbOrbhA97R18AbuYqPiIYGMee8Hb7fSO
+         Yhe82H0n+76wuw3v6JhPL4fdA1i4rBOmwgDcT1Cmj34zJAx+VudzyRZIhUWVHRUucbBv
+         04S0wkXFA/CcKkh+B8ets17uZ4vlOLdVot/+UJ6N22OATl0X0elDd3LOGNNLP9bfMfVL
+         wS+lpgpqISjgnGHswrZjR7Zj0VZYtmkQxix86/WClDfP/OxatwPaxnCUIfbVdXRwY1ln
+         KsxQ==
+X-Gm-Message-State: AOAM5317McktcFe4QsplYH8jMlWy63KCVov7L0ZjzuOpsdRYo3+Vs/E3
+        QsuwJeg3e2mdb7xinFyNpJWgMQ==
+X-Google-Smtp-Source: ABdhPJw1FKxiTUNd0OpgPlNdACQm6dz2Y0aIO/DgWrV1QOf113ghOARQTDstU8K9fNFH7D7b1ObIsw==
+X-Received: by 2002:a65:4c43:: with SMTP id l3mr6228379pgr.494.1644501432971;
+        Thu, 10 Feb 2022 05:57:12 -0800 (PST)
+Received: from [192.168.1.116] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id o9sm20902431pfw.86.2022.02.10.05.57.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Feb 2022 05:57:12 -0800 (PST)
+Subject: Re: [GIT PULL] nvme fixes for Linux 5.17
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YgTB0csAbKyI5WvN@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d165d411-4499-12aa-fb59-05ff1e2faaa2@kernel.dk>
+Date:   Thu, 10 Feb 2022 06:57:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.178.114.63]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-04.corp.yadro.com (172.17.100.104)
+In-Reply-To: <YgTB0csAbKyI5WvN@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Added functions to attach user PI iovec pages to bio
-and release this pages via bio_integrity_free.
+On 2/10/22 12:42 AM, Christoph Hellwig wrote:
+> The following changes since commit b13e0c71856817fca67159b11abac350e41289f5:
+> 
+>   block: bio-integrity: Advance seed correctly for larger interval sizes (2022-02-03 21:09:24 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-5.17-2022-02-10
 
-Signed-off-by: Alexander V. Buev <a.buev@yadro.com>
----
- block/bio-integrity.c | 151 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/bio.h   |   8 +++
- 2 files changed, 159 insertions(+)
+Pulled, thanks.
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 0827b19820c5..8e57aea9c9eb 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -10,6 +10,7 @@
- #include <linux/mempool.h>
- #include <linux/export.h>
- #include <linux/bio.h>
-+#include <linux/uio.h>
- #include <linux/workqueue.h>
- #include <linux/slab.h>
- #include "blk.h"
-@@ -91,6 +92,19 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
- }
- EXPORT_SYMBOL(bio_integrity_alloc);
- 
-+void bio_integrity_release_pages(struct bio *bio)
-+{
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
-+	unsigned short i;
-+
-+	for (i = 0; i < bip->bip_vcnt; ++i) {
-+		struct bio_vec *bv;
-+
-+		bv = bip->bip_vec + i;
-+		put_page(bv->bv_page);
-+	}
-+}
-+
- /**
-  * bio_integrity_free - Free bio integrity payload
-  * @bio:	bio containing bip to be freed
-@@ -105,6 +119,10 @@ void bio_integrity_free(struct bio *bio)
- 
- 	if (bip->bip_flags & BIP_BLOCK_INTEGRITY)
- 		kfree(bvec_virt(bip->bip_vec));
-+	else {
-+		if (bip->bip_flags & BIP_RELEASE_PAGES)
-+			bio_integrity_release_pages(bio);
-+	}
- 
- 	__bio_integrity_free(bs, bip);
- 	bio->bi_integrity = NULL;
-@@ -377,6 +395,139 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
- 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
- }
- 
-+static inline
-+struct page **__bio_integrity_temp_pages(struct bio *bio, unsigned int nr_needed_page)
-+{
-+	struct page **pages = 0;
-+	unsigned int nr_avail_page;
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
-+
-+	if (bip->bip_max_vcnt > nr_needed_page) {
-+		nr_avail_page = (bip->bip_max_vcnt - nr_needed_page) *
-+			sizeof(struct bio_vec)/sizeof(struct page *);
-+	} else
-+		nr_avail_page = 0;
-+
-+	if (nr_avail_page >= nr_needed_page)
-+		pages = (struct page **) (bip->bip_vec + nr_needed_page);
-+	else {
-+		if (bio->bi_max_vecs - bio->bi_vcnt) {
-+			nr_avail_page = (bio->bi_max_vecs - bio->bi_vcnt) *
-+				sizeof(struct bio_vec)/sizeof(struct page *);
-+			if (nr_avail_page >= nr_needed_page)
-+				pages = (struct page **) (bio->bi_io_vec + bio->bi_vcnt);
-+		}
-+	}
-+
-+	return pages;
-+}
-+
-+/**
-+ * bio_integrity_add_iovec - Add PI io vector
-+ * @bio:	bio whose integrity vector to update
-+ * @pi_iter:	iov_iter pointed to data added to @bio's integrity
-+ *
-+ * Description: Pins pages for *pi_iov and appends them to @bio's integrity.
-+ */
-+int bio_integrity_add_iovec(struct bio *bio, struct iov_iter *pi_iter)
-+{
-+	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
-+	struct bio_integrity_payload *bip;
-+	struct page **pi_page = 0, **bio_page;
-+	unsigned int nr_vec_page, intervals;
-+	int ret;
-+	ssize_t size;
-+	size_t offset, len, pg_num, page_count;
-+
-+	if (unlikely(!bi && bi->tuple_size && bi->interval_exp)) {
-+		pr_err("Device is not integrity capable");
-+		return -EINVAL;
-+	}
-+
-+	intervals = bio_integrity_intervals(bi, bio_sectors(bio));
-+	if (unlikely(intervals * bi->tuple_size < pi_iter->count)) {
-+		pr_err("Intervals number is wrong, intervals=%u, tuple_size=%u, pi_len=%zu",
-+			intervals, bi->tuple_size, pi_iter->count);
-+		return -EINVAL;
-+	}
-+
-+	nr_vec_page = (pi_iter->count + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	/* data of size N pages can be pinned to N+1 page */
-+	nr_vec_page += 1;
-+
-+	bip = bio_integrity_alloc(bio, GFP_NOIO, nr_vec_page);
-+	if (IS_ERR(bip))
-+		return PTR_ERR(bip);
-+
-+	/* get space for page pointers array */
-+	bio_page = __bio_integrity_temp_pages(bio, nr_vec_page);
-+
-+	if (likely(bio_page))
-+		pi_page = bio_page;
-+	else {
-+		pi_page = kcalloc(nr_vec_page, sizeof(struct pi_page *), GFP_NOIO);
-+		if (!pi_page) {
-+			ret = -ENOMEM;
-+			goto error;
-+		}
-+	}
-+
-+	bip->bip_iter.bi_size = pi_iter->count;
-+	bip->bio_iter = bio->bi_iter;
-+	bip_set_seed(bip, bio->bi_iter.bi_sector);
-+
-+	if (bi->flags & BLK_INTEGRITY_IP_CHECKSUM)
-+		bip->bip_flags |= BIP_IP_CHECKSUM;
-+
-+	size = iov_iter_get_pages(pi_iter, pi_page, LONG_MAX, nr_vec_page, &offset);
-+	if (unlikely(size <= 0)) {
-+		pr_err("Failed to pin PI buffer to page (%zi)", size);
-+		ret = (size) ? size : -EFAULT;
-+		goto error;
-+	}
-+
-+	/* calc count of pined pages */
-+	if (size > (PAGE_SIZE - offset))
-+		page_count = DIV_ROUND_UP(size - (PAGE_SIZE - offset), PAGE_SIZE) + 1;
-+	else
-+		page_count = 1;
-+
-+	/* fill bio integrity biovecs the given pages */
-+	len = pi_iter->count;
-+	for (pg_num = 0; pg_num < page_count; ++pg_num) {
-+		size_t page_len;
-+
-+		page_len = PAGE_SIZE - offset;
-+		if (page_len > len)
-+			page_len = len;
-+		ret = bio_integrity_add_page(bio, pi_page[pg_num], page_len, offset);
-+		if (unlikely(ret != page_len)) {
-+			ret = -ENOMEM;
-+			goto error;
-+		}
-+		len -= page_len;
-+		offset = 0;
-+		bip->bip_flags |= BIP_RELEASE_PAGES;
-+	}
-+
-+	iov_iter_advance(pi_iter, size);
-+
-+	if (pi_page != bio_page)
-+		kfree(pi_page);
-+
-+	return 0;
-+
-+error:
-+	if (bio_integrity(bio))
-+		bio_integrity_free(bio);
-+
-+	if (pi_page && pi_page != bio_page)
-+		kfree(pi_page);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(bio_integrity_add_iovec);
-+
- /**
-  * bio_integrity_trim - Trim integrity vector
-  * @bio:	bio whose integrity vector to update
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 117d7f248ac9..ce008eeeb160 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -317,6 +317,7 @@ enum bip_flags {
- 	BIP_CTRL_NOCHECK	= 1 << 2, /* disable HBA integrity checking */
- 	BIP_DISK_NOCHECK	= 1 << 3, /* disable disk integrity checking */
- 	BIP_IP_CHECKSUM		= 1 << 4, /* IP checksum */
-+	BIP_RELEASE_PAGES	= 1 << 5, /* release pages after io completion */
- };
- 
- /*
-@@ -707,6 +708,7 @@ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, un
- extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
- extern bool bio_integrity_prep(struct bio *);
- extern void bio_integrity_advance(struct bio *, unsigned int);
-+extern int bio_integrity_add_iovec(struct bio *bio, struct iov_iter *iter);
- extern void bio_integrity_trim(struct bio *);
- extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
- extern int bioset_integrity_create(struct bio_set *, int);
-@@ -747,6 +749,12 @@ static inline void bio_integrity_advance(struct bio *bio,
- 	return;
- }
- 
-+static inline int bio_integrity_add_iovec(struct bio *bio,
-+					struct iov_iter *pi_iter)
-+{
-+	return 0;
-+}
-+
- static inline void bio_integrity_trim(struct bio *bio)
- {
- 	return;
 -- 
-2.34.1
+Jens Axboe
 
