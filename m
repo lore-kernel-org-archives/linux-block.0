@@ -2,123 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C21BC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 22:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC40EC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 22:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345003AbiBJWii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 17:38:38 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57440 "EHLO
+        id S1345012AbiBJWij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 17:38:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238352AbiBJWii (ORCPT
+        with ESMTP id S238352AbiBJWij (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 17:38:38 -0500
+        Thu, 10 Feb 2022 17:38:39 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1B262664
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 14:38:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A37E92664
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 14:38:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644532716;
+        s=mimecast20190719; t=1644532718;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=5zsO3Fp/ELwIYD28/txcroKMAxj9kdpSixyYpBN1Xrw=;
-        b=X5dfXb+x7RCXoWE3bLGEpoaiP1sGUpUmgRTokWGXDHN26S3MxiJkocKtVatPrkfpw7SAal
-        tGKElTBnk3uV3aS4LjtHZYndIHics6JagJqfNPcXK7VhuwgzabNlLep/g08oGhsWWlMspt
-        +cvGSnL9UFM10ta+Q3EGnCsc2PlQaDY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=gASqrtvOszXul4kd0cd64/f9seYYh7m9E4wnSmr4aF8=;
+        b=WWDbVzTFf03vSHz9eFdBbUtQJEm4iUXd/HnNl78QJXZLHciPBeDk5O0pYKhFB9hzM44P8f
+        cc9l8EmHKHD3b/QBhGNBBtCg+7MCoUPHMLb2EmrJKtyvz6ZEFqF7l4Shd1DrChVJw/0P5w
+        mMjPoliec/OeLmQY96H+c/oOCBuDSPI=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-468-7NO-Zn2xNWyygJytZSbbvg-1; Thu, 10 Feb 2022 17:38:34 -0500
-X-MC-Unique: 7NO-Zn2xNWyygJytZSbbvg-1
-Received: by mail-qk1-f198.google.com with SMTP id z1-20020ae9f441000000b00507a22b2d00so4571958qkl.8
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 14:38:34 -0800 (PST)
+ us-mta-582-XIfGEU_9N-6Fy6cx7umvDA-1; Thu, 10 Feb 2022 17:38:37 -0500
+X-MC-Unique: XIfGEU_9N-6Fy6cx7umvDA-1
+Received: by mail-qv1-f71.google.com with SMTP id du13-20020a05621409ad00b0042c2949e2c1so4990692qvb.19
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 14:38:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=5zsO3Fp/ELwIYD28/txcroKMAxj9kdpSixyYpBN1Xrw=;
-        b=s4e2XF50iXVaxSkiXqR0KLOFrsq9J/Q/MCmeNnFN/vX+F5MkqPJpda9JZO5B2pjInh
-         5T1W9ATLjEm8WbERIVZZQwjpsLKRg20BqXiAkO/vUxPEsQm5AlYoOrvtTpDiVaeORCnX
-         ygJ7qxDMlG+9Y3cIO/j9Y3wnyr5Z7mBXr7EYkpxDTxk9N3Yi1Hbiu6XGgik0clf/HwoD
-         xDOxDN5lx9Z0xjc96i1HRj+rw1/fIBtaiSamLJ/qbhA9saX/Wr+3af5uuiMDpmiFbjtp
-         jBc477vzJTCBX/nmODQ4ybZbp4ErjPcFqmelHyR8xdvNbsJkJmplDsPWWO2aiwGVa3lR
-         Oqjg==
-X-Gm-Message-State: AOAM533TuCA7dfyAtI+JN9oS87O9AlQrgtz+ADuS8+CEil0bHpsvJ1Gq
-        cVeODjr2aA4xolq5Z+rZZVqI+uVMrYmG8ZckadGqK0sVnnfxblpvDUcqIfwPniVefWfPN0RiJRv
-        gBJUDFAHC5ag5W2RLod/m9Q==
-X-Received: by 2002:ad4:5b83:: with SMTP id 3mr6625810qvp.103.1644532714152;
-        Thu, 10 Feb 2022 14:38:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwZUXcOQHDRnivoNe930Kbl9CSrwP87HKASyNcGBndoZSfIJ5t7gykPiUrhOnJ90EtUlhGs5A==
-X-Received: by 2002:ad4:5b83:: with SMTP id 3mr6625803qvp.103.1644532713898;
-        Thu, 10 Feb 2022 14:38:33 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=gASqrtvOszXul4kd0cd64/f9seYYh7m9E4wnSmr4aF8=;
+        b=q17LQf8obUKQebXVmcgNyv4QhIxZldKbFbqDXeZeVd2898yvF06+54x8fq4CzaLL3V
+         uR1oeXEOyHQoYzuJjjiVxVe5pY5INgTkSFep+3P550Jv/7fNuAh5/n1aif2x6I3yedp5
+         mZTb2uX7cLki1b2ML0J2/CEIVhAH8iiVNf+mRO7uVfwWOhDUsFGqwl1xOtpmHXhBn+7/
+         ikNOoq4j1UM5taMCJ80KGGNFv7YfyKPd3sJ20Rlg6E8N12PoEqzLo8q1zwVf2fdxCLag
+         n9qTGgR/Wgf63VV/OtW6bpQfPmH9FYRTSUCnclZDEgo9AMxyFn5RLO8Ueqg7EOMcv4iV
+         twxg==
+X-Gm-Message-State: AOAM530Rzw7EL8bmMyF59EWuyqTCrPj8D7dBrDmJJcJ5nDa5p7cTIx0R
+        WwQDq7byc8sslEwEwexBuZ08EfM6Eu/MH6HwDXFxXZbpOz+iroBtQHC4uGOe2XDx+opKq2Xzqyb
+        PIpodQ5qYLL5j5wbyqK1z7Q==
+X-Received: by 2002:a05:6214:262a:: with SMTP id gv10mr6836043qvb.98.1644532717061;
+        Thu, 10 Feb 2022 14:38:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzshop5rhMcKKQyyYkS5tpUkVizfBc4b1Us/DFjfwBMEjhEWnkmSha5lLdwwyHGYJ/E/eeeTw==
+X-Received: by 2002:a05:6214:262a:: with SMTP id gv10mr6836035qvb.98.1644532716895;
+        Thu, 10 Feb 2022 14:38:36 -0800 (PST)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id b10sm11641506qtb.34.2022.02.10.14.38.33
+        by smtp.gmail.com with ESMTPSA id y15sm10527083qko.133.2022.02.10.14.38.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 14:38:33 -0800 (PST)
+        Thu, 10 Feb 2022 14:38:36 -0800 (PST)
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     dm-devel@redhat.com
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 00/14] dm: improve bio-based IO accounting
-Date:   Thu, 10 Feb 2022 17:38:18 -0500
-Message-Id: <20220210223832.99412-1-snitzer@redhat.com>
+Subject: [PATCH 02/14] dm: fold __clone_and_map_data_bio into __split_and_process_bio
+Date:   Thu, 10 Feb 2022 17:38:20 -0500
+Message-Id: <20220210223832.99412-3-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
+In-Reply-To: <20220210223832.99412-1-snitzer@redhat.com>
+References: <20220210223832.99412-1-snitzer@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Fold __clone_and_map_data_bio into its only caller.
 
-All the changes from this patchset are available here:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.18
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+---
+ drivers/md/dm.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
 
-This work is based on Jens' for-5.18/block
-
-For the linux-block crowd, I'm spamming you purely to seek review of
-the last patch in this patchset (but welcome review of the entire set
-if you're willing). Given all the DM changes that precede the last
-block patch I'd appreciate review so it can be merged for 5.18 via
-linux-dm.git.
-
-DM is the only consumer of the recently added bio_start_io_acct_time
-that the last patch enhances and renames to bio_start_io_acct_remapped
-
-This patchset's primary purpose is to add the dm_submit_bio_remap()
-interface to improve the bio-based IO accounting for DM targets that
-take ownership of bios and use their own workqueues to process/remap
-and later submit the bios.
-
-Motivation is to fix the relatively useless nature of dm-crypt's
-buffered IO stats.  DM core shouldn't immediately start IO accounting
-for bios that dm-crypt goes on to queue in workqueues. The IO should
-only have its IO started once submitted.  Otherwise the iostats for
-dm-crypt just looks like an upfront flood of IO but then offer little
-indication that anything is happening.  Given dm-crypt's cpu intensive
-nature it takes time to complete IO but unless you look at the
-underlying devices' iostats you wouldn't see it occurring.
-
-Mike
-
-Mike Snitzer (14):
-  dm: rename split functions
-  dm: fold __clone_and_map_data_bio into __split_and_process_bio
-  dm: refactor dm_split_and_process_bio a bit
-  dm: reduce code duplication in __map_bio
-  dm: remove impossible BUG_ON in __send_empty_flush
-  dm: remove unused mapped_device argument from free_tio
-  dm: remove code only needed before submit_bio recursion
-  dm: record old_sector in dm_target_io before calling map function
-  dm: prep for following changes
-  dm: add dm_submit_bio_remap interface
-  dm crypt: use dm_submit_bio_remap
-  dm delay: dm_submit_bio_remap
-  dm: improve correctness and efficiency of bio-based IO accounting
-  block: add bio_start_io_acct_remapped for the benefit of DM
-
- block/blk-core.c              |  24 ++---
- drivers/md/dm-core.h          |   4 +-
- drivers/md/dm-crypt.c         |   7 +-
- drivers/md/dm-delay.c         |   3 +-
- drivers/md/dm.c               | 224 ++++++++++++++++++++++--------------------
- include/linux/blkdev.h        |  16 ++-
- include/linux/device-mapper.h |   7 ++
- 7 files changed, 156 insertions(+), 129 deletions(-)
-
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 2cecb8832936..2f1942b61d48 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1188,25 +1188,6 @@ static void bio_setup_sector(struct bio *bio, sector_t sector, unsigned len)
+ 	bio->bi_iter.bi_size = to_bytes(len);
+ }
+ 
+-/*
+- * Creates a bio that consists of range of complete bvecs.
+- */
+-static int __clone_and_map_data_bio(struct clone_info *ci, struct dm_target *ti,
+-				    sector_t sector, unsigned *len)
+-{
+-	struct bio *bio = ci->bio, *clone;
+-
+-	clone = alloc_tio(ci, ti, 0, len, GFP_NOIO);
+-	bio_advance(clone, to_bytes(sector - clone->bi_iter.bi_sector));
+-	clone->bi_iter.bi_size = to_bytes(*len);
+-
+-	if (bio_integrity(bio))
+-		bio_integrity_trim(clone);
+-
+-	__map_bio(clone);
+-	return 0;
+-}
+-
+ static void alloc_multiple_bios(struct bio_list *blist, struct clone_info *ci,
+ 				struct dm_target *ti, unsigned num_bios,
+ 				unsigned *len)
+@@ -1361,6 +1342,7 @@ static bool __process_abnormal_io(struct clone_info *ci, struct dm_target *ti,
+  */
+ static int __split_and_process_bio(struct clone_info *ci)
+ {
++	struct bio *clone;
+ 	struct dm_target *ti;
+ 	unsigned len;
+ 	int r;
+@@ -1374,9 +1356,13 @@ static int __split_and_process_bio(struct clone_info *ci)
+ 
+ 	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
+ 
+-	r = __clone_and_map_data_bio(ci, ti, ci->sector, &len);
+-	if (r < 0)
+-		return r;
++	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
++	bio_advance(clone, to_bytes(ci->sector - clone->bi_iter.bi_sector));
++	clone->bi_iter.bi_size = to_bytes(len);
++	if (bio_integrity(clone))
++		bio_integrity_trim(clone);
++
++	__map_bio(clone);
+ 
+ 	ci->sector += len;
+ 	ci->sector_count -= len;
 -- 
 2.15.0
 
