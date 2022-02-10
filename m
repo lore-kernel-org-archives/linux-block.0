@@ -2,110 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30185C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 19:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C21BC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 22:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235577AbiBJTel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 14:34:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44130 "EHLO
+        id S1345003AbiBJWii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 17:38:38 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245360AbiBJTel (ORCPT
+        with ESMTP id S238352AbiBJWii (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 14:34:41 -0500
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 681A4E61
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:34:41 -0800 (PST)
-Received: by mail-qt1-x835.google.com with SMTP id g4so5864137qto.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 11:34:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:content-transfer-encoding:mime-version:subject:message-id:date
-         :cc:to;
-        bh=Nkl51yYf/EKhGstFPpzBrtWqnV5GN775dSpin1RK3UE=;
-        b=WNY5d5ME1mlUXyTWD6sK18mEZKD+vsTIMpBeQSFlhk8Fvo+Am7EqNZpVWhkd/Pu4pc
-         tRK3y66AjiVZSit/4HAFgM5IDZZVLnxngOJHbYxygMNYSXmhsbI5LEts+LrrY1E0Lp1K
-         93vshHkvHYlnogalgr2VymZvuIAINY0APwV2lL98gLjSjPgQdUQKmSNg3uRXwwTu0j8R
-         rHBt88/5vQyyanJwD4fKUwGPk9J3kaHQUobuUtyXouqCOjb1vlb4qiqZiahZmYIFEvnM
-         OdaA7cPKxgmgYLCdGjNaN2ZJlsBkUqZ2T8gOnn3vRuDFbQVidACAN5Xb93uOKeS4gu/W
-         Ad7w==
+        Thu, 10 Feb 2022 17:38:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1B262664
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 14:38:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644532716;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=5zsO3Fp/ELwIYD28/txcroKMAxj9kdpSixyYpBN1Xrw=;
+        b=X5dfXb+x7RCXoWE3bLGEpoaiP1sGUpUmgRTokWGXDHN26S3MxiJkocKtVatPrkfpw7SAal
+        tGKElTBnk3uV3aS4LjtHZYndIHics6JagJqfNPcXK7VhuwgzabNlLep/g08oGhsWWlMspt
+        +cvGSnL9UFM10ta+Q3EGnCsc2PlQaDY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-468-7NO-Zn2xNWyygJytZSbbvg-1; Thu, 10 Feb 2022 17:38:34 -0500
+X-MC-Unique: 7NO-Zn2xNWyygJytZSbbvg-1
+Received: by mail-qk1-f198.google.com with SMTP id z1-20020ae9f441000000b00507a22b2d00so4571958qkl.8
+        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 14:38:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:content-transfer-encoding:mime-version
-         :subject:message-id:date:cc:to;
-        bh=Nkl51yYf/EKhGstFPpzBrtWqnV5GN775dSpin1RK3UE=;
-        b=dSNZ+jA279iIMnQ1j2e3U9eeRsbURuZbbO2Mbq19V/krltK3mxaNCC1l+fBMWdK2HY
-         NCqVjRM79w9XSs++WnaDk2+in3Md9cp7Gd/70iALRRIa18Yo9uSDEXwGBz+6g/Tjg4IW
-         Jksb7e1smJSYj4OljntUNbwjQWbTHpg5cW/quWwb6Lzy8NdBbfMHGEoCtH/vd2oui9D1
-         jjibk0RU9CZ55tXZPrcHTAGwsGOmszEaCbR1PMbKzL0b0BITouBO9STGjuFSKgxoJICJ
-         oV3yjAlBUKqcdJpGBO8Jm9nVEge83BgsJEECNxTtamBkii/p1lEN/4x2whqoy34BT+FE
-         V5Bg==
-X-Gm-Message-State: AOAM533GgumKRVsqa2svzv0Ucfchl+q7lfOAMYWlBfcOn3gRcqfhTo0Q
-        38FNO3IT6Uw1j5KGXpx4oZnyZWTxygGeofn5
-X-Google-Smtp-Source: ABdhPJxCaQNdrxnnNrnO3nmn9K0NNHI1oDAUnu+Zc0f4BAcJ0cTVFx+DqI3jPR33HCdZlO4WMvqsyw==
-X-Received: by 2002:ac8:5896:: with SMTP id t22mr6043234qta.613.1644521680580;
-        Thu, 10 Feb 2022 11:34:40 -0800 (PST)
-Received: from smtpclient.apple ([2600:1700:42f0:6600:cd8a:8634:7b18:da1e])
-        by smtp.gmail.com with ESMTPSA id n19sm1503518qtk.66.2022.02.10.11.34.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Feb 2022 11:34:40 -0800 (PST)
-From:   "Viacheslav A.Dubeyko" <viacheslav.dubeyko@bytedance.com>
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: [LSF/MM/BPF TOPIC] File system synthesis inside of computational
- storage
-Message-Id: <A7928480-2F5C-4BCD-B8E8-62E2AA5FCD8A@bytedance.com>
-Date:   Thu, 10 Feb 2022 11:34:38 -0800
-Cc:     Viacheslav Dubeyko <slava@dubeyko.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-To:     lsf-pc@lists.linux-foundation.org
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=5zsO3Fp/ELwIYD28/txcroKMAxj9kdpSixyYpBN1Xrw=;
+        b=s4e2XF50iXVaxSkiXqR0KLOFrsq9J/Q/MCmeNnFN/vX+F5MkqPJpda9JZO5B2pjInh
+         5T1W9ATLjEm8WbERIVZZQwjpsLKRg20BqXiAkO/vUxPEsQm5AlYoOrvtTpDiVaeORCnX
+         ygJ7qxDMlG+9Y3cIO/j9Y3wnyr5Z7mBXr7EYkpxDTxk9N3Yi1Hbiu6XGgik0clf/HwoD
+         xDOxDN5lx9Z0xjc96i1HRj+rw1/fIBtaiSamLJ/qbhA9saX/Wr+3af5uuiMDpmiFbjtp
+         jBc477vzJTCBX/nmODQ4ybZbp4ErjPcFqmelHyR8xdvNbsJkJmplDsPWWO2aiwGVa3lR
+         Oqjg==
+X-Gm-Message-State: AOAM533TuCA7dfyAtI+JN9oS87O9AlQrgtz+ADuS8+CEil0bHpsvJ1Gq
+        cVeODjr2aA4xolq5Z+rZZVqI+uVMrYmG8ZckadGqK0sVnnfxblpvDUcqIfwPniVefWfPN0RiJRv
+        gBJUDFAHC5ag5W2RLod/m9Q==
+X-Received: by 2002:ad4:5b83:: with SMTP id 3mr6625810qvp.103.1644532714152;
+        Thu, 10 Feb 2022 14:38:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwZUXcOQHDRnivoNe930Kbl9CSrwP87HKASyNcGBndoZSfIJ5t7gykPiUrhOnJ90EtUlhGs5A==
+X-Received: by 2002:ad4:5b83:: with SMTP id 3mr6625803qvp.103.1644532713898;
+        Thu, 10 Feb 2022 14:38:33 -0800 (PST)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id b10sm11641506qtb.34.2022.02.10.14.38.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Feb 2022 14:38:33 -0800 (PST)
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     dm-devel@redhat.com
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 00/14] dm: improve bio-based IO accounting
+Date:   Thu, 10 Feb 2022 17:38:18 -0500
+Message-Id: <20220210223832.99412-1-snitzer@redhat.com>
+X-Mailer: git-send-email 2.15.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi,
 
-Computational storage creates the way to offload as user data as =
-metadata processing into storage space. So, I would like to discuss the =
-feasibility of building a storage device that is capable of synthesizing =
-a file system by itself.
+All the changes from this patchset are available here:
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.18
 
-First of all, it is well known that designing and implementing a file =
-system architecture is a very time-consuming and difficult process. Also =
-this process includes a significant amount of debugging and bug fix =
-efforts. But real life and evolving technologies require much faster =
-data processing. So, file system technologies cannot satisfy the =
-challenges of real life very frequently. Generally speaking, if =
-computational storage is capable of designing and evolving file system =
-architecture under I/O load then it could be a very interesting =
-solution.
+This work is based on Jens' for-5.18/block
 
-Any machine learning approach is based on training by input data. So, =
-I/O requests can be such training data. It is possible to imagine a ML =
-engine inside of computational storage that can analyze the requests to =
-store and to retrieve the data and to build the file system=E2=80=99s =
-metadata structures on the fly. Generally speaking, computational =
-storage can implement a file system architecture inside of a storage =
-device without any preliminary development of a file system driver.
+For the linux-block crowd, I'm spamming you purely to seek review of
+the last patch in this patchset (but welcome review of the entire set
+if you're willing). Given all the DM changes that precede the last
+block patch I'd appreciate review so it can be merged for 5.18 via
+linux-dm.git.
 
-Initially, the ML engine inside of computational storage could be =
-equipped with the initial set of metadata structure primitives (array, =
-queue, bitmap, tree). By receiving I/O requests, ML engine can use at =
-first the simplest metadata structures and to gather the =
-modification/access statistics. For example, initially, it is possible =
-to use a simple array of extents to account file=E2=80=99s content =
-location. Then, with a growing amount of statistics, ML engine can =
-synthesize more sophisticated and efficient metadata structures and =
-start to use, for example, a tree that consumes existing arrays as =
-tree=E2=80=99s nodes. As a result, a file system can be constructed by =
-an ML engine taking into account the peculiarities of files=E2=80=99 =
-lifetime and workload.
+DM is the only consumer of the recently added bio_start_io_acct_time
+that the last patch enhances and renames to bio_start_io_acct_remapped
 
-Any opinions related to this crazy idea?
+This patchset's primary purpose is to add the dm_submit_bio_remap()
+interface to improve the bio-based IO accounting for DM targets that
+take ownership of bios and use their own workqueues to process/remap
+and later submit the bios.
 
-Thanks,
-Slava.
+Motivation is to fix the relatively useless nature of dm-crypt's
+buffered IO stats.  DM core shouldn't immediately start IO accounting
+for bios that dm-crypt goes on to queue in workqueues. The IO should
+only have its IO started once submitted.  Otherwise the iostats for
+dm-crypt just looks like an upfront flood of IO but then offer little
+indication that anything is happening.  Given dm-crypt's cpu intensive
+nature it takes time to complete IO but unless you look at the
+underlying devices' iostats you wouldn't see it occurring.
+
+Mike
+
+Mike Snitzer (14):
+  dm: rename split functions
+  dm: fold __clone_and_map_data_bio into __split_and_process_bio
+  dm: refactor dm_split_and_process_bio a bit
+  dm: reduce code duplication in __map_bio
+  dm: remove impossible BUG_ON in __send_empty_flush
+  dm: remove unused mapped_device argument from free_tio
+  dm: remove code only needed before submit_bio recursion
+  dm: record old_sector in dm_target_io before calling map function
+  dm: prep for following changes
+  dm: add dm_submit_bio_remap interface
+  dm crypt: use dm_submit_bio_remap
+  dm delay: dm_submit_bio_remap
+  dm: improve correctness and efficiency of bio-based IO accounting
+  block: add bio_start_io_acct_remapped for the benefit of DM
+
+ block/blk-core.c              |  24 ++---
+ drivers/md/dm-core.h          |   4 +-
+ drivers/md/dm-crypt.c         |   7 +-
+ drivers/md/dm-delay.c         |   3 +-
+ drivers/md/dm.c               | 224 ++++++++++++++++++++++--------------------
+ include/linux/blkdev.h        |  16 ++-
+ include/linux/device-mapper.h |   7 ++
+ 7 files changed, 156 insertions(+), 129 deletions(-)
+
+-- 
+2.15.0
 
