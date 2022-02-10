@@ -2,110 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FF4C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 09:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E7CC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 10:02:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235240AbiBJJTl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 04:19:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46048 "EHLO
+        id S238725AbiBJKCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 05:02:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238391AbiBJJTl (ORCPT
+        with ESMTP id S234215AbiBJKCY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 04:19:41 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D496F10B3;
-        Thu, 10 Feb 2022 01:19:41 -0800 (PST)
-Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JvWPV1Sttz9sXd;
-        Thu, 10 Feb 2022 17:18:06 +0800 (CST)
-Received: from dggpemm500002.china.huawei.com (7.185.36.229) by
- dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 10 Feb 2022 17:19:24 +0800
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 10 Feb 2022 17:19:24 +0800
-From:   Xiongfeng Wang <wangxiongfeng2@huawei.com>
-To:     <axboe@kernel.dk>, <hch@lst.de>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yuyufen@huawei.com>, <guohanjun@huawei.com>,
-        <wangxiongfeng2@huawei.com>
-Subject: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker on a non-housekeeping CPU
-Date:   Thu, 10 Feb 2022 17:35:32 +0800
-Message-ID: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Thu, 10 Feb 2022 05:02:24 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB28BE0;
+        Thu, 10 Feb 2022 02:02:25 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 775E721115;
+        Thu, 10 Feb 2022 10:02:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1644487344; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lcBtRTov0U4scR5M2Iy2myhqZeOwAIyV54RcClAbhV4=;
+        b=UVJHxaJMKmE/DO/JZe3iVbVw3GQe2kQmip1zYFYiRYyI1pZTASyk8ODPUH85ZCuqzCIWsi
+        rV6USU5SNQRHNVVtN7czjs/tg9jgYBrlYPUuVDHO/aShUUH/4xIgSIpkWiWmMUD14J4lqn
+        gHBmV7fgdq0Mk5zS8kvpWhMAHojnEdM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1644487344;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lcBtRTov0U4scR5M2Iy2myhqZeOwAIyV54RcClAbhV4=;
+        b=3uOBgMN4Wr+d5mCyhO6cp6IQhYZtOH8ULuhOgZdIotrLORbzqWHkWV4veZpJWP42oTgmJG
+        NOB6bjhLKtWqFVCQ==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 0BE01A3B97;
+        Thu, 10 Feb 2022 10:02:23 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id BEB02A05BC; Thu, 10 Feb 2022 11:02:22 +0100 (CET)
+Date:   Thu, 10 Feb 2022 11:02:22 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     NeilBrown <neilb@suse.de>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, Jan Kara <jack@suse.cz>,
+        Wu Fengguang <fengguang.wu@intel.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-doc@vger.kernel.org,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 10/11] block/bfq-iosched.c: use "false" rather than
+ "BLK_RW_ASYNC"
+Message-ID: <20220210100222.f2nmwwb5pcfmejvw@quack3.lan>
+References: <164447124918.23354.17858831070003318849.stgit@noble.brown>
+ <164447147264.23354.2763356897218946255.stgit@noble.brown>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500002.china.huawei.com (7.185.36.229)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <164447147264.23354.2763356897218946255.stgit@noble.brown>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
-into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
-are NOHZ_FULL CPUs and are often monopolized by the userspace process,
-such HPC application process. Any sort of interruption is not expected.
+On Thu 10-02-22 16:37:52, NeilBrown wrote:
+> bfq_get_queue() expects a "bool" for the third arg, so pass "false"
+> rather than "BLK_RW_ASYNC" which will soon be removed.
+> 
+> Acked-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: NeilBrown <neilb@suse.de>
 
-blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
-to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
-contains housekeeping CPU and non-housekeeping CPU at the same time, a
-housekeeping CPU, which want to request a IO, may schedule a worker on a
-non-housekeeping CPU. This may affect the performance of the userspace
-application running on non-housekeeping CPUs.
+Looks good. Feel free to add:
 
-So let's just schedule the worker thread on the current CPU when the
-current CPU is housekeeping CPU.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
----
- block/blk-mq.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+								Honza
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1adfe4824ef5..ff9a4bf16858 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -24,6 +24,7 @@
- #include <linux/sched/sysctl.h>
- #include <linux/sched/topology.h>
- #include <linux/sched/signal.h>
-+#include <linux/sched/isolation.h>
- #include <linux/delay.h>
- #include <linux/crash_dump.h>
- #include <linux/prefetch.h>
-@@ -2036,6 +2037,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 					unsigned long msecs)
- {
-+	int work_cpu;
-+
- 	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
- 
-@@ -2050,7 +2053,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- 		put_cpu();
- 	}
- 
--	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
-+	/*
-+	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
-+	 * CPU
-+	 */
-+	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
-+							 HK_FLAG_WQ))
-+		work_cpu = smp_processor_id();
-+	else
-+		work_cpu = blk_mq_hctx_next_cpu(hctx);
-+
-+	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
- 				    msecs_to_jiffies(msecs));
- }
- 
+> ---
+>  block/bfq-iosched.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0c612a911696..4e645ae1e066 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5448,7 +5448,7 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+>  	bfqq = bic_to_bfqq(bic, false);
+>  	if (bfqq) {
+>  		bfq_release_process_ref(bfqd, bfqq);
+> -		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic, true);
+> +		bfqq = bfq_get_queue(bfqd, bio, false, bic, true);
+>  		bic_set_bfqq(bic, bfqq, false);
+>  	}
+>  
+> 
+> 
 -- 
-2.20.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
