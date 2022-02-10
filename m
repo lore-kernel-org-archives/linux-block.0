@@ -2,69 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4802BC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 17:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB3CC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Feb 2022 19:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233034AbiBJR7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Feb 2022 12:59:01 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58128 "EHLO
+        id S1343605AbiBJTDT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Feb 2022 14:03:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245426AbiBJR7A (ORCPT
+        with ESMTP id S1343596AbiBJTDS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Feb 2022 12:59:00 -0500
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACFB72D5
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 09:59:01 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id y22so5292358eju.9
-        for <linux-block@vger.kernel.org>; Thu, 10 Feb 2022 09:59:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sECXErGkdA5AQY5nYN+swJSlC5kyNDhNurKnwALjcss=;
-        b=S3+QKdIZT/n1tuFwsWq16I65CYe2cOgZSU7RzODHtH0S4CSyemd151bfuoQBun6Hef
-         nPA+eNMbg+e1Pyr6xRY36gszEh2GuYAvZfRw8swg1iqtzZPh0dHei9TFwCKpHWcmoc5J
-         mtI8gZIYTxmSh7+ai3kmgRuPWhyf8i9QL783gupDAl6/i5pXY16WjW1JPQntecceR8oo
-         WtpovzckDYKRYiniNgBadRigw2zsU/1WyKbc8+A/c4S1ySLAELRS/zW98OJm9bgQsw8a
-         tukjSBQehu8AHzNnXhrkp6IX66o3bQ3iuHRIXD69O1PdOU7jlFaehNVucI0Z3m/6uucY
-         zxRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sECXErGkdA5AQY5nYN+swJSlC5kyNDhNurKnwALjcss=;
-        b=nkYT7yDdgy7HlYKaBrebf07R/Mrue4oFktlHLOI3Ui47HmHdyzc06wUpu1tvP3bPzC
-         +RzoxY9TRYHpRWsHSGPCtoTvgKLptzule/vZAam4T3HRICaVtTvVwbpoFoSxKs3jl9dH
-         S2s7doQygHJLitRrjwq0AJBwnpykyL0cZOWM2pGHILLbY8v2ctj78C6BV0xNDyZv7q0K
-         b9tgJzdlctthH4vZ2EvpVk8i6XKG9Yrt70AklHjnzMF0+zbwEgOMbGRpW3r7KUGdbbrs
-         Kq41eXJDfDWGOOnNumDQJ0fhCReo3iwQ1Mj9a1dBwXVRRx9+VfrFaN9SKiTfLbWiNf+W
-         n4Fw==
-X-Gm-Message-State: AOAM530uqeLEHAZcYHz6JoOE+Yi3LWN1L26Dj6zHoNRbY2Fdh2c7GxUb
-        3cRwdiX2gCJ6uTXsQN74whmCCcuTLj9F08uIl+oHykXj
-X-Google-Smtp-Source: ABdhPJyA42y0veYiF/Kt0dhVlhAhFlLrfai6PciojJPlfsRkNUOE2aBXxgxjVOGXHFtJ/+6/nZnTJK4E3pMCOpwk+n8=
-X-Received: by 2002:a17:906:7394:: with SMTP id f20mr7212489ejl.612.1644515940190;
- Thu, 10 Feb 2022 09:59:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20220205091150.6105-1-chaitanyak@nvidia.com> <20220205091150.6105-2-chaitanyak@nvidia.com>
- <YgPaO0OtJ+NhpNwX@infradead.org>
-In-Reply-To: <YgPaO0OtJ+NhpNwX@infradead.org>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Thu, 10 Feb 2022 09:58:48 -0800
-Message-ID: <CAHbLzkr+ShBzeahNnMnhMaW8zDfHsNGd-ahGa00m4GCMtd6L3g@mail.gmail.com>
-Subject: Re: [PATCH V7 1/2] block: create event class for rq completion
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Thu, 10 Feb 2022 14:03:18 -0500
+Received: from mta-01.yadro.com (mta-02.yadro.com [89.207.88.252])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48463191;
+        Thu, 10 Feb 2022 11:03:19 -0800 (PST)
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id B3AC647536;
+        Thu, 10 Feb 2022 19:03:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        in-reply-to:content-disposition:content-type:content-type
+        :mime-version:references:message-id:subject:subject:from:from
+        :date:date:received:received:received; s=mta-01; t=1644519796;
+         x=1646334197; bh=YfoHBazeBT8XZXrlGncvASdPnFAnnIpq46X6AOyi/rQ=; b=
+        ldAk3C7LIYTMAF2aJ7bEhkPpC3/5eNAS9sb9MQhroyqG9IybBB/AvLqN4I1tMTAV
+        MTcFYAwt7/JMVRaEQ3jexGcKBvsmUDhHb+z4NU8iKJW7RltZxk3B13A9C4psbt17
+        bCGrtJc8vME5RiPfqhW+8n8sAkIpIf0ipyKTBqsSxM8=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 6WystcSTyc2L; Thu, 10 Feb 2022 22:03:16 +0300 (MSK)
+Received: from T-EXCH-04.corp.yadro.com (t-exch-04.corp.yadro.com [172.17.100.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id A392C470B0;
+        Thu, 10 Feb 2022 22:03:15 +0300 (MSK)
+Received: from yadro.com (10.178.114.63) by T-EXCH-04.corp.yadro.com
+ (172.17.100.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Thu, 10
+ Feb 2022 22:03:13 +0300
+Date:   Thu, 10 Feb 2022 22:03:11 +0300
+From:   "Alexander V. Buev" <a.buev@yadro.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>
+Subject: Re: [PATCH v2 2/3] block: io_uring: add READV_PI/WRITEV_PI operations
+Message-ID: <20220210190311.driobrtfavnb7ha3@yadro.com>
+Mail-Followup-To: "Alexander V. Buev" <a.buev@yadro.com>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+        io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+References: <20220210130825.657520-1-a.buev@yadro.com>
+ <20220210130825.657520-3-a.buev@yadro.com>
+ <6d505bdc-d687-a9e7-54a1-9a2e662e9707@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <6d505bdc-d687-a9e7-54a1-9a2e662e9707@kernel.dk>
+X-Originating-IP: [10.178.114.63]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-04.corp.yadro.com (172.17.100.104)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 9, 2022 at 7:14 AM Christoph Hellwig <hch@infradead.org> wrote:
->
-> It seems a bit silly to add the even class without the second user.
->
-> But I'm fine with this if we'd just merge them together.
+> On 2/10/22 6:08 AM, Alexander V. Buev wrote:
+> > Added new READV_PI/WRITEV_PI operations to io_uring.
+> > Added new pi_addr & pi_len fields to SQE struct.
+> > Added new pi_iter field and IOCB_USE_PI flag to kiocb struct.
+> > Make corresponding corrections to io uring trace event.
+> > 
+> > +struct io_rw_pi_state {
+> > +	struct iov_iter			iter;
+> > +	struct iov_iter_state		iter_state;
+> > +	struct iovec			fast_iov[UIO_FASTIOV_PI];
+> > +};
+> > +
+> > +struct io_rw_pi {
+> > +	struct io_rw			rw;
+> > +	struct iovec			*pi_iov;
+> > +	u32				nr_pi_segs;
+> > +	struct io_rw_pi_state		*s;
+> > +};
+> 
+> One immediate issue I see here is that io_rw_pi is big, and we try very
+> hard to keep the per-command payload to 64-bytes. This would be 88 bytes
+> by my count :-/
+> 
+> Do you need everything from io_rw? If not, I'd just make io_rw_pi
+> contain the bits you need and see if you can squeeze it into the
+> existing cacheline.
 
-OK, I will merge them together. Thanks.
+In short - Yes. Current patch code call existing io_read/io_write functions.
+This functions use io_rw struct information and process this data.
+I wanted to use existing functions but may be this is wrong way in this 
+case.
+                                                                                
+The second problem with request size is that the patch adds pi_iter   
+pointer to kiocb struct. This also increase whole request union
+length.
+
+So I can see some (may be possible) solution for this: 
+
+ 1) do not store whole kiocb struct in request
+    and write fully separated io_read/write_pi functions
+
+ 2) make special CONFIG_XXX variable and simplify hide this code
+    as default
+
+Any other variants?
+
+
+
+-- 
+Alexander Buev
