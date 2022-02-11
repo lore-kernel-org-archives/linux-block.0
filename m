@@ -2,89 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5D9C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 17:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F179FC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 20:05:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351878AbiBKRC6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 12:02:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58302 "EHLO
+        id S1353164AbiBKUFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 15:05:25 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbiBKRCy (ORCPT
+        with ESMTP id S1353156AbiBKUFY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 12:02:54 -0500
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95DD8102
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 09:02:53 -0800 (PST)
-Received: by mail-io1-xd29.google.com with SMTP id d188so12153526iof.7
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 09:02:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=ekzdkokdLQymcTi9BqbUpoFHaXrlpGPqx3QS7/g6HiA=;
-        b=boZj3fRHPw7vLr1+SeUSEw/N+I7zVXm1YxrELc0on1ONG5jvJKVsQCKk/S2LUXhGo+
-         C/Jd3CkVcEGWm1VRKuiYaSmd6qi3zx5sSp6sTODMrKTyAzPZpE5oT8l9AOfwKtvapC74
-         Di8Ee+BTCNM+jwHDKqxC5lTFIFyOeOqvBRlYyErAP/lHQI0LE/QwBLs+ZzlI54a1Xom8
-         zxqrZSjgvO39KfJiyzGlseruNKmjSULGpYZFj7KmwwZWK+5wKV1IiA5MXUS4eHaMUlCO
-         51aXzVcuYgsWlwqOTQHnDGMm5kbKjyj7dmcP9Txm5ohTVJN6CAarObmZrpw0L66LAs4M
-         Im0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=ekzdkokdLQymcTi9BqbUpoFHaXrlpGPqx3QS7/g6HiA=;
-        b=nonbsKccMEREMa6vJgvrG6iv1BXbyki1PPeK8R8fni1cHE2ZBObEizw94wgt/c6Q5h
-         +0aC0TFLoQlgci1NXmjz2boyISUZjOSIk4rtJkcD0t4P9+1kDwFqfhad4ozcboAqNd/T
-         2LDbotodoFjd0IX1pGBEeXZVo7B7YmqCbzXmhl/I54sp4OrHdvDTkNdgbN6e2iN0q9i2
-         7XJgzkyMPNZ7aIvCO8UBWVUhd0YlFzfa8MRKNWgYGzv+OE1i8Zr/E9HkXgq+NSTftDZg
-         XcpZe2MrLDk0+KPTdstjmwmZMPQog/8ZAolrtdBYqQ69SlL5gzq/ZjRo7shjT33dZHSa
-         8DEw==
-X-Gm-Message-State: AOAM5336lje+gideU0vly3Cp22xM1o9ILITbjMe2GiIFHp1msJrI+q5K
-        bIIeLO/T13kIToUIi2yhcTsfxA==
-X-Google-Smtp-Source: ABdhPJw2soilQ74w2uqAn/C4r9mnikx/bzy+CB13FlWXgPghV5/PAGGqlVN2yPlE7A1DTWk/2IU3OA==
-X-Received: by 2002:a02:b1d1:: with SMTP id u17mr1322356jah.238.1644598972801;
-        Fri, 11 Feb 2022 09:02:52 -0800 (PST)
-Received: from x1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id f13sm13792996ion.18.2022.02.11.09.02.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 09:02:52 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20220211101149.2368042-1-ming.lei@redhat.com>
-References: <20220211101149.2368042-1-ming.lei@redhat.com>
-Subject: Re: [PATCH 0/3] block: cleanup cgroup
-Message-Id: <164459897210.122978.7665922634590222597.b4-ty@kernel.dk>
-Date:   Fri, 11 Feb 2022 10:02:52 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Fri, 11 Feb 2022 15:05:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA23CE6
+        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 12:05:22 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 65B31B82C8F
+        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 20:05:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA779C340ED;
+        Fri, 11 Feb 2022 20:05:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644609920;
+        bh=r+ch6Pdtea4xKaC8sqFQcHd/e2rpw1aQLtGPsfivfew=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=R7XVqNpjc4pEHngX6fQZFC5x9rff6CpKUdR7IWk+6RHv5nfXAlYjzs+nYit9lAexf
+         8aapM40IByLf+Az/ZrNMNyhISqGlU10WNq9SgzAyuzA7cIGH1SZewLmpQQpMg3x+1g
+         T8On3TKdmukldAkxHneSiCsrOMEh+G4VXfVlRs9cSHKMDaZ0Vm5A2ruIJ8RNUj2kXi
+         Z8c3Uu/R95djlR+GBbWq4g9vGgFd3XzcCc2MvQ/YrW4XsbvZSUE0AwdWxe2eE6LxZW
+         v1Brv8yzRRqQihnFEK4xVd/kNOrOes5Aij/h07M4t5aucqtx/aacAfk6hSiFyTwgnp
+         byxiK7LgHmp1g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8775E5CF96;
+        Fri, 11 Feb 2022 20:05:19 +0000 (UTC)
+Subject: Re: [GIT PULL] block changes for 5.17-rc4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <f20f0c25-503c-31d2-aa20-f1205fc5c98b@kernel.dk>
+References: <f20f0c25-503c-31d2-aa20-f1205fc5c98b@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <f20f0c25-503c-31d2-aa20-f1205fc5c98b@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-11
+X-PR-Tracked-Commit-Id: bf23747ee05320903177809648002601cd140cdd
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: cf26a2360a6e1352a9e0bebabbbcad2b92dd8c6c
+Message-Id: <164460991988.1412.6808623437008205784.pr-tracker-bot@kernel.org>
+Date:   Fri, 11 Feb 2022 20:05:19 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 11 Feb 2022 18:11:46 +0800, Ming Lei wrote:
-> The 1st two patches cleans up blk-cgroup code a bit.
-> 
-> The 3rd patch moves block layer internal definition into one private
-> header of block/blk-cgroup.h, as suggested by Christoph, and the idea
-> is that just small amount of structures & functions need to be exported,
-> and most of them are block layer internal structures and functions.
-> 
-> [...]
+The pull request you sent on Fri, 11 Feb 2022 09:49:12 -0700:
 
-Applied, thanks!
+> git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-11
 
-[1/3] block: remove THROTL_IOPS_MAX
-      commit: 0e51e2ab49a99bc5077760aa083dfa1c3bf9899b
-[2/3] block: move initialization of q->blkg_list into blkcg_init_queue
-      commit: 472e4314c039d6cf36e28783b1c63f87b5b394c2
-[3/3] block: partition include/linux/blk-cgroup.h
-      commit: 672fdcf0e7de3b1e39416ac85abf178f023271f1
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/cf26a2360a6e1352a9e0bebabbbcad2b92dd8c6c
 
-Best regards,
+Thank you!
+
 -- 
-Jens Axboe
-
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
