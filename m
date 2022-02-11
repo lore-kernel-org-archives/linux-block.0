@@ -2,90 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77202C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 12:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9150CC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 15:46:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237062AbiBKMwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 07:52:06 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52640 "EHLO
+        id S1347912AbiBKPq4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 10:46:56 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236724AbiBKMwG (ORCPT
+        with ESMTP id S234142AbiBKPqz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 07:52:06 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711F8B6B
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 04:52:04 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id ki18-20020a17090ae91200b001b8be87e9abso4133705pjb.1
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 04:52:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=iZ79BtVLU7DegA0rBBUNiSYQ+lHijlAQoaGIpVypItY=;
-        b=SqrtYeLwDjNCJVVVAs2IMD5DyTF32aBVrt3dg3FsVBEQ7ffGkzLM4ddU8CwQ/ef2S3
-         j+LEKUozhiA+6sE+ptVPcEzvd/hIwNaI71LVrlCJS/cQw5Xve7xBik6hLquhWKKoDWZn
-         Rw8f7WxHqkc4T4+iMblwBwISbKXVhACaVQMn+tcnvESxlzQGzsYob5ihht1ljbJHVxET
-         +0JZDgnV54BllAGkDFWcNxZ6969lLrgXmJ5U4YZmNFQQFNDWDzQ4XCvDc0Wek6/B6fRB
-         4twYOpQzArzHgOrZGDXOebJCe3lRpmnnZZAmhiuqt+Sy0xNMLiRhqhgFXlWTIQU6aYtb
-         X7FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=iZ79BtVLU7DegA0rBBUNiSYQ+lHijlAQoaGIpVypItY=;
-        b=GcMrt8nWTzvMpS1XJF/6xQ9t45/VrvpkeXgy1U3XNf0pjIR6I41TQhK5oprtJgSpix
-         J80fGyFTNg/fc9MhZj0EBKf0ZcZcTIggX6v6SRU+EMokVxipDbS1KGnuIlpGCZSIEOLH
-         HeIwkpOdql4w1zkrhQmd9Yan/Nm4KRPnlsbuVLaejjHmLBLXQtf+4TezKXtxSPbcgjXX
-         GznqXsDOhwmZdiL27Ayiwt07oxT+MqVlARo7w5TuvyNF1cLSl04tVivomp8EU7+zlQC8
-         v/R4K9uqVkwbJtAY67Z7hsaMRqxkTQOwWjK6rh/mQg/29bRmiqz65hSBQrrB4yO0TimV
-         gQJQ==
-X-Gm-Message-State: AOAM530mmj3Ez6N5df+tL/QpMR99uNk8ytziGNAeunfGlpRCMlH7bbQ2
-        j6yOBX1mX7zfqmSAaTwtN7lPZsrM6t+BCw==
-X-Google-Smtp-Source: ABdhPJztF0/YF3QFWAdtL+MSq14Yp01Tu9baILHQCgve/1WDZHsfFn/gyfJVY4+MBTEe3IpuJbxnyg==
-X-Received: by 2002:a17:90a:1c10:: with SMTP id s16mr203018pjs.115.1644583923850;
-        Fri, 11 Feb 2022 04:52:03 -0800 (PST)
-Received: from [192.168.1.116] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id q4sm27569071pfj.113.2022.02.11.04.52.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 04:52:03 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>,
-        kernel test robot <oliver.sang@intel.com>
-In-Reply-To: <20220211071554.3424-1-penguin-kernel@I-love.SAKURA.ne.jp>
-References: <20220211071554.3424-1-penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: Re: [PATCH for 5.17] loop: revert "make autoclear operation asynchronous"
-Message-Id: <164458392139.59442.6810114995328131315.b4-ty@kernel.dk>
-Date:   Fri, 11 Feb 2022 05:52:01 -0700
+        Fri, 11 Feb 2022 10:46:55 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B0C421F;
+        Fri, 11 Feb 2022 07:46:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644594413; x=1676130413;
+  h=message-id:subject:from:to:date:in-reply-to:references:
+   mime-version:content-transfer-encoding;
+  bh=pVxiaW+vV0quQ79sfEqbYXTjlLZHvVBgUsqT5Tk+lEY=;
+  b=T9CM3fi5XzxOKxmxDDFxrwCZ/7XfVh0QsmL3voYJQZylHhHJ880b8Shx
+   koP20RAuzPuMChRyjBfHKqZo8dMi60p4EXh2GdWDbwz2pjyOynj31LLs1
+   pAns0uY0l4hUcBuVqJoSDfM4WF6G8+ew4Pt1RGP3f6/Zd3BI9augt+rST
+   scynOEDC8qL0YlcakcUT2elDZmilVwGd+Nm7wewsyz7uAFWl5QNA5UFUi
+   pX+hvRfoyaPIcmSokxNoz1z8/zlQ8qVOUogTNOMJ6hZHYhWbnAGzz24zX
+   DSnDV6ypiojXMvNL8Drzm7IinFHuq9xQSgeLiLHNg5JuXrJ6WCCl5Pn8f
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10254"; a="248584196"
+X-IronPort-AV: E=Sophos;i="5.88,361,1635231600"; 
+   d="scan'208";a="248584196"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2022 07:46:52 -0800
+X-IronPort-AV: E=Sophos;i="5.88,361,1635231600"; 
+   d="scan'208";a="542134195"
+Received: from ankitata-mobl1.amr.corp.intel.com (HELO spandruv-desk1.amr.corp.intel.com) ([10.212.170.20])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2022 07:46:51 -0800
+Message-ID: <077501bfcb710c66754c61d69e45cac66fccf38a.camel@linux.intel.com>
+Subject: Re: [PATCH V2 5/13] hid: use time_is_after_jiffies() instead of
+ jiffies judgment
+From:   srinivas pandruvada <srinivas.pandruvada@linux.intel.com>
+To:     Qing Wang <wangqing@vivo.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?ISO-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>, Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Hans Verkuil <hverkuil@xs4all.nl>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org
+Date:   Fri, 11 Feb 2022 07:46:51 -0800
+In-Reply-To: <1644546640-23283-6-git-send-email-wangqing@vivo.com>
+References: <1644546640-23283-1-git-send-email-wangqing@vivo.com>
+         <1644546640-23283-6-git-send-email-wangqing@vivo.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 11 Feb 2022 16:15:54 +0900, Tetsuo Handa wrote:
-> The kernel test robot is reporting that xfstest which does
+On Thu, 2022-02-10 at 18:30 -0800, Qing Wang wrote:
+> From: Wang Qing <wangqing@vivo.com>
 > 
->   umount ext2 on xfs
->   umount xfs
+> It is better to use time_xxx() directly instead of jiffies judgment
+> for understanding.
 > 
-> sequence started failing, for commit 322c4293ecc58110 ("loop: make
-> autoclear operation asynchronous") removed a guarantee that fput() of
-> backing file is processed before lo_release() from close() returns to
-> user mode.
+> Signed-off-by: Wang Qing <wangqing@vivo.com>
+Acked-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+
+> ---
+>  drivers/hid/intel-ish-hid/ipc/ipc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> [...]
-
-Applied, thanks!
-
-[1/1] loop: revert "make autoclear operation asynchronous"
-      commit: bf23747ee05320903177809648002601cd140cdd
-
-Best regards,
--- 
-Jens Axboe
-
+> diff --git a/drivers/hid/intel-ish-hid/ipc/ipc.c b/drivers/hid/intel-
+> ish-hid/ipc/ipc.c
+> index 8ccb246..15e1423
+> --- a/drivers/hid/intel-ish-hid/ipc/ipc.c
+> +++ b/drivers/hid/intel-ish-hid/ipc/ipc.c
+> @@ -578,7 +578,7 @@ static void _ish_sync_fw_clock(struct
+> ishtp_device *dev)
+>         static unsigned long    prev_sync;
+>         uint64_t        usec;
+>  
+> -       if (prev_sync && jiffies - prev_sync < 20 * HZ)
+> +       if (prev_sync && time_is_after_jiffies(prev_sync + 20 * HZ))
+>                 return;
+>  
+>         prev_sync = jiffies;
 
