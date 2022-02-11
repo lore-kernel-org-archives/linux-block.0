@@ -2,62 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C08C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 22:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA72C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 22:09:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353956AbiBKWHx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 17:07:53 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40772 "EHLO
+        id S1349089AbiBKWJp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 17:09:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353952AbiBKWHw (ORCPT
+        with ESMTP id S231814AbiBKWJo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 17:07:52 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11431D7
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 14:07:48 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id om7so9235474pjb.5
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 14:07:48 -0800 (PST)
+        Fri, 11 Feb 2022 17:09:44 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8E4222
+        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 14:09:43 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso13271150pjg.0
+        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 14:09:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=2ntYYhI8g2rNOG/Ph4KVVGNf7Zafsv4NgM7iosIB+1s=;
-        b=t36CmCEhd5LUHbFU2mQH1te7W0Gj5+kOv7tYgZfVJTiUx2WwRbBMoCTdreVh2aPHmo
-         AJNGx+9i2ljf1yZqxTBiXtRZov0hZlzd5ac1W3UnrBunDoK6p50e34Tl2ivMZvLrHCfD
-         /rhZhIiHXNSU+LiwDRV/QmNKDhBNkhe0Akw5vQp42+ri400V2bb72/uWCK6CRUNpVVPp
-         uafw5dxdMisE9NkDMHgAnhdxds8AAz8701Y1PVt5tvFSSEMMzYuWp59L+y0nQyNZfqhJ
-         Dmk+MVgaCPevd5i0LPl7kMWHeUQ4VyiMDZAAKvHpJrlPKY8Fb83VHZlYm9GCqrKP4FAb
-         5uHQ==
+        bh=rOmo06AVJ29zMWc+Gwf+ZazCMWJDEtmsXwyKly/OrdA=;
+        b=JmqEjOGEN1SqtrKA8Jc0qNhzDy3uTABeBGcmVF1QGaUKAH68SlNnarE4tegrxA43aF
+         CeX7RZawOYwtCirX70zUunZQ/rDJmx5pR+zYIQBmvXILllDIYaLlsCon3OVj7VOOVw/n
+         j5g5d90+7bFYvTKsmsuLRu9ldP6jpiy0CL2ZqV0zhHaFG7KrG+RBri014wkWgjxSnaFb
+         qtdtNdzJLnkCXjfCO2nNpiptQWwoylCDdswvfIwScJr8kTu7B0xqUwD40J572oZa3Gyz
+         o8FbNTUzX5Nh2EU/l6lNCnrWNhGHLjm0QMho99C92xU50WqyP5MLTHEowyKL9aiVSCMN
+         xU0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=2ntYYhI8g2rNOG/Ph4KVVGNf7Zafsv4NgM7iosIB+1s=;
-        b=WcFp2I2eCBKrILD5JiNuENSAIcjyKlVQSbvv2Cu48mTQqYiDpPGfhwJvP3VetEQ7Dz
-         yFGK+w2pc3uewrDjl+fZZhsTJ56QVqpj1UqFwtlw9xIaxpc/YyuXA+MKX5mJw7FC8dBX
-         A+Vip3dpOXtA6ts/lYUQT8K2mqre4L0MYq2VwX64gs2cY6mbWSRo9IXi//pLjQw1yD5b
-         6tW3VXsEOzKfOGgxuzMi2ApRvIly/VSitsGnqHNNJ5LVyIYu6xHxQpenGSLKQdJivcIO
-         d2LUWrc6SUikRIn932qPOzVIrfVnlHmh4e2I3S7JBt6u6l0CTFT+Tx9R0Kr2Hab7Lgww
-         4lPA==
-X-Gm-Message-State: AOAM531qiJSEa+KkJd5j9SoBrSPp62fP6wKHX/X4kLB/prpCorWrqiqW
-        rzbE5IiZkv4WYXHi6SvNILgMmX/kT1a0SA==
-X-Google-Smtp-Source: ABdhPJz1IialgtYb1gyHYkv3hoI1Z7BV+qGjuUbXC5v9mGLYRvthvwk5eJL+wswkaIV71bNM+jOa+g==
-X-Received: by 2002:a17:90a:30c:: with SMTP id 12mr2551805pje.74.1644617268258;
-        Fri, 11 Feb 2022 14:07:48 -0800 (PST)
+        bh=rOmo06AVJ29zMWc+Gwf+ZazCMWJDEtmsXwyKly/OrdA=;
+        b=4F5cNR3mqgBvjgqKJDDb8ys5L4zuxDsQVQQDDZGaqrAFZZS7AKuyThnh8rQ70/ebdw
+         ndSrI2V1uZL1kUZ0MSRjw/iA45+M3X2IO5u0ChZiQX3YLIYGWWUvp4HryTbDl48klPo8
+         41MXraysSoBIW9xDCQmhjwlchieJdooAYzzPnmcrmt1BtNmT6+f/4zb2UrRzFI/RF5JH
+         1bI+0gLti4KMzdLLSqDfTCVU60wim+buUIleQN+hSWKBFV3iR3aDJ7BrUIVCFJXVQtaO
+         ZXDKSNb2bt4I7yr/Jyoluh65OUh0NRxwrUeu2D0748nW77RNk5r0YA+tPC1WQoIYz7zH
+         sjHQ==
+X-Gm-Message-State: AOAM533g5dDuywYz55MbeThp6jdQP3oAtKCTOfNryn8qnUolLe5YOfXz
+        99uTIlGj8/XCgZfqKWEMHK4R1g==
+X-Google-Smtp-Source: ABdhPJweMnFI9BAH2E1NSs7Lmkb5xcjFIsZNlFquAk+cEZZD7QosUbyPqOKjsAAjA3oEKj8Ftu1eNg==
+X-Received: by 2002:a17:902:b414:: with SMTP id x20mr3618304plr.76.1644617382660;
+        Fri, 11 Feb 2022 14:09:42 -0800 (PST)
 Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id nl7sm6633049pjb.5.2022.02.11.14.07.47
+        by smtp.gmail.com with ESMTPSA id t1sm28889025pfj.115.2022.02.11.14.09.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 14:07:47 -0800 (PST)
+        Fri, 11 Feb 2022 14:09:42 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     corbet@lwn.net, linux-block@vger.kernel.org,
-        Barry Song <21cnbao@gmail.com>, linux-doc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Barry Song <song.bao.hua@hisilicon.com>, linuxarm@huawei.com
-In-Reply-To: <20220207074931.20067-1-song.bao.hua@hisilicon.com>
-References: <20220207074931.20067-1-song.bao.hua@hisilicon.com>
-Subject: Re: [PATCH] docs: block: biodoc.rst: Drop the obsolete and incorrect content
-Message-Id: <164461726734.22569.18318246299123214260.b4-ty@kernel.dk>
-Date:   Fri, 11 Feb 2022 15:07:47 -0700
+To:     Colin Ian King <colin.i.king@gmail.com>,
+        linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20220208114656.61629-1-colin.i.king@gmail.com>
+References: <20220208114656.61629-1-colin.i.king@gmail.com>
+Subject: Re: [PATCH] loop: clean up grammar in warning message
+Message-Id: <164461738194.23200.14652374197414032855.b4-ty@kernel.dk>
+Date:   Fri, 11 Feb 2022 15:09:41 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -65,20 +64,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 7 Feb 2022 15:49:31 +0800, Barry Song wrote:
-> Since commit 7eaceaccab5f ("block: remove per-queue plugging"), kernel
-> has removed blk_run_address_space(), blk_unplug() and sync_buffer(),
-> and moved to on-stack plugging. The document has been obsolete for
-> years.
-> Given that there is no obvious counterparts in the new mechinism to
-> replace old APIs, this patch drops the content directly.
+On Tue, 8 Feb 2022 11:46:56 +0000, Colin Ian King wrote:
+> The phrase "has still" should be "still has" to clean up the grammar.
 > 
-> [...]
+> 
 
 Applied, thanks!
 
-[1/1] docs: block: biodoc.rst: Drop the obsolete and incorrect content
-      commit: 2e2f0199a20780463945e1cbffb3a191fa84bd9d
+[1/1] loop: clean up grammar in warning message
+      commit: 65f43c6791944393139078ac853423ed98cca3ad
 
 Best regards,
 -- 
