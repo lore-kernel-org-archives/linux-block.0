@@ -2,68 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F179FC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 20:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29489C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 20:56:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353164AbiBKUFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 15:05:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49836 "EHLO
+        id S240883AbiBKU4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 15:56:15 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353156AbiBKUFY (ORCPT
+        with ESMTP id S232904AbiBKU4P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 15:05:24 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA23CE6
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 12:05:22 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 65B31B82C8F
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 20:05:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EA779C340ED;
-        Fri, 11 Feb 2022 20:05:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644609920;
-        bh=r+ch6Pdtea4xKaC8sqFQcHd/e2rpw1aQLtGPsfivfew=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=R7XVqNpjc4pEHngX6fQZFC5x9rff6CpKUdR7IWk+6RHv5nfXAlYjzs+nYit9lAexf
-         8aapM40IByLf+Az/ZrNMNyhISqGlU10WNq9SgzAyuzA7cIGH1SZewLmpQQpMg3x+1g
-         T8On3TKdmukldAkxHneSiCsrOMEh+G4VXfVlRs9cSHKMDaZ0Vm5A2ruIJ8RNUj2kXi
-         Z8c3Uu/R95djlR+GBbWq4g9vGgFd3XzcCc2MvQ/YrW4XsbvZSUE0AwdWxe2eE6LxZW
-         v1Brv8yzRRqQihnFEK4xVd/kNOrOes5Aij/h07M4t5aucqtx/aacAfk6hSiFyTwgnp
-         byxiK7LgHmp1g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8775E5CF96;
-        Fri, 11 Feb 2022 20:05:19 +0000 (UTC)
-Subject: Re: [GIT PULL] block changes for 5.17-rc4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <f20f0c25-503c-31d2-aa20-f1205fc5c98b@kernel.dk>
-References: <f20f0c25-503c-31d2-aa20-f1205fc5c98b@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <f20f0c25-503c-31d2-aa20-f1205fc5c98b@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-11
-X-PR-Tracked-Commit-Id: bf23747ee05320903177809648002601cd140cdd
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cf26a2360a6e1352a9e0bebabbbcad2b92dd8c6c
-Message-Id: <164460991988.1412.6808623437008205784.pr-tracker-bot@kernel.org>
-Date:   Fri, 11 Feb 2022 20:05:19 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Fri, 11 Feb 2022 15:56:15 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26B59E;
+        Fri, 11 Feb 2022 12:56:12 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id cf2so18176764edb.9;
+        Fri, 11 Feb 2022 12:56:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Tgv7ys2zhrW+e9PNgo8siOn8/16+4IpioSAv02Oc+pc=;
+        b=SGKgygnDcuydKQNXbAIAgtRCWdEnfQlF9CLEP9e6blfzdYaBrvvQPYnvveYkBTsY9x
+         zwitWArfsEx/f0tNRYkf/fcKCQ/vV36NKqYw6nE/93GyZcIH8G+h/P28pNU74IDGeWbL
+         sIFxjm7sjdEEUtC/28AKRpEmPr8rkDdOV+0gY3REEIh776vbIWXYhBw3Rm8XFGeYN6XG
+         +YNALzF8qdQCsEqCNO/xmdslyWBRmViAwvYwDg+O6+fndpsgULQjcFzHq52qq4YtGNqd
+         pN0PYM5wrmIABdwGW3uZeivWEE6m0y3vxvoKU929A6H82nZgowbt0X3Sb19OXIzxnQv8
+         hBcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Tgv7ys2zhrW+e9PNgo8siOn8/16+4IpioSAv02Oc+pc=;
+        b=R88n/OCSZRJtwQDKdNeBQS3kuMps/KBH8C7pOutJMeJm9fnu7HNgezjbK81DGF74TG
+         8Bilzzh/JXn6FsxBzuWQR/7zSu3hoYIXNX7oG4rrB/uElrVwNM1PdyF3EtDVm6xoSeiQ
+         oljOXuf/CkfW3+55qFKKzbHj/sQFrRXlxRqKbNfCpwr9dGcGZLJkX107/SafqXXQY4tn
+         F0UUf7f/aadwEQJqmSsOkiXg06sOGrSdH6Gs9tT1W0wmDJPam3l6h5TXH8+cDQjp18CC
+         EpFpFKS8LYZE4NFWPFJCI5M/avQnJmxBLkE4J6FZjBv0MuVfGXb7Bu2CD/pUKgvzKdch
+         C1WQ==
+X-Gm-Message-State: AOAM532ZpfdJrs0XMinaZREp5Pi4purRYEF8fZPDOtEO+vDCKrz1RbQ8
+        3wpNtzwslNsBoGkDjMYdNBWIlP5YQvARky+fRDg=
+X-Google-Smtp-Source: ABdhPJydyDt3+X5VIrTpx3PQtQy02bTuF2uAvgGMZN91i8Gglb3c6XTZvHHha46M4FOtfhkw/fqNSmsN6xZNrW8VX9Q=
+X-Received: by 2002:a05:6402:3492:: with SMTP id v18mr3902168edc.345.1644612971455;
+ Fri, 11 Feb 2022 12:56:11 -0800 (PST)
+MIME-Version: 1.0
+References: <20220210225222.260069-1-shy828301@gmail.com> <YgYCdhgQ+PoudJvv@infradead.org>
+In-Reply-To: <YgYCdhgQ+PoudJvv@infradead.org>
+From:   Yang Shi <shy828301@gmail.com>
+Date:   Fri, 11 Feb 2022 12:55:58 -0800
+Message-ID: <CAHbLzkoF6JenubW_p0sO-_GZ6repeOm7euZKq0kG+UvcZWw6Mw@mail.gmail.com>
+Subject: Re: [v8 PATCH] block: introduce block_rq_error tracepoint
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Cong Wang <xiyou.wangcong@gmail.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 11 Feb 2022 09:49:12 -0700:
-
-> git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-11
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cf26a2360a6e1352a9e0bebabbbcad2b92dd8c6c
+On Thu, Feb 10, 2022 at 10:30 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> Looks good,
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
 Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
