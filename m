@@ -2,105 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68636C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 09:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0336DC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 09:40:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239466AbiBKJBp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 04:01:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48878 "EHLO
+        id S1348777AbiBKJkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 04:40:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235655AbiBKJBp (ORCPT
+        with ESMTP id S1348745AbiBKJj7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 04:01:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B59C101F
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 01:01:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644570103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=MUJ3kp9XV1crkiRU1Q1VRzma3f38pwQD2oCOh9SbY8o=;
-        b=Z/0Lc0VTas0KJCgpLazGew6CpEqe8UYcEbxAzCnAH+t5QEKi6IJ/pcsaD8IFomMsDBLrvE
-        wcMRN35N7xlgEhTSSDNhGm+yDbIfcIY03d0P6iuU3UBA+RY0Y872jFYD05yOttv5tKEF1e
-        RJXeZzifd9UrGF24hSn/JkCH3a0iMfs=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-gBqfDK0PN1i8l3gINBHyMg-1; Fri, 11 Feb 2022 04:01:42 -0500
-X-MC-Unique: gBqfDK0PN1i8l3gINBHyMg-1
-Received: by mail-qv1-f70.google.com with SMTP id t5-20020a056214118500b0042c272ede45so5832275qvv.13
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 01:01:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MUJ3kp9XV1crkiRU1Q1VRzma3f38pwQD2oCOh9SbY8o=;
-        b=CyrHl3ve062ysiBg397pu4Uib41M12SZvzJkpztKm864gPyzf2AtheNdjfRz8qTmwg
-         ZE/8NuBWdA1Z+I6t98NbfC04wt1XV6ZtdqajJ/oUaNT57Kf+mzGisBzfJXaupuQ8SuG6
-         bYJ+RdZKwRUrJOyztqXxPhFwVoGbjPMe65H/qghEZH7vkXy1BnOStRWN5Oi21u2YgTLa
-         dxm5Vudg9DXMD0i2+eijwGhAT8vG0yvwGcwMMd19KV92B/9rBt7qNvJlr5WD6G0Jv31l
-         ZRgjhpdFdhWj1Y9X0f0iryV6G7EQc4ks01d+7EX/m2tgncqKR88qBOYPovkWKyNvr6va
-         2ofQ==
-X-Gm-Message-State: AOAM533OMNSS/QMRzxZIg4HLD3ke4IYSuTB/6soicA/7XCVg78sjKT8s
-        8hTQ2QQswha6G+Gkpx0yjiXkDPZ9Lf9yjFpGgmfZ1pVzVb4sCAYqpkHs+CVXAEDpHOsoIJ1U1i8
-        WF+31SXcvjb4uklSxMKKyLcU=
-X-Received: by 2002:a05:620a:40cd:: with SMTP id g13mr235556qko.57.1644570101704;
-        Fri, 11 Feb 2022 01:01:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzyNuZXoU1YXd7dflX1tLfs7w8jGDkinb/+LSW7pW/yCk8l/jvZYRrAUOMjJt184Nuyt+EK0A==
-X-Received: by 2002:a05:620a:40cd:: with SMTP id g13mr235544qko.57.1644570101489;
-        Fri, 11 Feb 2022 01:01:41 -0800 (PST)
-Received: from step1g3.redhat.com (host-95-248-229-156.retail.telecomitalia.it. [95.248.229.156])
-        by smtp.gmail.com with ESMTPSA id p70sm10931673qka.62.2022.02.11.01.01.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 01:01:40 -0800 (PST)
-From:   Stefano Garzarella <sgarzare@redhat.com>
+        Fri, 11 Feb 2022 04:39:59 -0500
+Received: from mta-01.yadro.com (mta-02.yadro.com [89.207.88.252])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8373310D5;
+        Fri, 11 Feb 2022 01:39:46 -0800 (PST)
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id EE66F47753;
+        Fri, 11 Feb 2022 09:39:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        in-reply-to:content-disposition:content-type:content-type
+        :mime-version:references:message-id:subject:subject:from:from
+        :date:date:received:received:received; s=mta-01; t=1644572383;
+         x=1646386784; bh=LQcbOastj9QBIy1juLvBYG/IfneSfYFuWBe1Eqrfur0=; b=
+        VOK8UGz/bM3+KtIcaTXufXxpgsQG/NdrBaJY3VxMFoW4/d3DaBfGMwpjsRG7ntk6
+        mIXFmDdoZa+LrHOIfOENdE5WSgdzlvAObl+Ctag6hjsxN/j0E3RAnacqTgsfDxa3
+        kJaJ+TRwlehT7LhCNyVfrvsFo4G5ElLAojaBrUOUH00=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id CWke-Mc8_V0F; Fri, 11 Feb 2022 12:39:43 +0300 (MSK)
+Received: from T-EXCH-04.corp.yadro.com (t-exch-04.corp.yadro.com [172.17.100.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id BBB184783D;
+        Fri, 11 Feb 2022 12:39:42 +0300 (MSK)
+Received: from yadro.com (10.178.114.63) by T-EXCH-04.corp.yadro.com
+ (172.17.100.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 11
+ Feb 2022 12:39:40 +0300
+Date:   Fri, 11 Feb 2022 12:39:38 +0300
+From:   "Alexander V. Buev" <a.buev@yadro.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org,
+CC:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] block: clear iocb->private in blkdev_bio_end_io_async()
-Date:   Fri, 11 Feb 2022 10:01:36 +0100
-Message-Id: <20220211090136.44471-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.34.1
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>
+Subject: Re: [PATCH v2 2/3] block: io_uring: add READV_PI/WRITEV_PI operations
+Message-ID: <20220211093938.h2uu5cvaw2hswp3z@yadro.com>
+Mail-Followup-To: "Alexander V. Buev" <a.buev@yadro.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+References: <20220210130825.657520-1-a.buev@yadro.com>
+ <20220210130825.657520-3-a.buev@yadro.com>
+ <6d505bdc-d687-a9e7-54a1-9a2e662e9707@kernel.dk>
+ <20220210190311.driobrtfavnb7ha3@yadro.com>
+ <b8082a03-ab50-8a28-b6fd-1bf6985713ec@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <b8082a03-ab50-8a28-b6fd-1bf6985713ec@kernel.dk>
+X-Originating-IP: [10.178.114.63]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-04.corp.yadro.com (172.17.100.104)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-iocb_bio_iopoll() expects iocb->private to be cleared before
-releasing the bio.
+> On 2/10/22 12:03 PM, Alexander V. Buev wrote:
+> >> On 2/10/22 6:08 AM, Alexander V. Buev wrote:
+> >>> Added new READV_PI/WRITEV_PI operations to io_uring.
+> >>> Added new pi_addr & pi_len fields to SQE struct.
+> >>> Added new pi_iter field and IOCB_USE_PI flag to kiocb struct.
+> >>> Make corresponding corrections to io uring trace event.
+> >>>
+> >>> +struct io_rw_pi_state {
+> >>> +	struct iov_iter			iter;
+> >>> +	struct iov_iter_state		iter_state;
+> >>> +	struct iovec			fast_iov[UIO_FASTIOV_PI];
+> >>> +};
+> >>> +
+> >>> +struct io_rw_pi {
+> >>> +	struct io_rw			rw;
+> >>> +	struct iovec			*pi_iov;
+> >>> +	u32				nr_pi_segs;
+> >>> +	struct io_rw_pi_state		*s;
+> >>> +};
+> >>
+> >> One immediate issue I see here is that io_rw_pi is big, and we try very
+> >> hard to keep the per-command payload to 64-bytes. This would be 88 bytes
+> >> by my count :-/
+> >>
+> >> Do you need everything from io_rw? If not, I'd just make io_rw_pi
+> >> contain the bits you need and see if you can squeeze it into the
+> >> existing cacheline.
+> > 
+> > In short - Yes. Current patch code call existing io_read/io_write functions.
+> > This functions use io_rw struct information and process this data.
+> > I wanted to use existing functions but may be this is wrong way in this 
+> > case.
+> >                                                                                 
+> > The second problem with request size is that the patch adds pi_iter   
+> > pointer to kiocb struct. This also increase whole request union
+> > length.
+> > 
+> > So I can see some (may be possible) solution for this: 
+> > 
+> >  1) do not store whole kiocb struct in request
+> >     and write fully separated io_read/write_pi functions
+> > 
+> >  2) make special CONFIG_XXX variable and simplify hide this code
+> >     as default
+> 
+> Option 2 really sucks, because then obviously everyone wants their
+> feature enabled, and then we are back to square one. So never rely on a
+> config option, if it can be avoided.
+> 
+> I'd like to see what option 1 looks like, that sounds like a far better
+> solution.
+> 
+Accepted. I am starting to prepare v3 in this way. 
 
-We already do this in blkdev_bio_end_io(), but we forgot in the
-recently added blkdev_bio_end_io_async().
+Thanks to all for feedback!
 
-Fixes: 54a88eb838d3 ("block: add single bio async direct IO helper")
-Cc: asml.silence@gmail.com
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-I haven't seen a failure, I was just reading the code to understand iopoll,
-so IIUC we should clean iocb->private in blkdev_bio_end_io_async().
-
-Thanks,
-Stefano
----
- block/fops.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/fops.c b/block/fops.c
-index 4f59e0f5bf30..a18e7fbd97b8 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -289,6 +289,8 @@ static void blkdev_bio_end_io_async(struct bio *bio)
- 	struct kiocb *iocb = dio->iocb;
- 	ssize_t ret;
- 
-+	WRITE_ONCE(iocb->private, NULL);
-+
- 	if (likely(!bio->bi_status)) {
- 		ret = dio->size;
- 		iocb->ki_pos += ret;
 -- 
-2.34.1
-
+Alexander Buev
