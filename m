@@ -2,108 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9150CC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 15:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB8CC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 15:52:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347912AbiBKPq4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 10:46:56 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57434 "EHLO
+        id S229967AbiBKPwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 10:52:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234142AbiBKPqz (ORCPT
+        with ESMTP id S1349434AbiBKPwy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 10:46:55 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B0C421F;
-        Fri, 11 Feb 2022 07:46:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644594413; x=1676130413;
-  h=message-id:subject:from:to:date:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=pVxiaW+vV0quQ79sfEqbYXTjlLZHvVBgUsqT5Tk+lEY=;
-  b=T9CM3fi5XzxOKxmxDDFxrwCZ/7XfVh0QsmL3voYJQZylHhHJ880b8Shx
-   koP20RAuzPuMChRyjBfHKqZo8dMi60p4EXh2GdWDbwz2pjyOynj31LLs1
-   pAns0uY0l4hUcBuVqJoSDfM4WF6G8+ew4Pt1RGP3f6/Zd3BI9augt+rST
-   scynOEDC8qL0YlcakcUT2elDZmilVwGd+Nm7wewsyz7uAFWl5QNA5UFUi
-   pX+hvRfoyaPIcmSokxNoz1z8/zlQ8qVOUogTNOMJ6hZHYhWbnAGzz24zX
-   DSnDV6ypiojXMvNL8Drzm7IinFHuq9xQSgeLiLHNg5JuXrJ6WCCl5Pn8f
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10254"; a="248584196"
-X-IronPort-AV: E=Sophos;i="5.88,361,1635231600"; 
-   d="scan'208";a="248584196"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2022 07:46:52 -0800
-X-IronPort-AV: E=Sophos;i="5.88,361,1635231600"; 
-   d="scan'208";a="542134195"
-Received: from ankitata-mobl1.amr.corp.intel.com (HELO spandruv-desk1.amr.corp.intel.com) ([10.212.170.20])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2022 07:46:51 -0800
-Message-ID: <077501bfcb710c66754c61d69e45cac66fccf38a.camel@linux.intel.com>
-Subject: Re: [PATCH V2 5/13] hid: use time_is_after_jiffies() instead of
- jiffies judgment
-From:   srinivas pandruvada <srinivas.pandruvada@linux.intel.com>
-To:     Qing Wang <wangqing@vivo.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?ISO-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>, Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org
-Date:   Fri, 11 Feb 2022 07:46:51 -0800
-In-Reply-To: <1644546640-23283-6-git-send-email-wangqing@vivo.com>
-References: <1644546640-23283-1-git-send-email-wangqing@vivo.com>
-         <1644546640-23283-6-git-send-email-wangqing@vivo.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+        Fri, 11 Feb 2022 10:52:54 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA0E196
+        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 07:52:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=uJ30gXsqpZ2AiW/If6WWs+/Q+T
+        MQ05BTuxkitJy+y2IYiPgFAfISw4uZCuR+TtNyUV4CDzjicSfFaQBxfywVURW9n6j6u5laRmx3s05
+        6rYYCgFDKat/abLKSMrRVmKmqIq9zeOSFZxFurhA1y/6JOA8rAUKIm9jEjD0y/NHQbydnAjDg5I51
+        laROm51h5x5xL+ZqpVGBhtjs7yImCq2Kk5/KSvenRoWj2l9IkvBp34TpJXOBtFOh62LIKBL1eWGq9
+        JfZZ+CbuXE7lNiJE5BoMp1lJL/KXbo5niQkUjgHnjlIspzs6FzqAeHwXgZ0OQp+45Eb6mbyJyF3us
+        0PhJ4mmw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nIYE6-007sAN-1N; Fri, 11 Feb 2022 15:52:50 +0000
+Date:   Fri, 11 Feb 2022 07:52:50 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, Pankaj Raghav <pankydev8@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v1 1/1] block: Add handling for zone append command in
+ blk_complete_request
+Message-ID: <YgaGUtMwq2qjo+9+@infradead.org>
+References: <20220211093425.43262-1-p.raghav@samsung.com>
+ <CGME20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314@eucas1p1.samsung.com>
+ <20220211093425.43262-2-p.raghav@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220211093425.43262-2-p.raghav@samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2022-02-10 at 18:30 -0800, Qing Wang wrote:
-> From: Wang Qing <wangqing@vivo.com>
-> 
-> It is better to use time_xxx() directly instead of jiffies judgment
-> for understanding.
-> 
-> Signed-off-by: Wang Qing <wangqing@vivo.com>
-Acked-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Looks good:
 
-> ---
->  drivers/hid/intel-ish-hid/ipc/ipc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/hid/intel-ish-hid/ipc/ipc.c b/drivers/hid/intel-
-> ish-hid/ipc/ipc.c
-> index 8ccb246..15e1423
-> --- a/drivers/hid/intel-ish-hid/ipc/ipc.c
-> +++ b/drivers/hid/intel-ish-hid/ipc/ipc.c
-> @@ -578,7 +578,7 @@ static void _ish_sync_fw_clock(struct
-> ishtp_device *dev)
->         static unsigned long    prev_sync;
->         uint64_t        usec;
->  
-> -       if (prev_sync && jiffies - prev_sync < 20 * HZ)
-> +       if (prev_sync && time_is_after_jiffies(prev_sync + 20 * HZ))
->                 return;
->  
->         prev_sync = jiffies;
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
