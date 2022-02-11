@@ -2,138 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18111C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 09:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C63E0C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Feb 2022 10:02:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232618AbiBKJmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Feb 2022 04:42:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59244 "EHLO
+        id S1348731AbiBKKCc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Feb 2022 05:02:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243159AbiBKJmX (ORCPT
+        with ESMTP id S1348768AbiBKKCb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Feb 2022 04:42:23 -0500
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0AB10A0
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 01:42:20 -0800 (PST)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220211093603euoutp02540410c3c9913f6fcfc1f0653b6cf4b0~SsatqGIij2463324633euoutp02j
-        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 09:36:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220211093603euoutp02540410c3c9913f6fcfc1f0653b6cf4b0~SsatqGIij2463324633euoutp02j
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1644572163;
-        bh=SRQrFTd0rG07SC/2FQxJ9s6G6cclyw5X+oCD+oinaOo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hodlomVhqJq0PHwHBq8Y/hdnzyzWhuon7JgiV/4DzIMI6FBUPz78GIXaoYz6JoDvY
-         P3OeManImmH3nLF/Oj90yM15grY+94Jwnh31r55dodKmIDFUBjAg3iHEK0hnlT/fXk
-         XNR3X2o56+E2359lgw+6afPMHxdI6DB4kT6JBlng=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220211093602eucas1p11bcd3d7c36fab67e48cb18c15ccbc837~Ssas7uZhz2914829148eucas1p1Q;
-        Fri, 11 Feb 2022 09:36:02 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 91.0B.10260.40E26026; Fri, 11
-        Feb 2022 09:36:04 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314~SsasPRwuv2710227102eucas1p1B;
-        Fri, 11 Feb 2022 09:36:02 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220211093602eusmtrp1bde1100b437552cfc0b526b3e6ba19d9~SsasNct1w1150811508eusmtrp1G;
-        Fri, 11 Feb 2022 09:36:02 +0000 (GMT)
-X-AuditID: cbfec7f5-bddff70000002814-b8-62062e0460a7
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id AF.3A.09522.30E26026; Fri, 11
-        Feb 2022 09:36:03 +0000 (GMT)
-Received: from localhost (unknown [106.210.248.166]) by eusmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220211093601eusmtip2d696e68ff5610779f48dda885aa9fe8a~Ssar72FjP2236022360eusmtip2I;
-        Fri, 11 Feb 2022 09:36:01 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, Pankaj Raghav <pankydev8@gmail.com>,
+        Fri, 11 Feb 2022 05:02:31 -0500
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4140133
+        for <linux-block@vger.kernel.org>; Fri, 11 Feb 2022 02:02:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1644573748; x=1676109748;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=u58xzXKuue3Efjl5YAW8AZXWqLFkeDyfKKl6///ClkE=;
+  b=rh3IEXd8BddwUmAPcFftsgz15PrWtRsgDdIwyo1pCThAWPjmTLcHXTiZ
+   01wJ6QBIX0Woki1M/lI6oVwxxJ/+Ae88Nc8zML/xd467uYc9ljC0g3+vb
+   j3yiPMdvQKCLMtklNvnVMYXoXvDMsPabKE/nDMwlOMslccDnZ5QPqPDS2
+   vJ94lfBJ26s67/vF4cGZgewcHCRU0rakO+RGmJ+qSJojvtx/+STIYtZFi
+   TvALAhTC0yT/wOL2YvhWY13Qkvgz37swKXIynPmbEsSkaWfuiYkQPlmOr
+   iJHVjDtmgDdZNj62ILjFEm8sUwuhXsErbJYlQWq2eZTsMLnQz9DUn3whC
+   w==;
+X-IronPort-AV: E=Sophos;i="5.88,360,1635177600"; 
+   d="scan'208";a="197506576"
+Received: from mail-co1nam11lp2173.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.173])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Feb 2022 18:02:26 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FglU9zFFqDNKdjkx2SXlKiCk+t8/HoCOMHoLSh1u/j8P75IvmeWIfMzplpdi3vkDbTodlFS6Fp7Rs/xaTBo3/LsNeSipemL1JcRLpTFMScu63EMA7/e/acLuU74EWgSkWWLXsw7WVydfHNsZmMWHcDnHg/dXWlGGb7kh1LNHWqwdHH/8r/EBr6KL+P0yhLfBR64LIrhNpCfJCzlMycbUZ1D3bcPfKK/edOLzRkUOkA6GuEU3oYqPP6ZCLcRiaY0AoYp1Xq9Oa5IEXzGuLQ7cAsgzhtA6ri8RVho++w3L3RryzNS4YrS2QlDq20qXAuNnWvMAVQ/FzI6kQWiEqkFWrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u58xzXKuue3Efjl5YAW8AZXWqLFkeDyfKKl6///ClkE=;
+ b=Inz7ECBbVoPkwNy48+4D+5A5YBKj+Q1L6+8vIMIlgc0obOj41+j+nOyNJEvb4OEZEN8seuB0Z6vORS0gi76NhvXoQRFI8FmM7QCIt5oRfkLTv3tHwx+EPwr66xl7MhVsFF7O12lNtFFhfMVHvA90utBSfG3rma4iQVESoCNp5E565oGdUgwGCv/wRh/FHe8RN8jZj1WEjYTOD2M/m8UDJVKfJyVquqx0SGO9tBdYVg1C6UFS25Z9zvZmbfuwkT3wYpVDQXA6SnX1clJpFEb5B8jXmuk5hYFtDV3twTfFhCwpAXU1V7LTS96NULVO9fCEIY3yiJ6r7Nkry+OFNYqhlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u58xzXKuue3Efjl5YAW8AZXWqLFkeDyfKKl6///ClkE=;
+ b=wwUg/8mvqnUJnVO+ysp4Nd2+lm4jmQ46PzHSBx1y3WZY8IdyM+nT0AR6Y6ZA0USUNCy+ud+IQHgnlHPElCcqNzd0FmuRpQDTDX0BiJYSj+Epdyzga9QQxb9U4VfbQPJ8cuM3oFjFJ3L3usQXK3bucUZwAdb54xttcK43QW3Qnu4=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by CH2PR04MB6760.namprd04.prod.outlook.com (2603:10b6:610:91::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.15; Fri, 11 Feb
+ 2022 10:02:26 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::8d9e:d733:bca6:bc0f]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::8d9e:d733:bca6:bc0f%5]) with mapi id 15.20.4975.015; Fri, 11 Feb 2022
+ 10:02:26 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        "hch@infradead.org" <hch@infradead.org>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
         Luis Chamberlain <mcgrof@kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
+        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier.gonz@samsung.com>,
         Adam Manzanares <a.manzanares@samsung.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH v1 1/1] block: Add handling for zone append command in
+        kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v1 1/1] block: Add handling for zone append command in
  blk_complete_request
-Date:   Fri, 11 Feb 2022 10:34:25 +0100
-Message-Id: <20220211093425.43262-2-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220211093425.43262-1-p.raghav@samsung.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsWy7djP87osemxJBr936FhMP6xosfpuP5vF
-        6QmLmCwe3/nMbnH0/1s2i723tC1uTHjKaPF5aQu7xZqbT1kcOD12zrrL7rF5hZbH5bOlHptW
-        dbJ59G1ZxejxeZNcAFsUl01Kak5mWWqRvl0CV8a726dZC26xVby+s42xgXEnaxcjJ4eEgInE
-        5H+NzF2MXBxCAisYJR7e6GOCcL4wSsxf8g4q85lRYkLndnaYlqsndkJVLWeUWLK/nxXCecko
-        MXPJXaAMBwebgJZEYydYg4iAu8T9AyfAapgFljJJ9J9aCpYQFoiV+Nz3iRnEZhFQlWh4+gws
-        zitgKbF3/xKoA+UlZl76zg4yk1PASuL+8UqIEkGJkzOfsIDYzEAlzVtng10qIXCGQ+LRhSmM
-        EL0uEi+evIWaIyzx6vgWqA9kJE5P7mGBaOhnlJja8ocJwpnBKNFzeDPYBxIC1hJ9Z3JATGYB
-        TYn1u/Qheh0ljv+bzgpRwSdx460gxA18EpO2TWeGCPNKdLQJQVQrSez8+QRqq4TE5aY5LBC2
-        h8SKM1+ZJzAqzkLyzSwk38xC2LuAkXkVo3hqaXFuemqxcV5quV5xYm5xaV66XnJ+7iZGYAI6
-        /e/41x2MK1591DvEyMTBeIhRgoNZSYR3xQ3WJCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8yZkb
-        EoUE0hNLUrNTUwtSi2CyTBycUg1MMa83uS3/E8O4+6/ajk9GW5zLJnsZsVzYNXdWg5jSOzP+
-        tDTuoA17J2kF9p9r6s5RzPd/tq0h94np1txThmq9haEb5tcILJEx+Bd/Z3/W0Uq2f9Z5ndYX
-        +Wb/r69yP72vdAnPz5MWAsXdLfuqJeLeynYcTP5Z5TaV/0qDfK15AOuXlrtNn/8tbp15LETO
-        f32EzmvepgPbDjy6FrWyKPmKwMaw4NjnB9hPZFROOfZle9k8CaWT8uH7JlrM+2mbybirdfu8
-        DsOCuq+qx7p+WmnVyVkc/225LXiO60N2jjs/JLdNDFkYevqni0NyQcTvyY/ep3muXBI/lcUq
-        RLx8a0rIuaIEk95Qm8ZyQ6lZGllKLMUZiYZazEXFiQCKFfEkrwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupkkeLIzCtJLcpLzFFi42I5/e/4PV1mPbYkg0ezLSymH1a0WH23n83i
-        9IRFTBaP73xmtzj6/y2bxd5b2hY3JjxltPi8tIXdYs3NpywOnB47Z91l99i8Qsvj8tlSj02r
-        Otk8+rasYvT4vEkugC1Kz6Yov7QkVSEjv7jEVina0MJIz9DSQs/IxFLP0Ng81srIVEnfziYl
-        NSezLLVI3y5BL+Pd7dOsBbfYKl7f2cbYwLiTtYuRk0NCwETi6omdTCC2kMBSRokjn5Mh4hIS
-        txc2MULYwhJ/rnWxdTFyAdU8Z5Q4s+IcUDMHB5uAlkRjJztIjYiAp0TbxnZWkBpmgdVMEn/P
-        9bKAJIQFoiWmP7kFVsQioCrR8PQZmM0rYCmxd/8SqCPkJWZe+s4OMpNTwEri/vFKiHssJXbP
-        m88IUS4ocXLmE7CRzEDlzVtnM09gFJiFJDULSWoBI9MqRpHU0uLc9NxiQ73ixNzi0rx0veT8
-        3E2MwDjZduzn5h2M81591DvEyMTBeIhRgoNZSYR3xQ3WJCHelMTKqtSi/Pii0pzU4kOMpkBn
-        T2SWEk3OB0ZqXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQQHpiSWp2ampBahFMHxMHp1QDU7rl
-        wi8eixrmV9/ielteIl/i3s4292b6JIv561lNxZY8fTijaEN67Tc5rd8FU6aW9TP/+p/iE7Wh
-        7dPU3vnCSz/ZffL6uemZRc60GfdaleuuTCq2/s5eIc9jnvU9/EYK1xqxHf0N/q/sDpmnXMsP
-        lpSf8E/4xMyfx/ydwsNnuDh8+Bh5X0vszn9uMzX3JR/fi2nUvg43k1zY+f5qs4BzqkBNSNl3
-        0d037ve2B5ktanxiFXOF7VVL9AeOFdubqw/uPnju8vYtN9/lW3w8zF/yJVBm4rG3v0UXf4wM
-        3jpPvOr5Fl/9FZUfWr/eeLl3o6e1x1emvDulPmyOpkuCvnw4sPIt44rjQssEVrd0/1AtCVVi
-        Kc5INNRiLipOBAC5kC1xHAMAAA==
-X-CMS-MailID: 20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314
+Thread-Topic: [PATCH v1 1/1] block: Add handling for zone append command in
+ blk_complete_request
+Thread-Index: AQHYHyuwDs0xN4PpMEadJthhR/vcZw==
+Date:   Fri, 11 Feb 2022 10:02:26 +0000
+Message-ID: <PH0PR04MB7416B842B185ECF0F52AF0949B309@PH0PR04MB7416.namprd04.prod.outlook.com>
 References: <20220211093425.43262-1-p.raghav@samsung.com>
-        <CGME20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314@eucas1p1.samsung.com>
+ <CGME20220211093602eucas1p1fe39e931232162a686b2feb06ea1f314@eucas1p1.samsung.com>
+ <20220211093425.43262-2-p.raghav@samsung.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d9e8884c-b525-4b5b-149c-08d9ed459b75
+x-ms-traffictypediagnostic: CH2PR04MB6760:EE_
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+x-microsoft-antispam-prvs: <CH2PR04MB67608EFE2BB47C68D40E3B7E9B309@CH2PR04MB6760.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: nrqjGf5cCC10BuPhJIXRCQb/I8qBEMDrcoKH8xRtD+RmAoc+w8ntGPHQ1kEjFBegLFZ1IfE4BYj2G7MrUFazqPdGBMX5mZobtG3VYIzlZmjZGz3jdSpwe3E15/olA1JMFGT3eMUpWppIhsrEGEWhF1ef8yRcvlrwMkIX4WIrO30fuSXSSJpHEKEA2Jo4dfA0dOxxk3oTdSlSZ5MJjMNEPomT/nPSs2cgBS8M8qgPlxgvyjD9ppv1iIY1HRxXSqlpCSJZA3B75lJIk+0CeuWeHgam7kuH7GlrMoNQdd6vOFXX/JmaUvC+PJqxiWsnYzrctEw0zYjabeLp+oak8nZNJVnLESXjaszij7VgSps1BCJgfPKgV+43JjnkbxHK4xgmT52wwOCyr/WKqGAETz90QHGl+934HHh4Qvkhqj+hAX2Nd8y/QCxNBnntNiDlh0ZzceTZv+XS0mWnLKqsa7RcMPjDsinSwInGP6ZED7xgPwDmPE1fgMi+9Cb41io2FcbBh7SZ6DTmfPmAUlGqrlZ9PhHelbyRVufxqqPAvvWN1fKYWgnUoxvh1SPAmrOuNHidH8XPWo8np0IUEOJHd1Lm9WzUyu5qhXzfJD3jfRNuRxkvykGi5+S3magrv6D83ydnAUdZt9l8jxju5OaEYZgqgKvkRy5ReQeLFe9HJoGaRz4rGSWDer0IDry+yzcoVOlm7YLI9psU8DyoyRix3T5nsw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(110136005)(54906003)(38070700005)(82960400001)(64756008)(4326008)(66446008)(66556008)(8936002)(91956017)(33656002)(66476007)(66946007)(76116006)(5660300002)(316002)(508600001)(8676002)(52536014)(122000001)(7696005)(9686003)(186003)(86362001)(71200400001)(4744005)(55016003)(6506007)(53546011)(83380400001)(2906002)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?cevp6dwR1fmKLqOCMeBpw7omFSeJg8isrHESRhjcsh+pIMxDNA6fw2zMB5?=
+ =?iso-8859-1?Q?JMPK81q8aQUV9585UQcz4PNToQxUQZ7Ozow4RU03OvRere34Tapr+vgP9T?=
+ =?iso-8859-1?Q?hMVUqO/re1SofZAJ5yQ+5vbdbOjbHYmCuzg1lx4btOw/uxL4Gc7shKT9OB?=
+ =?iso-8859-1?Q?J0W8mmC6FNHbH2NnJOJk4pRjvKfxGYFSIDAbHwi4SD6Lo6EBFQzwzb/vSy?=
+ =?iso-8859-1?Q?qnDWE2f1WpJhwkPLABaf3iNitnMfA00bVW5Xzl/MDeXYv6MtFDJ1mDiuup?=
+ =?iso-8859-1?Q?CrX6iqE4f/8YU0/XIfVnrsH3yJ8EnNoNnhMoQHYgkZ4ls0tArsSjr08GQd?=
+ =?iso-8859-1?Q?IWbqXzTMauak9SPLIkLLd+jZz6F2KrH6AadFVdaVYP98llnsA4m+CZquAW?=
+ =?iso-8859-1?Q?47uBKPSca9B1SdITlDhxtf0i1OyR1XkmLxORJUluMttwhwRRRGFc76Pwsk?=
+ =?iso-8859-1?Q?Tz5SofcprFj3Nkp7TnCGoaQPNj2PrFzXo5SCyv/lJOY6GF4Sx21+ZqQPIy?=
+ =?iso-8859-1?Q?ze4wPDfsuQ4vnZkWSehgoptZzDkiNP8to3ODr36tzq77mY4GVShe2YD+nc?=
+ =?iso-8859-1?Q?yKoY17TckyssieM2fle2liaxGFPpjY1ga6IwS27DM5e3TmmqNuyH196/27?=
+ =?iso-8859-1?Q?58k3mgjr5kZWBOSXc6V/3Sh2ATX4p5J61ENe1p2XJIzPJulW4CSJp1PrEC?=
+ =?iso-8859-1?Q?2XUrJJhwRB3gEX4Ewd0CuLsbyc+oaDgWd8UvqKgFZIqMfBU43MUa0rMkXN?=
+ =?iso-8859-1?Q?ys9ZOo91d4v5tl+c06zjvr1nvaTl+SJElmHVwJQ54jUYkbXi25PNrm7ph9?=
+ =?iso-8859-1?Q?CuSSH+KHchjJ9XJKclB+RHA8z88/m+R6PlYggGM8ngT1hHC6J21OgrFYJg?=
+ =?iso-8859-1?Q?zUNq4tZH61P94daxS+i5ZuZYRuMaY+zqCKn3C39VrcEOT9NEl9lQoFj0gX?=
+ =?iso-8859-1?Q?S3tPaD2baBYYjK6kXOphhiAzbMMUjVuo/4MOsM1Jv0Ym1o4jhtGSUIPH/t?=
+ =?iso-8859-1?Q?mh2Z5yFeIyHLVN+uXPZIeQJSN09HpOOSOcZS1+LbXs0R0i4O8NgKPVtn4W?=
+ =?iso-8859-1?Q?9sgILShEBdp2YapC9GZoMmqzUC7/deXyZ7K20m5VoB0MsXTGhOUJAUAgZf?=
+ =?iso-8859-1?Q?GMnpM4y4vrLouFW/SvCxZt/iXBDB3ulYb3q/kXlJCpcA2pefdSZqURRmAq?=
+ =?iso-8859-1?Q?9aMWUTzTpSI3nBrSsPZ999S+N+5JGLoaT+wR5MZ7nmq4izgTOZ9a/mVAHO?=
+ =?iso-8859-1?Q?gIK39X0zd5t/WSLK3Nny8nEbeYR92R8XbxVx3ib5cnRkiorvHg1C1BTAU7?=
+ =?iso-8859-1?Q?ZA3vRKGbMQm2pJPKF2cpWxA1ngkbIPQRm1V/2uHNJwpSOdyjyhlWl+AKO7?=
+ =?iso-8859-1?Q?YwlCHHvyqOa988bugXqDaweBRPyapscRHlKEund2hixcQJJw/l5qkvXaEq?=
+ =?iso-8859-1?Q?VUlK35q4Ts/O1jFz8xWL3T5Gw6dyhhU0pMq03oD2ABrzDnPfs72a3L00Iq?=
+ =?iso-8859-1?Q?sEkFLFGhU25MI05LBxXmbWBtIzyrXb21Pk2IxYN6VeVTIxFdJDIxeG8GgM?=
+ =?iso-8859-1?Q?O2eVISy9E8LnOPTyUrhZHKlxvcudF31f32r4NESLBtJWemLa2WTYGIvhKZ?=
+ =?iso-8859-1?Q?dSOH8kPbAIfCXKR1xFsDCSLz9dgJoTS7z9fqHIAzhl9AkESxhto2f2+W6Y?=
+ =?iso-8859-1?Q?FW0byO6Icm5PnZdmG5x46EmS6W/EhWiyM6y/B1m3n2QlLCTuETcRBZluAG?=
+ =?iso-8859-1?Q?E9ryJT/3tNFiwEs96iSNqtFYcGiP1DFADJHVXRbPJvKgQYNtZ+i7hMt8cy?=
+ =?iso-8859-1?Q?S4lecImRmjA94bdyUidwks/q6R/bRck=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9e8884c-b525-4b5b-149c-08d9ed459b75
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2022 10:02:26.5053
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: w9GxnyWtfyEC8SjjdzbziujfcTf4c3/WnBbCutQQ2v3he+SDfj99xhDY2fTFZhn8FkZEZ6X977M+CeEyRqd641ci81j8k7Vyz8qKmIpTxeY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6760
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Zone append command needs special handling to update the bi_sector
-field in the bio struct with the actual position of the data in the
-device. It is stored in __sector field of the request struct.
-
-Fixes: 5581a5ddfe8d ("block: add completion handler for fast path")
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- block/blk-mq.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b868e792ba4..6c2231e52991 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -736,6 +736,10 @@ static void blk_complete_request(struct request *req)
- 
- 		/* Completion has already been traced */
- 		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
-+
-+		if (req_op(req) == REQ_OP_ZONE_APPEND)
-+			bio->bi_iter.bi_sector = req->__sector;
-+
- 		if (!is_flush)
- 			bio_endio(bio);
- 		bio = next;
--- 
-2.25.1
-
+On 11/02/2022 10:42, Pankaj Raghav wrote:=0A=
+> Zone append command needs special handling to update the bi_sector=0A=
+> field in the bio struct with the actual position of the data in the=0A=
+> device. It is stored in __sector field of the request struct.=0A=
+> =0A=
+> Fixes: 5581a5ddfe8d ("block: add completion handler for fast path")=0A=
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>=0A=
+=0A=
+I would've preferred if you had put the trace and steps to reproduce =0A=
+in the changelog instead of the cover letter but, maybe Jens can update=0A=
+it when he applies the patch.=0A=
+=0A=
+Anyways,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
