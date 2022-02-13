@@ -2,83 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E44C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 12 Feb 2022 16:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14938C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 13 Feb 2022 08:35:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237130AbiBLQt4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Feb 2022 11:49:56 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33576 "EHLO
+        id S231181AbiBMIf2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Feb 2022 03:35:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233383AbiBLQtz (ORCPT
+        with ESMTP id S230153AbiBMIf1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Feb 2022 11:49:55 -0500
-X-Greylist: delayed 133 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 12 Feb 2022 08:49:51 PST
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FD32409F;
-        Sat, 12 Feb 2022 08:49:51 -0800 (PST)
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 21CGkxsP010096
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 12 Feb 2022 11:47:00 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 1847215C0040; Sat, 12 Feb 2022 11:46:59 -0500 (EST)
-Date:   Sat, 12 Feb 2022 11:46:59 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Qing Wang <wangqing@vivo.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org
-Subject: Re: [PATCH V2 00/13] use time_is_xxx() instead of jiffies judgment
-Message-ID: <Ygfkg0n6RvvJYMJa@mit.edu>
-References: <1644546640-23283-1-git-send-email-wangqing@vivo.com>
+        Sun, 13 Feb 2022 03:35:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70E095EDD4
+        for <linux-block@vger.kernel.org>; Sun, 13 Feb 2022 00:35:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644741321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k6ZlI3Dqwo4UKY7jAxIGcE0pPnnVzQTfMXYUPVsBqRU=;
+        b=Un7MzgG8qfTOa+5ffJY9/ByYMpqKMOVB8lILvCqbp4c8PaYi0BJ5dgf22xp33MOTfWCDDR
+        zwD+yvVf46HsAuptoyS9qfJDP8YPCYGX3LEHmDDBgVt5ZILXLFdl0hShG0gQNQPzR7kCiW
+        Xh5kFIoZ6qhRv6p6tl5gVCzvUrwvtos=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-451-uO_OP2kPOOSHrMTRfbPEAQ-1; Sun, 13 Feb 2022 03:35:18 -0500
+X-MC-Unique: uO_OP2kPOOSHrMTRfbPEAQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62B8D814245;
+        Sun, 13 Feb 2022 08:35:16 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D83D87AB63;
+        Sun, 13 Feb 2022 08:34:58 +0000 (UTC)
+Date:   Sun, 13 Feb 2022 16:34:53 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Li Ning <lining2020x@163.com>,
+        Tejun Heo <tj@kernel.org>, Chunguang Xu <brookxu@tencent.com>
+Subject: Re: [PATCH V2 0/7] block: improve iops limit throttle
+Message-ID: <YgjCrXxdpfxKAYAD@T590>
+References: <20220209091429.1929728-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1644546640-23283-1-git-send-email-wangqing@vivo.com>
+In-Reply-To: <20220209091429.1929728-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 10, 2022 at 06:30:23PM -0800, Qing Wang wrote:
-> From: Wang Qing <wangqing@vivo.com>
+On Wed, Feb 09, 2022 at 05:14:22PM +0800, Ming Lei wrote:
+> Hello Guys,
 > 
-> It is better to use time_is_xxx() directly instead of jiffies judgment
-> for understanding.
+> Lining reported that iops limit throttle doesn't work on dm-thin, also
+> iops limit throttle works bad on plain disk in case of excessive split.
+> 
+> Commit 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios")
+> was for addressing this issue, but the taken approach is just to run
+> post-accounting, then current split bios won't be throttled actually,
+> so actual iops throttle result isn't good in case of excessive bio
+> splitting.
+> 
+> The 1st three patches are cleanup.
+> 
+> The 4th patches add one new local helper of submit_bio_noacct_nocheck() for
+> blk_throtl_dispatch_work_fn(), so that bios won't be throttled any more
+> when blk-throttle code dispatches throttled bios.
+> 
+> The 5th and 6th patch makes the real difference for throttling split bio wrt.
+> iops limit.
+> 
+> The last patch is to revert commit 4f1e9630afe6 ("blk-throtl: optimize IOPS
+> throttle for large IO scenarios").
+> 
+> Lining has verified that iops throttle is improved much on the posted
+> RFC V1 version.
+> 
+> V2:
+> 	- remove RFC
+> 	- don't add/export __submit_bio_noacct(), instead add one new local
+> 	helper of submit_bio_noacct_nocheck() per Christoph's suggestion
+> 
+> Ming Lei (7):
+>   block: move submit_bio_checks() into submit_bio_noacct
+>   block: move blk_crypto_bio_prep() out of blk-mq.c
+>   block: don't declare submit_bio_checks in local header
+>   block: don't check bio in blk_throtl_dispatch_work_fn
+>   block: throttle split bio in case of iops limit
+>   block: don't try to throttle split bio if iops limit isn't set
+>   block: revert 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for
+>     large IO scenarios")
 
-Hi Wang,
+Hello Tejun, Chunguang and guys,
 
-"judgement" doesn't really make sense as a description to an English
-speaker.  The following a commit desription (for all of these series)
-is probably going to be a bit more understable:
+Can you give an review on this patchset? Especially the last 4 changes
+on blk-throtl?
 
-Use the helper function time_is_{before,after}_jiffies() to improve
-code readability.
 
-Cheers,
+Thanks,
+Ming
 
-						- Ted
