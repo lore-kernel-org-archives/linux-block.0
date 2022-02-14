@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 627F1C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 17:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED06EC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 17:45:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357307AbiBNRpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 12:45:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34928 "EHLO
+        id S1357271AbiBNRpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 12:45:00 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357218AbiBNRor (ORCPT
+        with ESMTP id S1357235AbiBNRom (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 12:44:47 -0500
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8353E65496
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:36 -0800 (PST)
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21ECHRdZ024089
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:36 -0800
+        Mon, 14 Feb 2022 12:44:42 -0500
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1697165488
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:35 -0800 (PST)
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+        by m0089730.ppops.net (8.16.1.2/8.16.1.2) with ESMTP id 21ECPZYT015470
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:34 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=LHVvoEZfE6JaHZroD1k0ORc9e9YEoF8oOTWuN+537Qc=;
- b=m8IUD7cIb0bY1zrxnNi/Wp7ND5BOIKoqg2fLChxD1KbWdy4R8eKjp03nsRoywYY5ccC9
- aovmYfV1fYvtRyyTvncJ+7FM4WYupFi7gW/JB7NqLu4D5bI3btoKl1EwLDptwkLkwcnP
- XLym/5qbBGRfzYEgTHu0kZK1RUSUSmArQ+0= 
+ bh=WqJGTjlBszlWWKZYtp71MBllUosGp30baKNJ+u9prKQ=;
+ b=eTFgI6MxxCJDd+hMmqvY/GQq8D+Mwsn1gF53kcc87W9Y2R6XfndmXJ0XK1CnPoCyB5KU
+ DNx7xEAtXDVQwkx7NpdCf7biIWxbnWLu1GfyNi++WazJT5TBhANMjdZiFq/q8UG/t7vr
+ FPMIH309p+sCJm+u3hDB3/XKWqdbHGhjYhw= 
 Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3e7py4j44e-17
+        by m0089730.ppops.net (PPS) with ESMTPS id 3e7q2ea45x-6
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:36 -0800
-Received: from twshared7634.08.ash8.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:34 -0800
+Received: from twshared22811.39.frc1.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:21d::7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 14 Feb 2022 09:44:29 -0800
+ 15.1.2308.21; Mon, 14 Feb 2022 09:44:32 -0800
 Received: by devvm225.atn0.facebook.com (Postfix, from userid 425415)
-        id D2FC8ABBD10B; Mon, 14 Feb 2022 09:44:09 -0800 (PST)
+        id C0AFEABBD105; Mon, 14 Feb 2022 09:44:09 -0800 (PST)
 From:   Stefan Roesch <shr@fb.com>
 To:     <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>, <kernel-team@fb.com>
 CC:     <shr@fb.com>
-Subject: [PATCH v1 12/14] mm: support write throttling for async buffered writes
-Date:   Mon, 14 Feb 2022 09:44:01 -0800
-Message-ID: <20220214174403.4147994-13-shr@fb.com>
+Subject: [PATCH v1 09/14] io_uring: add support for async buffered writes
+Date:   Mon, 14 Feb 2022 09:43:58 -0800
+Message-ID: <20220214174403.4147994-10-shr@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220214174403.4147994-1-shr@fb.com>
 References: <20220214174403.4147994-1-shr@fb.com>
@@ -49,194 +49,102 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: YqHiaYG1BHuMUYooxUUSZo4NV4g3Vgj-
-X-Proofpoint-GUID: YqHiaYG1BHuMUYooxUUSZo4NV4g3Vgj-
+X-Proofpoint-GUID: RT1GO0DnTmdcesImqCFf2YjCX3komD6a
+X-Proofpoint-ORIG-GUID: RT1GO0DnTmdcesImqCFf2YjCX3komD6a
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 phishscore=0
- clxscore=1015 spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140105
+X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 mlxscore=0
+ suspectscore=0 impostorscore=0 clxscore=1015 malwarescore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=953 phishscore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202140105
 X-FB-Internal: deliver
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This change adds support for async write throttling in the function
-balance_dirty_pages(). So far if throttling was required, the code
-was waiting synchronously as long as the writes were throttled. This
-change introduces asynchronous throttling. Instead of waiting in the
-function balance_dirty_pages(), the timeout is set in the task_struct
-field bdp_pause. Once the timeout has expired, the writes are no
-longer throttled.
+This enables the async buffered writes for block devices in io_uring.
+Buffered writes are enabled for blocks that are already in the page
+cache or can be acquired with noio.
 
-- Add a new parameter to the balance_dirty_pages() function
-  - This allows the caller to pass in the nowait flag
-  - When the nowait flag is specified, the code does not wait in
-    balance_dirty_pages(), but instead stores the wait expiration in the
-    new task_struct field bdp_pause.
-
-- The function balance_dirty_pages_ratelimited() resets the new values
-  in the task_struct, once the timeout has expired
-
-This change is required to support write throttling for the async
-buffered writes. While the writes are throttled, io_uring still can make
-progress with processing other requests.
+It is possible that a write request cannot be completely fullfilled
+(short write). In that case the request is punted and sent to the io
+workers to be completed. Before submitting the request to the io
+workers, the request is updated with how much has already been written.
 
 Signed-off-by: Stefan Roesch <shr@fb.com>
 ---
- include/linux/writeback.h |  1 +
- mm/filemap.c              |  2 +-
- mm/page-writeback.c       | 54 ++++++++++++++++++++++++++++-----------
- 3 files changed, 41 insertions(+), 16 deletions(-)
+ fs/io_uring.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index fec248ab1fec..48176a8047db 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -373,6 +373,7 @@ unsigned long wb_calc_thresh(struct bdi_writeback *wb=
-, unsigned long thresh);
-=20
- void wb_update_bandwidth(struct bdi_writeback *wb);
- void balance_dirty_pages_ratelimited(struct address_space *mapping);
-+void  balance_dirty_pages_ratelimited_flags(struct address_space *mappin=
-g, bool is_async);
- bool wb_over_bg_thresh(struct bdi_writeback *wb);
-=20
- typedef int (*writepage_t)(struct page *page, struct writeback_control *=
-wbc,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 19065ad95a4c..aa51ff1a0e8f 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3805,7 +3805,7 @@ static ssize_t do_generic_perform_write(struct file=
- *file, struct iov_iter *i,
- 		pos +=3D status;
- 		written +=3D status;
-=20
--		balance_dirty_pages_ratelimited(mapping);
-+		balance_dirty_pages_ratelimited_flags(mapping, flags & AOP_FLAGS_NOWAI=
-T);
- 	} while (iov_iter_count(i));
-=20
- 	return written ? written : status;
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 91d163f8d36b..767d0b997da5 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -1558,7 +1558,7 @@ static inline void wb_dirty_limits(struct dirty_thr=
-ottle_control *dtc)
-  * perform some writeout.
-  */
- static void balance_dirty_pages(struct bdi_writeback *wb,
--				unsigned long pages_dirtied)
-+				unsigned long pages_dirtied, bool is_async)
- {
- 	struct dirty_throttle_control gdtc_stor =3D { GDTC_INIT(wb) };
- 	struct dirty_throttle_control mdtc_stor =3D { MDTC_INIT(wb, &gdtc_stor)=
- };
-@@ -1792,6 +1792,14 @@ static void balance_dirty_pages(struct bdi_writeba=
-ck *wb,
- 					  period,
- 					  pause,
- 					  start_time);
-+		if (is_async) {
-+			if (current->bdp_nr_dirtied_pause =3D=3D -1) {
-+				current->bdp_pause =3D now + pause;
-+				current->bdp_nr_dirtied_pause =3D nr_dirtied_pause;
-+			}
-+			break;
-+		}
-+
- 		__set_current_state(TASK_KILLABLE);
- 		wb->dirty_sleep =3D now;
- 		io_schedule_timeout(pause);
-@@ -1799,6 +1807,8 @@ static void balance_dirty_pages(struct bdi_writebac=
-k *wb,
- 		current->dirty_paused_when =3D now + pause;
- 		current->nr_dirtied =3D 0;
- 		current->nr_dirtied_pause =3D nr_dirtied_pause;
-+		current->bdp_nr_dirtied_pause =3D -1;
-+		current->bdp_pause =3D 0;
-=20
- 		/*
- 		 * This is typically equal to (dirty < thresh) and can also
-@@ -1863,19 +1873,7 @@ static DEFINE_PER_CPU(int, bdp_ratelimits);
-  */
- DEFINE_PER_CPU(int, dirty_throttle_leaks) =3D 0;
-=20
--/**
-- * balance_dirty_pages_ratelimited - balance dirty memory state
-- * @mapping: address_space which was dirtied
-- *
-- * Processes which are dirtying memory should call in here once for each=
- page
-- * which was newly dirtied.  The function will periodically check the sy=
-stem's
-- * dirty state and will initiate writeback if needed.
-- *
-- * Once we're over the dirty memory limit we decrease the ratelimiting
-- * by a lot, to prevent individual processes from overshooting the limit
-- * by (ratelimit_pages) each.
-- */
--void balance_dirty_pages_ratelimited(struct address_space *mapping)
-+void balance_dirty_pages_ratelimited_flags(struct address_space *mapping=
-, bool is_async)
- {
- 	struct inode *inode =3D mapping->host;
- 	struct backing_dev_info *bdi =3D inode_to_bdi(inode);
-@@ -1886,6 +1884,15 @@ void balance_dirty_pages_ratelimited(struct addres=
-s_space *mapping)
- 	if (!(bdi->capabilities & BDI_CAP_WRITEBACK))
- 		return;
-=20
-+	if (current->bdp_nr_dirtied_pause !=3D -1 && time_after(jiffies, curren=
-t->bdp_pause)) {
-+		current->dirty_paused_when =3D current->bdp_pause;
-+		current->nr_dirtied =3D 0;
-+		current->nr_dirtied_pause =3D current->bdp_nr_dirtied_pause;
-+
-+		current->bdp_nr_dirtied_pause =3D -1;
-+		current->bdp_pause =3D 0;
-+	}
-+
- 	if (inode_cgwb_enabled(inode))
- 		wb =3D wb_get_create_current(bdi, GFP_KERNEL);
- 	if (!wb)
-@@ -1924,10 +1931,27 @@ void balance_dirty_pages_ratelimited(struct addre=
-ss_space *mapping)
- 	preempt_enable();
-=20
- 	if (unlikely(current->nr_dirtied >=3D ratelimit))
--		balance_dirty_pages(wb, current->nr_dirtied);
-+		balance_dirty_pages(wb, current->nr_dirtied, is_async);
-=20
- 	wb_put(wb);
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 2e04f718319d..76b1ff602470 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -3615,7 +3615,7 @@ static inline int io_iter_do_read(struct io_kiocb *=
+req, struct iov_iter *iter)
+ 		return -EINVAL;
  }
-+
-+/**
-+ * balance_dirty_pages_ratelimited - balance dirty memory state
-+ * @mapping: address_space which was dirtied
-+ *
-+ * Processes which are dirtying memory should call in here once for each=
- page
-+ * which was newly dirtied.  The function will periodically check the sy=
-stem's
-+ * dirty state and will initiate writeback if needed.
-+ *
-+ * Once we're over the dirty memory limit we decrease the ratelimiting
-+ * by a lot, to prevent individual processes from overshooting the limit
-+ * by (ratelimit_pages) each.
-+ */
-+void balance_dirty_pages_ratelimited(struct address_space *mapping)
-+{
-+	balance_dirty_pages_ratelimited_flags(mapping, false);
-+}
- EXPORT_SYMBOL(balance_dirty_pages_ratelimited);
 =20
- /**
+-static bool need_read_all(struct io_kiocb *req)
++static bool need_complete_io(struct io_kiocb *req)
+ {
+ 	return req->flags & REQ_F_ISREG ||
+ 		S_ISBLK(file_inode(req->file)->i_mode);
+@@ -3679,7 +3679,7 @@ static int io_read(struct io_kiocb *req, unsigned i=
+nt issue_flags)
+ 	} else if (ret =3D=3D -EIOCBQUEUED) {
+ 		goto out_free;
+ 	} else if (ret =3D=3D req->result || ret <=3D 0 || !force_nonblock ||
+-		   (req->flags & REQ_F_NOWAIT) || !need_read_all(req)) {
++		   (req->flags & REQ_F_NOWAIT) || !need_complete_io(req)) {
+ 		/* read all, failed, already did sync or don't want to retry */
+ 		goto done;
+ 	}
+@@ -3777,9 +3777,10 @@ static int io_write(struct io_kiocb *req, unsigned=
+ int issue_flags)
+ 		if (unlikely(!io_file_supports_nowait(req)))
+ 			goto copy_iov;
+=20
+-		/* file path doesn't support NOWAIT for non-direct_IO */
+-		if (force_nonblock && !(kiocb->ki_flags & IOCB_DIRECT) &&
+-		    (req->flags & REQ_F_ISREG))
++		/* File path supports NOWAIT for non-direct_IO only for block devices.=
+ */
++		if (!(kiocb->ki_flags & IOCB_DIRECT) &&
++			!(kiocb->ki_filp->f_mode & FMODE_BUF_WASYNC) &&
++			(req->flags & REQ_F_ISREG))
+ 			goto copy_iov;
+=20
+ 		kiocb->ki_flags |=3D IOCB_NOWAIT;
+@@ -3831,6 +3832,24 @@ static int io_write(struct io_kiocb *req, unsigned=
+ int issue_flags)
+ 		/* IOPOLL retry should happen for io-wq threads */
+ 		if (ret2 =3D=3D -EAGAIN && (req->ctx->flags & IORING_SETUP_IOPOLL))
+ 			goto copy_iov;
++
++		if (ret2 !=3D req->result && ret2 >=3D 0 && need_complete_io(req)) {
++			struct io_async_rw *rw;
++
++			/* This is a partial write. The file pos has already been
++			 * updated, setup the async struct to complete the request
++			 * in the worker. Also update bytes_done to account for
++			 * the bytes already written.
++			 */
++			iov_iter_save_state(&s->iter, &s->iter_state);
++			ret =3D io_setup_async_rw(req, iovec, s, true);
++
++			rw =3D req->async_data;
++			if (rw)
++				rw->bytes_done +=3D ret2;
++
++			return ret ? ret : -EAGAIN;
++		}
+ done:
+ 		kiocb_done(req, ret2, issue_flags);
+ 	} else {
 --=20
 2.30.2
 
