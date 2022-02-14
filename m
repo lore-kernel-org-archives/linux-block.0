@@ -2,69 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD2CC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 13:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35919C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 13:47:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348720AbiBNNqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 08:46:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58220 "EHLO
+        id S1354650AbiBNNrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 08:47:08 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354711AbiBNNp5 (ORCPT
+        with ESMTP id S1354615AbiBNNrI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 08:45:57 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3E0DB849
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 05:45:49 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id h14-20020a17090a130e00b001b88991a305so18907779pja.3
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 05:45:49 -0800 (PST)
+        Mon, 14 Feb 2022 08:47:08 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A326BCBF
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 05:47:00 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id z16so7400659pfh.3
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 05:47:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AFL1QrRZFiRBpJOUN2fd4w7QGVdaH7B6zGnzpkZBapw=;
-        b=D6bX9VUCLqM8jyGjb4VMY6tXa0mEG//TgY5UlTRkkJdLxthwxikwk0zQq/r5v5aiZ3
-         gMk15/vGlBSxyKjWaUMOfvAPG+GTTrQfLbIa2UmLc7FMQBMIFGgjJAtI1DOMlPvZSXgc
-         YJlV6SKYCigwk09hDb8NWNa5BFAk+jApnpIkij9CYFhqi2xtgRLQKd95BmsHhWLopGYw
-         aHdHCY6JG6ol4MOVKhc7VQbEYIBvKHlDABre2sI8jTJIWqWm+POAoOFpmw4uBgYOyrj1
-         BZQfqdNhvUMAr1ceftYG0sWBfKeuW/8+MujkM6NhFdU5+mAsxtZbnfNmhOSPxInQjije
-         tqzQ==
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=MQyTnQdQjSUY0e78Gh+oLNwswoy3Hv5PSlLyjvXSo7Q=;
+        b=Tf6gDPf342I3F2XOXojPByk3D5E4j8aFY1XRUMtHjN6AAaPkrlBwqUXryN6fse6iQA
+         2RsKLuE+OVmx1jGJAUDhVZzO6i8Osanb5ggdCN2HKX3LRQC/Tt3bD+cTnxXao9AG/jrw
+         P1rD3WX6M9zdfIIaXC8Va24TN/NledeQlGmTNj/4SpRp8JdkodKXgisPDU44Eof4W/NO
+         gCyOeoT/HcVNy/Ak2bLK1C7PxnYhSTlOjMr4qhVlNwvTKP0IFOtyGkYyiVSKyM8OvwxE
+         S2wDG49boxBlI3Y/sH1jy0R/xwVsF5UwExXTywkoi2oA+bts8/ArT70dAY7xn09XKNyC
+         8Xdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=AFL1QrRZFiRBpJOUN2fd4w7QGVdaH7B6zGnzpkZBapw=;
-        b=Kf5npIHW0TNMAPlB16SD+mWNZ2usjvVbg32kuNuoWDQSiWDCBRR6bB9Kmrs6mI3htE
-         /WJmXh0LDV/TcoJ4Z27X9C1sO4daCeOAtHGgjsJPKHFKnZMBvuk05odfUrnEuC19E0f3
-         9wAa8JaX8EUZkuoe0GkYhEtb+HUJnzK+0AdbPZo+xU4oDJmNtqtDDkMQ1QMZ6x5lzV7d
-         0S7V6J5S3bBKAc2v9ABaQbYyaowBikAY2zzFuMr5T+0Zyorsl6J8++3V+z2C7Jbvxhvu
-         KOCgvQ6HphJ6/WjCK0qY3mCITaB21/JlR+9Euw/5HA1ylJcl1HAN4Q8/BwpcqlGunD+Z
-         4lpQ==
-X-Gm-Message-State: AOAM531fl3IQ8/Sa46Ur7xvAlhFUWJSeUddZZamQ/cqVr+9FgTiKUJna
-        3jTz6DNwNfLdua8SL1TIk8KCzQ==
-X-Google-Smtp-Source: ABdhPJxEThvNuxPwxJjuBk8NHTkaRqgrmTwxf1q5rLUh7kyivevFeJz3lSSqx9N3v0rnvuKnEq95jQ==
-X-Received: by 2002:a17:902:a98b:: with SMTP id bh11mr14370585plb.49.1644846349300;
-        Mon, 14 Feb 2022 05:45:49 -0800 (PST)
+        bh=MQyTnQdQjSUY0e78Gh+oLNwswoy3Hv5PSlLyjvXSo7Q=;
+        b=48hGfwmcJV+XX5/+xYgqDJ6NZSw+SiZqrzIcVUh/E7Y8ZZ/vFIwpo5nJbf/C9Lse/p
+         3pI6c72M+LfgzmlgMI/BelkpJIXcpaK6Mui9TAEjRrmIGk8RcdQIdBe060RGhBOhADs5
+         B4GLcuNxCfi3F0g8ES0jbGqoqUPNxf6EXvhLiHx9FXlPRKe0ByXJpxh8o7QrZFOAcZVf
+         yq45LM2WupvFozN/L9QPm03uptJNC2f/wBt3iM+Rc+t/RTvI1x1mtyQ3Ak9iMHznJL7j
+         z6mHq2cWE3RAm4cPF4pQQ58Abr4aYij9Gz+lW6grC31vHkJc1ioXPGZ2uy3oQDC6T1Fp
+         PfoA==
+X-Gm-Message-State: AOAM53398nmHau9uhfRviaHRu6o4Hne/JPoi8BTBPTpdZs9qokyKOC+k
+        hLZnPzxZo+4qYrk2SaNA/H9Opn7yEK0YkA==
+X-Google-Smtp-Source: ABdhPJzbRYhSFBJrtCWaNzNYUGN8AOr2nQpS0Oz8VoypHgHSgTlq4TbRAXgYRS5WXnQi6MHP/goPVA==
+X-Received: by 2002:a62:7ed1:: with SMTP id z200mr2267090pfc.76.1644846419742;
+        Mon, 14 Feb 2022 05:46:59 -0800 (PST)
 Received: from [192.168.1.116] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ch19sm14417318pjb.19.2022.02.14.05.45.48
+        by smtp.gmail.com with ESMTPSA id l8sm2952852pgt.77.2022.02.14.05.46.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Feb 2022 05:45:48 -0800 (PST)
-Subject: Re: [PATCH 0/4] blk-lib: cleanup bdev_get_queue()
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>,
-        "jiangguoqing@kylinos.cn" <jiangguoqing@kylinos.cn>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
-References: <20220214100859.9400-1-kch@nvidia.com>
- <5e12a394-031f-51f6-a5f1-39f8d0ee369c@nvidia.com>
+        Mon, 14 Feb 2022 05:46:59 -0800 (PST)
+Subject: Re: [PATCH 0/8] loop: cleanup and few improvements
+To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org
+References: <20220214100119.6795-1-kch@nvidia.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8fe8553e-d9b0-bcbf-f332-55dbf1985358@kernel.dk>
-Date:   Mon, 14 Feb 2022 06:45:47 -0700
+Message-ID: <448dd873-daed-25a8-4996-755b64805cc6@kernel.dk>
+Date:   Mon, 14 Feb 2022 06:46:58 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <5e12a394-031f-51f6-a5f1-39f8d0ee369c@nvidia.com>
+In-Reply-To: <20220214100119.6795-1-kch@nvidia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,28 +66,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/14/22 3:19 AM, Chaitanya Kulkarni wrote:
-> On 2/14/22 2:08 AM, Chaitanya Kulkarni wrote:
->> Hi,
->>
->> Based on the comment in the include/linux/blkdev.h:bdev_get_queue()
->> the return value of the function will never be NULL. This patch series
->> removes those checks present in the blk-lib.c, also removes the not
->> needed local variable pointer to request_queue from the write_zeroes
->> helpers.
->>
->> Below is the test log for  discard (__blkdev_issue_disacrd()) and
->> write-zeroes (__blkdev_issue_write_zeroes/__blkdev_issue_zero_pages()).
->>
->> -ck
->>
+On 2/14/22 3:01 AM, Chaitanya Kulkarni wrote:
+> Hi,
 > 
-> This clashes with Christoph's write same cleanup. I'll resend this
-> once that is in the linux-block tree, meanwhile any comments on
-> discard, write-zeroes and zero-pages patches are welcome.
+> This has few improvment and cleanups such as using sysfs_emit() for the
+> sysfs dev attributes and removing variables that are only used once and
+> a cleanup with fixing declaration.
+> 
+> Below is the test log where 10 loop devices created, each device is
+> linked to it's own file in ./loopX, formatted with xfs and mounted on
+> /mnt/loopX. For each device it reads the offset, sizelimit, autoclear,
+> partscan, and dio attr from sysfs using cat command, then it runs fio
+> verify job on it.
+> 
+> In summary write-verify fio job seems to work fine :-
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3495: Mon Feb 14 00:43:19 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3960: Mon Feb 14 00:45:17 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4321: Mon Feb 14 00:47:15 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4369: Mon Feb 14 00:49:20 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4443: Mon Feb 14 00:51:25 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4536: Mon Feb 14 00:53:25 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4770: Mon Feb 14 00:55:24 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4933: Mon Feb 14 00:57:31 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=5008: Mon Feb 14 00:59:35 2022
+> write-and-verify: (groupid=0, jobs=1): err= 0: pid=5048: Mon Feb 14 01:01:58 2022
+> 
+> Below is detailed test log.
+> 
+> Chaitanya Kulkarni (8):
+>   loop: use sysfs_emit() in the sysfs offset show
+>   loop: use sysfs_emit() in the sysfs sizelimit show
+>   loop: use sysfs_emit() in the sysfs autoclear show
+>   loop: use sysfs_emit() in the sysfs partscan show
+>   loop: use sysfs_emit() in the sysfs dio show
+>   loop: remove extra variable in lo_fallocate()
+>   loop: remove extra variable in lo_req_flush
+>   loop: allow user to set the queue depth
 
-Please just collapse those patches into 1. Right now it's 4 patches
-with identical titles, that's very confusing.
+Please collapse patches 1..5.
 
 -- 
 Jens Axboe
