@@ -2,122 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 517CEC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 17:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F272C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 18:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357246AbiBNRpL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 12:45:11 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35146 "EHLO
+        id S1348972AbiBNSIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 13:08:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357249AbiBNRor (ORCPT
+        with ESMTP id S235368AbiBNSIm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 12:44:47 -0500
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE536549E
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:37 -0800 (PST)
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21ECHRdc024089
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:37 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=facebook;
- bh=zdWhSChvqhF2fmfEaurlE4EGbKOQKMRzCLYDx/9AfHo=;
- b=qiIC9nO4C8g/b/yIJ0VqOVOTvbSaWfhF415m2rk4uv8/sZsGbM2vtYkwVfMv+ueVWRwV
- KNAdN27ymErA7rrpOutG5SnmnaSrqvbvg1i2F6pFiHTiKZBVZx+GEfxMTTi06OrjNI+o
- Cj8DRAP98GVYmi14RYoWw63XIpnALeDsepE= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3e7py4j44e-20
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:37 -0800
-Received: from twshared7634.08.ash8.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 14 Feb 2022 09:44:25 -0800
-Received: by devvm225.atn0.facebook.com (Postfix, from userid 425415)
-        id ADF1DABBD0FF; Mon, 14 Feb 2022 09:44:09 -0800 (PST)
-From:   Stefan Roesch <shr@fb.com>
-To:     <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
-CC:     <shr@fb.com>
-Subject: [PATCH v1 06/14] fs: split off __create_empty_buffers function
-Date:   Mon, 14 Feb 2022 09:43:55 -0800
-Message-ID: <20220214174403.4147994-7-shr@fb.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220214174403.4147994-1-shr@fb.com>
+        Mon, 14 Feb 2022 13:08:42 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED0365171;
+        Mon, 14 Feb 2022 10:08:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=c9YPrGABn7w/8u5ruEO/mdlaRrXyOVduf4KJ9J9ae6w=; b=akTThdDY+jFH+5THen3Sn3+Ux1
+        /Oza9Vnodscf30MWU7Pvn3x0n+xnB+keIotCqEEOSeZvgmesga+UbXGALn6WrV00c61iEBVNspwhF
+        8gmNeLyCvWQFiHQ8viKtxyQi80Acqo77ncm1k9PM7jM9H4k211nU+7M9YG4lCdeUserReXRkZvHRf
+        XLNOvAoQCohO6yH9+sFwgzaUM8k8D2MANvYcNxHws83n8SOszjMa+4K5TdYPzYfG0109bl5G3p0m3
+        tnFPBQrjL0ZufHJuuYG9AHIPDTA0F5amorZSCZ5Du244dvc0TQnNH6NUHY3kDyK8LOhPmY9ZLryXA
+        Mg6aHR4g==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nJflz-00D8zj-KC; Mon, 14 Feb 2022 18:08:29 +0000
+Date:   Mon, 14 Feb 2022 18:08:27 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Stefan Roesch <shr@fb.com>
+Cc:     io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH v1 03/14] mm: add noio support in filemap_get_pages
+Message-ID: <Ygqam9fgYXZeqK2H@casper.infradead.org>
 References: <20220214174403.4147994-1-shr@fb.com>
+ <20220214174403.4147994-4-shr@fb.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: uCAdGLz1Nrj5HtxaMBECvskAn8GVZ9ya
-X-Proofpoint-GUID: uCAdGLz1Nrj5HtxaMBECvskAn8GVZ9ya
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 phishscore=0
- clxscore=1015 spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140105
-X-FB-Internal: deliver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220214174403.4147994-4-shr@fb.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This splits off the function __create_empty_buffers() from the function
-create_empty_buffers. The __create_empty_buffers has an additional gfp
-parameter. This allows the caller to specify the allocation properties.
+On Mon, Feb 14, 2022 at 09:43:52AM -0800, Stefan Roesch wrote:
+> This adds noio support for async buffered writes in filemap_get_pages.
+> The idea is to handle the failure gracefully and return -EAGAIN if we
+> can't get the memory quickly.
 
-Signed-off-by: Stefan Roesch <shr@fb.com>
----
- fs/buffer.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+But it doesn't return -EAGAIN?
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index a1986f95a39a..948505480b43 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1554,17 +1554,12 @@ void block_invalidatepage(struct page *page, unsi=
-gned int offset,
- EXPORT_SYMBOL(block_invalidatepage);
-=20
-=20
--/*
-- * We attach and possibly dirty the buffers atomically wrt
-- * __set_page_dirty_buffers() via private_lock.  try_to_free_buffers
-- * is already excluded via the page lock.
-- */
--void create_empty_buffers(struct page *page,
--			unsigned long blocksize, unsigned long b_state)
-+static void __create_empty_buffers(struct page *page, unsigned long bloc=
-ksize,
-+				unsigned long b_state, gfp_t gfp)
- {
- 	struct buffer_head *bh, *head, *tail;
-=20
--	head =3D alloc_page_buffers(page, blocksize, true);
-+	head =3D __alloc_page_buffers(page, blocksize, gfp);
- 	bh =3D head;
- 	do {
- 		bh->b_state |=3D b_state;
-@@ -1587,6 +1582,17 @@ void create_empty_buffers(struct page *page,
- 	attach_page_private(page, head);
- 	spin_unlock(&page->mapping->private_lock);
- }
-+/*
-+ * We attach and possibly dirty the buffers atomically wrt
-+ * __set_page_dirty_buffers() via private_lock.  try_to_free_buffers
-+ * is already excluded via the page lock.
-+ */
-+void create_empty_buffers(struct page *page,
-+			unsigned long blocksize, unsigned long b_state)
-+{
-+	return __create_empty_buffers(page, blocksize, b_state,
-+				GFP_NOFS | __GFP_ACCOUNT | __GFP_NOFAIL);
-+}
- EXPORT_SYMBOL(create_empty_buffers);
-=20
- /**
---=20
-2.30.2
+        folio = filemap_alloc_folio(mapping_gfp_mask(mapping), 0);
+        if (!folio)
+                return -ENOMEM;
 
+> Signed-off-by: Stefan Roesch <shr@fb.com>
+> ---
+>  mm/filemap.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index d2fb817c0845..0ff4278c3961 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -2591,10 +2591,15 @@ static int filemap_get_pages(struct kiocb *iocb, struct iov_iter *iter,
+>  		filemap_get_read_batch(mapping, index, last_index, fbatch);
+>  	}
+>  	if (!folio_batch_count(fbatch)) {
+> +		unsigned int pflags;
+> +
+>  		if (iocb->ki_flags & (IOCB_NOWAIT | IOCB_WAITQ))
+> -			return -EAGAIN;
+> +			pflags = memalloc_noio_save();
+>  		err = filemap_create_folio(filp, mapping,
+>  				iocb->ki_pos >> PAGE_SHIFT, fbatch);
+> +		if (iocb->ki_flags & (IOCB_NOWAIT | IOCB_WAITQ))
+> +			memalloc_noio_restore(pflags);
+> +
+>  		if (err == AOP_TRUNCATED_PAGE)
+>  			goto retry;
+>  		return err;
+
+I would also not expect the memalloc_noio_save/restore calls to be
+here.  Surely they should be at the top of the call chain where
+IOCB_NOWAIT/IOCB_WAITQ are set?
