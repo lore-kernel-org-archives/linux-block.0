@@ -2,125 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABF4C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 18:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98451C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 19:06:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352157AbiBNSOU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 13:14:20 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58770 "EHLO
+        id S229710AbiBNTFo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 14:05:44 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:57518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233083AbiBNSOS (ORCPT
+        with ESMTP id S229937AbiBNTFV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 13:14:18 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FC3A65426;
-        Mon, 14 Feb 2022 10:14:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gZk48DWl/X/wLqDnKuDw3FHoocPr0eoj6xn33SzKit0=; b=YkypXM1CO6rGTl6RzndZaQyJIq
-        1YmFKeHUJGgQ7L8MgQYmJ6kiqenOXgl2nnO7iHq1+rg/IWqvAZa0PxVpbJ/Dzr1GTLRq4S1eYZQCp
-        Z/0oJQ0XGONGmgwsTGWugqyIzHoYzucvwf7F90nCV91qB+FXlBcyHrkTPcK2G84H8ES47a9UIoJOX
-        /X7RDgaqfrayRUjrf+lvdqWzX7A3A1j33rOv7F70YbnRZJNWnRsE/b3JdlIHnlhnLbl8yfARRhQyb
-        aEXO+JxE06OBTJ3rrIiEqfwX85GYjwf9rwh3ZwATI1YaWwAtQs2YRBu+zFd1ATHKGarfgRnQp2HF0
-        Cg8YRbjw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nJfrS-00D9EJ-5Q; Mon, 14 Feb 2022 18:14:06 +0000
-Date:   Mon, 14 Feb 2022 18:14:06 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Stefan Roesch <shr@fb.com>
-Cc:     io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: Re: [PATCH v1 07/14] fs: Add aop_flags parameter to
- create_page_buffers()
-Message-ID: <Ygqb7j8PUIg8dU2v@casper.infradead.org>
-References: <20220214174403.4147994-1-shr@fb.com>
- <20220214174403.4147994-8-shr@fb.com>
+        Mon, 14 Feb 2022 14:05:21 -0500
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EAE893995;
+        Mon, 14 Feb 2022 11:05:00 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id v4so15476588pjh.2;
+        Mon, 14 Feb 2022 11:05:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=b9IZjTswnZ1iUB9QT+cr1Wj9o8flIHUShxrRz7LR2AY=;
+        b=hq4XAe/+8zUJOL7TaevyVlyRAm0inKyh0npqK/CTm41Cd4954DnlPK/JP2Pf+d2Zlz
+         ec+rIRhHieKvs8YzlFJ8I7Q3Bbd1daycnvc2MB5yQCQGkvJyX9eggG7E9VRYWrMKZfl0
+         7xGINYcqaJOdATGQyx+FgOkhdCi5iPKDgOv8DSKuhOOLKBYAiYRHqlsohInZN++DNr3V
+         ciVownfJPlGcIQwi6GZH5T0b7UnAX0OvcMsdXfmaBuFD1V0xVrPLhqVFLgz2ruwHflin
+         2C7BxdkSlgAXUBEI7Mo38KYeMczl2swk0w+dbefn4GbwIuidwHH+yKAbu0xK+q0vSjQI
+         5LHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=b9IZjTswnZ1iUB9QT+cr1Wj9o8flIHUShxrRz7LR2AY=;
+        b=VGrLNCUFsXSEplsWPq18Hg73nU3Lo+swWZCKRRHUJw+wswht5Mm7mE4GMdCgK6E0GK
+         9iDJjBFEo4XiqFEzIU79CBSEIFDdXN+5XEpLSGjY9ZrLrZyDayPK/YqW6QQ3H//Eqk4o
+         x2pw1Gq1CsL9mZ7Rn3yqURJdp7n7sbJgIS5VdmWFcst2+SIM3VQaV+D3E5/eM2K+PPbD
+         vd3IgeIsj2GjwR13bznDOgqXxxABS9iRc17VpdZFFipKNCAiRn93o1rjZM6K12FaKgY7
+         bXnwRotkaj7gb9Oj3Rkk5vs54dN3VRlRgjp7B37k9jMYqL7BB0KmKIoOCSbZJLXmucoP
+         cV9g==
+X-Gm-Message-State: AOAM531IMrukNVjxfBtMnJaSaBDhwkXKjUZSdObnqVSSf91cp3IgYjWu
+        ZyhtXcIruwYy5wXPfQZS53M=
+X-Google-Smtp-Source: ABdhPJysZBUSrwdyj1e3zOC7f5puZMI0DtdNub2vOnjMtHbFWpCx5t0iqlDmLMscS4zXC2Cw4gq2tQ==
+X-Received: by 2002:a17:902:aa90:: with SMTP id d16mr140317plr.89.1644865167586;
+        Mon, 14 Feb 2022 10:59:27 -0800 (PST)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id hk3sm10314466pjb.12.2022.02.14.10.59.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Feb 2022 10:59:27 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 14 Feb 2022 08:59:26 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     axboe@kernel.dk, boris@bur.io, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-cgroup: set blkg iostat after percpu stat aggregation
+Message-ID: <Ygqmjsbu96+UZDw+@slm.duckdns.org>
+References: <20220213085902.88884-1-zhouchengming@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220214174403.4147994-8-shr@fb.com>
+In-Reply-To: <20220213085902.88884-1-zhouchengming@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 09:43:56AM -0800, Stefan Roesch wrote:
-> This adds the aop_flags parameter to the create_page_buffers function.
-> When AOP_FLAGS_NOWAIT parameter is set, the atomic allocation flag is
-> set. The AOP_FLAGS_NOWAIT flag is set, when async buffered writes are
-> enabled.
-
-Why is this better than passing in gfp flags directly?
-
-> Signed-off-by: Stefan Roesch <shr@fb.com>
-> ---
->  fs/buffer.c | 28 +++++++++++++++++++++-------
->  1 file changed, 21 insertions(+), 7 deletions(-)
+On Sun, Feb 13, 2022 at 04:59:02PM +0800, Chengming Zhou wrote:
+> Don't need to do blkg_iostat_set for top blkg iostat on each CPU,
+> so move it after percpu stat aggregation.
 > 
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index 948505480b43..5e3067173580 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -1682,13 +1682,27 @@ static inline int block_size_bits(unsigned int blocksize)
->  	return ilog2(blocksize);
->  }
->  
-> -static struct buffer_head *create_page_buffers(struct page *page, struct inode *inode, unsigned int b_state)
-> +static struct buffer_head *create_page_buffers(struct page *page,
-> +					struct inode *inode,
-> +					unsigned int b_state,
-> +					unsigned int aop_flags)
->  {
->  	BUG_ON(!PageLocked(page));
->  
-> -	if (!page_has_buffers(page))
-> -		create_empty_buffers(page, 1 << READ_ONCE(inode->i_blkbits),
-> -				     b_state);
-> +	if (!page_has_buffers(page)) {
-> +		gfp_t gfp = GFP_NOFS | __GFP_ACCOUNT;
-> +
-> +		if (aop_flags & AOP_FLAGS_NOWAIT) {
-> +			gfp |= GFP_ATOMIC | __GFP_NOWARN;
-> +			gfp &= ~__GFP_DIRECT_RECLAIM;
-> +		} else {
-> +			gfp |= __GFP_NOFAIL;
-> +		}
-> +
-> +		__create_empty_buffers(page, 1 << READ_ONCE(inode->i_blkbits),
-> +				     b_state, gfp);
-> +	}
-> +
->  	return page_buffers(page);
->  }
->  
-> @@ -1734,7 +1748,7 @@ int __block_write_full_page(struct inode *inode, struct page *page,
->  	int write_flags = wbc_to_write_flags(wbc);
->  
->  	head = create_page_buffers(page, inode,
-> -					(1 << BH_Dirty)|(1 << BH_Uptodate));
-> +					(1 << BH_Dirty)|(1 << BH_Uptodate), 0);
->  
->  	/*
->  	 * Be very careful.  We have no exclusion from __set_page_dirty_buffers
-> @@ -2000,7 +2014,7 @@ int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
->  	BUG_ON(to > PAGE_SIZE);
->  	BUG_ON(from > to);
->  
-> -	head = create_page_buffers(&folio->page, inode, 0);
-> +	head = create_page_buffers(&folio->page, inode, 0, flags);
->  	blocksize = head->b_size;
->  	bbits = block_size_bits(blocksize);
->  
-> @@ -2280,7 +2294,7 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
->  	int nr, i;
->  	int fully_mapped = 1;
->  
-> -	head = create_page_buffers(page, inode, 0);
-> +	head = create_page_buffers(page, inode, 0, 0);
->  	blocksize = head->b_size;
->  	bbits = block_size_bits(blocksize);
->  
-> -- 
-> 2.30.2
-> 
+> Fixes: ef45fe470e1e ("blk-cgroup: show global disk stats in root cgroup
+> io.stat")
+
+I'm not sure Fixes tag is necessary here.
+
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+
+but other than that,
+
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
