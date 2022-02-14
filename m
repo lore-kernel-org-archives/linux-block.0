@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2984EC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 10:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9C7C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 10:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348391AbiBNKhN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 05:37:13 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46482 "EHLO
+        id S1348410AbiBNKhO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 05:37:14 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349788AbiBNKgn (ORCPT
+        with ESMTP id S1350223AbiBNKhA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 05:36:43 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BEAAE67
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 02:03:04 -0800 (PST)
+        Mon, 14 Feb 2022 05:37:00 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2067.outbound.protection.outlook.com [40.107.237.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06A9CA66EC
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 02:03:32 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EtiAx92ZmqmnYx8wzWv1adnoXuUSWuFK1qqDqCZ2j8kfL+EAwoLbFxmTa99vNnvvQ82+WhskpmRJqBE+q61aXSpLxv/UcPA2dmXd3b6LXgE/UcQBY2nj2zhcpquFCQswTk8rEZs3uUDoR9ySmYCv/Ppp+WZliOoBqBtY4KDBb4cDdoqPgy3xZUYSLpStZ8tylGHiXug5Asy14me+TC1lLgdWa3Gbz3FzcMQExuG4SqqguiO+ALVgoCS/jnJl6mj8JprviyQTEIVD3Y5dats27Ik1ZpO2U9+alFaR5Ox26LrwAgwv96A0lQ1QawQyIqAlzZZcOtdQk/KPOb+l8d2+UQ==
+ b=LjqlT7MWXq23/W2BR/kZM4EI8k7sxARFe+s6lNvssZ2C4yJKMEe2YbhpcKVdWYyaySVqlPdt+8H6H1WV7rzEXtkmBeUgb0k6/7aXtw/kwkIg+e4OAesNqyCcHMOt7NsGnpIbaKxXWaLHvAznAg5bdgokGOxK0qbLZhPluRjdkdAeyZTylmD7C33XVYZBbdNSzjvC4I4V0E+5kyVdypuTqbatq3RikzcUMAfxJ+pBmmM7M4ybQA5/E06R6hFwZ8nlmxLXP4jlbNgmdtHZMvIpHZF+XetpcBAhH+pfhiKFxrEVaLlfoAxx8CmWcdrSJtaJrEr5RExX4TTA7dLU1r/CRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tPRL8HISYCbWUWa86yzKyPNqFQr5skJ1vmQY5DJJ4s4=;
- b=YwtbC+ZVqBXLE0guDZ2zowfuPzY1UVuwuI46vXLEl+3BHEmnt85MH7LmSoXcrwaWVM1Xxygsxh5rBNJ76PlfNYiyqtoZNflv4+opB2J2T6Jik4bPBmmtUcRzzvNkZkATKkV49edGRR7kc8jGNChd7V9pYNRU3lA67vO7qpM84skv9atDiwIdYHfk2AO9Rh9Re8wt/DIKpdbmg8+AwAJcQrXXEt6wxC9xFSLHzlrrbstnMdXb6Mv5D9u6GAzpEg0lvScYwgP5f05fSZGJx+68rWMeEklTshqzxozpNqEf3J99PddhuPa7KaULHqVRbzR5mRygMYTIGdxttLMbfO4VQw==
+ bh=ZirCYQgO91Xa3Ta75VHvK+haR/Ieo9cvEFnC1t/Ya0k=;
+ b=XUSpVo0GRLlgjxm/k1FyWl1mgAZM8Tz1JdElIn2jE8giYOFhRtOZUcNf1QdljlEGIooMiMMNc8lpk+wmEAE9vjK6NhXLc1QrAujCONbBzKFlbRodgWoJ/BsRG+QX7drenY8GFf+cyLzMSeFTEGHt4YX6pTZoE05R3uoK8jRISlr1C4H6qejruvBWEircYnLL392++/YR1OkzAiwX5Um94Ej4hPkX/ILYdxcBCAPZ6/9bihA61cNxf9VxT5pEosLiyL7Jc1QxydzI3sLGJfoNRO5uYNbc6dHZP+Z4vL2sOlxDpcwRB4V3yiD5m0SH7d641nruidQb0H4zZvw1t23Blg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  12.22.5.236) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -29,18 +29,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tPRL8HISYCbWUWa86yzKyPNqFQr5skJ1vmQY5DJJ4s4=;
- b=o1Yr98j1ZkZjHMSDso/YMaC4l8q1pcA52Hab7tIV5DuRRLOexD1aTNCFHwlaMWxOkrCx6WN3fX7j78YMuBfOolCV7ayKKLRAKTDOCKb96OXlCX8uDQKr13B0HCFzsN9JLo7AVHe/tOjPp4Q9V4pfMxrREg0oVw9MSXOH5SN9U6/LCTuMqiWAOSmkhx9ONepP6k8FqrhR6xLH17wWcv+mDauW4jcbcGJhXeQc/+/eVXuFbAQAIblSJVrJZaJUrwzJmAxo/5nKGxwxI6AxseRJZqvIt1iwypwH/PIk9MqmRAh1hvMFWfYQW7qKmVleVHOTBfa0xBBR94dzxeq2Uw+IJw==
-Received: from DM5PR19CA0024.namprd19.prod.outlook.com (2603:10b6:3:151::34)
- by PH7PR12MB5807.namprd12.prod.outlook.com (2603:10b6:510:1d3::8) with
+ bh=ZirCYQgO91Xa3Ta75VHvK+haR/Ieo9cvEFnC1t/Ya0k=;
+ b=DpeiTkdC0AS6gc3HGTJa1gm3B+OKxOwqgEjalUUEndBfM6mq5roCYHgrQ34TCbm69x6z1BBw7TvLrO2vGoJajjPjs6JZdD+mdQZNM6wJ/4FhL+q3LC2dvy4PyGqaFfrUKzHp6iTUnbmK/iqJ4G5y35Itx2KuVaXgPWfprIEsQqRVdTg5yYQlqbFo/HJ9DWDsCtOUqgUN/y/o19dcvhRwJd9XPlYZqTa11bAxa0NaZnQtWgTHxQcTgRtOn9P5UVSaMEnFyaa0rz1nqOl46AUBB7KXjVMCqzY4WRBRI8lfX609bi0YJxCW9pmo5P6iYJquWsHQleQ6JxrjW1Gxdt/AEA==
+Received: from DM6PR07CA0122.namprd07.prod.outlook.com (2603:10b6:5:330::18)
+ by DS7PR12MB5934.namprd12.prod.outlook.com (2603:10b6:8:7d::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.18; Mon, 14 Feb
- 2022 10:02:41 +0000
-Received: from DM6NAM11FT049.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:151:cafe::4b) by DM5PR19CA0024.outlook.office365.com
- (2603:10b6:3:151::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.15 via Frontend
- Transport; Mon, 14 Feb 2022 10:02:40 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.14; Mon, 14 Feb
+ 2022 10:03:02 +0000
+Received: from DM6NAM11FT033.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:330:cafe::74) by DM6PR07CA0122.outlook.office365.com
+ (2603:10b6:5:330::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.11 via Frontend
+ Transport; Mon, 14 Feb 2022 10:03:02 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -48,23 +48,23 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  12.22.5.236 as permitted sender) receiver=protection.outlook.com;
  client-ip=12.22.5.236; helo=mail.nvidia.com;
 Received: from mail.nvidia.com (12.22.5.236) by
- DM6NAM11FT049.mail.protection.outlook.com (10.13.172.188) with Microsoft SMTP
+ DM6NAM11FT033.mail.protection.outlook.com (10.13.172.221) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4975.11 via Frontend Transport; Mon, 14 Feb 2022 10:02:40 +0000
+ 15.20.4975.11 via Frontend Transport; Mon, 14 Feb 2022 10:03:02 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL109.nvidia.com
  (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Mon, 14 Feb
- 2022 10:02:39 +0000
+ 2022 10:03:02 +0000
 Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.9; Mon, 14 Feb 2022
- 02:02:39 -0800
+ 02:03:01 -0800
 From:   Chaitanya Kulkarni <kch@nvidia.com>
 To:     <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, Chaitanya Kulkarni <kch@nvidia.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>
-Subject: [PATCH 6/8] loop: remove extra variable in lo_fallocate()
-Date:   Mon, 14 Feb 2022 02:01:17 -0800
-Message-ID: <20220214100119.6795-7-kch@nvidia.com>
+Subject: [PATCH 8/8] loop: allow user to set the queue depth
+Date:   Mon, 14 Feb 2022 02:01:19 -0800
+Message-ID: <20220214100119.6795-9-kch@nvidia.com>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20220214100119.6795-1-kch@nvidia.com>
 References: <20220214100119.6795-1-kch@nvidia.com>
@@ -76,59 +76,62 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 12043c90-258d-40dd-92b7-08d9efa12319
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5807:EE_
-X-Microsoft-Antispam-PRVS: <PH7PR12MB580773C03682DCD16A3E5898A3339@PH7PR12MB5807.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Office365-Filtering-Correlation-Id: 3c38349d-2a97-4192-3619-08d9efa13043
+X-MS-TrafficTypeDiagnostic: DS7PR12MB5934:EE_
+X-Microsoft-Antispam-PRVS: <DS7PR12MB593440342B824A087B87B57EA3339@DS7PR12MB5934.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 92RMICFzsW/Xj133BYqycR3id7VvhEOFj+y8SFTfx+Z8bgVTl6ov8EzFffOF7QeXcsWejhPkk9sxz2OxZR5aOg2sGBhYssu3zcH8fYKhY8XM2HLCWiNtBn/Yq7a+vtNQ89f8hf93hl5EQ7HzSXh44qVl+VYT/zWWZZkqaT6BPyxLSHcd9VEKW9vJbdpAQ2QsMbO0sLVwF9c8HSHPEDzDGmnTvJ8LVK03ucRmPZta0a4r/QmsUbzYVQQON33a7eKdkxlNce8GvyxKgLZH/XmvdHLRTmztPuKPH0IgTGq4IFoXg80L2yMR2pb2hjyUOXyC5Ax55k2saFF+5+3iygW+Ie/bt89zT6ypzNhOj77Fxm0hERwXUxNC5RJOunyh3rN7Ng9kQiBotK7a4tAX6pDUhcxQkpqzj7j7ufcdRcjO9zxwoSIBlLOw49A9yNIXpDfRCBogJmm19KUch10p8TvzcJnKBnBQvpDSqKtETyEIcdkB3uc2jOQhbLj1jhWk/sx1U3NR3ASwwDFqlKGwwjd2xdFOr+hpUEptkITFupNco9Ru8CDeA4KgtTAw6BmgfnSlUX6aZ6gmtdxyn4vwm8FPqkhfeKvJ/RXh5PshdyD7ml/OPALNwFlqDgCkHVn4Escqy1uTf/P//VswwlI4SoLLR8g5DT+NCdqeJFXigmqqvCxZp0Uz+ru1q6Upkyv1GD6kSNkiE+kzLcOgYX1h6Tvn0w==
-X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(2616005)(1076003)(81166007)(47076005)(26005)(356005)(2906002)(36756003)(40460700003)(54906003)(508600001)(426003)(8936002)(83380400001)(8676002)(36860700001)(6916009)(4744005)(5660300002)(82310400004)(7696005)(70586007)(6666004)(316002)(336012)(4326008)(70206006)(186003)(16526019)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: OcE3GV19IDTX/eY7hUZnwKHtJZMml8pTx55UBergFGaN+C0FzevYJbIgonrCKYq+nQ7Az5hVH1kbehKXdYeucFCpiGFtdlyGmzdh1eecUKFwvjBq8hBnZPpEeDVfowdvJ9vsQB7lVM8gKrYQmv1q1fNf7zYf8jbGMy6DeTm2UuLtZJG1Um6gKkUQq9dxHogH2aZLXJJbiCuUjl1rVTNwGdYf5EPJCF2uju/2DlNf4Ltl8wzLfrBoD47Ph0ulvYgxjgobj2W7pUNHeFoG4w5HA1mASA9gA8zXFLTvXGwXNdiBznYfsorptzMjaiUz0RohSo1ulhlnBp7MMGCcf7UbAbtH4h1PUKysRUzOGLXfILpET3lSlxJUj8RPp0tC/M+TkWNqV5xT9VBPtiVjVvy61UKg/4Ssmg/2OFRTjNSQTA10nNTSF7Vgo05RSPOyvpuTlJVQJnPwHWAOZP4eao8GB1ZWEq93UkfkSsxebzkC96U95dCwQpR1IbsCbMVuoEQ7deO1p8OpvARJ7fDQ5dJwlGzJ60sULzSEHzy0vZTryTBolgDJsoVErCk7u7CgWn5jE5DQWVGc4qP8yDG+4pzwW7ZE/r2fwAMYImYkfzi6vlSqvBOs2w3EY7KB1LUCap2fWqx+S18AawWLkf9/ZMJvxX9/ZvjdCHdigIBHLt4/SaHpe2L2/LtwE+l66gyp7kgmlc6IiOv92dBKTt7gg0/bfQ==
+X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(5660300002)(40460700003)(508600001)(356005)(36860700001)(36756003)(2906002)(81166007)(426003)(54906003)(83380400001)(7696005)(6666004)(1076003)(16526019)(2616005)(47076005)(70206006)(26005)(70586007)(186003)(82310400004)(4326008)(336012)(8676002)(8936002)(6916009)(316002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2022 10:02:40.6037
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2022 10:03:02.6245
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12043c90-258d-40dd-92b7-08d9efa12319
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c38349d-2a97-4192-3619-08d9efa13043
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT049.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT033.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5807
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5934
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The local variable q is used to pass it to the blk_queue_discard(). We
-can get away with using lo->lo_queue instead of storing in a local
-variable which is not used anywhere else.
-
-No functional change in this patch.
+Instead of hardcoding queue depth allow user to set the hw queue depth
+using module parameter. Set default value to 128 to retain the existing
+behavior.
 
 Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
 ---
- drivers/block/loop.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/loop.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index a55e5eda1d17..77c61eaaa6e4 100644
+index 18b30a56bfc4..fd2184d63c11 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -308,12 +308,11 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
- 	 * a.k.a. discard/zerorange.
- 	 */
- 	struct file *file = lo->lo_backing_file;
--	struct request_queue *q = lo->lo_queue;
- 	int ret;
+@@ -1785,6 +1785,9 @@ module_param(max_loop, int, 0444);
+ MODULE_PARM_DESC(max_loop, "Maximum number of loop devices");
+ module_param(max_part, int, 0444);
+ MODULE_PARM_DESC(max_part, "Maximum number of partitions per loop device");
++static int hw_queue_depth = 128;
++module_param_named(hw_queue_depth, hw_queue_depth, int, 0444);
++MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 128");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_BLOCKDEV_MAJOR(LOOP_MAJOR);
  
- 	mode |= FALLOC_FL_KEEP_SIZE;
+@@ -1979,7 +1982,7 @@ static int loop_add(int i)
  
--	if (!blk_queue_discard(q)) {
-+	if (!blk_queue_discard(lo->lo_queue)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
+ 	lo->tag_set.ops = &loop_mq_ops;
+ 	lo->tag_set.nr_hw_queues = 1;
+-	lo->tag_set.queue_depth = 128;
++	lo->tag_set.queue_depth = hw_queue_depth;
+ 	lo->tag_set.numa_node = NUMA_NO_NODE;
+ 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
+ 	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_STACKING |
 -- 
 2.29.0
 
