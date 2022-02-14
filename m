@@ -2,124 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70ED6C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 14:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E583DC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 17:44:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353295AbiBNOu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 09:50:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53954 "EHLO
+        id S1357186AbiBNRoZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 12:44:25 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231529AbiBNOu5 (ORCPT
+        with ESMTP id S1344316AbiBNRoZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 09:50:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4906D4C7AB
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 06:50:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644850248;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=D11+cVAG03IUHV0X0HfzlaSQjb7g4OFzkQbP1NRpCco=;
-        b=Iy9h+tG8PtDwDlmqpW1+TYqAaQd6wquGJa39k8ywWDHj8Z4MnBqLV3I60sF1X9HjV6vzXY
-        SjopPNT/ub15DVWMfELIhiBl68GqE+sx4DA56leRBRxZ4E+8cmsQe05/ro2pQt4jZUy+tx
-        z8L4pICRzvv5t2dSHyuITVWf1715Wxk=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-674-eTmlwcf5OLGjSD2nnRgLJg-1; Mon, 14 Feb 2022 09:50:47 -0500
-X-MC-Unique: eTmlwcf5OLGjSD2nnRgLJg-1
-Received: by mail-ua1-f72.google.com with SMTP id q19-20020ab04a13000000b002fef2f854a6so6570070uae.7
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 06:50:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=D11+cVAG03IUHV0X0HfzlaSQjb7g4OFzkQbP1NRpCco=;
-        b=qAb9RidPVsol6tJaff+CMWT5LXXEWXniJNdGjtCslmfS90GN5isUmZI5Zr2TDLXwNq
-         cvxH6gcYl+d5IT+b0UH+j/8z5Ok6meRHn0AKzhpcrSux+aEHmrY2s7e6fZMFZMDCFbcV
-         6g4GwtStPr0bKotQqCE4ju2N6FNvpIjJhX2ZTA3kyu2/XlGKea4ks2JKT6gTpQ3Ac4Lu
-         zkuJlWxQVa+8EakFWi2q22J+Lm9qHCcZRHrOf91zs0k8RAZo6X0b9H1Fdq7ex6qqvQTa
-         qR9Fl8NReiqWua6IkfD1brlfu/c/yV5YdULwOhsyV53YLT7HaS05MofLV6KDkWh4j0X4
-         dyAA==
-X-Gm-Message-State: AOAM533bfthq9ZzlX4odEGsk1ucgpkjPeDz/xiujg6wC0XyAtw/1pqjI
-        fgama6eUj/WdHaP3EG7mt6ok3qAfG7mp8JEabh/Dz+jMz/ahKq4ILYRMY5CNz1A9kQZxUi13FCY
-        2WI+MvuFBmL2c9P5X1AmjRZkFfx9i/EZoa8Rn/Nk=
-X-Received: by 2002:a1f:dc03:: with SMTP id t3mr10747vkg.28.1644850246644;
-        Mon, 14 Feb 2022 06:50:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz4q628KlCa/+wUdfCY2l5tdpIeBtgyv3otR+7O6uT0p81j8fndB1fOtoAgIQwf1FvTSOLT9p91QC6ZtiNFuJE=
-X-Received: by 2002:a1f:dc03:: with SMTP id t3mr10729vkg.28.1644850246393;
- Mon, 14 Feb 2022 06:50:46 -0800 (PST)
+        Mon, 14 Feb 2022 12:44:25 -0500
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 116926543A
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:16 -0800 (PST)
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.1.2/8.16.1.2) with ESMTP id 21EHPrkF019421
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=HeRa2xrPrzZWD3nBwmQhy5/qvO2TqyLuQ8Y3Q09V+fQ=;
+ b=YGm+a3Ur7LIiy+gx4ZBHMIrifsmQgdAq+U5TZR801eM2CaRQD2Dbl5PGZavpyjmIaUh0
+ 2HJ3Tik4cbS04Ig1GFIc/daIKtiM9duwIfj5jKpa0VCLv1wSudwNKBG2ouqiyS0R9NBj
+ caAmL71NKoIq/CF5kLWb8R6jGskEFenEWHI= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by m0001303.ppops.net (PPS) with ESMTPS id 3e7ufp85v3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 09:44:16 -0800
+Received: from twshared0983.05.ash8.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:82::c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 14 Feb 2022 09:44:15 -0800
+Received: by devvm225.atn0.facebook.com (Postfix, from userid 425415)
+        id 94151ABBD0F7; Mon, 14 Feb 2022 09:44:09 -0800 (PST)
+From:   Stefan Roesch <shr@fb.com>
+To:     <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
+CC:     <shr@fb.com>
+Subject: [PATCH v1 02/14] mm: Introduce do_generic_perform_write
+Date:   Mon, 14 Feb 2022 09:43:51 -0800
+Message-ID: <20220214174403.4147994-3-shr@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220214174403.4147994-1-shr@fb.com>
+References: <20220214174403.4147994-1-shr@fb.com>
 MIME-Version: 1.0
-References: <20220131203337.GA17666@redhat> <CAFj5m9Lej-oZx2x9f1aSiEDyND_J2cSNAbyytLcTEJWrDZJBvA@mail.gmail.com>
-In-Reply-To: <CAFj5m9Lej-oZx2x9f1aSiEDyND_J2cSNAbyytLcTEJWrDZJBvA@mail.gmail.com>
-From:   John Pittman <jpittman@redhat.com>
-Date:   Mon, 14 Feb 2022 09:50:35 -0500
-Message-ID: <CA+RJvhynSq7Po=qWiLOTSOU+KVEyKsv42TRzPgStBW+-YDLYDA@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: avoid extending delays of active hctx from blk_mq_delay_run_hw_queues
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     David Jeffery <djeffery@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Laurence Oberman <loberman@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: TUSWyj3vrvpNQ7bVSL1FYHulIrXMBEE3
+X-Proofpoint-GUID: TUSWyj3vrvpNQ7bVSL1FYHulIrXMBEE3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 mlxlogscore=750
+ spamscore=0 clxscore=1011 priorityscore=1501 suspectscore=0 malwarescore=0
+ mlxscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202140105
+X-FB-Internal: deliver
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch has now been tested in the customer environment and results
-were good (fixed the hangs).
+This splits off the do generic_perform_write() function, so an
+additional flags parameter can be specified. It uses the new flag
+parameter to support async buffered writes.
 
-On Mon, Feb 7, 2022 at 9:45 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Tue, Feb 1, 2022 at 4:34 AM David Jeffery <djeffery@redhat.com> wrote:
-> >
-> > When blk_mq_delay_run_hw_queues sets an hctx to run in the future, it can
-> > reset the delay length for an already pending delayed work run_work. This
-> > creates a scenario where multiple hctx may have their queues set to run,
-> > but if one runs first and finds nothing to do, it can reset the delay of
-> > another hctx and stall the other hctx's ability to run requests.
-> >
-> > To avoid this I/O stall when an hctx's run_work is already pending,
-> > leave it untouched to run at its current designated time rather than
-> > extending its delay. The work will still run which keeps closed the race
-> > calling blk_mq_delay_run_hw_queues is needed for while also avoiding the
-> > I/O stall.
-> >
-> > Signed-off-by: David Jeffery <djeffery@redhat.com>
-> > ---
-> >  block/blk-mq.c |    8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index f3bf3358a3bb..ae46eb4bf547 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2177,6 +2177,14 @@ void blk_mq_delay_run_hw_queues(struct request_queue *q, unsigned long msecs)
-> >         queue_for_each_hw_ctx(q, hctx, i) {
-> >                 if (blk_mq_hctx_stopped(hctx))
-> >                         continue;
-> > +               /*
-> > +                * If there is already a run_work pending, leave the
-> > +                * pending delay untouched. Otherwise, a hctx can stall
-> > +                * if another hctx is re-delaying the other's work
-> > +                * before the work executes.
-> > +                */
-> > +               if (delayed_work_pending(&hctx->run_work))
-> > +                       continue;
->
-> The issue is triggered on BFQ, since BFQ's has_work() may return true,
-> however its ->dispatch_request() may return NULL, so
-> blk_mq_delay_run_hw_queues()
-> is run for delay schedule.
->
-> In case of multiple hw queue, the described issue may be triggered, and cause io
-> stall for long time. And there are only 3 in-tree callers of
-> blk_mq_delay_run_hw_queues(),
-> David's fix works well for the 3 users, so this patch looks fine:
->
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
->
-> Thanks,
->
+Signed-off-by: Stefan Roesch <shr@fb.com>
+---
+ include/linux/fs.h |  1 +
+ mm/filemap.c       | 20 +++++++++++++++-----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index e2d892b201b0..e62dba6ed453 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -278,6 +278,7 @@ enum positive_aop_returns {
+ #define AOP_FLAG_NOFS			0x0002 /* used by filesystem to direct
+ 						* helper code (eg buffer layer)
+ 						* to clear GFP_FS from alloc */
++#define AOP_FLAGS_NOWAIT		0x0004 /* async nowait buffered writes */
+=20
+ /*
+  * oh the beauties of C type declarations.
+diff --git a/mm/filemap.c b/mm/filemap.c
+index ad8c39d90bf9..d2fb817c0845 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -3725,14 +3725,13 @@ generic_file_direct_write(struct kiocb *iocb, str=
+uct iov_iter *from)
+ }
+ EXPORT_SYMBOL(generic_file_direct_write);
+=20
+-ssize_t generic_perform_write(struct file *file,
+-				struct iov_iter *i, loff_t pos)
++static ssize_t do_generic_perform_write(struct file *file, struct iov_it=
+er *i,
++					loff_t pos, int flags)
+ {
+ 	struct address_space *mapping =3D file->f_mapping;
+ 	const struct address_space_operations *a_ops =3D mapping->a_ops;
+ 	long status =3D 0;
+ 	ssize_t written =3D 0;
+-	unsigned int flags =3D 0;
+=20
+ 	do {
+ 		struct page *page;
+@@ -3801,6 +3800,12 @@ ssize_t generic_perform_write(struct file *file,
+=20
+ 	return written ? written : status;
+ }
++
++ssize_t generic_perform_write(struct file *file,
++				struct iov_iter *i, loff_t pos)
++{
++	return do_generic_perform_write(file, i, pos, 0);
++}
+ EXPORT_SYMBOL(generic_perform_write);
+=20
+ /**
+@@ -3832,6 +3837,10 @@ ssize_t __generic_file_write_iter(struct kiocb *io=
+cb, struct iov_iter *from)
+ 	ssize_t		written =3D 0;
+ 	ssize_t		err;
+ 	ssize_t		status;
++	int             flags =3D 0;
++
++	if (iocb->ki_flags & IOCB_NOWAIT)
++		flags |=3D AOP_FLAGS_NOWAIT;
+=20
+ 	/* We can write back this queue in page reclaim */
+ 	current->backing_dev_info =3D inode_to_bdi(inode);
+@@ -3857,7 +3866,8 @@ ssize_t __generic_file_write_iter(struct kiocb *ioc=
+b, struct iov_iter *from)
+ 		if (written < 0 || !iov_iter_count(from) || IS_DAX(inode))
+ 			goto out;
+=20
+-		status =3D generic_perform_write(file, from, pos =3D iocb->ki_pos);
++		status =3D do_generic_perform_write(file, from, pos =3D iocb->ki_pos, =
+flags);
++
+ 		/*
+ 		 * If generic_perform_write() returned a synchronous error
+ 		 * then we want to return the number of bytes which were
+@@ -3889,7 +3899,7 @@ ssize_t __generic_file_write_iter(struct kiocb *ioc=
+b, struct iov_iter *from)
+ 			 */
+ 		}
+ 	} else {
+-		written =3D generic_perform_write(file, from, iocb->ki_pos);
++		written =3D do_generic_perform_write(file, from, iocb->ki_pos, flags);
+ 		if (likely(written > 0))
+ 			iocb->ki_pos +=3D written;
+ 	}
+--=20
+2.30.2
 
