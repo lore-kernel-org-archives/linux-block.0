@@ -2,52 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 192EEC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 20:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6711C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Feb 2022 20:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbiBNU4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 15:56:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40816 "EHLO
+        id S229510AbiBNU4Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 15:56:16 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbiBNU4F (ORCPT
+        with ESMTP id S229865AbiBNU4P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 15:56:05 -0500
+        Mon, 14 Feb 2022 15:56:15 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A53419AA;
-        Mon, 14 Feb 2022 12:55:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD17106CBE;
+        Mon, 14 Feb 2022 12:55:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4yPaINfIhHjDxeogf8godB/SLDYFJIZL+IhApoI09+A=; b=jEi/BRRwlarzsw3AwXejwW+kgB
-        APfvkHtxgxSsgBUhjdxWDcBfWcZRGXLX2E6ISAI/wdPcujvA0zPUifVfocAXrkMeYKHOk08uDgU7z
-        x2sxhEUjOyMsEiTkzuChXoWELvchB9Se7JtqZbe0WSGw+HNwNMnOMTQq5bIO3OsEn5H07ahgWkiHE
-        ezqyc3KIlSl0dkk6tWA5V/OZ+utYDAibUy9PDck5wJMyLz9RrYiWvbKEmYXsDB+DKKt7hSWp0DrJY
-        8o/4zFW5Re/xNuvsBNSVwwGpc7V+97If25TUwDzRL42mD+ASeK7eL9JB5TijwKg86M8u9lX7gra66
-        jq6jvvmg==;
+        bh=6oV/BYsJ2Iv0nHeWAGsToliTTqLlD4Bf/cVkrUQ0q7o=; b=eqy7DkvNFn/UaH2Y4iuSapWyBs
+        56nmEkKA1dVhifDqvbt5jBaUFAbk+AAKU3lIBcZ0qP6RMHm/o4qytHppKZvNLHq8O7zO8+PwmyZLX
+        DgFYD61GcXaXnXhpsQEQkupJxCpv2y3lSKpN5YapX4pw7mJNCHUyOR46dguSvPNROeu1ruHmIJOyg
+        V/wp8LJZcANNzlTTBfuMUUYqQsk9EJgUv0Lrwg69UFGpDrWms/vtAyKRG+gbNeNyialLCPJVplDFk
+        ttNsQPLVwTqCYXBAQLk4SOUnNgk9C00drQts9/5u1auKcPijnvKP9/MTA5qrvM6a/x20BsG5ecclB
+        s6lnMBsA==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nJgg8-00DBgE-Ba; Mon, 14 Feb 2022 19:06:28 +0000
-Date:   Mon, 14 Feb 2022 19:06:28 +0000
+        id 1nJgcj-00DBTt-BB; Mon, 14 Feb 2022 19:02:57 +0000
+Date:   Mon, 14 Feb 2022 19:02:57 +0000
 From:   Matthew Wilcox <willy@infradead.org>
 To:     Stefan Roesch <shr@fb.com>
 Cc:     io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, kernel-team@fb.com
-Subject: Re: [PATCH v1 02/14] mm: Introduce do_generic_perform_write
-Message-ID: <YgqoNAA+J81E2LJw@casper.infradead.org>
+Subject: Re: [PATCH v1 01/14] fs: Add flags parameter to
+ __block_write_begin_int
+Message-ID: <YgqnYYRZKGMQK7N/@casper.infradead.org>
 References: <20220214174403.4147994-1-shr@fb.com>
- <20220214174403.4147994-3-shr@fb.com>
+ <20220214174403.4147994-2-shr@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220214174403.4147994-3-shr@fb.com>
+In-Reply-To: <20220214174403.4147994-2-shr@fb.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 09:43:51AM -0800, Stefan Roesch wrote:
-> This splits off the do generic_perform_write() function, so an
-> additional flags parameter can be specified. It uses the new flag
-> parameter to support async buffered writes.
+On Mon, Feb 14, 2022 at 09:43:50AM -0800, Stefan Roesch wrote:
+> This adds a flags parameter to the __begin_write_begin_int() function.
+> This allows to pass flags down the stack.
 
-It would seem simpler to pass the iocb pointer to generic_perform_write()
-(in place of the struct file pointer) instead of inventing a new flag.
+In general, I am not in favour of more AOP_FLAG uses.  I'd prefer to
+remove the two that we do have (reiserfs is the only user of
+AOP_FLAG_CONT_EXPAND and AOP_FLAG_NOFS can usually be replaced by
+passing in gfp_t flags).
