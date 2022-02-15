@@ -2,189 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4848C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 03:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97514C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 04:37:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbiBOD7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 22:59:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55066 "EHLO
+        id S231417AbiBOEhg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 23:37:36 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbiBOD7X (ORCPT
+        with ESMTP id S231372AbiBOEhe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 22:59:23 -0500
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0963137009;
-        Mon, 14 Feb 2022 19:59:12 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=haoxu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0V4WYNGT_1644897549;
-Received: from 30.225.24.82(mailfrom:haoxu@linux.alibaba.com fp:SMTPD_---0V4WYNGT_1644897549)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 15 Feb 2022 11:59:10 +0800
-Message-ID: <fe10885d-78b7-a90a-01a0-60ac58d64357@linux.alibaba.com>
-Date:   Tue, 15 Feb 2022 11:59:09 +0800
+        Mon, 14 Feb 2022 23:37:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 07F7B658D
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 20:37:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644899843;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=laXOEz3XJdYs1LRtIBGtVU1b1vkDx30bGp7eg3VkwMk=;
+        b=eedXwCesZtTFqtHOt/UMSC7EOP4zEfrvhKbyiJtYg6zYLW3lw//xvqo5T+dtXK6Mmt8E0h
+        8u/V1kRxee3FzYeVtvEkn+2OfzoQiOOrQ/JPb7suR0nMsUnyzZkeiMtWjtuBx9nM9qJUco
+        Iji4Sg2RHXm9jsULZaFACqejkph9fE8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-50-iwVetfnMPOqHWCamb6Z0eA-1; Mon, 14 Feb 2022 23:37:19 -0500
+X-MC-Unique: iwVetfnMPOqHWCamb6Z0eA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56C691091DA1;
+        Tue, 15 Feb 2022 04:37:18 +0000 (UTC)
+Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41CBA5BC3C;
+        Tue, 15 Feb 2022 04:37:07 +0000 (UTC)
+Date:   Tue, 15 Feb 2022 12:37:01 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yuyufen@huawei.com,
+        guohanjun@huawei.com
+Subject: Re: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker
+ on a non-housekeeping CPU
+Message-ID: <Ygst7R+X7u2OBgUW@T590>
+References: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
+ <881ae7a8-5dff-ff50-9bc2-a983b6a53c30@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.3.0
-Subject: Re: [PATCH v1 00/14] Support sync buffered writes for io-uring
-To:     Stefan Roesch <shr@fb.com>, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com
-References: <20220214174403.4147994-1-shr@fb.com>
-From:   Hao Xu <haoxu@linux.alibaba.com>
-In-Reply-To: <20220214174403.4147994-1-shr@fb.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <881ae7a8-5dff-ff50-9bc2-a983b6a53c30@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/2/15 上午1:43, Stefan Roesch 写道:
-> This patch series adds support for async buffered writes. Currently
-> io-uring only supports buffered writes in the slow path, by processing
-> them in the io workers. With this patch series it is now possible to
-> support buffered writes in the fast path. To be able to use the fast
-> path the required pages must be in the page cache or they can be loaded
-> with noio. Otherwise they still get punted to the slow path.
+Hello Xiongfeng,
+
+On Tue, Feb 15, 2022 at 10:29:51AM +0800, Xiongfeng Wang wrote:
+> Hi Ming,
 > 
-> If a buffered write request requires more than one page, it is possible
-> that only part of the request can use the fast path, the resst will be
-> completed by the io workers.
+> Sorry to disturb you. It's just that I think you may be interested at this
+> patch. I found the following commit written by you.
+>   commit 11ea68f553e244851d15793a7fa33a97c46d8271
+>   genirq, sched/isolation: Isolate from handling managed interrupts
+> It removed the managed_irq interruption from non-housekeeping CPUs as long as
+> the non-housekeeping CPUs do not request IO. But the the work thread
+> blk_mq_run_work_fn() may still run on the non-housekeeping CPUs.
+> Appreciate it a lot if you can give it a look.
+
+Yeah, commit 11ea68f553e24 touches irq subsystem to try not assign
+isolated cpus for managed irq's effective affinity.
+
+Here blk-mq just selects one cpu and calls mod_delayed_work_on()
+to execute the run queue handler on specified cpu. There are lots of
+such bound wq usage in tree, so I guess it might belong to one wq or
+scheduler generic problem instead of blk-mq specific issue. Not sure
+if it is good to address it in block layer.
+
+thanks,
+Ming
+
 > 
-> Support for async buffered writes:
->    Patch 1: fs: Add flags parameter to __block_write_begin_int
->      Add a flag parameter to the function __block_write_begin_int
->      to allow specifying a nowait parameter.
->      
->    Patch 2: mm: Introduce do_generic_perform_write
->      Introduce a new do_generic_perform_write function. The function
->      is split off from the existing generic_perform_write() function.
->      It allows to specify an additional flag parameter. This parameter
->      is used to specify the nowait flag.
->      
->    Patch 3: mm: add noio support in filemap_get_pages
->      This allows to allocate pages with noio, if a page for async
->      buffered writes is not yet loaded in the page cache.
->      
->    Patch 4: mm: Add support for async buffered writes
->      For async buffered writes allocate pages without blocking on the
->      allocation.
+> Thanks,
+> Xiongfeng
 > 
->    Patch 5: fs: split off __alloc_page_buffers function
->      Split off __alloc_page_buffers() function with new gfp_t parameter.
+> On 2022/2/10 17:35, Xiongfeng Wang wrote:
+> > When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
+> > into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
+> > are NOHZ_FULL CPUs and are often monopolized by the userspace process,
+> > such HPC application process. Any sort of interruption is not expected.
+> > 
+> > blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
+> > to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
+> > contains housekeeping CPU and non-housekeeping CPU at the same time, a
+> > housekeeping CPU, which want to request a IO, may schedule a worker on a
+> > non-housekeeping CPU. This may affect the performance of the userspace
+> > application running on non-housekeeping CPUs.
+> > 
+> > So let's just schedule the worker thread on the current CPU when the
+> > current CPU is housekeeping CPU.
+> > 
+> > Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+> > ---
+> >  block/blk-mq.c | 15 ++++++++++++++-
+> >  1 file changed, 14 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 1adfe4824ef5..ff9a4bf16858 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -24,6 +24,7 @@
+> >  #include <linux/sched/sysctl.h>
+> >  #include <linux/sched/topology.h>
+> >  #include <linux/sched/signal.h>
+> > +#include <linux/sched/isolation.h>
+> >  #include <linux/delay.h>
+> >  #include <linux/crash_dump.h>
+> >  #include <linux/prefetch.h>
+> > @@ -2036,6 +2037,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+> >  static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+> >  					unsigned long msecs)
+> >  {
+> > +	int work_cpu;
+> > +
+> >  	if (unlikely(blk_mq_hctx_stopped(hctx)))
+> >  		return;
+> >  
+> > @@ -2050,7 +2053,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+> >  		put_cpu();
+> >  	}
+> >  
+> > -	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+> > +	/*
+> > +	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
+> > +	 * CPU
+> > +	 */
+> > +	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
+> > +							 HK_FLAG_WQ))
+> > +		work_cpu = smp_processor_id();
+> > +	else
+> > +		work_cpu = blk_mq_hctx_next_cpu(hctx);
+> > +
+> > +	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
+> >  				    msecs_to_jiffies(msecs));
+> >  }
+> >  
+> > 
 > 
->    Patch 6: fs: split off __create_empty_buffers function
->      Split off __create_empty_buffers() function with new gfp_t parameter.
-> 
->    Patch 7: fs: Add aop_flags parameter to create_page_buffers()
->      Add aop_flags to create_page_buffers() function. Use atomic allocation
->      for async buffered writes.
-> 
->    Patch 8: fs: add support for async buffered writes
->      Return -EAGAIN instead of -ENOMEM for async buffered writes. This
->      will cause the write request to be processed by an io worker.
-> 
->    Patch 9: io_uring: add support for async buffered writes
->      This enables the async buffered writes for block devices in io_uring.
->      Buffered writes are enabled for blocks that are already in the page
->      cache or can be acquired with noio.
-> 
->    Patch 10: io_uring: Add tracepoint for short writes
-> 
-> Support for write throttling of async buffered writes:
->    Patch 11: sched: add new fields to task_struct
->      Add two new fields to the task_struct. These fields store the
->      deadline after which writes are no longer throttled.
-> 
->    Patch 12: mm: support write throttling for async buffered writes
->      This changes the balance_dirty_pages function to take an additonal
->      parameter. When nowait is specified the write throttling code no
->      longer waits synchronously for the deadline to expire. Instead
->      it sets the fields in task_struct. Once the deadline expires the
->      fields are reset.
->      
->    Patch 13: io_uring: support write throttling for async buffered writes
->      Adds support to io_uring for write throttling. When the writes
->      are throttled, the write requests are added to the pending io list.
->      Once the write throttling deadline expires, the writes are submitted.
->      
-> Enable async buffered write support
->    Patch 14: fs: add flag to support async buffered writes
->      This sets the flags that enables async buffered writes for block
->      devices.
-> 
-> 
-> Testing:
->    This patch has been tested with xfstests and fio.
-> 
-> 
-> Peformance results:
->    For fio the following results have been obtained with a queue depth of
->    1 and 4k block size (runtime 600 secs):
-> 
->                   sequential writes:
->                   without patch                 with patch
->    throughput:       329 Mib/s                    1032Mib/s
->    iops:              82k                          264k
->    slat (nsec)      2332                          3340
->    clat (nsec)      9017                            60
->                     
->    CPU util%:         37%                          78%
-> 
-> 
-> 
->                   random writes:
->                   without patch                 with patch
->    throughput:       307 Mib/s                    909Mib/s
->    iops:              76k                         227k
->    slat (nsec)      2419                         3780
->    clat (nsec)      9934                           59
-> 
->    CPU util%:         57%                          88%
-> 
-> For an io depth of 1, the new patch improves throughput by close to 3
-> times and also the latency is considerably reduced. To achieve the same
-> or better performance with the exisiting code an io depth of 4 is required.
-> 
-> Especially for mixed workloads this is a considerable improvement.
-> 
-> 
-> 
-> 
-> Stefan Roesch (14):
->    fs: Add flags parameter to __block_write_begin_int
->    mm: Introduce do_generic_perform_write
->    mm: add noio support in filemap_get_pages
->    mm: Add support for async buffered writes
->    fs: split off __alloc_page_buffers function
->    fs: split off __create_empty_buffers function
->    fs: Add aop_flags parameter to create_page_buffers()
->    fs: add support for async buffered writes
->    io_uring: add support for async buffered writes
->    io_uring: Add tracepoint for short writes
->    sched: add new fields to task_struct
->    mm: support write throttling for async buffered writes
->    io_uring: support write throttling for async buffered writes
->    block: enable async buffered writes for block devices.
-> 
->   block/fops.c                    |   5 +-
->   fs/buffer.c                     | 103 ++++++++++++++++---------
->   fs/internal.h                   |   3 +-
->   fs/io_uring.c                   | 130 +++++++++++++++++++++++++++++---
->   fs/iomap/buffered-io.c          |   4 +-
->   fs/read_write.c                 |   3 +-
->   include/linux/fs.h              |   4 +
->   include/linux/sched.h           |   3 +
->   include/linux/writeback.h       |   1 +
->   include/trace/events/io_uring.h |  25 ++++++
->   kernel/fork.c                   |   1 +
->   mm/filemap.c                    |  34 +++++++--
->   mm/folio-compat.c               |   4 +
->   mm/page-writeback.c             |  54 +++++++++----
->   14 files changed, 298 insertions(+), 76 deletions(-)
-> 
-> 
-> base-commit: f1baf68e1383f6ed93eb9cff2866d46562607a43
-> 
-It's a little bit different between buffered read and buffered write,
-there may be block points in detail filesystems due to journal
-operations for the latter.
+
+-- 
+Ming
 
