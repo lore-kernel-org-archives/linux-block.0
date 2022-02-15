@@ -2,155 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97514C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 04:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E37A6C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 07:08:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231417AbiBOEhg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 23:37:36 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44324 "EHLO
+        id S231638AbiBOHIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 02:08:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231372AbiBOEhe (ORCPT
+        with ESMTP id S231927AbiBOHIb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 23:37:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 07F7B658D
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 20:37:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644899843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=laXOEz3XJdYs1LRtIBGtVU1b1vkDx30bGp7eg3VkwMk=;
-        b=eedXwCesZtTFqtHOt/UMSC7EOP4zEfrvhKbyiJtYg6zYLW3lw//xvqo5T+dtXK6Mmt8E0h
-        8u/V1kRxee3FzYeVtvEkn+2OfzoQiOOrQ/JPb7suR0nMsUnyzZkeiMtWjtuBx9nM9qJUco
-        Iji4Sg2RHXm9jsULZaFACqejkph9fE8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-50-iwVetfnMPOqHWCamb6Z0eA-1; Mon, 14 Feb 2022 23:37:19 -0500
-X-MC-Unique: iwVetfnMPOqHWCamb6Z0eA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56C691091DA1;
-        Tue, 15 Feb 2022 04:37:18 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41CBA5BC3C;
-        Tue, 15 Feb 2022 04:37:07 +0000 (UTC)
-Date:   Tue, 15 Feb 2022 12:37:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yuyufen@huawei.com,
-        guohanjun@huawei.com
-Subject: Re: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker
- on a non-housekeeping CPU
-Message-ID: <Ygst7R+X7u2OBgUW@T590>
-References: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
- <881ae7a8-5dff-ff50-9bc2-a983b6a53c30@huawei.com>
+        Tue, 15 Feb 2022 02:08:31 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AE399A4F2
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 23:08:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4aeSjr+Hlvj3VZ4aj4dAC93MEskArD/7tIOS52Y5bTY=; b=z/+8E/jeHuv04yz0tWQRn82Dkd
+        dIaYBDMOw6O3kI2kUeQzv/1yag1Ajt9R2mGeb0yhSvHjnd6lQmDS9LkRYY6kEAcIX9wy8OREkxYdG
+        fD6RU4aOdeCYmYXparl1TOIeh5x6Gs7k0NzhYT95QU3YJaG57xDuuKI29no63Tc2TELJ59bQusOsj
+        bkuqNRg/SP5op0P9WOOKjOvJe6x1fIqxNh4tEqsV7rqyQIl1SQ3Af8lnsQOowlGkBwzIk8Y4lUdfk
+        ZPqI0Vcdr+E3JF1uyjMCIW0fe5gqRxd90IY8IV1nqYNhtv4VF7upZU3FP0qdDRZ8Bvgx7LfJGiCLj
+        aFTiMeuw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nJrwU-0010hX-Eb; Tue, 15 Feb 2022 07:08:06 +0000
+Date:   Mon, 14 Feb 2022 23:08:06 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Li Ning <lining2020x@163.com>,
+        Chunguang Xu <brookxu@tencent.com>
+Subject: Re: [PATCH V2 5/7] block: throttle split bio in case of iops limit
+Message-ID: <YgtRVl7oLR4mqf3c@infradead.org>
+References: <20220209091429.1929728-1-ming.lei@redhat.com>
+ <20220209091429.1929728-6-ming.lei@redhat.com>
+ <Ygq6GanKSLlTixqe@slm.duckdns.org>
+ <Ygr9evnWSjcCjYkd@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <881ae7a8-5dff-ff50-9bc2-a983b6a53c30@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <Ygr9evnWSjcCjYkd@T590>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Xiongfeng,
+On Tue, Feb 15, 2022 at 09:10:18AM +0800, Ming Lei wrote:
+> The big problem is that rq-qos is only hooked for request based queue,
+> and we need to support cgroup/throttle for bio base queue.
 
-On Tue, Feb 15, 2022 at 10:29:51AM +0800, Xiongfeng Wang wrote:
-> Hi Ming,
-> 
-> Sorry to disturb you. It's just that I think you may be interested at this
-> patch. I found the following commit written by you.
->   commit 11ea68f553e244851d15793a7fa33a97c46d8271
->   genirq, sched/isolation: Isolate from handling managed interrupts
-> It removed the managed_irq interruption from non-housekeeping CPUs as long as
-> the non-housekeeping CPUs do not request IO. But the the work thread
-> blk_mq_run_work_fn() may still run on the non-housekeeping CPUs.
-> Appreciate it a lot if you can give it a look.
-
-Yeah, commit 11ea68f553e24 touches irq subsystem to try not assign
-isolated cpus for managed irq's effective affinity.
-
-Here blk-mq just selects one cpu and calls mod_delayed_work_on()
-to execute the run queue handler on specified cpu. There are lots of
-such bound wq usage in tree, so I guess it might belong to one wq or
-scheduler generic problem instead of blk-mq specific issue. Not sure
-if it is good to address it in block layer.
-
-thanks,
-Ming
-
-> 
-> Thanks,
-> Xiongfeng
-> 
-> On 2022/2/10 17:35, Xiongfeng Wang wrote:
-> > When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
-> > into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
-> > are NOHZ_FULL CPUs and are often monopolized by the userspace process,
-> > such HPC application process. Any sort of interruption is not expected.
-> > 
-> > blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
-> > to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
-> > contains housekeeping CPU and non-housekeeping CPU at the same time, a
-> > housekeeping CPU, which want to request a IO, may schedule a worker on a
-> > non-housekeeping CPU. This may affect the performance of the userspace
-> > application running on non-housekeeping CPUs.
-> > 
-> > So let's just schedule the worker thread on the current CPU when the
-> > current CPU is housekeeping CPU.
-> > 
-> > Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-> > ---
-> >  block/blk-mq.c | 15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 1adfe4824ef5..ff9a4bf16858 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -24,6 +24,7 @@
-> >  #include <linux/sched/sysctl.h>
-> >  #include <linux/sched/topology.h>
-> >  #include <linux/sched/signal.h>
-> > +#include <linux/sched/isolation.h>
-> >  #include <linux/delay.h>
-> >  #include <linux/crash_dump.h>
-> >  #include <linux/prefetch.h>
-> > @@ -2036,6 +2037,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
-> >  static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
-> >  					unsigned long msecs)
-> >  {
-> > +	int work_cpu;
-> > +
-> >  	if (unlikely(blk_mq_hctx_stopped(hctx)))
-> >  		return;
-> >  
-> > @@ -2050,7 +2053,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
-> >  		put_cpu();
-> >  	}
-> >  
-> > -	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
-> > +	/*
-> > +	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
-> > +	 * CPU
-> > +	 */
-> > +	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
-> > +							 HK_FLAG_WQ))
-> > +		work_cpu = smp_processor_id();
-> > +	else
-> > +		work_cpu = blk_mq_hctx_next_cpu(hctx);
-> > +
-> > +	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
-> >  				    msecs_to_jiffies(msecs));
-> >  }
-> >  
-> > 
-> 
-
--- 
-Ming
-
+Which bio based driver do we care about?
