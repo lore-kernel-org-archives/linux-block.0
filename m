@@ -2,122 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1272C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 09:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC43C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 09:45:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235024AbiBOJiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 04:38:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53826 "EHLO
+        id S232406AbiBOJpi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 04:45:38 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235951AbiBOJiN (ORCPT
+        with ESMTP id S236050AbiBOJph (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 04:38:13 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D13D8C3C2C;
-        Tue, 15 Feb 2022 01:38:03 -0800 (PST)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4JybW96B08z1FCh9;
-        Tue, 15 Feb 2022 17:33:41 +0800 (CST)
-Received: from dggpemm500002.china.huawei.com (7.185.36.229) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 15 Feb 2022 17:38:02 +0800
-Received: from [10.174.179.5] (10.174.179.5) by dggpemm500002.china.huawei.com
- (7.185.36.229) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 15 Feb
- 2022 17:38:01 +0800
-Subject: Re: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker
- on a non-housekeeping CPU
-To:     <axboe@kernel.dk>, <hch@lst.de>,
-        Frederic Weisbecker <frederic@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yuyufen@huawei.com>, <guohanjun@huawei.com>
-References: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
-From:   Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Message-ID: <68800eb8-af54-a836-eb1d-eecde951ede4@huawei.com>
-Date:   Tue, 15 Feb 2022 17:38:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Tue, 15 Feb 2022 04:45:37 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CBD6E61F8;
+        Tue, 15 Feb 2022 01:45:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=k2zUIoihKeX/PzTYAq+E6BX9omLlFxe2qXDX5akB7yw=; b=vDOP69iXQBS1etC9BNUgTKGNBG
+        /khYC8I3DdAsyvTAJQDnYeX8sXRlOuPZJeOAg/ldjkhU4zwEDMdN62+p/QTA52FxDk2wuxx6tIgda
+        CA2897HUhMe+Fy3qhaK9jPNazwCJfvlB4KDDsrn6/vmV3IkOSRW8BeEDzQxJnzBfvu9zPaEC+EIo9
+        4K1EQz2VVPqr9rpyADPoup8dCtU3DiwZtLdfFU9fDcfvK2XJUDBpa3uwIT13Bv91g8aX+FEprUjgN
+        EjidiXCviAuUxOEzRtRsF+02dAO8y/DKM2ys/hmDSXPyv89cjHn42WPRbN+QMMOUEKuwSSMjCsKHQ
+        /4k/L6VA==;
+Received: from [2001:4bb8:184:543c:6bdf:22f4:7f0a:fe97] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nJuOb-0025zX-8L; Tue, 15 Feb 2022 09:45:17 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-mmc@vger.kernel.org
+Subject: add a ->free_disk block_device_operation v3
+Date:   Tue, 15 Feb 2022 10:45:09 +0100
+Message-Id: <20220215094514.3828912-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.5]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500002.china.huawei.com (7.185.36.229)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Frederic,
+Hi Jens,
 
-Sorry to disturb you. It's just that I think you may be interested in this
-patch. I notice you are reviewing some other CPU isolation patches. Appreciate
-it a lot if you can give it a look. Or just ignore it if you are not interested.
+this series adds a ->free_disk method to struct block_device_operation so that
+drivers can defer freeing their disk private data until the gendisk goes away
+and don't need to play games with the validity of ->private_data.
 
-Thanks,
-Xiongfeng
+This also converts three simple drivers over as example, but eventually I
+imagine that all drivers with private data will use it.
 
-On 2022/2/10 17:35, Xiongfeng Wang wrote:
-> When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
-> into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
-> are NOHZ_FULL CPUs and are often monopolized by the userspace process,
-> such HPC application process. Any sort of interruption is not expected.
-> 
-> blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
-> to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
-> contains housekeeping CPU and non-housekeeping CPU at the same time, a
-> housekeeping CPU, which want to request a IO, may schedule a worker on a
-> non-housekeeping CPU. This may affect the performance of the userspace
-> application running on non-housekeeping CPUs.
-> 
-> So let's just schedule the worker thread on the current CPU when the
-> current CPU is housekeeping CPU.
-> 
-> Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-> ---
->  block/blk-mq.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1adfe4824ef5..ff9a4bf16858 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -24,6 +24,7 @@
->  #include <linux/sched/sysctl.h>
->  #include <linux/sched/topology.h>
->  #include <linux/sched/signal.h>
-> +#include <linux/sched/isolation.h>
->  #include <linux/delay.h>
->  #include <linux/crash_dump.h>
->  #include <linux/prefetch.h>
-> @@ -2036,6 +2037,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
->  static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
->  					unsigned long msecs)
->  {
-> +	int work_cpu;
-> +
->  	if (unlikely(blk_mq_hctx_stopped(hctx)))
->  		return;
->  
-> @@ -2050,7 +2053,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
->  		put_cpu();
->  	}
->  
-> -	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
-> +	/*
-> +	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
-> +	 * CPU
-> +	 */
-> +	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
-> +							 HK_FLAG_WQ))
-> +		work_cpu = smp_processor_id();
-> +	else
-> +		work_cpu = blk_mq_hctx_next_cpu(hctx);
-> +
-> +	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
->  				    msecs_to_jiffies(msecs));
->  }
->  
-> 
+Changes since v2:
+ - only call ->free_disk after add_disk has returned to simplify probe error
+   handling
+Changes since v1:
+ - fix a tag_set use after free in virtio_blk
+
+Diffstat:
+ block/genhd.c                       |    5 ++
+ drivers/block/virtio_blk.c          |   66 +++++++-----------------------------
+ drivers/memstick/core/ms_block.c    |   64 ++++++++--------------------------
+ drivers/memstick/core/ms_block.h    |    1 
+ drivers/memstick/core/mspro_block.c |   57 +++++--------------------------
+ include/linux/blkdev.h              |    2 +
+ 6 files changed, 46 insertions(+), 149 deletions(-)
