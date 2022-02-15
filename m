@@ -2,181 +2,213 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3446C43217
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 09:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7041DC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 09:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235249AbiBOJpu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 04:45:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49206 "EHLO
+        id S236091AbiBOJpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 04:45:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236089AbiBOJpu (ORCPT
+        with ESMTP id S236090AbiBOJpy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 04:45:50 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB821E61E8;
-        Tue, 15 Feb 2022 01:45:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=9GwSkxFbAAcxg10ZpVTsZzHKPI4VoEWLYjJIK1zScJg=; b=Ay91D2S3n80JCKQKYiFR535ia4
-        XH9lTKIQLPYk9wr/KzAwAPVeut0862az9cfIXhw6zP8ontWaT4V71rXUGclOCC6dFTDmfE9kBeZC7
-        cHqAWQvX2J4HJzynMS8BSH8LF+D3rn7YSf1hMKhFr63Ypbb1A2ut+ljQmAy/0BDGomYVbLDaJRbte
-        w9Coq4645CDXe5048nqrktKJL+kTGlWfBLMLwfe/hV4oR/QRr0BGfC1CPx38MFqoBJrBUGTU3uXWH
-        EevtCvUpvlC2JZQYId3zxiGsTGbCf6MlqBPvNb/CKPLaeVOLm2tvK/YvxZSvu5ic91mUXLGwp/cpI
-        p17PU5qA==;
-Received: from [2001:4bb8:184:543c:6bdf:22f4:7f0a:fe97] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nJuOp-00267N-39; Tue, 15 Feb 2022 09:45:31 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-mmc@vger.kernel.org
-Subject: [PATCH 5/5] virtio_blk: simplify refcounting
-Date:   Tue, 15 Feb 2022 10:45:14 +0100
-Message-Id: <20220215094514.3828912-6-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220215094514.3828912-1-hch@lst.de>
-References: <20220215094514.3828912-1-hch@lst.de>
-MIME-Version: 1.0
+        Tue, 15 Feb 2022 04:45:54 -0500
+Received: from esa2.hc3370-68.iphmx.com (esa2.hc3370-68.iphmx.com [216.71.145.153])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87AAAE61E7;
+        Tue, 15 Feb 2022 01:45:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1644918343;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=iw8WzCaDfNAox61c1XTlHvprnyEm93V7Mqc/NxaYPBw=;
+  b=A0Om4nEvEay38pmyKqYf7DkJGWBX3yBr4fNEiI43cQ8YcH4U9pTfkWKf
+   cFyD4J6xAQ52e93BxIStj6DaMLM6QXQjlG2w1KYNIElTlFMXkz97pURRq
+   blyXbHN2rF9pXBFbW1JrayMvWe7opcns5Ho9mo43J5v/Vg2QYO0bkJvMG
+   c=;
+Authentication-Results: esa2.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
+IronPort-SDR: Wy0OJLz6BuLKyYyzm2UoNMMOAxz6G/3neQcF9aSpcIkhlg978QlODMMVsPPe3DjUQ6eUeSIp/n
+ QCthxswFYy1Li6iyC2ZtdJHyNrkEtlM/dJ0mZo+66T22pj6nB9njXhj83O6ONETK/QicZW5wlU
+ opmuewDGpJvhcKVUKcG73ea1cuyrrUmc8Oet+JEl0zRkXdWBKLXmJo94XBUDUJudcj5rt8BtvF
+ GHjdDsFOUt9K3t/++aa6dj2bPfJTHQwcNP3FvGRMMHD6Z8J9WbzVRwNVJL4cgkHj2UAE6Ds4s+
+ 6Tm7v4IVEWwyQ4Vi2lgpkYS8
+X-SBRS: 5.1
+X-MesageID: 64225888
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.156.83
+X-Policy: $RELAYED
+IronPort-Data: A9a23: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
+ NBConD9M3BdGH2yqTr/MhBjvdpa+w==
+IronPort-HdrOrdr: A9a23:W5eZqKtRS/7uml8SUMgj8fDR7skC7oMji2hC6mlwRA09TyXGra
+ +TdaUguSMc1gx9ZJhBo7G90KnpewK6yXdQ2/hqAV7EZniahILIFvAY0WKG+VPd8kLFh4xgPM
+ tbAs1D4ZjLfCRHZKXBkXiF+rQbsaC6GcmT7I+0pRcdLj2CKZsQlzuRYjzrbHGeLzM2Y6bReq
+ Dsgvau8FGbCAsqh4mAdzI4dtmGg+eOuIPtYBYACRJiwA6SjQmw4Lq/NxSDxB8RXx5G3L9nqA
+ H+4kHEz5Tml8v+5g7X1mfV4ZgTsNz9yuFbDMjJrsQOMD3jhiuheYwkcbyfuzIepv2p9T8R4Z
+ PxiiZlG/42x2Laf2mzrxeo8w780Aw243un8lOciWuLm72OeBsKT+56wa5JeBrQ7EQt+Ptm1r
+ hQ4m6fv51LSTvdgSXU/bHzJl9Xv3vxhUBnvf8YjnRZX4dbQqRWt5Yj8ERcF4pFND7m6bogDP
+ JlAKjnlblrmGuhHjDkV1RUsZ+RtixZJGbFfqFCgL3Y79FupgE586NCr/Zv20vp9/oGOu55Dq
+ r/Q+BVfYp1P7wrhJRGdZM8qPuMexzwqC33QRCvyHTcZeg60iH22tbKCItc3pDeRHVP9up0pK
+ j8
+X-IronPort-AV: E=Sophos;i="5.88,370,1635220800"; 
+   d="scan'208";a="64225888"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ilaZ4q+uZdIfts/UFRJeZaM0CaSfhaUI5TOPze+hbufN+hwg5iWKU+RMjTQULAQhBl99p2QyPToVJweQ/2ilYug59c0JmprjOLhZQDG3ejuxIG3vDoO0TxH0SaQ7yxEQUOyLKzn+g3tF9cpUGtvN39RVhZB0k4Bn6TaPQYvfReDO92Mm3wU89wkzKZM5UHWITDAoRioOk6YKm9ad92P2EEW1CRQvEXwPwvrp3TQpF8GLXF/DYX0A/fiv8r59VxMGtizra6BUFqJMriKPpsMKvytZTVuuJKyyn/BIQHU9Pn4Dsqql31vGLQN6XmAN/jFRqCVGbmcWhsovVEp5APThpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZGfL1e1bMDpYfkGiAfrTfHC/8z7eJZ5Kbc5EER5I8Tw=;
+ b=g8+HFMAudfrhF88CIlb9USB4nGjlF4auwIeYzZnxFXCbg4+gjWXDgsLiW9mvxTxKAEODZFjcJKVOuXG/mF3DCc7SCg1VEcDmUELS2FfIxT8QnTqBPzAKehh4uJaOe2+JRGiwEwsl83tEXLkmZfZ1UVKZI3aFbEBTwUYI0VaFPSy8z44kxcHyi1KIMWk5JOyMQDbw3ytlnrJxtt2P0Ak+nfRHoQGM0P/y6k6GkeXE/yIZVVjNDuAfd7IwCCExqvi/PqougbcOZOoylnhjhZiEDYZh3XXTUg9NGy7ixAEK4As9so8okofMIfEnghM1FKJ8wDzzGnaHEY3AKmQLzKp0Sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZGfL1e1bMDpYfkGiAfrTfHC/8z7eJZ5Kbc5EER5I8Tw=;
+ b=LNgn9kWhTFP+qaoGPYjaMJr97wkw5aM0jbMVOU7Zv52knzicKXInSAw1GEuD41okAti8/upRUcKLszQsdhK0QdJnyaldk8J2RyLbEgygJkEHUHc948p5HPE44gTp7XPKG4mvavfpk18SKQZVCkGgxiQynn4n3GQQdGMc3DnvsYg=
+Date:   Tue, 15 Feb 2022 10:45:34 +0100
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Qing Wang <wangqing@vivo.com>
+CC:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, <dm-devel@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Hans Verkuil <hverkuil@xs4all.nl>,
+        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <intel-gfx@lists.freedesktop.org>,
+        <dri-devel@lists.freedesktop.org>, <amd-gfx@lists.freedesktop.org>,
+        <linux-input@vger.kernel.org>, <linux-media@vger.kernel.org>
+Subject: Re: [PATCH V3 1/13] block: xen: use time_is_before_eq_jiffies()
+ instead of open coding it
+Message-ID: <Ygt2Pr26MHOMGgR1@Air-de-Roger>
+References: <1644890154-64915-1-git-send-email-wangqing@vivo.com>
+ <1644890154-64915-2-git-send-email-wangqing@vivo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1644890154-64915-2-git-send-email-wangqing@vivo.com>
+X-ClientProxiedBy: LO3P265CA0004.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:bb::9) To DS7PR03MB5608.namprd03.prod.outlook.com
+ (2603:10b6:5:2c9::18)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 32826cc3-a767-4fe8-891b-08d9f067ec86
+X-MS-TrafficTypeDiagnostic: MWHPR03MB3053:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR03MB3053FA0087E2C31570D06F3F8F349@MWHPR03MB3053.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2276;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XwIKyJ1rEAvRB1r6HE88BUpHD6Uz5+G+3zSYNOGigqz7NUTie21YXIqvuU92NqBmDn1nEe6TixP1P9GtV9kGSmnT8Vwgc19Z2lp3C4QZ6/CjCW59WUnCC45bousTjDOBRst8ivXWUQzhtLh35raiJeMPVuhETHIRYjwMsGFYAqcpzk4mHMkhYh4BM41r3YSHn81+32lkPMR8hfMfpv9TGrljmgUFDf9LjzTsKggo3sGJX1sw7aKO27JkXUWgVJghQ7JdIzLPYk+6xRJ1fQggmAEygybuwCCmWXUgCm17rAoi/5cP9XIT/1fxDEWXHqkJml+tMDNRXFTkgkYw+HZRfyXM5fHpZSNaaOyakz9OrexvvD9kHh7aRZefDTkBvUVEpbunNo1Vx2iJ/4jRRbcodDeOi5y44NK+xRwMAiOtVj4dRdvAH3ADF69BndhDJlfK6AUZ4708oRQIQLpFj4jdHSIWgPzy6pfn2A4ZGn/2q5lg39/1u4llA3xZrWUCszX0SaDzb5nZjppoq0bHWESPRtGwqBIpiqKf5lLczaJnAQk1VFU1D6Go3axvQa1KAIDY0Fp12NNs8kw5rkQLTF94F3BJQ2ZRH4Hy6AmY/9nOcwHQ6lx8eMfqJjl2XCUxqxowKpwaYYEp6NaUnEJSSKDJHQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(4636009)(366004)(8676002)(66476007)(66556008)(4326008)(558084003)(9686003)(33716001)(6512007)(6666004)(86362001)(85182001)(66946007)(508600001)(8936002)(6506007)(5660300002)(7416002)(6486002)(7406005)(316002)(26005)(186003)(38100700002)(6916009)(82960400001)(2906002)(54906003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q09ReHgwWUdvalprSjFvZXhkNTBSNkl1azRTa2ZUZTBZVWNEdzhYNmtuSWxX?=
+ =?utf-8?B?UWR5U2owVUUySG02WlNTdUpuRjVvNnVPdTZkMzF2MWw2QUZFWWZsT0NJakJ6?=
+ =?utf-8?B?bkRpNURuYXlpQXZaWTRwQUVIa2pKTEtWOGMvbWNkcmZHNkdSK3ZaYm80UE1n?=
+ =?utf-8?B?T0hwRlF4L1BpNlR3bmNDUmRYTkJUMzdGM3cxbmY5UmllUGE0M0tnSTVYNUNa?=
+ =?utf-8?B?YTdLa2tNdXVmNG5JQlBQV1ZkUmRHaStOc0hEc3lpVENTd0dVYXFPbnlJbkN1?=
+ =?utf-8?B?eWNNbVN2SWZPSkl0SGZEb2h3c1J5MEdMWnVRbDdtcVgvVENNRjdWMlhtZHpZ?=
+ =?utf-8?B?V1RFQUI2RjNjc3lBR0pyVnRHZ01SRjBLU25GUjIzR2RPMWtvZk92Vi9tZTFR?=
+ =?utf-8?B?UHNDYzExdjdrN3RjUG9pSUxFWHpXL1pQcVJJRVFVa0hUTXBEdGFyRTFkdmIv?=
+ =?utf-8?B?bm9pMmt4bWdENEtwdWZMRUc4a21QR1hqbGpjS2JJbktYV3IvbVZod0NaRHFI?=
+ =?utf-8?B?QUpjSk80WFlPbUlHUi9icURicW5uMGp6bkJRcDhPVjRQeklnUFBFU1A0TUcw?=
+ =?utf-8?B?ZlBPd0U0RGhKUFBnb0g1TEVPajVQTERrb2hwUmZ0T2F1eVQ2VE1nYnZYWFph?=
+ =?utf-8?B?b2RreDZHVEJrbjN6OEg5WVZKZW9LVTNMcVhqV2NTTWNVdHpqckU2WGJjYkNC?=
+ =?utf-8?B?TzlXdCtGNmk2N05VakVPM1NJZ00yRG1meEVGOVZiNElERGxuUitIWTFDekJx?=
+ =?utf-8?B?aDloV0RtUEVvWVVHVDg4QVF3L09mQlY1b1k2MmtjOWJwN0NRVWc2VC8zc2wr?=
+ =?utf-8?B?S0xiOXlYK284WmJrRloyUXZZSHFYYkE4OE1TVmtRRHhNbHo0L2NnK1puOUVC?=
+ =?utf-8?B?TmZWSm8wVVdhY0g5WjVnUnJkWFBJOGhsaHlOWG1hSm1MOUUwbE1XVEZ6bzVs?=
+ =?utf-8?B?OCt0UGN6Umd0Q1lXM25RSTdoT0lkcUl4NklvVjFsbVk1TGk1dW95ZlZyQnc4?=
+ =?utf-8?B?MzQycXFZbjBIbEZtcXRtV0pzSFk2NnRHOFpLa3pFTEFuYzdVWmF2VTRiYVZ6?=
+ =?utf-8?B?Y1dNaXdORnBDSFlBa3FwdGZQSFFOL0Q5MGs1c0lMbTkxL0xwSEJiNngwV25q?=
+ =?utf-8?B?am1ZNVQyUEZUNlYrZjA0OFRHenVZamlZVjd1TUVNVFZ5aEdEQ3M2UGZmZk9B?=
+ =?utf-8?B?R1AzZUVqYVV5eW1kTDF0d1pJZmZ3a3NhcmMwREprWnVxOWpNRGwvbW5NcWVi?=
+ =?utf-8?B?dWU3UlU2WkExSW5KR2tQMTkvVU42MnlmZ01XWGU3RGhIZUMycnJYNG96aURv?=
+ =?utf-8?B?Vktxcmp0YzVaTUJhV0swRUFpUHdIbk9seG0zQlRvbWVKdldYK216THpTU2tz?=
+ =?utf-8?B?REEwOHcrb0RHcXNMbkF4Nm9iQmNkMERjTi9kV1NidG4xSVVaL3gweVFmclNu?=
+ =?utf-8?B?MXpla0hmU3lEVzNSLzcvdU1zNXV0cUplOHhQbmk0aHMzdS91aDBqaUk5R25o?=
+ =?utf-8?B?RWNUVWtiTGVDOEZmempoV3NPMUVsS2JYbmVPaVdIK1JMaEtLbDFJaUt1NHN6?=
+ =?utf-8?B?QTNoTUk0K3NCdlV3TkVrU2g1SzFLRnhkODMrVFJGcWYwT3ZwUUpwSlBmbTVB?=
+ =?utf-8?B?TkQwd1Q3TFhtWHJqbTZkMWVDMEFzWEhUbUc5S3gwbkphT1ZCdkVRVnVrbk9C?=
+ =?utf-8?B?b1crS1lmWlhaSjUxZG43N1ZHZTdPZ1l0d1RTQThvS2JtVGxmSmtRZXdRUDRB?=
+ =?utf-8?B?T0xtNXFUWGtON2tlM05FZ25VcmdjblpaelozRnpydU0vU0F0R3BCSEFZdHY5?=
+ =?utf-8?B?ay8wZzRrQ3NyZU1TL3FFVGwxeEphSzhicW1aTUUxbi9Ec042cERpSERsNkNn?=
+ =?utf-8?B?YW8vOStLOWRuWStJSzYzVCt0dWk4cFpveDJnMmxDeDZjbytOb0NHOTlLUDZn?=
+ =?utf-8?B?TkVoL2dRTzlHd3JON0cvV0kyck1GZlM4TEdpYnpOMjlNL29BQmRQdkdkU3lo?=
+ =?utf-8?B?T2U4SEpGeDBxa1FGYUlBTjgvVXhQQndFOVVhckdDVzdFenRaMk9MSzRZMGtK?=
+ =?utf-8?B?RW9EUlpZeWhIVzI3c0Yxb2JNZ2FOMUMzbG1Od2l2ZWJTYm9kMm1yNHBMR3h0?=
+ =?utf-8?B?UGUxeW9TRGRPL2JaaC96L05qSCsrR09tZkxEWWVuUU5RRjlPTU5KNVBNWFM5?=
+ =?utf-8?Q?RgJs9iDivClS1Q9nXOcWIRM=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32826cc3-a767-4fe8-891b-08d9f067ec86
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2022 09:45:39.1735
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pCZULRE0ypM1MYAFyBxumnnbHYB9R4P24gzY44d0kV4TkZA/k/jKXVcffojdAGeVleKqo682MpIuIeFVQsferg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR03MB3053
+X-OriginatorOrg: citrix.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement the ->free_disk method to free the virtio_blk structure only
-once the last gendisk reference goes away instead of keeping a local
-refcount.
+On Mon, Feb 14, 2022 at 05:55:38PM -0800, Qing Wang wrote:
+> From: Wang Qing <wangqing@vivo.com>
+> 
+> Use the helper function time_is_{before,after}_jiffies() to improve
+> code readability.
+> 
+> Signed-off-by: Wang Qing <wangqing@vivo.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/block/virtio_blk.c | 66 ++++++++------------------------------
- 1 file changed, 14 insertions(+), 52 deletions(-)
+Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index c443cd64fc9b4..5c636ca7f1a7f 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -69,13 +69,6 @@ struct virtio_blk {
- 	/* Process context for config space updates */
- 	struct work_struct config_work;
- 
--	/*
--	 * Tracks references from block_device_operations open/release and
--	 * virtio_driver probe/remove so this object can be freed once no
--	 * longer in use.
--	 */
--	refcount_t refs;
--
- 	/* What host tells us, plus 2 for header & tailer. */
- 	unsigned int sg_elems;
- 
-@@ -391,43 +384,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 	return err;
- }
- 
--static void virtblk_get(struct virtio_blk *vblk)
--{
--	refcount_inc(&vblk->refs);
--}
--
--static void virtblk_put(struct virtio_blk *vblk)
--{
--	if (refcount_dec_and_test(&vblk->refs)) {
--		ida_simple_remove(&vd_index_ida, vblk->index);
--		mutex_destroy(&vblk->vdev_mutex);
--		kfree(vblk);
--	}
--}
--
--static int virtblk_open(struct block_device *bd, fmode_t mode)
--{
--	struct virtio_blk *vblk = bd->bd_disk->private_data;
--	int ret = 0;
--
--	mutex_lock(&vblk->vdev_mutex);
--
--	if (vblk->vdev)
--		virtblk_get(vblk);
--	else
--		ret = -ENXIO;
--
--	mutex_unlock(&vblk->vdev_mutex);
--	return ret;
--}
--
--static void virtblk_release(struct gendisk *disk, fmode_t mode)
--{
--	struct virtio_blk *vblk = disk->private_data;
--
--	virtblk_put(vblk);
--}
--
- /* We provide getgeo only to please some old bootloader/partitioning tools */
- static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
- {
-@@ -460,11 +416,19 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
- 	return ret;
- }
- 
-+static void virtblk_free_disk(struct gendisk *disk)
-+{
-+	struct virtio_blk *vblk = disk->private_data;
-+
-+	ida_simple_remove(&vd_index_ida, vblk->index);
-+	mutex_destroy(&vblk->vdev_mutex);
-+	kfree(vblk);
-+}
-+
- static const struct block_device_operations virtblk_fops = {
--	.owner  = THIS_MODULE,
--	.open = virtblk_open,
--	.release = virtblk_release,
--	.getgeo = virtblk_getgeo,
-+	.owner  	= THIS_MODULE,
-+	.getgeo		= virtblk_getgeo,
-+	.free_disk	= virtblk_free_disk,
- };
- 
- static int index_to_minor(int index)
-@@ -791,8 +755,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- 		goto out_free_index;
- 	}
- 
--	/* This reference is dropped in virtblk_remove(). */
--	refcount_set(&vblk->refs, 1);
- 	mutex_init(&vblk->vdev_mutex);
- 
- 	vblk->vdev = vdev;
-@@ -970,7 +932,7 @@ static void virtblk_remove(struct virtio_device *vdev)
- 	flush_work(&vblk->config_work);
- 
- 	del_gendisk(vblk->disk);
--	blk_cleanup_disk(vblk->disk);
-+	blk_cleanup_queue(vblk->disk->queue);
- 	blk_mq_free_tag_set(&vblk->tag_set);
- 
- 	mutex_lock(&vblk->vdev_mutex);
-@@ -986,7 +948,7 @@ static void virtblk_remove(struct virtio_device *vdev)
- 
- 	mutex_unlock(&vblk->vdev_mutex);
- 
--	virtblk_put(vblk);
-+	put_disk(vblk->disk);
- }
- 
- #ifdef CONFIG_PM_SLEEP
--- 
-2.30.2
-
+Thanks, Roger.
