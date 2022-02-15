@@ -2,49 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66086C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 21:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E972C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 21:27:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239244AbiBOVYA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 16:24:00 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48928 "EHLO
+        id S233296AbiBOV1K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 16:27:10 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238383AbiBOVYA (ORCPT
+        with ESMTP id S233069AbiBOV1J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 16:24:00 -0500
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64779E61D6;
-        Tue, 15 Feb 2022 13:23:49 -0800 (PST)
-Received: by mail-pj1-f50.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso4396934pjg.0;
-        Tue, 15 Feb 2022 13:23:49 -0800 (PST)
+        Tue, 15 Feb 2022 16:27:09 -0500
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90AB5B10A1;
+        Tue, 15 Feb 2022 13:26:57 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id x4so229461plb.4;
+        Tue, 15 Feb 2022 13:26:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=qLbBvFVC577ibqj3b5u8NA+u/tqGnpQje7r8Bqpw0jQ=;
-        b=RP7AYWH+B6sgAmrvH3TeuIJipTlj3rfZnKvgzYEinJ92wPCxGcJHTo+XFWartszUP+
-         a1DB3Kfqsjp5Ve7OCw1tWDb7k8YBDiQqk5Bj0buZD5p8SjRiIk/xyWLUrBBj0a8QgfDU
-         5H7rP9LTBKtQ5zdQfZccdJYbsFutvJEhYXEyfWqxQ9ti5k8W8SLHInr6mXhipmLPDN+V
-         vEZEq1xxcAy7b/Xi8YFtWU/R5NnFsCwGYFDp2ga56n4kxBPy2CpBKUb2H6Bimy/UjUol
-         bR8poaW/1HtA4TKwHVHErgbnObKsJrsZn6qywH7VBLw13DdJG9kK8NZop1GuaW6wwDG2
-         9HOg==
-X-Gm-Message-State: AOAM530YO46fuFJbLr7Gx++uzaYzoAG20VR0faC6JvcjJGX3UOd3JsmA
-        QDG2Q1R8zxNmgV8JD/m3hy0=
-X-Google-Smtp-Source: ABdhPJyXyPE8wHBIybkMAui490IDkz5GW+uKQmy+kw6bryVQjCpYwAkIB+67yW7npKmMzZJbTESv7w==
-X-Received: by 2002:a17:902:e74b:: with SMTP id p11mr642867plf.115.1644960228705;
-        Tue, 15 Feb 2022 13:23:48 -0800 (PST)
+        bh=J+NlIpbaWVwSgyeODUccvQdmtmUkD9/pliXzM5eAo74=;
+        b=eLBaNO9Bp0x4A9ccwaH5LT75mRlShZ8dducWfoYVQJue4HCzERE1DT65gwway9z9Mm
+         Bh/fNXPNmy3gubPkaK0gE7tQguoIyVkAldbBGfl9EiDLs7AahsegLzVArMJe55JjH4TY
+         e9CiAv4WJnKq4a8RbEKVQfNmA7nAWPiBhNc/x5J0TPJIccU0f9mZ1h+sEcrMrdRd1BrC
+         E4FPByN+NEg3we569zJVgJn7wwQfCGBAbz7hzXAK1ARZLFf5ruY8XdksML1VYtxflnr6
+         Hw6/fAmPV+VI2H9xQXlplFcuTuR3kQEKHkv9QiDPMcbWHfRvIWjrLSfwLEcOzLuy4y2V
+         LUVg==
+X-Gm-Message-State: AOAM530v4bW+75+2pjroBKXXVxjsA7azejG5oA8AEPdfHoaOxqCHSSd5
+        bYkiH/7KME5g+676D9NqZzs=
+X-Google-Smtp-Source: ABdhPJzDnpo/eAadoEBFL3xHM3Kz5f6vsKh2Fh4L8nJ06vXgJ5Mg3nhBMiXdqKfhdiZ7kvqQ+I29dg==
+X-Received: by 2002:a17:90b:1d0d:: with SMTP id on13mr874630pjb.208.1644960417011;
+        Tue, 15 Feb 2022 13:26:57 -0800 (PST)
 Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id pc18sm7701980pjb.9.2022.02.15.13.23.46
+        by smtp.gmail.com with ESMTPSA id q2sm43785660pfj.94.2022.02.15.13.26.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 13:23:47 -0800 (PST)
-Message-ID: <517dddb8-efd6-6b1a-fa1b-eba6f2c93119@acm.org>
-Date:   Tue, 15 Feb 2022 13:23:46 -0800
+        Tue, 15 Feb 2022 13:26:56 -0800 (PST)
+Message-ID: <cb5677fc-01ac-f97f-ccf8-eb91505ad0e3@acm.org>
+Date:   Tue, 15 Feb 2022 13:26:55 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.1
-Subject: Re: [RFC V2 1/6] blk: make blk-rq-qos support pluggable and modular
- policy
+Subject: Re: [RFC V2 5/6] blk-ioprio: make ioprio pluggable and modular
 Content-Language: en-US
 To:     "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>,
         Jens Axboe <axboe@kernel.dk>
@@ -52,9 +51,9 @@ Cc:     hch@infradead.org, Josef Bacik <jbacik@fb.com>,
         Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20220215123705.58968-1-jianchao.wan9@gmail.com>
- <20220215123705.58968-2-jianchao.wan9@gmail.com>
+ <20220215123705.58968-6-jianchao.wan9@gmail.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220215123705.58968-2-jianchao.wan9@gmail.com>
+In-Reply-To: <20220215123705.58968-6-jianchao.wan9@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -62,18 +61,28 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/15/22 04:37, Wang Jianchao (Kuaishou) wrote:
-> @@ -337,6 +338,7 @@ void blk_cleanup_queue(struct request_queue *q)
->   	 * it is safe to free requests now.
->   	 */
->   	mutex_lock(&q->sysfs_lock);
-> +	rq_qos_exit(q);
->   	if (q->elevator)
->   		blk_mq_sched_free_rqs(q);
->   	mutex_unlock(&q->sysfs_lock);
+> diff --git a/block/Makefile b/block/Makefile
+> index f38eaa612929..f6a3995af285 100644
+> --- a/block/Makefile
+> +++ b/block/Makefile
+> @@ -17,7 +17,8 @@ obj-$(CONFIG_BLK_DEV_BSGLIB)	+= bsg-lib.o
+>   obj-$(CONFIG_BLK_CGROUP)	+= blk-cgroup.o
+>   obj-$(CONFIG_BLK_CGROUP_RWSTAT)	+= blk-cgroup-rwstat.o
+>   obj-$(CONFIG_BLK_DEV_THROTTLING)	+= blk-throttle.o
+> -obj-$(CONFIG_BLK_CGROUP_IOPRIO)	+= blk-ioprio.o
+> +io-prio-y 			:= blk-ioprio.o
+> +obj-$(CONFIG_BLK_CGROUP_IOPRIO)	+= io-prio.o
+>   obj-$(CONFIG_BLK_CGROUP_IOLATENCY)	+= blk-iolatency.o
+>   obj-$(CONFIG_BLK_CGROUP_IOCOST)	+= blk-iocost.o
+>   obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
 
-I think this change should be a separate patch with tag "Fixes: 
-8e141f9eb803 ("block: drain file system I/O on del_gendisk")". See also 
-https://lore.kernel.org/linux-block/b64942a1-0f7e-9e9c-0fd4-c35647035eaf@acm.org/
+Is the above change really necessary?
+
+> +static int blk_ioprio_init(struct request_queue *q);
+>   static struct rq_qos_ops blkcg_ioprio_ops = {
+
+Please insert a blank line between a function declaration and a 
+structure definition.
 
 Thanks,
 
