@@ -2,93 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A86C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 02:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB82FC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 03:32:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233714AbiBOCml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 21:42:41 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48706 "EHLO
+        id S229779AbiBODcX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 22:32:23 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233669AbiBOCmk (ORCPT
+        with ESMTP id S229497AbiBODcX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 21:42:40 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82104111DC3;
-        Mon, 14 Feb 2022 18:42:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644892951; x=1676428951;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ymUxp0XdwB1tSymGwsMVGCDGKJ7qTLE+FJH01P7W150=;
-  b=KJAv0J+KAUd1KZ0201BS1bvTymtZYvxxnMsY1LsyYb0DFSMi/ukfAPZa
-   G8OsHUkEhR/IT4trBxjx2wMluZ37cC4KlgnsOy42Ewqo6Z/mCs1MB7a2Q
-   WvNEFyl4T5UR3vHxrU/QYScXuGs4cyRDlyIXgnzunG7InLvl81t+TZgIU
-   d+3ZBmxhTUQtRnVLCVH6gYga7BZpAnkDBOvddFrQnSK42He0xX2nUpGgE
-   Gr1JUzSWmjanGI0KNpZ5N9nMnkrrjq1nPCL2TntsWVCfu6ssaPbhOJrzI
-   G6hwzsKVsO4CO7ZtDFEFI13id2eiI6i9oWBqRq1Xhffhni0Kvl/oOSTMf
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10258"; a="313507870"
-X-IronPort-AV: E=Sophos;i="5.88,369,1635231600"; 
-   d="scan'208";a="313507870"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2022 18:42:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,369,1635231600"; 
-   d="scan'208";a="775564613"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 14 Feb 2022 18:42:29 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nJnnQ-0009C6-P1; Tue, 15 Feb 2022 02:42:28 +0000
-Date:   Tue, 15 Feb 2022 10:41:47 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Stefan Roesch <shr@fb.com>, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        kernel-team@fb.com
-Cc:     kbuild-all@lists.01.org, shr@fb.com
-Subject: Re: [PATCH v1 05/14] fs: split off __alloc_page_buffers function
-Message-ID: <202202151030.Z3rVrN17-lkp@intel.com>
-References: <20220214174403.4147994-6-shr@fb.com>
+        Mon, 14 Feb 2022 22:32:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 58473E95
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 19:32:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644895933;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=L1VVWWrmvIyPcYZot/SfrQKGh7RmwMpxVehk3q72WDE=;
+        b=bXy8U5RufGCIYfOXEghRT4BW7B66jZju/8bJjMrmBSlYVElVJVVwmXPT1m263qtFlGH4Lp
+        JEBmsumlj3SgVqQbwwWv7WGndBNrOmkw6a8i53rerOFPN1xWZFst0Vn92VoaL8nTnbUhkl
+        gdhIC3EBhLlBnPL8n/ROrD85ymU31Gg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-467-WeFh-czwMLiDszK6AqI_dA-1; Mon, 14 Feb 2022 22:32:10 -0500
+X-MC-Unique: WeFh-czwMLiDszK6AqI_dA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAA052F25;
+        Tue, 15 Feb 2022 03:32:08 +0000 (UTC)
+Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 668B556F71;
+        Tue, 15 Feb 2022 03:32:02 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Li Ning <lining2020x@163.com>,
+        Tejun Heo <tj@kernel.org>, Chunguang Xu <brookxu@tencent.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 0/8] block: improve iops limit throttle
+Date:   Tue, 15 Feb 2022 11:30:42 +0800
+Message-Id: <20220215033050.2730533-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220214174403.4147994-6-shr@fb.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Stefan,
+Hello Guys,
 
-Thank you for the patch! Perhaps something to improve:
+Lining reported that iops limit throttle doesn't work on dm-thin, also
+iops limit throttle works bad on plain disk in case of excessive split.
 
-[auto build test WARNING on f1baf68e1383f6ed93eb9cff2866d46562607a43]
+Commit 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios")
+was for addressing this issue, but the taken approach is just to run
+post-accounting, then current split bios won't be throttled actually,
+so actual iops throttle result isn't good in case of excessive bio
+splitting.
 
-url:    https://github.com/0day-ci/linux/commits/Stefan-Roesch/Support-sync-buffered-writes-for-io-uring/20220215-014908
-base:   f1baf68e1383f6ed93eb9cff2866d46562607a43
-config: i386-randconfig-s002-20220214 (https://download.01.org/0day-ci/archive/20220215/202202151030.Z3rVrN17-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/e8b24c1ab111c127cbe1daaac3b607c626fb03a8
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Stefan-Roesch/Support-sync-buffered-writes-for-io-uring/20220215-014908
-        git checkout e8b24c1ab111c127cbe1daaac3b607c626fb03a8
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash
+The 1st three patches are cleanup.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+The 4th patches add one new local helper of submit_bio_noacct_nocheck() for
+blk_throtl_dispatch_work_fn(), so that bios won't be throttled any more
+when blk-throttle code dispatches throttled bios.
+
+The 5th patch merges merge submit_bio_checks() into submit_bio_noacct
+as suggested by Christoph.
+
+The 6th and 7th patch makes the real difference for throttling split bio wrt.
+iops limit.
+
+The last patch is to revert commit 4f1e9630afe6 ("blk-throtl: optimize IOPS
+throttle for large IO scenarios").
+
+Lining has verified that iops throttle is improved much on the posted
+RFC V1 version.
+
+V3:
+	- add reviewed-by/acked-by tag
+	- patch style change 2/8
+	- mark submit_bio_checks as static 3/8
+	- move ubmit_bio_checks() into submit_bio_noacct 5/8
+
+V2:
+	- remove RFC
+	- don't add/export __submit_bio_noacct(), instead add one new local
+	helper of submit_bio_noacct_nocheck() per Christoph's suggestion
 
 
-sparse warnings: (new ones prefixed by >>)
->> fs/buffer.c:805:20: sparse: sparse: symbol '__alloc_page_buffers' was not declared. Should it be static?
 
-Please review and possibly fold the followup patch.
+Ming Lei (8):
+  block: move submit_bio_checks() into submit_bio_noacct
+  block: move blk_crypto_bio_prep() out of blk-mq.c
+  block: don't declare submit_bio_checks in local header
+  block: don't check bio in blk_throtl_dispatch_work_fn
+  block: merge submit_bio_checks() into submit_bio_noacct
+  block: throttle split bio in case of iops limit
+  block: don't try to throttle split bio if iops limit isn't set
+  block: revert 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for
+    large IO scenarios")
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ block/blk-core.c     | 259 +++++++++++++++++++++----------------------
+ block/blk-merge.c    |   2 -
+ block/blk-mq.c       |   3 -
+ block/blk-throttle.c |  61 ++++------
+ block/blk-throttle.h |  16 ++-
+ block/blk.h          |   2 +-
+ 6 files changed, 161 insertions(+), 182 deletions(-)
+
+-- 
+2.31.1
+
