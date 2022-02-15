@@ -2,171 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE879C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 03:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4848C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 03:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229811AbiBODd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 22:33:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54902 "EHLO
+        id S231561AbiBOD7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 22:59:23 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiBODd5 (ORCPT
+        with ESMTP id S230088AbiBOD7X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 22:33:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 315F36A057
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 19:33:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644896027;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O9J6/mmYY+DQGg07c14Y9wN5WFmdh/uIILxRmMFpKww=;
-        b=a90AC82YXSA3VOR/XXTqOGNqDhCtQHUnRV8ALGMJNRkTAcgDlxBet7g9UsRZQ0psBpBKhp
-        nL9eejrlbTbNnqjq+ooRD62ZKxK5ORfkby2R8gKBR9fHK+ztJDDcBEmH2NFhwNJe4MZ2e1
-        wyLaU4D5ZALXfS1dtrB/KQQO0Rtf4Rk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-97-KQvFPofdOPOx1BcPGO-_eQ-1; Mon, 14 Feb 2022 22:33:44 -0500
-X-MC-Unique: KQvFPofdOPOx1BcPGO-_eQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF4F31853028;
-        Tue, 15 Feb 2022 03:33:42 +0000 (UTC)
-Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 460A84ABA2;
-        Tue, 15 Feb 2022 03:33:27 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Li Ning <lining2020x@163.com>,
-        Tejun Heo <tj@kernel.org>, Chunguang Xu <brookxu@tencent.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 8/8] block: revert 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios")
-Date:   Tue, 15 Feb 2022 11:30:50 +0800
-Message-Id: <20220215033050.2730533-9-ming.lei@redhat.com>
-In-Reply-To: <20220215033050.2730533-1-ming.lei@redhat.com>
-References: <20220215033050.2730533-1-ming.lei@redhat.com>
+        Mon, 14 Feb 2022 22:59:23 -0500
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0963137009;
+        Mon, 14 Feb 2022 19:59:12 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=haoxu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0V4WYNGT_1644897549;
+Received: from 30.225.24.82(mailfrom:haoxu@linux.alibaba.com fp:SMTPD_---0V4WYNGT_1644897549)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 15 Feb 2022 11:59:10 +0800
+Message-ID: <fe10885d-78b7-a90a-01a0-60ac58d64357@linux.alibaba.com>
+Date:   Tue, 15 Feb 2022 11:59:09 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.0
+Subject: Re: [PATCH v1 00/14] Support sync buffered writes for io-uring
+To:     Stefan Roesch <shr@fb.com>, io-uring@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+References: <20220214174403.4147994-1-shr@fb.com>
+From:   Hao Xu <haoxu@linux.alibaba.com>
+In-Reply-To: <20220214174403.4147994-1-shr@fb.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Revert commit 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large
-IO scenarios") since we have another easier way to address this issue and
-get better iops throttling result.
-
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-throttle.c | 28 ----------------------------
- block/blk-throttle.h |  5 -----
- 2 files changed, 33 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index ec72eced24d2..a3b3ebc72dd4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -640,8 +640,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 
--	atomic_set(&tg->io_split_cnt[rw], 0);
--
- 	/*
- 	 * Previous slice has expired. We must have trimmed it after last
- 	 * bio dispatch. That means since start of last slice, we never used
-@@ -665,8 +663,6 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- 	tg->slice_start[rw] = jiffies;
- 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
- 
--	atomic_set(&tg->io_split_cnt[rw], 0);
--
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -900,9 +896,6 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 				jiffies + tg->td->throtl_slice);
- 	}
- 
--	if (iops_limit != UINT_MAX)
--		tg->io_disp[rw] += atomic_xchg(&tg->io_split_cnt[rw], 0);
--
- 	if (tg_with_in_bps_limit(tg, bio, bps_limit, &bps_wait) &&
- 	    tg_with_in_iops_limit(tg, bio, iops_limit, &iops_wait)) {
- 		if (wait)
-@@ -1927,14 +1920,12 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 	}
- 
- 	if (tg->iops[READ][LIMIT_LOW]) {
--		tg->last_io_disp[READ] += atomic_xchg(&tg->last_io_split_cnt[READ], 0);
- 		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
- 		if (iops >= tg->iops[READ][LIMIT_LOW])
- 			tg->last_low_overflow_time[READ] = now;
- 	}
- 
- 	if (tg->iops[WRITE][LIMIT_LOW]) {
--		tg->last_io_disp[WRITE] += atomic_xchg(&tg->last_io_split_cnt[WRITE], 0);
- 		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
- 		if (iops >= tg->iops[WRITE][LIMIT_LOW])
- 			tg->last_low_overflow_time[WRITE] = now;
-@@ -2053,25 +2044,6 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
--void blk_throtl_charge_bio_split(struct bio *bio)
--{
--	struct blkcg_gq *blkg = bio->bi_blkg;
--	struct throtl_grp *parent = blkg_to_tg(blkg);
--	struct throtl_service_queue *parent_sq;
--	bool rw = bio_data_dir(bio);
--
--	do {
--		if (!parent->has_rules[rw])
--			break;
--
--		atomic_inc(&parent->io_split_cnt[rw]);
--		atomic_inc(&parent->last_io_split_cnt[rw]);
--
--		parent_sq = parent->service_queue.parent_sq;
--		parent = sq_to_tg(parent_sq);
--	} while (parent);
--}
--
- bool __blk_throtl_bio(struct bio *bio)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index c996a15f290e..b23a9f3abb82 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -138,9 +138,6 @@ struct throtl_grp {
- 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
- 	unsigned long bio_cnt_reset_time;
- 
--	atomic_t io_split_cnt[2];
--	atomic_t last_io_split_cnt[2];
--
- 	struct blkg_rwstat stat_bytes;
- 	struct blkg_rwstat stat_ios;
- };
-@@ -164,13 +161,11 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
--static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
- #else /* CONFIG_BLK_DEV_THROTTLING */
- int blk_throtl_init(struct request_queue *q);
- void blk_throtl_exit(struct request_queue *q);
- void blk_throtl_register_queue(struct request_queue *q);
--void blk_throtl_charge_bio_split(struct bio *bio);
- bool __blk_throtl_bio(struct bio *bio);
- static inline bool blk_throtl_bio(struct bio *bio)
- {
--- 
-2.31.1
+在 2022/2/15 上午1:43, Stefan Roesch 写道:
+> This patch series adds support for async buffered writes. Currently
+> io-uring only supports buffered writes in the slow path, by processing
+> them in the io workers. With this patch series it is now possible to
+> support buffered writes in the fast path. To be able to use the fast
+> path the required pages must be in the page cache or they can be loaded
+> with noio. Otherwise they still get punted to the slow path.
+> 
+> If a buffered write request requires more than one page, it is possible
+> that only part of the request can use the fast path, the resst will be
+> completed by the io workers.
+> 
+> Support for async buffered writes:
+>    Patch 1: fs: Add flags parameter to __block_write_begin_int
+>      Add a flag parameter to the function __block_write_begin_int
+>      to allow specifying a nowait parameter.
+>      
+>    Patch 2: mm: Introduce do_generic_perform_write
+>      Introduce a new do_generic_perform_write function. The function
+>      is split off from the existing generic_perform_write() function.
+>      It allows to specify an additional flag parameter. This parameter
+>      is used to specify the nowait flag.
+>      
+>    Patch 3: mm: add noio support in filemap_get_pages
+>      This allows to allocate pages with noio, if a page for async
+>      buffered writes is not yet loaded in the page cache.
+>      
+>    Patch 4: mm: Add support for async buffered writes
+>      For async buffered writes allocate pages without blocking on the
+>      allocation.
+> 
+>    Patch 5: fs: split off __alloc_page_buffers function
+>      Split off __alloc_page_buffers() function with new gfp_t parameter.
+> 
+>    Patch 6: fs: split off __create_empty_buffers function
+>      Split off __create_empty_buffers() function with new gfp_t parameter.
+> 
+>    Patch 7: fs: Add aop_flags parameter to create_page_buffers()
+>      Add aop_flags to create_page_buffers() function. Use atomic allocation
+>      for async buffered writes.
+> 
+>    Patch 8: fs: add support for async buffered writes
+>      Return -EAGAIN instead of -ENOMEM for async buffered writes. This
+>      will cause the write request to be processed by an io worker.
+> 
+>    Patch 9: io_uring: add support for async buffered writes
+>      This enables the async buffered writes for block devices in io_uring.
+>      Buffered writes are enabled for blocks that are already in the page
+>      cache or can be acquired with noio.
+> 
+>    Patch 10: io_uring: Add tracepoint for short writes
+> 
+> Support for write throttling of async buffered writes:
+>    Patch 11: sched: add new fields to task_struct
+>      Add two new fields to the task_struct. These fields store the
+>      deadline after which writes are no longer throttled.
+> 
+>    Patch 12: mm: support write throttling for async buffered writes
+>      This changes the balance_dirty_pages function to take an additonal
+>      parameter. When nowait is specified the write throttling code no
+>      longer waits synchronously for the deadline to expire. Instead
+>      it sets the fields in task_struct. Once the deadline expires the
+>      fields are reset.
+>      
+>    Patch 13: io_uring: support write throttling for async buffered writes
+>      Adds support to io_uring for write throttling. When the writes
+>      are throttled, the write requests are added to the pending io list.
+>      Once the write throttling deadline expires, the writes are submitted.
+>      
+> Enable async buffered write support
+>    Patch 14: fs: add flag to support async buffered writes
+>      This sets the flags that enables async buffered writes for block
+>      devices.
+> 
+> 
+> Testing:
+>    This patch has been tested with xfstests and fio.
+> 
+> 
+> Peformance results:
+>    For fio the following results have been obtained with a queue depth of
+>    1 and 4k block size (runtime 600 secs):
+> 
+>                   sequential writes:
+>                   without patch                 with patch
+>    throughput:       329 Mib/s                    1032Mib/s
+>    iops:              82k                          264k
+>    slat (nsec)      2332                          3340
+>    clat (nsec)      9017                            60
+>                     
+>    CPU util%:         37%                          78%
+> 
+> 
+> 
+>                   random writes:
+>                   without patch                 with patch
+>    throughput:       307 Mib/s                    909Mib/s
+>    iops:              76k                         227k
+>    slat (nsec)      2419                         3780
+>    clat (nsec)      9934                           59
+> 
+>    CPU util%:         57%                          88%
+> 
+> For an io depth of 1, the new patch improves throughput by close to 3
+> times and also the latency is considerably reduced. To achieve the same
+> or better performance with the exisiting code an io depth of 4 is required.
+> 
+> Especially for mixed workloads this is a considerable improvement.
+> 
+> 
+> 
+> 
+> Stefan Roesch (14):
+>    fs: Add flags parameter to __block_write_begin_int
+>    mm: Introduce do_generic_perform_write
+>    mm: add noio support in filemap_get_pages
+>    mm: Add support for async buffered writes
+>    fs: split off __alloc_page_buffers function
+>    fs: split off __create_empty_buffers function
+>    fs: Add aop_flags parameter to create_page_buffers()
+>    fs: add support for async buffered writes
+>    io_uring: add support for async buffered writes
+>    io_uring: Add tracepoint for short writes
+>    sched: add new fields to task_struct
+>    mm: support write throttling for async buffered writes
+>    io_uring: support write throttling for async buffered writes
+>    block: enable async buffered writes for block devices.
+> 
+>   block/fops.c                    |   5 +-
+>   fs/buffer.c                     | 103 ++++++++++++++++---------
+>   fs/internal.h                   |   3 +-
+>   fs/io_uring.c                   | 130 +++++++++++++++++++++++++++++---
+>   fs/iomap/buffered-io.c          |   4 +-
+>   fs/read_write.c                 |   3 +-
+>   include/linux/fs.h              |   4 +
+>   include/linux/sched.h           |   3 +
+>   include/linux/writeback.h       |   1 +
+>   include/trace/events/io_uring.h |  25 ++++++
+>   kernel/fork.c                   |   1 +
+>   mm/filemap.c                    |  34 +++++++--
+>   mm/folio-compat.c               |   4 +
+>   mm/page-writeback.c             |  54 +++++++++----
+>   14 files changed, 298 insertions(+), 76 deletions(-)
+> 
+> 
+> base-commit: f1baf68e1383f6ed93eb9cff2866d46562607a43
+> 
+It's a little bit different between buffered read and buffered write,
+there may be block points in detail filesystems due to journal
+operations for the latter.
 
