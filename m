@@ -2,146 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A71BC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 13:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A56C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 13:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238060AbiBONBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 08:01:19 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53700 "EHLO
+        id S238173AbiBONSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 08:18:02 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235884AbiBONBT (ORCPT
+        with ESMTP id S238160AbiBONSC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 08:01:19 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2079.outbound.protection.outlook.com [40.107.243.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2652E8020E;
-        Tue, 15 Feb 2022 05:01:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S9ipcSoqolC4DZNy7nHePrmxmuQ1ZPOEqvIJMSgCfbWM0Y1H6wgtCwG6OWARu/isjQDsrsBizHmK6B8a3YwyNaEOMpPozLShsSot4HpL7JfvJzMb0IrK1tEImDQhJmJ+zNfhKRTVystpA6yOXzZdzlgRrao/x3bCe6G1EOKFPm+Df66LRI24NBaJJsmWSMOvOyxPvLg+3wvRaH7CIna2mDTgyYMVBw3w5chXK2SwEDTVC6utphQbtHW9ZjlBUojOZfFcsEdUPBIHII9/jHSVXunHZt2uJ67BOdr61XVkglYY8h2KLvByG4khGvPRqVmMoOPf+qZ3XlrOb8ySRCJM2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W56PhEffbKIn/VvbaiPNymS6wpxskR5gR5//KoLtuX0=;
- b=np78KSHd8x6YHL2JGnNTPRWCZMpFDa/g0gvIePmFMTZ9KBMkNm9lQLZE1S3tULnu+gpSM7dfGmo54jRiiauc24qEyjBrrSYQRlUBPXysn+WwCSipflP27Ca1dSIuIfRmDmfOX66BepiaG97st7Z7c8cTClNPclk3Mpm2CWHAltQ7EWpG/yNUKZrqO93+/fpQcPQbl/Byvr0g9qodhLT5SRjy55kRm5hz9195Z1K2AtMnv8dDdvNIm1Q6ySao6H0MNa2+udUmJCXKkrzVBwZ7AYcHq+6AuvKFgn03OK99v1XprSufyXrqK/rj90K8TqjWMEKZ8VLSnSAz6l9P38g6Wg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W56PhEffbKIn/VvbaiPNymS6wpxskR5gR5//KoLtuX0=;
- b=EbkvXxQoyhEmZ2no5Kraw0nHYKVL0PPJJb5mQs+aDBygGMJfARoc1GLY0y4hFRlH7YzywLmY/SL7mr5G14Jnej2kNw8E5R99uxgqjwEM8tGyx0abVTGCfckx+iLD7Yiydpv6noAp2mJDbVKpvFiFEOiWN9go4uRYOVD4Tz2MPyCTc6YVPmRbFvKE4dik4xUWh1J5Jpxb0AVYy2XGCJSW0m//8qI/lSDpHYv4oiX18X0by4Q4M5lXWO3td+cl0niDMs5zuF5Gh2wRK0avZMLtk3niQXXR1Z5m/IiUyRL3StRu/3CxceP5F1+++Ep3gss4/3ZHu2XNyIWWjqbL2+n0bQ==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by DM4PR12MB5795.namprd12.prod.outlook.com (2603:10b6:8:62::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4975.15; Tue, 15 Feb 2022 13:01:06 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::846c:d3cd:5a30:c35]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::846c:d3cd:5a30:c35%5]) with mapi id 15.20.4975.017; Tue, 15 Feb 2022
- 13:01:06 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
-CC:     "hch@infradead.org" <hch@infradead.org>,
-        Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [RFC V2 0/6] blk: make blk-rq-qos policies pluggable and modular
-Thread-Topic: [RFC V2 0/6] blk: make blk-rq-qos policies pluggable and modular
-Thread-Index: AQHYImkO+BBQM1c3ykqSN6DbIjyAAKyUk10A
-Date:   Tue, 15 Feb 2022 13:01:06 +0000
-Message-ID: <44f86e8d-45f4-f40e-bc8b-00aa4f488f3a@nvidia.com>
-References: <20220215123705.58968-1-jianchao.wan9@gmail.com>
-In-Reply-To: <20220215123705.58968-1-jianchao.wan9@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fe680d98-b4f3-4100-4c55-08d9f0833acc
-x-ms-traffictypediagnostic: DM4PR12MB5795:EE_
-x-microsoft-antispam-prvs: <DM4PR12MB579586B1781739E80BB31057A3349@DM4PR12MB5795.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1388;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: H3wIHiVEbD1Ujn0m7WC7+s+WIKy2OwhTz0NVEF5oJTGcu0yXHjYj8ZZXYgjA0iF+GwHxpEdlr39/UN2mrVCkhw+QNzR7RyBCrLjUmhWsNr9/PPRS7G1RN1Zh7YkoZiMPUBIVLKnjMGTZpDygo2BQ5iZ12veLF9cvBfIgVAWHiB6P0VJK/8FPbNJgOd2POQ/PtUOt/GhOGorn8j/FrIAwQeOsi1Kl9oWVc+23BAyOW/08BabHginD4Kagp2Fweqi0Vi1g4DLHFW1I23WfLBbE85SVtjhfnu5wl8koJwGsX+uO38tvkNlPEJq5UehPyhOeQxDs9mFLu+jsAnqsI5OqQg2L7Htttzh7Flmy4kzC2Yr/R+u/YgrLzf3pgRXJmqIoMZjAHyuP3ZviWPDx/jyNP8SdrjwXhaFY4gEYFpAhCJUuOvw38zQfNjOefJ4LybDCgCXjNCsXm3IVVyx/t8yZdWvXrmOQrD66TExavTiZ707fjTEbGPYUsZDrOP+1MKeCDEOYTc9+yRxXH6RByMpxdx44C0TuiGMS6TNI8MPasXhGZHnY4JWzfm86iBSTRCocyYeEvBkdrHn9JrTRe9/AXnk1VC+xE+n5NqaQZuy6BOCQQ/eaJ39J+oU14CYpZkWmWuepQmbVgOkcRTIiLzmlld7rJV2xN8dwnVQszOp5EGJJsGwwVjBjTalZud9aWfgORVu1B6m97rLUdjERG55OlMPkHNJ/y8XZrcHIkP6qlLbHj4SifJH0Frh4n+Ekj4X73UQwWhQxvMEhXfuepYykhq5F8R383t0ZbXEqUI5Cg9VlcHHLPBuSEH/4Zai6yxmW3sD6oMwn0RFPSjo9sNy2TIAd4wGLQFM6+GaADL0YrKU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(316002)(83380400001)(54906003)(66556008)(76116006)(66946007)(91956017)(64756008)(66476007)(66446008)(8676002)(53546011)(4326008)(31696002)(71200400001)(6512007)(6506007)(38070700005)(86362001)(6486002)(508600001)(31686004)(2616005)(122000001)(4744005)(36756003)(2906002)(38100700002)(186003)(966005)(8936002)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TkQ3b28yaXRXNUU2djdxcURFNTZ3MC9HdnQ1UXJhL3hRL2NMRWI0b2FMR1NU?=
- =?utf-8?B?bVBuTis5Zlo1WmhaQ2luMmFOZE13MFQwbkRWTlhab0J5U1U5MFVGRFhtcnBo?=
- =?utf-8?B?QUcrdXhtcldQQlgxYkhWOTFLaDdsRTZ4bFR3RnhhYlV3OGs4bFBhK01QdHJw?=
- =?utf-8?B?aFE5eWZTZ29WTXBmMW5VRmU0eWpVUXhYTDJRbFg3TzRtVzU4NHhLUFFMclJU?=
- =?utf-8?B?bmxsakUwcno2elJlQkdjTzNIVDV1ZFl0MXV6ZFFsdG1pZ2RUSlg1T0VqdG9C?=
- =?utf-8?B?aFFjM0FoN0dwNS9tN2lyWWVQaVhEVmFjLzZPY0ZTeFlxSWVHRUZReHNYNU1K?=
- =?utf-8?B?QTB1Qm43Z0FreUhsR3ZMaUs2bzVDbVZxZ3dVb3VFQ3RKaFROeG1UNlJ3TnY2?=
- =?utf-8?B?UEhNS3dGZnBxMkFTNVRZUThFUmpJSi9KQVdDWmhRd284Nm1ONWxuR1lUelpN?=
- =?utf-8?B?V2hBYXV5cmpGeEM5WmlnL2hwajVKUnV2UjBNazNkM1BaeEVEVVJlT2Z3YkFH?=
- =?utf-8?B?Szc5T2twc1diemI4dm9UMVJxQzNWZzc2dStoSUdjWDVKUlhHYjRuSGZSL2Jy?=
- =?utf-8?B?RWRrMzAyek93cGdFOTRPUTd4c1ZZcWVLNW8zNFpiSmdxWjNQOUhSR0NnWUE0?=
- =?utf-8?B?TmZlREFXbUxUdXlBd3NBdUxucFVacDJLZkNDeXo3L2R3RGV4ZklPcmh4NzhK?=
- =?utf-8?B?M2N1elRRTCtMem5VekVCelFGOXR6WE9jNmNobDhISEw2NFJraUNSN3VDeUVB?=
- =?utf-8?B?Z0dVbDR1cnVubm9IQzQxNS9jeVVGczFWN0x1N1VzekQ5RGhQM1lkRllwM3Zt?=
- =?utf-8?B?aDBYdEF0UUlMV01OYVpVVXJ2R0xsMjUxd2U4UXFhSkxPUUhwQndESVZ4Qy9z?=
- =?utf-8?B?QlJQZjRCRnpUeHA1NTY3cm5Yemh2Z3RVOWd3eGc1OHJ1T1piYVkyMXR0aTJG?=
- =?utf-8?B?dlJTaGpQMzh0VzhEZVRKSlcrR2xqVmYwc25QenVmMUVhRi9ocGtCK0dPZFVO?=
- =?utf-8?B?SmpkNmxIc0NyN3FTaVN2Smo4V3dLVUNReTJrdkVLdVJwajFiR1gzdVRzMko4?=
- =?utf-8?B?TUJQSjdZdmZwL0FiamovclVIVkhmdkd4R1ByN2g5d0IrK3lkOUNjQUd2bkZP?=
- =?utf-8?B?bWZkV1FXTWR1ZHlZdHhWT3hVMkVjaXNGNHdrZzVEQ3dJZyt5RmNldTNQRjJC?=
- =?utf-8?B?QkdWenhIQlA1bGdHT2JiR1VzRWwxSERKMEpHNmlUdTljMnhVSjA4Q3JtRzEx?=
- =?utf-8?B?THBSbmJPdzlPZ1BjaDlXSkVzRUdZTVN5UWRmbHhxeVJ6SW5kNTZtUkQyMFJn?=
- =?utf-8?B?b3dQRk9WaWJTK3FTUGluUWRhSFBHbVhFOXZqREkzM3VvUzM1NlJ3aWVIYStr?=
- =?utf-8?B?blBzbmRKREFpeUpTUSswSjRGZTkveWY0UmpPN1pkZXZwblpEemoxaUVKWWMw?=
- =?utf-8?B?K1R4cUpQbnIwRUMxOVFlQWQrN1VWeElVYmJBbm5yWURJNnFpRU9RZTNYZFJY?=
- =?utf-8?B?SUtGKzRIYzdDQ2NSYXF5UmFqNE04TXYrdXZzaW5Dai9YVUNKdDFFVWNEelZB?=
- =?utf-8?B?WGdlcXl1c0s4UlZQVzdNdldLTkxOakJ1UjBud0VTY3ArTnJXMnpUQjA4cGs0?=
- =?utf-8?B?NmJyV3JaSmIxV1RMSmY0Zi9EbWsvcnJUZVFyNytNMk1zOTZZVU1TSVF2RlZ0?=
- =?utf-8?B?eUlSMnJveHBacGZSbEw1L1pHR3ZOSGQ3Q1NXS1NNcVJsNUdjK1NTN3Y1ekhR?=
- =?utf-8?B?dUl0QUc1REE1UlNhOS9YcnVrTUJuQjlWWlczaC9uNkVPYUdrMTdaN21aZkRV?=
- =?utf-8?B?VFY4Z1p2NXZrUTBRS0R4VG9iejY1OUovU1pyMTVRa3l6VzRobVJ4aWczTmlJ?=
- =?utf-8?B?K2xYZVRwcWtQRHkydVNOS0QycFV2bWZaZmx1WEIyR0dxUzdQVHkyclhqSTVv?=
- =?utf-8?B?WlZkTHgxZFNsZ1d2LzZPMkc4VlU4T3dDbWIyTnN3VTlnNVFab0dVWVY3YXBz?=
- =?utf-8?B?Rllwd0xuaVlkVUtHck5CRll0WDRTeDlQbG9Bc2xDa1o4QjFrRlhTMWthWnJ3?=
- =?utf-8?B?ekVxT0Q3aWwxTENHRGdtRHZxNVpLZ1hndUlYcmR6VFZPWDVOeXNhVytxTFdF?=
- =?utf-8?B?ZDkzZXpWQnROL05FMVlpbEZaMWZDWGo5YXBMYlIwNTgxYzFxMHFKbzNiWXBV?=
- =?utf-8?B?TEJHRkRyVjZtWlN5cDhtejh5UFJkVklqV3JGd3Y4ZGFZNWRqcGhtc0VMdFh0?=
- =?utf-8?B?eXpvSDVwalVqUXZYRVpWTTR4SWZ3PT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <90E9FBD72FDE994EADF3AA834A3DA56B@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 15 Feb 2022 08:18:02 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F35BCD10A0
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 05:17:49 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id gb39so9469286ejc.1
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 05:17:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fsJbGaa3SFcG2KERbDvW9xmJviCwqG46K8qkid7fn6c=;
+        b=7XgS7fALQBQuwbclAnMxqO2wqnc/+bGyhHE6lujXNJouj8037qr9Ue3xmlYhI+AFsM
+         f03sdWv+Ujf9RTFJyoBv7idlnbP7CFOaazsTBbodwXnN05FoLL135oSZZxVmGFnnwP88
+         WH3bxdDxRsdRjGcjNZZO48JYgmAldIWUGcGXbXsjnGnIh9ZihL3KqC9/M1MbHs3GoBne
+         zE83wH/HodNhR31zL6+Hqvc1xTPXqI9cJkDGWbw0rx6TjkaZPKZQOq6w46mlcAExg6az
+         +Ec+2vyvtnJq1nDHQ82gJCkdM7D0dK0xKB5ba5B4yaS+xrvLCTuuVhVUZzMWRcV3I5k/
+         IEhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fsJbGaa3SFcG2KERbDvW9xmJviCwqG46K8qkid7fn6c=;
+        b=SPd8CaNF6nC2FQAGxM74oZNodC9pO9h7NWlADTxHeUulIjj931UEhdC7uZk2Ta5ktk
+         RMnBh9D+6gzQ3NIVHO3aSZZadelATzV4+LUtV7E2oZKJEmsvT/C7HxW3Y8aD2k2uPfyB
+         vl7F41hNmDwiK+526IlJDVrDXiJG2dEyc+jDGW2sDikRLsCr2gFdoIhh5LQpBPWlPTtS
+         RKWBiUvip8+NtKgMXTtqbPrF/ehk1Er0Sty3m41PNHYAxZdMnEgk/TkYHoZ5DQzjx1PF
+         4/oVE71lGIFekSbK5b9DobA1/CM8Vip6VdCJSBSVXFhFdqGR8eNZo2BleF1HwU1fYEDB
+         aSLA==
+X-Gm-Message-State: AOAM533WsdMex0XrJxyDiJjh4596c3B3ePvlTPdX8xnGAgsM3c0uJhAE
+        wQMRF/HkBWlv5jhQzOao3N/cmhh7RiOzr/TBnn7UXSvngXTs
+X-Google-Smtp-Source: ABdhPJzGcLJvBPy+H95ps/k6isFv1SA3/3aRTr93ZAojJyrKa1HFzpIz9t7VDfN9wQ5IPOeOZTgAe28YX895rwe8htA=
+X-Received: by 2002:a17:907:9605:: with SMTP id gb5mr3161841ejc.490.1644931068478;
+ Tue, 15 Feb 2022 05:17:48 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe680d98-b4f3-4100-4c55-08d9f0833acc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2022 13:01:06.6235
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XI868UNzOlFnRcG3wp6YFJFc0Hrcn9TMgBH0RLtfPq9WLAhjbm+UOMa+FuUuBMtjfJZcU9J46HCIi1MS0n3w+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5795
+References: <20211227091241.103-1-xieyongji@bytedance.com> <Ycycda8w/zHWGw9c@infradead.org>
+ <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
+ <YdMgCS1RMcb5V2RJ@localhost.localdomain> <CACycT3vYt0XNV2GdjKjDS1iyWieY_OV4h=W1qqk_AAAahRZowA@mail.gmail.com>
+ <YdSMqKXv0PUkAwfl@localhost.localdomain> <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
+ <CACycT3tTKBpS_B5vVJ8MZ1iuaF2bf-01=9+tAdxUddziF2DQ-g@mail.gmail.com>
+In-Reply-To: <CACycT3tTKBpS_B5vVJ8MZ1iuaF2bf-01=9+tAdxUddziF2DQ-g@mail.gmail.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 15 Feb 2022 21:17:37 +0800
+Message-ID: <CACycT3thVwb466u2JR-oDRHLY5j_uxAx5uXXGmaoCZL5vs__mQ@mail.gmail.com>
+Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-V2FuZyBKaWFuY2hhbyAoS3VhaXNob3UpLA0KDQpPbiAyLzE1LzIyIDA0OjM2LCBXYW5nIEppYW5j
-aGFvIChLdWFpc2hvdSkgd3JvdGU6DQo+IEhpIEplbnMNCj4gDQo+IGJsay1ycS1xb3MgaXMgYSBz
-dGFuZGFsb25lIGZyYW1ld29yayBvdXQgb2YgaW8tc2NoZWQgYW5kIGNhbiBiZSB1c2VkIHRvDQo+
-IGNvbnRyb2wgb3Igb2JzZXJ2ZSB0aGUgSU8gcHJvZ3Jlc3MgaW4gYmxvY2stbGF5ZXIgd2l0aCBo
-b29rcy4gYmxrLXJxLXFvcw0KPiBpcyBhIGdyZWF0IGRlc2lnbiBidXQgcmlnaHQgbm93LCBpdCBp
-cyB0b3RhbGx5IGZpeGVkIGFuZCBidWlsdC1pbiBhbmQgc2h1dA0KPiBvdXQgcGVvcGxlcyB3aG8g
-d2FudCB0byB1c2UgaXQgd2l0aCBleHRlcm5hbCBtb2R1bGUuDQo+IA0KPiBUaGlzIHBhdGNoc2V0
-IGF0dGVtcHRzIHRvIG1ha2UgYmxrLXJxLXFvcyBmcmFtZXdvcmsgcGx1Z2dhYmxlIGFuZCBtb2R1
-bGFyLg0KPiBUaGVuIHdlIGNhbiB1cGRhdGUgdGhlIGJsay1ycS1xb3MgcG9saWN5IG1vZHVsZSB3
-L28gc3RvcHBpbmcgdGhlIElPIHdvcmtsb2FkLg0KPiBBbmQgaXQgaXMgbW9yZSBjb252ZW5pZW50
-IHRvIGludHJvZHVjZSBuZXcgcG9saWN5IG9uIG9sZCBtYWNoaW5lcyB3L28gdWRncmFkZQ0KPiBr
-ZXJuZWwuIEFuZCB3ZSBjYW4gY2xvc2UgYWxsIG9mIHRoZSBibGstcnEtcW9zIHBvbGljeSBpZiB3
-ZSBuZWVkbid0IGFueSBvZg0KPiB0aGVtLiBBdCB0aGUgbW9tZW50LCB0aGUgcmVxdWVzdF9xdWV1
-ZS5ycW9zIGxpc3QgaXMgZW1wdHksIHdlIG5lZWRuJ3QgdG8NCj4gd2FzdGUgY3B1IGN5bGVzIG9u
-IHRoZW0uDQo+IA0KPg0KDQpQbGVhc2Ugd3JpdGUgdGVzdHMgaW4gYmxrdGVzdHMgWzFdIHRvIGNv
-dmVyIHRoZSBjb2RlIHRoYXQgd2UgYXJlDQpjaGFuZ2luZyBpbiB0aGlzIGNvbW1pdC4NCg0KLWNr
-DQoNClsxXSBodHRwczovL2dpdGh1Yi5jb20vb3NhbmRvdi9ibGt0ZXN0cw0KDQoNCg==
+Ping again.
+
+Hi Josef, could you take a look?
+
+On Fri, Jan 21, 2022 at 4:34 PM Yongji Xie <xieyongji@bytedance.com> wrote:
+>
+> Ping.
+>
+> On Wed, Jan 5, 2022 at 1:36 PM Yongji Xie <xieyongji@bytedance.com> wrote:
+> >
+> > On Wed, Jan 5, 2022 at 2:06 AM Josef Bacik <josef@toxicpanda.com> wrote:
+> > >
+> > > On Tue, Jan 04, 2022 at 01:31:47PM +0800, Yongji Xie wrote:
+> > > > On Tue, Jan 4, 2022 at 12:10 AM Josef Bacik <josef@toxicpanda.com> wrote:
+> > > > >
+> > > > > On Thu, Dec 30, 2021 at 12:01:23PM +0800, Yongji Xie wrote:
+> > > > > > On Thu, Dec 30, 2021 at 1:35 AM Christoph Hellwig <hch@infradead.org> wrote:
+> > > > > > >
+> > > > > > > On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
+> > > > > > > > The rescuer thread might take over the works queued on
+> > > > > > > > the workqueue when the worker thread creation timed out.
+> > > > > > > > If this happens, we have no chance to create multiple
+> > > > > > > > recv threads which causes I/O hung on this nbd device.
+> > > > > > >
+> > > > > > > If a workqueue is used there aren't really 'receive threads'.
+> > > > > > > What is the deadlock here?
+> > > > > >
+> > > > > > We might have multiple recv works, and those recv works won't quit
+> > > > > > unless the socket is closed. If the rescuer thread takes over those
+> > > > > > works, only the first recv work can run. The I/O needed to be handled
+> > > > > > in other recv works would be hung since no thread can handle them.
+> > > > > >
+> > > > >
+> > > > > I'm not following this explanation.  What is the rescuer thread you're talking
+> > > >
+> > > > https://www.kernel.org/doc/html/latest/core-api/workqueue.html#c.rescuer_thread
+> > > >
+> > >
+> > > Ahhh ok now I see, thanks, I didn't know this is how this worked.
+> > >
+> > > So what happens is we do the queue_work(), this needs to do a GFP_KERNEL
+> > > allocation internally, we are unable to satisfy this, and thus the work gets
+> > > pushed onto the rescuer thread.
+> > >
+> > > Then the rescuer thread can't be used in the future because it's doing this long
+> > > running thing.
+> > >
+> >
+> > Yes.
+> >
+> > > I think the correct thing to do here is simply drop the WQ_MEM_RECLAIM bit.  It
+> > > makes sense for workqueue's that are handling the work of short lived works that
+> > > are in the memory reclaim path.  That's not what these workers are doing, yes
+> > > they are in the reclaim path, but they run the entire time the device is up.
+> > > The actual work happens as they process incoming requests.  AFAICT
+> > > WQ_MEM_RECLAIM doesn't affect the actual allocations that the worker thread
+> > > needs to do, which is what I think the intention was in using WQ_MEM_RECLAIM,
+> > > which isn't really what it's used for.
+> > >
+> > > tl;dr, just remove thee WQ_MEM_RECLAIM flag completely and I think that's good
+> > > enough?  Thanks,
+> > >
+> >
+> > In the reconnect case, we still need to call queue_work() while the
+> > device is running. So it looks like we can't simply remove the
+> > WQ_MEM_RECLAIM flag.
+> >
+> > Thanks,
+> > Yongji
