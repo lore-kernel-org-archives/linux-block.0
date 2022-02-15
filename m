@@ -2,147 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3950FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 03:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E4CC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 03:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232305AbiBODdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 22:33:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53096 "EHLO
+        id S233134AbiBODdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 22:33:38 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233134AbiBODdc (ORCPT
+        with ESMTP id S229497AbiBODdh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 22:33:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B4D433EAB9
-        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 19:33:23 -0800 (PST)
+        Mon, 14 Feb 2022 22:33:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D54854552A
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 19:33:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644896002;
+        s=mimecast20190719; t=1644896008;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VleaoSRhhOyyIzlno3jkVcqNdSk7z7upGzeZXq8scPI=;
-        b=eYWQnxIjDtj/S0Re34mVwtoL8ONJBq7vv83IhMyhEYgbJlLRP9aqiUqdlLVOIBwk+V8YN+
-        KVLNHuOcwfAyr1BAIBAbSeQeKaJqe0DqgmxqHTk+T4x50L/WM4/CDFEaoeZoUK+iU574rJ
-        wf2yA87A++knkX4i6vuv/ZhOTWhm2bg=
+        bh=sXL6gda84rSfFDQ/K0wQcHzXVEcSQqhmCEHnCICmMys=;
+        b=FwkkqnOtZL7sTZKWU1WlTjWp+ZdHSjVDQ0ZiHh0lV5axjHy6uou6BouNlCjsJpw3pwMeKY
+        3TjNajDsSI4D6oniEo8bbfkZpf6UvGtQhWyJ8pw4MplurbXxKY+P4vQ3EKYwE7d787TWGb
+        Y+dMTqJVDJRc6UkAaj9Kn9FjW0qC8Tk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-56-4XD86ha8PouJ0wRVNRmKQw-1; Mon, 14 Feb 2022 22:33:19 -0500
-X-MC-Unique: 4XD86ha8PouJ0wRVNRmKQw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-35-98ZcF-jUPOukLv6NV0wOUw-1; Mon, 14 Feb 2022 22:33:26 -0500
+X-MC-Unique: 98ZcF-jUPOukLv6NV0wOUw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 417A1801B0D;
-        Tue, 15 Feb 2022 03:33:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82ADC1091DA3;
+        Tue, 15 Feb 2022 03:33:25 +0000 (UTC)
 Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6EECB56F85;
-        Tue, 15 Feb 2022 03:33:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D71D21059A6D;
+        Tue, 15 Feb 2022 03:33:20 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Li Ning <lining2020x@163.com>,
         Tejun Heo <tj@kernel.org>, Chunguang Xu <brookxu@tencent.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 6/8] block: throttle split bio in case of iops limit
-Date:   Tue, 15 Feb 2022 11:30:48 +0800
-Message-Id: <20220215033050.2730533-7-ming.lei@redhat.com>
+Subject: [PATCH V3 7/8] block: don't try to throttle split bio if iops limit isn't set
+Date:   Tue, 15 Feb 2022 11:30:49 +0800
+Message-Id: <20220215033050.2730533-8-ming.lei@redhat.com>
 In-Reply-To: <20220215033050.2730533-1-ming.lei@redhat.com>
 References: <20220215033050.2730533-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 111be8839817 ("block-throttle: avoid double charge") marks bio as
-BIO_THROTTLED unconditionally if __blk_throtl_bio() is called on this bio,
-then this bio won't be called into __blk_throtl_bio() any more. This way
-is to avoid double charge in case of bio splitting. It is reasonable for
-read/write throughput limit, but not reasonable for IOPS limit because
-block layer provides io accounting against split bio.
+We need to throttle split bio in case of IOPS limit even though the
+split bio has been marked as BIO_THROTTLED since block layer
+accounts split bio actually.
 
-Chunguang Xu has already observed this issue and fixed it in commit
-4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios").
-However, that patch only covers bio splitting in __blk_queue_split(), and
-we have other kind of bio splitting, such as bio_split() &
-submit_bio_noacct() and other ways.
+If only throughput throttle is setup, no need to throttle any more
+if BIO_THROTTLED is set since we have accounted & considered the
+whole bio bytes already.
 
-This patch tries to fix the issue in one generic way by always charging
-the bio for iops limit in blk_throtl_bio(). This way is reasonable:
-re-submission & fast-cloned bio is charged if it is submitted to same
-disk/queue, and BIO_THROTTLED will be cleared if bio->bi_bdev is changed.
+Add one flag of THROTL_TG_HAS_IOPS_LIMIT for serving this purpose.
 
-This new approach can get much more smooth/stable iops limit compared with
-commit 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO
-scenarios") since that commit can't throttle current split bios actually.
-
-Also this way won't cause new double bio iops charge in
-blk_throtl_dispatch_work_fn() in which blk_throtl_bio() won't be called
-any more.
-
-Reported-by: Li Ning <lining2020x@163.com>
 Acked-by: Tejun Heo <tj@kernel.org>
-Cc: Chunguang Xu <brookxu@tencent.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-merge.c    |  2 --
- block/blk-throttle.c | 10 +++++++---
- block/blk-throttle.h |  2 --
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ block/blk-throttle.c | 21 ++++++++++++++-------
+ block/blk-throttle.h | 11 +++++++++++
+ 2 files changed, 25 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 4de34a332c9f..f5255991b773 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -368,8 +368,6 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
- 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
- 		submit_bio_noacct(*bio);
- 		*bio = split;
--
--		blk_throtl_charge_bio_split(*bio);
- 	}
- }
- 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8770768f1000..c7aa26d52e84 100644
+index c7aa26d52e84..ec72eced24d2 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -807,7 +807,8 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 	unsigned int bio_size = throtl_bio_data_size(bio);
+@@ -41,11 +41,6 @@
+ /* A workqueue to queue throttle related work */
+ static struct workqueue_struct *kthrotld_workqueue;
  
--	if (bps_limit == U64_MAX) {
-+	/* no need to throttle if this bio's bytes have been accounted */
-+	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
-@@ -919,9 +920,12 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
- 	unsigned int bio_size = throtl_bio_data_size(bio);
+-enum tg_state_flags {
+-	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
+-	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
+-};
+-
+ #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
  
- 	/* Charge the bio to the group */
--	tg->bytes_disp[rw] += bio_size;
-+	if (!bio_flagged(bio, BIO_THROTTLED)) {
-+		tg->bytes_disp[rw] += bio_size;
-+		tg->last_bytes_disp[rw] += bio_size;
+ /* We measure latency for request size from <= 4k to >= 1M */
+@@ -425,12 +420,24 @@ static void tg_update_has_rules(struct throtl_grp *tg)
+ 	struct throtl_grp *parent_tg = sq_to_tg(tg->service_queue.parent_sq);
+ 	struct throtl_data *td = tg->td;
+ 	int rw;
++	int has_iops_limit = 0;
++
++	for (rw = READ; rw <= WRITE; rw++) {
++		unsigned int iops_limit = tg_iops_limit(tg, rw);
+ 
+-	for (rw = READ; rw <= WRITE; rw++)
+ 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
+ 			(td->limit_valid[td->limit_index] &&
+ 			 (tg_bps_limit(tg, rw) != U64_MAX ||
+-			  tg_iops_limit(tg, rw) != UINT_MAX));
++			  iops_limit != UINT_MAX));
++
++		if (iops_limit != UINT_MAX)
++			has_iops_limit = 1;
 +	}
 +
- 	tg->io_disp[rw]++;
--	tg->last_bytes_disp[rw] += bio_size;
- 	tg->last_io_disp[rw]++;
++	if (has_iops_limit)
++		tg->flags |= THROTL_TG_HAS_IOPS_LIMIT;
++	else
++		tg->flags &= ~THROTL_TG_HAS_IOPS_LIMIT;
+ }
  
- 	/*
+ static void throtl_pd_online(struct blkg_policy_data *pd)
 diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 175f03abd9e4..cb43f4417d6e 100644
+index cb43f4417d6e..c996a15f290e 100644
 --- a/block/blk-throttle.h
 +++ b/block/blk-throttle.h
-@@ -170,8 +170,6 @@ static inline bool blk_throtl_bio(struct bio *bio)
+@@ -52,6 +52,12 @@ struct throtl_service_queue {
+ 	struct timer_list	pending_timer;	/* fires on first_pending_disptime */
+ };
+ 
++enum tg_state_flags {
++	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
++	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
++	THROTL_TG_HAS_IOPS_LIMIT = 1 << 2,	/* tg has iops limit */
++};
++
+ enum {
+ 	LIMIT_LOW,
+ 	LIMIT_MAX,
+@@ -170,6 +176,11 @@ static inline bool blk_throtl_bio(struct bio *bio)
  {
  	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
  
--	if (bio_flagged(bio, BIO_THROTTLED))
--		return false;
++	/* no need to throttle bps any more if the bio has been throttled */
++	if (bio_flagged(bio, BIO_THROTTLED) &&
++	    !(tg->flags & THROTL_TG_HAS_IOPS_LIMIT))
++		return false;
++
  	if (!tg->has_rules[bio_data_dir(bio)])
  		return false;
  
