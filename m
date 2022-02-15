@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24763C43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891F2C433F5
 	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 09:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235008AbiBOJpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 04:45:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49144 "EHLO
+        id S236044AbiBOJpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 04:45:47 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236060AbiBOJpm (ORCPT
+        with ESMTP id S236075AbiBOJpo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 04:45:42 -0500
+        Tue, 15 Feb 2022 04:45:44 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48431E61E1;
-        Tue, 15 Feb 2022 01:45:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A1AE61E1;
+        Tue, 15 Feb 2022 01:45:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Ilg8MRKs3UhBiK+Mujp47+wrzj58nCf6OMRjMHqSUG8=; b=0Syc33e4E0l4xLIb5ubjxRLTpS
-        wCmradLTHx1xhTcg8Sz4A/VpdbNeQJg6MTHl4MsmRUdhBnoKWsd4AdBslg5FU2Q1U97HiTvGubcpG
-        IKzNJaH4uzghtVKRya+Xr47tk/4RCTuC2fOGwueAgxXWIu7/tw8kvhfUSKGyW7LgX+LGSKSd49HIq
-        K88Gym8cSI50EIb8JCdPf4cDavFnuMNgrY7cfmVLLBJhUjFjYeORn5ECRjvskLxawtX7Vpa2lPPND
-        CA3nNIUiR+sp0S4IlVdSV2q4yOBU8WrCTMIwWpSpVpeVLMW9h6cJhd/SKN9d7AXnwlViGAAlowlXy
-        3wd613Xg==;
+        bh=QzwLw7j8eTvZsRbJglcJOtBbwWYohx/2fo0FBI/zHLQ=; b=KFBBkcir0Gjj7a6jdeW8oy/0tu
+        yEN93eOfiPFKOZWq43GZvKKP+Ru3bHGuy2gH3s8jlv7yRpo4e6JTFlqwqVzyvuKdQnAravZUnMs+n
+        crXaizk2u8HF+rbgGwgSIgExcHurmzKa9/QEsoHRaVhRxBH00bDa92gsDBkypLVrACgZNcBwwW04b
+        wYdpngs8cCE3p8YVQqkXQGh9XXaaJM/x6yaju77D4ccB/Gc89bC3p1usLf8kcINNyD42Oc7QvoOCn
+        k7aReUE0jqd8dvviej3PbCilN9MNiOtyU2807LpbUXGbqXCsawMG92BCan9qTtYRDcW03k4V292Ay
+        mftApjNA==;
 Received: from [2001:4bb8:184:543c:6bdf:22f4:7f0a:fe97] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nJuOg-00262Y-HJ; Tue, 15 Feb 2022 09:45:23 +0000
+        id 1nJuOj-002648-KX; Tue, 15 Feb 2022 09:45:26 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
@@ -40,9 +40,9 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         linux-block@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         linux-mmc@vger.kernel.org
-Subject: [PATCH 2/5] memstick/ms_block: simplify refcounting
-Date:   Tue, 15 Feb 2022 10:45:11 +0100
-Message-Id: <20220215094514.3828912-3-hch@lst.de>
+Subject: [PATCH 3/5] memstick/mspro_block: fix handling of read-only devices
+Date:   Tue, 15 Feb 2022 10:45:12 +0100
+Message-Id: <20220215094514.3828912-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220215094514.3828912-1-hch@lst.de>
 References: <20220215094514.3828912-1-hch@lst.de>
@@ -53,137 +53,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement the ->free_disk method to free the msb_data structure only once
-the last gendisk reference goes away instead of keeping a local refcount.
+Use set_disk_ro to propagate the read-only state to the block layer
+instead of checking for it in ->open and leaking a reference in case
+of a read-only device.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/memstick/core/ms_block.c | 64 ++++++++------------------------
- drivers/memstick/core/ms_block.h |  1 -
- 2 files changed, 15 insertions(+), 50 deletions(-)
+ drivers/memstick/core/mspro_block.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
-index 0cda6c6baefc3..3993bdd4b519c 100644
---- a/drivers/memstick/core/ms_block.c
-+++ b/drivers/memstick/core/ms_block.c
-@@ -1943,22 +1943,6 @@ static void msb_io_work(struct work_struct *work)
- static DEFINE_IDR(msb_disk_idr); /*set of used disk numbers */
- static DEFINE_MUTEX(msb_disk_lock); /* protects against races in open/release */
+diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
+index c0450397b6735..7ea312f0840e0 100644
+--- a/drivers/memstick/core/mspro_block.c
++++ b/drivers/memstick/core/mspro_block.c
+@@ -186,13 +186,8 @@ static int mspro_block_bd_open(struct block_device *bdev, fmode_t mode)
  
--static int msb_bd_open(struct block_device *bdev, fmode_t mode)
--{
--	struct gendisk *disk = bdev->bd_disk;
--	struct msb_data *msb = disk->private_data;
--
--	dbg_verbose("block device open");
--
--	mutex_lock(&msb_disk_lock);
--
--	if (msb && msb->card)
--		msb->usage_count++;
--
--	mutex_unlock(&msb_disk_lock);
--	return 0;
--}
--
- static void msb_data_clear(struct msb_data *msb)
- {
- 	kfree(msb->boot_page);
-@@ -1968,33 +1952,6 @@ static void msb_data_clear(struct msb_data *msb)
- 	msb->card = NULL;
- }
+ 	mutex_lock(&mspro_block_disk_lock);
  
--static int msb_disk_release(struct gendisk *disk)
--{
--	struct msb_data *msb = disk->private_data;
--
--	dbg_verbose("block device release");
--	mutex_lock(&msb_disk_lock);
--
--	if (msb) {
--		if (msb->usage_count)
--			msb->usage_count--;
--
--		if (!msb->usage_count) {
--			disk->private_data = NULL;
--			idr_remove(&msb_disk_idr, msb->disk_id);
--			put_disk(disk);
--			kfree(msb);
--		}
+-	if (msb && msb->card) {
++	if (msb && msb->card)
+ 		msb->usage_count++;
+-		if ((mode & FMODE_WRITE) && msb->read_only)
+-			rc = -EROFS;
+-		else
+-			rc = 0;
 -	}
--	mutex_unlock(&msb_disk_lock);
--	return 0;
--}
--
--static void msb_bd_release(struct gendisk *disk, fmode_t mode)
--{
--	msb_disk_release(disk);
--}
--
- static int msb_bd_getgeo(struct block_device *bdev,
- 				 struct hd_geometry *geo)
- {
-@@ -2003,6 +1960,17 @@ static int msb_bd_getgeo(struct block_device *bdev,
- 	return 0;
- }
  
-+static void msb_bd_free_disk(struct gendisk *disk)
-+{
-+	struct msb_data *msb = disk->private_data;
-+
-+	mutex_lock(&msb_disk_lock);
-+	idr_remove(&msb_disk_idr, msb->disk_id);
-+	mutex_unlock(&msb_disk_lock);
-+
-+	kfree(msb);
-+}
-+
- static blk_status_t msb_queue_rq(struct blk_mq_hw_ctx *hctx,
- 				 const struct blk_mq_queue_data *bd)
- {
-@@ -2096,10 +2064,9 @@ static void msb_start(struct memstick_dev *card)
- }
+ 	mutex_unlock(&mspro_block_disk_lock);
  
- static const struct block_device_operations msb_bdops = {
--	.open    = msb_bd_open,
--	.release = msb_bd_release,
--	.getgeo  = msb_bd_getgeo,
--	.owner   = THIS_MODULE
-+	.owner		= THIS_MODULE,
-+	.getgeo		= msb_bd_getgeo,
-+	.free_disk	= msb_bd_free_disk, 
- };
- 
- static const struct blk_mq_ops msb_mq_ops = {
-@@ -2147,7 +2114,6 @@ static int msb_init_disk(struct memstick_dev *card)
+@@ -1239,6 +1234,9 @@ static int mspro_block_init_disk(struct memstick_dev *card)
  	set_capacity(msb->disk, capacity);
- 	dbg("Set total disk size to %lu sectors", capacity);
+ 	dev_dbg(&card->dev, "capacity set %ld\n", capacity);
  
--	msb->usage_count = 1;
- 	msb->io_queue = alloc_ordered_workqueue("ms_block", WQ_MEM_RECLAIM);
- 	INIT_WORK(&msb->io_work, msb_io_work);
- 	sg_init_table(msb->prealloc_sg, MS_BLOCK_MAX_SEGS+1);
-@@ -2229,7 +2195,7 @@ static void msb_remove(struct memstick_dev *card)
- 	msb_data_clear(msb);
- 	mutex_unlock(&msb_disk_lock);
- 
--	msb_disk_release(msb->disk);
-+	put_disk(msb->disk);
- 	memstick_set_drvdata(card, NULL);
- }
- 
-diff --git a/drivers/memstick/core/ms_block.h b/drivers/memstick/core/ms_block.h
-index 122e1a8a8bd5b..7058f9aefeb92 100644
---- a/drivers/memstick/core/ms_block.h
-+++ b/drivers/memstick/core/ms_block.h
-@@ -143,7 +143,6 @@ struct ms_boot_page {
- } __packed;
- 
- struct msb_data {
--	unsigned int			usage_count;
- 	struct memstick_dev		*card;
- 	struct gendisk			*disk;
- 	struct request_queue		*queue;
++	if (msb->read_only)
++		set_disk_ro(msb->disk, true);
++
+ 	rc = device_add_disk(&card->dev, msb->disk, NULL);
+ 	if (rc)
+ 		goto out_cleanup_disk;
 -- 
 2.30.2
 
