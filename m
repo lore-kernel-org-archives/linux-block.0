@@ -2,103 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 393D4C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 21:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C8DC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 22:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237523AbiBOVnY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 16:43:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44300 "EHLO
+        id S244738AbiBOW7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 17:59:48 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232789AbiBOVnX (ORCPT
+        with ESMTP id S244719AbiBOW7j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 16:43:23 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24536B3E4C
-        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 13:43:13 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id e11so49295ils.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 13:43:13 -0800 (PST)
+        Tue, 15 Feb 2022 17:59:39 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C85E3891;
+        Tue, 15 Feb 2022 14:59:29 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id k60-20020a17090a4cc200b001b932781f3eso3056814pjh.0;
+        Tue, 15 Feb 2022 14:59:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
-         :content-transfer-encoding;
-        bh=ngpIg9tl8qQjRFLR4HZLIWqei74jAfA/kRCbUbOKoqs=;
-        b=FtYGja45nuYkJHqgefciap4RzuAERv7iIPyKyYbMsanvPArdWQUmpCv1J072QYnu1H
-         t8j31lmrMTjhQWjLCaJRA2/UzWjHXY8EkrDxGbkoahKL+R2fqYAxnqu7Vha3l0Qjr1id
-         Gs2s5OSYzmxoE2ZzI0W/stnWzk/Bd14dTCgkSLVylrnt3P8ic7JBXQlNoha+GEuftaj0
-         t6QpC/tQjMW04yuonkTok8plGgHq7G7ulwKhp5ZmHZGjt+cvDwZ8ArmMEOr34Isq7tiy
-         IIZ5ukmd+w1y9arvQ+2AxcK+0TUL1Q+L+INx152S8RfBLZn6OucCwIwngm2h2LJp+Nmu
-         oxBg==
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ydg/QaEHk+YtzGHqWPzjDmBjfyy2f1JmjiAxPzP8crc=;
+        b=neA8UZ+ztvqI+c9Y0GhuINKiFZbH9bwEKDbDdCj/aBEOg8Je4KJR2FY7wqhQqcBAYk
+         3Wy+WGL8h5hMZhHiRrJnELKEzNVne+rWwRiNSK+LaaB40t3gKAMZ5iPl6SH4z0sCF1sK
+         WeebZKAyrtHxpGEBt52RHDKoImWcRYibqiE5YdJSrERCh5ErepkYhiOc7Yw8VRa7JtSJ
+         adEHSUdt8ZETIXkSrLoXpm9wbvKFejNQ1Fv3M/q0bRnt69wRrVeApz/eynGg7QDAnCzT
+         uJF8lE/RahbG4H9xVfC7Tm4Wgh1nT1vyrj+ukgd4F45LFSngNGYO0nz3bd1+0RfzB/uo
+         Q/xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=ngpIg9tl8qQjRFLR4HZLIWqei74jAfA/kRCbUbOKoqs=;
-        b=vHW669XxkY71y1K4WykAq4CSMOnNT2gLSDLu5NmSXcLM3CscY2IG2P56cVBFtpIy9x
-         98ybsa43buxJPoCCAJ6eJ1ZwHLa/k52+uhywbD/Jg9yJ6jnYM6pQJqrdkbBrX2PP/gXy
-         Uw8grXoe+Eo+FER+MQA044g+LSwvKtWE4mwUl5bpbpbzrbsOElDxSFIhdU0N4sSpwouF
-         SLbMv6crR4mDBdV2JvFkLbww+naXTZCi3PHqbydHxAO/QtbycKrrS0+0PakfnR/dcX8g
-         L5iAqc8ra2mty2F+S2jnvEVskHniW0ZY+aVqVgvS8EM7RwqZ1tn5w9HxLFcVL4zZIdvS
-         591Q==
-X-Gm-Message-State: AOAM531F8ggYow+xLGvez8LNiVgWzq+79w8dtfAySqvS38/gL6KGWweq
-        qv4zE46v68jaaSg0upLcH3LrC/gEelwfAw==
-X-Google-Smtp-Source: ABdhPJxGxKMmBx6nJ3pGWfUHMDRiN0aVvkQjcNYRFIDsRpduNuzQvXMh0KBfeA30KhSxCzOUVnresw==
-X-Received: by 2002:a92:c60f:: with SMTP id p15mr660845ilm.196.1644961392305;
-        Tue, 15 Feb 2022 13:43:12 -0800 (PST)
-Received: from m1.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id d8sm11108593ioy.27.2022.02.15.13.43.11
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ydg/QaEHk+YtzGHqWPzjDmBjfyy2f1JmjiAxPzP8crc=;
+        b=jcyxnoN6sH1LNSWvMVODjrCi1Ms/7ihCiQuLNAMrFzQBcpH/78A0aGGgxNLLgFLTFW
+         WrusZ2fOr9fBta4oykkLyMkUveNo2imJ4f6cbXXPB0XFGhZfh0IbcbZXGAQuk7PIqduF
+         91hPNb5oSKYlfSZysWanByackIqS5vJHMFRjIQP63i4EnO7nJ8059jALZfCxi8AB4I/5
+         gYH7pPleib3Aa008mRWxzzXgO88LhREpfTn+FV5tUnKLWGRtPVlh5++9HQqyb+ryY3VC
+         IP0M/b0m+4C/QfcXd9ucaK/N8LMSlCjuFa6dKZGrQYPKw/tS66KVQ+gLVAkzwrdqTFjS
+         Q83w==
+X-Gm-Message-State: AOAM533xqME4mPEYcYWb4rBukVPdwafCX+GxdAzGg6QAtQaa2ylA5Lw+
+        XR7gFu+igA3JZzd5jbbo3gw=
+X-Google-Smtp-Source: ABdhPJzD5VTWuMUJjUi6d0x1rXiN3okRfTcvfy3+tsDIIsH6bfb6SZ+FiyUr2n1wCBp6WTu5fGOOUA==
+X-Received: by 2002:a17:902:f686:: with SMTP id l6mr1079179plg.7.1644965965923;
+        Tue, 15 Feb 2022 14:59:25 -0800 (PST)
+Received: from google.com ([2620:15c:202:201:4e4a:b0ff:e926:40e2])
+        by smtp.gmail.com with ESMTPSA id n85sm10430319pfd.142.2022.02.15.14.59.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 13:43:11 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org
-In-Reply-To: <20220215213310.7264-1-kch@nvidia.com>
-References: <20220215213310.7264-1-kch@nvidia.com>
-Subject: Re: [PATCH V3 0/4] loop: cleanup and few improvements
-Message-Id: <164496139156.13148.1299670905252631936.b4-ty@kernel.dk>
-Date:   Tue, 15 Feb 2022 14:43:11 -0700
+        Tue, 15 Feb 2022 14:59:25 -0800 (PST)
+Date:   Tue, 15 Feb 2022 14:59:21 -0800
+From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To:     Qing Wang <wangqing@vivo.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Hans Verkuil <hverkuil@xs4all.nl>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org
+Subject: Re: [PATCH V3 6/13] input: serio: use time_is_before_jiffies()
+ instead of open coding it
+Message-ID: <YgwwSUlZVakiYF8j@google.com>
+References: <1644890154-64915-1-git-send-email-wangqing@vivo.com>
+ <1644890154-64915-7-git-send-email-wangqing@vivo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1644890154-64915-7-git-send-email-wangqing@vivo.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 15 Feb 2022 13:33:06 -0800, Chaitanya Kulkarni wrote:
-> This has few improvment and cleanups such as using sysfs_emit() for the
-> sysfs dev attributes and removing variables that are only used once and
-> a cleanup with fixing declaration.
+Hi Wang,
+
+On Mon, Feb 14, 2022 at 05:55:43PM -0800, Qing Wang wrote:
+> From: Wang Qing <wangqing@vivo.com>
 > 
-> Below is the test log where 10 loop devices created, each device is
-> linked to it's own file in ./loopX, formatted with xfs and mounted on
-> /mnt/loopX. For each device it reads the offset, sizelimit, autoclear,
-> partscan, and dio attr from sysfs using cat command, then it runs fio
-> verify job on it.
-> root@dev loop-sysfs-emit (for-next) # grep err= 0000-cover-letter.patch
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3802: Tue Feb 15 12:53:57 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3824: Tue Feb 15 12:54:24 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3836: Tue Feb 15 12:54:51 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3849: Tue Feb 15 12:55:18 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3879: Tue Feb 15 12:55:45 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3907: Tue Feb 15 12:56:12 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3959: Tue Feb 15 12:56:39 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3980: Tue Feb 15 12:57:06 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=3998: Tue Feb 15 12:57:34 2022
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4018: Tue Feb 15 12:58:01 2022
-> 
-> [...]
+> Use the helper function time_is_{before,after}_jiffies() to improve
+> code readability.
 
-Applied, thanks!
+I applied changes by Danilo Krummrich converting the driver to use
+ktime_t (see https://lore.kernel.org/r/20220215160208.34826-3-danilokrummrich@dk-develop.de)
+which makes this change not applicable.
 
-[1/4] loop: use sysfs_emit() in the sysfs xxx show()
-      (no commit info)
-[2/4] loop: remove extra variable in lo_fallocate()
-      (no commit info)
-[3/4] loop: remove extra variable in lo_req_flush
-      (no commit info)
-[4/4] loop: allow user to set the queue depth
-      (no commit info)
+Thanks.
 
-Best regards,
 -- 
-Jens Axboe
-
-
+Dmitry
