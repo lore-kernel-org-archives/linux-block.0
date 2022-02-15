@@ -2,126 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43E5DC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 02:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D464C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 02:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233595AbiBOCaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Feb 2022 21:30:04 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59060 "EHLO
+        id S229924AbiBOCk5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Feb 2022 21:40:57 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231330AbiBOCaE (ORCPT
+        with ESMTP id S229640AbiBOCk4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Feb 2022 21:30:04 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E068ADFD6;
-        Mon, 14 Feb 2022 18:29:54 -0800 (PST)
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JyQ4v3RVjzcccZ;
-        Tue, 15 Feb 2022 10:28:47 +0800 (CST)
-Received: from dggpemm500002.china.huawei.com (7.185.36.229) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 15 Feb 2022 10:29:52 +0800
-Received: from [10.174.179.5] (10.174.179.5) by dggpemm500002.china.huawei.com
- (7.185.36.229) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 15 Feb
- 2022 10:29:52 +0800
-Subject: Re: [RFC PATCH] blk-mq: avoid housekeeping CPUs scheduling a worker
- on a non-housekeeping CPU
-To:     <axboe@kernel.dk>, <hch@lst.de>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yuyufen@huawei.com>, <guohanjun@huawei.com>
-References: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
-From:   Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Message-ID: <881ae7a8-5dff-ff50-9bc2-a983b6a53c30@huawei.com>
-Date:   Tue, 15 Feb 2022 10:29:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Mon, 14 Feb 2022 21:40:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B1547117C80
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 18:40:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1644892846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7xZ94wx0xxHGjFOz2gdvaz5q0yIBiNDZwqvRJ9bfyDQ=;
+        b=OuoG0q+cann5V33Kla2L1ey+EqCZ2vPSHN0GtU0qRU9ULJZEYLxLZve8uifXBvwVymgits
+        C1aV1RoCxoVipOuA2stytp4IaC1lQn63phFE7JKNHFjRylnnoBsN/qpJsww+2iHvyvZKbq
+        y+qCbbRUKso5eLbobGRaViO7cWTETlg=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-nNqbnRIeOAGZWIGq2Hr1rg-1; Mon, 14 Feb 2022 21:40:43 -0500
+X-MC-Unique: nNqbnRIeOAGZWIGq2Hr1rg-1
+Received: by mail-qv1-f70.google.com with SMTP id g2-20020a0562141cc200b004123b0abe18so13110719qvd.2
+        for <linux-block@vger.kernel.org>; Mon, 14 Feb 2022 18:40:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7xZ94wx0xxHGjFOz2gdvaz5q0yIBiNDZwqvRJ9bfyDQ=;
+        b=D+IM1GElFd8FskvVW/j6zU3NP6EObtDw7CDomnt8qIftuubwsoSR1HRTOqfnlMymGv
+         X2nsUdVlMXRYtDuLIaJFeV6ubXbPvTDAsx/0dwOBaqLkVgvYSH6As0dAmapsQixS2AKT
+         F2zeP/7Agc/i1mHvCf2FYFNA4uCg6BR2vG4T9b20rOEDsySR6lS2n2n69t3p6TnuBX19
+         ZfxYxFisFPb29sKPWB43LJhU3wWKbDt/RSwYuuak2VCP4JYiiU0ox8s7y4cvHy38p6yA
+         awpvwIWiYcCchU4+91nieyrVpTOCBdukRwAUJCGDQE2c9YGQvtB15f90Jt8oAPdr2SxF
+         TGBw==
+X-Gm-Message-State: AOAM531AjwRi0PjLPzTvBG/u8G+Yr+9TqVmjZnB62i9hlBCF0YGprjso
+        rL5UA7agECKppnkaz/3R3gzGEMridsvL+d/QoSLnEx9BkxNWerpeLKJNYqS+BnK1TBjeE4uIY5q
+        4zo9uD08Wc3CTO0ZqJGQcKg==
+X-Received: by 2002:ad4:576b:: with SMTP id r11mr1174314qvx.34.1644892834729;
+        Mon, 14 Feb 2022 18:40:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyjUxIh8PAkN+Wc/wo+m+HrG05WY5hQjIOeVqxluyBFBdCgdkI1egd9MPDeXG+iCh1nwO6+rA==
+X-Received: by 2002:ad4:576b:: with SMTP id r11mr1174306qvx.34.1644892834506;
+        Mon, 14 Feb 2022 18:40:34 -0800 (PST)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id r2sm19304798qta.15.2022.02.14.18.40.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Feb 2022 18:40:34 -0800 (PST)
+Date:   Mon, 14 Feb 2022 21:40:33 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 10/14] block: add bio_start_io_acct_remapped for the
+ benefit of DM
+Message-ID: <YgsSoZvc8YHBflfM@redhat.com>
+References: <20220211214057.40612-1-snitzer@redhat.com>
+ <20220211214057.40612-11-snitzer@redhat.com>
+ <YgphC67SVZIWfhhs@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20220210093532.182818-1-wangxiongfeng2@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.5]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500002.china.huawei.com (7.185.36.229)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YgphC67SVZIWfhhs@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Mon, Feb 14 2022 at  9:02P -0500,
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Sorry to disturb you. It's just that I think you may be interested at this
-patch. I found the following commit written by you.
-  commit 11ea68f553e244851d15793a7fa33a97c46d8271
-  genirq, sched/isolation: Isolate from handling managed interrupts
-It removed the managed_irq interruption from non-housekeeping CPUs as long as
-the non-housekeeping CPUs do not request IO. But the the work thread
-blk_mq_run_work_fn() may still run on the non-housekeeping CPUs.
-Appreciate it a lot if you can give it a look.
+> On Fri, Feb 11, 2022 at 04:40:53PM -0500, Mike Snitzer wrote:
+> > DM needs the ability to account a clone bio's IO to the original
+> > block_device. So add @orig_bdev argument to bio_start_io_acct_time.
+> > 
+> > Rename bio_start_io_acct_time to bio_start_io_acct_remapped.
+> > 
+> > Also, follow bio_end_io_acct and bio_end_io_acct_remapped pattern by
+> > moving bio_start_io_acct to blkdev.h and have it call
+> > bio_start_io_acct_remapped.
+> 
+> Looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
 
-Thanks,
-Xiongfeng
+Thanks.
 
-On 2022/2/10 17:35, Xiongfeng Wang wrote:
-> When NOHZ_FULL is enabled, such as in HPC situation, CPUs are divided
-> into housekeeping CPUs and non-housekeeping CPUs. Non-housekeeping CPUs
-> are NOHZ_FULL CPUs and are often monopolized by the userspace process,
-> such HPC application process. Any sort of interruption is not expected.
-> 
-> blk_mq_hctx_next_cpu() selects each cpu in 'hctx->cpumask' alternately
-> to schedule the work thread blk_mq_run_work_fn(). When 'hctx->cpumask'
-> contains housekeeping CPU and non-housekeeping CPU at the same time, a
-> housekeeping CPU, which want to request a IO, may schedule a worker on a
-> non-housekeeping CPU. This may affect the performance of the userspace
-> application running on non-housekeeping CPUs.
-> 
-> So let's just schedule the worker thread on the current CPU when the
-> current CPU is housekeeping CPU.
-> 
-> Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-> ---
->  block/blk-mq.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1adfe4824ef5..ff9a4bf16858 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -24,6 +24,7 @@
->  #include <linux/sched/sysctl.h>
->  #include <linux/sched/topology.h>
->  #include <linux/sched/signal.h>
-> +#include <linux/sched/isolation.h>
->  #include <linux/delay.h>
->  #include <linux/crash_dump.h>
->  #include <linux/prefetch.h>
-> @@ -2036,6 +2037,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
->  static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
->  					unsigned long msecs)
->  {
-> +	int work_cpu;
-> +
->  	if (unlikely(blk_mq_hctx_stopped(hctx)))
->  		return;
->  
-> @@ -2050,7 +2053,17 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
->  		put_cpu();
->  	}
->  
-> -	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
-> +	/*
-> +	 * Avoid housekeeping CPUs scheduling a worker on a non-housekeeping
-> +	 * CPU
-> +	 */
-> +	if (tick_nohz_full_enabled() && housekeeping_cpu(smp_processor_id(),
-> +							 HK_FLAG_WQ))
-> +		work_cpu = smp_processor_id();
-> +	else
-> +		work_cpu = blk_mq_hctx_next_cpu(hctx);
-> +
-> +	kblockd_mod_delayed_work_on(work_cpu, &hctx->run_work,
->  				    msecs_to_jiffies(msecs));
->  }
->  
-> 
+But turns out I don't need this patch afterall.
+
+DM can't account IO to the DM device in terms of clone bios because
+they may not be simple remaps, the payload could change in size such
+that the original vs clone varies widely.  Also, dmstats imposes the
+additional constraint that the same bio be used for the
+{start,end}_io_acct's calls to dm_stats_account_io().
+
