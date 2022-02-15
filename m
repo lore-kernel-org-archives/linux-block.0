@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9CCC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 08:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ADA4C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 08:48:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234679AbiBOIsK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 03:48:10 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59292 "EHLO
+        id S234866AbiBOIsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 03:48:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbiBOIsJ (ORCPT
+        with ESMTP id S229884AbiBOIst (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 03:48:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E700EBDF4
-        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 00:48:00 -0800 (PST)
+        Tue, 15 Feb 2022 03:48:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 259181133F5
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 00:48:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644914879;
+        s=mimecast20190719; t=1644914919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+0eleqiUVBeAPaQGD2Q6ihFW/Z9JIAN0Kj0GeNRsLaA=;
-        b=ayphHF/zz/QRT1LtgSyf1ZNurdY3ZWjlPMleazOL4obzkYrLOaUkjPHx48MLeXSGDjEml3
-        FgDcGj7sk8oOyMZq9cCqhrWx8PKM5uzJ5/FEKp9yGBqW98g1a81XVSY6c/juNsND1Haz75
-        Sh5yTD9yDaBontOCOez+FBIoh5O7Jzk=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=cAghCw6nMXIP8DbPC2ZTmMjVdzgtfdV0Q4rDuIo9NkY=;
+        b=DSqmbLSAwCAJVngxiscPK3AI83fBvtKyU1g0AilU1+5l1HWqSms+MFHSUGa0sZO/SfGwjz
+        MTARKord6OnXu1SikYooOuoDXp45WeVwP+NSyH7Y/dELylzZWdS76PxZnMHKfa6/B5mtm0
+        Kk9NNo2FFnT7z/6lrYWi3bCEQd9gsF4=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-191-E6E4wcqkPvulRFW3FingBg-1; Tue, 15 Feb 2022 03:47:55 -0500
-X-MC-Unique: E6E4wcqkPvulRFW3FingBg-1
-Received: by mail-pl1-f200.google.com with SMTP id x2-20020a170902a38200b0014f252d67e2so1859966pla.13
-        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 00:47:55 -0800 (PST)
+ us-mta-564-hmtDjrkUPyO8YnU0TBJ7cg-1; Tue, 15 Feb 2022 03:48:36 -0500
+X-MC-Unique: hmtDjrkUPyO8YnU0TBJ7cg-1
+Received: by mail-pj1-f69.google.com with SMTP id z12-20020a17090a1fcc00b001b63e477f9fso12693451pjz.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 00:48:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+0eleqiUVBeAPaQGD2Q6ihFW/Z9JIAN0Kj0GeNRsLaA=;
-        b=fU2S+tOAJmAHFPI1Vtkb1VCRA23mxoOcvXU8+CpfOsSM0faZS7gOmAacvwFLl/gSN4
-         6DwxPR8oXD9y8eHYnTk9CY3uDtuE0lDRq29d8CmxmcgZgnCYHQTBSwFGMS/WEqeG/GvE
-         NdSqym/abLaX+owuG9CMA7C603dDx9jJwgV32l3wRvun0f2XHX9AYELlIigxzS7Frn2/
-         aqtY4J4u/6RXXrd4AqJSloAYzcL+BUBTWminm+5eUxn8G/CPEvbfd8E8WlsJXkD2bE9m
-         W60ZosipooCLHsAocKBVgtj4X2/4plgrHDG6OHW3sS4Oh05fo8VMJPukoEdHFFl3GoNr
-         w9tw==
-X-Gm-Message-State: AOAM532dbuGKr40IsfM4iBrRqsoumr3G+umdwy+ergZNqHOum6LOfP8v
-        ZG6bBOU7Q9lp/y47pw78IcGE9hkfhSIqPWky4nWfSURPU1VlekQFdzrZIqyvka7kJm0aG+weZ00
-        yIlsJi4F5GM3SXhkm0MhcB10w/lmIUVi0gZq/uEo=
-X-Received: by 2002:a05:6a00:9a9:: with SMTP id u41mr3233689pfg.83.1644914874661;
-        Tue, 15 Feb 2022 00:47:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy1RXfHqGKUOwHiOd9TXDCmkRfLOApnv8+NP4UBdUIs2zHseVmQ3Z770IwhZgE/Zg1NSmgYeteqUdN9fAOzix8=
-X-Received: by 2002:a05:6a00:9a9:: with SMTP id u41mr3233676pfg.83.1644914874405;
- Tue, 15 Feb 2022 00:47:54 -0800 (PST)
+        bh=cAghCw6nMXIP8DbPC2ZTmMjVdzgtfdV0Q4rDuIo9NkY=;
+        b=X8BUxxaj18y4S1g/n7wHIjNm3Btg+arFFad8mAFcRudiZMybbyiGC/yaNAo63y4Y8f
+         Qjb+NS0TCuLGiR9Ve0EyJY0GP4uLprxDCQ8rOPrRoeNUrsjkMEZPZfoZ/XKyr0IQjqUe
+         9fTvPGMjsptbNQ3UDjrrWCd38B8wAzxr6SjJbEKfR3CwlAiek9RGs1QpzCvsjYoNrvel
+         PQGRcFaFagDl+kWOnjCSI8Izkm9xITPCKlXI8Ti9oV2LN3Ii+BjMSG9ORJdr5hGMUZBN
+         7rkqVY74jsWIj5JZmiRWh2UVh1Vn4i72dg9TeK/s/pBt3++hAbv1t3lGGWHUgVknpOQr
+         OXLg==
+X-Gm-Message-State: AOAM530sQh+VFmZhWNv8nDKgqQwifUa63ZDBwztgKs5G4Ofzoo/8thSk
+        x523QJWth/AUBnmbAWbsS9W/NvlLHKbLMbMhIhJcMAVmAavbXQ5Yze3eoppGWqTiFLsYhNt+r8F
+        MJJF+PGttag+XYx7EMKYfu2B5LSi4Ydei6YWSyJ0=
+X-Received: by 2002:a63:2bc5:: with SMTP id r188mr2644610pgr.363.1644914915609;
+        Tue, 15 Feb 2022 00:48:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxNykZwzg4bf+5n8EbXDkY7JRsdOTnLNDPgNJlOcTDejNQ8sWs8DiYpM4W3ztHYleOanIdgFMhO3Rj6Rj63QAs=
+X-Received: by 2002:a63:2bc5:: with SMTP id r188mr2644575pgr.363.1644914915393;
+ Tue, 15 Feb 2022 00:48:35 -0800 (PST)
 MIME-Version: 1.0
-References: <1644890154-64915-1-git-send-email-wangqing@vivo.com> <1644890154-64915-6-git-send-email-wangqing@vivo.com>
-In-Reply-To: <1644890154-64915-6-git-send-email-wangqing@vivo.com>
+References: <1644890154-64915-1-git-send-email-wangqing@vivo.com> <1644890154-64915-7-git-send-email-wangqing@vivo.com>
+In-Reply-To: <1644890154-64915-7-git-send-email-wangqing@vivo.com>
 From:   Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Date:   Tue, 15 Feb 2022 09:47:43 +0100
-Message-ID: <CAO-hwJJK5yeW+K_vLpWV9t3TsEdk0xCO-ETxeJsXM2c117JzNw@mail.gmail.com>
-Subject: Re: [PATCH V3 5/13] hid: use time_is_after_jiffies() instead of open
- coding it
+Date:   Tue, 15 Feb 2022 09:48:24 +0100
+Message-ID: <CAO-hwJLwomyHyjza8x3cEhR97HkK7Z7yPWVXwA4-1jmM=WKqeQ@mail.gmail.com>
+Subject: Re: [PATCH V3 6/13] input: serio: use time_is_before_jiffies()
+ instead of open coding it
 To:     Qing Wang <wangqing@vivo.com>
 Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
@@ -90,7 +90,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 2:56 AM Qing Wang <wangqing@vivo.com> wrote:
+On Tue, Feb 15, 2022 at 2:57 AM Qing Wang <wangqing@vivo.com> wrote:
 >
 > From: Wang Qing <wangqing@vivo.com>
 >
@@ -98,34 +98,38 @@ On Tue, Feb 15, 2022 at 2:56 AM Qing Wang <wangqing@vivo.com> wrote:
 > code readability.
 >
 > Signed-off-by: Wang Qing <wangqing@vivo.com>
-> Acked-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+> ---
 
-FWIW, this one is
-Acked-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-
-Wang, is there any plan to take this series through the trivial tree
-or should each maintainer take the matching patches?
+Reviewed-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
 
 Cheers,
 Benjamin
 
-> ---
->  drivers/hid/intel-ish-hid/ipc/ipc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/input/serio/ps2-gpio.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/drivers/hid/intel-ish-hid/ipc/ipc.c b/drivers/hid/intel-ish-hid/ipc/ipc.c
-> index 8ccb246..15e1423
-> --- a/drivers/hid/intel-ish-hid/ipc/ipc.c
-> +++ b/drivers/hid/intel-ish-hid/ipc/ipc.c
-> @@ -578,7 +578,7 @@ static void _ish_sync_fw_clock(struct ishtp_device *dev)
->         static unsigned long    prev_sync;
->         uint64_t        usec;
+> diff --git a/drivers/input/serio/ps2-gpio.c b/drivers/input/serio/ps2-gpio.c
+> index 8970b49..7834296
+> --- a/drivers/input/serio/ps2-gpio.c
+> +++ b/drivers/input/serio/ps2-gpio.c
+> @@ -136,7 +136,7 @@ static irqreturn_t ps2_gpio_irq_rx(struct ps2_gpio_data *drvdata)
+>         if (old_jiffies == 0)
+>                 old_jiffies = jiffies;
 >
-> -       if (prev_sync && jiffies - prev_sync < 20 * HZ)
-> +       if (prev_sync && time_is_after_jiffies(prev_sync + 20 * HZ))
->                 return;
+> -       if ((jiffies - old_jiffies) > usecs_to_jiffies(100)) {
+> +       if (time_is_before_jiffies(old_jiffies + usecs_to_jiffies(100))) {
+>                 dev_err(drvdata->dev,
+>                         "RX: timeout, probably we missed an interrupt\n");
+>                 goto err;
+> @@ -237,7 +237,7 @@ static irqreturn_t ps2_gpio_irq_tx(struct ps2_gpio_data *drvdata)
+>         if (old_jiffies == 0)
+>                 old_jiffies = jiffies;
 >
->         prev_sync = jiffies;
+> -       if ((jiffies - old_jiffies) > usecs_to_jiffies(100)) {
+> +       if (time_is_before_jiffies(old_jiffies + usecs_to_jiffies(100))) {
+>                 dev_err(drvdata->dev,
+>                         "TX: timeout, probably we missed an interrupt\n");
+>                 goto err;
 > --
 > 2.7.4
 >
