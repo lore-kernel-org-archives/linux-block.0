@@ -2,216 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FADC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 11:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF942C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 12:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232484AbiBPLuL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 06:50:11 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57332 "EHLO
+        id S232902AbiBPMBK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 07:01:10 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232489AbiBPLuG (ORCPT
+        with ESMTP id S232920AbiBPMBJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 06:50:06 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7667B1CEB29;
-        Wed, 16 Feb 2022 03:49:52 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id h14-20020a17090a130e00b001b88991a305so6198209pja.3;
-        Wed, 16 Feb 2022 03:49:52 -0800 (PST)
+        Wed, 16 Feb 2022 07:01:09 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35274271E1E
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 04:00:57 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id t4-20020a17090a510400b001b8c4a6cd5dso2142207pjh.5
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 04:00:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pRrgwOHWLiM1Q+J4i60wpnw6sWhrdkcW+cGlMVFX6jM=;
-        b=GFzblecDliUi6HFrmTuyPU60rqHXFp+G8qiTodPaZMvbFdnRcbNUlbNgpzniJzWOOT
-         A64lU+z7qxke0RNVFnqmbWw9wbnDfozkJyIZmhuYiGqLA/rKGq/Q7lCg0AjfuGV+iK0Q
-         b0cEAOQrVGlYNDsE6g+bfYqMXQtr7nHAZRo2OKKuwiqgxmZNyeviNAdIKw34WbsUwr7a
-         tOpefCBwV6UhXmI2FRndFPel7rOVj2+U/4D6PS/rc8h54qWV+z29+vr9EUnMHuu06I1M
-         xCtSLypxDpTZTkW2ncF3VyK3phW/Gz1A10Wb+BGNzU3SWMoCTX1HvATHCAsxsWXRcz9N
-         caTA==
+        h=from:to:cc:subject:date:message-id;
+        bh=GCdIUFdujlOzAKymVHoLCjyy0z76tPnSzT+6kO8LwWY=;
+        b=VpOFOuvhXjUv2E2IuKYyPHXPM0cR/te4hKts3kgukz5bppZaQYGoCJfklbNgCwFkKL
+         jEe/NgIwPiASQI53Wutj7s2N42bf9OG35/iIeS1TSQCofdvaPAsnltYnOhsltWnYorzf
+         Stjgzwq7e89y3hsmVqvuU/jk0J6XZyw70FgXfj6GkUu4pE8hSjMQRQdZqzkrGDg+zK3j
+         T2AvKf4qla1q6UJ2d5ETbwLZxM6xzKbm6ptsDzpO0Vs5+xufit2by9drVo4mmigRiRzK
+         chkXsnGhiIAQNDbvq4GUx5rr+BsPWOYhIDiqSSdprG5vS1+SuUST0qaq2xfIrT15CSvt
+         ia3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=pRrgwOHWLiM1Q+J4i60wpnw6sWhrdkcW+cGlMVFX6jM=;
-        b=aoMiDu0N1EYN/b7LSYcTb9ugpHmaiXTkHA0gFg5CDjOMmNtedxurSZxOQy5MoAiNF/
-         i8nP1DdqOgpx92NM5fIbJxo3gJkT0WDgH3TEH0uUhWw+wwKnPvrH7AfBjSdVxAeG5ejd
-         BhDY57dlb0ZmjoQ1rbOAqbjP2EJcH2R0l2tUe6YgoqZ3Gw/1xnSHUfubXH11hNTLNcsV
-         uJHkDBq2HVrQENnSXOp4bCrkbT9ScfSuQmxoNogtLRxJq3qNb3cheW9/LdO+MMv+8ZVV
-         tbzmd4v7/Cr43xwb6R1jJuUx8GBBsGWRXgk6Y7cUpo7xlddnz0nHjtX/yqhLI5BGqhCZ
-         NurQ==
-X-Gm-Message-State: AOAM531WqpdsQydQkM6rTHrlg/GM6BQG1Y7KPQgl2NYk/3ai7OdN65p0
-        pltYH0aLce3X08AloKk3WVuGVAmry1TIYWcP
-X-Google-Smtp-Source: ABdhPJzgDAgMFW1bjTKE3h4NjmPmpSD2L0ngBHK20EB1jYJ2Y8E3MSbHEGcmp53c8sO5W7VbDvFjNg==
-X-Received: by 2002:a17:903:1249:b0:14e:e477:5019 with SMTP id u9-20020a170903124900b0014ee4775019mr2181392plh.53.1645012191999;
-        Wed, 16 Feb 2022 03:49:51 -0800 (PST)
-Received: from localhost.localdomain ([61.16.102.69])
-        by smtp.gmail.com with ESMTPSA id q1sm26209119pfs.112.2022.02.16.03.49.49
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=GCdIUFdujlOzAKymVHoLCjyy0z76tPnSzT+6kO8LwWY=;
+        b=NheVM5HTLGZ96SMoKegAir3Qnmtq+4n3C1oWjvTyGyM+6oOpy3dIdU3mfFQ636cCAl
+         4JHl9Or10Q/6TTlojeHVV+AQ0NYz0INOH1RHTiZYCj2OtjBeBGOAUEgfdtRwfPXFZCPT
+         aVpxEr9QCqj2L2h+Eb4/3OhgvEu9rnaCvxjXYfL8KKSoc/eQcEl8lh9ZnCLm/ub1xWBm
+         xuWZdXu8Kh9WnYcUZWhwaXG+/zH4Pr93V6e5sOvLdlIF0KyysNQLlLe6HXf/zkeWHlBE
+         EEzC4aXuHgEieA819PM/q79VrpRsPBMuZ7nhCifZu96qKU55xY28KkDB+7CosuMMWRP0
+         nRdg==
+X-Gm-Message-State: AOAM532AWGuc3NDEPjC2oXhNOJbZL1zPNH2Elws/pJ5qt/EHm30HeNK1
+        BQ4C7/tWfN5/JNTNtosIoEA=
+X-Google-Smtp-Source: ABdhPJz3z8WQkEsGeJwy1bwdL8/bg2zNQcroQdFBJX3jYLpd4WJT7E5MtbA1e8450+m56SB1Ls2NzQ==
+X-Received: by 2002:a17:90a:120f:b0:1b8:7ba9:e48f with SMTP id f15-20020a17090a120f00b001b87ba9e48fmr1308130pja.59.1645012856627;
+        Wed, 16 Feb 2022 04:00:56 -0800 (PST)
+Received: from localhost.localdomain ([61.16.102.73])
+        by smtp.gmail.com with ESMTPSA id k14sm44471132pff.25.2022.02.16.04.00.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 03:49:51 -0800 (PST)
+        Wed, 16 Feb 2022 04:00:56 -0800 (PST)
 From:   "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC V3 6/6] blk: export the sysfs for switching qos
-Date:   Wed, 16 Feb 2022 19:48:09 +0800
-Message-Id: <20220216114809.84551-7-jianchao.wan9@gmail.com>
+To:     osandov@osandov.com
+Cc:     chaitanyak@nvidia.com, linux-block@vger.kernel.org
+Subject: [[RFC blktests]] test/block/032: add test cases for switching queue qos
+Date:   Wed, 16 Feb 2022 19:59:47 +0800
+Message-Id: <20220216115947.85220-1-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220216114809.84551-1-jianchao.wan9@gmail.com>
-References: <20220216114809.84551-1-jianchao.wan9@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-And also remove the unused interfaces.
-
 Signed-off-by: Wang Jianchao (Kuaishou) <jianchao.wan9@gmail.com>
 ---
- block/blk-mq-debugfs.c | 10 +-------
- block/blk-rq-qos.h     | 54 ++----------------------------------------
- block/blk-sysfs.c      |  2 ++
- 3 files changed, 5 insertions(+), 61 deletions(-)
+ tests/block/032     | 62 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/032.out |  2 ++
+ 2 files changed, 64 insertions(+)
+ create mode 100644 tests/block/032
+ create mode 100644 tests/block/032.out
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ba43efed3565..9079541e92f1 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -823,11 +823,6 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
- 	q->sched_debugfs_dir = NULL;
- }
- 
--static const char *rq_qos_id_to_name(enum rq_qos_id id)
--{
--	return "unknown";
--}
--
- void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
- {
- 	debugfs_remove_recursive(rqos->debugfs_dir);
-@@ -837,9 +832,6 @@ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
- void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- {
- 	struct request_queue *q = rqos->q;
--	const char *dir_name;
--
--	dir_name = rqos->ops->name ? rqos->ops->name : rq_qos_id_to_name(rqos->id);
- 
- 	if (rqos->debugfs_dir || !rqos->ops->debugfs_attrs)
- 		return;
-@@ -848,7 +840,7 @@ void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- 		q->rqos_debugfs_dir = debugfs_create_dir("rqos",
- 							 q->debugfs_dir);
- 
--	rqos->debugfs_dir = debugfs_create_dir(dir_name,
-+	rqos->debugfs_dir = debugfs_create_dir(rqos->ops->name,
- 					       rqos->q->rqos_debugfs_dir);
- 
- 	debugfs_create_files(rqos->debugfs_dir, rqos, rqos->ops->debugfs_attrs);
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index bba829bbb461..498abefea9b4 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -13,10 +13,6 @@
- 
- struct blk_mq_debugfs_attr;
- 
--enum rq_qos_id {
--	RQ_QOS_UNUSED,
--};
--
- struct rq_wait {
- 	wait_queue_head_t wait;
- 	atomic_t inflight;
-@@ -25,7 +21,7 @@ struct rq_wait {
- struct rq_qos {
- 	const struct rq_qos_ops *ops;
- 	struct request_queue *q;
--	enum rq_qos_id id;
-+	int id;
- 	refcount_t ref;
- 	wait_queue_head_t waitq;
- 	bool dying;
-@@ -70,7 +66,7 @@ struct rq_depth {
- };
- 
- static inline struct rq_qos *rq_qos_id(struct request_queue *q,
--				       enum rq_qos_id id)
-+				       int id)
- {
- 	struct rq_qos *rqos;
- 	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-@@ -99,52 +95,6 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
- 	init_waitqueue_head(&rq_wait->wait);
- }
- 
--static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
--{
--	/*
--	 * No IO can be in-flight when adding rqos, so freeze queue, which
--	 * is fine since we only support rq_qos for blk-mq queue.
--	 *
--	 * Reuse ->queue_lock for protecting against other concurrent
--	 * rq_qos adding/deleting
--	 */
--	blk_mq_freeze_queue(q);
--
--	spin_lock_irq(&q->queue_lock);
--	rqos->next = q->rq_qos;
--	q->rq_qos = rqos;
--	spin_unlock_irq(&q->queue_lock);
--
--	blk_mq_unfreeze_queue(q);
--
--	if (rqos->ops->debugfs_attrs)
--		blk_mq_debugfs_register_rqos(rqos);
--}
--
--static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
--{
--	struct rq_qos **cur;
--
--	/*
--	 * See comment in rq_qos_add() about freezing queue & using
--	 * ->queue_lock.
--	 */
--	blk_mq_freeze_queue(q);
--
--	spin_lock_irq(&q->queue_lock);
--	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
--		if (*cur == rqos) {
--			*cur = rqos->next;
--			break;
--		}
--	}
--	spin_unlock_irq(&q->queue_lock);
--
--	blk_mq_unfreeze_queue(q);
--
--	blk_mq_debugfs_unregister_rqos(rqos);
--}
--
- int rq_qos_register(struct rq_qos_ops *ops);
- void rq_qos_unregister(struct rq_qos_ops *ops);
- void rq_qos_activate(struct request_queue *q,
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9f32882ceb2f..c02747db4e3b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -574,6 +574,7 @@ QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
- QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
- QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
- QUEUE_RW_ENTRY(elv_iosched, "scheduler");
-+QUEUE_RW_ENTRY(queue_qos, "qos");
- 
- QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
- QUEUE_RO_ENTRY(queue_physical_block_size, "physical_block_size");
-@@ -633,6 +634,7 @@ static struct attribute *queue_attrs[] = {
- 	&queue_max_integrity_segments_entry.attr,
- 	&queue_max_segment_size_entry.attr,
- 	&elv_iosched_entry.attr,
-+	&queue_qos_entry.attr,
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
+diff --git a/tests/block/032 b/tests/block/032
+new file mode 100644
+index 0000000..bb10506
+--- /dev/null
++++ b/tests/block/032
+@@ -0,0 +1,62 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2022 Wang Jianchao
++#
++# Threads doing IO to a device, while we switch rqos
++
++. tests/block/rc
++
++DESCRIPTION="switch rqos while doing IO"
++TIMED=1
++CAN_BE_ZONED=1
++
++requires() {
++	_have_fio
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++
++	local rqos=("wbt" "iolat" "iocost" "io-prio")
++
++	if _test_dev_is_rotational; then
++		size="32m"
++	else
++		size="1g"
++	fi
++
++	# start fio job
++	_run_fio_rand_io --filename="$TEST_DEV" --size="$size" &
++
++	start_time=$(date +%s)
++	timeout=${TIMEOUT:=900}
++	while kill -0 $! 2>/dev/null; do
++		idx=$((RANDOM % ${#rqos[@]}))
++		pol=${rqos[$idx]}
++		cat ${TEST_DEV_SYSFS}/queue/qos | grep "\[$pol\]" > /dev/null
++		if [ $? -eq 0 ];then
++			echo "-$pol" > ${TEST_DEV_SYSFS}/queue/qos
++			if [ $? -ne 0 ];then
++				echo "$pol"
++				cat ${TEST_DEV_SYSFS}/queue/qos
++			fi
++		else
++			echo "+$pol" > ${TEST_DEV_SYSFS}/queue/qos
++			if [ $? -ne 0 ];then
++				echo "$pol"
++				cat ${TEST_DEV_SYSFS}/queue/qos
++			fi
++		fi
++		sleep .2
++		end_time=$(date +%s)
++		if (( end_time - start_time > timeout + 15 )); then
++			echo "fio did not finish after $timeout seconds!"
++			break
++		fi
++	done
++
++	FIO_PERF_FIELDS=("read iops")
++	_fio_perf_report
++
++	echo "Test complete"
++}
+diff --git a/tests/block/032.out b/tests/block/032.out
+new file mode 100644
+index 0000000..3604e9e
+--- /dev/null
++++ b/tests/block/032.out
+@@ -0,0 +1,2 @@
++Running block/032
++Test complete
 -- 
 2.17.1
 
