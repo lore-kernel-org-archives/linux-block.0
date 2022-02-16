@@ -2,97 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D5B2C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 11:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38345C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 11:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbiBPLdf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 06:33:35 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46340 "EHLO
+        id S232213AbiBPLtt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 06:49:49 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbiBPLdf (ORCPT
+        with ESMTP id S231834AbiBPLts (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 06:33:35 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9967BB0A4F;
-        Wed, 16 Feb 2022 03:33:23 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id ki18-20020a17090ae91200b001b8be87e9abso3812104pjb.1;
-        Wed, 16 Feb 2022 03:33:23 -0800 (PST)
+        Wed, 16 Feb 2022 06:49:48 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41697195079;
+        Wed, 16 Feb 2022 03:49:36 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id c4so1927773pfl.7;
+        Wed, 16 Feb 2022 03:49:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id;
-        bh=/Q5i1rs4lIXUeYDzL8nbllPDsVhaLW6OGjHpaEqXpZc=;
-        b=O0B1XlkA1cPZBrpkAdvWaT2/Ssr79kVD3zVUFxXI6jaYUSswhqsh1gmP3PrcwlkvJs
-         E2VSZWxdxYgsnZEp5HhjwsNzvkcXXj93Ze2LaYLTC+Zw4rQRsheaIISHbztmUkzXEnGj
-         KR2birAbkaIX/vUrIHRozSr3gwDP9q2zEudod4HpMScS7cj5MWFxYRqiRuOpdDcXPm2x
-         z1FpymYtl8TAjewxgQVfy1Ko2yKgLOfpwX8LsBzd1OHyy1dMsNKTmrUSqGeK4cPYv52b
-         C9XiO8xECRXdPJnR4O0MtYifLiEleeE/kzQjleiSXebpAwm6iF+ihjWLKGmkdFZ9YVOk
-         DpjA==
+        bh=lMdBePoQlUE1rdnsGymQ1Fxz9PybQL1yjjavRNOkHdE=;
+        b=OaVRdKeKWsdGhVE/mgKLSIR9TcjpQOWtan0p54ueC5qA1HClH4fBXwMrNtJiFh2ue3
+         bLG6k2T4zsTDH3lJ/SRD3VrTRpYcZNgRPRRhi4fqlATV43JYCJ5god4Xz0II9fwLbV8D
+         cuVkWbVmVQK44S8s7NDGXUFOTCgtbq+y/89loQJPpMI+/S2CL1tYmwjRF4pSug8pClFR
+         O/x6iiLFOGJSzIKkOW/4U/ksZ3aKpioZtlcL4S251vmK+CxgrEmNunflfP4HH/BMA0om
+         cuUsW6tuEXX5S0lWGOo3/IEAGweFWjFz7OAqnueqtLqmGe9C9gjA2QU0YT817HyhgC6n
+         Fcsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=/Q5i1rs4lIXUeYDzL8nbllPDsVhaLW6OGjHpaEqXpZc=;
-        b=BXoC+6vA2G4e5xu+LGseAqRRM3DQyL/5k5WazDvMyInZJB9/H8Xdvv39031siI79BT
-         IwIIbQJu9buZ50UHxaeomKyJRLife3/NYGbD8PCwWLWUjrRxd5gZgzF6jVx7a5BigZZE
-         WBkKXWItoz7gF0GKpJjVakgx/r+6dMMxeSgCojyTEp/+p7wxSAr79q8308xczesTGoDi
-         fRcu6IWnuTp1XR6wpOoRAKWHEKVRYs0StfgGXYanpGbV+doi61ODCoPLtmGfygO1JoZc
-         ehTz9fNydqr25XvgvlA+3LufxoR+WUeaQUIq3ciiFtTC2SFCv3bkM3cd8LoV1p2quUFc
-         bjGA==
-X-Gm-Message-State: AOAM533ftlVkTuseoyxLKWE64W3RonuEW4uWtukVTHQkeY8fJeEtVNkg
-        /54jsLN8l/ASnhCSVuTwBR4=
-X-Google-Smtp-Source: ABdhPJx2chKXIlg3Cf++XymkKVZ6f5B2YEliefIb7XFKvwNsZj2zFoG9Joym3NIYUV/sZDZ3TYuEbQ==
-X-Received: by 2002:a17:902:7485:b0:14f:3b6:1847 with SMTP id h5-20020a170902748500b0014f03b61847mr2114546pll.70.1645011203126;
-        Wed, 16 Feb 2022 03:33:23 -0800 (PST)
-Received: from localhost.localdomain ([61.16.102.72])
-        by smtp.gmail.com with ESMTPSA id n2sm21607370pjp.56.2022.02.16.03.33.20
+        bh=lMdBePoQlUE1rdnsGymQ1Fxz9PybQL1yjjavRNOkHdE=;
+        b=KSq3XaioVZnE1j/KQ2j98K5tYM3EAgwfcjSSHupXImWW+o1LPaws+G/ucWoxFuKY0R
+         JYTA7EA7IhpgzH42Oxv2Fr/GLpOeR0GsaZivRb4UHEwMcunQn2dwjjz5JPM8o/obRDlx
+         b+iZpyy9gn35184yRwX2EtoVr/2JbigI9DdIFDDPMePs4lTG9mRlYxmTy/D6CwPhoyY0
+         JUx4NBV4YfXQMgIlcIFR+br5zPzS/5jl50Szqv2bO1hcJJJ+WhEvXneaitnsmrZAMsGD
+         fu1Fwg7bp/f8mmlUP0pGKg+yFxcZmHEi8l9Lu2nbkDoaTgvmMgBUFuPrIdNAh4pXhJRQ
+         uReQ==
+X-Gm-Message-State: AOAM530d8UrhMvXtJXsPgTCeQpl0q/hzebJS5A21pq2b01o+0Y+X9/ZJ
+        s8n0x5Y2otakdWi5liWzKs4=
+X-Google-Smtp-Source: ABdhPJxtd1Cx1D08Vu3YFKf8sZCD0qXEJlMfNlXjrzCM77uMQSY9JAjOQn7M0TD/WjaXr+lMPz/fXQ==
+X-Received: by 2002:a63:1048:0:b0:370:6352:2d9b with SMTP id 8-20020a631048000000b0037063522d9bmr1912048pgq.413.1645012175792;
+        Wed, 16 Feb 2022 03:49:35 -0800 (PST)
+Received: from localhost.localdomain ([61.16.102.69])
+        by smtp.gmail.com with ESMTPSA id q1sm26209119pfs.112.2022.02.16.03.49.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 03:33:22 -0800 (PST)
+        Wed, 16 Feb 2022 03:49:35 -0800 (PST)
 From:   "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     hch@infradead.org, Bart Van Assche <bvanassche@acm.org>,
+Cc:     Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] blk: do rq_qos_exit in blk_cleanup_queue
-Date:   Wed, 16 Feb 2022 19:32:12 +0800
-Message-Id: <20220216113212.83000-1-jianchao.wan9@gmail.com>
+Subject: [RFC V3 0/6] blk: make blk-rq-qos policies pluggable and modular
+Date:   Wed, 16 Feb 2022 19:48:03 +0800
+Message-Id: <20220216114809.84551-1-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Wang Jianchao <wangjianchao@kuaishou.com>
+Hi Jens
 
-When __alloc_disk_node() failed, there will not not del_gendisk()
-any more, then resource in rqos policies is leaked. Add rq_qos_exit()
-into blk_cleanup_queue(). rqos is removed from the list, so needn't
-to worry .exit is called twice.
+blk-rq-qos is a standalone framework out of io-sched and can be used to
+control or observe the IO progress in block-layer with hooks. blk-rq-qos
+is a great design but right now, it is totally fixed and built-in and shut
+out peoples who want to use it with external module.
 
-Fixes: commit 8e141f9eb803 ("block: drain file system I/O on del_gendisk")
-Suggested-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Wang Jianchao <wangjianchao@kuaishou.com>
----
- block/blk-core.c | 3 +++
- 1 file changed, 3 insertions(+)
+This patchset attempts to make blk-rq-qos framework pluggable and modular.
+Then we can update the blk-rq-qos policy module w/o stopping the IO workload.
+And it is more convenient to introduce new policy on old machines w/o udgrade
+kernel. And we can close all of the blk-rq-qos policy if we needn't any of
+them. At the moment, the request_queue.rqos list is empty, we needn't to
+waste cpu cyles on them.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d93e3bb9a769..108c7207d048 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -50,6 +50,7 @@
- #include "blk-mq-sched.h"
- #include "blk-pm.h"
- #include "blk-throttle.h"
-+#include "blk-rq-qos.h"
- 
- struct dentry *blk_debugfs_root;
- 
-@@ -322,6 +323,8 @@ void blk_cleanup_queue(struct request_queue *q)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
- 
-+	rq_qos_exit(q);
-+
- 	blk_sync_queue(q);
- 	if (queue_is_mq(q)) {
- 		blk_mq_cancel_work_sync(q);
--- 
-2.17.1
+Changes since v2:
+ Refactor the patches,
+ - patch01 only provide new interfaces and not export the sysfs interface.
+ - patch02 adapt the wbt to new interface, reserve the previous action
+   when write to wbt_lat
+ - export sysfs interface in last patch when all of the blk-rqos policies
+   are preprared well.
+
+Changes since v1:
+ - Just make iocost and iolatency pluggable, then we needn't to export
+   those interfaces
+ - Remove the iostat rqos policy
+ - Rename module of blk-ioprio to io-prio to avoid rename ioprio.c file
+
+WangJianchao(6):
+	blk: prepare to make blk-rq-qos pluggable and modular
+    blk-wbt: make wbt pluggable
+    blk-iolatency: make iolatency pluggable
+    blk-iocost: make iocost pluggable
+    blk-ioprio: make ioprio pluggable and modular
+    blk: export the sysfs for switching qos
+
+ block/Kconfig          |   2 +-
+ block/Makefile         |   3 +-
+ block/blk-cgroup.c     |  11 ---
+ block/blk-iocost.c     |  49 +++++++-----
+ block/blk-iolatency.c  |  33 +++++++--
+ block/blk-ioprio.c     |  50 ++++++++-----
+ block/blk-ioprio.h     |  19 -----
+ block/blk-mq-debugfs.c |  23 ++----
+ block/blk-rq-qos.c     | 303 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ block/blk-rq-qos.h     |  96 +++++++++---------------
+ block/blk-sysfs.c      |   2 +
+ block/blk-wbt.c        |  52 +++++++++++--
+ block/blk-wbt.h        |   7 +-
+ block/blk.h            |   6 --
+ include/linux/blkdev.h |   4 +
+ 15 files changed, 488 insertions(+), 172 deletions(-)
 
