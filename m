@@ -2,22 +2,21 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F47C43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F324EC4321E
 	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 04:15:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343775AbiBPEPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 23:15:39 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45348 "EHLO
+        id S1343629AbiBPEPk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 23:15:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343675AbiBPEPi (ORCPT
+        with ESMTP id S1343654AbiBPEPi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Feb 2022 23:15:38 -0500
-X-Greylist: delayed 206 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Feb 2022 20:15:24 PST
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DB873100748
+Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E871EFCB76
         for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 20:15:24 -0800 (PST)
 Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
-        by 156.147.23.52 with ESMTP; 16 Feb 2022 13:15:23 +0900
+        by 156.147.23.51 with ESMTP; 16 Feb 2022 13:15:23 +0900
 X-Original-SENDERIP: 156.147.1.127
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
@@ -46,193 +45,200 @@ Cc:     torvalds@linux-foundation.org, mingo@redhat.com,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: Report in ext4_buffered_write_iter()
-Date:   Wed, 16 Feb 2022 13:15:13 +0900
-Message-Id: <1644984918-27955-1-git-send-email-byungchul.park@lge.com>
+Subject: Report in ext4_file_write_iter()
+Date:   Wed, 16 Feb 2022 13:15:15 +0900
+Message-Id: <1644984918-27955-3-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1644984711-26423-1-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1644984918-27955-1-git-send-email-byungchul.park@lge.com>
 References: <1644984711-26423-1-git-send-email-byungchul.park@lge.com>
+ <1644984918-27955-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[    7.083356] ===================================================
-[    7.083360] DEPT: Circular dependency has been detected.
-[    7.083361] 5.17.0-rc1-00014-gcf3441bb2012 #2 Tainted: G        W        
-[    7.083363] ---------------------------------------------------
-[    7.083364] summary
-[    7.083364] ---------------------------------------------------
-[    7.083365] *** DEADLOCK ***
-[    7.083365] 
-[    7.083366] context A
-[    7.083366]     [S] (unknown)(&(&journal->j_wait_commit)->dmap:0)
-[    7.083368]     [W] down_write(&sb->s_type->i_mutex_key:0)
-[    7.083370]     [E] event(&(&journal->j_wait_commit)->dmap:0)
-[    7.083371] 
-[    7.083371] context B
-[    7.083372]     [S] __raw_write_lock(&journal->j_state_lock:8)
-[    7.083373]     [W] wait(&(&journal->j_wait_commit)->dmap:0)
-[    7.083374]     [E] write_unlock(&journal->j_state_lock:8)
-[    7.083375] 
-[    7.083376] context C
-[    7.083377]     [S] down_write(&sb->s_type->i_mutex_key:0)
-[    7.083378]     [W] __raw_read_lock(&journal->j_state_lock:8)
-[    7.083379]     [E] up_write(&sb->s_type->i_mutex_key:0)
-[    7.083380] 
-[    7.083380] [S]: start of the event context
-[    7.083381] [W]: the wait blocked
-[    7.083382] [E]: the event not reachable
-[    7.083382] ---------------------------------------------------
-[    7.083383] context A's detail
-[    7.083384] ---------------------------------------------------
-[    7.083384] context A
-[    7.083385]     [S] (unknown)(&(&journal->j_wait_commit)->dmap:0)
-[    7.083386]     [W] down_write(&sb->s_type->i_mutex_key:0)
-[    7.083387]     [E] event(&(&journal->j_wait_commit)->dmap:0)
-[    7.083388] 
-[    7.083388] [S] (unknown)(&(&journal->j_wait_commit)->dmap:0):
-[    7.083389] (N/A)
-[    7.083390] 
-[    7.083391] [W] down_write(&sb->s_type->i_mutex_key:0):
-[    7.083391] [<ffffffff812e39d7>] ext4_buffered_write_iter+0x37/0x100
-[    7.083398] stacktrace:
-[    7.083399]       down_write+0x68/0x580
-[    7.083402]       ext4_buffered_write_iter+0x37/0x100
-[    7.083404]       ext4_file_write_iter+0x4a/0x7f0
-[    7.083406]       new_sync_write+0x100/0x190
-[    7.083409]       vfs_write+0x134/0x360
-[    7.083411]       ksys_write+0x4d/0xc0
-[    7.083413]       do_syscall_64+0x3a/0x90
-[    7.083415]       entry_SYSCALL_64_after_hwframe+0x44/0xae
-[    7.083417] 
-[    7.083418] [E] event(&(&journal->j_wait_commit)->dmap:0):
-[    7.083419] [<ffffffff810baa53>] __wake_up_common+0x93/0x1a0
-[    7.083421] stacktrace:
-[    7.083422]       dept_event+0x12b/0x1f0
-[    7.083424]       __wake_up_common+0xb0/0x1a0
-[    7.083426]       __wake_up_common_lock+0x65/0x90
-[    7.083427]       __jbd2_log_start_commit+0x8a/0xa0
-[    7.083430]       jbd2_log_start_commit+0x24/0x40
-[    7.083431]       __jbd2_journal_force_commit+0x91/0xb0
-[    7.083433]       jbd2_journal_force_commit_nested+0x5/0x10
-[    7.083434]       ext4_should_retry_alloc+0x5b/0xb0
-[    7.083436]       ext4_da_write_begin+0xf2/0x2a0
-[    7.083439]       generic_perform_write+0xa6/0x1c0
-[    7.083440]       ext4_buffered_write_iter+0x89/0x100
-[    7.083442]       ext4_file_write_iter+0x4a/0x7f0
-[    7.083444]       new_sync_write+0x100/0x190
-[    7.083446]       vfs_write+0x134/0x360
-[    7.083448]       ksys_write+0x4d/0xc0
-[    7.083449]       do_syscall_64+0x3a/0x90
-[    7.083451] ---------------------------------------------------
-[    7.083452] context B's detail
-[    7.083452] ---------------------------------------------------
-[    7.083453] context B
-[    7.083453]     [S] __raw_write_lock(&journal->j_state_lock:8)
-[    7.083454]     [W] wait(&(&journal->j_wait_commit)->dmap:0)
-[    7.083455]     [E] write_unlock(&journal->j_state_lock:8)
-[    7.083457] 
-[    7.083457] [S] __raw_write_lock(&journal->j_state_lock:8):
-[    7.083458] [<ffffffff81346e9e>] kjournald2+0x7e/0x260
-[    7.083460] stacktrace:
-[    7.083460]       _raw_write_lock+0x6e/0x90
-[    7.083462]       kjournald2+0x7e/0x260
-[    7.083463]       kthread+0xe3/0x110
-[    7.083466]       ret_from_fork+0x22/0x30
-[    7.083469] 
-[    7.083469] [W] wait(&(&journal->j_wait_commit)->dmap:0):
-[    7.083470] [<ffffffff810bb017>] prepare_to_wait+0x47/0xd0
-[    7.083472] stacktrace:
-[    7.083473]       kjournald2+0x164/0x260
-[    7.083474]       kthread+0xe3/0x110
-[    7.083476]       ret_from_fork+0x22/0x30
-[    7.083477] 
-[    7.083478] [E] write_unlock(&journal->j_state_lock:8):
-[    7.083479] [<ffffffff8134700b>] kjournald2+0x1eb/0x260
-[    7.083480] stacktrace:
-[    7.083481]       _raw_write_unlock+0x30/0x70
-[    7.083483]       kjournald2+0x1eb/0x260
-[    7.083484]       kthread+0xe3/0x110
-[    7.083486]       ret_from_fork+0x22/0x30
-[    7.083487] ---------------------------------------------------
-[    7.083488] context C's detail
-[    7.083488] ---------------------------------------------------
-[    7.083489] context C
-[    7.083490]     [S] down_write(&sb->s_type->i_mutex_key:0)
-[    7.083491]     [W] __raw_read_lock(&journal->j_state_lock:8)
-[    7.083492]     [E] up_write(&sb->s_type->i_mutex_key:0)
-[    7.083493] 
-[    7.083493] [S] down_write(&sb->s_type->i_mutex_key:0):
-[    7.083494] [<ffffffff81228358>] do_truncate+0x58/0xa0
-[    7.083496] stacktrace:
-[    7.083497]       down_write+0x8a/0x580
-[    7.083498]       do_truncate+0x58/0xa0
-[    7.083500]       path_openat+0x646/0x9c0
-[    7.083502]       do_filp_open+0xaf/0x110
-[    7.083504]       do_sys_openat2+0x1ff/0x300
-[    7.083505]       do_sys_open+0x51/0x60
-[    7.083507]       do_syscall_64+0x3a/0x90
-[    7.083509]       entry_SYSCALL_64_after_hwframe+0x44/0xae
-[    7.083511] 
-[    7.083511] [W] __raw_read_lock(&journal->j_state_lock:8):
-[    7.083512] [<ffffffff8133cd87>] start_this_handle+0xa7/0x5e0
-[    7.083515] stacktrace:
-[    7.083516]       _raw_read_lock+0x57/0xd0
-[    7.083518]       start_this_handle+0xa7/0x5e0
-[    7.083519]       jbd2__journal_start+0xe6/0x220
-[    7.083521]       __ext4_journal_start_sb+0x11c/0x150
-[    7.083523]       ext4_setattr+0x436/0x8f0
-[    7.083524]       notify_change+0x352/0x4c0
-[    7.083527]       do_truncate+0x6a/0xa0
-[    7.083528]       path_openat+0x646/0x9c0
-[    7.083530]       do_filp_open+0xaf/0x110
-[    7.083531]       do_sys_openat2+0x1ff/0x300
-[    7.083533]       do_sys_open+0x51/0x60
-[    7.083535]       do_syscall_64+0x3a/0x90
-[    7.083536]       entry_SYSCALL_64_after_hwframe+0x44/0xae
-[    7.083538] 
-[    7.083539] [E] up_write(&sb->s_type->i_mutex_key:0):
-[    7.083540] [<ffffffff81228381>] do_truncate+0x81/0xa0
-[    7.083541] stacktrace:
-[    7.083542]       up_write+0x36/0x170
-[    7.083545]       do_truncate+0x81/0xa0
-[    7.083547]       path_openat+0x646/0x9c0
-[    7.083548]       do_filp_open+0xaf/0x110
-[    7.083550]       do_sys_openat2+0x1ff/0x300
-[    7.083552]       do_sys_open+0x51/0x60
-[    7.083553]       do_syscall_64+0x3a/0x90
-[    7.083555]       entry_SYSCALL_64_after_hwframe+0x44/0xae
-[    7.083557] ---------------------------------------------------
-[    7.083557] information that might be helpful
-[    7.083558] ---------------------------------------------------
-[    7.083559] CPU: 2 PID: 628 Comm: rs:main Q:Reg Tainted: G        W         5.17.0-rc1-00014-gcf3441bb2012 #2
-[    7.083561] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
-[    7.083563] Call Trace:
-[    7.083564]  <TASK>
-[    7.083565]  dump_stack_lvl+0x44/0x57
-[    7.083568]  print_circle+0x384/0x510
-[    7.083570]  ? __kernel_text_address+0x9/0x30
-[    7.083572]  ? print_circle+0x510/0x510
-[    7.083574]  cb_check_dl+0x58/0x60
-[    7.083575]  bfs+0xdc/0x1b0
-[    7.083578]  add_dep+0x94/0x120
-[    7.083580]  do_event.isra.22+0x284/0x300
-[    7.083582]  ? __wake_up_common+0x93/0x1a0
-[    7.083583]  dept_event+0x12b/0x1f0
-[    7.083586]  __wake_up_common+0xb0/0x1a0
-[    7.083588]  __wake_up_common_lock+0x65/0x90
-[    7.083590]  __jbd2_log_start_commit+0x8a/0xa0
-[    7.083591]  jbd2_log_start_commit+0x24/0x40
-[    7.083593]  __jbd2_journal_force_commit+0x91/0xb0
-[    7.083595]  jbd2_journal_force_commit_nested+0x5/0x10
-[    7.083597]  ext4_should_retry_alloc+0x5b/0xb0
-[    7.083598]  ext4_da_write_begin+0xf2/0x2a0
-[    7.083601]  generic_perform_write+0xa6/0x1c0
-[    7.083604]  ext4_buffered_write_iter+0x89/0x100
-[    7.083606]  ext4_file_write_iter+0x4a/0x7f0
-[    7.083609]  new_sync_write+0x100/0x190
-[    7.083612]  vfs_write+0x134/0x360
-[    7.083615]  ksys_write+0x4d/0xc0
-[    7.083616]  ? trace_hardirqs_on+0x38/0xe0
-[    7.083619]  do_syscall_64+0x3a/0x90
-[    7.083621]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[    6.881168] ===================================================
+[    6.881170] DEPT: Circular dependency has been detected.
+[    6.881172] 5.17.0-rc1-00014-gcf3441bb2012 #2 Tainted: G        W        
+[    6.881173] ---------------------------------------------------
+[    6.881174] summary
+[    6.881174] ---------------------------------------------------
+[    6.881175] *** DEADLOCK ***
+[    6.881175] 
+[    6.881176] context A
+[    6.881176]     [S] (unknown)(&(&journal->j_wait_commit)->dmap:0)
+[    6.881178]     [W] down_write(mapping.invalidate_lock:0)
+[    6.881179]     [E] event(&(&journal->j_wait_commit)->dmap:0)
+[    6.881180] 
+[    6.881181] context B
+[    6.881182]     [S] __raw_write_lock(&journal->j_state_lock:8)
+[    6.881183]     [W] wait(&(&journal->j_wait_commit)->dmap:0)
+[    6.881184]     [E] write_unlock(&journal->j_state_lock:8)
+[    6.881185] 
+[    6.881185] context C
+[    6.881186]     [S] down_write(mapping.invalidate_lock:0)
+[    6.881187]     [W] __raw_read_lock(&journal->j_state_lock:8)
+[    6.881188]     [E] up_write(mapping.invalidate_lock:0)
+[    6.881189] 
+[    6.881190] [S]: start of the event context
+[    6.881190] [W]: the wait blocked
+[    6.881191] [E]: the event not reachable
+[    6.881191] ---------------------------------------------------
+[    6.881192] context A's detail
+[    6.881193] ---------------------------------------------------
+[    6.881193] context A
+[    6.881194]     [S] (unknown)(&(&journal->j_wait_commit)->dmap:0)
+[    6.881195]     [W] down_write(mapping.invalidate_lock:0)
+[    6.881196]     [E] event(&(&journal->j_wait_commit)->dmap:0)
+[    6.881197] 
+[    6.881198] [S] (unknown)(&(&journal->j_wait_commit)->dmap:0):
+[    6.881199] (N/A)
+[    6.881199] 
+[    6.881200] [W] down_write(mapping.invalidate_lock:0):
+[    6.881201] [<ffffffff812f7cc3>] ext4_da_write_begin+0x183/0x2a0
+[    6.881207] stacktrace:
+[    6.881207]       down_write+0x68/0x580
+[    6.881210]       ext4_da_write_begin+0x183/0x2a0
+[    6.881213]       generic_perform_write+0xa6/0x1c0
+[    6.881215]       ext4_buffered_write_iter+0x89/0x100
+[    6.881219]       ext4_file_write_iter+0x4a/0x7f0
+[    6.881222]       new_sync_write+0x100/0x190
+[    6.881225]       vfs_write+0x134/0x360
+[    6.881228]       ksys_write+0x4d/0xc0
+[    6.881230]       do_syscall_64+0x3a/0x90
+[    6.881233]       entry_SYSCALL_64_after_hwframe+0x44/0xae
+[    6.881236] 
+[    6.881237] [E] event(&(&journal->j_wait_commit)->dmap:0):
+[    6.881238] [<ffffffff810baa53>] __wake_up_common+0x93/0x1a0
+[    6.881240] stacktrace:
+[    6.881240]       dept_event+0x12b/0x1f0
+[    6.881243]       __wake_up_common+0xb0/0x1a0
+[    6.881244]       __wake_up_common_lock+0x65/0x90
+[    6.881246]       __jbd2_log_start_commit+0x8a/0xa0
+[    6.881248]       jbd2_log_start_commit+0x24/0x40
+[    6.881250]       __jbd2_journal_force_commit+0x91/0xb0
+[    6.881251]       jbd2_journal_force_commit_nested+0x5/0x10
+[    6.881253]       ext4_should_retry_alloc+0x5b/0xb0
+[    6.881254]       ext4_da_write_begin+0xf2/0x2a0
+[    6.881256]       generic_perform_write+0xa6/0x1c0
+[    6.881258]       ext4_buffered_write_iter+0x89/0x100
+[    6.881260]       ext4_file_write_iter+0x4a/0x7f0
+[    6.881262]       new_sync_write+0x100/0x190
+[    6.881264]       vfs_write+0x134/0x360
+[    6.881265]       ksys_write+0x4d/0xc0
+[    6.881267]       do_syscall_64+0x3a/0x90
+[    6.881268] ---------------------------------------------------
+[    6.881269] context B's detail
+[    6.881270] ---------------------------------------------------
+[    6.881270] context B
+[    6.881271]     [S] __raw_write_lock(&journal->j_state_lock:8)
+[    6.881272]     [W] wait(&(&journal->j_wait_commit)->dmap:0)
+[    6.881273]     [E] write_unlock(&journal->j_state_lock:8)
+[    6.881274] 
+[    6.881275] [S] __raw_write_lock(&journal->j_state_lock:8):
+[    6.881276] [<ffffffff81346e9e>] kjournald2+0x7e/0x260
+[    6.881277] stacktrace:
+[    6.881278]       _raw_write_lock+0x6e/0x90
+[    6.881280]       kjournald2+0x7e/0x260
+[    6.881281]       kthread+0xe3/0x110
+[    6.881287]       ret_from_fork+0x22/0x30
+[    6.881290] 
+[    6.881290] [W] wait(&(&journal->j_wait_commit)->dmap:0):
+[    6.881291] [<ffffffff810bb017>] prepare_to_wait+0x47/0xd0
+[    6.881293] stacktrace:
+[    6.881294]       kjournald2+0x164/0x260
+[    6.881295]       kthread+0xe3/0x110
+[    6.881297]       ret_from_fork+0x22/0x30
+[    6.881298] 
+[    6.881299] [E] write_unlock(&journal->j_state_lock:8):
+[    6.881300] [<ffffffff8134700b>] kjournald2+0x1eb/0x260
+[    6.881301] stacktrace:
+[    6.881302]       _raw_write_unlock+0x30/0x70
+[    6.881304]       kjournald2+0x1eb/0x260
+[    6.881305]       kthread+0xe3/0x110
+[    6.881307]       ret_from_fork+0x22/0x30
+[    6.881308] ---------------------------------------------------
+[    6.881309] context C's detail
+[    6.881309] ---------------------------------------------------
+[    6.881310] context C
+[    6.881311]     [S] down_write(mapping.invalidate_lock:0)
+[    6.881312]     [W] __raw_read_lock(&journal->j_state_lock:8)
+[    6.881313]     [E] up_write(mapping.invalidate_lock:0)
+[    6.881314] 
+[    6.881314] [S] down_write(mapping.invalidate_lock:0):
+[    6.881315] [<ffffffff812f94db>] ext4_setattr+0x3eb/0x8f0
+[    6.881317] stacktrace:
+[    6.881318]       down_write+0x8a/0x580
+[    6.881319]       ext4_setattr+0x3eb/0x8f0
+[    6.881321]       notify_change+0x352/0x4c0
+[    6.881323]       do_truncate+0x6a/0xa0
+[    6.881325]       path_openat+0x646/0x9c0
+[    6.881327]       do_filp_open+0xaf/0x110
+[    6.881329]       do_sys_openat2+0x1ff/0x300
+[    6.881330]       do_sys_open+0x51/0x60
+[    6.881332]       do_syscall_64+0x3a/0x90
+[    6.881333]       entry_SYSCALL_64_after_hwframe+0x44/0xae
+[    6.881335] 
+[    6.881336] [W] __raw_read_lock(&journal->j_state_lock:8):
+[    6.881337] [<ffffffff8133cd87>] start_this_handle+0xa7/0x5e0
+[    6.881340] stacktrace:
+[    6.881340]       _raw_read_lock+0x57/0xd0
+[    6.881342]       start_this_handle+0xa7/0x5e0
+[    6.881344]       jbd2__journal_start+0xe6/0x220
+[    6.881345]       __ext4_journal_start_sb+0x11c/0x150
+[    6.881347]       ext4_setattr+0x436/0x8f0
+[    6.881349]       notify_change+0x352/0x4c0
+[    6.881350]       do_truncate+0x6a/0xa0
+[    6.881352]       path_openat+0x646/0x9c0
+[    6.881353]       do_filp_open+0xaf/0x110
+[    6.881355]       do_sys_openat2+0x1ff/0x300
+[    6.881356]       do_sys_open+0x51/0x60
+[    6.881358]       do_syscall_64+0x3a/0x90
+[    6.881360]       entry_SYSCALL_64_after_hwframe+0x44/0xae
+[    6.881362] 
+[    6.881362] [E] up_write(mapping.invalidate_lock:0):
+[    6.881363] [<ffffffff812f982f>] ext4_setattr+0x73f/0x8f0
+[    6.881365] stacktrace:
+[    6.881365]       up_write+0x36/0x170
+[    6.881369]       ext4_setattr+0x73f/0x8f0
+[    6.881370]       notify_change+0x352/0x4c0
+[    6.881372]       do_truncate+0x6a/0xa0
+[    6.881373]       path_openat+0x646/0x9c0
+[    6.881375]       do_filp_open+0xaf/0x110
+[    6.881376]       do_sys_openat2+0x1ff/0x300
+[    6.881378]       do_sys_open+0x51/0x60
+[    6.881379]       do_syscall_64+0x3a/0x90
+[    6.881381]       entry_SYSCALL_64_after_hwframe+0x44/0xae
+[    6.881383] ---------------------------------------------------
+[    6.881383] information that might be helpful
+[    6.881384] ---------------------------------------------------
+[    6.881385] CPU: 2 PID: 628 Comm: rs:main Q:Reg Tainted: G        W         5.17.0-rc1-00014-gcf3441bb2012 #2
+[    6.881387] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+[    6.881389] Call Trace:
+[    6.881390]  <TASK>
+[    6.881391]  dump_stack_lvl+0x44/0x57
+[    6.881394]  print_circle+0x384/0x510
+[    6.881396]  ? __kernel_text_address+0x9/0x30
+[    6.881398]  ? print_circle+0x510/0x510
+[    6.881400]  cb_check_dl+0x58/0x60
+[    6.881401]  bfs+0xdc/0x1b0
+[    6.881404]  add_dep+0x94/0x120
+[    6.881406]  do_event.isra.22+0x284/0x300
+[    6.881408]  ? __wake_up_common+0x93/0x1a0
+[    6.881409]  dept_event+0x12b/0x1f0
+[    6.881411]  __wake_up_common+0xb0/0x1a0
+[    6.881413]  __wake_up_common_lock+0x65/0x90
+[    6.881415]  __jbd2_log_start_commit+0x8a/0xa0
+[    6.881417]  jbd2_log_start_commit+0x24/0x40
+[    6.881419]  __jbd2_journal_force_commit+0x91/0xb0
+[    6.881421]  jbd2_journal_force_commit_nested+0x5/0x10
+[    6.881422]  ext4_should_retry_alloc+0x5b/0xb0
+[    6.881424]  ext4_da_write_begin+0xf2/0x2a0
+[    6.881427]  generic_perform_write+0xa6/0x1c0
+[    6.881429]  ext4_buffered_write_iter+0x89/0x100
+[    6.881432]  ext4_file_write_iter+0x4a/0x7f0
+[    6.881435]  new_sync_write+0x100/0x190
+[    6.881438]  vfs_write+0x134/0x360
+[    6.881441]  ksys_write+0x4d/0xc0
+[    6.881442]  ? trace_hardirqs_on+0x38/0xe0
+[    6.881445]  do_syscall_64+0x3a/0x90
+[    6.881447]  entry_SYSCALL_64_after_hwframe+0x44/0xae
