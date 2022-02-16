@@ -2,161 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 924A2C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 10:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709D5C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 11:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232036AbiBPKXS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 05:23:18 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:60658 "EHLO
+        id S230117AbiBPLS7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 06:18:59 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232796AbiBPKXR (ORCPT
+        with ESMTP id S229486AbiBPLS6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 05:23:17 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53F2365808
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 02:23:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1645006985; x=1676542985;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=l4AFwXW7MVNZupf53sqqLCkxfedT33Nz59gVDc8IAhI=;
-  b=fj/VF5QfuOCJfQ7kXbe2wUTlJgWQLso0UBppUWQ1xNsqj1CYnUvLdAMk
-   zFFsLblz3FasGWXOUOTnOj5ZsFFu1VxMV1q6FqopjLHxxtOryHgp+WYcx
-   aAmLVDwpBI1Xdcod8TkUwbEhg+AX3uJrVQ8teLFFkJgvKJNNiiPOvzQss
-   lj4MLuBeFgyiV6AmI56Fr+5AEdpSvUIMFhPNgMPojhynmzYzgLuBNG9jF
-   aqA2Ecvs02yN38ad5wACZWbdaXPg5x2+W8BKeBtoubdp3+FLF33/y23Uw
-   X28Y2Km/yN//QAGMNHfiIOZ4NxWkqAAJZm1I2si4IpxM5NfeaiK2orB+E
-   A==;
-X-IronPort-AV: E=Sophos;i="5.88,373,1635177600"; 
-   d="scan'208";a="194062769"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Feb 2022 18:23:04 +0800
-IronPort-SDR: w2kOVNfSBItSP2WJXNcm2DxIDHO4f0xDB5K+QlbWblaWCm87kxDx9UkVcx530jsj9weyYP2KeQ
- Xj9VyarS50qZqDfA2Shrocr/39PVwfAvkB4GlIFDw2HwicYP0WdK9STwt8e4v7MWIlLVCqCUEn
- EitmAMTMt4Zm9OJVk+vmSSWO6Lu7eBxye5eO8gdmLk2bFeWt2vGAkIHkKHtumwCgfXKQURlBPB
- tSyfcNFp8GG8X/485z1/F6qUxboZauWOaCjhI4EGlM0gwY2kjR6Bkaw7f7ni3mZU8pgfWYFMdh
- loO0fkJnoGXakFEteT1Nob+0
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 01:54:44 -0800
-IronPort-SDR: PvvD3btchuq8bFAt1o+fSXTSmUr9ydZiKy84HUS8gE4g/SEyxQ9nXy332//evVfVffPlgWupKE
- DTzpQv2yQAW/lP4B40bYAVEIMP1v85wjLxnqwEkOig2OiqxujRGL9aH7pPR8+Zf7bonQKWcJj1
- 8ylT+KW4VN5QcUO6t1ILRkUMCnQofXQKiE4k0Shv1AtYQ0A+dQmQooL1BR3wszb++PyeYAwyuF
- 6gP6f2SVLT/NNyrdoi2tqRDj4CVLvnZ4L9O0q8QpJ0IqxK75EjzUjIzzZj20MAB7crdwjzmCtJ
- Q/A=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 02:23:04 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4JzDYg4f6wz1SVp3
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 02:23:03 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1645006983; x=1647598984; bh=l4AFwXW7MVNZupf53sqqLCkxfedT33Nz59g
-        VDc8IAhI=; b=nOk6KAZFeP68vK36mii76zziT4J21EDyYPFbWSr/PhsR4/ps1r9
-        XbTnHIjGbrxeN5sd1lY6Lt/s34IvzordkwkcRfHKRGLVRKaCo605sABVCsZVlJLW
-        G3Xw1B0zJ2zjgT14RkTkcoSzUj/dP/e8hFkF66eJIIC5rdqqCHux61jwIj0Ds0e+
-        CSnnQsBhAMcVD8PVaRzdGdzAwIaiXNl+ZlpRndexXKaTpDW4gR2MbwRo59IEPFGo
-        WGWA91SnuBTJNNXLP7pFJtZpfQFa8MBhog2oYnAyRpKZzfi4Gqdwcw58unbGtzTQ
-        G5znwLoPBQ8d1qg824dxuVP/gj9DWcoh/Mg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id FJoQT810Kdp9 for <linux-block@vger.kernel.org>;
-        Wed, 16 Feb 2022 02:23:03 -0800 (PST)
-Received: from [10.225.163.73] (unknown [10.225.163.73])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4JzDYf0v32z1Rwrw;
-        Wed, 16 Feb 2022 02:23:01 -0800 (PST)
-Message-ID: <3ec98d01-6b9e-77d7-aa29-9f7c4ff21d4d@opensource.wdc.com>
-Date:   Wed, 16 Feb 2022 19:23:00 +0900
+        Wed, 16 Feb 2022 06:18:58 -0500
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-eopbgr70089.outbound.protection.outlook.com [40.107.7.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB893A6;
+        Wed, 16 Feb 2022 03:18:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kVuLkFePo+O4vpVPiqT02GhWkHoYITXg05kvZhgZ2qj4hPbPxvA6aNugowzy3mTpTgSTwd3KdB2MDoiaCXo3Q12oKOWlXf5XpJ45ccjmGmnFtKetHGrtOP2Z87pWXO69pddRyzW6eltUOttBGQWEjP2igtkW+tSf/Z0xCk1cKnuZUTxghuW6MrPzzpDkihSwBYRFvIAioXX3NcFOxShyd2yY5Lesm4zeyfVJXotuwpz4SXSeZJ21tvi1/oPCk69tjGvTUpZtOVbB+P84g6rrk2p5uh+jTmjDsgjMSCRGxBxGlAjFfIy3YX1pV7dR+H2ObarpKQqT2IMhbghZIFqe+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7xGo+edj9OT9bvqFlhkz8SWq2rBrrVOKffW7uRTyhwA=;
+ b=FcMacYOpssmSao8ToegfK7KhsZ/ChfaXCagILuZ6or1/u/vcwkmLq8vuJ++ghxciW2jrxPrWgpq0iEkEnqT6WhdK0NdBn1I33BstLBBVuJN1T1FqSSv5BWS7u6iWUgHp62V8cSRtSlcql41RD9bvuRGowVZjQgJbcLS1h/hZE2LUZJ6SixwguueL3axP0QukoCaMkhYVdIPPcSiy4iGBDbiWiC07zctFPNRMoHpyP1VkwlzbO5avvkpwmVIVyiku6kRoCrfW8hjJGGt5u9578RnAscXCBGb2UoQ45dEwy/76PLzeimsbNbOQ7RAYsfq/ZehLrl5otC+3P+cWBOfaow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ipetronik.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7xGo+edj9OT9bvqFlhkz8SWq2rBrrVOKffW7uRTyhwA=;
+ b=OQA+De2LdX3sKAWWEXpBd5/H3YO7vL6wDBaUfOH0btuWk49tEEC8Ygq7JF9zVTkIeUYgdGngeQUISLSxxeNwL+noE2TxlhmCGCk93OVhb6Yb7GSODJkreIRdJ8HRDRVGnJKpH3aV6r6IDmRrD1lyc4KsZKlw2aFijnvys4SATSsYUN2S8Li6ghfcKUj2gPHanGTGhDwrwiancxHBXullcIJLX5WEyr30z/RPAcBDrs/MVsvvtjshLCRC9EzZnizxq6i5mcBB3ITJgAp017eG0KAhH1rGUIqnr6yCb5ixRgbYXQPdors1ympQISJv0sQQvddXXhCS6GRaelYeFhiG3Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=ipetronik.com;
+Received: from AM9P193MB1572.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:307::12)
+ by AS8P193MB1413.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:39b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.11; Wed, 16 Feb
+ 2022 11:18:42 +0000
+Received: from AM9P193MB1572.EURP193.PROD.OUTLOOK.COM
+ ([fe80::f127:41d:4d91:9dc0]) by AM9P193MB1572.EURP193.PROD.OUTLOOK.COM
+ ([fe80::f127:41d:4d91:9dc0%8]) with mapi id 15.20.4995.016; Wed, 16 Feb 2022
+ 11:18:42 +0000
+Date:   Wed, 16 Feb 2022 12:18:41 +0100
+From:   Markus =?utf-8?Q?Bl=C3=B6chl?= <Markus.Bloechl@ipetronik.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Stefan Roese <sr@denx.de>
+Subject: Re: [RFC PATCH] nvme: prevent hang on surprise removal of NVMe disk
+Message-ID: <20220216111841.jaunxn6blouzjleg@ipetronik.com>
+References: <20220214095107.3t5en5a3tosaeoo6@ipetronik.com>
+ <20220215191731.GB25076@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220215191731.GB25076@lst.de>
+X-ClientProxiedBy: AM0PR10CA0118.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::35) To AM9P193MB1572.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:20b:307::12)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 2/2] null_blk: remove local var & init cmd in alloc_cmd
-Content-Language: en-US
-To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, shinichiro.kawasaki@wdc.com,
-        damien.lemoal@wdc.com
-References: <20220216093020.175351-1-kch@nvidia.com>
- <20220216093020.175351-3-kch@nvidia.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220216093020.175351-3-kch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ed799b0c-8fba-4066-312f-08d9f13e16d4
+X-MS-TrafficTypeDiagnostic: AS8P193MB1413:EE_
+X-Microsoft-Antispam-PRVS: <AS8P193MB1413010291100038AF01382492359@AS8P193MB1413.EURP193.PROD.OUTLOOK.COM>
+X-MS-Oob-TLC-OOBClassifiers: OLM:179;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oT3U4USBMRieohPeykkSCKdVZU7hfynvyPil2GS3jo7iAmKBcTUPAcF5WjdLqhX3XElmOb0TrMVmfsUmDE3/JrsBMgs2ys3fZDnu6sWaGRtzyiYXb1LSv+9zBbQo9ig1Kb4LGI9IihRpPcnWbLANTz1FsPWGANlW7SB/LoNt4Hg9hBf+mKO5arnZnnJ2XR3fb768D0VrNMDrU3TOvoO5AwaqKNFRhCH+wXMIl1olXusD4ezGlZC8pr275IszKFkXT4K67H7vSHZdRLjLjQlS/W0NsXR6/zeeYh0T+/3PjTViP2SZJvaBgSwAZ+nCzH0nHElGoEJjavXhreQMEorCfCJGou9U3NWcMuE2B84U6uHBZeg4ws6Ys0hkm4mQPXNZ7YCfKx0zdbEOZTFMp7PQ7a+VNeR4WFXvADz/oHMJvV8iZgjUa/jmv09ILS5nv1o4CPGqM0fypFKRPeXD15GmTI2DMh40pBxf7IBxCEYfIkQuNpCqvS3G6ed3avZIPWq9kW4833CWqX3g/5tMIfESikMJBcGMO3G5ZLZt3FwnawrUz1YXGEmmKnF9Yie43TzaTFkElf4d6vzXPjPUxCNdlUtfZI6mrfOWvQ5RtVswxR6rct3jl5OY9VQGC2vqTyqJdIIJWHOOeNKHroARoijFWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9P193MB1572.EURP193.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230001)(366004)(6506007)(86362001)(66556008)(36756003)(6486002)(508600001)(52116002)(6512007)(1076003)(38100700002)(316002)(54906003)(83380400001)(2906002)(4744005)(8936002)(5660300002)(8676002)(6916009)(4326008)(186003)(66476007)(2616005)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q0tNaHk0M3RWejRseWU4cUNPM0FmQVoyREpVYWNMM3JxbFk2T05ndmdVdERS?=
+ =?utf-8?B?MVB0TGJWV3NCci8ydlh4ems4TGhCZW1mR1NOUW81TkFhVVJhY2kreko2QitM?=
+ =?utf-8?B?ZXBxcGNBancrd1lvRCsvQWxHTVBScGFrUmM4aXNhemhGeEQ4YWF2dVRXZXlQ?=
+ =?utf-8?B?Y1JpcjQvT0tGSDJObEFrZFVjVXU2MDFuZ01ad3cwdkJjRzRwL1h4RUdySE02?=
+ =?utf-8?B?U0lTV012TkNaQ2xIbzJOVWFqRmVpeUI3K21NbG9MZFh4a2g3WnF6Yyt4ZTNh?=
+ =?utf-8?B?dHpHZnJkN2FEWFRzSGxEYXN2Z3RnZFQ1T1U5TWJkQU9BRHlWQzlrZjFoU01T?=
+ =?utf-8?B?RzlPTnNWN04yVEhmcVhEUmE4R0d4Z2NScVlKYTJ6Ym1raHpRYVZCQ2xOVzQ1?=
+ =?utf-8?B?eU15WXJhdFFUNEorYjFHdjlENlRObGJleVJPL3lOaUNjdHpPUDBPODU2cjRX?=
+ =?utf-8?B?ZjRmcVduMWN1aW0weWhtdjM4TGxCR1JwdkZRYmJhWW9XOEg1eHdDRFVQalNZ?=
+ =?utf-8?B?eFJQMll5ZU1HbERjN0ZTd2lLMzF0S213NnpRL0puRTNTMTlUeFdOTmszak5y?=
+ =?utf-8?B?aU1QRitUOTA4N1l3ZTQrMThFUDZOMmp2M3gycFd2YmVvbEJsUXVKeE8xeXZw?=
+ =?utf-8?B?QmdFUVpJSjM3TUxVQVd2QkJKUnJYZHdaVlFrR3JtYis1czV1V0lLUHRtMU0v?=
+ =?utf-8?B?dmpOeFM1Q1VJdDhrTDN2MHN0a3J5QWh6ZFFTQUVUcjFVeU91U2VnRWlGN0p5?=
+ =?utf-8?B?ZGNkM3RSUkZZVy9HRWJqbjV2ZW1JSG10amduRG9ncVhFcWhzek1zR3Y2MVUv?=
+ =?utf-8?B?UktPdmZhR3ZkZC9nWkZXZHQ4TXhpTGNvcDhVM2VUU2hWeDB6ajU4dWU0V25s?=
+ =?utf-8?B?N241dDNVVEhZdThwOTEzOW13anlxUkR5MHhUaDJOYTZ3cXZSbDdNM0hzWGRU?=
+ =?utf-8?B?MEVwS1dWK0M3K01ZbTVVNStHTExWbDdBbUNWcUQ0TlgxWVhBakNkVzBaeVNB?=
+ =?utf-8?B?OStFeUpacVBwLzQxTkxiNmlKWVNNbG8rYnpyeEN2Uk9mVm11THNZS3E3NWlI?=
+ =?utf-8?B?NytyVWFNQ2V0amtXT21ZWEZKTVIzWnltOGx3Uy9NMkhyTzRiNWp1ZUUwR3gz?=
+ =?utf-8?B?T3BlekQ4eHkvSHFyM29nazlJMjJYR1RLWUEvY0U2QnAwbktxY3B0ZUI2SnVv?=
+ =?utf-8?B?OVNPakQ3OWhCcGtxaXJYMndSaXlPRDBLMkp1anRId251cjg4dzZLQnNrWHZF?=
+ =?utf-8?B?QysvVmJzRVdOZ2JoWGhuL1pRMVQ4bTgxZHlpYzRuT0FHNkVUd3ZXV0pSdC9J?=
+ =?utf-8?B?Z3dtazRiQjlnb1djTFRKVVNueTRCaXFJaXJxd0ZabWxxd0xYTmtkU0FKZ0Qz?=
+ =?utf-8?B?U0pnMVRYZDBFd1NvVmd5NS8vS09kS0VWMFU2RmI2NWdLdXR3eERtSGUrUDVs?=
+ =?utf-8?B?ckRkRnpGbjFHWUFoN09UamNEdWRSendmeHdrT3AzOUNib3l2WW9hZ1Y2SWhD?=
+ =?utf-8?B?NlRnSTE1SWVHVVB6OFNSYXBkMXlQYUtmc3FsNklHZWlKU0dwT08rZC9VaXpo?=
+ =?utf-8?B?NkhIMkV4Nkg4a2wzTXNyVytZM21HeHo5SElDNyt5dmkvdWd4ZjJPRmRNUk5y?=
+ =?utf-8?B?UjF2Tzl5cXpxVnBEWEtpcktlVkVqSU42aEs2clhEVXg2OENjbzg4VlVtNlVR?=
+ =?utf-8?B?MGNocnd6VXZGOUtJdzBnQ3NDbjlCelFsRlBQbk9DMkI1SnhEN1BIcHhPUXFR?=
+ =?utf-8?B?VWYrdUxRc0lxTnZ1cjR1QUlBNGJ3WEhzOXIzbW8wcjZKZGZ2Y0JSaVRJOUJo?=
+ =?utf-8?B?MGN6TXZoeWV0T3ArSnp0NjlDVERSQmhuK25GTjh3bUhuMm5sUzI3VCtHeUVG?=
+ =?utf-8?B?SmFqTFNrOFByZWQwcGgwRWlMQ2Evb1hJUHYwYzg5UDBzRDl1MzZncFNrOURy?=
+ =?utf-8?B?RjluSktHMVNyOHpBd3F5QVdPTGJVVkh1WWVuQ1hpSkw3YzdONnlIT20ydGdI?=
+ =?utf-8?B?QTBNUXRkSUQrbnJtZlBEM3FZaFNaRUtweXBZdHgrYzhMblJvUHRzNGFJSHl4?=
+ =?utf-8?B?UlJVcGRWb0lWcVk2NHRJeVNPd0tubHEwSmdzNWQ0Uk5lMVNNSEF6c1pSaGRZ?=
+ =?utf-8?B?V2NsZGJvSFdzWFpzUGVWS3Jnc2NyYnBnUkZtbmVnT2FzKzllbmJwbTZHMGQ1?=
+ =?utf-8?B?ajJGa1hUY0hhMnRrQk1RcGYzcElpVXY3NXhEcTZvS3ZiaU9QMVVmQ09QZDhG?=
+ =?utf-8?B?dU1DNU53UWdzT2xLdzh2Z0N6UGpHMll0a0NxelkvSkpOQ0g4REtIMjF3MElp?=
+ =?utf-8?B?Mi95RitKWXI5VTYraHhlVzRFQ25ZZi8rQ3NEMEZlTEVoaHNJaG5sUT09?=
+X-OriginatorOrg: ipetronik.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed799b0c-8fba-4066-312f-08d9f13e16d4
+X-MS-Exchange-CrossTenant-AuthSource: AM9P193MB1572.EURP193.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2022 11:18:42.5406
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 982fe058-7d80-4936-bdfa-9bed4f9ae127
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FvMAkNxoXoB92hmewYmela7pyHGLHzxelLmnB2mSKSatRND14+xRbu0xFX/HJS4DXSgYSC7JGCbQZKIuTRysttO/sP04WdSEdWg3GZyZGeo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P193MB1413
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/16/22 18:30, Chaitanya Kulkarni wrote:
-> Follow the pattern what we have in bio_alloc() to set the structure
-
-s/what/that
-
-> members in the structure allocation function in alloc_cmd() and pass
-> bio to initialize newly allocated cmd->bio member.
+On Tue, Feb 15, 2022 at 08:17:31PM +0100, Christoph Hellwig wrote:
+> On Mon, Feb 14, 2022 at 10:51:07AM +0100, Markus Blöchl wrote:
+> > After the surprise removal of a mounted NVMe disk the pciehp task
+> > reliably hangs forever with a trace similar to this one:
 > 
-> Follow the pattern in copy_to_nullb() to use result of one function call
-> (null_cache_active()) to be used as a parameter to another function call
-> (null_insert_page()), use result of alloc_cmd() as a first parameter to
-> the null_handle_cmd() in null_submit_bio() function. This allow us to
-> remove the local variable cmd on stack in null_submit_bio() that is in
-> fast path.
+> Do you have a specific reproducer? At least with doing a
 > 
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->  drivers/block/null_blk/main.c | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
+> echo 1 > /sys/.../remove
 > 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index d78fc3edb22e..e19340f686a8 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -719,7 +719,7 @@ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
->  	return NULL;
->  }
->  
-> -static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq)
-> +static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq, struct bio *bio)
->  {
->  	struct nullb_cmd *cmd;
->  	DEFINE_WAIT(wait);
-> @@ -730,8 +730,10 @@ static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq)
->  		 * __alloc_cmd() and a fast path call to prepare_to_wait().
->  		 */
->  		cmd = __alloc_cmd(nq);
-> -		if (cmd)
-> +		if (cmd) {
-> +			cmd->bio = bio;
->  			return cmd;
-> +		}
->  		prepare_to_wait(&nq->wait, &wait, TASK_UNINTERRUPTIBLE);
->  		io_schedule();
->  		finish_wait(&nq->wait, &wait);
-> @@ -1473,12 +1475,8 @@ static void null_submit_bio(struct bio *bio)
->  	sector_t nr_sectors = bio_sectors(bio);
->  	struct nullb *nullb = bio->bi_bdev->bd_disk->private_data;
->  	struct nullb_queue *nq = nullb_to_queue(nullb);
-> -	struct nullb_cmd *cmd;
-> -
-> -	cmd = alloc_cmd(nq);
-> -	cmd->bio = bio;
->  
-> -	null_handle_cmd(cmd, sector, nr_sectors, bio_op(bio));
-> +	null_handle_cmd(alloc_cmd(nq, bio), sector, nr_sectors, bio_op(bio));
->  }
->  
->  static bool should_timeout_request(struct request *rq)
+> while running fsx on a file system I can't actually reproduce it.
 
-Since patch 1 rewrite this function already, you could squash this patch
-into it, replacing the can_wait argument with the bio argument.
+We built our own enclosures with a custom connector to plug the disks.
 
+So an external enclosure for thunderbolt is probably very similar.
+(or just ripping an unscrewed NVMe out of the M.2 ...)
 
--- 
-Damien Le Moal
-Western Digital Research
+But as already suggested, qemu might also be very useful here as it also
+allows us to test multiple namespaces and multipath I/O, if you/someone
+wants to check those too (hotplug with multipath I/O really scares me).
+
