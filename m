@@ -2,143 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145F0C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 08:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8B5C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 09:12:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230456AbiBPInI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 03:43:08 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:45498 "EHLO
+        id S231935AbiBPJMi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 04:12:38 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:48404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiBPInH (ORCPT
+        with ESMTP id S231600AbiBPJMh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 03:43:07 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8402D1704E2
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 00:42:55 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id x4so1487148plb.4
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 00:42:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qY0+CcAiCiceVtxes8e3Q80Ldr0PhM46jmJFDF3A7ao=;
-        b=mLdrZdU4n4hLz+N3Llpx0+c6nTTU2S6rggBmN5QzR6DWCTWxzGr/FkJHfcr3iGgcQZ
-         2euVNeKqQpiYwCSF0KlsIdjN4NwxBBNTZbN4kdfF0Z4Gx9qeGC167tW0D1VvgIyP0EMs
-         S+C9QXMT/rWSDOJdrZiILLrk9pmNgG11fbo0X/n8z/0DZksRX7HvQ7Ha2kqFK7QISewo
-         6OyBMAIIbd7i0PrFwA3IXHKXNLotKsSjmGfnAD+NfDQh74JwJ3Ey7jSHcoi0tCkfJHqf
-         gOmwtxDZCSh46JRfLyCFSWz8NwMAiAoE1YFz2ZRn6OQHa3XS2o/edgymSC0n23HJl24p
-         er3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qY0+CcAiCiceVtxes8e3Q80Ldr0PhM46jmJFDF3A7ao=;
-        b=Lf1kZA6bUmSj68Oqw2LSwKVSd032AN17oV4TtHS4Ckoi1F4w9YGS0SyBA+WiVfsGB8
-         1WQm6/zIivTmqKZbTgI/S9ewctc0YxnzIIR1MzPje4TDJgIyM2bYGagt0jTislbFomgf
-         gUS92CJZW5wMxQtbdJuAF/FVDL4KzVpqYkC5k0Scy73q+677YNP50A2pu3mGLKiYnDPa
-         EHK2wa3gekY+3P+hX7wERc4UscHBWpec7r5n43eMs/LhQIDqQRM7mn+Was4/G9Bb2qYq
-         Mj1QJMBFHW3VwOU7vBg/LWzv6G9H5yUcsNSLXB/61tigW80N9UUtF3iw1tRcxNwsdEUi
-         7OjQ==
-X-Gm-Message-State: AOAM5313H0Xb/XzGtIB0wjyC4+FbhyIj+LIiceKtnB/E1bjI7Ipfs5DU
-        +LJ6yfnZObMXyYtcWt5Dgl9FvZL2RN4=
-X-Google-Smtp-Source: ABdhPJwtHDsJFe3QosyD2uHzDXuy4WnT1LcwQE4N6kCZcuyueb3iBlh/JG83bFAvykbUC7E6AVRkJw==
-X-Received: by 2002:a17:902:9a0a:b0:14a:199:bc5c with SMTP id v10-20020a1709029a0a00b0014a0199bc5cmr1531421plp.10.1645000974936;
-        Wed, 16 Feb 2022 00:42:54 -0800 (PST)
-Received: from ELIJAHBAI-MB0.tencent.com ([103.7.29.31])
-        by smtp.gmail.com with ESMTPSA id g11sm5390491pfj.83.2022.02.16.00.42.53
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 16 Feb 2022 00:42:54 -0800 (PST)
-From:   Haimin Zhang <tcs.kernel@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Haimin Zhang <tcs.kernel@gmail.com>
-Subject: [PATCH] block-map: add __GFP_ZERO flag for alloc_page in function bio_copy_kern
-Date:   Wed, 16 Feb 2022 16:40:38 +0800
-Message-Id: <20220216084038.15635-1-tcs.kernel@gmail.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+        Wed, 16 Feb 2022 04:12:37 -0500
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on20606.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eb2::606])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F5966ADE
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 01:12:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S6fCKCMoPuuNwzf4QHf1AkzU/YDoSp2uR/2nqHfDzxjg8skbR21V/4eMMg/nZo1VFp483/CnhZkkARdnEJDxQJb6rIZ7Ij/OBrJXSP78HguBqibRAUXxThjjPBnp5rRPGqBROfFgLy0cY2lQrabMc7VGhJrOWdEle5C57AXF74yl/mtH9lIkzWjMOPRYr4uj7SkpG5RUvq6cZbJD0fAjuIoE4FGMEZBHwZXzHCdh7NX645Keofk4s7yoLYOq0u8B3es07clzSdp4A3aaQ3N08jseCc36dYY0qAT4o8ZTt8xjFAAHlLL6lZR3F6tRmPendufXqnE/HIQomuQQgjiXSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GUMVSn+dL0bMvHACHrX4jykZUWTSylIblUGgKr6cjZE=;
+ b=nm0cBE/ATun81/Ox8j/K3FWCA4mgL1k+eHyrWIfqmMIi3O+KqO4BcFtG6LLWiCM0wr5+6IeFGZ6qtnflJ8vpjJUsyP8k4ud+gY0kVP1qUdcxGEoq140ftICFjFWUziDIVhzJrQd4QPh4nemy63v/LYnreecNzqOXiV+36ikVNbi/4yt3FZobAcQ3diEZlXv72H7yqm0kBsrQ/SaVGk7PffzyTtkLvgR2+5R3QQ+dy8wM8bw/F9vVCrpQS3b1Zw6B8tyfyAgyOZA/OIUPXAC9X8uGltWrNDtG0dS/au7CYwHCOJROYqkCAd4M5MWQNlLeUECyB3GAaHu0C3GIwh6k6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GUMVSn+dL0bMvHACHrX4jykZUWTSylIblUGgKr6cjZE=;
+ b=oYGzK6SgxPtf5X/OX0LSG0NQbOdwzyNyjzhnkWYlk75EpmI+5M5XKhJJbR5FOufR7JeUZed9/Jd7uYoLL41hzGGWPJps8Jvz+sSUe17ZjOz1DDyZlr9l0f64SNrNxzWMaEUyhdBsY2sVDMFIoNHiyRYh275I2VqiAL3Z4pKpjJiZuVjHbIbsBC1sfW8vuTDdeaVDIKPzriwcFr3vuc4/rbDtrMtMhUoQrGLbSBzd+QmO3YMH1KqKxr1L73/ZruXgzXvlWq0VTUep6htsOB9oIJ97Oy7hAy7OgkgdqT47pZRyvYRvCUfxo8JoxQ+y7Jw4iz8oNjjNA7m5S9Z86ET8pA==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by CY4PR1201MB0069.namprd12.prod.outlook.com (2603:10b6:910:1a::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16; Wed, 16 Feb
+ 2022 09:12:22 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::846c:d3cd:5a30:c35]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::846c:d3cd:5a30:c35%5]) with mapi id 15.20.4975.017; Wed, 16 Feb 2022
+ 09:12:22 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Haimin Zhang <tcs.kernel@gmail.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block-map: add __GFP_ZERO flag for alloc_page in function
+ bio_copy_kern
+Thread-Topic: [PATCH] block-map: add __GFP_ZERO flag for alloc_page in
+ function bio_copy_kern
+Thread-Index: AQHYIxE0/IIgYxhY8EW3m7YIWmu8s6yV5HiA
+Date:   Wed, 16 Feb 2022 09:12:21 +0000
+Message-ID: <47002290-3064-7de1-25e6-0716a89b94c0@nvidia.com>
+References: <20220216084038.15635-1-tcs.kernel@gmail.com>
+In-Reply-To: <20220216084038.15635-1-tcs.kernel@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0800a30c-ae1d-41fd-5e13-08d9f12c70a9
+x-ms-traffictypediagnostic: CY4PR1201MB0069:EE_
+x-microsoft-antispam-prvs: <CY4PR1201MB00697E1195BEB8468F4AE896A3359@CY4PR1201MB0069.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DM8vRnGLhFROgo+yPcltW0oWkEv0dg8wFqy6409Ca3g3wSXzVNgxO4nI4MHRg2g/WK/pv4+xqrhIo5fmYqucOD3O93DVif51WkKU9YzfIdXr/OZfL3Jvc/n7kxqXLUCVKb44GOsg2CWyZdDbbxfJFwadieChHNw0uTd+ITFYkeEJaES+NvF2mvsJwrgB75XGmBemL9e3a7MPh9E8l/BZCQvZi9p6/Ut4R3fh9S9NFF34xICfWZsT2YLZgv/ydbKufjS7G5MZs8z0aWX/lNz32BNvQcF2k9jUMnoUji/7cXaRJTItTP8HQWwQCRvSJKBR9M6MyDlblksvxl8r0XMzvhm+iyIaP9z+AiMst37o7wCKM73o5dwE7rRtpMqdr6pVL3gCl/+ipskwpctmbNXCK1oiJahZJEWoqEH+1OnIb+38U30n0JJpjxR6kWmUdJSekOM1wgCDb+zFpEwGfBWXpBivAZEm1mMarZbTdlwbIAJ7sVFW/a2L31G+6CDZvDQEGbDEHjiW+i163WCvs0dSB+/czssFtknREfSXYLBhb5dmT1aZ5MuhgzeObgVfBXxdlTp3EJdQBRCWEMSLZroWd8k6tnpiCs8Pxto0xPo9Rb2LSCGCjFVLgbFQ1qz0yhAzE5jvVhAQG5j4kBtYTJLmey2DzhRtccgJba4BYLgUA7kyuw9/REcXnQg2nmZKCrRlV6PsQZ5243/iY4d6Q9jNV5ltsgFt+PWRoCXHRjU5roOIxYB9NscXkjSGiolfX5Q0RKVh4TVBNMRxkoGb+pA5OQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(31686004)(36756003)(71200400001)(38100700002)(54906003)(2906002)(6916009)(83380400001)(38070700005)(316002)(6512007)(6506007)(186003)(6486002)(8936002)(53546011)(76116006)(91956017)(5660300002)(66556008)(2616005)(66946007)(66476007)(4744005)(66446008)(8676002)(86362001)(64756008)(4326008)(508600001)(122000001)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YUNsaUVBVE1tUDhoQzdrTlB0ekVMTlgzMnA1QXRFVE9EbzZxRFpIQU0xbnBV?=
+ =?utf-8?B?ekV3RUViNk1qYmJDc09CZUVvUXpZM1A0TG1xd1FCWUFNczBMZ0NQTnJHNTE4?=
+ =?utf-8?B?UmpwcXRvck44dTZvTW5wWEV4Rm5xK1orMlVBeVppU3dxNDIwaThQZEw3Zkth?=
+ =?utf-8?B?UnVWNExvcy9SK2tBSGJveTBNcGZUdGQxN3c1WGNWd0hKUGhUcU1tSWN2d1Q2?=
+ =?utf-8?B?VC9IV3F3SU1OTUpzUDVaNXpveU13R3JBQ2FNRkVFcjQxY001N1JPSzBoUGFt?=
+ =?utf-8?B?NkkwMVZwc2pudHZSNWExNkhUakh6OFE3YVBHSW05UTRxZEdWRExvdDNFQXI3?=
+ =?utf-8?B?RUhBMjV6QzBPZUc1V3lzbkxpdkR0UCtPZk1tejJmUi92eG5xajNLMmVveGxH?=
+ =?utf-8?B?OWt5TXJnUlBBb1d1dGJpQmJhZ2s0S0tuMHQyR1Fwc1RmM1Q0dlNMSUk1b0xx?=
+ =?utf-8?B?bEdnbmNkK1ZVRzFjOVdGUWRoTmo1TXhiMElJeU05eUNVbTVoMWoxeVFBZG5V?=
+ =?utf-8?B?MUkwcDN5eEk0Tzc5SDlYaUZzTTVPRjQwU1RIOHVGNWhGY2lsWXYyNnZIbG8r?=
+ =?utf-8?B?bXdzc1JyS24xK25XdkU3RTBibFVEanNMMXQreEFmb21lQjNMUkZySHlUQS91?=
+ =?utf-8?B?ZUNFOExDYWkxNjlMamVSd09jdTY3MFZsMHFna0hZN29IUUlmU08zU0d2WVhV?=
+ =?utf-8?B?WTRKdWgwalFlNStmekFheXVWblc3ZXBmQjAyRkhxYURyNUxpVVdrNW5HVHlS?=
+ =?utf-8?B?dWJLeTdnNnFPelVZRFJtbnplcE1pYlRVVTZ5SkZ4blRSV2FlbnRLUWhRS2Rp?=
+ =?utf-8?B?bjFieUFPenRsT05MQ0dMTHhYSDUvNXY0QXdZNWVpQVFOVFJzUE5TdEJyY2ZX?=
+ =?utf-8?B?UUhWUzVQUmR1UFIwOVlvQVRtWktsTkkyR2JvMGloTmV6Ni9QRGdCbmpVTmhk?=
+ =?utf-8?B?ZVVkb0ZKNUs3dFRiV2tmeW5MMVJCVy9vemdReFF2ZmRDY3NKVEtkcjIrRU9l?=
+ =?utf-8?B?dnJ3L3hRbnJXbXRzMmIzRGlnbS9vS1hNZyt2SUpuQ3pleWRUMkN1Mkt2eGFu?=
+ =?utf-8?B?cHU2SFBWd1VZd1JyZHg0SkZIL2NQc3NpbFRYcUo2c2hWTzJGL0pDVGVOcldU?=
+ =?utf-8?B?OEtHWmlodWxhd1hCWm5sdENGQjZ4eUdjeHprQkFQamcrS2xnQ1lwWE1XQTF4?=
+ =?utf-8?B?d0FPT0V4SGd2dkQzUms3N3RWQm9KNU5taFQ0SkVIcVkrdFpxQXBVa3hXU2E1?=
+ =?utf-8?B?K2ZaWGdDVTYyUWE4OUthMncxOUswMnJQdmJwVkdOQTlrdjlIUURCa2ZybWVr?=
+ =?utf-8?B?bk5PcFlGU0NuWFNxZ1ppUGtlRFN3ZTJvTVIzRmttckg0U0s5bGVoUTZSZHJ2?=
+ =?utf-8?B?dGQrMzRZNkN3UmVybzc4QjQwM1czaFdyWU9wdzdaWkYyOEZ2Szc0Y3lhTXA2?=
+ =?utf-8?B?YlJGaUdGWDhvcVVBTEZEWUVNYW9FeFlnRlkvbEdrLzJZWS90MzNqYUFLV1V5?=
+ =?utf-8?B?b1kzRXdrTEFjWTlWY3gxUlovOFMrSndrZU9qZ25lTkJiWk5oK0RCOWlac2Nn?=
+ =?utf-8?B?M3A5WFd3WS9hdVgrOE9qemRBak1OVFhiZm9LNnhiQ2gvVTdZbEZxcGxSTEVW?=
+ =?utf-8?B?UXozTlZnNGJacytaVG9MVFFsMnRQQWtqS0FzVVJNZE9NSFFQaVBzZ2ExNm1j?=
+ =?utf-8?B?RkNQK3RVSTBNNitYbWpIRy9HZW1CR3ZxaC95eENBbFRBMzdSWWF6eUoxa2Ew?=
+ =?utf-8?B?UGx6V0FXTUg4V1JzTnRpYm5lM3RCSDhoUkFjeGt1U1dUUjAxVTkxMWNqMldN?=
+ =?utf-8?B?S2o0Y3ZGUlh4RUc0TnE1TFZLU2Vpa1JORkFFUUUvbml1VjYrR082S0w1MDRa?=
+ =?utf-8?B?UDhmVGNRUm9GVWdsVk5hOHFnd2hBbnFqS09NNkJUMkJuci9XTnFMVmRQemlX?=
+ =?utf-8?B?dVFHTTEyeW9pMWxvdGx6SE1pQ1ZwVlE4aWlYY1NkQlpjQ21CTHhnSUJZS1Nm?=
+ =?utf-8?B?aldEVm52U1BrdjcxblZXOVd3cHJlQ2haOXp6TUhZYWpRU0JPbHRaODZMYUE0?=
+ =?utf-8?B?bzBRemVlSk1ObkV6ZFhnL294NzZHRkxZWUFIUzMwUGdKWmgyWG5wYmhpR3FX?=
+ =?utf-8?B?ZkNidHV2VG1TUlhHTzRoYnAxYktydE1qdFQyRVIza0FKMDNpZWFoMjFBa1VU?=
+ =?utf-8?B?TTgwN2w4YXRkU0VzZ2FYYUkyeTMvWHN0VVFaYThVUTNFdlBrMXJlenYvR2Rj?=
+ =?utf-8?B?ZkhuOXlPRkVuVE5JUEl0Qy8xeDFBPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F986B69AB8B5CC409E22E6A3432042EB@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0800a30c-ae1d-41fd-5e13-08d9f12c70a9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2022 09:12:21.9076
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 89PEBIkl1PLpZ/U8m4vYPZNwKq285nbV+gULasTXrun9NQ8//3yZGpym1rZ5Ydm7b5Kh0IQ/B0w0KpNQ8OG6JQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0069
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add __GFP_ZERO flag for alloc_page in function bio_copy_kern to initialize
-the buffer of a bio.
-
-Signed-off-by: Haimin Zhang <tcs.kernel@gmail.com>
----
-This can cause a kernel-info-leak problem.
-0. This problem occurred in function scsi_ioctl. If the parameter cmd is SCSI_IOCTL_SEND_COMMAND, the function scsi_ioctl will call sg_scsi_ioctl to further process.
-1. In function sg_scsi_ioctl, it creates a scsi request and calls blk_rq_map_kern to map kernel data to a request.
-3. blq_rq_map_kern calls bio_copy_kern to request a bio.
-4. bio_copy_kern calls alloc_page to request the buffer of a bio. In the case of reading, it wouldn't fill anything into the buffer.
-
-```
-__alloc_pages+0xbbf/0x1090 build/../mm/page_alloc.c:5409
-alloc_pages+0x8a5/0xb80
-bio_copy_kern build/../block/blk-map.c:449 [inline]
-blk_rq_map_kern+0x813/0x1400 build/../block/blk-map.c:640
-sg_scsi_ioctl build/../drivers/scsi/scsi_ioctl.c:618 [inline]
-scsi_ioctl+0x40c0/0x4600 build/../drivers/scsi/scsi_ioctl.c:932
-sg_ioctl_common build/../drivers/scsi/sg.c:1112 [inline]
-sg_ioctl+0x3351/0x4c10 build/../drivers/scsi/sg.c:1165
-vfs_ioctl build/../fs/ioctl.c:51 [inline]
-__do_sys_ioctl build/../fs/ioctl.c:874 [inline]
-__se_sys_ioctl+0x2df/0x4a0 build/../fs/ioctl.c:860
-__x64_sys_ioctl+0xd8/0x110 build/../fs/ioctl.c:860
-do_syscall_x64 build/../arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x54/0xd0 build/../arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x44/0xae
-```
-
-5. Then this request will be sent to the disk driver. When bio is finished, bio_copy_kern_endio_read will copy the readed content back to parameter data from the bio.
-But if the block driver didn't process this request, the buffer of bio is still unitialized.
-
-```
-memcpy_from_page build/../include/linux/highmem.h:346 [inline]
-memcpy_from_bvec build/../include/linux/bvec.h:207 [inline]
-bio_copy_kern_endio_read+0x4a3/0x620 build/../block/blk-map.c:403
-bio_endio+0xa7f/0xac0 build/../block/bio.c:1491
-req_bio_endio build/../block/blk-mq.c:674 [inline]
-blk_update_request+0x1129/0x22d0 build/../block/blk-mq.c:742
-scsi_end_request+0x119/0xe40 build/../drivers/scsi/scsi_lib.c:543
-scsi_io_completion+0x329/0x810 build/../drivers/scsi/scsi_lib.c:939
-scsi_finish_command+0x6e3/0x700 build/../drivers/scsi/scsi.c:199
-scsi_complete+0x239/0x640 build/../drivers/scsi/scsi_lib.c:1441
-blk_complete_reqs build/../block/blk-mq.c:892 [inline]
-blk_done_softirq+0x189/0x260 build/../block/blk-mq.c:897
-__do_softirq+0x1ee/0x7c5 build/../kernel/softirq.c:558
-```
-
-6. Finally, the internal buffer's content is copied to the user buffer which is specified by the parameter sic->data of sg_scsi_ioctl.
-_copy_to_user+0x1c9/0x270 build/../lib/usercopy.c:33
-copy_to_user build/../include/linux/uaccess.h:209 [inline]
-sg_scsi_ioctl build/../drivers/scsi/scsi_ioctl.c:634 [inline]
-scsi_ioctl+0x44d9/0x4600 build/../drivers/scsi/scsi_ioctl.c:932
-sg_ioctl_common build/../drivers/scsi/sg.c:1112 [inline]
-sg_ioctl+0x3351/0x4c10 build/../drivers/scsi/sg.c:1165
-vfs_ioctl build/../fs/ioctl.c:51 [inline]
-__do_sys_ioctl build/../fs/ioctl.c:874 [inline]
-__se_sys_ioctl+0x2df/0x4a0 build/../fs/ioctl.c:860
-__x64_sys_ioctl+0xd8/0x110 build/../fs/ioctl.c:860
-do_syscall_x64 build/../arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x54/0xd0 build/../arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x44/0xae
- block/blk-map.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 4526adde0156..c7f71d83eff1 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -446,7 +446,7 @@ static struct bio *bio_copy_kern(struct request_queue *q, void *data,
- 		if (bytes > len)
- 			bytes = len;
- 
--		page = alloc_page(GFP_NOIO | gfp_mask);
-+		page = alloc_page(GFP_NOIO | __GFP_ZERO | gfp_mask);
- 		if (!page)
- 			goto cleanup;
- 
--- 
-2.30.1 (Apple Git-130)
-
+T24gMi8xNi8yMiAwMDo0MCwgSGFpbWluIFpoYW5nIHdyb3RlOg0KPiBBZGQgX19HRlBfWkVSTyBm
+bGFnIGZvciBhbGxvY19wYWdlIGluIGZ1bmN0aW9uIGJpb19jb3B5X2tlcm4gdG8gaW5pdGlhbGl6
+ZQ0KPiB0aGUgYnVmZmVyIG9mIGEgYmlvLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSGFpbWluIFpo
+YW5nIDx0Y3Mua2VybmVsQGdtYWlsLmNvbT4NCj4gLS0tDQo+IFRoaXMgY2FuIGNhdXNlIGEga2Vy
+bmVsLWluZm8tbGVhayBwcm9ibGVtLg0KPiAwLiBUaGlzIHByb2JsZW0gb2NjdXJyZWQgaW4gZnVu
+Y3Rpb24gc2NzaV9pb2N0bC4gSWYgdGhlIHBhcmFtZXRlciBjbWQgaXMgU0NTSV9JT0NUTF9TRU5E
+X0NPTU1BTkQsIHRoZSBmdW5jdGlvbiBzY3NpX2lvY3RsIHdpbGwgY2FsbCBzZ19zY3NpX2lvY3Rs
+IHRvIGZ1cnRoZXIgcHJvY2Vzcy4NCj4gMS4gSW4gZnVuY3Rpb24gc2dfc2NzaV9pb2N0bCwgaXQg
+Y3JlYXRlcyBhIHNjc2kgcmVxdWVzdCBhbmQgY2FsbHMgYmxrX3JxX21hcF9rZXJuIHRvIG1hcCBr
+ZXJuZWwgZGF0YSB0byBhIHJlcXVlc3QuDQo+IDMuIGJscV9ycV9tYXBfa2VybiBjYWxscyBiaW9f
+Y29weV9rZXJuIHRvIHJlcXVlc3QgYSBiaW8uDQo+IDQuIGJpb19jb3B5X2tlcm4gY2FsbHMgYWxs
+b2NfcGFnZSB0byByZXF1ZXN0IHRoZSBidWZmZXIgb2YgYSBiaW8uIEluIHRoZSBjYXNlIG9mIHJl
+YWRpbmcsIGl0IHdvdWxkbid0IGZpbGwgYW55dGhpbmcgaW50byB0aGUgYnVmZmVyLg0KDQpidXQg
+YmxrX3JxX21hcF9rZXJuKCkgZG9lcyBhY2NlcHQgZ2ZwX21hc2sgZm9yIGV4YWN0bHkgdGhpcyBz
+YW1lIGNhc2UNCmFuZCB0aGF0IGlzIHBhc3NlZCBvbiB0byB0aGUgYmlvX2NvcHlfa2VybigpIHVu
+bGVzcyBJJ20gd3JvbmcgaGVyZSwNCnNvIHlvdSBuZWVkIHRvIHBhc3MgdGhlIF9fR0ZQX1pFUk8g
+ZmxhZyBpbiB0aGUgc3RlcCAzIGFib3ZlDQooc2dfc2NzaV9pb2N0bCkgYW5kIG5vdCBmb3JjZSB6
+emVyb2VkIGFsbG9jYXRpb24gdGhlIGdlbmVyaWMgQVBJLi4NCg0KLWNrDQoNCg0K
