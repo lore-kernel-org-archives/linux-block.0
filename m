@@ -2,41 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F46C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 04:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A27BCC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 04:42:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344278AbiBPEeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 23:34:17 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45906 "EHLO
+        id S1344451AbiBPEmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 23:42:17 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232657AbiBPEeQ (ORCPT
+        with ESMTP id S245232AbiBPEmQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 23:34:16 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEDADB7C6E;
-        Tue, 15 Feb 2022 20:34:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VTnUeYEN/ux3yU4giIFFK259vlfxLfwy7+DV+rNURNo=; b=AtozEhme1vnLMD/TWoB8IIDEFL
-        R6tadFetshclOhJLIVIpFqRhbxTDXTJ7BTLSDyENrf3HD4HTn3QmRnwcG/GLW315O4+X16t92795G
-        1OG6FnVToqynAjjvbbL0s2Vd8FjQ1SoK5ytLW1gqJHR4a2yOkHWiLo0g2amMEcjQ8zFlexF8qy1Zc
-        1Wsu1Fg8sk/TE9Qj3FVSmcCEDwcyx6AISbAblirEKVuEiCAE20Ea2SlUXMkPrNlY8bnxmQ/aT9U9c
-        lDbPwsVz2aXuu6UfBEQINHQFCcgXgFcEu68UHFLIRDHlSdpV/iMzBZjNJNWi8p25ZzYT38Imx3vLm
-        FWHf4KFA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nKC0b-00EQi5-HP; Wed, 16 Feb 2022 04:33:41 +0000
-Date:   Wed, 16 Feb 2022 04:33:41 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
-        torvalds@linux-foundation.org, mingo@redhat.com,
+        Tue, 15 Feb 2022 23:42:16 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 78C22C2481
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 20:42:01 -0800 (PST)
+Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
+        by 156.147.23.51 with ESMTP; 16 Feb 2022 13:11:56 +0900
+X-Original-SENDERIP: 156.147.1.126
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
+        by 156.147.1.126 with ESMTP; 16 Feb 2022 13:11:56 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     tytso@mit.edu, adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org
+Cc:     torvalds@linux-foundation.org, mingo@redhat.com,
         linux-kernel@vger.kernel.org, peterz@infradead.org,
         will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
         joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
         chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
         david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
         gregkh@linuxfoundation.org, kernel-team@lge.com,
         linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
@@ -51,85 +45,60 @@ Cc:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: Re: Report in unix_stream_read_generic()
-Message-ID: <Ygx+pRo1+b1RBLJg@casper.infradead.org>
-References: <1644984767-26886-1-git-send-email-byungchul.park@lge.com>
- <1644985024-28757-1-git-send-email-byungchul.park@lge.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1644985024-28757-1-git-send-email-byungchul.park@lge.com>
+Subject: [REPORT] ext4 deadlock possibilities by DEPT
+Date:   Wed, 16 Feb 2022 13:11:51 +0900
+Message-Id: <1644984711-26423-1-git-send-email-byungchul.park@lge.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 16, 2022 at 01:17:03PM +0900, Byungchul Park wrote:
-> [    7.013330] ===================================================
-> [    7.013331] DEPT: Circular dependency has been detected.
-> [    7.013332] 5.17.0-rc1-00014-gcf3441bb2012 #2 Tainted: G        W        
-> [    7.013333] ---------------------------------------------------
-> [    7.013334] summary
-> [    7.013334] ---------------------------------------------------
-> [    7.013335] *** DEADLOCK ***
-> [    7.013335] 
-> [    7.013335] context A
-> [    7.013336]     [S] (unknown)(&(&ei->socket.wq.wait)->dmap:0)
-> [    7.013337]     [W] __mutex_lock_common(&u->iolock:0)
-> [    7.013338]     [E] event(&(&ei->socket.wq.wait)->dmap:0)
-> [    7.013340] 
-> [    7.013340] context B
-> [    7.013341]     [S] __raw_spin_lock(&u->lock:0)
-> [    7.013342]     [W] wait(&(&ei->socket.wq.wait)->dmap:0)
-> [    7.013343]     [E] spin_unlock(&u->lock:0)
+Hi Theodore, Andreas and ext4 folks,
 
-This seems unlikely to be real.  We're surely not actually waiting
-while holding a spinlock; existing debug checks would catch it.
+I've been developing a tool for detecting deadlock possibilities by
+tracking wait/event rather than lock(?) acquisition order to try to
+cover all synchonization machanisms. It's done on v5.17-rc1 tag.
 
-> [    7.013407] ---------------------------------------------------
-> [    7.013407] context B's detail
-> [    7.013408] ---------------------------------------------------
-> [    7.013408] context B
-> [    7.013409]     [S] __raw_spin_lock(&u->lock:0)
-> [    7.013410]     [W] wait(&(&ei->socket.wq.wait)->dmap:0)
-> [    7.013411]     [E] spin_unlock(&u->lock:0)
-> [    7.013412] 
-> [    7.013412] [S] __raw_spin_lock(&u->lock:0):
-> [    7.013413] [<ffffffff81aa451f>] unix_stream_read_generic+0x6bf/0xb60
-> [    7.013416] stacktrace:
-> [    7.013416]       _raw_spin_lock+0x6e/0x90
-> [    7.013418]       unix_stream_read_generic+0x6bf/0xb60
+https://github.com/lgebyungchulpark/linux-dept/commits/dept1.11_on_v5.17-rc1
 
-It would be helpful if you'd run this through scripts/decode_stacktrace.sh
-so we could see line numbers instead of hex offsets (which arene't much
-use without the binary kernel).
+Benifit:
 
-> [    7.013420]       unix_stream_recvmsg+0x40/0x50
-> [    7.013422]       sock_read_iter+0x85/0xd0
-> [    7.013424]       new_sync_read+0x162/0x180
-> [    7.013426]       vfs_read+0xf3/0x190
-> [    7.013428]       ksys_read+0xa6/0xc0
-> [    7.013429]       do_syscall_64+0x3a/0x90
-> [    7.013431]       entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [    7.013433] 
-> [    7.013434] [W] wait(&(&ei->socket.wq.wait)->dmap:0):
-> [    7.013434] [<ffffffff810bb017>] prepare_to_wait+0x47/0xd0
+	0. Works with all lock primitives.
+	1. Works with wait_for_completion()/complete().
+	2. Works with 'wait' on PG_locked.
+	3. Works with 'wait' on PG_writeback.
+	4. Works with swait/wakeup.
+	5. Works with waitqueue.
+	6. Multiple reports are allowed.
+	7. Deduplication control on multiple reports.
+	8. Withstand false positives thanks to 6.
+	9. Easy to tag any wait/event.
 
-... this may be the source of confusion.  Just because we prepare to
-wait doesn't mean we end up actually waiting.  For example, look at
-unix_wait_for_peer():
+Future work:
 
-        prepare_to_wait_exclusive(&u->peer_wait, &wait, TASK_INTERRUPTIBLE);
+	0. To make it more stable.
+	1. To separates Dept from Lockdep.
+	2. To improves performance in terms of time and space.
+	3. To use Dept as a dependency engine for Lockdep.
+	4. To add any missing tags of wait/event in the kernel.
+	5. To deduplicate stack trace.
 
-        sched = !sock_flag(other, SOCK_DEAD) &&
-                !(other->sk_shutdown & RCV_SHUTDOWN) &&
-                unix_recvq_full(other);
+I've got several reports from the tool. Some of them look like false
+alarms caused by Lockdep's fake annotations added for better detection.
+However, some others look like real deadlock possibility. Because of my
+unfamiliarity of the domain, it's hard to confirm if it's a real one.
+I'd like to ask for your opinion on it and it'd be appreciated.
 
-        unix_state_unlock(other);
+How to interpret the report is:
 
-        if (sched)
-                timeo = schedule_timeout(timeo);
+	1. E(event) in each context cannot be triggered because of the
+	   W(wait) that cannot be woken.
+	2. The stack trace helping find the problematic code is located
+	   in each conext's detail.
 
-        finish_wait(&u->peer_wait, &wait);
+Let me add the reports on this email thread.
 
-We *prepare* to wait, *then* drop the lock, then actually schedule.
+---
+Thanks,
+Byungchul
 
