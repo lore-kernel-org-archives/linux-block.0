@@ -2,94 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C71C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 07:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9BDC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 07:37:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbiBPHfV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 02:35:21 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:36472 "EHLO
+        id S230208AbiBPHhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 02:37:25 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:44942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbiBPHfU (ORCPT
+        with ESMTP id S230242AbiBPHhY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 02:35:20 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 481DE17185C;
-        Tue, 15 Feb 2022 23:35:08 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 3D0651F37D;
-        Wed, 16 Feb 2022 06:39:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1644993565; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7GGMtEIGANtAaJZgWgs4fHi8bEqaZzSeIEHxY3YZQSM=;
-        b=m54ylZrQ963wIR6zi/BQOguiJ0LS7VKESk6EZVzEEtdNitM7NhSeOR6d8YfWns9fyd+rKO
-        JQf8TMGuCoyo6S5CNhgOtJi4Pr7kJ2boPw9pJnDQjgv+PrGMTZgLqzMGym7//FPLFmH3hz
-        GMdFeegXjZsFRhDkJm5JwTpI0ta8AIE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1644993565;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7GGMtEIGANtAaJZgWgs4fHi8bEqaZzSeIEHxY3YZQSM=;
-        b=i5cHX04eaVceesCbkAEE3R3DVeOG/2Qc1y6CzyyOpK21iDbNYaNV813kGh1GjuqRkR6YDM
-        AcIAcFu6O9glNJBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0673213A1A;
-        Wed, 16 Feb 2022 06:39:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id hQkqAB2cDGLUIwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 16 Feb 2022 06:39:24 +0000
-Message-ID: <da0e1493-bdfb-f510-7cf9-ffbf4baf6159@suse.de>
-Date:   Wed, 16 Feb 2022 07:39:24 +0100
+        Wed, 16 Feb 2022 02:37:24 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8017B188D6A
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 23:36:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9s2FbjeGq9Icm/leBeePGBy7havrRGubD+RzoFN8VFA=; b=g+FEGhDxmAVyC7b54WOLoLi179
+        qTGTon6LKy7ucLIgc55FUkncea0leSf7O0hYIlOtvJy77GImaMm2XUMF8fY7rGJLj80lUJoId9xFi
+        fQvJIQa29MQIx23fmWJEvJ21+04KiO7C2MqLIMFeJecQEMrHW293qnGN5eDUjslWpr7uc3OFOp2aF
+        pv/NQuGa4sq9WgG/HwiaOu0Ruv6oZFuZzCFP56pzK0Qx/3o4u3iI0cZ9jcUm4p4GzV06vmZiZX3hN
+        4POpipXNDep2R23nL+AqLHOrmFCL9VZsL6EC/DK1wk/Zvj+cRRmnZopxvnOIG22XdVtEVwosLKMib
+        0ztywWvg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nKErM-005rs5-KI; Wed, 16 Feb 2022 07:36:20 +0000
+Date:   Tue, 15 Feb 2022 23:36:20 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ning Li <lining2020x@163.com>, Tejun Heo <tj@kernel.org>,
+        Chunguang Xu <brookxu@tencent.com>
+Subject: Re: [PATCH V4 4/8] block: don't check bio in
+ blk_throtl_dispatch_work_fn
+Message-ID: <YgypdGchjWDwBaYs@infradead.org>
+References: <20220216044514.2903784-1-ming.lei@redhat.com>
+ <20220216044514.2903784-5-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [RFC PATCH] nvme: prevent hang on surprise removal of NVMe disk
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        =?UTF-8?Q?Markus_Bl=c3=b6chl?= <markus.bloechl@ipetronik.com>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Stefan Roese <sr@denx.de>
-References: <20220214095107.3t5en5a3tosaeoo6@ipetronik.com>
- <20220215191731.GB25076@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220215191731.GB25076@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220216044514.2903784-5-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/15/22 20:17, Christoph Hellwig wrote:
-> On Mon, Feb 14, 2022 at 10:51:07AM +0100, Markus Blöchl wrote:
->> After the surprise removal of a mounted NVMe disk the pciehp task
->> reliably hangs forever with a trace similar to this one:
+On Wed, Feb 16, 2022 at 12:45:10PM +0800, Ming Lei wrote:
+> The bio has been checked already before throttling, so no need to check
+> it again before dispatching it from throttle queue.
 > 
-> Do you have a specific reproducer? At least with doing a
-> 
-> echo 1 > /sys/.../remove
-> 
-> while running fsx on a file system I can't actually reproduce it.
+> Add a helper of submit_bio_noacct_nocheck() for this purpose.
 
-You should be able to reproduce it doing a PCI hotplug from qemu.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Reviewed-by: Christoph Hellwig <hch@lst.de>
