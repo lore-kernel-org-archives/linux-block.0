@@ -2,106 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C8DC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Feb 2022 22:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9950EC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 01:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244738AbiBOW7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 17:59:48 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35862 "EHLO
+        id S234702AbiBPBoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Feb 2022 20:44:07 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244719AbiBOW7j (ORCPT
+        with ESMTP id S232045AbiBPBoG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 17:59:39 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C85E3891;
-        Tue, 15 Feb 2022 14:59:29 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id k60-20020a17090a4cc200b001b932781f3eso3056814pjh.0;
-        Tue, 15 Feb 2022 14:59:29 -0800 (PST)
+        Tue, 15 Feb 2022 20:44:06 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FFCDF9F87;
+        Tue, 15 Feb 2022 17:43:55 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id v22so113389pgb.0;
+        Tue, 15 Feb 2022 17:43:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ydg/QaEHk+YtzGHqWPzjDmBjfyy2f1JmjiAxPzP8crc=;
-        b=neA8UZ+ztvqI+c9Y0GhuINKiFZbH9bwEKDbDdCj/aBEOg8Je4KJR2FY7wqhQqcBAYk
-         3Wy+WGL8h5hMZhHiRrJnELKEzNVne+rWwRiNSK+LaaB40t3gKAMZ5iPl6SH4z0sCF1sK
-         WeebZKAyrtHxpGEBt52RHDKoImWcRYibqiE5YdJSrERCh5ErepkYhiOc7Yw8VRa7JtSJ
-         adEHSUdt8ZETIXkSrLoXpm9wbvKFejNQ1Fv3M/q0bRnt69wRrVeApz/eynGg7QDAnCzT
-         uJF8lE/RahbG4H9xVfC7Tm4Wgh1nT1vyrj+ukgd4F45LFSngNGYO0nz3bd1+0RfzB/uo
-         Q/xw==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=sBqUWhLOfuM8cBn3lZB8mcgooapXqw9+iXRzpDONfss=;
+        b=dymwFmpaLlKaD8KQHESLM/vl6g21Sp8Hh+P713+oiTlY0cWoyycIgUIr18vyqFtSbQ
+         E9TvVJJB6F/fNWWH4iAbAHrekHqNqlEPzo71gu5Y2iasY4zRZyLwZxaKMqYmpCCJW6c4
+         x1yFI/XzE/OESW5MYzyzuwyI0GAGaFJBxynoQ6nphNOMtzUJ2AGesrZdWlC4LrACBudK
+         6g2zF5xFb4dQt71JH8AS9h4sXotdYIcvN4zcX3KKjLVOlJe3LLF8/tQ8w+QXiV2v3/4F
+         T6ssXzB+7HzAkQ1PFYiGyQLUfuIAlkD5hiFNJ2PJdb0dX97SevkLTVsLvpZpWwe2RE8b
+         X70g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ydg/QaEHk+YtzGHqWPzjDmBjfyy2f1JmjiAxPzP8crc=;
-        b=jcyxnoN6sH1LNSWvMVODjrCi1Ms/7ihCiQuLNAMrFzQBcpH/78A0aGGgxNLLgFLTFW
-         WrusZ2fOr9fBta4oykkLyMkUveNo2imJ4f6cbXXPB0XFGhZfh0IbcbZXGAQuk7PIqduF
-         91hPNb5oSKYlfSZysWanByackIqS5vJHMFRjIQP63i4EnO7nJ8059jALZfCxi8AB4I/5
-         gYH7pPleib3Aa008mRWxzzXgO88LhREpfTn+FV5tUnKLWGRtPVlh5++9HQqyb+ryY3VC
-         IP0M/b0m+4C/QfcXd9ucaK/N8LMSlCjuFa6dKZGrQYPKw/tS66KVQ+gLVAkzwrdqTFjS
-         Q83w==
-X-Gm-Message-State: AOAM533xqME4mPEYcYWb4rBukVPdwafCX+GxdAzGg6QAtQaa2ylA5Lw+
-        XR7gFu+igA3JZzd5jbbo3gw=
-X-Google-Smtp-Source: ABdhPJzD5VTWuMUJjUi6d0x1rXiN3okRfTcvfy3+tsDIIsH6bfb6SZ+FiyUr2n1wCBp6WTu5fGOOUA==
-X-Received: by 2002:a17:902:f686:: with SMTP id l6mr1079179plg.7.1644965965923;
-        Tue, 15 Feb 2022 14:59:25 -0800 (PST)
-Received: from google.com ([2620:15c:202:201:4e4a:b0ff:e926:40e2])
-        by smtp.gmail.com with ESMTPSA id n85sm10430319pfd.142.2022.02.15.14.59.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 14:59:25 -0800 (PST)
-Date:   Tue, 15 Feb 2022 14:59:21 -0800
-From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To:     Qing Wang <wangqing@vivo.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org
-Subject: Re: [PATCH V3 6/13] input: serio: use time_is_before_jiffies()
- instead of open coding it
-Message-ID: <YgwwSUlZVakiYF8j@google.com>
-References: <1644890154-64915-1-git-send-email-wangqing@vivo.com>
- <1644890154-64915-7-git-send-email-wangqing@vivo.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sBqUWhLOfuM8cBn3lZB8mcgooapXqw9+iXRzpDONfss=;
+        b=sGk0D+ZEneUeSxhdVT9edo1HtSzzmpv5ph9QDG3h+7lpIcqayRKjD5vzyLhDuLTDSr
+         vcDtE7vfVnFt68dxvB82WZchTyzhdeB8EraCECRtTuXTsBYOsTokWmoaDZ5HKilLQNoY
+         X7xNYmNxFuExgZLC4QkHeRNlavtaKw+reEsb+Nw51DgaUcA3K6oMnb4AbruABjh0Gy+h
+         A7V7CtK7rp67PAkkr8j7qkLGBSRFlp/kJ2KmEaDQy4FsWEEggp/S7sLM5SRe+NyGBV/3
+         79uLh88D2JhBIu2ZghNbQZ/ELmyTllwVfGhqQN56MN35g5ZfMGSI5lsZsT6J/jgbquwj
+         Q8CQ==
+X-Gm-Message-State: AOAM5305Z+abvOUhj744yltATcGGiCbwBtZWguK6haIcBNflnGdhnUCk
+        zvWgMtwXnX3VhapfZOOniqI=
+X-Google-Smtp-Source: ABdhPJwVMIlANY5aAEF+dk+PoYSnulrEFdguTx0c5fdN/FjfUIno85D2VmPNOXmm/cnjCDwyptIiaA==
+X-Received: by 2002:a05:6a00:8d1:b0:4c9:f1a0:e0d0 with SMTP id s17-20020a056a0008d100b004c9f1a0e0d0mr781604pfu.53.1644975834859;
+        Tue, 15 Feb 2022 17:43:54 -0800 (PST)
+Received: from [172.20.119.15] ([61.16.102.73])
+        by smtp.gmail.com with ESMTPSA id n5sm3759862pgt.22.2022.02.15.17.43.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Feb 2022 17:43:54 -0800 (PST)
+Message-ID: <82a67141-7b4f-1254-4622-74bfd19a541d@gmail.com>
+Date:   Wed, 16 Feb 2022 09:43:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1644890154-64915-7-git-send-email-wangqing@vivo.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.0
+Subject: Re: [RFC V2 0/6] blk: make blk-rq-qos policies pluggable and modular
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20220215123705.58968-1-jianchao.wan9@gmail.com>
+ <44f86e8d-45f4-f40e-bc8b-00aa4f488f3a@nvidia.com>
+From:   Wang Jianchao <jianchao.wan9@gmail.com>
+In-Reply-To: <44f86e8d-45f4-f40e-bc8b-00aa4f488f3a@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Wang,
 
-On Mon, Feb 14, 2022 at 05:55:43PM -0800, Qing Wang wrote:
-> From: Wang Qing <wangqing@vivo.com>
+
+On 2022/2/15 9:01 下午, Chaitanya Kulkarni wrote:
+> Wang Jianchao (Kuaishou),
 > 
-> Use the helper function time_is_{before,after}_jiffies() to improve
-> code readability.
+> On 2/15/22 04:36, Wang Jianchao (Kuaishou) wrote:
+>> Hi Jens
+>>
+>> blk-rq-qos is a standalone framework out of io-sched and can be used to
+>> control or observe the IO progress in block-layer with hooks. blk-rq-qos
+>> is a great design but right now, it is totally fixed and built-in and shut
+>> out peoples who want to use it with external module.
+>>
+>> This patchset attempts to make blk-rq-qos framework pluggable and modular.
+>> Then we can update the blk-rq-qos policy module w/o stopping the IO workload.
+>> And it is more convenient to introduce new policy on old machines w/o udgrade
+>> kernel. And we can close all of the blk-rq-qos policy if we needn't any of
+>> them. At the moment, the request_queue.rqos list is empty, we needn't to
+>> waste cpu cyles on them.
+>>
+>>
+> 
+> Please write tests in blktests [1] to cover the code that we are
+> changing in this commit.
+> 
+> -ck
+> 
+> [1] https://github.com/osandov/blktests
+> 
 
-I applied changes by Danilo Krummrich converting the driver to use
-ktime_t (see https://lore.kernel.org/r/20220215160208.34826-3-danilokrummrich@dk-develop.de)
-which makes this change not applicable.
+Yes, I will send out next
 
-Thanks.
-
--- 
-Dmitry
+Thanks
+Jianchao
