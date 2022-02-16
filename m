@@ -2,171 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF36FC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 04:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB97C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Feb 2022 06:53:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344387AbiBPErT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Feb 2022 23:47:19 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47538 "EHLO
+        id S229450AbiBPGxn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 01:53:43 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:40508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbiBPErS (ORCPT
+        with ESMTP id S229449AbiBPGxm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Feb 2022 23:47:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8C6E2F4639
-        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 20:47:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1644986826;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O9J6/mmYY+DQGg07c14Y9wN5WFmdh/uIILxRmMFpKww=;
-        b=LSkhqbnhfjOjA321HChdW390CDI80XwuDerH/1soMbWH9Qjg9Sk44zjaC+znCxOT9cJhgN
-        J9yizzsGS0PBiKm8jsndDsqA69BmXLSPdkCcp01CPS18+Xhy0KrgLeoOG6sQB3/vj3FtPJ
-        K4Ml1bZMZ9Fin3Rhdszj1NMafQMPYEg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-102-3AJry-fjP4-aUcCHMNSxTw-1; Tue, 15 Feb 2022 23:47:03 -0500
-X-MC-Unique: 3AJry-fjP4-aUcCHMNSxTw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D64A1800D50;
-        Wed, 16 Feb 2022 04:47:02 +0000 (UTC)
-Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5B89057CD2;
-        Wed, 16 Feb 2022 04:46:56 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ning Li <lining2020x@163.com>,
-        Tejun Heo <tj@kernel.org>, Chunguang Xu <brookxu@tencent.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 8/8] block: revert 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios")
-Date:   Wed, 16 Feb 2022 12:45:14 +0800
-Message-Id: <20220216044514.2903784-9-ming.lei@redhat.com>
-In-Reply-To: <20220216044514.2903784-1-ming.lei@redhat.com>
-References: <20220216044514.2903784-1-ming.lei@redhat.com>
+        Wed, 16 Feb 2022 01:53:42 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 027C028572B
+        for <linux-block@vger.kernel.org>; Tue, 15 Feb 2022 22:53:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644994402; x=1676530402;
+  h=from:to:cc:subject:references:date:in-reply-to:
+   message-id:mime-version;
+  bh=q8LqAYTT+rCKLBOuXOQb7rqDPKP6It+owG5+PV14lP8=;
+  b=B6gaBh9S95C09fub2S/Sbn0abuf0CMIzBcmje7Iqqe9ViYX8rvRELpRI
+   gIny5VowJAdBVdQamI4nNgsbSY2sc0KrygJ7UAhK0vujPvGQX9HuOeF3+
+   rW4aaUg+nOLDqU+f75lB7CV7X6YSjOkthY5b00VRYySF4ikXYGK8hEr6u
+   0Fp80RFPngbCWG+KOkA9UJdVA+OEQdfxMJe9lA1smh9vPqFIsnO9BCtCs
+   SzsRtxh9S/d5/tumFrhrIDq71EtezP0uOSgieSkMxzU2cqU10/vjv5H9E
+   DloPh/ItkDAG7in/bOQ9d8fD8zZAcmvsyNcCARPqgHZzQU2NR4TXwltdP
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="248134098"
+X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
+   d="scan'208";a="248134098"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 22:48:23 -0800
+X-IronPort-AV: E=Sophos;i="5.88,373,1635231600"; 
+   d="scan'208";a="633342319"
+Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.239.13.11])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 22:48:21 -0800
+From:   "Huang, Ying" <ying.huang@intel.com>
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     Mauricio Faria de Oliveira <mfo@canonical.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Shi <shy828301@gmail.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
+ direct IO read
+References: <20220131230255.789059-1-mfo@canonical.com>
+        <Yfrh9F67ligMDUB7@google.com>
+        <CAO9xwp3DNioiVPJNH9w-eXLxfVmTx9jBpOgq9eatpTFJTTg50Q@mail.gmail.com>
+        <Yfr9UkEtLSHL2qhZ@google.com>
+Date:   Wed, 16 Feb 2022 14:48:19 +0800
+In-Reply-To: <Yfr9UkEtLSHL2qhZ@google.com> (Yu Zhao's message of "Wed, 2 Feb
+        2022 14:53:22 -0700")
+Message-ID: <87o837cnnw.fsf@yhuang6-desk2.ccr.corp.intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=ascii
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Revert commit 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large
-IO scenarios") since we have another easier way to address this issue and
-get better iops throttling result.
+Yu Zhao <yuzhao@google.com> writes:
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-throttle.c | 28 ----------------------------
- block/blk-throttle.h |  5 -----
- 2 files changed, 33 deletions(-)
+> On Wed, Feb 02, 2022 at 06:27:47PM -0300, Mauricio Faria de Oliveira wrote:
+>> On Wed, Feb 2, 2022 at 4:56 PM Yu Zhao <yuzhao@google.com> wrote:
+>> >
+>> > On Mon, Jan 31, 2022 at 08:02:55PM -0300, Mauricio Faria de Oliveira wrote:
+>> > > Problem:
+>> > > =======
+>> >
+>> > Thanks for the update. A couple of quick questions:
+>> >
+>> > > Userspace might read the zero-page instead of actual data from a
+>> > > direct IO read on a block device if the buffers have been called
+>> > > madvise(MADV_FREE) on earlier (this is discussed below) due to a
+>> > > race between page reclaim on MADV_FREE and blkdev direct IO read.
+>> >
+>> > 1) would page migration be affected as well?
+>> 
+>> Could you please elaborate on the potential problem you considered?
+>> 
+>> I checked migrate_pages() -> try_to_migrate() holds the page lock,
+>> thus shouldn't race with shrink_page_list() -> with try_to_unmap()
+>> (where the issue with MADV_FREE is), but maybe I didn't get you
+>> correctly.
+>
+> Could the race exist between DIO and migration? While DIO is writing
+> to a page, could migration unmap it and copy the data from this page
+> to a new page?
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index ec72eced24d2..a3b3ebc72dd4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -640,8 +640,6 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 
--	atomic_set(&tg->io_split_cnt[rw], 0);
--
- 	/*
- 	 * Previous slice has expired. We must have trimmed it after last
- 	 * bio dispatch. That means since start of last slice, we never used
-@@ -665,8 +663,6 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- 	tg->slice_start[rw] = jiffies;
- 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
- 
--	atomic_set(&tg->io_split_cnt[rw], 0);
--
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -900,9 +896,6 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 				jiffies + tg->td->throtl_slice);
- 	}
- 
--	if (iops_limit != UINT_MAX)
--		tg->io_disp[rw] += atomic_xchg(&tg->io_split_cnt[rw], 0);
--
- 	if (tg_with_in_bps_limit(tg, bio, bps_limit, &bps_wait) &&
- 	    tg_with_in_iops_limit(tg, bio, iops_limit, &iops_wait)) {
- 		if (wait)
-@@ -1927,14 +1920,12 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 	}
- 
- 	if (tg->iops[READ][LIMIT_LOW]) {
--		tg->last_io_disp[READ] += atomic_xchg(&tg->last_io_split_cnt[READ], 0);
- 		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
- 		if (iops >= tg->iops[READ][LIMIT_LOW])
- 			tg->last_low_overflow_time[READ] = now;
- 	}
- 
- 	if (tg->iops[WRITE][LIMIT_LOW]) {
--		tg->last_io_disp[WRITE] += atomic_xchg(&tg->last_io_split_cnt[WRITE], 0);
- 		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
- 		if (iops >= tg->iops[WRITE][LIMIT_LOW])
- 			tg->last_low_overflow_time[WRITE] = now;
-@@ -2053,25 +2044,6 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
- }
- #endif
- 
--void blk_throtl_charge_bio_split(struct bio *bio)
--{
--	struct blkcg_gq *blkg = bio->bi_blkg;
--	struct throtl_grp *parent = blkg_to_tg(blkg);
--	struct throtl_service_queue *parent_sq;
--	bool rw = bio_data_dir(bio);
--
--	do {
--		if (!parent->has_rules[rw])
--			break;
--
--		atomic_inc(&parent->io_split_cnt[rw]);
--		atomic_inc(&parent->last_io_split_cnt[rw]);
--
--		parent_sq = parent->service_queue.parent_sq;
--		parent = sq_to_tg(parent_sq);
--	} while (parent);
--}
--
- bool __blk_throtl_bio(struct bio *bio)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index c996a15f290e..b23a9f3abb82 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -138,9 +138,6 @@ struct throtl_grp {
- 	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
- 	unsigned long bio_cnt_reset_time;
- 
--	atomic_t io_split_cnt[2];
--	atomic_t last_io_split_cnt[2];
--
- 	struct blkg_rwstat stat_bytes;
- 	struct blkg_rwstat stat_ios;
- };
-@@ -164,13 +161,11 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_register_queue(struct request_queue *q) { }
--static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
- static inline bool blk_throtl_bio(struct bio *bio) { return false; }
- #else /* CONFIG_BLK_DEV_THROTTLING */
- int blk_throtl_init(struct request_queue *q);
- void blk_throtl_exit(struct request_queue *q);
- void blk_throtl_register_queue(struct request_queue *q);
--void blk_throtl_charge_bio_split(struct bio *bio);
- bool __blk_throtl_bio(struct bio *bio);
- static inline bool blk_throtl_bio(struct bio *bio)
- {
--- 
-2.31.1
+Check the migrate_pages() code,
 
+  migrate_pages
+    unmap_and_move
+      __unmap_and_move
+        try_to_migrate // set PTE to swap entry with PTL
+        move_to_new_page
+          migrate_page
+            folio_migrate_mapping
+              folio_ref_count(folio) != expected_count // check page ref count
+            folio_migrate_copy
+
+The page ref count is checked after unmapping and before copying.  This
+is good, but it appears that we need a memory barrier between checking
+page ref count and copying page.
+
+Best Regards,
+Huang, Ying
