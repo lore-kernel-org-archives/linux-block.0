@@ -2,103 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FF9C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 03:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57604C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 06:08:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232502AbiBQDx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 22:53:59 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37234 "EHLO
+        id S233913AbiBQGIu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Feb 2022 01:08:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiBQDx7 (ORCPT
+        with ESMTP id S234868AbiBQGIt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 22:53:59 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154B71D966C;
-        Wed, 16 Feb 2022 19:53:46 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id i6so3880206pfc.9;
-        Wed, 16 Feb 2022 19:53:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=anu63ADScUWbvf9kEf9F61i07ll+gpD88rNiTggb59Y=;
-        b=O4x5kUJYhlgOKQCP1W/ATa8vcxLZlyEmDrTCZVOvA3FEu2XISkxvNndUhTM6QNByoq
-         8KMn4855joZ5MJDi6IuP8PivIe19NoRZNdS60cJeLnsUDZ6n4k0QwgSJnM+qRiI+tOdC
-         2UGgpiOXgtqiQu4oKUkuR/Nurh74qOvYAxDanVJeEAlgUE38ROEv30j6edpwmm9Kbn93
-         wgUyVsgOL3E3qtiiyfkxEswvdfwx65PoNyy/udyoQmxuumO8VEcfmpy/1DmiBkgJEVJ3
-         0KiVcyWAP2VW1fh4Qx9QUL97Y8Fpup5v0QRAZfue/ZJwcc7C1ur/VHPyuTTBSzN5j7tO
-         uatQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=anu63ADScUWbvf9kEf9F61i07ll+gpD88rNiTggb59Y=;
-        b=mqdEByVS+ERlCpdPIb/dX8krHvdFWT3/n8m+ceagiHsFAJM2fXd6TC91A7uRy260n/
-         xqagStzDIECN7fq9ByAOZnemaep0a/F4SmU1dO9mZNObRu/2z8qpKGkvg2l4qtwWx00f
-         3C6Ris3J/R/CrJucME7IcExPuubcVv3mnF45hFb+S0rVYFu9JzW9TvthwnPWvNMg7x6u
-         zKk27s1GdD95FsyMybb5PHh7jTyskSribmhOMRVutiCMlPdaz5RFSOKw6upeMUoYT7Hz
-         aFiSIAKp7vpP/ZB47MnrydDP8uzIxw6IcrHADtz4ed33IOM7ll24hqv3t1pHlfIWyAcr
-         58Uw==
-X-Gm-Message-State: AOAM533ZHtFGqyQ6YOo6l39tBo1jLf21GrWfqdEOsYRgxXffeixUVNx1
-        Oj09FNMIQ8JgoR1zhgjTzO4=
-X-Google-Smtp-Source: ABdhPJyGcrJCVxjkv5tQVr/9luHQAKul6vb98q+6FEFGBlevbqifCt8C31CkAnR1GXrhSgnzO+Rs3A==
-X-Received: by 2002:a05:6a00:1787:b0:4c8:aca8:52cd with SMTP id s7-20020a056a00178700b004c8aca852cdmr1056850pfg.10.1645070025580;
-        Wed, 16 Feb 2022 19:53:45 -0800 (PST)
-Received: from [172.20.119.15] ([61.16.102.69])
-        by smtp.gmail.com with ESMTPSA id z13sm6702847pga.84.2022.02.16.19.53.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Feb 2022 19:53:45 -0800 (PST)
-Message-ID: <4b8864f3-c4da-88a8-2c62-39722ef7cd02@gmail.com>
-Date:   Thu, 17 Feb 2022 11:53:41 +0800
+        Thu, 17 Feb 2022 01:08:49 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40BB2C7D6B
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 22:08:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645078116; x=1676614116;
+  h=from:to:cc:subject:references:date:in-reply-to:
+   message-id:mime-version;
+  bh=m2kcHBEI7JLaKzxurYEKxslk3esMl6wjzgpM2u6BgEM=;
+  b=T4NOnwb4yEsxnmHmQGCVUNzU5M1oUzLRydGed3qpbBmLcTdxDxwyS4LH
+   GRoimF7Ez9Snscy62rmGWKE0DpYy7tXmkbT1u8yfp/m63/jynjQoiiTtM
+   GzIWY3m3qF17U/IcVWB7oon9mQzcPUeDosxc+PgdIpgQ37LHv1NCbDYJa
+   b9wB+cMyKI7LLh6Ewsptp5dQqhAIHhgScwUA2mVLZv65JebwxOAe0sx/P
+   N02J7J+a6klrc7cLYSMjaBgFF+XGX+wi1ds74ySrJRlbQuEBVY3WhHqMY
+   rZg3HWvwvP2m6Kz0Y9JuFi5t9humIeBWYZ4X9eMfsVnKNiQoCgRYNVKpH
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10260"; a="248400864"
+X-IronPort-AV: E=Sophos;i="5.88,375,1635231600"; 
+   d="scan'208";a="248400864"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 22:08:36 -0800
+X-IronPort-AV: E=Sophos;i="5.88,375,1635231600"; 
+   d="scan'208";a="545390963"
+Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.239.13.11])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2022 22:08:33 -0800
+From:   "Huang, Ying" <ying.huang@intel.com>
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     Mauricio Faria de Oliveira <mfo@canonical.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Shi <shy828301@gmail.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v3] mm: fix race between MADV_FREE reclaim and blkdev
+ direct IO read
+References: <20220131230255.789059-1-mfo@canonical.com>
+        <Yfrh9F67ligMDUB7@google.com>
+        <CAO9xwp3DNioiVPJNH9w-eXLxfVmTx9jBpOgq9eatpTFJTTg50Q@mail.gmail.com>
+        <Yfr9UkEtLSHL2qhZ@google.com>
+        <87o837cnnw.fsf@yhuang6-desk2.ccr.corp.intel.com>
+        <Yg1zjHkctX0zkF+o@google.com>
+Date:   Thu, 17 Feb 2022 14:08:31 +0800
+In-Reply-To: <Yg1zjHkctX0zkF+o@google.com> (Yu Zhao's message of "Wed, 16 Feb
+        2022 14:58:36 -0700")
+Message-ID: <87zgmq6n4w.fsf@yhuang6-desk2.ccr.corp.intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [RFC V4 0/6] blk: make blk-rq-qos policies pluggable and modular
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
- <f7936d00-a495-64b9-9497-7eb515d7c15b@kernel.dk>
-From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <f7936d00-a495-64b9-9497-7eb515d7c15b@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=ascii
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Yu Zhao <yuzhao@google.com> writes:
 
+> On Wed, Feb 16, 2022 at 02:48:19PM +0800, Huang, Ying wrote:
+>> Yu Zhao <yuzhao@google.com> writes:
+>> 
+>> > On Wed, Feb 02, 2022 at 06:27:47PM -0300, Mauricio Faria de Oliveira wrote:
+>> >> On Wed, Feb 2, 2022 at 4:56 PM Yu Zhao <yuzhao@google.com> wrote:
+>> >> >
+>> >> > On Mon, Jan 31, 2022 at 08:02:55PM -0300, Mauricio Faria de Oliveira wrote:
+>> >> > > Problem:
+>> >> > > =======
+>> >> >
+>> >> > Thanks for the update. A couple of quick questions:
+>> >> >
+>> >> > > Userspace might read the zero-page instead of actual data from a
+>> >> > > direct IO read on a block device if the buffers have been called
+>> >> > > madvise(MADV_FREE) on earlier (this is discussed below) due to a
+>> >> > > race between page reclaim on MADV_FREE and blkdev direct IO read.
+>> >> >
+>> >> > 1) would page migration be affected as well?
+>> >> 
+>> >> Could you please elaborate on the potential problem you considered?
+>> >> 
+>> >> I checked migrate_pages() -> try_to_migrate() holds the page lock,
+>> >> thus shouldn't race with shrink_page_list() -> with try_to_unmap()
+>> >> (where the issue with MADV_FREE is), but maybe I didn't get you
+>> >> correctly.
+>> >
+>> > Could the race exist between DIO and migration? While DIO is writing
+>> > to a page, could migration unmap it and copy the data from this page
+>> > to a new page?
+>> 
+>> Check the migrate_pages() code,
+>> 
+>>   migrate_pages
+>>     unmap_and_move
+>>       __unmap_and_move
+>>         try_to_migrate // set PTE to swap entry with PTL
+>>         move_to_new_page
+>>           migrate_page
+>>             folio_migrate_mapping
+>>               folio_ref_count(folio) != expected_count // check page ref count
+>>             folio_migrate_copy
+>> 
+>> The page ref count is checked after unmapping and before copying.  This
+>> is good, but it appears that we need a memory barrier between checking
+>> page ref count and copying page.
+>
+> I didn't look into this but, off the top of head, this should be
+> similar if not identical to the DIO case. Therefore, it requires two
+> barriers -- before and after the refcnt check (which may or may not
+> exist).
 
-On 2022/2/17 11:21 上午, Jens Axboe wrote:
-> On 2/16/22 8:13 PM, Wang Jianchao (Kuaishou) wrote:
->> Hi Jens
->>
->> blk-rq-qos is a standalone framework out of io-sched and can be used to
->> control or observe the IO progress in block-layer with hooks. blk-rq-qos
->> is a great design but right now, it is totally fixed and built-in and shut
->> out peoples who want to use it with external module.
->>
->> This patchset attempts to make blk-rq-qos framework pluggable and modular.
->> Then we can update the blk-rq-qos policy module w/o stopping the IO workload.
->> And it is more convenient to introduce new policy on old machines w/o udgrade
->> kernel. And we can close all of the blk-rq-qos policy if we needn't any of
->> them. At the moment, the request_queue.rqos list is empty, we needn't to
->> waste cpu cyles on them.
-> 
-> I like this patchset, would be a lot more convenient and helps
-> efficiency.
-> 
-> What kind of testing have you done on it?
-> 
-I have run blktests against this patchset in a VM machine along with a new test
-case for switching rqos policies while running IO. 
+Yes.  I think so too.
 
-https://marc.info/?l=linux-block&m=164506848620632&w=2
-
-And also there is a bit different version running on v4.18 with more tests
-
-Thanks
-Jianchao
+Best Regards,
+Huang, Ying
