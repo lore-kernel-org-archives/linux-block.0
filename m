@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F4FC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 03:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 861A8C43217
+	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 03:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232552AbiBQDPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 22:15:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57246 "EHLO
+        id S232588AbiBQDPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 22:15:52 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232533AbiBQDPg (ORCPT
+        with ESMTP id S232679AbiBQDPp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 22:15:36 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC31627828C;
-        Wed, 16 Feb 2022 19:15:20 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id d17so3885117pfl.0;
-        Wed, 16 Feb 2022 19:15:20 -0800 (PST)
+        Wed, 16 Feb 2022 22:15:45 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C66D2727B1;
+        Wed, 16 Feb 2022 19:15:31 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id l73so3806305pge.11;
+        Wed, 16 Feb 2022 19:15:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=PO6QTLbmwgbeaFwMxrG1oK4/zim0ER7h1OgHbUIGmY0=;
-        b=oQ0Ucfn9bqRVTFBOaKmocHV/p32+MGGIHIoYQ+AafT0IPac6LOqUNkk4/oF37YEQdJ
-         KI+r7qsi+VmP9NF/Q2ot5b2U7mb2YRy6DABAsyn9z3PnmW3+8VPpwgbyt7Zhc6mVhz7T
-         MccuSJ2KAkC6JUXs8pPGwKnjdlzVaOz7YX9tapKRj5DPS436JHjrK+F9tQQko3ZFPj/J
-         xw/JqIY1NIQNC7GQn4qCRhNEkUB6hpCS/fGS2auidZyHjjNuX9Uv9Nibgn4r+5FbwlRY
-         oW5tiCvSyaFSh4uaScKHGKeTSyVP9uTZs+VIbo9pZ06xyNgRJtQO3ouO7nd/kBxEYMyF
-         OiKg==
+        bh=nC+1B3PeLDhJAaHINUXdTNpBlJO6pz1AmTjWajsQpzQ=;
+        b=HG9bk6ncJCZHDKIJ0KNwMKOB8Up68PnbEzjz6VcqlokqzCPQ3AgBGCFuaWB5gKblWA
+         qCDLakFLP2aWHLxIaLDwL9PV8v+PIDFtWBw8P+KtxVyQDCqhF7i4MwYduZURLsvQLbOd
+         pO7Ssw72dJaKItcs8OddSb5U7JuBN9iEmxHJSxj7AQlLeeiocxUPgTW9cP9Ma0zvi0aF
+         Gp6MgwJ5f/csPTvlh7qlVYDCJQnuS4wX5O/v1K8jB0/01MMbQGfl7XVIFC2iYCtq9BV7
+         eFSARbYZeVC0NOxamSGPZiw7FtgGUdbvYlFxq5edT4h+1Gs649+kuiERXDhwna7GKwXG
+         fPrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=PO6QTLbmwgbeaFwMxrG1oK4/zim0ER7h1OgHbUIGmY0=;
-        b=f/FBwqFOoLpE6T6Jpl8CCDFL/Zn+sY73DUXE71u1pizDgSslCsTVXsRIpdHHPK7T1O
-         +7bKvEGFXMaBvrlVWiChb2CNZip+Sk6D6L/qUHB+Kie/FXbePG74St3ZC2WxMn+N7iiU
-         ChmeZJZDQ7tGeitqWTvg2v0V1U9N0HeQu0UpHH7rsU2Qbu6QZ8RjfFyqMq47FK48e+ts
-         PT4zG4SunZxs1mLnKOpj2Mr+RUWz4WZgYqZOFG2xg59QWcrqv2RL3yXYVDSw70ulqCTL
-         i2nd4GWNAWc1OglzmQO0hbP1ConZwhlhZ2aHt+XcQJoo87Fh6jFbSGdIGYoGboKH30O5
-         zAGg==
-X-Gm-Message-State: AOAM530P64QYT0VbkPX2ORE4hGH8u7rZJqdpO3OHW6T0VIMmT6NGjgya
-        bed0uTUXux9qKexJjOaAfzM=
-X-Google-Smtp-Source: ABdhPJzGnKO9bHzhlkTtZOmhohr0GcwQTUiU9fD8GGJauE6Xj2rLY/lcHMYTLzlagh6l9poPqhxyYw==
-X-Received: by 2002:a63:d116:0:b0:372:9961:4203 with SMTP id k22-20020a63d116000000b0037299614203mr830923pgg.361.1645067720415;
-        Wed, 16 Feb 2022 19:15:20 -0800 (PST)
+        bh=nC+1B3PeLDhJAaHINUXdTNpBlJO6pz1AmTjWajsQpzQ=;
+        b=6wfPbHDzc0NfO6L2vYrjUbxoMMMcRVLUr9o8qCwY6+1EdiQM3j41k5PLL5RNu3I7x7
+         mtqTfbK692zWmb/Y6fVteIEKXNEKeBPbdZhr2n6JkuioyC9zI8ta7CSi/ugUV3db/sJh
+         dm9NYIlNfw6NlIn0nEqwvdnuiyg/khPO8UOOizo5CEjCl6EWo/KCP+44l8ZGa/qq/Qws
+         07XrqvDa4PrmJs/byaZUv8YblXMEi6FjGOucHj9IbhVpRlZYGydtlIrsrEA5tmf2XhOx
+         5/2fCU31BG8MG4QmzHO0RNTOn+TGNOgp4emqw/ZBEskaKukpXXGg4L5LYzbZZZxg5t64
+         B8hw==
+X-Gm-Message-State: AOAM533/LnUIN5iAeMd6MFTdf8/GO3e6qt5KB/IYHdvd18jt5J5ytZ4N
+        9eIH0MHpiWP3A3RBCStK3FA=
+X-Google-Smtp-Source: ABdhPJyZK6XRMixCNv7nozmyzTljSlGuuyWxQUtQ0wRCHHQyuoWFbU+DiCjixgjbUpf40wO6PWzDDg==
+X-Received: by 2002:a05:6a00:150a:b0:4cc:f6a6:1bc6 with SMTP id q10-20020a056a00150a00b004ccf6a61bc6mr1177769pfu.74.1645067730943;
+        Wed, 16 Feb 2022 19:15:30 -0800 (PST)
 Received: from localhost.localdomain ([162.219.34.248])
-        by smtp.gmail.com with ESMTPSA id cu21sm421018pjb.50.2022.02.16.19.15.18
+        by smtp.gmail.com with ESMTPSA id cu21sm421018pjb.50.2022.02.16.19.15.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 19:15:20 -0800 (PST)
+        Wed, 16 Feb 2022 19:15:30 -0800 (PST)
 From:   "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC V4 2/6] blk-wbt: make wbt pluggable
-Date:   Thu, 17 Feb 2022 11:13:45 +0800
-Message-Id: <20220217031349.98561-3-jianchao.wan9@gmail.com>
+Subject: [RFC V4 6/6] blk: export the sysfs for switching qos
+Date:   Thu, 17 Feb 2022 11:13:49 +0800
+Message-Id: <20220217031349.98561-7-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220217031349.98561-1-jianchao.wan9@gmail.com>
 References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
@@ -62,218 +62,167 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch makes wbt pluggable through /sys/block/xxx/queue/qos.
-Some queue_lock/unlock is added to protect rq_qos_by_id() in
-wbt_rq_qos(). By default, wbt is enabled which is same with previous
-code.
+All of the blk-rq-qos policies has been changed to use the new
+interfaces. Thus we can export the sysfs interface, namely
+/sys/block/xxx/queue/qos and get rid of the unused interfaces.
 
 Signed-off-by: Wang Jianchao (Kuaishou) <jianchao.wan9@gmail.com>
 ---
- block/blk-mq-debugfs.c |  2 --
- block/blk-rq-qos.h     |  6 -----
- block/blk-wbt.c        | 51 +++++++++++++++++++++++++++++++++++-------
- block/blk-wbt.h        |  6 +++++
- 4 files changed, 49 insertions(+), 16 deletions(-)
+ block/blk-mq-debugfs.c | 10 +------
+ block/blk-rq-qos.h     | 63 +-----------------------------------------
+ block/blk-sysfs.c      |  2 ++
+ 3 files changed, 4 insertions(+), 71 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 8b6d557e1ad6..a5d78b094234 100644
+index cbbd668029a1..3defd5cb1cea 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -826,8 +826,6 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
- static const char *rq_qos_id_to_name(enum rq_qos_id id)
- {
- 	switch (id) {
--	case RQ_QOS_WBT:
--		return "wbt";
- 	case RQ_QOS_LATENCY:
- 		return "latency";
- 	case RQ_QOS_COST:
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 586c3f5ec152..171a83d6de45 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -14,7 +14,6 @@
- struct blk_mq_debugfs_attr;
- 
- enum rq_qos_id {
--	RQ_QOS_WBT,
- 	RQ_QOS_LATENCY,
- 	RQ_QOS_COST,
- 	RQ_QOS_IOPRIO,
-@@ -96,11 +95,6 @@ static inline struct rq_qos *rq_qos_by_id(struct request_queue *q, int id)
- 	return rqos;
+@@ -823,11 +823,6 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
+ 	q->sched_debugfs_dir = NULL;
  }
  
--static inline struct rq_qos *wbt_rq_qos(struct request_queue *q)
+-static const char *rq_qos_id_to_name(enum rq_qos_id id)
 -{
--	return rq_qos_id(q, RQ_QOS_WBT);
+-	return "unknown";
 -}
 -
- static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
+ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
  {
- 	return rq_qos_id(q, RQ_QOS_LATENCY);
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0c119be0e813..8aa85303bbbc 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -31,6 +31,13 @@
- #define CREATE_TRACE_POINTS
- #include <trace/events/wbt.h>
- 
-+static struct rq_qos_ops wbt_rqos_ops;
-+
-+struct rq_qos *wbt_rq_qos(struct request_queue *q)
-+{
-+	return rq_qos_by_id(q, wbt_rqos_ops.id);
-+}
-+
- static inline void wbt_clear_state(struct request *rq)
+ 	debugfs_remove_recursive(rqos->debugfs_dir);
+@@ -837,9 +832,6 @@ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
+ void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
  {
- 	rq->wbt_flags = 0;
-@@ -628,9 +635,13 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
- 
- void wbt_set_write_cache(struct request_queue *q, bool write_cache_on)
- {
--	struct rq_qos *rqos = wbt_rq_qos(q);
-+	struct rq_qos *rqos;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	rqos = wbt_rq_qos(q);
- 	if (rqos)
- 		RQWB(rqos)->wc = write_cache_on;
-+	spin_unlock_irq(&q->queue_lock);
- }
- 
- /*
-@@ -638,14 +649,20 @@ void wbt_set_write_cache(struct request_queue *q, bool write_cache_on)
-  */
- void wbt_enable_default(struct request_queue *q)
- {
--	struct rq_qos *rqos = wbt_rq_qos(q);
-+	struct rq_qos *rqos;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	rqos = wbt_rq_qos(q);
- 
- 	/* Throttling already enabled? */
- 	if (rqos) {
- 		if (RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
- 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
-+
-+		spin_unlock_irq(&q->queue_lock);
- 		return;
- 	}
-+	spin_unlock_irq(&q->queue_lock);
- 
- 	/* Queue not registered? Maybe shutting down... */
- 	if (!blk_queue_registered(q))
-@@ -692,6 +709,7 @@ static void wbt_exit(struct rq_qos *rqos)
- 	struct rq_wb *rwb = RQWB(rqos);
  	struct request_queue *q = rqos->q;
+-	const char *dir_name;
+-
+-	dir_name = rqos->ops->name ? rqos->ops->name : rq_qos_id_to_name(rqos->id);
  
-+	rq_qos_deactivate(rqos);
- 	blk_stat_remove_callback(q, rwb->cb);
- 	blk_stat_free_callback(rwb->cb);
- 	kfree(rwb);
-@@ -702,15 +720,21 @@ static void wbt_exit(struct rq_qos *rqos)
-  */
- void wbt_disable_default(struct request_queue *q)
+ 	if (rqos->debugfs_dir || !rqos->ops->debugfs_attrs)
+ 		return;
+@@ -848,7 +840,7 @@ void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
+ 		q->rqos_debugfs_dir = debugfs_create_dir("rqos",
+ 							 q->debugfs_dir);
+ 
+-	rqos->debugfs_dir = debugfs_create_dir(dir_name,
++	rqos->debugfs_dir = debugfs_create_dir(rqos->ops->name,
+ 					       rqos->q->rqos_debugfs_dir);
+ 
+ 	debugfs_create_files(rqos->debugfs_dir, rqos, rqos->ops->debugfs_attrs);
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index bba829bbb461..262d221794f5 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -13,10 +13,6 @@
+ 
+ struct blk_mq_debugfs_attr;
+ 
+-enum rq_qos_id {
+-	RQ_QOS_UNUSED,
+-};
+-
+ struct rq_wait {
+ 	wait_queue_head_t wait;
+ 	atomic_t inflight;
+@@ -25,7 +21,7 @@ struct rq_wait {
+ struct rq_qos {
+ 	const struct rq_qos_ops *ops;
+ 	struct request_queue *q;
+-	enum rq_qos_id id;
++	int id;
+ 	refcount_t ref;
+ 	wait_queue_head_t waitq;
+ 	bool dying;
+@@ -69,17 +65,6 @@ struct rq_depth {
+ 	unsigned int default_depth;
+ };
+ 
+-static inline struct rq_qos *rq_qos_id(struct request_queue *q,
+-				       enum rq_qos_id id)
+-{
+-	struct rq_qos *rqos;
+-	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->id == id)
+-			break;
+-	}
+-	return rqos;
+-}
+-
+ static inline struct rq_qos *rq_qos_by_id(struct request_queue *q, int id)
  {
--	struct rq_qos *rqos = wbt_rq_qos(q);
-+	struct rq_qos *rqos;
- 	struct rq_wb *rwb;
-+
-+	spin_lock_irq(&q->queue_lock);
-+	rqos = wbt_rq_qos(q);
- 	if (!rqos)
--		return;
-+		goto out;
-+
- 	rwb = RQWB(rqos);
- 	if (rwb->enable_state == WBT_STATE_ON_DEFAULT) {
- 		blk_stat_deactivate(rwb->cb);
- 		rwb->enable_state = WBT_STATE_OFF_DEFAULT;
- 	}
-+out:
-+	spin_unlock_irq(&q->queue_lock);
+ 	struct rq_qos *rqos;
+@@ -99,52 +84,6 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ 	init_waitqueue_head(&rq_wait->wait);
  }
- EXPORT_SYMBOL_GPL(wbt_disable_default);
  
-@@ -803,6 +827,7 @@ static const struct blk_mq_debugfs_attr wbt_debugfs_attrs[] = {
- #endif
+-static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+-{
+-	/*
+-	 * No IO can be in-flight when adding rqos, so freeze queue, which
+-	 * is fine since we only support rq_qos for blk-mq queue.
+-	 *
+-	 * Reuse ->queue_lock for protecting against other concurrent
+-	 * rq_qos adding/deleting
+-	 */
+-	blk_mq_freeze_queue(q);
+-
+-	spin_lock_irq(&q->queue_lock);
+-	rqos->next = q->rq_qos;
+-	q->rq_qos = rqos;
+-	spin_unlock_irq(&q->queue_lock);
+-
+-	blk_mq_unfreeze_queue(q);
+-
+-	if (rqos->ops->debugfs_attrs)
+-		blk_mq_debugfs_register_rqos(rqos);
+-}
+-
+-static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
+-{
+-	struct rq_qos **cur;
+-
+-	/*
+-	 * See comment in rq_qos_add() about freezing queue & using
+-	 * ->queue_lock.
+-	 */
+-	blk_mq_freeze_queue(q);
+-
+-	spin_lock_irq(&q->queue_lock);
+-	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
+-		if (*cur == rqos) {
+-			*cur = rqos->next;
+-			break;
+-		}
+-	}
+-	spin_unlock_irq(&q->queue_lock);
+-
+-	blk_mq_unfreeze_queue(q);
+-
+-	blk_mq_debugfs_unregister_rqos(rqos);
+-}
+-
+ int rq_qos_register(struct rq_qos_ops *ops);
+ void rq_qos_unregister(struct rq_qos_ops *ops);
+ void rq_qos_activate(struct request_queue *q,
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 9f32882ceb2f..c02747db4e3b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -574,6 +574,7 @@ QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
+ QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
+ QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
+ QUEUE_RW_ENTRY(elv_iosched, "scheduler");
++QUEUE_RW_ENTRY(queue_qos, "qos");
  
- static struct rq_qos_ops wbt_rqos_ops = {
-+	.name = "blk-wbt",
- 	.throttle = wbt_wait,
- 	.issue = wbt_issue,
- 	.track = wbt_track,
-@@ -811,6 +836,7 @@ static struct rq_qos_ops wbt_rqos_ops = {
- 	.cleanup = wbt_cleanup,
- 	.queue_depth_changed = wbt_queue_depth_changed,
- 	.exit = wbt_exit,
-+	.init = wbt_init,
- #ifdef CONFIG_BLK_DEBUG_FS
- 	.debugfs_attrs = wbt_debugfs_attrs,
- #endif
-@@ -834,9 +860,6 @@ int wbt_init(struct request_queue *q)
- 	for (i = 0; i < WBT_NUM_RWQ; i++)
- 		rq_wait_init(&rwb->rq_wait[i]);
- 
--	rwb->rqos.id = RQ_QOS_WBT;
--	rwb->rqos.ops = &wbt_rqos_ops;
--	rwb->rqos.q = q;
- 	rwb->last_comp = rwb->last_issue = jiffies;
- 	rwb->win_nsec = RWB_WINDOW_NSEC;
- 	rwb->enable_state = WBT_STATE_ON_DEFAULT;
-@@ -846,7 +869,7 @@ int wbt_init(struct request_queue *q)
- 	/*
- 	 * Assign rwb and add the stats callback.
- 	 */
--	rq_qos_add(q, &rwb->rqos);
-+	rq_qos_activate(q, &rwb->rqos, &wbt_rqos_ops);
- 	blk_stat_add_callback(q, rwb->cb);
- 
- 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
-@@ -856,3 +879,15 @@ int wbt_init(struct request_queue *q)
- 
- 	return 0;
- }
-+
-+static __init int wbt_mod_init(void)
-+{
-+	return rq_qos_register(&wbt_rqos_ops);
-+}
-+
-+static __exit void wbt_mod_exit(void)
-+{
-+	return rq_qos_unregister(&wbt_rqos_ops);
-+}
-+module_init(wbt_mod_init);
-+module_exit(wbt_mod_exit);
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index 2eb01becde8c..e0d051cb00f7 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -88,6 +88,7 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
- 
- #ifdef CONFIG_BLK_WBT
- 
-+struct rq_qos *wbt_rq_qos(struct request_queue *q);
- int wbt_init(struct request_queue *);
- void wbt_disable_default(struct request_queue *);
- void wbt_enable_default(struct request_queue *);
-@@ -101,6 +102,11 @@ u64 wbt_default_latency_nsec(struct request_queue *);
- 
- #else
- 
-+static inline struct rq_qos *wbt_rq_qos(struct request_queue *q)
-+{
-+	return NULL;
-+}
-+
- static inline void wbt_track(struct request *rq, enum wbt_flags flags)
- {
- }
+ QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
+ QUEUE_RO_ENTRY(queue_physical_block_size, "physical_block_size");
+@@ -633,6 +634,7 @@ static struct attribute *queue_attrs[] = {
+ 	&queue_max_integrity_segments_entry.attr,
+ 	&queue_max_segment_size_entry.attr,
+ 	&elv_iosched_entry.attr,
++	&queue_qos_entry.attr,
+ 	&queue_hw_sector_size_entry.attr,
+ 	&queue_logical_block_size_entry.attr,
+ 	&queue_physical_block_size_entry.attr,
 -- 
 2.17.1
 
