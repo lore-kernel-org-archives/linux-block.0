@@ -2,100 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B80B9C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 03:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3511C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 03:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232263AbiBQDJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 22:09:12 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36538 "EHLO
+        id S232490AbiBQDP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 22:15:29 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232133AbiBQDJM (ORCPT
+        with ESMTP id S231329AbiBQDP3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 22:09:12 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6DB1516AD
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 19:08:58 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id y11so822090pfi.11
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 19:08:58 -0800 (PST)
+        Wed, 16 Feb 2022 22:15:29 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB672727B1;
+        Wed, 16 Feb 2022 19:15:15 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id qe15so4294255pjb.3;
+        Wed, 16 Feb 2022 19:15:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Anr52g04+AVHtEhsIJzL+W2iG28YfG2faiyY/MF3S1Q=;
-        b=07TZlRToCc/AdEf2OdPUHwVs6g+ZsE6t5ADSClYQD4YtLyHDVtCXrw0tbUm5v86EPN
-         OcyUz4BPpxlWcNwlAG/jJ4TFq8G31s73PHQlBhy433SC8RI/KBQO0Gkws+BdbEE/vCP5
-         uunMezkromTerPmrToxjiF43VMZj6JgV+Lp1m+ekN058H3KyHKdIGzREZe7VFg8MQC+a
-         WCmwQ3PofM6Oe/FkqsfB2Dx8ro75SLsNUHeoFaNVgJX2gEypTIFOWshmUMn2J51B1eTG
-         BcxZbdvjOZptcd3Hm9Hrqlc3/uXKMStobZyt42V3TWV+wy1/3/QJnRUERHVyTeXFFoqz
-         YhVw==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=LmgepXP/Vtuh5oVHO9dtuvcfXAWSOUVOBIqTArmUnB4=;
+        b=kj/jTVICqbtyVh4P9EU3cDaIFy+nJu84K7xiBHnUb9RUeXjlweD4oqmGigQDGNWByf
+         1aQ3DCXOk+dT6RKLaSJn79HAQJ2yuMWBwb7de9rFrW+T1whFG9g66bM1KF9sUyKhdhHU
+         /0dkD9Hf32ZuMdEPbXVZaQgNYPB3dwRgrBRxaAZHcQaM5BfWz10mHtBej3VmCH3iSBo9
+         u9cIaUsFtqHfgihMQA7ofMoE1Wz6h93FiYIqOVuamwmAFfBrS/maSzQo0jmZeK4lVr7r
+         dYzRXaCRUR3Gy6AX4THgZn2NWR89ovEZlZvrE4czogVaks+MoJKgLJo2cuIq8LglKLhN
+         hx7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Anr52g04+AVHtEhsIJzL+W2iG28YfG2faiyY/MF3S1Q=;
-        b=vRIPTtM0//qyTCNoaF3i+mRALffbFteGnIHvU+vSH1/7DT5T7UgRKKNSjehbLTvqPH
-         uiBfA7LdW7hhoxYMOp24aNIo9wtN/sx4/DK1wQAWcz6CXN8n4Ki+Cf/VKVlxF3lUXeUC
-         krlvfVSZ0Hu8FiJAuj4l9C+aSHTTgx3h6AqkJ0mE1D7uqeDMR7ei+nOTe6oCDKjhZzLE
-         fMg0xUSdsC1nANQxRwoHiPeIy7YTQdq+oKmCOXk39AAwf9P/164Wrizcm7LVgA2zUe2s
-         Pdcr0QwC6GtbjPSD5lAO5rWmmmikHCHu9ZkK0q4kG1UPj6aPrNgXLq3ngnv78D3SYrHN
-         D3OA==
-X-Gm-Message-State: AOAM532uZ3Eo0roVexujWRZCBIHNahDnk4EWIyTXkRnqTKUHS9Pjy0co
-        z2XTNOsCC1QoSTopClOFuIz/gw==
-X-Google-Smtp-Source: ABdhPJxl3am8omzitpxin/MQKTLxfv3srfGyqtpva7Sci8tI20hniUCP5Uj33Vt824nPP+nacT26Eg==
-X-Received: by 2002:a62:1d07:0:b0:4bf:3782:22e3 with SMTP id d7-20020a621d07000000b004bf378222e3mr1145580pfd.52.1645067338250;
-        Wed, 16 Feb 2022 19:08:58 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s1sm404329pjr.56.2022.02.16.19.08.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Feb 2022 19:08:57 -0800 (PST)
-Message-ID: <5e633f42-817a-1861-524f-8659e7340351@kernel.dk>
-Date:   Wed, 16 Feb 2022 20:08:56 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH -next] block: update io_ticks when io hang
-Content-Language: en-US
-To:     "zhangwensheng (E)" <zhangwensheng5@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220125091938.1799001-1-zhangwensheng5@huawei.com>
- <164506609748.50355.11490091116960287078.b4-ty@kernel.dk>
- <1998c61c-c3d9-8050-be43-16aba2d6e09f@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <1998c61c-c3d9-8050-be43-16aba2d6e09f@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=LmgepXP/Vtuh5oVHO9dtuvcfXAWSOUVOBIqTArmUnB4=;
+        b=Nkl3EA5iK8qUXH8XGR3TkEauPQIcncEFyFrnqbVzFg5QLsgAn2BtNxXrHtASZds04a
+         m7OD6Fjz1M6Q0YJd6yfI0eOOUjw1l0muNeuRjRR9SHQJzeTocVn9SelkS5CAwR3pkxbq
+         XW77IcJxAlsxmViNjIrMpvpcPZZA4J8jVMJOq+27fRDpl45u1iB3k5765SFHUblrGXBT
+         TjGiBYtOX0E3eurKjfxDOVCDEU1ZGp8N2TI1rtgQdtMU8Ofpn1MFjYGeH4+WfiAj5+Xa
+         AdA+f9h0AamRvzFOiQu9UKSJJFs55lnYG3ywXXgF68TNky3uQYrsNeJsx3aqHhmmcki2
+         bp2w==
+X-Gm-Message-State: AOAM531Fjmpyh+O51kh9qtrKlJZ54ESriL1hwQ4LU5odSZN+5Rzvj3Eu
+        mbwpWuhk1X56cObsJWLhrTw=
+X-Google-Smtp-Source: ABdhPJx2zsmexVDBX/XeYLm2KRhRqgPZJ5fxjvUiqGjSA3rJ8fD9Jtrm1YKyUo2KXvi/OO1i0gdPNA==
+X-Received: by 2002:a17:902:9684:b0:14d:85a7:6eda with SMTP id n4-20020a170902968400b0014d85a76edamr912134plp.111.1645067715224;
+        Wed, 16 Feb 2022 19:15:15 -0800 (PST)
+Received: from localhost.localdomain ([162.219.34.248])
+        by smtp.gmail.com with ESMTPSA id cu21sm421018pjb.50.2022.02.16.19.15.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Feb 2022 19:15:14 -0800 (PST)
+From:   "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Josef Bacik <jbacik@fb.com>, Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC V4 0/6] blk: make blk-rq-qos policies pluggable and modular
+Date:   Thu, 17 Feb 2022 11:13:43 +0800
+Message-Id: <20220217031349.98561-1-jianchao.wan9@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/16/22 8:07 PM, zhangwensheng (E) wrote:
-> hi, Jens:
-> 
-> I am sorry that there are some problems with the patch below:
-> 
-> 
-> @@ -913,12 +913,14 @@ ssize_t part_stat_show(struct device *dev,
->       struct disk_stats stat;
->       unsigned int inflight;
->   -    part_stat_read_all(bdev, &stat);
->       if (queue_is_mq(q))
->           inflight = blk_mq_in_flight(q, bdev);
->       else
->           inflight = part_in_flight(bdev);
->   +    if (inflight)
-> +        update_io_ticks(bdev, jiffies, true);
-> +    part_stat_read_all(bdev, &stat);
->       return sprintf(buf,
->           "%8lu %8lu %8llu %8u "
->           "%8lu %8lu %8llu %8u "
-> 
-> It shoule use part_stat_lock() & part_stat_unlock() to protect update_io_ticks(),
-> 
-> because it operates on per-cpu variables.  And I will fix it in V2.
+Hi Jens
 
-I'll drop it, please resend a fixed and tested one.
+blk-rq-qos is a standalone framework out of io-sched and can be used to
+control or observe the IO progress in block-layer with hooks. blk-rq-qos
+is a great design but right now, it is totally fixed and built-in and shut
+out peoples who want to use it with external module.
 
--- 
-Jens Axboe
+This patchset attempts to make blk-rq-qos framework pluggable and modular.
+Then we can update the blk-rq-qos policy module w/o stopping the IO workload.
+And it is more convenient to introduce new policy on old machines w/o udgrade
+kernel. And we can close all of the blk-rq-qos policy if we needn't any of
+them. At the moment, the request_queue.rqos list is empty, we needn't to
+waste cpu cyles on them.
+
+Changes since v3:
+ - Fix some code sytle issues
+ - Rename policies to blk-wbt, blk-iolat, blk-iocost, blk-ioprio
+
+Changes since v2:
+ Refactor the patches,
+ - patch01 only provide new interfaces and not export the sysfs interface.
+ - patch02 adapt the wbt to new interface, reserve the previous action
+   when write to wbt_lat
+ - export sysfs interface in last patch when all of the blk-rqos policies
+   are preprared well.
+
+Changes since v1:
+ - Just make iocost and iolatency pluggable, then we needn't to export
+   those interfaces
+ - Remove the iostat rqos policy
+ - Rename module of blk-ioprio to io-prio to avoid rename ioprio.c file
+
+WangJianchao(6):
+	blk: prepare to make blk-rq-qos pluggable and modular
+    blk-wbt: make wbt pluggable
+    blk-iolatency: make iolatency pluggable
+    blk-iocost: make iocost pluggable
+    blk-ioprio: make ioprio pluggable and modular
+    blk: export the sysfs for switching qos
+
+ block/Kconfig          |   2 +-
+ block/Makefile         |   3 +-
+ block/blk-cgroup.c     |  11 ---
+ block/blk-iocost.c     |  49 +++++++-----
+ block/blk-iolatency.c  |  33 +++++++--
+ block/blk-ioprio.c     |  50 ++++++++-----
+ block/blk-ioprio.h     |  19 -----
+ block/blk-mq-debugfs.c |  23 ++----
+ block/blk-rq-qos.c     | 303 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ block/blk-rq-qos.h     |  96 +++++++++---------------
+ block/blk-sysfs.c      |   2 +
+ block/blk-wbt.c        |  52 +++++++++++--
+ block/blk-wbt.h        |   7 +-
+ block/blk.h            |   6 --
+ include/linux/blkdev.h |   4 +
+ 15 files changed, 488 insertions(+), 172 deletions(-)
 
