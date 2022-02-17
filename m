@@ -2,103 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B22C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 14:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CB1C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 15:39:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242236AbiBQOzf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Feb 2022 09:55:35 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37364 "EHLO
+        id S242608AbiBQPkL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Feb 2022 10:40:11 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242241AbiBQOze (ORCPT
+        with ESMTP id S242614AbiBQPkK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Feb 2022 09:55:34 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B5602B2E00
-        for <linux-block@vger.kernel.org>; Thu, 17 Feb 2022 06:55:19 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id om7so5781911pjb.5
-        for <linux-block@vger.kernel.org>; Thu, 17 Feb 2022 06:55:19 -0800 (PST)
+        Thu, 17 Feb 2022 10:40:10 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520842B2E15;
+        Thu, 17 Feb 2022 07:39:56 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id x18so1046pfh.5;
+        Thu, 17 Feb 2022 07:39:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Gtr/RxsviZ5tCz0Bvt9jFmBxJ4FzXAbaGSbJElz/Hlg=;
-        b=RP7AQlvkfeyRpEygxSQlTGe6YiucyajrKNZ4j2hs8dxrxbOzhwdAjmuzMhSXrnPt1c
-         sny5HzykjZTUwFYcF613btPpzWCTxDY1j5wRZK396jirf7OMFgu649fDpCFyebrafdeG
-         RnSHJknmwSjudEtRmuN9INtjpMjAMBfnvhjFILCzmwDxH0liEGGIY5hPQzFOUwOxpnJY
-         zy4U1fENYzFqWYZfBVexpReueospH8JHhAGfLUg9sSummfXjccAJxvdS2vlQIMoHXiIe
-         FZn/OmNGkZPFj63d+yMQR67slCb6+k0EGJ58QDfqVCieoff++Ce4wWVz/akRdrferrbx
-         sWMw==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TE8n2qHv14fuB3CwoM4G4MqgZMfIJ3HjzCk+Yfyt5N8=;
+        b=qMt5VtEERrppHzkcA843sKlSXVkDWwJVCc8xr8+WeAWWtHU+r71qgQBRYbX1ux5DHL
+         NTb7U6GXDPSHTmip7AfIy5Ko8VL/n2wYZkfTF+oblRqdZyRfvEJN8zeIrsT+U1xUpvfJ
+         riVOgdNN8btUUwTA2klq9U/ssBcB0UxtckmqrZ9tEwGNj1BJ21gr/PO2oSD17bvd5xTR
+         WaPxX9eN4glrpIkVpONkOkPCdwiqP9MsrN3kghCci+eV1jQZ8IyRz1YxvinGdbLTKvYS
+         g0yJtFpgUiwqm4F4jDITroCd2gmObqxz7e5DqX7MyAaS2lksK8rHnhn45TfDiH1mcbj+
+         z0hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Gtr/RxsviZ5tCz0Bvt9jFmBxJ4FzXAbaGSbJElz/Hlg=;
-        b=mBOvSZpELK0mASuZYeyb5FIUByChB6XzNIrG1wcdRQuxikQnpa7yLwbEccT2UORNLS
-         VjiKgePZPhhSIjhAAtf0TSefsqBvUtwKwNT1uMk14lRIvJbJIPpID/c1s66iheXRnevz
-         /ueaFNeuBUZg8+84btHHpGVo287RO9UUqCX9mt+QoJK9Vv0WPiKhI/LkH8ISfMDyyvNT
-         VuUH/PtPrqOYgPCIt+2NE3UUIuYjA3Z/dBEcQpHS/v7YKV1rgHqCZRnkM0gzY00wCoap
-         2w6SqwzLA/+vbWouUganGhZWGDQ5ZiKaSwKoJT5HJzGOGszW4aP+d7R9aRX2GV3SoZo5
-         5NSA==
-X-Gm-Message-State: AOAM530/ZsTnLq4eACbRatFybdCxbbmL4/ljSSWj6GPahJK11P+aSUcI
-        9aKFe2T8W0AaLxiisrox7AiHYw==
-X-Google-Smtp-Source: ABdhPJxxN4fdtmNfBaNeeot2cudgg/6576pYDbt5buKEIhVRK6sNxrw74mPRD7B40QhIulki0+PgcQ==
-X-Received: by 2002:a17:902:daca:b0:14d:7e1b:24af with SMTP id q10-20020a170902daca00b0014d7e1b24afmr3123388plx.167.1645109718763;
-        Thu, 17 Feb 2022 06:55:18 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d8sm2040679pjr.29.2022.02.17.06.55.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 06:55:18 -0800 (PST)
-Message-ID: <eb8e2477-d8f6-b032-6177-8ce187de12ab@kernel.dk>
-Date:   Thu, 17 Feb 2022 07:55:16 -0700
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TE8n2qHv14fuB3CwoM4G4MqgZMfIJ3HjzCk+Yfyt5N8=;
+        b=kygUEExA9ls2eY9mP3l1m+7HNipYu3K0HPgAtc5fP7Hvhf0611sonb/+WE5HFgs6O8
+         g4e8c0pLOQve2Oi/h2Hj7XNF/4gESq72fq3DHGVInzXqn9LfFcxRoIoRG1AAvNU4XiRO
+         EeM5R+IwUFq8MNrGY6VOHeYIeptzqzKfwVgZK6daQrwPMAhX52I/JJUT9WWhIdiHjj7q
+         agQ3b5GQQFGorgECrJXK0yoRa4bDcg4dXxXUbZmLvz/u6yAf1cvcvpuIVT5ziGXvwtzW
+         itDDHWgkQezEGlif9G4atfBcGFbGzkqGqmJ8VPrtU843AJZSMXy5LXNjco27q6ozr021
+         lGfQ==
+X-Gm-Message-State: AOAM532jCfIG3ExumzhnK4yfb6SCfUjomLEvWuuaKVQb5NmZHLySg9cv
+        eum6kbkUrfETFMjBUzW2NW0VtzBUnNEvAsnLHaQ=
+X-Google-Smtp-Source: ABdhPJzPHsLcfwtzgYqMUfCU52gOXoVikjFPcVCnRLCbbJ9C8FYtQSZ8LnF5dDCB8RmVXuGNHrzFCDcOFwUhqIC04Qk=
+X-Received: by 2002:a05:6a00:a8b:b0:4cd:6030:4df3 with SMTP id
+ b11-20020a056a000a8b00b004cd60304df3mr3442934pfl.40.1645112395768; Thu, 17
+ Feb 2022 07:39:55 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH] blk: do rq_qos_exit in blk_cleanup_queue
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220216113212.83000-1-jianchao.wan9@gmail.com>
- <Yg392sqFydj9p3My@infradead.org>
- <96deb063-f4ef-fadd-543b-e905495898f6@kernel.dk>
- <Yg5VnRtsrrQX4mFG@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Yg5VnRtsrrQX4mFG@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20211220141734.12206-1-joshi.k@samsung.com> <CGME20211220142228epcas5p2978d92d38f2015148d5f72913d6dbc3e@epcas5p2.samsung.com>
+ <20211220141734.12206-2-joshi.k@samsung.com> <Yg2vP7lo3hGLGakx@bombadil.infradead.org>
+In-Reply-To: <Yg2vP7lo3hGLGakx@bombadil.infradead.org>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Thu, 17 Feb 2022 21:09:30 +0530
+Message-ID: <CA+1E3rLpKp0h2x7CoFPXwsYOc4ZYg_sqQQ+ed8cJhq77ESOAjg@mail.gmail.com>
+Subject: Re: [RFC 01/13] io_uring: add infra for uring_cmd completion in submitter-task
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Anuj Gupta <anuj20.g@samsung.com>,
+        Pankaj Raghav <pankydev8@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/17/22 7:03 AM, Christoph Hellwig wrote:
-> On Thu, Feb 17, 2022 at 06:34:02AM -0700, Jens Axboe wrote:
->> On 2/17/22 12:48 AM, Christoph Hellwig wrote:
->>> On Wed, Feb 16, 2022 at 07:32:12PM +0800, Wang Jianchao (Kuaishou) wrote:
->>>> From: Wang Jianchao <wangjianchao@kuaishou.com>
->>>>
->>>> When __alloc_disk_node() failed, there will not not del_gendisk()
->>>> any more, then resource in rqos policies is leaked. Add rq_qos_exit()
->>>> into blk_cleanup_queue(). rqos is removed from the list, so needn't
->>>> to worry .exit is called twice.
->>>>
->>>> Fixes: commit 8e141f9eb803 ("block: drain file system I/O on del_gendisk")
->>>> Suggested-by: Bart Van Assche <bart.vanassche@wdc.com>
->>>> Signed-off-by: Wang Jianchao <wangjianchao@kuaishou.com>
->>>
->>> Ming had a pending patch to move it into disk_release instead, which
->>> I think is the right place.
->>
->> I missed that patch and can't seem to find it, do you have a link?
-> 
-> [PATCH V2 12/13] block: move rq_qos_exit() into disk_release()
-> 
-> from Jan 22.  Although it would need a rebase so it can be applied
-> without the preceding patches.
+On Thu, Feb 17, 2022 at 7:43 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> On Mon, Dec 20, 2021 at 07:47:22PM +0530, Kanchan Joshi wrote:
+> > Completion of a uring_cmd ioctl may involve referencing certain
+> > ioctl-specific fields, requiring original submitter context.
+> > Export an API that driver can use for this purpose.
+> > The API facilitates reusing task-work infra of io_uring, while driver
+> > gets to implement cmd-specific handling in a callback.
+> >
+> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> > Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> > ---
+> >  fs/io_uring.c            | 16 ++++++++++++++++
+> >  include/linux/io_uring.h |  8 ++++++++
+> >  2 files changed, 24 insertions(+)
+> >
+> > diff --git a/fs/io_uring.c b/fs/io_uring.c
+> > index e96ed3d0385e..246f1085404d 100644
+> > --- a/fs/io_uring.c
+> > +++ b/fs/io_uring.c
+> > @@ -2450,6 +2450,22 @@ static void io_req_task_submit(struct io_kiocb *req, bool *locked)
+> >               io_req_complete_failed(req, -EFAULT);
+> >  }
+> >
+> > +static void io_uring_cmd_work(struct io_kiocb *req, bool *locked)
+> > +{
+> > +     req->uring_cmd.driver_cb(&req->uring_cmd);
+>
+> If the callback memory area is gone, boom.
 
-Can someone respin that for 5.17 then?
+Why will the memory area be gone?
+Module removal is protected because try_module_get is done anyway when
+the namespace was opened.
 
--- 
-Jens Axboe
+> > +}
+> > +
+> > +void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+> > +                     void (*driver_cb)(struct io_uring_cmd *))
+>
+> Adding kdoc style comment for this would be nice. Please document
+> the context that is allowed.
 
+Sure, for all kdoc style comments. Will add that in the next version.
+
+> > +{
+> > +     struct io_kiocb *req = container_of(ioucmd, struct io_kiocb, uring_cmd);
+> > +
+> > +     req->uring_cmd.driver_cb = driver_cb;
+> > +     req->io_task_work.func = io_uring_cmd_work;
+> > +     io_req_task_work_add(req, !!(req->ctx->flags & IORING_SETUP_SQPOLL));
+>
+> This can schedules, and so the callback may go fishing in the meantime.
+
+io_req_task_work_add is safe to be called in atomic context.
+FWIW, io_uring uses this for regular (i.e. direct block) io completion too.
+
+> > +}
+> > +EXPORT_SYMBOL_GPL(io_uring_cmd_complete_in_task);
+> > +
+> >  static void io_req_task_queue_fail(struct io_kiocb *req, int ret)
+> >  {
+> >       req->result = ret;
+> > diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+> > index 64e788b39a86..f4b4990a3b62 100644
+> > --- a/include/linux/io_uring.h
+> > +++ b/include/linux/io_uring.h
+> > @@ -14,11 +14,15 @@ struct io_uring_cmd {
+> >       __u16           op;
+> >       __u16           unused;
+> >       __u32           len;
+> > +     /* used if driver requires update in task context*/
+>
+> By using kdoc above youcan remove this comment.
+>
+> > +     void (*driver_cb)(struct io_uring_cmd *cmd);
+>
+> So we'd need a struct module here I think if we're going to
+> defer this into memory which can be removed.
+>
+Same as the previous module-removal comment.Do we really need that?
+
+Thanks,
+--
