@@ -2,71 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62222C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 02:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8643C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 03:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231995AbiBQC4a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 21:56:30 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47826 "EHLO
+        id S232102AbiBQDAc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 22:00:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231570AbiBQC43 (ORCPT
+        with ESMTP id S231487AbiBQDAb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 21:56:29 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 752BA2A82F1;
-        Wed, 16 Feb 2022 18:56:16 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id m7so4309276pjk.0;
-        Wed, 16 Feb 2022 18:56:16 -0800 (PST)
+        Wed, 16 Feb 2022 22:00:31 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5CD011798C
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 19:00:18 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id 10so3551782plj.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 19:00:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=VCg3RHLInrgniOKILMGbojNoMCIaEL/WD2F2sir3AnY=;
-        b=G6BPBHytOnGUDNYwcKVMuQZrwWXgLg0zrVx63/qTFaZNkPZetO0kgU0rajqYZYfLHX
-         PRoUePZn1egnj5dsf/rFHbuUjNhrvfss0grV5F2egsoKP8Fprqoz9uaPnKSPY05rOhUS
-         pKCUlnUYhBWa8NBoRghg9fqIdxm5GoukuzsODHQlKjibVxIIhQ1b7bZKbg3wqs5GAuwt
-         laTOsPEr0ALYGfRL0HoPXTquFefDqanPyD6AjxvEV/rRuiPkaMhH93XWQxfZ1o2bD1RT
-         ep0H9pZon3uc57t1iBuZbBXQda9Xev0x0W2qzYuxYCvicPxj317JlDX7PCsGBIsMGuBc
-         wAhw==
+        bh=N60qr2krIAjXbDIrmScAICdv9KtrKPICkqaKlx8WkGM=;
+        b=c80wYtRFkO6AOaiuqPTXpb/f10Jdb53VzVcSdM4Ope0zVGssdPIhZ6ZjX+PCgSaro+
+         1uFUhNI/STauWf6uqVH6BlZ0T+AvBAVs4n/5gtRx8Q3PPepU8CTAO83R0F+6ahfo9zKY
+         now12eflm1+llaacTjC3ZoBlP8ciky7yCmafNQnjTc6zjtoPfAm84aLx2fPNDpJxfNj2
+         FtEQ84Ro2djp1YOXDS5UxVpLHM35eKLSa61RjaEAXsRqTRme/rsEVV5Y1qV/NSwPeZe2
+         lVrRhdTS2liU7NgJBd2YvWX1MLnV/BnbcZf/d35BOh1vfCXs0KuVcBqxedywXa6kBLeg
+         2+vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=VCg3RHLInrgniOKILMGbojNoMCIaEL/WD2F2sir3AnY=;
-        b=qaoOpOrchErJ7BJKHz41eNAN4sS+MjiL1CkmeipurpQCqEyhHmx9ou4w0RdL9iE2Ab
-         osFB+1dQgEoGlP6inivPFSFKBu3TRnMOroqZszcfCFpGUpjYoYQBxWwTEzS/9ISA0rVu
-         TMU1aNKYIH46WgSItAnR4QiqUnvSIRKO8byV3/DENNlhPy0MLEiLaqgYoPtoxkmUWfB6
-         kXwnhXkfkLKNyC8ny3cecEPPDCykgMDZ+wDa5G0l1552gOWjdU9UGLtl67eKuQbD2LC8
-         aMOz6dYSMzsO3NAY0yFhPT87ANabymFT4QGOK5JqMSPEP86FWVuHGKl3nT2u8h00AWk5
-         SSQg==
-X-Gm-Message-State: AOAM530MKo6plyQim4AlsRiBmJLUIFfr2gPHgpPF+PjoKyNb9GwWFP8R
-        oDJx4HUMfHlGl2Tj7MCh9Bg=
-X-Google-Smtp-Source: ABdhPJyrrssLYNNC6H1c42LMnZd0TAGyNf2ernvHSYQuWo/ZJNcxBjkTpUSzyNpZgKd5rEBB39yKJA==
-X-Received: by 2002:a17:90b:b16:b0:1b9:eef:1690 with SMTP id bf22-20020a17090b0b1600b001b90eef1690mr907858pjb.9.1645066575993;
-        Wed, 16 Feb 2022 18:56:15 -0800 (PST)
-Received: from [172.20.119.15] ([162.219.34.248])
-        by smtp.gmail.com with ESMTPSA id s5sm7042020pfd.66.2022.02.16.18.56.13
+        bh=N60qr2krIAjXbDIrmScAICdv9KtrKPICkqaKlx8WkGM=;
+        b=uRKRYE9Y4DFbQSpMmFCUiSkLHj2BQnp35ZbF7ejT0KWc+hH9hhF8b2qg5gKRucTZHJ
+         RTvTcPhatH7snWkMlG6Qs9Jkymi1G6uPKawBwqGK1cR92o3Vd8FaKD+jf46uct7obHed
+         yJmwbLiYlqsN+0Dq/FKrdempgSjzZNipj4OXKMM8YOedt88q6xxXc+kkBFdYfA+FZW54
+         1Y2sboGPPDDF9jVyjkia/Cyml2zcSSkXACoRwqcjMW0PJ8cD8ODdW1HDMQDCIVrljxM7
+         o+9md7v3hhzpUnURiBkHxgphDR1i4Ky1HttjLY0jnUbC1uJ+O51yiksedXqufmtXdsWK
+         nguQ==
+X-Gm-Message-State: AOAM533gh9Q5oEM2SYrgSoh+9RjIOH06MOUdmgyCztvwhnud0oemaWvB
+        wOPhXYfgNxbPJzQwFNxrRNY=
+X-Google-Smtp-Source: ABdhPJyK/TayBrEJbcMxiXvfCxx0dV3bnTBjFtt6pymkLzKBLkvAdvBj/SDj7rlooiXR5xdnpbjsFw==
+X-Received: by 2002:a17:903:1207:b0:14d:537b:40f6 with SMTP id l7-20020a170903120700b0014d537b40f6mr923722plh.50.1645066818162;
+        Wed, 16 Feb 2022 19:00:18 -0800 (PST)
+Received: from [172.20.119.15] ([61.16.102.71])
+        by smtp.gmail.com with ESMTPSA id o8sm320805pfu.90.2022.02.16.19.00.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Feb 2022 18:56:15 -0800 (PST)
-Message-ID: <8b358115-67c6-c76a-b0ca-5c44c79218e7@gmail.com>
-Date:   Thu, 17 Feb 2022 10:56:11 +0800
+        Wed, 16 Feb 2022 19:00:17 -0800 (PST)
+Message-ID: <8e2a7c6a-01b2-39f5-758c-467fed461488@gmail.com>
+Date:   Thu, 17 Feb 2022 11:00:15 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [RFC V2 5/6] blk-ioprio: make ioprio pluggable and modular
+Subject: Re: [[RFC blktests]] test/block/032: add test cases for switching
+ queue qos
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     hch@infradead.org, Josef Bacik <jbacik@fb.com>,
-        Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220215123705.58968-1-jianchao.wan9@gmail.com>
- <20220215123705.58968-6-jianchao.wan9@gmail.com>
- <cb5677fc-01ac-f97f-ccf8-eb91505ad0e3@acm.org>
- <0608cd82-89c6-8fba-d06b-fdef9c53114f@gmail.com>
- <306b80f7-1185-17b8-fb85-7241823681d0@acm.org>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "osandov@osandov.com" <osandov@osandov.com>
+References: <20220216115947.85220-1-jianchao.wan9@gmail.com>
+ <44ef4a68-054e-9b96-b40a-f9d1e65ddb0b@nvidia.com>
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <306b80f7-1185-17b8-fb85-7241823681d0@acm.org>
+In-Reply-To: <44ef4a68-054e-9b96-b40a-f9d1e65ddb0b@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -75,35 +72,25 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2022/2/17 2:01 上午, Bart Van Assche wrote:
-> On 2/15/22 18:09, Wang Jianchao wrote:
->> On 2022/2/16 5:26 上午, Bart Van Assche wrote:
->>> On 2/15/22 04:37, Wang Jianchao (Kuaishou) wrote:
->>>> diff --git a/block/Makefile b/block/Makefile
->>>> index f38eaa612929..f6a3995af285 100644
->>>> --- a/block/Makefile
->>>> +++ b/block/Makefile
->>>> @@ -17,7 +17,8 @@ obj-$(CONFIG_BLK_DEV_BSGLIB)    += bsg-lib.o
->>>>    obj-$(CONFIG_BLK_CGROUP)    += blk-cgroup.o
->>>>    obj-$(CONFIG_BLK_CGROUP_RWSTAT)    += blk-cgroup-rwstat.o
->>>>    obj-$(CONFIG_BLK_DEV_THROTTLING)    += blk-throttle.o
->>>> -obj-$(CONFIG_BLK_CGROUP_IOPRIO)    += blk-ioprio.o
->>>> +io-prio-y             := blk-ioprio.o
->>>> +obj-$(CONFIG_BLK_CGROUP_IOPRIO)    += io-prio.o
->>>>    obj-$(CONFIG_BLK_CGROUP_IOLATENCY)    += blk-iolatency.o
->>>>    obj-$(CONFIG_BLK_CGROUP_IOCOST)    += blk-iocost.o
->>>>    obj-$(CONFIG_MQ_IOSCHED_DEADLINE)    += mq-deadline.o
->>>
->>> Is the above change really necessary?
+On 2022/2/17 1:34 上午, Chaitanya Kulkarni wrote:
+> On 2/16/22 03:59, Wang Jianchao (Kuaishou) wrote:
+>> Signed-off-by: Wang Jianchao (Kuaishou) <jianchao.wan9@gmail.com>
+>> ---
+>>   tests/block/032     | 62 +++++++++++++++++++++++++++++++++++++++++++++
+>>   tests/block/032.out |  2 ++
+>>   2 files changed, 64 insertions(+)
+>>   create mode 100644 tests/block/032
+>>   create mode 100644 tests/block/032.out
 >>
->> Except for making maintaining easier on a running system, removing a
->> rqos policy module with cgroup supporting can release a blk-cgroup
->> policy slots. As BLKCG_MAX_POLS, the max slots number is fixed now.
+>> diff --git a/tests/block/032 b/tests/block/032
 > 
-> It seems like my question was not clear? What I meant is that I think that the above changes are not necessary to build blk-ioprio as a kernel module.
 > 
-Thanks so much for your kindly remind. I have changed it.
+> Can you please add some comments to make it easier to read for someone
+> who's new to the blktests framework ?
+> 
 
-Regards
+I will add some comment to explain what does the test case do in next version.
+
+Thanks
 Jianchao
-
+ 
