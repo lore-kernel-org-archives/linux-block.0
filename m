@@ -2,61 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDD1C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 02:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B2AC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Feb 2022 02:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231827AbiBQCnM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Feb 2022 21:43:12 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40798 "EHLO
+        id S231864AbiBQCs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Feb 2022 21:48:26 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbiBQCnM (ORCPT
+        with ESMTP id S231934AbiBQCsZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Feb 2022 21:43:12 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3801139109
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 18:42:58 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id d9-20020a17090a498900b001b8bb1d00e7so4146370pjh.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 18:42:58 -0800 (PST)
+        Wed, 16 Feb 2022 21:48:25 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334341FFCB5
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 18:48:12 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id m22so3789501pfk.6
+        for <linux-block@vger.kernel.org>; Wed, 16 Feb 2022 18:48:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=VQwupMkuml15X4XCUJ5gnxsl6W+UGm/inheXCXHtoe4=;
-        b=CQb1fFlOZ6k4lIyKOQFnODXtJ9Z1X9QF1ZtXTN3CSJdUgcCSPE8UpXWSc38nf19bDR
-         DmVIEUaPS8KygUEZ8ssknS+4B0csusMkgebCUERwmRGAq0+TUWnxF9SaFDOUvGcBBID7
-         W/dMuEIxOS8QDrAbx1A+VGsE6BVSh6xO8ChKffsxa59TWUo9z9yD8P2+ZFeYNXVxCD+u
-         U4zTz9i143/U6xYDqe1ZFww0+9crZXCO6f6m9CMUQMfhflVqrNdt0N5cBpDqFVLXXIvb
-         2A1PN2rN5E8kceD9IThtbobOyHeAIq804pkkFYaDfkoVBoR7btxLtn4o0ZEBuT+oOHM4
-         gq0w==
+        bh=z4i3sOJXuX5pLimLJFSpC+ldhVIHQTJAyQCIIZg6vB0=;
+        b=MAKfpeBarFVBWwQcysBwZiWFmuKrF2I+yyKafwWHcLfuPTLpj5AhAFFMGSOS1ptpVW
+         BYaxp5/QaxDBE1pbWlzrWulYvblHF3P7HnUm40geVqEe/CWtocilVYmWtBMQzvgh7gBP
+         SbAi45TriQv1LDZ2FyoWNZKj3/g8YKlnllG9oTlhCX6attCGW/oTE70mpGrFw+Mm37eD
+         LqBsarqyBz7pJPWcP7lS0PVSDwRX7c2kZZjb0yAi580ERYzK4vlWMpLyB6+sBS9G1+2S
+         R+di0YkeuwdBoSGR3bQktJMmbNdIuykrRs4AADH7x+Gtr0RqPEq4USsFnolA7nsMWr9W
+         XLrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=VQwupMkuml15X4XCUJ5gnxsl6W+UGm/inheXCXHtoe4=;
-        b=dV38Sw6FVAJApiUeEiiE4cnSHpuPlsWEuAStVZ7km8vGk1kcUsEfXn2jUssX5ot15k
-         tKrmU5ErhkYAXQ8Lvzu1Vy/HgFGHu1fd9fNOrWJLgJeAIZA4G1k1woXzgSlQJgIebnNG
-         VUFGxXoljdvRVSz8g2OKWMtyeB/svDeHXtDtJCqKPS63VSW6JKgdXQAnSdbMvJyo7NJl
-         lw5lg32r6qf1Ey3ZcPgExiahbWhSQ78nrbUGAu7DnXcrno7oylK4MDwx+gTF1byhXI+c
-         /8Yn4uAZQHraCugfq0kuW/POWz/6C9p/HG9QKLvYWO5s53ldsT2ovpBh5lwHCdKYP9n+
-         32Wg==
-X-Gm-Message-State: AOAM532G+5uePNf6bNCDblKjrR55OG5OXGrxpWHR7COgT/g6B50rW+j0
-        CAQjoVdp3DSepVwnVJN9WYlLv9YFGSiXKw==
-X-Google-Smtp-Source: ABdhPJyE0KcuzZAj07I01uphvfUg60finwzJxOq1oHLoyBsMRNN+FAqs0OVyH8qtWJ0E90iY26sZzg==
-X-Received: by 2002:a17:902:8bc1:b0:14c:f41b:b3b6 with SMTP id r1-20020a1709028bc100b0014cf41bb3b6mr915626plo.168.1645065778363;
-        Wed, 16 Feb 2022 18:42:58 -0800 (PST)
+        bh=z4i3sOJXuX5pLimLJFSpC+ldhVIHQTJAyQCIIZg6vB0=;
+        b=SVNMtHuixH9UryF703s0KAvgLvLZcqV5hCv+3iV99Zi7XMzlcMRuqJWBUP3TADUD9A
+         T+dQflyCloS/s0KN0ZHtcJFTo6ZCEYlB1gGpJB6793ZvaEz5nf+1J/PZER8MCnQZm/tt
+         Qoq8/2BH6BAfl4U9I5g0U8WjHG7Y6bLdg/9Zyh1EXn4aL7gPx4O3uDj71tKOy0qZmb9R
+         iYI0OaWGEhf2pkWRB/0IehnXxeY6aEd50uqxJ3Hb46QTEOst0jlxPvN1KA/yt3ViLU3A
+         PJk0dtmVmaTKe3A7kkjcxw4VAp5HVfCTuYAmLwEb+5mDf1t/JdaJlWpTB+hqdWpe/FfR
+         sOFg==
+X-Gm-Message-State: AOAM531RRp1/AU6hcRvs73+DvXZLQeUbiqU+QWbrDY3P1SuPWXOrSJ/B
+        QHNXZUIUuazgIhDcGonTIt82tA==
+X-Google-Smtp-Source: ABdhPJzvExI+t8yuXaS1DEStOCB4GW78Viv/TkR5lL+Qjf2kAF0uOwLJYp8MNv5DGGmehSRGmJjLtw==
+X-Received: by 2002:a05:6a00:124a:b0:4e1:7cfb:634c with SMTP id u10-20020a056a00124a00b004e17cfb634cmr1100314pfi.12.1645066091528;
+        Wed, 16 Feb 2022 18:48:11 -0800 (PST)
 Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id kb17sm390122pjb.1.2022.02.16.18.42.57
+        by smtp.gmail.com with ESMTPSA id lw3sm377109pjb.24.2022.02.16.18.48.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 18:42:57 -0800 (PST)
+        Wed, 16 Feb 2022 18:48:11 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Chunguang Xu <brookxu@tencent.com>, linux-block@vger.kernel.org,
-        Ning Li <lining2020x@163.com>, Tejun Heo <tj@kernel.org>
-In-Reply-To: <20220216044514.2903784-1-ming.lei@redhat.com>
-References: <20220216044514.2903784-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V4 0/8] block: improve iops limit throttle
-Message-Id: <164506577727.48067.15872775943104157586.b4-ty@kernel.dk>
-Date:   Wed, 16 Feb 2022 19:42:57 -0700
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>, Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        virtualization@lists.linux-foundation.org,
+        linux-mmc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220215094514.3828912-1-hch@lst.de>
+References: <20220215094514.3828912-1-hch@lst.de>
+Subject: Re: add a ->free_disk block_device_operation v3
+Message-Id: <164506608998.50072.6316036301772123687.b4-ty@kernel.dk>
+Date:   Wed, 16 Feb 2022 19:48:09 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -64,36 +69,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 16 Feb 2022 12:45:06 +0800, Ming Lei wrote:
-> Lining reported that iops limit throttle doesn't work on dm-thin, also
-> iops limit throttle works bad on plain disk in case of excessive split.
+On Tue, 15 Feb 2022 10:45:09 +0100, Christoph Hellwig wrote:
+> this series adds a ->free_disk method to struct block_device_operation so that
+> drivers can defer freeing their disk private data until the gendisk goes away
+> and don't need to play games with the validity of ->private_data.
 > 
-> Commit 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios")
-> was for addressing this issue, but the taken approach is just to run
-> post-accounting, then current split bios won't be throttled actually,
-> so actual iops throttle result isn't good in case of excessive bio
-> splitting.
+> This also converts three simple drivers over as example, but eventually I
+> imagine that all drivers with private data will use it.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/8] block: move submit_bio_checks() into submit_bio_noacct
-      commit: a650628bde77f6ac5b1d532092346feff7b58c52
-[2/8] block: move blk_crypto_bio_prep() out of blk-mq.c
-      commit: 7f36b7d02a287ed18d02ae821868aa07b0235521
-[3/8] block: don't declare submit_bio_checks in local header
-      commit: 29ff23624e21c89d3321d6429dec8ad3847b534a
-[4/8] block: don't check bio in blk_throtl_dispatch_work_fn
-      commit: 3f98c753717c600eb5708e9b78b3eba6664bddf1
-[5/8] block: merge submit_bio_checks() into submit_bio_noacct
-      commit: d24c670ec1f9f1dc320e59004e61f3491ae24546
-[6/8] block: throttle split bio in case of iops limit
-      commit: 9f5ede3c01f9951b0ae7d68b28762ad51d9bacc8
-[7/8] block: don't try to throttle split bio if iops limit isn't set
-      commit: 5a93b6027eb4ef5db60a4bc5bdbeba5fb9f29384
-[8/8] block: revert 4f1e9630afe6 ("blk-throtl: optimize IOPS throttle for large IO scenarios")
-      commit: 34841e6fb125aa3f0e33e4eaac9f5eb86b2bb34b
+[1/5] block: add a ->free_disk method
+      commit: 76792055c4c8b2472ca1ae48e0ddaf8497529f08
+[2/5] memstick/ms_block: simplify refcounting
+      commit: e2efa0796607efe60c708271be483c3a2b0128de
+[3/5] memstick/mspro_block: fix handling of read-only devices
+      commit: 6dab421bfe06a59bf8f212a72e34673e8acf2018
+[4/5] memstick/mspro_block: simplify refcounting
+      commit: 185ed423d1898ead071c18f6161959cd3cab2dde
+[5/5] virtio_blk: simplify refcounting
+      commit: 24b45e6c25173abcf8d5e82285212b47f2b0f86b
 
 Best regards,
 -- 
