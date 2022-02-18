@@ -2,100 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5798C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 08:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C7BC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 13:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232524AbiBRIa2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 03:30:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58052 "EHLO
+        id S235694AbiBRNN7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 08:13:59 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231165AbiBRIa1 (ORCPT
+        with ESMTP id S234116AbiBRNN6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 03:30:27 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C6217044;
-        Fri, 18 Feb 2022 00:30:09 -0800 (PST)
-Received: from kwepemi100006.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K0Px70DkxzbkbG;
-        Fri, 18 Feb 2022 16:28:59 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100006.china.huawei.com (7.221.188.165) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Feb 2022 16:30:06 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Feb 2022 16:30:06 +0800
-Subject: Re: [PATCH v3 0/3] block, bfq: minor cleanup and fix
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     <paolo.valente@linaro.org>, <jack@suse.cz>,
-        <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+        Fri, 18 Feb 2022 08:13:58 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9058C204DA6
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 05:13:42 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id v5-20020a17090a4ec500b001b8b702df57so12360123pjl.2
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 05:13:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=GK4rz9+seFn4xdxHvPLjlObHSp4PzOJAfGpbgOOGnDc=;
+        b=X0yxpy0FpsFY7ZLcYL/hyLZTcm0tOjEZLx7X2m/1SjWaDiXAxsGjQ3/RVtMsybX1vD
+         eUM4FKRSXHyTu2bsmY9dXOfKtxk6g8ka27l8MYEVjuweCvpCSeUW4UzRXSCnZQQ+pfIU
+         JtbpenlRpDiplHlpX+TUFxxs2aOg+dZC2RxDFoAFK3kmkY9FunGo9ockke4UU8MM+gJZ
+         2I2LNOuslQVGnctx/w+Zpz3/8yTUFqzfahTN9FFImDypH63XrQHgLszBX8NNBFm0tnew
+         Xymx+whVxA8NHk7ooSDbJrHQRFalkm53OPCNNXS8CLisZbMRgXl4JQ5lnZqqPzngJpJK
+         S9Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=GK4rz9+seFn4xdxHvPLjlObHSp4PzOJAfGpbgOOGnDc=;
+        b=hpaIwaoYjL4Nejh+UbDXFUdOVo32AjIsGfZd9nikg8yUHZ1Vuc6fSMNLQCZcwlA1/A
+         E1h+5wNQiyeR2Lp5rCaIFjOJx4T3PmugyuKpUmqqkuaGf9r0Co019en/GWDupT7/9BTq
+         0JlTVgcyRpFSi70+02BD77nmEnhNX6c1URp5j9c5F7IOKsGNieqRgySRQWhVH0oB8Ee5
+         XRso2LPbmmzNpDXHMMNotcF0sopVX3JGxT78BAfT9NJyzYJaDYhwsLkHPw49faJm7XFa
+         O69Ch4gOQoTG1LJoDJhDf5fzsndmfC6AwAdFqfJsle0Gn0Cz1JX19uM6VOdzKFkD6d9/
+         wFjw==
+X-Gm-Message-State: AOAM532HN11lzwgagsvu9aavxaRdfT8o/CawvGGVTAniUG0/7WtrRBPd
+        sTdhqR+6OsQc1yqrGlpvi6X6Xw==
+X-Google-Smtp-Source: ABdhPJxVEuInQM8ER6sR1lK2pIrJ6V0BG+s8JKZCjXNLjuXxYDSIzxEnjHU8F7msAcnMf1oHw8AiAg==
+X-Received: by 2002:a17:902:b116:b0:14f:460d:bf42 with SMTP id q22-20020a170902b11600b0014f460dbf42mr7500903plr.108.1645190021985;
+        Fri, 18 Feb 2022 05:13:41 -0800 (PST)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id j8sm3179025pfu.55.2022.02.18.05.13.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Feb 2022 05:13:41 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     jack@suse.cz, Yu Kuai <yukuai3@huawei.com>,
+        paolo.valente@linaro.org
+Cc:     linux-block@vger.kernel.org, yi.zhang@huawei.com,
+        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
+In-Reply-To: <20220129015924.3958918-1-yukuai3@huawei.com>
 References: <20220129015924.3958918-1-yukuai3@huawei.com>
- <7cb40388-02e9-712a-6a40-ccabd5605880@kernel.dk>
- <9ed6bf05-4c31-eef1-1736-65915e55eb8e@huawei.com>
- <0215f548-5d5f-107d-9c8e-3a802a51e00f@huawei.com>
-Message-ID: <040c3568-50c4-5f5a-08c4-fb182cbcd2a7@huawei.com>
-Date:   Fri, 18 Feb 2022 16:30:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Subject: Re: [PATCH v3 0/3] block, bfq: minor cleanup and fix
+Message-Id: <164519002068.11187.11125581863819344403.b4-ty@kernel.dk>
+Date:   Fri, 18 Feb 2022 06:13:40 -0700
 MIME-Version: 1.0
-In-Reply-To: <0215f548-5d5f-107d-9c8e-3a802a51e00f@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping ...
+On Sat, 29 Jan 2022 09:59:21 +0800, Yu Kuai wrote:
+> Changes in v3:
+>  - fix a clerical error in patch 2
+> 
+> Chagnes in v2:
+>  - add comment in patch 2
+>  - remove patch 4, since the problem do not exist.
+> 
+> [...]
 
-在 2022/02/10 19:46, yukuai (C) 写道:
-> 在 2022/01/29 10:05, yukuai (C) 写道:
->> 在 2022/01/29 9:51, Jens Axboe 写道:
->>> On 1/28/22 6:59 PM, Yu Kuai wrote:
->>>> Changes in v3:
->>>>   - fix a clerical error in patch 2
->>>>
->>>> Chagnes in v2:
->>>>   - add comment in patch 2
->>>>   - remove patch 4, since the problem do not exist.
->>>>
->>>> Yu Kuai (3):
->>>>    block, bfq: cleanup bfq_bfqq_to_bfqg()
->>>>    block, bfq: avoid moving bfqq to it's parent bfqg
->>>>    block, bfq: don't move oom_bfqq
->>>>
->>>>   block/bfq-cgroup.c  | 16 +++++++++++++++-
->>>>   block/bfq-iosched.c |  4 ++--
->>>>   block/bfq-iosched.h |  1 -
->>>>   block/bfq-wf2q.c    | 15 ---------------
->>>>   4 files changed, 17 insertions(+), 19 deletions(-)
->>>
->>> I'm not even looking at this until you tell me that:
->>>
->>> a) you've actually compiled this one. which, btw, I can't believe
->>>     needs mentioning, particularly when you had enough time to keep
->>>     pinging about this patchset.
->>>
->>> b) it's actually be run. last one was clearly not.
->>>
->> Hi,
->>
->> I compiled and tested the patchset locally in a different version,
->> v4.19 specifically. However, after I decide to send them to mainline,
->> I made such clerical mistake and forgot to check the patches.
->>
->> My sincerely apologize again...
->> Kuai
-> 
-> Hi, Jens
-> 
-> Can you please apply this patch this time?
-> 
-> Thanks,
-> Kuai
+Applied, thanks!
+
+[1/3] block, bfq: cleanup bfq_bfqq_to_bfqg()
+      commit: 43a4b1fee098bd38eed9c334d0e0df221ecdf719
+[2/3] block, bfq: avoid moving bfqq to it's parent bfqg
+      commit: c5e4cb0fcbbaa5ad853818c4a2383e9bd147fad6
+[3/3] block, bfq: don't move oom_bfqq
+      commit: 8410f70977734f21b8ed45c37e925d311dfda2e7
+
+Best regards,
+-- 
+Jens Axboe
+
+
