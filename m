@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FA6C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 19:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 682AEC43217
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 19:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238733AbiBRT6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 14:58:22 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44652 "EHLO
+        id S238583AbiBRT6X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 14:58:23 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236962AbiBRT6W (ORCPT
+        with ESMTP id S238616AbiBRT6W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 18 Feb 2022 14:58:22 -0500
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C225F205F1
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C30C205E8
         for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800 (PST)
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21IIMfPH020415
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21IA79xw030766
         for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=XFSnjQc0lxUFxFW6WH9BEHHNV+K91S6aCM8WNgx+bZM=;
- b=QFmzyw1WGU1KRMyZQIdpVkgMVfC/1sfITRThCI/I7Li261IumteN1aIgEjGpayoPjl0s
- Sl0jh4Lw7inEF4U9Vs94LCvhW2RAZJwUd0Xt3uAsYHIlt3pU2arTtSpzTMkBStFD4cYq
- GpnCLjzPDrTJAnX/FYFAcPGzqOnMVBJZR94= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ea6knvax3-2
+ bh=dyQGKcmKLpBFkL0VFOvvJJDt9XqOrzO/TDGIL6U8++0=;
+ b=H57y9wVdNGQuv+4ziv9okUhV1TSt/PMqnpZ6avVGOdn0fXztN5aetoOoeoe5Ze/E5Slr
+ 4/vFXmtFFzHwhoKRZlLmT00tSz9GmoT/6nHyK99/CBjFHMTlTAgSJG7t92MNU68J8DpP
+ Bzt7OSo+qvD5mXrCFAzK1meESV3xDsi7tYE= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ea9dm3m2h-6
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:03 -0800
-Received: from twshared9880.08.ash8.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c085:21d::7) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800
+Received: from twshared6457.05.ash9.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::6) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Feb 2022 11:58:01 -0800
+ 15.1.2308.21; Fri, 18 Feb 2022 11:58:02 -0800
 Received: by devvm225.atn0.facebook.com (Postfix, from userid 425415)
-        id AFE5FAEB660B; Fri, 18 Feb 2022 11:57:50 -0800 (PST)
+        id 963EBAEB6603; Fri, 18 Feb 2022 11:57:50 -0800 (PST)
 From:   Stefan Roesch <shr@fb.com>
 To:     <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>, <kernel-team@fb.com>
 CC:     <shr@fb.com>
-Subject: [PATCH v2 07/13] fs: add support for async buffered writes
-Date:   Fri, 18 Feb 2022 11:57:33 -0800
-Message-ID: <20220218195739.585044-8-shr@fb.com>
+Subject: [PATCH v2 03/13] mm: Add support for async buffered writes
+Date:   Fri, 18 Feb 2022 11:57:29 -0800
+Message-ID: <20220218195739.585044-4-shr@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220218195739.585044-1-shr@fb.com>
 References: <20220218195739.585044-1-shr@fb.com>
@@ -49,58 +49,70 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: z2yDZWciiChyDySTu0wgMK-srcGwKswP
-X-Proofpoint-GUID: z2yDZWciiChyDySTu0wgMK-srcGwKswP
+X-Proofpoint-GUID: eZBCTMGcYSHmjMQtv-dB5U4Pz4_bZy_T
+X-Proofpoint-ORIG-GUID: eZBCTMGcYSHmjMQtv-dB5U4Pz4_bZy_T
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-18_08,2022-02-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 suspectscore=0
- spamscore=0 clxscore=1015 priorityscore=1501 impostorscore=0 adultscore=0
- mlxlogscore=781 lowpriorityscore=0 malwarescore=0 mlxscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202180121
+ definitions=2022-02-18_09,2022-02-18_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 phishscore=0
+ malwarescore=0 spamscore=0 priorityscore=1501 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 clxscore=1015 bulkscore=0 impostorscore=0
+ mlxlogscore=877 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202180122
 X-FB-Internal: deliver
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for the AOP_FLAGS_BUF_WASYNC flag to the fs layer. If
-a page that is required for writing is not in the page cache, it returns
-EAGAIN instead of ENOMEM.
+This adds support for async buffered writes in the mm layer. When the
+AOP_FLAG_NOWAIT flag is set, if the page is not already loaded,
+the page gets created without blocking on the allocation.
 
 Signed-off-by: Stefan Roesch <shr@fb.com>
 ---
- fs/buffer.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ mm/filemap.c      |  1 +
+ mm/folio-compat.c | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index ae588ae4b1c1..58331ef214b9 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2062,6 +2062,7 @@ int __block_write_begin_int(struct folio *folio, lo=
-ff_t pos, unsigned len,
- 			*wait_bh++=3Dbh;
- 		}
- 	}
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 5bd692a327d0..f4e2036c5029 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -42,6 +42,7 @@
+ #include <linux/ramfs.h>
+ #include <linux/page_idle.h>
+ #include <linux/migrate.h>
++#include <linux/sched/mm.h>
+ #include <asm/pgalloc.h>
+ #include <asm/tlbflush.h>
+ #include "internal.h"
+diff --git a/mm/folio-compat.c b/mm/folio-compat.c
+index 749555a232a8..8243eeb883c1 100644
+--- a/mm/folio-compat.c
++++ b/mm/folio-compat.c
+@@ -133,11 +133,19 @@ struct page *grab_cache_page_write_begin(struct add=
+ress_space *mapping,
+ 					pgoff_t index, unsigned flags)
+ {
+ 	unsigned fgp_flags =3D FGP_LOCK | FGP_WRITE | FGP_CREAT | FGP_STABLE;
++	gfp_t gfp =3D mapping_gfp_mask(mapping);
+=20
+ 	if (flags & AOP_FLAG_NOFS)
+ 		fgp_flags |=3D FGP_NOFS;
+-	return pagecache_get_page(mapping, index, fgp_flags,
+-			mapping_gfp_mask(mapping));
 +
- 	/*
- 	 * If we issued read requests - let them complete.
- 	 */
-@@ -2141,8 +2142,11 @@ int block_write_begin(struct address_space *mappin=
-g, loff_t pos, unsigned len,
- 		gfp =3D GFP_ATOMIC | __GFP_NOWARN;
-=20
- 	page =3D grab_cache_page_write_begin(mapping, index, flags);
--	if (!page)
-+	if (!page) {
-+		if (no_wait)
-+			return -EAGAIN;
- 		return -ENOMEM;
++	if (flags & AOP_FLAG_NOWAIT) {
++		fgp_flags |=3D FGP_NOWAIT;
++
++		gfp |=3D GFP_ATOMIC;
++		gfp &=3D ~__GFP_DIRECT_RECLAIM;
 +	}
++
++	return pagecache_get_page(mapping, index, fgp_flags, gfp);
+ }
+ EXPORT_SYMBOL(grab_cache_page_write_begin);
 =20
- 	status =3D __block_write_begin_int(page_folio(page), pos, len, get_bloc=
-k, NULL, gfp);
- 	if (unlikely(status)) {
 --=20
 2.30.2
 
