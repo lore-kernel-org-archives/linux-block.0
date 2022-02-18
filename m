@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92090C35276
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 19:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F12C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 19:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238707AbiBRT63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 14:58:29 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44664 "EHLO
+        id S238933AbiBRT6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 14:58:44 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238700AbiBRT6W (ORCPT
+        with ESMTP id S238535AbiBRT61 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 14:58:22 -0500
+        Fri, 18 Feb 2022 14:58:27 -0500
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA04255A1
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:05 -0800 (PST)
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21IB9kjG008180
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35216318
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:10 -0800 (PST)
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21IILs85019472
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:09 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=diiXg5ASU6ZxIrdESQhrsgpZ9XXx9iwjyH5u3VF5/BQ=;
- b=WnzRguBhxbS5tJ6Co3Nwqb0cCfGPezS0rmqxk23iIGWmeHEZKijF6ugtT5PALlvWYCQY
- hn6eL+a8/zjG69qq/BS+Vd1WscxHbHMGPuai3IXf5lekQEXIc8OZGhuPG0rm7WuDZghc
- AQCDoTYK8UoL2Ap9Zlk/h3mf+cWchgmWV44= 
+ bh=PrMhbqwOga++xb/Ni5mVt/2MYejdr64cMoOG2i2n2Bc=;
+ b=ELJLbBl+g8Q1wQJeP3oaqUX4Wvd1a+umnXXcH3u+FcbHmQKnvu1dlveB/+yl6nI16pdh
+ MXTUftat+KVM/7PtxZzNcvhPYcVP0haB5uENjPTKy3SyXSxuR+nptecSnNdCI8upWga1
+ UfTf2EV4pEHt1/CEREJZs6NNzbCjnx9wHOc= 
 Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3e9yf2xd4q-2
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ea6knvaxw-3
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:09 -0800
 Received: from twshared6457.05.ash9.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::4) with Microsoft SMTP Server
+ mail.thefacebook.com (2620:10d:c0a8:83::7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Feb 2022 11:58:02 -0800
+ 15.1.2308.21; Fri, 18 Feb 2022 11:58:07 -0800
 Received: by devvm225.atn0.facebook.com (Postfix, from userid 425415)
-        id A32C8AEB6607; Fri, 18 Feb 2022 11:57:50 -0800 (PST)
+        id C2103AEB6611; Fri, 18 Feb 2022 11:57:50 -0800 (PST)
 From:   Stefan Roesch <shr@fb.com>
 To:     <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>, <kernel-team@fb.com>
 CC:     <shr@fb.com>
-Subject: [PATCH v2 05/13] fs: split off __create_empty_buffers function
-Date:   Fri, 18 Feb 2022 11:57:31 -0800
-Message-ID: <20220218195739.585044-6-shr@fb.com>
+Subject: [PATCH v2 10/13] sched: add new fields to task_struct
+Date:   Fri, 18 Feb 2022 11:57:36 -0800
+Message-ID: <20220218195739.585044-11-shr@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220218195739.585044-1-shr@fb.com>
 References: <20220218195739.585044-1-shr@fb.com>
@@ -49,75 +49,61 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: P634YsyKwdTKDub6i-YD8TvHBqqkDanU
-X-Proofpoint-ORIG-GUID: P634YsyKwdTKDub6i-YD8TvHBqqkDanU
+X-Proofpoint-ORIG-GUID: Jxd0ZtFBUqZJiM7SfaGzXPHTtRot99dc
+X-Proofpoint-GUID: Jxd0ZtFBUqZJiM7SfaGzXPHTtRot99dc
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-18_08,2022-02-18_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 phishscore=0
- spamscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=999 malwarescore=0 impostorscore=0 mlxscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 suspectscore=0
+ spamscore=0 clxscore=1015 priorityscore=1501 impostorscore=0 adultscore=0
+ mlxlogscore=999 lowpriorityscore=0 malwarescore=0 mlxscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2201110000 definitions=main-2202180121
 X-FB-Internal: deliver
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This splits off the function __create_empty_buffers() from the function
-create_empty_buffers. The __create_empty_buffers has an additional gfp
-parameter. This allows the caller to specify the allocation properties.
+Add two new fields to the task_struct to support async
+write throttling.
+
+  - One field to store how long writes are throttled: bdp_pause
+  - The other field to store the number of dirtied pages:
+    bdp_nr_dirtied_pause
 
 Signed-off-by: Stefan Roesch <shr@fb.com>
 ---
- fs/buffer.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ include/linux/sched.h | 3 +++
+ kernel/fork.c         | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 2858eaf433c8..648e1cba6da3 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1554,17 +1554,12 @@ void block_invalidatepage(struct page *page, unsi=
-gned int offset,
- EXPORT_SYMBOL(block_invalidatepage);
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 75ba8aa60248..97146b7539c5 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1324,6 +1324,9 @@ struct task_struct {
+ 	/* Start of a write-and-pause period: */
+ 	unsigned long			dirty_paused_when;
 =20
++	unsigned long			bdp_pause;
++	int				bdp_nr_dirtied_pause;
++
+ #ifdef CONFIG_LATENCYTOP
+ 	int				latency_record_count;
+ 	struct latency_record		latency_record[LT_SAVECOUNT];
+diff --git a/kernel/fork.c b/kernel/fork.c
+index d75a528f7b21..d34c9c00baea 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -2246,6 +2246,7 @@ static __latent_entropy struct task_struct *copy_pr=
+ocess(
+ 	p->nr_dirtied =3D 0;
+ 	p->nr_dirtied_pause =3D 128 >> (PAGE_SHIFT - 10);
+ 	p->dirty_paused_when =3D 0;
++	p->bdp_nr_dirtied_pause =3D -1;
 =20
--/*
-- * We attach and possibly dirty the buffers atomically wrt
-- * __set_page_dirty_buffers() via private_lock.  try_to_free_buffers
-- * is already excluded via the page lock.
-- */
--void create_empty_buffers(struct page *page,
--			unsigned long blocksize, unsigned long b_state)
-+static void __create_empty_buffers(struct page *page, unsigned long bloc=
-ksize,
-+				unsigned long b_state, gfp_t gfp)
- {
- 	struct buffer_head *bh, *head, *tail;
-=20
--	head =3D alloc_page_buffers(page, blocksize, true);
-+	head =3D __alloc_page_buffers(page, blocksize, gfp);
- 	bh =3D head;
- 	do {
- 		bh->b_state |=3D b_state;
-@@ -1587,6 +1582,17 @@ void create_empty_buffers(struct page *page,
- 	attach_page_private(page, head);
- 	spin_unlock(&page->mapping->private_lock);
- }
-+/*
-+ * We attach and possibly dirty the buffers atomically wrt
-+ * __set_page_dirty_buffers() via private_lock.  try_to_free_buffers
-+ * is already excluded via the page lock.
-+ */
-+void create_empty_buffers(struct page *page,
-+			unsigned long blocksize, unsigned long b_state)
-+{
-+	return __create_empty_buffers(page, blocksize, b_state,
-+				GFP_NOFS | __GFP_ACCOUNT | __GFP_NOFAIL);
-+}
- EXPORT_SYMBOL(create_empty_buffers);
-=20
- /**
+ 	p->pdeath_signal =3D 0;
+ 	INIT_LIST_HEAD(&p->thread_group);
 --=20
 2.30.2
 
