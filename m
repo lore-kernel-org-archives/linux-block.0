@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10532C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 03:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B09C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 03:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbiBRDnq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Feb 2022 22:43:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50606 "EHLO
+        id S229436AbiBRDoM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Feb 2022 22:44:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiBRDnp (ORCPT
+        with ESMTP id S229515AbiBRDoL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Feb 2022 22:43:45 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13FB0FEB2F;
-        Thu, 17 Feb 2022 19:43:30 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id 12so3183573pgd.0;
-        Thu, 17 Feb 2022 19:43:30 -0800 (PST)
+        Thu, 17 Feb 2022 22:44:11 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F210B219C3F;
+        Thu, 17 Feb 2022 19:43:54 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id z4so6724424pgh.12;
+        Thu, 17 Feb 2022 19:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=yN/a5yAp+A1O77SE+NBh+Z65AOWGwkPFtLthFGjHyhM=;
-        b=FTygqvIwaOL/rLpE2cmSpdFbQhEgQdKxgBVWrX4R2HKFk0R99hqa9SxDm1KfnPrOJX
-         OE22FBu4vtK5i131on7otz0rHM14HX1S4B5oh5ZLT5Pp20GZvLkS5WVfxiO/8z6AW7T0
-         0Pv8O4tLa7fVJkk7Rae4nO9Ay8X+Mx7iyBzfcVMTicEDqyRMEcH7BwGQrm248zHuXLUB
-         zsF6YXC+hxDmAYKOOSyjoK+zlJ5W44E8DSYdBL0/4jYbRE8aPjItxO4GWE9knk0sCb+t
-         Tgz+lb+Bg9Rv76S7jHP/ILVjgSi7aXTV3EkUxJ19X4xtSei6wllFyBCjuFfAUD6ArZXX
-         CEsg==
+        bh=wv/+n1Q+HAlLjb+w4/QeMPmoHd/JEq3IFMjhLXwWxzQ=;
+        b=aJbjhGQskGCoVVjFhLItRaAo1qPKhpkkmVjlYIVG65cmQBfWk4+Sp66V47DcqjJH2n
+         oG8E0G0G0cKp0z1jaDeSz0PjvhXdnPXdQpqfosnhRmAgcYdBbpumtFeuhIUGXhNSj0Lm
+         hravh2vemKlHEBfg75oUxLSeMdhN2oUyS4SFiq7gmhIHZ3Fuhur0936faFbqkCjjLq+X
+         +N/6tG36u9ivq+rsl7tPaCg2M+byCnQk9O6inn7wtfJhsOhRAmQ4v7QoRVMwidlpw1rb
+         xSrOTj4Dk3wHmZy0qTyaZ1lGwM/LH8TeWZzHus6o2/HGPMOxNGPajWknfkFhwBKc/4gP
+         6uOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=yN/a5yAp+A1O77SE+NBh+Z65AOWGwkPFtLthFGjHyhM=;
-        b=jpBCv0kSUi2JcI2yB8/3bj92YHM36CxcqTT7qLM0dH21xi2HuGiFmu05rmOPcqkPBO
-         A4xRqaiDbAo/V3EWyhW/cPDEB4RSW+U9BUnFgf1uXTS/d5oMXjv7AXAjHECSQsS3kWau
-         RTdyd94TZ+CsQiVUzj9ArSowRfRApecUWvF2MruQPiASE76+fnaTqGx1SNsz8tdnN69R
-         nYgzd68MqfTDVSOCnCjcL+pc0U9lwiFZy7ULrSL/6ibjDYkBbBpNx6tcJrU+f0XziFB0
-         vSXGZDP3jACkqHRDHHv/ARG1S6NvB6qD24uFq0aPvxO8QlZSkItNCYlQ8sEOa8gPXy5p
-         HhKQ==
-X-Gm-Message-State: AOAM532Y0Zi42oajH3J0r3T+UyF/mOQSh5LSNKeeqh2pFqubfQIQxLcq
-        GdjJGR4Ae+B4nLiCvEavUPA=
-X-Google-Smtp-Source: ABdhPJzUc65amfvPFHsZAKrUDxFG8bH7m5W5+7q0WCleU1U4l8120N8Paw368gj++SLLmsrHkV2b5g==
-X-Received: by 2002:a63:8bc9:0:b0:34c:17:6174 with SMTP id j192-20020a638bc9000000b0034c00176174mr4848049pge.133.1645155809585;
-        Thu, 17 Feb 2022 19:43:29 -0800 (PST)
-Received: from [172.20.119.15] ([61.16.102.69])
-        by smtp.gmail.com with ESMTPSA id d13sm956636pfj.205.2022.02.17.19.43.25
+        bh=wv/+n1Q+HAlLjb+w4/QeMPmoHd/JEq3IFMjhLXwWxzQ=;
+        b=KqOzTM+IsT6F+K2F+vNr49CPiHGwr40UECxvqZ54lR9IXM2ADuNoHvbzGZt7JrJY/H
+         KGzJZcTR/YqKcIX10ocNgvnShrMhYfY550zXWqJAzatVtXxjUTsAL0TSdq16UunxWGP0
+         n+ujAwp8xh3iPnxx4pDEBujxFKiMSiDFXJIj5nDCEIrlpHMY9y85Mxz7TGvqDc3Kdq0/
+         zszLGmPUtkHGD7rJmHlkxi2Q2syw/I7DKNBtDActXireDZstvHKVQ0KYH4GvZyjNRr3p
+         Yny6Ec/6LW+dwA2JNebmBfOZslmtAFc9tFSugkpjQovPAxwnqOV1Yxv2Com8d12GLeGP
+         +iLA==
+X-Gm-Message-State: AOAM533fSloJi6PSfH6bBhc4nMgrk46ipLWR8QvLN1zgIpBQ4yL/iqL8
+        D4rAQSjG/0LPjyiuM3TEtD9nhjNoduDTeA==
+X-Google-Smtp-Source: ABdhPJxw+c2WLxlMvpFAAGvxIOO++8RTCSUUYCG8f58peZoY29HDT1AptigeGTZYxcvvl4AiBe1WfA==
+X-Received: by 2002:a05:6a00:b86:b0:4e1:954e:4f04 with SMTP id g6-20020a056a000b8600b004e1954e4f04mr6166140pfj.33.1645155834545;
+        Thu, 17 Feb 2022 19:43:54 -0800 (PST)
+Received: from [172.20.119.15] ([162.219.34.248])
+        by smtp.gmail.com with ESMTPSA id lk11sm3634526pjb.31.2022.02.17.19.43.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 19:43:29 -0800 (PST)
-Message-ID: <0c121357-8cea-ef1f-024c-da30f989d406@gmail.com>
-Date:   Fri, 18 Feb 2022 11:43:23 +0800
+        Thu, 17 Feb 2022 19:43:54 -0800 (PST)
+Message-ID: <88622875-4a96-111e-93d0-6a10e4306ada@gmail.com>
+Date:   Fri, 18 Feb 2022 11:43:51 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [RFC V4 4/6] blk-iocost: make iocost pluggable
+Subject: Re: [RFC V4 6/6] blk: export the sysfs for switching qos
 Content-Language: en-US
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
@@ -62,10 +62,10 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
         Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
- <20220217031349.98561-5-jianchao.wan9@gmail.com>
- <Yg4M2+eG1EGY/+vV@infradead.org>
+ <20220217031349.98561-7-jianchao.wan9@gmail.com>
+ <Yg4Necp/xHXWvoDM@infradead.org>
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <Yg4M2+eG1EGY/+vV@infradead.org>
+In-Reply-To: <Yg4Necp/xHXWvoDM@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -74,51 +74,14 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2022/2/17 4:52 下午, Christoph Hellwig wrote:
-> On Thu, Feb 17, 2022 at 11:13:47AM +0800, Wang Jianchao (Kuaishou) wrote:
->> Make blk-iocost pluggable. Then we can close or open it through
->> /sys/block/xxx/queue/qos.
->>
->> Signed-off-by: Wang Jianchao (Kuaishou) <jianchao.wan9@gmail.com>
->> ---
->>  block/blk-iocost.c     | 52 ++++++++++++++++++++++++++----------------
->>  block/blk-mq-debugfs.c |  2 --
->>  block/blk-rq-qos.h     |  1 -
->>  3 files changed, 32 insertions(+), 23 deletions(-)
->>
->> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
->> index 769b64394298..5a3a45985b49 100644
->> --- a/block/blk-iocost.c
->> +++ b/block/blk-iocost.c
->> @@ -660,9 +660,10 @@ static struct ioc *rqos_to_ioc(struct rq_qos *rqos)
->>  	return container_of(rqos, struct ioc, rqos);
->>  }
->>  
->> +static struct rq_qos_ops ioc_rqos_ops;
->>  static struct ioc *q_to_ioc(struct request_queue *q)
->>  {
->> -	return rqos_to_ioc(rq_qos_id(q, RQ_QOS_COST));
->> +	return rqos_to_ioc(rq_qos_by_id(q, ioc_rqos_ops.id));
->>  }
+On 2022/2/17 4:55 下午, Christoph Hellwig wrote:
+> On Thu, Feb 17, 2022 at 11:13:49AM +0800, Wang Jianchao (Kuaishou) wrote:
+>> -static const char *rq_qos_id_to_name(enum rq_qos_id id)
+>> -{
+>> -	return "unknown";
+>> -}
 > 
-> This has a single caller, so just open code it.
-> 
->> +static int blk_iocost_init(struct request_queue *q);
->> +
->>  static struct rq_qos_ops ioc_rqos_ops = {
->> +	.name = "blk-iocost",
->> +	.flags = RQOS_FLAG_CGRP_POL,
->>  	.throttle = ioc_rqos_throttle,
->>  	.merge = ioc_rqos_merge,
->>  	.done_bio = ioc_rqos_done_bio,
->>  	.done = ioc_rqos_done,
->>  	.queue_depth_changed = ioc_rqos_queue_depth_changed,
->>  	.exit = ioc_rqos_exit,
->> +	.init = blk_iocost_init,
->>  };
-> 
-> Again, move rq_qos_ops below the init function to avoid the forward
-> declaration.
+> Please split the removal of dead code into a separate patch.
 
 Got it
 
