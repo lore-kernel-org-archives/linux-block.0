@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 682AEC43217
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 19:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 424E6C4321E
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 19:58:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238583AbiBRT6X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 14:58:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44650 "EHLO
+        id S238670AbiBRT6Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 14:58:25 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238616AbiBRT6W (ORCPT
+        with ESMTP id S238593AbiBRT6W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 18 Feb 2022 14:58:22 -0500
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C30C205E8
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58C3B1FA70
         for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800 (PST)
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21IA79xw030766
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.1.2/8.16.1.2) with ESMTP id 21IHUXXY014023
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:03 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=dyQGKcmKLpBFkL0VFOvvJJDt9XqOrzO/TDGIL6U8++0=;
- b=H57y9wVdNGQuv+4ziv9okUhV1TSt/PMqnpZ6avVGOdn0fXztN5aetoOoeoe5Ze/E5Slr
- 4/vFXmtFFzHwhoKRZlLmT00tSz9GmoT/6nHyK99/CBjFHMTlTAgSJG7t92MNU68J8DpP
- Bzt7OSo+qvD5mXrCFAzK1meESV3xDsi7tYE= 
+ bh=alXhLW7aurhHczIm3IzCj5kJidR1rbjDw8mIZ0YRvcw=;
+ b=DHGSK/R4EqPc0NUjFBF6FAlhOwu1u6CCBsgoYKFDVyxj7y1ffyuQjXXki8V2OvUu+UpO
+ Paw4O9E47g2vnIaOn0JhgQajgdWgDYsjOeJR0MPvFrGZJlirSJGnAc05A+dUpd+w1MO2
+ NwxyI7Cjqnr+lCbbdmzn03vfQ96O0nrVwW8= 
 Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ea9dm3m2h-6
+        by m0001303.ppops.net (PPS) with ESMTPS id 3eafwrh1a3-2
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:04 -0800
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 11:58:03 -0800
 Received: from twshared6457.05.ash9.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::6) with Microsoft SMTP Server
+ mail.thefacebook.com (2620:10d:c0a8:82::c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2308.21; Fri, 18 Feb 2022 11:58:02 -0800
 Received: by devvm225.atn0.facebook.com (Postfix, from userid 425415)
-        id 963EBAEB6603; Fri, 18 Feb 2022 11:57:50 -0800 (PST)
+        id B5AC3AEB660D; Fri, 18 Feb 2022 11:57:50 -0800 (PST)
 From:   Stefan Roesch <shr@fb.com>
 To:     <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
         <linux-block@vger.kernel.org>, <kernel-team@fb.com>
 CC:     <shr@fb.com>
-Subject: [PATCH v2 03/13] mm: Add support for async buffered writes
-Date:   Fri, 18 Feb 2022 11:57:29 -0800
-Message-ID: <20220218195739.585044-4-shr@fb.com>
+Subject: [PATCH v2 08/13] io_uring: add support for async buffered writes
+Date:   Fri, 18 Feb 2022 11:57:34 -0800
+Message-ID: <20220218195739.585044-9-shr@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220218195739.585044-1-shr@fb.com>
 References: <20220218195739.585044-1-shr@fb.com>
@@ -49,70 +49,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: eZBCTMGcYSHmjMQtv-dB5U4Pz4_bZy_T
-X-Proofpoint-ORIG-GUID: eZBCTMGcYSHmjMQtv-dB5U4Pz4_bZy_T
+X-Proofpoint-ORIG-GUID: Gc3PEEJ1LScDBv0T8ODLcG9wp7jvHSD_
+X-Proofpoint-GUID: Gc3PEEJ1LScDBv0T8ODLcG9wp7jvHSD_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2022-02-18_09,2022-02-18_01,2021-12-02_01
 X-Proofpoint-Spam-Details: rule=fb_outbound_notspam policy=fb_outbound score=0 phishscore=0
- malwarescore=0 spamscore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 mlxscore=0 clxscore=1015 bulkscore=0 impostorscore=0
- mlxlogscore=877 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2202180122
+ adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
+ clxscore=1015 suspectscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=962
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202180122
 X-FB-Internal: deliver
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for async buffered writes in the mm layer. When the
-AOP_FLAG_NOWAIT flag is set, if the page is not already loaded,
-the page gets created without blocking on the allocation.
+This enables the async buffered writes for block devices in io_uring.
+Buffered writes are enabled for blocks that are already in the page
+cache or can be acquired with noio.
+
+It is possible that a write request cannot be completely fullfilled
+(short write). In that case the request is punted and sent to the io
+workers to be completed. Before submitting the request to the io
+workers, the request is updated with how much has already been written.
 
 Signed-off-by: Stefan Roesch <shr@fb.com>
 ---
- mm/filemap.c      |  1 +
- mm/folio-compat.c | 12 ++++++++++--
- 2 files changed, 11 insertions(+), 2 deletions(-)
+ fs/io_uring.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 5bd692a327d0..f4e2036c5029 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -42,6 +42,7 @@
- #include <linux/ramfs.h>
- #include <linux/page_idle.h>
- #include <linux/migrate.h>
-+#include <linux/sched/mm.h>
- #include <asm/pgalloc.h>
- #include <asm/tlbflush.h>
- #include "internal.h"
-diff --git a/mm/folio-compat.c b/mm/folio-compat.c
-index 749555a232a8..8243eeb883c1 100644
---- a/mm/folio-compat.c
-+++ b/mm/folio-compat.c
-@@ -133,11 +133,19 @@ struct page *grab_cache_page_write_begin(struct add=
-ress_space *mapping,
- 					pgoff_t index, unsigned flags)
- {
- 	unsigned fgp_flags =3D FGP_LOCK | FGP_WRITE | FGP_CREAT | FGP_STABLE;
-+	gfp_t gfp =3D mapping_gfp_mask(mapping);
-=20
- 	if (flags & AOP_FLAG_NOFS)
- 		fgp_flags |=3D FGP_NOFS;
--	return pagecache_get_page(mapping, index, fgp_flags,
--			mapping_gfp_mask(mapping));
-+
-+	if (flags & AOP_FLAG_NOWAIT) {
-+		fgp_flags |=3D FGP_NOWAIT;
-+
-+		gfp |=3D GFP_ATOMIC;
-+		gfp &=3D ~__GFP_DIRECT_RECLAIM;
-+	}
-+
-+	return pagecache_get_page(mapping, index, fgp_flags, gfp);
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 77b9c7e4793b..52bd88908afd 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -3615,7 +3615,7 @@ static inline int io_iter_do_read(struct io_kiocb *=
+req, struct iov_iter *iter)
+ 		return -EINVAL;
  }
- EXPORT_SYMBOL(grab_cache_page_write_begin);
 =20
+-static bool need_read_all(struct io_kiocb *req)
++static bool need_complete_io(struct io_kiocb *req)
+ {
+ 	return req->flags & REQ_F_ISREG ||
+ 		S_ISBLK(file_inode(req->file)->i_mode);
+@@ -3679,7 +3679,7 @@ static int io_read(struct io_kiocb *req, unsigned i=
+nt issue_flags)
+ 	} else if (ret =3D=3D -EIOCBQUEUED) {
+ 		goto out_free;
+ 	} else if (ret =3D=3D req->result || ret <=3D 0 || !force_nonblock ||
+-		   (req->flags & REQ_F_NOWAIT) || !need_read_all(req)) {
++		   (req->flags & REQ_F_NOWAIT) || !need_complete_io(req)) {
+ 		/* read all, failed, already did sync or don't want to retry */
+ 		goto done;
+ 	}
+@@ -3777,9 +3777,10 @@ static int io_write(struct io_kiocb *req, unsigned=
+ int issue_flags)
+ 		if (unlikely(!io_file_supports_nowait(req)))
+ 			goto copy_iov;
+=20
+-		/* file path doesn't support NOWAIT for non-direct_IO */
+-		if (force_nonblock && !(kiocb->ki_flags & IOCB_DIRECT) &&
+-		    (req->flags & REQ_F_ISREG))
++		/* File path supports NOWAIT for non-direct_IO only for block devices.=
+ */
++		if (!(kiocb->ki_flags & IOCB_DIRECT) &&
++			!(kiocb->ki_filp->f_mode & FMODE_BUF_WASYNC) &&
++			(req->flags & REQ_F_ISREG))
+ 			goto copy_iov;
+=20
+ 		kiocb->ki_flags |=3D IOCB_NOWAIT;
+@@ -3831,6 +3832,24 @@ static int io_write(struct io_kiocb *req, unsigned=
+ int issue_flags)
+ 		/* IOPOLL retry should happen for io-wq threads */
+ 		if (ret2 =3D=3D -EAGAIN && (req->ctx->flags & IORING_SETUP_IOPOLL))
+ 			goto copy_iov;
++
++		if (ret2 !=3D req->result && ret2 >=3D 0 && need_complete_io(req)) {
++			struct io_async_rw *rw;
++
++			/* This is a partial write. The file pos has already been
++			 * updated, setup the async struct to complete the request
++			 * in the worker. Also update bytes_done to account for
++			 * the bytes already written.
++			 */
++			iov_iter_save_state(&s->iter, &s->iter_state);
++			ret =3D io_setup_async_rw(req, iovec, s, true);
++
++			rw =3D req->async_data;
++			if (rw)
++				rw->bytes_done +=3D ret2;
++
++			return ret ? ret : -EAGAIN;
++		}
+ done:
+ 		kiocb_done(req, ret2, issue_flags);
+ 	} else {
 --=20
 2.30.2
 
