@@ -2,78 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F28AC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 08:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5798C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 08:30:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232457AbiBRIVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 03:21:06 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55348 "EHLO
+        id S232524AbiBRIa2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 03:30:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230221AbiBRIVD (ORCPT
+        with ESMTP id S231165AbiBRIa1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 03:21:03 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB82E25B2F7;
-        Fri, 18 Feb 2022 00:20:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645172446; x=1676708446;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5ejHrB5B466U6W+fI4GxsWg/8qpDAbd2bstCAFg1MpY=;
-  b=DesFvz0AAfxYpo6A+wazO9ViMVpCMtIHCj1JdwxvlrAtsy0eUxAKnK4F
-   IBtT6QHvmG26x/5RwHAAtGkHRDIIMcRPX4YJUB7VVlaOXLv9KH2LDVq3n
-   +qrQ5H5+jCSjmcdIwT1zNojTZeLZFzlHLq47Gt/Zf1o0pMzClZyoTSL/b
-   ++xBBTjlKepEMH+63dwB1jnZuVv8KvaIYERQzJCWXxbViMr0z+pccBf18
-   zzBZRV8lNF4oSQwVGj0dYeNHDS6fxN298X9JX4RhA48Uguf2CpfOCGkmY
-   o/YCKamHNNro54raPMJIgv+SR29OqXcn5IR63E2+JAoZW+wEIq/poHM39
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="275675307"
-X-IronPort-AV: E=Sophos;i="5.88,378,1635231600"; 
-   d="scan'208";a="275675307"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2022 00:20:46 -0800
-X-IronPort-AV: E=Sophos;i="5.88,378,1635231600"; 
-   d="scan'208";a="505115448"
-Received: from svaddara-mobl.amr.corp.intel.com (HELO ldmartin-desk2) ([10.212.147.37])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2022 00:20:45 -0800
-Date:   Fri, 18 Feb 2022 00:20:46 -0800
-From:   Lucas De Marchi <lucas.demarchi@intel.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Lucas De Marchi <lucas.de.marchi@gmail.com>,
-        linux-modules <linux-modules@vger.kernel.org>,
-        live-patching@vger.kernel.org, fstests@vger.kernel.org,
-        linux-block@vger.kernel.org, hare@suse.de, dgilbert@interlog.com,
-        Jessica Yu <jeyu@kernel.org>, osandov@fb.com,
-        lkml <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 0/3] kmod: add patient module removal support
-Message-ID: <20220218082046.c33zz64owau3oiln@ldmartin-desk2>
-X-Patchwork-Hint: comment
-References: <20210810051602.3067384-1-mcgrof@kernel.org>
- <YUIwKUXc7YbVAqut@bombadil.infradead.org>
- <CAKi4VAKbN31hqfg5EHZO=T_Hdkv3uhzarFLuEZO4b5Zm+TF77Q@mail.gmail.com>
- <Yg4Djc+vqRbMFRto@bombadil.infradead.org>
+        Fri, 18 Feb 2022 03:30:27 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C6217044;
+        Fri, 18 Feb 2022 00:30:09 -0800 (PST)
+Received: from kwepemi100006.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K0Px70DkxzbkbG;
+        Fri, 18 Feb 2022 16:28:59 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100006.china.huawei.com (7.221.188.165) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Fri, 18 Feb 2022 16:30:06 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Fri, 18 Feb 2022 16:30:06 +0800
+Subject: Re: [PATCH v3 0/3] block, bfq: minor cleanup and fix
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     <paolo.valente@linaro.org>, <jack@suse.cz>,
+        <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220129015924.3958918-1-yukuai3@huawei.com>
+ <7cb40388-02e9-712a-6a40-ccabd5605880@kernel.dk>
+ <9ed6bf05-4c31-eef1-1736-65915e55eb8e@huawei.com>
+ <0215f548-5d5f-107d-9c8e-3a802a51e00f@huawei.com>
+Message-ID: <040c3568-50c4-5f5a-08c4-fb182cbcd2a7@huawei.com>
+Date:   Fri, 18 Feb 2022 16:30:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <Yg4Djc+vqRbMFRto@bombadil.infradead.org>
+In-Reply-To: <0215f548-5d5f-107d-9c8e-3a802a51e00f@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 12:13:01AM -0800, Luis Chamberlain wrote:
->On Mon, Sep 20, 2021 at 10:51:46PM -0700, Lucas De Marchi wrote:
->> On Wed, Sep 15, 2021 at 10:41 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
->> >
->> > *Friendly poke*
+friendly ping ...
+
+在 2022/02/10 19:46, yukuai (C) 写道:
+> 在 2022/01/29 10:05, yukuai (C) 写道:
+>> 在 2022/01/29 9:51, Jens Axboe 写道:
+>>> On 1/28/22 6:59 PM, Yu Kuai wrote:
+>>>> Changes in v3:
+>>>>   - fix a clerical error in patch 2
+>>>>
+>>>> Chagnes in v2:
+>>>>   - add comment in patch 2
+>>>>   - remove patch 4, since the problem do not exist.
+>>>>
+>>>> Yu Kuai (3):
+>>>>    block, bfq: cleanup bfq_bfqq_to_bfqg()
+>>>>    block, bfq: avoid moving bfqq to it's parent bfqg
+>>>>    block, bfq: don't move oom_bfqq
+>>>>
+>>>>   block/bfq-cgroup.c  | 16 +++++++++++++++-
+>>>>   block/bfq-iosched.c |  4 ++--
+>>>>   block/bfq-iosched.h |  1 -
+>>>>   block/bfq-wf2q.c    | 15 ---------------
+>>>>   4 files changed, 17 insertions(+), 19 deletions(-)
+>>>
+>>> I'm not even looking at this until you tell me that:
+>>>
+>>> a) you've actually compiled this one. which, btw, I can't believe
+>>>     needs mentioning, particularly when you had enough time to keep
+>>>     pinging about this patchset.
+>>>
+>>> b) it's actually be run. last one was clearly not.
+>>>
+>> Hi,
 >>
->> Sorry for the delay. Let me take a look in detail tomorrow.
->
->*Friendly poke*
-
-oh, I dropped the ball here, sorry. Then I got busy with i915 and other
-projects. Let me take a look again at your implementation and respin it
-
-Lucas De Marchi
->
->  Luis
+>> I compiled and tested the patchset locally in a different version,
+>> v4.19 specifically. However, after I decide to send them to mainline,
+>> I made such clerical mistake and forgot to check the patches.
+>>
+>> My sincerely apologize again...
+>> Kuai
+> 
+> Hi, Jens
+> 
+> Can you please apply this patch this time?
+> 
+> Thanks,
+> Kuai
