@@ -2,60 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4023AC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 03:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D02C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 03:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbiBRDfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Feb 2022 22:35:15 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47038 "EHLO
+        id S229487AbiBRDld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Feb 2022 22:41:33 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232201AbiBRDfO (ORCPT
+        with ESMTP id S229561AbiBRDlc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Feb 2022 22:35:14 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCDED10FC0;
-        Thu, 17 Feb 2022 19:34:58 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id om7so7441909pjb.5;
-        Thu, 17 Feb 2022 19:34:58 -0800 (PST)
+        Thu, 17 Feb 2022 22:41:32 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16E5B18B6;
+        Thu, 17 Feb 2022 19:41:16 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id d16so6732999pgd.9;
+        Thu, 17 Feb 2022 19:41:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=bg+M/53E71OGRs8mVxe7azXsdV17hdariP4bI8/+sLM=;
-        b=nWwSNIgt+olaLsHCJqjmkpAr+dPku8dsAlYQjbctiR5FFJP8ts2bcKftkAUFSX5t02
-         Iy0KXMNqFU5K0gNsFTMEfFPSLSCFR5mMsgUEXKIp80jyj+FZtvbc4nC8xjSAaQtvtfeP
-         qfIACCxrP3an2ypnyxgx6U/IDXLkg+sONivLYBsY2do75HwNnLbPsI1ujBexNTMFsBtH
-         /3lNnGhlJYDCS971lvq0adpHt/ueXW3wWTQvb3hbko3pCOcmuw7D74CNfNrvhQkr+Ea7
-         ytwfyab1OsEpqfcRAufuTC2W5jMyi1ulSxHkh/4yzFByghAcT7x8CmFTpTNtG9QiGn4d
-         yv5Q==
+        bh=IO9s8KzRes95vzfkF7po1cE6U/yprrUy5xOgD2OSUu4=;
+        b=ON3tYEw/7+3ccvxhEx90PqtB6dGsTiQOSIRCkXBXa/ykFOEXPWEOQv8iaAsD5MhEk9
+         Fi2YzjXH3edf5xlWOYV0pJt2z/hP4ZWwNLLCnKCS+UrAE69Zbvp67rnIeaXiY3pxf9v0
+         zZxaXIAZRtKhZ6SQgYTD6kEUR+DEHrdICGGZhmZ7VfvKcc3BVD3D19tzs6qQ8YlpiPln
+         sllGf7i61bpMPJ3k5pTHyZjC+bjvFh5K8T91WfA8/MOBl+PQeaQe7Rp489cqRLW9XbN6
+         9RjB9ertGPP/I4eWyGGYeLjA1J4rGmjRPtRoCTTXugIwtF53BWYi1kdNgKFHwLVkzjjF
+         FJ2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=bg+M/53E71OGRs8mVxe7azXsdV17hdariP4bI8/+sLM=;
-        b=kV34U8iJMjlnYT8a5E8aq/6V/JGtrua63PFyIwpqDPH4aaAO4Hh2jXpKHxRR3mWw7o
-         37DNSHmUa4aEz/ejhxiivrk0vQZd0eQ/ThGcBe+0r/nMb+/16fX+5gCc9XFMDzyWjF4P
-         LD7jncbMqYepaDIpWa4+sqBWHQ/TvUA5lDzy855dlTwshlYxPuMxe/5khyOE58U1QKLV
-         Stziv3WBqqIoaQ1M5Gwq1DQuhGgOWd3QrSbNHeeOPFz0RLsMaxZZFaPgMJRWrttPJz/W
-         +FNC+T1pBwVrBBzkhHO/zAj0YiDyr3SeUCpxR5GNoTxBcgKZs6dnxs2c4pHDbElQdmHR
-         EP5Q==
-X-Gm-Message-State: AOAM530HILkiTzY2JpCXcb6iBggfMpSeaEdspn0/IIu8ismnZnjotswp
-        S7SCnSxn0LzVwX7qA/qh570=
-X-Google-Smtp-Source: ABdhPJyL/2W21CPt0s5nmadX3AEms+t2nPu80iSgGfnuyCyUOQ9fue4Fa/0J7QcHhrxOWLt2SpyIOA==
-X-Received: by 2002:a17:902:9046:b0:14d:5c9d:e7df with SMTP id w6-20020a170902904600b0014d5c9de7dfmr5772139plz.65.1645155298423;
-        Thu, 17 Feb 2022 19:34:58 -0800 (PST)
-Received: from [172.20.119.15] ([61.16.102.69])
-        by smtp.gmail.com with ESMTPSA id 131sm1054254pfz.76.2022.02.17.19.34.54
+        bh=IO9s8KzRes95vzfkF7po1cE6U/yprrUy5xOgD2OSUu4=;
+        b=HJlBdOxUDmHH8fy+hNDY6d3luECPnA7OW9veSnwATQQR/t9RuUSJgZBe/5Uv+9Ekd0
+         20p/jV/O+P11ipeFM62S1bZ4F9TBX5S8DMcLTAUs99f7Ma8scxG+T39Do4gO3LDt7RCD
+         VBg2DJTBIKjDNKzQXMo4VAa2YFiZuGOH2yFrguzrjZCZaVeyiEEoJiaS+JAjsoOKJWG+
+         HnEOe0b5XNRTLkFZld5y1NlHwCo64GDG02vqsLJPN2CG26h8k7Mez+tD7WJpAyWUuonD
+         2sWTHNmlN0XH5OeRJKP8vOEbxIqDxSziDsRBZZckwXPUzZD0AxqoTMs2mB/GekfS/IlY
+         oetQ==
+X-Gm-Message-State: AOAM532hfspP5MuIROyaeNO2hQilmTDXX9wwu/+r9/U8w1VWSECBJrHL
+        dPsxI9JBP5xIteBVaiyfFdU=
+X-Google-Smtp-Source: ABdhPJwd6cr/xrdWP6jxd0afu7D5RpFS8K7nU2iDuksHf9i7m2G/f7+NEAJQA+nRszt/SY9o9ifWpQ==
+X-Received: by 2002:a63:5f0f:0:b0:370:1db0:5766 with SMTP id t15-20020a635f0f000000b003701db05766mr4816692pgb.532.1645155676052;
+        Thu, 17 Feb 2022 19:41:16 -0800 (PST)
+Received: from [172.20.119.15] ([103.112.79.203])
+        by smtp.gmail.com with ESMTPSA id ng16sm3245301pjb.12.2022.02.17.19.41.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 19:34:58 -0800 (PST)
-Message-ID: <842be400-baf0-9185-25f2-8c00c2db553d@gmail.com>
-Date:   Fri, 18 Feb 2022 11:34:52 +0800
+        Thu, 17 Feb 2022 19:41:15 -0800 (PST)
+Message-ID: <6e6df16c-3609-71ef-c147-435920e59e8c@gmail.com>
+Date:   Fri, 18 Feb 2022 11:41:11 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [RFC V4 1/6] blk: prepare to make blk-rq-qos pluggable and
- modular
+Subject: Re: [RFC V4 2/6] blk-wbt: make wbt pluggable
 Content-Language: en-US
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
@@ -63,10 +62,10 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
         Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
- <20220217031349.98561-2-jianchao.wan9@gmail.com>
- <Yg4L67f96aQ2q5uy@infradead.org>
+ <20220217031349.98561-3-jianchao.wan9@gmail.com>
+ <Yg4MQSUZZu9D+qJu@infradead.org>
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <Yg4L67f96aQ2q5uy@infradead.org>
+In-Reply-To: <Yg4MQSUZZu9D+qJu@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -75,64 +74,19 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2022/2/17 4:48 下午, Christoph Hellwig wrote:
->>  {
->>  	struct request_queue *q = rqos->q;
->> -	const char *dir_name = rq_qos_id_to_name(rqos->id);
->> +	const char *dir_name;
->> +
->> +	dir_name = rqos->ops->name ? rqos->ops->name : rq_qos_id_to_name(rqos->id);
+On 2022/2/17 4:50 下午, Christoph Hellwig wrote:
+>> +struct rq_qos *wbt_rq_qos(struct request_queue *q);
+>>  int wbt_init(struct request_queue *);
 > 
-> Overly long line here.  And it would be much more readable if you used
-> a good old if/else.
 > 
->> +static DEFINE_IDA(rq_qos_ida);
->> +static int nr_rqos_blkcg_pols;
->> +static DEFINE_MUTEX(rq_qos_mutex);
->> +static LIST_HEAD(rq_qos_list);
+> Please move the wb_lat sysfs attribute into blk-wbt.c as well, which
+> removes the need to expose these two functions.
 > 
-> Please use an allocating xarray instead of an IDA plus list.
-> 
->> +	/*
->> +	 * queue must have been unregistered here, it is safe to iterate
->> +	 * the list w/o lock
->> +	 */
-> 
-> Please capitalize multi-line comments.
-> 
->> + * After the pluggable blk-qos, rqos's life cycle become complicated,
->> + * as we may modify the rqos list there. Except for the places where
->> + * queue is not registered, there are following places may access rqos
->> + * list concurrently:
-> 
-> Code comments are not the place to explain history.  PLease explain the
-> current situation.
-> 
->> +struct rq_qos *rq_qos_get(struct request_queue *q, int id)
->> +{
->> +	struct rq_qos *rqos;
->> +
->> +	spin_lock_irq(&q->queue_lock);
-> 
-> Please don't use the grab all queue_lock for new code.  It badly needs
-> to be split and documented, and new code is the best place to start
-> that.
-> 
-> Also with all the new code please add a new config option that is
-> selected by all rq-pos implementations so that blk-rq-qos.c only gets
-> built when actually needed.
-> 
->> +static inline struct rq_qos *rq_qos_by_id(struct request_queue *q, int id)
->> +{
->> +	struct rq_qos *rqos;
->> +
->> +	WARN_ON(!mutex_is_locked(&q->sysfs_lock) && !spin_is_locked(&q->queue_lock));
-> 
-> Another overly long line.  And in doubt split this into two helpers
-> so that you cna use lockdep_assert_held instead of doing the incorrect
-> asserts.
 
-Thanks so much for your kindly comment. I'd change the code in next version.
+Given this patchset:
+(1) Do we need to reserve the wb_lat sysfs when we turn off the wbt ?
+(2) Do we need to disable wbt automatically when switch io scheduler
+    to bfq ? Or just tell the user turn off the wbt by themselves ?
 
-Regards
+Thanks
 Jianchao
