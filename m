@@ -2,90 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C7BC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 13:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E53DC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 15:21:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235694AbiBRNN7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 08:13:59 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55876 "EHLO
+        id S234663AbiBRPVX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 10:21:23 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:32810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234116AbiBRNN6 (ORCPT
+        with ESMTP id S232013AbiBRPVX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 08:13:58 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9058C204DA6
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 05:13:42 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id v5-20020a17090a4ec500b001b8b702df57so12360123pjl.2
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 05:13:42 -0800 (PST)
+        Fri, 18 Feb 2022 10:21:23 -0500
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791C518CC46
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 07:21:02 -0800 (PST)
+Received: by mail-qk1-x72c.google.com with SMTP id c7so6084955qka.7
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 07:21:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=GK4rz9+seFn4xdxHvPLjlObHSp4PzOJAfGpbgOOGnDc=;
-        b=X0yxpy0FpsFY7ZLcYL/hyLZTcm0tOjEZLx7X2m/1SjWaDiXAxsGjQ3/RVtMsybX1vD
-         eUM4FKRSXHyTu2bsmY9dXOfKtxk6g8ka27l8MYEVjuweCvpCSeUW4UzRXSCnZQQ+pfIU
-         JtbpenlRpDiplHlpX+TUFxxs2aOg+dZC2RxDFoAFK3kmkY9FunGo9ockke4UU8MM+gJZ
-         2I2LNOuslQVGnctx/w+Zpz3/8yTUFqzfahTN9FFImDypH63XrQHgLszBX8NNBFm0tnew
-         Xymx+whVxA8NHk7ooSDbJrHQRFalkm53OPCNNXS8CLisZbMRgXl4JQ5lnZqqPzngJpJK
-         S9Og==
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dFva2jphudu5nNQOtFetMtWWxY8U+kSkf6ymT6sVouY=;
+        b=6cqBgFFBOvizHU93Po+Zmf3Phx4g1oVC0Ve/zIfQpn7TkYyMnMeR1iI8Mrx1PpICf5
+         Z5UAmE86htGVfvf1UDCIY/gPeDwGJ0+h9FXY1kU/AAR2Ampat4gzDgpi4r3f4XZd4ZoJ
+         LMgccAH3CuN9komOtrImQ3Yg/wGl/H+D1cr3lgu089ljtPtZnIntdsk7MuAyu19rn9E+
+         AVz3ae3PKLAZi1oWAXIqAO/2pVAymh7igvT2Ai0dWGeuibDwrJIRa1IlOrGy73y1b8iC
+         /IOIDsgS7LoRfkVysGHJZgK2O5fBJCqRe0w3cmOqXc5d8Z1CEXkD7DgDm1wGZ1cdAes0
+         oVhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=GK4rz9+seFn4xdxHvPLjlObHSp4PzOJAfGpbgOOGnDc=;
-        b=hpaIwaoYjL4Nejh+UbDXFUdOVo32AjIsGfZd9nikg8yUHZ1Vuc6fSMNLQCZcwlA1/A
-         E1h+5wNQiyeR2Lp5rCaIFjOJx4T3PmugyuKpUmqqkuaGf9r0Co019en/GWDupT7/9BTq
-         0JlTVgcyRpFSi70+02BD77nmEnhNX6c1URp5j9c5F7IOKsGNieqRgySRQWhVH0oB8Ee5
-         XRso2LPbmmzNpDXHMMNotcF0sopVX3JGxT78BAfT9NJyzYJaDYhwsLkHPw49faJm7XFa
-         O69Ch4gOQoTG1LJoDJhDf5fzsndmfC6AwAdFqfJsle0Gn0Cz1JX19uM6VOdzKFkD6d9/
-         wFjw==
-X-Gm-Message-State: AOAM532HN11lzwgagsvu9aavxaRdfT8o/CawvGGVTAniUG0/7WtrRBPd
-        sTdhqR+6OsQc1yqrGlpvi6X6Xw==
-X-Google-Smtp-Source: ABdhPJxVEuInQM8ER6sR1lK2pIrJ6V0BG+s8JKZCjXNLjuXxYDSIzxEnjHU8F7msAcnMf1oHw8AiAg==
-X-Received: by 2002:a17:902:b116:b0:14f:460d:bf42 with SMTP id q22-20020a170902b11600b0014f460dbf42mr7500903plr.108.1645190021985;
-        Fri, 18 Feb 2022 05:13:41 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j8sm3179025pfu.55.2022.02.18.05.13.40
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dFva2jphudu5nNQOtFetMtWWxY8U+kSkf6ymT6sVouY=;
+        b=DaoIwnOrrNIg1XjTc/vhqBmmKu1nESwMFvA1AjqDxv5cDNZg+lcHigQXmfvOGGU/4x
+         sBk3wsXjrA3w5L1VJF8STyEql4SKqtKT8PzNf8owmyVLN3UtNTE+LLJDI+XsDsWLXYut
+         RLaDTw8QamxjrGSuNcx8y3EIk+c3GYzmCoeBe7fV75gnA2Sf7ffKohzAfDchUky/Cdy6
+         9otrOeW7Er8bg6CgmjtqSnlynuYCrrN2XWfHaharJtqUN/QJb4RSqhYwuwK70QdYZAKZ
+         BW+0iOKo4pwjsd6PuUlHvxV8TTT4mKe3n0uSwZcGY/1zzNKeXKmbX22I+393+9N5UJCq
+         BPeQ==
+X-Gm-Message-State: AOAM532djBfNa3bEPGaekOJ4xsIY9sggDVkyn+uGaJB1Aa7ffyRDfDBQ
+        /4VGT9ak48IVHMjqme+0Xf0JEA==
+X-Google-Smtp-Source: ABdhPJyGNUkWSTWwJo7nhA780UyQwUX+LwX0Q7tqbWJWKYGoikX/fIia26lFPmjFrxCM1vj2GlgaqA==
+X-Received: by 2002:a37:c442:0:b0:60d:da8a:1c6 with SMTP id h2-20020a37c442000000b0060dda8a01c6mr4606180qkm.162.1645197661178;
+        Fri, 18 Feb 2022 07:21:01 -0800 (PST)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id o5sm6282400qtp.48.2022.02.18.07.21.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 05:13:41 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     jack@suse.cz, Yu Kuai <yukuai3@huawei.com>,
-        paolo.valente@linaro.org
-Cc:     linux-block@vger.kernel.org, yi.zhang@huawei.com,
-        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
-In-Reply-To: <20220129015924.3958918-1-yukuai3@huawei.com>
-References: <20220129015924.3958918-1-yukuai3@huawei.com>
-Subject: Re: [PATCH v3 0/3] block, bfq: minor cleanup and fix
-Message-Id: <164519002068.11187.11125581863819344403.b4-ty@kernel.dk>
-Date:   Fri, 18 Feb 2022 06:13:40 -0700
+        Fri, 18 Feb 2022 07:21:00 -0800 (PST)
+Date:   Fri, 18 Feb 2022 10:20:59 -0500
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
+Message-ID: <Yg+5Wytvc2eG8uLD@localhost.localdomain>
+References: <20211227091241.103-1-xieyongji@bytedance.com>
+ <Ycycda8w/zHWGw9c@infradead.org>
+ <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
+ <YdMgCS1RMcb5V2RJ@localhost.localdomain>
+ <CACycT3vYt0XNV2GdjKjDS1iyWieY_OV4h=W1qqk_AAAahRZowA@mail.gmail.com>
+ <YdSMqKXv0PUkAwfl@localhost.localdomain>
+ <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
+ <CACycT3tTKBpS_B5vVJ8MZ1iuaF2bf-01=9+tAdxUddziF2DQ-g@mail.gmail.com>
+ <CACycT3thVwb466u2JR-oDRHLY5j_uxAx5uXXGmaoCZL5vs__mQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACycT3thVwb466u2JR-oDRHLY5j_uxAx5uXXGmaoCZL5vs__mQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 29 Jan 2022 09:59:21 +0800, Yu Kuai wrote:
-> Changes in v3:
->  - fix a clerical error in patch 2
+On Tue, Feb 15, 2022 at 09:17:37PM +0800, Yongji Xie wrote:
+> Ping again.
 > 
-> Chagnes in v2:
->  - add comment in patch 2
->  - remove patch 4, since the problem do not exist.
-> 
-> [...]
+> Hi Josef, could you take a look?
 
-Applied, thanks!
+Sorry Yongji this got lost.  Again in the reconnect case we're still setting up
+a long running thread, so it's not like it'll happen during a normal reclaim
+path thing, it'll be acted upon by userspace.  Thanks,
 
-[1/3] block, bfq: cleanup bfq_bfqq_to_bfqg()
-      commit: 43a4b1fee098bd38eed9c334d0e0df221ecdf719
-[2/3] block, bfq: avoid moving bfqq to it's parent bfqg
-      commit: c5e4cb0fcbbaa5ad853818c4a2383e9bd147fad6
-[3/3] block, bfq: don't move oom_bfqq
-      commit: 8410f70977734f21b8ed45c37e925d311dfda2e7
-
-Best regards,
--- 
-Jens Axboe
-
-
+Josef
