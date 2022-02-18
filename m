@@ -2,131 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D1EC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 03:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3634BC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 04:19:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbiBRDsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Feb 2022 22:48:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44916 "EHLO
+        id S229766AbiBRETj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Feb 2022 23:19:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiBRDsp (ORCPT
+        with ESMTP id S229478AbiBRETi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Feb 2022 22:48:45 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55EC4ECC2
-        for <linux-block@vger.kernel.org>; Thu, 17 Feb 2022 19:48:28 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id x11so6160890pll.10
-        for <linux-block@vger.kernel.org>; Thu, 17 Feb 2022 19:48:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:from:subject:to:cc
-         :content-language:content-transfer-encoding;
-        bh=rh9E5hVzHKf8Hq4mp5T4NxauljnDhznInuHhIXBFoNM=;
-        b=PnydVvfK72xMzS3Oj8MmpA8B76klPC5uftUIpBfvkCgdQU38lBFauolaeXHPyW2SDm
-         ezCuIIBPilqc6/XTQfRO4MRvwirMuySQkBbBLPhY/qM/HaUArcvFoT/956RLiJSVIaQU
-         PCoobFsmFEuMdDMx8BqJZATk/zVq7hTx4pCqh2rv3odzyma6kw2I9dAQcrBAVBzG4rCA
-         uxpHKBXBsSDIt7P+QxuMQRCAbuXG3WHLMOECnBvOhUVN9nH+CWzojeBJ89SEyn2BM3kU
-         8CMyBOZc6INCLn6LvRcDkayEo8kZheIQi/ISk+BKufaJKbSTpIZqFk/kqqRv+PowkJuD
-         djvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
-         :subject:to:cc:content-language:content-transfer-encoding;
-        bh=rh9E5hVzHKf8Hq4mp5T4NxauljnDhznInuHhIXBFoNM=;
-        b=onjShJ4co2zmvihiJELHdoP5izMEayksBYnn+VCDfpbq+RYQPjrffRAU5LUSBvkfnL
-         wV38e5izDIQCaoBeIjM/F/MkmD1omyjF3AlvcNEOBcsfrzGtwWaqgtv5VvMkKLCqJCgZ
-         m9wYVD7grNJF7XkTxYTX1Re7+1uFuX8qnJxRH/2+i3jh83+YiOj36DVZALPKEYqIIcdi
-         pqPu38OM0ZLhhqpY0a73CTW+mImmLCW5TQGnQPFjKsiFb27QSi3U2hGmRjGUjSVLzdNO
-         9qUg2rsr9DqiA7W5BY5qAs9d5YW8CxPx4F1PTqWVGTJ1YLGpBnjcTo8upDxmSxAdVUAx
-         eDOQ==
-X-Gm-Message-State: AOAM532SAfGwh8ur68jHpG4OCjcUoORzndLDwDRbhErogkVyJYCFurzG
-        mrU/YJm1jxF8cJPebEQykaj5rSuK/xf2oQ==
-X-Google-Smtp-Source: ABdhPJy59+dcLA00fbdpkugPdejb9tWIqovhvvA8Bu+mUeWJucTIZkTkH7uKUPAT6rtR9AhenpOxYg==
-X-Received: by 2002:a17:90a:e284:b0:1b8:ad26:7edb with SMTP id d4-20020a17090ae28400b001b8ad267edbmr6315995pjz.53.1645156107309;
-        Thu, 17 Feb 2022 19:48:27 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id v10sm1051954pfu.38.2022.02.17.19.48.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Feb 2022 19:48:26 -0800 (PST)
-Message-ID: <5922f9b2-a23d-20b5-c8ae-619422a08df7@kernel.dk>
-Date:   Thu, 17 Feb 2022 20:48:25 -0700
+        Thu, 17 Feb 2022 23:19:38 -0500
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CC718462E;
+        Thu, 17 Feb 2022 20:19:22 -0800 (PST)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 21I4JFfx022029
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Feb 2022 23:19:16 -0500
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id CB37615C34C8; Thu, 17 Feb 2022 23:19:15 -0500 (EST)
+Date:   Thu, 17 Feb 2022 23:19:15 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Byungchul Park <byungchul.park@lge.com>,
+        torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, joel@joelfernandes.org,
+        sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org, axboe@kernel.dk,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: Re: [PATCH 00/16] DEPT(Dependency Tracker)
+Message-ID: <Yg8eQ/iR5H/AHZIg@mit.edu>
+References: <1645095472-26530-1-git-send-email-byungchul.park@lge.com>
+ <Yg5u7dzUxL3Vkncg@mit.edu>
+ <20220217120005.67f5ddf4@gandalf.local.home>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.17-rc5
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220217120005.67f5ddf4@gandalf.local.home>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Thu, Feb 17, 2022 at 12:00:05PM -0500, Steven Rostedt wrote:
+> 
+> I personally believe that there's potential that this can be helpful and we
+> will want to merge it.
+> 
+> But, what I believe Ted is trying to say is, if you do not know if the
+> report is a bug or not, please do not ask the maintainers to determine it
+> for you. This is a good opportunity for you to look to see why your tool
+> reported an issue, and learn that subsystem. Look at if this is really a
+> bug or not, and investigate why.
 
-- Surprise removal fix (Christoph)
+I agree there's potential here, or I would have ignored the ext4 "bug
+report".
 
-- Ensure that pages are zeroed before submitted for userspace IO
-  (Haimin)
+When we can get rid of the false positives, I think it should be
+merged; I'd just rather it not be merged until after the false
+positives are fixed, since otherwise, someone well-meaning will start
+using it with Syzkaller, and noise that maintainers need to deal with
+(with people requesting reverts of two year old commits, etc) will
+increase by a factor of ten or more.  (With Syzbot reproducers that
+set up random cgroups, IP tunnels with wiregaurd enabled, FUSE stress
+testers, etc., that file system maintainers will be asked to try to
+disentangle.)
 
-- Fix blk-wbt accounting issue with BFQ (Laibin)
+So from a maintainer's perspective, false positives are highly
+negative.  It may be that from some people's POV, one bug found and 20
+false positive might still be "useful".  But if your tool gains a
+reputation of not valuing maintainers' time, it's just going to make
+us (or at least me :-) cranky, and it's going to be very hard to
+recover from perception.  So it's probably better to be very
+conservative and careful in polishing it before asking for it to be
+merged.
 
-- Use bsize for discard granularity in loop (Ming)
+Cheers,
 
-- Fix missing zone handling in blk_complete_request() (Pankaj)
-
-Please pull!
-
-
-The following changes since commit bf23747ee05320903177809648002601cd140cdd:
-
-  loop: revert "make autoclear operation asynchronous" (2022-02-11 05:51:23 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-17
-
-for you to fetch changes up to e92bc4cd34de2ce454bdea8cd198b8067ee4e123:
-
-  block/wbt: fix negative inflight counter when remove scsi device (2022-02-17 07:54:03 -0700)
-
-----------------------------------------------------------------
-block-5.17-2022-02-17
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      block: fix surprise removal for drivers calling blk_set_queue_dying
-
-Haimin Zhang (1):
-      block-map: add __GFP_ZERO flag for alloc_page in function bio_copy_kern
-
-Laibin Qiu (1):
-      block/wbt: fix negative inflight counter when remove scsi device
-
-Ming Lei (1):
-      block: loop:use kstatfs.f_bsize of backing file to set discard granularity
-
-Pankaj Raghav (1):
-      block: Add handling for zone append command in blk_complete_request
-
- block/bfq-iosched.c               |  2 ++
- block/blk-core.c                  | 10 ++--------
- block/blk-map.c                   |  2 +-
- block/blk-mq.c                    |  4 ++++
- block/elevator.c                  |  2 --
- block/genhd.c                     | 14 ++++++++++++++
- drivers/block/loop.c              |  8 +++++++-
- drivers/block/mtip32xx/mtip32xx.c |  2 +-
- drivers/block/rbd.c               |  2 +-
- drivers/block/xen-blkfront.c      |  2 +-
- drivers/md/dm.c                   |  2 +-
- drivers/nvme/host/core.c          |  2 +-
- drivers/nvme/host/multipath.c     |  2 +-
- include/linux/blkdev.h            |  3 ++-
- 14 files changed, 38 insertions(+), 19 deletions(-)
-
--- 
-Jens Axboe
+						- Ted
 
