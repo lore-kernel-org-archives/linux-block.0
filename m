@@ -2,323 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 303D5C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 00:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE96FC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 03:23:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbiBRAly (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Feb 2022 19:41:54 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:54338 "EHLO
+        id S231926AbiBRDXU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Feb 2022 22:23:20 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:59336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230164AbiBRAlx (ORCPT
+        with ESMTP id S231909AbiBRDXU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Feb 2022 19:41:53 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1FA9C32EDC
-        for <linux-block@vger.kernel.org>; Thu, 17 Feb 2022 16:41:32 -0800 (PST)
-Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.51 with ESMTP; 18 Feb 2022 09:41:31 +0900
-X-Original-SENDERIP: 156.147.1.151
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 18 Feb 2022 09:41:31 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Fri, 18 Feb 2022 09:41:24 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: Report 1 in ext4 and journal based on v5.17-rc1
-Message-ID: <20220218004124.GC20620@X58A-UD3R>
-References: <1645095472-26530-1-git-send-email-byungchul.park@lge.com>
- <1645096204-31670-1-git-send-email-byungchul.park@lge.com>
- <Yg5NTs2RlhdTmSQj@casper.infradead.org>
+        Thu, 17 Feb 2022 22:23:20 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF80E19DEA4;
+        Thu, 17 Feb 2022 19:23:04 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id y9so7461499pjf.1;
+        Thu, 17 Feb 2022 19:23:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=MW5+mgo4D9khCYGp5XLA5oPQ58Fp8A7oXa2V6fKP9uM=;
+        b=W07QPP/tHJTR8bjJO5DrwTh5c8QmIYccGHP5ZIOB6/7JKEV851Xtm6H8i2agDMa8w+
+         SBMEUFBSFQfqwmfLXOZrXmRqdiVslMAX78G9jZLwMOpInCVYn3uBUytlrcpN1G9MNx0i
+         1ON5kabHnTNkAqRBD7VydHfhwJinC3fcMVx0ay23PurBTXpye2CoK5xwBnceyXClj6Ow
+         jIZhKfHG+w2VZJbHk3F57cqGY11eDY+zCj139f9NI9XOf25leto8RPD2AiPuKwd5LKha
+         eRMckWRk1CHOcLQ8NXg3/FK0JyEpePbqo81rn7i6xj4ktGEY4dAKpk5FIb5PpzlkMMfx
+         J6Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=MW5+mgo4D9khCYGp5XLA5oPQ58Fp8A7oXa2V6fKP9uM=;
+        b=zTV7bwYPifgsLztCjNWP/aUDFODX6sTbbd8mi/1757ja4wEao1c5hqlxFWuTOXkkpI
+         decOaGak4jiqDNIwv9fbnYehHu13cfZBgi7lxKltxG2DpvG/ASuHGESdU4wab5qfJsww
+         C4R+Z999F9PdoTcGOd/qOED55a7EVvfmp2E8YskKWiIafrbFMhkMq34orh5/JXb7HPei
+         gyErikFBLH71Om8mIcu3f2C2qYDmMGdeUJKJg9M5etVXlhk7e38qDBR39bxa3/QDOkEN
+         8E6l+Zz4JI7VpCcFo0EYBKGvTRbupVMmPsT3YTkEZgw2C6ByF75qTXU0x5OHO0cL40dq
+         bdYw==
+X-Gm-Message-State: AOAM532Qkot31Tm4vFRJD4GeNX+9uaMCPZbAkDSDqdD9jckTqD3lDRsg
+        n3eoJnMQhaVLiuEdid6sP20=
+X-Google-Smtp-Source: ABdhPJxOlDrjpZULWDIBVYKDEt4Pj/bJESmO10QaNt1UpzaWgxRAAAyYaJNIyk7Njo3e0+lrinGVGg==
+X-Received: by 2002:a17:902:e5d0:b0:14a:496c:6f2b with SMTP id u16-20020a170902e5d000b0014a496c6f2bmr5771373plf.57.1645154584467;
+        Thu, 17 Feb 2022 19:23:04 -0800 (PST)
+Received: from [172.20.119.15] ([61.16.102.72])
+        by smtp.gmail.com with ESMTPSA id 8sm961000pfl.164.2022.02.17.19.23.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Feb 2022 19:23:04 -0800 (PST)
+Message-ID: <ba4065ae-f663-9084-371e-4fdf401ac70b@gmail.com>
+Date:   Fri, 18 Feb 2022 11:22:57 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yg5NTs2RlhdTmSQj@casper.infradead.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.0
+Subject: Re: [RFC V4 0/6] blk: make blk-rq-qos policies pluggable and modular
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
+ <Yg4Kl6EHWS5N3WoH@infradead.org>
+From:   Wang Jianchao <jianchao.wan9@gmail.com>
+In-Reply-To: <Yg4Kl6EHWS5N3WoH@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 01:27:42PM +0000, Matthew Wilcox wrote:
-> On Thu, Feb 17, 2022 at 08:10:03PM +0900, Byungchul Park wrote:
-> > [    7.009608] ===================================================
-> > [    7.009613] DEPT: Circular dependency has been detected.
-> > [    7.009614] 5.17.0-rc1-00014-g8a599299c0cb-dirty #30 Tainted: G        W
-> > [    7.009616] ---------------------------------------------------
-> > [    7.009617] summary
-> > [    7.009618] ---------------------------------------------------
-> > [    7.009618] *** DEADLOCK ***
-> > [    7.009618]
-> > [    7.009619] context A
-> > [    7.009619]     [S] (unknown)(&(bit_wait_table + i)->dmap:0)
+
+
+On 2022/2/17 4:43 下午, Christoph Hellwig wrote:
+> On Thu, Feb 17, 2022 at 11:13:43AM +0800, Wang Jianchao (Kuaishou) wrote:
+>> Hi Jens
+>>
+>> blk-rq-qos is a standalone framework out of io-sched and can be used to
+>> control or observe the IO progress in block-layer with hooks. blk-rq-qos
+>> is a great design but right now, it is totally fixed and built-in and shut
+>> out peoples who want to use it with external module.
 > 
-> Why is the context unknown here?  I don't see a way to debug this
-> without knowing where we acquired the bit wait lock.
+> And that's got.  External modules do not matter.
+> 
+> That being said this series has a bunch of nice cleanups, but we really
+> do not need the exports and modular build.
 
-ideal view
-------------------
+Got it.
+I will get rid of the code for supporting external module in next patch.
 
-context X			context A
-
-request event E to context A	...
-   write REQUESTEVENT		if (can see REQUESTEVENT written)
-...				   notice the request from X [S]
-wait for the event [W]		...
-   write barrier
-   write WAITSTART		
-   actual wait			if (can see REQUESTEVENT written)
-				   consider it's on the way to the event
-...				
-				...
-				finally the event [E]
-
-Dept works with the above view wrt. wait and event. [S] point varies
-depending on ways to make context A notice the request so that the event
-context A can start. Of course, by making more effort on identifying
-each way in the kernel, we can figure out the exact point.
-
-Here, we can also check WAITSTART with a read barrier instead of
-REQUESTEVENT in context A conservatively. That's how Dept works.
-
-Dept's view
-------------------
-
-context X			context A
-
-request event E to context A	...
-   write REQUESTEVENT		if (can see REQUESTEVENT written)
-...				   notice the request from X [S]
-wait for the event [W]		...
-   write barrier
-   write WAITSTART		read barrier
-   actual wait			if (can see WAITSTART written)
-				   consider it's on the way to the event
-...				
-				...
-				finally the event [E]
-				   consider all waits in context A so far
-				   that could see WAITSTART written
-
-Thanks,
-Byungchul
-
-> > [    7.009621]     [W] down_write(&ei->i_data_sem:0)
-> > [    7.009623]     [E] event(&(bit_wait_table + i)->dmap:0)
-> > [    7.009624]
-> > [    7.009625] context B
-> > [    7.009625]     [S] down_read(&ei->i_data_sem:0)
-> > [    7.009626]     [W] wait(&(bit_wait_table + i)->dmap:0)
-> > [    7.009627]     [E] up_read(&ei->i_data_sem:0)
-> > [    7.009628]
-> > [    7.009629] [S]: start of the event context
-> > [    7.009629] [W]: the wait blocked
-> > [    7.009630] [E]: the event not reachable
-> > [    7.009631] ---------------------------------------------------
-> > [    7.009631] context A's detail
-> > [    7.009632] ---------------------------------------------------
-> > [    7.009632] context A
-> > [    7.009633]     [S] (unknown)(&(bit_wait_table + i)->dmap:0)
-> > [    7.009634]     [W] down_write(&ei->i_data_sem:0)
-> > [    7.009635]     [E] event(&(bit_wait_table + i)->dmap:0)
-> > [    7.009636]
-> > [    7.009636] [S] (unknown)(&(bit_wait_table + i)->dmap:0):
-> > [    7.009638] (N/A)
-> > [    7.009638]
-> > [    7.009639] [W] down_write(&ei->i_data_sem:0):
-> > [    7.009639] ext4_truncate (fs/ext4/inode.c:4187) 
-> > [    7.009645] stacktrace:
-> > [    7.009646] down_write (kernel/locking/rwsem.c:1514) 
-> > [    7.009648] ext4_truncate (fs/ext4/inode.c:4187) 
-> > [    7.009650] ext4_da_write_begin (./include/linux/fs.h:827 fs/ext4/truncate.h:23 fs/ext4/inode.c:2963) 
-> > [    7.009652] generic_perform_write (mm/filemap.c:3784) 
-> > [    7.009654] ext4_buffered_write_iter (fs/ext4/file.c:269) 
-> > [    7.009657] ext4_file_write_iter (fs/ext4/file.c:677) 
-> > [    7.009659] new_sync_write (fs/read_write.c:504 (discriminator 1)) 
-> > [    7.009662] vfs_write (fs/read_write.c:590) 
-> > [    7.009663] ksys_write (fs/read_write.c:644) 
-> > [    7.009664] do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80) 
-> > [    7.009667] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:113) 
-> > [    7.009669]
-> > [    7.009670] [E] event(&(bit_wait_table + i)->dmap:0):
-> > [    7.009671] __wake_up_common (kernel/sched/wait.c:108) 
-> > [    7.009673] stacktrace:
-> > [    7.009674] dept_event (kernel/dependency/dept.c:2337) 
-> > [    7.009677] __wake_up_common (kernel/sched/wait.c:109) 
-> > [    7.009678] __wake_up_common_lock (./include/linux/spinlock.h:428 (discriminator 1) kernel/sched/wait.c:141 (discriminator 1)) 
-> > [    7.009679] __wake_up_bit (kernel/sched/wait_bit.c:127) 
-> > [    7.009681] ext4_orphan_del (fs/ext4/orphan.c:282) 
-> > [    7.009683] ext4_truncate (fs/ext4/inode.c:4212) 
-> > [    7.009685] ext4_da_write_begin (./include/linux/fs.h:827 fs/ext4/truncate.h:23 fs/ext4/inode.c:2963) 
-> > [    7.009687] generic_perform_write (mm/filemap.c:3784) 
-> > [    7.009688] ext4_buffered_write_iter (fs/ext4/file.c:269) 
-> > [    7.009690] ext4_file_write_iter (fs/ext4/file.c:677) 
-> > [    7.009692] new_sync_write (fs/read_write.c:504 (discriminator 1)) 
-> > [    7.009694] vfs_write (fs/read_write.c:590) 
-> > [    7.009695] ksys_write (fs/read_write.c:644) 
-> > [    7.009696] do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80) 
-> > [    7.009698] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:113) 
-> > [    7.009700] ---------------------------------------------------
-> > [    7.009700] context B's detail
-> > [    7.009701] ---------------------------------------------------
-> > [    7.009702] context B
-> > [    7.009702]     [S] down_read(&ei->i_data_sem:0)
-> > [    7.009703]     [W] wait(&(bit_wait_table + i)->dmap:0)
-> > [    7.009704]     [E] up_read(&ei->i_data_sem:0)
-> > [    7.009705]
-> > [    7.009706] [S] down_read(&ei->i_data_sem:0):
-> > [    7.009707] ext4_map_blocks (./arch/x86/include/asm/bitops.h:207 ./include/asm-generic/bitops/instrumented-non-atomic.h:135 fs/ext4/ext4.h:1918 fs/ext4/inode.c:562) 
-> > [    7.009709] stacktrace:
-> > [    7.009709] down_read (kernel/locking/rwsem.c:1461) 
-> > [    7.009711] ext4_map_blocks (./arch/x86/include/asm/bitops.h:207 ./include/asm-generic/bitops/instrumented-non-atomic.h:135 fs/ext4/ext4.h:1918 fs/ext4/inode.c:562) 
-> > [    7.009712] ext4_getblk (fs/ext4/inode.c:851) 
-> > [    7.009714] ext4_bread (fs/ext4/inode.c:903) 
-> > [    7.009715] __ext4_read_dirblock (fs/ext4/namei.c:117) 
-> > [    7.009718] dx_probe (fs/ext4/namei.c:789) 
-> > [    7.009720] ext4_dx_find_entry (fs/ext4/namei.c:1721) 
-> > [    7.009722] __ext4_find_entry (fs/ext4/namei.c:1571) 
-> > [    7.009723] ext4_lookup (fs/ext4/namei.c:1770) 
-> > [    7.009725] lookup_open (./include/linux/dcache.h:361 fs/namei.c:3310) 
-> > [    7.009727] path_openat (fs/namei.c:3401 fs/namei.c:3605) 
-> > [    7.009729] do_filp_open (fs/namei.c:3637) 
-> > [    7.009731] do_sys_openat2 (fs/open.c:1215) 
-> > [    7.009732] do_sys_open (fs/open.c:1231) 
-> > [    7.009734] do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80) 
-> > [    7.009736] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:113) 
-> > [    7.009738]
-> > [    7.009738] [W] wait(&(bit_wait_table + i)->dmap:0):
-> > [    7.009739] prepare_to_wait (kernel/sched/wait.c:275) 
-> > [    7.009741] stacktrace:
-> > [    7.009741] __schedule (kernel/sched/sched.h:1318 kernel/sched/sched.h:1616 kernel/sched/core.c:6213) 
-> > [    7.009743] schedule (kernel/sched/core.c:6373 (discriminator 1)) 
-> > [    7.009744] io_schedule (./arch/x86/include/asm/current.h:15 kernel/sched/core.c:8392 kernel/sched/core.c:8418) 
-> > [    7.009745] bit_wait_io (./arch/x86/include/asm/current.h:15 kernel/sched/wait_bit.c:210) 
-> > [    7.009746] __wait_on_bit (kernel/sched/wait_bit.c:49) 
-> > [    7.009748] out_of_line_wait_on_bit (kernel/sched/wait_bit.c:65) 
-> > [    7.009749] ext4_read_bh (./arch/x86/include/asm/bitops.h:207 ./include/asm-generic/bitops/instrumented-non-atomic.h:135 ./include/linux/buffer_head.h:120 fs/ext4/super.c:201) 
-> > [    7.009752] __read_extent_tree_block (fs/ext4/extents.c:545) 
-> > [    7.009754] ext4_find_extent (fs/ext4/extents.c:928) 
-> > [    7.009756] ext4_ext_map_blocks (fs/ext4/extents.c:4099) 
-> > [    7.009757] ext4_map_blocks (fs/ext4/inode.c:563) 
-> > [    7.009759] ext4_getblk (fs/ext4/inode.c:851) 
-> > [    7.009760] ext4_bread (fs/ext4/inode.c:903) 
-> > [    7.009762] __ext4_read_dirblock (fs/ext4/namei.c:117) 
-> > [    7.009764] dx_probe (fs/ext4/namei.c:789) 
-> > [    7.009765] ext4_dx_find_entry (fs/ext4/namei.c:1721) 
-> > [    7.009767]
-> > [    7.009768] [E] up_read(&ei->i_data_sem:0):
-> > [    7.009769] ext4_map_blocks (fs/ext4/inode.c:593) 
-> > [    7.009771] stacktrace:
-> > [    7.009771] up_read (kernel/locking/rwsem.c:1556) 
-> > [    7.009774] ext4_map_blocks (fs/ext4/inode.c:593) 
-> > [    7.009775] ext4_getblk (fs/ext4/inode.c:851) 
-> > [    7.009777] ext4_bread (fs/ext4/inode.c:903) 
-> > [    7.009778] __ext4_read_dirblock (fs/ext4/namei.c:117) 
-> > [    7.009780] dx_probe (fs/ext4/namei.c:789) 
-> > [    7.009782] ext4_dx_find_entry (fs/ext4/namei.c:1721) 
-> > [    7.009784] __ext4_find_entry (fs/ext4/namei.c:1571) 
-> > [    7.009786] ext4_lookup (fs/ext4/namei.c:1770) 
-> > [    7.009788] lookup_open (./include/linux/dcache.h:361 fs/namei.c:3310) 
-> > [    7.009789] path_openat (fs/namei.c:3401 fs/namei.c:3605) 
-> > [    7.009791] do_filp_open (fs/namei.c:3637) 
-> > [    7.009792] do_sys_openat2 (fs/open.c:1215) 
-> > [    7.009794] do_sys_open (fs/open.c:1231) 
-> > [    7.009795] do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80) 
-> > [    7.009797] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:113) 
-> > [    7.009799] ---------------------------------------------------
-> > [    7.009800] information that might be helpful
-> > [    7.009800] ---------------------------------------------------
-> > [    7.009801] CPU: 0 PID: 611 Comm: rs:main Q:Reg Tainted: G        W         5.17.0-rc1-00014-g8a599299c0cb-dirty #30
-> > [    7.009804] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
-> > [    7.009805] Call Trace:
-> > [    7.009806]  <TASK>
-> > [    7.009807] dump_stack_lvl (lib/dump_stack.c:107) 
-> > [    7.009809] print_circle (./arch/x86/include/asm/atomic.h:108 ./include/linux/atomic/atomic-instrumented.h:258 kernel/dependency/dept.c:157 kernel/dependency/dept.c:762) 
-> > [    7.009812] ? print_circle (kernel/dependency/dept.c:1086) 
-> > [    7.009814] cb_check_dl (kernel/dependency/dept.c:1104) 
-> > [    7.009815] bfs (kernel/dependency/dept.c:860) 
-> > [    7.009818] add_dep (kernel/dependency/dept.c:1423) 
-> > [    7.009820] do_event.isra.25 (kernel/dependency/dept.c:1650) 
-> > [    7.009822] ? __wake_up_common (kernel/sched/wait.c:108) 
-> > [    7.009824] dept_event (kernel/dependency/dept.c:2337) 
-> > [    7.009826] __wake_up_common (kernel/sched/wait.c:109) 
-> > [    7.009828] __wake_up_common_lock (./include/linux/spinlock.h:428 (discriminator 1) kernel/sched/wait.c:141 (discriminator 1)) 
-> > [    7.009830] __wake_up_bit (kernel/sched/wait_bit.c:127) 
-> > [    7.009832] ext4_orphan_del (fs/ext4/orphan.c:282) 
-> > [    7.009835] ? dept_ecxt_exit (./arch/x86/include/asm/current.h:15 kernel/dependency/dept.c:241 kernel/dependency/dept.c:999 kernel/dependency/dept.c:1043 kernel/dependency/dept.c:2478) 
-> > [    7.009837] ext4_truncate (fs/ext4/inode.c:4212) 
-> > [    7.009839] ext4_da_write_begin (./include/linux/fs.h:827 fs/ext4/truncate.h:23 fs/ext4/inode.c:2963) 
-> > [    7.009842] generic_perform_write (mm/filemap.c:3784) 
-> > [    7.009845] ext4_buffered_write_iter (fs/ext4/file.c:269) 
-> > [    7.009848] ext4_file_write_iter (fs/ext4/file.c:677) 
-> > [    7.009851] new_sync_write (fs/read_write.c:504 (discriminator 1)) 
-> > [    7.009854] vfs_write (fs/read_write.c:590) 
-> > [    7.009856] ksys_write (fs/read_write.c:644) 
-> > [    7.009857] ? trace_hardirqs_on (kernel/trace/trace_preemptirq.c:65) 
-> > [    7.009860] do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80) 
-> > [    7.009862] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:113) 
-> > [    7.009865] RIP: 0033:0x7f3b160b335d
-> > [ 7.009867] Code: e1 20 00 00 75 10 b8 01 00 00 00 0f 05 48 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 ce fa ff ff 48 89 04 24 b8 01 00 00 00 0f 05 <48> 8b 3c 24 48 89 c2 e8 17 fb ff ff 48 89 d0 48 83 c4 08 48 3d 01
-> > All code
-> > ========
-> >    0:	e1 20                	loope  0x22
-> >    2:	00 00                	add    %al,(%rax)
-> >    4:	75 10                	jne    0x16
-> >    6:	b8 01 00 00 00       	mov    $0x1,%eax
-> >    b:	0f 05                	syscall 
-> >    d:	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax
-> >   13:	73 31                	jae    0x46
-> >   15:	c3                   	retq   
-> >   16:	48 83 ec 08          	sub    $0x8,%rsp
-> >   1a:	e8 ce fa ff ff       	callq  0xfffffffffffffaed
-> >   1f:	48 89 04 24          	mov    %rax,(%rsp)
-> >   23:	b8 01 00 00 00       	mov    $0x1,%eax
-> >   28:	0f 05                	syscall 
-> >   2a:*	48 8b 3c 24          	mov    (%rsp),%rdi		<-- trapping instruction
-> >   2e:	48 89 c2             	mov    %rax,%rdx
-> >   31:	e8 17 fb ff ff       	callq  0xfffffffffffffb4d
-> >   36:	48 89 d0             	mov    %rdx,%rax
-> >   39:	48 83 c4 08          	add    $0x8,%rsp
-> >   3d:	48                   	rex.W
-> >   3e:	3d                   	.byte 0x3d
-> >   3f:	01                   	.byte 0x1
-> > 
-> > Code starting with the faulting instruction
-> > ===========================================
-> >    0:	48 8b 3c 24          	mov    (%rsp),%rdi
-> >    4:	48 89 c2             	mov    %rax,%rdx
-> >    7:	e8 17 fb ff ff       	callq  0xfffffffffffffb23
-> >    c:	48 89 d0             	mov    %rdx,%rax
-> >    f:	48 83 c4 08          	add    $0x8,%rsp
-> >   13:	48                   	rex.W
-> >   14:	3d                   	.byte 0x3d
-> >   15:	01                   	.byte 0x1
-> > [    7.009869] RSP: 002b:00007f3b1340f180 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-> > [    7.009871] RAX: ffffffffffffffda RBX: 00007f3b040010a0 RCX: 00007f3b160b335d
-> > [    7.009873] RDX: 0000000000000300 RSI: 00007f3b040010a0 RDI: 0000000000000001
-> > [    7.009874] RBP: 0000000000000000 R08: fffffffffffffa15 R09: fffffffffffffa05
-> > [    7.009875] R10: 0000000000000000 R11: 0000000000000293 R12: 00007f3b04000df0
-> > [    7.009876] R13: 00007f3b1340f1a0 R14: 0000000000000220 R15: 0000000000000300
-> > [    7.009879]  </TASK>
+Thanks
+Jianchao
