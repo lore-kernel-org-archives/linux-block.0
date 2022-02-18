@@ -2,86 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E53DC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 15:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D36C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 17:40:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234663AbiBRPVX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 10:21:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:32810 "EHLO
+        id S238716AbiBRRkT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 12:40:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232013AbiBRPVX (ORCPT
+        with ESMTP id S238737AbiBRRkS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 10:21:23 -0500
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791C518CC46
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 07:21:02 -0800 (PST)
-Received: by mail-qk1-x72c.google.com with SMTP id c7so6084955qka.7
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 07:21:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dFva2jphudu5nNQOtFetMtWWxY8U+kSkf6ymT6sVouY=;
-        b=6cqBgFFBOvizHU93Po+Zmf3Phx4g1oVC0Ve/zIfQpn7TkYyMnMeR1iI8Mrx1PpICf5
-         Z5UAmE86htGVfvf1UDCIY/gPeDwGJ0+h9FXY1kU/AAR2Ampat4gzDgpi4r3f4XZd4ZoJ
-         LMgccAH3CuN9komOtrImQ3Yg/wGl/H+D1cr3lgu089ljtPtZnIntdsk7MuAyu19rn9E+
-         AVz3ae3PKLAZi1oWAXIqAO/2pVAymh7igvT2Ai0dWGeuibDwrJIRa1IlOrGy73y1b8iC
-         /IOIDsgS7LoRfkVysGHJZgK2O5fBJCqRe0w3cmOqXc5d8Z1CEXkD7DgDm1wGZ1cdAes0
-         oVhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dFva2jphudu5nNQOtFetMtWWxY8U+kSkf6ymT6sVouY=;
-        b=DaoIwnOrrNIg1XjTc/vhqBmmKu1nESwMFvA1AjqDxv5cDNZg+lcHigQXmfvOGGU/4x
-         sBk3wsXjrA3w5L1VJF8STyEql4SKqtKT8PzNf8owmyVLN3UtNTE+LLJDI+XsDsWLXYut
-         RLaDTw8QamxjrGSuNcx8y3EIk+c3GYzmCoeBe7fV75gnA2Sf7ffKohzAfDchUky/Cdy6
-         9otrOeW7Er8bg6CgmjtqSnlynuYCrrN2XWfHaharJtqUN/QJb4RSqhYwuwK70QdYZAKZ
-         BW+0iOKo4pwjsd6PuUlHvxV8TTT4mKe3n0uSwZcGY/1zzNKeXKmbX22I+393+9N5UJCq
-         BPeQ==
-X-Gm-Message-State: AOAM532djBfNa3bEPGaekOJ4xsIY9sggDVkyn+uGaJB1Aa7ffyRDfDBQ
-        /4VGT9ak48IVHMjqme+0Xf0JEA==
-X-Google-Smtp-Source: ABdhPJyGNUkWSTWwJo7nhA780UyQwUX+LwX0Q7tqbWJWKYGoikX/fIia26lFPmjFrxCM1vj2GlgaqA==
-X-Received: by 2002:a37:c442:0:b0:60d:da8a:1c6 with SMTP id h2-20020a37c442000000b0060dda8a01c6mr4606180qkm.162.1645197661178;
-        Fri, 18 Feb 2022 07:21:01 -0800 (PST)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id o5sm6282400qtp.48.2022.02.18.07.21.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 07:21:00 -0800 (PST)
-Date:   Fri, 18 Feb 2022 10:20:59 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
-Message-ID: <Yg+5Wytvc2eG8uLD@localhost.localdomain>
-References: <20211227091241.103-1-xieyongji@bytedance.com>
- <Ycycda8w/zHWGw9c@infradead.org>
- <CACycT3usfTdzmK=gOsBf3=-0e8HZ3_0ZiBJqkWb_r7nki7xzYA@mail.gmail.com>
- <YdMgCS1RMcb5V2RJ@localhost.localdomain>
- <CACycT3vYt0XNV2GdjKjDS1iyWieY_OV4h=W1qqk_AAAahRZowA@mail.gmail.com>
- <YdSMqKXv0PUkAwfl@localhost.localdomain>
- <CACycT3tPZOSkCXPz-oYCXRJ_EOBs3dC0+Juv=FYsa6qRS0GVCw@mail.gmail.com>
- <CACycT3tTKBpS_B5vVJ8MZ1iuaF2bf-01=9+tAdxUddziF2DQ-g@mail.gmail.com>
- <CACycT3thVwb466u2JR-oDRHLY5j_uxAx5uXXGmaoCZL5vs__mQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACycT3thVwb466u2JR-oDRHLY5j_uxAx5uXXGmaoCZL5vs__mQ@mail.gmail.com>
+        Fri, 18 Feb 2022 12:40:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6E275627
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 09:40:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F91861FF1
+        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 17:40:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88654C36AE7;
+        Fri, 18 Feb 2022 17:40:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645206000;
+        bh=yrvvWPu3d//w75ddlydDXCcSQK5PQA1993PaMdM0CN4=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=l2I3AE2BfoFN1fe2c+5DLwj8Z/sFkPIPlE8gIEzIBVvd9Xp4v1JYjgsP+OQaWulLM
+         oNsPxvep6jokRm25J8Gfac87oZOpcbfsE6fWQIUJGZqoFJmDXdJ/gqSHSvE4SfYB5s
+         9myqa8TviUNVHAzAwOP7mqsS+MNt7cQkZhYeaKi/8Wy9JARrHoDiOqpzKV9ajbe3V/
+         XPe6/RYgLCUapLzaHsLPUc/0udrdEV1NIgguh8cdMY+sBpWc+poWX7/am6PQY92u3H
+         9O9geP+Kcolz/84qdZrcpHwIcgKAPhgqqSyS5c9H8cU5QYkyYAKfdcVhKFcY3gYQNQ
+         lHOFBUwvo6MPQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 780E7E6BBD2;
+        Fri, 18 Feb 2022 17:40:00 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 5.17-rc5
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <5922f9b2-a23d-20b5-c8ae-619422a08df7@kernel.dk>
+References: <5922f9b2-a23d-20b5-c8ae-619422a08df7@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <5922f9b2-a23d-20b5-c8ae-619422a08df7@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-17
+X-PR-Tracked-Commit-Id: e92bc4cd34de2ce454bdea8cd198b8067ee4e123
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b9889768bda1a326238990b7d75ea179321d9693
+Message-Id: <164520600048.19024.8079944301156078799.pr-tracker-bot@kernel.org>
+Date:   Fri, 18 Feb 2022 17:40:00 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 09:17:37PM +0800, Yongji Xie wrote:
-> Ping again.
-> 
-> Hi Josef, could you take a look?
+The pull request you sent on Thu, 17 Feb 2022 20:48:25 -0700:
 
-Sorry Yongji this got lost.  Again in the reconnect case we're still setting up
-a long running thread, so it's not like it'll happen during a normal reclaim
-path thing, it'll be acted upon by userspace.  Thanks,
+> git://git.kernel.dk/linux-block.git tags/block-5.17-2022-02-17
 
-Josef
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b9889768bda1a326238990b7d75ea179321d9693
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
