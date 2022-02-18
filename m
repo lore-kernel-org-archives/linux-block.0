@@ -2,164 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70053C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 06:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F28AC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 18 Feb 2022 08:20:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231211AbiBRGJ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 01:09:57 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52094 "EHLO
+        id S232457AbiBRIVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Feb 2022 03:21:06 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231183AbiBRGJy (ORCPT
+        with ESMTP id S230221AbiBRIVD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 01:09:54 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A6FE19C12
-        for <linux-block@vger.kernel.org>; Thu, 17 Feb 2022 22:09:34 -0800 (PST)
-Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
-        by 156.147.23.51 with ESMTP; 18 Feb 2022 15:09:33 +0900
-X-Original-SENDERIP: 156.147.1.127
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.127 with ESMTP; 18 Feb 2022 15:09:33 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Fri, 18 Feb 2022 15:09:26 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, joel@joelfernandes.org,
-        sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: [PATCH 02/16] dept: Implement Dept(Dependency Tracker)
-Message-ID: <20220218060926.GA26206@X58A-UD3R>
-References: <1645095472-26530-1-git-send-email-byungchul.park@lge.com>
- <1645095472-26530-3-git-send-email-byungchul.park@lge.com>
- <20220217123656.389e8783@gandalf.local.home>
+        Fri, 18 Feb 2022 03:21:03 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB82E25B2F7;
+        Fri, 18 Feb 2022 00:20:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645172446; x=1676708446;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5ejHrB5B466U6W+fI4GxsWg/8qpDAbd2bstCAFg1MpY=;
+  b=DesFvz0AAfxYpo6A+wazO9ViMVpCMtIHCj1JdwxvlrAtsy0eUxAKnK4F
+   IBtT6QHvmG26x/5RwHAAtGkHRDIIMcRPX4YJUB7VVlaOXLv9KH2LDVq3n
+   +qrQ5H5+jCSjmcdIwT1zNojTZeLZFzlHLq47Gt/Zf1o0pMzClZyoTSL/b
+   ++xBBTjlKepEMH+63dwB1jnZuVv8KvaIYERQzJCWXxbViMr0z+pccBf18
+   zzBZRV8lNF4oSQwVGj0dYeNHDS6fxN298X9JX4RhA48Uguf2CpfOCGkmY
+   o/YCKamHNNro54raPMJIgv+SR29OqXcn5IR63E2+JAoZW+wEIq/poHM39
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="275675307"
+X-IronPort-AV: E=Sophos;i="5.88,378,1635231600"; 
+   d="scan'208";a="275675307"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2022 00:20:46 -0800
+X-IronPort-AV: E=Sophos;i="5.88,378,1635231600"; 
+   d="scan'208";a="505115448"
+Received: from svaddara-mobl.amr.corp.intel.com (HELO ldmartin-desk2) ([10.212.147.37])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2022 00:20:45 -0800
+Date:   Fri, 18 Feb 2022 00:20:46 -0800
+From:   Lucas De Marchi <lucas.demarchi@intel.com>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Lucas De Marchi <lucas.de.marchi@gmail.com>,
+        linux-modules <linux-modules@vger.kernel.org>,
+        live-patching@vger.kernel.org, fstests@vger.kernel.org,
+        linux-block@vger.kernel.org, hare@suse.de, dgilbert@interlog.com,
+        Jessica Yu <jeyu@kernel.org>, osandov@fb.com,
+        lkml <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 0/3] kmod: add patient module removal support
+Message-ID: <20220218082046.c33zz64owau3oiln@ldmartin-desk2>
+X-Patchwork-Hint: comment
+References: <20210810051602.3067384-1-mcgrof@kernel.org>
+ <YUIwKUXc7YbVAqut@bombadil.infradead.org>
+ <CAKi4VAKbN31hqfg5EHZO=T_Hdkv3uhzarFLuEZO4b5Zm+TF77Q@mail.gmail.com>
+ <Yg4Djc+vqRbMFRto@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220217123656.389e8783@gandalf.local.home>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <Yg4Djc+vqRbMFRto@bombadil.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 12:36:56PM -0500, Steven Rostedt wrote:
-> > +struct dept_ecxt;
-> > +struct dept_iecxt {
-> > +	struct dept_ecxt *ecxt;
-> > +	int enirq;
-> > +	bool staled; /* for preventing to add a new ecxt */
-> > +};
-> > +
-> > +struct dept_wait;
-> > +struct dept_iwait {
-> > +	struct dept_wait *wait;
-> > +	int irq;
-> > +	bool staled; /* for preventing to add a new wait */
-> > +	bool touched;
-> > +};
-> 
-> Nit. It makes it easier to read (and then review) if structures are spaced
-> where their fields are all lined up:
-> 
-> struct dept_iecxt {
-> 	struct dept_ecxt		*ecxt;
-> 	int				enirq;
-> 	bool				staled;
-> };
-> 
-> struct dept_iwait {
-> 	struct dept_wait		*wait;
-> 	int				irq;
-> 	bool				staled;
-> 	bool				touched;
-> };
-> 
-> See, the fields stand out, and is nicer on the eyes. Especially for those
-> of us that are getting up in age, and our eyes do not work as well as they
-> use to ;-)
+On Thu, Feb 17, 2022 at 12:13:01AM -0800, Luis Chamberlain wrote:
+>On Mon, Sep 20, 2021 at 10:51:46PM -0700, Lucas De Marchi wrote:
+>> On Wed, Sep 15, 2021 at 10:41 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>> >
+>> > *Friendly poke*
+>>
+>> Sorry for the delay. Let me take a look in detail tomorrow.
+>
+>*Friendly poke*
 
-Sure! I will apply this.
+oh, I dropped the ball here, sorry. Then I got busy with i915 and other
+projects. Let me take a look again at your implementation and respin it
 
-> > + * ---
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License as published by
-> > + * the Free Software Foundation; either version 2 of the License, or
-> > + * (at your ootion) any later version.
-> > + *
-> > + * This program is distributed in the hope that it will be useful, but
-> > + * WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-> > + * General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-> > + * along with this program; if not, you can access it online at
-> > + * http://www.gnu.org/licenses/gpl-2.0.html.
-> 
-> The SPDX at the top of the file is all that is needed. Please remove this
-> boiler plate. We do not use GPL boiler plates in the kernel anymore. The
-> SPDX code supersedes that.
-
-Thank you for informing it!
-
-> > +/*
-> > + * Can use llist no matter whether CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG is
-> > + * enabled because DEPT never race with NMI by nesting control.
-> 
->                          "never races with"
-
-Good eyes!
-
-> Although, I'm confused by what you mean with "by nesting control".
-
-I should've expressed it more clearly. It meant NMI and other contexts
-never run inside of Dept concurrently in the same CPU by preventing
-reentrance.
-
-> > +static void initialize_class(struct dept_class *c)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < DEPT_IRQS_NR; i++) {
-> > +		struct dept_iecxt *ie = &c->iecxt[i];
-> > +		struct dept_iwait *iw = &c->iwait[i];
-> > +
-> > +		ie->ecxt = NULL;
-> > +		ie->enirq = i;
-> > +		ie->staled = false;
-> > +
-> > +		iw->wait = NULL;
-> > +		iw->irq = i;
-> > +		iw->staled = false;
-> > +		iw->touched = false;
-> > +	}
-> > +	c->bfs_gen = 0U;
-> 
-> Is the U really necessary?
-
-I was just wondering if it's really harmful? I want to leave this if
-it's harmless because U let us guess the data type of ->bfs_gen correctly
-at a glance. Or am I missing some reason why I should fix this?
-
-Thank you very much, Steven.
-
+Lucas De Marchi
+>
+>  Luis
