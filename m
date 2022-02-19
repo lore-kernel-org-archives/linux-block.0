@@ -2,40 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2818C4332F
-	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 10:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB8AC43217
+	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 10:58:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238728AbiBSKfb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Feb 2022 05:35:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53906 "EHLO
+        id S242039AbiBSK7E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Feb 2022 05:59:04 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236937AbiBSKfa (ORCPT
+        with ESMTP id S236606AbiBSK7D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Feb 2022 05:35:30 -0500
+        Sat, 19 Feb 2022 05:59:03 -0500
 Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7072221FC61
-        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 02:35:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9259D674F0
+        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 02:58:41 -0800 (PST)
 Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.53 with ESMTP; 19 Feb 2022 19:35:07 +0900
+        by 156.147.23.53 with ESMTP; 19 Feb 2022 19:58:40 +0900
 X-Original-SENDERIP: 156.147.1.151
 X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 19 Feb 2022 19:35:07 +0900
+Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
+        by 156.147.1.151 with ESMTP; 19 Feb 2022 19:58:40 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Sat, 19 Feb 2022 19:34:58 +0900
 From:   Byungchul Park <byungchul.park@lge.com>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, joel@joelfernandes.org,
-        sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+To:     torvalds@linux-foundation.org
+Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
+        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+        amir73il@gmail.com, bfields@fieldses.org,
         gregkh@linuxfoundation.org, kernel-team@lge.com,
         linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
         minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
@@ -49,77 +47,64 @@ Cc:     Steven Rostedt <rostedt@goodmis.org>,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: Re: [PATCH 00/16] DEPT(Dependency Tracker)
-Message-ID: <20220219103458.GD10342@X58A-UD3R>
-References: <1645095472-26530-1-git-send-email-byungchul.park@lge.com>
- <Yg5u7dzUxL3Vkncg@mit.edu>
- <20220217120005.67f5ddf4@gandalf.local.home>
- <Yg8eQ/iR5H/AHZIg@mit.edu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yg8eQ/iR5H/AHZIg@mit.edu>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Subject: [PATCH v2 01/18] llist: Move llist_{head,node} definition to types.h
+Date:   Sat, 19 Feb 2022 19:58:14 +0900
+Message-Id: <1645268311-24222-2-git-send-email-byungchul.park@lge.com>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1645268311-24222-1-git-send-email-byungchul.park@lge.com>
+References: <1645268311-24222-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 11:19:15PM -0500, Theodore Ts'o wrote:
-> On Thu, Feb 17, 2022 at 12:00:05PM -0500, Steven Rostedt wrote:
-> > 
-> > I personally believe that there's potential that this can be helpful and we
-> > will want to merge it.
-> > 
-> > But, what I believe Ted is trying to say is, if you do not know if the
-> > report is a bug or not, please do not ask the maintainers to determine it
-> > for you. This is a good opportunity for you to look to see why your tool
-> > reported an issue, and learn that subsystem. Look at if this is really a
-> > bug or not, and investigate why.
-> 
-> I agree there's potential here, or I would have ignored the ext4 "bug
-> report".
+llist_head and llist_node can be used by very primitives. For example,
+Dept for tracking dependency uses llist things in its header. To avoid
+header dependency, move those to types.h.
 
-I just checked this one. Appreciate it...
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+---
+ include/linux/llist.h | 8 --------
+ include/linux/types.h | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-> When we can get rid of the false positives, I think it should be
+diff --git a/include/linux/llist.h b/include/linux/llist.h
+index 85bda2d..99cc3c3 100644
+--- a/include/linux/llist.h
++++ b/include/linux/llist.h
+@@ -53,14 +53,6 @@
+ #include <linux/stddef.h>
+ #include <linux/types.h>
+ 
+-struct llist_head {
+-	struct llist_node *first;
+-};
+-
+-struct llist_node {
+-	struct llist_node *next;
+-};
+-
+ #define LLIST_HEAD_INIT(name)	{ NULL }
+ #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+ 
+diff --git a/include/linux/types.h b/include/linux/types.h
+index ac825ad..4662d6e 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -187,6 +187,14 @@ struct hlist_node {
+ 	struct hlist_node *next, **pprev;
+ };
+ 
++struct llist_head {
++	struct llist_node *first;
++};
++
++struct llist_node {
++	struct llist_node *next;
++};
++
+ struct ustat {
+ 	__kernel_daddr_t	f_tfree;
+ #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
+-- 
+1.9.1
 
-Of course, the false positives should be removed once it's found. I will
-try my best to remove all of those on my own as much as possible.
-However, thing is I can't see others than what I can see with my system.
-
-> merged; I'd just rather it not be merged until after the false
-> positives are fixed, since otherwise, someone well-meaning will start
-> using it with Syzkaller, and noise that maintainers need to deal with
-> (with people requesting reverts of two year old commits, etc) will
-> increase by a factor of ten or more.  (With Syzbot reproducers that
-
-Agree.
-
-> set up random cgroups, IP tunnels with wiregaurd enabled, FUSE stress
-> testers, etc., that file system maintainers will be asked to try to
-> disentangle.)
-> 
-> So from a maintainer's perspective, false positives are highly
-> negative.  It may be that from some people's POV, one bug found and 20
-> false positive might still be "useful".  But if your tool gains a
-> reputation of not valuing maintainers' time, it's just going to make
-> us (or at least me :-) cranky, and it's going to be very hard to
-
-Agree.
-
-> recover from perception.  So it's probably better to be very
-> conservative and careful in polishing it before asking for it to be
-> merged.
-
-If it's true that there are too many false positives like 95%, then I'll
-fix those fist for sure before asking to merge it. Let's see if so.
-
-To kernel developers,
-
-It'd be appreciated if you'd let us know if you can see real ones than
-false positives in the middle of developing something in the kernel so
-it's useful. Otherwise, it's hard to measure how many false positives it
-reports and how valuable it is and so on...
-
-Thanks,
-Byungchul
