@@ -2,70 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCAFC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 03:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C4CC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 07:35:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240302AbiBSDct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Feb 2022 22:32:49 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59124 "EHLO
+        id S234553AbiBSHfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Feb 2022 02:35:30 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230240AbiBSDcs (ORCPT
+        with ESMTP id S234270AbiBSHf3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Feb 2022 22:32:48 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE10D1B7624
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 19:32:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3E4B462075
-        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 03:32:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A65AC340EF
-        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 03:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645241549;
-        bh=dr6RiblauHb7AyJYXabmITvaPdrndByhXm3PAifETd4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=e9dU2amkojYJUxWjqpaqsT0UZaX9l9Xqmf9OtMbydSnvfbY57Cj/kVAWiNC9kMtwR
-         hObbCNSQ1Yv3bPCUOdzSFwVRJuVCxBz8GUZd31vvEiCVJx1Sskvr2dZJmFmugiC8px
-         uAfTiQFKBCd13KxH8ns/TJx7eZ9XVyBIRHVl02cPWphtnSGereY3aPbX/J6cndMbFC
-         JF92wMpXcOMIax2IT1116ipSw6om5kcPKmSqD7/0T4l5m9gfAZsDe8t7nDp/SxZHji
-         quqqsrjACnKWxZYWQD5s0pphRNbE29XttSeaAmQP+zvq3Y3WAjAvXZnnfBYiDIcCmy
-         hVjKUomEDPZ3Q==
-Received: by mail-yb1-f171.google.com with SMTP id w63so1918474ybe.10
-        for <linux-block@vger.kernel.org>; Fri, 18 Feb 2022 19:32:29 -0800 (PST)
-X-Gm-Message-State: AOAM530hxfmAYKZi+BTQNWbFhEmMYCts6Jr+akYooyK5jxfWn0oFR71C
-        cw3+fid3OCG5ezuZ5wtVy+eQn9TmkoPV1VoX0Aw=
-X-Google-Smtp-Source: ABdhPJzCBR9nHGbDK8UY4UCXlvhCw+mNjig8CfHtks3BUT4dASQyyYP1dTBQ7imh5ntVEvzQ5kl2Ilb+azuKR494cG8=
-X-Received: by 2002:a25:e747:0:b0:623:efe8:62d5 with SMTP id
- e68-20020a25e747000000b00623efe862d5mr10583561ybh.256.1645241548766; Fri, 18
- Feb 2022 19:32:28 -0800 (PST)
+        Sat, 19 Feb 2022 02:35:29 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B67CC9D041;
+        Fri, 18 Feb 2022 23:35:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wN/R54DdjG51GJ6FLBWX7by9g1NK4X9Fp+pJwqXBiSY=; b=XLm5fOZoTSqUQcc/6HfBfv5Jjp
+        EC24wDq9QL7o0YZmGY/Dl6Un+zXHUBXWLx0CdmzayahZKrW4JfCWCpvy3FeqTaTeoo2IXfxsuWJd7
+        Xunzz414UatDBr1UrShziKs6rEwVJ1Pn042Kwa6xzmMsR8PIDnKidUQ3AYMuAsXcM5qAENM4MMjg+
+        pE6sDmJXZVLbvXumLRbcsbYPzSY9prTsSLKXsbu9tlR2zePoCVVWHoBB3VIHSS2RrfqY4DjJLjLdH
+        sti2tdv5TRjapsWueb5KPUbyV1JG889JbvQaZLbauSGzphyPg9laNXHhNy42JPGSuaWwVjAfXTvDc
+        55PDxGdA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nLKGs-00GNIY-8z; Sat, 19 Feb 2022 07:35:10 +0000
+Date:   Fri, 18 Feb 2022 23:35:10 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Stefan Roesch <shr@fb.com>
+Cc:     io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH v2 04/13] fs: split off __alloc_page_buffers function
+Message-ID: <YhCdruAyTmLyVp8z@infradead.org>
+References: <20220218195739.585044-1-shr@fb.com>
+ <20220218195739.585044-5-shr@fb.com>
 MIME-Version: 1.0
-References: <YhBfsIqCNsi7D/st@bombadil.infradead.org>
-In-Reply-To: <YhBfsIqCNsi7D/st@bombadil.infradead.org>
-From:   Luis Chamberlain <mcgrof@kernel.org>
-Date:   Fri, 18 Feb 2022 19:32:17 -0800
-X-Gmail-Original-Message-ID: <CAB=NE6UB-qE2SW-2nsB0vUfQ+aMpeUB4yUqjfp_5VE2RQhMMFQ@mail.gmail.com>
-Message-ID: <CAB=NE6UB-qE2SW-2nsB0vUfQ+aMpeUB4yUqjfp_5VE2RQhMMFQ@mail.gmail.com>
-Subject: Re: block loopback driver possible regression since next-20220211
-To:     Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220218195739.585044-5-shr@fb.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 18, 2022 at 7:10 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> I noticed that since next-20220211 losetup fails at something stupid
-> simple:
->
-> losetup $LOOPDEV $DISK
-
-I can bisect through linux-next, next-20220201 works. I'll let you
-know what I find.
-
- Luis
+Err, hell no.  Please do not add any new functionality to the legacy
+buffer head code.  If you want new features do that on the
+non-bufferhead iomap code path only please.
