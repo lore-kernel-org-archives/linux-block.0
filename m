@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4CEC35296
-	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 10:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF29C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 10:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242087AbiBSK7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Feb 2022 05:59:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41896 "EHLO
+        id S242064AbiBSK7c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Feb 2022 05:59:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242085AbiBSK7J (ORCPT
+        with ESMTP id S239896AbiBSK7D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Feb 2022 05:59:09 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DFFF069499
-        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 02:58:43 -0800 (PST)
+        Sat, 19 Feb 2022 05:59:03 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C704069286
+        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 02:58:41 -0800 (PST)
 Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.53 with ESMTP; 19 Feb 2022 19:58:42 +0900
+        by 156.147.23.51 with ESMTP; 19 Feb 2022 19:58:41 +0900
 X-Original-SENDERIP: 156.147.1.151
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 19 Feb 2022 19:58:42 +0900
+        by 156.147.1.151 with ESMTP; 19 Feb 2022 19:58:41 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -47,9 +47,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v2 07/18] dept: Apply Dept to rwlock
-Date:   Sat, 19 Feb 2022 19:58:20 +0900
-Message-Id: <1645268311-24222-8-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v2 04/18] dept: Add a API for skipping dependency check temporarily
+Date:   Sat, 19 Feb 2022 19:58:17 +0900
+Message-Id: <1645268311-24222-5-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1645268311-24222-1-git-send-email-byungchul.park@lge.com>
 References: <1645268311-24222-1-git-send-email-byungchul.park@lge.com>
@@ -57,183 +57,158 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by rwlock.
+Dept would skip check for dmaps marked by dept_map_nocheck() permanently.
+However, sometimes it needs to skip check for some dmaps temporarily and
+back to normal, for instance, lock acquisition with a nest lock.
+
+Lock usage check with regard to nest lock could be performed by Lockdep,
+however, dependency check is not necessary for that case. So prepared
+for it by adding two new APIs, dept_skip() and dept_unskip_if_skipped().
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/lockdep.h        | 25 ++++++++++++++++----
- include/linux/rwlock.h         | 52 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/rwlock_api_smp.h |  8 +++----
- include/linux/rwlock_types.h   |  7 ++++++
- 4 files changed, 83 insertions(+), 9 deletions(-)
+ include/linux/dept.h     |  9 +++++++++
+ include/linux/dept_sdt.h |  2 +-
+ include/linux/lockdep.h  |  4 +++-
+ kernel/dependency/dept.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+), 2 deletions(-)
 
+diff --git a/include/linux/dept.h b/include/linux/dept.h
+index c3fb3cf..c0bbb8e 100644
+--- a/include/linux/dept.h
++++ b/include/linux/dept.h
+@@ -352,6 +352,11 @@ struct dept_map {
+ 	unsigned int			wgen;
+ 
+ 	/*
++	 * for skipping dependency check temporarily
++	 */
++	atomic_t			skip_cnt;
++
++	/*
+ 	 * whether this map should be going to be checked or not
+ 	 */
+ 	bool				nocheck;
+@@ -444,6 +449,8 @@ struct dept_task {
+ extern void dept_ask_event(struct dept_map *m);
+ extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn);
+ extern void dept_ecxt_exit(struct dept_map *m, unsigned long ip);
++extern void dept_skip(struct dept_map *m);
++extern bool dept_unskip_if_skipped(struct dept_map *m);
+ 
+ /*
+  * for users who want to manage external keys
+@@ -475,6 +482,8 @@ struct dept_task {
+ #define dept_ask_event(m)			do { } while (0)
+ #define dept_event(m, e_f, ip, e_fn)		do { (void)(e_fn); } while (0)
+ #define dept_ecxt_exit(m, ip)			do { } while (0)
++#define dept_skip(m)				do { } while (0)
++#define dept_unskip_if_skipped(m)		(false)
+ #define dept_key_init(k)			do { (void)(k); } while (0)
+ #define dept_key_destroy(k)			do { (void)(k); } while (0)
+ #endif
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+index 375c4c3..e9d558d 100644
+--- a/include/linux/dept_sdt.h
++++ b/include/linux/dept_sdt.h
+@@ -13,7 +13,7 @@
+ #include <linux/dept.h>
+ 
+ #ifdef CONFIG_DEPT
+-#define DEPT_SDT_MAP_INIT(dname)	{ .name = #dname }
++#define DEPT_SDT_MAP_INIT(dname)	{ .name = #dname, .skip_cnt = ATOMIC_INIT(0) }
+ 
+ /*
+  * SDT(Single-event Dependency Tracker) APIs
 diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 6653a4f..b93a707 100644
+index c56f6b6..c1a56fe 100644
 --- a/include/linux/lockdep.h
 +++ b/include/linux/lockdep.h
-@@ -600,16 +600,31 @@ static inline void print_irqtrace_events(struct task_struct *curr)
- 	dept_spin_unlock(&(l)->dmap, i);				\
- } while (0)
- 
--#define rwlock_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
-+#define rwlock_acquire(l, s, t, i)					\
-+do {									\
-+	lock_acquire_exclusive(l, s, t, NULL, i);			\
-+	dept_rwlock_wlock(&(l)->dmap, s, t, NULL, "write_unlock", i);	\
-+} while (0)
- #define rwlock_acquire_read(l, s, t, i)					\
- do {									\
--	if (read_lock_is_recursive())					\
-+	if (read_lock_is_recursive()) {				\
- 		lock_acquire_shared_recursive(l, s, t, NULL, i);	\
--	else								\
-+		dept_rwlock_rlock(&(l)->dmap, s, t, NULL, "read_unlock", i, 0);\
-+	} else {							\
- 		lock_acquire_shared(l, s, t, NULL, i);			\
-+		dept_rwlock_rlock(&(l)->dmap, s, t, NULL, "read_unlock", i, 1);\
-+	}								\
-+} while (0)
-+#define rwlock_release(l, i)						\
-+do {									\
-+	lock_release(l, i);						\
-+	dept_rwlock_wunlock(&(l)->dmap, i);				\
-+} while (0)
-+#define rwlock_release_read(l, i)					\
-+do {									\
-+	lock_release(l, i);						\
-+	dept_rwlock_runlock(&(l)->dmap, i);				\
- } while (0)
--
--#define rwlock_release(l, i)			lock_release(l, i)
- 
- #define seqcount_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
- #define seqcount_acquire_read(l, s, t, i)	lock_acquire_shared_recursive(l, s, t, NULL, i)
-diff --git a/include/linux/rwlock.h b/include/linux/rwlock.h
-index 8f416c5..768ad9e 100644
---- a/include/linux/rwlock.h
-+++ b/include/linux/rwlock.h
-@@ -28,6 +28,58 @@
- 	do { *(lock) = __RW_LOCK_UNLOCKED(lock); } while (0)
- #endif
- 
-+#ifdef CONFIG_DEPT
-+#define DEPT_EVT_RWLOCK_R		1UL
-+#define DEPT_EVT_RWLOCK_W		(1UL << 1)
-+#define DEPT_EVT_RWLOCK_RW		(DEPT_EVT_RWLOCK_R | DEPT_EVT_RWLOCK_W)
-+
-+#define dept_rwlock_wlock(m, ne, t, n, e_fn, ip)			\
-+do {									\
-+	if (t) {							\
-+		dept_ecxt_enter(m, DEPT_EVT_RWLOCK_W, ip, __func__, e_fn, ne);\
-+		dept_ask_event(m);					\
-+	} else if (n) {							\
-+		dept_skip(m);						\
-+	} else {							\
-+		dept_wait(m, DEPT_EVT_RWLOCK_RW, ip, __func__, ne);	\
-+		dept_ecxt_enter(m, DEPT_EVT_RWLOCK_W, ip, __func__, e_fn, ne);\
-+		dept_ask_event(m);					\
-+	}								\
-+} while (0)
-+#define dept_rwlock_rlock(m, ne, t, n, e_fn, ip, q)			\
-+do {									\
-+	if (t) {							\
-+		dept_ecxt_enter(m, DEPT_EVT_RWLOCK_R, ip, __func__, e_fn, ne);\
-+		dept_ask_event(m);					\
-+	} else if (n) {							\
-+		dept_skip(m);						\
-+	} else {							\
-+		dept_wait(m, (q) ? DEPT_EVT_RWLOCK_RW : DEPT_EVT_RWLOCK_W, ip, __func__, ne);\
-+		dept_ecxt_enter(m, DEPT_EVT_RWLOCK_R, ip, __func__, e_fn, ne);\
-+		dept_ask_event(m);					\
-+	}								\
-+} while (0)
-+#define dept_rwlock_wunlock(m, ip)					\
-+do {									\
-+	if (!dept_unskip_if_skipped(m)) {				\
-+		dept_event(m, DEPT_EVT_RWLOCK_W, ip, __func__);		\
-+		dept_ecxt_exit(m, ip);					\
-+	}								\
-+} while (0)
-+#define dept_rwlock_runlock(m, ip)					\
-+do {									\
-+	if (!dept_unskip_if_skipped(m)) {				\
-+		dept_event(m, DEPT_EVT_RWLOCK_R, ip, __func__);		\
-+		dept_ecxt_exit(m, ip);					\
-+	}								\
-+} while (0)
-+#else
-+#define dept_rwlock_wlock(m, ne, t, n, e_fn, ip)	do { } while (0)
-+#define dept_rwlock_rlock(m, ne, t, n, e_fn, ip, q)	do { } while (0)
-+#define dept_rwlock_wunlock(m, ip)			do { } while (0)
-+#define dept_rwlock_runlock(m, ip)			do { } while (0)
-+#endif
-+
- #ifdef CONFIG_DEBUG_SPINLOCK
-  extern void do_raw_read_lock(rwlock_t *lock) __acquires(lock);
-  extern int do_raw_read_trylock(rwlock_t *lock);
-diff --git a/include/linux/rwlock_api_smp.h b/include/linux/rwlock_api_smp.h
-index dceb0a5..a222cf1 100644
---- a/include/linux/rwlock_api_smp.h
-+++ b/include/linux/rwlock_api_smp.h
-@@ -228,7 +228,7 @@ static inline void __raw_write_unlock(rwlock_t *lock)
- 
- static inline void __raw_read_unlock(rwlock_t *lock)
- {
--	rwlock_release(&lock->dep_map, _RET_IP_);
-+	rwlock_release_read(&lock->dep_map, _RET_IP_);
- 	do_raw_read_unlock(lock);
- 	preempt_enable();
- }
-@@ -236,7 +236,7 @@ static inline void __raw_read_unlock(rwlock_t *lock)
- static inline void
- __raw_read_unlock_irqrestore(rwlock_t *lock, unsigned long flags)
- {
--	rwlock_release(&lock->dep_map, _RET_IP_);
-+	rwlock_release_read(&lock->dep_map, _RET_IP_);
- 	do_raw_read_unlock(lock);
- 	local_irq_restore(flags);
- 	preempt_enable();
-@@ -244,7 +244,7 @@ static inline void __raw_read_unlock(rwlock_t *lock)
- 
- static inline void __raw_read_unlock_irq(rwlock_t *lock)
- {
--	rwlock_release(&lock->dep_map, _RET_IP_);
-+	rwlock_release_read(&lock->dep_map, _RET_IP_);
- 	do_raw_read_unlock(lock);
- 	local_irq_enable();
- 	preempt_enable();
-@@ -252,7 +252,7 @@ static inline void __raw_read_unlock_irq(rwlock_t *lock)
- 
- static inline void __raw_read_unlock_bh(rwlock_t *lock)
- {
--	rwlock_release(&lock->dep_map, _RET_IP_);
-+	rwlock_release_read(&lock->dep_map, _RET_IP_);
- 	do_raw_read_unlock(lock);
- 	__local_bh_enable_ip(_RET_IP_, SOFTIRQ_LOCK_OFFSET);
- }
-diff --git a/include/linux/rwlock_types.h b/include/linux/rwlock_types.h
-index 1948442..74804b7 100644
---- a/include/linux/rwlock_types.h
-+++ b/include/linux/rwlock_types.h
-@@ -5,11 +5,18 @@
- # error "Do not include directly, include spinlock_types.h"
- #endif
- 
-+#ifdef CONFIG_DEPT
-+# define RW_DMAP_INIT(lockname) .dmap = { .name = #lockname, .skip_cnt = ATOMIC_INIT(0) },
-+#else
-+# define RW_DMAP_INIT(lockname)
-+#endif
-+
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- # define RW_DEP_MAP_INIT(lockname)					\
- 	.dep_map = {							\
- 		.name = #lockname,					\
- 		.wait_type_inner = LD_WAIT_CONFIG,			\
-+		RW_DMAP_INIT(lockname)					\
- 	}
+@@ -488,7 +488,9 @@ enum xhlock_context_t {
+  */
+ #define STATIC_DEPT_MAP_INIT(_name, _key) .dmap = {		\
+ 	.name = (_name),					\
+-	.keys = NULL },
++	.keys = NULL,						\
++	.skip_cnt = ATOMIC_INIT(0),				\
++	},
  #else
- # define RW_DEP_MAP_INIT(lockname)
+ #define STATIC_DEPT_MAP_INIT(_name, _key)
+ #endif
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 8e0effd..69d91ca 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -1943,6 +1943,7 @@ void dept_map_init(struct dept_map *m, struct dept_key *k, int sub,
+ 	m->name = n;
+ 	m->wgen = 0U;
+ 	m->nocheck = false;
++	atomic_set(&m->skip_cnt, 0);
+ exit:
+ 	dept_exit(flags);
+ }
+@@ -1961,6 +1962,7 @@ void dept_map_reinit(struct dept_map *m)
+ 	clean_classes_cache(&m->keys_local);
+ 	m->wgen = 0U;
+ 	m->nocheck = false;
++	atomic_set(&m->skip_cnt, 0);
+ 
+ 	dept_exit(flags);
+ }
+@@ -2344,6 +2346,53 @@ void dept_ecxt_exit(struct dept_map *m, unsigned long ip)
+ }
+ EXPORT_SYMBOL_GPL(dept_ecxt_exit);
+ 
++void dept_skip(struct dept_map *m)
++{
++	struct dept_task *dt = dept_task();
++	unsigned long flags;
++
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return;
++
++	if (m->nocheck)
++		return;
++
++	flags = dept_enter();
++
++	atomic_inc(&m->skip_cnt);
++
++	dept_exit(flags);
++}
++EXPORT_SYMBOL_GPL(dept_skip);
++
++/*
++ * Return true if successfully unskip, otherwise false.
++ */
++bool dept_unskip_if_skipped(struct dept_map *m)
++{
++	struct dept_task *dt = dept_task();
++	unsigned long flags;
++	bool ret = false;
++
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return false;
++
++	if (m->nocheck)
++		return false;
++
++	flags = dept_enter();
++
++	if (!atomic_read(&m->skip_cnt))
++		goto exit;
++
++	atomic_dec(&m->skip_cnt);
++	ret = true;
++exit:
++	dept_exit(flags);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(dept_unskip_if_skipped);
++
+ void dept_task_exit(struct task_struct *t)
+ {
+ 	struct dept_task *dt = &t->dept_task;
 -- 
 1.9.1
 
