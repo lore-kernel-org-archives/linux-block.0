@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B049C35276
-	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 10:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EDAC3527D
+	for <linux-block@archiver.kernel.org>; Sat, 19 Feb 2022 10:59:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242225AbiBSK7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Feb 2022 05:59:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41568 "EHLO
+        id S242162AbiBSK72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Feb 2022 05:59:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242152AbiBSK7M (ORCPT
+        with ESMTP id S242147AbiBSK7M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 19 Feb 2022 05:59:12 -0500
 Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 447CA674F8
-        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 02:58:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0FEB2674EA
+        for <linux-block@vger.kernel.org>; Sat, 19 Feb 2022 02:58:44 -0800 (PST)
 Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.53 with ESMTP; 19 Feb 2022 19:58:45 +0900
+        by 156.147.23.53 with ESMTP; 19 Feb 2022 19:58:43 +0900
 X-Original-SENDERIP: 156.147.1.151
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 19 Feb 2022 19:58:45 +0900
+        by 156.147.1.151 with ESMTP; 19 Feb 2022 19:58:43 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -47,9 +47,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v2 18/18] dept: Distinguish each work from another
-Date:   Sat, 19 Feb 2022 19:58:31 +0900
-Message-Id: <1645268311-24222-19-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v2 12/18] dept: Introduce split map concept and new APIs for them
+Date:   Sat, 19 Feb 2022 19:58:25 +0900
+Message-Id: <1645268311-24222-13-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1645268311-24222-1-git-send-email-byungchul.park@lge.com>
 References: <1645268311-24222-1-git-send-email-byungchul.park@lge.com>
@@ -57,81 +57,263 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Workqueue already provides concurrency control. By that, any wait in a
-work doesn't prevents events in other works with the control enabled.
-Thus, each work would better be considered a different context.
+There is a case where all maps used for a type of wait/event is so large
+in size. For instance, struct page can be a type for (un)lock_page().
+The additional memory size for the maps would be 'the # of pages *
+sizeof(struct dept_map)' if each struct page keeps its map all the way,
+which might be too big to accept in some system.
 
-So let Dept assign a different context id to each work.
+It'd better to have split map, one is for each instance and the other
+is for the type which is commonly used, and new APIs using them. So
+introduced split map and new APIs for them.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/dept.h     |  2 ++
- kernel/dependency/dept.c | 10 ++++++++++
- kernel/workqueue.c       |  3 +++
- 3 files changed, 15 insertions(+)
+ include/linux/dept.h     |  80 ++++++++++++++++++++++---------
+ kernel/dependency/dept.c | 122 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 180 insertions(+), 22 deletions(-)
 
 diff --git a/include/linux/dept.h b/include/linux/dept.h
-index 1a1c307..55c5ed5 100644
+index c0bbb8e..e2d4aea 100644
 --- a/include/linux/dept.h
 +++ b/include/linux/dept.h
-@@ -486,6 +486,7 @@ struct dept_task {
- extern void dept_event_split_map(struct dept_map_each *me, struct dept_map_common *mc, unsigned long ip, const char *e_fn);
- extern void dept_ask_event_split_map(struct dept_map_each *me, struct dept_map_common *mc);
- extern void dept_kernel_enter(void);
-+extern void dept_work_enter(void);
+@@ -362,6 +362,30 @@ struct dept_map {
+ 	bool				nocheck;
+ };
+ 
++struct dept_map_each {
++	/*
++	 * wait timestamp associated to this map
++	 */
++	unsigned int wgen;
++};
++
++struct dept_map_common {
++	const char *name;
++	struct dept_key *keys;
++	int sub_usr;
++
++	/*
++	 * It's local copy for fast acces to the associated classes. And
++	 * Also used for dept_key instance for statically defined map.
++	 */
++	struct dept_key keys_local;
++
++	/*
++	 * whether this map should be going to be checked or not
++	 */
++	bool nocheck;
++};
++
+ struct dept_task {
+ 	/*
+ 	 * all event contexts that have entered and before exiting
+@@ -451,6 +475,11 @@ struct dept_task {
+ extern void dept_ecxt_exit(struct dept_map *m, unsigned long ip);
+ extern void dept_skip(struct dept_map *m);
+ extern bool dept_unskip_if_skipped(struct dept_map *m);
++extern void dept_split_map_each_init(struct dept_map_each *me);
++extern void dept_split_map_common_init(struct dept_map_common *mc, struct dept_key *k, const char *n);
++extern void dept_wait_split_map(struct dept_map_each *me, struct dept_map_common *mc, unsigned long ip, const char *w_fn, int ne);
++extern void dept_event_split_map(struct dept_map_each *me, struct dept_map_common *mc, unsigned long ip, const char *e_fn);
++extern void dept_ask_event_split_map(struct dept_map_each *me, struct dept_map_common *mc);
  
  /*
   * for users who want to manage external keys
-@@ -527,6 +528,7 @@ struct dept_task {
- #define dept_event_split_map(me, mc, ip, e_fn)		do { } while (0)
- #define dept_ask_event_split_map(me, mc)		do { } while (0)
- #define dept_kernel_enter()				do { } while (0)
-+#define dept_work_enter()				do { } while (0)
- #define dept_key_init(k)				do { (void)(k); } while (0)
- #define dept_key_destroy(k)				do { (void)(k); } while (0)
+@@ -460,31 +489,38 @@ struct dept_task {
+ #else /* !CONFIG_DEPT */
+ struct dept_key  { };
+ struct dept_map  { };
++struct dept_map_each    { };
++struct dept_map_commmon { };
+ struct dept_task { };
+ 
+ #define DEPT_TASK_INITIALIZER(t)
+ 
+-#define dept_on()				do { } while (0)
+-#define dept_off()				do { } while (0)
+-#define dept_init()				do { } while (0)
+-#define dept_task_init(t)			do { } while (0)
+-#define dept_task_exit(t)			do { } while (0)
+-#define dept_free_range(s, sz)			do { } while (0)
+-#define dept_map_init(m, k, s, n)		do { (void)(n); (void)(k); } while (0)
+-#define dept_map_reinit(m)			do { } while (0)
+-#define dept_map_nocheck(m)			do { } while (0)
+-
+-#define dept_wait(m, w_f, ip, w_fn, ne)		do { (void)(w_fn); } while (0)
+-#define dept_stage_wait(m, w_f, w_fn, ne)	do { (void)(w_fn); } while (0)
+-#define dept_ask_event_wait_commit(ip)		do { } while (0)
+-#define dept_clean_stage()			do { } while (0)
+-#define dept_ecxt_enter(m, e_f, ip, c_fn, e_fn, ne) do { (void)(c_fn); (void)(e_fn); } while (0)
+-#define dept_ask_event(m)			do { } while (0)
+-#define dept_event(m, e_f, ip, e_fn)		do { (void)(e_fn); } while (0)
+-#define dept_ecxt_exit(m, ip)			do { } while (0)
+-#define dept_skip(m)				do { } while (0)
+-#define dept_unskip_if_skipped(m)		(false)
+-#define dept_key_init(k)			do { (void)(k); } while (0)
+-#define dept_key_destroy(k)			do { (void)(k); } while (0)
++#define dept_on()					do { } while (0)
++#define dept_off()					do { } while (0)
++#define dept_init()					do { } while (0)
++#define dept_task_init(t)				do { } while (0)
++#define dept_task_exit(t)				do { } while (0)
++#define dept_free_range(s, sz)				do { } while (0)
++#define dept_map_init(m, k, s, n)			do { (void)(n); (void)(k); } while (0)
++#define dept_map_reinit(m)				do { } while (0)
++#define dept_map_nocheck(m)				do { } while (0)
++
++#define dept_wait(m, w_f, ip, w_fn, ne)			do { (void)(w_fn); } while (0)
++#define dept_stage_wait(m, w_f, w_fn, ne)		do { (void)(w_fn); } while (0)
++#define dept_ask_event_wait_commit(ip)			do { } while (0)
++#define dept_clean_stage()				do { } while (0)
++#define dept_ecxt_enter(m, e_f, ip, c_fn, e_fn, ne)	do { (void)(c_fn); (void)(e_fn); } while (0)
++#define dept_ask_event(m)				do { } while (0)
++#define dept_event(m, e_f, ip, e_fn)			do { (void)(e_fn); } while (0)
++#define dept_ecxt_exit(m, ip)				do { } while (0)
++#define dept_skip(m)					do { } while (0)
++#define dept_unskip_if_skipped(m)			(false)
++#define dept_split_map_each_init(me)			do { } while (0)
++#define dept_split_map_common_init(mc, k, n)		do { (void)(n); (void)(k); } while (0)
++#define dept_wait_split_map(me, mc, ip, w_fn, ne)	do { } while (0)
++#define dept_event_split_map(me, mc, ip, e_fn)		do { } while (0)
++#define dept_ask_event_split_map(me, mc)		do { } while (0)
++#define dept_key_init(k)				do { (void)(k); } while (0)
++#define dept_key_destroy(k)				do { (void)(k); } while (0)
  #endif
+ #endif /* __LINUX_DEPT_H */
 diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index c369a8e..ee3faa2 100644
+index 0fc200c..84409759 100644
 --- a/kernel/dependency/dept.c
 +++ b/kernel/dependency/dept.c
-@@ -1873,6 +1873,16 @@ void dept_disable_hardirq(unsigned long ip)
- 	dept_exit(flags);
+@@ -2323,6 +2323,128 @@ void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip,
  }
+ EXPORT_SYMBOL_GPL(dept_event);
  
-+/*
-+ * Assign a different context id to each work.
-+ */
-+void dept_work_enter(void)
++void dept_split_map_each_init(struct dept_map_each *me)
 +{
 +	struct dept_task *dt = dept_task();
++	unsigned long flags;
 +
-+	dt->cxt_id[DEPT_CXT_PROCESS] += (1UL << DEPT_CXTS_NR);
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return;
++
++	flags = dept_enter();
++
++	me->wgen = 0U;
++
++	dept_exit(flags);
 +}
++EXPORT_SYMBOL_GPL(dept_split_map_each_init);
 +
- void dept_kernel_enter(void)
++void dept_split_map_common_init(struct dept_map_common *mc,
++				struct dept_key *k, const char *n)
++{
++	struct dept_task *dt = dept_task();
++	unsigned long flags;
++
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return;
++
++	flags = dept_enter();
++
++	if (mc->keys != k)
++		mc->keys = k;
++	clean_classes_cache(&mc->keys_local);
++
++	/*
++	 * sub_usr is not used with split map.
++	 */
++	mc->sub_usr = 0;
++	mc->name = n;
++	mc->nocheck = false;
++
++	dept_exit(flags);
++}
++EXPORT_SYMBOL_GPL(dept_split_map_common_init);
++
++void dept_wait_split_map(struct dept_map_each *me,
++			 struct dept_map_common *mc,
++			 unsigned long ip, const char *w_fn, int ne)
++{
++	struct dept_task *dt = dept_task();
++	struct dept_class *c;
++	struct dept_key *k;
++	unsigned long flags;
++
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return;
++
++	if (mc->nocheck)
++		return;
++
++	flags = dept_enter();
++
++	k = mc->keys ?: &mc->keys_local;
++	c = check_new_class(&mc->keys_local, k, 0, mc->name);
++	if (c)
++		add_wait(c, ip, w_fn, ne);
++
++	dept_exit(flags);
++}
++EXPORT_SYMBOL_GPL(dept_wait_split_map);
++
++void dept_ask_event_split_map(struct dept_map_each *me,
++			      struct dept_map_common *mc)
++{
++	struct dept_task *dt = dept_task();
++	unsigned long flags;
++	unsigned int wg;
++
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return;
++
++	if (mc->nocheck)
++		return;
++
++	flags = dept_enter();
++
++	/*
++	 * Avoid zero wgen.
++	 */
++	wg = atomic_inc_return(&wgen) ?: atomic_inc_return(&wgen);
++	WRITE_ONCE(me->wgen, wg);
++
++	dept_exit(flags);
++}
++EXPORT_SYMBOL_GPL(dept_ask_event_split_map);
++
++void dept_event_split_map(struct dept_map_each *me,
++			  struct dept_map_common *mc,
++			  unsigned long ip, const char *e_fn)
++{
++	struct dept_task *dt = dept_task();
++	struct dept_class *c;
++	struct dept_key *k;
++	unsigned long flags;
++
++	if (READ_ONCE(dept_stop) || dt->recursive)
++		return;
++
++	if (mc->nocheck)
++		return;
++
++	flags = dept_enter();
++
++	k = mc->keys ?: &mc->keys_local;
++	c = check_new_class(&mc->keys_local, k, 0, mc->name);
++	if (c) {
++		add_ecxt((void *)me, c, 0UL, NULL, e_fn, 0);
++		do_event((void *)me, c, READ_ONCE(me->wgen), ip);
++		pop_ecxt((void *)me);
++	}
++
++	dept_exit(flags);
++}
++EXPORT_SYMBOL_GPL(dept_event_split_map);
++
+ void dept_ecxt_exit(struct dept_map *m, unsigned long ip)
  {
  	struct dept_task *dt = dept_task();
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 33f1106..f5d762c 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -51,6 +51,7 @@
- #include <linux/sched/isolation.h>
- #include <linux/nmi.h>
- #include <linux/kvm_para.h>
-+#include <linux/dept.h>
- 
- #include "workqueue_internal.h"
- 
-@@ -2217,6 +2218,8 @@ static void process_one_work(struct worker *worker, struct work_struct *work)
- 
- 	lockdep_copy_map(&lockdep_map, &work->lockdep_map);
- #endif
-+	dept_work_enter();
-+
- 	/* ensure we're on the correct CPU */
- 	WARN_ON_ONCE(!(pool->flags & POOL_DISASSOCIATED) &&
- 		     raw_smp_processor_id() != pool->cpu);
 -- 
 1.9.1
 
