@@ -2,162 +2,269 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67805C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 21 Feb 2022 00:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0B8C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Feb 2022 00:19:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245360AbiBUAGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Feb 2022 19:06:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52276 "EHLO
+        id S241712AbiBUAT0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Feb 2022 19:19:26 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245357AbiBUAG3 (ORCPT
+        with ESMTP id S237932AbiBUATZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Feb 2022 19:06:29 -0500
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F272517DB
-        for <linux-block@vger.kernel.org>; Sun, 20 Feb 2022 16:06:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1645401963; x=1676937963;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qq4qpDosp6DxyH08XdA7K6jKs4urmOKuJ45lIhnK/EA=;
-  b=J/AT66FJbo837HuyosmsqadgoWtfyYOE3tDl5KDxobg6pSjYTKr3ubBH
-   Wr1lGdyrR3q/TwQYuqeRjkoKd4qX4411TesIcozeb8ltF5/URZabUsYRf
-   dD0tn9Cn19vdIll0suA8oXQwV0TL5tLDMvg02MdmOKGCtrRPQv3IjozD9
-   IX0WonTzflj9e1997xPlLqgS6WaizO1yHRRr/YAgc0f2MHSK6ILrnMqTI
-   BgbMiTzq+tFvS6oMHR6H7/U4mU5rOc95lrROO6gNkUiXg8gpfrtGJeiIk
-   QMVqdEq5GpN5Ypah5go10RLm8gKLhcDmneLeGeBCl81fzwXofQxi+fNtB
-   g==;
-X-IronPort-AV: E=Sophos;i="5.88,384,1635177600"; 
-   d="scan'208";a="194453434"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Feb 2022 08:06:02 +0800
-IronPort-SDR: kbO0BXkojCaDax4AcGRpK/6jSU14exhSKLT6l1WIDV49/XGdehn4Ly69PyCXOwSPzCZd8YZPXf
- u+yRG0xaI5L/Ji4CgebKBUHSxGO3xum950rlqIv1rRZ/M4Du6XzDpWP1E76cHgIVIUoMG1QyOE
- IFBABejIcRxWMmwuOCfkqwvtLjroi/P/fb7KdbZMx638dfLVxqi6DqwqMUQybKW9OqrSSatnAC
- dxvOsYawaDTQDpBdIin3sgjwpkm3vAULqMmhYynfiIsqxyNXu2Sb29dtoc4h+/xObMpzqHWH/7
- hirSjWbD8orepWHigt3NQ2bK
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2022 15:37:36 -0800
-IronPort-SDR: dwcKuGbQ98C+A8WErSQbAWw1O5fkxlj/QKYrJAiW+OYAd27XyPCYCBS/2SvQS0XUlSu6XUoTfx
- TOxLFGtX4YNFAAGXyEiXwR4r+6vuT6UxlLduwQuSSKTmWTbSLRyhNgtlCfyS39nLtbZOPGRxqL
- RY6eaIoWLX5f6q+CtXGTD9dzuroeF9ujOiQQOmCw5CPEJACAZvrvWVc4bIKxki07lciHpAlZg0
- QFuvsby9Qep5uQQGmr4j/g+utZKBqBOtnO4JhQyYvMMyirW9yacTZcQGxvc0XDD2pbpjqTxjqQ
- PIc=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2022 16:06:01 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4K22dP3Q0sz1Rwrw
-        for <linux-block@vger.kernel.org>; Sun, 20 Feb 2022 16:06:01 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1645401960; x=1647993961; bh=qq4qpDosp6DxyH08XdA7K6jKs4urmOKuJ45
-        lIhnK/EA=; b=r6trkfg+h84wdZZMN3Yj54xs/5Xjvh94bt9D0qh3sewQfWEgfB4
-        m7E6z9GEa0tZndIdUDlKRCpGsWsI4bKryYxCRiojc9xnvcpKcS/NKzdsccbZOzIH
-        tVz+h4jEW4gH9ClXw79YCPAItdpKQ7jK+ObK++64nrEo0gooLVqc4Ll7l6zv+JXg
-        15xjxK9kOx/zmDX1+zcLYQBbgpiS3JJV1RyJ/uil+emANKZFUXr6eKGXgq9go6OS
-        53dqzMnuYmH/CG+iYY9pMsF64r0aJSiIB7Yqn9Re/m99RE2p0psrk+izVfKgjBsX
-        mkOXIUqI68AASKJiZC5an41Ca2//eYAN5ww==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id BIIq67PZNmwc for <linux-block@vger.kernel.org>;
-        Sun, 20 Feb 2022 16:06:00 -0800 (PST)
-Received: from [10.89.87.236] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.87.236])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4K22dM57Tpz1Rvlx;
-        Sun, 20 Feb 2022 16:05:59 -0800 (PST)
-Message-ID: <ecdcc86e-433e-8592-bb7a-51aa1f83ae25@opensource.wdc.com>
-Date:   Mon, 21 Feb 2022 09:05:58 +0900
+        Sun, 20 Feb 2022 19:19:25 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66ED223BF3;
+        Sun, 20 Feb 2022 16:19:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645402743; x=1676938743;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eqwvLvvhwbM/z4ytWovK0S2D+/RtjbpDYDmRlzEiuX8=;
+  b=c5ItyiWpbpztYIHunPb+NV3IdPOnXRi/ipwE7fRXxaYb9I5n47XTrW+5
+   xDKKImzrinLY9DqMgf6MZZKGAJ+XjUsiupoq9szZZP3krweF6LfrCqOux
+   XFCQn9Tch7N9X7LeAdqn3ovYtyyogG5GCB+t3Qzu4zFvMN1tciXzsbWf1
+   6rE9YI0gQRFWQMADPNcA9KGKIy4GxoO7FT/bPyxYkZ9WZAxpjW0i2rr9V
+   RfmiIXoriNiKJK/enGHqhaU9Pu4j8xMZm6UEdKeG/AUcpEmUlqsy3t5FH
+   4vt4D3a/df9S0SdNHF87lt69tgobvFRDqRtsi9hBIpFLMgebUjU2ZxbD3
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10264"; a="251594439"
+X-IronPort-AV: E=Sophos;i="5.88,384,1635231600"; 
+   d="scan'208";a="251594439"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2022 16:19:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,384,1635231600"; 
+   d="scan'208";a="638370649"
+Received: from lkp-server01.sh.intel.com (HELO da3212ac2f54) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 20 Feb 2022 16:19:00 -0800
+Received: from kbuild by da3212ac2f54 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nLwPr-00014O-IC; Mon, 21 Feb 2022 00:18:59 +0000
+Date:   Mon, 21 Feb 2022 08:18:48 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Stefan Roesch <shr@fb.com>, io-uring@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-team@fb.com
+Cc:     kbuild-all@lists.01.org, shr@fb.com
+Subject: Re: [PATCH v2 06/13] fs: Add gfp_t parameter to create_page_buffers()
+Message-ID: <202202210828.SR411CM4-lkp@intel.com>
+References: <20220218195739.585044-7-shr@fb.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.0
-Subject: Re: [PATCH] pata_parport: second preview
-Content-Language: en-US
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
-        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220220224909.8032-1-linux@zary.sk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220220224909.8032-1-linux@zary.sk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220218195739.585044-7-shr@fb.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/02/21 7:49, Ondrej Zary wrote:
-> Hello,
-> here's a second version of pata_parport. Now a complete patch with protocol
-> drivers (cleaned up coding style).
-> 
-> The device model is complete now (pata_parport bus, protocol drivers and
-> manually created devices). Devices can also be deleted:
-> # echo pata_parport.0 > /sys/bus/pata_parport/delete_device 
-> 
-> Protocol registration could be improved - I don't like protocols[] and
-> protocol numbers, devices should probably be created by protocol name.
-> Also the LPT port base addresses should probably be replaced by port names
-> (like parport0).
-> 
-> The bpck driver seems to need to know if a CD drive is attached (weird) but
-> I doubt that I can get such info from libata.
-> 
-> I haven't tested other devices yet, only the Imation SuperDisk drive:
-> 
-> [ 4297.947270] paride: epat registered as protocol 0
-> [ 4302.019782] pata_parport pata_parport.0: 0x378 is parport0
-> [ 4302.030573] pata_parport pata_parport.0: epat: port 0x378, mode 0, ccr 0, test=(0,256,0)
-> [ 4302.030587] pata_parport pata_parport.0: Sharing parport0 at 0x378
-> [ 4302.030719] pata_parport pata_parport.0: epat, Shuttle EPAT chip c6 at 0x378, mode 0 (4-bit), delay 0
-> [ 4302.062891] scsi host4: pata_parport-epat
-> [ 4302.063036] ata6: PATA max PIO0 port parport0 protocol epat
-> [ 4302.277720] ata6.00: ATAPI: LS-120 COSM   04              UHD Floppy, 0270M09T, max PIO2
-> [ 4302.358986] scsi 4:0:0:0: Direct-Access     MATSHITA LS-120 COSM   04 0270 PQ: 0 ANSI: 5
-> [ 4302.394406] sd 4:0:0:0: Attached scsi generic sg1 type 0
-> [ 4302.429152] sd 4:0:0:0: [sdb] Media removed, stopped polling
-> [ 4302.461007] sd 4:0:0:0: [sdb] Attached SCSI removable disk
-> 
-> 
-> ---
->  drivers/ata/Kconfig                     |  25 +
->  drivers/ata/Makefile                    |   2 +
->  drivers/ata/pata_parport/Kconfig        | 189 ++++++
->  drivers/ata/pata_parport/Makefile       |  24 +
->  drivers/ata/pata_parport/aten.c         | 139 +++++
->  drivers/ata/pata_parport/bpck.c         | 481 +++++++++++++++
->  drivers/ata/pata_parport/bpck6.c        | 164 +++++
->  drivers/ata/pata_parport/comm.c         | 198 ++++++
->  drivers/ata/pata_parport/dstr.c         | 226 +++++++
->  drivers/ata/pata_parport/epat.c         | 320 ++++++++++
->  drivers/ata/pata_parport/epia.c         | 308 ++++++++++
->  drivers/ata/pata_parport/fit2.c         | 135 +++++
->  drivers/ata/pata_parport/fit3.c         | 195 ++++++
->  drivers/ata/pata_parport/friq.c         | 263 ++++++++
->  drivers/ata/pata_parport/frpw.c         | 292 +++++++++
->  drivers/ata/pata_parport/kbic.c         | 292 +++++++++
->  drivers/ata/pata_parport/ktti.c         | 112 ++++
->  drivers/ata/pata_parport/on20.c         | 136 +++++
->  drivers/ata/pata_parport/on26.c         | 302 +++++++++
->  drivers/ata/pata_parport/pata_parport.c | 773 ++++++++++++++++++++++++
->  drivers/ata/pata_parport/pata_parport.h | 114 ++++
+Hi Stefan,
 
-This is a very large patch... Could you split this into multiple patches ?
-1) The first patch adds the generic pata_parport & Kconfig
-2) Following patches add pata_parport drivers, one patch per driver.
+Thank you for the patch! Perhaps something to improve:
 
-That will make reviewing easier.
+[auto build test WARNING on 9195e5e0adbb8a9a5ee9ef0f9dedf6340d827405]
+
+url:    https://github.com/0day-ci/linux/commits/Stefan-Roesch/Support-sync-buffered-writes-for-io-uring/20220220-172629
+base:   9195e5e0adbb8a9a5ee9ef0f9dedf6340d827405
+config: sparc64-randconfig-s031-20220220 (https://download.01.org/0day-ci/archive/20220221/202202210828.SR411CM4-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 11.2.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-dirty
+        # https://github.com/0day-ci/linux/commit/e98a7c2a17960f81efc5968cbc386af7c088a8ed
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Stefan-Roesch/Support-sync-buffered-writes-for-io-uring/20220220-172629
+        git checkout e98a7c2a17960f81efc5968cbc386af7c088a8ed
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=sparc64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
 
+sparse warnings: (new ones prefixed by >>)
+>> fs/buffer.c:2010:60: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted gfp_t [usertype] flags @@     got unsigned int flags @@
+   fs/buffer.c:2010:60: sparse:     expected restricted gfp_t [usertype] flags
+   fs/buffer.c:2010:60: sparse:     got unsigned int flags
+>> fs/buffer.c:2147:87: sparse: sparse: incorrect type in argument 6 (different base types) @@     expected unsigned int flags @@     got restricted gfp_t [assigned] [usertype] gfp @@
+   fs/buffer.c:2147:87: sparse:     expected unsigned int flags
+   fs/buffer.c:2147:87: sparse:     got restricted gfp_t [assigned] [usertype] gfp
 
--- 
-Damien Le Moal
-Western Digital Research
+vim +2010 fs/buffer.c
+
+  1991	
+  1992	int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
+  1993				get_block_t *get_block, const struct iomap *iomap,
+  1994				unsigned int flags)
+  1995	{
+  1996		unsigned from = pos & (PAGE_SIZE - 1);
+  1997		unsigned to = from + len;
+  1998		struct inode *inode = folio->mapping->host;
+  1999		unsigned block_start, block_end;
+  2000		sector_t block;
+  2001		int err = 0;
+  2002		unsigned blocksize, bbits;
+  2003		struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
+  2004	
+  2005		BUG_ON(!folio_test_locked(folio));
+  2006		BUG_ON(from > PAGE_SIZE);
+  2007		BUG_ON(to > PAGE_SIZE);
+  2008		BUG_ON(from > to);
+  2009	
+> 2010		head = create_page_buffers(&folio->page, inode, 0, flags);
+  2011		blocksize = head->b_size;
+  2012		bbits = block_size_bits(blocksize);
+  2013	
+  2014		block = (sector_t)folio->index << (PAGE_SHIFT - bbits);
+  2015	
+  2016		for(bh = head, block_start = 0; bh != head || !block_start;
+  2017		    block++, block_start=block_end, bh = bh->b_this_page) {
+  2018			block_end = block_start + blocksize;
+  2019			if (block_end <= from || block_start >= to) {
+  2020				if (folio_test_uptodate(folio)) {
+  2021					if (!buffer_uptodate(bh))
+  2022						set_buffer_uptodate(bh);
+  2023				}
+  2024				continue;
+  2025			}
+  2026			if (buffer_new(bh))
+  2027				clear_buffer_new(bh);
+  2028			if (!buffer_mapped(bh)) {
+  2029				WARN_ON(bh->b_size != blocksize);
+  2030				if (get_block) {
+  2031					err = get_block(inode, block, bh, 1);
+  2032					if (err)
+  2033						break;
+  2034				} else {
+  2035					iomap_to_bh(inode, block, bh, iomap);
+  2036				}
+  2037	
+  2038				if (buffer_new(bh)) {
+  2039					clean_bdev_bh_alias(bh);
+  2040					if (folio_test_uptodate(folio)) {
+  2041						clear_buffer_new(bh);
+  2042						set_buffer_uptodate(bh);
+  2043						mark_buffer_dirty(bh);
+  2044						continue;
+  2045					}
+  2046					if (block_end > to || block_start < from)
+  2047						folio_zero_segments(folio,
+  2048							to, block_end,
+  2049							block_start, from);
+  2050					continue;
+  2051				}
+  2052			}
+  2053			if (folio_test_uptodate(folio)) {
+  2054				if (!buffer_uptodate(bh))
+  2055					set_buffer_uptodate(bh);
+  2056				continue; 
+  2057			}
+  2058			if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
+  2059			    !buffer_unwritten(bh) &&
+  2060			     (block_start < from || block_end > to)) {
+  2061				ll_rw_block(REQ_OP_READ, 0, 1, &bh);
+  2062				*wait_bh++=bh;
+  2063			}
+  2064		}
+  2065		/*
+  2066		 * If we issued read requests - let them complete.
+  2067		 */
+  2068		while(wait_bh > wait) {
+  2069			wait_on_buffer(*--wait_bh);
+  2070			if (!buffer_uptodate(*wait_bh))
+  2071				err = -EIO;
+  2072		}
+  2073		if (unlikely(err))
+  2074			page_zero_new_buffers(&folio->page, from, to);
+  2075		return err;
+  2076	}
+  2077	
+  2078	int __block_write_begin(struct page *page, loff_t pos, unsigned len,
+  2079			get_block_t *get_block)
+  2080	{
+  2081		return __block_write_begin_int(page_folio(page), pos, len, get_block,
+  2082					       NULL, 0);
+  2083	}
+  2084	EXPORT_SYMBOL(__block_write_begin);
+  2085	
+  2086	static int __block_commit_write(struct inode *inode, struct page *page,
+  2087			unsigned from, unsigned to)
+  2088	{
+  2089		unsigned block_start, block_end;
+  2090		int partial = 0;
+  2091		unsigned blocksize;
+  2092		struct buffer_head *bh, *head;
+  2093	
+  2094		bh = head = page_buffers(page);
+  2095		blocksize = bh->b_size;
+  2096	
+  2097		block_start = 0;
+  2098		do {
+  2099			block_end = block_start + blocksize;
+  2100			if (block_end <= from || block_start >= to) {
+  2101				if (!buffer_uptodate(bh))
+  2102					partial = 1;
+  2103			} else {
+  2104				set_buffer_uptodate(bh);
+  2105				mark_buffer_dirty(bh);
+  2106			}
+  2107			if (buffer_new(bh))
+  2108				clear_buffer_new(bh);
+  2109	
+  2110			block_start = block_end;
+  2111			bh = bh->b_this_page;
+  2112		} while (bh != head);
+  2113	
+  2114		/*
+  2115		 * If this is a partial write which happened to make all buffers
+  2116		 * uptodate then we can optimize away a bogus readpage() for
+  2117		 * the next read(). Here we 'discover' whether the page went
+  2118		 * uptodate as a result of this (potentially partial) write.
+  2119		 */
+  2120		if (!partial)
+  2121			SetPageUptodate(page);
+  2122		return 0;
+  2123	}
+  2124	
+  2125	/*
+  2126	 * block_write_begin takes care of the basic task of block allocation and
+  2127	 * bringing partial write blocks uptodate first.
+  2128	 *
+  2129	 * The filesystem needs to handle block truncation upon failure.
+  2130	 */
+  2131	int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+  2132			unsigned flags, struct page **pagep, get_block_t *get_block)
+  2133	{
+  2134		pgoff_t index = pos >> PAGE_SHIFT;
+  2135		struct page *page;
+  2136		int status;
+  2137		gfp_t gfp = 0;
+  2138		bool no_wait = (flags & AOP_FLAG_NOWAIT);
+  2139	
+  2140		if (no_wait)
+  2141			gfp = GFP_ATOMIC | __GFP_NOWARN;
+  2142	
+  2143		page = grab_cache_page_write_begin(mapping, index, flags);
+  2144		if (!page)
+  2145			return -ENOMEM;
+  2146	
+> 2147		status = __block_write_begin_int(page_folio(page), pos, len, get_block, NULL, gfp);
+  2148		if (unlikely(status)) {
+  2149			unlock_page(page);
+  2150			put_page(page);
+  2151			page = NULL;
+  2152		}
+  2153	
+  2154		*pagep = page;
+  2155		return status;
+  2156	}
+  2157	EXPORT_SYMBOL(block_write_begin);
+  2158	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
