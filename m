@@ -2,87 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C19B9C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 18:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAFEC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 19:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234757AbiBVSnw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 13:43:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34274 "EHLO
+        id S233007AbiBVTvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 14:51:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233516AbiBVSnw (ORCPT
+        with ESMTP id S233500AbiBVTvM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 13:43:52 -0500
-Received: from relay4.hostedemail.com (relay4.hostedemail.com [64.99.140.36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D45E9E576;
-        Tue, 22 Feb 2022 10:43:26 -0800 (PST)
-Received: from omf17.hostedemail.com (a10.router.float.18 [10.200.18.1])
-        by unirelay11.hostedemail.com (Postfix) with ESMTP id 7E08A802C9;
-        Tue, 22 Feb 2022 18:43:24 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf17.hostedemail.com (Postfix) with ESMTPA id 5571217;
-        Tue, 22 Feb 2022 18:42:32 +0000 (UTC)
-Message-ID: <603f9243bb9e1c4c50aaec83a527266b48ab9e20.camel@perches.com>
-Subject: Re: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
-From:   Joe Perches <joe@perches.com>
-To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+        Tue, 22 Feb 2022 14:51:12 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9C4BB097;
+        Tue, 22 Feb 2022 11:50:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5AE3D61638;
+        Tue, 22 Feb 2022 19:50:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B671C340F1;
+        Tue, 22 Feb 2022 19:50:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645559444;
+        bh=l639N21A2FrjSs/WG0rCtIuhybcq24CZv4Vtx+UKttk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Irx+SLoYYE4wGSeXxrVOr/7x0kf5CJU/O6kGp1PTQL0PoOg7Y8xTdt4gtt35pqirB
+         Fz/7MdwiISDDp7bKfySLsgjR8Qa9A1slwZId5NyeipA/9gw2FoOd3RUN5RBquwzmpW
+         TJdyT49+tR9n7os7o6Ksawv/yJzeePn+eb+zPG9rvtRz2JxF9+kpiSUeMHJeMK7vft
+         Az4u2xE12wvsP6fTqA2tNXevWSysmu1Bakcg8EC86sjmQEQy04gh+ECR+cm49X6eG4
+         y/xN1Z/ZQ5J+meMPKwY9oNMfgvLcirNzLkJ1a/FEK8Y3soyghpccFTKPMsaO61B7y9
+         UIo1jhARzPBEw==
+Date:   Tue, 22 Feb 2022 11:50:42 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Keith Busch <kbusch@kernel.org>
 Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, colyli@suse.de,
-        Bart Van Assche <bvanassche@acm.org>
-Date:   Tue, 22 Feb 2022 10:43:21 -0800
-In-Reply-To: <20220222165613.GB1497257@dhcp-10-100-145-180.wdc.com>
+        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        martin.petersen@oracle.com, colyli@suse.de
+Subject: Re: [PATCHv3 06/10] crypto: add rocksoft 64b crc framework
+Message-ID: <YhU+kuMhueXVQvxe@sol.localdomain>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
-         <20220222163144.1782447-5-kbusch@kernel.org>
-         <66a0c8210cf9e7dfcc3fa2d247de1eebd5a8acb7.camel@perches.com>
-         <20220222165045.GA14168@lst.de>
-         <20220222165613.GB1497257@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1ubuntu2 
+ <20220222163144.1782447-7-kbusch@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: nazzjjx87869o4w9oakhjiahqxjdbban
-X-Rspamd-Server: rspamout06
-X-Rspamd-Queue-Id: 5571217
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18aL9+BR2B9Ovzx+56lKMnaVrCxDabIdXo=
-X-HE-Tag: 1645555352-996125
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220222163144.1782447-7-kbusch@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2022-02-22 at 08:56 -0800, Keith Busch wrote:
-> On Tue, Feb 22, 2022 at 05:50:45PM +0100, Christoph Hellwig wrote:
-> > On Tue, Feb 22, 2022 at 08:45:53AM -0800, Joe Perches wrote:
-> > > On Tue, 2022-02-22 at 08:31 -0800, Keith Busch wrote:
-> > > > +/ *
-> > > > + * lower_48_bits - return bits 0-47 of a number
-> > > > + * @n: the number we're accessing
-> > > > + */
-> > > > +#define lower_48_bits(n) ((u64)((n) & 0xffffffffffffull))
-> > > 
-> > > why not make this a static inline function?
-> > 
-> > Agreed.
-> 
-> Sure, that sounds good to me. I only did it this way to match the
-> existing local convention, but I personally prefer the inline function
-> too. 
+On Tue, Feb 22, 2022 at 08:31:40AM -0800, Keith Busch wrote:
+> +config CRYPTO_CRC64_ROCKSOFT
+> +	tristate "Rocksoft Model CRC64 algorithm"
+> +	depends on CRC64
+> +	select CRYPTO_HASH
+> +	help
+> +	  Rocksoft Model CRC64 computation is being cast as a crypto
+> +	  transform. This allows for faster crc64 transforms to be used
+> +	  if they are available.
 
-The existing convention is used there to allow the compiler to
-avoid warnings and unnecessary conversions of a u32 to a u64 when
-shifting by 32 or more bits.
+The first sentence of this help text doesn't make sense.
 
-If it's possible to be used with an architecture dependent typedef
-like dma_addr_t, then perhaps it's reasonable to do something like:
+> diff --git a/crypto/crc64_rocksoft_generic.c b/crypto/crc64_rocksoft_generic.c
+> new file mode 100644
+> index 000000000000..55bad1939614
+> --- /dev/null
+> +++ b/crypto/crc64_rocksoft_generic.c
+> @@ -0,0 +1,104 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Cryptographic API.
 
-#define lower_48_bits(val)					\
-({								\
-	typeof(val) high = lower_16_bits(upper_32_bits(val));	\
-	typeof(val) low = lower_32_bits(val);			\
-								\
-	(high << 16 << 16) | low;				\
-})
+The "Cryptographic API" line doesn't provide any helpful information.
 
-and have the compiler have the return value be an appropriate type.
+> +static int chksum_final(struct shash_desc *desc, u8 *out)
+> +{
+> +	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+> +
+> +	*(u64 *)out = ctx->crc;
+> +	return 0;
+> +}
+> +
+> +static int __chksum_finup(u64 crc, const u8 *data, unsigned int len, u8 *out)
+> +{
+> +	*(u64 *)out = crc64_rocksoft_generic(crc, data, len);
+> +	return 0;
+> +}
 
+These 64-bit writes violate alignment rules and will give the wrong result on
+big endian CPUs.  They need to use put_unaligned_le64().
 
+> +static int __init crc64_rocksoft_x86_mod_init(void)
+> +{
+> +	return crypto_register_shash(&alg);
+> +}
+> +
+> +static void __exit crc64_rocksoft_x86_mod_fini(void)
+> +{
+> +	crypto_unregister_shash(&alg);
+> +}
+
+This has nothing to do with x86.
+
+> +config CRC64_ROCKSOFT
+> +	tristate "CRC calculation for the Rocksoft^TM model CRC64"
+
+I'm sure what the rules for trademarks are, but kernel source code usually
+doesn't have the trademark symbol/abbreviation scattered everywhere.
+
+> +	select CRYPTO
+> +	select CRYPTO_CRC64_ROCKSOFT
+> +	help
+> +	  This option is only needed if a module that's not in the
+> +	  kernel tree needs to calculate CRC checks for use with the
+> +	  rocksoft model parameters.
+
+Out-of-tree modules can't be the reason to have a kconfig option.  What is the
+real reason?
+
+> +u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
+> +{
+> +	return crc64_rocksoft_update(~0ULL, buffer, len);
+> +}
+> +EXPORT_SYMBOL(crc64_rocksoft);
+
+Isn't this missing the bitwise inversion at the end?
+
+> +MODULE_AUTHOR("Keith Busch <kbusch@kernel.org>");
+> +MODULE_DESCRIPTION("Rocksoft model CRC64 calculation (library API)");
+> +MODULE_LICENSE("GPL");
+> +MODULE_SOFTDEP("pre: crc64");
+
+Shouldn't the MODULE_SOFTDEP be on crc64-rocksoft?
+
+- Eric
