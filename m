@@ -2,102 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D14DC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5860FC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234058AbiBVQdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 11:33:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
+        id S234094AbiBVQdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 11:33:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234084AbiBVQcs (ORCPT
+        with ESMTP id S234085AbiBVQcs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 22 Feb 2022 11:32:48 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA586E8E7;
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FA6113AF4;
         Tue, 22 Feb 2022 08:32:22 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6AE3360AE3;
-        Tue, 22 Feb 2022 16:32:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B68C36AE2;
-        Tue, 22 Feb 2022 16:32:21 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id CB23ACE17B2;
+        Tue, 22 Feb 2022 16:32:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9012BC340F5;
+        Tue, 22 Feb 2022 16:32:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645547542;
-        bh=MB+r43dHRQMNdHaSJDC4o0kmCFx0xqnueQmd65wbpGg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XlZupw4ZY2oOYsUOkYHoTFbN8+l6bNfE7kmstGFv7bqhAUWzu4IUm4/f1aD2TL8OH
-         VXMLQq/+Mww0HTf9KVkjd91K0hvk3SR+O5zYSx2XlLZV4s01yoKcBMRxKIavFnT9Zt
-         rdsq8t7+CheArB5z99foKVy/uLcPOnFrslQN89TciB6tM0i/CIAhiMfgDc+uwnON3A
-         wrVSqtPDpwRqP3nH201SzpRKUalKqXIyxbBJh16VA8s0rXtXy51Q+QiOXN/wVvXzWo
-         Wffd8XVxl2qxl/FqLlu2oMtqJ1DMcC3QGGWehCKtiKYJqkPQank7vkSOebzd8axVbw
-         82jondGoqs4MA==
+        s=k20201202; t=1645547539;
+        bh=GJp5srIWu1c79tiofwNLlNLZx6fG9DBOwi7z0tds3LI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=XdA8/bxNpbpVX6QJl+I/qhRyqv6XOhDuEMTsHWEumj7DeyznddJGH/53kesCj5+K1
+         l5bFGUXHsk9D7Ls0v6wkM/b/469AUrJmpD0FSDRE81CyfTqi0meX209dvMYqTwOcs4
+         kjZ/AbLbmfWj9n5fycJOWsrBlFqcgyB7rCKVn+/vx85iqnmkgOgIp2D8j/QBLKKxep
+         7csetHDCTeThLrtJbfN725lc3epyEvIvq99XhPv3jZMD9eQanGBsQ421geAa1YHv+i
+         jCyRK9FT6zBfcitT1n09gHoSmbfIDOqAozALpu63mZ05b7lOnC4ru5R4fTiJUlbsPY
+         uWWoyp/8P36Hg==
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de, Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCHv3 03/10] asm-generic: introduce be48 unaligned accessors
-Date:   Tue, 22 Feb 2022 08:31:37 -0800
-Message-Id: <20220222163144.1782447-4-kbusch@kernel.org>
+        colyli@suse.de, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv3 00/10] 64-bit data integrity field support
+Date:   Tue, 22 Feb 2022 08:31:34 -0800
+Message-Id: <20220222163144.1782447-1-kbusch@kernel.org>
 X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20220222163144.1782447-1-kbusch@kernel.org>
-References: <20220222163144.1782447-1-kbusch@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The NVMe protocol extended the data integrity fields with unaligned
-48-bit reference tags. Provide some helper accessors in
-preparation for these.
+The NVM Express protocol added enhancements to the data integrity field
+formats beyond the T10 defined protection information. A detailed
+description of the new formats can be found in the NVMe's NVM Command
+Set Specification, section 5.2, available at:
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Acked-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- include/asm-generic/unaligned.h | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+  https://nvmexpress.org/wp-content/uploads/NVM-Command-Set-Specification-1.0b-2021.12.18-Ratified.pdf
 
-diff --git a/include/asm-generic/unaligned.h b/include/asm-generic/unaligned.h
-index 1c4242416c9f..8fc637379899 100644
---- a/include/asm-generic/unaligned.h
-+++ b/include/asm-generic/unaligned.h
-@@ -126,4 +126,30 @@ static inline void put_unaligned_le24(const u32 val, void *p)
- 	__put_unaligned_le24(val, p);
- }
- 
-+static inline void __put_unaligned_be48(const u64 val, __u8 *p)
-+{
-+	*p++ = val >> 40;
-+	*p++ = val >> 32;
-+	*p++ = val >> 24;
-+	*p++ = val >> 16;
-+	*p++ = val >> 8;
-+	*p++ = val;
-+}
-+
-+static inline void put_unaligned_be48(const u64 val, void *p)
-+{
-+	__put_unaligned_be48(val, p);
-+}
-+
-+static inline u64 __get_unaligned_be48(const u8 *p)
-+{
-+	return (u64)p[0] << 40 | (u64)p[1] << 32 | p[2] << 24 |
-+		p[3] << 16 | p[4] << 8 | p[5];
-+}
-+
-+static inline u64 get_unaligned_be48(const void *p)
-+{
-+	return __get_unaligned_be48(p);
-+}
-+
- #endif /* __ASM_GENERIC_UNALIGNED_H */
+This series implements one possible new format: the CRC64 guard with
+48-bit reference tags. This does not add support for the variable
+"storage tag" field, or any potential hardware acceleration.
+
+Changes since v2:
+
+  Introduced lower_48_bits() (Bart)
+
+  Added "64" suffix to crc names to distinguish from other crc
+  calculations (Martin)
+
+  Added module support to crypto library, and have the integrity
+  generate/verify use that instead of directly calling the generic table
+  lookup implementation. This is modeled after the t10 implementation.
+
+  Added an x86 pclmul accelerated crc64 calculation
+
+  Added speed tests to the test module so that the generic and library
+  function could be compared.
+
+  Bug fix in nvme to select the correct integrity profile.
+
+  Added reviews
+
+Note, I am not particularly well versed with x86 assembly, so I'm reasonably
+sure that the pcl implementation could be improved. It currently is
+about 20x faster than the generic implementation, but I believe it could
+be over 30x faster if done more efficiently.
+
+Keith Busch (10):
+  block: support pi with extended metadata
+  nvme: allow integrity on extended metadata formats
+  asm-generic: introduce be48 unaligned accessors
+  linux/kernel: introduce lower_48_bits macro
+  lib: add rocksoft model crc64
+  crypto: add rocksoft 64b crc guard tag framework
+  lib: add crc64 tests
+  block: add pi for nvme enhanced integrity
+  nvme: add support for enhanced metadata
+  x86/crypto: add pclmul acceleration for crc64
+
+ arch/x86/crypto/Makefile                  |   3 +
+ arch/x86/crypto/crc64-rocksoft-pcl-asm.S  | 215 ++++++++++++++++++++++
+ arch/x86/crypto/crc64-rocksoft-pcl_glue.c | 117 ++++++++++++
+ block/Kconfig                             |   1 +
+ block/bio-integrity.c                     |   1 +
+ block/t10-pi.c                            | 198 +++++++++++++++++++-
+ crypto/Kconfig                            |  20 ++
+ crypto/Makefile                           |   1 +
+ crypto/crc64_rocksoft_generic.c           | 104 +++++++++++
+ drivers/nvme/host/core.c                  | 175 ++++++++++++++----
+ drivers/nvme/host/nvme.h                  |   4 +-
+ include/asm-generic/unaligned.h           |  26 +++
+ include/linux/blk-integrity.h             |   1 +
+ include/linux/crc64.h                     |   7 +
+ include/linux/kernel.h                    |   6 +
+ include/linux/nvme.h                      |  53 +++++-
+ include/linux/t10-pi.h                    |  20 ++
+ lib/Kconfig                               |   9 +
+ lib/Kconfig.debug                         |   4 +
+ lib/Makefile                              |   2 +
+ lib/crc64-rocksoft.c                      | 129 +++++++++++++
+ lib/crc64.c                               |  26 +++
+ lib/gen_crc64table.c                      |  51 +++--
+ lib/test_crc64.c                          | 133 +++++++++++++
+ 24 files changed, 1252 insertions(+), 54 deletions(-)
+ create mode 100644 arch/x86/crypto/crc64-rocksoft-pcl-asm.S
+ create mode 100644 arch/x86/crypto/crc64-rocksoft-pcl_glue.c
+ create mode 100644 crypto/crc64_rocksoft_generic.c
+ create mode 100644 lib/crc64-rocksoft.c
+ create mode 100644 lib/test_crc64.c
+
 -- 
 2.25.4
 
