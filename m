@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A22AC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 15:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B173EC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 15:52:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233762AbiBVPwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 10:52:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44930 "EHLO
+        id S233617AbiBVPxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 10:53:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233766AbiBVPwe (ORCPT
+        with ESMTP id S233857AbiBVPwx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 10:52:34 -0500
+        Tue, 22 Feb 2022 10:52:53 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F8A54BF9;
-        Tue, 22 Feb 2022 07:52:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739DD66AFD;
+        Tue, 22 Feb 2022 07:52:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=aN/osrpoBd93lFAdSfaCdvaW2yQTD+I1EmrK67O47xo=; b=ymFEIIWRPVZXMO4JkLMfHN4H+o
-        7lzhP/9wb5ws8ulA8vXqpL6Gnf5WCXLcVGI7F2t9VyOMuRbtoPZlJVUhojPyi+S4FRfvDhJWxlhnd
-        VoASMEVXyotQDu2MRwUOaAP5BrK3099mEr7Jx/fY5YXGi0w9SHbxIv6Snf6d6iK3gNnUorFTXZot/
-        m/T+Fcpv85Pv+MVabQuyRdgiQ73dUKa2KA4SAOoGctusaJfKEqtvWoZtDXyoogI4YAAk1XTAR0yMg
-        lTynV8r5Vd22j5Svs1gzYSKHlSLIpZlXBew3dr8n26Py8vMubO6fI98CHaLTcF7Kd9TMcWgLC3mKk
-        XYuBufXQ==;
+        bh=mYLMoZDjZs4nM2uUMfs8K8R/bltMADz1cEKMxm4yh5Y=; b=1PC9OGoQwio4cczU8Znx9JB5Lw
+        AwZGoW2JW6FOgsQBp+725OShdlfzReuSImK8HEAbPk2SG1yravIE5BYsf4k4loJIDh0HM2WZ2ZDRe
+        s0x5Rpy7gN+6mCsRNMGwWg8kZS8TP+fugbTKzetPDCfgotIQmcpNlD581e+ID3SPmH58i7wmXSO6e
+        5hcDcvllwk7mwtt6Xcyt2lzF5aKF3+In45wNomLDcbEgxX7a0XDo69VO6gL+eoR8FAcWAs2uD5R/H
+        sRbg6VzQbd8GSVpI+iz+FpdxcJ7kZ9mJyLQyAKrKIKDDo3PVlnZLZ1npQAfBe1sPdEtTbtB9mcGk6
+        2IEUFwpw==;
 Received: from [2001:4bb8:198:f8fc:c22a:ebfc:be8d:63c2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nMXSL-00APog-La; Tue, 22 Feb 2022 15:52:02 +0000
+        id 1nMXSc-00APxY-Jx; Tue, 22 Feb 2022 15:52:19 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
@@ -42,9 +42,9 @@ Cc:     Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
         linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
         drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
         nvdimm@lists.linux.dev
-Subject: [PATCH 01/10] iss-simdisk: use bvec_kmap_local in simdisk_submit_bio
-Date:   Tue, 22 Feb 2022 16:51:47 +0100
-Message-Id: <20220222155156.597597-2-hch@lst.de>
+Subject: [PATCH 07/10] bcache: use bvec_kmap_local in bio_csum
+Date:   Tue, 22 Feb 2022 16:51:53 +0100
+Message-Id: <20220222155156.597597-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220222155156.597597-1-hch@lst.de>
 References: <20220222155156.597597-1-hch@lst.de>
@@ -60,29 +60,26 @@ the bvec interface cleans up the code a little bit.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/xtensa/platforms/iss/simdisk.c | 4 ++--
+ drivers/md/bcache/request.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/xtensa/platforms/iss/simdisk.c b/arch/xtensa/platforms/iss/simdisk.c
-index 8eb6ad1a3a1de..0f0e0724397f4 100644
---- a/arch/xtensa/platforms/iss/simdisk.c
-+++ b/arch/xtensa/platforms/iss/simdisk.c
-@@ -108,13 +108,13 @@ static void simdisk_submit_bio(struct bio *bio)
- 	sector_t sector = bio->bi_iter.bi_sector;
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 6869e010475a3..4e55ca8ca67ff 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -44,10 +44,10 @@ static void bio_csum(struct bio *bio, struct bkey *k)
+ 	uint64_t csum = 0;
  
- 	bio_for_each_segment(bvec, bio, iter) {
--		char *buffer = kmap_atomic(bvec.bv_page) + bvec.bv_offset;
-+		char *buffer = bvec_kmap_local(&bvec);
- 		unsigned len = bvec.bv_len >> SECTOR_SHIFT;
+ 	bio_for_each_segment(bv, bio, iter) {
+-		void *d = kmap(bv.bv_page) + bv.bv_offset;
++		void *d = bvec_kmap_local(&bv);
  
- 		simdisk_transfer(dev, sector, len, buffer,
- 				bio_data_dir(bio) == WRITE);
- 		sector += len;
--		kunmap_atomic(buffer);
-+		kunmap_local(buffer);
+ 		csum = crc64_be(csum, d, bv.bv_len);
+-		kunmap(bv.bv_page);
++		kunmap(d);
  	}
  
- 	bio_endio(bio);
+ 	k->ptr[KEY_PTRS(k)] = csum & (~0ULL >> 1);
 -- 
 2.30.2
 
