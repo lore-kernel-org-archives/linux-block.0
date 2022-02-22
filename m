@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EFB3C35272
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8433C4332F
 	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 15:52:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233777AbiBVPxT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S233831AbiBVPxT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 22 Feb 2022 10:53:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45362 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233850AbiBVPww (ORCPT
+        with ESMTP id S233828AbiBVPwv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 10:52:52 -0500
+        Tue, 22 Feb 2022 10:52:51 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2CF65480;
-        Tue, 22 Feb 2022 07:52:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187855C379;
+        Tue, 22 Feb 2022 07:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=f0NF498hDCrz75r99TeO+EjHW8Kl3t4Al355uemFwlc=; b=37zJuMF9dgCA4QvIj001HeKVod
-        iq1ff2Yd/eEwLZrB+5j9muZtNqaRLraBd4ZYvO0ckSDoPfCcxozaJa0fiTUcWRY/i1eqVgW6cu9ET
-        p5KbiI+r2NKlvgUmKKEQrUC02MmduqovdVGY6Af0A6ezQi+2gacmeew4b3nMAM/sThVlQOMETyIKW
-        O7TOyNV7rxTb8dYP4broU6NvJBSlQdgYmH/t77uliSjKa0dEUO+i/6pQrlAlEERXL7UXPOwMJ30MW
-        tttO0W8K7T1YoOyopfjb/IJME2ZK0lWij1jXRt4u3fkD1GOUYxnLCjPsDatBF17s4YijYRfpxZuhg
-        pUzpNPWg==;
+        bh=uybeJmrsOhYNyYw6JuTBsmhNCkwuMOHtglR2JjFNKIQ=; b=h/VY5ZyBUj2q/fYwi4v3BW0Bm3
+        ejGl3SxqCsQ/PlggoKd1s6AkYUm5njHRilhhFnkjozFUd4SHU28Mu21fHScvDxICH1plE6xVqew9Y
+        3l1j6G7pWAhFwacuDy9dTnr5k9moMtPtfPuIpxoHKKCbhMQCSE2h50m8ZRctcvv75AxI0ME4yljRu
+        F7Hj11mV8OkXiabX3KTHbujeGELLnp7bmLX4mfYV9YVIw6tvxqAPsbCn0gkDTZR4xL63sM/nr0AZc
+        +wKSytIZRrIvvR7W5J78ih9qcdIkECsFSDD0TzwCUbJmr3X+KybeGwd5L3siel7RF8BBlwhjrpuNd
+        iApc2ETw==;
 Received: from [2001:4bb8:198:f8fc:c22a:ebfc:be8d:63c2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nMXSZ-00APw8-Nq; Tue, 22 Feb 2022 15:52:16 +0000
+        id 1nMXSU-00APtE-4o; Tue, 22 Feb 2022 15:52:10 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
@@ -42,9 +42,9 @@ Cc:     Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
         linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
         drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
         nvdimm@lists.linux.dev
-Subject: [PATCH 06/10] nvdimm-btt: use bvec_kmap_local in btt_rw_integrity
-Date:   Tue, 22 Feb 2022 16:51:52 +0100
-Message-Id: <20220222155156.597597-7-hch@lst.de>
+Subject: [PATCH 04/10] zram: use memcpy_from_bvec in zram_bvec_write
+Date:   Tue, 22 Feb 2022 16:51:50 +0100
+Message-Id: <20220222155156.597597-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220222155156.597597-1-hch@lst.de>
 References: <20220222155156.597597-1-hch@lst.de>
@@ -55,40 +55,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Using local kmaps slightly reduces the chances to stray writes, and
-the bvec interface cleans up the code a little bit.
+Use memcpy_from_bvec instead of open coding the logic.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvdimm/btt.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/block/zram/zram_drv.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-index cbd994f7f1fe6..9613e54c7a675 100644
---- a/drivers/nvdimm/btt.c
-+++ b/drivers/nvdimm/btt.c
-@@ -1163,17 +1163,15 @@ static int btt_rw_integrity(struct btt *btt, struct bio_integrity_payload *bip,
- 		 */
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 14becdf2815df..e9474b02012de 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1465,7 +1465,6 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ {
+ 	int ret;
+ 	struct page *page = NULL;
+-	void *src;
+ 	struct bio_vec vec;
  
- 		cur_len = min(len, bv.bv_len);
--		mem = kmap_atomic(bv.bv_page);
-+		mem = bvec_kmap_local(&bv);
- 		if (rw)
--			ret = arena_write_bytes(arena, meta_nsoff,
--					mem + bv.bv_offset, cur_len,
-+			ret = arena_write_bytes(arena, meta_nsoff, mem, cur_len,
- 					NVDIMM_IO_ATOMIC);
- 		else
--			ret = arena_read_bytes(arena, meta_nsoff,
--					mem + bv.bv_offset, cur_len,
-+			ret = arena_read_bytes(arena, meta_nsoff, mem, cur_len,
- 					NVDIMM_IO_ATOMIC);
- 
--		kunmap_atomic(mem);
-+		kunmap_local(mem);
+ 	vec = *bvec;
+@@ -1483,11 +1482,9 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
  		if (ret)
- 			return ret;
+ 			goto out;
  
+-		src = kmap_atomic(bvec->bv_page);
+ 		dst = kmap_atomic(page);
+-		memcpy(dst + offset, src + bvec->bv_offset, bvec->bv_len);
++		memcpy_from_bvec(dst + offset, bvec);
+ 		kunmap_atomic(dst);
+-		kunmap_atomic(src);
+ 
+ 		vec.bv_page = page;
+ 		vec.bv_len = PAGE_SIZE;
 -- 
 2.30.2
 
