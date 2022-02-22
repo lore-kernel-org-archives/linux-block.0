@@ -2,104 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB01C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 01:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21002C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 01:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbiBVBa0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Feb 2022 20:30:26 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59340 "EHLO
+        id S238534AbiBVBnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Feb 2022 20:43:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbiBVBaY (ORCPT
+        with ESMTP id S238510AbiBVBnq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Feb 2022 20:30:24 -0500
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8865A25585;
-        Mon, 21 Feb 2022 17:30:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1645493400; x=1677029400;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eyXpTaIq25nB5bdHP4lR4iF+QtCbpy796Ah/ggXuoxw=;
-  b=XYqpVKQMEXxkGAotQ6G0sUH2lv6KVtpkA2V2IR4Z3I/Jvy9q7cip/voD
-   iIG4aTzu0IFG6iOFqfgyDB2hesI1n3UvxqExhVkF0MmmGKqqsj8BXR7mJ
-   wpXqbQteaqlc8/uKP4hnsUqOd8QD1FPpzXOXhHk9lMFx8YJVmClXHfP3R
-   /Jv5yU/MHj7jJ1Fu/e5KbJ1AJdYwsR7KV0Vdw4qJAPkBL4YUu9WKivNCj
-   kwh9adesBvJr5gyzk1+FdVN+9HvITdvl7byozjccaDTIp1PuwcRa2uuVM
-   7CaUO+5UQnOLE/RNnGAZe3FR3Iixd3S3WqIch0WFRoeFbUPdLk8Pv7FjR
-   w==;
-X-IronPort-AV: E=Sophos;i="5.88,386,1635177600"; 
-   d="scan'208";a="198419408"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Feb 2022 09:29:59 +0800
-IronPort-SDR: 9KiK8UW06quco6nxQtLGaNpIeJHha3/04PQRsqjyzNjlajbNe2EfrX5eflgzAeuRsvSPE+BdAk
- zJMt7atHvdAs6P36ji++NvAljbh9UXqrFagIABKF6deF+rzIzHs3OsSJKduPYKm0MJYrUPE05D
- 6M1skOODT5ko398pSBN9uGWB8JhuO3Vwvz8DB+UIV3RlEZaMRP1MN8w+1fqLkTfNZW4xsAzPa1
- XqSa43XqFTQmLVrA1h/xpErJGhvPBwD+kNDIWS5T7ZVyh3ue3TyTaEcduVVGOzrQINMOcoEZ1B
- yQuJq9NdtriNuhFbqVtFWGmc
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 17:01:33 -0800
-IronPort-SDR: hP/NO1r0AXmpYAmOdVmDuk4md91+2huKGSssd3ZywihjXh5pebiz89MX3TFxdCJ6JGak0lFA9e
- 4WuvzU993R6V725NLuc4ucCdksrijTLKmpDFOOk1hagtcH6hh0W77SHLAjNq9+QTjqKbeIIE/D
- e2i0vXjZC5zPQsOGaoNL1GpVIlKXPdhbAKl2+DBz+o3XTuJ398Bc/SPyQiMxpf14Jr8mVIPoQP
- 3nJY841nlgErkxQbAAX28Pqh0Of3LOPpwlyeJcdhoESnOSjoRET54p1tdUiq/SzaT3NtMcYcAq
- xWI=
-WDCIronportException: Internal
-Received: from hlpbl13.ad.shared (HELO naota-xeon.wdc.com) ([10.225.55.32])
-  by uls-op-cesaip02.wdc.com with ESMTP; 21 Feb 2022 17:29:59 -0800
-From:   Naohiro Aota <naohiro.aota@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Naohiro Aota <naohiro.aota@wdc.com>
-Subject: [PATCH] Documentation: block/diskstats: update function names
-Date:   Tue, 22 Feb 2022 10:27:51 +0900
-Message-Id: <20220222012751.1933194-1-naohiro.aota@wdc.com>
-X-Mailer: git-send-email 2.35.1
+        Mon, 21 Feb 2022 20:43:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50FD0255A1
+        for <linux-block@vger.kernel.org>; Mon, 21 Feb 2022 17:43:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645494201;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NzjAem9tlu54IyZrw9QsYOzEU0mhjZkov0DubyCaMYo=;
+        b=XhkWGceDBZ6g+XGmrUtMoqMrty9vZWKshQHh41rkbqjP3T3e0J8ClkHjawJcSVsy4hVMcY
+        s1jGT5dDZayKbjtDNSQIdNg5XU4Fy0Pt3TzbM0HlaJendzfmDO2ERybvNpyNWnM7KNEbZl
+        l+avdRdoW29oSo5yMqUpPRKs11sjx5g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-622-_8Yt6BTYOHqmhKsiuDG6VQ-1; Mon, 21 Feb 2022 20:43:18 -0500
+X-MC-Unique: _8Yt6BTYOHqmhKsiuDG6VQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCA498017FE;
+        Tue, 22 Feb 2022 01:43:16 +0000 (UTC)
+Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D7E735DF21;
+        Tue, 22 Feb 2022 01:43:09 +0000 (UTC)
+Date:   Tue, 22 Feb 2022 09:43:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: clear iocb->private in blkdev_bio_end_io_async()
+Message-ID: <YhQ/qM6S34TwVCSq@T590>
+References: <20220211090136.44471-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220211090136.44471-1-sgarzare@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__make_request() and end_that_request_last() do no longer exist. Replace
-them with the current call-site.
+On Fri, Feb 11, 2022 at 10:01:36AM +0100, Stefano Garzarella wrote:
+> iocb_bio_iopoll() expects iocb->private to be cleared before
+> releasing the bio.
+> 
+> We already do this in blkdev_bio_end_io(), but we forgot in the
 
-Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
----
- Documentation/admin-guide/iostats.rst | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+But also iomap_dio_bio_end_io().
 
-diff --git a/Documentation/admin-guide/iostats.rst b/Documentation/admin-guide/iostats.rst
-index 9b14b0c2c9c4..609a3201fd4e 100644
---- a/Documentation/admin-guide/iostats.rst
-+++ b/Documentation/admin-guide/iostats.rst
-@@ -76,7 +76,7 @@ Field  3 -- # of sectors read (unsigned long)
- 
- Field  4 -- # of milliseconds spent reading (unsigned int)
-     This is the total number of milliseconds spent by all reads (as
--    measured from __make_request() to end_that_request_last()).
-+    measured from blk_mq_alloc_request() to __blk_mq_end_request()).
- 
- Field  5 -- # of writes completed (unsigned long)
-     This is the total number of writes completed successfully.
-@@ -89,7 +89,7 @@ Field  7 -- # of sectors written (unsigned long)
- 
- Field  8 -- # of milliseconds spent writing (unsigned int)
-     This is the total number of milliseconds spent by all writes (as
--    measured from __make_request() to end_that_request_last()).
-+    measured from blk_mq_alloc_request() to __blk_mq_end_request()).
- 
- Field  9 -- # of I/Os currently in progress (unsigned int)
-     The only field that should go to zero. Incremented as requests are
-@@ -120,7 +120,7 @@ Field 14 -- # of sectors discarded (unsigned long)
- 
- Field 15 -- # of milliseconds spent discarding (unsigned int)
-     This is the total number of milliseconds spent by all discards (as
--    measured from __make_request() to end_that_request_last()).
-+    measured from blk_mq_alloc_request() to __blk_mq_end_request()).
- 
- Field 16 -- # of flush requests completed
-     This is the total number of flush requests completed successfully.
--- 
-2.35.1
+> recently added blkdev_bio_end_io_async().
+> 
+> Fixes: 54a88eb838d3 ("block: add single bio async direct IO helper")
+> Cc: asml.silence@gmail.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+> I haven't seen a failure, I was just reading the code to understand iopoll,
+> so IIUC we should clean iocb->private in blkdev_bio_end_io_async().
+> 
+> Thanks,
+> Stefano
+> ---
+>  block/fops.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/fops.c b/block/fops.c
+> index 4f59e0f5bf30..a18e7fbd97b8 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -289,6 +289,8 @@ static void blkdev_bio_end_io_async(struct bio *bio)
+>  	struct kiocb *iocb = dio->iocb;
+>  	ssize_t ret;
+>  
+> +	WRITE_ONCE(iocb->private, NULL);
+
+It might cause race in case of concurrent polling on same queue without
+clearing iocb->private, so looks fine:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
 
