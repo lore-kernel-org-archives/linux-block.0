@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FAD5C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E81C43217
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234116AbiBVQdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 11:33:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39970 "EHLO
+        id S234145AbiBVQdE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 11:33:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234095AbiBVQcu (ORCPT
+        with ESMTP id S234097AbiBVQcu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 22 Feb 2022 11:32:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37914BB091;
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E5A3113AD5;
         Tue, 22 Feb 2022 08:32:24 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C8CA860A2B;
-        Tue, 22 Feb 2022 16:32:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 709A5C340F6;
+        by sin.source.kernel.org (Postfix) with ESMTPS id B39DECE17A3;
         Tue, 22 Feb 2022 16:32:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72ABAC340FB;
+        Tue, 22 Feb 2022 16:32:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645547543;
-        bh=r/bd83ebHmk3oq087sNFUNNVtBRYLznJSmRLMlpTbUw=;
+        s=k20201202; t=1645547541;
+        bh=UcJmaYKYSUedgav8DTnlV/x/GzgaonSprD2wkPg3Hq4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GCSf5tRNML33gIhC3sIrrGWNIgk5kvVblmBu4I3xUoYSfiBZQ7ehJCYaFMnjgfYrh
-         OEya2ydwEKX3H3fD0dwoZ6w+H+uVTnLvXdVh13m4ZYJeOwoVOR8FpM5mREFIghRXun
-         Hbo1Vj+fgL7RwAtA8rRkuMSwCelOJIR8YWHIIT259xvZllYv4OVf9/3czpEuPPVy05
-         LfWvNjQZxOLoyJOF48fW/B6VWOY4CLWhcn4SoZpbDixEkczclmp/n15F/B5+EtU2/C
-         QIy+oT0tinibuGXLKZUog8+xSn83qCPVsd+HVtOq+tDiYftWhlgYVwby4IeweuNnAO
-         rEhXiElbv4AFg==
+        b=pW31tNlM7vrf4Vja9RGa/oOYqzpEBdOuNydh7Ok1ffO63/zOdH2U0436X7xpoxH/8
+         7s6I316cTMlOtl6fP7RXS+RVgFgxGG5E823yZS5kPKCn3awuLuwEbPgJZATptM5xXG
+         C0nlmBtQHPmAPwvKugvDIo7PJXkZs9TZj79n6IMUVDugAWJUmeT+WjvcP6V6njW8wD
+         AXeVPSmqv4Y8KdVJrjVsQ1jiYk1hDAi9OPnwhVH1TOrZKJnA1RaGGHU0DmHO3mVJls
+         vBARKxLPPxYkqEZ/tWPceK9rZ5KhnYxAB34eR5iEalccUIb/p7mWMMkyBxCKs8aqLy
+         kZ5NghPYeOjOg==
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
         colyli@suse.de, Keith Busch <kbusch@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
-Date:   Tue, 22 Feb 2022 08:31:38 -0800
-Message-Id: <20220222163144.1782447-5-kbusch@kernel.org>
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv3 02/10] nvme: allow integrity on extended metadata formats
+Date:   Tue, 22 Feb 2022 08:31:36 -0800
+Message-Id: <20220222163144.1782447-3-kbusch@kernel.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20220222163144.1782447-1-kbusch@kernel.org>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
@@ -51,32 +51,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Recent data integrity field enhancements allow 48-bit reference tags.
-Introduce a helper macro since this will be a repeated operation.
+The block integrity subsystem knows how to construct protection
+information buffers with metadata beyond the protection information
+fields. Remove the driver restriction.
 
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Note, this can only work if the PI field appears first in the metadata,
+as the integrity subsystem doesn't calculate guard tags on preceding
+metadata.
+
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/linux/kernel.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/nvme/host/core.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-index 33f47a996513..c1fa9fc2b5cd 100644
---- a/include/linux/kernel.h
-+++ b/include/linux/kernel.h
-@@ -63,6 +63,12 @@
- }					\
- )
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3b876dcab730..8132b1282082 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1760,12 +1760,9 @@ static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
+ {
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
  
-+/**
-+ * lower_48_bits - return bits 0-47 of a number
-+ * @n: the number we're accessing
-+ */
-+#define lower_48_bits(n) ((u64)((n) & 0xffffffffffffull))
-+
- /**
-  * upper_32_bits - return bits 32-63 of a number
-  * @n: the number we're accessing
+-	/*
+-	 * The PI implementation requires the metadata size to be equal to the
+-	 * t10 pi tuple size.
+-	 */
+ 	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
+-	if (ns->ms == sizeof(struct t10_pi_tuple))
++	if (id->dps & NVME_NS_DPS_PI_FIRST ||
++	    ns->ms == sizeof(struct t10_pi_tuple))
+ 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
+ 	else
+ 		ns->pi_type = 0;
 -- 
 2.25.4
 
