@@ -2,530 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BC3C46467
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42DD9C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:48:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234171AbiBVQdL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 11:33:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40538 "EHLO
+        id S229958AbiBVQsj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 11:48:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234137AbiBVQc6 (ORCPT
+        with ESMTP id S234152AbiBVQsd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 11:32:58 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EBB5BB091;
-        Tue, 22 Feb 2022 08:32:31 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 8002FCE17A9;
-        Tue, 22 Feb 2022 16:32:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F19C340F3;
-        Tue, 22 Feb 2022 16:32:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645547548;
-        bh=gOLNNSW5Geh3wfVR6/JfYsAKw6uI81oMxU3qD4ONSO0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e7jmaeyldiXqtvDN0SHe+Ksme9c2hBoEjnr1DskEQOJsgVm1SU/h0W9mgYhg3PkyJ
-         B68+r63Q2+5GWP3L4iZh8uXG58LktLBdRrLbYEEJ4vYa1EY3/4v5pX/IIFHZSjMO9w
-         uS/Q08XWFZOA+dTfG0qWXnuZWlG/w1OZmBndFL9MsPIJF2p6GrPOf6dGKNCYBn0U71
-         72CpMVadCsBpw3nT4yCTRKqob30p+Jpjn8YgdIF6FErJSPyh/AVTAN546hUZB0Oy2v
-         GyGlkksfvQ+N1AnW8OfTqphOmQeVZtKW/e7GMrQ9FUBHiThF3cqGbXMrxvhaWic/qY
-         yK6saR6GFmGIQ==
-From:   Keith Busch <kbusch@kernel.org>
-To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de, Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Klaus Jensen <its@irrelevant.dk>
-Subject: [PATCHv3 09/10] nvme: add support for enhanced metadata
-Date:   Tue, 22 Feb 2022 08:31:43 -0800
-Message-Id: <20220222163144.1782447-10-kbusch@kernel.org>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20220222163144.1782447-1-kbusch@kernel.org>
+        Tue, 22 Feb 2022 11:48:33 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA38160FE9;
+        Tue, 22 Feb 2022 08:48:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cFxES0IDLl2NNxyGoDQrwiU3so6cxXcEEq2Hrx3R0fS+XcRL6hl050X+wfvsLLe2oMeGhdI8DpL0+hSPl7qxSM/8YWYpp8pl2KAtxRCfIxzb6pVm8pJlLEgOEmCVoZe95OBiZI+JuoaXZ5699yXpuCf60hzkoXSfAfh2h84yu9HAGEFYSIFX5jzLmMGAj526ZHZPXqWSDl87cGwXE19Z09cORTEDcHfyTzoGwL38j9WFCnL2a0Pi/fA3FlUlhJiTFlx6+NE8mHucHzQcIv7fCK7kx4yerRIT7qgWIYXU91fz6eSDAiGQg7AtWEVRpfDKonyoPINX9qU7QO1ooeiAbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FVZG/eMxN+YB3U4Vv72atrAFc1Tax9fpKjBSpdxt84g=;
+ b=PN5SV7Ir92Vg0Us32uYvHBmUWzt+Mtsac/WOwWRe2XVaQaOY6cUI0nEROsrf74qvB9jrfUe6YO/41/LkoGZid3BFvodne19AxfZ664hnIu+JGINWaSil2UCGMsxKYlxGxB4XtPxU+7SFyCR9/bC7S9zWZmaPgc6/n133lhhjkmrB22h8B+0ruDxTyiLH6Qy9szAn5mRhXv82osW4iH7jP9bfLfMG01U697stQ96BvUdp07ZKRmXsQMplAYcVTyuaiI4OfM1hwCFO2n6kwyyIIekli2v1IakBWTWOhYvNOBZ3d4mF38MMEbGdQ+PLAAhzFBOFXragF/Erc33cyZrUjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FVZG/eMxN+YB3U4Vv72atrAFc1Tax9fpKjBSpdxt84g=;
+ b=r8FvhtJ4Ul9sxfz+Vpil9wJ4GNkVw5XqS5LmeJsHmLelr9LFlVTs2dXfQarcsc0kVwSOgmuBAf8QKI30qaRj4eU2JP5Y0EgGpaZ3c6ncxrSIoysZ2jVuISqAEuCuYHKEPU4LJP24awRhyDVjNpBXJEPPu9KHviGzjsPxSFbUK3VOGYwJo7hfKtQS7Ho441Z0uG5Hbn/c/mwYglVjg8GXnsWTC4cz8KmLtj1ECAvFAcNDGQ2ASkTtpIx6n7vkBOT6ZRWmB9rIvDw6gF2oZZnO3mV+ZxtlafZL53C07xFUuIcIcyiK8E3YbjMjhZcOxgPKzbEXQ9N1dleqtm9C5H654A==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by BN6PR12MB1204.namprd12.prod.outlook.com (2603:10b6:404:1b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.21; Tue, 22 Feb
+ 2022 16:48:05 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::204b:bbcb:d388:64a2]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::204b:bbcb:d388:64a2%4]) with mapi id 15.20.4995.027; Tue, 22 Feb 2022
+ 16:48:05 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Keith Busch <kbusch@kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "colyli@suse.de" <colyli@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
+Thread-Topic: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
+Thread-Index: AQHYKAnT3qhQXFzrb0qMggW0v7q9UKyfx9mA
+Date:   Tue, 22 Feb 2022 16:48:05 +0000
+Message-ID: <c3eb843b-1c33-4098-eba6-4680e820e924@nvidia.com>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
+ <20220222163144.1782447-5-kbusch@kernel.org>
+In-Reply-To: <20220222163144.1782447-5-kbusch@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ebc78c07-1bc0-4d01-150b-08d9f6231948
+x-ms-traffictypediagnostic: BN6PR12MB1204:EE_
+x-microsoft-antispam-prvs: <BN6PR12MB1204964EA57ACF9CD469D667A33B9@BN6PR12MB1204.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: sMYpmfZOWE4P1dHcoGBW9fQlian5+O2mtG6vGv0BdeFFNVxaRV65nC+nmpi826VCpIEQwI2CN/+jHoDWTC0PI82w1AufuL6YQhmsNv4iVDrWz791k2GQwzfpi+pveVhOoXg3QHzIWCCEnIabhKcEq/zdvcAlE32v/vmTTUWgFu5hgXfSo3bIL5QOzEcOoBVUEJrYlPQM+b1Pb4lutw+3Zqbq9Ek+3blUBCtl1v1lXfw/D/vBl7OWoI8TRsb/RIJnChaauMctMKhJn3wSMOh5y1RFsiMZ9rgLWcskvz1BtVSkbwCa3eCUn1QelUZ5rD+VG98chenLG8JfUItg+Zx+pgp1DC9xNEx0lOvmFekrwTB0XTIJ2CbnCZf4xeWGMFBsttCuixulIexoz/Kd0Z6xFYEwQUnappNIRulObS/8h7ZBiOc//06N90nlxkdy+xd2UxzK6+wzHAFGUxTOotylU+9bXVA1hEcoTQjYtY9HR2WgWx2pRWmP5VeR6rP4iaR5hkp8VitQ3hy0F5Y1OczK7mmh6XzSnwu81bAXajfHiMVGQTVhLlVz0tmP/iWj5OdwT2iSkYv7rHY+e92cS083lBJk+UCB2pRAF8iIMeIuTJ8/ZmWZkH6GDqrSEVhtmItdoXh0jXgqNS4RJoRigT6zflmgx4TtQbLaQ8eziEBqFQgWbRZICCy4D7D4E4wRi/JlRC7p3IfM4TgKKeurMc55gDAxHIMx1nHK9JvhpXtVutLhkjwVT2pzDwqIwdYm6R+C+cN93r/hIGS6TTRoQggy4g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(558084003)(38100700002)(36756003)(122000001)(508600001)(6486002)(5660300002)(86362001)(7416002)(8936002)(316002)(54906003)(8676002)(64756008)(66446008)(66476007)(66556008)(66946007)(4326008)(76116006)(2616005)(91956017)(186003)(6512007)(6506007)(2906002)(53546011)(31696002)(110136005)(71200400001)(38070700005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bEFsc0x5cnVOeDN3L21lc0c5SmdyYkpEcmtZVk5rWXQxekFYTmR3dkF4R2lQ?=
+ =?utf-8?B?ZUI2cnMyMFlkQnY2R3Y0dGEzVEJqTC9SdC9CUEh4b0RTYlNsNWZ0M01DbVcv?=
+ =?utf-8?B?clpVTktxOW9SY2I2cFAwRkcvYWdiYlpuSlJFSmVIcVBtZWFKdDJrSVJCMHdE?=
+ =?utf-8?B?cHI4c042SVNPQmFQVW11ZEZGdTBLNlhvVi8yNGQ0Nmdub0xsWFBFWFF2Y1k2?=
+ =?utf-8?B?V3duZmRtQk1UaXVJUyswQ0UrRy9FZTZrZHMzYUVaTFJVQ3JTVDIydGduUmJa?=
+ =?utf-8?B?K0xiSHlBNkJYOGtvbXVrTUhYNDVCanF6TnFQeHE5RmdPSmtNVHJ0K2dLM2Ex?=
+ =?utf-8?B?aDFVSWVmOFdWNkQ2azl3My9RdEtjajdOM0dSRGozdGFPZWRWYVk5VjA3Zm91?=
+ =?utf-8?B?Zm1uYkFzc3BYYUM2L1VXeEs1TzJCdDNsNlpNbDdRem40cThSRzdUUm9hZGN5?=
+ =?utf-8?B?eXgxMzlrcmVTalJuU3Z1TE5TNlVJdHBKaVNqL0hvZVZIcnRJTHBBc3AveFh6?=
+ =?utf-8?B?MjZXN1hlRTFzZzNQbzlYUEdDc1RhZkwyTlduTjhweUdkeUFSNmdsc3laeVB3?=
+ =?utf-8?B?ZW9QbnNvenRObDRVc1ZzWmNZcFRqbnRRdHVqRFNuUGFmNThUdGMwRW1KdUxj?=
+ =?utf-8?B?SFArNmhELzliQjgrZ3RjNUVwd3FFUnhLcU1VdHQvZG53WWE5emRHWDYxa1BX?=
+ =?utf-8?B?RmUrdGtjVTdSazVBVVpYaXhlU0dSZ2Fjd1lqbE1ueVNzK0diZWpMQWxJTlNw?=
+ =?utf-8?B?S2dkUXZ2eGFaZUpsUW04WGZTMXFEODVocVF1UFRUSDEya3hzd3ppMFVqdzk5?=
+ =?utf-8?B?Ump0RjQrdlhqanBRZ3lOUUtaWVB2OUpVTWt1TllRRnpDSjFxYm10enVjdUpz?=
+ =?utf-8?B?S1oxNTR0WldxWmV0UTR1cEsyYkt0UkVaeG5FNW14MHRsckg3a2Y1MzZ6VURj?=
+ =?utf-8?B?MDloSVFXdFEvWjFZLzcvckdLQXNvUXRRUmdBL3pBQ1didVI2L0pKdi9JUlRz?=
+ =?utf-8?B?SHdITytaUW1yZFZXRlo5VldqUXBBNW40QzJlWnZaYWlZUXlBb0p1b1Bad3Vl?=
+ =?utf-8?B?VitlRG1JYzBKZWlIeTRTZURnR0NvQUR3cm5ZZXhXakNHeWlQSjdPM0JsMFNr?=
+ =?utf-8?B?Q1MzOGpSMjM1bXcybENiS2RFeWpKZ3Z0Z2VCWGVSWmxyZkxvbFUrT0ovNk11?=
+ =?utf-8?B?ZHU5UUlic0wrcm4xcDZZdnJWa0ZzNitUaktUblA5ZE5pcVZQSVBObm5QOTFs?=
+ =?utf-8?B?SENhNDJKeUxrWTd5cEJGa0JsbzRwQ2ZQNlpkWnNMcW4rMDgrbzZHTzQvOTZy?=
+ =?utf-8?B?dk9KekJPaTh2c0o1d2VFT2pNR09YS29hOWFLL04rc0dERUUvY0V1TVRleXBx?=
+ =?utf-8?B?dGJWYlUydWdJZjIyVWx1ZjhKTzkydHUvZnpSaEc3cnlnYitwQXcybXlVMFlx?=
+ =?utf-8?B?d0Z3dWtnUUgzQiswOG1MZGtZS0ZCakNYTlQzeGVZdFczQ2pmRHBGdnlwVS9F?=
+ =?utf-8?B?TllRUnhrNTh0WUEyYnBhSnZpeXUzMmRpN0ppOVNXUEl6REtzd094bU1FVDNs?=
+ =?utf-8?B?T3pMNTZtTlJnK0lyK1ZpbEs5aERiSzNIUTcwUDV2RnNyb2tTK1laSSt3cWxK?=
+ =?utf-8?B?QnVsVmE3WHZrVmdSWThXakZzNzVEMFd1ZGRTRG10MVRSbXljQ3IxVGxlVU9m?=
+ =?utf-8?B?V1B4alh3Snl2RVFXdmtJTGtOTzlNTXMrYWdINXhTV1doSGZjZWIwbFdQZXlp?=
+ =?utf-8?B?NmhiQlRPSkhCQ2VLL2JJZ1hXYWFYcXNwaWFtQTRzSnp3WjlNWHhVU0twYzI2?=
+ =?utf-8?B?aWNleEpubG5EKzVKYi9lbHlsTEgyTTVSOWFmb3hxRUM2bW5RcXFVME1EVTVG?=
+ =?utf-8?B?T1dxN2xsMGp4ZjFHQ3c1SWxvU2ZPcUFTVWhIY1lMcVdwS1hsaVBFSFhvejQv?=
+ =?utf-8?B?ZVRrbmR5dngyVTFDNHhvbDVJekw3UGl2RUE2QW5Gc0cvL0FjMTdQSjZ2bVdS?=
+ =?utf-8?B?a3FZdUlLTDlUbkxlck01MkZ5YW1udGcvTmtlTHJwVm1JZzFJT09JTmY4eXNp?=
+ =?utf-8?B?cjZoVVZrRkZhcjBqNERQNGFBU1hEYTBWY3FseG5jUGJ0UzMvQllPQUxRbkth?=
+ =?utf-8?B?dnppdkpjY3VVVFZWVGIyV0NWNVdKVDNmNXR3a1BuZmpGZ1BkTHJsa09PK2c1?=
+ =?utf-8?B?TGZQNVRiSE1rWHZxWFBsTVRpWFhVcjFaYlRaZERTRm1aT2s1TEYxZFdmdDQy?=
+ =?utf-8?B?ejdreHdKRm9iZHZyL1dPa25jVkJBPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EA5AB886AFF664498FDA6522CF650FD7@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebc78c07-1bc0-4d01-150b-08d9f6231948
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Feb 2022 16:48:05.7453
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4oiWAN0YjpesBmHhUIJvLbKD4zmMq1oauW6nqtasI+Ulu1LdYV/1SpY6tH1fVEn8sBp8TPL1SMGIb+TSbc0lHw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1204
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVM Express ratified TP 4068 defines new protection information formats.
-Implement support for the CRC64 guard tags.
-
-Since the block layer doesn't support variable length reference tags,
-driver support for the Storage Tag space is not supported at this time.
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Klaus Jensen <its@irrelevant.dk>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/nvme/host/core.c | 172 ++++++++++++++++++++++++++++++++-------
- drivers/nvme/host/nvme.h |   4 +-
- include/linux/nvme.h     |  53 ++++++++++--
- 3 files changed, 191 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8132b1282082..5599c84ec5ec 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -918,6 +918,30 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
- 	return BLK_STS_OK;
- }
- 
-+static inline void nvme_set_ref_tag(struct nvme_ns *ns, struct nvme_command *cmnd,
-+				    struct request *req)
-+{
-+	u32 upper, lower;
-+	u64 ref48;
-+
-+	/* both rw and write zeroes share the same reftag format */
-+	switch (ns->guard_type) {
-+	case NVME_NVM_NS_16B_GUARD:
-+		cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
-+		break;
-+	case NVME_NVM_NS_64B_GUARD:
-+		ref48 = nvme_pi_extended_ref_tag(req);
-+		lower = lower_32_bits(ref48);
-+		upper = upper_32_bits(ref48);
-+
-+		cmnd->rw.reftag = cpu_to_le32(lower);
-+		cmnd->rw.cdw3 = cpu_to_le32(upper);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
- 		struct request *req, struct nvme_command *cmnd)
- {
-@@ -939,8 +963,7 @@ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
- 		switch (ns->pi_type) {
- 		case NVME_NS_DPS_PI_TYPE1:
- 		case NVME_NS_DPS_PI_TYPE2:
--			cmnd->write_zeroes.reftag =
--				cpu_to_le32(t10_pi_ref_tag(req));
-+			nvme_set_ref_tag(ns, cmnd, req);
- 			break;
- 		}
- 	}
-@@ -967,7 +990,8 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 	cmnd->rw.opcode = op;
- 	cmnd->rw.flags = 0;
- 	cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
--	cmnd->rw.rsvd2 = 0;
-+	cmnd->rw.cdw2 = 0;
-+	cmnd->rw.cdw3 = 0;
- 	cmnd->rw.metadata = 0;
- 	cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
- 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
-@@ -1001,7 +1025,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 					NVME_RW_PRINFO_PRCHK_REF;
- 			if (op == nvme_cmd_zone_append)
- 				control |= NVME_RW_APPEND_PIREMAP;
--			cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
-+			nvme_set_ref_tag(ns, cmnd, req);
- 			break;
- 		}
- 	}
-@@ -1653,33 +1677,58 @@ int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
- }
- 
- #ifdef CONFIG_BLK_DEV_INTEGRITY
--static void nvme_init_integrity(struct gendisk *disk, u16 ms, u8 pi_type,
-+static void nvme_init_integrity(struct gendisk *disk, struct nvme_ns *ns,
- 				u32 max_integrity_segments)
- {
- 	struct blk_integrity integrity = { };
- 
--	switch (pi_type) {
-+	switch (ns->pi_type) {
- 	case NVME_NS_DPS_PI_TYPE3:
--		integrity.profile = &t10_pi_type3_crc;
--		integrity.tag_size = sizeof(u16) + sizeof(u32);
--		integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+		switch (ns->guard_type) {
-+		case NVME_NVM_NS_16B_GUARD:
-+			integrity.profile = &t10_pi_type3_crc;
-+			integrity.tag_size = sizeof(u16) + sizeof(u32);
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		case NVME_NVM_NS_64B_GUARD:
-+			integrity.profile = &nvme_pi_type3_crc64;
-+			integrity.tag_size = sizeof(u16) + 6;
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		default:
-+			integrity.profile = NULL;
-+			break;
-+		}
- 		break;
- 	case NVME_NS_DPS_PI_TYPE1:
- 	case NVME_NS_DPS_PI_TYPE2:
--		integrity.profile = &t10_pi_type1_crc;
--		integrity.tag_size = sizeof(u16);
--		integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+		switch (ns->guard_type) {
-+		case NVME_NVM_NS_16B_GUARD:
-+			integrity.profile = &t10_pi_type1_crc;
-+			integrity.tag_size = sizeof(u16);
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		case NVME_NVM_NS_64B_GUARD:
-+			integrity.profile = &nvme_pi_type1_crc64;
-+			integrity.tag_size = sizeof(u16);
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		default:
-+			integrity.profile = NULL;
-+			break;
-+		}
- 		break;
- 	default:
- 		integrity.profile = NULL;
- 		break;
- 	}
--	integrity.tuple_size = ms;
-+
-+	integrity.tuple_size = ns->ms;
- 	blk_integrity_register(disk, &integrity);
- 	blk_queue_max_integrity_segments(disk->queue, max_integrity_segments);
- }
- #else
--static void nvme_init_integrity(struct gendisk *disk, u16 ms, u8 pi_type,
-+static void nvme_init_integrity(struct gendisk *disk, struct nvme_ns *ns,
- 				u32 max_integrity_segments)
- {
- }
-@@ -1756,20 +1805,76 @@ static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	return 0;
- }
- 
--static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
-+static int nvme_init_ms(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
-+	bool first = id->dps & NVME_NS_DPS_PI_FIRST;
-+	unsigned lbaf = nvme_lbaf_index(id->flbas);
- 	struct nvme_ctrl *ctrl = ns->ctrl;
-+	struct nvme_command c = { };
-+	struct nvme_id_ns_nvm *nvm;
-+	int ret = 0;
-+	u32 elbaf;
-+
-+	ns->pi_size = 0;
-+	ns->ms = le16_to_cpu(id->lbaf[lbaf].ms);
-+	if (!(ctrl->ctratt & NVME_CTRL_ATTR_ELBAS)) {
-+		ns->pi_size = sizeof(struct t10_pi_tuple);
-+		ns->guard_type = NVME_NVM_NS_16B_GUARD;
-+		goto set_pi;
-+	}
-+
-+	nvm = kzalloc(sizeof(*nvm), GFP_KERNEL);
-+	if (!nvm)
-+		return -ENOMEM;
-+
-+	c.identify.opcode = nvme_admin_identify;
-+	c.identify.nsid = cpu_to_le32(ns->head->ns_id);
-+	c.identify.cns = NVME_ID_CNS_CS_NS;
-+	c.identify.csi = NVME_CSI_NVM;
- 
--	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
--	if (id->dps & NVME_NS_DPS_PI_FIRST ||
--	    ns->ms == sizeof(struct t10_pi_tuple))
-+	ret = nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, nvm, sizeof(*nvm));
-+	if (ret)
-+		goto free_data;
-+
-+	elbaf = le32_to_cpu(nvm->elbaf[lbaf]);
-+
-+	/* no support for storage tag formats right now */
-+	if (nvme_elbaf_sts(elbaf))
-+		goto free_data;
-+
-+	ns->guard_type = nvme_elbaf_guard_type(elbaf);
-+	switch (ns->guard_type) {
-+	case NVME_NVM_NS_64B_GUARD:
-+		ns->pi_size = sizeof(struct nvme_crc64_pi_tuple);
-+		break;
-+	case NVME_NVM_NS_16B_GUARD:
-+		ns->pi_size = sizeof(struct t10_pi_tuple);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+free_data:
-+	kfree(nvm);
-+set_pi:
-+	if (ns->pi_size && (first || ns->ms == ns->pi_size))
- 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
- 	else
- 		ns->pi_type = 0;
- 
-+	return ret;
-+}
-+
-+static void nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
-+{
-+	struct nvme_ctrl *ctrl = ns->ctrl;
-+
-+	if (nvme_init_ms(ns, id))
-+		return;
-+
- 	ns->features &= ~(NVME_NS_METADATA_SUPPORTED | NVME_NS_EXT_LBAS);
- 	if (!ns->ms || !(ctrl->ops->flags & NVME_F_METADATA_SUPPORTED))
--		return 0;
-+		return;
- 	if (ctrl->ops->flags & NVME_F_FABRICS) {
- 		/*
- 		 * The NVMe over Fabrics specification only supports metadata as
-@@ -1777,7 +1882,7 @@ static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
- 		 * remap the separate metadata buffer from the block layer.
- 		 */
- 		if (WARN_ON_ONCE(!(id->flbas & NVME_NS_FLBAS_META_EXT)))
--			return -EINVAL;
-+			return;
- 
- 		ns->features |= NVME_NS_EXT_LBAS;
- 
-@@ -1804,8 +1909,6 @@ static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
- 		else
- 			ns->features |= NVME_NS_METADATA_SUPPORTED;
- 	}
--
--	return 0;
- }
- 
- static void nvme_set_queue_limits(struct nvme_ctrl *ctrl,
-@@ -1884,7 +1987,7 @@ static void nvme_update_disk_info(struct gendisk *disk,
- 	if (ns->ms) {
- 		if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
- 		    (ns->features & NVME_NS_METADATA_SUPPORTED))
--			nvme_init_integrity(disk, ns->ms, ns->pi_type,
-+			nvme_init_integrity(disk, ns,
- 					    ns->ctrl->max_integrity_segments);
- 		else if (!nvme_ns_has_pi(ns))
- 			capacity = 0;
-@@ -1939,16 +2042,14 @@ static void nvme_set_chunk_sectors(struct nvme_ns *ns, struct nvme_id_ns *id)
- 
- static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
--	unsigned lbaf = id->flbas & NVME_NS_FLBAS_LBA_MASK;
-+	unsigned lbaf = nvme_lbaf_index(id->flbas);
- 	int ret;
- 
- 	blk_mq_freeze_queue(ns->disk->queue);
- 	ns->lba_shift = id->lbaf[lbaf].ds;
- 	nvme_set_queue_limits(ns->ctrl, ns->queue);
- 
--	ret = nvme_configure_metadata(ns, id);
--	if (ret)
--		goto out_unfreeze;
-+	nvme_configure_metadata(ns, id);
- 	nvme_set_chunk_sectors(ns, id);
- 	nvme_update_disk_info(ns->disk, ns, id);
- 
-@@ -2286,20 +2387,27 @@ static int nvme_configure_timestamp(struct nvme_ctrl *ctrl)
- 	return ret;
- }
- 
--static int nvme_configure_acre(struct nvme_ctrl *ctrl)
-+static int nvme_configure_host_options(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_feat_host_behavior *host;
-+	u8 acre = 0, lbafee = 0;
- 	int ret;
- 
- 	/* Don't bother enabling the feature if retry delay is not reported */
--	if (!ctrl->crdt[0])
-+	if (ctrl->crdt[0])
-+		acre = NVME_ENABLE_ACRE;
-+	if (ctrl->ctratt & NVME_CTRL_ATTR_ELBAS)
-+		lbafee = NVME_ENABLE_LBAFEE;
-+
-+	if (!acre && !lbafee)
- 		return 0;
- 
- 	host = kzalloc(sizeof(*host), GFP_KERNEL);
- 	if (!host)
- 		return 0;
- 
--	host->acre = NVME_ENABLE_ACRE;
-+	host->acre = acre;
-+	host->lbafee = lbafee;
- 	ret = nvme_set_features(ctrl, NVME_FEAT_HOST_BEHAVIOR, 0,
- 				host, sizeof(*host), NULL);
- 	kfree(host);
-@@ -3141,7 +3249,7 @@ int nvme_init_ctrl_finish(struct nvme_ctrl *ctrl)
- 	if (ret < 0)
- 		return ret;
- 
--	ret = nvme_configure_acre(ctrl);
-+	ret = nvme_configure_host_options(ctrl);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -4814,12 +4922,14 @@ static inline void _nvme_check_size(void)
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ns) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ns_zns) != NVME_IDENTIFY_DATA_SIZE);
-+	BUILD_BUG_ON(sizeof(struct nvme_id_ns_nvm) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl_zns) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl_nvm) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_lba_range_type) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_smart_log) != 512);
- 	BUILD_BUG_ON(sizeof(struct nvme_dbbuf) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_directive_cmd) != 64);
-+	BUILD_BUG_ON(sizeof(struct nvme_feat_host_behavior) != 512);
- }
- 
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 587d92df118b..77257e02ef03 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -454,9 +454,11 @@ struct nvme_ns {
- 
- 	int lba_shift;
- 	u16 ms;
-+	u16 pi_size;
- 	u16 sgs;
- 	u32 sws;
- 	u8 pi_type;
-+	u8 guard_type;
- #ifdef CONFIG_BLK_DEV_ZONED
- 	u64 zsze;
- #endif
-@@ -479,7 +481,7 @@ struct nvme_ns {
- /* NVMe ns supports metadata actions by the controller (generate/strip) */
- static inline bool nvme_ns_has_pi(struct nvme_ns *ns)
- {
--	return ns->pi_type && ns->ms == sizeof(struct t10_pi_tuple);
-+	return ns->pi_type && ns->ms == ns->pi_size;
- }
- 
- struct nvme_ctrl_ops {
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 9dbc3ef4daf7..4f44f83817a9 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -244,6 +244,7 @@ enum {
- enum nvme_ctrl_attr {
- 	NVME_CTRL_ATTR_HID_128_BIT	= (1 << 0),
- 	NVME_CTRL_ATTR_TBKAS		= (1 << 6),
-+	NVME_CTRL_ATTR_ELBAS		= (1 << 15),
- };
- 
- struct nvme_id_ctrl {
-@@ -399,8 +400,7 @@ struct nvme_id_ns {
- 	__le16			endgid;
- 	__u8			nguid[16];
- 	__u8			eui64[8];
--	struct nvme_lbaf	lbaf[16];
--	__u8			rsvd192[192];
-+	struct nvme_lbaf	lbaf[64];
- 	__u8			vs[3712];
- };
- 
-@@ -418,8 +418,7 @@ struct nvme_id_ns_zns {
- 	__le32			rrl;
- 	__le32			frl;
- 	__u8			rsvd20[2796];
--	struct nvme_zns_lbafe	lbafe[16];
--	__u8			rsvd3072[768];
-+	struct nvme_zns_lbafe	lbafe[64];
- 	__u8			vs[256];
- };
- 
-@@ -428,6 +427,30 @@ struct nvme_id_ctrl_zns {
- 	__u8	rsvd1[4095];
- };
- 
-+struct nvme_id_ns_nvm {
-+	__le64	lbstm;
-+	__u8	pic;
-+	__u8	rsvd9[3];
-+	__le32	elbaf[64];
-+	__u8	rsvd268[3828];
-+};
-+
-+enum {
-+	NVME_ID_NS_NVM_STS_MASK		= 0x3f,
-+	NVME_ID_NS_NVM_GUARD_SHIFT	= 7,
-+	NVME_ID_NS_NVM_GUARD_MASK	= 0x3,
-+};
-+
-+static inline __u8 nvme_elbaf_sts(__u32 elbaf)
-+{
-+	return elbaf & NVME_ID_NS_NVM_STS_MASK;
-+}
-+
-+static inline __u8 nvme_elbaf_guard_type(__u32 elbaf)
-+{
-+	return (elbaf >> NVME_ID_NS_NVM_GUARD_SHIFT) & NVME_ID_NS_NVM_GUARD_MASK;
-+}
-+
- struct nvme_id_ctrl_nvm {
- 	__u8	vsl;
- 	__u8	wzsl;
-@@ -478,6 +501,8 @@ enum {
- 	NVME_NS_FEAT_IO_OPT	= 1 << 4,
- 	NVME_NS_ATTR_RO		= 1 << 0,
- 	NVME_NS_FLBAS_LBA_MASK	= 0xf,
-+	NVME_NS_FLBAS_LBA_UMASK	= 0x60,
-+	NVME_NS_FLBAS_LBA_SHIFT	= 1,
- 	NVME_NS_FLBAS_META_EXT	= 0x10,
- 	NVME_NS_NMIC_SHARED	= 1 << 0,
- 	NVME_LBAF_RP_BEST	= 0,
-@@ -496,6 +521,18 @@ enum {
- 	NVME_NS_DPS_PI_TYPE3	= 3,
- };
- 
-+enum {
-+	NVME_NVM_NS_16B_GUARD	= 0,
-+	NVME_NVM_NS_32B_GUARD	= 1,
-+	NVME_NVM_NS_64B_GUARD	= 2,
-+};
-+
-+static inline __u8 nvme_lbaf_index(__u8 flbas)
-+{
-+	return (flbas & NVME_NS_FLBAS_LBA_MASK) |
-+		((flbas & NVME_NS_FLBAS_LBA_UMASK) >> NVME_NS_FLBAS_LBA_SHIFT);
-+}
-+
- /* Identify Namespace Metadata Capabilities (MC): */
- enum {
- 	NVME_MC_EXTENDED_LBA	= (1 << 0),
-@@ -842,7 +879,8 @@ struct nvme_rw_command {
- 	__u8			flags;
- 	__u16			command_id;
- 	__le32			nsid;
--	__u64			rsvd2;
-+	__le32			cdw2;
-+	__le32			cdw3;
- 	__le64			metadata;
- 	union nvme_data_ptr	dptr;
- 	__le64			slba;
-@@ -996,11 +1034,14 @@ enum {
- 
- struct nvme_feat_host_behavior {
- 	__u8 acre;
--	__u8 resv1[511];
-+	__u8 etdas;
-+	__u8 lbafee;
-+	__u8 resv1[509];
- };
- 
- enum {
- 	NVME_ENABLE_ACRE	= 1,
-+	NVME_ENABLE_LBAFEE	= 1,
- };
- 
- /* Admin commands */
--- 
-2.25.4
-
+T24gMi8yMi8yMiAwODozMSwgS2VpdGggQnVzY2ggd3JvdGU6DQo+IFJlY2VudCBkYXRhIGludGVn
+cml0eSBmaWVsZCBlbmhhbmNlbWVudHMgYWxsb3cgNDgtYml0IHJlZmVyZW5jZSB0YWdzLg0KPiBJ
+bnRyb2R1Y2UgYSBoZWxwZXIgbWFjcm8gc2luY2UgdGhpcyB3aWxsIGJlIGEgcmVwZWF0ZWQgb3Bl
+cmF0aW9uLg0KPiANCj4gU3VnZ2VzdGVkLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJ2YW5hc3NjaGVA
+YWNtLm9yZz4NCj4gU2lnbmVkLW9mZi1ieTogS2VpdGggQnVzY2ggPGtidXNjaEBrZXJuZWwub3Jn
+Pg0KPiAtLS0NCg0KTG9va3MgZ29vZC4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBLdWxrYXJu
+aSA8a2NoQG52aWRpYS5jb20+DQoNCg0K
