@@ -2,85 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D904AC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 14:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EBAC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 14:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232579AbiBVOAe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 09:00:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57296 "EHLO
+        id S232096AbiBVOBo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 09:01:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229801AbiBVOAd (ORCPT
+        with ESMTP id S232602AbiBVOBm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 09:00:33 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C781275F3
-        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 06:00:08 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id p23so17107659pgj.2
-        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 06:00:08 -0800 (PST)
+        Tue, 22 Feb 2022 09:01:42 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD710128585
+        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 06:01:16 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id m13-20020a17090aab0d00b001bbe267d4d1so1802573pjq.0
+        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 06:01:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=OYGvkou6t6u8e1bfgXALw0P6fudskRCL4vAoBoZnxTs=;
-        b=lZAXckA4EooRL6Vftdr9Vv5S6wLf249lTZyVXKcW/hSqGnwtbrQFqEtI9tZhqd67Eh
-         uq2c7k1+c81sj40hO2f2TUz/AjSaLESe84gHk8HNJ5+AW/He/KS6Z8nwiFXS32Uwu6As
-         CUwYUa+G6ySDZRHf0HJ8eHIp2F6J3BqWhSGkNVB3U0fG+mOa08aFFNrYM9+kOdEvIhRq
-         Db73IA4CBk9ObWq10BHB+lEh/jQZJnkxzd5NxTVpN4E4/VQ1NzM8AcqeH265NEibjyZN
-         UdwWQHUXMKoXgUoSZLGLDnQV22J5KYUraCkp8IvEO1Pb+lY+sJGkoiTdCtfuWfAVs/MS
-         SQog==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=1EuJPg3zDH+553oumLIiCfwPqy2DMhgvL7xVVgemWXs=;
+        b=oA5HSbFdUn8MlHqwBhEfHVekBTUbyw5s+8q6W+GJ5rK4yLcFNJ1BWXLZNmzw64hWLg
+         sz1Ra30efTFu+RTJuMU/DJj978AbDve9xVx5kXt9Xv9toiumahNKEEmlLjQelTO5SoPS
+         kuz2PVQDYTj3S/6jztGDzbdEf7tBBFdy3Xi3IFyAdcYRlrNqvHeyZm33n0FKSiPsXx6s
+         yuOU6Y5pcdrcNNggDuScpuF+DZS1qh5Z8bcBcayw/RggZd/3/mLa8XrLGhj2Z3qqhSpV
+         adXIHU6SL/b2ULcZYxcuvqOQVCGtBk1XBrXMMTNvyuNSNyFNuuiaTp/D69Hx382D8xsR
+         w3VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=OYGvkou6t6u8e1bfgXALw0P6fudskRCL4vAoBoZnxTs=;
-        b=AZ7oAi6v3rrLJ2Maxw33Ux+AuVwrmYc5KTxRyZ+pgRu2rR2Sti8tJU7oQa/8TzVjX7
-         ksXYvDtpO8+Ap4mkUodwIqYc6r5jP6X6sBZq2RjHtu0ex26Ko8Vt8rBKJiqEQ+x4xjSZ
-         EtyLYpa47cwUkKV1J+CZpLGF/apFqxfCU/6Nd0gMs+fK532r+UJ1GBEGSFufB+kQAD2z
-         A/4ZtNaGToTcjLWC3yENwycB9FkILafgzAJa+7aCJ+ooEfcDgbQ535oxJE5PkadU/AXm
-         u3is8UCFYPmOyuj8tdS7EZ217QiSqq3NhXh99LGztD+ux+Eqwsu7Yx7tLFpikqFhGi2c
-         1RNQ==
-X-Gm-Message-State: AOAM531XpVVBzpkDgbFdFlXx3SpCd7T2DOaS2KTdCl+kaHyRB4YdaHUl
-        L+A8pHmiJ0YZjcQVBHnSktiHrw==
-X-Google-Smtp-Source: ABdhPJwxUq4rYahW3uu0UEQDGfs1WW+/+oCdiiFWL56ktdrW6ecztEhsIAFjWsT40OJfk5UK7xhMkg==
-X-Received: by 2002:a63:2f87:0:b0:374:4ebe:2048 with SMTP id v129-20020a632f87000000b003744ebe2048mr7265092pgv.157.1645538406837;
-        Tue, 22 Feb 2022 06:00:06 -0800 (PST)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d18sm17641501pfv.204.2022.02.22.06.00.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 06:00:06 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20220211090136.44471-1-sgarzare@redhat.com>
-References: <20220211090136.44471-1-sgarzare@redhat.com>
-Subject: Re: [PATCH] block: clear iocb->private in blkdev_bio_end_io_async()
-Message-Id: <164553840592.21302.5942854488206786597.b4-ty@kernel.dk>
-Date:   Tue, 22 Feb 2022 07:00:05 -0700
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=1EuJPg3zDH+553oumLIiCfwPqy2DMhgvL7xVVgemWXs=;
+        b=MCfxpn8RyukLn52ZQMZYKEqdvdX/5oZzhLuTbdwoIwFbP3HQ2MF5bH3d17hRArTl3y
+         OpxBHF+QTi4AhGKYl5WLhVtfLCW6yp/eM/vRyIeoEl0o5HjOZEl5XlPkj7GkubLuTnWL
+         pBv/MfD5sfiokGMk/UbwDlOFPF7TakNYVvFpYeafJ1z+946YmCOq31V47ngQPBoxpbTj
+         ZlahSbY/+idDOaY7iVCDTieeJGSQf+sI+dm4q21nSQCbmMxCbP55q81oM1oh8BqyH5mv
+         gaH4FO+pTmutcFm11sUGVTF17b/5gIXf0Rk/RW9nl4CpvXGkkT3UEca2AtzNkOB22svU
+         t1ug==
+X-Gm-Message-State: AOAM533oVsAGNFXDPy2I7loHSnnWG9TxZsNYEhOuOZsM7jbNP9UHFH0L
+        X5IKXoTQvDKQUJh8qaPXKI59fA==
+X-Google-Smtp-Source: ABdhPJxXio6mghvZZVs2OD+URAyurggbN97AdXL/5x06qMLGqHXHiFntXchiDlhukcWRtvIRzagfEA==
+X-Received: by 2002:a17:90a:8581:b0:1b2:7541:af6c with SMTP id m1-20020a17090a858100b001b27541af6cmr4299890pjn.48.1645538476207;
+        Tue, 22 Feb 2022 06:01:16 -0800 (PST)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id fz21-20020a17090b025500b001b9cd847ef0sm2951474pjb.35.2022.02.22.06.01.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Feb 2022 06:01:15 -0800 (PST)
+Message-ID: <be020330-5b67-ad0d-0214-b89f97f8d3e3@kernel.dk>
+Date:   Tue, 22 Feb 2022 07:01:14 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH] Documentation: block/diskstats: update function names
+Content-Language: en-US
+To:     Naohiro Aota <naohiro.aota@wdc.com>, linux-block@vger.kernel.org
+Cc:     linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+References: <20220222012751.1933194-1-naohiro.aota@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220222012751.1933194-1-naohiro.aota@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 11 Feb 2022 10:01:36 +0100, Stefano Garzarella wrote:
-> iocb_bio_iopoll() expects iocb->private to be cleared before
-> releasing the bio.
-> 
-> We already do this in blkdev_bio_end_io(), but we forgot in the
-> recently added blkdev_bio_end_io_async().
-> 
-> 
-> [...]
+On 2/21/22 6:27 PM, Naohiro Aota wrote:
+> __make_request() and end_that_request_last() do no longer exist. Replace
+> them with the current call-site.
 
-Applied, thanks!
+Reviwed-by: Jens Axboe <axboe@kernel.dk>
 
-[1/1] block: clear iocb->private in blkdev_bio_end_io_async()
-      commit: bb49c6fa8b845591b317b0d7afea4ae60ec7f3aa
+Jon, will you pick this one up?
 
-Best regards,
 -- 
 Jens Axboe
-
 
