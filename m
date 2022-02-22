@@ -2,101 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F3EC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 18:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C19B9C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 18:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233610AbiBVSaR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 13:30:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
+        id S234757AbiBVSnw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 13:43:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234863AbiBVSaQ (ORCPT
+        with ESMTP id S233516AbiBVSnw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 13:30:16 -0500
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C08B2EEA7D;
-        Tue, 22 Feb 2022 10:29:49 -0800 (PST)
-Received: by mail-pf1-f175.google.com with SMTP id p8so12921606pfh.8;
-        Tue, 22 Feb 2022 10:29:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=1etCuTtUGMTh1zy0Rkelm55EZW2T//pVnNR7YFuw4UM=;
-        b=lM52GhZcLNxGReQvkewX6k+UsRaW+W6quIAKfUJzVrh/0pPuiidL26KzaJJA5ONKPe
-         rQ00ZEjGiUVgPVPsI8glk996gyvFGAOFMqdukub+F0q8dc5yi4ojD9LLsOn12zELc/z6
-         6QL/68MlpCJvmrJjAHsYmS8NjkF33Em2XqM+VgkKwRtAvUuRn1jy2PF8/Oc+fahHVAS0
-         BoRHda8via2cly/SSVXSi4GqiCbxaKsNG16n1JLKCU7M6JENr28ehzubDw04zBTIyJTp
-         3CZF17rTuqPrRvYBcDtVYjZZ1ouaw42AhgDgUkDEs61JU6U9c7GWvEq6TB6AMSz2ZHgc
-         bD8A==
-X-Gm-Message-State: AOAM533mEx1z2K0p3pLldPbU9tvqtV9HP1k2nlSb8gHwaYiGaQZ6g8Hl
-        KwJ7LMRvIWirG/mZD4xUG31l7mMgXPpWKg==
-X-Google-Smtp-Source: ABdhPJz/NwkGmoTyHeOw8uxGygP6M5F2JksIPxMWhUY6SlqPGzMPrfRYtxl3w1y1dSsMOaSqaIhZnw==
-X-Received: by 2002:aa7:85c2:0:b0:4cb:b95a:887f with SMTP id z2-20020aa785c2000000b004cbb95a887fmr26068497pfn.74.1645554589177;
-        Tue, 22 Feb 2022 10:29:49 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id s19sm18098839pfu.34.2022.02.22.10.29.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Feb 2022 10:29:48 -0800 (PST)
-Message-ID: <4b9a4121-7f37-9bd3-036a-51892a456eef@acm.org>
-Date:   Tue, 22 Feb 2022 10:29:47 -0800
+        Tue, 22 Feb 2022 13:43:52 -0500
+Received: from relay4.hostedemail.com (relay4.hostedemail.com [64.99.140.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D45E9E576;
+        Tue, 22 Feb 2022 10:43:26 -0800 (PST)
+Received: from omf17.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay11.hostedemail.com (Postfix) with ESMTP id 7E08A802C9;
+        Tue, 22 Feb 2022 18:43:24 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf17.hostedemail.com (Postfix) with ESMTPA id 5571217;
+        Tue, 22 Feb 2022 18:42:32 +0000 (UTC)
+Message-ID: <603f9243bb9e1c4c50aaec83a527266b48ab9e20.camel@perches.com>
+Subject: Re: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
+From:   Joe Perches <joe@perches.com>
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, colyli@suse.de,
+        Bart Van Assche <bvanassche@acm.org>
+Date:   Tue, 22 Feb 2022 10:43:21 -0800
+In-Reply-To: <20220222165613.GB1497257@dhcp-10-100-145-180.wdc.com>
+References: <20220222163144.1782447-1-kbusch@kernel.org>
+         <20220222163144.1782447-5-kbusch@kernel.org>
+         <66a0c8210cf9e7dfcc3fa2d247de1eebd5a8acb7.camel@perches.com>
+         <20220222165045.GA14168@lst.de>
+         <20220222165613.GB1497257@dhcp-10-100-145-180.wdc.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.4-1ubuntu2 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH 10/12] block: move blk_exit_queue into disk_release
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20220222141450.591193-1-hch@lst.de>
- <20220222141450.591193-11-hch@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220222141450.591193-11-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Stat-Signature: nazzjjx87869o4w9oakhjiahqxjdbban
+X-Rspamd-Server: rspamout06
+X-Rspamd-Queue-Id: 5571217
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX18aL9+BR2B9Ovzx+56lKMnaVrCxDabIdXo=
+X-HE-Tag: 1645555352-996125
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/22/22 06:14, Christoph Hellwig wrote:
-> From: Ming Lei <ming.lei@redhat.com>
+On Tue, 2022-02-22 at 08:56 -0800, Keith Busch wrote:
+> On Tue, Feb 22, 2022 at 05:50:45PM +0100, Christoph Hellwig wrote:
+> > On Tue, Feb 22, 2022 at 08:45:53AM -0800, Joe Perches wrote:
+> > > On Tue, 2022-02-22 at 08:31 -0800, Keith Busch wrote:
+> > > > +/ *
+> > > > + * lower_48_bits - return bits 0-47 of a number
+> > > > + * @n: the number we're accessing
+> > > > + */
+> > > > +#define lower_48_bits(n) ((u64)((n) & 0xffffffffffffull))
+> > > 
+> > > why not make this a static inline function?
+> > 
+> > Agreed.
 > 
-> There can't be FS IO in disk_release(), so move blk_exit_queue() there.
-> 
-> We still need to freeze queue here since the request is freed after the
-> bio is completed and passthrough request rely on scheduler tags as well.
-> 
-> The disk can be released before or after queue is cleaned up, and we have
-> to free the scheduler request pool before blk_cleanup_queue returns,
-> while the static request pool has to be freed before exiting the
-> I/O scheduler.
+> Sure, that sounds good to me. I only did it this way to match the
+> existing local convention, but I personally prefer the inline function
+> too. 
 
-This patch looks dubious to me because:
-- The blk_freeze_queue() call in blk_cleanup_queue() waits for pending
-   requests to finish, so why to move blk_exit_queue() from
-   blk_cleanup_queue() into disk_release()?
-- I'm concerned that this patch will break user space, e.g. scripts that
-   try to unload an I/O scheduler kernel module immediately after having
-   removed a request queue.
+The existing convention is used there to allow the compiler to
+avoid warnings and unnecessary conversions of a u32 to a u64 when
+shifting by 32 or more bits.
 
-> +static void blk_mq_release_queue(struct request_queue *q)
-> +{
-> +	blk_mq_cancel_work_sync(q);
-> +
-> +	/*
-> +	 * There can't be any non non-passthrough bios in flight here, but
-> +	 * requests stay around longer, including passthrough ones so we
-> +	 * still need to freeze the queue here.
-> +	 */
-> +	blk_mq_freeze_queue(q);
+If it's possible to be used with an architecture dependent typedef
+like dma_addr_t, then perhaps it's reasonable to do something like:
 
-The above comment should be elaborated since what matters in this 
-context is not whether or not any bios are still in flight but what 
-happens with the request structures. As you know blk_queue_enter() fails 
-after the DYING flag has been set, a flag that is set by 
-blk_cleanup_queue(). blk_cleanup_queue() already freezes the queue. So 
-why is it necessary to call blk_mq_freeze_queue() from 
-blk_mq_release_queue()?
+#define lower_48_bits(val)					\
+({								\
+	typeof(val) high = lower_16_bits(upper_32_bits(val));	\
+	typeof(val) low = lower_32_bits(val);			\
+								\
+	(high << 16 << 16) | low;				\
+})
 
-Bart.
+and have the compiler have the return value be an appropriate type.
+
+
