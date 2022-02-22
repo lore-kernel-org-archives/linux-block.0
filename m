@@ -2,88 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 280C5C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 20:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B5BC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 20:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235351AbiBVUB2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 15:01:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40960 "EHLO
+        id S233069AbiBVUHL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 15:07:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234387AbiBVUB1 (ORCPT
+        with ESMTP id S235396AbiBVUHK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 15:01:27 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065B6EA74E
-        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 12:01:01 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d187so13173716pfa.10
-        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 12:01:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=4h9kf9VqoPCNtulp0ojgIX7wOSrB7YtOTmYGEUjWqL0=;
-        b=cjyLUHV6S+8p9TfT7Micy7LWl7ctXo0lpeqDUJuhjQfHutQSkbuFYRVxgNDsFzXj8X
-         /mXx4Sda7iU8O/NHqU74omam8yOhdh8msdWRrHKJc/aqdtpbXwUfZFz2AZ15CzZeqrqW
-         1ntJcYVypE4L65sUABgeQ/33M84H9Jy7iIs2AdtK0dw3MLYT3/2HIKHqxTSEwx/auNC5
-         CYznqE61v7kLxrmVnUvxU6QO69pDTzovJxsXi1djki690t3sc130eEtYguTvEZ19pg8U
-         /Pgtfe1U3xK15cEffzfT0QipmR2hNqexSrqV8lbjAdbZ38gH1W55Axy9LpCsRV29+rcY
-         TyrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=4h9kf9VqoPCNtulp0ojgIX7wOSrB7YtOTmYGEUjWqL0=;
-        b=muhGbsso1YBn6TzLhxMHcJuxeMY8p8sgewEsjjLT83uHZ0IUq3jAa0sVM/MGntKk5J
-         J1MWsle+0/pW7MCRZwAvlS8tJ4T9QTca/eazTs+cBaoHFWP9L8x9cl8XKFI5hZiUi1W+
-         t8bClejzOlu5UhdSQXoosTmfE8fnSUq0NOPzZnV7rQJ643hL24EfW8/nDQ8qHJXJHhYK
-         gzBdklNmiIMfgsU5C6jUKLdS6i2lkWIbxmQKQ9m+6fUO+f2aHaEOjwhI1tHLAYy0bRrc
-         DYLxsLeUyY4Oi/I5Gf2uLumRSpkbTZKg8tIFm9FGY4VQjSInLdm67tBhWB3BmrPaN0W9
-         hkeA==
-X-Gm-Message-State: AOAM532hqpJSAtSL3Jhrkgh+h+hcQ9PAbo0O2KLLs4JXuI46Z7IKGyhj
-        x7Ndy8FXoJbTv2PG04IkLrabzQ==
-X-Google-Smtp-Source: ABdhPJz9B+VNfVlGOdY8+lNM/fmfOn+oAHq2HMh3zbs60IcgtE3gwlV++5FBfZf5CPofITBZ6HS7Sg==
-X-Received: by 2002:aa7:9911:0:b0:4e1:3a76:96f8 with SMTP id z17-20020aa79911000000b004e13a7696f8mr26060983pff.28.1645560060461;
-        Tue, 22 Feb 2022 12:01:00 -0800 (PST)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b13sm10207949pfl.75.2022.02.22.12.00.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 12:01:00 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     damien.lemoal@wdc.com, shinichiro.kawasaki@wdc.com,
-        ming.lei@redhat.com
-In-Reply-To: <20220222152852.26043-1-kch@nvidia.com>
-References: <20220222152852.26043-1-kch@nvidia.com>
-Subject: Re: [PATCH 0/2] null_blk: null_alloc_page() cleanup
-Message-Id: <164556005938.133381.110434333749525761.b4-ty@kernel.dk>
-Date:   Tue, 22 Feb 2022 13:00:59 -0700
+        Tue, 22 Feb 2022 15:07:10 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA58A41BD;
+        Tue, 22 Feb 2022 12:06:44 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0499DB81C5F;
+        Tue, 22 Feb 2022 20:06:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56812C340E8;
+        Tue, 22 Feb 2022 20:06:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645560401;
+        bh=uI0Fg70JQsRjF8A280UxeWyrTx+BSIhEvWBXFTuCqvc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oV94Lm4dBzwnapWO4YqkF1+FiDKUOgNPNsAaPRtqEp7aUERF9fx5An9GvUGCIbjdO
+         ml75/8hKPJIpMkKR/BBixoM9MlWszX9BQJEKLvkbdOzd5Y/MFnIaVoZs8X+7cHzmIR
+         KVog4RCIGsRxnnU5t+0SXRfTXag3ZmA4C7G2mVIhYTQtQpmD8Fi2lnPAPAjGORG1/H
+         NXOsNZ6yLBw/2p5WTdH9a/+NLBV7UFhzavqHlsVPAk3ftgHAe79bNPhSvhWaqizg+P
+         i+q/0tgKBideH8K1N+4kBi0MLYEDFCy0cUuJC5JX6ZbkLDR4FOp4iDlw0bKrCJ4VBZ
+         EIzYowpTp8JVA==
+Date:   Tue, 22 Feb 2022 12:06:39 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     David Laight <David.Laight@aculab.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "colyli@suse.de" <colyli@suse.de>
+Subject: Re: [PATCHv3 10/10] x86/crypto: add pclmul acceleration for crc64
+Message-ID: <YhVCTzUOUHZnze4x@sol.localdomain>
+References: <20220222163144.1782447-1-kbusch@kernel.org>
+ <20220222163144.1782447-11-kbusch@kernel.org>
+ <a7e806ed3c074534a24b74f827bcc914@AcuMS.aculab.com>
+ <20220222171405.GA1782521@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220222171405.GA1782521@dhcp-10-100-145-180.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 22 Feb 2022 07:28:50 -0800, Chaitanya Kulkarni wrote:
-> This has null_alloc_page() cleanup to remvoe the unwanted function
-> parameter and remove function goto labels where we can return easily.
+On Tue, Feb 22, 2022 at 09:14:05AM -0800, Keith Busch wrote:
+> On Tue, Feb 22, 2022 at 05:02:16PM +0000, David Laight wrote:
+> > From: Keith Busch
+> > > Sent: 22 February 2022 16:32
+> > > 
+> > > The crc64 table lookup method is inefficient, using a significant number
+> > > of CPU cycles in the block stack per IO. If available on x86, use a
+> > > PCLMULQDQ implementation to accelerate the calculation.
+> > > 
+> > > The assembly from this patch was mostly generated by gcc from a C
+> > > program using library functions provided by x86 intrinsics, and measures
+> > > ~20x faster than the table lookup.
+> > 
+> > I think I'd like to see the C code and compiler options used to
+> > generate the assembler as comments in the committed source file.
+> > Either that or reasonable comments in the assembler.
 > 
-> Below is the test log of memory backed null_blk with fio verify job and
-> blktests output.
+> The C code, compiled as "gcc -O3 -msse4 -mpclmul -S", was adapted from
+> this found on the internet:
 > 
-> -ck
+>   https://github.com/rawrunprotected/crc/blob/master/crc64.c
 > 
-> [...]
+> I just ported it to linux, changed the poly parameters and removed the
+> unnecessary stuff. 
+>  
+> I'm okay with dropping this patch from the series for now since I don't
+> think I'm qualified to write it. :) I just needed something to test the
+> crytpo module registration.
 
-Applied, thanks!
+Is the license of that code compatible with the kernel's license?
 
-[1/2] null_blk: remove hardcoded null_alloc_page() param
-      commit: 4a330a241a41e4f2a9d752dea41be70803a66a94
-[2/2] null_blk: null_alloc_page() cleanup
-      commit: 2ff4ec783f4c635289384398d14b241f21bce269
+In any case, adding uncommented generated assembly isn't acceptable.  The most
+common convention for Linux kernel crypto is to use hand-written assembly that
+is properly commented.
 
-Best regards,
--- 
-Jens Axboe
+There is some precedent for using compiler intrinsics instead, e.g.
+crypto/aegis128-neon-inner.c.  (I'm not sure why they aren't used more often.)
 
+There are also some files where a Perl script generates the assembly code.
+(This is a bit ugly IMO, but it's what the author of much of OpenSSL's crypto
+assembly code does, and it was desired to reuse that code.)
 
+Anyway, those are the available options.  Checking in some uncommented generated
+assembly isn't one of them.
+
+- Eric
