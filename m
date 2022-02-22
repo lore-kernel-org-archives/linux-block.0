@@ -2,46 +2,45 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E81C43217
-	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4441C43219
+	for <linux-block@archiver.kernel.org>; Tue, 22 Feb 2022 16:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234145AbiBVQdE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 11:33:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
+        id S234062AbiBVQdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 11:33:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234097AbiBVQcu (ORCPT
+        with ESMTP id S234108AbiBVQcw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 11:32:50 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E5A3113AD5;
-        Tue, 22 Feb 2022 08:32:24 -0800 (PST)
+        Tue, 22 Feb 2022 11:32:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92D9AA2FC;
+        Tue, 22 Feb 2022 08:32:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id B39DECE17A3;
-        Tue, 22 Feb 2022 16:32:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72ABAC340FB;
-        Tue, 22 Feb 2022 16:32:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 85EF760A2B;
+        Tue, 22 Feb 2022 16:32:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 409E3C340F7;
+        Tue, 22 Feb 2022 16:32:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645547541;
-        bh=UcJmaYKYSUedgav8DTnlV/x/GzgaonSprD2wkPg3Hq4=;
+        s=k20201202; t=1645547546;
+        bh=K6Y7PoEX/ei0aWx5jBUIAMLJ24UZ5DFTNrAOH1STYEg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pW31tNlM7vrf4Vja9RGa/oOYqzpEBdOuNydh7Ok1ffO63/zOdH2U0436X7xpoxH/8
-         7s6I316cTMlOtl6fP7RXS+RVgFgxGG5E823yZS5kPKCn3awuLuwEbPgJZATptM5xXG
-         C0nlmBtQHPmAPwvKugvDIo7PJXkZs9TZj79n6IMUVDugAWJUmeT+WjvcP6V6njW8wD
-         AXeVPSmqv4Y8KdVJrjVsQ1jiYk1hDAi9OPnwhVH1TOrZKJnA1RaGGHU0DmHO3mVJls
-         vBARKxLPPxYkqEZ/tWPceK9rZ5KhnYxAB34eR5iEalccUIb/p7mWMMkyBxCKs8aqLy
-         kZ5NghPYeOjOg==
+        b=u9njbRhtam4tj7EVawuiEHrQK/nvvMc1jbYszicWb68JbDLKKiZBRuK69/HrTdhYc
+         h08qvcJoobCsKto8s1Y/9yUVkuqMZlqdE0u3qY31ALVTM1bWbKVS37YrfO7HFh36Ig
+         I+1nEV2P4pH7YWFwfmUWx5Qrks60mddWWGEwexufBzWoMapCpKLv4FiZrs+Qq/mgF3
+         dyQ01Ax3ziLdSxeKN7gv7YcPWYJbb8PSkTR/+DIUpYAMrhHHOgQAIRJDx0S841hSYh
+         iQ1l5MHVRFFZZRj2F9CBwEOSHIYIobaMC/1XjexedLGcnPPteETqHPX+L81vaQVOSI
+         JLrke3jmgBwCg==
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de, Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv3 02/10] nvme: allow integrity on extended metadata formats
-Date:   Tue, 22 Feb 2022 08:31:36 -0800
-Message-Id: <20220222163144.1782447-3-kbusch@kernel.org>
+        colyli@suse.de, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv3 07/10] lib: add crc64 tests
+Date:   Tue, 22 Feb 2022 08:31:41 -0800
+Message-Id: <20220222163144.1782447-8-kbusch@kernel.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20220222163144.1782447-1-kbusch@kernel.org>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
@@ -51,40 +50,185 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The block integrity subsystem knows how to construct protection
-information buffers with metadata beyond the protection information
-fields. Remove the driver restriction.
+Provide a module to test the rocksoft crc64 calculations with well known
+inputs and exepected values. Check the generic table implementation and
+whatever module is registered from the crypto library, and compare their
+speeds.
 
-Note, this can only work if the PI field appears first in the metadata,
-as the integrity subsystem doesn't calculate guard tags on preceding
-metadata.
-
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/nvme/host/core.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ lib/Kconfig.debug |   4 ++
+ lib/Makefile      |   1 +
+ lib/test_crc64.c  | 133 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 138 insertions(+)
+ create mode 100644 lib/test_crc64.c
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 3b876dcab730..8132b1282082 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1760,12 +1760,9 @@ static int nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
- 	struct nvme_ctrl *ctrl = ns->ctrl;
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 14b89aa37c5c..149de11ae903 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -2214,6 +2214,10 @@ config TEST_UUID
+ config TEST_XARRAY
+ 	tristate "Test the XArray code at runtime"
  
--	/*
--	 * The PI implementation requires the metadata size to be equal to the
--	 * t10 pi tuple size.
--	 */
- 	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
--	if (ns->ms == sizeof(struct t10_pi_tuple))
-+	if (id->dps & NVME_NS_DPS_PI_FIRST ||
-+	    ns->ms == sizeof(struct t10_pi_tuple))
- 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
- 	else
- 		ns->pi_type = 0;
++config TEST_CRC64
++	depends on CRC64
++	tristate "Test the crc64 code at runtime"
++
+ config TEST_OVERFLOW
+ 	tristate "Test check_*_overflow() functions at runtime"
+ 
+diff --git a/lib/Makefile b/lib/Makefile
+index 130bed83cdf2..0895a3fc3f5a 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -103,6 +103,7 @@ obj-$(CONFIG_TEST_HMM) += test_hmm.o
+ obj-$(CONFIG_TEST_FREE_PAGES) += test_free_pages.o
+ obj-$(CONFIG_KPROBES_SANITY_TEST) += test_kprobes.o
+ obj-$(CONFIG_TEST_REF_TRACKER) += test_ref_tracker.o
++obj-$(CONFIG_TEST_CRC64) += test_crc64.o
+ #
+ # CFLAGS for compiling floating point code inside the kernel. x86/Makefile turns
+ # off the generation of FPU/SSE* instructions for kernel proper but FPU_FLAGS
+diff --git a/lib/test_crc64.c b/lib/test_crc64.c
+new file mode 100644
+index 000000000000..281aacd20f0a
+--- /dev/null
++++ b/lib/test_crc64.c
+@@ -0,0 +1,133 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Tests were selected from NVM Express NVM Command Set Specification 1.0a,
++ * section 5.2.1.3.5 "64b CRC Test Cases" available here:
++ *
++ *   https://nvmexpress.org/wp-content/uploads/NVMe-NVM-Command-Set-Specification-1.0a-2021.07.26-Ratified.pdf
++ *
++ * Copyright 2022 Keith Busch <kbusch@kernel.org>
++ */
++
++#include <linux/crc64.h>
++#include <linux/module.h>
++#include <linux/vmalloc.h>
++#include <linux/random.h>
++
++static unsigned int tests_passed;
++static unsigned int tests_run;
++
++#define ALL_ZEROS 0x6482D367EB22B64EULL
++#define ALL_FFS 0xC0DDBA7302ECA3ACULL
++#define INC 0x3E729F5F6750449CULL
++#define DEC 0x9A2DF64B8E9E517EULL
++
++static u8 buffer[4096];
++
++#define CRC_CHECK(c, v) do {					\
++	tests_run++;						\
++	if (c != v)						\
++		printk("BUG at %s:%d expected:%llx got:%llx\n", \
++			__func__, __LINE__, v, c);		\
++	else							\
++		tests_passed++;					\
++} while (0)
++
++static void randomize(u64 *b, int size)
++{
++	int i;
++
++	for (i = 0; i < size / 8; i++)
++		b[i] = get_random_u64();
++}
++
++static void crc_speed_tests(void)
++{
++	unsigned long size = 1 << 20;
++	unsigned test_size;
++	void *b;
++
++	b = vmalloc(size);
++	if (!b)
++		return;
++
++	test_size = 512;
++	while (test_size <= size) {
++		ktime_t start_time, end_time;
++		u64 crc1, crc2;
++		s64 t1, t2;
++		int i;
++
++		randomize(b, test_size);
++		crc1 = crc2 = ~0ULL;
++
++		start_time = ktime_get();
++		for (i = 0; i < 1024; i++)
++			crc1 = crc64_rocksoft_generic(crc1, b, test_size);
++		end_time = ktime_get();
++		t1 = ktime_us_delta(end_time, start_time);
++
++		start_time = ktime_get();
++		for (i = 0; i < 1024; i++)
++			crc2 = crc64_rocksoft_update(crc2, b, test_size);
++		end_time = ktime_get();
++		t2 = ktime_us_delta(end_time, start_time);
++
++		printk("Size:%-7u Generic:%-7lld Library:%lld\n", test_size,
++			t1, t2);
++		CRC_CHECK(crc1, crc2);
++
++		test_size <<= 1;
++	}
++
++        vfree(b);
++}
++
++static int crc_tests(void)
++{
++	__u64 crc;
++	int i;
++
++	memset(buffer, 0, sizeof(buffer));
++	crc = crc64_rocksoft_generic(~0ULL, buffer, 4096);
++	CRC_CHECK(crc, ALL_ZEROS);
++
++	crc = crc64_rocksoft(buffer, 4096);
++	CRC_CHECK(crc, ALL_ZEROS);
++
++	memset(buffer, 0xff, sizeof(buffer));
++	crc = crc64_rocksoft_generic(~0ULL, buffer, 4096);
++	CRC_CHECK(crc, ALL_FFS);
++
++	crc = crc64_rocksoft(buffer, 4096);
++	CRC_CHECK(crc, ALL_FFS);
++
++	for (i = 0; i < 4096; i++)
++		buffer[i] = i & 0xff;
++	crc = crc64_rocksoft_generic(~0ULL, buffer, 4096);
++	CRC_CHECK(crc, INC);
++
++	crc = crc64_rocksoft(buffer, 4096);
++	CRC_CHECK(crc, INC);
++
++	for (i = 0; i < 4096; i++)
++		buffer[i] = 0xff - (i & 0xff);
++	crc = crc64_rocksoft_generic(~0ULL, buffer, 4096);
++	CRC_CHECK(crc, DEC);
++
++	crc = crc64_rocksoft(buffer, 4096);
++	CRC_CHECK(crc, DEC);
++
++	crc_speed_tests();
++
++	printk("CRC64: %u of %u tests passed\n", tests_passed, tests_run);
++	return (tests_run == tests_passed) ? 0 : -EINVAL;
++}
++
++static void crc_exit(void)
++{
++}
++
++module_init(crc_tests);
++module_exit(crc_exit);
++MODULE_AUTHOR("Keith Busch <kbusch@kernel.org>");
++MODULE_LICENSE("GPL");
 -- 
 2.25.4
 
