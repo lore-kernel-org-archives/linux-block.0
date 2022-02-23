@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA2DC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 02:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A1EC4167B
+	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 02:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237041AbiBWCb2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 21:31:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42678 "EHLO
+        id S237283AbiBWCd5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 21:33:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237002AbiBWCbK (ORCPT
+        with ESMTP id S237202AbiBWCcl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 21:31:10 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B5C04617E;
-        Tue, 22 Feb 2022 18:29:52 -0800 (PST)
+        Tue, 22 Feb 2022 21:32:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC0E5A0B9;
+        Tue, 22 Feb 2022 18:30:35 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D7E9661519;
-        Wed, 23 Feb 2022 02:29:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58004C340EB;
-        Wed, 23 Feb 2022 02:29:49 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 44584B81E11;
+        Wed, 23 Feb 2022 02:30:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4484CC340F0;
+        Wed, 23 Feb 2022 02:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645583390;
-        bh=rW27RDIxb4zRm6FShjRgjJye5PiLNdSUc2enKTspRag=;
+        s=k20201202; t=1645583434;
+        bh=Y0ydCJdLcvb/muRQhxCjXoK2Jvm2kqf39/xsowfr3bs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=b3Kk3O8HO5FDagMGg4m0LsqmpYgm0dLH9Vn3DVSqz+I0D9lBsiPQ+Ap8auXS7C0HK
-         osrvNda5RBjEE8k/r+KVQho+uRMxUNbZmtzbvkvqyROyFbd3ZlLRRNdKA1LRcFTPuH
-         9rlhAC30D5XYNvENq3DhNeMrPEKfYG+NAqWMpORMn8YYHnO02G4ck7TJguTPCjly9x
-         HNXya/iuOlvKemcW8f6YDrdt+BFsnfmd0EV5nxZ5XVWZjpmR2oRhqir2SCKhmudKxw
-         dCOelY9Tnm93w0lRy5m+LAvRLAJ0lZrF2t+mmrwXfc0f52w71vL0/SUbNabhfJpXlS
-         GgiQzG8Uh9Byg==
+        b=CDY6TQjvqzUCUiBaxVxNyoghwJaONDXipUTFpOFrIg1V+SSX/7ppnwm+s2uLQZqiA
+         NLVQxAjneeKTyN6gzgxIWFqJv88wlBSXNvEEJPZykEjnZDEIsqHTknoazsuAicwSiS
+         x/fc5VPEtodJN/zPzHWDabhSapEsZzZ23PQakre8oueLQScHPkyiuCmRrV1jjb5IxB
+         NQT/9Ev3Hw5mpJByW31x1n9wudZSdzpJnax4geXdEMdLFsJP4ISH67g9T30aEaS4mm
+         jT+nghVRejgWDe9z64CIYZL3/ejwhI4DwasAE8pCI783YvBtklSPw30PQj82YJFd4/
+         SvJh31t6TUoSw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Pei Zhang <pezhang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+Cc:     Haimin Zhang <tcs.kernel@gmail.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 10/28] block: loop:use kstatfs.f_bsize of backing file to set discard granularity
-Date:   Tue, 22 Feb 2022 21:29:11 -0500
-Message-Id: <20220223022929.241127-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 28/28] block-map: add __GFP_ZERO flag for alloc_page in function bio_copy_kern
+Date:   Tue, 22 Feb 2022 21:29:29 -0500
+Message-Id: <20220223022929.241127-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220223022929.241127-1-sashal@kernel.org>
 References: <20220223022929.241127-1-sashal@kernel.org>
@@ -52,62 +52,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Haimin Zhang <tcs.kernel@gmail.com>
 
-[ Upstream commit 06582bc86d7f48d35cd044098ca1e246e8c7c52e ]
+[ Upstream commit cc8f7fe1f5eab010191aa4570f27641876fa1267 ]
 
-If backing file's filesystem has implemented ->fallocate(), we think the
-loop device can support discard, then pass sb->s_blocksize as
-discard_granularity. However, some underlying FS, such as overlayfs,
-doesn't set sb->s_blocksize, and causes discard_granularity to be set as
-zero, then the warning in __blkdev_issue_discard() is triggered.
+Add __GFP_ZERO flag for alloc_page in function bio_copy_kern to initialize
+the buffer of a bio.
 
-Christoph suggested to pass kstatfs.f_bsize as discard granularity, and
-this way is fine because kstatfs.f_bsize means 'Optimal transfer block
-size', which still matches with definition of discard granularity.
-
-So fix the issue by setting discard_granularity as kstatfs.f_bsize if it
-is available, otherwise claims discard isn't supported.
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Vivek Goyal <vgoyal@redhat.com>
-Reported-by: Pei Zhang <pezhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Haimin Zhang <tcs.kernel@gmail.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20220126035830.296465-1-ming.lei@redhat.com
+Link: https://lore.kernel.org/r/20220216084038.15635-1-tcs.kernel@gmail.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/loop.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/blk-map.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c00ae30fde89e..92f9d32bfae5e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -79,6 +79,7 @@
- #include <linux/ioprio.h>
- #include <linux/blk-cgroup.h>
- #include <linux/sched/mm.h>
-+#include <linux/statfs.h>
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 4526adde01564..c7f71d83eff18 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -446,7 +446,7 @@ static struct bio *bio_copy_kern(struct request_queue *q, void *data,
+ 		if (bytes > len)
+ 			bytes = len;
  
- #include "loop.h"
+-		page = alloc_page(GFP_NOIO | gfp_mask);
++		page = alloc_page(GFP_NOIO | __GFP_ZERO | gfp_mask);
+ 		if (!page)
+ 			goto cleanup;
  
-@@ -939,8 +940,13 @@ static void loop_config_discard(struct loop_device *lo)
- 		granularity = 0;
- 
- 	} else {
-+		struct kstatfs sbuf;
-+
- 		max_discard_sectors = UINT_MAX >> 9;
--		granularity = inode->i_sb->s_blocksize;
-+		if (!vfs_statfs(&file->f_path, &sbuf))
-+			granularity = sbuf.f_bsize;
-+		else
-+			max_discard_sectors = 0;
- 	}
- 
- 	if (max_discard_sectors) {
 -- 
 2.34.1
 
