@@ -2,140 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E52CCC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 14:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33817C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 14:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232221AbiBWOZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 09:25:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41750 "EHLO
+        id S236034AbiBWOcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 09:32:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241542AbiBWOZG (ORCPT
+        with ESMTP id S235360AbiBWOcD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 09:25:06 -0500
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FFBDB1A98
-        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 06:24:38 -0800 (PST)
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 21NEOHsC093057;
-        Wed, 23 Feb 2022 23:24:17 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Wed, 23 Feb 2022 23:24:16 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 21NEOGjC093051
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 23 Feb 2022 23:24:16 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <cf61ca83-d9b0-2e5d-eb3b-018e16753749@I-love.SAKURA.ne.jp>
-Date:   Wed, 23 Feb 2022 23:24:16 +0900
+        Wed, 23 Feb 2022 09:32:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2305F1115B
+        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 06:31:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645626694;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YxLpiB7JcAtWZKh8Bz5fym9bypONvzzglGIYn+ip4xc=;
+        b=GC8/1Lu9RC5qesNGHKO5qJ/ncY17wgMc6ttiQBZOCS6lotQiOmQUPBvA7+rF5JlwczZAhq
+        7OjNqqbRf9dF/nW7bTx2QiZXa83NF3RxZ3m/UFmTy0eaexIf8V4Iq1Xc+nwgaEdZR984uk
+        0hJCSQ5wAPDs5m4RgEvjXfDX6j84YrI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-245-CrjbTZfqNpG5zC5hgpFv8A-1; Wed, 23 Feb 2022 09:31:31 -0500
+X-MC-Unique: CrjbTZfqNpG5zC5hgpFv8A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCF882D4;
+        Wed, 23 Feb 2022 14:31:29 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4268927CC5;
+        Wed, 23 Feb 2022 14:31:07 +0000 (UTC)
+Date:   Wed, 23 Feb 2022 22:30:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH RFC] blk-mq: fix potential uaf for 'queue_hw_ctx'
+Message-ID: <YhZFITXtiL8Xaord@T590>
+References: <20220223112601.2902761-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 5/8] loop: only take lo_mutex for the first reference in
- lo_open
-Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        "Darrick J . Wong" <djwong@kernel.org>
-References: <20220128130022.1750906-1-hch@lst.de>
- <20220128130022.1750906-6-hch@lst.de>
- <397e50c7-ae46-8834-1632-7bac1ad7df99@I-love.SAKURA.ne.jp>
- <10d156e7-4347-4ccd-51f4-ea5febd1b1ee@I-love.SAKURA.ne.jp>
- <20220208134559.qfs4pkukdzkuh2rg@quack3.lan>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220208134559.qfs4pkukdzkuh2rg@quack3.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220223112601.2902761-1-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/02/08 22:45, Jan Kara wrote:
-> On Sat 05-02-22 09:28:33, Tetsuo Handa wrote:
->> Ping?
->>
->> I sent https://lkml.kernel.org/r/20220129071500.3566-1-penguin-kernel@I-love.SAKURA.ne.jp
->> based on ideas from your series.
->>
->> Since automated kernel tests are failing, can't we apply
->> [PATCH 1/7] loop: revert "make autoclear operation asynchronous"
->> for now if we can't come to a conclusion?
+On Wed, Feb 23, 2022 at 07:26:01PM +0800, Yu Kuai wrote:
+> blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
+> submit_queues through configfs for null_blk), while it might still be
+> used from other context(e.g. switch elevator to none):
 > 
-> That's certainly a good start so feel free to add my Acked-by to the
-> revert. I agree it should be merged quickly as I think it is better to have
-> a theoretical deadlock in the code than userspace breakage hit in the wild.
-> I'll find some more time to look into this but it will take a while.
+> t1					t2
+> elevator_switch
+>  blk_mq_unquiesce_queue
+>   blk_mq_run_hw_queues
+>    queue_for_each_hw_ctx
+>     // assembly code for hctx = (q)->queue_hw_ctx[i]
+>     mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
+> 
+> 					__blk_mq_update_nr_hw_queues
+> 					 blk_mq_realloc_hw_ctxs
+> 					  hctxs = q->queue_hw_ctx
+> 					  q->queue_hw_ctx = new_hctxs
+> 					  kfree(hctxs)
+>     movslq %ebx,%rax
+>     mov    (%rdx,%rax,8),%rdi ->uaf
+> 
 
-Did you get a chance to look into this? As far as I tested, I found two problems
-( https://lkml.kernel.org/r/a72c59c6-298b-e4ba-b1f5-2275afab49a1@I-love.SAKURA.ne.jp ).
-That is, waiting for lo->lo_mutex upon open is not only for /bin/mount but for other
-programs.
+Not only uaf on queue_hw_ctx, but also other similar issue on other
+structures, and I think the correct and easy fix is to quiesce request
+queue during updating nr_hw_queues, something like the following patch:
 
-I found that we can use anon_inodes approach (basic idea is shown below) as a way
-to use task_work context. If we can agree with this approach, I can re-implement
-https://lkml.kernel.org/r/20220121114006.3633-1-penguin-kernel@I-love.SAKURA.ne.jp
-without exporting task_work_add().
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 19fe19eaa50e..6bd6af1836c6 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -80,6 +80,7 @@
- #include <linux/blk-cgroup.h>
- #include <linux/sched/mm.h>
- #include <linux/statfs.h>
-+#include <linux/anon_inodes.h>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a05ce7725031..d8e7c3cce0dd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4467,8 +4467,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
+ 		return;
  
- #include "loop.h"
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_freeze_queue(q);
++		blk_mq_quiesce_queue(q);
++	}
+ 	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+@@ -4518,8 +4520,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 		blk_mq_elv_switch_back(&head, q);
  
-@@ -1736,6 +1737,25 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- 	return err;
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		blk_mq_unquiesce_queue(q);
+ 		blk_mq_unfreeze_queue(q);
++	}
  }
  
-+static int loop_no_open(struct inode *inode, struct file *file)
-+{
-+	return -ENXIO;
-+}
-+
-+static int loop_post_release(struct inode *inode, struct file *file)
-+{
-+	struct loop_device *lo = file->private_data;
-+
-+	pr_info("Performing autoclear operation.\n");
-+	__loop_clr_fd(lo, false);
-+	return 0;
-+}
-+
-+static const struct file_operations loop_close_fops = {
-+	.open = loop_no_open,
-+	.release = loop_post_release,
-+};
-+
- static void lo_release(struct gendisk *disk, fmode_t mode)
- {
- 	struct loop_device *lo = disk->private_data;
-@@ -1745,6 +1765,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		goto out_unlock;
- 
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
-+		struct file *file;
-+
- 		if (lo->lo_state != Lo_bound)
- 			goto out_unlock;
- 		lo->lo_state = Lo_rundown;
-@@ -1753,7 +1775,9 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		__loop_clr_fd(lo, true);
-+		file = anon_inode_getfile("loop.close", &loop_close_fops, lo, O_CLOEXEC);
-+		if (!IS_ERR(file))
-+			fput(file);
- 		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+
+
+
+Thanks,
+Ming
 
