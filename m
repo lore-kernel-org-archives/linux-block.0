@@ -2,120 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0C7C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 13:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52CCC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 14:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237787AbiBWNhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 08:37:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32872 "EHLO
+        id S232221AbiBWOZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 09:25:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231817AbiBWNhX (ORCPT
+        with ESMTP id S241542AbiBWOZG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 08:37:23 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA43A369E1
-        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 05:36:55 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id em10-20020a17090b014a00b001bc3071f921so2201213pjb.5
-        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 05:36:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=N9cHY4SifJQRPZGyqNzFAaMxdyKcHiU7tvyOh1en6H0=;
-        b=UJiDBDcJyhYfAtRxkH4e/g0SGCcioXPblzBek5TXkQO5JhKcZgaA9ZD66eafxv7H1O
-         v7ClLP7WcakqTKbRR2vewZDNHcx7f+THBx4tBUlntqunkjKZHAozZVxN+BYW4IRZhddI
-         8SKnXgc+DrxlOAkLY9BpBBM8F+Dvf9MKmivTFFkFlrZ6MZ7VwWw1KtQcewrjcjh9wzOh
-         1BVIQMn9FcODiPsTvcfiUyo/hdmf2RmJkJHJ4CW+p39+BIxhbBfMbkPzkzUMy1shNDA0
-         NXDTQyP2WhwbTpFR8peDLGOorIg8nmt+quT9caZcI7hh3B1QccAY2k7AdM1x+Az30j8f
-         RaCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=N9cHY4SifJQRPZGyqNzFAaMxdyKcHiU7tvyOh1en6H0=;
-        b=KhoUndU8GkVlxuI0GlDARYurZs2TYH1f88NRlN/tg1XUUPR6DQp/wq1+5zc04z0b1B
-         I+zSVwYcyyRch7lt8Qrrq+hzhLiUZRYA664gYlZiHv1COt7Ji79f2sXe6NRdslLtZTDh
-         djam9arIRdAheGo6UHFqP56Wro7qqMsdDIOxdnrA9v/T2PnUN+2GnZf6D8U9ccru5JDU
-         5BPG6nPlJSmVgrktoC+lMxCGIrKKAWOudlCxUdK50BFzRra1+vWA54EnD0EytBE6RFvB
-         3WBPdZSYJYczAThma7sY2GG7VrBk3mNQHuIkrhTPiZEHaPooH7BuSJIWJu8HRgB/bV2J
-         WHoQ==
-X-Gm-Message-State: AOAM533zD9Z2QNOv4kQ3rMXyIMyDzVWSt9sjCr1EWcUS8vrofb28u93M
-        lSDM92VL2tmf925bjn+eZxpA
-X-Google-Smtp-Source: ABdhPJw+wPH2gByHLFqSSr47CT7uq33n0tImgzGg94Iwzm9FxJdX5AHXB7Ottaa62JyqEaiCI771tQ==
-X-Received: by 2002:a17:902:7b81:b0:14f:1b7e:c83c with SMTP id w1-20020a1709027b8100b0014f1b7ec83cmr27873913pll.119.1645623415325;
-        Wed, 23 Feb 2022 05:36:55 -0800 (PST)
-Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id p17sm21942412pfh.59.2022.02.23.05.36.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 05:36:54 -0800 (PST)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH] virtio-blk: Check the max discard segment for discard request
-Date:   Wed, 23 Feb 2022 21:36:27 +0800
-Message-Id: <20220223133627.102-1-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 23 Feb 2022 09:25:06 -0500
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FFBDB1A98
+        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 06:24:38 -0800 (PST)
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 21NEOHsC093057;
+        Wed, 23 Feb 2022 23:24:17 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Wed, 23 Feb 2022 23:24:16 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 21NEOGjC093051
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 23 Feb 2022 23:24:16 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <cf61ca83-d9b0-2e5d-eb3b-018e16753749@I-love.SAKURA.ne.jp>
+Date:   Wed, 23 Feb 2022 23:24:16 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH 5/8] loop: only take lo_mutex for the first reference in
+ lo_open
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        "Darrick J . Wong" <djwong@kernel.org>
+References: <20220128130022.1750906-1-hch@lst.de>
+ <20220128130022.1750906-6-hch@lst.de>
+ <397e50c7-ae46-8834-1632-7bac1ad7df99@I-love.SAKURA.ne.jp>
+ <10d156e7-4347-4ccd-51f4-ea5febd1b1ee@I-love.SAKURA.ne.jp>
+ <20220208134559.qfs4pkukdzkuh2rg@quack3.lan>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20220208134559.qfs4pkukdzkuh2rg@quack3.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently we have a BUG_ON() to make sure the number of sg list
-does not exceed queue_max_segments() in virtio_queue_rq().
-However, the block layer uses queue_max_discard_segments()
-instead of queue_max_segments() to limit the sg list for
-discard requests. So the BUG_ON() might be triggered if
-virtio-blk device reports a larger value for max discard
-segment than queue_max_segments(). To fix it, this patch
-checks the max discard segment for the discard request
-in the BUG_ON() instead.
+On 2022/02/08 22:45, Jan Kara wrote:
+> On Sat 05-02-22 09:28:33, Tetsuo Handa wrote:
+>> Ping?
+>>
+>> I sent https://lkml.kernel.org/r/20220129071500.3566-1-penguin-kernel@I-love.SAKURA.ne.jp
+>> based on ideas from your series.
+>>
+>> Since automated kernel tests are failing, can't we apply
+>> [PATCH 1/7] loop: revert "make autoclear operation asynchronous"
+>> for now if we can't come to a conclusion?
+> 
+> That's certainly a good start so feel free to add my Acked-by to the
+> revert. I agree it should be merged quickly as I think it is better to have
+> a theoretical deadlock in the code than userspace breakage hit in the wild.
+> I'll find some more time to look into this but it will take a while.
 
-Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- drivers/block/virtio_blk.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Did you get a chance to look into this? As far as I tested, I found two problems
+( https://lkml.kernel.org/r/a72c59c6-298b-e4ba-b1f5-2275afab49a1@I-love.SAKURA.ne.jp ).
+That is, waiting for lo->lo_mutex upon open is not only for /bin/mount but for other
+programs.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index c443cd64fc9b..a1f9045f848e 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -79,6 +79,9 @@ struct virtio_blk {
- 	/* What host tells us, plus 2 for header & tailer. */
- 	unsigned int sg_elems;
+I found that we can use anon_inodes approach (basic idea is shown below) as a way
+to use task_work context. If we can agree with this approach, I can re-implement
+https://lkml.kernel.org/r/20220121114006.3633-1-penguin-kernel@I-love.SAKURA.ne.jp
+without exporting task_work_add().
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 19fe19eaa50e..6bd6af1836c6 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -80,6 +80,7 @@
+ #include <linux/blk-cgroup.h>
+ #include <linux/sched/mm.h>
+ #include <linux/statfs.h>
++#include <linux/anon_inodes.h>
  
-+	/* The max discard segment. */
-+	unsigned int discard_sg_elems;
+ #include "loop.h"
+ 
+@@ -1736,6 +1737,25 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
+ 	return err;
+ }
+ 
++static int loop_no_open(struct inode *inode, struct file *file)
++{
++	return -ENXIO;
++}
 +
- 	/* Ida index - used to track minor number allocations. */
- 	int index;
++static int loop_post_release(struct inode *inode, struct file *file)
++{
++	struct loop_device *lo = file->private_data;
++
++	pr_info("Performing autoclear operation.\n");
++	__loop_clr_fd(lo, false);
++	return 0;
++}
++
++static const struct file_operations loop_close_fops = {
++	.open = loop_no_open,
++	.release = loop_post_release,
++};
++
+ static void lo_release(struct gendisk *disk, fmode_t mode)
+ {
+ 	struct loop_device *lo = disk->private_data;
+@@ -1745,6 +1765,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		goto out_unlock;
  
-@@ -321,8 +324,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	bool notify = false;
- 	blk_status_t status;
- 	int err;
-+	u32 sg_elems = (req_op(req) == REQ_OP_DISCARD) ?
-+				vblk->discard_sg_elems + 2 : vblk->sg_elems;
- 
--	BUG_ON(req->nr_phys_segments + 2 > vblk->sg_elems);
-+	BUG_ON(req->nr_phys_segments + 2 > sg_elems);
- 
- 	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
- 	if (unlikely(status))
-@@ -925,9 +930,8 @@ static int virtblk_probe(struct virtio_device *vdev)
- 
- 		virtio_cread(vdev, struct virtio_blk_config, max_discard_seg,
- 			     &v);
--		blk_queue_max_discard_segments(q,
--					       min_not_zero(v,
--							    MAX_DISCARD_SEGMENTS));
-+		vblk->discard_sg_elems = min_not_zero(v, MAX_DISCARD_SEGMENTS);
-+		blk_queue_max_discard_segments(q, vblk->discard_sg_elems);
- 
- 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
- 	}
--- 
-2.20.1
+ 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
++		struct file *file;
++
+ 		if (lo->lo_state != Lo_bound)
+ 			goto out_unlock;
+ 		lo->lo_state = Lo_rundown;
+@@ -1753,7 +1775,9 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 		 * In autoclear mode, stop the loop thread
+ 		 * and remove configuration after last close.
+ 		 */
+-		__loop_clr_fd(lo, true);
++		file = anon_inode_getfile("loop.close", &loop_close_fops, lo, O_CLOEXEC);
++		if (!IS_ERR(file))
++			fput(file);
+ 		return;
+ 	} else if (lo->lo_state == Lo_bound) {
+ 		/*
 
