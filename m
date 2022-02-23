@@ -2,146 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482ECC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 12:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0C7C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 13:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239282AbiBWMfF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 07:35:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42058 "EHLO
+        id S237787AbiBWNhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 08:37:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232550AbiBWMfE (ORCPT
+        with ESMTP id S231817AbiBWNhX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 07:35:04 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB528AE46
-        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 04:34:36 -0800 (PST)
-Received: from canpemm500005.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K3b696cgkz9svL;
-        Wed, 23 Feb 2022 20:32:49 +0800 (CST)
-Received: from [10.174.178.134] (10.174.178.134) by
- canpemm500005.china.huawei.com (7.192.104.229) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 23 Feb 2022 20:34:33 +0800
-Subject: Re: dm: make sure dm_table is binded before queue request
-To:     Mike Snitzer <snitzer@redhat.com>
-CC:     <dm-devel@redhat.com>, <linux-block@vger.kernel.org>,
-        <agk@redhat.com>, <axboe@kernel.dk>, <yukuai3@huawei.com>
-References: <20220209093751.2986716-1-yi.zhang@huawei.com>
- <YhUrH7UfBN3Uw5HP@redhat.com>
-From:   Zhang Yi <yi.zhang@huawei.com>
-Message-ID: <dc2af2ca-5e4c-d149-46fc-ae82dd56a121@huawei.com>
-Date:   Wed, 23 Feb 2022 20:34:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Wed, 23 Feb 2022 08:37:23 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA43A369E1
+        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 05:36:55 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id em10-20020a17090b014a00b001bc3071f921so2201213pjb.5
+        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 05:36:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=N9cHY4SifJQRPZGyqNzFAaMxdyKcHiU7tvyOh1en6H0=;
+        b=UJiDBDcJyhYfAtRxkH4e/g0SGCcioXPblzBek5TXkQO5JhKcZgaA9ZD66eafxv7H1O
+         v7ClLP7WcakqTKbRR2vewZDNHcx7f+THBx4tBUlntqunkjKZHAozZVxN+BYW4IRZhddI
+         8SKnXgc+DrxlOAkLY9BpBBM8F+Dvf9MKmivTFFkFlrZ6MZ7VwWw1KtQcewrjcjh9wzOh
+         1BVIQMn9FcODiPsTvcfiUyo/hdmf2RmJkJHJ4CW+p39+BIxhbBfMbkPzkzUMy1shNDA0
+         NXDTQyP2WhwbTpFR8peDLGOorIg8nmt+quT9caZcI7hh3B1QccAY2k7AdM1x+Az30j8f
+         RaCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=N9cHY4SifJQRPZGyqNzFAaMxdyKcHiU7tvyOh1en6H0=;
+        b=KhoUndU8GkVlxuI0GlDARYurZs2TYH1f88NRlN/tg1XUUPR6DQp/wq1+5zc04z0b1B
+         I+zSVwYcyyRch7lt8Qrrq+hzhLiUZRYA664gYlZiHv1COt7Ji79f2sXe6NRdslLtZTDh
+         djam9arIRdAheGo6UHFqP56Wro7qqMsdDIOxdnrA9v/T2PnUN+2GnZf6D8U9ccru5JDU
+         5BPG6nPlJSmVgrktoC+lMxCGIrKKAWOudlCxUdK50BFzRra1+vWA54EnD0EytBE6RFvB
+         3WBPdZSYJYczAThma7sY2GG7VrBk3mNQHuIkrhTPiZEHaPooH7BuSJIWJu8HRgB/bV2J
+         WHoQ==
+X-Gm-Message-State: AOAM533zD9Z2QNOv4kQ3rMXyIMyDzVWSt9sjCr1EWcUS8vrofb28u93M
+        lSDM92VL2tmf925bjn+eZxpA
+X-Google-Smtp-Source: ABdhPJw+wPH2gByHLFqSSr47CT7uq33n0tImgzGg94Iwzm9FxJdX5AHXB7Ottaa62JyqEaiCI771tQ==
+X-Received: by 2002:a17:902:7b81:b0:14f:1b7e:c83c with SMTP id w1-20020a1709027b8100b0014f1b7ec83cmr27873913pll.119.1645623415325;
+        Wed, 23 Feb 2022 05:36:55 -0800 (PST)
+Received: from localhost ([139.177.225.253])
+        by smtp.gmail.com with ESMTPSA id p17sm21942412pfh.59.2022.02.23.05.36.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 05:36:54 -0800 (PST)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH] virtio-blk: Check the max discard segment for discard request
+Date:   Wed, 23 Feb 2022 21:36:27 +0800
+Message-Id: <20220223133627.102-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <YhUrH7UfBN3Uw5HP@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.178.134]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500005.china.huawei.com (7.192.104.229)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/2/23 2:27, Mike Snitzer wrote:
-> On Wed, Feb 09 2022 at  4:37P -0500,
-> Zhang Yi <yi.zhang@huawei.com> wrote:
-> 
->> We found a NULL pointer dereference problem when using dm-mpath target.
->> The problem is if we submit IO between loading and binding the table,
->> we could neither get a valid dm_target nor a valid dm table when
->> submitting request in dm_mq_queue_rq(). BIO based dm target could
->> handle this case in dm_submit_bio(). This patch fix this by checking
->> the mapping table before submitting request.
->>
->> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
->> ---
->>  drivers/md/dm-rq.c | 11 +++++++++--
->>  1 file changed, 9 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
->> index 579ab6183d4d..af2cf71519e9 100644
->> --- a/drivers/md/dm-rq.c
->> +++ b/drivers/md/dm-rq.c
->> @@ -499,8 +499,15 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
->>  
->>  	if (unlikely(!ti)) {
->>  		int srcu_idx;
->> -		struct dm_table *map = dm_get_live_table(md, &srcu_idx);
->> -
->> +		struct dm_table *map;
->> +
->> +		map = dm_get_live_table(md, &srcu_idx);
->> +		if (!map) {
->> +			DMERR_LIMIT("%s: mapping table unavailable, erroring io",
->> +				    dm_device_name(md));
->> +			dm_put_live_table(md, srcu_idx);
->> +			return BLK_STS_IOERR;
->> +		}
->>  		ti = dm_table_find_target(map, 0);
->>  		dm_put_live_table(md, srcu_idx);
->>  	}
->> -- 
->> 2.31.1
->>
-> 
-> I think both dm_submit_bio() and now dm_mq_queue_rq() should _not_
-> error the IO.  This is such a narrow race during device setup that it
-> best to requeue the IO.
-> 
+Currently we have a BUG_ON() to make sure the number of sg list
+does not exceed queue_max_segments() in virtio_queue_rq().
+However, the block layer uses queue_max_discard_segments()
+instead of queue_max_segments() to limit the sg list for
+discard requests. So the BUG_ON() might be triggered if
+virtio-blk device reports a larger value for max discard
+segment than queue_max_segments(). To fix it, this patch
+checks the max discard segment for the discard request
+in the BUG_ON() instead.
 
-Yes，make sense, thanks for the fix.
+Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/block/virtio_blk.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Thanks,
-Yi.
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index c443cd64fc9b..a1f9045f848e 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -79,6 +79,9 @@ struct virtio_blk {
+ 	/* What host tells us, plus 2 for header & tailer. */
+ 	unsigned int sg_elems;
+ 
++	/* The max discard segment. */
++	unsigned int discard_sg_elems;
++
+ 	/* Ida index - used to track minor number allocations. */
+ 	int index;
+ 
+@@ -321,8 +324,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	bool notify = false;
+ 	blk_status_t status;
+ 	int err;
++	u32 sg_elems = (req_op(req) == REQ_OP_DISCARD) ?
++				vblk->discard_sg_elems + 2 : vblk->sg_elems;
+ 
+-	BUG_ON(req->nr_phys_segments + 2 > vblk->sg_elems);
++	BUG_ON(req->nr_phys_segments + 2 > sg_elems);
+ 
+ 	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
+ 	if (unlikely(status))
+@@ -925,9 +930,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 
+ 		virtio_cread(vdev, struct virtio_blk_config, max_discard_seg,
+ 			     &v);
+-		blk_queue_max_discard_segments(q,
+-					       min_not_zero(v,
+-							    MAX_DISCARD_SEGMENTS));
++		vblk->discard_sg_elems = min_not_zero(v, MAX_DISCARD_SEGMENTS);
++		blk_queue_max_discard_segments(q, vblk->discard_sg_elems);
+ 
+ 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+ 	}
+-- 
+2.20.1
 
-> I'll queue this for 5.18:
-> 
-> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> index 6948d5db9092..3dd040a56318 100644
-> --- a/drivers/md/dm-rq.c
-> +++ b/drivers/md/dm-rq.c
-> @@ -491,8 +491,13 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
->  
->  	if (unlikely(!ti)) {
->  		int srcu_idx;
-> -		struct dm_table *map = dm_get_live_table(md, &srcu_idx);
-> +		struct dm_table *map;
->  
-> +		map = dm_get_live_table(md, &srcu_idx);
-> +		if (unlikely(!map)) {
-> +			dm_put_live_table(md, srcu_idx);
-> +			return BLK_STS_RESOURCE;
-> +		}
->  		ti = dm_table_find_target(map, 0);
->  		dm_put_live_table(md, srcu_idx);
->  	}
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 082366d0ad49..c70be6e5ed55 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1533,15 +1533,10 @@ static void dm_submit_bio(struct bio *bio)
->  	struct dm_table *map;
->  
->  	map = dm_get_live_table(md, &srcu_idx);
-> -	if (unlikely(!map)) {
-> -		DMERR_LIMIT("%s: mapping table unavailable, erroring io",
-> -			    dm_device_name(md));
-> -		bio_io_error(bio);
-> -		goto out;
-> -	}
->  
-> -	/* If suspended, queue this IO for later */
-> -	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
-> +	/* If suspended, or map not yet available, queue this IO for later */
-> +	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags)) ||
-> +	    unlikely(!map)) {
->  		if (bio->bi_opf & REQ_NOWAIT)
->  			bio_wouldblock_error(bio);
->  		else if (bio->bi_opf & REQ_RAHEAD)
-> 
-> .
-> 
