@@ -2,104 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 222ACC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 02:08:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A72C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Feb 2022 02:29:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235187AbiBWCJI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Feb 2022 21:09:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43140 "EHLO
+        id S236946AbiBWC3n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Feb 2022 21:29:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230047AbiBWCJF (ORCPT
+        with ESMTP id S236863AbiBWC3X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Feb 2022 21:09:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 607226150
-        for <linux-block@vger.kernel.org>; Tue, 22 Feb 2022 18:08:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645582118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gK04vuf2B7TP6AyCZ7iOGVpTZr/vcEI2ew7H/GaHVyg=;
-        b=GPsoWXONwpldp4dMoHWkzg/pZYn7bFvB1T4lW1zwA5nAEf4KEVY91Ezu3Pm8xcjkGbg5RQ
-        gMX2bVVOIt2AZPqBBc9yVJecv+A5GPzUpKLH5NLJc2xq0pToyyz93LNwkoeQApyJhWwYIe
-        fM6T19CnY+jMFVDJXFDNOxG1EDa2y+M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-441-S90CxYFOOHaaVcnQJdN7bQ-1; Tue, 22 Feb 2022 21:08:35 -0500
-X-MC-Unique: S90CxYFOOHaaVcnQJdN7bQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 22 Feb 2022 21:29:23 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D0E46B28;
+        Tue, 22 Feb 2022 18:28:48 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE3B91854E26;
-        Wed, 23 Feb 2022 02:08:33 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 106662AFAA;
-        Wed, 23 Feb 2022 02:08:25 +0000 (UTC)
-Date:   Wed, 23 Feb 2022 10:08:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 01/12] blk-mq: do not include passthrough requests in I/O
- accounting
-Message-ID: <YhWXFMhdms1QO1dL@T590>
-References: <20220222141450.591193-1-hch@lst.de>
- <20220222141450.591193-2-hch@lst.de>
+        by ams.source.kernel.org (Postfix) with ESMTPS id AA991B81E0C;
+        Wed, 23 Feb 2022 02:28:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82AAFC340F1;
+        Wed, 23 Feb 2022 02:28:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645583325;
+        bh=goSQsIx1vr5XuNPvESDGISMoMw1wJOGeLiM+1mNyTJE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=TyxcFzfeLK81Gh/Ytpz5tHXaWGQYHODutEWetlfxf1l39JgjqoAwp4qHAcj1kLTMK
+         x+vhh5T18DYFt3eRsu1u1pnJ8LULWML5NsGcq7xL9NA2CGupOaT6vOlq9RNhgs2KsW
+         pL0xEuSIWpYC2o4+S6nAKcqJoPejFH8m6qXyQnTk/YlRxq3iCSUKzdiqRgP9zAgqpI
+         5DTFP/aJklvjZ3KbmDaWho4mYbaDpN8/nU6GO2zQhvtiSLex/gB75WG9a2Lg7bANoo
+         QKD5d0Mb2VismOVwdKx+EpnCZx+mgS/cfVdVnneWsk9n/Lue+DMMIwYRgCuQejPyhY
+         on+ZbsBVXkRqg==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Pei Zhang <pezhang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 12/30] block: loop:use kstatfs.f_bsize of backing file to set discard granularity
+Date:   Tue, 22 Feb 2022 21:28:01 -0500
+Message-Id: <20220223022820.240649-12-sashal@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220223022820.240649-1-sashal@kernel.org>
+References: <20220223022820.240649-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220222141450.591193-2-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 03:14:39PM +0100, Christoph Hellwig wrote:
-> I/O accounting buckets I/O into the read/write/discard categories into
-> which passthrough I/O does not fit at all.  It also accounts to the
-> block_device, which may not even exist for passthrough I/O.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-mq.c | 6 +-----
->  block/blk.h    | 2 +-
->  2 files changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a05ce77250316..ee80853473d1e 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -883,11 +883,7 @@ static inline void blk_account_io_done(struct request *req, u64 now)
->  
->  static void __blk_account_io_start(struct request *rq)
->  {
-> -	/* passthrough requests can hold bios that do not have ->bi_bdev set */
-> -	if (rq->bio && rq->bio->bi_bdev)
-> -		rq->part = rq->bio->bi_bdev;
-> -	else if (rq->q->disk)
-> -		rq->part = rq->q->disk->part0;
-> +	rq->part = rq->bio->bi_bdev;
->  
->  	part_stat_lock();
->  	update_io_ticks(rq->part, jiffies, false);
-> diff --git a/block/blk.h b/block/blk.h
-> index ebaa59ca46ca6..6f21859c7f0ff 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -325,7 +325,7 @@ int blk_dev_init(void);
->   */
->  static inline bool blk_do_io_stat(struct request *rq)
->  {
-> -	return (rq->rq_flags & RQF_IO_STAT) && rq->q->disk;
-> +	return (rq->rq_flags & RQF_IO_STAT) && !blk_rq_is_passthrough(rq);
+From: Ming Lei <ming.lei@redhat.com>
 
-I guess this way may cause regression for workloads with lots of userspace IO
-from user viewpoint?
+[ Upstream commit 06582bc86d7f48d35cd044098ca1e246e8c7c52e ]
 
+If backing file's filesystem has implemented ->fallocate(), we think the
+loop device can support discard, then pass sb->s_blocksize as
+discard_granularity. However, some underlying FS, such as overlayfs,
+doesn't set sb->s_blocksize, and causes discard_granularity to be set as
+zero, then the warning in __blkdev_issue_discard() is triggered.
 
-Thanks,
-Ming
+Christoph suggested to pass kstatfs.f_bsize as discard granularity, and
+this way is fine because kstatfs.f_bsize means 'Optimal transfer block
+size', which still matches with definition of discard granularity.
+
+So fix the issue by setting discard_granularity as kstatfs.f_bsize if it
+is available, otherwise claims discard isn't supported.
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Vivek Goyal <vgoyal@redhat.com>
+Reported-by: Pei Zhang <pezhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20220126035830.296465-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/loop.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c3a36cfaa855a..fdb4798cb0065 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -79,6 +79,7 @@
+ #include <linux/ioprio.h>
+ #include <linux/blk-cgroup.h>
+ #include <linux/sched/mm.h>
++#include <linux/statfs.h>
+ 
+ #include "loop.h"
+ 
+@@ -774,8 +775,13 @@ static void loop_config_discard(struct loop_device *lo)
+ 		granularity = 0;
+ 
+ 	} else {
++		struct kstatfs sbuf;
++
+ 		max_discard_sectors = UINT_MAX >> 9;
+-		granularity = inode->i_sb->s_blocksize;
++		if (!vfs_statfs(&file->f_path, &sbuf))
++			granularity = sbuf.f_bsize;
++		else
++			max_discard_sectors = 0;
+ 	}
+ 
+ 	if (max_discard_sectors) {
+-- 
+2.34.1
 
