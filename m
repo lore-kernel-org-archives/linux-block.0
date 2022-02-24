@@ -2,124 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE6DC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 01:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C194DC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 01:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbiBXBqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 20:46:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59280 "EHLO
+        id S229785AbiBXBvh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 20:51:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbiBXBqd (ORCPT
+        with ESMTP id S229782AbiBXBvg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 20:46:33 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EAC141FC2;
-        Wed, 23 Feb 2022 17:46:02 -0800 (PST)
-Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K3wDl2BGGzbbnh;
-        Thu, 24 Feb 2022 09:24:39 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 24 Feb 2022 09:29:10 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 24 Feb 2022 09:29:10 +0800
-Subject: Re: [PATCH RFC] blk-mq: fix potential uaf for 'queue_hw_ctx'
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220223112601.2902761-1-yukuai3@huawei.com>
- <YhZFITXtiL8Xaord@T590>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
-Date:   Thu, 24 Feb 2022 09:29:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 23 Feb 2022 20:51:36 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 749B7159293;
+        Wed, 23 Feb 2022 17:51:07 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id l19so563107pfu.2;
+        Wed, 23 Feb 2022 17:51:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=RhKhAkTTrkMeO2LTTiP23E3IDSrksBY5pBg7ODoVhdQ=;
+        b=GQqAtyFgniyh0PvnLWGmDOmG60ubr9j4MKOjIrQrxaDRQj37QD4Rtzaea0Ry3CEs3r
+         eClV5OXDOg8b3YM1sZt+Xu3676vAGdH773d6zFYm2ti4Nk3qP9pvfhMJTJGbXjVt0u5y
+         +UDrMgYKKXj/AVrQ5eT4k7bWrmyqQpXLDg9XGU5HpWnnlcnoBaVauB7qnbYJyQwhrRX/
+         vwLcnvnezSxcjxcGnybSjWlcBZXTBECm9/n90jNZYXdTPl+gLfw5hrlSgh3gq5NuloUp
+         m5r84yD9t9ic9Gop/RPGY3VbHLZZZgUzOxTs03xwU0+uYS749YyLt9MWSyZokA23JdRJ
+         CQzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=RhKhAkTTrkMeO2LTTiP23E3IDSrksBY5pBg7ODoVhdQ=;
+        b=ncFTVxMbaKZ+xPKjxEetx79Djmi3THfa9RD5yTceUveBH2pIgm7xqHQK54YvVLM+6z
+         aXxQsS5ud0aflcnBl4qpT1XDpJKInQ075ENavuoIqPupogBe6lN1iTPiMGn2FK3V9tx3
+         7CGgfYfDZcOZCwadhbHwEBIYVf2nqbk4kGHZyZQ/JggznNkOp9blBWc3rKlyYeTrJnnD
+         l6bSGZ+wsgVPX02eTZ+viXCNHTLtOq9v9Zh3VPZpUWc+b8unz8YodHlEwyKq5qk+wo7Y
+         A7iBPeSMfLiDy9+SYsZwuruykv6icLgVKLR+2iF2IZiBISdb1n1+/K3PNnygDPHuySe8
+         A5YA==
+X-Gm-Message-State: AOAM530TNScN2VsAHsKkZreL9XmYIGmH8AS/DN0iGe6afEnH4qt6URRs
+        V/S6nXtZt/zQ1hviNN4r8lsUaXTTiE0ufg==
+X-Google-Smtp-Source: ABdhPJx51vfxbOZNXNBHmmp/JoXM+3xQyq1uApYDSP0c1CdAZvWtpLWVREhwI0LPOaY9K1Fo15lt8w==
+X-Received: by 2002:a63:d64d:0:b0:374:6edc:989c with SMTP id d13-20020a63d64d000000b003746edc989cmr493333pgj.434.1645667466973;
+        Wed, 23 Feb 2022 17:51:06 -0800 (PST)
+Received: from [172.20.119.15] ([162.219.34.248])
+        by smtp.gmail.com with ESMTPSA id g1sm808146pfu.32.2022.02.23.17.51.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Feb 2022 17:51:06 -0800 (PST)
+Message-ID: <efd94670-9d6d-5651-358c-2f88646298cd@gmail.com>
+Date:   Thu, 24 Feb 2022 09:51:04 +0800
 MIME-Version: 1.0
-In-Reply-To: <YhZFITXtiL8Xaord@T590>
-Content-Type: text/plain; charset="gbk"; format=flowed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [RFC V4 1/6] blk: prepare to make blk-rq-qos pluggable and
+ modular
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
+ <20220217031349.98561-2-jianchao.wan9@gmail.com>
+ <YhUbCH+dhKkgMirE@slm.duckdns.org>
+ <2e17c058-8917-4a37-896e-1093446339f6@gmail.com>
+ <39db454d-ca30-fb42-3d72-899efa34fb78@gmail.com>
+ <YhapCurbiI21WYmm@slm.duckdns.org>
+From:   Wang Jianchao <jianchao.wan9@gmail.com>
+In-Reply-To: <YhapCurbiI21WYmm@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/02/23 22:30, Ming Lei Ð´µÀ:
-> On Wed, Feb 23, 2022 at 07:26:01PM +0800, Yu Kuai wrote:
->> blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
->> submit_queues through configfs for null_blk), while it might still be
->> used from other context(e.g. switch elevator to none):
->>
->> t1					t2
->> elevator_switch
->>   blk_mq_unquiesce_queue
->>    blk_mq_run_hw_queues
->>     queue_for_each_hw_ctx
->>      // assembly code for hctx = (q)->queue_hw_ctx[i]
->>      mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
->>
->> 					__blk_mq_update_nr_hw_queues
->> 					 blk_mq_realloc_hw_ctxs
->> 					  hctxs = q->queue_hw_ctx
->> 					  q->queue_hw_ctx = new_hctxs
->> 					  kfree(hctxs)
->>      movslq %ebx,%rax
->>      mov    (%rdx,%rax,8),%rdi ->uaf
->>
-> 
-> Not only uaf on queue_hw_ctx, but also other similar issue on other
-> structures, and I think the correct and easy fix is to quiesce request
-> queue during updating nr_hw_queues, something like the following patch:
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a05ce7725031..d8e7c3cce0dd 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4467,8 +4467,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->   	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
->   		return;
->   
-> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->   		blk_mq_freeze_queue(q);
-> +		blk_mq_quiesce_queue(q);
-> +	}
->   	/*
->   	 * Switch IO scheduler to 'none', cleaning up the data associated
->   	 * with the previous scheduler. We will switch back once we are done
-> @@ -4518,8 +4520,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->   	list_for_each_entry(q, &set->tag_list, tag_set_list)
->   		blk_mq_elv_switch_back(&head, q);
->   
-> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +		blk_mq_unquiesce_queue(q);
->   		blk_mq_unfreeze_queue(q);
-> +	}
->   }
->   
->   void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
-Hi, Ming
 
-If blk_mq_quiesce_queue() is called from __blk_mq_update_nr_hw_queues()
-first, and then swithing elevator to none won't trigger the problem. 
-However, what if blk_mq_unquiesce_queue() from switching elevator
-decrease quiesce_depth to 0 first, and then blk_mq_quiesce_queue() is
-called from __blk_mq_update_nr_hw_queues(), it seems to me such
-concurrent scenarios still exist.
 
-Thanks,
-Kuai
+On 2022/2/24 5:37 ä¸Šåˆ, Tejun Heo wrote:
+> Hello,
 > 
+>>> We just want to provide the flexibility for the user to open/close a policy
+>>> per device. If we need to the policy on a device, we needn't to waste cpu
+>> sorry, it should be "If we don't need the policy on a device" ;)
 > 
+> Yeah, that's what modularization does but why does it need a separate user
+> interface for loading? Everything else inits on insmod and exits on rmmod
+> and autoloading has been delegated to udev a very long time ago. The
+> interface you added for loading module doesn't make sense to me.
 > 
-> Thanks,
-> Ming
-> 
-> .
-> 
+
+The initial version of this patchset has two targetsï¼š
+(1) Add a sysfs interface to open/close the policy per device. Then we needn't
+    waste cpu cycles and memory if the device doesn't need the policy.
+(2) Make the policies modular, then it easy to maintain the code of policy in
+    production environment as we only need to close the policy and replace the
+    .ko file.
+
+The loading module when open policy in sysfs interface is just to avoid modprobe
+manually. There is similar operation when switch io scheduler.
+
+And as Christoph suggested, the modularization has been get rid of in next version.
+
+Thanks
+Jianchao
