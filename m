@@ -2,82 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7241C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 13:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB81C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 14:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232430AbiBXN7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Feb 2022 08:59:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33366 "EHLO
+        id S235266AbiBXOED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Feb 2022 09:04:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231722AbiBXN7m (ORCPT
+        with ESMTP id S235256AbiBXOED (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Feb 2022 08:59:42 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7291CF099
-        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 05:59:12 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id h15so2959553edv.7
-        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 05:59:12 -0800 (PST)
+        Thu, 24 Feb 2022 09:04:03 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CADE20D830
+        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 06:03:32 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d187so1928650pfa.10
+        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 06:03:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1b6ODtXjGkLhwW4cQUSwmSTk3bQuPqn7DzrMrcdDeK8=;
-        b=CRAK9G+FO11xtxUzAOTWRHzyamOAyNwpSDRVR38de4jqXZVuWMdpf2bboA74ZIWJk0
-         J+NR1+y+39QVtuZFDJ4159lZPMzuinksPFWoL+gpbctK6zuTiS7p3J9CqUy7UrModHG3
-         sO+snK1vEHa03yrl42W1a7OnpK861RuX80LN4FtENLRvLfgzSlNlaDsC1aKEsdB6rI2y
-         fH6m0k6C/GW3yx+jiVVH2bm7or7pBifCfupCq5xtRlUig0iZzzla1/qi1YIBhwtX8aLd
-         5T5fzzMDH0Q1HOJrNGXx2jMCsHZk9wrqQMcRgC6mf3IYuADVWJr6fRs67pkSOEOgAAaA
-         GQ2Q==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=sCiNyIsGOxqAa+8g0kd9PqEfF+2jVxczpLK8SIG1Tw4=;
+        b=vMJN5Hl2knWeVOSfwAjcnWQuH0oBr3rK7YpSbZYkcxyPIli93eNnFgorZMWm8NUK93
+         QoWx0qFY4JUtcjf7/+L1tor6C+LeEv0Srjbg2J7XMWkfPqrHaL6+Y6u/uLi4Glv1hG+W
+         x7Mn+1MiHbcSnKiog/r+nFdM8+fJNJAI825reF0kc4WVinQC3QUN6Jnh/FZvAeiyP7hS
+         nG7+YKFYQT8bQBm46v7NZmTi4jbANmO2jIP78GSuShM/jtbAfCTJdTcHBzmZ+DnarT07
+         JR5g9eSkvd7UigAlhpu3XQgjU6XjmuMcaOskihpRA//Bf/8tQK0vsmZusbrp+MUMuerU
+         uCzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1b6ODtXjGkLhwW4cQUSwmSTk3bQuPqn7DzrMrcdDeK8=;
-        b=rgwx+gIStISA0Ym9FveouJ0QJ+fW0C/ZTKm9p7F0fEmZe90B7EHChTn3pZi/LFCD09
-         N8n5M753yZI2q654GwVMeGJqejHyIarhnD+MSO8rH75Hc4jeBCP9AZFpMH2yqHU3jtP8
-         sA40x61C3tQjNst9dDgZTUH4ICI9aQj+Pju/guEmktJs0pl8Sklcm37hYGm49OFiPkZI
-         dEr+fxonrvxyTUU2d9MAxbNf4A+hunoR0WLRFUd2pFEH/+tD0rfHWLnyDaZCwo1mX8zW
-         TYb3kxs9RMLLcIe2azJBQhqnQH4nsrq1FvSmPXPZpH87LKN3wR7WAfMPq02ZWw1CmM+Y
-         +h3A==
-X-Gm-Message-State: AOAM531k3amUxjifwh6k3u6pC5zOBC6h+KtiQ4oLiGFKbKit4NviHPzm
-        BAigtZEoBzXHigpxv0PLt6vv4Wvg9khShIsVfACa
-X-Google-Smtp-Source: ABdhPJxUVIFwulhc3A3Y/zW/itJbFP/8KLqmDi95Xmj1eM4dAra67uc43c+5fKEcyYF9JRzjhCIWieOCwz/Y+q5sBKU=
-X-Received: by 2002:a05:6402:220a:b0:413:5d5e:4470 with SMTP id
- cq10-20020a056402220a00b004135d5e4470mr2022436edb.200.1645711151356; Thu, 24
- Feb 2022 05:59:11 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sCiNyIsGOxqAa+8g0kd9PqEfF+2jVxczpLK8SIG1Tw4=;
+        b=NV6YTaNZ9QrdzxSTBGwbtpBpEYI+ml4jcYwiT/LtjS4o1zGiGQU8rz8lrCROEZrYUn
+         TZD798hvezBEsC9CrLqmOT81LP5DW14Y6CuLVZZkN7/WLgqpRCJI7FJgCrZZWEVAXT/Q
+         4EIWmyqIFjYqNH/oCP28xubW3+FTcik/2aDsBFWxMLrc50rFmzpLyhWxQfz8N3OnodSO
+         HKiWV4jGtxDfHR4XlTZaNhWzXJDHDXvSUWagMrbz1YbSZe6aygy62JKxjNLrytZ3EVwM
+         AcZDRxkeaTuByRBYq2N2CeuGQZMdorFJK6FO7i0Sudd05uBDvXsDHVhW/w5scteGNtUO
+         1YvA==
+X-Gm-Message-State: AOAM5322+h0oM0mdffZjLeLx/6vhLXxl4NGr+VRt2fNbVd4TCh+H8PSq
+        NXd1raUAguiC7JxrYnZnHdCgdW8DBnnP/Q==
+X-Google-Smtp-Source: ABdhPJz+ePxqdtPzoVNNFzIfNBpXfbeumQrkwTlau6nf8NoJJjy7oossvc42Y2IijnEM7zJ8TD4xIw==
+X-Received: by 2002:a05:6a00:1a04:b0:4e1:294:e1e5 with SMTP id g4-20020a056a001a0400b004e10294e1e5mr2754361pfv.51.1645711411849;
+        Thu, 24 Feb 2022 06:03:31 -0800 (PST)
+Received: from [192.168.4.155] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id h4sm3931052pfv.166.2022.02.24.06.03.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Feb 2022 06:03:31 -0800 (PST)
+Message-ID: <60b3efbe-a4f2-71ac-dd3e-54643849df17@kernel.dk>
+Date:   Thu, 24 Feb 2022 07:03:30 -0700
 MIME-Version: 1.0
-References: <20220223133627.102-1-xieyongji@bytedance.com> <YheJUTK8BKCjEQYF@infradead.org>
-In-Reply-To: <YheJUTK8BKCjEQYF@infradead.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 24 Feb 2022 21:59:00 +0800
-Message-ID: <CACycT3u+p6sBE76fP2uZBmBKjiGV9i7N+WAO3c_-NmHnYVfxNw@mail.gmail.com>
-Subject: Re: [PATCH] virtio-blk: Check the max discard segment for discard request
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [GIT PULL] nvme fixes for Linux 5.17
+Content-Language: en-US
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <Yhc01AadzWuqPuAe@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Yhc01AadzWuqPuAe@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 9:34 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Wed, Feb 23, 2022 at 09:36:27PM +0800, Xie Yongji wrote:
-> > Currently we have a BUG_ON() to make sure the number of sg list
-> > does not exceed queue_max_segments() in virtio_queue_rq().
-> > However, the block layer uses queue_max_discard_segments()
-> > instead of queue_max_segments() to limit the sg list for
-> > discard requests. So the BUG_ON() might be triggered if
-> > virtio-blk device reports a larger value for max discard
-> > segment than queue_max_segments(). To fix it, this patch
-> > checks the max discard segment for the discard request
-> > in the BUG_ON() instead.
->
-> This looks god, but jut removing the BUG_ON might be even better.
+On 2/24/22 12:33 AM, Christoph Hellwig wrote:
+>   git://git.infradead.org/nvme.git tags/nvme-5.17-2022-02-24
 
-LGTM. If no objection, I will do it in v2.
+Pulled, thanks.
 
-Thanks,
-Yongji
+-- 
+Jens Axboe
+
