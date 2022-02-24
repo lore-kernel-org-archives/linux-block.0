@@ -2,102 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4731CC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 02:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6735C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 02:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbiBXCIY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 21:08:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59070 "EHLO
+        id S230025AbiBXCQq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 21:16:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229976AbiBXCIY (ORCPT
+        with ESMTP id S229985AbiBXCQp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 21:08:24 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0CAF2717C;
-        Wed, 23 Feb 2022 18:07:53 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id x18so582508pfh.5;
-        Wed, 23 Feb 2022 18:07:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Uv2rCp8QaBEfsJ8idQ0xOtWsAg2D33Aox4De34JFITE=;
-        b=OtkOvAsDXiiIQwb0IXhNwjFB7mIU3sS9AVWAo4/DD8sy3AA+0favut4okIKw3WJ0BJ
-         PUCLgD+3ZXT8J/qyxVdAa6G9CRxRnPtwePJ0847tAEZZ14Rccxk9KXnIyLdNNavtJA84
-         VvqQBKp7KwTj/kn3lzJ99zfV4oU7xWo3UbXpQ0ckRUAONzrQB1Wg997imPpXPWfBjiTz
-         LnMtn922TEplmI58N0QibruJTemqrt0TGKDHjXk3ChS7Ml0eUdu6gQWxjyzwPIoFysMT
-         RUiHFv9degsnc2bv9BZcQogR3ISza5XzslXJbI2nPericPZWLVy2AT7Xo+dD5E58EYzY
-         W0jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to;
-        bh=Uv2rCp8QaBEfsJ8idQ0xOtWsAg2D33Aox4De34JFITE=;
-        b=0qNuV5X7YW94n3Ip56pbFiRQspv6cUTe8IsaDZLX4cihzTwcKVlgcf7sgUuEli3u5D
-         J2AiRvONYpkWEieMChJmjSx8Ke4G/mn/xN1UqDlUrEdBinJSsxjxDs7Eg4RjkZaasawi
-         VSkwCHKDR+WkLqDYnaV22GcgL1GasWNIFXfGWbkxNPY33eZi2nZUWFle93h5GSgRycOu
-         jpdIOa5E8yPqgF8fvqWSKamzsr31tJ/pfruOSherPJGMo+uMSBQ7FLQYhtGSdEYeGAG0
-         Q1/x+TsdpZrmpD0GrzgizPZAX8jfOxYt+8dWzId+LYVUn5jH4acoyi+vj4eUOTvNJcuS
-         Tm8w==
-X-Gm-Message-State: AOAM533Kjkp9uHgq3xMdWD6GCJUa491a1DqyyBWTzm2S5f4tExwFcyKU
-        YdTH/WMwVF+KDMhko9E1Ek1TiYHQS30=
-X-Google-Smtp-Source: ABdhPJwrZY3mxQAdKkSY1wspnRMI4eDzN1kUtRk5ug102s6I5QhQGcHfMNHYYYiNiucdcwqyT/FZZQ==
-X-Received: by 2002:a63:1719:0:b0:373:9a4a:368d with SMTP id x25-20020a631719000000b003739a4a368dmr561321pgl.134.1645668473172;
-        Wed, 23 Feb 2022 18:07:53 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id m19sm800659pfk.215.2022.02.23.18.07.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 18:07:52 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 23 Feb 2022 16:07:51 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Wang Jianchao <jianchao.wan9@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC V4 1/6] blk: prepare to make blk-rq-qos pluggable and
- modular
-Message-ID: <Yhbod7pJ1X4CGhEZ@slm.duckdns.org>
-References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
- <20220217031349.98561-2-jianchao.wan9@gmail.com>
- <YhUbCH+dhKkgMirE@slm.duckdns.org>
- <2e17c058-8917-4a37-896e-1093446339f6@gmail.com>
- <39db454d-ca30-fb42-3d72-899efa34fb78@gmail.com>
- <YhapCurbiI21WYmm@slm.duckdns.org>
- <efd94670-9d6d-5651-358c-2f88646298cd@gmail.com>
+        Wed, 23 Feb 2022 21:16:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B088FBE8
+        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 18:16:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645668974;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ouhKFZWq4guS9Nb84H+5Q9CfdYqhj416J6D5cP6zMB8=;
+        b=X8myRfDSKSVYi1v8pm+xxEfpMh80XnHvKpZvafz+83eJ76rR2M1LKdRnlCunZifSj+KR1y
+        W/luilrCAk1uWirow2qiCAM/RjGZgLgDrjw0XPpn0A51KmHa56f/7xF9NqqYgxwshPGJrf
+        Ol1Q48E3twW123Jo0rsYDsPCkoyFZNg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-414-CPKAjdE4Pn2PnWSTSlnIsg-1; Wed, 23 Feb 2022 21:16:11 -0500
+X-MC-Unique: CPKAjdE4Pn2PnWSTSlnIsg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89AD91091DA0;
+        Thu, 24 Feb 2022 02:16:09 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F18E5DB80;
+        Thu, 24 Feb 2022 02:15:59 +0000 (UTC)
+Date:   Thu, 24 Feb 2022 10:15:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH RFC] blk-mq: fix potential uaf for 'queue_hw_ctx'
+Message-ID: <YhbqWqtwNueSffuR@T590>
+References: <20220223112601.2902761-1-yukuai3@huawei.com>
+ <YhZFITXtiL8Xaord@T590>
+ <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <efd94670-9d6d-5651-358c-2f88646298cd@gmail.com>
+In-Reply-To: <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Thu, Feb 24, 2022 at 09:51:04AM +0800, Wang Jianchao wrote:
-> The initial version of this patchset has two targets：
-> (1) Add a sysfs interface to open/close the policy per device. Then we needn't
->     waste cpu cycles and memory if the device doesn't need the policy.
-> (2) Make the policies modular, then it easy to maintain the code of policy in
->     production environment as we only need to close the policy and replace the
->     .ko file.
+On Thu, Feb 24, 2022 at 09:29:09AM +0800, yukuai (C) wrote:
+> 在 2022/02/23 22:30, Ming Lei 写道:
+> > On Wed, Feb 23, 2022 at 07:26:01PM +0800, Yu Kuai wrote:
+> > > blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
+> > > submit_queues through configfs for null_blk), while it might still be
+> > > used from other context(e.g. switch elevator to none):
+> > > 
+> > > t1					t2
+> > > elevator_switch
+> > >   blk_mq_unquiesce_queue
+> > >    blk_mq_run_hw_queues
+> > >     queue_for_each_hw_ctx
+> > >      // assembly code for hctx = (q)->queue_hw_ctx[i]
+> > >      mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
+> > > 
+> > > 					__blk_mq_update_nr_hw_queues
+> > > 					 blk_mq_realloc_hw_ctxs
+> > > 					  hctxs = q->queue_hw_ctx
+> > > 					  q->queue_hw_ctx = new_hctxs
+> > > 					  kfree(hctxs)
+> > >      movslq %ebx,%rax
+> > >      mov    (%rdx,%rax,8),%rdi ->uaf
+> > > 
+> > 
+> > Not only uaf on queue_hw_ctx, but also other similar issue on other
+> > structures, and I think the correct and easy fix is to quiesce request
+> > queue during updating nr_hw_queues, something like the following patch:
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index a05ce7725031..d8e7c3cce0dd 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -4467,8 +4467,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+> >   	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
+> >   		return;
+> > -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> > +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> >   		blk_mq_freeze_queue(q);
+> > +		blk_mq_quiesce_queue(q);
+> > +	}
+> >   	/*
+> >   	 * Switch IO scheduler to 'none', cleaning up the data associated
+> >   	 * with the previous scheduler. We will switch back once we are done
+> > @@ -4518,8 +4520,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+> >   	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> >   		blk_mq_elv_switch_back(&head, q);
+> > -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> > +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> > +		blk_mq_unquiesce_queue(q);
+> >   		blk_mq_unfreeze_queue(q);
+> > +	}
+> >   }
+> >   void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+> Hi, Ming
 > 
-> The loading module when open policy in sysfs interface is just to avoid modprobe
-> manually. There is similar operation when switch io scheduler.
+> If blk_mq_quiesce_queue() is called from __blk_mq_update_nr_hw_queues()
+> first, and then swithing elevator to none won't trigger the problem.
+> However, what if blk_mq_unquiesce_queue() from switching elevator
+> decrease quiesce_depth to 0 first, and then blk_mq_quiesce_queue() is
+> called from __blk_mq_update_nr_hw_queues(), it seems to me such
+> concurrent scenarios still exist.
 
-Each rq-qos mechanism already needs and has a way to turn off itself.
-There's no reason to add another layer on top. If the current way of
-disabling isn't efficient, we should improve that instead of adding a new
-layer of interface on top.
+No, the scenario won't exist, once blk_mq_quiesce_queue() returns, it is
+guaranteed that:
 
-And please don't add a custom interface to avoid modprobing. All it adds is
-unnecessary deviation. There's no benefit to echoing a selector to a custom
-sysfs file compared to explicitly modprobing it.
+- in-progress run queue is drained
+- no new run queue can be started
 
-Thanks.
+Thanks,
+Ming
 
--- 
-tejun
