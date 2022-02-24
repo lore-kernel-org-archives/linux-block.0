@@ -2,130 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6735C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 02:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C632C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 02:43:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230025AbiBXCQq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 21:16:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40226 "EHLO
+        id S230138AbiBXCny (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 21:43:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229985AbiBXCQp (ORCPT
+        with ESMTP id S230127AbiBXCnx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 21:16:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B088FBE8
-        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 18:16:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645668974;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ouhKFZWq4guS9Nb84H+5Q9CfdYqhj416J6D5cP6zMB8=;
-        b=X8myRfDSKSVYi1v8pm+xxEfpMh80XnHvKpZvafz+83eJ76rR2M1LKdRnlCunZifSj+KR1y
-        W/luilrCAk1uWirow2qiCAM/RjGZgLgDrjw0XPpn0A51KmHa56f/7xF9NqqYgxwshPGJrf
-        Ol1Q48E3twW123Jo0rsYDsPCkoyFZNg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-414-CPKAjdE4Pn2PnWSTSlnIsg-1; Wed, 23 Feb 2022 21:16:11 -0500
-X-MC-Unique: CPKAjdE4Pn2PnWSTSlnIsg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89AD91091DA0;
-        Thu, 24 Feb 2022 02:16:09 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F18E5DB80;
-        Thu, 24 Feb 2022 02:15:59 +0000 (UTC)
-Date:   Thu, 24 Feb 2022 10:15:54 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+        Wed, 23 Feb 2022 21:43:53 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BE223585C;
+        Wed, 23 Feb 2022 18:43:24 -0800 (PST)
+Received: from kwepemi500014.china.huawei.com (unknown [172.30.72.54])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4K3xtL4Xqjz1FD30;
+        Thu, 24 Feb 2022 10:38:50 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500014.china.huawei.com (7.221.188.232) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 24 Feb 2022 10:43:22 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 24 Feb 2022 10:43:21 +0800
 Subject: Re: [PATCH RFC] blk-mq: fix potential uaf for 'queue_hw_ctx'
-Message-ID: <YhbqWqtwNueSffuR@T590>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
 References: <20220223112601.2902761-1-yukuai3@huawei.com>
- <YhZFITXtiL8Xaord@T590>
- <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
+ <YhZFITXtiL8Xaord@T590> <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
+ <YhbqWqtwNueSffuR@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <430683f5-d271-b2f2-8f7c-486e2a4a7d42@huawei.com>
+Date:   Thu, 24 Feb 2022 10:43:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <YhbqWqtwNueSffuR@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 09:29:09AM +0800, yukuai (C) wrote:
-> 在 2022/02/23 22:30, Ming Lei 写道:
-> > On Wed, Feb 23, 2022 at 07:26:01PM +0800, Yu Kuai wrote:
-> > > blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
-> > > submit_queues through configfs for null_blk), while it might still be
-> > > used from other context(e.g. switch elevator to none):
-> > > 
-> > > t1					t2
-> > > elevator_switch
-> > >   blk_mq_unquiesce_queue
-> > >    blk_mq_run_hw_queues
-> > >     queue_for_each_hw_ctx
-> > >      // assembly code for hctx = (q)->queue_hw_ctx[i]
-> > >      mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
-> > > 
-> > > 					__blk_mq_update_nr_hw_queues
-> > > 					 blk_mq_realloc_hw_ctxs
-> > > 					  hctxs = q->queue_hw_ctx
-> > > 					  q->queue_hw_ctx = new_hctxs
-> > > 					  kfree(hctxs)
-> > >      movslq %ebx,%rax
-> > >      mov    (%rdx,%rax,8),%rdi ->uaf
-> > > 
-> > 
-> > Not only uaf on queue_hw_ctx, but also other similar issue on other
-> > structures, and I think the correct and easy fix is to quiesce request
-> > queue during updating nr_hw_queues, something like the following patch:
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index a05ce7725031..d8e7c3cce0dd 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -4467,8 +4467,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
-> >   	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
-> >   		return;
-> > -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> > +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> >   		blk_mq_freeze_queue(q);
-> > +		blk_mq_quiesce_queue(q);
-> > +	}
-> >   	/*
-> >   	 * Switch IO scheduler to 'none', cleaning up the data associated
-> >   	 * with the previous scheduler. We will switch back once we are done
-> > @@ -4518,8 +4520,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
-> >   	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> >   		blk_mq_elv_switch_back(&head, q);
-> > -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> > +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> > +		blk_mq_unquiesce_queue(q);
-> >   		blk_mq_unfreeze_queue(q);
-> > +	}
-> >   }
-> >   void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
-> Hi, Ming
+在 2022/02/24 10:15, Ming Lei 写道:
+>> Hi, Ming
+>>
+>> If blk_mq_quiesce_queue() is called from __blk_mq_update_nr_hw_queues()
+>> first, and then swithing elevator to none won't trigger the problem.
+>> However, what if blk_mq_unquiesce_queue() from switching elevator
+>> decrease quiesce_depth to 0 first, and then blk_mq_quiesce_queue() is
+>> called from __blk_mq_update_nr_hw_queues(), it seems to me such
+>> concurrent scenarios still exist.
 > 
-> If blk_mq_quiesce_queue() is called from __blk_mq_update_nr_hw_queues()
-> first, and then swithing elevator to none won't trigger the problem.
-> However, what if blk_mq_unquiesce_queue() from switching elevator
-> decrease quiesce_depth to 0 first, and then blk_mq_quiesce_queue() is
-> called from __blk_mq_update_nr_hw_queues(), it seems to me such
-> concurrent scenarios still exist.
+> No, the scenario won't exist, once blk_mq_quiesce_queue() returns, it is
+> guaranteed that:
+> 
+> - in-progress run queue is drained
+> - no new run queue can be started
 
-No, the scenario won't exist, once blk_mq_quiesce_queue() returns, it is
-guaranteed that:
+I understand that... What I mean about the concurrent scenario is that
+reading queue_hw_ctx in blk_mq_run_hw_queues(), not the actual run
+queue blk_mq_run_hw_queue():
 
-- in-progress run queue is drained
-- no new run queue can be started
+t1                              t2
+elevator_switch
+  blk_mq_quiesce_queue -> quiesce_depth = 1
+  blk_mq_unquiesce_queue-> quiesce_depth = 0
+   blk_mq_run_hw_queues
+                                  __blk_mq_update_nr_hw_queues
+                                   blk_mq_quiesce_queue
+    queue_for_each_hw_ctx
+    -> quiesce_queue can't prevent reading queue_hw_ctx
+     blk_mq_run_hw_queue
+     //need_run is always false, nothing to do
+
+Am I missing something about blk_mq_quiesce_queue ?
 
 Thanks,
-Ming
-
+Kuai
