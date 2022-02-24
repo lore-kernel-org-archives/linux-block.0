@@ -2,67 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 945DBC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 08:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475FDC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 08:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbiBXIOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Feb 2022 03:14:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42610 "EHLO
+        id S230419AbiBXIzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Feb 2022 03:55:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbiBXINd (ORCPT
+        with ESMTP id S232190AbiBXIzT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Feb 2022 03:13:33 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA33720E7B0
-        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 00:12:53 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id h17-20020a17090acf1100b001bc68ecce4aso5027278pju.4
-        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 00:12:53 -0800 (PST)
+        Thu, 24 Feb 2022 03:55:19 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD221164D2F
+        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 00:54:49 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id g1so1302853pfv.1
+        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 00:54:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id;
-        bh=2gUtwz2XT30takhrE4qNbeayWAmeKBPeOvMDrxWjT6s=;
-        b=LXUUwr0xVYGaadDo2aKDFNjGW0GECjcVdyowC5kkRakFgRVmDYiAdw2TKby660U0zN
-         oOBOoe4P1m/xysN3aVz13f+tXDWsZXyfIZYShixOWFBvkd5E9suGS1K7Z5wo5f2wsK/b
-         a5PA1HJx3peQxbassJPG3+SuI1cmvB7Db6A6m+y+QOzVq2KoM1+qzNOnndqiePwCY05W
-         ayX3jQqY1QdyaepxmBXjJ2ltQr2Z8Sl1lCASlFrqycOJ2JzyIZ0xqKxw2D6n9hvo5vaB
-         4yUOcIhmD1j9lQkQMdpDGdj4LqwFgd9zIveUbZVWUQOEurDyqn4e3lpcBkyH7n9HR8FH
-         zQ8Q==
+        bh=32DByH6vX/KFle8OsvMqwALHe3eUcgPRF7B5vKXTRIk=;
+        b=lY+Bd7Mqc2ONfTDXwfbUHKf9AyAiX4+yeOBOmqXxzxq2hw4/VGvmp8vdegSUPOh8h7
+         hxItUp3stMQ+uQtxQ4/rxY6wk6n5swKU5LD5zuhsei0raqhXVlvZBpsB3vwByohADs7X
+         319D9CdjGc+LDj3BUYXjC2d8TBdZ+927ua70WCBe5y2i8eEBkzZYZFLSM3WHix0VdDq4
+         ojhRqYS8Hd9fOEX++Ay227HFVZKoa+TDOVs3/CPo5EApCh1PIH/2nrhp9u30pVvJHnJP
+         gtNZRtA3i2TF93NoO+fWsyU+CxK457e2PZBB6Msh1t+AwbzQa0gj1gOmgpeHH/W5tRLa
+         CQIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=2gUtwz2XT30takhrE4qNbeayWAmeKBPeOvMDrxWjT6s=;
-        b=z4rmZLF9jZ1Edr0Q0GwHxsIuLYyyHwK/AgxT5/n6hUu7LAmwto7NH/b56qeaG5B7F3
-         Oq3lvFThtPm/QWDdj7TLELx9drxBrMtYwBdz/TBjWyPHARRI+M45EhdQGF5lCgk8H0kK
-         4l37DwifXp/JLxSXxobdtoLPoL8A7baCsWuhCVJ2nWJLhB1lKRezpZRXvJGNKQDQ7i1R
-         Ute/Uz5UHCm6qIpyS7/Zk8usNo/1T9W06ktTpMw/d355AeaXRMVbIqvvHExU96OqM8lD
-         PTumh8hmNe6seiGtWsia6skB5kMNBUnAWdJDADYntX4Xb9LmHqj91ko0o+AbjkbcwZyB
-         emcA==
-X-Gm-Message-State: AOAM531lI+IX2sbEzZSOlpii/T5cFbj4U/T3tXbc3OrO5P3AztLpjG/D
-        UkFeZ4kO5qj5Embvksk0LcE=
-X-Google-Smtp-Source: ABdhPJxrSaoAoshXMDaCmQ4CTIGC938qfQjUGYIuQDhC5d/78c6pjC4GaHCrRoLRY2zcobrqQlSSZQ==
-X-Received: by 2002:a17:902:aa8a:b0:14f:460d:bf2e with SMTP id d10-20020a170902aa8a00b0014f460dbf2emr1468720plr.144.1645690373182;
-        Thu, 24 Feb 2022 00:12:53 -0800 (PST)
-Received: from localhost.localdomain ([103.112.79.202])
-        by smtp.gmail.com with ESMTPSA id l2sm2337769pfc.183.2022.02.24.00.12.49
+        bh=32DByH6vX/KFle8OsvMqwALHe3eUcgPRF7B5vKXTRIk=;
+        b=gD5kMleDIol1MjO0+2avbg0R+7txRtfDJcnLSb0kw5s0qKmRlcYeg/z7JS82Mf83AN
+         aX7hqVzJQxBOSCAiuyufxlTFlsacSvMaBTAM5Dqcq+liB2iXGZnV5Bf79E4+cLpCRhRN
+         5WKmj7tdrkifnxUgK+MY1e9Z9PzEccll7Yn/7koDHsB3y2vBE3wnKu81tQt6G5Fl7svV
+         3/oPyWJCH2+UuG+FXCDokfofVqYe6N4Az39Q6Rmls/Ywkai5K84MmHEIJHdiuRk51che
+         4ra7I9Xb+igMHITsEC1Vz+vwF9zzhim8XLyjhpWJcIksAypmSUVAuHYE17RKXwci3h3N
+         h7Tg==
+X-Gm-Message-State: AOAM530zLvm+V5fx+SvRC8Wl/eONQoSHadwQoZUXoR8FYgJHQtv90BO/
+        37s39cVDBh1b4uZBfsXyQ7c=
+X-Google-Smtp-Source: ABdhPJx0Tjbh+2Cb+302RKiqZY3oHYqDGBel8NtW/RVa8dG+FeLk2GSyTxw57l8Xvh3bvczzNt3K9Q==
+X-Received: by 2002:a05:6a00:88e:b0:4d2:4829:156c with SMTP id q14-20020a056a00088e00b004d24829156cmr1804682pfj.47.1645692889277;
+        Thu, 24 Feb 2022 00:54:49 -0800 (PST)
+Received: from localhost.localdomain ([162.219.34.248])
+        by smtp.gmail.com with ESMTPSA id q13sm2799300pfl.210.2022.02.24.00.54.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Feb 2022 00:12:52 -0800 (PST)
+        Thu, 24 Feb 2022 00:54:48 -0800 (PST)
 From:   "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
 To:     osandov@osandov.com
-Cc:     chaitanyak@nvidia.com, linux-block@vger.kernel.org
-Subject: [RFC V3 blktests] block/032: add test case for open and close rqos policy w/ io
-Date:   Thu, 24 Feb 2022 16:11:38 +0800
-Message-Id: <20220224081138.53098-1-jianchao.wan9@gmail.com>
+Cc:     linux-block@vger.kernel.org
+Subject: [RFC RESEND V3 blktests] block/032: add test case for open and close rqos policy w/ io
+Date:   Thu, 24 Feb 2022 16:53:40 +0800
+Message-Id: <20220224085340.53854-1-jianchao.wan9@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: root <root@localhost.localdomain>
-
 This test case is to test switching rqos policy w/ io running.
 The fio is running under cgroup with blkio controller opened.
 
-Signed-off-by: root <root@localhost.localdomain>
+Signed-off-by: Wang Jianchao (Kuaishou) <jianchao.wan9@gmail.com>
 ---
  tests/block/032     | 86 +++++++++++++++++++++++++++++++++++++++++++++
  tests/block/032.out |  2 ++
