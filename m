@@ -2,108 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 542D7C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 02:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6913C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 07:25:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbiBXCu4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 21:50:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+        id S231407AbiBXHZ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Feb 2022 02:25:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbiBXCuz (ORCPT
+        with ESMTP id S230128AbiBXHZ5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 21:50:55 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62945237437;
-        Wed, 23 Feb 2022 18:50:26 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id v4so772073pjh.2;
-        Wed, 23 Feb 2022 18:50:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=0pXW77xbSqoqd07SPOdMy6+frewnUErjG3BJoCU9xDQ=;
-        b=BLl5H9NX6YUNRD93h7c/vngLNJjudh/21VVtQn4DmFm4iDSShGw+uLt07zvfShhW07
-         dBYZBERO7cmVboh9TwHp4FnA0CzWX/LLjG/N9A4qmDJc5UgIOmuW9HBCw4Jqf0OUHbsN
-         ju92gxmIxzoNxkGEBgCoHLq0olkXCLU1qmV91MD/PB7gdQlmtmr8FSSTFasK5a17Dibc
-         jiOodnBm1xqhGEo+nLPFpXvTQlQH7f2ma5h9pNIJdcUVegGGpIjCsFujiF88i4MZXsyJ
-         CHvy3p+RAGAQvwJKOxFy+hPumyv6LsvMokjYvbhpB0iuqqvs9VOli87W8AT8tO1xriAE
-         EXLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0pXW77xbSqoqd07SPOdMy6+frewnUErjG3BJoCU9xDQ=;
-        b=A7gx/tmD8EZ+KsSnFgwjsbzZRrt3IMALyhPROB22cfqeS6r61OaKl7lm51pU80KYpY
-         GAG4BXOCH4gSQjbtA/taZ0WPmHmQiXkwZdkHS8qp3CIo0mVJmmXklXDps/NIGWJEmfdk
-         /bOC4jRN1bRE71Ii6xkcrKQV3pQWQplowyK+aZM6ji3hv1pWmM0WS6DEsYv9wmcQpzJR
-         4Sw35iwpZsiM9sIThaLox7Wf39m0JcLB+KJxtZV3q5BsMNKH7GTSDVMDKBlgk5PUHKEf
-         hHuL0h4YxyeZEoQVgNiaTRxX2wISoylbfczlYOBRq7f/bCEK2VxilJY1aftDbx2hKJvC
-         P7eA==
-X-Gm-Message-State: AOAM5334HNE+ouKYRUtGi0jue34lTE82T3qWFs6SRU0ZXwFRny3rYITi
-        gnt8TtIyYq4wvTjeCqhP3s4=
-X-Google-Smtp-Source: ABdhPJz24dHKQmcXqS7azyJDfNBw3zXK87BYAbvO4kajEuZofKqEzzgChDHeA43qUG4bxXTECXNDiA==
-X-Received: by 2002:a17:90a:fb84:b0:1bc:4d16:51fb with SMTP id cp4-20020a17090afb8400b001bc4d1651fbmr12561044pjb.22.1645671025820;
-        Wed, 23 Feb 2022 18:50:25 -0800 (PST)
-Received: from [172.20.119.15] ([61.16.102.69])
-        by smtp.gmail.com with ESMTPSA id 84sm906752pfx.181.2022.02.23.18.50.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Feb 2022 18:50:25 -0800 (PST)
-Message-ID: <7489a7f8-2589-29de-1c95-b99d1d9b1850@gmail.com>
-Date:   Thu, 24 Feb 2022 10:50:22 +0800
+        Thu, 24 Feb 2022 02:25:57 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383C023401C;
+        Wed, 23 Feb 2022 23:25:28 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id A19D468AA6; Thu, 24 Feb 2022 08:25:24 +0100 (CET)
+Date:   Thu, 24 Feb 2022 08:25:24 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 10/12] block: move blk_exit_queue into disk_release
+Message-ID: <20220224072524.GA21228@lst.de>
+References: <20220222141450.591193-1-hch@lst.de> <20220222141450.591193-11-hch@lst.de> <4b9a4121-7f37-9bd3-036a-51892a456eef@acm.org> <YhXapc7fuhb8mlwW@T590> <d2cbbf56-6984-fc54-9eb4-2142a69c379a@acm.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [RFC V4 1/6] blk: prepare to make blk-rq-qos pluggable and
- modular
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
- <20220217031349.98561-2-jianchao.wan9@gmail.com>
- <YhUbCH+dhKkgMirE@slm.duckdns.org>
- <2e17c058-8917-4a37-896e-1093446339f6@gmail.com>
- <39db454d-ca30-fb42-3d72-899efa34fb78@gmail.com>
- <YhapCurbiI21WYmm@slm.duckdns.org>
- <efd94670-9d6d-5651-358c-2f88646298cd@gmail.com>
- <Yhbod7pJ1X4CGhEZ@slm.duckdns.org>
-From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <Yhbod7pJ1X4CGhEZ@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2cbbf56-6984-fc54-9eb4-2142a69c379a@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Feb 23, 2022 at 12:04:03PM -0800, Bart Van Assche wrote:
+> On 2/22/22 22:56, Ming Lei wrote:
+>> But I admit here the name of blk_mq_release_queue() is very misleading,
+>> maybe blk_mq_release_io_queue() is better?
+>
+> I'm not sure what the best name for that function would be. Anyway, thanks 
+> for having clarified that disk structures are removed before the request 
+> queue is cleaned up. That's something I was missing.
 
-
-On 2022/2/24 10:07 上午, Tejun Heo wrote:
-> Hello,
-> 
-> On Thu, Feb 24, 2022 at 09:51:04AM +0800, Wang Jianchao wrote:
->> The initial version of this patchset has two targets：
->> (1) Add a sysfs interface to open/close the policy per device. Then we needn't
->>     waste cpu cycles and memory if the device doesn't need the policy.
->> (2) Make the policies modular, then it easy to maintain the code of policy in
->>     production environment as we only need to close the policy and replace the
->>     .ko file.
->>
->> The loading module when open policy in sysfs interface is just to avoid modprobe
->> manually. There is similar operation when switch io scheduler.
-> 
-> Each rq-qos mechanism already needs and has a way to turn off itself.
-> There's no reason to add another layer on top. If the current way of
-> disabling isn't efficient, we should improve that instead of adding a new
-> layer of interface on top.
-
-Yes, right now, every policy has their own way to turn off, but we always need to
-iterate the rqos list and enter into the policy's callback to check it. And every
-blkio cgroup needs to allocate memory for it even we don't use it.
-
-I don't this patchset is adding a new layer, but blk-rq-qos layer has been already
-there , we just add a unified interface to open/close the policies.
-
-Thanks
-Jianchao
+Maybe disk_release_mq?
