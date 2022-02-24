@@ -2,196 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 280CDC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 01:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE6DC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 01:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229676AbiBXBlt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Feb 2022 20:41:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42312 "EHLO
+        id S229743AbiBXBqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Feb 2022 20:46:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbiBXBls (ORCPT
+        with ESMTP id S229739AbiBXBqd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Feb 2022 20:41:48 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B4FB840E74
-        for <linux-block@vger.kernel.org>; Wed, 23 Feb 2022 17:41:17 -0800 (PST)
-Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-        by 156.147.23.53 with ESMTP; 24 Feb 2022 10:11:15 +0900
-X-Original-SENDERIP: 156.147.1.125
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.125 with ESMTP; 24 Feb 2022 10:11:15 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Thu, 24 Feb 2022 10:11:02 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.com, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-Message-ID: <20220224011102.GA29726@X58A-UD3R>
-References: <1645095472-26530-1-git-send-email-byungchul.park@lge.com>
- <1645096204-31670-1-git-send-email-byungchul.park@lge.com>
- <1645096204-31670-2-git-send-email-byungchul.park@lge.com>
- <20220221190204.q675gtsb6qhylywa@quack3.lan>
- <20220223003534.GA26277@X58A-UD3R>
- <20220223144859.na2gjgl5efgw5zhn@quack3.lan>
+        Wed, 23 Feb 2022 20:46:33 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EAC141FC2;
+        Wed, 23 Feb 2022 17:46:02 -0800 (PST)
+Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K3wDl2BGGzbbnh;
+        Thu, 24 Feb 2022 09:24:39 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 24 Feb 2022 09:29:10 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 24 Feb 2022 09:29:10 +0800
+Subject: Re: [PATCH RFC] blk-mq: fix potential uaf for 'queue_hw_ctx'
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220223112601.2902761-1-yukuai3@huawei.com>
+ <YhZFITXtiL8Xaord@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <df32802a-7dfb-3e80-359a-206c2be6ebe5@huawei.com>
+Date:   Thu, 24 Feb 2022 09:29:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220223144859.na2gjgl5efgw5zhn@quack3.lan>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <YhZFITXtiL8Xaord@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 03:48:59PM +0100, Jan Kara wrote:
-> On Wed 23-02-22 09:35:34, Byungchul Park wrote:
-> > On Mon, Feb 21, 2022 at 08:02:04PM +0100, Jan Kara wrote:
-> > > On Thu 17-02-22 20:10:04, Byungchul Park wrote:
-> > > > [    9.008161] ===================================================
-> > > > [    9.008163] DEPT: Circular dependency has been detected.
-> > > > [    9.008164] 5.17.0-rc1-00015-gb94f67143867-dirty #2 Tainted: G        W
-> > > > [    9.008166] ---------------------------------------------------
-> > > > [    9.008167] summary
-> > > > [    9.008167] ---------------------------------------------------
-> > > > [    9.008168] *** DEADLOCK ***
-> > > > [    9.008168]
-> > > > [    9.008168] context A
-> > > > [    9.008169]     [S] (unknown)(&(&journal->j_wait_transaction_locked)->dmap:0)
-> > > > [    9.008171]     [W] wait(&(&journal->j_wait_commit)->dmap:0)
-> > > > [    9.008172]     [E] event(&(&journal->j_wait_transaction_locked)->dmap:0)
-> > > > [    9.008173]
-> > > > [    9.008173] context B
-> > > > [    9.008174]     [S] down_write(mapping.invalidate_lock:0)
-> > > > [    9.008175]     [W] wait(&(&journal->j_wait_transaction_locked)->dmap:0)
-> > > > [    9.008176]     [E] up_write(mapping.invalidate_lock:0)
-> > > > [    9.008177]
-> > > > [    9.008178] context C
-> > > > [    9.008179]     [S] (unknown)(&(&journal->j_wait_commit)->dmap:0)
-> > > > [    9.008180]     [W] down_write(mapping.invalidate_lock:0)
-> > > > [    9.008181]     [E] event(&(&journal->j_wait_commit)->dmap:0)
-> > > > [    9.008181]
-> > > > [    9.008182] [S]: start of the event context
-> > > > [    9.008183] [W]: the wait blocked
-> > > > [    9.008183] [E]: the event not reachable
-> > > 
-> > > So what situation is your tool complaining about here? Can you perhaps show
-> > > it here in more common visualization like:
-> > 
-> > Sure.
-> > 
-> > > TASK1				TASK2
-> > > 				does foo, grabs Z
-> > > does X, grabs lock Y
-> > > blocks on Z
-> > > 				blocks on Y
-> > > 
-> > > or something like that? Because I was not able to decipher this from the
-> > > report even after trying for some time...
-> > 
-> > KJOURNALD2(kthread)	TASK1(ksys_write)	TASK2(ksys_write)
-> > 
-> > wait A
-> > --- stuck
-> > 			wait B
-> > 			--- stuck
-> > 						wait C
-> > 						--- stuck
-> > 
-> > wake up B		wake up C		wake up A
-> > 
-> > where:
-> > A is a wait_queue, j_wait_commit
-> > B is a wait_queue, j_wait_transaction_locked
-> > C is a rwsem, mapping.invalidate_lock
+ÔÚ 2022/02/23 22:30, Ming Lei Ð´µÀ:
+> On Wed, Feb 23, 2022 at 07:26:01PM +0800, Yu Kuai wrote:
+>> blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
+>> submit_queues through configfs for null_blk), while it might still be
+>> used from other context(e.g. switch elevator to none):
+>>
+>> t1					t2
+>> elevator_switch
+>>   blk_mq_unquiesce_queue
+>>    blk_mq_run_hw_queues
+>>     queue_for_each_hw_ctx
+>>      // assembly code for hctx = (q)->queue_hw_ctx[i]
+>>      mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
+>>
+>> 					__blk_mq_update_nr_hw_queues
+>> 					 blk_mq_realloc_hw_ctxs
+>> 					  hctxs = q->queue_hw_ctx
+>> 					  q->queue_hw_ctx = new_hctxs
+>> 					  kfree(hctxs)
+>>      movslq %ebx,%rax
+>>      mov    (%rdx,%rax,8),%rdi ->uaf
+>>
 > 
-> I see. But a situation like this is not necessarily a guarantee of a
-> deadlock, is it? I mean there can be task D that will eventually call say
-> 'wake up B' and unblock everything and this is how things were designed to
-> work? Multiple sources of wakeups are quite common I'd say... What does
-
-Yes. At the very beginning when I desgined Dept, I was thinking whether
-to support multiple wakeup sources or not for a quite long time.
-Supporting it would be a better option to aovid non-critical reports.
-However, I thought anyway we'd better fix it - not urgent tho - if
-there's any single circle dependency. That's why I decided not to
-support it for now and wanted to gather the kernel guys' opinions. Thing
-is which policy we should go with.
-
-> Dept do to prevent false reports in cases like this?
+> Not only uaf on queue_hw_ctx, but also other similar issue on other
+> structures, and I think the correct and easy fix is to quiesce request
+> queue during updating nr_hw_queues, something like the following patch:
 > 
-> > The above is the simplest form. And it's worth noting that Dept focuses
-> > on wait and event itself rather than grabing and releasing things like
-> > lock. The following is the more descriptive form of it.
-> > 
-> > KJOURNALD2(kthread)	TASK1(ksys_write)	TASK2(ksys_write)
-> > 
-> > wait @j_wait_commit
-> > 			ext4_truncate_failed_write()
-> > 			   down_write(mapping.invalidate_lock)
-> > 
-> > 			   ext4_truncate()
-> > 			      ...
-> > 			      wait @j_wait_transaction_locked
-> > 
-> > 						ext_truncate_failed_write()
-> > 						   down_write(mapping.invalidate_lock)
-> > 
-> > 						ext4_should_retry_alloc()
-> > 						   ...
-> > 						   __jbd2_log_start_commit()
-> > 						      wake_up(j_wait_commit)
-> > jbd2_journal_commit_transaction()
-> >    wake_up(j_wait_transaction_locked)
-> > 			   up_write(mapping.invalidate_lock)
-> > 
-> > I hope this would help you understand the report.
-> 
-> I see, thanks for explanation! So the above scenario is impossible because
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index a05ce7725031..d8e7c3cce0dd 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -4467,8 +4467,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   	if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
+>   		return;
+>   
+> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>   		blk_mq_freeze_queue(q);
+> +		blk_mq_quiesce_queue(q);
+> +	}
+>   	/*
+>   	 * Switch IO scheduler to 'none', cleaning up the data associated
+>   	 * with the previous scheduler. We will switch back once we are done
+> @@ -4518,8 +4520,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   	list_for_each_entry(q, &set->tag_list, tag_set_list)
+>   		blk_mq_elv_switch_back(&head, q);
+>   
+> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> +		blk_mq_unquiesce_queue(q);
+>   		blk_mq_unfreeze_queue(q);
+> +	}
+>   }
+>   
+>   void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+Hi, Ming
 
-My pleasure.
-
-> for anyone to block on @j_wait_transaction_locked the transaction must be
-> committing, which is done only by kjournald2 kthread and so that thread
-> cannot be waiting at @j_wait_commit. Essentially blocking on
-> @j_wait_transaction_locked means @j_wait_commit wakeup was already done.
-
-kjournal2 repeatedly does the wait and the wake_up so the above scenario
-looks possible to me even based on what you explained. Maybe I should
-understand how the journal things work more for furhter discussion. Your
-explanation is so helpful. Thank you really.
+If blk_mq_quiesce_queue() is called from __blk_mq_update_nr_hw_queues()
+first, and then swithing elevator to none won't trigger the problem. 
+However, what if blk_mq_unquiesce_queue() from switching elevator
+decrease quiesce_depth to 0 first, and then blk_mq_quiesce_queue() is
+called from __blk_mq_update_nr_hw_queues(), it seems to me such
+concurrent scenarios still exist.
 
 Thanks,
-Byungchul
-
-> I guess this shows there can be non-trivial dependencies between wait
-> queues which are difficult to track in an automated way and without such
-> tracking we are going to see false positives...
+Kuai
 > 
-> 								Honza
 > 
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
