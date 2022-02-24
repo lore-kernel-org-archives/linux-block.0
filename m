@@ -2,59 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57105C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 13:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D83C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Feb 2022 13:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232992AbiBXNeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Feb 2022 08:34:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50818 "EHLO
+        id S235085AbiBXNhj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Feb 2022 08:37:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234879AbiBXNen (ORCPT
+        with ESMTP id S230178AbiBXNhj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Feb 2022 08:34:43 -0500
+        Thu, 24 Feb 2022 08:37:39 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E8B16DAF7
-        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 05:34:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8083CBA75E;
+        Thu, 24 Feb 2022 05:37:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FsO7bPKCV3C+M1TmyA8utq7bBJP2VWHvNICABqAl79U=; b=S7udAxLeP/5cwJAjGJh4uUL0Ry
-        CcU+7HikmsczEpk++c4m8HqRS7wR08qeINQ8FJKz5mYPcL3oDMMTxGpc/vWlAjmKFWKTMz9N0SKmM
-        BH8o4jn9w2gVBHn6lhKn7G7FOEWzDVkHbEFsMcUAU34NGYHXAGOu/cz7GEQmX09DadRgetvKqrOLH
-        5H90zoraVUu6qPB1t+GTb+DPbVqF2yNoO5FGPpq9JWWdADWYa+BOxup3gZM44oC6ONha6VVhYBkx+
-        ytuwHUnchJeSegXZo26fF3rxI5NQ/veEON4lUWRGmdNfdc3aKUe4gRZpyozB26wPVD2G9IQOZHa6Q
-        o3NVLx+w==;
+        bh=7aqAN+NnpSZwwrMPtcPE7dlz5yuJbDqnRPGeamokN7A=; b=iaKEbDa0RehVT2n/UtmhsOiWkM
+        RLzlnEiXS7WJuTIGDJgFWZzjcUn5UhP+Y7HpnumyVomHkDenClOrwkCLnmCB/0za8ed1ephspviwo
+        F0sm1YJAx6QUVndteHidVIzcOIFT0x4izXs8aPmrYy5yC+OATcvTRYVM0Kn8OhXH/JShcRRWPELxi
+        tGL+VHKekgHK+4KH+0Uq+SVfcPoKo7LJkYRAkBqzLNUiMiTOM44D2A1OVs2ZU6s4CT8WGiVFe0MEA
+        SDC/WKkiUfgEn0vCScjy16Agf15nVb5MPRbltFGc43UkIn13H3HinSwXXzVrXTjMZ4wzp2yEDwatT
+        F8FN1NJg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nNEG1-000x30-BW; Thu, 24 Feb 2022 13:34:09 +0000
-Date:   Thu, 24 Feb 2022 05:34:09 -0800
+        id 1nNEIp-000xaN-O3; Thu, 24 Feb 2022 13:37:03 +0000
+Date:   Thu, 24 Feb 2022 05:37:03 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] virtio-blk: Check the max discard segment for discard
- request
-Message-ID: <YheJUTK8BKCjEQYF@infradead.org>
-References: <20220223133627.102-1-xieyongji@bytedance.com>
+To:     "Wang Jianchao (Kuaishou)" <jianchao.wan9@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        Tejun Heo <tj@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC V5 0/16] blk: blk-rq-qos framework refactor and cleanup
+Message-ID: <YheJ/8W3LM0U23gl@infradead.org>
+References: <20220224090654.54671-1-jianchao.wan9@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220223133627.102-1-xieyongji@bytedance.com>
+In-Reply-To: <20220224090654.54671-1-jianchao.wan9@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 09:36:27PM +0800, Xie Yongji wrote:
-> Currently we have a BUG_ON() to make sure the number of sg list
-> does not exceed queue_max_segments() in virtio_queue_rq().
-> However, the block layer uses queue_max_discard_segments()
-> instead of queue_max_segments() to limit the sg list for
-> discard requests. So the BUG_ON() might be triggered if
-> virtio-blk device reports a larger value for max discard
-> segment than queue_max_segments(). To fix it, this patch
-> checks the max discard segment for the discard request
-> in the BUG_ON() instead.
+On Thu, Feb 24, 2022 at 05:06:38PM +0800, Wang Jianchao (Kuaishou) wrote:
+> Hi Jens
+> 
+> This patchset is working on our v4.18 kernel to provide the capacity
+> for upgrade blk-rq-qos policies on the fly w/o needing to restart
+> machine and applications.
 
-This looks god, but jut removing the BUG_ON might be even better.
+Why would you upgrade kernel code at runtime?  And how is what you do
+on some randm old kernel relevant for mainline?
