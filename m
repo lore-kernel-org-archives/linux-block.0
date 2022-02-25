@@ -2,183 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFF9C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 07:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FB3C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 07:54:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232840AbiBYHSh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Feb 2022 02:18:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47562 "EHLO
+        id S238304AbiBYHyf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 02:54:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232495AbiBYHSg (ORCPT
+        with ESMTP id S238310AbiBYHyd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Feb 2022 02:18:36 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204B0239D5F;
-        Thu, 24 Feb 2022 23:18:04 -0800 (PST)
-Received: from kwepemi100026.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K4h0c6kkHzdZgJ;
-        Fri, 25 Feb 2022 15:16:48 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100026.china.huawei.com (7.221.188.60) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.18; Fri, 25 Feb 2022 15:18:01 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 25 Feb 2022 15:18:01 +0800
-Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
-To:     <ming.lei@redhat.com>, <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220210115637.1074927-1-yukuai3@huawei.com>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <c000951a-b304-4663-4752-4a2cf8a4cbbb@huawei.com>
-Date:   Fri, 25 Feb 2022 15:18:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 25 Feb 2022 02:54:33 -0500
+X-Greylist: delayed 499 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 24 Feb 2022 23:54:02 PST
+Received: from mail.powerangels.com.pl (mail.powerangels.com.pl [45.86.209.159])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC6A1B4004
+        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 23:54:02 -0800 (PST)
+Received: by mail.powerangels.com.pl (Postfix, from userid 1001)
+        id 0855B82B82; Fri, 25 Feb 2022 02:45:27 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=powerangels.com.pl;
+        s=mail; t=1645775143;
+        bh=07NAgW1e0WiNB9zqagiM2BnwZfWBCpNa2E4+ccxBPgw=;
+        h=Date:From:To:Subject:From;
+        b=ALF6qSudrDptxDYJ8PKzvMuL1D3uPxPpIXtsr7rS7QvD/AQ/ARbEjnXCB47W+MJ3u
+         LPsqNeqdCq23DYzJfQ4AT0tzDM5oT9htkWlV52XhB8E4rn6OHFA/hbGCn7LQ3rdnPW
+         bcsobd9XCIMu3Blhf8pCEC2WKKEtfhC94lq+CCCQNwAvBtNMQoZFm2kKtodY8XBb8P
+         t8FDGXMYfoUeJXfQ0fC4IZZNDrBdH6+xl2fyqPsWPWM7NjcJEWWlcN77AAY6UnHOWz
+         Mo7fuv/5igCnbL6rcDMrWEOB3C0vnh5iRjvVT/S7YZkxW1Da14WOEVsuvgRmr5dk7C
+         6638cOgvLcjPg==
+Received: by mail.powerangels.com.pl for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 07:45:21 GMT
+Message-ID: <20220225024500-0.1.j.209b.0.k9cecqm0av@powerangels.com.pl>
+Date:   Fri, 25 Feb 2022 07:45:21 GMT
+From:   "Jakub Daroch" <jakub.daroch@powerangels.com.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Wycena paneli fotowoltaicznych
+X-Mailer: mail.powerangels.com.pl
 MIME-Version: 1.0
-In-Reply-To: <20220210115637.1074927-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping ...
+Dzie=C5=84 dobry,
 
-ÔÚ 2022/02/10 19:56, Yu Kuai Ð´µÀ:
-> Throttled bios can't be issued after del_gendisk() is done, thus
-> it's better to cancel them immediately rather than waiting for
-> throttle is done.
-> 
-> For example, if user thread is throttled with low bps while it's
-> issuing large io, and the device is deleted. The user thread will
-> wait for a long time for io to return.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
-> Changes in v9:
->   - some minor changes as suggested by Ming.
-> Changes in v8:
->   - fold two patches into one
-> Changes in v7:
->   - use the new solution as suggested by Ming.
-> 
->   block/blk-throttle.c | 44 +++++++++++++++++++++++++++++++++++++++++---
->   block/blk-throttle.h |  2 ++
->   block/genhd.c        |  2 ++
->   3 files changed, 45 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 7c462c006b26..ca92e5fa2769 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -43,8 +43,12 @@
->   static struct workqueue_struct *kthrotld_workqueue;
->   
->   enum tg_state_flags {
-> -	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
-> -	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
-> +	/* on parent's pending tree */
-> +	THROTL_TG_PENDING	= 1 << 0,
-> +	/* bio_lists[] became non-empty */
-> +	THROTL_TG_WAS_EMPTY	= 1 << 1,
-> +	/* starts to cancel all bios, will be set if the disk is deleted */
-> +	THROTL_TG_CANCELING	= 1 << 2,
->   };
->   
->   #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
-> @@ -871,7 +875,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
->   	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
->   
->   	/* If tg->bps = -1, then BW is unlimited */
-> -	if (bps_limit == U64_MAX && iops_limit == UINT_MAX) {
-> +	if ((bps_limit == U64_MAX && iops_limit == UINT_MAX) ||
-> +	    tg->flags & THROTL_TG_CANCELING) {
->   		if (wait)
->   			*wait = 0;
->   		return true;
-> @@ -1763,6 +1768,39 @@ static bool throtl_hierarchy_can_upgrade(struct throtl_grp *tg)
->   	return false;
->   }
->   
-> +void blk_throtl_cancel_bios(struct request_queue *q)
-> +{
-> +	struct cgroup_subsys_state *pos_css;
-> +	struct blkcg_gq *blkg;
-> +
-> +	spin_lock_irq(&q->queue_lock);
-> +	/*
-> +	 * queue_lock is held, rcu lock is not needed here technically.
-> +	 * However, rcu lock is still held to emphasize that following
-> +	 * path need RCU protection and to prevent warning from lockdep.
-> +	 */
-> +	rcu_read_lock();
-> +	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
-> +		struct throtl_grp *tg = blkg_to_tg(blkg);
-> +		struct throtl_service_queue *sq = &tg->service_queue;
-> +
-> +		/*
-> +		 * Set the flag to make sure throtl_pending_timer_fn() won't
-> +		 * stop until all throttled bios are dispatched.
-> +		 */
-> +		blkg_to_tg(blkg)->flags |= THROTL_TG_CANCELING;
-> +		/*
-> +		 * Update disptime after setting the above flag to make sure
-> +		 * throtl_select_dispatch() won't exit without dispatching.
-> +		 */
-> +		tg_update_disptime(tg);
-> +
-> +		throtl_schedule_pending_timer(sq, jiffies + 1);
-> +	}
-> +	rcu_read_unlock();
-> +	spin_unlock_irq(&q->queue_lock);
-> +}
-> +
->   static bool throtl_can_upgrade(struct throtl_data *td,
->   	struct throtl_grp *this_tg)
->   {
-> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-> index 175f03abd9e4..2ae467ac17ea 100644
-> --- a/block/blk-throttle.h
-> +++ b/block/blk-throttle.h
-> @@ -160,12 +160,14 @@ static inline void blk_throtl_exit(struct request_queue *q) { }
->   static inline void blk_throtl_register_queue(struct request_queue *q) { }
->   static inline void blk_throtl_charge_bio_split(struct bio *bio) { }
->   static inline bool blk_throtl_bio(struct bio *bio) { return false; }
-> +static inline void blk_throtl_cancel_bios(struct request_queue *q) { }
->   #else /* CONFIG_BLK_DEV_THROTTLING */
->   int blk_throtl_init(struct request_queue *q);
->   void blk_throtl_exit(struct request_queue *q);
->   void blk_throtl_register_queue(struct request_queue *q);
->   void blk_throtl_charge_bio_split(struct bio *bio);
->   bool __blk_throtl_bio(struct bio *bio);
-> +void blk_throtl_cancel_bios(struct request_queue *q);
->   static inline bool blk_throtl_bio(struct bio *bio)
->   {
->   	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 9589d1d59afa..6acc98cd0365 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -29,6 +29,7 @@
->   #include "blk.h"
->   #include "blk-mq-sched.h"
->   #include "blk-rq-qos.h"
-> +#include "blk-throttle.h"
->   
->   static struct kobject *block_depr;
->   
-> @@ -625,6 +626,7 @@ void del_gendisk(struct gendisk *disk)
->   
->   	blk_mq_freeze_queue_wait(q);
->   
-> +	blk_throtl_cancel_bios(disk->queue);
->   	rq_qos_exit(q);
->   	blk_sync_queue(q);
->   	blk_flush_integrity();
-> 
+dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
+irm=C4=85.
+
+=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
+ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej nawet o 90%.
+
+Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
+ropozycji?
+
+
+Pozdrawiam,
+Jakub Daroch
