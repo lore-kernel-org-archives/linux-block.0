@@ -2,48 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FA7C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 16:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E0CC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 16:40:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242808AbiBYQTi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Feb 2022 11:19:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46904 "EHLO
+        id S243125AbiBYQk4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 11:40:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242816AbiBYQTh (ORCPT
+        with ESMTP id S235766AbiBYQkz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Feb 2022 11:19:37 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB845469B;
-        Fri, 25 Feb 2022 08:19:05 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6A06F68AA6; Fri, 25 Feb 2022 17:19:02 +0100 (CET)
-Date:   Fri, 25 Feb 2022 17:19:02 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, colyli@suse.de
-Subject: Re: [PATCHv3 07/10] lib: add crc64 tests
-Message-ID: <20220225161902.GA14059@lst.de>
-References: <20220222163144.1782447-1-kbusch@kernel.org> <20220222163144.1782447-8-kbusch@kernel.org> <20220225160509.GE13610@lst.de> <20220225161259.GA4111669@dhcp-10-100-145-180.wdc.com>
+        Fri, 25 Feb 2022 11:40:55 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F41218CCD;
+        Fri, 25 Feb 2022 08:40:23 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 239732114D;
+        Fri, 25 Feb 2022 16:40:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1645807222; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tWMIUHa0fBAb1sjWcQulU95T21ZKZnSq9Doda166V14=;
+        b=JuAs0dtW2wKpx+bssg4WCSeHc5mfMUwNAAGWi8XDNYurKR3sLARj4hsjyn2H0iFs+IYOr6
+        RFR2U763fOXe3DBAGG27SkFLlNUyTw0ZQJN4ojIxuCk7xv0Cl25kk01aNJG63nm+W/Rft1
+        v+t0yk988AO+naiNi2oLsRFYna6Eo4s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1645807222;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tWMIUHa0fBAb1sjWcQulU95T21ZKZnSq9Doda166V14=;
+        b=fpmsJkUoh+jPBaKF+/CqprBoDi2xs0cypb+JYPL6ZNxz8ceCCtHITK0r9Kk6gHWNGae0/z
+        1mCd7CFTzPJSPHBA==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id E1463A3B83;
+        Fri, 25 Feb 2022 16:40:21 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 0352FA05D9; Fri, 25 Feb 2022 17:40:15 +0100 (CET)
+Date:   Fri, 25 Feb 2022 17:40:15 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 0/7] block, fs: convert Direct IO to FOLL_PIN
+Message-ID: <20220225164015.sriu6rz4hnqz25s5@quack3.lan>
+References: <20220225085025.3052894-1-jhubbard@nvidia.com>
+ <20220225120522.6qctxigvowpnehxl@quack3.lan>
+ <1d31ce1f-d307-fef0-8fce-84d6d96c6968@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220225161259.GA4111669@dhcp-10-100-145-180.wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <1d31ce1f-d307-fef0-8fce-84d6d96c6968@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 08:12:59AM -0800, Keith Busch wrote:
-> I don't have experience with kunit, but I'll look into that.
+On Fri 25-02-22 16:14:14, Chaitanya Kulkarni wrote:
+> On 2/25/22 04:05, Jan Kara wrote:
+> > On Fri 25-02-22 00:50:18, John Hubbard wrote:
+> >> Hi,
+> >>
+> >> Summary:
+> >>
+> >> This puts some prerequisites in place, including a CONFIG parameter,
+> >> making it possible to start converting and testing the Direct IO part of
+> >> each filesystem, from get_user_pages_fast(), to pin_user_pages_fast().
+> >>
+> >> It will take "a few" kernel releases to get the whole thing done.
+> >>
+> >> Details:
+> >>
+> >> As part of fixing the "get_user_pages() + file-backed memory" problem
+> >> [1], and to support various COW-related fixes as well [2], we need to
+> >> convert the Direct IO code from get_user_pages_fast(), to
+> >> pin_user_pages_fast(). Because pin_user_pages*() calls require a
+> >> corresponding call to unpin_user_page(), the conversion is more
+> >> elaborate than just substitution.
+> >>
+> >> Further complicating the conversion, the block/bio layers get their
+> >> Direct IO pages via iov_iter_get_pages() and iov_iter_get_pages_alloc(),
+> >> each of which has a large number of callers. All of those callers need
+> >> to be audited and changed so that they call unpin_user_page(), rather
+> >> than put_page().
+> >>
+> >> After quite some time exploring and consulting with people as well, it
+> >> is clear that this cannot be done in just one patchset. That's because,
+> >> not only is this large and time-consuming (for example, Chaitanya
+> >> Kulkarni's first reaction, after looking into the details, was, "convert
+> >> the remaining filesystems to use iomap, *then* convert to FOLL_PIN..."),
+> >> but it is also spread across many filesystems.
+> > 
+> > With having modified fs/direct-io.c and fs/iomap/direct-io.c which
+> > filesystems do you know are missing conversion? Or is it that you just want
+> > to make sure with audit everything is fine? The only fs I could find
+> > unconverted by your changes is ceph. Am I missing something?
 > 
-> I am already changing the way this gets tested. Eric recommended adding
-> to the crypto "testmgr", and I've done that on my private tree. That
-> test framework exercises a lot more than this this patch, and it did
-> reveal a problem with how I've implemented the initial XOR when the
-> buffer is split, so I have some minor updates coming soon.
+> if I understand your comment correctly file systems which are listed in
+> the list see [1] (all the credit goes to John to have a complete list)
+> that are not using iomap but use XXX_XXX_direct_IO() should be fine,
+> since in the callchain going from :-
+> 
+> XXX_XXX_direct_io()
+>   __blkdev_direct_io()
+>    do_direct_io()
+> 
+>    ...
+> 
+>      submit_page_selection()
+>       get/put_page() <---
+> 
+> will take care of itself ?
 
-I guess if we exercise the algorithm through that we don't really need
-another low-level test anyway, right?
+Yes, John's changes to fs/direct-io.c should take care of these
+filesystems using __blkdev_direct_io().
+
+								Honza
+
+> [1]
+> 
+> jfs_direct_IO()
+> nilfs_direct_IO()
+> ntfs_dirct_IO()
+> reiserfs_direct_IO()
+> udf_direct_IO()
+> ocfs2_dirct_IO()
+> affs_direct_IO()
+> exfat_direct_IO()
+> ext2_direct_IO()
+> fat_direct_IO()
+> hfs_direct_IO()
+> hfs_plus_direct_IO()
+> 
+> -ck
+> 
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
