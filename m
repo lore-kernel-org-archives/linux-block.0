@@ -2,89 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7280AC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 02:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B24FC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 02:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236458AbiBYCMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Feb 2022 21:12:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37012 "EHLO
+        id S236822AbiBYCk4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Feb 2022 21:40:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235994AbiBYCME (ORCPT
+        with ESMTP id S236821AbiBYCkz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Feb 2022 21:12:04 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A967658;
-        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id d17so3504244pfl.0;
-        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=cMIbfsx8xhlhlO0rypyks70MaXjDJamppwKLSs70zXg=;
-        b=agWfV/KneIzXmyRrz9MpUkEGgtLQ5KieS3r1T3hSsxxTTjGHJaicT4V4kxEGKONjVE
-         Wh9CgIJBTHvaGQ1v7gf9NEIe9gZYcqGNOsHaaSCmxYOJIXCNOGxp76w8CbxJqcO6T134
-         qAVaYVuyz3CVRipALOty+jj9f8rTzFIDx+uHOUmgywNiXZHQ2sHCgRoQUqWF2p85L3iO
-         xHLYhKcDdQA4d+4B3ipOQwbYvkLjSoAuNv8FHbi7MVmnTNSKXZ+CZUUcknxIhTwIVsgb
-         UrlgGSHZX4lw8ZUUmbJ0ZtgJbtse6r5WLZC+Fr83Uo2Us7l75FA76Pzc3QyxQPHsZn8R
-         nvxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=cMIbfsx8xhlhlO0rypyks70MaXjDJamppwKLSs70zXg=;
-        b=fkSd/cs//mDToW2GtMB/HWyU3Icz0omhULs9lDCHVdk0f6F0w73AQFmlG2tJ8nPWCZ
-         DNjqTYq55GPNWj0JLZZg5K6lkdcVRbZNWaBb0kNZfNwJQblIYmzdlQ/4YqnXvoKF46Yg
-         zCqHU4wB8j+ReLAdguqX+AYXIzLDfaYlJstIVwRYGcygUX88HF4Y1RRvucy5qTknpXHM
-         6stlTqhF8BeWkNDCvnqB1BczgIivJFxiNzCpi887+mtgO69xxpue+MLRFCVdlcMm1tXW
-         xHG/TS3+2y/fB2i88f7ShhWRnqjr+cMEmmodXVpqVXK0ZJMH8NO+Mvq69Nf+9Ma/1vch
-         Fv2A==
-X-Gm-Message-State: AOAM530V9O/MyT4toVQ0HercQsfocZSGV0ATiAsDx5Jn9G1RfnLgj//V
-        zfahBpVAgPA8wLDMdgFEIcP41QALa71Mdg==
-X-Google-Smtp-Source: ABdhPJxFcvdnn/j15+geNn7yyDWNYYaTArNomqCKM6Cn4Z8bJTS3viCvPilmLH4a3DbEyOErUhCO7g==
-X-Received: by 2002:a63:d201:0:b0:372:c882:210f with SMTP id a1-20020a63d201000000b00372c882210fmr4418862pgg.198.1645755092437;
-        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
-Received: from [172.20.119.15] ([162.219.34.248])
-        by smtp.gmail.com with ESMTPSA id f4-20020a63f744000000b00373855b7cf2sm745316pgk.22.2022.02.24.18.11.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
-Message-ID: <99ff40cc-8e56-3dff-ccc5-095844734818@gmail.com>
-Date:   Fri, 25 Feb 2022 10:11:29 +0800
+        Thu, 24 Feb 2022 21:40:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E5522692C0
+        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 18:40:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645756823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=l55E8pkQ2P3LKhJVKRYi4sOOVTHPZ0peePJHbMNdgTk=;
+        b=VVxJMLdsLoWEl7Xz1NEXOijnUzZqUrbAeTvKW4bd9DTz8msJXrY/OpY7dCoJdeZKcCBaZC
+        hjGzR3L1LtLZlBfKhIEW6/cvsJB3Rhd7zfmjJcGTRvLijdVviomywbWo8z3+LivkGVzojz
+        0HVkXB/lCCkPjNKzT30IyT8eVnMQz7g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-215-WS-oqy_INgOKW2YZRjMCQw-1; Thu, 24 Feb 2022 21:40:19 -0500
+X-MC-Unique: WS-oqy_INgOKW2YZRjMCQw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 313AA805742;
+        Fri, 25 Feb 2022 02:40:16 +0000 (UTC)
+Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F163C9BEB1;
+        Fri, 25 Feb 2022 02:40:12 +0000 (UTC)
+Date:   Fri, 25 Feb 2022 10:40:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH RFC] blk-mq: fix potential uaf for 'queue_hw_ctx'
+Message-ID: <YhhBh0ehPjdARU5h@T590>
+References: <20220223112601.2902761-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [RFC V5 01/16] blk: make the whole blk_mq_submit_bio under
- q_usage_counter
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
-        Tejun Heo <tj@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220224090654.54671-1-jianchao.wan9@gmail.com>
- <20220224090654.54671-2-jianchao.wan9@gmail.com>
- <YheKOdJdibfxSr5R@infradead.org>
-From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <YheKOdJdibfxSr5R@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220223112601.2902761-1-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022/2/24 9:38 下午, Christoph Hellwig wrote:
-> On Thu, Feb 24, 2022 at 05:06:39PM +0800, Wang Jianchao (Kuaishou) wrote:
->> This is to protect the rqos list against the rqos open/close. We
->> need to drain all of the caller of blk_mq_submit_bio() before
->> we can operate the rqos list.
+On Wed, Feb 23, 2022 at 07:26:01PM +0800, Yu Kuai wrote:
+> blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
+> submit_queues through configfs for null_blk), while it might still be
+> used from other context(e.g. switch elevator to none):
 > 
-> This means ever I/O now has to d an extra refcount roundtrip.
+> t1					t2
+> elevator_switch
+>  blk_mq_unquiesce_queue
+>   blk_mq_run_hw_queues
+>    queue_for_each_hw_ctx
+>     // assembly code for hctx = (q)->queue_hw_ctx[i]
+>     mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
+> 
+> 					__blk_mq_update_nr_hw_queues
+> 					 blk_mq_realloc_hw_ctxs
+> 					  hctxs = q->queue_hw_ctx
+> 					  q->queue_hw_ctx = new_hctxs
+> 					  kfree(hctxs)
+>     movslq %ebx,%rax
+>     mov    (%rdx,%rax,8),%rdi ->uaf
+> 
+> This problem was found by code review, and I comfirmed that the concurrent
+> scenarios do exist(specifically 'q->queue_hw_ctx' can be changed during
+> blk_mq_run_hw_queues), however, the uaf problem hasn't been repoduced yet
+> without hacking the kernel.
+> 
+> Sicne the queue is freezed in __blk_mq_update_nr_hw_queues, fix the
+> problem by protecting 'queue_hw_ctx' through rcu where it can be accessed
+> without grabbing 'q_usage_counter'.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-mq.c         |  8 +++++++-
+>  include/linux/blk-mq.h |  2 +-
+>  include/linux/blkdev.h | 13 ++++++++++++-
+>  3 files changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 6c59ffe765fd..79367457d555 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3955,7 +3955,13 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  		if (hctxs)
+>  			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
+>  			       sizeof(*hctxs));
+> -		q->queue_hw_ctx = new_hctxs;
+> +
+> +		rcu_assign_pointer(q->queue_hw_ctx, new_hctxs);
+> +		/*
+> +		 * Make sure reading the old queue_hw_ctx from other
+> +		 * context concurrently won't trigger uaf.
+> +		 */
+> +		synchronize_rcu();
+>  		kfree(hctxs);
+>  		hctxs = new_hctxs;
+>  	}
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index d319ffa59354..edcf8ead76c6 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -918,7 +918,7 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+>  
+>  #define queue_for_each_hw_ctx(q, hctx, i)				\
+>  	for ((i) = 0; (i) < (q)->nr_hw_queues &&			\
+> -	     ({ hctx = (q)->queue_hw_ctx[i]; 1; }); (i)++)
+> +	     ({ hctx = queue_hctx((q), i); 1; }); (i)++)
+>  
+>  #define hctx_for_each_ctx(hctx, ctx, i)					\
+>  	for ((i) = 0; (i) < (hctx)->nr_ctx &&				\
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 3bfc75a2a450..2018a4dd2028 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -354,7 +354,7 @@ struct request_queue {
+>  	unsigned int		queue_depth;
+>  
+>  	/* hw dispatch queues */
+> -	struct blk_mq_hw_ctx	**queue_hw_ctx;
+> +	struct blk_mq_hw_ctx __rcu	**queue_hw_ctx;
+>  	unsigned int		nr_hw_queues;
+>  
+>  	/*
+> @@ -622,6 +622,17 @@ static inline bool queue_is_mq(struct request_queue *q)
+>  	return q->mq_ops;
+>  }
+>  
+> +static inline struct blk_mq_hw_ctx *queue_hctx(struct request_queue *q, int id)
+> +{
+> +	struct blk_mq_hw_ctx *hctx;
+> +
+> +	rcu_read_lock();
+> +	hctx = *(rcu_dereference(q->queue_hw_ctx) + id);
+> +	rcu_read_unlock();
+> +
+> +	return hctx;
+> +}
 
-If we want to save cpu cycles for the very fast device, why not introduce
-another blk_mq_submit_bio_fast() which can reduce the code drastically.
+queue_hctx() should be moved into linux/blk-mq.h, otherwise feel free to
+add:
 
-Thanks
-Jianchao 
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Also it should be fine to implement queue_for_each_hw_ctx() as list, then we
+can avoid the allocation for q->queue_hw_ctx without extra cost. I will work
+toward that direction for improving the code.
+
+Thanks,
+Ming
+
