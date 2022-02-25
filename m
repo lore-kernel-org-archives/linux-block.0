@@ -2,77 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 687EAC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 02:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7280AC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 02:11:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236630AbiBYCDP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Feb 2022 21:03:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
+        id S236458AbiBYCMF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Feb 2022 21:12:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236479AbiBYCDP (ORCPT
+        with ESMTP id S235994AbiBYCME (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Feb 2022 21:03:15 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B75A85974;
-        Thu, 24 Feb 2022 18:02:44 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id m22so3595420pja.0;
-        Thu, 24 Feb 2022 18:02:44 -0800 (PST)
+        Thu, 24 Feb 2022 21:12:04 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A967658;
+        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id d17so3504244pfl.0;
+        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=wZjioodKc5i2UrY3alN+TPIIALpLSLRR0tr9ny9WIyo=;
-        b=Nx7NMD8qU/NXptOn+9dkF9Ix+eBmtRTZuRzKcblBxcw8keIKBEAvgcGmbo3f9Z/02/
-         mNBM2w/uJjC55vSY6b5c4lM7swcdOZ+YnMU9EZBDNk/sH9nWELAl23eoR3UCiWcEn5q/
-         FTl2iboXT1YQUWtU259SWugCJZZFZBLHNVkWPWrWbNqG312ulxwDh2jdbynvL8098PNd
-         P5ykxJOohSup/GMBw1YoE9GUupu5Lfz8VsYebmGdet/jIFpZap8Ax01gofNvW6568K5Z
-         Kd7MDaSnAl3ROb6n9ailuF53EviYpBNT/4HFgTsInY71wF8NGmJMNXJA5r5fKrEYtNU5
-         W/Sw==
+        bh=cMIbfsx8xhlhlO0rypyks70MaXjDJamppwKLSs70zXg=;
+        b=agWfV/KneIzXmyRrz9MpUkEGgtLQ5KieS3r1T3hSsxxTTjGHJaicT4V4kxEGKONjVE
+         Wh9CgIJBTHvaGQ1v7gf9NEIe9gZYcqGNOsHaaSCmxYOJIXCNOGxp76w8CbxJqcO6T134
+         qAVaYVuyz3CVRipALOty+jj9f8rTzFIDx+uHOUmgywNiXZHQ2sHCgRoQUqWF2p85L3iO
+         xHLYhKcDdQA4d+4B3ipOQwbYvkLjSoAuNv8FHbi7MVmnTNSKXZ+CZUUcknxIhTwIVsgb
+         UrlgGSHZX4lw8ZUUmbJ0ZtgJbtse6r5WLZC+Fr83Uo2Us7l75FA76Pzc3QyxQPHsZn8R
+         nvxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=wZjioodKc5i2UrY3alN+TPIIALpLSLRR0tr9ny9WIyo=;
-        b=AG6XMhNtwzGStyBme3a+w7OMWZOZowCSEST8GuXC8GAt+Y5jZQheio529ixK+b+KZ/
-         h6UIIrCo6fpsD8+DXDsYc7QlD6fY/BjKAqP7J52W+uEXJPzYQHTtf5c+iHLFwNe5z/Lc
-         fkFOVJfyWbNeJTLmsjklRhT0vqe9e63eGqqNulfcMUJaqYnwBxpp9RfjIAeEWsf416ph
-         s2WunsodAcC3kcPtYeGJakAhBcpTSy4Q6EwXgFTnynguChfiFCDH/JBejQ0bCFqSB0PY
-         FSfJgD4I/gVdj6QReA9fNdNiasR5NzLdo1j2X4dC1BrLGgHR4my8aty4DbGYp9SaWEow
-         W5bQ==
-X-Gm-Message-State: AOAM530zsJ68k5mDGfUIcKC6YrObujsLHlbnncN4wgkV+ihTD+x676DR
-        0vgXu0JdZrfghoxkvwsLEN4=
-X-Google-Smtp-Source: ABdhPJz05a2c5otlXDdIezkGb/k5WVIEc7aPtxwPaqdwdxj4146BHHVrCUDpiFd5fDCwNViZIwPfbw==
-X-Received: by 2002:a17:90a:aa83:b0:1b9:7c62:61e5 with SMTP id l3-20020a17090aaa8300b001b97c6261e5mr946319pjq.118.1645754563771;
-        Thu, 24 Feb 2022 18:02:43 -0800 (PST)
-Received: from [172.20.119.15] ([61.16.102.72])
-        by smtp.gmail.com with ESMTPSA id d25-20020a639919000000b00364f999aed5sm730865pge.20.2022.02.24.18.02.41
+        bh=cMIbfsx8xhlhlO0rypyks70MaXjDJamppwKLSs70zXg=;
+        b=fkSd/cs//mDToW2GtMB/HWyU3Icz0omhULs9lDCHVdk0f6F0w73AQFmlG2tJ8nPWCZ
+         DNjqTYq55GPNWj0JLZZg5K6lkdcVRbZNWaBb0kNZfNwJQblIYmzdlQ/4YqnXvoKF46Yg
+         zCqHU4wB8j+ReLAdguqX+AYXIzLDfaYlJstIVwRYGcygUX88HF4Y1RRvucy5qTknpXHM
+         6stlTqhF8BeWkNDCvnqB1BczgIivJFxiNzCpi887+mtgO69xxpue+MLRFCVdlcMm1tXW
+         xHG/TS3+2y/fB2i88f7ShhWRnqjr+cMEmmodXVpqVXK0ZJMH8NO+Mvq69Nf+9Ma/1vch
+         Fv2A==
+X-Gm-Message-State: AOAM530V9O/MyT4toVQ0HercQsfocZSGV0ATiAsDx5Jn9G1RfnLgj//V
+        zfahBpVAgPA8wLDMdgFEIcP41QALa71Mdg==
+X-Google-Smtp-Source: ABdhPJxFcvdnn/j15+geNn7yyDWNYYaTArNomqCKM6Cn4Z8bJTS3viCvPilmLH4a3DbEyOErUhCO7g==
+X-Received: by 2002:a63:d201:0:b0:372:c882:210f with SMTP id a1-20020a63d201000000b00372c882210fmr4418862pgg.198.1645755092437;
+        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
+Received: from [172.20.119.15] ([162.219.34.248])
+        by smtp.gmail.com with ESMTPSA id f4-20020a63f744000000b00373855b7cf2sm745316pgk.22.2022.02.24.18.11.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Feb 2022 18:02:43 -0800 (PST)
-Message-ID: <54557a1a-94b5-9f75-61f9-90991d5ff409@gmail.com>
-Date:   Fri, 25 Feb 2022 10:02:39 +0800
+        Thu, 24 Feb 2022 18:11:32 -0800 (PST)
+Message-ID: <99ff40cc-8e56-3dff-ccc5-095844734818@gmail.com>
+Date:   Fri, 25 Feb 2022 10:11:29 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [RFC V4 1/6] blk: prepare to make blk-rq-qos pluggable and
- modular
+Subject: Re: [RFC V5 01/16] blk: make the whole blk_mq_submit_bio under
+ q_usage_counter
 Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <jbacik@fb.com>,
+        Tejun Heo <tj@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220217031349.98561-1-jianchao.wan9@gmail.com>
- <20220217031349.98561-2-jianchao.wan9@gmail.com>
- <YhUbCH+dhKkgMirE@slm.duckdns.org>
- <2e17c058-8917-4a37-896e-1093446339f6@gmail.com>
- <39db454d-ca30-fb42-3d72-899efa34fb78@gmail.com>
- <YhapCurbiI21WYmm@slm.duckdns.org>
- <efd94670-9d6d-5651-358c-2f88646298cd@gmail.com>
- <Yhbod7pJ1X4CGhEZ@slm.duckdns.org>
- <7489a7f8-2589-29de-1c95-b99d1d9b1850@gmail.com>
- <Yhe38VnBq7VzUBAV@slm.duckdns.org>
+References: <20220224090654.54671-1-jianchao.wan9@gmail.com>
+ <20220224090654.54671-2-jianchao.wan9@gmail.com>
+ <YheKOdJdibfxSr5R@infradead.org>
 From:   Wang Jianchao <jianchao.wan9@gmail.com>
-In-Reply-To: <Yhe38VnBq7VzUBAV@slm.duckdns.org>
+In-Reply-To: <YheKOdJdibfxSr5R@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -81,28 +75,16 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2022/2/25 12:53 上午, Tejun Heo wrote:
-> On Thu, Feb 24, 2022 at 10:50:22AM +0800, Wang Jianchao wrote:
->> Yes, right now, every policy has their own way to turn off, but we always need to
->> iterate the rqos list and enter into the policy's callback to check it. And every
->> blkio cgroup needs to allocate memory for it even we don't use it.
->>
->> I don't this patchset is adding a new layer, but blk-rq-qos layer has been already
->> there , we just add a unified interface to open/close the policies.
+On 2022/2/24 9:38 下午, Christoph Hellwig wrote:
+> On Thu, Feb 24, 2022 at 05:06:39PM +0800, Wang Jianchao (Kuaishou) wrote:
+>> This is to protect the rqos list against the rqos open/close. We
+>> need to drain all of the caller of blk_mq_submit_bio() before
+>> we can operate the rqos list.
 > 
-> We're talking in circles. We already know when a policy is inactive. If it
-> sits in hot path in that state, take it off whatever gets iterated in hot
-> path and put it back on when it actually gets enabled. The same goes for
-> memory allocation. If there's substantial amount of memory allocted while
-> not used, make that dynamic and trigger it when the policy starts getting
-> used. It makes no sense to add another enable/disable interface on top.
->
-It can make things more complicated if we does as above...
+> This means ever I/O now has to d an extra refcount roundtrip.
 
-> FWIW, please consider the series nacked on this side.
+If we want to save cpu cycles for the very fast device, why not introduce
+another blk_mq_submit_bio_fast() which can reduce the code drastically.
 
-Anyway, thanks so much for all of your comment ;)
-
-Regards
-Jianchao
-
+Thanks
+Jianchao 
