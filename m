@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A787AC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 18:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 233E0C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 18:14:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231605AbiBYSJl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Feb 2022 13:09:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42922 "EHLO
+        id S229705AbiBYSPQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 13:15:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231182AbiBYSJl (ORCPT
+        with ESMTP id S229747AbiBYSPQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:09:41 -0500
+        Fri, 25 Feb 2022 13:15:16 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B351AE67D;
-        Fri, 25 Feb 2022 10:09:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8235F1F6353
+        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 10:14:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
         Content-ID:Content-Description:In-Reply-To:References;
-        bh=guR3hcibdcrqTbpixvKm64JfcQytu3zT11iDRFrtiLk=; b=mjNSOKH7lOPIncTH6QZIjlLL+K
-        +D6SkjsvnhgTKU/y2MU83ti7+WUDjbP+Nt8FXCi3JJ1giE00XQnRfNOe08iKbR6nbRNGupuqqGOLD
-        XmdSbEPK2tsRU1ZRWKsDQJvghQs90Z8WU/HBwJFYuLNGFyyb0BlURbh6+t6GlxuCjkILoErirTufz
-        SqC8n21V03Se02TT2U7cYqGl80wKea3+y5nnAtKSRvd6YQHYWrzjD7FRkySDPsaFfSnyr/heq0SPD
-        +UtKSj3GAyVKn57uQrZjF/t1EMiWj4kFv8tkpuUt2CyLxJJiTseU+hdtC5T0Qqn3jqeNnYQ8c6Ny6
-        Yx65HVEw==;
+        bh=Q7VHpVx21mUja6gLo8+e7srJn+uYkNFU0P21aMHgCMk=; b=qYVIo1gSo7SVNxFixFAnSGP4Zd
+        7VFVQRle08MOyeu5Gypjv0hnXUEh2Cp+b4a/4KISqfaRN52lkTvI7/rtOj+1ncBYQNBQHsl11DAW5
+        bDjaYFhznzBWLNRGkkU+1kbNZTxUIFpVQPvIvC0ndY0XYBmWMzzxxv2HFPmQpJBPD/o9dkIR+C/wd
+        3nN60zLE56FdORD4Or2oL+bjqMD5VzXvHTk5Zy3JV2waqaW6015ac8+Zc8etQllMq+nLs9sU8XSvU
+        AJQ0OfGCqrOwgGvabJ7aILAjknmFYCO8LEa4ZLrsn/jxCe60yLswigmBe3bzi3UtBMh98Cje7aRfv
+        nS0F7Epg==;
 Received: from 089144202139.atnat0011.highway.a1.net ([89.144.202.139] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nNf1e-006TgU-Ne; Fri, 25 Feb 2022 18:09:07 +0000
+        id 1nNf75-006W01-18; Fri, 25 Feb 2022 18:14:43 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     util-linux@vger.kernel.org
+To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH] losetup: don't skip adding a new device if it already has a device node
-Date:   Fri, 25 Feb 2022 19:09:03 +0100
-Message-Id: <20220225180903.1341819-1-hch@lst.de>
+Subject: [PATCH] block: default BLOCK_LEGACY_AUTOLOAD to y
+Date:   Fri, 25 Feb 2022 19:14:40 +0100
+Message-Id: <20220225181440.1351591-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -42,39 +42,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linux plans to deprecate the auto-creation of block devices based on
-access to the devic node starting from kernel 5.18.  Without that feature
-losetup will fail to create the loop device if a device node already
-exists, but the loop device to back it in the kernel does not exist yet.
-This is a scenario that should not happen in modern udev based
-distributions, but apparently there still are various scripts around that
-manually call the superflous mknod.
-
-Change losetup to unconditionally call loopcxt_add_device when a specific
-device node is specified on the command line.  If the loop device
-already exists the LOOP_CTL_ADD ioctl will fail, but given that losetup
-ignores the return value from loopcxt_add_device that failure has no
-further effect.
+As Luis reported, losetup currently doesn't properly create the loop
+device without this if the device node already exists because old
+scripts created it manually.  So default to y for now and remove the
+aggressive removal schedule.
 
 Reported-by: Luis Chamberlain <mcgrof@kernel.org>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- sys-utils/losetup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/Kconfig | 8 +++-----
+ block/bdev.c  | 2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/sys-utils/losetup.c b/sys-utils/losetup.c
-index c400cbf12..09c028b6b 100644
---- a/sys-utils/losetup.c
-+++ b/sys-utils/losetup.c
-@@ -522,7 +522,7 @@ static int create_loop(struct loopdev_cxt *lc,
- 		}
+diff --git a/block/Kconfig b/block/Kconfig
+index 168b873eb666d..7eb5d6d53b3fc 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -28,15 +28,13 @@ if BLOCK
+ 
+ config BLOCK_LEGACY_AUTOLOAD
+ 	bool "Legacy autoloading support"
++	default y
+ 	help
+ 	  Enable loading modules and creating block device instances based on
+ 	  accesses through their device special file.  This is a historic Linux
+ 	  feature and makes no sense in a udev world where device files are
+-	  created on demand.
+-
+-	  Say N here unless booting or other functionality broke without it, in
+-	  which case you should also send a report to your distribution and
+-	  linux-block@vger.kernel.org.
++	  created on demand, but scripts that manually create device nodes and
++	  then call losetup might rely on this behavior.
+ 
+ config BLK_RQ_ALLOC_TIME
+ 	bool
+diff --git a/block/bdev.c b/block/bdev.c
+index c687726445660..a3632317c8aae 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -738,7 +738,7 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+ 		inode = ilookup(blockdev_superblock, dev);
+ 		if (inode)
+ 			pr_warn_ratelimited(
+-"block device autoloading is deprecated. It will be removed in Linux 5.19\n");
++"block device autoloading is deprecated and will be removed.\n");
  	}
- 
--	if (hasdev && !is_loopdev(loopcxt_get_device(lc)))
-+	if (hasdev)
- 		loopcxt_add_device(lc);
- 
- 	/* losetup --noverlap /dev/loopN file.img */
+ 	if (!inode)
+ 		return NULL;
 -- 
 2.30.2
 
