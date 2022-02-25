@@ -2,122 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 891D6C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 13:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAC5C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 14:27:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241012AbiBYNNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Feb 2022 08:13:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S239919AbiBYO1t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 09:27:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240876AbiBYNNO (ORCPT
+        with ESMTP id S238031AbiBYO1q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:13:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98513181E55
-        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 05:12:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645794761;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q5m/jO7lh5udnKQzVaUijMT/vcP8DIr3AnFBCv6X8sA=;
-        b=A+whudTHBepKndncnELDJctBP6oue4vB3ufQvbGVHmaOmN0NNDVYUiY70U9rMqGdsgRxP3
-        Ehk1454R3uy3G6MRabXy6klxw8OQP0fYbFDUlY1TnHXriHha4Kgyu9/jPlNfaeTupNCJuS
-        PreZpfbiNMAyA3fZUXDuGSyiffPuIO0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-297-vTs_eEdQM2Cbqa6NEZynvg-1; Fri, 25 Feb 2022 08:12:40 -0500
-X-MC-Unique: vTs_eEdQM2Cbqa6NEZynvg-1
-Received: by mail-wr1-f69.google.com with SMTP id t8-20020adfa2c8000000b001e8f6889404so910624wra.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 05:12:39 -0800 (PST)
+        Fri, 25 Feb 2022 09:27:46 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B965EDE2EE
+        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 06:27:13 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id m11so4959589pls.5
+        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 06:27:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=CueWZXVwpZqdL5pKcLH+mDQMXSj/tgq8h6dqyMSiTWc=;
+        b=PfpjwGmuxVMO98b9FDuDLsLE9btC0WBH7LhsJ8t4TpjmMe2OedybHGRFlbaMxvYueI
+         GLqc6LyVGQuJqh2jy8NIWPv0N0tKhYKhSghFrdptUgkE7MxEqeWrePJD0232xturOP2i
+         df8DJgH6f6Jr0nFGXKB7PXidirxCjRPva+wV9HkYaIj524bMF5Slt5aPVJh4G/B9xohN
+         yS6/VWCFrOF0R5IASe5MFC60DxuRiDjAhaKPiK2d+udCx4FGyiMGBw5knhW0hY8Cx1j7
+         tRFkY6hwSHgmjZy1IprRmpUfS8AE64hOqjHRilR3OGHIem0SxKWFJIyhdmRxNcjZ094D
+         FUmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Q5m/jO7lh5udnKQzVaUijMT/vcP8DIr3AnFBCv6X8sA=;
-        b=0sibuKJnf5HJbCk+zDQ9ssexQZ+ia4qwBD/2GGjiltAXgzj7yS52zhAWCGKZTs/WnT
-         3zFJ8Iw0slLQ5VFCdh3/P47xxwk9XBlhA76nj5vWo9ghoh+XiR225dg1nzNqfXv36YE6
-         SzRECtkPTGEq9NGYhM8YPKK8yWJ6A1KjUZiMdTIxy9Hfx1pkaXnS2qIqGhZhGx1VrY+9
-         ugGdnJVgyDKoqH9WvJ6ByVi3famGq7aVZFpfq1lcGZh5oc4qJpfwLY6HasS67WJ4ENIZ
-         6ixMFtp6kRxxur+twaLwKVFsfTVsqRscUIc42AiKX+SU7F0EfRG591JYn1m5JVkA7MrX
-         gQ2Q==
-X-Gm-Message-State: AOAM533ihQrDcM+kcDtcQbhXw+dwaU6xZlGbInsn0WviQDBiApZUiRFa
-        0mOVWPgxRUVx6MIsKIAeJT4UUqHjWWrooT/1n/6PS1FYqGm2Q2IWLguw2t4wZE9olWi0FCrzUTW
-        BsQ6fcSJ1HltW2pHbjVJBwrg=
-X-Received: by 2002:a05:600c:230d:b0:37d:5882:ec9b with SMTP id 13-20020a05600c230d00b0037d5882ec9bmr2621767wmo.162.1645794759007;
-        Fri, 25 Feb 2022 05:12:39 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwI4b9vBHcOeQt/ZmS1/e52HNSF01bwScuFUG5ZV9CohndqVjI+TJ4cckBrt1RE2I3tNlK5oQ==
-X-Received: by 2002:a05:600c:230d:b0:37d:5882:ec9b with SMTP id 13-20020a05600c230d00b0037d5882ec9bmr2621744wmo.162.1645794758739;
-        Fri, 25 Feb 2022 05:12:38 -0800 (PST)
-Received: from ?IPV6:2003:cb:c706:1900:f2f7:d2ad:80d9:218f? (p200300cbc7061900f2f7d2ad80d9218f.dip0.t-ipconnect.de. [2003:cb:c706:1900:f2f7:d2ad:80d9:218f])
-        by smtp.gmail.com with ESMTPSA id m5-20020a05600c3b0500b00380da3ac789sm2535021wms.1.2022.02.25.05.12.37
+        bh=CueWZXVwpZqdL5pKcLH+mDQMXSj/tgq8h6dqyMSiTWc=;
+        b=hLuICtwF+me0mnP59xKI3fCiLyakGguUYSskhMUoa3XfZKCc/xZ6hp7wWX7uomopRo
+         Rew7+lEdviW4hhOWoUXfO2zQ35k9WTdvdGjIE9HWsUbQ1tURImTcpKImrz/9geTt23BX
+         VEHU8KXkq6DzjpaW1oAoQMPMkw+22AfUAfGe49CgBNHPh/pHA8APMTXi5jm2ko6Xu+pK
+         ESALyauf+TesRFOHQDq/RjsaJzhlBFZsrlUiW3MngQA6w6FwI1pAz0jqXcXDzdHhApCS
+         Dc7hspml7zk9wcNQtlatAo08OWXafemPhyK1dWNNubos1VH/eA2BdEdsnVNKZtODA7Ge
+         6J/Q==
+X-Gm-Message-State: AOAM530G0bue2pSngTFUOaafmv/L+M2s2e/Q1FcWP+MoztTvXzfwCilc
+        ZCRghlp/JpcRej+FNA+21cpCYg==
+X-Google-Smtp-Source: ABdhPJyrLKbOQ8eTWPLV/0scGMnACkwjuJFvTJHTGBtWwoynPikelwG7k7xTp6UTIKeE64ve7G24pQ==
+X-Received: by 2002:a17:90a:fe86:b0:1bc:6935:346 with SMTP id co6-20020a17090afe8600b001bc69350346mr3457979pjb.150.1645799233170;
+        Fri, 25 Feb 2022 06:27:13 -0800 (PST)
+Received: from [192.168.4.157] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id na5-20020a17090b4c0500b001bc9301f316sm2669492pjb.42.2022.02.25.06.27.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Feb 2022 05:12:38 -0800 (PST)
-Message-ID: <ad29be74-d296-a9fb-41d7-00d2ba15ea5c@redhat.com>
-Date:   Fri, 25 Feb 2022 14:12:37 +0100
+        Fri, 25 Feb 2022 06:27:12 -0800 (PST)
+Message-ID: <6db54b86-4f25-af15-692b-af067823d77e@kernel.dk>
+Date:   Fri, 25 Feb 2022 07:27:11 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [RFC PATCH 0/7] block, fs: convert Direct IO to FOLL_PIN
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
 Content-Language: en-US
-To:     John Hubbard <jhubbard@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220225085025.3052894-1-jhubbard@nvidia.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220225085025.3052894-1-jhubbard@nvidia.com>
+To:     Yu Kuai <yukuai3@huawei.com>, ming.lei@redhat.com, tj@kernel.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220210115637.1074927-1-yukuai3@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25.02.22 09:50, John Hubbard wrote:
-> Hi,
+On 2/10/22 4:56 AM, Yu Kuai wrote:
+> Throttled bios can't be issued after del_gendisk() is done, thus
+> it's better to cancel them immediately rather than waiting for
+> throttle is done.
 > 
-> Summary:
-> 
-> This puts some prerequisites in place, including a CONFIG parameter,
-> making it possible to start converting and testing the Direct IO part of
-> each filesystem, from get_user_pages_fast(), to pin_user_pages_fast().
-> 
-> It will take "a few" kernel releases to get the whole thing done.
-> 
-> Details:
-> 
-> As part of fixing the "get_user_pages() + file-backed memory" problem
-> [1], and to support various COW-related fixes as well [2], we need to
-> convert the Direct IO code from get_user_pages_fast(), to
-> pin_user_pages_fast(). Because pin_user_pages*() calls require a
-> corresponding call to unpin_user_page(), the conversion is more
-> elaborate than just substitution.
-> 
-> Further complicating the conversion, the block/bio layers get their
-> Direct IO pages via iov_iter_get_pages() and iov_iter_get_pages_alloc(),
-> each of which has a large number of callers. All of those callers need
-> to be audited and changed so that they call unpin_user_page(), rather
-> than put_page().
+> For example, if user thread is throttled with low bps while it's
+> issuing large io, and the device is deleted. The user thread will
+> wait for a long time for io to return.
 
-vmsplice is another candidate that uses iov_iter_get_pages() and should
-be converted to FOLL_PIN. For that particular user, we have to also pass
-FOLL_LONGTERM -- vmsplice as it stands can block memory hotunplug / CMA
-/ ... for all eternity.
+I hand applied this for 5.18 as it's conflicting with other
+changes. Please double check the end result.
 
 -- 
-Thanks,
-
-David / dhildenb
+Jens Axboe
 
