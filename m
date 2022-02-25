@@ -2,169 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66372C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 03:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 404D7C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 07:05:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236474AbiBYDpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Feb 2022 22:45:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50272 "EHLO
+        id S230076AbiBYHGL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 02:06:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237170AbiBYDpa (ORCPT
+        with ESMTP id S229597AbiBYHGK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Feb 2022 22:45:30 -0500
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F9CC2692B0
-        for <linux-block@vger.kernel.org>; Thu, 24 Feb 2022 19:44:58 -0800 (PST)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220225034456epoutp0329fdf89338fbf27666d8718f1f63a297~W6qJJJ9oY0114201142epoutp03B
-        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 03:44:56 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220225034456epoutp0329fdf89338fbf27666d8718f1f63a297~W6qJJJ9oY0114201142epoutp03B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1645760696;
-        bh=/UO9eDeRsnQ02mI7zvtYj8GHrR3f9M5BXxxiPQPbV80=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JefR7KCdoc8VYZ/gaDGHtpQ93aksxuZB3AltK9ZrzS4COccgFleZ2IgUqiU5g/XYZ
-         llyjEm/q+BSxGEao4yH9oPfQU6vaOH72a4ytEYQwrlR8PlIrQZxQvZiMGZFBBhVwCt
-         4iLRXVnfztS7zF7tGnpVqfhKyKRzzcux+8UqDOn4=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20220225034455epcas5p26a20b70a651c5c4813b20d1e48f2ba38~W6qIW7Vke0148301483epcas5p2P;
-        Fri, 25 Feb 2022 03:44:55 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.183]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4K4bJ31YBBz4x9Px; Fri, 25 Feb
-        2022 03:44:51 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        26.C9.06423.9A058126; Fri, 25 Feb 2022 12:44:41 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220224124713epcas5p17e353eef4fb4990f0442bc0614217227~WuaVbgzqc2876728767epcas5p15;
-        Thu, 24 Feb 2022 12:47:13 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220224124713epsmtrp2ee80afa62db594176e0e55aba7521d29~WuaVZNiVv0741907419epsmtrp2H;
-        Thu, 24 Feb 2022 12:47:13 +0000 (GMT)
-X-AuditID: b6c32a49-b13ff70000001917-22-621850a9e292
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F7.83.29871.15E77126; Thu, 24 Feb 2022 21:47:13 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220224124709epsmtip22be20cc572111b6fe3937746e483cc64~WuaR4KTdj1429314293epsmtip2W;
-        Thu, 24 Feb 2022 12:47:09 +0000 (GMT)
-Date:   Thu, 24 Feb 2022 18:12:13 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     javier@javigon.com, chaitanyak@nvidia.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        msnitzer@redhat.com, bvanassche@acm.org,
-        martin.petersen@oracle.com, roland@purestorage.com, hare@suse.de,
-        kbusch@kernel.org, hch@lst.de, Frederick.Knight@netapp.com,
-        zach.brown@ni.com, osandov@fb.com,
-        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
-        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
-        jack@suse.com, joshi.k@samsung.com, arnav.dawn@samsung.com
-Subject: Re: [PATCH v2 08/10] dm: Add support for copy offload.
-Message-ID: <20220224124213.GD9117@test-zns>
+        Fri, 25 Feb 2022 02:06:10 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59D61DD0C0;
+        Thu, 24 Feb 2022 23:05:35 -0800 (PST)
+Received: from kwepemi500026.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K4gjw1D6YzdZhK;
+        Fri, 25 Feb 2022 15:04:04 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500026.china.huawei.com (7.221.188.247) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.18; Fri, 25 Feb 2022 15:05:17 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 25 Feb
+ 2022 15:05:16 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <ming.lei@redhat.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+Subject: [PATCH] blk-mq: fix potential uaf for 'queue_hw_ctx'
+Date:   Fri, 25 Feb 2022 15:20:53 +0800
+Message-ID: <20220225072053.2472431-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.2202160845210.22021@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHPfe2txe2sgtCOHYwu+qcqBQqDw+LDBN0u5NJGCxjc3FY4IYS
-        Stu0ZRvbxEIhCohIGbPAAsSBBJCJzPCuCo4wBAyMlzIfMECUlzwmg4iylpbF/z6/7/l+f+ec
-        38khcbtaDo+MlqkZpUwsFRDWrJqbLjtdy4JguPvFaifUdHeRjSruZxLop7kVHD1tHmUjXaae
-        g3rHbJBhNp+NupcTMTRavYahpgs6DJVVtGJoovQXgFI7ujG0OiJCrWszBNK1DABkGNqNmgzt
-        LFR4cZyD0gfrCHRtyoCj0raXGMo63Y+h23mrBLr5oJ+FKlYRSjmzwkGT17864ET39gXQWdpZ
-        Dq0tuseie7vi6OryVIL+rfgknX2nFNCNdzUEndTZitP6hX8IerCzFqMztLMEPT8+xKJrRjI4
-        9NNr/QR99mo5CLI/GrNfwogjGSWfkUXII6NlUb6CgJAw/zAvb3eRq8gH7RPwZeJYxldw8OMg
-        1w+ipcb5CPhfi6VxRilIrFIJ3N7fr5THqRm+RK5S+woYRaRU4akQqsSxqjhZlFDGqN8Tubvv
-        9TIaj8dI9IX5hGLutW/L12ZZGjBslQasSEh5wtTkK3gasCbtqEYAl3MGOeZiAcD56ny2uVgC
-        sGS6gL0ReZyYaHEZACzUbuQfAViZVIibXCzqHbhWWmZMkCRB7YYda6RJtqdc4J8/T693xakh
-        FtQPjnBMC5spP5iyXLnu51J7YP7tfSaZS9nC9twxlomtqC9hT3bSOjtQ2+CNmjbM1AdSf1vB
-        56VduPl0B2HeTC3HzJvhZNtVC/Pg4qyBMAfSjRftfGhJ6wHUntMSZpcf7Gl6gZkYpySwPnfZ
-        knaGObd+teg2MOP5GGbWubCuYIO3wUuXiyx9tsCBfxMtTMOugReWQfZjcPxSDXEObM175Xp5
-        r+xn5j2wqHGByDNOA6fehKUvSTO6wMsNbkWAXQ62MApVbBSj8lKIZMw3/795hDy2Gqz/oF0f
-        1YH7w3PCFoCRoAVAEhfYc0dPOIbbcSPF8d8xSnmYMk7KqFqAl/G1snCeQ4Tc+AVl6jCRp4+7
-        p7e3t6ePh7dI4MjtiKoS21FRYjUTwzAKRrmRw0grngb7vim44Nlhh5lNkpPVy4tdQ0fC39bU
-        Vcyzy/x5xVd+rPyMHMvzCPV7qww4f5F67K+SUxUrtavRwY+SNSE2Hk47HlhnvhESmLYpfqq9
-        JKZYZ5OZuzLhc+yH7fIbRw9P+iz87uoRv5iTIDTY3nOK1tpmR/g69JGC+ltVd6rCCkLttzZr
-        Pm1IlYghKyPpyYdnNWqH84su+sejBzbxczo0oER++pTOOuW6UFAXKnJOiB14knyI07Dj4fmI
-        pHcDhMfx4cDF7J1/uDS/nrwUFHgBtC/0HAmdomB6Pe32bODzib5pXa+ddPsJ5pOEejJ4SaFr
-        3uvfPXBmitcZ4jznODTtqq+05c8LWCqJWLQLV6rE/wGLOMDxygQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7bCSvG5gnXiSQcd3RYs9Nz+zWqy+289m
-        Me3DT2aL9wcfs1pM6p/BbnH5CZ/F3nezWS0u/Ghksni86T+TxZ5Fk5gsVq4+ymTxfPliRovO
-        0xeYLP48NLQ4+v8tm8WkQ9cYLfbe0rbYs/cki8X8ZU/ZLbqv72Cz2Pd6L7PF8uP/mCwmdlxl
-        sjg36w+bxeF7V1ksVv+xsGjt+clu8Wp/nIOMx+Ur3h4Tm9+xezQvuMPicflsqcemVZ1sHpuX
-        1HtMvrGc0WP3zQY2j6YzR5k9Znz6wuZx/cx2Jo/e5ndsHh+f3mLx2Pawl93j/b6rbB59W1Yx
-        BohEcdmkpOZklqUW6dslcGWs77zAXLCBs+LWSssGxp3sXYycHBICJhIvGhvBbCGB3YwSUz7r
-        Q8QlJZb9PcIMYQtLrPz3HKiGC6jmCaPEyXdPmEASLAKqEv+Xr2TtYuTgYBPQljj9nwMkLCKg
-        KXFpzhtWkHpmgTssErv+PAMbJCxgL9H6Yy1YPa+AjsTsc+YQM68ySWzcPIMRpIZXQFDi5Mwn
-        LCA2s4CWxI1/L5lA6pkFpCWW/wObzykQLXFxchNYiaiAssSBbceZJjAKzkLSPQtJ9yyE7gWM
-        zKsYJVMLinPTc4sNCwzzUsv1ihNzi0vz0vWS83M3MYIThpbmDsbtqz7oHWJk4mA8xCjBwawk
-        wmtaKJYkxJuSWFmVWpQfX1Sak1p8iFGag0VJnPdC18l4IYH0xJLU7NTUgtQimCwTB6dUA1Nt
-        Rhj70op5z0xtc6esmRqwSjwgbqXToigz7esFRfMLY3ddqhN4kfC4L+T/MkUjW5GwS4c5Td2X
-        bqxtY6413Bx5a7WgwUvdb6sfM98L3dgUbn/g/YXXfAWT3kzKe35tu5+27S/d0zclvzi/Eg1R
-        dji5VrU+2Nbc+4Fawv73pyVPu97awP/lYH0RA8vVD5uMM2ZVzD3/IqWnepOsWkeM7OnrMco8
-        OjzhOfnHFzWmPrPzFFypedbRa2+l8eU/7309zA683Dqh64bofvlLi5fxfvKQiDPLtjHtrvvu
-        al5VuvPVG69VEhOKgx+rars5FFfxT1566u+8t7q3C4y/TPZ/fPx84MM9s4KkHuxdyT5F0FyJ
-        pTgj0VCLuag4EQCXTrmYhwMAAA==
-X-CMS-MailID: 20220224124713epcas5p17e353eef4fb4990f0442bc0614217227
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_b2668_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220207141948epcas5p4534f6bdc5a1e2e676d7d09c04f8b4a5b
-References: <CAOSviJ0HmT9iwdHdNtuZ8vHETCosRMpR33NcYGVWOV0ki3EYgw@mail.gmail.com>
-        <20220207141348.4235-1-nj.shetty@samsung.com>
-        <CGME20220207141948epcas5p4534f6bdc5a1e2e676d7d09c04f8b4a5b@epcas5p4.samsung.com>
-        <20220207141348.4235-9-nj.shetty@samsung.com>
-        <alpine.LRH.2.02.2202160845210.22021@file01.intranet.prod.int.rdu2.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_b2668_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+blk_mq_realloc_hw_ctxs() will free the 'queue_hw_ctx'(e.g. undate
+submit_queues through configfs for null_blk), while it might still be
+used from other context(e.g. switch elevator to none):
 
-On Wed, Feb 16, 2022 at 08:51:08AM -0500, Mikulas Patocka wrote:
-> 
-> 
-> On Mon, 7 Feb 2022, Nitesh Shetty wrote:
-> 
-> > Before enabling copy for dm target, check if underlaying devices and
-> > dm target support copy. Avoid split happening inside dm target.
-> > Fail early if the request needs split, currently spliting copy
-> > request is not supported
-> > 
-> > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> 
-> If a dm device is reconfigured, you must invalidate all the copy tokens 
-> that are in flight, otherwise they would copy stale data.
-> 
-> I suggest that you create a global variable "atomic64_t dm_changed".
-> In nvme_setup_copy_read you copy this variable to the token.
-> In nvme_setup_copy_write you compare the variable with the value in the 
-> token and fail if there is mismatch.
-> In dm.c:__bind you increase the variable, so that all the tokens will be 
-> invalidated if a dm table is changed.
-> 
-> Mikulas
-> 
->
-Yes, you are right about the reconfiguration of dm device. But wouldn't having a
-single global counter(dm_changed), will invalidate for all in-flight copy IO's
-across all dm devices. Is my understanding correct?
+t1					t2
+elevator_switch
+ blk_mq_unquiesce_queue
+  blk_mq_run_hw_queues
+   queue_for_each_hw_ctx
+    // assembly code for hctx = (q)->queue_hw_ctx[i]
+    mov    0x48(%rbp),%rdx -> read old queue_hw_ctx
 
---
-Nitesh Shetty
+					__blk_mq_update_nr_hw_queues
+					 blk_mq_realloc_hw_ctxs
+					  hctxs = q->queue_hw_ctx
+					  q->queue_hw_ctx = new_hctxs
+					  kfree(hctxs)
+    movslq %ebx,%rax
+    mov    (%rdx,%rax,8),%rdi ->uaf
 
-------.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_b2668_
-Content-Type: text/plain; charset="utf-8"
+This problem was found by code review, and I comfirmed that the concurrent
+scenario do exist(specifically 'q->queue_hw_ctx' can be changed during
+blk_mq_run_hw_queues()), however, the uaf problem hasn't been repoduced yet
+without hacking the kernel.
 
+Sicne the queue is freezed in __blk_mq_update_nr_hw_queues(), fix the
+problem by protecting 'queue_hw_ctx' through rcu where it can be accessed
+without grabbing 'q_usage_counter'.
 
-------.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_b2668_--
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+changes from rfc
+ - move queue_hctx() to blk-mq.h
+ - add review tag
+
+ block/blk-mq.c         |  8 +++++++-
+ block/blk-mq.h         | 11 +++++++++++
+ include/linux/blk-mq.h |  2 +-
+ include/linux/blkdev.h |  2 +-
+ 4 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f1b067d06ab5..3fab7f925011 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3937,7 +3937,13 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 		if (hctxs)
+ 			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
+ 			       sizeof(*hctxs));
+-		q->queue_hw_ctx = new_hctxs;
++
++		rcu_assign_pointer(q->queue_hw_ctx, new_hctxs);
++		/*
++		 * Make sure reading the old queue_hw_ctx from other
++		 * context concurrently won't trigger uaf.
++		 */
++		synchronize_rcu();
+ 		kfree(hctxs);
+ 		hctxs = new_hctxs;
+ 	}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 948791ea2a3e..20dcfc74d9ee 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -86,6 +86,17 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *
+ 	return q->queue_hw_ctx[q->tag_set->map[type].mq_map[cpu]];
+ }
+ 
++static inline struct blk_mq_hw_ctx *queue_hctx(struct request_queue *q, int id)
++{
++	struct blk_mq_hw_ctx *hctx;
++
++	rcu_read_lock();
++	hctx = *(rcu_dereference(q->queue_hw_ctx) + id);
++	rcu_read_unlock();
++
++	return hctx;
++}
++
+ static inline enum hctx_type blk_mq_get_hctx_type(unsigned int flags)
+ {
+ 	enum hctx_type type = HCTX_TYPE_DEFAULT;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 3a41d50b85d3..34eab6cd95f8 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -918,7 +918,7 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+ 
+ #define queue_for_each_hw_ctx(q, hctx, i)				\
+ 	for ((i) = 0; (i) < (q)->nr_hw_queues &&			\
+-	     ({ hctx = (q)->queue_hw_ctx[i]; 1; }); (i)++)
++	     ({ hctx = queue_hctx((q), i); 1; }); (i)++)
+ 
+ #define hctx_for_each_ctx(hctx, ctx, i)					\
+ 	for ((i) = 0; (i) < (hctx)->nr_ctx &&				\
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 51a7399a98a1..b16785d1286d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -354,7 +354,7 @@ struct request_queue {
+ 	unsigned int		queue_depth;
+ 
+ 	/* hw dispatch queues */
+-	struct blk_mq_hw_ctx	**queue_hw_ctx;
++	struct blk_mq_hw_ctx __rcu	**queue_hw_ctx;
+ 	unsigned int		nr_hw_queues;
+ 
+ 	/*
+-- 
+2.31.1
+
