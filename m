@@ -2,91 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67620C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 12:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891D6C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 13:12:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240363AbiBYMww (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Feb 2022 07:52:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49386 "EHLO
+        id S241012AbiBYNNO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 08:13:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240753AbiBYMwt (ORCPT
+        with ESMTP id S240876AbiBYNNO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Feb 2022 07:52:49 -0500
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06669C4847;
-        Fri, 25 Feb 2022 04:52:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1645793530;
-        bh=9lcoOLsGCXLhkybsvev0q1tU/jL3rCQ5FnCyxRe43og=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=Jd/SsLoPixrR02DgY9hWbozzLSPPbGTNJnOW7wDsw/ZrlZX9EduwaxRHuSJO5jDdl
-         4GLz8WqWjsUHRFAecNL1seO6geNv2sb8+IbG0dcUyhS+YRqJSCrxsqZTT6t21hNJIg
-         qqBYTLJdur5M2gBEV30oIOLZPF68G7Cq+4w2vl4Y=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id F1F4F1280D51;
-        Fri, 25 Feb 2022 07:52:10 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id usP77mWu0meA; Fri, 25 Feb 2022 07:52:10 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1645793530;
-        bh=9lcoOLsGCXLhkybsvev0q1tU/jL3rCQ5FnCyxRe43og=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=Jd/SsLoPixrR02DgY9hWbozzLSPPbGTNJnOW7wDsw/ZrlZX9EduwaxRHuSJO5jDdl
-         4GLz8WqWjsUHRFAecNL1seO6geNv2sb8+IbG0dcUyhS+YRqJSCrxsqZTT6t21hNJIg
-         qqBYTLJdur5M2gBEV30oIOLZPF68G7Cq+4w2vl4Y=
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id E1D461280BA6;
-        Fri, 25 Feb 2022 07:52:09 -0500 (EST)
-Message-ID: <c97132f444ddb45dcbd4561df0a0c045dbcc2192.camel@HansenPartnership.com>
-Subject: Re: [REMINDER] LSF/MM/BPF: 2022: Call for Proposals
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Josef Bacik <josef@toxicpanda.com>,
-        lsf-pc@lists.linuxfoundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, bpf@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 25 Feb 2022 07:52:08 -0500
-In-Reply-To: <YherWymi1E/hP/sS@localhost.localdomain>
-References: <YherWymi1E/hP/sS@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        Fri, 25 Feb 2022 08:13:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98513181E55
+        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 05:12:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645794761;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q5m/jO7lh5udnKQzVaUijMT/vcP8DIr3AnFBCv6X8sA=;
+        b=A+whudTHBepKndncnELDJctBP6oue4vB3ufQvbGVHmaOmN0NNDVYUiY70U9rMqGdsgRxP3
+        Ehk1454R3uy3G6MRabXy6klxw8OQP0fYbFDUlY1TnHXriHha4Kgyu9/jPlNfaeTupNCJuS
+        PreZpfbiNMAyA3fZUXDuGSyiffPuIO0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-297-vTs_eEdQM2Cbqa6NEZynvg-1; Fri, 25 Feb 2022 08:12:40 -0500
+X-MC-Unique: vTs_eEdQM2Cbqa6NEZynvg-1
+Received: by mail-wr1-f69.google.com with SMTP id t8-20020adfa2c8000000b001e8f6889404so910624wra.0
+        for <linux-block@vger.kernel.org>; Fri, 25 Feb 2022 05:12:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=Q5m/jO7lh5udnKQzVaUijMT/vcP8DIr3AnFBCv6X8sA=;
+        b=0sibuKJnf5HJbCk+zDQ9ssexQZ+ia4qwBD/2GGjiltAXgzj7yS52zhAWCGKZTs/WnT
+         3zFJ8Iw0slLQ5VFCdh3/P47xxwk9XBlhA76nj5vWo9ghoh+XiR225dg1nzNqfXv36YE6
+         SzRECtkPTGEq9NGYhM8YPKK8yWJ6A1KjUZiMdTIxy9Hfx1pkaXnS2qIqGhZhGx1VrY+9
+         ugGdnJVgyDKoqH9WvJ6ByVi3famGq7aVZFpfq1lcGZh5oc4qJpfwLY6HasS67WJ4ENIZ
+         6ixMFtp6kRxxur+twaLwKVFsfTVsqRscUIc42AiKX+SU7F0EfRG591JYn1m5JVkA7MrX
+         gQ2Q==
+X-Gm-Message-State: AOAM533ihQrDcM+kcDtcQbhXw+dwaU6xZlGbInsn0WviQDBiApZUiRFa
+        0mOVWPgxRUVx6MIsKIAeJT4UUqHjWWrooT/1n/6PS1FYqGm2Q2IWLguw2t4wZE9olWi0FCrzUTW
+        BsQ6fcSJ1HltW2pHbjVJBwrg=
+X-Received: by 2002:a05:600c:230d:b0:37d:5882:ec9b with SMTP id 13-20020a05600c230d00b0037d5882ec9bmr2621767wmo.162.1645794759007;
+        Fri, 25 Feb 2022 05:12:39 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwI4b9vBHcOeQt/ZmS1/e52HNSF01bwScuFUG5ZV9CohndqVjI+TJ4cckBrt1RE2I3tNlK5oQ==
+X-Received: by 2002:a05:600c:230d:b0:37d:5882:ec9b with SMTP id 13-20020a05600c230d00b0037d5882ec9bmr2621744wmo.162.1645794758739;
+        Fri, 25 Feb 2022 05:12:38 -0800 (PST)
+Received: from ?IPV6:2003:cb:c706:1900:f2f7:d2ad:80d9:218f? (p200300cbc7061900f2f7d2ad80d9218f.dip0.t-ipconnect.de. [2003:cb:c706:1900:f2f7:d2ad:80d9:218f])
+        by smtp.gmail.com with ESMTPSA id m5-20020a05600c3b0500b00380da3ac789sm2535021wms.1.2022.02.25.05.12.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Feb 2022 05:12:38 -0800 (PST)
+Message-ID: <ad29be74-d296-a9fb-41d7-00d2ba15ea5c@redhat.com>
+Date:   Fri, 25 Feb 2022 14:12:37 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [RFC PATCH 0/7] block, fs: convert Direct IO to FOLL_PIN
+Content-Language: en-US
+To:     John Hubbard <jhubbard@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20220225085025.3052894-1-jhubbard@nvidia.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20220225085025.3052894-1-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2022-02-24 at 10:59 -0500, Josef Bacik wrote:
-> A few updates
+On 25.02.22 09:50, John Hubbard wrote:
+> Hi,
 > 
-> - The COVID related restrictions can be found here 
+> Summary:
 > 
-> 	
-> https://events.linuxfoundation.org/lsfmm/attend/health-and-safety/
+> This puts some prerequisites in place, including a CONFIG parameter,
+> making it possible to start converting and testing the Direct IO part of
+> each filesystem, from get_user_pages_fast(), to pin_user_pages_fast().
 > 
-> - We are working on a virtual component, however it will likely not
-> be interactive, likely just a live stream and then an IRC channel to
-> ask questions through.
+> It will take "a few" kernel releases to get the whole thing done.
+> 
+> Details:
+> 
+> As part of fixing the "get_user_pages() + file-backed memory" problem
+> [1], and to support various COW-related fixes as well [2], we need to
+> convert the Direct IO code from get_user_pages_fast(), to
+> pin_user_pages_fast(). Because pin_user_pages*() calls require a
+> corresponding call to unpin_user_page(), the conversion is more
+> elaborate than just substitution.
+> 
+> Further complicating the conversion, the block/bio layers get their
+> Direct IO pages via iov_iter_get_pages() and iov_iter_get_pages_alloc(),
+> each of which has a large number of callers. All of those callers need
+> to be audited and changed so that they call unpin_user_page(), rather
+> than put_page().
 
-We've been experimenting with hybrid over at plumbers.  Our last
-experiment at LSS in Seattle managed to get us a successful interactive
-two way A/V stream for a live Q and A using Big Blue Button.  We
-collaborated with E3 on this (The standard LF A/V provider for OSS) so
-most likely they'll be who you have in Palm Springs.  We were planning
-to go for another trial at OSS in Austin, but if you'd like to be our
-Guinea Pig, we can put all our infrastructure at your disposal.
+vmsplice is another candidate that uses iov_iter_get_pages() and should
+be converted to FOLL_PIN. For that particular user, we have to also pass
+FOLL_LONGTERM -- vmsplice as it stands can block memory hotunplug / CMA
+/ ... for all eternity.
 
-Note, your hotel uplink may not support doing this for all four tracks:
-we estimate the uplink bandwidth requirement at around 10M per track
-dedicated, but we could try it on a single track.
+-- 
+Thanks,
 
-Regards,
-
-James
-
+David / dhildenb
 
