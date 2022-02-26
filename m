@@ -2,177 +2,208 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E50ECC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 25 Feb 2022 22:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A26C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 26 Feb 2022 04:46:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233002AbiBYWVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Feb 2022 17:21:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44834 "EHLO
+        id S229831AbiBZErB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Feb 2022 23:47:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbiBYWVF (ORCPT
+        with ESMTP id S229490AbiBZEq7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Feb 2022 17:21:05 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42AE41A58C9;
-        Fri, 25 Feb 2022 14:20:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PbgL8uecXCytHcWAde/kneVzg98q0GF6063QZBcTzCgO5Mmi6Jc+Jt6FsmbHunNW2Ihh1Dvjc9pD8APDKNK+DS0tE4VM/4Fpqa2akrEJpad0N3Aw0+WUXJdunOk/AOB9n0zeMueLQ4C9YT4cRTO2I3Pxt9hzSviK90vbNQgfrzC8TxzLfPlRvjYEIY8A/REHGQ22fXlZNJEfYij0QOLg5NJ/g7ElzdGfbatqlSDt/YthLM1tjptkMafZmcNp5jkbPbcaUbAmXJn3QNtdNeBj9G0Hk2r5ryeg4xlxGEpNjBGzg1kKMA6eV4bLvgnb8FHtYedYquwHDehvqlQi/MBJ/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9c8TcnhAR7GENlu0oKJ0qHTw1exP4AbiHErVgkTWaOU=;
- b=U/SaQRbQsHuw6r60y34AuRuObrh/1uWsCO9TqZ3ni7Ek8aAVwZ/U1Mjhyt0GEAQZbObB/m93AkY/u/VIt5A2uM1WJBqg/FNE7OSPfJVFAKPqrzrTZ0bVGG4xSgMkPD+9KgrDJrB3jqdObPMn0uTJ8vJtjddGtbjt0qO0kljzNMJrY9mCl305+QhllkCpjBgnnD22iIsP38RSsi7WaDp8YsWd/8rB0F997N1ek2PNOaINcm132o7uO/n145wU7z2AQbBm99u3ohQO76/Tb8PWgVfu5UQlwiv0TWyRDl4lX0kU4bWMjveNVQtEqndVk5bj6yjl3rw1yfjSRLHGjAq6DA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9c8TcnhAR7GENlu0oKJ0qHTw1exP4AbiHErVgkTWaOU=;
- b=AKBDdyi3xAsg5OMoZpdy1yaGwXC4zbqufB3bm/4WBm62wxDKQikvGLKt0nPT/SJjep0hpkLY42OFbBhzE6n368Jnb/wSoQqDSorZE0TiZlpnf1OuOPEIm+4Nlnr7OQicLIkQOUkv2utplsi023xwtYF8/fnbzMBWOsfftWAfZEMceKA/w5JIOxsF1saJRUpTP/lWZpg/BuhqVEpCSBRsEBUT2mZq0hjhY5EZPiBRTWjk3STVXeFjMaBU9WMo8jhwrw9OnMinNWSjCYwnQaa4GZtlXtbwnoXHwawuWoqdumZuBvg+WBkRf70dl+wghmsGiQig74Ve3rIFBug8BoJ5Jw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by BN8PR12MB3217.namprd12.prod.outlook.com (2603:10b6:408:6e::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.22; Fri, 25 Feb
- 2022 22:20:28 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::498:6469:148a:49c7]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::498:6469:148a:49c7%7]) with mapi id 15.20.5017.026; Fri, 25 Feb 2022
- 22:20:28 +0000
-Message-ID: <a23c8d6f-6311-f74f-b0fe-26682e16ee98@nvidia.com>
-Date:   Fri, 25 Feb 2022 14:20:25 -0800
+        Fri, 25 Feb 2022 23:46:59 -0500
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E97B2ACD4F;
+        Fri, 25 Feb 2022 20:46:26 -0800 (PST)
+Received: by mail-pg1-f176.google.com with SMTP id o23so6420197pgk.13;
+        Fri, 25 Feb 2022 20:46:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:references:content-language:in-reply-to
+         :content-transfer-encoding;
+        bh=nj432UFAM5VOOemXaY0K3bg1hhvY0vsuWQ/8n9KXdJc=;
+        b=2ZslV52kzn5DhxY4lpv1dNXx6o83kfvh56jWrdUv7/bu61edY/sTluyjU4zPCSwDSB
+         iVkWaJ2QdxuJ9PSWNu6iywGOaPGkT1iuqTmYbCJ4F2DuYhXolxJupr5rmkZd5WAr4FD/
+         KbFIzRrmrGchh2J+UA7tvCuLov26QtqnWLKtcyiP2dQWgQM7FOLp5XzQyAiyfF0B/u3k
+         HOF5iJnjFFO1ZE6oFI5BGpv6JSg2OkX081hfbI52HPnh7vy03jfamhhWk2cCtuUXsBTX
+         iQqq5ZfABFgktcqiBLfHNTpDqIPiBWK+4dElJmhWaHzwa99gI2MYsDN68wM/ulOq4zB7
+         xqNg==
+X-Gm-Message-State: AOAM530Pu5nxcBAzItQKX/UIgL392RJoxvWX+S2wF4wLR1tQ+o6IjJH7
+        tIrXbw+Ux7BIkpaVVu7qlZI=
+X-Google-Smtp-Source: ABdhPJw9JsnVt6xjZYsHb/PqQAywfntL+yQQmfTAkERFNbVjFjPtjbfVBeAp4kpImiLBilSKgdkp+w==
+X-Received: by 2002:a63:2a45:0:b0:373:1850:d5b with SMTP id q66-20020a632a45000000b0037318500d5bmr8578548pgq.563.1645850785412;
+        Fri, 25 Feb 2022 20:46:25 -0800 (PST)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id e7-20020aa78c47000000b004de8f900716sm4747599pfd.127.2022.02.25.20.46.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Feb 2022 20:46:24 -0800 (PST)
+Message-ID: <660e2961-bbd9-afb5-7711-54745d8c6ad6@acm.org>
+Date:   Fri, 25 Feb 2022 20:46:22 -0800
+MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.6.1
-Subject: Re: [RFC PATCH 0/7] block, fs: convert Direct IO to FOLL_PIN
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: move more work to disk_release
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <20220222141450.591193-1-hch@lst.de>
 Content-Language: en-US
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220225085025.3052894-1-jhubbard@nvidia.com>
- <20220225120522.6qctxigvowpnehxl@quack3.lan>
- <d2b87357-baf9-ef1f-6e6a-18aab8e6d2fd@nvidia.com>
-In-Reply-To: <d2b87357-baf9-ef1f-6e6a-18aab8e6d2fd@nvidia.com>
+In-Reply-To: <20220222141450.591193-1-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BYAPR02CA0064.namprd02.prod.outlook.com
- (2603:10b6:a03:54::41) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dac4101a-8dd3-4947-bb1b-08d9f8ad0741
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3217:EE_
-X-Microsoft-Antispam-PRVS: <BN8PR12MB32179A76D954B23E0DC7DD71A83E9@BN8PR12MB3217.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +j9sqMzzaWXVSlE1MvqWGQtgOaPSjI9t8DD4Uy/8EJqQf/NOWvhAD1SlRt71HXdRR3ARwKRCoB4y+2ED4M4DONbgdgD2h9sBVUqxEBENAGLZkRtl1p+C9gD2Nwhl2dzxmaeOn2HxjpsxBXNFm25nUBBTHYmCzJ0OmgNrjl4nvMjSvFNh74kys22mpKaVsVtJv0PTMAJO2OhRYaQhxQVzenYTnUoF6pP897OgK/4vOceojMtpimrh+j+2+6RcAWgE4SvPKJrFLsV9w9IRXkn55vVJc0PiBYZeNG8kHux2DkGwdbRfXZd8PBAZJ60A8c+NnLnkuhxM62W9S60/pg3jWAPh1TfwWoBWxUKxcMweE6mEmZukpc0nVJKtNWTppgNj6peuMQZ1AO+7GPvFNDvxV3dgwGCJW4xAaiMdtIvUN+gF/hO7vRMKyxodU0BDHEVDFLcjhWTrkd7VdW24fLos7Lz9uTbtAxYp+LrIy7Go/VNbBEjuOSfaMFhxoJizlVmsrzf8nrVu0HnNkbBI2wMQ3mkF3/MeU+yEyx7jNLYho3Hc+if7H4d2UGk3/3vvpOMTYnTC3fdIAUc2tufTC/EzGtIl1Mpl0wWV0j80x5RKbjFHjvp5QrIs0dmSpIPL+8XwSQLNWEeiYjzV1KjK3eDmZYx/jEd0//GJo6Xc9T/DQivyYAjhwHyvBXfCEQ6OkrGDe1YbEnm0JQGX/LOE0Z6HZC9iw4cFpiNwKSn0hG636YsAD3T21jgZdw6Jk1e+Q021
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6512007)(8936002)(31686004)(86362001)(26005)(53546011)(6506007)(36756003)(31696002)(6486002)(508600001)(7416002)(6916009)(54906003)(66556008)(66476007)(38100700002)(5660300002)(2906002)(8676002)(2616005)(6666004)(186003)(66946007)(316002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFE2eU5EZTgxV25ndVJjRFdmNkxzQmYwMWYvTmJiNzZvcDNiRC9GNmlEWXFO?=
- =?utf-8?B?Q3hQQXh5QTMwRTRXL3RFd3lmdDkwVG9jeEcvMGwzSkU4aklsVmlXQ2RPWmJm?=
- =?utf-8?B?SnFpelcvRGc1ZnF0Z0NuRlJkaFdUMkNUOHBocllSLzV2ZHZMNnEyd2hnUVlj?=
- =?utf-8?B?Q0dVazdqMXVGR1VGN1Y4bkR4RWZvOEJVRndqSkttU0ROYjBJU2I3Mm5tSW5u?=
- =?utf-8?B?QkY2ZTRKajhYQzI1V09lUGV2SmkzT0VRVkZsa01jOFNBR0toenNTNDllMmtF?=
- =?utf-8?B?MEEwWnRhd1V6TVQ0SGpBbE5nTENXMDZhZDEwRURmRjdka3hTUWw5bE5leXR0?=
- =?utf-8?B?UlAzRlFKRTZVbmpudXB1MjRoUHpnWHVPeGpydFU2TUxQbWxsc0d5Z2d6RHhv?=
- =?utf-8?B?dElOdUxaWnJ6OWZhYjFRV2NpeVc1cGRoU0lIZ2xtQnlYWE5GNzlNM0sxN0JN?=
- =?utf-8?B?eUxVWTU5eExoOVJhQUFwd3dTMktoVlNqb2p0NU4zTUFaaXFucnl5L0FUYTFV?=
- =?utf-8?B?MnllSHJ4SWllQm9RSzFpVkZHbG5HTzIrYlBEZ0xOdS82WlBVNTN1Sm5hUTVz?=
- =?utf-8?B?TUZSTHNZN21kWC80NVNvOC9xc0NNWU1RaStwa3BHaGwrOHA2c2preTJGa1Jp?=
- =?utf-8?B?OHhZRWFLSkhnMG02MmRBWFhYTmJmTW9SNEs3S3h1Q1ptM3RGbVJOcXoxeURW?=
- =?utf-8?B?NlAreFJLQXN0NkRQcTgvcXZ4T3RpMUpyd1R6U0dWWE43N1NEMCtpbkM3REpq?=
- =?utf-8?B?R09TNGdFQm9URVJPazlxbXZVNUcrNjNoYXRaVDh3ODFmQnp2Q2RSc2lOS0dv?=
- =?utf-8?B?S1lySkl6Y1cva2Z5Q05kV3Y1SW1IZnhVWDlvTk5tVldtNFVocHozMzJ3Q0t3?=
- =?utf-8?B?c29OeU8wL0duZXNjblJHVldGWTVxVjJCNEUxZ3FxbW15Ritwd3VId3pjdGJZ?=
- =?utf-8?B?eEx3dWNBcG5DTElWa04wQmg1TE1jcldBL0lWdUJYdDVEdHM4VXFpRzNkZ2Jl?=
- =?utf-8?B?TldXd0k5LzJtNXkyUXF3MWJ6RE0vM2FXUkhlQ2I4WGtDa3g1aEVMWjI4S3or?=
- =?utf-8?B?S0tZaExlbzk5LytOQ1I0eHB2clcwYVRzZlJyNmtaVkd3SkJld2xJNExjSDI4?=
- =?utf-8?B?RjhVaWxEejYvZ3lvMWV6SjF4UHVXTmZ4MzBYWTUxbGhURTBacTdnMHZsY0JM?=
- =?utf-8?B?bWpIN09qTXlXSDV4NXVRRDVFcXU4azhiNGE1ZWF1bVZLYk14TmhEZWFadExh?=
- =?utf-8?B?eHJHNGRPc3RqOVhPcm5HS3hDVnhjWXZZMHFKUlNYT09GMVRTRWhCdGpZZWZr?=
- =?utf-8?B?NGJPdXV0YnFCWXpudWxMcHhwZlhCa0FNMmdLdXpEVDN1d1NhSEdqbkJUMFFM?=
- =?utf-8?B?blR4dmtMTFNJUGVZWm9iT1pJZkljTDVHUTFoblQzSVRnZ1RMV1FZVUU1V2NK?=
- =?utf-8?B?TFlvM2plUjRkNGxJWDNrTGNlbSsyQ2R2bnh5MlI1bjk2T2xxS3k0VFZVSi9y?=
- =?utf-8?B?bElYbTNUa1dsSW1lRjNyUHVsbjJiczdtTnRtb1RSSHdWcEwxaFUxbXc0TTFO?=
- =?utf-8?B?YXQ5VG5lVUhvaU91UnZocldzd2tXNlFBcUIvQzY4YzJKc2RkNFJpSE8yOFRJ?=
- =?utf-8?B?K0xteVFUY3BRMU9Ud0lkYUVXYW9RVFc5MEY2RGdDd0ZTbDUyQ3VpTFNsZmd0?=
- =?utf-8?B?RnpHUEU3Y3Fyb3QwOG9nakRIWjZYYk4ycGl2VFdhUWZ6dnd1aW91M2Znd3Jx?=
- =?utf-8?B?dFIzVDdmRVR0eHorVVBvTzBaWThTUTdUWGhIUC81bDU3T0tLNk54WWpqaVJL?=
- =?utf-8?B?Z1plZUtqZmVjTU13Yk5vTEppNjB4eEllc29kdFhBSlQ2YUN2cmZGOC9BN1RX?=
- =?utf-8?B?Z2N3VHpzYWpuMlRndEp3UnFDVXVGeDZmZkIwTUNoVHhiYUpOMWlFVVJjY2Vz?=
- =?utf-8?B?UEdwajVOdjlNOVA3UVM1Umx6aWRtYzNuU3JxUlhzMG9sQTFEaXFXQ0FmVFdp?=
- =?utf-8?B?eC9UVmp1WjkzK1NhQ2JTMnVCTm9DZFlXeGFnczc1M0txSXlvbnNwRldqSDBW?=
- =?utf-8?B?WGZoT2g0Yy9OMzg2QUFlOWFaWExKMU9aSVh1djlPWmh4dWJDTXNiRjVpVVVC?=
- =?utf-8?B?Y243cEF6UHV4STI2TmZUalUwVFlHSU5UelhPSXRXK0s4U1hhV0pNM2MrdEZ6?=
- =?utf-8?Q?oLhYCLqBpePyupp14hw81Ko=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dac4101a-8dd3-4947-bb1b-08d9f8ad0741
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2022 22:20:28.6758
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9tsroRTmQfhzZezlm8B9tndp3PWK8Z304VlD3vqC8UIL5yKnQxDuu8ddMzW2Pat3Apd4LgJ0jwD1avUFGV9rFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3217
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/25/22 11:36, John Hubbard wrote:
-> On 2/25/22 04:05, Jan Kara wrote:
-> ...
->> With having modified fs/direct-io.c and fs/iomap/direct-io.c which
->> filesystems do you know are missing conversion? Or is it that you just want
->> to make sure with audit everything is fine? The only fs I could find
->> unconverted by your changes is ceph. Am I missing something?
->>
->>                                 Honza
+On 2/22/22 06:14, Christoph Hellwig wrote:
+> Git branch:
 > 
-> There are a few more filesystems that call iov_iter_get_pages() or
-> iov_iter_get_pages_alloc(), plus networking things as well, plus some
-> others that are hard to categorize, such as vhost. So we have:
-> 
-> * ceph
-> * rds
-> * cifs
-> * p9
-> * net: __zerocopy_sg_from_iter(), tls_setup_from_iter(),
-> * crypto: af_alg_make_sg() (maybe N/A)
-> * vmsplice() (as David Hildenbrand mentioned)
-> * vhost: vhost_scsi_map_to_sgl()
+>      git://git.infradead.org/users/hch/block.git freeze-5.18
 
-...although...if each filesystem does *not* require custom attention,
-then there is another, maybe better approach, which is: factor out an
-iovec-only pair of allocators, and transition each subsystem when it's
-ready. So:
+A patch in or before this patch series may need some additional
+work. This is what I see in the kernel log if I verify the above
+kernel branch with blktests:
 
-     dio_iov_iter_get_pages()
-     dio_iov_iter_get_pages_alloc()
+run blktests block/027 at 2022-02-26 03:54:57
+[ ... ]
+==================================================================
+BUG: KASAN: use-after-free in sd_release+0x2a/0x100 [sd_mod]
+Read of size 8 at addr ffff888115a0a000 by task fio/7217
 
-That would allow doing this a bit at a time, and without the horrible
-CONFIG parameter that is switched over all at once.
+CPU: 1 PID: 7217 Comm: fio Not tainted 5.17.0-rc2-dbg+ #8
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b-rebuilt.opensuse.org 04/01/2014
+Call Trace:
+sd 9:0:0:1: [sde] Synchronizing SCSI cache
+  <TASK>
+  show_stack+0x52/0x58
+  dump_stack_lvl+0x5b/0x82
+  print_address_description.constprop.0+0x24/0x160
+  ? sd_release+0x2a/0x100 [sd_mod]
+  kasan_report.cold+0x82/0xdb
+  ? perf_trace_sched_numa_pair_template+0x340/0x350
+  ? sd_release+0x2a/0x100 [sd_mod]
+  __asan_load8+0x69/0x90
+  sd_release+0x2a/0x100 [sd_mod]
+  blkdev_put+0x15a/0x3b0
+  blkdev_close+0x3c/0x50
+  __fput+0x13d/0x430
+  ____fput+0xe/0x10
+  task_work_run+0x8e/0xe0
+  do_exit+0x2b6/0x5e0
+  do_group_exit+0x71/0x150
+  __x64_sys_exit_group+0x31/0x40
+  do_syscall_64+0x35/0x80
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f8d243d0ed1
+Code: Unable to access opcode bytes at RIP 0x7f8d243d0ea7.
+RSP: 002b:00007ffe2c7aae48 EFLAGS: 00000206 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007f8d243d0ed1
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000013
+RBP: 00007f8d1214ae90 R08: ffffffffffffe168 R09: a53fa94fea53fa95
+R10: 0000000000000002 R11: 0000000000000206 R12: 00007f8d253d3c30
+R13: 0000000000000000 R14: 0000000000000004 R15: 0000000000000000
+  </TASK>
 
-The bio_release_pages() still calls unpin_user_page(), though, so that
-means that all Direct IO callers would still have to change over at
-once.
+Allocated by task 5692:
+  kasan_save_stack+0x26/0x50
+  __kasan_kmalloc+0x88/0xa0
+  kmem_cache_alloc_trace+0x1a3/0x2c0
+  sd_probe+0x9a/0x700 [sd_mod]
+  really_probe+0x141/0x5d0
+  __driver_probe_device+0x1aa/0x240
+  driver_probe_device+0x4e/0x110
+  __device_attach_driver+0xf6/0x160
+  bus_for_each_drv+0xfd/0x160
+  __device_attach_async_helper+0x138/0x190
+  async_run_entry_fn+0x63/0x240
+  process_one_work+0x594/0xad0
+  worker_thread+0x2de/0x6b0
+  kthread+0x15f/0x190
+  ret_from_fork+0x1f/0x30
 
+Freed by task 6426:
+  kasan_save_stack+0x26/0x50
+  kasan_set_track+0x25/0x30
+  kasan_set_free_info+0x24/0x40
+  __kasan_slab_free+0x100/0x140
+  kfree+0xd1/0x510
+  scsi_disk_release+0x41/0x50 [sd_mod]
+  device_release+0x60/0x100
+  kobject_cleanup+0x7f/0x1c0
+  kobject_put+0x76/0x90
+  put_device+0x13/0x20
+  sd_remove+0x63/0x70 [sd_mod]
+  __device_release_driver+0x37e/0x390
+  device_release_driver+0x2b/0x40
+  bus_remove_device+0x1aa/0x270
+  device_del+0x2d4/0x640
+  __scsi_remove_device+0x168/0x1a0
+  sdev_store_delete+0x75/0xe0
+  dev_attr_store+0x3e/0x60
+  sysfs_kf_write+0x87/0xa0
+  kernfs_fop_write_iter+0x1c7/0x270
+  new_sync_write+0x296/0x3c0
+  vfs_write+0x43c/0x580
+  ksys_write+0xd9/0x180
+  __x64_sys_write+0x42/0x50
+  do_syscall_64+0x35/0x80
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Last potentially related work creation:
+  kasan_save_stack+0x26/0x50
+  __kasan_record_aux_stack+0xa8/0xc0
+  kasan_record_aux_stack_noalloc+0xb/0x10
+  insert_work+0x3b/0x170
+  __queue_work+0x32f/0x7d0
+  queue_work_on+0x7e/0x90
+  rpm_idle+0x432/0x460
+  __pm_runtime_set_status+0x1da/0x520
+  pm_runtime_remove+0xb3/0xc0
+  device_pm_remove+0x108/0x190
+  device_del+0x2dc/0x640
+  __scsi_remove_device+0x168/0x1a0
+  sdev_store_delete+0x75/0xe0
+  dev_attr_store+0x3e/0x60
+  sysfs_kf_write+0x87/0xa0
+  kernfs_fop_write_iter+0x1c7/0x270
+  new_sync_write+0x296/0x3c0
+  vfs_write+0x43c/0x580
+  ksys_write+0xd9/0x180
+  __x64_sys_write+0x42/0x50
+  do_syscall_64+0x35/0x80
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Second to last potentially related work creation:
+  kasan_save_stack+0x26/0x50
+  __kasan_record_aux_stack+0xa8/0xc0
+  kasan_record_aux_stack_noalloc+0xb/0x10
+  insert_work+0x3b/0x170
+  __queue_work+0x32f/0x7d0
+  queue_work_on+0x7e/0x90
+  queue_release_one_tty+0xbf/0xd0
+  release_tty+0x241/0x290
+  tty_release_struct+0x92/0xb0
+  tty_release+0x5b1/0x5f0
+  __fput+0x13d/0x430
+  ____fput+0xe/0x10
+  task_work_run+0x8e/0xe0
+  exit_to_user_mode_loop+0xee/0xf0
+  exit_to_user_mode_prepare+0xd6/0x100
+  syscall_exit_to_user_mode+0x1e/0x50
+  do_syscall_64+0x42/0x80
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff888115a0a000
+  which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 0 bytes inside of
+  2048-byte region [ffff888115a0a000, ffff888115a0a800)
+The buggy address belongs to the page:
+page:00000000fac6ce95 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888115a0f000 pfn:0x115a08
+head:00000000fac6ce95 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0x2000000000010200(slab|head|node=0|zone=2)
+raw: 2000000000010200 ffffea00041d5408 ffffea000407d808 ffff888100042f00
+raw: ffff888115a0f000 0000000000080006 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
