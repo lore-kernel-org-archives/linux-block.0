@@ -2,220 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF6FC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 26 Feb 2022 13:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 015F2C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 26 Feb 2022 14:19:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231747AbiBZNBK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Feb 2022 08:01:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40826 "EHLO
+        id S231629AbiBZOTd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Feb 2022 09:19:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230121AbiBZNBK (ORCPT
+        with ESMTP id S231497AbiBZOTc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Feb 2022 08:01:10 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD02266DB8;
-        Sat, 26 Feb 2022 05:00:35 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 79672B80139;
-        Sat, 26 Feb 2022 13:00:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C0DC340E8;
-        Sat, 26 Feb 2022 13:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1645880433;
-        bh=frJylF/+FxLOI5G318Rhg4DUZhcG4+0AAN7L8S41CrM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=V9uipyOymCTqT+EbivBEe4AYc+pBeKqN0BSGP+jOPZRHR2OiD2rwOvm9KUdsYjT40
-         YEq1e+CpFHFgcTmq/111wY3ZVIRzl8bLMce+2D8qX5amd+ftsK6nBbLzAzjLNihvBg
-         MgkmuMkSmKWC5GsneQ3FUxu2zB6DZI1iFdsMnnpI=
-Date:   Sat, 26 Feb 2022 14:00:30 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, rostedt@goodmis.org, mingo@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH] blktrace: Revert "blktrace: remove debugfs file dentries
- from struct blk_trace"
-Message-ID: <Yhokbid+ForZROCn@kroah.com>
-References: <20220226095343.1121256-1-yukuai3@huawei.com>
- <Yhn2UD7nY3poWzkN@kroah.com>
- <09fd48a2-77b1-f4fb-87d8-704fba9d754b@huawei.com>
+        Sat, 26 Feb 2022 09:19:32 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA0A28BE81
+        for <linux-block@vger.kernel.org>; Sat, 26 Feb 2022 06:18:56 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id d15so3878495pjg.1
+        for <linux-block@vger.kernel.org>; Sat, 26 Feb 2022 06:18:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=YLa//Mj+DxSVB6ps7DGXFT54Z3VfJ89NQIGANWGG0d8=;
+        b=4ZL0rPQtivoPekslBbHbwd4MefOSslZozUIbdtrwySGfwrmJgBc+4NYFds5wDTHm4t
+         2becxLEhcY0AudOFZ4Leuds9nQWinUKLxN6SxVY8v/DeIiB7zFc+sge2xTZt7HZ22E4c
+         wI8SYLYmz84xi4a9xzyzJHo9eCJMOD1cjl7Bb1Nv4I02Ks91P50Txh6GFwxAX+nN/N2O
+         4a3u/5VfFZioKhCo+T586yBD3Fo6GXnd1mbYw8bBPJ4/YmkfAFihTXT5w4NyzBoo6HyQ
+         98T2uukeyBcSTCwQEyXQsaWbpdGz1EsLyNLehoM9MUUXu2vWcjMBduc3+jxZEqlAQhXS
+         njbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=YLa//Mj+DxSVB6ps7DGXFT54Z3VfJ89NQIGANWGG0d8=;
+        b=HrBX2QQvpJ5fbPqNaDll9E1rBVmGH4q5hu/g3uPCscqO4QFTLwzJOqETzXyPskvzpS
+         PJECqbh/8elh0X1OZkGeA0kdOLzdx3MLIww+Sdb2shJ7VpFdLS++g4YzLYR9e6xo1d60
+         k/fOtnwAQu1XqUd/Bm0lkGxjm8WR8dtiXkAXGelLpD/miYA47vsH8hGTNj4SeZxQuzkc
+         uOxcvXBEh3GLb/jZHWcLXRR51eNUx1FMbazhC8HoLspAq7Z2qgIoo8BgnBWQ343R9MKF
+         cyz0odhAndyJa0nAjlZBCnMWux70X7BR/4XB15Esdz6uC2B9+sD1RirzJFpJVVnIQ8AI
+         UHfQ==
+X-Gm-Message-State: AOAM531F2LkYN3yE0/iOVmm53e6jI2fZWfLQbApx/EQ3d0WTHVaDbSRA
+        4G3ZJcuZ09nkx3yu6eCWxhyhAw==
+X-Google-Smtp-Source: ABdhPJyJKVuE7IehtiPL55TmKVwMJ1sfKAPOT8bfarpBPlYkibZZVH3H7ViDApTvLOtrG+Q1QJrxKA==
+X-Received: by 2002:a17:902:b60b:b0:150:c60:28d0 with SMTP id b11-20020a170902b60b00b001500c6028d0mr12147643pls.116.1645885136312;
+        Sat, 26 Feb 2022 06:18:56 -0800 (PST)
+Received: from [127.0.1.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id x23-20020a63fe57000000b0036490068f12sm5767222pgj.90.2022.02.26.06.18.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Feb 2022 06:18:55 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc:     linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org
+In-Reply-To: <20220222154634.597067-1-hch@lst.de>
+References: <20220222154634.597067-1-hch@lst.de>
+Subject: Re: simple file system cleanups for the new bio_alloc calling conventions
+Message-Id: <164588513511.8353.16195805858154505642.b4-ty@kernel.dk>
+Date:   Sat, 26 Feb 2022 07:18:55 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <09fd48a2-77b1-f4fb-87d8-704fba9d754b@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 26, 2022 at 05:57:44PM +0800, yukuai (C) wrote:
-> 在 2022/02/26 17:43, Greg KH 写道:
-> > On Sat, Feb 26, 2022 at 05:53:43PM +0800, Yu Kuai wrote:
-> > > This reverts commit c0ea57608b691d6cde8aff23e11f9858a86b5918.
-> > > 
-> > > When tracing the whole disk, 'dropped' and 'msg' will be created
-> > > under 'q->debugfs_dir' and 'bt->dir' is NULL, thus blk_trace_free()
-> > > won't remove those files. What's worse, the following UAF can be
-> > > triggered because of stale 'dropped' and 'msg':
-> > 
-> > Only root has access to these files, right?
+On Tue, 22 Feb 2022 16:46:31 +0100, Christoph Hellwig wrote:
+> this fixes up the remaining fairly trivial file system bio alloctions to
+> directly pass the bdev to bio_alloc.  f2fs and btrfs will need more work and
+> will be handled separately.
 > 
-> Hi,
+> This is against Jens' for-5.18/block branch.  It would probably make sense to
+> also merge it through that.
 > 
-> Yes, usually user will use blktrace to access these files.
-> > 
-> > > 
-> > > ==================================================================
-> > > BUG: KASAN: use-after-free in blk_dropped_read+0x89/0x100
-> > > Read of size 4 at addr ffff88816912f3d8 by task blktrace/1188
-> > > 
-> > > CPU: 27 PID: 1188 Comm: blktrace Not tainted 5.17.0-rc4-next-20220217+ #469
-> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-4
-> > > Call Trace:
-> > >   <TASK>
-> > >   dump_stack_lvl+0x34/0x44
-> > >   print_address_description.constprop.0.cold+0xab/0x381
-> > >   ? blk_dropped_read+0x89/0x100
-> > >   ? blk_dropped_read+0x89/0x100
-> > >   kasan_report.cold+0x83/0xdf
-> > >   ? blk_dropped_read+0x89/0x100
-> > >   kasan_check_range+0x140/0x1b0
-> > >   blk_dropped_read+0x89/0x100
-> > >   ? blk_create_buf_file_callback+0x20/0x20
-> > >   ? kmem_cache_free+0xa1/0x500
-> > >   ? do_sys_openat2+0x258/0x460
-> > >   full_proxy_read+0x8f/0xc0
-> > >   vfs_read+0xc6/0x260
-> > >   ksys_read+0xb9/0x150
-> > >   ? vfs_write+0x3d0/0x3d0
-> > >   ? fpregs_assert_state_consistent+0x55/0x60
-> > >   ? exit_to_user_mode_prepare+0x39/0x1e0
-> > >   do_syscall_64+0x35/0x80
-> > >   entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > > RIP: 0033:0x7fbc080d92fd
-> > > Code: ce 20 00 00 75 10 b8 00 00 00 00 0f 05 48 3d 01 f0 ff ff 73 31 c3 48 83 1
-> > > RSP: 002b:00007fbb95ff9cb0 EFLAGS: 00000293 ORIG_RAX: 0000000000000000
-> > > RAX: ffffffffffffffda RBX: 00007fbb95ff9dc0 RCX: 00007fbc080d92fd
-> > > RDX: 0000000000000100 RSI: 00007fbb95ff9cc0 RDI: 0000000000000045
-> > > RBP: 0000000000000045 R08: 0000000000406299 R09: 00000000fffffffd
-> > > R10: 000000000153afa0 R11: 0000000000000293 R12: 00007fbb780008c0
-> > > R13: 00007fbb78000938 R14: 0000000000608b30 R15: 00007fbb780029c8
-> > >   </TASK>
-> > > 
-> > > Allocated by task 1050:
-> > >   kasan_save_stack+0x1e/0x40
-> > >   __kasan_kmalloc+0x81/0xa0
-> > >   do_blk_trace_setup+0xcb/0x410
-> > >   __blk_trace_setup+0xac/0x130
-> > >   blk_trace_ioctl+0xe9/0x1c0
-> > >   blkdev_ioctl+0xf1/0x390
-> > >   __x64_sys_ioctl+0xa5/0xe0
-> > >   do_syscall_64+0x35/0x80
-> > >   entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > > 
-> > > Freed by task 1050:
-> > >   kasan_save_stack+0x1e/0x40
-> > >   kasan_set_track+0x21/0x30
-> > >   kasan_set_free_info+0x20/0x30
-> > >   __kasan_slab_free+0x103/0x180
-> > >   kfree+0x9a/0x4c0
-> > >   __blk_trace_remove+0x53/0x70
-> > >   blk_trace_ioctl+0x199/0x1c0
-> > >   blkdev_common_ioctl+0x5e9/0xb30
-> > >   blkdev_ioctl+0x1a5/0x390
-> > >   __x64_sys_ioctl+0xa5/0xe0
-> > >   do_syscall_64+0x35/0x80
-> > >   entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > > 
-> > > The buggy address belongs to the object at ffff88816912f380
-> > >   which belongs to the cache kmalloc-96 of size 96
-> > > The buggy address is located 88 bytes inside of
-> > >   96-byte region [ffff88816912f380, ffff88816912f3e0)
-> > > The buggy address belongs to the page:
-> > > page:000000009a1b4e7c refcount:1 mapcount:0 mapping:0000000000000000 index:0x0f
-> > > flags: 0x17ffffc0000200(slab|node=0|zone=2|lastcpupid=0x1fffff)
-> > > raw: 0017ffffc0000200 ffffea00044f1100 dead000000000002 ffff88810004c780
-> > > raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
-> > > page dumped because: kasan: bad access detected
-> > > 
-> > > Memory state around the buggy address:
-> > >   ffff88816912f280: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-> > >   ffff88816912f300: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-> > > > ffff88816912f380: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-> > >                                                      ^
-> > >   ffff88816912f400: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-> > >   ffff88816912f480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-> > > ==================================================================
-> > > 
-> > > Fixes: c0ea57608b69 ("blktrace: remove debugfs file dentries from struct blk_trace")
-> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > > ---
-> > >   include/linux/blktrace_api.h | 2 ++
-> > >   kernel/trace/blktrace.c      | 8 ++++++--
-> > >   2 files changed, 8 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-> > > index 22501a293fa5..f288d229727c 100644
-> > > --- a/include/linux/blktrace_api.h
-> > > +++ b/include/linux/blktrace_api.h
-> > > @@ -23,6 +23,8 @@ struct blk_trace {
-> > >   	u32 pid;
-> > >   	u32 dev;
-> > >   	struct dentry *dir;
-> > > +	struct dentry *dropped_file;
-> > > +	struct dentry *msg_file;
-> > 
-> > No need to save these dentries.  Just look them up when you want to
-> > remove the files.
-> 
-> Ok, I'll do this in the v2 patch.
-> > 
-> > >   	struct list_head running_list;
-> > >   	atomic_t dropped;
-> > >   };
-> > > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> > > index 19514edc44f7..13152a17fdb3 100644
-> > > --- a/kernel/trace/blktrace.c
-> > > +++ b/kernel/trace/blktrace.c
-> > > @@ -312,6 +312,8 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
-> > >   static void blk_trace_free(struct blk_trace *bt)
-> > >   {
-> > > +	debugfs_remove(bt->msg_file);
-> > > +	debugfs_remove(bt->dropped_file);
-> > >   	relay_close(bt->rchan);
-> > >   	debugfs_remove(bt->dir);
-> > 
-> > Why not just move this line up above relay_close()?
-> > 
-> > Then you the whole directory is properly removed, along with the files
-> > in it.
-> 
-> In the case tracing the whole disk, bt->dir is NULL, if dentries are not
-> saved, they should be looked up from 'q->debugfs_dir'. Perhaps the
-> following:
-> 
-> if (bt->dir) {
-> 	debugfs_remove(bt->dir);
-> } else {
-> 	/* lookup from q->debugfs_dir and remove */
-> }
+> [...]
 
-The check for bt->dir is odd, as aren't the msg_file in the bt->dir
-directory?
+Applied, thanks!
 
-Ah, ick, that's not obvious at all that there is two different cases
-happening here.
+[1/3] mpage: pass the operation to bio_alloc
+      commit: 8020990b8e1be0b4e325371ccb45a427acbabf9e
+[2/3] ext4: pass the operation to bio_alloc
+      commit: 6a9856721a18208a50c826ed84b3665c4851dfe8
+[3/3] nilfs2: pass the operation to bio_alloc
+      commit: 91f6bd2d4d0aa91abf11b5780221d776f30cbac1
 
-Yes, your code will work, but please comment the heck out of it as
-normally when I see a "check if we have a file/directory before we
-remove it" for debugfs I want to optimize it away to just call the
-debugfs function as debugfs doesn't care about invalid parameters like
-this.  But you are using it as a test if this is in full disk mode or
-not, which isn't obvious at all (hence my confusion when I wrote the
-original patch, sorry.)
+Best regards,
+-- 
+Jens Axboe
 
-thanks,
 
-greg k-h
