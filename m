@@ -2,108 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA59C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 17:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3342CC433FE
+	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 21:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbiB0RXT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Feb 2022 12:23:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59550 "EHLO
+        id S231894AbiB0Vw1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Feb 2022 16:52:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229897AbiB0RXG (ORCPT
+        with ESMTP id S231421AbiB0Vw1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Feb 2022 12:23:06 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C73ED25FF;
-        Sun, 27 Feb 2022 09:22:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=lyhZqRb2LLr4H11ILlCUnzxmrssUy41DoVjUxuwxvoE=; b=vsqe+xRwRfuOXRf3QyTLYuSDq0
-        mz9kfHVU6yREWyUvrrgea7PQRkbU4VDblWjNkZcpzOToEoZB9P0ouE6KgBxKgofFTVuCFyLlMYHFS
-        RvwcHi/WgdxKQypCQQPMzn8+O9jjq8UCcVwhFIAse+HrcvRTuw9AJsOQ3bjDhFtHThU32E6cfCDq7
-        Xy5lCM3g202eqzZt6obZ2/jaHB1NLbac3Hs0bxU5wVL5rpUQMCFW3txE78dOIh5nNrZTEtY0D4yad
-        TpOCcVpImaJVNuKMOBQ0LqSvu4UwBBtLcFv7h+gxQvXh2JQTc5bZATJsI2PpCDwrmqdZXsopTpqC3
-        osdN9aow==;
-Received: from 91-118-163-82.static.upcbusiness.at ([91.118.163.82] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nONFX-009s6m-Pe; Sun, 27 Feb 2022 17:22:24 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH 13/14] block: do more work in elevator_exit
-Date:   Sun, 27 Feb 2022 18:21:43 +0100
-Message-Id: <20220227172144.508118-14-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220227172144.508118-1-hch@lst.de>
-References: <20220227172144.508118-1-hch@lst.de>
+        Sun, 27 Feb 2022 16:52:27 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C01D05BD32
+        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 13:51:49 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id bc27so919117pgb.4
+        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 13:51:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=T+bY3cSVQwU97rpm1PWOkOKMCijaJDttt0NtP9XMRUQ=;
+        b=P5MaDUXk16z8/hpH693B2xHSHZo//ZReUYLWsO5WmQlLEtpjLdqZ3SxcShABucESWD
+         gkUDZcqvtqrxzTL/HBznk0KrejYwIAj3HoxYQalVeG1HxDmq/YLbpu9NlB4P6TirmJj2
+         tNdNIV6wYGqY82VLMA+Mw5GUbyS0jOd/itE8dHkrcVdM9Bb6L95gorWOa8zYmgsddC8h
+         zwCoc5DjwY/j3Rg7vXTyev4iXasdo5AcMBQ1q6scfujWk+AKpoL3W0XrcjyD40Gt2MbI
+         /8viux9vd/q2pOFj2lly3had36ZTNzGSAeWkdFCorEsxqkjHFwoed3w28lUUMVXaTzda
+         BIcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=T+bY3cSVQwU97rpm1PWOkOKMCijaJDttt0NtP9XMRUQ=;
+        b=e1hOXYLvvCywOhKM3XwNr20WMVfhcDsQGVzCLImv3fPqeKARkMtBIjrefjApEGCi3p
+         c8WA44rDbvHHZiODwl9akVXrKYJ9RjpGQAf92UP+ajEnJBACWvusCQBQfnF9E5cMWkcj
+         /AxdHmRFBHiy5q2vi0Jntu0bIu/7YCOy2Bj39dBXBYV9aWSUH4wxuBWQ67G78civFp/p
+         xSHyvWdqVzRF4Ql4L6/optk8g9COFvcmQ0ADywLEw9W9LmoCJ9i/V1L6b1p4ZU5uqTA7
+         kKjhVVfJtuW+HvS+U1ZR4x2/B5Q79jNiqAY+zH6hotOnYdEMulqDtr0DP8IthFgiNSvA
+         x5eA==
+X-Gm-Message-State: AOAM532hrZ2c26WpxfA12AvQ6TqCbMhv7GBAyyszMaTeTQf7sEAfMhUn
+        dPnG6SBNOrR9ID6UOOKkydecI/5jIWOrXA==
+X-Google-Smtp-Source: ABdhPJw5iyelAy8Y8e7UDBvu5VGI0R9LRLKgwMaAMReYVGgkCIixIT0k5CsicGBwZOju4r6toco/bw==
+X-Received: by 2002:a63:221f:0:b0:374:7286:446a with SMTP id i31-20020a63221f000000b003747286446amr14756264pgi.538.1645998709137;
+        Sun, 27 Feb 2022 13:51:49 -0800 (PST)
+Received: from [192.168.4.166] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id v23-20020a17090a521700b001bbfc181c93sm15037230pjh.19.2022.02.27.13.51.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Feb 2022 13:51:48 -0800 (PST)
+Message-ID: <d7ed009d-09af-935b-f905-fef7d02f1649@kernel.dk>
+Date:   Sun, 27 Feb 2022 14:51:46 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai3@huawei.com>
+Cc:     ming.lei@redhat.com, tj@kernel.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+ <YhuyBgZSS6m/Mwu6@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YhuyBgZSS6m/Mwu6@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the calls to ioc_clear_queue and blk_mq_sched_free_rqs into
-elevator_exit.  Except for one call where we know we can't have io_cq
-structures yet these always go together, and that extra call in an
-error path is harmless.
+On 2/27/22 10:16 AM, Christoph Hellwig wrote:
+> On Thu, Feb 10, 2022 at 07:56:37PM +0800, Yu Kuai wrote:
+>> Throttled bios can't be issued after del_gendisk() is done, thus
+>> it's better to cancel them immediately rather than waiting for
+>> throttle is done.
+>>
+>> For example, if user thread is throttled with low bps while it's
+>> issuing large io, and the device is deleted. The user thread will
+>> wait for a long time for io to return.
+> 
+> FYI, this crashed left rigt and center when running xfstests with
+> traces pointing to throtl_pending_timer_fn.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/elevator.c | 7 +++----
- block/genhd.c    | 3 ---
- 2 files changed, 3 insertions(+), 7 deletions(-)
+Dropped for now.
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 6847ab6e7aa50..4664cae50da86 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -192,6 +192,9 @@ void elevator_exit(struct request_queue *q)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	ioc_clear_queue(q);
-+	blk_mq_sched_free_rqs(q);
-+
- 	mutex_lock(&e->sysfs_lock);
- 	blk_mq_exit_sched(q, e);
- 	mutex_unlock(&e->sysfs_lock);
-@@ -595,9 +598,6 @@ int elevator_switch_mq(struct request_queue *q,
- 	if (q->elevator) {
- 		if (q->elevator->registered)
- 			elv_unregister_queue(q);
--
--		ioc_clear_queue(q);
--		blk_mq_sched_free_rqs(q);
- 		elevator_exit(q);
- 	}
- 
-@@ -608,7 +608,6 @@ int elevator_switch_mq(struct request_queue *q,
- 	if (new_e) {
- 		ret = elv_register_queue(q, true);
- 		if (ret) {
--			blk_mq_sched_free_rqs(q);
- 			elevator_exit(q);
- 			goto out;
- 		}
-diff --git a/block/genhd.c b/block/genhd.c
-index a92641911bc1b..5368ec88e485f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1117,10 +1117,7 @@ static void disk_release_mq(struct request_queue *q)
- 	 * cgroup controller.
- 	 */
- 	if (q->elevator) {
--		ioc_clear_queue(q);
--
- 		mutex_lock(&q->sysfs_lock);
--		blk_mq_sched_free_rqs(q);
- 		elevator_exit(q);
- 		mutex_unlock(&q->sysfs_lock);
- 	}
 -- 
-2.30.2
+Jens Axboe
 
