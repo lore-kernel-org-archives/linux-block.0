@@ -2,91 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 015F2C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 26 Feb 2022 14:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78932C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 09:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231629AbiBZOTd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Feb 2022 09:19:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50928 "EHLO
+        id S229575AbiB0JfU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Feb 2022 04:35:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231497AbiBZOTc (ORCPT
+        with ESMTP id S229512AbiB0JfU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Feb 2022 09:19:32 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA0A28BE81
-        for <linux-block@vger.kernel.org>; Sat, 26 Feb 2022 06:18:56 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id d15so3878495pjg.1
-        for <linux-block@vger.kernel.org>; Sat, 26 Feb 2022 06:18:56 -0800 (PST)
+        Sun, 27 Feb 2022 04:35:20 -0500
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6B13AA66;
+        Sun, 27 Feb 2022 01:34:44 -0800 (PST)
+Received: by mail-qv1-xf2f.google.com with SMTP id h13so10137210qvk.12;
+        Sun, 27 Feb 2022 01:34:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=YLa//Mj+DxSVB6ps7DGXFT54Z3VfJ89NQIGANWGG0d8=;
-        b=4ZL0rPQtivoPekslBbHbwd4MefOSslZozUIbdtrwySGfwrmJgBc+4NYFds5wDTHm4t
-         2becxLEhcY0AudOFZ4Leuds9nQWinUKLxN6SxVY8v/DeIiB7zFc+sge2xTZt7HZ22E4c
-         wI8SYLYmz84xi4a9xzyzJHo9eCJMOD1cjl7Bb1Nv4I02Ks91P50Txh6GFwxAX+nN/N2O
-         4a3u/5VfFZioKhCo+T586yBD3Fo6GXnd1mbYw8bBPJ4/YmkfAFihTXT5w4NyzBoo6HyQ
-         98T2uukeyBcSTCwQEyXQsaWbpdGz1EsLyNLehoM9MUUXu2vWcjMBduc3+jxZEqlAQhXS
-         njbA==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Mni5yEHGP1qoaz/6hLvUm/V5F3W7L/m3Wwp7WeQHDBs=;
+        b=i/DtVk9P1DTHcuWOXDH9pwmZG/a6m++cXjyfgszKxoJCGq61z0Vh9V6VT7598xqiMi
+         EF1aHesjRXqFVb1MLfCyfjVLdKDjxStOIQgcFf5sdUVfVFVSgj5nzuRpk39ZssABWyKh
+         a5V1wQVAoDRNzC9Dl1gk7AqHG50JPjaqkE16unCe75SAiAEMS+WC4cVBEtbtkF7Dem5C
+         uPnBaKWJ7OQhiSUrqoI9Da0PZrEndqPQmR1OX4KId4mTUcIqvmNuHTnvKYBBLBjkQG9b
+         zfm9wn/aSeqIz2OuKsGS5Jxx5jqmvvBDJl5gDl+K45QxzWErwVzB3/emB9ggfzRG4X0z
+         Zzmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=YLa//Mj+DxSVB6ps7DGXFT54Z3VfJ89NQIGANWGG0d8=;
-        b=HrBX2QQvpJ5fbPqNaDll9E1rBVmGH4q5hu/g3uPCscqO4QFTLwzJOqETzXyPskvzpS
-         PJECqbh/8elh0X1OZkGeA0kdOLzdx3MLIww+Sdb2shJ7VpFdLS++g4YzLYR9e6xo1d60
-         k/fOtnwAQu1XqUd/Bm0lkGxjm8WR8dtiXkAXGelLpD/miYA47vsH8hGTNj4SeZxQuzkc
-         uOxcvXBEh3GLb/jZHWcLXRR51eNUx1FMbazhC8HoLspAq7Z2qgIoo8BgnBWQ343R9MKF
-         cyz0odhAndyJa0nAjlZBCnMWux70X7BR/4XB15Esdz6uC2B9+sD1RirzJFpJVVnIQ8AI
-         UHfQ==
-X-Gm-Message-State: AOAM531F2LkYN3yE0/iOVmm53e6jI2fZWfLQbApx/EQ3d0WTHVaDbSRA
-        4G3ZJcuZ09nkx3yu6eCWxhyhAw==
-X-Google-Smtp-Source: ABdhPJyJKVuE7IehtiPL55TmKVwMJ1sfKAPOT8bfarpBPlYkibZZVH3H7ViDApTvLOtrG+Q1QJrxKA==
-X-Received: by 2002:a17:902:b60b:b0:150:c60:28d0 with SMTP id b11-20020a170902b60b00b001500c6028d0mr12147643pls.116.1645885136312;
-        Sat, 26 Feb 2022 06:18:56 -0800 (PST)
-Received: from [127.0.1.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id x23-20020a63fe57000000b0036490068f12sm5767222pgj.90.2022.02.26.06.18.55
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Mni5yEHGP1qoaz/6hLvUm/V5F3W7L/m3Wwp7WeQHDBs=;
+        b=z7gfc4HX5nXy1chSEyqmSlX1X47whTIgem/EfSk3ZBe0cD4aMk1vBlMnPGbejdoaIf
+         iq6NfBZ0RhxMgfM3VvOJdTk/BWWsojD18e3t10N7mlqDkNZrrNuK4h610LKpVoMG4/uc
+         WU8WUqzLxO24LSSV2cDcZWQF3e13drDQYnAbuQqfIwqs+rvnSVLELjfvCWT9g3ilDHMI
+         aKsA46ULKw5wUys6ArsBgKoN5+5C0ICxP3GsLc3V6FqjzjbCYWTkxC3EoF3srJgvJB2L
+         i6fgf1bQlh0sJLSPqIx1KCTqtI0QfjT73TcyDXgF6yQq9ANO04zJVxBhdoltgU7f3NZK
+         Jzmw==
+X-Gm-Message-State: AOAM5331l3AuHqqfNBB9b75j/Wz/NFgvy/wRQR1CucQzOBdQF8E1RpcS
+        Vpaynl4Wnoc9AaSkVjtp9/A=
+X-Google-Smtp-Source: ABdhPJzlq9Z9ay7IQGmu5husNkkRN/qKFoSudupKCgD7SFi/psSCUSPiOgMXvH9tuYollM3Gca/QcA==
+X-Received: by 2002:a05:6214:ca3:b0:42d:129a:5ac6 with SMTP id s3-20020a0562140ca300b0042d129a5ac6mr11161514qvs.86.1645954483191;
+        Sun, 27 Feb 2022 01:34:43 -0800 (PST)
+Received: from sandstorm.attlocal.net (76-242-90-12.lightspeed.sntcca.sbcglobal.net. [76.242.90.12])
+        by smtp.gmail.com with ESMTPSA id h3-20020a05622a170300b002e008a93f8fsm469815qtk.91.2022.02.27.01.34.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Feb 2022 06:18:55 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Cc:     linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Sun, 27 Feb 2022 01:34:42 -0800 (PST)
+From:   jhubbard.send.patches@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20220222154634.597067-1-hch@lst.de>
-References: <20220222154634.597067-1-hch@lst.de>
-Subject: Re: simple file system cleanups for the new bio_alloc calling conventions
-Message-Id: <164588513511.8353.16195805858154505642.b4-ty@kernel.dk>
-Date:   Sat, 26 Feb 2022 07:18:55 -0700
+        Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH 0/6] block, fs: convert most Direct IO cases to FOLL_PIN
+Date:   Sun, 27 Feb 2022 01:34:28 -0800
+Message-Id: <20220227093434.2889464-1-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 22 Feb 2022 16:46:31 +0100, Christoph Hellwig wrote:
-> this fixes up the remaining fairly trivial file system bio alloctions to
-> directly pass the bdev to bio_alloc.  f2fs and btrfs will need more work and
-> will be handled separately.
-> 
-> This is against Jens' for-5.18/block branch.  It would probably make sense to
-> also merge it through that.
-> 
-> [...]
+From: John Hubbard <jhubbard@nvidia.com>
 
-Applied, thanks!
+Hi,
 
-[1/3] mpage: pass the operation to bio_alloc
-      commit: 8020990b8e1be0b4e325371ccb45a427acbabf9e
-[2/3] ext4: pass the operation to bio_alloc
-      commit: 6a9856721a18208a50c826ed84b3665c4851dfe8
-[3/3] nilfs2: pass the operation to bio_alloc
-      commit: 91f6bd2d4d0aa91abf11b5780221d776f30cbac1
+The feedback on the RFC [1] prompted me to convert the core Direct IO
+subsystem all at once. The key differences here, as compared to the RFC,
+are:
 
-Best regards,
+    * no dio_w_*() wrapper routines,
+
+    * no CONFIG parameter; and
+
+    * new iov_iter_pin_pages*() routines that pin pages without
+      affecting other callers of iov_iter_get_pages*(). Those other
+      callers (ceph, rds, net, ...) can be converted separately.
+
+Also, many pre-existing callers of unpin_user_pages_dirty_lock() are
+wrong, and this series adds a few more callers. So readers may naturally
+wonder about that. I recently had a very productive discussion with Ted
+Ts'o, who suggested a way to fix the problem, and I'm going to implement
+it, next. However, I think it's best to do that fix separately from
+this, probably layered on top, although it could go either before or
+after.
+
+As part of fixing the "get_user_pages() + file-backed memory" problem
+[2], and to support various COW-related fixes as well [3], we need to
+convert the Direct IO code from get_user_pages_fast(), to
+pin_user_pages_fast(). Because pin_user_pages*() calls require a
+corresponding call to unpin_user_page(), the conversion is more
+elaborate than just substitution.
+
+In the main patch (patch 4) I'm a little concerned about the
+bio_map_user_iov() changes, because the sole caller,
+blk_rq_map_user_iov(), has either a direct mapped case or a copy from
+user case, and I'm still not sure that these are properly kept separate,
+from an unpin pages point of view. So a close look there by reviewers
+would be welcome.
+
+Testing: this needs lots of filesystem testing.
+
+In this patchset:
+
+Patches 1, 2: provide a few new routines that will be used by
+conversion: pin_user_page(), iov_iter_pin_pages(),
+iov_iter_pin_pages_alloc().
+
+Patch 3: provide a few asserts that only user space pages are being
+passed in for Direct IO. (This patch could be folded into another
+patch.)
+
+Patch 4: Convert all Direct IO callers that use iomap, or
+blockdev_direct_IO(), or bio_iov_iter_get_pages().
+
+Patch 5, 6: convert a few other callers to the new system: NFS-Direct,
+and fuse.
+
+This is based on linux-next (next-20220225). I've also stashed it here:
+
+    https://github.com/johnhubbard/linux bio_pup_next_20220225
+
+
+[1] https://lore.kernel.org/r/20220225085025.3052894-1-jhubbard@nvidia.com
+
+[2] https://lwn.net/Articles/753027/ "The trouble with get_user_pages()"
+
+[3] https://lore.kernel.org/all/20211217113049.23850-1-david@redhat.com/T/#u
+    (David Hildenbrand's mm/COW fixes)
+
+John Hubbard (6):
+  mm/gup: introduce pin_user_page()
+  iov_iter: new iov_iter_pin_pages*(), for FOLL_PIN pages
+  block, fs: assert that key paths use iovecs, and nothing else
+  block, bio, fs: convert most filesystems to pin_user_pages_fast()
+  NFS: direct-io: convert to FOLL_PIN pages
+  fuse: convert direct IO paths to use FOLL_PIN
+
+ block/bio.c          | 29 ++++++++--------
+ block/blk-map.c      |  6 ++--
+ fs/direct-io.c       | 28 ++++++++--------
+ fs/fuse/dev.c        |  7 ++--
+ fs/fuse/file.c       | 38 +++++----------------
+ fs/iomap/direct-io.c |  2 +-
+ fs/nfs/direct.c      | 15 +++------
+ include/linux/mm.h   |  1 +
+ include/linux/uio.h  |  4 +++
+ lib/iov_iter.c       | 78 ++++++++++++++++++++++++++++++++++++++++++++
+ mm/gup.c             | 34 +++++++++++++++++++
+ 11 files changed, 170 insertions(+), 72 deletions(-)
+
+
+base-commit: 06aeb1495c39c86ccfaf1adadc1d2200179f16eb
 -- 
-Jens Axboe
-
+2.35.1
 
