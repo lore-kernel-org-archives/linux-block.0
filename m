@@ -2,199 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D929DC43217
-	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 09:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 154BFC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 11:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbiB0Jfb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Feb 2022 04:35:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35486 "EHLO
+        id S230192AbiB0LBL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Feb 2022 06:01:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbiB0Jfa (ORCPT
+        with ESMTP id S229964AbiB0LBK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Feb 2022 04:35:30 -0500
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD82B3B00A;
-        Sun, 27 Feb 2022 01:34:54 -0800 (PST)
-Received: by mail-qk1-x72e.google.com with SMTP id c7so8186936qka.7;
-        Sun, 27 Feb 2022 01:34:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=3ydXRxafX1EOKVAeUm3spAkjR9HLvDHZhsiMVOXC7pM=;
-        b=Ry/pcRhCOPtr1BHLw6EHtZnD+ABBqojtwAXfsBmfqclWrxUkX6MSl4hET36Zct4AbT
-         4uOAlghzb+c72+v2pSSvRm9khxVGZyzADyCaA/2p864tFi9InGHoLV0kZrMm87/zxJVh
-         VSq5O3bnrSjGRHZCSfSHEs5jlLPJrKFDBq1EveU6WRvxDlNB/p5VOKzVXfQ629fxPNIr
-         qawBh26DurhQt+kvkGKMpZaWMscQKuOJlDFAwqqL6UrQyJ9vSzYS3uQG5AL7kRhVM2jS
-         wIj427P9ZAnm1FzBk73O1UcZn8Qg1HgpjyUioAIyoz4lhqRQZQr0yTULOXil6Kri7OeG
-         NslQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3ydXRxafX1EOKVAeUm3spAkjR9HLvDHZhsiMVOXC7pM=;
-        b=RBxDqXomR6rJ3gjI0kdDutTwO3UiVItGXQolGym3ibmsqmFpB3s2iHHaIG3fhoU+UE
-         tbb4XLXWYySI2eEUEgLgVTQmsd2WhwQtdnh35yYxMcFeXffyDnbcT4HLTLoHdLQpQyGM
-         uMp1Wdly8GSw/jWijdQa2JF6+iecO/69HB0ghGYZh8ytA58BEFpq82ihEYbFMoFnrqLU
-         kYe/iOtlgOOguID81mPla9JEGNy1OwAUfQ0uF2RoAqpjZn1tzKkBzNkjVqO6DrruD0VS
-         /rU0sf4sjLF7u1jnUirFpnM/vgb0AMCON7hp3o/pMYVDadrsYtoAfKu+VLIkj15d00rv
-         HZgQ==
-X-Gm-Message-State: AOAM531cRkW5/f+cqkpiZRqfHyXMSC7TYukbKt/P2InqzCHWfk06gMP5
-        eBmln+MbIYDgLgrywzazeN0=
-X-Google-Smtp-Source: ABdhPJxMxpMStJYT/anaXMiOzH0PUmpS5c44ybggs8kRB3SW3X4/9Ls7JKzoSQwP278gUHwekI7TMA==
-X-Received: by 2002:a05:620a:469f:b0:648:f460:333c with SMTP id bq31-20020a05620a469f00b00648f460333cmr8758089qkb.36.1645954494005;
-        Sun, 27 Feb 2022 01:34:54 -0800 (PST)
-Received: from sandstorm.attlocal.net (76-242-90-12.lightspeed.sntcca.sbcglobal.net. [76.242.90.12])
-        by smtp.gmail.com with ESMTPSA id h3-20020a05622a170300b002e008a93f8fsm469815qtk.91.2022.02.27.01.34.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Feb 2022 01:34:53 -0800 (PST)
-From:   jhubbard.send.patches@gmail.com
-X-Google-Original-From: jhubbard@nvidia.com
-To:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH 6/6] fuse: convert direct IO paths to use FOLL_PIN
-Date:   Sun, 27 Feb 2022 01:34:34 -0800
-Message-Id: <20220227093434.2889464-7-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220227093434.2889464-1-jhubbard@nvidia.com>
-References: <20220227093434.2889464-1-jhubbard@nvidia.com>
+        Sun, 27 Feb 2022 06:01:10 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A806D56211
+        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 03:00:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1645959632;
+        bh=DmtChRc6KYh/Oj5XxryxrWWO/JG5NgXElHEXJfkoAhg=;
+        h=X-UI-Sender-Class:Date:Subject:To:References:From:In-Reply-To;
+        b=GR8rI7D5w9WL/bVJVhNOkrwWp5hH9XGzso0q+rpb4OKet/goVDPsOBqc62yL60Pnx
+         rM7DWY1R2/a/cl78ueafZ8FMc2DWeec6QWT1Xu3I6luEgNmAccVsTHt24KSUCV0iMa
+         GKTiSlZ1lBAnbIv+/um5ly8KvGj5C09SRy2Xc8LE=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.178.27] ([45.14.99.28]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M5QF5-1nP6dO3BGH-001Pai for
+ <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 12:00:31 +0100
+Message-ID: <90b58638-8279-ff09-62fc-aa1fdd5057df@gmx.net>
+Date:   Sun, 27 Feb 2022 12:01:19 +0100
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: blocksize 4096 even for floppy and CDROM?
+Content-Language: en-US
+To:     linux-block@vger.kernel.org
+References: <e4ab39cb-fbe7-1148-8d8a-5cd46866159f@gmx.net>
+ <f94fc06e-c0ff-103b-789a-87af52c53e11@infradead.org>
+ <yq1fsoab5n0.fsf@ca-mkp.ca.oracle.com>
+From:   JPT <j-p-t@gmx.net>
+In-Reply-To: <yq1fsoab5n0.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:+eX6AtR9w2/NC/xGwYkPhc3vn18jALNmRfL7yL70dN/FUfPRtuA
+ 0Z2z4gW2XtOVKVs3ded59RnOQYaHOPolhy/dQGtwqu5gHJGM/yvrLD2mZufIkKDOWpXRVfD
+ ZAFsCUMNcqoeO0HAtm8xxvSBQLbdIUIXxO26V4719118gx3eF8sw+ICeIAf4opLkPGKPe6a
+ EzgO1kR6F23cuHvNxiBOw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:eM1492xQSpY=:WkIf2rZCnREJGSDB0nszer
+ D26k48ZXawTGDWaB7MLvMFezgVcmsrg5rX6AHb4ltn1fNBXaj2ytWRzxmXrIalOEwJbrxrThm
+ lr0yNsRXnpGtUa8FUB5O3lY2GroCutdZ0xmMYLdTqKPoS1V7bfAoIL+HUER30sKefchmALqJ0
+ ZntZEls7ZoGUdD/ILFgPdM1xPL51c9lubtGiLmqs2tRwWsuEypI0UvPrSUjQj0Gsj0UKR+ms1
+ OSJLmmZ/LGJQMwR6tPHRuaDZFUTqR+hmpttDeBp9etmuJ452TP/C8hvcpNA8QGCcDAJtHDmBW
+ zrU/JERDQic7109/EsGXR+LrQA3qkZgLC9ndMuo8gXmFFlN8Xrb+VvrL25Cxq5yOLQ7uT7Q3P
+ mJq2/4gvAzQ/kPZ7oMekv5aBo3zut27xgV5D+cq9/mV11IgfZ/X23JnnYoBBPYzbJitPwPBGP
+ B4K7jiUDLb2XxS6clx4+fVegZIB8czl90Usy4xM96le847X/E6ole07/MSZ4s3/Mr02v6VN1y
+ uSSWUm3xIi0tt49Pvix+MJFsLKzQMxBGi0Drb+IwBcwRFX02UPxS/72ZjCpqQiqC5ZheuATtE
+ Uo57ykPGqAD7Q2qm/e5QmfgTtlwQ5TN5GwF17Kycy46do2k9bALg213fqCxNm8OHGUO3XrNYI
+ hRAiHP7XwvdsE8uXwOW7wzzf2ROm71fZyzrHlYPvKb4vjMKco/+6up/zMJ5XTzv5hemlR5Dfo
+ HljCWFk21knOZIG2iym75EG5NYVi067ZRdAt5Q01RLhCaP0ssAtSJLXPICzEgKg0vJY4qdSVd
+ RW/8xz+mUinVGVzYUt2SyGateoldEhtdRHpcC5vbXAsB5TJJaPpko+UNCgtD/XHpVbaIMWE3J
+ DEWUum2eH1VofbFovsa6EoUA0gRwolbqxEXJ184cluJRrkAd6uiejjYPEWRw4BwYT8j8hBw3h
+ kSqYlc+OBgj3sT7NT2MtBiZyHuL63GqokR3XGkaYlYC0/xG8HOJBdw4pOVBTVNjYbVvVR5he9
+ h27/jOF76niKNjVPbSfX7rSmq/T9fZmMqRzRPvRPs1Mj2GbmPsqo151d9q4LLUBKHAUaNu6Jp
+ tGOfomx19EgOBM=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: John Hubbard <jhubbard@nvidia.com>
+Hi,
 
-Convert the fuse filesystem to support the new iov_iter_get_pages()
-behavior. That routine now invokes pin_user_pages_fast(), which means
-that such pages must be released via unpin_user_page(), rather than via
-put_page().
+seems that safecopy always assumes 4096, while ddrescue always assumes 512=
+.
+you have to specify the blocksize manually for both programs.
 
-This commit also removes any possibility of kernel pages being handled,
-in the fuse_get_user_pages() call. Although this may seem like a steep
-price to pay, Christoph Hellwig actually recommended it a few years ago
-for nearly the same situation [1].
+thanks
 
-[1] https://lore.kernel.org/kvm/20190724061750.GA19397@infradead.org/
+Jan
 
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- fs/fuse/dev.c  |  7 +++++--
- fs/fuse/file.c | 38 +++++++++-----------------------------
- 2 files changed, 14 insertions(+), 31 deletions(-)
 
-diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
-index e1b4a846c90d..9db85c4d549a 100644
---- a/fs/fuse/dev.c
-+++ b/fs/fuse/dev.c
-@@ -675,7 +675,10 @@ static void fuse_copy_finish(struct fuse_copy_state *cs)
- 			flush_dcache_page(cs->pg);
- 			set_page_dirty_lock(cs->pg);
- 		}
--		put_page(cs->pg);
-+		if (cs->pipebufs)
-+			put_page(cs->pg);
-+		else
-+			unpin_user_page(cs->pg);
- 	}
- 	cs->pg = NULL;
- }
-@@ -730,7 +733,7 @@ static int fuse_copy_fill(struct fuse_copy_state *cs)
- 		}
- 	} else {
- 		size_t off;
--		err = iov_iter_get_pages(cs->iter, &page, PAGE_SIZE, 1, &off);
-+		err = iov_iter_pin_pages(cs->iter, &page, PAGE_SIZE, 1, &off);
- 		if (err < 0)
- 			return err;
- 		BUG_ON(!err);
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index 94747bac3489..ecfa5bdde919 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -611,18 +611,6 @@ void fuse_read_args_fill(struct fuse_io_args *ia, struct file *file, loff_t pos,
- 	args->out_args[0].size = count;
- }
- 
--static void fuse_release_user_pages(struct fuse_args_pages *ap,
--				    bool should_dirty)
--{
--	unsigned int i;
--
--	for (i = 0; i < ap->num_pages; i++) {
--		if (should_dirty)
--			set_page_dirty_lock(ap->pages[i]);
--		put_page(ap->pages[i]);
--	}
--}
--
- static void fuse_io_release(struct kref *kref)
- {
- 	kfree(container_of(kref, struct fuse_io_priv, refcnt));
-@@ -720,7 +708,8 @@ static void fuse_aio_complete_req(struct fuse_mount *fm, struct fuse_args *args,
- 	struct fuse_io_priv *io = ia->io;
- 	ssize_t pos = -1;
- 
--	fuse_release_user_pages(&ia->ap, io->should_dirty);
-+	unpin_user_pages_dirty_lock(ia->ap.pages, ia->ap.num_pages,
-+				    io->should_dirty);
- 
- 	if (err) {
- 		/* Nothing */
-@@ -1382,25 +1371,14 @@ static int fuse_get_user_pages(struct fuse_args_pages *ap, struct iov_iter *ii,
- 	size_t nbytes = 0;  /* # bytes already packed in req */
- 	ssize_t ret = 0;
- 
--	/* Special case for kernel I/O: can copy directly into the buffer */
--	if (iov_iter_is_kvec(ii)) {
--		unsigned long user_addr = fuse_get_user_addr(ii);
--		size_t frag_size = fuse_get_frag_size(ii, *nbytesp);
--
--		if (write)
--			ap->args.in_args[1].value = (void *) user_addr;
--		else
--			ap->args.out_args[0].value = (void *) user_addr;
--
--		iov_iter_advance(ii, frag_size);
--		*nbytesp = frag_size;
--		return 0;
--	}
-+	/* Only user space buffers are allowed with fuse Direct IO. */
-+	if (WARN_ON_ONCE(!iter_is_iovec(ii)))
-+		return -EOPNOTSUPP;
- 
- 	while (nbytes < *nbytesp && ap->num_pages < max_pages) {
- 		unsigned npages;
- 		size_t start;
--		ret = iov_iter_get_pages(ii, &ap->pages[ap->num_pages],
-+		ret = iov_iter_pin_pages(ii, &ap->pages[ap->num_pages],
- 					*nbytesp - nbytes,
- 					max_pages - ap->num_pages,
- 					&start);
-@@ -1484,7 +1462,9 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
- 		}
- 
- 		if (!io->async || nres < 0) {
--			fuse_release_user_pages(&ia->ap, io->should_dirty);
-+			unpin_user_pages_dirty_lock(ia->ap.pages,
-+						    ia->ap.num_pages,
-+						    io->should_dirty);
- 			fuse_io_free(ia);
- 		}
- 		ia = NULL;
--- 
-2.35.1
-
+Am 23.02.22 um 05:00 schrieb Martin K. Petersen:
+>
+> Randy,
+>
+>>> I wonder why safecopy always says
+>>> Reported hw blocksize: 4096
+>>> Reported low level blocksize: 4096
+>>>
+>>> even if the medium is floppy (512) or CDROM (2048)
+>>>
+>>> is this a kernel issue always assuming min 4k block size?
+>
+> Not sure how safecopy queries the block size. The kernel supports
+> devices with 512, 1024, 2048, and 4096-byte logical blocks.
+>
