@@ -2,57 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5565FC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 17:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65B5C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 17:21:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbiB0RRq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Feb 2022 12:17:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44150 "EHLO
+        id S229483AbiB0RW3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Feb 2022 12:22:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230515AbiB0RRq (ORCPT
+        with ESMTP id S229458AbiB0RW2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Feb 2022 12:17:46 -0500
+        Sun, 27 Feb 2022 12:22:28 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6484265481;
-        Sun, 27 Feb 2022 09:17:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C62396C958;
+        Sun, 27 Feb 2022 09:21:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1+1W3bcZcWwdxZGt68XLVQsJDzEEa3DPMfJ+40hI5ZE=; b=Qmk+ArWtToMpl/lfeapZnRuA+i
-        PrpP0ngA7XYmy9Gc6kV2P9n12jrrsV7XUBTZPhKniH/NRJt3xiLUsoQSQ+Ft50Cdcl6W0AOwA+Md5
-        dC1WO3nZbABs3yFH5hL2CshbLWPfMlFmLXZqG78tLsnQ2fxKSF/2Ox84afzZCXbdfWT4VW8xUIkQI
-        t/m/r7ViW2IaqOCXCC7ZY6Y7CUGw6J831FxUykxsBiYnBFwNAr0OzK+kqsTxY69VgvQ0hwZHWdsW7
-        W6qFUCswdr+I2WSzWlPThBAJ9S1pEht19lBh0nZGUPujtoVBKBtTMr6mBKnDLxkby0ZjFP7t8BMmz
-        IxzPFXzA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nONAE-009roj-8J; Sun, 27 Feb 2022 17:16:54 +0000
-Date:   Sun, 27 Feb 2022 09:16:54 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     ming.lei@redhat.com, tj@kernel.org, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
-Message-ID: <YhuyBgZSS6m/Mwu6@infradead.org>
-References: <20220210115637.1074927-1-yukuai3@huawei.com>
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=yvww6d8BmZb4do2L6Ohh8xyQjsnEZblD8cgs2zIraRw=; b=KLJ3tT23aPRViqtDTZBvy8cVYg
+        +iEvRHSKb+UtCFu73ZWQ+7lv2YARvpLXrF+OALgcWPO6LqT0leZqwCfRZvJyi+pxjk9iMhOmZJcqV
+        UuuSzSS9rDJyrjlyQZxn2a7S9lPZX+I1/n3wx/c0d4smE3LlYUD4+YbEgKua4iobtljbso5hBOyqQ
+        wIx8a/cbdbszF6YkfxVs49OYU6+C7tBl90by9UbsF/n06ZFNWTQFUgwfGY80oL1WCJU4b5DUV3R5e
+        Ekam5BjcBBbwuybcJnb97C5DhDnEPd4mk12GWvrhU7ijONm0uUj6CkgPpRcqQoiH9MZtEPcd2rWlb
+        4bYur0vw==;
+Received: from 91-118-163-82.static.upcbusiness.at ([91.118.163.82] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nONEy-009rxo-Pd; Sun, 27 Feb 2022 17:21:49 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: move more work to disk_release v2
+Date:   Sun, 27 Feb 2022 18:21:30 +0100
+Message-Id: <20220227172144.508118-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220210115637.1074927-1-yukuai3@huawei.com>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 10, 2022 at 07:56:37PM +0800, Yu Kuai wrote:
-> Throttled bios can't be issued after del_gendisk() is done, thus
-> it's better to cancel them immediately rather than waiting for
-> throttle is done.
-> 
-> For example, if user thread is throttled with low bps while it's
-> issuing large io, and the device is deleted. The user thread will
-> wait for a long time for io to return.
+Hi all,
 
-FYI, this crashed left rigt and center when running xfstests with
-traces pointing to throtl_pending_timer_fn.
+this series resurrects and forward ports ports larger parts of the
+"block: don't drain file system I/O on del_gendisk" series from Ming,
+but does not remove the draining in del_gendisk, but instead the one
+in the sd driver, which always was a bit ad-hoc.  As part of that sd
+and sr are switched to use the new ->free_disk method to avoid having
+to clear disk->private_data and the way to lookup the SCSI ULP is
+cleaned up as well.
+
+Git branch:
+
+    git://git.infradead.org/users/hch/block.git freeze-5.18
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/freeze-5.18
+
+Changes since v1:
+ - fix a refcounting bug in sd
+ - rename a function
+
+Diffstat:
+ block/blk-core.c           |    7 --
+ block/blk-mq.c             |   10 +--
+ block/blk-sysfs.c          |   25 --------
+ block/blk.h                |    2 
+ block/elevator.c           |    7 +-
+ block/genhd.c              |   38 ++++++++++++-
+ drivers/scsi/sd.c          |  114 +++++++++------------------------------
+ drivers/scsi/sd.h          |   13 +++-
+ drivers/scsi/sr.c          |  129 +++++++++------------------------------------
+ drivers/scsi/sr.h          |    5 -
+ drivers/scsi/st.c          |    1 
+ drivers/scsi/st.h          |    1 
+ include/scsi/scsi_cmnd.h   |    9 ---
+ include/scsi/scsi_driver.h |    9 ++-
+ 14 files changed, 117 insertions(+), 253 deletions(-)
