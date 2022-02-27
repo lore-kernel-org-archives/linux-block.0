@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA5AC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 21:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2AEC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 21:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232004AbiB0V6z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Feb 2022 16:58:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56734 "EHLO
+        id S231977AbiB0WAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Feb 2022 17:00:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231997AbiB0V6y (ORCPT
+        with ESMTP id S229849AbiB0WAP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Feb 2022 16:58:54 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E251659E
-        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 13:58:16 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id e6so8415019pgn.2
-        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 13:58:16 -0800 (PST)
+        Sun, 27 Feb 2022 17:00:15 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8426AA75
+        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 13:59:38 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id t5so272784pfg.4
+        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 13:59:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=aXJFJhk1K2hoknGcBZ9kI4Js4QpCOlhkiS6q9yRKYSE=;
-        b=tZknqemS/fPOUC/USDG3GaCA0Nodcy6KelVr8Ar/WafdH7GUSBuJ+lb14p7Z6m6dZP
-         nz46b7PpESAvZaol7cvFRjqGwnw+JLR8tfgC0lDa7HEEuHI403RO7zne3MCaEolcJ+5R
-         UZGsCn9N+2KTKfV/x5ontlHUceiGCb+QRnNC9Ecko0RRkFI3lUb5iud6iaNaexsUVm8T
-         Sq/dX09NFmEwr0PyvXFVfQmjJ6W6if7MGQF7P/D/xZxC+2zvMj3wZsYBvmA1Zz9HTBqq
-         1HuG2boYwp/XDtUj6wJh/K+hGKU62kPEbzQvopeKHRmxQ+2GgSxXznGhsbQVbS4j80TJ
-         o5Iw==
+        bh=ZrKI3DSZdTxekUPySsEMaohdk0Ebr8lmd+pDdB2Ygvc=;
+        b=AEhyForKjbDZKEq/PFv6p/G2ZB3dSs895NqBGgn0JW1Tpv1osByHflyrOYUBKFe77q
+         rEzyndlbiiho8KtHMqzE7la0X+pbnixp070cQjW5ARtttgU/Am64dO7sDyfRknxLrR3K
+         B5709/Td+SGSynJoMRndSLIvppWg0zHQ/RNreCH4AAiQbKAvmExz7Q5DXgKbdUajZAdz
+         6GSAmhxXaOW1i2nQEZWU8VAkNeBD9W+wTXXgmD0ohNTFh0XI/Ziv8rrDbVUm955l6TZL
+         0ByyWm6Mlf4+963avEfu65LwMhX6InrJK8z7CPhZ9K5MzRYcNmotW4008jGVKXEw8WvJ
+         gqKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=aXJFJhk1K2hoknGcBZ9kI4Js4QpCOlhkiS6q9yRKYSE=;
-        b=4Dit98mwQd9iYRO2PZILcZoLX+Bo/MZISulnNOV1lIFSpsq6nelwLgIIOry2MisQox
-         Pyq7N4yAgbFJAJeTf6dOkfbymoxOdVVGqJKjFbMOBmiIrfHotenSNsen3fFeoZGQdoSa
-         FEQwsD7d6/sb4npzGlcWI0k4tiQjOCKPOIq8UyHQbpzVRH9I/TbqeOBQ/FgyXmPUnFy0
-         i14eLL4BaZUgn4wRVlkt6v5venxhTaCNqDROQGZcMldrMO0/i66gWXWpwxwdTYwy3d+Z
-         jFyZk2NHcB9tc0Qnprgi1DMugItcH3TWcHp/VZqbLyx6TdPSKpyu1I6GHmwgCRHedYyN
-         86zw==
-X-Gm-Message-State: AOAM533tc1Ab/NaEdHVN8URQxhhNUTytyvLyuc2TI0jMotC7A9y27eNH
-        isp4M257NYcJtmRtEWi4EFLktA==
-X-Google-Smtp-Source: ABdhPJxpRE/n/1CUrpqRACuHUK5ahk4nB13pUI7Ys5UhPY4IircljF5Vov+KiY14lkQ+ra/nf6BogA==
-X-Received: by 2002:a63:be0e:0:b0:363:e0be:613f with SMTP id l14-20020a63be0e000000b00363e0be613fmr14676330pgf.448.1645999095872;
-        Sun, 27 Feb 2022 13:58:15 -0800 (PST)
+        bh=ZrKI3DSZdTxekUPySsEMaohdk0Ebr8lmd+pDdB2Ygvc=;
+        b=xfDaciZU5Jpf7NuCvUrFh7uTaFrjBB/fZHeBfQVp5EimS7icIVMGjmDFb7C0qZcnKH
+         ynSe5CtZ9jXvrfC4Dt5DjGvtfXs5T/gt3jbqyumnj349X/FsDT2u0Sxv8cH2HPsSg+JH
+         NoUOpoGGul+cVGls0Tr9uE2+woOIQlCwt0mumx3heUZ5SGhAx7UbuayiiQFtYzWOUy+e
+         QMZrYN/dXMnFbdtEcQ4w8uCgpjXXGkGpWOrWu1bMGmm6NH7jOYii0x8mY2vE4QsWwhez
+         YCSO3rMmQSjoAb5rypfHDUqh7xCA6ZIpkCJBQ05UY4fOxzAvtwwdEMdDaqPYA/wbqudC
+         riLA==
+X-Gm-Message-State: AOAM530IQNFalau+ufX3MXTOyXqPgO2TNALrxT17ba49Xq4CZdWUpZ4N
+        mxlx/GgU1qDnfx5lrQtQgRJkSA==
+X-Google-Smtp-Source: ABdhPJyaSQFLGaa+8maa8wDtePuQmdliyTg6t1OPFEjFv3DiD8FgQGuKlD2bA9CLsLw5mSJh0YHR0g==
+X-Received: by 2002:a05:6a00:8ca:b0:4e0:2ed3:5630 with SMTP id s10-20020a056a0008ca00b004e02ed35630mr18547182pfu.3.1645999178369;
+        Sun, 27 Feb 2022 13:59:38 -0800 (PST)
 Received: from [192.168.4.166] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id l5-20020a056a0016c500b004f140564a00sm10716550pfc.203.2022.02.27.13.58.14
+        by smtp.gmail.com with ESMTPSA id f31-20020a631f1f000000b003742e45f7d7sm8492806pgf.32.2022.02.27.13.59.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Feb 2022 13:58:15 -0800 (PST)
-Message-ID: <5935986f-bbbf-fa90-2eba-b249ca7e15e1@kernel.dk>
-Date:   Sun, 27 Feb 2022 14:58:13 -0700
+        Sun, 27 Feb 2022 13:59:37 -0800 (PST)
+Message-ID: <8b5b35fa-3c70-adc8-ca3a-4829388c4d12@kernel.dk>
+Date:   Sun, 27 Feb 2022 14:59:35 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.6.1
-Subject: Re: [PATCH 3/6] block, fs: assert that key paths use iovecs, and
- nothing else
+Subject: Re: [PATCH 4/6] block, bio, fs: convert most filesystems to
+ pin_user_pages_fast()
 Content-Language: en-US
 To:     jhubbard.send.patches@gmail.com, Jan Kara <jack@suse.cz>,
         Christoph Hellwig <hch@infradead.org>,
@@ -71,27 +71,29 @@ Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         LKML <linux-kernel@vger.kernel.org>,
         John Hubbard <jhubbard@nvidia.com>
 References: <20220227093434.2889464-1-jhubbard@nvidia.com>
- <20220227093434.2889464-4-jhubbard@nvidia.com>
+ <20220227093434.2889464-5-jhubbard@nvidia.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220227093434.2889464-4-jhubbard@nvidia.com>
+In-Reply-To: <20220227093434.2889464-5-jhubbard@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> diff --git a/block/bio.c b/block/bio.c
-> index b15f5466ce08..4679d6539e2d 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1167,6 +1167,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
->  	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
->  
-> +	WARN_ON_ONCE(!iter_is_iovec(iter));
-> +
+On 2/27/22 2:34 AM, jhubbard.send.patches@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
+> 
+> Use pin_user_pages_fast(), pin_user_page(), and unpin_user_page() calls,
+> in place of get_user_pages_fast(), get_page() and put_page().
+> 
+> This converts the Direct IO parts of most filesystems over to using
+> FOLL_PIN (pin_user_page*()) page pinning.
 
-If these make sense, why aren't they also returning an error?
+The commit message needs to explain why a change is being made, not what
+is being done. The latter I can just look at the code for.
+
+Didn't even find it in in your cover letter, had to go to the original
+posting for that.
 
 -- 
 Jens Axboe
