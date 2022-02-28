@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30012C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 09:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B07AC3527A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 09:57:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234666AbiB1J61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:58:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32852 "EHLO
+        id S234661AbiB1J60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:58:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234695AbiB1J6X (ORCPT
+        with ESMTP id S234666AbiB1J6U (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:58:23 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 458212A70F
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 01:57:24 -0800 (PST)
+        Mon, 28 Feb 2022 04:58:20 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 440E029823
+        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 01:57:21 -0800 (PST)
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.51 with ESMTP; 28 Feb 2022 18:57:21 +0900
+        by 156.147.23.52 with ESMTP; 28 Feb 2022 18:57:20 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 28 Feb 2022 18:57:21 +0900
+        by 156.147.1.121 with ESMTP; 28 Feb 2022 18:57:20 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -47,9 +47,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v3 19/21] dept: Disable Dept within the wait_bit layer by default
-Date:   Mon, 28 Feb 2022 18:56:58 +0900
-Message-Id: <1646042220-28952-20-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v3 15/21] dept: Apply SDT to wait(waitqueue)
+Date:   Mon, 28 Feb 2022 18:56:54 +0900
+Message-Id: <1646042220-28952-16-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
 References: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
@@ -57,43 +57,123 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The struct wait_queue_head array, bit_wait_table[] in sched/wait_bit.c
-are shared by all its users, which unfortunately vary in terms of class.
-So each should've been assigned its own class to avoid false positives.
-
-It'd better let Dept work at a higher layer than wait_bit. So disabled
-Dept within the wait_bit layer by default.
-
-It's worth noting that Dept is still working with the other struct
-wait_queue_head ones that are mostly well-classified.
+Makes SDT able to track dependencies by wait(waitqueue).
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- kernel/sched/wait_bit.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ include/linux/wait.h |  6 +++++-
+ kernel/sched/wait.c  | 16 ++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/sched/wait_bit.c b/kernel/sched/wait_bit.c
-index 02ce292..3e5a3eb 100644
---- a/kernel/sched/wait_bit.c
-+++ b/kernel/sched/wait_bit.c
-@@ -3,6 +3,7 @@
-  * The implementation of the wait_bit*() and related waiting APIs:
-  */
- #include "sched.h"
-+#include <linux/dept.h>
+diff --git a/include/linux/wait.h b/include/linux/wait.h
+index 851e07d..2133998 100644
+--- a/include/linux/wait.h
++++ b/include/linux/wait.h
+@@ -7,6 +7,7 @@
+ #include <linux/list.h>
+ #include <linux/stddef.h>
+ #include <linux/spinlock.h>
++#include <linux/dept_sdt.h>
  
- #define WAIT_TABLE_BITS 8
- #define WAIT_TABLE_SIZE (1 << WAIT_TABLE_BITS)
-@@ -246,6 +247,8 @@ void __init wait_bit_init(void)
- {
- 	int i;
+ #include <asm/current.h>
+ #include <uapi/linux/wait.h>
+@@ -37,6 +38,7 @@ struct wait_queue_entry {
+ struct wait_queue_head {
+ 	spinlock_t		lock;
+ 	struct list_head	head;
++	struct dept_map		dmap;
+ };
+ typedef struct wait_queue_head wait_queue_head_t;
  
--	for (i = 0; i < WAIT_TABLE_SIZE; i++)
-+	for (i = 0; i < WAIT_TABLE_SIZE; i++) {
- 		init_waitqueue_head(bit_wait_table + i);
-+		dept_map_nocheck(&(bit_wait_table + i)->dmap);
-+	}
+@@ -56,7 +58,8 @@ struct wait_queue_head {
+ 
+ #define __WAIT_QUEUE_HEAD_INITIALIZER(name) {					\
+ 	.lock		= __SPIN_LOCK_UNLOCKED(name.lock),			\
+-	.head		= LIST_HEAD_INIT(name.head) }
++	.head		= LIST_HEAD_INIT(name.head),				\
++	.dmap		= DEPT_SDT_MAP_INIT(name) }
+ 
+ #define DECLARE_WAIT_QUEUE_HEAD(name) \
+ 	struct wait_queue_head name = __WAIT_QUEUE_HEAD_INITIALIZER(name)
+@@ -67,6 +70,7 @@ struct wait_queue_head {
+ 	do {									\
+ 		static struct lock_class_key __key;				\
+ 										\
++		sdt_map_init(&(wq_head)->dmap);					\
+ 		__init_waitqueue_head((wq_head), #wq_head, &__key);		\
+ 	} while (0)
+ 
+diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
+index eca3810..fc5a16a 100644
+--- a/kernel/sched/wait.c
++++ b/kernel/sched/wait.c
+@@ -105,6 +105,7 @@ static int __wake_up_common(struct wait_queue_head *wq_head, unsigned int mode,
+ 		if (flags & WQ_FLAG_BOOKMARK)
+ 			continue;
+ 
++		sdt_event(&wq_head->dmap);
+ 		ret = curr->func(curr, mode, wake_flags, key);
+ 		if (ret < 0)
+ 			break;
+@@ -268,6 +269,9 @@ void __wake_up_pollfree(struct wait_queue_head *wq_head)
+ 		__add_wait_queue(wq_head, wq_entry);
+ 	set_current_state(state);
+ 	spin_unlock_irqrestore(&wq_head->lock, flags);
++
++	if (state & TASK_NORMAL)
++		sdt_wait_prepare(&wq_head->dmap);
  }
+ EXPORT_SYMBOL(prepare_to_wait);
+ 
+@@ -286,6 +290,10 @@ void __wake_up_pollfree(struct wait_queue_head *wq_head)
+ 	}
+ 	set_current_state(state);
+ 	spin_unlock_irqrestore(&wq_head->lock, flags);
++
++	if (state & TASK_NORMAL)
++		sdt_wait_prepare(&wq_head->dmap);
++
+ 	return was_empty;
+ }
+ EXPORT_SYMBOL(prepare_to_wait_exclusive);
+@@ -331,6 +339,9 @@ long prepare_to_wait_event(struct wait_queue_head *wq_head, struct wait_queue_en
+ 	}
+ 	spin_unlock_irqrestore(&wq_head->lock, flags);
+ 
++	if (!ret && state & TASK_NORMAL)
++		sdt_wait_prepare(&wq_head->dmap);
++
+ 	return ret;
+ }
+ EXPORT_SYMBOL(prepare_to_wait_event);
+@@ -352,7 +363,9 @@ int do_wait_intr(wait_queue_head_t *wq, wait_queue_entry_t *wait)
+ 		return -ERESTARTSYS;
+ 
+ 	spin_unlock(&wq->lock);
++	sdt_wait_prepare(&wq->dmap);
+ 	schedule();
++	sdt_wait_finish();
+ 	spin_lock(&wq->lock);
+ 
+ 	return 0;
+@@ -369,7 +382,9 @@ int do_wait_intr_irq(wait_queue_head_t *wq, wait_queue_entry_t *wait)
+ 		return -ERESTARTSYS;
+ 
+ 	spin_unlock_irq(&wq->lock);
++	sdt_wait_prepare(&wq->dmap);
+ 	schedule();
++	sdt_wait_finish();
+ 	spin_lock_irq(&wq->lock);
+ 
+ 	return 0;
+@@ -389,6 +404,7 @@ void finish_wait(struct wait_queue_head *wq_head, struct wait_queue_entry *wq_en
+ {
+ 	unsigned long flags;
+ 
++	sdt_wait_finish();
+ 	__set_current_state(TASK_RUNNING);
+ 	/*
+ 	 * We can check for list emptiness outside the lock
 -- 
 1.9.1
 
