@@ -2,147 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A69C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 27 Feb 2022 23:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80585C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 03:28:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231722AbiB0XTF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Feb 2022 18:19:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41572 "EHLO
+        id S232926AbiB1D3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Feb 2022 22:29:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231630AbiB0XTF (ORCPT
+        with ESMTP id S232971AbiB1D3E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Feb 2022 18:19:05 -0500
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E62020F53;
-        Sun, 27 Feb 2022 15:18:27 -0800 (PST)
-Received: by mail-pg1-f174.google.com with SMTP id 139so9940690pge.1;
-        Sun, 27 Feb 2022 15:18:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0Ph/ZT2aWktwffC/2ax75T6epHj/LQx3vML/3EhsTbg=;
-        b=MTVqiM5AjFCh35O+0awPqOC+tK9pxts7QxSUYC22s5Qj+jdBG5AysEsZ74E9PZ1bmU
-         3D00gyHF7aLxtC64XXYKq2f0Z2BVRD/1NYZuw6fP+eiXNsUGKjbaAM5wYNUpVI+0ImZ/
-         acpzJdHF9tIvX/8zoi+vbIzABHzOWQEKmJQ741/mN504OZLPFERupdHb/0EJSeRzAbwC
-         eIt9YERRpe7QnbB/ZMH2/CzNLlW2pueXRF1lic66jplET5O930gZ+uxrOWnp5CzJlwLb
-         jm/rToV8PSxcGRE+EFAq3FCKnbXvno8tJzfxdgDmBvhBGabeoFluYQcSoYcuZj3dPDgG
-         OjdQ==
-X-Gm-Message-State: AOAM531sVsIb5AJzuOMm9ri3j/hcmrCDVBlgUj/+CSopnKlYh870fD+J
-        qjtn2j+dCppEy3/WfXS1ubibL6seWuYnSQ==
-X-Google-Smtp-Source: ABdhPJykDXMXmg3Vn7UzfSjTt07+WmJm2wMMkwtiCmirVxZ4yYZxKCM7MKFklSGGCMn8i6Phbhpmpg==
-X-Received: by 2002:a63:9d8c:0:b0:378:4b73:5b3b with SMTP id i134-20020a639d8c000000b003784b735b3bmr9675714pgd.564.1646003906694;
-        Sun, 27 Feb 2022 15:18:26 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id 63-20020a630942000000b00372a99c1821sm8287895pgj.21.2022.02.27.15.18.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Feb 2022 15:18:25 -0800 (PST)
-Message-ID: <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org>
-Date:   Sun, 27 Feb 2022 15:18:24 -0800
+        Sun, 27 Feb 2022 22:29:04 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E67653B53;
+        Sun, 27 Feb 2022 19:28:24 -0800 (PST)
+Received: from kwepemi500010.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K6Qlb0ssSzBrN3;
+        Mon, 28 Feb 2022 11:26:35 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500010.china.huawei.com (7.221.188.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Mon, 28 Feb 2022 11:28:22 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Mon, 28 Feb
+ 2022 11:28:21 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <rostedt@goodmis.org>, <mingo@redhat.com>,
+        <gregkh@linuxfoundation.org>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+Subject: [PATCH v2] blktrace: fix use after free for struct blk_trace
+Date:   Mon, 28 Feb 2022 11:43:54 +0800
+Message-ID: <20220228034354.4047385-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: move more work to disk_release v2
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20220227172144.508118-1-hch@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220227172144.508118-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/27/22 09:21, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this series resurrects and forward ports ports larger parts of the
-> "block: don't drain file system I/O on del_gendisk" series from Ming,
-> but does not remove the draining in del_gendisk, but instead the one
-> in the sd driver, which always was a bit ad-hoc.  As part of that sd
-> and sr are switched to use the new ->free_disk method to avoid having
-> to clear disk->private_data and the way to lookup the SCSI ULP is
-> cleaned up as well.
-> 
-> Git branch:
-> 
->      git://git.infradead.org/users/hch/block.git freeze-5.18
-
-Hi Christoph,
-
-Thanks for the quick respin. If I run blktests as follows:
-
-$ use_siw=1 ./check -q
-
-then the first report I hit with this branch is a deadlock report in
-nvmet_rdma_free_queue(). That issue has already been reported - see also
-https://lore.kernel.org/linux-nvme/CAHj4cs93BfTRgWF6PbuZcfq6AARHgYC2g=RQ-7Jgcf1-6h+2SQ@mail.gmail.com/
-
-The second issue I run into with this branch is as follows
-(also for nvmeof-mp/002):
+When tracing the whole disk, 'dropped' and 'msg' will be created
+under 'q->debugfs_dir' and 'bt->dir' is NULL, thus blk_trace_free()
+won't remove those files. What's worse, the following UAF can be
+triggered because of accessing stale 'dropped' and 'msg':
 
 ==================================================================
-BUG: KASAN: null-ptr-deref in __blk_account_io_start+0x28/0xa0
-Read of size 8 at addr 0000000000000008 by task kworker/0:1H/159
+BUG: KASAN: use-after-free in blk_dropped_read+0x89/0x100
+Read of size 4 at addr ffff88816912f3d8 by task blktrace/1188
 
-CPU: 0 PID: 159 Comm: kworker/0:1H Not tainted 5.17.0-rc2-dbg+ #9
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b-rebuilt.opensuse.org 04/01/2014
-Workqueue: kblockd blk_mq_requeue_work
+CPU: 27 PID: 1188 Comm: blktrace Not tainted 5.17.0-rc4-next-20220217+ #469
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-4
 Call Trace:
-  <TASK>
-  show_stack+0x52/0x58
-  ? __blk_account_io_start+0x28/0xa0
-  dump_stack_lvl+0x5b/0x82
-  kasan_report.cold+0x64/0xdb
-  ? __blk_account_io_start+0x28/0xa0
-  __asan_load8+0x69/0x90
-  __blk_account_io_start+0x28/0xa0
-  blk_insert_cloned_request+0x107/0x3b0
-  map_request+0x260/0x3c0 [dm_mod]
-  ? dm_requeue_original_request+0x1a0/0x1a0 [dm_mod]
-  ? blk_add_timer+0xc3/0x110
-  dm_mq_queue_rq+0x207/0x400 [dm_mod]
-  ? kasan_set_track+0x25/0x30
-  ? kasan_set_free_info+0x24/0x40
-  ? map_request+0x3c0/0x3c0 [dm_mod]
-  ? nvmet_rdma_release_rsp+0xb3/0x3f0 [nvmet_rdma]
-  ? nvmet_rdma_send_done+0x4a/0x70 [nvmet_rdma]
-  ? __ib_process_cq+0x11b/0x3c0 [ib_core]
-  ? ib_cq_poll_work+0x37/0xb0 [ib_core]
-  ? process_one_work+0x594/0xad0
-  ? worker_thread+0x2de/0x6b0
-  ? kthread+0x15f/0x190
-  ? ret_from_fork+0x1f/0x30
-  blk_mq_dispatch_rq_list+0x344/0xc00
-  ? blk_mq_mark_tag_wait+0x470/0x470
-  ? rcu_read_lock_sched_held+0x16/0x80
-  __blk_mq_sched_dispatch_requests+0x19b/0x280
-  ? blk_mq_do_dispatch_ctx+0x3f0/0x3f0
-  ? rcu_read_lock_sched_held+0x16/0x80
-  blk_mq_sched_dispatch_requests+0x8a/0xc0
-  __blk_mq_run_hw_queue+0x99/0x220
-  __blk_mq_delay_run_hw_queue+0x372/0x3a0
-  ? blk_mq_run_hw_queue+0xd7/0x2b0
-  ? rcu_read_lock_sched_held+0x16/0x80
-  blk_mq_run_hw_queue+0x1d6/0x2b0
-  blk_mq_run_hw_queues+0xa0/0x1e0
-  blk_mq_requeue_work+0x2e4/0x330
-  ? blk_mq_try_issue_directly+0x60/0x60
-  ? lock_acquire+0x76/0x1a0
-  process_one_work+0x594/0xad0
-  ? pwq_dec_nr_in_flight+0x120/0x120
-  ? do_raw_spin_lock+0x115/0x1b0
-  ? lock_acquire+0x76/0x1a0
-  worker_thread+0x2de/0x6b0
-  ? trace_hardirqs_on+0x2b/0x120
-  ? process_one_work+0xad0/0xad0
-  kthread+0x15f/0x190
-  ? kthread_complete_and_exit+0x30/0x30
-  ret_from_fork+0x1f/0x30
-  </TASK>
+ <TASK>
+ dump_stack_lvl+0x34/0x44
+ print_address_description.constprop.0.cold+0xab/0x381
+ ? blk_dropped_read+0x89/0x100
+ ? blk_dropped_read+0x89/0x100
+ kasan_report.cold+0x83/0xdf
+ ? blk_dropped_read+0x89/0x100
+ kasan_check_range+0x140/0x1b0
+ blk_dropped_read+0x89/0x100
+ ? blk_create_buf_file_callback+0x20/0x20
+ ? kmem_cache_free+0xa1/0x500
+ ? do_sys_openat2+0x258/0x460
+ full_proxy_read+0x8f/0xc0
+ vfs_read+0xc6/0x260
+ ksys_read+0xb9/0x150
+ ? vfs_write+0x3d0/0x3d0
+ ? fpregs_assert_state_consistent+0x55/0x60
+ ? exit_to_user_mode_prepare+0x39/0x1e0
+ do_syscall_64+0x35/0x80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fbc080d92fd
+Code: ce 20 00 00 75 10 b8 00 00 00 00 0f 05 48 3d 01 f0 ff ff 73 31 c3 48 83 1
+RSP: 002b:00007fbb95ff9cb0 EFLAGS: 00000293 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 00007fbb95ff9dc0 RCX: 00007fbc080d92fd
+RDX: 0000000000000100 RSI: 00007fbb95ff9cc0 RDI: 0000000000000045
+RBP: 0000000000000045 R08: 0000000000406299 R09: 00000000fffffffd
+R10: 000000000153afa0 R11: 0000000000000293 R12: 00007fbb780008c0
+R13: 00007fbb78000938 R14: 0000000000608b30 R15: 00007fbb780029c8
+ </TASK>
+
+Allocated by task 1050:
+ kasan_save_stack+0x1e/0x40
+ __kasan_kmalloc+0x81/0xa0
+ do_blk_trace_setup+0xcb/0x410
+ __blk_trace_setup+0xac/0x130
+ blk_trace_ioctl+0xe9/0x1c0
+ blkdev_ioctl+0xf1/0x390
+ __x64_sys_ioctl+0xa5/0xe0
+ do_syscall_64+0x35/0x80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Freed by task 1050:
+ kasan_save_stack+0x1e/0x40
+ kasan_set_track+0x21/0x30
+ kasan_set_free_info+0x20/0x30
+ __kasan_slab_free+0x103/0x180
+ kfree+0x9a/0x4c0
+ __blk_trace_remove+0x53/0x70
+ blk_trace_ioctl+0x199/0x1c0
+ blkdev_common_ioctl+0x5e9/0xb30
+ blkdev_ioctl+0x1a5/0x390
+ __x64_sys_ioctl+0xa5/0xe0
+ do_syscall_64+0x35/0x80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff88816912f380
+ which belongs to the cache kmalloc-96 of size 96
+The buggy address is located 88 bytes inside of
+ 96-byte region [ffff88816912f380, ffff88816912f3e0)
+The buggy address belongs to the page:
+page:000000009a1b4e7c refcount:1 mapcount:0 mapping:0000000000000000 index:0x0f
+flags: 0x17ffffc0000200(slab|node=0|zone=2|lastcpupid=0x1fffff)
+raw: 0017ffffc0000200 ffffea00044f1100 dead000000000002 ffff88810004c780
+raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88816912f280: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+ ffff88816912f300: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+>ffff88816912f380: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+                                                    ^
+ ffff88816912f400: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+ ffff88816912f480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
 ==================================================================
+
+Fixes: c0ea57608b69 ("blktrace: remove debugfs file dentries from struct blk_trace")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+Changes in v2:
+ - don't save file dentry in blk_trace, and lookup them in
+ blk_trace_free
+ - use a new title.
+
+ kernel/trace/blktrace.c | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 19514edc44f7..9efdc2c25b9a 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -310,10 +310,20 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
+ 	local_irq_restore(flags);
+ }
+ 
+-static void blk_trace_free(struct blk_trace *bt)
++static void blk_trace_free(struct request_queue *q, struct blk_trace *bt)
+ {
+ 	relay_close(bt->rchan);
+-	debugfs_remove(bt->dir);
++
++	/*
++	 * If 'bt->dir' is not set, then both 'dropped' and 'msg' are created
++	 * under 'q->debugfs_dir', thus lookup and remove them.
++	 */
++	if (!bt->dir) {
++		debugfs_remove(debugfs_lookup("dropped", q->debugfs_dir));
++		debugfs_remove(debugfs_lookup("msg", q->debugfs_dir));
++	} else {
++		debugfs_remove(bt->dir);
++	}
+ 	free_percpu(bt->sequence);
+ 	free_percpu(bt->msg_data);
+ 	kfree(bt);
+@@ -335,10 +345,10 @@ static void put_probe_ref(void)
+ 	mutex_unlock(&blk_probe_mutex);
+ }
+ 
+-static void blk_trace_cleanup(struct blk_trace *bt)
++static void blk_trace_cleanup(struct request_queue *q, struct blk_trace *bt)
+ {
+ 	synchronize_rcu();
+-	blk_trace_free(bt);
++	blk_trace_free(q, bt);
+ 	put_probe_ref();
+ }
+ 
+@@ -352,7 +362,7 @@ static int __blk_trace_remove(struct request_queue *q)
+ 		return -EINVAL;
+ 
+ 	if (bt->trace_state != Blktrace_running)
+-		blk_trace_cleanup(bt);
++		blk_trace_cleanup(q, bt);
+ 
+ 	return 0;
+ }
+@@ -572,7 +582,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	ret = 0;
+ err:
+ 	if (ret)
+-		blk_trace_free(bt);
++		blk_trace_free(q, bt);
+ 	return ret;
+ }
+ 
+@@ -1616,7 +1626,7 @@ static int blk_trace_remove_queue(struct request_queue *q)
+ 
+ 	put_probe_ref();
+ 	synchronize_rcu();
+-	blk_trace_free(bt);
++	blk_trace_free(q, bt);
+ 	return 0;
+ }
+ 
+@@ -1647,7 +1657,7 @@ static int blk_trace_setup_queue(struct request_queue *q,
+ 	return 0;
+ 
+ free_bt:
+-	blk_trace_free(bt);
++	blk_trace_free(q, bt);
+ 	return ret;
+ }
+ 
+-- 
+2.31.1
+
