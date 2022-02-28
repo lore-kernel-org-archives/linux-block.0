@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA00C4707A
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 07:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 530EBC3527D
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 07:49:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233725AbiB1Hth (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 02:49:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
+        id S233720AbiB1Htg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 02:49:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233711AbiB1Htf (ORCPT
+        with ESMTP id S229664AbiB1Hte (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 02:49:35 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAABC3D1CE;
+        Mon, 28 Feb 2022 02:49:34 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39DE23D1D2;
         Sun, 27 Feb 2022 23:48:56 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3D17FB80E58;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 72162610A4;
         Mon, 28 Feb 2022 07:48:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE3FEC340F3;
-        Mon, 28 Feb 2022 07:48:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2854CC36AE3;
+        Mon, 28 Feb 2022 07:48:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646034533;
-        bh=SVSbmmZuBNWRYo5l3+eRPfTfeDjvLCb7XGjy8DkFlBA=;
+        s=k20201202; t=1646034535;
+        bh=dNhFGMROSIDvPCnQSBawc2ub7nxSShPfueI2bzsEfMg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BWXczMefXLjGBj96On3ikhUuVhRq/7D5npkeBWWyKAmR7I39iKcvi3RyFEUF3YPKm
-         x84aTpWMqL9JAg3fPWwy1ox5/22kipHipaTWoWxFrRP+85b8gwngzw04L6lcBkG4ei
-         +e1ukdrIOhG/Hb6YmwP0r8CZ0fqmSy14TdC+qrpaYQyHq8/mj5wfAG+nsa5B0QOmVz
-         LflPEm9HoSQ9WDlIJYvUAqapKNHY4wHwUsiMTtQVP/4z8g/+Ls6bm6hnvBPu5qgCOJ
-         2TaWGz3Ph/T8xUIC3Y4JbzqtmlxsJnDP7hcEy59CbDfOr3hWRdCjeXExQ2Nar//MZB
-         v+4BCpel/vIgg==
+        b=CFLzk888PsDt/RXZezLtV6WOwbd+ubyx26G96Nu2AmrslHMmvif2czdBzcFVZgoBC
+         +rudEBCrT0p7dORa3edlu7/mxBhGQIPI35oBF7cDf+GTsVxGztWoWdmBpziCY32aiw
+         K3PcgYg1pO4oxZ0/4QcgN4EatGCrkqGwb8o+0BFPkOw5dtn+0DNVAIT+AvIO3ErALm
+         BncYn7mzzb39C/e7fInqH38Oihi1WsRTo7H3fShyqr0c91Ua2P76nFdwVR1UGx5FHS
+         lSMTQk19ivZj8rQajRMB/keknSdXH3QaVQP/hmgZkl9hhJ8QoUIE5yly+YqC+EqHDR
+         w4P//ZBGHGKLw==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     fstests@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
         Gaurav Kashyap <quic_gaurkash@quicinc.com>
-Subject: [RFC PATCH 3/8] fscrypt-crypt-util: add support for dumping key identifier
-Date:   Sun, 27 Feb 2022 23:47:17 -0800
-Message-Id: <20220228074722.77008-4-ebiggers@kernel.org>
+Subject: [RFC PATCH 8/8] generic: verify ciphertext with hardware-wrapped keys
+Date:   Sun, 27 Feb 2022 23:47:22 -0800
+Message-Id: <20220228074722.77008-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220228074722.77008-1-ebiggers@kernel.org>
 References: <20220228074722.77008-1-ebiggers@kernel.org>
@@ -50,160 +50,132 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add an option to fscrypt-crypt-util to make it compute the key
-identifier for the given key.  This will allow testing the correctness
-of the filesystem's key identifier computation.
+Add two tests which verify that encrypted files are encrypted correctly
+when a hardware-wrapped inline encryption key is used.  The two tests
+are identical except that one uses FSCRYPT_POLICY_FLAG_IV_INO_LBLK_64
+and the other uses FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32.  These cover both
+of the settings where hardware-wrapped keys currently may be used.
+
+I've verified that these tests run and pass when all prerequisites are
+met, namely:
+
+- Hardware supporting the feature must be present.  I tested this on the
+  SM8350 HDK (note: this currently requires a custom TrustZone image);
+  this hardware is compatible with both of IV_INO_LBLK_{64,32}.
+- The kernel patches for hardware-wrapped key support must be applied.
+- The filesystem must be ext4 or f2fs.
+- The kernel must have CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y.
+- The fscryptctl program must be available, and must have patches for
+  hardware-wrapped key support applied.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- src/fscrypt-crypt-util.c | 82 +++++++++++++++++++++++++++++-----------
- 1 file changed, 60 insertions(+), 22 deletions(-)
+ tests/generic/900     | 30 ++++++++++++++++++++++++++++++
+ tests/generic/900.out |  6 ++++++
+ tests/generic/901     | 30 ++++++++++++++++++++++++++++++
+ tests/generic/901.out |  6 ++++++
+ 4 files changed, 72 insertions(+)
+ create mode 100755 tests/generic/900
+ create mode 100644 tests/generic/900.out
+ create mode 100755 tests/generic/901
+ create mode 100644 tests/generic/901.out
 
-diff --git a/src/fscrypt-crypt-util.c b/src/fscrypt-crypt-util.c
-index 0ecf9272..876d9f5c 100644
---- a/src/fscrypt-crypt-util.c
-+++ b/src/fscrypt-crypt-util.c
-@@ -46,7 +46,7 @@
- static void usage(FILE *fp)
- {
- 	fputs(
--"Usage: " PROGRAM_NAME " [OPTION]... CIPHER MASTER_KEY\n"
-+"Usage: " PROGRAM_NAME " [OPTION]... [CIPHER | --dump-key-identifier] MASTER_KEY\n"
- "\n"
- "Utility for verifying fscrypt-encrypted data.  This program encrypts\n"
- "(or decrypts) the data on stdin using the given CIPHER with the given\n"
-@@ -66,6 +66,8 @@ static void usage(FILE *fp)
- "  --decrypt                   Decrypt instead of encrypt\n"
- "  --direct-key                Use the format where the IVs include the file\n"
- "                                nonce and the same key is shared across files.\n"
-+"  --dump-key-identifier       Instead of encrypting/decrypting data, just\n"
-+"                                compute and dump the key identifier.\n"
- "  --file-nonce=NONCE          File's nonce as a 32-character hex string\n"
- "  --fs-uuid=UUID              The filesystem UUID as a 32-character hex string.\n"
- "                                Required for --iv-ino-lblk-32 and\n"
-@@ -1946,11 +1948,31 @@ static void get_key_and_iv(const struct key_and_iv_params *params,
- 	generate_iv(params, iv);
- }
- 
-+static void do_dump_key_identifier(const struct key_and_iv_params *params)
-+{
-+	u8 info[9] = "fscrypt";
-+	u8 key_identifier[16];
-+	int i;
+diff --git a/tests/generic/900 b/tests/generic/900
+new file mode 100755
+index 00000000..a021732e
+--- /dev/null
++++ b/tests/generic/900
+@@ -0,0 +1,30 @@
++#! /bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright 2022 Google LLC
++#
++# FS QA Test No. 900
++#
++# Verify the ciphertext for encryption policies that use the HW_WRAPPED_KEY and
++# IV_INO_LBLK_64 flags and that use AES-256-XTS to encrypt file contents and
++# AES-256-CTS-CBC to encrypt file names.
++#
++. ./common/preamble
++_begin_fstest auto quick encrypt
 +
-+	if (params->kdf != KDF_HKDF_SHA512)
-+		die("--dump-key-identifier requires --kdf=HKDF-SHA512");
++# Import common functions.
++. ./common/filter
++. ./common/encrypt
 +
-+	info[8] = HKDF_CONTEXT_KEY_IDENTIFIER;
++# real QA test starts here
++_supported_fs generic
 +
-+	hkdf_sha512(params->master_key, params->master_key_size,
-+		    NULL, 0, info, sizeof(info), key_identifier,
-+		    sizeof(key_identifier));
++# Hardware-wrapped keys require the inlinecrypt mount option.
++_require_scratch_inlinecrypt
++export MOUNT_OPTIONS="$MOUNT_OPTIONS -o inlinecrypt"
 +
-+	for (i = 0; i < sizeof(key_identifier); i++)
-+		printf("%02x", key_identifier[i]);
-+}
++_verify_ciphertext_for_encryption_policy AES-256-XTS AES-256-CTS-CBC \
++	v2 iv_ino_lblk_64 hw_wrapped_key
 +
- enum {
- 	OPT_BLOCK_NUMBER,
- 	OPT_BLOCK_SIZE,
- 	OPT_DECRYPT,
- 	OPT_DIRECT_KEY,
-+	OPT_DUMP_KEY_IDENTIFIER,
- 	OPT_FILE_NONCE,
- 	OPT_FS_UUID,
- 	OPT_HELP,
-@@ -1967,6 +1989,7 @@ static const struct option longopts[] = {
- 	{ "block-size",      required_argument, NULL, OPT_BLOCK_SIZE },
- 	{ "decrypt",         no_argument,       NULL, OPT_DECRYPT },
- 	{ "direct-key",      no_argument,       NULL, OPT_DIRECT_KEY },
-+	{ "dump-key-identifier", no_argument,   NULL, OPT_DUMP_KEY_IDENTIFIER },
- 	{ "file-nonce",      required_argument, NULL, OPT_FILE_NONCE },
- 	{ "fs-uuid",         required_argument, NULL, OPT_FS_UUID },
- 	{ "help",            no_argument,       NULL, OPT_HELP },
-@@ -1983,9 +2006,10 @@ int main(int argc, char *argv[])
- {
- 	size_t block_size = 4096;
- 	bool decrypting = false;
-+	bool dump_key_identifier = false;
- 	struct key_and_iv_params params;
- 	size_t padding = 0;
--	const struct fscrypt_cipher *cipher;
-+	const struct fscrypt_cipher *cipher = NULL;
- 	u8 real_key[MAX_KEY_SIZE];
- 	union fscrypt_iv iv;
- 	char *tmp;
-@@ -2024,6 +2048,9 @@ int main(int argc, char *argv[])
- 		case OPT_DIRECT_KEY:
- 			params.direct_key = true;
- 			break;
-+		case OPT_DUMP_KEY_IDENTIFIER:
-+			dump_key_identifier = true;
-+			break;
- 		case OPT_FILE_NONCE:
- 			if (hex2bin(optarg, params.file_nonce, FILE_NONCE_SIZE)
- 			    != FILE_NONCE_SIZE)
-@@ -2071,29 +2098,40 @@ int main(int argc, char *argv[])
- 	argc -= optind;
- 	argv += optind;
- 
--	if (argc != 2) {
--		usage(stderr);
--		return 2;
-+	if (dump_key_identifier) {
-+		if (argc != 1) {
-+			usage(stderr);
-+			return 2;
-+		}
-+	} else {
-+		if (argc != 2) {
-+			usage(stderr);
-+			return 2;
-+		}
-+		cipher = find_fscrypt_cipher(*argv);
-+		if (cipher == NULL)
-+			die("Unknown cipher: %s", *argv);
++# success, all done
++status=0
++exit
+diff --git a/tests/generic/900.out b/tests/generic/900.out
+new file mode 100644
+index 00000000..9edc012c
+--- /dev/null
++++ b/tests/generic/900.out
+@@ -0,0 +1,6 @@
++QA output created by 900
 +
-+		if (block_size < cipher->min_input_size)
-+			die("Block size of %zu bytes is too small for cipher %s",
-+			    block_size, cipher->name);
-+		argv++;
- 	}
--
--	cipher = find_fscrypt_cipher(argv[0]);
--	if (cipher == NULL)
--		die("Unknown cipher: %s", argv[0]);
--
--	if (block_size < cipher->min_input_size)
--		die("Block size of %zu bytes is too small for cipher %s",
--		    block_size, cipher->name);
--
--	params.master_key_size = hex2bin(argv[1], params.master_key,
-+	params.master_key_size = hex2bin(*argv, params.master_key,
- 					 MAX_KEY_SIZE);
- 	if (params.master_key_size < 0)
--		die("Invalid master_key: %s", argv[1]);
--	if (params.master_key_size < cipher->keysize)
--		die("Master key is too short for cipher %s", cipher->name);
-+		die("Invalid master_key: %s", *argv);
- 
--	get_key_and_iv(&params, real_key, cipher->keysize, &iv);
--
--	crypt_loop(cipher, real_key, &iv, decrypting, block_size, padding,
--		   params.iv_ino_lblk_64 || params.iv_ino_lblk_32);
-+	if (dump_key_identifier) {
-+		do_dump_key_identifier(&params);
-+	} else {
-+		if (params.master_key_size < cipher->keysize)
-+			die("Master key is too short for cipher %s",
-+			    cipher->name);
-+		get_key_and_iv(&params, real_key, cipher->keysize, &iv);
-+		crypt_loop(cipher, real_key, &iv, decrypting, block_size,
-+			   padding,
-+			   params.iv_ino_lblk_64 || params.iv_ino_lblk_32);
-+	}
- 	return 0;
- }
++Verifying ciphertext with parameters:
++	contents_encryption_mode: AES-256-XTS
++	filenames_encryption_mode: AES-256-CTS-CBC
++	options: v2 iv_ino_lblk_64 hw_wrapped_key
+diff --git a/tests/generic/901 b/tests/generic/901
+new file mode 100755
+index 00000000..dd5c6e5f
+--- /dev/null
++++ b/tests/generic/901
+@@ -0,0 +1,30 @@
++#! /bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright 2022 Google LLC
++#
++# FS QA Test No. 901
++#
++# Verify the ciphertext for encryption policies that use the HW_WRAPPED_KEY and
++# IV_INO_LBLK_32 flags and that use AES-256-XTS to encrypt file contents and
++# AES-256-CTS-CBC to encrypt file names.
++#
++. ./common/preamble
++_begin_fstest auto quick encrypt
++
++# Import common functions.
++. ./common/filter
++. ./common/encrypt
++
++# real QA test starts here
++_supported_fs generic
++
++# Hardware-wrapped keys require the inlinecrypt mount option.
++_require_scratch_inlinecrypt
++export MOUNT_OPTIONS="$MOUNT_OPTIONS -o inlinecrypt"
++
++_verify_ciphertext_for_encryption_policy AES-256-XTS AES-256-CTS-CBC \
++	v2 iv_ino_lblk_32 hw_wrapped_key
++
++# success, all done
++status=0
++exit
+diff --git a/tests/generic/901.out b/tests/generic/901.out
+new file mode 100644
+index 00000000..2f928465
+--- /dev/null
++++ b/tests/generic/901.out
+@@ -0,0 +1,6 @@
++QA output created by 901
++
++Verifying ciphertext with parameters:
++	contents_encryption_mode: AES-256-XTS
++	filenames_encryption_mode: AES-256-CTS-CBC
++	options: v2 iv_ino_lblk_32 hw_wrapped_key
 -- 
 2.35.1
 
