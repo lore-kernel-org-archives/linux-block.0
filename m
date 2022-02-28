@@ -2,116 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A07D6C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 05:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B0EC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 06:12:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232490AbiB1FUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 00:20:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53130 "EHLO
+        id S229836AbiB1GMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 01:12:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230123AbiB1FUP (ORCPT
+        with ESMTP id S229727AbiB1GMj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 00:20:15 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8613939154;
-        Sun, 27 Feb 2022 21:19:37 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E6BD921155;
-        Mon, 28 Feb 2022 05:19:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646025575; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Mon, 28 Feb 2022 01:12:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E64F66ACC
+        for <linux-block@vger.kernel.org>; Sun, 27 Feb 2022 22:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646028720;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=OsOdRKyOPTsqFVySVeje99MCazN8FHXIRZGctTB3Fjc=;
-        b=1aDnYNyCMKoqi7852ELng+RjN9qj4H3oZKIs6lZKTxoiwJvkWraBZGmj+Lgr7uB+1SHFJz
-        Yh2mZu17ZFxMhdj6twoLK7xeDGS6uw7JuUWs/fN+ewmZBdcdER+polBa/xGaRr74gldhFA
-        Ag1t4rw/IZDJ70lWUTD3DCkE1pDKQVg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646025575;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OsOdRKyOPTsqFVySVeje99MCazN8FHXIRZGctTB3Fjc=;
-        b=ETy1bbk4AvRTgoyR516RJsfNTn47d24xVl6EFjxT7PerkTAmm+E/x1KFcnx2xiTY9paC/z
-        4vNKWy2UyfSPGfDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=koDNyhpZRRWUbZFhH9KWUoWf+UDX5NXH16ZSUqLPEwY=;
+        b=KygYL8GXXMd9+htAZDQw0Ye1IVMuKEi+xcQAUW/kppRaQoKqzAc++g8yMGwOpo9hTxXmBg
+        VjSswtEUvC7ByJf/hThqHvRBnmiPxQRVBKqX086L07KgMPZH1i066U26xPi/xP1jtPeEVS
+        Oz2EP75izlM1CZYn7b8Che1k/l3LoFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-ks5XyE6KNN-Cmhjz6i-Eiw-1; Mon, 28 Feb 2022 01:11:58 -0500
+X-MC-Unique: ks5XyE6KNN-Cmhjz6i-Eiw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E5C712FC5;
-        Mon, 28 Feb 2022 05:19:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 5BzICmBbHGIXfAAAMHmgww
-        (envelope-from <neilb@suse.de>); Mon, 28 Feb 2022 05:19:28 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D747800422;
+        Mon, 28 Feb 2022 06:11:56 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C84D5DBBD;
+        Mon, 28 Feb 2022 06:11:35 +0000 (UTC)
+Date:   Mon, 28 Feb 2022 14:11:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Yu Kuai <yukuai3@huawei.com>, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
+Message-ID: <Yhxnkg0AEaj36t+a@T590>
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+ <YhuyBgZSS6m/Mwu6@infradead.org>
 MIME-Version: 1.0
-From:   "NeilBrown" <neilb@suse.de>
-To:     "Andrew Morton" <akpm@linux-foundation.org>
-Cc:     "Jan Kara" <jack@suse.cz>, "Wu Fengguang" <fengguang.wu@intel.com>,
-        "Jaegeuk Kim" <jaegeuk@kernel.org>, "Chao Yu" <chao@kernel.org>,
-        "Jeff Layton" <jlayton@kernel.org>,
-        "Ilya Dryomov" <idryomov@gmail.com>,
-        "Miklos Szeredi" <miklos@szeredi.hu>,
-        "Trond Myklebust" <trond.myklebust@hammerspace.com>,
-        "Anna Schumaker" <anna.schumaker@netapp.com>,
-        "Ryusuke Konishi" <konishi.ryusuke@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "Philipp Reisner" <philipp.reisner@linbit.com>,
-        "Lars Ellenberg" <lars.ellenberg@linbit.com>,
-        "Paolo Valente" <paolo.valente@linaro.org>,
-        "Jens Axboe" <axboe@kernel.dk>, linux-doc@vger.kernel.org,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        ceph-devel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 02/11] MM: document and polish read-ahead code.
-In-reply-to: <20220227204728.b2eb5dd94ecc3e86912bacad@linux-foundation.org>
-References: <164447124918.23354.17858831070003318849.stgit@noble.brown>,
- <164447147257.23354.2801426518649016278.stgit@noble.brown>,
- <20220210122440.vqth5mwsqtv6vjpq@quack3.lan>,
- <164453611721.27779.1299851963795418722@noble.neil.brown.name>,
- <20220224182622.n7abfey3asszyq3x@quack3.lan>,
- <164602251992.20161.9146570952337454229@noble.neil.brown.name>,
- <20220227204728.b2eb5dd94ecc3e86912bacad@linux-foundation.org>
-Date:   Mon, 28 Feb 2022 16:19:24 +1100
-Message-id: <164602556430.20161.5451268677064506613@noble.neil.brown.name>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YhuyBgZSS6m/Mwu6@infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 28 Feb 2022, Andrew Morton wrote:
-> On Mon, 28 Feb 2022 15:28:39 +1100 "NeilBrown" <neilb@suse.de> wrote:
-> 
-> > When writing documentation the intent of the author is of some interest,
-> > but the behaviour of the code is paramount.
-> 
-> uh, er, ah, no.  The code describes the behaviour of the code.  The
-> comments are there to describe things other than the code's behaviour.
-> Things such as the author's intent.
-> 
-> Any deviation between the author's intent and the code's behaviour is
-> called a "bug", so it's pretty important to understand authorial
-> intent, no?
+Hi Christoph,
 
-When the author is writing the documentation - then yes - definitely. 
-When the "author" is several different people over a period of years,
-then it is not even certain that there is a single unified "intent".
+On Sun, Feb 27, 2022 at 09:16:54AM -0800, Christoph Hellwig wrote:
+> On Thu, Feb 10, 2022 at 07:56:37PM +0800, Yu Kuai wrote:
+> > Throttled bios can't be issued after del_gendisk() is done, thus
+> > it's better to cancel them immediately rather than waiting for
+> > throttle is done.
+> > 
+> > For example, if user thread is throttled with low bps while it's
+> > issuing large io, and the device is deleted. The user thread will
+> > wait for a long time for io to return.
+> 
+> FYI, this crashed left rigt and center when running xfstests with
+> traces pointing to throtl_pending_timer_fn.
 
-The author's intent is less interesting not so much because it is less
-relevant, but because it is less available.
+Can you share the exact xfstests test(fs, test)? Or panic log?
 
-So when writing third-party post-hoc documentation, the focus has to be
-on the code, though with reference to the intent to whatever extent it
-is available.  Bugs then show up where the actual behaviour turns out to
-be impossible to document coherently.
+I can't reproduce it when running './check -g auto' on XFS, meantime
+tracking throtl_pending_timer_fn().
+
 
 Thanks,
-NeilBrown
+Ming
+
