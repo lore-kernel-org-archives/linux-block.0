@@ -2,214 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAEA8C4321E
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 09:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68687C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 09:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234311AbiB1J31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:29:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36256 "EHLO
+        id S234373AbiB1Jls (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:41:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233538AbiB1J30 (ORCPT
+        with ESMTP id S234372AbiB1Jls (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:29:26 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 09C8050B3D
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 01:28:46 -0800 (PST)
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.51 with ESMTP; 28 Feb 2022 18:28:44 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 28 Feb 2022 18:28:44 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Mon, 28 Feb 2022 18:28:26 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.com, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-Message-ID: <20220228092826.GA5201@X58A-UD3R>
-References: <1645095472-26530-1-git-send-email-byungchul.park@lge.com>
- <1645096204-31670-1-git-send-email-byungchul.park@lge.com>
- <1645096204-31670-2-git-send-email-byungchul.park@lge.com>
- <20220221190204.q675gtsb6qhylywa@quack3.lan>
- <20220223003534.GA26277@X58A-UD3R>
- <20220223144859.na2gjgl5efgw5zhn@quack3.lan>
- <20220224011102.GA29726@X58A-UD3R>
- <20220224102239.n7nzyyekuacgpnzg@quack3.lan>
+        Mon, 28 Feb 2022 04:41:48 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33543657B9;
+        Mon, 28 Feb 2022 01:41:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=K1HgFtbE1kLZa+V59uyLK4T/jY6J7IZE1EzN8l8FpIM=; b=2P8WU/IEmqKdXPm15SQLHHORTC
+        RoIFzZI3fiQ3VLEVV3iFKNHgV6TURqiCidTMWVro3/cIS9lvv//Vhw4UP4bH2j3Yb3ACS2cZGeg9+
+        O88UcioX187BzUeeTTJ317jqm6CAUJCLcfsMmTkHfr/dZlcqSrRX4AHInpixdk2EvRKDEuSs3WZQI
+        yJYkQo5/qzTysL5Sw6UVPWB3x60lTwZAD/TMSJM041cRTOI75fZl08QUzjRYldWoTL1rfCqpUfrqa
+        TAfdwqSLQpZeQo/6BjW9t0SVWWg7hvHpHB0NdkEnH9aWZ0j0G7nDQDeWQqkkT+3iH8R+wI7YMHU9Z
+        ABSfhnUQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nOcWT-00BI0K-Ev; Mon, 28 Feb 2022 09:40:53 +0000
+Date:   Mon, 28 Feb 2022 01:40:53 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Yu Kuai <yukuai3@huawei.com>, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
+Message-ID: <YhyYpWHGVhs3J/dk@infradead.org>
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+ <YhuyBgZSS6m/Mwu6@infradead.org>
+ <Yhxnkg0AEaj36t+a@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220224102239.n7nzyyekuacgpnzg@quack3.lan>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <Yhxnkg0AEaj36t+a@T590>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 11:22:39AM +0100, Jan Kara wrote:
-> On Thu 24-02-22 10:11:02, Byungchul Park wrote:
-> > On Wed, Feb 23, 2022 at 03:48:59PM +0100, Jan Kara wrote:
-> > > > KJOURNALD2(kthread)	TASK1(ksys_write)	TASK2(ksys_write)
-> > > > 
-> > > > wait A
-> > > > --- stuck
-> > > > 			wait B
-> > > > 			--- stuck
-> > > > 						wait C
-> > > > 						--- stuck
-> > > > 
-> > > > wake up B		wake up C		wake up A
-> > > > 
-> > > > where:
-> > > > A is a wait_queue, j_wait_commit
-> > > > B is a wait_queue, j_wait_transaction_locked
-> > > > C is a rwsem, mapping.invalidate_lock
-> > > 
-> > > I see. But a situation like this is not necessarily a guarantee of a
-> > > deadlock, is it? I mean there can be task D that will eventually call say
-> > > 'wake up B' and unblock everything and this is how things were designed to
-> > > work? Multiple sources of wakeups are quite common I'd say... What does
-> > 
-> > Yes. At the very beginning when I desgined Dept, I was thinking whether
-> > to support multiple wakeup sources or not for a quite long time.
-> > Supporting it would be a better option to aovid non-critical reports.
-> > However, I thought anyway we'd better fix it - not urgent tho - if
-> > there's any single circle dependency. That's why I decided not to
-> > support it for now and wanted to gather the kernel guys' opinions. Thing
-> > is which policy we should go with.
+On Mon, Feb 28, 2022 at 02:11:30PM +0800, Ming Lei wrote:
+> > FYI, this crashed left rigt and center when running xfstests with
+> > traces pointing to throtl_pending_timer_fn.
 > 
-> I see. So supporting only a single wakeup source is fine for locks I guess.
-> But for general wait queues or other synchronization mechanisms, I'm afraid
-> it will lead to quite some false positive reports. Just my 2c.
-
-Thank you for your feedback.
-
-I realized we've been using "false positive" differently. There exist
-the three types of code in terms of dependency and deadlock. It's worth
-noting that dependencies are built from between waits and events in Dept.
-
----
-
-case 1. Code with an actual circular dependency, but not deadlock.
-
-   A circular dependency can be broken by a rescue wakeup source e.g.
-   timeout. It's not a deadlock. If it's okay that the contexts
-   participating in the circular dependency and others waiting for the
-   events in the circle are stuck until it gets broken. Otherwise, say,
-   if it's not meant, then it's anyway problematic.
-
-   1-1. What if we judge this code is problematic?
-   1-2. What if we judge this code is good?
-
-case 2. Code with an actual circular dependency, and deadlock.
-
-   There's no other wakeup source than those within the circular
-   dependency. Literally deadlock. It's problematic and critical.
-
-   2-1. What if we judge this code is problematic?
-   2-2. What if we judge this code is good?
-
-case 3. Code with no actual circular dependency, and not deadlock.
-
-   Must be good.
-
-   3-1. What if we judge this code is problematic?
-   3-2. What if we judge this code is good?
-
----
-
-I call only 3-1 "false positive" circular dependency. And you call 1-1
-and 3-1 "false positive" deadlock.
-
-I've been wondering if the kernel guys esp. Linus considers code with
-any circular dependency is problematic or not, even if it won't lead to
-a deadlock, say, case 1. Even though I designed Dept based on what I
-believe is right, of course, I'm willing to change the design according
-to the majority opinion.
-
-However, I would never allow case 1 if I were the owner of the kernel
-for better stability, even though the code works anyway okay for now.
-
-Thanks,
-Byungchul
-
-> > > Dept do to prevent false reports in cases like this?
-> > > 
-> > > > The above is the simplest form. And it's worth noting that Dept focuses
-> > > > on wait and event itself rather than grabing and releasing things like
-> > > > lock. The following is the more descriptive form of it.
-> > > > 
-> > > > KJOURNALD2(kthread)	TASK1(ksys_write)	TASK2(ksys_write)
-> > > > 
-> > > > wait @j_wait_commit
-> > > > 			ext4_truncate_failed_write()
-> > > > 			   down_write(mapping.invalidate_lock)
-> > > > 
-> > > > 			   ext4_truncate()
-> > > > 			      ...
-> > > > 			      wait @j_wait_transaction_locked
-> > > > 
-> > > > 						ext_truncate_failed_write()
-> > > > 						   down_write(mapping.invalidate_lock)
-> > > > 
-> > > > 						ext4_should_retry_alloc()
-> > > > 						   ...
-> > > > 						   __jbd2_log_start_commit()
-> > > > 						      wake_up(j_wait_commit)
-> > > > jbd2_journal_commit_transaction()
-> > > >    wake_up(j_wait_transaction_locked)
-> > > > 			   up_write(mapping.invalidate_lock)
-> > > > 
-> > > > I hope this would help you understand the report.
-> > > 
-> > > I see, thanks for explanation! So the above scenario is impossible because
-> > 
-> > My pleasure.
-> > 
-> > > for anyone to block on @j_wait_transaction_locked the transaction must be
-> > > committing, which is done only by kjournald2 kthread and so that thread
-> > > cannot be waiting at @j_wait_commit. Essentially blocking on
-> > > @j_wait_transaction_locked means @j_wait_commit wakeup was already done.
-> > 
-> > kjournal2 repeatedly does the wait and the wake_up so the above scenario
-> > looks possible to me even based on what you explained. Maybe I should
-> > understand how the journal things work more for furhter discussion. Your
-> > explanation is so helpful. Thank you really.
+> Can you share the exact xfstests test(fs, test)? Or panic log?
 > 
-> OK, let me provide you with more details for better understanding :) In
-> jbd2 we have an object called 'transaction'. This object can go through
-> many states but for our case is important that transaction is moved to
-> T_LOCKED state and out of it only while jbd2_journal_commit_transaction()
-> function is executing and waiting on j_wait_transaction_locked waitqueue is
-> exactly waiting for a transaction to get out of T_LOCKED state. Function
-> jbd2_journal_commit_transaction() is executed only by kjournald. Hence
-> anyone can see transaction in T_LOCKED state only if kjournald is running
-> inside jbd2_journal_commit_transaction() and thus kjournald cannot be
-> sleeping on j_wait_commit at the same time. Does this explain things?
-> 
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
+> I can't reproduce it when running './check -g auto' on XFS, meantime
+> tracking throtl_pending_timer_fn().
+
+From a quick run using f2fs:
+
+generic/081 files ... [  316.487861] run fstests generic/081 at 2022-02-28 09:38:40
+[  318.291133] F2FS-fs (dm-3): Found nat_bits in checkpoint
+[  318.298016] F2FS-fs (dm-3): Mounted with checkpoint version = 526422b7
+[  318.363888] device-mapper: snapshots: Invalidating snapshot: Unable to allocate exceptio.
+[  318.540023] general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6I
+[  318.541556] CPU: 0 PID: 13947 Comm: dmsetup Not tainted 5.17.0-rc2+ #1074
+[  318.542514] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/24
+[  318.543695] RIP: 0010:__lock_acquire+0x5b4/0x1de0
+[  318.544351] Code: 89 84 24 40 09 00 00 0f 87 2a 05 00 00 3b 05 17 c7 b2 03 41 bf 01 00 03
+[  318.546881] RSP: 0000:ffffc90000003cf8 EFLAGS: 00010002
+[  318.547610] RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000001
+[  318.548556] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 6b6b6b6b6b6b6bf3
+[  318.549497] RBP: 6b6b6b6b6b6b6bf3 R08: 0000000000000001 R09: 0000000000000001
+[  318.550438] R10: 0000000000000001 R11: 0000000000000000 R12: ffff8880117c8040
+[  318.551378] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+[  318.552323] FS:  0000000000000000(0000) GS:ffff88813bc00000(0000) knlGS:0000000000000000
+[  318.553380] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  318.554119] CR2: 00007f54883c9028 CR3: 0000000012a52000 CR4: 00000000000006f0
+[  318.555036] Call Trace:
+[  318.555360]  <IRQ>
+[  318.555630]  lock_acquire+0xd6/0x300
+[  318.556099]  ? throtl_pending_timer_fn+0x69/0xa50
+[  318.556709]  ? _raw_spin_lock_irq+0x4f/0x60
+[  318.557252]  ? throtl_pd_offline+0x60/0x60
+[  318.557783]  _raw_spin_lock_irq+0x40/0x60
+[  318.558303]  ? throtl_pending_timer_fn+0x69/0xa50
+[  318.558915]  throtl_pending_timer_fn+0x69/0xa50
+[  318.559485]  ? throtl_pd_offline+0x60/0x60
+[  318.560003]  ? throtl_pd_offline+0x60/0x60
+[  318.560520]  call_timer_fn+0x9f/0x2c0
+[  318.560985]  __run_timers.part.0+0x1fc/0x2f0
+[  318.561524]  ? lock_is_held_type+0xe4/0x140
+[  318.562055]  run_timer_softirq+0x2c/0x60
+[  318.562550]  __do_softirq+0x174/0x512
+[  318.563016]  __irq_exit_rcu+0xdf/0x130
+[  318.563491]  irq_exit_rcu+0x5/0x20
+[  318.563926]  sysvec_apic_timer_interrupt+0xa2/0xd0
+[  318.564529]  </IRQ>
+[  318.564800]  <TASK>
+[  318.565072]  asm_sysvec_apic_timer_interrupt+0x12/0x20
