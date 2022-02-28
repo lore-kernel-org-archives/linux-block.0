@@ -2,91 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 728B5C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 15:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BDAC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 16:27:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237456AbiB1QA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 11:00:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48472 "EHLO
+        id S233171AbiB1Q2b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 11:28:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234899AbiB1QAZ (ORCPT
+        with ESMTP id S232278AbiB1Q2a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 11:00:25 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478CE31523
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 07:59:46 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id lw4so25668412ejb.12
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 07:59:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=udUUwQMYZOQdeQeu7KJflNOXp5UljA8CQOPQlhHKm+Y=;
-        b=Ps2g3Rmx7y+RxaExNigUlAShr8r9n4HJx4jXh3jX3l48QN2GGz17bPjHQGFh/RPT/a
-         Xe3Y302EzQSNvW7VzbwzWaqmO5xMMVqpxy+XXofnecS/u0ED0x+tbYTlqkSLsLRhSciu
-         N6rSkzsDR47sLeOm/7rAJXCL4mb6S7A5gjjMA=
+        Mon, 28 Feb 2022 11:28:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8EBDA31529
+        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 08:27:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646065668;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qkqO4WyPsrXQ7pdah2RqVsOYeXGLOr/c/Kjxy3SJ4Tg=;
+        b=QTKjMBQUnAaoqAc02j9m5gekHK7sjHMNUO6YIAuJNZnd1fe7Uzpmak7AoHhfS+fzNemjhB
+        nWHdaAaKzU8ctdt3/CKDlCJ5OZPLEoJkv7R8vSo2Rql5hUeXjEfRN/lzTZvb0s2gd7jHKI
+        OpTW0UkIiiTtrLs9zr6CuzutYVsUPx8=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-510-8IjkmhJuOjak85did-tbug-1; Mon, 28 Feb 2022 11:27:46 -0500
+X-MC-Unique: 8IjkmhJuOjak85did-tbug-1
+Received: by mail-qv1-f71.google.com with SMTP id h7-20020a0cf407000000b00432843fb43fso12502713qvl.7
+        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 08:27:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=udUUwQMYZOQdeQeu7KJflNOXp5UljA8CQOPQlhHKm+Y=;
-        b=t30Z3U+o56x2kBGln4unHUmXgLdpzI+h3bDaoxNAn3SzWNSKkSdB7DvIbGgZQ2c+aV
-         JZ8a9hxhk2TsIgPIVkWWV9oho37EDnsfi3CEE1Yt94xfZcqQM5eODhnOYW1F4h0b9K1i
-         3LikMBWYHrPVxw4f8ZlzGEUXQySdWpvaLqO6V0M0KOWggStlu2GlT+k9n+wDAmpTAGmu
-         2h3Bb5upPspjDy77WLLj9qR2e5ofxYfc10WosWLZDpkLim8JoROk2i+TtsLufqrwDFnZ
-         QCCVq0st6ZSwEpvTV7eINg1ZMks6FP06yJqgbulRX7pQLXiSJaj8Iy/4flnYI7REm7jP
-         sttA==
-X-Gm-Message-State: AOAM532Flt8eKlKe6odNtGilCKWrXkXEZDRRFNDmadidl4N9h2L9n7So
-        G8uYE2KbhL+flWPAW+NpeIp7qLGlbImft2BnMadFpQ==
-X-Google-Smtp-Source: ABdhPJzFuwC4cXK43NRFP1CzDPmxJHkeyiho2pckN/boPKiQ0vuUKSn6l1ZxMqIRvXXEFW5bhRCbL2ZNT2f45sLUzvo=
-X-Received: by 2002:a17:907:76fc:b0:6ce:a836:34a1 with SMTP id
- kg28-20020a17090776fc00b006cea83634a1mr16312616ejc.663.1646063984879; Mon, 28
- Feb 2022 07:59:44 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qkqO4WyPsrXQ7pdah2RqVsOYeXGLOr/c/Kjxy3SJ4Tg=;
+        b=fVNMO9A3Mi8brGK1P3Lb5q7BzckkG4bv5zwZbzSDqAX1emoZO3p4U7ykCB5OobBsaL
+         BArDXJz5qM8ijKcpiGU5mYJhreIYWaEA0UW2eXpbIzheYGudAhcbimRXqQKSb3YTDEDQ
+         D+iCBMAdlP2yhYhRPO0RJ4Y1LgQIFDnL6znGLUOBSPiTvddDc64hCxCZJVCYqwDVRE1g
+         JPUFvHqHiiyC3B9a9Zt9SKYfDvIxaiGXwhRk/OrVJAJIKqnDgN4kVF22zrJSAzgCZ/ON
+         8jRow5xSlFv27Z7zo2rZSLb5gdyx5qMYtDPKLbnPHTGVkdtyHOng4fprO+ZSpezpqrXS
+         iusA==
+X-Gm-Message-State: AOAM531GQlKtHIVIRDFWh4XTXqhi00wj8q289F+SeIqp3oZsXaP1R5Vk
+        3+T2aRYrPNZvMIpmg5KRdW7zc2xeuGT6jQBj5R7dOb680W9rqdOfFuVgfGXsJm/Ewv00OqU06qT
+        SWVXgPM0NMMbaV+7AGoYj5w==
+X-Received: by 2002:a37:a2ca:0:b0:47d:8c2f:c3d3 with SMTP id l193-20020a37a2ca000000b0047d8c2fc3d3mr11162125qke.287.1646065666424;
+        Mon, 28 Feb 2022 08:27:46 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwA60xCEtiITWiusl7AJY0rzXeBFgfRODZ5ofroFmbcGfRe3sjw1d3qMMbiZc0x9vEX0ccabg==
+X-Received: by 2002:a37:a2ca:0:b0:47d:8c2f:c3d3 with SMTP id l193-20020a37a2ca000000b0047d8c2fc3d3mr11162121qke.287.1646065666206;
+        Mon, 28 Feb 2022 08:27:46 -0800 (PST)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id c6-20020ac87d86000000b002ddd9f33ed1sm6847024qtd.44.2022.02.28.08.27.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Feb 2022 08:27:45 -0800 (PST)
+Date:   Mon, 28 Feb 2022 11:27:44 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V3 0/3] block/dm: support bio polling
+Message-ID: <Yhz4AGXcn0DUeSwq@redhat.com>
+References: <20210623074032.1484665-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20220227093434.2889464-1-jhubbard@nvidia.com> <20220227093434.2889464-7-jhubbard@nvidia.com>
-In-Reply-To: <20220227093434.2889464-7-jhubbard@nvidia.com>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Mon, 28 Feb 2022 16:59:33 +0100
-Message-ID: <CAJfpegsDkpdCQiPmfKfX_b4-bkkj5N5vRhseifEH6woJ7r0S6A@mail.gmail.com>
-Subject: Re: [PATCH 6/6] fuse: convert direct IO paths to use FOLL_PIN
-To:     jhubbard.send.patches@gmail.com
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210623074032.1484665-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 27 Feb 2022 at 10:34, <jhubbard.send.patches@gmail.com> wrote:
->
-> From: John Hubbard <jhubbard@nvidia.com>
->
-> Convert the fuse filesystem to support the new iov_iter_get_pages()
-> behavior. That routine now invokes pin_user_pages_fast(), which means
-> that such pages must be released via unpin_user_page(), rather than via
-> put_page().
->
-> This commit also removes any possibility of kernel pages being handled,
-> in the fuse_get_user_pages() call. Although this may seem like a steep
-> price to pay, Christoph Hellwig actually recommended it a few years ago
-> for nearly the same situation [1].
+On Wed, Jun 23 2021 at  3:40P -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-This might work for O_DIRECT, but fuse has this mode of operation
-which turns normal "buffered" I/O into direct I/O.  And that in turn
-will break execve of such files.
+> Hello Guys,
+> 
+> Based on Christoph's bio based polling model[1], implement DM bio polling
+> with one very simple approach.
+> 
+> Patch 1 adds helper of blk_queue_poll().
+> 
+> Patch 2 adds .bio_poll() callback to block_device_operations, so bio
+> driver can implement its own logic for io polling.
+> 
+> Patch 3 implements bio polling for device mapper.
+> 
+> 
+> V3:
+> 	- patch style change as suggested by Christoph(2/3)
+> 	- fix kernel panic issue caused by nested dm polling, which is found
+> 	  & figured out by Jeffle Xu (3/3)
+> 	- re-organize setup polling code (3/3)
+> 	- remove RFC
+> 
+> V2:
+> 	- drop patch to add new fields into bio
+> 	- support io polling for dm native bio splitting
+> 	- add comment
+> 
+> Ming Lei (3):
+>   block: add helper of blk_queue_poll
+>   block: add ->poll_bio to block_device_operations
+>   dm: support bio polling
+> 
+>  block/blk-core.c         |  18 +++---
+>  block/blk-sysfs.c        |   4 +-
+>  block/genhd.c            |   2 +
+>  drivers/md/dm-table.c    |  24 +++++++
+>  drivers/md/dm.c          | 131 ++++++++++++++++++++++++++++++++++++++-
+>  drivers/nvme/host/core.c |   2 +-
+>  include/linux/blkdev.h   |   2 +
+>  7 files changed, 170 insertions(+), 13 deletions(-)
+> 
+> -- 
+> 2.31.1
+> 
 
-So AFAICS we need to keep kvec handing in some way.
+Hey Ming,
 
-Thanks,
-Miklos
+I'd like us to follow-through with adding bio-based polling support.
+Kind of strange none of us that were sent this V3 ever responded,
+sorry about that!
+
+Do you have interest in rebasing this patchset (against linux-dm.git's
+"dm-5.18" branch since there has been quite some churn)?  Or are you
+OK with me doing the rebase?
+
+thanks,
+Mike
+
