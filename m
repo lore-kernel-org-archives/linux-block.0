@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6C4C35278
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 09:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BCFC41535
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 09:57:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234651AbiB1J6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:58:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60308 "EHLO
+        id S234676AbiB1J6V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:58:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234585AbiB1J6H (ORCPT
+        with ESMTP id S234634AbiB1J6N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:58:07 -0500
+        Mon, 28 Feb 2022 04:58:13 -0500
 Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41C871171
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 01:57:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A66881C121
+        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 01:57:20 -0800 (PST)
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.53 with ESMTP; 28 Feb 2022 18:57:18 +0900
+        by 156.147.23.53 with ESMTP; 28 Feb 2022 18:57:19 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 28 Feb 2022 18:57:18 +0900
+        by 156.147.1.121 with ESMTP; 28 Feb 2022 18:57:19 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -47,9 +47,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v3 04/21] dept: Add a API for skipping dependency check temporarily
-Date:   Mon, 28 Feb 2022 18:56:43 +0900
-Message-Id: <1646042220-28952-5-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v3 11/21] dept: Add proc knobs to show stats and dependency graph
+Date:   Mon, 28 Feb 2022 18:56:50 +0900
+Message-Id: <1646042220-28952-12-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
 References: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
@@ -57,158 +57,248 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dept would skip check for dmaps marked by dept_map_nocheck() permanently.
-However, sometimes it needs to skip check for some dmaps temporarily and
-back to normal, for instance, lock acquisition with a nest lock.
-
-Lock usage check with regard to nest lock could be performed by Lockdep,
-however, dependency check is not necessary for that case. So prepared
-for it by adding two new APIs, dept_skip() and dept_unskip_if_skipped().
+It'd be useful to show Dept internal stats and dependency graph on
+runtime via proc for better information. Introduced the knobs.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/dept.h     |  9 +++++++++
- include/linux/dept_sdt.h |  2 +-
- include/linux/lockdep.h  |  4 +++-
- kernel/dependency/dept.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 62 insertions(+), 2 deletions(-)
+ kernel/dependency/Makefile        |  1 +
+ kernel/dependency/dept.c          | 24 ++++------
+ kernel/dependency/dept_internal.h | 26 +++++++++++
+ kernel/dependency/dept_proc.c     | 92 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 128 insertions(+), 15 deletions(-)
+ create mode 100644 kernel/dependency/dept_internal.h
+ create mode 100644 kernel/dependency/dept_proc.c
 
-diff --git a/include/linux/dept.h b/include/linux/dept.h
-index c3fb3cf..c0bbb8e 100644
---- a/include/linux/dept.h
-+++ b/include/linux/dept.h
-@@ -352,6 +352,11 @@ struct dept_map {
- 	unsigned int			wgen;
+diff --git a/kernel/dependency/Makefile b/kernel/dependency/Makefile
+index b5cfb8a..92f1654 100644
+--- a/kernel/dependency/Makefile
++++ b/kernel/dependency/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
  
- 	/*
-+	 * for skipping dependency check temporarily
-+	 */
-+	atomic_t			skip_cnt;
-+
-+	/*
- 	 * whether this map should be going to be checked or not
- 	 */
- 	bool				nocheck;
-@@ -444,6 +449,8 @@ struct dept_task {
- extern void dept_ask_event(struct dept_map *m);
- extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn);
- extern void dept_ecxt_exit(struct dept_map *m, unsigned long ip);
-+extern void dept_skip(struct dept_map *m);
-+extern bool dept_unskip_if_skipped(struct dept_map *m);
- 
- /*
-  * for users who want to manage external keys
-@@ -475,6 +482,8 @@ struct dept_task {
- #define dept_ask_event(m)			do { } while (0)
- #define dept_event(m, e_f, ip, e_fn)		do { (void)(e_fn); } while (0)
- #define dept_ecxt_exit(m, ip)			do { } while (0)
-+#define dept_skip(m)				do { } while (0)
-+#define dept_unskip_if_skipped(m)		(false)
- #define dept_key_init(k)			do { (void)(k); } while (0)
- #define dept_key_destroy(k)			do { (void)(k); } while (0)
- #endif
-diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
-index 375c4c3..e9d558d 100644
---- a/include/linux/dept_sdt.h
-+++ b/include/linux/dept_sdt.h
-@@ -13,7 +13,7 @@
- #include <linux/dept.h>
- 
- #ifdef CONFIG_DEPT
--#define DEPT_SDT_MAP_INIT(dname)	{ .name = #dname }
-+#define DEPT_SDT_MAP_INIT(dname)	{ .name = #dname, .skip_cnt = ATOMIC_INIT(0) }
- 
- /*
-  * SDT(Single-event Dependency Tracker) APIs
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index c56f6b6..c1a56fe 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -488,7 +488,9 @@ enum xhlock_context_t {
-  */
- #define STATIC_DEPT_MAP_INIT(_name, _key) .dmap = {		\
- 	.name = (_name),					\
--	.keys = NULL },
-+	.keys = NULL,						\
-+	.skip_cnt = ATOMIC_INIT(0),				\
-+	},
- #else
- #define STATIC_DEPT_MAP_INIT(_name, _key)
- #endif
+ obj-$(CONFIG_DEPT) += dept.o
++obj-$(CONFIG_DEPT) += dept_proc.o
 diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index ec3f131..3f22c5b 100644
+index 3f22c5b..4142c78 100644
 --- a/kernel/dependency/dept.c
 +++ b/kernel/dependency/dept.c
-@@ -1943,6 +1943,7 @@ void dept_map_init(struct dept_map *m, struct dept_key *k, int sub,
- 	m->name = n;
- 	m->wgen = 0U;
- 	m->nocheck = false;
-+	atomic_set(&m->skip_cnt, 0);
- exit:
- 	dept_exit(flags);
- }
-@@ -1963,6 +1964,7 @@ void dept_map_reinit(struct dept_map *m)
+@@ -73,6 +73,7 @@
+ #include <linux/hash.h>
+ #include <linux/dept.h>
+ #include <linux/utsname.h>
++#include "dept_internal.h"
  
- 	clean_classes_cache(&m->keys_local);
- 	m->wgen = 0U;
-+	atomic_set(&m->skip_cnt, 0);
+ static int dept_stop;
+ static int dept_per_cpu_ready;
+@@ -233,20 +234,13 @@ static inline struct dept_task *dept_task(void)
+  *       have been freed will be placed.
+  */
  
- 	dept_exit(flags);
- }
-@@ -2346,6 +2348,53 @@ void dept_ecxt_exit(struct dept_map *m, unsigned long ip)
- }
- EXPORT_SYMBOL_GPL(dept_ecxt_exit);
+-enum object_t {
+-#define OBJECT(id, nr) OBJECT_##id,
+-	#include "dept_object.h"
+-#undef  OBJECT
+-	OBJECT_NR,
+-};
+-
+ #define OBJECT(id, nr)							\
+ static struct dept_##id spool_##id[nr];					\
+ static DEFINE_PER_CPU(struct llist_head, lpool_##id);
+ 	#include "dept_object.h"
+ #undef  OBJECT
  
-+void dept_skip(struct dept_map *m)
-+{
-+	struct dept_task *dt = dept_task();
-+	unsigned long flags;
-+
-+	if (READ_ONCE(dept_stop) || dt->recursive)
-+		return;
-+
-+	if (m->nocheck)
-+		return;
-+
-+	flags = dept_enter();
-+
-+	atomic_inc(&m->skip_cnt);
-+
-+	dept_exit(flags);
-+}
-+EXPORT_SYMBOL_GPL(dept_skip);
-+
-+/*
-+ * Return true if successfully unskip, otherwise false.
-+ */
-+bool dept_unskip_if_skipped(struct dept_map *m)
-+{
-+	struct dept_task *dt = dept_task();
-+	unsigned long flags;
-+	bool ret = false;
-+
-+	if (READ_ONCE(dept_stop) || dt->recursive)
-+		return false;
-+
-+	if (m->nocheck)
-+		return false;
-+
-+	flags = dept_enter();
-+
-+	if (!atomic_read(&m->skip_cnt))
-+		goto exit;
-+
-+	atomic_dec(&m->skip_cnt);
-+	ret = true;
-+exit:
-+	dept_exit(flags);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(dept_unskip_if_skipped);
-+
- void dept_task_exit(struct task_struct *t)
+-static struct dept_pool pool[OBJECT_NR] = {
++struct dept_pool dept_pool[OBJECT_NR] = {
+ #define OBJECT(id, nr) {						\
+ 	.name = #id,							\
+ 	.obj_sz = sizeof(struct dept_##id),				\
+@@ -276,7 +270,7 @@ static void *from_pool(enum object_t t)
+ 	if (DEPT_WARN_ON(!irqs_disabled()))
+ 		return NULL;
+ 
+-	p = &pool[t];
++	p = &dept_pool[t];
+ 
+ 	/*
+ 	 * Try local pool first.
+@@ -306,7 +300,7 @@ static void *from_pool(enum object_t t)
+ 
+ static void to_pool(void *o, enum object_t t)
  {
- 	struct dept_task *dt = &t->dept_task;
+-	struct dept_pool *p = &pool[t];
++	struct dept_pool *p = &dept_pool[t];
+ 	struct llist_head *h;
+ 
+ 	preempt_disable();
+@@ -1986,7 +1980,7 @@ void dept_map_nocheck(struct dept_map *m)
+ }
+ EXPORT_SYMBOL_GPL(dept_map_nocheck);
+ 
+-static LIST_HEAD(classes);
++LIST_HEAD(dept_classes);
+ 
+ static inline bool within(const void *addr, void *start, unsigned long size)
+ {
+@@ -2013,7 +2007,7 @@ void dept_free_range(void *start, unsigned int sz)
+ 	while (unlikely(!dept_lock()))
+ 		cpu_relax();
+ 
+-	list_for_each_entry_safe(c, n, &classes, all_node) {
++	list_for_each_entry_safe(c, n, &dept_classes, all_node) {
+ 		if (!within((void *)c->key, start, sz) &&
+ 		    !within(c->name, start, sz))
+ 			continue;
+@@ -2082,7 +2076,7 @@ static struct dept_class *check_new_class(struct dept_key *local,
+ 	c->sub = sub;
+ 	c->key = (unsigned long)(k->subkeys + sub);
+ 	hash_add_class(c);
+-	list_add(&c->all_node, &classes);
++	list_add(&c->all_node, &dept_classes);
+ unlock:
+ 	dept_unlock();
+ caching:
+@@ -2537,8 +2531,8 @@ static void migrate_per_cpu_pool(void)
+ 		struct llist_head *from;
+ 		struct llist_head *to;
+ 
+-		from = &pool[i].boot_pool;
+-		to = per_cpu_ptr(pool[i].lpool, boot_cpu);
++		from = &dept_pool[i].boot_pool;
++		to = per_cpu_ptr(dept_pool[i].lpool, boot_cpu);
+ 		move_llist(to, from);
+ 	}
+ }
+diff --git a/kernel/dependency/dept_internal.h b/kernel/dependency/dept_internal.h
+new file mode 100644
+index 0000000..007c1ee
+--- /dev/null
++++ b/kernel/dependency/dept_internal.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Dept(DEPendency Tracker) - runtime dependency tracker internal header
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (c) 2020 LG Electronics, Inc., Byungchul Park
++ */
++
++#ifndef __DEPT_INTERNAL_H
++#define __DEPT_INTERNAL_H
++
++#ifdef CONFIG_DEPT
++
++enum object_t {
++#define OBJECT(id, nr) OBJECT_##id,
++	#include "dept_object.h"
++#undef  OBJECT
++	OBJECT_NR,
++};
++
++extern struct list_head dept_classes;
++extern struct dept_pool dept_pool[];
++
++#endif
++#endif /* __DEPT_INTERNAL_H */
+diff --git a/kernel/dependency/dept_proc.c b/kernel/dependency/dept_proc.c
+new file mode 100644
+index 0000000..c069354
+--- /dev/null
++++ b/kernel/dependency/dept_proc.c
+@@ -0,0 +1,92 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Procfs knobs for Dept(DEPendency Tracker)
++ *
++ * Started by Byungchul Park <max.byungchul.park@gmail.com>:
++ *
++ *  Copyright (C) 2021 LG Electronics, Inc. , Byungchul Park
++ */
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
++#include <linux/dept.h>
++#include "dept_internal.h"
++
++static void *l_next(struct seq_file *m, void *v, loff_t *pos)
++{
++	/*
++	 * XXX: Serialize list traversal if needed. The following might
++	 * give a wrong information on contention.
++	 */
++	return seq_list_next(v, &dept_classes, pos);
++}
++
++static void *l_start(struct seq_file *m, loff_t *pos)
++{
++	/*
++	 * XXX: Serialize list traversal if needed. The following might
++	 * give a wrong information on contention.
++	 */
++	return seq_list_start_head(&dept_classes, *pos);
++}
++
++static void l_stop(struct seq_file *m, void *v)
++{
++}
++
++static int l_show(struct seq_file *m, void *v)
++{
++	struct dept_class *fc = list_entry(v, struct dept_class, all_node);
++	struct dept_dep *d;
++
++	if (v == &dept_classes) {
++		seq_puts(m, "All classes:\n\n");
++		return 0;
++	}
++
++	seq_printf(m, "[%p] %s\n", (void *)fc->key, fc->name);
++
++	/*
++	 * XXX: Serialize list traversal if needed. The following might
++	 * give a wrong information on contention.
++	 */
++	list_for_each_entry(d, &fc->dep_head, dep_node) {
++		struct dept_class *tc = d->wait->class;
++
++		seq_printf(m, " -> [%p] %s\n", (void *)tc->key, tc->name);
++	}
++	seq_puts(m, "\n");
++
++	return 0;
++}
++
++static const struct seq_operations dept_deps_ops = {
++	.start	= l_start,
++	.next	= l_next,
++	.stop	= l_stop,
++	.show	= l_show,
++};
++
++static int dept_stats_show(struct seq_file *m, void *v)
++{
++	int r;
++
++	seq_puts(m, "Availability in the static pools:\n\n");
++#define OBJECT(id, nr)							\
++	r = atomic_read(&dept_pool[OBJECT_##id].obj_nr);		\
++	if (r < 0)							\
++		r = 0;							\
++	seq_printf(m, "%s\t%d/%d(%d%%)\n", #id, r, nr, (r * 100) / (nr));
++	#include "dept_object.h"
++#undef  OBJECT
++
++	return 0;
++}
++
++static int __init dept_proc_init(void)
++{
++	proc_create_seq("dept_deps", S_IRUSR, NULL, &dept_deps_ops);
++	proc_create_single("dept_stats", S_IRUSR, NULL, dept_stats_show);
++	return 0;
++}
++
++__initcall(dept_proc_init);
 -- 
 1.9.1
 
