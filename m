@@ -2,120 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E88FC43217
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 10:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B78CC43217
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 11:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235332AbiB1Ky6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 05:54:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47806 "EHLO
+        id S234814AbiB1LJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 06:09:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235208AbiB1Kyj (ORCPT
+        with ESMTP id S231282AbiB1LJf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 05:54:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7C2BA6E785
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 02:52:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646045527;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IVYeDVfzq28sn8+/lq8Z6rjLomlALnQoJ59O71VHfzQ=;
-        b=URPshq2SWCIAoYuTxiZRsJHg3SgQVwdGohpYrnKouWr1dA5EeKZ7YIaWizqkxbnKQgEzgQ
-        /eU4fpp9BXVMYuAv52kZGFXC750iiRx6fUkfCWXqK9GJugczFDx9NZqlb6ANWRG1/YzRp8
-        D4B8Rce5gePx3okNmhCjIr7tt9UwnW8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-92-q7kWgGG-NKuf4SMC_VkNLg-1; Mon, 28 Feb 2022 05:52:01 -0500
-X-MC-Unique: q7kWgGG-NKuf4SMC_VkNLg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 499E651E0;
-        Mon, 28 Feb 2022 10:52:00 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9241182E57;
-        Mon, 28 Feb 2022 10:51:57 +0000 (UTC)
-Date:   Mon, 28 Feb 2022 10:51:56 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Akihiko Odaki <akihiko.odaki@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] virtio-blk: Assign discard_granularity
-Message-ID: <YhypTNtWpcgh3gb2@stefanha-x1.localdomain>
-References: <20220224093802.11348-1-akihiko.odaki@gmail.com>
+        Mon, 28 Feb 2022 06:09:35 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773B76621A;
+        Mon, 28 Feb 2022 03:08:54 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id p15so23995782ejc.7;
+        Mon, 28 Feb 2022 03:08:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DGHuYFjchXbmgUIZ1SnPPgINXW2r1tGfV7LKxanZ5rw=;
+        b=mx6+xil8F/OwTucWDkjx4s8oWe9qKYEvq+lRSteVfL7qHoHjMYzOaON1c2kL9OYiTX
+         db1Mykp/ffS9il6Fqi76pAlN/G5rXNdswBXj/5Gig3gkxoatbBHPRDADsVd/P2bKgern
+         FiNaHDXHNfiQkUQdDT0QxGTuel99Vo9xYQqWbNfVZEfqWt3+vAZeTOc1QbByn6ecNGa6
+         S2BlhLxmBqy/aCRkfkMxvBR+4RMiFfh+//eOhtERGL+8TdWCfHba+zdrYCDUyKUpjEKv
+         GoJF4WvvVQmT7fMcDismFLp5shdM79FKyOLpnEpulQji7R6fg8Aw9kXLsIi9eJ28dAK+
+         e6Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DGHuYFjchXbmgUIZ1SnPPgINXW2r1tGfV7LKxanZ5rw=;
+        b=1bNDt9DZ9vdL6IeovAr4FC27FUvFi4jnZQZYMMlul2Q01UKNzlHm1z3FwigGBlBL1a
+         espESZaRqFGQyOLnZlQ2VIxqXxwmKG9rNZS5OL8UTCCD2L3zqxeo/o6ooY+au4yLNoUQ
+         xbQ67jdWOaxSIAf/9gXcrfXoHmHrzU9nctvDiuVM2E0MqwD5Uc8e0s/Znij6esRwHHsr
+         tQgLndisNG3XjKntWxlZFqx4/XoJZG0o4ZDlswQwsb9TwRtqiFjX7Ac4hj+yOAY8qDAh
+         EDPMcDy/3thVOQRqa7C/ZVY2quKjLEYSvnTUPxXBZYSZoX3EPTADSk3rkwnlHxo6TpE1
+         LQow==
+X-Gm-Message-State: AOAM532nrmuiJjF1PUmL8f3Xz/7nH2iwYgIfMWvD8fXRM1QYRO2KP3N/
+        5/JZGLThCH30fo87HakgtPA=
+X-Google-Smtp-Source: ABdhPJzNctGRxtGORumk8xJxhLEhhYPBXw3MCY4PM4mZEwTJgQgzAy87Z2fgE8nw5jOtXDmEFeeNlg==
+X-Received: by 2002:a17:906:32d8:b0:6ce:d850:f79 with SMTP id k24-20020a17090632d800b006ced8500f79mr14260258ejk.414.1646046532887;
+        Mon, 28 Feb 2022 03:08:52 -0800 (PST)
+Received: from localhost.localdomain (dhcp-077-250-038-153.chello.nl. [77.250.38.153])
+        by smtp.googlemail.com with ESMTPSA id z22-20020a17090655d600b006d229436793sm4209049ejp.223.2022.02.28.03.08.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Feb 2022 03:08:52 -0800 (PST)
+From:   Jakob Koschel <jakobkoschel@gmail.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jakob Koschel <jakobkoschel@gmail.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergman <arnd@arndb.de>,
+        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "Brian Johannesmeyer" <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sgx@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-usb@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+        bcm-kernel-feedback-list@broadcom.com, linux-tegra@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, kvm@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        v9fs-developer@lists.sourceforge.net,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: [PATCH 0/6] Remove usage of list iterator past the loop body
+Date:   Mon, 28 Feb 2022 12:08:16 +0100
+Message-Id: <20220228110822.491923-1-jakobkoschel@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="o6KFt0EAQYlUHcer"
-Content-Disposition: inline
-In-Reply-To: <20220224093802.11348-1-akihiko.odaki@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This is the first patch removing several categories of use cases of
+the list iterator variable past the loop.
+This is follow up to the discussion in:
+https://lore.kernel.org/all/20220217184829.1991035-1-jakobkoschel@gmail.com/
 
---o6KFt0EAQYlUHcer
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+As concluded in:
+https://lore.kernel.org/all/YhdfEIwI4EdtHdym@kroah.com/
+the correct use should be using a separate variable after the loop
+and using a 'tmp' variable as the list iterator.
+The list iterator will not point to a valid structure after the loop
+if no break/goto was hit. Invalid uses of the list iterator variable
+can be avoided altogether by simply using a separate pointer to
+iterate the list.
 
-On Thu, Feb 24, 2022 at 06:38:02PM +0900, Akihiko Odaki wrote:
-> Virtual I/O Device (VIRTIO) Version 1.1
-> https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd0=
-1.html
-> > discard_sector_alignment can be used by OS when splitting a request
-> > based on alignment.
->=20
-> According to Documentation/ABI/stable/sysfs-block, the corresponding
-> field in the kernel is, confusingly, discard_granularity, not
-> discard_alignment.
+Linus and Greg agreed on the following pattern:
 
-Good catch, struct virtio_blk_config->discard_sector_alignment is Linux
-q->limits.discard_granularity.
+-	struct gr_request *req;
++	struct gr_request *req = NULL;
++	struct gr_request *tmp;
+	struct gr_ep *ep;
+	int ret = 0;
 
->=20
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@gmail.com>
-> ---
->  drivers/block/virtio_blk.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index c443cd64fc9b..1fb3c89900e3 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -913,11 +913,9 @@ static int virtblk_probe(struct virtio_device *vdev)
->  		blk_queue_io_opt(q, blk_size * opt_io_size);
-> =20
->  	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
-> -		q->limits.discard_granularity =3D blk_size;
-> -
->  		virtio_cread(vdev, struct virtio_blk_config,
->  			     discard_sector_alignment, &v);
-> -		q->limits.discard_alignment =3D v ? v << SECTOR_SHIFT : 0;
+-	list_for_each_entry(req, &ep->queue, queue) {
+-		if (&req->req == _req)
++	list_for_each_entry(tmp, &ep->queue, queue) {
++		if (&tmp->req == _req) {
++			req = tmp;
+			break;
++		}
+	}
+-	if (&req->req != _req) {
++	if (!req) {
+		ret = -EINVAL;
+		goto out;
+	}
 
-Should we use struct virtio_blk_config->topology.alignment_offset
-("offset of first aligned logical block" and used for Linux
-blk_queue_alignment_offset()) for q->limits.discard_alignment?
 
---o6KFt0EAQYlUHcer
-Content-Type: application/pgp-signature; name="signature.asc"
+With gnu89 the list iterator variable cannot yet be declared
+within the for loop of the list iterator.
+Moving to a more modern version of C would allow defining
+the list iterator variable within the macro, limiting
+the scope to the loop.
+This avoids any incorrect usage past the loop altogether.
 
------BEGIN PGP SIGNATURE-----
+This are around 30% of the cases where the iterator
+variable is used past the loop (identified with a slightly
+modified version of use_after_iter.cocci).
+I've decided to split it into at a few patches separated
+by similar use cases.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIcqUsACgkQnKSrs4Gr
-c8gvvgf8CUBI66KzLI88mzNHI2Vrynk7iPeOE+nt95l0+w7br24PncTRvUQCHPko
-u1d/0UZcCsOAG9cW5CSwRRQedrVbCrhNaJm6KywnghK/41SCcMHDJEAwQNyX9GCy
-FvmYghT9oHxhkucTD91oVuD0Sk714G2ikPNleZmijh/+kn224gCy1eP/3/S/KWGr
-/edZF24TIDpujQNdR9emr+UF7eLoWBC3n/ldoDVU+fmgXaCIT2DjZXbsqiu6Cjir
-ytI7KakJsyjFuWMXTSEIg9RKV0GRJTj/YYLspFMNEDZGv2ikaMatl/MNxDNpDvln
-+bylNvU54z5CWo7wObRdwWmybWOTzw==
-=Ldv1
------END PGP SIGNATURE-----
+Because the output of get_maintainer.pl was too big,
+I included all the found lists and everyone from the
+previous discussion.
 
---o6KFt0EAQYlUHcer--
+Jakob Koschel (6):
+  drivers: usb: remove usage of list iterator past the loop body
+  treewide: remove using list iterator after loop body as a ptr
+  treewide: fix incorrect use to determine if list is empty
+  drivers: remove unnecessary use of list iterator variable
+  treewide: remove dereference of list iterator after loop body
+  treewide: remove check of list iterator against head past the loop
+    body
 
+ arch/arm/mach-mmp/sram.c                      |  9 ++--
+ arch/arm/plat-pxa/ssp.c                       | 28 +++++-------
+ arch/powerpc/sysdev/fsl_gtm.c                 |  4 +-
+ arch/x86/kernel/cpu/sgx/encl.c                |  6 ++-
+ drivers/block/drbd/drbd_req.c                 | 45 ++++++++++++-------
+ drivers/counter/counter-chrdev.c              | 26 ++++++-----
+ drivers/crypto/cavium/nitrox/nitrox_main.c    | 11 +++--
+ drivers/dma/dw-edma/dw-edma-core.c            |  4 +-
+ drivers/dma/ppc4xx/adma.c                     | 11 +++--
+ drivers/firewire/core-transaction.c           | 32 +++++++------
+ drivers/firewire/sbp2.c                       | 14 +++---
+ drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c        | 19 +++++---
+ drivers/gpu/drm/drm_memory.c                  | 15 ++++---
+ drivers/gpu/drm/drm_mm.c                      | 17 ++++---
+ drivers/gpu/drm/drm_vm.c                      | 13 +++---
+ drivers/gpu/drm/gma500/oaktrail_lvds.c        |  9 ++--
+ drivers/gpu/drm/i915/gem/i915_gem_context.c   | 14 +++---
+ .../gpu/drm/i915/gem/i915_gem_execbuffer.c    | 15 ++++---
+ drivers/gpu/drm/i915/gt/intel_ring.c          | 15 ++++---
+ .../gpu/drm/nouveau/nvkm/subdev/clk/base.c    | 11 +++--
+ .../gpu/drm/nouveau/nvkm/subdev/fb/ramgk104.c | 13 +++---
+ drivers/gpu/drm/scheduler/sched_main.c        | 14 +++---
+ drivers/gpu/drm/ttm/ttm_bo.c                  | 19 ++++----
+ drivers/gpu/drm/vmwgfx/vmwgfx_kms.c           | 22 +++++----
+ drivers/infiniband/hw/hfi1/tid_rdma.c         | 16 ++++---
+ drivers/infiniband/hw/mlx4/main.c             | 12 ++---
+ drivers/media/dvb-frontends/mxl5xx.c          | 11 +++--
+ drivers/media/pci/saa7134/saa7134-alsa.c      |  4 +-
+ drivers/media/v4l2-core/v4l2-ctrls-api.c      | 31 +++++++------
+ drivers/misc/mei/interrupt.c                  | 12 ++---
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |  3 +-
+ .../net/ethernet/qlogic/qede/qede_filter.c    | 11 +++--
+ drivers/net/wireless/ath/ath6kl/htc_mbox.c    |  2 +-
+ .../net/wireless/intel/ipw2x00/libipw_rx.c    | 15 ++++---
+ drivers/perf/xgene_pmu.c                      | 13 +++---
+ drivers/power/supply/cpcap-battery.c          | 11 +++--
+ drivers/scsi/lpfc/lpfc_bsg.c                  | 16 ++++---
+ drivers/scsi/scsi_transport_sas.c             | 17 ++++---
+ drivers/scsi/wd719x.c                         | 12 +++--
+ drivers/staging/rtl8192e/rtl819x_TSProc.c     | 17 +++----
+ drivers/staging/rtl8192e/rtllib_rx.c          | 17 ++++---
+ .../staging/rtl8192u/ieee80211/ieee80211_rx.c | 15 ++++---
+ .../rtl8192u/ieee80211/rtl819x_TSProc.c       | 19 ++++----
+ drivers/thermal/thermal_core.c                | 38 ++++++++++------
+ drivers/usb/gadget/composite.c                |  9 ++--
+ drivers/usb/gadget/configfs.c                 | 22 +++++----
+ drivers/usb/gadget/udc/aspeed-vhub/epn.c      | 11 +++--
+ drivers/usb/gadget/udc/at91_udc.c             | 26 ++++++-----
+ drivers/usb/gadget/udc/atmel_usba_udc.c       | 11 +++--
+ drivers/usb/gadget/udc/bdc/bdc_ep.c           | 11 +++--
+ drivers/usb/gadget/udc/fsl_qe_udc.c           | 11 +++--
+ drivers/usb/gadget/udc/fsl_udc_core.c         | 11 +++--
+ drivers/usb/gadget/udc/goku_udc.c             | 11 +++--
+ drivers/usb/gadget/udc/gr_udc.c               | 11 +++--
+ drivers/usb/gadget/udc/lpc32xx_udc.c          | 11 +++--
+ drivers/usb/gadget/udc/max3420_udc.c          | 11 +++--
+ drivers/usb/gadget/udc/mv_u3d_core.c          | 11 +++--
+ drivers/usb/gadget/udc/mv_udc_core.c          | 11 +++--
+ drivers/usb/gadget/udc/net2272.c              | 12 ++---
+ drivers/usb/gadget/udc/net2280.c              | 11 +++--
+ drivers/usb/gadget/udc/omap_udc.c             | 11 +++--
+ drivers/usb/gadget/udc/pxa25x_udc.c           | 11 +++--
+ drivers/usb/gadget/udc/s3c-hsudc.c            | 11 +++--
+ drivers/usb/gadget/udc/tegra-xudc.c           | 11 +++--
+ drivers/usb/gadget/udc/udc-xilinx.c           | 11 +++--
+ drivers/usb/mtu3/mtu3_gadget.c                | 11 +++--
+ drivers/usb/musb/musb_gadget.c                | 11 +++--
+ drivers/vfio/mdev/mdev_core.c                 | 11 +++--
+ fs/cifs/smb2misc.c                            | 10 +++--
+ fs/f2fs/segment.c                             |  9 ++--
+ fs/proc/kcore.c                               | 13 +++---
+ kernel/debug/kdb/kdb_main.c                   | 36 +++++++++------
+ kernel/power/snapshot.c                       | 10 +++--
+ kernel/trace/ftrace.c                         | 22 +++++----
+ kernel/trace/trace_eprobe.c                   | 15 ++++---
+ kernel/trace/trace_events.c                   | 11 ++---
+ net/9p/trans_xen.c                            | 11 +++--
+ net/ipv4/udp_tunnel_nic.c                     | 10 +++--
+ net/tipc/name_table.c                         | 11 +++--
+ net/tipc/socket.c                             | 11 +++--
+ net/xfrm/xfrm_ipcomp.c                        | 11 +++--
+ sound/soc/intel/catpt/pcm.c                   | 13 +++---
+ sound/soc/sprd/sprd-mcdt.c                    | 13 +++---
+ 83 files changed, 708 insertions(+), 465 deletions(-)
+
+
+base-commit: 7ee022567bf9e2e0b3cd92461a2f4986ecc99673
+--
+2.25.1
